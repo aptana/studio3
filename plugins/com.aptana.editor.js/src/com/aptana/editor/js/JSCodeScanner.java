@@ -51,6 +51,7 @@ import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.common.text.rules.WordDetector;
 import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.editor.js.parsing.lexer.JSTokenType;
 
 /**
  * @author Kevin Lindsey
@@ -187,25 +188,25 @@ public class JSCodeScanner extends RuleBasedScanner
 
 		// Converted word rules
 		WordRule wordRule = new WordRule(new LettersAndDigitsWordDetector(), Token.UNDEFINED);
-		addWordRules(wordRule, createToken("keyword.operator.js"), KEYWORD_OPERATORS); //$NON-NLS-1$
-		addWordRules(wordRule, createToken("support.function.js"), SUPPORT_FUNCTIONS); //$NON-NLS-1$
-		addWordRules(wordRule, createToken("support.function.event-handler.js"), EVENT_HANDLER_FUNCTIONS); //$NON-NLS-1$
-		addWordRules(wordRule, createToken("support.function.dom.js"), DOM_FUNCTIONS); //$NON-NLS-1$
+		addWordRules(wordRule, createToken(JSTokenType.KEYWORD), KEYWORD_OPERATORS); //$NON-NLS-1$
+		addWordRules(wordRule, createToken(JSTokenType.SUPPORT_FUNCTION), SUPPORT_FUNCTIONS); //$NON-NLS-1$
+		addWordRules(wordRule, createToken(JSTokenType.EVENT_HANDLER_FUNCTION), EVENT_HANDLER_FUNCTIONS); //$NON-NLS-1$
+		addWordRules(wordRule, createToken(JSTokenType.DOM_FUNCTION), DOM_FUNCTIONS); //$NON-NLS-1$
 		rules.add(wordRule);
 
 		// Functions where we need period to begin it
 		wordRule = new WordRule(new FunctionCallDetector(), Token.UNDEFINED);
-		addWordRules(wordRule, createToken("support.function.js.firebug"), FIREBUG_FUNCTIONS); //$NON-NLS-1$
+		addWordRules(wordRule, createToken(JSTokenType.FIREBUG_FUNCTION), FIREBUG_FUNCTIONS); //$NON-NLS-1$
 		rules.add(wordRule);
 
 		// Operators
 		wordRule = new WordRule(new OperatorDetector(), Token.UNDEFINED);
-		addWordRules(wordRule, createToken("keyword.operator.js"), OPERATORS); //$NON-NLS-1$
+		addWordRules(wordRule, createToken(JSTokenType.OPERATOR), OPERATORS); //$NON-NLS-1$
 		rules.add(wordRule);
 
 		for (char operator : SINGLE_CHARACTER_OPERATORS)
 		{
-			rules.add(new SingleCharacterRule(operator, createToken("keyword.operator.js"))); //$NON-NLS-1$
+			rules.add(new SingleCharacterRule(operator, createToken(JSTokenType.KEYWORD))); //$NON-NLS-1$
 		}
 
 		// TODO Turn these next two rules into word rules using the FunctionCallDetector word rule list
@@ -214,53 +215,58 @@ public class JSCodeScanner extends RuleBasedScanner
 		rules
 				.add(new RegexpRule(
 						"\\.(s(ystemLanguage|cr(ipts|ollbars|een(X|Y|Top|Left))|t(yle(Sheets)?|atus(Text|bar)?)|ibling(Below|Above)|ource|uffixes|e(curity(Policy)?|l(ection|f)))|h(istory|ost(name)?|as(h|Focus))|y|X(MLDocument|SLDocument)|n(ext|ame(space(s|URI)|Prop))|M(IN_VALUE|AX_VALUE)|c(haracterSet|o(n(structor|trollers)|okieEnabled|lorDepth|mp(onents|lete))|urrent|puClass|l(i(p(boardData)?|entInformation)|osed|asses)|alle(e|r)|rypto)|t(o(olbar|p)|ext(Transform|Indent|Decoration|Align)|ags)|SQRT(1_2|2)|i(n(ner(Height|Width)|put)|ds|gnoreCase)|zIndex|o(scpu|n(readystatechange|Line)|uter(Height|Width)|p(sProfile|ener)|ffscreenBuffering)|NEGATIVE_INFINITY|d(i(splay|alog(Height|Top|Width|Left|Arguments)|rectories)|e(scription|fault(Status|Ch(ecked|arset)|View)))|u(ser(Profile|Language|Agent)|n(iqueID|defined)|pdateInterval)|_content|p(ixelDepth|ort|ersonalbar|kcs11|l(ugins|atform)|a(thname|dding(Right|Bottom|Top|Left)|rent(Window|Layer)?|ge(X(Offset)?|Y(Offset)?))|r(o(to(col|type)|duct(Sub)?|mpter)|e(vious|fix)))|e(n(coding|abledPlugin)|x(ternal|pando)|mbeds)|v(isibility|endor(Sub)?|Linkcolor)|URLUnencoded|P(I|OSITIVE_INFINITY)|f(ilename|o(nt(Size|Family|Weight)|rmName)|rame(s|Element)|gColor)|E|whiteSpace|l(i(stStyleType|n(eHeight|kColor))|o(ca(tion(bar)?|lName)|wsrc)|e(ngth|ft(Context)?)|a(st(M(odified|atch)|Index|Paren)|yer(s|X)|nguage))|a(pp(MinorVersion|Name|Co(deName|re)|Version)|vail(Height|Top|Width|Left)|ll|r(ity|guments)|Linkcolor|bove)|r(ight(Context)?|e(sponse(XML|Text)|adyState))|global|x|m(imeTypes|ultiline|enubar|argin(Right|Bottom|Top|Left))|L(N(10|2)|OG(10E|2E))|b(o(ttom|rder(RightWidth|BottomWidth|Style|Color|TopWidth|LeftWidth))|ufferDepth|elow|ackground(Color|Image)))\\b", //$NON-NLS-1$
-						createToken("support.constant.js"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
+						createToken(JSTokenType.SUPPORT_CONSTANT), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
 		// FIXME This rule shouldn't actually match the leading period, but we have no way to capture just the rest as
 		// the token
 		rules
 				.add(new RegexpRule(
 						"\\.(s(hape|ystemId|c(heme|ope|rolling)|ta(ndby|rt)|ize|ummary|pecified|e(ctionRowIndex|lected(Index)?)|rc)|h(space|t(tpEquiv|mlFor)|e(ight|aders)|ref(lang)?)|n(o(Resize|tation(s|Name)|Shade|Href|de(Name|Type|Value)|Wrap)|extSibling|ame)|c(h(ildNodes|Off|ecked|arset)?|ite|o(ntent|o(kie|rds)|de(Base|Type)?|l(s|Span|or)|mpact)|ell(s|Spacing|Padding)|l(ear|assName)|aption)|t(ype|Bodies|itle|Head|ext|a(rget|gName)|Foot)|i(sMap|ndex|d|m(plementation|ages))|o(ptions|wnerDocument|bject)|d(i(sabled|r)|o(c(type|umentElement)|main)|e(clare|f(er|ault(Selected|Checked|Value)))|at(eTime|a))|useMap|p(ublicId|arentNode|r(o(file|mpt)|eviousSibling))|e(n(ctype|tities)|vent|lements)|v(space|ersion|alue(Type)?|Link|Align)|URL|f(irstChild|orm(s)?|ace|rame(Border)?)|width|l(ink(s)?|o(ngDesc|wSrc)|a(stChild|ng|bel))|a(nchors|c(ce(ssKey|pt(Charset)?)|tion)|ttributes|pplets|l(t|ign)|r(chive|eas)|xis|Link|bbr)|r(ow(s|Span|Index)|ules|e(v|ferrer|l|adOnly))|m(ultiple|e(thod|dia)|a(rgin(Height|Width)|xLength))|b(o(dy|rder)|ackground|gColor))\\b", //$NON-NLS-1$
-						createToken("support.constant.dom.js"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
+						createToken(JSTokenType.DOM_CONSTANTS), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
 
 		// Add word rule for keywords, types, and constants.
-		wordRule = new WordRule(new WordDetector(), createToken("source.js")); //$NON-NLS-1$
-		addWordRules(wordRule, createToken("keyword.control.js"), KEYWORD_CONTROL); //$NON-NLS-1$
-		addWordRules(wordRule, createToken("keyword.control.js"), KEYWORD_CONTROL_FUTURE); //$NON-NLS-1$
-		addWordRules(wordRule, createToken("storage.type.js"), STORAGE_TYPES); //$NON-NLS-1$
-		addWordRules(wordRule, createToken("storage.modifier.js"), STORAGE_MODIFIERS); //$NON-NLS-1$
-		addWordRules(wordRule, createToken("support.class.js"), SUPPORT_CLASSES); //$NON-NLS-1$
-		addWordRules(wordRule, createToken("support.constant.dom.js"), SUPPORT_DOM_CONSTANTS); //$NON-NLS-1$
-		wordRule.addWord("true", createToken("constant.language.boolean.true.js")); //$NON-NLS-1$ //$NON-NLS-2$
-		wordRule.addWord("false", createToken("constant.language.boolean.false.js")); //$NON-NLS-1$ //$NON-NLS-2$
-		wordRule.addWord("null", createToken("constant.language.null.js")); //$NON-NLS-1$ //$NON-NLS-2$
-		wordRule.addWord("Infinity", createToken("constant.language.js")); //$NON-NLS-1$ //$NON-NLS-2$
-		wordRule.addWord("NaN", createToken("constant.language.js")); //$NON-NLS-1$ //$NON-NLS-2$
-		wordRule.addWord("undefined", createToken("constant.language.js")); //$NON-NLS-1$ //$NON-NLS-2$
-		wordRule.addWord("super", createToken("variable.language.js")); //$NON-NLS-1$ //$NON-NLS-2$
-		wordRule.addWord("this", createToken("variable.language.js")); //$NON-NLS-1$ //$NON-NLS-2$
-		wordRule.addWord("debugger", createToken("keyword.other.js")); //$NON-NLS-1$ //$NON-NLS-2$
+		wordRule = new WordRule(new WordDetector(), createToken(JSTokenType.SOURCE)); //$NON-NLS-1$
+		addWordRules(wordRule, createToken(JSTokenType.CONTROL_KEYWORD), KEYWORD_CONTROL); //$NON-NLS-1$
+		addWordRules(wordRule, createToken(JSTokenType.CONTROL_KEYWORD), KEYWORD_CONTROL_FUTURE); //$NON-NLS-1$
+		addWordRules(wordRule, createToken(JSTokenType.STORAGE_TYPE), STORAGE_TYPES); //$NON-NLS-1$
+		addWordRules(wordRule, createToken(JSTokenType.STORAGE_MODIFIER), STORAGE_MODIFIERS); //$NON-NLS-1$
+		addWordRules(wordRule, createToken(JSTokenType.SUPPORT_CLASS), SUPPORT_CLASSES); //$NON-NLS-1$
+		addWordRules(wordRule, createToken(JSTokenType.SUPPORT_DOM_CONSTANT), SUPPORT_DOM_CONSTANTS); //$NON-NLS-1$
+		wordRule.addWord("true", createToken(JSTokenType.TRUE)); //$NON-NLS-1$ //$NON-NLS-2$
+		wordRule.addWord("false", createToken(JSTokenType.FALSE)); //$NON-NLS-1$ //$NON-NLS-2$
+		wordRule.addWord("null", createToken(JSTokenType.NULL)); //$NON-NLS-1$ //$NON-NLS-2$
+		wordRule.addWord("Infinity", createToken(JSTokenType.CONSTANT)); //$NON-NLS-1$ //$NON-NLS-2$
+		wordRule.addWord("NaN", createToken(JSTokenType.CONSTANT)); //$NON-NLS-1$ //$NON-NLS-2$
+		wordRule.addWord("undefined", createToken(JSTokenType.CONSTANT)); //$NON-NLS-1$ //$NON-NLS-2$
+		wordRule.addWord("super", createToken(JSTokenType.VARIABLE)); //$NON-NLS-1$ //$NON-NLS-2$
+		wordRule.addWord("this", createToken(JSTokenType.VARIABLE)); //$NON-NLS-1$ //$NON-NLS-2$
+		wordRule.addWord("debugger", createToken(JSTokenType.OTHER_KEYWORD)); //$NON-NLS-1$ //$NON-NLS-2$
 		rules.add(wordRule);
 
 		// Punctuation
-		rules.add(new SingleCharacterRule(';', createToken("punctuation.terminator.statement.js"))); //$NON-NLS-1$
-		rules.add(new SingleCharacterRule('(', createToken("meta.brace.round.js"))); //$NON-NLS-1$
-		rules.add(new SingleCharacterRule(')', createToken("meta.brace.round.js"))); //$NON-NLS-1$
-		rules.add(new SingleCharacterRule('[', createToken("meta.brace.square.js"))); //$NON-NLS-1$
-		rules.add(new SingleCharacterRule(']', createToken("meta.brace.square.js"))); //$NON-NLS-1$
-		rules.add(new SingleCharacterRule('{', createToken("meta.brace.curly.js"))); //$NON-NLS-1$
-		rules.add(new SingleCharacterRule('}', createToken("meta.brace.curly.js"))); //$NON-NLS-1$
-		rules.add(new SingleCharacterRule(',', createToken("meta.delimiter.object.comma.js"))); //$NON-NLS-1$
+		rules.add(new SingleCharacterRule(';', createToken(JSTokenType.SEMICOLON))); //$NON-NLS-1$
+		rules.add(new SingleCharacterRule('(', createToken(JSTokenType.PARENTHESIS))); //$NON-NLS-1$
+		rules.add(new SingleCharacterRule(')', createToken(JSTokenType.PARENTHESIS))); //$NON-NLS-1$
+		rules.add(new SingleCharacterRule('[', createToken(JSTokenType.BRACKET))); //$NON-NLS-1$
+		rules.add(new SingleCharacterRule(']', createToken(JSTokenType.BRACKET))); //$NON-NLS-1$
+		rules.add(new SingleCharacterRule('{', createToken(JSTokenType.CURLY_BRACE))); //$NON-NLS-1$
+		rules.add(new SingleCharacterRule('}', createToken(JSTokenType.CURLY_BRACE))); //$NON-NLS-1$
+		rules.add(new SingleCharacterRule(',', createToken(JSTokenType.COMMA))); //$NON-NLS-1$
 
 		// Numbers
 		rules.add(new RegexpRule("\\b((0(x|X)[0-9a-fA-F]+)|([0-9]+(\\.[0-9]+)?))\\b", //$NON-NLS-1$
-				createToken("constant.numeric.js"))); //$NON-NLS-1$
+				createToken(JSTokenType.NUMBER))); //$NON-NLS-1$
 
 		// identifiers
-		rules.add(new RegexpRule("[_a-zA-Z0-9$]+", createToken("source.js"), true)); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new RegexpRule("[_a-zA-Z0-9$]+", createToken(JSTokenType.SOURCE), true)); //$NON-NLS-1$ //$NON-NLS-2$
 
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}
 
+	protected IToken createToken(JSTokenType type)
+	{
+		return this.createToken(type.getScope());
+	}
+	
 	protected IToken createToken(String string)
 	{
 		return getThemeManager().getToken(string);

@@ -34,18 +34,24 @@
  */
 package com.aptana.editor.common.outline;
 
+import java.net.URI;
+
+import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
+ * interface allowing clients to access source basing abstract absolute or relative path
  * @author Pavel Petrochenko
- * interface allowing clients to access source basing abstract absolute or 
- * relative path 
+ * @author Chris Williams
  */
 public interface IPathResolver
-{	
+{
 	/**
 	 * @param path
+	 * @param monitor
 	 * @return
-	 * @throws Exception 
+	 * @throws Exception
 	 */
-	String resolveSource(String path) throws Exception;
+	String resolveSource(String path, IProgressMonitor monitor) throws Exception;
+	
+	URI resolveURI(String path);
 }

@@ -32,5 +32,11 @@
             class="com.aptana.editor.js.preferences.PreferenceInitializer">
       </initializer>
    </extension>
+   <extension
+         point="com.aptana.index.core.fileIndexingParticipants">
+      <fileIndexingParticipant
+            class="com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant">
+      </fileIndexingParticipant>
+   </extension>
 
 </plugin>

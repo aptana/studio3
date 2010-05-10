@@ -44,7 +44,6 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.ITextDoubleClickStrategy;
-import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.formatter.IContentFormatter;
@@ -55,36 +54,78 @@ import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationHover;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 
+import com.aptana.editor.common.contentassist.ContentAssistant;
+import com.aptana.editor.common.contentassist.HTMLTextPresenter;
+import com.aptana.editor.common.contentassist.InformationControl;
 import com.aptana.editor.common.hover.CommonAnnotationHover;
-import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.text.CommonDoubleClickStrategy;
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
 import com.aptana.editor.common.text.reconciler.CommonCompositeReconcilingStrategy;
 import com.aptana.editor.common.text.reconciler.CommonReconciler;
 
-public abstract class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration implements
-		ITopContentTypesProvider
+public abstract class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration implements ITopContentTypesProvider
 {
-
 	private AbstractThemeableEditor fTextEditor;
 	private CommonDoubleClickStrategy fDoubleClickStrategy;
 
+	/**
+	 * CommonSourceViewerConfiguration
+	 * 
+	 * @param preferenceStore
+	 * @param editor
+	 */
 	public CommonSourceViewerConfiguration(IPreferenceStore preferenceStore, AbstractThemeableEditor editor)
 	{
 		super(preferenceStore);
+		
 		fTextEditor = editor;
 	}
 
+	/**
+	 * getAbstractThemeableEditor
+	 * 
+	 * @return
+	 */
+	protected AbstractThemeableEditor getAbstractThemeableEditor()
+	{
+		return fTextEditor;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getAnnotationHover(org.eclipse.jface.text.source.ISourceViewer)
+	 */
+	@Override
+	public IAnnotationHover getAnnotationHover(ISourceViewer sourceViewer)
+	{
+		return new CommonAnnotationHover(false)
+		{
+			protected boolean isIncluded(Annotation annotation)
+			{
+				return isShowInVerticalRuler(annotation);
+			}
+		};
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getAutoEditStrategies(org.eclipse.jface.text.source.ISourceViewer, java.lang.String)
+	 */
 	@Override
 	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
 	{
 		return new IAutoEditStrategy[] { new RubyRegexpAutoIndentStrategy(contentType, this, sourceViewer) };
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getContentAssistant(org.eclipse.jface.text.source.ISourceViewer)
+	 */
 	@Override
 	public IContentAssistant getContentAssistant(ISourceViewer sourceViewer)
 	{
@@ -93,10 +134,11 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		assistant.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
 
 		String[] contentTypes = getConfiguredContentTypes(sourceViewer);
-		IContentAssistProcessor processor;
+		
 		for (String type : contentTypes)
 		{
-			processor = getContentAssistProcessor(sourceViewer, type);
+			IContentAssistProcessor processor = getContentAssistProcessor(sourceViewer, type);
+			
 			if (processor != null)
 			{
 				assistant.setContentAssistProcessor(processor, type);
@@ -104,120 +146,18 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		}
 
 		assistant.setInformationControlCreator(getInformationControlCreator(sourceViewer));
+		
 		if (fPreferenceStore != null)
 		{
-			assistant.enableAutoActivation(fPreferenceStore
-					.getBoolean(IPreferenceConstants.CONTENT_ASSIST_AUTO_ACTIVATION));
-			assistant.setAutoActivationDelay(fPreferenceStore.getInt(IPreferenceConstants.CONTENT_ASSIST_DELAY));
+//			assistant.enableAutoActivation(fPreferenceStore.getBoolean(IPreferenceConstants.CONTENT_ASSIST_AUTO_ACTIVATION));
+//			assistant.setAutoActivationDelay(fPreferenceStore.getInt(IPreferenceConstants.CONTENT_ASSIST_DELAY));
+			assistant.enableAutoActivation(true);
+			assistant.setAutoActivationDelay(200);
 		}
+		
 		assistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
 
 		return assistant;
-	}
-
-	@Override
-	public IContentFormatter getContentFormatter(ISourceViewer sourceViewer)
-	{
-		MultiPassContentFormatter formatter = new MultiPassContentFormatter(
-				getConfiguredDocumentPartitioning(sourceViewer), IDocument.DEFAULT_CONTENT_TYPE);
-		return formatter;
-	}
-
-	@Override
-	public IAnnotationHover getAnnotationHover(ISourceViewer sourceViewer)
-	{
-		return new CommonAnnotationHover(false)
-		{
-
-			protected boolean isIncluded(Annotation annotation)
-			{
-				return isShowInVerticalRuler(annotation);
-			}
-		};
-	}
-
-	@Override
-	public IAnnotationHover getOverviewRulerAnnotationHover(ISourceViewer sourceViewer)
-	{
-		return new CommonAnnotationHover(true)
-		{
-
-			protected boolean isIncluded(Annotation annotation)
-			{
-				return isShowInOverviewRuler(annotation);
-			}
-		};
-	}
-
-	@Override
-	public IInformationControlCreator getInformationControlCreator(ISourceViewer sourceViewer)
-	{
-		return new IInformationControlCreator()
-		{
-
-			public IInformationControl createInformationControl(Shell parent)
-			{
-				return new DefaultInformationControl(parent, false);
-			}
-		};
-	}
-
-	@Override
-	public IInformationPresenter getInformationPresenter(ISourceViewer sourceViewer)
-	{
-		InformationPresenter presenter = new InformationPresenter(getInformationPresenterControlCreator(sourceViewer));
-
-		presenter.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
-		presenter.setSizeConstraints(60, 10, true, true);
-
-		return presenter;
-	}
-
-	@Override
-	public IReconciler getReconciler(ISourceViewer sourceViewer)
-	{
-		if (fTextEditor != null && fTextEditor.isEditable())
-		{
-			CommonCompositeReconcilingStrategy strategy = new CommonCompositeReconcilingStrategy(fTextEditor,
-					getConfiguredDocumentPartitioning(sourceViewer));
-			CommonReconciler reconciler = new CommonReconciler(fTextEditor, strategy, false);
-			reconciler.setIsIncrementalReconciler(false);
-			reconciler.setIsAllowedToModifyDocument(false);
-			reconciler.setProgressMonitor(new NullProgressMonitor());
-			reconciler.setDelay(500);
-
-			return reconciler;
-		}
-		return null;
-	}
-
-	/**
-	 * @return the default indentation string (either tab or spaces which represents a tab)
-	 */
-	public String getIndent()
-	{
-		boolean useSpaces = fPreferenceStore
-				.getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
-		if (useSpaces)
-		{
-			int tabWidth = fPreferenceStore.getInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
-			StringBuilder buf = new StringBuilder();
-			for (int i = 0; i < tabWidth; ++i)
-			{
-				buf.append(" "); //$NON-NLS-1$
-			}
-			return buf.toString();
-		}
-		return "\t"; //$NON-NLS-1$
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	protected Map getHyperlinkDetectorTargets(ISourceViewer sourceViewer)
-	{
-		Map targets = super.getHyperlinkDetectorTargets(sourceViewer);
-		targets.put("com.aptana.editor.ui.hyperlinkTarget", fTextEditor); //$NON-NLS-1$
-		return targets;
 	}
 
 	/**
@@ -232,21 +172,25 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	 */
 	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
 	{
-		return null;
+		return new CommonContentAssistProcessor(getAbstractThemeableEditor());
 	}
 
-	private IInformationControlCreator getInformationPresenterControlCreator(ISourceViewer sourceViewer)
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getContentFormatter(org.eclipse.jface.text.source.ISourceViewer)
+	 */
+	@Override
+	public IContentFormatter getContentFormatter(ISourceViewer sourceViewer)
 	{
-		return new IInformationControlCreator()
-		{
-
-			public IInformationControl createInformationControl(Shell parent)
-			{
-				return new DefaultInformationControl(parent, true);
-			}
-		};
+		return new MultiPassContentFormatter(getConfiguredDocumentPartitioning(sourceViewer), IDocument.DEFAULT_CONTENT_TYPE);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getDoubleClickStrategy(org.eclipse.jface.text.source.
+	 * ISourceViewer, java.lang.String)
+	 */
 	@Override
 	public ITextDoubleClickStrategy getDoubleClickStrategy(ISourceViewer sourceViewer, String contentType)
 	{
@@ -254,6 +198,138 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		{
 			fDoubleClickStrategy = new CommonDoubleClickStrategy();
 		}
+
 		return fDoubleClickStrategy;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getHyperlinkDetectorTargets(org.eclipse.jface.text.source.ISourceViewer)
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	protected Map getHyperlinkDetectorTargets(ISourceViewer sourceViewer)
+	{
+		Map targets = super.getHyperlinkDetectorTargets(sourceViewer);
+		
+		targets.put("com.aptana.editor.ui.hyperlinkTarget", fTextEditor); //$NON-NLS-1$
+		
+		return targets;
+	}
+
+	/**
+	 * @return the default indentation string (either tab or spaces which represents a tab)
+	 */
+	public String getIndent()
+	{
+		boolean useSpaces = fPreferenceStore.getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
+		
+		if (useSpaces)
+		{
+			int tabWidth = fPreferenceStore.getInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
+			StringBuilder buf = new StringBuilder();
+			
+			for (int i = 0; i < tabWidth; ++i)
+			{
+				buf.append(" "); //$NON-NLS-1$
+			}
+			
+			return buf.toString();
+		}
+		
+		return "\t"; //$NON-NLS-1$
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getInformationControlCreator(org.eclipse.jface.text.source.ISourceViewer)
+	 */
+	@Override
+	public IInformationControlCreator getInformationControlCreator(ISourceViewer sourceViewer)
+	{
+		return new IInformationControlCreator()
+		{
+			public IInformationControl createInformationControl(Shell parent)
+			{
+				//return new DefaultInformationControl(parent, false);
+				return new InformationControl(parent, SWT.NONE, new HTMLTextPresenter(false));
+			}
+		};
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getInformationPresenter(org.eclipse.jface.text.source.ISourceViewer)
+	 */
+	@Override
+	public IInformationPresenter getInformationPresenter(ISourceViewer sourceViewer)
+	{
+		InformationPresenter presenter = new InformationPresenter(getInformationPresenterControlCreator(sourceViewer));
+
+		presenter.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
+		presenter.setSizeConstraints(60, 10, true, true);
+
+		return presenter;
+	}
+
+	/**
+	 * getInformationPresenterControlCreator
+	 * 
+	 * @param sourceViewer
+	 * @return
+	 */
+	private IInformationControlCreator getInformationPresenterControlCreator(ISourceViewer sourceViewer)
+	{
+		return new IInformationControlCreator()
+		{
+			public IInformationControl createInformationControl(Shell parent)
+			{
+				return new DefaultInformationControl(parent, true);
+			}
+		};
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getOverviewRulerAnnotationHover(org.eclipse.jface.text.source.ISourceViewer)
+	 */
+	@Override
+	public IAnnotationHover getOverviewRulerAnnotationHover(ISourceViewer sourceViewer)
+	{
+		return new CommonAnnotationHover(true)
+		{
+			protected boolean isIncluded(Annotation annotation)
+			{
+				return isShowInOverviewRuler(annotation);
+			}
+		};
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getReconciler(org.eclipse.jface.text.source.ISourceViewer)
+	 */
+	@Override
+	public IReconciler getReconciler(ISourceViewer sourceViewer)
+	{
+		if (fTextEditor != null && fTextEditor.isEditable())
+		{
+			CommonCompositeReconcilingStrategy strategy = new CommonCompositeReconcilingStrategy(fTextEditor, getConfiguredDocumentPartitioning(sourceViewer));
+			CommonReconciler reconciler = new CommonReconciler(fTextEditor, strategy, false);
+			
+			reconciler.setIsIncrementalReconciler(false);
+			reconciler.setIsAllowedToModifyDocument(false);
+			reconciler.setProgressMonitor(new NullProgressMonitor());
+			reconciler.setDelay(500);
+
+			return reconciler;
+		}
+		
+		return null;
+	}
+	
+	protected AbstractThemeableEditor getEditor()
+	{
+		return fTextEditor;
 	}
 }

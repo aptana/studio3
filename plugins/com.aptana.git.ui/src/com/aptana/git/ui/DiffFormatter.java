@@ -10,8 +10,8 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
-import com.aptana.util.IOUtil;
-import com.aptana.util.StringUtil;
+import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.StringUtil;
 
 /**
  * Used to share common code for formatting Diffs for display.

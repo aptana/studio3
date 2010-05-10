@@ -37,6 +37,8 @@ package com.aptana.terminal.connector;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -136,6 +138,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 	 */
 	@Override
 	public void processCompleted() {
+		fControl.setState(TerminalState.CLOSED);
 		if (streamsProxy != null) {
 			streamsProxy.close();
 			streamsProxy = null;
@@ -236,6 +239,12 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			}
 		}
 		return null;
+	}
+
+	public List<String> getRunningProcesses() {
+		List<String> processes = new ArrayList<String>();
+		processes.add("bash");
+		return processes;
 	}
 
 }

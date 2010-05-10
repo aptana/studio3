@@ -3,7 +3,7 @@
    <description url="http://download.aptana.org/studio3/plugin/update/">
       Aptana Update Central. Version {version.full}
    </description>
-   <feature url="features/com.aptana.red.core_{version.full}.jar" id="com.aptana.red.core" version="{version.full}">
+   <feature url="features/com.aptana.feature_{version.full}.jar" id="com.aptana.feature" version="{version.full}">
       <category name="Aptana Studio 3 Core"/>
    </feature>   
    <category-def name="Aptana Studio 3 Core" label="Aptana Studio 3 Core">

@@ -28,7 +28,7 @@ import com.aptana.scope.ScopeSelector;
  */
 public class CharacterPairMatcher implements ICharacterPairMatcher
 {
-	private static final ScopeSelector fgCommentSelector = new ScopeSelector("comment");
+	private static final ScopeSelector fgCommentSelector = new ScopeSelector(Messages.getString("CharacterPairMatcher.0")); //$NON-NLS-1$
 	private int fAnchor = -1;
 	private final CharPairs fPairs;
 	private final String fPartitioning;

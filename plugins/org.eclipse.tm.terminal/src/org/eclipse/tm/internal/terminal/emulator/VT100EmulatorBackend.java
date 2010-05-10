@@ -53,9 +53,10 @@ public class VT100EmulatorBackend implements IVT100EmulatorBackend {
 	private Style fStyle;
 	int fLines;
 	int fColumns;
-	int fScrollingRegionTopLine;
-	int fScrollingRegionBottomLine;
-	Stack fBufferStack = new Stack();
+	private int fScrollingRegionTopLine;
+	private int fScrollingRegionBottomLine;
+	private Stack fBufferStack = new Stack();
+	private boolean wrapNewLine = false;
 	
 	final private ITerminalTextData fTerminal;
 	public VT100EmulatorBackend(ITerminalTextData terminal) {
@@ -294,25 +295,21 @@ public class VT100EmulatorBackend implements IVT100EmulatorBackend {
 	 */
 	public void appendString(String buffer) {
 		synchronized (fTerminal) {
-			boolean hasCRLF = false;
-			char ch = buffer.charAt(buffer.length()-1);
-			if ( ch == '\r' || ch == '\n') {
-				hasCRLF = true;
-				buffer = buffer.substring(0, buffer.length() - 1);
-			}
 			char[] chars=buffer.toCharArray();
-			int line=toAbsoluteLine(fCursorLine);
 			int i=0;
 			while (i < chars.length) {
+				if (wrapNewLine) {
+					doNewline();
+				}
+				int line=toAbsoluteLine(fCursorLine);
 				int n=Math.min(fColumns-fCursorColumn,chars.length-i);
 				fTerminal.setChars(line, fCursorColumn, chars, i, n, fStyle);
 				int col=fCursorColumn+n;
 				i+=n;
 				// wrap needed?
-				if(col>fColumns || (!hasCRLF && col>=fColumns)) {
-					doNewline();
-					line=toAbsoluteLine(fCursorLine);
+				if(col>=fColumns) {
 					setCursorColumn(0);
+					wrapNewLine = true;
 				} else {
 					setCursorColumn(col);
 				}
@@ -324,6 +321,7 @@ public class VT100EmulatorBackend implements IVT100EmulatorBackend {
 	 * MUST be called from a synchronized block!
 	 */
 	private void doNewline() {
+		wrapNewLine = false;
 		if(fCursorLine+1>=fLines) {
 			int h=fTerminal.getHeight();
 			fTerminal.addLine();
@@ -374,6 +372,7 @@ public class VT100EmulatorBackend implements IVT100EmulatorBackend {
 	 */
 	public void setCursorColumn(int targetColumn) {
 		synchronized (fTerminal) {
+			wrapNewLine = false;
 			if(targetColumn<0)
 				targetColumn=0;
 			else if(targetColumn>=fColumns)
@@ -391,6 +390,7 @@ public class VT100EmulatorBackend implements IVT100EmulatorBackend {
 	 */
 	public void setCursorLine(int targetLine) {
 		synchronized (fTerminal) {
+			wrapNewLine = false;
 			if(targetLine<0)
 				targetLine=0;
 			else if(targetLine>=fLines)
@@ -448,6 +448,7 @@ public class VT100EmulatorBackend implements IVT100EmulatorBackend {
 	 */
 	public void setAlternativeScreenBuffer(boolean enable) {
 		synchronized (fTerminal) {
+			wrapNewLine = false;
 			if (enable) {
 				ITerminalTextData data = new TerminalTextDataStore();
 				data.copy(fTerminal);

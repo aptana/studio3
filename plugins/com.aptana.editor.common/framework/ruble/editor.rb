@@ -209,8 +209,13 @@ module Ruble
     end
     
     def current_line
-      styled_text.nil? ? 0 : styled_text.line(caret_line)
-    end    
+      line(caret_line)
+    end
+    
+    # Returns the string content on the line
+    def line(line_number)
+      styled_text.nil? ? '' : styled_text.line(line_number)
+    end
     
     def insert_as_text(text)
       self[caret_offset, 0] = snippet

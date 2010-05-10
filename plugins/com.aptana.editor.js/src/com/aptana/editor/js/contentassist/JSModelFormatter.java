@@ -1,0 +1,164 @@
+package com.aptana.editor.js.contentassist;
+
+import com.aptana.core.util.StringUtil;
+import com.aptana.editor.js.contentassist.model.FunctionElement;
+import com.aptana.editor.js.contentassist.model.ParameterElement;
+import com.aptana.editor.js.contentassist.model.PropertyElement;
+import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
+
+public class JSModelFormatter
+{
+	private JSModelFormatter()
+	{
+	}
+	
+	/**
+	 * formatProperty
+	 * 
+	 * @param property
+	 * @return
+	 */
+	public static String getDescription(PropertyElement property)
+	{
+		if (property instanceof FunctionElement)
+		{
+			return getDescription((FunctionElement) property);
+		}
+		
+		StringBuilder buffer = new StringBuilder();
+		
+		// title
+		buffer.append("<b>").append(property.getName()).append("</b>"); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		// type
+		addReturnTypes(buffer, property.getTypes(), "undefined"); //$NON-NLS-1$
+		
+		// description
+		buffer.append("<br><br>"); //$NON-NLS-1$
+		buffer.append(property.getDescription());
+		
+		return buffer.toString();
+	}
+	
+	/**
+	 * formatFunction
+	 * 
+	 * @param function
+	 * @return
+	 */
+	public static String getDescription(FunctionElement function)
+	{
+		StringBuilder buffer = new StringBuilder();
+		
+		// title
+		buffer.append("<b>").append(function.getName()).append("</b>").append("("); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		
+		// append parameters
+		boolean first = true;
+		
+		for (ParameterElement parameter : function.getParameters())
+		{
+			if (first == false)
+			{
+				buffer.append(", "); //$NON-NLS-1$
+			}
+			else
+			{
+				first = false;
+			}
+			
+			String usage = parameter.getUsage();
+			boolean isOptional = ("zero-or-more".equals(usage) || "optional".equals(usage)); //$NON-NLS-1$ //$NON-NLS-2$
+			boolean isRepeating = ("zero-or-more".equals(usage) || "one-or-more".equals(usage)); //$NON-NLS-1$ //$NON-NLS-2$
+			
+			if (isOptional)
+			{
+				buffer.append("["); //$NON-NLS-1$
+			}
+			
+			buffer.append("<b>").append(parameter.getName()).append("</b>"); //$NON-NLS-1$ //$NON-NLS-2$
+			
+			if (isRepeating)
+			{
+				buffer.append("+"); //$NON-NLS-1$
+			}
+			
+			buffer.append(" : ").append(StringUtil.join("|", parameter.getTypes())); //$NON-NLS-1$ //$NON-NLS-2$
+			
+			if (isOptional)
+			{
+				buffer.append("]"); //$NON-NLS-1$
+			}
+		}
+		
+		buffer.append(")"); //$NON-NLS-1$
+		
+		// return type
+		addReturnTypes(buffer, function.getReturnTypes(), "void"); //$NON-NLS-1$
+		
+		// description
+		buffer.append("<br><br>"); //$NON-NLS-1$
+		buffer.append(function.getDescription());
+		
+		return buffer.toString();
+	}
+
+	private static void addReturnTypes(StringBuilder buffer, ReturnTypeElement[] returnTypes, String defaultType)
+	{
+		boolean first;
+		
+		if (returnTypes != null && returnTypes.length > 0)
+		{
+			buffer.append(" : "); //$NON-NLS-1$
+			
+			first = true;
+			
+			for (ReturnTypeElement returnType : returnTypes)
+			{
+				if (first == false)
+				{
+					buffer.append("|"); //$NON-NLS-1$
+				}
+				else
+				{
+					first = false;
+				}
+				
+				buffer.append(returnType.getType());
+			}
+		}
+		else
+		{
+			buffer.append(" : ").append(defaultType); //$NON-NLS-1$
+		}
+	}
+	
+	/**
+	 * getName
+	 * 
+	 * @param property
+	 * @return
+	 */
+	public static String getName(PropertyElement property)
+	{
+		if (property instanceof FunctionElement)
+		{
+			return getName((FunctionElement) property);
+		}
+		else
+		{
+			return property.getName();
+		}
+	}
+	
+	/**
+	 * getName
+	 * 
+	 * @param function
+	 * @return
+	 */
+	public static String getName(FunctionElement function)
+	{
+		return function.getName() + "()"; //$NON-NLS-1$
+	}
+}

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="propertyDialogs" name="propertyDialogs" schema="schema/propertyDialogs.exsd"/>
+   <extension-point id="imageAssociations" name="imageAssociations" schema="schema/imageAssociations.exsd"/>
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
@@ -14,14 +16,6 @@
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
             targetID="com.aptana.ui.WebPerspective">
-         <view
-               id="com.aptana.explorer.view"
-               minimized="false"
-               ratio="0.25"
-               relationship="left"
-               relative="org.eclipse.ui.editorss"
-               visible="true">
-         </view>
          <viewShortcut
                id="com.aptana.explorer.view">
          </viewShortcut>
@@ -47,37 +41,29 @@
          </viewShortcut>
          <view
                id="com.aptana.terminal.views.terminal"
-               ratio="0.75"
-               relationship="bottom"
-               relative="org.eclipse.ui.editorss"
-               visible="true">
+               relationship="stack"
+               relative="org.eclipse.ui.console.ConsoleView"
+               visible="false">
          </view>
          <viewShortcut
                id="com.aptana.terminal.views.terminal">
          </viewShortcut>
          <view
-               id="org.eclipse.ui.console.ConsoleView"
-               minimized="false"
-               relationship="stack"
-               relative="com.aptana.terminal.views.terminal"
-               visible="false">
-         </view>
-         <view
                id="org.eclipse.pde.runtime.LogView"
                relationship="stack"
-               relative="com.aptana.terminal.views.terminal"
+               relative="org.eclipse.ui.console.ConsoleView"
                visible="false">
          </view>
          <view
                id="org.eclipse.ui.views.ProblemView"
                relationship="stack"
-               relative="com.aptana.terminal.views.terminal"
+               relative="org.eclipse.ui.console.ConsoleView"
                visible="false">
          </view>
          <view
                id="org.eclipse.ui.views.TaskList"
                relationship="stack"
-               relative="com.aptana.terminal.views.terminal"
+               relative="org.eclipse.ui.console.ConsoleView"
                visible="false">
          </view>
          <newWizardShortcut
@@ -92,7 +78,57 @@
          <actionSet
                id="org.eclipse.ui.edit.text.actionSet.presentation">
          </actionSet>
+         <newWizardShortcut
+               id="com.aptana.ui.wizards.NewWebProject">
+         </newWizardShortcut>
+         <actionSet
+               id="com.aptana.editor.common.globalActionSet">
+         </actionSet>
+         <actionSet
+               id="com.aptana.terminal.actionSet">
+         </actionSet>
       </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            category="com.aptana.ui.wizards.category"
+            class="com.aptana.ui.internal.wizards.NewProjectWizard"
+            finalPerspective="com.aptana.ui.WebPerspective"
+            icon="icons/new_web_project.gif"
+            id="com.aptana.ui.wizards.NewWebProject"
+            name="%wizard.webproject.name"
+            preferredPerspectives="com.aptana.ui.WebPerspective"
+            project="true">
+         <description>
+            %wizard.webproject.description
+         </description>
+      </wizard>
+      <category
+            id="com.aptana.ui.wizards.category"
+            name="%category.web.name">
+      </category>
+      <primaryWizard
+            id="com.aptana.ui.wizards.NewWebProject">
+      </primaryWizard>
+   </extension>
+   <extension
+         id="webnature"
+         name="%extension.webnature.name"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="com.aptana.ui.projects.WebProjectNature">
+         </run>
+      </runtime>
+   </extension>
+   <extension
+         point="org.eclipse.ui.ide.projectNatureImages">
+      <image
+            icon="icons/webnature.gif"
+            id="com.aptana.ui.webnature.image"
+            natureId="com.aptana.ui.webnature">
+      </image>
    </extension>
 
 </plugin>

@@ -18,16 +18,21 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.editor.findbar;bundle-version="1.0.0",
  com.aptana.scripting,
  org.eclipse.ui.workbench.texteditor,
- com.aptana.epl;bundle-version="1.0.0",
+ com.aptana.core;bundle-version="3.0.0",
+ com.aptana.ui.epl;bundle-version="1.0.0",
  plistreader;bundle-version="1.0.0",
  com.aptana.parsing,
  org.jruby;bundle-version="1.4.0",
  com.aptana.git.core;bundle-version="1.0.0",
- com.aptana.usage
+ com.aptana.usage,
+ com.aptana.core,
+ com.aptana.index.core;bundle-version="2.0.0",
+ com.aptana.ui;bundle-version="3.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.common,
+ com.aptana.editor.common.contentassist,
  com.aptana.editor.common.outline,
  com.aptana.editor.common.parsing,
  com.aptana.editor.common.preferences,
@@ -37,5 +42,4 @@ Export-Package: com.aptana.editor.common,
  com.aptana.editor.common.text,
  com.aptana.editor.common.text.rules,
  com.aptana.editor.common.theme
-Import-Package: com.aptana.util
 Eclipse-ExtensibleAPI: true

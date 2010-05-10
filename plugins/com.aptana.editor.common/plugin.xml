@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="userAgent" name="%extension-point.name" schema="schema/userAgent.exsd"/>
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
@@ -445,5 +446,109 @@
             </command>
          </menu>
       </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="com.aptana.editor.common.globalActionSet"
+            label="%actionSet.global.label"
+            visible="false">
+      </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.definitions">
+      <definition
+            id="com.aptana.editor.common.contributions.inGlobalActionSet">
+         <with
+               variable="activeContexts">
+            <iterate
+                  operator="or">
+               <equals
+                     value="com.aptana.editor.common.globalActionSet">
+               </equals>
+            </iterate>
+         </with>
+      </definition>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.ui.category.views"
+            defaultHandler="com.aptana.editor.common.internal.handlers.ToggleOutlineHandler"
+            description="%command.toggleoutline.description"
+            id="com.aptana.editor.common.commands.toggleOutline"
+            name="%command.toggleoutline.name">
+         <state
+               class="org.eclipse.ui.handlers.RegistryToggleState:true"
+               id="org.eclipse.ui.commands.toggleState">
+         </state>
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="aptana">
+            <command
+                  commandId="com.aptana.editor.common.commands.toggleOutline"
+                  icon="icons/full/eview16/outline_co.gif"
+                  style="toggle">
+               <visibleWhen>
+                  <reference
+                        definitionId="com.aptana.editor.common.contributions.inGlobalActionSet">
+                  </reference>
+               </visibleWhen>
+            </command>
+         </toolbar>
+      </menuContribution>
+	</extension>
+	<extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectorTargets">
+      <target
+            id="com.aptana.editor.ui.hyperlinkTarget"
+            name="%target.name">
+      </target>
+   </extension>
+    <extension
+          point="com.aptana.editor.common.userAgent">
+       <user-agent
+             icon="icons/ie_icon.png"
+             icon-disabled="icons/ie_icon_grey.png"
+             id="IE"
+             name="Internet Explorer">
+       </user-agent>
+       <user-agent
+             icon="icons/firefox_icon.png"
+             icon-disabled="icons/firefox_icon_grey.png"
+             id="Mozilla"
+             name="Firefox">
+       </user-agent>
+       <user-agent
+             icon="icons/netscape_icon.png"
+             icon-disabled="icons/netscape_icon_grey.png"
+             id="Netscape"
+             name="Netscape">
+       </user-agent>
+       <user-agent
+             icon="icons/opera_icon.png"
+             icon-disabled="icons/opera_icon_grey.png"
+             id="Opera"
+             name="Opera">
+       </user-agent>
+       <user-agent
+             icon="icons/safari_icon.png"
+             icon-disabled="icons/safari_icon_grey.png"
+             id="Safari"
+             name="Safari">
+       </user-agent>
+    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.common"
+            class="com.aptana.editor.common.preferences.UserAgentPreferencePage"
+            id="com.aptana.editor.common.preferences.UserAgentPreferencePage"
+            name="%page.name.0"/>            
    </extension>
 </plugin>

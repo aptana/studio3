@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.aptana.util.StringUtil;
+import com.aptana.core.util.StringUtil;
 
 public abstract class AbstractElement implements Comparable<AbstractElement>
 {

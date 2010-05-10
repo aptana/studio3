@@ -20,14 +20,14 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.ProcessUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.BundlePrecedence;
-import com.aptana.util.IOUtil;
-import com.aptana.util.ProcessUtil;
 
 /**
  * This job tries to grab down a local copy of a pre-installed application bundle. It will also generate a project for
@@ -250,8 +250,8 @@ class EditBundleJob extends Job
 	@SuppressWarnings("nls")
 	private boolean looksLikeSVNURI(String repoURI)
 	{
-		return repoURI.startsWith("svn:") || repoURI.startsWith("svn+") || repoURI.contains("/trunk")
-				|| repoURI.contains("/tags") || repoURI.contains("/branches");
+		return repoURI.startsWith("svn:") || repoURI.startsWith("svn+") || repoURI.contains("/trunk") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				|| repoURI.contains("/tags") || repoURI.contains("/branches"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -263,7 +263,7 @@ class EditBundleJob extends Job
 	@SuppressWarnings("nls")
 	private boolean looksLikeGitURI(String repoURI)
 	{
-		return repoURI.startsWith("git:") || repoURI.endsWith(".git") || repoURI.contains("github.com");
+		return repoURI.startsWith("git:") || repoURI.endsWith(".git") || repoURI.contains("github.com"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 }

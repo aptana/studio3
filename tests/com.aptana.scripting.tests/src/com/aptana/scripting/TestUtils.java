@@ -12,8 +12,8 @@ import junit.framework.TestCase;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 
-import com.aptana.util.IOUtil;
-import com.aptana.util.ResourceUtils;
+import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.ResourceUtil;
 
 public class TestUtils extends TestCase
 {
@@ -58,7 +58,7 @@ public class TestUtils extends TestCase
 		{
 			URL url = FileLocator.find(Activator.getDefault().getBundle(), path, null);
 			URL fileURL = FileLocator.toFileURL(url);
-			URI fileURI = ResourceUtils.toURI(fileURL);
+			URI fileURI = ResourceUtil.toURI(fileURL);
 			
 			result = new File(fileURI);
 		}

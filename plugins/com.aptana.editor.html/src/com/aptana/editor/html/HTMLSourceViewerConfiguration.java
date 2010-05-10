@@ -34,8 +34,11 @@
  */
 package com.aptana.editor.html;
 
+import java.util.Map;
+
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -44,6 +47,7 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.css.CSSSourceConfiguration;
+import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor;
 import com.aptana.editor.js.JSSourceConfiguration;
 
 public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfiguration
@@ -89,5 +93,20 @@ public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfigurati
 		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
 		HTMLSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		return reconciler;
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	protected Map getHyperlinkDetectorTargets(ISourceViewer sourceViewer)
+	{
+		Map targets = super.getHyperlinkDetectorTargets(sourceViewer);
+		targets.put("com.aptana.editor.html", getEditor()); //$NON-NLS-1$
+		return targets;
+	}
+
+	@Override
+	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
+	{
+		return new HTMLContentAssistProcessor(getAbstractThemeableEditor());
 	}
 }

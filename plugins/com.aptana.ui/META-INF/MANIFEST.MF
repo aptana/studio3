@@ -7,6 +7,14 @@ Bundle-Activator: com.aptana.ui.UIPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.ui.workbench
+ org.eclipse.core.resources,
+ org.eclipse.core.expressions,
+ org.eclipse.ui.workbench,
+ org.eclipse.ui.ide,
+ org.eclipse.ui.console,
+ com.aptana.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
+Export-Package: com.aptana.ui,
+ com.aptana.ui.projects
+Eclipse-ExtensibleAPI: true
