@@ -9,11 +9,11 @@ import javax.script.ScriptException;
 
 import org.eclipse.core.runtime.Platform;
 
+import com.aptana.core.util.IOUtil;
 import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.ContextContributor;
 import com.aptana.scripting.model.EnvironmentContributor;
-import com.aptana.util.IOUtil;
 
 public class FullnameEnvContextContributor implements ContextContributor, EnvironmentContributor
 {

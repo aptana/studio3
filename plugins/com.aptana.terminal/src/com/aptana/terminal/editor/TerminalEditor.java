@@ -43,6 +43,7 @@ import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.ISaveablePart2;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -55,15 +56,15 @@ import org.eclipse.ui.progress.UIJob;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.terminal.Activator;
-import com.aptana.terminal.Closeable;
 import com.aptana.terminal.Utils;
 import com.aptana.terminal.connector.LocalTerminalConnector;
 import com.aptana.terminal.internal.IProcessListener;
+import com.aptana.terminal.internal.TerminalCloseHelper;
 import com.aptana.terminal.internal.emulator.VT100TerminalControl;
 import com.aptana.terminal.preferences.IPreferenceConstants;
 
 @SuppressWarnings("restriction")
-public class TerminalEditor extends EditorPart implements Closeable, ITerminalListener, IProcessListener, IPreferenceChangeListener {
+public class TerminalEditor extends EditorPart implements ISaveablePart2, ITerminalListener, IProcessListener, IPreferenceChangeListener {
 	public static final String ID = "com.aptana.terminal.TerminalEditor"; //$NON-NLS-1$
 
 	private ITerminalViewControl fCtlTerminal;
@@ -75,6 +76,7 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 	private TerminalActionSelectAll fActionEditSelectAll;
 	
 	private List<String> inputs = new ArrayList<String>();
+	private boolean checkCanClose = false;
 	
 	/*
 	 * (non-Javadoc)
@@ -212,11 +214,7 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.terminal.Closeable#close()
-	 */
-	public void close() {
+	protected void close() {
 		if (fCtlTerminal != null && !fCtlTerminal.isDisposed()) {
 			fCtlTerminal.getControl().getDisplay().asyncExec(new Runnable() {
 				@Override
@@ -237,6 +235,54 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 		if (closeViewOnExit) {
 			close();
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.part.EditorPart#isDirty()
+	 */
+	@Override
+	public boolean isDirty() {
+		try {
+			return checkCanClose;
+		} finally {
+			checkCanClose = false;
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.part.EditorPart#isSaveAsAllowed()
+	 */
+	@Override
+	public boolean isSaveAsAllowed() {
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.EditorPart#isSaveOnCloseNeeded()
+	 */
+	@Override
+	public boolean isSaveOnCloseNeeded() {
+		checkCanClose = true;
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart2#promptToSaveOnClose()
+	 */
+	@Override
+	public int promptToSaveOnClose() {
+		return canCloseTerminal() ? ISaveablePart2.YES : ISaveablePart2.CANCEL;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.EditorPart#setContentDescription(java.lang.String)
+	 */
+	@Override
+	protected void setContentDescription(String description) {
+		super.setContentDescription(description);
+		checkCanClose = false; // reset state set by testEditor
 	}
 
 	/* (non-Javadoc)
@@ -354,24 +400,6 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 		fCtlTerminal.disposeTerminal();
 		super.dispose();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.part.EditorPart#isDirty()
-	 */
-	@Override
-	public boolean isDirty() {
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.part.EditorPart#isSaveAsAllowed()
-	 */
-	@Override
-	public boolean isSaveAsAllowed() {
-		return false;
-	}
 	
 	/*
 	 * (non-Javadoc)
@@ -418,6 +446,14 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 		if (localTerminalConnector != null) {
 			localTerminalConnector.addProcessListener(this);
 		}
+	}
+	
+	protected boolean canCloseTerminal() {
+		LocalTerminalConnector localTerminalConnector = (LocalTerminalConnector) fCtlTerminal.getTerminalConnector().getAdapter(LocalTerminalConnector.class);
+		if (localTerminalConnector != null) {
+			return TerminalCloseHelper.canCloseTerminal(getSite(), localTerminalConnector);
+		}
+		return true;
 	}
 
 }

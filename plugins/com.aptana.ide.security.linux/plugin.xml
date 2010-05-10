@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="com.aptana.ide.security.linux.provider"
+         name="Aptana Linux Secure Storage"
+         point="org.eclipse.equinox.security.secureStorage">
+      <provider
+            class="com.aptana.ide.security.internal.linux.PasswordProvider"
+            priority="3">
+      </provider>
+   </extension>
+
+</plugin>

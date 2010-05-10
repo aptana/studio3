@@ -1,9 +1,9 @@
 package com.aptana.parsing.ast;
 
-import com.aptana.parsing.lexer.IRange;
+import com.aptana.parsing.lexer.ILexeme;
 
 
-public interface IParseNode extends IRange, ILanguageNode
+public interface IParseNode extends ILexeme, ILanguageNode
 {
 
 	public void addChild(IParseNode child);
@@ -19,8 +19,6 @@ public interface IParseNode extends IRange, ILanguageNode
 	public INameNode getNameNode();
 
 	public IParseNode getParent();
-
-	public String getText();
 
 	public short getType();
 

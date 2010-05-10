@@ -49,12 +49,12 @@ import org.eclipse.ui.views.properties.PropertySheet;
 import org.osgi.framework.Version;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.Theme;
 import com.aptana.editor.common.theme.TreeThemer;
-import com.aptana.util.EclipseUtils;
 
 /**
  * This is a UIJob that tries to expand the influence of our themes to the JDT Editor; all Outline pages; Problems,
@@ -173,7 +173,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 		else if (view instanceof ExtendedMarkersView) // Problems, Tasks, Bookmarks
 		{
-			if (new Version(EclipseUtils.getPluginVersion("org.eclipse.ui.ide")).compareTo(Version
+			if (new Version(EclipseUtil.getPluginVersion("org.eclipse.ui.ide")).compareTo(Version
 					.parseVersion("3.6.0")) >= 0)
 			{
 				try

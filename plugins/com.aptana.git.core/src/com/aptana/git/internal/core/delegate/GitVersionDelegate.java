@@ -1,8 +1,8 @@
 package com.aptana.git.internal.core.delegate;
 
 import com.aptana.configurations.processor.AbstractProcessorDelegate;
+import com.aptana.core.util.ProcessUtil;
 import com.aptana.git.core.model.GitExecutable;
-import com.aptana.util.ProcessUtil;
 
 /**
  * A processor delegate class that returns the configured/installed Git version. This delegate invoke the

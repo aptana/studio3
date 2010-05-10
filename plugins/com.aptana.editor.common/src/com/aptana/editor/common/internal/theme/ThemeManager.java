@@ -104,8 +104,8 @@ public class ThemeManager implements IThemeManager
 		adaptTokens();
 
 		// Set the find in file search color
-		IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.search");
-		prefs.put("org.eclipse.search.potentialMatch.fgColor", toString(theme.getSearchResultColor()));
+		IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.search"); //$NON-NLS-1$
+		prefs.put("org.eclipse.search.potentialMatch.fgColor", toString(theme.getSearchResultColor())); //$NON-NLS-1$
 		try
 		{
 			prefs.flush();

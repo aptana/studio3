@@ -12,10 +12,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
+import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.ProcessUtil;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptUtils;
-import com.aptana.util.IOUtil;
-import com.aptana.util.ProcessUtil;
 
 public class CommandScriptRunner extends AbstractCommandRunner
 {
