@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.filesystem.ftp.tests;
+package com.aptana.filesystem.secureftp.tests;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -51,7 +51,7 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 	private static FTPConnectionPoint setupConnection()
 	{
 		FTPConnectionPoint ftpcp = new FTPConnectionPoint();
-		ftpcp.setHost("207.7.120.91"); //$NON-NLS-1$
+		ftpcp.setHost("10.10.1.60"); //$NON-NLS-1$
 		ftpcp.setLogin("ftpuser"); //$NON-NLS-1$
 		ftpcp.setPassword(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'});
 		return ftpcp;
@@ -109,7 +109,6 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 	{
 		return false;
 	}
-
 
 	/*
 	 * (non-Javadoc)

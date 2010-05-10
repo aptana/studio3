@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.filesystem.ftp.tests;
+package com.aptana.filesystem.secureftp.tests;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -45,13 +45,13 @@ import com.aptana.ide.filesystem.ftp.FTPConnectionPoint;
 /**
  * @author Max Stepanov
  */
-public class FTPConnectionWithBasePathTest extends CommonConnectionTest
+public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 {
 
 	private static FTPConnectionPoint setupConnection()
 	{
 		FTPConnectionPoint ftpcp = new FTPConnectionPoint();
-		ftpcp.setHost("207.7.120.91"); //$NON-NLS-1$
+		ftpcp.setHost("10.10.1.60"); //$NON-NLS-1$
 		ftpcp.setLogin("ftpuser"); //$NON-NLS-1$
 		ftpcp.setPassword(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'});
 		return ftpcp;
@@ -60,24 +60,17 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 	@Override
 	protected void setUp() throws Exception
 	{
-		initBasePath();
 		FTPConnectionPoint ftpcp = setupConnection();
 		ftpcp.setPath(Path.ROOT.append(getClass().getSimpleName()));
 		cp = ftpcp;
 		super.setUp();
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-		cleanupBasePath();
-	}
-
 	public static void initBasePath() throws CoreException
 	{
 		FTPConnectionPoint ftpcp = setupConnection();
 		IFileStore fs = ftpcp.getRoot().getFileStore(
-				Path.ROOT.append(FTPConnectionWithBasePathTest.class.getSimpleName()));
+				Path.ROOT.append(FTPSConnectionWithBasePathTest.class.getSimpleName()));
 		assertNotNull(fs);
 		if (!fs.fetchInfo().exists())
 		{
@@ -91,7 +84,7 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 	{
 		FTPConnectionPoint ftpcp = setupConnection();
 		IFileStore fs = ftpcp.getRoot().getFileStore(
-				Path.ROOT.append(FTPConnectionWithBasePathTest.class.getSimpleName()));
+				Path.ROOT.append(FTPSConnectionWithBasePathTest.class.getSimpleName()));
 		assertNotNull(fs);
 		if (fs.fetchInfo().exists())
 		{
