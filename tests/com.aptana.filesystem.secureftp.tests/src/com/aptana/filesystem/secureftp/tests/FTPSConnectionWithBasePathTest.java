@@ -60,10 +60,17 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 	@Override
 	protected void setUp() throws Exception
 	{
+		initBasePath();
 		FTPConnectionPoint ftpcp = setupConnection();
 		ftpcp.setPath(Path.ROOT.append(getClass().getSimpleName()));
 		cp = ftpcp;
 		super.setUp();
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+		cleanupBasePath();
 	}
 
 	public static void initBasePath() throws CoreException

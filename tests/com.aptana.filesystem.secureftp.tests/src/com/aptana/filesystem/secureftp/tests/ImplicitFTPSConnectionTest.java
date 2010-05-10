@@ -61,6 +61,7 @@ public class ImplicitFTPSConnectionTest extends TestCase {
 		ftpcp.setLogin("test"); //$NON-NLS-1$
 		ftpcp.setPassword(new char[] { 't', 'e', 's', 't' });
 		ftpcp.setExplicit(false);
+		ftpcp.setValidateCertificate(false);
 		cp = ftpcp;
 	}
 
