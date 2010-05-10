@@ -7,9 +7,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.Platform;
 
-import com.aptana.configurations.processor.AbstractConfigurationProcessor;
-import com.aptana.configurations.processor.IConfigurationProcessorDelegate;
-import com.aptana.util.ProcessUtil;
+import com.aptana.core.util.ProcessUtil;
 
 /**
  * A abstract configuration processor delegate that provides some common operations of running a command and retrieving
