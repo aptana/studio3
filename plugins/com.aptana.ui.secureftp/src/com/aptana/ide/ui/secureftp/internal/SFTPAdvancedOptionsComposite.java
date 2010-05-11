@@ -52,7 +52,6 @@ import org.eclipse.swt.widgets.Text;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.filesystem.secureftp.ISFTPConnectionPoint;
 import com.aptana.ide.filesystem.secureftp.ISFTPConstants;
-import com.aptana.ide.ui.ftp.internal.IConnectionDialog;
 import com.aptana.ide.ui.ftp.internal.IOptionsComposite;
 import com.aptana.ide.ui.ftp.internal.NumberVerifyListener;
 import com.aptana.ide.ui.io.dialogs.IDialogConstants;
@@ -64,7 +63,7 @@ import com.aptana.ide.ui.io.dialogs.IDialogConstants;
 @SuppressWarnings("restriction")
 public class SFTPAdvancedOptionsComposite extends Composite implements IOptionsComposite {
 	
-	private IConnectionDialog connectionDialog;
+	private Listener listener;
 	private Combo compressionCombo;
 	private Text portText;
 	private Combo encodingCombo;
@@ -75,9 +74,9 @@ public class SFTPAdvancedOptionsComposite extends Composite implements IOptionsC
 	 * @param parent
 	 * @param style
 	 */
-	public SFTPAdvancedOptionsComposite(Composite parent, int style, IConnectionDialog connectionDialog) {
+	public SFTPAdvancedOptionsComposite(Composite parent, int style, Listener listener) {
 		super(parent, style);
-		this.connectionDialog = connectionDialog;
+		this.listener = listener;
 		
 		setLayout(GridLayoutFactory.swtDefaults().numColumns(5)
 				.spacing(new PixelConverter(this).convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_SPACING),
@@ -215,7 +214,7 @@ public class SFTPAdvancedOptionsComposite extends Composite implements IOptionsC
 		if (modifyListener == null) {
 			modifyListener = new ModifyListener() {
 				public void modifyText(ModifyEvent e) {
-					connectionDialog.validate();
+					listener.validate();
 				}
 			};
 		}
