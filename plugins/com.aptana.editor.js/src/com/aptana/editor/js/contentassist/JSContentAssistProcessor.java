@@ -53,6 +53,30 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 	
 	/**
+	 * getGlobals
+	 */
+	protected void addGlobals(List<ICompletionProposal> proposals, int offset)
+	{
+		List<PropertyElement> globals = this._helper.getGlobals();
+
+		for (PropertyElement property : globals)
+		{
+			// slightly change behavior if this is a function
+			boolean isFunction = (property instanceof FunctionElement);
+
+			// grab the interesting parts
+			String name = JSModelFormatter.getName(property);
+			//int length = isFunction ? name.length() - 1 : name.length();
+			String description = JSModelFormatter.getDescription(property);
+			Image image = isFunction ? JS_FUNCTION : JS_PROPERTY;
+			String[] userAgentNames = property.getUserAgentNames();
+			Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(userAgentNames);
+			
+			this.addProposal(proposals, name, image, description, userAgents, offset);
+		}
+	}
+
+	/**
 	 * addProposal
 	 * 
 	 * @param proposals
@@ -119,6 +143,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			switch (location)
 			{
 				default:
+					// TEMP: for debugging
+					this.addGlobals(result, offset);
 					break;
 			}
 	
@@ -165,30 +191,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 
 		return this._validator;
-	}
-
-	/**
-	 * getGlobals
-	 */
-	public void getGlobals(List<ICompletionProposal> proposals, int offset)
-	{
-		List<PropertyElement> globals = this._helper.getGlobals();
-
-		for (PropertyElement property : globals)
-		{
-			// slightly change behavior if this is a function
-			boolean isFunction = (property instanceof FunctionElement);
-
-			// grab the interesting parts
-			String name = JSModelFormatter.getName(property);
-			//int length = isFunction ? name.length() - 1 : name.length();
-			String description = JSModelFormatter.getDescription(property);
-			Image image = isFunction ? JS_FUNCTION : JS_PROPERTY;
-			String[] userAgentNames = property.getUserAgentNames();
-			Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(userAgentNames);
-			
-			this.addProposal(proposals, name, image, description, userAgents, offset);
-		}
 	}
 
 	/**
