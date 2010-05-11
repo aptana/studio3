@@ -8,7 +8,7 @@ import com.aptana.parsing.lexer.ITypePredicate;
 
 public enum JSTokenType implements ITypePredicate
 {
-	UNDEFINED("undefined.html"), //$NON-NLS-1$
+	UNDEFINED("undefined.js"), //$NON-NLS-1$
 	KEYWORD("keyword.operator.js"), //$NON-NLS-1$
 	SUPPORT_FUNCTION("support.function.js"), //$NON-NLS-1$
 	EVENT_HANDLER_FUNCTION("support.function.event-handler.js"), //$NON-NLS-1$

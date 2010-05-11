@@ -54,45 +54,14 @@ public final class Messages extends NLS
 	}
 
 	public static String JSMetadataReader_Parse_Error;
-
 	public static String JSMetadataReader_Parse_IO_Error;
-
 	public static String JSMetadataReader_SAX_Error;
-
-	/**
-	 * NativeObjectsReader_UnalbeToLocateXMLFile
-	 */
 	public static String NativeObjectsReader_UnalbeToLocateXMLFile;
-
-	/**
-	 * NativeObjectsReader_IOError
-	 */
 	public static String NativeObjectsReader_IOError;
-
 	public static String NativeObjectsReader2_ERR_Loading_scriptdoc_file;
-
-	/**
-	 * ScriptDocReader_SchemaError
-	 */
 	public static String ScriptDocReader_SchemaError;
-
-	/**
-	 * ScriptDocReader_IOError
-	 */
 	public static String ScriptDocReader_IOError;
-
-	/**
-	 * ScriptDocReader_XMLLocationError
-	 */
 	public static String ScriptDocReader_XMLLocationError;
-
-	/**
-	 * ScriptDocReader_ParamNullError
-	 */
 	public static String ScriptDocReader_ParamNullError;
-
-	/**
-	 * ScriptDocReader_PropertyNullError
-	 */
 	public static String ScriptDocReader_PropertyNullError;
 }
