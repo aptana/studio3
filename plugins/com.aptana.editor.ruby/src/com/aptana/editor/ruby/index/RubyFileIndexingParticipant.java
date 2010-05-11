@@ -1,5 +1,7 @@
 package com.aptana.editor.ruby.index;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -9,9 +11,13 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.core.runtime.content.IContentTypeManager;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.ruby.Activator;
+import com.aptana.editor.ruby.IRubyConstants;
 import com.aptana.editor.ruby.parsing.RubyParser;
 import com.aptana.editor.ruby.parsing.ast.RubyImport;
 import com.aptana.index.core.IFileIndexingParticipant;
@@ -27,12 +33,9 @@ public class RubyFileIndexingParticipant implements IFileIndexingParticipant
 	@Override
 	public void index(Set<IFile> files, Index index, IProgressMonitor monitor)
 	{
-		String extension;
 		for (IFile file : files)
 		{
-			extension = file.getFileExtension();
-
-			if (RUBY_EXTENSION.equalsIgnoreCase(extension))
+			if (isRubyFile(file))
 			{
 				try
 				{
@@ -67,6 +70,41 @@ public class RubyFileIndexingParticipant implements IFileIndexingParticipant
 		}
 	}
 
+	private boolean isRubyFile(IFile file)
+	{
+		InputStream stream = null;
+		IContentTypeManager manager = Platform.getContentTypeManager();
+		try
+		{
+			stream = file.getContents();
+			IContentType[] types = manager.findContentTypesFor(stream, file.getName());
+			for (IContentType type : types)
+			{
+				if (type.getId().equals(IRubyConstants.CONTENT_TYPE_RUBY)
+						|| type.getId().equals(IRubyConstants.CONTENT_TYPE_RUBY_AMBIGUOUS))
+					return true;
+			}
+		}
+		catch (Exception e)
+		{
+			Activator.log(e);
+		}
+		finally
+		{
+			try
+			{
+				if (stream != null)
+					stream.close();
+			}
+			catch (IOException e)
+			{
+				// ignore
+			}
+		}
+
+		return RUBY_EXTENSION.equalsIgnoreCase(file.getFileExtension());
+	}
+
 	private void walkAST(Index index, IFile file, IParseNode ast)
 	{
 		Queue<IParseNode> queue = new LinkedList<IParseNode>();
@@ -84,6 +122,8 @@ public class RubyFileIndexingParticipant implements IFileIndexingParticipant
 				String name = require.getName();
 				if (name != null)
 				{
+					// FIXME This isn't checking loadpaths in any sort of way. Requires may be relative to loadpaths,
+					// which may be the file's parent, the project root, the working dir, std library, gems, etc!
 					IFile requireFile = file.getParent().getFile(new Path(name));
 					if (requireFile.exists())
 					{
