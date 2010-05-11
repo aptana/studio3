@@ -72,7 +72,7 @@ public class CloneJob extends Job
 				throw new CoreException(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
 						Messages.CloneJob_UnableToFindGitExecutableError));
 			}
-			ILaunch launch = Launcher.launch(GitExecutable.instance().path(), null, subMonitor.newChild(100),
+			ILaunch launch = Launcher.launch(GitExecutable.instance().path().toOSString(), null, subMonitor.newChild(100),
 					"clone", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$
 			if (launch == null)
 			{

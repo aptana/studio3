@@ -2,7 +2,7 @@ package com.aptana.git.ui.actions;
 
 import java.text.MessageFormat;
 
-import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.window.Window;
 
 import com.aptana.git.ui.dialogs.AddRemoteDialog;
@@ -21,8 +21,8 @@ public class AddRemoteAction extends SimpleGitCommandAction
 		if (username == null || username.length() == 0)
 			username = "user"; //$NON-NLS-1$
 		String reponame = "repo";
-		String wd = getSelectedRepository().workingDirectory();
-		reponame = new Path(wd).lastSegment();
+		IPath wd = getSelectedRepository().workingDirectory();
+		reponame = wd.lastSegment();
 		if (reponame.endsWith(".git"))
 			reponame = reponame.substring(0, reponame.length() - 4);
 		url = MessageFormat.format("git://github.com/{0}/{1}.git", username, reponame); //$NON-NLS-1$

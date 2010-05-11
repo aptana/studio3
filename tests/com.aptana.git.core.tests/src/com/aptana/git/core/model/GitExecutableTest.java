@@ -36,10 +36,10 @@ public class GitExecutableTest extends TestCase
 	{
 		URL url = makeURLForExecutableFile(new Path(FAKE_GIT_1_5));
 
-		assertFalse(GitExecutable.acceptBinary(url.getPath()));
+		assertFalse(GitExecutable.acceptBinary(Path.fromOSString(url.getPath())));
 
 		url = makeURLForExecutableFile(new Path(FAKE_GIT_1_6));
-		assertTrue(GitExecutable.acceptBinary(url.getPath()));
+		assertTrue(GitExecutable.acceptBinary(Path.fromOSString(url.getPath())));
 	}
 
 	protected URL makeURLForExecutableFile(IPath path) throws IOException

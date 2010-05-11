@@ -40,12 +40,12 @@ public abstract class Launcher
 	 * @param args
 	 * @return
 	 */
-	public static ILaunch launch(String command, String workingDir, String... args) throws CoreException
+	public static ILaunch launch(String command, IPath workingDir, String... args) throws CoreException
 	{
 		return launch(command, workingDir, new NullProgressMonitor(), args);
 	}
 
-	public static ILaunch launch(String command, String workingDir, IProgressMonitor monitor, String... args)
+	public static ILaunch launch(String command, IPath workingDir, IProgressMonitor monitor, String... args)
 			throws CoreException
 	{
 		ILaunchConfigurationWorkingCopy config = createLaunchConfig(command, workingDir, args);
@@ -55,7 +55,7 @@ public abstract class Launcher
 	// TODO 3.6+ Can't properly point to undeprecated constants until 3.6 is our base version where they moved these out
 	// to a core plugin
 	// @SuppressWarnings("deprecation")
-	private static ILaunchConfigurationWorkingCopy createLaunchConfig(String command, String workingDir, String... args)
+	private static ILaunchConfigurationWorkingCopy createLaunchConfig(String command, IPath workingDir, String... args)
 			throws CoreException
 	{
 		String toolArgs = '"' + join(args, "\" \"") + '"'; //$NON-NLS-1$
@@ -84,7 +84,7 @@ public abstract class Launcher
 		ILaunchConfigurationWorkingCopy config = configType.newInstance(null, name);
 		config.setAttribute(IExternalToolConstants.ATTR_LOCATION, command);
 		config.setAttribute(IExternalToolConstants.ATTR_TOOL_ARGUMENTS, toolArgs);
-		config.setAttribute(IExternalToolConstants.ATTR_WORKING_DIRECTORY, workingDir);
+		config.setAttribute(IExternalToolConstants.ATTR_WORKING_DIRECTORY, workingDir.toOSString());
 		config.setAttribute(DebugPlugin.ATTR_CAPTURE_OUTPUT, true);
 		config.setAttribute(IExternalToolConstants.ATTR_SHOW_CONSOLE, true);
 		config.setAttribute(IDebugUIConstants.ATTR_LAUNCH_IN_BACKGROUND, false);

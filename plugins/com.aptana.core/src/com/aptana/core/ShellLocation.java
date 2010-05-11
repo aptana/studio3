@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.terminal.internal.configurations;
+package com.aptana.core;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,35 +42,56 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 
-import com.aptana.core.ShellLocation;
+import com.aptana.core.util.ExecutableUtil;
+import com.aptana.core.util.PlatformUtil;
 
 /**
  * @author Max Stepanov
+ *
  */
-public class WindowsMingwConfiguration extends AbstractProcessConfiguration {
+public class ShellLocation {
 
-	private static final String EXECUTABLE = "$os$/redttyw.exe"; //$NON-NLS-1$
-
-	@Override
-	protected IPath getExecutablePath() {
-		return new Path(EXECUTABLE);
+	private static final String[] POSSIBLE_SHELL_LOCATIONS_WIN32 = new String[] {
+		"%PROGRAMW6432%\\Git\\bin", //$NON-NLS-1$
+		"%PROGRAMFILES%\\Git\\bin", //$NON-NLS-1$
+		"%PROGRAMFILES(X86)%\\Git\\bin" //$NON-NLS-1$
+	};
+	
+	private static final String SHELL = "sh";
+	
+	private static IPath shellPath = null;
+	
+	
+	/**
+	 * 
+	 */
+	private ShellLocation() {
+	}
+	
+	public static synchronized IPath getPath() throws CoreException {
+		if (shellPath == null) {
+			shellPath = ExecutableUtil.find(SHELL, Platform.OS_WIN32.equals(Platform.getOS()), getPossibleShellLocations());
+			if (shellPath == null) {
+				throw new CoreException(new Status(Status.ERROR, CorePlugin.PLUGIN_ID, "Shell executable could not be found."));
+			}
+		}
+		return shellPath;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.terminal.IProcessConfiguration#getCommandLine()
-	 */
-	@Override
-	public List<String> getCommandLine() throws CoreException {
-		List<String> list = new ArrayList<String>();
-		list.add(getExecutable().getAbsolutePath());
-		list.add("\"\\\"" + ShellLocation.getPath().toOSString() + "\\\"  --login -i\""); //$NON-NLS-1$ //$NON-NLS-2$
-		list.add("120x40"); //$NON-NLS-1$
-		if (Platform.inDevelopmentMode() || Platform.inDebugMode()) {
-			list.add("-show"); //$NON-NLS-1$
+	private static List<IPath> getPossibleShellLocations() {	
+		if (Platform.OS_WIN32.equals(Platform.getOS())) {
+			List<IPath> list = new ArrayList<IPath>();
+			for (String location : POSSIBLE_SHELL_LOCATIONS_WIN32) {
+				IPath path = Path.fromOSString(PlatformUtil.expandEnvironmentStrings(location));
+				if (path.toFile().isDirectory()) {
+					list.add(path);
+				}
+			}
+			return list;
 		}
-		return list;
+		return null;
 	}
 
 }

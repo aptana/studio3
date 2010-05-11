@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -43,7 +42,7 @@ public class GitIndex
 
 	private GitRepository repository;
 	private boolean amend;
-	private String workingDirectory;
+	private IPath workingDirectory;
 
 	/**
 	 * Temporary list of changed files that we build up on refreshes. TODO Don't make this a field here that is
@@ -64,7 +63,7 @@ public class GitIndex
 
 	private Job indexRefreshJob;
 
-	GitIndex(GitRepository repository, String workingDirectory)
+	GitIndex(GitRepository repository, IPath workingDirectory)
 	{
 		super();
 
@@ -796,7 +795,7 @@ public class GitIndex
 		{
 			try
 			{
-				return ProcessUtil.read(new FileInputStream(new File(workingDirectory, file.path)));
+				return ProcessUtil.read(new FileInputStream(workingDirectory.append(file.path).toFile()));
 			}
 			catch (FileNotFoundException e)
 			{
@@ -842,12 +841,12 @@ public class GitIndex
 			if (changedFiles == null || changedFiles.isEmpty())
 				return false;
 
-			String workingDirectory = repository.workingDirectory();
-			IPath resourcePath = new Path(new File(resource.getLocationURI()).getAbsolutePath());
+			IPath workingDirectory = repository.workingDirectory();
+			IPath resourcePath = resource.getLocation();
 			for (ChangedFile changedFile : changedFiles)
 			{
-				String fullPath = new File(workingDirectory, changedFile.getPath()).getAbsolutePath();
-				if (resourcePath.isPrefixOf(new Path(fullPath)))
+				IPath fullPath = workingDirectory.append(changedFile.getPath()).makeAbsolute();
+				if (resourcePath.isPrefixOf(fullPath))
 					return true;
 			}
 		}
@@ -879,14 +878,14 @@ public class GitIndex
 
 	public Set<IResource> getChangedResources()
 	{
-		String workingDir = repository.workingDirectory();
+		IPath workingDir = repository.workingDirectory();
 		Set<IResource> resources = new HashSet<IResource>();
 		synchronized (changedFiles)
 		{
 			for (ChangedFile changedFile : changedFiles)
 			{
 				IResource resource = ResourcesPlugin.getWorkspace().getRoot()
-						.getFileForLocation(new Path(workingDir).append(changedFile.getPath()));
+						.getFileForLocation(workingDir.append(changedFile.getPath()));
 				if (resource != null)
 					resources.add(resource);
 			}
@@ -898,13 +897,13 @@ public class GitIndex
 	{
 		if (resource == null || resource.getLocationURI() == null)
 			return null;
-		String resourcePath = new File(resource.getLocationURI()).getAbsolutePath();
-		String workingDirectory = repository.workingDirectory();
+		IPath resourcePath = resource.getLocation();
+		IPath workingDirectory = repository.workingDirectory();
 		synchronized (changedFiles)
 		{
 			for (ChangedFile changedFile : changedFiles)
 			{
-				String fullPath = new File(workingDirectory, changedFile.getPath()).getAbsolutePath();
+				IPath fullPath = workingDirectory.append(changedFile.getPath());
 				if (resourcePath.equals(fullPath))
 				{
 					return changedFile;
@@ -925,9 +924,9 @@ public class GitIndex
 		if (container == null || container.getLocationURI() == null)
 			return Collections.emptyList();
 
-		String resourcePath = new File(container.getLocationURI()).getAbsolutePath();
+		IPath resourcePath = container.getLocation();
 		List<ChangedFile> filtered = new ArrayList<ChangedFile>();
-		String workingDirectory = repository.workingDirectory();
+		IPath workingDirectory = repository.workingDirectory();
 
 		synchronized (changedFiles)
 		{
@@ -935,8 +934,8 @@ public class GitIndex
 				return Collections.emptyList();
 			for (ChangedFile changedFile : changedFiles)
 			{
-				String fullPath = new File(workingDirectory, changedFile.getPath()).getAbsolutePath();
-				if (fullPath.startsWith(resourcePath))
+				IPath fullPath = workingDirectory.append(changedFile.getPath()).makeAbsolute();
+				if (resourcePath.isPrefixOf(fullPath))
 					filtered.add(changedFile);
 			}
 		}
