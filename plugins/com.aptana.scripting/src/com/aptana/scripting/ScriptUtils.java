@@ -2,14 +2,9 @@ package com.aptana.scripting;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.bindings.keys.IKeyLookup;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.jruby.Ruby;
@@ -17,9 +12,6 @@ import org.jruby.RubyClass;
 import org.jruby.RubyModule;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
-
-import com.aptana.core.util.ExecutableUtil;
-import com.aptana.core.util.PlatformUtil;
 
 public class ScriptUtils
 {
@@ -93,38 +85,6 @@ public class ScriptUtils
 		}
 		
 		return result;
-	}
-	
-	/**
-	 * getPossibleShellLocations
-	 * 
-	 * @return
-	 */
-	private static List<IPath> getPossibleShellLocations()
-	{
-		List<IPath> list = null;
-		
-		if (Platform.OS_WIN32.equals(Platform.getOS()))
-		{
-			list = new ArrayList<IPath>();
-			list.add(Path.fromOSString(PlatformUtil.expandEnvironmentStrings("%PROGRAMW6432%\\Git\\bin"))); //$NON-NLS-1$
-			list.add(Path.fromOSString(PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES%\\Git\\bin"))); //$NON-NLS-1$
-			list.add(Path.fromOSString(PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES(X86)%\\Git\\bin"))); //$NON-NLS-1$
-		}
-		
-		return list;
-	}
-	
-	/**
-	 * getShellPath
-	 * 
-	 * @return
-	 */
-	public static IPath getShellPath()
-	{
-		String shell = (Platform.OS_WIN32.equals(Platform.getOS())) ? "sh.exe" : "bash";
-		
-		return ExecutableUtil.find(shell, false, null, getPossibleShellLocations());
 	}
 	
 	/**
