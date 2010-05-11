@@ -1,13 +1,20 @@
 package com.aptana.editor.css.contentassist.index;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.core.runtime.content.IContentTypeManager;
 
 import com.aptana.core.util.IOUtil;
+import com.aptana.editor.css.Activator;
 import com.aptana.editor.css.CSSColors;
+import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.parsing.CSSParser;
 import com.aptana.editor.css.parsing.ast.CSSAttributeSelectorNode;
 import com.aptana.editor.css.parsing.ast.CSSRuleNode;
@@ -21,17 +28,12 @@ public class CSSFileIndexingParticipant implements IFileIndexingParticipant
 {
 	private static final String CSS_EXTENSION = "css"; //$NON-NLS-1$
 
-	public CSSFileIndexingParticipant()
-	{
-	}
-
 	@Override
 	public void index(Set<IFile> files, Index index, IProgressMonitor monitor)
 	{		
 		for (IFile file : files)
 		{
-			String fileExtension = file.getFileExtension();
-			if (CSS_EXTENSION.equalsIgnoreCase(fileExtension))
+			if (isCSSFile(file))
 			{
 				try
 				{
@@ -44,17 +46,52 @@ public class CSSFileIndexingParticipant implements IFileIndexingParticipant
 				}
 				catch (CoreException e)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					Activator.logError(e);
 				}
 				catch (Exception e)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					Activator.logError(e.getMessage(), e);
 				}
-
 			}
 		}
+	}
+	
+	private boolean isCSSFile(IFile file)
+	{
+		InputStream stream = null;
+		IContentTypeManager manager = Platform.getContentTypeManager();
+		try
+		{
+			stream = file.getContents();
+			IContentType[] types = manager.findContentTypesFor(stream, file.getName());
+			for (IContentType type : types)
+			{
+				if (type.getId().equals(ICSSConstants.CONTENT_TYPE_CSS))
+				return true;
+			}
+		}
+		catch (CoreException e)
+		{
+			Activator.logError(e);
+		}
+		catch (Exception e)
+		{
+			Activator.logError(e.getMessage(), e);
+		}
+		finally
+		{
+			try
+			{
+				if (stream != null)
+					stream.close();
+			}
+			catch (IOException e)
+			{
+				// ignore
+			}
+		}
+		
+		return CSS_EXTENSION.equalsIgnoreCase(file.getFileExtension());
 	}
 
 	public static void walkNode(Index index, IFile file, IParseNode parent)
