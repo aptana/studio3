@@ -37,6 +37,7 @@ package com.aptana.terminal.internal;
 
 import java.io.IOException;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.ListenerList;
 
@@ -61,7 +62,7 @@ public class ProcessLauncher {
 		this.initialDirectory = initialDirectory;
 	}
 	
-	public void launch() throws IOException {
+	public void launch() throws IOException, CoreException {
 		ProcessBuilder builder = new ProcessBuilder(configuration.getCommandLine());
 		builder.environment().putAll(configuration.getEnvironment());
 		builder.directory(initialDirectory != null ? initialDirectory.toFile() : null);

@@ -148,6 +148,7 @@ public class ResourceIndexer implements IResourceChangeListener
 					{
 						return Status.CANCEL_STATUS;
 					}
+					// TODO Limit file indexers by content type here so we don't have to check content type for each file in every indexer! indexers should/could register what content types they handle and then we can pre-filter here!
 					fileIndexingParticipant.index(files, index, monitor);
 				}
 

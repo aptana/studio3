@@ -76,6 +76,7 @@ import org.eclipse.osgi.util.NLS;
 	public static String SFTPConnectionFileManager_FailedRenaming;
 	public static String SFTPConnectionFileManager_FailedSetModificationTime;
 	public static String SFTPConnectionFileManager_FailedSetPermissions;
+	public static String SFTPConnectionFileManager_FailedChangeGroup;
 	public static String SFTPConnectionFileManager_GatheringFileDetails;
 	public static String SFTPConnectionFileManager_HostNameNotFound;
 	public static String SFTPConnectionFileManager_IncorrectLogin;

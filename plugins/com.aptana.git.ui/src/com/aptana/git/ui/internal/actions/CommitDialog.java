@@ -1,6 +1,5 @@
 package com.aptana.git.ui.internal.actions;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,8 +12,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -517,10 +516,10 @@ public class CommitDialog extends StatusDialog
 					{
 						String filePath = item.getText(1);
 
-						String workingDirectory = gitRepository.workingDirectory();
+						IPath workingDirectory = gitRepository.workingDirectory();
 
 						IFile file = ResourcesPlugin.getWorkspace().getRoot()
-								.getFileForLocation(new Path(workingDirectory).append(filePath));
+								.getFileForLocation(workingDirectory.append(filePath));
 						if (file != null)
 						{
 							files.add(file);
@@ -623,8 +622,8 @@ public class CommitDialog extends StatusDialog
 			{
 				if (file.getPath().endsWith(extension))
 				{
-					String fullPath = new File(gitRepository.workingDirectory(), file.getPath()).getAbsolutePath();
-					updateDiff(file, "<img src=\"" + fullPath + "\" />"); //$NON-NLS-1$ //$NON-NLS-2$
+					IPath fullPath = gitRepository.workingDirectory().append(file.getPath());
+					updateDiff(file, "<img src=\"" + fullPath.toOSString() + "\" />"); //$NON-NLS-1$ //$NON-NLS-2$
 					return;
 				}
 			}

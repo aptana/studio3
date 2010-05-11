@@ -38,25 +38,22 @@ package com.aptana.terminal.internal.configurations;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
-import com.aptana.scripting.ScriptUtils;
+import com.aptana.core.ShellLocation;
 
 /**
  * @author Max Stepanov
  */
-public class WindowsMingwConfiguration extends AbstractProcessConfiguration
-{
+public class WindowsMingwConfiguration extends AbstractProcessConfiguration {
 
 	private static final String EXECUTABLE = "$os$/redttyw.exe"; //$NON-NLS-1$
 
-	private IPath shellExecutable = null;
-
 	@Override
-	protected IPath getExecutablePath()
-	{
+	protected IPath getExecutablePath() {
 		return new Path(EXECUTABLE);
 	}
 
@@ -65,33 +62,15 @@ public class WindowsMingwConfiguration extends AbstractProcessConfiguration
 	 * @see com.aptana.terminal.IProcessConfiguration#getCommandLine()
 	 */
 	@Override
-	public List<String> getCommandLine()
-	{
+	public List<String> getCommandLine() throws CoreException {
 		List<String> list = new ArrayList<String>();
 		list.add(getExecutable().getAbsolutePath());
-		IPath shell = findShellExecutable();
-		String command = shell != null ? shell.toOSString() : "sh"; //$NON-NLS-1$
-		list.add("\"\\\"" + command + "\\\"  --login -i\""); //$NON-NLS-1$ //$NON-NLS-2$
+		list.add("\"\\\"" + ShellLocation.getPath().toOSString() + "\\\"  --login -i\""); //$NON-NLS-1$ //$NON-NLS-2$
 		list.add("120x40"); //$NON-NLS-1$
-		if (Platform.inDevelopmentMode() || Platform.inDebugMode())
-		{
+		if (Platform.inDevelopmentMode() || Platform.inDebugMode()) {
 			list.add("-show"); //$NON-NLS-1$
 		}
 		return list;
 	}
 
-	/**
-	 * findShellExecutable
-	 * 
-	 * @return
-	 */
-	private IPath findShellExecutable()
-	{
-		if (shellExecutable != null)
-		{
-			return shellExecutable;
-		}
-		
-		return shellExecutable = ScriptUtils.getShellPath();
-	}
 }
