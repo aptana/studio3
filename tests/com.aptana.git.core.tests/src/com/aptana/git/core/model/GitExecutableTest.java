@@ -61,7 +61,7 @@ public class GitExecutableTest extends TestCase
 		prefs.flush();
 
 		GitExecutable executable = GitExecutable.instance();
-		assertEquals(url.getPath(), executable.path());
+		assertEquals(url.getPath(), executable.path().toPortableString());
 	}
 
 	public void testDetectsInStandardLocation() throws Throwable
@@ -74,7 +74,7 @@ public class GitExecutableTest extends TestCase
 		{
 			expectedLocation = "/usr/local/bin/git";
 		}
-		assertEquals(expectedLocation, executable.path());
+		assertEquals(expectedLocation, executable.path().toPortableString());
 	}
 
 	// Test that it reacts to changes in pref location
