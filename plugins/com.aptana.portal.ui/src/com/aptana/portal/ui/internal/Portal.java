@@ -42,7 +42,7 @@ import com.aptana.usage.PingStartup;
 @SuppressWarnings("restriction")
 public class Portal
 {
-	public static final String BASE_URL_PREFIX = "http://aptana.com/tools/content/"; //$NON-NLS-1$
+	public static final String BASE_URL_PREFIX = "http://toolbox.aptana.com/toolbox"; //$NON-NLS-1$
 	private static final String EXPLORER_PLUGIN_ID = "com.aptana.explorer"; //$NON-NLS-1$
 	public static final String ACTIVE_PROJECT_KEY = "activeProject"; //$NON-NLS-1$
 	private static final String RAILS_NATURE = "org.radrails.rails.core.railsnature"; //$NON-NLS-1$
@@ -73,7 +73,8 @@ public class Portal
 
 	/**
 	 * Opens the portal with a given URL. In case the portal is already open, and the given URL is valid, direct the
-	 * portal to the new URL.
+	 * portal to the new URL.<br>
+	 * This method must be called from the UI thread (preferably, through a UIJob).
 	 * 
 	 * @param url
 	 *            A URL (can be null).
@@ -164,7 +165,8 @@ public class Portal
 		catch (Exception e)
 		{
 			connected = false;
-			PortalUIPlugin.logWarning("Could not establish a connection to the remote Aptana Dev Toolbox portal. Using the local portal content."); //$NON-NLS-1$
+			PortalUIPlugin
+					.logWarning("Could not establish a connection to the remote Aptana Dev Toolbox portal. Using the local portal content."); //$NON-NLS-1$
 		}
 		finally
 		{
@@ -184,62 +186,44 @@ public class Portal
 	protected String getURLForProject(final IProject activeProject)
 	{
 		final StringBuilder builder = new StringBuilder();
-		Job uiJob = new UIJob("Building portal URL...")
-		{
-			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor)
-			{
-				builder.append("?v=");
-				builder.append(getVersion()); 
+		builder.append("?v=");
+		builder.append(getVersion());
 
-				builder.append("&bg=");
-				builder.append(toHex(getThemeManager().getCurrentTheme().getBackground()));
-				builder.append("&fg=");
-				builder.append(toHex(getThemeManager().getCurrentTheme().getForeground()));
+		builder.append("&bg=");
+		builder.append(toHex(getThemeManager().getCurrentTheme().getBackground()));
+		builder.append("&fg=");
+		builder.append(toHex(getThemeManager().getCurrentTheme().getForeground()));
 
-				// "chrome"
-				builder.append("&ch=");// FIXME Grab one of the actual parent widgets and grab it's bg?
-				Color color = PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
-				builder.append(toHex(color.getRGB()));
+		// "chrome"
+		builder.append("&ch=");// FIXME Grab one of the actual parent widgets and grab it's bg?
+		Color color = PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+		builder.append(toHex(color.getRGB()));
 
-				// project type
-				builder.append("&p=");
-				builder.append(getProjectType(activeProject));
+		// project type
+		builder.append("&p=");
+		builder.append(getProjectType(activeProject));
 
-				// version control
-				// builder.append("&vc=");
-				// builder.append(getVersionControl());
+		// version control
+		// builder.append("&vc=");
+		// builder.append(getVersionControl());
 
-				// github
-				// builder.append("&gh=");
-				// builder.append(hasGithubRemote() ? '1' : '0');
+		// github
+		// builder.append("&gh=");
+		// builder.append(hasGithubRemote() ? '1' : '0');
 
-				// timestamp to force updates to server (bypass browser cache)
-				builder.append("&ts=");
-				builder.append(System.currentTimeMillis());
+		// timestamp to force updates to server (bypass browser cache)
+		builder.append("&ts=");
+		builder.append(System.currentTimeMillis());
 
-				// guid that relates to a single install of the IDE
-				builder.append("&id=");
-				builder.append(getGUID());
+		// guid that relates to a single install of the IDE
+		builder.append("&id=");
+		builder.append(getGUID());
 
-				// deploy info
-				builder.append(getDeployParam(activeProject));
+		// deploy info
+		builder.append(getDeployParam(activeProject));
 
-				// for debugging output
-				// builder.append("&debug=1");
-				return Status.OK_STATUS;
-			}
-		};
-		uiJob.setSystem(true);
-		uiJob.schedule();
-		try
-		{
-			uiJob.join();
-		}
-		catch (InterruptedException e)
-		{
-			PortalUIPlugin.logError(e);
-		}
+		// for debugging output
+		// builder.append("&debug=1");
 		return builder.toString();
 	}
 

@@ -35,5 +35,6 @@ Export-Package: com.aptana.portal.ui,
  com.aptana.portal.ui.internal.startup
 Import-Package: com.aptana.configurations,
  com.aptana.editor.common,
+ com.aptana.editor.common.theme,
  com.aptana.usage
 Eclipse-ExtensibleAPI: true
