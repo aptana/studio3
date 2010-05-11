@@ -46,7 +46,6 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Random;
@@ -75,9 +74,6 @@ import com.aptana.ide.core.io.vfs.IExtendedFileStore;
  */
 public abstract class CommonConnectionTest extends TestCase
 {
-
-	protected static final long ALLOWED_TIME_DIFFERENCE = 15 * 60 * 1000; /* 15 minute difference */
-
 	protected static final String TEXT = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse nunc tellus, condimentum quis luctus fermentum, tincidunt eget dui. Sed bibendum iaculis ligula, fringilla ullamcorper justo ullamcorper non. Curabitur tristique mi a magna vestibulum fermentum. Praesent sed neque feugiat purus egestas tristique. Sed non nisi velit. Maecenas placerat, nisi quis iaculis porta, nisi mauris facilisis est, at rutrum lacus sem non ante. Morbi et cursus nibh. Aliquam tincidunt urna quis quam semper ut congue est auctor. Curabitur malesuada, diam ut congue elementum, orci eros rhoncus felis, vel elementum felis velit id eros. Quisque eros diam, malesuada nec tincidunt eget, gravida iaculis tortor. Donec sollicitudin ultricies ante ac facilisis. In egestas malesuada erat id vehicula.\n" + //$NON-NLS-1$
 			"Integer non urna nunc, et rhoncus eros. Suspendisse tincidunt laoreet enim vel pretium. Nam bibendum sodales risus nec adipiscing. Pellentesque fringilla interdum odio posuere consectetur. Nullam venenatis augue sed felis tempus eu posuere quam facilisis. Pellentesque commodo rutrum bibendum. Ut sit amet sapien in purus vestibulum sodales. Integer pharetra mi in dui auctor in tristique erat malesuada. Integer nec ipsum quam. Quisque non enim et quam consequat mollis id ac sem. Nunc ut elit ac odio adipiscing pretium vel eget mauris. Aenean diam diam, porttitor sit amet lobortis a, accumsan at ante. Phasellus ut nulla enim. In nec diam magna. In molestie vulputate viverra. Etiam at justo tellus, sed rutrum erat.\r\n" //$NON-NLS-1$
 			+ "Duis consectetur ornare ante, sit amet ultricies leo aliquam vitae. In fermentum nisi non dolor viverra non hendrerit nulla malesuada. Mauris adipiscing aliquet fringilla. Curabitur porttitor tristique massa, et semper nulla semper et. Phasellus a ipsum eu lectus pulvinar aliquam eget viverra velit. Sed commodo ultrices pulvinar. In at felis sollicitudin lorem semper scelerisque. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin vel purus id odio malesuada gravida. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Quisque metus mi, eleifend consectetur varius vitae, euismod eget nulla. Morbi justo felis, accumsan vel tempor non, rutrum at augue. Curabitur nulla lorem, ultricies a lobortis in, semper vitae diam. Pellentesque nec orci non turpis dignissim mollis. Quisque quis sapien vitae ligula iaculis dapibus sed at quam. Nullam ut nisl id eros sagittis rutrum a vitae risus. Suspendisse lacinia lacinia rutrum. Fusce molestie pellentesque dapibus. Quisque eu orci dolor, eget venenatis velit.\n" //$NON-NLS-1$
@@ -227,16 +223,12 @@ public abstract class CommonConnectionTest extends TestCase
 		assertNotNull(fi);
 		assertFalse(fi.exists());
 		assertEquals("emptyfile.txt", fi.getName()); //$NON-NLS-1$
-		long beforeTime = System.currentTimeMillis() - ALLOWED_TIME_DIFFERENCE;
 		OutputStream out = fs.openOutputStream(EFS.NONE, null);
 		out.close();
-		long afterTime = System.currentTimeMillis() + ALLOWED_TIME_DIFFERENCE;
 		fi = fs.fetchInfo();
 		assertNotNull(fi);
 		assertTrue(fi.exists());
 		assertEquals(0, fi.getLength());
-		assertTrue(MessageFormat.format("{0} > {1} && {2} < {3}", new Object[] { fi.getLastModified(), beforeTime, fi.getLastModified(), afterTime }),
-				fi.getLastModified() > beforeTime && fi.getLastModified() < afterTime);
 	}
 
 	public final void testCreateEmptyFileRecursive() throws CoreException, IOException
@@ -272,15 +264,11 @@ public abstract class CommonConnectionTest extends TestCase
 		assertNotNull(fi);
 		assertFalse(fi.exists());
 		assertEquals("newfolder", fi.getName()); //$NON-NLS-1$
-		long beforeTime = System.currentTimeMillis() - ALLOWED_TIME_DIFFERENCE;
 		fs.mkdir(EFS.SHALLOW, null);
-		long afterTime = System.currentTimeMillis() + ALLOWED_TIME_DIFFERENCE;
 		fi = fs.fetchInfo();
 		assertNotNull(fi);
 		assertTrue(fi.exists());
 		assertTrue(fi.isDirectory());
-		assertTrue(MessageFormat.format("{0} > {1} && {2} < {3}", new Object[] { fi.getLastModified(), beforeTime, fi.getLastModified(), afterTime }),
-				fi.getLastModified() > beforeTime && fi.getLastModified() < afterTime);
 		fs.mkdir(EFS.SHALLOW, null); // retry to show no errors
 	}
 
@@ -307,14 +295,10 @@ public abstract class CommonConnectionTest extends TestCase
 		assertNotNull(fi);
 		assertFalse(fi.exists());
 
-		long beforeTime = System.currentTimeMillis() - ALLOWED_TIME_DIFFERENCE;
 		fs2.mkdir(EFS.NONE, null);
-		long afterTime = System.currentTimeMillis() + ALLOWED_TIME_DIFFERENCE;
 		fi = fs2.fetchInfo();
 		assertNotNull(fi);
 		assertTrue(fi.exists());
-		assertTrue(MessageFormat.format("{0} > {1} && {2} < {3}", new Object[] { fi.getLastModified(), beforeTime, fi.getLastModified(), afterTime }),
-				fi.getLastModified() > beforeTime && fi.getLastModified() < afterTime);
 	}
 
 	public final void testWriteReadBinFile() throws CoreException, IOException
@@ -324,17 +308,13 @@ public abstract class CommonConnectionTest extends TestCase
 		IFileInfo fi = fs.fetchInfo();
 		assertNotNull(fi);
 		assertFalse(fi.exists());
-		long beforeTime = System.currentTimeMillis() - ALLOWED_TIME_DIFFERENCE;
 		OutputStream out = fs.openOutputStream(EFS.NONE, null);
 		out.write(BYTES);
 		out.close();
-		long afterTime = System.currentTimeMillis() + ALLOWED_TIME_DIFFERENCE;
 		fi = fs.fetchInfo();
 		assertNotNull(fi);
 		assertTrue(fi.exists());
 		assertEquals(BYTES.length, fi.getLength());
-		assertTrue(MessageFormat.format("{0} > {1} && {2} < {3}", new Object[] { fi.getLastModified(), beforeTime, fi.getLastModified(), afterTime }),
-				fi.getLastModified() > beforeTime && fi.getLastModified() < afterTime);
 		InputStream in = fs.openInputStream(EFS.NONE, null);
 		ByteArrayOutputStream bout = new ByteArrayOutputStream(BYTES.length);
 		byte[] buffer = new byte[256];
@@ -355,17 +335,13 @@ public abstract class CommonConnectionTest extends TestCase
 		IFileInfo fi = fs.fetchInfo();
 		assertNotNull(fi);
 		assertFalse(fi.exists());
-		long beforeTime = System.currentTimeMillis() - ALLOWED_TIME_DIFFERENCE;
 		Writer w = new OutputStreamWriter(fs.openOutputStream(EFS.NONE, null));
 		w.write(TEXT);
 		w.close();
-		long afterTime = System.currentTimeMillis() + ALLOWED_TIME_DIFFERENCE;
 		fi = fs.fetchInfo();
 		assertNotNull(fi);
 		assertTrue(fi.exists());
 		assertEquals(TEXT.length(), fi.getLength());
-		assertTrue(MessageFormat.format("{0} > {1} && {2} < {3}", new Object[] { fi.getLastModified(), beforeTime, fi.getLastModified(), afterTime }),
-				fi.getLastModified() > beforeTime && fi.getLastModified() < afterTime);
 		Reader r = new InputStreamReader(fs.openInputStream(EFS.NONE, null));
 		StringWriter sw = new StringWriter(TEXT.length());
 		char[] buffer = new char[256];
@@ -390,17 +366,13 @@ public abstract class CommonConnectionTest extends TestCase
 		assertNotNull(fi);
 		assertTrue(fi.exists());
 
-		long beforeTime = System.currentTimeMillis() - ALLOWED_TIME_DIFFERENCE;
 		Writer w = new OutputStreamWriter(fs.openOutputStream(EFS.NONE, null));
 		w.write(TEXT);
 		w.close();
-		long afterTime = System.currentTimeMillis() + ALLOWED_TIME_DIFFERENCE;
 		fi = fs.fetchInfo();
 		assertNotNull(fi);
 		assertTrue(fi.exists());
 		assertEquals(TEXT.length(), fi.getLength());
-		assertTrue(MessageFormat.format("{0} > {1} && {2} < {3}", new Object[] { fi.getLastModified(), beforeTime, fi.getLastModified(), afterTime }),
-				fi.getLastModified() > beforeTime && fi.getLastModified() < afterTime);
 		Reader r = new InputStreamReader(fs.openInputStream(EFS.NONE, null));
 		StringWriter sw = new StringWriter(TEXT.length());
 		char[] buffer = new char[256];
@@ -463,13 +435,11 @@ public abstract class CommonConnectionTest extends TestCase
 		String[] NAMES = new String[] { "file1.txt", "file2.txt", "file3.txt" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		IFileStore fs = cp.getRoot().getFileStore(testPath);
 		assertNotNull(fs);
-		long beforeTime = System.currentTimeMillis() - ALLOWED_TIME_DIFFERENCE;
 		for (int i = 0; i < NAMES.length; ++i)
 		{
 			OutputStream out = fs.getChild(NAMES[i]).openOutputStream(EFS.NONE, null);
 			out.close();
 		}
-		long afterTime = System.currentTimeMillis() + ALLOWED_TIME_DIFFERENCE;
 
 		String[] names = fs.childNames(EFS.NONE, null);
 		Arrays.sort(names);
@@ -506,8 +476,6 @@ public abstract class CommonConnectionTest extends TestCase
 		{
 			assertEquals(NAMES[i], filist[i].getName());
 			assertFalse(filist[i].isDirectory());
-			assertTrue(MessageFormat.format("{0} > {1} && {2} < {3}", new Object[] { filist[i].getLastModified(), beforeTime, filist[i].getLastModified(), afterTime }),
-					filist[i].getLastModified() > beforeTime && filist[i].getLastModified() < afterTime);
 		}
 	}
 
@@ -516,12 +484,10 @@ public abstract class CommonConnectionTest extends TestCase
 		String[] NAMES = new String[] { "folder1", "folder2", "folder3" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		IFileStore fs = cp.getRoot().getFileStore(testPath);
 		assertNotNull(fs);
-		long beforeTime = System.currentTimeMillis() - ALLOWED_TIME_DIFFERENCE;
 		for (int i = 0; i < NAMES.length; ++i)
 		{
 			fs.getChild(NAMES[i]).mkdir(EFS.SHALLOW, null);
 		}
-		long afterTime = System.currentTimeMillis() + ALLOWED_TIME_DIFFERENCE;
 
 		String[] names = fs.childNames(EFS.NONE, null);
 		Arrays.sort(names);
@@ -558,8 +524,6 @@ public abstract class CommonConnectionTest extends TestCase
 		{
 			assertEquals(NAMES[i], filist[i].getName());
 			assertTrue(filist[i].isDirectory());
-			assertTrue(MessageFormat.format("{0} > {1} && {2} < {3}", new Object[] { filist[i].getLastModified(), beforeTime, filist[i].getLastModified(), afterTime }),
-					filist[i].getLastModified() > beforeTime && filist[i].getLastModified() < afterTime);
 		}
 	}
 
