@@ -11,9 +11,11 @@ import java.util.Set;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.team.core.RepositoryProvider;
@@ -59,16 +61,16 @@ public class GitRepositoryManager implements IGitRepositoryManager
 	}
 
 	@Override
-	public void create(String path)
+	public void create(IPath path)
 	{
 		if (path == null)
 			return;
-		if (path.endsWith(File.separator + GIT_DIR))
+		if (path.lastSegment().equals(GIT_DIR))
 		{
-			path = path.substring(0, path.length() - GIT_DIR.length());
+			path = path.removeLastSegments(1);
 		}
 
-		File file = new File(path);
+		File file = path.toFile();
 		URI existing = gitDirForURL(file.toURI());
 		if (existing != null)
 			return;
@@ -198,12 +200,12 @@ public class GitRepositoryManager implements IGitRepositoryManager
 		if (GitExecutable.instance() == null)
 			return null;
 
-		String repositoryPath = repositoryURL.getPath();
+		IPath repositoryPath = Path.fromOSString(repositoryURL.getPath());
 		if (repositoryURL.getScheme().equals("file")) //$NON-NLS-1$
 		{
-			repositoryPath = new File(repositoryURL).getAbsolutePath();
+			repositoryPath = Path.fromOSString(new File(repositoryURL).getAbsolutePath());
 		}
-		if (!new File(repositoryPath).exists())
+		if (!repositoryPath.toFile().exists())
 			return null;
 
 		if (isBareRepository(repositoryPath))
@@ -221,14 +223,14 @@ public class GitRepositoryManager implements IGitRepositoryManager
 		if (newPath == null)
 			return null;
 		if (newPath.equals(GIT_DIR))
-			return new File(repositoryPath, GIT_DIR).toURI();
+			return repositoryPath.append(GIT_DIR).toFile().toURI();
 		if (newPath.length() > 0)
 			return new File(newPath).toURI();
 
 		return null;
 	}
 
-	private boolean isBareRepository(String path)
+	private boolean isBareRepository(IPath path)
 	{
 		String output = GitExecutable.instance().outputForCommand(path, "rev-parse", "--is-bare-repository"); //$NON-NLS-1$ //$NON-NLS-2$
 		return "true".equals(output); //$NON-NLS-1$
@@ -281,7 +283,7 @@ public class GitRepositoryManager implements IGitRepositoryManager
 			{
 				if (sub.isCanceled())
 					throw new CoreException(Status.CANCEL_STATUS);
-				create(new File(project.getLocationURI()).getAbsolutePath());
+				create(project.getLocation());
 			}
 			sub.worked(50);
 			if (sub.isCanceled())

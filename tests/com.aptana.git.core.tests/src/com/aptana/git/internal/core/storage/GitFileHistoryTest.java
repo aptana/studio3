@@ -149,7 +149,7 @@ public class GitFileHistoryTest extends TestCase
 
 	protected GitRepository createRepo() throws CoreException
 	{
-		getGitRepositoryManager().create(getProject().getLocation().toOSString());
+		getGitRepositoryManager().create(getProject().getLocation());
 		return getGitRepositoryManager().attachExisting(getProject(), new NullProgressMonitor());
 	}
 

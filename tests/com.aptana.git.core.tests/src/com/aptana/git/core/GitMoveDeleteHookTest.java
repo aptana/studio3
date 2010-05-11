@@ -53,10 +53,12 @@ public class GitMoveDeleteHookTest extends TestCase
 				return repo;
 			}
 
+			/*
 			protected boolean hasNoCommittedFiles(String source, GitRepository repo)
 			{
 				return false;
 			}
+			*/
 		};
 	}
 
@@ -195,10 +197,12 @@ public class GitMoveDeleteHookTest extends TestCase
 				addFilesToHistoryCalled[0] = true;
 			}
 
+			/*
 			protected boolean hasNoCommittedFiles(String source, GitRepository repo)
 			{
 				return false;
 			}
+			*/
 
 		};
 		context.checking(new Expectations()
@@ -226,7 +230,7 @@ public class GitMoveDeleteHookTest extends TestCase
 				// local history
 
 				// delete via repo
-				oneOf(repo).deleteFolder("folder");
+				oneOf(repo).deleteFolder(Path.fromOSString("folder"));
 				will(returnValue(org.eclipse.core.runtime.Status.OK_STATUS));
 				// repo says we deleted ok, so we should mark that on the tree
 				oneOf(tree).deletedFolder(folder);
@@ -269,10 +273,12 @@ public class GitMoveDeleteHookTest extends TestCase
 				return repo;
 			}
 
+			/*
 			protected boolean hasNoCommittedFiles(String source, GitRepository repo)
 			{
 				return true;
 			}
+			*/
 		};
 		context.checking(new Expectations()
 		{
@@ -296,7 +302,7 @@ public class GitMoveDeleteHookTest extends TestCase
 						.toURI()));
 
 				// We don't try these because we punted
-				never(repo).deleteFolder("folder");
+				never(repo).deleteFolder(Path.fromOSString("folder"));
 				never(tree).deletedFolder(folder);
 			}
 		});
@@ -375,7 +381,7 @@ public class GitMoveDeleteHookTest extends TestCase
 				will(returnValue(true));
 
 				// Now actually delete contents
-				oneOf(repo).deleteFolder("project");
+				oneOf(repo).deleteFolder(Path.fromOSString("project"));
 				will(returnValue(org.eclipse.core.runtime.Status.OK_STATUS));
 				// repo says we deleted ok, so we should mark that on the tree
 				oneOf(tree).deletedProject(project);
@@ -409,7 +415,7 @@ public class GitMoveDeleteHookTest extends TestCase
 				will(returnValue(false));
 
 				// should never actually try to delete the project
-				never(repo).deleteFolder("project");
+				never(repo).deleteFolder(Path.fromOSString("project"));
 			}
 		});
 		assertFalse(hook.deleteProject(tree, project, 0, new NullProgressMonitor()));
@@ -426,10 +432,12 @@ public class GitMoveDeleteHookTest extends TestCase
 				return repo;
 			}
 
+			/*
 			protected boolean hasNoCommittedFiles(String source, GitRepository repo)
 			{
 				return true;
 			}
+			*/
 		};
 		context.checking(new Expectations()
 		{
@@ -447,7 +455,7 @@ public class GitMoveDeleteHookTest extends TestCase
 				oneOf(project).getLocationURI();
 				will(returnValue(new File(File.separator + "some" + File.separator + "root" + File.separator
 						+ "project").toURI()));
-				never(repo).deleteFolder("project");
+				never(repo).deleteFolder(Path.fromOSString("project"));
 			}
 		});
 		assertFalse(hook.deleteProject(tree, project, IResource.ALWAYS_DELETE_PROJECT_CONTENT,

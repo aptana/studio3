@@ -32,7 +32,7 @@ public class GitMoveDeleteIntegrationTest extends TestCase
 		project = ProjectCreator.createAndOpen(PROJECT_NAME);
 
 		// create a git repo
-		getGitRepositoryManager().create(project.getLocation().toOSString());
+		getGitRepositoryManager().create(project.getLocation());
 		repo = getGitRepositoryManager().attachExisting(project, new NullProgressMonitor());
 	}
 
