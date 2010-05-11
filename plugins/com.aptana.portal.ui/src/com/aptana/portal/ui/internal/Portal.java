@@ -1,23 +1,38 @@
 package com.aptana.portal.ui.internal;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.MessageFormat;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 import org.eclipse.ui.progress.UIJob;
 
+import com.aptana.core.util.EclipseUtil;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.browser.PortalBrowserEditor;
+import com.aptana.usage.PingStartup;
 
 /**
  * The portal class is a singleton that controls the portal browser and allows interacting with it.
@@ -28,17 +43,13 @@ import com.aptana.portal.ui.browser.PortalBrowserEditor;
 public class Portal
 {
 	public static final String BASE_URL_PREFIX = "http://aptana.com/tools/content/"; //$NON-NLS-1$
+	private static final String EXPLORER_PLUGIN_ID = "com.aptana.explorer"; //$NON-NLS-1$
+	public static final String ACTIVE_PROJECT_KEY = "activeProject"; //$NON-NLS-1$
+	private static final String RAILS_NATURE = "org.radrails.rails.core.railsnature"; //$NON-NLS-1$
+	private static final String PHP_NATURE = "com.aptana.editor.php.phpnature"; //$NON-NLS-1$
 	private static Portal instance;
-	private static URL BASE_LOCAL_URL;
-	{
-		try
-		{
-			BASE_LOCAL_URL = FileLocator.toFileURL(Portal.class.getResource("/content/index.html")); //$NON-NLS-1$
-		}
-		catch (IOException e)
-		{
-		}
-	}
+	private static final String BASE_REMOTE_URL = "http://toolbox.aptana.com/toolbox"; //$NON-NLS-1$
+	private static final String BASE_LOCAL_URL = "/content/index.html"; //$NON-NLS-1$
 	private PortalBrowserEditor portalBrowser;
 
 	// Private constructor
@@ -69,9 +80,19 @@ public class Portal
 	 */
 	public void openPortal(URL url)
 	{
-		if (url == null)
+		try
 		{
-			url = getDefaultURL();
+			if (url == null)
+			{
+				url = getDefaultURL();
+			}
+			URL urlWithGetParams = new URL(url.toString() + getURLForProject(getActiveProject()));
+			url = urlWithGetParams;
+		}
+		catch (IOException e)
+		{
+			PortalUIPlugin.logError(e);
+			return;
 		}
 		if (portalBrowser != null && !portalBrowser.isDisposed())
 		{
@@ -80,7 +101,7 @@ public class Portal
 		final URL finalURL = url;
 		// TODO: Shalom - Put a condition on this startup to not load the portal
 		// when it was already loaded once and the user set up everything needed.
-		Job job = new UIJob("Aptana Portal Launch Job") //$NON-NLS-1$
+		Job job = new UIJob("Launching Aptana Portal...") //$NON-NLS-1$
 		{
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
@@ -104,17 +125,223 @@ public class Portal
 	}
 
 	/**
-	 * Returns the default URL for the portal.
+	 * Returns the default URL for the portal.<br>
+	 * In case we have a live Internet connection, return the remote content. Otherwise, return the local content.
 	 * 
 	 * @return A default URL (can be null)
+	 * @throws IOException
 	 */
-	protected URL getDefaultURL()
+	protected URL getDefaultURL() throws IOException
 	{
-		return BASE_LOCAL_URL;
-		// TODO: Shalom - Do a test for network and decide what to return
-		/*
-		 * try { return new URL(BASE_URL_PREFIX); } catch (MalformedURLException e) { return null; }
-		 */
+		// Do a connection check
+		if (isConnected())
+		{
+			return new URL(BASE_REMOTE_URL);
+		}
+		return FileLocator.toFileURL(Portal.class.getResource(BASE_LOCAL_URL));
+	}
+
+	/**
+	 * Check for connection with the remote portal server.
+	 * 
+	 * @return True, if and only if the remote server is alive.
+	 */
+	private boolean isConnected()
+	{
+		boolean connected = false;
+		HttpURLConnection connection = null;
+		try
+		{
+			connection = (HttpURLConnection) new URL(BASE_REMOTE_URL).openConnection();
+			// Give it a 4 seconds delay before deciding that it's a dead connection
+			connection.setConnectTimeout(4000);
+			connection.setRequestMethod("HEAD"); // Don't ask for content //$NON-NLS-1$
+			connection.setAllowUserInteraction(false);
+			connection.connect();
+			connected = true;
+
+		}
+		catch (Exception e)
+		{
+			connected = false;
+			PortalUIPlugin.logWarning("Could not establish a connection to the remote Aptana Dev Toolbox portal. Using the local portal content."); //$NON-NLS-1$
+		}
+		finally
+		{
+			if (connection != null)
+				connection.disconnect();
+		}
+		return connected;
+	}
+
+	/**
+	 * Build the URL GET parameters that will be appended to the original portal path.
+	 * 
+	 * @param activeProject
+	 * @return The GET parameters string
+	 */
+	@SuppressWarnings("nls")
+	protected String getURLForProject(final IProject activeProject)
+	{
+		final StringBuilder builder = new StringBuilder();
+		Job uiJob = new UIJob("Building portal URL...")
+		{
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor)
+			{
+				builder.append("?v=");
+				builder.append(getVersion()); 
+
+				builder.append("&bg=");
+				builder.append(toHex(getThemeManager().getCurrentTheme().getBackground()));
+				builder.append("&fg=");
+				builder.append(toHex(getThemeManager().getCurrentTheme().getForeground()));
+
+				// "chrome"
+				builder.append("&ch=");// FIXME Grab one of the actual parent widgets and grab it's bg?
+				Color color = PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+				builder.append(toHex(color.getRGB()));
+
+				// project type
+				builder.append("&p=");
+				builder.append(getProjectType(activeProject));
+
+				// version control
+				// builder.append("&vc=");
+				// builder.append(getVersionControl());
+
+				// github
+				// builder.append("&gh=");
+				// builder.append(hasGithubRemote() ? '1' : '0');
+
+				// timestamp to force updates to server (bypass browser cache)
+				builder.append("&ts=");
+				builder.append(System.currentTimeMillis());
+
+				// guid that relates to a single install of the IDE
+				builder.append("&id=");
+				builder.append(getGUID());
+
+				// deploy info
+				builder.append(getDeployParam(activeProject));
+
+				// for debugging output
+				// builder.append("&debug=1");
+				return Status.OK_STATUS;
+			}
+		};
+		uiJob.setSystem(true);
+		uiJob.schedule();
+		try
+		{
+			uiJob.join();
+		}
+		catch (InterruptedException e)
+		{
+			PortalUIPlugin.logError(e);
+		}
+		return builder.toString();
+	}
+
+	@SuppressWarnings("nls")
+	protected String getDeployParam(IProject selectedProject)
+	{
+		if (selectedProject != null && selectedProject.exists())
+		{
+			IFile file = selectedProject.getFile("deploy/default.rb");
+			if (file.exists())
+				return "&dep=ch";
+			file = selectedProject.getFile("deploy/solo.rb");
+			if (file.exists())
+				return "&dep=cs";
+			file = selectedProject.getFile("Capfile");
+			if (file.exists())
+				return "&dep=cap";
+			file = selectedProject.getFile("capfile");
+			if (file.exists())
+				return "&dep=cap";
+		}
+		return "";
+	}
+
+	/**
+	 * Returns the portal plugin version
+	 * 
+	 * @return
+	 */
+	protected String getVersion()
+	{
+		return EclipseUtil.getPluginVersion(PortalUIPlugin.getDefault());
+	}
+
+	/**
+	 * Get the theme manager.
+	 * 
+	 * @return
+	 */
+	protected IThemeManager getThemeManager()
+	{
+		return CommonEditorPlugin.getDefault().getThemeManager();
+	}
+
+	/**
+	 * getActiveProject
+	 * 
+	 * @return
+	 */
+	protected IProject getActiveProject()
+	{
+		IPreferencesService preferencesService = Platform.getPreferencesService();
+		String activeProjectName = preferencesService.getString(EXPLORER_PLUGIN_ID, ACTIVE_PROJECT_KEY, null, null);
+		IProject result = null;
+
+		if (activeProjectName != null)
+		{
+			result = ResourcesPlugin.getWorkspace().getRoot().getProject(activeProjectName);
+		}
+
+		return result;
+	}
+
+	protected String getGUID()
+	{
+		return PingStartup.getApplicationId();
+	}
+
+	protected char getProjectType(IProject selectedProject)
+	{
+		if (selectedProject != null)
+		{
+			// R for Rails, P for pydev, W for web, O for other. How do we determine? Check natures?
+			try
+			{
+				// FIXME This id is a constant in the rails plugins...
+				if (selectedProject.hasNature(RAILS_NATURE))
+					return 'R';
+				else if (selectedProject.hasNature(PHP_NATURE))
+					return 'P';
+			}
+			catch (CoreException e)
+			{
+				PortalUIPlugin.logError(e);
+			}
+		}
+		// TODO How do we determine if project is "web"? check for HTML/JS/CSS files?
+		return 'O';
+	}
+
+	private String toHex(RGB rgb)
+	{
+		// FIXME This and pad are copy-pasted from Theme class
+		return MessageFormat.format("{0}{1}{2}", pad(Integer.toHexString(rgb.red), 2, '0'), pad(Integer //$NON-NLS-1$
+				.toHexString(rgb.green), 2, '0'), pad(Integer.toHexString(rgb.blue), 2, '0'));
+	}
+
+	private String pad(String string, int desiredLength, char padChar)
+	{
+		while (string.length() < desiredLength)
+			string = padChar + string;
+		return string;
 	}
 
 	/**
