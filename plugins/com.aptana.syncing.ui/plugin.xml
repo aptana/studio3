@@ -238,6 +238,14 @@
                label="%connectionPropertiesAction.label"
                menubarPath="group.properties">
          </action>
+         <action
+               class="com.aptana.ide.ui.io.actions.DeleteConnectionAction"
+               enablesFor="+"
+               icon="icons/full/etool16/delete.png"
+               id="com.aptana.ide.ui.io.actions.DeleteConnectionAction"
+               label="%deleteAction.label"
+               menubarPath="group.edit">
+         </action>
       </objectContribution>
    </extension>
    <extension
