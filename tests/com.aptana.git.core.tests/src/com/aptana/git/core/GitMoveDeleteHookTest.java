@@ -217,6 +217,7 @@ public class GitMoveDeleteHookTest extends TestCase
 
 				// repo relative path
 				oneOf(repo).workingDirectory();
+
 				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
 				oneOf(folder).getLocation();
 				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator + "folder")));
@@ -290,6 +291,7 @@ public class GitMoveDeleteHookTest extends TestCase
 
 				// repo relative path
 				oneOf(repo).workingDirectory();
+
 				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
 				oneOf(folder).getLocation();
 				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator + "folder")));
@@ -353,6 +355,7 @@ public class GitMoveDeleteHookTest extends TestCase
 		{
 			{
 				oneOf(repo).workingDirectory();
+
 				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
 
 				oneOf(project).getLocation();
@@ -361,6 +364,7 @@ public class GitMoveDeleteHookTest extends TestCase
 
 				// Repo relative path
 				oneOf(repo).workingDirectory();
+
 				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
 				oneOf(project).getLocation();
 				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator
@@ -389,17 +393,10 @@ public class GitMoveDeleteHookTest extends TestCase
 		context.checking(new Expectations()
 		{
 			{
-				oneOf(repo).workingDirectory();
+				exactly(2).of(repo).workingDirectory();
 				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
 
-				oneOf(project).getLocation();
-				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator
-						+ "project")));
-
-				// Repo relative path
-				oneOf(repo).workingDirectory();
-				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
-				oneOf(project).getLocation();
+				exactly(2).of(project).getLocation();
 				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator
 						+ "project")));
 
@@ -433,19 +430,13 @@ public class GitMoveDeleteHookTest extends TestCase
 		context.checking(new Expectations()
 		{
 			{
-				oneOf(repo).workingDirectory();
+				exactly(2).of(repo).workingDirectory();
 				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
 
-				oneOf(project).getLocation();
+				exactly(2).of(project).getLocation();
 				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator
 						+ "project")));
 
-				// Repo relative path
-				oneOf(repo).workingDirectory();
-				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
-				oneOf(project).getLocation();
-				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator
-						+ "project")));
 				never(repo).deleteFolder(Path.fromOSString("project"));
 			}
 		});
@@ -474,23 +465,24 @@ public class GitMoveDeleteHookTest extends TestCase
 		{
 			{
 				oneOf(repo).workingDirectory();
+
 				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
 
 				oneOf(project).getLocation();
 				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
 
 				oneOf(project).getLocationURI();
-				
+
 				oneOf(project).getFolder(GitRepository.GIT_DIR);
 				will(returnValue(folder));
-				
+
 				oneOf(folder).exists();
 				will(returnValue(true));
 
 				oneOf(tree).standardDeleteFolder(with(equal(folder)),
 						with(equal(IResource.ALWAYS_DELETE_PROJECT_CONTENT | IResource.FORCE)),
 						with(any(NullProgressMonitor.class)));
-				
+
 				oneOf(tree).deletedFolder(folder);
 			}
 		});
