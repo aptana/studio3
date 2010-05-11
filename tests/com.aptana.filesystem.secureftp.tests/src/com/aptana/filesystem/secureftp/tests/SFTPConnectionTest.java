@@ -33,24 +33,27 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.filesystem.ftp.tests;
+package com.aptana.filesystem.secureftp.tests;
+
+import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.io.tests.CommonConnectionTest;
-import com.aptana.ide.filesystem.ftp.FTPConnectionPoint;
+import com.aptana.ide.filesystem.secureftp.SFTPConnectionPoint;
 
 /**
  * @author Max Stepanov
  */
-public class FTPConnectionTest extends CommonConnectionTest
+public class SFTPConnectionTest extends CommonConnectionTest
 {
 
 	@Override
 	protected void setUp() throws Exception
 	{
-		FTPConnectionPoint ftpcp = new FTPConnectionPoint();
+		SFTPConnectionPoint ftpcp = new SFTPConnectionPoint();
 		ftpcp.setHost("10.10.1.60"); //$NON-NLS-1$
 		ftpcp.setLogin("ftpuser"); //$NON-NLS-1$
 		ftpcp.setPassword(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'});
+		ftpcp.setPath(Path.fromPortableString("/home/ftpuser")); //$NON-NLS-1$
 		cp = ftpcp;
 		super.setUp();
 	}
@@ -61,9 +64,8 @@ public class FTPConnectionTest extends CommonConnectionTest
 	@Override
 	protected boolean supportsSetModificationTime()
 	{
-		return false;
+		return true;
 	}
-
 
 	/*
 	 * (non-Javadoc)
@@ -82,6 +84,6 @@ public class FTPConnectionTest extends CommonConnectionTest
 	@Override
 	protected boolean supportsChangePermissions()
 	{
-		return false;
+		return true;
 	}
 }

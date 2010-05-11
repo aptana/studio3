@@ -32,8 +32,12 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
+package com.aptana.filesystem.secureftp.tests;
 
-package com.aptana.filesystem.ftp.tests;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.io.tests.CommonConnectionTest;
 import com.aptana.ide.filesystem.ftp.FTPConnectionPoint;
@@ -41,18 +45,60 @@ import com.aptana.ide.filesystem.ftp.FTPConnectionPoint;
 /**
  * @author Max Stepanov
  */
-public class FTPConnectionTest extends CommonConnectionTest
+public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 {
 
-	@Override
-	protected void setUp() throws Exception
+	private static FTPConnectionPoint setupConnection()
 	{
 		FTPConnectionPoint ftpcp = new FTPConnectionPoint();
 		ftpcp.setHost("10.10.1.60"); //$NON-NLS-1$
 		ftpcp.setLogin("ftpuser"); //$NON-NLS-1$
 		ftpcp.setPassword(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'});
+		return ftpcp;
+	}
+
+	@Override
+	protected void setUp() throws Exception
+	{
+		initBasePath();
+		FTPConnectionPoint ftpcp = setupConnection();
+		ftpcp.setPath(Path.ROOT.append(getClass().getSimpleName()));
 		cp = ftpcp;
 		super.setUp();
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+		cleanupBasePath();
+	}
+
+	public static void initBasePath() throws CoreException
+	{
+		FTPConnectionPoint ftpcp = setupConnection();
+		IFileStore fs = ftpcp.getRoot().getFileStore(
+				Path.ROOT.append(FTPConnectionWithBasePathTest.class.getSimpleName()));
+		assertNotNull(fs);
+		if (!fs.fetchInfo().exists())
+		{
+			fs.mkdir(EFS.NONE, null);
+		}
+		ftpcp.disconnect(null);
+		assertFalse(ftpcp.isConnected());
+	}
+
+	public static void cleanupBasePath() throws CoreException
+	{
+		FTPConnectionPoint ftpcp = setupConnection();
+		IFileStore fs = ftpcp.getRoot().getFileStore(
+				Path.ROOT.append(FTPConnectionWithBasePathTest.class.getSimpleName()));
+		assertNotNull(fs);
+		if (fs.fetchInfo().exists())
+		{
+			fs.delete(EFS.NONE, null);
+		}
+		ftpcp.disconnect(null);
+		assertFalse(ftpcp.isConnected());
 	}
 
 	/* (non-Javadoc)
@@ -63,7 +109,6 @@ public class FTPConnectionTest extends CommonConnectionTest
 	{
 		return false;
 	}
-
 
 	/*
 	 * (non-Javadoc)

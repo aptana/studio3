@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.filesystem.ftp.tests;
+package com.aptana.filesystem.secureftp.tests;
 
 import com.aptana.core.io.tests.CommonConnectionTest;
 import com.aptana.ide.filesystem.ftp.FTPConnectionPoint;
@@ -41,7 +41,7 @@ import com.aptana.ide.filesystem.ftp.FTPConnectionPoint;
 /**
  * @author Max Stepanov
  */
-public class FTPConnectionTest extends CommonConnectionTest
+public class FTPSConnectionTest extends CommonConnectionTest
 {
 
 	@Override

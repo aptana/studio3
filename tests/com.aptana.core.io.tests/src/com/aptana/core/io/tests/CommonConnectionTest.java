@@ -46,6 +46,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Random;
@@ -234,7 +235,8 @@ public abstract class CommonConnectionTest extends TestCase
 		assertNotNull(fi);
 		assertTrue(fi.exists());
 		assertEquals(0, fi.getLength());
-		assertTrue(fi.getLastModified() > beforeTime && fi.getLastModified() < afterTime);
+		assertTrue(MessageFormat.format("{0} > {1} && {2} < {3}", new Object[] { fi.getLastModified(), beforeTime, fi.getLastModified(), afterTime }),
+				fi.getLastModified() > beforeTime && fi.getLastModified() < afterTime);
 	}
 
 	public final void testCreateEmptyFileRecursive() throws CoreException, IOException
@@ -277,7 +279,8 @@ public abstract class CommonConnectionTest extends TestCase
 		assertNotNull(fi);
 		assertTrue(fi.exists());
 		assertTrue(fi.isDirectory());
-		assertTrue(fi.getLastModified() > beforeTime && fi.getLastModified() < afterTime);
+		assertTrue(MessageFormat.format("{0} > {1} && {2} < {3}", new Object[] { fi.getLastModified(), beforeTime, fi.getLastModified(), afterTime }),
+				fi.getLastModified() > beforeTime && fi.getLastModified() < afterTime);
 		fs.mkdir(EFS.SHALLOW, null); // retry to show no errors
 	}
 
@@ -310,7 +313,8 @@ public abstract class CommonConnectionTest extends TestCase
 		fi = fs2.fetchInfo();
 		assertNotNull(fi);
 		assertTrue(fi.exists());
-		assertTrue(fi.getLastModified() > beforeTime && fi.getLastModified() < afterTime);
+		assertTrue(MessageFormat.format("{0} > {1} && {2} < {3}", new Object[] { fi.getLastModified(), beforeTime, fi.getLastModified(), afterTime }),
+				fi.getLastModified() > beforeTime && fi.getLastModified() < afterTime);
 	}
 
 	public final void testWriteReadBinFile() throws CoreException, IOException
@@ -329,7 +333,8 @@ public abstract class CommonConnectionTest extends TestCase
 		assertNotNull(fi);
 		assertTrue(fi.exists());
 		assertEquals(BYTES.length, fi.getLength());
-		assertTrue(fi.getLastModified() > beforeTime && fi.getLastModified() < afterTime);
+		assertTrue(MessageFormat.format("{0} > {1} && {2} < {3}", new Object[] { fi.getLastModified(), beforeTime, fi.getLastModified(), afterTime }),
+				fi.getLastModified() > beforeTime && fi.getLastModified() < afterTime);
 		InputStream in = fs.openInputStream(EFS.NONE, null);
 		ByteArrayOutputStream bout = new ByteArrayOutputStream(BYTES.length);
 		byte[] buffer = new byte[256];
@@ -359,7 +364,8 @@ public abstract class CommonConnectionTest extends TestCase
 		assertNotNull(fi);
 		assertTrue(fi.exists());
 		assertEquals(TEXT.length(), fi.getLength());
-		assertTrue(fi.getLastModified() > beforeTime && fi.getLastModified() < afterTime);
+		assertTrue(MessageFormat.format("{0} > {1} && {2} < {3}", new Object[] { fi.getLastModified(), beforeTime, fi.getLastModified(), afterTime }),
+				fi.getLastModified() > beforeTime && fi.getLastModified() < afterTime);
 		Reader r = new InputStreamReader(fs.openInputStream(EFS.NONE, null));
 		StringWriter sw = new StringWriter(TEXT.length());
 		char[] buffer = new char[256];
@@ -393,7 +399,8 @@ public abstract class CommonConnectionTest extends TestCase
 		assertNotNull(fi);
 		assertTrue(fi.exists());
 		assertEquals(TEXT.length(), fi.getLength());
-		assertTrue(fi.getLastModified() > beforeTime && fi.getLastModified() < afterTime);
+		assertTrue(MessageFormat.format("{0} > {1} && {2} < {3}", new Object[] { fi.getLastModified(), beforeTime, fi.getLastModified(), afterTime }),
+				fi.getLastModified() > beforeTime && fi.getLastModified() < afterTime);
 		Reader r = new InputStreamReader(fs.openInputStream(EFS.NONE, null));
 		StringWriter sw = new StringWriter(TEXT.length());
 		char[] buffer = new char[256];
@@ -499,7 +506,8 @@ public abstract class CommonConnectionTest extends TestCase
 		{
 			assertEquals(NAMES[i], filist[i].getName());
 			assertFalse(filist[i].isDirectory());
-			assertTrue(filist[i].getLastModified() > beforeTime && filist[i].getLastModified() < afterTime);
+			assertTrue(MessageFormat.format("{0} > {1} && {2} < {3}", new Object[] { filist[i].getLastModified(), beforeTime, filist[i].getLastModified(), afterTime }),
+					filist[i].getLastModified() > beforeTime && filist[i].getLastModified() < afterTime);
 		}
 	}
 
@@ -550,8 +558,14 @@ public abstract class CommonConnectionTest extends TestCase
 		{
 			assertEquals(NAMES[i], filist[i].getName());
 			assertTrue(filist[i].isDirectory());
-			assertTrue(filist[i].getLastModified() > beforeTime && filist[i].getLastModified() < afterTime);
+			assertTrue(MessageFormat.format("{0} > {1} && {2} < {3}", new Object[] { filist[i].getLastModified(), beforeTime, filist[i].getLastModified(), afterTime }),
+					filist[i].getLastModified() > beforeTime && filist[i].getLastModified() < afterTime);
 		}
+	}
+
+	protected boolean supportsSetModificationTime()
+	{
+		return false;
 	}
 
 	public final void testPutInfoFileBase() throws CoreException, IOException
@@ -560,12 +574,16 @@ public abstract class CommonConnectionTest extends TestCase
 		assertNotNull(fs);
 		OutputStream out = fs.openOutputStream(EFS.NONE, null);
 		out.close();
-		IFileInfo fi = fs.fetchInfo();
+		IFileInfo fi = fs.fetchInfo(IExtendedFileStore.DETAILED, null);
 		assertNotNull(fi);
 		assertTrue(fi.exists());
 
-		long lastModified = System.currentTimeMillis();
-		lastModified -= lastModified % 1000; // remove milliseconds
+		long lastModified = fi.getLastModified();
+		if (supportsSetModificationTime())
+		{
+			lastModified -= new Random().nextInt(7 * 24 * 60)*1000;
+			lastModified -= lastModified % 1000; // remove milliseconds
+		}
 		IFileInfo pfi = new FileInfo();
 		pfi.setLastModified(lastModified);
 		fs.putInfo(pfi, EFS.SET_LAST_MODIFIED, null);
@@ -581,14 +599,16 @@ public abstract class CommonConnectionTest extends TestCase
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/newfolder")); //$NON-NLS-1$
 		assertNotNull(fs);
 		fs.mkdir(EFS.SHALLOW, null);
-		IFileInfo fi = fs.fetchInfo();
+		IFileInfo fi = fs.fetchInfo(IExtendedFileStore.DETAILED, null);
 		assertNotNull(fi);
 		assertTrue(fi.exists());
 		assertTrue(fi.isDirectory());
 
-		long lastModified = System.currentTimeMillis();
-		lastModified -= new Random().nextInt(7 * 24 * 60) * 60000;
-		lastModified -= lastModified % 60000; // remove seconds/milliseconds
+		long lastModified = fi.getLastModified();
+		if (supportsSetModificationTime()) {
+			lastModified -= new Random().nextInt(7 * 24) * 60000;
+			lastModified -= lastModified % 60000; // remove seconds/milliseconds
+		}
 		IFileInfo pfi = new FileInfo();
 		pfi.setLastModified(lastModified);
 		fs.putInfo(pfi, EFS.SET_LAST_MODIFIED, null);
@@ -914,9 +934,12 @@ public abstract class CommonConnectionTest extends TestCase
 				IFileStore child = parent.getChild("file" + i); //$NON-NLS-1$
 				OutputStream out = child.openOutputStream(EFS.NONE, null);
 				out.close();
-				IFileInfo fi = new FileInfo();
-				fi.setLastModified(lastModified);
-				child.putInfo(fi, EFS.SET_LAST_MODIFIED, null);
+				if (supportsSetModificationTime())
+				{
+					IFileInfo fi = new FileInfo();
+					fi.setLastModified(lastModified);
+					child.putInfo(fi, EFS.SET_LAST_MODIFIED, null);
+				}
 			}
 			parent = parent.getParent();
 		}
@@ -947,7 +970,10 @@ public abstract class CommonConnectionTest extends TestCase
 					assertTrue(fi.getName().startsWith("file")); //$NON-NLS-1$
 					assertTrue(fslist[j].getName().startsWith("file")); //$NON-NLS-1$
 					assertEquals(0, fi.getLength());
-					assertEquals(lastModified, fi.getLastModified());
+					if (supportsSetModificationTime())
+					{
+						assertEquals(lastModified, fi.getLastModified());
+					}
 				}
 			}
 			assertNotNull(fs);
