@@ -59,7 +59,8 @@ public class ShellLocation {
 		"%PROGRAMFILES(X86)%\\Git\\bin" //$NON-NLS-1$
 	};
 	
-	private static final String SHELL = "sh";
+	private static final String SH = "sh";
+	private static final String BASH = "bash";
 	
 	private static IPath shellPath = null;
 	
@@ -72,7 +73,8 @@ public class ShellLocation {
 	
 	public static synchronized IPath getPath() throws CoreException {
 		if (shellPath == null) {
-			shellPath = ExecutableUtil.find(SHELL, Platform.OS_WIN32.equals(Platform.getOS()), getPossibleShellLocations());
+			boolean isWin32 = Platform.OS_WIN32.equals(Platform.getOS());
+			shellPath = ExecutableUtil.find(isWin32 ? SH : BASH, isWin32, getPossibleShellLocations());
 			if (shellPath == null) {
 				throw new CoreException(new Status(Status.ERROR, CorePlugin.PLUGIN_ID, "Shell executable could not be found."));
 			}
