@@ -18,3 +18,5 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Eclipse-ExtensibleAPI: true
+Export-Package: com.aptana.ide.ui.secureftp.dialogs,
+ com.aptana.ide.ui.secureftp.internal
