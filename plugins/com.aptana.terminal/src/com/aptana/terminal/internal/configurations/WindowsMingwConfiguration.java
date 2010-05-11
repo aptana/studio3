@@ -43,7 +43,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
-import com.aptana.core.ShellLocation;
+import com.aptana.core.ShellExecutable;
 
 /**
  * @author Max Stepanov
@@ -65,7 +65,7 @@ public class WindowsMingwConfiguration extends AbstractProcessConfiguration {
 	public List<String> getCommandLine() throws CoreException {
 		List<String> list = new ArrayList<String>();
 		list.add(getExecutable().getAbsolutePath());
-		list.add("\"\\\"" + ShellLocation.getPath().toOSString() + "\\\"  --login -i\""); //$NON-NLS-1$ //$NON-NLS-2$
+		list.add("\"\\\"" + ShellExecutable.getPath().toOSString() + "\\\"  --login -i\""); //$NON-NLS-1$ //$NON-NLS-2$
 		list.add("120x40"); //$NON-NLS-1$
 		if (Platform.inDevelopmentMode() || Platform.inDebugMode()) {
 			list.add("-show"); //$NON-NLS-1$

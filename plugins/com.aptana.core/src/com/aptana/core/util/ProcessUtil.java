@@ -10,6 +10,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.IPath;
 
 import com.aptana.core.CorePlugin;
+import com.aptana.core.ShellExecutable;
 import com.aptana.core.internal.InputStreamGobbler;
 import com.aptana.core.internal.OutputStreamThread;
 
@@ -61,26 +62,13 @@ public abstract class ProcessUtil
 	 * @param args
 	 * @return
 	 */
-	public static Map<Integer, String> runInBackground(String command, IPath workingDir, String input,
-			Map<String, String> env, String[] args)
+	public static Map<Integer, String> runInBackground(String command, IPath workingDirectory, String input,
+			Map<String, String> environment, String[] arguments)
 	{
-		List<String> commands = new ArrayList<String>();
-		commands.add(command);
-		for (String arg : args)
-			commands.add(arg);
-
-		ProcessBuilder builder = new ProcessBuilder(commands);
-		if (workingDir != null)
-			builder.directory(workingDir.toFile());
-
-		if (env != null && !env.isEmpty())
-		{
-			builder.environment().putAll(env);
-		}
 		String lineSeparator = ResourceUtil.getLineSeparatorValue(null);
 		try
 		{
-			Process p = builder.start();
+			Process p = ShellExecutable.run(command, workingDirectory, environment, arguments);
 			// Read and write in threads to avoid from choking the process streams
 			OutputStreamThread writerThread = null;
 			if (input != null)
