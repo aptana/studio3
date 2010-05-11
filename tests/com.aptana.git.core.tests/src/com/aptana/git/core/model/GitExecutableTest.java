@@ -75,7 +75,7 @@ public class GitExecutableTest extends TestCase
 		{
 			expectedLocation = local;
 		}
-		assertEquals(expectedLocation, executable.path().toPortableString());
+		assertEquals(expectedLocation, executable.path());
 	}
 
 	// Test that it reacts to changes in pref location
