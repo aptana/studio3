@@ -36,6 +36,7 @@ public class ContentAssistLocationTests extends TestCase
 	}
 	
 	private Mockery context;
+	private String partitionType;
 	
 	/*
 	 * (non-Javadoc)
@@ -44,6 +45,7 @@ public class ContentAssistLocationTests extends TestCase
 	protected void setUp() throws Exception
 	{
 		context = new Mockery();
+		partitionType = HTMLSourceConfiguration.HTML_TAG;
 	}
 
 	/*
@@ -149,7 +151,8 @@ public class ContentAssistLocationTests extends TestCase
 		this.tagTests(
 			source,
 			new RangeWithLocation(0, 1, Location.IN_TEXT),
-			new RangeWithLocation(1, source.length(), Location.IN_OPEN_TAG)
+			new RangeWithLocation(1, source.length(), Location.IN_OPEN_TAG),
+			new RangeWithLocation(source.length(), source.length() + 1, Location.IN_TEXT)
 		);
 	}
 	
@@ -163,13 +166,11 @@ public class ContentAssistLocationTests extends TestCase
 	 */
 	protected void tagTests(String source, RangeWithLocation ... ranges)
 	{
-		String partitionType = HTMLSourceConfiguration.HTML_TAG;
 		IDocument document = this.createDocument(partitionType, source);
 		HTMLContentAssistProcessor processor = new HTMLContentAssistProcessor(null);
 		
 		for (RangeWithLocation range : ranges)
 		{
-			// 0 is IN_TEXT
 			for (int offset = range.startingOffset; offset < range.endingOffset; offset++)
 			{
 				LexemeProvider<HTMLTokenType> lexemeProvider = processor.createLexemeProvider(document, offset); 
@@ -190,6 +191,7 @@ public class ContentAssistLocationTests extends TestCase
 	 */
 	public void testOpenTagNoElementName()
 	{
+		partitionType = HTMLSourceConfiguration.DEFAULT;
 		this.openTagTests("<>");
 	}
 	
@@ -231,5 +233,28 @@ public class ContentAssistLocationTests extends TestCase
 	public void testOpenTagWithIDAttribute()
 	{
 		this.openTagTests("<body id=\"testing\">");
+	}
+
+	/**
+	 * testSelfClosingTag
+	 */
+	public void testSelfClosingTag()
+	{
+		this.openTagTests("<body/>");
+	}
+	
+	/**
+	 * testOpenAndCloseTag
+	 */
+	public void testCloseTag()
+	{
+		String source = "</body>";
+		
+		this.tagTests(
+			source,
+			new RangeWithLocation(0, 1, Location.IN_TEXT),
+			new RangeWithLocation(1, source.length() - 1, Location.IN_CLOSE_TAG),
+			new RangeWithLocation(source.length(), source.length() + 1, Location.IN_TEXT)
+		);
 	}
 }
