@@ -90,7 +90,10 @@ public abstract class Launcher
 		ILaunchConfigurationWorkingCopy config = configType.newInstance(null, name);
 		config.setAttribute(IExternalToolConstants.ATTR_LOCATION, command);
 		config.setAttribute(IExternalToolConstants.ATTR_TOOL_ARGUMENTS, toolArgs);
-		config.setAttribute(IExternalToolConstants.ATTR_WORKING_DIRECTORY, workingDir.toOSString());
+		if (workingDir != null)
+		{
+			config.setAttribute(IExternalToolConstants.ATTR_WORKING_DIRECTORY, workingDir.toOSString());
+		}
 		config.setAttribute(DebugPlugin.ATTR_CAPTURE_OUTPUT, true);
 		config.setAttribute(IExternalToolConstants.ATTR_SHOW_CONSOLE, true);
 		config.setAttribute(IDebugUIConstants.ATTR_LAUNCH_IN_BACKGROUND, false);
