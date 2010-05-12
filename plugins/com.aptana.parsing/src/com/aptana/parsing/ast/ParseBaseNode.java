@@ -8,10 +8,8 @@ import com.aptana.parsing.lexer.Range;
 
 public class ParseBaseNode extends Node implements IParseNode
 {
-
 	protected static final class NameNode implements INameNode
 	{
-
 		private final String fName;
 		private final IRange fRange;
 
@@ -37,15 +35,31 @@ public class ParseBaseNode extends Node implements IParseNode
 	private IParseNode[] fChildren;
 	private IParseNode fParent;
 	private int fChildrenCount;
-
 	private String fLanguage;
 
+	/**
+	 * ParseBaseNode
+	 * 
+	 * @param language
+	 */
 	public ParseBaseNode(String language)
 	{
 		fLanguage = language;
 		fChildren = new IParseNode[0];
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see beaver.spec.ast.Node#accept(beaver.spec.ast.TreeWalker)
+	 */
+	@Override
+	public void accept(TreeWalker walker)
+	{
+	}
+
+	/**
+	 * addChild
+	 */
 	public void addChild(IParseNode child)
 	{
 		// makes sure our private buffer is large enough
@@ -69,156 +83,30 @@ public class ParseBaseNode extends Node implements IParseNode
 		}
 	}
 
+	/**
+	 * addOffset
+	 * 
+	 * @param offset
+	 */
 	public void addOffset(int offset)
 	{
 		setLocation(getStart() + offset, getEnd() + offset);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.lexer.IRange#contains(int)
+	 */
 	@Override
-	public void accept(TreeWalker walker)
+	public boolean contains(int offset)
 	{
+		return this.getStartingOffset() <= offset && offset < this.getEndingOffset();
 	}
 
-	@Override
-	public IParseNode getChild(int index)
-	{
-		if (index >= 0 && index < fChildrenCount)
-		{
-			return fChildren[index];
-		}
-		return null;
-	}
-
-	@Override
-	public IParseNode[] getChildren()
-	{
-		IParseNode[] result = new IParseNode[fChildrenCount];
-		if (fChildrenCount > 0)
-		{
-			System.arraycopy(fChildren, 0, result, 0, fChildrenCount);
-		}
-		return result;
-	}
-
-	@Override
-	public int getChildrenCount()
-	{
-		return fChildrenCount;
-	}
-
-	@Override
-	public IParseNode getNodeAt(int offset)
-	{
-		if (offset < getStartingOffset() || offset > getEndingOffset())
-		{
-			// not in this node
-			return null;
-		}
-		IParseNode[] children = getChildren();
-		for (IParseNode child : children)
-		{
-			if (child.getStartingOffset() <= offset && offset <= child.getEndingOffset())
-			{
-				IParseNode node = child.getNodeAt(offset);
-				if (node != null) {
-					return node;
-				}
-			}
-		}
-		return this;
-	}
-
-	@Override
-	public int getEndingOffset()
-	{
-		return getEnd();
-	}
-
-	@Override
-	public int getIndex(IParseNode child)
-	{
-		for (int i = 0; i < fChildrenCount; ++i)
-		{
-			if (fChildren[i] == child)
-			{
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	@Override
-	public String getLanguage()
-	{
-		return fLanguage;
-	}
-
-	@Override
-	public int getLength()
-	{
-		return getEnd() - getStart() + 1;
-	}
-
-	@Override
-	public INameNode getNameNode()
-	{
-		return new NameNode(getText(), getStartingOffset(), getEndingOffset());
-	}
-
-	@Override
-	public IParseNode getParent()
-	{
-		return fParent;
-	}
-
-	@Override
-	public int getStartingOffset()
-	{
-		return getStart();
-	}
-
-	@Override
-	public String getText()
-	{
-		return ""; //$NON-NLS-1$
-	}
-
-	@Override
-	public short getType()
-	{
-		return getId();
-	}
-
-	@Override
-	public String toString()
-	{
-		StringBuilder text = new StringBuilder();
-		for (int i = 0; i < fChildrenCount; ++i)
-		{
-			text.append(fChildren[i]);
-			if (i < fChildrenCount - 1)
-			{
-				text.append(" "); //$NON-NLS-1$
-			}
-		}
-		return text.toString();
-	}
-
-	public void setParent(IParseNode parent)
-	{
-		fParent = parent;
-	}
-
-	public void setChildren(IParseNode[] children)
-	{
-		fChildren = children;
-		fChildrenCount = children.length;
-		for (IParseNode child : children)
-		{
-			((ParseBaseNode) child).setParent(this);
-		}
-	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -249,6 +137,179 @@ public class ParseBaseNode extends Node implements IParseNode
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.IParseNode#getChild(int)
+	 */
+	@Override
+	public IParseNode getChild(int index)
+	{
+		if (index >= 0 && index < fChildrenCount)
+		{
+			return fChildren[index];
+		}
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.IParseNode#getChildren()
+	 */
+	@Override
+	public IParseNode[] getChildren()
+	{
+		IParseNode[] result = new IParseNode[fChildrenCount];
+		if (fChildrenCount > 0)
+		{
+			System.arraycopy(fChildren, 0, result, 0, fChildrenCount);
+		}
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.IParseNode#getChildrenCount()
+	 */
+	@Override
+	public int getChildrenCount()
+	{
+		return fChildrenCount;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.lexer.IRange#getEndingOffset()
+	 */
+	@Override
+	public int getEndingOffset()
+	{
+		return getEnd();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.IParseNode#getIndex(com.aptana.parsing.ast.IParseNode)
+	 */
+	@Override
+	public int getIndex(IParseNode child)
+	{
+		for (int i = 0; i < fChildrenCount; ++i)
+		{
+			if (fChildren[i] == child)
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.IParseNode#getLanguage()
+	 */
+	@Override
+	public String getLanguage()
+	{
+		return fLanguage;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.lexer.IRange#getLength()
+	 */
+	@Override
+	public int getLength()
+	{
+		return getEnd() - getStart() + 1;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.IParseNode#getNameNode()
+	 */
+	@Override
+	public INameNode getNameNode()
+	{
+		return new NameNode(getText(), getStartingOffset(), getEndingOffset());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.IParseNode#getNodeAt(int)
+	 */
+	@Override
+	public IParseNode getNodeAt(int offset)
+	{
+		IParseNode result = null;
+
+		if (contains(offset))
+		{
+			// default to this node being the match
+			result = this;
+			
+			// but check the children in case one of them contains the offset
+			for (IParseNode child : getChildren())
+			{
+				if (child.contains(offset))
+				{
+					IParseNode node = child.getNodeAt(offset);
+
+					if (node != null)
+					{
+						result = node;
+						break;
+					}
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.IParseNode#getParent()
+	 */
+	@Override
+	public IParseNode getParent()
+	{
+		return fParent;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.lexer.IRange#getStartingOffset()
+	 */
+	@Override
+	public int getStartingOffset()
+	{
+		return getStart();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.lexer.ILexeme#getText()
+	 */
+	@Override
+	public String getText()
+	{
+		return ""; //$NON-NLS-1$
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.IParseNode#getType()
+	 */
+	@Override
+	public short getType()
+	{
+		return getId();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode()
 	{
@@ -256,5 +317,49 @@ public class ParseBaseNode extends Node implements IParseNode
 		hash = hash * 31 + getType();
 		hash = hash * 31 + (getParent() == null ? 0 : getParent().hashCode());
 		return hash;
+	}
+
+	/**
+	 * setChildren
+	 * 
+	 * @param children
+	 */
+	public void setChildren(IParseNode[] children)
+	{
+		fChildren = children;
+		fChildrenCount = children.length;
+		for (IParseNode child : children)
+		{
+			((ParseBaseNode) child).setParent(this);
+		}
+	}
+
+	/**
+	 * setParent
+	 * 
+	 * @param parent
+	 */
+	public void setParent(IParseNode parent)
+	{
+		fParent = parent;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString()
+	{
+		StringBuilder text = new StringBuilder();
+		for (int i = 0; i < fChildrenCount; ++i)
+		{
+			text.append(fChildren[i]);
+			if (i < fChildrenCount - 1)
+			{
+				text.append(" "); //$NON-NLS-1$
+			}
+		}
+		return text.toString();
 	}
 }

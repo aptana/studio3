@@ -3,6 +3,14 @@ package com.aptana.parsing.lexer;
 public interface IRange
 {
 	/**
+	 * Determines if the specified offset is contained within this range
+	 * 
+	 * @param offset
+	 * @return
+	 */
+	boolean contains(int offset);
+	
+	/**
 	 * Gets the starting offset for this range.
 	 * 
 	 * @return the starting offset for this range
