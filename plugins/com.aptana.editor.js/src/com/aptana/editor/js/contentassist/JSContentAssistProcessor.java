@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -24,6 +25,7 @@ import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
+import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.Lexeme;
 
 public class JSContentAssistProcessor extends CommonContentAssistProcessor
@@ -122,6 +124,25 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		
 		if (Platform.inDevelopmentMode())
 		{
+			IParseNode ast = this.editor.getFileService().getParseResult();
+			IParseNode node = ast.getNodeAt(offset);
+			
+			if (node != null)
+			{
+				String text = "";
+				
+				try
+				{
+					text = viewer.getDocument().get(node.getStartingOffset(), node.getLength());
+				}
+				catch (BadLocationException e)
+				{
+				}
+				
+				System.out.println(node.toString());
+				System.out.println("~" + text + "~");
+			}
+			
 			// tokenize the current document
 			IDocument document = viewer.getDocument();
 			LexemeProvider<JSTokenType> lexemeProvider = new LexemeProvider<JSTokenType>(document, offset, new JSScopeScanner())
