@@ -14,6 +14,7 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
 
+import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.ITypePredicate;
 import com.aptana.parsing.lexer.Lexeme;
 
@@ -24,28 +25,53 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	private List<Lexeme<T>> _lexemes;
 
 	/**
-	 * CSSScannerHelper
+	 * Convert the partition that contains the given offset into a list of
+	 * lexemes.
 	 * 
 	 * @param document
 	 * @param offset
 	 */
 	public LexemeProvider(IDocument document, int offset, ITokenScanner scanner)
 	{
-		this.createLexemeList(document, offset, scanner);
+		int length = 0;
+		
+		try
+		{
+			ITypedRegion partition = document.getPartition(offset);
+			
+			offset = partition.getOffset();
+			length = partition.getLength();
+		}
+		catch (BadLocationException e)
+		{
+		}
+		
+		this.createLexemeList(document, offset, length, scanner);
+	}
+	
+	/**
+	 * Convert the specified range of text into a list of lexemes
+	 * 
+	 * @param document
+	 * @param offset
+	 * @param length
+	 * @param scanner
+	 */
+	public LexemeProvider(IDocument document, IRange range, ITokenScanner scanner)
+	{
+		this.createLexemeList(document, range.getStartingOffset(), range.getLength(), scanner);
 	}
 
 	/**
 	 * createLexemeList
 	 */
-	private void createLexemeList(IDocument document, int offset, ITokenScanner scanner)
+	private void createLexemeList(IDocument document, int offset, int length, ITokenScanner scanner)
 	{
 		List<Lexeme<T>> lexemes = new ArrayList<Lexeme<T>>();
 
 		try
 		{
-			ITypedRegion partition = document.getPartition(offset);
-
-			scanner.setRange(document, partition.getOffset(), partition.getLength());
+			scanner.setRange(document, offset, length);
 
 			// prime scanner
 			IToken token = scanner.nextToken();
