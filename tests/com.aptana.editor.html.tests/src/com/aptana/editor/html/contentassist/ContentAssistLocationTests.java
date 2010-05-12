@@ -66,13 +66,13 @@ public class ContentAssistLocationTests extends TestCase
 	 * 
 	 * @param source
 	 */
-	protected void openTagTests(String source)
+	protected void tagTests(String source, Location mainLocation)
 	{
 		// this ends with Eclipse's default partition
 		this.tagTests(
 			source,
 			new RangeWithLocation(0, 1, Location.IN_TEXT),
-			new RangeWithLocation(1, source.length(), Location.IN_OPEN_TAG),
+			new RangeWithLocation(1, source.length(), mainLocation),
 			new RangeWithLocation(source.length(), source.length() + 1, Location.IN_TEXT)
 		);
 		
@@ -82,7 +82,7 @@ public class ContentAssistLocationTests extends TestCase
 		this.tagTests(
 			source,
 			new RangeWithLocation(0, 1, Location.IN_TEXT),
-			new RangeWithLocation(1, source.length() - 1, Location.IN_OPEN_TAG),
+			new RangeWithLocation(1, source.length() - 1, mainLocation),
 			new RangeWithLocation(source.length() - 1, source.length(), Location.IN_TEXT)
 		);
 	}
@@ -122,7 +122,7 @@ public class ContentAssistLocationTests extends TestCase
 	 */
 	public void testOpenTagNoElementName()
 	{
-		this.openTagTests("<>");
+		this.tagTests("<>", Location.IN_OPEN_TAG);
 	}
 	
 	/**
@@ -130,7 +130,7 @@ public class ContentAssistLocationTests extends TestCase
 	 */
 	public void testOpenTagElementName()
 	{
-		this.openTagTests("<body>");
+		this.tagTests("<body>", Location.IN_OPEN_TAG);
 	}
 	
 	/**
@@ -138,7 +138,7 @@ public class ContentAssistLocationTests extends TestCase
 	 */
 	public void testOpenScriptElement()
 	{
-		this.openTagTests("<script>");
+		this.tagTests("<script>", Location.IN_OPEN_TAG);
 	}
 	
 	/**
@@ -146,7 +146,7 @@ public class ContentAssistLocationTests extends TestCase
 	 */
 	public void testOpenStyleElement()
 	{
-		this.openTagTests("<style>");
+		this.tagTests("<style>", Location.IN_OPEN_TAG);
 	}
 	
 	/**
@@ -154,7 +154,7 @@ public class ContentAssistLocationTests extends TestCase
 	 */
 	public void testOpenTagWithClassAttribute()
 	{
-		this.openTagTests("<body class=\"testing\">");
+		this.tagTests("<body class=\"testing\">", Location.IN_OPEN_TAG);
 	}
 	
 	/**
@@ -162,7 +162,7 @@ public class ContentAssistLocationTests extends TestCase
 	 */
 	public void testOpenTagWithIDAttribute()
 	{
-		this.openTagTests("<body id=\"testing\">");
+		this.tagTests("<body id=\"testing\">", Location.IN_OPEN_TAG);
 	}
 
 	/**
@@ -170,7 +170,7 @@ public class ContentAssistLocationTests extends TestCase
 	 */
 	public void testSelfClosingTag()
 	{
-		this.openTagTests("<body/>");
+		this.tagTests("<body/>", Location.IN_OPEN_TAG);
 	}
 	
 	/**
@@ -178,13 +178,6 @@ public class ContentAssistLocationTests extends TestCase
 	 */
 	public void testCloseTag()
 	{
-		String source = "</body>";
-		
-		this.tagTests(
-			source,
-			new RangeWithLocation(0, 1, Location.IN_TEXT),
-			new RangeWithLocation(1, source.length() - 1, Location.IN_CLOSE_TAG)
-			//new RangeWithLocation(source.length(), source.length() + 1, Location.IN_TEXT)
-		);
+		this.tagTests("</body>", Location.IN_CLOSE_TAG);
 	}
 }
