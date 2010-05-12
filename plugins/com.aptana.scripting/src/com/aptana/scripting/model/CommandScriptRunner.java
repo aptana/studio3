@@ -7,15 +7,17 @@ import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.Map;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
+import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ProcessUtil;
+import com.aptana.scripting.Activator;
 import com.aptana.scripting.ScriptLogger;
-import com.aptana.scripting.ScriptUtils;
 
 public class CommandScriptRunner extends AbstractCommandRunner
 {
@@ -83,63 +85,43 @@ public class CommandScriptRunner extends AbstractCommandRunner
 	}
 	
 	/**
-	 * createShellCommand
-	 */
-	protected String getShell()
-	{
-		IPath path = ScriptUtils.getShellPath();
-		String result = null;
-		
-		if (path != null)
-		{
-			result = path.toOSString();
-		}
-		
-		return result;
-	}
-
-	/**
 	 * executeScript
 	 * 
 	 * @return
 	 */
 	public String executeScript()
 	{
-		String shell = this.getShell();
-		String[] commandLine = this.getCommandLineArguments();
-		String resultText = null;
-		
-		if (shell != null)
-		{
-			String input = IOUtil.read(this.getContext().getInputStream(), "UTF-8"); //$NON-NLS-1$			
-			Map<Integer, String> result = ProcessUtil.runInBackground(shell, this.getCommand().getWorkingDirectory(), input, this.getContributedEnvironment(), commandLine);
-			
-			if (result == null)
-			{
-				this._exitValue = 1;
-				this.setExecutedSuccessfully(false);
-			}
-			else
-			{
-				this._exitValue = result.keySet().iterator().next();
-				resultText = result.values().iterator().next();
-				this.setExecutedSuccessfully(this._exitValue == 0);
-			}
+		IPath shell;
+		try {
+			shell = ShellExecutable.getPath();
+		} catch (CoreException e) {
+			Activator.logError("Could not locate shell", e);
+			this._exitValue = 1;
+			this.setExecutedSuccessfully(false);
+			return MessageFormat.format(
+					"Unable to locate a shell with which to execute this command: {0}",
+					new Object[]
+					{
+						this.getCommand().getPath()
+					}
+				);
 		}
-		else
+		String[] commandLine = this.getCommandLineArguments();
+		String resultText = null;		
+		String input = IOUtil.read(this.getContext().getInputStream(), "UTF-8"); //$NON-NLS-1$			
+		Map<Integer, String> result = ProcessUtil.runInBackground(shell.toOSString(), this.getCommand().getWorkingDirectory(), input, this.getContributedEnvironment(), commandLine);
+		
+		if (result == null)
 		{
-			resultText = MessageFormat.format(
-				"Unable to locate a shell with which to execute this command: {0}",
-				new Object[]
-				{
-					this.getCommand().getPath()
-				}
-			);
-			
 			this._exitValue = 1;
 			this.setExecutedSuccessfully(false);
 		}
-
+		else
+		{
+			this._exitValue = result.keySet().iterator().next();
+			resultText = result.values().iterator().next();
+			this.setExecutedSuccessfully(this._exitValue == 0);
+		}
 		return resultText;
 	}
 

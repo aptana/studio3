@@ -29,9 +29,11 @@ import net.contentobjects.jnotify.JNotifyListener;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
@@ -76,7 +78,7 @@ public class GitRepository
 			// FIXME When actions are taken through our model/UI we end up causing multiple refreshes for index changes
 			// index appears to change on commit/stage/unstage/pull
 			// Add listener for changes in HEAD (i.e. switched branches), and index
-			fileWatcherIds.add(FileWatcher.addWatch(gitDirPath(), IJNotify.FILE_ANY, false, new JNotifyAdapter()
+			fileWatcherIds.add(FileWatcher.addWatch(gitDirPath().toOSString(), IJNotify.FILE_ANY, false, new JNotifyAdapter()
 			{
 
 				private Set<String> filesToWatch;
@@ -386,10 +388,10 @@ public class GitRepository
 				}));
 	}
 
-	public String workingDirectory()
+	public IPath workingDirectory()
 	{
-		if (gitDirPath().endsWith(File.separator + GIT_DIR))
-			return gitDirPath().substring(0, gitDirPath().length() - 5);
+		if (gitDirPath().lastSegment().equals(GIT_DIR))
+			return gitDirPath().removeLastSegments(1);
 		else if (GitExecutable.instance().outputForCommand(gitDirPath(), "rev-parse", "--is-inside-work-tree") //$NON-NLS-1$ //$NON-NLS-2$
 				.equals("true")) //$NON-NLS-1$
 			return GitExecutable.instance().path(); // FIXME This doesn't seem right....
@@ -655,11 +657,9 @@ public class GitRepository
 
 	boolean executeHook(String name, String... arguments)
 	{
-		String hookPath = gitDirPath();
-		if (!hookPath.endsWith(File.separator))
-			hookPath += File.separator;
-		hookPath += "hooks" + File.separator + name; //$NON-NLS-1$
-		File hook = new File(hookPath);
+		IPath hookPath = gitDirPath();
+		hookPath = hookPath.append("hooks").append(name); //$NON-NLS-1$
+		File hook = hookPath.toFile();
 		if (!hook.exists() || !hook.isFile())
 			return true;
 
@@ -679,11 +679,11 @@ public class GitRepository
 		}
 
 		Map<String, String> env = new HashMap<String, String>();
-		env.put(GitEnv.GIT_DIR, gitDirPath());
+		env.put(GitEnv.GIT_DIR, gitDirPath().toOSString());
 		env.put(GitEnv.GIT_INDEX_FILE, gitFile(INDEX).getAbsolutePath());
 
 		int ret = 1;
-		Map<Integer, String> result = ProcessUtil.runInBackground(hookPath, workingDirectory(), env, arguments);
+		Map<Integer, String> result = ProcessUtil.runInBackground(hookPath.toOSString(), workingDirectory(), env, arguments);
 		ret = result.keySet().iterator().next();
 		return ret == 0;
 	}
@@ -956,10 +956,10 @@ public class GitRepository
 		return Status.OK_STATUS;
 	}
 
-	public IStatus deleteFolder(String folderPath)
+	public IStatus deleteFolder(IPath folderPath)
 	{
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", "-rf", //$NON-NLS-1$ //$NON-NLS-2$
-				folderPath);
+				folderPath.toOSString());
 		if (result == null)
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git rm -rf"); //$NON-NLS-1$
 		if (result.keySet().iterator().next() != 0)
@@ -968,9 +968,9 @@ public class GitRepository
 		return Status.OK_STATUS;
 	}
 
-	public IStatus moveFile(String source, String dest)
+	public IStatus moveFile(IPath source, IPath dest)
 	{
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "mv", source, dest); //$NON-NLS-1$
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "mv", source.toOSString(), dest.toOSString()); //$NON-NLS-1$
 		int exitCode = result.keySet().iterator().next();
 		if (exitCode != 0)
 		{
@@ -981,20 +981,18 @@ public class GitRepository
 		return Status.OK_STATUS;
 	}
 
-	public String relativePath(IResource theResource)
+	public IPath relativePath(IResource theResource)
 	{
-		String workingDirectory = workingDirectory();
-		String resourcePath = theResource.getLocationURI().getPath();
-		if (resourcePath.startsWith(workingDirectory))
+		IPath workingDirectory = workingDirectory();
+		IPath resourcePath = theResource.getLocation();
+		if (workingDirectory.isPrefixOf(resourcePath))
 		{
-			resourcePath = resourcePath.substring(workingDirectory.length());
-			if (resourcePath.startsWith("/") || resourcePath.startsWith("\\")) //$NON-NLS-1$ //$NON-NLS-2$
-				resourcePath = resourcePath.substring(1);
+			resourcePath = resourcePath.makeRelativeTo(workingDirectory);
 		}
 		// What if we have some trailing slash or something?
-		if (resourcePath.length() == 0)
+		if (resourcePath.isEmpty())
 		{
-			resourcePath = currentBranch();
+			resourcePath = Path.fromOSString(currentBranch());
 		}
 		return resourcePath;
 	}
@@ -1096,12 +1094,12 @@ public class GitRepository
 
 	File gitFile(String string)
 	{
-		return new File(gitDirPath(), string);
+		return gitDirPath().append(string).toFile();
 	}
 
-	private String gitDirPath()
+	private IPath gitDirPath()
 	{
-		return new File(fileURL).getAbsolutePath();
+		return Path.fromOSString(new File(fileURL).getAbsolutePath());
 	}
 
 	public void firePullEvent()

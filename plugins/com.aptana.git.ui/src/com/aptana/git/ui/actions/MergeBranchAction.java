@@ -70,7 +70,7 @@ public class MergeBranchAction extends MenuAction
 				try
 				{
 					SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
-					ILaunch launch = Launcher.launch(GitExecutable.instance().path(), repo.workingDirectory(), subMonitor.newChild(75), "merge", //$NON-NLS-1$
+					ILaunch launch = Launcher.launch(GitExecutable.instance().path().toOSString(), repo.workingDirectory(), subMonitor.newChild(75), "merge", //$NON-NLS-1$
 							branchName);
 					while (!launch.isTerminated())
 					{

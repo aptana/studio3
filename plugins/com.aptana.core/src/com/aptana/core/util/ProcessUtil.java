@@ -1,6 +1,5 @@
 package com.aptana.core.util;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -8,7 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+
 import com.aptana.core.CorePlugin;
+import com.aptana.core.ShellExecutable;
 import com.aptana.core.internal.InputStreamGobbler;
 import com.aptana.core.internal.OutputStreamThread;
 
@@ -21,12 +24,12 @@ import com.aptana.core.internal.OutputStreamThread;
 public abstract class ProcessUtil
 {
 
-	public static String outputForCommand(String command, String workingDir, String... args)
+	public static String outputForCommand(String command, IPath workingDir, String... args)
 	{
 		return outputForCommand(command, workingDir, null, args);
 	}
 
-	public static String outputForCommand(String command, String workingDir, Map<String, String> env, String... args)
+	public static String outputForCommand(String command, IPath workingDir, Map<String, String> env, String... args)
 	{
 		Map<Integer, String> result = runInBackground(command, workingDir, env, args);
 		if (result == null || result.isEmpty())
@@ -39,12 +42,12 @@ public abstract class ProcessUtil
 		return IOUtil.read(stream, "UTF-8"); //$NON-NLS-1$
 	}
 
-	public static Map<Integer, String> runInBackground(String command, String workingDir, String[] args)
+	public static Map<Integer, String> runInBackground(String command, IPath workingDir, String[] args)
 	{
 		return runInBackground(command, workingDir, null, args);
 	}
 
-	public static Map<Integer, String> runInBackground(String command, String workingDir, Map<String, String> env,
+	public static Map<Integer, String> runInBackground(String command, IPath workingDir, Map<String, String> env,
 			String[] args)
 	{
 		return runInBackground(command, workingDir, null, env, args);
@@ -60,26 +63,13 @@ public abstract class ProcessUtil
 	 * @param args
 	 * @return
 	 */
-	public static Map<Integer, String> runInBackground(String command, String workingDir, String input,
-			Map<String, String> env, String[] args)
+	public static Map<Integer, String> runInBackground(String command, IPath workingDirectory, String input,
+			Map<String, String> environment, String[] arguments)
 	{
-		List<String> commands = new ArrayList<String>();
-		commands.add(command);
-		for (String arg : args)
-			commands.add(arg);
-
-		ProcessBuilder builder = new ProcessBuilder(commands);
-		if (workingDir != null && workingDir.trim().length() > 0)
-			builder.directory(new File(workingDir));
-
-		if (env != null && !env.isEmpty())
-		{
-			builder.environment().putAll(env);
-		}
 		String lineSeparator = ResourceUtil.getLineSeparatorValue(null);
 		try
 		{
-			Process p = builder.start();
+			Process p = ShellExecutable.run(command, workingDirectory, environment, arguments);
 			// Read and write in threads to avoid from choking the process streams
 			OutputStreamThread writerThread = null;
 			if (input != null)
@@ -130,6 +120,10 @@ public abstract class ProcessUtil
 		{
 			CorePlugin.logError(e.getMessage(), e);
 		}
+		catch (CoreException e)
+		{
+			CorePlugin.logError(e.getMessage(), e);
+		}
 		catch (InterruptedException e)
 		{
 			CorePlugin.logError(e.getMessage(), e);
@@ -146,7 +140,7 @@ public abstract class ProcessUtil
 	 * @return
 	 * @throws IOException
 	 */
-	public static Process run(String command, String workingDir, String... args) throws IOException
+	public static Process run(String command, IPath workingDir, String... args) throws IOException
 	{
 		List<String> commands = new ArrayList<String>();
 		commands.add(command);
@@ -155,7 +149,7 @@ public abstract class ProcessUtil
 
 		ProcessBuilder builder = new ProcessBuilder(commands);
 		if (workingDir != null)
-			builder.directory(new File(workingDir));
+			builder.directory(workingDir.toFile());
 
 		return builder.start();
 	}

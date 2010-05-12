@@ -102,6 +102,7 @@ class PathFilter extends ViewerFilter
 		// check if the resource is included by the filtered file or vise versa
 		if (queryResults == null)
 		{
+			// FIXME We should have a search API layer over the top of this and shouldn't be hitting indices directly. Pass a scope object to the search API and it calculates what indices to search within!
 			queryResults = new ArrayList<QueryResult>();
 			Index index = IndexManager.getInstance().getIndex(resource.getProject().getFullPath().toPortableString());
 			try

@@ -1,6 +1,7 @@
 package com.aptana.index.core;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -27,6 +28,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 
@@ -43,7 +45,7 @@ public class ResourceIndexer implements IResourceChangeListener
 
 		public IndexProjectJob(IProject project)
 		{
-			super(project.getName());
+			super(MessageFormat.format("Indexing project {0}", project.getName()));
 			this.project = project;
 		}
 
@@ -69,7 +71,7 @@ public class ResourceIndexer implements IResourceChangeListener
 
 		public RemoveIndexOfProjectJob(IProject project)
 		{
-			super(project.getName());
+			super(MessageFormat.format("Removing index for project {0}", project.getName()));
 			this.project = project;
 		}
 
@@ -105,7 +107,7 @@ public class ResourceIndexer implements IResourceChangeListener
 
 		public IndexFilesOfProjectJob(IProject project, Set<IFile> files)
 		{
-			super(project.getName());
+			super(MessageFormat.format("Indexing files in project {0}", project.getName()));
 			this.project = project;
 			this.files = files;
 		}
@@ -119,7 +121,9 @@ public class ResourceIndexer implements IResourceChangeListener
 		@Override
 		public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException
 		{
-			if (monitor.isCanceled())
+			IFileIndexingParticipant[] participants = getFileIndexingParticipants();
+			SubMonitor sub = SubMonitor.convert(monitor, (participants.length + 1) * files.size());
+			if (sub.isCanceled())
 			{
 				return Status.CANCEL_STATUS;
 			}
@@ -135,20 +139,22 @@ public class ResourceIndexer implements IResourceChangeListener
 				// First cleanup indices for files
 				for (IFile file : files)
 				{
-					if (monitor.isCanceled())
+					if (sub.isCanceled())
 					{
 						return Status.CANCEL_STATUS;
 					}
 					index.remove(file.getProjectRelativePath().toPortableString());
+					sub.worked(1);
 				}
 
-				for (IFileIndexingParticipant fileIndexingParticipant : getFileIndexingParticipants())
+				for (IFileIndexingParticipant fileIndexingParticipant : participants)
 				{
-					if (monitor.isCanceled())
+					if (sub.isCanceled())
 					{
 						return Status.CANCEL_STATUS;
 					}
-					fileIndexingParticipant.index(files, index, monitor);
+					// TODO Limit file indexers by content type here so we don't have to check content type for each file in every indexer! indexers should/could register what content types they handle and then we can pre-filter here!
+					fileIndexingParticipant.index(files, index, sub.newChild(files.size()));
 				}
 
 			}
@@ -176,7 +182,7 @@ public class ResourceIndexer implements IResourceChangeListener
 
 		public RemoveIndexOfFilesOfProjectJob(IProject project, Set<IFile> files)
 		{
-			super(project.getName());
+			super(MessageFormat.format("Removing entries for files in index of project {0}", project.getName()));
 			this.project = project;
 			this.files = files;
 		}
@@ -221,8 +227,7 @@ public class ResourceIndexer implements IResourceChangeListener
 				}
 				catch (IOException e)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					IndexActivator.logError(e.getMessage(), e);
 				}
 			}
 			return Status.OK_STATUS;
@@ -459,8 +464,7 @@ public class ResourceIndexer implements IResourceChangeListener
 							}
 							catch (CoreException e)
 							{
-								// TODO
-								e.printStackTrace();
+								IndexActivator.logError(e);
 							}
 						}
 					}

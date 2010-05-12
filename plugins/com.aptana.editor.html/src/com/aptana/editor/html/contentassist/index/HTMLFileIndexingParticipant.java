@@ -1,5 +1,8 @@
 package com.aptana.editor.html.contentassist.index;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -7,12 +10,17 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.core.runtime.content.IContentTypeManager;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.html.Activator;
+import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
@@ -30,23 +38,23 @@ public class HTMLFileIndexingParticipant implements IFileIndexingParticipant
 	private static final String ATTRIBUTE_HREF = "href"; //$NON-NLS-1$
 	private static final String ATTRIBUTE_SRC = "src"; //$NON-NLS-1$
 
-	public HTMLFileIndexingParticipant()
-	{
-	}
-
 	@Override
 	public void index(Set<IFile> files, Index index, IProgressMonitor monitor)
 	{
+		monitor = SubMonitor.convert(monitor, files.size());
 		for (IFile file : files)
 		{
 			if (monitor.isCanceled())
 			{
 				return;
 			}
-			String fileExtension = file.getFileExtension();
-			if (HTML_EXTENSIONS[0].equalsIgnoreCase(fileExtension)
-					|| HTML_EXTENSIONS[1].equalsIgnoreCase(fileExtension))
+			try
 			{
+				if (file == null || !isHTMLFile(file))
+				{
+					continue;
+				}
+				monitor.subTask(file.getLocation().toPortableString());
 				try
 				{
 					String fileContents = IOUtil.read(file.getContents());
@@ -56,16 +64,57 @@ public class HTMLFileIndexingParticipant implements IFileIndexingParticipant
 					IParseNode parseNode = htmlParser.parse(parseState);
 					walkNode(index, file, parseNode);
 				}
-				catch (CoreException e)
-				{
-					Activator.logError("An error occurred while indexing " + file.getName(), e);
-				}
 				catch (Exception e)
 				{
-					Activator.logError("An error occurred while indexing " + file.getName(), e);
+					Activator.logError(MessageFormat.format("An error occurred while indexing {0}", file.getName()), e);
 				}
 			}
+			finally
+			{
+				monitor.worked(1);
+			}
 		}
+		monitor.done();
+	}
+
+	private boolean isHTMLFile(IFile file)
+	{
+		InputStream stream = null;
+		IContentTypeManager manager = Platform.getContentTypeManager();
+		try
+		{
+			stream = file.getContents();
+			IContentType[] types = manager.findContentTypesFor(stream, file.getName());
+			for (IContentType type : types)
+			{
+				if (type.getId().equals(IHTMLConstants.CONTENT_TYPE_HTML))
+					return true;
+			}
+		}
+		catch (CoreException e)
+		{
+			Activator.logError(e);
+		}
+		catch (Exception e)
+		{
+			Activator.logError(e.getMessage(), e);
+		}
+		finally
+		{
+			try
+			{
+				if (stream != null)
+					stream.close();
+			}
+			catch (IOException e)
+			{
+				// ignore
+			}
+		}
+		// fall back to file extensions
+		String fileExtension = file.getFileExtension();
+		return (HTML_EXTENSIONS[0].equalsIgnoreCase(fileExtension) || HTML_EXTENSIONS[1]
+				.equalsIgnoreCase(fileExtension));
 	}
 
 	public static void walkNode(Index index, IFile file, IParseNode parent)

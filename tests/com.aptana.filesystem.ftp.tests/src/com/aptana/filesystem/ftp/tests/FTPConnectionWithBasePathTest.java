@@ -51,19 +51,26 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 	private static FTPConnectionPoint setupConnection()
 	{
 		FTPConnectionPoint ftpcp = new FTPConnectionPoint();
-		ftpcp.setHost("aptana.ftpstream.com"); //$NON-NLS-1$
-		ftpcp.setLogin("test5"); //$NON-NLS-1$
-		ftpcp.setPassword(new char[] { 'n', 'o', 'c', '$', '$', '1' });
+		ftpcp.setHost("10.10.1.60"); //$NON-NLS-1$
+		ftpcp.setLogin("ftpuser"); //$NON-NLS-1$
+		ftpcp.setPassword(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'});
 		return ftpcp;
 	}
 
 	@Override
 	protected void setUp() throws Exception
 	{
+		initBasePath();
 		FTPConnectionPoint ftpcp = setupConnection();
 		ftpcp.setPath(Path.ROOT.append(getClass().getSimpleName()));
 		cp = ftpcp;
 		super.setUp();
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+		cleanupBasePath();
 	}
 
 	public static void initBasePath() throws CoreException
@@ -93,6 +100,16 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 		ftpcp.disconnect(null);
 		assertFalse(ftpcp.isConnected());
 	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsSetModificationTime()
+	 */
+	@Override
+	protected boolean supportsSetModificationTime()
+	{
+		return false;
+	}
+
 
 	/*
 	 * (non-Javadoc)

@@ -372,7 +372,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 
 		// create proposal container
 		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
-
+		// FIXME Grab prefix user types and pass that down into the queries to generate more efficient queries!
 		switch (location)
 		{
 			case OUTSIDE_RULE:
@@ -734,7 +734,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		else
 		{
-			this._replaceRange = null;
+			this._replaceRange = new Range(offset + 1, offset);
 		}
 	}
 }

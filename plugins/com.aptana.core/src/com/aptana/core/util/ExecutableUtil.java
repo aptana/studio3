@@ -18,22 +18,12 @@ public abstract class ExecutableUtil
 	 *            name of the binary.
 	 * @param appendExtension
 	 *            ".exe" is appended for windows when searching the PATH.
-	 * @param preferencesPath
-	 *            Path specified in user's preferences.
 	 * @param searchLocations
 	 *            Common locations to search.
 	 * @return
 	 */
-	public static IPath find(String executableName, boolean appendExtension, IPath preferencesPath, List<IPath> searchLocations)
+	public static IPath find(String executableName, boolean appendExtension, List<IPath> searchLocations)
 	{
-		if (preferencesPath != null) 
-		{
-			if (isExecutable(preferencesPath)) 
-			{
-				return preferencesPath;
-			}
-		}
-
 		if (Platform.OS_WIN32.equals(Platform.getOS())) 
 		{
 			// Grab PATH and search it!

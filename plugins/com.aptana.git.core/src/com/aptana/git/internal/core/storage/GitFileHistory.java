@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.team.core.history.IFileHistoryProvider;
@@ -40,7 +41,7 @@ public class GitFileHistory extends FileHistory
 			if (repo == null)
 				return new CommitFileRevision[0];
 			// Need the repo relative path
-			String resourcePath = repo.relativePath(resource);
+			IPath resourcePath = repo.relativePath(resource);
 			List<IFileRevision> revisions = new ArrayList<IFileRevision>();
 			GitRevList list = new GitRevList(repo);
 			int max = -1;
@@ -48,7 +49,7 @@ public class GitFileHistory extends FileHistory
 			{
 				max = 1;
 			}
-			list.walkRevisionListWithSpecifier(new GitRevSpecifier(resourcePath), max, subMonitor.newChild(95));
+			list.walkRevisionListWithSpecifier(new GitRevSpecifier(resourcePath.toOSString()), max, subMonitor.newChild(95));
 			List<GitCommit> commits = list.getCommits();
 			for (GitCommit gitCommit : commits)
 			{
