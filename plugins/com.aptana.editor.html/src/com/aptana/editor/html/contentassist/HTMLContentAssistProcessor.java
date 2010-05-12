@@ -24,6 +24,7 @@ import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
+import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.html.Activator;
 import com.aptana.editor.html.HTMLScopeScanner;
 import com.aptana.editor.html.HTMLSourceConfiguration;
@@ -33,6 +34,7 @@ import com.aptana.editor.html.contentassist.model.ElementElement;
 import com.aptana.editor.html.contentassist.model.EntityElement;
 import com.aptana.editor.html.contentassist.model.ValueElement;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
+import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.parsing.lexer.Range;
@@ -71,6 +73,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		locationMap.put(HTMLSourceConfiguration.HTML_SCRIPT, Location.IN_OPEN_TAG);
 		locationMap.put(HTMLSourceConfiguration.HTML_STYLE, Location.IN_OPEN_TAG);
 		locationMap.put(HTMLSourceConfiguration.HTML_TAG, Location.IN_OPEN_TAG);
+		
+		locationMap.put(JSSourceConfiguration.DEFAULT, Location.IN_TEXT);
+		locationMap.put(CSSSourceConfiguration.DEFAULT, Location.IN_TEXT);
+		locationMap.put(IDocument.DEFAULT_CONTENT_TYPE, Location.IN_TEXT);
 	}
 
 	/**
