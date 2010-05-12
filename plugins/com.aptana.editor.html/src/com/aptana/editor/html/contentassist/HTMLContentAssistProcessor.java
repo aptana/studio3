@@ -589,31 +589,36 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				result = locationMap.get(type);
 
-				Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexeme(0);
+				Lexeme<HTMLTokenType> firstLexeme = lexemeProvider.getFirstLexeme();
 
-				if (lexeme != null)
+				if (firstLexeme != null)
 				{
 					switch (result)
 					{
 						case IN_OPEN_TAG:
-							if (lexeme.getStartingOffset() == offset)
+							if (firstLexeme.getStartingOffset() == offset)
 							{
 								result = Location.IN_TEXT;
 							}
-							else if ("</".equals(lexeme.getText())) //$NON-NLS-1$
+							else if ("</".equals(firstLexeme.getText())) //$NON-NLS-1$
 							{
 								result = Location.IN_CLOSE_TAG;
 							}
 							break;
 
 						case IN_TEXT:
-							if ("<".equals(lexeme.getText())) //$NON-NLS-1$
+							Lexeme<HTMLTokenType> lastLexeme = lexemeProvider.getLastLexeme();
+							
+							if (firstLexeme.getStartingOffset() < offset && offset < lastLexeme.getEndingOffset())
 							{
-								result = Location.IN_OPEN_TAG;
-							}
-							else if ("</".equals(lexeme.getText())) //$NON-NLS-1$
-							{
-								result = Location.IN_CLOSE_TAG;
+								if ("<".equals(firstLexeme.getText())) //$NON-NLS-1$
+								{
+									result = Location.IN_OPEN_TAG;
+								}
+								else if ("</".equals(firstLexeme.getText())) //$NON-NLS-1$
+								{
+									result = Location.IN_CLOSE_TAG;
+								}
 							}
 							break;
 
