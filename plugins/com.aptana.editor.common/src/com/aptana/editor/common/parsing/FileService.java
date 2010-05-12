@@ -13,71 +13,117 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class FileService
 {
-
 	private IDocument fDocument;
 	private IParser fParser;
 	private IParseState fParseState;
 	private Set<IParseListener> listeners = new HashSet<IParseListener>();
 
+	/**
+	 * FileService
+	 */
 	public FileService()
 	{
 		fParseState = new ParseState();
 	}
 
-	public void parse()
-	{
-		if (fParser == null || fDocument == null)
-		{
-			return;
-		}
-
-		String source = fDocument.get();
-		fParseState.setEditState(source, source, 0, 0);
-		try
-		{
-			fParser.parse(fParseState);
-			for (IParseListener listener : listeners)
-				listener.parseFinished();
-		}
-		catch (Exception e)
-		{
-			// not logging the parsing error here since the source could be in an intermediate state of being edited by
-			// the user
-		}
-	}
-
-	public IParseState getParseState()
-	{
-		return fParseState;
-	}
-
-	public IParseNode getParseResult()
-	{
-		return fParseState.getParseResult();
-	}
-
-	public void setParser(IParser parser)
-	{
-		fParser = parser;
-	}
-
-	public void setParseState(IParseState parseState)
-	{
-		fParseState = parseState;
-	}
-
-	public void setDocument(IDocument document)
-	{
-		fDocument = document;
-	}
-
+	/**
+	 * addListener
+	 * 
+	 * @param listener
+	 */
 	public void addListener(IParseListener listener)
 	{
 		listeners.add(listener);		
 	}
 
+	/**
+	 * getParseResult
+	 * 
+	 * @return
+	 */
+	public IParseNode getParseResult()
+	{
+		return fParseState.getParseResult();
+	}
+
+	/**
+	 * getParseState
+	 * 
+	 * @return
+	 */
+	public IParseState getParseState()
+	{
+		return fParseState;
+	}
+
+	/**
+	 * parse
+	 */
+	public void parse()
+	{
+		if (fParser != null && fDocument != null)
+		{
+			String source = fDocument.get();
+			
+			// TODO: at some point, we'll want to use this call to indicate the
+			// actual edit with the theory that we'll be able to perform
+			// incremental lexing and parsing based on that info.
+			fParseState.setEditState(source, source, 0, 0);
+			
+			try
+			{
+				fParser.parse(fParseState);
+				
+				for (IParseListener listener : listeners)
+				{
+					listener.parseFinished();
+				}
+			}
+			catch (Exception e)
+			{
+				// not logging the parsing error here since the source could be in an intermediate state of being edited by
+				// the user
+			}
+		}
+	}
+
+	/**
+	 * removeListener
+	 * 
+	 * @param fListener
+	 */
 	public void removeListener(IParseListener fListener)
 	{
 		listeners.remove(fListener);
+	}
+
+	/**
+	 * setDocument
+	 * 
+	 * @param document
+	 */
+	public void setDocument(IDocument document)
+	{
+		fDocument = document;
+	}
+
+	/**
+	 * setParser
+	 * 
+	 * @param parser
+	 */
+	public void setParser(IParser parser)
+	{
+		fParser = parser;
+	}
+
+	/**
+	 * setParseState
+	 * 
+	 * @param parseState
+	 */
+	public void setParseState(IParseState parseState)
+	{
+		fParseState = parseState;
 	}
 }
