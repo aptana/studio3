@@ -542,7 +542,7 @@ public class ConnectionPointComposite implements SelectionListener, ISelectionCh
     }
 
     private void delete(ISelection selection) {
-        final FileSystemDeleteAction action = new FileSystemDeleteAction(getControl().getShell());
+        final FileSystemDeleteAction action = new FileSystemDeleteAction(getControl().getShell(), fTreeViewer.getTree());
         action.updateSelection((IStructuredSelection) selection);
         action.addJobListener(new JobChangeAdapter() {
 
