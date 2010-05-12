@@ -145,14 +145,16 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			
 			// tokenize the current document
 			IDocument document = viewer.getDocument();
-			LexemeProvider<JSTokenType> lexemeProvider = new LexemeProvider<JSTokenType>(document, offset, new JSScopeScanner())
+			LexemeProvider<JSTokenType> lexemeProvider;
+			
+			if (node != null)
 			{
-				@Override
-				protected JSTokenType getTypeFromName(String name)
-				{
-					return JSTokenType.get(name);
-				}
-			};
+				lexemeProvider = new JSLexemeProvider(document, node, new JSScopeScanner());
+			}
+			else
+			{
+				lexemeProvider = new JSLexemeProvider(document, offset, new JSScopeScanner());
+			}
 	
 			// store a reference to the lexeme at the current position
 			this._currentLexeme = lexemeProvider.getFloorLexeme(offset);
