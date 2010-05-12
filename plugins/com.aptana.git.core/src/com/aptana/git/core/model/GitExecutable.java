@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
@@ -246,8 +247,9 @@ public class GitExecutable
 	 * @param arguments
 	 * @return
 	 * @throws IOException
+	 * @throws CoreException 
 	 */
-	public Process run(IPath directory, String... arguments) throws IOException
+	public Process run(IPath directory, String... arguments) throws IOException, CoreException
 	{
 		return ShellExecutable.run(gitPath, directory, null, arguments);
 	}
