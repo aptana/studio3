@@ -2,6 +2,7 @@ package com.aptana.git.ui.internal;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
@@ -18,6 +19,7 @@ import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.ui.externaltools.internal.model.IExternalToolConstants;
 
 import com.aptana.console.process.ConsoleProcessFactory;
+import com.aptana.core.ShellExecutable;
 import com.aptana.git.core.GitPlugin;
 
 /**
@@ -58,7 +60,6 @@ public abstract class Launcher
 	private static ILaunchConfigurationWorkingCopy createLaunchConfig(String command, IPath workingDir, String... args)
 			throws CoreException
 	{
-		String toolArgs = '"' + join(args, "\" \"") + '"'; //$NON-NLS-1$
 		ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
 		ILaunchConfigurationType configType = manager
 				.getLaunchConfigurationType(IExternalToolConstants.ID_PROGRAM_BUILDER_LAUNCH_CONFIGURATION_TYPE);
@@ -81,6 +82,11 @@ public abstract class Launcher
 			name = manager.generateUniqueLaunchConfigurationNameFrom(name);
 		}
 
+		List<String> shellCommand = ShellExecutable.toShellCommand(command, args);
+		command = shellCommand.remove(0);
+		args = shellCommand.toArray(new String[shellCommand.size()]);
+
+		String toolArgs = '"' + join(args, "\" \"") + '"'; //$NON-NLS-1$
 		ILaunchConfigurationWorkingCopy config = configType.newInstance(null, name);
 		config.setAttribute(IExternalToolConstants.ATTR_LOCATION, command);
 		config.setAttribute(IExternalToolConstants.ATTR_TOOL_ARGUMENTS, toolArgs);

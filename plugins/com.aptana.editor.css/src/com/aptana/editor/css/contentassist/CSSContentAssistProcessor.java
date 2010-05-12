@@ -734,7 +734,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		else
 		{
-			this._replaceRange = null;
+			this._replaceRange = new Range(offset + 1, offset);
 		}
 	}
 }

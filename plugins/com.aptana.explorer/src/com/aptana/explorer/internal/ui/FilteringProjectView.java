@@ -358,7 +358,7 @@ public class FilteringProjectView extends GitProjectView
 		{
 			public void handleEvent(Event event)
 			{
-				if (hoveredItem == null)
+				if (hoveredItem == null || hoveredItem.isDisposed())
 					return;
 				if (eyeball != null)
 				{
