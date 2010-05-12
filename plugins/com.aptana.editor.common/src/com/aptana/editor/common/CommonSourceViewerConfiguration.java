@@ -153,9 +153,6 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 //			assistant.setAutoActivationDelay(fPreferenceStore.getInt(IPreferenceConstants.CONTENT_ASSIST_DELAY));
 			assistant.enableAutoActivation(true);
 			assistant.setAutoActivationDelay(200);
-			
-			assistant.enablePrefixCompletion(true);
-			assistant.enableAutoInsert(true);
 		}
 		
 		assistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
