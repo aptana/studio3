@@ -39,7 +39,7 @@ import com.aptana.parsing.lexer.Range;
 
 public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 {
-	private static enum Location
+	static enum Location
 	{
 		ERROR, IN_OPEN_TAG, IN_CLOSE_TAG, IN_DOCTYPE, IN_COMMENT, IN_TEXT, // coarse-grain locations
 		IN_ELEMENT_NAME,
@@ -404,14 +404,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		// tokenize the current document
 		IDocument document = viewer.getDocument();
-		LexemeProvider<HTMLTokenType> lexemeProvider = new LexemeProvider<HTMLTokenType>(document, offset, new HTMLScopeScanner())
-		{
-			@Override
-			protected HTMLTokenType getTypeFromName(String name)
-			{
-				return HTMLTokenType.get(name);
-			}
-		};
+		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
 
 		// store a reference to the lexeme at the current position
 		this._replaceRange = this._currentLexeme = lexemeProvider.getFloorLexeme(offset);
@@ -465,6 +458,25 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		return result.toArray(new ICompletionProposal[result.size()]);
 	}
 
+	/**
+	 * createLexemeProvider
+	 * 
+	 * @param document
+	 * @param offset
+	 * @return
+	 */
+	LexemeProvider<HTMLTokenType> createLexemeProvider(IDocument document, int offset)
+	{
+		return new LexemeProvider<HTMLTokenType>(document, offset, new HTMLScopeScanner())
+		{
+			@Override
+			protected HTMLTokenType getTypeFromName(String name)
+			{
+				return HTMLTokenType.get(name);
+			}
+		};
+	}
+	
 	/**
 	 * getAttributeName
 	 * 
@@ -564,7 +576,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	private Location getLocation(IDocument document, LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
+	Location getLocation(IDocument document, LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
 	{
 		Location result = Location.ERROR;
 
