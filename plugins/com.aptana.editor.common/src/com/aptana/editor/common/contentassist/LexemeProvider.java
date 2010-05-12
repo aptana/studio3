@@ -142,6 +142,16 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	}
 
 	/**
+	 * getFirstLexeme
+	 * 
+	 * @return
+	 */
+	public Lexeme<T> getFirstLexeme()
+	{
+		return this.getLexeme(0);
+	}
+	
+	/**
 	 * getFloorLexeme
 	 * 
 	 * @param offset
@@ -152,6 +162,16 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 		int index = this.getLexemeFloorIndex(offset);
 
 		return this.getLexeme(index);
+	}
+	
+	/**
+	 * getLastLexeme
+	 * 
+	 * @return
+	 */
+	public Lexeme<T> getLastLexeme()
+	{
+		return this.getLexeme(this.size() - 1);
 	}
 
 	/**
