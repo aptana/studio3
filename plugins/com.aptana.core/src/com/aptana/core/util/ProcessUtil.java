@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
 import com.aptana.core.CorePlugin;
@@ -116,6 +117,10 @@ public abstract class ProcessUtil
 			return result;
 		}
 		catch (IOException e)
+		{
+			CorePlugin.logError(e.getMessage(), e);
+		}
+		catch (CoreException e)
 		{
 			CorePlugin.logError(e.getMessage(), e);
 		}
