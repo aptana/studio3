@@ -87,10 +87,7 @@ public class WizardNewFilePage extends WizardNewFileCreationPage
 					String filetype = te.getFiletype();
 					return filetype != null && filetype.equals(fileExtension);
 				}
-				else
-				{
-					return false;
-				}
+				return false;
 			}
 		});
 		if (commands != null && commands.length > 0)

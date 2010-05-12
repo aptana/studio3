@@ -62,9 +62,10 @@ public class ShellExecutable {
 		"%PROGRAMFILES(X86)%\\Git\\bin" //$NON-NLS-1$
 	};
 	
-	private static final String SH = "sh";
-	private static final String BASH = "bash";
+	private static final String SH = "sh"; //$NON-NLS-1$
+	private static final String BASH = "bash"; //$NON-NLS-1$
 	
+	private static boolean initilizing = false;
 	private static IPath shellPath = null;
 	
 	
@@ -77,9 +78,14 @@ public class ShellExecutable {
 	public static synchronized IPath getPath() throws CoreException {
 		if (shellPath == null) {
 			boolean isWin32 = Platform.OS_WIN32.equals(Platform.getOS());
-			shellPath = ExecutableUtil.find(isWin32 ? SH : BASH, isWin32, getPossibleShellLocations());
+			try {
+				initilizing = true;
+				shellPath = ExecutableUtil.find(isWin32 ? SH : BASH, isWin32, getPossibleShellLocations());
+			} finally {
+				initilizing = false;
+			}
 			if (shellPath == null) {
-				throw new CoreException(new Status(Status.ERROR, CorePlugin.PLUGIN_ID, "Shell executable could not be found."));
+				throw new CoreException(new Status(Status.ERROR, CorePlugin.PLUGIN_ID, "Shell executable could not be found.")); //$NON-NLS-1$
 			}
 		}
 		return shellPath;
@@ -99,8 +105,33 @@ public class ShellExecutable {
 		return null;
 	}
 	
-	public static Process run(List<String> command, IPath workingDirectory, Map<String,String> environment) throws IOException {
-		ProcessBuilder processBuilder = new ProcessBuilder(command);
+	private synchronized static List<String> toShellCommand(List<String> command) throws CoreException {
+		if (true) {
+			return command;
+		}
+		if (initilizing) {
+			return command;
+		}
+		List<String> shellCommand = new ArrayList<String>();
+		shellCommand.add(getPath().toOSString());
+		shellCommand.add("--login"); //$NON-NLS-1$
+		shellCommand.add("-c"); //$NON-NLS-1$
+		StringBuffer sb = new StringBuffer();
+		for (String arg : command) {
+			sb.append(arg.replaceAll("\"|\'", "\\$0")).append(' '); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		shellCommand.add(sb.toString().trim());
+		return shellCommand;
+	}
+	
+	public static List<String> toShellCommand(String command, String... arguments) throws CoreException {
+		List<String> commands = new ArrayList<String>(Arrays.asList(arguments));
+		commands.add(0, command);
+		return toShellCommand(commands);
+	}
+			
+	public static Process run(List<String> command, IPath workingDirectory, Map<String,String> environment) throws IOException, CoreException {
+		ProcessBuilder processBuilder = new ProcessBuilder(toShellCommand(command));
 		if (workingDirectory != null) {
 			processBuilder.directory(workingDirectory.toFile());
 		}
@@ -110,17 +141,18 @@ public class ShellExecutable {
 		return processBuilder.start();
 	}
 
-	public static Process run(List<String> command, IPath workingDirectory, String[] envp) throws IOException {
+	public static Process run(List<String> command, IPath workingDirectory, String[] envp) throws IOException, CoreException {
+		command = toShellCommand(command);
 		return Runtime.getRuntime().exec(command.toArray(new String[command.size()]), envp, workingDirectory.toFile());
 	}
 
-	public static Process run(String command, IPath workingDirectory, Map<String,String> environment, String... arguments) throws IOException {
+	public static Process run(String command, IPath workingDirectory, Map<String,String> environment, String... arguments) throws IOException, CoreException {
 		List<String> commands = new ArrayList<String>(Arrays.asList(arguments));
 		commands.add(0, command);
 		return run(commands, workingDirectory, environment);
 	}
 
-	public static Process run(IPath executablePath, IPath workingDirectory, Map<String,String> environment, String... arguments) throws IOException {
+	public static Process run(IPath executablePath, IPath workingDirectory, Map<String,String> environment, String... arguments) throws IOException, CoreException {
 		return run(executablePath.toOSString(), workingDirectory, environment, arguments);
 	}
 
