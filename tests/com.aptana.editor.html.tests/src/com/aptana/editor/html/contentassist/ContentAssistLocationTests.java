@@ -4,17 +4,16 @@ import java.text.MessageFormat;
 
 import junit.framework.TestCase;
 
-import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.DefaultLineTracker;
+import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.ITypedRegion;
-import org.hamcrest.Description;
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.api.Action;
-import org.jmock.api.Invocation;
+import org.eclipse.jface.text.IDocumentPartitioner;
 
+import com.aptana.editor.common.ExtendedFastPartitioner;
+import com.aptana.editor.common.IExtendedPartitioner;
+import com.aptana.editor.common.NullPartitionerSwitchStrategy;
 import com.aptana.editor.common.contentassist.LexemeProvider;
+import com.aptana.editor.common.text.rules.CompositePartitionScanner;
+import com.aptana.editor.common.text.rules.NullSubPartitionScanner;
 import com.aptana.editor.html.HTMLSourceConfiguration;
 import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.Location;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
@@ -35,28 +34,6 @@ public class ContentAssistLocationTests extends TestCase
 		}
 	}
 	
-	private Mockery context;
-	private String partitionType;
-	
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception
-	{
-		context = new Mockery();
-		partitionType = HTMLSourceConfiguration.HTML_TAG;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	protected void tearDown() throws Exception
-	{
-		context = null;
-	}
-	
 	/**
 	 * createDocument
 	 * 
@@ -64,81 +41,24 @@ public class ContentAssistLocationTests extends TestCase
 	 * @param source
 	 * @return
 	 */
-	protected IDocument createDocument(String partitionType, final String source)
+	protected IDocument createDocument(String source)
 	{
-		final IDocument document = context.mock(IDocument.class);
-		final ITypedRegion partition = this.createPartition(partitionType, source.length());
+		CompositePartitionScanner partitionScanner = new CompositePartitionScanner(
+			HTMLSourceConfiguration.getDefault().createSubPartitionScanner(),
+			new NullSubPartitionScanner(),
+			new NullPartitionerSwitchStrategy()
+		);
+		IDocumentPartitioner partitioner = new ExtendedFastPartitioner(
+			partitionScanner,
+			HTMLSourceConfiguration.getDefault().getContentTypes()
+		);
+		partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
 		
-		context.checking(new Expectations() {
-			{
-				try
-				{
-					allowing(document).getPartition(with(any(Integer.class)));
-					will(returnValue(partition));
-					
-					allowing(document).get(with(any(Integer.class)), with(any(Integer.class)));
-					will(new Action() {
-						@Override
-						public void describeTo(Description description)
-						{
-							description.appendText("returns a substring of <source>");
-						}
-
-						@Override
-						public Object invoke(Invocation invocation) throws Throwable
-						{
-							Integer offset = (Integer) invocation.getParameter(0);
-							Integer length = (Integer) invocation.getParameter(1);
-							
-							return source.substring(offset, offset + length);
-						}
-					});
-					
-					allowing(document).getLength();
-					will(returnValue(source.length()));
-					
-					allowing(document).getLegalLineDelimiters();
-					will(returnValue(DefaultLineTracker.DELIMITERS));
-					
-					for (int i = 0; i < source.length(); i++)
-					{
-						allowing(document).getChar(i);
-						will(returnValue(source.charAt(i)));
-					}
-				}
-				catch (BadLocationException e)
-				{
-				}
-			}
-		});
+		final IDocument document = new Document(source);
+		partitioner.connect(document);
+		document.setDocumentPartitioner(partitioner);
 		
 		return document;
-	}
-	
-	/**
-	 * createPartition
-	 * 
-	 * @param partitionType
-	 * @return
-	 */
-	protected ITypedRegion createPartition(final String partitionType, final int length)
-	{
-		final ITypedRegion partition = context.mock(ITypedRegion.class);
-		
-		context.checking(new Expectations() {
-			{
-				allowing(partition).getType();
-				will(returnValue(partitionType));
-				
-				allowing(partition).getOffset();
-				will(returnValue(0));
-				
-				allowing(partition).getLength();
-				will(returnValue(length));
-			}
-		});
-		
-		return partition;
 	}
 	
 	/**
@@ -148,11 +68,22 @@ public class ContentAssistLocationTests extends TestCase
 	 */
 	protected void openTagTests(String source)
 	{
+		// this ends with Eclipse's default partition
 		this.tagTests(
 			source,
 			new RangeWithLocation(0, 1, Location.IN_TEXT),
 			new RangeWithLocation(1, source.length(), Location.IN_OPEN_TAG),
 			new RangeWithLocation(source.length(), source.length() + 1, Location.IN_TEXT)
+		);
+		
+		// this ends with one of our language's default partitions
+		source += "\n";
+		
+		this.tagTests(
+			source,
+			new RangeWithLocation(0, 1, Location.IN_TEXT),
+			new RangeWithLocation(1, source.length() - 1, Location.IN_OPEN_TAG),
+			new RangeWithLocation(source.length() - 1, source.length(), Location.IN_TEXT)
 		);
 	}
 	
@@ -166,7 +97,7 @@ public class ContentAssistLocationTests extends TestCase
 	 */
 	protected void tagTests(String source, RangeWithLocation ... ranges)
 	{
-		IDocument document = this.createDocument(partitionType, source);
+		IDocument document = this.createDocument(source);
 		HTMLContentAssistProcessor processor = new HTMLContentAssistProcessor(null);
 		
 		for (RangeWithLocation range : ranges)
@@ -191,7 +122,6 @@ public class ContentAssistLocationTests extends TestCase
 	 */
 	public void testOpenTagNoElementName()
 	{
-		partitionType = HTMLSourceConfiguration.DEFAULT;
 		this.openTagTests("<>");
 	}
 	
@@ -253,8 +183,8 @@ public class ContentAssistLocationTests extends TestCase
 		this.tagTests(
 			source,
 			new RangeWithLocation(0, 1, Location.IN_TEXT),
-			new RangeWithLocation(1, source.length() - 1, Location.IN_CLOSE_TAG),
-			new RangeWithLocation(source.length(), source.length() + 1, Location.IN_TEXT)
+			new RangeWithLocation(1, source.length() - 1, Location.IN_CLOSE_TAG)
+			//new RangeWithLocation(source.length(), source.length() + 1, Location.IN_TEXT)
 		);
 	}
 }
