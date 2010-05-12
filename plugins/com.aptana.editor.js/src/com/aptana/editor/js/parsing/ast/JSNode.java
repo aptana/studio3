@@ -93,7 +93,7 @@ public class JSNode extends ParseBaseNode
 				text.append(children[0]).append(" = ").append(children[1]); //$NON-NLS-1$
 				break;
 			case JSNodeTypes.INVOKE:
-				text.append(children[0]).append("(").append(children[1]).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
+				text.append(children[0]).append(children[1]); //$NON-NLS-1$ //$NON-NLS-2$
 				break;
 			case JSNodeTypes.DECLARATION:
 				text.append(children[0]);
