@@ -35,8 +35,11 @@
 
 package com.aptana.core;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -51,7 +54,7 @@ import com.aptana.core.util.PlatformUtil;
  * @author Max Stepanov
  *
  */
-public class ShellLocation {
+public class ShellExecutable {
 
 	private static final String[] POSSIBLE_SHELL_LOCATIONS_WIN32 = new String[] {
 		"%PROGRAMW6432%\\Git\\bin", //$NON-NLS-1$
@@ -59,7 +62,8 @@ public class ShellLocation {
 		"%PROGRAMFILES(X86)%\\Git\\bin" //$NON-NLS-1$
 	};
 	
-	private static final String SHELL = "sh";
+	private static final String SH = "sh";
+	private static final String BASH = "bash";
 	
 	private static IPath shellPath = null;
 	
@@ -67,12 +71,13 @@ public class ShellLocation {
 	/**
 	 * 
 	 */
-	private ShellLocation() {
+	private ShellExecutable() {
 	}
 	
 	public static synchronized IPath getPath() throws CoreException {
 		if (shellPath == null) {
-			shellPath = ExecutableUtil.find(SHELL, Platform.OS_WIN32.equals(Platform.getOS()), getPossibleShellLocations());
+			boolean isWin32 = Platform.OS_WIN32.equals(Platform.getOS());
+			shellPath = ExecutableUtil.find(isWin32 ? SH : BASH, isWin32, getPossibleShellLocations());
 			if (shellPath == null) {
 				throw new CoreException(new Status(Status.ERROR, CorePlugin.PLUGIN_ID, "Shell executable could not be found."));
 			}
@@ -92,6 +97,31 @@ public class ShellLocation {
 			return list;
 		}
 		return null;
+	}
+	
+	public static Process run(List<String> command, IPath workingDirectory, Map<String,String> environment) throws IOException {
+		ProcessBuilder processBuilder = new ProcessBuilder(command);
+		if (workingDirectory != null) {
+			processBuilder.directory(workingDirectory.toFile());
+		}
+		if (environment != null && !environment.isEmpty()) {
+			processBuilder.environment().putAll(environment);
+		}
+		return processBuilder.start();
+	}
+
+	public static Process run(List<String> command, IPath workingDirectory, String[] envp) throws IOException {
+		return Runtime.getRuntime().exec(command.toArray(new String[command.size()]), envp, workingDirectory.toFile());
+	}
+
+	public static Process run(String command, IPath workingDirectory, Map<String,String> environment, String... arguments) throws IOException {
+		List<String> commands = new ArrayList<String>(Arrays.asList(arguments));
+		commands.add(0, command);
+		return run(commands, workingDirectory, environment);
+	}
+
+	public static Process run(IPath executablePath, IPath workingDirectory, Map<String,String> environment, String... arguments) throws IOException {
+		return run(executablePath.toOSString(), workingDirectory, environment, arguments);
 	}
 
 }

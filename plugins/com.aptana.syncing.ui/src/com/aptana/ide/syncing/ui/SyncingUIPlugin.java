@@ -82,14 +82,7 @@ public class SyncingUIPlugin extends AbstractUIPlugin {
                 break;
             }
 
-            IConnectionPoint source = siteConnection.getSource();
-            if (source != null) {
-                IContainer container = (IContainer) source.getAdapter(IContainer.class);
-                if (container != null) {
-                    IOUIPlugin.refreshNavigatorView(ProjectSitesManager.getInstance()
-                            .getProjectSites(container.getProject()));
-                }
-            }
+            refreshProjectSiteConnection(siteConnection);
         }
     };
 
@@ -107,12 +100,27 @@ public class SyncingUIPlugin extends AbstractUIPlugin {
                     }
                     if (siteConnection.getDestination() == connectionPoint) {
                         ((SiteConnection) siteConnection).setDestination(null);
+                        refreshProjectSiteConnection(siteConnection);
                     }
                 }
                 break;
             }
         }
     };
+
+	private static void refreshProjectSiteConnection(ISiteConnection siteConnection)
+	{
+		IConnectionPoint source = siteConnection.getSource();
+		if (source != null)
+		{
+			IContainer container = (IContainer) source.getAdapter(IContainer.class);
+			if (container != null)
+			{
+				IOUIPlugin.refreshNavigatorView(ProjectSitesManager.getInstance().getProjectSites(
+						container.getProject()));
+			}
+		}
+	}
 
     /**
      * The constructor

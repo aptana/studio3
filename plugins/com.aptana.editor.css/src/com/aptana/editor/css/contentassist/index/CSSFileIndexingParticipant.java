@@ -8,6 +8,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
 
@@ -30,11 +31,19 @@ public class CSSFileIndexingParticipant implements IFileIndexingParticipant
 
 	@Override
 	public void index(Set<IFile> files, Index index, IProgressMonitor monitor)
-	{		
+	{
+		monitor = SubMonitor.convert(monitor, files.size());
 		for (IFile file : files)
 		{
-			if (isCSSFile(file))
+			if (monitor.isCanceled())
+				return;
+			try
 			{
+				if (file == null || !isCSSFile(file))
+				{
+					continue;
+				}
+				monitor.subTask(file.getLocation().toPortableString());
 				try
 				{
 					String fileContents = IOUtil.read(file.getContents());
@@ -53,9 +62,14 @@ public class CSSFileIndexingParticipant implements IFileIndexingParticipant
 					Activator.logError(e.getMessage(), e);
 				}
 			}
+			finally
+			{
+				monitor.worked(1);
+			}
 		}
+		monitor.done();
 	}
-	
+
 	private boolean isCSSFile(IFile file)
 	{
 		InputStream stream = null;
@@ -67,7 +81,7 @@ public class CSSFileIndexingParticipant implements IFileIndexingParticipant
 			for (IContentType type : types)
 			{
 				if (type.getId().equals(ICSSConstants.CONTENT_TYPE_CSS))
-				return true;
+					return true;
 			}
 		}
 		catch (CoreException e)
@@ -90,7 +104,7 @@ public class CSSFileIndexingParticipant implements IFileIndexingParticipant
 				// ignore
 			}
 		}
-		
+
 		return CSS_EXTENSION.equalsIgnoreCase(file.getFileExtension());
 	}
 

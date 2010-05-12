@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
 
@@ -40,14 +41,20 @@ public class HTMLFileIndexingParticipant implements IFileIndexingParticipant
 	@Override
 	public void index(Set<IFile> files, Index index, IProgressMonitor monitor)
 	{
+		monitor = SubMonitor.convert(monitor, files.size());
 		for (IFile file : files)
 		{
 			if (monitor.isCanceled())
 			{
 				return;
 			}
-			if (isHTMLFile(file))
+			try
 			{
+				if (file == null || !isHTMLFile(file))
+				{
+					continue;
+				}
+				monitor.subTask(file.getLocation().toPortableString());
 				try
 				{
 					String fileContents = IOUtil.read(file.getContents());
@@ -62,7 +69,12 @@ public class HTMLFileIndexingParticipant implements IFileIndexingParticipant
 					Activator.logError(MessageFormat.format("An error occurred while indexing {0}", file.getName()), e);
 				}
 			}
+			finally
+			{
+				monitor.worked(1);
+			}
 		}
+		monitor.done();
 	}
 
 	private boolean isHTMLFile(IFile file)

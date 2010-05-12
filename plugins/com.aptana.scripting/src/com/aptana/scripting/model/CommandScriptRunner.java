@@ -13,7 +13,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
-import com.aptana.core.ShellLocation;
+import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.scripting.Activator;
@@ -93,7 +93,7 @@ public class CommandScriptRunner extends AbstractCommandRunner
 	{
 		IPath shell;
 		try {
-			shell = ShellLocation.getPath();
+			shell = ShellExecutable.getPath();
 		} catch (CoreException e) {
 			Activator.logError("Could not locate shell", e);
 			this._exitValue = 1;

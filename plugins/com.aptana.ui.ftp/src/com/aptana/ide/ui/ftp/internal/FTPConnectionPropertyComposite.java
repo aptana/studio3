@@ -89,6 +89,7 @@ import com.aptana.ide.ui.ftp.dialogs.Messages;
 import com.aptana.ide.ui.io.FileSystemUtils;
 import com.aptana.ide.ui.io.dialogs.FileTreeSelectionDialog;
 import com.aptana.ide.ui.io.dialogs.IDialogConstants;
+import com.aptana.ui.UIUtils;
 
 /**
  * 
@@ -734,7 +735,7 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 			{
 				monitor.beginTask(Messages.FTPConnectionPointPropertyDialog_Task_Browse, IProgressMonitor.UNKNOWN);
 				monitor.subTask(""); //$NON-NLS-1$
-				getShell().getDisplay().syncExec(new Runnable()
+				UIUtils.getDisplay().syncExec(new Runnable()
 				{
 					public void run()
 					{

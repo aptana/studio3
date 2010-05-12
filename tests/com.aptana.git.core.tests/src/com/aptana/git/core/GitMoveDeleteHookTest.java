@@ -10,6 +10,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.team.IResourceTree;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -53,12 +54,10 @@ public class GitMoveDeleteHookTest extends TestCase
 				return repo;
 			}
 
-			/*
-			protected boolean hasNoCommittedFiles(String source, GitRepository repo)
+			protected boolean hasNoCommittedFiles(IPath source, GitRepository repo)
 			{
 				return false;
 			}
-			*/
 		};
 	}
 
@@ -197,12 +196,10 @@ public class GitMoveDeleteHookTest extends TestCase
 				addFilesToHistoryCalled[0] = true;
 			}
 
-			/*
-			protected boolean hasNoCommittedFiles(String source, GitRepository repo)
+			protected boolean hasNoCommittedFiles(IPath source, GitRepository repo)
 			{
 				return false;
 			}
-			*/
 
 		};
 		context.checking(new Expectations()
@@ -220,10 +217,10 @@ public class GitMoveDeleteHookTest extends TestCase
 
 				// repo relative path
 				oneOf(repo).workingDirectory();
-				will(returnValue(File.separator + "some" + File.separator + "root"));
-				oneOf(folder).getLocationURI();
-				will(returnValue(new File(File.separator + "some" + File.separator + "root" + File.separator + "folder")
-						.toURI()));
+
+				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
+				oneOf(folder).getLocation();
+				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator + "folder")));
 
 				// check for committed files
 
@@ -273,12 +270,10 @@ public class GitMoveDeleteHookTest extends TestCase
 				return repo;
 			}
 
-			/*
-			protected boolean hasNoCommittedFiles(String source, GitRepository repo)
+			protected boolean hasNoCommittedFiles(IPath source, GitRepository repo)
 			{
 				return true;
 			}
-			*/
 		};
 		context.checking(new Expectations()
 		{
@@ -296,10 +291,10 @@ public class GitMoveDeleteHookTest extends TestCase
 
 				// repo relative path
 				oneOf(repo).workingDirectory();
-				will(returnValue(File.separator + "some" + File.separator + "root"));
-				oneOf(folder).getLocationURI();
-				will(returnValue(new File(File.separator + "some" + File.separator + "root" + File.separator + "folder")
-						.toURI()));
+
+				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
+				oneOf(folder).getLocation();
+				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator + "folder")));
 
 				// We don't try these because we punted
 				never(repo).deleteFolder(Path.fromOSString("folder"));
@@ -360,18 +355,20 @@ public class GitMoveDeleteHookTest extends TestCase
 		{
 			{
 				oneOf(repo).workingDirectory();
-				will(returnValue(File.separator + "some" + File.separator + "root"));
+
+				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
 
 				oneOf(project).getLocation();
-				will(returnValue(new Path(File.separator + "some" + File.separator + "root" + File.separator
+				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator
 						+ "project")));
 
 				// Repo relative path
 				oneOf(repo).workingDirectory();
-				will(returnValue(File.separator + "some" + File.separator + "root"));
-				oneOf(project).getLocationURI();
-				will(returnValue(new File(File.separator + "some" + File.separator + "root" + File.separator
-						+ "project").toURI()));
+
+				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
+				oneOf(project).getLocation();
+				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator
+						+ "project")));
 
 				// We're not forcing, so we need to check if file is synched
 				oneOf(tree).isSynchronized(project, IResource.DEPTH_INFINITE);
@@ -396,19 +393,12 @@ public class GitMoveDeleteHookTest extends TestCase
 		context.checking(new Expectations()
 		{
 			{
-				oneOf(repo).workingDirectory();
-				will(returnValue(File.separator + "some" + File.separator + "root"));
+				exactly(2).of(repo).workingDirectory();
+				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
 
-				oneOf(project).getLocation();
-				will(returnValue(new Path(File.separator + "some" + File.separator + "root" + File.separator
+				exactly(2).of(project).getLocation();
+				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator
 						+ "project")));
-
-				// Repo relative path
-				oneOf(repo).workingDirectory();
-				will(returnValue(File.separator + "some" + File.separator + "root"));
-				oneOf(project).getLocationURI();
-				will(returnValue(new File(File.separator + "some" + File.separator + "root" + File.separator
-						+ "project").toURI()));
 
 				// We're not forcing, so we need to check if file is synched
 				oneOf(tree).isSynchronized(project, IResource.DEPTH_INFINITE);
@@ -432,29 +422,21 @@ public class GitMoveDeleteHookTest extends TestCase
 				return repo;
 			}
 
-			/*
-			protected boolean hasNoCommittedFiles(String source, GitRepository repo)
+			protected boolean hasNoCommittedFiles(IPath source, GitRepository repo)
 			{
 				return true;
 			}
-			*/
 		};
 		context.checking(new Expectations()
 		{
 			{
-				oneOf(repo).workingDirectory();
-				will(returnValue(File.separator + "some" + File.separator + "root"));
+				exactly(2).of(repo).workingDirectory();
+				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
 
-				oneOf(project).getLocation();
-				will(returnValue(new Path(File.separator + "some" + File.separator + "root" + File.separator
+				exactly(2).of(project).getLocation();
+				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator
 						+ "project")));
 
-				// Repo relative path
-				oneOf(repo).workingDirectory();
-				will(returnValue(File.separator + "some" + File.separator + "root"));
-				oneOf(project).getLocationURI();
-				will(returnValue(new File(File.separator + "some" + File.separator + "root" + File.separator
-						+ "project").toURI()));
 				never(repo).deleteFolder(Path.fromOSString("project"));
 			}
 		});
@@ -483,23 +465,24 @@ public class GitMoveDeleteHookTest extends TestCase
 		{
 			{
 				oneOf(repo).workingDirectory();
-				will(returnValue(File.separator + "some" + File.separator + "root"));
+
+				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
 
 				oneOf(project).getLocation();
-				will(returnValue(new Path(File.separator + "some" + File.separator + "root")));
+				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
 
 				oneOf(project).getLocationURI();
-				
+
 				oneOf(project).getFolder(GitRepository.GIT_DIR);
 				will(returnValue(folder));
-				
+
 				oneOf(folder).exists();
 				will(returnValue(true));
 
 				oneOf(tree).standardDeleteFolder(with(equal(folder)),
 						with(equal(IResource.ALWAYS_DELETE_PROJECT_CONTENT | IResource.FORCE)),
 						with(any(NullProgressMonitor.class)));
-				
+
 				oneOf(tree).deletedFolder(folder);
 			}
 		});

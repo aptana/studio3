@@ -171,6 +171,7 @@ public class FTPConnectionPointPropertyDialog extends TitleAreaDialog implements
 			return;
 		}
 		if (ftpComposite.completeConnection()) {
+			ftpConnectionPoint = ftpComposite.getConnectionPoint();
 			super.okPressed();
 		}
 	}
