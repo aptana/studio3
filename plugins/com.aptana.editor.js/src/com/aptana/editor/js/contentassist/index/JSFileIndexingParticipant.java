@@ -11,6 +11,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
 
@@ -36,14 +37,20 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 	@Override
 	public void index(Set<IFile> files, Index index, IProgressMonitor monitor)
 	{
+		monitor = SubMonitor.convert(monitor, files.size());
 		for (IFile file : files)
 		{
-			if (isJSFile(file))
+			if (monitor.isCanceled())
+				return;
+			try
 			{
+				if (file == null || !isJSFile(file))
+				{
+					continue;
+				}
+				monitor.subTask(file.getLocation().toPortableString());
 				try
 				{
-					IParseNode ast;
-
 					// create parser and associated parse state
 					JSParser parser = new JSParser();
 					ParseState parseState = new ParseState();
@@ -58,7 +65,7 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 						parseState.setEditState(source, source, 0, 0);
 
 						// parse and grab the result
-						ast = parser.parse(parseState);
+						IParseNode ast = parser.parse(parseState);
 
 						// now walk the parse tree
 						this.walkAST(index, file, ast);
@@ -73,7 +80,12 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 					Activator.logError(e.getMessage(), e);
 				}
 			}
+			finally
+			{
+				monitor.worked(1);
+			}
 		}
+		monitor.done();
 	}
 
 	private boolean isJSFile(IFile file)
