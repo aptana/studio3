@@ -35,6 +35,7 @@
 package com.aptana.ide.ui.io.navigator.actions;
 
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.actions.ActionContext;
 import org.eclipse.ui.navigator.CommonActionProvider;
@@ -51,7 +52,7 @@ public class FileSystemEditActionProvider extends CommonActionProvider {
         super.init(aSite);
 
         fEditActionGroup = new FileSystemEditActionGroup(aSite.getViewSite()
-                .getShell());
+                .getShell(), (Tree) aSite.getStructuredViewer().getControl());
     }
 
     public void dispose() {
