@@ -106,6 +106,9 @@ public class ShellExecutable {
 	}
 	
 	private synchronized static List<String> toShellCommand(List<String> command) throws CoreException {
+		if (true) {
+			return command;
+		}
 		if (initilizing) {
 			return command;
 		}
