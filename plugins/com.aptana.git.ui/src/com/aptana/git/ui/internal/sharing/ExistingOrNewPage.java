@@ -101,7 +101,7 @@ class ExistingOrNewPage extends WizardPage
 		{
 			public void widgetSelected(SelectionEvent e)
 			{
-				File gitDir = new File(repositoryToCreate.getText(), GitRepository.GIT_DIR);
+				IPath gitDir = Path.fromOSString(repositoryToCreate.getText()).append(GitRepository.GIT_DIR);
 				try
 				{
 					if (GitExecutable.instance() == null)
@@ -109,7 +109,7 @@ class ExistingOrNewPage extends WizardPage
 						throw new CoreException(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
 								Messages.ExistingOrNewPage_UnabletoFindGitExecutableError));
 					}
-					getGitRepositoryManager().create(gitDir.getParentFile().getAbsolutePath());
+					getGitRepositoryManager().create(gitDir.removeLastSegments(1));
 					for (IProject project : getProjects())
 					{
 						// If we don't refresh the project directories right

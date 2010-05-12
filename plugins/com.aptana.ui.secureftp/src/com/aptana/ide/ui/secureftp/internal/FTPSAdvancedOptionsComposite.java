@@ -59,7 +59,6 @@ import com.aptana.core.util.TimeZoneUtil;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.filesystem.secureftp.IFTPSConnectionPoint;
 import com.aptana.ide.filesystem.secureftp.IFTPSConstants;
-import com.aptana.ide.ui.ftp.internal.IConnectionDialog;
 import com.aptana.ide.ui.ftp.internal.IOptionsComposite;
 import com.aptana.ide.ui.ftp.internal.NumberVerifyListener;
 import com.aptana.ide.ui.io.dialogs.IDialogConstants;
@@ -73,7 +72,7 @@ public class FTPSAdvancedOptionsComposite extends Composite implements IOptionsC
 	
 	private static final String EMPTY = ""; //$NON-NLS-1$
 	
-	private IConnectionDialog connectionDialog;
+	private Listener listener;
 	private Combo securityMethodCombo;
 	private Button validateCertificateCheckbox;
 	private Combo modeCombo;
@@ -88,9 +87,9 @@ public class FTPSAdvancedOptionsComposite extends Composite implements IOptionsC
 	 * @param parent
 	 * @param style
 	 */
-	public FTPSAdvancedOptionsComposite(Composite parent, int style, IConnectionDialog connectionDialog) {
+	public FTPSAdvancedOptionsComposite(Composite parent, int style, Listener listener) {
 		super(parent, style);
-		this.connectionDialog = connectionDialog;
+		this.listener = listener;
 		
 		setLayout(GridLayoutFactory.swtDefaults().numColumns(5)
 				.spacing(new PixelConverter(this).convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_SPACING),
@@ -316,12 +315,12 @@ public class FTPSAdvancedOptionsComposite extends Composite implements IOptionsC
 	}
 	
 	private void detectTimezone() {
-		if (!connectionDialog.isValid()) {
+		if (!listener.isValid()) {
 			return;
 		}
 		ConnectionContext context = new ConnectionContext();
 		context.setBoolean(ConnectionContext.DETECT_TIMEZONE, true);
-		if (connectionDialog.testConnection(context, null)) {
+		if (listener.testConnection(context, null)) {
 			String[] tzones = (String[]) context.get(ConnectionContext.SERVER_TIMEZONE);
 			if (tzones != null && tzones.length > 0) {
 				String tz = timezoneCombo.getItem(timezoneCombo.getSelectionIndex());
@@ -340,7 +339,7 @@ public class FTPSAdvancedOptionsComposite extends Composite implements IOptionsC
 		if (modifyListener == null) {
 			modifyListener = new ModifyListener() {
 				public void modifyText(ModifyEvent e) {
-					connectionDialog.validate();
+					listener.validate();
 				}
 			};
 		}

@@ -1,16 +1,11 @@
 package com.aptana.explorer.internal.ui;
 
-import java.lang.reflect.Field;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
 
 import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -40,9 +35,6 @@ import org.eclipse.search.ui.text.FileTextSearchScope;
 import org.eclipse.search.ui.text.TextSearchQueryProvider;
 import org.eclipse.search.ui.text.TextSearchQueryProvider.TextSearchInput;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.OpenWindowListener;
-import org.eclipse.swt.browser.WindowEvent;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -53,39 +45,24 @@ import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.team.core.RepositoryProvider;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.ISizeProvider;
 import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.DeleteResourceAction;
-import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
-import org.eclipse.ui.internal.browser.BrowserViewer;
-import org.eclipse.ui.internal.browser.WebBrowserEditor;
-import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 import org.eclipse.ui.internal.navigator.wizards.WizardShortcutAction;
 import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.navigator.CommonNavigator;
@@ -97,7 +74,6 @@ import org.eclipse.ui.wizards.IWizardRegistry;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.IScopeReference;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.TreeThemer;
@@ -105,11 +81,7 @@ import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IExplorerUIConstants;
 import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.filewatcher.FileWatcher;
-import com.aptana.git.core.GitPlugin;
-import com.aptana.git.core.model.GitRepository;
-import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.terminal.views.TerminalView;
-import com.aptana.usage.PingStartup;
 
 /**
  * Customized CommonNavigator that adds a project combo and focuses the view on a single project.
@@ -117,7 +89,7 @@ import com.aptana.usage.PingStartup;
  * @author cwilliams
  */
 @SuppressWarnings("restriction")
-public abstract class SingleProjectView extends CommonNavigator implements ISizeProvider
+public abstract class SingleProjectView extends CommonNavigator
 {
 
 	private static final String GEAR_MENU_ID = "com.aptana.explorer.gear"; //$NON-NLS-1$
@@ -183,23 +155,6 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 	// memento wasn't declared protected until Eclipse 3.5, so store it ourselves
 	protected IMemento memento;
 
-	/**
-	 * Message area
-	 */
-	private Browser browser;
-	private IPreferenceChangeListener fThemeChangeListener;
-
-	private Composite normal;
-
-	private Composite browserComposite;
-
-	private Job updateMessageAreaJob;
-	private static final String BASE_MESSAGE_URL = "http://toolbox.aptana.com/"; //$NON-NLS-1$
-	// private static final String BASE_MESSAGE_URL = "http://localhost:3000/"; //$NON-NLS-1$
-	private static final int MINIMUM_BROWSER_HEIGHT = 150;
-	private static final int MINIMUM_BROWSER_WIDTH = 310;
-	private static final String BROWSER_ID = "message.area.browser"; //$NON-NLS-1$
-
 	private static final String CASE_SENSITIVE_ICON_PATH = "icons/full/elcl16/casesensitive.png"; //$NON-NLS-1$
 	private static final String REGULAR_EXPRESSION_ICON_PATH = "icons/full/elcl16/regularexpression.png"; //$NON-NLS-1$
 
@@ -256,52 +211,9 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 			}
 		});
 
-		// Holds normal contents, then splitter, then message area
-		final Composite master = new Composite(parent, SWT.NONE);
-		master.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-		// Normal contents, wraps the search, filter and navigator areas
-		normal = new Composite(master, SWT.NONE);
-		normal.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		normal.setLayout(gridLayout);
-
-		createSearchComposite(normal);
-		filterComp = createFilterComposite(normal);
-		createNavigator(normal);
-
-		browserComposite = createBrowserComposite(master);
-
-		master.setLayout(new FormLayout());
-
-		FormData normalData = new FormData();
-		normalData.left = new FormAttachment(0, 0);
-		normalData.right = new FormAttachment(100, 0);
-		normalData.top = new FormAttachment(0, 0);
-		normalData.bottom = new FormAttachment(browserComposite, 0);
-		normal.setLayoutData(normalData);
-
-		// Browser message area
-		final FormData browserData = new FormData();
-		browserData.left = new FormAttachment(0, 0);
-		browserData.right = new FormAttachment(100, 0);
-		browserData.top = new FormAttachment(100, -MINIMUM_BROWSER_HEIGHT);
-		browserData.bottom = new FormAttachment(100, 0);
-		browserComposite.setLayoutData(browserData);
-
-		updateMessageArea();
-
-		// Force relayout on resize of view so that splitter gets resized.
-		parent.addListener(SWT.Resize, new Listener()
-		{
-
-			@Override
-			public void handleEvent(Event event)
-			{
-				browserData.top = new FormAttachment(100, -MINIMUM_BROWSER_HEIGHT);
-				browserData.bottom = new FormAttachment(100, 0);
-				parent.layout();
-			}
-		});
+		createSearchComposite(parent);
+		filterComp = createFilterComposite(parent);
+		createNavigator(parent);
 
 		// Remove the navigation actions
 		getViewSite().getActionBars().getToolBarManager().remove("org.eclipse.ui.framelist.back"); //$NON-NLS-1$
@@ -750,223 +662,6 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 		return filter;
 	}
 
-	private Composite createBrowserComposite(final Composite myComposite)
-	{
-		Composite browserParent = new Composite(myComposite, SWT.NONE);
-		FillLayout layout = new FillLayout();
-		layout.marginWidth = 1;
-		browserParent.setLayout(layout);
-
-		GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, false);
-		layoutData.minimumHeight = MINIMUM_BROWSER_HEIGHT;
-		layoutData.minimumWidth = MINIMUM_BROWSER_WIDTH;
-		browserParent.setLayoutData(layoutData);
-
-		browser = new Browser(browserParent, SWT.NONE);
-		browser.setText("<html><head></head><body style=\"background-color: #"
-				+ toHex(getThemeManager().getCurrentTheme().getBackground()) + "; color: #"
-				+ toHex(getThemeManager().getCurrentTheme().getForeground()) + ";\"><h3>Loading...</h3></body></html>");
-		// Open links with target of _new in an internal browser editor
-		browser.addOpenWindowListener(new OpenWindowListener()
-		{
-
-			@Override
-			public void open(WindowEvent event)
-			{
-				try
-				{
-					int style = IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.LOCATION_BAR
-							| IWorkbenchBrowserSupport.STATUS;
-					WebBrowserEditorInput input = new WebBrowserEditorInput(null, style, BROWSER_ID);
-					IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-					IEditorPart editorPart = page.openEditor(input, WebBrowserEditor.WEB_BROWSER_EDITOR_ID);
-					WebBrowserEditor webBrowserEditor = (WebBrowserEditor) editorPart;
-					Field f = WebBrowserEditor.class.getDeclaredField("webBrowser"); //$NON-NLS-1$
-					f.setAccessible(true);
-					BrowserViewer viewer = (BrowserViewer) f.get(webBrowserEditor);
-					event.browser = viewer.getBrowser();
-				}
-				catch (Exception e)
-				{
-					ExplorerPlugin.logError(e.getMessage(), e);
-				}
-			}
-		});
-		return browserParent;
-	}
-
-	@SuppressWarnings("nls")
-	private String getURLForProject()
-	{
-		StringBuilder builder = new StringBuilder(BASE_MESSAGE_URL);
-		builder.append("?v=");
-		builder.append(getVersion());
-
-		builder.append("&bg=");
-		builder.append(toHex(getThemeManager().getCurrentTheme().getBackground()));
-		builder.append("&fg=");
-		builder.append(toHex(getThemeManager().getCurrentTheme().getForeground()));
-
-		// "chrome"
-		builder.append("&ch=");// FIXME Grab one of the actual parent widgets and grab it's bg?
-		Color color = PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
-		builder.append(toHex(color.getRGB()));
-
-		// project type
-		builder.append("&p=");
-		builder.append(getProjectType());
-
-		// version control
-		builder.append("&vc=");
-		builder.append(getVersionControl());
-
-		// github
-		builder.append("&gh=");
-		builder.append(hasGithubRemote() ? '1' : '0');
-
-		// timestamp to force updates to server (bypass browser cache)
-		builder.append("&ts=");
-		builder.append(System.currentTimeMillis());
-
-		// guid that relates to a single install of the IDE
-		builder.append("&id=");
-		builder.append(getGUID());
-
-		// deploy info
-		builder.append(getDeployParam());
-
-		// for debugging output
-		// builder.append("&debug=1");
-
-		return builder.toString();
-	}
-
-	/**
-	 * additional parameter &dep=VALUE where VALUE is one of (in decreasing order of precedence):
-	 * <ul>
-	 * <li>ch (deploy/default.rb at project root)</li>
-	 * <li>cs (chef solo - deploy/solo.rb at project root)</li>
-	 * <li>cap (Capfile or capfile at root)</li>
-	 * </ul>
-	 * 
-	 * @return
-	 */
-	@SuppressWarnings("nls")
-	private String getDeployParam()
-	{
-		if (selectedProject != null && selectedProject.exists())
-		{
-			IFile file = selectedProject.getFile("deploy/default.rb");
-			if (file.exists())
-				return "&dep=ch";
-			file = selectedProject.getFile("deploy/solo.rb");
-			if (file.exists())
-				return "&dep=cs";
-			file = selectedProject.getFile("Capfile");
-			if (file.exists())
-				return "&dep=cap";
-			file = selectedProject.getFile("capfile");
-			if (file.exists())
-				return "&dep=cap";
-		}
-		return "";
-	}
-
-	private String getGUID()
-	{
-		return PingStartup.getApplicationId();
-	}
-
-	private boolean hasGithubRemote()
-	{
-		if (selectedProject == null)
-			return false;
-		final GitRepository repo = getGitRepositoryManager().getAttached(selectedProject);
-		if (repo == null)
-			return false;
-		Set<String> remoteURLs = repo.remoteURLs();
-		if (remoteURLs != null)
-		{
-			for (String remoteURL : remoteURLs)
-			{
-				if (remoteURL.contains("github.com")) //$NON-NLS-1$
-					return true;
-			}
-		}
-		return false;
-	}
-
-	private char getVersionControl()
-	{
-		// G for git, S for SVN, H for Mercurial, N for none, O for other
-		if (selectedProject == null)
-			return 'N';
-		if (getGitRepositoryManager().getAttached(selectedProject) != null)
-			return 'G';
-		RepositoryProvider provider = RepositoryProvider.getProvider(selectedProject);
-		if (provider == null)
-			return 'N';
-		String id = provider.getID();
-		if (id == null)
-			return 'O';
-		if (id.equals("org.tigris.subversion.subclipse.core.svnnature")) // subclipse //$NON-NLS-1$
-			return 'S';
-		if (id.equals("org.eclipse.team.svn.core.svnnature")) // subversive //$NON-NLS-1$
-			return 'S';
-		if (id.equals("org.eclipse.egit.core")) // egit //$NON-NLS-1$
-			return 'G';
-		if (id.equals("com.vectrace.MercurialEclipse.team.MercurialTeamProvider")) // hgEclipse //$NON-NLS-1$
-			return 'M';
-		if (id.equals("org.eclipse.team.cvs.core.cvsnature")) // CVS //$NON-NLS-1$
-			return 'C';
-		return 'O';
-	}
-
-	protected IGitRepositoryManager getGitRepositoryManager()
-	{
-		return GitPlugin.getDefault().getGitRepositoryManager();
-	}
-
-	private char getProjectType()
-	{
-		if (selectedProject != null)
-		{
-			// R for Rails, P for pydev, W for web, O for other. How do we determine? Check natures?
-			try
-			{
-				// FIXME This id is a constant in the rails plugins...
-				if (selectedProject.hasNature(RAILS_NATURE))
-					return 'R';
-			}
-			catch (CoreException e)
-			{
-				ExplorerPlugin.logError(e);
-			}
-		}
-		// TODO How do we determine if project is "web"? check for HTML/JS/CSS files?
-		return 'O';
-	}
-
-	private String getVersion()
-	{
-		// FIXME Do we want this plugin's version, or some other version?
-		return EclipseUtil.getPluginVersion(ExplorerPlugin.getDefault());
-	}
-
-	private String toHex(RGB rgb)
-	{
-		// FIXME This and pad are copy-pasted from Theme class
-		return MessageFormat.format("{0}{1}{2}", pad(Integer.toHexString(rgb.red), 2, '0'), pad(Integer //$NON-NLS-1$
-				.toHexString(rgb.green), 2, '0'), pad(Integer.toHexString(rgb.blue), 2, '0'));
-	}
-
-	private String pad(String string, int desiredLength, char padChar)
-	{
-		while (string.length() < desiredLength)
-			string = padChar + string;
-		return string;
-	}
-
 	protected void hideFilterLable()
 	{
 		filterLayoutData.exclude = true;
@@ -1034,18 +729,6 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 	{
 		treeThemer = new TreeThemer(getCommonViewer());
 		treeThemer.apply();
-		// list for theme changes, update message area
-		fThemeChangeListener = new IPreferenceChangeListener()
-		{
-
-			public void preferenceChange(PreferenceChangeEvent event)
-			{
-				if (!event.getKey().equals(IThemeManager.THEME_CHANGED))
-					return;
-				updateMessageArea();
-			}
-		};
-		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
 	}
 
 	protected IThemeManager getThemeManager()
@@ -1156,87 +839,6 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 		getCommonViewer().setInput(newProject);
 		// Update the tree since project changed
 		// updateViewer(oldProject, newProject); // no structural change, just project changed
-		updateMessageArea();
-	}
-
-	private void updateMessageArea()
-	{
-		if (updateMessageAreaJob == null)
-		{
-			updateMessageAreaJob = new Job("Updating App Explorer message area")
-			{
-				boolean shouldCancel = false;
-
-				@Override
-				protected IStatus run(IProgressMonitor monitor)
-				{
-					if (monitor != null && monitor.isCanceled() && shouldCancel)
-						return Status.CANCEL_STATUS;
-					boolean connected = false;
-					HttpURLConnection connection = null;
-					try
-					{
-						connection = (HttpURLConnection) new URL(BASE_MESSAGE_URL).openConnection();
-						connection.setRequestMethod("HEAD"); // Don't ask for content //$NON-NLS-1$
-						connection.setAllowUserInteraction(false);
-						connection.connect();
-						connected = true;
-
-					}
-					catch (Exception e)
-					{
-						connected = false;
-					}
-					finally
-					{
-						if (connection != null)
-							connection.disconnect();
-					}
-					final boolean wasConnected = connected;
-					if (monitor != null && monitor.isCanceled() && shouldCancel)
-						return Status.CANCEL_STATUS;
-
-					PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
-					{
-
-						@Override
-						public void run()
-						{
-							if (wasConnected)
-							{
-								browser.setUrl(getURLForProject());
-								// Show the message area
-								FormData fd = (FormData) normal.getLayoutData();
-								fd.bottom.control = browserComposite;
-								fd.bottom.numerator = 0;
-
-								FormData fd2 = (FormData) browserComposite.getLayoutData();
-								fd2.top.offset = -MINIMUM_BROWSER_HEIGHT;
-							}
-							else
-							{
-								// Hide the message area!
-								FormData fd = (FormData) normal.getLayoutData();
-								fd.bottom.control = null;
-								fd.bottom.numerator = 100;
-
-								FormData fd2 = (FormData) browserComposite.getLayoutData();
-								fd2.top.offset = 0;
-							}
-						}
-					});
-					shouldCancel = true;
-					return Status.OK_STATUS;
-				}
-			};
-			updateMessageAreaJob.setSystem(true);
-			updateMessageAreaJob.setPriority(Job.SHORT);
-		}
-		else
-		{
-			updateMessageAreaJob.cancel();
-		}
-		updateMessageAreaJob.schedule(25);
 	}
 
 	private void removeFileWatcher()
@@ -1285,18 +887,7 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 		treeThemer = null;
 		removeProjectResourceListener();
 		removeActiveProjectPrefListener();
-		removeThemeListener();
 		super.dispose();
-	}
-
-	private void removeThemeListener()
-	{
-		if (fThemeChangeListener != null)
-		{
-			new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
-					fThemeChangeListener);
-		}
-		fThemeChangeListener = null;
 	}
 
 	private void removeProjectResourceListener()
@@ -1603,22 +1194,5 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 		{
 			return fScope;
 		}
-	}
-
-	public int computePreferredSize(boolean width, int availableParallel, int availablePerpendicular,
-			int preferredResult)
-	{
-		if (width)
-		{
-			return Math.max(MINIMUM_BROWSER_WIDTH, preferredResult);
-		}
-		return preferredResult;
-	}
-
-	public int getSizeFlags(boolean width)
-	{
-		if (width)
-			return SWT.MIN;
-		return SWT.NONE;
 	}
 }

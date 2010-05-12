@@ -208,7 +208,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			errorMonitor.addListener(errorListener);
 			errorListener.streamAppended(errorMonitor.getContents(), errorMonitor);
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 			Activator.logError("Starting terminal process failed.", e); //$NON-NLS-1$
 		}
 	}

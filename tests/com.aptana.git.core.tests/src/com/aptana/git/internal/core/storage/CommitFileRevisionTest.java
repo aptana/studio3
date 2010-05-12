@@ -12,7 +12,6 @@ import junit.framework.TestCase;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.git.core.GitPlugin;
@@ -35,8 +34,7 @@ public class CommitFileRevisionTest extends TestCase
 	{
 		try
 		{
-			IPath path = new Path(fRepo.workingDirectory());
-			File generatedRepo = path.toFile();
+			File generatedRepo = fRepo.workingDirectory().toFile();
 			if (generatedRepo.exists())
 			{
 				delete(generatedRepo);
@@ -85,7 +83,7 @@ public class CommitFileRevisionTest extends TestCase
 	 */
 	protected GitRepository createRepo(IPath path)
 	{
-		getGitRepositoryManager().create(path.toOSString());
+		getGitRepositoryManager().create(path);
 		GitRepository repo = getGitRepositoryManager().getUnattachedExisting(path.toFile().toURI());
 		assertNotNull(repo);
 		fRepo = repo;
@@ -113,8 +111,7 @@ public class CommitFileRevisionTest extends TestCase
 
 		GitIndex index = repo.index();
 		// Actually add a file to the location
-		String txtFile = new File(repo.workingDirectory(), filename).getAbsolutePath();
-		FileWriter writer = new FileWriter(txtFile);
+		FileWriter writer = new FileWriter(repo.workingDirectory().append(filename).toFile());
 		writer.write(contents);
 		writer.close();
 		// refresh the index
@@ -148,7 +145,7 @@ public class CommitFileRevisionTest extends TestCase
 
 		GitIndex index = repo.index();
 		// Actually add a file to the location
-		String txtFile = new File(repo.workingDirectory(), filename).getAbsolutePath();
+		File txtFile = repo.workingDirectory().append(filename).toFile();
 		for (Entry<String, String> entry : commitsToMake.entrySet())
 		{
 			FileWriter writer = new FileWriter(txtFile);

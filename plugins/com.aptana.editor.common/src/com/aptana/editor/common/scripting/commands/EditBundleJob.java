@@ -1,6 +1,5 @@
 package com.aptana.editor.common.scripting.commands;
 
-import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Map;
@@ -10,6 +9,7 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
@@ -56,10 +56,10 @@ class EditBundleJob extends Job
 		{
 			SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
 
-			File userBundlesDir = makeUserBundlesDirectory();
+			IPath userBundlesDir = makeUserBundlesDirectory();
 			subMonitor.worked(5);
 
-			File destRuble = grabBundle(userBundlesDir);
+			IPath destRuble = grabBundle(userBundlesDir);
 			subMonitor.worked(75);
 
 			createProjectIfNecessary(destRuble, subMonitor.newChild(20));
@@ -90,13 +90,13 @@ class EditBundleJob extends Job
 	 * @return
 	 * @throws CoreException
 	 */
-	protected File grabBundle(File destinationDir) throws CoreException
+	protected IPath grabBundle(IPath destinationDir) throws CoreException
 	{
-		File destRuble = new File(destinationDir, bundle.getBundleDirectory().getName());
-		if (destRuble.isDirectory())
+		IPath destRuble = destinationDir.append(bundle.getBundleDirectory().getName());
+		if (destRuble.toFile().isDirectory())
 		{
 			CommonEditorPlugin
-					.logInfo("Trying to grab bundle, destination directory already exists: " + destRuble.getAbsolutePath()); //$NON-NLS-1$
+					.logInfo("Trying to grab bundle, destination directory already exists: " + destRuble.toOSString()); //$NON-NLS-1$
 			return destRuble; // Already exists, just return it.
 		}
 
@@ -118,19 +118,19 @@ class EditBundleJob extends Job
 	 * @throws CoreException
 	 *             if we were unable to make the directory structure for some reason.
 	 */
-	protected File makeUserBundlesDirectory() throws CoreException
+	protected IPath makeUserBundlesDirectory() throws CoreException
 	{
-		File userBundlesDir = new File(BundleManager.getInstance().getUserBundlesPath());
-		if (userBundlesDir.isDirectory())
+		IPath userBundlesDir = Path.fromOSString(BundleManager.getInstance().getUserBundlesPath());
+		if (userBundlesDir.toFile().isDirectory())
 			return userBundlesDir;
-		if (userBundlesDir.mkdirs())
+		if (userBundlesDir.toFile().mkdirs())
 			return userBundlesDir;
 
 		throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID,
 				Messages.EditBundleJob_CantCreateUserBundlesDir_Error));
 	}
 
-	protected void createProjectIfNecessary(File projectLocation, IProgressMonitor monitor) throws CoreException
+	protected void createProjectIfNecessary(IPath projectLocation, IProgressMonitor monitor) throws CoreException
 	{
 		SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
@@ -142,7 +142,7 @@ class EditBundleJob extends Job
 		if (!theProject.exists()) // it shouldn't...
 		{
 			IProjectDescription description = workspace.newProjectDescription(theProject.getName());
-			description.setLocation(new Path(projectLocation.getAbsolutePath()));
+			description.setLocation(projectLocation);
 			theProject.create(description, subMonitor.newChild(50));
 			theProject.open(subMonitor.newChild(50));
 		}
@@ -172,7 +172,7 @@ class EditBundleJob extends Job
 	 * @param destRuble
 	 * @throws CoreException
 	 */
-	private void copyIfPossible(File destRuble) throws CoreException
+	private void copyIfPossible(IPath destRuble) throws CoreException
 	{
 		if (bundle.getBundlePrecedence() != BundlePrecedence.APPLICATION)
 		{
@@ -183,7 +183,7 @@ class EditBundleJob extends Job
 		}
 		try
 		{
-			IOUtil.copyDirectory(bundle.getBundleDirectory(), destRuble);
+			IOUtil.copyDirectory(bundle.getBundleDirectory(), destRuble.toFile());
 		}
 		catch (IOException e)
 		{
@@ -191,28 +191,28 @@ class EditBundleJob extends Job
 		}
 	}
 
-	private void grabCopyFromRepository(File workingDirectory, File destRuble) throws CoreException
+	private void grabCopyFromRepository(IPath workingDirectory, IPath destRuble) throws CoreException
 	{
 		String repoURI = bundle.getRepository();
 		Map<Integer, String> result = null;
 		if (looksLikeGitURI(repoURI))
 		{
 			// definitely looks like a git repo
-			result = GitExecutable.instance().runInBackground(workingDirectory.getAbsolutePath(), "clone", repoURI, //$NON-NLS-1$
-					destRuble.getAbsolutePath());
+			result = GitExecutable.instance().runInBackground(workingDirectory, "clone", repoURI, //$NON-NLS-1$
+					destRuble.toOSString());
 		}
 		else if (looksLikeSVNURI(repoURI))
 		{
 			// wasn't git, but appears it's probably SVN
 			result = ProcessUtil.runInBackground(
-					"svn", workingDirectory.getAbsolutePath(), new String[] { "checkout", repoURI, //$NON-NLS-1$ //$NON-NLS-2$
-							destRuble.getAbsolutePath() });
+					"svn", workingDirectory, new String[] { "checkout", repoURI, //$NON-NLS-1$ //$NON-NLS-2$
+							destRuble.toOSString() });
 		}
 		else
 		{
 			// we couldn't determine git or SVN, so let's just assume git.
-			result = GitExecutable.instance().runInBackground(workingDirectory.getAbsolutePath(), "clone", repoURI, //$NON-NLS-1$
-					destRuble.getAbsolutePath());
+			result = GitExecutable.instance().runInBackground(workingDirectory, "clone", repoURI, //$NON-NLS-1$
+					destRuble.toOSString());
 		}
 		// Non-zero exit code, so we probably had an error...
 		if (result.keySet().iterator().next() != 0)
@@ -229,11 +229,11 @@ class EditBundleJob extends Job
 	 * @param dest
 	 * @return
 	 */
-	protected IProject findMatchingProject(IWorkspace workspace, File dest)
+	protected IProject findMatchingProject(IWorkspace workspace, IPath dest)
 	{
 		for (IProject project : workspace.getRoot().getProjects())
 		{
-			if (project.getLocation().toFile().equals(dest))
+			if (project.getLocation().equals(dest))
 			{
 				return project;
 			}

@@ -56,6 +56,9 @@ public class JSScanner extends Scanner
 		}
 		try
 		{
+			int totalLength = fDocument.getLength();
+			if (offset > totalLength) offset = totalLength;
+			if (length == -1) length = 0;
 			return new Symbol(type, offset, offset + length - 1, fDocument.get(offset, length));
 		}
 		catch (BadLocationException e)

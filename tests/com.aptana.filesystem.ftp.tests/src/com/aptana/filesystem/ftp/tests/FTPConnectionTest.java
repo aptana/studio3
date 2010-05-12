@@ -48,12 +48,22 @@ public class FTPConnectionTest extends CommonConnectionTest
 	protected void setUp() throws Exception
 	{
 		FTPConnectionPoint ftpcp = new FTPConnectionPoint();
-		ftpcp.setHost("localhost"); //$NON-NLS-1$
-		ftpcp.setLogin("aptana"); //$NON-NLS-1$
-		ftpcp.setPassword(new char[] { 'n', 'o', 'c', '$', '$', '1' });
+		ftpcp.setHost("10.10.1.60"); //$NON-NLS-1$
+		ftpcp.setLogin("ftpuser"); //$NON-NLS-1$
+		ftpcp.setPassword(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'});
 		cp = ftpcp;
 		super.setUp();
 	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsSetModificationTime()
+	 */
+	@Override
+	protected boolean supportsSetModificationTime()
+	{
+		return false;
+	}
+
 
 	/*
 	 * (non-Javadoc)

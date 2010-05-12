@@ -65,10 +65,10 @@ import com.aptana.ide.ui.io.dialogs.IDialogConstants;
  *
  */
 public class FTPAdvancedOptionsComposite extends Composite implements IOptionsComposite {
-	
+
 	private static final String EMPTY = ""; //$NON-NLS-1$
 	
-	private IConnectionDialog connectionDialog;
+	private Listener listener;
 	private Combo modeCombo;
 	private Text portText;
 	private Combo encodingCombo;
@@ -81,9 +81,9 @@ public class FTPAdvancedOptionsComposite extends Composite implements IOptionsCo
 	 * @param parent
 	 * @param style
 	 */
-	public FTPAdvancedOptionsComposite(Composite parent, int style, IConnectionDialog connectionDialog) {
+	public FTPAdvancedOptionsComposite(Composite parent, int style, Listener listener) {
 		super(parent, style);
-		this.connectionDialog = connectionDialog;
+		this.listener = listener;
 		
 		setLayout(GridLayoutFactory.swtDefaults().numColumns(5)
 				.spacing(new PixelConverter(this).convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_SPACING),
@@ -266,12 +266,12 @@ public class FTPAdvancedOptionsComposite extends Composite implements IOptionsCo
 	}
 	
 	private void detectTimezone() {
-		if (!connectionDialog.isValid()) {
+		if (!listener.isValid()) {
 			return;
 		}
 		ConnectionContext context = new ConnectionContext();
 		context.setBoolean(ConnectionContext.DETECT_TIMEZONE, true);
-		if (connectionDialog.testConnection(context, null)) {
+		if (listener.testConnection(context, null)) {
 			String[] tzones = (String[]) context.get(ConnectionContext.SERVER_TIMEZONE);
 			if (tzones != null && tzones.length > 0) {
 				String tz = timezoneCombo.getItem(timezoneCombo.getSelectionIndex());
@@ -290,7 +290,7 @@ public class FTPAdvancedOptionsComposite extends Composite implements IOptionsCo
 		if (modifyListener == null) {
 			modifyListener = new ModifyListener() {
 				public void modifyText(ModifyEvent e) {
-					connectionDialog.validate();
+					listener.validate();
 				}
 			};
 		}
