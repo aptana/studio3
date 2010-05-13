@@ -203,6 +203,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					}
 					break;
 
+				case EQUAL:
+					this._replaceRange = new Range(offset, offset - 1);
+					break;
+					
 				default:
 					break;
 			}
