@@ -65,7 +65,7 @@ public class WindowsMingwConfiguration extends AbstractProcessConfiguration {
 	public List<String> getCommandLine() throws CoreException {
 		List<String> list = new ArrayList<String>();
 		list.add(getExecutable().getAbsolutePath());
-		list.add("\"\\\"" + ShellExecutable.getPath().toOSString() + "\\\"  --login -i\""); //$NON-NLS-1$ //$NON-NLS-2$
+		list.add("\"\\\"" + ShellExecutable.getPath().toOSString() + "\\\" --login -i\""); //$NON-NLS-1$ //$NON-NLS-2$
 		list.add("120x40"); //$NON-NLS-1$
 		if (Platform.inDevelopmentMode() || Platform.inDebugMode()) {
 			list.add("-show"); //$NON-NLS-1$

@@ -128,13 +128,10 @@ public class TemplateSelectionPage extends WizardPage implements ISelectionChang
 				{
 					return selected;
 				}
-				else
-				{
-					// we had an empty selection, probably because the user never got to this page.
-					// load the templates and select the first by default.
-					loadTemplates();
-					return (templates != null && templates.length > 0) ? templates[0] : null;
-				}
+				// we had an empty selection, probably because the user never got to this page.
+				// load the templates and select the first by default.
+				loadTemplates();
+				return (templates != null && templates.length > 0) ? templates[0] : null;
 			}
 			else if (templates != null && templates.length > 0)
 			{
@@ -292,5 +289,28 @@ public class TemplateSelectionPage extends WizardPage implements ISelectionChang
 			selectInitialTemplate();
 		}
 		super.setVisible(visible);
+	}
+
+	@Override
+	public boolean isPageComplete()
+	{
+		// force load the templates
+		WizardNewFilePage page = (WizardNewFilePage) getWizard().getPage(NewFileWizard.MAIN_PAGE_NAME);
+		templates = page.getTemplates();
+		// if no templates or one template, don't force this page to be shown
+		if (templates == null)
+			return true;
+		if (templates.length < 2)
+		{
+			return true;
+		}
+		// Force this page to be shown if multiple templates and user hasn't yet selected one
+		if (!useTemplateBt.getSelection())
+			return true;
+		ISelection selection = templateSelectionViewer.getSelection();
+		if (selection == null)
+			return false;
+		TemplateElement selected = (TemplateElement) ((StructuredSelection) selection).getFirstElement();
+		return selected != null;
 	}
 }

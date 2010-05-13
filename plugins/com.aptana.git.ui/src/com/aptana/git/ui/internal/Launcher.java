@@ -18,6 +18,7 @@ import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.ui.externaltools.internal.model.IExternalToolConstants;
 
 import com.aptana.console.process.ConsoleProcessFactory;
+import com.aptana.core.ShellExecutable;
 import com.aptana.git.core.GitPlugin;
 
 /**
@@ -58,7 +59,6 @@ public abstract class Launcher
 	private static ILaunchConfigurationWorkingCopy createLaunchConfig(String command, IPath workingDir, String... args)
 			throws CoreException
 	{
-		String toolArgs = '"' + join(args, "\" \"") + '"'; //$NON-NLS-1$
 		ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
 		ILaunchConfigurationType configType = manager
 				.getLaunchConfigurationType(IExternalToolConstants.ID_PROGRAM_BUILDER_LAUNCH_CONFIGURATION_TYPE);
@@ -81,6 +81,7 @@ public abstract class Launcher
 			name = manager.generateUniqueLaunchConfigurationNameFrom(name);
 		}
 
+		String toolArgs = '"' + join(args, "\" \"") + '"'; //$NON-NLS-1$
 		ILaunchConfigurationWorkingCopy config = configType.newInstance(null, name);
 		config.setAttribute(IExternalToolConstants.ATTR_LOCATION, command);
 		config.setAttribute(IExternalToolConstants.ATTR_TOOL_ARGUMENTS, toolArgs);
@@ -93,6 +94,7 @@ public abstract class Launcher
 		config.setAttribute(IDebugUIConstants.ATTR_LAUNCH_IN_BACKGROUND, false);
 		config.setAttribute(DebugPlugin.ATTR_PROCESS_FACTORY_ID, ConsoleProcessFactory.ID);
 		Map<String, String> env = new HashMap<String, String>();
+		env.putAll(ShellExecutable.getEnvironment());
 		IPath git_ssh = GitPlugin.getDefault().getGIT_SSH();
 		if (git_ssh != null)
 		{

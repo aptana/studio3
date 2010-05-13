@@ -266,6 +266,11 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				int index = lexemeProvider.getLexemeCeilingIndex(offset);
 
 				this._replaceRange = this._currentLexeme = lexemeProvider.getLexeme(index - 1);
+				
+				if (this._currentLexeme.getType() == HTMLTokenType.TAG_START)
+				{
+					this._replaceRange = this._currentLexeme = null;
+				}
 			}
 
 			for (ElementElement element : elements)

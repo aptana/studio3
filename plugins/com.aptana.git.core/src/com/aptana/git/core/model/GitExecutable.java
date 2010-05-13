@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
@@ -15,7 +16,6 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 
-import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.git.core.GitPlugin;
@@ -246,9 +246,10 @@ public class GitExecutable
 	 * @param arguments
 	 * @return
 	 * @throws IOException
+	 * @throws CoreException 
 	 */
-	public Process run(IPath directory, String... arguments) throws IOException
+	public Process run(IPath directory, String... arguments) throws IOException, CoreException
 	{
-		return ShellExecutable.run(gitPath, directory, null, arguments);
+		return ProcessUtil.run(gitPath.toOSString(), directory, arguments);
 	}
 }

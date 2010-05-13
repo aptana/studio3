@@ -32,7 +32,7 @@ public class NewFileWizard extends BasicNewFileResourceWizard
 	 */
 	public void addPages()
 	{
-		mainPage = new WizardNewFilePage(MAIN_PAGE_NAME, getSelection());//$NON-NLS-1$
+		mainPage = new WizardNewFilePage(MAIN_PAGE_NAME, getSelection());
 		mainPage.setTitle(ResourceMessages.FileResource_pageTitle);
 		mainPage.setDescription(ResourceMessages.FileResource_description);
 
