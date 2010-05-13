@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.xml.sax.InputSource;
@@ -177,6 +178,10 @@ public class BundleConverter
 			e.printStackTrace();
 		}
 		catch (InterruptedException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CoreException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();

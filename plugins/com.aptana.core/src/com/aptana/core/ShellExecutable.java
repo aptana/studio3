@@ -38,6 +38,7 @@ package com.aptana.core;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -67,6 +68,7 @@ public class ShellExecutable {
 	
 	private static boolean initilizing = false;
 	private static IPath shellPath = null;
+	private static Map<String, String> shellEnvironment;
 	
 	
 	/**
@@ -105,10 +107,14 @@ public class ShellExecutable {
 		return null;
 	}
 	
-	private synchronized static List<String> toShellCommand(List<String> command) throws CoreException {
-		if (true) {
-			return command;
+	public synchronized static Map<String, String> getEnvironment() {
+		if (shellEnvironment == null) {
+			shellEnvironment = new HashMap<String, String>();
 		}
+		return shellEnvironment;
+	}
+	
+	private synchronized static List<String> toShellCommand(List<String> command) throws CoreException {
 		if (initilizing) {
 			return command;
 		}
