@@ -477,7 +477,12 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	LexemeProvider<HTMLTokenType> createLexemeProvider(IDocument document, int offset)
 	{
-		return new LexemeProvider<HTMLTokenType>(document, offset, new HTMLScopeScanner())
+		int documentLength = document.getLength();
+		
+		// account for last position returning an empty IDocument default partition
+		int lexemeProviderOffset = (offset >= documentLength) ? documentLength - 1 : offset;
+		
+		return new LexemeProvider<HTMLTokenType>(document, lexemeProviderOffset, new HTMLScopeScanner())
 		{
 			@Override
 			protected HTMLTokenType getTypeFromName(String name)
