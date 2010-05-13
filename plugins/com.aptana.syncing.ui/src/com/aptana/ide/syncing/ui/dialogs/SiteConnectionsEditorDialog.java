@@ -105,10 +105,10 @@ public class SiteConnectionsEditorDialog extends TitleAreaDialog implements Site
         setShellStyle(getShellStyle() | SWT.RESIZE);
         setHelpAvailable(false);
 
-        sites.add(DefaultSiteConnection.getInstance());
+        // sites.add(DefaultSiteConnection.getInstance());
 		sites.addAll(Arrays.asList(SyncingPlugin.getSiteConnectionManager().getSiteConnections()));
 
-		setSelection(DefaultSiteConnection.getInstance());
+		// setSelection(DefaultSiteConnection.getInstance());
 	}
 
 	public void setCreateNew(String name, IAdaptable source, IAdaptable destination) {
@@ -220,8 +220,9 @@ public class SiteConnectionsEditorDialog extends TitleAreaDialog implements Site
 						sites.remove(selection);
 						sitePropertiesWidget.setSource(null);
 						sitesViewer.refresh();
-						if (newSelectionIndex > -1 || newSelectionIndex < sitesViewer.getList().getItemCount()) {
-							setSelection(newSelectionIndex == 0 ? DefaultSiteConnection.getInstance() : sites.get(newSelectionIndex - 1));
+						if (newSelectionIndex > -1 && newSelectionIndex < sitesViewer.getList().getItemCount()) {
+							setSelection(sites.get(newSelectionIndex));
+							// setSelection(newSelectionIndex == 0 ? DefaultSiteConnection.getInstance() : sites.get(newSelectionIndex - 1));
 						}
 					}
 				}
@@ -328,10 +329,12 @@ public class SiteConnectionsEditorDialog extends TitleAreaDialog implements Site
     	}
 
         ISiteConnection siteConnection = sitePropertiesWidget.getSource();
-        if (siteConnection != DefaultSiteConnection.getInstance()) {
-            SyncingPlugin.getSiteConnectionManager().addSiteConnection(siteConnection);
+        if (siteConnection != null) {
+        	if (siteConnection != DefaultSiteConnection.getInstance()) {
+        		SyncingPlugin.getSiteConnectionManager().addSiteConnection(siteConnection);
+        	}
+        	SyncingPlugin.getSiteConnectionManager().siteConnectionChanged(siteConnection);
         }
-        SyncingPlugin.getSiteConnectionManager().siteConnectionChanged(siteConnection);
 
     	return applied;
     }
