@@ -655,13 +655,20 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
-	 * getOpenTagLocation
+	 * This method further refines a location within an open tag. The following
+	 * locations types are identified:
+	 * 
+	 * 1. In an element name
+	 * 2. In an attribute name
+	 * 3. In an attribute value
+	 * 
+	 * If the location cannot be determined, the ERROR location is returned
 	 * 
 	 * @param lexemeProvider
 	 * @param offset
 	 * @return
 	 */
-	private Location getOpenTagLocation(LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
+	Location getOpenTagLocation(LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
 	{
 		Location result = Location.ERROR;
 
@@ -691,8 +698,11 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				case ATTRIBUTE:
 				case CLASS:
 				case ID:
-				case EQUAL:
 					result = Location.IN_ATTRIBUTE_NAME;
+					break;
+					
+				case EQUAL:
+					result = (offset <= lexeme.getStartingOffset()) ? Location.IN_ATTRIBUTE_NAME : Location.IN_ATTRIBUTE_VALUE;
 					break;
 
 				case TAG_START:
