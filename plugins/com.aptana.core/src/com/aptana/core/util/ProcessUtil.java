@@ -53,33 +53,29 @@ public abstract class ProcessUtil
 		return runInBackground(command, workingDir, null, env, args);
 	}
 
-	/**
-	 * Launches the process and returns a map from the exit value to the stdout output read in.
-	 * 
-	 * @param command
-	 * @param workingDir
-	 * @param input
-	 * @param env
-	 * @param args
-	 * @return
-	 */
-	public static Map<Integer, String> runInBackground(String command, IPath workingDirectory, String input,
-			Map<String, String> environment, String[] arguments)
+	public static String outputForProcess(Process process)
+	{
+		Map<Integer, String> result = processData(process, null);
+		if (result == null || result.isEmpty())
+			return null;
+		return result.values().iterator().next();
+	}
+
+	private static Map<Integer, String> processData(Process process, String input)
 	{
 		String lineSeparator = ResourceUtil.getLineSeparatorValue(null);
 		try
 		{
-			Process p = run(command, workingDirectory, environment, arguments);
 			// Read and write in threads to avoid from choking the process streams
 			OutputStreamThread writerThread = null;
 			if (input != null)
 			{
 				// TODO - Use EditorUtils.getEncoding once we have an IFile reference.
 				// Using the UTF-8 will not work for all cases.
-				writerThread = new OutputStreamThread(p.getOutputStream(), input, "UTF-8"); //$NON-NLS-1$
+				writerThread = new OutputStreamThread(process.getOutputStream(), input, "UTF-8"); //$NON-NLS-1$
 			}
-			InputStreamGobbler readerGobbler = new InputStreamGobbler(p.getInputStream(), lineSeparator, "UTF-8"); //$NON-NLS-1$
-			InputStreamGobbler errorGobbler = new InputStreamGobbler(p.getErrorStream(), lineSeparator, null);
+			InputStreamGobbler readerGobbler = new InputStreamGobbler(process.getInputStream(), lineSeparator, "UTF-8"); //$NON-NLS-1$
+			InputStreamGobbler errorGobbler = new InputStreamGobbler(process.getErrorStream(), lineSeparator, null);
 
 			// Start the threads
 			if (writerThread != null)
@@ -89,7 +85,7 @@ public abstract class ProcessUtil
 			readerGobbler.start();
 			errorGobbler.start();
 			// This will wait till the process is done.
-			int exitValue = p.waitFor();
+			int exitValue = process.waitFor();
 			if (writerThread != null)
 			{
 				writerThread.interrupt();
@@ -116,15 +112,36 @@ public abstract class ProcessUtil
 			result.put(exitValue, read);
 			return result;
 		}
+		catch (InterruptedException e)
+		{
+			CorePlugin.logError(e.getMessage(), e);
+		}
+		return null;		
+	}
+
+	/**
+	 * Launches the process and returns a map from the exit value to the stdout output read in.
+	 * 
+	 * @param command
+	 * @param workingDir
+	 * @param input
+	 * @param env
+	 * @param args
+	 * @return
+	 */
+	public static Map<Integer, String> runInBackground(String command, IPath workingDirectory, String input,
+			Map<String, String> environment, String[] arguments)
+	{
+		try
+		{
+			Process p = run(command, workingDirectory, environment, arguments);
+			return processData(p, input);
+		}
 		catch (IOException e)
 		{
 			CorePlugin.logError(e.getMessage(), e);
 		}
 		catch (CoreException e)
-		{
-			CorePlugin.logError(e.getMessage(), e);
-		}
-		catch (InterruptedException e)
 		{
 			CorePlugin.logError(e.getMessage(), e);
 		}

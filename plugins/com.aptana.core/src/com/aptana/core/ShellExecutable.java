@@ -41,6 +41,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -50,6 +51,7 @@ import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.PlatformUtil;
+import com.aptana.core.util.ProcessUtil;
 
 /**
  * @author Max Stepanov
@@ -109,9 +111,27 @@ public class ShellExecutable {
 	
 	public synchronized static Map<String, String> getEnvironment() {
 		if (shellEnvironment == null) {
-			shellEnvironment = new HashMap<String, String>();
+			shellEnvironment = new HashMap<String, String>();			
+			try {
+				shellEnvironment.putAll(buildEnvironment(ProcessUtil.outputForProcess(run("env", null, null))));
+			} catch (Exception e) {
+				CorePlugin.logError("Get shell environment failed.", e);
+			}
 		}
 		return shellEnvironment;
+	}
+	
+	private static Map<String, String> buildEnvironment(String envp) {
+		Map<String, String> env = new HashMap<String, String>();
+		StringTokenizer tok = new StringTokenizer(envp, "\r\n");
+		while (tok.hasMoreTokens()) {
+			String envstring = tok.nextToken();
+			int eqlsign = envstring.indexOf('=');
+			if (eqlsign != -1) {
+				env.put(envstring.substring(0,eqlsign), envstring.substring(eqlsign+1));
+			}
+		}
+		return env;
 	}
 	
 	private synchronized static List<String> toShellCommand(List<String> command) throws CoreException {
