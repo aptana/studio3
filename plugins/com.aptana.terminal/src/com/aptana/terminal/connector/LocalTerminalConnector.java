@@ -37,6 +37,8 @@ package com.aptana.terminal.connector;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -206,7 +208,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			errorMonitor.addListener(errorListener);
 			errorListener.streamAppended(errorMonitor.getContents(), errorMonitor);
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 			Activator.logError("Starting terminal process failed.", e); //$NON-NLS-1$
 		}
 	}
@@ -237,6 +239,12 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			}
 		}
 		return null;
+	}
+
+	public List<String> getRunningProcesses() {
+		List<String> processes = new ArrayList<String>();
+		processes.add("bash");
+		return processes;
 	}
 
 }

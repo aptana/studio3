@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-SymbolicName: com.aptana.ui.io.epl;singleton:=true
+Bundle-Version: 3.0.0.qualifier
+Bundle-Activator: com.aptana.ui.io.epl.IOUIEplPlugin
+Bundle-Vendor: %providerName
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.core.filesystem,
+ org.eclipse.ui.ide
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Export-Package: com.aptana.ui.io.epl
+Eclipse-ExtensibleAPI: true

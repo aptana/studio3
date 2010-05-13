@@ -16,13 +16,13 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.team.core.history.IFileHistoryProvider;
 import org.eclipse.team.core.history.IFileRevision;
 
+import com.aptana.core.util.IOUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitIndex;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.testing.utils.ProjectCreator;
-import com.aptana.util.IOUtil;
 
 public class GitFileHistoryTest extends TestCase
 {
@@ -149,7 +149,7 @@ public class GitFileHistoryTest extends TestCase
 
 	protected GitRepository createRepo() throws CoreException
 	{
-		getGitRepositoryManager().create(getProject().getLocation().toOSString());
+		getGitRepositoryManager().create(getProject().getLocation());
 		return getGitRepositoryManager().attachExisting(getProject(), new NullProgressMonitor());
 	}
 

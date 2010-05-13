@@ -69,7 +69,7 @@ public class ExplorerContextContributor implements ContextContributor
 			// This contributor is responsible for setting the path for this working dir type
 			if (command.getWorkingDirectoryType().equals(WorkingDirectoryType.CURRENT_PROJECT))
 			{
-				command.setWorkingDirectoryPath(project.getLocation().toOSString());
+				command.setWorkingDirectoryPath(project.getLocation());
 			}
 
 			Ruby runtime = command.getRuntime();

@@ -10,8 +10,8 @@ import java.util.Map;
 
 import org.jruby.RubyRegexp;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.scope.ScopeSelector;
-import com.aptana.util.StringUtil;
 
 public class BundleElement extends AbstractElement
 {

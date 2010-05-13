@@ -2,10 +2,13 @@ package com.aptana.configurations.processor;
 
 import java.util.Set;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
 
+import com.aptana.configurations.ConfigurationsPlugin;
+import com.aptana.core.ShellExecutable;
 import com.aptana.scripting.ScriptUtils;
 
 /**
@@ -27,7 +30,7 @@ public abstract class AbstractConfigurationProcessor implements IConfigurationPr
 	protected static final String ITEM_VERSION = "version"; //$NON-NLS-1$
 	protected static final String ITEM_COMPATIBILITY = "compatibility"; //$NON-NLS-1$
 	protected static final String ITEM_VERSION_OUTPUT = "rawOutput"; //$NON-NLS-1$
-	
+
 	private String processorID;
 	private String processorName;
 	private String[] categories;
@@ -200,11 +203,19 @@ public abstract class AbstractConfigurationProcessor implements IConfigurationPr
 	 */
 	public static String getShellPath()
 	{
-		IPath path = ScriptUtils.getShellPath();
-		if (path != null)
+		try
 		{
-			return path.toOSString();
+			IPath path = ShellExecutable.getPath();
+			if (path != null)
+			{
+				return path.toOSString();
+			}
 		}
+		catch (CoreException e)
+		{
+			ConfigurationsPlugin.logError(e);
+		}
+
 		return null;
 	}
 

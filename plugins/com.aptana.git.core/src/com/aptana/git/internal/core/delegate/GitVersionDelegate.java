@@ -1,8 +1,10 @@
 package com.aptana.git.internal.core.delegate;
 
+import org.eclipse.core.runtime.IPath;
+
 import com.aptana.configurations.processor.AbstractProcessorDelegate;
+import com.aptana.core.util.ProcessUtil;
 import com.aptana.git.core.model.GitExecutable;
-import com.aptana.util.ProcessUtil;
 
 /**
  * A processor delegate class that returns the configured/installed Git version. This delegate invoke the
@@ -31,10 +33,10 @@ public class GitVersionDelegate extends AbstractProcessorDelegate
 		String command = supportedCommands.get(commandType);
 		if (command != null)
 		{
-			String gitPath = GitExecutable.instance().path();
+			IPath gitPath = GitExecutable.instance().path();
 			if (gitPath != null)
 			{
-				return ProcessUtil.outputForCommand(gitPath, null, command);
+				return ProcessUtil.outputForCommand(gitPath.toString(), null, command);
 			}
 		}
 		return null;

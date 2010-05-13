@@ -4,6 +4,7 @@ import java.net.URI;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 public interface IGitRepositoryManager
@@ -23,7 +24,7 @@ public interface IGitRepositoryManager
 	/**
 	 * Generates a brand new git repository in the specified location.
 	 */
-	public void create(String path);
+	public void create(IPath path);
 
 	/**
 	 * Used when the user disconnects the project from the repository. We should notify listeners that the repo has been

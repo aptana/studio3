@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
@@ -38,6 +39,8 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 
+import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitRepository;
@@ -45,8 +48,6 @@ import com.aptana.git.core.model.GitRevList;
 import com.aptana.git.core.model.GitRevSpecifier;
 import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.ui.GitUIPlugin;
-import com.aptana.util.IOUtil;
-import com.aptana.util.StringUtil;
 
 public class GitHistoryPage extends HistoryPage
 {
@@ -96,12 +97,12 @@ public class GitHistoryPage extends HistoryPage
 					return Status.OK_STATUS;
 				GitRevList revList = new GitRevList(repo);
 				// Need the repo relative path
-				String resourcePath = repo.relativePath(theResource);
+				IPath resourcePath = repo.relativePath(theResource);
 				if (subMonitor.isCanceled())
 					return Status.CANCEL_STATUS;
 				repo.lazyReload();
 				subMonitor.worked(5);
-				revList.walkRevisionListWithSpecifier(new GitRevSpecifier(resourcePath), subMonitor.newChild(95));
+				revList.walkRevisionListWithSpecifier(new GitRevSpecifier(resourcePath.toOSString()), subMonitor.newChild(95));
 				final List<GitCommit> commits = revList.getCommits();
 				Display.getDefault().asyncExec(new Runnable()
 				{

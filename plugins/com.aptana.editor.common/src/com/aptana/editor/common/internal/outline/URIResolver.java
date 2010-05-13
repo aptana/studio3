@@ -13,9 +13,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
+import com.aptana.core.util.IOUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.outline.IPathResolver;
-import com.aptana.util.IOUtil;
 
 /**
  * Resolves paths that may be relative to a base URI (filesystem, remote, etc)
@@ -32,11 +32,16 @@ public class URIResolver implements IPathResolver
 		this.baseURI = baseURI;
 	}
 
+	/**
+	 * Returns null if unable to resolve the path to a URI and grab the contents.
+	 */
 	@Override
 	public String resolveSource(String path, IProgressMonitor monitor) throws Exception
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
 		URI uri = resolveURI(path);
+		if (uri == null)
+			return null;
 		sub.worked(5);
 		// get the filesystem that can handle the URI
 		IFileStore store = getFileStore(uri);
@@ -68,6 +73,8 @@ public class URIResolver implements IPathResolver
 
 	public URI resolveURI(String path)
 	{
+		if (path == null)
+			return null;
 		URI uri;
 		try
 		{

@@ -13,7 +13,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.xml.sax.InputSource;
+
+import com.aptana.core.util.ProcessUtil;
 
 import plistreader.AbstractReader;
 import plistreader.PlistFactory;
@@ -152,15 +156,18 @@ public class BundleConverter
 
 	private static boolean copyDir(String srcPath, String destPath)
 	{
-		if (!new File(srcPath).exists())
+		return copyDir(Path.fromOSString(srcPath), Path.fromOSString(destPath));
+	}
+
+	private static boolean copyDir(IPath srcPath, IPath destPath)
+	{
+		if (!srcPath.toFile().exists())
 			return true;
 		try
 		{
-			File dest = new File(destPath);
-			dest.mkdirs();
+			destPath.toFile().mkdirs();
 
-			ProcessBuilder builder = new ProcessBuilder("cp", "-R", srcPath, destPath);
-			Process p = builder.start();
+			Process p = ProcessUtil.run("cp", null, "-R", srcPath.toOSString(), destPath.toOSString());
 			p.waitFor();
 			return true;
 		}
@@ -405,11 +412,14 @@ public class BundleConverter
 
 	static PlistProperties parse(File plistFile)
 	{
+		return parse(Path.fromOSString(plistFile.getAbsolutePath()));
+	}
+
+	static PlistProperties parse(IPath plistPath)
+	{
 		try
 		{
-			ProcessBuilder builder = new ProcessBuilder("/usr/bin/plutil", "-convert", "xml1", plistFile.getName());
-			builder.directory(plistFile.getParentFile());
-			Process p = builder.start();
+			Process p = ProcessUtil.run("/usr/bin/plutil", plistPath.removeLastSegments(1), "-convert", "xml1", plistPath.lastSegment());
 			int exitCode = p.waitFor();
 			if (exitCode != 0)
 			{
@@ -419,14 +429,14 @@ public class BundleConverter
 			AbstractReader reader = PlistFactory.createReader();
 			// FIXME Often these files will have special characters that aren't proper in XML (like say Ctrl+C as a
 			// keybinding, 0x03 so we need it to become "&#x03;"), we need to massage the XML now!
-			InputSource source = new InputSource(new InputStreamReader(new FileInputStream(plistFile), "UTF-8"));
+			InputSource source = new InputSource(new InputStreamReader(new FileInputStream(plistPath.toFile()), "UTF-8"));
 			source.setEncoding("UTF-8");
 			reader.setSource(source);
 			return reader.parse();
 		}
 		catch (Exception e)
 		{
-			System.err.println("An error occurred processing: " + plistFile.getAbsolutePath());
+			System.err.println("An error occurred processing: " + plistPath.toOSString());
 		}
 		return null;
 	}

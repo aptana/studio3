@@ -10,10 +10,10 @@ import org.osgi.framework.Version;
 
 import com.aptana.configurations.processor.AbstractConfigurationProcessor;
 import com.aptana.configurations.processor.ConfigurationStatus;
+import com.aptana.core.util.ProcessUtil;
+import com.aptana.core.util.ResourceUtil;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.processorDelegates.BaseVersionProcessor;
-import com.aptana.util.ProcessUtil;
-import com.aptana.util.ResourceUtils;
 
 /**
  * A configuration processor for Ruby Gems management.
@@ -72,7 +72,7 @@ public class GemsConfigurationProcessor extends AbstractConfigurationProcessor
 		String allGems = ProcessUtil.outputForCommand(shellCommandPath, null, new String[] { "-c", GEM_LIST }); //$NON-NLS-1$
 		if (allGems != null)
 		{
-			String[] gemsArray = allGems.split(ResourceUtils.getLineSeparatorValue(null));
+			String[] gemsArray = allGems.split(ResourceUtil.getLineSeparatorValue(null));
 			for (String gem : gemsArray)
 			{
 				Gem g = parseGem(gem);

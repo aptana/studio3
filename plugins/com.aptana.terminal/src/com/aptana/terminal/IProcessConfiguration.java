@@ -39,6 +39,8 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.CoreException;
+
 /**
  * @author Max Stepanov
  *
@@ -46,6 +48,6 @@ import java.util.Map;
 public interface IProcessConfiguration {
 
 	public File getExecutable();
-	public List<String> getCommandLine();
+	public List<String> getCommandLine() throws CoreException;
 	public Map<String, String> getEnvironment();
 }

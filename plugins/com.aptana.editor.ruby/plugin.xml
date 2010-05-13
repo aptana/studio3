@@ -35,5 +35,11 @@
             priority="normal">
       </content-type>
    </extension>
+   <extension
+         point="com.aptana.index.core.fileIndexingParticipants">
+      <fileIndexingParticipant
+            class="com.aptana.editor.ruby.index.RubyFileIndexingParticipant">
+      </fileIndexingParticipant>
+   </extension>
 
 </plugin>

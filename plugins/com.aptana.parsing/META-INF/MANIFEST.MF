@@ -5,7 +5,8 @@ Bundle-SymbolicName: com.aptana.parsing
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.aptana.parsing.ParsingPlugin
 Bundle-Vendor: %providerName
-Require-Bundle: org.eclipse.core.runtime
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.jface.text
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: beaver,
@@ -18,7 +19,9 @@ Export-Package: beaver,
  beaver.spec.parser,
  com.aptana.parsing,
  com.aptana.parsing.ast,
- com.aptana.parsing.lexer
+ com.aptana.parsing.io,
+ com.aptana.parsing.lexer,
+ com.aptana.sax
 Bundle-ClassPath: libs/beaver.jar,
  .
 Eclipse-ExtensibleAPI: true

@@ -28,8 +28,7 @@ public class GitRepositoryTest extends TestCase
 	{
 		try
 		{
-			IPath path = new Path(fRepo.workingDirectory());
-			File generatedRepo = path.toFile();
+			File generatedRepo = fRepo.workingDirectory().toFile();
 			if (generatedRepo.exists())
 			{
 				delete(generatedRepo);
@@ -451,7 +450,7 @@ public class GitRepositoryTest extends TestCase
 	protected GitRepository createRepo(IPath path)
 	{
 		// FIXME Turn off a pref flag so we don't hook up the file watchers to git repo!
-		getGitRepositoryManager().create(path.toOSString());
+		getGitRepositoryManager().create(path);
 		GitRepository repo = getGitRepositoryManager().getUnattachedExisting(path.toFile().toURI());
 		assertNotNull(repo);
 		fRepo = repo;

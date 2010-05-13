@@ -20,9 +20,9 @@ import org.jruby.embed.LocalVariableBehavior;
 import org.jruby.embed.ScriptingContainer;
 import org.osgi.framework.Bundle;
 
+import com.aptana.core.util.ResourceUtil;
 import com.aptana.scripting.model.RunType;
 import com.aptana.scripting.model.ScriptLoadJob;
-import com.aptana.util.ResourceUtils;
 
 public class ScriptingEngine
 {
@@ -71,7 +71,7 @@ public class ScriptingEngine
 
 			if (url != null)
 			{
-				File lib = ResourceUtils.resourcePathToFile(url);
+				File lib = ResourceUtil.resourcePathToFile(url);
 				// Ok, now use the parent of exploded lib dir as JRuby Home
 				jrubyHome = lib.getParentFile();
 			}
@@ -129,7 +129,7 @@ public class ScriptingEngine
 								String declaringPluginID = declaring.getNamespaceIdentifier();
 								Bundle bundle = Platform.getBundle(declaringPluginID);
 								URL url = bundle.getEntry(path);
-								String urlAsPath = ResourceUtils.resourcePathToString(url);
+								String urlAsPath = ResourceUtil.resourcePathToString(url);
 
 								if (urlAsPath != null && urlAsPath.length() > 0)
 								{

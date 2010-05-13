@@ -17,11 +17,11 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.team.core.history.IFileRevision;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.core.util.IOUtil;
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitRepositoryManager;
 import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.internal.core.storage.CommitFileRevision;
-import com.aptana.util.IOUtil;
 
 /**
  * The activator class controls the plug-in life cycle

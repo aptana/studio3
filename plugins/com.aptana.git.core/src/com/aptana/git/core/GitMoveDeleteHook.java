@@ -1,6 +1,6 @@
 package com.aptana.git.core;
 
-import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 import org.eclipse.core.resources.IContainer;
@@ -13,6 +13,7 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.team.IMoveDeleteHook;
 import org.eclipse.core.resources.team.IResourceTree;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -81,7 +82,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 			return cannotModifyRepository(tree);
 		}
 
-		String source = getRepoRelativePath(folder, repo);
+		IPath source = getRepoRelativePath(folder, repo);
 		// If project contains no already committed files, we need to punt!
 		if (hasNoCommittedFiles(source, repo))
 			return false;
@@ -114,22 +115,26 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 
 		// If repo root is same as project root, we need to just punt and return false
 		// so filesystem takes care of it
-		if (new File(repo.workingDirectory()).getAbsolutePath()
-				.equals(project.getLocation().toFile().getAbsolutePath()))
-		{
-			GitPlugin.getDefault().getGitRepositoryManager().removeRepository(project);
-			// Force delete the .git dir, since it's probably out of sync and not forcing could cause project delete to fail!
-			IFolder gitDir = project.getFolder(GitRepository.GIT_DIR);
-			if (gitDir.exists())
+		try {
+			if (repo.workingDirectory().toFile().getCanonicalPath()
+					.equals(project.getLocation().toFile().getCanonicalPath()))
 			{
-				tree.standardDeleteFolder(gitDir, updateFlags | IResource.FORCE,
-					new NullProgressMonitor()); // TODO Use a submonitor here?
-				tree.deletedFolder(gitDir);
+				GitPlugin.getDefault().getGitRepositoryManager().removeRepository(project);
+				// Force delete the .git dir, since it's probably out of sync and not forcing could cause project delete to fail!
+				IFolder gitDir = project.getFolder(GitRepository.GIT_DIR);
+				if (gitDir.exists())
+				{
+					tree.standardDeleteFolder(gitDir, updateFlags | IResource.FORCE,
+						new NullProgressMonitor()); // TODO Use a submonitor here?
+					tree.deletedFolder(gitDir);
+				}
+				return false;
 			}
-			return false;
+		} catch (IOException e) {
+			GitPlugin.logError("File.getCanonicalPath failed.", e); //$NON-NLS-1$
 		}
 
-		String source = getRepoRelativePath(project, repo);
+		IPath source = getRepoRelativePath(project, repo);
 		// If project contains no already committed files, we need to punt!
 		if (hasNoCommittedFiles(source, repo))
 			return false;
@@ -195,8 +200,8 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		if ((updateFlags & IResource.KEEP_HISTORY) == IResource.KEEP_HISTORY)
 			tree.addToLocalHistory(srcf);
 
-		String source = getRepoRelativePath(srcf, repo);
-		String dest = getRepoRelativePath(dstf, repo);
+		IPath source = getRepoRelativePath(srcf, repo);
+		IPath dest = getRepoRelativePath(dstf, repo);
 		IStatus status = repo.moveFile(source, dest);
 		// Call tree.failed if failed, call tree.movedFile if success
 		if (status.isOK())
@@ -217,7 +222,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 			return false;
 		// TODO If they're in separate repos, we need to delete and add!
 
-		String source = getRepoRelativePath(srcf, repo);
+		IPath source = getRepoRelativePath(srcf, repo);
 		// If source folder contains no already committed files, we need to punt!
 		if (hasNoCommittedFiles(source, repo))
 			return false;
@@ -228,7 +233,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 			addFilesToLocalHistoryRecursively(tree, srcf);
 		}
 
-		String dest = getRepoRelativePath(dstf, repo);
+		IPath dest = getRepoRelativePath(dstf, repo);
 		IStatus status = repo.moveFile(source, dest);
 		// Call tree.failed if failed, call tree.movedFolder if success
 		if (status.isOK())
@@ -238,11 +243,11 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		return true;
 	}
 
-	protected boolean hasNoCommittedFiles(String source, GitRepository repo)
+	protected boolean hasNoCommittedFiles(IPath source, GitRepository repo)
 	{
 		int exitCode = 1;
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(repo.workingDirectory(), "ls-tree", //$NON-NLS-1$
-				"-r", "HEAD:" + source); //$NON-NLS-1$ //$NON-NLS-2$
+				"-r", "HEAD:" + source.toOSString()); //$NON-NLS-1$ //$NON-NLS-2$
 		if (result != null && !result.isEmpty())
 			exitCode = result.keySet().iterator().next();
 		return exitCode != 0;
@@ -262,15 +267,13 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		return I_AM_DONE;
 	}
 
-	protected String getRepoRelativePath(final IResource file, GitRepository repo)
+	protected IPath getRepoRelativePath(final IResource file, GitRepository repo)
 	{
-		String workingDir = repo.workingDirectory();
-		String filePath = new File(file.getLocationURI()).getAbsolutePath();
-		if (filePath.startsWith(workingDir))
+		IPath workingDir = repo.workingDirectory();
+		IPath filePath = file.getLocation();
+		if (workingDir.isPrefixOf(filePath))
 		{
-			filePath = filePath.substring(workingDir.length());
-			if (filePath.startsWith(File.separator))
-				filePath = filePath.substring(1);
+			return filePath.makeRelativeTo(workingDir);
 		}
 		return filePath;
 	}
