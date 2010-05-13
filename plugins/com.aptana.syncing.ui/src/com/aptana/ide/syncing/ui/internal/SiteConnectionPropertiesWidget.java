@@ -84,7 +84,6 @@ import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.filesystem.ftp.FTPConnectionPoint;
 import com.aptana.ide.syncing.core.DefaultSiteConnection;
 import com.aptana.ide.syncing.core.ISiteConnection;
-import com.aptana.ide.syncing.core.SiteConnection;
 import com.aptana.ide.syncing.core.SyncingPlugin;
 import com.aptana.ide.ui.ftp.internal.FTPPropertyDialogProvider;
 import com.aptana.ui.IPropertyDialog;
@@ -101,7 +100,7 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
     }
 
     private Client client;
-    private ISiteConnection source;
+    private ISiteConnection siteConnection;
     private Text nameText;
     private TargetEditor sourceEditor;
     private TargetEditor destinationEditor;
@@ -149,10 +148,10 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
     }
 
     public void setSource(ISiteConnection source) {
-        if (this.source == source && source != null) {
+        if (this.siteConnection == source && source != null) {
             return;
         }
-        this.source = source;
+        this.siteConnection = source;
         if (source == null) {
             ((GridData) getLayoutData()).exclude = true;
             setVisible(false);
@@ -176,18 +175,17 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
     }
 
     public ISiteConnection getSource() {
-        return source;
+        return siteConnection;
     }
 
     public boolean isChanged() {
-        return source != null && changed;
+        return siteConnection != null && changed;
     }
 
     public boolean applyChanges() {
         if (!validateAll()) {
             return false;
         }
-        SiteConnection siteConnection = (SiteConnection) source;
         siteConnection.setName(nameText.getText());
 
         IConnectionPoint connectionPoint = sourceEditor.getTarget();
@@ -214,11 +212,11 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
 
     private boolean validateAll() {
         String message = null;
-        if (source != null) {
+        if (siteConnection != null) {
             String name = nameText.getText().trim();
             if (name.length() == 0) {
                 message = Messages.SiteConnectionPropertiesWidget_ERR_EmptyName;
-            } else if (source != DefaultSiteConnection.getInstance()
+            } else if (siteConnection != DefaultSiteConnection.getInstance()
                     && name.equals(DefaultSiteConnection.NAME)) {
                 message = MessageFormat.format(
                         Messages.SiteConnectionPropertiesWidget_ERR_DuplicateNames, name);
@@ -226,7 +224,7 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
                 ISiteConnection[] connections = SyncingPlugin.getSiteConnectionManager()
                         .getSiteConnections();
                 for (ISiteConnection connection : connections) {
-                    if (connection != source && name.equals(connection.getName())) {
+                    if (connection != siteConnection && name.equals(connection.getName())) {
                         message = MessageFormat.format(
                                 Messages.SiteConnectionPropertiesWidget_ERR_DuplicateNames, name);
                         break;
@@ -588,7 +586,7 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
         }
 
         private void setTarget(IConnectionPoint connectionPoint) {
-            isDefault = (source == DefaultSiteConnection.getInstance() && connectionPoint == source
+            isDefault = (siteConnection == DefaultSiteConnection.getInstance() && connectionPoint == siteConnection
                     .getDestination());
             mainComp.setVisible(!isDefault);
             ((GridData) mainComp.getLayoutData()).exclude = isDefault;
