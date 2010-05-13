@@ -414,13 +414,14 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		// tokenize the current document
 		IDocument document = viewer.getDocument();
+		
 		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
 
 		// store a reference to the lexeme at the current position
 		this._replaceRange = this._currentLexeme = lexemeProvider.getFloorLexeme(offset);
 
 		// first step is to determine if we're inside an open tag, close tag, text, etc.
-		Location location = this.getLocation(document, lexemeProvider, offset);
+		Location location = this.getCoarseLocation(document, lexemeProvider, offset);
 
 		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
 
@@ -585,13 +586,20 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
-	 * getLocation
+	 * This method looks at the partition that contains the specified offset and
+	 * from that partition type determines if the offset is:
+	 * 
+	 * 1. Within an open tag
+	 * 2. Within a close tag
+	 * 3. Within a text area
+	 * 
+	 * If the partition type is unrecognized, the ERROR location will be returned.
 	 * 
 	 * @param lexemeProvider
 	 * @param offset
 	 * @return
 	 */
-	Location getLocation(IDocument document, LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
+	Location getCoarseLocation(IDocument document, LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
 	{
 		Location result = Location.ERROR;
 
@@ -622,17 +630,43 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 							break;
 
 						case IN_TEXT:
-							Lexeme<HTMLTokenType> lastLexeme = lexemeProvider.getLastLexeme();
-							
-							if (firstLexeme.getStartingOffset() < offset && offset < lastLexeme.getEndingOffset())
+							if (firstLexeme.getStartingOffset() < offset) // && offset <= lastLexeme.getEndingOffset())
 							{
+								Lexeme<HTMLTokenType> lastLexeme = lexemeProvider.getLastLexeme();
+								
 								if ("<".equals(firstLexeme.getText())) //$NON-NLS-1$
 								{
-									result = Location.IN_OPEN_TAG;
+									switch (lastLexeme.getType())
+									{
+										case TAG_END:
+										case TAG_SELF_CLOSE:
+											if (offset <= lastLexeme.getStartingOffset())
+											{
+												result = Location.IN_OPEN_TAG;
+											}
+											break;
+											
+										default:
+											result = Location.IN_OPEN_TAG;
+											break;
+									}
 								}
 								else if ("</".equals(firstLexeme.getText())) //$NON-NLS-1$
 								{
-									result = Location.IN_CLOSE_TAG;
+									switch (lastLexeme.getType())
+									{
+										case TAG_END:
+										case TAG_SELF_CLOSE:
+											if (offset <= lastLexeme.getStartingOffset())
+											{
+												result = Location.IN_CLOSE_TAG;
+											}
+											break;
+											
+										default:
+											result = Location.IN_CLOSE_TAG;
+											break;
+									}
 								}
 							}
 							break;
