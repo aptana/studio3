@@ -2,7 +2,6 @@ package com.aptana.git.ui.internal;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
@@ -82,10 +81,6 @@ public abstract class Launcher
 			name = manager.generateUniqueLaunchConfigurationNameFrom(name);
 		}
 
-		List<String> shellCommand = ShellExecutable.toShellCommand(command, args);
-		command = shellCommand.remove(0);
-		args = shellCommand.toArray(new String[shellCommand.size()]);
-
 		String toolArgs = '"' + join(args, "\" \"") + '"'; //$NON-NLS-1$
 		ILaunchConfigurationWorkingCopy config = configType.newInstance(null, name);
 		config.setAttribute(IExternalToolConstants.ATTR_LOCATION, command);
@@ -99,6 +94,7 @@ public abstract class Launcher
 		config.setAttribute(IDebugUIConstants.ATTR_LAUNCH_IN_BACKGROUND, false);
 		config.setAttribute(DebugPlugin.ATTR_PROCESS_FACTORY_ID, ConsoleProcessFactory.ID);
 		Map<String, String> env = new HashMap<String, String>();
+		env.putAll(ShellExecutable.getEnvironment());
 		IPath git_ssh = GitPlugin.getDefault().getGIT_SSH();
 		if (git_ssh != null)
 		{

@@ -3,6 +3,7 @@ package com.aptana.core.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +12,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
 import com.aptana.core.CorePlugin;
-import com.aptana.core.ShellExecutable;
 import com.aptana.core.internal.InputStreamGobbler;
 import com.aptana.core.internal.OutputStreamThread;
 
@@ -69,7 +69,7 @@ public abstract class ProcessUtil
 		String lineSeparator = ResourceUtil.getLineSeparatorValue(null);
 		try
 		{
-			Process p = ShellExecutable.run(command, workingDirectory, environment, arguments);
+			Process p = run(command, workingDirectory, environment, arguments);
 			// Read and write in threads to avoid from choking the process streams
 			OutputStreamThread writerThread = null;
 			if (input != null)
@@ -133,25 +133,51 @@ public abstract class ProcessUtil
 
 	/**
 	 * Launches the process and returns a handle to the active Process.
-	 * 
 	 * @param command
-	 * @param workingDir
-	 * @param args
+	 * @param workingDirectory
+	 * @param environment
+	 * @param arguments
 	 * @return
 	 * @throws IOException
+	 * @throws CoreException
 	 */
-	public static Process run(String command, IPath workingDir, String... args) throws IOException
-	{
-		List<String> commands = new ArrayList<String>();
-		commands.add(command);
-		for (String arg : args)
-			commands.add(arg);
+	public static Process run(String command, IPath workingDirectory, Map<String,String> environment, String... arguments) throws IOException, CoreException {
+		List<String> commands = new ArrayList<String>(Arrays.asList(arguments));
+		commands.add(0, command);
+		return run(commands, workingDirectory, environment);
+	}
 
-		ProcessBuilder builder = new ProcessBuilder(commands);
-		if (workingDir != null)
-			builder.directory(workingDir.toFile());
+	/**
+	 * 
+	 * @param command
+	 * @param workingDirectory
+	 * @param arguments
+	 * @return
+	 * @throws IOException
+	 * @throws CoreException
+	 */
+	public static Process run(String command, IPath workingDirectory, String... arguments) throws IOException, CoreException {
+		return run(command, workingDirectory, null, arguments);
+	}
 
-		return builder.start();
+	/**
+	 * Launches the process and returns a handle to the active Process.
+	 * @param command
+	 * @param workingDirectory
+	 * @param environment
+	 * @return
+	 * @throws IOException
+	 * @throws CoreException
+	 */
+	public static Process run(List<String> command, IPath workingDirectory, Map<String,String> environment) throws IOException, CoreException {
+		ProcessBuilder processBuilder = new ProcessBuilder(command);
+		if (workingDirectory != null) {
+			processBuilder.directory(workingDirectory.toFile());
+		}
+		if (environment != null && !environment.isEmpty()) {
+			processBuilder.environment().putAll(environment);
+		}
+		return processBuilder.start();
 	}
 
 }
