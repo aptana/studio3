@@ -43,13 +43,17 @@ import com.aptana.usage.PingStartup;
 public class Portal
 {
 	public static final String BASE_URL_PREFIX = "http://toolbox.aptana.com/toolbox"; //$NON-NLS-1$
+	private static final String BASE_REMOTE_URL = "http://toolbox.aptana.com/toolbox"; //$NON-NLS-1$
+	// for debugging, do NOT check in with these uncommented:
+	// public static final String BASE_URL_PREFIX = "http://localhost:3000/toolbox"; //$NON-NLS-1$
+	// private static final String BASE_REMOTE_URL = "http://localhost:3000/toolbox"; //$NON-NLS-1$
+	private static final String BASE_LOCAL_URL = "/content/index.html"; //$NON-NLS-1$
+
 	private static final String EXPLORER_PLUGIN_ID = "com.aptana.explorer"; //$NON-NLS-1$
 	public static final String ACTIVE_PROJECT_KEY = "activeProject"; //$NON-NLS-1$
 	private static final String RAILS_NATURE = "org.radrails.rails.core.railsnature"; //$NON-NLS-1$
 	private static final String PHP_NATURE = "com.aptana.editor.php.phpnature"; //$NON-NLS-1$
 	private static Portal instance;
-	private static final String BASE_REMOTE_URL = "http://toolbox.aptana.com/toolbox"; //$NON-NLS-1$
-	private static final String BASE_LOCAL_URL = "/content/index.html"; //$NON-NLS-1$
 	private PortalBrowserEditor portalBrowser;
 
 	// Private constructor
