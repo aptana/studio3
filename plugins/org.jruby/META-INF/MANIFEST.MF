@@ -6,6 +6,14 @@ Bundle-Version: 1.5.0.qualifier
 Bundle-ClassPath: jruby.jar
 Bundle-Vendor: jruby.org
 Export-Package: .,
+ builtin,
+ builtin.core_ext,
+ builtin.java,
+ builtin.javasupport,
+ builtin.javasupport.core_ext,
+ builtin.javasupport.proxy,
+ builtin.javasupport.utilities,
+ builtin.yaml,
  com.kenai.constantine,
  com.kenai.constantine.platform,
  com.kenai.constantine.platform.darwin,
@@ -133,10 +141,7 @@ Export-Package: .,
  org.jruby.util.func,
  org.jruby.util.io,
  org.jruby.util.string,
- org.jruby.util.unsafe,
- org.yecht,
- org.yecht.debug,
- org.yecht.ruby
+ org.jruby.util.unsafe
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Eclipse-BuddyPolicy: global
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.4.0"
