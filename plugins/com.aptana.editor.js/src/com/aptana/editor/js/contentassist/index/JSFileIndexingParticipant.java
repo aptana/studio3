@@ -152,7 +152,9 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 		{
 			System.out.println(varName);
 		}
+		for (String varName : queryHelper.getAccidentalGlobals(ast))
+		{
+			System.out.println(varName);
+		}
 	}
-
-	
 }

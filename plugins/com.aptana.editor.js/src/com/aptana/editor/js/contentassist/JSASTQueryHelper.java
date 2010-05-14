@@ -1,8 +1,10 @@
 package com.aptana.editor.js.contentassist;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.jaxen.JaxenException;
 import org.jaxen.XPath;
@@ -22,6 +24,44 @@ public class JSASTQueryHelper
 	}
 	
 	/**
+	 * declaredInScope
+	 * 
+	 * @param ast
+	 * @param name
+	 * @return
+	 */
+	public boolean declaredInScope(IParseNode ast, String name)
+	{
+		boolean result = false;
+		
+		try
+		{
+			XPath xpath = new ParseNodeXPath("ancestor::function/statements/var/declaration/identifier[position() = 1]");
+			Object list = xpath.evaluate(ast);
+			
+			if (list instanceof List<?>)
+			{
+				List<?> items = (List<?>) list;
+				
+				for (Object item : items)
+				{
+					if (name.equals(item.toString()))
+					{
+						result = true;
+						break;
+					}
+				}
+			}
+		}
+		catch (JaxenException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * getSymbolsInScope
 	 * 
 	 * @param ast
@@ -29,7 +69,7 @@ public class JSASTQueryHelper
 	 */
 	public List<String> getSymbolsInScope(IParseNode ast)
 	{
-		final List<String> result = new LinkedList<String>();
+		final Set<String> result = new HashSet<String>();
 		
 		this.processXPath(
 			"ancestor::function",
@@ -41,13 +81,22 @@ public class JSASTQueryHelper
 					{
 						JSFunctionNode function = (JSFunctionNode) item;
 						
-						result.addAll(Arrays.asList(function.getArgNames()));
+						// add args
+						for (IParseNode arg : function.getArgs())
+						{
+							result.add(arg.toString());
+						}
+						
+						// add vars
+						result.addAll(getGlobalDeclarations(function.getBody()));
 					}
 				}
 			}
 		);
 		
-		return result;
+		result.addAll(this.getAccidentalGlobals(ast));
+		
+		return new ArrayList<String>(result);
 	}
 	
 	/**
@@ -60,8 +109,10 @@ public class JSASTQueryHelper
 	{
 		final List<String> result = new LinkedList<String>();
 
+		// NOTE: we're using a relative path here so we can use this expression
+		// at the top-level of a file and for function bodies
 		this.processXPath(
-			"/var/declaration/identifier[position() = 1 and count(following-sibling::function) = 0]",
+			"var/declaration/identifier[position() = 1 and count(following-sibling::function) = 0]",
 			ast,
 			new ItemProcessor() {
 				public void process(Object item)
@@ -74,6 +125,39 @@ public class JSASTQueryHelper
 			}
 		);
 
+		return result;
+	}
+
+	/**
+	 * getAccidentalGlobals
+	 * 
+	 * @param ast
+	 * @return
+	 */
+	public List<String> getAccidentalGlobals(IParseNode ast)
+	{
+		final List<String> result = new LinkedList<String>();
+		
+		this.processXPath(
+			"//assign/identifier[position() = 1]",
+			ast,
+			new ItemProcessor() {
+				public void process(Object item)
+				{
+					if (item instanceof IParseNode)
+					{
+						IParseNode node = (IParseNode) item;
+						String name = node.toString();
+						
+						if (declaredInScope(node, name) == false)
+						{
+							result.add(name);
+						}
+					}
+				}
+			}
+		);
+		
 		return result;
 	}
 
