@@ -9,14 +9,14 @@ import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 
-public class JSContentAssistHelper
+public class JSIndexQueryHelper
 {
 	private JSIndexReader _reader;
 	
 	/**
 	 * JSContentAssistant
 	 */
-	public JSContentAssistHelper()
+	public JSIndexQueryHelper()
 	{
 		this._reader = new JSIndexReader();
 	}
