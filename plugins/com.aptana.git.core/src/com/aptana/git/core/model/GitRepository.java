@@ -78,86 +78,87 @@ public class GitRepository
 			// FIXME When actions are taken through our model/UI we end up causing multiple refreshes for index changes
 			// index appears to change on commit/stage/unstage/pull
 			// Add listener for changes in HEAD (i.e. switched branches), and index
-			fileWatcherIds.add(FileWatcher.addWatch(gitDirPath().toOSString(), IJNotify.FILE_ANY, false, new JNotifyAdapter()
-			{
-
-				private Set<String> filesToWatch;
-
-				@Override
-				public void fileRenamed(int wd, String rootPath, String oldName, String newName)
-				{
-					if (newName == null || !filesToWatch().contains(newName))
-						return;
-					if (newName.equals(HEAD))
-						checkForBranchChange();
-					else if (newName.equals(INDEX) || newName.equals(COMMIT_EDITMSG))
-						refreshIndex();
-				}
-
-				@Override
-				public void fileCreated(int wd, String rootPath, String name)
-				{
-					if (name != null && name.equals(INDEX))
-						refreshIndex();
-				}
-
-				@Override
-				public void fileDeleted(int wd, String rootPath, String name)
-				{
-					if (name != null && name.equals(INDEX))
-						refreshIndex();
-				}
-
-				private Set<String> filesToWatch()
-				{
-					if (filesToWatch == null)
+			fileWatcherIds.add(FileWatcher.addWatch(gitDirPath().toOSString(), IJNotify.FILE_ANY, false,
+					new JNotifyAdapter()
 					{
-						filesToWatch = new HashSet<String>();
-						filesToWatch.add(HEAD);
-						filesToWatch.add(INDEX);
-						filesToWatch.add(COMMIT_EDITMSG);
-					}
-					return filesToWatch;
-				}
 
-				@Override
-				public void fileModified(int wd, String rootPath, String name)
-				{
-					if (name == null || !filesToWatch().contains(name))
-						return;
-					if (name.equals(HEAD))
-						checkForBranchChange();
-					else if (name.equals(INDEX) || name.equals(COMMIT_EDITMSG))
-						refreshIndex();
-				}
+						private Set<String> filesToWatch;
 
-				// Do long running work in another thread/job so we don't tie up the jnotify locks!
-				private void refreshIndex()
-				{
-					index().refreshAsync();
-				}
-
-				protected void checkForBranchChange()
-				{
-					Job job = new Job("Checking for current branch switch") //$NON-NLS-1$
-					{
 						@Override
-						protected IStatus run(IProgressMonitor monitor)
+						public void fileRenamed(int wd, String rootPath, String oldName, String newName)
 						{
-							String oldBranchName = currentBranch.simpleRef().shortName();
-							_headRef = null;
-							readCurrentBranch();
-							String newBranchName = currentBranch.simpleRef().shortName();
-							if (oldBranchName.equals(newBranchName))
-								return Status.OK_STATUS;
-							fireBranchChangeEvent(oldBranchName, newBranchName);
-							return Status.OK_STATUS;
+							if (newName == null || !filesToWatch().contains(newName))
+								return;
+							if (newName.equals(HEAD))
+								checkForBranchChange();
+							else if (newName.equals(INDEX) || newName.equals(COMMIT_EDITMSG))
+								refreshIndex();
 						}
-					};
-					job.setSystem(true);
-					job.schedule();
-				}
-			}));
+
+						@Override
+						public void fileCreated(int wd, String rootPath, String name)
+						{
+							if (name != null && name.equals(INDEX))
+								refreshIndex();
+						}
+
+						@Override
+						public void fileDeleted(int wd, String rootPath, String name)
+						{
+							if (name != null && name.equals(INDEX))
+								refreshIndex();
+						}
+
+						private Set<String> filesToWatch()
+						{
+							if (filesToWatch == null)
+							{
+								filesToWatch = new HashSet<String>();
+								filesToWatch.add(HEAD);
+								filesToWatch.add(INDEX);
+								filesToWatch.add(COMMIT_EDITMSG);
+							}
+							return filesToWatch;
+						}
+
+						@Override
+						public void fileModified(int wd, String rootPath, String name)
+						{
+							if (name == null || !filesToWatch().contains(name))
+								return;
+							if (name.equals(HEAD))
+								checkForBranchChange();
+							else if (name.equals(INDEX) || name.equals(COMMIT_EDITMSG))
+								refreshIndex();
+						}
+
+						// Do long running work in another thread/job so we don't tie up the jnotify locks!
+						private void refreshIndex()
+						{
+							index().refreshAsync();
+						}
+
+						protected void checkForBranchChange()
+						{
+							Job job = new Job("Checking for current branch switch") //$NON-NLS-1$
+							{
+								@Override
+								protected IStatus run(IProgressMonitor monitor)
+								{
+									String oldBranchName = currentBranch.simpleRef().shortName();
+									_headRef = null;
+									readCurrentBranch();
+									String newBranchName = currentBranch.simpleRef().shortName();
+									if (oldBranchName.equals(newBranchName))
+										return Status.OK_STATUS;
+									fireBranchChangeEvent(oldBranchName, newBranchName);
+									return Status.OK_STATUS;
+								}
+							};
+							job.setSystem(true);
+							job.schedule();
+						}
+					}));
 
 			// Add listener for remotes
 			if (gitFile(GitRef.REFS_REMOTES).isDirectory())
@@ -399,16 +400,53 @@ public class GitRepository
 		return null;
 	}
 
+	/**
+	 * Returns the set of local branches that this repo knows about.
+	 * 
+	 * @return
+	 */
 	public Set<String> localBranches()
 	{
 		return branches(GitRef.TYPE.HEAD);
 	}
 
+	/**
+	 * Returns the set of remote branches that this repo knows about.
+	 * 
+	 * @return
+	 */
 	public Set<String> remoteBranches()
 	{
 		return branches(GitRef.TYPE.REMOTE);
 	}
 
+	/**
+	 * Returns the set of remotes attached to this repository. 'git remote'
+	 * 
+	 * @return
+	 */
+	public Set<String> remotes()
+	{
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "remote"); //$NON-NLS-1$
+		int exitValue = result.keySet().iterator().next();
+		if (exitValue != 0)
+			return Collections.emptySet();
+		String output = result.values().iterator().next();
+		String[] lines = output.split("\r\n|\r|\n"); //$NON-NLS-1$
+		Set<String> set = new HashSet<String>();
+		for (String line : lines)
+		{
+			set.add(line);
+		}
+		return set;
+	}
+
+	/**
+	 * Returns a sorted set of local and remote branches known to this repo. Orders local branches before remote
+	 * branches.
+	 * 
+	 * @return
+	 */
 	public Set<String> allBranches()
 	{
 		// Return local branches first!
@@ -456,6 +494,13 @@ public class GitRepository
 		return allBranches;
 	}
 
+	/**
+	 * Switches the current working branch on the repo. 'git checkout <branchName>'
+	 * 
+	 * @param branchName
+	 *            the new branch to use as the working branch
+	 * @return true if the switch happened. false otherwise.
+	 */
 	public boolean switchBranch(String branchName)
 	{
 		if (branchName == null)
@@ -595,6 +640,11 @@ public class GitRepository
 		return currentBranch.simpleRef().shortName();
 	}
 
+	/**
+	 * Return the model encapsulating the index for this repo.
+	 * 
+	 * @return
+	 */
 	public synchronized GitIndex index()
 	{
 		if (index == null)
@@ -683,7 +733,8 @@ public class GitRepository
 		env.put(GitEnv.GIT_INDEX_FILE, gitFile(INDEX).getAbsolutePath());
 
 		int ret = 1;
-		Map<Integer, String> result = ProcessUtil.runInBackground(hookPath.toOSString(), workingDirectory(), env, arguments);
+		Map<Integer, String> result = ProcessUtil.runInBackground(hookPath.toOSString(), workingDirectory(), env,
+				arguments);
 		ret = result.keySet().iterator().next();
 		return ret == 0;
 	}
@@ -735,6 +786,10 @@ public class GitRepository
 		hasChanged = true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -744,6 +799,10 @@ public class GitRepository
 		return fileURL.getPath().equals(other.fileURL.getPath());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode()
 	{
@@ -783,6 +842,14 @@ public class GitRepository
 		return index().commitsBetween(GitRef.REFS_HEADS + branchName, remote.ref());
 	}
 
+	/**
+	 * Tries to calculate if a branch that has a corresponding remote branch has a different SHA as the tree/head. TODO
+	 * This is pretty inefficient if we loop over branches calling this. We should do one single ls-remote to grab all
+	 * remote SHAs at once rather than making a trip for each branch.
+	 * 
+	 * @param branchName
+	 * @return
+	 */
 	@SuppressWarnings("nls")
 	public boolean shouldPull(String branchName)
 	{
@@ -858,6 +925,11 @@ public class GitRepository
 		return GitRef.refFromString(GitRef.REFS_REMOTES + remoteSubname + "/" + branchName); //$NON-NLS-1$
 	}
 
+	/**
+	 * Returns the set of URLs for all remotes.
+	 * 
+	 * @return
+	 */
 	public Set<String> remoteURLs()
 	{
 		Set<String> remotes = new HashSet<String>();
@@ -970,7 +1042,8 @@ public class GitRepository
 
 	public IStatus moveFile(IPath source, IPath dest)
 	{
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "mv", source.toOSString(), dest.toOSString()); //$NON-NLS-1$
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(),
+				"mv", source.toOSString(), dest.toOSString()); //$NON-NLS-1$
 		int exitCode = result.keySet().iterator().next();
 		if (exitCode != 0)
 		{
