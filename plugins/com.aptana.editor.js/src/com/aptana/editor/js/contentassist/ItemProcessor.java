@@ -1,4 +1,4 @@
-package com.aptana.editor.js.contentassist.index;
+package com.aptana.editor.js.contentassist;
 
 public interface ItemProcessor
 {
