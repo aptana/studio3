@@ -32,6 +32,8 @@ public class ParseBaseNode extends Node implements IParseNode
 		}
 	}
 
+	protected static final IParseNodeAttribute[] NO_ATTRIBUTES = new IParseNodeAttribute[0];
+	
 	private IParseNode[] fChildren;
 	private IParseNode fParent;
 	private int fChildrenCount;
@@ -139,6 +141,16 @@ public class ParseBaseNode extends Node implements IParseNode
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.IParseNode#getAttributes()
+	 */
+	@Override
+	public IParseNodeAttribute[] getAttributes()
+	{
+		return NO_ATTRIBUTES;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.IParseNode#getChild(int)
 	 */
 	@Override
@@ -151,6 +163,31 @@ public class ParseBaseNode extends Node implements IParseNode
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.IParseNode#getChildIndex()
+	 */
+	@Override
+	public int getChildIndex()
+	{
+		IParseNode parent = getParent();
+		int result = 0;
+		
+		if (parent != null)
+		{
+			for (int i = 0; i < parent.getChildrenCount(); i++)
+			{
+				if (parent.getChild(i) == this)
+				{
+					result = i;
+					break;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.IParseNode#getChildren()
@@ -176,6 +213,16 @@ public class ParseBaseNode extends Node implements IParseNode
 		return fChildrenCount;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.IParseNode#getElementName()
+	 */
+	@Override
+	public String getElementName()
+	{
+		return this.getClass().getSimpleName();
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.lexer.IRange#getEndingOffset()
@@ -246,7 +293,7 @@ public class ParseBaseNode extends Node implements IParseNode
 		{
 			// default to this node being the match
 			result = this;
-			
+
 			// but check the children in case one of them contains the offset
 			for (IParseNode child : getChildren())
 			{
