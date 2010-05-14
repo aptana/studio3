@@ -581,7 +581,7 @@ public abstract class BaseFTPConnectionFileManager implements IConnectionFileMan
 		}
 	}
 	
-	private void testOrConnect(IProgressMonitor monitor) throws CoreException {
+	protected void testOrConnect(IProgressMonitor monitor) throws CoreException {
 		Policy.checkCanceled(monitor);
 		testConnection();
 		if (!isConnected()) {
