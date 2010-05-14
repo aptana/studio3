@@ -35,6 +35,7 @@ public class ParseBaseNode extends Node implements IParseNode
 		}
 	}
 
+	protected static final IParseNode[] NO_CHILDREN = new IParseNode[0];
 	protected static final IParseNodeAttribute[] NO_ATTRIBUTES = new IParseNodeAttribute[0];
 
 	private IParseNode[] fChildren;
@@ -423,13 +424,13 @@ public class ParseBaseNode extends Node implements IParseNode
 		return new Iterator<IParseNode>()
 		{
 			private int index = 0;
-			
+
 			@Override
 			public void remove()
 			{
 				throw new UnsupportedOperationException();
 			}
-			
+
 			@Override
 			public IParseNode next()
 			{
@@ -437,10 +438,10 @@ public class ParseBaseNode extends Node implements IParseNode
 				{
 					throw new NoSuchElementException();
 				}
-				
+
 				return fChildren[index++];
 			}
-			
+
 			@Override
 			public boolean hasNext()
 			{
