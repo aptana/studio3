@@ -371,6 +371,28 @@ public class ParseBaseNode extends Node implements IParseNode
 	}
 
 	/**
+	 * Set a child node at a specific index, <b>replacing</b> any other child that exists in that index.
+	 * 
+	 * @param index
+	 * @param child
+	 * @throws IndexOutOfBoundsException
+	 *             in case the given index is negative, bigger / equal to the children count.
+	 * @see #getChildrenCount()
+	 */
+	public void setChildAt(int index, IParseNode child) throws IndexOutOfBoundsException
+	{
+		if (index >= fChildrenCount)
+		{
+			throw new IndexOutOfBoundsException(index + " >= " + fChildrenCount); //$NON-NLS-1$
+		}
+		fChildren[index] = child;
+		if (child instanceof ParseBaseNode)
+		{
+			((ParseBaseNode) child).setParent(this);
+		}
+	}
+
+	/**
 	 * setChildren
 	 * 
 	 * @param children
