@@ -1,5 +1,8 @@
 package com.aptana.parsing.ast;
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 import beaver.spec.ast.Node;
 import beaver.spec.ast.TreeWalker;
 
@@ -408,5 +411,41 @@ public class ParseBaseNode extends Node implements IParseNode
 			}
 		}
 		return text.toString();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Iterable#iterator()
+	 */
+	@Override
+	public Iterator<IParseNode> iterator()
+	{
+		return new Iterator<IParseNode>()
+		{
+			private int index = 0;
+			
+			@Override
+			public void remove()
+			{
+				throw new UnsupportedOperationException();
+			}
+			
+			@Override
+			public IParseNode next()
+			{
+				if (hasNext() == false)
+				{
+					throw new NoSuchElementException();
+				}
+				
+				return fChildren[index++];
+			}
+			
+			@Override
+			public boolean hasNext()
+			{
+				return fChildren != null && index < fChildrenCount;
+			}
+		};
 	}
 }
