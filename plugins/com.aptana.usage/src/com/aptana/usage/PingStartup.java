@@ -69,7 +69,7 @@ public class PingStartup implements IStartup
 {
 
 	private static final String ENCODING = "UTF-8"; //$NON-NLS-1$
-	private static final String UPDATE_URL = "https://ping.aptana.com/ping.php"; //$NON-NLS-1$
+	private static final String UPDATE_URL = "http://ping.aptana.com/ping.php"; //$NON-NLS-1$
 	private static final int READ_TIMEOUT = 15 * 60 * 1000; // 15 minutes in milliseconds
 	private static final long TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
