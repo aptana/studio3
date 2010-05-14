@@ -75,7 +75,7 @@ public enum HTMLTokenType implements ITypePredicate
 	{
 		return this._index;
 	}
-	
+
 	/**
 	 * getName
 	 * 

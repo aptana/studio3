@@ -73,7 +73,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		locationMap.put(HTMLSourceConfiguration.HTML_SCRIPT, Location.IN_OPEN_TAG);
 		locationMap.put(HTMLSourceConfiguration.HTML_STYLE, Location.IN_OPEN_TAG);
 		locationMap.put(HTMLSourceConfiguration.HTML_TAG, Location.IN_OPEN_TAG);
-		
+
 		locationMap.put(JSSourceConfiguration.DEFAULT, Location.IN_TEXT);
 		locationMap.put(CSSSourceConfiguration.DEFAULT, Location.IN_TEXT);
 		locationMap.put(IDocument.DEFAULT_CONTENT_TYPE, Location.IN_TEXT);
@@ -206,7 +206,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				case EQUAL:
 					this._replaceRange = new Range(offset, offset - 1);
 					break;
-					
+
 				default:
 					break;
 			}
@@ -266,7 +266,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				int index = lexemeProvider.getLexemeCeilingIndex(offset);
 
 				this._replaceRange = this._currentLexeme = lexemeProvider.getLexeme(index - 1);
-				
+
 				if (this._currentLexeme.getType() == HTMLTokenType.TAG_START)
 				{
 					this._replaceRange = this._currentLexeme = null;
@@ -374,7 +374,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		this.addProposal(proposals, name, image, description, userAgents, HTMLIndexConstants.CORE, offset);
 	}
-	
+
 	/**
 	 * addProposal
 	 * 
@@ -384,7 +384,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param userAgents
 	 * @param offset
 	 */
-	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, String fileLocation, int offset)
+	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, String fileLocation,
+		int offset)
 	{
 		int length = name.length();
 		String displayName = name;
@@ -419,7 +420,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		// tokenize the current document
 		IDocument document = viewer.getDocument();
-		
+
 		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
 
 		// store a reference to the lexeme at the current position
@@ -484,10 +485,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	LexemeProvider<HTMLTokenType> createLexemeProvider(IDocument document, int offset)
 	{
 		int documentLength = document.getLength();
-		
+
 		// account for last position returning an empty IDocument default partition
 		int lexemeProviderOffset = (offset >= documentLength) ? documentLength - 1 : offset;
-		
+
 		return new LexemeProvider<HTMLTokenType>(document, lexemeProviderOffset, new HTMLScopeScanner())
 		{
 			@Override
@@ -497,7 +498,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			}
 		};
 	}
-	
+
 	/**
 	 * getAttributeName
 	 * 
@@ -591,14 +592,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
-	 * This method looks at the partition that contains the specified offset and
-	 * from that partition type determines if the offset is:
-	 * 
-	 * 1. Within an open tag
-	 * 2. Within a close tag
-	 * 3. Within a text area
-	 * 
-	 * If the partition type is unrecognized, the ERROR location will be returned.
+	 * This method looks at the partition that contains the specified offset and from that partition type determines if
+	 * the offset is: 1. Within an open tag 2. Within a close tag 3. Within a text area If the partition type is
+	 * unrecognized, the ERROR location will be returned.
 	 * 
 	 * @param lexemeProvider
 	 * @param offset
@@ -638,7 +634,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 							if (firstLexeme.getStartingOffset() < offset) // && offset <= lastLexeme.getEndingOffset())
 							{
 								Lexeme<HTMLTokenType> lastLexeme = lexemeProvider.getLastLexeme();
-								
+
 								if ("<".equals(firstLexeme.getText())) //$NON-NLS-1$
 								{
 									switch (lastLexeme.getType())
@@ -650,7 +646,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 												result = Location.IN_OPEN_TAG;
 											}
 											break;
-											
+
 										default:
 											result = Location.IN_OPEN_TAG;
 											break;
@@ -667,7 +663,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 												result = Location.IN_CLOSE_TAG;
 											}
 											break;
-											
+
 										default:
 											result = Location.IN_CLOSE_TAG;
 											break;
@@ -694,14 +690,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
-	 * This method further refines a location within an open tag. The following
-	 * locations types are identified:
-	 * 
-	 * 1. In an element name
-	 * 2. In an attribute name
-	 * 3. In an attribute value
-	 * 
-	 * If the location cannot be determined, the ERROR location is returned
+	 * This method further refines a location within an open tag. The following locations types are identified: 1. In an
+	 * element name 2. In an attribute name 3. In an attribute value If the location cannot be determined, the ERROR
+	 * location is returned
 	 * 
 	 * @param lexemeProvider
 	 * @param offset
@@ -712,12 +703,12 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		Location result = Location.ERROR;
 
 		int index = lexemeProvider.getLexemeIndex(offset);
-		
+
 		if (index < 0)
 		{
 			int candidateIndex = lexemeProvider.getLexemeFloorIndex(offset);
 			Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexeme(candidateIndex);
-			
+
 			if (lexeme != null && lexeme.getEndingOffset() == offset)
 			{
 				index = candidateIndex;
@@ -727,7 +718,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				result = Location.IN_ATTRIBUTE_NAME;
 			}
 		}
-		
+
 		while (index >= 0)
 		{
 			Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexeme(index);
@@ -739,7 +730,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				case ID:
 					result = Location.IN_ATTRIBUTE_NAME;
 					break;
-					
+
 				case EQUAL:
 					result = (offset <= lexeme.getStartingOffset()) ? Location.IN_ATTRIBUTE_NAME : Location.IN_ATTRIBUTE_VALUE;
 					break;

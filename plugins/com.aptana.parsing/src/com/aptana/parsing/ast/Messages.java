@@ -54,38 +54,11 @@ public final class Messages extends NLS
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 	
-	/**
-	 * ParseNodeAttribute_Undefined_Parent
-	 */
 	public static String ParseNodeAttribute_Undefined_Parent;
-	
-	/**
-	 * ParseNodeAttribute_Undefined_Name
-	 */
 	public static String ParseNodeAttribute_Undefined_Name;
-	
-	/**
-	 * ParseNodeAttribute_Undefined_Value
-	 */
 	public static String ParseNodeAttribute_Undefined_Value;
-
-	/**
-	 * ParseNodeBase_Undefined_Child
-	 */
 	public static String ParseNodeBase_Undefined_Child;
-
-	/**
-	 * ParseNodeFactory_Undefined_Parse_State
-	 */
 	public static String ParseNodeFactory_Undefined_Parse_State;
-
-	/**
-	 * ParseNodeWalkerBase_Undefined_Node
-	 */
 	public static String ParseNodeWalkerBase_Undefined_Node;
-
-	/**
-	 * ParseNodeWalkerGroup_Undefined_Node_Processor
-	 */
 	public static String ParseNodeWalkerGroup_Undefined_Node_Processor;
 }

@@ -10,14 +10,14 @@ public interface IParseNode extends ILexeme, ILanguageNode
 	 * @param child
 	 */
 	public void addChild(IParseNode child);
-	
+
 	/**
 	 * getAttributes
 	 * 
 	 * @return
 	 */
 	public IParseNodeAttribute[] getAttributes();
-	
+
 	/**
 	 * getChild
 	 * 
@@ -46,14 +46,14 @@ public interface IParseNode extends ILexeme, ILanguageNode
 	 * @return
 	 */
 	public int getChildrenCount();
-	
+
 	/**
 	 * getElementName
 	 * 
 	 * @return
 	 */
 	public String getElementName();
-	
+
 	/**
 	 * getIndex
 	 * 

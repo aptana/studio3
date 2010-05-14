@@ -36,13 +36,13 @@ class LocationRange
 	public final Location location;
 	public final int startingOffset;
 	public final int endingOffset;
-	
+
 	public LocationRange(Location location, int offset)
 	{
 		this.location = location;
 		this.startingOffset = this.endingOffset = offset;
 	}
-	
+
 	public LocationRange(Location location, int startingOffset, int endingOffset)
 	{
 		this.location = location;

@@ -85,8 +85,6 @@ public class ParseNodeNavigator extends DefaultNavigator
 	 */
 	public Iterator<?> getChildAxisIterator(Object contextNode) throws UnsupportedAxisException
 	{
-		// System.out.println("Get child axis iterator for: " + ((IParseNode) contextNode).getSource());
-
 		if (contextNode instanceof IParseNode)
 		{
 			return new ParseNodeIterator((IParseNode) contextNode)
@@ -158,8 +156,6 @@ public class ParseNodeNavigator extends DefaultNavigator
 	 */
 	public String getElementNamespaceUri(Object element)
 	{
-		// System.out.println("getElementNamespaceUri");
-
 		return null;
 	}
 
@@ -168,8 +164,6 @@ public class ParseNodeNavigator extends DefaultNavigator
 	 */
 	public String getElementName(Object element)
 	{
-		// System.out.println("getElementName: " + ((IParseNode) element).getName());
-
 		return ((IParseNode) element).getElementName();
 	}
 
@@ -178,8 +172,6 @@ public class ParseNodeNavigator extends DefaultNavigator
 	 */
 	public String getElementQName(Object element)
 	{
-		// System.out.println("getElementQName");
-
 		return null;
 	}
 
@@ -188,8 +180,6 @@ public class ParseNodeNavigator extends DefaultNavigator
 	 */
 	public String getAttributeNamespaceUri(Object attr)
 	{
-		// System.out.println("getAttributeNamespaceUri");
-
 		return null;
 	}
 
@@ -213,8 +203,6 @@ public class ParseNodeNavigator extends DefaultNavigator
 	 */
 	public String getAttributeQName(Object attr)
 	{
-		// System.out.println("getAttributeQName");
-
 		return null;
 	}
 
@@ -223,8 +211,6 @@ public class ParseNodeNavigator extends DefaultNavigator
 	 */
 	public boolean isDocument(Object object)
 	{
-		// System.out.println("isDocument");
-
 		return false;
 	}
 
@@ -249,8 +235,6 @@ public class ParseNodeNavigator extends DefaultNavigator
 	 */
 	public boolean isNamespace(Object object)
 	{
-		// System.out.println("isNamespace: " + object);
-
 		return false;
 	}
 
@@ -259,8 +243,6 @@ public class ParseNodeNavigator extends DefaultNavigator
 	 */
 	public boolean isComment(Object object)
 	{
-		// System.out.println("isComment: " + object);
-
 		return false;
 	}
 
@@ -277,8 +259,6 @@ public class ParseNodeNavigator extends DefaultNavigator
 	 */
 	public boolean isProcessingInstruction(Object object)
 	{
-		// System.out.println("isProcessingInstruction: " + object);
-
 		return false;
 	}
 
@@ -287,8 +267,6 @@ public class ParseNodeNavigator extends DefaultNavigator
 	 */
 	public String getCommentStringValue(Object comment)
 	{
-		// System.out.println("getCommentStringValue");
-
 		return null;
 	}
 
@@ -297,8 +275,6 @@ public class ParseNodeNavigator extends DefaultNavigator
 	 */
 	public String getElementStringValue(Object element)
 	{
-		// System.out.println("getElementStringValue");
-
 		return null;
 	}
 
@@ -322,8 +298,6 @@ public class ParseNodeNavigator extends DefaultNavigator
 	 */
 	public String getNamespaceStringValue(Object ns)
 	{
-		// System.out.println("getNamespaceStringValue");
-
 		return null;
 	}
 
@@ -362,8 +336,6 @@ public class ParseNodeNavigator extends DefaultNavigator
 	 */
 	public String getNamespacePrefix(Object ns)
 	{
-		// System.out.println("getNamespacePrefix");
-
 		return null;
 	}
 
@@ -372,8 +344,6 @@ public class ParseNodeNavigator extends DefaultNavigator
 	 */
 	public XPath parseXPath(String xpath) throws SAXPathException
 	{
-		// System.out.println("parseXPath");
-
 		return null;
 	}
 }

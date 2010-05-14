@@ -24,7 +24,7 @@ public class Range implements IRange
 	@Override
 	public boolean contains(int offset)
 	{
-		return getStartingOffset() <= offset && offset < getEndingOffset(); 
+		return getStartingOffset() <= offset && offset < getEndingOffset();
 	}
 
 	/*

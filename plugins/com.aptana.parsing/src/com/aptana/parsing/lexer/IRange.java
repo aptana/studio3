@@ -9,7 +9,7 @@ public interface IRange
 	 * @return
 	 */
 	boolean contains(int offset);
-	
+
 	/**
 	 * Gets the starting offset for this range.
 	 * 
