@@ -32,7 +32,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 {
 	private static enum Location
 	{
-		ERROR
+		ERROR, IN_PROPERTY_NAME, IN_VARIABLE_NAME
 	};
 
 	private static final Image JS_FUNCTION = Activator.getImage("/icons/js_function.gif"); //$NON-NLS-1$
@@ -162,12 +162,18 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			// first step is to determine where we are
 			Location location = this.getLocation(lexemeProvider, offset);
 	
-			
 			switch (location)
 			{
+				case IN_PROPERTY_NAME:
+					System.out.println("Property");
+					break;
+					
+				case IN_VARIABLE_NAME:
+					System.out.println("Variable");
+					break;
+					
 				default:
-					// TEMP: for debugging
-					this.addGlobals(result, offset);
+					System.out.println("Location = " + location);
 					break;
 			}
 	
@@ -225,6 +231,75 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private Location getLocation(LexemeProvider<JSTokenType> lexemeProvider, int offset)
 	{
-		return Location.ERROR;
+		Location result = Location.ERROR;
+		int index = lexemeProvider.getLexemeIndex(offset);
+		
+		if (index < 0)
+		{
+			int candidateIndex = lexemeProvider.getLexemeFloorIndex(offset);
+			Lexeme<JSTokenType> lexeme = lexemeProvider.getLexeme(candidateIndex);
+			
+			if (lexeme != null && lexeme.getEndingOffset() == offset)
+			{
+				index = candidateIndex;
+			}
+		}
+		
+		if (index >= 0)
+		{
+			Lexeme<JSTokenType> lexeme = lexemeProvider.getLexeme(index);
+			
+			switch (lexeme.getType())
+			{
+				case DOT:
+					result = Location.IN_PROPERTY_NAME;
+					break;
+					
+				case SEMICOLON:
+					if (index > 0)
+					{
+						Lexeme<JSTokenType> previousLexeme = lexemeProvider.getLexeme(index - 1);
+						
+						switch (previousLexeme.getType())
+						{
+							case SOURCE:
+								result = Location.IN_VARIABLE_NAME;
+								break;
+								
+							default:
+								break;
+						}
+					}
+					break;
+					
+				case SOURCE:
+					if (index > 0)
+					{
+						Lexeme<JSTokenType> previousLexeme = lexemeProvider.getLexeme(index - 1);
+						
+						switch (previousLexeme.getType())
+						{
+							case DOT:
+								result = Location.IN_PROPERTY_NAME;
+								break;
+								
+							default:
+								result = Location.IN_VARIABLE_NAME;
+								break;
+						}
+					}
+					else
+					{
+						result = Location.IN_VARIABLE_NAME;
+					}
+					break;
+					
+				default:
+					break;
+			}
+				
+		}
+		
+		return result;
 	}
 }
