@@ -81,6 +81,52 @@ public class ParseNodeNavigator extends DefaultNavigator
 	}
 
 	/**
+	 * @see org.jaxen.Navigator#getAttributeName(java.lang.Object)
+	 */
+	public String getAttributeName(Object attr)
+	{
+		if (isAttribute(attr))
+		{
+			return ((IParseNodeAttribute) attr).getName();
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	/**
+	 * @see org.jaxen.Navigator#getAttributeNamespaceUri(java.lang.Object)
+	 */
+	public String getAttributeNamespaceUri(Object attr)
+	{
+		return null;
+	}
+
+	/**
+	 * @see org.jaxen.Navigator#getAttributeQName(java.lang.Object)
+	 */
+	public String getAttributeQName(Object attr)
+	{
+		return null;
+	}
+
+	/**
+	 * @see org.jaxen.Navigator#getAttributeStringValue(java.lang.Object)
+	 */
+	public String getAttributeStringValue(Object attr)
+	{
+		if (isAttribute(attr))
+		{
+			return ((IParseNodeAttribute) attr).getValue();
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	/**
 	 * @see org.jaxen.DefaultNavigator#getChildAxisIterator(java.lang.Object)
 	 */
 	public Iterator<?> getChildAxisIterator(Object contextNode) throws UnsupportedAxisException
@@ -106,10 +152,6 @@ public class ParseNodeNavigator extends DefaultNavigator
 		{
 			return new Iterator<Object>()
 			{
-				public void remove()
-				{
-				}
-
 				public boolean hasNext()
 				{
 					return false;
@@ -119,13 +161,21 @@ public class ParseNodeNavigator extends DefaultNavigator
 				{
 					return null;
 				}
+
+				public void remove()
+				{
+				}
 			};
 		}
 	}
 
-	/*
-	 * Methods
+	/**
+	 * @see org.jaxen.Navigator#getCommentStringValue(java.lang.Object)
 	 */
+	public String getCommentStringValue(Object comment)
+	{
+		return null;
+	}
 
 	/**
 	 * @see org.jaxen.DefaultNavigator#getDocumentNode(java.lang.Object)
@@ -147,9 +197,13 @@ public class ParseNodeNavigator extends DefaultNavigator
 		return result;
 	}
 
-	/*
-	 * Necessary overrides
+	/**
+	 * @see org.jaxen.Navigator#getElementName(java.lang.Object)
 	 */
+	public String getElementName(Object element)
+	{
+		return ((IParseNode) element).getElementName();
+	}
 
 	/**
 	 * @see org.jaxen.Navigator#getElementNamespaceUri(java.lang.Object)
@@ -160,112 +214,9 @@ public class ParseNodeNavigator extends DefaultNavigator
 	}
 
 	/**
-	 * @see org.jaxen.Navigator#getElementName(java.lang.Object)
-	 */
-	public String getElementName(Object element)
-	{
-		return ((IParseNode) element).getElementName();
-	}
-
-	/**
 	 * @see org.jaxen.Navigator#getElementQName(java.lang.Object)
 	 */
 	public String getElementQName(Object element)
-	{
-		return null;
-	}
-
-	/**
-	 * @see org.jaxen.Navigator#getAttributeNamespaceUri(java.lang.Object)
-	 */
-	public String getAttributeNamespaceUri(Object attr)
-	{
-		return null;
-	}
-
-	/**
-	 * @see org.jaxen.Navigator#getAttributeName(java.lang.Object)
-	 */
-	public String getAttributeName(Object attr)
-	{
-		if (isAttribute(attr))
-		{
-			return ((IParseNodeAttribute) attr).getName();
-		}
-		else
-		{
-			return null;
-		}
-	}
-
-	/**
-	 * @see org.jaxen.Navigator#getAttributeQName(java.lang.Object)
-	 */
-	public String getAttributeQName(Object attr)
-	{
-		return null;
-	}
-
-	/**
-	 * @see org.jaxen.Navigator#isDocument(java.lang.Object)
-	 */
-	public boolean isDocument(Object object)
-	{
-		return false;
-	}
-
-	/**
-	 * @see org.jaxen.Navigator#isElement(java.lang.Object)
-	 */
-	public boolean isElement(Object object)
-	{
-		return (object instanceof IParseNode);
-	}
-
-	/**
-	 * @see org.jaxen.Navigator#isAttribute(java.lang.Object)
-	 */
-	public boolean isAttribute(Object object)
-	{
-		return (object instanceof IParseNodeAttribute);
-	}
-
-	/**
-	 * @see org.jaxen.Navigator#isNamespace(java.lang.Object)
-	 */
-	public boolean isNamespace(Object object)
-	{
-		return false;
-	}
-
-	/**
-	 * @see org.jaxen.Navigator#isComment(java.lang.Object)
-	 */
-	public boolean isComment(Object object)
-	{
-		return false;
-	}
-
-	/**
-	 * @see org.jaxen.Navigator#isText(java.lang.Object)
-	 */
-	public boolean isText(Object object)
-	{
-		return (object instanceof String);
-	}
-
-	/**
-	 * @see org.jaxen.Navigator#isProcessingInstruction(java.lang.Object)
-	 */
-	public boolean isProcessingInstruction(Object object)
-	{
-		return false;
-	}
-
-	/**
-	 * @see org.jaxen.Navigator#getCommentStringValue(java.lang.Object)
-	 */
-	public String getCommentStringValue(Object comment)
 	{
 		return null;
 	}
@@ -279,18 +230,11 @@ public class ParseNodeNavigator extends DefaultNavigator
 	}
 
 	/**
-	 * @see org.jaxen.Navigator#getAttributeStringValue(java.lang.Object)
+	 * @see org.jaxen.Navigator#getNamespacePrefix(java.lang.Object)
 	 */
-	public String getAttributeStringValue(Object attr)
+	public String getNamespacePrefix(Object ns)
 	{
-		if (isAttribute(attr))
-		{
-			return ((IParseNodeAttribute) attr).getValue();
-		}
-		else
-		{
-			return null;
-		}
+		return null;
 	}
 
 	/**
@@ -332,11 +276,59 @@ public class ParseNodeNavigator extends DefaultNavigator
 	}
 
 	/**
-	 * @see org.jaxen.Navigator#getNamespacePrefix(java.lang.Object)
+	 * @see org.jaxen.Navigator#isAttribute(java.lang.Object)
 	 */
-	public String getNamespacePrefix(Object ns)
+	public boolean isAttribute(Object object)
 	{
-		return null;
+		return (object instanceof IParseNodeAttribute);
+	}
+
+	/**
+	 * @see org.jaxen.Navigator#isComment(java.lang.Object)
+	 */
+	public boolean isComment(Object object)
+	{
+		return false;
+	}
+
+	/**
+	 * @see org.jaxen.Navigator#isDocument(java.lang.Object)
+	 */
+	public boolean isDocument(Object object)
+	{
+		return false;
+	}
+
+	/**
+	 * @see org.jaxen.Navigator#isElement(java.lang.Object)
+	 */
+	public boolean isElement(Object object)
+	{
+		return (object instanceof IParseNode);
+	}
+
+	/**
+	 * @see org.jaxen.Navigator#isNamespace(java.lang.Object)
+	 */
+	public boolean isNamespace(Object object)
+	{
+		return false;
+	}
+
+	/**
+	 * @see org.jaxen.Navigator#isProcessingInstruction(java.lang.Object)
+	 */
+	public boolean isProcessingInstruction(Object object)
+	{
+		return false;
+	}
+
+	/**
+	 * @see org.jaxen.Navigator#isText(java.lang.Object)
+	 */
+	public boolean isText(Object object)
+	{
+		return (object instanceof String);
 	}
 
 	/**
