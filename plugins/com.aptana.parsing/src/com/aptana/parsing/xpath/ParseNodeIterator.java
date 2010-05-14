@@ -32,36 +32,80 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js.contentassist.index;
+package com.aptana.parsing.xpath;
 
-import org.eclipse.osgi.util.NLS;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+import com.aptana.parsing.ast.IParseNode;
 
 /**
- * @author Robin
+ * @author Kevin Lindsey
  */
-public final class Messages extends NLS
+public abstract class ParseNodeIterator implements Iterator<Object>
 {
-	private static final String BUNDLE_NAME = "com.aptana.ide.editor.scriptdoc.parsing.reader.messages"; //$NON-NLS-1$
+	private IParseNode _node;
 
-	private Messages()
+	/**
+	 * ParseNodeIterator
+	 * 
+	 * @param node
+	 */
+	public ParseNodeIterator(IParseNode node)
 	{
+		this._node = this.getFirstNode(node);
 	}
 
-	static
+	/**
+	 * @see java.util.Iterator#remove()
+	 */
+	public void remove()
 	{
-		// initialize resource bundle
-		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+		throw new UnsupportedOperationException();
 	}
 
-	public static String JSMetadataReader_Parse_Error;
-	public static String JSMetadataReader_Parse_IO_Error;
-	public static String JSMetadataReader_SAX_Error;
-	public static String NativeObjectsReader_UnalbeToLocateXMLFile;
-	public static String NativeObjectsReader_IOError;
-	public static String NativeObjectsReader2_ERR_Loading_scriptdoc_file;
-	public static String ScriptDocReader_SchemaError;
-	public static String ScriptDocReader_IOError;
-	public static String ScriptDocReader_XMLLocationError;
-	public static String ScriptDocReader_ParamNullError;
-	public static String ScriptDocReader_PropertyNullError;
+	/**
+	 * @see java.util.Iterator#hasNext()
+	 */
+	public boolean hasNext()
+	{
+		return (this._node != null);
+	}
+
+	/**
+	 * @see java.util.Iterator#next()
+	 */
+	public Object next()
+	{
+		IParseNode result = _node;
+
+		if (this._node == null)
+		{
+			throw new NoSuchElementException();
+		}
+		else
+		{
+			this._node = this.getNextNode(this._node);
+		}
+
+		// System.out.println("next = " + result.getName() + ", " + ((IParseNode) result).getSource());
+
+		return result;
+	}
+
+	/**
+	 * getFirstNode
+	 * 
+	 * @param node
+	 * @return IParseNode
+	 */
+	protected abstract IParseNode getFirstNode(IParseNode node);
+
+	/**
+	 * getNextNode
+	 * 
+	 * @param node
+	 * @return IParseNode
+	 */
+	protected abstract IParseNode getNextNode(IParseNode node);
 }

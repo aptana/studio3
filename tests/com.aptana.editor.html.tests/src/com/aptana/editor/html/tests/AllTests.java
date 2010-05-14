@@ -27,6 +27,7 @@ public class AllTests
 		suite.addTestSuite(HTMLEditorTest.class);
 		suite.addTestSuite(OpenTagCloserTest.class);
 		suite.addTest(com.aptana.editor.html.outline.AllTests.suite());
+		suite.addTest(com.aptana.editor.html.contentassist.AllTests.suite());
 		// $JUnit-END$
 		return suite;
 	}

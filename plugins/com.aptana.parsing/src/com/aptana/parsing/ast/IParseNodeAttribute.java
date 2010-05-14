@@ -32,36 +32,31 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js.contentassist.index;
-
-import org.eclipse.osgi.util.NLS;
+package com.aptana.parsing.ast;
 
 /**
- * @author Robin
+ * @author Kevin Lindsey
  */
-public final class Messages extends NLS
+public interface IParseNodeAttribute
 {
-	private static final String BUNDLE_NAME = "com.aptana.ide.editor.scriptdoc.parsing.reader.messages"; //$NON-NLS-1$
+	/**
+	 * getName
+	 * 
+	 * @return String
+	 */
+	String getName();
 
-	private Messages()
-	{
-	}
+	/**
+	 * Gets the parent of the node.
+	 * 
+	 * @return Returns the parent of the node.
+	 */
+	IParseNode getParent();
 
-	static
-	{
-		// initialize resource bundle
-		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
-	}
-
-	public static String JSMetadataReader_Parse_Error;
-	public static String JSMetadataReader_Parse_IO_Error;
-	public static String JSMetadataReader_SAX_Error;
-	public static String NativeObjectsReader_UnalbeToLocateXMLFile;
-	public static String NativeObjectsReader_IOError;
-	public static String NativeObjectsReader2_ERR_Loading_scriptdoc_file;
-	public static String ScriptDocReader_SchemaError;
-	public static String ScriptDocReader_IOError;
-	public static String ScriptDocReader_XMLLocationError;
-	public static String ScriptDocReader_ParamNullError;
-	public static String ScriptDocReader_PropertyNullError;
+	/**
+	 * getValue
+	 * 
+	 * @return String
+	 */
+	String getValue();
 }

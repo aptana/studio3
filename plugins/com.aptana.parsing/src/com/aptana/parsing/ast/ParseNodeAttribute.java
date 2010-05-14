@@ -32,36 +32,65 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js.contentassist.index;
-
-import org.eclipse.osgi.util.NLS;
+package com.aptana.parsing.ast;
 
 /**
- * @author Robin
+ * @author Kevin Lindsey
  */
-public final class Messages extends NLS
+public class ParseNodeAttribute implements IParseNodeAttribute
 {
-	private static final String BUNDLE_NAME = "com.aptana.ide.editor.scriptdoc.parsing.reader.messages"; //$NON-NLS-1$
+	private IParseNode _parent;
+	private String _name;
+	private String _value;
 
-	private Messages()
+	/**
+	 * ParseNodeAttribute
+	 * 
+	 * @param parent
+	 * @param name
+	 * @param value
+	 */
+	public ParseNodeAttribute(IParseNode parent, String name, String value)
 	{
+		if (parent == null)
+		{
+			throw new IllegalArgumentException(Messages.ParseNodeAttribute_Undefined_Parent);
+		}
+		if (name == null)
+		{
+			throw new IllegalArgumentException(Messages.ParseNodeAttribute_Undefined_Name);
+		}
+		if (value == null)
+		{
+			throw new IllegalArgumentException(Messages.ParseNodeAttribute_Undefined_Value);
+		}
+
+		this._parent = parent;
+		this._name = name;
+		this._value = value;
 	}
 
-	static
+	/**
+	 * @see com.aptana.ide.parsing.nodes.IParseNodeAttribute#getName()
+	 */
+	public String getName()
 	{
-		// initialize resource bundle
-		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+		return this._name;
 	}
 
-	public static String JSMetadataReader_Parse_Error;
-	public static String JSMetadataReader_Parse_IO_Error;
-	public static String JSMetadataReader_SAX_Error;
-	public static String NativeObjectsReader_UnalbeToLocateXMLFile;
-	public static String NativeObjectsReader_IOError;
-	public static String NativeObjectsReader2_ERR_Loading_scriptdoc_file;
-	public static String ScriptDocReader_SchemaError;
-	public static String ScriptDocReader_IOError;
-	public static String ScriptDocReader_XMLLocationError;
-	public static String ScriptDocReader_ParamNullError;
-	public static String ScriptDocReader_PropertyNullError;
+	/**
+	 * @see com.aptana.ide.parsing.nodes.IParseNodeAttribute#getValue()
+	 */
+	public String getValue()
+	{
+		return this._value;
+	}
+
+	/**
+	 * @see com.aptana.ide.parsing.nodes.IParseNodeAttribute#getParent()
+	 */
+	public IParseNode getParent()
+	{
+		return this._parent;
+	}
 }

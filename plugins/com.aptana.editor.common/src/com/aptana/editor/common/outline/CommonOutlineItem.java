@@ -64,4 +64,10 @@ public class CommonOutlineItem implements IRange, Comparable<IRange>
 	{
 		return getStartingOffset() - o.getStartingOffset();
 	}
+
+	@Override
+	public boolean contains(int offset)
+	{
+		return fSourceRange.contains(offset);
+	}
 }
