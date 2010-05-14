@@ -95,4 +95,13 @@ public interface IParseNode extends ILexeme, ILanguageNode
 	 * @return
 	 */
 	public short getType();
+
+	/**
+	 * Set a child at a given index, replacing any existing child.
+	 * 
+	 * @param index
+	 * @param child
+	 * @throws IndexOutOfBoundsException
+	 */
+	void setChildAt(int index, IParseNode child) throws IndexOutOfBoundsException;
 }
