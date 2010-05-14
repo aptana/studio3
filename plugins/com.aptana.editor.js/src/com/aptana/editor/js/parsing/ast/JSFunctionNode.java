@@ -1,8 +1,5 @@
 package com.aptana.editor.js.parsing.ast;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseNodeAttribute;
 import com.aptana.parsing.ast.ParseBaseNode;
@@ -22,6 +19,24 @@ public class JSFunctionNode extends JSNode
 		super(JSNodeTypes.FUNCTION, children, start, end);
 	}
 
+	/**
+	 * getArgs
+	 * 
+	 * @return
+	 */
+	public IParseNode[] getArgs()
+	{
+		IParseNode[] result = NO_CHILDREN;
+		IParseNode argsNode = this.getChild(1);
+		
+		if (argsNode != null && argsNode.getType() == JSNodeTypes.PARAMETERS)
+		{
+			result = argsNode.getChildren();
+		}
+		
+		return result;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.ParseBaseNode#getAttributes()
@@ -44,27 +59,13 @@ public class JSFunctionNode extends JSNode
 	}
 	
 	/**
-	 * getArgNames
+	 * getBody
 	 * 
 	 * @return
 	 */
-	public String[] getArgNames()
+	public IParseNode getBody()
 	{
-		List<String> result = new LinkedList<String>();
-		IParseNode argsNode = this.getChild(1);
-		
-		if (argsNode != null && argsNode.getType() == JSNodeTypes.PARAMETERS)
-		{
-			for (IParseNode arg : argsNode)
-			{
-				if (arg.getType() == JSNodeTypes.IDENTIFIER)
-				{
-					result.add(arg.toString());
-				}
-			}
-		}
-		
-		return result.toArray(new String[result.size()]);
+		return this.getChild(2);
 	}
 	
 	/**
