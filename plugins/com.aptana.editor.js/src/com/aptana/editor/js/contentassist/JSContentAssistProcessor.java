@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -24,13 +25,14 @@ import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
+import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.Lexeme;
 
 public class JSContentAssistProcessor extends CommonContentAssistProcessor
 {
 	private static enum Location
 	{
-		ERROR
+		ERROR, IN_PROPERTY_NAME, IN_VARIABLE_NAME
 	};
 
 	private static final Image JS_FUNCTION = Activator.getImage("/icons/js_function.gif"); //$NON-NLS-1$
@@ -52,6 +54,30 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		this._helper = new JSContentAssistHelper();
 	}
 	
+	/**
+	 * getGlobals
+	 */
+	protected void addGlobals(List<ICompletionProposal> proposals, int offset)
+	{
+		List<PropertyElement> globals = this._helper.getGlobals();
+
+		for (PropertyElement property : globals)
+		{
+			// slightly change behavior if this is a function
+			boolean isFunction = (property instanceof FunctionElement);
+
+			// grab the interesting parts
+			String name = JSModelFormatter.getName(property);
+			//int length = isFunction ? name.length() - 1 : name.length();
+			String description = JSModelFormatter.getDescription(property);
+			Image image = isFunction ? JS_FUNCTION : JS_PROPERTY;
+			String[] userAgentNames = property.getUserAgentNames();
+			Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(userAgentNames);
+			
+			this.addProposal(proposals, name, image, description, userAgents, offset);
+		}
+	}
+
 	/**
 	 * addProposal
 	 * 
@@ -98,16 +124,37 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		
 		if (Platform.inDevelopmentMode())
 		{
+			IParseNode ast = this.editor.getFileService().getParseResult();
+			IParseNode node = ast.getNodeAt(offset);
+			
+			if (node != null)
+			{
+				String text = "";
+				
+				try
+				{
+					text = viewer.getDocument().get(node.getStartingOffset(), node.getLength());
+				}
+				catch (BadLocationException e)
+				{
+				}
+				
+				System.out.println(node.toString());
+				System.out.println("~" + text + "~");
+			}
+			
 			// tokenize the current document
 			IDocument document = viewer.getDocument();
-			LexemeProvider<JSTokenType> lexemeProvider = new LexemeProvider<JSTokenType>(document, offset, new JSScopeScanner())
+			LexemeProvider<JSTokenType> lexemeProvider;
+			
+			if (node != null)
 			{
-				@Override
-				protected JSTokenType getTypeFromName(String name)
-				{
-					return JSTokenType.get(name);
-				}
-			};
+				lexemeProvider = new JSLexemeProvider(document, node, new JSScopeScanner());
+			}
+			else
+			{
+				lexemeProvider = new JSLexemeProvider(document, offset, new JSScopeScanner());
+			}
 	
 			// store a reference to the lexeme at the current position
 			this._currentLexeme = lexemeProvider.getFloorLexeme(offset);
@@ -115,10 +162,18 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			// first step is to determine where we are
 			Location location = this.getLocation(lexemeProvider, offset);
 	
-			
 			switch (location)
 			{
+				case IN_PROPERTY_NAME:
+					System.out.println("Property");
+					break;
+					
+				case IN_VARIABLE_NAME:
+					System.out.println("Variable");
+					break;
+					
 				default:
+					System.out.println("Location = " + location);
 					break;
 			}
 	
@@ -168,30 +223,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
-	 * getGlobals
-	 */
-	public void getGlobals(List<ICompletionProposal> proposals, int offset)
-	{
-		List<PropertyElement> globals = this._helper.getGlobals();
-
-		for (PropertyElement property : globals)
-		{
-			// slightly change behavior if this is a function
-			boolean isFunction = (property instanceof FunctionElement);
-
-			// grab the interesting parts
-			String name = JSModelFormatter.getName(property);
-			//int length = isFunction ? name.length() - 1 : name.length();
-			String description = JSModelFormatter.getDescription(property);
-			Image image = isFunction ? JS_FUNCTION : JS_PROPERTY;
-			String[] userAgentNames = property.getUserAgentNames();
-			Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(userAgentNames);
-			
-			this.addProposal(proposals, name, image, description, userAgents, offset);
-		}
-	}
-
-	/**
 	 * getLocation
 	 * 
 	 * @param lexemeProvider
@@ -200,6 +231,75 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private Location getLocation(LexemeProvider<JSTokenType> lexemeProvider, int offset)
 	{
-		return Location.ERROR;
+		Location result = Location.ERROR;
+		int index = lexemeProvider.getLexemeIndex(offset);
+		
+		if (index < 0)
+		{
+			int candidateIndex = lexemeProvider.getLexemeFloorIndex(offset);
+			Lexeme<JSTokenType> lexeme = lexemeProvider.getLexeme(candidateIndex);
+			
+			if (lexeme != null && lexeme.getEndingOffset() == offset)
+			{
+				index = candidateIndex;
+			}
+		}
+		
+		if (index >= 0)
+		{
+			Lexeme<JSTokenType> lexeme = lexemeProvider.getLexeme(index);
+			
+			switch (lexeme.getType())
+			{
+				case DOT:
+					result = Location.IN_PROPERTY_NAME;
+					break;
+					
+				case SEMICOLON:
+					if (index > 0)
+					{
+						Lexeme<JSTokenType> previousLexeme = lexemeProvider.getLexeme(index - 1);
+						
+						switch (previousLexeme.getType())
+						{
+							case SOURCE:
+								result = Location.IN_VARIABLE_NAME;
+								break;
+								
+							default:
+								break;
+						}
+					}
+					break;
+					
+				case SOURCE:
+					if (index > 0)
+					{
+						Lexeme<JSTokenType> previousLexeme = lexemeProvider.getLexeme(index - 1);
+						
+						switch (previousLexeme.getType())
+						{
+							case DOT:
+								result = Location.IN_PROPERTY_NAME;
+								break;
+								
+							default:
+								result = Location.IN_VARIABLE_NAME;
+								break;
+						}
+					}
+					else
+					{
+						result = Location.IN_VARIABLE_NAME;
+					}
+					break;
+					
+				default:
+					break;
+			}
+				
+		}
+		
+		return result;
 	}
 }

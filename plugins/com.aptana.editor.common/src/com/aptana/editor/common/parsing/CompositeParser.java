@@ -17,11 +17,11 @@ import com.aptana.parsing.ast.ParseBaseNode;
 public class CompositeParser implements IParser
 {
 
-	private CompositeParserScanner fScanner;
-	private IParser fParser;
+	protected CompositeParserScanner fScanner;
+	protected IParser fParser;
 
-	private IParseNode fEmbeddedlanguageRoot;
-	private Symbol fCurrentSymbol;
+	protected IParseNode fEmbeddedlanguageRoot;
+	protected Symbol fCurrentSymbol;
 
 	public CompositeParser(CompositeParserScanner defaultScanner, IParser primaryParser)
 	{
@@ -121,7 +121,7 @@ public class CompositeParser implements IParser
 		return null;
 	}
 
-	private static void getAllNodes(IParseNode node, List<IParseNode> list)
+	protected static void getAllNodes(IParseNode node, List<IParseNode> list)
 	{
 		IParseNode[] children = node.getChildren();
 		for (IParseNode child : children)
@@ -131,7 +131,7 @@ public class CompositeParser implements IParser
 		list.add(node);
 	}
 
-	private static IParseNode findNode(IParseNode node, List<IParseNode> list)
+	protected static IParseNode findNode(IParseNode node, List<IParseNode> list)
 	{
 		for (IParseNode element : list)
 		{
@@ -144,7 +144,7 @@ public class CompositeParser implements IParser
 		return null;
 	}
 
-	private static void addOffset(IParseNode node, int offset)
+	protected static void addOffset(IParseNode node, int offset)
 	{
 		if (node instanceof ParseBaseNode)
 		{

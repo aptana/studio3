@@ -23,10 +23,12 @@ public enum HTMLTokenType implements ITypePredicate
 	TAG_END("punctuation.definition.tag.end.html"), //$NON-NLS-1$
 	EQUAL("punctuation.separator.key-value.html"), //$NON-NLS-1$
 	TAG_START("punctuation.definition.tag.begin.html"), //$NON-NLS-1$
-	TEXT("text"); //$NON-NLS-1$
+	TEXT("text"), //$NON-NLS-1$
+	TAG_SELF_CLOSE("punctuation.definition.tag.self_close.html"); //$NON-NLS-1$
 
 	private static final Map<String, HTMLTokenType> NAME_MAP;
 	private String _scope;
+	private int _index;
 
 	/**
 	 * static
@@ -34,10 +36,12 @@ public enum HTMLTokenType implements ITypePredicate
 	static
 	{
 		NAME_MAP = new HashMap<String, HTMLTokenType>();
+		int index = 0;
 
 		for (HTMLTokenType type : EnumSet.allOf(HTMLTokenType.class))
 		{
 			NAME_MAP.put(type.getScope(), type);
+			type._index = index++;
 		}
 	}
 
@@ -60,6 +64,16 @@ public enum HTMLTokenType implements ITypePredicate
 	private HTMLTokenType(String scope)
 	{
 		this._scope = scope;
+	}
+
+	/**
+	 * getIndex
+	 * 
+	 * @return
+	 */
+	public int getIndex()
+	{
+		return this._index;
 	}
 
 	/**

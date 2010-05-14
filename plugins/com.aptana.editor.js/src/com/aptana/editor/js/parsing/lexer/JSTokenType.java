@@ -8,7 +8,7 @@ import com.aptana.parsing.lexer.ITypePredicate;
 
 public enum JSTokenType implements ITypePredicate
 {
-	UNDEFINED("undefined.html"), //$NON-NLS-1$
+	UNDEFINED("undefined.js"), //$NON-NLS-1$
 	KEYWORD("keyword.operator.js"), //$NON-NLS-1$
 	SUPPORT_FUNCTION("support.function.js"), //$NON-NLS-1$
 	EVENT_HANDLER_FUNCTION("support.function.event-handler.js"), //$NON-NLS-1$
@@ -34,7 +34,8 @@ public enum JSTokenType implements ITypePredicate
 	BRACKET("meta.brace.square.js"), //$NON-NLS-1$
 	CURLY_BRACE("meta.brace.curly.js"), //$NON-NLS-1$
 	COMMA("meta.delimiter.object.comma.js"), //$NON-NLS-1$
-	NUMBER("constant.numeric.js"); //$NON-NLS-1$
+	NUMBER("constant.numeric.js"), //$NON-NLS-1$
+	DOT("operator.dot.js"); //$NON-NLS-1$
 
 	private static final Map<String, JSTokenType> NAME_MAP;
 	private String _scope;

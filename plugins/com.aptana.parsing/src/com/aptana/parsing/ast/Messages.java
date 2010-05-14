@@ -32,16 +32,17 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js.contentassist.index;
+package com.aptana.parsing.ast;
 
 import org.eclipse.osgi.util.NLS;
 
 /**
- * @author Robin
+ * @author Kevin Lindsey
+ *
  */
 public final class Messages extends NLS
 {
-	private static final String BUNDLE_NAME = "com.aptana.ide.editor.scriptdoc.parsing.reader.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.ide.parsing.nodes.messages"; //$NON-NLS-1$
 
 	private Messages()
 	{
@@ -52,16 +53,12 @@ public final class Messages extends NLS
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
-
-	public static String JSMetadataReader_Parse_Error;
-	public static String JSMetadataReader_Parse_IO_Error;
-	public static String JSMetadataReader_SAX_Error;
-	public static String NativeObjectsReader_UnalbeToLocateXMLFile;
-	public static String NativeObjectsReader_IOError;
-	public static String NativeObjectsReader2_ERR_Loading_scriptdoc_file;
-	public static String ScriptDocReader_SchemaError;
-	public static String ScriptDocReader_IOError;
-	public static String ScriptDocReader_XMLLocationError;
-	public static String ScriptDocReader_ParamNullError;
-	public static String ScriptDocReader_PropertyNullError;
+	
+	public static String ParseNodeAttribute_Undefined_Parent;
+	public static String ParseNodeAttribute_Undefined_Name;
+	public static String ParseNodeAttribute_Undefined_Value;
+	public static String ParseNodeBase_Undefined_Child;
+	public static String ParseNodeFactory_Undefined_Parse_State;
+	public static String ParseNodeWalkerBase_Undefined_Node;
+	public static String ParseNodeWalkerGroup_Undefined_Node_Processor;
 }

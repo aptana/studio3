@@ -8,6 +8,7 @@ import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 
+import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
 
 public class HTMLScopeScanner extends HTMLTagScanner
@@ -29,6 +30,7 @@ public class HTMLScopeScanner extends HTMLTagScanner
 		}
 
 		// add custom rules with lower precedence here
+		rules.add(new RegexpRule("/>", createToken(HTMLTokenType.TAG_SELF_CLOSE)));
 
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}

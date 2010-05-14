@@ -288,7 +288,6 @@ public class JSIndexReader
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
 		}
 
 		return result;
