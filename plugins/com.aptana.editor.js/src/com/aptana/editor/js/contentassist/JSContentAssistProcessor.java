@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -130,22 +129,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			IParseNode ast = this.editor.getFileService().getParseResult();
 			IParseNode node = ast.getNodeAt(offset);
 			
-			if (node != null)
-			{
-				String text = "";
-				
-				try
-				{
-					text = viewer.getDocument().get(node.getStartingOffset(), node.getLength());
-				}
-				catch (BadLocationException e)
-				{
-				}
-				
-				//System.out.println(node.toString());
-				//System.out.println("~" + text + "~");
-			}
-			
 			// tokenize the current document
 			IDocument document = viewer.getDocument();
 			LexemeProvider<JSTokenType> lexemeProvider;
@@ -178,6 +161,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					
 				default:
 					List<String> args = this._astHelper.getSymbolsInScope(node);
+					Collections.sort(args);
 					System.out.println(StringUtil.join(",", args));
 					//System.out.println("Location = " + location);
 					break;
