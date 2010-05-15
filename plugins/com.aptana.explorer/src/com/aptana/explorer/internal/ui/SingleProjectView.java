@@ -6,7 +6,6 @@ import java.util.Set;
 import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -19,9 +18,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
@@ -30,10 +27,8 @@ import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.window.Window;
 import org.eclipse.search.ui.IContextMenuConstants;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.search.ui.text.FileTextSearchScope;
@@ -86,19 +81,7 @@ import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IExplorerUIConstants;
 import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.filewatcher.FileWatcher;
-import com.aptana.git.core.GitPlugin;
-import com.aptana.git.core.model.GitRepository;
 import com.aptana.terminal.views.TerminalView;
-import com.aptana.ui.UIUtils;
-import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.syncing.core.ISiteConnection;
-import com.aptana.ide.syncing.core.ResourceSynchronizationUtils;
-import com.aptana.ide.syncing.core.SiteConnectionUtils;
-import com.aptana.ide.syncing.ui.actions.DownloadAction;
-import com.aptana.ide.syncing.ui.actions.SynchronizeAction;
-import com.aptana.ide.syncing.ui.actions.UploadAction;
-import com.aptana.ide.syncing.ui.dialogs.ChooseSiteConnectionDialog;
-import com.aptana.ide.ui.secureftp.dialogs.CommonFTPConnectionPointPropertyDialog;
 
 /**
  * Customized CommonNavigator that adds a project combo and focuses the view on a single project.
@@ -112,7 +95,6 @@ public abstract class SingleProjectView extends CommonNavigator
 	private static final String GEAR_MENU_ID = "com.aptana.explorer.gear"; //$NON-NLS-1$
 	private static final String RAILS_NATURE = "org.radrails.rails.core.railsnature"; //$NON-NLS-1$
 	private static final String WEB_NATURE = "com.aptana.ui.webnature"; //$NON-NLS-1$
-	private static final String DEPLOY_MENU_ID = "com.aptana.explorer.deploy"; //$NON-NLS-1$
 
 	/**
 	 * Forced removal of context menu entries dynamically to match the context menu Andrew wants...
@@ -135,11 +117,9 @@ public abstract class SingleProjectView extends CommonNavigator
 		TO_REMOVE.add("org.radrails.rails.ui.actions.RunScriptServerAction"); //$NON-NLS-1$
 	};
 
-	private ToolItem deployToolItem;
 	private ToolItem projectToolItem;
 	private Menu projectsMenu;
 
-	protected ISiteConnection[] siteConnections;
 	protected IProject selectedProject;
 	/**
 	 * Listens for the addition/removal of projects.
@@ -177,18 +157,8 @@ public abstract class SingleProjectView extends CommonNavigator
 
 	private static final String CASE_SENSITIVE_ICON_PATH = "icons/full/elcl16/casesensitive.png"; //$NON-NLS-1$
 	private static final String REGULAR_EXPRESSION_ICON_PATH = "icons/full/elcl16/regularexpression.png"; //$NON-NLS-1$
-	private static final String DEPLOY_MENU_ICON = "icons/full/elcl16/network_arrow.png"; //$NON-NLS-1$
-	private static final String[] animationImage = {
-			"icons/full/elcl16/yinyang1.png", "icons/full/elcl16/yinyang2.png", "icons/full/elcl16/yinyang3.png", "icons/full/elcl16/yinyang4.png" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-	private static final int DEPLOY_KEY_BINDING = SWT.MOD4 | SWT.MOD3 | 'D';
 
 	protected static final String GROUP_RUN = "group.run"; //$NON-NLS-1$
-	protected static final String GROUP_DEPLOY = "group.deploy"; //$NON-NLS-1$
-	protected static final String GROUP_HEROKU_COMMANDS = "group.herokucommands"; //$NON-NLS-1$
-	protected static final String GROUP_CAP = "group.cap"; //$NON-NLS-1$
-	protected static final String GROUP_FTP_SETTINGS = "group.ftp_settings"; //$NON-NLS-1$
-	protected static final String GROUP_FTP = "group.ftp"; //$NON-NLS-1$
-	protected static final String GROUP_WIZARD = "group.wizard"; //$NON-NLS-1$
 
 	@Override
 	public void createPartControl(final Composite parent)
@@ -204,7 +174,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		GridData toolbarGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		toolbarComposite.setLayoutData(toolbarGridData);
 
-		GridLayout toolbarGridLayout = new GridLayout(3, false);
+		GridLayout toolbarGridLayout = new GridLayout(2, false);
 		toolbarGridLayout.marginWidth = 2;
 		toolbarGridLayout.marginHeight = 0;
 		toolbarGridLayout.horizontalSpacing = 0;
@@ -216,14 +186,11 @@ public abstract class SingleProjectView extends CommonNavigator
 		// Let sub classes add to the toolbar
 		doCreateToolbar(toolbarComposite);
 
-		// Create Deploy menu
-		createDeployMenu(toolbarComposite);
-
 		// Now create Commands menu
 		final ToolBar commandsToolBar = new ToolBar(toolbarComposite, SWT.FLAT);
 		ToolItem commandsToolItem = new ToolItem(commandsToolBar, SWT.DROP_DOWN);
 		commandsToolItem.setImage(ExplorerPlugin.getImage("icons/full/elcl16/command.png")); //$NON-NLS-1$
-		GridData branchComboData = new GridData(SWT.END, SWT.CENTER, false, false);
+		GridData branchComboData = new GridData(SWT.END, SWT.CENTER, true, false);
 		branchComboData.minimumWidth = 24;
 		commandsToolBar.setLayoutData(branchComboData);
 
@@ -337,8 +304,8 @@ public abstract class SingleProjectView extends CommonNavigator
 					public void widgetSelected(SelectionEvent e)
 					{
 						// Open a terminal on active project!
-						TerminalView.openView(selectedProject.getName(), selectedProject.getName(), selectedProject
-								.getLocation());
+						TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
+								selectedProject.getLocation());
 					}
 				});
 				terminalMenuItem.setEnabled(selectedProject != null && selectedProject.exists());
@@ -416,396 +383,6 @@ public abstract class SingleProjectView extends CommonNavigator
 			}
 
 		});
-	}
-
-	private void createDeployMenu(Composite parent)
-	{
-		final ToolBar deployToolBar = new ToolBar(parent, SWT.FLAT);
-		deployToolItem = new ToolItem(deployToolBar, SWT.DROP_DOWN);
-		deployToolItem.setImage(ExplorerPlugin.getImage(DEPLOY_MENU_ICON));
-		GridData deployComboData = new GridData(SWT.END, SWT.CENTER, true, false);
-		deployComboData.minimumWidth = 24;
-		deployToolBar.setLayoutData(deployComboData);
-
-		deployToolItem.addSelectionListener(new SelectionAdapter()
-		{
-			public void widgetSelected(SelectionEvent selectionEvent)
-			{
-				Point toolbarLocation = deployToolBar.getLocation();
-				toolbarLocation = deployToolBar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
-				Point toolbarSize = deployToolBar.getSize();
-				final MenuManager deployMenuManager = new MenuManager(null, DEPLOY_MENU_ID);
-				fillDeployMenu(deployMenuManager);
-				IMenuService menuService = (IMenuService) getSite().getService(IMenuService.class);
-				menuService.populateContributionManager(deployMenuManager, "toolbar:" + deployMenuManager.getId()); //$NON-NLS-1$
-				final Menu commandsMenu = deployMenuManager.createContextMenu(deployToolBar);
-				commandsMenu.setLocation(toolbarLocation.x, toolbarLocation.y + toolbarSize.y + 2);
-				commandsMenu.setVisible(true);
-			}
-		});
-	}
-
-	protected void fillDeployMenu(MenuManager menuManager)
-	{
-		if (selectedProject == null || !selectedProject.isAccessible())
-			return;
-
-		if (isCapistranoProject())
-		{
-			// insert commands for capistrano here
-			menuManager.add(new Separator(GROUP_CAP));
-			menuManager.appendToGroup(GROUP_CAP, new ContributionItem()
-			{
-
-				@Override
-				public void fill(Menu menu, int index)
-				{
-					createHerokuSubMenuItem(menu,
-							"echo 'cap command'", Messages.SingleProjectView_DeployAppMenuItem, DEPLOY_KEY_BINDING); //$NON-NLS-1$
-				}
-
-				@Override
-				public boolean isDynamic()
-				{
-					return true;
-				}
-			});
-		}
-		else if (isHerokuProject())
-		{
-			addHerokuMenuCommands(menuManager);
-		}
-		else if (isFTPProject())
-		{
-			addFTPMenuCommands(menuManager);
-		}
-		else
-		{
-			// insert command for wizard here
-			menuManager.add(new Separator(GROUP_WIZARD));
-			menuManager.appendToGroup(GROUP_WIZARD, new ContributionItem()
-			{
-
-				@Override
-				public void fill(Menu menu, int index)
-				{
-					createHerokuSubMenuItem(menu,
-							"echo 'deploy wizard'", Messages.SingleProjectView_DeployWizardItem, DEPLOY_KEY_BINDING); //$NON-NLS-1$
-				}
-
-				@Override
-				public boolean isDynamic()
-				{
-					return true;
-				}
-			});
-		}
-	}
-
-	private void addFTPMenuCommands(MenuManager menuManager)
-	{
-
-		menuManager.add(new Separator(GROUP_FTP));
-		menuManager.appendToGroup(GROUP_FTP, new ContributionItem()
-		{
-
-			@Override
-			public void fill(Menu menu, int index)
-			{
-
-				SelectionAdapter synchronizeAdapter = new SelectionAdapter()
-				{
-					public void widgetSelected(SelectionEvent e)
-					{
-						SynchronizeAction action = new SynchronizeAction();
-						action.setActivePart(null, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-								.getActivePart());
-						action.setSelection(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService()
-								.getSelection());
-						action.run(null);
-					}
-				};
-
-				createFTPSubMenuItem(menu, Messages.SingleProjectView_SynchronizeItem, DEPLOY_KEY_BINDING,
-						synchronizeAdapter);
-
-				SelectionAdapter uploadAdapter = new SelectionAdapter()
-				{
-					public void widgetSelected(SelectionEvent e)
-					{
-						UploadAction action = new UploadAction();
-						action.setActivePart(null, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-								.getActivePart());
-						action.setSelection(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService()
-								.getSelection());
-						action.addJobListener(new JobChangeAdapter()
-						{
-
-							private AnimatedIconThread iconThread;
-
-							@Override
-							public void running(IJobChangeEvent e)
-							{
-								iconThread = new AnimatedIconThread(DEPLOY_MENU_ICON, animationImage, UIUtils
-										.getDisplay(), deployToolItem);
-								iconThread.start();
-							}
-
-							@Override
-							public void done(IJobChangeEvent e)
-							{
-								UIUtils.getDisplay().asyncExec(new Runnable()
-								{
-									public void run()
-									{
-										iconThread.terminate();
-									}
-								});
-							}
-						});
-						action.run(null);
-					}
-				};
-
-				createFTPSubMenuItem(menu, Messages.SingleProjectView_UploadItem, SWT.MOD4 | SWT.MOD2 | 'U',
-						uploadAdapter);
-
-				SelectionAdapter downloadAdapter = new SelectionAdapter()
-				{
-					public void widgetSelected(SelectionEvent e)
-					{
-						DownloadAction action = new DownloadAction();
-						action.setActivePart(null, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-								.getActivePart());
-						action.setSelection(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService()
-								.getSelection());
-						action.addJobListener(new JobChangeAdapter()
-						{
-							private AnimatedIconThread iconThread;
-
-							@Override
-							public void running(IJobChangeEvent e)
-							{
-								iconThread = new AnimatedIconThread(DEPLOY_MENU_ICON, animationImage, UIUtils
-										.getDisplay(), deployToolItem);
-								iconThread.start();
-							}
-
-							@Override
-							public void done(IJobChangeEvent e)
-							{
-								UIUtils.getDisplay().asyncExec(new Runnable()
-								{
-									public void run()
-									{
-										iconThread.terminate();
-									}
-								});
-							}
-						});
-						action.run(null);
-					}
-
-				};
-				createFTPSubMenuItem(menu, Messages.SingleProjectView_DownloadItem, 0, downloadAdapter);
-			}
-
-			@Override
-			public boolean isDynamic()
-			{
-				return true;
-			}
-		});
-
-		menuManager.add(new Separator(GROUP_FTP_SETTINGS));
-		menuManager.appendToGroup(GROUP_FTP_SETTINGS, new ContributionItem()
-		{
-			@Override
-			public void fill(Menu menu, int index)
-			{
-				MenuItem settingsItem = new MenuItem(menu, SWT.PUSH);
-				settingsItem.setText(Messages.SingleProjectView_FTPSettingItem);
-				settingsItem.addSelectionListener(new SelectionAdapter()
-				{
-					public void widgetSelected(SelectionEvent e)
-					{
-						IConnectionPoint siteConnection;
-						CommonFTPConnectionPointPropertyDialog settingsDialog = new CommonFTPConnectionPointPropertyDialog(
-								PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-						siteConnection = siteConnections[0].getDestination();
-
-						if (siteConnections.length != 1)
-						{
-
-							// try for last remembered site first
-							IContainer container = (IContainer) selectedProject;
-							String lastConnection = ResourceSynchronizationUtils.getLastSyncConnection(container);
-							Boolean remember = ResourceSynchronizationUtils.isRememberDecision(container);
-
-							if (!remember || (lastConnection == null))
-							{
-
-								ChooseSiteConnectionDialog dialog = new ChooseSiteConnectionDialog(PlatformUI
-										.getWorkbench().getActiveWorkbenchWindow().getShell(), siteConnections);
-								dialog.setShowRememberMyDecision(true);
-								dialog.open();
-
-								siteConnection = dialog.getSelectedSite().getDestination();
-
-								if (siteConnection != null)
-								{
-									Boolean rememberMyDecision = dialog.isRememberMyDecision();
-									if (rememberMyDecision)
-									{
-										ResourceSynchronizationUtils.setRememberDecision(container, rememberMyDecision);
-									}
-
-									// remembers the last sync connection
-									ResourceSynchronizationUtils.setLastSyncConnection(container, siteConnection
-											.getName());
-
-								}
-							}
-							else
-							{
-								String target;
-
-								for (ISiteConnection site : siteConnections)
-								{
-									target = site.getDestination().getName();
-									if (target.equals(lastConnection))
-									{
-										siteConnection = site.getDestination();
-										break;
-									}
-								}
-							}
-						}
-						settingsDialog.setPropertySource(siteConnection);
-						settingsDialog.open();
-					}
-
-				});
-			}
-
-			@Override
-			public boolean isDynamic()
-			{
-				return true;
-			}
-		});
-
-	}
-
-	private void addHerokuMenuCommands(MenuManager menuManager)
-	{
-
-		menuManager.add(new Separator(GROUP_DEPLOY));
-		menuManager.add(new Separator(GROUP_HEROKU_COMMANDS));
-
-		menuManager.appendToGroup(GROUP_DEPLOY, new ContributionItem()
-		{
-
-			@Override
-			public void fill(Menu menu, int index)
-			{
-				createHerokuSubMenuItem(menu,
-						"git push heroku master", Messages.SingleProjectView_DeployAppMenuItem, DEPLOY_KEY_BINDING); //$NON-NLS-1$
-			}
-
-			@Override
-			public boolean isDynamic()
-			{
-				return true;
-			}
-		});
-
-		menuManager.appendToGroup(GROUP_HEROKU_COMMANDS, new ContributionItem()
-		{
-
-			@Override
-			public void fill(Menu menu, int index)
-			{
-
-				// Sharing Submenu
-				final MenuItem sharingMenuItem = new MenuItem(menu, SWT.CASCADE);
-				sharingMenuItem.setText(Messages.SingleProjectView_SharingSubmenuLabel);
-				Menu sharingSubMenu = new Menu(menu);
-
-				createHerokuSubMenuItemWithInput(
-						sharingSubMenu,
-						"heroku sharing:add ", Messages.SingleProjectView_AddCollaboratorItem, Messages.SingleProjectView_EmailAddressLabel); //$NON-NLS-1$ //$NON-NLS-2$
-				createHerokuSubMenuItemWithInput(
-						sharingSubMenu,
-						"heroku sharing:remove ", Messages.SingleProjectView_RemoveCollaboratorItem, Messages.SingleProjectView_EmailAddressLabel); //$NON-NLS-1$
-				sharingMenuItem.setMenu(sharingSubMenu);
-
-				// Database
-				final MenuItem databaseMenuItem = new MenuItem(menu, SWT.CASCADE);
-				databaseMenuItem.setText(Messages.SingleProjectView_DatabaseSubmenuLabel);
-				Menu databaseSubMenu = new Menu(menu);
-
-				createHerokuSubMenuItem(databaseSubMenu,
-						"heroku db:push", Messages.SingleProjectView_PushLocalDBItem, 0); //$NON-NLS-1$
-				createHerokuSubMenuItem(databaseSubMenu,
-						"heroku db:pull", Messages.SingleProjectView_PullRemoteDBItem, 0); //$NON-NLS-1$
-
-				databaseMenuItem.setMenu(databaseSubMenu);
-
-				// Maintenance
-				final MenuItem maintenanceMenuItem = new MenuItem(menu, SWT.CASCADE);
-				maintenanceMenuItem.setText(Messages.SingleProjectView_MaintenanceSubmenuLabel);
-				Menu maintanenceSubMenu = new Menu(menu);
-
-				createHerokuSubMenuItem(maintanenceSubMenu,
-						"heroku maintenance:on", Messages.SingleProjectView_OnMaintenanceItem, 0); //$NON-NLS-1$
-				createHerokuSubMenuItem(maintanenceSubMenu,
-						"heroku maintenance:off", Messages.SingleProjectView_OffMaintenanceItem, 0); //$NON-NLS-1$
-
-				maintenanceMenuItem.setMenu(maintanenceSubMenu);
-
-				// Remote
-				final MenuItem remoteMenuItem = new MenuItem(menu, SWT.CASCADE);
-				remoteMenuItem.setText(Messages.SingleProjectView_RemoteSubmenuLabel);
-				Menu remoteSubMenu = new Menu(menu);
-
-				createHerokuSubMenuItem(remoteSubMenu, "heroku console", Messages.SingleProjectView_ConsoleItem, 0); //$NON-NLS-1$
-				createHerokuSubMenuItemWithInput(
-						remoteSubMenu,
-						"heroku rake ", Messages.SingleProjectView_RakeCommandItem, Messages.SingleProjectView_CommandLabel); //$NON-NLS-1$
-
-				remoteMenuItem.setMenu(remoteSubMenu);
-
-				// config vars
-				final MenuItem configMenuItem = new MenuItem(menu, SWT.CASCADE);
-				configMenuItem.setText(Messages.SingleProjectView_ConfigVarsSubmenuLabel);
-				Menu configSubMenu = new Menu(menu);
-
-				createHerokuSubMenuItemWithInput(
-						configSubMenu,
-						"heroku config:add ", Messages.SingleProjectView_AddConfigVarsItem, Messages.SingleProjectView_VariableNameLabel); //$NON-NLS-1$ //$NON-NLS-2$
-				createHerokuSubMenuItemWithInput(
-						configSubMenu,
-						"heroku config:clear ", Messages.SingleProjectView_ClearConfigVarsItem, Messages.SingleProjectView_VariableNameLabel); //$NON-NLS-1$
-
-				configMenuItem.setMenu(configSubMenu);
-
-				// may want to add backup commands
-
-				createHerokuSubMenuItem(menu, "heroku info", Messages.SingleProjectView_AppInfoItem, 0); //$NON-NLS-1$
-				createHerokuSubMenuItemWithInput(
-						menu,
-						"heroku rename ", Messages.SingleProjectView_RenameAppItem, Messages.SingleProjectView_NewAppNameLabel); //$NON-NLS-1$
-
-			}
-
-			@Override
-			public boolean isDynamic()
-			{
-				return true;
-			}
-		});
-
 	}
 
 	private IProject[] createProjectCombo(Composite parent)
@@ -1538,7 +1115,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		}
 	}
 
-	@SuppressWarnings( { "nls" })
+	@SuppressWarnings({ "nls" })
 	protected void forceOurNewFileWizard(Menu menu)
 	{
 		// Hack the New > File entry
@@ -1548,15 +1125,15 @@ public abstract class SingleProjectView extends CommonNavigator
 			if (data instanceof IContributionItem)
 			{
 				IContributionItem contrib = (IContributionItem) data;
-				if ("common.new.menu".equals(contrib.getId())) //$NON-NLS-1$
+				if ("common.new.menu".equals(contrib.getId()))
 				{
 					MenuManager manager = (MenuManager) contrib;
 					// force an entry for our special template New File wizard!
 					IWizardRegistry registry = PlatformUI.getWorkbench().getNewWizardRegistry();
-					IWizardDescriptor desc = registry.findWizard("com.aptana.ui.wizards.new.file"); //$NON-NLS-1$
-					manager.insertAfter("new", new WizardShortcutAction(PlatformUI.getWorkbench() //$NON-NLS-1$
+					IWizardDescriptor desc = registry.findWizard("com.aptana.ui.wizards.new.file");
+					manager.insertAfter("new", new WizardShortcutAction(PlatformUI.getWorkbench()
 							.getActiveWorkbenchWindow(), desc));
-					manager.remove("new"); //$NON-NLS-1$
+					manager.remove("new");
 					break;
 				}
 			}
@@ -1579,102 +1156,6 @@ public abstract class SingleProjectView extends CommonNavigator
 				}
 			}
 		}
-	}
-
-	private void createFTPSubMenuItem(Menu menu, String text, int keybinding, SelectionListener listener)
-	{
-		MenuItem synchronizeItem = new MenuItem(menu, SWT.PUSH);
-		synchronizeItem.setText(text);
-		if (keybinding != 0)
-			synchronizeItem.setAccelerator(keybinding);
-		synchronizeItem.addSelectionListener(listener);
-
-	}
-
-	private void createHerokuSubMenuItem(Menu menu, String cmd, String text, int keybinding)
-	{
-		final String command = cmd;
-		MenuItem item = new MenuItem(menu, SWT.PUSH);
-		item.setText(text);
-		if (keybinding != 0)
-			item.setAccelerator(keybinding);
-		item.addSelectionListener(new SelectionAdapter()
-		{
-			public void widgetSelected(SelectionEvent e)
-			{
-				herokuCmd(command);
-			}
-		});
-	}
-
-	private void createHerokuSubMenuItemWithInput(Menu menu, String cmd, String text, String message)
-	{
-		final String command = cmd;
-		final String dialogMessage = message;
-		MenuItem item = new MenuItem(menu, SWT.PUSH);
-		item.setText(text);
-		item.addSelectionListener(new SelectionAdapter()
-		{
-			public void widgetSelected(SelectionEvent e)
-			{
-
-				InputDialog dialog = new InputDialog(null, dialogMessage, "", "", null); //$NON-NLS-1$ //$NON-NLS-2$
-				dialog.setBlockOnOpen(true);
-
-				if (dialog.open() == Window.OK)
-					herokuCmd(command + dialog.getValue());
-			}
-		});
-	}
-
-	private void herokuCmd(String command)
-	{
-		TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
-				selectedProject.getLocation());
-		terminal.sendInput(command + '\n');
-	}
-
-	private boolean isCapistranoProject()
-	{
-		if (selectedProject.getFile("Capfile").exists()) //$NON-NLS-1$
-			return true;
-
-		return false;
-	}
-
-	private boolean isFTPProject()
-	{
-		siteConnections = SiteConnectionUtils.findSitesForSource(selectedProject);
-
-		if (siteConnections.length > 0)
-			return true;
-
-		return false;
-	}
-
-	private boolean isHerokuProject()
-	{
-
-		GitRepository repo = GitPlugin.getDefault().getGitRepositoryManager().getAttached(selectedProject);
-		if (repo != null)
-		{
-			for (String remote : repo.remotes())
-			{
-				if (remote.indexOf("heroku") != -1)
-				{
-					return true;
-				}
-			}
-			for (String remoteURL : repo.remoteURLs())
-			{
-				if (remoteURL.indexOf("heroku.com") != -1)
-				{
-					return true;
-				}
-			}
-		}
-		return false;
-
 	}
 
 	private static class TextSearchPageInput extends TextSearchInput

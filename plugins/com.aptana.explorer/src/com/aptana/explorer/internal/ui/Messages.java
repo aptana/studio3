@@ -60,7 +60,6 @@ public class Messages extends NLS
 	public static String GitProjectView_LBL_ShowInHistory;
 	
 	public static String SingleProjectView_CaseSensitive;
-	public static String SingleProjectView_CreateAppMenuItem;
 	public static String SingleProjectView_OpenTerminalMenuItem_LBL;
 	public static String SingleProjectView_RefreshJob_title;
 	public static String SingleProjectView_Wildcard;
@@ -69,44 +68,7 @@ public class Messages extends NLS
 	public static String SingleProjectView_RunMenuTitle;
 	public static String SingleProjectView_SwitchToApplication;
 	public static String SingleProjectView_DeleteProjectMenuItem_LBL;
-	public static String SingleProjectView_DeploySubmenuLabel;
-	public static String SingleProjectView_DeployAppMenuItem;
-
-	public static String SingleProjectView_DeployWizardItem;
 	public static String SingleProjectView_InitialFileFilterText;
-	public static String SingleProjectView_SharingSubmenuLabel;
-
-	public static String SingleProjectView_SynchronizeItem;
-	public static String SingleProjectView_AddCollaboratorItem;
-	public static String SingleProjectView_RemoveCollaboratorItem;
-	public static String SingleProjectView_DatabaseSubmenuLabel;
-
-	public static String SingleProjectView_DownloadItem;
-	public static String SingleProjectView_PushLocalDBItem;
-	public static String SingleProjectView_PullRemoteDBItem;
-	public static String SingleProjectView_MaintenanceSubmenuLabel;
-	public static String SingleProjectView_OnMaintenanceItem;
-	public static String SingleProjectView_OffMaintenanceItem;
-	public static String SingleProjectView_RemoteSubmenuLabel;
-	public static String SingleProjectView_CommandLabel;
-
-	public static String SingleProjectView_ConsoleItem;
-	public static String SingleProjectView_RakeCommandItem;
-	public static String SingleProjectView_ConfigVarsSubmenuLabel;
-	public static String SingleProjectView_AddConfigVarsItem;
-	public static String SingleProjectView_ClearConfigVarsItem;
-	public static String SingleProjectView_AppInfoItem;
-
-	public static String SingleProjectView_EmailAddressLabel;
-
-	public static String SingleProjectView_FTPSettingItem;
-
-	public static String SingleProjectView_NewAppNameLabel;
-	public static String SingleProjectView_RenameAppItem;
-
-	public static String SingleProjectView_UploadItem;
-
-	public static String SingleProjectView_VariableNameLabel;
 	
 	static
 	{
