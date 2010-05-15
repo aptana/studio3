@@ -42,6 +42,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.core.util.StringUtil;
@@ -56,65 +57,86 @@ import com.aptana.ui.DialogUtils;
 /**
  * @author Michael Xia (mxia@aptana.com)
  */
-public class UploadAction extends BaseSyncAction {
+public class UploadAction extends BaseSyncAction
+{
 
-    private static String MESSAGE_TITLE = StringUtil.ellipsify(Messages.UploadAction_MessageTitle);
+	private IJobChangeListener jobListener = null;
+	private Job job;
 
-    protected void performAction(final IAdaptable[] files, final ISiteConnection site)
-            throws CoreException {
-        Job job = new Job(MESSAGE_TITLE) {
+	private static String MESSAGE_TITLE = StringUtil.ellipsify(Messages.UploadAction_MessageTitle);
 
-            @Override
-            protected IStatus run(IProgressMonitor monitor) {
-                IConnectionPoint source = site.getSource();
-                IConnectionPoint target = site.getDestination();
-                // retrieves the root filestore of each end
-                IFileStore sourceRoot;
-                IFileStore targetRoot;
-                try {
-                    sourceRoot = source.getRoot();
-                    if (!target.isConnected()) {
-                        target.connect(monitor);
-                    }
-                    targetRoot = target.getRoot();
-                } catch (CoreException e) {
-                    return new Status(Status.ERROR, SyncingUIPlugin.PLUGIN_ID, e
-                            .getLocalizedMessage(), e);
-                }
+	protected void performAction(final IAdaptable[] files, final ISiteConnection site) throws CoreException
+	{
+		job = new Job(MESSAGE_TITLE)
+		{
 
-                // gets the filestores of the files to be copied
-                IFileStore[] fileStores = new IFileStore[files.length];
-                for (int i = 0; i < fileStores.length; ++i) {
-                    fileStores[i] = SyncUtils.getFileStore(files[i]);
-                }
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				IConnectionPoint source = site.getSource();
+				IConnectionPoint target = site.getDestination();
+				// retrieves the root filestore of each end
+				IFileStore sourceRoot;
+				IFileStore targetRoot;
+				try
+				{
+					sourceRoot = source.getRoot();
+					if (!target.isConnected())
+					{
+						target.connect(monitor);
+					}
+					targetRoot = target.getRoot();
+				}
+				catch (CoreException e)
+				{
+					return new Status(Status.ERROR, SyncingUIPlugin.PLUGIN_ID, e.getLocalizedMessage(), e);
+				}
 
-                CopyFilesOperation operation = new CopyFilesOperation(getShell());
-                IStatus status = operation.copyFiles(fileStores, sourceRoot, targetRoot, monitor);
+				// gets the filestores of the files to be copied
+				IFileStore[] fileStores = new IFileStore[files.length];
+				for (int i = 0; i < fileStores.length; ++i)
+				{
+					fileStores[i] = SyncUtils.getFileStore(files[i]);
+				}
 
-                if (status != Status.CANCEL_STATUS) {
-                    postAction(status);
-                }
-                return status;
-            }
-        };
-        job.setUser(true);
-        job.schedule();
-    }
+				CopyFilesOperation operation = new CopyFilesOperation(getShell());
+				IStatus status = operation.copyFiles(fileStores, sourceRoot, targetRoot, monitor);
 
-    @Override
-    protected String getMessageTitle() {
-        return MESSAGE_TITLE;
-    }
+				if (status != Status.CANCEL_STATUS)
+				{
+					postAction(status);
+				}
+				return status;
+			}
+		};
+		if (jobListener != null)
+			job.addJobChangeListener(jobListener);
+		job.setUser(true);
+		job.schedule();
+	}
 
-    private void postAction(final IStatus status) {
-        getShell().getDisplay().asyncExec(new Runnable() {
+	public void addJobListener(IJobChangeListener listener)
+	{
+		jobListener = listener;
+	}
 
-            public void run() {
-                DialogUtils.openIgnoreMessageDialogInformation(getShell(), MESSAGE_TITLE,
-                        MessageFormat.format(Messages.UploadAction_PostMessage, status.getCode()),
-                        SyncingUIPlugin.getDefault().getPreferenceStore(),
-                        IPreferenceConstants.IGNORE_DIALOG_FILE_UPLOAD);
-            }
-        });
-    }
+	@Override
+	protected String getMessageTitle()
+	{
+		return MESSAGE_TITLE;
+	}
+
+	private void postAction(final IStatus status)
+	{
+		getShell().getDisplay().asyncExec(new Runnable()
+		{
+
+			public void run()
+			{
+				DialogUtils.openIgnoreMessageDialogInformation(getShell(), MESSAGE_TITLE, MessageFormat.format(
+						Messages.UploadAction_PostMessage, status.getCode()), SyncingUIPlugin.getDefault()
+						.getPreferenceStore(), IPreferenceConstants.IGNORE_DIALOG_FILE_UPLOAD);
+			}
+		});
+	}
 }
