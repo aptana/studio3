@@ -33,54 +33,48 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.filesystem.secureftp.tests;
+package com.aptana.filesystem.secureftp.internal;
 
-import com.aptana.core.io.tests.CommonConnectionTest;
-import com.aptana.ide.filesystem.ftp.FTPConnectionPoint;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+
+import com.aptana.ide.filesystem.secureftp.SecureUtils;
+import com.enterprisedt.net.ftp.ssh.SSHFTPPublicKey;
+import com.enterprisedt.net.ftp.ssh.SSHFTPValidator;
 
 /**
  * @author Max Stepanov
+ *
  */
-public class FTPConnectionTest extends CommonConnectionTest
-{
+public class SSHHostValidator extends SSHFTPValidator {
 
-	@Override
-	protected void setUp() throws Exception
-	{
-		FTPConnectionPoint ftpcp = new FTPConnectionPoint();
-		ftpcp.setHost("10.10.1.60"); //$NON-NLS-1$
-		ftpcp.setLogin("ftpuser"); //$NON-NLS-1$
-		ftpcp.setPassword(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'});
-		cp = ftpcp;
-		super.setUp();
+	/**
+	 * 
+	 */
+	public SSHHostValidator() {
+		String ssh_home = SecureUtils.getSSH_HOME();
+		File knownHosts = new File(ssh_home, "known_hosts"); //$NON-NLS-1$
+		if (knownHosts.exists() && knownHosts.isFile()) {
+			try {
+				loadKnownHosts(new FileInputStream(knownHosts));
+			} catch (IOException e) {
+				SecureFTPPlugin.log(new Status(IStatus.WARNING, SecureFTPPlugin.PLUGIN_ID, Messages.SSHHostValidator_FailedLoadKnownHosts, e));
+			}
+		}
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsSetModificationTime()
+	 * @see com.enterprisedt.net.ftp.ssh.SSHFTPValidator#validate(java.lang.String, com.enterprisedt.net.ftp.ssh.SSHFTPPublicKey, boolean)
 	 */
 	@Override
-	protected boolean supportsSetModificationTime()
-	{
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangeGroup()
-	 */
-	@Override
-	protected boolean supportsChangeGroup()
-	{
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangePermissions()
-	 */
-	@Override
-	protected boolean supportsChangePermissions()
-	{
-		return false;
+	protected boolean validate(String hostSpecifier, SSHFTPPublicKey publicKey, boolean hostKnown) {
+		if (!hostKnown) {
+			return true;
+		}
+		return super.validate(hostSpecifier, publicKey, hostKnown);
 	}
 }

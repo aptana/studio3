@@ -1,4 +1,4 @@
-package com.aptana.ide.filesystem.secureftp;
+package com.aptana.filesystem.secureftp.internal;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;

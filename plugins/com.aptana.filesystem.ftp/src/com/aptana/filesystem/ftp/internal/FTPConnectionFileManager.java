@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.filesystem.ftp;
+package com.aptana.filesystem.ftp.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
@@ -70,6 +70,10 @@ import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.preferences.PreferenceUtils;
 import com.aptana.ide.core.io.vfs.ExtendedFileInfo;
 import com.aptana.ide.core.io.vfs.IExtendedFileStore;
+import com.aptana.ide.filesystem.ftp.FTPPlugin;
+import com.aptana.ide.filesystem.ftp.IFTPConnectionFileManager;
+import com.aptana.ide.filesystem.ftp.IFTPConstants;
+import com.aptana.ide.filesystem.ftp.Policy;
 import com.enterprisedt.net.ftp.FTPClient;
 import com.enterprisedt.net.ftp.FTPConnectMode;
 import com.enterprisedt.net.ftp.FTPConnectionClosedException;
@@ -81,17 +85,18 @@ import com.enterprisedt.net.ftp.FTPMessageListener;
 import com.enterprisedt.net.ftp.FTPOutputStream;
 import com.enterprisedt.net.ftp.FTPReply;
 import com.enterprisedt.net.ftp.FTPTransferType;
+import com.enterprisedt.net.ftp.pro.ProFTPClient;
 
 /**
  * @author Max Stepanov
  *
  */
-/* package */ class FTPConnectionFileManager extends BaseFTPConnectionFileManager implements IFTPConnectionFileManager {
+public class FTPConnectionFileManager extends BaseFTPConnectionFileManager implements IFTPConnectionFileManager {
 	
 	private static final String TMP_TIMEZONE_CHECK = "_tmp_tz_check"; //$NON-NLS-1$
-	
+
 	private final static String WINDOWS_STR = "WINDOWS"; //$NON-NLS-1$
-	
+
 	protected FTPClient ftpClient;
 	private List<String> serverFeatures;
 	protected String transferType;
@@ -114,7 +119,7 @@ import com.enterprisedt.net.ftp.FTPTransferType;
 	public void init(String host, int port, IPath basePath, String login, char[] password, boolean passive, String transferType, String encoding, String timezone) {
 		Assert.isTrue(ftpClient == null, Messages.FTPConnectionFileManager_already_initialized);
 		try {
-			ftpClient = new FTPClient();
+			ftpClient = createFTPClient();
 			this.host = host;
 			this.port = port;
 			this.login = login;
@@ -129,7 +134,11 @@ import com.enterprisedt.net.ftp.FTPTransferType;
 			ftpClient = null;
 		}
 	}
-	
+
+	protected FTPClient createFTPClient() {
+		return new ProFTPClient();
+	}
+
 	protected static void initFTPClient(FTPClient ftpClient, boolean passive, String encoding) throws IOException, FTPException {
 		ftpClient.setTimeout(TIMEOUT);
 		ftpClient.setControlEncoding(encoding);
@@ -139,9 +148,21 @@ import com.enterprisedt.net.ftp.FTPTransferType;
 		ftpClient.setRetryDelay(RETRY_DELAY);
 		ftpClient.setServerWakeupInterval(KEEPALIVE_INTERVAL);
 		ftpClient.setDeleteOnFailure(true);
-		ftpClient.setTransferBufferSize(TRANSFER_BUFFER_SIZE);	
+		ftpClient.setTransferBufferSize(TRANSFER_BUFFER_SIZE);
 	}
-	
+
+	protected void initAndAuthFTPClient(FTPClient newFtpClient, IProgressMonitor monitor) throws IOException, FTPException {
+		initFTPClient(newFtpClient, ftpClient.getConnectMode() == FTPConnectMode.PASV, ftpClient.getControlEncoding());
+		newFtpClient.setRemoteHost(host);
+		newFtpClient.setRemotePort(port);
+		Policy.checkCanceled(monitor);
+		newFtpClient.connect();
+		monitor.worked(1);
+		Policy.checkCanceled(monitor);
+		newFtpClient.login(login, String.copyValueOf(password));
+		monitor.worked(1);
+	}
+
 	protected static void setMessageLogger(FTPClient ftpClient, final PrintWriter writer) {
 		FTPMessageListener listener = null;
 		if (writer != null && ftpClient.getMessageListener() == null) {
@@ -218,7 +239,7 @@ import com.enterprisedt.net.ftp.FTPTransferType;
 					ftpClient.login(login, String.copyValueOf(password));
 				} catch (FTPException e) {
 					Policy.checkCanceled(monitor);
-					if ("331".equals(ftpClient.getLastValidReply().getReplyCode())) { //$NON-NLS-1$
+					if (ftpClient.getLastValidReply() == null || "331".equals(ftpClient.getLastValidReply().getReplyCode())) { //$NON-NLS-1$
 						if (context != null && context.getBoolean(ConnectionContext.NO_PASSWORD_PROMPT)) {
 							throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, MessageFormat.format(Messages.FTPConnectionFileManager_FailedAuthenticate, e.getLocalizedMessage()), e));
 						}
@@ -251,7 +272,7 @@ import com.enterprisedt.net.ftp.FTPTransferType;
 			throw e;
 		} catch (UnknownHostException e) {
 			safeQuit();
-			throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_HostNotFound+e.getLocalizedMessage(), e));
+			throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_HostNameNotFound+e.getLocalizedMessage(), e));
 		} catch (FileNotFoundException e) {
 			safeQuit();
 			throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_RemoteFolderNotFound+e.getLocalizedMessage(), e));			
@@ -262,7 +283,7 @@ import com.enterprisedt.net.ftp.FTPTransferType;
 			monitor.done();
 		}
 	}
-
+	
 	@SuppressWarnings("deprecation")
 	protected void getherServerInfo(ConnectionContext context, IProgressMonitor monitor) {
 		Policy.checkCanceled(monitor);
@@ -381,9 +402,10 @@ import com.enterprisedt.net.ftp.FTPTransferType;
 			}
 		}
 					
-		hasServerInfo = true;		
+		hasServerInfo = true;
+		
 	}
-
+	
 	protected void safeQuit() {
 		try {
 			if (ftpClient.connected()) {
@@ -590,7 +612,7 @@ import com.enterprisedt.net.ftp.FTPTransferType;
 			// forces one connection retry
 			if (connectionRetryCount < 1) {
 				connectionRetryCount++;
-				connect(monitor);
+				testOrConnect(monitor);
 				return fetchFile(path, options, monitor);
 			} else {
 				connectionRetryCount = 0;
@@ -653,7 +675,7 @@ import com.enterprisedt.net.ftp.FTPTransferType;
 			// forces one connection retry
 			if (connectionRetryCount < 1) {
 				connectionRetryCount++;
-				connect(monitor);
+				testOrConnect(monitor);
 				return fetchFiles(path, options, monitor);
 			} else {
 				connectionRetryCount = 0;
@@ -691,24 +713,16 @@ import com.enterprisedt.net.ftp.FTPTransferType;
 			monitor.done();
 		}
 	}
-
+		
 	/* (non-Javadoc)
 	 * @see com.aptana.ide.core.ftp.BaseFTPConnectionFileManager#readFile(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected InputStream readFile(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
 		monitor.beginTask(Messages.FTPConnectionFileManager_initiating_download, 4);
-		FTPClient downloadFtpClient = new FTPClient();
+		FTPClient downloadFtpClient = createFTPClient();
 		try {
-			initFTPClient(downloadFtpClient, ftpClient.getConnectMode() == FTPConnectMode.PASV, ftpClient.getControlEncoding());
-			downloadFtpClient.setRemoteHost(host);
-			downloadFtpClient.setRemotePort(port);
-			Policy.checkCanceled(monitor);
-			downloadFtpClient.connect();
-			monitor.worked(1);
-			Policy.checkCanceled(monitor);
-			downloadFtpClient.login(login, String.copyValueOf(password));
-			monitor.worked(1);
+			initAndAuthFTPClient(downloadFtpClient, monitor);
 			Policy.checkCanceled(monitor);
 			setMessageLogger(downloadFtpClient, messageLogWriter);
 			downloadFtpClient.setType(IFTPConstants.TRANSFER_TYPE_ASCII.equals(transferType)
@@ -759,17 +773,9 @@ import com.enterprisedt.net.ftp.FTPTransferType;
 	@Override
 	protected OutputStream writeFile(IPath path, long permissions, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
 		monitor.beginTask(Messages.FTPConnectionFileManager_initiating_file_upload, 4);
-		FTPClient uploadFtpClient = new FTPClient();
+		FTPClient uploadFtpClient = createFTPClient();
 		try {
-			initFTPClient(uploadFtpClient, ftpClient.getConnectMode() == FTPConnectMode.PASV, ftpClient.getControlEncoding());
-			uploadFtpClient.setRemoteHost(host);
-			uploadFtpClient.setRemotePort(port);
-			Policy.checkCanceled(monitor);
-			uploadFtpClient.connect();
-			monitor.worked(1);
-			Policy.checkCanceled(monitor);
-			uploadFtpClient.login(login, String.copyValueOf(password));
-			monitor.worked(1);
+			initAndAuthFTPClient(uploadFtpClient, monitor);
 			Policy.checkCanceled(monitor);
 			setMessageLogger(uploadFtpClient, messageLogWriter);
 			uploadFtpClient.setType(IFTPConstants.TRANSFER_TYPE_ASCII.equals(transferType)

@@ -33,23 +33,25 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.filesystem.ftp;
+package com.aptana.filesystem.ftp.internal;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
 
 import com.enterprisedt.net.ftp.FTPClient;
+import com.enterprisedt.net.ftp.FTPClientInterface;
 import com.enterprisedt.net.ftp.FTPException;
 import com.enterprisedt.net.ftp.FileTransferOutputStream;
+import com.enterprisedt.net.ftp.ssh.SSHFTPClient;
 
 /**
  * @author Max Stepanov
  *
  */
-/* package */ class FTPFileUploadOutputStream extends OutputStream {
+public class FTPFileUploadOutputStream extends OutputStream {
 
-	private FTPClient ftpClient;
+	private FTPClientInterface ftpClient;
 	private FileTransferOutputStream ftpOutputStream;
 	private String filename;
 	private Date modificationTime;
@@ -58,7 +60,7 @@ import com.enterprisedt.net.ftp.FileTransferOutputStream;
 	/**
 	 * 
 	 */
-	public FTPFileUploadOutputStream(FTPClient ftpClient, FileTransferOutputStream ftpOutputStream, String filename, Date modificationTime, long permissions) {
+	public FTPFileUploadOutputStream(FTPClientInterface ftpClient, FileTransferOutputStream ftpOutputStream, String filename, Date modificationTime, long permissions) {
 		this.ftpClient = ftpClient;
 		this.ftpOutputStream = ftpOutputStream;
 		this.filename = filename;
@@ -67,7 +69,9 @@ import com.enterprisedt.net.ftp.FileTransferOutputStream;
 	}
 
 	private void safeQuit(boolean failed) {
-		ftpClient.setMessageListener(null);
+		if (ftpClient instanceof FTPClient) {
+			((FTPClient) ftpClient).setMessageListener(null);
+		}
 		try {
 			if (ftpClient.connected()) {
 				if (failed) {
@@ -112,7 +116,12 @@ import com.enterprisedt.net.ftp.FileTransferOutputStream;
 						ftpClient.delete(filename);
 					}
 					ftpClient.rename(ftpOutputStream.getRemoteFile(), filename);
-                    ftpClient.site("CHMOD " + Long.toOctalString(permissions) + " " + filename); //$NON-NLS-1$ //$NON-NLS-2$
+                    if (ftpClient instanceof FTPClient) {
+                        ((FTPClient) ftpClient).site("CHMOD " + Long.toOctalString(permissions) //$NON-NLS-1$
+                                + " " + filename); //$NON-NLS-1$
+                    } else if (ftpClient instanceof SSHFTPClient) {
+                        ((SSHFTPClient) ftpClient).changeMode((int) (permissions & 0777), filename);
+                    }
 				}
 			} catch (FTPException e) {
 				safeQuit(true);

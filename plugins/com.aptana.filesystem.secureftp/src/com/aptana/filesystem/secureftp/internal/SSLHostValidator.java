@@ -33,97 +33,27 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.filesystem.secureftp;
+package com.aptana.filesystem.secureftp.internal;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import com.enterprisedt.net.ftp.FTPClient;
-import com.enterprisedt.net.ftp.FTPClientInterface;
-import com.enterprisedt.net.ftp.FileTransferInputStream;
+import com.enterprisedt.net.ftp.ssl.SSLFTPStandardValidator;
 
 /**
  * @author Max Stepanov
  *
  */
-/* package */ class FTPFileDownloadInputStream extends InputStream {
-
-	private FTPClientInterface ftpClient;
-	private FileTransferInputStream ftpInputStream;
-	
-	/**
-	 * 
-	 */
-	public FTPFileDownloadInputStream(FTPClientInterface ftpClient, FileTransferInputStream ftpInputStream) {
-		this.ftpClient = ftpClient;
-		this.ftpInputStream = ftpInputStream;
-	}
-	
-	private void safeQuit() {
-		if (ftpClient instanceof FTPClient) {
-			((FTPClient) ftpClient).setMessageListener(null);
-		}
-		try {
-			if (ftpClient.connected()) {
-				ftpClient.quit();
-			}
-		} catch (Exception e) {
-			try {
-				ftpClient.quitImmediately();
-			} catch (Exception ignore) {
-			}
-		}		
-	}
+public class SSLHostValidator extends SSLFTPStandardValidator {
 
 	/* (non-Javadoc)
-	 * @see java.io.InputStream#read()
+	 * @see com.enterprisedt.net.ftp.ssl.SSLFTPStandardValidator#checkCommonName(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public int read() throws IOException {
-		try {
-			return ftpInputStream.read();
-		} catch (IOException e) {
-			safeQuit();
-			throw e;
+	protected boolean checkCommonName(String certCommonName, String serverHostName) {
+		if (super.checkCommonName(certCommonName, serverHostName)) {
+			return true;
 		}
-	}
-
-	/* (non-Javadoc)
-	 * @see java.io.InputStream#available()
-	 */
-	@Override
-	public int available() throws IOException {
-		try {
-			return ftpInputStream.available();
-		} catch (IOException e) {
-			safeQuit();
-			throw e;
+		if (certCommonName.startsWith("*.")) { //$NON-NLS-1$
+			return serverHostName.toLowerCase().endsWith(certCommonName.substring(1).toLowerCase());
 		}
+		return false;
 	}
-
-	/* (non-Javadoc)
-	 * @see java.io.InputStream#close()
-	 */
-	@Override
-	public void close() throws IOException {
-		try {
-			ftpInputStream.close();
-		} finally {
-			safeQuit();
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see java.io.InputStream#read(byte[], int, int)
-	 */
-	@Override
-	public int read(byte[] b, int off, int len) throws IOException {
-		try {
-			return ftpInputStream.read(b, off, len);
-		} catch (IOException e) {
-			safeQuit();
-			throw e;
-		}
-	}
-
 }

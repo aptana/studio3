@@ -1,4 +1,4 @@
-package com.aptana.ide.filesystem.ftp;
+package com.aptana.filesystem.ftp.internal;
 
 import org.eclipse.osgi.util.NLS;
 
@@ -40,7 +40,7 @@ import org.eclipse.osgi.util.NLS;
 	public static String FTPConnectionFileManager_ftp_auth;
 	public static String FTPConnectionFileManager_gethering_file_details;
 	public static String FTPConnectionFileManager_gethering_server_info;
-	public static String FTPConnectionFileManager_HostNotFound;
+	public static String FTPConnectionFileManager_HostNameNotFound;
 	public static String FTPConnectionFileManager_initialization_failed;
 	public static String FTPConnectionFileManager_initiating_download;
 	public static String FTPConnectionFileManager_initiating_file_upload;
