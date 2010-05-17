@@ -19,15 +19,5 @@
             name="SFTP">
       </connectionPointType>
    </extension>
-   <extension
-         point="org.eclipse.core.runtime.adapters">
-      <factory
-            adaptableType="com.aptana.ide.filesystem.ftp.FTPConnectionPoint"
-            class="com.aptana.ide.filesystem.secureftp.FTPConnectionAdapterFactory">
-         <adapter
-               type="com.aptana.ide.filesystem.ftp.IFTPConnectionFileManager">
-         </adapter>
-      </factory>
-   </extension>
 
 </plugin>

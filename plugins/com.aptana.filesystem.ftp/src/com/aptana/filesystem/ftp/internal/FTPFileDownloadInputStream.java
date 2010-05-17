@@ -33,55 +33,97 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.filesystem.secureftp;
+package com.aptana.filesystem.ftp.internal;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import java.io.IOException;
+import java.io.InputStream;
 
-import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
+import com.enterprisedt.net.ftp.FTPClient;
+import com.enterprisedt.net.ftp.FTPClientInterface;
+import com.enterprisedt.net.ftp.FileTransferInputStream;
 
 /**
  * @author Max Stepanov
  *
  */
-public final class Policy {
+public class FTPFileDownloadInputStream extends InputStream {
 
+	private FTPClientInterface ftpClient;
+	private FileTransferInputStream ftpInputStream;
+	
 	/**
 	 * 
 	 */
-	private Policy() {
+	public FTPFileDownloadInputStream(FTPClientInterface ftpClient, FileTransferInputStream ftpInputStream) {
+		this.ftpClient = ftpClient;
+		this.ftpInputStream = ftpInputStream;
+	}
+	
+	private void safeQuit() {
+		if (ftpClient instanceof FTPClient) {
+			((FTPClient) ftpClient).setMessageListener(null);
+		}
+		try {
+			if (ftpClient.connected()) {
+				ftpClient.quit();
+			}
+		} catch (Exception e) {
+			try {
+				ftpClient.quitImmediately();
+			} catch (Exception ignore) {
+			}
+		}		
 	}
 
-	public static String generateAuthId(String proto, IBaseRemoteConnectionPoint connectionPoint) {
-		return com.aptana.ide.filesystem.ftp.Policy.generateAuthId(proto, connectionPoint.getLogin(), connectionPoint.getHost(), connectionPoint.getPort());
+	/* (non-Javadoc)
+	 * @see java.io.InputStream#read()
+	 */
+	@Override
+	public int read() throws IOException {
+		try {
+			return ftpInputStream.read();
+		} catch (IOException e) {
+			safeQuit();
+			throw e;
+		}
 	}
 
-	public static String generateAuthId(String proto, String login, String host, int port) {
-		return com.aptana.ide.filesystem.ftp.Policy.generateAuthId(proto, login, host, port);
+	/* (non-Javadoc)
+	 * @see java.io.InputStream#available()
+	 */
+	@Override
+	public int available() throws IOException {
+		try {
+			return ftpInputStream.available();
+		} catch (IOException e) {
+			safeQuit();
+			throw e;
+		}
 	}
 
-	public static long permissionsFromString(String string) {
-		return com.aptana.ide.filesystem.ftp.Policy.permissionsFromString(string);
+	/* (non-Javadoc)
+	 * @see java.io.InputStream#close()
+	 */
+	@Override
+	public void close() throws IOException {
+		try {
+			ftpInputStream.close();
+		} finally {
+			safeQuit();
+		}
 	}
 
-	public static IProgressMonitor monitorFor(IProgressMonitor monitor) {
-		return monitor == null ? new NullProgressMonitor() : monitor;
+	/* (non-Javadoc)
+	 * @see java.io.InputStream#read(byte[], int, int)
+	 */
+	@Override
+	public int read(byte[] b, int off, int len) throws IOException {
+		try {
+			return ftpInputStream.read(b, off, len);
+		} catch (IOException e) {
+			safeQuit();
+			throw e;
+		}
 	}
-
-	public static IProgressMonitor subMonitorFor(IProgressMonitor monitor, int ticks) {
-		if (monitor == null)
-			return new NullProgressMonitor();
-		if (monitor instanceof NullProgressMonitor)
-			return monitor;
-		return new SubProgressMonitor(monitor, ticks);
-	}
-
-	public static void checkCanceled(IProgressMonitor monitor) {
-		if (monitor.isCanceled())
-			throw new OperationCanceledException();
-	}
-
 
 }
