@@ -82,6 +82,7 @@ public class Messages extends NLS
 	public static String SingleProjectView_DatabaseSubmenuLabel;
 
 	public static String SingleProjectView_DownloadItem;
+	public static String SingleProjectView_RakeDBMigrateItem;
 	public static String SingleProjectView_PushLocalDBItem;
 	public static String SingleProjectView_PullRemoteDBItem;
 	public static String SingleProjectView_MaintenanceSubmenuLabel;
