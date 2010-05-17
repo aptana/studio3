@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.filesystem.ftp;
+package com.aptana.filesystem.ftp.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
@@ -66,6 +66,8 @@ import com.aptana.ide.core.io.vfs.ExtendedFileInfo;
 import com.aptana.ide.core.io.vfs.IConnectionFileManager;
 import com.aptana.ide.core.io.vfs.IExtendedFileInfo;
 import com.aptana.ide.core.io.vfs.IExtendedFileStore;
+import com.aptana.ide.filesystem.ftp.FTPPlugin;
+import com.aptana.ide.filesystem.ftp.Policy;
 
 /**
  * @author Max Stepanov
@@ -581,7 +583,7 @@ public abstract class BaseFTPConnectionFileManager implements IConnectionFileMan
 		}
 	}
 	
-	private void testOrConnect(IProgressMonitor monitor) throws CoreException {
+	protected void testOrConnect(IProgressMonitor monitor) throws CoreException {
 		Policy.checkCanceled(monitor);
 		testConnection();
 		if (!isConnected()) {

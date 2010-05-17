@@ -10,11 +10,10 @@ public class AllTests
 	{
 		TestSuite suite = new TestSuite(AllTests.class.getName());
 		// $JUnit-BEGIN$
-		suite.addTestSuite(FTPConnectionTest.class);
-		suite.addTestSuite(FTPConnectionWithBasePathTest.class);
 		suite.addTestSuite(FTPSConnectionTest.class);
 		suite.addTestSuite(FTPSConnectionWithBasePathTest.class);
-		suite.addTestSuite(SFTPConnectionTest.class);
+		suite.addTest(SFTPConnectionTest.suite());
+		suite.addTestSuite(ImplicitFTPSConnectionTest.class);
 		// $JUnit-END$
 		return suite;
 	}

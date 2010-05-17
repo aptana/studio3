@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.filesystem.secureftp;
+package com.aptana.filesystem.secureftp.internal;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -58,14 +58,20 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.PerformanceStats;
 import org.eclipse.core.runtime.Status;
 
+import com.aptana.filesystem.ftp.internal.BaseFTPConnectionFileManager;
+import com.aptana.filesystem.ftp.internal.ExpiringMap;
+import com.aptana.filesystem.ftp.internal.FTPFileDownloadInputStream;
+import com.aptana.filesystem.ftp.internal.FTPFileUploadOutputStream;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.preferences.PreferenceUtils;
 import com.aptana.ide.core.io.vfs.ExtendedFileInfo;
-import com.aptana.ide.filesystem.ftp.BaseFTPConnectionFileManager;
-import com.aptana.ide.filesystem.ftp.ExpiringMap;
+import com.aptana.ide.filesystem.ftp.Policy;
+import com.aptana.ide.filesystem.secureftp.ISFTPConnectionFileManager;
+import com.aptana.ide.filesystem.secureftp.ISFTPConstants;
 import com.enterprisedt.net.ftp.FTPException;
 import com.enterprisedt.net.ftp.FTPFile;
 import com.enterprisedt.net.ftp.FTPTransferType;
@@ -82,7 +88,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
  * @author Max Stepanov
  *
  */
-/* package */ class SFTPConnectionFileManager extends BaseFTPConnectionFileManager implements ISFTPConnectionFileManager {
+public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager implements ISFTPConnectionFileManager {
 
 	protected static final int SLEEP_INTERVAL = 10; /* 10 secs */
 
@@ -148,6 +154,8 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 	 * @see com.aptana.ide.core.io.vfs.IConnectionFileManager#connect(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void connect(IProgressMonitor monitor) throws CoreException {
+		PerformanceStats stats = PerformanceStats.getStats("com.aptana.filesystem.secureftp/perf/connect", this);
+		stats.startRun(host);
 		Assert.isTrue(ftpClient != null, Messages.SFTPConnectionFileManager_ConnectionNotInitialized);
 		monitor = Policy.monitorFor(monitor);
 		try {
@@ -244,6 +252,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedEstablishConnection+e.getLocalizedMessage(), e));
 		} finally {
 			monitor.done();
+			stats.endRun();
 		}
 	}
 
@@ -264,6 +273,8 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 	 * @see com.aptana.ide.core.io.vfs.IConnectionFileManager#disconnect(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void disconnect(IProgressMonitor monitor) throws CoreException {
+		PerformanceStats stats = PerformanceStats.getStats("com.aptana.filesystem.secureftp/perf/disconnect", this);
+		stats.startRun(host);
 		try {
 			checkConnected();
 		} catch (Exception ignore) {
@@ -285,6 +296,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 			cwd = null;
 			cleanup();
 			monitor.done();
+			stats.endRun();
 		}
 	}
 

@@ -35,53 +35,66 @@
 
 package com.aptana.filesystem.secureftp.tests;
 
-import com.aptana.core.io.tests.CommonConnectionTest;
-import com.aptana.ide.filesystem.ftp.FTPConnectionPoint;
+import junit.framework.TestCase;
+
+import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
+
+import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.ide.filesystem.secureftp.FTPSConnectionPoint;
 
 /**
  * @author Max Stepanov
  */
-public class FTPSConnectionTest extends CommonConnectionTest
+public class FTPSConnectionTest extends TestCase
 {
+
+	protected IConnectionPoint cp;
 
 	@Override
 	protected void setUp() throws Exception
 	{
-		FTPConnectionPoint ftpcp = new FTPConnectionPoint();
-		ftpcp.setHost("10.10.1.60"); //$NON-NLS-1$
-		ftpcp.setLogin("ftpuser"); //$NON-NLS-1$
-		ftpcp.setPassword(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'});
+		FTPSConnectionPoint ftpcp = new FTPSConnectionPoint();
+		ftpcp.setHost("ftp.secureftp-test.com"); //$NON-NLS-1$
+		ftpcp.setLogin("test"); //$NON-NLS-1$
+		ftpcp.setPassword(new char[] { 't', 'e', 's', 't' });
+		ftpcp.setExplicit(true);
+		ftpcp.setValidateCertificate(false);
 		cp = ftpcp;
-		super.setUp();
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsSetModificationTime()
-	 */
 	@Override
-	protected boolean supportsSetModificationTime()
+	protected void tearDown() throws Exception
 	{
-		return false;
+		if (cp.isConnected())
+		{
+			cp.disconnect(null);
+		}
 	}
 
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangeGroup()
-	 */
-	@Override
-	protected boolean supportsChangeGroup()
+	public final void testConnect() throws CoreException
 	{
-		return false;
+		cp.connect(null);
+		assertTrue(cp.isConnected());
+		assertTrue(cp.canDisconnect());
+		cp.disconnect(null);
+		assertFalse(cp.isConnected());
+		assertFalse(cp.canDisconnect());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangePermissions()
-	 */
-	@Override
-	protected boolean supportsChangePermissions()
+	public final void testFetchRootInfo() throws CoreException
 	{
-		return false;
+		IFileStore fs = cp.getRoot();
+		assertNotNull(fs);
+		assertFalse(cp.isConnected());
+		IFileInfo fi = fs.fetchInfo();
+		assertTrue(cp.isConnected());
+		assertNotNull(fi);
+		assertTrue(fi.exists());
+		assertTrue(fi.isDirectory());
+		assertEquals(Path.ROOT.toPortableString(), fi.getName());
 	}
+
 }
