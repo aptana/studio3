@@ -60,7 +60,6 @@ import org.eclipse.core.filesystem.provider.FileInfo;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.PerformanceStats;
 
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.CoreIOPlugin;
@@ -90,51 +89,22 @@ public abstract class CommonConnectionTest extends TestCase
 		}
 	}
 
-	protected static void oneTimeTeardown() throws Exception
-	{
-		try
-		{
-			if (cp != null)
-			{
-				cp.disconnect(null);
-			}
-		}
-		finally
-		{
-			cp = null;
-		}
-	}
-
-	private static IConnectionPoint cp;
+	protected IConnectionPoint cp;
 	private IPath testPath;
-
-	protected abstract IConnectionPoint createConnectionPoint();
-
-	protected static IConnectionPoint getConnection()
-	{
-		return cp;
-	}
 
 	@Override
 	protected void setUp() throws Exception
 	{
-		PerformanceStats.clear();
-		if (cp == null)
-		{
-			ConnectionContext context = new ConnectionContext();
-			context.put(ConnectionContext.COMMAND_LOG, System.out);
-			cp = createConnectionPoint();
-			CoreIOPlugin.setConnectionContext(cp, context);
-		}
+		ConnectionContext context = new ConnectionContext();
+		context.put(ConnectionContext.COMMAND_LOG, System.out);
+		CoreIOPlugin.setConnectionContext(cp, context);
 
-		if (testPath == null)
-		{
-			testPath = Path.ROOT.append(getClass().getSimpleName() + System.currentTimeMillis());
-		}
-		// TODO Do we really need to make the dir here every time, for every test?
+		testPath = Path.ROOT.append(getClass().getSimpleName() + System.currentTimeMillis());
 		IFileStore fs = cp.getRoot().getFileStore(testPath);
 		assertNotNull(fs);
 		fs.mkdir(EFS.NONE, null);
+		cp.disconnect(null);
+		assertFalse(cp.isConnected());
 	}
 
 	@Override
@@ -151,7 +121,10 @@ public abstract class CommonConnectionTest extends TestCase
 		}
 		finally
 		{
-			PerformanceStats.printStats();
+			if (cp.isConnected())
+			{
+				cp.disconnect(null);
+			}
 		}
 	}
 
@@ -174,24 +147,11 @@ public abstract class CommonConnectionTest extends TestCase
 		assertFalse(cp.canDisconnect());
 	}
 
-	public final void testFetchInfoWillConnectIfDisconnected() throws CoreException
-	{
-		IFileStore fs = cp.getRoot();
-		assertNotNull(fs);
-		if (cp.isConnected())
-		{
-			cp.disconnect(null);
-		}
-		assertFalse(cp.isConnected());
-		IFileInfo fi = fs.fetchInfo();
-		assertTrue(cp.isConnected());
-		assertNotNull(fi);
-	}
-
 	public final void testFetchRootInfo() throws CoreException
 	{
 		IFileStore fs = cp.getRoot();
 		assertNotNull(fs);
+		assertFalse(cp.isConnected());
 		IFileInfo fi = fs.fetchInfo();
 		assertTrue(cp.isConnected());
 		assertNotNull(fi);
@@ -585,7 +545,7 @@ public abstract class CommonConnectionTest extends TestCase
 		long lastModified = fi.getLastModified();
 		if (supportsSetModificationTime())
 		{
-			lastModified -= new Random().nextInt(7 * 24 * 60) * 1000;
+			lastModified -= new Random().nextInt(7 * 24 * 60)*1000;
 			lastModified -= lastModified % 1000; // remove milliseconds
 		}
 		IFileInfo pfi = new FileInfo();
@@ -609,8 +569,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertTrue(fi.isDirectory());
 
 		long lastModified = fi.getLastModified();
-		if (supportsSetModificationTime())
-		{
+		if (supportsSetModificationTime()) {
 			lastModified -= new Random().nextInt(7 * 24) * 60000;
 			lastModified -= lastModified % 60000; // remove seconds/milliseconds
 		}

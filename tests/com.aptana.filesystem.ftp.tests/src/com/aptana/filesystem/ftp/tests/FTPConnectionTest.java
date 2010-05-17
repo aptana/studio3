@@ -36,7 +36,6 @@
 package com.aptana.filesystem.ftp.tests;
 
 import com.aptana.core.io.tests.CommonConnectionTest;
-import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.filesystem.ftp.FTPConnectionPoint;
 
 /**
@@ -44,16 +43,16 @@ import com.aptana.ide.filesystem.ftp.FTPConnectionPoint;
  */
 public class FTPConnectionTest extends CommonConnectionTest
 {
-	// FIXME These tests are unbelievably slow for me. They take 25-40sec per test method!
-	
-	protected IConnectionPoint createConnectionPoint()
+
+	@Override
+	protected void setUp() throws Exception
 	{
 		FTPConnectionPoint ftpcp = new FTPConnectionPoint();
 		ftpcp.setHost("10.10.1.60"); //$NON-NLS-1$
 		ftpcp.setLogin("ftpuser"); //$NON-NLS-1$
 		ftpcp.setPassword(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'});
-		// TODO Extract the site connection details out to local property files so I can test outside our network!
-		return ftpcp;
+		cp = ftpcp;
+		super.setUp();
 	}
 
 	/* (non-Javadoc)

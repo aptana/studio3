@@ -44,11 +44,12 @@ import org.eclipse.core.runtime.Path;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.filesystem.secureftp.FTPSConnectionPoint;
 
+
 /**
  * @author Max Stepanov
+ *
  */
-public class ImplicitFTPSConnectionTest extends TestCase
-{
+public class ImplicitFTPSConnectionTest extends TestCase {
 
 	protected IConnectionPoint cp;
 
@@ -57,7 +58,6 @@ public class ImplicitFTPSConnectionTest extends TestCase
 	{
 		FTPSConnectionPoint ftpcp = new FTPSConnectionPoint();
 		ftpcp.setHost("ftp.secureftp-test.com"); //$NON-NLS-1$
-		ftpcp.setPort(990);
 		ftpcp.setLogin("test"); //$NON-NLS-1$
 		ftpcp.setPassword(new char[] { 't', 'e', 's', 't' });
 		ftpcp.setExplicit(false);
@@ -68,24 +68,21 @@ public class ImplicitFTPSConnectionTest extends TestCase
 	@Override
 	protected void tearDown() throws Exception
 	{
-		if (cp.isConnected())
-		{
+		if (cp.isConnected()) {
 			cp.disconnect(null);
 		}
 	}
 
-	public final void testConnect() throws CoreException
-	{
+	public final void testConnect() throws CoreException {
 		cp.connect(null);
 		assertTrue(cp.isConnected());
 		assertTrue(cp.canDisconnect());
 		cp.disconnect(null);
 		assertFalse(cp.isConnected());
-		assertFalse(cp.canDisconnect());
+		assertFalse(cp.canDisconnect());		
 	}
 
-	public final void testFetchRootInfo() throws CoreException
-	{
+	public final void testFetchRootInfo() throws CoreException {
 		IFileStore fs = cp.getRoot();
 		assertNotNull(fs);
 		assertFalse(cp.isConnected());
@@ -94,7 +91,7 @@ public class ImplicitFTPSConnectionTest extends TestCase
 		assertNotNull(fi);
 		assertTrue(fi.exists());
 		assertTrue(fi.isDirectory());
-		assertEquals(Path.ROOT.toPortableString(), fi.getName());
+		assertEquals(Path.ROOT.toPortableString(), fi.getName());		
 	}
 
 }

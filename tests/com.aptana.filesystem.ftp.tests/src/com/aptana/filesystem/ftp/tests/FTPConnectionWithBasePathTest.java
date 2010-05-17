@@ -40,7 +40,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.io.tests.CommonConnectionTest;
-import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.filesystem.ftp.FTPConnectionPoint;
 
 /**
@@ -49,21 +48,23 @@ import com.aptana.ide.filesystem.ftp.FTPConnectionPoint;
 public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 {
 
-	protected IConnectionPoint createConnectionPoint()
+	private static FTPConnectionPoint setupConnection()
 	{
 		FTPConnectionPoint ftpcp = new FTPConnectionPoint();
 		ftpcp.setHost("10.10.1.60"); //$NON-NLS-1$
 		ftpcp.setLogin("ftpuser"); //$NON-NLS-1$
 		ftpcp.setPassword(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'});
-		ftpcp.setPath(Path.ROOT.append(getClass().getSimpleName()));
 		return ftpcp;
 	}
 
 	@Override
 	protected void setUp() throws Exception
 	{
-		super.setUp();
 		initBasePath();
+		FTPConnectionPoint ftpcp = setupConnection();
+		ftpcp.setPath(Path.ROOT.append(getClass().getSimpleName()));
+		cp = ftpcp;
+		super.setUp();
 	}
 
 	@Override
@@ -72,9 +73,9 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 		cleanupBasePath();
 	}
 
-	public void initBasePath() throws CoreException
+	public static void initBasePath() throws CoreException
 	{
-		IConnectionPoint ftpcp = getConnection();
+		FTPConnectionPoint ftpcp = setupConnection();
 		IFileStore fs = ftpcp.getRoot().getFileStore(
 				Path.ROOT.append(FTPConnectionWithBasePathTest.class.getSimpleName()));
 		assertNotNull(fs);
@@ -86,9 +87,9 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 		assertFalse(ftpcp.isConnected());
 	}
 
-	public void cleanupBasePath() throws CoreException
+	public static void cleanupBasePath() throws CoreException
 	{
-		IConnectionPoint ftpcp = getConnection();
+		FTPConnectionPoint ftpcp = setupConnection();
 		IFileStore fs = ftpcp.getRoot().getFileStore(
 				Path.ROOT.append(FTPConnectionWithBasePathTest.class.getSimpleName()));
 		assertNotNull(fs);

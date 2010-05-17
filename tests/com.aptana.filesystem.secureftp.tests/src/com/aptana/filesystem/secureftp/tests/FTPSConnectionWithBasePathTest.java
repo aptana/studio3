@@ -34,71 +34,100 @@
  */
 package com.aptana.filesystem.secureftp.tests;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
-import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.filesystem.secureftp.FTPSConnectionPoint;
+import com.aptana.core.io.tests.CommonConnectionTest;
+import com.aptana.ide.filesystem.ftp.FTPConnectionPoint;
 
 /**
  * @author Max Stepanov
  */
-public class FTPSConnectionWithBasePathTest extends TestCase
+public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 {
 
-	private static final String BASE_PATH = "subdir1"; //$NON-NLS-1$
-	protected IConnectionPoint cp;
+	private static FTPConnectionPoint setupConnection()
+	{
+		FTPConnectionPoint ftpcp = new FTPConnectionPoint();
+		ftpcp.setHost("10.10.1.60"); //$NON-NLS-1$
+		ftpcp.setLogin("ftpuser"); //$NON-NLS-1$
+		ftpcp.setPassword(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'});
+		return ftpcp;
+	}
 
 	@Override
 	protected void setUp() throws Exception
 	{
-		// FIXME This server is read-only, so we can't just add our own base path!
-		FTPSConnectionPoint ftpcp = new FTPSConnectionPoint();
-		ftpcp.setHost("ftp.secureftp-test.com"); //$NON-NLS-1$
-		ftpcp.setLogin("test"); //$NON-NLS-1$
-		ftpcp.setPassword(new char[] { 't', 'e', 's', 't' });
-		ftpcp.setExplicit(true);
-		ftpcp.setValidateCertificate(false);
-		ftpcp.setPath(Path.ROOT.append(BASE_PATH));
+		initBasePath();
+		FTPConnectionPoint ftpcp = setupConnection();
+		ftpcp.setPath(Path.ROOT.append(getClass().getSimpleName()));
 		cp = ftpcp;
+		super.setUp();
 	}
 
 	@Override
-	protected void tearDown() throws Exception
-	{
-		if (cp.isConnected())
-		{
-			cp.disconnect(null);
-		}
+	protected void tearDown() throws Exception {
+		super.tearDown();
+		cleanupBasePath();
 	}
 
-	public final void testConnect() throws CoreException
+	public static void initBasePath() throws CoreException
 	{
-		cp.connect(null);
-		assertTrue(cp.isConnected());
-		assertTrue(cp.canDisconnect());
-		cp.disconnect(null);
-		assertFalse(cp.isConnected());
-		assertFalse(cp.canDisconnect());
-	}
-
-	public final void testFetchRootInfo() throws CoreException
-	{
-		IFileStore fs = cp.getRoot();
+		FTPConnectionPoint ftpcp = setupConnection();
+		IFileStore fs = ftpcp.getRoot().getFileStore(
+				Path.ROOT.append(FTPSConnectionWithBasePathTest.class.getSimpleName()));
 		assertNotNull(fs);
-		assertFalse(cp.isConnected());
-		IFileInfo fi = fs.fetchInfo();
-		assertTrue(cp.isConnected());
-		assertNotNull(fi);
-		assertTrue(fi.exists());
-		assertTrue(fi.isDirectory());
-		assertEquals(Path.ROOT.toPortableString(), fi.getName());
+		if (!fs.fetchInfo().exists())
+		{
+			fs.mkdir(EFS.NONE, null);
+		}
+		ftpcp.disconnect(null);
+		assertFalse(ftpcp.isConnected());
 	}
 
+	public static void cleanupBasePath() throws CoreException
+	{
+		FTPConnectionPoint ftpcp = setupConnection();
+		IFileStore fs = ftpcp.getRoot().getFileStore(
+				Path.ROOT.append(FTPSConnectionWithBasePathTest.class.getSimpleName()));
+		assertNotNull(fs);
+		if (fs.fetchInfo().exists())
+		{
+			fs.delete(EFS.NONE, null);
+		}
+		ftpcp.disconnect(null);
+		assertFalse(ftpcp.isConnected());
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsSetModificationTime()
+	 */
+	@Override
+	protected boolean supportsSetModificationTime()
+	{
+		return false;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangeGroup()
+	 */
+	@Override
+	protected boolean supportsChangeGroup()
+	{
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangePermissions()
+	 */
+	@Override
+	protected boolean supportsChangePermissions()
+	{
+		return false;
+	}
 }
