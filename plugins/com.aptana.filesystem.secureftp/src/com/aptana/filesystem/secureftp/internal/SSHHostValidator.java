@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.filesystem.secureftp;
+package com.aptana.filesystem.secureftp.internal;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,6 +42,7 @@ import java.io.IOException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
+import com.aptana.ide.filesystem.secureftp.SecureUtils;
 import com.enterprisedt.net.ftp.ssh.SSHFTPPublicKey;
 import com.enterprisedt.net.ftp.ssh.SSHFTPValidator;
 

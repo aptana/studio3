@@ -46,6 +46,7 @@ import org.eclipse.jsch.internal.core.IConstants;
 import org.eclipse.jsch.internal.core.JSchCorePlugin;
 import org.eclipse.jsch.internal.core.PreferenceInitializer;
 
+import com.aptana.filesystem.secureftp.internal.SecureFTPPlugin;
 import com.enterprisedt.net.j2ssh.transport.publickey.InvalidSshKeyException;
 import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 import com.enterprisedt.net.puretls.LoadProviders;

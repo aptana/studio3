@@ -42,6 +42,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
 import com.aptana.core.epl.IMemento;
+import com.aptana.filesystem.ftp.internal.FTPConnectionFileManager;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.ConnectionPoint;
 import com.aptana.ide.core.io.CoreIOPlugin;

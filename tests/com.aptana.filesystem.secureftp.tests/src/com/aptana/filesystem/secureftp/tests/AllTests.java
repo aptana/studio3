@@ -12,6 +12,7 @@ public class AllTests
 		// $JUnit-BEGIN$
 		suite.addTestSuite(FTPSConnectionTest.class);
 		suite.addTestSuite(FTPSConnectionWithBasePathTest.class);
+		suite.addTestSuite(ImplicitFTPSConnectionTest.class);
 		suite.addTestSuite(SFTPConnectionTest.class);
 		// $JUnit-END$
 		return suite;
