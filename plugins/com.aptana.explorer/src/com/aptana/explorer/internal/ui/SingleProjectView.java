@@ -746,6 +746,8 @@ public abstract class SingleProjectView extends CommonNavigator
 				Menu databaseSubMenu = new Menu(menu);
 
 				createHerokuSubMenuItem(databaseSubMenu,
+						"heroku rake db:migrate", Messages.SingleProjectView_RakeDBMigrateItem, 0); //$NON-NLS-1$
+				createHerokuSubMenuItem(databaseSubMenu,
 						"heroku db:push", Messages.SingleProjectView_PushLocalDBItem, 0); //$NON-NLS-1$
 				createHerokuSubMenuItem(databaseSubMenu,
 						"heroku db:pull", Messages.SingleProjectView_PullRemoteDBItem, 0); //$NON-NLS-1$
