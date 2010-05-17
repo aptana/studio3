@@ -34,9 +34,11 @@
  */
 package com.aptana.usage;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -69,7 +71,7 @@ public class PingStartup implements IStartup
 {
 
 	private static final String ENCODING = "UTF-8"; //$NON-NLS-1$
-	private static final String UPDATE_URL = "http://ping.aptana.com/ping.php"; //$NON-NLS-1$
+	private static final String UPDATE_URL = "https://ping.aptana.com/ping.php"; //$NON-NLS-1$
 	private static final int READ_TIMEOUT = 15 * 60 * 1000; // 15 minutes in milliseconds
 	private static final long TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
@@ -236,6 +238,7 @@ public class PingStartup implements IStartup
 		URL url = null;
 		GZIPOutputStream gos = null;
 		DataOutputStream output = null;
+		BufferedReader input = null;
 		try
 		{
 			// gzips POST string
@@ -263,6 +266,19 @@ public class PingStartup implements IStartup
 			output = new DataOutputStream(connection.getOutputStream());
 			output.write(gzippedData);
 			output.flush();
+			
+			// Get the response
+			input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+			StringBuffer sb = new StringBuffer();
+			String line;
+
+			while ((line = input.readLine()) != null)
+			{
+				sb.append(line);
+			}
+			
+			// NOTE: Leave sysout here so we can use this during debugging
+			//System.out.println(sb.toString());
 
 			return true;
 		}
@@ -307,6 +323,17 @@ public class PingStartup implements IStartup
 				catch (IOException e)
 				{
 					// ignores
+				}
+			}
+			if (input != null)
+			{
+				try
+				{
+					input.close();
+				}
+				catch (IOException e)
+				{
+					// ignore
 				}
 			}
 		}

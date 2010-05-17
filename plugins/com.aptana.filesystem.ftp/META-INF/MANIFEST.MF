@@ -9,10 +9,10 @@ Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
  com.aptana.core,
  com.aptana.core.io,
- com.aptana.core.epl
+ com.aptana.core.epl,
+ com.aptana.ide.libraries.subscription;bundle-version="2.0.2"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Export-Package: com.aptana.ide.filesystem.ftp
-Bundle-ClassPath: lib/edtftpj.jar,
- .
+Export-Package: com.aptana.filesystem.ftp.internal;x-friends:="com.aptana.filesystem.secureftp",
+ com.aptana.ide.filesystem.ftp
 Eclipse-ExtensibleAPI: true
