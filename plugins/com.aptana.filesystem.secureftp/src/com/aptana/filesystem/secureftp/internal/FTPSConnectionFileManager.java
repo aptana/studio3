@@ -53,6 +53,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.PerformanceStats;
 import org.eclipse.core.runtime.Status;
 
 import com.aptana.filesystem.ftp.internal.FTPConnectionFileManager;
@@ -156,7 +157,7 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 			ftpClient.setRemotePort(port);
 			while (true) {
 				monitor.subTask(Messages.FTPSConnectionFileManager_Connecting);
-				ftpClient.connect();
+				connectFTPClient(ftpsClient);
 				if (!ftpsClient.isImplicitFTPS()) {
 					if (securityMechanism == null) {
 						String[] supportedMechanisms = new String[] {
@@ -259,6 +260,16 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 		return null;
 	}
 
+	private static void connectFTPClient(FTPClient ftpClient) throws IOException, FTPException {
+		PerformanceStats stats = PerformanceStats.getStats("com.aptana.filesystem.ftp/perf/connect", FTPSConnectionFileManager.class.getName());
+		stats.startRun(ftpClient.getRemoteHost());
+		try {
+			ftpClient.connect();
+		} finally {
+			stats.endRun();
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see com.aptana.ide.filesystem.secureftp.FTPConnectionFileManager#initAndAuthFTPClient(com.enterprisedt.net.ftp.FTPClient, org.eclipse.core.runtime.IProgressMonitor)
 	 */
@@ -269,7 +280,7 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 		newFtpClient.setRemoteHost(host);
 		newFtpClient.setRemotePort(port);
 		Policy.checkCanceled(monitor);
-		newFtpClient.connect();
+		connectFTPClient(newFtpClient);
 		monitor.worked(1);
 		Policy.checkCanceled(monitor);
 		if (!newFtpsClient.isImplicitFTPS()) {

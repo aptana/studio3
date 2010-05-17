@@ -63,6 +63,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.PerformanceStats;
 import org.eclipse.core.runtime.Status;
 
 import com.aptana.ide.core.io.ConnectionContext;
@@ -150,13 +151,23 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 		ftpClient.setDeleteOnFailure(true);
 		ftpClient.setTransferBufferSize(TRANSFER_BUFFER_SIZE);
 	}
+	
+	private static void connectFTPClient(FTPClient ftpClient) throws IOException, FTPException {
+		PerformanceStats stats = PerformanceStats.getStats("com.aptana.filesystem.ftp/perf/connect", FTPConnectionFileManager.class.getName());
+		stats.startRun(ftpClient.getRemoteHost());
+		try {
+			ftpClient.connect();
+		} finally {
+			stats.endRun();
+		}
+	}
 
 	protected void initAndAuthFTPClient(FTPClient newFtpClient, IProgressMonitor monitor) throws IOException, FTPException {
 		initFTPClient(newFtpClient, ftpClient.getConnectMode() == FTPConnectMode.PASV, ftpClient.getControlEncoding());
 		newFtpClient.setRemoteHost(host);
 		newFtpClient.setRemotePort(port);
 		Policy.checkCanceled(monitor);
-		newFtpClient.connect();
+		connectFTPClient(newFtpClient);
 		monitor.worked(1);
 		Policy.checkCanceled(monitor);
 		newFtpClient.login(login, String.copyValueOf(password));
@@ -227,7 +238,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 			ftpClient.setRemotePort(port);
 			while (true) {
 				monitor.subTask(Messages.FTPConnectionFileManager_connecting);
-				ftpClient.connect();
+				connectFTPClient(ftpClient);
 				if (password.length == 0 && !IFTPConstants.LOGIN_ANONYMOUS.equals(login) && (context == null || !context.getBoolean(ConnectionContext.NO_PASSWORD_PROMPT))) {
                     getOrPromptPassword(MessageFormat.format(
                             Messages.FTPConnectionFileManager_ftp_auth, host),
