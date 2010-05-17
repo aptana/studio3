@@ -35,9 +35,14 @@
 
 package com.aptana.filesystem.secureftp.tests;
 
+import junit.extensions.TestSetup;
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.io.tests.CommonConnectionTest;
+import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.filesystem.secureftp.SFTPConnectionPoint;
 
 /**
@@ -47,18 +52,32 @@ public class SFTPConnectionTest extends CommonConnectionTest
 {
 
 	@Override
-	protected void setUp() throws Exception
+	protected IConnectionPoint createConnectionPoint()
 	{
 		SFTPConnectionPoint ftpcp = new SFTPConnectionPoint();
-		ftpcp.setHost("10.10.1.60"); //$NON-NLS-1$
-		ftpcp.setLogin("ftpuser"); //$NON-NLS-1$
-		ftpcp.setPassword(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'});
+		ftpcp.setHost("ftp.aptana-ftp-test-site.com"); //$NON-NLS-1$
+		ftpcp.setLogin("aptana-test"); //$NON-NLS-1$
+		ftpcp.setPassword("TC2f79p7Y4{J".toCharArray());
+		ftpcp.setPort(2222);
 		ftpcp.setPath(Path.fromPortableString("/home/ftpuser")); //$NON-NLS-1$
-		cp = ftpcp;
-		super.setUp();
+		return ftpcp;
 	}
 
-	/* (non-Javadoc)
+	public static Test suite()
+	{
+		return new TestSetup(new TestSuite(SFTPConnectionTest.class))
+		{
+			@Override
+			protected void tearDown() throws Exception
+			{
+				super.tearDown();
+				oneTimeTeardown();
+			}
+		};
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsSetModificationTime()
 	 */
 	@Override

@@ -35,7 +35,18 @@
 
 package com.aptana.filesystem.ftp.tests;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.Path;
+
+import junit.extensions.TestSetup;
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import com.aptana.core.io.tests.CommonConnectionTest;
+import com.aptana.ide.core.io.ConnectionContext;
+import com.aptana.ide.core.io.CoreIOPlugin;
+import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.filesystem.ftp.FTPConnectionPoint;
 
 /**
@@ -43,16 +54,15 @@ import com.aptana.ide.filesystem.ftp.FTPConnectionPoint;
  */
 public class FTPConnectionTest extends CommonConnectionTest
 {
-
-	@Override
-	protected void setUp() throws Exception
+	// FIXME These tests are unbelievably slow for me. They take 25-40sec per test method!
+	
+	protected IConnectionPoint createConnectionPoint()
 	{
 		FTPConnectionPoint ftpcp = new FTPConnectionPoint();
-		ftpcp.setHost("10.10.1.60"); //$NON-NLS-1$
-		ftpcp.setLogin("ftpuser"); //$NON-NLS-1$
-		ftpcp.setPassword(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'});
-		cp = ftpcp;
-		super.setUp();
+		ftpcp.setHost("ftp.aptana-ftp-test-site.com"); //$NON-NLS-1$
+		ftpcp.setLogin("aptana-test"); //$NON-NLS-1$
+		ftpcp.setPassword("TC2f79p7Y4{J".toCharArray());
+		return ftpcp;
 	}
 
 	/* (non-Javadoc)

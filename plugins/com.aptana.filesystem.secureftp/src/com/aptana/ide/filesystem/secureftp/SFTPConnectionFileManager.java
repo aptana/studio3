@@ -58,6 +58,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.PerformanceStats;
 import org.eclipse.core.runtime.Status;
 
 import com.aptana.ide.core.io.ConnectionContext;
@@ -148,6 +149,8 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 	 * @see com.aptana.ide.core.io.vfs.IConnectionFileManager#connect(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void connect(IProgressMonitor monitor) throws CoreException {
+		PerformanceStats stats = PerformanceStats.getStats("com.aptana.filesystem.secureftp/perf/connect", this);
+		stats.startRun(host);
 		Assert.isTrue(ftpClient != null, Messages.SFTPConnectionFileManager_ConnectionNotInitialized);
 		monitor = Policy.monitorFor(monitor);
 		try {
@@ -244,6 +247,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedEstablishConnection+e.getLocalizedMessage(), e));
 		} finally {
 			monitor.done();
+			stats.endRun();
 		}
 	}
 
@@ -264,6 +268,8 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 	 * @see com.aptana.ide.core.io.vfs.IConnectionFileManager#disconnect(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void disconnect(IProgressMonitor monitor) throws CoreException {
+		PerformanceStats stats = PerformanceStats.getStats("com.aptana.filesystem.secureftp/perf/disconnect", this);
+		stats.startRun(host);
 		try {
 			checkConnected();
 		} catch (Exception ignore) {
@@ -285,6 +291,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 			cwd = null;
 			cleanup();
 			monitor.done();
+			stats.endRun();
 		}
 	}
 

@@ -34,13 +34,18 @@
  */
 package com.aptana.filesystem.secureftp.tests;
 
+import junit.extensions.TestSetup;
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.io.tests.CommonConnectionTest;
-import com.aptana.ide.filesystem.ftp.FTPConnectionPoint;
+import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.ide.filesystem.secureftp.FTPSConnectionPoint;
 
 /**
  * @author Max Stepanov
@@ -48,34 +53,46 @@ import com.aptana.ide.filesystem.ftp.FTPConnectionPoint;
 public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 {
 
-	private static FTPConnectionPoint setupConnection()
+	protected IConnectionPoint createConnectionPoint()
 	{
-		FTPConnectionPoint ftpcp = new FTPConnectionPoint();
-		ftpcp.setHost("10.10.1.60"); //$NON-NLS-1$
-		ftpcp.setLogin("ftpuser"); //$NON-NLS-1$
-		ftpcp.setPassword(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'});
+		FTPSConnectionPoint ftpcp = new FTPSConnectionPoint();
+		ftpcp.setHost("ftp.aptana-ftp-test-site.com"); //$NON-NLS-1$
+		ftpcp.setLogin("aptana-test"); //$NON-NLS-1$
+		ftpcp.setPassword("TC2f79p7Y4{J".toCharArray());
+		ftpcp.setPath(Path.ROOT.append(getClass().getSimpleName()));
 		return ftpcp;
+	}
+
+	public static Test suite()
+	{
+		return new TestSetup(new TestSuite(FTPSConnectionWithBasePathTest.class))
+		{
+			@Override
+			protected void tearDown() throws Exception
+			{
+				super.tearDown();
+				oneTimeTeardown();
+			}
+		};
 	}
 
 	@Override
 	protected void setUp() throws Exception
 	{
-		initBasePath();
-		FTPConnectionPoint ftpcp = setupConnection();
-		ftpcp.setPath(Path.ROOT.append(getClass().getSimpleName()));
-		cp = ftpcp;
 		super.setUp();
+		initBasePath();
 	}
 
 	@Override
-	protected void tearDown() throws Exception {
+	protected void tearDown() throws Exception
+	{
 		super.tearDown();
 		cleanupBasePath();
 	}
 
-	public static void initBasePath() throws CoreException
+	public void initBasePath() throws CoreException
 	{
-		FTPConnectionPoint ftpcp = setupConnection();
+		IConnectionPoint ftpcp = getConnection();
 		IFileStore fs = ftpcp.getRoot().getFileStore(
 				Path.ROOT.append(FTPSConnectionWithBasePathTest.class.getSimpleName()));
 		assertNotNull(fs);
@@ -83,13 +100,13 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 		{
 			fs.mkdir(EFS.NONE, null);
 		}
-		ftpcp.disconnect(null);
-		assertFalse(ftpcp.isConnected());
+		// ftpcp.disconnect(null);
+		// assertFalse(ftpcp.isConnected());
 	}
 
-	public static void cleanupBasePath() throws CoreException
+	public void cleanupBasePath() throws CoreException
 	{
-		FTPConnectionPoint ftpcp = setupConnection();
+		IConnectionPoint ftpcp = getConnection();
 		IFileStore fs = ftpcp.getRoot().getFileStore(
 				Path.ROOT.append(FTPSConnectionWithBasePathTest.class.getSimpleName()));
 		assertNotNull(fs);
@@ -97,11 +114,12 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 		{
 			fs.delete(EFS.NONE, null);
 		}
-		ftpcp.disconnect(null);
-		assertFalse(ftpcp.isConnected());
+		// ftpcp.disconnect(null);
+		// assertFalse(ftpcp.isConnected());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsSetModificationTime()
 	 */
 	@Override
@@ -109,7 +127,6 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 	{
 		return false;
 	}
-
 
 	/*
 	 * (non-Javadoc)
