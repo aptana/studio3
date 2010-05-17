@@ -33,49 +33,18 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.filesystem.secureftp;
+package com.aptana.filesystem.ftp;
 
 import org.eclipse.core.runtime.IPath;
 
-import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
-
+import com.aptana.ide.core.io.vfs.IConnectionFileManager;
 
 /**
  * @author Max Stepanov
  *
  */
-public interface ISFTPConnectionPoint extends IBaseRemoteConnectionPoint {
+public interface IFTPConnectionFileManager extends IConnectionFileManager {
 
-	public static final String TYPE_SFTP = "sftp"; //$NON-NLS-1$
-
-	/**
-	 * @return the encoding
-	 */
-	public String getEncoding();
-
-	/**
-	 * @param encoding the encoding to set
-	 */
-	public void setEncoding(String encoding);
-
-	/**
-	 * @return the compression
-	 */
-	public String getCompression();
-
-	/**
-	 * @param compression the compression to set
-	 */
-	public void setCompression(String compression);
+	public void init(String host, int port, IPath basePath, String login, char[] password, boolean passive, String transferType, String encoding, String timezone);
 	
-	/**
-	 * @return the key file path
-	 */
-	public IPath getKeyFilePath();
-
-	/**
-	 * @param keyFilePath the key file path to set
-	 */
-	public void setKeyFilePath(IPath keyFilePath);
-
 }

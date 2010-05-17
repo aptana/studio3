@@ -68,9 +68,9 @@ import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.preferences.PreferenceUtils;
 import com.aptana.ide.core.io.vfs.ExtendedFileInfo;
-import com.aptana.ide.filesystem.ftp.Policy;
-import com.aptana.ide.filesystem.secureftp.ISFTPConnectionFileManager;
-import com.aptana.ide.filesystem.secureftp.ISFTPConstants;
+import com.aptana.filesystem.ftp.Policy;
+import com.aptana.filesystem.secureftp.ISFTPConnectionFileManager;
+import com.aptana.filesystem.secureftp.ISFTPConstants;
 import com.enterprisedt.net.ftp.FTPException;
 import com.enterprisedt.net.ftp.FTPFile;
 import com.enterprisedt.net.ftp.FTPTransferType;
@@ -102,7 +102,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	private int connectionRetryCount;
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.filesystem.secureftp.ISFTPConnectionFileManager#init(java.lang.String, int, org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IPath, java.lang.String, char[], java.lang.String, java.lang.String, java.lang.String)
+	 * @see com.aptana.filesystem.secureftp.ISFTPConnectionFileManager#init(java.lang.String, int, org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IPath, java.lang.String, char[], java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public void init(String host, int port, IPath basePath, IPath keyFilePath, String login, char[] password, String transferType, String encoding, String compression) {
 		Assert.isTrue(ftpClient == null, Messages.SFTPConnectionFileManager_ConnectionHasBeenInitialized);

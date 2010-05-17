@@ -38,7 +38,7 @@ package com.aptana.filesystem.secureftp.tests;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.io.tests.CommonConnectionTest;
-import com.aptana.ide.filesystem.secureftp.SFTPConnectionPoint;
+import com.aptana.filesystem.secureftp.SFTPConnectionPoint;
 
 /**
  * @author Max Stepanov

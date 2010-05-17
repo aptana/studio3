@@ -33,15 +33,22 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.filesystem.ftp;
-
-import java.io.OutputStream;
+package com.aptana.filesystem.ftp;
 
 /**
  * @author Max Stepanov
  *
  */
-public interface IFTPCommandLog {
+public interface IFTPConstants {
 
-	public OutputStream getOutputStream();
+	public static final String TRANSFER_TYPE_AUTO = "AUTO"; //$NON-NLS-1$
+	public static final String TRANSFER_TYPE_ASCII = "ASCII"; //$NON-NLS-1$
+	public static final String TRANSFER_TYPE_BINARY = "BINARY"; //$NON-NLS-1$
+	
+	public static final int FTP_PORT_DEFAULT = 21;
+	
+	public static final String ENCODING_DEFAULT = "US-ASCII"; //$NON-NLS-1$
+
+	public static final String LOGIN_ANONYMOUS = "anonymous"; //$NON-NLS-1$
+
 }

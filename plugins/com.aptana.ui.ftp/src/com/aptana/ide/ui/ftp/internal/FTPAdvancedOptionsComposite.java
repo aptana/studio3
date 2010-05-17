@@ -57,7 +57,7 @@ import org.eclipse.swt.widgets.Text;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.TimeZoneUtil;
 import com.aptana.ide.core.io.ConnectionContext;
-import com.aptana.ide.filesystem.ftp.IBaseFTPConnectionPoint;
+import com.aptana.filesystem.ftp.IBaseFTPConnectionPoint;
 import com.aptana.ide.ui.io.dialogs.IDialogConstants;
 
 /**

@@ -59,11 +59,11 @@ import org.eclipse.core.runtime.Status;
 import com.aptana.filesystem.ftp.internal.FTPConnectionFileManager;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.CoreIOPlugin;
-import com.aptana.ide.filesystem.ftp.FTPPlugin;
-import com.aptana.ide.filesystem.ftp.IFTPConstants;
-import com.aptana.ide.filesystem.ftp.Policy;
-import com.aptana.ide.filesystem.secureftp.IFTPSConnectionFileManager;
-import com.aptana.ide.filesystem.secureftp.IFTPSConstants;
+import com.aptana.filesystem.ftp.FTPPlugin;
+import com.aptana.filesystem.ftp.IFTPConstants;
+import com.aptana.filesystem.ftp.Policy;
+import com.aptana.filesystem.secureftp.IFTPSConnectionFileManager;
+import com.aptana.filesystem.secureftp.IFTPSConstants;
 import com.enterprisedt.net.ftp.FTPClient;
 import com.enterprisedt.net.ftp.FTPConnectMode;
 import com.enterprisedt.net.ftp.FTPException;
@@ -80,7 +80,7 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 	private String securityMechanism;
 	
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.filesystem.secureftp.FTPConnectionFileManager#init(java.lang.String, int, org.eclipse.core.runtime.IPath, java.lang.String, char[], boolean, java.lang.String, java.lang.String, java.lang.String)
+	 * @see com.aptana.filesystem.secureftp.FTPConnectionFileManager#init(java.lang.String, int, org.eclipse.core.runtime.IPath, java.lang.String, char[], boolean, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
 	public void init(String host, int port, IPath basePath, String login, char[] password, boolean passive, String transferType, String encoding, String timezone) {
@@ -88,7 +88,7 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.filesystem.secureftp.IFTPSConnectionFileManager#init(java.lang.String, int, org.eclipse.core.runtime.IPath, java.lang.String, char[], boolean, boolean, java.lang.String, java.lang.String, java.lang.String, boolean)
+	 * @see com.aptana.filesystem.secureftp.IFTPSConnectionFileManager#init(java.lang.String, int, org.eclipse.core.runtime.IPath, java.lang.String, char[], boolean, boolean, java.lang.String, java.lang.String, java.lang.String, boolean)
 	 */
 	public void init(String host, int port, IPath basePath, String login, char[] password, boolean explicit, boolean passive, String transferType, String encoding, String timezone, boolean validateCertificate) {
 		Assert.isTrue(ftpClient == null, Messages.FTPSConnectionFileManager_ConnectionHasBeenInitiated);
@@ -119,7 +119,7 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.filesystem.secureftp.FTPConnectionFileManager#connect(org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.filesystem.secureftp.FTPConnectionFileManager#connect(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public void connect(IProgressMonitor monitor) throws CoreException {
@@ -248,7 +248,7 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.filesystem.secureftp.FTPConnectionFileManager#createFTPClient()
+	 * @see com.aptana.filesystem.secureftp.FTPConnectionFileManager#createFTPClient()
 	 */
 	@Override
 	protected FTPClient createFTPClient() {
@@ -271,7 +271,7 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.filesystem.secureftp.FTPConnectionFileManager#initAndAuthFTPClient(com.enterprisedt.net.ftp.FTPClient, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.filesystem.secureftp.FTPConnectionFileManager#initAndAuthFTPClient(com.enterprisedt.net.ftp.FTPClient, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected void initAndAuthFTPClient(FTPClient newFtpClient, IProgressMonitor monitor) throws IOException, FTPException {
@@ -291,7 +291,7 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.filesystem.secureftp.FTPConnectionFileManager#getRootCanonicalURI()
+	 * @see com.aptana.filesystem.secureftp.FTPConnectionFileManager#getRootCanonicalURI()
 	 */
 	@Override
 	protected URI getRootCanonicalURI() {

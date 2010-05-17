@@ -33,46 +33,21 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.filesystem.ftp;
+package com.aptana.filesystem.secureftp;
 
-import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
+import com.aptana.filesystem.ftp.IFTPConstants;
+
 
 /**
  * @author Max Stepanov
  *
  */
-public interface IBaseFTPConnectionPoint extends IBaseRemoteConnectionPoint {
+public interface ISFTPConstants extends IFTPConstants {
 
-	public static final String TYPE_FTP = "ftp"; //$NON-NLS-1$
+	public static final int SFTP_PORT_DEFAULT = 22;
 
-	/**
-	 * @return the passiveMode
-	 */
-	public boolean isPassiveMode();
-
-	/**
-	 * @param passiveMode the passiveMode to set
-	 */
-	public void setPassiveMode(boolean passiveMode);
-
-	/**
-	 * @return the encoding
-	 */
-	public String getEncoding();
-
-	/**
-	 * @param encoding the encoding to set
-	 */
-	public void setEncoding(String encoding);
-
-	/**
-	 * @return the timezone
-	 */
-	public String getTimezone();
-
-	/**
-	 * @param timezone the timezone to set
-	 */
-	public void setTimezone(String timezone);
+	public static final String COMPRESSION_AUTO = "AUTO"; //$NON-NLS-1$
+	public static final String COMPRESSION_NONE = "NONE"; //$NON-NLS-1$
+	public static final String COMPRESSION_ZLIB = "ZLIB"; //$NON-NLS-1$
 
 }
