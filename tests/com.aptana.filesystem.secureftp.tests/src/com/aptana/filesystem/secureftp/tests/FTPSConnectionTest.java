@@ -35,70 +35,66 @@
 
 package com.aptana.filesystem.secureftp.tests;
 
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import junit.framework.TestCase;
 
-import com.aptana.core.io.tests.CommonConnectionTest;
+import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
+
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.filesystem.secureftp.FTPSConnectionPoint;
 
 /**
  * @author Max Stepanov
  */
-public class FTPSConnectionTest extends CommonConnectionTest
+public class FTPSConnectionTest extends TestCase
 {
 
+	protected IConnectionPoint cp;
+
 	@Override
-	protected IConnectionPoint createConnectionPoint()
+	protected void setUp() throws Exception
 	{
 		FTPSConnectionPoint ftpcp = new FTPSConnectionPoint();
-		ftpcp.setHost("ftp.aptana-ftp-test-site.com"); //$NON-NLS-1$
-		ftpcp.setLogin("aptana-test"); //$NON-NLS-1$
-		ftpcp.setPassword("TC2f79p7Y4{J".toCharArray());
-		return ftpcp;
+		ftpcp.setHost("ftp.secureftp-test.com"); //$NON-NLS-1$
+		ftpcp.setLogin("test"); //$NON-NLS-1$
+		ftpcp.setPassword(new char[] { 't', 'e', 's', 't' });
+		ftpcp.setExplicit(true);
+		ftpcp.setValidateCertificate(false);
+		cp = ftpcp;
 	}
 
-	public static Test suite()
+	@Override
+	protected void tearDown() throws Exception
 	{
-		return new TestSetup(new TestSuite(FTPSConnectionTest.class))
+		if (cp.isConnected())
 		{
-			@Override
-			protected void tearDown() throws Exception
-			{
-				super.tearDown();
-				oneTimeTeardown();
-			}
-		};
+			cp.disconnect(null);
+		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsSetModificationTime()
-	 */
-	@Override
-	protected boolean supportsSetModificationTime()
+	public final void testConnect() throws CoreException
 	{
-		return false;
+		cp.connect(null);
+		assertTrue(cp.isConnected());
+		assertTrue(cp.canDisconnect());
+		cp.disconnect(null);
+		assertFalse(cp.isConnected());
+		assertFalse(cp.canDisconnect());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangeGroup()
-	 */
-	@Override
-	protected boolean supportsChangeGroup()
+	public final void testFetchRootInfo() throws CoreException
 	{
-		return false;
+		IFileStore fs = cp.getRoot();
+		assertNotNull(fs);
+		assertFalse(cp.isConnected());
+		IFileInfo fi = fs.fetchInfo();
+		assertTrue(cp.isConnected());
+		assertNotNull(fi);
+		assertTrue(fi.exists());
+		assertTrue(fi.isDirectory());
+		assertEquals(Path.ROOT.toPortableString(), fi.getName());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangePermissions()
-	 */
-	@Override
-	protected boolean supportsChangePermissions()
-	{
-		return false;
-	}
 }

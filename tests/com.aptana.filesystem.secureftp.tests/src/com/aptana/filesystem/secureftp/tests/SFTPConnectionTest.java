@@ -55,10 +55,10 @@ public class SFTPConnectionTest extends CommonConnectionTest
 	protected IConnectionPoint createConnectionPoint()
 	{
 		SFTPConnectionPoint ftpcp = new SFTPConnectionPoint();
-		ftpcp.setHost("ftp.aptana-ftp-test-site.com"); //$NON-NLS-1$
-		ftpcp.setLogin("aptana-test"); //$NON-NLS-1$
-		ftpcp.setPassword("TC2f79p7Y4{J".toCharArray());
-		ftpcp.setPort(2222);
+		ftpcp.setHost("10.10.1.60"); //$NON-NLS-1$
+		ftpcp.setLogin("ftpuser"); //$NON-NLS-1$
+		ftpcp.setPassword("letmein".toCharArray()); //$NON-NLS-1$
+		// TODO Extract the site connection details out to local property files so I can test outside our network!		
 		ftpcp.setPath(Path.fromPortableString("/home/ftpuser")); //$NON-NLS-1$
 		return ftpcp;
 	}

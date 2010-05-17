@@ -34,117 +34,71 @@
  */
 package com.aptana.filesystem.secureftp.tests;
 
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import junit.framework.TestCase;
 
 import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
-import com.aptana.core.io.tests.CommonConnectionTest;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.filesystem.secureftp.FTPSConnectionPoint;
 
 /**
  * @author Max Stepanov
  */
-public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
+public class FTPSConnectionWithBasePathTest extends TestCase
 {
 
-	protected IConnectionPoint createConnectionPoint()
-	{
-		FTPSConnectionPoint ftpcp = new FTPSConnectionPoint();
-		ftpcp.setHost("ftp.aptana-ftp-test-site.com"); //$NON-NLS-1$
-		ftpcp.setLogin("aptana-test"); //$NON-NLS-1$
-		ftpcp.setPassword("TC2f79p7Y4{J".toCharArray());
-		ftpcp.setPath(Path.ROOT.append(getClass().getSimpleName()));
-		return ftpcp;
-	}
-
-	public static Test suite()
-	{
-		return new TestSetup(new TestSuite(FTPSConnectionWithBasePathTest.class))
-		{
-			@Override
-			protected void tearDown() throws Exception
-			{
-				super.tearDown();
-				oneTimeTeardown();
-			}
-		};
-	}
+	private static final String BASE_PATH = "subdir1"; //$NON-NLS-1$
+	protected IConnectionPoint cp;
 
 	@Override
 	protected void setUp() throws Exception
 	{
-		super.setUp();
-		initBasePath();
+		// FIXME This server is read-only, so we can't just add our own base path!
+		FTPSConnectionPoint ftpcp = new FTPSConnectionPoint();
+		ftpcp.setHost("ftp.secureftp-test.com"); //$NON-NLS-1$
+		ftpcp.setLogin("test"); //$NON-NLS-1$
+		ftpcp.setPassword(new char[] { 't', 'e', 's', 't' });
+		ftpcp.setExplicit(true);
+		ftpcp.setValidateCertificate(false);
+		ftpcp.setPath(Path.ROOT.append(BASE_PATH));
+		cp = ftpcp;
 	}
 
 	@Override
 	protected void tearDown() throws Exception
 	{
-		super.tearDown();
-		cleanupBasePath();
-	}
-
-	public void initBasePath() throws CoreException
-	{
-		IConnectionPoint ftpcp = getConnection();
-		IFileStore fs = ftpcp.getRoot().getFileStore(
-				Path.ROOT.append(FTPSConnectionWithBasePathTest.class.getSimpleName()));
-		assertNotNull(fs);
-		if (!fs.fetchInfo().exists())
+		if (cp.isConnected())
 		{
-			fs.mkdir(EFS.NONE, null);
+			cp.disconnect(null);
 		}
-		// ftpcp.disconnect(null);
-		// assertFalse(ftpcp.isConnected());
 	}
 
-	public void cleanupBasePath() throws CoreException
+	public final void testConnect() throws CoreException
 	{
-		IConnectionPoint ftpcp = getConnection();
-		IFileStore fs = ftpcp.getRoot().getFileStore(
-				Path.ROOT.append(FTPSConnectionWithBasePathTest.class.getSimpleName()));
+		cp.connect(null);
+		assertTrue(cp.isConnected());
+		assertTrue(cp.canDisconnect());
+		cp.disconnect(null);
+		assertFalse(cp.isConnected());
+		assertFalse(cp.canDisconnect());
+	}
+
+	public final void testFetchRootInfo() throws CoreException
+	{
+		IFileStore fs = cp.getRoot();
 		assertNotNull(fs);
-		if (fs.fetchInfo().exists())
-		{
-			fs.delete(EFS.NONE, null);
-		}
-		// ftpcp.disconnect(null);
-		// assertFalse(ftpcp.isConnected());
+		assertFalse(cp.isConnected());
+		IFileInfo fi = fs.fetchInfo();
+		assertTrue(cp.isConnected());
+		assertNotNull(fi);
+		assertTrue(fi.exists());
+		assertTrue(fi.isDirectory());
+		assertEquals(Path.ROOT.toPortableString(), fi.getName());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsSetModificationTime()
-	 */
-	@Override
-	protected boolean supportsSetModificationTime()
-	{
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangeGroup()
-	 */
-	@Override
-	protected boolean supportsChangeGroup()
-	{
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangePermissions()
-	 */
-	@Override
-	protected boolean supportsChangePermissions()
-	{
-		return false;
-	}
 }
