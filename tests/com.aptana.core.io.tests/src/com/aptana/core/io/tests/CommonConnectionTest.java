@@ -121,10 +121,19 @@ public abstract class CommonConnectionTest extends TestCase
 		}
 		finally
 		{
-			if (cp.isConnected())
+			try
 			{
-				cp.disconnect(null);
+				if (cp.isConnected())
+				{
+					cp.disconnect(null);
+				}
 			}
+			finally
+			{
+				cp = null;
+				testPath = null;
+				super.tearDown();
+			}			
 		}
 	}
 
