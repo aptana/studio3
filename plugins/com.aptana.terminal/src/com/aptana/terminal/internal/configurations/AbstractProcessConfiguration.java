@@ -8,10 +8,10 @@ import java.util.Map;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 
+import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.ResourceUtil;
 import com.aptana.terminal.Activator;
 import com.aptana.terminal.IProcessConfiguration;
-import com.aptana.util.EclipseUtils;
-import com.aptana.util.ResourceUtils;
 
 abstract class AbstractProcessConfiguration implements IProcessConfiguration
 {
@@ -24,7 +24,7 @@ abstract class AbstractProcessConfiguration implements IProcessConfiguration
 	public File getExecutable()
 	{
 		URL url = FileLocator.find(Activator.getDefault().getBundle(), getExecutablePath(), null);
-		return ResourceUtils.resourcePathToFile(url);
+		return ResourceUtil.resourcePathToFile(url);
 	}
 
 	protected abstract IPath getExecutablePath();
@@ -44,22 +44,22 @@ abstract class AbstractProcessConfiguration implements IProcessConfiguration
 	private String getVersion()
 	{
 		// Grab RED RCP plugin version
-		String version = EclipseUtils.getPluginVersion("com.aptana.radrails.rcp"); //$NON-NLS-1$
+		String version = EclipseUtil.getPluginVersion("com.aptana.radrails.rcp"); //$NON-NLS-1$
 		if (version == null)
 		{
 			// Grab Product version
-			version = EclipseUtils.getProductVersion();
+			version = EclipseUtil.getProductVersion();
 		}
 		// FIXME This doesn't work for features.
 //		if (version == null)
 //		{
 //			// Try Red Core feature
-//			version = EclipseUtils.getPluginVersion("com.aptana.red.core"); //$NON-NLS-1$
+//			version = EclipseUtil.getPluginVersion("com.aptana.red.core"); //$NON-NLS-1$
 //		}
 		if (version == null)
 		{
 			// Fallback to Terminal plugin version
-			version = EclipseUtils.getPluginVersion(Activator.PLUGIN_ID);
+			version = EclipseUtil.getPluginVersion(Activator.PLUGIN_ID);
 		}
 		return version;
 	}

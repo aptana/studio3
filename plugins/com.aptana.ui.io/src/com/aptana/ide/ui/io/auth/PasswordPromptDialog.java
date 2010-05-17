@@ -50,7 +50,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import com.aptana.core.StringUtils;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.ui.io.IOUIPlugin;
 
 /**
@@ -147,7 +147,7 @@ public class PasswordPromptDialog extends TitleAreaDialog {
 		/* row 1 */
 		Label label = new Label(container, SWT.NONE);
 		label.setLayoutData(GridDataFactory.swtDefaults().create());
-		label.setText(StringUtils.makeFormLabel(Messages.PasswordPromptDialog_UserName));
+		label.setText(StringUtil.makeFormLabel(Messages.PasswordPromptDialog_UserName));
 		
 		loginText = new Text(container, SWT.SINGLE | SWT.BORDER);
 		loginText.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
@@ -159,7 +159,7 @@ public class PasswordPromptDialog extends TitleAreaDialog {
 		/* row 2 */
 		label = new Label(container, SWT.NONE);
 		label.setLayoutData(GridDataFactory.swtDefaults().create());
-		label.setText(StringUtils.makeFormLabel(Messages.PasswordPromptDialog_Password));
+		label.setText(StringUtil.makeFormLabel(Messages.PasswordPromptDialog_Password));
 
 		passwordText = new Text(container, SWT.SINGLE | SWT.PASSWORD | SWT.BORDER);
 		passwordText.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());

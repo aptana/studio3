@@ -51,13 +51,6 @@
    </requires>
 
    <plugin
-         id="com.aptana.util"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="com.aptana.console"
          download-size="0"
          install-size="0"
@@ -203,13 +196,6 @@
          version="0.0.0"/>
 
    <plugin
-         id="com.aptana.epl"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="com.aptana.editor.text"
          download-size="0"
          install-size="0"
@@ -328,6 +314,28 @@
 
    <plugin
          id="com.aptana.ui.ftp"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.ide.security.linux"
+         os="linux"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.ui.epl"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.index.core"
          download-size="0"
          install-size="0"
          version="0.0.0"

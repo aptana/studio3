@@ -70,7 +70,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 
 import com.aptana.core.CoreStrings;
-import com.aptana.core.StringUtils;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.DefaultSiteConnection;
 import com.aptana.ide.syncing.core.ISiteConnection;
@@ -105,10 +105,10 @@ public class SiteConnectionsEditorDialog extends TitleAreaDialog implements Site
         setShellStyle(getShellStyle() | SWT.RESIZE);
         setHelpAvailable(false);
 
-        sites.add(DefaultSiteConnection.getInstance());
+        // sites.add(DefaultSiteConnection.getInstance());
 		sites.addAll(Arrays.asList(SyncingPlugin.getSiteConnectionManager().getSiteConnections()));
 
-		setSelection(DefaultSiteConnection.getInstance());
+		// setSelection(DefaultSiteConnection.getInstance());
 	}
 
 	public void setCreateNew(String name, IAdaptable source, IAdaptable destination) {
@@ -163,7 +163,7 @@ public class SiteConnectionsEditorDialog extends TitleAreaDialog implements Site
 		addButton = new Button(group, SWT.PUSH);
 		addButton.setLayoutData(GridDataFactory.swtDefaults().create());
 		addButton.setImage(SWTUtils.getImage(UIPlugin.getDefault(), "/icons/add.gif")); //$NON-NLS-1$
-		addButton.setToolTipText(StringUtils.ellipsify(CoreStrings.ADD));
+		addButton.setToolTipText(StringUtil.ellipsify(CoreStrings.ADD));
 
 		removeButton = new Button(group, SWT.PUSH);
 		removeButton.setLayoutData(GridDataFactory.swtDefaults().create());
@@ -220,8 +220,9 @@ public class SiteConnectionsEditorDialog extends TitleAreaDialog implements Site
 						sites.remove(selection);
 						sitePropertiesWidget.setSource(null);
 						sitesViewer.refresh();
-						if (newSelectionIndex > -1 || newSelectionIndex < sitesViewer.getList().getItemCount()) {
-							setSelection(newSelectionIndex == 0 ? DefaultSiteConnection.getInstance() : sites.get(newSelectionIndex - 1));
+						if (newSelectionIndex > -1 && newSelectionIndex < sitesViewer.getList().getItemCount()) {
+							setSelection(sites.get(newSelectionIndex));
+							// setSelection(newSelectionIndex == 0 ? DefaultSiteConnection.getInstance() : sites.get(newSelectionIndex - 1));
 						}
 					}
 				}
@@ -328,10 +329,12 @@ public class SiteConnectionsEditorDialog extends TitleAreaDialog implements Site
     	}
 
         ISiteConnection siteConnection = sitePropertiesWidget.getSource();
-        if (siteConnection != DefaultSiteConnection.getInstance()) {
-            SyncingPlugin.getSiteConnectionManager().addSiteConnection(siteConnection);
+        if (siteConnection != null) {
+        	if (siteConnection != DefaultSiteConnection.getInstance()) {
+        		SyncingPlugin.getSiteConnectionManager().addSiteConnection(siteConnection);
+        	}
+        	SyncingPlugin.getSiteConnectionManager().siteConnectionChanged(siteConnection);
         }
-        SyncingPlugin.getSiteConnectionManager().siteConnectionChanged(siteConnection);
 
     	return applied;
     }

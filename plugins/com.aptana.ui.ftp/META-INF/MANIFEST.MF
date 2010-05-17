@@ -10,7 +10,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  org.eclipse.ui.forms,
  org.eclipse.ui.console,
- org.eclipse.ui.navigator,
  com.aptana.ui,
  com.aptana.ui.io,
  com.aptana.core,
@@ -21,3 +20,4 @@ Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.ide.ui.ftp.actions,
  com.aptana.ide.ui.ftp.dialogs,
  com.aptana.ide.ui.ftp.internal;x-friends:="com.aptana.ide.ui.secureftp"
+Eclipse-ExtensibleAPI: true

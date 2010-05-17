@@ -42,4 +42,5 @@ package com.aptana.editor.ruby;
 public interface IRubyConstants {
 
 	public String CONTENT_TYPE_RUBY = "com.aptana.contenttype.ruby"; //$NON-NLS-1$
+	public String CONTENT_TYPE_RUBY_AMBIGUOUS = "com.aptana.contenttype.ruby.ambiguous"; //$NON-NLS-1$
 }

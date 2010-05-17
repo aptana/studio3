@@ -779,7 +779,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 		} catch (OperationCanceledException e) {
 			throw e;
 		} catch (Exception e) {
-			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedSetPermissions, e));			
+			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedChangeGroup, e));			
 		} finally {
 			monitor.done();
 		}

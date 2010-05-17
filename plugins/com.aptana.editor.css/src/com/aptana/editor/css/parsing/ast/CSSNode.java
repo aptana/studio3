@@ -17,4 +17,10 @@ public class CSSNode extends ParseBaseNode
 		this.start = start;
 		this.end = end;
 	}
+	
+	@Override
+	public String getText()
+	{
+		return toString();
+	}
 }

@@ -42,7 +42,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
-import com.aptana.core.StringUtils;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.vfs.IExtendedFileInfo;
 
 /**
@@ -124,7 +124,7 @@ public class PermissionsGroup {
         group.setLayout(layout);
 
         Label label = new Label(group, SWT.NONE);
-        label.setText(StringUtils.makeFormLabel(Messages.PermissionsGroup_User));
+        label.setText(StringUtil.makeFormLabel(Messages.PermissionsGroup_User));
         fUserRead = new Button(group, SWT.CHECK);
         fUserRead.setText(Messages.PermissionsGroup_Read);
         fUserWrite = new Button(group, SWT.CHECK);
@@ -133,7 +133,7 @@ public class PermissionsGroup {
         fUserExecute.setText(Messages.PermissionsGroup_Execute);
 
         label = new Label(group, SWT.NONE);
-        label.setText(StringUtils.makeFormLabel(Messages.PermissionsGroup_Group));
+        label.setText(StringUtil.makeFormLabel(Messages.PermissionsGroup_Group));
         fGroupRead = new Button(group, SWT.CHECK);
         fGroupRead.setText(Messages.PermissionsGroup_Read);
         fGroupWrite = new Button(group, SWT.CHECK);
@@ -142,7 +142,7 @@ public class PermissionsGroup {
         fGroupExecute.setText(Messages.PermissionsGroup_Execute);
 
         label = new Label(group, SWT.NONE);
-        label.setText(StringUtils.makeFormLabel(Messages.PermissionsGroup_All));
+        label.setText(StringUtil.makeFormLabel(Messages.PermissionsGroup_All));
         fAllRead = new Button(group, SWT.CHECK);
         fAllRead.setText(Messages.PermissionsGroup_Read);
         fAllWrite = new Button(group, SWT.CHECK);

@@ -35,11 +35,20 @@
 
 package com.aptana.ide.ui.ftp.internal;
 
+import com.aptana.ide.core.io.ConnectionContext;
+
 /**
  * @author Max Stepanov
  *
  */
 public interface IOptionsComposite {
+
+	public static interface Listener {
+
+		public boolean isValid();
+		public void validate();
+		public boolean testConnection(ConnectionContext context, IConnectionRunnable connectRunnable);
+	}
 
 	public void loadPropertiesFrom(Object element);
 	

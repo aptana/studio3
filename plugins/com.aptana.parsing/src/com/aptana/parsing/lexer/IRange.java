@@ -2,7 +2,6 @@ package com.aptana.parsing.lexer;
 
 public interface IRange
 {
-
 	/**
 	 * Gets the starting offset for this range.
 	 * 

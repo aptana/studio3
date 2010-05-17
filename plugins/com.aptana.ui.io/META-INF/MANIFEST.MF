@@ -12,7 +12,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.navigator,
  org.eclipse.ui.navigator.resources,
  org.eclipse.ui,
- org.eclipse.ui.ide,
+ org.eclipse.ui.ide;bundle-version="3.4.0",
  com.aptana.ui,
  com.aptana.core,
  com.aptana.core.io,
@@ -27,3 +27,4 @@ Export-Package: com.aptana.ide.ui.io,
  com.aptana.ide.ui.io.navigator.resources,
  com.aptana.ide.ui.io.preferences,
  com.aptana.ide.ui.io.properties
+Eclipse-ExtensibleAPI: true

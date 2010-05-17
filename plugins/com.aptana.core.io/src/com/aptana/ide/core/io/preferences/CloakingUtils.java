@@ -43,7 +43,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
-import com.aptana.core.StringUtils;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 
 /**
@@ -164,7 +164,7 @@ public class CloakingUtils {
     }
 
     private static void setCloakedFileTypes(String[] filetypes) {
-        String value = StringUtils.join(";", filetypes); //$NON-NLS-1$
+        String value = StringUtil.join(";", filetypes); //$NON-NLS-1$
         IEclipsePreferences prefs = (new InstanceScope()).getNode(CoreIOPlugin.PLUGIN_ID);
         prefs.put(IPreferenceConstants.GLOBAL_CLOAKING_EXTENSIONS, value);
         try {

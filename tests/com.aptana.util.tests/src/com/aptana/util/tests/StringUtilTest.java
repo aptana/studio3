@@ -6,7 +6,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import com.aptana.util.StringUtil;
+import com.aptana.core.util.StringUtil;
 
 public class StringUtilTest extends TestCase
 {

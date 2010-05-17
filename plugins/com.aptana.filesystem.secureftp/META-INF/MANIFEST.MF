@@ -15,3 +15,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.ide.filesystem.secureftp
+Eclipse-ExtensibleAPI: true

@@ -10,7 +10,7 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 
-import com.aptana.util.IOUtil;
+import com.aptana.core.util.IOUtil;
 
 public class IOUtilTest extends TestCase
 {

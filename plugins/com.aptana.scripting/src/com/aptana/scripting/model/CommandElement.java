@@ -1,7 +1,6 @@
 package com.aptana.scripting.model;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,6 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.jruby.Ruby;
@@ -18,6 +19,7 @@ import org.jruby.exceptions.RaiseException;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
+import com.aptana.core.ShellExecutable;
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptUtils;
@@ -115,7 +117,7 @@ public class CommandElement extends AbstractBundleElement
 	private RunType _runType;
 	private Ruby _runtime;
 
-	private String _workingDirectoryPath;
+	private IPath _workingDirectoryPath;
 	private WorkingDirectoryType _workingDirectoryType;
 
 	/**
@@ -461,7 +463,7 @@ public class CommandElement extends AbstractBundleElement
 	 * 
 	 * @return
 	 */
-	public String getWorkingDirectory()
+	public IPath getWorkingDirectory()
 	{
 		switch (this._workingDirectoryType)
 		{
@@ -471,11 +473,11 @@ public class CommandElement extends AbstractBundleElement
 				// this type and will turn it into a PATH type and set the path to the current project
 				return this._workingDirectoryPath;
 			case CURRENT_BUNDLE:
-				return getOwningBundle().getBundleDirectory().toString();
+				return Path.fromOSString(getOwningBundle().getBundleDirectory().getAbsolutePath());
 			case UNDEFINED:
 			case CURRENT_FILE:
 			default:
-				return new File(this.getPath()).getParentFile().toString();
+				return Path.fromOSString(this.getPath()).removeLastSegments(1);
 		}
 	}
 
@@ -532,6 +534,7 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	void populateEnvironment(Map<String, Object> contextMap, Map<String, String> environment)
 	{
+		environment.putAll(ShellExecutable.getEnvironment());
 		for (Map.Entry<String, Object> entry : contextMap.entrySet())
 		{
 			Object valueObject = entry.getValue();
@@ -954,7 +957,7 @@ public class CommandElement extends AbstractBundleElement
 	 * 
 	 * @param path
 	 */
-	public void setWorkingDirectoryPath(String path)
+	public void setWorkingDirectoryPath(IPath path)
 	{
 		this._workingDirectoryPath = path;
 	}

@@ -18,6 +18,7 @@ import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.ui.externaltools.internal.model.IExternalToolConstants;
 
 import com.aptana.console.process.ConsoleProcessFactory;
+import com.aptana.core.ShellExecutable;
 import com.aptana.git.core.GitPlugin;
 
 /**
@@ -40,12 +41,12 @@ public abstract class Launcher
 	 * @param args
 	 * @return
 	 */
-	public static ILaunch launch(String command, String workingDir, String... args) throws CoreException
+	public static ILaunch launch(String command, IPath workingDir, String... args) throws CoreException
 	{
 		return launch(command, workingDir, new NullProgressMonitor(), args);
 	}
 
-	public static ILaunch launch(String command, String workingDir, IProgressMonitor monitor, String... args)
+	public static ILaunch launch(String command, IPath workingDir, IProgressMonitor monitor, String... args)
 			throws CoreException
 	{
 		ILaunchConfigurationWorkingCopy config = createLaunchConfig(command, workingDir, args);
@@ -55,10 +56,9 @@ public abstract class Launcher
 	// TODO 3.6+ Can't properly point to undeprecated constants until 3.6 is our base version where they moved these out
 	// to a core plugin
 	// @SuppressWarnings("deprecation")
-	private static ILaunchConfigurationWorkingCopy createLaunchConfig(String command, String workingDir, String... args)
+	private static ILaunchConfigurationWorkingCopy createLaunchConfig(String command, IPath workingDir, String... args)
 			throws CoreException
 	{
-		String toolArgs = '"' + join(args, "\" \"") + '"'; //$NON-NLS-1$
 		ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
 		ILaunchConfigurationType configType = manager
 				.getLaunchConfigurationType(IExternalToolConstants.ID_PROGRAM_BUILDER_LAUNCH_CONFIGURATION_TYPE);
@@ -81,15 +81,20 @@ public abstract class Launcher
 			name = manager.generateUniqueLaunchConfigurationNameFrom(name);
 		}
 
+		String toolArgs = '"' + join(args, "\" \"") + '"'; //$NON-NLS-1$
 		ILaunchConfigurationWorkingCopy config = configType.newInstance(null, name);
 		config.setAttribute(IExternalToolConstants.ATTR_LOCATION, command);
 		config.setAttribute(IExternalToolConstants.ATTR_TOOL_ARGUMENTS, toolArgs);
-		config.setAttribute(IExternalToolConstants.ATTR_WORKING_DIRECTORY, workingDir);
+		if (workingDir != null)
+		{
+			config.setAttribute(IExternalToolConstants.ATTR_WORKING_DIRECTORY, workingDir.toOSString());
+		}
 		config.setAttribute(DebugPlugin.ATTR_CAPTURE_OUTPUT, true);
 		config.setAttribute(IExternalToolConstants.ATTR_SHOW_CONSOLE, true);
 		config.setAttribute(IDebugUIConstants.ATTR_LAUNCH_IN_BACKGROUND, false);
 		config.setAttribute(DebugPlugin.ATTR_PROCESS_FACTORY_ID, ConsoleProcessFactory.ID);
 		Map<String, String> env = new HashMap<String, String>();
+		env.putAll(ShellExecutable.getEnvironment());
 		IPath git_ssh = GitPlugin.getDefault().getGIT_SSH();
 		if (git_ssh != null)
 		{

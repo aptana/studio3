@@ -1,6 +1,5 @@
 package com.aptana.git.core.model;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -9,7 +8,7 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.IPath;
 
 public class IndexChangedEvent extends RepositoryEvent
 {
@@ -36,12 +35,12 @@ public class IndexChangedEvent extends RepositoryEvent
 		Collection<ChangedFile> changedFiles = getDiff();
 
 		GitRepository repo = getRepository();
-		String workingDirectory = repo.workingDirectory();
+		IPath workingDirectory = repo.workingDirectory();
 		Set<IResource> files = new HashSet<IResource>();
 		for (ChangedFile changedFile : changedFiles)
 		{
-			String path = new File(workingDirectory, changedFile.getPath()).getAbsolutePath();
-			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(path));
+			IPath path = workingDirectory.append(changedFile.getPath()).makeAbsolute();
+			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(path);
 			if (file == null)
 				continue;
 			files.add(file);

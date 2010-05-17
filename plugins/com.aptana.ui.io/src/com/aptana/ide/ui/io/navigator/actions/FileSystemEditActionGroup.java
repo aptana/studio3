@@ -34,28 +34,31 @@
  */
 package com.aptana.ide.ui.io.navigator.actions;
 
+import java.lang.reflect.Method;
+
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionGroup;
-import org.eclipse.ui.internal.navigator.resources.actions.TextActionHandler;
+import org.eclipse.ui.actions.TextActionHandler;
 import org.eclipse.ui.navigator.ICommonMenuConstants;
 
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.LocalRoot;
 
-@SuppressWarnings("restriction")
 public class FileSystemEditActionGroup extends ActionGroup {
 
     private Clipboard fClipboard;
     private Shell fShell;
+    private Tree fTree;
 
     private FileSystemCopyAction fCopyAction;
     private FileSystemPasteAction fPasteAction;
@@ -63,8 +66,9 @@ public class FileSystemEditActionGroup extends ActionGroup {
 
     private TextActionHandler fTextActionHandler;
 
-    public FileSystemEditActionGroup(Shell shell) {
+    public FileSystemEditActionGroup(Shell shell, Tree tree) {
         fShell = shell;
+        fTree = tree;
         makeActions();
     }
 
@@ -110,7 +114,18 @@ public class FileSystemEditActionGroup extends ActionGroup {
         // fTextActionHandler.setPasteAction(fPasteAction);
         fTextActionHandler.setDeleteAction(fDeleteAction);
         updateActionBars();
-        fTextActionHandler.updateActionBars();
+        
+//      fTextActionHandler.updateActionBars(); // 3.6+ only, so we need to use reflection
+        try
+		{
+			Method m = TextActionHandler.class.getMethod("updateActionBars"); //$NON-NLS-1$
+			m.invoke(fTextActionHandler);
+		}
+		catch (Exception e)
+		{
+			// ignore
+		}
+
     }
 
     @Override
@@ -154,7 +169,7 @@ public class FileSystemEditActionGroup extends ActionGroup {
         fCopyAction.setImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
         // fCopyAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_COPY);
 
-        fDeleteAction = new FileSystemDeleteAction(fShell);
+        fDeleteAction = new FileSystemDeleteAction(fShell, fTree);
         fDeleteAction.setDisabledImageDescriptor(images
                 .getImageDescriptor(ISharedImages.IMG_TOOL_DELETE_DISABLED));
         fDeleteAction.setImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_DELETE));

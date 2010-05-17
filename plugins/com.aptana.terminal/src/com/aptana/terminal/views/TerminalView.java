@@ -44,9 +44,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -80,6 +80,7 @@ import org.eclipse.tm.internal.terminal.provisional.api.TerminalConnectorExtensi
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.ISaveablePart2;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -96,11 +97,11 @@ import org.eclipse.ui.progress.UIJob;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.terminal.Activator;
-import com.aptana.terminal.Closeable;
 import com.aptana.terminal.Utils;
 import com.aptana.terminal.connector.LocalTerminalConnector;
 import com.aptana.terminal.editor.TerminalEditor;
 import com.aptana.terminal.internal.IProcessListener;
+import com.aptana.terminal.internal.TerminalCloseHelper;
 import com.aptana.terminal.internal.emulator.VT100TerminalControl;
 import com.aptana.terminal.preferences.IPreferenceConstants;
 
@@ -109,7 +110,7 @@ import com.aptana.terminal.preferences.IPreferenceConstants;
  *
  */
 @SuppressWarnings("restriction")
-public class TerminalView extends ViewPart implements Closeable, ITerminalListener, IProcessListener, IPreferenceChangeListener {
+public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalListener, IProcessListener, IPreferenceChangeListener {
 
 	public static final String ID = "com.aptana.terminal.views.terminal"; //$NON-NLS-1$
 
@@ -127,6 +128,7 @@ public class TerminalView extends ViewPart implements Closeable, ITerminalListen
 	private TerminalActionSelectAll fActionEditSelectAll;
 	
 	private List<String> inputs = new ArrayList<String>();
+	private boolean checkCanClose = false;
 
 	/**
 	 * @param id
@@ -273,11 +275,7 @@ public class TerminalView extends ViewPart implements Closeable, ITerminalListen
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.terminal.Closeable#close()
-	 */
-	@Override
-	public void close() {
+	protected void close() {
 		if (fCtlTerminal != null && !fCtlTerminal.isDisposed()) {
 			fCtlTerminal.getControl().getDisplay().asyncExec(new Runnable() {
 				@Override
@@ -298,6 +296,57 @@ public class TerminalView extends ViewPart implements Closeable, ITerminalListen
 		if (closeViewOnExit) {
 			close();
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart2#promptToSaveOnClose()
+	 */
+	@Override
+	public int promptToSaveOnClose() {
+		return canCloseTerminal() ? ISaveablePart2.YES : ISaveablePart2.CANCEL;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+	public void doSave(IProgressMonitor monitor) {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#doSaveAs()
+	 */
+	@Override
+	public void doSaveAs() {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#isDirty()
+	 */
+	@Override
+	public boolean isDirty() {
+		try {
+			return checkCanClose;
+		} finally {
+			checkCanClose = false;
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
+	 */
+	@Override
+	public boolean isSaveAsAllowed() {
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#isSaveOnCloseNeeded()
+	 */
+	@Override
+	public boolean isSaveOnCloseNeeded() {
+		checkCanClose = true;
+		return true;
 	}
 
 	/* (non-Javadoc)
@@ -389,6 +438,14 @@ public class TerminalView extends ViewPart implements Closeable, ITerminalListen
 		if (localTerminalConnector != null) {
 			localTerminalConnector.addProcessListener(this);
 		}
+	}
+
+	protected boolean canCloseTerminal() {
+		LocalTerminalConnector localTerminalConnector = (LocalTerminalConnector) fCtlTerminal.getTerminalConnector().getAdapter(LocalTerminalConnector.class);
+		if (localTerminalConnector != null) {
+			return TerminalCloseHelper.canCloseTerminal(getSite(), localTerminalConnector);
+		}
+		return true;
 	}
 
 	public void sendInput(String text) {
