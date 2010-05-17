@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.syncing.ui.internal;
+package com.aptana.ide.syncing.ui.dialogs;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.TrayDialog;
@@ -52,6 +52,7 @@ import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.ISiteConnection;
+import com.aptana.ide.syncing.ui.dialogs.Messages;
 import com.aptana.ui.SWTUtils;
 import com.aptana.ui.UIPlugin;
 
