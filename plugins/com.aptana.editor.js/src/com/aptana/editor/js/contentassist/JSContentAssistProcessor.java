@@ -30,9 +30,9 @@ import com.aptana.parsing.lexer.Lexeme;
 
 public class JSContentAssistProcessor extends CommonContentAssistProcessor
 {
-	private static enum Location
+	static enum Location
 	{
-		ERROR, IN_PROPERTY_NAME, IN_VARIABLE_NAME
+		ERROR, IN_GLOBAL, IN_PROPERTY_NAME, IN_VARIABLE_NAME
 	};
 
 	private static final Image JS_FUNCTION = Activator.getImage("/icons/js_function.gif"); //$NON-NLS-1$
@@ -42,6 +42,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private JSASTQueryHelper _astHelper;
 	private IContextInformationValidator _validator;
 	private Lexeme<JSTokenType> _currentLexeme;
+	private IParseNode _currentNode;
 
 	/**
 	 * JSIndexContentAssitProcessor
@@ -126,21 +127,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		
 		if (Platform.inDevelopmentMode())
 		{
-			IParseNode ast = this.editor.getFileService().getParseResult();
-			IParseNode node = ast.getNodeAt(offset);
-			
-			// tokenize the current document
 			IDocument document = viewer.getDocument();
-			LexemeProvider<JSTokenType> lexemeProvider;
 			
-			if (node != null)
-			{
-				lexemeProvider = new JSLexemeProvider(document, node, new JSScopeScanner());
-			}
-			else
-			{
-				lexemeProvider = new JSLexemeProvider(document, offset, new JSScopeScanner());
-			}
+			LexemeProvider<JSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
 	
 			// store a reference to the lexeme at the current position
 			this._currentLexeme = lexemeProvider.getFloorLexeme(offset);
@@ -160,10 +149,13 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					break;
 					
 				default:
-					List<String> args = this._astHelper.getSymbolsInScope(node);
-					Collections.sort(args);
-					System.out.println(StringUtil.join(",", args));
-					//System.out.println("Location = " + location);
+					if (this._currentNode != null)
+					{
+						List<String> args = this._astHelper.getSymbolsInScope(this._currentNode);
+						Collections.sort(args);
+						System.out.println(StringUtil.join(",", args));
+						//System.out.println("Location = " + location);
+					}
 					break;
 			}
 	
@@ -187,6 +179,32 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		return result.toArray(new ICompletionProposal[result.size()]);
 	}
 
+	/**
+	 * createLexemeProvider
+	 * 
+	 * @param document
+	 * @param offset
+	 * @return
+	 */
+	LexemeProvider<JSTokenType> createLexemeProvider(IDocument document, int offset)
+	{
+		IParseNode ast = this.editor.getFileService().getParseResult();
+		LexemeProvider<JSTokenType> result;
+		
+		this._currentNode = ast.getNodeAt(offset);
+		
+		if (this._currentNode != null)
+		{
+			result = new JSLexemeProvider(document, this._currentNode, new JSScopeScanner());
+		}
+		else
+		{
+			result = new JSLexemeProvider(document, offset, new JSScopeScanner());
+		}
+		
+		return result;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.CommonContentAssistProcessor#getCompletionProposalAutoActivationCharacters()
@@ -219,7 +237,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	private Location getLocation(LexemeProvider<JSTokenType> lexemeProvider, int offset)
+	Location getLocation(LexemeProvider<JSTokenType> lexemeProvider, int offset)
 	{
 		Location result = Location.ERROR;
 		int index = lexemeProvider.getLexemeIndex(offset);
@@ -258,6 +276,23 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 								
 							default:
 								break;
+						}
+					}
+					break;
+					
+				case PARENTHESIS:
+					if ("(".equals(lexeme.getText()))
+					{
+						if (offset == lexeme.getEndingOffset())
+						{
+							result = Location.IN_GLOBAL;
+						}
+					}
+					else
+					{
+						if (offset == lexeme.getStartingOffset())
+						{
+							result = Location.IN_GLOBAL;
 						}
 					}
 					break;
