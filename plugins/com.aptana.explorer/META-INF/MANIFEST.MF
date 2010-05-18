@@ -33,7 +33,8 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.syncing.core;bundle-version="3.0.0",
  com.aptana.syncing.ui;bundle-version="3.0.0",
  com.aptana.ui.secureftp;bundle-version="3.0.0",
- com.aptana.ui;bundle-version="3.0.0"
+ com.aptana.ui;bundle-version="3.0.0",
+ com.aptana.deploy;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
