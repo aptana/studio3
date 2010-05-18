@@ -79,7 +79,6 @@ import org.eclipse.ui.wizards.IWizardRegistry;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.IScopeReference;
-import com.aptana.deploy.actions.DeployAction;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.TreeThemer;
@@ -96,7 +95,6 @@ import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.ResourceSynchronizationUtils;
 import com.aptana.ide.syncing.core.SiteConnectionUtils;
 import com.aptana.ide.syncing.ui.actions.DownloadAction;
-import com.aptana.ide.syncing.ui.actions.SynchronizeAction;
 import com.aptana.ide.syncing.ui.actions.UploadAction;
 import com.aptana.ide.syncing.ui.dialogs.ChooseSiteConnectionDialog;
 import com.aptana.ide.ui.secureftp.dialogs.CommonFTPConnectionPointPropertyDialog;
@@ -181,7 +179,6 @@ public abstract class SingleProjectView extends CommonNavigator
 	private static final String DEPLOY_MENU_ICON = "icons/full/elcl16/network_arrow.png"; //$NON-NLS-1$
 	private static final String[] animationImage = {
 			"icons/full/elcl16/yinyang1.png", "icons/full/elcl16/yinyang2.png", "icons/full/elcl16/yinyang3.png", "icons/full/elcl16/yinyang4.png" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-	private static final int DEPLOY_KEY_BINDING = SWT.MOD4 | SWT.MOD3 | 'D';
 
 	protected static final String GROUP_RUN = "group.run"; //$NON-NLS-1$
 	protected static final String GROUP_DEPLOY = "group.deploy"; //$NON-NLS-1$
@@ -455,22 +452,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		{
 			// insert commands for capistrano here
 			menuManager.add(new Separator(GROUP_CAP));
-			menuManager.appendToGroup(GROUP_CAP, new ContributionItem()
-			{
 
-				@Override
-				public void fill(Menu menu, int index)
-				{
-					createHerokuSubMenuItem(menu,
-							"cap deploy", Messages.SingleProjectView_DeployAppMenuItem, DEPLOY_KEY_BINDING); //$NON-NLS-1$
-				}
-
-				@Override
-				public boolean isDynamic()
-				{
-					return true;
-				}
-			});
 		}
 		else if (isHerokuProject())
 		{
@@ -482,39 +464,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		}
 		else
 		{
-			// insert command for wizard here
 			menuManager.add(new Separator(GROUP_WIZARD));
-			menuManager.appendToGroup(GROUP_WIZARD, new ContributionItem()
-			{
-
-				@Override
-				public void fill(Menu menu, int index)
-				{
-
-					SelectionAdapter WizardAdapter = new SelectionAdapter()
-					{
-						public void widgetSelected(SelectionEvent e)
-						{
-							DeployAction action = new DeployAction();
-							action.setActivePart(null, PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-									.getActivePage().getActivePart());
-							action.selectionChanged(null, PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-									.getSelectionService().getSelection());
-							action.run(null);
-						}
-					};
-
-					createSubMenuItemWithListener(menu, Messages.SingleProjectView_DeployWizardItem,
-							DEPLOY_KEY_BINDING, WizardAdapter);
-
-				}
-
-				@Override
-				public boolean isDynamic()
-				{
-					return true;
-				}
-			});
 		}
 	}
 
@@ -528,22 +478,6 @@ public abstract class SingleProjectView extends CommonNavigator
 			@Override
 			public void fill(Menu menu, int index)
 			{
-
-				SelectionAdapter synchronizeAdapter = new SelectionAdapter()
-				{
-					public void widgetSelected(SelectionEvent e)
-					{
-						SynchronizeAction action = new SynchronizeAction();
-						action.setActivePart(null, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-								.getActivePart());
-						action.setSelection(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService()
-								.getSelection());
-						action.run(null);
-					}
-				};
-
-				createSubMenuItemWithListener(menu, Messages.SingleProjectView_SynchronizeItem, DEPLOY_KEY_BINDING,
-						synchronizeAdapter);
 
 				SelectionAdapter uploadAdapter = new SelectionAdapter()
 				{
@@ -583,7 +517,7 @@ public abstract class SingleProjectView extends CommonNavigator
 					}
 				};
 
-				createSubMenuItemWithListener(menu, Messages.SingleProjectView_UploadItem, SWT.MOD4 | SWT.MOD2 | 'U',
+				createSubMenuItemWithListener(menu, Messages.SingleProjectView_UploadItem,
 						uploadAdapter);
 
 				SelectionAdapter downloadAdapter = new SelectionAdapter()
@@ -623,7 +557,7 @@ public abstract class SingleProjectView extends CommonNavigator
 					}
 
 				};
-				createSubMenuItemWithListener(menu, Messages.SingleProjectView_DownloadItem, 0, downloadAdapter);
+				createSubMenuItemWithListener(menu, Messages.SingleProjectView_DownloadItem, downloadAdapter);
 			}
 
 			@Override
@@ -719,23 +653,6 @@ public abstract class SingleProjectView extends CommonNavigator
 		menuManager.add(new Separator(GROUP_DEPLOY));
 		menuManager.add(new Separator(GROUP_HEROKU_COMMANDS));
 
-		menuManager.appendToGroup(GROUP_DEPLOY, new ContributionItem()
-		{
-
-			@Override
-			public void fill(Menu menu, int index)
-			{
-				createHerokuSubMenuItem(menu,
-						"git push heroku master", Messages.SingleProjectView_DeployAppMenuItem, DEPLOY_KEY_BINDING); //$NON-NLS-1$
-			}
-
-			@Override
-			public boolean isDynamic()
-			{
-				return true;
-			}
-		});
-
 		menuManager.appendToGroup(GROUP_HEROKU_COMMANDS, new ContributionItem()
 		{
 
@@ -762,11 +679,11 @@ public abstract class SingleProjectView extends CommonNavigator
 				Menu databaseSubMenu = new Menu(menu);
 
 				createHerokuSubMenuItem(databaseSubMenu,
-						"heroku rake db:migrate", Messages.SingleProjectView_RakeDBMigrateItem, 0); //$NON-NLS-1$
+						"heroku rake db:migrate", Messages.SingleProjectView_RakeDBMigrateItem); //$NON-NLS-1$
 				createHerokuSubMenuItem(databaseSubMenu,
-						"heroku db:push", Messages.SingleProjectView_PushLocalDBItem, 0); //$NON-NLS-1$
+						"heroku db:push", Messages.SingleProjectView_PushLocalDBItem); //$NON-NLS-1$
 				createHerokuSubMenuItem(databaseSubMenu,
-						"heroku db:pull", Messages.SingleProjectView_PullRemoteDBItem, 0); //$NON-NLS-1$
+						"heroku db:pull", Messages.SingleProjectView_PullRemoteDBItem); //$NON-NLS-1$
 
 				databaseMenuItem.setMenu(databaseSubMenu);
 
@@ -776,9 +693,9 @@ public abstract class SingleProjectView extends CommonNavigator
 				Menu maintanenceSubMenu = new Menu(menu);
 
 				createHerokuSubMenuItem(maintanenceSubMenu,
-						"heroku maintenance:on", Messages.SingleProjectView_OnMaintenanceItem, 0); //$NON-NLS-1$
+						"heroku maintenance:on", Messages.SingleProjectView_OnMaintenanceItem); //$NON-NLS-1$
 				createHerokuSubMenuItem(maintanenceSubMenu,
-						"heroku maintenance:off", Messages.SingleProjectView_OffMaintenanceItem, 0); //$NON-NLS-1$
+						"heroku maintenance:off", Messages.SingleProjectView_OffMaintenanceItem); //$NON-NLS-1$
 
 				maintenanceMenuItem.setMenu(maintanenceSubMenu);
 
@@ -787,7 +704,7 @@ public abstract class SingleProjectView extends CommonNavigator
 				remoteMenuItem.setText(Messages.SingleProjectView_RemoteSubmenuLabel);
 				Menu remoteSubMenu = new Menu(menu);
 
-				createHerokuSubMenuItem(remoteSubMenu, "heroku console", Messages.SingleProjectView_ConsoleItem, 0); //$NON-NLS-1$
+				createHerokuSubMenuItem(remoteSubMenu, "heroku console", Messages.SingleProjectView_ConsoleItem); //$NON-NLS-1$
 				createHerokuSubMenuItemWithInput(
 						remoteSubMenu,
 						"heroku rake ", Messages.SingleProjectView_RakeCommandItem, Messages.SingleProjectView_CommandLabel); //$NON-NLS-1$
@@ -810,7 +727,7 @@ public abstract class SingleProjectView extends CommonNavigator
 
 				// may want to add backup commands
 
-				createHerokuSubMenuItem(menu, "heroku info", Messages.SingleProjectView_AppInfoItem, 0); //$NON-NLS-1$
+				createHerokuSubMenuItem(menu, "heroku info", Messages.SingleProjectView_AppInfoItem); //$NON-NLS-1$
 				createHerokuSubMenuItemWithInput(
 						menu,
 						"heroku rename ", Messages.SingleProjectView_RenameAppItem, Messages.SingleProjectView_NewAppNameLabel); //$NON-NLS-1$
@@ -1599,23 +1516,19 @@ public abstract class SingleProjectView extends CommonNavigator
 		}
 	}
 
-	private void createSubMenuItemWithListener(Menu menu, String text, int keybinding, SelectionListener listener)
+	private void createSubMenuItemWithListener(Menu menu, String text, SelectionListener listener)
 	{
 		MenuItem synchronizeItem = new MenuItem(menu, SWT.PUSH);
 		synchronizeItem.setText(text);
-		if (keybinding != 0)
-			synchronizeItem.setAccelerator(keybinding);
 		synchronizeItem.addSelectionListener(listener);
 
 	}
 
-	private void createHerokuSubMenuItem(Menu menu, String cmd, String text, int keybinding)
+	private void createHerokuSubMenuItem(Menu menu, String cmd, String text)
 	{
 		final String command = cmd;
 		MenuItem item = new MenuItem(menu, SWT.PUSH);
 		item.setText(text);
-		if (keybinding != 0)
-			item.setAccelerator(keybinding);
 		item.addSelectionListener(new SelectionAdapter()
 		{
 			public void widgetSelected(SelectionEvent e)

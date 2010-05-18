@@ -144,7 +144,8 @@
          id="com.aptana.editor.ruby"
          download-size="0"
          install-size="0"
-         version="0.0.0"/>
+         version="0.0.0"
+         unpack="false"/>
 
    <plugin
          id="com.aptana.editor.xml"
@@ -348,6 +349,13 @@
 
    <plugin
          id="beaver"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.jrubyparser"
          download-size="0"
          install-size="0"
          version="0.0.0"

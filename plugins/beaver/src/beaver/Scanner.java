@@ -17,6 +17,7 @@ import java.io.IOException;
  */
 public abstract class Scanner
 {
+	@SuppressWarnings("serial")
 	public static class Exception extends java.lang.Exception
 	{
 		public final int line;

@@ -294,7 +294,8 @@ public class ScriptingConsole implements IStartup, IConsolePageParticipant
 	 */
 	private void listenForFontChanges()
 	{
-		if (JFaceResources.getFontRegistry() != null)
+		// This is for the unit tests, need to not try and get font registry when not on UI thread
+		if (Display.getCurrent() != null && JFaceResources.getFontRegistry() != null)
 		{
 			this._fontChangeListener = new IPropertyChangeListener()
 			{

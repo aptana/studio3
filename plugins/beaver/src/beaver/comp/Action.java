@@ -23,6 +23,7 @@ import beaver.spec.Terminal;
  * This class abstracts an action that is performed by an automaton when it's in some state and
  * a specified symbol has arrived.
  */
+@SuppressWarnings("unchecked")
 class Action
 {
 	static final Comparator LOOKAHEAD_ID_COMPARATOR = new Comparator()

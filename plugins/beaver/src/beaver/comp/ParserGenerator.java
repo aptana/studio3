@@ -37,6 +37,7 @@ import beaver.spec.parser.GrammarScanner;
  * This class provides parser generation driving routines. In a way it is a driver, where only top level calls are left
  * for the Main application class.
  */
+@SuppressWarnings("unchecked")
 public class ParserGenerator
 {
 	static public final String VERSION = "0.9.6.1";

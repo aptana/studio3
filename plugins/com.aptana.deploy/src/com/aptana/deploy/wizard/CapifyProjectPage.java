@@ -1,7 +1,6 @@
 package com.aptana.deploy.wizard;
 
 import java.net.URL;
-import java.text.MessageFormat;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -12,31 +11,24 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
-import org.eclipse.tm.internal.terminal.control.ITerminalListener;
-import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
-import org.eclipse.tm.internal.terminal.provisional.api.TerminalConnectorExtension;
-import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
 import com.aptana.deploy.Activator;
-import com.aptana.terminal.connector.LocalTerminalConnector;
-import com.aptana.terminal.internal.emulator.VT100TerminalControl;
+import com.aptana.terminal.widget.TerminalComposite;
 
-@SuppressWarnings("restriction")
 public class CapifyProjectPage extends WizardPage
 {
 
 	static final String NAME = "CapifyProject"; //$NON-NLS-1$
-	private VT100TerminalControl fCtlTerminal;
+	private TerminalComposite terminalComposite;
 
 	protected CapifyProjectPage()
 	{
@@ -68,42 +60,22 @@ public class CapifyProjectPage extends WizardPage
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				if (!fCtlTerminal.isEmpty())
+				if (!terminalComposite.isEmpty())
 				{
-					fCtlTerminal.clearTerminal();
+					terminalComposite.clear();
 				}
-				// Force a cd to project root
-				fCtlTerminal.pasteString(MessageFormat.format("cd '{0}'\n", getProject().getLocation().toOSString())); //$NON-NLS-1$
-
 				// Send "capify" command to terminal
-				fCtlTerminal.pasteString("capify .\n"); //$NON-NLS-1$
+				terminalComposite.sendInput("capify .\n"); //$NON-NLS-1$
 			}
 		});
 
 		// Terminal
-		Composite terminal = new Composite(composite, SWT.NONE);
-		terminal.setLayout(new FillLayout());
-		terminal.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_FILL | GridData.HORIZONTAL_ALIGN_FILL));
+		terminalComposite = new TerminalComposite(composite, SWT.NONE);
+		terminalComposite.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_FILL | GridData.HORIZONTAL_ALIGN_FILL));
 
 		// TODO Can we prevent user input to this terminal?
-		fCtlTerminal = new VT100TerminalControl(new ITerminalListener()
-		{
-
-			@Override
-			public void setState(TerminalState state)
-			{
-				// do nothing
-			}
-
-			@Override
-			public void setTerminalTitle(String title)
-			{
-				// do nothing
-			}
-
-		}, terminal, getTerminalConnectors());
-		fCtlTerminal.setConnector(fCtlTerminal.getConnectors()[0]);
-		fCtlTerminal.connectTerminal();
+		terminalComposite.setWorkingDirectory(getProject().getLocation());
+		terminalComposite.connect();
 
 		// label/link
 		Link link = new Link(composite, SWT.NONE);
@@ -130,32 +102,6 @@ public class CapifyProjectPage extends WizardPage
 		});
 
 		Dialog.applyDialogFont(composite);
-	}
-
-	@Override
-	public void dispose()
-	{
-		try
-		{
-			if (fCtlTerminal != null)
-			{
-				fCtlTerminal.disposeTerminal();
-			}
-		}
-		finally
-		{
-			super.dispose();
-		}
-	}
-
-	private ITerminalConnector[] getTerminalConnectors()
-	{
-		ITerminalConnector connector = TerminalConnectorExtension.makeTerminalConnector(LocalTerminalConnector.ID);
-		if (connector != null)
-		{
-			connector.getInitializationErrorMessage();
-		}
-		return new ITerminalConnector[] { connector };
 	}
 
 	@Override

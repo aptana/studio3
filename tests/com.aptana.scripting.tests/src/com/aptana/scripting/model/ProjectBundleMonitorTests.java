@@ -26,5 +26,8 @@ public class ProjectBundleMonitorTests extends BundleMonitorTests
 	protected void waitForAction(FileSystemAction action) throws Exception
 	{
 		action.performAction();
+		
+		// TODO: Probably should be relying on events or monitors here
+		Thread.sleep(500);
 	}
 }

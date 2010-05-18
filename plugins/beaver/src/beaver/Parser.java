@@ -16,6 +16,7 @@ import java.io.IOException;
  */
 public abstract class Parser
 {
+	@SuppressWarnings("serial")
 	static public class Exception extends java.lang.Exception
 	{
 		Exception(String msg)

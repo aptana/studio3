@@ -135,6 +135,11 @@
                id="org.eclipse.ui.commands.toggleState">
          </state>
       </command>
+      <command
+            defaultHandler="com.aptana.explorer.internal.handlers.DeployHandler"
+            id="com.aptana.explorer.deploy"
+            name="%Deploy.label">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -154,5 +159,46 @@
             </command>
          </toolbar>
       </menuContribution>
+      <menuContribution
+            locationURI="toolbar:com.aptana.explorer.deploy?before=group.deploy">
+         <command
+               commandId="com.aptana.explorer.deploy"
+               label="%Deploy.label"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:com.aptana.explorer.deploy?before=group.cap">
+         <command
+               commandId="com.aptana.explorer.deploy"
+               label="%Deploy.label"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:com.aptana.explorer.deploy?before=group.ftp">
+         <command
+               commandId="com.aptana.explorer.deploy"
+               label="%FTPDeploy.label"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:com.aptana.explorer.deploy?before=group.wizard">
+         <command
+               commandId="com.aptana.explorer.deploy"
+               label="%DeployWizard.label"
+               style="push">
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="com.aptana.explorer.deploy"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M4+M3+D">
+      </key>
    </extension>
 </plugin>
