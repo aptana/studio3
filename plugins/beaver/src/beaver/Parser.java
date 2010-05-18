@@ -352,7 +352,6 @@ public abstract class Parser
 			return true;
 		}
 
-		@SuppressWarnings("unused")
 		private void initStack() throws IOException
 		{
 			if (states == null || states.length < Parser.this.states.length)
