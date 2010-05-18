@@ -31,7 +31,7 @@ public abstract class ExecutableUtil
 		if (Platform.OS_WIN32.equals(Platform.getOS()))
 		{
 			String pathENV = System.getenv("PATH");
-			if (env != null)
+			if (env != null && !env.isEmpty())
 			{
 				pathENV = env.get("PATH");
 			}
