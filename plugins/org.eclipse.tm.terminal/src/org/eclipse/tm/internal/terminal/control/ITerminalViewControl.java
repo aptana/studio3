@@ -67,7 +67,7 @@ public interface ITerminalViewControl {
     void disposeTerminal();
     String getSettingsSummary();
     ITerminalConnector[] getConnectors();
-    void setFocus();
+    boolean setFocus();
     ITerminalConnector getTerminalConnector();
     void setConnector(ITerminalConnector connector);
     void connectTerminal();
