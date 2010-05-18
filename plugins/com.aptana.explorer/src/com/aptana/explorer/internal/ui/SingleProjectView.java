@@ -79,6 +79,7 @@ import org.eclipse.ui.wizards.IWizardRegistry;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.IScopeReference;
+import com.aptana.deploy.actions.DeployAction;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.TreeThemer;
@@ -461,7 +462,7 @@ public abstract class SingleProjectView extends CommonNavigator
 				public void fill(Menu menu, int index)
 				{
 					createHerokuSubMenuItem(menu,
-							"echo 'cap command'", Messages.SingleProjectView_DeployAppMenuItem, DEPLOY_KEY_BINDING); //$NON-NLS-1$
+							"cap deploy", Messages.SingleProjectView_DeployAppMenuItem, DEPLOY_KEY_BINDING); //$NON-NLS-1$
 				}
 
 				@Override
@@ -489,8 +490,23 @@ public abstract class SingleProjectView extends CommonNavigator
 				@Override
 				public void fill(Menu menu, int index)
 				{
-					createHerokuSubMenuItem(menu,
-							"echo 'deploy wizard'", Messages.SingleProjectView_DeployWizardItem, DEPLOY_KEY_BINDING); //$NON-NLS-1$
+
+					SelectionAdapter WizardAdapter = new SelectionAdapter()
+					{
+						public void widgetSelected(SelectionEvent e)
+						{
+							DeployAction action = new DeployAction();
+							action.setActivePart(null, PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+									.getActivePage().getActivePart());
+							action.selectionChanged(null, PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+									.getSelectionService().getSelection());
+							action.run(null);
+						}
+					};
+
+					createSubMenuItemWithListener(menu, Messages.SingleProjectView_DeployWizardItem,
+							DEPLOY_KEY_BINDING, WizardAdapter);
+
 				}
 
 				@Override
@@ -526,7 +542,7 @@ public abstract class SingleProjectView extends CommonNavigator
 					}
 				};
 
-				createFTPSubMenuItem(menu, Messages.SingleProjectView_SynchronizeItem, DEPLOY_KEY_BINDING,
+				createSubMenuItemWithListener(menu, Messages.SingleProjectView_SynchronizeItem, DEPLOY_KEY_BINDING,
 						synchronizeAdapter);
 
 				SelectionAdapter uploadAdapter = new SelectionAdapter()
@@ -567,7 +583,7 @@ public abstract class SingleProjectView extends CommonNavigator
 					}
 				};
 
-				createFTPSubMenuItem(menu, Messages.SingleProjectView_UploadItem, SWT.MOD4 | SWT.MOD2 | 'U',
+				createSubMenuItemWithListener(menu, Messages.SingleProjectView_UploadItem, SWT.MOD4 | SWT.MOD2 | 'U',
 						uploadAdapter);
 
 				SelectionAdapter downloadAdapter = new SelectionAdapter()
@@ -607,7 +623,7 @@ public abstract class SingleProjectView extends CommonNavigator
 					}
 
 				};
-				createFTPSubMenuItem(menu, Messages.SingleProjectView_DownloadItem, 0, downloadAdapter);
+				createSubMenuItemWithListener(menu, Messages.SingleProjectView_DownloadItem, 0, downloadAdapter);
 			}
 
 			@Override
@@ -1583,7 +1599,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		}
 	}
 
-	private void createFTPSubMenuItem(Menu menu, String text, int keybinding, SelectionListener listener)
+	private void createSubMenuItemWithListener(Menu menu, String text, int keybinding, SelectionListener listener)
 	{
 		MenuItem synchronizeItem = new MenuItem(menu, SWT.PUSH);
 		synchronizeItem.setText(text);

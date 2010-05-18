@@ -42,7 +42,7 @@ import java.io.IOException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
-import com.aptana.ide.filesystem.secureftp.SecureUtils;
+import com.aptana.filesystem.secureftp.SecureUtils;
 import com.enterprisedt.net.ftp.ssh.SSHFTPPublicKey;
 import com.enterprisedt.net.ftp.ssh.SSHFTPValidator;
 

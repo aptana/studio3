@@ -33,21 +33,17 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.filesystem.secureftp;
+package com.aptana.filesystem.secureftp;
 
-import com.aptana.ide.filesystem.ftp.IFTPConstants;
+import org.eclipse.core.runtime.IPath;
 
+import com.aptana.ide.core.io.vfs.IConnectionFileManager;
 
 /**
  * @author Max Stepanov
  *
  */
-public interface ISFTPConstants extends IFTPConstants {
+public interface IFTPSConnectionFileManager extends IConnectionFileManager {
 
-	public static final int SFTP_PORT_DEFAULT = 22;
-
-	public static final String COMPRESSION_AUTO = "AUTO"; //$NON-NLS-1$
-	public static final String COMPRESSION_NONE = "NONE"; //$NON-NLS-1$
-	public static final String COMPRESSION_ZLIB = "ZLIB"; //$NON-NLS-1$
-
+	public void init(String host, int port, IPath basePath, String login, char[] password, boolean explicit, boolean passive, String transferType, String encoding, String timezone, boolean validateCertificate);
 }

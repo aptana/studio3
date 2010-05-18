@@ -41,8 +41,8 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 
+import com.aptana.filesystem.secureftp.FTPSConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.filesystem.secureftp.FTPSConnectionPoint;
 
 
 /**

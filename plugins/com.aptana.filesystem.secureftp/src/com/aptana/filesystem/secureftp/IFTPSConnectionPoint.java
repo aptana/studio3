@@ -33,18 +33,38 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.filesystem.ftp;
+package com.aptana.filesystem.secureftp;
 
-import org.eclipse.core.runtime.IPath;
-
-import com.aptana.ide.core.io.vfs.IConnectionFileManager;
+import com.aptana.filesystem.ftp.IBaseFTPConnectionPoint;
 
 /**
  * @author Max Stepanov
  *
  */
-public interface IFTPConnectionFileManager extends IConnectionFileManager {
+public interface IFTPSConnectionPoint extends IBaseFTPConnectionPoint {
 
-	public void init(String host, int port, IPath basePath, String login, char[] password, boolean passive, String transferType, String encoding, String timezone);
+	public static final String TYPE_FTPS = "ftps"; //$NON-NLS-1$
+
+	/**
+	 * @return explicit
+	 */
+	public boolean isExplicit();
+
+	/**
+	 * @param explicit the explicit to set
+	 */
+	public void setExplicit(boolean explicit);
 	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isValidateCertificate();
+	
+	/**
+	 * 
+	 * @param validate
+	 */
+	public void setValidateCertificate(boolean validate);
+
 }

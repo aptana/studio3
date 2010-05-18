@@ -36,7 +36,7 @@
 package com.aptana.filesystem.secureftp.tests;
 
 import com.aptana.core.io.tests.CommonConnectionTest;
-import com.aptana.ide.filesystem.secureftp.FTPSConnectionPoint;
+import com.aptana.filesystem.secureftp.FTPSConnectionPoint;
 
 /**
  * @author Max Stepanov

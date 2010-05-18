@@ -59,6 +59,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.util.URLEncoder;
+import com.aptana.filesystem.ftp.FTPPlugin;
+import com.aptana.filesystem.ftp.Policy;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.InfiniteProgressMonitor;
 import com.aptana.ide.core.io.preferences.PreferenceUtils;
@@ -66,8 +68,6 @@ import com.aptana.ide.core.io.vfs.ExtendedFileInfo;
 import com.aptana.ide.core.io.vfs.IConnectionFileManager;
 import com.aptana.ide.core.io.vfs.IExtendedFileInfo;
 import com.aptana.ide.core.io.vfs.IExtendedFileStore;
-import com.aptana.ide.filesystem.ftp.FTPPlugin;
-import com.aptana.ide.filesystem.ftp.Policy;
 
 /**
  * @author Max Stepanov
