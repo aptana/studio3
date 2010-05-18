@@ -37,6 +37,7 @@ import beaver.spec.parser.GrammarScanner;
  * This class provides parser generation driving routines. In a way it is a driver, where only top level calls are left
  * for the Main application class.
  */
+@SuppressWarnings("unchecked")
 public class ParserGenerator
 {
 	static public final String VERSION = "0.9.6.1";
@@ -493,6 +494,7 @@ public class ParserGenerator
 			return bytes_stream;
 		}
 
+		@SuppressWarnings("unused")
 		static private String encode(byte[] bytes) throws IOException
 		{
 			final StringBuffer text = new StringBuffer((bytes.length * 4 + 2) / 3);
