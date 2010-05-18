@@ -16,7 +16,6 @@ Export-Package: com.aptana.parsing,
  com.aptana.parsing.xpath,
  com.aptana.sax,
  org.jaxen
-Bundle-ClassPath: libs/beaver.jar,
- libs/jaxen-1.1.2.jar,
+Bundle-ClassPath: libs/jaxen-1.1.2.jar,
  .
 Eclipse-ExtensibleAPI: true
