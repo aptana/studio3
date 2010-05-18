@@ -197,7 +197,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					if (this._currentLexeme.getLength() >= 2)
 					{
 						int startingOffset = this._currentLexeme.getStartingOffset() + 1;
-						int endingOffset = this._currentLexeme.getEndingOffset() - 2;
+						int endingOffset = this._currentLexeme.getEndingOffset() - 1;
 
 						this._replaceRange = new Range(startingOffset, endingOffset);
 					}
@@ -709,7 +709,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			int candidateIndex = lexemeProvider.getLexemeFloorIndex(offset);
 			Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexeme(candidateIndex);
 
-			if (lexeme != null && lexeme.getEndingOffset() == offset)
+			if (lexeme != null && lexeme.getEndingOffset() == offset - 1)
 			{
 				index = candidateIndex;
 			}
@@ -744,7 +744,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					{
 						Lexeme<HTMLTokenType> previous = lexemeProvider.getLexeme(index - 1);
 						
-						if (previous.getEndingOffset() < offset)
+						if (previous.getEndingOffset() < offset - 1)
 						{
 							result = Location.IN_ATTRIBUTE_NAME;
 						}
@@ -788,7 +788,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 				case SINGLE_QUOTED_STRING:
 				case DOUBLE_QUOTED_STRING:
-					if (lexeme.getEndingOffset() == offset)
+					if (lexeme.getEndingOffset() < offset)
 					{
 						result = Location.IN_ATTRIBUTE_NAME;
 						this._replaceRange = null;
