@@ -39,7 +39,7 @@ import java.io.OutputStream;
 
 import org.eclipse.core.runtime.IAdapterFactory;
 
-import com.aptana.ide.filesystem.ftp.IFTPCommandLog;
+import com.aptana.filesystem.ftp.IFTPCommandLog;
 
 /**
  * @author Max Stepanov

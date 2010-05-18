@@ -91,6 +91,14 @@ public class FileSystemRenameAction extends BaseSelectionListenerAction {
             return;
         }
 
+        TreeItem parentItem = item.getParentItem();
+        final Object parentData;
+        if (parentItem == null) {
+        	parentData = null;
+        } else {
+        	parentData = parentItem.getData();
+        }
+
         if (Platform.OS_MACOSX.equals(Platform.getOS())) {
             // through a dialog
             final InputDialog dialog = new InputDialog(fShell,
@@ -102,7 +110,7 @@ public class FileSystemRenameAction extends BaseSelectionListenerAction {
                 try {
                     renameTo(fileStore, newName, null);
                     item.setText(newName);
-                    refresh(null);
+                    refresh(parentData);
                 } catch (CoreException e) {
                     showError(e);
                 }
@@ -127,7 +135,7 @@ public class FileSystemRenameAction extends BaseSelectionListenerAction {
                         try {
                             renameTo(fileStore, newName, null);
                             item.setText(newName);
-                            refresh(null);
+                            refresh(parentData);
                         } catch (CoreException ex) {
                             showError(ex);
                         }
@@ -155,7 +163,7 @@ public class FileSystemRenameAction extends BaseSelectionListenerAction {
                     try {
                         renameTo(fileStore, newName, null);
                         item.setText(newName);
-                        refresh(null);
+                        refresh(parentData);
                     } catch (CoreException ex) {
                         showError(ex);
                     }
@@ -186,15 +194,16 @@ public class FileSystemRenameAction extends BaseSelectionListenerAction {
      *            the name the file is renamed to
      * @param monitor
      *            the progress monitor
-     * @return true if rename succeeds, false otherwise
+     * @return the new file store, or null if rename failed
      */
-    private static void renameTo(IFileStore oldStore, String newName,
+    private static IFileStore renameTo(IFileStore oldStore, String newName,
             IProgressMonitor monitor) throws CoreException {
         IFileStore parent = oldStore.getParent();
         if (parent == null) {
-            return;
+            return null;
         }
         IFileStore newStore = parent.getChild(newName);
         oldStore.move(newStore, EFS.NONE, monitor);
+        return newStore;
     }
 }

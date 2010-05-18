@@ -9,7 +9,7 @@
       </image>
       <objectImage
             icon="icons/full/obj16/ftp.png"
-            objectClass="com.aptana.ide.filesystem.ftp.FTPConnectionPoint">
+            objectClass="com.aptana.filesystem.ftp.FTPConnectionPoint">
       </objectImage>
    </extension>
    <extension
@@ -17,7 +17,7 @@
       <dialog
             class="com.aptana.ide.ui.ftp.internal.FTPPropertyDialogProvider"
             id="com.aptana.ide.ui.ftp.dialog"
-            objectClass="com.aptana.ide.filesystem.ftp.FTPConnectionPoint">
+            objectClass="com.aptana.filesystem.ftp.FTPConnectionPoint">
       </dialog>
    </extension>
    <extension
@@ -31,10 +31,10 @@
    <extension
          point="org.eclipse.core.runtime.adapters">
       <factory
-            adaptableType="com.aptana.ide.filesystem.ftp.FTPPlugin"
+            adaptableType="com.aptana.filesystem.ftp.FTPPlugin"
             class="com.aptana.ide.ui.ftp.console.FTPCommandLog$Factory">
          <adapter
-               type="com.aptana.ide.filesystem.ftp.IFTPCommandLog">
+               type="com.aptana.filesystem.ftp.IFTPCommandLog">
          </adapter>
       </factory>
    </extension>

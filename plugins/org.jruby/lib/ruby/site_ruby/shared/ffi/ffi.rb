@@ -72,18 +72,17 @@ require 'ffi/types'
 require 'ffi/library'
 require 'ffi/memorypointer'
 require 'ffi/autopointer'
-require 'ffi/buffer'
 require 'ffi/struct'
 require 'ffi/io'
 require 'ffi/variadic'
 require 'ffi/errno'
-require 'ffi/rbx'
 require 'ffi/managedstruct'
 require 'ffi/enum'
 
 module FFI
   
   def self.map_library_name(lib)
+    lib = lib.to_s
     # Mangle the library name to reflect the native library naming conventions
     lib = Platform::LIBC if lib == 'c'
     if lib && File.basename(lib) == lib

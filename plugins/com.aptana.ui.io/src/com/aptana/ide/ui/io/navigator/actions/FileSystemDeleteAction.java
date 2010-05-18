@@ -36,12 +36,13 @@ package com.aptana.ide.ui.io.navigator.actions;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -50,11 +51,13 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.actions.BaseSelectionListenerAction;
 
-import com.aptana.ui.UIUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.internal.Utils;
+import com.aptana.ui.UIUtils;
 
 /**
  * @author Michael Xia (mxia@aptana.com)
@@ -62,14 +65,18 @@ import com.aptana.ide.ui.io.internal.Utils;
 public class FileSystemDeleteAction extends BaseSelectionListenerAction {
 
     private Shell fShell;
+    private Tree fTree;
     private List<IFileStore> fFiles;
+    private Set<Object> fParentElements;
 
     private List<IJobChangeListener> fListeners;
 
-    public FileSystemDeleteAction(Shell shell) {
+    public FileSystemDeleteAction(Shell shell, Tree tree) {
         super(Messages.FileSystemDeleteAction_Text);
         fShell = shell;
+        fTree = tree;
         fFiles = new ArrayList<IFileStore>();
+        fParentElements = new HashSet<Object>();
         fListeners = new ArrayList<IJobChangeListener>();
     }
 
@@ -96,7 +103,6 @@ public class FileSystemDeleteAction extends BaseSelectionListenerAction {
         } else {
             message = MessageFormat.format(Messages.FileSystemDeleteAction_Confirm_MultipleFiles,
                     count);
-
         }
         if (MessageDialog.openQuestion(fShell, Messages.FileSystemDeleteAction_Confirm_Title,
                 message)) {
@@ -106,18 +112,22 @@ public class FileSystemDeleteAction extends BaseSelectionListenerAction {
 
     public boolean updateSelection(IStructuredSelection selection) {
         fFiles.clear();
+        fParentElements.clear();
 
-        if (selection != null && !selection.isEmpty()) {
-            Object[] elements = selection.toArray();
-            IFileStore fileStore;
-            for (Object element : elements) {
-                if (element instanceof IAdaptable) {
-                    fileStore = Utils.getFileStore((IAdaptable) element);
-                    if (fileStore != null) {
-                        fFiles.add(fileStore);
-                    }
-                }
-            }
+        TreeItem[] items = fTree.getSelection();
+        Object element;
+        IFileStore fileStore;
+        TreeItem parentItem;
+        for (TreeItem item : items) {
+        	element = item.getData();
+        	fileStore = Utils.getFileStore(element);
+        	if (fileStore != null) {
+        		fFiles.add(fileStore);
+        		parentItem = item.getParentItem();
+        		if (parentItem != null) {
+        			fParentElements.add(parentItem.getData());
+        		}
+        	}
         }
 
         return super.updateSelection(selection) && !fFiles.isEmpty();
@@ -140,8 +150,10 @@ public class FileSystemDeleteAction extends BaseSelectionListenerAction {
                     }
                 }
                 monitor.done();
-                // TODO: needs improve to not refresh the whole File view here
-                IOUIPlugin.refreshNavigatorView(null);
+
+                for (Object element : fParentElements) {
+                	IOUIPlugin.refreshNavigatorView(element);
+                }
 
                 return Status.OK_STATUS;
             }
@@ -160,11 +172,13 @@ public class FileSystemDeleteAction extends BaseSelectionListenerAction {
         deleteJob.schedule();
     }
 
-    private static void deleteFile(IFileStore file, IProgressMonitor monitor) {
+    private static boolean deleteFile(IFileStore file, IProgressMonitor monitor) {
         try {
             file.delete(EFS.NONE, monitor);
+            return true;
         } catch (CoreException e) {
             UIUtils.showErrorMessage(e.getLocalizedMessage(), e);
+            return false;
         }
     }
 }

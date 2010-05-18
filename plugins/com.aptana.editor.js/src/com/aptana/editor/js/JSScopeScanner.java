@@ -8,6 +8,7 @@ import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 
+import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 
 public class JSScopeScanner extends JSCodeScanner
@@ -29,6 +30,7 @@ public class JSScopeScanner extends JSCodeScanner
 		}
 
 		// add custom rules with lower precedence here
+		rules.add(new SingleCharacterRule('.', createToken(JSTokenType.DOT)));
 
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}

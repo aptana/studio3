@@ -16,7 +16,6 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 
-import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.git.core.GitPlugin;
@@ -251,6 +250,6 @@ public class GitExecutable
 	 */
 	public Process run(IPath directory, String... arguments) throws IOException, CoreException
 	{
-		return ShellExecutable.run(gitPath, directory, null, arguments);
+		return ProcessUtil.run(gitPath.toOSString(), directory, arguments);
 	}
 }

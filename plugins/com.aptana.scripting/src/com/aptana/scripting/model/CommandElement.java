@@ -19,6 +19,7 @@ import org.jruby.exceptions.RaiseException;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
+import com.aptana.core.ShellExecutable;
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptUtils;
@@ -533,6 +534,7 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	void populateEnvironment(Map<String, Object> contextMap, Map<String, String> environment)
 	{
+		environment.putAll(ShellExecutable.getEnvironment());
 		for (Map.Entry<String, Object> entry : contextMap.entrySet())
 		{
 			Object valueObject = entry.getValue();

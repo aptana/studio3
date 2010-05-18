@@ -280,8 +280,8 @@ public class VT100TerminalControl implements ITerminalControlForText, ITerminalC
 	/* (non-Javadoc)
 	 * @see org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl#setFocus()
 	 */
-	public void setFocus() {
-		getCtlText().setFocus();
+	public boolean setFocus() {
+		return getCtlText().setFocus();
 	}
 
 	/* (non-Javadoc)

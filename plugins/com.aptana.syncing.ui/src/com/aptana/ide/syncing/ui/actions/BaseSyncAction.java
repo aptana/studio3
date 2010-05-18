@@ -59,8 +59,8 @@ import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.ResourceSynchronizationUtils;
 import com.aptana.ide.syncing.core.SiteConnectionUtils;
+import com.aptana.ide.syncing.ui.dialogs.ChooseSiteConnectionDialog;
 import com.aptana.ide.syncing.ui.editors.EditorUtils;
-import com.aptana.ide.syncing.ui.internal.ChooseSiteConnectionDialog;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
 
 /**
@@ -70,6 +70,7 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
 
     private IWorkbenchPart fActivePart;
     private List<IAdaptable> fSelectedElements;
+    private ISiteConnection fSite;
 
     public BaseSyncAction() {
         fSelectedElements = new ArrayList<IAdaptable>();
@@ -84,63 +85,77 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
             return;
         }
 
-        // gets the site connection user wants to use
-        ISiteConnection[] sites = getSiteConnections();
-        if (sites.length == 0) {
-            // the selected elements do not belong to a common source location
-            MessageDialog.openWarning(getShell(), getMessageTitle(),
-                    Messages.BaseSyncAction_Warning_NoCommonParent);
-            return;
-        }
+		if (fSite == null)
+		{
+			// gets the site connection user wants to use
+			ISiteConnection[] sites = getSiteConnections();
+			if (sites.length == 0)
+			{
+				// the selected elements do not belong to a common source location
+				MessageDialog
+						.openWarning(getShell(), getMessageTitle(), Messages.BaseSyncAction_Warning_NoCommonParent);
+				return;
+			}
 
-        ISiteConnection site = null;
-        if (sites.length == 1) {
-            site = sites[0];
-        } else {
-            // multiple connections on the selected source
-            Object firstElement = fSelectedElements.get(0);
-            if (firstElement instanceof IResource) {
-                IContainer container = null;
-                boolean remember = false;
-                if (firstElement instanceof IContainer) {
-                    remember = ResourceSynchronizationUtils
-                            .isRememberDecision((IContainer) firstElement);
-                    if (remember) {
-                        container = (IContainer) firstElement;
-                    }
-                }
-                if (!remember) {
-                    IProject project = ((IResource) firstElement).getProject();
-                    remember = ResourceSynchronizationUtils.isRememberDecision(project);
-                    if (remember) {
-                        container = project;
-                    }
-                }
+			if (sites.length == 1)
+			{
+				fSite = sites[0];
+			}
+			else
+			{
+				// multiple connections on the selected source
+				Object firstElement = fSelectedElements.get(0);
+				if (firstElement instanceof IResource)
+				{
+					IContainer container = null;
+					boolean remember = false;
+					if (firstElement instanceof IContainer)
+					{
+						remember = ResourceSynchronizationUtils.isRememberDecision((IContainer) firstElement);
+						if (remember)
+						{
+							container = (IContainer) firstElement;
+						}
+					}
+					if (!remember)
+					{
+						IProject project = ((IResource) firstElement).getProject();
+						remember = ResourceSynchronizationUtils.isRememberDecision(project);
+						if (remember)
+						{
+							container = project;
+						}
+					}
 
-                site = getLastSyncConnection(container);
-            }
+					fSite = getLastSyncConnection(container);
+				}
 
-            if (site == null) {
-                ChooseSiteConnectionDialog dialog = new ChooseSiteConnectionDialog(getShell(),
-                        sites);
-                dialog.setShowRememberMyDecision(true);
-                dialog.open();
+				if (fSite == null)
+				{
+					ChooseSiteConnectionDialog dialog = new ChooseSiteConnectionDialog(getShell(), sites);
+					dialog.setShowRememberMyDecision(true);
+					dialog.open();
 
-                site = dialog.getSelectedSite();
-                if (site != null) {
-                    setRememberMyDecision(site, dialog.isRememberMyDecision());
-                }
-            }
-        }
+					fSite = dialog.getSelectedSite();
+					if (fSite != null)
+					{
+						setRememberMyDecision(fSite, dialog.isRememberMyDecision());
+					}
+				}
+			}
+		}
 
-        if (site != null) {
-            try {
-                performAction(fSelectedElements.toArray(new IAdaptable[fSelectedElements.size()]),
-                        site);
-            } catch (CoreException e) {
-                // TODO: Opens an error dialog
-            }
-        }
+		if (fSite != null)
+		{
+			try
+			{
+				performAction(fSelectedElements.toArray(new IAdaptable[fSelectedElements.size()]), fSite);
+			}
+			catch (CoreException e)
+			{
+				// TODO: Opens an error dialog
+			}
+		}
     }
 
     public void selectionChanged(IAction action, ISelection selection) {
@@ -148,6 +163,11 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
         setSelection(selection);
         action.setEnabled(fSelectedElements.size() > 0);
     }
+
+	public void setSelectedSite(ISiteConnection site)
+	{
+		fSite = site;
+	}
 
 	@Override
 	public void init(IViewPart view) {

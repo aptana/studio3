@@ -2,9 +2,6 @@ package com.aptana.editor.js.contentassist.index;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -18,8 +15,8 @@ import org.eclipse.core.runtime.content.IContentTypeManager;
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.IJSConstants;
+import com.aptana.editor.js.contentassist.JSASTQueryHelper;
 import com.aptana.editor.js.parsing.JSParser;
-import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.index.core.IFileIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.ParseState;
@@ -88,18 +85,29 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 		monitor.done();
 	}
 
+	/**
+	 * isJSFile
+	 * 
+	 * @param file
+	 * @return
+	 */
 	private boolean isJSFile(IFile file)
 	{
 		InputStream stream = null;
 		IContentTypeManager manager = Platform.getContentTypeManager();
+
 		try
 		{
 			stream = file.getContents();
+
 			IContentType[] types = manager.findContentTypesFor(stream, file.getName());
+
 			for (IContentType type : types)
 			{
 				if (type.getId().equals(IJSConstants.CONTENT_TYPE_JS))
+				{
 					return true;
+				}
 			}
 		}
 		catch (Exception e)
@@ -111,7 +119,9 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 			try
 			{
 				if (stream != null)
+				{
 					stream.close();
+				}
 			}
 			catch (IOException e)
 			{
@@ -131,34 +141,20 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 	 */
 	private void walkAST(Index index, IFile file, IParseNode ast)
 	{
-		Queue<IParseNode> queue = new LinkedList<IParseNode>();
-
-		queue.add(ast);
-
-		while (queue.size() > 0)
+		JSASTQueryHelper queryHelper = new JSASTQueryHelper();
+		
+		for (String name : queryHelper.getGlobalFunctions(ast))
 		{
-			IParseNode node = queue.remove();
-
-			// process functions
-			if (node instanceof JSFunctionNode)
-			{
-				JSFunctionNode function = (JSFunctionNode) node;
-				String name = function.getName();
-
-				if (name != null && name.length() > 0)
-				{
-					index.addEntry(JSIndexConstants.FUNCTION, name, file.getProjectRelativePath().toPortableString());
-				}
-
-			}
-
-			// add children for processing
-			IParseNode[] children = node.getChildren();
-
-			if (children != null && children.length > 0)
-			{
-				queue.addAll(Arrays.asList(children));
-			}
+			System.out.println(name + "()");
+			index.addEntry(JSIndexConstants.FUNCTION, name, file.getProjectRelativePath().toPortableString());
+		}
+		for (String varName : queryHelper.getGlobalDeclarations(ast))
+		{
+			System.out.println(varName);
+		}
+		for (String varName : queryHelper.getAccidentalGlobals(ast))
+		{
+			System.out.println(varName);
 		}
 	}
 }

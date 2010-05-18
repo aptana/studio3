@@ -40,12 +40,6 @@ public class Messages extends NLS {
 
     private static final String BUNDLE_NAME = "com.aptana.ide.syncing.ui.internal.messages"; //$NON-NLS-1$
 
-    public static String ChooseSiteConnectionDialog_LBL_Connection;
-    public static String ChooseSiteConnectionDialog_LBL_Message;
-    public static String ChooseSiteConnectionDialog_LBL_PropertyPage;
-    public static String ChooseSiteConnectionDialog_LBL_RememberMyDecision;
-    public static String ChooseSiteConnectionDialog_Title;
-
     public static String SiteConnectionPropertiesWidget_ERR_DuplicateNames;
     public static String SiteConnectionPropertiesWidget_ERR_EmptyName;
     public static String SiteConnectionPropertiesWidget_ERR_InvalidFilesystemFolder;
