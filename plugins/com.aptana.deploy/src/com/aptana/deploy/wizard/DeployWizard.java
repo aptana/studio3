@@ -253,6 +253,7 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 							{
 								command = getCommand(bundleName, "Create and Deploy App"); //$NON-NLS-1$
 							}
+							// TODO What if command is null!?
 							// Send along the app name
 							CommandContext context = command.createCommandContext();
 							context.put("HEROKU_APP_NAME", appName); //$NON-NLS-1$
