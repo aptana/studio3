@@ -1,5 +1,6 @@
 package com.aptana.editor.js.parsing.ast;
 
+import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseNodeAttribute;
 import com.aptana.parsing.ast.ParseBaseNode;
 import com.aptana.parsing.ast.ParseNodeAttribute;
@@ -18,6 +19,24 @@ public class JSFunctionNode extends JSNode
 		super(JSNodeTypes.FUNCTION, children, start, end);
 	}
 
+	/**
+	 * getArgs
+	 * 
+	 * @return
+	 */
+	public IParseNode[] getArgs()
+	{
+		IParseNode[] result = NO_CHILDREN;
+		IParseNode argsNode = this.getChild(1);
+		
+		if (argsNode != null && argsNode.getType() == JSNodeTypes.PARAMETERS)
+		{
+			result = argsNode.getChildren();
+		}
+		
+		return result;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.ParseBaseNode#getAttributes()
@@ -37,6 +56,16 @@ public class JSFunctionNode extends JSNode
 		{
 			return ParseBaseNode.NO_ATTRIBUTES;
 		}
+	}
+	
+	/**
+	 * getBody
+	 * 
+	 * @return
+	 */
+	public IParseNode getBody()
+	{
+		return this.getChild(2);
 	}
 	
 	/**

@@ -26,6 +26,7 @@ import com.aptana.editor.js.parsing.ast.JSUnaryOperatorNode;
 import com.aptana.editor.js.parsing.lexer.JSTokens;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
+import com.aptana.parsing.IRecoveryStrategy;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 
@@ -178,6 +179,7 @@ public class JSParser extends Parser implements IParser {
 		"1jVVpcc7faD7$ttrqU2ZmTU2hmM$9W#w#$y01Uz6KG==");
 
 	private final Action[] actions;
+	private final IRecoveryStrategy[] recoveryStrategies;
 
 	private JSScanner fScanner;
 
@@ -2037,37 +2039,137 @@ public class JSParser extends Parser implements IParser {
 				}
 			}
 		};
+		
+		recoveryStrategies = new IRecoveryStrategy[] {
+			new IRecoveryStrategy() {
+				public boolean recover(Symbol token, TokenStream in, Symbol lastSymbol, Events report) throws IOException
+				{
+					boolean result = false;
+	
+					Symbol term = new Symbol(JSTokens.SEMICOLON, lastSymbol.getEnd(), token.getStart(), ";");
+					Simulator sim = new Simulator();
+	
+					// make room for the semicolon and the last term
+					in.alloc(2);
+	
+					// insert expected terminal before unexpected one
+					in.insert(term, token);
+	
+					// back so we can try again
+					in.rewind();
+	
+					// run simulator
+					if (sim.parse(in))
+					{
+						// success!
+						result = true;
+	
+						// back up so we can re-parse for real
+						in.rewind();
+	
+						// add report about what we did
+						report.missingTokenInserted(term);
+					}
+	
+					return result;
+				}
+			},
+			new IRecoveryStrategy() {
+				public boolean recover(Symbol token, TokenStream in, Symbol lastSymbol, Events report) throws IOException
+				{
+					boolean result = false;
+	
+					if (lastSymbol.getId() == JSTokens.DOT)
+					{
+						Symbol term1 = new Symbol(JSTokens.IDENTIFIER, lastSymbol.getEnd(), lastSymbol.getEnd(), "");
+						Symbol term2 = new Symbol(JSTokens.SEMICOLON, lastSymbol.getEnd(), token.getStart(), ";");
+	
+						Simulator sim = new Simulator();
+	
+						// make room for the semicolon and the last term
+						in.alloc(3);
+	
+						// insert expected terminal before unexpected one
+						in.insert(token);
+						in.insert(term2);
+						in.insert(term1);
+	
+						// back up so we can try again
+						in.rewind();
+	
+						// run simulator
+						if (sim.parse(in))
+						{
+							// success!
+							result = true;
+	
+							// back so we can re-parse for real
+							in.rewind();
+	
+							// add report about what we did
+							report.missingTokenInserted(term1);
+							report.missingTokenInserted(term2);
+						}
+					}
+	
+					return result;
+				}
+			}
+		};
 	}
 
 	protected Symbol invokeReduceAction(int rule_num, int offset) {
 		return actions[rule_num].reduce(_symbols, offset);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see beaver.Parser#recoverFromError(beaver.Symbol, beaver.Parser.TokenStream)
+	 */
 	@Override
 	protected void recoverFromError(Symbol token, TokenStream in) throws IOException, Parser.Exception
 	{
-		int start = 0;
-		for (int i = 0; i < _symbols.length; ++i)
+		boolean success = false;
+
+		if (this.recoveryStrategies != null)
 		{
-			if (_symbols[i] == null && i > 0)
+			Symbol lastSymbol = this.getLastSymbol();
+
+			for (IRecoveryStrategy strategy : this.recoveryStrategies)
 			{
-				start = _symbols[i - 1].getEnd();
+				if (strategy.recover(token, in, lastSymbol, report))
+				{
+					success = true;
+					break;
+				}
+			}
+		}
+
+		if (success == false)
+		{
+			super.recoverFromError(token, in);
+		}
+	}
+
+	/**
+	 * getNextSymbolIndex
+	 * 
+	 * @return
+	 */
+	protected Symbol getLastSymbol()
+	{
+		Symbol result = null;
+
+		for (int i = 0; i < this._symbols.length; ++i)
+		{
+			if (this._symbols[i] == null && i > 0)
+			{
+				result = this._symbols[i - 1];
 				break;
 			}
 		}
-		Symbol term = new Symbol(JSTokens.SEMICOLON, start, token.getStart(), ";");
 
-		Simulator sim = new Simulator();
-		in.alloc(2);
-		in.insert(term, token); // insert expected terminal before unexpected one
-		in.rewind();
-		if (sim.parse(in))
-		{
-			in.rewind();
-			report.missingTokenInserted(term);
-			return;
-		}
-		super.recoverFromError(token, in);
+		return result;
 	}
 
 	@Override

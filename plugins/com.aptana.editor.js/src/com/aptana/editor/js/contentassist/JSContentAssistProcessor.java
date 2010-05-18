@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -14,6 +13,7 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.swt.graphics.Image;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
@@ -38,7 +38,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private static final Image JS_FUNCTION = Activator.getImage("/icons/js_function.gif"); //$NON-NLS-1$
 	private static final Image JS_PROPERTY = Activator.getImage("/icons/js_property.gif"); //$NON-NLS-1$
 
-	private JSContentAssistHelper _helper;
+	private JSIndexQueryHelper _indexHelper;
+	private JSASTQueryHelper _astHelper;
 	private IContextInformationValidator _validator;
 	private Lexeme<JSTokenType> _currentLexeme;
 
@@ -51,7 +52,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		super(editor);
 
-		this._helper = new JSContentAssistHelper();
+		this._indexHelper = new JSIndexQueryHelper();
+		this._astHelper = new JSASTQueryHelper();
 	}
 	
 	/**
@@ -59,7 +61,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected void addGlobals(List<ICompletionProposal> proposals, int offset)
 	{
-		List<PropertyElement> globals = this._helper.getGlobals();
+		List<PropertyElement> globals = this._indexHelper.getGlobals();
 
 		for (PropertyElement property : globals)
 		{
@@ -127,22 +129,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			IParseNode ast = this.editor.getFileService().getParseResult();
 			IParseNode node = ast.getNodeAt(offset);
 			
-			if (node != null)
-			{
-				String text = "";
-				
-				try
-				{
-					text = viewer.getDocument().get(node.getStartingOffset(), node.getLength());
-				}
-				catch (BadLocationException e)
-				{
-				}
-				
-				System.out.println(node.toString());
-				System.out.println("~" + text + "~");
-			}
-			
 			// tokenize the current document
 			IDocument document = viewer.getDocument();
 			LexemeProvider<JSTokenType> lexemeProvider;
@@ -166,6 +152,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				case IN_PROPERTY_NAME:
 					System.out.println("Property");
+					
 					break;
 					
 				case IN_VARIABLE_NAME:
@@ -173,7 +160,10 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					break;
 					
 				default:
-					System.out.println("Location = " + location);
+					List<String> args = this._astHelper.getSymbolsInScope(node);
+					Collections.sort(args);
+					System.out.println(StringUtil.join(",", args));
+					//System.out.println("Location = " + location);
 					break;
 			}
 	

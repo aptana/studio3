@@ -2,8 +2,6 @@ package com.aptana.editor.js.contentassist.index;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -13,20 +11,16 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
-import org.jaxen.JaxenException;
-import org.jaxen.XPath;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.IJSConstants;
+import com.aptana.editor.js.contentassist.JSASTQueryHelper;
 import com.aptana.editor.js.parsing.JSParser;
-import com.aptana.editor.js.parsing.ast.JSFunctionNode;
-import com.aptana.editor.js.parsing.ast.JSPrimitiveNode;
 import com.aptana.index.core.IFileIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
-import com.aptana.parsing.xpath.ParseNodeXPath;
 
 public class JSFileIndexingParticipant implements IFileIndexingParticipant
 {
@@ -147,117 +141,20 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 	 */
 	private void walkAST(Index index, IFile file, IParseNode ast)
 	{
-		for (String name : this.getGlobalFunctions(ast))
+		JSASTQueryHelper queryHelper = new JSASTQueryHelper();
+		
+		for (String name : queryHelper.getGlobalFunctions(ast))
 		{
 			System.out.println(name + "()");
 			index.addEntry(JSIndexConstants.FUNCTION, name, file.getProjectRelativePath().toPortableString());
 		}
-		for (String varName : this.getGlobalDeclarations(ast))
+		for (String varName : queryHelper.getGlobalDeclarations(ast))
 		{
 			System.out.println(varName);
 		}
-	}
-
-	/**
-	 * getGlobalDeclarations
-	 * 
-	 * @param ast
-	 * @return
-	 */
-	private List<String> getGlobalDeclarations(IParseNode ast)
-	{
-		final List<String> result = new LinkedList<String>();
-
-		this.processXPath(
-			"/var/declaration/identifier[position() = 1 and count(following-sibling::function) = 0]",
-			ast,
-			new ItemProcessor() {
-				public void process(Object item)
-				{
-					if (item instanceof JSPrimitiveNode)
-					{
-						result.add(item.toString());
-					}
-				}
-			}
-		);
-
-		return result;
-	}
-
-	/**
-	 * getGlobalFunctions
-	 * 
-	 * @param ast
-	 * @return
-	 */
-	private List<String> getGlobalFunctions(IParseNode ast)
-	{
-		final List<String> result = new LinkedList<String>();
-
-		this.processXPath(
-			"/function[string-length(@name) > 0]",
-			ast,
-			new ItemProcessor() {
-				public void process(Object item)
-				{
-					if (item instanceof JSFunctionNode)
-					{
-						JSFunctionNode function = (JSFunctionNode) item;
-						
-						result.add(function.getName());
-					}
-				}
-			}
-		);
-
-		this.processXPath(
-			"/var/declaration/identifier[count(following-sibling::function) > 0]",
-			ast,
-			new ItemProcessor() {
-				public void process(Object item)
-				{
-					if (item instanceof JSPrimitiveNode)
-					{
-						result.add(item.toString());
-					}
-				}
-			}
-		);
-
-		return result;
-	}
-
-	/**
-	 * processXPath
-	 * 
-	 * @param expression
-	 * @param node
-	 * @param processor
-	 */
-	private void processXPath(String expression, IParseNode node, ItemProcessor processor)
-	{
-		if (expression != null && expression.length() > 0 && node != null && processor != null)
+		for (String varName : queryHelper.getAccidentalGlobals(ast))
 		{
-			try
-			{
-				XPath xpath = new ParseNodeXPath(expression);
-				Object list = xpath.evaluate(node);
-	
-				if (list instanceof List<?>)
-				{
-					List<?> items = (List<?>) list;
-	
-					for (Object item : items)
-					{
-						processor.process(item);
-					}
-				}
-			}
-			catch (JaxenException e)
-			{
-				e.printStackTrace();
-			}
+			System.out.println(varName);
 		}
 	}
 }

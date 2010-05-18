@@ -102,6 +102,20 @@ public class ContentAssistFineLocationTests extends LocationTests
 	}
 	
 	/**
+	 * testOpenTagElementName2
+	 */
+	public void testOpenTagElementName2()
+	{
+		String source = "<body >";
+		
+		this.fineLocationTests(
+			source,
+			new LocationRange(Location.IN_ELEMENT_NAME, 1, source.length() - 2),
+			new LocationRange(Location.IN_ATTRIBUTE_NAME, source.length() - 1)
+		);
+	}
+	
+	/**
 	 * testOpenScriptElement
 	 */
 	public void testOpenScriptElement()
