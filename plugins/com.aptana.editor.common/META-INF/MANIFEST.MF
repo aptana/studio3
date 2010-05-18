@@ -27,7 +27,8 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.usage,
  com.aptana.core,
  com.aptana.index.core;bundle-version="2.0.0",
- com.aptana.ui;bundle-version="3.0.0"
+ com.aptana.ui;bundle-version="3.0.0",
+ beaver;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

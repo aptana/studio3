@@ -65,7 +65,7 @@ public class ShellExecutable {
 		"%PROGRAMFILES(X86)%\\Git\\bin" //$NON-NLS-1$
 	};
 	
-	private static final String SH = "sh"; //$NON-NLS-1$
+	private static final String SH_EXE = "sh.exe"; //$NON-NLS-1$
 	private static final String BASH = "bash"; //$NON-NLS-1$
 	
 	private static boolean initilizing = false;
@@ -84,7 +84,7 @@ public class ShellExecutable {
 			boolean isWin32 = Platform.OS_WIN32.equals(Platform.getOS());
 			try {
 				initilizing = true;
-				shellPath = ExecutableUtil.find(isWin32 ? SH : BASH, isWin32, getPossibleShellLocations());
+				shellPath = ExecutableUtil.find(isWin32 ? SH_EXE : BASH, false, getPossibleShellLocations());
 			} finally {
 				initilizing = false;
 			}
@@ -113,9 +113,9 @@ public class ShellExecutable {
 		if (shellEnvironment == null) {
 			shellEnvironment = new HashMap<String, String>();			
 			try {
-				shellEnvironment.putAll(buildEnvironment(ProcessUtil.outputForProcess(run("env", null, null))));
+				shellEnvironment.putAll(buildEnvironment(ProcessUtil.outputForProcess(run("env", null, null)))); //$NON-NLS-1$
 			} catch (Exception e) {
-				CorePlugin.logError("Get shell environment failed.", e);
+				CorePlugin.logError("Get shell environment failed.", e); //$NON-NLS-1$
 			}
 		}
 		return shellEnvironment;
@@ -123,7 +123,7 @@ public class ShellExecutable {
 	
 	private static Map<String, String> buildEnvironment(String envp) {
 		Map<String, String> env = new HashMap<String, String>();
-		StringTokenizer tok = new StringTokenizer(envp, "\r\n");
+		StringTokenizer tok = new StringTokenizer(envp, "\r\n"); //$NON-NLS-1$
 		while (tok.hasMoreTokens()) {
 			String envstring = tok.nextToken();
 			int eqlsign = envstring.indexOf('=');
@@ -131,6 +131,7 @@ public class ShellExecutable {
 				env.put(envstring.substring(0,eqlsign), envstring.substring(eqlsign+1));
 			}
 		}
+		env.remove("_"); //$NON-NLS-1$
 		return env;
 	}
 	

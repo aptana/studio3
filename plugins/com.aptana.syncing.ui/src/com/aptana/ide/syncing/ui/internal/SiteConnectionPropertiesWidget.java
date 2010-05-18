@@ -81,7 +81,7 @@ import com.aptana.ide.core.io.ConnectionPointUtils;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.efs.EFSUtils;
-import com.aptana.ide.filesystem.ftp.FTPConnectionPoint;
+import com.aptana.filesystem.ftp.FTPConnectionPoint;
 import com.aptana.ide.syncing.core.DefaultSiteConnection;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.SiteConnection;
