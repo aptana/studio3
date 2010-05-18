@@ -53,7 +53,7 @@ import org.eclipse.swt.widgets.Shell;
 import com.aptana.ide.core.io.ConnectionPointType;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
-import com.aptana.ide.filesystem.ftp.IBaseFTPConnectionPoint;
+import com.aptana.filesystem.ftp.IBaseFTPConnectionPoint;
 import com.aptana.ide.ui.ftp.FTPUIPlugin;
 import com.aptana.ide.ui.ftp.internal.FTPConnectionPropertyComposite;
 import com.aptana.ui.IPropertyDialog;
