@@ -244,7 +244,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 			for (Entry<String, String> entry : classes.entrySet())
 			{
-				this.addProposal(proposals, entry.getKey(), ELEMENT_ICON, null, userAgentIcons, entry.getValue(), offset);
+				this.addProposal(proposals, entry.getKey(), ATTRIBUTE_ICON, null, userAgentIcons, entry.getValue(), offset);
 			}
 		}
 	}
@@ -325,7 +325,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 			for (Entry<String, String> entry : ids.entrySet())
 			{
-				this.addProposal(proposals, entry.getKey(), ELEMENT_ICON, null, userAgentIcons, entry.getValue(), offset);
+				this.addProposal(proposals, entry.getKey(), ATTRIBUTE_ICON, null, userAgentIcons, entry.getValue(), offset);
 			}
 		}
 	}
