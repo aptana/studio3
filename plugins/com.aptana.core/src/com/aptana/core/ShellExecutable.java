@@ -65,7 +65,7 @@ public class ShellExecutable {
 		"%PROGRAMFILES(X86)%\\Git\\bin" //$NON-NLS-1$
 	};
 	
-	private static final String SH = "sh"; //$NON-NLS-1$
+	private static final String SH_EXE = "sh.exe"; //$NON-NLS-1$
 	private static final String BASH = "bash"; //$NON-NLS-1$
 	
 	private static boolean initilizing = false;
@@ -84,7 +84,7 @@ public class ShellExecutable {
 			boolean isWin32 = Platform.OS_WIN32.equals(Platform.getOS());
 			try {
 				initilizing = true;
-				shellPath = ExecutableUtil.find(isWin32 ? SH : BASH, isWin32, getPossibleShellLocations());
+				shellPath = ExecutableUtil.find(isWin32 ? SH_EXE : BASH, false, getPossibleShellLocations());
 			} finally {
 				initilizing = false;
 			}

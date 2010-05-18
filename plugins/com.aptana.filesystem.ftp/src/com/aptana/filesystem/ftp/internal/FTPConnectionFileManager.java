@@ -499,7 +499,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 
 	private static void fillFileInfo(ExtendedFileInfo fileInfo, FTPFile ftpFile) {
 		fileInfo.setExists(true);
-		fileInfo.setName(ftpFile.getName()+"x");
+		fileInfo.setName(ftpFile.getName());
 		fileInfo.setDirectory(ftpFile.isDir());
 		fileInfo.setLength(ftpFile.size());
 		fileInfo.setLastModified(ftpFile.lastModified() != null ? ftpFile.lastModified().getTime() : 0);

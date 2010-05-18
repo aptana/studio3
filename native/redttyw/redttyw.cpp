@@ -22,11 +22,15 @@ int _tmain(int argc, _TCHAR* argv[])
 	HANDLE hParentStdOut = ::GetStdHandle(STD_OUTPUT_HANDLE);
 	HANDLE hParentStdErr = ::GetStdHandle(STD_ERROR_HANDLE);
 	TCHAR szCmdline[1024];
+	TCHAR szComSpec[1024];
+	size_t nComSpec;
 
 	if( argc < 2) {
 		return -1;
 	}
-	_tcscpy_s(szCmdline, sizeof(szCmdline)/sizeof(*szCmdline), argv[1]);
+
+	_tcscpy_s(szCmdline, sizeof(szCmdline)/sizeof(*szCmdline), _T(" /u /c "));
+	_tcscat_s(szCmdline, sizeof(szCmdline)/sizeof(*szCmdline), argv[1]);
 
 	//_tcscpy_s(szCmdline, sizeof(szCmdline)/sizeof(*szCmdline), _T("C:\\WINDOWS\\system32\\cmd.exe /u /c \"\"C:\\Program Files\\Git\\bin\\sh.exe\"  --login -i\""));
 	//_tcscpy_s(szCmdline, sizeof(szCmdline)/sizeof(*szCmdline), _T("\"C:\\Program Files\\Git\\bin\\sh.exe\"  --login -i"));
@@ -98,7 +102,7 @@ int _tmain(int argc, _TCHAR* argv[])
 #endif
 
 	if( !::CreateProcess(
-		NULL,		// No module name (use command line)
+		_tgetenv_s(&nComSpec, szComSpec, sizeof(szComSpec), _T("COMSPEC")) == 0 ? szComSpec : NULL,		// No module name (use command line)
         szCmdline,	// Command line
         NULL,		// Process handle not inheritable
         NULL,		// Thread handle not inheritable
