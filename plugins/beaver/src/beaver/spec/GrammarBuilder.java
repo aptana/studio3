@@ -25,6 +25,7 @@ import beaver.spec.ast.TreeWalker;
 /**
  * 
  */
+@SuppressWarnings("unchecked")
 public class GrammarBuilder extends TreeWalker
 {
 	/**

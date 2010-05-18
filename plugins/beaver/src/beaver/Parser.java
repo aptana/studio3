@@ -16,6 +16,7 @@ import java.io.IOException;
  */
 public abstract class Parser
 {
+	@SuppressWarnings("serial")
 	static public class Exception extends java.lang.Exception
 	{
 		Exception(String msg)
@@ -351,6 +352,7 @@ public abstract class Parser
 			return true;
 		}
 
+		@SuppressWarnings("unused")
 		private void initStack() throws IOException
 		{
 			if (states == null || states.length < Parser.this.states.length)

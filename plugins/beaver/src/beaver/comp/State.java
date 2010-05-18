@@ -17,6 +17,7 @@ import beaver.spec.GrammarSymbol;
  * This class represents LALR state.
  * A state consists of an LALR configuration set and a set of transitions to other states.
  */
+@SuppressWarnings("unchecked")
 class State
 {
 	static class Factory
