@@ -1,10 +1,14 @@
-package com.aptana.deploy.wizard;
+package com.aptana.deploy.internal.wizard;
 
 import java.net.URL;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
@@ -22,13 +26,15 @@ import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
 import com.aptana.deploy.Activator;
+import com.aptana.deploy.wizard.DeployWizard;
 import com.aptana.terminal.widget.TerminalComposite;
 
 public class CapifyProjectPage extends WizardPage
 {
 
-	static final String NAME = "CapifyProject"; //$NON-NLS-1$
+	public static final String NAME = "CapifyProject"; //$NON-NLS-1$
 	private TerminalComposite terminalComposite;
+	protected Job checkCapifiedJob;
 
 	protected CapifyProjectPage()
 	{
@@ -66,6 +72,41 @@ public class CapifyProjectPage extends WizardPage
 				}
 				// Send "capify" command to terminal
 				terminalComposite.sendInput("capify .\n"); //$NON-NLS-1$
+
+				// Poll to check if capistrano is installed
+				if (checkCapifiedJob == null)
+				{
+					checkCapifiedJob = new Job("Checking if config/deploy.rb exists") //$NON-NLS-1$
+					{
+						protected IStatus run(IProgressMonitor monitor)
+						{
+							if (monitor != null && monitor.isCanceled())
+							{
+								return Status.CANCEL_STATUS;
+							}
+							if (isPageComplete())
+							{
+								PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
+								{
+
+									@Override
+									public void run()
+									{
+										getContainer().updateButtons(); // ok update the wizard TODO Just finish for them?
+									}
+								});
+							}
+							else
+							{
+								schedule(1000); // check again in a second
+							}
+							return Status.OK_STATUS;
+						}
+					};
+					checkCapifiedJob.setSystem(true);
+				}
+				checkCapifiedJob.cancel();
+				checkCapifiedJob.schedule(1000);
 			}
 		});
 
@@ -123,5 +164,22 @@ public class CapifyProjectPage extends WizardPage
 	protected IProject getProject()
 	{
 		return ((DeployWizard) getWizard()).getProject();
+	}
+
+	@Override
+	public void dispose()
+	{
+		try
+		{
+			if (checkCapifiedJob != null)
+			{
+				checkCapifiedJob.cancel();
+				checkCapifiedJob = null;
+			}
+		}
+		finally
+		{
+			super.dispose();
+		}
 	}
 }

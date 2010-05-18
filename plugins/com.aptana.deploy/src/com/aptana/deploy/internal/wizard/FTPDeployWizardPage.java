@@ -1,4 +1,4 @@
-package com.aptana.deploy.wizard;
+package com.aptana.deploy.internal.wizard;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -12,7 +12,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.deploy.Activator;
-import com.aptana.deploy.internal.wizard.FTPDeployComposite;
 import com.aptana.deploy.internal.wizard.FTPDeployComposite.Direction;
 import com.aptana.deploy.preferences.IPreferenceConstants;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
@@ -25,7 +24,7 @@ import com.aptana.ide.ui.ftp.internal.FTPConnectionPropertyComposite;
 public class FTPDeployWizardPage extends WizardPage implements FTPConnectionPropertyComposite.Listener
 {
 
-	static final String NAME = "FTPDeployment"; //$NON-NLS-1$
+	public static final String NAME = "FTPDeployment"; //$NON-NLS-1$
 	private static final String ICON_PATH = "icons/ftp.png"; //$NON-NLS-1$
 
 	private FTPDeployComposite ftpConnectionComposite;
