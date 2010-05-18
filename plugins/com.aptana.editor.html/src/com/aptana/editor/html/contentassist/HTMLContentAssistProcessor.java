@@ -738,6 +738,18 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				case TAG_START:
 					result = Location.IN_ELEMENT_NAME;
 					break;
+					
+				case TAG_END:
+					if (index >= 1)
+					{
+						Lexeme<HTMLTokenType> previous = lexemeProvider.getLexeme(index - 1);
+						
+						if (previous.getEndingOffset() < offset)
+						{
+							result = Location.IN_ATTRIBUTE_NAME;
+						}
+					}
+					break;
 
 				case BLOCK_TAG:
 				case STRUCTURE_TAG:
