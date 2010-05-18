@@ -46,6 +46,8 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.window.SameShellProvider;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.tm.internal.terminal.control.ITerminalListener;
@@ -82,6 +84,12 @@ public class TerminalComposite extends Composite {
 		fCtlTerminal = new VT100TerminalControl(getTerminalListener(), this, getTerminalConnectors());
 		fCtlTerminal.getRootControl().setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 		fCtlTerminal.setConnector(fCtlTerminal.getConnectors()[0]);
+		addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				disposeTerminal();
+			}
+		});
 	}
 	
 	/**
@@ -101,13 +109,10 @@ public class TerminalComposite extends Composite {
 		job.schedule(100);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.swt.widgets.Widget#dispose()
-	 */
-	@Override
-	public void dispose() {
-		fCtlTerminal.disposeTerminal();
-		super.dispose();
+	public void disposeTerminal() {
+		if (!fCtlTerminal.isDisposed()) {
+			fCtlTerminal.disposeTerminal();
+		}
 	}
 
 	/**
