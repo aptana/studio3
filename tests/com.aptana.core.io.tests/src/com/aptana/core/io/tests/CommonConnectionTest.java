@@ -121,10 +121,19 @@ public abstract class CommonConnectionTest extends TestCase
 		}
 		finally
 		{
-			if (cp.isConnected())
+			try
 			{
-				cp.disconnect(null);
+				if (cp.isConnected())
+				{
+					cp.disconnect(null);
+				}
 			}
+			finally
+			{
+				cp = null;
+				testPath = null;
+				super.tearDown();
+			}			
 		}
 	}
 
@@ -146,7 +155,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertFalse(cp.isConnected());
 		assertFalse(cp.canDisconnect());
 	}
-
+    
 	public final void testFetchRootInfo() throws CoreException
 	{
 		IFileStore fs = cp.getRoot();
@@ -158,6 +167,20 @@ public abstract class CommonConnectionTest extends TestCase
 		assertTrue(fi.exists());
 		assertTrue(fi.isDirectory());
 		assertEquals(Path.ROOT.toPortableString(), fi.getName());
+	}
+
+	public final void testFetchInfoWillConnectIfDisconnected() throws CoreException
+	{
+		IFileStore fs = cp.getRoot();
+		assertNotNull(fs);
+		if (cp.isConnected())
+		{
+			cp.disconnect(null);
+		}
+		assertFalse(cp.isConnected());
+		IFileInfo fi = fs.fetchInfo();
+		assertTrue(cp.isConnected());
+		assertNotNull(fi);
 	}
 
 	public final void testNonexisting() throws CoreException
