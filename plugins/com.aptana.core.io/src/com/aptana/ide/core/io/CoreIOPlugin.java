@@ -63,143 +63,176 @@ import com.aptana.ide.core.io.internal.DeleteResourceShortcutListener;
  * The activator class controls the plug-in life cycle
  */
 @SuppressWarnings("restriction")
-public class CoreIOPlugin extends Plugin {
+public class CoreIOPlugin extends Plugin
+{
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.core.io"; //$NON-NLS-1$
-	
+
 	// The shared instance
 	private static CoreIOPlugin plugin;
-	
+
 	private WeakHashMap<Object, ConnectionContext> connectionContexts = new WeakHashMap<Object, ConnectionContext>();
 
-    private IConnectionPointListener listener = new IConnectionPointListener() {
+	private IConnectionPointListener listener = new IConnectionPointListener()
+	{
 
-        public void connectionPointChanged(ConnectionPointEvent event) {
-            // saves the connections on any change instead of waiting for the
-            // shutdown in case of workbench crash
-            SaveManager saveManager = ((Workspace) ResourcesPlugin.getWorkspace()).getSaveManager();
-            (new DelayedSnapshotJob(saveManager)).schedule();
-        }
-    };
+		public void connectionPointChanged(ConnectionPointEvent event)
+		{
+			// saves the connections on any change instead of waiting for the
+			// shutdown in case of workbench crash
+			SaveManager saveManager = ((Workspace) ResourcesPlugin.getWorkspace()).getSaveManager();
+			(new DelayedSnapshotJob(saveManager)).schedule();
+		}
+	};
 
 	/**
 	 * The constructor
 	 */
-	public CoreIOPlugin() {
+	public CoreIOPlugin()
+	{
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
 	 */
-	public void start(BundleContext context) throws Exception {
+	public void start(BundleContext context) throws Exception
+	{
 		super.start(context);
 		plugin = this;
-		ISavedState lastState = ResourcesPlugin.getWorkspace().addSaveParticipant(this,
-				new WorkspaceSaveParticipant());
-		if (lastState != null) {
+		ISavedState lastState = ResourcesPlugin.getWorkspace().addSaveParticipant(this, new WorkspaceSaveParticipant());
+		if (lastState != null)
+		{
 			IPath location = lastState.lookup(new Path(ConnectionPointManager.STATE_FILENAME));
-			if (location != null) {
+			if (location != null)
+			{
 				ConnectionPointManager.getInstance().loadState(getStateLocation().append(location));
 			}
 		}
 
-        ResourcesPlugin.getWorkspace().addResourceChangeListener(
-                new DeleteResourceShortcutListener(), IResourceChangeEvent.POST_CHANGE);
-        getConnectionPointManager().addConnectionPointListener(listener);
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(new DeleteResourceShortcutListener(),
+				IResourceChangeEvent.POST_CHANGE);
+		getConnectionPointManager().addConnectionPointListener(listener);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
 	 */
-	public void stop(BundleContext context) throws Exception {
-		ResourcesPlugin.getWorkspace().removeSaveParticipant(this);
-		getConnectionPointManager().removeConnectionPointListener(listener);
-		plugin = null;
-		super.stop(context);
+	public void stop(BundleContext context) throws Exception
+	{
+		try
+		{
+			ResourcesPlugin.getWorkspace().removeSaveParticipant(this);
+			getConnectionPointManager().removeConnectionPointListener(listener);
+			connectionContexts.clear();
+		}
+		finally
+		{
+			plugin = null;
+			super.stop(context);
+		}
 	}
 
 	/**
 	 * Returns the shared instance
-	 *
+	 * 
 	 * @return the shared instance
 	 */
-	public static CoreIOPlugin getDefault() {
+	public static CoreIOPlugin getDefault()
+	{
 		return plugin;
 	}
 
-	public static void log(Throwable e) {
+	public static void log(Throwable e)
+	{
 		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, e.getLocalizedMessage(), e));
 	}
 
-	public static void log(String msg) {
-		log(new Status(IStatus.INFO, PLUGIN_ID, IStatus.OK, msg, null)); 
+	public static void log(String msg)
+	{
+		log(new Status(IStatus.INFO, PLUGIN_ID, IStatus.OK, msg, null));
 	}
 
-	public static void log(String msg, Throwable e) {
-		log(new Status(IStatus.INFO, PLUGIN_ID, IStatus.OK, msg, e)); 
+	public static void log(String msg, Throwable e)
+	{
+		log(new Status(IStatus.INFO, PLUGIN_ID, IStatus.OK, msg, e));
 	}
 
-	public static void log(IStatus status) {
+	public static void log(IStatus status)
+	{
 		getDefault().getLog().log(status);
 	}
 
 	/**
 	 * Returns the Connection Manager instance
+	 * 
 	 * @return
 	 */
-	public static IConnectionPointManager getConnectionPointManager() {
+	public static IConnectionPointManager getConnectionPointManager()
+	{
 		return ConnectionPointManager.getInstance();
 	}
-	
-	public static IAuthenticationManager getAuthenticationManager() {
+
+	public static IAuthenticationManager getAuthenticationManager()
+	{
 		return AuthenticationManager.getInstance();
 	}
-	
-	public static void setConnectionContext(Object key, ConnectionContext context) {
+
+	public static void setConnectionContext(Object key, ConnectionContext context)
+	{
 		getDefault().connectionContexts.put(key, context);
 	}
-	
-	public static ConnectionContext getConnectionContext(Object key) {
+
+	public static ConnectionContext getConnectionContext(Object key)
+	{
 		return getDefault().connectionContexts.get(key);
 	}
-	
-	private class WorkspaceSaveParticipant implements ISaveParticipant {
 
-		/* (non-Javadoc)
+	private class WorkspaceSaveParticipant implements ISaveParticipant
+	{
+
+		/*
+		 * (non-Javadoc)
 		 * @see org.eclipse.core.resources.ISaveParticipant#prepareToSave(org.eclipse.core.resources.ISaveContext)
 		 */
-		public void prepareToSave(ISaveContext context) throws CoreException {
+		public void prepareToSave(ISaveContext context) throws CoreException
+		{
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
 		 * @see org.eclipse.core.resources.ISaveParticipant#saving(org.eclipse.core.resources.ISaveContext)
 		 */
-		public void saving(ISaveContext context) throws CoreException {
+		public void saving(ISaveContext context) throws CoreException
+		{
 			IPath savePath = new Path(ConnectionPointManager.STATE_FILENAME).addFileExtension(Integer.toString(context
 					.getSaveNumber()));
 			ConnectionPointManager.getInstance().saveState(getStateLocation().append(savePath));
 			context.map(new Path(ConnectionPointManager.STATE_FILENAME), savePath);
 			context.needSaveNumber();
 		}
-		
-		/* (non-Javadoc)
+
+		/*
+		 * (non-Javadoc)
 		 * @see org.eclipse.core.resources.ISaveParticipant#doneSaving(org.eclipse.core.resources.ISaveContext)
 		 */
-		public void doneSaving(ISaveContext context) {
-			IPath prevSavePath = new Path(ConnectionPointManager.STATE_FILENAME)
-						.addFileExtension(Integer.toString(context.getPreviousSaveNumber()));
+		public void doneSaving(ISaveContext context)
+		{
+			IPath prevSavePath = new Path(ConnectionPointManager.STATE_FILENAME).addFileExtension(Integer
+					.toString(context.getPreviousSaveNumber()));
 			getStateLocation().append(prevSavePath).toFile().delete();
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
 		 * @see org.eclipse.core.resources.ISaveParticipant#rollback(org.eclipse.core.resources.ISaveContext)
 		 */
-		public void rollback(ISaveContext context) {
-			IPath savePath = new Path(ConnectionPointManager.STATE_FILENAME)
-						.addFileExtension(Integer.toString(context.getSaveNumber()));
+		public void rollback(ISaveContext context)
+		{
+			IPath savePath = new Path(ConnectionPointManager.STATE_FILENAME).addFileExtension(Integer.toString(context
+					.getSaveNumber()));
 			getStateLocation().append(savePath).toFile().delete();
 		}
 	}

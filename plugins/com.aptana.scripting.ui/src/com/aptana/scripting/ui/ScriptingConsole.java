@@ -3,9 +3,9 @@ package com.aptana.scripting.ui;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -55,8 +55,8 @@ public class ScriptingConsole implements IStartup, IConsolePageParticipant
 	{
 		if (console == null)
 		{
-			console = new MessageConsole(Messages.EarlyStartup_SCRIPTING_CONSOLE_NAME, ScriptingUIPlugin
-					.getImageDescriptor(CONSOLE_ICON_PATH));
+			console = new MessageConsole(Messages.EarlyStartup_SCRIPTING_CONSOLE_NAME,
+					ScriptingUIPlugin.getImageDescriptor(CONSOLE_ICON_PATH));
 
 			// create message streams
 			outputConsoleStream = console.newMessageStream();
@@ -67,7 +67,7 @@ public class ScriptingConsole implements IStartup, IConsolePageParticipant
 
 			// bring console into view when errors occur
 			errorConsoleStream.setActivateOnWrite(true);
-			
+
 			// register our console with Eclipse
 			ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { console });
 		}
@@ -294,18 +294,21 @@ public class ScriptingConsole implements IStartup, IConsolePageParticipant
 	 */
 	private void listenForFontChanges()
 	{
-		this._fontChangeListener = new IPropertyChangeListener()
+		if (JFaceResources.getFontRegistry() != null)
 		{
-			@Override
-			public void propertyChange(PropertyChangeEvent event)
+			this._fontChangeListener = new IPropertyChangeListener()
 			{
-				if (event.getProperty().equals(TEXTFONT_PROPERTY))
+				@Override
+				public void propertyChange(PropertyChangeEvent event)
 				{
-					applyTheme();
+					if (event.getProperty().equals(TEXTFONT_PROPERTY))
+					{
+						applyTheme();
+					}
 				}
-			}
-		};
-		JFaceResources.getFontRegistry().addListener(this._fontChangeListener);
+			};
+			JFaceResources.getFontRegistry().addListener(this._fontChangeListener);
+		}
 	}
 
 	/**
@@ -380,7 +383,7 @@ public class ScriptingConsole implements IStartup, IConsolePageParticipant
 		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID)
 				.addPreferenceChangeListener(this._themeChangeListener);
 	}
-	
+
 	/**
 	 * refresh
 	 */
