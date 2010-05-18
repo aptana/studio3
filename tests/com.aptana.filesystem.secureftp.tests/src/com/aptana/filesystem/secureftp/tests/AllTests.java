@@ -1,7 +1,5 @@
 package com.aptana.filesystem.secureftp.tests;
 
-import org.kohsuke.junit.ParallelTestSuite;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -10,7 +8,7 @@ public class AllTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new ParallelTestSuite(AllTests.class.getName(), 2);
+		TestSuite suite = new TestSuite(AllTests.class.getName());
 		// $JUnit-BEGIN$
 		suite.addTestSuite(SFTPConnectionTest.class);
 		suite.addTestSuite(ImplicitFTPSConnectionTest.class);

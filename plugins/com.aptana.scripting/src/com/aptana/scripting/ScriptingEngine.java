@@ -81,7 +81,7 @@ public class ScriptingEngine
 				jrubyHome = FileLocator.getBundleFile(jruby);
 			}
 
-			result.getProvider().getRubyInstanceConfig().setJRubyHome(jrubyHome.getAbsolutePath());
+			result.setHomeDirectory(jrubyHome.getAbsolutePath());
 		}
 		catch (IOException e)
 		{
