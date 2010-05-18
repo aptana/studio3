@@ -15,29 +15,22 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.tm.internal.terminal.control.ITerminalListener;
-import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
-import org.eclipse.tm.internal.terminal.provisional.api.TerminalConnectorExtension;
-import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
 import org.eclipse.ui.PlatformUI;
 
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.ProcessUtil;
-import com.aptana.terminal.connector.LocalTerminalConnector;
-import com.aptana.terminal.internal.emulator.VT100TerminalControl;
+import com.aptana.terminal.widget.TerminalComposite;
 
-@SuppressWarnings("restriction")
 public class InstallCapistranoGemPage extends WizardPage
 {
 
 	static final String NAME = "InstallCapistrano"; //$NON-NLS-1$
-	private VT100TerminalControl fCtlTerminal;
+	private TerminalComposite terminalComposite;
 	private IWizardPage fNextPage;
 	protected Job checkGemInstalledJob;
 
@@ -69,9 +62,9 @@ public class InstallCapistranoGemPage extends WizardPage
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				if (!fCtlTerminal.isEmpty())
+				if (!terminalComposite.isEmpty())
 				{
-					fCtlTerminal.clearTerminal();
+					terminalComposite.clear();
 				}
 
 				// Need to check to see if we should run under sudo to install gem...
@@ -92,12 +85,12 @@ public class InstallCapistranoGemPage extends WizardPage
 					if (!new File(output).canWrite())
 					{
 						// Does not have permission
-						fCtlTerminal.pasteString("sudo "); //$NON-NLS-1$
+						terminalComposite.sendInput("sudo "); //$NON-NLS-1$
 					}
 				}
 
 				// install gem
-				fCtlTerminal.pasteString("gem install capistrano\n"); //$NON-NLS-1$
+				terminalComposite.sendInput("gem install capistrano\n"); //$NON-NLS-1$
 
 				// Poll to check if capistrano is installed
 				if (checkGemInstalledJob == null)
@@ -137,29 +130,11 @@ public class InstallCapistranoGemPage extends WizardPage
 		});
 
 		// Terminal
-		Composite terminal = new Composite(composite, SWT.NONE);
-		terminal.setLayout(new FillLayout());
-		terminal.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		terminalComposite = new TerminalComposite(composite, SWT.NONE);
+		terminalComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		// TODO Can we prevent user input to this terminal?
-		fCtlTerminal = new VT100TerminalControl(new ITerminalListener()
-		{
-
-			@Override
-			public void setState(TerminalState state)
-			{
-				// do nothing
-			}
-
-			@Override
-			public void setTerminalTitle(String title)
-			{
-				// do nothing
-			}
-
-		}, terminal, getTerminalConnectors());
-		fCtlTerminal.setConnector(fCtlTerminal.getConnectors()[0]);
-		fCtlTerminal.connectTerminal();
+		terminalComposite.setWorkingDirectory(getProject().getLocation());
+		terminalComposite.connect();
 
 		Dialog.applyDialogFont(composite);
 	}
@@ -174,25 +149,11 @@ public class InstallCapistranoGemPage extends WizardPage
 				checkGemInstalledJob.cancel();
 				checkGemInstalledJob = null;
 			}
-			if (fCtlTerminal != null)
-			{
-				fCtlTerminal.disposeTerminal();
-			}
 		}
 		finally
 		{
 			super.dispose();
 		}
-	}
-
-	private ITerminalConnector[] getTerminalConnectors()
-	{
-		ITerminalConnector connector = TerminalConnectorExtension.makeTerminalConnector(LocalTerminalConnector.ID);
-		if (connector != null)
-		{
-			connector.getInitializationErrorMessage();
-		}
-		return new ITerminalConnector[] { connector };
 	}
 
 	@Override
