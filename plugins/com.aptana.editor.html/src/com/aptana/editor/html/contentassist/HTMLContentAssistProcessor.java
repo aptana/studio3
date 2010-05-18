@@ -244,7 +244,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 			for (Entry<String, String> entry : classes.entrySet())
 			{
-				this.addProposal(proposals, entry.getKey(), ELEMENT_ICON, null, userAgentIcons, entry.getValue(), offset);
+				this.addProposal(proposals, entry.getKey(), ATTRIBUTE_ICON, null, userAgentIcons, entry.getValue(), offset);
 			}
 		}
 	}
@@ -325,7 +325,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 			for (Entry<String, String> entry : ids.entrySet())
 			{
-				this.addProposal(proposals, entry.getKey(), ELEMENT_ICON, null, userAgentIcons, entry.getValue(), offset);
+				this.addProposal(proposals, entry.getKey(), ATTRIBUTE_ICON, null, userAgentIcons, entry.getValue(), offset);
 			}
 		}
 	}
@@ -737,6 +737,18 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 				case TAG_START:
 					result = Location.IN_ELEMENT_NAME;
+					break;
+					
+				case TAG_END:
+					if (index >= 1)
+					{
+						Lexeme<HTMLTokenType> previous = lexemeProvider.getLexeme(index - 1);
+						
+						if (previous.getEndingOffset() < offset)
+						{
+							result = Location.IN_ATTRIBUTE_NAME;
+						}
+					}
 					break;
 
 				case BLOCK_TAG:
