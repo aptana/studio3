@@ -78,6 +78,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
+import com.aptana.editor.common.theme.ConsoleThemer;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.TextmateImporter;
 import com.aptana.editor.common.theme.Theme;
@@ -105,6 +106,11 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		tokenTypeNames.add("constant.language"); //$NON-NLS-1$
 		tokenTypeNames.add("constant.numeric"); //$NON-NLS-1$
 		tokenTypeNames.add("constant.other"); //$NON-NLS-1$
+		tokenTypeNames.add(ConsoleThemer.CONSOLE_ERROR);
+		tokenTypeNames.add(ConsoleThemer.CONSOLE_INPUT);
+		tokenTypeNames.add(ConsoleThemer.CONSOLE_OUTPUT);
+		tokenTypeNames.add(ConsoleThemer.CONSOLE_PROMPT);
+		tokenTypeNames.add(ConsoleThemer.CONSOLE_WARNING);
 		tokenTypeNames.add("entity.name"); //$NON-NLS-1$
 		tokenTypeNames.add("entity.name.class"); //$NON-NLS-1$
 		tokenTypeNames.add("entity.name.function"); //$NON-NLS-1$

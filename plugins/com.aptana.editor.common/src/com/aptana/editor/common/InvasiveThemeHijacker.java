@@ -52,6 +52,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
+import com.aptana.editor.common.theme.ConsoleThemer;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.Theme;
 import com.aptana.editor.common.theme.TreeThemer;
@@ -118,10 +119,9 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 		else
 		{
-			setColor(prefs, "org.eclipse.debug.ui.errorColor", currentTheme, "console.error", new RGB(0x80, 0, 0));
-			setColor(prefs, "org.eclipse.debug.ui.outColor", currentTheme, "console.output",
-					currentTheme.getForeground());
-			setColor(prefs, "org.eclipse.debug.ui.inColor", currentTheme, "console.input", currentTheme.getForeground());
+			setColor(prefs, "org.eclipse.debug.ui.errorColor", currentTheme, ConsoleThemer.CONSOLE_ERROR, new RGB(0x80, 0, 0));
+			setColor(prefs, "org.eclipse.debug.ui.outColor", currentTheme, ConsoleThemer.CONSOLE_OUTPUT, currentTheme.getForeground());
+			setColor(prefs, "org.eclipse.debug.ui.inColor", currentTheme, ConsoleThemer.CONSOLE_INPUT, currentTheme.getForeground());
 			prefs.put("org.eclipse.debug.ui.consoleBackground", StringConverter.asString(currentTheme.getBackground()));
 		}
 		try

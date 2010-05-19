@@ -17,7 +17,7 @@ public class StreamContextContributor implements ContextContributor
 	 */
 	public void modifyContext(CommandElement command, CommandContext context)
 	{
-		context.setConsoleStream(ScriptingConsole.getDefault().getOutputConsoleStream());
-		context.setErrorStream(ScriptingConsole.getDefault().getErrorConsoleStream());
+		context.setConsoleStream(ScriptingConsole.getInstance().getOutputConsoleStream());
+		context.setErrorStream(ScriptingConsole.getInstance().getErrorConsoleStream());
 	}
 }
