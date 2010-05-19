@@ -69,7 +69,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	/**
 	 * Location
 	 */
-	private static enum Location
+	static enum Location
 	{
 		ERROR, OUTSIDE_RULE, INSIDE_RULE, INSIDE_ARG, INSIDE_PROPERTY, INSIDE_VALUE
 	};
@@ -347,18 +347,10 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
 	{
-		offset = Math.max(0, offset - 1);
-		
 		// tokenize the current document
 		IDocument document = viewer.getDocument();
-		LexemeProvider<CSSTokenType> lexemeProvider = new LexemeProvider<CSSTokenType>(document, offset, new CSSScopeScanner())
-		{
-			@Override
-			protected CSSTokenType getTypeFromName(String name)
-			{
-				return CSSTokenType.get(name);
-			}
-		};
+		
+		LexemeProvider<CSSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
 
 		// store a reference to the lexeme at the current position
 		this._currentLexeme = lexemeProvider.getCeilingLexeme(offset);
@@ -368,7 +360,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		this._replaceRange = this._currentLexeme;
 
 		// first step is to determine if we're inside our outside of a rule
-		Location location = this.getLocation(lexemeProvider, offset);
+		Location location = this.getCoarseLocation(lexemeProvider, offset);
 
 		// create proposal container
 		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
@@ -411,6 +403,25 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		return result.toArray(new ICompletionProposal[result.size()]);
 	}
 
+	/**
+	 * createLexemeProvider
+	 * 
+	 * @param document
+	 * @param offset
+	 * @return
+	 */
+	LexemeProvider<CSSTokenType> createLexemeProvider(IDocument document, int offset)
+	{
+		return new LexemeProvider<CSSTokenType>(document, offset, new CSSScopeScanner())
+		{
+			@Override
+			protected CSSTokenType getTypeFromName(String name)
+			{
+				return CSSTokenType.get(name);
+			}
+		};
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getCompletionProposalAutoActivationCharacters()
@@ -471,7 +482,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	private Location getInsideLocation(LexemeProvider<CSSTokenType> lexemeProvider, int offset)
+	Location getInsideLocation(LexemeProvider<CSSTokenType> lexemeProvider, int offset)
 	{
 		Location location = Location.ERROR;
 		
@@ -621,7 +632,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	private Location getLocation(LexemeProvider<CSSTokenType> lexemeProvider, int offset)
+	Location getCoarseLocation(LexemeProvider<CSSTokenType> lexemeProvider, int offset)
 	{
 		Location result = Location.ERROR;
 		int index = lexemeProvider.getLexemeFloorIndex(offset);
@@ -633,7 +644,14 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			switch (lexeme.getType())
 			{
 				case CURLY_BRACE:
-					result = ("{".equals(lexeme.getText())) ? Location.INSIDE_RULE : Location.OUTSIDE_RULE; //$NON-NLS-1$
+					if ("{".equals(lexeme.getText())) //$NON-NLS-1$
+					{
+						result = (lexeme.getEndingOffset() < offset) ? Location.INSIDE_RULE : Location.OUTSIDE_RULE;
+					}
+					else
+					{
+						result = (lexeme.getEndingOffset() < offset) ? Location.OUTSIDE_RULE : Location.INSIDE_RULE;
+					}
 					break LOOP;
 
 				case PROPERTY:
