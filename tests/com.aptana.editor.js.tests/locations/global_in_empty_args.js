@@ -1,4 +1,4 @@
 function abc() {
 }
 
-abc("hello",${cursor})
+abc()
