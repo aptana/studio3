@@ -29,21 +29,21 @@
  * ***** END LICENSE BLOCK ***** */
 package com.aptana.editor.css.contentassist;
 
-import com.aptana.editor.css.contentassist.CSSContentAssistProcessor.Location;
+import com.aptana.editor.css.contentassist.CSSContentAssistProcessor.LocationType;
 
-class LocationRange
+class LocationTypeRange
 {
-	public final Location location;
+	public final LocationType location;
 	public final int startingOffset;
 	public final int endingOffset;
 
-	public LocationRange(Location location, int offset)
+	public LocationTypeRange(LocationType location, int offset)
 	{
 		this.location = location;
 		this.startingOffset = this.endingOffset = offset;
 	}
 
-	public LocationRange(Location location, int startingOffset, int endingOffset)
+	public LocationTypeRange(LocationType location, int startingOffset, int endingOffset)
 	{
 		this.location = location;
 		this.startingOffset = startingOffset;

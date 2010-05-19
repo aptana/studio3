@@ -1,6 +1,6 @@
 package com.aptana.editor.css.contentassist;
 
-import com.aptana.editor.css.contentassist.CSSContentAssistProcessor.Location;
+import com.aptana.editor.css.contentassist.CSSContentAssistProcessor.LocationType;
 
 public class ContentAssistCoarseLocationTests extends LocationTests
 {
@@ -13,7 +13,7 @@ public class ContentAssistCoarseLocationTests extends LocationTests
 		
 		this.coarseLocationTests(
 			source,
-			new LocationRange(Location.OUTSIDE_RULE, source.length())
+			new LocationTypeRange(LocationType.OUTSIDE_RULE, source.length())
 		);
 	}
 	
@@ -26,7 +26,7 @@ public class ContentAssistCoarseLocationTests extends LocationTests
 		
 		this.coarseLocationTests(
 			source,
-			new LocationRange(Location.OUTSIDE_RULE, 0, source.length())
+			new LocationTypeRange(LocationType.OUTSIDE_RULE, 0, source.length())
 		);
 	}
 	
@@ -39,7 +39,7 @@ public class ContentAssistCoarseLocationTests extends LocationTests
 		
 		this.coarseLocationTests(
 			source,
-			new LocationRange(Location.OUTSIDE_RULE, 0, source.length())
+			new LocationTypeRange(LocationType.OUTSIDE_RULE, 0, source.length())
 		);
 	}
 	
@@ -52,7 +52,7 @@ public class ContentAssistCoarseLocationTests extends LocationTests
 		
 		this.coarseLocationTests(
 			source,
-			new LocationRange(Location.OUTSIDE_RULE, 0, source.length())
+			new LocationTypeRange(LocationType.OUTSIDE_RULE, 0, source.length())
 		);
 	}
 	
@@ -65,7 +65,7 @@ public class ContentAssistCoarseLocationTests extends LocationTests
 		
 		this.coarseLocationTests(
 			source,
-			new LocationRange(Location.OUTSIDE_RULE, 0, source.length())
+			new LocationTypeRange(LocationType.OUTSIDE_RULE, 0, source.length())
 		);
 	}
 	
@@ -78,9 +78,9 @@ public class ContentAssistCoarseLocationTests extends LocationTests
 		
 		this.coarseLocationTests(
 			source,
-			new LocationRange(Location.OUTSIDE_RULE, 0, 5),
-			new LocationRange(Location.INSIDE_RULE, 6),
-			new LocationRange(Location.OUTSIDE_RULE, 7, source.length())
+			new LocationTypeRange(LocationType.OUTSIDE_RULE, 0, 5),
+			new LocationTypeRange(LocationType.INSIDE_RULE, 6),
+			new LocationTypeRange(LocationType.OUTSIDE_RULE, 7, source.length())
 		);
 	}
 	
@@ -93,9 +93,9 @@ public class ContentAssistCoarseLocationTests extends LocationTests
 		
 		this.coarseLocationTests(
 			source,
-			new LocationRange(Location.OUTSIDE_RULE, 0, 5),
-			new LocationRange(Location.INSIDE_RULE, 6, 10),
-			new LocationRange(Location.OUTSIDE_RULE, 11, source.length())
+			new LocationTypeRange(LocationType.OUTSIDE_RULE, 0, 5),
+			new LocationTypeRange(LocationType.INSIDE_RULE, 6, 10),
+			new LocationTypeRange(LocationType.OUTSIDE_RULE, 11, source.length())
 		);
 	}
 	
@@ -108,11 +108,11 @@ public class ContentAssistCoarseLocationTests extends LocationTests
 		
 		this.coarseLocationTests(
 			source,
-			new LocationRange(Location.OUTSIDE_RULE, 0, 5),
-			new LocationRange(Location.INSIDE_RULE, 6, 10),
-			new LocationRange(Location.OUTSIDE_RULE, 11, 19),
-			new LocationRange(Location.INSIDE_RULE, 20, 24),
-			new LocationRange(Location.OUTSIDE_RULE, 25, source.length())
+			new LocationTypeRange(LocationType.OUTSIDE_RULE, 0, 5),
+			new LocationTypeRange(LocationType.INSIDE_RULE, 6, 10),
+			new LocationTypeRange(LocationType.OUTSIDE_RULE, 11, 19),
+			new LocationTypeRange(LocationType.INSIDE_RULE, 20, 24),
+			new LocationTypeRange(LocationType.OUTSIDE_RULE, 25, source.length())
 		);
 	}
 }
