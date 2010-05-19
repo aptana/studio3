@@ -33,67 +33,51 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.filesystem.ftp.internal;
+package com.aptana.filesystem.secureftp.internal;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
 
-import com.enterprisedt.net.ftp.FTPClient;
-import com.enterprisedt.net.ftp.FTPClientInterface;
+import org.eclipse.core.runtime.Status;
+
 import com.enterprisedt.net.ftp.FTPException;
 import com.enterprisedt.net.ftp.FileTransferOutputStream;
+import com.enterprisedt.net.ftp.ssh.SSHFTPClient;
 
 /**
  * @author Max Stepanov
  *
  */
-public class FTPFileUploadOutputStream extends OutputStream {
+public class SFTPFileUploadOutputStream extends OutputStream {
 
-	private FTPClientInterface ftpClient;
+	private SSHFTPClient ftpClient;
 	private FileTransferOutputStream ftpOutputStream;
 	private String filename;
 	private Date modificationTime;
 	private long permissions;
-	private FTPClientPool pool;
 	
 	/**
-	 * @param pool 
 	 * 
 	 */
-	public FTPFileUploadOutputStream(FTPClientPool pool, FTPClientInterface ftpClient, FileTransferOutputStream ftpOutputStream, String filename, Date modificationTime, long permissions) {
+	public SFTPFileUploadOutputStream(SSHFTPClient ftpClient, FileTransferOutputStream ftpOutputStream, String filename, Date modificationTime, long permissions) {
 		this.ftpClient = ftpClient;
 		this.ftpOutputStream = ftpOutputStream;
 		this.filename = filename;
 		this.modificationTime = modificationTime;
 		this.permissions = permissions;
-		this.pool = pool;
 	}
 
-	private void safeQuit(boolean failed) {		
+	private void safeClose(boolean failed) {
 		try {
 			if (ftpClient.connected()) {
 				if (failed) {
 					ftpClient.delete(ftpOutputStream.getRemoteFile());
 				}
 			}
-		}
-		catch (Exception e)
-		{
-			// ignore
-		}
-		finally 
-		{
-			try
-			{
-				ftpOutputStream.close();
-			}
-			catch (IOException e)
-			{
-				// ignore
-			}
-			pool.checkIn(ftpClient);
-		}
+		} catch (Exception e) {
+			SecureFTPPlugin.log(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "SFTP upload error.", e));
+		}		
 	}
 
 	/* (non-Javadoc)
@@ -104,7 +88,7 @@ public class FTPFileUploadOutputStream extends OutputStream {
 		try {
 			ftpOutputStream.write(b);
 		} catch (IOException e) {
-			safeQuit(true);
+			safeClose(true);
 			throw e;
 		}
 	}
@@ -125,17 +109,14 @@ public class FTPFileUploadOutputStream extends OutputStream {
 						ftpClient.delete(filename);
 					}
 					ftpClient.rename(ftpOutputStream.getRemoteFile(), filename);
-                    if (ftpClient instanceof FTPClient) {
-                        ((FTPClient) ftpClient).site("CHMOD " + Long.toOctalString(permissions) //$NON-NLS-1$
-                                + " " + filename); //$NON-NLS-1$
-                    }
+                    ((SSHFTPClient) ftpClient).changeMode((int) (permissions & 0777), filename);
 				}
 			} catch (FTPException e) {
-				safeQuit(true);
+				safeClose(true);
 				throw new IOException(e.getMessage()); 
 			}
 		} finally {
-			safeQuit(false);
+			safeClose(false);
 		}
 	}
 
@@ -147,7 +128,7 @@ public class FTPFileUploadOutputStream extends OutputStream {
 		try {
 			ftpOutputStream.write(b, off, len);
 		} catch (IOException e) {
-			safeQuit(true);
+			safeClose(true);
 			throw e;
 		}		
 	}

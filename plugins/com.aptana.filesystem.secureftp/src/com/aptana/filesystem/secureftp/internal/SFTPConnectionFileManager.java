@@ -624,6 +624,8 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 		try {
 			Policy.checkCanceled(monitor);
 			changeCurrentDir(path.removeLastSegments(1));
+			monitor.worked(1);
+			Policy.checkCanceled(monitor);
 			try {
 				return new SFTPFileDownloadInputStream(new SSHFTPInputStream(ftpClient, path.toPortableString()));
 			} catch (FTPException e) {
@@ -649,6 +651,9 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	protected OutputStream writeFile(IPath path, long permissions, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
 		monitor.beginTask(Messages.SFTPConnectionFileManager_FailedInitiatingFile, 4);
 		try {
+			Policy.checkCanceled(monitor);
+			changeCurrentDir(path.removeLastSegments(1));
+			monitor.worked(1);
 			Policy.checkCanceled(monitor);
 			return new SFTPFileUploadOutputStream(ftpClient,
 					new SSHFTPOutputStream(ftpClient, path.removeLastSegments(1).append(generateTempFileName(path.lastSegment())).toPortableString()),
