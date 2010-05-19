@@ -55,8 +55,6 @@ public class FTPClientPool extends ObjectPool<FTPClientInterface>
 			catch (Exception ignore)
 			{
 			}
-			// throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID,
-			// Messages.FTPConnectionFileManager_disconnect_failed, e));
 		}
 	}
 
