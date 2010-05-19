@@ -47,8 +47,10 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.css.CSSSourceConfiguration;
+import com.aptana.editor.css.contentassist.CSSContentAssistProcessor;
 import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor;
 import com.aptana.editor.js.JSSourceConfiguration;
+import com.aptana.editor.js.contentassist.JSContentAssistProcessor;
 
 public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfiguration
 {
@@ -107,6 +109,22 @@ public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfigurati
 	@Override
 	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
 	{
-		return new HTMLContentAssistProcessor(getAbstractThemeableEditor());
+		AbstractThemeableEditor editor = this.getAbstractThemeableEditor();
+		IContentAssistProcessor result;
+		
+		if (contentType.startsWith(JSSourceConfiguration.PREFIX))
+		{
+			result = new JSContentAssistProcessor(editor);
+		}
+		else if (contentType.startsWith(CSSSourceConfiguration.PREFIX))
+		{
+			result = new CSSContentAssistProcessor(editor);
+		}
+		else
+		{
+			result = new HTMLContentAssistProcessor(editor);
+		}
+		
+		return result;
 	}
 }
