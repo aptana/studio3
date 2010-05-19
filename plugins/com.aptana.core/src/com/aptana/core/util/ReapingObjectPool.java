@@ -6,10 +6,10 @@ import java.util.Hashtable;
 class ConnectionReaper extends Thread
 {
 
-	private ReapingObjectPool pool;
+	private ReapingObjectPool<?> pool;
 	private final long delay = 300000;
 
-	ConnectionReaper(ReapingObjectPool pool)
+	ConnectionReaper(ReapingObjectPool<?> pool)
 	{
 		this.pool = pool;
 	}
