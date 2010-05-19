@@ -191,7 +191,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		IParseNode ast = this.editor.getFileService().getParseResult();
 		LexemeProvider<JSTokenType> result;
 		
-		this._currentNode = ast.getNodeAt(offset);
+		this._currentNode = (ast != null) ? ast.getNodeAt(offset) : null;
 		
 		if (this._currentNode != null)
 		{
