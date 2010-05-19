@@ -177,6 +177,10 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		IEditorInput editorInput = editor.getEditorInput();
 		Index result = null;
 
+		// FIXME: For non-workspace files, the editor input would be FileStoreEditorInput.
+		// Both it and FileEditorInput implements IURIEditorInput, so we could use that once
+		// we're adapting to handle indexing non-workspace files.
+		
 		if (editorInput instanceof IFileEditorInput)
 		{
 			IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
