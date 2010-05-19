@@ -1,4 +1,4 @@
-package com.aptana.deploy.wizard;
+package com.aptana.deploy.internal.wizard;
 
 import java.io.File;
 
@@ -24,12 +24,13 @@ import org.eclipse.ui.PlatformUI;
 
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.ProcessUtil;
+import com.aptana.deploy.wizard.DeployWizard;
 import com.aptana.terminal.widget.TerminalComposite;
 
 public class InstallCapistranoGemPage extends WizardPage
 {
 
-	static final String NAME = "InstallCapistrano"; //$NON-NLS-1$
+	private static final String NAME = "InstallCapistrano"; //$NON-NLS-1$
 	private TerminalComposite terminalComposite;
 	private IWizardPage fNextPage;
 	protected Job checkGemInstalledJob;
@@ -95,7 +96,7 @@ public class InstallCapistranoGemPage extends WizardPage
 				// Poll to check if capistrano is installed
 				if (checkGemInstalledJob == null)
 				{
-					checkGemInstalledJob = new Job("Checking if capistrano gem is installed")
+					checkGemInstalledJob = new Job("Checking if capistrano gem is installed") //$NON-NLS-1$
 					{
 						protected IStatus run(IProgressMonitor monitor)
 						{

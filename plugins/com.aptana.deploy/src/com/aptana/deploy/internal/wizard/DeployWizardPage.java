@@ -1,4 +1,4 @@
-package com.aptana.deploy.wizard;
+package com.aptana.deploy.internal.wizard;
 
 import java.io.File;
 
@@ -19,11 +19,12 @@ import org.eclipse.swt.widgets.Label;
 
 import com.aptana.deploy.Activator;
 import com.aptana.deploy.HerokuAPI;
+import com.aptana.deploy.wizard.DeployWizard;
 
 public class DeployWizardPage extends WizardPage
 {
 
-	static final String NAME = "Deployment"; //$NON-NLS-1$
+	public static final String NAME = "Deployment"; //$NON-NLS-1$
 	private static final String HEROKU_IMG_PATH = "icons/heroku.png"; //$NON-NLS-1$
 
 	private Button deployWithFTP;
@@ -32,7 +33,7 @@ public class DeployWizardPage extends WizardPage
 
 	private IProject project;
 
-	protected DeployWizardPage(IProject project)
+	public DeployWizardPage(IProject project)
 	{
 		super(NAME, Messages.DeployWizardPage_Title, null);
 		this.project = project;

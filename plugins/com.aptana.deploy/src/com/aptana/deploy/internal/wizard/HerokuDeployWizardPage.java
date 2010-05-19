@@ -1,4 +1,4 @@
-package com.aptana.deploy.wizard;
+package com.aptana.deploy.internal.wizard;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.dialogs.Dialog;
@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.deploy.Activator;
+import com.aptana.deploy.wizard.DeployWizard;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 
@@ -26,7 +27,7 @@ public class HerokuDeployWizardPage extends WizardPage
 
 	private static final String HEROKU_ICON = "icons/heroku.png"; //$NON-NLS-1$
 
-	static final String NAME = "HerokuDeploy"; //$NON-NLS-1$
+	public static final String NAME = "HerokuDeploy"; //$NON-NLS-1$
 
 	private Text appName;
 	private Button publishButton;

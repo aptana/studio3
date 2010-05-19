@@ -1,4 +1,4 @@
-package com.aptana.deploy.wizard;
+package com.aptana.deploy.internal.wizard;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.JFaceResources;
@@ -22,7 +22,7 @@ import com.aptana.deploy.Activator;
 public class HerokuSignupPage extends WizardPage
 {
 
-	static final String NAME = "HerokuSignup"; //$NON-NLS-1$
+	public static final String NAME = "HerokuSignup"; //$NON-NLS-1$
 	private static final String HEROKU_ICON = "icons/heroku.png"; //$NON-NLS-1$
 
 	private Text userId;

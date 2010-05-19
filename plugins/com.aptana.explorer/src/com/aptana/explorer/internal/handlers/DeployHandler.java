@@ -5,10 +5,13 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import com.aptana.deploy.actions.DeployAction;
+import com.aptana.deploy.wizard.DeployWizard;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.ide.syncing.core.ISiteConnection;
@@ -25,43 +28,52 @@ public class DeployHandler extends AbstractHandler
 
 		IStructuredSelection selections = (IStructuredSelection) HandlerUtil.getCurrentSelection(event);
 		IProject selectedProject = (IProject) selections.getFirstElement();
-				
-		if(isCapistranoProject(selectedProject))
+
+		if (isCapistranoProject(selectedProject))
 		{
 			TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
 					selectedProject.getLocation());
-			terminal.sendInput("cap deploy" + '\n');
-			
-		} else if (isFTPProject(selectedProject)) {
-			
+			terminal.sendInput("cap deploy\n"); //$NON-NLS-1$
+		}
+		else if (isFTPProject(selectedProject))
+		{
 			SynchronizeAction action = new SynchronizeAction();
 			action.setActivePart(null, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
 					.getActivePart());
 			action.setSelection(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService()
 					.getSelection());
 			action.run(null);
-			
-		} else if (isHerokuProject(selectedProject)) {
-			
+		}
+		else if (isHerokuProject(selectedProject))
+		{
 			TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
 					selectedProject.getLocation());
-			terminal.sendInput("git push heroku master" + '\n');
-			
-		} else {
-			
-			DeployAction action = new DeployAction();
-			action.setActivePart(null, PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-					.getActivePage().getActivePart());
-			action.selectionChanged(null, PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-					.getSelectionService().getSelection());
-			action.run(null);
-			
+			terminal.sendInput("git push heroku master\n"); //$NON-NLS-1$
 		}
-		
+		else
+		{
+			IWorkbenchPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart();
+
+			// Instantiates and initializes the wizard
+			DeployWizard wizard = new DeployWizard();
+			wizard.init(part.getSite().getWorkbenchWindow().getWorkbench(), (IStructuredSelection) part.getSite().getSelectionProvider()
+					.getSelection());
+
+			// Instantiates the wizard container with the wizard and opens it
+			Shell shell = part.getSite().getShell();
+			if (shell == null)
+			{
+				shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+			}
+			WizardDialog dialog = new WizardDialog(shell, wizard);
+			dialog.setPageSize(350, 470);
+			dialog.create();
+			dialog.open();
+		}
+
 		return null;
 	}
-	
-	
+
 	private boolean isCapistranoProject(IProject selectedProject)
 	{
 		if (selectedProject.getFile("Capfile").exists()) //$NON-NLS-1$
@@ -88,14 +100,14 @@ public class DeployHandler extends AbstractHandler
 		{
 			for (String remote : repo.remotes())
 			{
-				if (remote.indexOf("heroku") != -1)
+				if (remote.indexOf("heroku") != -1) //$NON-NLS-1$
 				{
 					return true;
 				}
 			}
 			for (String remoteURL : repo.remoteURLs())
 			{
-				if (remoteURL.indexOf("heroku.com") != -1)
+				if (remoteURL.indexOf("heroku.com") != -1) //$NON-NLS-1$
 				{
 					return true;
 				}

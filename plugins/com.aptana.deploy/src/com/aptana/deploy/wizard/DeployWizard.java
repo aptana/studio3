@@ -40,7 +40,12 @@ import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.deploy.Activator;
+import com.aptana.deploy.internal.wizard.CapifyProjectPage;
+import com.aptana.deploy.internal.wizard.DeployWizardPage;
 import com.aptana.deploy.internal.wizard.FTPDeployComposite.Direction;
+import com.aptana.deploy.internal.wizard.FTPDeployWizardPage;
+import com.aptana.deploy.internal.wizard.HerokuDeployWizardPage;
+import com.aptana.deploy.internal.wizard.HerokuSignupPage;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
