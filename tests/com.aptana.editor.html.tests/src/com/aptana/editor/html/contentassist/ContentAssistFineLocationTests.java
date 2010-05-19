@@ -1,6 +1,6 @@
 package com.aptana.editor.html.contentassist;
 
-import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.Location;
+import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.LocationType;
 
 public class ContentAssistFineLocationTests extends LocationTests
 {
@@ -13,7 +13,7 @@ public class ContentAssistFineLocationTests extends LocationTests
 
 		this.fineLocationTests(
 			source,
-			new LocationRange(Location.IN_ELEMENT_NAME, 1)
+			new LocationTypeRange(LocationType.IN_ELEMENT_NAME, 1)
 		);
 	}
 	
@@ -26,7 +26,7 @@ public class ContentAssistFineLocationTests extends LocationTests
 		
 		this.fineLocationTests(
 			source,
-			new LocationRange(Location.IN_ELEMENT_NAME, 1, source.length())
+			new LocationTypeRange(LocationType.IN_ELEMENT_NAME, 1, source.length())
 		);
 	}
 	
@@ -39,8 +39,8 @@ public class ContentAssistFineLocationTests extends LocationTests
 		
 		this.fineLocationTests(
 			source,
-			new LocationRange(Location.IN_ELEMENT_NAME, 1, 5),
-			new LocationRange(Location.IN_ATTRIBUTE_NAME, 6, source.length())
+			new LocationTypeRange(LocationType.IN_ELEMENT_NAME, 1, 5),
+			new LocationTypeRange(LocationType.IN_ATTRIBUTE_NAME, 6, source.length())
 		);
 	}
 	
@@ -53,9 +53,9 @@ public class ContentAssistFineLocationTests extends LocationTests
 		
 		this.fineLocationTests(
 			source,
-			new LocationRange(Location.IN_ELEMENT_NAME, 1, 5),
-			new LocationRange(Location.IN_ATTRIBUTE_NAME, 6, source.length() - 1),
-			new LocationRange(Location.IN_ATTRIBUTE_VALUE, source.length())
+			new LocationTypeRange(LocationType.IN_ELEMENT_NAME, 1, 5),
+			new LocationTypeRange(LocationType.IN_ATTRIBUTE_NAME, 6, source.length() - 1),
+			new LocationTypeRange(LocationType.IN_ATTRIBUTE_VALUE, source.length())
 		);
 	}
 	
@@ -68,10 +68,10 @@ public class ContentAssistFineLocationTests extends LocationTests
 		
 		this.fineLocationTests(
 			source,
-			new LocationRange(Location.IN_ELEMENT_NAME, 1, 5),
-			new LocationRange(Location.IN_ATTRIBUTE_NAME, 6, 12),
-			new LocationRange(Location.IN_ATTRIBUTE_VALUE, 13, source.length() - 1),
-			new LocationRange(Location.IN_ATTRIBUTE_NAME, source.length())
+			new LocationTypeRange(LocationType.IN_ELEMENT_NAME, 1, 5),
+			new LocationTypeRange(LocationType.IN_ATTRIBUTE_NAME, 6, 12),
+			new LocationTypeRange(LocationType.IN_ATTRIBUTE_VALUE, 13, source.length() - 1),
+			new LocationTypeRange(LocationType.IN_ATTRIBUTE_NAME, source.length())
 		);
 	}
 	
@@ -84,7 +84,7 @@ public class ContentAssistFineLocationTests extends LocationTests
 		
 		this.fineLocationTests(
 			source,
-			new LocationRange(Location.IN_ELEMENT_NAME, 1)
+			new LocationTypeRange(LocationType.IN_ELEMENT_NAME, 1)
 		);
 	}
 	
@@ -97,7 +97,7 @@ public class ContentAssistFineLocationTests extends LocationTests
 		
 		this.fineLocationTests(
 			source,
-			new LocationRange(Location.IN_ELEMENT_NAME, 1, source.length() - 1)
+			new LocationTypeRange(LocationType.IN_ELEMENT_NAME, 1, source.length() - 1)
 		);
 	}
 	
@@ -110,8 +110,8 @@ public class ContentAssistFineLocationTests extends LocationTests
 		
 		this.fineLocationTests(
 			source,
-			new LocationRange(Location.IN_ELEMENT_NAME, 1, source.length() - 2),
-			new LocationRange(Location.IN_ATTRIBUTE_NAME, source.length() - 1)
+			new LocationTypeRange(LocationType.IN_ELEMENT_NAME, 1, source.length() - 2),
+			new LocationTypeRange(LocationType.IN_ATTRIBUTE_NAME, source.length() - 1)
 		);
 	}
 	
@@ -124,7 +124,7 @@ public class ContentAssistFineLocationTests extends LocationTests
 		
 		this.fineLocationTests(
 			source,
-			new LocationRange(Location.IN_ELEMENT_NAME, 1, source.length() - 1)
+			new LocationTypeRange(LocationType.IN_ELEMENT_NAME, 1, source.length() - 1)
 		);
 	}
 	
@@ -137,7 +137,7 @@ public class ContentAssistFineLocationTests extends LocationTests
 		
 		this.fineLocationTests(
 			source,
-			new LocationRange(Location.IN_ELEMENT_NAME, 1, source.length() - 1)
+			new LocationTypeRange(LocationType.IN_ELEMENT_NAME, 1, source.length() - 1)
 		);
 	}
 	
@@ -150,10 +150,10 @@ public class ContentAssistFineLocationTests extends LocationTests
 		
 		this.fineLocationTests(
 			source,
-			new LocationRange(Location.IN_ELEMENT_NAME, 1, 5),
-			new LocationRange(Location.IN_ATTRIBUTE_NAME, 6, 11),
-			new LocationRange(Location.IN_ATTRIBUTE_VALUE, 12, source.length() - 2),
-			new LocationRange(Location.IN_ATTRIBUTE_NAME, source.length() - 1)
+			new LocationTypeRange(LocationType.IN_ELEMENT_NAME, 1, 5),
+			new LocationTypeRange(LocationType.IN_ATTRIBUTE_NAME, 6, 11),
+			new LocationTypeRange(LocationType.IN_ATTRIBUTE_VALUE, 12, source.length() - 2),
+			new LocationTypeRange(LocationType.IN_ATTRIBUTE_NAME, source.length() - 1)
 		);
 	}
 	
@@ -166,10 +166,10 @@ public class ContentAssistFineLocationTests extends LocationTests
 		
 		this.fineLocationTests(
 			source,
-			new LocationRange(Location.IN_ELEMENT_NAME, 1, 5),
-			new LocationRange(Location.IN_ATTRIBUTE_NAME, 6, 8),
-			new LocationRange(Location.IN_ATTRIBUTE_VALUE, 9, source.length() - 2),
-			new LocationRange(Location.IN_ATTRIBUTE_NAME, source.length() - 1)
+			new LocationTypeRange(LocationType.IN_ELEMENT_NAME, 1, 5),
+			new LocationTypeRange(LocationType.IN_ATTRIBUTE_NAME, 6, 8),
+			new LocationTypeRange(LocationType.IN_ATTRIBUTE_VALUE, 9, source.length() - 2),
+			new LocationTypeRange(LocationType.IN_ATTRIBUTE_NAME, source.length() - 1)
 		);
 	}
 
@@ -182,7 +182,7 @@ public class ContentAssistFineLocationTests extends LocationTests
 		
 		this.fineLocationTests(
 			source,
-			new LocationRange(Location.IN_ELEMENT_NAME, 1, 5)
+			new LocationTypeRange(LocationType.IN_ELEMENT_NAME, 1, 5)
 		);
 	}
 }

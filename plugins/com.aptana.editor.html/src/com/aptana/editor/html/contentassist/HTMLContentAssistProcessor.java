@@ -41,19 +41,29 @@ import com.aptana.parsing.lexer.Range;
 
 public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 {
-	static enum Location
+	/**
+	 * LocationType
+	 */
+	static enum LocationType
 	{
-		ERROR, IN_OPEN_TAG, IN_CLOSE_TAG, IN_DOCTYPE, IN_COMMENT, IN_TEXT, // coarse-grain locations
+		// coarse-grain locations
+		ERROR,
+		IN_OPEN_TAG,
+		IN_CLOSE_TAG,
+		IN_DOCTYPE,
+		IN_COMMENT,
+		IN_TEXT,
 		IN_ELEMENT_NAME,
+
+		// fine-grain locations
 		IN_ATTRIBUTE_NAME,
 		IN_ATTRIBUTE_VALUE
-		// fine-grain locations
 	};
 
 	private static final Image ELEMENT_ICON = Activator.getImage("/icons/element.gif"); //$NON-NLS-1$
 	private static final Image ATTRIBUTE_ICON = Activator.getImage("/icons/attribute.gif"); //$NON-NLS-1$
 	private static final Image EVENT_ICON = Activator.getImage("/icons/event.gif"); //$NON-NLS-1$
-	private static final Map<String, Location> locationMap;
+	private static final Map<String, LocationType> locationMap;
 
 	private HTMLIndexQueryHelper _queryHelper;
 	private IContextInformationValidator _validator;
@@ -65,18 +75,18 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	static
 	{
-		locationMap = new HashMap<String, Location>();
-		locationMap.put(HTMLSourceConfiguration.DEFAULT, Location.IN_TEXT);
-		locationMap.put(HTMLSourceConfiguration.HTML_COMMENT, Location.IN_COMMENT);
-		locationMap.put(HTMLSourceConfiguration.HTML_DOCTYPE, Location.IN_DOCTYPE);
+		locationMap = new HashMap<String, LocationType>();
+		locationMap.put(HTMLSourceConfiguration.DEFAULT, LocationType.IN_TEXT);
+		locationMap.put(HTMLSourceConfiguration.HTML_COMMENT, LocationType.IN_COMMENT);
+		locationMap.put(HTMLSourceConfiguration.HTML_DOCTYPE, LocationType.IN_DOCTYPE);
 
-		locationMap.put(HTMLSourceConfiguration.HTML_SCRIPT, Location.IN_OPEN_TAG);
-		locationMap.put(HTMLSourceConfiguration.HTML_STYLE, Location.IN_OPEN_TAG);
-		locationMap.put(HTMLSourceConfiguration.HTML_TAG, Location.IN_OPEN_TAG);
+		locationMap.put(HTMLSourceConfiguration.HTML_SCRIPT, LocationType.IN_OPEN_TAG);
+		locationMap.put(HTMLSourceConfiguration.HTML_STYLE, LocationType.IN_OPEN_TAG);
+		locationMap.put(HTMLSourceConfiguration.HTML_TAG, LocationType.IN_OPEN_TAG);
 
-		locationMap.put(JSSourceConfiguration.DEFAULT, Location.IN_TEXT);
-		locationMap.put(CSSSourceConfiguration.DEFAULT, Location.IN_TEXT);
-		locationMap.put(IDocument.DEFAULT_CONTENT_TYPE, Location.IN_TEXT);
+		locationMap.put(JSSourceConfiguration.DEFAULT, LocationType.IN_TEXT);
+		locationMap.put(CSSSourceConfiguration.DEFAULT, LocationType.IN_TEXT);
+		locationMap.put(IDocument.DEFAULT_CONTENT_TYPE, LocationType.IN_TEXT);
 	}
 
 	/**
@@ -339,7 +349,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private void addOpenTagPropsals(List<ICompletionProposal> proposals, LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
 	{
-		Location location = this.getOpenTagLocation(lexemeProvider, offset);
+		LocationType location = this.getOpenTagLocationType(lexemeProvider, offset);
 
 		switch (location)
 		{
@@ -427,7 +437,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		this._replaceRange = this._currentLexeme = lexemeProvider.getFloorLexeme(offset);
 
 		// first step is to determine if we're inside an open tag, close tag, text, etc.
-		Location location = this.getCoarseLocation(document, lexemeProvider, offset);
+		LocationType location = this.getCoarseLocationType(document, lexemeProvider, offset);
 
 		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
 
@@ -600,9 +610,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	Location getCoarseLocation(IDocument document, LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
+	LocationType getCoarseLocationType(IDocument document, LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
 	{
-		Location result = Location.ERROR;
+		LocationType result = LocationType.ERROR;
 
 		try
 		{
@@ -622,11 +632,11 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						case IN_OPEN_TAG:
 							if (firstLexeme.getStartingOffset() == offset)
 							{
-								result = Location.IN_TEXT;
+								result = LocationType.IN_TEXT;
 							}
 							else if ("</".equals(firstLexeme.getText())) //$NON-NLS-1$
 							{
-								result = Location.IN_CLOSE_TAG;
+								result = LocationType.IN_CLOSE_TAG;
 							}
 							break;
 
@@ -643,12 +653,12 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 										case TAG_SELF_CLOSE:
 											if (offset <= lastLexeme.getStartingOffset())
 											{
-												result = Location.IN_OPEN_TAG;
+												result = LocationType.IN_OPEN_TAG;
 											}
 											break;
 
 										default:
-											result = Location.IN_OPEN_TAG;
+											result = LocationType.IN_OPEN_TAG;
 											break;
 									}
 								}
@@ -660,12 +670,12 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 										case TAG_SELF_CLOSE:
 											if (offset <= lastLexeme.getStartingOffset())
 											{
-												result = Location.IN_CLOSE_TAG;
+												result = LocationType.IN_CLOSE_TAG;
 											}
 											break;
 
 										default:
-											result = Location.IN_CLOSE_TAG;
+											result = LocationType.IN_CLOSE_TAG;
 											break;
 									}
 								}
@@ -678,7 +688,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				}
 				else
 				{
-					result = Location.IN_TEXT;
+					result = LocationType.IN_TEXT;
 				}
 			}
 		}
@@ -698,9 +708,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	Location getOpenTagLocation(LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
+	LocationType getOpenTagLocationType(LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
 	{
-		Location result = Location.ERROR;
+		LocationType result = LocationType.ERROR;
 
 		int index = lexemeProvider.getLexemeIndex(offset);
 
@@ -715,7 +725,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			}
 			else
 			{
-				result = Location.IN_ATTRIBUTE_NAME;
+				result = LocationType.IN_ATTRIBUTE_NAME;
 			}
 		}
 
@@ -728,15 +738,15 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				case ATTRIBUTE:
 				case CLASS:
 				case ID:
-					result = Location.IN_ATTRIBUTE_NAME;
+					result = LocationType.IN_ATTRIBUTE_NAME;
 					break;
 
 				case EQUAL:
-					result = (offset <= lexeme.getStartingOffset()) ? Location.IN_ATTRIBUTE_NAME : Location.IN_ATTRIBUTE_VALUE;
+					result = (offset <= lexeme.getStartingOffset()) ? LocationType.IN_ATTRIBUTE_NAME : LocationType.IN_ATTRIBUTE_VALUE;
 					break;
 
 				case TAG_START:
-					result = Location.IN_ELEMENT_NAME;
+					result = LocationType.IN_ELEMENT_NAME;
 					break;
 					
 				case TAG_END:
@@ -746,7 +756,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						
 						if (previous.getEndingOffset() < offset - 1)
 						{
-							result = Location.IN_ATTRIBUTE_NAME;
+							result = LocationType.IN_ATTRIBUTE_NAME;
 						}
 					}
 					break;
@@ -768,12 +778,12 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 							case SINGLE_QUOTED_STRING:
 							case DOUBLE_QUOTED_STRING:
 								this._replaceRange = this._currentLexeme = lexeme;
-								result = Location.IN_ATTRIBUTE_NAME;
+								result = LocationType.IN_ATTRIBUTE_NAME;
 								break;
 
 							case TAG_START:
 								this._replaceRange = this._currentLexeme = lexeme;
-								result = Location.IN_ELEMENT_NAME;
+								result = LocationType.IN_ELEMENT_NAME;
 								break;
 
 							default:
@@ -782,7 +792,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					}
 					else
 					{
-						result = Location.IN_ELEMENT_NAME;
+						result = LocationType.IN_ELEMENT_NAME;
 					}
 					break;
 
@@ -790,12 +800,12 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				case DOUBLE_QUOTED_STRING:
 					if (lexeme.getEndingOffset() < offset)
 					{
-						result = Location.IN_ATTRIBUTE_NAME;
+						result = LocationType.IN_ATTRIBUTE_NAME;
 						this._replaceRange = null;
 					}
 					else
 					{
-						result = Location.IN_ATTRIBUTE_VALUE;
+						result = LocationType.IN_ATTRIBUTE_VALUE;
 					}
 					break;
 
@@ -803,7 +813,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					break;
 			}
 
-			if (result != Location.ERROR)
+			if (result != LocationType.ERROR)
 			{
 				break;
 			}
