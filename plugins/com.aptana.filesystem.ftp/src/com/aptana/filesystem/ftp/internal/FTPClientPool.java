@@ -2,6 +2,7 @@ package com.aptana.filesystem.ftp.internal;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 
+import com.aptana.core.util.ObjectPool;
 import com.enterprisedt.net.ftp.FTPClient;
 import com.enterprisedt.net.ftp.FTPClientInterface;
 

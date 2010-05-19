@@ -1,4 +1,4 @@
-package com.aptana.filesystem.ftp.internal;
+package com.aptana.core.util;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
