@@ -93,7 +93,7 @@ import com.enterprisedt.net.ftp.pro.ProFTPClient;
  * @author Max Stepanov
  *
  */
-public class FTPConnectionFileManager extends BaseFTPConnectionFileManager implements IFTPConnectionFileManager {
+public class FTPConnectionFileManager extends BaseFTPConnectionFileManager implements IFTPConnectionFileManager, IPoolConnectionManager {
 	
 	private static final String TMP_TIMEZONE_CHECK = "_tmp_tz_check"; //$NON-NLS-1$
 
