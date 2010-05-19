@@ -15,10 +15,10 @@ package  com.aptana.editor.common.contentassist;
  * available at http://www.eclipse.org/legal/epl-v10.html Contributors: IBM Corporation - initial API and implementation
  **********************************************************************************************************************/
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.contentassist.IContentAssistSubjectControl;
 import org.eclipse.jface.contentassist.ISubjectControlContextInformationPresenter;
 import org.eclipse.jface.contentassist.ISubjectControlContextInformationValidator;
-import org.eclipse.jface.text.Assert;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IEventConsumer;
 import org.eclipse.jface.text.ITextViewer;
