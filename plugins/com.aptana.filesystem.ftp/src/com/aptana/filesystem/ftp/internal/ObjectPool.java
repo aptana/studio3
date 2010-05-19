@@ -5,8 +5,9 @@ import java.util.Hashtable;
 
 public abstract class ObjectPool<T>
 {
-	private long expirationTime;
+	private static final int DEFAULT_EXPIRATION = 30000; // 30 seconds
 
+	private long expirationTime;
 	private Hashtable<T, Long> locked, unlocked;
 
 	public ObjectPool(int expirationTime)
@@ -19,7 +20,7 @@ public abstract class ObjectPool<T>
 	
 	public ObjectPool()
 	{
-		this(30000); // 30 seconds
+		this(DEFAULT_EXPIRATION);
 	}
 
 	protected abstract T create();
@@ -38,8 +39,8 @@ public abstract class ObjectPool<T>
 			while (e.hasMoreElements())
 			{
 				t = e.nextElement();
-				// TODO Allow for expiration time of -1, which means never expire!
-				if ((now - unlocked.get(t)) > expirationTime)
+				// Allow for expiration time of -1, which means never expire!
+				if (expirationTime != -1 && (now - unlocked.get(t)) > expirationTime)
 				{
 					// object has expired
 					unlocked.remove(t);
@@ -52,7 +53,6 @@ public abstract class ObjectPool<T>
 					{
 						unlocked.remove(t);
 						locked.put(t, now);
-						System.out.println("Returned existing " + t.getClass().getName());
 						return t;
 					}
 					// object failed validation
@@ -64,7 +64,6 @@ public abstract class ObjectPool<T>
 		}
 		// no objects available, create a new one
 		t = create();
-		System.out.println("Created new " + t.getClass().getName());
 		locked.put(t, now);
 		return t;
 	}
