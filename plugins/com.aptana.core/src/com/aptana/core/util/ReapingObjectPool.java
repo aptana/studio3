@@ -38,7 +38,7 @@ class ConnectionReaper extends Thread
  * @author cwilliams
  * @param <T>
  */
-public abstract class ReapingObjectPool<T>
+public abstract class ReapingObjectPool<T> implements IObjectPool<T>
 {
 
 	private long expirationTime;
@@ -99,7 +99,7 @@ public abstract class ReapingObjectPool<T>
 
 	public abstract void expire(T o);
 
-	protected abstract T create();
+	public abstract T create();
 
 	public abstract boolean validate(T o);
 

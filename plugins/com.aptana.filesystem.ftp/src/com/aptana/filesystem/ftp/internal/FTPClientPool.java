@@ -16,7 +16,7 @@ public class FTPClientPool extends ReapingObjectPool<FTPClientInterface>
 	}
 
 	@Override
-	protected FTPClientInterface create()
+	public FTPClientInterface create()
 	{
 		return manager.newClient();
 	}

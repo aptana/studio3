@@ -11,7 +11,7 @@ import java.util.Hashtable;
  * @author cwilliams
  * @param <T>
  */
-public abstract class ObjectPool<T>
+public abstract class ObjectPool<T> implements IObjectPool<T>
 {
 	private static final int DEFAULT_EXPIRATION = 30000; // 30 seconds
 
@@ -31,12 +31,24 @@ public abstract class ObjectPool<T>
 		this(DEFAULT_EXPIRATION);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.aptana.core.util.IObjectPool#create()
+	 */
 	public abstract T create();
 
+	/* (non-Javadoc)
+	 * @see com.aptana.core.util.IObjectPool#validate(T)
+	 */
 	public abstract boolean validate(T o);
 
+	/* (non-Javadoc)
+	 * @see com.aptana.core.util.IObjectPool#expire(T)
+	 */
 	public abstract void expire(T o);
 
+	/* (non-Javadoc)
+	 * @see com.aptana.core.util.IObjectPool#checkOut()
+	 */
 	public synchronized T checkOut()
 	{
 		long now = System.currentTimeMillis();
@@ -76,12 +88,18 @@ public abstract class ObjectPool<T>
 		return t;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.aptana.core.util.IObjectPool#checkIn(T)
+	 */
 	public synchronized void checkIn(T t)
 	{
 		locked.remove(t);
 		unlocked.put(t, System.currentTimeMillis());
 	}
 
+	/* (non-Javadoc)
+	 * @see com.aptana.core.util.IObjectPool#cleanup()
+	 */
 	public synchronized void cleanup()
 	{
 		for (T t : unlocked.keySet())
