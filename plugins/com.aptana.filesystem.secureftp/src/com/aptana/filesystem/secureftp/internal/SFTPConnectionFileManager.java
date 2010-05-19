@@ -62,6 +62,7 @@ import org.eclipse.core.runtime.Status;
 
 import com.aptana.filesystem.ftp.internal.BaseFTPConnectionFileManager;
 import com.aptana.filesystem.ftp.internal.ExpiringMap;
+import com.aptana.filesystem.ftp.internal.FTPClientPool;
 import com.aptana.filesystem.ftp.internal.FTPFileDownloadInputStream;
 import com.aptana.filesystem.ftp.internal.FTPFileUploadOutputStream;
 import com.aptana.ide.core.io.ConnectionContext;
@@ -107,6 +108,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	public void init(String host, int port, IPath basePath, IPath keyFilePath, String login, char[] password, String transferType, String encoding, String compression) {
 		Assert.isTrue(ftpClient == null, Messages.SFTPConnectionFileManager_ConnectionHasBeenInitialized);
 		try {
+			this.pool = new SFTPClientPool(this);
 			ftpClient = new SSHFTPClient();
 			this.host = host;
 			this.port = port;

@@ -56,19 +56,22 @@ public class FTPFileUploadOutputStream extends OutputStream {
 	private String filename;
 	private Date modificationTime;
 	private long permissions;
+	private FTPClientPool pool;
 	
 	/**
+	 * @param pool 
 	 * 
 	 */
-	public FTPFileUploadOutputStream(FTPClientInterface ftpClient, FileTransferOutputStream ftpOutputStream, String filename, Date modificationTime, long permissions) {
+	public FTPFileUploadOutputStream(FTPClientPool pool, FTPClientInterface ftpClient, FileTransferOutputStream ftpOutputStream, String filename, Date modificationTime, long permissions) {
 		this.ftpClient = ftpClient;
 		this.ftpOutputStream = ftpOutputStream;
 		this.filename = filename;
 		this.modificationTime = modificationTime;
 		this.permissions = permissions;
+		this.pool = pool;
 	}
 
-	private void safeQuit(boolean failed) {
+	private void safeQuit(boolean failed) {		
 		if (ftpClient instanceof FTPClient) {
 			((FTPClient) ftpClient).setMessageListener(null);
 		}
@@ -77,14 +80,18 @@ public class FTPFileUploadOutputStream extends OutputStream {
 				if (failed) {
 					ftpClient.delete(ftpOutputStream.getRemoteFile());
 				}
-				ftpClient.quit();
 			}
-		} catch (Exception e) {
-			try {
-				ftpClient.quitImmediately();
-			} catch (Exception ignore) {
+		}
+		catch (Exception e)
+		{
+			// ignore
+		}
+		finally 
+		{
+			if (ftpClient instanceof FTPClient) {
+				pool.checkIn((FTPClient) ftpClient);
 			}
-		}		
+		}
 	}
 
 	/* (non-Javadoc)

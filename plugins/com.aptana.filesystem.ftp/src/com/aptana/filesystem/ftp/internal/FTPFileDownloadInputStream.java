@@ -50,29 +50,23 @@ public class FTPFileDownloadInputStream extends InputStream {
 
 	private FTPClientInterface ftpClient;
 	private FileTransferInputStream ftpInputStream;
+	private FTPClientPool pool;
 	
 	/**
+	 * @param pool 
 	 * 
 	 */
-	public FTPFileDownloadInputStream(FTPClientInterface ftpClient, FileTransferInputStream ftpInputStream) {
+	public FTPFileDownloadInputStream(FTPClientPool pool, FTPClientInterface ftpClient, FileTransferInputStream ftpInputStream) {
 		this.ftpClient = ftpClient;
+		this.pool = pool;
 		this.ftpInputStream = ftpInputStream;
 	}
 	
 	private void safeQuit() {
 		if (ftpClient instanceof FTPClient) {
 			((FTPClient) ftpClient).setMessageListener(null);
+			pool.checkIn((FTPClient) ftpClient);
 		}
-		try {
-			if (ftpClient.connected()) {
-				ftpClient.quit();
-			}
-		} catch (Exception e) {
-			try {
-				ftpClient.quitImmediately();
-			} catch (Exception ignore) {
-			}
-		}		
 	}
 
 	/* (non-Javadoc)
