@@ -162,7 +162,11 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 		}
 	}
 
-	public void initAndAuthFTPClient(FTPClientInterface clientInterface, IProgressMonitor monitor) throws IOException, FTPException {
+	protected void initAndAuthFTPClient(FTPClientInterface clientInterface, IProgressMonitor monitor) throws IOException, FTPException {
+		if (clientInterface.connected())
+		{
+			return;
+		}
 		FTPClient newFtpClient = (FTPClient) clientInterface;
 		initFTPClient(newFtpClient, ftpClient.getConnectMode() == FTPConnectMode.PASV, ftpClient.getControlEncoding());
 		newFtpClient.setRemoteHost(host);
@@ -735,6 +739,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 		monitor.beginTask(Messages.FTPConnectionFileManager_initiating_download, 4);
 		FTPClient downloadFtpClient = (FTPClient) pool.checkOut();
 		try {
+			initAndAuthFTPClient(downloadFtpClient, monitor);
 			Policy.checkCanceled(monitor);
 			setMessageLogger(downloadFtpClient, messageLogWriter);
 			downloadFtpClient.setType(IFTPConstants.TRANSFER_TYPE_ASCII.equals(transferType)
@@ -775,6 +780,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 		monitor.beginTask(Messages.FTPConnectionFileManager_initiating_file_upload, 4);
 		FTPClient uploadFtpClient = (FTPClient) pool.checkOut();
 		try {
+			initAndAuthFTPClient(uploadFtpClient, monitor);
 			Policy.checkCanceled(monitor);
 			setMessageLogger(uploadFtpClient, messageLogWriter);
 			uploadFtpClient.setType(IFTPConstants.TRANSFER_TYPE_ASCII.equals(transferType)

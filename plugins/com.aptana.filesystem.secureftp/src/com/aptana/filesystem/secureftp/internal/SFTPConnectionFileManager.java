@@ -60,18 +60,18 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 
+import com.aptana.filesystem.ftp.Policy;
 import com.aptana.filesystem.ftp.internal.BaseFTPConnectionFileManager;
 import com.aptana.filesystem.ftp.internal.ExpiringMap;
 import com.aptana.filesystem.ftp.internal.FTPClientPool;
 import com.aptana.filesystem.ftp.internal.FTPFileDownloadInputStream;
 import com.aptana.filesystem.ftp.internal.FTPFileUploadOutputStream;
+import com.aptana.filesystem.secureftp.ISFTPConnectionFileManager;
+import com.aptana.filesystem.secureftp.ISFTPConstants;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.preferences.PreferenceUtils;
 import com.aptana.ide.core.io.vfs.ExtendedFileInfo;
-import com.aptana.filesystem.ftp.Policy;
-import com.aptana.filesystem.secureftp.ISFTPConnectionFileManager;
-import com.aptana.filesystem.secureftp.ISFTPConstants;
 import com.enterprisedt.net.ftp.FTPClientInterface;
 import com.enterprisedt.net.ftp.FTPException;
 import com.enterprisedt.net.ftp.FTPFile;
@@ -635,6 +635,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 		monitor.beginTask(Messages.SFTPConnectionFileManager_InitiatingFileDownload, 4);
 		SSHFTPClient downloadFtpClient = (SSHFTPClient) pool.checkOut();
 		try {
+			initAndAuthFTPClient(downloadFtpClient, monitor);
 			Policy.checkCanceled(monitor);
 			downloadFtpClient.setType(ISFTPConstants.TRANSFER_TYPE_ASCII.equals(transferType)
 					? FTPTransferType.ASCII : FTPTransferType.BINARY);
@@ -673,6 +674,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 		monitor.beginTask(Messages.SFTPConnectionFileManager_FailedInitiatingFile, 4);
 		SSHFTPClient uploadFtpClient = (SSHFTPClient) pool.checkOut();
 		try {
+			initAndAuthFTPClient(uploadFtpClient, monitor);
 			Policy.checkCanceled(monitor);
 			uploadFtpClient.setType(ISFTPConstants.TRANSFER_TYPE_ASCII.equals(transferType)
 					? FTPTransferType.ASCII : FTPTransferType.BINARY);
@@ -828,10 +830,13 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 		return new SSHFTPClient();
 	}
 
-	@Override
-	public void initAndAuthFTPClient(FTPClientInterface client, IProgressMonitor monitor) throws IOException,
+	protected void initAndAuthFTPClient(FTPClientInterface client, IProgressMonitor monitor) throws IOException,
 			FTPException
 	{
+		if (client.connected())
+		{
+			return;
+		}
 		SSHFTPClient sshFTPClient = (SSHFTPClient) client;
 		initFTPClient(sshFTPClient, controlEncoding, compression);
 		sshFTPClient.setValidator(ftpClient.getValidator());

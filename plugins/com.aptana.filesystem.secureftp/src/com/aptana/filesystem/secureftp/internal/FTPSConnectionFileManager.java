@@ -279,6 +279,10 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 	 */
 	@Override
 	public void initAndAuthFTPClient(FTPClientInterface newFtpClient, IProgressMonitor monitor) throws IOException, FTPException {
+		if (newFtpClient.connected())
+		{
+			return;
+		}
 		SSLFTPClient newFtpsClient = (SSLFTPClient) newFtpClient;
 		initFTPSClient(newFtpsClient, !((SSLFTPClient) ftpClient).isImplicitFTPS(), ftpClient.getConnectMode() == FTPConnectMode.PASV, ftpClient.getControlEncoding(), validateCertificate);
 		newFtpClient.setRemoteHost(host);

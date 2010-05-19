@@ -1,12 +1,10 @@
 package com.aptana.filesystem.ftp.internal;
 
-import org.eclipse.core.runtime.NullProgressMonitor;
-
-import com.aptana.core.util.ObjectPool;
+import com.aptana.core.util.ReapingObjectPool;
 import com.enterprisedt.net.ftp.FTPClient;
 import com.enterprisedt.net.ftp.FTPClientInterface;
 
-public class FTPClientPool extends ObjectPool<FTPClientInterface>
+public class FTPClientPool extends ReapingObjectPool<FTPClientInterface>
 {
 
 	private BaseFTPConnectionFileManager manager;
@@ -20,21 +18,7 @@ public class FTPClientPool extends ObjectPool<FTPClientInterface>
 	@Override
 	protected FTPClientInterface create()
 	{
-		FTPClientInterface client = null;
-		try
-		{
-			client = manager.newClient();
-			manager.initAndAuthFTPClient(client, new NullProgressMonitor());
-			return client;
-		}
-		catch (Exception e)
-		{
-			// TODO retry? log?
-			e.printStackTrace();
-			expire(client);
-		}
-		// FIXME We can't ever return null here, it messes things up! Need to retry?
-		return null;
+		return manager.newClient();
 	}
 
 	@Override

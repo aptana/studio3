@@ -618,6 +618,4 @@ public abstract class BaseFTPConnectionFileManager implements IConnectionFileMan
 	}
 	
 	public abstract FTPClientInterface newClient();
-
-	public abstract void initAndAuthFTPClient(FTPClientInterface client, IProgressMonitor monitor) throws IOException, FTPException;
 }

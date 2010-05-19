@@ -3,6 +3,14 @@ package com.aptana.core.util;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+/**
+ * A basic object pool that checks expiration and validation on checkout of instances. Instances are not automatically
+ * expired and cleaned via a thread, but instead are only checked on checkout. If validation can be costly this may slow
+ * down checkout.
+ * 
+ * @author cwilliams
+ * @param <T>
+ */
 public abstract class ObjectPool<T>
 {
 	private static final int DEFAULT_EXPIRATION = 30000; // 30 seconds
@@ -17,13 +25,13 @@ public abstract class ObjectPool<T>
 		locked = new Hashtable<T, Long>();
 		unlocked = new Hashtable<T, Long>();
 	}
-	
+
 	public ObjectPool()
 	{
 		this(DEFAULT_EXPIRATION);
 	}
 
-	protected abstract T create();
+	public abstract T create();
 
 	public abstract boolean validate(T o);
 
@@ -73,7 +81,7 @@ public abstract class ObjectPool<T>
 		locked.remove(t);
 		unlocked.put(t, System.currentTimeMillis());
 	}
-	
+
 	public synchronized void cleanup()
 	{
 		for (T t : unlocked.keySet())
@@ -81,6 +89,6 @@ public abstract class ObjectPool<T>
 			expire(t);
 		}
 		unlocked.clear();
-		// TODO Also expire all the locked ones?		
+		// TODO Also expire all the locked ones?
 	}
 }
