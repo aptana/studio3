@@ -409,6 +409,52 @@ public abstract class CommonConnectionTest extends TestCase
 		assertTrue(Arrays.equals(TEXT.toCharArray(), sw.toString().toCharArray()));
 	}
 
+	public final void testWriteReadTextFileSimultanesously() throws CoreException, IOException
+	{
+		IFileStore[] fslist = new IFileStore[4];
+		for (int i = 0; i < fslist.length; ++i) {
+			IFileStore fs = fslist[i] = cp.getRoot().getFileStore(testPath.append("/rwfile"+i+".txt")); //$NON-NLS-1$
+			assertNotNull(fs);
+			IFileInfo fi = fs.fetchInfo();
+			assertNotNull(fi);
+			assertFalse(fi.exists());
+		}
+		Writer[] writers = new Writer[fslist.length];
+		for (int i = 0; i < fslist.length; ++i) {
+			writers[i] = new OutputStreamWriter(fslist[i].openOutputStream(EFS.NONE, null));
+		}
+		for (int i = 0; i < writers.length; ++i) {
+			writers[i].write(TEXT);
+		}
+		for (int i = 0; i < writers.length; ++i) {
+			writers[i].close();
+		}
+		for (int i = 0; i < fslist.length; ++i) {
+			IFileInfo fi = fslist[i].fetchInfo();
+			assertNotNull(fi);
+			assertTrue(fi.exists());
+			assertEquals(TEXT.length(), fi.getLength());
+		}
+		Reader[] readers = new Reader[fslist.length];
+		for (int i = 0; i < fslist.length; ++i) {
+			readers[i] = new InputStreamReader(fslist[i].openInputStream(EFS.NONE, null));
+		}
+		for (int i = 0; i < readers.length; ++i) {
+			StringWriter sw = new StringWriter(TEXT.length());
+			char[] buffer = new char[256];
+			int count;
+			while ((count = readers[i].read(buffer)) > 0)
+			{
+				sw.write(buffer, 0, count);
+			}
+			sw.close();
+			assertTrue(Arrays.equals(TEXT.toCharArray(), sw.toString().toCharArray()));
+		}
+		for (int i = 0; i < readers.length; ++i) {
+			readers[i].close();
+		}
+	}
+
 	public final void testDeleteFile() throws CoreException, IOException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/deleteme.ext")); //$NON-NLS-1$
