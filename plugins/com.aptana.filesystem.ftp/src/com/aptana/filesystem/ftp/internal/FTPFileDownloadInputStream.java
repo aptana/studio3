@@ -66,6 +66,14 @@ public class FTPFileDownloadInputStream extends InputStream {
 		if (ftpClient instanceof FTPClient) {
 			((FTPClient) ftpClient).setMessageListener(null);
 		}
+		try
+		{
+			ftpInputStream.close();
+		}
+		catch (IOException e)
+		{
+			// ignore
+		}
 		pool.checkIn(ftpClient);
 	}
 

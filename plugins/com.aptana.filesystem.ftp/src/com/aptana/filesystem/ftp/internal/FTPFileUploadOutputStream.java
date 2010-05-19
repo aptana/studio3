@@ -88,6 +88,14 @@ public class FTPFileUploadOutputStream extends OutputStream {
 		}
 		finally 
 		{
+			try
+			{
+				ftpOutputStream.close();
+			}
+			catch (IOException e)
+			{
+				// ignore
+			}
 			pool.checkIn(ftpClient);
 		}
 	}
