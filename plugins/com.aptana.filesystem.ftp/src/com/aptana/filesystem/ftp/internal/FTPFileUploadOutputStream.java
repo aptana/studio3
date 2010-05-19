@@ -88,9 +88,7 @@ public class FTPFileUploadOutputStream extends OutputStream {
 		}
 		finally 
 		{
-			if (ftpClient instanceof FTPClient) {
-				pool.checkIn((FTPClient) ftpClient);
-			}
+			pool.checkIn(ftpClient);
 		}
 	}
 

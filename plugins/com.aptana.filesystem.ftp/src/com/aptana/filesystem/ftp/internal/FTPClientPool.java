@@ -3,39 +3,44 @@ package com.aptana.filesystem.ftp.internal;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
 import com.enterprisedt.net.ftp.FTPClient;
-import com.enterprisedt.net.ftp.pro.ProFTPClient;
+import com.enterprisedt.net.ftp.FTPClientInterface;
 
-public class FTPClientPool extends ObjectPool<FTPClient>
+public class FTPClientPool extends ObjectPool<FTPClientInterface>
 {
 
-	private FTPConnectionFileManager manager;
+	private BaseFTPConnectionFileManager manager;
 
-	public FTPClientPool(FTPConnectionFileManager manager)
+	public FTPClientPool(BaseFTPConnectionFileManager manager)
 	{
 		super();
 		this.manager = manager;
 	}
 
 	@Override
-	protected FTPClient create()
+	protected FTPClientInterface create()
 	{
+		FTPClientInterface client = null;
 		try
 		{
-			FTPClient client = new ProFTPClient();
+			client = manager.newClient();
 			manager.initAndAuthFTPClient(client, new NullProgressMonitor());
 			return client;
 		}
 		catch (Exception e)
 		{
-			// TODO Auto-generated catch block
+			// TODO retry? log?
 			e.printStackTrace();
+			expire(client);
 		}
+		// FIXME We can't ever return null here, it messes things up! Need to retry?
 		return null;
 	}
 
 	@Override
-	public void expire(FTPClient ftpClient)
+	public void expire(FTPClientInterface ftpClient)
 	{
+		if (ftpClient == null)
+			return;
 		try
 		{
 			ftpClient.quit();
@@ -55,18 +60,21 @@ public class FTPClientPool extends ObjectPool<FTPClient>
 	}
 
 	@Override
-	public boolean validate(FTPClient o)
+	public boolean validate(FTPClientInterface o)
 	{
 		if (!o.connected())
 			return false;
-		try
+		if (o instanceof FTPClient)
 		{
-			o.noOperation();
-		}
-		catch (Exception e)
-		{
-			// ignore
-			return false;
+			try
+			{
+				((FTPClient) o).noOperation();
+			}
+			catch (Exception e)
+			{
+				// ignore
+				return false;
+			}
 		}
 		return true;
 	}

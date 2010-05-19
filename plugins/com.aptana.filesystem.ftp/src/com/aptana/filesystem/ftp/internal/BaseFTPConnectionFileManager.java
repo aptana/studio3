@@ -37,6 +37,7 @@ package com.aptana.filesystem.ftp.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
@@ -54,6 +55,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
@@ -68,6 +70,8 @@ import com.aptana.ide.core.io.vfs.ExtendedFileInfo;
 import com.aptana.ide.core.io.vfs.IConnectionFileManager;
 import com.aptana.ide.core.io.vfs.IExtendedFileInfo;
 import com.aptana.ide.core.io.vfs.IExtendedFileStore;
+import com.enterprisedt.net.ftp.FTPClientInterface;
+import com.enterprisedt.net.ftp.FTPException;
 
 /**
  * @author Max Stepanov
@@ -612,4 +616,8 @@ public abstract class BaseFTPConnectionFileManager implements IConnectionFileMan
 	private void setLastOperationTime() {
 		lastOperationTime = System.currentTimeMillis();		
 	}
+	
+	public abstract FTPClientInterface newClient();
+
+	public abstract void initAndAuthFTPClient(FTPClientInterface client, IProgressMonitor monitor) throws IOException, FTPException;
 }

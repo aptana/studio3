@@ -76,6 +76,7 @@ import com.aptana.ide.core.io.preferences.PreferenceUtils;
 import com.aptana.ide.core.io.vfs.ExtendedFileInfo;
 import com.aptana.ide.core.io.vfs.IExtendedFileStore;
 import com.enterprisedt.net.ftp.FTPClient;
+import com.enterprisedt.net.ftp.FTPClientInterface;
 import com.enterprisedt.net.ftp.FTPConnectMode;
 import com.enterprisedt.net.ftp.FTPConnectionClosedException;
 import com.enterprisedt.net.ftp.FTPException;
@@ -114,7 +115,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 
 	private int connectionRetryCount;
 
-	private FTPClientPool pool;
+	protected FTPClientPool pool;
 
 	/* (non-Javadoc)
 	 * @see com.aptana.ide.core.ftp.IFTPConnectionFileManager#init(java.lang.String, int, org.eclipse.core.runtime.IPath, java.lang.String, char[], boolean, java.lang.String, java.lang.String, java.lang.String)
@@ -161,7 +162,8 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 		}
 	}
 
-	protected void initAndAuthFTPClient(FTPClient newFtpClient, IProgressMonitor monitor) throws IOException, FTPException {
+	public void initAndAuthFTPClient(FTPClientInterface clientInterface, IProgressMonitor monitor) throws IOException, FTPException {
+		FTPClient newFtpClient = (FTPClient) clientInterface;
 		initFTPClient(newFtpClient, ftpClient.getConnectMode() == FTPConnectMode.PASV, ftpClient.getControlEncoding());
 		newFtpClient.setRemoteHost(host);
 		newFtpClient.setRemotePort(port);
@@ -730,7 +732,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	@Override
 	protected InputStream readFile(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
 		monitor.beginTask(Messages.FTPConnectionFileManager_initiating_download, 4);
-		FTPClient downloadFtpClient = pool.checkOut();
+		FTPClient downloadFtpClient = (FTPClient) pool.checkOut();
 		try {
 			Policy.checkCanceled(monitor);
 			setMessageLogger(downloadFtpClient, messageLogWriter);
@@ -770,7 +772,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	@Override
 	protected OutputStream writeFile(IPath path, long permissions, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
 		monitor.beginTask(Messages.FTPConnectionFileManager_initiating_file_upload, 4);
-		FTPClient uploadFtpClient = pool.checkOut();
+		FTPClient uploadFtpClient = (FTPClient) pool.checkOut();
 		try {
 			Policy.checkCanceled(monitor);
 			setMessageLogger(uploadFtpClient, messageLogWriter);
@@ -1084,5 +1086,10 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 		StringBuffer sb = new StringBuffer();
 		sb.append(TMP_UPLOAD_PREFIX).append(base);
 		return sb.toString();
+	}
+
+	public FTPClient newClient()
+	{
+		return new ProFTPClient();
 	}
 }
