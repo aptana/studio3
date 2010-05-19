@@ -396,7 +396,7 @@ public abstract class Parser
 	private short[] states;
 
 	/** Index of the stack's top element, i.e. it's = -1 when the stack is empty; */
-	private int top;
+	protected int top;
 
 	/** The stack of shifted symbols. */
 	protected Symbol[] _symbols;
