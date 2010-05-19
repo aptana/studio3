@@ -75,7 +75,7 @@ public abstract class ReapingObjectPool<T> implements IObjectPool<T>
 		while ((e != null) && (e.hasMoreElements()))
 		{
 			T t = e.nextElement();
-			if ((expirationTime != -1 && (now - unlocked.get(t)) > expirationTime) && (!validate(t)))
+			if ((expirationTime != -1 && (now - unlocked.get(t)) > expirationTime) && !validate(t))
 			{
 				unlocked.remove(t);
 				expire(t);
@@ -89,10 +89,11 @@ public abstract class ReapingObjectPool<T> implements IObjectPool<T>
 	 */
 	public synchronized void cleanup()
 	{
-		Enumeration<T> connlist = unlocked.keys();
-		while ((connlist != null) && (connlist.hasMoreElements()))
+		Enumeration<T> e = unlocked.keys();
+		while ((e != null) && (e.hasMoreElements()))
 		{
-			T t = connlist.nextElement();
+			T t = e.nextElement();
+			unlocked.remove(t);
 			expire(t);
 		}
 	}
@@ -114,6 +115,7 @@ public abstract class ReapingObjectPool<T> implements IObjectPool<T>
 		long now = System.currentTimeMillis();
 		for (T c : unlocked.keySet())
 		{
+			unlocked.remove(c);
 			locked.put(c, now);
 			return c;
 		}
