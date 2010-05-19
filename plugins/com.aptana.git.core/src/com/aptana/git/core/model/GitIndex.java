@@ -59,7 +59,6 @@ public class GitIndex
 
 	private int refreshStatus = 0;
 	private boolean notify;
-	private Map<String, String> amendEnvironment;
 
 	private Job indexRefreshJob;
 
@@ -580,7 +579,6 @@ public class GitIndex
 
 		repository.hasChanged();
 
-		amendEnvironment = null;
 		if (amend)
 			this.amend = false;
 		else
@@ -683,7 +681,7 @@ public class GitIndex
 		int ret = 1;
 		String commit = ""; //$NON-NLS-1$
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, commitMessage,
-				amendEnvironment, arguments.toArray(new String[arguments.size()]));
+				null, arguments.toArray(new String[arguments.size()]));
 		if (result != null && !result.isEmpty())
 		{
 			commit = result.values().iterator().next();

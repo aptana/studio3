@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 
+import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.git.core.GitPlugin;
@@ -196,10 +197,10 @@ public class GitExecutable
 	 */
 	public String outputForCommand(IPath workingDir, String... args)
 	{
-		Map<String, String> env = null;
+		Map<String, String> env = new HashMap<String, String>();
+		env.putAll(ShellExecutable.getEnvironment());
 		IPath git_ssh = GitPlugin.getDefault().getGIT_SSH();
 		if (git_ssh != null) {
-			env = new HashMap<String, String>();
 			env.put("GIT_SSH", git_ssh.toOSString()); //$NON-NLS-1$
 		}
 		return ProcessUtil.outputForCommand(gitPath.toOSString(), workingDir, env, args);
@@ -229,14 +230,17 @@ public class GitExecutable
 	public Map<Integer, String> runInBackground(IPath workingDirectory, String input,
 			Map<String, String> amendEnvironment, String... args)
 	{
+		Map<String, String> env = new HashMap<String, String>();
+		env.putAll(ShellExecutable.getEnvironment());
+		if (amendEnvironment != null) {
+			env.putAll(amendEnvironment);
+		}
+
 		IPath git_ssh = GitPlugin.getDefault().getGIT_SSH();
 		if (git_ssh != null) {
-			if (amendEnvironment == null) {
-				amendEnvironment = new HashMap<String, String>();
-			}
-			amendEnvironment.put("GIT_SSH", git_ssh.toOSString()); //$NON-NLS-1$
+			env.put("GIT_SSH", git_ssh.toOSString()); //$NON-NLS-1$
 		}
-		return ProcessUtil.runInBackground(gitPath.toOSString(), workingDirectory, input, amendEnvironment, args);
+		return ProcessUtil.runInBackground(gitPath.toOSString(), workingDirectory, input, env, args);
 	}
 
 	/**
