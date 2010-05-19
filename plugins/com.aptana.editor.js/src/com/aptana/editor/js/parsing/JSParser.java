@@ -2046,28 +2046,19 @@ public class JSParser extends Parser implements IParser {
 				{
 					boolean result = false;
 	
-					Symbol term = new Symbol(JSTokens.SEMICOLON, lastSymbol.getEnd(), token.getStart(), ";");
+					Symbol term = new Symbol(JSTokens.SEMICOLON, token.getStart(), token.getStart() - 1, ";");
 					Simulator sim = new Simulator();
 	
-					// make room for the semicolon and the last term
 					in.alloc(2);
-	
-					// insert expected terminal before unexpected one
 					in.insert(term, token);
-	
-					// back so we can try again
 					in.rewind();
 	
-					// run simulator
 					if (sim.parse(in))
 					{
-						// success!
 						result = true;
 	
-						// back up so we can re-parse for real
 						in.rewind();
 	
-						// add report about what we did
 						report.missingTokenInserted(term);
 					}
 	
@@ -2081,37 +2072,61 @@ public class JSParser extends Parser implements IParser {
 	
 					if (lastSymbol.getId() == JSTokens.DOT)
 					{
-						Symbol term1 = new Symbol(JSTokens.IDENTIFIER, lastSymbol.getEnd(), lastSymbol.getEnd(), "");
-						Symbol term2 = new Symbol(JSTokens.SEMICOLON, lastSymbol.getEnd(), token.getStart(), ";");
+						Symbol term1 = new Symbol(JSTokens.IDENTIFIER, token.getStart(), token.getStart() - 1, "");
+						Symbol term2 = new Symbol(JSTokens.SEMICOLON, token.getStart(), token.getStart() - 1, ";");
 	
 						Simulator sim = new Simulator();
 	
-						// make room for the semicolon and the last term
 						in.alloc(3);
-	
-						// insert expected terminal before unexpected one
 						in.insert(token);
 						in.insert(term2);
 						in.insert(term1);
-	
-						// back up so we can try again
 						in.rewind();
 	
-						// run simulator
 						if (sim.parse(in))
 						{
-							// success!
 							result = true;
-	
-							// back so we can re-parse for real
+							
 							in.rewind();
-	
-							// add report about what we did
+							
 							report.missingTokenInserted(term1);
 							report.missingTokenInserted(term2);
 						}
 					}
 	
+					return result;
+				}
+			},
+			new IRecoveryStrategy() {
+				public boolean recover(Symbol token, TokenStream in, Symbol lastSymbol, Events report) throws IOException
+				{
+					boolean result = false;
+					
+					if (top >= 2)
+					{
+						Symbol symbol1 = _symbols[top - 2];
+						Symbol symbol2 = _symbols[top - 1];
+						                          
+						if (lastSymbol.getId() == JSTokens.COMMA && symbol2.value instanceof List<?> && symbol1.getId() == JSTokens.LPAREN)
+						{
+							Symbol term = new Symbol(JSTokens.IDENTIFIER, token.getStart(), token.getStart() - 1, "");
+							Simulator sim = new Simulator();
+							
+							in.alloc(2);
+							in.insert(term, token);
+							in.rewind();
+			
+							if (sim.parse(in))
+							{
+								result = true;
+			
+								in.rewind();
+			
+								report.missingTokenInserted(term);
+							}
+						}
+					}
+					
 					return result;
 				}
 			}
@@ -2135,6 +2150,11 @@ public class JSParser extends Parser implements IParser {
 		{
 			Symbol lastSymbol = this.getLastSymbol();
 
+			// NOTE: Consider building a Map<Object,List<IRecoveryStrategy>> which
+			// would allow us to reduce the number of recovery strategies that will
+			// be attempted based on the last symbol on the stack. We may need
+			// catch-all cases: 1) try these before the mapped strategies, 2)
+			// try the strategies, 3) try these after the mapped strategies
 			for (IRecoveryStrategy strategy : this.recoveryStrategies)
 			{
 				if (strategy.recover(token, in, lastSymbol, report))
@@ -2160,13 +2180,9 @@ public class JSParser extends Parser implements IParser {
 	{
 		Symbol result = null;
 
-		for (int i = 0; i < this._symbols.length; ++i)
+		if (this.top != -1)
 		{
-			if (this._symbols[i] == null && i > 0)
-			{
-				result = this._symbols[i - 1];
-				break;
-			}
+			result = this._symbols[this.top];
 		}
 
 		return result;
