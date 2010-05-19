@@ -46,6 +46,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Random;
@@ -413,7 +414,7 @@ public abstract class CommonConnectionTest extends TestCase
 	{
 		IFileStore[] fslist = new IFileStore[4];
 		for (int i = 0; i < fslist.length; ++i) {
-			IFileStore fs = fslist[i] = cp.getRoot().getFileStore(testPath.append("/rwfile"+i+".txt")); //$NON-NLS-1$
+			IFileStore fs = fslist[i] = cp.getRoot().getFileStore(testPath.append(MessageFormat.format("/rwfile{0}.txt", i))); //$NON-NLS-1$
 			assertNotNull(fs);
 			IFileInfo fi = fs.fetchInfo();
 			assertNotNull(fi);
