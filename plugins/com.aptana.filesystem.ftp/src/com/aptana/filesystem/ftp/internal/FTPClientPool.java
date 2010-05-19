@@ -12,7 +12,7 @@ public class FTPClientPool extends ObjectPool<FTPClientInterface>
 
 	public FTPClientPool(BaseFTPConnectionFileManager manager)
 	{
-		super();
+		super(15 * 60 * 1000); // 15 minutes
 		this.manager = manager;
 	}
 
@@ -78,4 +78,5 @@ public class FTPClientPool extends ObjectPool<FTPClientInterface>
 		}
 		return true;
 	}
+
 }

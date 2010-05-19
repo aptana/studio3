@@ -292,6 +292,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			}
 			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedDisconnectConnection, e));
 		} finally {
+			pool.cleanup();
 			cwd = null;
 			cleanup();
 			monitor.done();
