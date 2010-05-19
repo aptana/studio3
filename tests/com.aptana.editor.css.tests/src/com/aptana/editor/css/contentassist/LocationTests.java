@@ -1,6 +1,8 @@
-package com.aptana.editor.html.contentassist;
+package com.aptana.editor.css.contentassist;
 
 import java.text.MessageFormat;
+
+import junit.framework.TestCase;
 
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
@@ -12,11 +14,9 @@ import com.aptana.editor.common.NullPartitionerSwitchStrategy;
 import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.common.text.rules.CompositePartitionScanner;
 import com.aptana.editor.common.text.rules.NullSubPartitionScanner;
-import com.aptana.editor.html.HTMLSourceConfiguration;
-import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.LocationType;
-import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
-
-import junit.framework.TestCase;
+import com.aptana.editor.css.CSSSourceConfiguration;
+import com.aptana.editor.css.contentassist.CSSContentAssistProcessor.LocationType;
+import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
 public class LocationTests extends TestCase
 {
@@ -30,13 +30,13 @@ public class LocationTests extends TestCase
 	protected IDocument createDocument(String source)
 	{
 		CompositePartitionScanner partitionScanner = new CompositePartitionScanner(
-			HTMLSourceConfiguration.getDefault().createSubPartitionScanner(),
+			CSSSourceConfiguration.getDefault().createSubPartitionScanner(),
 			new NullSubPartitionScanner(),
 			new NullPartitionerSwitchStrategy()
 		);
 		IDocumentPartitioner partitioner = new ExtendedFastPartitioner(
 			partitionScanner,
-			HTMLSourceConfiguration.getDefault().getContentTypes()
+			CSSSourceConfiguration.getDefault().getContentTypes()
 		);
 		partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
 		
@@ -58,21 +58,21 @@ public class LocationTests extends TestCase
 	protected void coarseLocationTests(String source, LocationTypeRange ... ranges)
 	{
 		IDocument document = this.createDocument(source);
-		HTMLContentAssistProcessor processor = new HTMLContentAssistProcessor(null);
+		CSSContentAssistProcessor processor = new CSSContentAssistProcessor(null);
 		
 		for (LocationTypeRange range : ranges)
 		{
 			for (int offset = range.startingOffset; offset <= range.endingOffset; offset++)
 			{
-				LexemeProvider<HTMLTokenType> lexemeProvider = processor.createLexemeProvider(document, offset); 
-				LocationType LocationType = processor.getCoarseLocationType(document, lexemeProvider, offset);
+				LexemeProvider<CSSTokenType> lexemeProvider = processor.createLexemeProvider(document, offset); 
+				LocationType location = processor.getCoarseLocationType(lexemeProvider, offset);
 				String message = MessageFormat.format(
-					"Expected {0} at LocationType {1} of ''{2}''",
-					range.LocationType.toString(),
+					"Expected {0} at location {1} of ''{2}''",
+					range.location.toString(),
 					Integer.toString(offset),
 					source
 				);
-				assertEquals(message, range.LocationType, LocationType);
+				assertEquals(message, range.location, location);
 			}
 		}
 	}
@@ -88,21 +88,21 @@ public class LocationTests extends TestCase
 	protected void fineLocationTests(String source, LocationTypeRange ... ranges)
 	{
 		IDocument document = this.createDocument(source);
-		HTMLContentAssistProcessor processor = new HTMLContentAssistProcessor(null);
+		CSSContentAssistProcessor processor = new CSSContentAssistProcessor(null);
 		
 		for (LocationTypeRange range : ranges)
 		{
 			for (int offset = range.startingOffset; offset <= range.endingOffset; offset++)
 			{
-				LexemeProvider<HTMLTokenType> lexemeProvider = processor.createLexemeProvider(document, offset); 
-				LocationType LocationType = processor.getOpenTagLocationType(lexemeProvider, offset);
+				LexemeProvider<CSSTokenType> lexemeProvider = processor.createLexemeProvider(document, offset); 
+				LocationType location = processor.getInsideLocationType(lexemeProvider, offset);
 				String message = MessageFormat.format(
-					"Expected {0} at LocationType {1} of ''{2}''",
-					range.LocationType.toString(),
+					"Expected {0} at location {1} of ''{2}''",
+					range.location.toString(),
 					Integer.toString(offset),
 					source
 				);
-				assertEquals(message, range.LocationType, LocationType);
+				assertEquals(message, range.location, location);
 			}
 		}
 	}

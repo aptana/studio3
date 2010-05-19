@@ -29,23 +29,23 @@
  * ***** END LICENSE BLOCK ***** */
 package com.aptana.editor.html.contentassist;
 
-import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.Location;
+import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.LocationType;
 
-class LocationRange
+class LocationTypeRange
 {
-	public final Location location;
+	public final LocationType LocationType;
 	public final int startingOffset;
 	public final int endingOffset;
 
-	public LocationRange(Location location, int offset)
+	public LocationTypeRange(LocationType LocationType, int offset)
 	{
-		this.location = location;
+		this.LocationType = LocationType;
 		this.startingOffset = this.endingOffset = offset;
 	}
 
-	public LocationRange(Location location, int startingOffset, int endingOffset)
+	public LocationTypeRange(LocationType LocationType, int startingOffset, int endingOffset)
 	{
-		this.location = location;
+		this.LocationType = LocationType;
 		this.startingOffset = startingOffset;
 		this.endingOffset = endingOffset;
 	}
