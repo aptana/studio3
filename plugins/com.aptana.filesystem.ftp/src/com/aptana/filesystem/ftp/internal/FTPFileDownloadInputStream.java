@@ -38,7 +38,6 @@ package com.aptana.filesystem.ftp.internal;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.enterprisedt.net.ftp.FTPClient;
 import com.enterprisedt.net.ftp.FTPClientInterface;
 import com.enterprisedt.net.ftp.FileTransferInputStream;
 
@@ -63,9 +62,6 @@ public class FTPFileDownloadInputStream extends InputStream {
 	}
 	
 	private void safeQuit() {
-		if (ftpClient instanceof FTPClient) {
-			((FTPClient) ftpClient).setMessageListener(null);
-		}
 		try
 		{
 			ftpInputStream.close();

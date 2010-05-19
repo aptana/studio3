@@ -72,9 +72,6 @@ public class FTPFileUploadOutputStream extends OutputStream {
 	}
 
 	private void safeQuit(boolean failed) {		
-		if (ftpClient instanceof FTPClient) {
-			((FTPClient) ftpClient).setMessageListener(null);
-		}
 		try {
 			if (ftpClient.connected()) {
 				if (failed) {
