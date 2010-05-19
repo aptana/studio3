@@ -34,7 +34,8 @@ module Ruble
           "/Applications/Firefox.app/Contents/MacOS/firefox-bin \"#{url.to_s}\" &"
         elsif Ruble.platforms.include? :windows
           path = path_that_exists(com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES%/Mozilla Firefox/firefox.exe"),
-            com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES(x86)%/Mozilla Firefox/firefox.exe"))
+            com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES(x86)%/Mozilla Firefox/firefox.exe"),
+            com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMW6432%/Mozilla Firefox/firefox.exe"))
           "ruby -e \"IO.popen('#{path} \"#{url.to_s}\"')\""
         else
           "/usr/bin/firefox \"#{url.to_s}\" &"
@@ -51,7 +52,8 @@ module Ruble
         end
       when :ie
         path = path_that_exists(com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES%/Internet Explorer/iexplore.exe"),
-          com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES(X86)%/Internet Explorer/iexplore.exe"))
+          com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES(X86)%/Internet Explorer/iexplore.exe"),
+            com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMW6432%/Internet Explorer/iexplore.exe")))
         "ruby -e \"IO.popen('#{path} \"#{url.to_s}\"')\""
       when :safari
         if Ruble.platforms.include? :mac
@@ -59,7 +61,8 @@ module Ruble
           "osascript -e \"tell application \\\"Safari\\\"\nopen location \\\"#{url.to_s}\\\"\nend tell\""          
         elsif Ruble.platforms.include? :windows
           path = path_that_exists(com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES%/Safari/Safari.exe"),
-            com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES(X86)%/Safari/Safari.exe"))
+            com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES(X86)%/Safari/Safari.exe"),
+            com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMW6432%/Safari/Safari.exe")))
           # FIXME Doesn't seem to take URL on Windows XP...
           "ruby -e \"IO.popen('#{path} \"#{url.to_s}\"')\""
         end
@@ -72,7 +75,8 @@ module Ruble
           "/Applications/Opera.app/Contents/MacOS/Opera \"#{url.to_s}\" &"
         elsif Ruble.platforms.include? :windows
           path = path_that_exists(com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES%/Opera/opera.exe"),
-            com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES(X86)%/Opera/opera.exe"))
+            com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES(X86)%/Opera/opera.exe"),
+            com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMW6432%/Opera/opera.exe")))
           "ruby -e \"IO.popen('#{path} \"#{url.to_s}\"')\""
         else
           "/usr/bin/opera \"#{url.to_s}\" &"
