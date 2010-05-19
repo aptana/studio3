@@ -11,7 +11,7 @@ public class FTPClientPool extends ReapingObjectPool<FTPClientInterface>
 
 	public FTPClientPool(BaseFTPConnectionFileManager manager)
 	{
-		super(15 * 60 * 1000); // 15 minutes
+		super(2 * 60 * 1000); // 2 minutes
 		this.manager = manager;
 	}
 
@@ -25,7 +25,9 @@ public class FTPClientPool extends ReapingObjectPool<FTPClientInterface>
 	public void expire(FTPClientInterface ftpClient)
 	{
 		if (ftpClient == null)
+		{
 			return;
+		}
 		try
 		{
 			ftpClient.quit();
@@ -46,7 +48,9 @@ public class FTPClientPool extends ReapingObjectPool<FTPClientInterface>
 	public boolean validate(FTPClientInterface o)
 	{
 		if (!o.connected())
+		{
 			return false;
+		}
 		if (o instanceof FTPClient)
 		{
 			try
