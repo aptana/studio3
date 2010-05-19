@@ -97,4 +97,96 @@ public class ContentAssistFineLocationTests extends LocationTests
 			new LocationTypeRange(LocationType.INSIDE_VALUE, 19)
 		);
 	}
+	
+	/**
+	 * testPropertyAndValueNoSemi
+	 */
+	public void testPropertyAndValueNoSemi()
+	{
+		String source = "body{background:red}";
+		
+		this.fineLocationTests(
+			source,
+			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 5, 15),
+			new LocationTypeRange(LocationType.INSIDE_VALUE, 16, 19)
+		);
+	}
+	
+	/**
+	 * testPropertyAndValueNoSemi2
+	 */
+	public void testPropertyAndValueNoSemi2()
+	{
+		String source = "body{\n  background:red\n}";
+		
+		this.fineLocationTests(
+			source,
+			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 5, 18),
+			new LocationTypeRange(LocationType.INSIDE_VALUE, 19, 22),
+			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 23)
+		);
+	}
+	
+	/**
+	 * testPropertyAndValue
+	 */
+	public void testPropertyAndValue()
+	{
+		String source = "body{background:red;}";
+		
+		this.fineLocationTests(
+			source,
+			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 5, 15),
+			new LocationTypeRange(LocationType.INSIDE_VALUE, 16, 19),
+			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 20)
+		);
+	}
+	
+	/**
+	 * testPropertyAndValue2
+	 */
+	public void testPropertyAndValue2()
+	{
+		String source = "body{\n  background:red;\n}";
+		
+		this.fineLocationTests(
+			source,
+			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 5, 18),
+			new LocationTypeRange(LocationType.INSIDE_VALUE, 19, 22),
+			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 23, 24)
+		);
+	}
+	
+	/**
+	 * testMultipleProperties
+	 */
+	public void testMultipleProperties()
+	{
+		String source = "body{background:red;border: 1 solid black}";
+		
+		this.fineLocationTests(
+			source,
+			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 5, 15),
+			new LocationTypeRange(LocationType.INSIDE_VALUE, 16, 19),
+			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 20, 26),
+			new LocationTypeRange(LocationType.INSIDE_VALUE, 27, 41)
+		);
+	}
+	
+	/**
+	 * testMultipleProperties2
+	 */
+	public void testMultipleProperties2()
+	{
+		String source = "body{\n  background: red;\n  border: 1 solid black\n}";
+		
+		this.fineLocationTests(
+			source,
+			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 5, 18),
+			new LocationTypeRange(LocationType.INSIDE_VALUE, 19, 23),
+			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 24, 33),
+			new LocationTypeRange(LocationType.INSIDE_VALUE, 34, 48),
+			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 49)
+		);
+	}
 }
