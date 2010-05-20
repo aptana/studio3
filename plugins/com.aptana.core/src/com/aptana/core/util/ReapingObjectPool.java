@@ -91,9 +91,9 @@ public abstract class ReapingObjectPool<T> implements IObjectPool<T>
 	}
 
 	/**
-	 * Expires all unlocked instances.
+	 * Expires all unlocked instances, stops the reaper thread.
 	 */
-	public synchronized void cleanup()
+	public synchronized void dispose()
 	{
 		Enumeration<T> e = unlocked.keys();
 		while ((e != null) && (e.hasMoreElements()))
