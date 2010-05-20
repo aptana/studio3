@@ -11,7 +11,7 @@ public class CoreTests
 		TestSuite suite = new TestSuite(CoreTests.class.getName());
 		// $JUnit-BEGIN$
 		suite.addTest(com.aptana.git.core.tests.AllTests.suite());
-		suite.addTest(com.aptana.util.tests.AllTests.suite());
+		suite.addTest(com.aptana.core.tests.AllTests.suite());
 		suite.addTest(com.aptana.scripting.tests.AllTests.suite());
 		// $JUnit-END$
 		return suite;
