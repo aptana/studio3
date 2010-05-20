@@ -465,7 +465,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 			throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_disconnect_failed, e));
 		} finally {
 			cwd = null;
-			pool.cleanup();
+			pool.dispose();
 			cleanup();
 			monitor.done();
 		}
