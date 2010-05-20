@@ -53,6 +53,7 @@ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
 import org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl;
 
+import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.PlatformUtil.ProcessItem;
 import com.aptana.terminal.Activator;
@@ -323,24 +324,33 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			for (ProcessItem i : PlatformUtil.getRunningProcesses()) {
 				map.put(i.getPid(), i.getExecutableName());
 			}
+			if (Platform.OS_WIN32.equals(Platform.getOS())) {
+				String processName = map.get(list[0]);
+				Map<String, String> env = ShellExecutable.getEnvironment();
+				if (env != null && processName != null && processName.equals(env.get("COMSPEC"))) { //$NON-NLS-1$
+					map.remove(list[0]);
+				}
+			}
 			for (int pid : list) {
 				String processName = map.get(pid);
 				if (processName != null) {
-					if (processName.startsWith("-")) { //$NON-NLS-1$
-						processName = processName.substring(1);
+					if (Platform.OS_WIN32.equals(Platform.getOS())) {
+						processName = Path.fromOSString(processName).removeFileExtension().lastSegment();
+					} else {
+						if (processName.startsWith("-")) { //$NON-NLS-1$
+							processName = processName.substring(1);
+						}
+						int index = processName.indexOf(' ');
+						if (index > 0) {
+							processName = processName.substring(0, index);
+						}
+						index = processName.lastIndexOf('/');
+						if (index != -1) {
+							processName = processName.substring(index+1, processName.length());
+						}
 					}
-					int index = processName.indexOf(' ');
-					if (index > 0) {
-						processName = processName.substring(0, index);
-					}
-					index = processName.lastIndexOf('/');
-					if (index != -1) {
-						processName = processName.substring(index+1, processName.length());
-					}
-				} else {
-					processName = "pid:"+pid;
+					processes.add(processName);
 				}
-				processes.add(processName);
 			}
 		}
 		return processes;
