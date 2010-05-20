@@ -1,4 +1,8 @@
-package com.aptana.util.tests;
+package com.aptana.core.tests;
+
+import com.aptana.core.util.CollectionsUtilTest;
+import com.aptana.core.util.IOUtilTest;
+import com.aptana.core.util.StringUtilTest;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;

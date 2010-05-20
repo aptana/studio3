@@ -1,4 +1,4 @@
-package com.aptana.util.tests;
+package com.aptana.core.util;
 
 import java.util.ArrayList;
 import java.util.List;

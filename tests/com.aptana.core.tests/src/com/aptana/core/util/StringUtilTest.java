@@ -1,4 +1,4 @@
-package com.aptana.util.tests;
+package com.aptana.core.util;
 
 import java.util.HashMap;
 import java.util.List;
