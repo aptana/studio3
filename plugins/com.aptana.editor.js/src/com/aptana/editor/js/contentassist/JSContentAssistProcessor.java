@@ -35,7 +35,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 {
 	static enum Location
 	{
-		ERROR, IN_GLOBAL, IN_PROPERTY_NAME, IN_VARIABLE_NAME
+		ERROR, IN_GLOBAL, IN_CONSTRUCTOR, IN_PROPERTY_NAME, IN_VARIABLE_NAME
 	};
 
 	private static final Image JS_FUNCTION = Activator.getImage("/icons/js_function.gif"); //$NON-NLS-1$
@@ -61,11 +61,41 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 	
 	/**
-	 * getGlobals
+	 * addCoreFunctions
+	 * 
+	 * @param proposals
+	 * @param offset
 	 */
-	protected void addGlobals(List<ICompletionProposal> proposals, int offset)
+	private void addCoreFunctions(List<ICompletionProposal> proposals, int offset)
 	{
-		// add globals from core
+		List<PropertyElement> globals = this._indexHelper.getCoreGlobals();
+		
+		for (PropertyElement property : globals)
+		{
+			boolean isFunction = (property instanceof FunctionElement);
+			
+			if (isFunction)
+			{
+				// grab the interesting parts
+				String name = JSModelFormatter.getName(property);
+				String description = JSModelFormatter.getDescription(property);
+				Image image = JS_FUNCTION;
+				String[] userAgentNames = property.getUserAgentNames();
+				Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(userAgentNames);
+				
+				this.addProposal(proposals, name, image, description, userAgents, offset);
+			}
+		}
+	}
+	
+	/**
+	 * addCoreGlobals
+	 * 
+	 * @param proposals
+	 * @param offset
+	 */
+	private void addCoreGlobals(List<ICompletionProposal> proposals, int offset)
+	{
 		List<PropertyElement> globals = this._indexHelper.getCoreGlobals();
 
 		for (PropertyElement property : globals)
@@ -83,37 +113,106 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			
 			this.addProposal(proposals, name, image, description, userAgents, offset);
 		}
+	}
+	
+	/**
+	 * getGlobals
+	 */
+	protected void addAllGlobals(List<ICompletionProposal> proposals, int offset)
+	{
+		// add globals from core
+		this.addCoreGlobals(proposals, offset);
+		this.addProjectGlobalFunctions(proposals, offset);
+		this.addProjectVariables(proposals, offset);
+		this.addLocalGlobalFunctions(proposals, offset);
+	}
+
+	/**
+	 * addGlobalFunctions
+	 * 
+	 * @param proposals
+	 * @param offset
+	 */
+	private void addLocalGlobalFunctions(List<ICompletionProposal> proposals, int offset)
+	{
+		String fileLocation = this.editor.getEditorInput().getName();
 		
 		// add globals from current file
 		List<String> globalFunctions = this._astHelper.getGlobalFunctions(this._currentNode);
-		String fileLocation = this.editor.getEditorInput().getName();
 		
-		for (String function : globalFunctions)
+		if (globalFunctions != null)
 		{
-			String name = function + "()";
-			String description = null;
-			Image image = JS_FUNCTION;
-			Image[] userAgents = this.getAllUserAgentIcons();
-			
-			this.addProposal(proposals, name, image, description, userAgents, fileLocation, offset);
-		}
-		
-		// add project globals
-		Index index = this.getIndex();
-		Map<String,String> projectGlobals = this._indexHelper.getProjectGlobals(index);
-		fileLocation = this.editor.getEditorInput().getName();
-		
-		for (Entry<String,String> entry : projectGlobals.entrySet())
-		{
-			String name = entry.getKey() + "()";
-			String description = null;
-			Image image = JS_FUNCTION;
-			Image[] userAgents = this.getAllUserAgentIcons();
-			
-			this.addProposal(proposals, name, image, description, userAgents, entry.getValue(), offset);
+			for (String function : globalFunctions)
+			{
+				String name = function + "()";
+				String description = null;
+				Image image = JS_FUNCTION;
+				Image[] userAgents = this.getAllUserAgentIcons();
+				
+				this.addProposal(proposals, name, image, description, userAgents, fileLocation, offset);
+			}
 		}
 	}
 
+	/**
+	 * addProjectGlobalFunctions
+	 * 
+	 * @param proposals
+	 * @param offset
+	 */
+	private void addProjectGlobalFunctions(List<ICompletionProposal> proposals, int offset)
+	{
+		// add project globals
+		Index index = this.getIndex();
+		Map<String,List<String>> projectGlobals = this._indexHelper.getProjectGlobals(index);
+		
+		if (projectGlobals != null)
+		{
+			for (Entry<String,List<String>> entry : projectGlobals.entrySet())
+			{
+				List<String> files = entry.getValue();
+				boolean hasFiles = (files != null && files.size() > 0);
+				
+				String name = entry.getKey() + "()";
+				String description = (hasFiles) ? JSModelFormatter.getDescription("Referencing Files:", files) : null;
+				Image image = JS_FUNCTION;
+				Image[] userAgents = this.getAllUserAgentIcons();
+				String location = (hasFiles) ? files.get(0) : null;
+				
+				this.addProposal(proposals, name, image, description, userAgents, location, offset);
+			}
+		}
+	}
+	
+	/**
+	 * addProjectVariables
+	 * 
+	 * @param proposals
+	 * @param offset
+	 */
+	private void addProjectVariables(List<ICompletionProposal> proposals, int offset)
+	{
+		Index index = this.getIndex();
+		Map<String,List<String>> projectVariables = this._indexHelper.getProjectVariables(index);
+		
+		if (projectVariables != null)
+		{
+			for (Entry<String,List<String>> entry : projectVariables.entrySet())
+			{
+				List<String> files = entry.getValue();
+				boolean hasFiles = (files != null && files.size() > 0);
+				
+				String name = entry.getKey();
+				String description = (hasFiles) ? JSModelFormatter.getDescription("Referencing Files:", files) : null;;
+				Image image = JS_PROPERTY;
+				Image[] userAgents = this.getAllUserAgentIcons();
+				String location = (hasFiles) ? files.get(0) : null;
+				
+				this.addProposal(proposals, name, image, description, userAgents, location, offset);
+			}
+		}
+	}
+	
 	/**
 	 * addProposal
 	 * 
@@ -142,6 +241,12 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, String fileLocation, int offset)
 	{
 		int length = name.length();
+
+		if (name.endsWith(")"))
+		{
+			length--;
+		}
+		
 		String displayName = name;
 		IContextInformation contextInfo = null;
 
@@ -212,7 +317,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				case IN_PROPERTY_NAME:
 					//System.out.println("Property");
-					
 					break;
 					
 				case IN_VARIABLE_NAME:
@@ -220,8 +324,14 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					break;
 					
 				case IN_GLOBAL:
-					this.addGlobals(result, offset);
+					this.addAllGlobals(result, offset);
 					this.addSymbolsInScope(result, offset);
+					break;
+					
+				case IN_CONSTRUCTOR:
+					this.addCoreFunctions(result, offset);
+					this.addProjectGlobalFunctions(result, offset);
+					this.addLocalGlobalFunctions(result, offset);
 					break;
 					
 				default:
@@ -302,6 +412,20 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 						break;
 				}
 			}
+			else
+			{
+				if (offset > ast.getEndingOffset())
+				{
+					candidate = ast.getNodeAt(ast.getEndingOffset());
+					
+					switch (candidate.getType())
+					{
+						case JSNodeTypes.CONSTRUCT:
+							result = ast;
+							break;
+					}
+				}
+			}
 		}
 		
 		return result;
@@ -353,6 +477,10 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				index = candidateIndex;
 			}
+			else if (lexeme.getType() == JSTokenType.OPERATOR)
+			{
+				index = candidateIndex;
+			}
 		}
 		
 		if (index >= 0)
@@ -363,6 +491,18 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				case DOT:
 					result = Location.IN_PROPERTY_NAME;
+					break;
+					
+				case OPERATOR:
+					if ("new".equals(lexeme.getText()))
+					{
+						result = Location.IN_CONSTRUCTOR;
+						
+						//if (lexeme.getEndingOffset() < offset)
+						//{
+							this._currentLexeme = null;
+						//}
+					}
 					break;
 					
 				case SEMICOLON:
@@ -424,7 +564,10 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				default:
 					break;
 			}
-				
+		}
+		else if (lexemeProvider.size() == 0)
+		{
+			result = Location.IN_GLOBAL;
 		}
 		
 		return result;
