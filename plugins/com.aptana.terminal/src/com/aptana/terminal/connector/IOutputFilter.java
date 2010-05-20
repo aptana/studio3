@@ -35,40 +35,12 @@
 
 package com.aptana.terminal.connector;
 
-import java.io.PrintStream;
-
-import org.eclipse.debug.core.IStreamListener;
-import org.eclipse.debug.core.model.IStreamMonitor;
-import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
-
 /**
  * @author Max Stepanov
  *
  */
-@SuppressWarnings("restriction")
-/* package */ class LocalTerminalOutputListener implements IStreamListener {
+/* package */ interface IOutputFilter {
 
-	private PrintStream printStream;
-	private IOutputFilter outputFilter;
-
-	/**
-	 * 
-	 */
-	public LocalTerminalOutputListener(ITerminalControl control, IOutputFilter outputFilter) {
-		printStream = new PrintStream(control.getRemoteToTerminalOutputStream(), true);
-		this.outputFilter = outputFilter;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.IStreamListener#streamAppended(java.lang.String, org.eclipse.debug.core.model.IStreamMonitor)
-	 */
-	@Override
-	public void streamAppended(String text, IStreamMonitor monitor) {
-		if (outputFilter != null) {
-			printStream.print(outputFilter.filterOutput(text.toCharArray()));
-		} else {
-			printStream.print(text);
-		}
-	}
+	public char[] filterOutput(char[] output);
 
 }

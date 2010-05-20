@@ -611,5 +611,5 @@ public abstract class BaseFTPConnectionFileManager implements IConnectionFileMan
 	
 	private void setLastOperationTime() {
 		lastOperationTime = System.currentTimeMillis();		
-	}
+	}	
 }

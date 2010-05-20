@@ -63,11 +63,12 @@ import com.aptana.terminal.internal.StreamsProxyOutputStream;
  *
  */
 @SuppressWarnings("restriction")
-public class LocalTerminalConnector extends TerminalConnectorImpl implements IProcessListener {
+public class LocalTerminalConnector extends TerminalConnectorImpl implements IProcessListener, IOutputFilter {
 
 	public static final String ID = "com.aptana.terminal.connector.local"; //$NON-NLS-1$
 	
 	private static final String ENCODING = "ISO-8859-1"; //$NON-NLS-1$
+	private static final char DLE = '\u0010';
 
 	// TODO: These shouldn't be in here. We're pulling the values from the explorer plugin
 	// so as not to create a dependency on the two projects.
@@ -82,6 +83,8 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 	
 	private int currentWidth = 0;
 	private int currentHeight = 0;
+	
+	private StringBuffer filteredSequence = new StringBuffer();
 	
 	private IPath initialDirectory;
 	
@@ -130,7 +133,19 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			streamsProxy.write("\u001b[8;"+Integer.toString(currentHeight)+";"+Integer.toString(currentWidth)+"t"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		} catch (IOException e) {
 			Activator.logError("Send terminal size failed.", e); //$NON-NLS-1$
-		}		
+		}
+		getProcessList();
+	}
+	
+	private void getProcessList() {
+		if (streamsProxy == null) {
+			return;
+		}
+		try {
+			streamsProxy.write(DLE+"$p"); //$NON-NLS-1$
+		} catch (IOException e) {
+			Activator.logError("Get terminal process list failed.", e); //$NON-NLS-1$
+		}				
 	}
 	
 	/* (non-Javadoc)
@@ -197,14 +212,14 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			// Hook up standard output:
 			//
 			IStreamMonitor outputMonitor = streamsProxy.getOutputStreamMonitor();
-			LocalTerminalOutputListener outputListener = new LocalTerminalOutputListener(control);
+			LocalTerminalOutputListener outputListener = new LocalTerminalOutputListener(control, this);
 			outputMonitor.addListener(outputListener);
 			outputListener.streamAppended(outputMonitor.getContents(), outputMonitor);
 
 			// Hook up standard error:
 			//
 			IStreamMonitor errorMonitor = streamsProxy.getErrorStreamMonitor();
-			LocalTerminalOutputListener errorListener = new LocalTerminalOutputListener(control);
+			LocalTerminalOutputListener errorListener = new LocalTerminalOutputListener(control, null);
 			errorMonitor.addListener(errorListener);
 			errorListener.streamAppended(errorMonitor.getContents(), errorMonitor);
 
@@ -239,6 +254,35 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			}
 		}
 		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.terminal.connector.IOutputFilter#filterOutput(char[])
+	 */
+	@Override
+	public char[] filterOutput(char[] output) {
+		StringBuffer result = new StringBuffer(output.length);
+		boolean filtering = filteredSequence.length() != 0;
+		for (int i = 0; i < output.length; ++i) {
+			if (filtering) {
+				filteredSequence.append(output[i]);
+				if (Character.isLetter(output[i])) {
+					processCommandResponse(filteredSequence.toString());
+					filteredSequence.setLength(0);
+					filtering = false;
+				}
+			} else if (output[i] == DLE) {
+				filteredSequence.append(output[i]);
+				filtering = true;
+			} else {
+				result.append(output[i]);
+			}
+		}
+		return result.length() == output.length ? output : result.toString().toCharArray();
+	}
+	
+	private void processCommandResponse(String response) {
+		System.out.println(">>> "+response);
 	}
 
 	public List<String> getRunningProcesses() {

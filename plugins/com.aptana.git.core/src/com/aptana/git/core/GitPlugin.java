@@ -39,6 +39,7 @@ public class GitPlugin extends Plugin
 	private IResourceChangeListener fGitResourceListener;
 
 	private GitRepositoryManager fGitRepoManager;
+	private boolean updateSSHW = true;
 
 	/**
 	 * The constructor
@@ -158,7 +159,7 @@ public class GitPlugin extends Plugin
 		{
 			IPath path = getStateLocation().append("bin").append("sshw.exe"); //$NON-NLS-1$ //$NON-NLS-2$
 			File file = path.toFile();
-			if (!file.exists())
+			if (!file.exists() || updateSSHW)
 			{
 				try
 				{
@@ -172,6 +173,7 @@ public class GitPlugin extends Plugin
 				{
 					logError("Extract file failed.", e); //$NON-NLS-1$
 				}
+				updateSSHW = false;
 			}
 			if (file.exists())
 			{

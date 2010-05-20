@@ -33,42 +33,16 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.terminal.connector;
+package com.aptana.filesystem.ftp.internal;
 
-import java.io.PrintStream;
-
-import org.eclipse.debug.core.IStreamListener;
-import org.eclipse.debug.core.model.IStreamMonitor;
-import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
+import com.enterprisedt.net.ftp.FTPClientInterface;
 
 /**
  * @author Max Stepanov
  *
  */
-@SuppressWarnings("restriction")
-/* package */ class LocalTerminalOutputListener implements IStreamListener {
+public interface IPoolConnectionManager {
 
-	private PrintStream printStream;
-	private IOutputFilter outputFilter;
-
-	/**
-	 * 
-	 */
-	public LocalTerminalOutputListener(ITerminalControl control, IOutputFilter outputFilter) {
-		printStream = new PrintStream(control.getRemoteToTerminalOutputStream(), true);
-		this.outputFilter = outputFilter;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.IStreamListener#streamAppended(java.lang.String, org.eclipse.debug.core.model.IStreamMonitor)
-	 */
-	@Override
-	public void streamAppended(String text, IStreamMonitor monitor) {
-		if (outputFilter != null) {
-			printStream.print(outputFilter.filterOutput(text.toCharArray()));
-		} else {
-			printStream.print(text);
-		}
-	}
+	public FTPClientInterface newClient();
 
 }

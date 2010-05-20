@@ -75,6 +75,7 @@ public class FTPConnectionPointPropertyDialog extends TitleAreaDialog implements
 	 */
 	public FTPConnectionPointPropertyDialog(Shell parentShell) {
 		super(parentShell);
+		setHelpAvailable(false);
 	}
 
 	@Override

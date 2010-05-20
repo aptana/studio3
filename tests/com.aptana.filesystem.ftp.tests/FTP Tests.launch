@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.pde.ui.JunitLaunchConfig">
+<booleanAttribute key="append.args" value="true"/>
+<stringAttribute key="application" value="org.eclipse.pde.junit.runtime.coretestapplication"/>
+<booleanAttribute key="askclear" value="false"/>
+<booleanAttribute key="automaticAdd" value="true"/>
+<booleanAttribute key="automaticValidate" value="false"/>
+<stringAttribute key="bootstrap" value=""/>
+<stringAttribute key="checked" value="[NONE]"/>
+<booleanAttribute key="clearConfig" value="true"/>
+<booleanAttribute key="clearws" value="true"/>
+<booleanAttribute key="clearwslog" value="false"/>
+<stringAttribute key="configLocation" value="${workspace_loc}/.metadata/.plugins/org.eclipse.pde.core/pde-junit"/>
+<booleanAttribute key="default" value="false"/>
+<stringAttribute key="deselected_workspace_plugins" value="org.radrails.rails.ui,com.aptana.ui.ftp,com.aptana.git.core,com.aptana.filesystem.secureftp.tests,com.aptana.explorer,com.aptana.editor.findbar,com.aptana.editor.common,com.aptana.libraries,com.aptana.deploy,org.radrails.rails.core,com.aptana.testing.utils,com.aptana.console,com.aptana.editor.erb.tests,com.aptana.syncing.ui,org.jruby,com.aptana.git.ui.tests,com.aptana.editor.css,com.aptana.filewatcher,com.aptana.git.core.tests,com.aptana.editor.html.tests,com.aptana.ui.io.epl,com.aptana.ide.security.linux,plistreader,com.aptana.ui,com.aptana.index.core,com.aptana.editor.css.tests,com.aptana.commandline.launcher,com.aptana.editor.js,com.aptana.scripting.tests,com.aptana.editor.erb,com.aptana.editor.js.tests,com.aptana.filesystem.http,com.aptana.editor.common.tests,com.aptana.ui.epl,com.aptana.editor.xml,com.aptana.branding,com.aptana.usage,com.aptana.editor.text,com.aptana.editor.xml.tests,com.aptana.ruby.debug.ui,com.aptana.filesystem.secureftp,com.aptana.terminal,com.aptana.radrails.rcp,org.jrubyparser,beaver,com.aptana.editor.ruby,org.eclipse.tm.terminal,com.aptana.scripting.ui,com.aptana.red.core.tests.all,com.aptana.ruby.debug.core,com.aptana.editor.sass.tests,com.aptana.syncing.core,com.aptana.ui.secureftp,com.aptana.ui.io,com.aptana.editor.html,com.aptana.editor.ruby.tests,com.aptana.parsing,com.aptana.git.ui,com.aptana.scripting,com.aptana.editor.sass"/>
+<booleanAttribute key="includeOptional" value="true"/>
+<stringAttribute key="location" value="${workspace_loc}/../junit-workspace"/>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/com.aptana.filesystem.ftp.tests/src/com/aptana/filesystem/ftp/tests/AllTests.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.ui.favoriteGroups">
+<listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.jdt.junit.CONTAINER" value=""/>
+<booleanAttribute key="org.eclipse.jdt.junit.KEEPRUNNING_ATTR" value="false"/>
+<stringAttribute key="org.eclipse.jdt.junit.TESTNAME" value=""/>
+<stringAttribute key="org.eclipse.jdt.junit.TEST_KIND" value="org.eclipse.jdt.junit.loader.junit3"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.aptana.filesystem.ftp.tests.AllTests"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-os ${target.os} -ws ${target.ws} -arch ${target.arch} -nl ${target.nl} -consoleLog"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="com.aptana.filesystem.ftp.tests"/>
+<stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.pde.ui.workbenchClasspathProvider"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xms40m -Xmx512m -Xdock:icon=../Resources/Eclipse.icns -XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts"/>
+<stringAttribute key="pde.version" value="3.3"/>
+<stringAttribute key="product" value="com.aptana.radrails.rcp.product"/>
+<booleanAttribute key="run_in_ui_thread" value="true"/>
+<stringAttribute key="selected_target_plugins" value="org.eclipse.osgi.services@default:default,org.eclipse.core.contenttype@default:default,org.eclipse.osgi@-1:true,org.eclipse.ant.core@default:default,org.eclipse.core.runtime.compatibility.registry@default:false,org.eclipse.equinox.preferences@default:default,org.eclipse.equinox.app@default:default,org.eclipse.core.jobs@default:default,org.eclipse.equinox.security@default:default,org.eclipse.core.runtime@default:true,javax.servlet@default:default,org.eclipse.core.filesystem.macosx@default:false,org.eclipse.equinox.registry@default:default,org.eclipse.core.resources@default:default,org.eclipse.core.expressions@default:default,org.eclipse.equinox.security.macosx@default:false,org.eclipse.equinox.common@2:true,org.eclipse.core.runtime.compatibility.auth@default:default,org.eclipse.core.variables@default:default,org.junit*3.8.2.v3_8_2_v20100427-1100@default:default,org.eclipse.core.filesystem@default:default"/>
+<stringAttribute key="selected_workspace_plugins" value="com.aptana.core@default:default,com.aptana.core.epl@default:default,com.aptana.filesystem.ftp.tests@default:false,com.aptana.ide.libraries.subscription@default:default,com.aptana.core.io.tests@default:false,com.aptana.util.tests@default:false,com.aptana.core.io@default:default,com.aptana.testing.mocks@default:default,com.aptana.filesystem.ftp@default:default"/>
+<booleanAttribute key="show_selected_only" value="false"/>
+<booleanAttribute key="tracing" value="false"/>
+<booleanAttribute key="useCustomFeatures" value="false"/>
+<booleanAttribute key="useDefaultConfig" value="true"/>
+<booleanAttribute key="useDefaultConfigArea" value="false"/>
+<booleanAttribute key="useProduct" value="false"/>
+</launchConfiguration>

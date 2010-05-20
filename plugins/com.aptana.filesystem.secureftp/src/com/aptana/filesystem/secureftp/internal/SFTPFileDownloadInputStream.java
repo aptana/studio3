@@ -33,41 +33,86 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.terminal.connector;
+package com.aptana.filesystem.secureftp.internal;
 
-import java.io.PrintStream;
+import java.io.IOException;
+import java.io.InputStream;
 
-import org.eclipse.debug.core.IStreamListener;
-import org.eclipse.debug.core.model.IStreamMonitor;
-import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
+import org.eclipse.core.runtime.Status;
+
+import com.enterprisedt.net.ftp.FileTransferInputStream;
 
 /**
  * @author Max Stepanov
  *
  */
-@SuppressWarnings("restriction")
-/* package */ class LocalTerminalOutputListener implements IStreamListener {
+public class SFTPFileDownloadInputStream extends InputStream {
 
-	private PrintStream printStream;
-	private IOutputFilter outputFilter;
-
+	private FileTransferInputStream ftpInputStream;
+	
 	/**
 	 * 
 	 */
-	public LocalTerminalOutputListener(ITerminalControl control, IOutputFilter outputFilter) {
-		printStream = new PrintStream(control.getRemoteToTerminalOutputStream(), true);
-		this.outputFilter = outputFilter;
+	public SFTPFileDownloadInputStream(FileTransferInputStream ftpInputStream) {
+		this.ftpInputStream = ftpInputStream;
+	}
+	
+	private void safeClose() {
+		try {
+			ftpInputStream.close();
+		} catch (IOException e) {
+			SecureFTPPlugin.log(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "SFTP download error.", e));
+		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.IStreamListener#streamAppended(java.lang.String, org.eclipse.debug.core.model.IStreamMonitor)
+	 * @see java.io.InputStream#read()
 	 */
 	@Override
-	public void streamAppended(String text, IStreamMonitor monitor) {
-		if (outputFilter != null) {
-			printStream.print(outputFilter.filterOutput(text.toCharArray()));
-		} else {
-			printStream.print(text);
+	public int read() throws IOException {
+		try {
+			return ftpInputStream.read();
+		} catch (IOException e) {
+			safeClose();
+			throw e;
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see java.io.InputStream#available()
+	 */
+	@Override
+	public int available() throws IOException {
+		try {
+			return ftpInputStream.available();
+		} catch (IOException e) {
+			safeClose();
+			throw e;
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see java.io.InputStream#close()
+	 */
+	@Override
+	public void close() throws IOException {
+		try {
+			ftpInputStream.close();
+		} finally {
+			safeClose();
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see java.io.InputStream#read(byte[], int, int)
+	 */
+	@Override
+	public int read(byte[] b, int off, int len) throws IOException {
+		try {
+			return ftpInputStream.read(b, off, len);
+		} catch (IOException e) {
+			safeClose();
+			throw e;
 		}
 	}
 

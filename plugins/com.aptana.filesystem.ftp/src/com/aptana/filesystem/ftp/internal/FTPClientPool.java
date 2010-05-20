@@ -33,42 +33,71 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.terminal.connector;
+package com.aptana.filesystem.ftp.internal;
 
-import java.io.PrintStream;
+import com.aptana.core.util.ReapingObjectPool;
+import com.enterprisedt.net.ftp.FTPClient;
+import com.enterprisedt.net.ftp.FTPClientInterface;
 
-import org.eclipse.debug.core.IStreamListener;
-import org.eclipse.debug.core.model.IStreamMonitor;
-import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
+public class FTPClientPool extends ReapingObjectPool<FTPClientInterface> {
 
-/**
- * @author Max Stepanov
- *
- */
-@SuppressWarnings("restriction")
-/* package */ class LocalTerminalOutputListener implements IStreamListener {
+	private IPoolConnectionManager manager;
 
-	private PrintStream printStream;
-	private IOutputFilter outputFilter;
-
-	/**
-	 * 
-	 */
-	public LocalTerminalOutputListener(ITerminalControl control, IOutputFilter outputFilter) {
-		printStream = new PrintStream(control.getRemoteToTerminalOutputStream(), true);
-		this.outputFilter = outputFilter;
+	public FTPClientPool(IPoolConnectionManager manager)
+	{
+		super(2 * 60 * 1000); // 2 minutes
+		this.manager = manager;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.IStreamListener#streamAppended(java.lang.String, org.eclipse.debug.core.model.IStreamMonitor)
-	 */
 	@Override
-	public void streamAppended(String text, IStreamMonitor monitor) {
-		if (outputFilter != null) {
-			printStream.print(outputFilter.filterOutput(text.toCharArray()));
-		} else {
-			printStream.print(text);
+	public FTPClientInterface create()
+	{
+		return manager.newClient();
+	}
+
+	@Override
+	public void expire(FTPClientInterface ftpClient)
+	{
+		if (ftpClient == null)
+		{
+			return;
 		}
+		try
+		{
+			ftpClient.quit();
+		}
+		catch (Exception e)
+		{
+			try
+			{
+				ftpClient.quitImmediately();
+			}
+			catch (Exception ignore)
+			{
+			}
+		}
+	}
+
+	@Override
+	public boolean validate(FTPClientInterface o)
+	{
+		if (!o.connected())
+		{
+			return false;
+		}
+		if (o instanceof FTPClient)
+		{
+			try
+			{
+				((FTPClient) o).noOperation();
+			}
+			catch (Exception e)
+			{
+				// ignore
+				return false;
+			}
+		}
+		return true;
 	}
 
 }

@@ -60,17 +60,15 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 
+import com.aptana.filesystem.ftp.Policy;
 import com.aptana.filesystem.ftp.internal.BaseFTPConnectionFileManager;
 import com.aptana.filesystem.ftp.internal.ExpiringMap;
-import com.aptana.filesystem.ftp.internal.FTPFileDownloadInputStream;
-import com.aptana.filesystem.ftp.internal.FTPFileUploadOutputStream;
+import com.aptana.filesystem.secureftp.ISFTPConnectionFileManager;
+import com.aptana.filesystem.secureftp.ISFTPConstants;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.preferences.PreferenceUtils;
 import com.aptana.ide.core.io.vfs.ExtendedFileInfo;
-import com.aptana.filesystem.ftp.Policy;
-import com.aptana.filesystem.secureftp.ISFTPConnectionFileManager;
-import com.aptana.filesystem.secureftp.ISFTPConstants;
 import com.enterprisedt.net.ftp.FTPException;
 import com.enterprisedt.net.ftp.FTPFile;
 import com.enterprisedt.net.ftp.FTPTransferType;
@@ -94,8 +92,6 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	private SSHFTPClient ftpClient;
 	private IPath keyFilePath;
 	private String transferType;
-	private String controlEncoding;
-	private String compression;
 	private IPath cwd;
 	private Map<IPath, FTPFile> ftpFileCache = new ExpiringMap<IPath, FTPFile>(CACHE_TTL);
 
@@ -120,8 +116,6 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 				this.authId = Policy.generateAuthId("SFTP", login, host, port); //$NON-NLS-1$
 			}
 			this.transferType = transferType;
-			this.controlEncoding = encoding;
-			this.compression = compression;
 			initFTPClient(ftpClient, encoding, compression);
 		} catch (Exception e) {
 			SecureFTPPlugin.log(new Status(IStatus.WARNING, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_InitializationFailed, e));
@@ -627,51 +621,18 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	@Override
 	protected InputStream readFile(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
 		monitor.beginTask(Messages.SFTPConnectionFileManager_InitiatingFileDownload, 4);
-		SSHFTPClient downloadFtpClient = new SSHFTPClient();
 		try {
-			initFTPClient(downloadFtpClient, controlEncoding, compression);
-			downloadFtpClient.setValidator(ftpClient.getValidator());
-			downloadFtpClient.setRemoteHost(host);
-			downloadFtpClient.setRemotePort(port);
 			Policy.checkCanceled(monitor);
-			if (keyFilePath != null) {
-				downloadFtpClient.setAuthentication(keyFilePath.toOSString(), login, String.copyValueOf(password));
-			} else {
-				downloadFtpClient.setAuthentication(login, String.copyValueOf(password));
-			}
-			downloadFtpClient.connect();
-			monitor.worked(1);
-			Policy.checkCanceled(monitor);
-			downloadFtpClient.setType(ISFTPConstants.TRANSFER_TYPE_ASCII.equals(transferType)
-					? FTPTransferType.ASCII : FTPTransferType.BINARY);
-			try {
-				downloadFtpClient.chdir(path.removeLastSegments(1).toPortableString());
-			} catch (FTPException e) {
-				throwFileNotFound(e, path.removeLastSegments(1));
-			}
+			changeCurrentDir(path.removeLastSegments(1));
 			monitor.worked(1);
 			Policy.checkCanceled(monitor);
 			try {
-				return new FTPFileDownloadInputStream(downloadFtpClient,
-						new SSHFTPInputStream(downloadFtpClient, path.lastSegment()));
+				return new SFTPFileDownloadInputStream(new SSHFTPInputStream(ftpClient, path.toPortableString()));
 			} catch (FTPException e) {
 				throwFileNotFound(e, path);
 				return null;
 			}
 		} catch (Exception e) {
-			if (downloadFtpClient.connected()) {
-				try {
-					if (e instanceof OperationCanceledException
-							|| e instanceof FTPException
-							|| e instanceof FileNotFoundException) {
-						downloadFtpClient.quit();
-					} else {
-						downloadFtpClient.quitImmediately();
-					}
-				} catch (IOException ignore) {
-				} catch (FTPException ignore) {
-				}
-			}
 			if (e instanceof OperationCanceledException) {
 				throw (OperationCanceledException) e;
 			} else if (e instanceof FileNotFoundException) {
@@ -689,49 +650,16 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	@Override
 	protected OutputStream writeFile(IPath path, long permissions, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
 		monitor.beginTask(Messages.SFTPConnectionFileManager_FailedInitiatingFile, 4);
-		SSHFTPClient uploadFtpClient = new SSHFTPClient();
 		try {
-			initFTPClient(uploadFtpClient, controlEncoding, compression);
-			uploadFtpClient.setValidator(ftpClient.getValidator());
-			uploadFtpClient.setRemoteHost(host);
-			uploadFtpClient.setRemotePort(port);
-			if (keyFilePath != null) {
-				uploadFtpClient.setAuthentication(keyFilePath.toOSString(), login, String.copyValueOf(password));
-			} else {
-				uploadFtpClient.setAuthentication(login, String.copyValueOf(password));
-			}
 			Policy.checkCanceled(monitor);
-			uploadFtpClient.connect();
+			changeCurrentDir(path.removeLastSegments(1));
 			monitor.worked(1);
 			Policy.checkCanceled(monitor);
-			uploadFtpClient.setType(ISFTPConstants.TRANSFER_TYPE_ASCII.equals(transferType)
-					? FTPTransferType.ASCII : FTPTransferType.BINARY);
-			IPath dirPath = path.removeLastSegments(1);
-			try {
-				uploadFtpClient.chdir(dirPath.toPortableString());
-			} catch (FTPException e) {
-				throwFileNotFound(e, dirPath);
-			}
-			monitor.worked(1);
-			Policy.checkCanceled(monitor);
-			return new FTPFileUploadOutputStream(uploadFtpClient,
-					new SSHFTPOutputStream(uploadFtpClient, generateTempFileName(path.lastSegment())),
-					path.lastSegment(),
+			return new SFTPFileUploadOutputStream(ftpClient,
+					new SSHFTPOutputStream(ftpClient, path.removeLastSegments(1).append(generateTempFileName(path.lastSegment())).toPortableString()),
+					path.toPortableString(),
 					new Date(), permissions);
 		} catch (Exception e) {
-			if (uploadFtpClient.connected()) {
-				try {
-					if (e instanceof OperationCanceledException
-							|| e instanceof FTPException
-							|| e instanceof FileNotFoundException) {
-						uploadFtpClient.quit();
-					} else {
-						uploadFtpClient.quitImmediately();
-					}
-				} catch (IOException ignore) {
-				} catch (FTPException ignore) {
-				}
-			}
 			if (e instanceof OperationCanceledException) {
 				throw (OperationCanceledException) e;
 			} else if (e instanceof FileNotFoundException) {

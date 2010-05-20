@@ -16,6 +16,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -78,6 +79,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 
 	private AbstractThemeableEditor fEditor;
 
+	private TreeViewer fTreeViewer;
 	private CommonOutlineContentProvider fContentProvider;
 	private ILabelProvider fLabelProvider;
 
@@ -98,7 +100,9 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 	@Override
 	public void createControl(Composite parent)
 	{
-		super.createControl(parent);
+		fTreeViewer = new TreeViewer(parent, SWT.VIRTUAL | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		fTreeViewer.addSelectionChangedListener(this);
+
 		((IContextService) getSite().getService(IContextService.class)).activateContext(OUTLINE_CONTEXT);
 
 		final TreeViewer viewer = getTreeViewer();
@@ -162,6 +166,47 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		actionBars.updateActionBars();
 
 		fPrefs.addPropertyChangeListener(this);
+	}
+
+	@Override
+	public Control getControl()
+	{
+		if (fTreeViewer == null)
+		{
+			return null;
+		}
+		return fTreeViewer.getControl();
+	}
+
+	@Override
+	public ISelection getSelection()
+	{
+		if (fTreeViewer == null)
+		{
+			return StructuredSelection.EMPTY;
+		}
+		return fTreeViewer.getSelection();
+	}
+
+	@Override
+	protected TreeViewer getTreeViewer()
+	{
+		return fTreeViewer;
+	}
+
+	@Override
+	public void setFocus()
+	{
+		fTreeViewer.getControl().setFocus();
+	}
+
+	@Override
+	public void setSelection(ISelection selection)
+	{
+		if (fTreeViewer != null)
+		{
+			fTreeViewer.setSelection(selection);
+		}
 	}
 
 	private void hookToThemes()
