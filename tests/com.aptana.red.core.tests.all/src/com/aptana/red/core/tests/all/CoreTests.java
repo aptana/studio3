@@ -13,10 +13,8 @@ public class CoreTests
 		suite.addTest(com.aptana.git.core.tests.AllTests.suite());
 		suite.addTest(com.aptana.util.tests.AllTests.suite());
 		suite.addTest(com.aptana.scripting.tests.AllTests.suite());
-		/*
-		suite.addTest(com.aptana.filesystem.ftp.tests.AllTests.suite());
-		suite.addTest(com.aptana.filesystem.secureftp.tests.AllTests.suite());
-		*/
+//		suite.addTest(com.aptana.filesystem.ftp.tests.AllTests.suite());
+//		suite.addTest(com.aptana.filesystem.secureftp.tests.AllTests.suite());
 		// $JUnit-END$
 		return suite;
 	}
