@@ -14,6 +14,9 @@ public class UITests
 	{
 		TestSuite suite = new TestSuite(UITests.class.getName());
 		// $JUnit-BEGIN$
+		// FIXME Why do the FTP tests need to be run on UI thread on unit test build machine?
+		suite.addTest(com.aptana.filesystem.ftp.tests.AllTests.suite());
+		suite.addTest(com.aptana.filesystem.secureftp.tests.AllTests.suite());
 		suite.addTest(com.aptana.git.ui.AllTests.suite());
 		suite.addTest(com.aptana.editor.common.tests.AllTests.suite());
 		// suite.addTest(com.aptana.editor.text.tests.AllTests.suite()); // TODO Add Tests for editor.text
