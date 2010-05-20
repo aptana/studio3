@@ -24,6 +24,7 @@ import com.aptana.editor.js.JSScopeScanner;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
+import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.Lexeme;
@@ -114,6 +115,28 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		proposals.add(proposal);
 	}
 
+	/**
+	 * addSymbolsInScope
+	 * 
+	 * @param proposals
+	 */
+	protected void addSymbolsInScope(List<ICompletionProposal> proposals, int offset)
+	{
+		if (this._currentNode != null)
+		{
+			List<String> args = this._astHelper.getSymbolsInScope(this._currentNode);
+			
+			for (String name : args)
+			{
+				String description = null;
+				Image image = JS_PROPERTY;
+				Image[] userAgents = this.getAllUserAgentIcons();
+				
+				this.addProposal(proposals, name, image, description, userAgents, offset);
+			}
+		}
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -140,22 +163,20 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			switch (location)
 			{
 				case IN_PROPERTY_NAME:
-					System.out.println("Property");
+					//System.out.println("Property");
 					
 					break;
 					
 				case IN_VARIABLE_NAME:
-					System.out.println("Variable");
+					//System.out.println("Variable");
+					break;
+					
+				case IN_GLOBAL:
+					this.addGlobals(result, offset);
+					this.addSymbolsInScope(result, offset);
 					break;
 					
 				default:
-					if (this._currentNode != null)
-					{
-						List<String> args = this._astHelper.getSymbolsInScope(this._currentNode);
-						Collections.sort(args);
-						System.out.println(StringUtil.join(",", args));
-						//System.out.println("Location = " + location);
-					}
 					break;
 			}
 	
@@ -188,10 +209,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	LexemeProvider<JSTokenType> createLexemeProvider(IDocument document, int offset)
 	{
-		IParseNode ast = this.editor.getFileService().getParseResult();
 		LexemeProvider<JSTokenType> result;
 		
-		this._currentNode = (ast != null) ? ast.getNodeAt(offset) : null;
+		this._currentNode = this.getActiveASTNode(offset);
 		
 		if (this._currentNode != null)
 		{
@@ -200,6 +220,40 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		else
 		{
 			result = new JSLexemeProvider(document, offset, new JSScopeScanner());
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * getActiveASTNode
+	 * 
+	 * @param offset
+	 * @return
+	 */
+	IParseNode getActiveASTNode(int offset)
+	{
+		IParseNode ast = this.editor.getFileService().getParseResult();
+		IParseNode result = null;
+		
+		// TODO: Limit this to only the node types we're interested in
+		if (ast != null)
+		{
+			IParseNode candidate = ast.getNodeAt(offset);
+			
+			if (candidate != null)
+			{
+				switch (candidate.getType())
+				{
+					case JSNodeTypes.GET_PROPERTY:
+					case JSNodeTypes.ARGUMENTS:
+						result = candidate;
+						break;
+						
+					default:
+						break;
+				}
+			}
 		}
 		
 		return result;
