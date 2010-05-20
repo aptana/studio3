@@ -89,6 +89,14 @@ public class HTMLEditor extends AbstractThemeableEditor
 	{
 		super.createPartControl(parent);
 		// Install a verify key listener that auto-closes unclosed open tags!
+		installOpenTagCloser();
+	}
+
+	/**
+	 * Install a tag closer to auto-close unclosed open tags.
+	 */
+	protected void installOpenTagCloser()
+	{
 		OpenTagCloser.install(getSourceViewer());
 	}
 
