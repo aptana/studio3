@@ -1,13 +1,18 @@
 package com.aptana.core.util;
 
+import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.Hashtable;
+
+import com.aptana.core.CorePlugin;
 
 class ConnectionReaper extends Thread
 {
 
 	private ReapingObjectPool<?> pool;
 	private final long delay = 300000;
+
+	boolean keepRunning = true;
 
 	ConnectionReaper(ReapingObjectPool<?> pool)
 	{
@@ -16,7 +21,7 @@ class ConnectionReaper extends Thread
 
 	public void run()
 	{
-		while (true)
+		while (keepRunning)
 		{
 			try
 			{
@@ -27,6 +32,7 @@ class ConnectionReaper extends Thread
 			}
 			pool.reap();
 		}
+		CorePlugin.trace("Reaping thread stopped"); //$NON-NLS-1$
 	}
 }
 
@@ -95,6 +101,20 @@ public abstract class ReapingObjectPool<T> implements IObjectPool<T>
 			T t = e.nextElement();
 			unlocked.remove(t);
 			expire(t);
+		}
+		if (locked != null && locked.size() > 0)
+		{
+			CorePlugin.logWarning(MessageFormat.format("Killed a connection pool that still has {0} locked items", locked.size())); //$NON-NLS-1$
+		}
+		try
+		{
+			// Kill the reaper
+			this.reaper.keepRunning = false;
+			this.reaper.interrupt();
+		}
+		catch (Exception e1)
+		{
+			// ignore
 		}
 	}
 
