@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Util Tests
-Bundle-SymbolicName: com.aptana.util.tests
+Bundle-SymbolicName: com.aptana.core.tests
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: APTANA
 Fragment-Host: com.aptana.core;bundle-version="3.0.0"
