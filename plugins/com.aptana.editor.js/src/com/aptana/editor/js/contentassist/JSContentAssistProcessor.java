@@ -33,6 +33,8 @@ import com.aptana.parsing.lexer.Lexeme;
 
 public class JSContentAssistProcessor extends CommonContentAssistProcessor
 {
+	private static final String PARENS = "()";
+
 	static enum Location
 	{
 		ERROR, IN_GLOBAL, IN_CONSTRUCTOR, IN_PROPERTY_NAME, IN_VARIABLE_NAME
@@ -144,7 +146,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			for (String function : globalFunctions)
 			{
-				String name = function + "()";
+				String name = function + PARENS;
 				String description = null;
 				Image image = JS_FUNCTION;
 				Image[] userAgents = this.getAllUserAgentIcons();
@@ -173,7 +175,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				List<String> files = entry.getValue();
 				boolean hasFiles = (files != null && files.size() > 0);
 				
-				String name = entry.getKey() + "()";
+				String name = entry.getKey() + PARENS;
 				String description = (hasFiles) ? JSModelFormatter.getDescription("Referencing Files:", files) : null;
 				Image image = JS_FUNCTION;
 				Image[] userAgents = this.getAllUserAgentIcons();
@@ -242,7 +244,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		int length = name.length();
 
-		if (name.endsWith(")"))
+		// back up one if we end with parentheses
+		if (name.endsWith(PARENS))
 		{
 			length--;
 		}
@@ -250,7 +253,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		String displayName = name;
 		IContextInformation contextInfo = null;
 
-		// TEMP:
 		int replaceLength = 0;
 
 		if (this._currentLexeme != null)
