@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.IDocument;
@@ -25,6 +27,7 @@ import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
+import com.aptana.index.core.Index;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.Lexeme;
 
@@ -93,6 +96,21 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			Image[] userAgents = this.getAllUserAgentIcons();
 			
 			this.addProposal(proposals, name, image, description, userAgents, fileLocation, offset);
+		}
+		
+		// add project globals
+		Index index = this.getIndex();
+		Map<String,String> projectGlobals = this._indexHelper.getProjectGlobals(index);
+		fileLocation = this.editor.getEditorInput().getName();
+		
+		for (Entry<String,String> entry : projectGlobals.entrySet())
+		{
+			String name = entry.getKey() + "()";
+			String description = null;
+			Image image = JS_FUNCTION;
+			Image[] userAgents = this.getAllUserAgentIcons();
+			
+			this.addProposal(proposals, name, image, description, userAgents, entry.getValue(), offset);
 		}
 	}
 
