@@ -16,6 +16,7 @@ public class Messages extends NLS
 	public static String ThemePreferencePage_ForegroundColumnLabel;
 	public static String ThemePreferencePage_ForegroundLabel;
 	public static String ThemePreferencePage_ImportLabel;
+	public static String ThemePreferencePage_ExportLabel;
 	public static String ThemePreferencePage_InvasiveThemesLBL;
 	public static String ThemePreferencePage_ItalicButtonLabel;
 	public static String ThemePreferencePage_LineHighlightLabel;
