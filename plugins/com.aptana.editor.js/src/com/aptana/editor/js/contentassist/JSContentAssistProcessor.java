@@ -81,6 +81,20 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			
 			this.addProposal(proposals, name, image, description, userAgents, offset);
 		}
+		
+		// add globals from current file
+		List<String> globalFunctions = this._astHelper.getGlobalFunctions(this._currentNode);
+		String fileLocation = this.editor.getEditorInput().getName();
+		
+		for (String function : globalFunctions)
+		{
+			String name = function + "()";
+			String description = null;
+			Image image = JS_FUNCTION;
+			Image[] userAgents = this.getAllUserAgentIcons();
+			
+			this.addProposal(proposals, name, image, description, userAgents, fileLocation, offset);
+		}
 	}
 
 	/**
