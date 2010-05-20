@@ -91,7 +91,7 @@ public class HTMLEditor extends AbstractThemeableEditor
 		// Install a verify key listener that auto-closes unclosed open tags!
 		installOpenTagCloser();
 	}
-	
+
 	/**
 	 * Install a tag closer to auto-close unclosed open tags.
 	 */
@@ -99,7 +99,7 @@ public class HTMLEditor extends AbstractThemeableEditor
 	{
 		OpenTagCloser.install(getSourceViewer());
 	}
-	
+
 	@Override
 	protected IPreferenceStore getOutlinePreferenceStore()
 	{
