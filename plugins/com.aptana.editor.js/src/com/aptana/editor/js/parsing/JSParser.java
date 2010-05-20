@@ -2042,7 +2042,7 @@ public class JSParser extends Parser implements IParser {
 		
 		recoveryStrategies = new IRecoveryStrategy[] {
 			new IRecoveryStrategy() {
-				public boolean recover(Symbol token, TokenStream in, Symbol lastSymbol, Events report) throws IOException
+				public boolean recover(IParser parser, Symbol token, TokenStream in) throws IOException
 				{
 					boolean result = false;
 	
@@ -2066,11 +2066,13 @@ public class JSParser extends Parser implements IParser {
 				}
 			},
 			new IRecoveryStrategy() {
-				public boolean recover(Symbol token, TokenStream in, Symbol lastSymbol, Events report) throws IOException
+				public boolean recover(IParser parser, Symbol token, TokenStream in) throws IOException
 				{
+					Symbol lastSymbol = getLastSymbol();
+					int type = lastSymbol.getId();
 					boolean result = false;
 	
-					if (lastSymbol.getId() == JSTokens.DOT)
+					if (type == JSTokens.DOT || type == JSTokens.NEW)
 					{
 						Symbol term1 = new Symbol(JSTokens.IDENTIFIER, token.getStart(), token.getStart() - 1, "");
 						Symbol term2 = new Symbol(JSTokens.SEMICOLON, token.getStart(), token.getStart() - 1, ";");
@@ -2098,8 +2100,9 @@ public class JSParser extends Parser implements IParser {
 				}
 			},
 			new IRecoveryStrategy() {
-				public boolean recover(Symbol token, TokenStream in, Symbol lastSymbol, Events report) throws IOException
+				public boolean recover(IParser parser, Symbol token, TokenStream in) throws IOException
 				{
+					Symbol lastSymbol = getLastSymbol();
 					boolean result = false;
 					
 					if (top >= 2)
@@ -2148,8 +2151,6 @@ public class JSParser extends Parser implements IParser {
 
 		if (this.recoveryStrategies != null)
 		{
-			Symbol lastSymbol = this.getLastSymbol();
-
 			// NOTE: Consider building a Map<Object,List<IRecoveryStrategy>> which
 			// would allow us to reduce the number of recovery strategies that will
 			// be attempted based on the last symbol on the stack. We may need
@@ -2157,7 +2158,7 @@ public class JSParser extends Parser implements IParser {
 			// try the strategies, 3) try these after the mapped strategies
 			for (IRecoveryStrategy strategy : this.recoveryStrategies)
 			{
-				if (strategy.recover(token, in, lastSymbol, report))
+				if (strategy.recover(this, token, in))
 				{
 					success = true;
 					break;
