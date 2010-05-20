@@ -26,7 +26,7 @@ public class JSIndexQueryHelper
 	 * 
 	 * @return
 	 */
-	public List<PropertyElement> getGlobals()
+	public List<PropertyElement> getCoreGlobals()
 	{
 		List<PropertyElement> result = null;
 		

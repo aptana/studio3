@@ -63,7 +63,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected void addGlobals(List<ICompletionProposal> proposals, int offset)
 	{
-		List<PropertyElement> globals = this._indexHelper.getGlobals();
+		// add globals from core
+		List<PropertyElement> globals = this._indexHelper.getCoreGlobals();
 
 		for (PropertyElement property : globals)
 		{
