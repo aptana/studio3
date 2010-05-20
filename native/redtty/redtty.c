@@ -40,28 +40,28 @@ main (int argc, char** argv)
 	
 	int pty;
 	char ptyname[MAXCOMLEN+1];
+	struct winsize size = { 0, 0 };
+
+	if( argc > 1 ) {
+		unsigned int width, height;
+		if( sscanf(argv[1], "%ux%u", &width, &height) == 2 ) {
+			size.ws_col = width;
+			size.ws_row = height;
+		}
+	}
 	
 	switch (forkpty(&pty,	/* pseudo-terminal master end descriptor */ 
 					ptyname,/* This can be a char[] buffer used to get... */ 
 							/* ...the device name of the pseudo-terminal */ 
 					NULL,	/* This can be a struct termios pointer used... */ 
 							/* to set the terminal attributes */ 
-					NULL))	/* This can be a struct winsize pointer used... */ 
+					size.ws_col != 0 ? &size : NULL))	/* This can be a struct winsize pointer used... */ 
     {						/* ...to set the screen size of the terminal */ 
 		case -1: /* Error */ 
 			perror ("fork()"); 
 			exit (EXIT_FAILURE); 
 			
 		case 0: /* This is the child process */ 
-			if( argc > 1 ) {
-				unsigned int width, height;
-				if( sscanf(argv[1], "%ux%u", &width, &height) == 2 ) {
-					struct winsize size;
-					size.ws_col = width;
-					size.ws_row = height;
-					ioctl(STDOUT_FILENO, TIOCSWINSZ, &size);
-				}
-			}
 			execl("/bin/bash", "-bash", "-li", NULL); 
 			
 			perror("exec()"); /* Since exec* never return */ 
