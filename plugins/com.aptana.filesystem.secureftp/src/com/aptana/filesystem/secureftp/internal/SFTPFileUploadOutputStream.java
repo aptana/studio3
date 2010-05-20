@@ -77,14 +77,12 @@ public class SFTPFileUploadOutputStream extends OutputStream {
 			}
 		} catch (Exception e) {
 			SecureFTPPlugin.log(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "SFTP upload error.", e));
-		}
-		try
-		{
-			ftpOutputStream.close();
-		}
-		catch (Exception e)
-		{
-			// ignore
+		} finally {
+			try {
+				ftpOutputStream.close();
+			} catch (IOException e) {
+				SecureFTPPlugin.log(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "SFTP close stream error.", e));
+			}
 		}
 	}
 
