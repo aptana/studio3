@@ -16,6 +16,7 @@ public interface JSIndexConstants
 	static final String DESCRIPTION = "js.description"; //$NON-NLS-1$
 	static final String PARAMETERS = "js.parameters"; //$NON-NLS-1$
 	static final String RETURN_TYPES = "js.return_types"; //$NON-NLS-1$
+	static final String USER_AGENT = "css.user_agent"; //$NON-NLS-1$
 	
 	// special values
 	static final String NO_ENTRY = "-1"; //$NON-NLS-1$
