@@ -395,7 +395,6 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 				if (contains(activation, e.character) && fContextInfoPopup != null && !fContextInfoPopup.isActive())
 				{
 					showStyle = SHOW_CONTEXT_INFO;
-					fContextInfoPopup.setActivationKey(e.character);
 				}
 				else
 				{
