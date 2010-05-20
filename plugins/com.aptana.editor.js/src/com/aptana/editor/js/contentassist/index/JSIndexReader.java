@@ -2,8 +2,11 @@ package com.aptana.editor.js.contentassist.index;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.ParameterElement;
@@ -275,6 +278,42 @@ public class JSIndexReader
 			if (column < columns.length)
 			{
 				result.setVersion(columns[column++]);
+			}
+		}
+
+		return result;
+	}
+	
+	/**
+	 * getValues
+	 * 
+	 * @return
+	 */
+	public Map<String, List<String>> getValues(Index index, String category)
+	{
+		Map<String, List<String>> result = null;
+
+		if (index != null)
+		{
+			String pattern = "*"; //$NON-NLS-1$
+
+			try
+			{
+				List<QueryResult> items = index.query(new String[] { category }, pattern, SearchPattern.PATTERN_MATCH);
+
+				if (items != null && items.size() > 0)
+				{
+					result = new HashMap<String, List<String>>();
+
+					for (QueryResult item : items)
+					{
+						result.put(item.getWord(), Arrays.asList(item.getDocuments()));
+					}
+				}
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
 			}
 		}
 
