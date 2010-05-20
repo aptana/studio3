@@ -148,20 +148,23 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 	 */
 	private void walkAST(Index index, IFile file, IParseNode ast)
 	{
-		JSASTQueryHelper queryHelper = new JSASTQueryHelper();
-		
-		for (String name : queryHelper.getGlobalFunctions(ast))
+		JSASTQueryHelper astHelper = new JSASTQueryHelper();
+		String location = file.getProjectRelativePath().toPortableString();
+
+		for (String name : astHelper.getGlobalFunctions(ast))
 		{
 			System.out.println(name + "()");
-			index.addEntry(JSIndexConstants.FUNCTION, name, file.getProjectRelativePath().toPortableString());
+			index.addEntry(JSIndexConstants.FUNCTION, name, location);
 		}
-		for (String varName : queryHelper.getGlobalDeclarations(ast))
+		for (String varName : astHelper.getGlobalDeclarations(ast))
 		{
-			System.out.println(varName);
+			System.out.println("global: " + varName);
+			index.addEntry(JSIndexConstants.VARIABLE, varName, location);
 		}
-		for (String varName : queryHelper.getAccidentalGlobals(ast))
+		for (String varName : astHelper.getAccidentalGlobals(ast))
 		{
-			System.out.println(varName);
+			System.out.println("accidental global: " + varName);
+			index.addEntry(JSIndexConstants.VARIABLE, varName, location);
 		}
 	}
 }
