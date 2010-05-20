@@ -1,4 +1,4 @@
-package com.aptana.util.tests;
+package com.aptana.core.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
