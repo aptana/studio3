@@ -94,6 +94,22 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, int offset)
 	{
+		this.addProposal(proposals, name, image, description, userAgents, JSIndexConstants.CORE, offset);
+	}
+	
+	/**
+	 * addProposal
+	 * 
+	 * @param proposals
+	 * @param name
+	 * @param image
+	 * @param description
+	 * @param userAgents
+	 * @param fileLocation
+	 * @param offset
+	 */
+	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, String fileLocation, int offset)
+	{
 		int length = name.length();
 		String displayName = name;
 		IContextInformation contextInfo = null;
@@ -109,7 +125,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 		// build proposal
 		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image, displayName, contextInfo, description);
-		proposal.setFileLocation(JSIndexConstants.CORE);
+		proposal.setFileLocation(fileLocation);
 		proposal.setUserAgentImages(userAgents);
 
 		// add it to the list
