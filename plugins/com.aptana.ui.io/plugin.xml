@@ -74,9 +74,17 @@
                class="com.aptana.ide.ui.io.navigator.resources.FileDropAdapterAssistant"
                id="com.aptana.ide.ui.io.navigator.resources.fileDropAdapter">
             <possibleDropTargets>
-               <instanceof
-                     value="com.aptana.ide.ui.io.navigator.FileSystemObject">
-               </instanceof></possibleDropTargets>
+               <or>
+                  <instanceof
+                        value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+                  </instanceof>
+                  <instanceof
+                        value="org.eclipse.core.resources.IResource">
+                  </instanceof>
+                  <adapt
+                        type="org.eclipse.core.resources.IProject">
+                  </adapt>
+               </or></possibleDropTargets>
          </dropAssistant>
       </navigatorContent>
       <actionProvider
