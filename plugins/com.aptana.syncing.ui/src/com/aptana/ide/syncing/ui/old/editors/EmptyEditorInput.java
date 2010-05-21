@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2007 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -32,32 +32,67 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.syncing.ui.preferences;
+package com.aptana.ide.syncing.ui.editors;
 
-import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IPersistableElement;
 
-import com.aptana.ide.syncing.ui.SyncingUIPlugin;
+import com.aptana.core.util.StringUtil;
 
 /**
  * @author Kevin Sawicki (ksawicki@aptana.com)
  */
-public class PreferenceInitializer extends AbstractPreferenceInitializer
+public class EmptyEditorInput implements IEditorInput
 {
 
 	/**
-	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
+	 * @see org.eclipse.ui.IEditorInput#exists()
 	 */
-	public void initializeDefaultPreferences()
+	public boolean exists()
 	{
-		IPreferenceStore store = SyncingUIPlugin.getDefault().getPreferenceStore();
-		store.setDefault(IPreferenceConstants.VIEW_MODE, IPreferenceConstants.VIEW_FLAT);
-		store.setDefault(IPreferenceConstants.DIRECTION_MODE, IPreferenceConstants.DIRECTION_BOTH);
-		store.setDefault(IPreferenceConstants.SHOW_SYNC_EXPLORER_TABLE, true);
-		store.setDefault(IPreferenceConstants.SHOW_DATE, true);
-		store.setDefault(IPreferenceConstants.SHOW_SIZE, true);
-		store.setDefault(IPreferenceConstants.FILE_PERMISSION, "-rw-rw-rw-");
-		store.setDefault(IPreferenceConstants.DIRECTORY_PERMISSION, "drwxrwxrwx");
+		return false;
+	}
+
+	/**
+	 * @see org.eclipse.ui.IEditorInput#getImageDescriptor()
+	 */
+	public ImageDescriptor getImageDescriptor()
+	{
+		return null;
+	}
+
+	/**
+	 * @see org.eclipse.ui.IEditorInput#getName()
+	 */
+	public String getName()
+	{
+		return StringUtil.EMPTY;
+	}
+
+	/**
+	 * @see org.eclipse.ui.IEditorInput#getPersistable()
+	 */
+	public IPersistableElement getPersistable()
+	{
+		return null;
+	}
+
+	/**
+	 * @see org.eclipse.ui.IEditorInput#getToolTipText()
+	 */
+	public String getToolTipText()
+	{
+		return StringUtil.EMPTY;
+	}
+
+	/**
+	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+	 */
+	@SuppressWarnings("unchecked")
+	public Object getAdapter(Class adapter)
+	{
+		return null;
 	}
 
 }

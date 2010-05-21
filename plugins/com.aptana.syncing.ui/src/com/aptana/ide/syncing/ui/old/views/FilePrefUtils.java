@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2008 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -32,32 +32,39 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.syncing.ui.preferences;
+package com.aptana.ide.syncing.ui.views;
 
-import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.jface.preference.IPreferenceStore;
-
+import com.aptana.ide.filesystem.ftp.Policy;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
+import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants;
+
 
 /**
- * @author Kevin Sawicki (ksawicki@aptana.com)
+ * @author Michael Xia (mxia@aptana.com)
  */
-public class PreferenceInitializer extends AbstractPreferenceInitializer
+public class FilePrefUtils
 {
 
 	/**
-	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
+	 * Returns the permissions for new directory.
+	 * 
+	 * @return the permissions for new directory
 	 */
-	public void initializeDefaultPreferences()
+	public static long getDirectoryPermission()
 	{
-		IPreferenceStore store = SyncingUIPlugin.getDefault().getPreferenceStore();
-		store.setDefault(IPreferenceConstants.VIEW_MODE, IPreferenceConstants.VIEW_FLAT);
-		store.setDefault(IPreferenceConstants.DIRECTION_MODE, IPreferenceConstants.DIRECTION_BOTH);
-		store.setDefault(IPreferenceConstants.SHOW_SYNC_EXPLORER_TABLE, true);
-		store.setDefault(IPreferenceConstants.SHOW_DATE, true);
-		store.setDefault(IPreferenceConstants.SHOW_SIZE, true);
-		store.setDefault(IPreferenceConstants.FILE_PERMISSION, "-rw-rw-rw-");
-		store.setDefault(IPreferenceConstants.DIRECTORY_PERMISSION, "drwxrwxrwx");
+		return Policy.permissionsFromString(SyncingUIPlugin.getDefault()
+        .getPreferenceStore().getString(IPreferenceConstants.DIRECTORY_PERMISSION));
+	}
+
+	/**
+	 * Returns the permissions for new file.
+	 * 
+	 * @return the permissions for new file
+	 */
+	public static long getFilePermission()
+	{
+		return Policy.permissionsFromString(SyncingUIPlugin.getDefault()
+        .getPreferenceStore().getString(IPreferenceConstants.FILE_PERMISSION));
 	}
 
 }

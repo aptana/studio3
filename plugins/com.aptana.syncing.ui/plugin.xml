@@ -232,6 +232,15 @@
                tooltip="%action.openConnection.tooltip">
          </action>
          <action
+               class="com.aptana.ide.syncing.ui.actions.SiteConnectionSynchronizeAction"
+               enablesFor="1"
+               icon="icons/full/obj16/sync_both.gif"
+               id="com.aptana.ide.syncing.ui.actions.SiteConnectionSynchronizeAction"
+               label="%action.siteConnectionSynchronize.label"
+               menubarPath="group.properties"
+               tooltip="%action.siteConnectionSynchronize.tooltip">
+         </action>
+         <action
                class="com.aptana.ide.ui.io.actions.ConnectionPropertiesAction"
                enablesFor="1"
                id="com.aptana.ide.ui.io.actions.connectionProperties"
