@@ -420,9 +420,9 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		return new LexemeProvider<CSSTokenType>(document, offset, new CSSScopeScanner())
 		{
 			@Override
-			protected CSSTokenType getTypeFromName(String name)
+			protected CSSTokenType getTypeFromData(Object data)
 			{
-				return CSSTokenType.get(name);
+				return CSSTokenType.get((String) data);
 			}
 		};
 	}

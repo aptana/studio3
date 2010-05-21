@@ -36,11 +36,11 @@ public class JSLexemeProvider extends LexemeProvider<JSTokenType>
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.contentassist.LexemeProvider#getTypeFromName(java.lang.String)
+	 * @see com.aptana.editor.common.contentassist.LexemeProvider#getTypeFromData(java.lang.Object)
 	 */
 	@Override
-	protected JSTokenType getTypeFromName(String name)
+	protected JSTokenType getTypeFromData(Object data)
 	{
-		return JSTokenType.get(name);
+		return (data == null) ? JSTokenType.UNDEFINED : (JSTokenType) data;
 	}
 }

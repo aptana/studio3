@@ -85,7 +85,7 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 				int tokenLength = scanner.getTokenLength();
 				int endingOffset = tokenOffset + tokenLength;
 				String text = document.get(tokenOffset, tokenLength);
-				T type = this.getTypeFromName((String) data);
+				T type = this.getTypeFromData(data);
 				Lexeme<T> lexeme = new Lexeme<T>(type, tokenOffset, endingOffset - 1, text);
 
 				// skip tokens with null data (typically whitespace)
@@ -306,12 +306,12 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	}
 
 	/**
-	 * getTypeFromName
+	 * getTypeFromData
 	 * 
-	 * @param name
+	 * @param data
 	 * @return
 	 */
-	protected abstract T getTypeFromName(String name);
+	protected abstract T getTypeFromData(Object data);
 
 	/**
 	 * iterator
