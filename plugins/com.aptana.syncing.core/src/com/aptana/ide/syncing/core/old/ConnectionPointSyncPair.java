@@ -214,14 +214,4 @@ public class ConnectionPointSyncPair
 		_useCRC = usecrc;
 	}
 
-
-
-
-	/**
-	 * @see com.aptana.ide.core.io.sync.ISerializableSyncItem#getType()
-	 */
-	public String getType()
-	{
-		return "com.aptana.ide.core.io.sync.VirtualFileManagerSyncItem"; //$NON-NLS-1$
-	}
 }
