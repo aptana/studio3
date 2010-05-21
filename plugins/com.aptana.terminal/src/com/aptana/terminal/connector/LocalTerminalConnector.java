@@ -38,7 +38,9 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -51,6 +53,9 @@ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
 import org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl;
 
+import com.aptana.core.ShellExecutable;
+import com.aptana.core.util.PlatformUtil;
+import com.aptana.core.util.PlatformUtil.ProcessItem;
 import com.aptana.terminal.Activator;
 import com.aptana.terminal.IProcessConfiguration;
 import com.aptana.terminal.internal.IProcessListener;
@@ -69,6 +74,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 	
 	private static final String ENCODING = "ISO-8859-1"; //$NON-NLS-1$
 	private static final char DLE = '\u0010';
+	private static final int PROCESS_LIST_TIMEOUT = 1500;
 
 	// TODO: These shouldn't be in here. We're pulling the values from the explorer plugin
 	// so as not to create a dependency on the two projects.
@@ -85,6 +91,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 	private int currentHeight = 0;
 	
 	private StringBuffer filteredSequence = new StringBuffer();
+	private List<Integer> processList = new ArrayList<Integer>();
 	
 	private IPath initialDirectory;
 	
@@ -134,18 +141,28 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 		} catch (IOException e) {
 			Activator.logError("Send terminal size failed.", e); //$NON-NLS-1$
 		}
-		getProcessList();
 	}
 	
-	private void getProcessList() {
-		if (streamsProxy == null) {
-			return;
+	private Integer[] getProcessList() {
+		processList.clear();
+		if (streamsProxy != null) {
+			try {
+				streamsProxy.write(DLE+"$p"); //$NON-NLS-1$
+			} catch (IOException e) {
+				Activator.logError("Get terminal process list failed.", e); //$NON-NLS-1$
+				return null;
+			}
+			synchronized (processList) {
+				if (processList.isEmpty()) {
+					try {
+						processList.wait(PROCESS_LIST_TIMEOUT);
+					} catch (InterruptedException e) {
+					}
+				}
+				return processList.toArray(new Integer[processList.size()]);
+			}
 		}
-		try {
-			streamsProxy.write(DLE+"$p"); //$NON-NLS-1$
-		} catch (IOException e) {
-			Activator.logError("Get terminal process list failed.", e); //$NON-NLS-1$
-		}				
+		return null;
 	}
 	
 	/* (non-Javadoc)
@@ -282,12 +299,60 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 	}
 	
 	private void processCommandResponse(String response) {
-		System.out.println(">>> "+response);
+		if (response.startsWith(DLE+"$") && response.endsWith("p")) { //$NON-NLS-1$ //$NON-NLS-2$
+			synchronized (processList) {
+				processList.notifyAll();
+				processList.clear();
+				response = response.substring(2, response.length()-1);
+				for (String pid : response.split(",")) {
+					try {
+						processList.add(Integer.parseInt(pid));
+					} catch (NumberFormatException ignore) {
+					}
+				}
+			}
+		} else {
+			Activator.logWarning("LocalTerminalConnector:UNKNOWN COMMAND RESPONSE: "+response); //$NON-NLS-1$
+		}
 	}
 
 	public List<String> getRunningProcesses() {
 		List<String> processes = new ArrayList<String>();
-		processes.add("bash");
+		Integer[] list = getProcessList();
+		if (list != null && list.length > 0) {
+			Map<Integer, String> map = new HashMap<Integer, String>();
+			for (ProcessItem i : PlatformUtil.getRunningProcesses()) {
+				map.put(i.getPid(), i.getExecutableName());
+			}
+			if (Platform.OS_WIN32.equals(Platform.getOS())) {
+				String processName = map.get(list[0]);
+				Map<String, String> env = ShellExecutable.getEnvironment();
+				if (env != null && processName != null && processName.equals(env.get("COMSPEC"))) { //$NON-NLS-1$
+					map.remove(list[0]);
+				}
+			}
+			for (int pid : list) {
+				String processName = map.get(pid);
+				if (processName != null) {
+					if (Platform.OS_WIN32.equals(Platform.getOS())) {
+						processName = Path.fromOSString(processName).removeFileExtension().lastSegment();
+					} else {
+						if (processName.startsWith("-")) { //$NON-NLS-1$
+							processName = processName.substring(1);
+						}
+						int index = processName.indexOf(' ');
+						if (index > 0) {
+							processName = processName.substring(0, index);
+						}
+						index = processName.lastIndexOf('/');
+						if (index != -1) {
+							processName = processName.substring(index+1, processName.length());
+						}
+					}
+					processes.add(processName);
+				}
+			}
+		}
 		return processes;
 	}
 

@@ -256,7 +256,7 @@ public class Theme
 		save();
 	}
 
-	private Properties toProps()
+	public Properties toProps()
 	{
 		Properties props = new Properties();
 		props.put(THEME_NAME_PROP_KEY, getName());

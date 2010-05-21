@@ -99,14 +99,6 @@
          unpack="false"/>
 
    <plugin
-         id="com.aptana.util.tests"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
          id="com.aptana.editor.css.tests"
          download-size="0"
          install-size="0"
@@ -215,6 +207,21 @@
 
    <plugin
          id="com.aptana.testing.utils"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.core.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.kohsuke.junit"
          download-size="0"
          install-size="0"
          version="0.0.0"
