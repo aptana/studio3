@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2007 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -17,7 +17,7 @@
  * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  * 
  * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
+ * with certain Eclipse Public Licensed code and certain additional terms
  * pursuant to Section 7 of the GPL. You may view the exception and these
  * terms on the web at http://www.aptana.com/legal/gpl/.
  * 
@@ -34,38 +34,26 @@
  */
 package com.aptana.core;
 
-import org.eclipse.osgi.util.NLS;
-
 /**
- * Messages class for internationalization
+ * Interface for an object that logs to an ILogger
  * 
- * @author Ingo Muschenetz
+ * @author Kevin Sawicki (ksawicki@aptana.com)
  */
-public final class Messages extends NLS
+public interface ILoggable
 {
-	private static final String BUNDLE_NAME = "com.aptana.core.messages"; //$NON-NLS-1$
 
-	private Messages()
-	{
-	}
+	/**
+	 * Sets the logger to use for this object
+	 * 
+	 * @param logger
+	 */
+	void setLogger(ILogger logger);
 
-	static
-	{
-		// initialize resource bundle
-		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
-	}
-
-	public static String CoreStrings_Add;
-	public static String CoreStrings_Browse;
-	public static String CoreStrings_Delete;
-	public static String CoreStrings_Edit;
-	public static String CoreStrings_New;
-	public static String CoreStrings_Open;
-	public static String CoreStrings_Properties;
-	public static String CoreStrings_Refresh;
-	public static String CoreStrings_Remove;
-	public static String CoreStrings_Rename;
-	public static String CoreStrings_Continue;
-	public static String CoreStrings_Cancel;
+	/**
+	 * Gets the logger this object is currently loggin to
+	 * 
+	 * @return - logger
+	 */
+	ILogger getLogger();
 
 }

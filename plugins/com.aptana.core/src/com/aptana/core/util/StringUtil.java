@@ -2,6 +2,7 @@ package com.aptana.core.util;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,11 @@ import com.aptana.core.CorePlugin;
 
 public abstract class StringUtil
 {
+	/**
+	 * EMPTY
+	 */
+	public static final String EMPTY = ""; //$NON-NLS-1$
+
 	/**
 	 * Create a string by concatenating the elements of a string array using a delimited between each item
 	 * 
@@ -234,4 +240,65 @@ public abstract class StringUtil
 	{
 		return (s1 == null) ? (s2 == null) : (s2 != null) ? s1.equals(s2) : false;
 	}
+	
+	/**
+	 * Formats the string with replacement values
+	 * 
+	 * @param str
+	 * @param replacement
+	 * @return String
+	 */
+	public static String format(String str, long replacement)
+	{
+		return MessageFormat.format(str, new Object[] { Long.toString(replacement) });
+	}
+
+	/**
+	 * Formats the string with replacement values
+	 * 
+	 * @param str
+	 * @param replacement
+	 * @return String
+	 */
+	public static String format(String str, int replacement)
+	{
+		return MessageFormat.format(str, new Object[] { Integer.toString(replacement) });
+	}
+
+	/**
+	 * Formats the string with replacement values
+	 * 
+	 * @param str
+	 * @param replacement
+	 * @return String
+	 */
+	public static String format(String str, String replacement)
+	{
+		return MessageFormat.format(str, new Object[] { replacement });
+	}
+
+	/**
+	 * Formats the string with replacement values
+	 * 
+	 * @param str
+	 * @param replacement
+	 * @return String
+	 */
+	public static String format(String str, Object replacement)
+	{
+		return MessageFormat.format(str, new Object[] { replacement.toString() });
+	}
+
+	/**
+	 * Formats the string with replacement values
+	 * 
+	 * @param str
+	 * @param replacements
+	 * @return String
+	 */
+	public static String format(String str, Object[] replacements)
+	{
+		return MessageFormat.format(str, replacements);
+	}
+
 }
