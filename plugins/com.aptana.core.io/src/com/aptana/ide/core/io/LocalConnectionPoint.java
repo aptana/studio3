@@ -38,13 +38,13 @@ package com.aptana.ide.core.io;
 import java.io.File;
 import java.net.URI;
 
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.epl.IMemento;
-import com.aptana.ide.core.io.efs.LocalFile;
 
 /**
  * @author Max Stepanov
@@ -99,10 +99,9 @@ public class LocalConnectionPoint extends ConnectionPoint {
 	/* (non-Javadoc)
 	 * @see com.aptana.ide.core.io.ConnectionPoint#getRootURI()
 	 */
-	@SuppressWarnings("restriction")
 	@Override
 	public URI getRootURI() {
-		return (new LocalFile(path.toFile())).toURI();
+		return (EFS.getLocalFileSystem().fromLocalFile(path.toFile())).toURI();
 	}
 
 	/* (non-Javadoc)
@@ -110,7 +109,7 @@ public class LocalConnectionPoint extends ConnectionPoint {
 	 */
 	@Override
 	public IFileStore getRoot() throws CoreException {
-		return new LocalFile(path.toFile());
+		return EFS.getLocalFileSystem().fromLocalFile(path.toFile());
 	}
 
     /* (non-Javadoc)
