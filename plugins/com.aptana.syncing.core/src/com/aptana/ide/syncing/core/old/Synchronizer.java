@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.syncing.core;
+package com.aptana.ide.syncing.core.old;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,10 +59,8 @@ import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.efs.EFSUtils;
-import com.aptana.ide.core.io.syncing.SyncState;
-import com.aptana.ide.core.io.syncing.VirtualFileSyncPair;
 import com.aptana.ide.core.io.vfs.IExtendedFileStore;
-import com.aptana.ide.syncing.core.events.ISyncEventHandler;
+import com.aptana.ide.syncing.core.SyncingPlugin;
 
 /**
  * @author Kevin Lindsey

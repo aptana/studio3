@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.syncing.ui.views;
+package com.aptana.ide.syncing.core.old;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,9 +43,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.core.runtime.IPath;
-
-import com.aptana.ide.core.io.syncing.SyncState;
-import com.aptana.ide.core.io.syncing.VirtualFileSyncPair;
 
 /**
  * @author Kevin Sawicki (ksawicki@aptana.com)

@@ -32,10 +32,9 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.syncing.ui.views;
+package com.aptana.ide.syncing.core.old;
 
 import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.core.io.syncing.VirtualFileSyncPair;
 
 /**
  * @author Kevin Sawicki (ksawicki@aptana.com)

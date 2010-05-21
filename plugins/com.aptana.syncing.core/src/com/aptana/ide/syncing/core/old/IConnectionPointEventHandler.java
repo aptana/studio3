@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.core.io.syncing;
+package com.aptana.ide.syncing.core.old;
 
 import com.aptana.ide.core.io.IConnectionPoint;
 

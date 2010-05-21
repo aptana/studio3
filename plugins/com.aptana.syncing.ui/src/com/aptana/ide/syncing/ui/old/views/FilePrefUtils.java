@@ -32,9 +32,9 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.syncing.ui.views;
+package com.aptana.ide.syncing.ui.old.views;
 
-import com.aptana.ide.filesystem.ftp.Policy;
+import com.aptana.filesystem.ftp.Policy;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants;
 

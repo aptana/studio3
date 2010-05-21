@@ -32,11 +32,11 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.syncing.ui.handlers;
+package com.aptana.ide.syncing.core.old.handlers;
 
 import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.core.io.syncing.VirtualFileSyncPair;
-import com.aptana.ide.syncing.core.events.ISyncEventHandler;
+import com.aptana.ide.syncing.core.old.ISyncEventHandler;
+import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
 
 /**
  * @author Kevin Sawicki (ksawicki@aptana.com)

@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2008 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -32,29 +32,99 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.syncing.core;
+package com.aptana.ide.syncing.core.old;
 
 import org.eclipse.osgi.util.NLS;
 
 /**
  * Messages
  */
-public final class Messages extends NLS {
+public final class Messages extends NLS
+{
+	private static final String BUNDLE_NAME = "com.aptana.ide.syncing.core.old.messages"; //$NON-NLS-1$
 
-	private static final String BUNDLE_NAME = "com.aptana.ide.syncing.core.messages"; //$NON-NLS-1$
+	/**
+	 * Synchronizer_BeginningDownload
+	 */
+	public static String Synchronizer_BeginningDownload;
 
-	public static String NaturePropertyTester_ERR_WhileTestingProjectNature;
+	/**
+	 * Synchronizer_BeginningFullSync
+	 */
+	public static String Synchronizer_BeginningFullSync;
 
-	public static String SiteConnection_LBL_NoDestination;
-	public static String SiteConnection_LBL_NoSource;
+	/**
+	 * Synchronizer_BeginningUpload
+	 */
+	public static String Synchronizer_BeginningUpload;
 
-	public static String SiteConnectionManager_ERR_FailedToLoadConnections;
+	/**
+	 * Synchronizer_ClientFileManagerCannotBeNull
+	 */
+	public static String Synchronizer_ClientFileManagerCannotBeNull;
 
-	static {
+	/**
+	 * Synchronizer_CreatedDirectory
+	 */
+	public static String Synchronizer_CreatedDirectory;
+
+	/**
+	 * Synchronizer_Downloading
+	 */
+	public static String Synchronizer_Downloading;
+
+	/**
+	 * Synchronizer_Error
+	 */
+	public static String Synchronizer_Error;
+
+	/**
+	 * Synchronizer_ErrorClosingStreams
+	 */
+	public static String Synchronizer_ErrorClosingStreams;
+
+	/**
+	 * Synchronizer_ErrorDuringSync
+	 */
+	public static String Synchronizer_ErrorDuringSync;
+
+	/**
+	 * Synchronizer_ErrorRetrievingCRC
+	 */
+	public static String Synchronizer_ErrorRetrievingCRC;
+
+	/**
+	 * Synchronizer_FileNotContained
+	 */
+	public static String Synchronizer_FileNotContained;
+
+	/**
+	 * Synchronizer_FullSyncCRCMismatches
+	 */
+	public static String Synchronizer_FullSyncCRCMismatches;
+
+	/**
+	 * Synchronizer_ServerFileManagerCannotBeNull
+	 */
+	public static String Synchronizer_ServerFileManagerCannotBeNull;
+
+	/**
+	 * Synchronizer_Success
+	 */
+	public static String Synchronizer_Success;
+
+	/**
+	 * Synchronizer_Uploading
+	 */
+	public static String Synchronizer_Uploading;
+
+	static
+	{
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
-	private Messages() {
+	private Messages()
+	{
 	}
 }

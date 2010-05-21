@@ -232,7 +232,7 @@
                tooltip="%action.openConnection.tooltip">
          </action>
          <action
-               class="com.aptana.ide.syncing.ui.actions.SiteConnectionSynchronizeAction"
+               class="com.aptana.ide.syncing.ui.old.actions.SiteConnectionSynchronizeAction"
                enablesFor="1"
                icon="icons/full/obj16/sync_both.gif"
                id="com.aptana.ide.syncing.ui.actions.SiteConnectionSynchronizeAction"

@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.syncing.ui.views;
+package com.aptana.ide.syncing.ui.old.views;
 
 import java.net.UnknownHostException;
 import java.text.MessageFormat;
@@ -86,15 +86,20 @@ import org.eclipse.ui.progress.UIJob;
 import com.aptana.core.ILogger;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.efs.EFSUtils;
-import com.aptana.ide.core.io.syncing.ConnectionPointSyncPair;
-import com.aptana.ide.core.io.syncing.SyncState;
-import com.aptana.ide.core.io.syncing.VirtualFileSyncPair;
-import com.aptana.ide.syncing.core.Synchronizer;
-import com.aptana.ide.syncing.core.events.ISyncEventHandler;
-import com.aptana.ide.syncing.ui.SyncingConsole;
+import com.aptana.ide.syncing.core.old.ConnectionPointSyncPair;
+import com.aptana.ide.syncing.core.old.ISyncEventHandler;
+import com.aptana.ide.syncing.core.old.ISyncResource;
+import com.aptana.ide.syncing.core.old.SyncFile;
+import com.aptana.ide.syncing.core.old.SyncFolder;
+import com.aptana.ide.syncing.core.old.SyncJob;
+import com.aptana.ide.syncing.core.old.SyncModelBuilder;
+import com.aptana.ide.syncing.core.old.SyncState;
+import com.aptana.ide.syncing.core.old.Synchronizer;
+import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
+import com.aptana.ide.syncing.core.old.handlers.SyncEventHandlerAdapterWithProgressMonitor;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
-import com.aptana.ide.syncing.ui.handlers.SyncEventHandlerAdapterWithProgressMonitor;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
+import com.aptana.ide.syncing.ui.old.SyncingConsole;
 import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants;
 import com.aptana.ide.ui.io.preferences.PermissionsGroup;
 import com.aptana.ui.SWTUtils;

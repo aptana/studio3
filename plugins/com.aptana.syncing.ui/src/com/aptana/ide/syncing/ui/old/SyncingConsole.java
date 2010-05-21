@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.syncing.ui;
+package com.aptana.ide.syncing.ui.old;
 
 import java.io.IOException;
 
@@ -41,6 +41,8 @@ import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
+
+import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 
 /**
  * @author Paul Colton

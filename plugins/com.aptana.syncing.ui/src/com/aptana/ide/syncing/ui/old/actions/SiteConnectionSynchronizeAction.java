@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.syncing.ui.actions;
+package com.aptana.ide.syncing.ui.old.actions;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.IAction;
@@ -45,13 +45,12 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
 import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.core.io.syncing.VirtualFileSyncPair;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.SiteConnection;
-import com.aptana.ide.syncing.ui.editors.EditorUtils;
-import com.aptana.ide.syncing.ui.handlers.SyncEventHandlerAdapter;
+import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
+import com.aptana.ide.syncing.core.old.handlers.SyncEventHandlerAdapter;
 import com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection;
-import com.aptana.ide.syncing.ui.views.SmartSyncDialog;
+import com.aptana.ide.syncing.ui.old.views.SmartSyncDialog;
 import com.aptana.ui.UIUtils;
 
 /**

@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.syncing.ui.views;
+package com.aptana.ide.syncing.ui.old.views;
 
 import java.io.File;
 
@@ -72,10 +72,13 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PlatformUI;
 
 import com.aptana.ide.core.io.efs.EFSUtils;
-import com.aptana.ide.core.io.syncing.SyncState;
-import com.aptana.ide.core.io.syncing.VirtualFileSyncPair;
+import com.aptana.ide.syncing.core.old.ISyncResource;
+import com.aptana.ide.syncing.core.old.SyncFile;
+import com.aptana.ide.syncing.core.old.SyncFolder;
+import com.aptana.ide.syncing.core.old.SyncState;
+import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
-import com.aptana.ide.syncing.ui.editors.FileCompareEditorInput;
+import com.aptana.ide.syncing.ui.old.editors.FileCompareEditorInput;
 
 /**
  * @author Kevin Sawicki (ksawicki@aptana.com)

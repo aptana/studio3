@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.syncing.ui.handlers;
+package com.aptana.ide.syncing.core.old.handlers;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,7 +43,7 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 
 import com.aptana.core.util.FileUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.core.io.syncing.VirtualFileSyncPair;
+import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
 
 /**
  * @author Max Stepanov (mstepanov@aptana.com)

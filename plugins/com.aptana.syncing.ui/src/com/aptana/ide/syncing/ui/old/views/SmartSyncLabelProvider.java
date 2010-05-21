@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.syncing.ui.views;
+package com.aptana.ide.syncing.ui.old.views;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -47,8 +47,11 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
-import com.aptana.ide.core.io.syncing.SyncState;
-import com.aptana.ide.core.io.syncing.VirtualFileSyncPair;
+import com.aptana.ide.syncing.core.old.ISyncResource;
+import com.aptana.ide.syncing.core.old.SyncFile;
+import com.aptana.ide.syncing.core.old.SyncFolder;
+import com.aptana.ide.syncing.core.old.SyncState;
+import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 
 /**

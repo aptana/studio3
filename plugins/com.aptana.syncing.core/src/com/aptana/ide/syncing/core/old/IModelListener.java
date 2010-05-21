@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.syncing.ui;
+package com.aptana.ide.syncing.core.old;
 
 /**
  * Simple listener interface for an object to be able to be notified when a model object changes.

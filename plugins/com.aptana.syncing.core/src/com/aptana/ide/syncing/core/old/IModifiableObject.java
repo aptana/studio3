@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.syncing.ui;
+package com.aptana.ide.syncing.core.old;
 
 /**
  * @author Kevin Sawicki (ksawicki@aptana.com)

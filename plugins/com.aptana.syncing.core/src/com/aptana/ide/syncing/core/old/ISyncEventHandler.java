@@ -32,10 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.syncing.core.events;
-
-import com.aptana.ide.core.io.syncing.IConnectionPointEventHandler;
-import com.aptana.ide.core.io.syncing.VirtualFileSyncPair;
+package com.aptana.ide.syncing.core.old;
 
 /**
  * @author Kevin Lindsey

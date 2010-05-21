@@ -74,18 +74,19 @@ import org.eclipse.ui.PlatformUI;
 import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.core.io.syncing.VirtualFileSyncPair;
 import com.aptana.ide.syncing.core.DefaultSiteConnection;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.SiteConnection;
 import com.aptana.ide.syncing.core.SyncingPlugin;
 import com.aptana.ide.syncing.core.events.ISiteConnectionListener;
 import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
+import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
+import com.aptana.ide.syncing.core.old.handlers.SyncEventHandlerAdapter;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 import com.aptana.ide.syncing.ui.dialogs.SiteConnectionsEditorDialog;
 import com.aptana.ide.syncing.ui.editors.EditorUtils;
-import com.aptana.ide.syncing.ui.handlers.SyncEventHandlerAdapter;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
+import com.aptana.ide.syncing.ui.old.views.SmartSyncDialog;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.actions.CopyFilesOperation;
 import com.aptana.ui.UIUtils;
@@ -442,8 +443,7 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
         IFileStore sourceStore = SyncUtils.getFileStore(fSource.getCurrentInput());
         IFileStore targetStore = SyncUtils.getFileStore(fTarget.getCurrentInput());
 
-        SmartSyncDialog dialog;
-		dialog = new SmartSyncDialog(UIUtils.getActiveShell(), source, dest, sourceStore, targetStore,
+        SmartSyncDialog dialog = new SmartSyncDialog(UIUtils.getActiveShell(), source, dest, sourceStore, targetStore,
 				source.getName(), dest.getName());
 		dialog.open();
 		dialog.setHandler(new SyncEventHandlerAdapter()
