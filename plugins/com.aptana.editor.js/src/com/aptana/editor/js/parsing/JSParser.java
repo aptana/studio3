@@ -23,7 +23,7 @@ import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSPostUnaryOperatorNode;
 import com.aptana.editor.js.parsing.ast.JSPrimitiveNode;
 import com.aptana.editor.js.parsing.ast.JSUnaryOperatorNode;
-import com.aptana.editor.js.parsing.lexer.JSTokens;
+import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.IRecoveryStrategy;
@@ -2046,7 +2046,7 @@ public class JSParser extends Parser implements IParser {
 				{
 					boolean result = false;
 	
-					Symbol term = new Symbol(JSTokens.SEMICOLON, token.getStart(), token.getStart() - 1, ";");
+					Symbol term = new Symbol(JSTokenType.SEMICOLON.getIndex(), token.getStart(), token.getStart() - 1, ";");
 					Simulator sim = new Simulator();
 	
 					in.alloc(2);
@@ -2072,10 +2072,10 @@ public class JSParser extends Parser implements IParser {
 					int type = lastSymbol.getId();
 					boolean result = false;
 	
-					if (type == JSTokens.DOT || type == JSTokens.NEW)
+					if (type == JSTokenType.DOT.getIndex() || type == JSTokenType.NEW.getIndex())
 					{
-						Symbol term1 = new Symbol(JSTokens.IDENTIFIER, token.getStart(), token.getStart() - 1, "");
-						Symbol term2 = new Symbol(JSTokens.SEMICOLON, token.getStart(), token.getStart() - 1, ";");
+						Symbol term1 = new Symbol(JSTokenType.IDENTIFIER.getIndex(), token.getStart(), token.getStart() - 1, "");
+						Symbol term2 = new Symbol(JSTokenType.SEMICOLON.getIndex(), token.getStart(), token.getStart() - 1, ";");
 	
 						Simulator sim = new Simulator();
 	
@@ -2110,9 +2110,9 @@ public class JSParser extends Parser implements IParser {
 						Symbol symbol1 = _symbols[top - 2];
 						Symbol symbol2 = _symbols[top - 1];
 						                          
-						if (lastSymbol.getId() == JSTokens.COMMA && symbol2.value instanceof List<?> && symbol1.getId() == JSTokens.LPAREN)
+						if (lastSymbol.getId() == JSTokenType.COMMA.getIndex() && symbol2.value instanceof List<?> && symbol1.getId() == JSTokenType.LPAREN.getIndex())
 						{
-							Symbol term = new Symbol(JSTokens.IDENTIFIER, token.getStart(), token.getStart() - 1, "");
+							Symbol term = new Symbol(JSTokenType.IDENTIFIER.getIndex(), token.getStart(), token.getStart() - 1, "");
 							Simulator sim = new Simulator();
 							
 							in.alloc(2);

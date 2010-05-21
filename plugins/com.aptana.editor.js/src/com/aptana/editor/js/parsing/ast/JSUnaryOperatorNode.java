@@ -1,6 +1,6 @@
 package com.aptana.editor.js.parsing.ast;
 
-import com.aptana.editor.js.parsing.lexer.JSTokens;
+import com.aptana.editor.js.parsing.lexer.JSTokenType;
 
 public class JSUnaryOperatorNode extends JSNode
 {
@@ -16,34 +16,34 @@ public class JSUnaryOperatorNode extends JSNode
 		this(expression, start, end);
 
 		short type = DEFAULT_TYPE;
-		short token = JSTokens.getToken(operator);
+		JSTokenType token = JSTokenType.get(operator);
 		switch (token)
 		{
-			case JSTokens.DELETE:
+			case DELETE:
 				type = JSNodeTypes.DELETE;
 				break;
-			case JSTokens.EXCLAMATION:
+			case EXCLAMATION:
 				type = JSNodeTypes.LOGICAL_NOT;
 				break;
-			case JSTokens.MINUS:
+			case MINUS:
 				type = JSNodeTypes.NEGATIVE;
 				break;
-			case JSTokens.MINUS_MINUS:
+			case MINUS_MINUS:
 				type = JSNodeTypes.PRE_DECREMENT;
 				break;
-			case JSTokens.PLUS:
+			case PLUS:
 				type = JSNodeTypes.POSITIVE;
 				break;
-			case JSTokens.PLUS_PLUS:
+			case PLUS_PLUS:
 				type = JSNodeTypes.PRE_INCREMENT;
 				break;
-			case JSTokens.TILDE:
+			case TILDE:
 				type = JSNodeTypes.BITWISE_NOT;
 				break;
-			case JSTokens.TYPEOF:
+			case TYPEOF:
 				type = JSNodeTypes.TYPEOF;
 				break;
-			case JSTokens.VOID:
+			case VOID:
 				type = JSNodeTypes.VOID;
 				break;
 		}

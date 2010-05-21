@@ -21,10 +21,10 @@ import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.js.Activator;
-import com.aptana.editor.js.JSScopeScanner;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
+import com.aptana.editor.js.parsing.JSTokenScanner;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.index.core.Index;
@@ -375,11 +375,11 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		
 		if (this._currentNode != null)
 		{
-			result = new JSLexemeProvider(document, this._currentNode, new JSScopeScanner());
+			result = new JSLexemeProvider(document, this._currentNode, new JSTokenScanner());
 		}
 		else
 		{
-			result = new JSLexemeProvider(document, offset, new JSScopeScanner());
+			result = new JSLexemeProvider(document, offset, new JSTokenScanner());
 		}
 		
 		return result;
@@ -479,7 +479,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				index = candidateIndex;
 			}
-			else if (lexeme.getType() == JSTokenType.OPERATOR)
+			else if (lexeme.getType() == JSTokenType.NEW)
 			{
 				index = candidateIndex;
 			}
@@ -495,7 +495,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					result = Location.IN_PROPERTY_NAME;
 					break;
 					
-				case OPERATOR:
+				case NEW:
 					if ("new".equals(lexeme.getText()))
 					{
 						result = Location.IN_CONSTRUCTOR;
@@ -514,7 +514,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 						
 						switch (previousLexeme.getType())
 						{
-							case SOURCE:
+							case IDENTIFIER:
 								result = Location.IN_VARIABLE_NAME;
 								break;
 								
@@ -524,24 +524,21 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					}
 					break;
 					
-				case PARENTHESIS:
-					if ("(".equals(lexeme.getText()))
+				case LPAREN:
+					if (offset == lexeme.getEndingOffset())
 					{
-						if (offset == lexeme.getEndingOffset())
-						{
-							result = Location.IN_GLOBAL;
-						}
-					}
-					else
-					{
-						if (offset == lexeme.getStartingOffset())
-						{
-							result = Location.IN_GLOBAL;
-						}
+						result = Location.IN_GLOBAL;
 					}
 					break;
 					
-				case SOURCE:
+				case RPAREN:
+					if (offset == lexeme.getStartingOffset())
+					{
+						result = Location.IN_GLOBAL;
+					}
+					break;
+					
+				case IDENTIFIER:
 					if (index > 0)
 					{
 						Lexeme<JSTokenType> previousLexeme = lexemeProvider.getLexeme(index - 1);

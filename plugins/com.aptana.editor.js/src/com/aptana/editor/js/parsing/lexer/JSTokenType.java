@@ -8,80 +8,163 @@ import com.aptana.parsing.lexer.ITypePredicate;
 
 public enum JSTokenType implements ITypePredicate
 {
-	UNDEFINED("undefined.js"), //$NON-NLS-1$
-	KEYWORD("keyword.operator.js"), //$NON-NLS-1$
-	SUPPORT_FUNCTION("support.function.js"), //$NON-NLS-1$
-	EVENT_HANDLER_FUNCTION("support.function.event-handler.js"), //$NON-NLS-1$
-	DOM_FUNCTION("support.function.dom.js"), //$NON-NLS-1$
-	FIREBUG_FUNCTION("support.function.js.firebug"), //$NON-NLS-1$
-	OPERATOR("keyword.operator.js"), //$NON-NLS-1$
-	SUPPORT_CONSTANT("support.constant.js"), //$NON-NLS-1$
-	DOM_CONSTANTS("support.constant.dom.js"), //$NON-NLS-1$
-	SOURCE("source.js"), //$NON-NLS-1$
-	CONTROL_KEYWORD("keyword.control.js"), //$NON-NLS-1$
-	STORAGE_TYPE("storage.type.js"), //$NON-NLS-1$
-	STORAGE_MODIFIER("storage.modifier.js"), //$NON-NLS-1$
-	SUPPORT_CLASS("support.class.js"), //$NON-NLS-1$
-	SUPPORT_DOM_CONSTANT("support.constant.dom.js"), //$NON-NLS-1$
-	TRUE("constant.language.boolean.true.js"), //$NON-NLS-1$
-	FALSE("constant.language.boolean.false.js"), //$NON-NLS-1$
-	NULL("constant.language.null.js"), //$NON-NLS-1$
-	CONSTANT("constant.language.js"), //$NON-NLS-1$
-	VARIABLE("variable.language.js"), //$NON-NLS-1$
-	OTHER_KEYWORD("keyword.other.js"), //$NON-NLS-1$
-	SEMICOLON("punctuation.terminator.statement.js"), //$NON-NLS-1$
-	PARENTHESIS("meta.brace.round.js"), //$NON-NLS-1$
-	BRACKET("meta.brace.square.js"), //$NON-NLS-1$
-	CURLY_BRACE("meta.brace.curly.js"), //$NON-NLS-1$
-	COMMA("meta.delimiter.object.comma.js"), //$NON-NLS-1$
-	NUMBER("constant.numeric.js"), //$NON-NLS-1$
-	DOT("operator.dot.js"); //$NON-NLS-1$
+	UNDEFINED("UNDEFINED"),
+	EOF("EOF"),
+	LPAREN("("),
+	IDENTIFIER("IDENTIFIER"),
+	LCURLY("{"),
+	LBRACKET("["),
+	PLUS_PLUS("++"),
+	MINUS_MINUS("--"),
+	STRING("STRING"),
+	NUMBER("NUMBER"),
+	MINUS("-"),
+	PLUS("+"),
+	FUNCTION("function"),
+	THIS("this"),
+	NEW("new"),
+	NULL("null"),
+	TRUE("true"),
+	FALSE("false"),
+	REGEX("REGEX"),
+	DELETE("delete"),
+	EXCLAMATION("!"),
+	TILDE("~"),
+	TYPEOF("typeof"),
+	VOID("void"),
+	SEMICOLON(";"),
+	COMMA(","),
+	VAR("var"),
+	WHILE("while"),
+	FOR("for"),
+	DO("do"),
+	SWITCH("switch"),
+	IF("if"),
+	CONTINUE("continue"),
+	BREAK("break"),
+	WITH("with"),
+	RETURN("return"),
+	THROW("throw"),
+	TRY("try"),
+	RPAREN(")"),
+	ELSE("else"),
+	RCURLY("}"),
+	COLON(":"),
+	RBRACKET("]"),
+	IN("in"),
+	EQUAL("="),
+	CASE("case"),
+	DOT("."),
+	LESS_LESS("<<"),
+	GREATER_GREATER(">>"),
+	GREATER_GREATER_GREATER(">>>"),
+	LESS("<"),
+	GREATER(">"),
+	LESS_EQUAL("<="),
+	GREATER_EQUAL(">="),
+	INSTANCEOF("instanceof"),
+	EQUAL_EQUAL("=="),
+	EXCLAMATION_EQUAL("!="),
+	EQUAL_EQUAL_EQUAL("==="),
+	EXCLAMATION_EQUAL_EQUAL("!=="),
+	AMPERSAND("&"),
+	CARET("^"),
+	PIPE("|"),
+	AMPERSAND_AMPERSAND("&&"),
+	STAR_EQUAL("*="),
+	FORWARD_SLASH_EQUAL("/="),
+	PERCENT_EQUAL("%="),
+	PLUS_EQUAL("+="),
+	MINUS_EQUAL("-="),
+	LESS_LESS_EQUAL("<<="),
+	GREATER_GREATER_EQUAL(">>="),
+	GREATER_GREATER_GREATER_EQUAL(">>>="),
+	AMPERSAND_EQUAL("&="),
+	CARET_EQUAL("^="),
+	PIPE_EQUAL("|="),
+	STAR("*"),
+	FORWARD_SLASH("/"),
+	PERCENT("%"),
+	QUESTION("?"),
+	PIPE_PIPE("||"),
+	DEFAULT("default"),
+	FINALLY("finally"),
+	CATCH("catch"),
+	SINGLELINE_COMMENT("SINGLELINE_COMMENT"),
+	MULTILINE_COMMENT("MULTILINE_COMMENT"),
+	DOC("DOC");
 
-	private static final Map<String, JSTokenType> NAME_MAP;
-	private String _scope;
+	private static Map<String, JSTokenType> NAME_MAP;
+	
+	private String _name;
+	private short _index;
 
 	/**
 	 * static
 	 */
 	static
 	{
+		short index = -1;
+		
+		for (JSTokenType type : EnumSet.allOf(JSTokenType.class))
+		{
+			type._index = index++;
+		}
+		
 		NAME_MAP = new HashMap<String, JSTokenType>();
 
 		for (JSTokenType type : EnumSet.allOf(JSTokenType.class))
 		{
-			NAME_MAP.put(type.getScope(), type);
+			NAME_MAP.put(type.getName(), type);
 		}
-	}
-
-	/**
-	 * get
-	 * 
-	 * @param scope
-	 * @return
-	 */
-	public static final JSTokenType get(String scope)
-	{
-		return (NAME_MAP.containsKey(scope)) ? NAME_MAP.get(scope) : UNDEFINED;
 	}
 
 	/**
 	 * CSSTokenTypes
 	 * 
-	 * @param scope
+	 * @param name
 	 */
-	private JSTokenType(String scope)
+	private JSTokenType(String name)
 	{
-		this._scope = scope;
+		this._name = name;
 	}
 
+	/**
+	 * get
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public static JSTokenType get(String name)
+	{
+		JSTokenType result = UNDEFINED;
+		
+		if (NAME_MAP.containsKey(name))
+		{
+			result = NAME_MAP.get(name);
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * getIndex
+	 * 
+	 * @return
+	 */
+	public short getIndex()
+	{
+		return this._index;
+	}
+	
 	/**
 	 * getName
 	 * 
 	 * @return
 	 */
-	public String getScope()
+	public String getName()
 	{
-		return this._scope;
+		return this._name;
 	}
 
 	/*
@@ -99,6 +182,6 @@ public enum JSTokenType implements ITypePredicate
 	 */
 	public String toString()
 	{
-		return this.getScope();
+		return this.getName();
 	}
 }
