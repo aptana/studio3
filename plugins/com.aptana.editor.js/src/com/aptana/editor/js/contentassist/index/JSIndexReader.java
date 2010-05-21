@@ -145,10 +145,13 @@ public class JSIndexReader
 					p.addType(returnType);
 				}
 				
-				for (String userAgentKey : columns[column++].split(JSIndexConstants.SUB_DELIMITER))
+				if (column < columns.length)
 				{
-					// get user agent and add to element
-					p.addUserAgent(this.getUserAgent(index, userAgentKey));
+					for (String userAgentKey : columns[column++].split(JSIndexConstants.SUB_DELIMITER))
+					{
+						// get user agent and add to element
+						p.addUserAgent(this.getUserAgent(index, userAgentKey));
+					}
 				}
 
 				result.add(p);
