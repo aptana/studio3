@@ -10,7 +10,9 @@ public class AllTests
 	{
 		TestSuite suite = new TestSuite(AllTests.class.getName());
 		// $JUnit-BEGIN$
-		suite.addTestSuite(SyncingTest.class);
+		suite.addTestSuite(LocalSyncingTests.class);
+		suite.addTestSuite(FTPSyncingTests.class);
+		suite.addTestSuite(SFTPSyncingTests.class);
 		// $JUnit-END$
 		return suite;
 	}
