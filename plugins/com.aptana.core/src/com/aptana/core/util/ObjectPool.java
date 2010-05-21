@@ -100,7 +100,7 @@ public abstract class ObjectPool<T> implements IObjectPool<T>
 	/* (non-Javadoc)
 	 * @see com.aptana.core.util.IObjectPool#cleanup()
 	 */
-	public synchronized void cleanup()
+	public synchronized void dispose()
 	{
 		for (T t : unlocked.keySet())
 		{

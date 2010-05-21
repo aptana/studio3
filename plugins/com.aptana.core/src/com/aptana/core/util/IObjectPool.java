@@ -13,6 +13,6 @@ public interface IObjectPool<T>
 
 	public abstract void checkIn(T t);
 
-	public abstract void cleanup();
+	public abstract void dispose();
 
 }
