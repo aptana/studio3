@@ -43,6 +43,7 @@ import java.util.List;
 
 import javax.swing.filechooser.FileSystemView;
 
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -50,7 +51,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.PlatformObject;
 
 import com.aptana.core.util.PlatformUtil;
-import com.aptana.ide.core.io.efs.LocalFile;
 
 /**
  * @author Max Stepanov
@@ -86,16 +86,15 @@ public final class LocalRoot extends PlatformObject {
 	/* (non-Javadoc)
 	 * @see com.aptana.ide.core.io.IConnectionPoint#getRootURI()
 	 */
-	@SuppressWarnings("restriction")
 	public URI getRootURI() {
-		return (new LocalFile(root)).toURI();
+		return (EFS.getLocalFileSystem().fromLocalFile(root)).toURI();
 	}
 
 	/* (non-Javadoc)
 	 * @see com.aptana.ide.core.io.IConnectionPoint#getRoot()
 	 */
 	public IFileStore getRoot() {
-		return new LocalFile(root);
+		return EFS.getLocalFileSystem().fromLocalFile(root);
 	}
 
 	/* (non-Javadoc)
