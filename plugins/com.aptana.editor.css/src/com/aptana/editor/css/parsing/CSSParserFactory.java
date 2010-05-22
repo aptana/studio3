@@ -7,8 +7,6 @@ public class CSSParserFactory
 
 	private static CSSParserFactory fInstance;
 
-	private IParser fParser;
-
 	public static CSSParserFactory getInstance()
 	{
 		if (fInstance == null)
@@ -22,11 +20,10 @@ public class CSSParserFactory
 	public IParser getParser()
 	{
 		// TODO Use an object pool! parsers are expensive to instantiate and re-using same instance makes us queue up because of sync lock
-		return fParser;
+		return new CSSParser();
 	}
 
 	private CSSParserFactory()
 	{
-		fParser = new CSSParser();
 	}
 }

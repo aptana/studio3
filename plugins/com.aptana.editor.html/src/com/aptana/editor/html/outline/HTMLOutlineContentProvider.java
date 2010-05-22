@@ -18,17 +18,17 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.PlatformUI;
 
+import com.aptana.editor.common.IParserPool;
+import com.aptana.editor.common.ParserPoolFactory;
 import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CompositeOutlineContentProvider;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
-import com.aptana.editor.css.parsing.CSSParserFactory;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.html.Activator;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
 import com.aptana.editor.js.parsing.IJSParserConstants;
-import com.aptana.editor.js.parsing.JSParserFactory;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ParseState;
@@ -177,15 +177,6 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 		return parser.parse(pState);
 	}
 
-	private IParser getParser(String language)
-	{
-		if (language.equals(IJSParserConstants.LANGUAGE))
-			return JSParserFactory.getInstance().getParser();
-		if (language.equals(ICSSParserConstants.LANGUAGE))
-			return CSSParserFactory.getInstance().getParser();
-		return null;
-	}
-
 	private Object[] getExternalChildren(final Object parent, final String srcPathOrURL, final String language)
 	{
 		Object[] cached;
@@ -221,13 +212,16 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 					{
 						throw new Exception(Messages.HTMLOutlineContentProvider_UnableToResolveFile_Error);
 					}
-					IParser parser = getParser(language);
+					
+					IParserPool pool = ParserPoolFactory.getInstance().getParserPool(language);
+					IParser parser = pool.checkOut();
 					if (parser == null)
 					{
 						throw new Exception(MessageFormat.format(
 								Messages.HTMLOutlineContentProvider_UnableToFindParser_Error, language));
 					}
 					IParseNode node = parse(parser, source);
+					pool.checkIn(parser);
 					sub.worked(90);
 					elements = getChildren(node);
 
