@@ -101,7 +101,7 @@ public final class ConnectionPointUtils {
 	}
 	
 	public static IConnectionPoint findOrCreateLocalConnectionPoint(IPath path) {
-		IConnectionPoint connectionPoint = findConnectionPoint(EFSUtils.getFileStore(path.toFile()).toURI());
+		IConnectionPoint connectionPoint = findConnectionPoint(EFSUtils.getLocalFileStore(path.toFile()).toURI());
 		if (connectionPoint == null) {
 			connectionPoint = ConnectionPointUtils.createLocalConnectionPoint(path);
 		}
