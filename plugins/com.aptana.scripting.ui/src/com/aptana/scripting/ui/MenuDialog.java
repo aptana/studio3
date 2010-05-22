@@ -8,6 +8,8 @@ import java.util.Map;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -24,6 +26,7 @@ import org.eclipse.swt.widgets.TableItem;
 
 public class MenuDialog extends PopupDialog
 {
+	private static final String MNEMONICS = "123456789"; //$NON-NLS-1$
 
 	private static final String TITLE = "title"; //$NON-NLS-1$
 	private static final String SEPARATOR = "separator"; //$NON-NLS-1$
@@ -107,19 +110,33 @@ public class MenuDialog extends PopupDialog
 
 		// Initialize the columns and rows.
 		Map<String, Object> rep = partialMatches.iterator().next();
+		int mnemonic = 0;
+		int index = -1;
 		if (rep.containsKey(TITLE))
 		{
 			// just a list
 			columns.add(new TableColumn(completionsTable, SWT.LEFT, 0));
+			columns.add(new TableColumn(completionsTable, SWT.CENTER, 1));
+
 			for (Map<String, Object> map : partialMatches)
 			{
-				final TableItem item = new TableItem(completionsTable, SWT.NULL);
+				index++;
 				if (map.containsKey(SEPARATOR))
 				{
 					// TODO Insert a separator
 					continue;
 				}
-				item.setText((String) map.get(TITLE));
+				String title = (String) map.get(TITLE);
+				if (title.trim().equals("---")) //$NON-NLS-1$
+				{
+					// TODO Insert a separator
+					continue;
+				}
+				final TableItem item = new TableItem(completionsTable, SWT.NULL);
+				item.setText(0, title);
+				item.setData("mnemonic", mnemonic); //$NON-NLS-1$
+				item.setText(1, mnemonic < MNEMONICS.length() ? String.valueOf(MNEMONICS.charAt(mnemonic++)) : ""); //$NON-NLS-1$
+				item.setData("index", index); //$NON-NLS-1$
 			}
 		}
 		else
@@ -127,14 +144,16 @@ public class MenuDialog extends PopupDialog
 			// image, display, insert, tool_tip
 			columns.add(new TableColumn(completionsTable, SWT.LEFT, 0));
 			columns.add(new TableColumn(completionsTable, SWT.LEFT, 1));
+			columns.add(new TableColumn(completionsTable, SWT.CENTER, 2));
 			for (Map<String, Object> map : partialMatches)
 			{
-				final TableItem item = new TableItem(completionsTable, SWT.NULL);
+				index++;
 				if (map.containsKey(SEPARATOR))
 				{
 					// TODO Insert a separator
 					continue;
 				}
+				final TableItem item = new TableItem(completionsTable, SWT.NULL);
 				String filename = (String) map.get(IMAGE);
 				Image image = null;
 				if (filename != null && filename.trim().length() > 0)
@@ -156,6 +175,9 @@ public class MenuDialog extends PopupDialog
 				}
 
 				item.setText(1, (String) map.get("display")); //$NON-NLS-1$
+				item.setData("mnemonic", mnemonic); //$NON-NLS-1$ // FIXME This is really off by one, but we expect it to be later. Funky code from Sandip. Juts use real value maybe?
+				item.setText(2, (mnemonic < MNEMONICS.length() ? String.valueOf(MNEMONICS.charAt(mnemonic++)) : "")); //$NON-NLS-1$
+				item.setData("index", index); //$NON-NLS-1$
 			}
 		}
 
@@ -164,7 +186,8 @@ public class MenuDialog extends PopupDialog
 		{
 			tableColumn.pack();
 		}
-		// FIXME Need to limit vertical size of list! If we have 100 items we shouldn't let this dialog grow to take up entire vertical space of screen/IDE!
+		// FIXME Need to limit vertical size of list! If we have 100 items we shouldn't let this dialog grow to take up
+		// entire vertical space of screen/IDE!
 
 		/*
 		 * If you double-click on the table, it should execute the selected command.
@@ -174,6 +197,48 @@ public class MenuDialog extends PopupDialog
 			public final void handleEvent(final Event event)
 			{
 				select();
+			}
+		});
+
+		completionsTable.addKeyListener(new KeyListener()
+		{
+			public void keyReleased(KeyEvent e)
+			{
+			}
+
+			public void keyPressed(KeyEvent e)
+			{
+				if (!e.doit)
+				{
+					return;
+				}
+				int index = MNEMONICS.indexOf(e.character);
+				if (index != -1)
+				{
+					if (index < completionsTable.getItemCount())
+					{
+						e.doit = false;
+						// I need to return the index of the item as it was in partialMatches!
+						int returnCode = index;
+						for (TableItem item : completionsTable.getItems())
+						{
+							Object data = item.getData("mnemonic"); //$NON-NLS-1$
+							if (data instanceof Integer)
+							{
+								Integer value = (Integer) data;
+								if (value == index) // does mnemonic match?
+								{
+									// OK We found the table item that was assigned this mnemonic, now we need to find
+									// it's index in partialMatches!
+									returnCode = (Integer) item.getData("index"); //$NON-NLS-1$
+									break;
+								}
+							}
+						}
+						setReturnCode(returnCode);
+						close();
+					}
+				}
 			}
 		});
 	}
