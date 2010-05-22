@@ -10,7 +10,9 @@ import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -23,6 +25,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.ui.PlatformUI;
 
 public class MenuDialog extends PopupDialog
 {
@@ -68,6 +71,22 @@ public class MenuDialog extends PopupDialog
 			createTableDialogArea(composite, menuItems);
 		}
 		return composite;
+	}
+	
+	@Override
+	protected Point getInitialLocation(Point initialSize)
+	{
+		Display display = PlatformUI.getWorkbench().getDisplay();
+		if (display != null && !display.isDisposed())
+		{
+			return display.getCursorLocation();
+		}
+		return super.getInitialLocation(initialSize);
+	}
+	
+	protected Color getBackground()
+	{
+		return getShell().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
 	}
 
 	/**
