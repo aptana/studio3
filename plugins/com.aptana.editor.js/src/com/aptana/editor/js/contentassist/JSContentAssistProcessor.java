@@ -25,10 +25,12 @@ import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.parsing.JSTokenScanner;
+import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.ParseRootNode;
 import com.aptana.parsing.lexer.Lexeme;
 
 public class JSContentAssistProcessor extends CommonContentAssistProcessor
@@ -396,10 +398,14 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		IParseNode ast = this.editor.getFileService().getParseResult();
 		IParseNode result = null;
 		
-		// TODO: Limit this to only the node types we're interested in
 		if (ast != null)
 		{
 			IParseNode candidate = ast.getNodeAt(offset);
+			
+			if (candidate == null && offset > ast.getEndingOffset())
+			{
+				candidate = ast.getNodeAt(ast.getEndingOffset());
+			}
 			
 			if (candidate != null)
 			{
@@ -407,28 +413,36 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				{
 					case JSNodeTypes.ARGUMENTS:
 					case JSNodeTypes.CONSTRUCT:
+					case JSNodeTypes.EMPTY:
 					case JSNodeTypes.GET_PROPERTY:
+					case JSNodeTypes.IDENTIFIER:
 					case JSNodeTypes.PARAMETERS:
 					case JSNodeTypes.STATEMENTS:
 						result = candidate;
 						break;
 						
-					default:
+					// assignment nodes
+					case JSNodeTypes.ASSIGN:
+					case JSNodeTypes.ADD_AND_ASSIGN:
+					case JSNodeTypes.ARITHMETIC_SHIFT_RIGHT_AND_ASSIGN:
+					case JSNodeTypes.BITWISE_AND_AND_ASSIGN:
+					case JSNodeTypes.BITWISE_OR_AND_ASSIGN:
+					case JSNodeTypes.BITWISE_XOR_AND_ASSIGN:
+					case JSNodeTypes.DIVIDE_AND_ASSIGN:
+					case JSNodeTypes.MOD_AND_ASSIGN:
+					case JSNodeTypes.MULTIPLY_AND_ASSIGN:
+					case JSNodeTypes.SHIFT_LEFT_AND_ASSIGN:
+					case JSNodeTypes.SHIFT_RIGHT_AND_ASSIGN:
+					case JSNodeTypes.SUBTRACT_AND_ASSIGN:
+						result = candidate;
 						break;
-				}
-			}
-			else
-			{
-				if (offset > ast.getEndingOffset())
-				{
-					candidate = ast.getNodeAt(ast.getEndingOffset());
 					
-					switch (candidate.getType())
-					{
-						case JSNodeTypes.CONSTRUCT:
-							result = ast;
-							break;
-					}
+					default:
+						if (candidate instanceof ParseRootNode)
+						{
+							result = candidate;
+						}
+						break;
 				}
 			}
 		}
@@ -480,18 +494,94 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					result = Location.IN_CONSTRUCTOR;
 					break;
 					
-				case JSNodeTypes.PARAMETERS:
-					result = Location.IN_PARAMETERS;
-					break;
-					
+				case JSNodeTypes.EMPTY:
 				case JSNodeTypes.STATEMENTS:
 					result = Location.IN_GLOBAL;
 					break;
 					
+				case JSNodeTypes.IDENTIFIER:
+					result = Location.IN_GLOBAL;
+					break;
+					
+				case JSNodeTypes.PARAMETERS:
+					result = Location.IN_PARAMETERS;
+					break;
+					
+				// assignment nodes
+				case JSNodeTypes.ASSIGN:
+				case JSNodeTypes.ADD_AND_ASSIGN:
+				case JSNodeTypes.ARITHMETIC_SHIFT_RIGHT_AND_ASSIGN:
+				case JSNodeTypes.BITWISE_AND_AND_ASSIGN:
+				case JSNodeTypes.BITWISE_OR_AND_ASSIGN:
+				case JSNodeTypes.BITWISE_XOR_AND_ASSIGN:
+				case JSNodeTypes.DIVIDE_AND_ASSIGN:
+				case JSNodeTypes.MOD_AND_ASSIGN:
+				case JSNodeTypes.MULTIPLY_AND_ASSIGN:
+				case JSNodeTypes.SHIFT_LEFT_AND_ASSIGN:
+				case JSNodeTypes.SHIFT_RIGHT_AND_ASSIGN:
+				case JSNodeTypes.SUBTRACT_AND_ASSIGN:
+					if (this._currentNode instanceof JSAssignmentNode)
+					{
+						Lexeme<JSTokenType> lexeme = lexemeProvider.getFloorLexeme(offset);
+						
+						if (lexeme != null)
+						{
+							switch (lexeme.getType())
+							{
+								case AMPERSAND_EQUAL:
+								case CARET_EQUAL:
+								case EQUAL:
+								case FORWARD_SLASH_EQUAL:
+								case GREATER_GREATER_EQUAL:
+								case GREATER_GREATER_GREATER_EQUAL:
+								case LESS_LESS_EQUAL:
+								case MINUS_EQUAL:
+								case PERCENT_EQUAL:
+								case PIPE_EQUAL:
+								case PLUS_EQUAL:
+								case STAR_EQUAL:
+									if (offset == lexeme.getStartingOffset())
+									{
+										result = Location.IN_VARIABLE_NAME;
+									}
+									break;
+									
+								case IDENTIFIER:
+									result = Location.IN_VARIABLE_NAME;
+									break;
+									
+								default:
+									break;
+							}
+						}
+					}
+					break;
+					
 				default:
+					if (this._currentNode instanceof ParseRootNode)
+					{
+						Lexeme<JSTokenType> lexeme = lexemeProvider.getFloorLexeme(offset);
+						
+						if (lexeme != null)
+						{
+							switch (lexeme.getType())
+							{
+								case RCURLY:
+								case SEMICOLON:
+									result = Location.IN_GLOBAL;
+									this._currentLexeme = null;
+									break;
+									
+								default:
+									break;
+							}
+						}
+					}
 					break;
 			}
 		}
+		
+		System.out.println("getLocationByAST: " + result);
 		
 		return result;
 	}
