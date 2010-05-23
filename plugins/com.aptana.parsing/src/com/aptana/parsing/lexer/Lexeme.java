@@ -116,7 +116,11 @@ public class Lexeme<T> implements ILexeme
 		StringBuilder buffer = new StringBuilder();
 		String type = this._type.toString();
 
-		buffer.append("[").append(type).append("]~").append(this.getText()).append("~");
+		buffer.append(type);
+		buffer.append(" [");
+		buffer.append(this.getStartingOffset()).append("-").append(this.getEndingOffset());
+		buffer.append(",").append(this.getText());
+		buffer.append("]");
 
 		return buffer.toString();
 	}
