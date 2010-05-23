@@ -17,11 +17,13 @@ import com.aptana.index.core.Index;
 
 public class JSIndexWriter
 {
+	private static Map<UserAgentElement,String> keysByUserAgent = new HashMap<UserAgentElement,String>();
+	static Map<String,UserAgentElement> userAgentsByKey = new HashMap<String,UserAgentElement>();
+	
 	private JSMetadataReader _reader;
 	private int _descriptionCount;
 	private int _parameterCount;
 	private int _returnTypeCount;
-	private Map<UserAgentElement,String> _userAgentKeyMap = new HashMap<UserAgentElement,String>();
 
 	/**
 	 * JSMetadataIndexer
@@ -254,11 +256,11 @@ public class JSIndexWriter
 	 */
 	protected String writeUserAgent(Index index, UserAgentElement userAgent)
 	{
-		String key = this._userAgentKeyMap.get(userAgent);
+		String key = keysByUserAgent.get(userAgent);
 		
 		if (key == null)
 		{
-			key = Integer.toString(this._userAgentKeyMap.size());
+			key = Integer.toString(keysByUserAgent.size());
 			
 			String[] columns = new String[] {
 				key,
@@ -271,7 +273,8 @@ public class JSIndexWriter
 			
 			index.addEntry(JSIndexConstants.USER_AGENT, value, this.getDocumentPath());
 			
-			this._userAgentKeyMap.put(userAgent, key);
+			keysByUserAgent.put(userAgent, key);
+			userAgentsByKey.put(key, userAgent);
 		}
 		
 		return key;
