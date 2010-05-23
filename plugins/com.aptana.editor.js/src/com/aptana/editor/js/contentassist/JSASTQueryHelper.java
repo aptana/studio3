@@ -1,6 +1,7 @@
 package com.aptana.editor.js.contentassist;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,6 +17,22 @@ import com.aptana.parsing.xpath.ParseNodeXPath;
 
 public class JSASTQueryHelper
 {
+	private static XPath SIBLING_VARS;
+	private static XPath ANCESTOR_FUNCTION_VARS;
+	
+	static
+	{
+		try
+		{
+			SIBLING_VARS = new ParseNodeXPath("../statements/var/declaration/identifier[position() = 1]");
+			ANCESTOR_FUNCTION_VARS = new ParseNodeXPath("ancestor::function/statements/var/declaration/identifier[position() = 1]|ancestor::function/parameters/identifier");
+		}
+		catch (JaxenException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * JSASTQueryHelper
 	 */
@@ -32,12 +49,13 @@ public class JSASTQueryHelper
 	 */
 	public boolean declaredInScope(IParseNode ast, String name)
 	{
+		Object list;
 		boolean result = false;
 		
 		try
 		{
-			XPath xpath = new ParseNodeXPath("ancestor::function/statements/var/declaration/identifier[position() = 1]");
-			Object list = xpath.evaluate(ast);
+			// look at any siblings
+			list = SIBLING_VARS.evaluate(ast);
 			
 			if (list instanceof List<?>)
 			{
@@ -49,6 +67,26 @@ public class JSASTQueryHelper
 					{
 						result = true;
 						break;
+					}
+				}
+			}
+			
+			// look at any parent function's vars and args
+			if (result == false)
+			{
+				list = ANCESTOR_FUNCTION_VARS.evaluate(ast);
+				
+				if (list instanceof List<?>)
+				{
+					List<?> items = (List<?>) list;
+					
+					for (Object item : items)
+					{
+						if (name.equals(item.toString()))
+						{
+							result = true;
+							break;
+						}
 					}
 				}
 			}
@@ -136,7 +174,7 @@ public class JSASTQueryHelper
 	 */
 	public List<String> getAccidentalGlobals(IParseNode ast)
 	{
-		final List<String> result = new LinkedList<String>();
+		final Set<String> globals = new HashSet<String>();
 		
 		this.processXPath(
 			"//assign/identifier[position() = 1]",
@@ -151,12 +189,15 @@ public class JSASTQueryHelper
 						
 						if (declaredInScope(node, name) == false)
 						{
-							result.add(name);
+							globals.add(name);
 						}
 					}
 				}
 			}
 		);
+		
+		List<String> result = new LinkedList<String>(globals);
+		Collections.sort(result);
 		
 		return result;
 	}
