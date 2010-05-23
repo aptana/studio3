@@ -475,13 +475,16 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			int candidateIndex = lexemeProvider.getLexemeFloorIndex(offset);
 			Lexeme<JSTokenType> lexeme = lexemeProvider.getLexeme(candidateIndex);
 			
-			if (lexeme != null && lexeme.getEndingOffset() == offset)
+			if (lexeme != null)
 			{
-				index = candidateIndex;
-			}
-			else if (lexeme.getType() == JSTokenType.NEW)
-			{
-				index = candidateIndex;
+				if (lexeme.getEndingOffset() == offset)
+				{
+					index = candidateIndex;
+				}
+				else if (lexeme.getType() == JSTokenType.NEW)
+				{
+					index = candidateIndex;
+				}
 			}
 		}
 		
