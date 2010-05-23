@@ -346,11 +346,13 @@ public class TreeThemer
 				Color oldBackground = gc.getBackground();
 				gc.setBackground(getBackground());
 				// wipe out the native control
-				gc.fillRectangle(x, y, width, height);
+				gc.fillRectangle(x, y, width+1, height-1); //+1 and -1 because of hovering selecting on windows vista
 				// draw a plus/minus based on expansion!
 				gc.setBackground(getForeground());
-				// draw surrounding box
-				gc.drawRectangle(x, y, width, width);
+				// draw surrounding box (with alpha so that it doesn't get too strong).
+				gc.setAlpha(195);
+				gc.drawRectangle(x+1, y+1, width-2, width-2); //make it smaller than the area erased
+				gc.setAlpha(255);
 				// draw '-'
 				gc.drawLine(x + 3, y + (width / 2), x + 7, y + (width / 2));
 				if (!isExpanded)
