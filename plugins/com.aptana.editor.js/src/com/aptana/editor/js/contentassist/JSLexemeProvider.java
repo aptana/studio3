@@ -6,6 +6,7 @@ import org.eclipse.jface.text.rules.ITokenScanner;
 import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.parsing.lexer.IRange;
+import com.aptana.parsing.lexer.Lexeme;
 
 public class JSLexemeProvider extends LexemeProvider<JSTokenType>
 {
@@ -32,6 +33,25 @@ public class JSLexemeProvider extends LexemeProvider<JSTokenType>
 	public JSLexemeProvider(IDocument document, IRange range, ITokenScanner scanner)
 	{
 		super(document, range, scanner);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.LexemeProvider#addLexeme(com.aptana.parsing.lexer.Lexeme)
+	 */
+	@Override
+	protected void addLexeme(Lexeme<JSTokenType> lexeme)
+	{
+		// don't add comments
+		switch (lexeme.getType())
+		{
+			case SINGLELINE_COMMENT:
+			case MULTILINE_COMMENT:
+			case DOC:
+				break;
+				
+			default:
+				super.addLexeme(lexeme);
+		}
 	}
 
 	/*

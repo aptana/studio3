@@ -63,11 +63,23 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	}
 
 	/**
+	 * Add the specified lexeme to the lexeme provider's list. Subclasses can
+	 * use override this method to filter which type of lexemes should be added
+	 * to the list
+	 * 
+	 * @param lexeme
+	 */
+	protected void addLexeme(Lexeme<T> lexeme)
+	{
+		this._lexemes.add(lexeme);
+	}
+	
+	/**
 	 * createLexemeList
 	 */
 	private void createLexemeList(IDocument document, int offset, int length, ITokenScanner scanner)
 	{
-		List<Lexeme<T>> lexemes = new ArrayList<Lexeme<T>>();
+		this._lexemes = new ArrayList<Lexeme<T>>();
 
 		try
 		{
@@ -92,7 +104,7 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 				if (data != null)
 				{
 					// add it to our list
-					lexemes.add(lexeme);
+					this.addLexeme(lexeme);
 				}
 
 				// NOTE: the following is useful during development to capture any
@@ -124,8 +136,6 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 		catch (BadLocationException e)
 		{
 		}
-
-		this._lexemes = lexemes;
 	}
 
 	/**
