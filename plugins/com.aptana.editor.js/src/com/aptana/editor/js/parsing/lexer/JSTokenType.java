@@ -100,7 +100,7 @@ public enum JSTokenType implements ITypePredicate
 	private short _index;
 
 	/**
-	 * static
+	 * static initializer
 	 */
 	static
 	{
