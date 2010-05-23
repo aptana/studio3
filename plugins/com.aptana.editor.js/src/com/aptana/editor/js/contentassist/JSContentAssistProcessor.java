@@ -405,8 +405,11 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				switch (candidate.getType())
 				{
-					case JSNodeTypes.GET_PROPERTY:
 					case JSNodeTypes.ARGUMENTS:
+					case JSNodeTypes.CONSTRUCT:
+					case JSNodeTypes.GET_PROPERTY:
+					case JSNodeTypes.PARAMETERS:
+					case JSNodeTypes.STATEMENTS:
 						result = candidate;
 						break;
 						
@@ -469,6 +472,26 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		Location result = Location.ERROR;
 		
+		if (this._currentNode != null)
+		{
+			switch (this._currentNode.getType())
+			{
+				case JSNodeTypes.CONSTRUCT:
+					result = Location.IN_CONSTRUCTOR;
+					break;
+					
+				case JSNodeTypes.PARAMETERS:
+					result = Location.IN_PARAMETERS;
+					break;
+					
+				case JSNodeTypes.STATEMENTS:
+					result = Location.IN_GLOBAL;
+					break;
+					
+				default:
+					break;
+			}
+		}
 		
 		return result;
 	}
