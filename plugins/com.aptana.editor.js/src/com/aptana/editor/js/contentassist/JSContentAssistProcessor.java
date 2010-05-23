@@ -37,7 +37,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 	static enum Location
 	{
-		ERROR, IN_GLOBAL, IN_CONSTRUCTOR, IN_PROPERTY_NAME, IN_VARIABLE_NAME
+		ERROR, IN_GLOBAL, IN_PARAMETERS, IN_CONSTRUCTOR, IN_PROPERTY_NAME, IN_VARIABLE_NAME
 	};
 
 	private static final Image JS_FUNCTION = Activator.getImage("/icons/js_function.gif"); //$NON-NLS-1$
@@ -459,13 +459,28 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
-	 * getLocation
+	 * getLocationByAST
 	 * 
 	 * @param lexemeProvider
 	 * @param offset
 	 * @return
 	 */
-	Location getLocation(LexemeProvider<JSTokenType> lexemeProvider, int offset)
+	Location getLocationByAST(LexemeProvider<JSTokenType> lexemeProvider, int offset)
+	{
+		Location result = Location.ERROR;
+		
+		
+		return result;
+	}
+	
+	/**
+	 * getLocationByLexeme
+	 * 
+	 * @param lexemeProvider
+	 * @param offset
+	 * @return
+	 */
+	Location getLocationByLexeme(LexemeProvider<JSTokenType> lexemeProvider, int offset)
 	{
 		Location result = Location.ERROR;
 		int index = lexemeProvider.getLexemeIndex(offset);
@@ -570,6 +585,25 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		else if (lexemeProvider.size() == 0)
 		{
 			result = Location.IN_GLOBAL;
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * getLocation
+	 * 
+	 * @param lexemeProvider
+	 * @param offset
+	 * @return
+	 */
+	Location getLocation(LexemeProvider<JSTokenType> lexemeProvider, int offset)
+	{
+		Location result = this.getLocationByAST(lexemeProvider, offset);
+		
+		if (result == Location.ERROR)
+		{
+			result = this.getLocationByLexeme(lexemeProvider, offset);
 		}
 		
 		return result;
