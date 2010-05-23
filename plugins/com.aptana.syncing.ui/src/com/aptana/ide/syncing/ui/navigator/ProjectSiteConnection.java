@@ -65,6 +65,11 @@ public final class ProjectSiteConnection extends PlatformObject {
         return siteConnection;
     }
 
+    public boolean canDisconnect() {
+    	IConnectionPoint connectionPoint = siteConnection.getDestination();
+    	return connectionPoint == null ? false : connectionPoint.canDisconnect();
+    }
+
     @SuppressWarnings("unchecked")
     public Object getAdapter(Class adapter) {
         if (adapter == IProject.class) {

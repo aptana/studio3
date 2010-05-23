@@ -55,7 +55,6 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.progress.UIJob;
 
-import com.aptana.ide.core.io.efs.LocalFile;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ui.UIUtils;
 
@@ -227,7 +226,7 @@ public class EditorUtils {
         } catch (IOException e) {
             return fileStore;
         }
-        IFileStore localFileStore = new LocalFile(file);
+        IFileStore localFileStore = EFS.getLocalFileSystem().fromLocalFile(file);
         fileStore.copy(localFileStore, EFS.OVERWRITE, monitor);
         file.deleteOnExit();
 

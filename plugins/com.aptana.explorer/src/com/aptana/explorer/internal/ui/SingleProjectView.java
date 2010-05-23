@@ -1196,6 +1196,11 @@ public abstract class SingleProjectView extends CommonNavigator
 			menuItem.setSelection(menuItem.getText().equals(newProjectName));
 		}
 		getCommonViewer().setInput(newProject);
+		if (newProject == null)
+		{
+			// Clear the selection when there is no active project so the menus get updated correctly
+			getCommonViewer().setSelection(StructuredSelection.EMPTY);
+		}
 		// Update the tree since project changed
 		// updateViewer(oldProject, newProject); // no structural change, just project changed
 	}
