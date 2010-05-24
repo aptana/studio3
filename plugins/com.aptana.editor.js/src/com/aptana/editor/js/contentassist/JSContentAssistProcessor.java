@@ -3,8 +3,10 @@ package com.aptana.editor.js.contentassist;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.Platform;
@@ -72,7 +74,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param proposals
 	 * @param offset
 	 */
-	private void addCoreFunctions(List<ICompletionProposal> proposals, int offset)
+	private void addCoreFunctions(Set<ICompletionProposal> proposals, int offset)
 	{
 		List<PropertyElement> globals = this._indexHelper.getCoreGlobals();
 		
@@ -100,7 +102,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param proposals
 	 * @param offset
 	 */
-	private void addCoreGlobals(List<ICompletionProposal> proposals, int offset)
+	private void addCoreGlobals(Set<ICompletionProposal> proposals, int offset)
 	{
 		List<PropertyElement> globals = this._indexHelper.getCoreGlobals();
 
@@ -122,9 +124,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 	
 	/**
-	 * getGlobals
+	 * addAllGlobals
 	 */
-	protected void addAllGlobals(List<ICompletionProposal> proposals, int offset)
+	protected void addAllGlobals(Set<ICompletionProposal> proposals, int offset)
 	{
 		// add globals from core
 		this.addCoreGlobals(proposals, offset);
@@ -139,7 +141,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param proposals
 	 * @param offset
 	 */
-	private void addLocalGlobalFunctions(List<ICompletionProposal> proposals, int offset)
+	private void addLocalGlobalFunctions(Set<ICompletionProposal> proposals, int offset)
 	{
 		String fileLocation = this.getFilename();
 		
@@ -168,9 +170,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param proposals
 	 * @param offset
 	 */
-	private void addProjectGlobalFunctions(List<ICompletionProposal> proposals, int offset)
+	private void addProjectGlobalFunctions(Set<ICompletionProposal> proposals, int offset)
 	{
-		// add project globals
 		Index index = this.getIndex();
 		Map<String,List<String>> projectGlobals = this._indexHelper.getProjectGlobals(index);
 		
@@ -198,7 +199,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param proposals
 	 * @param offset
 	 */
-	private void addProjectVariables(List<ICompletionProposal> proposals, int offset)
+	private void addProjectVariables(Set<ICompletionProposal> proposals, int offset)
 	{
 		Index index = this.getIndex();
 		Map<String,List<String>> projectVariables = this._indexHelper.getProjectVariables(index);
@@ -230,7 +231,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param userAgents
 	 * @param offset
 	 */
-	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, int offset)
+	private void addProposal(Set<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, int offset)
 	{
 		this.addProposal(proposals, name, image, description, userAgents, JSIndexConstants.CORE, offset);
 	}
@@ -246,18 +247,18 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param fileLocation
 	 * @param offset
 	 */
-	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, String fileLocation, int offset)
+	private void addProposal(Set<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, String fileLocation, int offset)
 	{
+		String displayName = name;
 		int length = name.length();
 
 		// back up one if we end with parentheses
 		if (name.endsWith(PARENS))
 		{
-			name = name.substring(0, name.length() - PARENS.length());
+			displayName = name.substring(0, name.length() - PARENS.length());
 			length--;
 		}
 		
-		String displayName = name;
 		IContextInformation contextInfo = null;
 
 		int replaceLength = 0;
@@ -282,7 +283,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * 
 	 * @param proposals
 	 */
-	protected void addSymbolsInScope(List<ICompletionProposal> proposals, int offset)
+	protected void addSymbolsInScope(Set<ICompletionProposal> proposals, int offset)
 	{
 		if (this._targetNode != null)
 		{
@@ -292,11 +293,13 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			
 			for (Entry<String,Classification> entry : args.entrySet())
 			{
+				boolean isFunction = (entry.getValue() == Classification.FUNCTION);
+				String name = (isFunction) ? entry.getKey() + PARENS : entry.getKey();
 				String description = null;
-				Image image = (entry.getValue() == Classification.PROPERTY) ? JS_PROPERTY : JS_FUNCTION;
+				Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
 				Image[] userAgents = this.getAllUserAgentIcons();
 				
-				this.addProposal(proposals, entry.getKey(), image, description, userAgents, fileLocation, offset);
+				this.addProposal(proposals, name, image, description, userAgents, fileLocation, offset);
 			}
 		}
 	}
@@ -310,7 +313,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	@Override
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
 	{
-		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
+		Set<ICompletionProposal> result = new HashSet<ICompletionProposal>();
 		
 		if (Platform.inDevelopmentMode())
 		{
@@ -353,25 +356,27 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				default:
 					break;
 			}
+		}
 	
-			// sort by display name
-			Collections.sort(result, new Comparator<ICompletionProposal>()
+		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>(result);
+		
+		// sort by display name
+		Collections.sort(proposals, new Comparator<ICompletionProposal>()
+		{
+			@Override
+			public int compare(ICompletionProposal o1, ICompletionProposal o2)
 			{
-				@Override
-				public int compare(ICompletionProposal o1, ICompletionProposal o2)
-				{
-					return o1.getDisplayString().compareToIgnoreCase(o2.getDisplayString());
-				}
-			});
-	
-			// select the current proposal based on the current lexeme
-			if (this._currentLexeme != null)
-			{
-				this.setSelectedProposal(this._currentLexeme.getText(), result);
+				return o1.getDisplayString().compareToIgnoreCase(o2.getDisplayString());
 			}
+		});
+
+		// select the current proposal based on the current lexeme
+		if (this._currentLexeme != null)
+		{
+			this.setSelectedProposal(this._currentLexeme.getText(), proposals);
 		}
 
-		return result.toArray(new ICompletionProposal[result.size()]);
+		return proposals.toArray(new ICompletionProposal[proposals.size()]);
 	}
 
 	/**
@@ -732,8 +737,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			}
 		}
 		
-		System.out.println("getLocationByAST: " + result);
-		
 		return result;
 	}
 	
@@ -847,8 +850,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			result = Location.IN_GLOBAL;
 		}
-		
-		System.out.println("getLocationByLexeme: " + result);
 		
 		return result;
 	}
