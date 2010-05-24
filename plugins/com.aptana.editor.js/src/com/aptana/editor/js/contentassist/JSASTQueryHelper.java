@@ -13,6 +13,7 @@ import org.jaxen.JaxenException;
 import org.jaxen.XPath;
 
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
+import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.xpath.ParseNodeXPath;
 
@@ -31,18 +32,21 @@ public class JSASTQueryHelper
 	private static XPath IDENTIFIER_ASSIGNMENTS;
 	private static XPath NON_FUNCTION_VARS;
 	private static XPath ANCESTOR_FUNCTIONS;
+	private static XPath ALL_VARS;
 	
 	static
 	{
 		try
 		{
+			ALL_VARS = new ParseNodeXPath("descendant::var/declaration/identifier[position() = 1]");
+			
 			ANCESTOR_FUNCTIONS = new ParseNodeXPath("ancestor::function");
 			ANCESTOR_FUNCTION_VARS = new ParseNodeXPath("ancestor::function/statements/var/declaration/identifier[position() = 1]|ancestor::function/parameters/identifier");
 			
 			IDENTIFIER_ASSIGNMENTS = new ParseNodeXPath("//assign/identifier[position() = 1]");
 			
-			NON_FUNCTION_VARS = new ParseNodeXPath("var/declaration/identifier[position() = 1 and count(following-sibling::function) = 0]");
-			VAR_FUNCTIONS = new ParseNodeXPath("var/declaration/identifier[count(following-sibling::function) > 0]");
+			NON_FUNCTION_VARS = new ParseNodeXPath("./var/declaration/identifier[position() = 1 and count(following-sibling::function) = 0]");
+			VAR_FUNCTIONS = new ParseNodeXPath("./var/declaration/identifier[count(following-sibling::function) > 0]");
 			
 			SIBLING_VARS = new ParseNodeXPath("../statements/var/declaration/identifier[position() = 1]");
 			
@@ -139,7 +143,7 @@ public class JSASTQueryHelper
 			new ItemProcessor() {
 				public void process(Object item)
 				{
-					JSFunctionNode function = (JSFunctionNode) item;
+					final JSFunctionNode function = (JSFunctionNode) item;
 					IParseNode body = function.getBody();
 					
 					// add args
@@ -154,17 +158,47 @@ public class JSASTQueryHelper
 						result.put(func, Classification.FUNCTION);
 					}
 					
-					// add non-function vars
-					for (String var : getNonFunctionDeclarations(body))
-					{
-						result.put(var, Classification.PROPERTY);
-					}
+					processXPath(
+						ALL_VARS,
+						body,
+						new ItemProcessor() {
+							public void process(Object item)
+							{
+								IParseNode node = (IParseNode) item;
+								IParseNode parent = node.getParent();
+								
+								while (parent != null)
+								{
+									if (parent.getType() == JSNodeTypes.FUNCTION)
+									{
+										if (parent == function)
+										{
+											Classification c = (node.getType() == JSNodeTypes.FUNCTION) ? Classification.FUNCTION : Classification.PROPERTY;
+											
+											result.put(item.toString(), c);
+										}
+										break;
+									}
+									else
+									{
+										parent = parent.getParent();
+									}
+								}
+							}
+						}
+					);
 					
-					// vars that are functions
-					for (String var : getVarDeclaredFunctions(body))
-					{
-						result.put(var, Classification.FUNCTION);
-					}
+//					// add non-function vars
+//					for (String var : getNonFunctionDeclarations(body))
+//					{
+//						result.put(var, Classification.PROPERTY);
+//					}
+//					
+//					// vars that are functions
+//					for (String var : getVarDeclaredFunctions(body))
+//					{
+//						result.put(var, Classification.FUNCTION);
+//					}
 				}
 			}
 		);
@@ -187,8 +221,6 @@ public class JSASTQueryHelper
 	{
 		final List<String> result = new LinkedList<String>();
 
-		// NOTE: we're using a relative path here so we can use this expression
-		// at the top-level of a file and for function bodies
 		this.processXPath(
 			NON_FUNCTION_VARS,
 			ast,
