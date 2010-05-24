@@ -287,6 +287,7 @@ public class MenuDialog extends PopupDialog
 	@Override
 	public int open()
 	{
+		setReturnCode(-1); // set return code back to -1
 		setBlockOnOpen(true);
 		super.open();
 
@@ -294,6 +295,13 @@ public class MenuDialog extends PopupDialog
 		runEventLoop(getShell());
 
 		return getReturnCode();
+	}
+	
+	@Override
+	protected void handleShellCloseEvent()
+	{
+		super.handleShellCloseEvent();
+		setReturnCode(-1);
 	}
 
 	/**
