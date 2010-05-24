@@ -42,10 +42,10 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CommonOutlinePage;
+import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.ruby.core.IImportContainer;
 import com.aptana.editor.ruby.outline.RubyOutlineContentProvider;
 import com.aptana.editor.ruby.outline.RubyOutlineLabelProvider;
-import com.aptana.editor.ruby.parsing.RubyParser;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 
@@ -67,10 +67,14 @@ public class RubySourceEditor extends AbstractThemeableEditor
 
 		setSourceViewerConfiguration(new RubySourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new RubyDocumentProvider());
-
-		getFileService().setParser(new RubyParser());
 	}
 
+	@Override
+	protected FileService createFileService()
+	{
+		return new FileService("text/ruby");
+	}
+	
 	protected char[] getPairMatchingCharacters()
 	{
 		return PAIR_MATCHING_CHARS;

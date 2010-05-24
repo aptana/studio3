@@ -35,6 +35,7 @@
 package com.aptana.editor.sass;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.parsing.FileService;
 
 public class SassSourceEditor extends AbstractThemeableEditor
 {
@@ -46,5 +47,11 @@ public class SassSourceEditor extends AbstractThemeableEditor
 
 		setSourceViewerConfiguration(new SassSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new SassDocumentProvider());
+	}
+	
+	@Override
+	protected FileService createFileService()
+	{
+		return new FileService("text/sass");
 	}
 }

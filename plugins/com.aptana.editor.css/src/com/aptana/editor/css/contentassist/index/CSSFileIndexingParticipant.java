@@ -13,15 +13,18 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
 
 import com.aptana.core.util.IOUtil;
+import com.aptana.editor.common.IParserPool;
+import com.aptana.editor.common.ParserPoolFactory;
 import com.aptana.editor.css.Activator;
 import com.aptana.editor.css.CSSColors;
 import com.aptana.editor.css.ICSSConstants;
-import com.aptana.editor.css.parsing.CSSParser;
+import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.css.parsing.ast.CSSAttributeSelectorNode;
 import com.aptana.editor.css.parsing.ast.CSSRuleNode;
 import com.aptana.editor.css.parsing.ast.CSSTermNode;
 import com.aptana.index.core.IFileIndexingParticipant;
 import com.aptana.index.core.Index;
+import com.aptana.parsing.IParser;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
 
@@ -47,11 +50,16 @@ public class CSSFileIndexingParticipant implements IFileIndexingParticipant
 				try
 				{
 					String fileContents = IOUtil.read(file.getContents());
-					ParseState parseState = new ParseState();
-					parseState.setEditState(fileContents, "", 0, 0); //$NON-NLS-1$
-					CSSParser cssParser = new CSSParser();
-					IParseNode parseNode = cssParser.parse(parseState);
-					walkNode(index, file, parseNode);
+					if (fileContents != null && fileContents.trim().length() > 0)
+					{
+						ParseState parseState = new ParseState();
+						parseState.setEditState(fileContents, "", 0, 0); //$NON-NLS-1$
+						IParserPool pool = ParserPoolFactory.getInstance().getParserPool(ICSSParserConstants.LANGUAGE);
+						IParser cssParser = pool.checkOut();					
+						IParseNode parseNode = cssParser.parse(parseState);
+						pool.checkIn(cssParser);
+						walkNode(index, file, parseNode);
+					}
 				}
 				catch (CoreException e)
 				{

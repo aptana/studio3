@@ -41,5 +41,12 @@
             class="com.aptana.editor.ruby.index.RubyFileIndexingParticipant">
       </fileIndexingParticipant>
    </extension>
+   <extension
+         point="com.aptana.parsing.parser">
+      <parser
+            class="com.aptana.editor.ruby.parsing.RubyParser"
+            language="text/ruby">
+      </parser>
+   </extension>
 
 </plugin>

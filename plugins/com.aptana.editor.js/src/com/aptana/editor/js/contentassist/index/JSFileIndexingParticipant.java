@@ -13,12 +13,15 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
 
 import com.aptana.core.util.IOUtil;
+import com.aptana.editor.common.IParserPool;
+import com.aptana.editor.common.ParserPoolFactory;
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.contentassist.JSASTQueryHelper;
-import com.aptana.editor.js.parsing.JSParser;
+import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.index.core.IFileIndexingParticipant;
 import com.aptana.index.core.Index;
+import com.aptana.parsing.IParser;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
 
@@ -54,21 +57,25 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 				
 				try
 				{
-					// create parser and associated parse state
-					JSParser parser = new JSParser();
-					ParseState parseState = new ParseState();
-
 					// grab the source of the file we're going to parse
 					String source = IOUtil.read(file.getContents());
 
 					// minor optimization when creating a new empty file
 					if (source != null && source.length() > 0)
 					{
+						// create parser and associated parse state
+						IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IJSParserConstants.LANGUAGE);
+						IParser parser = pool.checkOut();
+						
+						ParseState parseState = new ParseState();
+						
 						// apply the source to the parse state
 						parseState.setEditState(source, source, 0, 0);
 
 						// parse and grab the result
 						IParseNode ast = parser.parse(parseState);
+						
+						pool.checkIn(parser);
 
 						// now walk the parse tree
 						this.walkAST(index, file, ast);
