@@ -8,7 +8,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.URL;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -152,11 +155,12 @@ public abstract class IOUtil
 	 * @param file
 	 * @throws IOException
 	 */
-	public static void extractFile(String bundleId, String path, File file) throws IOException {
+	public static void extractFile(String bundleId, IPath path, File file) throws IOException {
+		URL url = FileLocator.find(Platform.getBundle(bundleId), path, null);
 		InputStream in = null;
 		FileOutputStream out = null;
 		try {
-			in = Platform.getBundle(bundleId).getEntry(path).openStream();
+			in = url.openStream();
 			out = new FileOutputStream(file);
 			byte[] buffer = new byte[1024];
 			int n;
