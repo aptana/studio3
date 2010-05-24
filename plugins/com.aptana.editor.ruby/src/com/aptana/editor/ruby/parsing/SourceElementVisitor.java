@@ -709,7 +709,7 @@ public class SourceElementVisitor extends InOrderVisitor
 				}
 				else if (node instanceof DStrNode)
 				{
-					Node next = (Node) ((DStrNode) node).childNodes().iterator().next();
+					Node next = ((DStrNode) node).childNodes().iterator().next();
 					if (next instanceof StrNode)
 					{
 						mixins.add(((StrNode) next).getValue());

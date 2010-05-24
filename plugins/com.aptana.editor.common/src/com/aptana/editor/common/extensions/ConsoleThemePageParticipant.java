@@ -26,6 +26,7 @@ public class ConsoleThemePageParticipant implements IConsolePageParticipant{
 	 * @see org.eclipse.ui.console.IConsolePageParticipant#init(org.eclipse.ui.part.IPageBookViewPage,
 	 * org.eclipse.ui.console.IConsole)
 	 */
+	@SuppressWarnings("unchecked")
 	public void init(IPageBookViewPage page, IConsole console)
 	{
 		if(console instanceof TextConsole)

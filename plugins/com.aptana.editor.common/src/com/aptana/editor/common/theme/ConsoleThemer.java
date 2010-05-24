@@ -55,6 +55,7 @@ public class ConsoleThemer
 	private IPreferenceChangeListener fThemeChangeListener;
 
 	private TextConsole fConsole;
+	@SuppressWarnings("unchecked")
 	private Map fThemeConsoleStreamToColor;
 
 	/**
@@ -68,6 +69,7 @@ public class ConsoleThemer
 	 * @param themeConsoleStreamToColor a map with the stream to the related color name (one of
 	 * the CONSOLE_XXX constants in this class).
 	 */
+	@SuppressWarnings("unchecked")
 	public ConsoleThemer(TextConsole textConsole, Map themeConsoleStreamToColor) 
 	{
 		this.fConsole = textConsole;
@@ -104,6 +106,7 @@ public class ConsoleThemer
 
 			display.syncExec(new Runnable()
 			{
+				@SuppressWarnings("unchecked")
 				public void run()
 				{
 					// set colors

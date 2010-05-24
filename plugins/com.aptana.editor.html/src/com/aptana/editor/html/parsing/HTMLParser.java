@@ -183,14 +183,14 @@ public class HTMLParser implements IParser
 		return new IParseNode[0];
 	}
 
-	private void processStartTag() throws IOException, Exception
+	private void processStartTag()
 	{
 		HTMLElementNode element = processCurrentTag();
 		// pushes the element onto the stack
 		openElement(element);
 	}
 
-	private void processEndTag() throws IOException, Exception
+	private void processEndTag()
 	{
 		// only closes current element if current lexeme and element have the same tag name
 		if (fCurrentElement != null)
