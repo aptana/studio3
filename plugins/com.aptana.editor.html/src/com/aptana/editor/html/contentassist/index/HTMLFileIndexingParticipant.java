@@ -66,7 +66,7 @@ public class HTMLFileIndexingParticipant implements IFileIndexingParticipant
 				}
 				catch (Exception e)
 				{
-					Activator.logError(MessageFormat.format("An error occurred while indexing {0}", file.getName()), e);
+					Activator.logError(MessageFormat.format(Messages.HTMLFileIndexingParticipant_Error_During_Indexing, file.getName()), e);
 				}
 			}
 			finally

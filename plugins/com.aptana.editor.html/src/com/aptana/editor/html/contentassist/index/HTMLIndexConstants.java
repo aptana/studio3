@@ -2,10 +2,10 @@ package com.aptana.editor.html.contentassist.index;
 
 public interface HTMLIndexConstants
 {
-	static final String PREFIX = "html.";
+	static final String PREFIX = "html."; //$NON-NLS-1$
 
 	// general constants
-	static final String DELIMITER = "\0";
+	static final String DELIMITER = "\0"; //$NON-NLS-1$
 	static final String SUB_DELIMITER = ","; //$NON-NLS-1$
 	static final String METADATA = PREFIX + "metadata"; //$NON-NLS-1$
 	static final String CORE = "HTML Core"; //$NON-NLS-1$
