@@ -8,6 +8,7 @@ import java.util.Map;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Color;
@@ -72,7 +73,7 @@ public class MenuDialog extends PopupDialog
 		}
 		return composite;
 	}
-	
+
 	@Override
 	protected Point getInitialLocation(Point initialSize)
 	{
@@ -83,7 +84,7 @@ public class MenuDialog extends PopupDialog
 		}
 		return super.getInitialLocation(initialSize);
 	}
-	
+
 	protected Color getBackground()
 	{
 		return getShell().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
@@ -117,13 +118,12 @@ public class MenuDialog extends PopupDialog
 	 */
 	private final void createTableDialogArea(final Composite parent, final List<Map<String, Object>> partialMatches)
 	{
-		// TODO Need to add accelerator 0-9 keys like Textmate does and our own keybinding hook does!
 		// Layout the table.
 		completionsTable = new Table(parent, SWT.FULL_SELECTION | SWT.SINGLE);
 		final GridData gridData = new GridData(GridData.FILL_BOTH);
 		completionsTable.setLayoutData(gridData);
 		completionsTable.setBackground(parent.getBackground());
-		completionsTable.setLinesVisible(true);
+		completionsTable.setLinesVisible(false);
 
 		List<TableColumn> columns = new ArrayList<TableColumn>();
 
@@ -142,13 +142,13 @@ public class MenuDialog extends PopupDialog
 				index++;
 				if (map.containsKey(SEPARATOR))
 				{
-					// TODO Insert a separator
+					insertSeparator(2);
 					continue;
 				}
 				String title = (String) map.get(TITLE);
 				if (title.trim().equals("---")) //$NON-NLS-1$
 				{
-					// TODO Insert a separator
+					insertSeparator(2);
 					continue;
 				}
 				final TableItem item = new TableItem(completionsTable, SWT.NULL);
@@ -169,7 +169,7 @@ public class MenuDialog extends PopupDialog
 				index++;
 				if (map.containsKey(SEPARATOR))
 				{
-					// TODO Insert a separator
+					insertSeparator(3);
 					continue;
 				}
 				final TableItem item = new TableItem(completionsTable, SWT.NULL);
@@ -262,11 +262,24 @@ public class MenuDialog extends PopupDialog
 		});
 	}
 
+	protected void insertSeparator(int columns)
+	{
+		// FIXME Shouldn't even be able to select/highlight these entries!
+		TableItem item = new TableItem(completionsTable, SWT.NULL);
+		for (int i = 0; i < columns; i++)
+		{
+			TableEditor editor = new TableEditor(completionsTable);
+			Label label = new Label(completionsTable, SWT.SEPARATOR | SWT.HORIZONTAL);
+			editor.grabHorizontal = true;
+			editor.setEditor(label, item, i);
+		}
+	}
+
 	protected void select()
 	{
 		int index = completionsTable.getSelectionIndex();
 		TableItem item = completionsTable.getItem(index);
-		int returnCode = (Integer) item.getData("index");  //$NON-NLS-1$
+		int returnCode = (Integer) item.getData("index"); //$NON-NLS-1$
 		setReturnCode(returnCode);
 		close();
 	}
