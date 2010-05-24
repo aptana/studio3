@@ -5,12 +5,17 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -27,6 +32,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.UIJob;
 
 public class MenuDialog extends PopupDialog
 {
@@ -260,11 +266,93 @@ public class MenuDialog extends PopupDialog
 				}
 			}
 		});
+
+		// Don't ever draw separators as selected!
+		completionsTable.addListener(SWT.EraseItem, new Listener()
+		{
+
+			@Override
+			public void handleEvent(Event event)
+			{
+				if ((event.detail & SWT.SELECTED) != 0)
+				{
+					TableItem item = (TableItem) event.item;
+					if (isSeparator(item))
+					{
+						event.detail &= ~SWT.SELECTED;
+						event.detail &= ~SWT.BACKGROUND;
+					}
+				}
+			}
+		});
+
+		completionsTable.addTraverseListener(new TraverseListener()
+		{
+
+			@Override
+			public void keyTraversed(TraverseEvent e)
+			{
+				int selectionIndex = completionsTable.getSelectionIndex();
+				final int initialIndex = selectionIndex;
+				if (e.detail == SWT.TRAVERSE_ARROW_NEXT)
+				{
+					selectionIndex++;
+					while (isSeparator(completionsTable.getItem(selectionIndex)))
+					{
+						selectionIndex++;
+						if (selectionIndex >= completionsTable.getItemCount())
+							return;
+					}
+					selectionIndex--;
+				}
+				else if (e.detail == SWT.TRAVERSE_ARROW_PREVIOUS)
+				{
+					selectionIndex--;
+					while (isSeparator(completionsTable.getItem(selectionIndex)))
+					{
+						selectionIndex--;
+						if (selectionIndex < 0)
+						{
+							// HACK have to run this in a job for some reason. Just setting selection index doesn't
+							// work.
+							new UIJob("retaining selection") //$NON-NLS-1$
+							{
+
+								@Override
+								public IStatus runInUIThread(IProgressMonitor monitor)
+								{
+									completionsTable.setSelection(initialIndex);
+									return Status.OK_STATUS;
+								}
+							}.schedule();
+							e.doit = false;
+							return;
+						}
+					}
+					selectionIndex++;
+				}
+				else
+				{
+					return;
+				}
+
+				if (selectionIndex < completionsTable.getItemCount() && selectionIndex >= 0)
+				{
+					completionsTable.setSelection(selectionIndex);
+					e.doit = false;
+				}
+			}
+		});
+	}
+
+	protected boolean isSeparator(TableItem item)
+	{
+		// FIXME This isn't the best way to determine if a row is actually a separator
+		return item.getText().equals(""); //$NON-NLS-1$
 	}
 
 	protected void insertSeparator(int columns)
 	{
-		// FIXME Shouldn't even be able to select/highlight these entries!
 		TableItem item = new TableItem(completionsTable, SWT.NULL);
 		for (int i = 0; i < columns; i++)
 		{
@@ -296,7 +384,7 @@ public class MenuDialog extends PopupDialog
 
 		return getReturnCode();
 	}
-	
+
 	@Override
 	protected void handleShellCloseEvent()
 	{
