@@ -153,18 +153,16 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 
 		for (String name : astHelper.getGlobalFunctions(ast))
 		{
-			System.out.println(name + "()");
 			index.addEntry(JSIndexConstants.FUNCTION, name, location);
 		}
-		for (String varName : astHelper.getGlobalDeclarations(ast))
+		for (String varName : astHelper.getNonFunctionDeclarations(ast))
 		{
-			System.out.println("global: " + varName);
 			index.addEntry(JSIndexConstants.VARIABLE, varName, location);
 		}
-		for (String varName : astHelper.getAccidentalGlobals(ast))
-		{
-			System.out.println("accidental global: " + varName);
-			index.addEntry(JSIndexConstants.VARIABLE, varName, location);
-		}
+//		for (String varName : astHelper.getAccidentalGlobals(ast))
+//		{
+//			System.out.println("accidental global: " + varName);
+//			index.addEntry(JSIndexConstants.VARIABLE, varName, location);
+//		}
 	}
 }
