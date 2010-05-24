@@ -263,16 +263,6 @@
          point="org.eclipse.core.runtime.adapters">
       <factory
             adaptableType="org.eclipse.ui.texteditor.ITextEditor"
-            class="com.aptana.editor.common.FindBarDecoratedAdapterFactory">
-         <adapter
-               type="com.aptana.editor.findbar.api.IFindBarDecorated">
-         </adapter>
-      </factory>
-   </extension>
-   <extension
-         point="org.eclipse.core.runtime.adapters">
-      <factory
-            adaptableType="org.eclipse.ui.texteditor.ITextEditor"
             class="com.aptana.editor.common.CommandElementsProviderAdapterFactory">
          <adapter
                type="com.aptana.scripting.keybindings.ICommandElementsProvider">
@@ -550,5 +540,13 @@
             class="com.aptana.editor.common.preferences.UserAgentPreferencePage"
             id="com.aptana.editor.common.preferences.UserAgentPreferencePage"
             name="%page.name.0"/>            
+   </extension>
+   <extension
+         point="org.eclipse.ui.console.consolePageParticipants">
+      <consolePageParticipant
+            class="com.aptana.editor.common.extensions.ConsoleThemePageParticipant"
+            id="com.aptana.editor.common.extensions.consoleThemePageParticipant">
+         <enablement></enablement>
+      </consolePageParticipant>
    </extension>
 </plugin>

@@ -15,7 +15,6 @@ import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.NotDefinedException;
-import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.text.IFindReplaceTarget;
 import org.eclipse.jface.text.IFindReplaceTargetExtension;
 import org.eclipse.jface.text.IFindReplaceTargetExtension3;
@@ -48,6 +47,7 @@ import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.handlers.IHandlerService;
+import org.eclipse.ui.texteditor.IEditorStatusLine;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 
@@ -58,11 +58,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener {
 
 	private final ITextEditor textEditor;
 	private ISourceViewer sourceViewer;
-	private final IStatusLineManager statusLineManager;
+	private final IEditorStatusLine statusLineManager;
 
-	public FindBarDecorator(ITextEditor textEditor, IStatusLineManager statusLineManager) {
+	public FindBarDecorator(ITextEditor textEditor) {
 		this.textEditor = textEditor;
-		this.statusLineManager = statusLineManager;
+		this.statusLineManager = (IEditorStatusLine) textEditor.getAdapter(IEditorStatusLine.class);
 	}
 
 	public Composite createFindBarComposite(Composite parent) {
@@ -393,7 +393,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener {
 			composite.layout();
 			incrementalOffset = -1;
 			combo.removeModifyListener(modifyListener);
-			statusLineManager.setMessage(EMPTY);
+			statusLineManager.setMessage(false, EMPTY, null);
 		}
 		textEditor.setFocus();
 	}
@@ -507,9 +507,9 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener {
 						incrementalOffset = selection.x;
 					}
 					if (wrapping) {
-						statusLineManager.setMessage(Messages.FindBarDecorator_MSG_Wrapped);
+						statusLineManager.setMessage(false, Messages.FindBarDecorator_MSG_Wrapped, null);
 					} else {
-						statusLineManager.setMessage(EMPTY);
+						statusLineManager.setMessage(false, EMPTY, null);
 					}
 				} else {
 					if (wrap) {
@@ -521,7 +521,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener {
 					combo.setForeground(combo.getDisplay().getSystemColor(
 							SWT.COLOR_RED));
 					textWidget.getDisplay().beep();
-					statusLineManager.setMessage(Messages.FindBarDecorator_MSG_StringNotFound);
+					statusLineManager.setMessage(false, Messages.FindBarDecorator_MSG_StringNotFound, null);
 				}
 			} finally {
 				if (findReplaceTarget instanceof IFindReplaceTargetExtension) {
