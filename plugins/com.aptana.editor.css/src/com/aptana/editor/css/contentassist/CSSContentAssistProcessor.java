@@ -515,7 +515,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			switch (lexeme.getType())
 			{
 				case CURLY_BRACE:
-					if ("{".equals(lexeme.getText()))
+					if ("{".equals(lexeme.getText())) //$NON-NLS-1$
 					{
 						location = LocationType.INSIDE_PROPERTY;
 					}

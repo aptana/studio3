@@ -57,9 +57,9 @@ public class JSNaryNode extends JSNode
 				}
 				break;
 			case JSNodeTypes.ARGUMENTS:
-				text.append("(");
+				text.append("("); //$NON-NLS-1$
 				appendText(text, children);
-				text.append(")");
+				text.append(")"); //$NON-NLS-1$
 				break;
 			default:
 				appendText(text, children);

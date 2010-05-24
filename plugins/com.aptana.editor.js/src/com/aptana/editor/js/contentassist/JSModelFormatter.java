@@ -54,10 +54,10 @@ public class JSModelFormatter
 		StringBuilder buffer = new StringBuilder();
 		
 		// emit header
-		buffer.append("<b>").append(header).append("</b><br><br>");
+		buffer.append("<b>").append(header).append("</b><br><br>"); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		// emit list
-		buffer.append(StringUtil.join("<br>", items));
+		buffer.append(StringUtil.join("<br>", items)); //$NON-NLS-1$
 		
 		return buffer.toString();
 	}

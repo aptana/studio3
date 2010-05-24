@@ -49,7 +49,7 @@ public class JSFunctionNode extends JSNode
 		{
 			// TODO: possibly cache this
 			return new IParseNodeAttribute[] {
-				new ParseNodeAttribute(this, "name", name)
+				new ParseNodeAttribute(this, "name", name) //$NON-NLS-1$
 			};
 		}
 		else

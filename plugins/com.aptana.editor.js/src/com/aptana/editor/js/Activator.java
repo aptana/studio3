@@ -88,15 +88,15 @@ public class Activator extends AbstractUIPlugin
 				}
 				catch (IOException e)
 				{
-					Activator.logError("An error occurred while trying to load JS metadata", e);
+					Activator.logError(Messages.Activator_Error_Loading_Metadata, e);
 				}
 				catch (ScriptDocException e)
 				{
-					Activator.logError("An error occurred while trying to load JS metadata", e);
+					Activator.logError(Messages.Activator_Error_Loading_Metadata, e);
 				}
 				catch (Throwable t)
 				{
-					Activator.logError("An error occurred while trying to load JS metadata", t);
+					Activator.logError(Messages.Activator_Error_Loading_Metadata, t);
 				}
 				finally
 				{

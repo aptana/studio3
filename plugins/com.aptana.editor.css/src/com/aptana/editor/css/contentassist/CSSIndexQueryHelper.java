@@ -86,11 +86,11 @@ public class CSSIndexQueryHelper
 					}
 					catch (IOException e)
 					{
-						Activator.logError("An error occurred while reading a CSS metadatafile", e);
+						Activator.logError(Messages.CSSIndexQueryHelper_Error_Reading_Metadata, e);
 					}
 					catch (Throwable t)
 					{
-						Activator.logError("An error occurred while reading a CSS metadatafile", t);
+						Activator.logError(Messages.CSSIndexQueryHelper_Error_Reading_Metadata, t);
 					}
 					finally
 					{

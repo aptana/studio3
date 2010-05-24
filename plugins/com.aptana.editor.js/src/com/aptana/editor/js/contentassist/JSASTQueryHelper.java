@@ -35,12 +35,12 @@ public class JSASTQueryHelper
 	{
 		try
 		{
-			ANCESTOR_FUNCTIONS = new ParseNodeXPath("ancestor::function");
-			NAMED_FUNCTIONS = new ParseNodeXPath("./function[string-length(@name) > 0]");
+			ANCESTOR_FUNCTIONS = new ParseNodeXPath("ancestor::function"); //$NON-NLS-1$
+			NAMED_FUNCTIONS = new ParseNodeXPath("./function[string-length(@name) > 0]"); //$NON-NLS-1$
 			
-			ALL_VARS = new ParseNodeXPath("descendant::var/declaration/identifier[position() = 1]");
-			NON_FUNCTION_VARS = new ParseNodeXPath("./var/declaration/identifier[position() = 1 and count(following-sibling::function) = 0]");
-			VAR_FUNCTIONS = new ParseNodeXPath("./var/declaration/identifier[count(following-sibling::function) > 0]");
+			ALL_VARS = new ParseNodeXPath("descendant::var/declaration/identifier[position() = 1]"); //$NON-NLS-1$
+			NON_FUNCTION_VARS = new ParseNodeXPath("./var/declaration/identifier[position() = 1 and count(following-sibling::function) = 0]"); //$NON-NLS-1$
+			VAR_FUNCTIONS = new ParseNodeXPath("./var/declaration/identifier[count(following-sibling::function) > 0]"); //$NON-NLS-1$
 		}
 		catch (JaxenException e)
 		{
