@@ -136,6 +136,9 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 		catch (BadLocationException e)
 		{
 		}
+		catch (IllegalArgumentException e)
+		{
+		}
 	}
 
 	/**
