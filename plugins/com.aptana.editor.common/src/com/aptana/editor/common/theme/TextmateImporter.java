@@ -70,8 +70,7 @@ public class TextmateImporter
 	}
 
 	@SuppressWarnings("unchecked")
-	private static Properties convertToProperties(InputStream stream) throws FileNotFoundException,
-			PlistReaderException
+	private static Properties convertToProperties(InputStream stream) throws PlistReaderException
 	{
 		Reader characterStream = new InputStreamReader(stream);
 		InputSource source = new InputSource(characterStream);

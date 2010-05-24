@@ -1,4 +1,4 @@
 function abc() {
 }
 
-abc()
+abc("hello",)

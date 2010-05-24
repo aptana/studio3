@@ -35,17 +35,23 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 	public void index(Set<IFile> files, Index index, IProgressMonitor monitor)
 	{
 		monitor = SubMonitor.convert(monitor, files.size());
+		
 		for (IFile file : files)
 		{
 			if (monitor.isCanceled())
+			{
 				return;
+			}
+			
 			try
 			{
 				if (file == null || !isJSFile(file))
 				{
 					continue;
 				}
+				
 				monitor.subTask(file.getLocation().toPortableString());
+				
 				try
 				{
 					// create parser and associated parse state
@@ -82,6 +88,7 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 				monitor.worked(1);
 			}
 		}
+		
 		monitor.done();
 	}
 
@@ -141,20 +148,21 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 	 */
 	private void walkAST(Index index, IFile file, IParseNode ast)
 	{
-		JSASTQueryHelper queryHelper = new JSASTQueryHelper();
-		
-		for (String name : queryHelper.getGlobalFunctions(ast))
+		JSASTQueryHelper astHelper = new JSASTQueryHelper();
+		String location = file.getProjectRelativePath().toPortableString();
+
+		for (String name : astHelper.getGlobalFunctions(ast))
 		{
-			System.out.println(name + "()");
-			index.addEntry(JSIndexConstants.FUNCTION, name, file.getProjectRelativePath().toPortableString());
+			index.addEntry(JSIndexConstants.FUNCTION, name, location);
 		}
-		for (String varName : queryHelper.getGlobalDeclarations(ast))
+		for (String varName : astHelper.getNonFunctionDeclarations(ast))
 		{
-			System.out.println(varName);
+			index.addEntry(JSIndexConstants.VARIABLE, varName, location);
 		}
-		for (String varName : queryHelper.getAccidentalGlobals(ast))
-		{
-			System.out.println(varName);
-		}
+//		for (String varName : astHelper.getAccidentalGlobals(ast))
+//		{
+//			System.out.println("accidental global: " + varName);
+//			index.addEntry(JSIndexConstants.VARIABLE, varName, location);
+//		}
 	}
 }

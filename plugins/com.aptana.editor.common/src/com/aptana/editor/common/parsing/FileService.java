@@ -16,6 +16,7 @@ public class FileService
 	private IDocument fDocument;
 	private IParser fParser;
 	private IParseState fParseState;
+	private int fLastSourceHash;
 	private Set<IParseListener> listeners = new HashSet<IParseListener>();
 
 	/**
@@ -59,31 +60,37 @@ public class FileService
 	/**
 	 * parse
 	 */
-	public void parse()
+	public synchronized void parse()
 	{
 		if (fParser != null && fDocument != null)
 		{
 			String source = fDocument.get();
+			int sourceHash = source.hashCode();
 
-			// TODO: at some point, we'll want to use this call to indicate the
-			// actual edit with the theory that we'll be able to perform
-			// incremental lexing and parsing based on that info.
-			fParseState.setEditState(source, source, 0, 0);
-
-			try
+			if (sourceHash != fLastSourceHash)
 			{
-				fParser.parse(fParseState);
-
-				for (IParseListener listener : listeners)
+				fLastSourceHash = sourceHash;
+				
+				// TODO: at some point, we'll want to use this call to indicate the
+				// actual edit with the theory that we'll be able to perform
+				// incremental lexing and parsing based on that info.
+				fParseState.setEditState(source, source, 0, 0);
+	
+				try
 				{
-					listener.parseFinished();
+					fParser.parse(fParseState);
+	
+					for (IParseListener listener : listeners)
+					{
+						listener.parseFinished();
+					}
 				}
-			}
-			catch (Exception e)
-			{
-				// not logging the parsing error here since the source could be in an intermediate state of being edited
-				// by
-				// the user
+				catch (Exception e)
+				{
+					// not logging the parsing error here since the source could be in an intermediate state of being edited
+					// by
+					// the user
+				}
 			}
 		}
 	}

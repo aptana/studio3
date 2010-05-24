@@ -23,6 +23,7 @@ import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
+import com.aptana.parsing.ast.IParseNode;
 
 public class CommonContentAssistProcessor implements IContentAssistProcessor, ICommonContentAssistProcessor
 {
@@ -127,6 +128,16 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		return null;
 	}
 
+	/**
+	 * getAST
+	 * 
+	 * @return
+	 */
+	protected IParseNode getAST()
+	{
+		return editor.getFileService().getParseResult();
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getCompletionProposalAutoActivationCharacters()
@@ -168,6 +179,16 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	}
 	
 	/**
+	 * getFilename
+	 * 
+	 * @return
+	 */
+	protected String getFilename()
+	{
+		return editor.getEditorInput().getName();
+	}
+	
+	/**
 	 * getIndex
 	 * 
 	 * @return
@@ -177,6 +198,10 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		IEditorInput editorInput = editor.getEditorInput();
 		Index result = null;
 
+		// FIXME: For non-workspace files, the editor input would be FileStoreEditorInput.
+		// Both it and FileEditorInput implements IURIEditorInput, so we could use that once
+		// we're adapting to handle indexing non-workspace files.
+		
 		if (editorInput instanceof IFileEditorInput)
 		{
 			IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;

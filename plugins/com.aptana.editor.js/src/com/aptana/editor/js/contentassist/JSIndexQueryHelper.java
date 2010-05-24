@@ -2,6 +2,7 @@ package com.aptana.editor.js.contentassist;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
@@ -26,7 +27,7 @@ public class JSIndexQueryHelper
 	 * 
 	 * @return
 	 */
-	public List<PropertyElement> getGlobals()
+	public List<PropertyElement> getCoreGlobals()
 	{
 		List<PropertyElement> result = null;
 		
@@ -40,6 +41,26 @@ public class JSIndexQueryHelper
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * getProjectGlobals
+	 * 
+	 * @return
+	 */
+	public Map<String,List<String>> getProjectGlobals(Index index)
+	{
+		return this._reader.getValues(index, JSIndexConstants.FUNCTION);
+	}
+	
+	/**
+	 * getProjectVariables
+	 * 
+	 * @return
+	 */
+	public Map<String,List<String>> getProjectVariables(Index index)
+	{
+		return this._reader.getValues(index, JSIndexConstants.VARIABLE);
 	}
 	
 	/**

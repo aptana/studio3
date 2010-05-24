@@ -502,9 +502,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		return new LexemeProvider<HTMLTokenType>(document, lexemeProviderOffset, new HTMLScopeScanner())
 		{
 			@Override
-			protected HTMLTokenType getTypeFromName(String name)
+			protected HTMLTokenType getTypeFromData(Object data)
 			{
-				return HTMLTokenType.get(name);
+				return HTMLTokenType.get((String) data);
 			}
 		};
 	}

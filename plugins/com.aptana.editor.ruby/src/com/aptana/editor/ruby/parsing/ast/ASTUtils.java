@@ -148,7 +148,7 @@ public class ASTUtils
 				if (varNode instanceof DAsgnNode)
 				{
 					// single variable in the block
-					arguments.add((DAsgnNode) varNode);
+					arguments.add(varNode);
 				}
 				else if (varNode instanceof MultipleAsgnNode)
 				{
@@ -164,7 +164,7 @@ public class ASTUtils
 						Node multiArgsNode = multi.getArgsNode();
 						if (multiArgsNode instanceof DAsgnNode)
 						{
-							arguments.add((DAsgnNode) multiArgsNode);
+							arguments.add(multiArgsNode);
 						}
 					}
 				}

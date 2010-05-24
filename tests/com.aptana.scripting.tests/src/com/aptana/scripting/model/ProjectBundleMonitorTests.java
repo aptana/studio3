@@ -27,7 +27,7 @@ public class ProjectBundleMonitorTests extends BundleMonitorTests
 	{
 		action.performAction();
 		
-		// TODO: Probably should be relying on events or monitors here
-		Thread.sleep(500);
+		// TODO: Should be relying on events or monitors here
+		Thread.sleep(750);
 	}
 }

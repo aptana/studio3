@@ -20,6 +20,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.js,
+ com.aptana.editor.js.contentassist,
  com.aptana.editor.js.contentassist.index,
  com.aptana.editor.js.outline,
  com.aptana.editor.js.parsing

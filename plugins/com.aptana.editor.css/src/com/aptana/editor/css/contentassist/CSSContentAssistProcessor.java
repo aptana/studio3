@@ -420,9 +420,9 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		return new LexemeProvider<CSSTokenType>(document, offset, new CSSScopeScanner())
 		{
 			@Override
-			protected CSSTokenType getTypeFromName(String name)
+			protected CSSTokenType getTypeFromData(Object data)
 			{
-				return CSSTokenType.get(name);
+				return CSSTokenType.get((String) data);
 			}
 		};
 	}
@@ -515,7 +515,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			switch (lexeme.getType())
 			{
 				case CURLY_BRACE:
-					if ("{".equals(lexeme.getText()))
+					if ("{".equals(lexeme.getText())) //$NON-NLS-1$
 					{
 						location = LocationType.INSIDE_PROPERTY;
 					}

@@ -30,7 +30,7 @@ public class HTMLScopeScanner extends HTMLTagScanner
 		}
 
 		// add custom rules with lower precedence here
-		rules.add(new RegexpRule("/>", createToken(HTMLTokenType.TAG_SELF_CLOSE)));
+		rules.add(new RegexpRule("/>", createToken(HTMLTokenType.TAG_SELF_CLOSE))); //$NON-NLS-1$
 
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}

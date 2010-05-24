@@ -29,8 +29,25 @@ import com.aptana.editor.js.parsing.lexer.JSTokenType;
 
 public class LocationTests extends TestCase
 {
-	private static final String CURSOR_TAG = "${cursor}";
-
+	/**
+	 * TestContext
+	 */
+	static class TestContext
+	{
+		public final ITextEditor editor;
+		public final IDocument document;
+		public final String source;
+		public final JSContentAssistProcessor processor;
+		
+		public TestContext(ITextEditor editor, IDocument document, String source, JSContentAssistProcessor processor)
+		{
+			this.editor = editor;
+			this.document = document;
+			this.source = source;
+			this.processor = processor;
+		}
+	}
+	
 	/**
 	 * createEditor
 	 * 
@@ -52,9 +69,26 @@ public class LocationTests extends TestCase
 			fail(e.getMessage());
 		}
 
-		assertNotNull(editor);
+		assertTrue(editor instanceof AbstractThemeableEditor);
 		
 		return editor;
+	}
+	
+	/**
+	 * getFileInfo
+	 * 
+	 * @param resource
+	 * @return
+	 */
+	protected TestContext getTestContext(String resource)
+	{
+		IFileStore file = this.getFileStore(resource);
+		ITextEditor editor = this.createEditor(file);
+		IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
+		String source = document.get();
+		JSContentAssistProcessor processor = new JSContentAssistProcessor((AbstractThemeableEditor) editor);
+		
+		return new TestContext(editor, document, source, processor);
 	}
 
 	/**
@@ -99,22 +133,39 @@ public class LocationTests extends TestCase
 	 * 
 	 * @throws BadLocationException 
 	 */
-	public void testEmptyArgs() throws BadLocationException
+	public void testEmptyArgs()
 	{
-		IFileStore file = this.getFileStore("locations/global_in_arg.js");
-		ITextEditor editor = this.createEditor(file);
-		assertTrue(editor instanceof AbstractThemeableEditor);
+		// setup everything for the test
+		TestContext context = this.getTestContext("locations/global_in_empty_args.js");
 		
-		IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
-		
-		String source = document.get();
-		int offset = source.lastIndexOf(")");
+		// find the offset to test within the source
+		int offset = context.source.lastIndexOf("(");
 		assertTrue(offset != -1);
 		
-		JSContentAssistProcessor processor = new JSContentAssistProcessor((AbstractThemeableEditor) editor);
-		LexemeProvider<JSTokenType> lexemeProvider = processor.createLexemeProvider(document, offset);
+		// lex around the offset
+		LexemeProvider<JSTokenType> lexemeProvider = context.processor.createLexemeProvider(context.document, offset);
 
-		Location location = processor.getLocation(lexemeProvider, offset);
+		Location location = context.processor.getLocation(lexemeProvider, offset);
+		assertEquals(Location.IN_GLOBAL, location);
+	}
+	
+	/**
+	 * testInArg
+	 */
+	public void testInArgs()
+	{
+		// setup everything for the test
+		TestContext context = this.getTestContext("locations/global_in_arg.js");
+		
+		// find the offset to test within the source
+		int offset = context.source.lastIndexOf(",");
+		assertTrue(offset != -1);
+		offset++;
+		
+		// lex around the offset
+		LexemeProvider<JSTokenType> lexemeProvider = context.processor.createLexemeProvider(context.document, offset);
+
+		Location location = context.processor.getLocation(lexemeProvider, offset);
 		assertEquals(Location.IN_GLOBAL, location);
 	}
 }

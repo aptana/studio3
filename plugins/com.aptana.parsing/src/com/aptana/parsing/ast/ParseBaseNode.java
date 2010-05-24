@@ -106,7 +106,7 @@ public class ParseBaseNode extends Node implements IParseNode
 	@Override
 	public boolean contains(int offset)
 	{
-		return this.getStartingOffset() <= offset && offset < this.getEndingOffset();
+		return this.getStartingOffset() <= offset && offset <= this.getEndingOffset();
 	}
 
 	/*

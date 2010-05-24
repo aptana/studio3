@@ -20,6 +20,7 @@ public class CommonCompletionProposal implements ICommonCompletionProposal
 	private boolean _isDefaultSelection;
 	private boolean _isSuggestedSelection;
 	private Image[] _userAgentImages;
+	private int _hash;
 
 	/**
 	 * CommonCompletionProposal
@@ -35,12 +36,12 @@ public class CommonCompletionProposal implements ICommonCompletionProposal
 	 */
 	public CommonCompletionProposal(String replacementString, int replacementOffset, int replacementLength, int cursorPosition, Image image, String displayString, IContextInformation contextInformation, String additionalProposalInfo)
 	{
-		this._replacementString = replacementString;
+		this._replacementString = (replacementString == null) ? "" : replacementString;
 		this._replacementOffset = replacementOffset;
 		this._replacementLength = replacementLength;
 		this._cursorPosition = cursorPosition;
 		this._image = image;
-		this._displayString = displayString;
+		this._displayString = (displayString == null) ? "" : displayString;
 		this._contextInformation = contextInformation;
 		this._additionalProposalInformation = additionalProposalInfo;
 	}
@@ -60,6 +61,52 @@ public class CommonCompletionProposal implements ICommonCompletionProposal
 		{
 			// ignore
 		}
+	}
+
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj)
+	{
+		boolean result = false;
+		
+		if (this == obj)
+		{
+			result = true;
+		}
+		else if (obj instanceof CommonCompletionProposal)
+		{
+			CommonCompletionProposal that = (CommonCompletionProposal) obj;
+			
+			result =
+					this._replacementString.equals(that._replacementString)
+				&&	this._replacementOffset == that._replacementOffset
+				&&	this._replacementLength == that._replacementLength
+				&&	this._cursorPosition == that._cursorPosition
+				&&	this._displayString.equals(that._displayString);
+		}
+		
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode()
+	{
+		if (this._hash == 0)
+		{
+			this._hash = this._hash * 31 + this._replacementString.hashCode();
+			this._hash = this._hash * 31 + this._replacementOffset;
+			this._hash = this._hash * 31 + this._replacementLength;
+			this._hash = this._hash * 31 + this._cursorPosition;
+			this._hash = this._hash * 31 + this._displayString.hashCode();
+		}
+		
+		return this._hash;
 	}
 
 	/*

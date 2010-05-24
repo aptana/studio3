@@ -181,27 +181,31 @@ public class CSSIndexReader
 	 */
 	protected UserAgentElement getUserAgent(Index index, String userAgentKey) throws IOException
 	{
-		String searchKey = userAgentKey + CSSIndexConstants.DELIMITER;
-		List<QueryResult> items = index.query(new String[] { CSSIndexConstants.USER_AGENT }, searchKey,
-				SearchPattern.PREFIX_MATCH);
-		UserAgentElement result = null;
-
-		if (items != null && items.size() > 0)
+		UserAgentElement result = CSSIndexWriter.userAgentsByKey.get(userAgentKey);
+		
+		if (result == null)
 		{
-			String key = items.get(0).getWord();
-			String[] columns = key.split(CSSIndexConstants.DELIMITER);
-			int column = 1; // skip index
-
-			result = new UserAgentElement();
-			result.setDescription(columns[column++]);
-			result.setOS(columns[column++]);
-			result.setPlatform(columns[column++]);
-
-			// NOTE: split does not return a final empty element if the string being split
-			// ends with the delimiter.
-			if (column < columns.length)
+			String searchKey = userAgentKey + CSSIndexConstants.DELIMITER;
+			List<QueryResult> items = index.query(new String[] { CSSIndexConstants.USER_AGENT }, searchKey,
+					SearchPattern.PREFIX_MATCH);
+	
+			if (items != null && items.size() > 0)
 			{
-				result.setVersion(columns[column++]);
+				String key = items.get(0).getWord();
+				String[] columns = key.split(CSSIndexConstants.DELIMITER);
+				int column = 1; // skip index
+	
+				result = new UserAgentElement();
+				result.setDescription(columns[column++]);
+				result.setOS(columns[column++]);
+				result.setPlatform(columns[column++]);
+	
+				// NOTE: split does not return a final empty element if the string being split
+				// ends with the delimiter.
+				if (column < columns.length)
+				{
+					result.setVersion(columns[column++]);
+				}
 			}
 		}
 

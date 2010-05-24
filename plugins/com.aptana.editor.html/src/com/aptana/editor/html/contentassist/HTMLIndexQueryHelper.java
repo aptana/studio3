@@ -166,11 +166,11 @@ public class HTMLIndexQueryHelper
 					}
 					catch (IOException e)
 					{
-						Activator.logError("An error occurred while reading HTML metadata", e);
+						Activator.logError(Messages.HTMLIndexQueryHelper_Error_Loading_Metadata, e);
 					}
 					catch (Throwable t)
 					{
-						Activator.logError("An error occurred while reading HTML metadata", t);
+						Activator.logError(Messages.HTMLIndexQueryHelper_Error_Loading_Metadata, t);
 					}
 					finally
 					{
