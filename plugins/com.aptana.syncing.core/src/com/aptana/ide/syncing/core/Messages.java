@@ -41,20 +41,20 @@ import org.eclipse.osgi.util.NLS;
  */
 public final class Messages extends NLS {
 
-    private static final String BUNDLE_NAME = "com.aptana.ide.syncing.core.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.ide.syncing.core.messages"; //$NON-NLS-1$
 
-    public static String NaturePropertyTester_ERR_WhileTestingProjectNature;
+	public static String NaturePropertyTester_ERR_WhileTestingProjectNature;
 
-    public static String SiteConnection_LBL_NoDestination;
-    public static String SiteConnection_LBL_NoSource;
+	public static String SiteConnection_LBL_NoDestination;
+	public static String SiteConnection_LBL_NoSource;
 
-    public static String SiteConnectionManager_ERR_FailedToLoadConnections;
+	public static String SiteConnectionManager_ERR_FailedToLoadConnections;
 
-    static {
-        // initialize resource bundle
-        NLS.initializeMessages(BUNDLE_NAME, Messages.class);
-    }
+	static {
+		// initialize resource bundle
+		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	}
 
-    private Messages() {
-    }
+	private Messages() {
+	}
 }

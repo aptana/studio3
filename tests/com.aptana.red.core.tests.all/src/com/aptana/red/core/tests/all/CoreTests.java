@@ -12,6 +12,7 @@ public class CoreTests
 		// $JUnit-BEGIN$
 		suite.addTest(com.aptana.git.core.tests.AllTests.suite());
 		suite.addTest(com.aptana.core.tests.AllTests.suite());
+		suite.addTest(com.aptana.core.io.tests.AllTests.suite());
 		suite.addTest(com.aptana.scripting.tests.AllTests.suite());
 		// $JUnit-END$
 		return suite;

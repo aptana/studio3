@@ -13,6 +13,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
 
@@ -187,4 +188,39 @@ public class SWTUtils
 		combo.setBackground(null);
 		return true;
 	}
+	
+
+	/**
+	 * Tests if the widget value is empty. If so, it adds an error color to the background of the cell;
+	 * 
+	 * @param widget
+	 *            the widget to set text for
+	 * @return boolean
+	 */
+	public static boolean testWidgetValue(Text widget)
+	{
+		if (widget.getText() == null || "".equals(widget.getText())) //$NON-NLS-1$
+		{
+			widget.setBackground(errorColor);
+			final ModifyListener ml = new ModifyListener()
+			{
+
+				public void modifyText(ModifyEvent e)
+				{
+					Text t = (Text) e.widget;
+					if (t.getText() != null && !"".equals(t.getText())) //$NON-NLS-1$
+					{
+						t.setBackground(null);
+					}
+					else
+					{
+						t.setBackground(errorColor);
+					}
+				}
+			};
+			widget.addModifyListener(ml);
+			return false;
+		}
+		return true;
+	}	
 }
