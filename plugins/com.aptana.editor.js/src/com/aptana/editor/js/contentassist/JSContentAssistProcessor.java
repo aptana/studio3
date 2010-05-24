@@ -431,6 +431,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	IParseNode getActiveASTNode(int offset)
 	{
+		// force a parse
+		editor.getFileService().parse();
+		
 		IParseNode ast = this.getAST();
 		IParseNode result = null;
 		
