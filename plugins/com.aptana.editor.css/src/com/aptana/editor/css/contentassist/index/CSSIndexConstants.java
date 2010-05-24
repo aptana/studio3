@@ -2,7 +2,7 @@ package com.aptana.editor.css.contentassist.index;
 
 public interface CSSIndexConstants
 {
-	static final String PREFIX = "css.";
+	static final String PREFIX = "css."; //$NON-NLS-1$
 
 	// general constants
 	static final String DELIMITER = "\0"; //$NON-NLS-1$
