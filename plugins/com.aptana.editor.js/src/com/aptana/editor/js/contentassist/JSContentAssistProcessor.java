@@ -144,7 +144,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		String fileLocation = this.editor.getEditorInput().getName();
 		
 		// add globals from current file
-		List<String> globalFunctions = this._astHelper.getGlobalFunctions(this._targetNode);
+		IParseNode node = (this._targetNode.contains(offset)) ? this._targetNode : this.editor.getFileService().getParseResult();
+		
+		List<String> globalFunctions = this._astHelper.getGlobalFunctions(node);
 		
 		if (globalFunctions != null)
 		{
@@ -284,8 +286,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		if (this._targetNode != null)
 		{
+			IParseNode node = (this._targetNode.contains(offset)) ? this._targetNode : this.editor.getFileService().getParseResult();
 			String fileLocation = this.editor.getEditorInput().getName();
-			Map<String,Classification> args = this._astHelper.getSymbolsInScope(this._targetNode);
+			Map<String,Classification> args = this._astHelper.getSymbolsInScope(node);
 			
 			for (Entry<String,Classification> entry : args.entrySet())
 			{
