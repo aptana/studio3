@@ -4,8 +4,6 @@ import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -169,50 +167,24 @@ public class SWTUtils
 	}
 
 	/**
-	 * Tests if the widget value is empty. If so, it adds an error color to the background of the cell.
+	 * Tests if the Combo value is empty. If so, it adds an error color to the background of the cell.
 	 * 
-	 * @param widget
-	 *            the widget to set text for
+	 * @param combo
+	 *            the combo to validate
 	 * @param validSelectionIndex
 	 *            the first item that is a "valid" selection
 	 * @return boolean
 	 */
-	public static boolean testWidgetValue(Combo widget, int validSelectionIndex)
+	public static boolean validateCombo(Combo combo, int validSelectionIndex)
 	{
-		final int selectionIndex;
-		if (validSelectionIndex > 0)
+		int selectionIndex = Math.max(validSelectionIndex, 0);
+		String text = combo.getText();
+		if (text == null || text.length() == 0 || combo.getSelectionIndex() < selectionIndex)
 		{
-			selectionIndex = validSelectionIndex;
-		}
-		else
-		{
-			selectionIndex = 0;
-		}
-
-		String text = widget.getText();
-		if (text == null || text.length() == 0 || widget.getSelectionIndex() < selectionIndex)
-		{
-			widget.setBackground(errorColor);
-			final ModifyListener ml = new ModifyListener()
-			{
-
-				public void modifyText(ModifyEvent e)
-				{
-					Combo c = (Combo) e.widget;
-					String t = c.getText();
-					if (t != null && t.length() > 0 || c.getSelectionIndex() >= selectionIndex)
-					{
-						c.setBackground(null);
-					}
-					else
-					{
-						c.setBackground(errorColor);
-					}
-				}
-			};
-			widget.addModifyListener(ml);
+			combo.setBackground(errorColor);
 			return false;
 		}
+		combo.setBackground(null);
 		return true;
 	}
 }
