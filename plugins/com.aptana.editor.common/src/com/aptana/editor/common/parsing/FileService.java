@@ -60,7 +60,7 @@ public class FileService
 	/**
 	 * parse
 	 */
-	public void parse()
+	public synchronized void parse()
 	{
 		if (fParser != null && fDocument != null)
 		{
