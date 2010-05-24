@@ -1,35 +1,59 @@
 package com.aptana.editor.js.contentassist;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.runtime.Platform;
 import org.jaxen.JaxenException;
 import org.jaxen.XPath;
 
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
-import com.aptana.editor.js.parsing.ast.JSPrimitiveNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.xpath.ParseNodeXPath;
 
 public class JSASTQueryHelper
 {
+	public enum Classification
+	{
+		PROPERTY,
+		FUNCTION
+	}
+	
 	private static XPath SIBLING_VARS;
 	private static XPath ANCESTOR_FUNCTION_VARS;
+	private static XPath NAMED_FUNCTIONS;
+	private static XPath VAR_FUNCTIONS;
+	private static XPath IDENTIFIER_ASSIGNMENTS;
+	private static XPath NON_FUNCTION_VARS;
+	private static XPath ANCESTOR_FUNCTIONS;
 	
 	static
 	{
 		try
 		{
-			SIBLING_VARS = new ParseNodeXPath("../statements/var/declaration/identifier[position() = 1]");
+			ANCESTOR_FUNCTIONS = new ParseNodeXPath("ancestor::function");
 			ANCESTOR_FUNCTION_VARS = new ParseNodeXPath("ancestor::function/statements/var/declaration/identifier[position() = 1]|ancestor::function/parameters/identifier");
+			
+			IDENTIFIER_ASSIGNMENTS = new ParseNodeXPath("//assign/identifier[position() = 1]");
+			
+			NON_FUNCTION_VARS = new ParseNodeXPath("var/declaration/identifier[position() = 1 and count(following-sibling::function) = 0]");
+			VAR_FUNCTIONS = new ParseNodeXPath("var/declaration/identifier[count(following-sibling::function) > 0]");
+			
+			SIBLING_VARS = new ParseNodeXPath("../statements/var/declaration/identifier[position() = 1]");
+			
+			NAMED_FUNCTIONS = new ParseNodeXPath("function[string-length(@name) > 0]");
 		}
 		catch (JaxenException e)
 		{
-			e.printStackTrace();
+			if (Platform.inDevelopmentMode())
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -105,60 +129,73 @@ public class JSASTQueryHelper
 	 * @param ast
 	 * @return
 	 */
-	public List<String> getSymbolsInScope(IParseNode ast)
+	public Map<String,Classification> getSymbolsInScope(IParseNode ast)
 	{
-		final Set<String> result = new HashSet<String>();
+		final Map<String,Classification> result = new HashMap<String,Classification>();
 		
 		this.processXPath(
-			"ancestor::function",
+			ANCESTOR_FUNCTIONS,
 			ast,
 			new ItemProcessor() {
 				public void process(Object item)
 				{
-					if (item instanceof JSFunctionNode)
+					JSFunctionNode function = (JSFunctionNode) item;
+					IParseNode body = function.getBody();
+					
+					// add args
+					for (IParseNode arg : function.getArgs())
 					{
-						JSFunctionNode function = (JSFunctionNode) item;
-						
-						// add args
-						for (IParseNode arg : function.getArgs())
-						{
-							result.add(arg.toString());
-						}
-						
-						// add vars
-						result.addAll(getGlobalDeclarations(function.getBody()));
+						result.put(arg.toString(), Classification.PROPERTY);
+					}
+					
+					// add named functions
+					for (String func : getNamedFunctions(body))
+					{
+						result.put(func, Classification.FUNCTION);
+					}
+					
+					// add non-function vars
+					for (String var : getNonFunctionDeclarations(body))
+					{
+						result.put(var, Classification.PROPERTY);
+					}
+					
+					// vars that are functions
+					for (String var : getVarDeclaredFunctions(body))
+					{
+						result.put(var, Classification.FUNCTION);
 					}
 				}
 			}
 		);
 		
-		result.addAll(this.getAccidentalGlobals(ast));
+//		for (String global : this.getAccidentalGlobals(ast))
+//		{
+//			result.put(global, Classification.PROPERTY);
+//		}
 		
-		return new ArrayList<String>(result);
+		return result;
 	}
 	
 	/**
-	 * getGlobalDeclarations
+	 * getNonFunctionDeclarations
 	 * 
 	 * @param ast
 	 * @return
 	 */
-	public List<String> getGlobalDeclarations(IParseNode ast)
+	public List<String> getNonFunctionDeclarations(IParseNode ast)
 	{
 		final List<String> result = new LinkedList<String>();
 
 		// NOTE: we're using a relative path here so we can use this expression
 		// at the top-level of a file and for function bodies
 		this.processXPath(
-			"var/declaration/identifier[position() = 1 and count(following-sibling::function) = 0]",
+			NON_FUNCTION_VARS,
 			ast,
 			new ItemProcessor() {
 				public void process(Object item)
 				{
-					if (item instanceof JSPrimitiveNode)
-					{
-						result.add(item.toString());
-					}
+					result.add(item.toString());
 				}
 			}
 		);
@@ -177,7 +214,7 @@ public class JSASTQueryHelper
 		final Set<String> globals = new HashSet<String>();
 		
 		this.processXPath(
-			"//assign/identifier[position() = 1]",
+			IDENTIFIER_ASSIGNMENTS,
 			ast,
 			new ItemProcessor() {
 				public void process(Object item)
@@ -210,41 +247,63 @@ public class JSASTQueryHelper
 	 */
 	public List<String> getGlobalFunctions(IParseNode ast)
 	{
+		List<String> result = this.getNamedFunctions(ast);
+
+		result.addAll(this.getVarDeclaredFunctions(ast));
+
+		return result;
+	}
+
+	/**
+	 * getNamedFunctions
+	 * 
+	 * @param ast
+	 * @return
+	 */
+	public List<String> getNamedFunctions(IParseNode ast)
+	{
 		final List<String> result = new LinkedList<String>();
 
 		this.processXPath(
-			"/function[string-length(@name) > 0]",
+			NAMED_FUNCTIONS,
 			ast,
 			new ItemProcessor() {
 				public void process(Object item)
 				{
-					if (item instanceof JSFunctionNode)
-					{
-						JSFunctionNode function = (JSFunctionNode) item;
-						
-						result.add(function.getName());
-					}
+					JSFunctionNode function = (JSFunctionNode) item;
+					
+					result.add(function.getName());
 				}
 			}
 		);
-
+		
+		return result;
+	}
+	
+	/**
+	 * getVarDeclaredFunctions
+	 * 
+	 * @param ast
+	 * @return
+	 */
+	public List<String> getVarDeclaredFunctions(IParseNode ast)
+	{
+		final List<String> result = new LinkedList<String>();
+		
 		this.processXPath(
-			"/var/declaration/identifier[count(following-sibling::function) > 0]",
+			VAR_FUNCTIONS,
 			ast,
 			new ItemProcessor() {
 				public void process(Object item)
 				{
-					if (item instanceof JSPrimitiveNode)
-					{
-						result.add(item.toString());
-					}
+					result.add(item.toString());
 				}
 			}
 		);
 
 		return result;
 	}
-
+	
 	/**
 	 * processXPath
 	 * 
@@ -252,14 +311,13 @@ public class JSASTQueryHelper
 	 * @param node
 	 * @param processor
 	 */
-	private void processXPath(String expression, IParseNode node, ItemProcessor processor)
+	private void processXPath(XPath expression, IParseNode node, ItemProcessor processor)
 	{
-		if (expression != null && expression.length() > 0 && node != null && processor != null)
+		if (expression != null && node != null && processor != null)
 		{
 			try
 			{
-				XPath xpath = new ParseNodeXPath(expression);
-				Object list = xpath.evaluate(node);
+				Object list = expression.evaluate(node);
 	
 				if (list instanceof List<?>)
 				{
