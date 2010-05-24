@@ -8,91 +8,91 @@ import com.aptana.parsing.lexer.ITypePredicate;
 
 public enum JSTokenType implements ITypePredicate
 {
-	UNDEFINED("UNDEFINED"),
-	EOF("EOF"),
-	LPAREN("("),
-	IDENTIFIER("IDENTIFIER"),
-	LCURLY("{"),
-	LBRACKET("["),
-	PLUS_PLUS("++"),
-	MINUS_MINUS("--"),
-	STRING("STRING"),
-	NUMBER("NUMBER"),
-	MINUS("-"),
-	PLUS("+"),
-	FUNCTION("function"),
-	THIS("this"),
-	NEW("new"),
-	NULL("null"),
-	TRUE("true"),
-	FALSE("false"),
-	REGEX("REGEX"),
-	DELETE("delete"),
-	EXCLAMATION("!"),
-	TILDE("~"),
-	TYPEOF("typeof"),
-	VOID("void"),
-	SEMICOLON(";"),
-	COMMA(","),
-	VAR("var"),
-	WHILE("while"),
-	FOR("for"),
-	DO("do"),
-	SWITCH("switch"),
-	IF("if"),
-	CONTINUE("continue"),
-	BREAK("break"),
-	WITH("with"),
-	RETURN("return"),
-	THROW("throw"),
-	TRY("try"),
-	RPAREN(")"),
-	ELSE("else"),
-	RCURLY("}"),
-	COLON(":"),
-	RBRACKET("]"),
-	IN("in"),
-	EQUAL("="),
-	CASE("case"),
-	DOT("."),
-	LESS_LESS("<<"),
-	GREATER_GREATER(">>"),
-	GREATER_GREATER_GREATER(">>>"),
-	LESS("<"),
-	GREATER(">"),
-	LESS_EQUAL("<="),
-	GREATER_EQUAL(">="),
-	INSTANCEOF("instanceof"),
-	EQUAL_EQUAL("=="),
-	EXCLAMATION_EQUAL("!="),
-	EQUAL_EQUAL_EQUAL("==="),
-	EXCLAMATION_EQUAL_EQUAL("!=="),
-	AMPERSAND("&"),
-	CARET("^"),
-	PIPE("|"),
-	AMPERSAND_AMPERSAND("&&"),
-	STAR_EQUAL("*="),
-	FORWARD_SLASH_EQUAL("/="),
-	PERCENT_EQUAL("%="),
-	PLUS_EQUAL("+="),
-	MINUS_EQUAL("-="),
-	LESS_LESS_EQUAL("<<="),
-	GREATER_GREATER_EQUAL(">>="),
-	GREATER_GREATER_GREATER_EQUAL(">>>="),
-	AMPERSAND_EQUAL("&="),
-	CARET_EQUAL("^="),
-	PIPE_EQUAL("|="),
-	STAR("*"),
-	FORWARD_SLASH("/"),
-	PERCENT("%"),
-	QUESTION("?"),
-	PIPE_PIPE("||"),
-	DEFAULT("default"),
-	FINALLY("finally"),
-	CATCH("catch"),
-	SINGLELINE_COMMENT("SINGLELINE_COMMENT"),
-	MULTILINE_COMMENT("MULTILINE_COMMENT"),
-	DOC("DOC");
+	UNDEFINED("UNDEFINED"), //$NON-NLS-1$
+	EOF("EOF"), //$NON-NLS-1$
+	LPAREN("("), //$NON-NLS-1$
+	IDENTIFIER("IDENTIFIER"), //$NON-NLS-1$
+	LCURLY("{"), //$NON-NLS-1$
+	LBRACKET("["), //$NON-NLS-1$
+	PLUS_PLUS("++"), //$NON-NLS-1$
+	MINUS_MINUS("--"), //$NON-NLS-1$
+	STRING("STRING"), //$NON-NLS-1$
+	NUMBER("NUMBER"), //$NON-NLS-1$
+	MINUS("-"), //$NON-NLS-1$
+	PLUS("+"), //$NON-NLS-1$
+	FUNCTION("function"), //$NON-NLS-1$
+	THIS("this"), //$NON-NLS-1$
+	NEW("new"), //$NON-NLS-1$
+	NULL("null"), //$NON-NLS-1$
+	TRUE("true"), //$NON-NLS-1$
+	FALSE("false"), //$NON-NLS-1$
+	REGEX("REGEX"), //$NON-NLS-1$
+	DELETE("delete"), //$NON-NLS-1$
+	EXCLAMATION("!"), //$NON-NLS-1$
+	TILDE("~"), //$NON-NLS-1$
+	TYPEOF("typeof"), //$NON-NLS-1$
+	VOID("void"), //$NON-NLS-1$
+	SEMICOLON(";"), //$NON-NLS-1$
+	COMMA(","), //$NON-NLS-1$
+	VAR("var"), //$NON-NLS-1$
+	WHILE("while"), //$NON-NLS-1$
+	FOR("for"), //$NON-NLS-1$
+	DO("do"), //$NON-NLS-1$
+	SWITCH("switch"), //$NON-NLS-1$
+	IF("if"), //$NON-NLS-1$
+	CONTINUE("continue"), //$NON-NLS-1$
+	BREAK("break"), //$NON-NLS-1$
+	WITH("with"), //$NON-NLS-1$
+	RETURN("return"), //$NON-NLS-1$
+	THROW("throw"), //$NON-NLS-1$
+	TRY("try"), //$NON-NLS-1$
+	RPAREN(")"), //$NON-NLS-1$
+	ELSE("else"), //$NON-NLS-1$
+	RCURLY("}"), //$NON-NLS-1$
+	COLON(":"), //$NON-NLS-1$
+	RBRACKET("]"), //$NON-NLS-1$
+	IN("in"), //$NON-NLS-1$
+	EQUAL("="), //$NON-NLS-1$
+	CASE("case"), //$NON-NLS-1$
+	DOT("."), //$NON-NLS-1$
+	LESS_LESS("<<"), //$NON-NLS-1$
+	GREATER_GREATER(">>"), //$NON-NLS-1$
+	GREATER_GREATER_GREATER(">>>"), //$NON-NLS-1$
+	LESS("<"), //$NON-NLS-1$
+	GREATER(">"), //$NON-NLS-1$
+	LESS_EQUAL("<="), //$NON-NLS-1$
+	GREATER_EQUAL(">="), //$NON-NLS-1$
+	INSTANCEOF("instanceof"), //$NON-NLS-1$
+	EQUAL_EQUAL("=="), //$NON-NLS-1$
+	EXCLAMATION_EQUAL("!="), //$NON-NLS-1$
+	EQUAL_EQUAL_EQUAL("==="), //$NON-NLS-1$
+	EXCLAMATION_EQUAL_EQUAL("!=="), //$NON-NLS-1$
+	AMPERSAND("&"), //$NON-NLS-1$
+	CARET("^"), //$NON-NLS-1$
+	PIPE("|"), //$NON-NLS-1$
+	AMPERSAND_AMPERSAND("&&"), //$NON-NLS-1$
+	STAR_EQUAL("*="), //$NON-NLS-1$
+	FORWARD_SLASH_EQUAL("/="), //$NON-NLS-1$
+	PERCENT_EQUAL("%="), //$NON-NLS-1$
+	PLUS_EQUAL("+="), //$NON-NLS-1$
+	MINUS_EQUAL("-="), //$NON-NLS-1$
+	LESS_LESS_EQUAL("<<="), //$NON-NLS-1$
+	GREATER_GREATER_EQUAL(">>="), //$NON-NLS-1$
+	GREATER_GREATER_GREATER_EQUAL(">>>="), //$NON-NLS-1$
+	AMPERSAND_EQUAL("&="), //$NON-NLS-1$
+	CARET_EQUAL("^="), //$NON-NLS-1$
+	PIPE_EQUAL("|="), //$NON-NLS-1$
+	STAR("*"), //$NON-NLS-1$
+	FORWARD_SLASH("/"), //$NON-NLS-1$
+	PERCENT("%"), //$NON-NLS-1$
+	QUESTION("?"), //$NON-NLS-1$
+	PIPE_PIPE("||"), //$NON-NLS-1$
+	DEFAULT("default"), //$NON-NLS-1$
+	FINALLY("finally"), //$NON-NLS-1$
+	CATCH("catch"), //$NON-NLS-1$
+	SINGLELINE_COMMENT("SINGLELINE_COMMENT"), //$NON-NLS-1$
+	MULTILINE_COMMENT("MULTILINE_COMMENT"), //$NON-NLS-1$
+	DOC("DOC"); //$NON-NLS-1$
 
 	private static Map<String, JSTokenType> NAME_MAP;
 	

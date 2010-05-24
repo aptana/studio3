@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -38,7 +37,7 @@ import com.aptana.parsing.lexer.Lexeme;
 
 public class JSContentAssistProcessor extends CommonContentAssistProcessor
 {
-	private static final String PARENS = "()";
+	private static final String PARENS = "()"; //$NON-NLS-1$
 
 	static enum Location
 	{
@@ -183,7 +182,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				boolean hasFiles = (files != null && files.size() > 0);
 				
 				String name = entry.getKey() + PARENS;
-				String description = (hasFiles) ? JSModelFormatter.getDescription("Referencing Files:", files) : null;
+				String description = (hasFiles) ? JSModelFormatter.getDescription(Messages.JSContentAssistProcessor_Referencing_Files, files) : null;
 				Image image = JS_FUNCTION;
 				Image[] userAgents = this.getAllUserAgentIcons();
 				String location = (hasFiles) ? files.get(0) : null;
@@ -212,7 +211,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				boolean hasFiles = (files != null && files.size() > 0);
 				
 				String name = entry.getKey();
-				String description = (hasFiles) ? JSModelFormatter.getDescription("Referencing Files:", files) : null;;
+				String description = (hasFiles) ? JSModelFormatter.getDescription(Messages.JSContentAssistProcessor_Referencing_Files, files) : null;;
 				Image image = JS_PROPERTY;
 				Image[] userAgents = this.getAllUserAgentIcons();
 				String location = (hasFiles) ? files.get(0) : null;
@@ -313,49 +312,44 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	@Override
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
 	{
+		IDocument document = viewer.getDocument();
+		LexemeProvider<JSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
 		Set<ICompletionProposal> result = new HashSet<ICompletionProposal>();
+
+		// store a reference to the lexeme at the current position
+		this._currentLexeme = lexemeProvider.getLexemeFromOffset(offset);
 		
-		if (Platform.inDevelopmentMode())
+		if (this._currentLexeme == null)
 		{
-			IDocument document = viewer.getDocument();
-			
-			LexemeProvider<JSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
-	
-			// store a reference to the lexeme at the current position
-			this._currentLexeme = lexemeProvider.getLexemeFromOffset(offset);
-			
-			if (this._currentLexeme == null)
-			{
-				this._currentLexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
-			}
-	
-			// first step is to determine where we are
-			Location location = this.getLocation(lexemeProvider, offset);
-	
-			switch (location)
-			{
-				case IN_PROPERTY_NAME:
-					//System.out.println("Property");
-					break;
-					
-				case IN_VARIABLE_NAME:
-					//System.out.println("Variable");
-					break;
-					
-				case IN_GLOBAL:
-					this.addAllGlobals(result, offset);
-					this.addSymbolsInScope(result, offset);
-					break;
-					
-				case IN_CONSTRUCTOR:
-					this.addCoreFunctions(result, offset);
-					this.addProjectGlobalFunctions(result, offset);
-					this.addLocalGlobalFunctions(result, offset);
-					break;
-					
-				default:
-					break;
-			}
+			this._currentLexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
+		}
+
+		// first step is to determine where we are
+		Location location = this.getLocation(lexemeProvider, offset);
+
+		switch (location)
+		{
+			case IN_PROPERTY_NAME:
+				//System.out.println("Property");
+				break;
+				
+			case IN_VARIABLE_NAME:
+				//System.out.println("Variable");
+				break;
+				
+			case IN_GLOBAL:
+				this.addAllGlobals(result, offset);
+				this.addSymbolsInScope(result, offset);
+				break;
+				
+			case IN_CONSTRUCTOR:
+				this.addCoreFunctions(result, offset);
+				this.addProjectGlobalFunctions(result, offset);
+				this.addLocalGlobalFunctions(result, offset);
+				break;
+				
+			default:
+				break;
 		}
 	
 		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>(result);
