@@ -1,12 +1,9 @@
 package com.aptana.editor.js.contentassist;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.runtime.Platform;
 import org.jaxen.JaxenException;
@@ -25,32 +22,25 @@ public class JSASTQueryHelper
 		FUNCTION
 	}
 	
-	private static XPath SIBLING_VARS;
-	private static XPath ANCESTOR_FUNCTION_VARS;
-	private static XPath NAMED_FUNCTIONS;
-	private static XPath VAR_FUNCTIONS;
-	private static XPath IDENTIFIER_ASSIGNMENTS;
-	private static XPath NON_FUNCTION_VARS;
 	private static XPath ANCESTOR_FUNCTIONS;
+	private static XPath NAMED_FUNCTIONS;
 	private static XPath ALL_VARS;
-	
+	private static XPath NON_FUNCTION_VARS;
+	private static XPath VAR_FUNCTIONS;
+
+	/**
+	 * static initializer
+	 */
 	static
 	{
 		try
 		{
-			ALL_VARS = new ParseNodeXPath("descendant::var/declaration/identifier[position() = 1]");
-			
 			ANCESTOR_FUNCTIONS = new ParseNodeXPath("ancestor::function");
-			ANCESTOR_FUNCTION_VARS = new ParseNodeXPath("ancestor::function/statements/var/declaration/identifier[position() = 1]|ancestor::function/parameters/identifier");
+			NAMED_FUNCTIONS = new ParseNodeXPath("./function[string-length(@name) > 0]");
 			
-			IDENTIFIER_ASSIGNMENTS = new ParseNodeXPath("//assign/identifier[position() = 1]");
-			
+			ALL_VARS = new ParseNodeXPath("descendant::var/declaration/identifier[position() = 1]");
 			NON_FUNCTION_VARS = new ParseNodeXPath("./var/declaration/identifier[position() = 1 and count(following-sibling::function) = 0]");
 			VAR_FUNCTIONS = new ParseNodeXPath("./var/declaration/identifier[count(following-sibling::function) > 0]");
-			
-			SIBLING_VARS = new ParseNodeXPath("../statements/var/declaration/identifier[position() = 1]");
-			
-			NAMED_FUNCTIONS = new ParseNodeXPath("function[string-length(@name) > 0]");
 		}
 		catch (JaxenException e)
 		{
@@ -66,65 +56,6 @@ public class JSASTQueryHelper
 	 */
 	public JSASTQueryHelper()
 	{
-	}
-	
-	/**
-	 * declaredInScope
-	 * 
-	 * @param ast
-	 * @param name
-	 * @return
-	 */
-	public boolean declaredInScope(IParseNode ast, String name)
-	{
-		Object list;
-		boolean result = false;
-		
-		try
-		{
-			// look at any siblings
-			list = SIBLING_VARS.evaluate(ast);
-			
-			if (list instanceof List<?>)
-			{
-				List<?> items = (List<?>) list;
-				
-				for (Object item : items)
-				{
-					if (name.equals(item.toString()))
-					{
-						result = true;
-						break;
-					}
-				}
-			}
-			
-			// look at any parent function's vars and args
-			if (result == false)
-			{
-				list = ANCESTOR_FUNCTION_VARS.evaluate(ast);
-				
-				if (list instanceof List<?>)
-				{
-					List<?> items = (List<?>) list;
-					
-					for (Object item : items)
-					{
-						if (name.equals(item.toString()))
-						{
-							result = true;
-							break;
-						}
-					}
-				}
-			}
-		}
-		catch (JaxenException e)
-		{
-			e.printStackTrace();
-		}
-		
-		return result;
 	}
 	
 	/**
@@ -144,7 +75,6 @@ public class JSASTQueryHelper
 				public void process(Object item)
 				{
 					final JSFunctionNode function = (JSFunctionNode) item;
-					IParseNode body = function.getBody();
 					
 					// add args
 					for (IParseNode arg : function.getArgs())
@@ -152,19 +82,15 @@ public class JSASTQueryHelper
 						result.put(arg.toString(), Classification.PROPERTY);
 					}
 					
-					// add named functions
-					for (String func : getNamedFunctions(body))
-					{
-						result.put(func, Classification.FUNCTION);
-					}
-					
+					// add all descendant vars not contained by descendant functions
 					processXPath(
 						ALL_VARS,
-						body,
+						function.getBody(),
 						new ItemProcessor() {
 							public void process(Object item)
 							{
 								IParseNode node = (IParseNode) item;
+								IParseNode nextSibling = node.getParent().getChild(1);
 								IParseNode parent = node.getParent();
 								
 								while (parent != null)
@@ -173,7 +99,7 @@ public class JSASTQueryHelper
 									{
 										if (parent == function)
 										{
-											Classification c = (node.getType() == JSNodeTypes.FUNCTION) ? Classification.FUNCTION : Classification.PROPERTY;
+											Classification c = (nextSibling.getType() == JSNodeTypes.FUNCTION) ? Classification.FUNCTION : Classification.PROPERTY;
 											
 											result.put(item.toString(), c);
 										}
@@ -187,26 +113,9 @@ public class JSASTQueryHelper
 							}
 						}
 					);
-					
-//					// add non-function vars
-//					for (String var : getNonFunctionDeclarations(body))
-//					{
-//						result.put(var, Classification.PROPERTY);
-//					}
-//					
-//					// vars that are functions
-//					for (String var : getVarDeclaredFunctions(body))
-//					{
-//						result.put(var, Classification.FUNCTION);
-//					}
 				}
 			}
 		);
-		
-//		for (String global : this.getAccidentalGlobals(ast))
-//		{
-//			result.put(global, Classification.PROPERTY);
-//		}
 		
 		return result;
 	}
@@ -232,42 +141,6 @@ public class JSASTQueryHelper
 			}
 		);
 
-		return result;
-	}
-
-	/**
-	 * getAccidentalGlobals
-	 * 
-	 * @param ast
-	 * @return
-	 */
-	public List<String> getAccidentalGlobals(IParseNode ast)
-	{
-		final Set<String> globals = new HashSet<String>();
-		
-		this.processXPath(
-			IDENTIFIER_ASSIGNMENTS,
-			ast,
-			new ItemProcessor() {
-				public void process(Object item)
-				{
-					if (item instanceof IParseNode)
-					{
-						IParseNode node = (IParseNode) item;
-						String name = node.toString();
-						
-						if (declaredInScope(node, name) == false)
-						{
-							globals.add(name);
-						}
-					}
-				}
-			}
-		);
-		
-		List<String> result = new LinkedList<String>(globals);
-		Collections.sort(result);
-		
 		return result;
 	}
 
