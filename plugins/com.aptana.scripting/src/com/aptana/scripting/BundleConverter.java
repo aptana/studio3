@@ -128,7 +128,7 @@ public class BundleConverter
 		});
 	}
 
-	private static void convertBundle(File bundleDir, String outputBundlePath) throws IOException
+	public static void convertBundle(File bundleDir, String outputBundlePath) throws IOException
 	{
 		Map<String, String> uuidToName = new HashMap<String, String>();
 		// Run SnippetConverter on snippets sub dir
@@ -496,18 +496,18 @@ public class BundleConverter
 				case '^':
 					if ((keyBinding.length() > (i + 1)) && (keyBinding.charAt(i + 1) == '@'))
 					{
-						builder.append("CONTROL+COMMAND+SHIFT+"); //$NON-NLS-1$
+						builder.append("M1+M2+M4+"); //$NON-NLS-1$
 						i++;
 					}
 					else
 					{
-						builder.append("CONTROL+M2+"); //$NON-NLS-1$
+						builder.append("M2+M4+"); //$NON-NLS-1$
 					}
 					break;
 				case '~':
 					if ((keyBinding.length() > (i + 1)) && (keyBinding.charAt(i + 1) == '@'))
 					{
-						builder.append("OPTION+COMMAND+"); //$NON-NLS-1$
+						builder.append("M1+M4+"); //$NON-NLS-1$
 						i++;
 					}
 					else

@@ -265,7 +265,9 @@ public class MenuDialog extends PopupDialog
 	protected void select()
 	{
 		int index = completionsTable.getSelectionIndex();
-		setReturnCode(index);
+		TableItem item = completionsTable.getItem(index);
+		int returnCode = (Integer) item.getData("index");  //$NON-NLS-1$
+		setReturnCode(returnCode);
 		close();
 	}
 
