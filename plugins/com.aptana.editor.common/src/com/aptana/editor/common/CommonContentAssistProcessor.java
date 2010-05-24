@@ -23,6 +23,7 @@ import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
+import com.aptana.parsing.ast.IParseNode;
 
 public class CommonContentAssistProcessor implements IContentAssistProcessor, ICommonContentAssistProcessor
 {
@@ -127,6 +128,16 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		return null;
 	}
 
+	/**
+	 * getAST
+	 * 
+	 * @return
+	 */
+	protected IParseNode getAST()
+	{
+		return editor.getFileService().getParseResult();
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getCompletionProposalAutoActivationCharacters()
@@ -165,6 +176,16 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	{
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	/**
+	 * getFilename
+	 * 
+	 * @return
+	 */
+	protected String getFilename()
+	{
+		return editor.getEditorInput().getName();
 	}
 	
 	/**

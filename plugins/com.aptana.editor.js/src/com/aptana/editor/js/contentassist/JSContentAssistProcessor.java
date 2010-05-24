@@ -141,10 +141,10 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private void addLocalGlobalFunctions(List<ICompletionProposal> proposals, int offset)
 	{
-		String fileLocation = this.editor.getEditorInput().getName();
+		String fileLocation = this.getFilename();
 		
 		// add globals from current file
-		IParseNode node = (this._targetNode.contains(offset)) ? this._targetNode : this.editor.getFileService().getParseResult();
+		IParseNode node = (this._targetNode.contains(offset)) ? this._targetNode : this.getAST();
 		
 		List<String> globalFunctions = this._astHelper.getGlobalFunctions(node);
 		
@@ -286,8 +286,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		if (this._targetNode != null)
 		{
-			IParseNode node = (this._targetNode.contains(offset)) ? this._targetNode : this.editor.getFileService().getParseResult();
-			String fileLocation = this.editor.getEditorInput().getName();
+			IParseNode node = (this._targetNode.contains(offset)) ? this._targetNode : this.getAST();
+			String fileLocation = this.getFilename();
 			Map<String,Classification> args = this._astHelper.getSymbolsInScope(node);
 			
 			for (Entry<String,Classification> entry : args.entrySet())
@@ -426,7 +426,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	IParseNode getActiveASTNode(int offset)
 	{
-		IParseNode ast = this.editor.getFileService().getParseResult();
+		IParseNode ast = this.getAST();
 		IParseNode result = null;
 		
 		if (ast != null)
