@@ -5,8 +5,6 @@ import java.util.Set;
 
 import org.eclipse.jface.text.IDocument;
 
-import com.aptana.editor.common.IParserPool;
-import com.aptana.editor.common.ParserPoolFactory;
 import com.aptana.editor.common.outline.IParseListener;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;

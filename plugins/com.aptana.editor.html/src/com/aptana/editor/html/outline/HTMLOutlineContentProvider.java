@@ -18,10 +18,10 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.PlatformUI;
 
-import com.aptana.editor.common.IParserPool;
-import com.aptana.editor.common.ParserPoolFactory;
 import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CompositeOutlineContentProvider;
+import com.aptana.editor.common.parsing.IParserPool;
+import com.aptana.editor.common.parsing.ParserPoolFactory;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.html.Activator;

@@ -1,6 +1,8 @@
-package com.aptana.editor.common;
+package com.aptana.editor.common.internal.parsing;
 
 import com.aptana.core.util.ObjectPool;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.parsing.IParserPool;
 import com.aptana.parsing.IParser;
 
 public class ParserPool extends ObjectPool<IParser> implements IParserPool
@@ -8,7 +10,7 @@ public class ParserPool extends ObjectPool<IParser> implements IParserPool
 
 	private String className;
 
-	ParserPool(String className)
+	public ParserPool(String className)
 	{
 		this.className = className;
 	}

@@ -16,8 +16,8 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
 
 import com.aptana.core.util.IOUtil;
-import com.aptana.editor.common.IParserPool;
-import com.aptana.editor.common.ParserPoolFactory;
+import com.aptana.editor.common.parsing.IParserPool;
+import com.aptana.editor.common.parsing.ParserPoolFactory;
 import com.aptana.editor.ruby.Activator;
 import com.aptana.editor.ruby.IRubyConstants;
 import com.aptana.editor.ruby.parsing.IRubyParserConstants;

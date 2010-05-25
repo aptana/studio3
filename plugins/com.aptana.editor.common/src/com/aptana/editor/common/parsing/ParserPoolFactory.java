@@ -1,4 +1,4 @@
-package com.aptana.editor.common;
+package com.aptana.editor.common.parsing;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +9,7 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 
+import com.aptana.editor.common.internal.parsing.ParserPool;
 import com.aptana.parsing.ParsingPlugin;
 
 public class ParserPoolFactory
