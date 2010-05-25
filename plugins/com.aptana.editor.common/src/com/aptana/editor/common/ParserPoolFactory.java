@@ -19,6 +19,13 @@ public class ParserPoolFactory
 	private Map<String, String> parsers;
 	private HashMap<String, IParserPool> pools;
 
+	/**
+	 * The main use of this class. Pass in a language (usually "text/language") and get back an IParserPool to use to
+	 * "borrow" a parser instance.
+	 * 
+	 * @param language
+	 * @return
+	 */
 	public synchronized IParserPool getParserPool(String language)
 	{
 		if (pools == null)
@@ -41,6 +48,11 @@ public class ParserPoolFactory
 		return pool;
 	}
 
+	/**
+	 * Singleton!
+	 * 
+	 * @return
+	 */
 	public static ParserPoolFactory getInstance()
 	{
 		if (fgInstance == null)
@@ -50,18 +62,26 @@ public class ParserPoolFactory
 		return fgInstance;
 	}
 
+	/**
+	 * Don't allow multiple instances.
+	 */
 	private ParserPoolFactory()
 	{
 	}
 
+	/**
+	 * Returns a map from language to parser class name. We don't want instances of parsers yet, just info on how to
+	 * generate instances, which we can with the class name.
+	 * 
+	 * @return
+	 */
 	private static Map<String, String> getParsers()
 	{
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		Map<String, String> parsers = new HashMap<String, String>();
 		if (registry != null)
 		{
-			IExtensionPoint extensionPoint = registry.getExtensionPoint(ParsingPlugin.PLUGIN_ID,
-					"parser"); //$NON-NLS-1$
+			IExtensionPoint extensionPoint = registry.getExtensionPoint(ParsingPlugin.PLUGIN_ID, "parser"); //$NON-NLS-1$
 
 			if (extensionPoint != null)
 			{
