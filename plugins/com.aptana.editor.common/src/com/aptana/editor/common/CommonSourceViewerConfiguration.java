@@ -58,7 +58,9 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 
@@ -269,6 +271,12 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 					protected Color getForeground()
 					{
 						return getThemeForeground();
+					}
+					
+					@Override
+					protected Color getBorderColor()
+					{
+						return getForeground();
 					}
 				};
 			}

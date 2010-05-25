@@ -103,8 +103,7 @@ public class InformationControl implements IInformationControl, IInformationCont
 		GridData gd;
 
 		fShell= new Shell(parent, SWT.NO_FOCUS | SWT.ON_TOP | shellStyle);
-		Display display= fShell.getDisplay();
-		fShell.setBackground(display.getSystemColor(SWT.COLOR_BLACK));
+		fShell.setBackground(getBorderColor());
 
 		Composite composite= fShell;
 		layout= new GridLayout(1, false);
@@ -173,13 +172,24 @@ public class InformationControl implements IInformationControl, IInformationCont
 			statusField.setFont(fStatusTextFont);
 			gd= new GridData(GridData.FILL_HORIZONTAL | GridData.HORIZONTAL_ALIGN_BEGINNING | GridData.VERTICAL_ALIGN_BEGINNING);
 			statusField.setLayoutData(gd);
-
-			statusField.setForeground(display.getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW));
-
+			
+			statusField.setForeground(getStatusFieldFG());
 			statusField.setBackground(getBackground());
 		}
 
 		addDisposeListener(this);
+	}
+	
+	protected Color getStatusFieldFG()
+	{
+		Display display= fShell.getDisplay();
+		return display.getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW);
+	}
+
+	protected Color getBorderColor()
+	{
+		Display display= fShell.getDisplay();
+		return display.getSystemColor(SWT.COLOR_WIDGET_BORDER);
 	}
 
 	protected Color getForeground()
