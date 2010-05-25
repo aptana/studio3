@@ -16,8 +16,6 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
 
 import com.aptana.core.util.IOUtil;
-import com.aptana.editor.common.parsing.IParserPool;
-import com.aptana.editor.common.parsing.ParserPoolFactory;
 import com.aptana.editor.ruby.Activator;
 import com.aptana.editor.ruby.IRubyConstants;
 import com.aptana.editor.ruby.parsing.IRubyParserConstants;
@@ -25,7 +23,9 @@ import com.aptana.editor.ruby.parsing.ast.RubyImport;
 import com.aptana.index.core.IFileIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.IParser;
+import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParseState;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 
 public class RubyFileIndexingParticipant implements IFileIndexingParticipant

@@ -1,4 +1,4 @@
-package com.aptana.editor.common.parsing;
+package com.aptana.parsing;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,8 +9,7 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 
-import com.aptana.editor.common.internal.parsing.ParserPool;
-import com.aptana.parsing.ParsingPlugin;
+import com.aptana.internal.parsing.ParserPool;
 
 public class ParserPoolFactory
 {
@@ -102,5 +101,25 @@ public class ParserPoolFactory
 			}
 		}
 		return parsers;
+	}
+
+	synchronized void dispose()
+	{
+		if (pools != null)
+		{
+			// Clean all the parsers up!
+			for (Map.Entry<String, IParserPool> entry : pools.entrySet())
+			{
+				IParserPool pool = entry.getValue();
+				pool.dispose();
+			}
+			pools.clear();
+			pools = null;
+		}
+		if (parsers != null)
+		{
+			parsers.clear();
+			parsers = null;
+		}
 	}
 }

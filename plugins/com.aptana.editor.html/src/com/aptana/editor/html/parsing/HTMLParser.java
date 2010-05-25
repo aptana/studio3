@@ -9,8 +9,6 @@ import org.eclipse.jface.text.rules.IToken;
 import beaver.Scanner.Exception;
 import beaver.Symbol;
 
-import com.aptana.editor.common.parsing.IParserPool;
-import com.aptana.editor.common.parsing.ParserPoolFactory;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.html.parsing.HTMLTagScanner.TokenType;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
@@ -20,7 +18,9 @@ import com.aptana.editor.html.parsing.lexer.HTMLTokens;
 import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
+import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParseState;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseBaseNode;
 import com.aptana.parsing.ast.ParseRootNode;

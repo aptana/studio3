@@ -8,7 +8,9 @@ import org.eclipse.jface.text.IDocument;
 import com.aptana.editor.common.outline.IParseListener;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
+import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParseState;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 
 public class FileService

@@ -1,9 +1,9 @@
-package com.aptana.editor.common.internal.parsing;
+package com.aptana.internal.parsing;
 
 import com.aptana.core.util.ObjectPool;
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.parsing.IParserPool;
 import com.aptana.parsing.IParser;
+import com.aptana.parsing.IParserPool;
+import com.aptana.parsing.ParsingPlugin;
 
 public class ParserPool extends ObjectPool<IParser> implements IParserPool
 {
@@ -12,6 +12,7 @@ public class ParserPool extends ObjectPool<IParser> implements IParserPool
 
 	public ParserPool(String className)
 	{
+		super(-1);
 		this.className = className;
 	}
 
@@ -25,7 +26,7 @@ public class ParserPool extends ObjectPool<IParser> implements IParserPool
 		}
 		catch (Exception e)
 		{
-			CommonEditorPlugin.logError(e);
+			ParsingPlugin.logError(e);
 		}
 		return null;
 	}

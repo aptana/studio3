@@ -16,8 +16,6 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
 
 import com.aptana.core.util.IOUtil;
-import com.aptana.editor.common.parsing.IParserPool;
-import com.aptana.editor.common.parsing.ParserPoolFactory;
 import com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
@@ -30,6 +28,8 @@ import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.index.core.IFileIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.IParser;
+import com.aptana.parsing.IParserPool;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 
 public class HTMLFileIndexingParticipant implements IFileIndexingParticipant
