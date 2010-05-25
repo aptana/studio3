@@ -3,14 +3,14 @@ package com.aptana.core.io.tests;
 import java.io.File;
 import java.io.IOException;
 
-import junit.framework.TestCase;
-
-import org.eclipse.core.internal.filesystem.local.LocalFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.ide.core.io.LocalConnectionPoint;
 import com.aptana.ide.core.io.efs.EFSUtils;
+import com.aptana.ide.core.io.efs.LocalFile;
+
+import junit.framework.TestCase;
 
 public class EFSUtilsTest extends TestCase {
 

@@ -1494,7 +1494,6 @@ public class Synchronizer implements ILoggable
 
 	private void logDebug(String message)
 	{
-		System.out.println(message);
 		//log(message);
 	}
 
