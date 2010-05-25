@@ -103,7 +103,6 @@ public class FileService
 							// by
 							// the user
 						}
-						// TODO Check it back in before notifying listeners?
 						pool.checkIn(parser);
 					}
 				}

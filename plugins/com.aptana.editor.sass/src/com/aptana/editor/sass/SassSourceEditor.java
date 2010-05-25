@@ -52,6 +52,6 @@ public class SassSourceEditor extends AbstractThemeableEditor
 	@Override
 	protected FileService createFileService()
 	{
-		return new FileService("text/sass");
+		return new FileService(ISassConstants.LANGUAGE);
 	}
 }

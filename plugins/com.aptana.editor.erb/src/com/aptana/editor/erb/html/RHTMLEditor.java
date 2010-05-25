@@ -37,6 +37,7 @@ package com.aptana.editor.erb.html;
 
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
+import com.aptana.editor.erb.IERBConstants;
 import com.aptana.editor.erb.html.outline.RHTMLOutlineContentProvider;
 import com.aptana.editor.erb.html.outline.RHTMLOutlineLabelProvider;
 import com.aptana.editor.erb.html.parsing.RHTMLParser;
@@ -62,7 +63,7 @@ public class RHTMLEditor extends HTMLEditor {
 	@Override
 	protected FileService createFileService()
 	{
-		return new FileService("text/erb");
+		return new FileService(IERBConstants.LANGUAGE_ERB);
 	}
 
 	@Override

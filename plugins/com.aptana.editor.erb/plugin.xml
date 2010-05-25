@@ -50,7 +50,7 @@
          point="com.aptana.parsing.parser">
       <parser
             class="com.aptana.editor.erb.html.RHTMLEditor"
-            language="text/html-ruby">
+            language="text/erb">
       </parser>
    </extension>
 
