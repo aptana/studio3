@@ -40,7 +40,6 @@ import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.erb.IERBConstants;
 import com.aptana.editor.erb.html.outline.RHTMLOutlineContentProvider;
 import com.aptana.editor.erb.html.outline.RHTMLOutlineLabelProvider;
-import com.aptana.editor.erb.html.parsing.RHTMLParser;
 import com.aptana.editor.html.HTMLEditor;
 
 /**
