@@ -110,18 +110,17 @@ public class HTMLParser implements IParser
 			id = fCurrentSymbol.getId();
 		}
 
-		IParseNode[] nested;
+		IParseNode[] nested = new IParseNode[0];
 		IParserPool pool = ParserPoolFactory.getInstance().getParserPool(language);
-		IParser parser = pool.checkOut();
-		if (parser == null)
+		if (pool != null)
 		{
-			nested = new IParseNode[0];
+			IParser parser = pool.checkOut();	
+			if (parser != null)
+			{
+				nested = getParseResult(parser, start, end);
+			}
+			pool.checkIn(parser);
 		}
-		else
-		{
-			nested = getParseResult(parser, start, end);
-		}
-		pool.checkIn(parser);
 		if (fCurrentElement != null)
 		{
 			HTMLSpecialNode node = new HTMLSpecialNode(startTag, nested, startTag.getStart(), fCurrentSymbol.getEnd());
