@@ -60,6 +60,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Tree;
 
 /**
  * This class is used to present proposals to the user. If additional information exists for a proposal, then selecting
@@ -458,6 +459,30 @@ public class CompletionProposalPopup implements IContentAssistListener
 			c = control.getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND);
 		}
 		fProposalTable.setForeground(c);
+		
+		final Color sc = fContentAssistant.getProposalSelectorSelectionColor();
+		if (sc != null)
+		{
+			Listener selectionOverride = new Listener()
+			{
+				public void handleEvent(Event event)
+				{
+					if ((event.detail & SWT.SELECTED) != 0)
+					{
+						GC gc = event.gc;
+						Color oldBackground = gc.getBackground();
+
+						gc.setBackground(sc);
+						gc.fillRectangle(event.x, event.y, event.width, event.height);
+						gc.setBackground(oldBackground);
+
+						event.detail &= ~SWT.SELECTED;
+						event.detail &= ~SWT.BACKGROUND;
+					}
+				}
+			};
+			fProposalTable.addListener(SWT.EraseItem, selectionOverride);
+		}
 
 		fProposalTable.addSelectionListener(new SelectionListener()
 		{

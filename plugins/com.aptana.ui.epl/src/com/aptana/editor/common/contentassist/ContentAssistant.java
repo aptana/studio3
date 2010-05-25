@@ -1174,6 +1174,8 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	 */
 	private boolean fIsPrefixCompletionEnabled = false;
 
+	private Color fProposalSelectorSelectionColor;
+
 	/**
 	 * Creates a new code assistant. The code assistant is not automatically activated, overlays the completion
 	 * proposals with context information list if necessary, and shows the context information above the location at
@@ -2528,5 +2530,15 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	public boolean hasProposalPopupFocus()
 	{
 		return fProposalPopup.hasFocus();
+	}
+
+	public void setProposalSelectorSelectionColor(Color color)
+	{
+		fProposalSelectorSelectionColor = color;
+	}
+	
+	Color getProposalSelectorSelectionColor()
+	{
+		return fProposalSelectorSelectionColor;
 	}
 }

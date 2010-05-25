@@ -56,12 +56,13 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationHover;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 
 import com.aptana.editor.common.contentassist.ContentAssistant;
-
 import com.aptana.editor.common.contentassist.InformationControl;
 import com.aptana.editor.common.hover.CommonAnnotationHover;
 import com.aptana.editor.common.text.CommonDoubleClickStrategy;
@@ -132,6 +133,9 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	public IContentAssistant getContentAssistant(ISourceViewer sourceViewer)
 	{
 		ContentAssistant assistant = new ContentAssistant();
+		assistant.setProposalSelectorBackground(getThemeBackground());
+		assistant.setProposalSelectorForeground(getThemeForeground());
+		assistant.setProposalSelectorSelectionColor(getThemeSelection());
 
 		assistant.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
 
@@ -253,10 +257,40 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		{
 			public IInformationControl createInformationControl(Shell parent)
 			{
-				//return new DefaultInformationControl(parent, false);
-				return new InformationControl(parent, SWT.NONE, new HTMLTextPresenter(false));
+				return new InformationControl(parent, SWT.NONE, new HTMLTextPresenter(false))
+				{
+					@Override
+					protected Color getBackground()
+					{
+						return getThemeBackground();
+					}
+					
+					@Override
+					protected Color getForeground()
+					{
+						return getThemeForeground();
+					}
+				};
 			}
 		};
+	}
+	
+	protected Color getThemeBackground()
+	{
+		RGB bg = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme().getBackground();
+		return CommonEditorPlugin.getDefault().getColorManager().getColor(bg);
+	}
+	
+	protected Color getThemeForeground()
+	{
+		RGB bg = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme().getForeground();
+		return CommonEditorPlugin.getDefault().getColorManager().getColor(bg);
+	}
+	
+	protected Color getThemeSelection()
+	{
+		RGB bg = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme().getSelection();
+		return CommonEditorPlugin.getDefault().getColorManager().getColor(bg);
 	}
 
 	/*
