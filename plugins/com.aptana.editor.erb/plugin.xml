@@ -49,7 +49,7 @@
    <extension
          point="com.aptana.parsing.parser">
       <parser
-            class="com.aptana.editor.erb.html.RHTMLEditor"
+            class="com.aptana.editor.erb.html.parsing.RHTMLParser"
             language="text/erb">
       </parser>
    </extension>

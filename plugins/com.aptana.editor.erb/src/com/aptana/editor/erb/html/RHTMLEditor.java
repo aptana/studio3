@@ -41,6 +41,7 @@ import com.aptana.editor.erb.IERBConstants;
 import com.aptana.editor.erb.html.outline.RHTMLOutlineContentProvider;
 import com.aptana.editor.erb.html.outline.RHTMLOutlineLabelProvider;
 import com.aptana.editor.html.HTMLEditor;
+import com.aptana.editor.html.parsing.HTMLParseState;
 
 /**
  * @author Max Stepanov
@@ -62,7 +63,7 @@ public class RHTMLEditor extends HTMLEditor {
 	@Override
 	protected FileService createFileService()
 	{
-		return new FileService(IERBConstants.LANGUAGE_ERB);
+		return new FileService(IERBConstants.LANGUAGE_ERB, new HTMLParseState());
 	}
 
 	@Override
