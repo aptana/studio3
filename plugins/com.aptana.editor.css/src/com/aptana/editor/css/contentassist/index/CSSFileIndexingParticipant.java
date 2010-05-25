@@ -55,10 +55,13 @@ public class CSSFileIndexingParticipant implements IFileIndexingParticipant
 						ParseState parseState = new ParseState();
 						parseState.setEditState(fileContents, "", 0, 0); //$NON-NLS-1$
 						IParserPool pool = ParserPoolFactory.getInstance().getParserPool(ICSSParserConstants.LANGUAGE);
-						IParser cssParser = pool.checkOut();					
-						IParseNode parseNode = cssParser.parse(parseState);
-						pool.checkIn(cssParser);
-						walkNode(index, file, parseNode);
+						if (pool != null)
+						{
+							IParser cssParser = pool.checkOut();
+							IParseNode parseNode = cssParser.parse(parseState);
+							pool.checkIn(cssParser);
+							walkNode(index, file, parseNode);
+						}
 					}
 				}
 				catch (CoreException e)

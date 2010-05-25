@@ -212,8 +212,13 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 					{
 						throw new Exception(Messages.HTMLOutlineContentProvider_UnableToResolveFile_Error);
 					}
-					
+
 					IParserPool pool = ParserPoolFactory.getInstance().getParserPool(language);
+					if (pool == null)
+					{
+						throw new Exception(MessageFormat.format(
+								Messages.HTMLOutlineContentProvider_UnableToFindParser_Error, language));
+					}
 					IParser parser = pool.checkOut();
 					if (parser == null)
 					{
@@ -233,15 +238,15 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 				}
 				catch (FileNotFoundException e)
 				{
-					Activator.getDefault().getLog().log(
-							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+					Activator.getDefault().getLog()
+							.log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
 					elements = new Object[] { new OutlinePlaceholderItem(IStatus.ERROR, MessageFormat.format(
 							Messages.HTMLOutlineContentProvider_FileNotFound_Error, e.getMessage())) };
 				}
 				catch (Exception e)
 				{
-					Activator.getDefault().getLog().log(
-							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+					Activator.getDefault().getLog()
+							.log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
 					elements = new Object[] { new OutlinePlaceholderItem(IStatus.ERROR, e.getMessage()) };
 				}
 				final Object[] finalElements = elements;

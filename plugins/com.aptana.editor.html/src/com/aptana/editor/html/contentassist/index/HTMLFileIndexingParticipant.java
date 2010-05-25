@@ -64,10 +64,13 @@ public class HTMLFileIndexingParticipant implements IFileIndexingParticipant
 					HTMLParseState parseState = new HTMLParseState();
 					parseState.setEditState(fileContents, "", 0, 0); //$NON-NLS-1$
 					IParserPool pool = ParserPoolFactory.getInstance().getParserPool(HTMLNode.LANGUAGE);
-					IParser htmlParser = pool.checkOut();
-					IParseNode parseNode = htmlParser.parse(parseState);
-					pool.checkIn(htmlParser);
-					walkNode(index, file, parseNode);
+					if (pool != null)
+					{
+						IParser htmlParser = pool.checkOut();
+						IParseNode parseNode = htmlParser.parse(parseState);
+						pool.checkIn(htmlParser);
+						walkNode(index, file, parseNode);
+					}
 				}
 				catch (Exception e)
 				{

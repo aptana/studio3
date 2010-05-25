@@ -38,23 +38,23 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 	public void index(Set<IFile> files, Index index, IProgressMonitor monitor)
 	{
 		monitor = SubMonitor.convert(monitor, files.size());
-		
+
 		for (IFile file : files)
 		{
 			if (monitor.isCanceled())
 			{
 				return;
 			}
-			
+
 			try
 			{
 				if (file == null || !isJSFile(file))
 				{
 					continue;
 				}
-				
+
 				monitor.subTask(file.getLocation().toPortableString());
-				
+
 				try
 				{
 					// grab the source of the file we're going to parse
@@ -65,20 +65,23 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 					{
 						// create parser and associated parse state
 						IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IJSParserConstants.LANGUAGE);
-						IParser parser = pool.checkOut();
-						
-						ParseState parseState = new ParseState();
-						
-						// apply the source to the parse state
-						parseState.setEditState(source, source, 0, 0);
+						if (pool != null)
+						{
+							IParser parser = pool.checkOut();
 
-						// parse and grab the result
-						IParseNode ast = parser.parse(parseState);
-						
-						pool.checkIn(parser);
+							ParseState parseState = new ParseState();
 
-						// now walk the parse tree
-						this.walkAST(index, file, ast);
+							// apply the source to the parse state
+							parseState.setEditState(source, source, 0, 0);
+
+							// parse and grab the result
+							IParseNode ast = parser.parse(parseState);
+
+							pool.checkIn(parser);
+
+							// now walk the parse tree
+							this.walkAST(index, file, ast);
+						}
 					}
 				}
 				catch (CoreException e)
@@ -95,7 +98,7 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 				monitor.worked(1);
 			}
 		}
-		
+
 		monitor.done();
 	}
 
@@ -166,10 +169,10 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 		{
 			index.addEntry(JSIndexConstants.VARIABLE, varName, location);
 		}
-//		for (String varName : astHelper.getAccidentalGlobals(ast))
-//		{
-//			System.out.println("accidental global: " + varName);
-//			index.addEntry(JSIndexConstants.VARIABLE, varName, location);
-//		}
+		// for (String varName : astHelper.getAccidentalGlobals(ast))
+		// {
+		// System.out.println("accidental global: " + varName);
+		// index.addEntry(JSIndexConstants.VARIABLE, varName, location);
+		// }
 	}
 }

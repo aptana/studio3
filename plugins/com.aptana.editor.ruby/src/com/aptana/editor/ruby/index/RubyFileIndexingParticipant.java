@@ -49,20 +49,23 @@ public class RubyFileIndexingParticipant implements IFileIndexingParticipant
 					if (source != null && source.length() > 0)
 					{
 						IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IRubyParserConstants.LANGUAGE);
-						IParser parser = pool.checkOut();
-						
-						// create parser and associated parse state
-						ParseState parseState = new ParseState();
-						
-						// apply the source to the parse state
-						parseState.setEditState(source, source, 0, 0);
+						if (pool != null)
+						{
+							IParser parser = pool.checkOut();
 
-						// parse and grab the result
-						IParseNode ast = parser.parse(parseState);
-						pool.checkIn(parser);
-						
-						// now walk the parse tree
-						walkAST(index, file, ast);
+							// create parser and associated parse state
+							ParseState parseState = new ParseState();
+
+							// apply the source to the parse state
+							parseState.setEditState(source, source, 0, 0);
+
+							// parse and grab the result
+							IParseNode ast = parser.parse(parseState);
+							pool.checkIn(parser);
+
+							// now walk the parse tree
+							walkAST(index, file, ast);
+						}
 					}
 				}
 				catch (CoreException e)
