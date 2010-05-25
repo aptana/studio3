@@ -20,6 +20,7 @@ public class RHTMLParser extends CompositeParser
 
 	public RHTMLParser()
 	{
+		// FIXME keep a reference to language and check out parser on demand?
 		super(new RHTMLParserScanner(), new HTMLParser());
 	}
 

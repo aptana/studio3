@@ -1,6 +1,8 @@
 package com.aptana.parsing;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -34,8 +36,15 @@ public class ParsingPlugin extends Plugin {
 	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
+		try
+		{
+			ParserPoolFactory.getInstance().dispose();
+		}
+		finally
+		{
+			plugin = null;
+			super.stop(context);
+		}		
 	}
 
 	/**
@@ -45,5 +54,10 @@ public class ParsingPlugin extends Plugin {
 	 */
 	public static ParsingPlugin getDefault() {
 		return plugin;
+	}
+
+	public static void logError(Exception e)
+	{
+		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, e.getMessage(), e));
 	}
 }

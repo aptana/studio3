@@ -38,5 +38,12 @@
             class="com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant">
       </fileIndexingParticipant>
    </extension>
+   <extension
+         point="com.aptana.parsing.parser">
+      <parser
+            class="com.aptana.editor.js.parsing.JSParser"
+            language="text/javascript">
+      </parser>
+   </extension>
 
 </plugin>

@@ -16,10 +16,13 @@ import com.aptana.core.util.IOUtil;
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.contentassist.JSASTQueryHelper;
-import com.aptana.editor.js.parsing.JSParser;
+import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.index.core.IFileIndexingParticipant;
 import com.aptana.index.core.Index;
+import com.aptana.parsing.IParser;
+import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParseState;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSFileIndexingParticipant implements IFileIndexingParticipant
@@ -35,43 +38,50 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 	public void index(Set<IFile> files, Index index, IProgressMonitor monitor)
 	{
 		monitor = SubMonitor.convert(monitor, files.size());
-		
+
 		for (IFile file : files)
 		{
 			if (monitor.isCanceled())
 			{
 				return;
 			}
-			
+
 			try
 			{
 				if (file == null || !isJSFile(file))
 				{
 					continue;
 				}
-				
+
 				monitor.subTask(file.getLocation().toPortableString());
-				
+
 				try
 				{
-					// create parser and associated parse state
-					JSParser parser = new JSParser();
-					ParseState parseState = new ParseState();
-
 					// grab the source of the file we're going to parse
 					String source = IOUtil.read(file.getContents());
 
 					// minor optimization when creating a new empty file
 					if (source != null && source.length() > 0)
 					{
-						// apply the source to the parse state
-						parseState.setEditState(source, source, 0, 0);
+						// create parser and associated parse state
+						IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IJSParserConstants.LANGUAGE);
+						if (pool != null)
+						{
+							IParser parser = pool.checkOut();
 
-						// parse and grab the result
-						IParseNode ast = parser.parse(parseState);
+							ParseState parseState = new ParseState();
 
-						// now walk the parse tree
-						this.walkAST(index, file, ast);
+							// apply the source to the parse state
+							parseState.setEditState(source, source, 0, 0);
+
+							// parse and grab the result
+							IParseNode ast = parser.parse(parseState);
+
+							pool.checkIn(parser);
+
+							// now walk the parse tree
+							this.walkAST(index, file, ast);
+						}
 					}
 				}
 				catch (CoreException e)
@@ -88,7 +98,7 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 				monitor.worked(1);
 			}
 		}
-		
+
 		monitor.done();
 	}
 
@@ -159,10 +169,10 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 		{
 			index.addEntry(JSIndexConstants.VARIABLE, varName, location);
 		}
-//		for (String varName : astHelper.getAccidentalGlobals(ast))
-//		{
-//			System.out.println("accidental global: " + varName);
-//			index.addEntry(JSIndexConstants.VARIABLE, varName, location);
-//		}
+		// for (String varName : astHelper.getAccidentalGlobals(ast))
+		// {
+		// System.out.println("accidental global: " + varName);
+		// index.addEntry(JSIndexConstants.VARIABLE, varName, location);
+		// }
 	}
 }

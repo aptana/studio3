@@ -1,17 +1,14 @@
 package com.aptana.editor.html.parsing;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Stack;
 
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.rules.IToken;
 
-import beaver.Symbol;
 import beaver.Scanner.Exception;
+import beaver.Symbol;
 
-import com.aptana.editor.css.parsing.CSSParserFactory;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.html.parsing.HTMLTagScanner.TokenType;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
@@ -19,10 +16,11 @@ import com.aptana.editor.html.parsing.ast.HTMLNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.editor.html.parsing.lexer.HTMLTokens;
 import com.aptana.editor.js.parsing.IJSParserConstants;
-import com.aptana.editor.js.parsing.JSParserFactory;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
+import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParseState;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseBaseNode;
 import com.aptana.parsing.ast.ParseRootNode;
@@ -50,8 +48,6 @@ public class HTMLParser implements IParser
 	private IParseNode fCurrentElement;
 	private Symbol fCurrentSymbol;
 
-	private Map<String, IParser> fLanguageParsers;
-
 	public HTMLParser()
 	{
 		this(new HTMLParserScanner());
@@ -62,9 +58,6 @@ public class HTMLParser implements IParser
 		fScanner = scanner;
 		fElementStack = new Stack<IParseNode>();
 		fTagScanner = new HTMLTagScanner();
-		fLanguageParsers = new HashMap<String, IParser>();
-		fLanguageParsers.put(ICSSParserConstants.LANGUAGE, CSSParserFactory.getInstance().getParser());
-		fLanguageParsers.put(IJSParserConstants.LANGUAGE, JSParserFactory.getInstance().getParser());
 	}
 
 	@Override
@@ -117,15 +110,16 @@ public class HTMLParser implements IParser
 			id = fCurrentSymbol.getId();
 		}
 
-		IParseNode[] nested;
-		IParser parser = fLanguageParsers.get(language);
-		if (parser == null)
+		IParseNode[] nested = new IParseNode[0];
+		IParserPool pool = ParserPoolFactory.getInstance().getParserPool(language);
+		if (pool != null)
 		{
-			nested = new IParseNode[0];
-		}
-		else
-		{
-			nested = getParseResult(parser, start, end);
+			IParser parser = pool.checkOut();	
+			if (parser != null)
+			{
+				nested = getParseResult(parser, start, end);
+			}
+			pool.checkIn(parser);
 		}
 		if (fCurrentElement != null)
 		{
@@ -141,11 +135,6 @@ public class HTMLParser implements IParser
 				.getEnd());
 		parseAttribute(element, fCurrentSymbol.value.toString());
 		return element;
-	}
-
-	protected void addLanguageParser(String language, IParser parser)
-	{
-		fLanguageParsers.put(language, parser);
 	}
 
 	private void parseAll(IParseNode root) throws IOException, Exception

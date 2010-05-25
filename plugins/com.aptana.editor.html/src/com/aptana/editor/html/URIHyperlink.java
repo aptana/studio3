@@ -43,7 +43,18 @@ public class URIHyperlink extends URLHyperlink
 			if (desc == null)
 			{
 				if (wrapped)
+				{
 					super.open();
+					return;
+				}
+				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+//				IFileStore store = EFS.getStore(uri);
+//				if (store.getFileSystem() != EFS.getLocalFileSystem())
+//				{
+//					File file = store.toLocalFile(EFS.CACHE, new NullProgressMonitor());
+//					uri = file.toURI();
+//				}
+				IDE.openEditor(page, uri, IEditorRegistry.SYSTEM_EXTERNAL_EDITOR_ID, true);
 				return;
 			}
 			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
@@ -65,6 +76,8 @@ public class URIHyperlink extends URLHyperlink
 	protected IEditorDescriptor getEditorDescriptor()
 	{
 		IEditorRegistry editorReg = PlatformUI.getWorkbench().getEditorRegistry();
+		if (uri.getPath() == null || uri.getPath().equals("/") || uri.getPath().trim().equals("")) //$NON-NLS-1$ //$NON-NLS-2$
+			return null;
 		IPath path = new Path(uri.getPath());
 		return editorReg.getDefaultEditor(path.lastSegment());
 	}

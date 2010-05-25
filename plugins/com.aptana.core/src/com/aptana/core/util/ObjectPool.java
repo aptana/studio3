@@ -84,7 +84,10 @@ public abstract class ObjectPool<T> implements IObjectPool<T>
 		}
 		// no objects available, create a new one
 		t = create();
-		locked.put(t, now);
+		if (t != null)
+		{
+			locked.put(t, now);
+		}
 		return t;
 	}
 

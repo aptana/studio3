@@ -42,6 +42,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.filesystem.secureftp.FTPSConnectionPoint;
+import com.aptana.ide.core.io.ConnectionContext;
+import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
 
 
@@ -63,6 +65,10 @@ public class ImplicitFTPSConnectionTest extends TestCase {
 		ftpcp.setExplicit(false);
 		ftpcp.setValidateCertificate(false);
 		cp = ftpcp;
+
+		ConnectionContext context = new ConnectionContext();
+		context.put(ConnectionContext.COMMAND_LOG, System.out);
+		CoreIOPlugin.setConnectionContext(cp, context);
 	}
 
 	@Override

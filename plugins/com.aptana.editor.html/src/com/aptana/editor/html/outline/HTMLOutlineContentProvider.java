@@ -21,17 +21,17 @@ import org.eclipse.ui.PlatformUI;
 import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CompositeOutlineContentProvider;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
-import com.aptana.editor.css.parsing.CSSParserFactory;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.html.Activator;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
 import com.aptana.editor.js.parsing.IJSParserConstants;
-import com.aptana.editor.js.parsing.JSParserFactory;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
+import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParseState;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 
@@ -177,15 +177,6 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 		return parser.parse(pState);
 	}
 
-	private IParser getParser(String language)
-	{
-		if (language.equals(IJSParserConstants.LANGUAGE))
-			return JSParserFactory.getInstance().getParser();
-		if (language.equals(ICSSParserConstants.LANGUAGE))
-			return CSSParserFactory.getInstance().getParser();
-		return null;
-	}
-
 	private Object[] getExternalChildren(final Object parent, final String srcPathOrURL, final String language)
 	{
 		Object[] cached;
@@ -221,13 +212,21 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 					{
 						throw new Exception(Messages.HTMLOutlineContentProvider_UnableToResolveFile_Error);
 					}
-					IParser parser = getParser(language);
+
+					IParserPool pool = ParserPoolFactory.getInstance().getParserPool(language);
+					if (pool == null)
+					{
+						throw new Exception(MessageFormat.format(
+								Messages.HTMLOutlineContentProvider_UnableToFindParser_Error, language));
+					}
+					IParser parser = pool.checkOut();
 					if (parser == null)
 					{
 						throw new Exception(MessageFormat.format(
 								Messages.HTMLOutlineContentProvider_UnableToFindParser_Error, language));
 					}
 					IParseNode node = parse(parser, source);
+					pool.checkIn(parser);
 					sub.worked(90);
 					elements = getChildren(node);
 
@@ -239,15 +238,15 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 				}
 				catch (FileNotFoundException e)
 				{
-					Activator.getDefault().getLog().log(
-							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+					Activator.getDefault().getLog()
+							.log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
 					elements = new Object[] { new OutlinePlaceholderItem(IStatus.ERROR, MessageFormat.format(
 							Messages.HTMLOutlineContentProvider_FileNotFound_Error, e.getMessage())) };
 				}
 				catch (Exception e)
 				{
-					Activator.getDefault().getLog().log(
-							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+					Activator.getDefault().getLog()
+							.log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
 					elements = new Object[] { new OutlinePlaceholderItem(IStatus.ERROR, e.getMessage()) };
 				}
 				final Object[] finalElements = elements;
