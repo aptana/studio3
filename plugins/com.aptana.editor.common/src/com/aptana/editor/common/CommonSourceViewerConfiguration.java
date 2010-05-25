@@ -37,6 +37,10 @@ package com.aptana.editor.common;
 import java.util.Map;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.internal.text.html.HTMLTextPresenter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.DefaultInformationControl;
@@ -71,12 +75,14 @@ import com.aptana.editor.common.text.CommonDoubleClickStrategy;
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
 import com.aptana.editor.common.text.reconciler.CommonCompositeReconcilingStrategy;
 import com.aptana.editor.common.text.reconciler.CommonReconciler;
+import com.aptana.editor.common.theme.IThemeManager;
 
 @SuppressWarnings("restriction")
 public abstract class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration implements ITopContentTypesProvider
 {
 	private AbstractThemeableEditor fTextEditor;
 	private CommonDoubleClickStrategy fDoubleClickStrategy;
+	private IPreferenceChangeListener fThemeChangeListener;
 
 	/**
 	 * CommonSourceViewerConfiguration
@@ -134,7 +140,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	@Override
 	public IContentAssistant getContentAssistant(ISourceViewer sourceViewer)
 	{
-		ContentAssistant assistant = new ContentAssistant();
+		final ContentAssistant assistant = new ContentAssistant();
 		assistant.setProposalSelectorBackground(getThemeBackground());
 		assistant.setProposalSelectorForeground(getThemeForeground());
 		assistant.setProposalSelectorSelectionColor(getThemeSelection());
@@ -165,6 +171,22 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		
 		assistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
 
+		fThemeChangeListener = new IPreferenceChangeListener()
+		{
+
+			@Override
+			public void preferenceChange(PreferenceChangeEvent event)
+			{
+				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
+				{
+					assistant.setProposalSelectorBackground(getThemeBackground());
+					assistant.setProposalSelectorForeground(getThemeForeground());
+					assistant.setProposalSelectorSelectionColor(getThemeSelection());
+				}
+			}
+		};
+		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+		
 		return assistant;
 	}
 
