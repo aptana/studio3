@@ -112,6 +112,7 @@ public class FTPPlugin extends Plugin {
 			}
 		}
 		return null;
+		//return new PrintWriter(System.out);
 	}
 
 	@SuppressWarnings("unchecked")

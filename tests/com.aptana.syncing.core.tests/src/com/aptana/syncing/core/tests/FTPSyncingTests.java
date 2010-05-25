@@ -29,7 +29,7 @@ public class FTPSyncingTests extends SyncingTests
 				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'})).toCharArray());
 		serverManager = ftpcp;
 
-		super.setUp();
+		super.setUp();		
 	}
 
 	@Override

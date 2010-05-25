@@ -4,6 +4,8 @@ import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -204,7 +206,7 @@ public class SWTUtils
 			widget.setBackground(errorColor);
 			final ModifyListener ml = new ModifyListener()
 			{
-
+				@Override
 				public void modifyText(ModifyEvent e)
 				{
 					Text t = (Text) e.widget;

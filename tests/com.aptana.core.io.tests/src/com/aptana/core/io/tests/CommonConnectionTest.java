@@ -641,7 +641,7 @@ public abstract class CommonConnectionTest extends TestCase
 		fi = fs.fetchInfo(IExtendedFileStore.DETAILED, null);
 		assertNotNull(fi);
 		assertTrue(fi.exists());
-		assertEquals(lastModified, fi.getLastModified());
+		assertEquals("Last modified time mismatch. Remote file off by " + (lastModified - fi.getLastModified())/1000/60 + " minutes.", lastModified, fi.getLastModified());
 	}
 
 	public final void testPutInfoFolderBase() throws CoreException
@@ -667,7 +667,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertNotNull(fi);
 		assertTrue(fi.exists());
 		assertTrue(fi.isDirectory());
-		assertEquals(lastModified, fi.getLastModified());
+		assertEquals("Last modified time mismatch. Remote file off by " + (lastModified - fi.getLastModified())/1000/60 + " minutes.", lastModified, fi.getLastModified());
 	}
 
 	protected boolean supportsChangePermissions()
