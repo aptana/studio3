@@ -14,7 +14,6 @@ import com.aptana.internal.parsing.ParserPool;
 public class ParserPoolFactory
 {
 
-	// TODO Hide instance in plugin, clean it up when plugin goes away
 	private static ParserPoolFactory fgInstance;
 	private Map<String, String> parsers;
 	private HashMap<String, IParserPool> pools;
