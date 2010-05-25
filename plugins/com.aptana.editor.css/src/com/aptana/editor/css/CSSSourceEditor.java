@@ -38,9 +38,10 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlinePage;
+import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
 import com.aptana.editor.css.outline.CSSOutlineLabelProvider;
-import com.aptana.editor.css.parsing.CSSParserFactory;
+import com.aptana.editor.css.parsing.ICSSParserConstants;
 
 public class CSSSourceEditor extends AbstractThemeableEditor
 {
@@ -62,8 +63,12 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 
 		setSourceViewerConfiguration(new CSSSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new CSSDocumentProvider());
-
-		getFileService().setParser(CSSParserFactory.getInstance().getParser());
+	}
+	
+	@Override
+	protected FileService createFileService()
+	{
+		return new FileService(ICSSParserConstants.LANGUAGE);
 	}
 
 	@Override

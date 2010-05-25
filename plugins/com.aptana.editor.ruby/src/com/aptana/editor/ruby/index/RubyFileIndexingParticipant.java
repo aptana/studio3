@@ -18,11 +18,14 @@ import org.eclipse.core.runtime.content.IContentTypeManager;
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.ruby.Activator;
 import com.aptana.editor.ruby.IRubyConstants;
-import com.aptana.editor.ruby.parsing.RubyParser;
+import com.aptana.editor.ruby.parsing.IRubyParserConstants;
 import com.aptana.editor.ruby.parsing.ast.RubyImport;
 import com.aptana.index.core.IFileIndexingParticipant;
 import com.aptana.index.core.Index;
+import com.aptana.parsing.IParser;
+import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParseState;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 
 public class RubyFileIndexingParticipant implements IFileIndexingParticipant
@@ -39,23 +42,30 @@ public class RubyFileIndexingParticipant implements IFileIndexingParticipant
 			{
 				try
 				{
-					// create parser and associated parse state
-					RubyParser parser = new RubyParser();
-					ParseState parseState = new ParseState();
-
 					// grab the source of the file we're going to parse
 					String source = IOUtil.read(file.getContents());
 
 					// minor optimization when creating a new empty file
 					if (source != null && source.length() > 0)
 					{
-						// apply the source to the parse state
-						parseState.setEditState(source, source, 0, 0);
+						IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IRubyParserConstants.LANGUAGE);
+						if (pool != null)
+						{
+							IParser parser = pool.checkOut();
 
-						// parse and grab the result
-						IParseNode ast = parser.parse(parseState);
-						// now walk the parse tree
-						walkAST(index, file, ast);
+							// create parser and associated parse state
+							ParseState parseState = new ParseState();
+
+							// apply the source to the parse state
+							parseState.setEditState(source, source, 0, 0);
+
+							// parse and grab the result
+							IParseNode ast = parser.parse(parseState);
+							pool.checkIn(parser);
+
+							// now walk the parse tree
+							walkAST(index, file, ast);
+						}
 					}
 				}
 				catch (CoreException e)

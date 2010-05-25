@@ -22,11 +22,14 @@ import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.html.Activator;
 import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.editor.html.parsing.HTMLParseState;
-import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
+import com.aptana.editor.html.parsing.ast.HTMLNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.index.core.IFileIndexingParticipant;
 import com.aptana.index.core.Index;
+import com.aptana.parsing.IParser;
+import com.aptana.parsing.IParserPool;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 
 public class HTMLFileIndexingParticipant implements IFileIndexingParticipant
@@ -60,13 +63,20 @@ public class HTMLFileIndexingParticipant implements IFileIndexingParticipant
 					String fileContents = IOUtil.read(file.getContents());
 					HTMLParseState parseState = new HTMLParseState();
 					parseState.setEditState(fileContents, "", 0, 0); //$NON-NLS-1$
-					HTMLParser htmlParser = new HTMLParser();
-					IParseNode parseNode = htmlParser.parse(parseState);
-					walkNode(index, file, parseNode);
+					IParserPool pool = ParserPoolFactory.getInstance().getParserPool(HTMLNode.LANGUAGE);
+					if (pool != null)
+					{
+						IParser htmlParser = pool.checkOut();
+						IParseNode parseNode = htmlParser.parse(parseState);
+						pool.checkIn(htmlParser);
+						walkNode(index, file, parseNode);
+					}
 				}
 				catch (Exception e)
 				{
-					Activator.logError(MessageFormat.format(Messages.HTMLFileIndexingParticipant_Error_During_Indexing, file.getName()), e);
+					Activator.logError(
+							MessageFormat.format(Messages.HTMLFileIndexingParticipant_Error_During_Indexing,
+									file.getName()), e);
 				}
 			}
 			finally
