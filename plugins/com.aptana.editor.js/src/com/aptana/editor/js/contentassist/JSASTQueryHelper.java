@@ -22,9 +22,9 @@ public class JSASTQueryHelper
 		FUNCTION
 	}
 	
+	private static XPath ALL_VARS;
 	private static XPath ANCESTOR_FUNCTIONS;
 	private static XPath NAMED_FUNCTIONS;
-	private static XPath ALL_VARS;
 	private static XPath NON_FUNCTION_VARS;
 	private static XPath VAR_FUNCTIONS;
 
@@ -35,10 +35,12 @@ public class JSASTQueryHelper
 	{
 		try
 		{
-			ANCESTOR_FUNCTIONS = new ParseNodeXPath("ancestor::function"); //$NON-NLS-1$
-			NAMED_FUNCTIONS = new ParseNodeXPath("./function[string-length(@name) > 0]"); //$NON-NLS-1$
-			
+			// symbol queries
 			ALL_VARS = new ParseNodeXPath("descendant::var/declaration/identifier[position() = 1]"); //$NON-NLS-1$
+			ANCESTOR_FUNCTIONS = new ParseNodeXPath("ancestor::function"); //$NON-NLS-1$
+			
+			// child queries
+			NAMED_FUNCTIONS = new ParseNodeXPath("./function[string-length(@name) > 0]"); //$NON-NLS-1$
 			NON_FUNCTION_VARS = new ParseNodeXPath("./var/declaration/identifier[position() = 1 and count(following-sibling::function) = 0]"); //$NON-NLS-1$
 			VAR_FUNCTIONS = new ParseNodeXPath("./var/declaration/identifier[count(following-sibling::function) > 0]"); //$NON-NLS-1$
 		}
@@ -121,12 +123,12 @@ public class JSASTQueryHelper
 	}
 	
 	/**
-	 * getNonFunctionDeclarations
+	 * getChildVarNonFunctions
 	 * 
 	 * @param ast
 	 * @return
 	 */
-	public List<String> getNonFunctionDeclarations(IParseNode ast)
+	public List<String> getChildVarNonFunctions(IParseNode ast)
 	{
 		final List<String> result = new LinkedList<String>();
 
@@ -145,27 +147,27 @@ public class JSASTQueryHelper
 	}
 
 	/**
-	 * getGlobalFunctions
+	 * getChildFunctions
 	 * 
 	 * @param ast
 	 * @return
 	 */
-	public List<String> getGlobalFunctions(IParseNode ast)
+	public List<String> getChildFunctions(IParseNode ast)
 	{
-		List<String> result = this.getNamedFunctions(ast);
+		List<String> result = this.getChildNamedFunctions(ast);
 
-		result.addAll(this.getVarDeclaredFunctions(ast));
+		result.addAll(this.getChildVarFunctions(ast));
 
 		return result;
 	}
 
 	/**
-	 * getNamedFunctions
+	 * getChildNamedFunctions
 	 * 
 	 * @param ast
 	 * @return
 	 */
-	public List<String> getNamedFunctions(IParseNode ast)
+	public List<String> getChildNamedFunctions(IParseNode ast)
 	{
 		final List<String> result = new LinkedList<String>();
 
@@ -186,12 +188,12 @@ public class JSASTQueryHelper
 	}
 	
 	/**
-	 * getVarDeclaredFunctions
+	 * getChildVarFunctions
 	 * 
 	 * @param ast
 	 * @return
 	 */
-	public List<String> getVarDeclaredFunctions(IParseNode ast)
+	public List<String> getChildVarFunctions(IParseNode ast)
 	{
 		final List<String> result = new LinkedList<String>();
 		
@@ -202,6 +204,15 @@ public class JSASTQueryHelper
 				public void process(Object item)
 				{
 					result.add(item.toString());
+					
+					IParseNode identifier = (IParseNode) item;
+					JSFunctionNode function = (JSFunctionNode) identifier.getParent().getChild(1);
+					String name = function.getName();
+					
+					if (name != null && name.length() > 0)
+					{
+						result.add(name);
+					}
 				}
 			}
 		);

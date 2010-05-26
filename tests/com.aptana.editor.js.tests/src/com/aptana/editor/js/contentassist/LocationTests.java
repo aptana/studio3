@@ -139,7 +139,7 @@ public class LocationTests extends TestCase
 		TestContext context = this.getTestContext("locations/global_in_empty_args.js");
 		
 		// find the offset to test within the source
-		int offset = context.source.lastIndexOf("(");
+		int offset = context.source.lastIndexOf(")");
 		assertTrue(offset != -1);
 		
 		// lex around the offset

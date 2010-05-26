@@ -1,0 +1,1 @@
+var globalVarFunction = function globalFunction() {}${cursor}
