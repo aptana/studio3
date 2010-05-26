@@ -46,8 +46,8 @@ public class Activator extends Plugin {
 	
 	private void checkOrInstallGit() {
 		try {
-			IPath path = getStateLocation().append("portableGit");
-			IPath installed = path.append(".installed"+getBundle().getLastModified());
+			IPath path = getStateLocation();
+			IPath installed = path.append(".installed_"+getBundle().getVersion().toString());
 			if (!installed.toFile().exists()) {
 				path.toFile().mkdirs();
 				if (Extractor.extract(path)) {

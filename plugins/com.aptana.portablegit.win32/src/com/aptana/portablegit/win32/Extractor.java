@@ -97,7 +97,7 @@ import org.eclipse.core.runtime.Path;
 				"-o"+destination.lastSegment(), //$NON-NLS-1$
 				"-y", //$NON-NLS-1$
 				archivePath.toOSString());
-		processBuilder.directory(destinationFile);
+		processBuilder.directory(destinationFile.getParentFile());
 		processBuilder.redirectErrorStream(true);
 		StringBuffer output = new StringBuffer();
 		try {
