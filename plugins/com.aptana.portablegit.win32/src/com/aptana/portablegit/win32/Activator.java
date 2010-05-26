@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
@@ -32,7 +33,9 @@ public class Activator extends Plugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		checkOrInstallGit();
+		if (Platform.OS_WIN32.equals(Platform.getOS())) {
+			checkOrInstallGit();
+		}
 	}
 
 	/*
