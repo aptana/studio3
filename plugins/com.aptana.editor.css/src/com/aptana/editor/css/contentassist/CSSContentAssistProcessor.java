@@ -354,7 +354,6 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		// tokenize the current document
 		IDocument document = viewer.getDocument();
-		
 		LexemeProvider<CSSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
 
 		// store a reference to the lexeme at the current position
@@ -369,7 +368,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 
 		// create proposal container
 		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
-		// FIXME Grab prefix user types and pass that down into the queries to generate more efficient queries!
+		
 		switch (location)
 		{
 			case OUTSIDE_RULE:
