@@ -81,4 +81,14 @@ public class Range implements IRange
 	{
 		return 31 * getStartingOffset() + getLength();
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.lexer.IRange#isEmpty()
+	 */
+	@Override
+	public boolean isEmpty()
+	{
+		return fEnd < fStart;
+	}
 }

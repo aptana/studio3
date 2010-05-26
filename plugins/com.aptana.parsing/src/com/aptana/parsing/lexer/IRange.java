@@ -30,4 +30,10 @@ public interface IRange
 	 * @return the length of this range
 	 */
 	int getLength();
+	
+	/**
+	 * Determines if this range is empty. This is equivalent to having a zero or negative length
+	 * @return
+	 */
+	boolean isEmpty();
 }

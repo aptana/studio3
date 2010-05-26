@@ -108,6 +108,16 @@ public class Lexeme<T> implements ILexeme
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.parsing.lexer.IRange#isEmpty()
+	 */
+	@Override
+	public boolean isEmpty()
+	{
+		return this._endingOffset < this._startingOffset;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
