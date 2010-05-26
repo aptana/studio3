@@ -6,6 +6,9 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 
+import com.aptana.parsing.lexer.IRange;
+import com.aptana.parsing.lexer.Range;
+
 public class CommonCompletionProposal implements ICommonCompletionProposal
 {
 	private String _additionalProposalInformation;
@@ -159,6 +162,16 @@ public class CommonCompletionProposal implements ICommonCompletionProposal
 		return this._image;
 	}
 
+	/**
+	 * getReplaceRange
+	 * 
+	 * @return
+	 */
+	public IRange getReplaceRange()
+	{
+		return new Range(this._replacementOffset, this._replacementOffset + this._replacementLength - 1);
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.ICompletionProposal#getSelection(org.eclipse.jface.text.IDocument)
