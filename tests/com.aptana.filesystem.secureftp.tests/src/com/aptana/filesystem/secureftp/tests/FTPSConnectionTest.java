@@ -62,7 +62,7 @@ public class FTPSConnectionTest extends CommonConnectionTest
 	@Override
 	protected boolean supportsSetModificationTime()
 	{
-		return false;
+		return true;
 	}
 
 
@@ -83,6 +83,6 @@ public class FTPSConnectionTest extends CommonConnectionTest
 	@Override
 	protected boolean supportsChangePermissions()
 	{
-		return false;
+		return true;
 	}
 }
