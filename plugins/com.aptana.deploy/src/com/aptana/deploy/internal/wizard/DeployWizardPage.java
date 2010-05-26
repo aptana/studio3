@@ -93,6 +93,10 @@ public class DeployWizardPage extends WizardPage
 		// "Other" Deployment options radio button group
 		deployWithFTP = new Button(composite, SWT.RADIO);
 		deployWithFTP.setText(Messages.DeployWizardPage_FTPLabel);
+		if (deployWithHeroku == null)
+		{
+			deployWithFTP.setSelection(true);
+		}
 
 		deployWithCapistrano = new Button(composite, SWT.RADIO);
 		deployWithCapistrano.setText(Messages.DeployWizardPage_CapistranoLabel);
