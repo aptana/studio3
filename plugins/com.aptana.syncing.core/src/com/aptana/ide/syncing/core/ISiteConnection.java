@@ -52,5 +52,26 @@ public interface ISiteConnection extends IAdaptable {
 	public IConnectionPoint getDestination();
 	
 	public boolean excludes(IPath path);
+
+	/**
+	 * Sets the source connection point.
+	 * 
+	 * @param source
+	 */
+	public void setSource(IConnectionPoint source);
+
+	/**
+	 * Sets the destination connection point.
+	 * 
+	 * @param destination
+	 */
+	public void setDestination(IConnectionPoint destination);
+
+	/**
+	 * set site connection name
+	 * 
+	 * @param name
+	 */
+	public void setName(String name);
 	
 }

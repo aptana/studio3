@@ -722,7 +722,7 @@ public class VT100TerminalControl implements ITerminalControlForText, ITerminalC
 			IContextService contextService = (IContextService) PlatformUI
 					.getWorkbench().getAdapter(IContextService.class);
 			contextActivation = contextService
-					.activateContext("org.eclipse.tm.terminal.TerminalContext"); //$NON-NLS-1$
+					.activateContext("com.aptana.org.eclipse.tm.terminal.TerminalContext"); //$NON-NLS-1$
 		}
 
 		public void focusLost(FocusEvent event) {

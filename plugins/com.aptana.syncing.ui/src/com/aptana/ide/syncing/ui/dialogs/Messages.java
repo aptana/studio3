@@ -40,8 +40,6 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 
     private static final String BUNDLE_NAME = "com.aptana.ide.syncing.ui.dialogs.messages"; //$NON-NLS-1$
-
-    public static String IDialogConstants_LBL_Apply;
     
     public static String ChooseSiteConnectionDialog_LBL_Connection;
     public static String ChooseSiteConnectionDialog_LBL_Message;

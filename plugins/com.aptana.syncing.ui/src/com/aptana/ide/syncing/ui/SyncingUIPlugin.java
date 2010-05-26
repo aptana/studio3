@@ -48,7 +48,6 @@ import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.events.ConnectionPointEvent;
 import com.aptana.ide.core.io.events.IConnectionPointListener;
 import com.aptana.ide.syncing.core.ISiteConnection;
-import com.aptana.ide.syncing.core.SiteConnection;
 import com.aptana.ide.syncing.core.SyncingPlugin;
 import com.aptana.ide.syncing.core.events.ISiteConnectionListener;
 import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
@@ -96,10 +95,10 @@ public class SyncingUIPlugin extends AbstractUIPlugin {
                 ISiteConnection[] siteConnections = SyncingPlugin.getSiteConnectionManager().getSiteConnections();
                 for (ISiteConnection siteConnection : siteConnections) {
                     if (siteConnection.getSource() == connectionPoint) {
-                        ((SiteConnection) siteConnection).setSource(null);
+                        siteConnection.setSource(null);
                     }
                     if (siteConnection.getDestination() == connectionPoint) {
-                        ((SiteConnection) siteConnection).setDestination(null);
+                        siteConnection.setDestination(null);
                         refreshProjectSiteConnection(siteConnection);
                     }
                 }

@@ -72,7 +72,7 @@ public final class SiteConnectionUtils {
      */
     public static ISiteConnection createSite(String name, IConnectionPoint source,
             IConnectionPoint destination) {
-        SiteConnection site = new SiteConnection();
+        ISiteConnection site = SiteConnectionManager.getInstance().createSiteConnection();
         site.setName(name);
         site.setSource(source);
         site.setDestination(destination);

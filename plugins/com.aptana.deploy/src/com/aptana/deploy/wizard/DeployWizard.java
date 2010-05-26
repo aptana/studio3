@@ -52,8 +52,8 @@ import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.ide.core.io.ConnectionPointUtils;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.ISiteConnection;
-import com.aptana.ide.syncing.core.SiteConnectionManager;
 import com.aptana.ide.syncing.core.SiteConnectionUtils;
+import com.aptana.ide.syncing.core.SyncingPlugin;
 import com.aptana.ide.syncing.ui.actions.BaseSyncAction;
 import com.aptana.ide.syncing.ui.actions.DownloadAction;
 import com.aptana.ide.syncing.ui.actions.UploadAction;
@@ -140,7 +140,7 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 						site = SiteConnectionUtils.createSite(MessageFormat.format("{0} <-> {1}", project.getName(), //$NON-NLS-1$
 								connectionPoint.getName()),
 								ConnectionPointUtils.createWorkspaceConnectionPoint(project), connectionPoint);
-						SiteConnectionManager.getInstance().addSiteConnection(site);
+						SyncingPlugin.getSiteConnectionManager().addSiteConnection(site);
 					}
 					else
 					{
