@@ -20,6 +20,8 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.contentassist.IContentAssistSubjectControl;
+import org.eclipse.jface.preference.JFacePreferences;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
@@ -352,18 +354,10 @@ public class CompletionProposalPopup implements IContentAssistListener
 		Control control = fContentAssistSubjectControlAdapter.getControl();
 		if (Helper.okToUse(fProposalShell))
 		{
-			Color c = fContentAssistant.getProposalSelectorBackground();
-			if (c == null)
-			{
-				c = control.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
-			}
+			Color c= getBackgroundColor(control);
 			fProposalTable.setBackground(c);
 
-			c = fContentAssistant.getProposalSelectorForeground();
-			if (c == null)
-			{
-				c = control.getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND);
-			}
+			c= getForegroundColor(control);
 			fProposalTable.setForeground(c);
 			return;
 		}
@@ -457,19 +451,11 @@ public class CompletionProposalPopup implements IContentAssistListener
 		{
 			fProposalShell.setBackground(control.getDisplay().getSystemColor(SWT.COLOR_BLACK));
 		}
-
-		Color c = fContentAssistant.getProposalSelectorBackground();
-		if (c == null)
-		{
-			c = control.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
-		}
+		
+		Color c= getBackgroundColor(control);
 		fProposalTable.setBackground(c);
 
-		c = fContentAssistant.getProposalSelectorForeground();
-		if (c == null)
-		{
-			c = control.getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND);
-		}
+		c= getForegroundColor(control);
 		fProposalTable.setForeground(c);
 
 		Listener selectionOverride = new Listener()
@@ -529,6 +515,34 @@ public class CompletionProposalPopup implements IContentAssistListener
 		 */
 
 		fProposalTable.setHeaderVisible(false);
+	}
+	
+	/**
+	 * Returns the background color to use.
+	 *
+	 * @param control the control to get the display from
+	 * @return the background color
+	 * @since 3.2
+	 */
+	private Color getBackgroundColor(Control control) {
+		Color c= fContentAssistant.getProposalSelectorBackground();
+		if (c == null)
+			c= JFaceResources.getColorRegistry().get(JFacePreferences.CONTENT_ASSIST_BACKGROUND_COLOR);
+		return c;
+	}
+
+	/**
+	 * Returns the foreground color to use.
+	 *
+	 * @param control the control to get the display from
+	 * @return the foreground color
+	 * @since 3.2
+	 */
+	private Color getForegroundColor(Control control) {
+		Color c= fContentAssistant.getProposalSelectorForeground();
+		if (c == null)
+			c= JFaceResources.getColorRegistry().get(JFacePreferences.CONTENT_ASSIST_FOREGROUND_COLOR);
+		return c;
 	}
 
 	/**
