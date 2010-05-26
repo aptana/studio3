@@ -165,7 +165,7 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 		{
 			index.addEntry(JSIndexConstants.FUNCTION, name, location);
 		}
-		for (String varName : astHelper.getNonFunctionDeclarations(ast))
+		for (String varName : astHelper.getChildVarNonFunctions(ast))
 		{
 			index.addEntry(JSIndexConstants.VARIABLE, varName, location);
 		}

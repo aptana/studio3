@@ -229,7 +229,7 @@ public class ASTQueryTests extends TestCase
 		assertNotNull(functions);
 		assertEquals(0, functions.size());
 		
-		List<String> vars = this._queryHelper.getNonFunctionDeclarations(node);
+		List<String> vars = this._queryHelper.getChildVarNonFunctions(node);
 		assertNotNull(vars);
 		assertEquals(6, vars.size());
 		assertTrue(vars.contains("localVar1"));
@@ -255,7 +255,7 @@ public class ASTQueryTests extends TestCase
 		assertNotNull(functions);
 		assertEquals(0, functions.size());
 		
-		List<String> vars = this._queryHelper.getNonFunctionDeclarations(targetNodes.get(index++));
+		List<String> vars = this._queryHelper.getChildVarNonFunctions(targetNodes.get(index++));
 		assertNotNull(vars);
 		assertEquals(6, vars.size());
 		assertTrue(vars.contains("localVar1"));
