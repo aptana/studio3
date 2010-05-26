@@ -114,7 +114,7 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 	@Override
 	protected boolean supportsSetModificationTime()
 	{
-		return false;
+		return true;
 	}
 
 
