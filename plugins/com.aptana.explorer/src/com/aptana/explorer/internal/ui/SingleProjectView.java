@@ -23,9 +23,9 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
@@ -88,8 +88,6 @@ import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.filewatcher.FileWatcher;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
-import com.aptana.terminal.views.TerminalView;
-import com.aptana.ui.UIUtils;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.ResourceSynchronizationUtils;
@@ -98,6 +96,8 @@ import com.aptana.ide.syncing.ui.actions.DownloadAction;
 import com.aptana.ide.syncing.ui.actions.UploadAction;
 import com.aptana.ide.syncing.ui.dialogs.ChooseSiteConnectionDialog;
 import com.aptana.ide.ui.secureftp.dialogs.CommonFTPConnectionPointPropertyDialog;
+import com.aptana.terminal.views.TerminalView;
+import com.aptana.ui.UIUtils;
 
 /**
  * Customized CommonNavigator that adds a project combo and focuses the view on a single project.
@@ -297,6 +297,10 @@ public abstract class SingleProjectView extends CommonNavigator
 				}
 			};
 		}
+		if (adapter == IProject.class)
+		{
+			return selectedProject;
+		}
 		return super.getAdapter(adapter);
 	}
 
@@ -323,25 +327,11 @@ public abstract class SingleProjectView extends CommonNavigator
 		menuManager.add(new Separator(IContextMenuConstants.GROUP_PROPERTIES));
 
 		// Add run related items
-		// Open Terminal
 		menuManager.appendToGroup(GROUP_RUN, new ContributionItem()
 		{
 			@Override
 			public void fill(Menu menu, int index)
 			{
-				final MenuItem terminalMenuItem = new MenuItem(menu, SWT.PUSH);
-				terminalMenuItem.setText(Messages.SingleProjectView_OpenTerminalMenuItem_LBL);
-				terminalMenuItem.addSelectionListener(new SelectionAdapter()
-				{
-					public void widgetSelected(SelectionEvent e)
-					{
-						// Open a terminal on active project!
-						TerminalView.openView(selectedProject.getName(), selectedProject.getName(), selectedProject
-								.getLocation());
-					}
-				});
-				terminalMenuItem.setEnabled(selectedProject != null && selectedProject.exists());
-
 				IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 				if (projects.length > 0)
 				{
