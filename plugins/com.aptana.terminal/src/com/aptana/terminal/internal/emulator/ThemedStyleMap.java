@@ -48,7 +48,6 @@ import com.aptana.editor.common.theme.Theme;
  * @author Max Stepanov
  *
  */
-@SuppressWarnings("restriction")
 /* package */ class ThemedStyleMap extends StyleMap {
 
 	/* (non-Javadoc)

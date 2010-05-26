@@ -66,7 +66,6 @@ import com.aptana.terminal.internal.emulator.VT100TerminalControl;
  * @author Max Stepanov
  *
  */
-@SuppressWarnings("restriction")
 public class TerminalComposite extends Composite {
 	
 	private ITerminalListener terminalListener;

@@ -45,7 +45,6 @@ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
  * @author Max Stepanov
  *
  */
-@SuppressWarnings("restriction")
 /* package */ class LocalTerminalOutputListener implements IStreamListener {
 
 	private PrintStream printStream;
