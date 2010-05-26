@@ -34,30 +34,53 @@
  */
 package com.aptana.ide.syncing.ui.actions;
 
-import org.eclipse.osgi.util.NLS;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.MessageBox;
 
-public class Messages extends NLS {
+import com.aptana.core.util.StringUtil;
+import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.ide.syncing.core.ISiteConnection;
+import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
+import com.aptana.ide.syncing.core.old.handlers.SyncEventHandlerAdapter;
+import com.aptana.ide.syncing.ui.old.views.SmartSyncDialog;
+import com.aptana.ui.UIUtils;
 
-    private static final String BUNDLE_NAME = "com.aptana.ide.syncing.ui.actions.messages"; //$NON-NLS-1$
+public class SynchronizeFilesAction extends BaseSyncAction
+{
 
-    public static String BaseSyncAction_MessageTitle;
-    public static String BaseSyncAction_Warning_NoCommonParent;
+	private static String MESSAGE_TITLE = StringUtil.ellipsify(Messages.UploadAction_MessageTitle);
 
-    public static String DownloadAction_MessageTitle;
-    public static String DownloadAction_PostMessage;
+	protected void performAction(final IAdaptable[] files, final ISiteConnection site) throws CoreException
+	{
+		IConnectionPoint source = site.getSource();
+		IConnectionPoint dest = site.getDestination();
+		SmartSyncDialog dialog;
+		try
+		{
+			dialog = new SmartSyncDialog(UIUtils.getActiveShell(), source, dest, source.getRoot(), dest.getRoot(),
+					source.getName(), dest.getName());
+			dialog.open();
+			dialog.setHandler(new SyncEventHandlerAdapter()
+			{
+				public void syncDone(VirtualFileSyncPair item)
+				{
+					// refresh();
+				}
+			});
+		}
+		catch (CoreException e)
+		{
+			MessageBox error = new MessageBox(UIUtils.getActiveShell(), SWT.ICON_ERROR | SWT.OK);
+			error.setMessage("Unable to open synchronization dialog.");
+			error.open();
+		}
+	}
 
-    public static String NewSiteAction_LBL_New;
-
-    public static String SynchronizeAction_MessageTitle;
-
-    public static String UploadAction_MessageTitle;
-    public static String UploadAction_PostMessage;
-
-    static {
-        // initialize resource bundle
-        NLS.initializeMessages(BUNDLE_NAME, Messages.class);
-    }
-
-    private Messages() {
-    }
+	@Override
+	protected String getMessageTitle()
+	{
+		return MESSAGE_TITLE;
+	}
 }

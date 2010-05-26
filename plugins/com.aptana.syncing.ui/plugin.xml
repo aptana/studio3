@@ -161,6 +161,14 @@
                tooltip="%Action.Upload.tooltip">
          </action>
          <action
+               class="com.aptana.ide.syncing.ui.actions.SynchronizeFilesAction"
+               icon="icons/full/obj16/sync_both.gif"
+               id="com.aptana.ide.syncing.ui.actions.ResourceSynchronizeNewAction"
+               label="%Action.SynchronizeNew.name"
+               menubarPath="aptanasynchronize/syncingGroup"
+               tooltip="%Action.SynchronizeNew.tooltip">
+         </action>
+         <action
                class="com.aptana.ide.syncing.ui.actions.SynchronizeAction"
                enablesFor="1"
                icon="icons/full/obj16/sync_vertical.gif"
@@ -237,7 +245,7 @@
                icon="icons/full/obj16/sync_both.gif"
                id="com.aptana.ide.syncing.ui.actions.SiteConnectionSynchronizeAction"
                label="%action.siteConnectionSynchronize.label"
-               menubarPath="group.properties"
+               menubarPath="group.edit"
                tooltip="%action.siteConnectionSynchronize.tooltip">
          </action>
          <action

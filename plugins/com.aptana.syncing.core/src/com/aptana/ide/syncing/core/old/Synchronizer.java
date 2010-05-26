@@ -290,12 +290,12 @@ public class Synchronizer implements ILoggable
 		return _newFilesUploaded.toArray(new IFileStore[_newFilesUploaded.size()]);
 	}
 
-	private void setClientFileRoot(IFileStore client)
+	public void setClientFileRoot(IFileStore client)
 	{
 		_clientFileRoot = client;
 	}
 
-	private void setServerFileRoot(IFileStore server)
+	public void setServerFileRoot(IFileStore server)
 	{
 		_serverFileRoot = server;
 	}
