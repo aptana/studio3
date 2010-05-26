@@ -176,7 +176,7 @@ public class ASTQueryTests extends TestCase
 	public void testGlobalNamedFunction() throws Exception
 	{
 		// make sure we have the expected number of test points
-		List<IParseNode> targetNodes = this.getTestContext("ast-queries/globalNamedfunction.js", 1);
+		List<IParseNode> targetNodes = this.getTestContext("ast-queries/globalNamedFunction.js", 1);
 
 		List<String> functions = this._queryHelper.getChildFunctions(targetNodes.get(0));
 		assertNotNull(functions);
@@ -191,7 +191,7 @@ public class ASTQueryTests extends TestCase
 	 */
 	public void testGlobalVarFunction() throws Exception
 	{
-		List<IParseNode> targetNodes = this.getTestContext("ast-queries/globalVarfunction.js", 1);
+		List<IParseNode> targetNodes = this.getTestContext("ast-queries/globalVarFunction.js", 1);
 		
 		List<String> functions = this._queryHelper.getChildFunctions(targetNodes.get(0));
 		assertNotNull(functions);
@@ -206,7 +206,7 @@ public class ASTQueryTests extends TestCase
 	 */
 	public void testGlobalNamedVarFunction() throws Exception
 	{
-		List<IParseNode> targetNodes = this.getTestContext("ast-queries/globalNamedVarfunction.js", 1);
+		List<IParseNode> targetNodes = this.getTestContext("ast-queries/globalNamedVarFunction.js", 1);
 		
 		List<String> functions = this._queryHelper.getChildFunctions(targetNodes.get(0));
 		assertNotNull(functions);
