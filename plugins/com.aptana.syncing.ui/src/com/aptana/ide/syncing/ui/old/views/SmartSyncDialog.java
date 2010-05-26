@@ -201,10 +201,12 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 		if (source != null)
 		{
 			this.syncer.setClientFileManager(sourceManager);
+			this.syncer.setClientFileRoot(source);
 		}
 		if (dest != null)
 		{
 			this.syncer.setServerFileManager(destManager);
+			this.syncer.setServerFileRoot(dest);
 		}
 		this.syncer.setLogger(new ILogger()
 		{			
@@ -262,6 +264,8 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 		this.syncer.setServerFileManager(conf.getDestinationFileManager());
 		sourceConnectionPoint = conf.getSourceFileManager();
 		destConnectionPoint = conf.getDestinationFileManager();
+		this.syncer.setClientFileRoot(sourceConnectionPoint.getRoot());
+		this.syncer.setServerFileRoot(destConnectionPoint.getRoot());
 		if (filesToBeSynced == null || filesToBeSynced.length == 0)
 		{
 			this.filesToBeSynced = null;
