@@ -161,7 +161,7 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 		JSASTQueryHelper astHelper = new JSASTQueryHelper();
 		String location = file.getProjectRelativePath().toPortableString();
 
-		for (String name : astHelper.getGlobalFunctions(ast))
+		for (String name : astHelper.getChildFunctions(ast))
 		{
 			index.addEntry(JSIndexConstants.FUNCTION, name, location);
 		}

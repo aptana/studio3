@@ -145,27 +145,27 @@ public class JSASTQueryHelper
 	}
 
 	/**
-	 * getGlobalFunctions
+	 * getChildFunctions
 	 * 
 	 * @param ast
 	 * @return
 	 */
-	public List<String> getGlobalFunctions(IParseNode ast)
+	public List<String> getChildFunctions(IParseNode ast)
 	{
-		List<String> result = this.getNamedFunctions(ast);
+		List<String> result = this.getChildNamedFunctions(ast);
 
-		result.addAll(this.getVarDeclaredFunctions(ast));
+		result.addAll(this.getChildVarFunctions(ast));
 
 		return result;
 	}
 
 	/**
-	 * getNamedFunctions
+	 * getChildNamedFunctions
 	 * 
 	 * @param ast
 	 * @return
 	 */
-	public List<String> getNamedFunctions(IParseNode ast)
+	public List<String> getChildNamedFunctions(IParseNode ast)
 	{
 		final List<String> result = new LinkedList<String>();
 
@@ -186,12 +186,12 @@ public class JSASTQueryHelper
 	}
 	
 	/**
-	 * getVarDeclaredFunctions
+	 * getChildVarFunctions
 	 * 
 	 * @param ast
 	 * @return
 	 */
-	public List<String> getVarDeclaredFunctions(IParseNode ast)
+	public List<String> getChildVarFunctions(IParseNode ast)
 	{
 		final List<String> result = new LinkedList<String>();
 		

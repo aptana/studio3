@@ -178,10 +178,10 @@ public class ASTQueryTests extends TestCase
 		// make sure we have the expected number of test points
 		List<IParseNode> targetNodes = this.getTestContext("ast-queries/globalNamedfunction.js", 1);
 
-		List<String> globals = this._queryHelper.getGlobalFunctions(targetNodes.get(0));
-		assertNotNull(globals);
-		assertEquals(1, globals.size());
-		assertEquals("globalFunction", globals.get(0));
+		List<String> functions = this._queryHelper.getChildFunctions(targetNodes.get(0));
+		assertNotNull(functions);
+		assertEquals(1, functions.size());
+		assertEquals("globalFunction", functions.get(0));
 	}
 
 	/**
@@ -193,10 +193,10 @@ public class ASTQueryTests extends TestCase
 	{
 		List<IParseNode> targetNodes = this.getTestContext("ast-queries/globalVarfunction.js", 1);
 		
-		List<String> globals = this._queryHelper.getGlobalFunctions(targetNodes.get(0));
-		assertNotNull(globals);
-		assertEquals(1, globals.size());
-		assertEquals("globalVarFunction", globals.get(0));
+		List<String> functions = this._queryHelper.getChildFunctions(targetNodes.get(0));
+		assertNotNull(functions);
+		assertEquals(1, functions.size());
+		assertEquals("globalVarFunction", functions.get(0));
 	}
 
 	/**
@@ -208,11 +208,11 @@ public class ASTQueryTests extends TestCase
 	{
 		List<IParseNode> targetNodes = this.getTestContext("ast-queries/globalNamedVarfunction.js", 1);
 		
-		List<String> globals = this._queryHelper.getGlobalFunctions(targetNodes.get(0));
-		assertNotNull(globals);
-		assertEquals(2, globals.size());
-		assertTrue(globals.contains("globalFunction"));
-		assertTrue(globals.contains("globalVarFunction"));
+		List<String> functions = this._queryHelper.getChildFunctions(targetNodes.get(0));
+		assertNotNull(functions);
+		assertEquals(2, functions.size());
+		assertTrue(functions.contains("globalFunction"));
+		assertTrue(functions.contains("globalVarFunction"));
 	}
 
 	/**
@@ -225,19 +225,19 @@ public class ASTQueryTests extends TestCase
 		List<IParseNode> targetNodes = this.getTestContext("ast-queries/globalVars.js", 1);
 		IParseNode node = targetNodes.get(0);
 		
-		List<String> globals = this._queryHelper.getGlobalFunctions(node);
-		assertNotNull(globals);
-		assertEquals(0, globals.size());
+		List<String> functions = this._queryHelper.getChildFunctions(node);
+		assertNotNull(functions);
+		assertEquals(0, functions.size());
 		
-		globals = this._queryHelper.getNonFunctionDeclarations(node);
-		assertNotNull(globals);
-		assertEquals(6, globals.size());
-		assertTrue(globals.contains("localVar1"));
-		assertTrue(globals.contains("localVar2"));
-		assertTrue(globals.contains("localVar3"));
-		assertTrue(globals.contains("localVar4"));
-		assertTrue(globals.contains("localVar5"));
-		assertTrue(globals.contains("localVar6"));
+		List<String> vars = this._queryHelper.getNonFunctionDeclarations(node);
+		assertNotNull(vars);
+		assertEquals(6, vars.size());
+		assertTrue(vars.contains("localVar1"));
+		assertTrue(vars.contains("localVar2"));
+		assertTrue(vars.contains("localVar3"));
+		assertTrue(vars.contains("localVar4"));
+		assertTrue(vars.contains("localVar5"));
+		assertTrue(vars.contains("localVar6"));
 	}
 
 	/**
@@ -251,25 +251,25 @@ public class ASTQueryTests extends TestCase
 		int index = 0;
 		
 		// position 1
-		List<String> globals = this._queryHelper.getGlobalFunctions(targetNodes.get(index));
-		assertNotNull(globals);
-		assertEquals(0, globals.size());
+		List<String> functions = this._queryHelper.getChildFunctions(targetNodes.get(index));
+		assertNotNull(functions);
+		assertEquals(0, functions.size());
 		
-		List<String> locals = this._queryHelper.getNonFunctionDeclarations(targetNodes.get(index++));
-		assertNotNull(locals);
-		assertEquals(6, locals.size());
-		assertTrue(locals.contains("localVar1"));
-		assertTrue(locals.contains("localVar2"));
-		assertTrue(locals.contains("localVar3"));
-		assertTrue(locals.contains("localVar4"));
-		assertTrue(locals.contains("localVar5"));
-		assertTrue(locals.contains("localVar6"));
+		List<String> vars = this._queryHelper.getNonFunctionDeclarations(targetNodes.get(index++));
+		assertNotNull(vars);
+		assertEquals(6, vars.size());
+		assertTrue(vars.contains("localVar1"));
+		assertTrue(vars.contains("localVar2"));
+		assertTrue(vars.contains("localVar3"));
+		assertTrue(vars.contains("localVar4"));
+		assertTrue(vars.contains("localVar5"));
+		assertTrue(vars.contains("localVar6"));
 		
 		// position 2
-		globals = this._queryHelper.getGlobalFunctions(targetNodes.get(index++));
-		assertNotNull(globals);
-		assertEquals(1, globals.size());
-		assertEquals("globalFunction", globals.get(0));
+		functions = this._queryHelper.getChildFunctions(targetNodes.get(index++));
+		assertNotNull(functions);
+		assertEquals(1, functions.size());
+		assertEquals("globalFunction", functions.get(0));
 	}
 	
 	/**
@@ -283,16 +283,16 @@ public class ASTQueryTests extends TestCase
 		int index = 0;
 		
 		// position 1
-		Map<String,Classification> globals = this._queryHelper.getSymbolsInScope(targetNodes.get(index++));
-		assertNotNull(globals);
-		assertEquals(2, globals.size());
-		assertTrue(globals.containsKey("parameter1"));
-		assertTrue(globals.containsKey("parameter2"));
+		Map<String,Classification> symbols = this._queryHelper.getSymbolsInScope(targetNodes.get(index++));
+		assertNotNull(symbols);
+		assertEquals(2, symbols.size());
+		assertTrue(symbols.containsKey("parameter1"));
+		assertTrue(symbols.containsKey("parameter2"));
 		
 		// position 2
-		globals = this._queryHelper.getSymbolsInScope(targetNodes.get(index++));
-		assertNotNull(globals);
-		assertEquals(0, globals.size());
+		symbols = this._queryHelper.getSymbolsInScope(targetNodes.get(index++));
+		assertNotNull(symbols);
+		assertEquals(0, symbols.size());
 	}
 
 	/**
@@ -306,24 +306,24 @@ public class ASTQueryTests extends TestCase
 		int index = 0;
 		
 		// position 1
-		Map<String,Classification> globals = this._queryHelper.getSymbolsInScope(targetNodes.get(index++));
-		assertNotNull(globals);
-		assertEquals(4, globals.size());
-		assertTrue(globals.containsKey("outerParam1"));
-		assertTrue(globals.containsKey("outerParam2"));
-		assertTrue(globals.containsKey("innerParam1"));
-		assertTrue(globals.containsKey("innerParam2"));
+		Map<String,Classification> symbols = this._queryHelper.getSymbolsInScope(targetNodes.get(index++));
+		assertNotNull(symbols);
+		assertEquals(4, symbols.size());
+		assertTrue(symbols.containsKey("outerParam1"));
+		assertTrue(symbols.containsKey("outerParam2"));
+		assertTrue(symbols.containsKey("innerParam1"));
+		assertTrue(symbols.containsKey("innerParam2"));
 		
 		// position 2
-		globals = this._queryHelper.getSymbolsInScope(targetNodes.get(index++));
-		assertNotNull(globals);
-		assertEquals(2, globals.size());
-		assertTrue(globals.containsKey("outerParam1"));
-		assertTrue(globals.containsKey("outerParam2"));
+		symbols = this._queryHelper.getSymbolsInScope(targetNodes.get(index++));
+		assertNotNull(symbols);
+		assertEquals(2, symbols.size());
+		assertTrue(symbols.containsKey("outerParam1"));
+		assertTrue(symbols.containsKey("outerParam2"));
 		
 		// position 3
-		globals = this._queryHelper.getSymbolsInScope(targetNodes.get(index++));
-		assertNotNull(globals);
-		assertEquals(0, globals.size());
+		symbols = this._queryHelper.getSymbolsInScope(targetNodes.get(index++));
+		assertNotNull(symbols);
+		assertEquals(0, symbols.size());
 	}
 }
