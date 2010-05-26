@@ -33,37 +33,17 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.syncing.ui.dialogs;
+package com.aptana.ui;
 
-import org.eclipse.osgi.util.NLS;
+/**
+ * @author Max Stepanov
+ *
+ */
+public interface IDialogConstants extends org.eclipse.jface.dialogs.IDialogConstants {
 
-public class Messages extends NLS {
-
-    private static final String BUNDLE_NAME = "com.aptana.ide.syncing.ui.dialogs.messages"; //$NON-NLS-1$
+    public static final int APPLY_ID = 31;
+    public static final int BROWSE_ID = 32;
     
-    public static String ChooseSiteConnectionDialog_LBL_Connection;
-    public static String ChooseSiteConnectionDialog_LBL_Message;
-    public static String ChooseSiteConnectionDialog_LBL_PropertyPage;
-    public static String ChooseSiteConnectionDialog_LBL_RememberMyDecision;
-    public static String ChooseSiteConnectionDialog_Title;
-
-    public static String SiteConnectionsEditorDialog_DeleteConfirm_Message;
-    public static String SiteConnectionsEditorDialog_DeleteConfirm_Title;
-    public static String SiteConnectionsEditorDialog_DialogTitle;
-    public static String SiteConnectionsEditorDialog_ERR_Duplicate;
-    public static String SiteConnectionsEditorDialog_LBL_ConnectionGroup;
-    public static String SiteConnectionsEditorDialog_LBL_Duplicate;
-    public static String SiteConnectionsEditorDialog_LBL_NewConnection;
-    public static String SiteConnectionsEditorDialog_Message;
-    public static String SiteConnectionsEditorDialog_SaveConfirm_Message;
-    public static String SiteConnectionsEditorDialog_SaveConfirm_Title;
-    public static String SiteConnectionsEditorDialog_Title;
-
-    static {
-        // initialize resource bundle
-        NLS.initializeMessages(BUNDLE_NAME, Messages.class);
-    }
-
-    private Messages() {
-    }
+    public static final String APPLY_LABEL = Messages.IDialogConstants_LBL_Apply;
+    public static final String BROWSE_LABEL = Messages.IDialogConstants_LBL_Browse;
 }

@@ -33,15 +33,38 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.syncing.ui.dialogs;
+package com.aptana.ui;
+
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
 /**
  * @author Max Stepanov
  *
  */
-public interface IDialogConstants extends org.eclipse.jface.dialogs.IDialogConstants {
+public final class PopupSchedulingRule implements ISchedulingRule {
 
-    public static final int APPLY_ID = 31;
-    
-    public static final String APPLY_LABEL = Messages.IDialogConstants_LBL_Apply;
+	public static final PopupSchedulingRule INSTANCE = new PopupSchedulingRule();
+	
+	/**
+	 * 
+	 */
+	private PopupSchedulingRule() {
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.jobs.ISchedulingRule#contains(org.eclipse.core.runtime.jobs.ISchedulingRule)
+	 */
+	@Override
+	public boolean contains(ISchedulingRule rule) {
+		return rule == this;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.jobs.ISchedulingRule#isConflicting(org.eclipse.core.runtime.jobs.ISchedulingRule)
+	 */
+	@Override
+	public boolean isConflicting(ISchedulingRule rule) {
+		return rule == this;
+	}
+
 }
