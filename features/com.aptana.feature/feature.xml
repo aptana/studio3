@@ -85,7 +85,7 @@
          version="0.0.0"/>
 
    <plugin
-         id="org.eclipse.tm.terminal"
+         id="com.aptana.org.eclipse.tm.terminal"
          download-size="0"
          install-size="0"
          version="0.0.0"
