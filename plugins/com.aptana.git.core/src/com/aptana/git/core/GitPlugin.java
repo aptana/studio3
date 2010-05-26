@@ -31,7 +31,7 @@ public class GitPlugin extends Plugin
 {
 
 	// The plug-in ID
-	private static final String PLUGIN_ID = "com.aptana.git.core"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "com.aptana.git.core"; //$NON-NLS-1$
 
 	// The shared instance
 	private static GitPlugin plugin;
@@ -128,6 +128,12 @@ public class GitPlugin extends Plugin
 	{
 		if (getDefault() != null)
 			getDefault().getLog().log(new Status(IStatus.WARNING, getPluginId(), warning));
+	}
+
+	public static void logError(Exception e)
+	{
+		if (getDefault() != null)
+			getDefault().getLog().log(new Status(IStatus.WARNING, getPluginId(), "", e));
 	}
 
 	public static void logInfo(String string)
