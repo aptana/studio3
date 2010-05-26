@@ -82,6 +82,6 @@ public class FTPConnectionTest extends CommonConnectionTest
 	@Override
 	protected boolean supportsChangePermissions()
 	{
-		return false;
+		return true;
 	}
 }
