@@ -78,6 +78,7 @@ import com.aptana.ide.syncing.core.SiteConnection;
 import com.aptana.ide.syncing.core.SyncingPlugin;
 import com.aptana.ide.syncing.ui.internal.SiteConnectionPropertiesWidget;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
+import com.aptana.ui.IDialogConstants;
 import com.aptana.ui.SWTUtils;
 import com.aptana.ui.UIPlugin;
 import com.aptana.ui.UIUtils;

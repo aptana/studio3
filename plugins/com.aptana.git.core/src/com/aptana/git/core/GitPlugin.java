@@ -10,6 +10,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
@@ -30,7 +31,7 @@ public class GitPlugin extends Plugin
 {
 
 	// The plug-in ID
-	private static final String PLUGIN_ID = "com.aptana.git.core"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "com.aptana.git.core"; //$NON-NLS-1$
 
 	// The shared instance
 	private static GitPlugin plugin;
@@ -129,6 +130,12 @@ public class GitPlugin extends Plugin
 			getDefault().getLog().log(new Status(IStatus.WARNING, getPluginId(), warning));
 	}
 
+	public static void logError(Exception e)
+	{
+		if (getDefault() != null)
+			getDefault().getLog().log(new Status(IStatus.WARNING, getPluginId(), "", e));
+	}
+
 	public static void logInfo(String string)
 	{
 		if (getDefault() != null && getDefault().isDebugging())
@@ -166,7 +173,7 @@ public class GitPlugin extends Plugin
 					file.getParentFile().mkdirs();
 					if (file.createNewFile())
 					{
-						IOUtil.extractFile(PLUGIN_ID, "res/win32/sshw.exe", file); //$NON-NLS-1$
+						IOUtil.extractFile(PLUGIN_ID, new Path("$os$/sshw.exe"), file); //$NON-NLS-1$
 					}
 				}
 				catch (IOException e)
