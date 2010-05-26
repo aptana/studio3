@@ -54,28 +54,35 @@ public class SynchronizeFilesAction extends BaseSyncAction
 
 	protected void performAction(final IAdaptable[] files, final ISiteConnection site) throws CoreException
 	{
-		IConnectionPoint source = site.getSource();
-		IConnectionPoint dest = site.getDestination();
-		SmartSyncDialog dialog;
-		try
+		final IConnectionPoint source = site.getSource();
+		final IConnectionPoint dest = site.getDestination();
+		UIUtils.getDisplay().asyncExec(new Runnable()
 		{
-			dialog = new SmartSyncDialog(UIUtils.getActiveShell(), source, dest, source.getRoot(), dest.getRoot(),
-					source.getName(), dest.getName());
-			dialog.open();
-			dialog.setHandler(new SyncEventHandlerAdapter()
+
+			@Override
+			public void run()
 			{
-				public void syncDone(VirtualFileSyncPair item)
+				try
 				{
-					// refresh();
+					SmartSyncDialog dialog = new SmartSyncDialog(getShell(), source, dest, source.getRoot(), dest
+							.getRoot(), source.getName(), dest.getName());
+					dialog.open();
+					dialog.setHandler(new SyncEventHandlerAdapter()
+					{
+						public void syncDone(VirtualFileSyncPair item)
+						{
+							// refresh();
+						}
+					});
 				}
-			});
-		}
-		catch (CoreException e)
-		{
-			MessageBox error = new MessageBox(UIUtils.getActiveShell(), SWT.ICON_ERROR | SWT.OK);
-			error.setMessage("Unable to open synchronization dialog.");
-			error.open();
-		}
+				catch (CoreException e)
+				{
+					MessageBox error = new MessageBox(UIUtils.getActiveShell(), SWT.ICON_ERROR | SWT.OK);
+					error.setMessage("Unable to open synchronization dialog.");
+					error.open();
+				}
+			}
+		});
 	}
 
 	@Override
