@@ -52,7 +52,7 @@ import com.aptana.ide.core.io.IConnectionPoint;
  * 
  * @author Michael Xia (mxia@aptana.com)
  */
-public class DefaultSiteConnection extends SiteConnection {
+public final class DefaultSiteConnection extends SiteConnection {
 
     public static final String NAME = "Default"; //$NON-NLS-1$
 

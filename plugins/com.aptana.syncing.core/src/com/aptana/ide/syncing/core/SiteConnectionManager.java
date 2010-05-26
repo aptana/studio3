@@ -67,7 +67,7 @@ import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
  * @author Max Stepanov
  *
  */
-public class SiteConnectionManager implements ISiteConnectionManager {
+/* package */ final class SiteConnectionManager implements ISiteConnectionManager {
 
 	protected static final String STATE_FILENAME = "sites"; //$NON-NLS-1$
 
@@ -110,7 +110,7 @@ public class SiteConnectionManager implements ISiteConnectionManager {
 				XMLMemento memento = XMLMemento.createReadRoot(reader);
 				for (IMemento child : memento.getChildren(ELEMENT_SITE)) {
 					SiteConnection siteConnection = restoreConnection(child);
-                    if (siteConnection != null && siteConnection.shouldRestore()) {
+                    if (siteConnection != null && siteConnection.isValid()) {
                         connections.add(siteConnection);
                     }
                 }
@@ -238,7 +238,7 @@ public class SiteConnectionManager implements ISiteConnectionManager {
 		}
 		if (siteConnection == DefaultSiteConnection.getInstance()) {
 		    // special handling for cloning the default site connection
-		    SiteConnection clone  = new SiteConnection();
+		    ISiteConnection clone  = new SiteConnection();
 		    clone.setName(siteConnection.getName());
 		    clone.setSource(siteConnection.getSource());
 		    clone.setDestination(siteConnection.getDestination());
@@ -398,7 +398,7 @@ public class SiteConnectionManager implements ISiteConnectionManager {
             return null;
         }
 
-        SiteConnection siteConnection = new SiteConnection();
+        ISiteConnection siteConnection = createSiteConnection();
         siteConnection.setName(args[0]);
         String sourceId = args[1];
         String destinationId = args[2];
