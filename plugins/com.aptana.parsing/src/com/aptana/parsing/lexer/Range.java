@@ -2,6 +2,8 @@ package com.aptana.parsing.lexer;
 
 public class Range implements IRange
 {
+	public static final Range EMPTY = new Range(0, -1);
+	
 	private int fStart;
 	private int fEnd;
 
