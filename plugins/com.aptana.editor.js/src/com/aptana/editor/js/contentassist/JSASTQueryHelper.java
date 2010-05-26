@@ -202,6 +202,15 @@ public class JSASTQueryHelper
 				public void process(Object item)
 				{
 					result.add(item.toString());
+					
+					IParseNode identifier = (IParseNode) item;
+					JSFunctionNode function = (JSFunctionNode) identifier.getParent().getChild(1);
+					String name = function.getName();
+					
+					if (name != null && name.length() > 0)
+					{
+						result.add(name);
+					}
 				}
 			}
 		);
