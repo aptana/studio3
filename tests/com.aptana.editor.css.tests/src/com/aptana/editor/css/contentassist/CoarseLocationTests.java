@@ -1,9 +1,47 @@
 package com.aptana.editor.css.contentassist;
 
-import com.aptana.editor.css.contentassist.CSSContentAssistProcessor.LocationType;
+import java.text.MessageFormat;
 
-public class ContentAssistCoarseLocationTests extends LocationTests
+import junit.framework.TestCase;
+
+import org.eclipse.jface.text.IDocument;
+
+import com.aptana.editor.common.contentassist.LexemeProvider;
+import com.aptana.editor.css.contentassist.CSSContentAssistProcessor.LocationType;
+import com.aptana.editor.css.parsing.lexer.CSSTokenType;
+
+public class CoarseLocationTests extends TestCase
 {
+	/**
+	 * coarseLocationTests
+	 * 
+	 * @param source
+	 * @param startingOffset
+	 * @param endingOffset
+	 * @param expectedLocation
+	 */
+	protected void coarseLocationTests(String source, LocationTypeRange ... ranges)
+	{
+		IDocument document = TestUtil.createDocument(source);
+		CSSContentAssistProcessor processor = new CSSContentAssistProcessor(null);
+		
+		for (LocationTypeRange range : ranges)
+		{
+			for (int offset = range.startingOffset; offset <= range.endingOffset; offset++)
+			{
+				LexemeProvider<CSSTokenType> lexemeProvider = processor.createLexemeProvider(document, offset); 
+				LocationType location = processor.getCoarseLocationType(lexemeProvider, offset);
+				String message = MessageFormat.format(
+					"Expected {0} at location {1} of ''{2}''",
+					range.location.toString(),
+					Integer.toString(offset),
+					source
+				);
+				assertEquals(message, range.location, location);
+			}
+		}
+	}
+	
 	/**
 	 * testNoSource
 	 */
