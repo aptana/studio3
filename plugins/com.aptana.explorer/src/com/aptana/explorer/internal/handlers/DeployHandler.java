@@ -66,7 +66,7 @@ public class DeployHandler extends AbstractHandler
 				shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 			}
 			WizardDialog dialog = new WizardDialog(shell, wizard);
-			dialog.setPageSize(350, 470);
+			dialog.setPageSize(350, 500);
 			dialog.create();
 			dialog.open();
 		}
