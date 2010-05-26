@@ -10,8 +10,9 @@ public class AllTests
 	{
 		TestSuite suite = new TestSuite("Test for com.aptana.editor.css.contentassist");
 		//$JUnit-BEGIN$
-		suite.addTestSuite(ContentAssistFineLocationTests.class);
-		suite.addTestSuite(ContentAssistCoarseLocationTests.class);
+		suite.addTestSuite(FineLocationTests.class);
+		suite.addTestSuite(CoarseLocationTests.class);
+		suite.addTestSuite(RangeTests.class);
 		//$JUnit-END$
 		return suite;
 	}
