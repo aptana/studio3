@@ -31,6 +31,7 @@ public class AllTests
 		suite.addTestSuite(JSEditorTest.class);
 		suite.addTest(com.aptana.editor.js.outline.AllTests.suite());
 		suite.addTest(com.aptana.editor.js.index.AllTests.suite());
+		suite.addTest(com.aptana.editor.js.contentassist.AllTests.suite());
 		// $JUnit-END$
 		return suite;
 	}
