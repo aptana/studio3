@@ -96,7 +96,20 @@ public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfigurati
 		HTMLSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		return reconciler;
 	}
-	
+
+	public static IContentAssistProcessor getContentAssistProcessor(String contentType, AbstractThemeableEditor editor)
+	{
+		if (contentType.startsWith(JSSourceConfiguration.PREFIX))
+		{
+			return new JSContentAssistProcessor(editor);
+		}
+		if (contentType.startsWith(CSSSourceConfiguration.PREFIX))
+		{
+			return new CSSContentAssistProcessor(editor);
+		}
+		return new HTMLContentAssistProcessor(editor);
+	}
+
 	@Override
 	@SuppressWarnings("unchecked")
 	protected Map getHyperlinkDetectorTargets(ISourceViewer sourceViewer)
@@ -110,21 +123,6 @@ public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfigurati
 	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
 	{
 		AbstractThemeableEditor editor = this.getAbstractThemeableEditor();
-		IContentAssistProcessor result;
-		
-		if (contentType.startsWith(JSSourceConfiguration.PREFIX))
-		{
-			result = new JSContentAssistProcessor(editor);
-		}
-		else if (contentType.startsWith(CSSSourceConfiguration.PREFIX))
-		{
-			result = new CSSContentAssistProcessor(editor);
-		}
-		else
-		{
-			result = new HTMLContentAssistProcessor(editor);
-		}
-		
-		return result;
+		return getContentAssistProcessor(contentType, editor);
 	}
 }
