@@ -93,4 +93,14 @@ public class Range implements IRange
 	{
 		return fEnd < fStart;
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString()
+	{
+		return "[" + fStart + "," + fEnd + "]";
+	}
 }
