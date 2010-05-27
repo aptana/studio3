@@ -12,12 +12,12 @@ public class CommonCompletionProposal implements ICommonCompletionProposal
 	private IContextInformation _contextInformation;
 	private String _displayString;
 	private Image _image;
-	private int _cursorPosition;
-	private int _replacementOffset;
-	private int _replacementLength;
-	private String _replacementString;
+	protected int _cursorPosition;
+	protected int _replacementOffset;
+	protected int _replacementLength;
+	protected String _replacementString;
 	private String _fileLocation;
-	private boolean _isDefaultSelection;
+	protected boolean _isDefaultSelection;
 	private boolean _isSuggestedSelection;
 	private Image[] _userAgentImages;
 	private int _hash;
@@ -36,12 +36,12 @@ public class CommonCompletionProposal implements ICommonCompletionProposal
 	 */
 	public CommonCompletionProposal(String replacementString, int replacementOffset, int replacementLength, int cursorPosition, Image image, String displayString, IContextInformation contextInformation, String additionalProposalInfo)
 	{
-		this._replacementString = (replacementString == null) ? "" : replacementString;
+		this._replacementString = (replacementString == null) ? "" : replacementString; //$NON-NLS-1$
 		this._replacementOffset = replacementOffset;
 		this._replacementLength = replacementLength;
 		this._cursorPosition = cursorPosition;
 		this._image = image;
-		this._displayString = (displayString == null) ? "" : displayString;
+		this._displayString = (displayString == null) ? "" : displayString; //$NON-NLS-1$
 		this._contextInformation = contextInformation;
 		this._additionalProposalInformation = additionalProposalInfo;
 	}
