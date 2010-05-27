@@ -100,7 +100,7 @@ public class Lexeme<T> implements ILexeme
 
 		if (secondLexeme != null)
 		{
-			result = this.getEndingOffset() == secondLexeme.getStartingOffset();
+			result = this.getEndingOffset() + 1 == secondLexeme.getStartingOffset();
 		}
 
 		return result;
