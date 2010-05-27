@@ -56,7 +56,7 @@ public class FineLocationTests extends TestCase
 	}
 	
 	/**
-	 * testEmptyBody
+	 * testEmptyBody2
 	 */
 	public void testEmptyBody2()
 	{
@@ -69,7 +69,7 @@ public class FineLocationTests extends TestCase
 	}
 	
 	/**
-	 * testEmptyBody2
+	 * testTwoRules
 	 */
 	public void testTwoRules()
 	{
