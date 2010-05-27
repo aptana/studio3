@@ -33,7 +33,9 @@ module Ruble
         if Ruble.platforms.include? :mac
           "/Applications/Firefox.app/Contents/MacOS/firefox-bin \"#{url.to_s}\" &"
         elsif Ruble.platforms.include? :windows
-          path = path_that_exists("/Program Files/Mozilla Firefox/firefox.exe", "/Program Files (x86)/Mozilla Firefox/firefox.exe")
+          path = path_that_exists(com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES%/Mozilla Firefox/firefox.exe"),
+            com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES(x86)%/Mozilla Firefox/firefox.exe"),
+            com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMW6432%/Mozilla Firefox/firefox.exe"))
           "ruby -e \"IO.popen('#{path} \"#{url.to_s}\"')\""
         else
           "/usr/bin/firefox \"#{url.to_s}\" &"
@@ -43,21 +45,25 @@ module Ruble
           # FIXME Seems to open a new instance and it reports an error about loading profile data
           "\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" \"#{url.to_s}\" &"
         elsif Ruble.platforms.include? :windows
-          path = path_that_exists("/Documents and Settings/#{ENV['TM_FULLNAME']}/Local Settings/Application Data/Google/Chrome/Application/chrome.exe", "/Users/#{ENV['TM_FULLNAME']}/AppData/Local/Google/Chrome/Application/chrome.exe")
+          path = com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%LOCAL_APPDATA%/Google/Chrome/Application/chrome.exe")
           "ruby -e \"IO.popen('#{path} \"#{url.to_s}\"')\""
         else
           "/usr/bin/google-chrome \"#{url.to_s}\" &"
         end
-      when :ie        
-        path = path_that_exists("/Program Files (x86)/Internet Explorer/iexplore.exe", "/Program Files/Internet Explorer/iexplore.exe")
+      when :ie
+        path = path_that_exists(com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES%/Internet Explorer/iexplore.exe"),
+          com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES(X86)%/Internet Explorer/iexplore.exe"),
+          com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMW6432%/Internet Explorer/iexplore.exe"))
         "ruby -e \"IO.popen('#{path} \"#{url.to_s}\"')\""
       when :safari
         if Ruble.platforms.include? :mac
           # FIXME Opens in new tab/window
           "osascript -e \"tell application \\\"Safari\\\"\nopen location \\\"#{url.to_s}\\\"\nend tell\""          
         elsif Ruble.platforms.include? :windows
+          path = path_that_exists(com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES%/Safari/Safari.exe"),
+            com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES(X86)%/Safari/Safari.exe"),
+            com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMW6432%/Safari/Safari.exe"))
           # FIXME Doesn't seem to take URL on Windows XP...
-          path = path_that_exists("/Program Files/Safari/Safari.exe", "/Program Files (x86)/Safari/Safari.exe")
           "ruby -e \"IO.popen('#{path} \"#{url.to_s}\"')\""
         end
       when :webkit
@@ -68,7 +74,9 @@ module Ruble
         if Ruble.platforms.include? :mac
           "/Applications/Opera.app/Contents/MacOS/Opera \"#{url.to_s}\" &"
         elsif Ruble.platforms.include? :windows
-          path = path_that_exists("/Program Files/Opera/opera.exe", "/Program Files (x86)/Opera/opera.exe")
+          path = path_that_exists(com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES%/Opera/opera.exe"),
+            com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES(X86)%/Opera/opera.exe"),
+            com.aptana.core.util.PlatformUtil.expandEnvironmentStrings("%PROGRAMW6432%/Opera/opera.exe"))
           "ruby -e \"IO.popen('#{path} \"#{url.to_s}\"')\""
         else
           "/usr/bin/opera \"#{url.to_s}\" &"

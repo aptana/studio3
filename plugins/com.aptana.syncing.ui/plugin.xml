@@ -246,6 +246,14 @@
                label="%deleteAction.label"
                menubarPath="group.edit">
          </action>
+         <action
+               class="com.aptana.ide.syncing.ui.navigator.actions.ProjectConnectionDisconnectAction"
+               enablesFor="1"
+               icon="icons/full/etool16/disconnect.png"
+               id="com.aptana.ide.syncing.ui.navigator.actions.ProjectConnectionDisconnectAction"
+               label="%disconnectAction.label"
+               menubarPath="group.edit">
+         </action>
       </objectContribution>
    </extension>
    <extension

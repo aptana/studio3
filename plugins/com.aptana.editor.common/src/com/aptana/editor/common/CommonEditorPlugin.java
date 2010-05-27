@@ -39,8 +39,8 @@ import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.editor.common.theme.ColorManager;
 import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.usage.EventLogger;
 import com.aptana.index.core.IndexActivator;
+import com.aptana.usage.EventLogger;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -49,7 +49,6 @@ import com.aptana.index.core.IndexActivator;
 public class CommonEditorPlugin extends AbstractUIPlugin
 {
 
-	public static final String PENCIL_ICON = "icons/pencil.png"; //$NON-NLS-1$
 	public static final String SNIPPET = "/icons/snippet.png"; //$NON-NLS-1$
 	public static final String COMMAND = "/icons/command.png"; //$NON-NLS-1$
 	public static final String IBEAM_BLACK = "/icons/ibeam-black.gif"; //$NON-NLS-1$
@@ -304,14 +303,6 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message, null));
 	}
 
-	@Override
-	protected ImageRegistry createImageRegistry()
-	{
-		ImageRegistry reg = super.createImageRegistry();
-		reg.put(PENCIL_ICON, imageDescriptorFromPlugin(PLUGIN_ID, PENCIL_ICON));
-		return reg;
-	}
-
 	public static Image getImage(String path)
 	{
 		ImageRegistry registry = plugin.getImageRegistry();
@@ -337,7 +328,6 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	@Override
 	protected void initializeImageRegistry(ImageRegistry reg)
 	{
-		reg.put(PENCIL_ICON, imageDescriptorFromPlugin(PLUGIN_ID, PENCIL_ICON));
 		reg.put(SNIPPET, imageDescriptorFromPlugin(PLUGIN_ID, SNIPPET));
 		reg.put(COMMAND, imageDescriptorFromPlugin(PLUGIN_ID, COMMAND));
 		reg.put(IBEAM_BLACK, imageDescriptorFromPlugin(PLUGIN_ID, IBEAM_BLACK));

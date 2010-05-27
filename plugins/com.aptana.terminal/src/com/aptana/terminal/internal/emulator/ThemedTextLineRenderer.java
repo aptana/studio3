@@ -42,7 +42,6 @@ import org.eclipse.tm.internal.terminal.textcanvas.TextLineRenderer;
  * @author Max Stepanov
  *
  */
-@SuppressWarnings("restriction")
 /* package */ class ThemedTextLineRenderer extends TextLineRenderer {
 
 	private static ThemedStyleMap sThemedStyleMap = null;

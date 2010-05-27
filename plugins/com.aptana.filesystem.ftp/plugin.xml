@@ -10,7 +10,7 @@
       </connectionPointCategory>
       <connectionPointType
             category="com.aptana.ide.filesystem.ftp.ftpCategory"
-            class="com.aptana.ide.filesystem.ftp.FTPConnectionPoint"
+            class="com.aptana.filesystem.ftp.FTPConnectionPoint"
             id="ftp"
             name="%connectionPointType.name.ftp">
       </connectionPointType>

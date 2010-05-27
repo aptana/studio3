@@ -45,16 +45,17 @@ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
  * @author Max Stepanov
  *
  */
-@SuppressWarnings("restriction")
-public class LocalTerminalOutputListener implements IStreamListener {
+/* package */ class LocalTerminalOutputListener implements IStreamListener {
 
 	private PrintStream printStream;
+	private IOutputFilter outputFilter;
 
 	/**
 	 * 
 	 */
-	public LocalTerminalOutputListener(ITerminalControl control) {
+	public LocalTerminalOutputListener(ITerminalControl control, IOutputFilter outputFilter) {
 		printStream = new PrintStream(control.getRemoteToTerminalOutputStream(), true);
+		this.outputFilter = outputFilter;
 	}
 
 	/* (non-Javadoc)
@@ -62,7 +63,11 @@ public class LocalTerminalOutputListener implements IStreamListener {
 	 */
 	@Override
 	public void streamAppended(String text, IStreamMonitor monitor) {
-		printStream.print(text);
+		if (outputFilter != null) {
+			printStream.print(outputFilter.filterOutput(text.toCharArray()));
+		} else {
+			printStream.print(text);
+		}
 	}
 
 }

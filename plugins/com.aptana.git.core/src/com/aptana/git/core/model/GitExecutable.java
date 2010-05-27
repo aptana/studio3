@@ -15,7 +15,9 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.git.core.GitPlugin;
@@ -23,7 +25,8 @@ import com.aptana.git.core.IPreferenceConstants;
 
 public class GitExecutable
 {
-
+	protected static final String GIT_EXECUTABLE = "git"; //$NON-NLS-1$
+	protected static final String GIT_EXECUTABLE_WIN32 = GIT_EXECUTABLE+".exe"; //$NON-NLS-1$
 	public static final String MIN_GIT_VERSION = "1.6.0"; //$NON-NLS-1$
 	private static ArrayList<IPath> fgLocations;
 	private IPath gitPath;
@@ -53,6 +56,10 @@ public class GitExecutable
 								if (!event.getKey().equals(IPreferenceConstants.GIT_EXECUTABLE_PATH))
 									return;
 								fgExecutable = null;
+								// reset shell path preferences on Win32
+								if (Platform.OS_WIN32.equals(Platform.getOS())) {
+									ShellExecutable.setPreferenceShellPath(null);
+								}
 							}
 						});
 				fgAddedPrefListener = true;
@@ -60,23 +67,52 @@ public class GitExecutable
 		}
 		return fgExecutable;
 	}
+	
+	private static IPath getPreferenceGitPath() {
+		String pref = new InstanceScope().getNode(GitPlugin.PLUGIN_ID).get(IPreferenceConstants.GIT_EXECUTABLE_PATH, null);
+		if (pref != null && !pref.isEmpty()) {
+			IPath path = Path.fromOSString(pref);
+			if (path.toFile().isDirectory()) {
+				boolean isWin32 = Platform.OS_WIN32.equals(Platform.getOS());
+				path = path.append(isWin32 ? GIT_EXECUTABLE_WIN32 : GIT_EXECUTABLE);
+			}
+			if (acceptBinary(path)) {
+				return path;
+			}
+			GitPlugin.logError(MessageFormat.format(
+					"You entered a custom git path in the Preferences pane, but this path is not a valid git v{0} or higher binary. We're going to use the default search paths instead", //$NON-NLS-1$
+					MIN_GIT_VERSION), null);
+		}
+		return null;
+	}
+
+	public static void setPreferenceGitPath(IPath path) {
+		IEclipsePreferences prefs = new InstanceScope().getNode(GitPlugin.PLUGIN_ID);
+		if (path != null) {
+			prefs.put(IPreferenceConstants.GIT_EXECUTABLE_PATH, path.toOSString());			
+		} else {
+			prefs.remove(IPreferenceConstants.GIT_EXECUTABLE_PATH);
+		}
+		try {
+			prefs.flush();
+		} catch (BackingStoreException e) {
+			GitPlugin.logError("Saving preferences failed.", e); //$NON-NLS-1$
+		}
+		fgExecutable = null;
+		if (Platform.OS_WIN32.equals(Platform.getOS())) {
+			if (path != null && path.toFile().isFile()) {
+				path = path.removeLastSegments(1);
+			}
+			ShellExecutable.setPreferenceShellPath(path);
+		}
+	}
 
 	private static GitExecutable find()
 	{
-		String pref = Platform.getPreferencesService().getString(GitPlugin.getPluginId(), IPreferenceConstants.GIT_EXECUTABLE_PATH, null, null);
-		if (pref != null)
-		{
-			IPath prefPath = Path.fromOSString(pref);
-			if (!prefPath.isEmpty() && acceptBinary(prefPath))
-			{
-				return new GitExecutable(prefPath);
-			}
-			GitPlugin
-					.logError(
-							MessageFormat
-									.format(
-											"You entered a custom git path in the Preferences pane, but this path is not a valid git v{0} or higher binary. We're going to use the default search paths instead", //$NON-NLS-1$
-											MIN_GIT_VERSION), null);
+		IPath prefPath = getPreferenceGitPath();
+		if (prefPath != null) {
+			PortableGit.checkInstallation(prefPath);
+			return new GitExecutable(prefPath);
 		}
 		
 		if (Platform.OS_WIN32.equals(Platform.getOS()))
@@ -92,7 +128,7 @@ public class GitExecutable
 			{
 				for (String pathString : paths)
 				{
-					IPath possiblePath = Path.fromOSString(pathString).append("git").addFileExtension(extension); //$NON-NLS-1$
+					IPath possiblePath = Path.fromOSString(pathString).append(GIT_EXECUTABLE).addFileExtension(extension);
 					if (acceptBinary(possiblePath))
 					{
 						return new GitExecutable(possiblePath);
@@ -103,7 +139,7 @@ public class GitExecutable
 		else
 		{
 			// No explicit path. Try it with "which"
-			IPath whichPath = Path.fromOSString(ProcessUtil.outputForCommand("/usr/bin/which", null, "git")); //$NON-NLS-1$ //$NON-NLS-2$
+			IPath whichPath = Path.fromOSString(ProcessUtil.outputForCommand("/usr/bin/which", null, GIT_EXECUTABLE)); //$NON-NLS-1$
 			if (!whichPath.isEmpty() && acceptBinary(whichPath))
 				return new GitExecutable(whichPath);
 		}
@@ -113,6 +149,11 @@ public class GitExecutable
 		{
 			if (acceptBinary(location))
 				return new GitExecutable(location);
+		}
+		IPath path = PortableGit.getLocation();
+		if (path != null) {
+			setPreferenceGitPath(path);
+			return new GitExecutable(path);
 		}
 
 		log(MessageFormat.format("Could not find a git binary higher than version {0}", MIN_GIT_VERSION)); //$NON-NLS-1$
@@ -196,10 +237,10 @@ public class GitExecutable
 	 */
 	public String outputForCommand(IPath workingDir, String... args)
 	{
-		Map<String, String> env = null;
+		Map<String, String> env = new HashMap<String, String>();
+		env.putAll(ShellExecutable.getEnvironment());
 		IPath git_ssh = GitPlugin.getDefault().getGIT_SSH();
 		if (git_ssh != null) {
-			env = new HashMap<String, String>();
 			env.put("GIT_SSH", git_ssh.toOSString()); //$NON-NLS-1$
 		}
 		return ProcessUtil.outputForCommand(gitPath.toOSString(), workingDir, env, args);
@@ -229,14 +270,17 @@ public class GitExecutable
 	public Map<Integer, String> runInBackground(IPath workingDirectory, String input,
 			Map<String, String> amendEnvironment, String... args)
 	{
+		Map<String, String> env = new HashMap<String, String>();
+		env.putAll(ShellExecutable.getEnvironment());
+		if (amendEnvironment != null) {
+			env.putAll(amendEnvironment);
+		}
+
 		IPath git_ssh = GitPlugin.getDefault().getGIT_SSH();
 		if (git_ssh != null) {
-			if (amendEnvironment == null) {
-				amendEnvironment = new HashMap<String, String>();
-			}
-			amendEnvironment.put("GIT_SSH", git_ssh.toOSString()); //$NON-NLS-1$
+			env.put("GIT_SSH", git_ssh.toOSString()); //$NON-NLS-1$
 		}
-		return ProcessUtil.runInBackground(gitPath.toOSString(), workingDirectory, input, amendEnvironment, args);
+		return ProcessUtil.runInBackground(gitPath.toOSString(), workingDirectory, input, env, args);
 	}
 
 	/**

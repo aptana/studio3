@@ -44,6 +44,8 @@ public interface IERBConstants
 
 	public String CONTENT_TYPE_HTML_ERB = "com.aptana.contenttype.html.erb"; //$NON-NLS-1$
 	public String CONTENT_TYPE_XML_ERB = "com.aptana.contenttype.xml.erb"; //$NON-NLS-1$
+	
+	public String LANGUAGE_ERB = "text/erb"; //$NON-NLS-1$
 
 	/**
 	 * Scope names for RHTML scopes.

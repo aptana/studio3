@@ -20,6 +20,8 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.contentassist.IContentAssistSubjectControl;
+import org.eclipse.jface.preference.JFacePreferences;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
@@ -322,7 +324,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 	 * 
 	 * @param offset
 	 *            the offset
-	 * @param autoActivated 
+	 * @param autoActivated
 	 * @return the completion proposals available at this offset
 	 */
 	private ICompletionProposal[] computeProposals(int offset, boolean autoActivated)
@@ -349,12 +351,17 @@ public class CompletionProposalPopup implements IContentAssistListener
 	 */
 	private void createProposalSelector()
 	{
+		Control control = fContentAssistSubjectControlAdapter.getControl();
 		if (Helper.okToUse(fProposalShell))
 		{
+			Color c= getBackgroundColor(control);
+			fProposalTable.setBackground(c);
+
+			c= getForegroundColor(control);
+			fProposalTable.setForeground(c);
 			return;
 		}
 
-		Control control = fContentAssistSubjectControlAdapter.getControl();
 		fProposalShell = new Shell(control.getShell(), SWT.ON_TOP | SWT.RESIZE);
 		fProposalTable = new Table(fProposalShell, SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL);
 		Listener listener = new Listener()
@@ -367,8 +374,8 @@ public class CompletionProposalPopup implements IContentAssistListener
 		fProposalTable.addListener(SWT.SetData, listener);
 
 		// TODO: grab value from preferences
-		//final IPreferenceStore store = CommonEditorPlugin.getDefault().getPreferenceStore();
-		_insertOnTab = false; //store.getBoolean(IPreferenceConstants.INSERT_ON_TAB);
+		// final IPreferenceStore store = CommonEditorPlugin.getDefault().getPreferenceStore();
+		_insertOnTab = false; // store.getBoolean(IPreferenceConstants.INSERT_ON_TAB);
 
 		// TODO: grab list from preferences
 		String agents = ""; //store.getString(IPreferenceConstants.USER_AGENT_PREFERENCE); //$NON-NLS-1$
@@ -378,7 +385,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 		}
 		else
 		{
-			//fUserAgents = 0;
+			// fUserAgents = 0;
 			fUserAgents = 5; // TEMP: hard-coding for testing purposes
 		}
 
@@ -444,20 +451,35 @@ public class CompletionProposalPopup implements IContentAssistListener
 		{
 			fProposalShell.setBackground(control.getDisplay().getSystemColor(SWT.COLOR_BLACK));
 		}
-
-		Color c = fContentAssistant.getProposalSelectorBackground();
-		if (c == null)
-		{
-			c = control.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
-		}
+		
+		Color c= getBackgroundColor(control);
 		fProposalTable.setBackground(c);
 
-		c = fContentAssistant.getProposalSelectorForeground();
-		if (c == null)
-		{
-			c = control.getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND);
-		}
+		c= getForegroundColor(control);
 		fProposalTable.setForeground(c);
+
+		Listener selectionOverride = new Listener()
+		{
+			public void handleEvent(Event event)
+			{
+				if ((event.detail & SWT.SELECTED) != 0)
+				{
+					GC gc = event.gc;
+					Color oldBackground = gc.getBackground();
+
+					Color sc = fContentAssistant.getProposalSelectorSelectionColor();
+					if (sc == null)
+						return;
+					gc.setBackground(sc);
+					gc.fillRectangle(event.x, event.y, event.width, event.height);
+					gc.setBackground(oldBackground);
+
+					event.detail &= ~SWT.SELECTED;
+					event.detail &= ~SWT.BACKGROUND;
+				}
+			}
+		};
+		fProposalTable.addListener(SWT.EraseItem, selectionOverride);
 
 		fProposalTable.addSelectionListener(new SelectionListener()
 		{
@@ -479,48 +501,48 @@ public class CompletionProposalPopup implements IContentAssistListener
 		});
 
 		fPopupCloser.install(fContentAssistant, fProposalTable);
-		
+
 		/*
-		final IPropertyChangeListener propListener = new IPropertyChangeListener()
-		{
-
-			public void propertyChange(PropertyChangeEvent event)
-			{
-				if (event.getProperty().equals(IPreferenceConstants.USER_AGENT_PREFERENCE))
-				{
-					if (Helper.okToUse(fProposalShell))
-					{
-						fProposalShell.dispose();
-					}
-					else
-					{
-						// shell already disposed so remove this listener
-						if (store != null)
-						{
-							store.removePropertyChangeListener(this);
-						}
-					}
-				}
-			}
-
-		};
-		
-		store.addPropertyChangeListener(propListener);
-		fProposalShell.addDisposeListener(new DisposeListener()
-		{
-			public void widgetDisposed(DisposeEvent e)
-			{
-				if (store != null && propListener != null)
-				{
-					store.removePropertyChangeListener(propListener);
-				}
-				unregister(); // but don't dispose the shell, since we're being called from its
-				// disposal event!
-			}
-		});
-		*/
+		 * final IPropertyChangeListener propListener = new IPropertyChangeListener() { public void
+		 * propertyChange(PropertyChangeEvent event) { if
+		 * (event.getProperty().equals(IPreferenceConstants.USER_AGENT_PREFERENCE)) { if
+		 * (Helper.okToUse(fProposalShell)) { fProposalShell.dispose(); } else { // shell already disposed so remove
+		 * this listener if (store != null) { store.removePropertyChangeListener(this); } } } } };
+		 * store.addPropertyChangeListener(propListener); fProposalShell.addDisposeListener(new DisposeListener() {
+		 * public void widgetDisposed(DisposeEvent e) { if (store != null && propListener != null) {
+		 * store.removePropertyChangeListener(propListener); } unregister(); // but don't dispose the shell, since we're
+		 * being called from its // disposal event! } });
+		 */
 
 		fProposalTable.setHeaderVisible(false);
+	}
+	
+	/**
+	 * Returns the background color to use.
+	 *
+	 * @param control the control to get the display from
+	 * @return the background color
+	 * @since 3.2
+	 */
+	private Color getBackgroundColor(Control control) {
+		Color c= fContentAssistant.getProposalSelectorBackground();
+		if (c == null)
+			c= JFaceResources.getColorRegistry().get(JFacePreferences.CONTENT_ASSIST_BACKGROUND_COLOR);
+		return c;
+	}
+
+	/**
+	 * Returns the foreground color to use.
+	 *
+	 * @param control the control to get the display from
+	 * @return the foreground color
+	 * @since 3.2
+	 */
+	private Color getForegroundColor(Control control) {
+		Color c= fContentAssistant.getProposalSelectorForeground();
+		if (c == null)
+			c= JFaceResources.getColorRegistry().get(JFacePreferences.CONTENT_ASSIST_FOREGROUND_COLOR);
+		return c;
 	}
 
 	/**
@@ -544,13 +566,13 @@ public class CompletionProposalPopup implements IContentAssistListener
 			item.setText(0, entry);
 
 			item.setData(current);
-			
+
 			if (current instanceof ICommonCompletionProposal)
 			{
 				ICommonCompletionProposal proposal = (ICommonCompletionProposal) current;
 				String location = proposal.getFileLocation();
 				Image[] images = proposal.getUserAgentImages();
-				
+
 				if (images != null)
 				{
 					for (int j = 0; j < images.length; j++)
@@ -859,8 +881,8 @@ public class CompletionProposalPopup implements IContentAssistListener
 	 * @param proposals
 	 *            the proposals
 	 * @param isFilteredSubset
-	 *            if <code>true</code>, the proposal table is not cleared, but the proposals that are not in the
-	 *            passed array are removed from the displayed set
+	 *            if <code>true</code>, the proposal table is not cleared, but the proposals that are not in the passed
+	 *            array are removed from the displayed set
 	 */
 	private void setProposals(ICompletionProposal[] proposals, boolean isFilteredSubset)
 	{
@@ -883,22 +905,22 @@ public class CompletionProposalPopup implements IContentAssistListener
 
 			fProposalTable.setItemCount(newLen);
 			fProposalTable.clearAll();
-			
+
 			for (int i = 0; i < proposals.length; i++)
 			{
 				ICompletionProposal proposal = proposals[i];
 				String entry = proposal.getDisplayString().trim();
-				
+
 				if (entry.length() > longestString.length())
 				{
 					longestString = entry;
 				}
-				
+
 				if (proposal instanceof ICommonCompletionProposal)
 				{
 					ICommonCompletionProposal prop = (ICommonCompletionProposal) proposal;
 					String loc = prop.getFileLocation();
-					
+
 					if (loc.length() > longestLoc.length())
 					{
 						longestLoc = loc;
@@ -1019,8 +1041,8 @@ public class CompletionProposalPopup implements IContentAssistListener
 	 * within the visible client area if (clientPoint.x < 0) clientPoint.x = 0; if (clientPoint.y < 0) clientPoint.y =
 	 * 0; // convert coordinate to screen coordinates Point screenPoint =
 	 * fContentAssistSubjectControlAdapter.getControl().toDisplay(clientPoint); Rectangle screenRect =
-	 * Display.getCurrent().getClientArea(); int lineHeight = fContentAssistSubjectControlAdapter.getLineHeight(); int x =
-	 * screenPoint.x; int y = screenPoint.y + lineHeight + 2; if (x + width > screenRect.width) { // hangs over the
+	 * Display.getCurrent().getClientArea(); int lineHeight = fContentAssistSubjectControlAdapter.getLineHeight(); int x
+	 * = screenPoint.x; int y = screenPoint.y + lineHeight + 2; if (x + width > screenRect.width) { // hangs over the
 	 * right side of the screen if (screenPoint.x - width > 0) { x = screenPoint.x - width; } else { // doesn't fit on
 	 * the left either // This should only happen on a really small screen or with a large popup } } if (y + height >
 	 * screenRect.height) { // doesn't fit below current line // TODO: '7' is a magic number. We really need a reliable
@@ -1501,11 +1523,11 @@ public class CompletionProposalPopup implements IContentAssistListener
 		for (int i = 0; i < length; i++)
 		{
 			ICompletionProposal proposal = proposals[i];
-			
+
 			if (proposal instanceof ICompletionProposalExtension2)
 			{
 				ICompletionProposalExtension2 p = (ICompletionProposalExtension2) proposal;
-				
+
 				if (p.validate(document, offset, event))
 				{
 					filtered.add(proposal);
@@ -1515,7 +1537,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 			else if (proposal instanceof ICompletionProposalExtension)
 			{
 				ICompletionProposalExtension p = (ICompletionProposalExtension) proposal;
-				
+
 				if (p.isValidFor(document, offset))
 				{
 					filtered.add(proposal);
@@ -1527,7 +1549,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 				fIsFilteredSubset = false;
 				fInvocationOffset = offset;
 				fComputedProposals = computeProposals(fInvocationOffset, false);
-				
+
 				return fComputedProposals;
 			}
 		}
@@ -1553,8 +1575,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 	 * 
 	 * @param proposal
 	 *            the single proposal that might be automatically inserted
-	 * @return <code>true</code> if <code>proposal</code> can be inserted automatically, <code>false</code>
-	 *         otherwise
+	 * @return <code>true</code> if <code>proposal</code> can be inserted automatically, <code>false</code> otherwise
 	 * @since 3.1
 	 */
 	private boolean canAutoInsert(ICompletionProposal proposal)
@@ -1656,8 +1677,8 @@ public class CompletionProposalPopup implements IContentAssistListener
 	 * common prefix of all proposals is inserted into the document. If there is no common prefix, nothing happens and
 	 * <code>false</code> is returned.
 	 * 
-	 * @return <code>true</code> if a single proposal was inserted and the selector can be closed, <code>false</code>
-	 *         if more than once choice remain
+	 * @return <code>true</code> if a single proposal was inserted and the selector can be closed, <code>false</code> if
+	 *         more than once choice remain
 	 * @since 3.0
 	 */
 	private boolean completeCommonPrefix()
@@ -1879,8 +1900,8 @@ public class CompletionProposalPopup implements IContentAssistListener
 
 	/**
 	 * Extracts the completion offset of an <code>ICompletionProposal</code>. If <code>proposal</code> is a
-	 * <code>ICompletionProposalExtension3</code>, its <code>getCompletionOffset</code> method is called,
-	 * otherwise, the invocation offset of this popup is shown.
+	 * <code>ICompletionProposalExtension3</code>, its <code>getCompletionOffset</code> method is called, otherwise, the
+	 * invocation offset of this popup is shown.
 	 * 
 	 * @param proposal
 	 *            the proposal to extract the offset from
@@ -1899,8 +1920,8 @@ public class CompletionProposalPopup implements IContentAssistListener
 
 	/**
 	 * Extracts the replacement string from an <code>ICompletionProposal</code>. If <code>proposal</code> is a
-	 * <code>ICompletionProposalExtension3</code>, its <code>getCompletionText</code> method is called, otherwise,
-	 * the display string is used.
+	 * <code>ICompletionProposalExtension3</code>, its <code>getCompletionText</code> method is called, otherwise, the
+	 * display string is used.
 	 * 
 	 * @param proposal
 	 *            the proposal to extract the text from

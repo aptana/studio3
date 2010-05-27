@@ -40,7 +40,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.io.tests.CommonConnectionTest;
-import com.aptana.ide.filesystem.ftp.FTPConnectionPoint;
+import com.aptana.filesystem.secureftp.FTPSConnectionPoint;
+import com.aptana.ide.core.io.ConnectionContext;
+import com.aptana.ide.core.io.CoreIOPlugin;
 
 /**
  * @author Max Stepanov
@@ -48,12 +50,18 @@ import com.aptana.ide.filesystem.ftp.FTPConnectionPoint;
 public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 {
 
-	private static FTPConnectionPoint setupConnection()
+	private static FTPSConnectionPoint setupConnection()
 	{
-		FTPConnectionPoint ftpcp = new FTPConnectionPoint();
+		FTPSConnectionPoint ftpcp = new FTPSConnectionPoint();
 		ftpcp.setHost("10.10.1.60"); //$NON-NLS-1$
 		ftpcp.setLogin("ftpuser"); //$NON-NLS-1$
 		ftpcp.setPassword(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'});
+		ftpcp.setValidateCertificate(false);
+
+		ConnectionContext context = new ConnectionContext();
+		context.put(ConnectionContext.COMMAND_LOG, System.out);
+		CoreIOPlugin.setConnectionContext(ftpcp, context);
+
 		return ftpcp;
 	}
 
@@ -61,7 +69,7 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 	protected void setUp() throws Exception
 	{
 		initBasePath();
-		FTPConnectionPoint ftpcp = setupConnection();
+		FTPSConnectionPoint ftpcp = setupConnection();
 		ftpcp.setPath(Path.ROOT.append(getClass().getSimpleName()));
 		cp = ftpcp;
 		super.setUp();
@@ -75,7 +83,7 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 
 	public static void initBasePath() throws CoreException
 	{
-		FTPConnectionPoint ftpcp = setupConnection();
+		FTPSConnectionPoint ftpcp = setupConnection();
 		IFileStore fs = ftpcp.getRoot().getFileStore(
 				Path.ROOT.append(FTPSConnectionWithBasePathTest.class.getSimpleName()));
 		assertNotNull(fs);
@@ -89,7 +97,7 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 
 	public static void cleanupBasePath() throws CoreException
 	{
-		FTPConnectionPoint ftpcp = setupConnection();
+		FTPSConnectionPoint ftpcp = setupConnection();
 		IFileStore fs = ftpcp.getRoot().getFileStore(
 				Path.ROOT.append(FTPSConnectionWithBasePathTest.class.getSimpleName()));
 		assertNotNull(fs);
@@ -107,7 +115,7 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 	@Override
 	protected boolean supportsSetModificationTime()
 	{
-		return false;
+		return true;
 	}
 
 
@@ -128,6 +136,6 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 	@Override
 	protected boolean supportsChangePermissions()
 	{
-		return false;
+		return true;
 	}
 }

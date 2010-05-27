@@ -14,7 +14,6 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
 
 
-@SuppressWarnings("restriction")
 public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emulator.VT100TerminalControl {
 
 	private IPreferenceChangeListener preferenceChangeListener;

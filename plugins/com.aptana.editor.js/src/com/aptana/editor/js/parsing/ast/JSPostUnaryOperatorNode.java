@@ -1,6 +1,6 @@
 package com.aptana.editor.js.parsing.ast;
 
-import com.aptana.editor.js.parsing.lexer.JSTokens;
+import com.aptana.editor.js.parsing.lexer.JSTokenType;
 
 public class JSPostUnaryOperatorNode extends JSUnaryOperatorNode
 {
@@ -10,13 +10,13 @@ public class JSPostUnaryOperatorNode extends JSUnaryOperatorNode
 		super(expression, start, end);
 
 		short type = DEFAULT_TYPE;
-		short token = JSTokens.getToken(operator);
+		JSTokenType token = JSTokenType.get(operator);
 		switch (token)
 		{
-			case JSTokens.MINUS_MINUS:
+			case MINUS_MINUS:
 				type = JSNodeTypes.POST_DECREMENT;
 				break;
-			case JSTokens.PLUS_PLUS:
+			case PLUS_PLUS:
 				type = JSNodeTypes.POST_INCREMENT;
 				break;
 		}

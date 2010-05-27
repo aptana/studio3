@@ -784,11 +784,11 @@ public class JSMetadataReader extends ValidatingReader
 			}
 			catch (IOException e)
 			{
-				e.printStackTrace();
+				Activator.logError(Messages.JSMetadataReader_Error_Loading_JS_Metadata, e);
 			}
 			catch (SchemaInitializationException e)
 			{
-				e.printStackTrace();
+				Activator.logError(Messages.JSMetadataReader_Error_Loading_JS_Metadata, e);
 			}
 			finally
 			{

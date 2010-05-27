@@ -36,7 +36,7 @@
 package com.aptana.filesystem.ftp.tests;
 
 import com.aptana.core.io.tests.CommonConnectionTest;
-import com.aptana.ide.filesystem.ftp.FTPConnectionPoint;
+import com.aptana.filesystem.ftp.FTPConnectionPoint;
 
 /**
  * @author Max Stepanov
@@ -61,7 +61,7 @@ public class FTPConnectionTest extends CommonConnectionTest
 	@Override
 	protected boolean supportsSetModificationTime()
 	{
-		return false;
+		return true;
 	}
 
 
@@ -82,6 +82,6 @@ public class FTPConnectionTest extends CommonConnectionTest
 	@Override
 	protected boolean supportsChangePermissions()
 	{
-		return false;
+		return true;
 	}
 }

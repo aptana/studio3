@@ -56,6 +56,11 @@ public class JSNaryNode extends JSNode
 					text.append(child);
 				}
 				break;
+			case JSNodeTypes.ARGUMENTS:
+				text.append("("); //$NON-NLS-1$
+				appendText(text, children);
+				text.append(")"); //$NON-NLS-1$
+				break;
 			default:
 				appendText(text, children);
 		}

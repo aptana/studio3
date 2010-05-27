@@ -88,15 +88,15 @@ public class Activator extends AbstractUIPlugin
 				}
 				catch (IOException e)
 				{
-					e.printStackTrace();
+					Activator.logError(Messages.Activator_Error_Loading_Metadata, e);
 				}
 				catch (ScriptDocException e)
 				{
-					e.printStackTrace();
+					Activator.logError(Messages.Activator_Error_Loading_Metadata, e);
 				}
 				catch (Throwable t)
 				{
-					t.printStackTrace();
+					Activator.logError(Messages.Activator_Error_Loading_Metadata, t);
 				}
 				finally
 				{

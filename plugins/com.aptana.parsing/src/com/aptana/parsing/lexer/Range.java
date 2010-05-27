@@ -2,34 +2,35 @@ package com.aptana.parsing.lexer;
 
 public class Range implements IRange
 {
-
 	private int fStart;
 	private int fEnd;
 
+	/**
+	 * Range
+	 * 
+	 * @param start
+	 * @param end
+	 */
 	public Range(int start, int end)
 	{
 		fStart = start;
 		fEnd = end;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.lexer.IRange#contains(int)
+	 */
 	@Override
-	public int getEndingOffset()
+	public boolean contains(int offset)
 	{
-		return fEnd;
+		return getStartingOffset() <= offset && offset < getEndingOffset();
 	}
 
-	@Override
-	public int getLength()
-	{
-		return getEndingOffset() - getStartingOffset() + 1;
-	}
-
-	@Override
-	public int getStartingOffset()
-	{
-		return fStart;
-	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -41,6 +42,40 @@ public class Range implements IRange
 		return getStartingOffset() == otherRange.getStartingOffset() && getLength() == otherRange.getLength();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.lexer.IRange#getEndingOffset()
+	 */
+	@Override
+	public int getEndingOffset()
+	{
+		return fEnd;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.lexer.IRange#getLength()
+	 */
+	@Override
+	public int getLength()
+	{
+		return getEndingOffset() - getStartingOffset() + 1;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.lexer.IRange#getStartingOffset()
+	 */
+	@Override
+	public int getStartingOffset()
+	{
+		return fStart;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode()
 	{

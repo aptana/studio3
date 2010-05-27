@@ -37,6 +37,10 @@ package com.aptana.editor.common;
 import java.util.Map;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.internal.text.html.HTMLTextPresenter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IAutoEditStrategy;
@@ -55,23 +59,27 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationHover;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 
 import com.aptana.editor.common.contentassist.ContentAssistant;
-import com.aptana.editor.common.contentassist.HTMLTextPresenter;
 import com.aptana.editor.common.contentassist.InformationControl;
 import com.aptana.editor.common.hover.CommonAnnotationHover;
 import com.aptana.editor.common.text.CommonDoubleClickStrategy;
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
 import com.aptana.editor.common.text.reconciler.CommonCompositeReconcilingStrategy;
 import com.aptana.editor.common.text.reconciler.CommonReconciler;
+import com.aptana.editor.common.theme.IThemeManager;
 
+@SuppressWarnings("restriction")
 public abstract class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration implements ITopContentTypesProvider
 {
 	private AbstractThemeableEditor fTextEditor;
 	private CommonDoubleClickStrategy fDoubleClickStrategy;
+	private IPreferenceChangeListener fThemeChangeListener;
 
 	/**
 	 * CommonSourceViewerConfiguration
@@ -129,7 +137,10 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	@Override
 	public IContentAssistant getContentAssistant(ISourceViewer sourceViewer)
 	{
-		ContentAssistant assistant = new ContentAssistant();
+		final ContentAssistant assistant = new ContentAssistant();
+		assistant.setProposalSelectorBackground(getThemeBackground());
+		assistant.setProposalSelectorForeground(getThemeForeground());
+		assistant.setProposalSelectorSelectionColor(getThemeSelection());
 
 		assistant.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
 
@@ -157,6 +168,22 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		
 		assistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
 
+		fThemeChangeListener = new IPreferenceChangeListener()
+		{
+
+			@Override
+			public void preferenceChange(PreferenceChangeEvent event)
+			{
+				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
+				{
+					assistant.setProposalSelectorBackground(getThemeBackground());
+					assistant.setProposalSelectorForeground(getThemeForeground());
+					assistant.setProposalSelectorSelectionColor(getThemeSelection());
+				}
+			}
+		};
+		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+		
 		return assistant;
 	}
 
@@ -251,10 +278,46 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		{
 			public IInformationControl createInformationControl(Shell parent)
 			{
-				//return new DefaultInformationControl(parent, false);
-				return new InformationControl(parent, SWT.NONE, new HTMLTextPresenter(false));
+				return new InformationControl(parent, SWT.NONE, new HTMLTextPresenter(false))
+				{
+					@Override
+					protected Color getBackground()
+					{
+						return getThemeBackground();
+					}
+					
+					@Override
+					protected Color getForeground()
+					{
+						return getThemeForeground();
+					}
+					
+					@Override
+					protected Color getBorderColor()
+					{
+						return getForeground();
+					}
+				};
 			}
 		};
+	}
+	
+	protected Color getThemeBackground()
+	{
+		RGB bg = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme().getBackground();
+		return CommonEditorPlugin.getDefault().getColorManager().getColor(bg);
+	}
+	
+	protected Color getThemeForeground()
+	{
+		RGB bg = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme().getForeground();
+		return CommonEditorPlugin.getDefault().getColorManager().getColor(bg);
+	}
+	
+	protected Color getThemeSelection()
+	{
+		RGB bg = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme().getSelection();
+		return CommonEditorPlugin.getDefault().getColorManager().getColor(bg);
 	}
 
 	/*

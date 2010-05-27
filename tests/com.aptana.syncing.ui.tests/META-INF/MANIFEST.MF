@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Aptana Syncing UI Tests
+Bundle-SymbolicName: com.aptana.syncing.ui.tests
+Bundle-Version: 3.0.0.qualifier
+Bundle-Vendor: Aptana, Inc.
+Fragment-Host: com.aptana.syncing.ui
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.junit;bundle-version="[3.0.0,4.0.0)"
+Export-Package: com.aptana.syncing.ui.tests

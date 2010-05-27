@@ -1,6 +1,5 @@
 package com.aptana.parsing.lexer;
 
-
 public class Lexeme<T> implements ILexeme
 {
 	private String _text;
@@ -23,25 +22,16 @@ public class Lexeme<T> implements ILexeme
 		this._text = text;
 	}
 
-	/**
-	 * areContiguous
-	 * 
-	 * @param firstLexeme
-	 * @param secondLexeme
-	 * @return
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.lexer.IRange#contains(int)
 	 */
-	public boolean isContiguousWith(Lexeme<T> secondLexeme)
+	@Override
+	public boolean contains(int offset)
 	{
-		boolean result = true;
-		
-		if (secondLexeme != null)
-		{
-			result = this.getEndingOffset() == secondLexeme.getStartingOffset();
-		}
-		
-		return result;
+		return getStartingOffset() <= offset && offset <= getEndingOffset();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.lexer.IRange#getEndingOffset()
@@ -97,6 +87,25 @@ public class Lexeme<T> implements ILexeme
 		return this._type;
 	}
 
+	/**
+	 * areContiguous
+	 * 
+	 * @param firstLexeme
+	 * @param secondLexeme
+	 * @return
+	 */
+	public boolean isContiguousWith(Lexeme<T> secondLexeme)
+	{
+		boolean result = true;
+
+		if (secondLexeme != null)
+		{
+			result = this.getEndingOffset() == secondLexeme.getStartingOffset();
+		}
+
+		return result;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -107,7 +116,11 @@ public class Lexeme<T> implements ILexeme
 		StringBuilder buffer = new StringBuilder();
 		String type = this._type.toString();
 
-		buffer.append("[").append(type).append("]~").append(this.getText()).append("~");
+		buffer.append(type);
+		buffer.append(" [");
+		buffer.append(this.getStartingOffset()).append("-").append(this.getEndingOffset());
+		buffer.append(",").append(this.getText());
+		buffer.append("]");
 
 		return buffer.toString();
 	}

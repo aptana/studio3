@@ -684,6 +684,10 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 	@Override
 	public void partDeactivated(IWorkbenchPart part)
 	{
+		if (!(part instanceof IEditorPart))
+			return;
+
+		hijackOutline();
 	}
 
 	@Override

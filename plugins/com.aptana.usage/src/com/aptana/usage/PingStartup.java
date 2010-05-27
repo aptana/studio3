@@ -266,7 +266,7 @@ public class PingStartup implements IStartup
 			output = new DataOutputStream(connection.getOutputStream());
 			output.write(gzippedData);
 			output.flush();
-
+			
 			// Get the response
 			input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 			StringBuffer sb = new StringBuffer();
@@ -276,9 +276,9 @@ public class PingStartup implements IStartup
 			{
 				sb.append(line);
 			}
-
+			
 			// NOTE: Leave sysout here so we can use this during debugging
-			// System.out.println(sb.toString());
+			//System.out.println(sb.toString());
 
 			return true;
 		}

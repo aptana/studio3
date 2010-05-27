@@ -35,15 +35,9 @@
 
 package com.aptana.terminal.views;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
@@ -54,6 +48,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.DropTargetAdapter;
@@ -69,14 +64,11 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.tm.internal.terminal.control.ITerminalListener;
-import org.eclipse.tm.internal.terminal.control.ITerminalViewControl;
 import org.eclipse.tm.internal.terminal.control.actions.TerminalActionClearAll;
 import org.eclipse.tm.internal.terminal.control.actions.TerminalActionCopy;
 import org.eclipse.tm.internal.terminal.control.actions.TerminalActionCut;
 import org.eclipse.tm.internal.terminal.control.actions.TerminalActionPaste;
 import org.eclipse.tm.internal.terminal.control.actions.TerminalActionSelectAll;
-import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
-import org.eclipse.tm.internal.terminal.provisional.api.TerminalConnectorExtension;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IMemento;
@@ -92,18 +84,15 @@ import org.eclipse.ui.internal.keys.BindingService;
 import org.eclipse.ui.internal.keys.WorkbenchKeyboard.KeyDownFilter;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.ViewPart;
-import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.terminal.Activator;
 import com.aptana.terminal.Utils;
-import com.aptana.terminal.connector.LocalTerminalConnector;
 import com.aptana.terminal.editor.TerminalEditor;
 import com.aptana.terminal.internal.IProcessListener;
-import com.aptana.terminal.internal.TerminalCloseHelper;
-import com.aptana.terminal.internal.emulator.VT100TerminalControl;
 import com.aptana.terminal.preferences.IPreferenceConstants;
+import com.aptana.terminal.widget.TerminalComposite;
 
 /**
  * @author Max Stepanov
@@ -117,7 +106,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	private static final String PROP_TITLE = "title"; //$NON-NLS-1$
 	private static final String PROP_WORKING_DIRECTORY = "workingDirectory"; //$NON-NLS-1$
 
-	private ITerminalViewControl fCtlTerminal;
+	private TerminalComposite terminalComposite;
 	private IMemento savedState = null;
 	
 	private Action fOpenEditorAction;
@@ -127,7 +116,6 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	private TerminalActionClearAll fActionEditClearAll;
 	private TerminalActionSelectAll fActionEditSelectAll;
 	
-	private List<String> inputs = new ArrayList<String>();
 	private boolean checkCanClose = false;
 
 	/**
@@ -168,7 +156,6 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	@Override
 	public void dispose() {
 		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(this);
-		fCtlTerminal.disposeTerminal();
 		super.dispose();
 	}
 
@@ -176,26 +163,27 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
-	public void createPartControl(Composite parent) {		
-		fCtlTerminal = new VT100TerminalControl(this, parent, getTerminalConnectors());
-		fCtlTerminal.setConnector(fCtlTerminal.getConnectors()[0]);
+	public void createPartControl(Composite parent) {
+		terminalComposite = new TerminalComposite(parent, SWT.NONE);
+		terminalComposite.setTerminalListener(this);
+		terminalComposite.setProcessListener(this);
 		if (getViewSite().getSecondaryId() == null || savedState != null) {
 			if (savedState != null) {
 				loadState(savedState);
 			}
-			connectTerminal();
+			terminalComposite.connect();
 		}
 		makeActions();
 		hookContextMenu();
 		contributeToActionBars();
 		
-		fCtlTerminal.getControl().addMouseListener(new MouseAdapter() {
+		terminalComposite.getTerminalControl().addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent e) {
 				updateActions();
 			}
 		});
-		fCtlTerminal.getControl().addKeyListener(new KeyAdapter() {
+		terminalComposite.getTerminalControl().addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.doit) {
@@ -225,7 +213,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 		});
 		
 		// Add drag and drop support for file paths		
-		DropTarget dt = new DropTarget(fCtlTerminal.getRootControl(), DND.DROP_DEFAULT | DND.DROP_MOVE);
+		DropTarget dt = new DropTarget(terminalComposite.getRootControl(), DND.DROP_DEFAULT | DND.DROP_MOVE);
 		dt.setTransfer(new Transfer[] { FileTransfer.getInstance() });
 		dt.addDropListener(new DropTargetAdapter()
 		{
@@ -242,42 +230,16 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 						{
 							builder.append(file).append(" "); //$NON-NLS-1$
 						}				
-						fCtlTerminal.pasteString(builder.toString());
+						terminalComposite.sendInput(builder.toString());
 					}
 				}
 			}
 		});
 	}
-
-	private void connectTerminal() {
-		Job job = new UIJob("Terminal connect") {
-			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				fCtlTerminal.connectTerminal();
-				hookProcessListener();
-				sendInputs();
-				return Status.OK_STATUS;
-			}
-		};
-		job.setSystem(true);
-		job.schedule(100);
-	}
 	
-	private void sendInputs() {
-		synchronized (inputs) {
-			if (!fCtlTerminal.isConnected()) {
-				return;
-			}
-			while (!inputs.isEmpty()) {
-				String text = inputs.remove(0);
-				fCtlTerminal.pasteString(text);
-			}
-		}
-	}
-
 	protected void close() {
-		if (fCtlTerminal != null && !fCtlTerminal.isDisposed()) {
-			fCtlTerminal.getControl().getDisplay().asyncExec(new Runnable() {
+		if (terminalComposite != null && !terminalComposite.isDisposed()) {
+			terminalComposite.getTerminalControl().getDisplay().asyncExec(new Runnable() {
 				@Override
 				public void run() {
 					getSite().getPage().hideView((IViewPart) getSite().getPart());
@@ -303,7 +265,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	 */
 	@Override
 	public int promptToSaveOnClose() {
-		return canCloseTerminal() ? ISaveablePart2.YES : ISaveablePart2.CANCEL;
+		return terminalComposite.canCloseTerminal() ? ISaveablePart2.YES : ISaveablePart2.CANCEL;
 	}
 
 	/* (non-Javadoc)
@@ -357,7 +319,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 		IMemento child = memento.createChild(PROP_TITLE);
 		child.putTextData(getPartName());
 		child = memento.createChild(PROP_WORKING_DIRECTORY);
-		IPath workingDirectory = getWorkingDirectory();
+		IPath workingDirectory = terminalComposite.getWorkingDirectory();
 		if (workingDirectory != null) {
 			child.putTextData(workingDirectory.toOSString());
 		}
@@ -372,7 +334,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 		if (child != null) {
 			String value = child.getTextData();
 			if (value != null) {
-				setWorkingDirectory(Path.fromOSString(value));
+				terminalComposite.setWorkingDirectory(Path.fromOSString(value));
 			}
 		}
 	}
@@ -382,17 +344,9 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	 */
 	@Override
 	public void setFocus() {
-		fCtlTerminal.setFocus();
+		terminalComposite.setFocus();
 	}
 	
-	private ITerminalConnector[] getTerminalConnectors() {
-		ITerminalConnector connector = TerminalConnectorExtension.makeTerminalConnector(LocalTerminalConnector.ID);
-		if (connector != null) {
-			connector.getInitializationErrorMessage();
-		}
-		return new ITerminalConnector[] { connector };
-	}
-
 	@Override
 	public void setState(TerminalState state) {
 	}
@@ -408,51 +362,20 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	}
 	
 	protected void initialize(String title, IPath workingDirectory) {
-		if (fCtlTerminal.isConnected()) {
+		if (terminalComposite.isConnected()) {
 			return;
 		}
 		setPartName(title);
-		setWorkingDirectory(workingDirectory);
-		connectTerminal();
+		terminalComposite.setWorkingDirectory(workingDirectory);
+		terminalComposite.connect();
 	}
-	
-	protected void setWorkingDirectory(IPath workingDirectory) {
-		if (workingDirectory != null) {
-			LocalTerminalConnector localTerminalConnector = (LocalTerminalConnector) fCtlTerminal.getTerminalConnector().getAdapter(LocalTerminalConnector.class);
-			if (localTerminalConnector != null) {
-				localTerminalConnector.setWorkingDirectory(workingDirectory);
-			}		
-		}
-	}
-	
-	protected IPath getWorkingDirectory() {
-		LocalTerminalConnector localTerminalConnector = (LocalTerminalConnector) fCtlTerminal.getTerminalConnector().getAdapter(LocalTerminalConnector.class);
-		if (localTerminalConnector != null) {
-			return localTerminalConnector.getWorkingDirectory();
-		}
-		return null;
-	}
-
-	protected void hookProcessListener() {
-		LocalTerminalConnector localTerminalConnector = (LocalTerminalConnector) fCtlTerminal.getTerminalConnector().getAdapter(LocalTerminalConnector.class);
-		if (localTerminalConnector != null) {
-			localTerminalConnector.addProcessListener(this);
-		}
-	}
-
-	protected boolean canCloseTerminal() {
-		LocalTerminalConnector localTerminalConnector = (LocalTerminalConnector) fCtlTerminal.getTerminalConnector().getAdapter(LocalTerminalConnector.class);
-		if (localTerminalConnector != null) {
-			return TerminalCloseHelper.canCloseTerminal(getSite(), localTerminalConnector);
-		}
-		return true;
-	}
-
+		
+	/**
+	 * @param text
+	 * @see com.aptana.terminal.widget.TerminalComposite#sendInput(java.lang.String)
+	 */
 	public void sendInput(String text) {
-		synchronized (inputs) {
-			inputs.add(text);
-			sendInputs();
-		}
+		terminalComposite.sendInput(text);
 	}
 
 	/* (non-Javadoc)
@@ -461,8 +384,8 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	@Override
 	public void preferenceChange(PreferenceChangeEvent event) {
 		if (IThemeManager.THEME_CHANGED.equals(event.getKey())) {
-			if (fCtlTerminal != null && !fCtlTerminal.isDisposed()) {
-				fCtlTerminal.getControl().redraw();
+			if (terminalComposite != null && !terminalComposite.isDisposed()) {
+				terminalComposite.getTerminalControl().redraw();
 			}
 		}
 	}
@@ -479,7 +402,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 			}
 		});
 
-		Control control = fCtlTerminal.getControl();
+		Control control = terminalComposite.getTerminalControl();
 		Menu menu = menuMgr.createContextMenu(control);
 		control.setMenu(menu);
 	}
@@ -532,11 +455,11 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	 * makeActions
 	 */
 	private void makeActions() {
-		fActionEditCopy = new TerminalActionCopy(fCtlTerminal);
-		fActionEditCut = new TerminalActionCut(fCtlTerminal);
-		fActionEditPaste = new TerminalActionPaste(fCtlTerminal);
-		fActionEditClearAll = new TerminalActionClearAll(fCtlTerminal);
-		fActionEditSelectAll = new TerminalActionSelectAll(fCtlTerminal);
+		fActionEditCopy = new TerminalActionCopy(terminalComposite.getTerminalViewControl());
+		fActionEditCut = new TerminalActionCut(terminalComposite.getTerminalViewControl());
+		fActionEditPaste = new TerminalActionPaste(terminalComposite.getTerminalViewControl());
+		fActionEditClearAll = new TerminalActionClearAll(terminalComposite.getTerminalViewControl());
+		fActionEditSelectAll = new TerminalActionSelectAll(terminalComposite.getTerminalViewControl());
 
 		// open editor action
 		fOpenEditorAction = new Action(Messages.TerminalView_Open_Terminal_Editor, Activator.getImageDescriptor("/icons/terminal.png")) { //$NON-NLS-1$

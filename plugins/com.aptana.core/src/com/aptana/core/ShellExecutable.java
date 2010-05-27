@@ -41,15 +41,20 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.PlatformUtil;
+import com.aptana.core.util.ProcessUtil;
 
 /**
  * @author Max Stepanov
@@ -63,7 +68,7 @@ public class ShellExecutable {
 		"%PROGRAMFILES(X86)%\\Git\\bin" //$NON-NLS-1$
 	};
 	
-	private static final String SH = "sh"; //$NON-NLS-1$
+	private static final String SH_EXE = "sh.exe"; //$NON-NLS-1$
 	private static final String BASH = "bash"; //$NON-NLS-1$
 	
 	private static boolean initilizing = false;
@@ -82,7 +87,10 @@ public class ShellExecutable {
 			boolean isWin32 = Platform.OS_WIN32.equals(Platform.getOS());
 			try {
 				initilizing = true;
-				shellPath = ExecutableUtil.find(isWin32 ? SH : BASH, isWin32, getPossibleShellLocations());
+				shellPath = getPreferenceShellPath();
+				if (shellPath == null) {
+					shellPath = ExecutableUtil.find(isWin32 ? SH_EXE : BASH, false, getPossibleShellLocations());
+				}
 			} finally {
 				initilizing = false;
 			}
@@ -107,11 +115,62 @@ public class ShellExecutable {
 		return null;
 	}
 	
+	private static IPath getPreferenceShellPath() {
+		String pref = new InstanceScope().getNode(CorePlugin.PLUGIN_ID).get(ICorePreferenceConstants.SHELL_EXECUTABLE_PATH, null);
+		if (pref != null && !pref.isEmpty()) {
+			IPath path = Path.fromOSString(pref);
+			if (path.toFile().isDirectory()) {
+				boolean isWin32 = Platform.OS_WIN32.equals(Platform.getOS());
+				path = path.append(isWin32 ? SH_EXE : BASH);
+			}
+			if (path.toFile().canExecute()) {
+				return path;
+			}
+			CorePlugin.logWarning("Shell executable path preference point to an invalid location"); //$NON-NLS-1$
+		}
+		return null;
+	}
+	
+	public static void setPreferenceShellPath(IPath path) {
+		IEclipsePreferences prefs = new InstanceScope().getNode(CorePlugin.PLUGIN_ID);
+		if (path != null) {
+			prefs.put(ICorePreferenceConstants.SHELL_EXECUTABLE_PATH, path.toOSString());			
+		} else {
+			prefs.remove(ICorePreferenceConstants.SHELL_EXECUTABLE_PATH);
+		}
+		try {
+			prefs.flush();
+		} catch (BackingStoreException e) {
+			CorePlugin.logError("Saving preferences failed.", e); //$NON-NLS-1$
+		}
+		shellPath = null;
+		shellEnvironment = null;
+	}
+	
 	public synchronized static Map<String, String> getEnvironment() {
 		if (shellEnvironment == null) {
-			shellEnvironment = new HashMap<String, String>();
+			shellEnvironment = new HashMap<String, String>();			
+			try {
+				shellEnvironment.putAll(buildEnvironment(ProcessUtil.outputForProcess(run("env", null, null)))); //$NON-NLS-1$
+			} catch (Exception e) {
+				CorePlugin.logError("Get shell environment failed.", e); //$NON-NLS-1$
+			}
 		}
 		return shellEnvironment;
+	}
+	
+	private static Map<String, String> buildEnvironment(String envp) {
+		Map<String, String> env = new HashMap<String, String>();
+		StringTokenizer tok = new StringTokenizer(envp, "\r\n"); //$NON-NLS-1$
+		while (tok.hasMoreTokens()) {
+			String envstring = tok.nextToken();
+			int eqlsign = envstring.indexOf('=');
+			if (eqlsign != -1) {
+				env.put(envstring.substring(0,eqlsign), envstring.substring(eqlsign+1));
+			}
+		}
+		env.remove("_"); //$NON-NLS-1$
+		return env;
 	}
 	
 	private synchronized static List<String> toShellCommand(List<String> command) throws CoreException {

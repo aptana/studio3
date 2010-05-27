@@ -14,6 +14,7 @@ import com.aptana.editor.common.theme.ConsoleThemer;
 import com.aptana.scripting.ScriptLogListener;
 import com.aptana.scripting.ScriptLogger;
 
+
 /**
  * Singleton for the scripting console.
  */
@@ -36,8 +37,8 @@ public class ScriptingConsole
 	{
 		if (console == null)
 		{
-			console = new MessageConsole(Messages.EarlyStartup_SCRIPTING_CONSOLE_NAME, ScriptingUIPlugin
-					.getImageDescriptor(CONSOLE_ICON_PATH));
+			console = new MessageConsole(Messages.EarlyStartup_SCRIPTING_CONSOLE_NAME,
+					ScriptingUIPlugin.getImageDescriptor(CONSOLE_ICON_PATH));
 
 			// create message streams
 			outputConsoleStream = console.newMessageStream();
@@ -140,8 +141,6 @@ public class ScriptingConsole
 		return warningConsoleStream;
 	}
 
-
-
 	/**
 	 * listenForLoggingEvents
 	 */
@@ -193,6 +192,7 @@ public class ScriptingConsole
 			}
 		});
 	}
+
 
 
 }

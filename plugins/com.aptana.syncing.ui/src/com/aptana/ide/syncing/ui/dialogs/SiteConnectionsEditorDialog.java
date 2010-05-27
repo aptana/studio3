@@ -74,10 +74,10 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.DefaultSiteConnection;
 import com.aptana.ide.syncing.core.ISiteConnection;
-import com.aptana.ide.syncing.core.SiteConnection;
 import com.aptana.ide.syncing.core.SyncingPlugin;
 import com.aptana.ide.syncing.ui.internal.SiteConnectionPropertiesWidget;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
+import com.aptana.ui.IDialogConstants;
 import com.aptana.ui.SWTUtils;
 import com.aptana.ui.UIPlugin;
 import com.aptana.ui.UIUtils;
@@ -115,7 +115,7 @@ public class SiteConnectionsEditorDialog extends TitleAreaDialog implements Site
 		IConnectionPoint sourceConnection = SyncUtils.findOrCreateConnectionPointFor(source);
 		IConnectionPoint destinationConnection = SyncUtils.findOrCreateConnectionPointFor(destination);
 
-		SiteConnection siteConnection = (SiteConnection) SyncingPlugin.getSiteConnectionManager().createSiteConnection();
+		ISiteConnection siteConnection = SyncingPlugin.getSiteConnectionManager().createSiteConnection();
 		siteConnection.setName(createUniqueSiteName(name));
 		siteConnection.setSource(sourceConnection);
 		siteConnection.setDestination(destinationConnection);
@@ -253,7 +253,7 @@ public class SiteConnectionsEditorDialog extends TitleAreaDialog implements Site
 				ISiteConnection siteConnection = (ISiteConnection) ((IStructuredSelection) sitesViewer.getSelection()).getFirstElement();
 				if (siteConnection != null && doSelectionChange()) {
 					try {
-						SiteConnection newSite = (SiteConnection) SyncingPlugin.getSiteConnectionManager().cloneSiteConnection(siteConnection);
+						ISiteConnection newSite = SyncingPlugin.getSiteConnectionManager().cloneSiteConnection(siteConnection);
 						newSite.setName(MessageFormat.format("Copy of {0}", siteConnection.getName())); //$NON-NLS-1$
 						sites.add(newSite);
 						sitesViewer.refresh();

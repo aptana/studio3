@@ -23,9 +23,10 @@ import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSPostUnaryOperatorNode;
 import com.aptana.editor.js.parsing.ast.JSPrimitiveNode;
 import com.aptana.editor.js.parsing.ast.JSUnaryOperatorNode;
-import com.aptana.editor.js.parsing.lexer.JSTokens;
+import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
+import com.aptana.parsing.IRecoveryStrategy;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 
@@ -178,6 +179,7 @@ public class JSParser extends Parser implements IParser {
 		"1jVVpcc7faD7$ttrqU2ZmTU2hmM$9W#w#$y01Uz6KG==");
 
 	private final Action[] actions;
+	private final IRecoveryStrategy[] recoveryStrategies;
 
 	private JSScanner fScanner;
 
@@ -2037,37 +2039,154 @@ public class JSParser extends Parser implements IParser {
 				}
 			}
 		};
+		
+		recoveryStrategies = new IRecoveryStrategy[] {
+			new IRecoveryStrategy() {
+				public boolean recover(IParser parser, Symbol token, TokenStream in) throws IOException
+				{
+					boolean result = false;
+	
+					Symbol term = new Symbol(JSTokenType.SEMICOLON.getIndex(), token.getStart(), token.getStart() - 1, ";");
+					Simulator sim = new Simulator();
+	
+					in.alloc(2);
+					in.insert(term, token);
+					in.rewind();
+	
+					if (sim.parse(in))
+					{
+						result = true;
+	
+						in.rewind();
+	
+						report.missingTokenInserted(term);
+					}
+	
+					return result;
+				}
+			},
+			new IRecoveryStrategy() {
+				public boolean recover(IParser parser, Symbol token, TokenStream in) throws IOException
+				{
+					Symbol lastSymbol = getLastSymbol();
+					int type = lastSymbol.getId();
+					boolean result = false;
+	
+					if (type == JSTokenType.DOT.getIndex() || type == JSTokenType.NEW.getIndex())
+					{
+						Symbol term1 = new Symbol(JSTokenType.IDENTIFIER.getIndex(), token.getStart(), token.getStart() - 1, "");
+						Symbol term2 = new Symbol(JSTokenType.SEMICOLON.getIndex(), token.getStart(), token.getStart() - 1, ";");
+	
+						Simulator sim = new Simulator();
+	
+						in.alloc(3);
+						in.insert(token);
+						in.insert(term2);
+						in.insert(term1);
+						in.rewind();
+	
+						if (sim.parse(in))
+						{
+							result = true;
+							
+							in.rewind();
+							
+							report.missingTokenInserted(term1);
+							report.missingTokenInserted(term2);
+						}
+					}
+	
+					return result;
+				}
+			},
+			new IRecoveryStrategy() {
+				public boolean recover(IParser parser, Symbol token, TokenStream in) throws IOException
+				{
+					Symbol lastSymbol = getLastSymbol();
+					boolean result = false;
+					
+					if (top >= 2)
+					{
+						Symbol symbol1 = _symbols[top - 2];
+						Symbol symbol2 = _symbols[top - 1];
+						                          
+						if (lastSymbol.getId() == JSTokenType.COMMA.getIndex() && symbol2.value instanceof List<?> && symbol1.getId() == JSTokenType.LPAREN.getIndex())
+						{
+							Symbol term = new Symbol(JSTokenType.IDENTIFIER.getIndex(), token.getStart(), token.getStart() - 1, "");
+							Simulator sim = new Simulator();
+							
+							in.alloc(2);
+							in.insert(term, token);
+							in.rewind();
+			
+							if (sim.parse(in))
+							{
+								result = true;
+			
+								in.rewind();
+			
+								report.missingTokenInserted(term);
+							}
+						}
+					}
+					
+					return result;
+				}
+			}
+		};
 	}
 
 	protected Symbol invokeReduceAction(int rule_num, int offset) {
 		return actions[rule_num].reduce(_symbols, offset);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see beaver.Parser#recoverFromError(beaver.Symbol, beaver.Parser.TokenStream)
+	 */
 	@Override
 	protected void recoverFromError(Symbol token, TokenStream in) throws IOException, Parser.Exception
 	{
-		int start = 0;
-		for (int i = 0; i < _symbols.length; ++i)
+		boolean success = false;
+
+		if (this.recoveryStrategies != null)
 		{
-			if (_symbols[i] == null && i > 0)
+			// NOTE: Consider building a Map<Object,List<IRecoveryStrategy>> which
+			// would allow us to reduce the number of recovery strategies that will
+			// be attempted based on the last symbol on the stack. We may need
+			// catch-all cases: 1) try these before the mapped strategies, 2)
+			// try the strategies, 3) try these after the mapped strategies
+			for (IRecoveryStrategy strategy : this.recoveryStrategies)
 			{
-				start = _symbols[i - 1].getEnd();
-				break;
+				if (strategy.recover(this, token, in))
+				{
+					success = true;
+					break;
+				}
 			}
 		}
-		Symbol term = new Symbol(JSTokens.SEMICOLON, start, token.getStart(), ";");
 
-		Simulator sim = new Simulator();
-		in.alloc(2);
-		in.insert(term, token); // insert expected terminal before unexpected one
-		in.rewind();
-		if (sim.parse(in))
+		if (success == false)
 		{
-			in.rewind();
-			report.missingTokenInserted(term);
-			return;
+			super.recoverFromError(token, in);
 		}
-		super.recoverFromError(token, in);
+	}
+
+	/**
+	 * getNextSymbolIndex
+	 * 
+	 * @return
+	 */
+	protected Symbol getLastSymbol()
+	{
+		Symbol result = null;
+
+		if (this.top != -1)
+		{
+			result = this._symbols[this.top];
+		}
+
+		return result;
 	}
 
 	@Override

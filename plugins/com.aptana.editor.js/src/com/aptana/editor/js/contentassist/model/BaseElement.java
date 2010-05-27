@@ -72,9 +72,9 @@ public class BaseElement
 	 * 
 	 * @return
 	 */
-	public UserAgentElement[] getUserAgents()
+	public List<UserAgentElement> getUserAgents()
 	{
-		return this._userAgents.toArray(new UserAgentElement[this._userAgents.size()]);
+		return this._userAgents;
 	}
 	
 	/**

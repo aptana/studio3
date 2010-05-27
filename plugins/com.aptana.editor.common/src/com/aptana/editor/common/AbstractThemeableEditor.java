@@ -119,7 +119,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	public void createPartControl(Composite parent)
 	{
 		this.fThemeableEditorColorsExtension.setParent(parent);
-		Composite findBarComposite = (Composite) this.fThemeableEditorFindBarExtension.createFindBarComposite(parent);
+		Composite findBarComposite = this.fThemeableEditorFindBarExtension.createFindBarComposite(parent);
 		Assert.isNotNull(findBarComposite); //the find bar must be the new parent.
 		super.createPartControl(findBarComposite);
 		this.fThemeableEditorFindBarExtension.createFindBar(getSourceViewer());
@@ -176,6 +176,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.texteditor.AbstractDecoratedTextEditor#getAdapter(java.lang.Class)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object getAdapter(Class adapter)
 	{
@@ -337,7 +338,12 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	{
 		setPreferenceStore(new ChainedPreferenceStore(new IPreferenceStore[] {
 				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() }));
-		fFileService = new FileService();
+		fFileService = createFileService();
+	}
+
+	protected FileService createFileService()
+	{
+		return new FileService(null);
 	}
 
 	@Override

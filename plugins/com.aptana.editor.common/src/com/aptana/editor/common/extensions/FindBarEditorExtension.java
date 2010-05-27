@@ -105,6 +105,7 @@ public class FindBarEditorExtension {
 	/**
 	 * Provide an adapter to IFindBarDecorator.
 	 */
+	@SuppressWarnings("unchecked")
 	public Object getFindBarDecoratorAdapter(Class adapter) 
 	{
 		if(IFindBarDecorated.class.equals(adapter))

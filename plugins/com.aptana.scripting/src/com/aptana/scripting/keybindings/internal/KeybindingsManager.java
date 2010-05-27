@@ -565,6 +565,7 @@ public class KeybindingsManager implements LoadCycleListener
 		state.reset();
 	}
 
+	// FIXME Combine with MenuDialog found in com.aptana.scripting.ui!
 	// Shows the commands menu.
 	private void popup(final Shell shell, final IBindingService bindingService, final IContextService contextService,
 			final ICommandElementsProvider commandElementsProvider, final List<CommandElement> commandElements,

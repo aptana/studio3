@@ -257,14 +257,14 @@ public class TreeThemer
 				if ((event.detail & SWT.SELECTED) != 0)
 				{
 					Tree tree = (Tree) event.widget;
-					int clientWidth = tree.getClientArea().width;
+					Rectangle clientArea = tree.getClientArea();
+					int clientWidth = clientArea.width;
 
 					GC gc = event.gc;
 					Color oldBackground = gc.getBackground();
 
-					// FIXME This isn't drawing whole width on windows...
 					gc.setBackground(getSelection());
-					gc.fillRectangle(0, event.y, clientWidth, event.height);
+					gc.fillRectangle(clientArea.x, event.y, clientWidth, event.height);
 					gc.setBackground(oldBackground);
 
 					event.detail &= ~SWT.SELECTED;
@@ -288,7 +288,8 @@ public class TreeThemer
 				TreeItem[] items = tree.getSelection();
 				if (items == null || items.length == 0)
 					return;
-				int clientWidth = tree.getClientArea().width;
+				Rectangle clientArea = tree.getClientArea();
+				int clientWidth = clientArea.x + clientArea.width;
 
 				GC gc = event.gc;
 				Color oldBackground = gc.getBackground();
@@ -298,7 +299,10 @@ public class TreeThemer
 				{
 					Rectangle bounds = item.getBounds();
 					int x = bounds.x + bounds.width;
-					gc.fillRectangle(x, bounds.y, clientWidth - x, bounds.height);
+					if (x < clientWidth)
+					{
+						gc.fillRectangle(x, bounds.y, clientWidth - x, bounds.height);
+					}
 				}
 				gc.setBackground(oldBackground);
 				// force foreground color for Windows. Otherwise on dark themes we get black fg
@@ -342,11 +346,13 @@ public class TreeThemer
 				Color oldBackground = gc.getBackground();
 				gc.setBackground(getBackground());
 				// wipe out the native control
-				gc.fillRectangle(x, y, width, height);
+				gc.fillRectangle(x, y, width+1, height-1); //+1 and -1 because of hovering selecting on windows vista
 				// draw a plus/minus based on expansion!
 				gc.setBackground(getForeground());
-				// draw surrounding box
-				gc.drawRectangle(x, y, width, width);
+				// draw surrounding box (with alpha so that it doesn't get too strong).
+				gc.setAlpha(195);
+				gc.drawRectangle(x+1, y+1, width-2, width-2); //make it smaller than the area erased
+				gc.setAlpha(255);
 				// draw '-'
 				gc.drawLine(x + 3, y + (width / 2), x + 7, y + (width / 2));
 				if (!isExpanded)

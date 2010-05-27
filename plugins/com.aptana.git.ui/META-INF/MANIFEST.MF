@@ -22,7 +22,8 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.core;bundle-version="3.0.0",
  com.aptana.git.core;bundle-version="1.0.0",
  com.aptana.editor.common;bundle-version="1.0.0",
- com.aptana.console;bundle-version="1.0.0"
+ com.aptana.console;bundle-version="1.0.0",
+ com.aptana.ui;bundle-version="3.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

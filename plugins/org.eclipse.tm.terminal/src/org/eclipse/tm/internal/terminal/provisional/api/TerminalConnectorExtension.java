@@ -66,7 +66,7 @@ public class TerminalConnectorExtension {
 	 * @since org.eclipse.tm.terminal 2.0
 	 */
 	public static ITerminalConnector makeTerminalConnector(String id) {
-		IConfigurationElement[] config = RegistryFactory.getRegistry().getConfigurationElementsFor("org.eclipse.tm.terminal.terminalConnectors"); //$NON-NLS-1$
+		IConfigurationElement[] config = RegistryFactory.getRegistry().getConfigurationElementsFor("com.aptana.org.eclipse.tm.terminal.terminalConnectors"); //$NON-NLS-1$
 		for (int i = 0; i < config.length; i++) {
 			if(id.equals(config[i].getAttribute("id"))) { //$NON-NLS-1$
 				return makeConnector(config[i]);
@@ -87,7 +87,7 @@ public class TerminalConnectorExtension {
 	 * @since org.eclipse.tm.terminal 2.0 return value is ITerminalConnector[]
 	 */
 	public static ITerminalConnector[] makeTerminalConnectors() {
-		IConfigurationElement[] config = RegistryFactory.getRegistry().getConfigurationElementsFor("org.eclipse.tm.terminal.terminalConnectors"); //$NON-NLS-1$
+		IConfigurationElement[] config = RegistryFactory.getRegistry().getConfigurationElementsFor("com.aptana.org.eclipse.tm.terminal.terminalConnectors"); //$NON-NLS-1$
 		List result=new ArrayList();
 		for (int i = 0; i < config.length; i++) {
 			result.add(makeConnector(config[i]));

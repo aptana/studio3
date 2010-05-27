@@ -12,8 +12,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -64,6 +64,7 @@ import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
@@ -82,6 +83,8 @@ import com.aptana.editor.common.theme.ConsoleThemer;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.TextmateImporter;
 import com.aptana.editor.common.theme.Theme;
+import com.aptana.editor.common.theme.ThemeExporter;
+import com.aptana.scripting.model.BundleManager;
 
 public class ThemePreferencePage extends PreferencePage implements IWorkbenchPreferencePage, SelectionListener, IInputValidator, IPropertyChangeListener
 {
@@ -90,6 +93,11 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	 * Key to store the dialog settings for the initial directory to open when importing themes (saves last directory).
 	 */
 	private static final String THEME_DIRECTORY = "themeDirectory"; //$NON-NLS-1$
+	
+	/**
+	 * Key to store the dialog settings for the initial directory to open when exporting themes (saves last directory).
+	 */
+	private static final String THEME_EXPORT_DIRECTORY = "themeExportDirectory"; //$NON-NLS-1$
 
 	/**
 	 * The list of "standard" token types to set up for a theme.
@@ -170,6 +178,8 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	private Button fRemoveTokenButton;
 	private Text fScopeText;
 
+	private Button fExportButton;
+
 	@Override
 	protected Control createContents(Composite parent)
 	{
@@ -206,7 +216,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	private void createThemeListControls(Composite composite)
 	{
 		Composite themesComp = new Composite(composite, SWT.NONE);
-		themesComp.setLayout(new GridLayout(5, false));
+		themesComp.setLayout(new GridLayout(6, false));
 
 		fThemeCombo = new Combo(themesComp, SWT.DROP_DOWN | SWT.READ_ONLY);
 		loadThemeNames();
@@ -218,8 +228,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 		renameThemeButton = new Button(themesComp, SWT.PUSH | SWT.FLAT);
 		renameThemeButton.setText(Messages.ThemePreferencePage_RenameButtonLabel);
-		renameThemeButton.setImage(CommonEditorPlugin.getDefault().getImageRegistry().get(
-				CommonEditorPlugin.PENCIL_ICON));
 		renameThemeButton.addSelectionListener(this);
 
 		deleteThemeButton = new Button(themesComp, SWT.PUSH | SWT.FLAT);
@@ -230,6 +238,10 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		fImportButton = new Button(themesComp, SWT.PUSH | SWT.FLAT);
 		fImportButton.setText(Messages.ThemePreferencePage_ImportLabel);
 		fImportButton.addSelectionListener(this);
+		
+		fExportButton = new Button(themesComp, SWT.PUSH | SWT.FLAT);
+		fExportButton.setText(Messages.ThemePreferencePage_ExportLabel);
+		fExportButton.addSelectionListener(this);
 	}
 
 	private void loadThemeNames()
@@ -962,6 +974,31 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			{
 				CommonEditorPlugin.logError(e1);
 			}
+		}
+		else if (source == fExportButton)
+		{
+			DirectoryDialog fileDialog = new DirectoryDialog(getShell(), SWT.SAVE);
+			IDialogSettings editorSettings = CommonEditorPlugin.getDefault().getDialogSettings();
+			String value = editorSettings.get(THEME_EXPORT_DIRECTORY);
+			if (value != null)
+			{
+				fileDialog.setFilterPath(value);
+			}
+			else
+			{
+				fileDialog.setFilterPath(BundleManager.getInstance().getUserBundlesPath());
+			}
+			String path = fileDialog.open();
+			if (path == null)
+			{
+				return;
+			}
+
+			File themeFile = new File(path);
+			editorSettings.put(THEME_EXPORT_DIRECTORY, themeFile.getParent());
+
+			Theme theme = getThemeManager().getCurrentTheme();
+			new ThemeExporter().export(themeFile, theme);
 		}
 		else if (source == fAddTokenButton)
 		{

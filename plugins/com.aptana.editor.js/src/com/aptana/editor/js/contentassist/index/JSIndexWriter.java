@@ -1,8 +1,10 @@
 package com.aptana.editor.js.contentassist.index;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
@@ -10,10 +12,14 @@ import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
+import com.aptana.editor.js.contentassist.model.UserAgentElement;
 import com.aptana.index.core.Index;
 
 public class JSIndexWriter
 {
+	private static Map<UserAgentElement,String> keysByUserAgent = new HashMap<UserAgentElement,String>();
+	static Map<String,UserAgentElement> userAgentsByKey = new HashMap<String,UserAgentElement>();
+	
 	private JSMetadataReader _reader;
 	private int _descriptionCount;
 	private int _parameterCount;
@@ -94,7 +100,8 @@ public class JSIndexWriter
 			function.getOwningType().getName(),
 			descriptionKey,
 			parametersKey,
-			returnTypesKey
+			returnTypesKey,
+			StringUtil.join(JSIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, function.getUserAgents()))
 		);
 
 		index.addEntry(JSIndexConstants.FUNCTION, value, this.getDocumentPath());
@@ -143,14 +150,14 @@ public class JSIndexWriter
 		String propertyTypesKey = this.writeReturnTypes(index, property.getTypes());
 		String descriptionKey = this.writeDescription(index, property.getDescription());
 		// SinceElement[] sinceList = property.getSinceList();
-		// UserAgentElement[] userAgents = property.getUserAgents();
 		
 		String value = StringUtil.join(
 			JSIndexConstants.DELIMITER,
 			property.getName(),
 			property.getOwningType().getName(),
 			descriptionKey,
-			propertyTypesKey
+			propertyTypesKey,
+			StringUtil.join(JSIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, property.getUserAgents()))
 		);
 
 		index.addEntry(JSIndexConstants.PROPERTY, value, this.getDocumentPath());
@@ -238,5 +245,56 @@ public class JSIndexWriter
 				this.writeProperty(index, property);
 			}
 		}
+	}
+	
+	/**
+	 * writeUserAgent
+	 * 
+	 * @param index
+	 * @param userAgent
+	 * @return
+	 */
+	protected String writeUserAgent(Index index, UserAgentElement userAgent)
+	{
+		String key = keysByUserAgent.get(userAgent);
+		
+		if (key == null)
+		{
+			key = Integer.toString(keysByUserAgent.size());
+			
+			String[] columns = new String[] {
+				key,
+				userAgent.getDescription(),
+				userAgent.getOS(),
+				userAgent.getPlatform(),
+				userAgent.getVersion()
+			};
+			String value = StringUtil.join(JSIndexConstants.DELIMITER, columns);
+			
+			index.addEntry(JSIndexConstants.USER_AGENT, value, this.getDocumentPath());
+			
+			keysByUserAgent.put(userAgent, key);
+			userAgentsByKey.put(key, userAgent);
+		}
+		
+		return key;
+	}
+	
+	/**
+	 * writeUserAgents
+	 * 
+	 * @param userAgents
+	 * @return
+	 */
+	protected List<String> writeUserAgents(Index index, List<UserAgentElement> userAgents)
+	{
+		List<String> keys = new LinkedList<String>();
+		
+		for (UserAgentElement userAgent : userAgents)
+		{
+			keys.add(this.writeUserAgent(index, userAgent));
+		}
+		
+		return keys;
 	}
 }
