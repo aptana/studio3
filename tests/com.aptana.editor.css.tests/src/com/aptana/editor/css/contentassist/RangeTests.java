@@ -54,13 +54,13 @@ public class RangeTests extends TestCase
 				{
 					CommonCompletionProposal proposal = (CommonCompletionProposal) proposals[0];
 					
-					if (selection.range.getLength() <= 0)
+					if (selection.range.isEmpty())
 					{
-						assertTrue(proposal.getReplaceRange().getLength() <= 0);
+						assertEquals(offset, proposal.getReplaceRange().getStartingOffset());
 					}
 					else
 					{
-						assertTrue(selection.range.equals(proposal.getReplaceRange()));
+						assertEquals("offset " + offset, selection.range, proposal.getReplaceRange());
 					}
 				}
 				else
@@ -82,7 +82,254 @@ public class RangeTests extends TestCase
 
 		this.rangeTests(
 			source,
-			new OffsetSelection(0, new Range(0, 3))
+			new OffsetSelection(0, Range.EMPTY),
+			new OffsetSelection(1, 4, new Range(0, 3)),
+			new OffsetSelection(5, 7, Range.EMPTY)
+		);
+	}
+	
+	/**
+	 * testEmptyBody2
+	 */
+	public void testEmptyBody2()
+	{
+		String source = "body {\n  \n}";
+		
+		this.rangeTests(
+			source,
+			new OffsetSelection(0, Range.EMPTY),
+			new OffsetSelection(1, 4, new Range(0, 3)),
+			new OffsetSelection(5, 11, Range.EMPTY)
+		);
+	}
+	
+	/**
+	 * testEmptyA - This came from a bug report
+	 */
+	public void testEmptyA()
+	{
+		String source = "a{\n  \n}";
+		
+		this.rangeTests(
+			source,
+			new OffsetSelection(0, Range.EMPTY),
+			new OffsetSelection(1, new Range(0, 0)),
+			new OffsetSelection(2, 7, Range.EMPTY)
+		);
+	}
+	
+	/**
+	 * testEmptyUnknownElement
+	 * 
+	 * @throws Exception
+	 */
+	public void testEmptyUnknownElement()
+	{
+		String source = "xxyyzz {}";
+		
+		this.rangeTests(
+			source,
+			new OffsetSelection(0, Range.EMPTY),
+			new OffsetSelection(1, 6, new Range(0, 5)),
+			new OffsetSelection(7, 9, Range.EMPTY)
+		);
+	}
+	
+	/**
+	 * testProperty
+	 */
+	public void testProperty()
+	{
+		String source = "body{background}";
+		
+		this.rangeTests(
+			source,
+			new OffsetSelection(0, Range.EMPTY),
+			new OffsetSelection(1, 4, new Range(0, 3)),
+			new OffsetSelection(5, Range.EMPTY),
+			new OffsetSelection(6, 15, new Range(5, 14)),
+			new OffsetSelection(16, Range.EMPTY)
+		);
+	}
+	
+	/**
+	 * testProperty2
+	 */
+	public void testProperty2()
+	{
+		String source = "body{\n  background}";
+		
+		this.rangeTests(
+			source,
+			new OffsetSelection(0, Range.EMPTY),
+			new OffsetSelection(1, 4, new Range(0, 3)),
+			new OffsetSelection(5, 8, Range.EMPTY),
+			new OffsetSelection(9, 18, new Range(8, 17)),
+			new OffsetSelection(19, Range.EMPTY)
+		);
+	}
+	
+	/**
+	 * testPropertyNoValue
+	 */
+	public void testPropertyNoValue()
+	{
+		String source = "body{background:}";
+		
+		this.rangeTests(
+			source,
+			new OffsetSelection(0, Range.EMPTY),
+			new OffsetSelection(1, 4, new Range(0, 3)),
+			new OffsetSelection(5, Range.EMPTY),
+			new OffsetSelection(6, 15, new Range(5, 14)),
+			new OffsetSelection(16, 17, Range.EMPTY)
+		);
+	}
+	
+	/**
+	 * testPropertyNoValue
+	 */
+	public void testPropertyNoValue2()
+	{
+		String source = "body{\n  background:}";
+		
+		this.rangeTests(
+			source,
+			new OffsetSelection(0, Range.EMPTY),
+			new OffsetSelection(1, 4, new Range(0, 3)),
+			new OffsetSelection(5, 8, Range.EMPTY),
+			new OffsetSelection(9, 18, new Range(8, 17)),
+			new OffsetSelection(19, 20, Range.EMPTY)
+		);
+	}
+	
+	/**
+	 * testPropertyAndValueNoSemi
+	 */
+	public void testPropertyAndValueNoSemi()
+	{
+		String source = "body{background:red}";
+		
+		this.rangeTests(
+			source,
+			new OffsetSelection(0, Range.EMPTY),
+			new OffsetSelection(1, 4, new Range(0, 3)),
+			new OffsetSelection(5, Range.EMPTY),
+			new OffsetSelection(6, 15, new Range(5, 14)),
+			new OffsetSelection(16, Range.EMPTY),
+			new OffsetSelection(17, 18, new Range(16, 18)),
+			new OffsetSelection(20, Range.EMPTY)
+		);
+	}
+	
+	/**
+	 * testPropertyAndValueNoSemi2
+	 */
+	public void testPropertyAndValueNoSemi2()
+	{
+		String source = "body{\n  background:red\n}";
+		
+		this.rangeTests(
+			source,
+			new OffsetSelection(0, Range.EMPTY),
+			new OffsetSelection(1, 4, new Range(0, 3)),
+			new OffsetSelection(5, 8, Range.EMPTY),
+			new OffsetSelection(9, 18, new Range(8, 17)),
+			new OffsetSelection(19, Range.EMPTY),
+			new OffsetSelection(20, 22, new Range(19, 21)),
+			new OffsetSelection(23, 24, Range.EMPTY)
+		);
+	}
+	
+	/**
+	 * testPropertyAndValue
+	 */
+	public void testPropertyAndValue()
+	{
+		String source = "body{background:red;}";
+		
+		this.rangeTests(
+			source,
+			new OffsetSelection(0, Range.EMPTY),
+			new OffsetSelection(1, 4, new Range(0, 3)),
+			new OffsetSelection(5, Range.EMPTY),
+			new OffsetSelection(6, 15, new Range(5, 14)),
+			new OffsetSelection(16, Range.EMPTY),
+			new OffsetSelection(17, 19, new Range(16, 18)),
+			new OffsetSelection(20, 21, Range.EMPTY)
+		);
+	}
+	
+	/**
+	 * testPropertyAndValue2
+	 */
+	public void testPropertyAndValue2()
+	{
+		String source = "body{\n  background:red;\n}";
+		
+		this.rangeTests(
+			source,
+			new OffsetSelection(0, Range.EMPTY),
+			new OffsetSelection(1, 4, new Range(0, 3)),
+			new OffsetSelection(5, 8, Range.EMPTY),
+			new OffsetSelection(9, 18, new Range(8, 17)),
+			new OffsetSelection(19, Range.EMPTY),
+			new OffsetSelection(20, 22, new Range(19, 21)),
+			new OffsetSelection(23, 25, Range.EMPTY)
+		);
+	}
+	
+	/**
+	 * testMultipleProperties
+	 */
+	public void testMultipleProperties()
+	{
+		String source = "body{background:red;border: 1 solid black}";
+		
+		this.rangeTests(
+			source,
+			new OffsetSelection(0, Range.EMPTY),
+			new OffsetSelection(1, 4, new Range(0, 3)),
+			new OffsetSelection(5, Range.EMPTY),
+			new OffsetSelection(6, 15, new Range(5, 14)),
+			new OffsetSelection(16, Range.EMPTY),
+			new OffsetSelection(17, 19, new Range(16, 18)),
+			new OffsetSelection(20, Range.EMPTY),
+			new OffsetSelection(21, 26, new Range(20, 25)),
+			new OffsetSelection(27, 28, Range.EMPTY),
+			new OffsetSelection(29, new Range(28, 28)),
+			new OffsetSelection(30, Range.EMPTY),
+			new OffsetSelection(31, 35, new Range(30, 34)),
+			new OffsetSelection(36, Range.EMPTY),
+			new OffsetSelection(37, 41, new Range(36, 40)),
+			new OffsetSelection(42, Range.EMPTY)
+		);
+	}
+	
+	/**
+	 * testMultipleProperties2
+	 */
+	public void testMultipleProperties2()
+	{
+		String source = "body{\n  background: red;\n  border: 1 solid black\n}";
+		
+		this.rangeTests(
+			source,
+			new OffsetSelection(0, Range.EMPTY),
+			new OffsetSelection(1, 4, new Range(0, 3)),
+			new OffsetSelection(5, 8, Range.EMPTY),
+			new OffsetSelection(9, 18, new Range(8, 17)),
+			new OffsetSelection(19, 20, Range.EMPTY),
+			new OffsetSelection(21, 23, new Range(20, 22)),
+			new OffsetSelection(24, 27, Range.EMPTY),
+			new OffsetSelection(28, 33, new Range(27, 32)),
+			new OffsetSelection(34, 35, Range.EMPTY),
+			new OffsetSelection(36, new Range(35, 35)),
+			new OffsetSelection(37, Range.EMPTY),
+			new OffsetSelection(38, 42, new Range(37, 41)),
+			new OffsetSelection(43, Range.EMPTY),
+			new OffsetSelection(44, 48, new Range(43, 47)),
+			new OffsetSelection(49, 50, Range.EMPTY)
 		);
 	}
 }
