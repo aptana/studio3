@@ -72,9 +72,17 @@ import org.eclipse.swt.widgets.TableItem;
 public class CompletionProposalPopup implements IContentAssistListener
 {
 	/**
+	 * Set to <code>true</code> to use a Table with SWT.VIRTUAL.
+	 * XXX: This is a workaround for: https://bugs.eclipse.org/bugs/show_bug.cgi?id=90321
+	 * 		More details see also: https://bugs.eclipse.org/bugs/show_bug.cgi?id=98585#c36
+	 * @since 3.1
+	 */
+	private static final boolean USE_VIRTUAL= !"motif".equals(SWT.getPlatform()); //$NON-NLS-1$
+	
+	/**
 	 * PROPOSAL_ITEM_HEIGHT
 	 */
-	public static final int PROPOSAL_ITEM_HEIGHT = 7;
+	public static final int PROPOSAL_ITEMS_VISIBLE = 7;
 
 	/**
 	 * ProposalSelectionListener
@@ -361,18 +369,24 @@ public class CompletionProposalPopup implements IContentAssistListener
 			fProposalTable.setForeground(c);
 			return;
 		}
+		
+		
+		fProposalShell= new Shell(control.getShell(), SWT.ON_TOP | SWT.RESIZE );
+		fProposalShell.setFont(JFaceResources.getDefaultFont());
+		if (USE_VIRTUAL) {
+			fProposalTable= new Table(fProposalShell, SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL);
 
-		fProposalShell = new Shell(control.getShell(), SWT.ON_TOP | SWT.RESIZE);
-		fProposalTable = new Table(fProposalShell, SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL);
-		Listener listener = new Listener()
-		{
-			public void handleEvent(Event event)
-			{
-				handleSetData(event);
-			}
-		};
-		fProposalTable.addListener(SWT.SetData, listener);
+			Listener listener= new Listener() {
+				public void handleEvent(Event event) {
+					handleSetData(event);
+				}
+			};
+			fProposalTable.addListener(SWT.SetData, listener);
+		} else {
+			fProposalTable= new Table(fProposalShell, SWT.H_SCROLL | SWT.V_SCROLL);
+		}
 
+		// Custom code for our impl!
 		// TODO: grab value from preferences
 		// final IPreferenceStore store = CommonEditorPlugin.getDefault().getPreferenceStore();
 		_insertOnTab = false; // store.getBoolean(IPreferenceConstants.INSERT_ON_TAB);
@@ -408,8 +422,8 @@ public class CompletionProposalPopup implements IContentAssistListener
 		}
 
 		GridLayout layout = new GridLayout();
-		layout.marginWidth = 0;
-		layout.marginHeight = 0;
+		layout.marginWidth = 1;
+		layout.marginHeight = 1;
 		fProposalShell.setLayout(layout);
 
 		GridData data = new GridData(GridData.FILL_BOTH);
@@ -421,9 +435,14 @@ public class CompletionProposalPopup implements IContentAssistListener
 			fProposalShell.setSize(size);
 		}
 		else
-		{
-			data.heightHint = fProposalTable.getItemHeight() * CompletionProposalPopup.PROPOSAL_ITEM_HEIGHT;
-			data.widthHint = 300;
+		{			
+			int height= fProposalTable.getItemHeight() * CompletionProposalPopup.PROPOSAL_ITEMS_VISIBLE;
+			// use golden ratio as default aspect ratio
+			final double aspectRatio= (1 + Math.sqrt(5)) / 2;
+			int width= (int) (height * aspectRatio);
+			Rectangle trim= fProposalTable.computeTrim(0, 0, width, height);
+			data.heightHint= trim.height;
+			data.widthHint= trim.width;
 			fProposalTable.setLayoutData(data);
 			fProposalShell.pack();
 		}
@@ -447,9 +466,10 @@ public class CompletionProposalPopup implements IContentAssistListener
 			}
 		});
 
+		// Not sure why we don't set background for all WS here
 		if (!"carbon".equals(SWT.getPlatform())) //$NON-NLS-1$
 		{
-			fProposalShell.setBackground(control.getDisplay().getSystemColor(SWT.COLOR_BLACK));
+			fProposalShell.setBackground(getForegroundColor(control));
 		}
 		
 		Color c= getBackgroundColor(control);
@@ -458,6 +478,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 		c= getForegroundColor(control);
 		fProposalTable.setForeground(c);
 
+		// Custom code for overriding selection color
 		Listener selectionOverride = new Listener()
 		{
 			public void handleEvent(Event event)
@@ -886,26 +907,54 @@ public class CompletionProposalPopup implements IContentAssistListener
 	 */
 	private void setProposals(ICompletionProposal[] proposals, boolean isFilteredSubset)
 	{
-		if (Helper.okToUse(fProposalTable))
-		{
+		ICompletionProposal[] oldProposals= fFilteredProposals;
+		ICompletionProposal oldProposal= getSelectedProposal(); // may trigger filtering and a reentrant call to setProposals()
+		if (oldProposals != fFilteredProposals) // reentrant call was first - abort
+			return;
 
-			ICompletionProposal oldProposal = getSelectedProposal();
+		if (Helper.okToUse(fProposalTable)) {
 			if (oldProposal instanceof ICompletionProposalExtension2 && fViewer != null)
-			{
 				((ICompletionProposalExtension2) oldProposal).unselected(fViewer);
-			}
 
-			fFilteredProposals = proposals;
-			final int newLen = proposals.length;
+			// Commented out code from original
+//			if (proposals == null || proposals.length == 0) {
+//				fEmptyProposal.fOffset= fFilterOffset;
+//				fEmptyProposal.fDisplayString= fEmptyMessage != null ? fEmptyMessage : JFaceTextMessages.getString("CompletionProposalPopup.no_proposals"); //$NON-NLS-1$
+//				proposals= new ICompletionProposal[] { fEmptyProposal };
+//			}
+
+			fFilteredProposals= proposals;
+			final int newLen= proposals.length;
+			if (USE_VIRTUAL) {
+				fProposalTable.setItemCount(newLen);
+				fProposalTable.clearAll();
+			} else {
+				fProposalTable.setRedraw(false);
+				fProposalTable.setItemCount(newLen);
+				TableItem[] items= fProposalTable.getItems();
+				for (int i= 0; i < items.length; i++) {
+					TableItem item= items[i];
+					ICompletionProposal proposal= proposals[i];
+					item.setText(proposal.getDisplayString());
+					item.setImage(proposal.getImage());
+					item.setData(proposal);
+				}
+				fProposalTable.setRedraw(true);
+			}
+			
+			// Code in original that we've commented out to alter our behavior!
+//			Point currentLocation= fProposalShell.getLocation();
+//			Point newLocation= getLocation();
+//			if ((newLocation.x < currentLocation.x && newLocation.y == currentLocation.y) || newLocation.y < currentLocation.y)
+//				fProposalShell.setLocation(newLocation);
+//
+//			selectProposal(0, false);
+			
+			// Custom code for modifying selection/size
 			int defaultIndex = -1;
 			int suggestedIndex = -1;
 			String longestString = ""; //$NON-NLS-1$
 			String longestLoc = ""; //$NON-NLS-1$
-			int totalItems = 0;
-
-			fProposalTable.setItemCount(newLen);
-			fProposalTable.clearAll();
-
 			for (int i = 0; i < proposals.length; i++)
 			{
 				ICompletionProposal proposal = proposals[i];
@@ -936,95 +985,101 @@ public class CompletionProposalPopup implements IContentAssistListener
 				}
 			}
 
-			String measureString = "MMMM" + longestString + "MMM"; //$NON-NLS-1$ //$NON-NLS-2$
-			GC gc = new GC(fProposalTable.getShell());
-			Point locationWidth = gc.stringExtent(longestLoc + "MMM"); //$NON-NLS-1$
-			measureString += longestLoc + "MMM"; //$NON-NLS-1$
-			Point widestText = gc.stringExtent(longestString + "MMMMMM"); //$NON-NLS-1$
-			Point extent = gc.stringExtent(measureString);
-			gc.dispose();
-			if (System.getProperty("os.name").startsWith("Mac OS")) //$NON-NLS-1$ //$NON-NLS-2$
+			forceResize(longestString, longestLoc);
+			modifySelection(defaultIndex, suggestedIndex);
+		}
+	}
+
+	protected void modifySelection(int defaultIndex, int suggestedIndex)
+	{
+		// IM changed this to deselect the table if there is no default selection
+		if (defaultIndex != -1)
+		{
+			this.selectProposal(defaultIndex, false, true);
+		}
+		else if (suggestedIndex != -1)
+		{
+			this.fProposalTable.deselectAll();
+			this.setScroll(suggestedIndex);
+		}
+		else if (fProposalTable != null)
+		{
+			if (fLastKeyPressed == '\b' && defaultIndex == -1)
 			{
-				measureString = "MMMM" + longestString + "MMMM"; //$NON-NLS-1$ //$NON-NLS-2$
-				for (int j = 1; j < fProposalTable.getColumnCount(); j++)
-				{
-					if (j == fUserAgents + 1)
-					{
-						if (fProposalTable.getColumn(j).getWidth() != locationWidth.x)
-						{
-							fProposalTable.getColumn(j).setWidth(locationWidth.x);
-						}
-					}
-					else if (fProposalTable.getColumn(j).getWidth() != 19)
-					{
-						fProposalTable.getColumn(j).setWidth(19);
-					}
-				}
+				hide();
 			}
 			else
 			{
-				fProposalTable.getColumn(fUserAgents + 1).pack();
-			}
-
-			TableColumn first = fProposalTable.getColumn(0);
-			if (first.getWidth() != widestText.x)
-			{
-				fProposalTable.getColumn(0).setWidth(widestText.x);
-			}
-			int width = extent.x;
-			if (fUserAgents > 0)
-			{
-				if (System.getProperty("os.name").startsWith("Mac OS")) //$NON-NLS-1$ //$NON-NLS-2$
-				{
-					width = width + fUserAgents * (fProposalTable.getColumn(1).getWidth() - 5);
-				}
-				else
-				{
-					width = width + fUserAgents * 10;
-				}
-			}
-
-			if (totalItems > PROPOSAL_ITEM_HEIGHT)
-			{
-				totalItems = PROPOSAL_ITEM_HEIGHT;
-			}
-			int height = (fProposalTable.getItemHeight() * PROPOSAL_ITEM_HEIGHT);
-
-			// Point currentLocation = fProposalShell.getLocation();
-			// Point newLocation = getLocation(width, height);
-			// if ((newLocation.x < currentLocation.x && newLocation.y == currentLocation.y) ||
-			// newLocation.y != currentLocation.y)
-			// fProposalShell.setLocation(newLocation);
-
-			GridData data = new GridData(GridData.FILL_BOTH);
-			data.heightHint = height;
-			data.widthHint = width;
-			fProposalTable.setLayoutData(data);
-			fProposalShell.pack(true);
-
-			// IM changed this to deselect the table if there is no default selection
-			if (defaultIndex != -1)
-			{
-				this.selectProposal(defaultIndex, false, true);
-			}
-			else if (suggestedIndex != -1)
-			{
+				this.fProposalTable.setTopIndex(0);
 				this.fProposalTable.deselectAll();
-				this.setScroll(suggestedIndex);
 			}
-			else if (fProposalTable != null)
+		}
+	}
+
+	/**
+	 * Custom code on our end which looks at all the proposals, and then tries to determine the max length of entries and resize the popup accordingly.
+	 * @param longestString
+	 * @param longestLoc
+	 */
+	private void forceResize(String longestString, String longestLoc)
+	{
+		// FIXME Wow is this ugly code! Can't we just pack the text columns? Do we need to do GC ops?		
+		String measureString = "MMMM" + longestString + "MMM"; //$NON-NLS-1$ //$NON-NLS-2$
+		GC gc = new GC(fProposalTable.getShell());
+		Point locationWidth = gc.stringExtent(longestLoc + "MMM"); //$NON-NLS-1$
+		measureString += longestLoc + "MMM"; //$NON-NLS-1$
+		Point widestText = gc.stringExtent(longestString + "MMMMMM"); //$NON-NLS-1$
+		Point extent = gc.stringExtent(measureString);
+		gc.dispose();
+		if (System.getProperty("os.name").startsWith("Mac OS")) //$NON-NLS-1$ //$NON-NLS-2$
+		{
+			measureString = "MMMM" + longestString + "MMMM"; //$NON-NLS-1$ //$NON-NLS-2$
+			for (int j = 1; j < fProposalTable.getColumnCount(); j++)
 			{
-				if (fLastKeyPressed == '\b' && defaultIndex == -1)
+				if (j == fUserAgents + 1)
 				{
-					hide();
+					if (fProposalTable.getColumn(j).getWidth() != locationWidth.x)
+					{
+						fProposalTable.getColumn(j).setWidth(locationWidth.x);
+					}
 				}
-				else
+				else if (fProposalTable.getColumn(j).getWidth() != 19)
 				{
-					this.fProposalTable.setTopIndex(0);
-					this.fProposalTable.deselectAll();
+					fProposalTable.getColumn(j).setWidth(19);
 				}
 			}
 		}
+		else
+		{
+			fProposalTable.getColumn(fUserAgents + 1).pack();
+		}
+
+		TableColumn first = fProposalTable.getColumn(0);
+		if (first.getWidth() != widestText.x)
+		{
+			fProposalTable.getColumn(0).setWidth(widestText.x);
+		}
+		int width = extent.x;
+		if (fUserAgents > 0)
+		{
+			if (System.getProperty("os.name").startsWith("Mac OS")) //$NON-NLS-1$ //$NON-NLS-2$
+			{
+				width = width + fUserAgents * (fProposalTable.getColumn(1).getWidth() - 5);
+				width += 18; // HACK to fix width on my machine so we don't need a horizontal scrollbar
+			}
+			else
+			{
+				width = width + fUserAgents * 10;
+			}
+		}
+
+		int height = (fProposalTable.getItemHeight() * PROPOSAL_ITEMS_VISIBLE);
+		
+		GridData data = new GridData(GridData.FILL_BOTH);
+		data.heightHint = height;
+		data.widthHint = width;
+		fProposalTable.setLayoutData(data);
+		fProposalShell.pack(true);
 	}
 
 	/**
