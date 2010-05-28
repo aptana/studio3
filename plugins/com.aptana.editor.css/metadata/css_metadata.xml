@@ -21644,6 +21644,20 @@ li {
         <value name="mathematical" description="The alignment-point of the element being aligned is aligned with the mathematical baseline of the parent."/>
       </values>
     </property>
+    <property name="animation" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies a shorthand property combines six of the animation properties into a single property.</description>
+      <example></example>
+      <hint>[&lt;animation-name&gt; || &lt;animation-duration&gt; || &lt;animation-timing-function&gt; || &lt;animation-delay&gt; || &lt;animation-iteration-count&gt; || &lt;animation-direction&gt;] [, [&lt;animation-name&gt; || &lt;animation-duration&gt; || &lt;animation-timing-function&gt; || &lt;animation-delay&gt; || &lt;animation-iteration-count&gt; || &lt;animation-direction&gt;] ]*</hint>
+      <remarks></remarks>
+      <values>
+      </values>
+    </property>
     <property name="animation-delay" type="String">
       <availability>
         <specification name="W3C" version="CSS3"/>
@@ -22991,7 +23005,7 @@ li {
         <value name="balance" description="Balance content equally between columns, if possible."/>
       </values>
     </property>
-    <property name="column-fill" type="String">
+    <property name="column-gap" type="String">
       <availability>
         <specification name="W3C" version="CSS3"/>
       </availability>
@@ -23005,6 +23019,20 @@ li {
       <values>
         <value name="normal" description="The ‘normal’ value is UA-specific. A value of ‘1em’ is suggested. "/>
         <value name="&lt;length&gt;" description="Specify a non-negative value"/>
+      </values>
+    </property>
+    <property name="columns-rule" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies a shorthand for setting ‘column-rule-width’, ‘column-rule-style’, and ‘column-rule-color’ at the same place in the style sheet.</description>
+      <example></example>
+      <hint>&lt;column-rule-width&gt;  || &lt;border-style&gt;  || [ &lt;color&gt;  | transparent ]</hint>
+      <remarks></remarks>
+      <values>
       </values>
     </property>
     <property name="column-rule-color" type="String">
@@ -23079,6 +23107,20 @@ li {
       <values>
         <value name="auto" description="Signifies that the column width will be determined by other properties (e.g., ‘column-count’, if it has a non-auto value)."/>
         <value name="&lt;length&gt;" description="Describes the optimal column width. The actual column width may be wider (to fill the available space), or narrower (only if the available space is smaller than the specified column width). Values must be greater than 0."/>        
+      </values>
+    </property>
+    <property name="columns" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies a shorthand property for setting ‘column-width’ and ‘column-count’.</description>
+      <example></example>
+      <hint>&lt;column-rule-width&gt;  || &lt;border-style&gt;  || [ &lt;color&gt;  | transparent ]</hint>
+      <remarks></remarks>
+      <values>
       </values>
     </property>
     <property name="content" type="String">
@@ -25558,6 +25600,23 @@ li {
         <value name="900" description="900 darkness font (dark)."/>
       </values>
     </property>
+    <property name="hanging-punctuation" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Determines whether a punctuation mark, if one is present, may be placed outside the line box at the start or at the end of a full line of text.</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+        <value name="start" description="Punctuation may hang outside the start edge of the first line."/>
+        <value name="end" description="Punctuation may hang outside the end edge of the last line."/>
+        <value name="end-edge" description="Punctuation may hang outside the end edge of all lines."/>
+      </values>
+    </property>
     <property name="height" type="String">
       <availability>
         <specification name="W3C" version="CSS2"/>
@@ -25888,6 +25947,20 @@ li {
         <value name="normal" description="Normal line-height."/>
       </values>
     </property>
+    <property name="line-stacking" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies a shorthand for line-stacking.</description>
+      <example></example>
+      <hint>&lt;line-stacking-strategy&gt; || &lt;line-stacking-ruby&gt; || &lt;line-stacking-shift&gt;</hint>
+      <remarks></remarks>
+      <values>
+      </values>
+    </property>
     <property name="line-stacking-ruby" type="String">
       <availability>
         <specification name="W3C" version="CSS3"/>
@@ -26145,6 +26218,20 @@ li {
       </browsers>
       <description>Specifies the width (in pixels, points, or a percentage) for the top margin of an element.</description>
       <hint>[margin-width]. Example values: 10px, 5%, etc.</hint>
+    </property>
+    <property name="mark" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies a shorthand for setting 'mark-before' and 'mark-after'. If two values are given the first value is 'mark-before' and the second is 'mark-after'. If only one value is given, it applies to both properties.</description>
+      <example></example>
+      <hint>[ &lt;mark-before&gt; || &lt;mark-after&gt; ]</hint>
+      <remarks></remarks>
+      <values>
+      </values>
     </property>
     <property name="mark-after" type="String">
       <availability>
@@ -27116,6 +27203,20 @@ li {
         <value name="vertical" description="The UA presents a unidirectional vertical resizing mechanism to allow the user to adjust only the height of the element."/>
       </values>
     </property>
+    <property name="rest" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies a shorthand for setting 'rest-before' and 'rest-after'. If two values are given, the first value is 'rest-before' and the second is 'rest-after'. If only one value is given, it applies to both properties.</description>
+      <example></example>
+      <hint>[ &lt;rest-before&gt; || &lt;rest-after&gt; ] | inherit</hint>
+      <remarks></remarks>
+      <values>
+      </values>
+    </property>
     <property name="rest-after" type="String">
       <availability>
         <specification name="W3C" version="CSS3"/>
@@ -27480,6 +27581,20 @@ li {
         <value name="fixed" description="Render the table layout in a single pass."/>
       </values>
     </property>
+    <property name="target" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies a shorthand property for setting the individual target properties (i.e., 'target-name', 'target-new' and 'target-position') at the same place in the style sheet. Given a valid declaration, the 'target' property first sets all the individual target properties to their initial values, then assigns explicit values given in the declaration. </description>
+      <example></example>
+      <hint>&lt;target-name&gt; || &lt;target-new&gt; || &lt;target-position&gt;</hint>
+      <remarks></remarks>
+      <values>
+      </values>
+    </property>
     <property name="target-name" type="String">
       <availability>
         <specification name="W3C" version="CSS3"/>
@@ -27782,6 +27897,20 @@ li {
         <value name="*" description="Specify a value for top that is not on this list."/>
         <value name="inherit" description="Inherit the value from the parent element."/>
         <value name="auto" description="Top position to be determined by the window or parent element."/>
+      </values>
+    </property>
+    <property name="transition" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies a shorthand property combines the four properties of transition into a single property. </description>
+      <example></example>
+      <hint>[&lt;‘transition-property’&gt;  || &lt;‘transition-duration’&gt;  || &lt;‘transition-timing-function’&gt;  || &lt;‘transition-delay’&gt;  [, [&lt;‘transition-property’&gt;  || &lt;‘transition-duration’&gt;  || &lt;‘transition-timing-function’&gt;  || &lt;‘transition-delay’&gt;]]*</hint>
+      <remarks></remarks>
+      <values>
       </values>
     </property>
     <property name="transition-delay" type="String">
