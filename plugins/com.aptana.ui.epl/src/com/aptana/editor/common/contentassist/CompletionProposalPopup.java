@@ -43,6 +43,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -362,14 +364,20 @@ public class CompletionProposalPopup implements IContentAssistListener
 		Control control = fContentAssistSubjectControlAdapter.getControl();
 		if (Helper.okToUse(fProposalShell))
 		{
+			// Custom code to force colors again in case theme changed...
+			// Not sure why we don't set background for all WS here
+			if (!"carbon".equals(SWT.getPlatform())) //$NON-NLS-1$
+			{
+				fProposalShell.setBackground(getForegroundColor(control));
+			}
+			
 			Color c= getBackgroundColor(control);
 			fProposalTable.setBackground(c);
 
 			c= getForegroundColor(control);
 			fProposalTable.setForeground(c);
 			return;
-		}
-		
+		}		
 		
 		fProposalShell= new Shell(control.getShell(), SWT.ON_TOP | SWT.RESIZE );
 		fProposalShell.setFont(JFaceResources.getDefaultFont());
@@ -402,7 +410,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 			// fUserAgents = 0;
 			fUserAgents = 5; // TEMP: hard-coding for testing purposes
 		}
-
+		// Here we add custom columns
 		TableColumn initialInfo = new TableColumn(fProposalTable, SWT.LEFT);
 		initialInfo.setWidth(16);
 
@@ -414,6 +422,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 
 		TableColumn locationInfo = new TableColumn(fProposalTable, SWT.LEFT);
 		locationInfo.setWidth(16);
+		// end custom columns
 
 		fProposalTable.setLocation(0, 0);
 		if (fAdditionalInfoController != null)
@@ -421,13 +430,14 @@ public class CompletionProposalPopup implements IContentAssistListener
 			fAdditionalInfoController.setSizeConstraints(40, 10, true, false);
 		}
 
+		// Custom code: We set margins to 1 so we get a border
 		GridLayout layout = new GridLayout();
 		layout.marginWidth = 1;
 		layout.marginHeight = 1;
 		fProposalShell.setLayout(layout);
 
 		GridData data = new GridData(GridData.FILL_BOTH);
-
+		
 		Point size = fContentAssistant.restoreCompletionProposalPopupSize();
 		if (size != null)
 		{
@@ -460,13 +470,15 @@ public class CompletionProposalPopup implements IContentAssistListener
 				{
 					// reset the cached resize constraints
 					fAdditionalInfoController.setSizeConstraints(40, 10, true, false);
+					fAdditionalInfoController.hideInformationControl();
+					fAdditionalInfoController.handleTableSelectionChanged();
 				}
 
 				fSize = fProposalShell.getSize();
 			}
 		});
 
-		// Not sure why we don't set background for all WS here
+		// Custom code: not sure why we don't set background for all WS here
 		if (!"carbon".equals(SWT.getPlatform())) //$NON-NLS-1$
 		{
 			fProposalShell.setBackground(getForegroundColor(control));
@@ -529,13 +541,18 @@ public class CompletionProposalPopup implements IContentAssistListener
 		 * (event.getProperty().equals(IPreferenceConstants.USER_AGENT_PREFERENCE)) { if
 		 * (Helper.okToUse(fProposalShell)) { fProposalShell.dispose(); } else { // shell already disposed so remove
 		 * this listener if (store != null) { store.removePropertyChangeListener(this); } } } } };
-		 * store.addPropertyChangeListener(propListener); fProposalShell.addDisposeListener(new DisposeListener() {
-		 * public void widgetDisposed(DisposeEvent e) { if (store != null && propListener != null) {
-		 * store.removePropertyChangeListener(propListener); } unregister(); // but don't dispose the shell, since we're
-		 * being called from its // disposal event! } });
+		 * store.addPropertyChangeListener(propListener);
 		 */
+		
+		fProposalShell.addDisposeListener(new DisposeListener() {
+			public void widgetDisposed(DisposeEvent e) {
+				unregister(); // but don't dispose the shell, since we're being called from its disposal event!
+			}
+		});
 
 		fProposalTable.setHeaderVisible(false);
+		
+//		addCommandSupport(fProposalTable);
 	}
 	
 	/**
@@ -985,7 +1002,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 				}
 			}
 
-			forceResize(longestString, longestLoc);
+			forceResize(longestString, longestLoc, newLen);
 			modifySelection(defaultIndex, suggestedIndex);
 		}
 	}
@@ -1021,7 +1038,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 	 * @param longestString
 	 * @param longestLoc
 	 */
-	private void forceResize(String longestString, String longestLoc)
+	private void forceResize(String longestString, String longestLoc, int itemCount)
 	{
 		// FIXME Wow is this ugly code! Can't we just pack the text columns? Do we need to do GC ops?		
 		String measureString = "MMMM" + longestString + "MMM"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -1065,7 +1082,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 			if (System.getProperty("os.name").startsWith("Mac OS")) //$NON-NLS-1$ //$NON-NLS-2$
 			{
 				width = width + fUserAgents * (fProposalTable.getColumn(1).getWidth() - 5);
-				width += 18; // HACK to fix width on my machine so we don't need a horizontal scrollbar
+				width += 2;
 			}
 			else
 			{
@@ -1073,8 +1090,11 @@ public class CompletionProposalPopup implements IContentAssistListener
 			}
 		}
 
-		int height = (fProposalTable.getItemHeight() * PROPOSAL_ITEMS_VISIBLE);
-		
+		int height = (fProposalTable.getItemHeight() * Math.min(itemCount, PROPOSAL_ITEMS_VISIBLE));
+		if (itemCount > PROPOSAL_ITEMS_VISIBLE)
+		{
+			width += 15; // HACK to fix width on my machine so we don't need a horizontal scrollbar
+		}
 		GridData data = new GridData(GridData.FILL_BOTH);
 		data.heightHint = height;
 		data.widthHint = width;
