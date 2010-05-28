@@ -2,6 +2,8 @@ package com.aptana.parsing.lexer;
 
 public class Range implements IRange
 {
+	public static final Range EMPTY = new Range(0, -1);
+	
 	private int fStart;
 	private int fEnd;
 
@@ -80,5 +82,25 @@ public class Range implements IRange
 	public int hashCode()
 	{
 		return 31 * getStartingOffset() + getLength();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.lexer.IRange#isEmpty()
+	 */
+	@Override
+	public boolean isEmpty()
+	{
+		return fEnd < fStart;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString()
+	{
+		return "[" + fStart + "," + fEnd + "]";
 	}
 }
