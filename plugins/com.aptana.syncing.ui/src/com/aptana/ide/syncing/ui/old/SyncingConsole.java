@@ -42,6 +42,7 @@ import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 
 /**
@@ -118,8 +119,7 @@ public class SyncingConsole extends MessageConsole
 		}
 		catch (Exception e)
 		{
-			// IdeLog.logError(CoreUIPlugin.getDefault(),
-			// StringUtil.format(Messages.SyncingConsole_UnableToWriteToConsole, message), e);
+			SyncingUIPlugin.logError(StringUtil.format(Messages.SyncingConsole_UnableToWriteToConsole, message), e);
 		}
 	}
 

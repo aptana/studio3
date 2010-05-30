@@ -13,6 +13,9 @@ public class AllTests
 		suite.addTestSuite(LocalSyncingTests.class);
 		suite.addTestSuite(FTPSyncingTests.class);
 		suite.addTestSuite(SFTPSyncingTests.class);
+		suite.addTestSuite(LocalLargeSampleSyncingTests.class);
+		suite.addTestSuite(FTPLargeSampleSyncingTests.class);
+
 		// $JUnit-END$
 		return suite;
 	}

@@ -214,31 +214,16 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 			{
 				SyncingConsole.println(message);
 			}
-			
-			public void logWarning(String message)
-			{
-				SyncingConsole.println(message);
-			}
-			
+						
 			public void logInfo(String message, Throwable th)
 			{
 				SyncingConsole.println(message);
 			}
-			
-			public void logInfo(String message)
-			{
-				SyncingConsole.println(message);
-			}
-			
+						
 			public void logError(String message, Throwable th)
 			{
 				SyncingConsole.println(message);
-			}
-			
-			public void logError(String message)
-			{
-				SyncingConsole.println(message);
-			}
+			}			
 		});
 	}
 

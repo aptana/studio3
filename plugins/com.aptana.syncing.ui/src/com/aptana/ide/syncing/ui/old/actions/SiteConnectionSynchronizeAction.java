@@ -35,7 +35,9 @@
 
 package com.aptana.ide.syncing.ui.old.actions;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -68,7 +70,7 @@ public class SiteConnectionSynchronizeAction implements IObjectActionDelegate
 
     public void run(IAction action) {
 		SiteConnection cp = (SiteConnection) fConnection;
-		IConnectionPoint source = cp.getSource();
+		final IConnectionPoint source = cp.getSource();
 		IConnectionPoint dest = cp.getDestination();
 		SmartSyncDialog dialog;
 		try
@@ -80,7 +82,17 @@ public class SiteConnectionSynchronizeAction implements IObjectActionDelegate
 			{
 				public void syncDone(VirtualFileSyncPair item)
 				{
-					// refresh();
+					Object file = source.getAdapter(IResource.class);
+					if (file != null && file instanceof IResource)
+					{
+						try
+						{
+							((IResource) file).refreshLocal(IResource.DEPTH_INFINITE, null);
+						}
+						catch (CoreException e)
+						{
+						}
+					}
 				}
 			});
 		}

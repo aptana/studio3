@@ -66,6 +66,7 @@ import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
 /**
  * @author Kevin Lindsey
  */
+@SuppressWarnings("restriction")
 public abstract class SyncingTests extends TestCase
 {
 	protected IFileStore clientDirectory;
@@ -310,11 +311,10 @@ public abstract class SyncingTests extends TestCase
 	 * @param modificationTime
 	 * @return File
 	 */
-	@SuppressWarnings("restriction")
 	protected File createDirectory(String path, long modificationTime)
 	{
 		File file = new File(path);
-		file.mkdir();
+		file.mkdirs();
 		file.setLastModified(modificationTime);
 
 		LocalFile fs = new LocalFile(file);
@@ -494,34 +494,17 @@ public abstract class SyncingTests extends TestCase
 				// TODO Auto-generated method stub
 				
 			}
-			
-			public void logWarning(String message)
-			{
-				// TODO Auto-generated method stub
-				
-			}
-			
+						
 			public void logInfo(String message, Throwable th)
 			{
 				System.out.print(message);
 			}
-			
-			public void logInfo(String message)
-			{
-				System.out.print(message);
-			}
-			
+						
 			public void logError(String message, Throwable th)
 			{
 				// TODO Auto-generated method stub
 				
-			}
-			
-			public void logError(String message)
-			{
-				// TODO Auto-generated method stub
-				
-			}
+			}		
 		});
 		
 		return syncManager.getSyncItems(clientManager, serverManager, clientRoot, serverRoot, null);

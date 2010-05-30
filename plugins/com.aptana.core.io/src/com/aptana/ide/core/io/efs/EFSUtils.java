@@ -119,7 +119,7 @@ public final class EFSUtils {
 	 * @throws CoreException
 	 */
 	public static IFileStore[] getFiles(IFileStore file, boolean recurse, boolean includeCloakedFiles) throws CoreException {
-		return file.childStores(EFS.NONE, null);
+		return getFiles(file, recurse, includeCloakedFiles, null);
 	}
 
 	/**
@@ -287,7 +287,7 @@ public final class EFSUtils {
 	 * @return
 	 */
 	public static IFileStore getParentFile(IFileStore file) {
-		return (IFileStore)file.getParent();
+		return file.getParent();
 	}
 	
 	

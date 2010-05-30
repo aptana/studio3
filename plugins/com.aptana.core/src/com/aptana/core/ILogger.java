@@ -39,28 +39,6 @@ package com.aptana.core;
  */
 public interface ILogger
 {
-
-	/**
-	 * Logs an error message
-	 * 
-	 * @param message
-	 */
-	void logError(String message);
-
-	/**
-	 * Logs an info message
-	 * 
-	 * @param message
-	 */
-	void logInfo(String message);
-
-	/**
-	 * Logs a warning message
-	 * 
-	 * @param message
-	 */
-	void logWarning(String message);
-
 	/**
 	 * Logs an error message with a throwable object
 	 * 

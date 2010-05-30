@@ -107,7 +107,7 @@ public class ConnectionPointSyncPair
 	/**
 	 * getServerFileManager
 	 * 
-	 * @return IVirtualFileManager
+	 * @return IConnectionPoint
 	 */
 	public IConnectionPoint getDestinationFileManager()
 	{

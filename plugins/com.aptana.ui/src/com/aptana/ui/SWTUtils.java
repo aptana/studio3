@@ -23,9 +23,9 @@ public class SWTUtils
 {
 
 	private static final String SMALL_FONT = "com.aptana.ui.small_font"; //$NON-NLS-1$
-
 	private static Color errorColor;
-
+	private static ModifyListener modifyListener;
+	
 	static
 	{
 		ColorRegistry cm = JFaceResources.getColorRegistry();
@@ -204,23 +204,25 @@ public class SWTUtils
 		if (widget.getText() == null || "".equals(widget.getText())) //$NON-NLS-1$
 		{
 			widget.setBackground(errorColor);
-			final ModifyListener ml = new ModifyListener()
-			{
-				@Override
-				public void modifyText(ModifyEvent e)
+			if(modifyListener == null) {
+				modifyListener = new ModifyListener()
 				{
-					Text t = (Text) e.widget;
-					if (t.getText() != null && !"".equals(t.getText())) //$NON-NLS-1$
+					@Override
+					public void modifyText(ModifyEvent e)
 					{
-						t.setBackground(null);
+						Text t = (Text) e.widget;
+						if (t.getText() != null && !"".equals(t.getText())) //$NON-NLS-1$
+						{
+							t.setBackground(null);
+						}
+						else
+						{
+							t.setBackground(errorColor);
+						}
 					}
-					else
-					{
-						t.setBackground(errorColor);
-					}
-				}
-			};
-			widget.addModifyListener(ml);
+				};
+				widget.addModifyListener(modifyListener);
+			}
 			return false;
 		}
 		return true;

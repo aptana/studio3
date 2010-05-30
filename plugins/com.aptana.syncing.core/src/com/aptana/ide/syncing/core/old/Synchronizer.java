@@ -74,6 +74,7 @@ public class Synchronizer implements ILoggable
 	private static final int DEFAULT_TIME_TOLERANCE = 1000;
 
 	private boolean _useCRC;
+	private boolean _includeCloakedFiles = false;
 	private long _timeTolerance;
 
 	private int _clientDirectoryCreatedCount;
@@ -100,7 +101,7 @@ public class Synchronizer implements ILoggable
 	 */
 	public Synchronizer()
 	{
-		this(false, DEFAULT_TIME_TOLERANCE);
+		this(false, DEFAULT_TIME_TOLERANCE, false);
 	}
 
 	/**
@@ -115,6 +116,23 @@ public class Synchronizer implements ILoggable
 	 */
 	public Synchronizer(boolean calculateCrc, int timeTolerance)
 	{
+		this(calculateCrc, timeTolerance, false);
+	}
+
+	/**
+	 * Constructs a Synchronizer with specified CRC flag and tolerance time.
+	 * 
+	 * @param calculateCrc
+	 *            A flag indicating whether two files should be compared by their CRC when their modification times
+	 *            match
+	 * @param timeTolerance
+	 *            The number of milleseconds a client and server file can differ in their modification times to still be
+	 *            considered equal
+	 * @param includeCloakedFiles
+	 * 			  Do we synchronize files marked as cloaked?
+	 */
+	public Synchronizer(boolean calculateCrc, int timeTolerance, boolean includeCloakedFiles)
+	{
 		if (timeTolerance < 0)
 		{
 			// makes sure time is positive
@@ -122,6 +140,7 @@ public class Synchronizer implements ILoggable
 		}
 
 		this._useCRC = calculateCrc;
+		this._includeCloakedFiles = includeCloakedFiles;
 		this._timeTolerance = timeTolerance;
 		_newFilesDownloaded = new ArrayList<IFileStore>();
 		_newFilesUploaded = new ArrayList<IFileStore>();
@@ -137,7 +156,7 @@ public class Synchronizer implements ILoggable
 	{
 		if (this.logger != null)
 		{
-			this.logger.logInfo(message);
+			this.logger.logInfo(message, null);
 		}
 	}
 
@@ -345,10 +364,10 @@ public class Synchronizer implements ILoggable
 			{
 				// get the complete file listings for the client and server
 				log(FileUtil.NEW_LINE + "Gathering list of source files from '" + client.toURI().toString() + "'. ");
-				clientFiles = EFSUtils.getFiles(client, true, false, monitor);
+				clientFiles = EFSUtils.getFiles(client, true, _includeCloakedFiles, monitor);
 				log("Completed.");
 				log(FileUtil.NEW_LINE + "Gathering list of destination files from '" + server.toURI().toString() + "'. ");
-				serverFiles = EFSUtils.getFiles(server, true, false, monitor);
+				serverFiles = EFSUtils.getFiles(server, true, _includeCloakedFiles, monitor);
 				log("Completed.");
 				log(FileUtil.NEW_LINE + "File listing complete.");
 			}
@@ -410,7 +429,7 @@ public class Synchronizer implements ILoggable
 			IFileStore serverFile = serverFiles[i];
 			String relativePath = getCanonicalPath(_serverFileRoot, serverFile);
 
-			logDebug(FileUtil.NEW_LINE + "Comparing " + relativePath + " with file from destination. ");
+			logDebug(FileUtil.NEW_LINE + "Comparing '" + relativePath + "' with file from destination. ");
 
 			if (!fileList.containsKey(relativePath)) // Server only
 			{
@@ -1288,7 +1307,7 @@ public class Synchronizer implements ILoggable
 					{
 						// Need to query if directory first because deletion makes isDirectory always return false.
 						boolean wasDirectory = serverFile.fetchInfo().isDirectory();
-						serverFile.delete(EFS.NONE, null); // server.deleteFile(serverFile);
+						serverFile.delete(EFS.NONE, monitor); // server.deleteFile(serverFile);
 						if (wasDirectory)
 						{
 							this._serverDirectoryDeletedCount++;
@@ -1314,8 +1333,13 @@ public class Synchronizer implements ILoggable
 						}
 						catch (CoreException e)
 						{
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							logError(e);
+
+							if (!syncError(item, e))
+							{
+								result = false;
+								break FILE_LOOP;
+							}
 						}
 
 						logSuccess();

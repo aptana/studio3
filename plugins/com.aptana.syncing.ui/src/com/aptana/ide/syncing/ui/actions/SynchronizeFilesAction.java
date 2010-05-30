@@ -34,6 +34,7 @@
  */
 package com.aptana.ide.syncing.ui.actions;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.swt.SWT;
@@ -71,7 +72,19 @@ public class SynchronizeFilesAction extends BaseSyncAction
 					{
 						public void syncDone(VirtualFileSyncPair item)
 						{
-							// refresh();
+							for (IAdaptable file : files)
+							{
+								if (file instanceof IResource)
+								{
+									try
+									{
+										((IResource) file).refreshLocal(IResource.DEPTH_INFINITE, null);
+									}
+									catch (CoreException e)
+									{
+									}
+								}
+							}
 						}
 					});
 				}
