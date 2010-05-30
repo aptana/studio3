@@ -338,7 +338,12 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	{
 		setPreferenceStore(new ChainedPreferenceStore(new IPreferenceStore[] {
 				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() }));
-		fFileService = new FileService();
+		fFileService = createFileService();
+	}
+
+	protected FileService createFileService()
+	{
+		return new FileService(null);
 	}
 
 	@Override

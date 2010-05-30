@@ -46,5 +46,12 @@
             priority="normal">
       </content-type>
    </extension>
+   <extension
+         point="com.aptana.parsing.parser">
+      <parser
+            class="com.aptana.editor.erb.html.parsing.RHTMLParser"
+            language="text/erb">
+      </parser>
+   </extension>
 
 </plugin>

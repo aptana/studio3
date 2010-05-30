@@ -1446,7 +1446,6 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 		{
 			syncViewer.refreshAndExpandTo(2);
 		}
-		updateStatLabels();
 	}
 
 	/**

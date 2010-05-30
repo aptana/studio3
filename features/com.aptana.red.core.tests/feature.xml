@@ -79,7 +79,7 @@
       <import plugin="org.eclipse.core.expressions" version="3.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.search" version="3.2.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.terminal" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.tm.terminal" version="3.0.100" match="greaterOrEqual"/>
+      <import plugin="com.aptana.org.eclipse.tm.terminal" version="3.0.100" match="greaterOrEqual"/>
    </requires>
 
    <plugin

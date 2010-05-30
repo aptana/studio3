@@ -41,6 +41,8 @@ import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.io.tests.CommonConnectionTest;
 import com.aptana.filesystem.ftp.FTPConnectionPoint;
+import com.aptana.ide.core.io.ConnectionContext;
+import com.aptana.ide.core.io.CoreIOPlugin;
 
 /**
  * @author Max Stepanov
@@ -55,6 +57,11 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 		ftpcp.setLogin(getConfig().getProperty("ftp.username", "ftpuser")); //$NON-NLS-1$ //$NON-NLS-2$
 		ftpcp.setPassword(getConfig().getProperty("ftp.password",	//$NON-NLS-1$
 				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'})).toCharArray());
+		
+		ConnectionContext context = new ConnectionContext();
+		context.put(ConnectionContext.COMMAND_LOG, System.out);
+		CoreIOPlugin.setConnectionContext(ftpcp, context);
+
 		return ftpcp;
 	}
 
@@ -108,7 +115,7 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 	@Override
 	protected boolean supportsSetModificationTime()
 	{
-		return false;
+		return true;
 	}
 
 
@@ -129,6 +136,6 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 	@Override
 	protected boolean supportsChangePermissions()
 	{
-		return false;
+		return true;
 	}
 }

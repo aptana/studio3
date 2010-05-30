@@ -207,7 +207,6 @@ public class SWTUtils
 			if(modifyListener == null) {
 				modifyListener = new ModifyListener()
 				{
-					@Override
 					public void modifyText(ModifyEvent e)
 					{
 						Text t = (Text) e.widget;
@@ -219,7 +218,7 @@ public class SWTUtils
 						{
 							t.setBackground(errorColor);
 						}
-					}
+					};
 				};
 				widget.addModifyListener(modifyListener);
 			}

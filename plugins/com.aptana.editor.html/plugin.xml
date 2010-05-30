@@ -56,4 +56,11 @@
             class="com.aptana.editor.html.contentassist.index.HTMLFileIndexingParticipant">
       </fileIndexingParticipant>
    </extension>
+   <extension
+         point="com.aptana.parsing.parser">
+      <parser
+            class="com.aptana.editor.html.parsing.HTMLParser"
+            language="text/html">
+      </parser>
+   </extension>
 </plugin>

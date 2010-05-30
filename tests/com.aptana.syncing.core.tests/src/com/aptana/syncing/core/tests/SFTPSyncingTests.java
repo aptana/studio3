@@ -5,6 +5,8 @@ import java.io.File;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.filesystem.secureftp.SFTPConnectionPoint;
+import com.aptana.ide.core.io.ConnectionContext;
+import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.LocalConnectionPoint;
 
 public class SFTPSyncingTests extends SyncingTests
@@ -30,6 +32,10 @@ public class SFTPSyncingTests extends SyncingTests
 		ftpcp.setPort(Integer.valueOf(getConfig().getProperty("sftp.port", "22"))); //$NON-NLS-1$ //$NON-NLS-2$
 		ftpcp.setPath(Path.fromPortableString(getConfig().getProperty("sftp.path","/home/ftpuser"))); //$NON-NLS-1$ //$NON-NLS-2$
 		serverManager = ftpcp;
+
+		ConnectionContext context = new ConnectionContext();
+		context.put(ConnectionContext.COMMAND_LOG, System.out);
+		CoreIOPlugin.setConnectionContext(ftpcp, context);
 
 		super.setUp();
 	}

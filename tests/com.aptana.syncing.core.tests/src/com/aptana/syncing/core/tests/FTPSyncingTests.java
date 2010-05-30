@@ -5,6 +5,8 @@ import java.io.File;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.filesystem.ftp.FTPConnectionPoint;
+import com.aptana.ide.core.io.ConnectionContext;
+import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.LocalConnectionPoint;
 
 public class FTPSyncingTests extends SyncingTests
@@ -29,7 +31,11 @@ public class FTPSyncingTests extends SyncingTests
 				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'})).toCharArray());
 		serverManager = ftpcp;
 
-		super.setUp();		
+		ConnectionContext context = new ConnectionContext();
+		context.put(ConnectionContext.COMMAND_LOG, System.out);
+		CoreIOPlugin.setConnectionContext(ftpcp, context);
+
+		super.setUp();
 	}
 
 	@Override

@@ -10,6 +10,9 @@ public class Messages extends NLS
 	public static String DialogUtils_HideMessage;
 	public static String UIUtils_Error;
 
+    public static String IDialogConstants_LBL_Apply;
+    public static String IDialogConstants_LBL_Browse;
+
 	static
 	{
 		// initialize resource bundle

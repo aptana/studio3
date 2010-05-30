@@ -76,7 +76,6 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.DefaultSiteConnection;
 import com.aptana.ide.syncing.core.ISiteConnection;
-import com.aptana.ide.syncing.core.SiteConnection;
 import com.aptana.ide.syncing.core.SyncingPlugin;
 import com.aptana.ide.syncing.core.events.ISiteConnectionListener;
 import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
@@ -416,16 +415,16 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
         }
 
         String name = dialog.getValue();
-        SiteConnection newSite = null;
+        ISiteConnection newSite = null;
         if (fSelectedSite != null) {
         	try {
-				newSite = (SiteConnection) SyncingPlugin.getSiteConnectionManager().cloneSiteConnection(fSelectedSite);
+				newSite = SyncingPlugin.getSiteConnectionManager().cloneSiteConnection(fSelectedSite);
 			} catch (CoreException e) {
 				UIUtils.showErrorMessage(Messages.FTPManagerComposite_ERR_CreateNewSiteFailed, e);
 				return;
 			}
         } else {
-        	newSite = (SiteConnection) SyncingPlugin.getSiteConnectionManager().createSiteConnection();
+        	newSite = SyncingPlugin.getSiteConnectionManager().createSiteConnection();
         }
         newSite.setName(name);
         SyncingPlugin.getSiteConnectionManager().addSiteConnection(newSite);

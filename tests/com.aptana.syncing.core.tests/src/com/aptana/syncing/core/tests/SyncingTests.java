@@ -47,8 +47,6 @@ import junit.framework.TestCase;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.filesystem.provider.FileInfo;
-import org.eclipse.core.internal.filesystem.local.LocalFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 
@@ -58,7 +56,6 @@ import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.efs.EFSUtils;
-import com.aptana.ide.core.io.vfs.IExtendedFileStore;
 import com.aptana.ide.syncing.core.old.SyncState;
 import com.aptana.ide.syncing.core.old.Synchronizer;
 import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
@@ -77,8 +74,6 @@ public abstract class SyncingTests extends TestCase
 
 	private static Properties cachedProperties;
 
-	private int timeTolerance = 0;
-	
 	protected static final Properties getConfig() {
 		if (cachedProperties == null) {
 			cachedProperties = new Properties();
@@ -102,9 +97,6 @@ public abstract class SyncingTests extends TestCase
 		context.put(ConnectionContext.COMMAND_LOG, System.out);
 		CoreIOPlugin.setConnectionContext(clientManager, context);
 
-		context.put(ConnectionContext.COMMAND_LOG, System.out);
-		CoreIOPlugin.setConnectionContext(serverManager, context);
-
 		clientDirectory = clientManager.getRoot().getFileStore(new Path("/client" + System.currentTimeMillis()));
 		assertNotNull(clientDirectory);
 		clientDirectory.mkdir(EFS.NONE, null);
@@ -117,12 +109,6 @@ public abstract class SyncingTests extends TestCase
 		serverDirectory = serverManager.getRoot().getFileStore(new Path("/server" + System.currentTimeMillis()));
 		assertNotNull(serverDirectory);
 		serverDirectory.mkdir(EFS.NONE, null);
-
-//		long serverFileTime = serverDirectory.fetchInfo(IExtendedFileStore.DETAILED, null).getLastModified();
-//		long clientFileTime = clientDirectory.fetchInfo(IExtendedFileStore.DETAILED, null).getLastModified();
-//		timeTolerance = (int)(serverFileTime - clientFileTime);
-//
-//		System.out.print(FileUtil.NEW_LINE + "Time difference: " + timeTolerance + FileUtil.NEW_LINE);
 
 		// if(!(serverManager instanceof LocalConnectionPoint)) {
 		// serverManager.disconnect(null);
@@ -273,12 +259,10 @@ public abstract class SyncingTests extends TestCase
 		IFileStore fs = clientDirectory.getFileStore(new Path(path));
 		fs.mkdir(0, null);
 
-		IFileInfo fi = new FileInfo();
+		IFileInfo fi = fs.fetchInfo();
 		fi.setLastModified(modificationTime);
 		fs.putInfo(fi, EFS.SET_LAST_MODIFIED, null);
 
-		assertModificationTimesEqual(fs, modificationTime);
-		
 		return fs;
 	}
 
@@ -295,11 +279,9 @@ public abstract class SyncingTests extends TestCase
 		IFileStore fs = serverDirectory.getFileStore(new Path(path));
 		fs.mkdir(0, null);
 
-		IFileInfo fi = new FileInfo();
+		IFileInfo fi = fs.fetchInfo();
 		fi.setLastModified(modificationTime);
 		fs.putInfo(fi, EFS.SET_LAST_MODIFIED, null);
-
-		assertModificationTimesEqual(fs, modificationTime);
 
 		return fs;
 	}
@@ -316,9 +298,6 @@ public abstract class SyncingTests extends TestCase
 		File file = new File(path);
 		file.mkdirs();
 		file.setLastModified(modificationTime);
-
-		LocalFile fs = new LocalFile(file);
-		assertModificationTimesEqual(fs, modificationTime);
 
 		return file;
 	}
@@ -416,33 +395,19 @@ public abstract class SyncingTests extends TestCase
 			w.write("");
 		}
 		w.close();
+		
+		IFileInfo fi = fs.fetchInfo();
 
-		IFileInfo fi = new FileInfo();
+		//System.out.print("Created: " + fs.fetchInfo(IExtendedFileStore.DETAILED, null).getLastModified() + ". ");
+
 		fi.setLastModified(modificationTime);
 		fs.putInfo(fi, EFS.SET_LAST_MODIFIED, null);
 
-		assertModificationTimesEqual(fs, modificationTime);
-		
+		//System.out.print("Modified: " + fs.fetchInfo(IExtendedFileStore.DETAILED, null).getLastModified() + "\n");
+
 		return fs;
 	}
 
-	private void assertModificationTimesEqual(IFileStore fs, long modificationTime) {
-
-		long modTime = modificationTime;
-		//modTime -= modTime % 1000; // Remove milliseconds
-		long newModTime;
-		try {
-			newModTime = fs.fetchInfo(IExtendedFileStore.DETAILED, null).getLastModified();
-			//newModTime -= newModTime % 1000;
-			int diff = Math.abs((int)(modTime - newModTime));
-			if(diff > 60000) {
-				assertEquals("Modification time not correctly set on file '" + fs.toURI().toString() + "'. Remote file off by " + diff/1000 + " seconds.", modTime, newModTime);
-			}
-		} catch (CoreException e) {
-			fail("Unable to retreive modification time for file '" + fs.toURI().toString() + "'");
-		}
-	}
-	
 	/**
 	 * getSyncItems
 	 * 
@@ -452,7 +417,7 @@ public abstract class SyncingTests extends TestCase
 	 */
 	protected VirtualFileSyncPair[] getSyncItems() throws IOException, CoreException
 	{
-		return this.getSyncItems(false, timeTolerance);
+		return this.getSyncItems(false, 0);
 	}
 
 	/**
@@ -578,13 +543,13 @@ public abstract class SyncingTests extends TestCase
 		long currentTime = new Date().getTime();
 		String directoryName = "test"; //$NON-NLS-1$
 		this.createClientDirectory(directoryName, currentTime);
-		this.createServerDirectory(directoryName, currentTime - 120000);
+		this.createServerDirectory(directoryName, currentTime - 1000);
 
 		VirtualFileSyncPair[] items = this.getSyncItems();
 
 		// we now delete remote directories
 		assertEquals(0, items.length);
-		//assertEquals(SyncState.ClientItemIsNewer, items[0].getSyncState());
+		// assertEquals(SyncState.ClientItemIsNewer, items[0].getSyncState());
 	}
 
 	/**

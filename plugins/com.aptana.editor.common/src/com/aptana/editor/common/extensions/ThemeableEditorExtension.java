@@ -174,7 +174,7 @@ public class ThemeableEditorExtension {
 			return;
 		}
 		ISourceViewer sourceViewer = editor.getISourceViewer();
-		if (sourceViewer.getTextWidget() == null)
+		if (sourceViewer == null || sourceViewer.getTextWidget() == null)
 		{
 			return;
 		}

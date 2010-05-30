@@ -104,7 +104,7 @@
       </page>
    </extension>
    <extension
-         point="org.eclipse.tm.terminal.terminalConnectors">
+         point="com.aptana.org.eclipse.tm.terminal.terminalConnectors">
       <connector
             class="com.aptana.terminal.connector.LocalTerminalConnector"
             hidden="false"

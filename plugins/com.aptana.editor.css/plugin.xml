@@ -38,5 +38,12 @@
             class="com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant">
       </fileIndexingParticipant>
    </extension>
+   <extension
+         point="com.aptana.parsing.parser">
+      <parser
+            class="com.aptana.editor.css.parsing.CSSParser"
+            language="text/css">
+      </parser>
+   </extension>
 
 </plugin>

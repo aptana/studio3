@@ -3,14 +3,14 @@ package com.aptana.core.io.tests;
 import java.io.File;
 import java.io.IOException;
 
-import junit.framework.TestCase;
-
-import org.eclipse.core.internal.filesystem.local.LocalFile;
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.ide.core.io.LocalConnectionPoint;
 import com.aptana.ide.core.io.efs.EFSUtils;
+
+import junit.framework.TestCase;
 
 public class EFSUtilsTest extends TestCase {
 
@@ -60,6 +60,6 @@ public class EFSUtilsTest extends TestCase {
 
 	public void testGetRelativePath() throws IOException, CoreException {
 		File f = File.createTempFile("test", "txt");
-		assertEquals("/" + f.getName(), EFSUtils.getRelativePath(new LocalFile(f.getParentFile()), new LocalFile(f)));
+		assertEquals("/" + f.getName(), EFSUtils.getRelativePath(EFS.getLocalFileSystem().fromLocalFile(f.getParentFile()), EFS.getLocalFileSystem().fromLocalFile(f)));
 	}
 }

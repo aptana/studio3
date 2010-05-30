@@ -12,15 +12,15 @@ public class AllTests
 	{
 		TestSuite suite;
 		// Run in parallel locally, not on unit test build...
-		String user = System.getenv("USER");
-		if (user != null && user.equals("hudson"))
-		{
-			suite = new TestSuite(AllTests.class.getName());
-		}
-		else
-		{
+//		String user = System.getenv("USER");
+//		if (user != null && user.equals("hudson"))
+//		{
+//			suite = new TestSuite(AllTests.class.getName());
+//		}
+//		else
+//		{
 			suite = new ParallelTestSuite(AllTests.class.getName(), 2);
-		}
+//		}
 		// $JUnit-BEGIN$
 		suite.addTestSuite(FTPConnectionTest.class);
 		suite.addTestSuite(FTPConnectionWithBasePathTest.class);

@@ -5,11 +5,17 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -26,6 +32,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.UIJob;
 
 public class MenuDialog extends PopupDialog
 {
@@ -72,7 +79,7 @@ public class MenuDialog extends PopupDialog
 		}
 		return composite;
 	}
-	
+
 	@Override
 	protected Point getInitialLocation(Point initialSize)
 	{
@@ -83,7 +90,7 @@ public class MenuDialog extends PopupDialog
 		}
 		return super.getInitialLocation(initialSize);
 	}
-	
+
 	protected Color getBackground()
 	{
 		return getShell().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
@@ -117,13 +124,12 @@ public class MenuDialog extends PopupDialog
 	 */
 	private final void createTableDialogArea(final Composite parent, final List<Map<String, Object>> partialMatches)
 	{
-		// TODO Need to add accelerator 0-9 keys like Textmate does and our own keybinding hook does!
 		// Layout the table.
 		completionsTable = new Table(parent, SWT.FULL_SELECTION | SWT.SINGLE);
 		final GridData gridData = new GridData(GridData.FILL_BOTH);
 		completionsTable.setLayoutData(gridData);
 		completionsTable.setBackground(parent.getBackground());
-		completionsTable.setLinesVisible(true);
+		completionsTable.setLinesVisible(false);
 
 		List<TableColumn> columns = new ArrayList<TableColumn>();
 
@@ -142,13 +148,13 @@ public class MenuDialog extends PopupDialog
 				index++;
 				if (map.containsKey(SEPARATOR))
 				{
-					// TODO Insert a separator
+					insertSeparator(2);
 					continue;
 				}
 				String title = (String) map.get(TITLE);
 				if (title.trim().equals("---")) //$NON-NLS-1$
 				{
-					// TODO Insert a separator
+					insertSeparator(2);
 					continue;
 				}
 				final TableItem item = new TableItem(completionsTable, SWT.NULL);
@@ -169,7 +175,7 @@ public class MenuDialog extends PopupDialog
 				index++;
 				if (map.containsKey(SEPARATOR))
 				{
-					// TODO Insert a separator
+					insertSeparator(3);
 					continue;
 				}
 				final TableItem item = new TableItem(completionsTable, SWT.NULL);
@@ -260,13 +266,108 @@ public class MenuDialog extends PopupDialog
 				}
 			}
 		});
+
+		// Don't ever draw separators as selected!
+		completionsTable.addListener(SWT.EraseItem, new Listener()
+		{
+
+			@Override
+			public void handleEvent(Event event)
+			{
+				if ((event.detail & SWT.SELECTED) != 0)
+				{
+					TableItem item = (TableItem) event.item;
+					if (isSeparator(item))
+					{
+						event.detail &= ~SWT.SELECTED;
+						event.detail &= ~SWT.BACKGROUND;
+					}
+				}
+			}
+		});
+
+		completionsTable.addTraverseListener(new TraverseListener()
+		{
+
+			@Override
+			public void keyTraversed(TraverseEvent e)
+			{
+				int selectionIndex = completionsTable.getSelectionIndex();
+				final int initialIndex = selectionIndex;
+				if (e.detail == SWT.TRAVERSE_ARROW_NEXT)
+				{
+					selectionIndex++;
+					while (isSeparator(completionsTable.getItem(selectionIndex)))
+					{
+						selectionIndex++;
+						if (selectionIndex >= completionsTable.getItemCount())
+							return;
+					}
+					selectionIndex--;
+				}
+				else if (e.detail == SWT.TRAVERSE_ARROW_PREVIOUS)
+				{
+					selectionIndex--;
+					while (isSeparator(completionsTable.getItem(selectionIndex)))
+					{
+						selectionIndex--;
+						if (selectionIndex < 0)
+						{
+							// HACK have to run this in a job for some reason. Just setting selection index doesn't
+							// work.
+							new UIJob("retaining selection") //$NON-NLS-1$
+							{
+
+								@Override
+								public IStatus runInUIThread(IProgressMonitor monitor)
+								{
+									completionsTable.setSelection(initialIndex);
+									return Status.OK_STATUS;
+								}
+							}.schedule();
+							e.doit = false;
+							return;
+						}
+					}
+					selectionIndex++;
+				}
+				else
+				{
+					return;
+				}
+
+				if (selectionIndex < completionsTable.getItemCount() && selectionIndex >= 0)
+				{
+					completionsTable.setSelection(selectionIndex);
+					e.doit = false;
+				}
+			}
+		});
+	}
+
+	protected boolean isSeparator(TableItem item)
+	{
+		// FIXME This isn't the best way to determine if a row is actually a separator
+		return item.getText().equals(""); //$NON-NLS-1$
+	}
+
+	protected void insertSeparator(int columns)
+	{
+		TableItem item = new TableItem(completionsTable, SWT.NULL);
+		for (int i = 0; i < columns; i++)
+		{
+			TableEditor editor = new TableEditor(completionsTable);
+			Label label = new Label(completionsTable, SWT.SEPARATOR | SWT.HORIZONTAL);
+			editor.grabHorizontal = true;
+			editor.setEditor(label, item, i);
+		}
 	}
 
 	protected void select()
 	{
 		int index = completionsTable.getSelectionIndex();
 		TableItem item = completionsTable.getItem(index);
-		int returnCode = (Integer) item.getData("index");  //$NON-NLS-1$
+		int returnCode = (Integer) item.getData("index"); //$NON-NLS-1$
 		setReturnCode(returnCode);
 		close();
 	}
@@ -274,6 +375,7 @@ public class MenuDialog extends PopupDialog
 	@Override
 	public int open()
 	{
+		setReturnCode(-1); // set return code back to -1
 		setBlockOnOpen(true);
 		super.open();
 
@@ -281,6 +383,13 @@ public class MenuDialog extends PopupDialog
 		runEventLoop(getShell());
 
 		return getReturnCode();
+	}
+
+	@Override
+	protected void handleShellCloseEvent()
+	{
+		super.handleShellCloseEvent();
+		setReturnCode(-1);
 	}
 
 	/**
