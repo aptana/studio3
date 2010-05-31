@@ -135,19 +135,6 @@ public final class EFSUtils {
 
 	/**
 	 * Returns the parent file of this file
-	 * @param file
-	 * @return
-	 */
-	public static String getPath(IFileStore file) {
-		// need to strip scheme (i.e. file:)
-		URI fileURI = file.toURI();
-		String scheme = fileURI.getScheme();
-		String filename = file.getName();
-		return fileURI.toString().substring(scheme.length() + 1, filename.length());
-	}
-
-	/**
-	 * Returns the parent file of this file
 	 * 
 	 * @param file
 	 * @return
