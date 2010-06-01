@@ -502,7 +502,15 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					{
 						switch (lexeme.getType())
 						{
+							case COMMA:
 							case LPAREN:
+								lexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
+								
+								if (lexeme != null && lexeme.getType() == JSTokenType.IDENTIFIER)
+								{
+									this._currentLexeme = lexeme;
+									result = Location.IN_GLOBAL;
+								}
 								break;
 								
 							case RPAREN:
@@ -534,6 +542,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					}
 					else
 					{
+						this._currentLexeme = null;
 						result = Location.IN_GLOBAL;
 					}
 					break;
