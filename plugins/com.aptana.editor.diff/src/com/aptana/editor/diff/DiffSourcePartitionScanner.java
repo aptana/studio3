@@ -36,10 +36,12 @@ package com.aptana.editor.diff;
 
 import com.aptana.editor.common.text.rules.SourceConfigurationPartitionScanner;
 
-public class DiffSourcePartitionScanner extends SourceConfigurationPartitionScanner {
-	
-	public DiffSourcePartitionScanner() {
+public class DiffSourcePartitionScanner extends SourceConfigurationPartitionScanner
+{
+
+	public DiffSourcePartitionScanner()
+	{
 		super(DiffSourceConfiguration.getDefault());
 	}
-	
+
 }

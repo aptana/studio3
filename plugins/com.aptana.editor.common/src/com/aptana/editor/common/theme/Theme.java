@@ -12,11 +12,11 @@ import java.util.HashMap;
 import java.util.InvalidPropertiesFormatException;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -206,24 +206,29 @@ public class Theme
 			if (tokenType.startsWith(key))
 				return map.get(key);
 		}
-		
-		
-		// Some tokens are special. They have fallbacks even if not in the theme! Looks like bundles can contribute them?
+
+		// Some tokens are special. They have fallbacks even if not in the theme! Looks like bundles can contribute
+		// them?
 		if (tokenType.startsWith("markup.changed")) //$NON-NLS-1$
-			return new TextAttribute(colorManager.getColor(new RGB(255, 255, 255)), colorManager.getColor(new RGB(248, 205, 14)), 0);
-		
+			return new TextAttribute(colorManager.getColor(new RGB(255, 255, 255)), colorManager.getColor(new RGB(248,
+					205, 14)), 0);
+
 		if (tokenType.startsWith("markup.deleted")) //$NON-NLS-1$
-			return new TextAttribute(colorManager.getColor(new RGB(255, 255, 255)), colorManager.getColor(new RGB(255, 86, 77)), 0);
-		
+			return new TextAttribute(colorManager.getColor(new RGB(255, 255, 255)), colorManager.getColor(new RGB(255,
+					86, 77)), 0);
+
 		if (tokenType.startsWith("markup.inserted")) //$NON-NLS-1$
-			return new TextAttribute(colorManager.getColor(new RGB(0, 0, 0)), colorManager.getColor(new RGB(128, 250, 120)), 0);
-		
+			return new TextAttribute(colorManager.getColor(new RGB(0, 0, 0)), colorManager.getColor(new RGB(128, 250,
+					120)), 0);
+
 		if (tokenType.startsWith("meta.diff.index") || tokenType.startsWith("meta.diff.range") || tokenType.startsWith("meta.separator.diff")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			return new TextAttribute(colorManager.getColor(new RGB(255, 255, 255)), colorManager.getColor(new RGB(65, 126, 218)), SWT.ITALIC);
-		
+			return new TextAttribute(colorManager.getColor(new RGB(255, 255, 255)), colorManager.getColor(new RGB(65,
+					126, 218)), SWT.ITALIC);
+
 		if (tokenType.startsWith("meta.diff.header")) //$NON-NLS-1$
-			return new TextAttribute(colorManager.getColor(new RGB(255, 255, 255)), colorManager.getColor(new RGB(103, 154, 233)), 0);
-		
+			return new TextAttribute(colorManager.getColor(new RGB(255, 255, 255)), colorManager.getColor(new RGB(103,
+					154, 233)), 0);
+
 		return new TextAttribute(colorManager.getColor(defaultFG));
 	}
 
@@ -557,7 +562,7 @@ public class Theme
 		TextAttribute attr = getTextAttribute(tokenType);
 		if (attr == null)
 		{
-			return null;			
+			return null;
 		}
 		return attr.getBackground();
 	}

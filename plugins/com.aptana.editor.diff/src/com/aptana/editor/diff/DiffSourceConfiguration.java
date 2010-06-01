@@ -66,6 +66,21 @@ import com.aptana.editor.common.theme.IThemeManager;
 public class DiffSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration
 {
 
+	/**
+	 * Scope names
+	 */
+	private static final String META_SEPARATOR_DIFF = "meta.separator.diff"; //$NON-NLS-1$
+	private static final String META_DIFF_RANGE = "meta.diff.range"; //$NON-NLS-1$
+	private static final String META_DIFF_INDEX = "meta.diff.index"; //$NON-NLS-1$
+	private static final String META_DIFF_HEADER = "meta.diff.header"; //$NON-NLS-1$
+	private static final String MARKUP_DELETED_DIFF = "markup.deleted.diff"; //$NON-NLS-1$
+	private static final String MARKUP_CHANGED_DIFF = "markup.changed.diff"; //$NON-NLS-1$
+	private static final String MARKUP_INSERTED_DIFF = "markup.inserted.diff"; //$NON-NLS-1$
+	private static final String SOURCE_DIFF = "source.diff"; //$NON-NLS-1$
+
+	/**
+	 * Partition names
+	 */
 	public final static String PREFIX = "__diff_"; //$NON-NLS-1$
 	public final static String DEFAULT = PREFIX + IDocument.DEFAULT_CONTENT_TYPE;
 	public final static String INSERTED = PREFIX + "inserted"; //$NON-NLS-1$
@@ -76,10 +91,10 @@ public class DiffSourceConfiguration implements IPartitioningConfiguration, ISou
 	public final static String RANGE = PREFIX + "range"; //$NON-NLS-1$
 	public final static String SEPARATOR = PREFIX + "separator"; //$NON-NLS-1$
 
-	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, INSERTED, CHANGED, DELETED, HEADER, INDEX, RANGE, SEPARATOR };
+	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, INSERTED, CHANGED, DELETED, HEADER, INDEX,
+			RANGE, SEPARATOR };
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IDiffConstants.CONTENT_TYPE_DIFF } };
-
 
 	private IPredicateRule[] partitioningRules;
 
@@ -89,14 +104,14 @@ public class DiffSourceConfiguration implements IPartitioningConfiguration, ISou
 	{
 		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 		c.addTranslation(new QualifiedContentType(IDiffConstants.CONTENT_TYPE_DIFF), new QualifiedContentType(
-				"source.diff")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(INSERTED), new QualifiedContentType("markup.inserted.diff")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(CHANGED), new QualifiedContentType("markup.changed.diff")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(DELETED), new QualifiedContentType("markup.deleted.diff")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(HEADER), new QualifiedContentType("meta.diff.header")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(INDEX), new QualifiedContentType("meta.diff.index")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(RANGE), new QualifiedContentType("meta.diff.range")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(SEPARATOR), new QualifiedContentType("meta.separator.diff")); //$NON-NLS-1$
+				SOURCE_DIFF));
+		c.addTranslation(new QualifiedContentType(INSERTED), new QualifiedContentType(MARKUP_INSERTED_DIFF));
+		c.addTranslation(new QualifiedContentType(CHANGED), new QualifiedContentType(MARKUP_CHANGED_DIFF));
+		c.addTranslation(new QualifiedContentType(DELETED), new QualifiedContentType(MARKUP_DELETED_DIFF));
+		c.addTranslation(new QualifiedContentType(HEADER), new QualifiedContentType(META_DIFF_HEADER));
+		c.addTranslation(new QualifiedContentType(INDEX), new QualifiedContentType(META_DIFF_INDEX));
+		c.addTranslation(new QualifiedContentType(RANGE), new QualifiedContentType(META_DIFF_RANGE));
+		c.addTranslation(new QualifiedContentType(SEPARATOR), new QualifiedContentType(META_SEPARATOR_DIFF));
 	}
 
 	public static DiffSourceConfiguration getDefault()
@@ -110,7 +125,7 @@ public class DiffSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	@SuppressWarnings("nls")
 	private DiffSourceConfiguration()
-	{		
+	{
 		Token changed = new Token(CHANGED);
 		Token deleted = new Token(DELETED);
 		Token inserted = new Token(INSERTED);
@@ -118,84 +133,85 @@ public class DiffSourceConfiguration implements IPartitioningConfiguration, ISou
 		Token separator = new Token(SEPARATOR);
 		Token range = new Token(RANGE);
 		List<IPredicateRule> rules = new ArrayList<IPredicateRule>();
-		
+
 		PatternRule rule;
-		
+
 		// Index
 		rule = new EndOfLineRule("Index: ", new Token(INDEX));
 		rule.setColumnConstraint(0);
 		rules.add(rule);
-		
+
 		// Range
 		rule = new EndOfLineRule("@@", range);
 		rule.setColumnConstraint(0);
 		rules.add(rule);
-		
-//		rule = new PatternRule("--- ", " ----\n", range, (char) 0, false);
-//		rule.setColumnConstraint(0);
-//		rules.add(rule);
-//		
-//		rule = new SingleLineRule("*** ", " ****", range, (char) 0, true);
-//		rule.setColumnConstraint(0);
-//		rules.add(rule);
-		
+
+		// rule = new PatternRule("--- ", " ----\n", range, (char) 0, false);
+		// rule.setColumnConstraint(0);
+		// rules.add(rule);
+		//
+		// rule = new SingleLineRule("*** ", " ****", range, (char) 0, true);
+		// rule.setColumnConstraint(0);
+		// rules.add(rule);
+
 		// headers
 		rule = new EndOfLineRule("--- ", header);
 		rule.setColumnConstraint(0);
 		rules.add(rule);
-		
+
 		rule = new EndOfLineRule("*** ", header);
 		rule.setColumnConstraint(0);
 		rules.add(rule);
-		
+
 		rule = new EndOfLineRule("==== ", header);
 		rule.setColumnConstraint(0);
 		rules.add(rule);
-		
+
 		rule = new EndOfLineRule("+++ ", header);
 		rule.setColumnConstraint(0);
 		rules.add(rule);
-		
+
 		rule = new SingleLineRule(" - ", " ====", header, (char) 0, true);
 		rule.setColumnConstraint(0);
 		rules.add(rule);
-		
+
 		// Separator
-		rule = new PatternRule("===================================================================", null, separator, (char) 0, true);
+		rule = new PatternRule("===================================================================", null, separator,
+				(char) 0, true);
 		rule.setColumnConstraint(0);
 		rules.add(rule);
-		
+
 		rule = new PatternRule("***************", null, separator, (char) 0, true);
 		rule.setColumnConstraint(0);
 		rules.add(rule);
-		
+
 		rule = new PatternRule("---", null, separator, (char) 0, true);
 		rule.setColumnConstraint(0);
 		rules.add(rule);
-		
+
 		// Inserted
 		rule = new EndOfLineRule("+", inserted);
 		rule.setColumnConstraint(0);
 		rules.add(rule);
-		
+
 		rule = new EndOfLineRule(">", inserted);
 		rule.setColumnConstraint(0);
 		rules.add(rule);
-		
+
 		// Changed
 		rule = new EndOfLineRule("!", changed);
 		rule.setColumnConstraint(0);
 		rules.add(rule);
-		
+
 		// Deleted
 		rule = new EndOfLineRule("-", deleted);
 		rule.setColumnConstraint(0);
 		rules.add(rule);
-		
+
 		rule = new EndOfLineRule("<", deleted);
 		rule.setColumnConstraint(0);
 		rules.add(rule);
-		
+
 		partitioningRules = new IPredicateRule[rules.size()];
 		rules.toArray(partitioningRules);
 	}
@@ -253,50 +269,50 @@ public class DiffSourceConfiguration implements IPartitioningConfiguration, ISou
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
 	{
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getOneTokenScanner("source.diff"));
+		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getOneTokenScanner(SOURCE_DIFF));
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
-		
-		dr = new DefaultDamagerRepairer(getOneTokenScanner("markup.inserted.diff"));
+
+		dr = new DefaultDamagerRepairer(getOneTokenScanner(MARKUP_INSERTED_DIFF));
 		reconciler.setDamager(dr, INSERTED);
 		reconciler.setRepairer(dr, INSERTED);
-		
-		dr = new DefaultDamagerRepairer(getOneTokenScanner("markup.changed.diff"));
+
+		dr = new DefaultDamagerRepairer(getOneTokenScanner(MARKUP_CHANGED_DIFF));
 		reconciler.setDamager(dr, CHANGED);
 		reconciler.setRepairer(dr, CHANGED);
-		
-		dr = new DefaultDamagerRepairer(getOneTokenScanner("markup.deleted.diff"));
+
+		dr = new DefaultDamagerRepairer(getOneTokenScanner(MARKUP_DELETED_DIFF));
 		reconciler.setDamager(dr, DELETED);
 		reconciler.setRepairer(dr, DELETED);
-		
-		dr = new DefaultDamagerRepairer(getOneTokenScanner("meta.diff.header"));
+
+		dr = new DefaultDamagerRepairer(getOneTokenScanner(META_DIFF_HEADER));
 		reconciler.setDamager(dr, HEADER);
 		reconciler.setRepairer(dr, HEADER);
-		
-		dr = new DefaultDamagerRepairer(getOneTokenScanner("meta.diff.index"));
+
+		dr = new DefaultDamagerRepairer(getOneTokenScanner(META_DIFF_INDEX));
 		reconciler.setDamager(dr, INDEX);
 		reconciler.setRepairer(dr, INDEX);
-		
-		dr = new DefaultDamagerRepairer(getOneTokenScanner("meta.diff.range"));
+
+		dr = new DefaultDamagerRepairer(getOneTokenScanner(META_DIFF_RANGE));
 		reconciler.setDamager(dr, RANGE);
 		reconciler.setRepairer(dr, RANGE);
-		
-		dr = new DefaultDamagerRepairer(getOneTokenScanner("meta.separator.diff"));
+
+		dr = new DefaultDamagerRepairer(getOneTokenScanner(META_SEPARATOR_DIFF));
 		reconciler.setDamager(dr, SEPARATOR);
 		reconciler.setRepairer(dr, SEPARATOR);
 	}
-	
+
 	protected ITokenScanner getOneTokenScanner(String token)
 	{
 		RuleBasedScanner multilineCommentScanner = new RuleBasedScanner();
-			multilineCommentScanner.setDefaultReturnToken(getToken(token));
-		
+		multilineCommentScanner.setDefaultReturnToken(getToken(token));
+
 		return multilineCommentScanner;
 	}
-	
+
 	protected IToken getToken(String name)
 	{
 		return getThemeManager().getToken(name);
