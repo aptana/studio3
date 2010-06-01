@@ -556,7 +556,14 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				case JSNodeTypes.DECLARATION:
 				case JSNodeTypes.EMPTY:
 				case JSNodeTypes.STATEMENTS:
-					result = Location.IN_GLOBAL;
+					if (this._targetNode.contains(offset) || this._targetNode.getEndingOffset() == offset - 1)
+					{
+						if (this._targetNode.getStartingOffset() != offset)
+						{
+							result = Location.IN_GLOBAL;
+							this._currentLexeme = null;
+						}
+					}
 					break;
 					
 				case JSNodeTypes.FOR:
@@ -587,6 +594,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					switch (node.getType())
 					{
 						case JSNodeTypes.DECLARATION:
+						case JSNodeTypes.FUNCTION:
 						case JSNodeTypes.PARAMETERS:
 							break;
 							
