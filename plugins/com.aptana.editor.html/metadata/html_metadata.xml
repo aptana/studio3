@@ -516,6 +516,289 @@ San Diego, CA 92122
       </references>
       <remarks>Remember to self-close your &amp;lt;area / &amp;gt; tags.</remarks>
     </element>
+    <element name="article" related-class="HTMLElement" display-name="Article">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <browser platform="Mozilla" version="3.7+"/>
+        <browser platform="Safari" version="4.0.6+"/>
+      </browsers>
+      <description>Specifies an article element that represents a self-contained composition in a document, page, application, or site.</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+      <example>
+        &lt;article&gt;
+         &lt;header&gt;
+          &lt;h1&gt;The Very First Rule of Life&lt;/h1&gt;
+          &lt;p&gt;&lt;time pubdate datetime=&quot;2009-10-09T14:28-08:00&quot;&gt;&lt;/time&gt;&lt;/p&gt;
+         &lt;/header&gt;
+         &lt;p&gt;If there&#039;s a microphone anywhere near you, assume it&#039;s hot and
+         sending whatever you&#039;re saying to the world. Seriously.&lt;/p&gt;
+         &lt;p&gt;...&lt;/p&gt;
+         &lt;footer&gt;
+          &lt;a href=&quot;?comments=1&quot;&gt;Show comments...&lt;/a&gt;
+         &lt;/footer&gt;
+        &lt;/article&gt;
+      </example>
+      <references>
+        <reference name="HTMLElement.article"/>
+      </references>
+      <remarks>An article could be a forum post, a magazine or newspaper article, a blog entry, a user-submitted comment, an interactive widget or gadget, or any other independent item of content.</remarks>
+    </element>
+    <element name="aside" related-class="HTMLElement" display-name="Aside">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <browser platform="Mozilla" version="3.7+"/>
+        <browser platform="Safari" version="4.0.6+"/>
+      </browsers>
+      <description>Specifies a sidebar for tangentially related content</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+      <example>
+        &lt;aside&gt;
+         &lt;h1&gt;Switzerland&lt;/h1&gt;
+         &lt;p&gt;Switzerland, a land-locked country in the middle of geographic
+         Europe, has not joined the geopolitical European Union, though it is
+         a signatory to a number of European treaties.&lt;/p&gt;
+        &lt;/aside&gt;
+      </example>
+      <references>
+        <reference name="HTMLElement.aside"/>
+      </references>
+      <remarks>The element can be used for typographical effects like pull quotes or sidebars, for advertising, for groups of nav  elements, and for other content that is considered separate from the main content of the page.</remarks>
+    </element>
+    <element name="audio" related-class="HTMLAudioElement" display-name="Audio">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="autoplay"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="controls"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="loop"/>
+        <attribute-ref name="preload"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="src"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <browser platform="IE" version="9.0+"/>
+        <browser platform="Mozilla" version="3.5+"/>
+        <browser platform="Opera" version="10.5+"/>
+        <browser platform="Safari" version="4.0.5+"/>
+      </browsers>
+      <description>Specifies an audio player</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+      <example>
+      </example>
+      <references>
+        <reference name="HTMLAudioElement"/>
+      </references>
+      <remarks>You can write text inside the start and end audio tags, to show older browser that they do not support this tag.</remarks>
+    </element>
     <element name="b" related-class="HTMLElement" display-name="Bold">
       <attribute-refs>
         <attribute-ref name="accesskey"/>
@@ -1205,6 +1488,102 @@ This sentence is on the second line.
 			</example>
       <remarks>Using &amp;lt;input type="button" /&amp;gt; is more common than using &amp;lt;button&amp;gt; &amp;lt;/button&amp;gt; tags. You can enclose an &amp;lt;img /&amp;gt; tag with &amp;lt;button&amp;gt; &amp;lt;/button&amp;gt; tags to display an image instead of text on the button.</remarks>
     </element>
+    <element name="canvas" related-class="HTMLCanvasElement" display-name="Canvas">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="height"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+        <attribute-ref name="width"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <browser platform="Mozilla" version="3.7+"/>
+        <browser platform="Opera" version="7.0+"/>
+        <browser platform="Safari" version="4.0.5+"/>
+      </browsers>
+      <description>Specifies a scriptable bitmap canvas</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+      <example>
+        // canvas is a reference to a &lt;canvas&gt; element
+        var context = canvas.getContext(&#039;2d&#039;);
+        context.fillRect(0,0,50,50);
+        canvas.setAttribute(&#039;width&#039;, &#039;300&#039;); // clears the canvas
+        context.fillRect(0,100,50,50);
+        canvas.width = canvas.width; // clears the canvas
+        context.fillRect(100,0,50,50); // only this square remains
+      </example>
+      <references>
+        <reference name="HTMLCanvasElement.canvas"/>
+      </references>
+      <remarks></remarks>
+    </element>
     <element name="caption" related-class="HTMLTableCaptionElement" display-name="Table Caption">
       <attribute-refs>
         <attribute-ref name="accesskey"/>
@@ -1691,6 +2070,110 @@ This sentence is on the second line.
       </references>
       <remarks>Specify the attributes of any individual columns in a &amp;lt;col /&amp;gt; tag that is nested inside of a set of &amp;lt;colgroup&amp;gt; &amp;lt;/colgroup&amp;gt; tags.</remarks>
     </element>
+    <element name="command" related-class="HTMLCommandElement" display-name="Command">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="checked"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="disabled"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="height"/>
+        <attribute-ref name="icon"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="label"/>
+        <attribute-ref name="radiogroup"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+        <attribute-ref name="type"/>
+        <attribute-ref name="width"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies a command that the user can invoke</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+      <example>
+        &lt;menu type=&quot;toolbar&quot;&gt;
+         &lt;command type=&quot;radio&quot; radiogroup=&quot;alignment&quot; checked=&quot;checked&quot;
+                  label=&quot;Left&quot; icon=&quot;icons/alL.png&quot; onclick=&quot;setAlign(&#039;left&#039;)&quot;&gt;
+         &lt;command type=&quot;radio&quot; radiogroup=&quot;alignment&quot;
+                  label=&quot;Center&quot; icon=&quot;icons/alC.png&quot; onclick=&quot;setAlign(&#039;center&#039;)&quot;&gt;
+         &lt;command type=&quot;radio&quot; radiogroup=&quot;alignment&quot;
+                  label=&quot;Right&quot; icon=&quot;icons/alR.png&quot; onclick=&quot;setAlign(&#039;right&#039;)&quot;&gt;
+         &lt;hr&gt;
+         &lt;command type=&quot;command&quot; disabled
+                  label=&quot;Publish&quot; icon=&quot;icons/pub.png&quot; onclick=&quot;publish()&quot;&gt;
+        &lt;/menu&gt;
+      </example>
+      <references>
+        <reference name="HTMLCommandElement.command"/>
+      </references>
+      <remarks></remarks>
+    </element>
     <element name="comment">
       <attribute-refs>
         <attribute-ref name="data"/>
@@ -1711,6 +2194,97 @@ This sentence is on the second line.
 			&lt;pre&gt;&lt;code&gt;&amp;lt;comment&amp;gt; Do not use this format for comments. &amp;lt;/comment&amp;gt;. &lt;/code&gt;&lt;/pre&gt;
 			</example>
       <remarks>Deprecated. IE only. Use the &amp;lt;!--&amp;gt;&amp;lt;--&amp;gt; tag set to comment out code instead.</remarks>
+    </element>
+    <element name="datalist" related-class="HTMLDatalistElement" display-name="Datalist">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <browser platform="Opera" version="9.0+"/>
+      </browsers>
+      <description>Specifies a container for options for combo box control</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+      <example>
+        &lt;input list=&quot;cars&quot; /&gt;
+        &lt;datalist id=&quot;cars&quot;&gt;
+        &lt;option value=&quot;BMW&quot;&gt;
+        &lt;option value=&quot;Ford&quot;&gt;
+        &lt;option value=&quot;Volvo&quot;&gt;
+        &lt;/datalist&gt;
+      </example>
+      <references>
+        <reference name="HTMLDatalistElement.datalist"/>
+      </references>
+      <remarks>In the rendering, the datalist  element represents  nothing and it, along with its children, should be hidden.</remarks>
     </element>
     <element name="dd" related-class="HTMLElement" display-name="Definition in Definition List">
       <attribute-refs>
@@ -1870,6 +2444,97 @@ This sentence is on the second line.
         <reference name="HTMLElement"/>
       </references>
       <remarks>The &amp;lt;del&amp;gt;&amp;lt;/del&amp;gt; tag only style text to visually show deletions. It does not actually delete the enclosed text.</remarks>
+    </element>
+    <element name="details" related-class="HTMLDetailsElement" display-name="Details">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="open"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <browser platform="Safari" version="1.0+"/>
+      </browsers>
+      <description>Specifies details about a document, or parts of a document.</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+      <example>
+      &lt;details&gt;
+       &lt;summary&gt;Name &amp; Extension:&lt;/summary&gt;
+       &lt;p&gt;&lt;input type=text name=fn value=&quot;Pillar Magazine.pdf&quot;&gt;
+       &lt;p&gt;&lt;label&gt;&lt;input type=checkbox name=ext checked&gt; Hide extension&lt;/label&gt;
+      &lt;/details&gt;
+      </example>
+      <references>
+        <reference name="HTMLDetailsElement.details"/>
+      </references>
+      <remarks>The details  element is not appropriate for footnotes.</remarks>
     </element>
     <element name="dfn" related-class="HTMLElement" display-name="Defining Instance of a Term">
       <attribute-refs>
@@ -2595,6 +3260,194 @@ This sentence is on the second line.
       </references>
       <remarks>Use &amp;lt;fieldset&amp;gt; &amp;lt;/fieldset&amp;gt; tags to group form controls together for usability and tabbing.</remarks>
     </element>
+    <element name="figcaption" related-class="HTMLElement" display-name="Figure Caption">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+      <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies a caption or legend for the rest of the contents of the figcaption element's parent figure element, if any.</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+      <example>
+        &lt;figure&gt;
+         &lt;p&gt;&#039;Twas brillig, and the slithy toves&lt;br&gt;
+         Did gyre and gimble in the wabe;&lt;br&gt;
+         All mimsy were the borogoves,&lt;br&gt;
+         And the mome raths outgrabe.&lt;/p&gt;
+         &lt;figcaption&gt;&lt;cite&gt;Jabberwocky&lt;/cite&gt; (first verse). Lewis Carroll, 1832-98&lt;/figcaption&gt;
+        &lt;/figure&gt;
+      </example>
+      <references>
+        <reference name="HTMLElement.figcaption"/>
+      </references>
+      <remarks></remarks>
+    </element>
+    <element name="figure" related-class="HTMLElement" display-name="Figure">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+      <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies a figure tag used to group some elements.</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+      <example>
+        &lt;p&gt;In &lt;a href=&quot;#l4&quot;&gt;listing 4&lt;/a&gt; we see the primary core interface
+        API declaration.&lt;/p&gt;
+        &lt;figure id=&quot;l4&quot;&gt;
+         &lt;figcaption&gt;Listing 4. The primary core interface API declaration.&lt;/figcaption&gt;
+         &lt;pre&gt;&lt;code&gt;interface PrimaryCore {
+         boolean verifyDataLine();
+         void sendData(in sequence&amp;lt;byte&gt; data);
+         void initSelfDestruct();
+        }&lt;/code&gt;&lt;/pre&gt;
+        &lt;/figure&gt;
+        &lt;p&gt;The API is designed to use UTF-8.&lt;/p&gt;
+      </example>
+      <references>
+        <reference name="HTMLElement.figure"/>
+      </references>
+      <remarks>The figure element can thus be used to annotate illustrations, diagrams, photos, code listings, etc, that are referred to from the main content of the document, but that could, without affecting the flow of the document, be moved away from that primary content, e.g. to the side of the page, to dedicated pages, or to an appendix.</remarks>
+    </element>
     <element name="font" related-class="HTMLFontElement" display-name="Font">
       <attribute-refs>
         <attribute-ref name="accesskey"/>
@@ -2683,6 +3536,107 @@ This sentence is on the second line.
         <reference name="HTMLFontElement"/>
       </references>
       <remarks>Use the CSS style sheets to style a font rather than the &amp;lt;font&amp;gt;&amp;lt;/font&amp;gt; tag if possible.</remarks>
+    </element>
+    <element name="footer" related-class="HTMLElement" display-name="Footer">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <browser platform="Mozilla" version="3.7+"/>
+        <browser platform="Safari" version="4.0.5+"/>
+      </browsers>
+      <description>Specifies a footer of a section or document that typically contains the name of the author, the date the document was written and/or contact information.</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+      <example>
+        &lt;body&gt;
+         &lt;footer&gt;&lt;a href=&quot;../&quot;&gt;Back to index...&lt;/a&gt;&lt;/footer&gt;
+         &lt;hgroup&gt;
+          &lt;h1&gt;Lorem ipsum&lt;/h1&gt;
+          &lt;h2&gt;The ipsum of all lorems&lt;/h2&gt;
+         &lt;/hgroup&gt;
+         &lt;p&gt;A dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+         tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+         veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
+         ea commodo consequat. Duis aute irure dolor in reprehenderit in
+         voluptate velit esse cillum dolore eu fugiat nulla
+         pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+         culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;
+         &lt;footer&gt;&lt;a href=&quot;../&quot;&gt;Back to index...&lt;/a&gt;&lt;/footer&gt;
+        &lt;/body&gt;
+      </example>
+      <references>
+        <reference name="HTMLElement.footer"/>
+      </references>
+      <remarks>Footers don't necessarily have to appear at the end of a section, though they usually do.</remarks>
     </element>
     <element name="form" related-class="HTMLFormElement" display-name="Form">
       <attribute-refs>
@@ -3489,6 +4443,191 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <reference name="HTMLHeadElement"/>
       </references>
       <remarks>The &amp;lt;head&amp;gt;&amp;lt;/head&amp;gt; element must contain a &amp;lt;title&amp;gt;&amp;lt;/title&amp;gt; element.</remarks>
+    </element>
+    <element name="header" related-class="HTMLElement" display-name="Header">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <browser platform="Mozilla" version="3.7+"/>
+        <browser platform="Safari" version="4.0.5+"/>
+      </browsers>
+      <description>Specifies an introduction to the document</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+      <example>
+        &lt;header&gt;
+         &lt;p&gt;Welcome to...&lt;/p&gt;
+         &lt;h1&gt;Voidwars!&lt;/h1&gt;
+        &lt;/header&gt;
+      </example>
+      <references>
+        <reference name="HTMLElement"/>
+      </references>
+      <remarks></remarks>
+    </element>
+    <element name="hgroup" related-class="HTMLElement" display-name="Header Group">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <browser platform="Mozilla" version="3.7+"/>
+        <browser platform="Safari" version="4.0.5+"/>
+      </browsers>
+      <description>Specifies the heading of a section or a document</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+      <example>
+        &lt;hgroup&gt;
+         &lt;h1&gt;The reality dysfunction&lt;/h1&gt;
+         &lt;h2&gt;Space is not the only void&lt;/h2&gt;
+        &lt;/hgroup&gt;
+        
+        &lt;hgroup&gt;
+         &lt;h1&gt;Dr. Strangelove&lt;/h1&gt;
+         &lt;h2&gt;Or: How I Learned to Stop Worrying and Love the Bomb&lt;/h2&gt;
+        &lt;/hgroup&gt;
+      </example>
+      <references>
+        <reference name="HTMLElement"/>
+      </references>
+      <remarks></remarks>
     </element>
     <element name="hr" related-class="HTMLHRElement" display-name="Horizontal Rule">
       <attribute-refs>
@@ -4302,6 +5441,99 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </references>
       <remarks>Use the &amp;lt;kbd&amp;gt;&amp;lt;/kbd&amp;gt; tag set to style text appropriately.</remarks>
     </element>
+    <element name="keygen" related-class="HTMLKeygenElement" display-name="Key Generation">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="autofocus"/>
+        <attribute-ref name="challenge"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="disabled"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="form"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="keytype"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="name"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <browser platform="Mozilla" version="0.1+"/>
+        <browser platform="Safari" version="1.2+"/>
+        <browser platform="Opera" version="9.0+"/>
+      </browsers>
+      <description>Specifies a generated key</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+      <example>
+      </example>
+      <references>
+        <reference name="HTMLKeygenElement"/>
+      </references>
+      <remarks></remarks>
+    </element>
     <element name="label" related-class="HTMLLabelElement" display-name="Label">
       <attribute-refs>
         <attribute-ref name="accesskey"/>
@@ -4747,6 +5979,98 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </references>
       <remarks>Remember to self-close your &amp;lt;area / &amp;gt; tags.</remarks>
     </element>
+    <element name="mark" related-class="HTMLElement" display-name="Highlight">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies marked text</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+      <example>
+        &lt;p lang=&quot;en-US&quot;&gt;Consider the following quote:&lt;/p&gt;
+        &lt;blockquote lang=&quot;en-GB&quot;&gt;
+         &lt;p&gt;Look around and you will find, no-one&#039;s really
+         &lt;mark&gt;colour&lt;/mark&gt; blind.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p lang=&quot;en-US&quot;&gt;As we can tell from the &lt;em&gt;spelling&lt;/em&gt; of the word,
+        the person writing this quote is clearly not American.&lt;/p&gt;
+      </example>
+      <references>
+        <reference name="HTMLElement"/>
+      </references>
+      <remarks></remarks>
+    </element>
     <element name="marquee" display-name="Marquee">
       <attribute-refs>
         <attribute-ref name="accesskey"/>
@@ -4845,6 +6169,116 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </references>
       <remarks>Limited support for &amp;lt;marquee&amp;gt;&amp;lt;/marquee&amp;gt; in non-Netscape browsers. Avoid using if possible.</remarks>
     </element>
+    <element name="menu" related-class="HTMLMenuElement" display-name="Menu">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="label"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="type"/>
+        <attribute-ref name="title"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies a list of commands</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+      <example>
+        &lt;menu type=&quot;toolbar&quot;&gt;
+         &lt;li&gt;
+          &lt;menu label=&quot;File&quot;&gt;
+           &lt;button type=&quot;button&quot; onclick=&quot;fnew()&quot;&gt;New...&lt;/button&gt;
+           &lt;button type=&quot;button&quot; onclick=&quot;fopen()&quot;&gt;Open...&lt;/button&gt;
+           &lt;button type=&quot;button&quot; onclick=&quot;fsave()&quot;&gt;Save&lt;/button&gt;
+           &lt;button type=&quot;button&quot; onclick=&quot;fsaveas()&quot;&gt;Save as...&lt;/button&gt;
+          &lt;/menu&gt;
+         &lt;/li&gt;
+         &lt;li&gt;
+          &lt;menu label=&quot;Edit&quot;&gt;
+           &lt;button type=&quot;button&quot; onclick=&quot;ecopy()&quot;&gt;Copy&lt;/button&gt;
+           &lt;button type=&quot;button&quot; onclick=&quot;ecut()&quot;&gt;Cut&lt;/button&gt;
+           &lt;button type=&quot;button&quot; onclick=&quot;epaste()&quot;&gt;Paste&lt;/button&gt;
+          &lt;/menu&gt;
+         &lt;/li&gt;
+         &lt;li&gt;
+          &lt;menu label=&quot;Help&quot;&gt;
+           &lt;li&gt;&lt;a href=&quot;help.html&quot;&gt;Help&lt;/a&gt;&lt;/li&gt;
+           &lt;li&gt;&lt;a href=&quot;about.html&quot;&gt;About&lt;/a&gt;&lt;/li&gt;
+          &lt;/menu&gt;
+         &lt;/li&gt;
+        &lt;/menu&gt;
+      </example>
+      <references>
+        <reference name="HTMLMenuElement"/>
+      </references>
+      <remarks></remarks>
+    </element>
     <element name="meta" related-class="HTMLMetaElement" display-name="Meta">
       <attribute-refs>
         <attribute-ref name="content"/>
@@ -4883,6 +6317,191 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <reference name="HTMLMetaElement"/>
       </references>
       <remarks>A &amp;lt;meta /&amp;gt; must be enclosed within the &amp;lt;head&amp;gt;&amp;lt;/head&amp;gt; element. You may have multiple &amp;lt;meta /&amp;gt; tags in the &amp;lt;head&amp;gt;&amp;lt;/head&amp;gt; element.</remarks>
+    </element>
+    <element name="meter" related-class="HTMLMeterElement" display-name="Meter">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="form"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="high"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="label"/>
+        <attribute-ref name="low"/>
+        <attribute-ref name="max"/>
+        <attribute-ref name="min"/>
+        <attribute-ref name="optimum"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="type"/>
+        <attribute-ref name="title"/>
+        <attribute-ref name="value"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies a scalar measurement within a known range, or a fractional value</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+      <example>
+        Storage space usage: &lt;meter value=6 max=8&gt;6 blocks used (out of 8 total)&lt;/meter&gt;
+        Voter turnout: &lt;meter value=0.75&gt;&lt;img alt=&quot;75%&quot; src=&quot;graph75.png&quot;&gt;&lt;/meter&gt;
+        Tickets sold: &lt;meter min=&quot;0&quot; max=&quot;100&quot; value=&quot;75&quot;&gt;&lt;/meter&gt;
+      </example>
+      <references>
+        <reference name="HTMLMeterElement"/>
+      </references>
+      <remarks>Used only for measurements with a known minimum and maximum value.</remarks>
+    </element>
+    <element name="nav" related-class="HTMLElement" display-name="Navigation">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies a section of a page that links to other pages or to parts within the page</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+      <example>
+        Storage space usage: &lt;meter value=6 max=8&gt;6 blocks used (out of 8 total)&lt;/meter&gt;
+        Voter turnout: &lt;meter value=0.75&gt;&lt;img alt=&quot;75%&quot; src=&quot;graph75.png&quot;&gt;&lt;/meter&gt;
+        Tickets sold: &lt;meter min=&quot;0&quot; max=&quot;100&quot; value=&quot;75&quot;&gt;&lt;/meter&gt;
+      </example>
+      <references>
+        <reference name="HTMLElement"/>
+      </references>
+      <remarks></remarks>
     </element>
     <element name="nobr" related-class="HTMLElement" display-name="No Line Breaks">
       <attribute-refs>
@@ -5408,6 +7027,100 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </references>
       <remarks>&amp;lt;option&amp;gt;&amp;lt;/option&amp;gt; tags should always be nested within a &amp;lt;select&amp;gt;&amp;lt;/select&amp;gt; element.</remarks>
     </element>
+    <element name="output" related-class="HTMLOutputElement" display-name="Output">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="for"/>
+        <attribute-ref name="form"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="name"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <browser platform="Opera" version="9.0+"/>
+        <browser platform="Mozilla" version="3.7+"/>
+      </browsers>
+      <description>Specifies the different types of output, such as output written by a script.</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+      <example>
+        &lt;form onsubmit=&quot;return false&quot;&gt;
+         &lt;input name=a type=number step=any&gt; +
+         &lt;input name=b type=number step=any&gt; =
+         &lt;output onforminput=&quot;value = a.valueAsNumber + b.valueAsNumber&quot;&gt;&lt;/output&gt;
+        &lt;/form&gt;
+      </example>
+      <references>
+        <reference name="HTMLOutputElement"/>
+      </references>
+      <remarks></remarks>
+    </element>
     <element name="p" related-class="HTMLParagraphElement" display-name="Paragraph">
       <attribute-refs>
         <attribute-ref name="accesskey"/>
@@ -5631,6 +7344,105 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </references>
       <remarks>Similar to the &amp;lt;code&amp;gt;&amp;lt;/code&amp;gt; tag, but the &amp;lt;code&amp;gt;&amp;lt;/code&amp;gt; tag does not preserve whitespace in code samples. For multiline code examples, or those with indentation, use the &amp;lt;pre&amp;gt;&amp;lt;/pre&amp;gt; tag.</remarks>
     </element>
+    <element name="progress" related-class="HTMLProgressElement" display-name="Progress">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="form"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="max"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+        <attribute-ref name="value"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <browser platform="Safari" version="4.0.6+"/>
+      </browsers>
+      <description>Specifies an element that represents the completion progress of a task.</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+      <example>
+        &lt;section&gt;
+         &lt;h2&gt;Task Progress&lt;/h2&gt;
+         &lt;p&gt;Progress: &lt;progress id=&quot;p&quot; max=100&gt;&lt;span&gt;0&lt;/span&gt;%&lt;/progress&gt;&lt;/p&gt;
+         &lt;script&gt;
+          var progressBar = document.getElementById(&#039;p&#039;);
+          function updateProgress(newValue) {
+            progressBar.value = newValue;
+            progressBar.getElementsByTagName(&#039;span&#039;)[0].textContent = newValue;
+          }
+         &lt;/script&gt;
+        &lt;/section&gt;
+      </example>
+      <references>
+        <reference name="HTMLProgressElement"/>
+      </references>
+      <remarks>Use the progress element to display the progress of a time consuming function in JavaScript.</remarks>
+    </element>
     <element name="q" related-class="HTMLQuoteElement" display-name="Quote">
       <attribute-refs>
         <attribute-ref name="accesskey"/>
@@ -5709,6 +7521,92 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <reference name="HTMLQuoteElement"/>
       </references>
       <remarks>Use &amp;lt;q&amp;gt;&amp;lt;/q&amp;gt; for short, inline quotes. Use &amp;lt;blockquote&amp;gt;&amp;lt;/blockquote&amp;gt; for longer quotes.</remarks>
+    </element>
+    <element name="rp" related-class="HTMLElement" display-name="RP">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <browser platform="Safari" version="4.0.6+"/>
+        <browser platform="IE" version="8.0+"/>
+      </browsers>
+      <description>Specifies an element to define what to show browsers that do not support the ruby element.</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+      <example>
+      </example>
+      <references>
+        <reference name="HTMLElement"/>
+      </references>
+      <remarks></remarks>
     </element>
     <element name="rt" display-name="Ruby Text">
       <attribute-refs>
@@ -6061,6 +7959,109 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </references>
       <remarks>Add the &amp;lt;noscript&amp;gt; &amp;lt;/noscript&amp;gt; tags in case users have JavaScript turned off in their browsers.</remarks>
     </element>
+    <element name="section" related-class="HTMLElement" display-name="Section">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <browser platform="Mozilla" version="3.7+"/>
+        <browser platform="Safari" version="4.0.6+"/>
+      </browsers>
+      <description>Specifies a generic section of a document or application.</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+      <example>
+        &lt;article&gt;
+         &lt;hgroup&gt;
+          &lt;h1&gt;Apples&lt;/h1&gt;
+          &lt;h2&gt;Tasty, delicious fruit!&lt;/h2&gt;
+         &lt;/hgroup&gt;
+         &lt;p&gt;The apple is the pomaceous fruit of the apple tree.&lt;/p&gt;
+         &lt;section&gt;
+          &lt;h1&gt;Red Delicious&lt;/h1&gt;
+          &lt;p&gt;These bright red apples are the most common found in many
+          supermarkets.&lt;/p&gt;
+         &lt;/section&gt;
+         &lt;section&gt;
+          &lt;h1&gt;Granny Smith&lt;/h1&gt;
+          &lt;p&gt;These juicy, green apples make a great filling for
+          apple pies.&lt;/p&gt;
+         &lt;/section&gt;
+        &lt;/article&gt;
+      </example>
+      <references>
+        <reference name="HTMLElement"/>
+      </references>
+      <remarks></remarks>
+    </element>
     <element name="select" related-class="HTMLSelectElement" display-name="Selection List">
       <attribute-refs>
         <attribute-ref name="accesskey"/>
@@ -6243,6 +8244,115 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <reference name="HTMLElement"/>
       </references>
       <remarks>For more options and flexibility with font sizes, use CSS rules, rather than the &amp;lt;small&amp;gt;&amp;lt;/small&amp;gt; tag set.</remarks>
+    </element>
+    <element name="source" related-class="HTMLSourceElement" display-name="Source">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="media"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="src"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+        <attribute-ref name="type"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <browser platform="IE" version="9.0+"/>
+        <browser platform="Mozilla" version="3.5+"/>
+        <browser platform="Opera" version="10.5+"/>
+        <browser platform="Safari" version="4.0.5+"/>
+      </browsers>
+      <description>Specifies multiple alternative media resources for media elements.</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+      <example>
+        &lt;script&gt;
+         function fallback(video) {
+           // replace &lt;video&gt; with its contents
+           while (video.hasChildNodes()) {
+             if (video.firstChild instanceof HTMLSourceElement)
+               video.removeChild(video.firstChild);
+             else
+               video.parentNode.insertBefore(video.firstChild, video);
+           }
+           video.parentNode.removeChild(video);
+         }
+        &lt;/script&gt;
+        &lt;video controls autoplay&gt;
+         &lt;source src=&#039;video.mp4&#039; type=&#039;video/mp4; codecs=&quot;avc1.42E01E, mp4a.40.2&quot;&#039;&gt;
+         &lt;source src=&#039;video.ogv&#039; type=&#039;video/ogg; codecs=&quot;theora, vorbis&quot;&#039;
+                 onerror=&quot;fallback(parentNode)&quot;&gt;
+         ...
+        &lt;/video&gt;
+      </example>
+      <references>
+        <reference name="HTMLSourceElement"/>
+      </references>
+      <remarks></remarks>
     </element>
     <element name="span" related-class="HTMLElement" display-name="Span">
       <attribute-refs>
@@ -6638,6 +8748,91 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <reference name="HTMLElement"/>
       </references>
       <remarks>Use the &amp;lt;sub&amp;gt;&amp;lt;/sub&amp;gt; tag for things like footnotes.</remarks>
+    </element>
+    <element name="summary" related-class="HTMLElement" display-name="Summary">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies a header for the "details" element, which is used to describe details about a document, or parts of a document.</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+      <example>
+      </example>
+      <references>
+        <reference name="HTMLElement"/>
+      </references>
+      <remarks></remarks>
     </element>
     <element name="sup" related-class="HTMLElement" display-name="Superscript">
       <attribute-refs>
@@ -7515,6 +9710,100 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </references>
       <remarks>Use &amp;lt;thead&amp;gt; &amp;lt;/ thead&amp;gt; element to style the table header differently from the rest of the table.</remarks>
     </element>
+    <element name="time" related-class="HTMLTimeElement" display-name="Time">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="datetime"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="pubdate"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies a time on a 24 hour clock, or a precise date in the proleptic Gregorian calendar, optionally with a time and a time-zone offset.</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+      <example>
+        &lt;div class=&quot;vevent&quot;&gt;
+         &lt;a class=&quot;url&quot; href=&quot;http://www.web2con.com/&quot;&gt;http://www.web2con.com/&lt;/a&gt;
+          &lt;span class=&quot;summary&quot;&gt;Web 2.0 Conference&lt;/span&gt;:
+          &lt;time class=&quot;dtstart&quot; datetime=&quot;2007-10-05&quot;&gt;October 5&lt;/time&gt; -
+          &lt;time class=&quot;dtend&quot; datetime=&quot;2007-10-20&quot;&gt;19&lt;/time&gt;,
+          at the &lt;span class=&quot;location&quot;&gt;Argent Hotel, San Francisco, CA&lt;/span&gt;
+         &lt;/div&gt;
+      </example>
+      <references>
+        <reference name="HTMLTimeElement"/>
+      </references>
+      <remarks></remarks>
+    </element>
     <element name="title" related-class="HTMLTitleElement" display-name="Title">
       <attribute-refs>
         <attribute-ref name="dir"/>
@@ -8011,6 +10300,125 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </references>
       <remarks>The &amp;lt;var&amp;gt;&amp;lt;/var&amp;gt; tag will usually render the enclosed text as italics.</remarks>
     </element>
+    <element name="video" related-class="HTMLVideoElement" display-name="Video">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="autoplay"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="height"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="loop"/>
+        <attribute-ref name="poster"/>
+        <attribute-ref name="preload"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="src"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+        <attribute-ref name="width"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <browser platform="IE" version="9.0+"/>
+        <browser platform="Mozilla" version="3.5+"/>
+        <browser platform="Opera" version="10.5+"/>
+        <browser platform="Safari" version="4.0.5+"/>
+      </browsers>
+      <description>Specifies an element used for playing videos or movies.</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+      <example>
+        &lt;script&gt;
+         function failed(e) {
+           // video playback failed - show a message saying why
+           switch (e.target.error.code) {
+             case e.target.error.MEDIA_ERR_ABORTED:
+               alert(&#039;You aborted the video playback.&#039;);
+               break;
+             case e.target.error.MEDIA_ERR_NETWORK:
+               alert(&#039;A network error caused the video download to fail part-way.&#039;);
+               break;
+             case e.target.error.MEDIA_ERR_DECODE:
+               alert(&#039;The video playback was aborted due to a corruption problem or because the video used features your browser did not support.&#039;);
+               break;
+             case e.target.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+               alert(&#039;The video could not be loaded, either because the server or network failed or because the format is not supported.&#039;);
+               break;
+             default:
+               alert(&#039;An unknown error occurred.&#039;);
+               break;
+           }
+         }
+        &lt;/script&gt;
+        &lt;p&gt;&lt;video src=&quot;tgif.vid&quot; autoplay controls onerror=&quot;failed(event)&quot;&gt;&lt;/video&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;a href=&quot;tgif.vid&quot;&gt;Download the video file&lt;/a&gt;.&lt;/p&gt;
+      </example>
+      <references>
+        <reference name="HTMLVideoElement"/>
+      </references>
+      <remarks></remarks>
+    </element>
     <element name="wbr" display-name="Word Break">
       <attribute-refs>
         <attribute-ref name="id"/>
@@ -8357,6 +10765,24 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="off" description="Form autocompletion is off."/>
       </values>
     </attribute>
+    <attribute name="autofocus" type="String">
+      <browsers>
+        <browser platform="Opera" version="9.0+"/>
+        <browser platform="Safari" version="4.0.5+"/>
+      </browsers>
+      <description>Makes the input field focused on page load</description>
+      <hint>[disabled]</hint>
+    </attribute>
+    <attribute name="autoplay" type="String">
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies whether the user agent will automatically begin playback of the media resource as soon as it can do so without stopping</description>
+      <values>
+        <value name="true" description="Element has autoplay enabled"/>
+        <value name="false" description="Element has autoplay disabled"/>
+      </values>
+    </attribute>
     <attribute name="axis" type="String">
       <availability>
         <specification name="W3C" version="HTML 4.01"/>
@@ -8500,6 +10926,13 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </browsers>
       <description>Number of pixels between cells.</description>
       <hint>[number-of-pixels]. Example values: 2 (pixels), 5, 10, etc.</hint>
+    </attribute>
+    <attribute name="challenge" type="String">
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies the challenge attribute of the keygen element.</description>
+      <hint>[value]</hint>
     </attribute>
     <attribute name="char" type="String">
       <availability>
@@ -8733,6 +11166,26 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="inherit" description="Inherit the value from the parent element."/>
       </values>
     </attribute>
+    <attribute name="contextmenu" type="String">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <!-- Not supported by any browsers -->
+      </browsers>
+      <description>Specifies context-menu for an element.</description>
+      <hint>[menu_id]</hint>
+    </attribute>
+    <attribute name="controls" type="String">
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies whether the author would like the user agent to provide its own set of controls</description>
+      <values>
+        <value name="true" description="Element has controls enabled"/>
+        <value name="false" description="Element has controls disabled"/>
+      </values>
+    </attribute>
     <attribute name="coords" type="String">
       <availability>
         <specification name="W3C" version="HTML 4.01"/>
@@ -8892,6 +11345,18 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="false" description="Element is not disabled."/>
       </values>
     </attribute>
+    <attribute name="draggable" type="String">
+      <browsers>
+        <browser platform="Mozilla" version="3.5+"/>
+        <browser platform="Safari" version="4.0.6+"/>
+      </browsers>
+      <description>Specifies whether or not a user is allowed to drag an element.</description>
+      <values>
+        <value name="true" description="Element is draggable."/>
+        <value name="false" description="Element is not draggable."/>
+        <value name="auto" description="Element is draggable was needed."/>
+      </values>
+    </attribute>
     <attribute name="dynsrc" type="String">
       <browsers>
         <browser platform="IE" version="4.0+"/>
@@ -8952,6 +11417,14 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </browsers>
       <description>Id corresponding to the form or event associated with the element.</description>
       <hint>[element-id]. Example values: myButton, textBox1, etc.</hint>
+    </attribute>
+    <attribute name="form" type="String">
+      <browsers>
+        <browser platform="Opera" version="9.0+"/>
+        <browser platform="Safari" version="4.0.5+"/>
+      </browsers>
+      <description>Specifies which form element the element is associated with.</description>
+      <hint></hint>
     </attribute>
     <attribute name="frame" type="String">
       <availability>
@@ -9063,6 +11536,13 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="false" description="Element shows a visual cue."/>
       </values>
     </attribute>
+    <attribute name="high" type="String">
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies the range that is considered to be the "high" part of the gauge</description>
+      <hint></hint>
+    </attribute>
     <attribute name="href" type="String">
       <availability>
         <specification name="W3C" version="HTML 4.01"/>
@@ -9123,6 +11603,13 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <hint>[http-header]. Example values: "refresh", "PICS-Label", etc.</hint>
       <remarks>Do not use the http-equiv and name attributes together.</remarks>
     </attribute>
+    <attribute name="icon" type="String">
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies url of an image to display as the command</description>
+      <hint>[url]</hint>
+    </attribute>
     <attribute name="id" type="String">
       <availability>
         <specification name="W3C" version="HTML 4.01"/>
@@ -9136,6 +11623,13 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </browsers>
       <description>Unique identifier for the element.</description>
       <hint>[element-id]</hint>
+    </attribute>
+    <attribute name="keytype" type="String">
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies the key type for user agents.</description>
+      <hint></hint>
     </attribute>
     <attribute name="label" type="String">
       <availability>
@@ -9232,6 +11726,13 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <description>Number of times to loop the media file. Specify "infinite" for a continuous loop.</description>
       <hint>[number]</hint>
     </attribute>
+    <attribute name="low" type="String">
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies the range that is considered to be the "low" part of the gauge</description>
+      <hint></hint>
+    </attribute>
     <attribute name="lowsrc" type="String">
       <browsers>
         <browser platform="IE" version="4.0+"/>
@@ -9266,6 +11767,13 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </browsers>
       <description>Left and right margins (in pixels) for the document.</description>
       <hint>[number-of-pixels]</hint>
+    </attribute>
+    <attribute name="max" type="String">
+      <browsers>
+        <browser platform="Opera" version="9.0+"/>
+      </browsers>
+      <description>Specifies the upper bound of the range.</description>
+      <hint>[value]</hint>
     </attribute>
     <attribute name="maxlength" type="String">
       <availability>
@@ -9335,6 +11843,13 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </browsers>
       <description>Possible methods that may be called on the element.</description>
       <hint>[http-method]</hint>
+    </attribute>
+    <attribute name="min" type="String">
+      <browsers>
+        <browser platform="Opera" version="9.0+"/>
+      </browsers>
+      <description>Specifies the lower bound of the range.</description>
+      <hint>[value]</hint>
     </attribute>
     <attribute name="multiple" type="String">
       <availability>
@@ -9443,6 +11958,23 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </references>
       <remarks>Do not use the code attribute if you are using the object attribute.</remarks>
     </attribute>
+    <attribute name="open" type="String">
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies if the details should be visible (present) or not (not present).</description>
+      <values>
+        <value name="true" description="Details are shown to the user."/>
+        <value name="false" description="Details are not shown to the user."/>
+      </values>
+    </attribute>
+    <attribute name="optimum" type="String">
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies the range that is considered to be the "optimum" part of the gauge</description>
+      <hint></hint>
+    </attribute>
     <attribute name="overflow" type="String">
       <browsers>
         <browser platform="Netscape" version="4.0+"/>
@@ -9494,6 +12026,24 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <description>Specifies the point size of the font.</description>
       <hint>[point-size]</hint>
     </attribute>
+    <attribute name="poster" type="String">
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies the address of an image file that the user agent can show while no video data is available.</description>
+      <hint>[url]</hint>
+    </attribute>
+    <attribute name="preload" type="String">
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies a hint to the user agent about what the author thinks will lead to the best user experience</description>
+      <values>
+        <value name="none" description="Hints to the user agent that either the author does not expect the user to need the media resource, or that the server wants to minimise unnecessary traffic."/>
+        <value name="metadata" description="Hints to the user agent that the author does not expect the user to need the media resource, but that fetching the resource metadata (dimensions, first frame, track list, duration, etc) is reasonable."/>
+        <value name="auto" description="Hints to the user agent that the user agent can put the user's needs first without risk to the server, up to and including optimistically downloading the entire resource. "/>
+      </values>
+    </attribute>
     <attribute name="profile" type="String">
       <availability>
         <specification name="W3C" version="HTML 4.01"/>
@@ -9507,6 +12057,23 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </browsers>
       <description>Specifies the URL for the meta-information dictionary.</description>
       <hint>[url]</hint>
+    </attribute>
+    <attribute name="pubdate" type="String">
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies whether the date and time given by the element is the publication date and time of the nearest ancestor article  element, or, if the element has no ancestor article element, of the document as a whole</description>
+      <values>
+        <value name="true" description="The date and time given by the element is the publication date and time of the nearest ancestor article element"/>
+        <value name="false" description="The date and time given by the element is not the publication date and time of the nearest ancestor article  element"/>
+      </values>
+    </attribute>
+    <attribute name="radiogroup" type="String">
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Specifies the name of the group of commands that will be toggled when the command itself is toggled, for commands whose type attribute has the value "radio".</description>
+      <hint>[name]</hint>
     </attribute>
     <attribute name="readonly" type="String">
       <availability>
@@ -9794,6 +12361,17 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </browsers>
       <description>Number of columns that this column should span.</description>
       <hint>[number-of-columns]</hint>
+    </attribute>
+    <attribute name="spellcheck" type="String">
+      <browsers>
+        <browser platform="Mozilla" version="2.0+"/>
+      </browsers>
+      <description>Specifies whether the element should be spelling and grammar checked.</description>
+      <values>
+        <value name="true" description="Element has spellcheck enabled."/>
+        <value name="false" description="Element has spellcheck disabled."/>
+        <value name="default" description="Element has spellcheck on default."/>
+      </values>
     </attribute>
     <attribute name="src" type="String">
       <availability>
@@ -10309,6 +12887,24 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </browsers>
       <description>Fires immediately before the scrolling contents of an element reach the far side of the window.</description>
     </event>
+    <event name="oncanplay" type="Function">
+      <availability>
+        <specification name="W3C" version="HTML 5">
+      </availability>  
+      <browsers>
+      <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Fires when media can start play, but might has to stop for buffering</description>
+    </event>
+    <event name="oncanplaythrough" type="Function">
+      <availability>
+        <specification name="W3C" version="HTML 5">
+      </availability> 
+      <browsers>
+      <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Fires when media can be played to the end, without stopping for buffering</description>
+    </event>
     <event name="oncellchange" type="Function">
       <browsers>
         <browser platform="IE" version="4.0+"/>
@@ -10454,6 +13050,30 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </browsers>
       <description>Fires when an object is dropped onto the element.</description>
     </event>
+    <event name="ondurationchange" type="Function">
+      <browsers>
+      <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Fires when the length of the media is changed</description>
+    </event>
+    <event name="onemptied" type="Function">
+      <availability>
+        <specification name="W3C" version="HTML 5">
+      </availability> 
+      <browsers>
+      <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Fires when a media resource element suddenly becomes empty (network errors, errors on load etc.)</description>
+    </event>
+    <event name="onended" type="Function">
+      <availability>
+        <specification name="W3C" version="HTML 5">
+      </availability> 
+      <browsers>
+      <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Fires when media has reach the end</description>
+    </event>
     <event name="onerror" type="Function">
       <browsers>
         <browser platform="IE" version="4.0+"/>
@@ -10492,6 +13112,24 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </browsers>
       <description>Fires when the element receives focus.</description>
     </event>
+    <event name="onformchange" type="Function">
+      <availability>
+        <specification name="W3C" version="HTML 5">
+      </availability> 
+      <browsers>
+      <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Fires when a form changes</description>
+    </event>
+    <event name="onforminput" type="Function">
+      <availability>
+        <specification name="W3C" version="HTML 5">
+      </availability> 
+      <browsers>
+      <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Fires when a form gets user input</description>
+    </event>
     <event name="onfocusin" type="Function">
       <browsers>
         <browser platform="IE" version="4.0+"/>
@@ -10509,6 +13147,24 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="IE" version="4.0+"/>
       </browsers>
       <description>Fires when a user presses the F1 key to activate help.</description>
+    </event>
+    <event name="oninput" type="Function">
+      <availability>
+        <specification name="W3C" version="HTML 5">
+      </availability> 
+      <browsers>
+      <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Fires when an element gets user input</description>
+    </event>
+    <event name="oninvalid" type="Function">
+      <availability>
+        <specification name="W3C" version="HTML 5">
+      </availability> 
+      <browsers>
+      <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Fires when an element is invalid</description>
     </event>
     <event name="onkeydown" type="Function">
       <availability>
@@ -10567,6 +13223,33 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when the content of the element finishes loading.</description>
+    </event>
+    <event name="onloadeddata" type="Function">
+      <availability>
+        <specification name="W3C" version="HTML 5">
+      </availability> 
+      <browsers>
+      <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Fires when media data is loaded</description>
+    </event>
+    <event name="onloadedmetadata" type="Function">
+      <availability>
+        <specification name="W3C" version="HTML 5">
+      </availability> 
+      <browsers>
+      <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Fires when the duration and other media data of a media element is loaded</description>
+    </event>
+    <event name="onloadstart" type="Function">
+      <availability>
+        <specification name="W3C" version="HTML 5">
+      </availability> 
+      <browsers>
+      <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Fires when the browser starts to load the media data</description>
     </event>
     <event name="onlosecapture" type="Function">
       <browsers>
@@ -10684,11 +13367,56 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </browsers>
       <description>Fires when the clipboard contents are pasted onto the element.</description>
     </event>
+    <event name="onpause" type="Function">
+      <availability>
+        <specification name="W3C" version="HTML 5">
+      </availability> 
+      <browsers>
+      <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Fires when media data is paused</description>
+    </event>
+    <event name="onplay" type="Function">
+      <availability>
+        <specification name="W3C" version="HTML 5">
+      </availability> 
+      <browsers>
+      <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Fires when media data is going to start playing</description>
+    </event>
+    <event name="onplaying" type="Function">
+      <availability>
+        <specification name="W3C" version="HTML 5">
+      </availability> 
+      <browsers>
+      <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Fires when media data has started playing</description>
+    </event>
+    <event name="onprogress" type="Function">
+      <availability>
+        <specification name="W3C" version="HTML 5">
+      </availability> 
+      <browsers>
+      <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Fires when the browser is fetching the media data</description>
+    </event>
     <event name="onpropertychange" type="Function">
       <browsers>
         <browser platform="IE" version="4.0+"/>
       </browsers>
       <description>Fires when one of the properties of the element changes.</description>
+    </event>
+    <event name="onratechange" type="Function">
+      <availability>
+        <specification name="W3C" version="HTML 5">
+      </availability> 
+      <browsers>
+      <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Fires when the media data's playing rate has changed</description>
     </event>
     <event name="onreadystatechange" type="Function">
       <browsers>
@@ -10759,6 +13487,24 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </browsers>
       <description>Fires when a user scrolls the element.</description>
     </event>
+    <event name="onseeked" type="Function">
+      <availability>
+        <specification name="W3C" version="HTML 5">
+      </availability> 
+      <browsers>
+      <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Fires when a media element's seeking attribute is no longer true, and the seeking has ended</description>
+    </event>
+    <event name="onseeking" type="Function">
+      <availability>
+        <specification name="W3C" version="HTML 5">
+      </availability> 
+      <browsers>
+      <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Fires when a media element's seeking attribute is true, and the seeking has begun</description>
+    </event>
     <event name="onselect" type="Function">
       <availability>
         <specification name="W3C" version="HTML 4.01"/>
@@ -10785,6 +13531,15 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </browsers>
       <description>Fires at the beginning of a loop for the looping content of an element.</description>
     </event>
+    <event name="onstalled" type="Function">
+      <availability>
+        <specification name="W3C" version="HTML 5">
+      </availability> 
+      <browsers>
+      <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Fires when there is an error in fetching media data (stalled)</description>
+    </event>
     <event name="onsubmit" type="Function">
       <availability>
         <specification name="W3C" version="HTML 4.01"/>
@@ -10797,6 +13552,15 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when the form data is submitted.</description>
+    </event>
+    <event name="onsuspend" type="Function">
+      <availability>
+        <specification name="W3C" version="HTML 5">
+      </availability> 
+      <browsers>
+      <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Fires when the browser has been fetching media data, but stopped before the entire media file was fetched</description>
     </event>
     <event name="ontimeerror" type="Function">
       <browsers>
@@ -10816,6 +13580,24 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when the content of the element finishes unloading.</description>
+    </event>
+    <event name="onvolumechange" type="Function">
+      <availability>
+        <specification name="W3C" version="HTML 5">
+      </availability> 
+      <browsers>
+      <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Fires when media changes the volume, also when volume is set to "mute"</description>
+    </event>
+    <event name="onwaiting" type="Function">
+      <availability>
+        <specification name="W3C" version="HTML 5">
+      </availability> 
+      <browsers>
+      <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Fires when media has stopped playing, but is expected to resume</description>
     </event>
   </events>
   <entities>
