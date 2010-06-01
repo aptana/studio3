@@ -4,6 +4,8 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
@@ -26,8 +28,17 @@ public class DeployHandler extends AbstractHandler
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 
-		IStructuredSelection selections = (IStructuredSelection) HandlerUtil.getCurrentSelection(event);
-		IProject selectedProject = (IProject) selections.getFirstElement();
+		ISelection selections = HandlerUtil.getCurrentSelection(event);
+		if (selections.isEmpty() || !(selections instanceof IStructuredSelection))
+		{
+			return null;
+		}
+		Object selection = ((IStructuredSelection) selections).getFirstElement();
+		if (!(selection instanceof IResource))
+		{
+			return null;
+		}
+		IProject selectedProject = ((IResource) selection).getProject();
 
 		if (isCapistranoProject(selectedProject))
 		{
@@ -76,25 +87,17 @@ public class DeployHandler extends AbstractHandler
 
 	private boolean isCapistranoProject(IProject selectedProject)
 	{
-		if (selectedProject.getFile("Capfile").exists()) //$NON-NLS-1$
-			return true;
-
-		return false;
+		return selectedProject.getFile("Capfile").exists(); //$NON-NLS-1$
 	}
 
 	private boolean isFTPProject(IProject selectedProject)
 	{
-		ISiteConnection[] siteConnections = SiteConnectionUtils.findSitesForSource(selectedProject);
-
-		if (siteConnections.length > 0)
-			return true;
-
-		return false;
+		ISiteConnection[] siteConnections = SiteConnectionUtils.findSitesForSource(selectedProject, true);
+		return siteConnections.length > 0;
 	}
 
 	private boolean isHerokuProject(IProject selectedProject)
 	{
-
 		GitRepository repo = GitPlugin.getDefault().getGitRepositoryManager().getAttached(selectedProject);
 		if (repo != null)
 		{
@@ -114,7 +117,6 @@ public class DeployHandler extends AbstractHandler
 			}
 		}
 		return false;
-
 	}
 
 }
