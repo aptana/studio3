@@ -27,15 +27,19 @@ public class DeployHandler extends AbstractHandler
 	{
 
 		IStructuredSelection selections = (IStructuredSelection) HandlerUtil.getCurrentSelection(event);
-		IProject selectedProject = (IProject) selections.getFirstElement();
-
-		if (isCapistranoProject(selectedProject))
+		
+		IProject selectedProject = null;
+		if(selections.getFirstElement() instanceof IProject) {
+			selectedProject = (IProject) selections.getFirstElement();
+		}
+		
+		if (selectedProject != null && isCapistranoProject(selectedProject))
 		{
 			TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
 					selectedProject.getLocation());
 			terminal.sendInput("cap deploy\n"); //$NON-NLS-1$
 		}
-		else if (isFTPProject(selectedProject))
+		else if (selectedProject != null && isFTPProject(selectedProject))
 		{
 			SynchronizeFilesAction action = new SynchronizeFilesAction();
 			action.setActivePart(null, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
@@ -44,7 +48,7 @@ public class DeployHandler extends AbstractHandler
 					.getSelection());
 			action.run(null);
 		}
-		else if (isHerokuProject(selectedProject))
+		else if (selectedProject != null && isHerokuProject(selectedProject))
 		{
 			TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
 					selectedProject.getLocation());
