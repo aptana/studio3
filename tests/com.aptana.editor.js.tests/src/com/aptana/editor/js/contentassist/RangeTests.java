@@ -80,14 +80,58 @@ public class RangeTests extends EditorBasedTests
 	}
 	
 	/**
-	 * testNoArgs
+	 * testFunctionWithoutArgs
 	 */
-	public void testNoArgs()
+	public void testFunctionWithoutArgs()
 	{
 		this.rangeTests(
-			"ranges/functionNoArgs.js",
+			"ranges/functionWithoutArgs.js",
 			new OffsetSelection(0, 15, null),
 			new OffsetSelection(16, 17, Range.EMPTY)
+		);
+	}
+	
+	/**
+	 * testFunctionWithArgs
+	 */
+	public void testFunctionWithArgs()
+	{
+		this.rangeTests(
+			"ranges/functionWithArgs.js",
+			new OffsetSelection(0, 24, null),
+			new OffsetSelection(25, 26, Range.EMPTY)
+		);
+	}
+	
+	/**
+	 * testInvokeWithoutParams
+	 */
+	public void testInvokeWithoutParams()
+	{
+		this.rangeTests(
+			"ranges/invokeWithoutParams.js",
+			new OffsetSelection(0, Range.EMPTY),
+			new OffsetSelection(1, 3, new Range(0, 2)),
+			new OffsetSelection(4, 5, Range.EMPTY)
+		);
+	}
+	
+	/**
+	 * testInvokeWithParams
+	 */
+	public void testInvokeWithParams()
+	{
+		this.rangeTests(
+			"ranges/invokeWithParams.js",
+			new OffsetSelection(0, Range.EMPTY),
+			new OffsetSelection(1, 3, new Range(0, 2)),
+			new OffsetSelection(4, Range.EMPTY),
+			new OffsetSelection(5, new Range(4)),
+			new OffsetSelection(6, Range.EMPTY),
+			new OffsetSelection(7, 8, new Range(6, 7)),
+			new OffsetSelection(9, 10, Range.EMPTY),
+			new OffsetSelection(11, 13, new Range(10, 12)),
+			new OffsetSelection(14, Range.EMPTY)
 		);
 	}
 }
