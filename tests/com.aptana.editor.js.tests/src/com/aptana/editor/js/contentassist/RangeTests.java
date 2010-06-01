@@ -38,7 +38,7 @@ public class RangeTests extends EditorBasedTests
 	 */
 	protected void rangeTests(String resource, OffsetSelection... selections)
 	{
-		TestContext context = this.getTestContext("locations/global_in_arg.js");
+		TestContext context = this.getTestContext(resource);
 		ITextViewer viewer = new TestTextViewer(context.document);
 		JSContentAssistProcessor processor = new JSContentAssistProcessor((AbstractThemeableEditor) context.editor);
 
@@ -85,8 +85,9 @@ public class RangeTests extends EditorBasedTests
 	public void testNoArgs()
 	{
 		this.rangeTests(
-			"ranges/global_in_arg.js",
-			new OffsetSelection(0, 8, null)
+			"ranges/functionNoArgs.js",
+			new OffsetSelection(0, 15, null),
+			new OffsetSelection(16, 17, Range.EMPTY)
 		);
 	}
 }
