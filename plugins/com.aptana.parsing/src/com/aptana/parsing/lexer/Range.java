@@ -10,6 +10,16 @@ public class Range implements IRange
 	/**
 	 * Range
 	 * 
+	 * @param offset
+	 */
+	public Range(int offset)
+	{
+		this(offset, offset);
+	}
+	
+	/**
+	 * Range
+	 * 
 	 * @param start
 	 * @param end
 	 */
