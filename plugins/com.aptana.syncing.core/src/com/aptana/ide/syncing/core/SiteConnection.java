@@ -53,7 +53,7 @@ import com.aptana.ide.core.io.IConnectionPoint;
  * @author Max Stepanov
  * 
  */
-/* package */ public class SiteConnection extends PlatformObject implements ISiteConnection {
+/* package */ class SiteConnection extends PlatformObject implements ISiteConnection {
 
     private static final String ELEMENT_NAME = "name"; //$NON-NLS-1$
     private static final String ELEMENT_SOURCE = "source"; //$NON-NLS-1$
