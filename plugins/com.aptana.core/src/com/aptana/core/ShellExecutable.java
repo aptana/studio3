@@ -68,6 +68,8 @@ public class ShellExecutable {
 		"%PROGRAMFILES(X86)%\\Git\\bin" //$NON-NLS-1$
 	};
 	
+	public static final String PATH_SEPARATOR = ":"; //$NON-NLS-1$
+	
 	private static final String SH_EXE = "sh.exe"; //$NON-NLS-1$
 	private static final String BASH = "bash"; //$NON-NLS-1$
 	
