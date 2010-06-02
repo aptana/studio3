@@ -69,6 +69,7 @@ public class DeployHandler extends AbstractHandler
 			DeployWizard wizard = new DeployWizard();
 			wizard.init(part.getSite().getWorkbenchWindow().getWorkbench(), (IStructuredSelection) part.getSite().getSelectionProvider()
 					.getSelection());
+			wizard.setWindowTitle(Messages.DeployHandler_Wizard_Title);
 
 			// Instantiates the wizard container with the wizard and opens it
 			Shell shell = part.getSite().getShell();
