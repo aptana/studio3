@@ -65,5 +65,7 @@ public final class Messages extends NLS
 	public static String CoreStrings_Refresh;
 	public static String CoreStrings_Remove;
 	public static String CoreStrings_Rename;
+	public static String CoreStrings_Continue;
+	public static String CoreStrings_Cancel;
 
 }

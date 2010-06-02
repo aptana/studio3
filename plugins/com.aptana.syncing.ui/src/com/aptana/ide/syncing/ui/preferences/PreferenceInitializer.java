@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -56,6 +56,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		store.setDefault(IPreferenceConstants.SHOW_SYNC_EXPLORER_TABLE, true);
 		store.setDefault(IPreferenceConstants.SHOW_DATE, true);
 		store.setDefault(IPreferenceConstants.SHOW_SIZE, true);
+		store.setDefault(IPreferenceConstants.FILE_PERMISSION, "-rw-rw-rw-");
+		store.setDefault(IPreferenceConstants.DIRECTORY_PERMISSION, "drwxrwxrwx");
 	}
 
 }
