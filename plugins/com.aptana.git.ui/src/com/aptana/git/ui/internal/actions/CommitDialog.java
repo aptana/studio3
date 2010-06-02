@@ -472,12 +472,6 @@ public class CommitDialog extends StatusDialog
 				// Truncate middle of string
 				Table theTable = (Table) event.widget;
 				int width = theTable.getColumn(event.index).getWidth();
-				if (width == 0)
-				{
-					// Try to compute the width from the parent table
-					Point tableSize = theTable.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-					width = tableSize.x / theTable.getColumnCount();
-				}
 				Point p = event.gc.stringExtent(text); // is text wider than available width?
 				if (p.x > width)
 				{
