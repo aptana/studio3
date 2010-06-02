@@ -38,9 +38,6 @@ package com.aptana.terminal.views;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -85,8 +82,6 @@ import org.eclipse.ui.internal.keys.WorkbenchKeyboard.KeyDownFilter;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.ViewPart;
 
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.terminal.Activator;
 import com.aptana.terminal.Utils;
 import com.aptana.terminal.editor.TerminalEditor;
@@ -99,7 +94,7 @@ import com.aptana.terminal.widget.TerminalComposite;
  *
  */
 @SuppressWarnings("restriction")
-public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalListener, IProcessListener, IPreferenceChangeListener {
+public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalListener, IProcessListener {
 
 	public static final String ID = "com.aptana.terminal.views.terminal"; //$NON-NLS-1$
 
@@ -147,16 +142,6 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	public void init(IViewSite site, IMemento memento) throws PartInitException {
 		super.init(site, memento);
 		savedState = memento;
-		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(this);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
-	 */
-	@Override
-	public void dispose() {
-		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(this);
-		super.dispose();
 	}
 
 	/* (non-Javadoc)
@@ -376,18 +361,6 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	 */
 	public void sendInput(String text) {
 		terminalComposite.sendInput(text);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener#preferenceChange(org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent)
-	 */
-	@Override
-	public void preferenceChange(PreferenceChangeEvent event) {
-		if (IThemeManager.THEME_CHANGED.equals(event.getKey())) {
-			if (terminalComposite != null && !terminalComposite.isDisposed()) {
-				terminalComposite.getTerminalControl().redraw();
-			}
-		}
 	}
 
 	/**
