@@ -95,7 +95,7 @@ public class TerminalComposite extends Composite {
 	 * Connect
 	 */
 	public void connect() {
-		Job job = new UIJob("Terminal connect") {
+		Job job = new UIJob("Terminal connect") { //$NON-NLS-1$
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				fCtlTerminal.connectTerminal();
