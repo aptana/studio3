@@ -437,13 +437,13 @@ public abstract class SingleProjectView extends CommonNavigator
 	protected void fillDeployMenu(MenuManager menuManager)
 	{
 		if (selectedProject == null || !selectedProject.isAccessible())
-			return;
-
-		if (isCapistranoProject())
+		{
+			menuManager.add(new Separator(GROUP_WIZARD));
+		}
+		else if (isCapistranoProject())
 		{
 			// insert commands for capistrano here
 			menuManager.add(new Separator(GROUP_CAP));
-
 		}
 		else if (isHerokuProject())
 		{

@@ -3,15 +3,17 @@ package com.aptana.explorer.internal.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.aptana.deploy.wizard.DeployWizard;
 import com.aptana.git.core.GitPlugin;
@@ -24,22 +26,11 @@ import com.aptana.terminal.views.TerminalView;
 public class DeployHandler extends AbstractHandler
 {
 
+	private IProject selectedProject;
+
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
-
-		ISelection selections = HandlerUtil.getCurrentSelection(event);
-		if (selections.isEmpty() || !(selections instanceof IStructuredSelection))
-		{
-			return null;
-		}
-		Object selection = ((IStructuredSelection) selections).getFirstElement();
-		if (!(selection instanceof IResource))
-		{
-			return null;
-		}
-		IProject selectedProject = ((IResource) selection).getProject();
-
 		if (isCapistranoProject(selectedProject))
 		{
 			TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
@@ -83,6 +74,43 @@ public class DeployHandler extends AbstractHandler
 		}
 
 		return null;
+	}
+
+	@Override
+	public boolean isEnabled()
+	{
+		return selectedProject != null && selectedProject.isAccessible();
+	}
+
+	@Override
+	public void setEnabled(Object evaluationContext)
+	{
+		selectedProject = null;
+		if (evaluationContext instanceof EvaluationContext)
+		{
+			Object value = ((EvaluationContext) evaluationContext).getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
+			if (value instanceof ISelection)
+			{
+				ISelection selections = (ISelection) value;
+				if (!selections.isEmpty() && selections instanceof IStructuredSelection)
+				{
+					Object selection = ((IStructuredSelection) selections).getFirstElement();
+					IResource resource = null;
+					if (selection instanceof IResource)
+					{
+						resource = (IResource) selection;
+					}
+					else if (selection instanceof IAdaptable)
+					{
+						resource = (IResource) ((IAdaptable) selection).getAdapter(IResource.class);
+					}
+					if (resource != null)
+					{
+						selectedProject = resource.getProject();
+					}
+				}
+			}
+		}
 	}
 
 	private boolean isCapistranoProject(IProject selectedProject)
