@@ -227,4 +227,18 @@ public class FineLocationTests extends TestCase
 			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 49)
 		);
 	}
+	
+	/**
+	 * testSpaceAfterColon
+	 */
+	public void testSpaceAfterColon()
+	{
+		String source = ".hello {\n  background: \n}";
+		
+		this.fineLocationTests(
+			source,
+			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 8, 21),
+			new LocationTypeRange(LocationType.INSIDE_VALUE, 22, 24)
+		);
+	}
 }
