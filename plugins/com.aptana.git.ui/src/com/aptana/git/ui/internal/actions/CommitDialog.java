@@ -135,7 +135,6 @@ public class CommitDialog extends StatusDialog
 		validate();
 		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 		{
-			
 			@Override
 			public void run()
 			{
@@ -143,8 +142,6 @@ public class CommitDialog extends StatusDialog
 				packTable(unstagedTable);
 			}
 		});
-		
-
 		return container;
 	}
 
@@ -475,7 +472,12 @@ public class CommitDialog extends StatusDialog
 				// Truncate middle of string
 				Table theTable = (Table) event.widget;
 				int width = theTable.getColumn(event.index).getWidth();
-
+				if (width == 0)
+				{
+					// Try to compute the width from the parent table
+					Point tableSize = theTable.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+					width = tableSize.x / theTable.getColumnCount();
+				}
 				Point p = event.gc.stringExtent(text); // is text wider than available width?
 				if (p.x > width)
 				{
@@ -488,8 +490,22 @@ public class CommitDialog extends StatusDialog
 					// lengths work better..
 					while (event.gc.stringExtent(beginning + "..." + end).x > width) //$NON-NLS-1$
 					{
-						beginning = beginning.substring(0, beginning.length() - 1);
-						end = end.substring(1);
+						if (beginning.length() > 0)
+						{
+							beginning = beginning.substring(0, beginning.length() - 1);
+						}
+						else
+						{
+							break;
+						}
+						if (end.length() > 0)
+						{
+							end = end.substring(1);
+						}
+						else
+						{
+							break;
+						}
 					}
 					text = beginning + "..." + end; //$NON-NLS-1$
 				}
