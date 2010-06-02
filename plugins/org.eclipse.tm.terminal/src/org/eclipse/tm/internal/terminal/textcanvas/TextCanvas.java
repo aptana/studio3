@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2009 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  * Michael Scharf (Wind River) - [240098] The cursor should not blink when the terminal is disconnected
  * Uwe Stieber (Wind River) - [281328] The very first few characters might be missing in the terminal control if opened and connected programmatically
  * Martin Oberhuber (Wind River) - [294327] After logging in, the remote prompt is hidden
+ * Anton Leherbauer (Wind River) - [294468] Fix scroller and text line rendering
  *******************************************************************************/
 package org.eclipse.tm.internal.terminal.textcanvas;
 
@@ -23,6 +24,7 @@ import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -66,7 +68,7 @@ public class TextCanvas extends GridCanvas {
 	// since it allows switching the terminal viewport small/large as needed,
 	// without destroying the backing store. For a complete solution, 
 	// Bug 196462 tracks the request for a user-defined fixed-widow-size-mode.
-	private int fMinColumns=20;
+	private int fMinColumns=80;
 	private int fMinLines=4;
 	private boolean fCursorEnabled;
 	/**
@@ -84,13 +86,15 @@ public class TextCanvas extends GridCanvas {
 				repaintRange(col,line,width,height);
 			}
 			public void dimensionsChanged(int cols, int rows) {
-				setVirtualExtend(cols+getCellWidth(), rows+getCellHeight());
 				calculateGrid();
 			}
 			public void terminalDataChanged() {
 				if(isDisposed())
 					return;
 				scrollToEnd();
+				// make sure the scroll area is correct:
+				scrollY(getVerticalBar());
+				scrollX(getHorizontalBar());
 			}
 		});
 		// let the cursor blink if the text canvas gets the focus...
@@ -206,8 +210,10 @@ public class TextCanvas extends GridCanvas {
 	protected void onResize(boolean init) {
 		if(fResizeListener!=null) {
 			Rectangle bonds=getClientArea();
-			int lines=bonds.height/getCellHeight();
-			int columns=bonds.width/getCellWidth();
+			int cellHeight = getCellHeight();
+			int cellWidth = getCellWidth();
+			int lines=bonds.height/cellHeight;
+			int columns=bonds.width/cellWidth;
 			// when the view is minimised, its size is set to 0
 			// we don't sent this to the terminal!
 			if((lines>0 && columns>0) || init) {
@@ -215,15 +221,14 @@ public class TextCanvas extends GridCanvas {
 					if(!isHorizontalBarVisble()) {
 						setHorizontalBarVisible(true);
 						bonds=getClientArea();
-						lines=bonds.height/getCellHeight();
+						lines=bonds.height/cellHeight;
 					}
 					columns=fMinColumns;
 				} else if(columns>=fMinColumns && isHorizontalBarVisble()) {
 					setHorizontalBarVisible(false);
 					bonds=getClientArea();
-					lines=bonds.height/getCellHeight();
-					columns=bonds.width/getCellWidth();
-
+					lines=bonds.height/cellHeight;
+					columns=bonds.width/cellWidth;
 				}
 				if(lines<fMinLines)
 					lines=fMinLines;
@@ -240,20 +245,27 @@ public class TextCanvas extends GridCanvas {
 
 	private void calculateGrid() {
 		setVirtualExtend(getCols()*getCellWidth(),getRows()*getCellHeight());
-		// scroll to end
-		scrollToEnd();
-		// make sure the scroll area is correct:
-		scrollY(getVerticalBar());
-		scrollX(getHorizontalBar());
-
-		getParent().layout();
-		redraw();
+		setRedraw(false);
+		try {
+			// scroll to end
+			scrollToEnd();
+			// make sure the scroll area is correct:
+			scrollY(getVerticalBar());
+			scrollX(getHorizontalBar());
+	
+			getParent().layout();
+		} finally {
+			setRedraw(true);
+		}
 	}
 	void scrollToEnd() {
 		if(!fScrollLock) {
 			int y=-(getRows()*getCellHeight()-getClientArea().height);
+			if (y > 0) {
+				y = 0;
+			}
 			Rectangle v=getViewRectangle();
-			if(v.y!=y) {
+			if(v.y!=-y) {
 				setVirtualOrigin(v.x,y);
 			}
 		}
@@ -267,7 +279,6 @@ public class TextCanvas extends GridCanvas {
 	}
 	/**
 	 * If set then if the size changes
-	 * @param scrollLock
 	 */
 	public void setScrollLock(boolean scrollLock) {
 		fScrollLock=scrollLock;
@@ -279,9 +290,9 @@ public class TextCanvas extends GridCanvas {
 	}
 	protected void drawLine(GC gc, int line, int x, int y, int colFirst, int colLast) {
 		fCellRenderer.drawLine(fCellCanvasModel, gc,line,x,y,colFirst, colLast);
-
 	}
-	protected void paintUnoccupiedSpace(GC gc, Rectangle clipping) {
+	protected Color getTerminalBackgroundColor() {
+		return fCellRenderer.getDefaultBackgroundColor();
 	}
 	protected void visibleCellRectangleChanged(int x, int y, int width, int height) {
 		fCellCanvasModel.setVisibleRectangle(y,x,height,width);
