@@ -1,5 +1,6 @@
 package com.aptana.terminal;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -15,6 +16,7 @@ import org.eclipse.ui.PerspectiveAdapter;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.WorkbenchJob;
 
+import com.aptana.core.ShellExecutable;
 import com.aptana.terminal.editor.TerminalEditor;
 import com.aptana.terminal.preferences.IPreferenceConstants;
 
@@ -163,6 +165,12 @@ public class EarlyStartup implements IStartup
 	 */
 	private void openTerminalEditor(IWorkbenchWindow workbenchWindow)
 	{
-		Utils.openTerminalEditor(workbenchWindow, TerminalEditor.ID, true);
+		try {
+			if (ShellExecutable.getPath().toFile().exists()) {
+				Utils.openTerminalEditor(workbenchWindow, TerminalEditor.ID, true);
+			}
+		} catch (CoreException e) {
+			Activator.logError("Skip opening terminal editor", e.getCause()); //$NON-NLS-1$
+		}
 	}
 }

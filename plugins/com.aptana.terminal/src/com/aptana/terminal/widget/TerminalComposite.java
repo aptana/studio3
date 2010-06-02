@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -95,7 +95,7 @@ public class TerminalComposite extends Composite {
 	 * Connect
 	 */
 	public void connect() {
-		Job job = new UIJob("Terminal connect") {
+		Job job = new UIJob("Terminal connect") { //$NON-NLS-1$
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				fCtlTerminal.connectTerminal();

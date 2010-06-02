@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -67,7 +67,7 @@ import com.aptana.editor.common.theme.Theme;
 		}
 
 		// Just grab colors straight from theme!
-		String ansiName = "ansi." + color.getName().toLowerCase();
+		String ansiName = "ansi." + color.getName().toLowerCase(); //$NON-NLS-1$
 		Theme theme = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme();
 		if (theme.hasEntry(ansiName)) {
 			return theme.getForeground(ansiName);

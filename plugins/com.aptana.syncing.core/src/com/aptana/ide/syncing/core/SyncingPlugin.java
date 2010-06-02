@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -45,6 +45,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.core.CorePlugin;
@@ -148,6 +149,11 @@ public class SyncingPlugin extends Plugin {
 	public static void log(IStatus status) {
 		getDefault().getLog().log(status);
 	}
+
+   public static void logError(String msg, Exception e) {
+        log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, msg, e));
+    }
+
 
 	private class WorkspaceSaveParticipant implements ISaveParticipant {
 

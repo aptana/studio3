@@ -9,6 +9,7 @@ public class Messages extends NLS
 
 	public static String FTPDeployComposite_AutoSync;
 	public static String FTPDeployComposite_Download;
+	public static String FTPDeployComposite_Synchronize;
 	public static String FTPDeployComposite_Upload;
 	public static String CapifyProjectPage_Description;
 	public static String CapifyProjectPage_GenerateButtonLabel;

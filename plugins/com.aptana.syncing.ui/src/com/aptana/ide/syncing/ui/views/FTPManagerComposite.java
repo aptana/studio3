@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -73,14 +73,19 @@ import org.eclipse.ui.PlatformUI;
 
 import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
+import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.DefaultSiteConnection;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.SyncingPlugin;
 import com.aptana.ide.syncing.core.events.ISiteConnectionListener;
 import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
+import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
+import com.aptana.ide.syncing.core.old.handlers.SyncEventHandlerAdapter;
+import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 import com.aptana.ide.syncing.ui.dialogs.SiteConnectionsEditorDialog;
 import com.aptana.ide.syncing.ui.editors.EditorUtils;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
+import com.aptana.ide.syncing.ui.old.views.SmartSyncDialog;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.actions.CopyFilesOperation;
 import com.aptana.ui.UIUtils;
@@ -100,6 +105,7 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
     private Button fSaveAsButton;
     private ConnectionPointComposite fSource;
     private ConnectionPointComposite fTarget;
+    private Button fTransferSyncButton;
     private Button fTransferRightButton;
     private Button fTransferLeftButton;
 
@@ -171,6 +177,8 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
             dlg.open();
         } else if (source == fSaveAsButton) {
             saveAs();
+        } else if (source == fTransferSyncButton) {
+            syncSourceToDestination();
         } else if (source == fTransferRightButton) {
             transferSourceToDestination();
         } else if (source == fTransferLeftButton) {
@@ -311,6 +319,12 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
         fTransferLeftButton.setLayoutData(new GridData(SWT.CENTER, SWT.BEGINNING, true, true));
         fTransferLeftButton.addSelectionListener(this);
 
+        fTransferSyncButton = new Button(directions, SWT.NONE);
+        fTransferSyncButton.setImage(SyncingUIPlugin.getImage("icons/full/obj16/sync_both.gif")); //$NON-NLS-1$
+        fTransferSyncButton.setToolTipText("Synchronizes the files on the right with those on the left");
+        fTransferSyncButton.setLayoutData(new GridData(SWT.CENTER, SWT.BEGINNING, true, true));
+        fTransferSyncButton.addSelectionListener(this);
+
         final Sash rightSash = new Sash(main, SWT.VERTICAL);
         rightSash.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
 
@@ -417,6 +431,27 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
         
         // opens the connection in a new editor
         EditorUtils.openConnectionEditor(newSite);
+    }
+
+    private void syncSourceToDestination() {
+    	
+    	ISiteConnection selection = (ISiteConnection) ((IStructuredSelection) fSitesViewer.getSelection()).getFirstElement();
+
+		IConnectionPoint source = selection.getSource();
+		IConnectionPoint dest = selection.getDestination();
+        IFileStore sourceStore = SyncUtils.getFileStore(fSource.getCurrentInput());
+        IFileStore targetStore = SyncUtils.getFileStore(fTarget.getCurrentInput());
+
+        SmartSyncDialog dialog = new SmartSyncDialog(UIUtils.getActiveShell(), source, dest, sourceStore, targetStore,
+				source.getName(), dest.getName());
+		dialog.open();
+		dialog.setHandler(new SyncEventHandlerAdapter()
+		{
+			public void syncDone(VirtualFileSyncPair item)
+			{
+				// refresh();
+			}
+		});
     }
 
     private void transferSourceToDestination() {

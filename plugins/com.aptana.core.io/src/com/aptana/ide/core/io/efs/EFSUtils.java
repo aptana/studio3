@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -37,6 +37,9 @@ package com.aptana.ide.core.io.efs;
 
 import java.io.File;
 import java.net.URI;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
@@ -44,7 +47,13 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.filesystem.provider.FileInfo;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+
+import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.ide.core.io.preferences.CloakingUtils;
+import com.aptana.ide.core.io.vfs.IExtendedFileStore;
 
 /**
  * @author Max Stepanov
@@ -74,7 +83,7 @@ public final class EFSUtils {
 	 */
 	public static void setModificationTime(IFileStore sourceFile, IFileStore destFile) throws CoreException {
 		IFileInfo fi = new FileInfo();
-		fi.setLastModified(sourceFile.fetchInfo().getLastModified());
+		fi.setLastModified(sourceFile.fetchInfo(IExtendedFileStore.DETAILED, null).getLastModified());
 		destFile.putInfo(fi, EFS.SET_LAST_MODIFIED, null);
 	}
 	
@@ -86,6 +95,16 @@ public final class EFSUtils {
 	 */
 	public static IFileStore[] getFiles(IFileStore file) throws CoreException {
 		return getFiles(file, false, true);
+	}
+	
+	/**
+	 * Returns the child files of the filestore
+	 * @param file
+	 * @return 
+	 * @throws CoreException 
+	 */
+	public static IFileStore[] getFiles(IFileStore file, IProgressMonitor monitor) throws CoreException {
+		return getFiles(file, false, true, monitor);
 	}
 
 	/**
@@ -100,7 +119,7 @@ public final class EFSUtils {
 	 * @throws CoreException
 	 */
 	public static IFileStore[] getFiles(IFileStore file, boolean recurse, boolean includeCloakedFiles) throws CoreException {
-		return file.childStores(EFS.NONE, null);
+		return getFiles(file, recurse, includeCloakedFiles, null);
 	}
 
 	/**
@@ -160,4 +179,116 @@ public final class EFSUtils {
         }
         return null;
 	}
+
+	/**
+	 * Returns the parent file of this file
+	 * @param file
+	 * @return
+	 * @throws CoreException 
+	 */
+	public static String getRelativePath(IConnectionPoint point, IFileStore file) {
+		try
+		{
+			return getRelativePath(point.getRoot(), file);
+		}
+		catch (CoreException e)
+		{
+			return null;
+		}
+	}
+	
+    /**
+     * @param sourceStore
+     *            the file to be copied
+     * @param destinationStore
+     *            the destination location
+     * @param monitor
+     *            the progress monitor
+     * @return true if the file is successfully copied, false if the operation
+     *         did not go through for any reason
+     * @throws CoreException 
+     */
+    public static boolean copyFile(IFileStore sourceStore, IFileStore destinationStore,
+            IProgressMonitor monitor) throws CoreException {
+        if (sourceStore == null || CloakingUtils.isFileCloaked(sourceStore)) {
+            return false;
+        }
+
+        if (monitor == null) {
+            monitor = new NullProgressMonitor();
+        }
+
+        boolean success = true;
+        monitor.subTask(MessageFormat.format("Copying {0} to {1}", sourceStore
+                .getName(), destinationStore.getName()));
+
+        sourceStore.copy(destinationStore, EFS.OVERWRITE, monitor);
+        return success;
+    }
+
+	/**
+	 * @throws CoreException 
+	 * @see {@link IConnectionPoint}#getFiles(IFileStore, boolean, boolean)
+	 */
+	public static IFileStore[] getFiles(IFileStore file, boolean recurse, boolean includeCloakedFiles, IProgressMonitor monitor) throws CoreException
+	{
+		IFileStore[] result = null;
+		ArrayList<IFileStore> list = new ArrayList<IFileStore>();
+		getFiles(file, recurse, list, includeCloakedFiles, monitor);
+		result = list.toArray(new IFileStore[0]);
+		return result;
+	}
+
+	/**
+	 * getFiles
+	 * 
+	 * @param file
+	 * @param recurse
+	 * @param list
+	 * @throws CoreException 
+	 */
+	private static void getFiles(IFileStore file, boolean recurse, List<IFileStore> list, boolean includeCloakedFiles, IProgressMonitor monitor) throws CoreException
+	{
+        if (monitor == null) {
+            monitor = new NullProgressMonitor();
+        }
+
+		if (file == null)
+		{
+			return;
+		}
+
+		IFileStore[] children = file.childStores(EFS.NONE, monitor);
+
+		if (children != null)
+		{
+			boolean addingFile;
+			for (int i = 0; i < children.length; i++)
+			{
+				IFileStore child = children[i];
+				addingFile = false;
+				if (includeCloakedFiles || !CloakingUtils.isFileCloaked(child))
+				{
+					list.add(child);
+					addingFile = true;
+				}
+
+				if (recurse && child.fetchInfo(EFS.NONE, monitor).isDirectory() && addingFile)
+				{
+					getFiles(child, recurse, list, includeCloakedFiles, monitor);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Returns the parent file of this file
+	 * @param file
+	 * @return
+	 */
+	public static IFileStore getParentFile(IFileStore file) {
+		return file.getParent();
+	}
+	
+	
 }

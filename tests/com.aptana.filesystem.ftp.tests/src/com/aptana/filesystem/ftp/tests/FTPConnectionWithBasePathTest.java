@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -53,9 +53,10 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 	private static FTPConnectionPoint setupConnection()
 	{
 		FTPConnectionPoint ftpcp = new FTPConnectionPoint();
-		ftpcp.setHost("10.10.1.60"); //$NON-NLS-1$
-		ftpcp.setLogin("ftpuser"); //$NON-NLS-1$
-		ftpcp.setPassword(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'});
+		ftpcp.setHost(getConfig().getProperty("ftp.host", "10.10.1.60")); //$NON-NLS-1$ //$NON-NLS-2$
+		ftpcp.setLogin(getConfig().getProperty("ftp.username", "ftpuser")); //$NON-NLS-1$ //$NON-NLS-2$
+		ftpcp.setPassword(getConfig().getProperty("ftp.password",	//$NON-NLS-1$
+				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'})).toCharArray());
 		
 		ConnectionContext context = new ConnectionContext();
 		context.put(ConnectionContext.COMMAND_LOG, System.out);
