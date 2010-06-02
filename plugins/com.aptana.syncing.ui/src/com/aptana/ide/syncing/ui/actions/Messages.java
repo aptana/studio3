@@ -48,6 +48,8 @@ public class Messages extends NLS {
 
     public static String NewSiteAction_LBL_New;
 
+    public static String SynchronizeAction_MessageTitle;
+
     public static String UploadAction_MessageTitle;
     public static String UploadAction_PostMessage;
 

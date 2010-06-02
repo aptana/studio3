@@ -18,7 +18,7 @@ import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.SiteConnectionUtils;
-import com.aptana.ide.syncing.ui.actions.SynchronizeAction;
+import com.aptana.ide.syncing.ui.actions.SynchronizeFilesAction;
 import com.aptana.terminal.views.TerminalView;
 
 public class DeployHandler extends AbstractHandler
@@ -48,7 +48,7 @@ public class DeployHandler extends AbstractHandler
 		}
 		else if (isFTPProject(selectedProject))
 		{
-			SynchronizeAction action = new SynchronizeAction();
+			SynchronizeFilesAction action = new SynchronizeFilesAction();
 			action.setActivePart(null, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
 					.getActivePart());
 			action.setSelection(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService()
@@ -77,7 +77,7 @@ public class DeployHandler extends AbstractHandler
 				shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 			}
 			WizardDialog dialog = new WizardDialog(shell, wizard);
-			dialog.setPageSize(350, 470);
+			dialog.setPageSize(350, 500);
 			dialog.create();
 			dialog.open();
 		}

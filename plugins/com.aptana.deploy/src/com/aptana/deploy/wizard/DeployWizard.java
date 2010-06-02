@@ -56,6 +56,7 @@ import com.aptana.ide.syncing.core.SiteConnectionUtils;
 import com.aptana.ide.syncing.core.SyncingPlugin;
 import com.aptana.ide.syncing.ui.actions.BaseSyncAction;
 import com.aptana.ide.syncing.ui.actions.DownloadAction;
+import com.aptana.ide.syncing.ui.actions.SynchronizeFilesAction;
 import com.aptana.ide.syncing.ui.actions.UploadAction;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleEntry;
@@ -159,6 +160,8 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 							case DOWNLOAD:
 								action = new DownloadAction();
 								break;
+							case BOTH:
+								action = new SynchronizeFilesAction();
 						}
 						action.setActivePart(null, activePart);
 						action.setSelection(new StructuredSelection(project));
