@@ -134,4 +134,60 @@ public class RangeTests extends EditorBasedTests
 			new OffsetSelection(14, Range.EMPTY)
 		);
 	}
+	
+	/**
+	 * testIfStatement
+	 */
+	public void testIfStatement()
+	{
+		this.rangeTests(
+			"ranges/ifStatement.js",
+			new OffsetSelection(0, 3, null),
+			new OffsetSelection(4, Range.EMPTY),
+			new OffsetSelection(5, new Range(4)),
+			new OffsetSelection(6, 7, null),
+			new OffsetSelection(8, Range.EMPTY),
+			new OffsetSelection(9, 15, null),
+			new OffsetSelection(16, 17, Range.EMPTY)
+		);
+	}
+	
+	/**
+	 * testWhileStatement
+	 */
+	public void testWhileStatement()
+	{
+		this.rangeTests(
+			"ranges/whileStatement.js",
+			new OffsetSelection(0, 6, null),
+			new OffsetSelection(7, Range.EMPTY),
+			new OffsetSelection(8, new Range(7)),
+			new OffsetSelection(9, 10, null),
+			new OffsetSelection(11, 12, Range.EMPTY)
+		);
+	}
+	
+	/**
+	 * testForStatement
+	 */
+	public void testForStatement()
+	{
+		this.rangeTests(
+			"ranges/forStatement.js",
+			new OffsetSelection(0, 29, null),
+			new OffsetSelection(30, 31, Range.EMPTY)
+		);
+	}
+	
+	/**
+	 * testForInStatement
+	 */
+	public void testForInStatement()
+	{
+		this.rangeTests(
+			"ranges/forInStatement.js",
+			new OffsetSelection(0, 19, null),
+			new OffsetSelection(20, 21, Range.EMPTY)
+		);
+	}
 }
