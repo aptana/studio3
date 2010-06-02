@@ -114,8 +114,11 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 	public void connect(ITerminalControl control) {
 		super.connect(control);
 		control.setState(TerminalState.CONNECTING);
-		startProcess(control);
-		control.setState(TerminalState.CONNECTED);
+		if (startProcess(control)) {
+			control.setState(TerminalState.CONNECTED);
+		} else {
+			control.setState(TerminalState.CLOSED);			
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -211,7 +214,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 		return initialDirectory;
 	}
 
-	private void startProcess(ITerminalControl control) {
+	private boolean startProcess(ITerminalControl control) {
 		try {
 			
 			processLauncher = new ProcessLauncher(getCurrentConfiguration(), initialDirectory = getInitialDirectory());
@@ -238,10 +241,12 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			LocalTerminalOutputListener errorListener = new LocalTerminalOutputListener(control, null);
 			errorMonitor.addListener(errorListener);
 			errorListener.streamAppended(errorMonitor.getContents(), errorMonitor);
-
+			return true;
 		} catch (Exception e) {
 			Activator.logError("Starting terminal process failed.", e); //$NON-NLS-1$
 		}
+		control.displayTextInTerminal(Messages.LocalTerminalConnector_NoShellErrorMessage);
+		return false;
 	}
 	
 	private IProcessConfiguration getCurrentConfiguration() {
@@ -303,7 +308,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 				processList.notifyAll();
 				processList.clear();
 				response = response.substring(2, response.length()-1);
-				for (String pid : response.split(",")) {
+				for (String pid : response.split(",")) { //$NON-NLS-1$
 					try {
 						processList.add(Integer.parseInt(pid));
 					} catch (NumberFormatException ignore) {
