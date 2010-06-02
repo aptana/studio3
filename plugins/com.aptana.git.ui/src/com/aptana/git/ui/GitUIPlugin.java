@@ -139,16 +139,16 @@ public class GitUIPlugin extends AbstractUIPlugin
 	private void checkHasGit() {
 		if (Platform.WS_WIN32.equals(Platform.getOS())) {
 			if (GitExecutable.instance() == null) {
-				UIJob job = new UIJob("GIT installation check") {
+				UIJob job = new UIJob(Messages.GitUIPlugin_0) {
 					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor) {
 						while(true) {
 							MessageDialog dlg = new MessageDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-									"TITLE",
+									Messages.GitUIPlugin_1,
 									null,
-									"Aptana Studio 3 could not find an installation of msysgit on your machine.\nmsysgit is required in order for Aptana Studio 3 to function. If you have already installed msysgit, please select the 'Browse...' button below and choose the root directory of your msysgit installation. If you would like us to use PortableGit installation, press the 'Use PortableGit' button. Press Skip if you want to do nothing at this time, but keep in mind that Aptana Studio 3 will not function correctly.",
+									Messages.GitUIPlugin_2,
 									MessageDialog.WARNING,
-									new String[] { IDialogConstants.SKIP_LABEL, "Use PortableGit", IDialogConstants.BROWSE_LABEL }, 2);
+									new String[] { IDialogConstants.SKIP_LABEL, Messages.GitUIPlugin_3, IDialogConstants.BROWSE_LABEL }, 2);
 							switch (dlg.open()) {
 							case 0:
 								return Status.OK_STATUS;
@@ -182,7 +182,7 @@ public class GitUIPlugin extends AbstractUIPlugin
 				@Override
 				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 					try {
-						monitor.beginTask("Installing PortableGit...(could take a few minutes)", IProgressMonitor.UNKNOWN);
+						monitor.beginTask(Messages.GitUIPlugin_4, IProgressMonitor.UNKNOWN);
 						monitor.worked(1);
 						PortableGit.install();
 					} finally {
@@ -200,8 +200,8 @@ public class GitUIPlugin extends AbstractUIPlugin
 			return true;
 		} else {
 			MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-					"Error",
-					"PortableGit installation incomplete.");
+					Messages.GitUIPlugin_5,
+					Messages.GitUIPlugin_6);
 		}
 		return false;
 	}
@@ -212,10 +212,10 @@ public class GitUIPlugin extends AbstractUIPlugin
 			FileDialog dlg = new FileDialog(shell, SWT.APPLICATION_MODAL | SWT.OPEN);
 			String gitExecutable = "git.exe"; //$NON-NLS-1$
 			dlg.setFilterExtensions(new String[] { gitExecutable }); 
-			dlg.setFilterNames(new String[] { "Git Executable Files" });
+			dlg.setFilterNames(new String[] { Messages.GitUIPlugin_7 });
 			dlg.setFileName(gitExecutable);
 			dlg.setFilterPath(PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES%\\Git\\bin")); //$NON-NLS-1$
-			dlg.setText("Select git executable location");
+			dlg.setText(Messages.GitUIPlugin_8);
 			String result = dlg.open();
 			if (result != null) {
 				IPath path = Path.fromOSString(result);
@@ -224,8 +224,8 @@ public class GitUIPlugin extends AbstractUIPlugin
 					return true;
 				} else {
 					MessageDialog.openWarning(shell,
-							"Invalid path specified",
-							NLS.bind("This path is not a valid git v{0} or higher binary.", GitExecutable.MIN_GIT_VERSION));
+							Messages.GitUIPlugin_9,
+							NLS.bind(Messages.GitUIPlugin_10, GitExecutable.MIN_GIT_VERSION));
 				}
 			} else {
 				return false;
