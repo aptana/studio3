@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -73,9 +73,4 @@ public interface IPreferenceConstants
 	 * Pref key for enabling "invasive" themes (extend to JDT and other views that are not explicitly ours).
 	 */
 	public static final String INVASIVE_THEMES = "enable_invasive_themes"; //$NON-NLS-1$
-	
-	/**
-	 * The types of user agents to display in code assist
-	 */
-	String USER_AGENT_PREFERENCE = CommonEditorPlugin.PLUGIN_ID + "selectUserAgents"; //$NON-NLS-1$
 }

@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -46,7 +46,6 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
 import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.syncing.core.SiteConnection;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
 import com.aptana.ide.syncing.core.old.handlers.SyncEventHandlerAdapter;
@@ -68,9 +67,8 @@ public class SiteConnectionSynchronizeAction implements IObjectActionDelegate
     }
 
     public void run(IAction action) {
-		SiteConnection cp = (SiteConnection) fConnection;
-		final IConnectionPoint source = cp.getSource();
-		IConnectionPoint dest = cp.getDestination();
+		final IConnectionPoint source = fConnection.getSource();
+		IConnectionPoint dest = fConnection.getDestination();
 		SmartSyncDialog dialog;
 		try
 		{

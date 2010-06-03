@@ -100,10 +100,20 @@ public class Lexeme<T> implements ILexeme
 
 		if (secondLexeme != null)
 		{
-			result = this.getEndingOffset() == secondLexeme.getStartingOffset();
+			result = this.getEndingOffset() + 1 == secondLexeme.getStartingOffset();
 		}
 
 		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.lexer.IRange#isEmpty()
+	 */
+	@Override
+	public boolean isEmpty()
+	{
+		return this._endingOffset < this._startingOffset;
 	}
 
 	/*

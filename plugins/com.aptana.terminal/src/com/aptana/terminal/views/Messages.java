@@ -5,7 +5,6 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.terminal.views.messages"; //$NON-NLS-1$
-	public static String TerminalView_Could_Not_Start_Server;
 	public static String TerminalView_Create_Terminal_Editor_Tooltip;
 	public static String TerminalView_Open_Terminal_Editor;
 	static

@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -67,6 +67,8 @@ public class ShellExecutable {
 		"%PROGRAMFILES%\\Git\\bin", //$NON-NLS-1$
 		"%PROGRAMFILES(X86)%\\Git\\bin" //$NON-NLS-1$
 	};
+	
+	public static final String PATH_SEPARATOR = ":"; //$NON-NLS-1$
 	
 	private static final String SH_EXE = "sh.exe"; //$NON-NLS-1$
 	private static final String BASH = "bash"; //$NON-NLS-1$

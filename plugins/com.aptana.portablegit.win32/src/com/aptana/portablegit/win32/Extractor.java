@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -39,7 +39,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
-import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -66,13 +65,11 @@ import org.eclipse.core.runtime.Path;
 		if (url != null) {
 			try {
 				url = FileLocator.toFileURL(url);
-				File file = new File(url.toURI());
+				File file = new File(url.getPath());
 				if (file.exists()) {
 					return Path.fromOSString(file.getAbsolutePath());
 				}
 			} catch (IOException e) {
-				Activator.log(e);
-			} catch (URISyntaxException e) {
 				Activator.log(e);
 			}
 		}
@@ -108,6 +105,7 @@ import org.eclipse.core.runtime.Path;
 				output.append(line);
 			}
 			process.waitFor();
+			return process.exitValue() == 0;
 		} catch (IOException e) {
 			Activator.log(e);
 			return false;
@@ -116,7 +114,6 @@ import org.eclipse.core.runtime.Path;
 		} finally {
 			Activator.log(output.toString());
 		}
-		return true;
 	}
 
 }

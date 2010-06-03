@@ -3,13 +3,17 @@ package com.aptana.explorer.internal.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.aptana.deploy.wizard.DeployWizard;
 import com.aptana.git.core.GitPlugin;
@@ -22,24 +26,18 @@ import com.aptana.terminal.views.TerminalView;
 public class DeployHandler extends AbstractHandler
 {
 
+	private IProject selectedProject;
+
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
-
-		IStructuredSelection selections = (IStructuredSelection) HandlerUtil.getCurrentSelection(event);
-		
-		IProject selectedProject = null;
-		if(selections.getFirstElement() instanceof IProject) {
-			selectedProject = (IProject) selections.getFirstElement();
-		}
-		
-		if (selectedProject != null && isCapistranoProject(selectedProject))
+		if (isCapistranoProject(selectedProject))
 		{
 			TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
 					selectedProject.getLocation());
 			terminal.sendInput("cap deploy\n"); //$NON-NLS-1$
 		}
-		else if (selectedProject != null && isFTPProject(selectedProject))
+		else if (isFTPProject(selectedProject))
 		{
 			SynchronizeFilesAction action = new SynchronizeFilesAction();
 			action.setActivePart(null, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
@@ -48,7 +46,7 @@ public class DeployHandler extends AbstractHandler
 					.getSelection());
 			action.run(null);
 		}
-		else if (selectedProject != null && isHerokuProject(selectedProject))
+		else if (isHerokuProject(selectedProject))
 		{
 			TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
 					selectedProject.getLocation());
@@ -62,6 +60,7 @@ public class DeployHandler extends AbstractHandler
 			DeployWizard wizard = new DeployWizard();
 			wizard.init(part.getSite().getWorkbenchWindow().getWorkbench(), (IStructuredSelection) part.getSite().getSelectionProvider()
 					.getSelection());
+			wizard.setWindowTitle(Messages.DeployHandler_Wizard_Title);
 
 			// Instantiates the wizard container with the wizard and opens it
 			Shell shell = part.getSite().getShell();
@@ -78,27 +77,56 @@ public class DeployHandler extends AbstractHandler
 		return null;
 	}
 
+	@Override
+	public boolean isEnabled()
+	{
+		return selectedProject != null && selectedProject.isAccessible();
+	}
+
+	@Override
+	public void setEnabled(Object evaluationContext)
+	{
+		selectedProject = null;
+		if (evaluationContext instanceof EvaluationContext)
+		{
+			Object value = ((EvaluationContext) evaluationContext).getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
+			if (value instanceof ISelection)
+			{
+				ISelection selections = (ISelection) value;
+				if (!selections.isEmpty() && selections instanceof IStructuredSelection)
+				{
+					Object selection = ((IStructuredSelection) selections).getFirstElement();
+					IResource resource = null;
+					if (selection instanceof IResource)
+					{
+						resource = (IResource) selection;
+					}
+					else if (selection instanceof IAdaptable)
+					{
+						resource = (IResource) ((IAdaptable) selection).getAdapter(IResource.class);
+					}
+					if (resource != null)
+					{
+						selectedProject = resource.getProject();
+					}
+				}
+			}
+		}
+	}
+
 	private boolean isCapistranoProject(IProject selectedProject)
 	{
-		if (selectedProject.getFile("Capfile").exists()) //$NON-NLS-1$
-			return true;
-
-		return false;
+		return selectedProject.getFile("Capfile").exists(); //$NON-NLS-1$
 	}
 
 	private boolean isFTPProject(IProject selectedProject)
 	{
-		ISiteConnection[] siteConnections = SiteConnectionUtils.findSitesForSource(selectedProject);
-
-		if (siteConnections.length > 0)
-			return true;
-
-		return false;
+		ISiteConnection[] siteConnections = SiteConnectionUtils.findSitesForSource(selectedProject, true);
+		return siteConnections.length > 0;
 	}
 
 	private boolean isHerokuProject(IProject selectedProject)
 	{
-
 		GitRepository repo = GitPlugin.getDefault().getGitRepositoryManager().getAttached(selectedProject);
 		if (repo != null)
 		{
@@ -118,7 +146,6 @@ public class DeployHandler extends AbstractHandler
 			}
 		}
 		return false;
-
 	}
 
 }

@@ -1,9 +1,47 @@
 package com.aptana.editor.css.contentassist;
 
-import com.aptana.editor.css.contentassist.CSSContentAssistProcessor.LocationType;
+import java.text.MessageFormat;
 
-public class ContentAssistFineLocationTests extends LocationTests
+import junit.framework.TestCase;
+
+import org.eclipse.jface.text.IDocument;
+
+import com.aptana.editor.common.contentassist.LexemeProvider;
+import com.aptana.editor.css.contentassist.CSSContentAssistProcessor.LocationType;
+import com.aptana.editor.css.parsing.lexer.CSSTokenType;
+
+public class FineLocationTests extends TestCase
 {
+	/**
+	 * fineLocationTests
+	 * 
+	 * @param source
+	 * @param startingOffset
+	 * @param endingOffset
+	 * @param expectedLocation
+	 */
+	protected void fineLocationTests(String source, LocationTypeRange ... ranges)
+	{
+		IDocument document = TestUtil.createDocument(source);
+		CSSContentAssistProcessor processor = new CSSContentAssistProcessor(null);
+		
+		for (LocationTypeRange range : ranges)
+		{
+			for (int offset = range.startingOffset; offset <= range.endingOffset; offset++)
+			{
+				LexemeProvider<CSSTokenType> lexemeProvider = processor.createLexemeProvider(document, offset); 
+				LocationType location = processor.getInsideLocationType(lexemeProvider, offset);
+				String message = MessageFormat.format(
+					"Expected {0} at location {1} of ''{2}''",
+					range.location.toString(),
+					Integer.toString(offset),
+					source
+				);
+				assertEquals(message, range.location, location);
+			}
+		}
+	}
+	
 	/**
 	 * testEmptyBody
 	 */
@@ -18,7 +56,7 @@ public class ContentAssistFineLocationTests extends LocationTests
 	}
 	
 	/**
-	 * testEmptyBody
+	 * testEmptyBody2
 	 */
 	public void testEmptyBody2()
 	{
@@ -31,7 +69,7 @@ public class ContentAssistFineLocationTests extends LocationTests
 	}
 	
 	/**
-	 * testEmptyBody2
+	 * testTwoRules
 	 */
 	public void testTwoRules()
 	{
@@ -187,6 +225,20 @@ public class ContentAssistFineLocationTests extends LocationTests
 			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 24, 33),
 			new LocationTypeRange(LocationType.INSIDE_VALUE, 34, 48),
 			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 49)
+		);
+	}
+	
+	/**
+	 * testSpaceAfterColon
+	 */
+	public void testSpaceAfterColon()
+	{
+		String source = ".hello {\n  background: \n}";
+		
+		this.fineLocationTests(
+			source,
+			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 8, 21),
+			new LocationTypeRange(LocationType.INSIDE_VALUE, 22, 24)
 		);
 	}
 }

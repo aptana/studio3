@@ -140,6 +140,11 @@
             id="com.aptana.explorer.deploy"
             name="%Deploy.label">
       </command>
+      <command
+            defaultHandler="com.aptana.explorer.internal.handlers.OpenTerminalHandler"
+            id="com.aptana.explorer.commands.openTerminal"
+            name="%command.openTerminal.name">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -189,6 +194,14 @@
          <command
                commandId="com.aptana.explorer.deploy"
                label="%DeployWizard.label"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:com.aptana.explorer.gear?after=group.run">
+         <command
+               commandId="com.aptana.explorer.commands.openTerminal"
+               label="%command.openTerminal.name"
                style="push">
          </command>
       </menuContribution>

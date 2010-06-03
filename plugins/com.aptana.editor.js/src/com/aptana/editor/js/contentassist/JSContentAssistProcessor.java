@@ -490,6 +490,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		Lexeme<JSTokenType> lexeme;
 		IParseNode node;
 		Location result = Location.ERROR;
+		short type;
 		
 		if (this._targetNode != null)
 		{
@@ -502,7 +503,15 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					{
 						switch (lexeme.getType())
 						{
+							case COMMA:
 							case LPAREN:
+								lexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
+								
+								if (lexeme != null && lexeme.getType() == JSTokenType.IDENTIFIER)
+								{
+									this._currentLexeme = lexeme;
+									result = Location.IN_GLOBAL;
+								}
 								break;
 								
 							case RPAREN:
@@ -534,6 +543,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					}
 					else
 					{
+						this._currentLexeme = null;
 						result = Location.IN_GLOBAL;
 					}
 					break;
@@ -554,9 +564,25 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					break;
 					
 				case JSNodeTypes.DECLARATION:
+					// ignore declarations in for-statements for now
+					type = this._statementNode.getType();
+					
+					if (type == JSNodeTypes.FOR || type == JSNodeTypes.FOR_IN)
+					{
+						break;
+					}
+					// else fall through
+					
 				case JSNodeTypes.EMPTY:
 				case JSNodeTypes.STATEMENTS:
-					result = Location.IN_GLOBAL;
+					if (this._targetNode.contains(offset) || this._targetNode.getEndingOffset() == offset - 1)
+					{
+						if (this._targetNode.getStartingOffset() != offset)
+						{
+							result = Location.IN_GLOBAL;
+							this._currentLexeme = null;
+						}
+					}
 					break;
 					
 				case JSNodeTypes.FOR:
@@ -567,6 +593,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 						result = Location.IN_GLOBAL;
 						this._currentLexeme = lexeme;
 					}
+					break;
+					
+				case JSNodeTypes.FOR_IN:
 					break;
 					
 				case JSNodeTypes.GET_ELEMENT:
@@ -582,24 +611,49 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					break;
 					
 				case JSNodeTypes.IDENTIFIER:
-					node = this._targetNode.getParent();
+					// ignore for-statements for now
+					 type = this._statementNode.getType();
 					
-					switch (node.getType())
+					if (type != JSNodeTypes.FOR && type != JSNodeTypes.FOR_IN)
 					{
-						case JSNodeTypes.DECLARATION:
-						case JSNodeTypes.PARAMETERS:
-							break;
-							
-						case JSNodeTypes.GET_PROPERTY:
-							if (node.getChild(0) == this._targetNode)
-							{
-								result = Location.IN_GLOBAL;
-							}
-							break;
+						node = this._targetNode.getParent();
 						
-						default:
-							result = Location.IN_GLOBAL;
-							break;
+						switch (node.getType())
+						{
+							case JSNodeTypes.DECLARATION:
+							case JSNodeTypes.FUNCTION:
+							case JSNodeTypes.PARAMETERS:
+								break;
+								
+							case JSNodeTypes.GET_PROPERTY:
+								if (node.getChild(0) == this._targetNode)
+								{
+									result = Location.IN_GLOBAL;
+								}
+								break;
+							
+							default:
+								result = Location.IN_GLOBAL;
+								break;
+						}
+					}
+					break;
+					
+				case JSNodeTypes.IF:
+				case JSNodeTypes.WHILE:
+					if (this._currentLexeme.getType() == JSTokenType.RPAREN && this._currentLexeme.getStartingOffset() == offset)
+					{
+						result = Location.IN_GLOBAL;
+						lexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
+						
+						if (lexeme != null & lexeme.getType() == JSTokenType.IDENTIFIER)
+						{
+							this._currentLexeme = lexeme;
+						}
+						else
+						{
+							this._currentLexeme = null;
+						}
 					}
 					break;
 					
