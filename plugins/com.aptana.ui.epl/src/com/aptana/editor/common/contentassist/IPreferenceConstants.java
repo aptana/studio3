@@ -32,45 +32,13 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.common.preferences;
-
-import com.aptana.editor.common.CommonEditorPlugin;
+package com.aptana.editor.common.contentassist;
 
 public interface IPreferenceConstants
 {
 
 	/**
-	 * Do we auto-pop content assist?
+	 * The types of user agents to display in code assist
 	 */
-	public static final String CONTENT_ASSIST_AUTO_ACTIVATION = "CONTENT_ASSIST_AUTO_ACTIVATION"; //$NON-NLS-1$
-
-	/**
-	 * The delay before which we show code assist
-	 */
-	public static final String CONTENT_ASSIST_DELAY = "CONTENT_ASSIST_DELAY"; //$NON-NLS-1$
-
-	/**
-	 * Pref key for the enable of coloring pair matches.
-	 */
-	public String ENABLE_CHARACTER_PAIR_COLORING = CommonEditorPlugin.PLUGIN_ID + ".enableCharacterPairColoring"; //$NON-NLS-1$
-
-	/**
-	 * Pref key for the color of the pair matching box.
-	 */
-	public String CHARACTER_PAIR_COLOR = CommonEditorPlugin.PLUGIN_ID + ".characterPairColor"; //$NON-NLS-1$
-
-	/**
-	 * Pref key for linking the outline view with the active editor
-	 */
-	public static final String LINK_OUTLINE_WITH_EDITOR = CommonEditorPlugin.PLUGIN_ID + ".linkOutlineWithEditor"; //$NON-NLS-1$
-
-	/**
-	 * Pref key for sorting the outline view alphabetically
-	 */
-	public static final String SORT_OUTLINE_ALPHABETIC = CommonEditorPlugin.PLUGIN_ID + ".sortOutlineAlphabetic"; //$NON-NLS-1$
-
-	/**
-	 * Pref key for enabling "invasive" themes (extend to JDT and other views that are not explicitly ours).
-	 */
-	public static final String INVASIVE_THEMES = "enable_invasive_themes"; //$NON-NLS-1$
+	String USER_AGENT_PREFERENCE = "selectUserAgents"; //$NON-NLS-1$
 }
