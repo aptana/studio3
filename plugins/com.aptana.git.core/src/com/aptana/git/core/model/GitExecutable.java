@@ -1,6 +1,7 @@
 package com.aptana.git.core.model;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChange
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.ShellExecutable;
+import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.git.core.GitPlugin;
@@ -115,42 +117,18 @@ public class GitExecutable
 			return new GitExecutable(prefPath);
 		}
 		
-		if (Platform.OS_WIN32.equals(Platform.getOS()))
-		{
-			// Grab PATH and search it!
-			String path = System.getenv("PATH"); //$NON-NLS-1$
-			String[] paths = path.split(File.pathSeparator);
-			// If the user is using msysgit we prefer using git.cmd wrapper
-			// instead of the git.exe because it sets the HOME variable
-			// correctly which in turn allows the ssh to find the
-			// ${HOME}/.ssh folder.
-			for (String extension : new String[] {"cmd", "exe"}) //$NON-NLS-1$ //$NON-NLS-2$
-			{
-				for (String pathString : paths)
-				{
-					IPath possiblePath = Path.fromOSString(pathString).append(GIT_EXECUTABLE).addFileExtension(extension);
-					if (acceptBinary(possiblePath))
-					{
-						return new GitExecutable(possiblePath);
-					}
-				}
+		boolean isWin32 = Platform.OS_WIN32.equals(Platform.getOS());
+		IPath path = ExecutableUtil.find(isWin32 ? GIT_EXECUTABLE_WIN32 : GIT_EXECUTABLE, false, searchLocations(), new FileFilter() {
+			@Override
+			public boolean accept(File pathname) {
+				return acceptBinary(Path.fromOSString(pathname.getAbsolutePath()));
 			}
-		}
-		else
-		{
-			// No explicit path. Try it with "which"
-			IPath whichPath = Path.fromOSString(ProcessUtil.outputForCommand("/usr/bin/which", null, GIT_EXECUTABLE)); //$NON-NLS-1$
-			if (!whichPath.isEmpty() && acceptBinary(whichPath))
-				return new GitExecutable(whichPath);
+		});
+		if (path != null) {
+			return new GitExecutable(path);
 		}
 		
-		// Still no path. Let's try some default locations.
-		for (IPath location : searchLocations())
-		{
-			if (acceptBinary(location))
-				return new GitExecutable(location);
-		}
-		IPath path = PortableGit.getLocation();
+		path = PortableGit.getLocation();
 		if (path != null) {
 			setPreferenceGitPath(path);
 			return new GitExecutable(path);
@@ -172,9 +150,9 @@ public class GitExecutable
 			fgLocations = new ArrayList<IPath>();
 			if (Platform.getOS().equals(Platform.OS_WIN32))
 			{
-				fgLocations.add(Path.fromOSString(PlatformUtil.expandEnvironmentStrings("%PROGRAMW6432%\\Git\\cmd\\git.cmd"))); //$NON-NLS-1$
-				fgLocations.add(Path.fromOSString(PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES%\\Git\\cmd\\git.cmd"))); //$NON-NLS-1$
-				fgLocations.add(Path.fromOSString(PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES(X86)%\\Git\\cmd\\git.cmd"))); //$NON-NLS-1$
+				fgLocations.add(Path.fromOSString(PlatformUtil.expandEnvironmentStrings("%PROGRAMW6432%\\Git\\bin"))); //$NON-NLS-1$
+				fgLocations.add(Path.fromOSString(PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES%\\Git\\bin"))); //$NON-NLS-1$
+				fgLocations.add(Path.fromOSString(PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES(X86)%\\Git\\bin"))); //$NON-NLS-1$
 			}
 			else
 			{
