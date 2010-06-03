@@ -427,6 +427,10 @@ public class CommitDialog extends StatusDialog
 				Table table = (Table) e.getSource();
 				Point point = new Point(e.x, e.y);
 				TableItem item = table.getItem(point);
+				if (item == null)
+				{
+					return;
+				}
 				// did user click on file image? If so, toggle staged/unstage
 				Rectangle imageBounds = item.getBounds(0);
 				if (imageBounds.contains(point))
