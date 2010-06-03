@@ -112,7 +112,7 @@ public class CapifyProjectPage extends WizardPage
 
 		// Terminal
 		terminalComposite = new TerminalComposite(composite, SWT.NONE);
-		terminalComposite.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_FILL | GridData.HORIZONTAL_ALIGN_FILL));
+		terminalComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		// TODO Can we prevent user input to this terminal?
 		terminalComposite.setWorkingDirectory(getProject().getLocation());
