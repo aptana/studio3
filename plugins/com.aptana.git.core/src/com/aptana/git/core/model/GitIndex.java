@@ -337,6 +337,10 @@ public class GitIndex
 
 	private void addFilesFromDictionary(Map<String, List<String>> dictionary, boolean staged, boolean tracked)
 	{
+		if (this.files == null)
+		{
+			return;
+		}
 		// Iterate over all existing files
 		synchronized (this.files)
 		{
