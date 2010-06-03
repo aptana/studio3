@@ -185,6 +185,7 @@
          <command
                commandId="com.aptana.explorer.deploy"
                label="%FTPDeploy.label"
+               icon="icons/full/elcl16/network_arrow.png"
                style="push">
          </command>
       </menuContribution>
