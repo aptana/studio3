@@ -284,10 +284,12 @@ public class CommitDialog extends StatusDialog
 		data.widthHint = 250;
 		table.setLayoutData(data);
 		String[] titles = { " ", Messages.CommitDialog_PathColumnLabel }; //$NON-NLS-1$
+		int[] widths = new int[] { 20, 250 };
 		for (int i = 0; i < titles.length; i++)
 		{
 			TableColumn column = new TableColumn(table, SWT.NONE);
 			column.setText(titles[i]);
+			column.setWidth(widths[i]);
 		}
 		List<ChangedFile> changedFiles = gitRepository.index().changedFiles();
 		Collections.sort(changedFiles);
@@ -528,8 +530,8 @@ public class CommitDialog extends StatusDialog
 
 						IPath workingDirectory = gitRepository.workingDirectory();
 
-						IFile file = ResourcesPlugin.getWorkspace().getRoot()
-								.getFileForLocation(workingDirectory.append(filePath));
+						IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(
+								workingDirectory.append(filePath));
 						if (file != null)
 						{
 							files.add(file);
