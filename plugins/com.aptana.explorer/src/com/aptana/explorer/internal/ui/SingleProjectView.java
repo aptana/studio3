@@ -181,8 +181,8 @@ public abstract class SingleProjectView extends CommonNavigator {
 	private static final String DEPLOY_MENU_ICON = "icons/full/elcl16/network_arrow.png"; //$NON-NLS-1$
 	private static final String UPLOAD_MENU_ICON = "icons/full/elcl16/direction_upload.png"; //$NON-NLS-1$
 	private static final String DOWNLOAD_MENU_ICON = "icons/full/elcl16/direction_download.png"; //$NON-NLS-1$
-	private static final String[] animationImage = {
-			"icons/full/elcl16/yinyang1.png", "icons/full/elcl16/yinyang2.png", "icons/full/elcl16/yinyang3.png", "icons/full/elcl16/yinyang4.png" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	// private static final String[] animationImage = {
+	// 		"icons/full/elcl16/yinyang1.png", "icons/full/elcl16/yinyang2.png", "icons/full/elcl16/yinyang3.png", "icons/full/elcl16/yinyang4.png" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	private static final String[] animationImageUp = {
 			"icons/full/elcl16/network_arrow_up.png", "icons/full/elcl16/network_arrow_up_20.png", "icons/full/elcl16/network_arrow_up_40.png", "icons/full/elcl16/network_arrow_up_60.png", "icons/full/elcl16/network_arrow_up_80.png", "icons/full/elcl16/network_arrow_up_60.png", "icons/full/elcl16/network_arrow_up_40.png", "icons/full/elcl16/network_arrow_up_20.png" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	private static final String[] animationImageDown = {
