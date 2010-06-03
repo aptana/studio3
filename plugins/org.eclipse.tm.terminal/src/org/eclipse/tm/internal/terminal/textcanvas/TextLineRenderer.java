@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  * Michael Scharf (Wind River) - initial API and implementation
  * Michael Scharf (Wind River) - [205260] Terminal does not take the font from the preferences
  * Michael Scharf (Wind River) - [206328] Terminal does not draw correctly with proportional fonts
+ * Anton Leherbauer (Wind River) - [294468] Fix scroller and text line rendering
  *******************************************************************************/
 package org.eclipse.tm.internal.terminal.textcanvas;
 
@@ -85,15 +86,17 @@ public class TextLineRenderer implements ILinelRenderer {
 
 	private void fillBackground(GC gc, int x, int y, int width, int height) {
 		Color bg=gc.getBackground();
-		gc.setBackground(getBackgroundColor());
+		gc.setBackground(getDefaultBackgroundColor());
 		gc.fillRectangle (x,y,width,height);
 		gc.setBackground(bg);
 
 	}
 
-	private Color getBackgroundColor() {
+	public Color getDefaultBackgroundColor() {
+		// null == default style
 		return fStyleMap.getBackgroundColor(null);
 	}
+	
 	private void drawCursor(ITextCanvasModel model, GC gc, int row, int x, int y, int colFirst) {
 		if(!model.isCursorOn())
 			return;
