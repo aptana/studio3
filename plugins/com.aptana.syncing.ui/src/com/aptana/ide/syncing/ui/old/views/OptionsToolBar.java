@@ -160,7 +160,9 @@ public class OptionsToolBar
 	 */
 	public void setEnabled(boolean enabled)
 	{
-		fOptionsBar.setEnabled(enabled);
+		if(!fOptionsBar.isDisposed()) {
+			fOptionsBar.setEnabled(enabled);
+		}
 	}
 
 	private ToolBar createContents(final Composite parent)

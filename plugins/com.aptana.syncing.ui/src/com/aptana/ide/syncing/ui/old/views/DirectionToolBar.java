@@ -193,7 +193,9 @@ public class DirectionToolBar
 	 */
 	public void setEnabled(boolean enabled)
 	{
-		fDirectionBar.setEnabled(enabled);
+		if(!fDirectionBar.isDisposed()) {
+			fDirectionBar.setEnabled(enabled);
+		}
 	}
 
 	private ToolBar createContents(final Composite parent)
@@ -264,19 +266,19 @@ public class DirectionToolBar
 		fBoth.addSelectionListener(directionAdapter);
 
 		fUpload = new MenuItem(directionMenu, SWT.RADIO);
-		fUpload.setText(Messages.SmartSyncDialog_Upload + "  ->"); //$NON-NLS-1$
+		fUpload.setText(Messages.SmartSyncDialog_Upload); //$NON-NLS-1$
 		fUpload.addSelectionListener(directionAdapter);
 
 		fForceUpload = new MenuItem(directionMenu, SWT.RADIO);
-		fForceUpload.setText(Messages.SmartSyncDialog_UploadAll + "  ->"); //$NON-NLS-1$
+		fForceUpload.setText(Messages.SmartSyncDialog_UploadAll); //$NON-NLS-1$
 		fForceUpload.addSelectionListener(directionAdapter);
 
 		fDownload = new MenuItem(directionMenu, SWT.RADIO);
-		fDownload.setText("<-  " + Messages.SmartSyncDialog_Download); //$NON-NLS-1$
+		fDownload.setText(Messages.SmartSyncDialog_Download); //$NON-NLS-1$
 		fDownload.addSelectionListener(directionAdapter);
 
 		fForceDownload = new MenuItem(directionMenu, SWT.RADIO);
-		fForceDownload.setText("<-  " + Messages.SmartSyncDialog_DownloadAll); //$NON-NLS-1$
+		fForceDownload.setText(Messages.SmartSyncDialog_DownloadAll); //$NON-NLS-1$
 		fForceDownload.addSelectionListener(directionAdapter);
 
 		fDirectionDown.setText(fBoth.getText());
