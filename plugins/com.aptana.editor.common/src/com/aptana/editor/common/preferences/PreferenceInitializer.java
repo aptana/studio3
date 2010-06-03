@@ -20,7 +20,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		prefs.putBoolean(IPreferenceConstants.ENABLE_CHARACTER_PAIR_COLORING, true);
 		prefs.put(IPreferenceConstants.CHARACTER_PAIR_COLOR, "128,128,128"); //$NON-NLS-1$
 		prefs.putBoolean(IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
-		prefs.put(IPreferenceConstants.USER_AGENT_PREFERENCE, "IE,Mozilla"); //$NON-NLS-1$
 
 		IPreferenceStore store = EditorsPlugin.getDefault().getPreferenceStore();
 		store.setDefault(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, true);

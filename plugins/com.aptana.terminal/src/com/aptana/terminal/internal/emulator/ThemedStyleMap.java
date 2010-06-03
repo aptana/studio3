@@ -67,7 +67,7 @@ import com.aptana.editor.common.theme.Theme;
 		}
 
 		// Just grab colors straight from theme!
-		String ansiName = "ansi." + color.getName().toLowerCase();
+		String ansiName = "ansi." + color.getName().toLowerCase(); //$NON-NLS-1$
 		Theme theme = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme();
 		if (theme.hasEntry(ansiName)) {
 			return theme.getForeground(ansiName);

@@ -30,13 +30,19 @@ public abstract class ExecutableUtil
 		Map<String, String> env = ShellExecutable.getEnvironment();
 		if (Platform.OS_WIN32.equals(Platform.getOS()))
 		{
-			String pathENV = System.getenv("PATH");
-			if (env != null && !env.isEmpty())
-			{
-				pathENV = env.get("PATH");
+			String[] paths;
+			if (env != null && env.containsKey("PATH")) {
+				paths = env.get("PATH").split(ShellExecutable.PATH_SEPARATOR);
+				for( int i = 0; i < paths.length; ++i) {
+					if (paths[i].matches("^/(.)/.*")) {
+						paths[i] = paths[i].replaceFirst("^/(.)/", "$1:/");
+					}
+				}
+			} else {
+				String pathENV = System.getenv("PATH");
+				paths = pathENV.split(File.pathSeparator);
 			}
 			// Grab PATH and search it!
-			String[] paths = pathENV.split(File.pathSeparator);
 			for (String pathString : paths)
 			{
 				IPath path = Path.fromOSString(pathString).append(executableName);

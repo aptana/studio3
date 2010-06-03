@@ -62,8 +62,8 @@ public final class TerminalCloseHelper {
 		}
 
 		int closeId = 1;
-		MessageDialog dialog = new MessageDialog(shellProvider.getShell(), "Close confirmition", null,
-				"Do you want to close terminal? Closing will terminate the running processes:\n" + processes.toString(),
+		MessageDialog dialog = new MessageDialog(shellProvider.getShell(), Messages.TerminalCloseHelper_DialogTitle, null,
+				Messages.TerminalCloseHelper_DialogMessage + processes.toString(),
 				MessageDialog.QUESTION,
 				new String[] { IDialogConstants.CANCEL_LABEL, IDialogConstants.CLOSE_LABEL }, closeId);
 		return dialog.open() == closeId;

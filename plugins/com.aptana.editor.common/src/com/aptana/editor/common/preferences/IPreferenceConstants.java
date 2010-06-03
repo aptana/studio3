@@ -73,9 +73,4 @@ public interface IPreferenceConstants
 	 * Pref key for enabling "invasive" themes (extend to JDT and other views that are not explicitly ours).
 	 */
 	public static final String INVASIVE_THEMES = "enable_invasive_themes"; //$NON-NLS-1$
-	
-	/**
-	 * The types of user agents to display in code assist
-	 */
-	String USER_AGENT_PREFERENCE = CommonEditorPlugin.PLUGIN_ID + "selectUserAgents"; //$NON-NLS-1$
 }

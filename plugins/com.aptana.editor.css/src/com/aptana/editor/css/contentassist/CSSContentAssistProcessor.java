@@ -566,7 +566,16 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 							}
 							else
 							{
-								location = LocationType.INSIDE_PROPERTY;
+								switch (previousLexeme.getType())
+								{
+									case COLON:
+										location = LocationType.INSIDE_VALUE;
+										break;
+										
+									default:
+										location = LocationType.INSIDE_PROPERTY;
+										break;
+								}
 							}
 						}
 					}
@@ -765,6 +774,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 					}
 					break LOOP;
 
+				case COLON:
 				case PROPERTY:
 				case VALUE:
 					result = LocationType.INSIDE_RULE;
