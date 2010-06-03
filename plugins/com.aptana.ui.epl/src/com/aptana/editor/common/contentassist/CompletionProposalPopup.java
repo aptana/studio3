@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.contentassist.IContentAssistSubjectControl;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.JFacePreferences;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.BadLocationException;
@@ -39,6 +40,8 @@ import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension3;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension4;
 import org.eclipse.jface.text.contentassist.IContextInformation;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ControlEvent;
@@ -64,6 +67,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+
+import com.aptana.ui.epl.UIEplPlugin;
 
 /**
  * This class is used to present proposals to the user. If additional information exists for a proposal, then selecting
@@ -396,19 +401,17 @@ public class CompletionProposalPopup implements IContentAssistListener
 
 		// Custom code for our impl!
 		// TODO: grab value from preferences
-		// final IPreferenceStore store = CommonEditorPlugin.getDefault().getPreferenceStore();
+		final IPreferenceStore store = UIEplPlugin.getDefault().getPreferenceStore();
 		_insertOnTab = false; // store.getBoolean(IPreferenceConstants.INSERT_ON_TAB);
 
-		// TODO: grab list from preferences
-		String agents = ""; //store.getString(IPreferenceConstants.USER_AGENT_PREFERENCE); //$NON-NLS-1$
+		String agents = store.getString(IPreferenceConstants.USER_AGENT_PREFERENCE);
 		if (agents != null && !agents.equals("")) //$NON-NLS-1$
 		{
 			fUserAgents = agents.split(",").length; //$NON-NLS-1$
 		}
 		else
 		{
-			// fUserAgents = 0;
-			fUserAgents = 5; // TEMP: hard-coding for testing purposes
+			fUserAgents = 0;
 		}
 		// Here we add custom columns
 		TableColumn initialInfo = new TableColumn(fProposalTable, SWT.LEFT);
@@ -535,17 +538,33 @@ public class CompletionProposalPopup implements IContentAssistListener
 
 		fPopupCloser.install(fContentAssistant, fProposalTable);
 
-		/*
-		 * final IPropertyChangeListener propListener = new IPropertyChangeListener() { public void
-		 * propertyChange(PropertyChangeEvent event) { if
-		 * (event.getProperty().equals(IPreferenceConstants.USER_AGENT_PREFERENCE)) { if
-		 * (Helper.okToUse(fProposalShell)) { fProposalShell.dispose(); } else { // shell already disposed so remove
-		 * this listener if (store != null) { store.removePropertyChangeListener(this); } } } } };
-		 * store.addPropertyChangeListener(propListener);
-		 */
-		
-		fProposalShell.addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(DisposeEvent e) {
+		final IPropertyChangeListener propListener = new IPropertyChangeListener()
+		{
+			public void propertyChange(PropertyChangeEvent event)
+			{
+				if (event.getProperty().equals(IPreferenceConstants.USER_AGENT_PREFERENCE))
+				{
+					if (Helper.okToUse(fProposalShell))
+					{
+						fProposalShell.dispose();
+					}
+					else
+					{
+						// shell already disposed so remove this listener
+						if (store != null)
+						{
+							store.removePropertyChangeListener(this);
+						}
+					}
+				}
+			}
+		};
+		store.addPropertyChangeListener(propListener);
+
+		fProposalShell.addDisposeListener(new DisposeListener()
+		{
+			public void widgetDisposed(DisposeEvent e)
+			{
 				unregister(); // but don't dispose the shell, since we're being called from its disposal event!
 			}
 		});
@@ -1060,9 +1079,9 @@ public class CompletionProposalPopup implements IContentAssistListener
 						fProposalTable.getColumn(j).setWidth(locationWidth.x);
 					}
 				}
-				else if (fProposalTable.getColumn(j).getWidth() != 19)
+				else
 				{
-					fProposalTable.getColumn(j).setWidth(19);
+					fProposalTable.getColumn(j).setWidth(25);
 				}
 			}
 		}

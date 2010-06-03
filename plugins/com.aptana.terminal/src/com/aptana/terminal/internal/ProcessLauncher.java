@@ -82,10 +82,12 @@ public class ProcessLauncher {
 	}
 	
 	public void destroy() {
-		try {
-			process.exitValue();
-		} catch (IllegalThreadStateException e) {
-			process.destroy();
+		if (process != null) {
+			try {
+				process.exitValue();
+			} catch (IllegalThreadStateException e) {
+				process.destroy();
+			}
 		}
 	}
 	
