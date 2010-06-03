@@ -178,6 +178,8 @@ public abstract class SingleProjectView extends CommonNavigator
 	private static final String CASE_SENSITIVE_ICON_PATH = "icons/full/elcl16/casesensitive.png"; //$NON-NLS-1$
 	private static final String REGULAR_EXPRESSION_ICON_PATH = "icons/full/elcl16/regularexpression.png"; //$NON-NLS-1$
 	private static final String DEPLOY_MENU_ICON = "icons/full/elcl16/network_arrow.png"; //$NON-NLS-1$
+	private static final String UPLOAD_MENU_ICON = "icons/full/elcl16/direction_upload.png"; //$NON-NLS-1$
+	private static final String DOWNLOAD_MENU_ICON = "icons/full/elcl16/direction_download.png"; //$NON-NLS-1$
 	private static final String[] animationImage = {
 			"icons/full/elcl16/yinyang1.png", "icons/full/elcl16/yinyang2.png", "icons/full/elcl16/yinyang3.png", "icons/full/elcl16/yinyang4.png" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
@@ -508,9 +510,10 @@ public abstract class SingleProjectView extends CommonNavigator
 					}
 				};
 
-				createSubMenuItemWithListener(menu, Messages.SingleProjectView_UploadItem,
+				MenuItem ul = createSubMenuItemWithListener(menu, Messages.SingleProjectView_UploadItem,
 						uploadAdapter);
-
+				ul.setImage(ExplorerPlugin.getImage(UPLOAD_MENU_ICON));
+				
 				SelectionAdapter downloadAdapter = new SelectionAdapter()
 				{
 					public void widgetSelected(SelectionEvent e)
@@ -548,7 +551,8 @@ public abstract class SingleProjectView extends CommonNavigator
 					}
 
 				};
-				createSubMenuItemWithListener(menu, Messages.SingleProjectView_DownloadItem, downloadAdapter);
+				MenuItem dl = createSubMenuItemWithListener(menu, Messages.SingleProjectView_DownloadItem, downloadAdapter);
+				dl.setImage(ExplorerPlugin.getImage(DOWNLOAD_MENU_ICON));
 			}
 
 			@Override
@@ -1512,12 +1516,12 @@ public abstract class SingleProjectView extends CommonNavigator
 		}
 	}
 
-	private void createSubMenuItemWithListener(Menu menu, String text, SelectionListener listener)
+	private MenuItem createSubMenuItemWithListener(Menu menu, String text, SelectionListener listener)
 	{
 		MenuItem synchronizeItem = new MenuItem(menu, SWT.PUSH);
 		synchronizeItem.setText(text);
 		synchronizeItem.addSelectionListener(listener);
-
+		return synchronizeItem;
 	}
 
 	private void createHerokuSubMenuItem(Menu menu, String cmd, String text)
