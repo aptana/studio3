@@ -449,7 +449,15 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 		{
 			public void syncDone(VirtualFileSyncPair item)
 			{
-				// refresh();
+                IOUIPlugin.refreshNavigatorView(fSource.getCurrentInput());
+                IOUIPlugin.refreshNavigatorView(fTarget.getCurrentInput());
+                UIUtils.getDisplay().asyncExec(new Runnable() {
+
+                    public void run() {
+                        fSource.refresh();
+                        fTarget.refresh();
+                    }
+                });
 			}
 		});
     }

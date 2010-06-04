@@ -18,11 +18,14 @@
 #include <util.h> 
 #endif
 
+#ifndef MAXCOMLEN
+#define MAXCOMLEN 255
+#endif
+
 #define ESC '\033'
 #define DLE	'\020'
 
 #define MAX_ESC_SEQUENCE_LENGTH	16
-//#define MIN(a,b)	((a) < (b) ? (a) : (b))
 
 static void send_process_list(char* ptyname);
 
@@ -225,6 +228,7 @@ main (int argc, char** argv)
 static void
 send_process_list(char* ptyname)
 {
+#ifdef __APPLE__
 	struct stat sb;
 	int mib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_TTY, 0};
 	int i;
@@ -260,4 +264,7 @@ send_process_list(char* ptyname)
 	}
 	if (kp != NULL)
 		free(kp);
+#else
+	write(STDOUT_FILENO, "\020$p", 3);
+#endif
 }

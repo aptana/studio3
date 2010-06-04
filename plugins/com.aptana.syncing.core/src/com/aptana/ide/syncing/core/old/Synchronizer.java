@@ -50,7 +50,6 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
 
 import com.aptana.core.ILoggable;
@@ -363,10 +362,10 @@ public class Synchronizer implements ILoggable
 			else
 			{
 				// get the complete file listings for the client and server
-				log(FileUtil.NEW_LINE + "Gathering list of source files from '" + client.toURI().toString() + "'. ");
+				log(FileUtil.NEW_LINE + "Gathering list of source files from '" + client.toString() + "'. ");
 				clientFiles = EFSUtils.getFiles(client, true, _includeCloakedFiles, monitor);
 				log("Completed.");
-				log(FileUtil.NEW_LINE + "Gathering list of destination files from '" + server.toURI().toString() + "'. ");
+				log(FileUtil.NEW_LINE + "Gathering list of destination files from '" + server.toString() + "'. ");
 				serverFiles = EFSUtils.getFiles(server, true, _includeCloakedFiles, monitor);
 				log("Completed.");
 				log(FileUtil.NEW_LINE + "File listing complete.");
@@ -753,8 +752,7 @@ public class Synchronizer implements ILoggable
 					break;
 
 				case SyncState.ServerItemOnly:
-					final IFileStore targetClientFile = constructDestinationPath(_clientFileRoot, item);
-					// final IVirtualFile targetClientFile;
+					final IFileStore targetClientFile = EFSUtils.createFile(_serverFileRoot, item.getDestinationFile(), _clientFileRoot);
 
 					if (serverFile.fetchInfo().isDirectory())
 					{
@@ -969,7 +967,7 @@ public class Synchronizer implements ILoggable
 						else
 						{
 							// creates the item on server
-							final IFileStore targetServerFile = constructDestinationPath(_serverFileRoot, item);
+							final IFileStore targetServerFile = EFSUtils.createFile(_clientFileRoot, item.getSourceFile(), _serverFileRoot);
 
 							if (clientFile.fetchInfo().isDirectory())
 							{
@@ -1074,8 +1072,7 @@ public class Synchronizer implements ILoggable
 						else
 						{
 							// creates the item on client
-							final IFileStore targetClientFile = constructDestinationPath(_clientFileRoot, item);
-							// final IVirtualFile targetClientFile;
+							final IFileStore targetClientFile = EFSUtils.createFile(_serverFileRoot, item.getDestinationFile(), _clientFileRoot);
 
 							if (serverFile.fetchInfo().isDirectory())
 							{
@@ -1154,19 +1151,6 @@ public class Synchronizer implements ILoggable
 		}
 
 		return result;
-	}
-
-	/**
-	 * Constructs the path for use on the destination
-	 * 
-	 * @param basePath
-	 * @param manager
-	 * @param item
-	 * @return String
-	 */
-	private IFileStore constructDestinationPath(IFileStore base, VirtualFileSyncPair item)
-	{
-		return base.getFileStore(new Path(item.getRelativePath()));
 	}
 
 	/**
@@ -1255,8 +1239,7 @@ public class Synchronizer implements ILoggable
 			{
 				case SyncState.ClientItemOnly:
 					// only exists on client; creates the item on server
-					final IFileStore targetServerFile = constructDestinationPath(_serverFileRoot, item);
-					// final IVirtualFile targetServerFile;
+					final IFileStore targetServerFile = EFSUtils.createFile(_clientFileRoot, item.getSourceFile(), _serverFileRoot);
 
 					if (clientFile.fetchInfo().isDirectory())
 					{
