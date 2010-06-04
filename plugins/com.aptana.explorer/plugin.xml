@@ -211,7 +211,7 @@
             commandId="com.aptana.explorer.deploy"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M4+M3+D">
+            sequence="CTRL+M3+D">
       </key>
    </extension>
 </plugin>
