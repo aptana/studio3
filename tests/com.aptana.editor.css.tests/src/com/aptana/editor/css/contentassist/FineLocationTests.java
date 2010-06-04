@@ -241,4 +241,32 @@ public class FineLocationTests extends TestCase
 			new LocationTypeRange(LocationType.INSIDE_VALUE, 22, 24)
 		);
 	}
+	
+	/**
+	 * testDotInProperty
+	 */
+	public void testDotInProperty()
+	{
+		String source = "body { background-color.}";
+		
+		this.fineLocationTests(
+			source,
+			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 6, 23),
+			new LocationTypeRange(LocationType.ERROR, 24)
+		);
+	}
+	
+	/**
+	 * testHashInProperty
+	 */
+	public void testHashInProperty()
+	{
+		String source = "body { background-color#}";
+		
+		this.fineLocationTests(
+			source,
+			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 6, 23),
+			new LocationTypeRange(LocationType.ERROR, 24)
+		);
+	}
 }
