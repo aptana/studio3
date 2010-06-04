@@ -65,7 +65,6 @@
 						<browser platform="Netscape"/>
 						<browser platform="Mozilla" version="1.0+ "/>
 						<browser platform="Opera" version="7.0+"/>
-						<browser platform="Chrome" version="5.0+"/>
 						<browser platform="Safari" version="1.0+"/>
 					</browsers>
 					<availability>
@@ -190,7 +189,6 @@
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -253,7 +251,6 @@
 				<browser platform="Netscape" version="6.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="6.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -362,7 +359,6 @@
            		<browser platform="IE" version="4.0+"/>
 				<browser platform="Netscape" version="6.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -518,7 +514,6 @@ San Diego, CA 92122
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -573,7 +568,6 @@ San Diego, CA 92122
 					<hint>[scripting-language-allowed]</hint>
 					<browsers>
 						<browser platform="Netscape"/>
-						<browser platform="Chrome" version="5.0+"/>
 						<browser platform="Safari" version="1.0+"/>
 					</browsers>
                 </field>
@@ -588,7 +582,6 @@ San Diego, CA 92122
 						<browser platform="Netscape"/>
 						<browser platform="Mozilla" version="1.0+"/>
 						<browser platform="Opera" version="7.0+"/>
-						<browser platform="Chrome" version="5.0+"/>
 						<browser platform="Safari" version="1.0+"/>
 					</browsers>
 					 <references>
@@ -700,7 +693,6 @@ San Diego, CA 92122
            		<browser platform="IE" version="2.0+"/>
 				<browser platform="Netscape" version="2.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 				<browser platform="Opera" version="7.0+"/>
  			</browsers>
@@ -863,7 +855,6 @@ San Diego, CA 92122
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -1015,7 +1006,6 @@ San Diego, CA 92122
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -1059,7 +1049,6 @@ San Diego, CA 92122
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -1103,7 +1092,6 @@ San Diego, CA 92122
 			<browsers>
            		<browser platform="IE" version="2.0+"/>
 				<browser platform="Netscape" version="1.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<deprecated>Use CSS to format fonts instead.
@@ -1262,7 +1250,6 @@ San Diego, CA 92122
 				<browser platform="Netscape" version="6.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="7.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -1464,7 +1451,6 @@ San Diego, CA 92122
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -1649,7 +1635,6 @@ San Diego, CA 92122
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -1679,7 +1664,6 @@ San Diego, CA 92122
 						<browser platform="Netscape"/>
 						<browser platform="Mozilla" version="1.0+"/>
 						<browser platform="Opera" version="7.0+"/>
-						<browser platform="Chrome" version="5.0+"/>
 						<browser platform="Safari" version="1.0+"/>
 					</browsers>
 					<deprecated>Use CSS to style links instead.</deprecated>
@@ -1696,7 +1680,6 @@ San Diego, CA 92122
 					</values>
 					<browsers>
 						<browser platform="IE" version="4.0+"/>
-						<browser platform="Chrome" version="5.0+"/>
 						<browser platform="Safari" version="1.0+"/>
 					</browsers>
                 </field>
@@ -1730,7 +1713,6 @@ San Diego, CA 92122
 					<hint>[margin-width]. Example values: 10px, 5%, etc.</hint>
 					<browsers>
 						<browser platform="IE" version="4.0+"/>
-						<browser platform="Chrome" version="5.0+"/>
 						<browser platform="Safari" version="1.0+"/>
 					</browsers>
                 </field>
@@ -1743,7 +1725,6 @@ San Diego, CA 92122
 						<browser platform="Netscape"/>
 						<browser platform="Mozilla" version="1.0+"/>
 						<browser platform="Opera" version="7.0+"/>
-						<browser platform="Chrome" version="5.0+"/>
 						<browser platform="Safari" version="1.0+"/>
 					</browsers>
 					<deprecated>Use CSS to style links instead.</deprecated>
@@ -1786,7 +1767,6 @@ San Diego, CA 92122
 						<browser platform="Netscape"/>
 						<browser platform="Mozilla" version="1.0+"/>
 						<browser platform="Opera" version="7.0+"/>
-						<browser platform="Chrome" version="5.0+"/>
 						<browser platform="Safari" version="1.0+"/>
 					</browsers>
 					<deprecated>Use CSS to style text instead.</deprecated>
@@ -1804,7 +1784,6 @@ San Diego, CA 92122
 						<browser platform="Netscape"/>
 						<browser platform="Mozilla" version="1.0+"/>
 						<browser platform="Opera" version="7.0+"/>
-						<browser platform="Chrome" version="5.0+"/>
 						<browser platform="Safari" version="1.0+"/>
 					</browsers>
 					<deprecated>Use CSS to style links instead.</deprecated>
@@ -1920,7 +1899,6 @@ San Diego, CA 92122
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -1958,7 +1936,6 @@ This sentence is on the second line.
 						<browser platform="Netscape"/>
 						<browser platform="Mozilla" version="1.0+"/>
 						<browser platform="Opera" version="7.0+"/>
-						<browser platform="Chrome" version="5.0+"/>
 						<browser platform="Safari" version="1.0+"/>
 					</browsers>
 					<availability>
@@ -1988,7 +1965,6 @@ This sentence is on the second line.
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -2054,7 +2030,6 @@ This sentence is on the second line.
 						<browser platform="Netscape"/>
 						<browser platform="Mozilla" version="1.0+"/>
 						<browser platform="Opera" version="7.0+"/>
-						<browser platform="Chrome" version="5.0+"/>
 						<browser platform="Safari" version="1.0+"/>
 					</browsers>
 					<availability>
@@ -2170,7 +2145,6 @@ This sentence is on the second line.
 				<browser platform="Netscape" version="6.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="5.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -2333,7 +2307,6 @@ This sentence is on the second line.
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -2485,7 +2458,6 @@ This sentence is on the second line.
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<deprecated>Use 'div align="center"' instead.
@@ -2638,7 +2610,6 @@ This sentence is on the second line.
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -2786,7 +2757,6 @@ This sentence is on the second line.
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -2882,7 +2852,6 @@ This sentence is on the second line.
 				<browser platform="Netscape" version="6.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="7.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -2976,7 +2945,6 @@ This sentence is on the second line.
 				<browser platform="Netscape" version="6.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="7.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -3178,7 +3146,6 @@ This sentence is on the second line.
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -3282,7 +3249,6 @@ This sentence is on the second line.
 				<browser platform="Netscape" version="6.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="7.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -3434,7 +3400,6 @@ This sentence is on the second line.
 				<browser platform="Netscape" version="6.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -3582,7 +3547,6 @@ This sentence is on the second line.
 				<browser platform="Netscape" version="6.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<deprecated>Use UL instead.
@@ -3742,7 +3706,6 @@ This sentence is on the second line.
 				<browser platform="Netscape" version="2.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -3907,7 +3870,6 @@ This sentence is on the second line.
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -3944,7 +3906,6 @@ This sentence is on the second line.
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -4111,7 +4072,6 @@ This sentence is on the second line.
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -4201,7 +4161,6 @@ This sentence is on the second line.
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -4391,7 +4350,6 @@ This sentence is on the second line.
 				<browser platform="Netscape" version="6.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -4485,7 +4443,6 @@ This sentence is on the second line.
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<deprecated>Define fonts using CSS instead.</deprecated>
@@ -4591,7 +4548,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -4666,7 +4622,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="2.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -4730,7 +4685,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="2.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -4820,7 +4774,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -4910,7 +4863,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -5000,7 +4952,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -5090,7 +5041,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -5180,7 +5130,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -5270,7 +5219,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -5310,7 +5258,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -5404,7 +5351,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -5493,7 +5439,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -5581,7 +5526,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="4.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -5657,7 +5601,6 @@ Sorry, your browser does not support inline frames. ;/iframe&amp;gt;
 				<browser platform="Netscape" version="3.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="5.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -5810,7 +5753,6 @@ Sorry, your browser does not support inline frames. ;/iframe&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -5883,7 +5825,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 						<browser platform="Netscape"/>
 						<browser platform="Mozilla" version="1.0+"/>
 						<browser platform="Opera" version="7.0+"/>
-						<browser platform="Chrome" version="5.0+"/>
 						<browser platform="Safari" version="1.0+"/>
 					</browsers>
 					<availability>
@@ -5955,7 +5896,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -6020,7 +5960,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="6.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -6080,7 +6019,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="4.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<deprecated>Use the INPUT element instead.
@@ -6166,7 +6104,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -6270,7 +6207,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="6.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -6400,7 +6336,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="6.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -6453,7 +6388,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 						<browser platform="Netscape"/>
 						<browser platform="Mozilla" version="1.0+"/>
 						<browser platform="Opera" version="7.0+"/>
-						<browser platform="Chrome" version="5.0+"/>
 						<browser platform="Safari" version="1.0+"/>
 					</browsers>
 					<deprecated>Use CSS to style list items instead.</deprecated>
@@ -6512,7 +6446,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -6562,7 +6495,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 						<browser platform="Netscape"/>
 						<browser platform="Mozilla" version="1.0+"/>
 						<browser platform="Opera" version="7.0+"/>
-						<browser platform="Chrome" version="5.0+"/>
 						<browser platform="Safari" version="1.0+"/>
 					</browsers>
 					<availability>
@@ -6589,7 +6521,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
            		<browser platform="IE" version="3.0+"/>
 				<browser platform="Netscape" version="4.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -6661,7 +6592,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="6.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -6801,7 +6731,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -6928,7 +6857,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="2.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -6967,7 +6895,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="2.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -7023,7 +6950,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 						<browser platform="Netscape"/>
 						<browser platform="Mozilla" version="1.0+"/>
 						<browser platform="Opera" version="7.0+"/>
-						<browser platform="Chrome" version="5.0+"/>
 						<browser platform="Safari" version="1.0+"/>
 					</browsers>
 					<availability>
@@ -7095,7 +7021,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="4.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -7147,7 +7072,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 						<browser platform="Netscape"/>
 						<browser platform="Mozilla" version="1.0+"/>
 						<browser platform="Opera" version="7.0+"/>
-						<browser platform="Chrome" version="5.0+"/>
 						<browser platform="Safari" version="1.0+"/>
 					</browsers>
 					<deprecated>Use CSS to style ordered list types instead.</deprecated>
@@ -7211,7 +7135,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -7304,7 +7227,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="6.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -7371,7 +7293,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -7462,7 +7383,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -7499,7 +7419,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 						<browser platform="Netscape"/>
 						<browser platform="Mozilla" version="1.0+"/>
 						<browser platform="Opera" version="7.0+"/>
-						<browser platform="Chrome" version="5.0+"/>
 						<browser platform="Safari" version="1.0+"/>
 					</browsers>
 					<availability>
@@ -7515,7 +7434,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -7614,7 +7532,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -7695,7 +7612,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="6.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -7922,7 +7838,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="3.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<deprecated>Use CSS to format text instead.
@@ -8010,7 +7925,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -8055,7 +7969,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 						<browser platform="Netscape" version="2.0+"/>
 						<browser platform="Mozilla" version="1.0+"/>
 						<browser platform="Opera" version="4.0+"/>
-						<browser platform="Chrome" version="5.0+"/>
 						<browser platform="Safari" version="1.0+"/>
 					</browsers>
 					<deprecated>Use "type" attribute instead.</deprecated>
@@ -8078,7 +7991,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 						<browser platform="Netscape" version="2.0+"/>
 						<browser platform="Mozilla" version="1.0+"/>
 						<browser platform="Opera" version="4.0+"/>
-						<browser platform="Chrome" version="5.0+"/>
 						<browser platform="Safari" version="1.0+"/>
 					</browsers>
 					<availability>
@@ -8097,7 +8009,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="2.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -8196,7 +8107,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -8284,7 +8194,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="2.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -8375,7 +8284,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="3.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -8465,7 +8373,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="3.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<deprecated>Use CSS to format text instead.
@@ -8554,7 +8461,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -8600,7 +8506,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 						<browser platform="Netscape" version="1.0+"/>
 						<browser platform="Mozilla" version="1.0+"/>
 						<browser platform="Opera" version="4.0+"/>
-						<browser platform="Chrome" version="5.0+"/>
 						<browser platform="Safari" version="1.0+"/>
 					</browsers>
 					<availability>
@@ -8618,7 +8523,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -8707,7 +8611,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="2.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -8795,7 +8698,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="2.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -8915,7 +8817,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -9025,7 +8926,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="6.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -9145,7 +9045,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -9252,7 +9151,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -9366,7 +9264,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="6.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="5.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -9485,7 +9382,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -9599,7 +9495,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="6.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="5.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -9637,7 +9532,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="5.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -9747,7 +9641,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -9836,7 +9729,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -9924,7 +9816,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<deprecated>Use CSS to style text instead.
@@ -9972,7 +9863,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 						<browser platform="Netscape" version="1.0+"/>
 						<browser platform="Mozilla" version="1.0+"/>
 						<browser platform="Opera" version="4.0+"/>
-						<browser platform="Chrome" version="5.0+"/>
 						<browser platform="Safari" version="1.0+"/>
 					</browsers>
 					<deprecated>Use CSS to style unordered lists instead.</deprecated>
@@ -10035,7 +9925,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10123,7 +10012,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10309,7 +10197,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10342,7 +10229,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10362,7 +10248,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10375,7 +10260,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<hint>[key].</hint>
 			<browsers>
            		<browser platform="IE" version="5.5+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10391,7 +10275,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10419,7 +10302,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10446,7 +10328,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10473,7 +10354,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="4.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10489,7 +10369,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			</values>
 			<browsers>
 				<browser platform="IE" version="5.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 		</field>
@@ -10502,7 +10381,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10518,7 +10396,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<deprecated>Use CSS to style the background instead.</deprecated>
@@ -10541,7 +10418,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			</values>
 			<browsers>
 				<browser platform="IE" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 		</field>
@@ -10554,7 +10430,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<deprecated>Use CSS to style the bgcolor instead.</deprecated>
@@ -10568,7 +10443,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10608,7 +10482,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10624,7 +10497,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10641,7 +10513,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="7.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10657,7 +10528,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="7.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10676,7 +10546,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10694,7 +10563,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10710,7 +10578,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10726,7 +10593,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10749,7 +10615,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
            		<browser platform="IE" version="2.0+"/>
 				<browser platform="Netscape" version="2.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10764,7 +10629,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
            		<browser platform="IE" version="2.0+"/>
 				<browser platform="Netscape" version="2.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10780,7 +10644,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10796,7 +10659,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10812,7 +10674,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10830,7 +10691,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10852,7 +10712,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10869,7 +10728,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
             </values>
 			<browsers>
         		<browser platform="IE" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
         </field>
@@ -10882,7 +10740,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="7.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10898,7 +10755,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="4.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="7.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10949,7 +10805,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="6.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="7.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10967,7 +10822,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="3.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -10985,7 +10839,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="2.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="7.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11004,7 +10857,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11022,7 +10874,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 	        </values>
 			<browsers>
            		<browser platform="IE" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
         </field>
@@ -11038,7 +10889,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11068,7 +10918,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11092,7 +10941,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11107,7 +10955,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
            		<browser platform="IE" version="4.0+"/>
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11133,7 +10980,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="2.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11154,7 +11000,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="2.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11191,7 +11036,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11207,7 +11051,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11222,7 +11065,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 	            <value name="false" description="Element is not hidden."/>
 	        </values>
 			<browsers>
-        		<browser platform="Chrome" version="5.0+"/>
         		<browser platform="Safari" version="1.0+"/>
 			</browsers>
         </field>
@@ -11246,7 +11088,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11262,7 +11103,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11281,7 +11121,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11297,7 +11136,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11314,7 +11152,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11330,7 +11167,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11346,7 +11182,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11366,7 +11201,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
            		<browser platform="IE" version="3.0+"/>
 				<browser platform="Netscape" version="2.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11390,7 +11224,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11403,7 +11236,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<hint>[number]</hint>
 			<browsers>
            		<browser platform="IE" version="2.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
         </field>
@@ -11433,7 +11265,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11449,7 +11280,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="4.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="7.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11465,7 +11295,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="4.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="7.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11481,7 +11310,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11500,7 +11328,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11518,7 +11345,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11534,7 +11360,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11552,7 +11377,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11570,7 +11394,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11588,7 +11411,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11606,7 +11428,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<deprecated>Use CSS to style text wrapping instead.</deprecated>
@@ -11639,7 +11460,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<hint>[x-position-in-pixels]</hint>
 			<browsers>
 				<browser platform="Netscape" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
         </field>
@@ -11649,7 +11469,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<hint>[y-position-in-pixels]</hint>
 			<browsers>
 				<browser platform="Netscape" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
         </field>
@@ -11659,7 +11478,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<hint>[url]</hint>
 			<browsers>
 				<browser platform="Netscape" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
         </field>
@@ -11680,7 +11498,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11698,7 +11515,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11728,7 +11544,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
            		<browser platform="IE" version="3.0+"/>
 				<browser platform="Netscape" version="4.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11758,7 +11573,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
            		<browser platform="IE" version="3.0+"/>
 				<browser platform="Netscape" version="4.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11774,7 +11588,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11790,7 +11603,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11812,7 +11624,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11828,7 +11639,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11849,7 +11659,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11874,7 +11683,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<hint>[number-of-pixels]</hint>
 			<browsers>
 				<browser platform="IE" version="3.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 		</field>
@@ -11884,7 +11692,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<hint>[number-of-milliseconds]</hint>
 			<browsers>
 				<browser platform="IE" version="3.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 		</field>
@@ -11901,7 +11708,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="2.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11919,7 +11725,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11940,7 +11745,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11965,7 +11769,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11981,7 +11784,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="6.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="7.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -11997,7 +11799,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -12013,7 +11814,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="4.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -12029,7 +11829,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -12045,7 +11844,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="7.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -12061,7 +11859,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -12087,7 +11884,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -12106,7 +11902,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -12119,7 +11914,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<hint>[number-of-pixels]</hint>
 			<browsers>
            		<browser platform="IE" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
         </field>
@@ -12131,7 +11925,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			</values>
 			<browsers>
         		<browser platform="IE" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
         </field>
@@ -12166,7 +11959,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -12182,7 +11974,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="7.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -12202,7 +11993,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="7.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -12230,7 +12020,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="7.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<deprecated>Use CSS to style space instead.</deprecated>
@@ -12250,7 +12039,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
         </field>
@@ -12281,7 +12069,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.1+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -12298,7 +12085,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			</values>
 			<browsers>
 				<browser platform="IE" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
         </field>
@@ -12323,7 +12109,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
         </field>
@@ -12333,7 +12118,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<hint>[number]</hint>
 			<browsers>
 				<browser platform="Netscape" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
         </field>
@@ -12346,7 +12130,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<description>Fires when the loading of the element is cancelled before it finishes loading.</description>
             <browsers>
                <browser platform="IE" version="4.0+"/>
-			   <browser platform="Chrome" version="5.0+"/>
 			   <browser platform="Safari" version="1.0+"/>
            </browsers>
         </event>
@@ -12383,7 +12166,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 		<description>Fires immediately before the selection is copied to the clipboard.</description>
         <browsers>
           <browser platform="IE" version="4.0+"/>
-		  <browser platform="Chrome" version="5.0+"/>
 		  <browser platform="Safari" version="1.0+"/>
         </browsers>
       </event>
@@ -12392,7 +12174,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<description>Fires immediately before the selection is cut to the clipboard.</description>
         	<browsers>
          		<browser platform="IE" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
         	</browsers>
       	</event>
@@ -12415,7 +12196,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<description>Fires immediately before the selection is pasted from the clipboard to the element.</description>
          	<browsers>
             	<browser platform="IE" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
           	</browsers>
      	</event>
@@ -12448,7 +12228,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -12477,7 +12256,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -12492,7 +12270,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -12504,7 +12281,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<description>Fires when the element is right-clicked and the context menu opens.</description>
          	<browsers>
           		<browser platform="IE" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
          	</browsers>
      	</event>
@@ -12520,7 +12296,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<description>Fires when the element is copied to the clipboard.</description>
              <browsers>
                <browser platform="IE" version="4.0+"/>
-			   <browser platform="Chrome" version="5.0+"/>
 			   <browser platform="Safari" version="1.0+"/>
              </browsers>
 		</event>
@@ -12529,7 +12304,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<description>Fires when the element is cut to the clipboard.</description>
             <browsers>
             	<browser platform="IE" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
             </browsers>
         </event>
@@ -12562,7 +12336,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -12581,7 +12354,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<description>Fires when the element is dragged.</description>
             <browsers>
                 <browser platform="IE" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
              </browsers>
         </event>
@@ -12590,7 +12362,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<description>Fires when the element is released from being dragged.</description>
             <browsers>
               <browser platform="IE" version="4.0+"/>
-			  <browser platform="Chrome" version="5.0+"/>
 			  <browser platform="Safari" version="1.0+"/>
             </browsers>
         </event>
@@ -12599,7 +12370,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<description>Fires when the element has another object dragged onto it that can be dropped on the element.</description>
             <browsers>
               <browser platform="IE" version="4.0+"/>
-			  <browser platform="Chrome" version="5.0+"/>
 			  <browser platform="Safari" version="1.0+"/>
             </browsers>
         </event>
@@ -12608,7 +12378,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<description>Fires when an element has an object dragged out of it that could be dropped onto the element.</description>
             <browsers>
               <browser platform="IE" version="4.0+"/>
-			  <browser platform="Chrome" version="5.0+"/>
 			  <browser platform="Safari" version="1.0+"/>
             </browsers>
         </event>
@@ -12617,7 +12386,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<description>Fires when an element has an object dragged over it that could be dropped onto the element.</description>
             <browsers>
               <browser platform="IE" version="4.0+"/>
-			  <browser platform="Chrome" version="5.0+"/>
 			  <browser platform="Safari" version="1.0+"/>
             </browsers>
         </event>
@@ -12626,7 +12394,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<description>Fires immediately before an element is dragged.</description>
             <browsers>
                <browser platform="IE" version="4.0+"/>
-			   <browser platform="Chrome" version="5.0+"/>
 			   <browser platform="Safari" version="1.0+"/>
              </browsers>
         </event>
@@ -12635,7 +12402,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<description>Fires when an object is dropped onto the element.</description>
            	<browsers>
             	<browser platform="IE" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
             </browsers>
         </event>
@@ -12644,7 +12410,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<description>Fires when an error occurs with the object associated with the element.</description>
            	<browsers>
             	<browser platform="IE" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
             </browsers>
         </event>
@@ -12677,7 +12442,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -12713,7 +12477,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -12728,7 +12491,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -12743,7 +12505,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -12765,7 +12526,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -12787,7 +12547,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -12818,7 +12577,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -12833,7 +12591,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -12848,7 +12605,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -12863,7 +12619,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -12903,7 +12658,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<description>Fires when the clipboard contents are pasted onto the element.</description>
             <browsers>
                 <browser platform="IE" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
             </browsers>
         </event>
@@ -12929,7 +12683,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -12941,7 +12694,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<description>Fires immediately before an element is about to be resized.</description>
             <browsers>
                 <browser platform="IE" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
             </browsers>
         </event>
@@ -12992,7 +12744,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<description>Fires when a user scrolls the element.</description>
             <browsers>
                 <browser platform="IE" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
             </browsers>
         </event>
@@ -13001,7 +12752,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 			<description>Fires immediately before the element is selected.</description>
             <browsers>
                 <browser platform="IE" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
             </browsers>
         </event>
@@ -13013,7 +12763,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -13035,7 +12784,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
@@ -13057,7 +12805,6 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 				<browser platform="Netscape" version="1.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Opera" version="4.0+"/>
-				<browser platform="Chrome" version="5.0+"/>
 				<browser platform="Safari" version="1.0+"/>
 			</browsers>
 			<availability>
