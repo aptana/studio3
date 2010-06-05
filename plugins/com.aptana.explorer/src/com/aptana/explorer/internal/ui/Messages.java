@@ -61,6 +61,8 @@ public class Messages extends NLS
 	
 	public static String SingleProjectView_CaseSensitive;
 	public static String SingleProjectView_CreateAppMenuItem;
+	public static String SingleProjectView_OpenBrowserItem;
+
 	public static String SingleProjectView_OpenTerminalMenuItem_LBL;
 	public static String SingleProjectView_RefreshJob_title;
 	public static String SingleProjectView_Wildcard;
