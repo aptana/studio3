@@ -641,7 +641,7 @@ static void WriteConsole(void)
 				{
 					hasEscSequence = FALSE;
 					bIgnoreEsc = TRUE;
-					i -= dwSeqIndex + 1;
+					i -= dwSeqIndex;
 					dwSeqIndex = 0;
 				} else {
 					break;
