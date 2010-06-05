@@ -297,8 +297,7 @@ public abstract class SingleProjectView extends CommonNavigator
 				}
 			};
 		}
-		if (adapter == IProject.class)
-		{
+		if (adapter == IProject.class) {
 			return selectedProject;
 		}
 		return super.getAdapter(adapter);
@@ -327,14 +326,12 @@ public abstract class SingleProjectView extends CommonNavigator
 		menuManager.add(new Separator(IContextMenuConstants.GROUP_PROPERTIES));
 
 		// Add run related items
-		menuManager.appendToGroup(GROUP_RUN, new ContributionItem()
-		{
+		menuManager.appendToGroup(GROUP_RUN, new ContributionItem() {
 			@Override
-			public void fill(Menu menu, int index)
-			{
-				IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-				if (projects.length > 0)
-				{
+			public void fill(Menu menu, int index) {
+				IProject[] projects = ResourcesPlugin.getWorkspace().getRoot()
+						.getProjects();
+				if (projects.length > 0) {
 					new MenuItem(menu, SWT.SEPARATOR);
 
 					MenuItem projectsMenuItem = new MenuItem(menu, SWT.CASCADE);
@@ -436,17 +433,12 @@ public abstract class SingleProjectView extends CommonNavigator
 
 	protected void fillDeployMenu(MenuManager menuManager)
 	{
-		if (selectedProject == null || !selectedProject.isAccessible())
-		{
+		if (selectedProject == null || !selectedProject.isAccessible()) {
 			menuManager.add(new Separator(GROUP_WIZARD));
-		}
-		else if (isCapistranoProject())
-		{
+		} else if (isCapistranoProject()) {
 			// insert commands for capistrano here
 			menuManager.add(new Separator(GROUP_CAP));
-		}
-		else if (isHerokuProject())
-		{
+		} else if (isHerokuProject()) {
 			addHerokuMenuCommands(menuManager);
 		}
 		else if (isFTPProject())
@@ -646,10 +638,15 @@ public abstract class SingleProjectView extends CommonNavigator
 
 		menuManager.appendToGroup(GROUP_HEROKU_COMMANDS, new ContributionItem()
 		{
-
 			@Override
 			public void fill(Menu menu, int index)
 			{
+				// Open in web browser
+				if (Platform.getOS().equals(Platform.OS_MACOSX)) {
+					createHerokuSubMenuItem(
+							menu,
+							"heroku open", Messages.SingleProjectView_OpenBrowserItem); //$NON-NLS-1$
+				}
 
 				// Sharing Submenu
 				final MenuItem sharingMenuItem = new MenuItem(menu, SWT.CASCADE);
@@ -1581,7 +1578,6 @@ public abstract class SingleProjectView extends CommonNavigator
 
 	private boolean isHerokuProject()
 	{
-
 		GitRepository repo = GitPlugin.getDefault().getGitRepositoryManager().getAttached(selectedProject);
 		if (repo != null)
 		{
