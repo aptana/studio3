@@ -242,12 +242,14 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_p = _symbols[offset + 1];
 					final ArrayList _list_p = (ArrayList) _symbol_p.value;
 					final JSNode[] p = _list_p == null ? new JSNode[0] : (JSNode[]) _list_p.toArray(new JSNode[_list_p.size()]);
-					return new ParseRootNode(IJSParserConstants.LANGUAGE, p, _symbol_p.getStart(), _symbol_p.getEnd());
+					
+			return new ParseRootNode(IJSParserConstants.LANGUAGE, p, _symbol_p.getStart(), _symbol_p.getEnd());
 				}
 			},
 			new Action() {	// [1] Program = 
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					return new ParseRootNode(IJSParserConstants.LANGUAGE, new Symbol[0], 0, 0);
+					
+			return new ParseRootNode(IJSParserConstants.LANGUAGE, new Symbol[0], 0, 0);
 				}
 			},
 			new Action() {	// [2] SourceElements = SourceElements SourceElement
@@ -270,7 +272,14 @@ public class JSParser extends Parser implements IParser {
 					final JSNode p = (JSNode) _symbol_p.value;
 					final Symbol _symbol_b = _symbols[offset + 4];
 					final JSNode b = (JSNode) _symbol_b.value;
-					return new JSFunctionNode(new JSNode[] { new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd()), p, b }, f.getStart(), b.getEnd());
+					
+			return new JSFunctionNode(
+				new JSNode[] {
+					new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd()), p, b
+				},
+				f.getStart(),
+				b.getEnd()
+			);
 				}
 			},
 			new Action() {	// [6] FunctionExpression = FUNCTION.f FunctionParameters.p FunctionBody.b
@@ -280,7 +289,14 @@ public class JSParser extends Parser implements IParser {
 					final JSNode p = (JSNode) _symbol_p.value;
 					final Symbol _symbol_b = _symbols[offset + 3];
 					final JSNode b = (JSNode) _symbol_b.value;
-					return new JSFunctionNode(new JSNode[] { new JSNode(), p, b }, f.getStart(), b.getEnd());
+					
+			return new JSFunctionNode(
+				new JSNode[] {
+					new JSNode(), p, b
+				},
+				f.getStart(),
+				b.getEnd()
+			);
 				}
 			},
 			Action.RETURN,	// [7] FunctionExpression = FunctionDeclaration
@@ -288,7 +304,8 @@ public class JSParser extends Parser implements IParser {
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol r = _symbols[offset + 2];
-					return new JSNaryNode(JSNodeTypes.PARAMETERS, l.getStart(), r.getEnd());
+					
+			return new JSNaryNode(JSNodeTypes.PARAMETERS, l.getStart(), r.getEnd());
 				}
 			},
 			new Action() {	// [9] FunctionParameters = LPAREN.l FormalParameterList.p RPAREN.r
@@ -297,7 +314,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_p = _symbols[offset + 2];
 					final JSNode p = (JSNode) _symbol_p.value;
 					final Symbol r = _symbols[offset + 3];
-					p.setLocation(l.getStart(), r.getEnd());return p;
+					
+			p.setLocation(l.getStart(), r.getEnd());return p;
 				}
 			},
 			new Action() {	// [10] FormalParameterList = FormalParameterList.p COMMA IDENTIFIER.i
@@ -306,21 +324,28 @@ public class JSParser extends Parser implements IParser {
 					final JSNode p = (JSNode) _symbol_p.value;
 					final Symbol _symbol_i = _symbols[offset + 3];
 					final String i = (String) _symbol_i.value;
-					JSNode node = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());p.addChild(node);p.setLocation(p.getStart(), node.getEnd());return p;
+					
+			JSNode node = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());
+			p.addChild(node);
+			p.setLocation(p.getStart(), node.getEnd());
+			return p;
 				}
 			},
 			new Action() {	// [11] FormalParameterList = IDENTIFIER.i
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_i = _symbols[offset + 1];
 					final String i = (String) _symbol_i.value;
-					JSNode node = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNaryNode(JSNodeTypes.PARAMETERS, new JSNode[] { node }, node.getStart(), node.getEnd());
+					
+			JSNode node = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());
+			return new JSNaryNode(JSNodeTypes.PARAMETERS, new JSNode[] { node }, node.getStart(), node.getEnd());
 				}
 			},
 			new Action() {	// [12] FunctionBody = LCURLY.l RCURLY.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol r = _symbols[offset + 2];
-					return new JSNaryNode(JSNodeTypes.STATEMENTS, l.getStart(), r.getEnd());
+					
+			return new JSNaryNode(JSNodeTypes.STATEMENTS, l.getStart(), r.getEnd());
 				}
 			},
 			new Action() {	// [13] FunctionBody = LCURLY.l SourceElements.s RCURLY.r
@@ -330,7 +355,8 @@ public class JSParser extends Parser implements IParser {
 					final ArrayList _list_s = (ArrayList) _symbol_s.value;
 					final JSNode[] s = _list_s == null ? new JSNode[0] : (JSNode[]) _list_s.toArray(new JSNode[_list_s.size()]);
 					final Symbol r = _symbols[offset + 3];
-					return new JSNaryNode(JSNodeTypes.STATEMENTS, s, l.getStart(), r.getEnd());
+					
+			return new JSNaryNode(JSNodeTypes.STATEMENTS, s, l.getStart(), r.getEnd());
 				}
 			},
 			Action.RETURN,	// [14] Statement = Block
@@ -342,14 +368,19 @@ public class JSParser extends Parser implements IParser {
 					final ArrayList _list_l = (ArrayList) _symbol_l.value;
 					final JSNode[] l = _list_l == null ? new JSNode[0] : (JSNode[]) _list_l.toArray(new JSNode[_list_l.size()]);
 					final Symbol e = _symbols[offset + 3];
-					JSNode node = new JSNaryNode(JSNodeTypes.VAR, l, s.getStart(), e.getEnd());node.setSemicolonIncluded(true);return node;
+					
+			JSNode node = new JSNaryNode(JSNodeTypes.VAR, l, s.getStart(), e.getEnd());
+			node.setSemicolonIncluded(true);
+			return node;
 				}
 			},
 			new Action() {	// [17] Statement = Expression_NoLBF.e SEMICOLON
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_e = _symbols[offset + 1];
 					final JSNode e = (JSNode) _symbol_e.value;
-					e.setSemicolonIncluded(true); return e;
+					
+			e.setSemicolonIncluded(true);
+			return e;
 				}
 			},
 			Action.RETURN,	// [18] Statement = IfStatement
@@ -365,13 +396,15 @@ public class JSParser extends Parser implements IParser {
 			new Action() {	// [28] Statement = SEMICOLON.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol s = _symbols[offset + 1];
-					return new JSNode(JSNodeTypes.EMPTY, s.getStart(), s.getEnd(), true);
+					
+			return new JSNode(JSNodeTypes.EMPTY, s.getStart(), s.getEnd(), true);
 				}
 			},
 			new Action() {	// [29] Statement = error.e
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol e = _symbols[offset + 1];
-					return new JSNode(JSNodeTypes.ERROR, e.getStart(), e.getEnd());
+					
+			return new JSNode(JSNodeTypes.ERROR, e.getStart(), e.getEnd());
 				}
 			},
 			Action.RETURN,	// [30] Statement_NoIf = Block
@@ -383,14 +416,19 @@ public class JSParser extends Parser implements IParser {
 					final ArrayList _list_l = (ArrayList) _symbol_l.value;
 					final JSNode[] l = _list_l == null ? new JSNode[0] : (JSNode[]) _list_l.toArray(new JSNode[_list_l.size()]);
 					final Symbol e = _symbols[offset + 3];
-					JSNode node = new JSNaryNode(JSNodeTypes.VAR, l, s.getStart(), e.getEnd());node.setSemicolonIncluded(true);return node;
+					
+			JSNode node = new JSNaryNode(JSNodeTypes.VAR, l, s.getStart(), e.getEnd());
+			node.setSemicolonIncluded(true);
+			return node;
 				}
 			},
 			new Action() {	// [33] Statement_NoIf = Expression_NoLBF.e SEMICOLON
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_e = _symbols[offset + 1];
 					final JSNode e = (JSNode) _symbol_e.value;
-					e.setSemicolonIncluded(true); return e;
+					
+			e.setSemicolonIncluded(true);
+			return e;
 				}
 			},
 			Action.RETURN,	// [34] Statement_NoIf = IfStatement_NoIf
@@ -406,20 +444,23 @@ public class JSParser extends Parser implements IParser {
 			new Action() {	// [44] Statement_NoIf = SEMICOLON.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol s = _symbols[offset + 1];
-					return new JSNode(JSNodeTypes.EMPTY, s.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.EMPTY, s.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [45] Statement_NoIf = error.e
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol e = _symbols[offset + 1];
-					return new JSNode(JSNodeTypes.ERROR, e.getStart(), e.getEnd());
+					
+			return new JSNode(JSNodeTypes.ERROR, e.getStart(), e.getEnd());
 				}
 			},
 			new Action() {	// [46] Block = LCURLY.l RCURLY.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol r = _symbols[offset + 2];
-					return new JSNaryNode(JSNodeTypes.STATEMENTS, l.getStart(), r.getEnd());
+					
+			return new JSNaryNode(JSNodeTypes.STATEMENTS, l.getStart(), r.getEnd());
 				}
 			},
 			new Action() {	// [47] Block = LCURLY.l StatementList.a RCURLY.r
@@ -429,7 +470,8 @@ public class JSParser extends Parser implements IParser {
 					final ArrayList _list_a = (ArrayList) _symbol_a.value;
 					final JSNode[] a = _list_a == null ? new JSNode[0] : (JSNode[]) _list_a.toArray(new JSNode[_list_a.size()]);
 					final Symbol r = _symbols[offset + 3];
-					return new JSNaryNode(JSNodeTypes.STATEMENTS, a, l.getStart(), r.getEnd());
+					
+			return new JSNaryNode(JSNodeTypes.STATEMENTS, a, l.getStart(), r.getEnd());
 				}
 			},
 			new Action() {	// [48] StatementList = StatementList Statement
@@ -466,7 +508,9 @@ public class JSParser extends Parser implements IParser {
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_i = _symbols[offset + 1];
 					final String i = (String) _symbol_i.value;
-					JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.DECLARATION, new JSNode[] { id, new JSNode() }, _symbol_i.getStart(), _symbol_i.getEnd());
+					
+			JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());
+			return new JSNode(JSNodeTypes.DECLARATION, new JSNode[] { id, new JSNode() }, _symbol_i.getStart(), _symbol_i.getEnd());
 				}
 			},
 			new Action() {	// [55] VariableDeclaration = IDENTIFIER.i EQUAL AssignmentExpression.e
@@ -475,14 +519,18 @@ public class JSParser extends Parser implements IParser {
 					final String i = (String) _symbol_i.value;
 					final Symbol _symbol_e = _symbols[offset + 3];
 					final JSNode e = (JSNode) _symbol_e.value;
-					JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.DECLARATION, new JSNode[] { id, e }, _symbol_i.getStart(), e.getEnd());
+					
+			JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());
+			return new JSNode(JSNodeTypes.DECLARATION, new JSNode[] { id, e }, _symbol_i.getStart(), e.getEnd());
 				}
 			},
 			new Action() {	// [56] VariableDeclaration_NoIn = IDENTIFIER.i
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_i = _symbols[offset + 1];
 					final String i = (String) _symbol_i.value;
-					JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.DECLARATION, new JSNode[] { id, new JSNode() }, _symbol_i.getStart(), _symbol_i.getEnd());
+					
+			JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());
+			return new JSNode(JSNodeTypes.DECLARATION, new JSNode[] { id, new JSNode() }, _symbol_i.getStart(), _symbol_i.getEnd());
 				}
 			},
 			new Action() {	// [57] VariableDeclaration_NoIn = IDENTIFIER.i EQUAL AssignmentExpression_NoIn.e
@@ -491,7 +539,9 @@ public class JSParser extends Parser implements IParser {
 					final String i = (String) _symbol_i.value;
 					final Symbol _symbol_e = _symbols[offset + 3];
 					final JSNode e = (JSNode) _symbol_e.value;
-					JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.DECLARATION, new JSNode[] { id, e }, _symbol_i.getStart(), e.getEnd());
+					
+			JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());
+			return new JSNode(JSNodeTypes.DECLARATION, new JSNode[] { id, e }, _symbol_i.getStart(), e.getEnd());
 				}
 			},
 			new Action() {	// [58] IfStatement = IF.i LPAREN Expression.e RPAREN Statement_NoIf.sn ELSE Statement.s
@@ -503,7 +553,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode sn = (JSNode) _symbol_sn.value;
 					final Symbol _symbol_s = _symbols[offset + 7];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.IF, new JSNode[] { e, sn, s }, i.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.IF, new JSNode[] { e, sn, s }, i.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [59] IfStatement = IF.i LPAREN Expression.e RPAREN Statement.s
@@ -513,7 +564,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode e = (JSNode) _symbol_e.value;
 					final Symbol _symbol_s = _symbols[offset + 5];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.IF, new JSNode[] { e, s, new JSNode() }, i.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.IF, new JSNode[] { e, s, new JSNode() }, i.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [60] IfStatement_NoIf = IF.i LPAREN Expression.e RPAREN Statement_NoIf.sn ELSE Statement_NoIf.s
@@ -525,7 +577,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode sn = (JSNode) _symbol_sn.value;
 					final Symbol _symbol_s = _symbols[offset + 7];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.IF, new JSNode[] { e, sn, s }, i.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.IF, new JSNode[] { e, sn, s }, i.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [61] IterationStatement = DO.d Statement.s WHILE LPAREN Expression.e RPAREN SEMICOLON.r
@@ -536,7 +589,10 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_e = _symbols[offset + 5];
 					final JSNode e = (JSNode) _symbol_e.value;
 					final Symbol r = _symbols[offset + 7];
-					JSNode node = new JSNode(JSNodeTypes.DO, new JSNode[] { s, e }, d.getStart(), r.getEnd());node.setSemicolonIncluded(true);return node;
+					
+			JSNode node = new JSNode(JSNodeTypes.DO, new JSNode[] { s, e }, d.getStart(), r.getEnd());
+			node.setSemicolonIncluded(true);
+			return node;
 				}
 			},
 			new Action() {	// [62] IterationStatement = WHILE.w LPAREN Expression.e RPAREN Statement.s
@@ -546,7 +602,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode e = (JSNode) _symbol_e.value;
 					final Symbol _symbol_s = _symbols[offset + 5];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.WHILE, new JSNode[] { e, s }, w.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.WHILE, new JSNode[] { e, s }, w.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [63] IterationStatement = FOR.f LPAREN SEMICOLON SEMICOLON RPAREN Statement.s
@@ -554,7 +611,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol _symbol_s = _symbols[offset + 6];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [64] IterationStatement = FOR.f LPAREN SEMICOLON SEMICOLON Expression.a RPAREN Statement.s
@@ -564,7 +622,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode a = (JSNode) _symbol_a.value;
 					final Symbol _symbol_s = _symbols[offset + 7];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), new JSNode(), a, s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), new JSNode(), a, s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [65] IterationStatement = FOR.f LPAREN SEMICOLON Expression.c SEMICOLON RPAREN Statement.s
@@ -574,7 +633,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode c = (JSNode) _symbol_c.value;
 					final Symbol _symbol_s = _symbols[offset + 7];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), c, new JSNode(), s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), c, new JSNode(), s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [66] IterationStatement = FOR.f LPAREN SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement.s
@@ -586,7 +646,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode a = (JSNode) _symbol_a.value;
 					final Symbol _symbol_s = _symbols[offset + 8];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), c, a, s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), c, a, s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [67] IterationStatement = FOR.f LPAREN Expression_NoIn.i SEMICOLON SEMICOLON RPAREN Statement.s
@@ -596,7 +657,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode i = (JSNode) _symbol_i.value;
 					final Symbol _symbol_s = _symbols[offset + 7];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [68] IterationStatement = FOR.f LPAREN Expression_NoIn.i SEMICOLON SEMICOLON Expression.a RPAREN Statement.s
@@ -608,7 +670,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode a = (JSNode) _symbol_a.value;
 					final Symbol _symbol_s = _symbols[offset + 8];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, new JSNode(), a, s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, new JSNode(), a, s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [69] IterationStatement = FOR.f LPAREN Expression_NoIn.i SEMICOLON Expression.c SEMICOLON RPAREN Statement.s
@@ -620,7 +683,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode c = (JSNode) _symbol_c.value;
 					final Symbol _symbol_s = _symbols[offset + 8];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, c, new JSNode(), s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, c, new JSNode(), s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [70] IterationStatement = FOR.f LPAREN Expression_NoIn.i SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement.s
@@ -634,7 +698,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode a = (JSNode) _symbol_a.value;
 					final Symbol _symbol_s = _symbols[offset + 9];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, c, a, s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, c, a, s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [71] IterationStatement = FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON SEMICOLON RPAREN Statement.s
@@ -646,7 +711,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode[] i = _list_i == null ? new JSNode[0] : (JSNode[]) _list_i.toArray(new JSNode[_list_i.size()]);
 					final Symbol _symbol_s = _symbols[offset + 8];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [72] IterationStatement = FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON SEMICOLON Expression.a RPAREN Statement.s
@@ -660,7 +726,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode a = (JSNode) _symbol_a.value;
 					final Symbol _symbol_s = _symbols[offset + 9];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), new JSNode(), a, s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), new JSNode(), a, s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [73] IterationStatement = FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON Expression.c SEMICOLON RPAREN Statement.s
@@ -674,7 +741,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode c = (JSNode) _symbol_c.value;
 					final Symbol _symbol_s = _symbols[offset + 9];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), c, new JSNode(), s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), c, new JSNode(), s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [74] IterationStatement = FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement.s
@@ -690,7 +758,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode a = (JSNode) _symbol_a.value;
 					final Symbol _symbol_s = _symbols[offset + 10];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), c, a, s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), c, a, s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [75] IterationStatement = FOR.f LPAREN LeftHandSideExpression.i IN Expression.o RPAREN Statement.s
@@ -702,7 +771,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode o = (JSNode) _symbol_o.value;
 					final Symbol _symbol_s = _symbols[offset + 7];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR_IN, new JSNode[] { i, o, s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR_IN, new JSNode[] { i, o, s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [76] IterationStatement = FOR.f LPAREN VAR.v VariableDeclaration_NoIn.i IN Expression.o RPAREN Statement.s
@@ -715,7 +785,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode o = (JSNode) _symbol_o.value;
 					final Symbol _symbol_s = _symbols[offset + 8];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR_IN, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, new JSNode[] { i }, v.getStart(), i.getEnd()), o, s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR_IN, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, new JSNode[] { i }, v.getStart(), i.getEnd()), o, s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [77] IterationStatement_NoIf = DO.d Statement.s WHILE LPAREN Expression.e RPAREN SEMICOLON.r
@@ -726,7 +797,10 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_e = _symbols[offset + 5];
 					final JSNode e = (JSNode) _symbol_e.value;
 					final Symbol r = _symbols[offset + 7];
-					JSNode node = new JSNode(JSNodeTypes.DO, new JSNode[] { s, e }, d.getStart(), r.getEnd());node.setSemicolonIncluded(true);return node;
+					
+			JSNode node = new JSNode(JSNodeTypes.DO, new JSNode[] { s, e }, d.getStart(), r.getEnd());
+			node.setSemicolonIncluded(true);
+			return node;
 				}
 			},
 			new Action() {	// [78] IterationStatement_NoIf = WHILE.w LPAREN Expression.e RPAREN Statement_NoIf.s
@@ -736,7 +810,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode e = (JSNode) _symbol_e.value;
 					final Symbol _symbol_s = _symbols[offset + 5];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.WHILE, new JSNode[] { e, s }, w.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.WHILE, new JSNode[] { e, s }, w.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [79] IterationStatement_NoIf = FOR.f LPAREN SEMICOLON SEMICOLON RPAREN Statement_NoIf.s
@@ -744,7 +819,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol _symbol_s = _symbols[offset + 6];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [80] IterationStatement_NoIf = FOR.f LPAREN SEMICOLON SEMICOLON Expression.a RPAREN Statement_NoIf.s
@@ -754,7 +830,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode a = (JSNode) _symbol_a.value;
 					final Symbol _symbol_s = _symbols[offset + 7];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), new JSNode(), a, s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), new JSNode(), a, s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [81] IterationStatement_NoIf = FOR.f LPAREN SEMICOLON Expression.c SEMICOLON RPAREN Statement_NoIf.s
@@ -764,7 +841,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode c = (JSNode) _symbol_c.value;
 					final Symbol _symbol_s = _symbols[offset + 7];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), c, new JSNode(), s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), c, new JSNode(), s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [82] IterationStatement_NoIf = FOR.f LPAREN SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement_NoIf.s
@@ -776,7 +854,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode a = (JSNode) _symbol_a.value;
 					final Symbol _symbol_s = _symbols[offset + 8];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), c, a, s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), c, a, s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [83] IterationStatement_NoIf = FOR.f LPAREN Expression_NoIn.i SEMICOLON SEMICOLON RPAREN Statement_NoIf.s
@@ -786,7 +865,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode i = (JSNode) _symbol_i.value;
 					final Symbol _symbol_s = _symbols[offset + 7];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [84] IterationStatement_NoIf = FOR.f LPAREN Expression_NoIn.i SEMICOLON SEMICOLON Expression.a RPAREN Statement_NoIf.s
@@ -798,7 +878,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode a = (JSNode) _symbol_a.value;
 					final Symbol _symbol_s = _symbols[offset + 8];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, new JSNode(), a, s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, new JSNode(), a, s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [85] IterationStatement_NoIf = FOR.f LPAREN Expression_NoIn.i SEMICOLON Expression.c SEMICOLON RPAREN Statement_NoIf.s
@@ -810,7 +891,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode c = (JSNode) _symbol_c.value;
 					final Symbol _symbol_s = _symbols[offset + 8];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, c, new JSNode(), s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, c, new JSNode(), s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [86] IterationStatement_NoIf = FOR.f LPAREN Expression_NoIn.i SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement_NoIf.s
@@ -824,7 +906,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode a = (JSNode) _symbol_a.value;
 					final Symbol _symbol_s = _symbols[offset + 9];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, c, a, s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, c, a, s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [87] IterationStatement_NoIf = FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON SEMICOLON RPAREN Statement_NoIf.s
@@ -836,7 +919,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode[] i = _list_i == null ? new JSNode[0] : (JSNode[]) _list_i.toArray(new JSNode[_list_i.size()]);
 					final Symbol _symbol_s = _symbols[offset + 8];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [88] IterationStatement_NoIf = FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON SEMICOLON Expression.a RPAREN Statement_NoIf.s
@@ -850,7 +934,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode a = (JSNode) _symbol_a.value;
 					final Symbol _symbol_s = _symbols[offset + 9];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), new JSNode(), a, s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), new JSNode(), a, s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [89] IterationStatement_NoIf = FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON Expression.c SEMICOLON RPAREN Statement_NoIf.s
@@ -864,7 +949,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode c = (JSNode) _symbol_c.value;
 					final Symbol _symbol_s = _symbols[offset + 9];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), c, new JSNode(), s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), c, new JSNode(), s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [90] IterationStatement_NoIf = FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement_NoIf.s
@@ -880,7 +966,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode a = (JSNode) _symbol_a.value;
 					final Symbol _symbol_s = _symbols[offset + 10];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), c, a, s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), c, a, s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [91] IterationStatement_NoIf = FOR.f LPAREN LeftHandSideExpression.i IN Expression.o RPAREN Statement_NoIf.s
@@ -892,7 +979,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode o = (JSNode) _symbol_o.value;
 					final Symbol _symbol_s = _symbols[offset + 7];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR_IN, new JSNode[] { i, o, s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR_IN, new JSNode[] { i, o, s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [92] IterationStatement_NoIf = FOR.f LPAREN VAR.v VariableDeclaration_NoIn.i IN Expression.o RPAREN Statement_NoIf.s
@@ -905,14 +993,18 @@ public class JSParser extends Parser implements IParser {
 					final JSNode o = (JSNode) _symbol_o.value;
 					final Symbol _symbol_s = _symbols[offset + 8];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.FOR_IN, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, new JSNode[] {i }, v.getStart(), i.getEnd()), o, s }, f.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.FOR_IN, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, new JSNode[] {i }, v.getStart(), i.getEnd()), o, s }, f.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [93] ContinueStatement = CONTINUE.c SEMICOLON.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol c = _symbols[offset + 1];
 					final Symbol s = _symbols[offset + 2];
-					JSNode node = new JSLabelStatementNode(JSNodeTypes.CONTINUE, c.getStart(), s.getEnd());node.setSemicolonIncluded(true);return node;
+					
+			JSNode node = new JSLabelStatementNode(JSNodeTypes.CONTINUE, c.getStart(), s.getEnd());
+			node.setSemicolonIncluded(true);
+			return node;
 				}
 			},
 			new Action() {	// [94] ContinueStatement = CONTINUE.c IDENTIFIER.i SEMICOLON.s
@@ -921,14 +1013,20 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_i = _symbols[offset + 2];
 					final String i = (String) _symbol_i.value;
 					final Symbol s = _symbols[offset + 3];
-					JSNode node = new JSLabelStatementNode(JSNodeTypes.CONTINUE, i, c.getStart(), s.getEnd());node.setSemicolonIncluded(true);return node;
+					
+			JSNode node = new JSLabelStatementNode(JSNodeTypes.CONTINUE, i, c.getStart(), s.getEnd());
+			node.setSemicolonIncluded(true);
+			return node;
 				}
 			},
 			new Action() {	// [95] BreakStatement = BREAK.b SEMICOLON.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol b = _symbols[offset + 1];
 					final Symbol s = _symbols[offset + 2];
-					JSNode node = new JSLabelStatementNode(JSNodeTypes.BREAK, b.getStart(), s.getEnd());node.setSemicolonIncluded(true);return node;
+					
+			JSNode node = new JSLabelStatementNode(JSNodeTypes.BREAK, b.getStart(), s.getEnd());
+			node.setSemicolonIncluded(true);
+			return node;
 				}
 			},
 			new Action() {	// [96] BreakStatement = BREAK.b IDENTIFIER.i SEMICOLON.s
@@ -937,14 +1035,20 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_i = _symbols[offset + 2];
 					final String i = (String) _symbol_i.value;
 					final Symbol s = _symbols[offset + 3];
-					JSNode node = new JSLabelStatementNode(JSNodeTypes.BREAK, i, b.getStart(), s.getEnd());node.setSemicolonIncluded(true);return node;
+					
+			JSNode node = new JSLabelStatementNode(JSNodeTypes.BREAK, i, b.getStart(), s.getEnd());
+			node.setSemicolonIncluded(true);
+			return node;
 				}
 			},
 			new Action() {	// [97] ReturnStatement = RETURN.r SEMICOLON.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol r = _symbols[offset + 1];
 					final Symbol s = _symbols[offset + 2];
-					JSNode node = new JSUnaryOperatorNode(JSNodeTypes.RETURN, new JSNode(), r.getStart(), s.getEnd());node.setSemicolonIncluded(true);return node;
+					
+			JSNode node = new JSUnaryOperatorNode(JSNodeTypes.RETURN, new JSNode(), r.getStart(), s.getEnd());
+			node.setSemicolonIncluded(true);
+			return node;
 				}
 			},
 			new Action() {	// [98] ReturnStatement = RETURN.r Expression.e SEMICOLON.s
@@ -953,7 +1057,10 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final JSNode e = (JSNode) _symbol_e.value;
 					final Symbol s = _symbols[offset + 3];
-					JSNode node = new JSUnaryOperatorNode(JSNodeTypes.RETURN, e, r.getStart(), s.getEnd());node.setSemicolonIncluded(true);return node;
+					
+			JSNode node = new JSUnaryOperatorNode(JSNodeTypes.RETURN, e, r.getStart(), s.getEnd());
+			node.setSemicolonIncluded(true);
+			return node;
 				}
 			},
 			new Action() {	// [99] WithStatement = WITH.w LPAREN Expression.e RPAREN Statement.s
@@ -963,7 +1070,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode e = (JSNode) _symbol_e.value;
 					final Symbol _symbol_s = _symbols[offset + 5];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.WITH, new JSNode[] { e, s }, w.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.WITH, new JSNode[] { e, s }, w.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [100] WithStatement_NoIf = WITH.w LPAREN Expression.e RPAREN Statement_NoIf.s
@@ -973,7 +1081,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode e = (JSNode) _symbol_e.value;
 					final Symbol _symbol_s = _symbols[offset + 5];
 					final JSNode s = (JSNode) _symbol_s.value;
-					return new JSNode(JSNodeTypes.WITH, new JSNode[] { e, s }, w.getStart(), s.getEnd());
+					
+			return new JSNode(JSNodeTypes.WITH, new JSNode[] { e, s }, w.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [101] SwitchStatement = SWITCH.s LPAREN Expression.e RPAREN LCURLY RCURLY.r
@@ -982,7 +1091,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_e = _symbols[offset + 3];
 					final JSNode e = (JSNode) _symbol_e.value;
 					final Symbol r = _symbols[offset + 6];
-					return new JSNaryAndExpressionNode(JSNodeTypes.SWITCH, e, s.getStart(), r.getEnd());
+					
+			return new JSNaryAndExpressionNode(JSNodeTypes.SWITCH, e, s.getStart(), r.getEnd());
 				}
 			},
 			new Action() {	// [102] SwitchStatement = SWITCH.s LPAREN Expression.e RPAREN LCURLY CaseClauses.c RCURLY.r
@@ -994,7 +1104,8 @@ public class JSParser extends Parser implements IParser {
 					final ArrayList _list_c = (ArrayList) _symbol_c.value;
 					final JSNode[] c = _list_c == null ? new JSNode[0] : (JSNode[]) _list_c.toArray(new JSNode[_list_c.size()]);
 					final Symbol r = _symbols[offset + 7];
-					return new JSNaryAndExpressionNode(JSNodeTypes.SWITCH, e, c, s.getStart(), r.getEnd());
+					
+			return new JSNaryAndExpressionNode(JSNodeTypes.SWITCH, e, c, s.getStart(), r.getEnd());
 				}
 			},
 			new Action() {	// [103] SwitchStatement = SWITCH.s LPAREN Expression.e RPAREN LCURLY DefaultClause.d RCURLY.r
@@ -1005,7 +1116,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_d = _symbols[offset + 6];
 					final JSNode d = (JSNode) _symbol_d.value;
 					final Symbol r = _symbols[offset + 7];
-					return new JSNaryAndExpressionNode(JSNodeTypes.SWITCH, e, new JSNode[] { d }, s.getStart(), r.getEnd());
+					
+			return new JSNaryAndExpressionNode(JSNodeTypes.SWITCH, e, new JSNode[] { d }, s.getStart(), r.getEnd());
 				}
 			},
 			new Action() {	// [104] SwitchStatement = SWITCH.s LPAREN Expression.e RPAREN LCURLY DefaultClause.d CaseClauses.c RCURLY.r
@@ -1090,7 +1202,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final JSNode e = (JSNode) _symbol_e.value;
 					final Symbol r = _symbols[offset + 3];
-					return new JSNaryAndExpressionNode(JSNodeTypes.CASE, e, c.getStart(), r.getEnd());
+					
+			return new JSNaryAndExpressionNode(JSNodeTypes.CASE, e, c.getStart(), r.getEnd());
 				}
 			},
 			new Action() {	// [110] CaseClause = CASE.c Expression.e COLON StatementList.s
@@ -1101,14 +1214,16 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_s = _symbols[offset + 4];
 					final ArrayList _list_s = (ArrayList) _symbol_s.value;
 					final JSNode[] s = _list_s == null ? new JSNode[0] : (JSNode[]) _list_s.toArray(new JSNode[_list_s.size()]);
-					return new JSNaryAndExpressionNode(JSNodeTypes.CASE, e, s, c.getStart(), s[s.length - 1].getEnd());
+					
+			return new JSNaryAndExpressionNode(JSNodeTypes.CASE, e, s, c.getStart(), s[s.length - 1].getEnd());
 				}
 			},
 			new Action() {	// [111] DefaultClause = DEFAULT.d COLON.c
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol d = _symbols[offset + 1];
 					final Symbol c = _symbols[offset + 2];
-					return new JSNaryNode(JSNodeTypes.DEFAULT, d.getStart(), c.getEnd());
+					
+			return new JSNaryNode(JSNodeTypes.DEFAULT, d.getStart(), c.getEnd());
 				}
 			},
 			new Action() {	// [112] DefaultClause = DEFAULT.d COLON StatementList.s
@@ -1117,7 +1232,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_s = _symbols[offset + 3];
 					final ArrayList _list_s = (ArrayList) _symbol_s.value;
 					final JSNode[] s = _list_s == null ? new JSNode[0] : (JSNode[]) _list_s.toArray(new JSNode[_list_s.size()]);
-					return new JSNaryNode(JSNodeTypes.DEFAULT, s, d.getStart(), s[s.length - 1].getEnd());
+					
+			return new JSNaryNode(JSNodeTypes.DEFAULT, s, d.getStart(), s[s.length - 1].getEnd());
 				}
 			},
 			new Action() {	// [113] LabelledStatement = IDENTIFIER.i COLON Statement.s
@@ -1126,7 +1242,9 @@ public class JSParser extends Parser implements IParser {
 					final String i = (String) _symbol_i.value;
 					final Symbol _symbol_s = _symbols[offset + 3];
 					final JSNode s = (JSNode) _symbol_s.value;
-					JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.LABELLED, new JSNode[] { id, s }, _symbol_i.getStart(), s.getEnd());
+					
+			JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());
+			return new JSNode(JSNodeTypes.LABELLED, new JSNode[] { id, s }, _symbol_i.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [114] LabelledStatement_NoIf = IDENTIFIER.i COLON Statement_NoIf.s
@@ -1135,7 +1253,9 @@ public class JSParser extends Parser implements IParser {
 					final String i = (String) _symbol_i.value;
 					final Symbol _symbol_s = _symbols[offset + 3];
 					final JSNode s = (JSNode) _symbol_s.value;
-					JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.LABELLED, new JSNode[] { id, s }, _symbol_i.getStart(), s.getEnd());
+					
+			JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());
+			return new JSNode(JSNodeTypes.LABELLED, new JSNode[] { id, s }, _symbol_i.getStart(), s.getEnd());
 				}
 			},
 			new Action() {	// [115] ThrowStatement = THROW.t Expression.e SEMICOLON.s
@@ -1144,7 +1264,10 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final JSNode e = (JSNode) _symbol_e.value;
 					final Symbol s = _symbols[offset + 3];
-					JSNode node = new JSUnaryOperatorNode(JSNodeTypes.THROW, e, t.getStart(), s.getEnd());node.setSemicolonIncluded(true);return node;
+					
+			JSNode node = new JSUnaryOperatorNode(JSNodeTypes.THROW, e, t.getStart(), s.getEnd());
+			node.setSemicolonIncluded(true);
+			return node;
 				}
 			},
 			new Action() {	// [116] TryStatement = TRY.t Block.b Catch.c
@@ -1154,7 +1277,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode b = (JSNode) _symbol_b.value;
 					final Symbol _symbol_c = _symbols[offset + 3];
 					final JSNode c = (JSNode) _symbol_c.value;
-					return new JSNode(JSNodeTypes.TRY, new JSNode[] { b, c, new JSNode() }, t.getStart(), c.getEnd());
+					
+			return new JSNode(JSNodeTypes.TRY, new JSNode[] { b, c, new JSNode() }, t.getStart(), c.getEnd());
 				}
 			},
 			new Action() {	// [117] TryStatement = TRY.t Block.b Finally.f
@@ -1164,7 +1288,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode b = (JSNode) _symbol_b.value;
 					final Symbol _symbol_f = _symbols[offset + 3];
 					final JSNode f = (JSNode) _symbol_f.value;
-					return new JSNode(JSNodeTypes.TRY, new JSNode[] { b, new JSNode(), f }, t.getStart(), f.getEnd());
+					
+			return new JSNode(JSNodeTypes.TRY, new JSNode[] { b, new JSNode(), f }, t.getStart(), f.getEnd());
 				}
 			},
 			new Action() {	// [118] TryStatement = TRY.t Block.b Catch.c Finally.f
@@ -1176,7 +1301,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode c = (JSNode) _symbol_c.value;
 					final Symbol _symbol_f = _symbols[offset + 4];
 					final JSNode f = (JSNode) _symbol_f.value;
-					return new JSNode(JSNodeTypes.TRY, new JSNode[] { b, c, f }, t.getStart(), f.getEnd());
+					
+			return new JSNode(JSNodeTypes.TRY, new JSNode[] { b, c, f }, t.getStart(), f.getEnd());
 				}
 			},
 			new Action() {	// [119] Catch = CATCH.c LPAREN IDENTIFIER.i RPAREN Block.b
@@ -1186,7 +1312,9 @@ public class JSParser extends Parser implements IParser {
 					final String i = (String) _symbol_i.value;
 					final Symbol _symbol_b = _symbols[offset + 5];
 					final JSNode b = (JSNode) _symbol_b.value;
-					JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.CATCH, new JSNode[] { id, b }, c.getStart(), b.getEnd());
+					
+			JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());
+			return new JSNode(JSNodeTypes.CATCH, new JSNode[] { id, b }, c.getStart(), b.getEnd());
 				}
 			},
 			new Action() {	// [120] Finally = FINALLY.f Block.b
@@ -1194,7 +1322,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol _symbol_b = _symbols[offset + 2];
 					final JSNode b = (JSNode) _symbol_b.value;
-					return new JSNode(JSNodeTypes.FINALLY, new JSNode[] { b }, f.getStart(), b.getEnd());
+					
+			return new JSNode(JSNodeTypes.FINALLY, new JSNode[] { b }, f.getStart(), b.getEnd());
 				}
 			},
 			Action.RETURN,	// [121] PrimaryExpression = PrimaryExpression_NoLBF
@@ -1202,14 +1331,16 @@ public class JSParser extends Parser implements IParser {
 			new Action() {	// [123] PrimaryExpression_NoLBF = THIS.t
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol t = _symbols[offset + 1];
-					return new JSPrimitiveNode(JSNodeTypes.THIS, t.value.toString(), t.getStart(), t.getEnd());
+					
+			return new JSPrimitiveNode(JSNodeTypes.THIS, t.value.toString(), t.getStart(), t.getEnd());
 				}
 			},
 			new Action() {	// [124] PrimaryExpression_NoLBF = IDENTIFIER.t
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_t = _symbols[offset + 1];
 					final String t = (String) _symbol_t.value;
-					return new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, t, _symbol_t.getStart(), _symbol_t.getEnd());
+					
+			return new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, t, _symbol_t.getStart(), _symbol_t.getEnd());
 				}
 			},
 			Action.RETURN,	// [125] PrimaryExpression_NoLBF = Literal
@@ -1220,14 +1351,16 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final JSNode e = (JSNode) _symbol_e.value;
 					final Symbol r = _symbols[offset + 3];
-					return new JSUnaryOperatorNode(JSNodeTypes.GROUP, e, l.getStart(), r.getEnd());
+					
+			return new JSUnaryOperatorNode(JSNodeTypes.GROUP, e, l.getStart(), r.getEnd());
 				}
 			},
 			new Action() {	// [128] ArrayLiteral = LBRACKET.l RBRACKET.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol r = _symbols[offset + 2];
-					return new JSNaryNode(JSNodeTypes.ARRAY_LITERAL, l.getStart(), r.getEnd());
+					
+			return new JSNaryNode(JSNodeTypes.ARRAY_LITERAL, l.getStart(), r.getEnd());
 				}
 			},
 			new Action() {	// [129] ArrayLiteral = LBRACKET.l Elision.e RBRACKET.r
@@ -1236,7 +1369,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final JSNode e = (JSNode) _symbol_e.value;
 					final Symbol r = _symbols[offset + 3];
-					return new JSNaryNode(JSNodeTypes.ARRAY_LITERAL, new JSNode[] { e }, l.getStart(), r.getEnd());
+					
+			return new JSNaryNode(JSNodeTypes.ARRAY_LITERAL, new JSNode[] { e }, l.getStart(), r.getEnd());
 				}
 			},
 			new Action() {	// [130] ArrayLiteral = LBRACKET.l ElementList.e RBRACKET.r
@@ -1245,7 +1379,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final JSNode e = (JSNode) _symbol_e.value;
 					final Symbol r = _symbols[offset + 3];
-					return new JSNaryNode(JSNodeTypes.ARRAY_LITERAL, new JSNode[] { e }, l.getStart(), r.getEnd());
+					
+			return new JSNaryNode(JSNodeTypes.ARRAY_LITERAL, new JSNode[] { e }, l.getStart(), r.getEnd());
 				}
 			},
 			new Action() {	// [131] ArrayLiteral = LBRACKET.l ElementList.e COMMA RBRACKET.r
@@ -1254,7 +1389,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final JSNode e = (JSNode) _symbol_e.value;
 					final Symbol r = _symbols[offset + 4];
-					return new JSNaryNode(JSNodeTypes.ARRAY_LITERAL, new JSNode[] { e, new JSPrimitiveNode(JSNodeTypes.NULL, "null", 0, 0) }, l.getStart(), r.getEnd());
+					
+			return new JSNaryNode(JSNodeTypes.ARRAY_LITERAL, new JSNode[] { e, new JSPrimitiveNode(JSNodeTypes.NULL, "null", 0, 0) }, l.getStart(), r.getEnd());
 				}
 			},
 			new Action() {	// [132] ArrayLiteral = LBRACKET.l ElementList.e COMMA Elision.n RBRACKET.r
@@ -1265,14 +1401,16 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_n = _symbols[offset + 4];
 					final JSNode n = (JSNode) _symbol_n.value;
 					final Symbol r = _symbols[offset + 5];
-					return new JSNaryNode(JSNodeTypes.ARRAY_LITERAL, new JSNode[] { e, n }, l.getStart(), r.getEnd());
+					
+			return new JSNaryNode(JSNodeTypes.ARRAY_LITERAL, new JSNode[] { e, n }, l.getStart(), r.getEnd());
 				}
 			},
 			new Action() {	// [133] ElementList = AssignmentExpression.e
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_e = _symbols[offset + 1];
 					final JSNode e = (JSNode) _symbol_e.value;
-					return new JSNaryNode(JSNodeTypes.ELEMENTS, new JSNode[] { e }, e.getStart(), e.getEnd());
+					
+			return new JSNaryNode(JSNodeTypes.ELEMENTS, new JSNode[] { e }, e.getStart(), e.getEnd());
 				}
 			},
 			new Action() {	// [134] ElementList = Elision.n AssignmentExpression.e
@@ -1281,7 +1419,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode n = (JSNode) _symbol_n.value;
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final JSNode e = (JSNode) _symbol_e.value;
-					return new JSNaryNode(JSNodeTypes.ELEMENTS, new JSNode[] { n, e }, n.getStart(), e.getEnd());
+					
+			return new JSNaryNode(JSNodeTypes.ELEMENTS, new JSNode[] { n, e }, n.getStart(), e.getEnd());
 				}
 			},
 			new Action() {	// [135] ElementList = ElementList.l COMMA AssignmentExpression.e
@@ -1290,7 +1429,10 @@ public class JSParser extends Parser implements IParser {
 					final JSNode l = (JSNode) _symbol_l.value;
 					final Symbol _symbol_e = _symbols[offset + 3];
 					final JSNode e = (JSNode) _symbol_e.value;
-					l.addChild(e);l.setLocation(l.getStart(), e.getEnd());return l;
+					
+			l.addChild(e);
+			l.setLocation(l.getStart(), e.getEnd());
+			return l;
 				}
 			},
 			new Action() {	// [136] ElementList = ElementList.l COMMA Elision.n AssignmentExpression.e
@@ -1301,26 +1443,34 @@ public class JSParser extends Parser implements IParser {
 					final JSNode n = (JSNode) _symbol_n.value;
 					final Symbol _symbol_e = _symbols[offset + 4];
 					final JSNode e = (JSNode) _symbol_e.value;
-					l.addChild(n);l.addChild(e);l.setLocation(l.getStart(), e.getEnd());return l;
+					
+			l.addChild(n);
+			l.addChild(e);
+			l.setLocation(l.getStart(), e.getEnd());
+			return l;
 				}
 			},
 			new Action() {	// [137] Elision = Elision.e COMMA
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_e = _symbols[offset + 1];
 					final JSNode e = (JSNode) _symbol_e.value;
-					e.addChild(new JSPrimitiveNode(JSNodeTypes.NULL, "null", 0, 0));return e;
+					
+			e.addChild(new JSPrimitiveNode(JSNodeTypes.NULL, "null", 0, 0));
+			return e;
 				}
 			},
 			new Action() {	// [138] Elision = COMMA
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					return new JSNaryNode(JSNodeTypes.ELISION, new JSNode[] { new JSPrimitiveNode(JSNodeTypes.NULL, "null", 0, 0), new JSPrimitiveNode(JSNodeTypes.NULL, "null", 0, 0) }, 0, 0);
+					
+			return new JSNaryNode(JSNodeTypes.ELISION, new JSNode[] { new JSPrimitiveNode(JSNodeTypes.NULL, "null", 0, 0), new JSPrimitiveNode(JSNodeTypes.NULL, "null", 0, 0) }, 0, 0);
 				}
 			},
 			new Action() {	// [139] ObjectLiteral = LCURLY.l RCURLY.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol r = _symbols[offset + 2];
-					return new JSNaryNode(JSNodeTypes.OBJECT_LITERAL, l.getStart(), r.getEnd());
+					
+			return new JSNaryNode(JSNodeTypes.OBJECT_LITERAL, l.getStart(), r.getEnd());
 				}
 			},
 			new Action() {	// [140] ObjectLiteral = LCURLY.l PropertyNameAndValueList.p RCURLY.r
@@ -1330,7 +1480,8 @@ public class JSParser extends Parser implements IParser {
 					final ArrayList _list_p = (ArrayList) _symbol_p.value;
 					final JSNode[] p = _list_p == null ? new JSNode[0] : (JSNode[]) _list_p.toArray(new JSNode[_list_p.size()]);
 					final Symbol r = _symbols[offset + 3];
-					return new JSNaryNode(JSNodeTypes.OBJECT_LITERAL, p, l.getStart(), r.getEnd());
+					
+			return new JSNaryNode(JSNodeTypes.OBJECT_LITERAL, p, l.getStart(), r.getEnd());
 				}
 			},
 			new Action() {	// [141] PropertyNameAndValueList = PropertyNameAndValue
@@ -1349,28 +1500,32 @@ public class JSParser extends Parser implements IParser {
 					final JSNode n = (JSNode) _symbol_n.value;
 					final Symbol _symbol_v = _symbols[offset + 3];
 					final JSNode v = (JSNode) _symbol_v.value;
-					return new JSNode(JSNodeTypes.NAME_VALUE_PAIR, new JSNode[] { n, v }, n.getStart(), v.getEnd());
+					
+			return new JSNode(JSNodeTypes.NAME_VALUE_PAIR, new JSNode[] { n, v }, n.getStart(), v.getEnd());
 				}
 			},
 			new Action() {	// [144] PropertyName = IDENTIFIER.i
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_i = _symbols[offset + 1];
 					final String i = (String) _symbol_i.value;
-					return new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());
+					
+			return new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());
 				}
 			},
 			new Action() {	// [145] PropertyName = STRING.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_s = _symbols[offset + 1];
 					final String s = (String) _symbol_s.value;
-					return new JSPrimitiveNode(JSNodeTypes.STRING, s, _symbol_s.getStart(), _symbol_s.getEnd());
+					
+			return new JSPrimitiveNode(JSNodeTypes.STRING, s, _symbol_s.getStart(), _symbol_s.getEnd());
 				}
 			},
 			new Action() {	// [146] PropertyName = NUMBER.n
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_n = _symbols[offset + 1];
 					final String n = (String) _symbol_n.value;
-					return new JSPrimitiveNode(JSNodeTypes.NUMBER, n, _symbol_n.getStart(), _symbol_n.getEnd());
+					
+			return new JSPrimitiveNode(JSNodeTypes.NUMBER, n, _symbol_n.getStart(), _symbol_n.getEnd());
 				}
 			},
 			Action.RETURN,	// [147] MemberExpression = PrimaryExpression
@@ -1381,7 +1536,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode l = (JSNode) _symbol_l.value;
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSGetElementOperatorNode(l, r);
+					
+			return new JSGetElementOperatorNode(l, r);
 				}
 			},
 			new Action() {	// [150] MemberExpression = MemberExpression.l DOT IDENTIFIER.r
@@ -1390,7 +1546,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode l = (JSNode) _symbol_l.value;
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final String r = (String) _symbol_r.value;
-					return new JSGetPropertyOperatorNode(l, new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, r, _symbol_r.getStart(), _symbol_r.getEnd()));
+					
+			return new JSGetPropertyOperatorNode(l, new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, r, _symbol_r.getStart(), _symbol_r.getEnd()));
 				}
 			},
 			new Action() {	// [151] MemberExpression = NEW.l MemberExpression.e Arguments.a
@@ -1400,7 +1557,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode e = (JSNode) _symbol_e.value;
 					final Symbol _symbol_a = _symbols[offset + 3];
 					final JSNode a = (JSNode) _symbol_a.value;
-					return new JSNode(JSNodeTypes.CONSTRUCT, new JSNode[] { e, a }, l.getStart(), a.getEnd());
+					
+			return new JSNode(JSNodeTypes.CONSTRUCT, new JSNode[] { e, a }, l.getStart(), a.getEnd());
 				}
 			},
 			Action.RETURN,	// [152] MemberExpression_NoLBF = PrimaryExpression_NoLBF
@@ -1410,7 +1568,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode l = (JSNode) _symbol_l.value;
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSGetElementOperatorNode(l, r);
+					
+			return new JSGetElementOperatorNode(l, r);
 				}
 			},
 			new Action() {	// [154] MemberExpression_NoLBF = MemberExpression_NoLBF.l DOT IDENTIFIER.r
@@ -1419,7 +1578,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode l = (JSNode) _symbol_l.value;
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final String r = (String) _symbol_r.value;
-					return new JSGetPropertyOperatorNode(l, new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, r, _symbol_r.getStart(), _symbol_r.getEnd()));
+					
+			return new JSGetPropertyOperatorNode(l, new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, r, _symbol_r.getStart(), _symbol_r.getEnd()));
 				}
 			},
 			new Action() {	// [155] MemberExpression_NoLBF = NEW.l MemberExpression.e Arguments.a
@@ -1429,7 +1589,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode e = (JSNode) _symbol_e.value;
 					final Symbol _symbol_a = _symbols[offset + 3];
 					final JSNode a = (JSNode) _symbol_a.value;
-					return new JSNode(JSNodeTypes.CONSTRUCT, new JSNode[] { e, a }, l.getStart(), a.getEnd());
+					
+			return new JSNode(JSNodeTypes.CONSTRUCT, new JSNode[] { e, a }, l.getStart(), a.getEnd());
 				}
 			},
 			Action.RETURN,	// [156] NewExpression = MemberExpression
@@ -1438,7 +1599,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final JSNode e = (JSNode) _symbol_e.value;
-					return new JSNode(JSNodeTypes.CONSTRUCT, new JSNode[] { e, new JSNode() }, l.getStart(), e.getEnd());
+					
+			return new JSNode(JSNodeTypes.CONSTRUCT, new JSNode[] { e, new JSNode() }, l.getStart(), e.getEnd());
 				}
 			},
 			Action.RETURN,	// [158] NewExpression_NoLBF = MemberExpression_NoLBF
@@ -1447,7 +1609,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final JSNode e = (JSNode) _symbol_e.value;
-					return new JSNode(JSNodeTypes.CONSTRUCT, new JSNode[] { e, new JSNode() }, l.getStart(), e.getEnd());
+					
+			return new JSNode(JSNodeTypes.CONSTRUCT, new JSNode[] { e, new JSNode() }, l.getStart(), e.getEnd());
 				}
 			},
 			new Action() {	// [160] CallExpression = MemberExpression.l Arguments.r
@@ -1456,7 +1619,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode l = (JSNode) _symbol_l.value;
 					final Symbol _symbol_r = _symbols[offset + 2];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSNode(JSNodeTypes.INVOKE, new JSNode[] {l, r}, l.getStart(), r.getEnd());
+					
+			return new JSNode(JSNodeTypes.INVOKE, new JSNode[] {l, r}, l.getStart(), r.getEnd());
 				}
 			},
 			new Action() {	// [161] CallExpression = CallExpression.l Arguments.r
@@ -1465,7 +1629,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode l = (JSNode) _symbol_l.value;
 					final Symbol _symbol_r = _symbols[offset + 2];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSNode(JSNodeTypes.INVOKE, new JSNode[] {l, r}, l.getStart(), r.getEnd());
+					
+			return new JSNode(JSNodeTypes.INVOKE, new JSNode[] {l, r}, l.getStart(), r.getEnd());
 				}
 			},
 			new Action() {	// [162] CallExpression = CallExpression.l LBRACKET Expression.r RBRACKET
@@ -1474,7 +1639,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode l = (JSNode) _symbol_l.value;
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSGetElementOperatorNode(l, r);
+					
+			return new JSGetElementOperatorNode(l, r);
 				}
 			},
 			new Action() {	// [163] CallExpression = CallExpression.l DOT IDENTIFIER.r
@@ -1483,7 +1649,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode l = (JSNode) _symbol_l.value;
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final String r = (String) _symbol_r.value;
-					return new JSGetPropertyOperatorNode(l, new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, r, _symbol_r.getStart(), _symbol_r.getEnd()));
+					
+			return new JSGetPropertyOperatorNode(l, new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, r, _symbol_r.getStart(), _symbol_r.getEnd()));
 				}
 			},
 			new Action() {	// [164] CallExpression_NoLBF = MemberExpression_NoLBF.l Arguments.r
@@ -1492,7 +1659,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode l = (JSNode) _symbol_l.value;
 					final Symbol _symbol_r = _symbols[offset + 2];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSNode(JSNodeTypes.INVOKE, new JSNode[] {l, r}, l.getStart(), r.getEnd());
+					
+			return new JSNode(JSNodeTypes.INVOKE, new JSNode[] {l, r}, l.getStart(), r.getEnd());
 				}
 			},
 			new Action() {	// [165] CallExpression_NoLBF = CallExpression_NoLBF.l Arguments.r
@@ -1501,7 +1669,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode l = (JSNode) _symbol_l.value;
 					final Symbol _symbol_r = _symbols[offset + 2];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSNode(JSNodeTypes.INVOKE, new JSNode[] {l, r}, l.getStart(), r.getEnd());
+					
+			return new JSNode(JSNodeTypes.INVOKE, new JSNode[] {l, r}, l.getStart(), r.getEnd());
 				}
 			},
 			new Action() {	// [166] CallExpression_NoLBF = CallExpression_NoLBF.l LBRACKET Expression.r RBRACKET
@@ -1510,7 +1679,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode l = (JSNode) _symbol_l.value;
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSGetElementOperatorNode(l, r);
+					
+			return new JSGetElementOperatorNode(l, r);
 				}
 			},
 			new Action() {	// [167] CallExpression_NoLBF = CallExpression_NoLBF.l DOT IDENTIFIER.r
@@ -1519,14 +1689,16 @@ public class JSParser extends Parser implements IParser {
 					final JSNode l = (JSNode) _symbol_l.value;
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final String r = (String) _symbol_r.value;
-					return new JSGetPropertyOperatorNode(l, new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, r, _symbol_r.getStart(), _symbol_r.getEnd()));
+					
+			return new JSGetPropertyOperatorNode(l, new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, r, _symbol_r.getStart(), _symbol_r.getEnd()));
 				}
 			},
 			new Action() {	// [168] Arguments = LPAREN.l RPAREN.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol r = _symbols[offset + 2];
-					return new JSNaryNode(JSNodeTypes.ARGUMENTS, l.getStart(), r.getEnd());
+					
+			return new JSNaryNode(JSNodeTypes.ARGUMENTS, l.getStart(), r.getEnd());
 				}
 			},
 			new Action() {	// [169] Arguments = LPAREN.l ArgumentList.a RPAREN.r
@@ -1536,7 +1708,8 @@ public class JSParser extends Parser implements IParser {
 					final ArrayList _list_a = (ArrayList) _symbol_a.value;
 					final JSNode[] a = _list_a == null ? new JSNode[0] : (JSNode[]) _list_a.toArray(new JSNode[_list_a.size()]);
 					final Symbol r = _symbols[offset + 3];
-					return new JSNaryNode(JSNodeTypes.ARGUMENTS, a, l.getStart(), r.getEnd());
+					
+			return new JSNaryNode(JSNodeTypes.ARGUMENTS, a, l.getStart(), r.getEnd());
 				}
 			},
 			new Action() {	// [170] ArgumentList = ArgumentList COMMA AssignmentExpression
@@ -1560,7 +1733,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode e = (JSNode) _symbol_e.value;
 					final Symbol _symbol_o = _symbols[offset + 2];
 					final String o = (String) _symbol_o.value;
-					return new JSPostUnaryOperatorNode(e, o, e.getStart(), _symbol_o.getEnd());
+					
+			return new JSPostUnaryOperatorNode(e, o, e.getStart(), _symbol_o.getEnd());
 				}
 			},
 			Action.RETURN,	// [178] PostfixExpression_NoLBF = LeftHandSideExpression_NoLBF
@@ -1570,7 +1744,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode e = (JSNode) _symbol_e.value;
 					final Symbol _symbol_o = _symbols[offset + 2];
 					final String o = (String) _symbol_o.value;
-					return new JSPostUnaryOperatorNode(e, o, e.getStart(),  _symbol_o.getEnd());
+					
+			return new JSPostUnaryOperatorNode(e, o, e.getStart(), _symbol_o.getEnd());
 				}
 			},
 			Action.RETURN,	// [180] PostfixOperator = PLUS_PLUS
@@ -1582,7 +1757,8 @@ public class JSParser extends Parser implements IParser {
 					final String o = (String) _symbol_o.value;
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final JSNode e = (JSNode) _symbol_e.value;
-					return new JSUnaryOperatorNode(o, e, _symbol_o.getStart(), e.getEnd());
+					
+			return new JSUnaryOperatorNode(o, e, _symbol_o.getStart(), e.getEnd());
 				}
 			},
 			Action.RETURN,	// [184] UnaryExpression_NoLBF = PostfixExpression_NoLBF
@@ -1592,7 +1768,8 @@ public class JSParser extends Parser implements IParser {
 					final String o = (String) _symbol_o.value;
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final JSNode e = (JSNode) _symbol_e.value;
-					return new JSUnaryOperatorNode(o, e, _symbol_o.getStart(), e.getEnd());
+					
+			return new JSUnaryOperatorNode(o, e, _symbol_o.getStart(), e.getEnd());
 				}
 			},
 			Action.RETURN,	// [186] UnaryOperator = DELETE
@@ -1613,7 +1790,8 @@ public class JSParser extends Parser implements IParser {
 					final String o = (String) _symbol_o.value;
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o, r);
+					
+			return new JSBinaryOperatorNode(l, o, r);
 				}
 			},
 			Action.RETURN,	// [197] MultiplicativeExpression_NoLBF = UnaryExpression_NoLBF
@@ -1625,7 +1803,8 @@ public class JSParser extends Parser implements IParser {
 					final String o = (String) _symbol_o.value;
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o, r);
+					
+			return new JSBinaryOperatorNode(l, o, r);
 				}
 			},
 			Action.RETURN,	// [199] MultiplicativeOperator = STAR
@@ -1640,7 +1819,8 @@ public class JSParser extends Parser implements IParser {
 					final String o = (String) _symbol_o.value;
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o, r);
+					
+			return new JSBinaryOperatorNode(l, o, r);
 				}
 			},
 			Action.RETURN,	// [204] AdditiveExpression_NoLBF = MultiplicativeExpression_NoLBF
@@ -1652,7 +1832,8 @@ public class JSParser extends Parser implements IParser {
 					final String o = (String) _symbol_o.value;
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o, r);
+					
+			return new JSBinaryOperatorNode(l, o, r);
 				}
 			},
 			Action.RETURN,	// [206] AdditiveOperator = PLUS
@@ -1666,7 +1847,8 @@ public class JSParser extends Parser implements IParser {
 					final String o = (String) _symbol_o.value;
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o, r);
+					
+			return new JSBinaryOperatorNode(l, o, r);
 				}
 			},
 			Action.RETURN,	// [210] ShiftExpression_NoLBF = AdditiveExpression_NoLBF
@@ -1678,7 +1860,8 @@ public class JSParser extends Parser implements IParser {
 					final String o = (String) _symbol_o.value;
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o, r);
+					
+			return new JSBinaryOperatorNode(l, o, r);
 				}
 			},
 			Action.RETURN,	// [212] ShiftOperator = LESS_LESS
@@ -1693,7 +1876,8 @@ public class JSParser extends Parser implements IParser {
 					final String o = (String) _symbol_o.value;
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o, r);
+					
+			return new JSBinaryOperatorNode(l, o, r);
 				}
 			},
 			Action.RETURN,	// [217] RelationalExpression_NoLBF = ShiftExpression_NoLBF
@@ -1705,7 +1889,8 @@ public class JSParser extends Parser implements IParser {
 					final String o = (String) _symbol_o.value;
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o, r);
+					
+			return new JSBinaryOperatorNode(l, o, r);
 				}
 			},
 			Action.RETURN,	// [219] RelationalExpression_NoIn = ShiftExpression
@@ -1717,7 +1902,8 @@ public class JSParser extends Parser implements IParser {
 					final String o = (String) _symbol_o.value;
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o, r);
+					
+			return new JSBinaryOperatorNode(l, o, r);
 				}
 			},
 			Action.RETURN,	// [221] RelationalOperator_NoIn = LESS
@@ -1736,7 +1922,8 @@ public class JSParser extends Parser implements IParser {
 					final String o = (String) _symbol_o.value;
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o, r);
+					
+			return new JSBinaryOperatorNode(l, o, r);
 				}
 			},
 			Action.RETURN,	// [230] EqualityExpression_NoLBF = RelationalExpression_NoLBF
@@ -1748,7 +1935,8 @@ public class JSParser extends Parser implements IParser {
 					final String o = (String) _symbol_o.value;
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o, r);
+					
+			return new JSBinaryOperatorNode(l, o, r);
 				}
 			},
 			Action.RETURN,	// [232] EqualityExpression_NoIn = RelationalExpression_NoIn
@@ -1760,7 +1948,8 @@ public class JSParser extends Parser implements IParser {
 					final String o = (String) _symbol_o.value;
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o, r);
+					
+			return new JSBinaryOperatorNode(l, o, r);
 				}
 			},
 			Action.RETURN,	// [234] EqualityOperator = EQUAL_EQUAL
@@ -1774,7 +1963,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o.value.toString(), r);
+					
+			return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
 			Action.RETURN,	// [239] BitwiseAndExpression = EqualityExpression
@@ -1785,7 +1975,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o.value.toString(), r);
+					
+			return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
 			Action.RETURN,	// [241] BitwiseAndExpression_NoLBF = EqualityExpression_NoLBF
@@ -1796,7 +1987,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o.value.toString(), r);
+					
+			return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
 			Action.RETURN,	// [243] BitwiseAndExpression_NoIn = EqualityExpression_NoIn
@@ -1807,7 +1999,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o.value.toString(), r);
+					
+			return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
 			Action.RETURN,	// [245] BitwiseXorExpression = BitwiseAndExpression
@@ -1818,7 +2011,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o.value.toString(), r);
+					
+			return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
 			Action.RETURN,	// [247] BitwiseXorExpression_NoLBF = BitwiseAndExpression_NoLBF
@@ -1829,7 +2023,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o.value.toString(), r);
+					
+			return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
 			Action.RETURN,	// [249] BitwiseXorExpression_NoIn = BitwiseAndExpression_NoIn
@@ -1840,7 +2035,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o.value.toString(), r);
+					
+			return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
 			Action.RETURN,	// [251] BitwiseOrExpression = BitwiseXorExpression
@@ -1851,7 +2047,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o.value.toString(), r);
+					
+			return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
 			Action.RETURN,	// [253] BitwiseOrExpression_NoLBF = BitwiseXorExpression_NoLBF
@@ -1862,7 +2059,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o.value.toString(), r);
+					
+			return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
 			Action.RETURN,	// [255] BitwiseOrExpression_NoIn = BitwiseXorExpression_NoIn
@@ -1873,7 +2071,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o.value.toString(), r);
+					
+			return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
 			Action.RETURN,	// [257] LogicalAndExpression = BitwiseOrExpression
@@ -1884,7 +2083,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o.value.toString(), r);
+					
+			return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
 			Action.RETURN,	// [259] LogicalAndExpression_NoLBF = BitwiseOrExpression_NoLBF
@@ -1895,7 +2095,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o.value.toString(), r);
+					
+			return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
 			Action.RETURN,	// [261] LogicalAndExpression_NoIn = BitwiseOrExpression_NoIn
@@ -1906,7 +2107,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o.value.toString(), r);
+					
+			return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
 			Action.RETURN,	// [263] LogicalOrExpression = LogicalAndExpression
@@ -1917,7 +2119,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o.value.toString(), r);
+					
+			return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
 			Action.RETURN,	// [265] LogicalOrExpression_NoLBF = LogicalAndExpression_NoLBF
@@ -1928,7 +2131,8 @@ public class JSParser extends Parser implements IParser {
 					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSBinaryOperatorNode(l, o.value.toString(), r);
+					
+			return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
 			Action.RETURN,	// [267] LogicalOrExpression_NoIn = LogicalAndExpression_NoIn
@@ -1941,7 +2145,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode t = (JSNode) _symbol_t.value;
 					final Symbol _symbol_f = _symbols[offset + 5];
 					final JSNode f = (JSNode) _symbol_f.value;
-					return new JSNode(JSNodeTypes.CONDITIONAL, new JSNode[] { l, t, f }, l.getStart(), f.getEnd());
+					
+			return new JSNode(JSNodeTypes.CONDITIONAL, new JSNode[] { l, t, f }, l.getStart(), f.getEnd());
 				}
 			},
 			Action.RETURN,	// [270] ConditionalExpression_NoLBF = LogicalOrExpression_NoLBF
@@ -1953,7 +2158,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode t = (JSNode) _symbol_t.value;
 					final Symbol _symbol_f = _symbols[offset + 5];
 					final JSNode f = (JSNode) _symbol_f.value;
-					return new JSNode(JSNodeTypes.CONDITIONAL, new JSNode[] { l, t, f }, l.getStart(), f.getEnd());
+					
+			return new JSNode(JSNodeTypes.CONDITIONAL, new JSNode[] { l, t, f }, l.getStart(), f.getEnd());
 				}
 			},
 			Action.RETURN,	// [272] ConditionalExpression_NoIn = LogicalOrExpression_NoIn
@@ -1965,7 +2171,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode t = (JSNode) _symbol_t.value;
 					final Symbol _symbol_f = _symbols[offset + 5];
 					final JSNode f = (JSNode) _symbol_f.value;
-					return new JSNode(JSNodeTypes.CONDITIONAL, new JSNode[] { l, t, f }, l.getStart(), f.getEnd());
+					
+			return new JSNode(JSNodeTypes.CONDITIONAL, new JSNode[] { l, t, f }, l.getStart(), f.getEnd());
 				}
 			},
 			Action.RETURN,	// [274] AssignmentExpression = ConditionalExpression
@@ -1977,7 +2184,8 @@ public class JSParser extends Parser implements IParser {
 					final String o = (String) _symbol_o.value;
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSAssignmentNode(l, o, r);
+					
+			return new JSAssignmentNode(l, o, r);
 				}
 			},
 			Action.RETURN,	// [276] AssignmentExpression_NoLBF = ConditionalExpression_NoLBF
@@ -1989,7 +2197,8 @@ public class JSParser extends Parser implements IParser {
 					final String o = (String) _symbol_o.value;
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSAssignmentNode(l, o, r);
+					
+			return new JSAssignmentNode(l, o, r);
 				}
 			},
 			Action.RETURN,	// [278] AssignmentExpression_NoIn = ConditionalExpression_NoIn
@@ -2001,7 +2210,8 @@ public class JSParser extends Parser implements IParser {
 					final String o = (String) _symbol_o.value;
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSAssignmentNode(l, o, r);
+					
+			return new JSAssignmentNode(l, o, r);
 				}
 			},
 			Action.RETURN,	// [280] AssignmentOperator = EQUAL
@@ -2022,7 +2232,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode l = (JSNode) _symbol_l.value;
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSNaryNode(JSNodeTypes.COMMA, new JSNode[] { l, r }, l.getStart(), r.getEnd());
+					
+			return new JSNaryNode(JSNodeTypes.COMMA, new JSNode[] { l, r }, l.getStart(), r.getEnd());
 				}
 			},
 			Action.RETURN,	// [293] Expression = AssignmentExpression
@@ -2032,7 +2243,8 @@ public class JSParser extends Parser implements IParser {
 					final JSNode l = (JSNode) _symbol_l.value;
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSNaryNode(JSNodeTypes.COMMA, new JSNode[] { l, r }, l.getStart(), r.getEnd());
+					
+			return new JSNaryNode(JSNodeTypes.COMMA, new JSNode[] { l, r }, l.getStart(), r.getEnd());
 				}
 			},
 			Action.RETURN,	// [295] Expression_NoLBF = AssignmentExpression_NoLBF
@@ -2042,47 +2254,54 @@ public class JSParser extends Parser implements IParser {
 					final JSNode l = (JSNode) _symbol_l.value;
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
-					return new JSNaryNode(JSNodeTypes.COMMA, new JSNode[] { l, r }, l.getStart(), r.getEnd());
+					
+			return new JSNaryNode(JSNodeTypes.COMMA, new JSNode[] { l, r }, l.getStart(), r.getEnd());
 				}
 			},
 			Action.RETURN,	// [297] Expression_NoIn = AssignmentExpression_NoIn
 			new Action() {	// [298] Literal = NULL.n
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol n = _symbols[offset + 1];
-					return new JSPrimitiveNode(JSNodeTypes.NULL, n.value.toString(), n.getStart(), n.getEnd());
+					
+			return new JSPrimitiveNode(JSNodeTypes.NULL, n.value.toString(), n.getStart(), n.getEnd());
 				}
 			},
 			new Action() {	// [299] Literal = TRUE.t
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol t = _symbols[offset + 1];
-					return new JSPrimitiveNode(JSNodeTypes.TRUE, t.value.toString(), t.getStart(), t.getEnd());
+					
+			return new JSPrimitiveNode(JSNodeTypes.TRUE, t.value.toString(), t.getStart(), t.getEnd());
 				}
 			},
 			new Action() {	// [300] Literal = FALSE.f
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
-					return new JSPrimitiveNode(JSNodeTypes.FALSE, f.value.toString(), f.getStart(), f.getEnd());
+					
+			return new JSPrimitiveNode(JSNodeTypes.FALSE, f.value.toString(), f.getStart(), f.getEnd());
 				}
 			},
 			new Action() {	// [301] Literal = NUMBER.n
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_n = _symbols[offset + 1];
 					final String n = (String) _symbol_n.value;
-					return new JSPrimitiveNode(JSNodeTypes.NUMBER, n, _symbol_n.getStart(), _symbol_n.getEnd());
+					
+			return new JSPrimitiveNode(JSNodeTypes.NUMBER, n, _symbol_n.getStart(), _symbol_n.getEnd());
 				}
 			},
 			new Action() {	// [302] Literal = STRING.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_s = _symbols[offset + 1];
 					final String s = (String) _symbol_s.value;
-					return new JSPrimitiveNode(JSNodeTypes.STRING, s, _symbol_s.getStart(), _symbol_s.getEnd());
+					
+			return new JSPrimitiveNode(JSNodeTypes.STRING, s, _symbol_s.getStart(), _symbol_s.getEnd());
 				}
 			},
 			new Action() {	// [303] Literal = REGEX.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_r = _symbols[offset + 1];
 					final String r = (String) _symbol_r.value;
-					return new JSPrimitiveNode(JSNodeTypes.REGEX, r, _symbol_r.getStart(), _symbol_r.getEnd());
+					
+			return new JSPrimitiveNode(JSNodeTypes.REGEX, r, _symbol_r.getStart(), _symbol_r.getEnd());
 				}
 			}
 		};
