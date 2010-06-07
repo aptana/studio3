@@ -70,6 +70,7 @@ public class DeployHandler extends AbstractHandler
 			}
 			WizardDialog dialog = new WizardDialog(shell, wizard);
 			dialog.setPageSize(350, 500);
+			dialog.setHelpAvailable(false);
 			dialog.create();
 			dialog.open();
 		}
