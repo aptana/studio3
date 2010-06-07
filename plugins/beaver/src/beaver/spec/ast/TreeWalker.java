@@ -39,6 +39,11 @@ public class TreeWalker
 	{
 		// leaf
 	}
+	
+	public void visit(Declaration.Implements node)
+	{
+		// leaf
+	}
 
 	public void visit(Declaration.Imports node)
 	{

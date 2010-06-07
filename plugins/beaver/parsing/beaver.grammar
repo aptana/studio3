@@ -1,0 +1,249 @@
+%header {:
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * This file is part of Beaver Parser Generator.                       *
+ * Copyright (C) 2003,2005 Alexander Demenchuk <alder@softanvil.com>.  *
+ * All rights reserved.                                                *
+ * See the file "LICENSE" for the terms and conditions for copying,    *
+ * distribution and modification of Beaver.                            *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+:};
+%package "beaver.spec.parser";
+%import "beaver.comp.util.Log", "beaver.spec.ast.*";
+%class "GrammarParser";
+%embed {:
+	static class Events extends Parser.Events
+	{
+		private final Log log;
+
+		Events(Log log)
+		{
+			this.log = log;
+		}
+
+		public void scannerError(Scanner.Exception e)
+		{
+			log.error(e);
+		}
+		public void syntaxError(Symbol token)
+		{
+			log.error(token, "unexpected token");
+		}
+		public void unexpectedTokenRemoved(Symbol token)
+		{
+			log.warning(token, "recovered by removing unexpected token");
+		}
+		public void missingTokenInserted(Symbol token)
+		{
+			log.warning(token, "recovered by inserting missing '" + Terminals.NAMES[token.getId()] + "'");
+		}
+		public void misspelledTokenReplaced(Symbol token)
+		{
+			log.warning(token, "recovered by replacing misspelled token with '" + Terminals.NAMES[token.getId()] + "'");
+		}
+		public void errorPhraseRemoved(Symbol error)
+		{
+			log.warning(error, "recovered by removing error phrase");
+		}
+	}
+
+	private Log log;
+
+	public GrammarParser(Log log)
+	{
+		this();
+		report = new Events(this.log = log);
+	}
+:};
+
+%terminals HEADER, PACKAGE, IMPORT, CLASS, EMBED, INIT, IMPLEMENTS;
+%terminals GOAL, TERMINALS, TYPEOF, IS, COMMA, LEFT, RIGHT, NONASSOC;
+%terminals SEMI, QUESTION, PLUS, STAR, AT, BAR, DOT;
+%terminals TEXT, CODE, IDENT;
+
+%typeof declaration, header, package, import, class_name, class_code, class_init,
+        grammar_goal, typeof, terminals, left_assoc, right_assoc, nonassoc = "Declaration";
+
+%typeof grammar     = "GrammarTreeRoot";
+%typeof rule        = "Rule";
+%typeof definition  = "Rule.Definition";
+%typeof def_element = "Rule.Definition.Element";
+
+%goal grammar;
+
+grammar
+	= declaration.decl* rule.rules+
+				{:
+					return new GrammarTreeRoot(decl, rules);
+				:}
+	;
+
+declaration
+	= header
+	| package
+	| import
+	| class_name
+	| class_code
+	| class_init
+	| class_implements
+	| grammar_goal
+	| typeof
+	| terminals
+	| left_assoc
+	| right_assoc
+	| nonassoc
+	| error.e SEMI
+				{:
+					log.error(e, "malformed declaration"); return new Declaration.Error();
+				:}
+ 	;
+
+header
+	= HEADER CODE.code SEMI
+				{:
+					return new Declaration.Header(code);
+				:}
+	;
+
+package
+	= PACKAGE TEXT.name SEMI
+				{:
+					return new Declaration.PackageName(name);
+				:}
+	;
+
+import
+	= IMPORT txt_list.names SEMI
+				{:
+					return new Declaration.Imports(names);
+				:}
+	;
+
+class_name
+	= CLASS TEXT.name SEMI
+				{:
+					return new Declaration.ClassName(name);
+				:}
+	;
+
+class_code
+	= EMBED CODE.code SEMI
+				{:
+					return new Declaration.ClassCode(code);
+				:}
+	;
+
+class_init
+	= INIT CODE.code  SEMI
+				{:
+					return new Declaration.ConstructorCode(code);
+				:}
+	;
+
+class_implements
+	= IMPLEMENTS txt_list.names SEMI
+				{:
+					return new Declaration.Implements(names);
+				:}
+	;
+	
+grammar_goal
+	= GOAL IDENT.name SEMI
+				{:
+					return new Declaration.Goal(name);
+				:}
+	;
+
+terminals
+	= TERMINALS sym_list.symbols SEMI
+				{:
+					return new Declaration.Terminals(symbols);
+				:}
+	;
+
+left_assoc
+	= LEFT sym_list.symbols SEMI
+				{:
+					return new Declaration.LeftAssoc(symbols);
+				:}
+	;
+
+right_assoc
+	= RIGHT sym_list.symbols SEMI
+				{:
+					return new Declaration.RightAssoc(symbols);
+				:}
+	;
+
+nonassoc
+	= NONASSOC sym_list.symbols SEMI
+				{:
+					return new Declaration.NonAssoc(symbols);
+				:}
+	;
+
+typeof
+	= TYPEOF sym_list.symbols IS TEXT.type SEMI
+				{:
+					return new Declaration.TypeOf(symbols, type);
+				:}
+	;
+
+txt_list
+	= TEXT
+	| txt_list COMMA TEXT
+	;
+
+sym_list
+	= IDENT
+	| sym_list COMMA IDENT
+	;
+
+rule
+	= IDENT.name IS def_list.defs SEMI
+				{:
+					return new Rule(name, defs);
+				:}
+	| error.e SEMI
+				{:
+					log.error(e, "malformed production");
+					return new Rule(new Symbol(""), new Rule.Definition[] {});
+				:}
+	;
+
+def_list
+	= definition
+	| def_list BAR definition
+	;
+
+definition
+	= def_element.elts* rule_precedence.prec? CODE.code?
+				{:
+					return new Rule.Definition(elts, prec, code);
+				:}
+	| error.e
+				{:
+					log.error(e, "malformed nonterminal definition");
+					return new Rule.Definition(null, new Symbol(null), new Symbol(null));
+				:}
+	;
+
+def_element
+	= IDENT.name alias.alias? ebnf_symbol.ebnf_mark?
+				{:
+					return new Rule.Definition.Element(name, alias, ebnf_mark);
+				:}
+	;
+
+alias
+	= DOT IDENT
+	;
+
+ebnf_symbol
+	= QUESTION
+	| PLUS
+	| STAR
+	;
+
+rule_precedence
+	= AT IDENT
+	;

@@ -33,6 +33,9 @@ public class Grammar
 	/** Java package of the parser */
 	public String package_name;
 	
+	/** List of java interfaces that will be declared in the class header */
+	public String[] impls;
+	
 	/** List of Java types and/or packages that wil be declared in the "import" section of a generated source file. */
 	public String[] imports;
 	
