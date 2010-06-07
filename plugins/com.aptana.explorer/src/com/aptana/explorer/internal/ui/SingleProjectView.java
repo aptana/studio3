@@ -1417,7 +1417,9 @@ public abstract class SingleProjectView extends CommonNavigator {
 	protected void mangleContextMenu(Menu menu) {
 		// TODO If the selected project isn't accessible, remove new
 		// file/folder, debug as
-		forceOurNewFileWizard(menu);
+		if (selectedProject != null && selectedProject.isAccessible()) {
+			forceOurNewFileWizard(menu);
+		}
 
 		// Remove a whole bunch of the contributed items that we don't want
 		removeMenuItems(menu, TO_REMOVE);
@@ -1436,7 +1438,6 @@ public abstract class SingleProjectView extends CommonNavigator {
 		}
 	}
 
-	@SuppressWarnings( { "nls" })
 	protected void forceOurNewFileWizard(Menu menu) {
 		// Hack the New > File entry
 		for (MenuItem menuItem : menu.getItems()) {
