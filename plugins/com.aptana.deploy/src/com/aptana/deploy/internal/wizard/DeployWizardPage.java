@@ -10,6 +10,8 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -76,12 +78,22 @@ public class DeployWizardPage extends WizardPage
 					{
 						if (isPageComplete())
 						{
-							getContainer().showPage(getNextPage());
+							if (deployWithHeroku.getSelection())
+								getContainer().showPage(getNextPage());
+							else
+								deployWithHeroku.setSelection(true);
 						}
 					}
 				}
 			});
 
+			deployWithHeroku.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					setImageDescriptor(Activator.getImageDescriptor(HEROKU_IMG_PATH));
+				}
+			});
+			
 			label = new Label(composite, SWT.NONE);
 			label.setText(Messages.DeployWizardPage_OtherDeploymentOptionsLabel);
 		}
@@ -93,14 +105,27 @@ public class DeployWizardPage extends WizardPage
 		// "Other" Deployment options radio button group
 		deployWithFTP = new Button(composite, SWT.RADIO);
 		deployWithFTP.setText(Messages.DeployWizardPage_FTPLabel);
+		deployWithFTP.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				setImageDescriptor(null);
+			}
+		});
 		if (deployWithHeroku == null)
 		{
 			deployWithFTP.setSelection(true);
 		}
 
+		
 		deployWithCapistrano = new Button(composite, SWT.RADIO);
 		deployWithCapistrano.setText(Messages.DeployWizardPage_CapistranoLabel);
-
+		deployWithCapistrano.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				setImageDescriptor(null);
+			}
+		});
+		
 		Dialog.applyDialogFont(composite);
 	}
 

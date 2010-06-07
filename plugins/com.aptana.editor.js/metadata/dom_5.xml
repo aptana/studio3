@@ -41,6 +41,7 @@
 				</availability>
         <browsers>
 	        <browser platform="Mozilla" version="1.9+"/>
+	        <browser platform="Chrome" version="5.0+"/>
 	        <browser platform="Safari" version="3.1+"/>
 	        <browser platform="Opera" version="9.51+"/>
         </browsers>
@@ -88,6 +89,7 @@
 				</availability>
 				<browsers>
 					<browser platform="Mozilla" version="1.9+"/>
+					<browser platform="Chrome" version="5.0+"/>
 					<browser platform="Safari" version="3.1+"/>
 					<browser platform="Opera" version="9.51+"/>
 				</browsers>

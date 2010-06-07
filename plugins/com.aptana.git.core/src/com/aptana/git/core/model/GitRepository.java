@@ -933,9 +933,14 @@ public class GitRepository
 	public Set<String> remoteURLs()
 	{
 		Set<String> remotes = new HashSet<String>();
+		int index;
 		for (String remoteBranch : remoteBranches())
 		{
-			remotes.add(remoteBranch.substring(0, remoteBranch.indexOf("/"))); //$NON-NLS-1$
+			index = remoteBranch.indexOf("/"); //$NON-NLS-1$
+			if (index > -1)
+			{
+				remotes.add(remoteBranch.substring(0, index));
+			}
 		}
 
 		Set<String> remoteURLs = new HashSet<String>();

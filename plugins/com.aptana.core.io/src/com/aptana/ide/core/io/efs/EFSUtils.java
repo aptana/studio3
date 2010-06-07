@@ -36,7 +36,6 @@
 package com.aptana.ide.core.io.efs;
 
 import java.io.File;
-import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;

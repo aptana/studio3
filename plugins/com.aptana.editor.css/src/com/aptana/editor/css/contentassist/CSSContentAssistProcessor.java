@@ -534,6 +534,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			}
 		}
 
+		LOOP:
 		while (index >= 0)
 		{
 			Lexeme<CSSTokenType> lexeme = lexemeProvider.getLexeme(index);
@@ -555,6 +556,11 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 							{
 								switch (previousLexeme.getType())
 								{
+									case CLASS:
+									case ID:
+										location = LocationType.ERROR;
+										break LOOP;
+										
 									case CURLY_BRACE:
 									case SEMICOLON:
 										location = LocationType.INSIDE_PROPERTY;
@@ -887,7 +893,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 						{
 							Lexeme<CSSTokenType> candidate = lexemeProvider.getLexemeFromOffset(offset - 1);
 							
-							if (this.isValueDelimiter(candidate) == false)
+							if (candidate != null && this.isValueDelimiter(candidate) == false)
 							{
 								this._replaceRange = this._currentLexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
 							}
