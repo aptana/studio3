@@ -127,9 +127,7 @@ public final class EFSUtils {
 	 * @return
 	 */
 	public static String getAbsolutePath(IFileStore file) {
-		// need to strip scheme (i.e. file:)
-		String scheme = file.toURI().getScheme();
-		return file.toURI().toString().substring(scheme.length() + 1);
+		return file.toURI().getPath();
 	}
 
 	/**
@@ -156,8 +154,8 @@ public final class EFSUtils {
 	 * @return
 	 */
 	public static IFileStore createFile(IFileStore sourceRoot, IFileStore sourceStore, IFileStore destinationRoot) {
-        String sourceRootPath = sourceRoot.toString();
-        String sourcePath = sourceStore.toString();
+        String sourceRootPath = sourceRoot.toURI().getPath();
+        String sourcePath = sourceStore.toURI().getPath();
         int index = sourcePath.indexOf(sourceRootPath);
         if (index > -1) {
             String relativePath = sourcePath.substring(index + sourceRootPath.length());
