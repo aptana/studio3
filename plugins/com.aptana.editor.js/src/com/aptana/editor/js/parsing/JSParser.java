@@ -29,6 +29,7 @@ import com.aptana.editor.js.parsing.ast.JSFunctionNode;
  * <a href="http://beaver.sourceforge.net">Beaver</a> v0.9.6.1
  * from the grammar specification "JS.grammar".
  */
+@SuppressWarnings("unchecked")
 public class JSParser extends Parser implements IParser {
 
 	static final ParsingTables PARSING_TABLES = new ParsingTables(
