@@ -828,7 +828,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		Composite main = new Composite(parent, SWT.NONE);
 		main.setLayout(new GridLayout(2, false));
 		main.setBackgroundMode(SWT.INHERIT_DEFAULT);
-		main.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+		//main.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		GridData gridData = new GridData(SWT.CENTER, SWT.CENTER, true, false);
 		gridData.exclude = true;
 		main.setLayoutData(gridData);
@@ -1097,8 +1097,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 									data.exclude = false;
 									synced.setVisible(true);
 									cancel.setText(Messages.SmartSyncDialog_Close);
-									setEnabled(false);
-									//end2Combo.setEnabled(true);
+									setEnabled(true);
 									syncer.disconnect();
 								}
 								else
