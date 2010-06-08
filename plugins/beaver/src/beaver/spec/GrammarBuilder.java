@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import beaver.Symbol;
 import beaver.comp.util.Log;
@@ -213,6 +215,7 @@ public class GrammarBuilder extends TreeWalker
 			/** Next unused highest precedence */
 			private int precedence = Integer.MAX_VALUE;
 			private HashSet imports = new HashSet(23);
+			private List<String> impls = new LinkedList<String>();
 			
 			public void visit(GrammarTreeRoot root)
 			{
@@ -247,6 +250,14 @@ public class GrammarBuilder extends TreeWalker
 				{
 					grammar.package_name = decl.getName();
 				}
+			}
+			public void visit(Declaration.Implements decl)
+			{
+				for (int i = 0; i < decl.symbols.length; i++)
+				{
+					impls.add((String) decl.symbols[i].value);
+				}
+				grammar.impls = impls.toArray(new String[impls.size()]);
 			}
 			public void visit(Declaration.Imports decl)
 			{

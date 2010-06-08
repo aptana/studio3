@@ -788,7 +788,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 
 	private static String generateTempFileName(String base) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(TMP_UPLOAD_PREFIX).append(base);
+		sb.append(base).append(TMP_UPLOAD_SUFFIX);
 		return sb.toString();
 	}
 }
