@@ -4,19 +4,6 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class JSNaryNode extends JSNode
 {
-	private static void appendText(StringBuilder text, IParseNode[] children)
-	{
-		int count = children.length;
-		for (int i = 0; i < count; ++i)
-		{
-			text.append(children[i]);
-			if (i < count - 1)
-			{
-				text.append(", "); //$NON-NLS-1$
-			}
-		}
-	}
-
 	/**
 	 * JSNaryNode
 	 * 
@@ -30,56 +17,91 @@ public class JSNaryNode extends JSNode
 		super(type, start, end, children);
 	}
 
-	@Override
+	/**
+	 * appendChildren
+	 * 
+	 * @param buffer
+	 */
+	protected void appendChildren(StringBuilder buffer)
+	{
+		boolean first = true;
+		String delimiter = this.getDelimiter();
+
+		for (IParseNode child : this)
+		{
+			if (!first)
+			{
+				buffer.append(delimiter); //$NON-NLS-1$
+			}
+			else
+			{
+				first = false;
+			}
+
+			buffer.append(child);
+		}
+	}
+
+	/**
+	 * appendCloseText
+	 * 
+	 * @param buffer
+	 */
+	protected void appendCloseText(StringBuilder buffer)
+	{
+		// do nothing, sub-classes should override
+	}
+
+	/**
+	 * appendOpenText
+	 * 
+	 * @param buffer
+	 */
+	protected void appendOpenText(StringBuilder buffer)
+	{
+		// do nothing, sub-classes should override
+	}
+
+	/**
+	 * appendSemicolon
+	 * 
+	 * @param buffer
+	 */
+	protected void appendSemicolon(StringBuilder buffer)
+	{
+		if (getSemicolonIncluded())
+		{
+			buffer.append(";");
+		}
+	}
+
+	/**
+	 * getDelimiter
+	 * 
+	 * @return
+	 */
+	protected String getDelimiter()
+	{
+		return ", ";
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
+	 */
 	public String toString()
 	{
-		StringBuilder text = new StringBuilder();
-		IParseNode[] children = getChildren();
-		switch (getType())
+		StringBuilder buffer = new StringBuilder();
+
+		this.appendOpenText(buffer);
+		this.appendChildren(buffer);
+		this.appendCloseText(buffer);
+
+		if (getSemicolonIncluded())
 		{
-			case JSNodeTypes.STATEMENTS:
-				text.append("{"); //$NON-NLS-1$
-				for (IParseNode child : children)
-				{
-					text.append(child);
-				}
-				text.append("}"); //$NON-NLS-1$
-				break;
-			case JSNodeTypes.VAR:
-				text.append("var "); //$NON-NLS-1$
-				appendText(text, children);
-				break;
-			case JSNodeTypes.PARAMETERS:
-				text.append("("); //$NON-NLS-1$
-				appendText(text, children);
-				text.append(")"); //$NON-NLS-1$
-				break;
-			case JSNodeTypes.ARRAY_LITERAL:
-				text.append("["); //$NON-NLS-1$
-				appendText(text, children);
-				text.append("]"); //$NON-NLS-1$
-				break;
-			case JSNodeTypes.OBJECT_LITERAL:
-				text.append("{"); //$NON-NLS-1$
-				appendText(text, children);
-				text.append("}"); //$NON-NLS-1$
-				break;
-			case JSNodeTypes.DEFAULT:
-				text.append("default: "); //$NON-NLS-1$
-				for (IParseNode child : children)
-				{
-					text.append(child);
-				}
-				break;
-			case JSNodeTypes.ARGUMENTS:
-				text.append("("); //$NON-NLS-1$
-				appendText(text, children);
-				text.append(")"); //$NON-NLS-1$
-				break;
-			default:
-				appendText(text, children);
+			buffer.append(";");
 		}
 
-		return appendSemicolon(text.toString());
+		return buffer.toString();
 	}
 }

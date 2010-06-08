@@ -12,4 +12,14 @@ public class JSVarNode extends JSNaryNode
 	{
 		super(JSNodeTypes.VAR, start, end, children);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNaryNode#appendOpenText(java.lang.StringBuilder)
+	 */
+	@Override
+	protected void appendOpenText(StringBuilder buffer)
+	{
+		buffer.append("var "); //$NON-NLS-1$
+	}
 }
