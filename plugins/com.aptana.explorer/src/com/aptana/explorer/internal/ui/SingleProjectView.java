@@ -369,43 +369,33 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		});
 
 		// Stick Delete in Properties area
-		menuManager.appendToGroup(IContextMenuConstants.GROUP_PROPERTIES,
-				new ContributionItem() {
-					@Override
-					public void fill(Menu menu, int index) {
-						final MenuItem terminalMenuItem = new MenuItem(menu,
-								SWT.PUSH);
-						terminalMenuItem
-								.setText(Messages.SingleProjectView_DeleteProjectMenuItem_LBL);
-						terminalMenuItem
-								.addSelectionListener(new SelectionAdapter() {
-									public void widgetSelected(SelectionEvent e) {
-										DeleteResourceAction action = new DeleteResourceAction(
-												getSite());
-										action
-												.selectionChanged(new StructuredSelection(
-														selectedProject));
-										action.run();
-									}
-								});
-						boolean enabled = (selectedProject != null && selectedProject
-								.exists());
-						ISharedImages images = PlatformUI.getWorkbench()
-								.getSharedImages();
-						terminalMenuItem
-								.setImage(enabled ? images
-										.getImage(ISharedImages.IMG_TOOL_DELETE)
-										: images
-												.getImage(ISharedImages.IMG_TOOL_DELETE_DISABLED));
-						terminalMenuItem.setEnabled(enabled);
-					}
+		menuManager.appendToGroup(IContextMenuConstants.GROUP_PROPERTIES, new ContributionItem() {
+
+			@Override
+			public void fill(Menu menu, int index) {
+				MenuItem item = new MenuItem(menu, SWT.PUSH);
+				item.setText(Messages.SingleProjectView_DeleteProjectMenuItem_LBL);
+				item.addSelectionListener(new SelectionAdapter() {
 
 					@Override
-					public boolean isDynamic() {
-						return true;
+					public void widgetSelected(SelectionEvent e) {
+						DeleteResourceAction action = new DeleteResourceAction(getSite());
+						action.selectionChanged(new StructuredSelection(selectedProject));
+						action.run();
 					}
-
 				});
+				boolean enabled = (selectedProject != null && selectedProject.exists());
+				ISharedImages images = PlatformUI.getWorkbench().getSharedImages();
+				item.setImage(enabled ? images.getImage(ISharedImages.IMG_TOOL_DELETE) : images
+						.getImage(ISharedImages.IMG_TOOL_DELETE_DISABLED));
+				item.setEnabled(enabled);
+			}
+
+			@Override
+			public boolean isDynamic() {
+				return true;
+			}
+		});
 	}
 
 	private void createDeployMenu(Composite parent) {
@@ -455,7 +445,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	}
 
 	private void addFTPMenuCommands(MenuManager menuManager) {
-
 		menuManager.add(new Separator(GROUP_FTP));
 		menuManager.appendToGroup(GROUP_FTP, new ContributionItem() {
 
@@ -801,12 +790,12 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	}
 
 	private Composite createSearchComposite(Composite myComposite) {
-		Composite search = new SearchComposite(myComposite, this);
+		SearchComposite search = new SearchComposite(myComposite, this);
 		search.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
 		// Register with focus service so that Cut/Copy/Paste/SelecAll handlers will work
 		IFocusService focusService = (IFocusService) getViewSite().getService(IFocusService.class);
-		focusService.addFocusTracker(search, IExplorerUIConstants.VIEW_ID + ".searchText"); //$NON-NLS-1$
+		focusService.addFocusTracker(search.getTextControl(), IExplorerUIConstants.VIEW_ID + ".searchText"); //$NON-NLS-1$
 
 		return search;
 	}

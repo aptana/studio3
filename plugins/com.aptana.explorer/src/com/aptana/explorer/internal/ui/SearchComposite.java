@@ -140,6 +140,11 @@ public class SearchComposite extends Composite
 		return searchText.setFocus();
 	}
 
+	public Text getTextControl()
+	{
+		return searchText;
+	}
+
 	private void searchText()
 	{
 		String text = searchText.getText();
