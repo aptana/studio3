@@ -5,7 +5,12 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class JSBinaryOperatorNode extends JSNode
 {
-
+	/**
+	 * JSBinaryOperatorNode
+	 * 
+	 * @param left
+	 * @param right
+	 */
 	protected JSBinaryOperatorNode(JSNode left, JSNode right)
 	{
 		this.start = left.getStart();
@@ -14,6 +19,13 @@ public class JSBinaryOperatorNode extends JSNode
 		setChildren(new JSNode[] { left, right });
 	}
 
+	/**
+	 * JSBinaryOperatorNode
+	 * 
+	 * @param left
+	 * @param operator
+	 * @param right
+	 */
 	public JSBinaryOperatorNode(JSNode left, String operator, JSNode right)
 	{
 		this(left, right);
@@ -95,6 +107,10 @@ public class JSBinaryOperatorNode extends JSNode
 		setType(type);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
+	 */
 	@Override
 	public String toString()
 	{
@@ -180,6 +196,8 @@ public class JSBinaryOperatorNode extends JSNode
 		text.append(" ").append(operator).append(" "); //$NON-NLS-1$ //$NON-NLS-2$
 		text.append(children[1]);
 
-		return appendSemicolon(text.toString());
+		this.appendSemicolon(text);
+
+		return text.toString();
 	}
 }

@@ -30,6 +30,10 @@ public class JSPostUnaryOperatorNode extends JSUnaryOperatorNode
 		setType(type);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSUnaryOperatorNode#toString()
+	 */
 	@Override
 	public String toString()
 	{
@@ -47,6 +51,8 @@ public class JSPostUnaryOperatorNode extends JSUnaryOperatorNode
 		}
 		text.append(operator);
 
-		return appendSemicolon(text.toString());
+		this.appendSemicolon(text);
+
+		return text.toString();
 	}
 }

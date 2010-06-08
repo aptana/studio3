@@ -24,4 +24,14 @@ public class JSContinueNode extends JSLabelStatementNode
 	{
 		super(JSNodeTypes.CONTINUE, start, end, identifier);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSLabelStatementNode#getKeyword()
+	 */
+	@Override
+	protected String getKeyword()
+	{
+		return "continue"; //$NON-NLS-1$
+	}
 }

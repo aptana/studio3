@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.aptana.editor.js.parsing.IJSParserConstants;
-import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseBaseNode;
 
 public class JSNode extends ParseBaseNode
@@ -74,16 +73,14 @@ public class JSNode extends ParseBaseNode
 	/**
 	 * appendSemicolon
 	 * 
-	 * @param text
-	 * @return
+	 * @param buffer
 	 */
-	protected String appendSemicolon(String text)
+	protected void appendSemicolon(StringBuilder buffer)
 	{
 		if (getSemicolonIncluded())
 		{
-			return text + ";"; //$NON-NLS-1$
+			buffer.append(";");
 		}
-		return text;
 	}
 
 	/*
@@ -182,104 +179,13 @@ public class JSNode extends ParseBaseNode
 	@Override
 	public String toString()
 	{
-		StringBuilder text = new StringBuilder();
-		IParseNode[] children = getChildren();
-		int type = getType();
-		switch (type)
+		if (this.getSemicolonIncluded())
 		{
-			case JSNodeTypes.ASSIGN:
-				text.append(children[0]).append(" = ").append(children[1]); //$NON-NLS-1$
-				break;
-			case JSNodeTypes.INVOKE:
-				text.append(children[0]).append(children[1]); //$NON-NLS-1$ //$NON-NLS-2$
-				break;
-			case JSNodeTypes.DECLARATION:
-				text.append(children[0]);
-				if (!((JSNode) children[1]).isEmpty())
-				{
-					text.append(" = ").append(children[1]); //$NON-NLS-1$
-				}
-				break;
-			case JSNodeTypes.TRY:
-				text.append("try "); //$NON-NLS-1$
-				text.append(children[0]);
-				if (!((JSNode) children[1]).isEmpty())
-				{
-					text.append(" ").append(children[1]); //$NON-NLS-1$
-				}
-				if (!((JSNode) children[2]).isEmpty())
-				{
-					text.append(" ").append(children[2]); //$NON-NLS-1$
-				}
-				break;
-			case JSNodeTypes.CATCH:
-				text.append("catch (").append(children[0]).append(") ").append(children[1]); //$NON-NLS-1$ //$NON-NLS-2$
-				break;
-			case JSNodeTypes.FINALLY:
-				text.append("finally ").append(children[0]); //$NON-NLS-1$
-				break;
-			case JSNodeTypes.CONDITIONAL:
-				text.append(children[0]).append(" ? ").append(children[1]).append(" : ").append(children[2]); //$NON-NLS-1$ //$NON-NLS-2$
-				break;
-			case JSNodeTypes.CONSTRUCT:
-				text.append("new ").append(children[0]).append(children[1]); //$NON-NLS-1$
-				break;
-			case JSNodeTypes.NAME_VALUE_PAIR:
-			case JSNodeTypes.LABELLED:
-				text.append(children[0]).append(": ").append(children[1]); //$NON-NLS-1$
-				break;
-			case JSNodeTypes.WHILE:
-				text.append("while (").append(children[0]).append(") ").append(children[1]); //$NON-NLS-1$ //$NON-NLS-2$
-				break;
-			case JSNodeTypes.WITH:
-				text.append("with (").append(children[0]).append(") ").append(children[1]); //$NON-NLS-1$ //$NON-NLS-2$
-				break;
-			case JSNodeTypes.IF:
-				text.append("if (").append(children[0]).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
-				text.append(children[1]);
-				if (!((JSNode) children[2]).isEmpty())
-				{
-					if (children[1].getType() != JSNodeTypes.STATEMENTS)
-					{
-						text.append(";"); //$NON-NLS-1$
-					}
-					text.append(" else ").append(children[2]); //$NON-NLS-1$
-				}
-				break;
-			case JSNodeTypes.DO:
-				text.append("do ").append(children[0]); //$NON-NLS-1$
-				if (children[0].getType() != JSNodeTypes.STATEMENTS)
-				{
-					text.append(";"); //$NON-NLS-1$
-				}
-				text.append(" while (").append(children[1]).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
-				break;
-			case JSNodeTypes.FOR:
-				text.append("for ("); //$NON-NLS-1$
-				if (!((JSNode) children[0]).isEmpty())
-				{
-					text.append(children[0]);
-				}
-				text.append(";"); //$NON-NLS-1$
-				if (!((JSNode) children[1]).isEmpty())
-				{
-					text.append(" ").append(children[1]); //$NON-NLS-1$
-				}
-				text.append(";"); //$NON-NLS-1$
-				if (!((JSNode) children[2]).isEmpty())
-				{
-					text.append(" ").append(children[2]); //$NON-NLS-1$
-				}
-				text.append(") ").append(children[3]); //$NON-NLS-1$
-				break;
-			case JSNodeTypes.FOR_IN:
-				text.append("for (").append(children[0]).append(" in ").append(children[1]).append(") ").append( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					children[2]);
-				break;
-			default:
-				text.append(super.toString());
+			return super.toString() + ";";
 		}
-
-		return appendSemicolon(text.toString());
+		else
+		{
+			return super.toString();
+		}
 	}
 }

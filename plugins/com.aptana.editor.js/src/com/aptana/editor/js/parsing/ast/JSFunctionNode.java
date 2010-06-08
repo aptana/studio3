@@ -102,6 +102,9 @@ public class JSFunctionNode extends JSNode
 			text.append(name).append(" "); //$NON-NLS-1$
 		}
 		text.append(getChild(1)).append(" ").append(getChild(2)); //$NON-NLS-1$
-		return appendSemicolon(text.toString());
+
+		this.appendSemicolon(text);
+
+		return text.toString();
 	}
 }

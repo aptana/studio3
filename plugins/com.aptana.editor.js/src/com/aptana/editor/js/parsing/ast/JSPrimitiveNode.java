@@ -64,6 +64,13 @@ public class JSPrimitiveNode extends JSNode
 	@Override
 	public String toString()
 	{
-		return appendSemicolon(fText);
+		if (getSemicolonIncluded())
+		{
+			return fText + ";";
+		}
+		else
+		{
+			return fText;
+		}
 	}
 }

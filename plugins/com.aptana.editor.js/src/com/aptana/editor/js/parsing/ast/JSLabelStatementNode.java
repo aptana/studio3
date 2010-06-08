@@ -3,7 +3,7 @@ package com.aptana.editor.js.parsing.ast;
 /**
  * Represents continue and break statements.
  */
-public class JSLabelStatementNode extends JSNode
+public abstract class JSLabelStatementNode extends JSNode
 {
 	private String fIdentifier;
 	private String fText;
@@ -34,6 +34,10 @@ public class JSLabelStatementNode extends JSNode
 		fIdentifier = identifier;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -45,6 +49,17 @@ public class JSLabelStatementNode extends JSNode
 		return fIdentifier == null ? other.fIdentifier == null : fIdentifier.equals(other.fIdentifier);
 	}
 
+	/**
+	 * geKeyword
+	 * 
+	 * @return
+	 */
+	protected abstract String getKeyword();
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#hashCode()
+	 */
 	@Override
 	public int hashCode()
 	{
@@ -52,27 +67,29 @@ public class JSLabelStatementNode extends JSNode
 		return hash * 31 + (fIdentifier == null ? 0 : fIdentifier.hashCode());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
+	 */
 	@Override
 	public String toString()
 	{
 		if (fText == null)
 		{
 			StringBuilder text = new StringBuilder();
-			switch (getType())
-			{
-				case JSNodeTypes.CONTINUE:
-					text.append("continue"); //$NON-NLS-1$
-					break;
-				case JSNodeTypes.BREAK:
-					text.append("break"); //$NON-NLS-1$
-					break;
-			}
+
+			text.append(this.getKeyword());
+
 			if (fIdentifier != null)
 			{
 				text.append(" ").append(fIdentifier); //$NON-NLS-1$
 			}
-			fText = appendSemicolon(text.toString());
+
+			this.appendSemicolon(text);
+
+			fText = text.toString();
 		}
+
 		return fText;
 	}
 }

@@ -24,4 +24,14 @@ public class JSBreakNode extends JSLabelStatementNode
 	{
 		super(JSNodeTypes.BREAK, start, end, identifier);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSLabelStatementNode#getKeyword()
+	 */
+	@Override
+	protected String getKeyword()
+	{
+		return "break"; //$NON-NLS-1$
+	}
 }

@@ -63,19 +63,6 @@ public class JSNaryNode extends JSNode
 	}
 
 	/**
-	 * appendSemicolon
-	 * 
-	 * @param buffer
-	 */
-	protected void appendSemicolon(StringBuilder buffer)
-	{
-		if (getSemicolonIncluded())
-		{
-			buffer.append(";");
-		}
-	}
-
-	/**
 	 * getDelimiter
 	 * 
 	 * @return
