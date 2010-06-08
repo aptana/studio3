@@ -4,15 +4,17 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class JSNaryNode extends JSNode
 {
-
-	public JSNaryNode(short type, int start, int end)
+	/**
+	 * JSNaryNode
+	 * 
+	 * @param type
+	 * @param start
+	 * @param end
+	 * @param children
+	 */
+	public JSNaryNode(short type, int start, int end, JSNode ... children)
 	{
-		super(type, start, end);
-	}
-
-	public JSNaryNode(short type, JSNode[] children, int start, int end)
-	{
-		super(type, children, start, end);
+		super(type, start, end, children);
 	}
 
 	@Override

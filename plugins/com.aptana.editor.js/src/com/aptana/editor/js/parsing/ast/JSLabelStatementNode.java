@@ -5,16 +5,30 @@ package com.aptana.editor.js.parsing.ast;
  */
 public class JSLabelStatementNode extends JSNode
 {
-
 	private String fIdentifier;
 	private String fText;
 
+	/**
+	 * JSLabelStatementNode
+	 * 
+	 * @param type
+	 * @param start
+	 * @param end
+	 */
 	public JSLabelStatementNode(short type, int start, int end)
 	{
-		this(type, null, start, end);
+		this(type, start, end, null);
 	}
 
-	public JSLabelStatementNode(short type, String identifier, int start, int end)
+	/**
+	 * JSLabelStatementNode
+	 * 
+	 * @param type
+	 * @param start
+	 * @param end
+	 * @param identifier
+	 */
+	public JSLabelStatementNode(short type, int start, int end, String identifier)
 	{
 		super(type, start, end);
 		fIdentifier = identifier;

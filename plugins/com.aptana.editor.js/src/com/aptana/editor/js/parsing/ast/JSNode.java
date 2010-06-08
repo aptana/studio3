@@ -60,40 +60,14 @@ public class JSNode extends ParseBaseNode
 	 * @param type
 	 * @param start
 	 * @param end
+	 * @param children
 	 */
-	public JSNode(short type, int start, int end)
+	public JSNode(short type, int start, int end, JSNode ... children)
 	{
 		super(IJSParserConstants.LANGUAGE);
 		fType = type;
 		this.start = start;
 		this.end = end;
-	}
-
-	/**
-	 * JSNode
-	 * 
-	 * @param type
-	 * @param start
-	 * @param end
-	 * @param semicolon
-	 */
-	public JSNode(short type, int start, int end, boolean semicolon)
-	{
-		this(type, start, end);
-		fSemicolonIncluded = semicolon;
-	}
-
-	/**
-	 * JSNode
-	 * 
-	 * @param type
-	 * @param children
-	 * @param start
-	 * @param end
-	 */
-	public JSNode(short type, JSNode[] children, int start, int end)
-	{
-		this(type, start, end);
 		setChildren(children);
 	}
 

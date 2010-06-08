@@ -4,16 +4,30 @@ import com.aptana.editor.js.parsing.lexer.JSTokenType;
 
 public class JSUnaryOperatorNode extends JSNode
 {
-
-	protected JSUnaryOperatorNode(JSNode expression, int start, int end)
+	/**
+	 * JSUnaryOperatorNode
+	 * 
+	 * @param start
+	 * @param end
+	 * @param expression
+	 */
+	protected JSUnaryOperatorNode(int start, int end, JSNode expression)
 	{
 		setLocation(start, end);
 		setChildren(new JSNode[] { expression });
 	}
 
-	public JSUnaryOperatorNode(String operator, JSNode expression, int start, int end)
+	/**
+	 * JSUnaryOperatorNode
+	 * 
+	 * @param operator
+	 * @param start
+	 * @param end
+	 * @param expression
+	 */
+	public JSUnaryOperatorNode(String operator, int start, int end, JSNode expression)
 	{
-		this(expression, start, end);
+		this(start, end, expression);
 
 		short type = DEFAULT_TYPE;
 		JSTokenType token = JSTokenType.get(operator);
@@ -50,9 +64,17 @@ public class JSUnaryOperatorNode extends JSNode
 		setType(type);
 	}
 
-	public JSUnaryOperatorNode(short type, JSNode expression, int start, int end)
+	/**
+	 * JSUnaryOperatorNode
+	 * 
+	 * @param type
+	 * @param start
+	 * @param end
+	 * @param expression
+	 */
+	public JSUnaryOperatorNode(short type, int start, int end, JSNode expression)
 	{
-		this(expression, start, end);
+		this(start, end, expression);
 		setType(type);
 	}
 
