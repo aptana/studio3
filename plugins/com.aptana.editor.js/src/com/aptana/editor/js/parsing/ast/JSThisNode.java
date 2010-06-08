@@ -1,7 +1,19 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 public class JSThisNode extends JSPrimitiveNode
 {
+	/**
+	 * JSThisNode
+	 * 
+	 * @param identifier
+	 */
+	public JSThisNode(Symbol identifier)
+	{
+		this(identifier.getStart(), identifier.getEnd());
+	}
+
 	/**
 	 * JSThisNode
 	 * 

@@ -1,7 +1,19 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 public class JSStringNode extends JSPrimitiveNode
 {
+	/**
+	 * JSStringNode
+	 * 
+	 * @param identifier
+	 */
+	public JSStringNode(Symbol identifier)
+	{
+		this(identifier.getStart(), identifier.getEnd(), (String) identifier.value);
+	}
+	
 	/**
 	 * JSStringNode
 	 * 

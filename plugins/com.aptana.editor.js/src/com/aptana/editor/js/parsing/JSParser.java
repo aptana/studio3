@@ -349,38 +349,37 @@ public class JSParser extends Parser implements IParser {
 			{
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 			}
-			case 5: // FunctionDeclaration = FUNCTION.f IDENTIFIER.i FunctionParameters.p FunctionBody.b
+			case 5: // FunctionDeclaration = FUNCTION.keyword IDENTIFIER.ident FunctionParameters.params FunctionBody.body
 			{
-					final Symbol f = _symbols[offset + 1];
-					final Symbol _symbol_i = _symbols[offset + 2];
-					final String i = (String) _symbol_i.value;
-					final Symbol _symbol_p = _symbols[offset + 3];
-					final JSNode p = (JSNode) _symbol_p.value;
-					final Symbol _symbol_b = _symbols[offset + 4];
-					final JSNode b = (JSNode) _symbol_b.value;
+					final Symbol keyword = _symbols[offset + 1];
+					final Symbol ident = _symbols[offset + 2];
+					final Symbol _symbol_params = _symbols[offset + 3];
+					final JSNode params = (JSNode) _symbol_params.value;
+					final Symbol _symbol_body = _symbols[offset + 4];
+					final JSNode body = (JSNode) _symbol_body.value;
 					
 			return new JSFunctionNode(
-				f.getStart(),
-				b.getEnd(),
-				new JSIdentifierNode(_symbol_i.getStart(), _symbol_i.getEnd(), i),
-				p,
-				b
+				keyword.getStart(),
+				body.getEnd(),
+				new JSIdentifierNode(ident),
+				params,
+				body
 			);
 			}
-			case 6: // FunctionExpression = FUNCTION.f FunctionParameters.p FunctionBody.b
+			case 6: // FunctionExpression = FUNCTION.keyword FunctionParameters.params FunctionBody.body
 			{
-					final Symbol f = _symbols[offset + 1];
-					final Symbol _symbol_p = _symbols[offset + 2];
-					final JSNode p = (JSNode) _symbol_p.value;
-					final Symbol _symbol_b = _symbols[offset + 3];
-					final JSNode b = (JSNode) _symbol_b.value;
+					final Symbol keyword = _symbols[offset + 1];
+					final Symbol _symbol_params = _symbols[offset + 2];
+					final JSNode params = (JSNode) _symbol_params.value;
+					final Symbol _symbol_body = _symbols[offset + 3];
+					final JSNode body = (JSNode) _symbol_body.value;
 					
 			return new JSFunctionNode(
-				f.getStart(),
-				b.getEnd(),
+				keyword.getStart(),
+				body.getEnd(),
 				new JSNode(),
-				p,
-				b
+				params,
+				body
 			);
 			}
 			case 8: // FunctionParameters = LPAREN.l RPAREN.r
@@ -390,35 +389,33 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSParametersNode(l.getStart(), r.getEnd());
 			}
-			case 9: // FunctionParameters = LPAREN.l FormalParameterList.p RPAREN.r
+			case 9: // FunctionParameters = LPAREN.l FormalParameterList.params RPAREN.r
 			{
 					final Symbol l = _symbols[offset + 1];
-					final Symbol _symbol_p = _symbols[offset + 2];
-					final JSNode p = (JSNode) _symbol_p.value;
+					final Symbol _symbol_params = _symbols[offset + 2];
+					final JSNode params = (JSNode) _symbol_params.value;
 					final Symbol r = _symbols[offset + 3];
 					
-			p.setLocation(l.getStart(), r.getEnd());
-			return p;
+			params.setLocation(l.getStart(), r.getEnd());
+			return params;
 			}
-			case 10: // FormalParameterList = FormalParameterList.p COMMA IDENTIFIER.i
+			case 10: // FormalParameterList = FormalParameterList.list COMMA IDENTIFIER.ident
 			{
-					final Symbol _symbol_p = _symbols[offset + 1];
-					final JSNode p = (JSNode) _symbol_p.value;
-					final Symbol _symbol_i = _symbols[offset + 3];
-					final String i = (String) _symbol_i.value;
+					final Symbol _symbol_list = _symbols[offset + 1];
+					final JSNode list = (JSNode) _symbol_list.value;
+					final Symbol ident = _symbols[offset + 3];
 					
-			JSNode node = new JSIdentifierNode(_symbol_i.getStart(), _symbol_i.getEnd(), i);
-			p.addChild(node);
-			p.setLocation(p.getStart(), node.getEnd());
-			return p;
+			JSNode identifier = new JSIdentifierNode(ident);
+			list.addChild(identifier);
+			list.setLocation(list.getStart(), identifier.getEnd());
+			return list;
 			}
-			case 11: // FormalParameterList = IDENTIFIER.i
+			case 11: // FormalParameterList = IDENTIFIER.ident
 			{
-					final Symbol _symbol_i = _symbols[offset + 1];
-					final String i = (String) _symbol_i.value;
+					final Symbol ident = _symbols[offset + 1];
 					
-			JSNode node = new JSIdentifierNode(_symbol_i.getStart(), _symbol_i.getEnd(), i);
-			return new JSParametersNode(node.getStart(), node.getEnd(), node);
+			JSNode identifier = new JSIdentifierNode(ident);
+			return new JSParametersNode(identifier.getStart(), identifier.getEnd(), identifier);
 			}
 			case 12: // FunctionBody = LCURLY.l RCURLY.r
 			{
@@ -546,39 +543,35 @@ public class JSParser extends Parser implements IParser {
 			}
 			case 54: // VariableDeclaration = IDENTIFIER.i
 			{
-					final Symbol _symbol_i = _symbols[offset + 1];
-					final String i = (String) _symbol_i.value;
+					final Symbol i = _symbols[offset + 1];
 					
-			JSNode id = new JSIdentifierNode(_symbol_i.getStart(), _symbol_i.getEnd(), i);
-			return new JSDeclarationNode(_symbol_i.getStart(), _symbol_i.getEnd(), id, new JSNode());
+			JSNode id = new JSIdentifierNode(i);
+			return new JSDeclarationNode(i.getStart(), i.getEnd(), id, new JSNode());
 			}
 			case 55: // VariableDeclaration = IDENTIFIER.i EQUAL AssignmentExpression.e
 			{
-					final Symbol _symbol_i = _symbols[offset + 1];
-					final String i = (String) _symbol_i.value;
+					final Symbol i = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 3];
 					final JSNode e = (JSNode) _symbol_e.value;
 					
-			JSNode id = new JSIdentifierNode(_symbol_i.getStart(), _symbol_i.getEnd(), i);
-			return new JSDeclarationNode(_symbol_i.getStart(), e.getEnd(), id, e);
+			JSNode id = new JSIdentifierNode(i);
+			return new JSDeclarationNode(i.getStart(), e.getEnd(), id, e);
 			}
 			case 56: // VariableDeclaration_NoIn = IDENTIFIER.i
 			{
-					final Symbol _symbol_i = _symbols[offset + 1];
-					final String i = (String) _symbol_i.value;
+					final Symbol i = _symbols[offset + 1];
 					
-			JSNode id = new JSIdentifierNode(_symbol_i.getStart(), _symbol_i.getEnd(), i);
-			return new JSDeclarationNode(_symbol_i.getStart(), _symbol_i.getEnd(), id, new JSNode());
+			JSNode id = new JSIdentifierNode(i);
+			return new JSDeclarationNode(i.getStart(), i.getEnd(), id, new JSNode());
 			}
 			case 57: // VariableDeclaration_NoIn = IDENTIFIER.i EQUAL AssignmentExpression_NoIn.e
 			{
-					final Symbol _symbol_i = _symbols[offset + 1];
-					final String i = (String) _symbol_i.value;
+					final Symbol i = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 3];
 					final JSNode e = (JSNode) _symbol_e.value;
 					
-			JSNode id = new JSIdentifierNode(_symbol_i.getStart(), _symbol_i.getEnd(), i);
-			return new JSDeclarationNode(_symbol_i.getStart(), e.getEnd(), id, e);
+			JSNode id = new JSIdentifierNode(i);
+			return new JSDeclarationNode(i.getStart(), e.getEnd(), id, e);
 			}
 			case 58: // IfStatement = IF.i LPAREN Expression.e RPAREN Statement_NoIf.sn ELSE Statement.s
 			{
@@ -1010,11 +1003,10 @@ public class JSParser extends Parser implements IParser {
 			case 94: // ContinueStatement = CONTINUE.c IDENTIFIER.i SEMICOLON.s
 			{
 					final Symbol c = _symbols[offset + 1];
-					final Symbol _symbol_i = _symbols[offset + 2];
-					final String i = (String) _symbol_i.value;
+					final Symbol i = _symbols[offset + 2];
 					final Symbol s = _symbols[offset + 3];
 					
-			JSNode node = new JSContinueNode(c.getStart(), s.getEnd(), i);
+			JSNode node = new JSContinueNode(c.getStart(), s.getEnd(), (String) i.value);
 			node.setSemicolonIncluded(true);
 			return node;
 			}
@@ -1030,11 +1022,10 @@ public class JSParser extends Parser implements IParser {
 			case 96: // BreakStatement = BREAK.b IDENTIFIER.i SEMICOLON.s
 			{
 					final Symbol b = _symbols[offset + 1];
-					final Symbol _symbol_i = _symbols[offset + 2];
-					final String i = (String) _symbol_i.value;
+					final Symbol i = _symbols[offset + 2];
 					final Symbol s = _symbols[offset + 3];
 					
-			JSNode node = new JSBreakNode(b.getStart(), s.getEnd(), i);
+			JSNode node = new JSBreakNode(b.getStart(), s.getEnd(), (String) i.value);
 			node.setSemicolonIncluded(true);
 			return node;
 			}
@@ -1237,23 +1228,21 @@ public class JSParser extends Parser implements IParser {
 			}
 			case 113: // LabelledStatement = IDENTIFIER.i COLON Statement.s
 			{
-					final Symbol _symbol_i = _symbols[offset + 1];
-					final String i = (String) _symbol_i.value;
+					final Symbol i = _symbols[offset + 1];
 					final Symbol _symbol_s = _symbols[offset + 3];
 					final JSNode s = (JSNode) _symbol_s.value;
 					
-			JSNode id = new JSIdentifierNode(_symbol_i.getStart(), _symbol_i.getEnd(), i);
-			return new JSLabelledNode(_symbol_i.getStart(), s.getEnd(), id, s);
+			JSNode id = new JSIdentifierNode(i);
+			return new JSLabelledNode(i.getStart(), s.getEnd(), id, s);
 			}
 			case 114: // LabelledStatement_NoIf = IDENTIFIER.i COLON Statement_NoIf.s
 			{
-					final Symbol _symbol_i = _symbols[offset + 1];
-					final String i = (String) _symbol_i.value;
+					final Symbol i = _symbols[offset + 1];
 					final Symbol _symbol_s = _symbols[offset + 3];
 					final JSNode s = (JSNode) _symbol_s.value;
 					
-			JSNode id = new JSIdentifierNode(_symbol_i.getStart(), _symbol_i.getEnd(), i);
-			return new JSLabelledNode(_symbol_i.getStart(), s.getEnd(), id, s);
+			JSNode id = new JSIdentifierNode(i);
+			return new JSLabelledNode(i.getStart(), s.getEnd(), id, s);
 			}
 			case 115: // ThrowStatement = THROW.t Expression.e SEMICOLON.s
 			{
@@ -1301,12 +1290,11 @@ public class JSParser extends Parser implements IParser {
 			case 119: // Catch = CATCH.c LPAREN IDENTIFIER.i RPAREN Block.b
 			{
 					final Symbol c = _symbols[offset + 1];
-					final Symbol _symbol_i = _symbols[offset + 3];
-					final String i = (String) _symbol_i.value;
+					final Symbol i = _symbols[offset + 3];
 					final Symbol _symbol_b = _symbols[offset + 5];
 					final JSNode b = (JSNode) _symbol_b.value;
 					
-			JSNode id = new JSIdentifierNode(_symbol_i.getStart(), _symbol_i.getEnd(), i);
+			JSNode id = new JSIdentifierNode(i);
 			return new JSCatchNode(c.getStart(), b.getEnd(), id, b);
 			}
 			case 120: // Finally = FINALLY.f Block.b
@@ -1321,14 +1309,13 @@ public class JSParser extends Parser implements IParser {
 			{
 					final Symbol t = _symbols[offset + 1];
 					
-			return new JSThisNode(t.getStart(), t.getEnd());
+			return new JSThisNode(t);
 			}
 			case 124: // PrimaryExpression_NoLBF = IDENTIFIER.i
 			{
-					final Symbol _symbol_i = _symbols[offset + 1];
-					final String i = (String) _symbol_i.value;
+					final Symbol i = _symbols[offset + 1];
 					
-			return new JSIdentifierNode(_symbol_i.getStart(), _symbol_i.getEnd(), i);
+			return new JSIdentifierNode(i);
 			}
 			case 127: // PrimaryExpression_NoLBF = LPAREN.l Expression.e RPAREN.r
 			{
@@ -1474,24 +1461,21 @@ public class JSParser extends Parser implements IParser {
 			}
 			case 144: // PropertyName = IDENTIFIER.i
 			{
-					final Symbol _symbol_i = _symbols[offset + 1];
-					final String i = (String) _symbol_i.value;
+					final Symbol i = _symbols[offset + 1];
 					
-			return new JSIdentifierNode(_symbol_i.getStart(), _symbol_i.getEnd(), i);
+			return new JSIdentifierNode(i);
 			}
 			case 145: // PropertyName = STRING.s
 			{
-					final Symbol _symbol_s = _symbols[offset + 1];
-					final String s = (String) _symbol_s.value;
+					final Symbol s = _symbols[offset + 1];
 					
-			return new JSStringNode(_symbol_s.getStart(), _symbol_s.getEnd(), s);
+			return new JSStringNode(s);
 			}
 			case 146: // PropertyName = NUMBER.n
 			{
-					final Symbol _symbol_n = _symbols[offset + 1];
-					final String n = (String) _symbol_n.value;
+					final Symbol n = _symbols[offset + 1];
 					
-			return new JSNumberNode(_symbol_n.getStart(), _symbol_n.getEnd(), n);
+			return new JSNumberNode(n);
 			}
 			case 149: // MemberExpression = MemberExpression.l LBRACKET Expression.r RBRACKET
 			{
@@ -1506,10 +1490,9 @@ public class JSParser extends Parser implements IParser {
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
-					final Symbol _symbol_r = _symbols[offset + 3];
-					final String r = (String) _symbol_r.value;
+					final Symbol r = _symbols[offset + 3];
 					
-			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(_symbol_r.getStart(), _symbol_r.getEnd(), r));
+			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(r));
 			}
 			case 151: // MemberExpression = NEW.l MemberExpression.e Arguments.a
 			{
@@ -1534,10 +1517,9 @@ public class JSParser extends Parser implements IParser {
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
-					final Symbol _symbol_r = _symbols[offset + 3];
-					final String r = (String) _symbol_r.value;
+					final Symbol r = _symbols[offset + 3];
 					
-			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(_symbol_r.getStart(), _symbol_r.getEnd(), r));
+			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(r));
 			}
 			case 155: // MemberExpression_NoLBF = NEW.l MemberExpression.e Arguments.a
 			{
@@ -1596,10 +1578,9 @@ public class JSParser extends Parser implements IParser {
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
-					final Symbol _symbol_r = _symbols[offset + 3];
-					final String r = (String) _symbol_r.value;
+					final Symbol r = _symbols[offset + 3];
 					
-			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(_symbol_r.getStart(), _symbol_r.getEnd(), r));
+			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(r));
 			}
 			case 164: // CallExpression_NoLBF = MemberExpression_NoLBF.l Arguments.r
 			{
@@ -1632,10 +1613,9 @@ public class JSParser extends Parser implements IParser {
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
-					final Symbol _symbol_r = _symbols[offset + 3];
-					final String r = (String) _symbol_r.value;
+					final Symbol r = _symbols[offset + 3];
 					
-			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(_symbol_r.getStart(), _symbol_r.getEnd(), r));
+			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(r));
 			}
 			case 168: // Arguments = LPAREN.l RPAREN.r
 			{
@@ -2077,40 +2057,37 @@ public class JSParser extends Parser implements IParser {
 			{
 					final Symbol n = _symbols[offset + 1];
 					
-			return new JSNullNode(n.getStart(), n.getEnd());
+			return new JSNullNode(n);
 			}
 			case 299: // Literal = TRUE.t
 			{
 					final Symbol t = _symbols[offset + 1];
 					
-			return new JSTrueNode(t.getStart(), t.getEnd());
+			return new JSTrueNode(t);
 			}
 			case 300: // Literal = FALSE.f
 			{
 					final Symbol f = _symbols[offset + 1];
 					
-			return new JSFalseNode(f.getStart(), f.getEnd());
+			return new JSFalseNode(f);
 			}
 			case 301: // Literal = NUMBER.n
 			{
-					final Symbol _symbol_n = _symbols[offset + 1];
-					final String n = (String) _symbol_n.value;
+					final Symbol n = _symbols[offset + 1];
 					
-			return new JSNumberNode(_symbol_n.getStart(), _symbol_n.getEnd(), n);
+			return new JSNumberNode(n);
 			}
 			case 302: // Literal = STRING.s
 			{
-					final Symbol _symbol_s = _symbols[offset + 1];
-					final String s = (String) _symbol_s.value;
+					final Symbol s = _symbols[offset + 1];
 					
-			return new JSStringNode(_symbol_s.getStart(), _symbol_s.getEnd(), s);
+			return new JSStringNode(s);
 			}
 			case 303: // Literal = REGEX.r
 			{
-					final Symbol _symbol_r = _symbols[offset + 1];
-					final String r = (String) _symbol_r.value;
+					final Symbol r = _symbols[offset + 1];
 					
-			return new JSRegexNode(_symbol_r.getStart(), _symbol_r.getEnd(), r);
+			return new JSRegexNode(r);
 			}
 			case 4: // SourceElement = Statement
 			case 7: // FunctionExpression = FunctionDeclaration
