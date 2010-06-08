@@ -271,6 +271,35 @@ public abstract class CommonConnectionTest extends TestCase
 		assertEquals(0, fi.getLength());
 	}
 
+	public final void testCreateEmptyDotFile() throws CoreException, IOException
+	{
+		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/.emptyfile.txt")); //$NON-NLS-1$
+		assertNotNull(fs);
+		IFileInfo fi = fs.fetchInfo();
+		assertNotNull(fi);
+		assertFalse(fi.exists());
+		assertEquals(".emptyfile.txt", fi.getName()); //$NON-NLS-1$
+		try
+		{
+			OutputStream out = fs.openOutputStream(EFS.NONE, null);
+			out.close();
+		}
+		catch (CoreException e)
+		{
+			assertEquals(FileNotFoundException.class, e.getCause().getClass());
+			assertEquals(
+					testPath.append(".emptyfile.txt").toPortableString(), ((FileNotFoundException) e.getCause()).getMessage()); //$NON-NLS-1$
+			fi = fs.fetchInfo();
+			assertNotNull(fi);
+			assertFalse(fi.exists());
+			return;
+		}
+		fi = fs.fetchInfo();
+		assertNotNull(fi);
+		assertTrue(fi.exists());
+		assertEquals(0, fi.getLength());
+	}
+
 	public final void testCreateEmptyFileRecursive() throws CoreException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/nonexisting/emptyfile.txt")); //$NON-NLS-1$

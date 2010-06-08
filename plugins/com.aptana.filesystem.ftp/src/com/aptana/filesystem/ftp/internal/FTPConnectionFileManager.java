@@ -788,7 +788,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 			} else if (e instanceof FileNotFoundException) {
 				throw (FileNotFoundException) e;
 			}
-			throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_opening_file_failed, e));			
+			throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_opening_file_read_failed, e));			
 		} finally {
 			monitor.done();
 		}
@@ -825,8 +825,12 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 				throw (OperationCanceledException) e;
 			} else if (e instanceof FileNotFoundException) {
 				throw (FileNotFoundException) e;
+			} else if (e instanceof FTPException) {
+				if (((FTPException)e).getReplyCode() == 553) {
+					throw (FileNotFoundException) new FileNotFoundException(path.toPortableString()).initCause(e);
+				}
 			}
-			throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_opening_file_failed, e));			
+			throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_opening_file_write_failed, e));			
 		} finally {
 			monitor.done();
 		}
