@@ -189,7 +189,7 @@ public class VirtualFileSyncPair
 		
 		if(this._destinationFileInfo != null)
 		{
-			return this._sourceFileInfo;
+			return this._destinationFileInfo;
 		}
 		this._destinationFileInfo = _destinationFile.fetchInfo(IExtendedFileStore.DETAILED, monitor);
 		return this._destinationFileInfo;

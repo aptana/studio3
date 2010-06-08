@@ -1510,7 +1510,7 @@ public class Synchronizer implements ILoggable
 
 	private void logDebug(String message)
 	{
-		log(message);
+		//log(message);
 	}
 
 	private void logError(Exception e)
@@ -1518,7 +1518,7 @@ public class Synchronizer implements ILoggable
 		if (this.logger != null)
 		{
 			if(e.getCause() != null) {
-				log(StringUtil.format(Messages.Synchronizer_Error, e.getCause().getLocalizedMessage()));
+				log(StringUtil.format(Messages.Synchronizer_Error, e.getLocalizedMessage() + " (" + e.getCause().getLocalizedMessage() + ")"));
 			}
 			else {
 				log(StringUtil.format(Messages.Synchronizer_Error, e.getLocalizedMessage()));				
