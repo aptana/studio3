@@ -9,7 +9,7 @@ public class JSWhileNode extends JSNode
 	 * @param end
 	 * @param children
 	 */
-	public JSWhileNode(int start, int end, JSNode ... children)
+	public JSWhileNode(int start, int end, JSNode... children)
 	{
 		super(JSNodeTypes.WHILE, start, end, children);
 	}

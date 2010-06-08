@@ -14,7 +14,7 @@ public class JSFunctionNode extends JSNode
 	 * @param start
 	 * @param end
 	 */
-	public JSFunctionNode(int start, int end, JSNode ... children)
+	public JSFunctionNode(int start, int end, JSNode... children)
 	{
 		super(JSNodeTypes.FUNCTION, start, end, children);
 	}
@@ -28,15 +28,15 @@ public class JSFunctionNode extends JSNode
 	{
 		IParseNode[] result = NO_CHILDREN;
 		IParseNode argsNode = this.getChild(1);
-		
+
 		if (argsNode != null && argsNode.getType() == JSNodeTypes.PARAMETERS)
 		{
 			result = argsNode.getChildren();
 		}
-		
+
 		return result;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.ParseBaseNode#getAttributes()
@@ -44,12 +44,11 @@ public class JSFunctionNode extends JSNode
 	public IParseNodeAttribute[] getAttributes()
 	{
 		String name = getName();
-		
+
 		if (name != null && name.length() > 0)
 		{
 			// TODO: possibly cache this
-			return new IParseNodeAttribute[] {
-				new ParseNodeAttribute(this, "name", name) //$NON-NLS-1$
+			return new IParseNodeAttribute[] { new ParseNodeAttribute(this, "name", name) //$NON-NLS-1$
 			};
 		}
 		else
@@ -57,7 +56,7 @@ public class JSFunctionNode extends JSNode
 			return ParseBaseNode.NO_ATTRIBUTES;
 		}
 	}
-	
+
 	/**
 	 * getBody
 	 * 
@@ -67,7 +66,7 @@ public class JSFunctionNode extends JSNode
 	{
 		return this.getChild(2);
 	}
-	
+
 	/**
 	 * getName
 	 * 

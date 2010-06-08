@@ -8,7 +8,7 @@ public class JSObjectNode extends JSNaryNode
 	 * @param start
 	 * @param end
 	 */
-	public JSObjectNode(int start, int end, JSNode ... children)
+	public JSObjectNode(int start, int end, JSNode... children)
 	{
 		super(JSNodeTypes.OBJECT_LITERAL, start, end, children);
 	}

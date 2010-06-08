@@ -9,7 +9,7 @@ public class JSDoNode extends JSNode
 	 * @param end
 	 * @param children
 	 */
-	public JSDoNode(int start, int end, JSNode ... children)
+	public JSDoNode(int start, int end, JSNode... children)
 	{
 		super(JSNodeTypes.DO, start, end, children);
 	}

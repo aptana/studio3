@@ -8,7 +8,7 @@ public class JSParametersNode extends JSNaryNode
 	 * @param start
 	 * @param end
 	 */
-	public JSParametersNode(int start, int end, JSNode ... children)
+	public JSParametersNode(int start, int end, JSNode... children)
 	{
 		super(JSNodeTypes.PARAMETERS, start, end, children);
 	}

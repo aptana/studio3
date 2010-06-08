@@ -9,7 +9,7 @@ public class JSForNode extends JSNode
 	 * @param end
 	 * @param children
 	 */
-	public JSForNode(int start, int end, JSNode ... children)
+	public JSForNode(int start, int end, JSNode... children)
 	{
 		super(JSNodeTypes.FOR, start, end, children);
 	}

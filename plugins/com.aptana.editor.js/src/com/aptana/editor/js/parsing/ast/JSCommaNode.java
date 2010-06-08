@@ -8,7 +8,7 @@ public class JSCommaNode extends JSNaryNode
 	 * @param start
 	 * @param end
 	 */
-	public JSCommaNode(int start, int end, JSNode ... children)
+	public JSCommaNode(int start, int end, JSNode... children)
 	{
 		super(JSNodeTypes.COMMA, start, end, children);
 	}

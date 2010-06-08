@@ -9,7 +9,7 @@ public class JSFinallyNode extends JSNode
 	 * @param end
 	 * @param children
 	 */
-	public JSFinallyNode(int start, int end, JSNode ... children)
+	public JSFinallyNode(int start, int end, JSNode... children)
 	{
 		super(JSNodeTypes.FINALLY, start, end, children);
 	}

@@ -13,7 +13,7 @@ public class JSNaryAndExpressionNode extends JSNaryNode
 	 * @param expression
 	 * @param statements
 	 */
-	public JSNaryAndExpressionNode(short type, int start, int end, JSNode ... children)
+	public JSNaryAndExpressionNode(short type, int start, int end, JSNode... children)
 	{
 		super(type, start, end, children);
 	}

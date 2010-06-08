@@ -4,6 +4,19 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class JSNaryNode extends JSNode
 {
+	private static void appendText(StringBuilder text, IParseNode[] children)
+	{
+		int count = children.length;
+		for (int i = 0; i < count; ++i)
+		{
+			text.append(children[i]);
+			if (i < count - 1)
+			{
+				text.append(", "); //$NON-NLS-1$
+			}
+		}
+	}
+
 	/**
 	 * JSNaryNode
 	 * 
@@ -12,7 +25,7 @@ public class JSNaryNode extends JSNode
 	 * @param end
 	 * @param children
 	 */
-	public JSNaryNode(short type, int start, int end, JSNode ... children)
+	public JSNaryNode(short type, int start, int end, JSNode... children)
 	{
 		super(type, start, end, children);
 	}
@@ -68,18 +81,5 @@ public class JSNaryNode extends JSNode
 		}
 
 		return appendSemicolon(text.toString());
-	}
-
-	private static void appendText(StringBuilder text, IParseNode[] children)
-	{
-		int count = children.length;
-		for (int i = 0; i < count; ++i)
-		{
-			text.append(children[i]);
-			if (i < count - 1)
-			{
-				text.append(", "); //$NON-NLS-1$
-			}
-		}
 	}
 }

@@ -8,7 +8,7 @@ public class JSArrayNode extends JSNaryNode
 	 * @param start
 	 * @param end
 	 */
-	public JSArrayNode(int start, int end, JSNode ... children)
+	public JSArrayNode(int start, int end, JSNode... children)
 	{
 		super(JSNodeTypes.ARRAY_LITERAL, start, end, children);
 	}

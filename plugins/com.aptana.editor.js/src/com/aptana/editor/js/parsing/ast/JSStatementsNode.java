@@ -8,7 +8,7 @@ public class JSStatementsNode extends JSNaryNode
 	 * @param start
 	 * @param end
 	 */
-	public JSStatementsNode(int start, int end, JSNode ... children)
+	public JSStatementsNode(int start, int end, JSNode... children)
 	{
 		super(JSNodeTypes.STATEMENTS, start, end, children);
 	}

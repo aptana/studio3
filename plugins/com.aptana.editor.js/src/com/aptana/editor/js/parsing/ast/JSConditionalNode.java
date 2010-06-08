@@ -9,7 +9,7 @@ public class JSConditionalNode extends JSNode
 	 * @param end
 	 * @param children
 	 */
-	public JSConditionalNode(int start, int end, JSNode ... children)
+	public JSConditionalNode(int start, int end, JSNode... children)
 	{
 		super(JSNodeTypes.CONDITIONAL, start, end, children);
 	}

@@ -12,7 +12,7 @@ public class JSBreakNode extends JSLabelStatementNode
 	{
 		super(JSNodeTypes.BREAK, start, end);
 	}
-	
+
 	/**
 	 * JSBreakNode
 	 * 

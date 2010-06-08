@@ -20,6 +20,20 @@ public class JSUnaryOperatorNode extends JSNode
 	/**
 	 * JSUnaryOperatorNode
 	 * 
+	 * @param type
+	 * @param start
+	 * @param end
+	 * @param expression
+	 */
+	public JSUnaryOperatorNode(short type, int start, int end, JSNode expression)
+	{
+		this(start, end, expression);
+		setType(type);
+	}
+
+	/**
+	 * JSUnaryOperatorNode
+	 * 
 	 * @param operator
 	 * @param start
 	 * @param end
@@ -61,20 +75,6 @@ public class JSUnaryOperatorNode extends JSNode
 				type = JSNodeTypes.VOID;
 				break;
 		}
-		setType(type);
-	}
-
-	/**
-	 * JSUnaryOperatorNode
-	 * 
-	 * @param type
-	 * @param start
-	 * @param end
-	 * @param expression
-	 */
-	public JSUnaryOperatorNode(short type, int start, int end, JSNode expression)
-	{
-		this(start, end, expression);
 		setType(type);
 	}
 

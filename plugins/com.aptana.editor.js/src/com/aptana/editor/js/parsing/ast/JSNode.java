@@ -62,7 +62,7 @@ public class JSNode extends ParseBaseNode
 	 * @param end
 	 * @param children
 	 */
-	public JSNode(short type, int start, int end, JSNode ... children)
+	public JSNode(short type, int start, int end, JSNode... children)
 	{
 		super(IJSParserConstants.LANGUAGE);
 		fType = type;
@@ -109,7 +109,7 @@ public class JSNode extends ParseBaseNode
 	public String getElementName()
 	{
 		String result = typeNameMap.get(this.getType());
-		
+
 		return (result == null) ? super.getElementName() : result;
 	}
 

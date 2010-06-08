@@ -9,7 +9,7 @@ public class JSNameValuePairNode extends JSNode
 	 * @param end
 	 * @param children
 	 */
-	public JSNameValuePairNode(int start, int end, JSNode ... children)
+	public JSNameValuePairNode(int start, int end, JSNode... children)
 	{
 		super(JSNodeTypes.NAME_VALUE_PAIR, start, end, children);
 	}

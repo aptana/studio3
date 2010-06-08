@@ -14,7 +14,7 @@ public class JSParseRootNode extends ParseRootNode
 	{
 		this(new Symbol[0], 0, 0);
 	}
-	
+
 	/**
 	 * JSParseRootNode
 	 * 

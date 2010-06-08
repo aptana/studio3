@@ -8,8 +8,8 @@ public class JSThisNode extends JSPrimitiveNode
 	 * @param start
 	 * @param end
 	 */
-	public JSThisNode(String text, int start, int end)
+	public JSThisNode(int start, int end)
 	{
-		super(JSNodeTypes.THIS, text, start, end);
+		super(JSNodeTypes.THIS, start, end, "this");
 	}
 }

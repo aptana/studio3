@@ -8,7 +8,7 @@ public class JSVarNode extends JSNaryNode
 	 * @param start
 	 * @param end
 	 */
-	public JSVarNode(int start, int end, JSNode ... children)
+	public JSVarNode(int start, int end, JSNode... children)
 	{
 		super(JSNodeTypes.VAR, start, end, children);
 	}

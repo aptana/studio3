@@ -9,7 +9,7 @@ public class JSIfNode extends JSNode
 	 * @param end
 	 * @param children
 	 */
-	public JSIfNode(int start, int end, JSNode ... children)
+	public JSIfNode(int start, int end, JSNode... children)
 	{
 		super(JSNodeTypes.IF, start, end, children);
 	}

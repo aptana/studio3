@@ -5,12 +5,12 @@ public class JSNumberNode extends JSPrimitiveNode
 	/**
 	 * JSNumberNode
 	 * 
-	 * @param text
 	 * @param start
 	 * @param end
+	 * @param text
 	 */
-	public JSNumberNode(String text, int start, int end)
+	public JSNumberNode(int start, int end, String text)
 	{
-		super(JSNodeTypes.NUMBER, text, start, end);
+		super(JSNodeTypes.NUMBER, start, end, text);
 	}
 }

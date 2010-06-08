@@ -8,7 +8,7 @@ public class JSElementsNode extends JSNaryNode
 	 * @param start
 	 * @param end
 	 */
-	public JSElementsNode(int start, int end, JSNode ... children)
+	public JSElementsNode(int start, int end, JSNode... children)
 	{
 		super(JSNodeTypes.ELEMENTS, start, end, children);
 	}

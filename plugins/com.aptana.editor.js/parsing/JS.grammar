@@ -256,7 +256,7 @@ FunctionDeclaration
 			return new JSFunctionNode(
 				f.getStart(),
 				b.getEnd(),
-				new JSIdentifierNode(i, _symbol_i.getStart(), _symbol_i.getEnd()),
+				new JSIdentifierNode(_symbol_i.getStart(), _symbol_i.getEnd(), i),
 				p,
 				b
 			);
@@ -292,14 +292,14 @@ FunctionParameters
 FormalParameterList
 	=	FormalParameterList.p COMMA IDENTIFIER.i
 		{:
-			JSNode node = new JSIdentifierNode(i, _symbol_i.getStart(), _symbol_i.getEnd());
+			JSNode node = new JSIdentifierNode(_symbol_i.getStart(), _symbol_i.getEnd(), i);
 			p.addChild(node);
 			p.setLocation(p.getStart(), node.getEnd());
 			return p;
 		:}
 	|	IDENTIFIER.i
 		{:
-			JSNode node = new JSIdentifierNode(i, _symbol_i.getStart(), _symbol_i.getEnd());
+			JSNode node = new JSIdentifierNode(_symbol_i.getStart(), _symbol_i.getEnd(), i);
 			return new JSParametersNode(node.getStart(), node.getEnd(), node);
 		:}
 	;
@@ -414,12 +414,12 @@ VariableDeclarationList_NoIn
 VariableDeclaration
 	=	IDENTIFIER.i
 		{:
-			JSNode id = new JSIdentifierNode(i, _symbol_i.getStart(), _symbol_i.getEnd());
+			JSNode id = new JSIdentifierNode(_symbol_i.getStart(), _symbol_i.getEnd(), i);
 			return new JSDeclarationNode(_symbol_i.getStart(), _symbol_i.getEnd(), id, new JSNode());
 		:}
 	|	IDENTIFIER.i EQUAL AssignmentExpression.e
 		{:
-			JSNode id = new JSIdentifierNode(i, _symbol_i.getStart(), _symbol_i.getEnd());
+			JSNode id = new JSIdentifierNode(_symbol_i.getStart(), _symbol_i.getEnd(), i);
 			return new JSDeclarationNode(_symbol_i.getStart(), e.getEnd(), id, e);
 		:}
 	;
@@ -427,12 +427,12 @@ VariableDeclaration
 VariableDeclaration_NoIn
 	=	IDENTIFIER.i
 		{:
-			JSNode id = new JSIdentifierNode(i, _symbol_i.getStart(), _symbol_i.getEnd());
+			JSNode id = new JSIdentifierNode(_symbol_i.getStart(), _symbol_i.getEnd(), i);
 			return new JSDeclarationNode(_symbol_i.getStart(), _symbol_i.getEnd(), id, new JSNode());
 		:}
 	|	IDENTIFIER.i EQUAL AssignmentExpression_NoIn.e
 		{:
-			JSNode id = new JSIdentifierNode(i, _symbol_i.getStart(), _symbol_i.getEnd());
+			JSNode id = new JSIdentifierNode(_symbol_i.getStart(), _symbol_i.getEnd(), i);
 			return new JSDeclarationNode(_symbol_i.getStart(), e.getEnd(), id, e);
 		:}
 	;
@@ -745,7 +745,7 @@ DefaultClause
 LabelledStatement
 	=	IDENTIFIER.i COLON Statement.s
 		{:
-			JSNode id = new JSIdentifierNode(i, _symbol_i.getStart(), _symbol_i.getEnd());
+			JSNode id = new JSIdentifierNode(_symbol_i.getStart(), _symbol_i.getEnd(), i);
 			return new JSLabelledNode(_symbol_i.getStart(), s.getEnd(), id, s);
 		:}
 	;
@@ -753,7 +753,7 @@ LabelledStatement
 LabelledStatement_NoIf
 	=	IDENTIFIER.i COLON Statement_NoIf.s
 		{:
-			JSNode id = new JSIdentifierNode(i, _symbol_i.getStart(), _symbol_i.getEnd());
+			JSNode id = new JSIdentifierNode(_symbol_i.getStart(), _symbol_i.getEnd(), i);
 			return new JSLabelledNode(_symbol_i.getStart(), s.getEnd(), id, s);
 		:}
 	;
@@ -785,7 +785,7 @@ TryStatement
 Catch
 	=	CATCH.c LPAREN IDENTIFIER.i RPAREN Block.b
 		{:
-			JSNode id = new JSIdentifierNode(i, _symbol_i.getStart(), _symbol_i.getEnd());
+			JSNode id = new JSIdentifierNode(_symbol_i.getStart(), _symbol_i.getEnd(), i);
 			return new JSCatchNode(c.getStart(), b.getEnd(), id, b);
 		:}
 	;
@@ -805,11 +805,11 @@ PrimaryExpression
 PrimaryExpression_NoLBF
 	=	THIS.t
 		{:
-			return new JSThisNode(t.value.toString(), t.getStart(), t.getEnd());
+			return new JSThisNode(t.getStart(), t.getEnd());
 		:}
-	|	IDENTIFIER.t
+	|	IDENTIFIER.i
 		{:
-			return new JSIdentifierNode(t, _symbol_t.getStart(), _symbol_t.getEnd());
+			return new JSIdentifierNode(_symbol_i.getStart(), _symbol_i.getEnd(), i);
 		:}
 	|	Literal
 	|	ArrayLiteral
@@ -834,7 +834,7 @@ ArrayLiteral
 		:}
 	|	LBRACKET.l ElementList.e COMMA RBRACKET.r
 		{:
-			return new JSArrayNode(l.getStart(), r.getEnd(), e, new JSNullNode("null", 0, 0));
+			return new JSArrayNode(l.getStart(), r.getEnd(), e, new JSNullNode(0, 0));
 		:}
 	|	LBRACKET.l ElementList.e COMMA Elision.n RBRACKET.r
 		{:
@@ -869,12 +869,12 @@ ElementList
 Elision
 	=	Elision.e COMMA
 		{:
-			e.addChild(new JSNullNode("null", 0, 0));
+			e.addChild(new JSNullNode(0, 0));
 			return e;
 		:}
 	|	COMMA
 		{:
-			return new JSElisionNode(0, 0, new JSNullNode("null", 0, 0), new JSNullNode("null", 0, 0));
+			return new JSElisionNode(0, 0, new JSNullNode(0, 0), new JSNullNode(0, 0));
 		:}
 	;
 
@@ -904,15 +904,15 @@ PropertyNameAndValue
 PropertyName
 	=	IDENTIFIER.i
 		{:
-			return new JSIdentifierNode(i, _symbol_i.getStart(), _symbol_i.getEnd());
+			return new JSIdentifierNode(_symbol_i.getStart(), _symbol_i.getEnd(), i);
 		:}
 	|	STRING.s
 		{:
-			return new JSStringNode(s, _symbol_s.getStart(), _symbol_s.getEnd());
+			return new JSStringNode(_symbol_s.getStart(), _symbol_s.getEnd(), s);
 		:}
 	|	NUMBER.n
 		{:
-			return new JSNumberNode(n, _symbol_n.getStart(), _symbol_n.getEnd());
+			return new JSNumberNode(_symbol_n.getStart(), _symbol_n.getEnd(), n);
 		:}
 	;
 
@@ -925,7 +925,7 @@ MemberExpression
 		:}
 	|	MemberExpression.l DOT IDENTIFIER.r
 		{:
-			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(r, _symbol_r.getStart(), _symbol_r.getEnd()));
+			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(_symbol_r.getStart(), _symbol_r.getEnd(), r));
 		:}
 	|	NEW.l MemberExpression.e Arguments.a
 		{:
@@ -941,7 +941,7 @@ MemberExpression_NoLBF
 		:}
 	|	MemberExpression_NoLBF.l DOT IDENTIFIER.r
 		{:
-			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(r, _symbol_r.getStart(), _symbol_r.getEnd()));
+			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(_symbol_r.getStart(), _symbol_r.getEnd(), r));
 		:}
 	|	NEW.l MemberExpression.e Arguments.a
 		{:
@@ -980,7 +980,7 @@ CallExpression
 		:}
 	|	CallExpression.l DOT IDENTIFIER.r
 		{:
-			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(r, _symbol_r.getStart(), _symbol_r.getEnd()));
+			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(_symbol_r.getStart(), _symbol_r.getEnd(), r));
 		:}
 	;
 
@@ -999,7 +999,7 @@ CallExpression_NoLBF
 		:}
 	|	CallExpression_NoLBF.l DOT IDENTIFIER.r
 		{:
-			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(r, _symbol_r.getStart(), _symbol_r.getEnd()));
+			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(_symbol_r.getStart(), _symbol_r.getEnd(), r));
 		:}
 	;
 
@@ -1421,26 +1421,26 @@ Expression_NoIn
 Literal
 	=	NULL.n
 		{:
-			return new JSNullNode(n.value.toString(), n.getStart(), n.getEnd());
+			return new JSNullNode(n.getStart(), n.getEnd());
 		:}
 	|	TRUE.t
 		{:
-			return new JSTrueNode(t.value.toString(), t.getStart(), t.getEnd());
+			return new JSTrueNode(t.getStart(), t.getEnd());
 		:}
 	|	FALSE.f
 		{:
-			return new JSFalseNode(f.value.toString(), f.getStart(), f.getEnd());
+			return new JSFalseNode(f.getStart(), f.getEnd());
 		:}
 	|	NUMBER.n
 		{:
-			return new JSNumberNode(n, _symbol_n.getStart(), _symbol_n.getEnd());
+			return new JSNumberNode(_symbol_n.getStart(), _symbol_n.getEnd(), n);
 		:}
 	|	STRING.s
 		{:
-			return new JSStringNode(s, _symbol_s.getStart(), _symbol_s.getEnd());
+			return new JSStringNode(_symbol_s.getStart(), _symbol_s.getEnd(), s);
 		:}
 	|	REGEX.r
 		{:
-			return new JSRegexNode(r, _symbol_r.getStart(), _symbol_r.getEnd());
+			return new JSRegexNode(_symbol_r.getStart(), _symbol_r.getEnd(), r);
 		:}
 	;

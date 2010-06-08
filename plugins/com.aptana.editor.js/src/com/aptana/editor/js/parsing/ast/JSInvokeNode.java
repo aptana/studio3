@@ -9,7 +9,7 @@ public class JSInvokeNode extends JSNode
 	 * @param end
 	 * @param children
 	 */
-	public JSInvokeNode(int start, int end, JSNode ... children)
+	public JSInvokeNode(int start, int end, JSNode... children)
 	{
 		super(JSNodeTypes.INVOKE, start, end, children);
 	}

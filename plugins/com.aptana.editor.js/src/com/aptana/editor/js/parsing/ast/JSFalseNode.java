@@ -9,8 +9,8 @@ public class JSFalseNode extends JSPrimitiveNode
 	 * @param start
 	 * @param end
 	 */
-	public JSFalseNode(String text, int start, int end)
+	public JSFalseNode(int start, int end)
 	{
-		super(JSNodeTypes.FALSE, text, start, end);
+		super(JSNodeTypes.FALSE, start, end, "false");
 	}
 }

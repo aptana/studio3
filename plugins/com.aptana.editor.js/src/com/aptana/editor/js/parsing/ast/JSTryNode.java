@@ -9,7 +9,7 @@ public class JSTryNode extends JSNode
 	 * @param end
 	 * @param children
 	 */
-	public JSTryNode(int start, int end, JSNode ... children)
+	public JSTryNode(int start, int end, JSNode... children)
 	{
 		super(JSNodeTypes.TRY, start, end, children);
 	}

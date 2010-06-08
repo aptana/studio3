@@ -9,7 +9,7 @@ public class JSCatchNode extends JSNode
 	 * @param end
 	 * @param children
 	 */
-	public JSCatchNode(int start, int end, JSNode ... children)
+	public JSCatchNode(int start, int end, JSNode... children)
 	{
 		super(JSNodeTypes.CATCH, start, end, children);
 	}

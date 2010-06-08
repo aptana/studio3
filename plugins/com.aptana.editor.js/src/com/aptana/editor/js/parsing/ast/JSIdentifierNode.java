@@ -5,12 +5,12 @@ public class JSIdentifierNode extends JSPrimitiveNode
 	/**
 	 * JSIdentifierNode
 	 * 
-	 * @param text
 	 * @param start
 	 * @param end
+	 * @param text
 	 */
-	public JSIdentifierNode(String text, int start, int end)
+	public JSIdentifierNode(int start, int end, String text)
 	{
-		super(JSNodeTypes.IDENTIFIER, text, start, end);
+		super(JSNodeTypes.IDENTIFIER, start, end, text);
 	}
 }

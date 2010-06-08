@@ -5,12 +5,12 @@ public class JSRegexNode extends JSPrimitiveNode
 	/**
 	 * JSRegexNode
 	 * 
-	 * @param text
 	 * @param start
 	 * @param end
+	 * @param text
 	 */
-	public JSRegexNode(String text, int start, int end)
+	public JSRegexNode(int start, int end, String text)
 	{
-		super(JSNodeTypes.REGEX, text, start, end);
+		super(JSNodeTypes.REGEX, start, end, text);
 	}
 }

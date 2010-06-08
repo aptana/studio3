@@ -5,12 +5,12 @@ public class JSStringNode extends JSPrimitiveNode
 	/**
 	 * JSStringNode
 	 * 
-	 * @param text
 	 * @param start
 	 * @param end
+	 * @param text
 	 */
-	public JSStringNode(String text, int start, int end)
+	public JSStringNode(int start, int end, String text)
 	{
-		super(JSNodeTypes.STRING, text, start, end);
+		super(JSNodeTypes.STRING, start, end, text);
 	}
 }

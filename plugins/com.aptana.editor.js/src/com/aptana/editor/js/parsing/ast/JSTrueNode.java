@@ -5,12 +5,11 @@ public class JSTrueNode extends JSPrimitiveNode
 	/**
 	 * JSTrueNode
 	 * 
-	 * @param text
 	 * @param start
 	 * @param end
 	 */
-	public JSTrueNode(String text, int start, int end)
+	public JSTrueNode(int start, int end)
 	{
-		super(JSNodeTypes.TRUE, text, start, end);
+		super(JSNodeTypes.TRUE, start, end, "true");
 	}
 }

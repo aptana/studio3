@@ -12,7 +12,7 @@ public class JSContinueNode extends JSLabelStatementNode
 	{
 		super(JSNodeTypes.CONTINUE, start, end);
 	}
-	
+
 	/**
 	 * JSContinueNode
 	 * 

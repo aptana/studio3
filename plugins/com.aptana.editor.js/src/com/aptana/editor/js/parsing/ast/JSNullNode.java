@@ -5,12 +5,11 @@ public class JSNullNode extends JSPrimitiveNode
 	/**
 	 * JSNullNode
 	 * 
-	 * @param text
 	 * @param start
 	 * @param end
 	 */
-	public JSNullNode(String text, int start, int end)
+	public JSNullNode(int start, int end)
 	{
-		super(JSNodeTypes.NULL, text, start, end);
+		super(JSNodeTypes.NULL, start, end, "null");
 	}
 }

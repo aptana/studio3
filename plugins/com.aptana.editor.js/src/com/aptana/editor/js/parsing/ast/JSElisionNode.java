@@ -8,7 +8,7 @@ public class JSElisionNode extends JSNaryNode
 	 * @param start
 	 * @param end
 	 */
-	public JSElisionNode(int start, int end, JSNode ... children)
+	public JSElisionNode(int start, int end, JSNode... children)
 	{
 		super(JSNodeTypes.ELISION, start, end, children);
 	}
