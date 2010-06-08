@@ -264,7 +264,7 @@ public class SyncUtils {
 				}
 
 				parentDirs.add(0, currentFile); // add at beginning of list, as we want most "distant" folder first
-				currentFile = EFSUtils.getParentFile(currentFile);
+				currentFile = currentFile.getParent();
 			}
 		}
 

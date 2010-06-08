@@ -38,8 +38,12 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+
+import com.aptana.ide.core.io.vfs.IExtendedFileStore;
 
 
 /**
@@ -53,7 +57,9 @@ public class VirtualFileSyncPair
 
 	private String _relativePath;
 	private IFileStore _sourceFile;
+	private IFileInfo _sourceFileInfo = null;
 	private IFileStore _destinationFile;
+	private IFileInfo _destinationFileInfo = null;
 	private int _syncState;
 	private int _syncDirection = Direction_None;
 
@@ -81,6 +87,38 @@ public class VirtualFileSyncPair
 	public IFileStore getSourceFile()
 	{
 		return this._sourceFile;
+	}
+
+	/**
+	 * getSourceFileInfo
+	 * @return
+	 */
+	public IFileInfo getSourceFileInfo() {
+		try {
+			return getSourceFileInfo(null);
+		} catch (CoreException e) {
+			return null;
+		}
+	}
+
+	/**
+	 * getClientFileInfo
+	 * 
+	 * @return IVirtualFile
+	 * @throws CoreException 
+	 */
+	public IFileInfo getSourceFileInfo(IProgressMonitor monitor) throws CoreException
+	{
+		if(this._sourceFile == null) {
+			return null;
+		}
+		
+		if(this._sourceFileInfo != null)
+		{
+			return this._sourceFileInfo;
+		}
+		this._sourceFileInfo = _sourceFile.fetchInfo(IExtendedFileStore.DETAILED, monitor);
+		return this._sourceFileInfo;
 	}
 
 	/**
@@ -112,6 +150,7 @@ public class VirtualFileSyncPair
 	public void setSourceFile(IFileStore sourceFile)
 	{
 		this._sourceFile = sourceFile;
+		this._sourceFileInfo = null;
 	}
 
 	/**
@@ -122,6 +161,38 @@ public class VirtualFileSyncPair
 	public IFileStore getDestinationFile()
 	{
 		return this._destinationFile;
+	}
+
+	/**
+	 * getDestinationFileInfo
+	 * @return
+	 */
+	public IFileInfo getDestinationFileInfo() {
+		try {
+			return getDestinationFileInfo(null);
+		} catch (CoreException e) {
+			return null;
+		}
+	}
+	
+	/**
+	 * getDestinationFileInfo
+	 * 
+	 * @return IVirtualFile
+	 * @throws CoreException 
+	 */
+	public IFileInfo getDestinationFileInfo(IProgressMonitor monitor) throws CoreException
+	{
+		if(this._destinationFile == null) {
+			return null;
+		}
+		
+		if(this._destinationFileInfo != null)
+		{
+			return this._sourceFileInfo;
+		}
+		this._destinationFileInfo = _destinationFile.fetchInfo(IExtendedFileStore.DETAILED, monitor);
+		return this._destinationFileInfo;
 	}
 
 	/**
@@ -153,6 +224,7 @@ public class VirtualFileSyncPair
 	public void setDestinationFile(IFileStore destinationFile)
 	{
 		this._destinationFile = destinationFile;
+		this._destinationFileInfo = null;
 	}
 
 	/**

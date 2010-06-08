@@ -103,50 +103,11 @@ public abstract class SyncingTests extends TestCase
 		assertNotNull(clientDirectory);
 		clientDirectory.mkdir(EFS.NONE, null);
 
-		// if(!(clientManager instanceof LocalConnectionPoint)) {
-		// clientManager.disconnect(null);
-		// assertFalse(clientManager.isConnected());
-		// }
-
 		serverDirectory = serverManager.getRoot().getFileStore(new Path("/server" + System.currentTimeMillis()));
 		assertNotNull(serverDirectory);
 		serverDirectory.mkdir(EFS.NONE, null);
 
-		// if(!(serverManager instanceof LocalConnectionPoint)) {
-		// serverManager.disconnect(null);
-		// assertFalse(serverManager.isConnected());
-		// }
-
 		super.setUp();
-		// // we'll use the local file system to make the testing a bit easier
-		// LocalProtocolManager protocolManager = new LocalProtocolManager();
-		//
-		// // setup the client file manager
-		// clientManager = protocolManager.createFileManager();
-		//
-		// // setup the server file manager
-		// serverManager = protocolManager.createFileManager();
-		//
-		//		File baseTempFile = File.createTempFile(folderName, ".txt"); //$NON-NLS-1$ //$NON-NLS-2$
-		// File baseClientDirectory = baseTempFile.getParentFile();
-		// if (!baseTempFile.delete())
-		// { // remove the temp file...
-		// baseTempFile.deleteOnExit();
-		// }
-		//
-		//		clientDirectory = new File(baseClientDirectory.getAbsolutePath() + clientManager.getFileSeparator() + "client"); //$NON-NLS-1$
-		//		serverDirectory = new File(baseClientDirectory.getAbsolutePath() + clientManager.getFileSeparator() + "server"); //$NON-NLS-1$
-		//
-		// // make sure they don't exist first
-		// removeDirectory(clientDirectory);
-		// removeDirectory(serverDirectory);
-		//
-		// // then recreate them so we know they're empty
-		// clientDirectory.mkdir();
-		// serverDirectory.mkdir();
-		//
-		// clientManager.setBasePath(clientDirectory.getAbsolutePath());
-		// serverManager.setBasePath(serverDirectory.getAbsolutePath());
 
 	}
 

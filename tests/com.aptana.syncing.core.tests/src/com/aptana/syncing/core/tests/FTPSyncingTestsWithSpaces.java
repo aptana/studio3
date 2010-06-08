@@ -1,8 +1,6 @@
 package com.aptana.syncing.core.tests;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.util.Properties;
 
 import org.eclipse.core.runtime.Path;
 

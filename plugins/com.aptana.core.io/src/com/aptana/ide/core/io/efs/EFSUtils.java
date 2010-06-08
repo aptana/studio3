@@ -52,7 +52,6 @@ import org.eclipse.core.runtime.Path;
 
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.preferences.CloakingUtils;
-import com.aptana.ide.core.io.vfs.IExtendedFileStore;
 
 /**
  * @author Max Stepanov
@@ -80,9 +79,9 @@ public final class EFSUtils {
 	 * @param clientFile
 	 * @throws CoreException
 	 */
-	public static void setModificationTime(IFileStore sourceFile, IFileStore destFile) throws CoreException {
+	public static void setModificationTime(long modifiedTime, IFileStore destFile) throws CoreException {
 		IFileInfo fi = new FileInfo();
-		fi.setLastModified(sourceFile.fetchInfo(IExtendedFileStore.DETAILED, null).getLastModified());
+		fi.setLastModified(modifiedTime);
 		destFile.putInfo(fi, EFS.SET_LAST_MODIFIED, null);
 	}
 	
@@ -209,6 +208,28 @@ public final class EFSUtils {
         sourceStore.copy(destinationStore, EFS.OVERWRITE, monitor);
         return success;
     }
+    
+    /**
+     * @param sourceStore
+     *            the file to be copied
+     * @param destinationStore
+     *            the destination location
+     * @param monitor
+     *            the progress monitor
+     * @param info
+     * 			  info to transfer
+     * @return true if the file is successfully copied, false if the operation
+     *         did not go through for any reason
+     * @throws CoreException 
+     */
+    public static boolean copyFileWithAttributes(IFileStore sourceStore, IFileStore destinationStore,
+    		IProgressMonitor monitor, IFileInfo info) throws CoreException {
+    	boolean success = copyFile(sourceStore, destinationStore, monitor);
+		if (success) {
+			EFSUtils.setModificationTime(info.getLastModified(), destinationStore);
+		}
+		return success;
+    }
 
 	/**
 	 * @throws CoreException 
@@ -263,16 +284,5 @@ public final class EFSUtils {
 				}
 			}
 		}
-	}
-	
-	/**
-	 * Returns the parent file of this file
-	 * @param file
-	 * @return
-	 */
-	public static IFileStore getParentFile(IFileStore file) {
-		return file.getParent();
-	}
-	
-	
+	}	
 }
