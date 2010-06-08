@@ -1,6 +1,8 @@
 package com.aptana.explorer.internal.ui;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import net.contentobjects.jnotify.IJNotify;
@@ -15,6 +17,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -79,6 +82,9 @@ import org.eclipse.ui.wizards.IWizardRegistry;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.IScopeReference;
+import com.aptana.core.ShellExecutable;
+import com.aptana.core.util.ExecutableUtil;
+import com.aptana.core.util.ProcessUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.TreeThemer;
@@ -635,18 +641,58 @@ public abstract class SingleProjectView extends CommonNavigator {
 		menuManager.add(new Separator(GROUP_DEPLOY));
 		menuManager.add(new Separator(GROUP_HEROKU_COMMANDS));
 
-		menuManager.appendToGroup(GROUP_HEROKU_COMMANDS,
-				new ContributionItem() {
+		menuManager.appendToGroup(GROUP_HEROKU_COMMANDS, new ContributionItem()
+		{
 
-					@Override
-					public void fill(Menu menu, int index) {
+			@Override
+			public void fill(Menu menu, int index)
+			{
 
-						// Open in web browser
-						if (Platform.getOS().equals(Platform.OS_MACOSX)) {
-							createHerokuSubMenuItem(
-									menu,
-									"heroku open", Messages.SingleProjectView_OpenBrowserItem); //$NON-NLS-1$
+				MenuItem item = new MenuItem(menu, SWT.PUSH);
+				item.setText(Messages.SingleProjectView_OpenBrowserItem);
+				item.addSelectionListener(new SelectionAdapter()
+				{
+					public void widgetSelected(SelectionEvent e)
+					{
+						// run heroku info
+
+						Map<String, String> env = new HashMap<String, String>();
+						env.putAll(ShellExecutable.getEnvironment());
+						IPath workingDir = selectedProject.getLocation();
+						IPath herokuPath = ExecutableUtil.find("heroku", true, null);
+						String output = ProcessUtil.outputForCommand(herokuPath.toOSString(), workingDir, env, "info");
+
+						try
+						{
+							// extract url from heroku info
+							if (output != null && output.contains("Web URL:"))
+							{
+								String URL = output.split("Web URL:")[1].split("\n")[0].replace(" ", "");
+
+								// Determine which OS and open url
+								if (Platform.getOS().equals(Platform.OS_MACOSX))
+								{
+									ProcessUtil.run("open", null, (Map<String, String>) null, URL);
+								}
+								else if (Platform.getOS().equals(Platform.OS_WIN32))
+								{
+									ProcessUtil.run("cmd", null, (Map<String, String>) null, "/c", "start " + URL);
+								}
+								else
+								{
+									ProcessUtil.run("x-www-browser", null, (Map<String, String>) null, URL);
+								}
+
+							}
 						}
+						catch (Exception e1)
+						{
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+
+					}
+				});
 
 						// Sharing Submenu
 						final MenuItem sharingMenuItem = new MenuItem(menu,
