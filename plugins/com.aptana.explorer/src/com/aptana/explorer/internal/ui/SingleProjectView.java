@@ -44,10 +44,6 @@ import org.eclipse.search.ui.text.TextSearchQueryProvider;
 import org.eclipse.search.ui.text.TextSearchQueryProvider.TextSearchInput;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -62,7 +58,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IMemento;
@@ -112,7 +107,7 @@ import com.aptana.ui.UIUtils;
  * @author cwilliams
  */
 @SuppressWarnings("restriction")
-public abstract class SingleProjectView extends CommonNavigator {
+public abstract class SingleProjectView extends CommonNavigator implements SearchComposite.Client {
 
 	private static final String GEAR_MENU_ID = "com.aptana.explorer.gear"; //$NON-NLS-1$
 	private static final String RAILS_NATURE = "org.radrails.rails.core.railsnature"; //$NON-NLS-1$
@@ -147,21 +142,15 @@ public abstract class SingleProjectView extends CommonNavigator {
 
 	protected ISiteConnection[] siteConnections;
 	protected IProject selectedProject;
+
 	/**
 	 * Listens for the addition/removal of projects.
 	 */
 	private ResourceListener fProjectsListener;
 
-	/**
-	 * The text to initially show in the filter text control.
-	 */
-	protected String initialText = Messages.SingleProjectView_InitialFileFilterText;
-	private Text searchText;
 	private Composite filterComp;
 	private CLabel filterLabel;
 	private GridData filterLayoutData;
-	protected boolean caseSensitiveSearch;
-	protected boolean regularExpressionSearch;
 
 	/**
 	 * Used as a handle for the filesystem watcher on the selected project.
@@ -182,11 +171,11 @@ public abstract class SingleProjectView extends CommonNavigator {
 	// ourselves
 	protected IMemento memento;
 
-	private static final String CASE_SENSITIVE_ICON_PATH = "icons/full/elcl16/casesensitive.png"; //$NON-NLS-1$
-	private static final String REGULAR_EXPRESSION_ICON_PATH = "icons/full/elcl16/regularexpression.png"; //$NON-NLS-1$
+	private static final String GEAR_MENU_ICON = "icons/full/elcl16/command.png"; //$NON-NLS-1$
 	private static final String DEPLOY_MENU_ICON = "icons/full/elcl16/network_arrow.png"; //$NON-NLS-1$
 	private static final String UPLOAD_MENU_ICON = "icons/full/elcl16/direction_upload.png"; //$NON-NLS-1$
 	private static final String DOWNLOAD_MENU_ICON = "icons/full/elcl16/direction_download.png"; //$NON-NLS-1$
+	private static final String CLOSE_ICON = "icons/full/elcl16/close.png"; //$NON-NLS-1$
 	// private static final String[] animationImage = {
 	// 		"icons/full/elcl16/yinyang1.png", "icons/full/elcl16/yinyang2.png", "icons/full/elcl16/yinyang3.png", "icons/full/elcl16/yinyang4.png" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	private static final String[] animationImageUp = {
@@ -206,15 +195,11 @@ public abstract class SingleProjectView extends CommonNavigator {
 	public void createPartControl(final Composite parent) {
 		GridLayout gridLayout = (GridLayout) parent.getLayout();
 		gridLayout.marginHeight = 0;
-		gridLayout.marginTop = 0;
-		gridLayout.marginBottom = 0;
 		gridLayout.verticalSpacing = 1;
 
 		// Create toolbar
 		Composite toolbarComposite = new Composite(parent, SWT.NONE);
-		GridData toolbarGridData = new GridData(SWT.FILL, SWT.CENTER, true,
-				false);
-		toolbarComposite.setLayoutData(toolbarGridData);
+		toolbarComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
 		GridLayout toolbarGridLayout = new GridLayout(3, false);
 		toolbarGridLayout.marginWidth = 2;
@@ -234,14 +219,15 @@ public abstract class SingleProjectView extends CommonNavigator {
 		// Now create Commands menu
 		final ToolBar commandsToolBar = new ToolBar(toolbarComposite, SWT.FLAT);
 		ToolItem commandsToolItem = new ToolItem(commandsToolBar, SWT.DROP_DOWN);
-		commandsToolItem.setImage(ExplorerPlugin
-				.getImage("icons/full/elcl16/command.png")); //$NON-NLS-1$
+		commandsToolItem.setImage(ExplorerPlugin.getImage(GEAR_MENU_ICON));
 		GridData branchComboData = new GridData(SWT.END, SWT.CENTER, false,
 				false);
 		branchComboData.minimumWidth = 24;
 		commandsToolBar.setLayoutData(branchComboData);
 
 		commandsToolItem.addSelectionListener(new SelectionAdapter() {
+
+			@Override
 			public void widgetSelected(SelectionEvent selectionEvent) {
 				Point toolbarLocation = commandsToolBar.getLocation();
 				toolbarLocation = commandsToolBar.getParent().toDisplay(
@@ -477,6 +463,8 @@ public abstract class SingleProjectView extends CommonNavigator {
 			public void fill(Menu menu, int index) {
 
 				SelectionAdapter uploadAdapter = new SelectionAdapter() {
+
+					@Override
 					public void widgetSelected(SelectionEvent e) {
 						UploadAction action = new UploadAction();
 						action.setActivePart(null, PlatformUI.getWorkbench()
@@ -515,6 +503,8 @@ public abstract class SingleProjectView extends CommonNavigator {
 				ul.setImage(ExplorerPlugin.getImage(UPLOAD_MENU_ICON));
 
 				SelectionAdapter downloadAdapter = new SelectionAdapter() {
+
+					@Override
 					public void widgetSelected(SelectionEvent e) {
 						DownloadAction action = new DownloadAction();
 						action.setActivePart(null, PlatformUI.getWorkbench()
@@ -524,6 +514,7 @@ public abstract class SingleProjectView extends CommonNavigator {
 								.getActiveWorkbenchWindow()
 								.getSelectionService().getSelection());
 						action.addJobListener(new JobChangeAdapter() {
+
 							private AnimatedIconThread iconThread;
 
 							@Override
@@ -545,7 +536,6 @@ public abstract class SingleProjectView extends CommonNavigator {
 						});
 						action.run(null);
 					}
-
 				};
 				MenuItem dl = createSubMenuItemWithListener(menu,
 						Messages.SingleProjectView_DownloadItem,
@@ -561,11 +551,14 @@ public abstract class SingleProjectView extends CommonNavigator {
 
 		menuManager.add(new Separator(GROUP_FTP_SETTINGS));
 		menuManager.appendToGroup(GROUP_FTP_SETTINGS, new ContributionItem() {
+
 			@Override
 			public void fill(Menu menu, int index) {
 				MenuItem settingsItem = new MenuItem(menu, SWT.PUSH);
 				settingsItem.setText(Messages.SingleProjectView_FTPSettingItem);
 				settingsItem.addSelectionListener(new SelectionAdapter() {
+
+					@Override
 					public void widgetSelected(SelectionEvent e) {
 						IConnectionPoint siteConnection;
 						CommonFTPConnectionPointPropertyDialog settingsDialog = new CommonFTPConnectionPointPropertyDialog(
@@ -574,7 +567,6 @@ public abstract class SingleProjectView extends CommonNavigator {
 						siteConnection = siteConnections[0].getDestination();
 
 						if (siteConnections.length != 1) {
-
 							// try for last remembered site first
 							IContainer container = (IContainer) selectedProject;
 							String lastConnection = ResourceSynchronizationUtils
@@ -583,7 +575,6 @@ public abstract class SingleProjectView extends CommonNavigator {
 									.isRememberDecision(container);
 
 							if (!remember || (lastConnection == null)) {
-
 								ChooseSiteConnectionDialog dialog = new ChooseSiteConnectionDialog(
 										PlatformUI.getWorkbench()
 												.getActiveWorkbenchWindow()
@@ -593,7 +584,6 @@ public abstract class SingleProjectView extends CommonNavigator {
 
 								siteConnection = dialog.getSelectedSite()
 										.getDestination();
-
 								if (siteConnection != null) {
 									Boolean rememberMyDecision = dialog
 											.isRememberMyDecision();
@@ -607,11 +597,9 @@ public abstract class SingleProjectView extends CommonNavigator {
 									ResourceSynchronizationUtils
 											.setLastSyncConnection(container,
 													siteConnection.getName());
-
 								}
 							} else {
 								String target;
-
 								for (ISiteConnection site : siteConnections) {
 									target = site.getDestination().getName();
 									if (target.equals(lastConnection)) {
@@ -624,7 +612,6 @@ public abstract class SingleProjectView extends CommonNavigator {
 						settingsDialog.setPropertySource(siteConnection);
 						settingsDialog.open();
 					}
-
 				});
 			}
 
@@ -633,11 +620,9 @@ public abstract class SingleProjectView extends CommonNavigator {
 				return true;
 			}
 		});
-
 	}
 
 	private void addHerokuMenuCommands(MenuManager menuManager) {
-
 		menuManager.add(new Separator(GROUP_DEPLOY));
 		menuManager.add(new Separator(GROUP_HEROKU_COMMANDS));
 
@@ -647,7 +632,6 @@ public abstract class SingleProjectView extends CommonNavigator {
 			@Override
 			public void fill(Menu menu, int index)
 			{
-
 				MenuItem item = new MenuItem(menu, SWT.PUSH);
 				item.setText(Messages.SingleProjectView_OpenBrowserItem);
 				item.addSelectionListener(new SelectionAdapter()
@@ -655,34 +639,32 @@ public abstract class SingleProjectView extends CommonNavigator {
 					public void widgetSelected(SelectionEvent e)
 					{
 						// run heroku info
-
 						Map<String, String> env = new HashMap<String, String>();
 						env.putAll(ShellExecutable.getEnvironment());
 						IPath workingDir = selectedProject.getLocation();
-						IPath herokuPath = ExecutableUtil.find("heroku", true, null);
-						String output = ProcessUtil.outputForCommand(herokuPath.toOSString(), workingDir, env, "info");
+						IPath herokuPath = ExecutableUtil.find("heroku", true, null); //$NON-NLS-1$
+						String output = ProcessUtil.outputForCommand(herokuPath.toOSString(), workingDir, env, "info"); //$NON-NLS-1$
 
 						try
 						{
 							// extract url from heroku info
-							if (output != null && output.contains("Web URL:"))
+							if (output != null && output.contains("Web URL:")) //$NON-NLS-1$
 							{
-								String URL = output.split("Web URL:")[1].split("\n")[0].replace(" ", "");
+								String URL = output.split("Web URL:")[1].split("\n")[0].replace(" ", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 								// Determine which OS and open url
 								if (Platform.getOS().equals(Platform.OS_MACOSX))
 								{
-									ProcessUtil.run("open", null, (Map<String, String>) null, URL);
+									ProcessUtil.run("open", null, (Map<String, String>) null, URL); //$NON-NLS-1$
 								}
 								else if (Platform.getOS().equals(Platform.OS_WIN32))
 								{
-									ProcessUtil.run("cmd", null, (Map<String, String>) null, "/c", "start " + URL);
+									ProcessUtil.run("cmd", null, (Map<String, String>) null, "/c", "start " + URL); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 								}
 								else
 								{
-									ProcessUtil.run("x-www-browser", null, (Map<String, String>) null, URL);
+									ProcessUtil.run("x-www-browser", null, (Map<String, String>) null, URL); //$NON-NLS-1$
 								}
-
 							}
 						}
 						catch (Exception e1)
@@ -690,109 +672,85 @@ public abstract class SingleProjectView extends CommonNavigator {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
-
 					}
 				});
 
-						// Sharing Submenu
-						final MenuItem sharingMenuItem = new MenuItem(menu,
-								SWT.CASCADE);
-						sharingMenuItem
-								.setText(Messages.SingleProjectView_SharingSubmenuLabel);
-						Menu sharingSubMenu = new Menu(menu);
+				// Sharing Submenu
+				final MenuItem sharingMenuItem = new MenuItem(menu, SWT.CASCADE);
+				sharingMenuItem.setText(Messages.SingleProjectView_SharingSubmenuLabel);
+				Menu sharingSubMenu = new Menu(menu);
 
-						createHerokuSubMenuItemWithInput(
-								sharingSubMenu,
-								"heroku sharing:add ", Messages.SingleProjectView_AddCollaboratorItem, Messages.SingleProjectView_EmailAddressLabel); //$NON-NLS-1$ //$NON-NLS-2$
-						createHerokuSubMenuItemWithInput(
-								sharingSubMenu,
-								"heroku sharing:remove ", Messages.SingleProjectView_RemoveCollaboratorItem, Messages.SingleProjectView_EmailAddressLabel); //$NON-NLS-1$
-						sharingMenuItem.setMenu(sharingSubMenu);
+				createHerokuSubMenuItemWithInput(
+						sharingSubMenu,
+						"heroku sharing:add ", Messages.SingleProjectView_AddCollaboratorItem, Messages.SingleProjectView_EmailAddressLabel); //$NON-NLS-1$
+				createHerokuSubMenuItemWithInput(
+						sharingSubMenu,
+						"heroku sharing:remove ", Messages.SingleProjectView_RemoveCollaboratorItem, Messages.SingleProjectView_EmailAddressLabel); //$NON-NLS-1$
+				sharingMenuItem.setMenu(sharingSubMenu);
 
-						// Database
-						final MenuItem databaseMenuItem = new MenuItem(menu,
-								SWT.CASCADE);
-						databaseMenuItem
-								.setText(Messages.SingleProjectView_DatabaseSubmenuLabel);
-						Menu databaseSubMenu = new Menu(menu);
+				// Database
+				final MenuItem databaseMenuItem = new MenuItem(menu, SWT.CASCADE);
+				databaseMenuItem.setText(Messages.SingleProjectView_DatabaseSubmenuLabel);
+				Menu databaseSubMenu = new Menu(menu);
 
-						createHerokuSubMenuItem(
-								databaseSubMenu,
-								"heroku rake db:migrate", Messages.SingleProjectView_RakeDBMigrateItem); //$NON-NLS-1$
-						createHerokuSubMenuItem(
-								databaseSubMenu,
-								"heroku db:push", Messages.SingleProjectView_PushLocalDBItem); //$NON-NLS-1$
-						createHerokuSubMenuItem(
-								databaseSubMenu,
-								"heroku db:pull", Messages.SingleProjectView_PullRemoteDBItem); //$NON-NLS-1$
+				createHerokuSubMenuItem(databaseSubMenu,
+						"heroku rake db:migrate", Messages.SingleProjectView_RakeDBMigrateItem); //$NON-NLS-1$
+				createHerokuSubMenuItem(databaseSubMenu, "heroku db:push", Messages.SingleProjectView_PushLocalDBItem); //$NON-NLS-1$
+				createHerokuSubMenuItem(databaseSubMenu, "heroku db:pull", Messages.SingleProjectView_PullRemoteDBItem); //$NON-NLS-1$
 
-						databaseMenuItem.setMenu(databaseSubMenu);
+				databaseMenuItem.setMenu(databaseSubMenu);
 
-						// Maintenance
-						final MenuItem maintenanceMenuItem = new MenuItem(menu,
-								SWT.CASCADE);
-						maintenanceMenuItem
-								.setText(Messages.SingleProjectView_MaintenanceSubmenuLabel);
-						Menu maintanenceSubMenu = new Menu(menu);
+				// Maintenance
+				final MenuItem maintenanceMenuItem = new MenuItem(menu, SWT.CASCADE);
+				maintenanceMenuItem.setText(Messages.SingleProjectView_MaintenanceSubmenuLabel);
+				Menu maintanenceSubMenu = new Menu(menu);
 
-						createHerokuSubMenuItem(
-								maintanenceSubMenu,
-								"heroku maintenance:on", Messages.SingleProjectView_OnMaintenanceItem); //$NON-NLS-1$
-						createHerokuSubMenuItem(
-								maintanenceSubMenu,
-								"heroku maintenance:off", Messages.SingleProjectView_OffMaintenanceItem); //$NON-NLS-1$
+				createHerokuSubMenuItem(maintanenceSubMenu,
+						"heroku maintenance:on", Messages.SingleProjectView_OnMaintenanceItem); //$NON-NLS-1$
+				createHerokuSubMenuItem(maintanenceSubMenu,
+						"heroku maintenance:off", Messages.SingleProjectView_OffMaintenanceItem); //$NON-NLS-1$
 
-						maintenanceMenuItem.setMenu(maintanenceSubMenu);
+				maintenanceMenuItem.setMenu(maintanenceSubMenu);
 
-						// Remote
-						final MenuItem remoteMenuItem = new MenuItem(menu,
-								SWT.CASCADE);
-						remoteMenuItem
-								.setText(Messages.SingleProjectView_RemoteSubmenuLabel);
-						Menu remoteSubMenu = new Menu(menu);
+				// Remote
+				final MenuItem remoteMenuItem = new MenuItem(menu, SWT.CASCADE);
+				remoteMenuItem.setText(Messages.SingleProjectView_RemoteSubmenuLabel);
+				Menu remoteSubMenu = new Menu(menu);
 
-						createHerokuSubMenuItem(
-								remoteSubMenu,
-								"heroku console", Messages.SingleProjectView_ConsoleItem); //$NON-NLS-1$
-						createHerokuSubMenuItemWithInput(
-								remoteSubMenu,
-								"heroku rake ", Messages.SingleProjectView_RakeCommandItem, Messages.SingleProjectView_CommandLabel); //$NON-NLS-1$
+				createHerokuSubMenuItem(remoteSubMenu, "heroku console", Messages.SingleProjectView_ConsoleItem); //$NON-NLS-1$
+				createHerokuSubMenuItemWithInput(
+						remoteSubMenu,
+						"heroku rake ", Messages.SingleProjectView_RakeCommandItem, Messages.SingleProjectView_CommandLabel); //$NON-NLS-1$
 
-						remoteMenuItem.setMenu(remoteSubMenu);
+				remoteMenuItem.setMenu(remoteSubMenu);
 
-						// config vars
-						final MenuItem configMenuItem = new MenuItem(menu,
-								SWT.CASCADE);
-						configMenuItem
-								.setText(Messages.SingleProjectView_ConfigVarsSubmenuLabel);
-						Menu configSubMenu = new Menu(menu);
+				// config vars
+				final MenuItem configMenuItem = new MenuItem(menu, SWT.CASCADE);
+				configMenuItem.setText(Messages.SingleProjectView_ConfigVarsSubmenuLabel);
+				Menu configSubMenu = new Menu(menu);
 
-						createHerokuSubMenuItemWithInput(
-								configSubMenu,
-								"heroku config:add ", Messages.SingleProjectView_AddConfigVarsItem, Messages.SingleProjectView_VariableNameLabel); //$NON-NLS-1$ //$NON-NLS-2$
-						createHerokuSubMenuItemWithInput(
-								configSubMenu,
-								"heroku config:clear ", Messages.SingleProjectView_ClearConfigVarsItem, Messages.SingleProjectView_VariableNameLabel); //$NON-NLS-1$
+				createHerokuSubMenuItemWithInput(
+						configSubMenu,
+						"heroku config:add ", Messages.SingleProjectView_AddConfigVarsItem, Messages.SingleProjectView_VariableNameLabel); //$NON-NLS-1$
+				createHerokuSubMenuItemWithInput(
+						configSubMenu,
+						"heroku config:clear ", Messages.SingleProjectView_ClearConfigVarsItem, Messages.SingleProjectView_VariableNameLabel); //$NON-NLS-1$
 
-						configMenuItem.setMenu(configSubMenu);
+				configMenuItem.setMenu(configSubMenu);
 
-						// may want to add backup commands
+				// may want to add backup commands
+				createHerokuSubMenuItem(menu, "heroku info", Messages.SingleProjectView_AppInfoItem); //$NON-NLS-1$
+				createHerokuSubMenuItemWithInput(
+						menu,
+						"heroku rename ", Messages.SingleProjectView_RenameAppItem, Messages.SingleProjectView_NewAppNameLabel); //$NON-NLS-1$
+			}
 
-						createHerokuSubMenuItem(
-								menu,
-								"heroku info", Messages.SingleProjectView_AppInfoItem); //$NON-NLS-1$
-						createHerokuSubMenuItemWithInput(
-								menu,
-								"heroku rename ", Messages.SingleProjectView_RenameAppItem, Messages.SingleProjectView_NewAppNameLabel); //$NON-NLS-1$
-
-					}
-
-					@Override
-					public boolean isDynamic() {
-						return true;
-					}
-				});
-
+			@Override
+			public boolean isDynamic()
+			{
+				return true;
+			}
+		});
 	}
 
 	private IProject[] createProjectCombo(Composite parent) {
@@ -816,6 +774,8 @@ public abstract class SingleProjectView extends CommonNavigator {
 			projectNameMenuItem.setText(iProject.getName());
 			projectNameMenuItem.setSelection(false);
 			projectNameMenuItem.addSelectionListener(new SelectionAdapter() {
+
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					String projectName = projectNameMenuItem.getText();
 					projectToolItem.setText(projectName);
@@ -825,6 +785,8 @@ public abstract class SingleProjectView extends CommonNavigator {
 		}
 
 		projectToolItem.addSelectionListener(new SelectionAdapter() {
+
+			@Override
 			public void widgetSelected(SelectionEvent selectionEvent) {
 				Point toolbarLocation = projectsToolbar.getLocation();
 				toolbarLocation = projectsToolbar.getParent().toDisplay(
@@ -839,120 +801,20 @@ public abstract class SingleProjectView extends CommonNavigator {
 	}
 
 	private Composite createSearchComposite(Composite myComposite) {
-		Composite search = new Composite(myComposite, SWT.NONE);
-		GridLayout searchGridLayout = new GridLayout(2, false);
-		searchGridLayout.marginWidth = 2;
-		searchGridLayout.marginHeight = 0;
-		search.setLayout(searchGridLayout);
+		Composite search = new SearchComposite(myComposite, this);
+		search.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
-		GridData searchGridData = new GridData(SWT.FILL, SWT.CENTER, true,
-				false);
-		search.setLayoutData(searchGridData);
-
-		searchText = new Text(search, SWT.SINGLE | SWT.BORDER | SWT.SEARCH
-				| SWT.ICON_CANCEL | SWT.ICON_SEARCH);
-		searchText.setText(initialText);
-		searchText.setToolTipText(Messages.SingleProjectView_Wildcard);
-		searchText.setForeground(searchText.getDisplay().getSystemColor(
-				SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-
-		// Register with focus service so that Cut/Copy/Paste/SelecAll handlers
-		// will work.
-		IFocusService focusService = (IFocusService) getViewSite().getService(
-				IFocusService.class);
-		focusService.addFocusTracker(searchText, IExplorerUIConstants.VIEW_ID
-				+ ".searchText"); //$NON-NLS-1$
-
-		searchText.addFocusListener(new FocusListener() {
-			@Override
-			public void focusLost(FocusEvent e) {
-				if (searchText.getText().length() == 0) {
-					searchText.setText(initialText);
-				}
-				searchText.setForeground(searchText.getDisplay()
-						.getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-			}
-
-			@Override
-			public void focusGained(FocusEvent e) {
-				if (searchText.getText().equals(initialText)) {
-					searchText.setText(""); //$NON-NLS-1$
-				}
-				searchText.setForeground(null);
-			}
-		});
-
-		searchText.addKeyListener(new KeyListener() {
-			@Override
-			public void keyReleased(KeyEvent e) {
-			}
-
-			@Override
-			public void keyPressed(KeyEvent e) {
-				if (!e.doit) {
-					return;
-				}
-
-				if (e.keyCode == 0x0D) {
-					searchText();
-					e.doit = false;
-				}
-			}
-		});
-
-		GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		// // if the text widget supported cancel then it will have it's own
-		// // integrated button. We can take all of the space.
-		// if ((searchText.getStyle() & SWT.ICON_CANCEL) != 0)
-		// gridData.horizontalSpan = 2;
-		searchText.setLayoutData(gridData);
-
-		// Button for search options
-		final ToolBar toolbar = new ToolBar(search, SWT.NONE);
-		GridData toolbarGridData = new GridData(SWT.FILL, SWT.CENTER, false,
-				false);
-		toolbar.setLayoutData(toolbarGridData);
-
-		final ToolItem caseSensitiveMenuItem = new ToolItem(toolbar, SWT.CHECK);
-		caseSensitiveMenuItem.setImage(ExplorerPlugin
-				.getImage(CASE_SENSITIVE_ICON_PATH));
-		caseSensitiveMenuItem
-				.setToolTipText(Messages.SingleProjectView_CaseSensitive);
-		caseSensitiveMenuItem.setSelection(caseSensitiveSearch);
-		caseSensitiveMenuItem.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				setCaseSensitiveSearch(caseSensitiveMenuItem.getSelection());
-				searchText.setFocus();
-			}
-		});
-
-		final ToolItem regularExressionMenuItem = new ToolItem(toolbar,
-				SWT.CHECK);
-		regularExressionMenuItem.setImage(ExplorerPlugin
-				.getImage(REGULAR_EXPRESSION_ICON_PATH));
-		regularExressionMenuItem
-				.setToolTipText(Messages.SingleProjectView_RegularExpression);
-		regularExressionMenuItem.setSelection(regularExpressionSearch);
-		regularExressionMenuItem.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				setRegularExpressionSearch(regularExressionMenuItem
-						.getSelection());
-				searchText.setFocus();
-			}
-		});
+		// Register with focus service so that Cut/Copy/Paste/SelecAll handlers will work
+		IFocusService focusService = (IFocusService) getViewSite().getService(IFocusService.class);
+		focusService.addFocusTracker(search, IExplorerUIConstants.VIEW_ID + ".searchText"); //$NON-NLS-1$
 
 		return search;
 	}
 
 	protected void createNavigator(Composite myComposite) {
 		Composite viewer = new Composite(myComposite, SWT.BORDER);
-		FillLayout fillLayout = new FillLayout();
-		fillLayout.marginWidth = 0;
-		fillLayout.marginHeight = 0;
-		viewer.setLayout(fillLayout);
-
-		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-		viewer.setLayoutData(gridData);
+		viewer.setLayout(new FillLayout());
+		viewer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		super.createPartControl(viewer);
 		getCommonViewer().setInput(detectSelectedProject());
@@ -976,6 +838,7 @@ public abstract class SingleProjectView extends CommonNavigator {
 	protected CommonViewer createCommonViewerObject(Composite aParent) {
 		return new CommonViewer(getViewSite().getId(), aParent, SWT.MULTI
 				| SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION) {
+
 			@Override
 			public ISelection getSelection() {
 				ISelection sel = super.getSelection();
@@ -1036,17 +899,14 @@ public abstract class SingleProjectView extends CommonNavigator {
 		filter.setLayoutData(filterLayoutData);
 
 		filterLabel = new CLabel(filter, SWT.LEFT);
-
-		GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		filterLabel.setLayoutData(gridData);
+		filterLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
 		ToolBar toolBar = new ToolBar(filter, SWT.FLAT);
 		toolBar.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false,
 				false));
 
 		ToolItem toolItem = new ToolItem(toolBar, SWT.PUSH);
-		toolItem.setImage(ExplorerPlugin
-				.getImage("icons/full/elcl16/close.png")); //$NON-NLS-1$
+		toolItem.setImage(ExplorerPlugin.getImage(CLOSE_ICON));
 		toolItem.addSelectionListener(new SelectionListener() {
 
 			@Override
@@ -1089,17 +949,21 @@ public abstract class SingleProjectView extends CommonNavigator {
 	private void listenToActiveProjectPrefChanges() {
 		fActiveProjectPrefChangeListener = new IPreferenceChangeListener() {
 
+			@Override
 			public void preferenceChange(PreferenceChangeEvent event) {
-				if (!event.getKey().equals(IPreferenceConstants.ACTIVE_PROJECT))
+				if (!event.getKey().equals(IPreferenceConstants.ACTIVE_PROJECT)) {
 					return;
+				}
 				final IProject oldActiveProject = selectedProject;
 				Object obj = event.getNewValue();
-				if (obj == null)
+				if (obj == null) {
 					return;
+				}
 				String newProjectName = (String) obj;
 				if (oldActiveProject != null
-						&& newProjectName.equals(oldActiveProject.getName()))
+						&& newProjectName.equals(oldActiveProject.getName())) {
 					return;
+				}
 				final IProject newSelectedProject = ResourcesPlugin
 						.getWorkspace().getRoot().getProject(newProjectName);
 				selectedProject = newSelectedProject;
@@ -1142,8 +1006,9 @@ public abstract class SingleProjectView extends CommonNavigator {
 		if (project == null) {
 			IProject[] projects = ResourcesPlugin.getWorkspace().getRoot()
 					.getProjects();
-			if (projects == null || projects.length == 0)
+			if (projects == null || projects.length == 0) {
 				return null;
+			}
 			project = projects[0];
 		}
 		return project;
@@ -1155,8 +1020,9 @@ public abstract class SingleProjectView extends CommonNavigator {
 			newSelectedProject = ResourcesPlugin.getWorkspace().getRoot()
 					.getProject(projectName);
 		if (selectedProject != null && newSelectedProject != null
-				&& selectedProject.equals(newSelectedProject))
+				&& selectedProject.equals(newSelectedProject)) {
 			return;
+		}
 
 		if (selectedProject != null) {
 			unsetActiveProject();
@@ -1225,9 +1091,6 @@ public abstract class SingleProjectView extends CommonNavigator {
 			// get updated correctly
 			getCommonViewer().setSelection(StructuredSelection.EMPTY);
 		}
-		// Update the tree since project changed
-		// updateViewer(oldProject, newProject); // no structural change, just
-		// project changed
 	}
 
 	private void removeFileWatcher() {
@@ -1241,14 +1104,16 @@ public abstract class SingleProjectView extends CommonNavigator {
 	}
 
 	protected void refreshViewer() {
-		if (getCommonViewer() == null)
+		if (getCommonViewer() == null) {
 			return;
+		}
 		getCommonViewer().refresh(selectedProject, true);
 	}
 
 	protected void updateViewer(Object... elements) {
-		if (getCommonViewer() == null)
+		if (getCommonViewer() == null) {
 			return;
+		}
 		// FIXME Need to update the element plus all it's children recursively
 		// if we want to call "update"
 		// List<Object> nonNulls = new ArrayList<Object>();
@@ -1296,19 +1161,23 @@ public abstract class SingleProjectView extends CommonNavigator {
 
 		public void resourceChanged(IResourceChangeEvent event) {
 			IResourceDelta delta = event.getDelta();
-			if (delta == null)
+			if (delta == null) {
 				return;
+			}
 			try {
 				delta.accept(new IResourceDeltaVisitor() {
 
+					@Override
 					public boolean visit(IResourceDelta delta)
 							throws CoreException {
 						IResource resource = delta.getResource();
 						if (resource.getType() == IResource.FILE
-								|| resource.getType() == IResource.FOLDER)
+								|| resource.getType() == IResource.FOLDER) {
 							return false;
-						if (resource.getType() == IResource.ROOT)
+						}
+						if (resource.getType() == IResource.ROOT) {
 							return true;
+						}
 						if (resource.getType() == IResource.PROJECT) {
 							// a project was added, removed, or changed!
 							if (delta.getKind() == IResourceDelta.ADDED
@@ -1320,6 +1189,7 @@ public abstract class SingleProjectView extends CommonNavigator {
 								final String projectName = resource.getName();
 								Display.getDefault().asyncExec(new Runnable() {
 
+									@Override
 									public void run() {
 										// Construct the menu item to for this
 										// project
@@ -1341,8 +1211,9 @@ public abstract class SingleProjectView extends CommonNavigator {
 												break;
 											}
 										}
-										if (index == -1)
+										if (index == -1) {
 											return;
+										}
 										final MenuItem projectNameMenuItem = new MenuItem(
 												projectsMenu, SWT.RADIO, index);
 										projectNameMenuItem
@@ -1372,6 +1243,7 @@ public abstract class SingleProjectView extends CommonNavigator {
 								final String projectName = resource.getName();
 								Display.getDefault().asyncExec(new Runnable() {
 
+									@Override
 									public void run() {
 										MenuItem[] menuItems = projectsMenu
 												.getItems();
@@ -1412,44 +1284,23 @@ public abstract class SingleProjectView extends CommonNavigator {
 		}
 	}
 
-	private boolean isCaseSensitiveSearch() {
-		return caseSensitiveSearch;
-	}
-
-	private void setCaseSensitiveSearch(boolean caseSensitiveSearch) {
-		this.caseSensitiveSearch = caseSensitiveSearch;
-	}
-
-	private boolean isRegularExpressionSearch() {
-		return regularExpressionSearch;
-	}
-
-	private void setRegularExpressionSearch(boolean regularExpressionSearch) {
-		this.regularExpressionSearch = regularExpressionSearch;
-	}
-
-	/**
-	 * Search the text in project.
-	 */
-	protected void searchText() {
-		if (selectedProject == null) {
-			return;
-		}
-		String textToSearch = searchText.getText();
-		if (textToSearch.length() == 0) {
+	@Override
+	public void search(String text, boolean isCaseSensitive, boolean isRegularExpression)
+	{
+		if (selectedProject == null)
+		{
 			return;
 		}
 
 		IResource searchResource = selectedProject;
-		TextSearchPageInput input = new TextSearchPageInput(textToSearch,
-				isCaseSensitiveSearch(), isRegularExpressionSearch(),
-				FileTextSearchScope.newSearchScope(
-						new IResource[] { searchResource },
-						new String[] { "*" }, false)); //$NON-NLS-1$
-		try {
-			NewSearchUI.runQueryInBackground(TextSearchQueryProvider
-					.getPreferred().createQuery(input));
-		} catch (CoreException e) {
+		TextSearchPageInput input = new TextSearchPageInput(text, isCaseSensitive, isRegularExpression,
+				FileTextSearchScope.newSearchScope(new IResource[] { searchResource }, new String[] { "*" }, false)); //$NON-NLS-1$
+		try
+		{
+			NewSearchUI.runQueryInBackground(TextSearchQueryProvider.getPreferred().createQuery(input));
+		}
+		catch (CoreException e)
+		{
 			ExplorerPlugin.logError(e);
 		}
 	}
@@ -1511,8 +1362,9 @@ public abstract class SingleProjectView extends CommonNavigator {
 	}
 
 	protected void removeMenuItems(Menu menu, Set<String> idsToRemove) {
-		if (idsToRemove == null || idsToRemove.isEmpty())
+		if (idsToRemove == null || idsToRemove.isEmpty()) {
 			return;
+		}
 		for (MenuItem menuItem : menu.getItems()) {
 			Object data = menuItem.getData();
 			if (data instanceof IContributionItem) {
@@ -1537,6 +1389,8 @@ public abstract class SingleProjectView extends CommonNavigator {
 		MenuItem item = new MenuItem(menu, SWT.PUSH);
 		item.setText(text);
 		item.addSelectionListener(new SelectionAdapter() {
+
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				herokuCmd(command);
 			}
@@ -1550,14 +1404,16 @@ public abstract class SingleProjectView extends CommonNavigator {
 		MenuItem item = new MenuItem(menu, SWT.PUSH);
 		item.setText(text);
 		item.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
 
+			@Override
+			public void widgetSelected(SelectionEvent e) {
 				InputDialog dialog = new InputDialog(null, dialogMessage,
 						"", "", null); //$NON-NLS-1$ //$NON-NLS-2$
 				dialog.setBlockOnOpen(true);
 
-				if (dialog.open() == Window.OK)
+				if (dialog.open() == Window.OK) {
 					herokuCmd(command + dialog.getValue());
+				}
 			}
 		});
 	}
@@ -1570,24 +1426,16 @@ public abstract class SingleProjectView extends CommonNavigator {
 	}
 
 	private boolean isCapistranoProject() {
-		if (selectedProject.getFile("Capfile").exists()) //$NON-NLS-1$
-			return true;
-
-		return false;
+		return selectedProject.getFile("Capfile").exists(); //$NON-NLS-1$
 	}
 
 	private boolean isFTPProject() {
 		siteConnections = SiteConnectionUtils
 				.findSitesForSource(selectedProject);
-
-		if (siteConnections.length > 0)
-			return true;
-
-		return false;
+		return siteConnections.length > 0;
 	}
 
 	private boolean isHerokuProject() {
-
 		GitRepository repo = GitPlugin.getDefault().getGitRepositoryManager()
 				.getAttached(selectedProject);
 		if (repo != null) {
@@ -1603,7 +1451,6 @@ public abstract class SingleProjectView extends CommonNavigator {
 			}
 		}
 		return false;
-
 	}
 
 	private static class TextSearchPageInput extends TextSearchInput {
