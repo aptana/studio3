@@ -61,6 +61,7 @@ import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.ide.core.io.vfs.IExtendedFileStore;
 import com.aptana.ide.syncing.core.SyncingPlugin;
+import com.aptana.syncing.core.internal.SyncUtils;
 
 /**
  * @author Kevin Lindsey
@@ -744,7 +745,6 @@ public class Synchronizer implements ILoggable
 						// Need to query first because deletion makes isDirectory always return false
 						boolean wasDirectory = clientFileInfo.isDirectory();
 						clientFile.delete(EFS.NONE, null);
-						// client.deleteFile(clientFile);
 						if (wasDirectory)
 						{
 							this._clientDirectoryDeletedCount++;
@@ -767,8 +767,6 @@ public class Synchronizer implements ILoggable
 						if (!targetClientFile.fetchInfo().exists())
 						{
 							targetClientFile.mkdir(EFS.NONE, null);
-							// createVirtualDirectory(clientPath);
-							// client.createLocalDirectory(targetClientFile);
 							this._clientDirectoryCreatedCount++;
 							_newFilesDownloaded.add(targetClientFile);
 						}
@@ -778,18 +776,15 @@ public class Synchronizer implements ILoggable
 					}
 					else
 					{
-						// targetClientFile = client.getRoot().createVirtualFile(clientPath);
 						logDownloading(serverFile);
 						try
 						{
-							if (EFSUtils.copyFileWithAttributes(serverFile, targetClientFile, monitor, serverFileInfo))
-							{
-								Synchronizer.this._serverFileTransferedCount++;
-								_newFilesDownloaded.add(targetClientFile);
+							SyncUtils.copy(serverFile, serverFileInfo, targetClientFile, EFS.NONE, monitor);
+							Synchronizer.this._serverFileTransferedCount++;
+							_newFilesDownloaded.add(targetClientFile);
 
-								logSuccess();
-								syncDone(item);
-							}
+							logSuccess();
+							syncDone(item);
 						}
 						catch (CoreException e)
 						{
@@ -825,12 +820,10 @@ public class Synchronizer implements ILoggable
 					{
 						try
 						{
-							if (EFSUtils.copyFileWithAttributes(serverFile, clientFile, monitor, serverFileInfo))
-							{
-								Synchronizer.this._serverFileTransferedCount++;
-								logSuccess();
-								syncDone(item);
-							}
+							SyncUtils.copy(serverFile, serverFileInfo, clientFile, EFS.NONE, monitor);
+							Synchronizer.this._serverFileTransferedCount++;
+							logSuccess();
+							syncDone(item);
 						}
 						catch (CoreException e)
 						{
@@ -930,13 +923,10 @@ public class Synchronizer implements ILoggable
 						{
 							try
 							{
-								if (EFSUtils.copyFileWithAttributes(clientFile, serverFile, monitor, clientFileInfo))
-								{
-									Synchronizer.this._clientFileTransferedCount++;
-
-									logSuccess();
-									syncDone(item);
-								}
+								SyncUtils.copy(clientFile, clientFileInfo, serverFile, EFS.NONE, monitor);
+								Synchronizer.this._clientFileTransferedCount++;
+								logSuccess();
+								syncDone(item);
 							}
 							catch (CoreException e)
 							{
@@ -959,7 +949,7 @@ public class Synchronizer implements ILoggable
 							// need to query first because deletion causes isDirectory to always return false
 							boolean wasDirectory = clientFileInfo.isDirectory();
 							// deletes the item
-							clientFile.delete(EFS.NONE, null); // .deleteFile(clientFile);
+							clientFile.delete(EFS.NONE, null);
 							if (wasDirectory)
 							{
 								this._clientDirectoryDeletedCount++;
@@ -982,9 +972,7 @@ public class Synchronizer implements ILoggable
 
 								if (!targetServerFile.fetchInfo().exists())
 								{
-									targetServerFile.mkdir(EFS.NONE, null); // =
-									// server.createVirtualDirectory(serverPath);
-									// server.createLocalDirectory(targetServerFile);
+									targetServerFile.mkdir(EFS.NONE, null);
 									this._serverDirectoryCreatedCount++;
 									_newFilesUploaded.add(targetServerFile);
 								}
@@ -998,14 +986,11 @@ public class Synchronizer implements ILoggable
 								logUploading(clientFile);
 								try
 								{
-									if (EFSUtils.copyFileWithAttributes(clientFile, targetServerFile, monitor, clientFileInfo))
-									{
-										Synchronizer.this._clientFileTransferedCount++;
-										_newFilesUploaded.add(targetServerFile);
-
-										logSuccess();
-										syncDone(item);
-									}
+									SyncUtils.copy(clientFile, clientFileInfo, targetServerFile, EFS.NONE, monitor);
+									Synchronizer.this._clientFileTransferedCount++;
+									_newFilesUploaded.add(targetServerFile);
+									logSuccess();
+									syncDone(item);
 								}
 								catch (CoreException e)
 								{
@@ -1036,12 +1021,10 @@ public class Synchronizer implements ILoggable
 						{
 							try
 							{
-								if (EFSUtils.copyFileWithAttributes(serverFile, clientFile, monitor, serverFileInfo))
-								{
-									Synchronizer.this._serverFileTransferedCount++;
-									logSuccess();
-									syncDone(item);
-								}
+								SyncUtils.copy(serverFile, serverFileInfo, clientFile, EFS.NONE, monitor);
+								Synchronizer.this._serverFileTransferedCount++;
+								logSuccess();
+								syncDone(item);
 							}
 							catch (CoreException e)
 							{
@@ -1104,14 +1087,11 @@ public class Synchronizer implements ILoggable
 
 								try
 								{
-									if (EFSUtils.copyFileWithAttributes(serverFile, targetClientFile, monitor, serverFileInfo))
-									{
-										Synchronizer.this._serverFileTransferedCount++;
-										_newFilesDownloaded.add(targetClientFile);
-
-										logSuccess();
-										syncDone(item);
-									}
+									SyncUtils.copy(serverFile, serverFileInfo, targetClientFile, EFS.NONE, monitor);
+									Synchronizer.this._serverFileTransferedCount++;
+									_newFilesDownloaded.add(targetClientFile);
+									logSuccess();
+									syncDone(item);
 								}
 								catch (CoreException e)
 								{
@@ -1265,19 +1245,15 @@ public class Synchronizer implements ILoggable
 					}
 					else
 					{
-						// targetServerFile = server.createVirtualFile(serverPath);
-
 						logUploading(clientFile);
 
 						try
 						{
-							if (EFSUtils.copyFileWithAttributes(clientFile, targetServerFile, monitor, clientFileInfo))
-							{
-								Synchronizer.this._clientFileTransferedCount++;
-								_newFilesUploaded.add(targetServerFile);
-								logSuccess();
-								syncDone(item);
-							}
+							SyncUtils.copy(clientFile, clientFileInfo, targetServerFile, EFS.NONE, monitor);
+							Synchronizer.this._clientFileTransferedCount++;
+							_newFilesUploaded.add(targetServerFile);
+							logSuccess();
+							syncDone(item);
 						}
 						catch (CoreException e)
 						{
@@ -1299,7 +1275,7 @@ public class Synchronizer implements ILoggable
 					{
 						// Need to query if directory first because deletion makes isDirectory always return false.
 						boolean wasDirectory = serverFileInfo.isDirectory();
-						serverFile.delete(EFS.NONE, monitor); // server.deleteFile(serverFile);
+						serverFile.delete(EFS.NONE, monitor);
 						if (wasDirectory)
 						{
 							this._serverDirectoryDeletedCount++;
@@ -1341,12 +1317,10 @@ public class Synchronizer implements ILoggable
 					{
 						try
 						{
-							if (EFSUtils.copyFileWithAttributes(clientFile, serverFile, monitor, clientFileInfo))
-							{
-								Synchronizer.this._clientFileTransferedCount++;
-								logSuccess();
-								syncDone(item);
-							}
+							SyncUtils.copy(clientFile, clientFileInfo, serverFile, EFS.NONE, monitor);
+							Synchronizer.this._clientFileTransferedCount++;
+							logSuccess();
+							syncDone(item);
 						}
 						catch (CoreException e)
 						{
