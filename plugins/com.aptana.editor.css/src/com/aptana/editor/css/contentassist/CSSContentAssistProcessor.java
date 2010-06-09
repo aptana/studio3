@@ -364,13 +364,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		proposals.add(proposal);
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * com.aptana.editor.common.CommonContentAssistProcessor#computeCompletionProposals(org.eclipse.jface.text.ITextViewer
-	 * , int, char, boolean)
-	 */
-	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
+	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
 	{
 		// tokenize the current document
 		IDocument document = viewer.getDocument();

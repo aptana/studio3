@@ -45,6 +45,19 @@ import com.aptana.scripting.model.filters.ScopeFilter;
 
 public class CommonContentAssistProcessor implements IContentAssistProcessor, ICommonContentAssistProcessor
 {
+	/**
+	 * Default image to use for ruble-contributed proposals (that don't override image)
+	 */
+	private static final String DEFAULT_IMAGE = "icons/proposal.png"; //$NON-NLS-1$
+
+	/**
+	 * Strings used in hash for content assist coming from Rubles
+	 */
+	private static final String INSERT = "insert"; //$NON-NLS-1$
+	private static final String DISPLAY = "display"; //$NON-NLS-1$
+	private static final String IMAGE = "image"; //$NON-NLS-1$
+	private static final String TOOL_TIP = "tool_tip"; //$NON-NLS-1$
+
 	protected final AbstractThemeableEditor editor;
 
 	/**
@@ -120,8 +133,29 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
 			boolean autoActivated)
 	{
-		// NOTE: This is the default implementation. Specific language CA processors
-		// should override this method
+		List<ICompletionProposal> proposals = addRubleProposals(viewer, offset);
+		ICompletionProposal[] others = this.doComputeCompletionProposals(viewer, offset, activationChar, autoActivated);
+		if (proposals == null || proposals.isEmpty())
+		{
+			return others;
+		}
+		// FIXME What if others is null/empty?
+		ICompletionProposal[] combined = new ICompletionProposal[proposals.size() + others.length];
+		proposals.toArray(combined);
+		System.arraycopy(others, 0, combined, proposals.size(), others.length);
+		return combined;
+	}
+
+	/**
+	 * This hooks our Ruble scripting up to Content Assist, allowing them to contribute possible proposals. Experimental
+	 * right now as the way to return results is... interesting.
+	 * 
+	 * @param viewer
+	 * @param offset
+	 * @return
+	 */
+	protected List<ICompletionProposal> addRubleProposals(ITextViewer viewer, int offset)
+	{
 		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		try
 		{
@@ -145,86 +179,94 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 				{
 					CommandResult result = ce.execute();
 
-					if (result.executedSuccessfully())
+					if (!result.executedSuccessfully())
 					{
-						String output = result.getOutputString();
-						// FIXME This assumes that the command is returning an array that is output as a
-						// string I can eval (via inspect)!
-						RubyArray object = (RubyArray) ruby.evalScriptlet(output);
-						for (IRubyObject element : object.toJavaArray())
+						continue;
+					}
+					String output = result.getOutputString();
+					if (output == null || output.trim().length() == 0)
+					{
+						continue;
+					}
+					// FIXME This assumes that the command is returning an array that is output as a
+					// string I can eval (via inspect)!
+					RubyArray object = (RubyArray) ruby.evalScriptlet(output);
+					for (IRubyObject element : object.toJavaArray())
+					{
+						String name;
+						String displayName;
+						String description = null;
+						int length;
+						IContextInformation contextInfo = null;
+						int replaceLength = 0;
+						Image image = CommonEditorPlugin.getImage(DEFAULT_IMAGE);
+						if (element instanceof RubyHash)
 						{
-							String name;
-							String displayName;
-							String description = "";
-							int length;
-							IContextInformation contextInfo = null;
-							int replaceLength = 0;
-							Image image = CommonEditorPlugin.getImage("icons/template.png");
-							if (element instanceof RubyHash)
+							RubyHash hash = (RubyHash) element;
+							// TODO Move symbol creation to top and re-use them?
+							if (hash.containsKey(RubySymbol.newSymbol(ruby, INSERT)))
 							{
-								RubyHash hash = (RubyHash) element;
-								// TODO Handle if there's no :insert key
-								// TODO Move symbol creation to top and re-use them?
-								name = hash.get(RubySymbol.newSymbol(ruby, "insert")).toString();
-								length = name.length();
-								if (hash.containsKey(RubySymbol.newSymbol(ruby, "display")))
-								{
-									displayName = hash.get(RubySymbol.newSymbol(ruby, "display")).toString();
-								}
-								else
-								{
-									displayName = name;
-								}
-								if (hash.containsKey(RubySymbol.newSymbol(ruby, "image")))
-								{
-									String imagePath = hash.get(RubySymbol.newSymbol(ruby, "image")).toString();
-									// Turn into image!
-									ImageRegistry reg = CommonEditorPlugin.getDefault().getImageRegistry();
-									Image fromReg = reg.get(imagePath);
-									if (fromReg == null)
-									{
-										try
-										{
-											ImageDescriptor desc = ImageDescriptor.createFromURL(new File(imagePath)
-													.toURI().toURL());
-											reg.put(imagePath, desc);
-											image = reg.get(imagePath);
-										}
-										catch (MalformedURLException e)
-										{
-											CommonEditorPlugin.logError(e);
-										}
-									}
-									else
-									{
-										image = fromReg;
-									}
-								}
-								if (hash.containsKey(RubySymbol.newSymbol(ruby, "tool_tip")))
-								{
-									description = hash.get(RubySymbol.newSymbol(ruby, "tool_tip")).toString();
-								}
+								continue;
+							}
+							name = hash.get(RubySymbol.newSymbol(ruby, INSERT)).toString();
+							length = name.length();
+							if (hash.containsKey(RubySymbol.newSymbol(ruby, DISPLAY)))
+							{
+								displayName = hash.get(RubySymbol.newSymbol(ruby, DISPLAY)).toString();
 							}
 							else
 							{
-								// Array of strings
-								name = element.toString();
 								displayName = name;
-								length = name.length();
-
-								// if (this._replaceRange != null)
-								// {
-								// offset = this._replaceRange.getStartingOffset();
-								// replaceLength = this._replaceRange.getLength();
-								// }
 							}
-							// build proposal
-							CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset,
-									replaceLength, length, image, displayName, contextInfo, description);
-
-							// add it to the list
-							proposals.add(proposal);
+							if (hash.containsKey(RubySymbol.newSymbol(ruby, IMAGE)))
+							{
+								String imagePath = hash.get(RubySymbol.newSymbol(ruby, IMAGE)).toString();
+								// Turn into image!
+								ImageRegistry reg = CommonEditorPlugin.getDefault().getImageRegistry();
+								Image fromReg = reg.get(imagePath);
+								if (fromReg == null)
+								{
+									try
+									{
+										ImageDescriptor desc = ImageDescriptor.createFromURL(new File(imagePath)
+												.toURI().toURL());
+										reg.put(imagePath, desc);
+										image = reg.get(imagePath);
+									}
+									catch (MalformedURLException e)
+									{
+										CommonEditorPlugin.logError(e);
+									}
+								}
+								else
+								{
+									image = fromReg;
+								}
+							}
+							if (hash.containsKey(RubySymbol.newSymbol(ruby, TOOL_TIP)))
+							{
+								description = hash.get(RubySymbol.newSymbol(ruby, TOOL_TIP)).toString();
+							}
 						}
+						else
+						{
+							// Array of strings
+							name = element.toString();
+							displayName = name;
+							length = name.length();
+
+							// if (this._replaceRange != null)
+							// {
+							// offset = this._replaceRange.getStartingOffset();
+							// replaceLength = this._replaceRange.getLength();
+							// }
+						}
+						// build proposal
+						CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength,
+								length, image, displayName, contextInfo, description);
+
+						// add it to the list
+						proposals.add(proposal);
 					}
 				}
 			}
@@ -233,13 +275,15 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		{
 			CommonEditorPlugin.logError(e.getMessage(), e);
 		}
-		// FIXME Need to extract a protected method that subclass can override to insert their own proposals that aren't
-		// related to scripting!
-		ICompletionProposal[] others = this.computeCompletionProposals(viewer, offset);
-		ICompletionProposal[] combined = new ICompletionProposal[proposals.size() + others.length];
-		proposals.toArray(combined);
-		System.arraycopy(others, 0, combined, proposals.size(), others.length);
-		return combined;
+		return proposals;
+	}
+
+	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
+			boolean autoActivated)
+	{
+		// NOTE: This is the default implementation. Specific language CA processors
+		// should override this method
+		return computeCompletionProposals(viewer, offset);
 	}
 
 	/**
