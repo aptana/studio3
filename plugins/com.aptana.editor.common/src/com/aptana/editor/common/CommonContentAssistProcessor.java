@@ -1,11 +1,16 @@
 package com.aptana.editor.common;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -15,6 +20,11 @@ import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
+import org.jruby.Ruby;
+import org.jruby.RubyArray;
+import org.jruby.RubyHash;
+import org.jruby.RubySymbol;
+import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.ICommonContentAssistProcessor;
@@ -24,6 +34,14 @@ import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.scripting.model.AbstractElement;
+import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.CommandElement;
+import com.aptana.scripting.model.CommandResult;
+import com.aptana.scripting.model.ContentAssistElement;
+import com.aptana.scripting.model.filters.AndFilter;
+import com.aptana.scripting.model.filters.IModelFilter;
+import com.aptana.scripting.model.filters.ScopeFilter;
 
 public class CommonContentAssistProcessor implements IContentAssistProcessor, ICommonContentAssistProcessor
 {
@@ -48,12 +66,13 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 * @param completionProposals
 	 * @param category
 	 */
-	protected void addCompletionProposalsForCategory(ITextViewer viewer, int offset, Index index, List<ICompletionProposal> completionProposals, String category)
+	protected void addCompletionProposalsForCategory(ITextViewer viewer, int offset, Index index,
+			List<ICompletionProposal> completionProposals, String category)
 	{
 		try
 		{
 			List<QueryResult> queryResults = index.query(new String[] { category }, "", SearchPattern.PREFIX_MATCH); //$NON-NLS-1$
-			
+
 			if (queryResults != null)
 			{
 				for (QueryResult queryResult : queryResults)
@@ -61,7 +80,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 					String text = queryResult.getWord();
 					int length = text.length();
 					String info = category + " : " + text; //$NON-NLS-1$
-					
+
 					completionProposals.add(new CompletionProposal(text, offset, 0, length, null, text, null, info));
 				}
 			}
@@ -93,14 +112,134 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.ICommonContentAssistProcessor#computeCompletionProposals(org.eclipse.jface.text.ITextViewer, int, char, boolean)
+	 * @see
+	 * com.aptana.editor.common.ICommonContentAssistProcessor#computeCompletionProposals(org.eclipse.jface.text.ITextViewer
+	 * , int, char, boolean)
 	 */
 	@Override
-	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
+	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
+			boolean autoActivated)
 	{
 		// NOTE: This is the default implementation. Specific language CA processors
 		// should override this method
-		return this.computeCompletionProposals(viewer, offset);
+		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
+		try
+		{
+			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
+					.getScopeAtOffset(viewer.getDocument(), offset);
+			IModelFilter filter = new AndFilter(new ScopeFilter(scope), new IModelFilter()
+			{
+
+				@Override
+				public boolean include(AbstractElement element)
+				{
+					return element instanceof ContentAssistElement;
+				}
+			});
+			CommandElement[] commands = BundleManager.getInstance().getCommands(filter);
+			if (commands != null && commands.length > 0)
+			{
+				Ruby ruby = Ruby.newInstance();
+
+				for (CommandElement ce : commands)
+				{
+					CommandResult result = ce.execute();
+
+					if (result.executedSuccessfully())
+					{
+						String output = result.getOutputString();
+						// FIXME This assumes that the command is returning an array that is output as a
+						// string I can eval (via inspect)!
+						RubyArray object = (RubyArray) ruby.evalScriptlet(output);
+						for (IRubyObject element : object.toJavaArray())
+						{
+							String name;
+							String displayName;
+							String description = "";
+							int length;
+							IContextInformation contextInfo = null;
+							int replaceLength = 0;
+							Image image = CommonEditorPlugin.getImage("icons/template.png");
+							if (element instanceof RubyHash)
+							{
+								RubyHash hash = (RubyHash) element;
+								// TODO Handle if there's no :insert key
+								// TODO Move symbol creation to top and re-use them?
+								name = hash.get(RubySymbol.newSymbol(ruby, "insert")).toString();
+								length = name.length();
+								if (hash.containsKey(RubySymbol.newSymbol(ruby, "display")))
+								{
+									displayName = hash.get(RubySymbol.newSymbol(ruby, "display")).toString();
+								}
+								else
+								{
+									displayName = name;
+								}
+								if (hash.containsKey(RubySymbol.newSymbol(ruby, "image")))
+								{
+									String imagePath = hash.get(RubySymbol.newSymbol(ruby, "image")).toString();
+									// Turn into image!
+									ImageRegistry reg = CommonEditorPlugin.getDefault().getImageRegistry();
+									Image fromReg = reg.get(imagePath);
+									if (fromReg == null)
+									{
+										try
+										{
+											ImageDescriptor desc = ImageDescriptor.createFromURL(new File(imagePath)
+													.toURI().toURL());
+											reg.put(imagePath, desc);
+											image = reg.get(imagePath);
+										}
+										catch (MalformedURLException e)
+										{
+											CommonEditorPlugin.logError(e);
+										}
+									}
+									else
+									{
+										image = fromReg;
+									}
+								}
+								if (hash.containsKey(RubySymbol.newSymbol(ruby, "tool_tip")))
+								{
+									description = hash.get(RubySymbol.newSymbol(ruby, "tool_tip")).toString();
+								}
+							}
+							else
+							{
+								// Array of strings
+								name = element.toString();
+								displayName = name;
+								length = name.length();
+
+								// if (this._replaceRange != null)
+								// {
+								// offset = this._replaceRange.getStartingOffset();
+								// replaceLength = this._replaceRange.getLength();
+								// }
+							}
+							// build proposal
+							CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset,
+									replaceLength, length, image, displayName, contextInfo, description);
+
+							// add it to the list
+							proposals.add(proposal);
+						}
+					}
+				}
+			}
+		}
+		catch (BadLocationException e)
+		{
+			CommonEditorPlugin.logError(e.getMessage(), e);
+		}
+		// FIXME Need to extract a protected method that subclass can override to insert their own proposals that aren't
+		// related to scripting!
+		ICompletionProposal[] others = this.computeCompletionProposals(viewer, offset);
+		ICompletionProposal[] combined = new ICompletionProposal[proposals.size() + others.length];
+		proposals.toArray(combined);
+		System.arraycopy(others, 0, combined, proposals.size(), others.length);
+		return combined;
 	}
 
 	/**
@@ -111,7 +250,8 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 * @param index
 	 * @param completionProposals
 	 */
-	protected void computeCompletionProposalsUsingIndex(ITextViewer viewer, int offset, Index index, List<ICompletionProposal> completionProposals)
+	protected void computeCompletionProposalsUsingIndex(ITextViewer viewer, int offset, Index index,
+			List<ICompletionProposal> completionProposals)
 	{
 	}
 
@@ -137,7 +277,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	{
 		return editor.getFileService().getParseResult();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getCompletionProposalAutoActivationCharacters()
@@ -177,7 +317,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	/**
 	 * getFilename
 	 * 
@@ -187,7 +327,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	{
 		return editor.getEditorInput().getName();
 	}
-	
+
 	/**
 	 * getIndex
 	 * 
@@ -201,19 +341,19 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		// FIXME: For non-workspace files, the editor input would be FileStoreEditorInput.
 		// Both it and FileEditorInput implements IURIEditorInput, so we could use that once
 		// we're adapting to handle indexing non-workspace files.
-		
+
 		if (editorInput instanceof IFileEditorInput)
 		{
 			IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
 			IFile file = fileEditorInput.getFile();
 			IProject project = file.getProject();
-			
+
 			result = IndexManager.getInstance().getIndex(project.getFullPath().toPortableString());
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getAllUserAgentIcons
 	 * 
@@ -224,10 +364,10 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		UserAgentManager manager = UserAgentManager.getInstance();
 		String[] userAgents = manager.getActiveUserAgentIDs();
 		Image[] userAgentIcons = manager.getUserAgentImages(userAgents);
-		
+
 		return userAgentIcons;
 	}
-	
+
 	/**
 	 * setSelectedProposal
 	 * 
@@ -278,7 +418,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 			if (proposals.size() > 0)
 			{
 				ICompletionProposal proposal = proposals.get(0);
-				
+
 				if (proposal instanceof CommonCompletionProposal)
 				{
 					((CommonCompletionProposal) proposal).setIsSuggestedSelection(true);
