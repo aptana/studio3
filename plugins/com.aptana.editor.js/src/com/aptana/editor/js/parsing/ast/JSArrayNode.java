@@ -1,5 +1,7 @@
 package com.aptana.editor.js.parsing.ast;
 
+import java.util.List;
+
 public class JSArrayNode extends JSNaryNode
 {
 	/**
@@ -31,5 +33,14 @@ public class JSArrayNode extends JSNaryNode
 	protected void appendOpenText(StringBuilder buffer)
 	{
 		buffer.append("["); //$NON-NLS-1$
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#addReturnTypes(java.util.List)
+	 */
+	@Override
+	protected void addReturnTypes(List<String> types)
+	{
+		types.add("Array");
 	}
 }
