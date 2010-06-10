@@ -70,9 +70,8 @@ public class UniformResourceChangeEvent extends EventObject implements IUniformR
 	/**
 	 * @see com.aptana.ide.core.resources.IUniformResourceChangeEvent#findMarkerDeltas(java.lang.String, boolean)
 	 */
-	@SuppressWarnings("unchecked")
 	public IMarkerDelta[] findMarkerDeltas(String type, boolean includeSubtypes) {
-		ArrayList matching = new ArrayList();
+		ArrayList<IMarkerDelta> matching = new ArrayList<IMarkerDelta>();
 		IMarkerDelta[] deltas = getMarkerDeltas();
 		for( int i = 0; i < deltas.length; ++i ) {
 			IMarkerDelta markerDelta = deltas[i];

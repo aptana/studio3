@@ -217,7 +217,8 @@ public class UniformResourceMarker extends PlatformObject implements IUniformRes
 	public void setAttribute(String attributeName, Object value) throws CoreException {
 		MarkerInfo info = getInfo();
 		checkInfo(info);
-		info.setAttribute(attributeName, value);
+		boolean validate = getMarkerManager().isPersistent(info);
+		info.setAttribute(attributeName, value, validate);
 		IMarkerSetElement[] changes = new IMarkerSetElement[] { new MarkerDelta(IResourceDelta.CHANGED,resource,info) };
 		getMarkerManager().changedMarkers(resource, changes);
 	}
@@ -235,7 +236,8 @@ public class UniformResourceMarker extends PlatformObject implements IUniformRes
 	public void setAttributes(String[] attributeNames, Object[] values) throws CoreException {
 		MarkerInfo info = getInfo();
 		checkInfo(info);
-		info.setAttributes(attributeNames, values);
+		boolean validate = getMarkerManager().isPersistent(info);
+		info.setAttributes(attributeNames, values, validate);
 		IMarkerSetElement[] changes = new IMarkerSetElement[] { new MarkerDelta(IResourceDelta.CHANGED,resource,info) };
 		getMarkerManager().changedMarkers(resource, changes);
 	}
@@ -246,7 +248,8 @@ public class UniformResourceMarker extends PlatformObject implements IUniformRes
 	public void setAttributes(Map attributes) throws CoreException {
 		MarkerInfo info = getInfo();
 		checkInfo(info);
-		info.setAttributes(attributes);
+		boolean validate = getMarkerManager().isPersistent(info);
+		info.setAttributes(attributes, validate);
 		IMarkerSetElement[] changes = new IMarkerSetElement[] { new MarkerDelta(IResourceDelta.CHANGED,resource,info) };
 		getMarkerManager().changedMarkers(resource, changes);
 	}
