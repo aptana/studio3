@@ -220,6 +220,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		final ToolBar commandsToolBar = new ToolBar(toolbarComposite, SWT.FLAT);
 		ToolItem commandsToolItem = new ToolItem(commandsToolBar, SWT.DROP_DOWN);
 		commandsToolItem.setImage(ExplorerPlugin.getImage(GEAR_MENU_ICON));
+		commandsToolItem.setToolTipText(Messages.SingleProjectView_TTP_Commands);
 		GridData branchComboData = new GridData(SWT.END, SWT.CENTER, false,
 				false);
 		branchComboData.minimumWidth = 24;
@@ -402,6 +403,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		final ToolBar deployToolBar = new ToolBar(parent, SWT.FLAT);
 		deployToolItem = new ToolItem(deployToolBar, SWT.DROP_DOWN);
 		deployToolItem.setImage(ExplorerPlugin.getImage(DEPLOY_MENU_ICON));
+		deployToolItem.setToolTipText(Messages.SingleProjectView_TTP_Deploy);
 		GridData deployComboData = new GridData(SWT.END, SWT.CENTER, true,
 				false);
 		deployComboData.minimumWidth = 24;

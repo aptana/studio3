@@ -321,7 +321,7 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 
         fTransferSyncButton = new Button(directions, SWT.NONE);
         fTransferSyncButton.setImage(SyncingUIPlugin.getImage("icons/full/obj16/sync_both.gif")); //$NON-NLS-1$
-        fTransferSyncButton.setToolTipText("Synchronizes the files on the right with those on the left");
+        fTransferSyncButton.setToolTipText(Messages.FTPManagerComposite_TTP_Synchronize);
         fTransferSyncButton.setLayoutData(new GridData(SWT.CENTER, SWT.BEGINNING, true, true));
         fTransferSyncButton.addSelectionListener(this);
 
@@ -463,7 +463,7 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
     }
 
     private void transferSourceToDestination() {
-        transferItems(fSource.getSelectedElements(), fTarget.getCurrentInput(),
+        transferItems(fSource.getSelectedElements(), fSource.getCurrentInput(), fTarget.getCurrentInput(),
                 new JobChangeAdapter() {
 
                     @Override
@@ -480,7 +480,7 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
     }
 
     private void transferDestinationToSource() {
-        transferItems(fTarget.getSelectedElements(), fSource.getCurrentInput(),
+        transferItems(fTarget.getSelectedElements(), fTarget.getCurrentInput(), fSource.getCurrentInput(),
                 new JobChangeAdapter() {
 
                     @Override
@@ -496,12 +496,17 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
                 });
     }
 
-    private void transferItems(IAdaptable[] sourceItems, IAdaptable targetRoot,
+    private void transferItems(IAdaptable[] sourceItems, IAdaptable sourceRoot, IAdaptable targetRoot,
             IJobChangeListener listener) {
-        IFileStore targetStore = SyncUtils.getFileStore(targetRoot);
-        if (targetStore != null) {
+        IFileStore targetRootStore = SyncUtils.getFileStore(targetRoot);
+        if (targetRootStore != null) {
             CopyFilesOperation operation = new CopyFilesOperation(getControl().getShell());
-            operation.copyFiles(sourceItems, targetStore, listener);
+            IFileStore sourceRootStore = SyncUtils.getFileStore(sourceRoot);
+            if (sourceRootStore == null) {
+            	operation.copyFiles(sourceItems, targetRootStore, listener);
+            } else {
+            	operation.copyFiles(sourceItems, sourceRootStore, targetRootStore, listener);
+            }
         }
     }
 
