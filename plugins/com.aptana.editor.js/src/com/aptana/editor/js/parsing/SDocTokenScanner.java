@@ -89,6 +89,7 @@ public class SDocTokenScanner extends RuleBasedScanner
 		List<IRule> rules = new LinkedList<IRule>();
 		
 		rules.add(new RegexpRule("[ \\t]+", getToken(SDocTokenType.WHITESPACE), true));
+		rules.add(new RegexpRule("^[ \\t]*\\*(?!/)[ \\t]*", getToken(SDocTokenType.WHITESPACE), true));
 		rules.add(new SingleCharacterRule('\r', getToken(SDocTokenType.WHITESPACE)));
 		rules.add(new SingleCharacterRule('\n', getToken(SDocTokenType.WHITESPACE)));
 
