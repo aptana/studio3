@@ -1,0 +1,377 @@
+%package "com.aptana.editor.js.parsing";
+%class "SDocParser";
+%embed {:
+	// suppress parser error reporting and let the custom error recovery mechanism handle it
+	private static class SDocEvents extends Events
+	{
+		public void scannerError(Scanner.Exception e)
+		{
+		}
+
+		public void syntaxError(Symbol token)
+		{
+		}
+
+		public void unexpectedTokenRemoved(Symbol token)
+		{
+		}
+
+		public void missingTokenInserted(Symbol token)
+		{
+		}
+
+		public void misspelledTokenReplaced(Symbol token)
+		{
+		}
+
+		public void errorPhraseRemoved(Symbol error)
+		{
+		}
+	}
+	
+	private SDocScanner fScanner;
+	
+	/**
+	 * parse
+	 *
+	 * @param source
+	 */
+	public void parse(String source) throws java.lang.Exception
+	{
+		fScanner.setSource(source);
+		parse(fScanner);
+	}
+:};
+%init {:
+	report = new SDocEvents();
+:};
+
+%terminals LBRACKET, RBRACKET, LCURLY, RCURLY, POUND, COLON, ERROR;
+%terminals COMMA, PIPE, LPAREN, RPAREN, LESS_THAN, GREATER_THAN, ARROW, ELLIPSIS;
+%terminals START_DOCUMENTATION, END_DOCUMENTATION, TEXT;
+%terminals ADVANCED, ALIAS, AUTHOR, CLASS_DESCRIPTION, CONSTRUCTOR, EXAMPLE, EXCEPTION;
+%terminals EXTENDS, INTERNAL, METHOD, NAMESPACE, OVERVIEW, PARAM, RETURN, SEE, UNKNOWN;
+%terminals IDENTIFIER, ARRAY, FUNCTION, PRIVATE, PROPERTY;
+
+%goal grammar;
+
+grammar
+	=	block
+	;
+
+block
+	=	START_DOCUMENTATION text END_DOCUMENTATION
+		{:
+			// TextBlock
+		:}
+	|	START_DOCUMENTATION tags END_DOCUMENTATION
+		{:
+			// TagsBlock
+		:}
+	|	START_DOCUMENTATION text tags END_DOCUMENTATION
+		{:
+			// Block
+		:}
+	;
+
+text
+	=	text textPart
+		{:
+			// AddText
+		:}
+	|	textPart
+		{:
+			// PassThrough
+		:}
+	;
+
+textPart
+	=	TEXT
+		{:
+			// Text
+		:}
+	|	LBRACKET
+		{:
+			// Text
+		:}
+	|	RBRACKET
+		{:
+			// Text
+		:}
+	|	LCURLY
+		{:
+			// Text
+		:}
+	|	RCURLY
+		{:
+			// Text
+		:}
+	|	POUND
+		{:
+			// Text
+		:}
+	|	IDENTIFIER
+		{:
+			// Text
+		:}
+	|	COLON
+		{:
+			// Text
+		:}
+	|	ERROR
+		{:
+			// Text
+		:}
+	;
+
+tags
+	=	tags tag
+		{:
+			// AddTag
+		:}
+	|	tag
+		{:
+			// FirstTag
+		:}
+	;
+
+tag
+	=	ADVANCED text?
+		{:
+			// Advanced
+		:}
+	|	ALIAS text
+		{:
+			// Alias
+		:}
+	|	AUTHOR text
+		{:
+			// Author
+		:}
+	|	CLASS_DESCRIPTION LCURLY namespace RCURLY text
+		{:
+			// ClassDescription
+		:}
+	|	CONSTRUCTOR text?
+		{:
+			// Constructor
+		:}
+	|	EXAMPLE text
+		{:
+			// Example
+		:}
+	|	EXCEPTION LCURLY types RCURLY text?
+		{:
+			// Exception
+		:}
+	|	EXTENDS LCURLY types RCURLY text?
+		{:
+			// Extends
+		:}
+	|	INTERNAL text?
+		{:
+			// Internal
+		:}
+	|	METHOD text?
+		{:
+			// Method
+		:}
+	|	NAMESPACE LCURLY namespace RCURLY text?
+		{:
+			// Namespace
+		:}
+	|	OVERVIEW text
+		{:
+			// Overview
+		:}
+	|	PARAM LCURLY types RCURLY paramName text?
+		{:
+			// Param
+		:}
+	|	PRIVATE text?
+		{:
+			// Private
+		:}
+	|	PROPERTY LCURLY types RCURLY text?
+		{:
+			// Property
+		:}
+	|	RETURN LCURLY types RCURLY text?
+		{:
+			// Return
+		:}
+	|	SEE text
+		{:
+			// SeeText
+		:}
+	|	UNKNOWN text?
+		{:
+			// Unknown
+		:}
+	;
+
+types
+	=	types typeDelimiter type
+		{:
+			// AddType
+		:}
+	|	type
+		{:
+			// FirstType
+		:}
+	;
+
+typeDelimiter
+	=	COMMA
+	|	PIPE
+	;
+
+type
+	=	IDENTIFIER
+		{:
+			// Type
+		:}
+	|	IDENTIFIER LBRACKET RBRACKET
+		{:
+			// SimpleArrayType
+		:}
+	|	ARRAY LBRACKET RBRACKET
+		{:
+			// SimpleArrayType
+		:}
+	|	FUNCTION LBRACKET RBRACKET
+		{:
+			// SimpleArrayType
+		:}
+	|	ARRAY
+		{:
+			// Type
+		:}
+	|	ARRAY LESS_THAN type GREATER_THAN
+		{:
+			// ComplexArrayType
+		:}
+	|	FUNCTION
+		{:
+			// SimpleProcedure
+		:}
+	|	FUNCTION returnDelimiter type
+		{:
+			// SimpleFunction
+		:}
+	|	FUNCTION returnDelimiter LPAREN types RPAREN
+		{:
+			// SimpleFunctionComplexReturn
+		:}
+	|	FUNCTION LPAREN RPAREN
+		{:
+			// SimpleProcedure
+		:}
+	|	FUNCTION LPAREN RPAREN returnDelimiter type
+		{:
+			// SimpleFunction2
+		:}
+	|	FUNCTION LPAREN RPAREN returnDelimiter LPAREN types RPAREN
+		{:
+			// SimpleFunctionComplexReturn2
+		:}
+	|	FUNCTION LPAREN types RPAREN
+		{:
+			// Procedure
+		:}
+	|	FUNCTION LPAREN types RPAREN returnDelimiter type
+		{:
+			// Function
+		:}
+	|	FUNCTION LPAREN types RPAREN returnDelimiter LPAREN types RPAREN
+		{:
+			// FunctionComplexReturn
+		:}
+//	|	FUNCTION functionParameterTypes functionReturnTypes
+//		{:
+//			// TestFunction
+//		:}
+	;
+
+//FunctionParameterTypes
+//	=	<empty>
+//		{:
+//			// NoParameterTypes
+//		:}
+//	|	LPAREN RPAREN
+//		{:
+//			// NoParameterTypes
+//		:}
+//	|	LPAREN Types RPAREN
+//		{:
+//			// ParameterTypes
+//		:}
+//	;
+//
+//FunctionReturnTypes
+//	=	<empty>
+//		{:
+//			// NoReturnType
+//		:}
+//	|	returnDelimiter Type
+//		{:
+//			// ReturnType
+//		:}
+//	|	returnDelimiter LPAREN Types RPAREN
+//		{:
+//			// ReturnTypes
+//		:}
+//	;
+
+returnDelimiter
+	=	COLON
+	|	ARROW
+	;
+
+paramName
+	=	TEXT
+		{:
+			// ParamName
+		:}
+	|	LBRACKET TEXT RBRACKET
+		{:
+			// OptionalParamName
+		:}
+	|	ELLIPSIS
+		{:
+			// VarArgs
+		:}
+	|	LBRACKET ELLIPSIS RBRACKET
+		{:
+			// OptionalVarArgs
+		:}
+	;
+
+namespace
+	=	IDENTIFIER
+	|	FUNCTION
+	|	ARRAY
+	;
+
+/*
+ * Below is a list of tags defined by the sdoc parser that are not supported yet in this parser
+ */
+
+//Param
+//	|	CLASS_DESCRIPTION
+//	|	COPYRIGHT
+//	|	DEPRECATED
+//	|	EXTENDS
+//	|	ID
+//	|	IGNORE
+//	|	LICENSE
+//	|	LINK
+//	|	MEMBER_OF
+//	|	NATIVE
+//	|	PROJECT_DESCRIPTION
+//	|	PROTECTED
+//	|	SDOC
+//	|	SINCE
+//	|	TYPE
+//	|	VERSION
+//	;
