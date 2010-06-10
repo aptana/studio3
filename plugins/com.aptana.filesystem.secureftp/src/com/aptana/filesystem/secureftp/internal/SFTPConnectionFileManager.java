@@ -312,10 +312,11 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	}
 
 	private static void throwFileNotFound(FTPException e, IPath path) throws FileNotFoundException, FTPException {
-		if (e.getReplyCode() == -1) {
+		int reply = e.getReplyCode();
+		if (reply == -1 || reply == 2) {
 			throw new FileNotFoundException(path.toPortableString());
 		}
-		throw e;		
+		throw e;
 	}
 
 	private static void fillFileInfo(ExtendedFileInfo fileInfo, FTPFile ftpFile) {
@@ -426,7 +427,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			} else {
 				connectionRetryCount = 0;
 				throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedFetchFileInfo, e));
-			}	
+			}
 		}
 		ExtendedFileInfo fileInfo = new ExtendedFileInfo(path.lastSegment());
 		fileInfo.setExists(false);
