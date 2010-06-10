@@ -28,6 +28,7 @@ public class SDocScanner extends Scanner
 	public SDocScanner()
 	{
 		fTokenScanner = new SDocTokenScanner();
+		fTypeTokenScanner = new SDocTypeTokenScanner();
 		fQueue = new LinkedList<Symbol>();
 	}
 
@@ -116,6 +117,8 @@ public class SDocScanner extends Scanner
 				Symbol symbol = new Symbol(type.getIndex(), offset, offset + length - 1, fDocument.get(offset, length));
 
 				fQueue.add(symbol);
+				
+				token = fTypeTokenScanner.nextToken();
 			}
 			catch (BadLocationException e)
 			{
