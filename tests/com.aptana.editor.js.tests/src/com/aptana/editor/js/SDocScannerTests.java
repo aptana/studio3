@@ -55,7 +55,7 @@ public class SDocScannerTests extends TestCase
 			{
 				Symbol symbol = this._scanner.nextToken();
 				
-				assertEquals("at index " + i, type.getIndex(), symbol.getId());
+				assertEquals(symbol.value + " at index " + i, type.getIndex(), symbol.getId());
 			}
 			catch (IOException e)
 			{
@@ -438,6 +438,43 @@ public class SDocScannerTests extends TestCase
 			SDocTokenType.COLON,
 			SDocTokenType.IDENTIFIER,
 			SDocTokenType.RCURLY
+		);
+	}
+	
+	/**
+	 * testSampleBlock
+	 */
+	public void testSampleBlock()
+	{
+		String source =
+			"/**\n" +
+			" * This is a sample block\n" +
+			" *\n" +
+			" * @param {Number} count\n" +
+			" *   The number of times to do something\n" +
+			" */";
+		
+		lexemeTypeTests(
+			source,
+			SDocTokenType.START_DOCUMENTATION,	// /**
+			SDocTokenType.TEXT,					// This
+			SDocTokenType.TEXT,					// is
+			SDocTokenType.TEXT,					// a
+			SDocTokenType.TEXT,					// sample
+			SDocTokenType.TEXT,					// block
+			SDocTokenType.PARAM,				// @param
+			SDocTokenType.LCURLY,				// {
+			SDocTokenType.IDENTIFIER,			// Number
+			SDocTokenType.RCURLY,				// }
+			SDocTokenType.TEXT,					// count
+			SDocTokenType.TEXT,					// The
+			SDocTokenType.TEXT,					// number
+			SDocTokenType.TEXT,					// of
+			SDocTokenType.TEXT,					// times
+			SDocTokenType.TEXT,					// to
+			SDocTokenType.TEXT,					// do
+			SDocTokenType.TEXT,					// something
+			SDocTokenType.END_DOCUMENTATION		// */
 		);
 	}
 }
