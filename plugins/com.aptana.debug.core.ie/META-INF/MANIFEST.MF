@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %fragmentName
+Bundle-SymbolicName: com.aptana.debug.core.ie
+Bundle-Version: 2.0.0.qualifier
+Bundle-Vendor: %providerName
+Fragment-Host: com.aptana.debug.core;bundle-version="1.0.0"
+Bundle-Localization: fragment
