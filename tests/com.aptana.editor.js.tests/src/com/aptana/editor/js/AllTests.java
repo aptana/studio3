@@ -14,13 +14,14 @@ public class AllTests
 		// suite.addTestSuite(JSCodeScannerPerformanceTest.class);
 		suite.addTestSuite(JSCodeScannerTest.class);
 		suite.addTestSuite(JSSourcePartitionScannerTest.class);
-		suite.addTestSuite(SDocTokenScannerTests.class);
 		// suite.addTestSuite(JSParserPerformanceTest.class);
 		suite.addTestSuite(JSSingleQuotedStringScannerTest.class);
 		suite.addTestSuite(JSDoubleQuotedStringScannerTest.class);
 		suite.addTestSuite(JSRegexScannerTest.class);
 		suite.addTestSuite(JSDocScannerTest.class);
 		suite.addTestSuite(JSEditorTest.class);
+		suite.addTestSuite(SDocTokenScannerTests.class);
+		suite.addTestSuite(SDocTypeTokenScannerTests.class);
 		// $JUnit-END$
 		return suite;
 	}

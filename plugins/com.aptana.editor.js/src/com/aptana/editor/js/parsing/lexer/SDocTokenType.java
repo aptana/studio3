@@ -45,7 +45,8 @@ public enum SDocTokenType
 	LESS_THAN,			//
 	GREATER_THAN,		//
 	START_DOCUMENTATION,
-	WHITESPACE;			//
+	WHITESPACE,			//
+	TYPES;				//
 	
 	private short _index;
 

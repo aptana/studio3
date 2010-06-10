@@ -1,111 +1,44 @@
 package com.aptana.editor.js;
 
-import junit.framework.TestCase;
-
-import org.eclipse.jface.text.Document;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.RuleBasedScanner;
 
 import com.aptana.editor.js.parsing.SDocTokenScanner;
 import com.aptana.editor.js.parsing.lexer.SDocTokenType;
 
-public class SDocTokenScannerTests extends TestCase
+public class SDocTokenScannerTests extends SDocScannerTestBase
 {
-	private SDocTokenScanner _scanner;
-	
 	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
+	 * @see com.aptana.editor.js.SDocScannerTestBase#createScanner()
 	 */
 	@Override
-	protected void setUp() throws Exception
+	protected RuleBasedScanner createScanner()
 	{
-		super.setUp();
-		
-		this._scanner = new SDocTokenScanner();
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
-	{
-		this._scanner = null;
-		
-		super.tearDown();
+		return new SDocTokenScanner();
 	}
 
 	/**
-	 * lexemeTypeTests
-	 * 
-	 * @param source
-	 * @param types
+	 * testNoTypes
 	 */
-	protected void lexemeTypeTests(String source, SDocTokenType... types)
+	public void testNoTypes()
 	{
-		IDocument document = new Document(source);
-		
-		this._scanner.setRange(document, 0, source.length());
-		
-		for (SDocTokenType type : types)
-		{
-			IToken token = this._scanner.nextToken();
-			Object data = token.getData();
-			
-			assertTrue(data instanceof SDocTokenType);
-			assertEquals(type, data);
-		}
-	}
-	
-	/**
-	 * testLeftParen
-	 */
-	public void testLeftParen()
-	{
-		String source = "(";
+		String source = "{}";
 		
 		lexemeTypeTests(
 			source,
-			SDocTokenType.LPAREN
+			SDocTokenType.TYPES
 		);
 	}
 	
 	/**
-	 * testRightParen
+	 * testTypes
 	 */
-	public void testRightParen()
+	public void testTypes()
 	{
-		String source = ")";
+		String source = "{Number}";
 		
 		lexemeTypeTests(
 			source,
-			SDocTokenType.RPAREN
-		);
-	}
-	
-	/**
-	 * testLeftCurly
-	 */
-	public void testLeftCurly()
-	{
-		String source = "{";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.LCURLY
-		);
-	}
-	
-	/**
-	 * testRightCurly
-	 */
-	public void testRightCurly()
-	{
-		String source = "}";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.RCURLY
+			SDocTokenType.TYPES
 		);
 	}
 	
@@ -136,84 +69,6 @@ public class SDocTokenScannerTests extends TestCase
 	}
 	
 	/**
-	 * testLessThan
-	 */
-	public void testLessThan()
-	{
-		String source = "<";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.LESS_THAN
-		);
-	}
-	
-	/**
-	 * testGreaterThan
-	 */
-	public void testGreaterThan()
-	{
-		String source = ">";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.GREATER_THAN
-		);
-	}
-	
-	/**
-	 * testColon
-	 */
-	public void testColon()
-	{
-		String source = ":";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.COLON
-		);
-	}
-	
-	/**
-	 * testPound
-	 */
-	public void testPound()
-	{
-		String source = "#";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.POUND
-		);
-	}
-	
-	/**
-	 * testComma
-	 */
-	public void testComma()
-	{
-		String source = ",";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.COMMA
-		);
-	}
-	
-	/**
-	 * testPipe
-	 */
-	public void testPipe()
-	{
-		String source = "|";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.PIPE
-		);
-	}
-	
-	/**
 	 * testStartDocumentation
 	 */
 	public void testStartDocumentation()
@@ -236,32 +91,6 @@ public class SDocTokenScannerTests extends TestCase
 		lexemeTypeTests(
 			source,
 			SDocTokenType.END_DOCUMENTATION
-		);
-	}
-	
-	/**
-	 * testArrow
-	 */
-	public void testArrow()
-	{
-		String source = "->";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.ARROW
-		);
-	}
-	
-	/**
-	 * testEllipsis
-	 */
-	public void testEllipsis()
-	{
-		String source = "...";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.ELLIPSIS
 		);
 	}
 	
@@ -500,60 +329,101 @@ public class SDocTokenScannerTests extends TestCase
 	}
 	
 	/**
-	 * testFunction
+	 * testCR
 	 */
-	public void testFunction()
+	public void testCR()
 	{
-		String source = "function";
+		String source = "\r";
 		
 		lexemeTypeTests(
 			source,
-			SDocTokenType.FUNCTION
+			SDocTokenType.WHITESPACE
 		);
 	}
 	
 	/**
-	 * testArray
+	 * testLF
 	 */
-	public void testArray()
+	public void testLF()
 	{
-		String source = "array";
+		String source = "\n";
 		
 		lexemeTypeTests(
 			source,
-			SDocTokenType.ARRAY
+			SDocTokenType.WHITESPACE
 		);
 	}
 	
 	/**
-	 * testSimpleIdentifiers
+	 * testCRLF
 	 */
-	public void testSimpleIdentifiers()
+	public void testCRLF()
 	{
-		String source = "Number $number _number";
+		String source = "\r\n";
 		
 		lexemeTypeTests(
 			source,
-			SDocTokenType.IDENTIFIER,
-			SDocTokenType.WHITESPACE,
-			SDocTokenType.IDENTIFIER,
-			SDocTokenType.WHITESPACE,
-			SDocTokenType.IDENTIFIER
+			SDocTokenType.WHITESPACE
 		);
 	}
 	
 	/**
-	 * testNearIdentifiers
+	 * testSpace
 	 */
-	public void testNearIdentifiers()
+	public void testSpace()
 	{
-		String source = "functions arrays";
+		String source = " ";
 		
 		lexemeTypeTests(
 			source,
-			SDocTokenType.IDENTIFIER,
-			SDocTokenType.WHITESPACE,
-			SDocTokenType.IDENTIFIER
+			SDocTokenType.WHITESPACE
 		);
+	}
+	
+	/**
+	 * testTab
+	 */
+	public void testTab()
+	{
+		String source = "\t";
+		
+		lexemeTypeTests(
+			source,
+			SDocTokenType.WHITESPACE
+		);
+	}
+	
+	public void testSampleBlock()
+	{
+//		String source =
+//			"/**\n" +
+//			" * This is a sample block of text\n" +
+//			" *\n" +
+//			" * @param {String} text\n" +
+//			" *   This is a description of 'text'\n" +
+//			" */";
+//		
+//		lexemeTypeTests(
+//			source,
+//			SDocTokenType.START_DOCUMENTATION,
+//			//SDocTokenType.WHITESPACE,
+//			//SDocTokenType.WHITESPACE,
+//			SDocTokenType.TEXT,
+//			SDocTokenType.WHITESPACE,
+//			SDocTokenType.WHITESPACE,
+//			SDocTokenType.WHITESPACE,
+//			SDocTokenType.PARAM,
+//			SDocTokenType.WHITESPACE,
+//			SDocTokenType.LCURLY,
+//			SDocTokenType.IDENTIFIER,
+//			SDocTokenType.RCURLY,
+//			SDocTokenType.WHITESPACE,
+//			SDocTokenType.TEXT,
+//			SDocTokenType.WHITESPACE,
+//			SDocTokenType.WHITESPACE,
+//			SDocTokenType.TEXT,
+//			SDocTokenType.WHITESPACE,
+//			SDocTokenType.END_DOCUMENTATION
+//		);
 	}
 }
