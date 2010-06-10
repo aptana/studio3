@@ -22,6 +22,7 @@ public class AllTests
 		suite.addTestSuite(JSEditorTest.class);
 		suite.addTestSuite(SDocTokenScannerTests.class);
 		suite.addTestSuite(SDocTypeTokenScannerTests.class);
+		suite.addTestSuite(SDocScannerTests.class);
 		// $JUnit-END$
 		return suite;
 	}
