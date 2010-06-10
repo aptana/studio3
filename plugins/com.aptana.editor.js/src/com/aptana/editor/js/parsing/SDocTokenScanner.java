@@ -125,7 +125,7 @@ public class SDocTokenScanner extends RuleBasedScanner
 		
 		rules.add(new RegexpRule("[^ \\t{\\[\\]#]+", getToken(SDocTokenType.TEXT), true));
 		
-		this.setDefaultReturnToken(getToken(SDocTokenType.TEXT));
+		this.setDefaultReturnToken(getToken(SDocTokenType.ERROR));
 		this.setRules(rules.toArray(new IRule[rules.size()]));
 	}
 	
