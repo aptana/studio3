@@ -59,7 +59,10 @@
 	 */
 	protected void addSymbol(String name, JSNode value)
 	{
-		fScope.addSymbol(name, value);
+		if (fScope != null)
+		{
+			fScope.addSymbol(name, value);
+		}
 	}
 	
 	/**
@@ -80,7 +83,11 @@
 	{
 		Scope<JSNode> childScope = new Scope<JSNode>();
 		
-		fScope.addScope(childScope);
+		if (fScope != null)
+		{
+			fScope.addScope(childScope);
+		}
+		
 		fScope = childScope;
 	}
 	

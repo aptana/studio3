@@ -173,7 +173,10 @@ public class JSParser extends Parser implements IParser {
 	 */
 	protected void addSymbol(String name, JSNode value)
 	{
-		fScope.addSymbol(name, value);
+		if (fScope != null)
+		{
+			fScope.addSymbol(name, value);
+		}
 	}
 	
 	/**
@@ -194,7 +197,11 @@ public class JSParser extends Parser implements IParser {
 	{
 		Scope<JSNode> childScope = new Scope<JSNode>();
 		
-		fScope.addScope(childScope);
+		if (fScope != null)
+		{
+			fScope.addScope(childScope);
+		}
+		
 		fScope = childScope;
 	}
 	
