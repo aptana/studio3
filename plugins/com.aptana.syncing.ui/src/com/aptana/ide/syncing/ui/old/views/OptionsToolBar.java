@@ -174,8 +174,9 @@ public class OptionsToolBar
 		optionsBar.setLayout(layout);
 
 		fDropdown = new ToolItem(optionsBar, SWT.DROP_DOWN);
-		fDropdown.setText(Messages.SmartSyncDialog_ViewOptions);
+		//fDropdown.setText(Messages.SmartSyncDialog_ViewOptions);
 		fDropdown.setToolTipText(Messages.SmartSyncDialog_OptionsToolTip);
+		fDropdown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/configure.gif"));
 
 		final Menu menu = new Menu(optionsBar);
 		fDropdown.addSelectionListener(new SelectionAdapter()

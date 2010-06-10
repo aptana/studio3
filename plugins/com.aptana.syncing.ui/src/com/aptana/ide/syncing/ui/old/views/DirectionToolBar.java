@@ -49,6 +49,8 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
+import com.aptana.ide.syncing.ui.SyncingUIPlugin;
+
 
 /**
  * @author Kevin Sawicki (ksawicki@aptana.com)
@@ -207,6 +209,7 @@ public class DirectionToolBar
 		directionBar.setLayout(layout);
 
 		fDirectionDown = new ToolItem(directionBar, SWT.DROP_DOWN);
+		fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/sync_both.gif"));
 
 		final Menu directionMenu = new Menu(directionBar);
 		fDirectionDown.addSelectionListener(new SelectionAdapter()
@@ -239,7 +242,7 @@ public class DirectionToolBar
 					return;
 				}
 
-				fDirectionDown.setText(item.getText());
+				updateText();
 				updateToolTip();
 				parent.getParent().layout(true, true);
 
@@ -281,7 +284,7 @@ public class DirectionToolBar
 		fForceDownload.setText(Messages.SmartSyncDialog_DownloadAll); //$NON-NLS-1$
 		fForceDownload.addSelectionListener(directionAdapter);
 
-		fDirectionDown.setText(fBoth.getText());
+		//fDirectionDown.setText(fBoth.getText());
 		updateToolTip();
 		fPreviousSelection = fBoth;
 
@@ -292,23 +295,28 @@ public class DirectionToolBar
 	{
 	    if (fBoth.getSelection())
         {
-	        fDirectionDown.setText(fBoth.getText());
+			fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/direction_both.gif"));
+	        //fDirectionDown.setText(fBoth.getText());
         }
         else if (fUpload.getSelection())
         {
-            fDirectionDown.setText(fUpload.getText());
+    		fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/direction_upload.gif"));
+            //fDirectionDown.setText(fUpload.getText());
         }
         else if (fForceUpload.getSelection())
         {
-            fDirectionDown.setText(fForceUpload.getText());
+    		fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/direction_upload_force.gif"));
+            //fDirectionDown.setText(fForceUpload.getText());
         }
         else if (fDownload.getSelection())
         {
-            fDirectionDown.setText(fDownload.getText());
+    		fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/direction_download.gif"));
+            //fDirectionDown.setText(fDownload.getText());
         }
         else if (fForceDownload.getSelection())
         {
-            fDirectionDown.setText(fForceDownload.getText());
+    		fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/direction_download_force.gif"));
+            //fDirectionDown.setText(fForceDownload.getText());
         }
 	}
 

@@ -84,7 +84,7 @@ public class SmartSyncLabelProvider implements ITableLabelProvider, ITableColorP
 	{
 		fDisplay = display;
 		fImages = new FileLabelProvider();
-		fNewColor = new Color(fDisplay, new RGB(216, 191, 216));
+		fNewColor = new Color(fDisplay, new RGB(96, 180, 247));
 		fOverwriteColor = new Color(fDisplay, new RGB(255, 165, 0));
 		fUpdateColor = new Color(fDisplay, new RGB(173, 216, 230));
 		fDeleteColor = fDisplay.getSystemColor(SWT.COLOR_RED);

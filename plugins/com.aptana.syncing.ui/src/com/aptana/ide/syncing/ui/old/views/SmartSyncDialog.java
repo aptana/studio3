@@ -62,6 +62,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Cursor;
@@ -86,6 +87,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.ILogger;
+import com.aptana.core.util.FileUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.ide.syncing.core.old.ConnectionPointSyncPair;
@@ -116,9 +119,12 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 {
 
 	private static final String ICON = "icons/full/obj16/direction_both.gif"; //$NON-NLS-1$
-	private static final String ICON_UPDATE = "icons/full/obj16/updated.png"; //$NON-NLS-1$
-	private static final String ICON_SKIP = "icons/full/obj16/skipped.png"; //$NON-NLS-1$
-	private static final String ICON_DELETE = "icons/full/obj16/error.png"; //$NON-NLS-1$
+	private static final String ICON_UPDATE = "icons/full/obj16/sync.png"; //$NON-NLS-1$
+	private static final String ICON_SKIP = "icons/full/obj16/skip.png"; //$NON-NLS-1$
+	private static final String ICON_DELETE = "icons/full/obj16/delete.png"; //$NON-NLS-1$
+	private static final String IMAGE_LOCAL_SITE = "icons/full/wizban/local_site.png"; //$NON-NLS-1$
+	private static final String IMAGE_REMOTE_SITE = "icons/full/wizban/remote_site.png"; //$NON-NLS-1$
+
 	private static final String CLOSE_WHEN_DONE = "com.aptana.ide.syncing.views.CLOSE_WHEN_DONE"; //$NON-NLS-1$
 	private static final String COMPARE_IN_BACKGROUND = IPreferenceConstants.COMPARE_IN_BACKGROUND;
 	private static final String USE_CRC = IPreferenceConstants.USE_CRC;
@@ -176,6 +182,9 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 
 	private IFileStore[] filesToBeSynced;
 	private Image titleImage;
+	private Button left_arrow;
+	private Button right_arrow;
+	private Label sync_label;
 
 	/**
 	 * Creates a new sync dialog.
@@ -348,9 +357,10 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		main.setLayout(layout);
 		main.setLayoutData(new GridData(SWT.END, SWT.FILL, true, false));
 
-		Label label = new Label(main, SWT.NONE);
-		label.setText(Messages.SmartSyncDialog_DirectionMode);
-		label.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
+		optionsBar = new OptionsToolBar(main, this);
+		optionsBar.setPresentationType(getPresentationTypePref());
+		optionsBar.setShowDatesSelected(getShowModificationTimePref());
+		optionsBar.setEnabled(false);
 
 		directionBar = new DirectionToolBar(main, this, end1, end2);
 		directionBar.setSelection(getDirectionPref());
@@ -394,24 +404,78 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		});
 
 		Composite endpoints = new Composite(description, SWT.NONE);
-		layout = new GridLayout(2, false);
+		layout = new GridLayout(3, true);
 		layout.marginHeight = 0;
 		layout.marginWidth = 10;
 		layout.verticalSpacing = 0;
 		endpoints.setLayout(layout);
 		endpoints.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 
-		Label symbol = new Label(endpoints, SWT.VERTICAL);
-		symbol.setImage(SyncingUIPlugin.getImage(ICON));
-		GridData gridData = new GridData(SWT.FILL, SWT.CENTER, false, true);
-		gridData.verticalSpan = 2;
-		symbol.setLayoutData(gridData);
+		Label local_site = new Label(endpoints, SWT.VERTICAL);
+		local_site.setImage(SyncingUIPlugin.getImage(IMAGE_LOCAL_SITE));
+		GridData gridData = new GridData(SWT.CENTER, SWT.CENTER, false, true);
+		local_site.setLayoutData(gridData);
+
+		Composite directions = new Composite(endpoints, SWT.NONE);
+		layout = new GridLayout(2, false);
+		layout.marginWidth = 0;
+		layout.marginTop = 0;
+		directions.setLayout(layout);
+		gridData = new GridData(SWT.CENTER, SWT.CENTER, false, true);
+		directions.setLayoutData(gridData);
+
+		left_arrow = new Button(directions, SWT.TOGGLE);
+		left_arrow.setImage(SyncingUIPlugin.getImage("icons/full/wizban/sync_arrow_left.png"));
+		gridData = new GridData(SWT.RIGHT, SWT.CENTER, false, true);
+		left_arrow.setLayoutData(gridData);
+		left_arrow.addSelectionListener(new SelectionAdapter() {			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if(!left_arrow.getSelection()) {
+					directionBar.setSelection(DirectionToolBar.UPLOAD);
+				}
+				else if(right_arrow.getSelection()) {
+					directionBar.setSelection(DirectionToolBar.BOTH);
+				}
+				else {
+					directionBar.setSelection(DirectionToolBar.DOWNLOAD);					
+				}
+				updateSyncArrows(directionBar.getSelection());
+				load(false);
+			}
+		});
+
+		right_arrow = new Button(directions, SWT.TOGGLE);
+		right_arrow.setImage(SyncingUIPlugin.getImage("icons/full/wizban/sync_arrow_right.png"));
+		gridData = new GridData(SWT.LEFT, SWT.CENTER, false, true);
+		right_arrow.setLayoutData(gridData);
+		right_arrow.addSelectionListener(new SelectionAdapter() {			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if(!right_arrow.getSelection()) {
+					directionBar.setSelection(DirectionToolBar.DOWNLOAD);
+				}
+				else if(left_arrow.getSelection()) {
+					directionBar.setSelection(DirectionToolBar.BOTH);
+				}
+				else {
+					directionBar.setSelection(DirectionToolBar.UPLOAD);
+				}
+				updateSyncArrows(directionBar.getSelection());
+				load(false);
+			}
+		});
+		
+		Label remote_site = new Label(endpoints, SWT.VERTICAL);
+		remote_site.setImage(SyncingUIPlugin.getImage(IMAGE_REMOTE_SITE));
+		gridData = new GridData(SWT.CENTER, SWT.CENTER, false, true);
+		remote_site.setLayoutData(gridData);
 
 		if (this.filesToBeSynced == null || this.filesToBeSynced.length <= 1)
 		{
 			Label end1Label = new Label(endpoints, SWT.NONE);
-			end1Label.setText("Source: '" + end1 + "' (" + source.toString() + ")");
-			end1Label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+			end1Label.setText(FileUtil.compressPath(source.toString(), 30));
+			end1Label.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, false));
 		}
 		else
 		{
@@ -424,8 +488,8 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 			end1Comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 
 			Label end1Label = new Label(end1Comp, SWT.NONE);
-			end1Label.setText("Source: '" + end1 + "' (" + source.toString() + ")");
-			end1Label.setLayoutData(new GridData(SWT.FILL, SWT.HORIZONTAL, false, false));
+			end1Label.setText(FileUtil.compressPath(source.toString(), 30));
+			end1Label.setLayoutData(new GridData(SWT.CENTER, SWT.HORIZONTAL, false, false));
 
 			final Label end1Extra = new Label(end1Comp, SWT.NONE);
 			end1Extra.setText("(multiple files/folders)"); //$NON-NLS-1$
@@ -436,16 +500,28 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 			new LabelToolTip(end1Extra);
 		}
 
+		sync_label = new Label(endpoints, SWT.VERTICAL | SWT.CENTER);
+		gridData = new GridData(SWT.CENTER, SWT.CENTER, false, true);
+		gridData.widthHint = 150;
+		sync_label.setLayoutData(gridData);
+		sync_label.setText("");
+		
 		Label end2Label = new Label(endpoints, SWT.NONE);
-		end2Label.setText("Destination: '" + end2 + "' (" + dest.toString() + ")");
+		end2Label.setText(FileUtil.compressPath(dest.toString(), 30));
 		end2Label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
+		Label shadow_sep_h = new Label(endpoints, SWT.SEPARATOR | SWT.SHADOW_IN | SWT.HORIZONTAL);
+		gridData = new GridData(SWT.FILL, SWT.CENTER, false, true);
+		gridData.horizontalSpan = 3;
+		gridData.verticalIndent = 15;
+		shadow_sep_h.setLayoutData(gridData);
+ 		
 		Composite status = new Composite(description, SWT.NONE);
 		layout = new GridLayout(6, false);
-		layout.marginWidth = 10;
-		layout.marginTop = 10;
+		layout.marginWidth = 40;
+		layout.marginTop = 12;
 		status.setLayout(layout);
-		status.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
+		status.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, false, true));
 
 		Label updatedSymbol = new Label(status, SWT.VERTICAL);
 		updatedSymbol.setImage(SyncingUIPlugin.getImage(ICON_UPDATE));
@@ -621,7 +697,6 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		main.setLayout(layout);
 		main.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		createViewOptions(main);
 		swappable = createTable(main);
 		createFooter(main);
 
@@ -691,7 +766,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 				}
 			}
 		}
-		updatedLabel.setText(UPDATED_LABEL + updated);
+		updatedLabel.setText(StringUtil.format(UPDATED_LABEL, updated));
 		if (deleted == 0)
 		{
 			deletedLabel.setFont(updatedLabel.getFont());
@@ -718,28 +793,34 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 			deletedLabel.setFont(boldFont);
 			deletedLabel.setForeground(deletedLabel.getDisplay().getSystemColor(SWT.COLOR_RED));
 		}
-		deletedLabel.setText(DELETED_LABEL + deleted);
-		skippedLabel.setText(SKIPPED_LABEL + skipped);
+		deletedLabel.setText(StringUtil.format(DELETED_LABEL, deleted));
+		skippedLabel.setText(StringUtil.format(SKIPPED_LABEL, skipped));
 		this.skipped = skipped;
 		skippedLabel.getParent().layout(true, true);
 		startSync.setEnabled(deleted + updated > 0);
 	}
 
-	private Composite createViewOptions(Composite parent)
-	{
-		Composite main = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout();
-		layout.marginHeight = 0;
-		layout.marginWidth = 0;
-		main.setLayout(layout);
-		main.setLayoutData(new GridData(SWT.END, SWT.FILL, true, false));
+	private void updateSyncArrows(int selection) {
 
-		optionsBar = new OptionsToolBar(main, this);
-		optionsBar.setPresentationType(getPresentationTypePref());
-		optionsBar.setShowDatesSelected(getShowModificationTimePref());
-		optionsBar.setEnabled(false);
-
-		return main;
+		switch (selection) {
+			case DirectionToolBar.BOTH:
+				left_arrow.setSelection(true);
+				right_arrow.setSelection(true);
+				sync_label.setText(Messages.SmartSyncDialog_BothDirection);
+				break;
+			case DirectionToolBar.UPLOAD:
+			case DirectionToolBar.FORCE_UPLOAD:
+				left_arrow.setSelection(false);
+				right_arrow.setSelection(true);
+				sync_label.setText(Messages.SmartSyncDialog_Upload);
+				break;
+			case DirectionToolBar.FORCE_DOWNLOAD:
+			case DirectionToolBar.DOWNLOAD:
+				left_arrow.setSelection(true);
+				right_arrow.setSelection(false);
+				sync_label.setText(Messages.SmartSyncDialog_Download);
+				break;
+		}
 	}
 
 	private Composite createTable(Composite parent)
@@ -901,6 +982,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		if (enabled)
 		{
 			updateFileButtonsState();
+			updateSyncArrows(directionBar.getSelection());
 		}
 	}
 
@@ -1309,6 +1391,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 	public void selectionChanged(int direction, boolean reload)
 	{
 		updateFileButtonsState();
+		updateSyncArrows(directionBar.getSelection());
 		syncViewer.setSyncDirection(directionBar.getSelection());
 		saveDirectionPref(direction);
 		if (reload)
