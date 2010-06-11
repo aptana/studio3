@@ -1,0 +1,9 @@
+/**
+ * This is a description of the MyClass constructor
+ *
+ * @constructor
+ * @alias MyClass
+ * @example
+ * // create a new MyClass instance<br/>
+ * var x = new MyClass();
+ */
