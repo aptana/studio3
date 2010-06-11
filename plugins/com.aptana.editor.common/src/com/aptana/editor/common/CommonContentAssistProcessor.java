@@ -139,7 +139,19 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		{
 			return others;
 		}
-		// FIXME What if others is null/empty?
+
+		if (others == null || others.length == 0)
+		{
+			// Pre-select the first ruble-contributed proposal
+			ICompletionProposal proposal = proposals.get(0);
+			if (proposal instanceof CommonCompletionProposal)
+			{
+				((CommonCompletionProposal) proposal).setIsDefaultSelection(true);
+			}		
+			return proposals.toArray(new ICompletionProposal[proposals.size()]);
+		}
+		
+		// Combine the two, leave selection as is
 		ICompletionProposal[] combined = new ICompletionProposal[proposals.size() + others.length];
 		proposals.toArray(combined);
 		System.arraycopy(others, 0, combined, proposals.size(), others.length);
@@ -188,7 +200,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 					{
 						continue;
 					}
-					// FIXME This assumes that the command is returning an array that is output as a
+					// This assumes that the command is returning an array that is output as a
 					// string I can eval (via inspect)!
 					RubyArray object = (RubyArray) ruby.evalScriptlet(output);
 					for (IRubyObject element : object.toJavaArray())
@@ -247,6 +259,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 							{
 								description = hash.get(RubySymbol.newSymbol(ruby, TOOL_TIP)).toString();
 							}
+							// TODO Allow hash to set offset to insert and replace length?
 						}
 						else
 						{
@@ -254,12 +267,6 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 							name = element.toString();
 							displayName = name;
 							length = name.length();
-
-							// if (this._replaceRange != null)
-							// {
-							// offset = this._replaceRange.getStartingOffset();
-							// replaceLength = this._replaceRange.getLength();
-							// }
 						}
 						// build proposal
 						CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength,
@@ -274,17 +281,6 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		catch (BadLocationException e)
 		{
 			CommonEditorPlugin.logError(e.getMessage(), e);
-		}
-		// FIXME Should select the best candidate based on prefix, etc. Also take into account if subclass has set
-		// suggested proposals!
-		if (proposals.size() > 0)
-		{
-			ICompletionProposal proposal = proposals.get(0);
-
-			if (proposal instanceof CommonCompletionProposal)
-			{
-				((CommonCompletionProposal) proposal).setIsDefaultSelection(true);
-			}
 		}
 		return proposals;
 	}
@@ -433,7 +429,6 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	{
 		ICompletionProposal caseSensitiveProposal = null;
 		ICompletionProposal caseInsensitiveProposal = null;
-		ICompletionProposal suggestedProposal = null;
 
 		for (ICompletionProposal proposal : proposals)
 		{
@@ -463,10 +458,6 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		else if (caseInsensitiveProposal instanceof CommonCompletionProposal)
 		{
 			((CommonCompletionProposal) caseInsensitiveProposal).setIsDefaultSelection(true);
-		}
-		else if (suggestedProposal instanceof CommonCompletionProposal)
-		{
-			((CommonCompletionProposal) suggestedProposal).setIsSuggestedSelection(true);
 		}
 		else
 		{
