@@ -263,7 +263,7 @@ public class ScopeTests extends FileContentBasedTests
 		Scope<JSNode> child = children.get(0);
 		assertEquals(2, child.getLocalSymbolNames().size());
 		
-		this.showSymbols("parameters.js", symbols);
+		//this.showSymbols("parameters.js", symbols);
 	}
 	
 	/**
@@ -355,7 +355,7 @@ public class ScopeTests extends FileContentBasedTests
 		assertNotNull(children);
 		assertEquals(0, children.size());
 		
-		this.showSymbols("primitives.js", symbols);
+		//this.showSymbols("primitives.js", symbols);
 	}
 	
 	/**
@@ -374,6 +374,6 @@ public class ScopeTests extends FileContentBasedTests
 		assertNotNull(children);
 		assertEquals(0, children.size());
 		
-		this.showSymbols("multipleTypes.js", symbols);
+		//this.showSymbols("multipleTypes.js", symbols);
 	}
 }
