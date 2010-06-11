@@ -69,9 +69,8 @@ public final class MarkerUtils {
 		MarkerInfo info = new MarkerInfo();
 		info.setType(markerType);
 		info.setCreationTime(System.currentTimeMillis());
-		if ( attributes != null )
-		{
-			info.setAttributes(attributes);
+		if ( attributes != null ) {
+			info.setAttributes(attributes, getMarkerManager().isPersistent(info));
 		}
 		getMarkerManager().add(resource, info);
 		return new UniformResourceMarker(resource, info.getId());
@@ -86,8 +85,7 @@ public final class MarkerUtils {
      * @return marker.
      * @throws CoreException IF exception occurs.
      */
-    public static IMarker createMarkerForExternalResource(
-            IUniformResource resource, Map attributes, String markerType ) throws CoreException {
+    public static IMarker createMarkerForExternalResource(IUniformResource resource, Map attributes, String markerType ) throws CoreException {
         IMarker marker = createMarker(resource, attributes, markerType);
         getMarkerManager().externalResourceChanged(resource);
         return marker;
