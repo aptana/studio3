@@ -90,24 +90,30 @@ public class SDocParser extends Parser {
 
 	protected Symbol invokeReduceAction(int rule_num, int offset) {
 		switch(rule_num) {
-			case 1: // Block = START_DOCUMENTATION Text.text END_DOCUMENTATION
+			case 1: // Block = START_DOCUMENTATION.s Text.text END_DOCUMENTATION.e
 			{
+					final Symbol s = _symbols[offset + 1];
 					final Symbol text = _symbols[offset + 2];
+					final Symbol e = _symbols[offset + 3];
 					
-			return new Block((String) text.value);
+			return new Block((String) text.value, s.getStart(), e.getEnd());
 			}
-			case 2: // Block = START_DOCUMENTATION Tags.tags END_DOCUMENTATION
+			case 2: // Block = START_DOCUMENTATION.s Tags.tags END_DOCUMENTATION.e
 			{
+					final Symbol s = _symbols[offset + 1];
 					final Symbol tags = _symbols[offset + 2];
+					final Symbol e = _symbols[offset + 3];
 					
-			return new Block((List<Tag>) tags.value);
+			return new Block((List<Tag>) tags.value, s.getStart(), e.getEnd());
 			}
-			case 3: // Block = START_DOCUMENTATION Text.text Tags.tags END_DOCUMENTATION
+			case 3: // Block = START_DOCUMENTATION.s Text.text Tags.tags END_DOCUMENTATION.e
 			{
+					final Symbol s = _symbols[offset + 1];
 					final Symbol text = _symbols[offset + 2];
 					final Symbol tags = _symbols[offset + 3];
+					final Symbol e = _symbols[offset + 4];
 					
-			return new Block((String) text.value, (List<Tag>) tags.value);
+			return new Block((String) text.value, (List<Tag>) tags.value, s.getStart(), e.getEnd());
 			}
 			case 4: // Text = Text.text TextPart.part
 			{
