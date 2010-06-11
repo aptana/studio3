@@ -2,22 +2,43 @@ package com.aptana.editor.js.sdoc.model;
 
 public enum TagType
 {
-	ADVANCED,
-	ALIAS,
-	AUTHOR,
-	CLASS_DESCRIPTION,
-	CONSTRUCTOR,
-	EXAMPLE,
-	EXCEPTION,
-	EXTENDS,
-	INTERNAL,
-	METHOD,
-	NAMESPACE,
-	OVERVIEW,
-	PARAM,
-	PRIVATE,
-	PROPERTY,
-	RETURN,
-	SEE,
-	UNKNOWN;
+	ADVANCED("@advanced"),
+	ALIAS("@alias"),
+	AUTHOR("@author"),
+	CLASS_DESCRIPTION("@classDescription"),
+	CONSTRUCTOR("@constructor"),
+	EXAMPLE("@example"),
+	EXCEPTION("@exception"),
+	EXTENDS("@extends"),
+	INTERNAL("@internal"),
+	METHOD("@method"),
+	NAMESPACE("@namespace"),
+	OVERVIEW("@overview"),
+	PARAM("@param"),
+	PRIVATE("@private"),
+	PROPERTY("@property"),
+	RETURN("@return"),
+	SEE("@see"),
+	UNKNOWN("@<???>");
+	
+	private String _name;
+	
+	/**
+	 * TagType
+	 * 
+	 * @param name
+	 */
+	private TagType(String name)
+	{
+		this._name = name;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Enum#toString()
+	 */
+	public String toString()
+	{
+		return this._name;
+	}
 }
