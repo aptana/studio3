@@ -1,4 +1,4 @@
-package com.aptana.editor.js.contentassist;
+package com.aptana.editor.js.tests;
 
 import java.io.IOException;
 import java.net.URI;
@@ -22,13 +22,14 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.contentassist.JSContentAssistProcessor;
 
 public class EditorBasedTests extends TestCase
 {
 	/**
 	 * TestContext
 	 */
-	static class TestContext
+	public static class TestContext
 	{
 		public final ITextEditor editor;
 		public final IDocument document;
