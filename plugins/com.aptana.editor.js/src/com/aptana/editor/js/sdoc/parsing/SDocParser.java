@@ -73,10 +73,11 @@ public class SDocParser extends Parser {
 	 *
 	 * @param source
 	 */
-	public void parse(String source) throws java.lang.Exception
+	public Object parse(String source) throws java.lang.Exception
 	{
 		fScanner.setSource(source);
-		parse(fScanner);
+		
+		return parse(fScanner);
 	}
 
 	public SDocParser() {
@@ -435,7 +436,7 @@ public class SDocParser extends Parser {
 					
 			Parameter result = new Parameter(name);
 			
-			result.setUsage(Usage.ONE_OR_MORE);
+			result.setUsage(Usage.OPTIONAL);
 			
 			return result;
 			}
