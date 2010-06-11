@@ -7,7 +7,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 
-import com.aptana.editor.js.parsing.lexer.SDocTokenType;
+import com.aptana.editor.js.sdoc.lexer.SDocTokenType;
 
 public abstract class SDocScannerTestBase extends TestCase
 {

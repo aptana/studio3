@@ -2,8 +2,8 @@ package com.aptana.editor.js;
 
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 
-import com.aptana.editor.js.parsing.SDocTokenScanner;
-import com.aptana.editor.js.parsing.lexer.SDocTokenType;
+import com.aptana.editor.js.sdoc.lexer.SDocTokenType;
+import com.aptana.editor.js.sdoc.parsing.SDocTokenScanner;
 
 public class SDocTokenScannerTests extends SDocScannerTestBase
 {

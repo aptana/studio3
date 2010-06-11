@@ -5,8 +5,8 @@ import java.io.IOException;
 import junit.framework.TestCase;
 import beaver.Symbol;
 
-import com.aptana.editor.js.parsing.SDocScanner;
-import com.aptana.editor.js.parsing.lexer.SDocTokenType;
+import com.aptana.editor.js.sdoc.lexer.SDocTokenType;
+import com.aptana.editor.js.sdoc.parsing.SDocScanner;
 
 public class SDocScannerTests extends TestCase
 {
