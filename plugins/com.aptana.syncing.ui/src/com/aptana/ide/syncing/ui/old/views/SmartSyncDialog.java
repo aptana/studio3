@@ -466,14 +466,14 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 			}
 		});
 		
-		Label remote_site = new Label(endpoints, SWT.VERTICAL);
+		Label remote_site = new Label(endpoints, SWT.VERTICAL | SWT.CENTER);
 		remote_site.setImage(SyncingUIPlugin.getImage(IMAGE_REMOTE_SITE));
 		gridData = new GridData(SWT.CENTER, SWT.CENTER, false, true);
 		remote_site.setLayoutData(gridData);
 
 		if (this.filesToBeSynced == null || this.filesToBeSynced.length <= 1)
 		{
-			Label end1Label = new Label(endpoints, SWT.NONE);
+			Label end1Label = new Label(endpoints, SWT.CENTER);
 			end1Label.setText(FileUtil.compressPath(source.toString(), 30));
 			end1Label.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, false));
 		}
@@ -487,7 +487,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 			end1Comp.setLayout(layout);
 			end1Comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 
-			Label end1Label = new Label(end1Comp, SWT.NONE);
+			Label end1Label = new Label(end1Comp, SWT.CENTER);
 			end1Label.setText(FileUtil.compressPath(source.toString(), 30));
 			end1Label.setLayoutData(new GridData(SWT.CENTER, SWT.HORIZONTAL, false, false));
 
@@ -506,7 +506,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		sync_label.setLayoutData(gridData);
 		sync_label.setText("");
 		
-		Label end2Label = new Label(endpoints, SWT.NONE);
+		Label end2Label = new Label(endpoints, SWT.CENTER);
 		end2Label.setText(FileUtil.compressPath(dest.toString(), 30));
 		end2Label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
