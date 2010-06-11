@@ -130,7 +130,7 @@ public class SDocTypeTokenScanner extends RuleBasedScanner
 		rules.add(new SingleCharacterRule(',', getToken(SDocTokenType.COMMA)));
 		rules.add(new SingleCharacterRule('|', getToken(SDocTokenType.PIPE)));
 		
-		WordRule operatorRules = new WordRule(new OperatorDetector(), getToken(SDocTokenType.UNKNOWN));
+		WordRule operatorRules = new WordRule(new OperatorDetector(), getToken(SDocTokenType.ERROR));
 		operatorRules.addWord("...", getToken(SDocTokenType.ELLIPSIS));
 		operatorRules.addWord("->", getToken(SDocTokenType.ARROW));
 		rules.add(operatorRules);
