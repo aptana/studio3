@@ -115,6 +115,19 @@ public abstract class Declaration extends Node
 		}
 	}
 
+	static public class Implements extends SymbolsContainer
+	{
+		public Implements(Symbol[] names)
+		{
+			super(names);
+		}
+		
+		public void accept(TreeWalker walker)
+		{
+			walker.visit(this);
+		}
+	}
+	
 	static public class Imports extends SymbolsContainer
 	{
 		public Imports(Symbol[] symbols)

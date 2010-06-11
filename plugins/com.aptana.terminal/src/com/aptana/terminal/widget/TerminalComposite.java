@@ -72,6 +72,7 @@ public class TerminalComposite extends Composite {
 	private IProcessListener processListener;
 	private VT100TerminalControl fCtlTerminal;
 	private List<String> inputs = new ArrayList<String>();
+	private boolean connecting;
 	
 	/**
 	 * @param parent
@@ -94,13 +95,23 @@ public class TerminalComposite extends Composite {
 	/**
 	 * Connect
 	 */
-	public void connect() {
+	public synchronized void connect() {
+		if (connecting) {
+			return;
+		}
+		connecting = true;
 		Job job = new UIJob("Terminal connect") { //$NON-NLS-1$
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
-				fCtlTerminal.connectTerminal();
-				hookProcessListener();
-				sendInputs();
+				try {
+					if (fCtlTerminal.getState() == TerminalState.CLOSED  && !fCtlTerminal.isDisposed()) {
+						fCtlTerminal.connectTerminal();
+						hookProcessListener();
+						sendInputs();
+					}
+				} finally {
+					connecting = false;
+				}
 				return Status.OK_STATUS;
 			}
 		};

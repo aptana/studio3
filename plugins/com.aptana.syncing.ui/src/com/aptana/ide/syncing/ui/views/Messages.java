@@ -59,6 +59,7 @@ public class Messages extends NLS {
     public static String FTPManagerComposite_NameInput_Title;
     public static String FTPManagerComposite_TTP_Edit;
     public static String FTPManagerComposite_TTP_SaveAs;
+	public static String FTPManagerComposite_TTP_Synchronize;
     public static String FTPManagerComposite_TTP_TransferLeft;
     public static String FTPManagerComposite_TTP_TransferRight;
 

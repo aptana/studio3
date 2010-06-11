@@ -532,6 +532,12 @@
              id="Safari"
              name="Safari">
        </user-agent>
+       <user-agent
+             icon="icons/chrome_icon.png"
+             icon-disabled="icons/chrome_icon_grey.png"
+             id="Chrome"
+             name="Chrome">
+       </user-agent>
     </extension>
    <extension
          point="org.eclipse.ui.preferencePages">

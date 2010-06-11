@@ -172,7 +172,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 	private IFileStore[] filesToBeSynced;
 
 	/**
-	 * Creates a new smart sync dialog.
+	 * Creates a new sync dialog.
 	 * 
 	 * @param parent
 	 *            the parent shell
@@ -228,7 +228,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 	}
 
 	/**
-	 * Creates a new smart sync dialog on a list of selected files.
+	 * Creates a new sync dialog on a list of selected files.
 	 * 
 	 * @param parent
 	 *            the parent shell
@@ -879,7 +879,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 
 			public void modify(Object element, String property, Object value)
 			{
-				// Only allow checking of skipped box when smart sync isn't
+				// Only allow checking of skipped box when sync isn't
 				// running
 				if (startSync.getText().equals(Messages.SmartSyncDialog_StartSync))
 				{
@@ -1094,7 +1094,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 			// cancels the existing one
 			buildSmartSync.cancel();
 		}
-		buildSmartSync = new Job("Generating Smart Sync") //$NON-NLS-1$
+		buildSmartSync = new Job("Generating Sync") //$NON-NLS-1$
 		{
 
 			protected IStatus run(final IProgressMonitor monitor)
@@ -1151,7 +1151,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 						VirtualFileSyncPair pair;
 						for (IFileStore file : serverFiles)
 						{
-							pair = pairs.get(Synchronizer.getCanonicalPath(destConnectionPoint.getRoot(), file));
+							pair = pairs.get(EFSUtils.getRelativePath(destConnectionPoint.getRoot(), file));
 							if (pair != null)
 							{
 								pair.setDestinationFile(file);
@@ -1211,7 +1211,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 				{
 					// no error
 					root = SyncModelBuilder.buildSyncFolder(sourceConnectionPoint, destConnectionPoint, items);
-					UIJob update = new UIJob("Loading Smart Sync") //$NON-NLS-1$
+					UIJob update = new UIJob("Loading Sync") //$NON-NLS-1$
 					{
 
 						public IStatus runInUIThread(IProgressMonitor monitor)
@@ -1286,7 +1286,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 							errorMessage.append("\n " + Messages.SmartSyncDialog_ErrorMessage + error.getMessage()); //$NON-NLS-1$
 						}
 					}
-					UIJob showError = new UIJob("Showing smart sync error") //$NON-NLS-1$
+					UIJob showError = new UIJob("Showing sync error") //$NON-NLS-1$
 					{
 
 						public IStatus runInUIThread(IProgressMonitor monitor)

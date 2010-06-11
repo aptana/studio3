@@ -36,7 +36,6 @@
 package com.aptana.ide.core.io.efs;
 
 import java.io.File;
-import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -131,19 +130,6 @@ public final class EFSUtils {
 		// need to strip scheme (i.e. file:)
 		String scheme = file.toURI().getScheme();
 		return file.toURI().toString().substring(scheme.length() + 1);
-	}
-
-	/**
-	 * Returns the parent file of this file
-	 * @param file
-	 * @return
-	 */
-	public static String getPath(IFileStore file) {
-		// need to strip scheme (i.e. file:)
-		URI fileURI = file.toURI();
-		String scheme = fileURI.getScheme();
-		String filename = file.getName();
-		return fileURI.toString().substring(scheme.length() + 1, filename.length());
 	}
 
 	/**
