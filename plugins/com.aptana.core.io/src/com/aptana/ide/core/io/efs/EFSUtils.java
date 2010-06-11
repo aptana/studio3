@@ -44,10 +44,10 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.filesystem.provider.FileInfo;
+import org.eclipse.core.internal.filesystem.Policy;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.ide.core.io.IConnectionPoint;
@@ -57,6 +57,7 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
  * @author Max Stepanov
  *
  */
+@SuppressWarnings("restriction")
 public final class EFSUtils {
 
 	/**
@@ -191,15 +192,13 @@ public final class EFSUtils {
      *         did not go through for any reason
      * @throws CoreException 
      */
-    public static boolean copyFile(IFileStore sourceStore, IFileStore destinationStore,
+	public static boolean copyFile(IFileStore sourceStore, IFileStore destinationStore,
             IProgressMonitor monitor) throws CoreException {
         if (sourceStore == null || CloakingUtils.isFileCloaked(sourceStore)) {
             return false;
         }
 
-        if (monitor == null) {
-            monitor = new NullProgressMonitor();
-        }
+        monitor = Policy.monitorFor(monitor);
 
         boolean success = true;
         monitor.subTask(MessageFormat.format("Copying {0} to {1}", sourceStore
@@ -254,15 +253,14 @@ public final class EFSUtils {
 	 */
 	private static void getFiles(IFileStore file, boolean recurse, List<IFileStore> list, boolean includeCloakedFiles, IProgressMonitor monitor) throws CoreException
 	{
-        if (monitor == null) {
-            monitor = new NullProgressMonitor();
-        }
-
 		if (file == null)
 		{
 			return;
 		}
 
+        monitor = Policy.monitorFor(monitor);
+        Policy.checkCanceled(monitor);
+        
 		IFileStore[] children = file.childStores(EFS.NONE, monitor);
 
 		if (children != null)
@@ -270,16 +268,19 @@ public final class EFSUtils {
 			boolean addingFile;
 			for (int i = 0; i < children.length; i++)
 			{
+		        Policy.checkCanceled(monitor);
 				IFileStore child = children[i];
 				addingFile = false;
 				if (includeCloakedFiles || !CloakingUtils.isFileCloaked(child))
 				{
 					list.add(child);
 					addingFile = true;
+					monitor.worked(1);
 				}
 
 				if (recurse && child.fetchInfo(EFS.NONE, monitor).isDirectory() && addingFile)
 				{
+					monitor.subTask(MessageFormat.format("Fetching children of {0}", child.getName()));
 					getFiles(child, recurse, list, includeCloakedFiles, monitor);
 				}
 			}

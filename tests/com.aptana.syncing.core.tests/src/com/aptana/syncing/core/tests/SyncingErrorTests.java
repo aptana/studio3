@@ -46,6 +46,8 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.ILogger;
@@ -193,57 +195,56 @@ public abstract class SyncingErrorTests extends TestCase
 			}
 		});
 		
-		System.out.println("4) upload from server_local to server_test");
-		VirtualFileSyncPair[] items = syncManager.getSyncItems(clientManager, serverManager, clientTestDirectory,
-				serverTestDirectory, null);
+		System.out.println("2) upload from server_local to server_test");
 		
-		IProgressMonitor monitor = new IProgressMonitor() {
+		IProgressMonitor monitor = new NullProgressMonitor() {
+			
+			private int work_total = 0;
 			
 			@Override
 			public void worked(int work) {
-				if(work > 2) {
+				work_total += work;
+				System.out.println("worked " + work_total);
+				if(work_total >= 2) {
 					this.setCanceled(true);
 				}
-				System.out.println("worked " + work);
-			}
-			
-			@Override
-			public void subTask(String name) {
-				System.out.println("subTask " + name);
-			}
-			
-			@Override
-			public void setTaskName(String name) {
-				System.out.println("setTaskName " + name);
-			}
-			
-			@Override
-			public void setCanceled(boolean value) {
-				System.out.println("setCanceled " + value);
-			}
-			
-			@Override
-			public boolean isCanceled() {
-				System.out.println("isCanceled");
-				return false;
-			}
-			
-			@Override
-			public void internalWorked(double work) {
-				System.out.println("internalWorked " + work);
-			}
-			
-			@Override
-			public void done() {
-				System.out.println("done");
-			}
-			
-			@Override
-			public void beginTask(String name, int totalWork) {
-				System.out.println("beginTask " + name + " " + totalWork);
 			}
 		};
-		syncManager.upload(items, monitor);
+
+		VirtualFileSyncPair[] items = null;
+		try {
+			items = syncManager.getSyncItems(clientManager, serverManager, clientTestDirectory,
+					serverTestDirectory, monitor);			
+			fail();
+		}
+		catch (OperationCanceledException ex) {
+			assertNull(items);
+		}
+
+		items = syncManager.getSyncItems(clientManager, serverManager, clientTestDirectory,
+				serverTestDirectory, null);
+
+		IProgressMonitor monitor2 = new NullProgressMonitor() {
+			
+			private int work_total = 0;
+			
+			@Override
+			public void worked(int work) {
+				work_total += work;
+				System.out.println("worked " + work_total);
+				if(work_total >= 2) {
+					this.setCanceled(true);
+				}
+			}
+		};
+
+		try {
+			syncManager.upload(items, monitor2);
+			fail();
+		}
+		catch (OperationCanceledException ex) {
+			assertTrue(syncManager.getClientFileTransferedCount() < items.length);
+		}
 	
 	}
 
