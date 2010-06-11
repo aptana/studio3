@@ -1,4 +1,4 @@
-package com.aptana.editor.js.parsing.lexer;
+package com.aptana.editor.js.sdoc.lexer;
 
 import java.util.EnumSet;
 

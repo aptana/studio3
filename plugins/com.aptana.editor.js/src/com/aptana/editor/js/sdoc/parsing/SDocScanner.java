@@ -1,4 +1,4 @@
-package com.aptana.editor.js.parsing;
+package com.aptana.editor.js.sdoc.parsing;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -13,7 +13,7 @@ import org.eclipse.jface.text.rules.Token;
 import beaver.Scanner;
 import beaver.Symbol;
 
-import com.aptana.editor.js.parsing.lexer.SDocTokenType;
+import com.aptana.editor.js.sdoc.lexer.SDocTokenType;
 
 public class SDocScanner extends Scanner
 {

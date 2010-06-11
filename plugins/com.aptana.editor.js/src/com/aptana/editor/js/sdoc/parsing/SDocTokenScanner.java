@@ -1,4 +1,4 @@
-package com.aptana.editor.js.parsing;
+package com.aptana.editor.js.sdoc.parsing;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -13,7 +13,7 @@ import org.eclipse.jface.text.rules.WordRule;
 
 import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
-import com.aptana.editor.js.parsing.lexer.SDocTokenType;
+import com.aptana.editor.js.sdoc.lexer.SDocTokenType;
 
 public class SDocTokenScanner extends RuleBasedScanner
 {

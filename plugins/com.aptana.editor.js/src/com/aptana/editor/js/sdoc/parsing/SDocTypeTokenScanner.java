@@ -1,4 +1,4 @@
-package com.aptana.editor.js.parsing;
+package com.aptana.editor.js.sdoc.parsing;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -12,7 +12,7 @@ import org.eclipse.jface.text.rules.WordRule;
 
 import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
-import com.aptana.editor.js.parsing.lexer.SDocTokenType;
+import com.aptana.editor.js.sdoc.lexer.SDocTokenType;
 
 public class SDocTypeTokenScanner extends RuleBasedScanner
 {
@@ -53,19 +53,6 @@ public class SDocTypeTokenScanner extends RuleBasedScanner
 			}
 			
 			return result;
-		}
-	}
-	
-	static class KeywordDetector implements IWordDetector
-	{
-		public boolean isWordPart(char c)
-		{
-			return Character.isLetter(c);
-		}
-
-		public boolean isWordStart(char c)
-		{
-			return Character.isLetter(c);
 		}
 	}
 	
@@ -148,12 +135,10 @@ public class SDocTypeTokenScanner extends RuleBasedScanner
 		operatorRules.addWord("->", getToken(SDocTokenType.ARROW));
 		rules.add(operatorRules);
 		
-		WordRule keywordRules = new WordRule(new KeywordDetector(), getToken(SDocTokenType.IDENTIFIER));
+		WordRule keywordRules = new WordRule(new IdentifierDetector(), getToken(SDocTokenType.IDENTIFIER));
 		keywordRules.addWord("Array", getToken(SDocTokenType.ARRAY));
 		keywordRules.addWord("Function", getToken(SDocTokenType.FUNCTION));
 		rules.add(keywordRules);
-		
-		rules.add(new WordRule(new IdentifierDetector(), getToken(SDocTokenType.IDENTIFIER)));
 		
 		this.setDefaultReturnToken(getToken(SDocTokenType.ERROR));
 		this.setRules(rules.toArray(new IRule[rules.size()]));
