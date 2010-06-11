@@ -275,6 +275,17 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		{
 			CommonEditorPlugin.logError(e.getMessage(), e);
 		}
+		// FIXME Should select the best candidate based on prefix, etc. Also take into account if subclass has set
+		// suggested proposals!
+		if (proposals.size() > 0)
+		{
+			ICompletionProposal proposal = proposals.get(0);
+
+			if (proposal instanceof CommonCompletionProposal)
+			{
+				((CommonCompletionProposal) proposal).setIsDefaultSelection(true);
+			}
+		}
 		return proposals;
 	}
 
