@@ -8,6 +8,7 @@
 
 %import "com.aptana.editor.js.parsing.ast.*";
 %import "com.aptana.editor.js.parsing.lexer.JSTokenType";
+%import "com.aptana.editor.js.sdoc.parsing.SDocParser";
 %import "com.aptana.parsing.IParseState";
 %import "com.aptana.parsing.IParser";
 %import "com.aptana.parsing.IRecoveryStrategy";
@@ -135,14 +136,30 @@
 		IParseNode result = (IParseNode) parse(fScanner);
 		parseState.setParseResult(result);
 		
-		List<Symbol> docs = fScanner.getDocComments();
+		this.parseDocs(fScanner.getDocComments());
+		
+		return result;
+	}
+	
+	/**
+	 * parseDocs
+	 *
+	 * @param docs
+	 */
+	protected void parseDocs(List<Symbol> docs)
+	{
+		SDocParser parser = new SDocParser();
 		
 		for (Symbol doc : docs)
 		{
-			System.out.println(doc.value);
+			try
+			{
+				parser.parse((String) doc.value);
+			}
+			catch (java.lang.Exception e)
+			{
+			}
 		}
-		
-		return result;
 	}
 	
 	/*

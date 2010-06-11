@@ -5,6 +5,7 @@ import java.util.List;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import java.io.IOException;
 import com.aptana.parsing.IRecoveryStrategy;
+import com.aptana.editor.js.sdoc.parsing.SDocParser;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.editor.js.parsing.ast.*;
 import beaver.*;
@@ -249,14 +250,30 @@ public class JSParser extends Parser implements IParser {
 		IParseNode result = (IParseNode) parse(fScanner);
 		parseState.setParseResult(result);
 		
-		List<Symbol> docs = fScanner.getDocComments();
+		this.parseDocs(fScanner.getDocComments());
+		
+		return result;
+	}
+	
+	/**
+	 * parseDocs
+	 *
+	 * @param docs
+	 */
+	protected void parseDocs(List<Symbol> docs)
+	{
+		SDocParser parser = new SDocParser();
 		
 		for (Symbol doc : docs)
 		{
-			System.out.println(doc.value);
+			try
+			{
+				parser.parse((String) doc.value);
+			}
+			catch (java.lang.Exception e)
+			{
+			}
 		}
-		
-		return result;
 	}
 	
 	/*
