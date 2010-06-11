@@ -343,7 +343,6 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				Set<String> colors = this._queryHelper.getColors(getIndex());
 				if (colors != null && !colors.isEmpty())
 				{
-					// TODO Don't show user agent images?
 					Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(
 							UserAgentManager.getInstance().getActiveUserAgentIDs());
 					for (String color : colors)
@@ -355,7 +354,6 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 							// Generate an image from the color value!
 							// FIXME Handle colors that aren't 7 chars hex values? Or will they always be normalized to
 							// this format?
-							// TODO This code was copy-pasted from Theme class
 							String s = color.substring(1, 3);
 							int r = Integer.parseInt(s, 16);
 							s = color.substring(3, 5);
@@ -375,10 +373,18 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 	}
 
+	@SuppressWarnings("nls")
 	private boolean supportsColorValues(PropertyElement property)
 	{
-		// FIXME Get actual list of properties that support colors!
-		return property.getName().endsWith("color");
+		// FIXME Support multiple types on properties, and use an enum of types. Then we can look for color type for values!
+		if (property == null)
+			return false;
+		String propertyName = property.getName();
+		if (propertyName.equals("background") || propertyName.equals("border-bottom") || propertyName.equals("border-left")
+				|| propertyName.equals("border-right") || propertyName.equals("border-top") || propertyName.equals("border")
+				|| propertyName.equals("column-rule"))
+			return true;
+		return propertyName.endsWith("color");
 	}
 
 	/**
@@ -683,10 +689,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				break;
 			}
-			else
-			{
-				index--;
-			}
+			index--;
 		}
 
 		return location;
@@ -770,11 +773,8 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 					// we've hit a delimiting lexeme or have passed over whitespace, so we're done
 					break;
 				}
-				else
-				{
-					// still looking so include this in our range
-					endingLexeme = candidateLexeme;
-				}
+				// still looking so include this in our range
+				endingLexeme = candidateLexeme;
 
 				index++;
 			}
@@ -937,7 +937,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 						break;
 
 					case CURLY_BRACE:
-						if ("}".equals(this._currentLexeme.getText()))
+						if ("}".equals(this._currentLexeme.getText())) //$NON-NLS-1$
 						{
 							Lexeme<CSSTokenType> candidate = lexemeProvider.getLexemeFromOffset(offset - 1);
 
