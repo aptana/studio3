@@ -1,4 +1,6 @@
-%package "com.aptana.editor.js.parsing";
+%package "com.aptana.editor.js.sdoc.parsing";
+%import "java.util.List";
+%import "com.aptana.editor.js.sdoc.model.*";
 %class "SDocParser";
 %embed {:
 	// suppress parser error reporting and let the custom error recovery mechanism handle it
@@ -44,6 +46,7 @@
 :};
 %init {:
 	report = new SDocEvents();
+	fScanner = new SDocScanner();
 :};
 
 %terminals LBRACKET, RBRACKET, LCURLY, RCURLY, POUND, COLON, ERROR;
@@ -53,241 +56,282 @@
 %terminals EXTENDS, INTERNAL, METHOD, NAMESPACE, OVERVIEW, PARAM, RETURN, SEE, UNKNOWN;
 %terminals IDENTIFIER, ARRAY, FUNCTION, PRIVATE, PROPERTY;
 
-%goal grammar;
+%typeof IDENTIFIER,FUNCTION,ARRAY = "String";
+%typeof TEXT,LBRACKET,RBRACKET,LCURLY,RCURLY,POUND,COLON,ERROR,UNKNOWN = "String";
 
-grammar
-	=	block
+%typeof Block = "Block";
+%typeof Namespace = "String";
+%typeof ParamName = "Parameter";
+%typeof Tag = "Tag";
+%typeof Type = "Type";
+
+%goal Grammar;
+
+Grammar
+	=	Block
 	;
 
-block
-	=	START_DOCUMENTATION text END_DOCUMENTATION
+Block
+	=	START_DOCUMENTATION Text.text END_DOCUMENTATION
 		{:
-			// TextBlock
+			return new Block((String) text.value);
 		:}
-	|	START_DOCUMENTATION tags END_DOCUMENTATION
+	|	START_DOCUMENTATION Tags.tags END_DOCUMENTATION
 		{:
-			// TagsBlock
+			return new Block((List<Tag>) tags.value);
 		:}
-	|	START_DOCUMENTATION text tags END_DOCUMENTATION
+	|	START_DOCUMENTATION Text.text Tags.tags END_DOCUMENTATION
 		{:
-			// Block
-		:}
-	;
-
-text
-	=	text textPart
-		{:
-			// AddText
-		:}
-	|	textPart
-		{:
-			// PassThrough
+			return new Block((String) text.value, (List<Tag>) tags.value);
 		:}
 	;
 
-textPart
+Text
+	=	Text.text TextPart.part
+		{:
+			return new Symbol(text.value + " " + part.value);
+		:}
+	|	TextPart
+	;
+
+TextPart
 	=	TEXT
-		{:
-			// Text
-		:}
 	|	LBRACKET
-		{:
-			// Text
-		:}
 	|	RBRACKET
-		{:
-			// Text
-		:}
 	|	LCURLY
-		{:
-			// Text
-		:}
 	|	RCURLY
-		{:
-			// Text
-		:}
 	|	POUND
-		{:
-			// Text
-		:}
 	|	IDENTIFIER
-		{:
-			// Text
-		:}
 	|	COLON
-		{:
-			// Text
-		:}
 	|	ERROR
+	;
+
+Tags
+	=	Tags.tags Tag.tag
 		{:
-			// Text
+			((List<Tag>) tags.value).add(tag);
+			
+			return tags;
+		:}
+	|	Tag.tag
+		{:
+			List<Tag> tags = new ArrayList<Tag>();
+			
+			tags.add(tag);
+			
+			return new Symbol(tags);
 		:}
 	;
 
-tags
-	=	tags tag
+Tag
+	=	ADVANCED Text.text?
 		{:
-			// AddTag
+			return new Tag(TagType.ADVANCED, (String) text.value);
 		:}
-	|	tag
+	|	ALIAS Text.text
 		{:
-			// FirstTag
+			return new Tag(TagType.ALIAS, (String) text.value);
 		:}
-	;
-
-tag
-	=	ADVANCED text?
+	|	AUTHOR Text.text
 		{:
-			// Advanced
+			return new Tag(TagType.AUTHOR, (String) text.value);
 		:}
-	|	ALIAS text
+	|	CLASS_DESCRIPTION LCURLY Namespace.name RCURLY Text.text
 		{:
-			// Alias
+			return new TagWithName(TagType.CLASS_DESCRIPTION, name, (String) text.value);
 		:}
-	|	AUTHOR text
+	|	CONSTRUCTOR Text.text?
 		{:
-			// Author
+			return new Tag(TagType.CONSTRUCTOR, (String) text.value);
 		:}
-	|	CLASS_DESCRIPTION LCURLY namespace RCURLY text
+	|	EXAMPLE Text.text
 		{:
-			// ClassDescription
+			return new Tag(TagType.EXAMPLE, (String) text.value);
 		:}
-	|	CONSTRUCTOR text?
+	|	EXCEPTION LCURLY Types.types RCURLY Text.text?
 		{:
-			// Constructor
+			return new TagWithTypes(TagType.EXCEPTION, (List<Type>) types.value, (String) text.value);
 		:}
-	|	EXAMPLE text
+	|	EXTENDS LCURLY Types.types RCURLY Text.text?
 		{:
-			// Example
+			return new TagWithTypes(TagType.EXTENDS, (List<Type>) types.value, (String) text.value);
 		:}
-	|	EXCEPTION LCURLY types RCURLY text?
+	|	INTERNAL Text.text?
 		{:
-			// Exception
+			return new Tag(TagType.INTERNAL, (String) text.value);
 		:}
-	|	EXTENDS LCURLY types RCURLY text?
+	|	METHOD Text.text?
 		{:
-			// Extends
+			return new Tag(TagType.METHOD, (String) text.value);
 		:}
-	|	INTERNAL text?
+	|	NAMESPACE LCURLY Namespace.name RCURLY Text.text?
 		{:
-			// Internal
+			return new TagWithName(TagType.NAMESPACE, name, (String) text.value);
 		:}
-	|	METHOD text?
+	|	OVERVIEW Text.text
 		{:
-			// Method
+			return new Tag(TagType.OVERVIEW, (String) text.value);
 		:}
-	|	NAMESPACE LCURLY namespace RCURLY text?
+	|	PARAM LCURLY Types.types RCURLY ParamName.name Text.text?
 		{:
-			// Namespace
+			return new ParamTag(name, (List<Type>) types.value, (String) text.value);
 		:}
-	|	OVERVIEW text
+	|	PRIVATE Text.text?
 		{:
-			// Overview
+			return new Tag(TagType.PRIVATE, (String) text.value);
 		:}
-	|	PARAM LCURLY types RCURLY paramName text?
+	|	PROPERTY LCURLY Types.types RCURLY Text.text?
 		{:
-			// Param
+			return new TagWithTypes(TagType.PROPERTY, (List<Type>) types.value, (String) text.value);
 		:}
-	|	PRIVATE text?
+	|	RETURN LCURLY Types.types RCURLY Text.text?
 		{:
-			// Private
+			return new TagWithTypes(TagType.RETURN, (List<Type>) types.value, (String) text.value);
 		:}
-	|	PROPERTY LCURLY types RCURLY text?
+	|	SEE Text.text
 		{:
-			// Property
+			return new Tag(TagType.SEE, (String) text.value);
 		:}
-	|	RETURN LCURLY types RCURLY text?
+	|	UNKNOWN.name Text.text?
 		{:
-			// Return
-		:}
-	|	SEE text
-		{:
-			// SeeText
-		:}
-	|	UNKNOWN text?
-		{:
-			// Unknown
+			return new TagWithName(TagType.UNKNOWN, name, (String) text.value);
 		:}
 	;
 
-types
-	=	types typeDelimiter type
+Types
+	=	Types.types TypeDelimiter Type.type
 		{:
-			// AddType
+			((List<Type>) types.value).add(type);
+			
+			return types;
 		:}
-	|	type
+	|	Type.type
 		{:
-			// FirstType
+			List<Type> types = new ArrayList<Type>();
+			
+			types.add(type);
+			
+			return new Symbol(types);
 		:}
 	;
 
-typeDelimiter
+TypeDelimiter
 	=	COMMA
 	|	PIPE
 	;
 
-type
-	=	IDENTIFIER
+Type
+	=	IDENTIFIER.name
 		{:
-			// Type
+			return new Type(name);
 		:}
-	|	IDENTIFIER LBRACKET RBRACKET
+	|	IDENTIFIER.name LBRACKET RBRACKET
 		{:
-			// SimpleArrayType
+			return new ArrayType(new Type(name));
 		:}
 	|	ARRAY LBRACKET RBRACKET
 		{:
-			// SimpleArrayType
+			return new ArrayType();
 		:}
 	|	FUNCTION LBRACKET RBRACKET
 		{:
-			// SimpleArrayType
+			return new FunctionType();
 		:}
 	|	ARRAY
 		{:
-			// Type
+			return new ArrayType();
 		:}
-	|	ARRAY LESS_THAN type GREATER_THAN
+	|	ARRAY LESS_THAN Type.memberType GREATER_THAN
 		{:
-			// ComplexArrayType
+			return new ArrayType(memberType);
 		:}
 	|	FUNCTION
 		{:
-			// SimpleProcedure
+			return new FunctionType();
 		:}
-	|	FUNCTION returnDelimiter type
+	|	FUNCTION ReturnDelimiter Type.returnType
 		{:
-			// SimpleFunction
+			FunctionType function = new FunctionType();
+			
+			function.addReturnType(returnType);
+			
+			return function;
 		:}
-	|	FUNCTION returnDelimiter LPAREN types RPAREN
+	|	FUNCTION ReturnDelimiter LPAREN Types.returnTypes RPAREN
 		{:
-			// SimpleFunctionComplexReturn
+			FunctionType function = new FunctionType();
+			
+			for (Type returnType : (List<Type>) returnTypes.value)
+			{
+				function.addReturnType(returnType);
+			}
+			
+			return function;
 		:}
 	|	FUNCTION LPAREN RPAREN
 		{:
-			// SimpleProcedure
+			return new FunctionType();
 		:}
-	|	FUNCTION LPAREN RPAREN returnDelimiter type
+	|	FUNCTION LPAREN RPAREN ReturnDelimiter Type.returnType
 		{:
-			// SimpleFunction2
+			FunctionType function = new FunctionType();
+			
+			function.addReturnType(returnType);
+			
+			return function;
 		:}
-	|	FUNCTION LPAREN RPAREN returnDelimiter LPAREN types RPAREN
+	|	FUNCTION LPAREN RPAREN ReturnDelimiter LPAREN Types.returnTypes RPAREN
 		{:
-			// SimpleFunctionComplexReturn2
+			FunctionType function = new FunctionType();
+			
+			for (Type returnType : (List<Type>) returnTypes.value)
+			{
+				function.addReturnType(returnType);
+			}
+			
+			return function;
 		:}
-	|	FUNCTION LPAREN types RPAREN
+	|	FUNCTION LPAREN Types.parameterTypes RPAREN
 		{:
-			// Procedure
+			FunctionType function = new FunctionType();
+			
+			for (Type parameterType : (List<Type>) parameterTypes.value)
+			{
+				function.addParameterType(parameterType);
+			}
+			
+			return function;
 		:}
-	|	FUNCTION LPAREN types RPAREN returnDelimiter type
+	|	FUNCTION LPAREN Types.parameterTypes RPAREN ReturnDelimiter Type.returnType
 		{:
-			// Function
+			FunctionType function = new FunctionType();
+			
+			for (Type parameterType : (List<Type>) parameterTypes.value)
+			{
+				function.addParameterType(parameterType);
+			}
+			
+			function.addReturnType(returnType);
+			
+			return function;
 		:}
-	|	FUNCTION LPAREN types RPAREN returnDelimiter LPAREN types RPAREN
+	|	FUNCTION LPAREN Types.parameterTypes RPAREN ReturnDelimiter LPAREN Types.returnTypes RPAREN
 		{:
-			// FunctionComplexReturn
+			FunctionType function = new FunctionType();
+			
+			for (Type parameterType : (List<Type>) parameterTypes.value)
+			{
+				function.addParameterType(parameterType);
+			}
+			
+			for (Type returnType : (List<Type>) returnTypes.value)
+			{
+				function.addReturnType(returnType);
+			}
+			
+			return function;
 		:}
-//	|	FUNCTION functionParameterTypes functionReturnTypes
+//	|	FUNCTION FunctionParameterTypes FunctionReturnTypes
 //		{:
 //			// TestFunction
 //		:}
@@ -323,31 +367,43 @@ type
 //		:}
 //	;
 
-returnDelimiter
+ReturnDelimiter
 	=	COLON
 	|	ARROW
 	;
 
-paramName
-	=	TEXT
+ParamName
+	=	TEXT.name
 		{:
-			// ParamName
+			return new Parameter(name);
 		:}
-	|	LBRACKET TEXT RBRACKET
+	|	LBRACKET TEXT.name RBRACKET
 		{:
-			// OptionalParamName
+			Parameter result = new Parameter(name);
+			
+			result.setUsage(Usage.ONE_OR_MORE);
+			
+			return result;
 		:}
 	|	ELLIPSIS
 		{:
-			// VarArgs
+			Parameter result = new Parameter("...");
+			
+			result.setUsage(Usage.ONE_OR_MORE);
+			
+			return result;
 		:}
 	|	LBRACKET ELLIPSIS RBRACKET
 		{:
-			// OptionalVarArgs
+			Parameter result = new Parameter("...");
+			
+			result.setUsage(Usage.ZERO_OR_MORE);
+			
+			return result;
 		:}
 	;
 
-namespace
+Namespace
 	=	IDENTIFIER
 	|	FUNCTION
 	|	ARRAY
