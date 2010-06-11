@@ -1,0 +1,23 @@
+package com.aptana.editor.js.sdoc.model;
+
+public enum TagType
+{
+	ADVANCED,
+	ALIAS,
+	AUTHOR,
+	CLASS_DESCRIPTION,
+	CONSTRUCTOR,
+	EXAMPLE,
+	EXCEPTION,
+	EXTENDS,
+	INTERNAL,
+	METHOD,
+	NAMESPACE,
+	OVERVIEW,
+	PARAM,
+	PRIVATE,
+	PROPERTY,
+	RETURN,
+	SEE,
+	UNKNOWN;
+}
