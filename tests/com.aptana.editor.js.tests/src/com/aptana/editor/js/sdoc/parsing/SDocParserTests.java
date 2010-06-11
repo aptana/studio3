@@ -13,9 +13,12 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
+import beaver.Symbol;
+
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.sdoc.model.Block;
 
 public class SDocParserTests extends TestCase
 {
@@ -83,7 +86,17 @@ public class SDocParserTests extends TestCase
 		
 		try
 		{
-			parser.parse(source);
+			Object result = parser.parse(source);
+			
+			if (result instanceof Symbol)
+			{
+				Object value = ((Symbol) result).value;
+				
+				if (value instanceof Block)
+				{
+					//System.out.println(((Block) value).toSource());
+				}
+			}
 		}
 		catch (Exception e)
 		{
