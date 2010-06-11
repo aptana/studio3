@@ -1,5 +1,7 @@
 package com.aptana.editor.js.sdoc.model;
 
+import com.aptana.parsing.io.SourceWriter;
+
 import beaver.Symbol;
 
 public class Parameter extends Symbol
@@ -46,5 +48,46 @@ public class Parameter extends Symbol
 	public void setUsage(Usage usage)
 	{
 		this._usage = usage;
+	}
+	
+	/**
+	 * toSource
+	 * 
+	 * @return
+	 */
+	public String toSource()
+	{
+		SourceWriter writer = new SourceWriter();
+		
+		this.toSource(writer);
+		
+		return writer.toString();
+	}
+	
+	/**
+	 * toSource
+	 * 
+	 * @param writer
+	 */
+	public void toSource(SourceWriter writer)
+	{
+		switch (this._usage)
+		{
+			case REQUIRED:
+				writer.print(this._name);
+				break;
+				
+			case OPTIONAL:
+				writer.print("[").print(this._name).print("]");
+				break;
+				
+			case ONE_OR_MORE:
+				writer.print("...");
+				break;
+				
+			case ZERO_OR_MORE:
+				writer.print("[...]");
+				break;
+		}
 	}
 }

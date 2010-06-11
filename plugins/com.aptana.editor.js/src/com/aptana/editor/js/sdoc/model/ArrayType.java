@@ -1,5 +1,7 @@
 package com.aptana.editor.js.sdoc.model;
 
+import com.aptana.parsing.io.SourceWriter;
+
 public class ArrayType extends Type
 {
 	private Type _memberType;
@@ -32,5 +34,22 @@ public class ArrayType extends Type
 	public Type getMemberType()
 	{
 		return this._memberType;
+	}
+	
+	/**
+	 * toSource
+	 * 
+	 * @param writer
+	 */
+	public void toSource(SourceWriter writer)
+	{
+		writer.print("Array");
+		
+		if (this._memberType != Type.OBJECT_TYPE)
+		{
+			writer.print("<");
+			this._memberType.toSource(writer);
+			writer.print(">");
+		}
 	}
 }
