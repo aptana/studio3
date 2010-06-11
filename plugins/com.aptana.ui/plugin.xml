@@ -48,6 +48,9 @@
          <viewShortcut
                id="com.aptana.terminal.views.terminal">
          </viewShortcut>
+         <viewShortcut
+               id="org.eclipse.ui.console.ConsoleView">
+         </viewShortcut>
          <view
                id="org.eclipse.pde.runtime.LogView"
                relationship="stack"

@@ -4,10 +4,17 @@ import com.aptana.editor.js.parsing.lexer.JSTokenType;
 
 public class JSPostUnaryOperatorNode extends JSUnaryOperatorNode
 {
-
-	public JSPostUnaryOperatorNode(JSNode expression, String operator, int start, int end)
+	/**
+	 * JSPostUnaryOperatorNode
+	 * 
+	 * @param operator
+	 * @param start
+	 * @param end
+	 * @param expression
+	 */
+	public JSPostUnaryOperatorNode(String operator, int start, int end, JSNode expression)
 	{
-		super(expression, start, end);
+		super(start, end, expression);
 
 		short type = DEFAULT_TYPE;
 		JSTokenType token = JSTokenType.get(operator);
@@ -23,6 +30,10 @@ public class JSPostUnaryOperatorNode extends JSUnaryOperatorNode
 		setType(type);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSUnaryOperatorNode#toString()
+	 */
 	@Override
 	public String toString()
 	{
@@ -40,6 +51,8 @@ public class JSPostUnaryOperatorNode extends JSUnaryOperatorNode
 		}
 		text.append(operator);
 
-		return appendSemicolon(text.toString());
+		this.appendSemicolon(text);
+
+		return text.toString();
 	}
 }

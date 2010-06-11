@@ -6,33 +6,19 @@
 %import "java.util.ArrayList";
 %import "java.util.List";
 
-%import "com.aptana.editor.js.parsing.ast.JSAssignmentNode";
-%import "com.aptana.editor.js.parsing.ast.JSBinaryOperatorNode";
-%import "com.aptana.editor.js.parsing.ast.JSFunctionNode";
-%import "com.aptana.editor.js.parsing.ast.JSGetElementOperatorNode";
-%import "com.aptana.editor.js.parsing.ast.JSGetPropertyOperatorNode";
-%import "com.aptana.editor.js.parsing.ast.JSLabelStatementNode";
-%import "com.aptana.editor.js.parsing.ast.JSNaryAndExpressionNode";
-%import "com.aptana.editor.js.parsing.ast.JSNaryNode";
-%import "com.aptana.editor.js.parsing.ast.JSNode";
-%import "com.aptana.editor.js.parsing.ast.JSNodeTypes";
-%import "com.aptana.editor.js.parsing.ast.JSPostUnaryOperatorNode";
-%import "com.aptana.editor.js.parsing.ast.JSPrimitiveNode";
-%import "com.aptana.editor.js.parsing.ast.JSUnaryOperatorNode";
+%import "com.aptana.editor.js.parsing.ast.*";
 %import "com.aptana.editor.js.parsing.lexer.JSTokenType";
 %import "com.aptana.parsing.IParseState";
 %import "com.aptana.parsing.IParser";
 %import "com.aptana.parsing.IRecoveryStrategy";
 %import "com.aptana.parsing.ast.IParseNode";
-%import "com.aptana.parsing.ast.ParseRootNode";
 
 %implements "IParser";
 
 %embed {:
-	// suppresses the parser error reporting and lets the custom error recovery mechanism handles it
+	// suppress parser error reporting and let the custom error recovery mechanism handle it
 	private static class JSEvents extends Events
 	{
-
 		public void scannerError(Scanner.Exception e)
 		{
 		}
@@ -110,6 +96,10 @@
 		return result;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.IParser#parse(com.aptana.parsing.IParseState)
+	 */
 	@Override
 	public synchronized IParseNode parse(IParseState parseState) throws java.lang.Exception
 	{
@@ -228,7 +218,6 @@
 %terminals LESS, GREATER, LESS_EQUAL, GREATER_EQUAL, INSTANCEOF, IN, EQUAL_EQUAL, EXCLAMATION_EQUAL, EQUAL_EQUAL_EQUAL, EXCLAMATION_EQUAL_EQUAL;
 %terminals EQUAL, STAR_EQUAL, FORWARD_SLASH_EQUAL, PERCENT_EQUAL, PLUS_EQUAL, MINUS_EQUAL, LESS_LESS_EQUAL, GREATER_GREATER_EQUAL, GREATER_GREATER_GREATER_EQUAL, AMPERSAND_EQUAL, CARET_EQUAL, PIPE_EQUAL;
 
-%typeof NUMBER, STRING, REGEX, IDENTIFIER = "String";
 %typeof AssignmentOperator, AdditiveOperator, MultiplicativeOperator, UnaryOperator, PostfixOperator, RelationalOperator, RelationalOperator_NoIn, ShiftOperator, EqualityOperator = "String";
 %typeof AssignmentExpression, AssignmentExpression_NoIn, LeftHandSideExpression, LeftHandSideExpression_NoLBF, UnaryExpression = "JSNode";
 %typeof AdditiveExpression, AdditiveExpression_NoLBF, MultiplicativeExpression, MultiplicativeExpression_NoLBF, RelationalExpression, RelationalExpression_NoIn, RelationalExpression_NoLBF = "JSNode";
@@ -244,10 +233,10 @@
 Program
 	=	SourceElements.p
 		{:
-			return new ParseRootNode(IJSParserConstants.LANGUAGE, p, _symbol_p.getStart(), _symbol_p.getEnd());
+			return new JSParseRootNode(p, _symbol_p.getStart(), _symbol_p.getEnd());
 		:}
 	|	{:
-			return new ParseRootNode(IJSParserConstants.LANGUAGE, new Symbol[0], 0, 0);
+			return new JSParseRootNode();
 		:}
 	;
 
@@ -261,27 +250,27 @@ SourceElement
 	;
 
 FunctionDeclaration
-	=	FUNCTION.f IDENTIFIER.i FunctionParameters.p FunctionBody.b
+	=	FUNCTION.keyword IDENTIFIER.ident FunctionParameters.params FunctionBody.body
 		{:
 			return new JSFunctionNode(
-				new JSNode[] {
-					new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd()), p, b
-				},
-				f.getStart(),
-				b.getEnd()
+				keyword.getStart(),
+				body.getEnd(),
+				new JSIdentifierNode(ident),
+				params,
+				body
 			);
 		:}
 	;
 
 FunctionExpression
-	=	FUNCTION.f FunctionParameters.p FunctionBody.b
+	=	FUNCTION.keyword FunctionParameters.params FunctionBody.body
 		{:
 			return new JSFunctionNode(
-				new JSNode[] {
-					new JSNode(), p, b
-				},
-				f.getStart(),
-				b.getEnd()
+				keyword.getStart(),
+				body.getEnd(),
+				new JSNode(),
+				params,
+				body
 			);
 		:}
 	|	FunctionDeclaration
@@ -290,37 +279,38 @@ FunctionExpression
 FunctionParameters
 	=	LPAREN.l RPAREN.r
 		{:
-			return new JSNaryNode(JSNodeTypes.PARAMETERS, l.getStart(), r.getEnd());
+			return new JSParametersNode(l.getStart(), r.getEnd());
 		:}
-	|	LPAREN.l FormalParameterList.p RPAREN.r
+	|	LPAREN.l FormalParameterList.params RPAREN.r
 		{:
-			p.setLocation(l.getStart(), r.getEnd());return p;
+			params.setLocation(l.getStart(), r.getEnd());
+			return params;
 		:}
 	;
 
 FormalParameterList
-	=	FormalParameterList.p COMMA IDENTIFIER.i
+	=	FormalParameterList.list COMMA IDENTIFIER.ident
 		{:
-			JSNode node = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());
-			p.addChild(node);
-			p.setLocation(p.getStart(), node.getEnd());
-			return p;
+			JSNode identifier = new JSIdentifierNode(ident);
+			list.addChild(identifier);
+			list.setLocation(list.getStart(), identifier.getEnd());
+			return list;
 		:}
-	|	IDENTIFIER.i
+	|	IDENTIFIER.ident
 		{:
-			JSNode node = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());
-			return new JSNaryNode(JSNodeTypes.PARAMETERS, new JSNode[] { node }, node.getStart(), node.getEnd());
+			JSNode identifier = new JSIdentifierNode(ident);
+			return new JSParametersNode(identifier.getStart(), identifier.getEnd(), identifier);
 		:}
 	;
 
 FunctionBody
 	=	LCURLY.l RCURLY.r
 		{:
-			return new JSNaryNode(JSNodeTypes.STATEMENTS, l.getStart(), r.getEnd());
+			return new JSStatementsNode(l.getStart(), r.getEnd());
 		:}
 	|	LCURLY.l SourceElements.s RCURLY.r
 		{:
-			return new JSNaryNode(JSNodeTypes.STATEMENTS, s, l.getStart(), r.getEnd());
+			return new JSStatementsNode(l.getStart(), r.getEnd(), s);
 		:}
 	;
 
@@ -329,7 +319,7 @@ Statement
 	|	FunctionDeclaration
 	|	VAR.s VariableDeclarationList.l SEMICOLON.e
 		{:
-			JSNode node = new JSNaryNode(JSNodeTypes.VAR, l, s.getStart(), e.getEnd());
+			JSNode node = new JSVarNode(s.getStart(), e.getEnd(), l);
 			node.setSemicolonIncluded(true);
 			return node;
 		:}
@@ -350,11 +340,13 @@ Statement
 	|	TryStatement
 	|	SEMICOLON.s
 		{:
-			return new JSNode(JSNodeTypes.EMPTY, s.getStart(), s.getEnd(), true);
+			JSNode node = new JSEmptyNode(s.getStart(), s.getEnd());
+			node.setSemicolonIncluded(true);
+			return node;
 		:}
 	|	error.e
 		{:
-			return new JSNode(JSNodeTypes.ERROR, e.getStart(), e.getEnd());
+			return new JSErrorNode(e.getStart(), e.getEnd());
 		:}
 	;
 
@@ -363,7 +355,7 @@ Statement_NoIf
 	|	FunctionDeclaration
 	|	VAR.s VariableDeclarationList.l SEMICOLON.e
 		{:
-			JSNode node = new JSNaryNode(JSNodeTypes.VAR, l, s.getStart(), e.getEnd());
+			JSNode node = new JSVarNode(s.getStart(), e.getEnd(), l);
 			node.setSemicolonIncluded(true);
 			return node;
 		:}
@@ -384,22 +376,22 @@ Statement_NoIf
 	|	TryStatement
 	|	SEMICOLON.s
 		{:
-			return new JSNode(JSNodeTypes.EMPTY, s.getStart(), s.getEnd());
+			return new JSEmptyNode(s.getStart(), s.getEnd());
 		:}
 	|	error.e
 		{:
-			return new JSNode(JSNodeTypes.ERROR, e.getStart(), e.getEnd());
+			return new JSErrorNode(e.getStart(), e.getEnd());
 		:}
 	;
 
 Block
 	=	LCURLY.l RCURLY.r
 		{:
-			return new JSNaryNode(JSNodeTypes.STATEMENTS, l.getStart(), r.getEnd());
+			return new JSStatementsNode(l.getStart(), r.getEnd());
 		:}
 	|	LCURLY.l StatementList.a RCURLY.r
 		{:
-			return new JSNaryNode(JSNodeTypes.STATEMENTS, a, l.getStart(), r.getEnd());
+			return new JSStatementsNode(l.getStart(), r.getEnd(), a);
 		:}
 	;
 
@@ -421,195 +413,195 @@ VariableDeclarationList_NoIn
 VariableDeclaration
 	=	IDENTIFIER.i
 		{:
-			JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());
-			return new JSNode(JSNodeTypes.DECLARATION, new JSNode[] { id, new JSNode() }, _symbol_i.getStart(), _symbol_i.getEnd());
+			JSNode id = new JSIdentifierNode(i);
+			return new JSDeclarationNode(i.getStart(), i.getEnd(), id, new JSNode());
 		:}
 	|	IDENTIFIER.i EQUAL AssignmentExpression.e
 		{:
-			JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());
-			return new JSNode(JSNodeTypes.DECLARATION, new JSNode[] { id, e }, _symbol_i.getStart(), e.getEnd());
+			JSNode id = new JSIdentifierNode(i);
+			return new JSDeclarationNode(i.getStart(), e.getEnd(), id, e);
 		:}
 	;
 
 VariableDeclaration_NoIn
 	=	IDENTIFIER.i
 		{:
-			JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());
-			return new JSNode(JSNodeTypes.DECLARATION, new JSNode[] { id, new JSNode() }, _symbol_i.getStart(), _symbol_i.getEnd());
+			JSNode id = new JSIdentifierNode(i);
+			return new JSDeclarationNode(i.getStart(), i.getEnd(), id, new JSNode());
 		:}
 	|	IDENTIFIER.i EQUAL AssignmentExpression_NoIn.e
 		{:
-			JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());
-			return new JSNode(JSNodeTypes.DECLARATION, new JSNode[] { id, e }, _symbol_i.getStart(), e.getEnd());
+			JSNode id = new JSIdentifierNode(i);
+			return new JSDeclarationNode(i.getStart(), e.getEnd(), id, e);
 		:}
 	;
 
 IfStatement
 	=	IF.i LPAREN Expression.e RPAREN Statement_NoIf.sn ELSE Statement.s
 		{:
-			return new JSNode(JSNodeTypes.IF, new JSNode[] { e, sn, s }, i.getStart(), s.getEnd());
+			return new JSIfNode(i.getStart(), s.getEnd(), e, sn, s);
 		:}
 	|	IF.i LPAREN Expression.e RPAREN Statement.s
 		{:
-			return new JSNode(JSNodeTypes.IF, new JSNode[] { e, s, new JSNode() }, i.getStart(), s.getEnd());
+			return new JSIfNode(i.getStart(), s.getEnd(), e, s, new JSNode());
 		:}
 	;
 
 IfStatement_NoIf
 	=	IF.i LPAREN Expression.e RPAREN Statement_NoIf.sn ELSE Statement_NoIf.s
 		{:
-			return new JSNode(JSNodeTypes.IF, new JSNode[] { e, sn, s }, i.getStart(), s.getEnd());
+			return new JSIfNode(i.getStart(), s.getEnd(), e, sn, s);
 		:}
 	;
 
 IterationStatement
 	=	DO.d Statement.s WHILE LPAREN Expression.e RPAREN SEMICOLON.r
 		{:
-			JSNode node = new JSNode(JSNodeTypes.DO, new JSNode[] { s, e }, d.getStart(), r.getEnd());
+			JSNode node = new JSDoNode(d.getStart(), r.getEnd(), s, e);
 			node.setSemicolonIncluded(true);
 			return node;
 		:}
 	|	WHILE.w LPAREN Expression.e RPAREN Statement.s
 		{:
-			return new JSNode(JSNodeTypes.WHILE, new JSNode[] { e, s }, w.getStart(), s.getEnd());
+			return new JSWhileNode(w.getStart(), s.getEnd(), e, s);
 		:}
 	|	FOR.f LPAREN SEMICOLON SEMICOLON RPAREN Statement.s
 		{:
-			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());
+			return new JSForNode(f.getStart(), s.getEnd(), new JSNode(), new JSNode(), new JSNode(), s);
 		:}
 	|	FOR.f LPAREN SEMICOLON SEMICOLON Expression.a RPAREN Statement.s
 		{:
-			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), new JSNode(), a, s }, f.getStart(), s.getEnd());
+			return new JSForNode(f.getStart(), s.getEnd(), new JSNode(), new JSNode(), a, s);
 		:}
 	|	FOR.f LPAREN SEMICOLON Expression.c SEMICOLON RPAREN Statement.s
 		{:
-			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), c, new JSNode(), s }, f.getStart(), s.getEnd());
+			return new JSForNode(f.getStart(), s.getEnd(), new JSNode(), c, new JSNode(), s);
 		:}
 	|	FOR.f LPAREN SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement.s
 		{:
-			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), c, a, s }, f.getStart(), s.getEnd());
+			return new JSForNode(f.getStart(), s.getEnd(), new JSNode(), c, a, s);
 		:}
 	|	FOR.f LPAREN Expression_NoIn.i SEMICOLON SEMICOLON RPAREN Statement.s
 		{:
-			return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());
+			return new JSForNode(f.getStart(), s.getEnd(), i, new JSNode(), new JSNode(), s);
 		:}
 	|	FOR.f LPAREN Expression_NoIn.i SEMICOLON SEMICOLON Expression.a RPAREN Statement.s
 		{:
-			return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, new JSNode(), a, s }, f.getStart(), s.getEnd());
+			return new JSForNode(f.getStart(), s.getEnd(), i, new JSNode(), a, s);
 		:}
 	|	FOR.f LPAREN Expression_NoIn.i SEMICOLON Expression.c SEMICOLON RPAREN Statement.s
 		{:
-			return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, c, new JSNode(), s }, f.getStart(), s.getEnd());
+			return new JSForNode(f.getStart(), s.getEnd(), i, c, new JSNode(), s);
 		:}
 	|	FOR.f LPAREN Expression_NoIn.i SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement.s
 		{:
-			return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, c, a, s }, f.getStart(), s.getEnd());
+			return new JSForNode(f.getStart(), s.getEnd(), i, c, a, s);
 		:}
 	|	FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON SEMICOLON RPAREN Statement.s
 		{:
-			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());
+			return new JSForNode(f.getStart(), s.getEnd(), new JSVarNode(v.getStart(), i[i.length - 1].getEnd(), i), new JSNode(), new JSNode(), s);
 		:}
 	|	FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON SEMICOLON Expression.a RPAREN Statement.s
 		{:
-			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), new JSNode(), a, s }, f.getStart(), s.getEnd());
+			return new JSForNode(f.getStart(), s.getEnd(), new JSVarNode(v.getStart(), i[i.length - 1].getEnd(), i), new JSNode(), a, s);
 		:}
 	|	FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON Expression.c SEMICOLON RPAREN Statement.s
 		{:
-			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), c, new JSNode(), s }, f.getStart(), s.getEnd());
+			return new JSForNode(f.getStart(), s.getEnd(), new JSVarNode(v.getStart(), i[i.length - 1].getEnd(), i), c, new JSNode(), s);
 		:}
 	|	FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement.s
 		{:
-			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), c, a, s }, f.getStart(), s.getEnd());
+			return new JSForNode(f.getStart(), s.getEnd(), new JSVarNode(v.getStart(), i[i.length - 1].getEnd(), i), c, a, s);
 		:}
 	|	FOR.f LPAREN LeftHandSideExpression.i IN Expression.o RPAREN Statement.s
 		{:
-			return new JSNode(JSNodeTypes.FOR_IN, new JSNode[] { i, o, s }, f.getStart(), s.getEnd());
+			return new JSForInNode(f.getStart(), s.getEnd(), i, o, s);
 		:}
 	|	FOR.f LPAREN VAR.v VariableDeclaration_NoIn.i IN Expression.o RPAREN Statement.s
 		{:
-			return new JSNode(JSNodeTypes.FOR_IN, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, new JSNode[] { i }, v.getStart(), i.getEnd()), o, s }, f.getStart(), s.getEnd());
+			return new JSForInNode(f.getStart(), s.getEnd(), new JSVarNode(v.getStart(), i.getEnd(), i), o, s);
 		:}
 	;
 
 IterationStatement_NoIf
 	=	DO.d Statement.s WHILE LPAREN Expression.e RPAREN SEMICOLON.r
 		{:
-			JSNode node = new JSNode(JSNodeTypes.DO, new JSNode[] { s, e }, d.getStart(), r.getEnd());
+			JSNode node = new JSDoNode(d.getStart(), r.getEnd(), s, e);
 			node.setSemicolonIncluded(true);
 			return node;
 		:}
 	|	WHILE.w LPAREN Expression.e RPAREN Statement_NoIf.s
 		{:
-			return new JSNode(JSNodeTypes.WHILE, new JSNode[] { e, s }, w.getStart(), s.getEnd());
+			return new JSWhileNode(w.getStart(), s.getEnd(), e, s);
 		:}
 	|	FOR.f LPAREN SEMICOLON SEMICOLON RPAREN Statement_NoIf.s
 		{:
-			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());
+			return new JSForNode(f.getStart(), s.getEnd(), new JSNode(), new JSNode(), new JSNode(), s);
 		:}
 	|	FOR.f LPAREN SEMICOLON SEMICOLON Expression.a RPAREN Statement_NoIf.s
 		{:
-			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), new JSNode(), a, s }, f.getStart(), s.getEnd());
+			return new JSForNode(f.getStart(), s.getEnd(), new JSNode(), new JSNode(), a, s);
 		:}
 	|	FOR.f LPAREN SEMICOLON Expression.c SEMICOLON RPAREN Statement_NoIf.s
 		{:
-			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), c, new JSNode(), s }, f.getStart(), s.getEnd());
+			return new JSForNode(f.getStart(), s.getEnd(), new JSNode(), c, new JSNode(), s);
 		:}
 	|	FOR.f LPAREN SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement_NoIf.s
 		{:
-			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), c, a, s }, f.getStart(), s.getEnd());
+			return new JSForNode(f.getStart(), s.getEnd(), new JSNode(), c, a, s);
 		:}
 	|	FOR.f LPAREN Expression_NoIn.i SEMICOLON SEMICOLON RPAREN Statement_NoIf.s
 		{:
-			return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());
+			return new JSForNode(f.getStart(), s.getEnd(), i, new JSNode(), new JSNode(), s);
 		:}
 	|	FOR.f LPAREN Expression_NoIn.i SEMICOLON SEMICOLON Expression.a RPAREN Statement_NoIf.s
 		{:
-			return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, new JSNode(), a, s }, f.getStart(), s.getEnd());
+			return new JSForNode(f.getStart(), s.getEnd(), i, new JSNode(), a, s);
 		:}
 	|	FOR.f LPAREN Expression_NoIn.i SEMICOLON Expression.c SEMICOLON RPAREN Statement_NoIf.s
 		{:
-			return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, c, new JSNode(), s }, f.getStart(), s.getEnd());
+			return new JSForNode(f.getStart(), s.getEnd(), i, c, new JSNode(), s);
 		:}
 	|	FOR.f LPAREN Expression_NoIn.i SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement_NoIf.s
 		{:
-			return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, c, a, s }, f.getStart(), s.getEnd());
+			return new JSForNode(f.getStart(), s.getEnd(), i, c, a, s);
 		:}
 	|	FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON SEMICOLON RPAREN Statement_NoIf.s
 		{:
-			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());
+			return new JSForNode(f.getStart(), s.getEnd(), new JSVarNode(v.getStart(), i[i.length - 1].getEnd(), i), new JSNode(), new JSNode(), s);
 		:}
 	|	FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON SEMICOLON Expression.a RPAREN Statement_NoIf.s
 		{:
-			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), new JSNode(), a, s }, f.getStart(), s.getEnd());
+			return new JSForNode(f.getStart(), s.getEnd(), new JSVarNode(v.getStart(), i[i.length - 1].getEnd(), i), new JSNode(), a, s);
 		:}
 	|	FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON Expression.c SEMICOLON RPAREN Statement_NoIf.s
 		{:
-			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), c, new JSNode(), s }, f.getStart(), s.getEnd());
+			return new JSForNode(f.getStart(), s.getEnd(), new JSVarNode(v.getStart(), i[i.length - 1].getEnd(), i), c, new JSNode(), s);
 		:}
 	|	FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement_NoIf.s
 		{:
-			return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), c, a, s }, f.getStart(), s.getEnd());
+			return new JSForNode(f.getStart(), s.getEnd(), new JSVarNode(v.getStart(), i[i.length - 1].getEnd(), i), c, a, s);
 		:}
 	|	FOR.f LPAREN LeftHandSideExpression.i IN Expression.o RPAREN Statement_NoIf.s
 		{:
-			return new JSNode(JSNodeTypes.FOR_IN, new JSNode[] { i, o, s }, f.getStart(), s.getEnd());
+			return new JSForInNode(f.getStart(), s.getEnd(), i, o, s);
 		:}
 	|	FOR.f LPAREN VAR.v VariableDeclaration_NoIn.i IN Expression.o RPAREN Statement_NoIf.s
 		{:
-			return new JSNode(JSNodeTypes.FOR_IN, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, new JSNode[] {i }, v.getStart(), i.getEnd()), o, s }, f.getStart(), s.getEnd());
+			return new JSForInNode(f.getStart(), s.getEnd(), new JSVarNode(v.getStart(), i.getEnd(), i), o, s);
 		:}
 	;
 
 ContinueStatement
 	=	CONTINUE.c SEMICOLON.s
 		{:
-			JSNode node = new JSLabelStatementNode(JSNodeTypes.CONTINUE, c.getStart(), s.getEnd());
+			JSNode node = new JSContinueNode(c.getStart(), s.getEnd());
 			node.setSemicolonIncluded(true);
 			return node;
 		:}
 	|	CONTINUE.c IDENTIFIER.i SEMICOLON.s
 		{:
-			JSNode node = new JSLabelStatementNode(JSNodeTypes.CONTINUE, i, c.getStart(), s.getEnd());
+			JSNode node = new JSContinueNode(c.getStart(), s.getEnd(), (String) i.value);
 			node.setSemicolonIncluded(true);
 			return node;
 		:}
@@ -618,13 +610,13 @@ ContinueStatement
 BreakStatement
 	=	BREAK.b SEMICOLON.s
 		{:
-			JSNode node = new JSLabelStatementNode(JSNodeTypes.BREAK, b.getStart(), s.getEnd());
+			JSNode node = new JSBreakNode(b.getStart(), s.getEnd());
 			node.setSemicolonIncluded(true);
 			return node;
 		:}
 	|	BREAK.b IDENTIFIER.i SEMICOLON.s
 		{:
-			JSNode node = new JSLabelStatementNode(JSNodeTypes.BREAK, i, b.getStart(), s.getEnd());
+			JSNode node = new JSBreakNode(b.getStart(), s.getEnd(), (String) i.value);
 			node.setSemicolonIncluded(true);
 			return node;
 		:}
@@ -633,13 +625,13 @@ BreakStatement
 ReturnStatement
 	=	RETURN.r SEMICOLON.s
 		{:
-			JSNode node = new JSUnaryOperatorNode(JSNodeTypes.RETURN, new JSNode(), r.getStart(), s.getEnd());
+			JSNode node = new JSReturnNode(r.getStart(), s.getEnd(), new JSNode());
 			node.setSemicolonIncluded(true);
 			return node;
 		:}
 	|	RETURN.r Expression.e SEMICOLON.s
 		{:
-			JSNode node = new JSUnaryOperatorNode(JSNodeTypes.RETURN, e, r.getStart(), s.getEnd());
+			JSNode node = new JSReturnNode(r.getStart(), s.getEnd(), e);
 			node.setSemicolonIncluded(true);
 			return node;
 		:}
@@ -648,59 +640,71 @@ ReturnStatement
 WithStatement
 	=	WITH.w LPAREN Expression.e RPAREN Statement.s
 		{:
-			return new JSNode(JSNodeTypes.WITH, new JSNode[] { e, s }, w.getStart(), s.getEnd());
+			return new JSWithNode(w.getStart(), s.getEnd(), e, s);
 		:}
 	;
 
 WithStatement_NoIf
 	=	WITH.w LPAREN Expression.e RPAREN Statement_NoIf.s
 		{:
-			return new JSNode(JSNodeTypes.WITH, new JSNode[] { e, s }, w.getStart(), s.getEnd());
+			return new JSWithNode(w.getStart(), s.getEnd(), e, s);
 		:}
 	;
 
 SwitchStatement
 	=	SWITCH.s LPAREN Expression.e RPAREN LCURLY RCURLY.r
 		{:
-			return new JSNaryAndExpressionNode(JSNodeTypes.SWITCH, e, s.getStart(), r.getEnd());
+			return new JSSwitchNode(s.getStart(), r.getEnd(), e);
 		:}
 	|	SWITCH.s LPAREN Expression.e RPAREN LCURLY CaseClauses.c RCURLY.r
 		{:
-			return new JSNaryAndExpressionNode(JSNodeTypes.SWITCH, e, c, s.getStart(), r.getEnd());
+			List<JSNode> nodes = new ArrayList<JSNode>();
+			nodes.add(e);
+			for (JSNode statement : c) {
+				nodes.add(statement);
+			}
+			JSNode[] children = nodes.toArray(new JSNode[nodes.size()]);
+			return new JSSwitchNode(s.getStart(), r.getEnd(), children);
 		:}
 	|	SWITCH.s LPAREN Expression.e RPAREN LCURLY DefaultClause.d RCURLY.r
 		{:
-			return new JSNaryAndExpressionNode(JSNodeTypes.SWITCH, e, new JSNode[] { d }, s.getStart(), r.getEnd());
+			return new JSSwitchNode(s.getStart(), r.getEnd(), e, d);
 		:}
 	|	SWITCH.s LPAREN Expression.e RPAREN LCURLY DefaultClause.d CaseClauses.c RCURLY.r
 		{:
-			List<JSNode> children = new ArrayList<JSNode>();
-			children.add(d);
+			List<JSNode> nodes = new ArrayList<JSNode>();
+			nodes.add(e);
+			nodes.add(d);
 			for (JSNode statement : c) {
-				children.add(statement);
+				nodes.add(statement);
 			}
-			return new JSNaryAndExpressionNode(JSNodeTypes.SWITCH, e, children.toArray(new JSNode[children.size()]), s.getStart(), r.getEnd());
+			JSNode[] children = nodes.toArray(new JSNode[nodes.size()]);
+			return new JSSwitchNode(s.getStart(), r.getEnd(), children);
 		:}
 	|	SWITCH.s LPAREN Expression.e RPAREN LCURLY CaseClauses.c DefaultClause.d RCURLY.r
 		{:
-			List<JSNode> children = new ArrayList<JSNode>();
+			List<JSNode> nodes = new ArrayList<JSNode>();
+			nodes.add(e);
 			for (JSNode statement : c) {
-				children.add(statement);
+				nodes.add(statement);
 			}
-			children.add(d);
-			return new JSNaryAndExpressionNode(JSNodeTypes.SWITCH, e, children.toArray(new JSNode[children.size()]), s.getStart(), r.getEnd());
+			nodes.add(d);
+			JSNode[] children = nodes.toArray(new JSNode[nodes.size()]);
+			return new JSSwitchNode(s.getStart(), r.getEnd(), children);
 		:}
 	|	SWITCH.s LPAREN Expression.e RPAREN LCURLY CaseClauses.c1 DefaultClause.d CaseClauses.c2 RCURLY.r
 		{:
-			List<JSNode> children = new ArrayList<JSNode>();
+			List<JSNode> nodes = new ArrayList<JSNode>();
+			nodes.add(e);
 			for (JSNode statement : c1) {
-				children.add(statement);
+				nodes.add(statement);
 			}
-			children.add(d);
+			nodes.add(d);
 			for (JSNode statement : c2) {
-				children.add(statement);
+				nodes.add(statement);
 			}
-			return new JSNaryAndExpressionNode(JSNodeTypes.SWITCH, e, children.toArray(new JSNode[children.size()]), s.getStart(), r.getEnd());
+			JSNode[] children = nodes.toArray(new JSNode[nodes.size()]);
+			return new JSSwitchNode(s.getStart(), r.getEnd(), children);
 		:}
 	;
 
@@ -712,45 +716,51 @@ CaseClauses
 CaseClause
 	=	CASE.c Expression.e COLON.r
 		{:
-			return new JSNaryAndExpressionNode(JSNodeTypes.CASE, e, c.getStart(), r.getEnd());
+			return new JSCaseNode(c.getStart(), r.getEnd(), e);
 		:}
 	|	CASE.c Expression.e COLON StatementList.s
 		{:
-			return new JSNaryAndExpressionNode(JSNodeTypes.CASE, e, s, c.getStart(), s[s.length - 1].getEnd());
+			List<JSNode> nodes = new ArrayList<JSNode>();
+			nodes.add(e);
+			for (JSNode statement : s) {
+				nodes.add(statement);
+			}
+			JSNode[] children = nodes.toArray(new JSNode[nodes.size()]);
+			return new JSCaseNode(c.getStart(), s[s.length - 1].getEnd(), children);
 		:}
 	;
 
 DefaultClause
 	=	DEFAULT.d COLON.c
 		{:
-			return new JSNaryNode(JSNodeTypes.DEFAULT, d.getStart(), c.getEnd());
+			return new JSDefaultNode(d.getStart(), c.getEnd());
 		:}
 	|	DEFAULT.d COLON StatementList.s
 		{:
-			return new JSNaryNode(JSNodeTypes.DEFAULT, s, d.getStart(), s[s.length - 1].getEnd());
+			return new JSDefaultNode(d.getStart(), s[s.length - 1].getEnd(), s);
 		:}
 	;
 
 LabelledStatement
 	=	IDENTIFIER.i COLON Statement.s
 		{:
-			JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());
-			return new JSNode(JSNodeTypes.LABELLED, new JSNode[] { id, s }, _symbol_i.getStart(), s.getEnd());
+			JSNode id = new JSIdentifierNode(i);
+			return new JSLabelledNode(i.getStart(), s.getEnd(), id, s);
 		:}
 	;
 
 LabelledStatement_NoIf
 	=	IDENTIFIER.i COLON Statement_NoIf.s
 		{:
-			JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());
-			return new JSNode(JSNodeTypes.LABELLED, new JSNode[] { id, s }, _symbol_i.getStart(), s.getEnd());
+			JSNode id = new JSIdentifierNode(i);
+			return new JSLabelledNode(i.getStart(), s.getEnd(), id, s);
 		:}
 	;
 
 ThrowStatement
 	=	THROW.t Expression.e SEMICOLON.s
 		{:
-			JSNode node = new JSUnaryOperatorNode(JSNodeTypes.THROW, e, t.getStart(), s.getEnd());
+			JSNode node = new JSThrowNode(t.getStart(), s.getEnd(), e);
 			node.setSemicolonIncluded(true);
 			return node;
 		:}
@@ -759,30 +769,30 @@ ThrowStatement
 TryStatement
 	=	TRY.t Block.b Catch.c
 		{:
-			return new JSNode(JSNodeTypes.TRY, new JSNode[] { b, c, new JSNode() }, t.getStart(), c.getEnd());
+			return new JSTryNode(t.getStart(), c.getEnd(), b, c, new JSNode());
 		:}
 	|	TRY.t Block.b Finally.f
 		{:
-			return new JSNode(JSNodeTypes.TRY, new JSNode[] { b, new JSNode(), f }, t.getStart(), f.getEnd());
+			return new JSTryNode(t.getStart(), f.getEnd(), b, new JSNode(), f);
 		:}
 	|	TRY.t Block.b Catch.c Finally.f
 		{:
-			return new JSNode(JSNodeTypes.TRY, new JSNode[] { b, c, f }, t.getStart(), f.getEnd());
+			return new JSTryNode(t.getStart(), f.getEnd(), b, c, f);
 		:}
 	;
 
 Catch
 	=	CATCH.c LPAREN IDENTIFIER.i RPAREN Block.b
 		{:
-			JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());
-			return new JSNode(JSNodeTypes.CATCH, new JSNode[] { id, b }, c.getStart(), b.getEnd());
+			JSNode id = new JSIdentifierNode(i);
+			return new JSCatchNode(c.getStart(), b.getEnd(), id, b);
 		:}
 	;
 
 Finally
 	=	FINALLY.f Block.b
 		{:
-			return new JSNode(JSNodeTypes.FINALLY, new JSNode[] { b }, f.getStart(), b.getEnd());
+			return new JSFinallyNode(f.getStart(), b.getEnd(), b);
 		:}
 	;
 
@@ -794,51 +804,51 @@ PrimaryExpression
 PrimaryExpression_NoLBF
 	=	THIS.t
 		{:
-			return new JSPrimitiveNode(JSNodeTypes.THIS, t.value.toString(), t.getStart(), t.getEnd());
+			return new JSThisNode(t);
 		:}
-	|	IDENTIFIER.t
+	|	IDENTIFIER.i
 		{:
-			return new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, t, _symbol_t.getStart(), _symbol_t.getEnd());
+			return new JSIdentifierNode(i);
 		:}
 	|	Literal
 	|	ArrayLiteral
 	|	LPAREN.l Expression.e RPAREN.r
 		{:
-			return new JSUnaryOperatorNode(JSNodeTypes.GROUP, e, l.getStart(), r.getEnd());
+			return new JSGroupNode(l.getStart(), r.getEnd(), e);
 		:}
 	;
 
 ArrayLiteral
 	=	LBRACKET.l RBRACKET.r
 		{:
-			return new JSNaryNode(JSNodeTypes.ARRAY_LITERAL, l.getStart(), r.getEnd());
+			return new JSArrayNode(l.getStart(), r.getEnd());
 		:}
 	|	LBRACKET.l Elision.e RBRACKET.r
 		{:
-			return new JSNaryNode(JSNodeTypes.ARRAY_LITERAL, new JSNode[] { e }, l.getStart(), r.getEnd());
+			return new JSArrayNode(l.getStart(), r.getEnd(), e);
 		:}
 	|	LBRACKET.l ElementList.e RBRACKET.r
 		{:
-			return new JSNaryNode(JSNodeTypes.ARRAY_LITERAL, new JSNode[] { e }, l.getStart(), r.getEnd());
+			return new JSArrayNode(l.getStart(), r.getEnd(), e);
 		:}
 	|	LBRACKET.l ElementList.e COMMA RBRACKET.r
 		{:
-			return new JSNaryNode(JSNodeTypes.ARRAY_LITERAL, new JSNode[] { e, new JSPrimitiveNode(JSNodeTypes.NULL, "null", 0, 0) }, l.getStart(), r.getEnd());
+			return new JSArrayNode(l.getStart(), r.getEnd(), e, new JSNullNode(0, 0));
 		:}
 	|	LBRACKET.l ElementList.e COMMA Elision.n RBRACKET.r
 		{:
-			return new JSNaryNode(JSNodeTypes.ARRAY_LITERAL, new JSNode[] { e, n }, l.getStart(), r.getEnd());
+			return new JSArrayNode(l.getStart(), r.getEnd(), e, n);
 		:}
 	;
 
 ElementList
 	=	AssignmentExpression.e
 		{:
-			return new JSNaryNode(JSNodeTypes.ELEMENTS, new JSNode[] { e }, e.getStart(), e.getEnd());
+			return new JSElementsNode(e.getStart(), e.getEnd(), e);
 		:}
 	|	Elision.n AssignmentExpression.e
 		{:
-			return new JSNaryNode(JSNodeTypes.ELEMENTS, new JSNode[] { n, e }, n.getStart(), e.getEnd());
+			return new JSElementsNode(n.getStart(), e.getEnd(), n, e);
 		:}
 	|	ElementList.l COMMA AssignmentExpression.e
 		{:
@@ -858,23 +868,23 @@ ElementList
 Elision
 	=	Elision.e COMMA
 		{:
-			e.addChild(new JSPrimitiveNode(JSNodeTypes.NULL, "null", 0, 0));
+			e.addChild(new JSNullNode(0, 0));
 			return e;
 		:}
 	|	COMMA
 		{:
-			return new JSNaryNode(JSNodeTypes.ELISION, new JSNode[] { new JSPrimitiveNode(JSNodeTypes.NULL, "null", 0, 0), new JSPrimitiveNode(JSNodeTypes.NULL, "null", 0, 0) }, 0, 0);
+			return new JSElisionNode(0, 0, new JSNullNode(0, 0), new JSNullNode(0, 0));
 		:}
 	;
 
 ObjectLiteral
 	=	LCURLY.l RCURLY.r
 		{:
-			return new JSNaryNode(JSNodeTypes.OBJECT_LITERAL, l.getStart(), r.getEnd());
+			return new JSObjectNode(l.getStart(), r.getEnd());
 		:}
 	|	LCURLY.l PropertyNameAndValueList.p RCURLY.r
 		{:
-			return new JSNaryNode(JSNodeTypes.OBJECT_LITERAL, p, l.getStart(), r.getEnd());
+			return new JSObjectNode(l.getStart(), r.getEnd(), p);
 		:}
 	;
 
@@ -886,22 +896,22 @@ PropertyNameAndValueList
 PropertyNameAndValue
 	=	PropertyName.n COLON AssignmentExpression.v
 		{:
-			return new JSNode(JSNodeTypes.NAME_VALUE_PAIR, new JSNode[] { n, v }, n.getStart(), v.getEnd());
+			return new JSNameValuePairNode(n.getStart(), v.getEnd(), n, v);
 		:}
 	;
 
 PropertyName
 	=	IDENTIFIER.i
 		{:
-			return new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());
+			return new JSIdentifierNode(i);
 		:}
 	|	STRING.s
 		{:
-			return new JSPrimitiveNode(JSNodeTypes.STRING, s, _symbol_s.getStart(), _symbol_s.getEnd());
+			return new JSStringNode(s);
 		:}
 	|	NUMBER.n
 		{:
-			return new JSPrimitiveNode(JSNodeTypes.NUMBER, n, _symbol_n.getStart(), _symbol_n.getEnd());
+			return new JSNumberNode(n);
 		:}
 	;
 
@@ -914,11 +924,11 @@ MemberExpression
 		:}
 	|	MemberExpression.l DOT IDENTIFIER.r
 		{:
-			return new JSGetPropertyOperatorNode(l, new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, r, _symbol_r.getStart(), _symbol_r.getEnd()));
+			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(r));
 		:}
 	|	NEW.l MemberExpression.e Arguments.a
 		{:
-			return new JSNode(JSNodeTypes.CONSTRUCT, new JSNode[] { e, a }, l.getStart(), a.getEnd());
+			return new JSConstructNode(l.getStart(), a.getEnd(), e, a);
 		:}
 	;
 
@@ -930,11 +940,11 @@ MemberExpression_NoLBF
 		:}
 	|	MemberExpression_NoLBF.l DOT IDENTIFIER.r
 		{:
-			return new JSGetPropertyOperatorNode(l, new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, r, _symbol_r.getStart(), _symbol_r.getEnd()));
+			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(r));
 		:}
 	|	NEW.l MemberExpression.e Arguments.a
 		{:
-			return new JSNode(JSNodeTypes.CONSTRUCT, new JSNode[] { e, a }, l.getStart(), a.getEnd());
+			return new JSConstructNode(l.getStart(), a.getEnd(), e, a);
 		:}
 	;
 
@@ -942,7 +952,7 @@ NewExpression
 	=	MemberExpression
 	|	NEW.l NewExpression.e
 		{:
-			return new JSNode(JSNodeTypes.CONSTRUCT, new JSNode[] { e, new JSNode() }, l.getStart(), e.getEnd());
+			return new JSConstructNode(l.getStart(), e.getEnd(), e, new JSNode());
 		:}
 	;
 
@@ -950,18 +960,18 @@ NewExpression_NoLBF
 	=	MemberExpression_NoLBF
 	|	NEW.l NewExpression.e
 		{:
-			return new JSNode(JSNodeTypes.CONSTRUCT, new JSNode[] { e, new JSNode() }, l.getStart(), e.getEnd());
+			return new JSConstructNode(l.getStart(), e.getEnd(), e, new JSNode());
 		:}
 	;
 
 CallExpression
 	=	MemberExpression.l Arguments.r
 		{:
-			return new JSNode(JSNodeTypes.INVOKE, new JSNode[] {l, r}, l.getStart(), r.getEnd());
+			return new JSInvokeNode(l.getStart(), r.getEnd(), l, r);
 		:}
 	|	CallExpression.l Arguments.r
 		{:
-			return new JSNode(JSNodeTypes.INVOKE, new JSNode[] {l, r}, l.getStart(), r.getEnd());
+			return new JSInvokeNode(l.getStart(), r.getEnd(), l, r);
 		:}
 	|	CallExpression.l LBRACKET Expression.r RBRACKET
 		{:
@@ -969,18 +979,18 @@ CallExpression
 		:}
 	|	CallExpression.l DOT IDENTIFIER.r
 		{:
-			return new JSGetPropertyOperatorNode(l, new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, r, _symbol_r.getStart(), _symbol_r.getEnd()));
+			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(r));
 		:}
 	;
 
 CallExpression_NoLBF
 	=	MemberExpression_NoLBF.l Arguments.r
 		{:
-			return new JSNode(JSNodeTypes.INVOKE, new JSNode[] {l, r}, l.getStart(), r.getEnd());
+			return new JSInvokeNode(l.getStart(), r.getEnd(), l, r);
 		:}
 	|	CallExpression_NoLBF.l Arguments.r
 		{:
-			return new JSNode(JSNodeTypes.INVOKE, new JSNode[] {l, r}, l.getStart(), r.getEnd());
+			return new JSInvokeNode(l.getStart(), r.getEnd(), l, r);
 		:}
 	|	CallExpression_NoLBF.l LBRACKET Expression.r RBRACKET
 		{:
@@ -988,18 +998,18 @@ CallExpression_NoLBF
 		:}
 	|	CallExpression_NoLBF.l DOT IDENTIFIER.r
 		{:
-			return new JSGetPropertyOperatorNode(l, new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, r, _symbol_r.getStart(), _symbol_r.getEnd()));
+			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(r));
 		:}
 	;
 
 Arguments
 	=	LPAREN.l RPAREN.r
 		{:
-			return new JSNaryNode(JSNodeTypes.ARGUMENTS, l.getStart(), r.getEnd());
+			return new JSArgumentsNode(l.getStart(), r.getEnd());
 		:}
 	|	LPAREN.l ArgumentList.a RPAREN.r
 		{:
-			return new JSNaryNode(JSNodeTypes.ARGUMENTS, a, l.getStart(), r.getEnd());
+			return new JSArgumentsNode(l.getStart(), r.getEnd(), a);
 		:}
 	;
 
@@ -1022,7 +1032,7 @@ PostfixExpression
 	=	LeftHandSideExpression
 	|	LeftHandSideExpression.e PostfixOperator.o
 		{:
-			return new JSPostUnaryOperatorNode(e, o, e.getStart(), _symbol_o.getEnd());
+			return new JSPostUnaryOperatorNode(o, e.getStart(), _symbol_o.getEnd(), e);
 		:}
 	;
 
@@ -1030,7 +1040,7 @@ PostfixExpression_NoLBF
 	=	LeftHandSideExpression_NoLBF
 	|	LeftHandSideExpression_NoLBF.e PostfixOperator.o
 		{:
-			return new JSPostUnaryOperatorNode(e, o, e.getStart(), _symbol_o.getEnd());
+			return new JSPostUnaryOperatorNode(o, e.getStart(), _symbol_o.getEnd(), e);
 		:}
 	;
 
@@ -1043,7 +1053,7 @@ UnaryExpression
 	=	PostfixExpression
 	|	UnaryOperator.o UnaryExpression.e
 		{:
-			return new JSUnaryOperatorNode(o, e, _symbol_o.getStart(), e.getEnd());
+			return new JSUnaryOperatorNode(o, _symbol_o.getStart(), e.getEnd(), e);
 		:}
 	;
 
@@ -1051,7 +1061,7 @@ UnaryExpression_NoLBF
 	=	PostfixExpression_NoLBF
 	|	UnaryOperator.o UnaryExpression.e
 		{:
-			return new JSUnaryOperatorNode(o, e, _symbol_o.getStart(), e.getEnd());
+			return new JSUnaryOperatorNode(o, _symbol_o.getStart(), e.getEnd(), e);
 		:}
 	;
 
@@ -1324,7 +1334,7 @@ ConditionalExpression
 	=	LogicalOrExpression
 	|	LogicalOrExpression.l QUESTION AssignmentExpression.t COLON AssignmentExpression.f
 		{:
-			return new JSNode(JSNodeTypes.CONDITIONAL, new JSNode[] { l, t, f }, l.getStart(), f.getEnd());
+			return new JSConditionalNode(l.getStart(), f.getEnd(), l, t, f);
 		:}
 	;
 
@@ -1332,7 +1342,7 @@ ConditionalExpression_NoLBF
 	=	LogicalOrExpression_NoLBF
 	|	LogicalOrExpression_NoLBF.l QUESTION AssignmentExpression.t COLON AssignmentExpression.f
 		{:
-			return new JSNode(JSNodeTypes.CONDITIONAL, new JSNode[] { l, t, f }, l.getStart(), f.getEnd());
+			return new JSConditionalNode(l.getStart(), f.getEnd(), l, t, f);
 		:}
 	;
 
@@ -1340,7 +1350,7 @@ ConditionalExpression_NoIn
 	=	LogicalOrExpression_NoIn
 	|	LogicalOrExpression_NoIn.l QUESTION AssignmentExpression_NoIn.t COLON AssignmentExpression_NoIn.f
 		{:
-			return new JSNode(JSNodeTypes.CONDITIONAL, new JSNode[] { l, t, f }, l.getStart(), f.getEnd());
+			return new JSConditionalNode(l.getStart(), f.getEnd(), l, t, f);
 		:}
 	;
 
@@ -1386,7 +1396,7 @@ AssignmentOperator
 Expression
 	=	Expression.l COMMA AssignmentExpression.r
 		{:
-			return new JSNaryNode(JSNodeTypes.COMMA, new JSNode[] { l, r }, l.getStart(), r.getEnd());
+			return new JSCommaNode(l.getStart(), r.getEnd(), l, r);
 		:}
 	|	AssignmentExpression
 	;
@@ -1394,7 +1404,7 @@ Expression
 Expression_NoLBF
 	=	Expression_NoLBF.l COMMA AssignmentExpression.r
 		{:
-			return new JSNaryNode(JSNodeTypes.COMMA, new JSNode[] { l, r }, l.getStart(), r.getEnd());
+			return new JSCommaNode(l.getStart(), r.getEnd(), l, r);
 		:}
 	|	AssignmentExpression_NoLBF
 	;
@@ -1402,7 +1412,7 @@ Expression_NoLBF
 Expression_NoIn
 	=	Expression_NoIn.l COMMA AssignmentExpression_NoIn.r
 		{:
-			return new JSNaryNode(JSNodeTypes.COMMA, new JSNode[] { l, r }, l.getStart(), r.getEnd());
+			return new JSCommaNode(l.getStart(), r.getEnd(), l, r);
 		:}
 	|	AssignmentExpression_NoIn
 	;
@@ -1410,26 +1420,26 @@ Expression_NoIn
 Literal
 	=	NULL.n
 		{:
-			return new JSPrimitiveNode(JSNodeTypes.NULL, n.value.toString(), n.getStart(), n.getEnd());
+			return new JSNullNode(n);
 		:}
 	|	TRUE.t
 		{:
-			return new JSPrimitiveNode(JSNodeTypes.TRUE, t.value.toString(), t.getStart(), t.getEnd());
+			return new JSTrueNode(t);
 		:}
 	|	FALSE.f
 		{:
-			return new JSPrimitiveNode(JSNodeTypes.FALSE, f.value.toString(), f.getStart(), f.getEnd());
+			return new JSFalseNode(f);
 		:}
 	|	NUMBER.n
 		{:
-			return new JSPrimitiveNode(JSNodeTypes.NUMBER, n, _symbol_n.getStart(), _symbol_n.getEnd());
+			return new JSNumberNode(n);
 		:}
 	|	STRING.s
 		{:
-			return new JSPrimitiveNode(JSNodeTypes.STRING, s, _symbol_s.getStart(), _symbol_s.getEnd());
+			return new JSStringNode(s);
 		:}
 	|	REGEX.r
 		{:
-			return new JSPrimitiveNode(JSNodeTypes.REGEX, r, _symbol_r.getStart(), _symbol_r.getEnd());
+			return new JSRegexNode(r);
 		:}
 	;
