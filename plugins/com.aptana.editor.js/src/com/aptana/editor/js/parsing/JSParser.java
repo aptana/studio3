@@ -1,6 +1,7 @@
 package com.aptana.editor.js.parsing;
 
 import java.util.ArrayList;
+import com.aptana.editor.js.sdoc.model.Block;
 import java.util.List;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import java.io.IOException;
@@ -250,7 +251,10 @@ public class JSParser extends Parser implements IParser {
 		IParseNode result = (IParseNode) parse(fScanner);
 		parseState.setParseResult(result);
 		
-		this.parseDocs(fScanner.getDocComments());
+		if (parseState instanceof JSParseState)
+		{
+			this.parseDocs(fScanner.getDocComments(), (JSParseState) parseState);
+		}
 		
 		return result;
 	}
@@ -260,20 +264,28 @@ public class JSParser extends Parser implements IParser {
 	 *
 	 * @param docs
 	 */
-	protected void parseDocs(List<Symbol> docs)
+	protected void parseDocs(List<Symbol> docs, JSParseState parseState)
 	{
 		SDocParser parser = new SDocParser();
+		List<Block> blocks = new ArrayList<Block>();
 		
 		for (Symbol doc : docs)
 		{
 			try
 			{
-				parser.parse((String) doc.value);
+				Object result = parser.parse((String) doc.value);
+				
+				if (result instanceof Block)
+				{
+					blocks.add((Block) result);
+				}
 			}
 			catch (java.lang.Exception e)
 			{
 			}
 		}
+		
+		parseState.setDocumentationBlocks(blocks);
 	}
 	
 	/*
