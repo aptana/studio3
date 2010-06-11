@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.Path;
 
+import com.aptana.editor.js.parsing.JSParseState;
 import com.aptana.editor.js.parsing.JSParser;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.tests.FileContentBasedTests;
@@ -16,7 +17,7 @@ import com.aptana.parsing.Scope;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 
-public class SymbolTests extends FileContentBasedTests
+public class ScopeTests extends FileContentBasedTests
 {
 	private static final String CURSOR = "${cursor}";
 	private static final int CURSOR_LENGTH = CURSOR.length();
@@ -31,7 +32,7 @@ public class SymbolTests extends FileContentBasedTests
 	protected IParseNode getAST(String source) throws Exception
 	{
 		JSParser parser = new JSParser();
-		ParseState parseState = new ParseState();
+		ParseState parseState = new JSParseState();
 
 		parseState.setEditState(source, source, 0, 0);
 		parser.parse(parseState);
@@ -145,7 +146,17 @@ public class SymbolTests extends FileContentBasedTests
 	{
 		Scope<JSNode> symbols = this.getSymbols("ast-queries/globalNamedFunction.js");
 		
-		this.showSymbols("globalNamedFunction.js", symbols);
+		assertNotNull(symbols);
+		assertEquals(1, symbols.getLocalSymbolNames().size());
+		
+		List<Scope<JSNode>> children = symbols.getChildren();
+		assertNotNull(children);
+		assertEquals(1, children.size());
+		
+		Scope<JSNode> child = children.get(0);
+		assertEquals(0, child.getLocalSymbolNames().size());
+		
+		//this.showSymbols("globalNamedFunction.js", symbols);
 	}
 	
 	/**
@@ -157,7 +168,17 @@ public class SymbolTests extends FileContentBasedTests
 	{
 		Scope<JSNode> symbols = this.getSymbols("ast-queries/globalVarFunction.js");
 		
-		this.showSymbols("globalVarFunction.js", symbols);
+		assertNotNull(symbols);
+		assertEquals(1, symbols.getLocalSymbolNames().size());
+		
+		List<Scope<JSNode>> children = symbols.getChildren();
+		assertNotNull(children);
+		assertEquals(1, children.size());
+		
+		Scope<JSNode> child = children.get(0);
+		assertEquals(0, child.getLocalSymbolNames().size());
+		
+		//this.showSymbols("globalVarFunction.js", symbols);
 	}
 	
 	/**
@@ -169,7 +190,17 @@ public class SymbolTests extends FileContentBasedTests
 	{
 		Scope<JSNode> symbols = this.getSymbols("ast-queries/globalNamedVarFunction.js");
 		
-		this.showSymbols("globalNamedVarFunction.js", symbols);
+		assertNotNull(symbols);
+		assertEquals(2, symbols.getLocalSymbolNames().size());
+		
+		List<Scope<JSNode>> children = symbols.getChildren();
+		assertNotNull(children);
+		assertEquals(1, children.size());
+		
+		Scope<JSNode> child = children.get(0);
+		assertEquals(0, child.getLocalSymbolNames().size());
+		
+		//this.showSymbols("globalNamedVarFunction.js", symbols);
 	}
 	
 	/**
@@ -181,7 +212,14 @@ public class SymbolTests extends FileContentBasedTests
 	{
 		Scope<JSNode> symbols = this.getSymbols("ast-queries/globalVars.js");
 		
-		this.showSymbols("globalVars.js", symbols);
+		assertNotNull(symbols);
+		assertEquals(6, symbols.getLocalSymbolNames().size());
+		
+		List<Scope<JSNode>> children = symbols.getChildren();
+		assertNotNull(children);
+		assertEquals(0, children.size());
+		
+		//this.showSymbols("globalVars.js", symbols);
 	}
 	
 	/**
@@ -193,7 +231,17 @@ public class SymbolTests extends FileContentBasedTests
 	{
 		Scope<JSNode> symbols = this.getSymbols("ast-queries/localVars.js");
 		
-		this.showSymbols("localVars.js", symbols);
+		assertNotNull(symbols);
+		assertEquals(1, symbols.getLocalSymbolNames().size());
+		
+		List<Scope<JSNode>> children = symbols.getChildren();
+		assertNotNull(children);
+		assertEquals(1, children.size());
+		
+		Scope<JSNode> child = children.get(0);
+		assertEquals(6, child.getLocalSymbolNames().size());
+		
+		//this.showSymbols("localVars.js", symbols);
 	}
 	
 	/**
@@ -204,6 +252,16 @@ public class SymbolTests extends FileContentBasedTests
 	public void testParameters() throws Exception
 	{
 		Scope<JSNode> symbols = this.getSymbols("ast-queries/parameters.js");
+		
+		assertNotNull(symbols);
+		assertEquals(1, symbols.getLocalSymbolNames().size());
+		
+		List<Scope<JSNode>> children = symbols.getChildren();
+		assertNotNull(children);
+		assertEquals(1, children.size());
+		
+		Scope<JSNode> child = children.get(0);
+		assertEquals(2, child.getLocalSymbolNames().size());
 		
 		this.showSymbols("parameters.js", symbols);
 	}
@@ -217,7 +275,24 @@ public class SymbolTests extends FileContentBasedTests
 	{
 		Scope<JSNode> symbols = this.getSymbols("ast-queries/nestedFunctions.js");
 		
-		this.showSymbols("nestedFunctions.js", symbols);
+		assertNotNull(symbols);
+		assertEquals(1, symbols.getLocalSymbolNames().size());
+		
+		List<Scope<JSNode>> children = symbols.getChildren();
+		assertNotNull(children);
+		assertEquals(1, children.size());
+		
+		Scope<JSNode> child = children.get(0);
+		assertEquals(3, child.getLocalSymbolNames().size());
+		
+		children = child.getChildren();
+		assertNotNull(children);
+		assertEquals(1, children.size());
+		
+		child = children.get(0);
+		assertEquals(2, child.getLocalSymbolNames().size());
+		
+		//this.showSymbols("nestedFunctions.js", symbols);
 	}
 	
 	/**
@@ -229,7 +304,39 @@ public class SymbolTests extends FileContentBasedTests
 	{
 		Scope<JSNode> symbols = this.getSymbols("ast-queries/nestedFunctions2.js");
 		
-		this.showSymbols("nestedFunctions2.js", symbols);
+		// global
+		assertNotNull(symbols);
+		assertEquals(3, symbols.getLocalSymbolNames().size());
+		
+		// functionA
+		List<Scope<JSNode>> children = symbols.getChildren();
+		assertNotNull(children);
+		assertEquals(1, children.size());
+		
+		Scope<JSNode> child = children.get(0);
+		assertEquals(5, child.getLocalSymbolNames().size());
+		
+		children = child.getChildren();
+		assertNotNull(children);
+		assertEquals(2, children.size());
+		
+		// functionB
+		child = children.get(0);
+		assertEquals(4, child.getLocalSymbolNames().size());
+		
+		// functionC
+		List<Scope<JSNode>> grandchildren = child.getChildren();
+		assertNotNull(grandchildren);
+		assertEquals(1, grandchildren.size());
+		
+		Scope<JSNode> grandchild = grandchildren.get(0);
+		assertEquals(3, grandchild.getLocalSymbolNames().size());
+		
+		// functoinB2
+		child = children.get(1);
+		assertEquals(2, child.getLocalSymbolNames().size());
+		
+		//this.showSymbols("nestedFunctions2.js", symbols);
 	}
 	
 	/**
@@ -240,6 +347,13 @@ public class SymbolTests extends FileContentBasedTests
 	public void testPrimitives() throws Exception
 	{
 		Scope<JSNode> symbols = this.getSymbols("ast-queries/primitives.js");
+		
+		assertNotNull(symbols);
+		assertEquals(8, symbols.getLocalSymbolNames().size());
+		
+		List<Scope<JSNode>> children = symbols.getChildren();
+		assertNotNull(children);
+		assertEquals(0, children.size());
 		
 		this.showSymbols("primitives.js", symbols);
 	}
@@ -252,6 +366,13 @@ public class SymbolTests extends FileContentBasedTests
 	public void testMultipleTypes() throws Exception
 	{
 		Scope<JSNode> symbols = this.getSymbols("ast-queries/multipleTypes.js");
+		
+		assertNotNull(symbols);
+		assertEquals(1, symbols.getLocalSymbolNames().size());
+		
+		List<Scope<JSNode>> children = symbols.getChildren();
+		assertNotNull(children);
+		assertEquals(0, children.size());
 		
 		this.showSymbols("multipleTypes.js", symbols);
 	}
