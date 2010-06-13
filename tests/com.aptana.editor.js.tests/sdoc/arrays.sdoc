@@ -1,0 +1,12 @@
+/**
+ * This is a top-level description
+ * 
+ * @alias MyType.arrays
+ * @param {Array} array
+ *		Array with no type
+ * @param {Array<String>} arrayOfString
+ *		Array of String using generics notation
+ * @param {String[]} arrayOfString2vArray of String using array notation
+ * @param {Array<Array<Number>>} arrayOfArrayOfNumber
+ *		Array of Arrays of Numbers
+ */

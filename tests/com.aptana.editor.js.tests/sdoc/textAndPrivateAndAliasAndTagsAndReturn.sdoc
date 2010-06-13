@@ -1,0 +1,17 @@
+/**
+ * Create a string representation of all properties in an object. A separator
+ * string can be used as a delimited between each property and the user has the
+ * object of showing the property values or not.
+ * 
+ * @private
+ * @alias Package1.Package2._privateMethodName
+ * @param {Object} obj
+ * 		The source object
+ * @param {String} [separator]
+ * 		The separator string to use between properties. If this value is not
+ * 		specified or if it is undefined, the string "; " will be used by default
+ * @param {Boolean} showContents
+ * 		A boolean value indicating whether property values should shown in
+ * 		addition to the property names.
+ * @return {String} Returns a string representation of the specified object.
+ */

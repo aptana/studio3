@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
@@ -61,6 +62,17 @@ public class CSSIndexQueryHelper
 	}
 
 	/**
+	 * getColors - Returns the unique set of colors used within the project.
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public Set<String> getColors(Index index)
+	{
+		return this.getReader().getValues(index, CSSIndexConstants.COLOR).keySet();
+	}
+
+	/**
 	 * getMetadata
 	 */
 	private CSSMetadataReader getMetadata()
@@ -111,7 +123,7 @@ public class CSSIndexQueryHelper
 
 		return this._metadata;
 	}
-	
+
 	/**
 	 * getMetadataResources
 	 * 

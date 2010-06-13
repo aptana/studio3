@@ -40,13 +40,19 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.PaletteData;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
@@ -330,7 +336,55 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 					this.addProposal(proposals, value.getName(), PROPERTY_ICON, value.getDescription(), userAgentIcons, offset);
 				}
 			}
+
+			// If this is a property that supports colors, suggest colors already used in the project
+			if (supportsColorValues(property))
+			{
+				Set<String> colors = this._queryHelper.getColors(getIndex());
+				if (colors != null && !colors.isEmpty())
+				{
+					Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(
+							UserAgentManager.getInstance().getActiveUserAgentIDs());
+					for (String color : colors)
+					{
+						ImageRegistry reg = Activator.getDefault().getImageRegistry();
+						Image img = reg.get(color);
+						if (img == null)
+						{
+							// Generate an image from the color value!
+							// FIXME Handle colors that aren't 7 chars hex values? Or will they always be normalized to
+							// this format?
+							String s = color.substring(1, 3);
+							int r = Integer.parseInt(s, 16);
+							s = color.substring(3, 5);
+							int g = Integer.parseInt(s, 16);
+							s = color.substring(5, 7);
+							int b = Integer.parseInt(s, 16);
+							RGB rgb = new RGB(r, g, b);
+							PaletteData pd = new PaletteData(new RGB[] { rgb });
+							ImageData data = new ImageData(16, 16, 1, pd);
+							img = new Image(Display.getCurrent(), data);
+							reg.put(color, img);
+						}
+						this.addProposal(proposals, color, img, null, userAgentIcons, offset);
+					}
+				}
+			}
 		}
+	}
+
+	@SuppressWarnings("nls")
+	private boolean supportsColorValues(PropertyElement property)
+	{
+		// FIXME Support multiple types on properties, and use an enum of types. Then we can look for color type for values!
+		if (property == null)
+			return false;
+		String propertyName = property.getName();
+		if (propertyName.equals("background") || propertyName.equals("border-bottom") || propertyName.equals("border-left")
+				|| propertyName.equals("border-right") || propertyName.equals("border-top") || propertyName.equals("border")
+				|| propertyName.equals("column-rule"))
+			return true;
+		return propertyName.endsWith("color");
 	}
 
 	/**
@@ -635,10 +689,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				break;
 			}
-			else
-			{
-				index--;
-			}
+			index--;
 		}
 
 		return location;
@@ -654,21 +705,21 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	private int getLexemeAfterDelimiter(LexemeProvider<CSSTokenType> lexemeProvider, int offset)
 	{
 		int index = lexemeProvider.getLexemeIndex(offset);
-		
+
 		if (index >= 0)
 		{
 			Lexeme<CSSTokenType> currentLexeme = lexemeProvider.getLexeme(index);
-			
+
 			if (currentLexeme.getType() == CSSTokenType.SEMICOLON)
 			{
 				index--;
 				currentLexeme = lexemeProvider.getLexeme(index);
 			}
-	
+
 			for (int i = index; i >= 0; i--)
 			{
 				Lexeme<CSSTokenType> previousLexeme = (i > 0) ? lexemeProvider.getLexeme(i - 1) : null;
-	
+
 				if (this.isValueDelimiter(currentLexeme))
 				{
 					index = i + 1;
@@ -688,7 +739,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				}
 			}
 		}
-		
+
 		return index;
 	}
 
@@ -702,46 +753,43 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	private Lexeme<CSSTokenType> getLexemeBeforeDelimiter(LexemeProvider<CSSTokenType> lexemeProvider, int index)
 	{
 		Lexeme<CSSTokenType> result = null;
-		
+
 		// get the staring lexeme
 		Lexeme<CSSTokenType> startingLexeme = lexemeProvider.getLexeme(index);
-		
+
 		if (startingLexeme != null && this.isValueDelimiter(startingLexeme) == false)
 		{
 			Lexeme<CSSTokenType> endingLexeme = startingLexeme;
-			
+
 			// advance to next lexeme
 			index++;
-			
+
 			while (index < lexemeProvider.size())
 			{
 				Lexeme<CSSTokenType> candidateLexeme = lexemeProvider.getLexeme(index);
-				
+
 				if (this.isValueDelimiter(candidateLexeme) || endingLexeme.isContiguousWith(candidateLexeme) == false)
 				{
 					// we've hit a delimiting lexeme or have passed over whitespace, so we're done
 					break;
 				}
-				else
-				{
-					// still looking so include this in our range
-					endingLexeme = candidateLexeme;
-				}
-				
+				// still looking so include this in our range
+				endingLexeme = candidateLexeme;
+
 				index++;
 			}
-			
+
 			if (index >= lexemeProvider.size())
 			{
 				endingLexeme = lexemeProvider.getLexeme(lexemeProvider.size() - 1);
 			}
-			
+
 			result = endingLexeme;
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getLocation
 	 * 
@@ -785,7 +833,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				case VALUE:
 					result = LocationType.INSIDE_RULE;
 					break LOOP;
-					
+
 				case IDENTIFIER:
 					if (lexeme.getText().charAt(0) == '-')
 					{
@@ -800,7 +848,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 
 			index--;
 		}
-		
+
 		if (index < 0 && result == LocationType.ERROR)
 		{
 			result = LocationType.OUTSIDE_RULE;
@@ -824,7 +872,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		if (index > 0)
 		{
 			Lexeme<CSSTokenType> lexeme = lexemeProvider.getLexeme(index - 1);
-			
+
 			result = lexeme.getText();
 		}
 
@@ -857,7 +905,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 
 		return result;
 	}
-	
+
 	/**
 	 * setPropertyValueRange
 	 * 
@@ -867,19 +915,19 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	private void setPropertyValueRange(LexemeProvider<CSSTokenType> lexemeProvider, int offset)
 	{
 		int index = this.getLexemeAfterDelimiter(lexemeProvider, offset);
-		
+
 		// get the staring lexeme
 		Lexeme<CSSTokenType> endingLexeme = (index >= 0) ? this.getLexemeBeforeDelimiter(lexemeProvider, index) : null;
-		
+
 		if (endingLexeme != null)
 		{
 			Lexeme<CSSTokenType> startingLexeme = lexemeProvider.getLexeme(index);
-		
+
 			this._replaceRange = new Range(startingLexeme.getStartingOffset(), endingLexeme.getEndingOffset());
 		}
 		else
 		{
-			
+
 			if (this._currentLexeme != null && (this._currentLexeme.contains(offset) || this._currentLexeme.getEndingOffset() == offset - 1))
 			{
 				switch (this._currentLexeme.getType())
@@ -887,12 +935,12 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 					case COLON:
 						this._replaceRange = this._currentLexeme = null;
 						break;
-						
+
 					case CURLY_BRACE:
-						if ("}".equals(this._currentLexeme.getText()))
+						if ("}".equals(this._currentLexeme.getText())) //$NON-NLS-1$
 						{
 							Lexeme<CSSTokenType> candidate = lexemeProvider.getLexemeFromOffset(offset - 1);
-							
+
 							if (candidate != null && this.isValueDelimiter(candidate) == false)
 							{
 								this._replaceRange = this._currentLexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
@@ -907,11 +955,11 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 							this._replaceRange = this._currentLexeme = null;
 						}
 						break;
-						
+
 					case SEMICOLON:
 						this._replaceRange = this._currentLexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
 						break;
-						
+
 					default:
 						this._replaceRange = this._currentLexeme;
 						break;
