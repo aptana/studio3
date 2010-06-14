@@ -23,6 +23,7 @@ import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
+import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ast.IParseNode;
 
 public class CommonContentAssistProcessor implements IContentAssistProcessor, ICommonContentAssistProcessor
@@ -212,6 +213,16 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * getParseState
+	 * 
+	 * @return
+	 */
+	protected IParseState getParseState()
+	{
+		return editor.getFileService().getParseState();
 	}
 	
 	/**
