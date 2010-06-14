@@ -18,7 +18,8 @@ public class JSScanner extends Scanner
 {
 	private JSTokenScanner fTokenScanner;
 	private IDocument fDocument;
-	private List<Symbol> fDocComments;
+	private List<Symbol> fSDocComments;
+	private List<Symbol> fVSDocComments;
 	
 	/**
 	 * JSScanner
@@ -26,7 +27,8 @@ public class JSScanner extends Scanner
 	public JSScanner()
 	{
 		fTokenScanner = new JSTokenScanner();
-		fDocComments = new LinkedList<Symbol>();
+		fSDocComments = new LinkedList<Symbol>();
+		fVSDocComments = new LinkedList<Symbol>();
 	}
 
 	/**
@@ -64,13 +66,23 @@ public class JSScanner extends Scanner
 	}
 
 	/**
-	 * getDocComments
+	 * getSDocComments
 	 * 
 	 * @return
 	 */
-	public List<Symbol> getDocComments()
+	public List<Symbol> getSDocComments()
 	{
-		return fDocComments;
+		return fSDocComments;
+	}
+	
+	/**
+	 * getVSDocComments
+	 * 
+	 * @return
+	 */
+	public List<Symbol> getVSDocComments()
+	{
+		return fVSDocComments;
 	}
 	
 	/**
@@ -91,7 +103,8 @@ public class JSScanner extends Scanner
 			{
 				case SINGLELINE_COMMENT:
 				case MULTILINE_COMMENT:
-				case DOC:
+				case SDOC:
+				case VSDOC:
 					result = true;
 					break;
 			}
@@ -104,25 +117,55 @@ public class JSScanner extends Scanner
 	 * (non-Javadoc)
 	 * @see beaver.Scanner#nextToken()
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public Symbol nextToken() throws IOException, Exception
 	{
+		Symbol vsdoc = null;
+		
 		IToken token = fTokenScanner.nextToken();
 		Object data = token.getData();
 		
 		while (token.isWhitespace() || isComment(data))
 		{
 			// save jsdoc comments for later processing
-			if (data != null && ((JSTokenType) data) == JSTokenType.DOC)
+			if (data != null)
 			{
-				fDocComments.add(createSymbol(data));
+				JSTokenType type = (JSTokenType) data;
+				
+				switch (type)
+				{
+					case SDOC:
+						fSDocComments.add(createSymbol(data));
+						break;
+						
+					case VSDOC:
+						int offset = fTokenScanner.getTokenOffset();
+						int length = fTokenScanner.getTokenLength();
+						
+						if (vsdoc == null)
+						{
+							vsdoc = new Symbol(JSTokenType.VSDOC.getIndex(), offset, offset + length - 1, new LinkedList<Symbol>());
+						}
+						
+						((List<Symbol>) vsdoc.value).add(createSymbol(data));
+						break;
+						
+					default:
+						break;
+				}
 			}
 			
 			// ignores whitespace and comments
 			token = fTokenScanner.nextToken();
 			data = token.getData();
 		}
-
+		
+		if (vsdoc != null)
+		{
+			fVSDocComments.add(vsdoc);
+		}
+		
 		return createSymbol(data);
 	}
 	
@@ -135,6 +178,9 @@ public class JSScanner extends Scanner
 	{
 		fDocument = document;
 		fTokenScanner.setRange(fDocument, 0, fDocument.getLength());
+		
+		fSDocComments.clear();
+		fVSDocComments.clear();
 	}
 
 	/**
