@@ -195,8 +195,21 @@ public abstract class MetadataReader extends ValidatingReader
 	 * @param qname
 	 * @param attributes
 	 */
-	public void startTextBuffer(String ns, String name, String qname, Attributes attributes)
+	public void startTextBuffer()
 	{
 		this._bufferText = true;
+	}
+	
+	/**
+	 * start buffering text
+	 * 
+	 * @param ns
+	 * @param name
+	 * @param qname
+	 * @param attributes
+	 */
+	public void startTextBuffer(String ns, String name, String qname, Attributes attributes)
+	{
+		this.startTextBuffer();
 	}
 }
