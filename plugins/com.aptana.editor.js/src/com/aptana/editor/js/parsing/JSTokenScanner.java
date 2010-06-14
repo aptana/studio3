@@ -86,12 +86,10 @@ public class JSTokenScanner extends JSCodeScanner implements IJSTokenScanner
 		// generic whitespace rule
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 		
-		// comments
+		// comments and documentation
 		rules.add(new EndOfLineRule("//", createToken(JSTokenType.SINGLELINE_COMMENT))); //$NON-NLS-1$
-		rules.add(new MultiLineRule("/*", "*/", createToken(JSTokenType.MULTILINE_COMMENT))); //$NON-NLS-1$ //$NON-NLS-2$
-		
-		// documentation
 		rules.add(new MultiLineRule("/**", "*/", createToken(JSTokenType.DOC), (char) 0, true)); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new MultiLineRule("/*", "*/", createToken(JSTokenType.MULTILINE_COMMENT))); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		// quoted strings
 		IToken token = createToken(JSTokenType.STRING);

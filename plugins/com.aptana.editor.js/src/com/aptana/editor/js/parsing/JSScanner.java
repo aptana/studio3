@@ -1,6 +1,8 @@
 package com.aptana.editor.js.parsing;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -16,53 +18,26 @@ public class JSScanner extends Scanner
 {
 	private JSTokenScanner fTokenScanner;
 	private IDocument fDocument;
-
+	private List<Symbol> fDocComments;
+	
 	/**
 	 * JSScanner
 	 */
 	public JSScanner()
 	{
 		fTokenScanner = new JSTokenScanner();
+		fDocComments = new LinkedList<Symbol>();
 	}
 
 	/**
-	 * setSource
+	 * createSymbol
 	 * 
-	 * @param text
+	 * @param data
+	 * @return
+	 * @throws Exception
 	 */
-	public void setSource(String text)
+	protected Symbol createSymbol(Object data) throws Exception
 	{
-		setSource(new Document(text));
-	}
-
-	/**
-	 * setSource
-	 * 
-	 * @param document
-	 */
-	public void setSource(IDocument document)
-	{
-		fDocument = document;
-		fTokenScanner.setRange(fDocument, 0, fDocument.getLength());
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see beaver.Scanner#nextToken()
-	 */
-	@Override
-	public Symbol nextToken() throws IOException, Exception
-	{
-		IToken token = fTokenScanner.nextToken();
-		Object data = token.getData();
-		
-		while (token.isWhitespace() || (data != null && isComment(data)))
-		{
-			// ignores whitespace and comments
-			token = fTokenScanner.nextToken();
-			data = token.getData();
-		}
-
 		int offset = fTokenScanner.getTokenOffset();
 		int length = fTokenScanner.getTokenLength();
 		JSTokenType type = (data == null) ? JSTokenType.EOF : (JSTokenType) data;
@@ -89,25 +64,86 @@ public class JSScanner extends Scanner
 	}
 
 	/**
+	 * getDocComments
+	 * 
+	 * @return
+	 */
+	public List<Symbol> getDocComments()
+	{
+		return fDocComments;
+	}
+	
+	/**
 	 * isComment
 	 * 
 	 * @param data
 	 * @return
 	 */
-	private static boolean isComment(Object data)
+	private boolean isComment(Object data)
 	{
-		JSTokenType type = (JSTokenType) data;
 		boolean result = false;
 		
-		switch (type)
+		if (data != null)
 		{
-			case SINGLELINE_COMMENT:
-			case MULTILINE_COMMENT:
-			case DOC:
-				result = true;
-				break;
+			JSTokenType type = (JSTokenType) data;
+			
+			switch (type)
+			{
+				case SINGLELINE_COMMENT:
+				case MULTILINE_COMMENT:
+				case DOC:
+					result = true;
+					break;
+			}
 		}
 		
 		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see beaver.Scanner#nextToken()
+	 */
+	@Override
+	public Symbol nextToken() throws IOException, Exception
+	{
+		IToken token = fTokenScanner.nextToken();
+		Object data = token.getData();
+		
+		while (token.isWhitespace() || isComment(data))
+		{
+			// save jsdoc comments for later processing
+			if (data != null && ((JSTokenType) data) == JSTokenType.DOC)
+			{
+				fDocComments.add(createSymbol(data));
+			}
+			
+			// ignores whitespace and comments
+			token = fTokenScanner.nextToken();
+			data = token.getData();
+		}
+
+		return createSymbol(data);
+	}
+	
+	/**
+	 * setSource
+	 * 
+	 * @param document
+	 */
+	public void setSource(IDocument document)
+	{
+		fDocument = document;
+		fTokenScanner.setRange(fDocument, 0, fDocument.getLength());
+	}
+
+	/**
+	 * setSource
+	 * 
+	 * @param text
+	 */
+	public void setSource(String text)
+	{
+		setSource(new Document(text));
 	}
 }

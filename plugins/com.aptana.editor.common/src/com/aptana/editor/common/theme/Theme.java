@@ -161,7 +161,7 @@ public class Theme
 		int b = Integer.parseInt(s, 16);
 		if (token.length() == 9 && alphaMergeWithBG)
 		{
-			// TODO Handle RGBa values by mixing against BG, etc?
+			// Handle RGBa values by mixing against BG, etc
 			s = token.substring(7, 9);
 			int a = Integer.parseInt(s, 16);
 			return alphaBlend(defaultBG, new RGB(r, g, b), a);
