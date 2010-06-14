@@ -596,4 +596,10 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		}
 		return 4;
 	}
+
+	@Override
+	public boolean isSaveAsAllowed()
+	{
+		return true;
+	}
 }

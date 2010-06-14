@@ -156,12 +156,12 @@ public class GitExecutable
 			}
 			else
 			{
-				fgLocations.add(Path.fromOSString("/opt/local/bin/git")); //$NON-NLS-1$
-				fgLocations.add(Path.fromOSString("/sw/bin/git")); //$NON-NLS-1$
-				fgLocations.add(Path.fromOSString("/opt/git/bin/git")); //$NON-NLS-1$
-				fgLocations.add(Path.fromOSString("/usr/local/bin/git")); //$NON-NLS-1$
-				fgLocations.add(Path.fromOSString("/usr/local/git/bin/git")); //$NON-NLS-1$
-				fgLocations.add(Path.fromOSString(PlatformUtil.expandEnvironmentStrings("~/bin/git"))); //$NON-NLS-1$
+				fgLocations.add(Path.fromOSString("/opt/local/bin")); //$NON-NLS-1$
+				fgLocations.add(Path.fromOSString("/sw/bin")); //$NON-NLS-1$
+				fgLocations.add(Path.fromOSString("/opt/git/bin")); //$NON-NLS-1$
+				fgLocations.add(Path.fromOSString("/usr/local/bin")); //$NON-NLS-1$
+				fgLocations.add(Path.fromOSString("/usr/local/git/bin")); //$NON-NLS-1$
+				fgLocations.add(Path.fromOSString(PlatformUtil.expandEnvironmentStrings("~/bin"))); //$NON-NLS-1$
 			}
 		}
 		return fgLocations;
