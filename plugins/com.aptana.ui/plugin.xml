@@ -98,7 +98,7 @@
             category="com.aptana.ui.wizards.category"
             class="com.aptana.ui.internal.wizards.NewProjectWizard"
             finalPerspective="com.aptana.ui.WebPerspective"
-            icon="icons/new_web_project.gif"
+            icon="icons/new_web_project.png"
             id="com.aptana.ui.wizards.NewWebProject"
             name="%wizard.webproject.name"
             preferredPerspectives="com.aptana.ui.WebPerspective"
