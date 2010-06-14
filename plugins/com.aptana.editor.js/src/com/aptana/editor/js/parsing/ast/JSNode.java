@@ -1,8 +1,10 @@
 package com.aptana.editor.js.parsing.ast;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.aptana.editor.js.parsing.IJSParserConstants;
@@ -11,11 +13,11 @@ import com.aptana.parsing.ast.ParseBaseNode;
 public class JSNode extends ParseBaseNode
 {
 	protected static final short DEFAULT_TYPE = JSNodeTypes.EMPTY;
-
 	private static Map<Short, String> typeNameMap;
 
 	private short fType;
 	private boolean fSemicolonIncluded;
+	private List<String> fReturnTypes;
 
 	/**
 	 * static initializer
@@ -71,6 +73,16 @@ public class JSNode extends ParseBaseNode
 	}
 
 	/**
+	 * addReturnTypes
+	 * 
+	 * @param types
+	 */
+	protected void addReturnTypes(List<String> types)
+	{
+		// do nothing, sub-classes should override
+	}
+
+	/**
 	 * appendSemicolon
 	 * 
 	 * @param buffer
@@ -108,6 +120,23 @@ public class JSNode extends ParseBaseNode
 		String result = typeNameMap.get(this.getType());
 
 		return (result == null) ? super.getElementName() : result;
+	}
+
+	/**
+	 * getReturnTypes
+	 * 
+	 * @return
+	 */
+	public List<String> getReturnTypes()
+	{
+		if (fReturnTypes == null)
+		{
+			fReturnTypes = new ArrayList<String>();
+
+			addReturnTypes(fReturnTypes);
+		}
+
+		return fReturnTypes;
 	}
 
 	/**

@@ -679,6 +679,7 @@ public class ParserGenerator
 
 		private void writeClass(String class_name, Options opts, Writer out) throws IOException
 		{
+			out.write("@SuppressWarnings(\"unchecked\")\n");
 			out.write("public class ");
 			out.write(class_name);
 			out.write(" extends ");

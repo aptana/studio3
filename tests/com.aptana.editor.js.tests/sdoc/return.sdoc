@@ -1,0 +1,7 @@
+/**
+ * This is a description of the MyInstanceMethod instance method
+ *
+ * @alias MyClass.prototype.MyInstanceMethod
+ * @return {String} Returns a string in one case
+ * @return {Number|Object} Returns a number or object in another case
+ */
