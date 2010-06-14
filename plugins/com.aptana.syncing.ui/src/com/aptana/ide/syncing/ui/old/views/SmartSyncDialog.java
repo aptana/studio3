@@ -34,10 +34,14 @@
  */
 package com.aptana.ide.syncing.ui.old.views;
 
+import java.io.File;
 import java.net.UnknownHostException;
+import java.text.DateFormat;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +53,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ICellModifier;
@@ -56,6 +61,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ModifyEvent;
@@ -76,6 +82,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Label;
@@ -83,12 +90,15 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.ILogger;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.ide.syncing.core.old.ConnectionPointSyncPair;
@@ -115,7 +125,7 @@ import com.aptana.ui.UIPlugin;
  * @author Michael Xia (mxia@aptana.com)
  */
 public class SmartSyncDialog extends TitleAreaDialog implements SelectionListener, ModifyListener, DirectionToolBar.Client,
-		OptionsToolBar.Client, SyncJob.Client
+		OptionsToolBar.Client, SyncJob.Client, SearchComposite.Client
 {
 
 	private static final String ICON = "icons/full/obj16/direction_both.gif"; //$NON-NLS-1$
@@ -124,6 +134,12 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 	private static final String ICON_DELETE = "icons/full/obj16/delete.png"; //$NON-NLS-1$
 	private static final String IMAGE_LOCAL_SITE = "icons/full/wizban/local_site.png"; //$NON-NLS-1$
 	private static final String IMAGE_REMOTE_SITE = "icons/full/wizban/remote_site.png"; //$NON-NLS-1$
+	private static final String CLOSE_ICON = "icons/full/elcl16/close.png"; //$NON-NLS-1$
+
+	/**
+	 * Key to store the dialog settings for the initial directory to open when exporting themes (saves last directory).
+	 */
+	private static final String LOG_EXPORT_DIRECTORY = "logExportDirectory"; //$NON-NLS-1$
 
 	private static final String CLOSE_WHEN_DONE = "com.aptana.ide.syncing.views.CLOSE_WHEN_DONE"; //$NON-NLS-1$
 	private static final String COMPARE_IN_BACKGROUND = IPreferenceConstants.COMPARE_IN_BACKGROUND;
@@ -185,6 +201,12 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 	private Button left_arrow;
 	private Button right_arrow;
 	private Label sync_label;
+	private GridData filterLayoutData;
+	private CLabel filterLabel;
+	private Composite filterComp;
+	private ViewerFilter viewerFilter;
+	private String searchText;
+	private Button saveLog;
 
 	/**
 	 * Creates a new sync dialog.
@@ -517,11 +539,11 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		shadow_sep_h.setLayoutData(gridData);
  		
 		Composite status = new Composite(description, SWT.NONE);
-		layout = new GridLayout(6, false);
+		layout = new GridLayout(7, false);
 		layout.marginWidth = 40;
 		layout.marginTop = 12;
 		status.setLayout(layout);
-		status.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, false, true));
+		status.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, true));
 
 		Label updatedSymbol = new Label(status, SWT.VERTICAL);
 		updatedSymbol.setImage(SyncingUIPlugin.getImage(ICON_UPDATE));
@@ -536,7 +558,71 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		deletedLabel = new Label(status, SWT.LEFT);
 		deletedLabel.setText(DELETED_LABEL);
 
+		createSearchComposite(status);
+		filterComp = createFilterComposite(status);
+		
 		return top;
+	}
+
+	private Composite createSearchComposite(Composite myComposite) {
+		SearchComposite search = new SearchComposite(myComposite, this);
+		search.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+		return search;
+	}
+	private Composite createFilterComposite(final Composite myComposite) {
+
+		Composite filter = new Composite(myComposite, SWT.NONE);
+		GridLayout gridLayout = new GridLayout(2, false);
+		gridLayout.marginWidth = 2;
+		gridLayout.marginHeight = 0;
+		gridLayout.marginBottom = 2;
+		filter.setLayout(gridLayout);
+
+		filterLayoutData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		filterLayoutData.exclude = true;
+		filter.setLayoutData(filterLayoutData);
+
+		filterLabel = new CLabel(filter, SWT.LEFT);
+		filterLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+		ToolBar toolBar = new ToolBar(filter, SWT.FLAT);
+		toolBar.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false,
+				false));
+
+		ToolItem toolItem = new ToolItem(toolBar, SWT.PUSH);
+		toolItem.setImage(SyncingUIPlugin.getImage(CLOSE_ICON));
+		toolItem.addSelectionListener(new SelectionListener() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				removeFilter();
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
+
+		return filter;
+	}
+	
+	protected void hideFilterLable() {
+		filterLayoutData.exclude = true;
+		filterComp.setVisible(false);
+		filterComp.getParent().layout();
+	}
+
+	protected void showFilterLabel(Image image, String text) {
+		filterLabel.setImage(image);
+		filterLabel.setText(text);
+		filterLayoutData.exclude = false;
+		filterComp.setVisible(true);
+		filterComp.getParent().layout();
+	}
+
+	protected void removeFilter() {
+		hideFilterLable();
 	}
 
 	private Composite createDeleteOptions(Composite parent)
@@ -883,19 +969,28 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 			}
 
 		});
-		syncViewer.addFilter(new ViewerFilter()
+		
+		viewerFilter = new ViewerFilter()
 		{
-
 			public boolean select(Viewer viewer, Object parentElement, Object element)
 			{
+				
 				if (element instanceof SyncFile || element instanceof SyncFolder)
 				{
-					return true;
+					ISyncResource resource = (ISyncResource)element;
+					if(searchText == null || resource.getPath().toString().contains(searchText)) {
+						return true;
+					}
+					else
+					{
+						return false;
+					}
 				}
 				return false;
 			}
-
-		});
+		};
+		
+		syncViewer.addFilter(viewerFilter);
 
 		errorComp = createErrorSection(main);
 		loadingComp = createLoadingSection(main);
@@ -968,6 +1063,11 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		cancel = createButton(parent, IDialogConstants.CANCEL_ID,
 				IDialogConstants.CANCEL_LABEL, false);
 		cancel.addSelectionListener(this);
+
+		saveLog = createButton(parent, IDialogConstants.DETAILS_ID,
+				"Save Log...", false);
+		saveLog.addSelectionListener(this);
+		saveLog.setEnabled(false);
 	}
 
 	private void setEnabled(boolean enabled)
@@ -1376,6 +1476,31 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 				close();
 			}
 		}
+		else if (source == saveLog) {
+			FileDialog fileDialog = new FileDialog(getShell(), SWT.SAVE);
+			IDialogSettings editorSettings = CommonEditorPlugin.getDefault().getDialogSettings();
+			String value = editorSettings.get(LOG_EXPORT_DIRECTORY);
+			if (value != null)
+			{
+				fileDialog.setFilterPath(value);
+			}
+
+			DateFormat fileFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+			Date d = new Date();
+			fileDialog.setFileName("Aptana Synchronize Log " + fileFormat.format(d) + ".txt");
+			String path = fileDialog.open();
+			if (path == null)
+			{
+				return;
+			}
+
+			File logFile = new File(path);
+			editorSettings.put(LOG_EXPORT_DIRECTORY, logFile.getParent());
+			
+			SyncExporter exporter = new SyncExporter();
+			ISyncResource[] resources = syncViewer.getCurrentResources();
+			exporter.export(logFile, resources);
+		}
 	}
 
 	/**
@@ -1625,6 +1750,8 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 						synced.setVisible(true);
 						setEnabled(false);
 						swappable.layout(true, true);
+						
+						saveLog.setEnabled(true);
 					}
 				}
 				else
@@ -1865,6 +1992,13 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 			return contentArea;
 		}
 
+	}
+
+	@Override
+	public void search(String text, boolean isCaseSensitive,
+			boolean isRegularExpression) {
+		searchText = text;
+		syncViewer.refresh();
 	}
 
 }

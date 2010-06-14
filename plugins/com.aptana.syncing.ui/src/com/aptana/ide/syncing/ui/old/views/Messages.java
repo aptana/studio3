@@ -127,6 +127,11 @@ public class Messages extends NLS {
 	public static String SmartSyncViewer_ColumnSkipTooltip;
 	public static String SmartSyncViewer_LocalTimeTooltip;
 	public static String SmartSyncViewer_RemoteTimeTooltip;
+
+	public static String SingleProjectView_InitialFileFilterText;
+	public static String SingleProjectView_Wildcard;
+	public static String SingleProjectView_CaseSensitive;
+	public static String SingleProjectView_RegularExpression;
 	
     static {
         // initialize resource bundle
