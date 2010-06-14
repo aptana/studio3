@@ -92,7 +92,8 @@ public enum JSTokenType implements ITypePredicate
 	CATCH("catch"), //$NON-NLS-1$
 	SINGLELINE_COMMENT("SINGLELINE_COMMENT"), //$NON-NLS-1$
 	MULTILINE_COMMENT("MULTILINE_COMMENT"), //$NON-NLS-1$
-	DOC("DOC"); //$NON-NLS-1$
+	SDOC("SDOC"), //$NON-NLS-1$
+	VSDOC("VSDOC"); //$NON-NLS-1$
 
 	private static Map<String, JSTokenType> NAME_MAP;
 	
