@@ -1,5 +1,6 @@
 package com.aptana.editor.js.parsing;
 
+import com.aptana.editor.js.vsdoc.parsing.VSDocReader;
 import java.util.ArrayList;
 import com.aptana.editor.js.sdoc.model.Block;
 import java.util.List;
@@ -13,6 +14,7 @@ import beaver.*;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.lexer.Range;
 import com.aptana.parsing.ast.IParseNode;
+import java.io.ByteArrayInputStream;
 import com.aptana.parsing.Scope;
 import com.aptana.parsing.IParseState;
 
@@ -253,23 +255,33 @@ public class JSParser extends Parser implements IParser {
 		
 		if (parseState instanceof JSParseState)
 		{
-			this.parseDocs(fScanner.getDocComments(), (JSParseState) parseState);
+			JSParseState jsParseState = (JSParseState) parseState;
+			
+			jsParseState.setGlobalScope(fScope);
+			
+			this.parseDocs(jsParseState);
 		}
 		
 		return result;
 	}
 	
+	protected void parseDocs(JSParseState parseState)
+	{
+		this.parseSDocs(parseState);
+		this.parseVSDocs(parseState);
+	}
+	
 	/**
-	 * parseDocs
+	 * parseSDocs
 	 *
-	 * @param docs
+	 * @param parseState
 	 */
-	protected void parseDocs(List<Symbol> docs, JSParseState parseState)
+	protected void parseSDocs(JSParseState parseState)
 	{
 		SDocParser parser = new SDocParser();
 		List<Block> blocks = new ArrayList<Block>();
 		
-		for (Symbol doc : docs)
+		for (Symbol doc : fScanner.getSDocComments())
 		{
 			try
 			{
@@ -285,7 +297,64 @@ public class JSParser extends Parser implements IParser {
 			}
 		}
 		
-		parseState.setDocumentationBlocks(blocks);
+		parseState.setSDocBlocks(blocks);
+	}
+	
+	/**
+	 * parseVSDocs
+	 *
+	 * @param parseState
+	 */
+	protected void parseVSDocs(JSParseState parseState)
+	{
+		VSDocReader parser = new VSDocReader();
+		List<Block> blocks = new ArrayList<Block>();
+		
+		for (Symbol doc : fScanner.getVSDocComments())
+		{
+			StringBuffer buffer = new StringBuffer();
+			buffer.append("<docs>\n");
+			List<Symbol> lines = (List<Symbol>) doc.value;
+			
+			for (Symbol line : lines)
+			{
+				String text = (String) line.value;
+				
+				buffer.append(text.substring(3));
+			}
+			
+			buffer.append("</docs>");
+			
+			String source = buffer.toString();
+			ByteArrayInputStream input = new ByteArrayInputStream(source.getBytes());
+			
+			try
+			{
+				parser.loadXML(input);
+				
+				Block result = parser.getBlock(); 
+				
+				if (result != null)
+				{
+					blocks.add(result);
+				}
+			}
+			catch (java.lang.Exception e)
+			{
+			}
+			finally
+			{
+				try
+				{
+					input.close();
+				}
+				catch (IOException e)
+				{
+				}
+			}
+		}
+		
+		parseState.setSDocBlocks(blocks);
 	}
 	
 	/*
