@@ -110,7 +110,7 @@ public class VSDocReader extends MetadataReader
 	 */
 	public void exitDocs(String ns, String name, String qname)
 	{
-		this._block = new DocumentationBlock(this._summary, this._tags, 0, 0);
+		this._block = new DocumentationBlock(this._summary, this._tags);
 		
 		// clean up
 		this._summary = null;

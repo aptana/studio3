@@ -17,9 +17,9 @@ public class DocumentationBlock extends Symbol
 	 * 
 	 * @param tags
 	 */
-	public DocumentationBlock(List<Tag> tags, int startingOffset, int endingOffset)
+	public DocumentationBlock(List<Tag> tags)
 	{
-		this("", tags, startingOffset, endingOffset);
+		this("", tags);
 	}
 
 	/**
@@ -27,9 +27,9 @@ public class DocumentationBlock extends Symbol
 	 * 
 	 * @param text
 	 */
-	public DocumentationBlock(String text, int startingOffset, int endingOffset)
+	public DocumentationBlock(String text)
 	{
-		this(text, new LinkedList<Tag>(), startingOffset, endingOffset);
+		this(text, new LinkedList<Tag>());
 	}
 
 	/**
@@ -38,12 +38,10 @@ public class DocumentationBlock extends Symbol
 	 * @param text
 	 * @param tags
 	 */
-	public DocumentationBlock(String text, List<Tag> tags, int startingOffset, int endingOffset)
+	public DocumentationBlock(String text, List<Tag> tags)
 	{
 		this._text = text;
 		this._tags = tags;
-		this.start = startingOffset;
-		this.end = endingOffset;
 	}
 
 	/**
@@ -74,6 +72,18 @@ public class DocumentationBlock extends Symbol
 	public boolean hasTags()
 	{
 		return (this._tags != null && this._tags.isEmpty() == false);
+	}
+	
+	/**
+	 * setRange
+	 * 
+	 * @param start
+	 * @param end
+	 */
+	public void setRange(int start, int end)
+	{
+		this.start = start;
+		this.end = end;
 	}
 	
 	/**
