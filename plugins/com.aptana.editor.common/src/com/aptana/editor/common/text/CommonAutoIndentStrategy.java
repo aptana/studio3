@@ -177,7 +177,7 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 				}
 				String toEnd = " */"; //$NON-NLS-1$
 				if (line.startsWith("/**")) //$NON-NLS-1$
-					toEnd = " **/"; //$NON-NLS-1$
+					toEnd = " */"; //$NON-NLS-1$
 				d.replace(c.offset, 0, "\n" + indent + toEnd); //$NON-NLS-1$
 			}
 		}
