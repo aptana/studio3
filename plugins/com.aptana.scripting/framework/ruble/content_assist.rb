@@ -17,7 +17,7 @@ module Ruble
     
     def to_s
       <<-EOS
-      snippet(
+      content_assist(
         path:      #{path}
         name:      #{display_name}
         scope:     #{scope}
@@ -29,16 +29,16 @@ module Ruble
       def define_content_assist(name, &block)
         log_info("loading content_assist #{name}")
         
-        snippet = ContentAssist.new(name)
-        block.call(snippet) if block_given?
+        content_assist = ContentAssist.new(name)
+        block.call(content_assist) if block_given?
         
-        # add snippet to bundle
-        bundle = BundleManager.bundle_from_path(snippet.path)
+        # add content_assist to bundle
+        bundle = BundleManager.bundle_from_path(content_assist.path)
         
         if !bundle.nil?
-          bundle.add_command(snippet)
+          bundle.add_command(content_assist)
         else
-          log_warning("No bundle found for content_assist #{name}: #{snippet.path}")
+          log_warning("No bundle found for content_assist #{name}: #{content_assist.path}")
         end
       end
     end
