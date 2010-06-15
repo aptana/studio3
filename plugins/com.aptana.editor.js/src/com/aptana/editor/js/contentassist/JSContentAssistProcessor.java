@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -26,11 +27,16 @@ import com.aptana.editor.js.contentassist.JSASTQueryHelper.Classification;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
+import com.aptana.editor.js.parsing.JSParseState;
 import com.aptana.editor.js.parsing.JSTokenScanner;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
+import com.aptana.editor.js.parsing.ast.JSFunctionNode;
+import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.index.core.Index;
+import com.aptana.parsing.IParseState;
+import com.aptana.parsing.Scope;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 import com.aptana.parsing.lexer.Lexeme;
@@ -286,19 +292,68 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		if (this._targetNode != null)
 		{
-			IParseNode node = (this._targetNode.contains(offset)) ? this._targetNode : this.getAST();
 			String fileLocation = this.getFilename();
-			Map<String,Classification> args = this._astHelper.getSymbolsInScope(node);
 			
-			for (Entry<String,Classification> entry : args.entrySet())
+			if (Platform.inDevelopmentMode())
 			{
-				boolean isFunction = (entry.getValue() == Classification.FUNCTION);
-				String name = (isFunction) ? entry.getKey() + PARENS : entry.getKey();
-				String description = null;
-				Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
-				Image[] userAgents = this.getAllUserAgentIcons();
+				IParseState parseState = this.getParseState();
 				
-				this.addProposal(proposals, name, image, description, userAgents, fileLocation, offset);
+				if (parseState instanceof JSParseState)
+				{
+					JSParseState jsParseState = (JSParseState) parseState;
+					Scope<JSNode> globalScope = jsParseState.getGlobalScope();
+					
+					if (globalScope != null)
+					{
+						Scope<JSNode> currentScope = globalScope.getScopeAtOffset(offset);
+						
+						if (currentScope != null)
+						{
+							List<String> symbols = currentScope.getSymbolNames();
+							
+							for (String symbol : symbols)
+							{
+								boolean isFunction = false;
+								List<JSNode> nodes = currentScope.getSymbol(symbol);
+								
+								if (nodes != null)
+								{
+									for (JSNode node : nodes)
+									{
+										if (node instanceof JSFunctionNode)
+										{
+											isFunction = true;
+											break;
+										}
+									}
+								}
+								
+								String name = (isFunction) ? symbol + PARENS : symbol;
+								String description = null;
+								Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
+								Image[] userAgents = this.getAllUserAgentIcons();
+								
+								this.addProposal(proposals, name, image, description, userAgents, fileLocation, offset);
+							}
+						}
+					}
+				}
+			}
+			else
+			{
+				IParseNode node = (this._targetNode.contains(offset)) ? this._targetNode : this.getAST();
+				Map<String,Classification> args = this._astHelper.getSymbolsInScope(node);
+				
+				for (Entry<String,Classification> entry : args.entrySet())
+				{
+					boolean isFunction = (entry.getValue() == Classification.FUNCTION);
+					String name = (isFunction) ? entry.getKey() + PARENS : entry.getKey();
+					String description = null;
+					Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
+					Image[] userAgents = this.getAllUserAgentIcons();
+					
+					this.addProposal(proposals, name, image, description, userAgents, fileLocation, offset);
+				}
 			}
 		}
 	}
