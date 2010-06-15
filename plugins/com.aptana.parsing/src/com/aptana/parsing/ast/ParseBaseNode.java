@@ -474,6 +474,32 @@ public class ParseBaseNode extends Node implements IParseNode
 		return result;
 	}
 	
+	/**
+	 * getRootNode
+	 * 
+	 * @return
+	 */
+	public IParseNode getRootNode()
+	{
+		IParseNode root = this;
+		
+		while (true)
+		{
+			IParseNode parent = root.getParent();
+			
+			if (parent == null)
+			{
+				break;
+			}
+			else
+			{
+				root = parent;
+			}
+		}
+		
+		return root;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.lexer.IRange#getStartingOffset()

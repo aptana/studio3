@@ -132,6 +132,12 @@ public interface IParseNode extends ILexeme, ILanguageNode, Iterable<IParseNode>
 	public IParseNode getPreviousSibling();
 
 	/**
+	 * 
+	 * @return
+	 */
+	public IParseNode getRootNode();
+	
+	/**
 	 * getType
 	 * 
 	 * @return
