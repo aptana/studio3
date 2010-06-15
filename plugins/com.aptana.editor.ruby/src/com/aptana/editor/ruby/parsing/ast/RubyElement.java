@@ -57,14 +57,14 @@ public class RubyElement extends ParseBaseNode implements IRubyElement
 	}
 
 	@Override
-	public IParseNode getNodeAt(int offset)
+	public IParseNode getNodeAtOffset(int offset)
 	{
 		if (getType() == IRubyElement.BLOCK)
 		{
 			// skips block
 			return null;
 		}
-		return super.getNodeAt(offset);
+		return super.getNodeAtOffset(offset);
 	}
 
 	@Override

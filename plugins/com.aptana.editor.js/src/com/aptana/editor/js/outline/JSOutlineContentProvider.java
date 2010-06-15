@@ -150,7 +150,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 				int count = 0;
 				if (value.getType() == JSNodeTypes.OBJECT_LITERAL)
 				{
-					count = value.getChildrenCount();
+					count = value.getChildCount();
 				}
 
 				item = new JSOutlineItem(reference.getName(), getOutlineType(value), reference.getNameNode(), value,
@@ -191,7 +191,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 				processFunction(elements, node, null);
 				break;
 			case JSNodeTypes.GROUP:
-				if (node.getChildrenCount() > 0)
+				if (node.getChildCount() > 0)
 				{
 					processNode(elements, node.getChild(0));
 				}
@@ -206,19 +206,19 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 				processNameValuePair(elements, node);
 				break;
 			case JSNodeTypes.OBJECT_LITERAL:
-				int size = node.getChildrenCount();
+				int size = node.getChildCount();
 				for (int i = 0; i < size; ++i)
 				{
 					processNode(elements, node.getChild(i));
 				}
 				break;
 			case JSNodeTypes.RETURN:
-				if (node.getChildrenCount() > 0)
+				if (node.getChildCount() > 0)
 				{
 					IParseNode child = node.getChild(0);
 					if (child.getType() == JSNodeTypes.OBJECT_LITERAL)
 					{
-						size = child.getChildrenCount();
+						size = child.getChildCount();
 						for (int i = 0; i < size; ++i)
 						{
 							processNode(elements, child.getChild(i));
@@ -232,7 +232,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 			case JSNodeTypes.IF:
 			case JSNodeTypes.TRY:
 			case JSNodeTypes.CATCH:
-				size = node.getChildrenCount();
+				size = node.getChildCount();
 				for (int i = 0; i < size; ++i)
 				{
 					processNode(elements, node.getChild(i));
@@ -273,7 +273,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 					Reference reference = new Reference(lhs.getParent(), lhs, lhs.getText(), CONTAINER_TYPE);
 					addValue(elements, reference, rhs);
 				}
-				else if (rhsType == JSNodeTypes.INVOKE && rhs.getChildrenCount() == 2)
+				else if (rhsType == JSNodeTypes.INVOKE && rhs.getChildCount() == 2)
 				{
 					IParseNode child = rhs.getChild(0);
 					Reference reference = new Reference(lhs.getParent(), lhs, lhs.getText(), CONTAINER_TYPE);
@@ -364,13 +364,13 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 	private void processIdentifier(Collection<JSOutlineItem> elements, IParseNode node)
 	{
 		IParseNode parent = node.getParent();
-		if (parent.getChildrenCount() > 1)
+		if (parent.getChildCount() > 1)
 		{
 			IParseNode rhs = parent.getChild(1);
 			if (rhs == node)
 			{
 				IParseNode grandparent = parent.getParent();
-				if (grandparent != null && grandparent.getChildrenCount() > 1)
+				if (grandparent != null && grandparent.getChildCount() > 1)
 				{
 					IParseNode target = grandparent.getChild(1);
 					Reference reference;
@@ -378,13 +378,13 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 					{
 						case JSNodeTypes.ARGUMENTS:
 							// supports dojo.lang.extend, MochiKit.Base.update, and Object.extend
-							target = grandparent.getChild(grandparent.getChildrenCount() - 1);
+							target = grandparent.getChild(grandparent.getChildCount() - 1);
 							reference = new Reference(parent, rhs, rhs.getText(), PROPERTY_TYPE);
 							String parentFullPath = reference.toString();
 
 							// processes all key/value pairs
 							IParseNode keyValuePair;
-							int size = target.getChildrenCount();
+							int size = target.getChildCount();
 							for (int i = 0; i < size; ++i)
 							{
 								keyValuePair = target.getChild(i);
@@ -424,7 +424,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 			IParseNode args = node.getChild(1);
 			if (args.getType() == JSNodeTypes.ARGUMENTS)
 			{
-				if (args.getChildrenCount() == 2)
+				if (args.getChildCount() == 2)
 				{
 					IParseNode arg1 = args.getChild(0);
 					IParseNode arg2 = args.getChild(1);
@@ -440,7 +440,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 						}
 					}
 				}
-				else if (args.getChildrenCount() == 3)
+				else if (args.getChildCount() == 3)
 				{
 					// EXT case
 					IParseNode arg1 = args.getChild(0);
@@ -505,7 +505,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 				processFunction(elements, value, new Reference(value, property, name, "")); //$NON-NLS-1$
 				break;
 			case JSNodeTypes.OBJECT_LITERAL:
-				elements.add(new JSOutlineItem(name, type, property, value, value.getChildrenCount()));
+				elements.add(new JSOutlineItem(name, type, property, value, value.getChildCount()));
 				break;
 			default:
 				elements.add(new JSOutlineItem(name, type, property, value));
@@ -517,7 +517,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 	{
 		// processes named functions first
 		IParseNode child;
-		int size = node.getChildrenCount();
+		int size = node.getChildCount();
 		for (int i = 0; i < size; ++i)
 		{
 			child = node.getChild(i);
@@ -575,7 +575,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 		IParseNode declaration;
 		IParseNode identifier, value;
 		Reference reference;
-		int size = node.getChildrenCount();
+		int size = node.getChildCount();
 		for (int i = 0; i < size; ++i)
 		{
 			declaration = node.getChild(i);
@@ -599,7 +599,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 	{
 		int result = 0;
 		IParseNode child;
-		int size = node.getChildrenCount();
+		int size = node.getChildCount();
 		for (int i = 0; i < size; ++i)
 		{
 			child = node.getChild(i);
@@ -631,7 +631,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 					result += getChildrenCount(child);
 					break;
 				case JSNodeTypes.RETURN:
-					if (child.getChildrenCount() > 0)
+					if (child.getChildCount() > 0)
 					{
 						IParseNode grandchild = child.getChild(0);
 						if (grandchild.getType() == JSNodeTypes.OBJECT_LITERAL)
@@ -641,7 +641,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 					}
 					break;
 				case JSNodeTypes.INVOKE:
-					if (child.getChildrenCount() > 0)
+					if (child.getChildCount() > 0)
 					{
 						IParseNode grandchild = child.getChild(0);
 						if (grandchild.getType() == JSNodeTypes.FUNCTION)

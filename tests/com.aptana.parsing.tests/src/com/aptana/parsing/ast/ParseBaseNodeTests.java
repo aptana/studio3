@@ -97,10 +97,10 @@ public class ParseBaseNodeTests extends TestCase
 		a.addChild(c);
 		a.addChild(d);
 		
-		assertNull(a.getFollowingSibling());
-		assertEquals(c, b.getFollowingSibling());
-		assertEquals(d, c.getFollowingSibling());
-		assertNull(d.getFollowingSibling());
+		assertNull(a.getNextSibling());
+		assertEquals(c, b.getNextSibling());
+		assertEquals(d, c.getNextSibling());
+		assertNull(d.getNextSibling());
 	}
 	
 	/**
@@ -117,10 +117,10 @@ public class ParseBaseNodeTests extends TestCase
 		a.addChild(c);
 		a.addChild(d);
 		
-		assertNull(a.getPrecedingSibling());
-		assertEquals(c, d.getPrecedingSibling());
-		assertEquals(b, c.getPrecedingSibling());
-		assertNull(b.getPrecedingSibling());
+		assertNull(a.getPreviousSibling());
+		assertEquals(c, d.getPreviousSibling());
+		assertEquals(b, c.getPreviousSibling());
+		assertNull(b.getPreviousSibling());
 	}
 	
 	/**
@@ -167,7 +167,7 @@ public class ParseBaseNodeTests extends TestCase
 		while (current != null)
 		{
 			buffer.append(current.getText());
-			current = current.getFollowingNode();
+			current = current.getNextNode();
 		}
 		
 		assertEquals("ABCDEFGHIJKLM", buffer.toString());
@@ -217,7 +217,7 @@ public class ParseBaseNodeTests extends TestCase
 		while (current != null)
 		{
 			buffer.append(current.getText());
-			current = current.getPrecedingNode();
+			current = current.getPreviousNode();
 		}
 		
 		assertEquals("MLKJIHGFEDCBA", buffer.toString());

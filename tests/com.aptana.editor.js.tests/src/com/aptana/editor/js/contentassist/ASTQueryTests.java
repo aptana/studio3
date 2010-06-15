@@ -70,7 +70,7 @@ public class ASTQueryTests extends FileContentBasedTests
 
 		for (int o : offsets)
 		{
-			IParseNode targetNode = (ast != null && ast.contains(o)) ? ast.getNodeAt(o) : ast;
+			IParseNode targetNode = (ast != null && ast.contains(o)) ? ast.getNodeAtOffset(o) : ast;
 
 			targetNodes.add(targetNode);
 		}

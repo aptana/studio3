@@ -27,6 +27,13 @@ public interface IParseNode extends ILexeme, ILanguageNode, Iterable<IParseNode>
 	public IParseNode getChild(int index);
 
 	/**
+	 * getChildCount
+	 * 
+	 * @return
+	 */
+	public int getChildCount();
+
+	/**
 	 * getChildIndex
 	 * 
 	 * @return
@@ -41,13 +48,6 @@ public interface IParseNode extends ILexeme, ILanguageNode, Iterable<IParseNode>
 	public IParseNode[] getChildren();
 
 	/**
-	 * getChildrenCount
-	 * 
-	 * @return
-	 */
-	public int getChildrenCount();
-
-	/**
 	 * getElementName
 	 * 
 	 * @return
@@ -60,20 +60,6 @@ public interface IParseNode extends ILexeme, ILanguageNode, Iterable<IParseNode>
 	 * @return
 	 */
 	public IParseNode getFirstChild();
-
-	/**
-	 * getFollowingNode
-	 * 
-	 * @return
-	 */
-	public IParseNode getFollowingNode();
-
-	/**
-	 * getFollowingSibling
-	 * 
-	 * @return
-	 */
-	public IParseNode getFollowingSibling();
 
 	/**
 	 * getIndex
@@ -103,12 +89,26 @@ public interface IParseNode extends ILexeme, ILanguageNode, Iterable<IParseNode>
 	public INameNode getNameNode();
 
 	/**
+	 * getNextNode
+	 * 
+	 * @return
+	 */
+	public IParseNode getNextNode();
+
+	/**
+	 * getNextSibling
+	 * 
+	 * @return
+	 */
+	public IParseNode getNextSibling();
+
+	/**
 	 * getNodeAt
 	 * 
 	 * @param offset
 	 * @return
 	 */
-	public IParseNode getNodeAt(int offset);
+	public IParseNode getNodeAtOffset(int offset);
 
 	/**
 	 * getParent
@@ -118,18 +118,18 @@ public interface IParseNode extends ILexeme, ILanguageNode, Iterable<IParseNode>
 	public IParseNode getParent();
 
 	/**
-	 * getPrecedingNode
+	 * getPreviousNode
 	 * 
 	 * @return
 	 */
-	public IParseNode getPrecedingNode();
+	public IParseNode getPreviousNode();
 
 	/**
-	 * getPrecedingSibling
+	 * getPreviousSibling
 	 * 
 	 * @return
 	 */
-	public IParseNode getPrecedingSibling();
+	public IParseNode getPreviousSibling();
 
 	/**
 	 * getType
@@ -152,5 +152,5 @@ public interface IParseNode extends ILexeme, ILanguageNode, Iterable<IParseNode>
 	 * @param child
 	 * @throws IndexOutOfBoundsException
 	 */
-	void setChildAt(int index, IParseNode child) throws IndexOutOfBoundsException;
+	void replaceChild(int index, IParseNode child) throws IndexOutOfBoundsException;
 }
