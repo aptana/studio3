@@ -297,11 +297,14 @@ public class TreeThemer
 				gc.setBackground(getSelection());
 				for (TreeItem item : items)
 				{
-					Rectangle bounds = item.getBounds();
-					int x = bounds.x + bounds.width;
-					if (x < clientWidth)
+					if (item != null)
 					{
-						gc.fillRectangle(x, bounds.y, clientWidth - x, bounds.height);
+						Rectangle bounds = item.getBounds();
+						int x = bounds.x + bounds.width;
+						if (x < clientWidth)
+						{
+							gc.fillRectangle(x, bounds.y, clientWidth - x, bounds.height);
+						}
 					}
 				}
 				gc.setBackground(oldBackground);

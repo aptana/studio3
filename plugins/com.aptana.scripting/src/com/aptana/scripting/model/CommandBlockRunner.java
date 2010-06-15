@@ -11,12 +11,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.jruby.Ruby;
+import org.jruby.RubyArray;
 import org.jruby.RubyClass;
+import org.jruby.RubyGlobal.InputGlobalVariable;
+import org.jruby.RubyGlobal.OutputGlobalVariable;
 import org.jruby.RubyHash;
 import org.jruby.RubyIO;
 import org.jruby.RubySystemExit;
-import org.jruby.RubyGlobal.InputGlobalVariable;
-import org.jruby.RubyGlobal.OutputGlobalVariable;
 import org.jruby.exceptions.RaiseException;
 import org.jruby.javasupport.JavaEmbedUtils;
 import org.jruby.runtime.ThreadContext;
@@ -216,6 +217,12 @@ public class CommandBlockRunner extends AbstractCommandRunner
 			// process return result, if any
 			if (result != null && result.isNil() == false)
 			{
+				// to_s for array and hash doesn't do what we want/many people expect.
+				// Inspect spits out values in a way that can then be eval'd back as ruby code.
+				if ((result instanceof RubyArray) || (result instanceof RubyHash))
+				{
+					result = result.inspect();
+				}
 				resultText = result.asString().asJavaString();
 			}
 		}
