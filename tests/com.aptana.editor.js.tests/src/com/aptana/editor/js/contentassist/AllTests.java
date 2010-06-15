@@ -8,7 +8,7 @@ public class AllTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite("Test for com.aptana.editor.js.contentassist");
+		TestSuite suite = new TestSuite("Tests for com.aptana.editor.js.contentassist");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(LocationTests.class);
 		suite.addTestSuite(ASTQueryTests.class);
