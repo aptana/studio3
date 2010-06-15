@@ -258,25 +258,19 @@ public class JSParser extends Parser implements IParser {
 			JSParseState jsParseState = (JSParseState) parseState;
 			
 			jsParseState.setGlobalScope(fScope);
-			
-			this.parseDocs(jsParseState);
+			jsParseState.setPreDocumentationBlocks(this.parsePreDocumentationBlocks());
+			jsParseState.setPostDocumentationBlocks(this.parsePostDocumentationBlocks());
 		}
 		
 		return result;
 	}
 	
-	protected void parseDocs(JSParseState parseState)
-	{
-		this.parseSDocs(parseState);
-		this.parseVSDocs(parseState);
-	}
-	
 	/**
-	 * parseSDocs
-	 *
-	 * @param parseState
+	 * parsePreDocumentationBlocks
+	 * 
+	 * @return
 	 */
-	protected void parseSDocs(JSParseState parseState)
+	protected List<Block> parsePreDocumentationBlocks()
 	{
 		SDocParser parser = new SDocParser();
 		List<Block> blocks = new ArrayList<Block>();
@@ -297,39 +291,53 @@ public class JSParser extends Parser implements IParser {
 			}
 		}
 		
-		parseState.setSDocBlocks(blocks);
+		return blocks;
 	}
 	
 	/**
-	 * parseVSDocs
+	 * buildVSDocXML
 	 *
-	 * @param parseState
+	 * @param lines
+	 * @return
 	 */
-	protected void parseVSDocs(JSParseState parseState)
+	private String buildVSDocXML(List<Symbol> lines)
+	{
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("<docs>\n");
+		
+		for (Symbol line : lines)
+		{
+			String text = (String) line.value;
+			
+			buffer.append(text.substring(3));
+			buffer.append("\n");
+		}
+		
+		buffer.append("</docs>");
+		
+		return buffer.toString();
+	}
+	
+	/**
+	 * parsePostDocumentationBlocks
+	 * 
+	 * @return
+	 */
+	protected List<Block> parsePostDocumentationBlocks()
 	{
 		VSDocReader parser = new VSDocReader();
 		List<Block> blocks = new ArrayList<Block>();
 		
 		for (Symbol doc : fScanner.getVSDocComments())
 		{
-			StringBuffer buffer = new StringBuffer();
-			buffer.append("<docs>\n");
-			List<Symbol> lines = (List<Symbol>) doc.value;
-			
-			for (Symbol line : lines)
-			{
-				String text = (String) line.value;
-				
-				buffer.append(text.substring(3));
-			}
-			
-			buffer.append("</docs>");
-			
-			String source = buffer.toString();
-			ByteArrayInputStream input = new ByteArrayInputStream(source.getBytes());
+			ByteArrayInputStream input = null;
 			
 			try
 			{
+				String source = this.buildVSDocXML((List<Symbol>) doc.value);
+				
+				new ByteArrayInputStream(source.getBytes());
+				
 				parser.loadXML(input);
 				
 				Block result = parser.getBlock(); 
@@ -346,7 +354,10 @@ public class JSParser extends Parser implements IParser {
 			{
 				try
 				{
-					input.close();
+					if (input != null)
+					{
+						input.close();
+					}
 				}
 				catch (IOException e)
 				{
@@ -354,7 +365,7 @@ public class JSParser extends Parser implements IParser {
 			}
 		}
 		
-		parseState.setSDocBlocks(blocks);
+		return blocks;
 	}
 	
 	/*
