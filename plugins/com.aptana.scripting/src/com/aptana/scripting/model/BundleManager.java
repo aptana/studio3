@@ -864,6 +864,47 @@ public class BundleManager
 
 		return result.toArray(new CommandElement[result.size()]);
 	}
+	
+	/**
+	 * getContentAssists
+	 * 
+	 * @param filter
+	 * @return
+	 */
+	public ContentAssistElement[] getContentAssists(IModelFilter filter)
+	{
+		IModelFilter caFilter = new IModelFilter()
+		{
+
+			@Override
+			public boolean include(AbstractElement element)
+			{
+				return element instanceof ContentAssistElement;
+			}
+		};
+		if (filter != null)
+		{
+			filter = new AndFilter(filter, caFilter);
+		}
+		else
+		{
+			filter = caFilter;
+		}
+		
+		List<ContentAssistElement> result = new ArrayList<ContentAssistElement>();
+		for (String name : this.getBundleNames())
+		{
+			for (CommandElement command : this.getBundleCommands(name))
+			{
+				if (filter.include(command))
+				{
+					result.add((ContentAssistElement) command);
+				}
+			}
+		}
+
+		return result.toArray(new ContentAssistElement[result.size()]);
+	}
 
 	/**
 	 * getDecreaseIndentRegexp
