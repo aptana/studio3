@@ -482,7 +482,7 @@
                id="aptana">
             <command
                   commandId="com.aptana.editor.common.commands.toggleOutline"
-                  icon="icons/full/eview16/outline_co.gif"
+                  icon="icons/full/eview16/outline_co.png"
                   style="toggle">
                <visibleWhen>
                   <reference
