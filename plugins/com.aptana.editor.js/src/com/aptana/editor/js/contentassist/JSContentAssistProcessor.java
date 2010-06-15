@@ -575,7 +575,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					
 				case JSNodeTypes.EMPTY:
 				case JSNodeTypes.STATEMENTS:
-					if (this._targetNode.contains(offset) || this._targetNode.getEndingOffset() == offset - 1)
+					if (this._targetNode.contains(offset) || this._targetNode.getEndingOffset() < offset)
 					{
 						if (this._targetNode.getStartingOffset() != offset)
 						{
