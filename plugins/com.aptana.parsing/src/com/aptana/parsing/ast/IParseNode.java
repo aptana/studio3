@@ -55,6 +55,27 @@ public interface IParseNode extends ILexeme, ILanguageNode, Iterable<IParseNode>
 	public String getElementName();
 
 	/**
+	 * getFirstChild
+	 * 
+	 * @return
+	 */
+	public IParseNode getFirstChild();
+
+	/**
+	 * getFollowingNode
+	 * 
+	 * @return
+	 */
+	public IParseNode getFollowingNode();
+
+	/**
+	 * getFollowingSibling
+	 * 
+	 * @return
+	 */
+	public IParseNode getFollowingSibling();
+
+	/**
 	 * getIndex
 	 * 
 	 * @param child
@@ -66,6 +87,13 @@ public interface IParseNode extends ILexeme, ILanguageNode, Iterable<IParseNode>
 	 * getLanguage
 	 */
 	public String getLanguage();
+
+	/**
+	 * getLastChild
+	 * 
+	 * @return
+	 */
+	public IParseNode getLastChild();
 
 	/**
 	 * getNameNode
@@ -90,12 +118,33 @@ public interface IParseNode extends ILexeme, ILanguageNode, Iterable<IParseNode>
 	public IParseNode getParent();
 
 	/**
+	 * getPrecedingNode
+	 * 
+	 * @return
+	 */
+	public IParseNode getPrecedingNode();
+
+	/**
+	 * getPrecedingSibling
+	 * 
+	 * @return
+	 */
+	public IParseNode getPrecedingSibling();
+
+	/**
 	 * getType
 	 * 
 	 * @return
 	 */
 	public short getType();
 
+	/**
+	 * hasChildren
+	 * 
+	 * @return
+	 */
+	public boolean hasChildren();
+	
 	/**
 	 * Set a child at a given index, replacing any existing child.
 	 * 

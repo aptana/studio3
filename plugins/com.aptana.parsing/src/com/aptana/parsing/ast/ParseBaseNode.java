@@ -239,6 +239,84 @@ public class ParseBaseNode extends Node implements IParseNode
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.IParseNode#getFollowingNode()
+	 */
+	@Override
+	public IParseNode getFollowingNode()
+	{
+		IParseNode result = this.getFirstChild();
+		
+		if (result == null)
+		{
+			result = this.getFollowingSibling();
+		}
+		
+		if (result == null)
+		{
+			IParseNode parent = this.getParent();
+			
+			while (parent != null)
+			{
+				IParseNode candidate = parent.getFollowingSibling();
+				
+				if (candidate != null)
+				{
+					result = candidate;
+					break;
+				}
+				else
+				{
+					parent = parent.getParent();
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.IParseNode#getFirstChild()
+	 */
+	@Override
+	public IParseNode getFirstChild()
+	{
+		IParseNode result = null;
+		
+		if (this.hasChildren())
+		{
+			result = this.getChild(0);
+		}
+		
+		return result;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.IParseNode#getFollowingSibling()
+	 */
+	@Override
+	public IParseNode getFollowingSibling()
+	{
+		IParseNode parent = this.getParent();
+		IParseNode result = null;
+		
+		if (parent != null)
+		{
+			// get index of potential sibling
+			int index = this.getChildIndex() + 1;
+			
+			if (index < parent.getChildrenCount())
+			{
+				result = parent.getChild(index);
+			}
+		}
+		
+		return result;
+	}
+	
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.IParseNode#getIndex(com.aptana.parsing.ast.IParseNode)
 	 */
 	@Override
@@ -274,6 +352,23 @@ public class ParseBaseNode extends Node implements IParseNode
 		return getEnd() - getStart() + 1;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.IParseNode#getLastChild()
+	 */
+	@Override
+	public IParseNode getLastChild()
+	{
+		IParseNode result = null;
+		
+		if (this.hasChildren())
+		{
+			result = this.getChild(this.getChildrenCount() - 1);
+		}
+		
+		return result;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.IParseNode#getNameNode()
@@ -329,6 +424,58 @@ public class ParseBaseNode extends Node implements IParseNode
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.IParseNode#getPrecedingNode()
+	 */
+	@Override
+	public IParseNode getPrecedingNode()
+	{
+		IParseNode result = this.getPrecedingSibling();
+		
+		if (result != null)
+		{
+			IParseNode candidate = result.getLastChild();
+			
+			while (candidate != null)
+			{
+				result = candidate;
+				candidate = candidate.getLastChild();
+			}
+		}
+		
+		if (result == null)
+		{
+			result = this.getParent();
+		}
+		
+		return result;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.IParseNode#getPrecedingSibling()
+	 */
+	@Override
+	public IParseNode getPrecedingSibling()
+	{
+		IParseNode parent = this.getParent();
+		IParseNode result = null;
+		
+		if (parent != null)
+		{
+			// get index of potential sibling
+			int index = this.getChildIndex() - 1;
+			
+			if (index >= 0)
+			{
+				result = parent.getChild(index);
+			}
+		}
+		
+		return result;
+	}
+	
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.parsing.lexer.IRange#getStartingOffset()
 	 */
 	@Override
@@ -357,6 +504,16 @@ public class ParseBaseNode extends Node implements IParseNode
 		return getId();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.IParseNode#hasChildren()
+	 */
+	@Override
+	public boolean hasChildren()
+	{
+		return this.getChildrenCount() > 0;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
