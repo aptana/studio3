@@ -389,23 +389,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		
 		if (this._targetNode != null)
 		{
-			// move up to nearest statement
-			this._statementNode = this._targetNode;
-			
-			IParseNode parent = this._statementNode.getParent();
-			
-			while (parent != null)
-			{
-				if (parent instanceof ParseRootNode || parent.getType() == JSNodeTypes.STATEMENTS)
-				{
-					break;
-				}
-				else
-				{
-					this._statementNode = parent;
-					parent = parent.getParent();
-				}
-			}
+			this._statementNode = ((JSNode) this._targetNode).getContainingStatementNode();
 			
 			result = new JSLexemeProvider(document, this._statementNode, new JSTokenScanner());
 		}
