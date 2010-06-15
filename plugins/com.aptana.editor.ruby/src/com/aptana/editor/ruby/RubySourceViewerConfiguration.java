@@ -37,6 +37,7 @@ package com.aptana.editor.ruby;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextDoubleClickStrategy;
+import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -44,6 +45,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
+import com.aptana.editor.ruby.contentassist.RubyContentAssistProcessor;
 import com.aptana.editor.ruby.core.RubyDoubleClickStrategy;
 
 public class RubySourceViewerConfiguration extends CommonSourceViewerConfiguration
@@ -76,6 +78,12 @@ public class RubySourceViewerConfiguration extends CommonSourceViewerConfigurati
 	public String[][] getTopContentTypes()
 	{
 		return RubySourceConfiguration.getDefault().getTopContentTypes();
+	}
+	
+	@Override
+	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
+	{
+		return new RubyContentAssistProcessor(getAbstractThemeableEditor());
 	}
 
 	/*
