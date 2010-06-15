@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package com.aptana.editor.common.scripting.snippets;
+package com.aptana.ui.epl.scripting.snippets;
 
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
