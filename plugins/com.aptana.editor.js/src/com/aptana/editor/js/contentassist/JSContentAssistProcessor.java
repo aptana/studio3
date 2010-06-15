@@ -433,19 +433,19 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		
 		if (ast != null)
 		{
-			result = ast.getNodeAt(offset);
+			result = ast.getNodeAtOffset(offset);
 
-			// We wont get a current node if the cursor is after the last position
+			// We won't get a current node if the cursor is after the last position
 			// recorded by the AST
 			if (result == null)
 			{
 				if (offset < ast.getStartingOffset())
 				{
-					result = ast.getNodeAt(ast.getStartingOffset());
+					result = ast.getNodeAtOffset(ast.getStartingOffset());
 				}
 				else if (ast.getEndingOffset() < offset)
 				{
-					result = ast.getNodeAt(ast.getEndingOffset());
+					result = ast.getNodeAtOffset(ast.getEndingOffset());
 				}
 			}
 		}
@@ -515,7 +515,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 								break;
 								
 							case RPAREN:
-								node = this._targetNode.getNodeAt(offset - 1);
+								node = this._targetNode.getNodeAtOffset(offset - 1);
 								
 								if (node != null)
 								{
@@ -685,7 +685,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					
 					if (lexeme != null)
 					{
-						node = this._statementNode.getNodeAt(lexeme.getStartingOffset());
+						node = this._statementNode.getNodeAtOffset(lexeme.getStartingOffset());
 						
 						if (node != null && node.getType() == JSNodeTypes.IDENTIFIER && node.getParent().getParent() == this._targetNode)
 						{
@@ -705,7 +705,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					}
 					else
 					{
-						node = this._targetNode.getNodeAt(offset - 1);
+						node = this._targetNode.getNodeAtOffset(offset - 1);
 						
 						if (node != null && node.getType() == JSNodeTypes.IDENTIFIER)
 						{
