@@ -204,4 +204,13 @@ public class VSDocReader extends MetadataReader
 	{
 		return this.getClass().getResourceAsStream(METADATA_SCHEMA_XML);
 	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.MetadataReader#getText()
+	 */
+	@Override
+	protected String getText()
+	{
+		return this.normalizeText(super.getText());
+	}
 }
