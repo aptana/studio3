@@ -10,31 +10,49 @@ import com.aptana.parsing.Scope;
 public class JSParseState extends ParseState
 {
 	private Scope<JSNode> _globalScope;
-	private List<Block> _sdocBlocks;
-	private List<Block> _vsdocBlocks;
+	private List<Block> _preBlocks;
+	private List<Block> _postBlocks;
 
+	/**
+	 * findBlock
+	 * 
+	 * @param offset
+	 * @return
+	 */
+	public Block findBlock(int offset)
+	{
+		Block block = this.findPreBlock(offset);
+		
+		if (block == null)
+		{
+			block = this.findPostBlock(offset);
+		}
+		
+		return block;
+	}
+	
 	/**
 	 * Finds the comment block ending or just before the given offset
 	 * 
 	 * @param offset
 	 * @return
 	 */
-	public Block findSDocBlock(int offset)
+	public Block findPreBlock(int offset)
 	{
 		Block result = null;
 
-		if (this._sdocBlocks != null)
+		if (this._preBlocks != null)
 		{
-			int index = this.getBlockIndex(this._sdocBlocks, offset);
+			int index = this.getBlockIndex(this._preBlocks, offset);
 
 			if (index < 0)
 			{
 				index = -index - 1;
 			}
 
-			if (index < this._sdocBlocks.size())
+			if (index < this._preBlocks.size())
 			{
-				result = this._sdocBlocks.get(index);
+				result = this._preBlocks.get(index);
 			}
 		}
 
@@ -47,22 +65,22 @@ public class JSParseState extends ParseState
 	 * @param offset
 	 * @return
 	 */
-	public Block findVSDocBlock(int offset)
+	public Block findPostBlock(int offset)
 	{
 		Block result = null;
 
-		if (this._vsdocBlocks != null)
+		if (this._postBlocks != null)
 		{
-			int index = this.getBlockIndex(this._vsdocBlocks, offset);
+			int index = this.getBlockIndex(this._postBlocks, offset);
 
 			if (index < 0)
 			{
 				index = -index - 1 + 1;
 			}
 
-			if (index < this._vsdocBlocks.size())
+			if (index < this._postBlocks.size())
 			{
-				result = this._vsdocBlocks.get(index);
+				result = this._postBlocks.get(index);
 			}
 		}
 
@@ -114,23 +132,23 @@ public class JSParseState extends ParseState
 	}
 
 	/**
-	 * getSDocBlocks
+	 * getPreDocumentationBlocks
 	 * 
 	 * @return
 	 */
-	public List<Block> getSDocBlocks()
+	public List<Block> getPreDocumentationBlocks()
 	{
-		return this._sdocBlocks;
+		return this._preBlocks;
 	}
 
 	/**
-	 * getVSDocBlocks
+	 * getPostDocumentationBlocks
 	 * 
 	 * @return
 	 */
-	public List<Block> getVSDocBlocks()
+	public List<Block> getPostDocumentationBlocks()
 	{
-		return this._vsdocBlocks;
+		return this._postBlocks;
 	}
 
 	/**
@@ -144,22 +162,22 @@ public class JSParseState extends ParseState
 	}
 
 	/**
-	 * setSDocBlocks
+	 * setPreDocumentationBlocks
 	 * 
 	 * @param blocks
 	 */
-	public void setSDocBlocks(List<Block> blocks)
+	public void setPreDocumentationBlocks(List<Block> blocks)
 	{
-		this._sdocBlocks = blocks;
+		this._preBlocks = blocks;
 	}
 
 	/**
-	 * setVSDocBlocks
+	 * setPostDocumentationBlocks
 	 * 
 	 * @param blocks
 	 */
-	public void setVSDocBlocks(List<Block> blocks)
+	public void setPostDocumentationBlocks(List<Block> blocks)
 	{
-		this._vsdocBlocks = blocks;
+		this._postBlocks = blocks;
 	}
 }
