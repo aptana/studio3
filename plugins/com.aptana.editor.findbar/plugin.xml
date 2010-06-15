@@ -43,6 +43,36 @@
             id="org.eclipse.ui.edit.findbar.selectall"
             name="%SelectAll.command.name">
       </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.home"
+            name="%Home.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.end"
+            name="%End.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.selectHome"
+            name="%SelectHome.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.selectEnd"
+            name="%SelectEnd.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.focusFind"
+            name="%FocusFind.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.focusReplace"
+            name="%FocusReplace.command.name">
+      </command>
    </extension>
    
    <extension
@@ -54,6 +84,12 @@
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="ESCAPE">
+      </key>
+      <key
+            commandId="org.eclipse.ui.edit.findbar.hide"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="F12">
       </key>
       
       <!-- Find Previous -->
@@ -86,6 +122,18 @@
             sequence="M1+F">
       </key>
       <key
+            commandId="org.eclipse.ui.edit.findbar.focusFind"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M3+F">
+      </key>
+      <key
+            commandId="org.eclipse.ui.edit.findbar.focusReplace"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M3+E">
+      </key>
+      <key
             commandId="org.eclipse.ui.edit.findbar.cut"
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
@@ -108,6 +156,30 @@
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+A">
+      </key>
+      <key
+            commandId="org.eclipse.ui.edit.findbar.home"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="HOME">
+      </key>
+      <key
+            commandId="org.eclipse.ui.edit.findbar.end"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="END">
+      </key>
+      <key
+            commandId="org.eclipse.ui.edit.findbar.selectHome"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+HOME">
+      </key>
+      <key
+            commandId="org.eclipse.ui.edit.findbar.selectEnd"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+END">
       </key>
    </extension>
    
