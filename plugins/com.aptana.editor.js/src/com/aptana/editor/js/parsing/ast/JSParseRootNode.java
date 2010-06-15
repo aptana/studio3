@@ -7,6 +7,7 @@ import beaver.Symbol;
 import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.parsing.Scope;
+import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 
 public class JSParseRootNode extends ParseRootNode
@@ -41,13 +42,57 @@ public class JSParseRootNode extends ParseRootNode
 	 * @param offset
 	 * @return
 	 */
-	public DocumentationBlock findDocumentationBlock(int offset)
+	public DocumentationBlock findDocumentationBlock(IParseNode node)
 	{
-		DocumentationBlock block = this.findPreDocumentationBlock(offset);
-
-		if (block == null)
+		DocumentationBlock block = null;
+		
+		if (node instanceof JSNode)
 		{
-			block = this.findPostDocumentationBlock(offset);
+			JSNode jsNode = (JSNode) node;
+			IParseNode statement = jsNode.getContainingStatementNode();
+			
+			block = this.findPreDocumentationBlock(statement.getStartingOffset());
+	
+			if (block != null)
+			{
+				IParseNode parent = statement.getParent();
+				
+				if (parent != null && parent.getFirstChild() != statement)
+				{
+					IParseNode previousNode = statement.getPreviousNode();
+					
+					if (previousNode instanceof JSNode)
+					{
+						IParseNode previousStatement = ((JSNode) previousNode).getContainingStatementNode();
+						
+						if (previousStatement != null && previousStatement.getEndingOffset() > block.getEnd())
+						{
+							block = null;
+						}
+					}
+				}
+			}
+			
+			if (block == null && node instanceof JSFunctionNode)
+			{
+				IParseNode body = ((JSFunctionNode) node).getBody();
+				
+				block = this.findPostDocumentationBlock(body.getStartingOffset());
+				
+				if (block != null)
+				{
+					if (body.contains(block.getStart()) && body.contains(block.getEnd()))
+					{
+						if (body.hasChildren())
+						{
+							if (body.getFirstChild().getEndingOffset() < block.getStart())
+							{
+								block = null;
+							}
+						}
+					}
+				}
+			}
 		}
 
 		return block;
@@ -69,7 +114,7 @@ public class JSParseRootNode extends ParseRootNode
 
 			if (index < 0)
 			{
-				index = -index - 1 + 1;
+				index = -index - 1;
 			}
 
 			if (index < this._postBlocks.size())
@@ -97,10 +142,10 @@ public class JSParseRootNode extends ParseRootNode
 
 			if (index < 0)
 			{
-				index = -index - 1;
+				index = -index - 1 - 1;
 			}
 
-			if (index < this._preBlocks.size())
+			if (0 <= index && index < this._preBlocks.size())
 			{
 				result = this._preBlocks.get(index);
 			}
