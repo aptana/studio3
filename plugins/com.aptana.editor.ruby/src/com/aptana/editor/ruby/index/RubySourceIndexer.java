@@ -58,18 +58,17 @@ public class RubySourceIndexer implements ISourceElementRequestor
 	@Override
 	public void enterType(TypeInfo type)
 	{
-		String packName = ""; // XXX We need to know the relative path from the source folder root!
 		String simpleName = getSimpleName(type.name);
 		String[] enclosingTypes = getEnclosingTypeNames(type.name);
-		addClassDeclaration(type.isModule, packName, simpleName, enclosingTypes, type.superclass, type.modules,
+		addClassDeclaration(type.isModule, simpleName, enclosingTypes, type.superclass, type.modules,
 				type.secondary);
 		typeStack.push(type);
 	}
 
-	private void addClassDeclaration(boolean isModule, String packName, String simpleName, String[] enclosingTypes,
+	private void addClassDeclaration(boolean isModule, String simpleName, String[] enclosingTypes,
 			String superclass, String[] modules, boolean secondary)
 	{
-		String indexKey = createTypeDeclarationKey(isModule, simpleName, packName, enclosingTypes, secondary);
+		String indexKey = createTypeDeclarationKey(isModule, simpleName, enclosingTypes, secondary);
 		addIndex(index, file, IRubyIndexConstants.TYPE_DECL, indexKey);
 
 		if (superclass != null && !superclass.equals(IRubyIndexConstants.OBJECT))
@@ -81,23 +80,36 @@ public class RubySourceIndexer implements ISourceElementRequestor
 				index,
 				file,
 				IRubyIndexConstants.SUPER_REF,
-				createSuperTypeReferenceKey(isModule, packName, simpleName, enclosingTypes,
+				createSuperTypeReferenceKey(isModule, simpleName, enclosingTypes,
 						IRubyIndexConstants.CLASS_SUFFIX, superclass, IRubyIndexConstants.CLASS_SUFFIX));
 		if (modules != null)
 		{
 			for (String module : modules)
 			{
 				addTypeReference(module);
-				addIncludedModuleReference(isModule, packName, simpleName, enclosingTypes, module);
+				addIncludedModuleReference(isModule, simpleName, enclosingTypes, module);
 			}
 		}
 	}
 
-	private String createTypeDeclarationKey(boolean isModule, String typeName, String packageName,
+	/**
+	 * Generates a key of the form:
+	 * 
+	 * TypeName/namespace/(M|C)/S
+	 * 
+	 * i.e. "Base/ActiveRecord/C"
+	 * 
+	 * @param isModule
+	 * @param typeName
+	 * @param packageName
+	 * @param enclosingTypeNames
+	 * @param secondary
+	 * @return
+	 */
+	private String createTypeDeclarationKey(boolean isModule, String typeName,
 			String[] enclosingTypeNames, boolean secondary)
 	{
 		int typeNameLength = typeName == null ? 0 : typeName.length();
-		int packageLength = packageName == null ? 0 : packageName.length();
 		int enclosingNamesLength = 0;
 		if (enclosingTypeNames != null)
 		{
@@ -109,7 +121,7 @@ public class RubySourceIndexer implements ISourceElementRequestor
 			}
 		}
 
-		int resultLength = typeNameLength + packageLength + enclosingNamesLength + 5;
+		int resultLength = typeNameLength + enclosingNamesLength + 5;
 		if (secondary)
 			resultLength += 2;
 		char[] result = new char[resultLength];
@@ -118,12 +130,6 @@ public class RubySourceIndexer implements ISourceElementRequestor
 		{
 			System.arraycopy(typeName.toCharArray(), 0, result, pos, typeNameLength);
 			pos += typeNameLength;
-		}
-		result[pos++] = IRubyIndexConstants.SEPARATOR;
-		if (packageLength > 0)
-		{
-			System.arraycopy(packageName.toCharArray(), 0, result, pos, packageLength);
-			pos += packageLength;
 		}
 		result[pos++] = IRubyIndexConstants.SEPARATOR;
 		if (enclosingTypeNames != null && enclosingNamesLength > 0)
@@ -142,13 +148,14 @@ public class RubySourceIndexer implements ISourceElementRequestor
 			}
 		}
 		result[pos++] = IRubyIndexConstants.SEPARATOR;
-		int modifiers = 0; // FIXME This was in Flags.AccModule, probably needed for querying back!
 		if (isModule)
 		{
-			modifiers = 1;
+			result[pos++] = IRubyIndexConstants.MODULE_SUFFIX;
 		}
-		result[pos++] = (char) modifiers;
-		result[pos] = (char) (modifiers >> 16);
+		else
+		{
+			result[pos++] = IRubyIndexConstants.CLASS_SUFFIX;
+		}
 		if (secondary)
 		{
 			result[++pos] = IRubyIndexConstants.SEPARATOR;
@@ -238,22 +245,22 @@ public class RubySourceIndexer implements ISourceElementRequestor
 
 		TypeInfo info = typeStack.peek();
 		String[] enclosingTypes = getEnclosingTypeNames(info.name);
-		addIncludedModuleReference(info.isModule, "", getSimpleName(info.name), enclosingTypes, moduleName);
+		addIncludedModuleReference(info.isModule, getSimpleName(info.name), enclosingTypes, moduleName);
 	}
 
-	private void addIncludedModuleReference(boolean isModule, String packageName, String simpleName,
+	private void addIncludedModuleReference(boolean isModule, String simpleName,
 			String[] enclosingTypes, String moduleName)
 	{
 		addIndex(
 				index,
 				file,
 				IRubyIndexConstants.SUPER_REF,
-				createSuperTypeReferenceKey(isModule, packageName, simpleName, enclosingTypes,
+				createSuperTypeReferenceKey(isModule, simpleName, enclosingTypes,
 						IRubyIndexConstants.CLASS_SUFFIX, moduleName, IRubyIndexConstants.MODULE_SUFFIX));
 	}
 
-	private String createSuperTypeReferenceKey(boolean isModule, String packageName, String typeName,
-			String[] enclosingTypeNames, char classOrInterface, String superTypeName, char superClassOrInterface)
+	private String createSuperTypeReferenceKey(boolean isModule, String typeName,
+			String[] enclosingTypeNames, char classOrModule, String superTypeName, char superClassOrModule)
 	{
 		if (superTypeName == null)
 			superTypeName = IRubyIndexConstants.OBJECT;
@@ -287,17 +294,14 @@ public class RubySourceIndexer implements ISourceElementRequestor
 
 		String simpleName = lastSegment(typeName, NAMESPACE_DELIMETER);
 		String enclosingTypeName = join(enclosingTypeNames, NAMESPACE_DELIMETER);
-		if (superQualification != null && superQualification.equals(packageName))
-			packageName = "0"; // save some space
 
-		// superSimpleName / superQualification / simpleName / enclosingTypeName / packageName /
+		// superSimpleName / superQualification / simpleName / enclosingTypeName /
 		// superClassOrModule classOrModule modifiers
 		int superLength = superSimpleName == null ? 0 : superSimpleName.length();
 		int superQLength = superQualification == null ? 0 : superQualification.length;
 		int simpleLength = simpleName == null ? 0 : simpleName.length();
 		int enclosingLength = enclosingTypeName == null ? 0 : enclosingTypeName.length();
-		int packageLength = packageName == null ? 0 : packageName.length();
-		char[] result = new char[superLength + superQLength + simpleLength + enclosingLength + packageLength + 8];
+		char[] result = new char[superLength + superQLength + simpleLength + enclosingLength + 8];
 		int pos = 0;
 		if (superLength > 0)
 		{
@@ -322,16 +326,10 @@ public class RubySourceIndexer implements ISourceElementRequestor
 			System.arraycopy(enclosingTypeName.toCharArray(), 0, result, pos, enclosingLength);
 			pos += enclosingLength;
 		}
+		
 		result[pos++] = IRubyIndexConstants.SEPARATOR;
-
-		if (packageLength > 0)
-		{
-			System.arraycopy(packageName.toCharArray(), 0, result, pos, packageLength);
-			pos += packageLength;
-		}
-		result[pos++] = IRubyIndexConstants.SEPARATOR;
-		result[pos++] = superClassOrInterface;
-		result[pos++] = classOrInterface;
+		result[pos++] = superClassOrModule;
+		result[pos++] = classOrModule;
 		int modifiers = 0;
 		if (isModule)
 		{
