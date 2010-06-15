@@ -69,6 +69,7 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 					{
 						// create parser and associated parse state
 						IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IJSParserConstants.LANGUAGE);
+						
 						if (pool != null)
 						{
 							IParser parser = pool.checkOut();
@@ -162,8 +163,8 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 	{
 		if (Platform.inDevelopmentMode())
 		{
-			Scope<JSNode> globals = parseState.getGlobalScope();
 			String location = file.getProjectRelativePath().toPortableString();
+			Scope<JSNode> globals = parseState.getGlobalScope();
 			
 			for (String symbol: globals.getLocalSymbolNames())
 			{
