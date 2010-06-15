@@ -11,7 +11,7 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.common.contentassist,
- com.aptana.ui.epl,
- com.aptana.ui.epl.scripting.snippets
+ com.aptana.editor.common.scripting.snippets,
+ com.aptana.ui.epl
 Eclipse-ExtensibleAPI: true
 Bundle-Activator: com.aptana.ui.epl.UIEplPlugin
