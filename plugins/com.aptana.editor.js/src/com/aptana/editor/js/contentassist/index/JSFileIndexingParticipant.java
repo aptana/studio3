@@ -75,20 +75,15 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 						{
 							IParser parser = pool.checkOut();
 
-							ParseState parseState = new ParseState();
-
 							// apply the source to the parse state and parse
+							ParseState parseState = new ParseState();
 							parseState.setEditState(source, source, 0, 0);
 							parser.parse(parseState);
 
 							pool.checkIn(parser);
 							
-							IParseNode ast = parseState.getParseResult();
-							
-							this.walkAST(index, file, ast);
-
 							// process results
-							this.processParseResults(index, file, ast);
+							this.processParseResults(index, file, parseState.getParseResult());
 						}
 					}
 				}
