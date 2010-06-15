@@ -41,6 +41,7 @@ import java.util.List;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
@@ -468,6 +469,9 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 
                     @Override
                     public void done(IJobChangeEvent event) {
+                    	if (event.getResult() == Status.CANCEL_STATUS) {
+                    		return;
+                    	}
                         IOUIPlugin.refreshNavigatorView(fTarget.getCurrentInput());
                         UIUtils.getDisplay().asyncExec(new Runnable() {
 
@@ -485,6 +489,9 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 
                     @Override
                     public void done(IJobChangeEvent event) {
+                    	if (event.getResult() == Status.CANCEL_STATUS) {
+                    		return;
+                    	}
                         IOUIPlugin.refreshNavigatorView(fSource.getCurrentInput());
                         UIUtils.getDisplay().asyncExec(new Runnable() {
 

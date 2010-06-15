@@ -63,16 +63,27 @@ public class FileService
 	}
 
 	/**
-	 * parse
+	 * Parse.<br>
+	 * This call is just like calling {@link #parse(boolean)} with false.
 	 */
 	public synchronized void parse()
+	{
+		parse(false);
+	}
+
+	/**
+	 * Parse, with an option to force a parsing even when the source did not change.
+	 * 
+	 * @param force
+	 */
+	public synchronized void parse(boolean force)
 	{
 		if (fLanguage != null && fDocument != null)
 		{
 			String source = fDocument.get();
 			int sourceHash = source.hashCode();
 
-			if (sourceHash != fLastSourceHash)
+			if (force || sourceHash != fLastSourceHash)
 			{
 				fLastSourceHash = sourceHash;
 
@@ -109,7 +120,7 @@ public class FileService
 			}
 		}
 	}
-
+	
 	/**
 	 * removeListener
 	 * 

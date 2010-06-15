@@ -35,6 +35,8 @@
 
 package com.aptana.ide.ui.ftp.console;
 
+import java.util.HashMap;
+
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -43,7 +45,9 @@ import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsoleFactory;
 import org.eclipse.ui.console.IOConsoleOutputStream;
 import org.eclipse.ui.console.MessageConsole;
+import org.eclipse.ui.console.MessageConsoleStream;
 
+import com.aptana.editor.common.extensions.ConsoleThemePageParticipant;
 import com.aptana.ide.ui.ftp.FTPUIPlugin;
 
 /**
@@ -74,6 +78,7 @@ public class FTPConsoleFactory implements IConsoleFactory {
 	private static MessageConsole getOrcreateConsole() {
 		if (console == null) {
 			console = new MessageConsole(Messages.FTPConsoleFactory_FTPConsole, FTPUIPlugin.getImageDescriptor("/icons/full/eview16/ftp.png")); //$NON-NLS-1$
+			console.setAttribute(ConsoleThemePageParticipant.THEME_CONSOLE_STREAM_TO_COLOR_ATTRIBUTE, new HashMap<MessageConsoleStream, String>());
 			ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { console });
 		}
 		return console;
