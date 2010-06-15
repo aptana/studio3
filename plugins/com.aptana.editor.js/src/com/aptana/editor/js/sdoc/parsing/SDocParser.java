@@ -96,7 +96,7 @@ public class SDocParser extends Parser {
 					final Symbol text = _symbols[offset + 2];
 					final Symbol e = _symbols[offset + 3];
 					
-			return new Block((String) text.value, s.getStart(), e.getEnd());
+			return new DocumentationBlock((String) text.value, s.getStart(), e.getEnd());
 			}
 			case 2: // Block = START_DOCUMENTATION.s Tags.tags END_DOCUMENTATION.e
 			{
@@ -104,7 +104,7 @@ public class SDocParser extends Parser {
 					final Symbol tags = _symbols[offset + 2];
 					final Symbol e = _symbols[offset + 3];
 					
-			return new Block((List<Tag>) tags.value, s.getStart(), e.getEnd());
+			return new DocumentationBlock((List<Tag>) tags.value, s.getStart(), e.getEnd());
 			}
 			case 3: // Block = START_DOCUMENTATION.s Text.text Tags.tags END_DOCUMENTATION.e
 			{
@@ -113,7 +113,7 @@ public class SDocParser extends Parser {
 					final Symbol tags = _symbols[offset + 3];
 					final Symbol e = _symbols[offset + 4];
 					
-			return new Block((String) text.value, (List<Tag>) tags.value, s.getStart(), e.getEnd());
+			return new DocumentationBlock((String) text.value, (List<Tag>) tags.value, s.getStart(), e.getEnd());
 			}
 			case 4: // Text = Text.text TextPart.part
 			{

@@ -2,7 +2,7 @@ package com.aptana.editor.js.parsing;
 
 import com.aptana.editor.js.vsdoc.parsing.VSDocReader;
 import java.util.ArrayList;
-import com.aptana.editor.js.sdoc.model.Block;
+import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import java.util.List;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import java.io.IOException;
@@ -253,13 +253,13 @@ public class JSParser extends Parser implements IParser {
 		IParseNode result = (IParseNode) parse(fScanner);
 		parseState.setParseResult(result);
 		
-		if (parseState instanceof JSParseState)
+		if (result instanceof JSParseRootNode)
 		{
-			JSParseState jsParseState = (JSParseState) parseState;
+			JSParseRootNode root = (JSParseRootNode) result;
 			
-			jsParseState.setGlobalScope(fScope);
-			jsParseState.setPreDocumentationBlocks(this.parsePreDocumentationBlocks());
-			jsParseState.setPostDocumentationBlocks(this.parsePostDocumentationBlocks());
+			root.setGlobalScope(fScope);
+			root.setPreDocumentationBlocks(this.parsePreDocumentationBlocks());
+			root.setPostDocumentationBlocks(this.parsePostDocumentationBlocks());
 		}
 		
 		return result;
@@ -270,10 +270,10 @@ public class JSParser extends Parser implements IParser {
 	 * 
 	 * @return
 	 */
-	protected List<Block> parsePreDocumentationBlocks()
+	protected List<DocumentationBlock> parsePreDocumentationBlocks()
 	{
 		SDocParser parser = new SDocParser();
-		List<Block> blocks = new ArrayList<Block>();
+		List<DocumentationBlock> blocks = new ArrayList<DocumentationBlock>();
 		
 		for (Symbol doc : fScanner.getSDocComments())
 		{
@@ -281,9 +281,9 @@ public class JSParser extends Parser implements IParser {
 			{
 				Object result = parser.parse((String) doc.value);
 				
-				if (result instanceof Block)
+				if (result instanceof DocumentationBlock)
 				{
-					blocks.add((Block) result);
+					blocks.add((DocumentationBlock) result);
 				}
 			}
 			catch (java.lang.Exception e)
@@ -323,10 +323,10 @@ public class JSParser extends Parser implements IParser {
 	 * 
 	 * @return
 	 */
-	protected List<Block> parsePostDocumentationBlocks()
+	protected List<DocumentationBlock> parsePostDocumentationBlocks()
 	{
 		VSDocReader parser = new VSDocReader();
-		List<Block> blocks = new ArrayList<Block>();
+		List<DocumentationBlock> blocks = new ArrayList<DocumentationBlock>();
 		
 		for (Symbol doc : fScanner.getVSDocComments())
 		{
@@ -340,7 +340,7 @@ public class JSParser extends Parser implements IParser {
 				
 				parser.loadXML(input);
 				
-				Block result = parser.getBlock(); 
+				DocumentationBlock result = parser.getBlock(); 
 				
 				if (result != null)
 				{

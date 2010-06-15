@@ -6,8 +6,8 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.IDocument;
@@ -27,15 +27,14 @@ import com.aptana.editor.js.contentassist.JSASTQueryHelper.Classification;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
-import com.aptana.editor.js.parsing.JSParseState;
 import com.aptana.editor.js.parsing.JSTokenScanner;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
+import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.index.core.Index;
-import com.aptana.parsing.IParseState;
 import com.aptana.parsing.Scope;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
@@ -296,12 +295,12 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			
 			if (Platform.inDevelopmentMode())
 			{
-				IParseState parseState = this.getParseState();
+				IParseNode ast = this.getAST();
 				
-				if (parseState instanceof JSParseState)
+				if (ast instanceof JSParseRootNode)
 				{
-					JSParseState jsParseState = (JSParseState) parseState;
-					Scope<JSNode> globalScope = jsParseState.getGlobalScope();
+					JSParseRootNode root = (JSParseRootNode) ast;
+					Scope<JSNode> globalScope = root.getGlobalScope();
 					
 					if (globalScope != null)
 					{

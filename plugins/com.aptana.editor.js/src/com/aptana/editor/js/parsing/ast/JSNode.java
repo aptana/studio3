@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.aptana.editor.js.parsing.IJSParserConstants;
+import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseBaseNode;
 import com.aptana.parsing.ast.ParseRootNode;
@@ -19,6 +20,8 @@ public class JSNode extends ParseBaseNode
 
 	private short fType;
 	private boolean fSemicolonIncluded;
+	
+	private DocumentationBlock fDocumentationBlock;
 	private List<String> fReturnTypes;
 
 	/**
@@ -137,6 +140,21 @@ public class JSNode extends ParseBaseNode
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * getDocumentationBlock
+	 * 
+	 * @return
+	 */
+	public DocumentationBlock getDocumentationBlock()
+	{
+		if (this.fDocumentationBlock == null)
+		{
+			// look up block
+		}
+		
+		return this.fDocumentationBlock;
 	}
 	
 	/*

@@ -7,7 +7,7 @@ import com.aptana.parsing.io.SourceWriter;
 
 import beaver.Symbol;
 
-public class Block extends Symbol
+public class DocumentationBlock extends Symbol
 {
 	private String _text;
 	private List<Tag> _tags;
@@ -17,7 +17,7 @@ public class Block extends Symbol
 	 * 
 	 * @param tags
 	 */
-	public Block(List<Tag> tags, int startingOffset, int endingOffset)
+	public DocumentationBlock(List<Tag> tags, int startingOffset, int endingOffset)
 	{
 		this("", tags, startingOffset, endingOffset);
 	}
@@ -27,7 +27,7 @@ public class Block extends Symbol
 	 * 
 	 * @param text
 	 */
-	public Block(String text, int startingOffset, int endingOffset)
+	public DocumentationBlock(String text, int startingOffset, int endingOffset)
 	{
 		this(text, new LinkedList<Tag>(), startingOffset, endingOffset);
 	}
@@ -38,7 +38,7 @@ public class Block extends Symbol
 	 * @param text
 	 * @param tags
 	 */
-	public Block(String text, List<Tag> tags, int startingOffset, int endingOffset)
+	public DocumentationBlock(String text, List<Tag> tags, int startingOffset, int endingOffset)
 	{
 		this._text = text;
 		this._tags = tags;

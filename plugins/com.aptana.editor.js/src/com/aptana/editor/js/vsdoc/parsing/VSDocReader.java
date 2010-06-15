@@ -7,7 +7,7 @@ import java.util.List;
 import org.xml.sax.Attributes;
 
 import com.aptana.editor.common.contentassist.MetadataReader;
-import com.aptana.editor.js.sdoc.model.Block;
+import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.editor.js.sdoc.model.ParamTag;
 import com.aptana.editor.js.sdoc.model.Parameter;
 import com.aptana.editor.js.sdoc.model.Tag;
@@ -25,7 +25,7 @@ public class VSDocReader extends MetadataReader
 	private Parameter _currentParameter;
 	private String _currentType;
 
-	private Block _block;
+	private DocumentationBlock _block;
 	
 	/**
 	 * process docs element
@@ -110,7 +110,7 @@ public class VSDocReader extends MetadataReader
 	 */
 	public void exitDocs(String ns, String name, String qname)
 	{
-		this._block = new Block(this._summary, this._tags, 0, 0);
+		this._block = new DocumentationBlock(this._summary, this._tags, 0, 0);
 		
 		// clean up
 		this._summary = null;
@@ -190,7 +190,7 @@ public class VSDocReader extends MetadataReader
 	 * 
 	 * @return
 	 */
-	public Block getBlock()
+	public DocumentationBlock getBlock()
 	{
 		return this._block;
 	}
