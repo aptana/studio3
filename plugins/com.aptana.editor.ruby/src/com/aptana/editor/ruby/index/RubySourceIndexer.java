@@ -85,11 +85,10 @@ public class RubySourceIndexer implements ISourceElementRequestor
 						IRubyIndexConstants.CLASS_SUFFIX, superclass, IRubyIndexConstants.CLASS_SUFFIX));
 		if (modules != null)
 		{
-			for (int i = 0, max = modules.length; i < max; i++)
+			for (String module : modules)
 			{
-				String superinterface = modules[i];
-				addTypeReference(superinterface);
-				addIncludedModuleReference(isModule, packName, simpleName, enclosingTypes, superinterface);
+				addTypeReference(module);
+				addIncludedModuleReference(isModule, packName, simpleName, enclosingTypes, module);
 			}
 		}
 	}
