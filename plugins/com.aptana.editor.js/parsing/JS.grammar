@@ -9,7 +9,7 @@
 
 %import "com.aptana.editor.js.parsing.ast.*";
 %import "com.aptana.editor.js.parsing.lexer.JSTokenType";
-%import "com.aptana.editor.js.sdoc.model.Block";
+%import "com.aptana.editor.js.sdoc.model.DocumentationBlock";
 %import "com.aptana.editor.js.sdoc.parsing.SDocParser";
 %import "com.aptana.editor.js.vsdoc.parsing.VSDocReader";
 %import "com.aptana.parsing.IParseState";
@@ -139,13 +139,13 @@
 		IParseNode result = (IParseNode) parse(fScanner);
 		parseState.setParseResult(result);
 		
-		if (parseState instanceof JSParseState)
+		if (result instanceof JSParseRootNode)
 		{
-			JSParseState jsParseState = (JSParseState) parseState;
+			JSParseRootNode root = (JSParseRootNode) result;
 			
-			jsParseState.setGlobalScope(fScope);
-			jsParseState.setPreDocumentationBlocks(this.parsePreDocumentationBlocks());
-			jsParseState.setPostDocumentationBlocks(this.parsePostDocumentationBlocks());
+			root.setGlobalScope(fScope);
+			root.setPreDocumentationBlocks(this.parsePreDocumentationBlocks());
+			root.setPostDocumentationBlocks(this.parsePostDocumentationBlocks());
 		}
 		
 		return result;
@@ -156,20 +156,20 @@
 	 * 
 	 * @return
 	 */
-	protected List<Block> parsePreDocumentationBlocks()
+	protected List<DocumentationBlock> parsePreDocumentationBlocks()
 	{
 		SDocParser parser = new SDocParser();
-		List<Block> blocks = new ArrayList<Block>();
+		List<DocumentationBlock> blocks = new ArrayList<DocumentationBlock>();
 		
 		for (Symbol doc : fScanner.getSDocComments())
 		{
 			try
 			{
-				Object result = parser.parse((String) doc.value);
+				Object result = parser.parse((String) doc.value, doc.getStart());
 				
-				if (result instanceof Block)
+				if (result instanceof DocumentationBlock)
 				{
-					blocks.add((Block) result);
+					blocks.add((DocumentationBlock) result);
 				}
 			}
 			catch (java.lang.Exception e)
@@ -209,10 +209,10 @@
 	 * 
 	 * @return
 	 */
-	protected List<Block> parsePostDocumentationBlocks()
+	protected List<DocumentationBlock> parsePostDocumentationBlocks()
 	{
 		VSDocReader parser = new VSDocReader();
-		List<Block> blocks = new ArrayList<Block>();
+		List<DocumentationBlock> blocks = new ArrayList<DocumentationBlock>();
 		
 		for (Symbol doc : fScanner.getVSDocComments())
 		{
@@ -220,16 +220,22 @@
 			
 			try
 			{
-				String source = this.buildVSDocXML((List<Symbol>) doc.value);
+				List<Symbol> lines = (List<Symbol>) doc.value;
+				String source = this.buildVSDocXML(lines);
 				
-				new ByteArrayInputStream(source.getBytes());
+				input = new ByteArrayInputStream(source.getBytes());
 				
 				parser.loadXML(input);
 				
-				Block result = parser.getBlock(); 
+				DocumentationBlock result = parser.getBlock(); 
 				
 				if (result != null)
 				{
+					if (lines.size() > 0)
+					{
+						result.setRange(lines.get(0).getStart(), lines.get(lines.size() - 1).getEnd());
+					}
+					
 					blocks.add(result);
 				}
 			}

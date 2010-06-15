@@ -2,9 +2,9 @@ package com.aptana.editor.js.parsing;
 
 import com.aptana.editor.js.vsdoc.parsing.VSDocReader;
 import java.util.ArrayList;
-import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import java.util.List;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
+import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import java.io.IOException;
 import com.aptana.parsing.IRecoveryStrategy;
 import com.aptana.editor.js.sdoc.parsing.SDocParser;
@@ -279,7 +279,7 @@ public class JSParser extends Parser implements IParser {
 		{
 			try
 			{
-				Object result = parser.parse((String) doc.value);
+				Object result = parser.parse((String) doc.value, doc.getStart());
 				
 				if (result instanceof DocumentationBlock)
 				{
@@ -334,9 +334,10 @@ public class JSParser extends Parser implements IParser {
 			
 			try
 			{
-				String source = this.buildVSDocXML((List<Symbol>) doc.value);
+				List<Symbol> lines = (List<Symbol>) doc.value;
+				String source = this.buildVSDocXML(lines);
 				
-				new ByteArrayInputStream(source.getBytes());
+				input = new ByteArrayInputStream(source.getBytes());
 				
 				parser.loadXML(input);
 				
@@ -344,6 +345,11 @@ public class JSParser extends Parser implements IParser {
 				
 				if (result != null)
 				{
+					if (lines.size() > 0)
+					{
+						result.setRange(lines.get(0).getStart(), lines.get(lines.size() - 1).getEnd());
+					}
+					
 					blocks.add(result);
 				}
 			}
