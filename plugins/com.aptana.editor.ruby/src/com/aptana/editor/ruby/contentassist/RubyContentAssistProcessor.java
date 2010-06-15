@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
@@ -15,6 +16,7 @@ import org.eclipse.swt.graphics.Image;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
+import com.aptana.editor.ruby.Activator;
 import com.aptana.editor.ruby.index.IRubyIndexConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.QueryResult;
@@ -36,28 +38,7 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 		Index index = getIndex();
 		try
 		{
-			IDocument doc = viewer.getDocument();
-			IRegion lineInfo = doc.getLineInformationOfOffset(offset);
-			String linePrefix = doc.get(lineInfo.getOffset(), offset - lineInfo.getOffset());
-			// find last period/space/:
-			int indexOfPeriod = linePrefix.lastIndexOf(".");
-			if (indexOfPeriod != -1)
-			{
-				linePrefix = linePrefix.substring(indexOfPeriod + 1);
-			}
-			indexOfPeriod = linePrefix.lastIndexOf(":");
-			if (indexOfPeriod != -1)
-			{
-				linePrefix = linePrefix.substring(indexOfPeriod + 1);
-			}
-			indexOfPeriod = linePrefix.lastIndexOf(" ");
-			if (indexOfPeriod != -1)
-			{
-				linePrefix = linePrefix.substring(indexOfPeriod + 1);
-			}
-
-			String prefix = linePrefix;
-
+			String prefix = getPrefix(viewer, offset);
 			List<QueryResult> results = index.query(new String[] { IRubyIndexConstants.FIELD_DECL,
 					IRubyIndexConstants.METHOD_DECL, IRubyIndexConstants.TYPE_DECL }, prefix,
 					SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
@@ -66,22 +47,24 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 				for (QueryResult result : results)
 				{
 					String name = result.getWord();
-					// FIXME We need to "decode" the word since it's the raw key, which has identifier plus a bunch of other info
+					// FIXME We need to "decode" the word since it's the raw key, which has identifier plus a bunch of
+					// other info
 					int firstSeparator = name.indexOf(IRubyIndexConstants.SEPARATOR);
 					if (firstSeparator != -1)
 					{
 						name = name.substring(0, firstSeparator);
 					}
-					String description = "";
-					int replaceLength = prefix.length();
-					int length = name.length();
-					String displayName = name;
-					Image image = null;
-					IContextInformation contextInfo = null;
-					// build proposal
-					CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset - replaceLength,
-							replaceLength, length, image, displayName, contextInfo, description);
-
+					CommonCompletionProposal proposal = createProposal(offset, prefix, name);
+					StringBuilder builder = new StringBuilder();
+					for (String doc : result.getDocuments())
+					{
+						builder.append(doc).append(", "); //$NON-NLS-1$
+					}
+					if (builder.length() > 0)
+					{
+						builder.delete(builder.length() - 2, builder.length());
+					}
+					proposal.setFileLocation(builder.toString());
 					// add it to the list
 					proposals.add(proposal);
 				}
@@ -89,8 +72,7 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		catch (Exception e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Activator.log(e);
 		}
 
 		// sort by display name
@@ -105,5 +87,42 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 
 		// return results
 		return proposals.toArray(new ICompletionProposal[proposals.size()]);
+	}
+
+	protected CommonCompletionProposal createProposal(int offset, String prefix, String value)
+	{
+		String description = ""; //$NON-NLS-1$
+		int replaceLength = prefix.length();
+		int length = value.length();
+		String displayName = value;
+		Image image = null;
+		IContextInformation contextInfo = null;
+		// build proposal
+		return new CommonCompletionProposal(value, offset - replaceLength, replaceLength, length, image, displayName,
+				contextInfo, description);
+	}
+
+	protected String getPrefix(ITextViewer viewer, int offset) throws BadLocationException
+	{
+		IDocument doc = viewer.getDocument();
+		IRegion lineInfo = doc.getLineInformationOfOffset(offset);
+		String linePrefix = doc.get(lineInfo.getOffset(), offset - lineInfo.getOffset());
+		// find last period/space/:
+		int indexOfPeriod = linePrefix.lastIndexOf('.');
+		if (indexOfPeriod != -1)
+		{
+			linePrefix = linePrefix.substring(indexOfPeriod + 1);
+		}
+		indexOfPeriod = linePrefix.lastIndexOf(':');
+		if (indexOfPeriod != -1)
+		{
+			linePrefix = linePrefix.substring(indexOfPeriod + 1);
+		}
+		indexOfPeriod = linePrefix.lastIndexOf(' ');
+		if (indexOfPeriod != -1)
+		{
+			linePrefix = linePrefix.substring(indexOfPeriod + 1);
+		}
+		return linePrefix;
 	}
 }
