@@ -149,9 +149,14 @@ public class JSNode extends ParseBaseNode
 	 */
 	public DocumentationBlock getDocumentationBlock()
 	{
-		if (this.fDocumentationBlock == null)
+		if (fDocumentationBlock == null)
 		{
-			// look up block
+			IParseNode root = this.getRootNode();
+			
+			if (root instanceof JSParseRootNode)
+			{
+				fDocumentationBlock = ((JSParseRootNode) root).findDocumentationBlock(this);
+			}
 		}
 		
 		return this.fDocumentationBlock;
