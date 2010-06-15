@@ -32,6 +32,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 
+import com.aptana.ui.epl.scripting.snippets.PositionBasedCompletionProposal;
+
 public class SnippetTemplateProposal extends TemplateProposal implements ICompletionProposalExtension6
 {
 
