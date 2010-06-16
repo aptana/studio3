@@ -18,8 +18,8 @@ import org.eclipse.jface.text.hyperlink.URLHyperlinkDetector;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 
-import com.aptana.editor.common.outline.IPathResolver;
 import com.aptana.editor.common.outline.PathResolverProvider;
+import com.aptana.editor.common.resolver.IPathResolver;
 
 public class HyperlinkDetector extends URLHyperlinkDetector
 {

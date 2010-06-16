@@ -44,7 +44,8 @@ import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
 
-import com.aptana.editor.common.internal.outline.URIResolver;
+import com.aptana.editor.common.resolver.IPathResolver;
+import com.aptana.editor.common.resolver.URIResolver;
 
 /**
  * @author Pavel Petrochenko
@@ -58,7 +59,7 @@ public final class PathResolverProvider
 	private static final class NullResolver implements IPathResolver
 	{
 		/**
-		 * @see com.aptana.ide.views.outline.IPathResolver#resolveSource(java.lang.String)
+		 * @see com.aptana.editor.common.resolver.ide.views.outline.IPathResolver#resolveSource(java.lang.String)
 		 */
 		public String resolveSource(String path, IProgressMonitor monitor) throws Exception
 		{

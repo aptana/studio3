@@ -42,13 +42,13 @@ public abstract class ProcessUtil
 		return IOUtil.read(stream, "UTF-8"); //$NON-NLS-1$
 	}
 
-	public static Map<Integer, String> runInBackground(String command, IPath workingDir, String[] args)
+	public static Map<Integer, String> runInBackground(String command, IPath workingDir, String... args)
 	{
 		return runInBackground(command, workingDir, null, args);
 	}
 
 	public static Map<Integer, String> runInBackground(String command, IPath workingDir, Map<String, String> env,
-			String[] args)
+			String... args)
 	{
 		return runInBackground(command, workingDir, null, env, args);
 	}
@@ -130,7 +130,7 @@ public abstract class ProcessUtil
 	 * @return
 	 */
 	public static Map<Integer, String> runInBackground(String command, IPath workingDirectory, String input,
-			Map<String, String> environment, String[] arguments)
+			Map<String, String> environment, String... arguments)
 	{
 		try
 		{
