@@ -5,6 +5,7 @@ import java.util.EnumSet;
 public enum SDocTokenType
 {
 	UNDEFINED,			// -1
+	
 	EOF,				// 0
 	IDENTIFIER,			// 1
 	RCURLY,				// 2
@@ -46,8 +47,10 @@ public enum SDocTokenType
 	LESS_THAN,			// 38
 	GREATER_THAN,		// 39
 	START_DOCUMENTATION,// 40
+	
 	WHITESPACE,			// 41
-	TYPES;				// 42
+	TYPES,				// 42
+	VALUE;				// 43
 	
 	private short _index;
 
