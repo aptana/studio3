@@ -178,7 +178,7 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 					
 					if (block != null)
 					{
-						System.out.println("Found block for " + symbol + "\n" + block.toSource());
+//						System.out.println("Found block for " + symbol + "\n" + block.toSource());
 					}
 					
 					if (node instanceof JSFunctionNode)
