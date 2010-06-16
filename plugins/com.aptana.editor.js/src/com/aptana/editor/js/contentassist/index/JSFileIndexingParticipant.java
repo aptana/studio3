@@ -174,7 +174,7 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 				
 				for (JSNode node : nodes)
 				{
-					DocumentationBlock block = node.getDocumentationBlock();
+					DocumentationBlock block = node.getDocumentation();
 					
 					if (block != null)
 					{
