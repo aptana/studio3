@@ -24,10 +24,10 @@ import com.aptana.editor.ruby.IRubyConstants;
 import com.aptana.editor.ruby.parsing.ISourceElementRequestor;
 import com.aptana.editor.ruby.parsing.RubySourceParser;
 import com.aptana.editor.ruby.parsing.SourceElementVisitor;
-import com.aptana.index.core.IFileIndexingParticipant;
+import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
 
-public class RubyFileIndexingParticipant implements IFileIndexingParticipant
+public class RubyFileIndexingParticipant implements IFileStoreIndexingParticipant
 {
 
 	private static final String RUBY_EXTENSION = "rb"; //$NON-NLS-1$

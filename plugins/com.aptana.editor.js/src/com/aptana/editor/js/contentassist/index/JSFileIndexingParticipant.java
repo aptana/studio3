@@ -24,7 +24,7 @@ import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.editor.js.parsing.JSParseState;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
-import com.aptana.index.core.IFileIndexingParticipant;
+import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.IParserPool;
@@ -32,7 +32,7 @@ import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.Scope;
 import com.aptana.parsing.ast.IParseNode;
 
-public class JSFileIndexingParticipant implements IFileIndexingParticipant
+public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 {
 	private static final String JS_EXTENSION = "js"; //$NON-NLS-1$
 

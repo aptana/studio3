@@ -124,7 +124,7 @@ public class ResourceIndexer implements IResourceChangeListener
 		@Override
 		public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException
 		{
-			IFileIndexingParticipant[] participants = getFileIndexingParticipants();
+			IFileStoreIndexingParticipant[] participants = getFileIndexingParticipants();
 			SubMonitor sub = SubMonitor.convert(monitor, (participants.length + 1) * files.size());
 			if (sub.isCanceled())
 			{
@@ -161,7 +161,7 @@ public class ResourceIndexer implements IResourceChangeListener
 					// TODO Limit file indexers by content type here so we don't have to check content type for each file in every indexer! indexers should/could register what content types they handle and then we can pre-filter here!
 					// To do so, we'd need to keep a mapping from the store to the content types it matches
 				}
-				for (IFileIndexingParticipant fileIndexingParticipant : participants)
+				for (IFileStoreIndexingParticipant fileIndexingParticipant : participants)
 				{
 					if (sub.isCanceled())
 					{
@@ -446,10 +446,10 @@ public class ResourceIndexer implements IResourceChangeListener
 	 *
 	 * @return
 	 */
-	public static IFileIndexingParticipant[] getFileIndexingParticipants()
+	public static IFileStoreIndexingParticipant[] getFileIndexingParticipants()
 	{
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		List<IFileIndexingParticipant> fileIndexingParticipants = new ArrayList<IFileIndexingParticipant>();
+		List<IFileStoreIndexingParticipant> fileIndexingParticipants = new ArrayList<IFileStoreIndexingParticipant>();
 
 		if (registry != null)
 		{
@@ -470,7 +470,7 @@ public class ResourceIndexer implements IResourceChangeListener
 						{
 							try
 							{
-								IFileIndexingParticipant fileIndexingParticipant = (IFileIndexingParticipant) element
+								IFileStoreIndexingParticipant fileIndexingParticipant = (IFileStoreIndexingParticipant) element
 										.createExecutableExtension(ATTR_CLASS);
 
 								fileIndexingParticipants.add(fileIndexingParticipant);
@@ -485,6 +485,6 @@ public class ResourceIndexer implements IResourceChangeListener
 			}
 		}
 
-		return fileIndexingParticipants.toArray(new IFileIndexingParticipant[fileIndexingParticipants.size()]);
+		return fileIndexingParticipants.toArray(new IFileStoreIndexingParticipant[fileIndexingParticipants.size()]);
 	}
 }

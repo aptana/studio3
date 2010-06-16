@@ -23,7 +23,7 @@ import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.css.parsing.ast.CSSAttributeSelectorNode;
 import com.aptana.editor.css.parsing.ast.CSSRuleNode;
 import com.aptana.editor.css.parsing.ast.CSSTermNode;
-import com.aptana.index.core.IFileIndexingParticipant;
+import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.IParserPool;
@@ -31,7 +31,7 @@ import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 
-public class CSSFileIndexingParticipant implements IFileIndexingParticipant
+public class CSSFileIndexingParticipant implements IFileStoreIndexingParticipant
 {
 	private static final String CSS_EXTENSION = "css"; //$NON-NLS-1$
 
