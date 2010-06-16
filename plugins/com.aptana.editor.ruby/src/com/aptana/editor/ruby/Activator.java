@@ -2,6 +2,7 @@ package com.aptana.editor.ruby;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
@@ -35,6 +36,11 @@ public class Activator extends AbstractUIPlugin
 	{
 		super.start(context);
 		plugin = this;
+		// Schedule a job to stub out core library for ruby, then index it
+		Job job = new CoreStubber();
+		job.setSystem(true);
+		job.setPriority(Job.LONG);
+		job.schedule();
 	}
 
 	/*
