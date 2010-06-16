@@ -22,7 +22,7 @@ public class JSNode extends ParseBaseNode
 	private boolean fSemicolonIncluded;
 
 	private DocumentationBlock fDocumentation;
-	private List<String> fReturnTypes;
+	private List<String> fTypes;
 
 	/**
 	 * static initializer
@@ -165,20 +165,20 @@ public class JSNode extends ParseBaseNode
 	}
 
 	/**
-	 * getReturnTypes
+	 * getTypes
 	 * 
 	 * @return
 	 */
-	public List<String> getReturnTypes()
+	public List<String> getTypes()
 	{
-		if (fReturnTypes == null)
+		if (fTypes == null)
 		{
-			fReturnTypes = new ArrayList<String>();
+			fTypes = new ArrayList<String>();
 
-			addReturnTypes(fReturnTypes);
+			addReturnTypes(fTypes);
 		}
 
-		return fReturnTypes;
+		return fTypes;
 	}
 
 	/**
