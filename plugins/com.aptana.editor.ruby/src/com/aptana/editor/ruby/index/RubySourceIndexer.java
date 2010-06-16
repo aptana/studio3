@@ -2,9 +2,6 @@ package com.aptana.editor.ruby.index;
 
 import java.util.Stack;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.Path;
-
 import com.aptana.editor.ruby.core.IRubyMethod.Visibility;
 import com.aptana.editor.ruby.parsing.ISourceElementRequestor;
 import com.aptana.index.core.Index;
@@ -12,20 +9,20 @@ import com.aptana.index.core.Index;
 public class RubySourceIndexer implements ISourceElementRequestor
 {
 	private static final String NAMESPACE_DELIMETER = "::"; //$NON-NLS-1$
-	
+
 	private Stack<TypeInfo> typeStack = new Stack<TypeInfo>();
 	private Index index;
-	private IFile file;
+	private String documentPath;
 
-	public RubySourceIndexer(Index index, IFile file)
+	public RubySourceIndexer(Index index, String documentPath)
 	{
 		this.index = index;
-		this.file = file;
+		this.documentPath = documentPath;
 	}
 
-	private static void addIndex(Index index, IFile file, String category, String word)
+	private void addIndex(String category, String word)
 	{
-		index.addEntry(category, word, file.getProjectRelativePath().toPortableString());
+		index.addEntry(category, word, documentPath);
 	}
 
 	@Override
@@ -60,16 +57,15 @@ public class RubySourceIndexer implements ISourceElementRequestor
 	{
 		String simpleName = getSimpleName(type.name);
 		String[] enclosingTypes = getEnclosingTypeNames(type.name);
-		addClassDeclaration(type.isModule, simpleName, enclosingTypes, type.superclass, type.modules,
-				type.secondary);
+		addClassDeclaration(type.isModule, simpleName, enclosingTypes, type.superclass, type.modules, type.secondary);
 		typeStack.push(type);
 	}
 
-	private void addClassDeclaration(boolean isModule, String simpleName, String[] enclosingTypes,
-			String superclass, String[] modules, boolean secondary)
+	private void addClassDeclaration(boolean isModule, String simpleName, String[] enclosingTypes, String superclass,
+			String[] modules, boolean secondary)
 	{
 		String indexKey = createTypeDeclarationKey(isModule, simpleName, enclosingTypes, secondary);
-		addIndex(index, file, IRubyIndexConstants.TYPE_DECL, indexKey);
+		addIndex(IRubyIndexConstants.TYPE_DECL, indexKey);
 
 		if (superclass != null && !superclass.equals(IRubyIndexConstants.OBJECT))
 		{
@@ -77,11 +73,9 @@ public class RubySourceIndexer implements ISourceElementRequestor
 		}
 
 		addIndex(
-				index,
-				file,
 				IRubyIndexConstants.SUPER_REF,
-				createSuperTypeReferenceKey(isModule, simpleName, enclosingTypes,
-						IRubyIndexConstants.CLASS_SUFFIX, superclass, IRubyIndexConstants.CLASS_SUFFIX));
+				createSuperTypeReferenceKey(isModule, simpleName, enclosingTypes, IRubyIndexConstants.CLASS_SUFFIX,
+						superclass, IRubyIndexConstants.CLASS_SUFFIX));
 		if (modules != null)
 		{
 			for (String module : modules)
@@ -93,11 +87,7 @@ public class RubySourceIndexer implements ISourceElementRequestor
 	}
 
 	/**
-	 * Generates a key of the form:
-	 * 
-	 * TypeName/namespace/(M|C)/S
-	 * 
-	 * i.e. "Base/ActiveRecord/C"
+	 * Generates a key of the form: TypeName/namespace/(M|C)/S i.e. "Base/ActiveRecord/C"
 	 * 
 	 * @param isModule
 	 * @param typeName
@@ -106,8 +96,8 @@ public class RubySourceIndexer implements ISourceElementRequestor
 	 * @param secondary
 	 * @return
 	 */
-	private String createTypeDeclarationKey(boolean isModule, String typeName,
-			String[] enclosingTypeNames, boolean secondary)
+	private String createTypeDeclarationKey(boolean isModule, String typeName, String[] enclosingTypeNames,
+			boolean secondary)
 	{
 		int typeNameLength = typeName == null ? 0 : typeName.length();
 		int enclosingNamesLength = 0;
@@ -188,19 +178,18 @@ public class RubySourceIndexer implements ISourceElementRequestor
 
 	public void enterConstructor(MethodInfo constructor)
 	{
-		addIndex(index, file, IRubyIndexConstants.CONSTRUCTOR_DECL,
+		addIndex(IRubyIndexConstants.CONSTRUCTOR_DECL,
 				createMethodKey(getSimpleName(constructor.name), constructor.parameterNames.length));
 	}
 
 	public void enterField(FieldInfo field)
 	{
-		addIndex(index, file, IRubyIndexConstants.FIELD_DECL, field.name);
+		addIndex(IRubyIndexConstants.FIELD_DECL, field.name);
 	}
 
 	public void enterMethod(MethodInfo method)
 	{
-		addIndex(index, file, IRubyIndexConstants.METHOD_DECL,
-				createMethodKey(method.name, method.parameterNames.length));
+		addIndex(IRubyIndexConstants.METHOD_DECL, createMethodKey(method.name, method.parameterNames.length));
 	}
 
 	@Override
@@ -216,7 +205,7 @@ public class RubySourceIndexer implements ISourceElementRequestor
 
 	private void addTypeReference(String name)
 	{
-		addIndex(index, file, IRubyIndexConstants.REF, getSimpleName(name));
+		addIndex(IRubyIndexConstants.REF, getSimpleName(name));
 	}
 
 	private String lastSegment(String name, String delimeter)
@@ -241,26 +230,24 @@ public class RubySourceIndexer implements ISourceElementRequestor
 	@Override
 	public void acceptMixin(String moduleName)
 	{
-		addIndex(index, file, IRubyIndexConstants.REF, getSimpleName(moduleName));
+		addIndex(IRubyIndexConstants.REF, getSimpleName(moduleName));
 
 		TypeInfo info = typeStack.peek();
 		String[] enclosingTypes = getEnclosingTypeNames(info.name);
 		addIncludedModuleReference(info.isModule, getSimpleName(info.name), enclosingTypes, moduleName);
 	}
 
-	private void addIncludedModuleReference(boolean isModule, String simpleName,
-			String[] enclosingTypes, String moduleName)
+	private void addIncludedModuleReference(boolean isModule, String simpleName, String[] enclosingTypes,
+			String moduleName)
 	{
 		addIndex(
-				index,
-				file,
 				IRubyIndexConstants.SUPER_REF,
-				createSuperTypeReferenceKey(isModule, simpleName, enclosingTypes,
-						IRubyIndexConstants.CLASS_SUFFIX, moduleName, IRubyIndexConstants.MODULE_SUFFIX));
+				createSuperTypeReferenceKey(isModule, simpleName, enclosingTypes, IRubyIndexConstants.CLASS_SUFFIX,
+						moduleName, IRubyIndexConstants.MODULE_SUFFIX));
 	}
 
-	private String createSuperTypeReferenceKey(boolean isModule, String typeName,
-			String[] enclosingTypeNames, char classOrModule, String superTypeName, char superClassOrModule)
+	private String createSuperTypeReferenceKey(boolean isModule, String typeName, String[] enclosingTypeNames,
+			char classOrModule, String superTypeName, char superClassOrModule)
 	{
 		if (superTypeName == null)
 			superTypeName = IRubyIndexConstants.OBJECT;
@@ -326,7 +313,7 @@ public class RubySourceIndexer implements ISourceElementRequestor
 			System.arraycopy(enclosingTypeName.toCharArray(), 0, result, pos, enclosingLength);
 			pos += enclosingLength;
 		}
-		
+
 		result[pos++] = IRubyIndexConstants.SEPARATOR;
 		result[pos++] = superClassOrModule;
 		result[pos++] = classOrModule;
@@ -366,7 +353,7 @@ public class RubySourceIndexer implements ISourceElementRequestor
 	@Override
 	public void acceptMethodReference(String name, int argCount, int offset)
 	{
-		addIndex(index, file, IRubyIndexConstants.METHOD_REF, createMethodKey(name, argCount));
+		addIndex(IRubyIndexConstants.METHOD_REF, createMethodKey(name, argCount));
 	}
 
 	private String createMethodKey(String name, int argCount)
@@ -377,25 +364,27 @@ public class RubySourceIndexer implements ISourceElementRequestor
 	@Override
 	public void acceptImport(String value, int startOffset, int endOffset)
 	{
-		IFile requireFile = file.getParent().getFile(new Path(value));
-		if (requireFile.exists())
-		{
-			addIndex(index, file, IRubyIndexConstants.REQUIRE, requireFile.getProjectRelativePath().toPortableString());
-		}
+		// FIXME This is really, really bad. requires are relative to loadpaths, which are dynamic.
+		// IFile requireFile = file.getParent().getFile(new Path(value));
+		// if (requireFile.exists())
+		// {
+		// addIndex(IRubyIndexConstants.REQUIRE, requireFile.getProjectRelativePath().toPortableString());
+		// }
+		addIndex(IRubyIndexConstants.REQUIRE, value);
 	}
 
 	@Override
 	public void acceptFieldReference(String name, int offset)
 	{
-		addIndex(index, file, IRubyIndexConstants.REF, name);
+		addIndex(IRubyIndexConstants.REF, name);
 	}
 
 	@Override
 	public void acceptConstructorReference(String name, int argCount, int offset)
 	{
 		String simpleTypeName = getSimpleName(name);
-		addIndex(index, file, IRubyIndexConstants.REF, simpleTypeName);
-		addIndex(index, file, IRubyIndexConstants.CONSTRUCTOR_REF, createMethodKey(simpleTypeName, argCount));
+		addIndex(IRubyIndexConstants.REF, simpleTypeName);
+		addIndex(IRubyIndexConstants.CONSTRUCTOR_REF, createMethodKey(simpleTypeName, argCount));
 	}
 
 	@Override

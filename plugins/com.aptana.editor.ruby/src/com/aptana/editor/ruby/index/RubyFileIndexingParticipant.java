@@ -4,9 +4,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
 
-import org.eclipse.core.resources.IFile;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
 import org.jrubyparser.ast.Node;
@@ -27,25 +31,29 @@ public class RubyFileIndexingParticipant implements IFileIndexingParticipant
 	private static final String RUBY_EXTENSION = "rb"; //$NON-NLS-1$
 
 	@Override
-	public void index(Set<IFile> files, final Index index, IProgressMonitor monitor)
+	public void index(Set<IFileStore> files, final Index index, IProgressMonitor monitor)
 	{
-		for (final IFile file : files)
+		SubMonitor sub = SubMonitor.convert(monitor, files.size());
+		for (final IFileStore store : files)
 		{
-			if (!isRubyFile(file))
+			if (store == null)
+				continue;
+			sub.subTask(store.getName());
+			if (!isRubyFile(store))
 				continue;
 			try
 			{
 				// grab the source of the file we're going to parse
-				String source = IOUtil.read(file.getContents());
+				String source = IOUtil.read(store.openInputStream(EFS.NONE, monitor));
 
 				// minor optimization when creating a new empty file
 				if (source != null && source.length() > 0)
 				{
 
 					RubySourceParser sourceParser = new RubySourceParser();
-					ParserResult result = sourceParser.parse(file.getName(), source);
+					ParserResult result = sourceParser.parse(store.getName(), source);
 					Node root = result.getAST();
-					ISourceElementRequestor builder = new RubySourceIndexer(index, file);
+					ISourceElementRequestor builder = new RubySourceIndexer(index, store.toURI().getPath());
 					SourceElementVisitor visitor = new SourceElementVisitor(builder);
 					visitor.acceptNode(root);
 				}
@@ -54,16 +62,17 @@ public class RubyFileIndexingParticipant implements IFileIndexingParticipant
 			{
 				Activator.log(e);
 			}
+			sub.worked(1);
 		}
 	}
 
-	private boolean isRubyFile(IFile file)
+	private boolean isRubyFile(IFileStore file)
 	{
 		InputStream stream = null;
 		IContentTypeManager manager = Platform.getContentTypeManager();
 		try
 		{
-			stream = file.getContents();
+			stream = file.openInputStream(EFS.NONE, new NullProgressMonitor());
 			IContentType[] types = manager.findContentTypesFor(stream, file.getName());
 			for (IContentType type : types)
 			{
@@ -89,6 +98,6 @@ public class RubyFileIndexingParticipant implements IFileIndexingParticipant
 			}
 		}
 
-		return RUBY_EXTENSION.equalsIgnoreCase(file.getFileExtension());
+		return RUBY_EXTENSION.equalsIgnoreCase(new Path(file.getName()).getFileExtension());
 	}
 }

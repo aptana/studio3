@@ -4,9 +4,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
 
-import org.eclipse.core.resources.IFile;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.content.IContentType;
@@ -35,13 +38,13 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public void index(Set<IFile> files, Index index, IProgressMonitor monitor)
+	public void index(Set<IFileStore> files, Index index, IProgressMonitor monitor)
 	{
-		monitor = SubMonitor.convert(monitor, files.size());
+		SubMonitor sub = SubMonitor.convert(monitor, files.size());
 
-		for (IFile file : files)
+		for (IFileStore file : files)
 		{
-			if (monitor.isCanceled())
+			if (sub.isCanceled())
 			{
 				return;
 			}
@@ -53,12 +56,12 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 					continue;
 				}
 
-				monitor.subTask(file.getLocation().toPortableString());
+				sub.subTask(file.getName());
 
 				try
 				{
 					// grab the source of the file we're going to parse
-					String source = IOUtil.read(file.getContents());
+					String source = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(-1)));
 
 					// minor optimization when creating a new empty file
 					if (source != null && source.length() > 0)
@@ -95,7 +98,7 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 			}
 			finally
 			{
-				monitor.worked(1);
+				sub.worked(1);
 			}
 		}
 
@@ -108,14 +111,14 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 	 * @param file
 	 * @return
 	 */
-	private boolean isJSFile(IFile file)
+	private boolean isJSFile(IFileStore file)
 	{
 		InputStream stream = null;
 		IContentTypeManager manager = Platform.getContentTypeManager();
 
 		try
 		{
-			stream = file.getContents();
+			stream = file.openInputStream(EFS.NONE, new NullProgressMonitor());
 
 			IContentType[] types = manager.findContentTypesFor(stream, file.getName());
 
@@ -146,7 +149,7 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 			}
 		}
 
-		return JS_EXTENSION.equalsIgnoreCase(file.getFileExtension());
+		return JS_EXTENSION.equalsIgnoreCase(new Path(file.getName()).getFileExtension());
 	}
 
 	/**
@@ -156,10 +159,10 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 	 * @param file
 	 * @param ast
 	 */
-	private void walkAST(Index index, IFile file, IParseNode ast)
+	private void walkAST(Index index, IFileStore file, IParseNode ast)
 	{
 		JSASTQueryHelper astHelper = new JSASTQueryHelper();
-		String location = file.getProjectRelativePath().toPortableString();
+		String location = file.toURI().getPath();
 
 		for (String name : astHelper.getChildFunctions(ast))
 		{

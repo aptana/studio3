@@ -3,6 +3,7 @@ package com.aptana.index.core;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -10,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -147,14 +150,24 @@ public class ResourceIndexer implements IResourceChangeListener
 					sub.worked(1);
 				}
 
+				
+				Set<IFileStore> fileStores = new HashSet<IFileStore>();
+				for (IFile file : files)
+				{
+					IFileStore store = EFS.getStore(file.getLocationURI());
+					if (store == null)
+						continue;
+					fileStores.add(store);
+					// TODO Limit file indexers by content type here so we don't have to check content type for each file in every indexer! indexers should/could register what content types they handle and then we can pre-filter here!
+					// To do so, we'd need to keep a mapping from the store to the content types it matches
+				}
 				for (IFileIndexingParticipant fileIndexingParticipant : participants)
 				{
 					if (sub.isCanceled())
 					{
 						return Status.CANCEL_STATUS;
 					}
-					// TODO Limit file indexers by content type here so we don't have to check content type for each file in every indexer! indexers should/could register what content types they handle and then we can pre-filter here!
-					fileIndexingParticipant.index(files, index, sub.newChild(files.size()));
+					fileIndexingParticipant.index(fileStores, index, sub.newChild(fileStores.size()));
 				}
 
 			}
