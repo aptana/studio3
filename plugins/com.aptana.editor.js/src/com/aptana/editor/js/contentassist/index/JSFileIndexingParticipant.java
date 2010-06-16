@@ -21,6 +21,7 @@ import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
+import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.index.core.IFileIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.IParser;
@@ -173,6 +174,13 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 				
 				for (JSNode node : nodes)
 				{
+					DocumentationBlock block = node.getDocumentationBlock();
+					
+					if (block != null)
+					{
+						System.out.println("Found block for " + symbol + "\n" + block.toSource());
+					}
+					
 					if (node instanceof JSFunctionNode)
 					{
 						category = JSIndexConstants.FUNCTION;
