@@ -72,16 +72,20 @@ public class RubySourceIndexer implements ISourceElementRequestor
 			addTypeReference(superclass);
 		}
 
-		addIndex(
-				IRubyIndexConstants.SUPER_REF,
-				createSuperTypeReferenceKey(isModule, simpleName, enclosingTypes, IRubyIndexConstants.CLASS_SUFFIX,
-						superclass, IRubyIndexConstants.CLASS_SUFFIX));
+		if (!isModule)
+		{
+			// We know that both class and superclass must be classes because Modules can't have subclasses
+			addIndex(
+					IRubyIndexConstants.SUPER_REF,
+					createSuperTypeReferenceKey(simpleName, enclosingTypes, IRubyIndexConstants.CLASS_SUFFIX,
+							superclass, IRubyIndexConstants.CLASS_SUFFIX));
+		}
 		if (modules != null)
 		{
 			for (String module : modules)
 			{
 				addTypeReference(module);
-				addIncludedModuleReference(isModule, simpleName, enclosingTypes, module);
+				addIncludedModuleReference(simpleName, enclosingTypes, module);
 			}
 		}
 	}
@@ -99,59 +103,28 @@ public class RubySourceIndexer implements ISourceElementRequestor
 	private String createTypeDeclarationKey(boolean isModule, String typeName, String[] enclosingTypeNames,
 			boolean secondary)
 	{
-		int typeNameLength = typeName == null ? 0 : typeName.length();
-		int enclosingNamesLength = 0;
-		if (enclosingTypeNames != null)
+		StringBuilder builder = new StringBuilder();
+		builder.append(typeName);
+		builder.append(IRubyIndexConstants.SEPARATOR);
+		if (enclosingTypeNames != null && enclosingTypeNames.length > 0)
 		{
-			for (int i = 0, length = enclosingTypeNames.length; i < length;)
+			for (String enclosingName : enclosingTypeNames)
 			{
-				enclosingNamesLength += enclosingTypeNames[i].length();
-				if (++i < length)
-					enclosingNamesLength += 2; // for the "::" separator
+				builder.append(enclosingName);
+				builder.append(NAMESPACE_DELIMETER);
 			}
+			builder.delete(builder.length() - 2, builder.length());
 		}
+		builder.append(IRubyIndexConstants.SEPARATOR);
 
-		int resultLength = typeNameLength + enclosingNamesLength + 5;
-		if (secondary)
-			resultLength += 2;
-		char[] result = new char[resultLength];
-		int pos = 0;
-		if (typeNameLength > 0)
-		{
-			System.arraycopy(typeName.toCharArray(), 0, result, pos, typeNameLength);
-			pos += typeNameLength;
-		}
-		result[pos++] = IRubyIndexConstants.SEPARATOR;
-		if (enclosingTypeNames != null && enclosingNamesLength > 0)
-		{
-			for (int i = 0, length = enclosingTypeNames.length; i < length;)
-			{
-				String enclosingName = enclosingTypeNames[i];
-				int itsLength = enclosingName.length();
-				System.arraycopy(enclosingName.toCharArray(), 0, result, pos, itsLength);
-				pos += itsLength;
-				if (++i < length)
-				{
-					result[pos++] = ':';
-					result[pos++] = ':';
-				}
-			}
-		}
-		result[pos++] = IRubyIndexConstants.SEPARATOR;
-		if (isModule)
-		{
-			result[pos++] = IRubyIndexConstants.MODULE_SUFFIX;
-		}
-		else
-		{
-			result[pos++] = IRubyIndexConstants.CLASS_SUFFIX;
-		}
+		builder.append(isModule ? IRubyIndexConstants.MODULE_SUFFIX : IRubyIndexConstants.CLASS_SUFFIX);
+
 		if (secondary)
 		{
-			result[++pos] = IRubyIndexConstants.SEPARATOR;
-			result[++pos] = 'S';
+			builder.append(IRubyIndexConstants.SEPARATOR);
+			builder.append('S');
 		}
-		return new String(result);
+		return builder.toString();
 	}
 
 	private String[] getEnclosingTypeNames(String typeName)
@@ -200,7 +173,7 @@ public class RubySourceIndexer implements ISourceElementRequestor
 		else if (Character.isUpperCase(field.name.charAt(0)))
 		{
 			category = IRubyIndexConstants.CONSTANT_DECL;
-		}		
+		}
 		addIndex(category, field.name);
 	}
 
@@ -251,23 +224,35 @@ public class RubySourceIndexer implements ISourceElementRequestor
 
 		TypeInfo info = typeStack.peek();
 		String[] enclosingTypes = getEnclosingTypeNames(info.name);
-		addIncludedModuleReference(info.isModule, getSimpleName(info.name), enclosingTypes, moduleName);
+		addIncludedModuleReference(getSimpleName(info.name), enclosingTypes, moduleName);
 	}
 
-	private void addIncludedModuleReference(boolean isModule, String simpleName, String[] enclosingTypes,
-			String moduleName)
+	private void addIncludedModuleReference(String simpleName, String[] enclosingTypes, String moduleName)
 	{
 		addIndex(
 				IRubyIndexConstants.SUPER_REF,
-				createSuperTypeReferenceKey(isModule, simpleName, enclosingTypes, IRubyIndexConstants.CLASS_SUFFIX,
-						moduleName, IRubyIndexConstants.MODULE_SUFFIX));
+				createSuperTypeReferenceKey(simpleName, enclosingTypes, IRubyIndexConstants.CLASS_SUFFIX, moduleName,
+						IRubyIndexConstants.MODULE_SUFFIX));
 	}
 
-	private String createSuperTypeReferenceKey(boolean isModule, String typeName, String[] enclosingTypeNames,
-			char classOrModule, String superTypeName, char superClassOrModule)
+	/**
+	 * SuperTypeName(Simple)/SuperTypeNamespace/SimpleName/EnclosingTypeName/SuperIsClassOrModule(M|C)
+	 * isClassorModule(M|C)
+	 * 
+	 * @param typeName
+	 * @param enclosingTypeNames
+	 * @param classOrModule
+	 * @param superTypeName
+	 * @param superClassOrModule
+	 * @return
+	 */
+	private String createSuperTypeReferenceKey(String typeName, String[] enclosingTypeNames, char classOrModule,
+			String superTypeName, char superClassOrModule)
 	{
 		if (superTypeName == null)
+		{
 			superTypeName = IRubyIndexConstants.OBJECT;
+		}
 		String superSimpleName = lastSegment(superTypeName, NAMESPACE_DELIMETER);
 		char[] superQualification = null;
 		if (!superTypeName.equals(superSimpleName))
@@ -299,48 +284,19 @@ public class RubySourceIndexer implements ISourceElementRequestor
 		String simpleName = lastSegment(typeName, NAMESPACE_DELIMETER);
 		String enclosingTypeName = join(enclosingTypeNames, NAMESPACE_DELIMETER);
 
-		// superSimpleName / superQualification / simpleName / enclosingTypeName /
-		// superClassOrModule classOrModule modifiers
-		int superLength = superSimpleName == null ? 0 : superSimpleName.length();
-		int superQLength = superQualification == null ? 0 : superQualification.length;
-		int simpleLength = simpleName == null ? 0 : simpleName.length();
-		int enclosingLength = enclosingTypeName == null ? 0 : enclosingTypeName.length();
-		char[] result = new char[superLength + superQLength + simpleLength + enclosingLength + 8];
-		int pos = 0;
-		if (superLength > 0)
-		{
-			System.arraycopy(superSimpleName.toCharArray(), 0, result, pos, superLength);
-			pos += superLength;
-		}
-		result[pos++] = IRubyIndexConstants.SEPARATOR;
-		if (superQLength > 0)
-		{
-			System.arraycopy(superQualification, 0, result, pos, superQLength);
-			pos += superQLength;
-		}
-		result[pos++] = IRubyIndexConstants.SEPARATOR;
-		if (simpleLength > 0)
-		{
-			System.arraycopy(simpleName.toCharArray(), 0, result, pos, simpleLength);
-			pos += simpleLength;
-		}
-		result[pos++] = IRubyIndexConstants.SEPARATOR;
-		if (enclosingLength > 0)
-		{
-			System.arraycopy(enclosingTypeName.toCharArray(), 0, result, pos, enclosingLength);
-			pos += enclosingLength;
-		}
+		StringBuilder builder = new StringBuilder();
+		builder.append(superSimpleName);
+		builder.append(IRubyIndexConstants.SEPARATOR);
+		builder.append(superQualification);
+		builder.append(IRubyIndexConstants.SEPARATOR);
+		builder.append(simpleName);
+		builder.append(IRubyIndexConstants.SEPARATOR);
+		builder.append(enclosingTypeName);
+		builder.append(IRubyIndexConstants.SEPARATOR);
+		builder.append(superClassOrModule);
+		builder.append(classOrModule);
 
-		result[pos++] = IRubyIndexConstants.SEPARATOR;
-		result[pos++] = superClassOrModule;
-		result[pos++] = classOrModule;
-		int modifiers = 0;
-		if (isModule)
-		{
-			modifiers = 1;
-		}
-		result[pos] = (char) modifiers;
-		return new String(result);
+		return builder.toString();
 	}
 
 	private String join(String[] enclosingTypeNames, String string)
