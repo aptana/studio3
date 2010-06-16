@@ -184,7 +184,24 @@ public class RubySourceIndexer implements ISourceElementRequestor
 
 	public void enterField(FieldInfo field)
 	{
-		addIndex(IRubyIndexConstants.FIELD_DECL, field.name);
+		String category = IRubyIndexConstants.LOCAL_DECL;
+		if (field.name.startsWith("@@")) //$NON-NLS-1$
+		{
+			category = IRubyIndexConstants.FIELD_DECL;
+		}
+		else if (field.name.startsWith("@")) //$NON-NLS-1$
+		{
+			category = IRubyIndexConstants.FIELD_DECL;
+		}
+		else if (field.name.startsWith("$")) //$NON-NLS-1$
+		{
+			category = IRubyIndexConstants.GLOBAL_DECL;
+		}
+		else if (Character.isUpperCase(field.name.charAt(0)))
+		{
+			category = IRubyIndexConstants.CONSTANT_DECL;
+		}		
+		addIndex(category, field.name);
 	}
 
 	public void enterMethod(MethodInfo method)

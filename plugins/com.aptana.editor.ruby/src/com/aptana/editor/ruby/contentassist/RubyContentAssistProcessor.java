@@ -1,11 +1,15 @@
 package com.aptana.editor.ruby.contentassist;
 
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -13,6 +17,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.texteditor.HippieProposalProcessor;
 
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.ProcessUtil;
@@ -55,18 +60,18 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
 			boolean autoActivated)
 	{
-		// create proposal container
-		Map<String, CommonCompletionProposal> proposalMap = new HashMap<String, CommonCompletionProposal>();
-
+		Map<String, CommonCompletionProposal> proposalMap = new HashMap<String, CommonCompletionProposal>();		
+		// FIXME What about completions of stuff added to current file since last save? Do we need to hit up AST?
 		try
 		{
 			String prefix = getPrefix(viewer, offset);
+			// FIXME This is a giant hack. We try to only search project index for vars/methods/types in current file if no prefix.
+			// If there is a prefix, widen to Ruby Core, Std Lib and project and limit categories based on prefix (plus preceding space/./::)
 			List<QueryResult> results = new ArrayList<QueryResult>();
-			List<Index> indices = getIndices();
+			List<Index> indices = getIndices(prefix);
 			for (Index index : indices)
 			{
-				List<QueryResult> partialResults = index.query(new String[] { IRubyIndexConstants.FIELD_DECL,
-						IRubyIndexConstants.METHOD_DECL, IRubyIndexConstants.TYPE_DECL }, prefix,
+				List<QueryResult> partialResults = index.query(getCategories(index, prefix, viewer, offset), prefix,
 						SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
 				if (partialResults != null)
 				{
@@ -76,6 +81,9 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 			for (QueryResult result : results)
 			{
 				CommonCompletionProposal proposal = createProposal(offset, prefix, result);
+				if (proposal == null)
+					continue;
+
 				CommonCompletionProposal existing = proposalMap.get(proposal.getDisplayString());
 				if (existing != null)
 				{
@@ -84,8 +92,14 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 					String location = existing.getFileLocation();
 					if (!proposal.getFileLocation().equals(location))
 					{
-						location += ", " + proposal.getFileLocation(); //$NON-NLS-1$
-						existing.setFileLocation(location);
+						String[] existingLocations = location.split(", ");
+						String[] newLocations = proposal.getFileLocation().split(", ");
+						Set<String> set = new HashSet<String>();
+						for (String l : existingLocations)
+							set.add(l);
+						for (String l : newLocations)
+							set.add(l);
+						existing.setFileLocation(join(set, ", "));
 					}
 				}
 				else
@@ -100,6 +114,12 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 		}
 
 		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>(proposalMap.values());
+		
+		// As a hack we use word completions to help round out possible completions. This helps make the changes introduced since last save on current file a little less of an issue.
+		HippieProposalProcessor processor = new HippieProposalProcessor();
+		ICompletionProposal[] wordCompletions = processor.computeCompletionProposals(viewer, offset);
+		proposals.addAll(Arrays.asList(wordCompletions));
+		
 		// sort by display name
 		Collections.sort(proposals, new Comparator<ICompletionProposal>()
 		{
@@ -114,15 +134,67 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 		return proposals.toArray(new ICompletionProposal[proposals.size()]);
 	}
 
-	private List<Index> getIndices()
+	private String join(Set<String> set, String delimeter)
+	{
+		StringBuilder builder = new StringBuilder();
+		for (String doc : set)
+		{
+			builder.append(doc).append(delimeter);
+		}
+		if (builder.length() > 0)
+		{
+			builder.delete(builder.length() - 2, builder.length());
+		}
+		return builder.toString();
+	}
+
+	/**
+	 * Search fields, methods and types, unless prefix is empty then just types.
+	 * 
+	 * @param index
+	 * @param prefix
+	 * @return
+	 */
+	private String[] getCategories(Index index, String prefix, ITextViewer viewer, int offset)
+	{
+		try
+		{
+			// if we're completing after a period, it's a method invocation
+			char charBeforePrefix = viewer.getDocument().getChar(offset - (prefix.length() + 1));
+			if (charBeforePrefix == '.')
+			{
+				return new String[] { IRubyIndexConstants.METHOD_DECL };
+			}
+		}
+		catch (BadLocationException e)
+		{
+			Activator.log(e);
+		}
+
+		if (getIndex().equals(index))
+		{
+			return new String[] { IRubyIndexConstants.FIELD_DECL, IRubyIndexConstants.METHOD_DECL,
+					IRubyIndexConstants.CONSTANT_DECL, IRubyIndexConstants.LOCAL_DECL, IRubyIndexConstants.TYPE_DECL };
+		}
+		// After space or ::, so could be pretty much anything.
+		// TODO If after ::, only constants, types, methods
+		return new String[] { IRubyIndexConstants.GLOBAL_DECL, IRubyIndexConstants.CONSTANT_DECL,
+				IRubyIndexConstants.METHOD_DECL, IRubyIndexConstants.TYPE_DECL };
+	}
+
+	private List<Index> getIndices(String prefix)
 	{
 		List<Index> indices = new ArrayList<Index>();
 		indices.add(getIndex());
+		if (prefix == null || prefix.trim().length() == 0)
+		{
+			return indices;
+		}
 		indices.add(getRubyCoreIndex());
 
 		// TODO Extract common code with CoreStubber out to some class!
 		// Now add the Std Lib indices
-		String rawLoadPathOutput = ProcessUtil.outputForCommand("ruby", null, ShellExecutable.getEnvironment(), "-e",  //$NON-NLS-1$//$NON-NLS-2$
+		String rawLoadPathOutput = ProcessUtil.outputForCommand("ruby", null, ShellExecutable.getEnvironment(), "-e", //$NON-NLS-1$//$NON-NLS-2$
 				"puts $:"); //$NON-NLS-1$
 		String[] loadpaths = rawLoadPathOutput.split("\r\n|\r|\n"); //$NON-NLS-1$
 		for (String loadpath : loadpaths)
@@ -135,6 +207,8 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 				indices.add(index);
 			}
 		}
+		
+		// TODO For rails we need to include the rails gem indices!
 		return indices;
 	}
 
@@ -155,6 +229,12 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 			value = value.substring(0, firstSeparator);
 		}
 
+		// Don't include local/class/instance variables out of current file/scope
+		if (isVariable(result) && !isInCurrentFile(result))
+		{
+			return null;
+		}
+
 		String description = ""; //$NON-NLS-1$
 		int replaceLength = prefix.length();
 		int length = value.length();
@@ -167,9 +247,26 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 		return proposal;
 	}
 
+	private boolean isInCurrentFile(QueryResult result)
+	{
+		URI uri = getURI();
+		if (uri == null)
+			return false;
+		
+		String[] documents = result.getDocuments();
+		for (String doc : documents)
+		{
+			if (doc.equals(uri.getPath()))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 	protected String getLocations(QueryResult result)
 	{
-		StringBuilder builder = new StringBuilder();
+		Set<String> set = new HashSet<String>();
 		for (String doc : result.getDocuments())
 		{
 			// HACK Detect when it's a core stub and change the reported name to "Ruby Core"
@@ -177,13 +274,9 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				doc = "Ruby Core"; //$NON-NLS-1$
 			}
-			builder.append(doc).append(", "); //$NON-NLS-1$
+			set.add(doc);
 		}
-		if (builder.length() > 0)
-		{
-			builder.delete(builder.length() - 2, builder.length());
-		}
-		return builder.toString();
+		return join(set, ", ");
 	}
 
 	protected Image getImage(QueryResult result)
@@ -194,15 +287,15 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 			image = Activator.getImage(GLOBAL_IMAGE);
 		}
 		// Must check class var before instance because of prefix!
-		else if (result.getWord().startsWith(CLASS_VAR_NAME_PREFIX))
+		else if (isClassVar(result))
 		{
 			image = Activator.getImage(CLASS_VAR_IMAGE);
 		}
-		else if (result.getWord().startsWith(INSTANCE_VAR_NAME_PREFIX))
+		else if (isInstanceVar(result))
 		{
 			image = Activator.getImage(INSTANCE_VAR_IMAGE);
 		}
-		else if (result.getWord().indexOf(IRubyIndexConstants.SEPARATOR) != -1)
+		else if (!isVariable(result))
 		{
 			// Must be a class/module/method
 			String[] parts = result.getWord().split("" + IRubyIndexConstants.SEPARATOR); //$NON-NLS-1$
@@ -228,6 +321,21 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 			image = Activator.getImage(CONSTANT_IMAGE);
 		}
 		return image;
+	}
+
+	protected boolean isVariable(QueryResult result)
+	{
+		return result.getWord().indexOf(IRubyIndexConstants.SEPARATOR) == -1;
+	}
+
+	protected boolean isInstanceVar(QueryResult result)
+	{
+		return result.getWord().startsWith(INSTANCE_VAR_NAME_PREFIX);
+	}
+
+	protected boolean isClassVar(QueryResult result)
+	{
+		return result.getWord().startsWith(CLASS_VAR_NAME_PREFIX);
 	}
 
 	protected String getPrefix(ITextViewer viewer, int offset) throws BadLocationException
