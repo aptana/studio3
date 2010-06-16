@@ -162,11 +162,11 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 	 * @param file
 	 * @param parseState
 	 */
-	private void processParseResults(Index index, IFile file, JSParseState parseState)
+	private void processParseResults(Index index, IFileStore file, JSParseState parseState)
 	{
 		if (Platform.inDevelopmentMode())
 		{
-			String location = file.getProjectRelativePath().toPortableString();
+			String location = file.toURI().getPath();
 			Scope<JSNode> globals = parseState.getGlobalScope();
 			
 			for (String symbol: globals.getLocalSymbolNames())
