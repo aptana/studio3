@@ -7,7 +7,6 @@ import java.util.Set;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -58,7 +57,7 @@ public class RubyFileIndexingParticipant implements IFileIndexingParticipant
 					RubySourceParser sourceParser = new RubySourceParser();
 					ParserResult result = sourceParser.parse(store.getName(), source);
 					Node root = result.getAST();
-					ISourceElementRequestor builder = new RubySourceIndexer(index, getFilePath(store));
+					ISourceElementRequestor builder = new RubySourceIndexer(index, store.toURI().getPath());
 					SourceElementVisitor visitor = new SourceElementVisitor(builder);
 					visitor.acceptNode(root);
 				}
@@ -69,17 +68,6 @@ public class RubyFileIndexingParticipant implements IFileIndexingParticipant
 			}
 			sub.worked(1);
 		}
-	}
-
-	public static String getFilePath(final IFileStore store)
-	{
-		// HACK Detect when it's a core stub and change the reported name to "Ruby Core"
-		String path = store.toURI().getPath();
-		if (path.contains(".metadata")) //$NON-NLS-1$
-		{
-			return "Ruby Core"; //$NON-NLS-1$
-		}
-		return path;
 	}
 
 	private boolean isRubyFile(IFileStore file)

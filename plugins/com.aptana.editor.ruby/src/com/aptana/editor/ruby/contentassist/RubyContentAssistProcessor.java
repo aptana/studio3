@@ -122,8 +122,8 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 
 		// TODO Extract common code with CoreStubber out to some class!
 		// Now add the Std Lib indices
-		String rawLoadPathOutput = ProcessUtil.outputForCommand("ruby", null, ShellExecutable.getEnvironment(), "-e",
-				"puts $:");
+		String rawLoadPathOutput = ProcessUtil.outputForCommand("ruby", null, ShellExecutable.getEnvironment(), "-e",  //$NON-NLS-1$//$NON-NLS-2$
+				"puts $:"); //$NON-NLS-1$
 		String[] loadpaths = rawLoadPathOutput.split("\r\n|\r|\n"); //$NON-NLS-1$
 		for (String loadpath : loadpaths)
 		{
@@ -172,6 +172,11 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 		StringBuilder builder = new StringBuilder();
 		for (String doc : result.getDocuments())
 		{
+			// HACK Detect when it's a core stub and change the reported name to "Ruby Core"
+			if (doc.contains(".metadata")) //$NON-NLS-1$
+			{
+				doc = "Ruby Core"; //$NON-NLS-1$
+			}
 			builder.append(doc).append(", "); //$NON-NLS-1$
 		}
 		if (builder.length() > 0)

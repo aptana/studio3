@@ -113,8 +113,8 @@ public class CoreStubber extends Job
 			{
 				throw new CoreException(Status.CANCEL_STATUS);
 			}
-			String path = RubyFileIndexingParticipant.getFilePath(file);
-			index.remove(path);
+			// FIXME I'm storing everything in indices via URI's path, which is not right. We should store URI string and if it's a file for convenience then in proposals we can lop off the "file:" portion
+			index.remove(file.toURI().getPath());
 			sub.worked(1);
 		}
 
