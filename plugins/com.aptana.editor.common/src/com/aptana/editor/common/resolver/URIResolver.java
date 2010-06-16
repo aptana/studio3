@@ -1,4 +1,4 @@
-package com.aptana.editor.common.internal.outline;
+package com.aptana.editor.common.resolver;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.outline.IPathResolver;
 
 /**
  * Resolves paths that may be relative to a base URI (filesystem, remote, etc)

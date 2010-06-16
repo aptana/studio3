@@ -20,8 +20,8 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
 
 import com.aptana.core.util.IOUtil;
-import com.aptana.editor.common.internal.outline.URIResolver;
-import com.aptana.editor.common.outline.IPathResolver;
+import com.aptana.editor.common.resolver.IPathResolver;
+import com.aptana.editor.common.resolver.URIResolver;
 import com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
