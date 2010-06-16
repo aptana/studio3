@@ -112,7 +112,7 @@ public class PingStartup implements IStartup
 		if (!Platform.getPreferencesService().getBoolean(UsagePlugin.PLUGIN_ID, IPreferenceConstants.P_IDE_HAS_RUN,
 				false, new IScopeContext[] { new ConfigurationScope() }))
 		{
-			add(keyValues, "first_run", ""); //$NON-NLS-1$ //$NON-NLS-2$
+			add(keyValues, "first_run", Long.toString(System.currentTimeMillis())); //$NON-NLS-1$
 		}
 		add(keyValues, "id", getApplicationId()); //$NON-NLS-1$
 		add(keyValues, "version", UsagePlugin.getPluginVersion()); //$NON-NLS-1$
