@@ -20,8 +20,8 @@ public class JSNode extends ParseBaseNode
 
 	private short fType;
 	private boolean fSemicolonIncluded;
-	
-	private DocumentationBlock fDocumentationBlock;
+
+	private DocumentationBlock fDocumentation;
 	private List<String> fReturnTypes;
 
 	/**
@@ -125,7 +125,7 @@ public class JSNode extends ParseBaseNode
 		// move up to nearest statement
 		IParseNode result = this;
 		IParseNode parent = result.getParent();
-		
+
 		while (parent != null)
 		{
 			if (parent instanceof ParseRootNode || parent.getType() == JSNodeTypes.STATEMENTS)
@@ -138,30 +138,20 @@ public class JSNode extends ParseBaseNode
 				parent = parent.getParent();
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
-	 * getDocumentationBlock
+	 * getDocumentation
 	 * 
 	 * @return
 	 */
-	public DocumentationBlock getDocumentationBlock()
+	public DocumentationBlock getDocumentation()
 	{
-		if (fDocumentationBlock == null)
-		{
-			IParseNode root = this.getRootNode();
-			
-			if (root instanceof JSParseRootNode)
-			{
-				fDocumentationBlock = ((JSParseRootNode) root).findDocumentationBlock(this);
-			}
-		}
-		
-		return this.fDocumentationBlock;
+		return this.fDocumentation;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.ParseBaseNode#getElementName()
@@ -231,6 +221,16 @@ public class JSNode extends ParseBaseNode
 	public boolean isEmpty()
 	{
 		return getType() == JSNodeTypes.EMPTY;
+	}
+
+	/**
+	 * setDocumentation
+	 * 
+	 * @param block
+	 */
+	public void setDocumentation(DocumentationBlock block)
+	{
+		fDocumentation = block;
 	}
 
 	/**
