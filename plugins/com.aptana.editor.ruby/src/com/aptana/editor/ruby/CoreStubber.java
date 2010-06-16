@@ -113,7 +113,8 @@ public class CoreStubber extends Job
 			{
 				throw new CoreException(Status.CANCEL_STATUS);
 			}
-			index.remove(file.toURI().getPath());
+			String path = RubyFileIndexingParticipant.getFilePath(file);
+			index.remove(path);
 			sub.worked(1);
 		}
 

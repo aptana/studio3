@@ -142,4 +142,22 @@ get_classes.each do |klass|
   open(file_name, 'w') do |f|
     f << print_type(klass)
   end
+  # Spit out constants to some file... i.e. ARGV
+  open(file_name('constants'), 'w') do |f|
+    f << "ARGV = []\n"
+    f << "TRUE = true\n"
+    f << "FALSE = false\n"
+    f << "STDOUT = IO.new\n"
+    f << "STDIN = IO.new\n"
+    f << "STDERR = IO.new\n"
+    f << "ENV = {}\n"
+    f << "NIL = nil\n"
+    f << "VERSION = ''\n"
+    f << "RUBY_PATCHLEVEL = 123\n"
+    f << "RUBY_COPYRIGHT = 'ruby - Copyright (C) 1993-2009 Yukihiro Matsumoto'\n"
+    f << "TOPLEVEL_BINDING = Binding.new\n"
+    f << "RUBY_VERSION = '1.8.7'\n"
+    f << "RUBY_PLATFORM = ''\n"
+    f << "PLATFORM = ''\n"
+  end
 end

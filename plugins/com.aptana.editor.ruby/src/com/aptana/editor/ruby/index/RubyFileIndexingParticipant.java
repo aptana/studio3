@@ -6,10 +6,13 @@ import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
@@ -31,11 +34,13 @@ public class RubyFileIndexingParticipant implements IFileIndexingParticipant
 	private static final String RUBY_EXTENSION = "rb"; //$NON-NLS-1$
 
 	@Override
-	public void index(Set<IFileStore> files, final Index index, IProgressMonitor monitor)
+	public void index(Set<IFileStore> files, final Index index, IProgressMonitor monitor) throws CoreException
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, files.size());
 		for (final IFileStore store : files)
 		{
+			if (sub.isCanceled())
+				throw new CoreException(Status.CANCEL_STATUS);
 			if (store == null)
 				continue;
 			sub.subTask(store.getName());
@@ -53,7 +58,7 @@ public class RubyFileIndexingParticipant implements IFileIndexingParticipant
 					RubySourceParser sourceParser = new RubySourceParser();
 					ParserResult result = sourceParser.parse(store.getName(), source);
 					Node root = result.getAST();
-					ISourceElementRequestor builder = new RubySourceIndexer(index, store.toURI().getPath());
+					ISourceElementRequestor builder = new RubySourceIndexer(index, getFilePath(store));
 					SourceElementVisitor visitor = new SourceElementVisitor(builder);
 					visitor.acceptNode(root);
 				}
@@ -64,6 +69,17 @@ public class RubyFileIndexingParticipant implements IFileIndexingParticipant
 			}
 			sub.worked(1);
 		}
+	}
+
+	public static String getFilePath(final IFileStore store)
+	{
+		// HACK Detect when it's a core stub and change the reported name to "Ruby Core"
+		String path = store.toURI().getPath();
+		if (path.contains(".metadata")) //$NON-NLS-1$
+		{
+			return "Ruby Core"; //$NON-NLS-1$
+		}
+		return path;
 	}
 
 	private boolean isRubyFile(IFileStore file)
