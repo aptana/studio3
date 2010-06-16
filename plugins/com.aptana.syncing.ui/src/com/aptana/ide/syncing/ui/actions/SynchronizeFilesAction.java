@@ -50,7 +50,7 @@ import com.aptana.ui.UIUtils;
 public class SynchronizeFilesAction extends BaseSyncAction
 {
 
-	private static String MESSAGE_TITLE = StringUtil.ellipsify(Messages.UploadAction_MessageTitle);
+	private static String MESSAGE_TITLE = StringUtil.ellipsify(Messages.SynchronizeAction_MessageTitle);
 
 	protected void performAction(final IAdaptable[] files, final ISiteConnection site) throws CoreException
 	{
