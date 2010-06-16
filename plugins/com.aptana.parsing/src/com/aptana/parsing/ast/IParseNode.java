@@ -34,13 +34,6 @@ public interface IParseNode extends ILexeme, ILanguageNode, Iterable<IParseNode>
 	public int getChildCount();
 
 	/**
-	 * getChildIndex
-	 * 
-	 * @return
-	 */
-	public int getChildIndex();
-
-	/**
 	 * getChildren
 	 * 
 	 * @return
@@ -64,10 +57,9 @@ public interface IParseNode extends ILexeme, ILanguageNode, Iterable<IParseNode>
 	/**
 	 * getIndex
 	 * 
-	 * @param child
 	 * @return
 	 */
-	public int getIndex(IParseNode child);
+	public int getIndex();
 
 	/**
 	 * getLanguage

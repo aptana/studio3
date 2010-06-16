@@ -148,7 +148,7 @@ class Reference
 								index = 0;
 								if (currentParent != null)
 								{
-									index = currentParent.getIndex(p);
+									index = p.getIndex();
 								}
 								path = MessageFormat.format("[{0}]{1}{2}", index, p.getText(), path); //$NON-NLS-1$
 
