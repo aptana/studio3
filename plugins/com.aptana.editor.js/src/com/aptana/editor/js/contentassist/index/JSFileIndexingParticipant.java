@@ -2,6 +2,7 @@ package com.aptana.editor.js.contentassist.index;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
@@ -20,12 +21,15 @@ import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.contentassist.JSASTQueryHelper;
 import com.aptana.editor.js.parsing.IJSParserConstants;
+import com.aptana.editor.js.parsing.JSParseState;
+import com.aptana.editor.js.parsing.ast.JSFunctionNode;
+import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.index.core.IFileIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.IParserPool;
-import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
+import com.aptana.parsing.Scope;
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSFileIndexingParticipant implements IFileIndexingParticipant
@@ -68,22 +72,21 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 					{
 						// create parser and associated parse state
 						IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IJSParserConstants.LANGUAGE);
+						
 						if (pool != null)
 						{
 							IParser parser = pool.checkOut();
 
-							ParseState parseState = new ParseState();
+							JSParseState parseState = new JSParseState();
 
-							// apply the source to the parse state
+							// apply the source to the parse state and parse
 							parseState.setEditState(source, source, 0, 0);
-
-							// parse and grab the result
-							IParseNode ast = parser.parse(parseState);
+							parser.parse(parseState);
 
 							pool.checkIn(parser);
 
-							// now walk the parse tree
-							this.walkAST(index, file, ast);
+							// process results
+							this.processParseResults(index, file, parseState);
 						}
 					}
 				}
@@ -152,6 +155,45 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 		return JS_EXTENSION.equalsIgnoreCase(new Path(file.getName()).getFileExtension());
 	}
 
+	/**
+	 * processParseResults
+	 * 
+	 * @param index
+	 * @param file
+	 * @param parseState
+	 */
+	private void processParseResults(Index index, IFile file, JSParseState parseState)
+	{
+		if (Platform.inDevelopmentMode())
+		{
+			String location = file.getProjectRelativePath().toPortableString();
+			Scope<JSNode> globals = parseState.getGlobalScope();
+			
+			for (String symbol: globals.getLocalSymbolNames())
+			{
+				List<JSNode> nodes = globals.getSymbol(symbol);
+				String category = JSIndexConstants.VARIABLE;
+				
+				for (JSNode node : nodes)
+				{
+					if (node instanceof JSFunctionNode)
+					{
+						category = JSIndexConstants.FUNCTION;
+						break;
+					}
+				}
+				
+				index.addEntry(category, symbol, location);
+			}
+		}
+		else
+		{
+			IParseNode ast = parseState.getParseResult();
+			
+			this.walkAST(index, file, ast);
+		}
+	}
+	
 	/**
 	 * walkAST
 	 * 

@@ -33,6 +33,7 @@ import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
+import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
@@ -373,6 +374,10 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 */
 	protected Index getIndex()
 	{
+		if (editor == null)
+		{
+			return null;
+		}
 		IEditorInput editorInput = editor.getEditorInput();
 		Index result = null;
 
@@ -392,6 +397,16 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		return result;
 	}
 
+	/**
+	 * getParseState
+	 * 
+	 * @return
+	 */
+	protected IParseState getParseState()
+	{
+		return editor.getFileService().getParseState();
+	}
+	
 	/**
 	 * getAllUserAgentIcons
 	 * 

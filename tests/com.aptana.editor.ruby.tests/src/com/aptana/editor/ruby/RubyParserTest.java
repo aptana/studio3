@@ -98,7 +98,7 @@ public class RubyParserTest extends TestCase
 		assertEquals(1, imports.length); // one require statement
 		assertEquals(IRubyElement.IMPORT_DECLARATION, imports[0].getType());
 		assertEquals("yaml", imports[0].toString());
-		assertEquals(imports[0], children[0].getNodeAt(5));
+		assertEquals(imports[0], children[0].getNodeAtOffset(5));
 	}
 
 	public void testGlobalVar() throws Exception

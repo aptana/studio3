@@ -8,7 +8,7 @@ public class AllTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite("Test for com.aptana.editor.js");
+		TestSuite suite = new TestSuite("Tests for com.aptana.editor.js");
 		// $JUnit-BEGIN$
 		suite.addTestSuite(JSParserTest.class);
 		// suite.addTestSuite(JSCodeScannerPerformanceTest.class);

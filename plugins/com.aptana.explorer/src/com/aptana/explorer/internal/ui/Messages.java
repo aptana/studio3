@@ -53,14 +53,11 @@ public class Messages extends NLS
 	public static String GitProjectView_AddRemoteTooltip;
 	public static String GitProjectView_GitDiffDialogTitle;
 	public static String GitProjectView_LBL_ShowInHistory;
-	
-	public static String SingleProjectView_CaseSensitive;
+
 	public static String SingleProjectView_CreateAppMenuItem;
 	public static String SingleProjectView_OpenBrowserItem;
 	public static String SingleProjectView_OpenTerminalMenuItem_LBL;
 	public static String SingleProjectView_RefreshJob_title;
-	public static String SingleProjectView_Wildcard;
-	public static String SingleProjectView_RegularExpression;
 	public static String SingleProjectView_Run_TerminalTitle;
 	public static String SingleProjectView_RunMenuTitle;
 	public static String SingleProjectView_SwitchToApplication;

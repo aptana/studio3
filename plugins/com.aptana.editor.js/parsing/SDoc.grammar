@@ -73,17 +73,17 @@ Grammar
 	;
 
 Block
-	=	START_DOCUMENTATION Text.text END_DOCUMENTATION
+	=	START_DOCUMENTATION.s Text.text END_DOCUMENTATION.e
 		{:
-			return new Block((String) text.value);
+			return new Block((String) text.value, s.getStart(), e.getEnd());
 		:}
-	|	START_DOCUMENTATION Tags.tags END_DOCUMENTATION
+	|	START_DOCUMENTATION.s Tags.tags END_DOCUMENTATION.e
 		{:
-			return new Block((List<Tag>) tags.value);
+			return new Block((List<Tag>) tags.value, s.getStart(), e.getEnd());
 		:}
-	|	START_DOCUMENTATION Text.text Tags.tags END_DOCUMENTATION
+	|	START_DOCUMENTATION.s Text.text Tags.tags END_DOCUMENTATION.e
 		{:
-			return new Block((String) text.value, (List<Tag>) tags.value);
+			return new Block((String) text.value, (List<Tag>) tags.value, s.getStart(), e.getEnd());
 		:}
 	;
 

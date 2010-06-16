@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<schema xmlns="http://www.aptana.com/2005/schema/1.0">
+
+	<element name="docs" type="root" onEnter="enterDocs" onExit="exitDocs">
+		<child-element name="param"/>
+		<child-element name="private"/>
+		<child-element name="returns"/>
+		<child-element name="summary"/>
+	</element>
+	
+	<element name="param" onEnter="enterParam" onExit="exitParam">
+		<attribute name="integer" usage="optional"/>		<!--  boolean -->
+		<attribute name="name"/>							<!--  string  -->
+		<attribute name="optional" usage="optional"/>		<!--  boolean -->
+		<attribute name="parameterArray" usage="optional"/> <!--  boolean -->
+		<attribute name="type" usage="optional"/>			<!--  string  -->
+	</element>
+	
+	<element name="private" onEnter="startTextBuffer" onExit="exitPrivate"/>
+	
+	<element name="returns" onEnter="enterReturns" onExit="exitReturns">
+		<attribute name="integer" usage="optional"/>		<!--  boolean -->
+		<attribute name="type"/>							<!--  string  -->
+	</element>
+	
+	<element name="summary" onEnter="startTextBuffer" onExit="exitSummary"/>
+
+</schema>

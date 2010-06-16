@@ -42,6 +42,7 @@ import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
 import com.aptana.editor.js.outline.JSOutlineLabelProvider;
 import com.aptana.editor.js.parsing.IJSParserConstants;
+import com.aptana.editor.js.parsing.JSParseState;
 
 public class JSSourceEditor extends AbstractThemeableEditor
 {
@@ -58,7 +59,7 @@ public class JSSourceEditor extends AbstractThemeableEditor
 	@Override
 	protected FileService createFileService()
 	{
-		return new FileService(IJSParserConstants.LANGUAGE);
+		return new FileService(IJSParserConstants.LANGUAGE, new JSParseState());
 	}
 
 	@Override

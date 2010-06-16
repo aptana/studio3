@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.aptana.editor.js.parsing.IJSParserConstants;
+import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseBaseNode;
+import com.aptana.parsing.ast.ParseRootNode;
 
 public class JSNode extends ParseBaseNode
 {
@@ -110,6 +112,33 @@ public class JSNode extends ParseBaseNode
 		return getType() == other.getType() && getSemicolonIncluded() == other.getSemicolonIncluded() && Arrays.equals(getChildren(), other.getChildren());
 	}
 
+	/**
+	 * getContainingStatementNode
+	 * 
+	 * @return
+	 */
+	public IParseNode getContainingStatementNode()
+	{
+		// move up to nearest statement
+		IParseNode result = this;
+		IParseNode parent = result.getParent();
+		
+		while (parent != null)
+		{
+			if (parent instanceof ParseRootNode || parent.getType() == JSNodeTypes.STATEMENTS)
+			{
+				break;
+			}
+			else
+			{
+				result = parent;
+				parent = parent.getParent();
+			}
+		}
+		
+		return result;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.ParseBaseNode#getElementName()

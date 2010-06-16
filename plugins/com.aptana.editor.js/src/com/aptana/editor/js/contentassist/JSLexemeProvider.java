@@ -46,7 +46,8 @@ public class JSLexemeProvider extends LexemeProvider<JSTokenType>
 		{
 			case SINGLELINE_COMMENT:
 			case MULTILINE_COMMENT:
-			case DOC:
+			case SDOC:
+			case VSDOC:
 				break;
 				
 			default:

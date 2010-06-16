@@ -1,6 +1,8 @@
 package com.aptana.editor.js.parsing;
 
+import com.aptana.editor.js.vsdoc.parsing.VSDocReader;
 import java.util.ArrayList;
+import com.aptana.editor.js.sdoc.model.Block;
 import java.util.List;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import java.io.IOException;
@@ -12,6 +14,7 @@ import beaver.*;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.lexer.Range;
 import com.aptana.parsing.ast.IParseNode;
+import java.io.ByteArrayInputStream;
 import com.aptana.parsing.Scope;
 import com.aptana.parsing.IParseState;
 
@@ -250,30 +253,119 @@ public class JSParser extends Parser implements IParser {
 		IParseNode result = (IParseNode) parse(fScanner);
 		parseState.setParseResult(result);
 		
-		this.parseDocs(fScanner.getDocComments());
+		if (parseState instanceof JSParseState)
+		{
+			JSParseState jsParseState = (JSParseState) parseState;
+			
+			jsParseState.setGlobalScope(fScope);
+			jsParseState.setPreDocumentationBlocks(this.parsePreDocumentationBlocks());
+			jsParseState.setPostDocumentationBlocks(this.parsePostDocumentationBlocks());
+		}
 		
 		return result;
 	}
 	
 	/**
-	 * parseDocs
-	 *
-	 * @param docs
+	 * parsePreDocumentationBlocks
+	 * 
+	 * @return
 	 */
-	protected void parseDocs(List<Symbol> docs)
+	protected List<Block> parsePreDocumentationBlocks()
 	{
 		SDocParser parser = new SDocParser();
+		List<Block> blocks = new ArrayList<Block>();
 		
-		for (Symbol doc : docs)
+		for (Symbol doc : fScanner.getSDocComments())
 		{
 			try
 			{
-				parser.parse((String) doc.value);
+				Object result = parser.parse((String) doc.value);
+				
+				if (result instanceof Block)
+				{
+					blocks.add((Block) result);
+				}
 			}
 			catch (java.lang.Exception e)
 			{
 			}
 		}
+		
+		return blocks;
+	}
+	
+	/**
+	 * buildVSDocXML
+	 *
+	 * @param lines
+	 * @return
+	 */
+	private String buildVSDocXML(List<Symbol> lines)
+	{
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("<docs>\n");
+		
+		for (Symbol line : lines)
+		{
+			String text = (String) line.value;
+			
+			buffer.append(text.substring(3));
+			buffer.append("\n");
+		}
+		
+		buffer.append("</docs>");
+		
+		return buffer.toString();
+	}
+	
+	/**
+	 * parsePostDocumentationBlocks
+	 * 
+	 * @return
+	 */
+	protected List<Block> parsePostDocumentationBlocks()
+	{
+		VSDocReader parser = new VSDocReader();
+		List<Block> blocks = new ArrayList<Block>();
+		
+		for (Symbol doc : fScanner.getVSDocComments())
+		{
+			ByteArrayInputStream input = null;
+			
+			try
+			{
+				String source = this.buildVSDocXML((List<Symbol>) doc.value);
+				
+				new ByteArrayInputStream(source.getBytes());
+				
+				parser.loadXML(input);
+				
+				Block result = parser.getBlock(); 
+				
+				if (result != null)
+				{
+					blocks.add(result);
+				}
+			}
+			catch (java.lang.Exception e)
+			{
+			}
+			finally
+			{
+				try
+				{
+					if (input != null)
+					{
+						input.close();
+					}
+				}
+				catch (IOException e)
+				{
+				}
+			}
+		}
+		
+		return blocks;
 	}
 	
 	/*

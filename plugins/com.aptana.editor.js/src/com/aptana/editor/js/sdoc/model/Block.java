@@ -17,9 +17,9 @@ public class Block extends Symbol
 	 * 
 	 * @param tags
 	 */
-	public Block(List<Tag> tags)
+	public Block(List<Tag> tags, int startingOffset, int endingOffset)
 	{
-		this("", tags);
+		this("", tags, startingOffset, endingOffset);
 	}
 
 	/**
@@ -27,9 +27,9 @@ public class Block extends Symbol
 	 * 
 	 * @param text
 	 */
-	public Block(String text)
+	public Block(String text, int startingOffset, int endingOffset)
 	{
-		this(text, new LinkedList<Tag>());
+		this(text, new LinkedList<Tag>(), startingOffset, endingOffset);
 	}
 
 	/**
@@ -38,10 +38,12 @@ public class Block extends Symbol
 	 * @param text
 	 * @param tags
 	 */
-	public Block(String text, List<Tag> tags)
+	public Block(String text, List<Tag> tags, int startingOffset, int endingOffset)
 	{
 		this._text = text;
 		this._tags = tags;
+		this.start = startingOffset;
+		this.end = endingOffset;
 	}
 
 	/**

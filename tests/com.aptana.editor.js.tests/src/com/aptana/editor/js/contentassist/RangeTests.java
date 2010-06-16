@@ -5,6 +5,8 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
+import com.aptana.editor.js.tests.EditorBasedTests;
+import com.aptana.editor.js.tests.TextViewer;
 import com.aptana.parsing.lexer.Range;
 
 public class RangeTests extends EditorBasedTests
@@ -39,7 +41,7 @@ public class RangeTests extends EditorBasedTests
 	protected void rangeTests(String resource, OffsetSelection... selections)
 	{
 		TestContext context = this.getTestContext(resource);
-		ITextViewer viewer = new TestTextViewer(context.document);
+		ITextViewer viewer = new TextViewer(context.document);
 		JSContentAssistProcessor processor = new JSContentAssistProcessor((AbstractThemeableEditor) context.editor);
 
 		for (OffsetSelection selection : selections)
