@@ -16,6 +16,26 @@ public class JSDeclarationNode extends JSNode
 		super(JSNodeTypes.DECLARATION, start, end, children);
 	}
 
+	/**
+	 * getIdentifier
+	 * 
+	 * @return
+	 */
+	public IParseNode getIdentifier()
+	{
+		return this.getChild(0);
+	}
+	
+	/**
+	 * getValue
+	 * 
+	 * @return
+	 */
+	public IParseNode getValue()
+	{
+		return this.getChild(1);
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
