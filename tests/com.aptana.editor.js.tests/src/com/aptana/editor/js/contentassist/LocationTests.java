@@ -3,7 +3,6 @@ package com.aptana.editor.js.contentassist;
 import org.eclipse.jface.text.BadLocationException;
 
 import com.aptana.editor.common.contentassist.LexemeProvider;
-import com.aptana.editor.js.contentassist.JSContentAssistProcessor.Location;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.editor.js.tests.EditorBasedTests;
 
@@ -26,8 +25,8 @@ public class LocationTests extends EditorBasedTests
 		// lex around the offset
 		LexemeProvider<JSTokenType> lexemeProvider = context.processor.createLexemeProvider(context.document, offset);
 
-		Location location = context.processor.getLocation(lexemeProvider, offset);
-		assertEquals(Location.IN_GLOBAL, location);
+		LocationType location = context.processor.getLocation(lexemeProvider, offset);
+		assertEquals(LocationType.IN_GLOBAL, location);
 	}
 	
 	/**
@@ -46,7 +45,7 @@ public class LocationTests extends EditorBasedTests
 		// lex around the offset
 		LexemeProvider<JSTokenType> lexemeProvider = context.processor.createLexemeProvider(context.document, offset);
 
-		Location location = context.processor.getLocation(lexemeProvider, offset);
-		assertEquals(Location.IN_GLOBAL, location);
+		LocationType location = context.processor.getLocation(lexemeProvider, offset);
+		assertEquals(LocationType.IN_GLOBAL, location);
 	}
 }

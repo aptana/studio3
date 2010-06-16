@@ -43,12 +43,6 @@ import com.aptana.parsing.lexer.Lexeme;
 public class JSContentAssistProcessor extends CommonContentAssistProcessor
 {
 	private static final String PARENS = "()"; //$NON-NLS-1$
-
-	static enum Location
-	{
-		ERROR, IN_GLOBAL, IN_PARAMETERS, IN_CONSTRUCTOR, IN_PROPERTY_NAME, IN_VARIABLE_NAME
-	};
-
 	private static final Image JS_FUNCTION = Activator.getImage("/icons/js_function.gif"); //$NON-NLS-1$
 	private static final Image JS_PROPERTY = Activator.getImage("/icons/js_property.gif"); //$NON-NLS-1$
 
@@ -377,7 +371,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 
 		// first step is to determine where we are
-		Location location = this.getLocation(lexemeProvider, offset);
+		LocationType location = this.getLocation(lexemeProvider, offset);
 
 		switch (location)
 		{
@@ -521,11 +515,11 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	Location getLocationByAST(LexemeProvider<JSTokenType> lexemeProvider, int offset)
+	LocationType getLocationByAST(LexemeProvider<JSTokenType> lexemeProvider, int offset)
 	{
 		Lexeme<JSTokenType> lexeme;
 		IParseNode node;
-		Location result = Location.ERROR;
+		LocationType result = LocationType.UNKNOWN;
 		short type;
 		
 		if (this._targetNode != null)
@@ -546,7 +540,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 								if (lexeme != null && lexeme.getType() == JSTokenType.IDENTIFIER)
 								{
 									this._currentLexeme = lexeme;
-									result = Location.IN_GLOBAL;
+									result = LocationType.IN_GLOBAL;
 								}
 								break;
 								
@@ -558,14 +552,14 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 									switch (node.getNodeType())
 									{
 										case JSNodeTypes.IDENTIFIER:
-											result = Location.IN_GLOBAL;
+											result = LocationType.IN_GLOBAL;
 											this._currentLexeme = lexemeProvider.getLexemeFromOffset(node.getStartingOffset());
 											break;
 											
 										default:
 											if (node == this._targetNode)
 											{
-												result = Location.IN_GLOBAL;
+												result = LocationType.IN_GLOBAL;
 											}
 											break;
 									}
@@ -573,14 +567,14 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 								break;
 								
 							default:
-								result = Location.IN_GLOBAL;
+								result = LocationType.IN_GLOBAL;
 								break;
 						}
 					}
 					else
 					{
 						this._currentLexeme = null;
-						result = Location.IN_GLOBAL;
+						result = LocationType.IN_GLOBAL;
 					}
 					break;
 					
@@ -595,7 +589,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					
 					if (lexeme == null || lexeme.getType() != JSTokenType.NEW)
 					{
-						result = Location.IN_CONSTRUCTOR;
+						result = LocationType.IN_CONSTRUCTOR;
 					}
 					break;
 					
@@ -615,7 +609,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					{
 						if (this._targetNode.getStartingOffset() != offset)
 						{
-							result = Location.IN_GLOBAL;
+							result = LocationType.IN_GLOBAL;
 							this._currentLexeme = null;
 						}
 					}
@@ -626,7 +620,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					
 					if (lexeme != null && lexeme.getType() == JSTokenType.IDENTIFIER)
 					{
-						result = Location.IN_GLOBAL;
+						result = LocationType.IN_GLOBAL;
 						this._currentLexeme = lexeme;
 					}
 					break;
@@ -636,7 +630,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					
 				case JSNodeTypes.GET_ELEMENT:
 				case JSNodeTypes.GET_PROPERTY:
-					result = Location.IN_GLOBAL;
+					result = LocationType.IN_GLOBAL;
 					
 					lexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
 					
@@ -664,12 +658,12 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 							case JSNodeTypes.GET_PROPERTY:
 								if (node.getChild(0) == this._targetNode)
 								{
-									result = Location.IN_GLOBAL;
+									result = LocationType.IN_GLOBAL;
 								}
 								break;
 							
 							default:
-								result = Location.IN_GLOBAL;
+								result = LocationType.IN_GLOBAL;
 								break;
 						}
 					}
@@ -679,7 +673,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				case JSNodeTypes.WHILE:
 					if (this._currentLexeme.getType() == JSTokenType.RPAREN && this._currentLexeme.getStartingOffset() == offset)
 					{
-						result = Location.IN_GLOBAL;
+						result = LocationType.IN_GLOBAL;
 						lexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
 						
 						if (lexeme != null & lexeme.getType() == JSTokenType.IDENTIFIER)
@@ -704,14 +698,14 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					
 					if (lexeme != null && lexeme.getType() == JSTokenType.SEMICOLON && lexeme.getEndingOffset() < offset)
 					{
-						result = Location.IN_GLOBAL;
+						result = LocationType.IN_GLOBAL;
 					}
 					break;
 					
 				case JSNodeTypes.NAME_VALUE_PAIR:
 					if (this._currentLexeme.getType() == JSTokenType.COLON && this._currentLexeme.getEndingOffset() < offset)
 					{
-						result = Location.IN_GLOBAL;
+						result = LocationType.IN_GLOBAL;
 						this._currentLexeme = null;
 					}
 					break;
@@ -725,19 +719,19 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 						
 						if (node != null && node.getNodeType() == JSNodeTypes.IDENTIFIER && node.getParent().getParent() == this._targetNode)
 						{
-							result = Location.IN_GLOBAL;
+							result = LocationType.IN_GLOBAL;
 						}
 					}
 					break;
 					
 				case JSNodeTypes.PARAMETERS:
-					result = Location.IN_PARAMETERS;
+					result = LocationType.IN_PARAMETERS;
 					break;
 					
 				case JSNodeTypes.VAR:
 					if (this._targetNode.contains(offset) == false)
 					{
-						result = Location.IN_GLOBAL;
+						result = LocationType.IN_GLOBAL;
 					}
 					else
 					{
@@ -745,7 +739,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 						
 						if (node != null && node.getNodeType() == JSNodeTypes.IDENTIFIER)
 						{
-							result = Location.IN_GLOBAL;
+							result = LocationType.IN_GLOBAL;
 						}
 					}
 					break;
@@ -785,12 +779,12 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 								case STAR_EQUAL:
 									if (offset == lexeme.getStartingOffset())
 									{
-										result = Location.IN_VARIABLE_NAME;
+										result = LocationType.IN_VARIABLE_NAME;
 									}
 									break;
 									
 								case IDENTIFIER:
-									result = Location.IN_VARIABLE_NAME;
+									result = LocationType.IN_VARIABLE_NAME;
 									break;
 									
 								default:
@@ -811,7 +805,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 							{
 								case RCURLY:
 								case SEMICOLON:
-									result = Location.IN_GLOBAL;
+									result = LocationType.IN_GLOBAL;
 									this._currentLexeme = null;
 									break;
 									
@@ -834,9 +828,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	Location getLocationByLexeme(LexemeProvider<JSTokenType> lexemeProvider, int offset)
+	LocationType getLocationByLexeme(LexemeProvider<JSTokenType> lexemeProvider, int offset)
 	{
-		Location result = Location.ERROR;
+		LocationType result = LocationType.UNKNOWN;
 		int index = lexemeProvider.getLexemeIndex(offset);
 		
 		if (index < 0)
@@ -864,7 +858,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			switch (lexeme.getType())
 			{
 				case DOT:
-					result = Location.IN_PROPERTY_NAME;
+					result = LocationType.IN_PROPERTY_NAME;
 					break;
 					
 				case SEMICOLON:
@@ -875,7 +869,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 						switch (previousLexeme.getType())
 						{
 							case IDENTIFIER:
-								result = Location.IN_GLOBAL;
+								result = LocationType.IN_GLOBAL;
 								break;
 								
 							default:
@@ -891,7 +885,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 						
 						if (previousLexeme.getType() != JSTokenType.IDENTIFIER)
 						{
-							result = Location.IN_GLOBAL;
+							result = LocationType.IN_GLOBAL;
 						}
 					}
 					break;
@@ -899,7 +893,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				case RPAREN:
 					if (offset == lexeme.getStartingOffset())
 					{
-						result = Location.IN_GLOBAL;
+						result = LocationType.IN_GLOBAL;
 					}
 					break;
 					
@@ -911,21 +905,21 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 						switch (previousLexeme.getType())
 						{
 							case DOT:
-								result = Location.IN_PROPERTY_NAME;
+								result = LocationType.IN_PROPERTY_NAME;
 								break;
 								
 							case NEW:
-								result = Location.IN_CONSTRUCTOR;
+								result = LocationType.IN_CONSTRUCTOR;
 								break;
 								
 							default:
-								result = Location.IN_VARIABLE_NAME;
+								result = LocationType.IN_VARIABLE_NAME;
 								break;
 						}
 					}
 					else
 					{
-						result = Location.IN_VARIABLE_NAME;
+						result = LocationType.IN_VARIABLE_NAME;
 					}
 					break;
 					
@@ -935,7 +929,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		else if (lexemeProvider.size() == 0)
 		{
-			result = Location.IN_GLOBAL;
+			result = LocationType.IN_GLOBAL;
 		}
 		
 		return result;
@@ -948,9 +942,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	Location getLocation(LexemeProvider<JSTokenType> lexemeProvider, int offset)
+	LocationType getLocation(LexemeProvider<JSTokenType> lexemeProvider, int offset)
 	{
-		Location result = this.getLocationByAST(lexemeProvider, offset);
+		LocationType result = this.getLocationByAST(lexemeProvider, offset);
 		
 //		if (result == Location.ERROR)
 //		{
