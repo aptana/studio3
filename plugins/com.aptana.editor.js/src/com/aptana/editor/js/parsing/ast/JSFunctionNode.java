@@ -29,7 +29,7 @@ public class JSFunctionNode extends JSNode
 		IParseNode[] result = NO_CHILDREN;
 		IParseNode argsNode = this.getChild(1);
 
-		if (argsNode != null && argsNode.getType() == JSNodeTypes.PARAMETERS)
+		if (argsNode != null && argsNode.getNodeType() == JSNodeTypes.PARAMETERS)
 		{
 			result = argsNode.getChildren();
 		}

@@ -135,7 +135,7 @@ public class ParseBaseNode extends Node implements IParseNode
 			return false;
 
 		// Same type
-		if (getType() != other.getType())
+		if (getNodeType() != other.getNodeType())
 			return false;
 
 		// That's about the best we can check from here, since offsets can change a lot. Should really also check
@@ -525,7 +525,7 @@ public class ParseBaseNode extends Node implements IParseNode
 	 * @see com.aptana.parsing.ast.IParseNode#getType()
 	 */
 	@Override
-	public short getType()
+	public short getNodeType()
 	{
 		return getId();
 	}
@@ -548,7 +548,7 @@ public class ParseBaseNode extends Node implements IParseNode
 	public int hashCode()
 	{
 		int hash = 31 + getLanguage().hashCode();
-		hash = hash * 31 + getType();
+		hash = hash * 31 + getNodeType();
 		hash = hash * 31 + (getParent() == null ? 0 : getParent().hashCode());
 		return hash;
 	}

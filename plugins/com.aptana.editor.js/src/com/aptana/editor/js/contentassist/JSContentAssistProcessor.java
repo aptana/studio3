@@ -530,7 +530,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		
 		if (this._targetNode != null)
 		{
-			switch (this._targetNode.getType())
+			switch (this._targetNode.getNodeType())
 			{
 				case JSNodeTypes.ARGUMENTS:
 					lexeme = lexemeProvider.getLexemeFromOffset(offset);
@@ -555,7 +555,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 								
 								if (node != null)
 								{
-									switch (node.getType())
+									switch (node.getNodeType())
 									{
 										case JSNodeTypes.IDENTIFIER:
 											result = Location.IN_GLOBAL;
@@ -601,7 +601,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					
 				case JSNodeTypes.DECLARATION:
 					// ignore declarations in for-statements for now
-					type = this._statementNode.getType();
+					type = this._statementNode.getNodeType();
 					
 					if (type == JSNodeTypes.FOR || type == JSNodeTypes.FOR_IN)
 					{
@@ -648,13 +648,13 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					
 				case JSNodeTypes.IDENTIFIER:
 					// ignore for-statements for now
-					 type = this._statementNode.getType();
+					 type = this._statementNode.getNodeType();
 					
 					if (type != JSNodeTypes.FOR && type != JSNodeTypes.FOR_IN)
 					{
 						node = this._targetNode.getParent();
 						
-						switch (node.getType())
+						switch (node.getNodeType())
 						{
 							case JSNodeTypes.DECLARATION:
 							case JSNodeTypes.FUNCTION:
@@ -723,7 +723,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					{
 						node = this._statementNode.getNodeAtOffset(lexeme.getStartingOffset());
 						
-						if (node != null && node.getType() == JSNodeTypes.IDENTIFIER && node.getParent().getParent() == this._targetNode)
+						if (node != null && node.getNodeType() == JSNodeTypes.IDENTIFIER && node.getParent().getParent() == this._targetNode)
 						{
 							result = Location.IN_GLOBAL;
 						}
@@ -743,7 +743,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					{
 						node = this._targetNode.getNodeAtOffset(offset - 1);
 						
-						if (node != null && node.getType() == JSNodeTypes.IDENTIFIER)
+						if (node != null && node.getNodeType() == JSNodeTypes.IDENTIFIER)
 						{
 							result = Location.IN_GLOBAL;
 						}

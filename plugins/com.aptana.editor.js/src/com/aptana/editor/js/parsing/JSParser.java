@@ -274,7 +274,7 @@ public class JSParser extends Parser implements IParser {
 				
 				if (node instanceof JSNode)
 				{
-					switch (node.getType())
+					switch (node.getNodeType())
 					{
 						case JSNodeTypes.VAR:
 							JSVarNode varNode = (JSVarNode) node;
@@ -302,12 +302,12 @@ public class JSParser extends Parser implements IParser {
 				
 				if (node instanceof JSNode)
 				{
-					switch (node.getType())
+					switch (node.getNodeType())
 					{
 						case JSNodeTypes.STATEMENTS:
 							IParseNode parent = node.getParent();
 							
-							if (parent.getType() == JSNodeTypes.FUNCTION)
+							if (parent.getNodeType() == JSNodeTypes.FUNCTION)
 							{
 								((JSNode) parent).setDocumentation(block);
 							}

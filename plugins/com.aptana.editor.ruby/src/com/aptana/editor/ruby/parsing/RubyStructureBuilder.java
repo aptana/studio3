@@ -336,7 +336,7 @@ public class RubyStructureBuilder implements ISourceElementRequestor
 		for (IParseNode node : nodes)
 		{
 			element = (IRubyElement) node;
-			if (element.getName().equals(child.getName()) && element.getType() == child.getType())
+			if (element.getName().equals(child.getName()) && element.getNodeType() == child.getNodeType())
 			{
 				return true;
 			}

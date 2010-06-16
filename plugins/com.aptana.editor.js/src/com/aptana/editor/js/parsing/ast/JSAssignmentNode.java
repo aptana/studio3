@@ -72,7 +72,7 @@ public class JSAssignmentNode extends JSNode
 	{
 		StringBuilder text = new StringBuilder();
 		String operator = "???"; //$NON-NLS-1$
-		switch (getType())
+		switch (getNodeType())
 		{
 			case JSNodeTypes.ASSIGN:
 				operator = "="; //$NON-NLS-1$

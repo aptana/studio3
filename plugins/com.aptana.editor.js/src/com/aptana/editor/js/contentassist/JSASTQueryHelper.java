@@ -97,11 +97,11 @@ public class JSASTQueryHelper
 								
 								while (parent != null)
 								{
-									if (parent.getType() == JSNodeTypes.FUNCTION)
+									if (parent.getNodeType() == JSNodeTypes.FUNCTION)
 									{
 										if (parent == function)
 										{
-											Classification c = (nextSibling.getType() == JSNodeTypes.FUNCTION) ? Classification.FUNCTION : Classification.PROPERTY;
+											Classification c = (nextSibling.getNodeType() == JSNodeTypes.FUNCTION) ? Classification.FUNCTION : Classification.PROPERTY;
 											
 											result.put(item.toString(), c);
 										}

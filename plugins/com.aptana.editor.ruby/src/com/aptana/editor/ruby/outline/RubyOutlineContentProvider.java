@@ -22,7 +22,7 @@ public class RubyOutlineContentProvider extends CommonOutlineContentProvider
 			{
 				element = (IRubyElement) node;
 				// filters out block elements
-				if (element.getType() != IRubyElement.BLOCK)
+				if (element.getNodeType() != IRubyElement.BLOCK)
 				{
 					list.add(getOutlineItem(element));
 				}
