@@ -39,12 +39,18 @@ public class RubyFileIndexingParticipant implements IFileStoreIndexingParticipan
 		for (final IFileStore store : files)
 		{
 			if (sub.isCanceled())
+			{
 				throw new CoreException(Status.CANCEL_STATUS);
+			}
 			if (store == null)
+			{
 				continue;
+			}
 			sub.subTask(store.getName());
 			if (!isRubyFile(store))
+			{
 				continue;
+			}
 			try
 			{
 				// grab the source of the file we're going to parse

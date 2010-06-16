@@ -2,6 +2,7 @@ package com.aptana.editor.ruby.index;
 
 import java.util.Stack;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.ruby.core.IRubyMethod.Visibility;
 import com.aptana.editor.ruby.parsing.ISourceElementRequestor;
 import com.aptana.index.core.Index;
@@ -282,7 +283,7 @@ public class RubySourceIndexer implements ISourceElementRequestor
 		}
 
 		String simpleName = lastSegment(typeName, NAMESPACE_DELIMETER);
-		String enclosingTypeName = join(enclosingTypeNames, NAMESPACE_DELIMETER);
+		String enclosingTypeName = StringUtil.join(NAMESPACE_DELIMETER, enclosingTypeNames);
 
 		StringBuilder builder = new StringBuilder();
 		builder.append(superSimpleName);
@@ -296,20 +297,6 @@ public class RubySourceIndexer implements ISourceElementRequestor
 		builder.append(superClassOrModule);
 		builder.append(classOrModule);
 
-		return builder.toString();
-	}
-
-	private String join(String[] enclosingTypeNames, String string)
-	{
-		StringBuilder builder = new StringBuilder();
-		for (String part : enclosingTypeNames)
-		{
-			builder.append(part).append(string);
-		}
-		if (builder.length() > 0)
-		{
-			builder.delete(builder.length() - string.length(), builder.length());
-		}
 		return builder.toString();
 	}
 

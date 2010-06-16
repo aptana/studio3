@@ -139,28 +139,28 @@ public class ResourceIndexer implements IResourceChangeListener
 			Index index = IndexManager.getInstance().getIndex(project.getFullPath().toPortableString());
 			try
 			{
-				// First cleanup indices for files
-				for (IFile file : files)
-				{
-					if (sub.isCanceled())
-					{
-						return Status.CANCEL_STATUS;
-					}
-					index.remove(file.getProjectRelativePath().toPortableString());
-					sub.worked(1);
-				}
-
-				
 				Set<IFileStore> fileStores = new HashSet<IFileStore>();
 				for (IFile file : files)
 				{
 					IFileStore store = EFS.getStore(file.getLocationURI());
 					if (store == null)
 						continue;
-					fileStores.add(store);
-					// TODO Limit file indexers by content type here so we don't have to check content type for each file in every indexer! indexers should/could register what content types they handle and then we can pre-filter here!
-					// To do so, we'd need to keep a mapping from the store to the content types it matches
+					fileStores.add(store);					
 				}
+				
+				// First cleanup indices for files
+				for (IFileStore file : fileStores)
+				{
+					if (sub.isCanceled())
+					{
+						return Status.CANCEL_STATUS;
+					}
+					index.remove(file.toURI().getPath());
+					sub.worked(1);
+				}
+				
+				// TODO Limit file indexers by content type here so we don't have to check content type for each file in every indexer! indexers should/could register what content types they handle and then we can pre-filter here!
+				// To do so, we'd need to keep a mapping from the store to the content types it matches
 				for (IFileStoreIndexingParticipant fileIndexingParticipant : participants)
 				{
 					if (sub.isCanceled())
@@ -169,7 +169,6 @@ public class ResourceIndexer implements IResourceChangeListener
 					}
 					fileIndexingParticipant.index(fileStores, index, sub.newChild(fileStores.size()));
 				}
-
 			}
 			finally
 			{

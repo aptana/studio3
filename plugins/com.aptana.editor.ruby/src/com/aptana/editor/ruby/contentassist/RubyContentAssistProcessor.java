@@ -21,6 +21,7 @@ import org.eclipse.ui.texteditor.HippieProposalProcessor;
 
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.ProcessUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
@@ -33,6 +34,11 @@ import com.aptana.index.core.SearchPattern;
 
 public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 {
+	/**
+	 * Separates file locations when using multiple values for proposal.
+	 */
+	private static final String LOCATIONS_DELIMETER = ", "; //$NON-NLS-1$
+
 	/**
 	 * Prefixes to cheat and easily tell type of variable
 	 */
@@ -60,13 +66,15 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
 			boolean autoActivated)
 	{
-		Map<String, CommonCompletionProposal> proposalMap = new HashMap<String, CommonCompletionProposal>();		
+		Map<String, CommonCompletionProposal> proposalMap = new HashMap<String, CommonCompletionProposal>();
 		// FIXME What about completions of stuff added to current file since last save? Do we need to hit up AST?
 		try
 		{
 			String prefix = getPrefix(viewer, offset);
-			// FIXME This is a giant hack. We try to only search project index for vars/methods/types in current file if no prefix.
-			// If there is a prefix, widen to Ruby Core, Std Lib and project and limit categories based on prefix (plus preceding space/./::)
+			// FIXME This is a giant hack. We try to only search project index for vars/methods/types in current file if
+			// no prefix.
+			// If there is a prefix, widen to Ruby Core, Std Lib and project and limit categories based on prefix (plus
+			// preceding space/./::)
 			List<QueryResult> results = new ArrayList<QueryResult>();
 			List<Index> indices = getIndices(prefix);
 			for (Index index : indices)
@@ -82,24 +90,29 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				CommonCompletionProposal proposal = createProposal(offset, prefix, result);
 				if (proposal == null)
+				{
 					continue;
+				}
 
 				CommonCompletionProposal existing = proposalMap.get(proposal.getDisplayString());
 				if (existing != null)
 				{
 					// Collapse results that have same value into one proposal, combine the filepaths
-					// FIXME Make file locations unique, we have duplicates here too
 					String location = existing.getFileLocation();
 					if (!proposal.getFileLocation().equals(location))
 					{
-						String[] existingLocations = location.split(", ");
-						String[] newLocations = proposal.getFileLocation().split(", ");
+						String[] existingLocations = location.split(LOCATIONS_DELIMETER);
+						String[] newLocations = proposal.getFileLocation().split(LOCATIONS_DELIMETER);
 						Set<String> set = new HashSet<String>();
 						for (String l : existingLocations)
+						{
 							set.add(l);
+						}
 						for (String l : newLocations)
+						{
 							set.add(l);
-						existing.setFileLocation(join(set, ", "));
+						}
+						existing.setFileLocation(StringUtil.join(LOCATIONS_DELIMETER, set));
 					}
 				}
 				else
@@ -114,12 +127,13 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 		}
 
 		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>(proposalMap.values());
-		
-		// As a hack we use word completions to help round out possible completions. This helps make the changes introduced since last save on current file a little less of an issue.
+
+		// As a hack we use word completions to help round out possible completions. This helps make the changes
+		// introduced since last save on current file a little less of an issue.
 		HippieProposalProcessor processor = new HippieProposalProcessor();
 		ICompletionProposal[] wordCompletions = processor.computeCompletionProposals(viewer, offset);
 		proposals.addAll(Arrays.asList(wordCompletions));
-		
+
 		// sort by display name
 		Collections.sort(proposals, new Comparator<ICompletionProposal>()
 		{
@@ -132,20 +146,6 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 
 		// return results
 		return proposals.toArray(new ICompletionProposal[proposals.size()]);
-	}
-
-	private String join(Set<String> set, String delimeter)
-	{
-		StringBuilder builder = new StringBuilder();
-		for (String doc : set)
-		{
-			builder.append(doc).append(delimeter);
-		}
-		if (builder.length() > 0)
-		{
-			builder.delete(builder.length() - 2, builder.length());
-		}
-		return builder.toString();
 	}
 
 	/**
@@ -207,7 +207,7 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 				indices.add(index);
 			}
 		}
-		
+
 		// TODO For rails we need to include the rails gem indices!
 		return indices;
 	}
@@ -252,7 +252,7 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 		URI uri = getURI();
 		if (uri == null)
 			return false;
-		
+
 		String[] documents = result.getDocuments();
 		for (String doc : documents)
 		{
@@ -276,7 +276,7 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 			}
 			set.add(doc);
 		}
-		return join(set, ", ");
+		return StringUtil.join(LOCATIONS_DELIMETER, set);
 	}
 
 	protected Image getImage(QueryResult result)
