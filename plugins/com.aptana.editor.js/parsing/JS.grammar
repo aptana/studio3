@@ -143,9 +143,68 @@
 		{
 			JSParseRootNode root = (JSParseRootNode) result;
 			
+			// save reference to scope information
 			root.setGlobalScope(fScope);
-			root.setPreDocumentationBlocks(this.parsePreDocumentationBlocks());
-			root.setPostDocumentationBlocks(this.parsePostDocumentationBlocks());
+			
+			// process each pre-documentation block
+			for (DocumentationBlock block : this.parsePreDocumentationBlocks())
+			{
+				int index = block.getEnd() + 1;
+				
+				while (index < source.length() && Character.isWhitespace(source.charAt(index)))
+				{
+					index++;
+				}
+				
+				IParseNode node = root.getNodeAtOffset(index);
+				
+				if (node instanceof JSNode)
+				{
+					switch (node.getType())
+					{
+						case JSNodeTypes.VAR:
+							JSVarNode varNode = (JSVarNode) node;
+							((JSNode) varNode.getFirstChild().getLastChild()).setDocumentation(block);
+							break;
+							
+						default:
+							((JSNode) node).setDocumentation(block);
+							break;
+					}
+				}
+			}
+			
+			// process each post-documentation block
+			for (DocumentationBlock block : this.parsePostDocumentationBlocks())
+			{
+				int index = block.getStart() - 1;
+				
+				while (index >= 0 && Character.isWhitespace(source.charAt(index)))
+				{
+					index--;
+				}
+				
+				IParseNode node = root.getNodeAtOffset(index);
+				
+				if (node instanceof JSNode)
+				{
+					switch (node.getType())
+					{
+						case JSNodeTypes.STATEMENTS:
+							IParseNode parent = node.getParent();
+							
+							if (parent.getType() == JSNodeTypes.FUNCTION)
+							{
+								((JSNode) parent).setDocumentation(block);
+							}
+							break;
+							
+						default:
+							((JSNode) node).setDocumentation(block);
+							break;
+					}
+				}
+			}
 		}
 		
 		return result;
@@ -452,16 +511,18 @@ FunctionDeclaration
 			
 			this.popScope();
 			
-			// add symbol for this function to new scope
-			this.addSymbol(identifier.getText(), identifier);
-			
-			return new JSFunctionNode(
+			JSFunctionNode function = new JSFunctionNode(
 				keyword.getStart(),
 				body.getEnd(),
 				new JSIdentifierNode(ident),
 				params,
 				body
 			);
+			
+			// add symbol for this function to new scope
+			this.addSymbol(identifier.getText(), function);
+			
+			return function;
 		:}
 	;
 
