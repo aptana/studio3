@@ -5,6 +5,7 @@ import java.util.EnumSet;
 public enum SDocTokenType
 {
 	UNDEFINED,			// -1
+	
 	EOF,				// 0
 	IDENTIFIER,			// 1
 	RCURLY,				// 2
@@ -28,25 +29,28 @@ public enum SDocTokenType
 	PARAM,				// 20
 	PROPERTY,			// 21
 	RETURN,				// 22
-	ADVANCED,			// 23
-	ALIAS,				// 24
-	AUTHOR,				// 25
-	CONSTRUCTOR,		// 26
-	EXAMPLE,			// 27
-	INTERNAL,			// 28
-	METHOD,				// 29
-	OVERVIEW,			// 30
-	PRIVATE,			// 31
-	SEE,				// 32
-	UNKNOWN,			// 33
-	END_DOCUMENTATION,	// 34
-	ARROW,				// 35
-	ELLIPSIS,			// 36
-	LESS_THAN,			// 37
-	GREATER_THAN,		// 38
-	START_DOCUMENTATION,// 39
-	WHITESPACE,			// 40
-	TYPES;				// 41
+	TYPE,				// 23
+	ADVANCED,			// 24
+	ALIAS,				// 25
+	AUTHOR,				// 26
+	CONSTRUCTOR,		// 27
+	EXAMPLE,			// 28
+	INTERNAL,			// 29
+	METHOD,				// 30
+	OVERVIEW,			// 31
+	PRIVATE,			// 32
+	SEE,				// 33
+	UNKNOWN,			// 34
+	END_DOCUMENTATION,	// 35
+	ARROW,				// 36
+	ELLIPSIS,			// 37
+	LESS_THAN,			// 38
+	GREATER_THAN,		// 39
+	START_DOCUMENTATION,// 40
+	
+	WHITESPACE,			// 41
+	TYPES,				// 42
+	VALUE;				// 43
 	
 	private short _index;
 

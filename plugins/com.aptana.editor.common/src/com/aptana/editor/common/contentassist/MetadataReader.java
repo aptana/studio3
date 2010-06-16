@@ -188,6 +188,24 @@ public abstract class MetadataReader extends ValidatingReader
 	}
 	
 	/**
+	 * normalizeText
+	 * 
+	 * @param text
+	 * @return
+	 */
+	public String normalizeText(String text)
+	{
+		String result = null;
+		
+		if (text != null)
+		{
+			result = text.replaceAll("\\s+", " ").trim();
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * start buffering text
 	 * 
 	 * @param ns

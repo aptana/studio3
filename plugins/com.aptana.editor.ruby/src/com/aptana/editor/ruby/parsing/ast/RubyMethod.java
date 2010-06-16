@@ -45,7 +45,7 @@ public class RubyMethod extends NamedMember implements IRubyMethod
 	}
 
 	@Override
-	public short getType()
+	public short getNodeType()
 	{
 		return IRubyElement.METHOD;
 	}

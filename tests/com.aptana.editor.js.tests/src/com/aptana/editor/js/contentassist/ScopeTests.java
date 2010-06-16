@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.Path;
 
-import com.aptana.editor.js.parsing.JSParseState;
 import com.aptana.editor.js.parsing.JSParser;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.tests.FileContentBasedTests;
@@ -32,7 +31,7 @@ public class ScopeTests extends FileContentBasedTests
 	protected IParseNode getAST(String source) throws Exception
 	{
 		JSParser parser = new JSParser();
-		ParseState parseState = new JSParseState();
+		ParseState parseState = new ParseState();
 
 		parseState.setEditState(source, source, 0, 0);
 		parser.parse(parseState);
@@ -88,7 +87,7 @@ public class ScopeTests extends FileContentBasedTests
 		
 		for (JSNode node : value)
 		{
-			typeSet.addAll(node.getReturnTypes());
+			typeSet.addAll(node.getTypes());
 		}
 		
 		return new LinkedList<String>(typeSet);

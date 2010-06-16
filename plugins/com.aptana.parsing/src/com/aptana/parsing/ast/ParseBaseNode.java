@@ -135,7 +135,7 @@ public class ParseBaseNode extends Node implements IParseNode
 			return false;
 
 		// Same type
-		if (getType() != other.getType())
+		if (getNodeType() != other.getNodeType())
 			return false;
 
 		// That's about the best we can check from here, since offsets can change a lot. Should really also check
@@ -169,13 +169,13 @@ public class ParseBaseNode extends Node implements IParseNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.IParseNode#getChildIndex()
+	 * @see com.aptana.parsing.ast.IParseNode#getIndex()
 	 */
 	@Override
-	public int getChildIndex()
+	public int getIndex()
 	{
 		IParseNode parent = getParent();
-		int result = 0;
+		int result = -1;
 
 		if (parent != null)
 		{
@@ -304,7 +304,7 @@ public class ParseBaseNode extends Node implements IParseNode
 		if (parent != null)
 		{
 			// get index of potential sibling
-			int index = this.getChildIndex() + 1;
+			int index = this.getIndex() + 1;
 			
 			if (index < parent.getChildCount())
 			{
@@ -313,23 +313,6 @@ public class ParseBaseNode extends Node implements IParseNode
 		}
 		
 		return result;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.IParseNode#getIndex(com.aptana.parsing.ast.IParseNode)
-	 */
-	@Override
-	public int getIndex(IParseNode child)
-	{
-		for (int i = 0; i < fChildrenCount; ++i)
-		{
-			if (fChildren[i] == child)
-			{
-				return i;
-			}
-		}
-		return -1;
 	}
 
 	/*
@@ -463,7 +446,7 @@ public class ParseBaseNode extends Node implements IParseNode
 		if (parent != null)
 		{
 			// get index of potential sibling
-			int index = this.getChildIndex() - 1;
+			int index = this.getIndex() - 1;
 			
 			if (index >= 0)
 			{
@@ -472,6 +455,32 @@ public class ParseBaseNode extends Node implements IParseNode
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * getRootNode
+	 * 
+	 * @return
+	 */
+	public IParseNode getRootNode()
+	{
+		IParseNode root = this;
+		
+		while (true)
+		{
+			IParseNode parent = root.getParent();
+			
+			if (parent == null)
+			{
+				break;
+			}
+			else
+			{
+				root = parent;
+			}
+		}
+		
+		return root;
 	}
 	
 	/*
@@ -499,7 +508,7 @@ public class ParseBaseNode extends Node implements IParseNode
 	 * @see com.aptana.parsing.ast.IParseNode#getType()
 	 */
 	@Override
-	public short getType()
+	public short getNodeType()
 	{
 		return getId();
 	}
@@ -522,7 +531,7 @@ public class ParseBaseNode extends Node implements IParseNode
 	public int hashCode()
 	{
 		int hash = 31 + getLanguage().hashCode();
-		hash = hash * 31 + getType();
+		hash = hash * 31 + getNodeType();
 		hash = hash * 31 + (getParent() == null ? 0 : getParent().hashCode());
 		return hash;
 	}

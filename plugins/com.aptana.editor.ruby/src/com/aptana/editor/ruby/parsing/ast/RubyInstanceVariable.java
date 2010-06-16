@@ -11,7 +11,7 @@ public class RubyInstanceVariable extends RubyField
 	}
 
 	@Override
-	public short getType()
+	public short getNodeType()
 	{
 		return IRubyElement.INSTANCE_VAR;
 	}

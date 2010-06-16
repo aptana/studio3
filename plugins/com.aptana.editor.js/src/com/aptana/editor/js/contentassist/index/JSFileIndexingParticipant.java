@@ -21,13 +21,15 @@ import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.contentassist.JSASTQueryHelper;
 import com.aptana.editor.js.parsing.IJSParserConstants;
-import com.aptana.editor.js.parsing.JSParseState;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
+import com.aptana.editor.js.parsing.ast.JSParseRootNode;
+import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.IParserPool;
+import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.Scope;
 import com.aptana.parsing.ast.IParseNode;
@@ -77,16 +79,15 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 						{
 							IParser parser = pool.checkOut();
 
-							JSParseState parseState = new JSParseState();
-
 							// apply the source to the parse state and parse
+							ParseState parseState = new ParseState();
 							parseState.setEditState(source, source, 0, 0);
 							parser.parse(parseState);
 
 							pool.checkIn(parser);
-
+							
 							// process results
-							this.processParseResults(index, file, parseState);
+							this.processParseResults(index, file, parseState.getParseResult());
 						}
 					}
 				}
@@ -162,12 +163,12 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 	 * @param file
 	 * @param parseState
 	 */
-	private void processParseResults(Index index, IFileStore file, JSParseState parseState)
+	private void processParseResults(Index index, IFileStore file, IParseNode ast)
 	{
 		if (Platform.inDevelopmentMode())
 		{
 			String location = file.toURI().getPath();
-			Scope<JSNode> globals = parseState.getGlobalScope();
+			Scope<JSNode> globals = ((JSParseRootNode) ast).getGlobalScope();
 			
 			for (String symbol: globals.getLocalSymbolNames())
 			{
@@ -176,6 +177,13 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 				
 				for (JSNode node : nodes)
 				{
+					DocumentationBlock block = node.getDocumentation();
+					
+					if (block != null)
+					{
+//						System.out.println("Found block for " + symbol + "\n" + block.toSource());
+					}
+					
 					if (node instanceof JSFunctionNode)
 					{
 						category = JSIndexConstants.FUNCTION;
@@ -188,8 +196,6 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 		}
 		else
 		{
-			IParseNode ast = parseState.getParseResult();
-			
 			this.walkAST(index, file, ast);
 		}
 	}

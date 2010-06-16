@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.aptana.editor.js.parsing.IJSParserConstants;
+import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseBaseNode;
 import com.aptana.parsing.ast.ParseRootNode;
@@ -19,7 +20,9 @@ public class JSNode extends ParseBaseNode
 
 	private short fType;
 	private boolean fSemicolonIncluded;
-	private List<String> fReturnTypes;
+
+	private DocumentationBlock fDocumentation;
+	private List<String> fTypes;
 
 	/**
 	 * static initializer
@@ -109,7 +112,7 @@ public class JSNode extends ParseBaseNode
 			return false;
 		}
 		JSNode other = (JSNode) obj;
-		return getType() == other.getType() && getSemicolonIncluded() == other.getSemicolonIncluded() && Arrays.equals(getChildren(), other.getChildren());
+		return getNodeType() == other.getNodeType() && getSemicolonIncluded() == other.getSemicolonIncluded() && Arrays.equals(getChildren(), other.getChildren());
 	}
 
 	/**
@@ -122,10 +125,10 @@ public class JSNode extends ParseBaseNode
 		// move up to nearest statement
 		IParseNode result = this;
 		IParseNode parent = result.getParent();
-		
+
 		while (parent != null)
 		{
-			if (parent instanceof ParseRootNode || parent.getType() == JSNodeTypes.STATEMENTS)
+			if (parent instanceof ParseRootNode || parent.getNodeType() == JSNodeTypes.STATEMENTS)
 			{
 				break;
 			}
@@ -135,10 +138,20 @@ public class JSNode extends ParseBaseNode
 				parent = parent.getParent();
 			}
 		}
-		
+
 		return result;
 	}
-	
+
+	/**
+	 * getDocumentation
+	 * 
+	 * @return
+	 */
+	public DocumentationBlock getDocumentation()
+	{
+		return this.fDocumentation;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.ParseBaseNode#getElementName()
@@ -146,26 +159,26 @@ public class JSNode extends ParseBaseNode
 	@Override
 	public String getElementName()
 	{
-		String result = typeNameMap.get(this.getType());
+		String result = typeNameMap.get(this.getNodeType());
 
 		return (result == null) ? super.getElementName() : result;
 	}
 
 	/**
-	 * getReturnTypes
+	 * getTypes
 	 * 
 	 * @return
 	 */
-	public List<String> getReturnTypes()
+	public List<String> getTypes()
 	{
-		if (fReturnTypes == null)
+		if (fTypes == null)
 		{
-			fReturnTypes = new ArrayList<String>();
+			fTypes = new ArrayList<String>();
 
-			addReturnTypes(fReturnTypes);
+			addReturnTypes(fTypes);
 		}
 
-		return fReturnTypes;
+		return fTypes;
 	}
 
 	/**
@@ -182,7 +195,7 @@ public class JSNode extends ParseBaseNode
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.ParseBaseNode#getType()
 	 */
-	public short getType()
+	public short getNodeType()
 	{
 		return fType;
 	}
@@ -194,7 +207,7 @@ public class JSNode extends ParseBaseNode
 	@Override
 	public int hashCode()
 	{
-		int hash = getType();
+		int hash = getNodeType();
 		hash = 31 * hash + (getSemicolonIncluded() ? 1 : 0);
 		hash = 31 * hash + Arrays.hashCode(getChildren());
 		return hash;
@@ -207,7 +220,17 @@ public class JSNode extends ParseBaseNode
 	 */
 	public boolean isEmpty()
 	{
-		return getType() == JSNodeTypes.EMPTY;
+		return getNodeType() == JSNodeTypes.EMPTY;
+	}
+
+	/**
+	 * setDocumentation
+	 * 
+	 * @param block
+	 */
+	public void setDocumentation(DocumentationBlock block)
+	{
+		fDocumentation = block;
 	}
 
 	/**

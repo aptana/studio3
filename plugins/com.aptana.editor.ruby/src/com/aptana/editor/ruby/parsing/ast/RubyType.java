@@ -76,7 +76,7 @@ public class RubyType extends NamedMember implements IRubyType
 	}
 
 	@Override
-	public short getType()
+	public short getNodeType()
 	{
 		return IRubyElement.TYPE;
 	}

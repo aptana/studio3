@@ -2,9 +2,9 @@ package com.aptana.editor.js.parsing;
 
 import com.aptana.editor.js.vsdoc.parsing.VSDocReader;
 import java.util.ArrayList;
-import com.aptana.editor.js.sdoc.model.Block;
 import java.util.List;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
+import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import java.io.IOException;
 import com.aptana.parsing.IRecoveryStrategy;
 import com.aptana.editor.js.sdoc.parsing.SDocParser;
@@ -253,13 +253,72 @@ public class JSParser extends Parser implements IParser {
 		IParseNode result = (IParseNode) parse(fScanner);
 		parseState.setParseResult(result);
 		
-		if (parseState instanceof JSParseState)
+		if (result instanceof JSParseRootNode)
 		{
-			JSParseState jsParseState = (JSParseState) parseState;
+			JSParseRootNode root = (JSParseRootNode) result;
 			
-			jsParseState.setGlobalScope(fScope);
-			jsParseState.setPreDocumentationBlocks(this.parsePreDocumentationBlocks());
-			jsParseState.setPostDocumentationBlocks(this.parsePostDocumentationBlocks());
+			// save reference to scope information
+			root.setGlobalScope(fScope);
+			
+			// process each pre-documentation block
+			for (DocumentationBlock block : this.parsePreDocumentationBlocks())
+			{
+				int index = block.getEnd() + 1;
+				
+				while (index < source.length() && Character.isWhitespace(source.charAt(index)))
+				{
+					index++;
+				}
+				
+				IParseNode node = root.getNodeAtOffset(index);
+				
+				if (node instanceof JSNode)
+				{
+					switch (node.getNodeType())
+					{
+						case JSNodeTypes.VAR:
+							JSVarNode varNode = (JSVarNode) node;
+							((JSNode) varNode.getFirstChild().getLastChild()).setDocumentation(block);
+							break;
+							
+						default:
+							((JSNode) node).setDocumentation(block);
+							break;
+					}
+				}
+			}
+			
+			// process each post-documentation block
+			for (DocumentationBlock block : this.parsePostDocumentationBlocks())
+			{
+				int index = block.getStart() - 1;
+				
+				while (index >= 0 && Character.isWhitespace(source.charAt(index)))
+				{
+					index--;
+				}
+				
+				IParseNode node = root.getNodeAtOffset(index);
+				
+				if (node instanceof JSNode)
+				{
+					switch (node.getNodeType())
+					{
+						case JSNodeTypes.STATEMENTS:
+							IParseNode parent = node.getParent();
+							
+							if (parent.getNodeType() == JSNodeTypes.FUNCTION)
+							{
+								((JSNode) parent).setDocumentation(block);
+							}
+							break;
+							
+						default:
+							((JSNode) node).setDocumentation(block);
+							break;
+					}
+				}
+			}
 		}
 		
 		return result;
@@ -270,20 +329,20 @@ public class JSParser extends Parser implements IParser {
 	 * 
 	 * @return
 	 */
-	protected List<Block> parsePreDocumentationBlocks()
+	protected List<DocumentationBlock> parsePreDocumentationBlocks()
 	{
 		SDocParser parser = new SDocParser();
-		List<Block> blocks = new ArrayList<Block>();
+		List<DocumentationBlock> blocks = new ArrayList<DocumentationBlock>();
 		
 		for (Symbol doc : fScanner.getSDocComments())
 		{
 			try
 			{
-				Object result = parser.parse((String) doc.value);
+				Object result = parser.parse((String) doc.value, doc.getStart());
 				
-				if (result instanceof Block)
+				if (result instanceof DocumentationBlock)
 				{
-					blocks.add((Block) result);
+					blocks.add((DocumentationBlock) result);
 				}
 			}
 			catch (java.lang.Exception e)
@@ -323,10 +382,10 @@ public class JSParser extends Parser implements IParser {
 	 * 
 	 * @return
 	 */
-	protected List<Block> parsePostDocumentationBlocks()
+	protected List<DocumentationBlock> parsePostDocumentationBlocks()
 	{
 		VSDocReader parser = new VSDocReader();
-		List<Block> blocks = new ArrayList<Block>();
+		List<DocumentationBlock> blocks = new ArrayList<DocumentationBlock>();
 		
 		for (Symbol doc : fScanner.getVSDocComments())
 		{
@@ -334,16 +393,22 @@ public class JSParser extends Parser implements IParser {
 			
 			try
 			{
-				String source = this.buildVSDocXML((List<Symbol>) doc.value);
+				List<Symbol> lines = (List<Symbol>) doc.value;
+				String source = this.buildVSDocXML(lines);
 				
-				new ByteArrayInputStream(source.getBytes());
+				input = new ByteArrayInputStream(source.getBytes());
 				
 				parser.loadXML(input);
 				
-				Block result = parser.getBlock(); 
+				DocumentationBlock result = parser.getBlock(); 
 				
 				if (result != null)
 				{
+					if (lines.size() > 0)
+					{
+						result.setRange(lines.get(0).getStart(), lines.get(lines.size() - 1).getEnd());
+					}
+					
 					blocks.add(result);
 				}
 			}
@@ -552,16 +617,18 @@ public class JSParser extends Parser implements IParser {
 			
 			this.popScope();
 			
-			// add symbol for this function to new scope
-			this.addSymbol(identifier.getText(), identifier);
-			
-			return new JSFunctionNode(
+			JSFunctionNode function = new JSFunctionNode(
 				keyword.getStart(),
 				body.getEnd(),
 				new JSIdentifierNode(ident),
 				params,
 				body
 			);
+			
+			// add symbol for this function to new scope
+			this.addSymbol(identifier.getText(), function);
+			
+			return function;
 			}
 			case 6: // FunctionExpression = FUNCTION.keyword FunctionParameters.params FunctionBody.body
 			{
