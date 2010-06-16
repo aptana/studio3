@@ -3,6 +3,7 @@ package com.aptana.editor.css.contentassist;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -69,7 +70,12 @@ public class CSSIndexQueryHelper
 	 */
 	public Set<String> getColors(Index index)
 	{
-		return this.getReader().getValues(index, CSSIndexConstants.COLOR).keySet();
+		if (index == null)
+			return Collections.emptySet();
+		Map<String, String> colorMap = this.getReader().getValues(index, CSSIndexConstants.COLOR);
+		if (colorMap == null)
+			return Collections.emptySet();
+		return colorMap.keySet();
 	}
 
 	/**

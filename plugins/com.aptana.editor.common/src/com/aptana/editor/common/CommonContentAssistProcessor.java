@@ -374,6 +374,10 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 */
 	protected Index getIndex()
 	{
+		if (editor == null)
+		{
+			return null;
+		}
 		IEditorInput editorInput = editor.getEditorInput();
 		Index result = null;
 
