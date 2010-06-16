@@ -36,7 +36,9 @@ public class CoreStubber extends Job
 
 	public CoreStubber()
 	{
-		super("Stubbing and Indexing Core Ruby...");
+		super("Stubbing and Indexing Core Ruby..."); //$NON-NLS-1$
+		setSystem(true);
+		setPriority(Job.LONG);
 	}
 
 	@Override

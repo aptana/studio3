@@ -38,8 +38,6 @@ public class Activator extends AbstractUIPlugin
 		plugin = this;
 		// Schedule a job to stub out core library for ruby, then index it
 		Job job = new CoreStubber();
-		job.setSystem(true);
-		job.setPriority(Job.LONG);
 		job.schedule();
 	}
 
