@@ -120,7 +120,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 	public void createControl(Composite parent)
 	{
 		fMainControl = new Composite(parent, SWT.NONE);
-		fMainControl.setLayout(GridLayoutFactory.fillDefaults().create());
+		fMainControl.setLayout(GridLayoutFactory.fillDefaults().spacing(0, 2).create());
 		fMainControl.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
 		fSearchBox = new Text(fMainControl, SWT.SINGLE | SWT.BORDER | SWT.SEARCH);
@@ -133,7 +133,15 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 			@Override
 			public void modifyText(ModifyEvent e)
 			{
-				fFilter.setPattern(fSearchBox.getText());
+				String text = fSearchBox.getText();
+				if (INITIAL_FILTER_TEXT.equals(text))
+				{
+					fFilter.setPattern(null);
+				}
+				else
+				{
+					fFilter.setPattern(text);
+				}
 				// refresh the content on a delay
 				fFilterRefreshJob.cancel();
 				fFilterRefreshJob.schedule(FILTER_REFRESH_DELAY);
