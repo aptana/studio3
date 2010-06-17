@@ -47,7 +47,7 @@ public class LocationTests extends EditorBasedTests
 	public void testEmptyArgs()
 	{
 		this.testLocations(
-			"locations/global_in_empty_args.js",
+			"ranges/functionAndInvokeWithoutParams.js",
 			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
 			new LocationTypeRange(LocationType.NONE, 1, 15),
 			new LocationTypeRange(LocationType.IN_GLOBAL, 16, 20),
@@ -62,7 +62,7 @@ public class LocationTests extends EditorBasedTests
 	public void testInArgs()
 	{
 		this.testLocations(
-			"locations/global_in_arg.js",
+			"ranges/functionAndInvokeWithIncompleteParams.js",
 			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
 			new LocationTypeRange(LocationType.NONE, 1, 15),
 			new LocationTypeRange(LocationType.IN_GLOBAL, 16, 20),
