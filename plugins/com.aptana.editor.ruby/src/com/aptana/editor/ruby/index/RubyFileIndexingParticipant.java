@@ -67,7 +67,7 @@ public class RubyFileIndexingParticipant implements IFileStoreIndexingParticipan
 						visitor.acceptNode(root);
 					}
 				}
-				catch (Exception e)
+				catch (Throwable e)
 				{
 					Activator.log(e);
 				}
