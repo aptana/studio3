@@ -1,5 +1,7 @@
 package com.aptana.editor.js.parsing.ast;
 
+import com.aptana.editor.js.contentassist.LocationType;
+
 public class JSPrimitiveNode extends JSNode
 {
 	private String fText;
@@ -35,6 +37,15 @@ public class JSPrimitiveNode extends JSNode
 		}
 
 		return fText.equals(((JSPrimitiveNode) obj).fText);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#getLocationType(int)
+	 */
+	@Override
+	LocationType getLocationType(int offset)
+	{
+		return LocationType.NONE;
 	}
 
 	/*

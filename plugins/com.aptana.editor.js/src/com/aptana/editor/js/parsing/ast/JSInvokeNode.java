@@ -1,5 +1,6 @@
 package com.aptana.editor.js.parsing.ast;
 
+import com.aptana.editor.js.contentassist.LocationType;
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSInvokeNode extends JSNode
@@ -16,6 +17,37 @@ public class JSInvokeNode extends JSNode
 		super(JSNodeTypes.INVOKE, start, end, children);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#getLocationType(int)
+	 */
+	LocationType getLocationType(int offset)
+	{
+		LocationType result = LocationType.IN_GLOBAL;
+		
+		if (this.contains(offset))
+		{
+			for (IParseNode child : this)
+			{
+				if (child.contains(offset))
+				{
+					if (child instanceof JSNode)
+					{
+						result = ((JSNode) child).getLocationType(offset);
+					}
+					else
+					{
+						result = LocationType.UNKNOWN;
+					}
+					
+					break;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()

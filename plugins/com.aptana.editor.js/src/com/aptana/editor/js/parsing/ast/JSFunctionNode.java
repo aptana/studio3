@@ -3,6 +3,7 @@ package com.aptana.editor.js.parsing.ast;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.aptana.editor.js.contentassist.LocationType;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseNodeAttribute;
 import com.aptana.parsing.ast.ParseBaseNode;
@@ -70,6 +71,31 @@ public class JSFunctionNode extends JSNode
 	public IParseNode getBody()
 	{
 		return this.getChild(2);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#getLocationType(int)
+	 */
+	@Override
+	LocationType getLocationType(int offset)
+	{
+		LocationType result = LocationType.UNKNOWN;
+		
+		if (this.contains(offset))
+		{
+			IParseNode body = this.getBody();
+			
+			if (body.contains(offset))
+			{
+				result = ((JSNode) body).getLocationType(offset);
+			}
+			else
+			{
+				result = LocationType.NONE;
+			}
+		}
+		
+		return result;
 	}
 
 	/**

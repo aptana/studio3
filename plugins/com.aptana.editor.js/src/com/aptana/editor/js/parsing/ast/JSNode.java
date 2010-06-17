@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.aptana.editor.js.contentassist.LocationType;
 import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.parsing.ast.IParseNode;
@@ -191,6 +192,35 @@ public class JSNode extends ParseBaseNode
 		return fSemicolonIncluded;
 	}
 
+	/**
+	 * getLocationType
+	 * 
+	 * @param offset
+	 * @return
+	 */
+	LocationType getLocationType(int offset)
+	{
+		LocationType result = LocationType.UNKNOWN;
+		
+		if (this.contains(offset) && this.hasChildren())
+		{
+			for (IParseNode child : this)
+			{
+				if (child.contains(offset))
+				{
+					if (child instanceof JSNode)
+					{
+						result = ((JSNode) child).getLocationType(offset);
+					}
+					
+					break;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.ParseBaseNode#getType()
