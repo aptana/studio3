@@ -2,13 +2,14 @@ package com.aptana.editor.js.parsing.ast;
 
 import beaver.Symbol;
 
+import com.aptana.editor.js.contentassist.LocationType;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSBinaryOperatorNode extends JSNode
 {
 	private Symbol _operator;
-	
+
 	/**
 	 * JSBinaryOperatorNode
 	 * 
@@ -33,7 +34,7 @@ public class JSBinaryOperatorNode extends JSNode
 	public JSBinaryOperatorNode(JSNode left, Symbol operator, JSNode right)
 	{
 		this(left, right);
-		
+
 		this._operator = operator;
 
 		short type = DEFAULT_TYPE;
@@ -122,7 +123,47 @@ public class JSBinaryOperatorNode extends JSNode
 	{
 		return this.getChild(0);
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#getLocationType(int)
+	 */
+	@Override
+	LocationType getLocationType(int offset)
+	{
+		LocationType result = LocationType.UNKNOWN;
+
+		if (this.contains(offset))
+		{
+			for (IParseNode child : this)
+			{
+				if (child.contains(offset))
+				{
+					if (child instanceof JSNode)
+					{
+						result = ((JSNode) child).getLocationType(offset);
+					}
+
+					break;
+				}
+			}
+
+			if (result == LocationType.UNKNOWN)
+			{
+				if (this._operator.getStart() == offset + 1 || this._operator.getEnd() <= offset)
+				{
+					result = LocationType.IN_GLOBAL;
+				}
+				else if (offset <= this._operator.getStart())
+				{
+					result = LocationType.NONE;
+				}
+			}
+		}
+
+		return result;
+	}
+
 	/**
 	 * getRightHandSide
 	 * 
@@ -132,7 +173,7 @@ public class JSBinaryOperatorNode extends JSNode
 	{
 		return this.getChild(1);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
@@ -141,7 +182,7 @@ public class JSBinaryOperatorNode extends JSNode
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
-		
+
 		text.append(this.getLeftHandSide());
 		text.append(" ").append(this._operator.value).append(" "); //$NON-NLS-1$ //$NON-NLS-2$
 		text.append(this.getRightHandSide());
