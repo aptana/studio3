@@ -1,10 +1,15 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
+import com.aptana.editor.js.contentassist.LocationType;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSAssignmentNode extends JSNode
 {
+	private Symbol _operator;
+	
 	/**
 	 * JSAssignmentNode
 	 * 
@@ -12,13 +17,14 @@ public class JSAssignmentNode extends JSNode
 	 * @param assignOperator
 	 * @param right
 	 */
-	public JSAssignmentNode(JSNode left, String assignOperator, JSNode right)
+	public JSAssignmentNode(JSNode left, Symbol assignOperator, JSNode right)
 	{
+		this._operator = assignOperator;
 		this.start = left.getStart();
 		this.end = right.getEnd();
 
 		short type = DEFAULT_TYPE;
-		JSTokenType token = JSTokenType.get(assignOperator);
+		JSTokenType token = JSTokenType.get((String) assignOperator.value);
 		switch (token)
 		{
 			case EQUAL:
@@ -61,6 +67,45 @@ public class JSAssignmentNode extends JSNode
 		setType(type);
 
 		setChildren(new JSNode[] { left, right });
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#getLocationType(int)
+	 */
+	@Override
+	LocationType getLocationType(int offset)
+	{
+		LocationType result = LocationType.UNKNOWN;
+		
+		if (this.contains(offset))
+		{
+			for (IParseNode child : this)
+			{
+				if (child.contains(offset))
+				{
+					if (child instanceof JSNode)
+					{
+						result = ((JSNode) child).getLocationType(offset);
+					}
+					
+					break;
+				}
+			}
+			
+			if (result == LocationType.UNKNOWN)
+			{
+				if (offset < this._operator.getStart())
+				{
+					result = LocationType.NONE;
+				}
+				else if (this._operator.getEnd() <= offset)
+				{
+					result = LocationType.IN_GLOBAL;
+				}
+			}
+		}
+		
+		return result;
 	}
 
 	/*

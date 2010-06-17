@@ -2299,8 +2299,7 @@ public class JSParser extends Parser implements IParser {
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
-					final Symbol _symbol_o = _symbols[offset + 2];
-					final String o = (String) _symbol_o.value;
+					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
@@ -2310,8 +2309,7 @@ public class JSParser extends Parser implements IParser {
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
-					final Symbol _symbol_o = _symbols[offset + 2];
-					final String o = (String) _symbol_o.value;
+					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
@@ -2321,8 +2319,7 @@ public class JSParser extends Parser implements IParser {
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
-					final Symbol _symbol_o = _symbols[offset + 2];
-					final String o = (String) _symbol_o.value;
+					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
