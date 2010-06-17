@@ -24,6 +24,8 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
@@ -87,6 +89,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 	}
 
 	private static final String OUTLINE_CONTEXT = "com.aptana.editor.common.outline"; //$NON-NLS-1$
+	private static final String INITIAL_FILTER_TEXT = Messages.CommonOutlinePage_InitialFilterText;
 	private static final int FILTER_REFRESH_DELAY = 200;
 
 	private AbstractThemeableEditor fEditor;
@@ -122,6 +125,8 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 
 		fSearchBox = new Text(fMainControl, SWT.SINGLE | SWT.BORDER | SWT.SEARCH);
 		fSearchBox.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).indent(0, 3).create());
+		fSearchBox.setText(INITIAL_FILTER_TEXT);
+		fSearchBox.setForeground(fSearchBox.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		fSearchBox.addModifyListener(new ModifyListener()
 		{
 
@@ -132,6 +137,29 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 				// refresh the content on a delay
 				fFilterRefreshJob.cancel();
 				fFilterRefreshJob.schedule(FILTER_REFRESH_DELAY);
+			}
+		});
+		fSearchBox.addFocusListener(new FocusListener()
+		{
+
+			@Override
+			public void focusLost(FocusEvent e)
+			{
+				if (fSearchBox.getText().length() == 0)
+				{
+					fSearchBox.setText(INITIAL_FILTER_TEXT);
+				}
+				fSearchBox.setForeground(fSearchBox.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			}
+
+			@Override
+			public void focusGained(FocusEvent e)
+			{
+				if (fSearchBox.getText().equals(INITIAL_FILTER_TEXT))
+				{
+					fSearchBox.setText(""); //$NON-NLS-1$
+				}
+				fSearchBox.setForeground(null);
 			}
 		});
 
@@ -279,7 +307,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 	@Override
 	public void setFocus()
 	{
-		fTreeViewer.getControl().setFocus();
+		getControl().setFocus();
 	}
 
 	@Override
@@ -408,8 +436,8 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 
 	private boolean isDisposed()
 	{
-		TreeViewer viewer = getTreeViewer();
-		return viewer == null || viewer.getControl() == null || viewer.getControl().isDisposed();
+		Control control = getControl();
+		return control == null || control.isDisposed();
 	}
 
 	private void registerActions(IActionBars actionBars)
