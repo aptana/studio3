@@ -31,10 +31,10 @@ public class CSSScopeScanner extends CSSCodeScanner
 		}
 
 		// Add the rules for block comments, single and double quoted strings
-		rules.add(new SingleLineRule("\"", "\"", createToken(CSSTokenType.DOUBLE_QUOTED_STRING), '\\')); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		rules.add(new SingleLineRule("\'", "\'", createToken(CSSTokenType.SINGLE_QUOTED_STRING), '\\')); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		rules.add(new WordPredicateRule(createToken(CSSTokenType.COMMENT))); //$NON-NLS-1$
-		rules.add(new MultiLineRule("/*", "*/", createToken(CSSTokenType.COMMENT), (char) 0, true)); //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$
+		rules.add(new SingleLineRule("\"", "\"", createToken(CSSTokenType.DOUBLE_QUOTED_STRING), '\\')); //$NON-NLS-1$ //$NON-NLS-2$ 
+		rules.add(new SingleLineRule("\'", "\'", createToken(CSSTokenType.SINGLE_QUOTED_STRING), '\\')); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new WordPredicateRule(createToken(CSSTokenType.COMMENT)));
+		rules.add(new MultiLineRule("/*", "*/", createToken(CSSTokenType.COMMENT), (char) 0, true)); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		// Add rules for the start characters of classes and ids
 		rules.add(new SingleCharacterRule('#', createToken(CSSTokenType.ID)));

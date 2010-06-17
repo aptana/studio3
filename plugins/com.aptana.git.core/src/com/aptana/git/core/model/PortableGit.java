@@ -70,7 +70,7 @@ public final class PortableGit {
 		if (bundle != null) {
 			IPath path = Platform.getStateLocation(bundle);
 			if (path != null) {
-				path = path.append("bin").append(GitExecutable.GIT_EXECUTABLE_WIN32);
+				path = path.append("bin").append(GitExecutable.GIT_EXECUTABLE_WIN32); //$NON-NLS-1$
 			}
 			if (path != null && GitExecutable.acceptBinary(path)) {
 				return location = path;
@@ -84,10 +84,10 @@ public final class PortableGit {
 		if (bundle != null) {
 			IPath path = Platform.getStateLocation(bundle);
 			if (path != null) {
-				path = path.append("bin").append(GitExecutable.GIT_EXECUTABLE_WIN32);
+				path = path.append("bin").append(GitExecutable.GIT_EXECUTABLE_WIN32); //$NON-NLS-1$
 			}
 			if (path != null && path.equals(location)) {
-				Job job = new Job("Check PortableGit installation") {
+				Job job = new Job("Check PortableGit installation") { //$NON-NLS-1$
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
 						try {
@@ -118,7 +118,7 @@ public final class PortableGit {
 	}
 	
 	private static Bundle getBundle() {
-		return Platform.getBundle("com.aptana.portablegit."+Platform.getOS());
+		return Platform.getBundle("com.aptana.portablegit."+Platform.getOS()); //$NON-NLS-1$
 	}
 
 }

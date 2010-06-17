@@ -159,23 +159,23 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 
 		IWordDetector identifierDetector = new KeywordIdentifierDetector();
 		WordRule wordRule = new WordRule(identifierDetector, Token.UNDEFINED);
-		addWordsToRule(wordRule, getPropertyNames(), CSSTokenType.PROPERTY); //$NON-NLS-1$
-		addWordsToRule(wordRule, PROPERTY_VALUES, CSSTokenType.VALUE); //$NON-NLS-1$
-		addWordsToRule(wordRule, MEASUREMENTS, CSSTokenType.UNIT); //$NON-NLS-1$
+		addWordsToRule(wordRule, getPropertyNames(), CSSTokenType.PROPERTY);
+		addWordsToRule(wordRule, PROPERTY_VALUES, CSSTokenType.VALUE);
+		addWordsToRule(wordRule, MEASUREMENTS, CSSTokenType.UNIT);
 		rules.add(wordRule);
 
 		// normal words
 		wordRule = new WordRule(identifierDetector, Token.UNDEFINED);
-		addWordsToRule(wordRule, HTML_TAGS, CSSTokenType.ELEMENT); //$NON-NLS-1$
-		addWordsToRule(wordRule, MEDIA, CSSTokenType.MEDIA); //$NON-NLS-1$
-		addWordsToRule(wordRule, FUNCTIONS, CSSTokenType.FUNCTION); //$NON-NLS-1$
-		addWordsToRule(wordRule, STANDARD_COLORS, CSSTokenType.COLOR); //$NON-NLS-1$
-		addWordsToRule(wordRule, DEPRECATED_COLORS, CSSTokenType.DEPRECATED_COLOR); //$NON-NLS-1$
+		addWordsToRule(wordRule, HTML_TAGS, CSSTokenType.ELEMENT);
+		addWordsToRule(wordRule, MEDIA, CSSTokenType.MEDIA);
+		addWordsToRule(wordRule, FUNCTIONS, CSSTokenType.FUNCTION);
+		addWordsToRule(wordRule, STANDARD_COLORS, CSSTokenType.COLOR);
+		addWordsToRule(wordRule, DEPRECATED_COLORS, CSSTokenType.DEPRECATED_COLOR);
 		rules.add(wordRule);
 
 		// ignore case
 		wordRule = new WordRule(identifierDetector, Token.UNDEFINED, true);
-		addWordsToRule(wordRule, FONT_NAMES, CSSTokenType.FONT); //$NON-NLS-1$
+		addWordsToRule(wordRule, FONT_NAMES, CSSTokenType.FONT);
 		rules.add(wordRule);
 
 		// Browser-specific property names
@@ -187,7 +187,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 				return c == '-';
 			}
 		};
-		rules.add(new ExtendedWordRule(browserSpecificProperties, createToken(CSSTokenType.PROPERTY), true) //$NON-NLS-1$
+		rules.add(new ExtendedWordRule(browserSpecificProperties, createToken(CSSTokenType.PROPERTY), true)
 				{
 					@Override
 					protected boolean wordOK(String word, ICharacterScanner scanner)
@@ -210,42 +210,42 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 				});
 
 		// curly braces
-		rules.add(new SingleCharacterRule('{', createToken(CSSTokenType.CURLY_BRACE))); //$NON-NLS-1$
-		rules.add(new SingleCharacterRule('}', createToken(CSSTokenType.CURLY_BRACE))); //$NON-NLS-1$
+		rules.add(new SingleCharacterRule('{', createToken(CSSTokenType.CURLY_BRACE)));
+		rules.add(new SingleCharacterRule('}', createToken(CSSTokenType.CURLY_BRACE)));
 		// colon
-		rules.add(new SingleCharacterRule(':', createToken(CSSTokenType.COLON))); //$NON-NLS-1$
+		rules.add(new SingleCharacterRule(':', createToken(CSSTokenType.COLON)));
 		// semicolon
-		rules.add(new SingleCharacterRule(';', createToken(CSSTokenType.SEMICOLON))); //$NON-NLS-1$
+		rules.add(new SingleCharacterRule(';', createToken(CSSTokenType.SEMICOLON)));
 		// parens
 		// HACK these rules are more correct, but for now we eat up the stuff inside parens too, to avoid weirder
 		// coloring
-		//		rules.add(new SingleCharacterRule('(', createToken("punctuation.section.function.css"))); //$NON-NLS-1$
-		//		rules.add(new SingleCharacterRule(')', createToken("punctuation.section.function.css"))); //$NON-NLS-1$
+		//		rules.add(new SingleCharacterRule('(', createToken("punctuation.section.function.css")));
+		//		rules.add(new SingleCharacterRule(')', createToken("punctuation.section.function.css")));
 		rules.add(new RegexpRule("\\([^)]*?\\)", createToken(CSSTokenType.ARGS), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
 
 		// Now onto to more expensive regexp rules
 		// rgb values
 		rules.add(new RegexpRule("#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\\b", //$NON-NLS-1$
-				createToken(CSSTokenType.RGB), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
+				createToken(CSSTokenType.RGB), OPTIMIZE_REGEXP_RULES));
 		// ids
-		rules.add(new RegexpRule("#[_a-zA-Z0-9-]+", createToken(CSSTokenType.ID), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new RegexpRule("#[_a-zA-Z0-9-]+", createToken(CSSTokenType.ID), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
 		// classes
-		rules.add(new RegexpRule("\\.[_a-zA-Z0-9-]+", createToken(CSSTokenType.CLASS), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new RegexpRule("\\.[_a-zA-Z0-9-]+", createToken(CSSTokenType.CLASS), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
 
 		// numbers
 		rules.add(new RegexpRule("(\\-|\\+)?\\s*[0-9]+(\\.[0-9]+)?", //$NON-NLS-1$
-				createToken(CSSTokenType.NUMBER))); //$NON-NLS-1$
+				createToken(CSSTokenType.NUMBER)));
 
 		// %
-		rules.add(new SingleCharacterRule('%', createToken(CSSTokenType.UNIT))); //$NON-NLS-1$
+		rules.add(new SingleCharacterRule('%', createToken(CSSTokenType.UNIT)));
 		// !important
-		rules.add(new RegexpRule("!important", createToken(CSSTokenType.VALUE), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new RegexpRule("!important", createToken(CSSTokenType.VALUE), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
 		// FIXME name of keyword should be in token!
 		// @ rules
-		rules.add(new RegexpRule("@[_a-zA-Z0-9-]+", createToken(CSSTokenType.AT_RULE), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new RegexpRule("@[_a-zA-Z0-9-]+", createToken(CSSTokenType.AT_RULE), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
 
 		// identifiers
-		rules.add(new RegexpRule("[_a-zA-Z0-9-]+", createToken(CSSTokenType.IDENTIFIER), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new RegexpRule("[_a-zA-Z0-9-]+", createToken(CSSTokenType.IDENTIFIER), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
 
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}
