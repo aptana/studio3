@@ -14,6 +14,11 @@ public class CommonOutlineItem implements IRange, Comparable<IRange>
 		fReferenceNode = referenceNode;
 	}
 
+	public String getLabel()
+	{
+		return fReferenceNode == null ? "" : fReferenceNode.getText(); //$NON-NLS-1$
+	}
+
 	@Override
 	public int compareTo(IRange o)
 	{
