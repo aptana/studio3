@@ -1984,8 +1984,7 @@ public class JSParser extends Parser implements IParser {
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
-					final Symbol _symbol_o = _symbols[offset + 2];
-					final String o = (String) _symbol_o.value;
+					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
@@ -1995,8 +1994,7 @@ public class JSParser extends Parser implements IParser {
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
-					final Symbol _symbol_o = _symbols[offset + 2];
-					final String o = (String) _symbol_o.value;
+					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
@@ -2006,8 +2004,7 @@ public class JSParser extends Parser implements IParser {
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
-					final Symbol _symbol_o = _symbols[offset + 2];
-					final String o = (String) _symbol_o.value;
+					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
@@ -2017,8 +2014,7 @@ public class JSParser extends Parser implements IParser {
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
-					final Symbol _symbol_o = _symbols[offset + 2];
-					final String o = (String) _symbol_o.value;
+					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
@@ -2028,8 +2024,7 @@ public class JSParser extends Parser implements IParser {
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
-					final Symbol _symbol_o = _symbols[offset + 2];
-					final String o = (String) _symbol_o.value;
+					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
@@ -2039,8 +2034,7 @@ public class JSParser extends Parser implements IParser {
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
-					final Symbol _symbol_o = _symbols[offset + 2];
-					final String o = (String) _symbol_o.value;
+					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
@@ -2050,8 +2044,7 @@ public class JSParser extends Parser implements IParser {
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
-					final Symbol _symbol_o = _symbols[offset + 2];
-					final String o = (String) _symbol_o.value;
+					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
@@ -2061,8 +2054,7 @@ public class JSParser extends Parser implements IParser {
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
-					final Symbol _symbol_o = _symbols[offset + 2];
-					final String o = (String) _symbol_o.value;
+					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
@@ -2072,8 +2064,7 @@ public class JSParser extends Parser implements IParser {
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
-					final Symbol _symbol_o = _symbols[offset + 2];
-					final String o = (String) _symbol_o.value;
+					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
@@ -2083,8 +2074,7 @@ public class JSParser extends Parser implements IParser {
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
-					final Symbol _symbol_o = _symbols[offset + 2];
-					final String o = (String) _symbol_o.value;
+					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
@@ -2094,8 +2084,7 @@ public class JSParser extends Parser implements IParser {
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
-					final Symbol _symbol_o = _symbols[offset + 2];
-					final String o = (String) _symbol_o.value;
+					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
@@ -2105,8 +2094,7 @@ public class JSParser extends Parser implements IParser {
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
-					final Symbol _symbol_o = _symbols[offset + 2];
-					final String o = (String) _symbol_o.value;
+					final Symbol o = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
@@ -2120,7 +2108,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
-			return new JSBinaryOperatorNode(l, o.value.toString(), r);
+			return new JSBinaryOperatorNode(l, o, r);
 			}
 			case 240: // BitwiseAndExpression_NoLBF = BitwiseAndExpression_NoLBF.l AMPERSAND.o EqualityExpression.r
 			{
@@ -2130,7 +2118,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
-			return new JSBinaryOperatorNode(l, o.value.toString(), r);
+			return new JSBinaryOperatorNode(l, o, r);
 			}
 			case 242: // BitwiseAndExpression_NoIn = BitwiseAndExpression_NoIn.l AMPERSAND.o EqualityExpression_NoIn.r
 			{
@@ -2140,7 +2128,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
-			return new JSBinaryOperatorNode(l, o.value.toString(), r);
+			return new JSBinaryOperatorNode(l, o, r);
 			}
 			case 244: // BitwiseXorExpression = BitwiseXorExpression.l CARET.o BitwiseAndExpression.r
 			{
@@ -2150,7 +2138,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
-			return new JSBinaryOperatorNode(l, o.value.toString(), r);
+			return new JSBinaryOperatorNode(l, o, r);
 			}
 			case 246: // BitwiseXorExpression_NoLBF = BitwiseXorExpression_NoLBF.l CARET.o BitwiseAndExpression.r
 			{
@@ -2160,7 +2148,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
-			return new JSBinaryOperatorNode(l, o.value.toString(), r);
+			return new JSBinaryOperatorNode(l, o, r);
 			}
 			case 248: // BitwiseXorExpression_NoIn = BitwiseXorExpression_NoIn.l CARET.o BitwiseAndExpression_NoIn.r
 			{
@@ -2170,7 +2158,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
-			return new JSBinaryOperatorNode(l, o.value.toString(), r);
+			return new JSBinaryOperatorNode(l, o, r);
 			}
 			case 250: // BitwiseOrExpression = BitwiseOrExpression.l PIPE.o BitwiseXorExpression.r
 			{
@@ -2180,7 +2168,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
-			return new JSBinaryOperatorNode(l, o.value.toString(), r);
+			return new JSBinaryOperatorNode(l, o, r);
 			}
 			case 252: // BitwiseOrExpression_NoLBF = BitwiseOrExpression_NoLBF.l PIPE.o BitwiseXorExpression.r
 			{
@@ -2190,7 +2178,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
-			return new JSBinaryOperatorNode(l, o.value.toString(), r);
+			return new JSBinaryOperatorNode(l, o, r);
 			}
 			case 254: // BitwiseOrExpression_NoIn = BitwiseOrExpression_NoIn.l PIPE.o BitwiseXorExpression_NoIn.r
 			{
@@ -2200,7 +2188,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
-			return new JSBinaryOperatorNode(l, o.value.toString(), r);
+			return new JSBinaryOperatorNode(l, o, r);
 			}
 			case 256: // LogicalAndExpression = LogicalAndExpression.l AMPERSAND_AMPERSAND.o BitwiseOrExpression.r
 			{
@@ -2210,7 +2198,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
-			return new JSBinaryOperatorNode(l, o.value.toString(), r);
+			return new JSBinaryOperatorNode(l, o, r);
 			}
 			case 258: // LogicalAndExpression_NoLBF = LogicalAndExpression_NoLBF.l AMPERSAND_AMPERSAND.o BitwiseOrExpression.r
 			{
@@ -2220,7 +2208,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
-			return new JSBinaryOperatorNode(l, o.value.toString(), r);
+			return new JSBinaryOperatorNode(l, o, r);
 			}
 			case 260: // LogicalAndExpression_NoIn = LogicalAndExpression_NoIn.l AMPERSAND_AMPERSAND.o BitwiseOrExpression_NoIn.r
 			{
@@ -2230,7 +2218,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
-			return new JSBinaryOperatorNode(l, o.value.toString(), r);
+			return new JSBinaryOperatorNode(l, o, r);
 			}
 			case 262: // LogicalOrExpression = LogicalOrExpression.l PIPE_PIPE.o LogicalAndExpression.r
 			{
@@ -2240,7 +2228,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
-			return new JSBinaryOperatorNode(l, o.value.toString(), r);
+			return new JSBinaryOperatorNode(l, o, r);
 			}
 			case 264: // LogicalOrExpression_NoLBF = LogicalOrExpression_NoLBF.l PIPE_PIPE.o LogicalAndExpression.r
 			{
@@ -2250,7 +2238,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
-			return new JSBinaryOperatorNode(l, o.value.toString(), r);
+			return new JSBinaryOperatorNode(l, o, r);
 			}
 			case 266: // LogicalOrExpression_NoIn = LogicalOrExpression_NoIn.l PIPE_PIPE.o LogicalAndExpression_NoIn.r
 			{
@@ -2260,7 +2248,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
 					
-			return new JSBinaryOperatorNode(l, o.value.toString(), r);
+			return new JSBinaryOperatorNode(l, o, r);
 			}
 			case 269: // ConditionalExpression = LogicalOrExpression.l QUESTION AssignmentExpression.t COLON AssignmentExpression.f
 			{
