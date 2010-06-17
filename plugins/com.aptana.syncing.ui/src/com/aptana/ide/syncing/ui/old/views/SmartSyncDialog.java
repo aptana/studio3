@@ -128,8 +128,8 @@ import com.aptana.ui.widgets.SearchComposite;
  * @author Kevin Sawicki (ksawicki@aptana.com)
  * @author Michael Xia (mxia@aptana.com)
  */
-public class SmartSyncDialog extends TitleAreaDialog implements SelectionListener, ModifyListener, DirectionToolBar.Client,
-		OptionsToolBar.Client, SyncJob.Client, SearchComposite.Client
+public class SmartSyncDialog extends TitleAreaDialog implements SelectionListener, ModifyListener,
+		DirectionToolBar.Client, OptionsToolBar.Client, SyncJob.Client, SearchComposite.Client
 {
 
 	private static final String ICON = "icons/full/obj16/direction_both.gif"; //$NON-NLS-1$
@@ -252,21 +252,21 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 			this.syncer.setServerFileRoot(dest);
 		}
 		this.syncer.setLogger(new ILogger()
-		{			
+		{
 			public void logWarning(String message, Throwable th)
 			{
 				SyncingConsole.println(message);
 			}
-						
+
 			public void logInfo(String message, Throwable th)
 			{
 				SyncingConsole.println(message);
 			}
-						
+
 			public void logError(String message, Throwable th)
 			{
 				SyncingConsole.println(message);
-			}			
+			}
 		});
 	}
 
@@ -286,8 +286,8 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 			throws CoreException
 	{
 		this(parent, conf.getSourceFileManager(), conf.getDestinationFileManager(), conf.getSourceFileManager()
-				.getRoot(), conf.getDestinationFileManager().getRoot(), conf.getSourceFileManager()
-				.getName(), conf.getDestinationFileManager().getName());
+				.getRoot(), conf.getDestinationFileManager().getRoot(), conf.getSourceFileManager().getName(), conf
+				.getDestinationFileManager().getName());
 		this.syncer.setClientFileManager(conf.getSourceFileManager());
 		this.syncer.setServerFileManager(conf.getDestinationFileManager());
 		sourceConnectionPoint = conf.getSourceFileManager();
@@ -456,17 +456,22 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		left_arrow.setImage(SyncingUIPlugin.getImage("icons/full/wizban/sync_arrow_left.png"));
 		gridData = new GridData(SWT.RIGHT, SWT.CENTER, false, true);
 		left_arrow.setLayoutData(gridData);
-		left_arrow.addSelectionListener(new SelectionAdapter() {			
+		left_arrow.addSelectionListener(new SelectionAdapter()
+		{
 			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if(!left_arrow.getSelection()) {
+			public void widgetSelected(SelectionEvent e)
+			{
+				if (!left_arrow.getSelection())
+				{
 					directionBar.setSelection(DirectionToolBar.UPLOAD);
 				}
-				else if(right_arrow.getSelection()) {
+				else if (right_arrow.getSelection())
+				{
 					directionBar.setSelection(DirectionToolBar.BOTH);
 				}
-				else {
-					directionBar.setSelection(DirectionToolBar.DOWNLOAD);					
+				else
+				{
+					directionBar.setSelection(DirectionToolBar.DOWNLOAD);
 				}
 				updateSyncArrows(directionBar.getSelection());
 				load(false);
@@ -477,23 +482,28 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		right_arrow.setImage(SyncingUIPlugin.getImage("icons/full/wizban/sync_arrow_right.png"));
 		gridData = new GridData(SWT.LEFT, SWT.CENTER, false, true);
 		right_arrow.setLayoutData(gridData);
-		right_arrow.addSelectionListener(new SelectionAdapter() {			
+		right_arrow.addSelectionListener(new SelectionAdapter()
+		{
 			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if(!right_arrow.getSelection()) {
+			public void widgetSelected(SelectionEvent e)
+			{
+				if (!right_arrow.getSelection())
+				{
 					directionBar.setSelection(DirectionToolBar.DOWNLOAD);
 				}
-				else if(left_arrow.getSelection()) {
+				else if (left_arrow.getSelection())
+				{
 					directionBar.setSelection(DirectionToolBar.BOTH);
 				}
-				else {
+				else
+				{
 					directionBar.setSelection(DirectionToolBar.UPLOAD);
 				}
 				updateSyncArrows(directionBar.getSelection());
 				load(false);
 			}
 		});
-		
+
 		Label remote_site = new Label(endpoints, SWT.VERTICAL | SWT.CENTER);
 		remote_site.setImage(SyncingUIPlugin.getImage(IMAGE_REMOTE_SITE));
 		gridData = new GridData(SWT.CENTER, SWT.CENTER, false, true);
@@ -533,7 +543,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		gridData.widthHint = 150;
 		sync_label.setLayoutData(gridData);
 		sync_label.setText("");
-		
+
 		Label end2Label = new Label(endpoints, SWT.CENTER);
 		end2Label.setText(FileUtil.compressPath(dest.toString(), 30));
 		end2Label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
@@ -543,7 +553,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		gridData.horizontalSpan = 3;
 		gridData.verticalIndent = 15;
 		shadow_sep_h.setLayoutData(gridData);
- 		
+
 		Composite status = new Composite(description, SWT.NONE);
 		layout = new GridLayout(7, false);
 		layout.marginWidth = 40;
@@ -566,20 +576,24 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 
 		searchComposite = createSearchComposite(status);
 		filterComp = createFilterComposite(status);
-		
+
 		return top;
 	}
 
-	private SearchComposite createSearchComposite(Composite myComposite) {
-		SearchComposite search = new SearchComposite(myComposite, this) {
+	private SearchComposite createSearchComposite(Composite myComposite)
+	{
+		SearchComposite search = new SearchComposite(myComposite, this)
+		{
 
 			@Override
-			public void keyPressed(KeyEvent e) {
+			public void keyPressed(KeyEvent e)
+			{
 				this.searchText();
 			}
 
 			@Override
-			public void keyReleased(KeyEvent e) {
+			public void keyReleased(KeyEvent e)
+			{
 				if (!e.doit)
 				{
 					return;
@@ -587,7 +601,8 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 			}
 
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(SelectionEvent e)
+			{
 				super.widgetSelected(e);
 				this.searchText();
 			}
@@ -595,7 +610,9 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		search.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		return search;
 	}
-	private Composite createFilterComposite(final Composite myComposite) {
+
+	private Composite createFilterComposite(final Composite myComposite)
+	{
 
 		Composite filter = new Composite(myComposite, SWT.NONE);
 		GridLayout gridLayout = new GridLayout(2, false);
@@ -612,33 +629,37 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		filterLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
 		ToolBar toolBar = new ToolBar(filter, SWT.FLAT);
-		toolBar.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false,
-				false));
+		toolBar.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
 
 		ToolItem toolItem = new ToolItem(toolBar, SWT.PUSH);
 		toolItem.setImage(SyncingUIPlugin.getImage(CLOSE_ICON));
-		toolItem.addSelectionListener(new SelectionListener() {
+		toolItem.addSelectionListener(new SelectionListener()
+		{
 
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(SelectionEvent e)
+			{
 				removeFilter();
 			}
 
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
+			public void widgetDefaultSelected(SelectionEvent e)
+			{
 			}
 		});
 
 		return filter;
 	}
-	
-	protected void hideFilterLable() {
+
+	protected void hideFilterLable()
+	{
 		filterLayoutData.exclude = true;
 		filterComp.setVisible(false);
 		filterComp.getParent().layout();
 	}
 
-	protected void showFilterLabel(Image image, String text) {
+	protected void showFilterLabel(Image image, String text)
+	{
 		filterLabel.setImage(image);
 		filterLabel.setText(text);
 		filterLayoutData.exclude = false;
@@ -646,7 +667,8 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		filterComp.getParent().layout();
 	}
 
-	protected void removeFilter() {
+	protected void removeFilter()
+	{
 		hideFilterLable();
 	}
 
@@ -672,12 +694,12 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		deleteRemoteFiles.setSelection(getDeleteRemotePreference());
 		deleteRemoteFiles.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 		deleteRemoteFiles.addSelectionListener(this);
-		
+
 		closeWhenDone = new Button(deletes, SWT.CHECK);
 		closeWhenDone.setText(Messages.SmartSyncDialog_CloseWhenDone);
 		closeWhenDone.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		closeWhenDone.setSelection(getSyncingPreferenceStore().getBoolean(CLOSE_WHEN_DONE));
-		closeWhenDone.addSelectionListener(this);		
+		closeWhenDone.addSelectionListener(this);
 
 		return deletes;
 	}
@@ -819,7 +841,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		Composite main = new Composite(parent, SWT.NONE);
 		main.setLayout(new GridLayout());
 		main.setBackgroundMode(SWT.INHERIT_DEFAULT);
-		//main.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+		// main.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		GridData gridData = new GridData(SWT.CENTER, SWT.CENTER, true, true);
 		gridData.exclude = true;
 		main.setLayoutData(gridData);
@@ -911,9 +933,11 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		startSync.setEnabled(deleted + updated > 0);
 	}
 
-	private void updateSyncArrows(int selection) {
+	private void updateSyncArrows(int selection)
+	{
 
-		switch (selection) {
+		switch (selection)
+		{
 			case DirectionToolBar.BOTH:
 				left_arrow.setSelection(true);
 				right_arrow.setSelection(true);
@@ -944,7 +968,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
 		gridData.heightHint = 400;
 		main.setLayoutData(gridData);
-		//main.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+		// main.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
 		syncViewer = new SmartSyncViewer(main, end1, end2);
 		syncViewer.setPresentationType(getPresentationTypePref());
@@ -994,23 +1018,25 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 			}
 
 		});
-		
+
 		viewerFilter = new ViewerFilter()
 		{
 			public boolean select(Viewer viewer, Object parentElement, Object element)
 			{
-				
+
 				if (element instanceof SyncFile || element instanceof SyncFolder)
 				{
-					ISyncResource resource = (ISyncResource)element;
-					if(searchText == null) {
+					ISyncResource resource = (ISyncResource) element;
+					if (searchText == null)
+					{
 						return true;
 					}
 
 					String path = resource.getPath().toString();
 					Matcher m = searchPattern.matcher(path);
 
-					if(m.find()) {
+					if (m.find())
+					{
 						return true;
 					}
 					else
@@ -1021,7 +1047,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 				return false;
 			}
 		};
-		
+
 		syncViewer.addFilter(viewerFilter);
 
 		errorComp = createErrorSection(main);
@@ -1036,7 +1062,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		Composite main = new Composite(parent, SWT.NONE);
 		main.setLayout(new GridLayout(2, false));
 		main.setBackgroundMode(SWT.INHERIT_DEFAULT);
-		//main.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+		// main.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		GridData gridData = new GridData(SWT.CENTER, SWT.CENTER, true, false);
 		gridData.exclude = true;
 		main.setLayoutData(gridData);
@@ -1068,7 +1094,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		loadingComp.setLayout(new GridLayout());
 		loadingComp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		loadingComp.setBackgroundMode(SWT.INHERIT_DEFAULT);
-		//loadingComp.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+		// loadingComp.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
 		loadingLabel = new Label(loadingComp, SWT.NONE);
 		loadingLabel.setText(SYNC_LABEL + "..."); //$NON-NLS-1$
@@ -1079,10 +1105,10 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		return loadingComp;
 	}
 
-	protected void createButtonsForButtonBar(Composite parent) {
+	protected void createButtonsForButtonBar(Composite parent)
+	{
 		// create OK and Cancel buttons by default
-		startSync = createButton(parent, IDialogConstants.PROCEED_ID, Messages.SmartSyncDialog_StartSync,
-				true);
+		startSync = createButton(parent, IDialogConstants.PROCEED_ID, Messages.SmartSyncDialog_StartSync, true);
 		GridData gridData = new GridData(SWT.FILL, SWT.END, false, false);
 		GC gc = new GC(startSync);
 		// calculates the ideal width
@@ -1091,14 +1117,12 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		gc.dispose();
 		startSync.setLayoutData(gridData);
 		startSync.addSelectionListener(this);
-		
-		saveLog = createButton(parent, IDialogConstants.DETAILS_ID,
-				"Save Log...", false);
+
+		saveLog = createButton(parent, IDialogConstants.DETAILS_ID, "Save Log...", false);
 		saveLog.addSelectionListener(this);
 		saveLog.setEnabled(false);
 
-		cancel = createButton(parent, IDialogConstants.CANCEL_ID,
-				IDialogConstants.CANCEL_LABEL, false);
+		cancel = createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
 		cancel.addSelectionListener(this);
 	}
 
@@ -1107,10 +1131,11 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		directionBar.setEnabled(enabled);
 		optionsBar.setEnabled(enabled);
 		boolean syncEnabled = enabled && syncViewer.getCurrentResources().length > 0;
-		if(!startSync.isDisposed()) {
+		if (!startSync.isDisposed())
+		{
 			startSync.setEnabled(syncEnabled);
 		}
-		
+
 		if (enabled)
 		{
 			updateFileButtonsState();
@@ -1245,7 +1270,8 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 					{
 						if (filesToBeSynced == null)
 						{
-							items = syncer.getSyncItems(sourceConnectionPoint, destConnectionPoint, source, dest, monitor);
+							items = syncer.getSyncItems(sourceConnectionPoint, destConnectionPoint, source, dest,
+									monitor);
 						}
 						else
 						{
@@ -1384,50 +1410,57 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		buildSmartSync.schedule();
 	}
 
-	protected void dispose() {
-		if (titleImage != null) {
+	protected void dispose()
+	{
+		if (titleImage != null)
+		{
 			setTitleImage(null);
 			titleImage.dispose();
 			titleImage = null;
-		}		
+		}
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.TitleAreaDialog#createDialogArea(org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
-	protected Control createDialogArea(Composite parent) {
-		
+	protected Control createDialogArea(Composite parent)
+	{
+
 		dialogArea = (Composite) super.createDialogArea(parent);
 
 		titleImage = SyncingUIPlugin.getImageDescriptor("/icons/full/wizban/sync.png").createImage(); //$NON-NLS-1$
-		dialogArea.addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(DisposeEvent e) {
+		dialogArea.addDisposeListener(new DisposeListener()
+		{
+			public void widgetDisposed(DisposeEvent e)
+			{
 				dispose();
 			}
 		});
-		
+
 		setTitleImage(titleImage);
 		getShell().setText("Synchronize");
 
 		setTitle("Synchronize files between two endpoints");
-		
+
 		Composite displayArea = new Composite(dialogArea, SWT.NONE);
 		displayArea.setLayout(new GridLayout());
 		displayArea.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-	
+
 		createHeader(displayArea);
 		createMainSection(displayArea);
 		createAdvancedSection(displayArea);
-	
+
 		syncViewer.setSyncDirection(directionBar.getSelection());
-				
+
 		return dialogArea;
 	}
-	
+
 	@Override
-	protected Control createContents(Composite parent) {
-		
+	protected Control createContents(Composite parent)
+	{
+
 		Control composite = super.createContents(parent);
 
 		setEnabled(false);
@@ -1508,7 +1541,8 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 				close();
 			}
 		}
-		else if (source == saveLog) {
+		else if (source == saveLog)
+		{
 			FileDialog fileDialog = new FileDialog(getShell(), SWT.SAVE);
 			IDialogSettings editorSettings = CommonEditorPlugin.getDefault().getDialogSettings();
 			String value = editorSettings.get(LOG_EXPORT_DIRECTORY);
@@ -1528,7 +1562,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 
 			File logFile = new File(path);
 			editorSettings.put(LOG_EXPORT_DIRECTORY, logFile.getParent());
-			
+
 			SyncExporter exporter = new SyncExporter();
 			ISyncResource[] resources = syncViewer.getCurrentResources();
 			exporter.export(logFile, resources);
@@ -1782,7 +1816,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 						synced.setVisible(true);
 						setEnabled(false);
 						swappable.layout(true, true);
-						
+
 						saveLog.setEnabled(true);
 					}
 				}
@@ -2027,8 +2061,8 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 	}
 
 	@Override
-	public void search(String text, boolean isCaseSensitive,
-			boolean isRegularExpression) {
+	public void search(String text, boolean isCaseSensitive, boolean isRegularExpression)
+	{
 		searchText = text;
 		searchPattern = searchComposite.createSearchPattern();
 		syncViewer.refresh();

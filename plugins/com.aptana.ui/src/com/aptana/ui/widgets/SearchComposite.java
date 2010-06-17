@@ -122,21 +122,25 @@ public class SearchComposite extends Composite implements KeyListener, Selection
 			client.search(text, caseSensitiveSearch, regularExpressionSearch);
 		}
 	}
-	
+
 	/**
 	 * Create a default search pattern taking into consideration case sensitivity and regular expression settings
+	 * 
 	 * @return
 	 */
-	public Pattern createSearchPattern() {
+	public Pattern createSearchPattern()
+	{
 		return PatternConstructor.createPattern(searchText.getText(), caseSensitiveSearch, regularExpressionSearch);
 	}
 
 	@Override
-	public void keyPressed(KeyEvent e) {
+	public void keyPressed(KeyEvent e)
+	{
 	}
 
 	@Override
-	public void keyReleased(KeyEvent e) {
+	public void keyReleased(KeyEvent e)
+	{
 		if (!e.doit)
 		{
 			return;
@@ -150,11 +154,13 @@ public class SearchComposite extends Composite implements KeyListener, Selection
 	}
 
 	@Override
-	public void widgetDefaultSelected(SelectionEvent e) {
+	public void widgetDefaultSelected(SelectionEvent e)
+	{
 	}
 
 	@Override
-	public void widgetSelected(SelectionEvent e) {
+	public void widgetSelected(SelectionEvent e)
+	{
 		Object source = e.getSource();
 		if (source == caseSensitiveMenuItem)
 		{

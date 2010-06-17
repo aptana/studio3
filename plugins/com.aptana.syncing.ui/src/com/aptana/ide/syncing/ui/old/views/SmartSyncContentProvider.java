@@ -259,8 +259,7 @@ public class SmartSyncContentProvider implements ITreeContentProvider
 	}
 
 	/**
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider#inputChanged(Viewer,
-	 *      Object, Object)
+	 * @see org.eclipse.jface.viewers.ITreeContentProvider#inputChanged(Viewer, Object, Object)
 	 */
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput)
 	{

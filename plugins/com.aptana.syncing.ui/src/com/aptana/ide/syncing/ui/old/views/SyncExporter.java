@@ -13,7 +13,8 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.ide.syncing.core.old.ISyncResource;
 import com.aptana.ide.syncing.core.old.SyncState;
 
-public class SyncExporter {
+public class SyncExporter
+{
 
 	/**
 	 * Exports a sync state to a log file.
@@ -32,19 +33,24 @@ public class SyncExporter {
 		Writer writer = null;
 		try
 		{
-			if(!logFile.exists()) {
+			if (!logFile.exists())
+			{
 				logFile.createNewFile();
 			}
 			writer = new FileWriter(logFile, true);
 
 			StringBuilder builder = new StringBuilder();
 			builder.append("File Transfer Log: " + date + FileUtil.NEW_LINE);
-			for (ISyncResource iSyncResource : items) {
-				if(iSyncResource.isSkipped()) {
+			for (ISyncResource iSyncResource : items)
+			{
+				if (iSyncResource.isSkipped())
+				{
 					builder.append(" " + iSyncResource.getPath().toString() + ": Skipped");
 				}
-				else {
-					builder.append(" " + iSyncResource.getPath().toString() + ": " + getSyncState(iSyncResource.getSyncState()));
+				else
+				{
+					builder.append(" " + iSyncResource.getPath().toString() + ": "
+							+ getSyncState(iSyncResource.getSyncState()));
 				}
 				builder.append("\n");
 			}
@@ -73,11 +79,14 @@ public class SyncExporter {
 
 	/**
 	 * Return the string associated with the item sync state.
+	 * 
 	 * @param state
 	 * @return
 	 */
-	public static String getSyncState(int state) {
-		switch (state) {
+	public static String getSyncState(int state)
+	{
+		switch (state)
+		{
 			case SyncState.Ignore:
 				return "Ignore";
 			case SyncState.ItemsMatch:
