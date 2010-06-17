@@ -111,6 +111,7 @@ public class RubyFileIndexingParticipant implements IFileStoreIndexingParticipan
 		}
 		catch (Exception e)
 		{
+			// TODO This can often be caused by permissions issues. We should probably just ignore them
 			Activator.log(e);
 		}
 		finally
