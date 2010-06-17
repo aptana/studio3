@@ -3,6 +3,7 @@ package com.aptana.index.core;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -10,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -121,7 +124,7 @@ public class ResourceIndexer implements IResourceChangeListener
 		@Override
 		public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException
 		{
-			IFileIndexingParticipant[] participants = getFileIndexingParticipants();
+			IFileStoreIndexingParticipant[] participants = getFileIndexingParticipants();
 			SubMonitor sub = SubMonitor.convert(monitor, (participants.length + 1) * files.size());
 			if (sub.isCanceled())
 			{
@@ -136,27 +139,36 @@ public class ResourceIndexer implements IResourceChangeListener
 			Index index = IndexManager.getInstance().getIndex(project.getFullPath().toPortableString());
 			try
 			{
-				// First cleanup indices for files
+				Set<IFileStore> fileStores = new HashSet<IFileStore>();
 				for (IFile file : files)
 				{
-					if (sub.isCanceled())
-					{
-						return Status.CANCEL_STATUS;
-					}
-					index.remove(file.getProjectRelativePath().toPortableString());
-					sub.worked(1);
+					IFileStore store = EFS.getStore(file.getLocationURI());
+					if (store == null)
+						continue;
+					fileStores.add(store);					
 				}
-
-				for (IFileIndexingParticipant fileIndexingParticipant : participants)
+				
+				// First cleanup indices for files
+				for (IFileStore file : fileStores)
 				{
 					if (sub.isCanceled())
 					{
 						return Status.CANCEL_STATUS;
 					}
-					// TODO Limit file indexers by content type here so we don't have to check content type for each file in every indexer! indexers should/could register what content types they handle and then we can pre-filter here!
-					fileIndexingParticipant.index(files, index, sub.newChild(files.size()));
+					index.remove(file.toURI().getPath());
+					sub.worked(1);
 				}
-
+				
+				// TODO Limit file indexers by content type here so we don't have to check content type for each file in every indexer! indexers should/could register what content types they handle and then we can pre-filter here!
+				// To do so, we'd need to keep a mapping from the store to the content types it matches
+				for (IFileStoreIndexingParticipant fileIndexingParticipant : participants)
+				{
+					if (sub.isCanceled())
+					{
+						return Status.CANCEL_STATUS;
+					}
+					fileIndexingParticipant.index(fileStores, index, sub.newChild(fileStores.size()));
+				}
 			}
 			finally
 			{
@@ -433,10 +445,10 @@ public class ResourceIndexer implements IResourceChangeListener
 	 *
 	 * @return
 	 */
-	public static IFileIndexingParticipant[] getFileIndexingParticipants()
+	public static IFileStoreIndexingParticipant[] getFileIndexingParticipants()
 	{
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		List<IFileIndexingParticipant> fileIndexingParticipants = new ArrayList<IFileIndexingParticipant>();
+		List<IFileStoreIndexingParticipant> fileIndexingParticipants = new ArrayList<IFileStoreIndexingParticipant>();
 
 		if (registry != null)
 		{
@@ -457,7 +469,7 @@ public class ResourceIndexer implements IResourceChangeListener
 						{
 							try
 							{
-								IFileIndexingParticipant fileIndexingParticipant = (IFileIndexingParticipant) element
+								IFileStoreIndexingParticipant fileIndexingParticipant = (IFileStoreIndexingParticipant) element
 										.createExecutableExtension(ATTR_CLASS);
 
 								fileIndexingParticipants.add(fileIndexingParticipant);
@@ -472,6 +484,6 @@ public class ResourceIndexer implements IResourceChangeListener
 			}
 		}
 
-		return fileIndexingParticipants.toArray(new IFileIndexingParticipant[fileIndexingParticipants.size()]);
+		return fileIndexingParticipants.toArray(new IFileStoreIndexingParticipant[fileIndexingParticipants.size()]);
 	}
 }

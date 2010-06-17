@@ -50,7 +50,7 @@ class CommitFileDiffViewer extends TableViewer
 
 		final Table rawTable = getTable();
 		rawTable.setHeaderVisible(true);
-		rawTable.setLinesVisible(true);
+		rawTable.setLinesVisible(false);
 
 		final TableLayout layout = new TableLayout();
 		rawTable.setLayout(layout);

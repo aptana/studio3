@@ -105,6 +105,35 @@ public class Scope<T>
 	}
 
 	/**
+	 * getScopeAtOffset
+	 * 
+	 * @param offset
+	 * @return
+	 */
+	public Scope<T> getScopeAtOffset(int offset)
+	{
+		Scope<T> result = null;
+		
+		if (this.getRange().contains(offset))
+		{
+			result = this;
+			
+			for (Scope<T> child : this.getChildren())
+			{
+				Scope<T> candidate = child.getScopeAtOffset(offset);
+				
+				if (candidate != null)
+				{
+					result = candidate;
+					break;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * getLocalSymbol
 	 * 
 	 * @param name

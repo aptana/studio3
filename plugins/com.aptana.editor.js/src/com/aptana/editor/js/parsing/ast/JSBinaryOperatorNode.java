@@ -116,7 +116,7 @@ public class JSBinaryOperatorNode extends JSNode
 	{
 		StringBuilder text = new StringBuilder();
 		String operator = "??"; //$NON-NLS-1$
-		switch (getType())
+		switch (getNodeType())
 		{
 			case JSNodeTypes.EQUAL:
 				operator = "=="; //$NON-NLS-1$

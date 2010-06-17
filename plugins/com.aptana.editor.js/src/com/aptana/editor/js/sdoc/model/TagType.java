@@ -19,6 +19,7 @@ public enum TagType
 	PROPERTY("@property"),
 	RETURN("@return"),
 	SEE("@see"),
+	TYPE("@type"),
 	UNKNOWN("@<???>");
 	
 	private String _name;

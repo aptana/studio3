@@ -1,4 +1,4 @@
-package com.aptana.editor.js.contentassist;
+package com.aptana.editor.js.tests;
 
 import org.eclipse.jface.text.IAutoIndentStrategy;
 import org.eclipse.jface.text.IDocument;
@@ -20,11 +20,11 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 
 @SuppressWarnings("deprecation")
-public class TestTextViewer implements ITextViewer
+public class TextViewer implements ITextViewer
 {
 	private IDocument _document;
 
-	public TestTextViewer(IDocument document)
+	public TextViewer(IDocument document)
 	{
 		this._document = document;
 	}

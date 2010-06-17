@@ -166,8 +166,8 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 				try
 				{
 					IRegion nextLineInfo = d.getLineInformationOfOffset(c.offset + 1);
-					String nextLine = d.get(nextLineInfo.getOffset(), nextLineInfo.getLength());
-					if (nextLine.endsWith("*/")) //$NON-NLS-1$
+					String nextLine = d.get(nextLineInfo.getOffset(), nextLineInfo.getLength()).trim();
+					if (nextLine.startsWith("*") || nextLine.endsWith("*/")) //$NON-NLS-1$ //$NON-NLS-2$
 					{
 						return buf.toString();
 					}
@@ -177,7 +177,9 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 				}
 				String toEnd = " */"; //$NON-NLS-1$
 				if (line.startsWith("/**")) //$NON-NLS-1$
-					toEnd = " **/"; //$NON-NLS-1$
+				{
+					toEnd = " */"; //$NON-NLS-1$
+				}
 				d.replace(c.offset, 0, "\n" + indent + toEnd); //$NON-NLS-1$
 			}
 		}

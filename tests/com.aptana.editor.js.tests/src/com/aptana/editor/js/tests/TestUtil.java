@@ -1,4 +1,4 @@
-package com.aptana.editor.js.contentassist;
+package com.aptana.editor.js.tests;
 
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;

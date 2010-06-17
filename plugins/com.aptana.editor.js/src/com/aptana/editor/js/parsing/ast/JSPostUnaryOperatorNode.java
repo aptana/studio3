@@ -40,7 +40,7 @@ public class JSPostUnaryOperatorNode extends JSUnaryOperatorNode
 		StringBuilder text = new StringBuilder();
 		text.append(getChildren()[0]);
 		String operator = ""; //$NON-NLS-1$
-		switch (getType())
+		switch (getNodeType())
 		{
 			case JSNodeTypes.POST_DECREMENT:
 				operator = "--"; //$NON-NLS-1$

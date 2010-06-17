@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.common.outline;
+package com.aptana.editor.common.resolver;
 
 import java.net.URI;
 

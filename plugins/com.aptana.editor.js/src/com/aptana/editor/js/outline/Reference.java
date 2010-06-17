@@ -65,12 +65,12 @@ class Reference
 		IParseNode currentNode = node;
 		IParseNode parent;
 
-		switch (currentNode.getType())
+		switch (currentNode.getNodeType())
 		{
 			case JSNodeTypes.IDENTIFIER:
 			case JSNodeTypes.THIS:
 				parent = currentNode.getParent();
-				if (parent.getType() == JSNodeTypes.GET_PROPERTY)
+				if (parent.getNodeType() == JSNodeTypes.GET_PROPERTY)
 				{
 					if (parent.getChild(1) == currentNode)
 					{
@@ -92,13 +92,13 @@ class Reference
 
 				// NOTE: The following block is for 'dojo.lang.extend', 'MochiKit.Base.update',
 				// and 'Object.extend' support
-				if (parent != null && parent.getType() == JSNodeTypes.NAME_VALUE_PAIR)
+				if (parent != null && parent.getNodeType() == JSNodeTypes.NAME_VALUE_PAIR)
 				{
 					IParseNode grandparent = parent.getParent();
-					if (grandparent != null && grandparent.getType() == JSNodeTypes.OBJECT_LITERAL)
+					if (grandparent != null && grandparent.getNodeType() == JSNodeTypes.OBJECT_LITERAL)
 					{
 						IParseNode greatgrandparent = grandparent.getParent();
-						if (greatgrandparent != null && greatgrandparent.getType() == JSNodeTypes.ARGUMENTS)
+						if (greatgrandparent != null && greatgrandparent.getNodeType() == JSNodeTypes.ARGUMENTS)
 						{
 							parts.add(greatgrandparent.getChild(0) + "."); //$NON-NLS-1$
 						}
@@ -110,7 +110,7 @@ class Reference
 
 		while (currentNode != null)
 		{
-			switch (currentNode.getType())
+			switch (currentNode.getNodeType())
 			{
 				case JSNodeTypes.FUNCTION:
 					String functionName = currentNode.getText();
@@ -130,8 +130,8 @@ class Reference
 							grandParentNode = parentNode.getParent();
 						}
 
-						if (parentNode != null && grandParentNode != null && parentNode.getType() == JSNodeTypes.GROUP
-								&& grandParentNode.getType() == JSNodeTypes.INVOKE)
+						if (parentNode != null && grandParentNode != null && parentNode.getNodeType() == JSNodeTypes.GROUP
+								&& grandParentNode.getNodeType() == JSNodeTypes.INVOKE)
 						{
 							currentNode = grandParentNode;
 						}
@@ -148,7 +148,7 @@ class Reference
 								index = 0;
 								if (currentParent != null)
 								{
-									index = currentParent.getIndex(p);
+									index = p.getIndex();
 								}
 								path = MessageFormat.format("[{0}]{1}{2}", index, p.getText(), path); //$NON-NLS-1$
 
@@ -164,7 +164,7 @@ class Reference
 					break;
 				case JSNodeTypes.DECLARATION:
 					IParseNode assignedValue = currentNode.getChild(1);
-					if (assignedValue.getType() == JSNodeTypes.OBJECT_LITERAL)
+					if (assignedValue.getNodeType() == JSNodeTypes.OBJECT_LITERAL)
 					{
 						parts.add(currentNode.getChild(0).getText());
 					}

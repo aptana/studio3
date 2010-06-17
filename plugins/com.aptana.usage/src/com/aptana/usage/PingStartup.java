@@ -61,6 +61,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.ui.IStartup;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -108,6 +109,11 @@ public class PingStartup implements IStartup
 		List<String> keyValues = new ArrayList<String>();
 
 		// builds the key/value pairs
+		if (!Platform.getPreferencesService().getBoolean(UsagePlugin.PLUGIN_ID, IPreferenceConstants.P_IDE_HAS_RUN,
+				false, new IScopeContext[] { new ConfigurationScope() }))
+		{
+			add(keyValues, "first_run", Long.toString(System.currentTimeMillis())); //$NON-NLS-1$
+		}
 		add(keyValues, "id", getApplicationId()); //$NON-NLS-1$
 		add(keyValues, "version", UsagePlugin.getPluginVersion()); //$NON-NLS-1$
 		add(keyValues, "product", System.getProperty("eclipse.product")); //$NON-NLS-1$ //$NON-NLS-2$

@@ -39,7 +39,7 @@ public class RubyParserTest extends TestCase
 		IParseNode result = fParser.parse(fParseState);
 		IParseNode[] classes = result.getChildren();
 		assertEquals(1, classes.length); // one class declaration
-		assertEquals(IRubyElement.TYPE, classes[0].getType()); // class type
+		assertEquals(IRubyElement.TYPE, classes[0].getNodeType()); // class type
 		assertEquals("Person", classes[0].toString()); // class name
 
 		IRubyType rubyClass = (IRubyType) classes[0];
@@ -59,7 +59,7 @@ public class RubyParserTest extends TestCase
 		IParseNode result = fParser.parse(fParseState);
 		IParseNode[] children = result.getChildren();
 		assertEquals(1, children.length); // one module declaration
-		assertEquals(IRubyElement.TYPE, children[0].getType());
+		assertEquals(IRubyElement.TYPE, children[0].getNodeType());
 		IRubyType module = (IRubyType) children[0];
 		assertEquals(false, module.isClass());
 		assertEquals(true, module.isModule());
@@ -76,7 +76,7 @@ public class RubyParserTest extends TestCase
 		IParseNode result = fParser.parse(fParseState);
 		IParseNode[] children = result.getChildren();
 		assertEquals(1, children.length);
-		assertEquals(IRubyElement.METHOD, children[0].getType());
+		assertEquals(IRubyElement.METHOD, children[0].getNodeType());
 		IRubyMethod method = (IRubyMethod) children[0];
 		assertEquals(true, method.isSingleton());
 	}
@@ -89,16 +89,16 @@ public class RubyParserTest extends TestCase
 		IParseNode result = fParser.parse(fParseState);
 		IParseNode[] children = result.getChildren();
 		assertEquals(1, children.length); // the container for require/load statements
-		assertEquals(IRubyElement.IMPORT_CONTAINER, children[0].getType());
+		assertEquals(IRubyElement.IMPORT_CONTAINER, children[0].getNodeType());
 		assertEquals("require/load declarations", children[0].toString());
 		assertEquals(0, ((RubyElement) children[0]).getStart());
 		assertEquals(14, ((RubyElement) children[0]).getEnd());
 
 		IParseNode[] imports = children[0].getChildren();
 		assertEquals(1, imports.length); // one require statement
-		assertEquals(IRubyElement.IMPORT_DECLARATION, imports[0].getType());
+		assertEquals(IRubyElement.IMPORT_DECLARATION, imports[0].getNodeType());
 		assertEquals("yaml", imports[0].toString());
-		assertEquals(imports[0], children[0].getNodeAt(5));
+		assertEquals(imports[0], children[0].getNodeAtOffset(5));
 	}
 
 	public void testGlobalVar() throws Exception
@@ -109,7 +109,7 @@ public class RubyParserTest extends TestCase
 		IParseNode result = fParser.parse(fParseState);
 		IParseNode[] children = result.getChildren();
 		assertEquals(1, children.length); // one global variable
-		assertEquals(IRubyElement.GLOBAL, children[0].getType());
+		assertEquals(IRubyElement.GLOBAL, children[0].getNodeType());
 		assertEquals("$foo", children[0].toString());
 	}
 
@@ -121,7 +121,7 @@ public class RubyParserTest extends TestCase
 		IParseNode result = fParser.parse(fParseState);
 		IParseNode[] children = result.getChildren();
 		assertEquals(1, children.length); // one global variable
-		assertEquals(IRubyElement.CLASS_VAR, children[0].getType());
+		assertEquals(IRubyElement.CLASS_VAR, children[0].getNodeType());
 		assertEquals("@@foo", children[0].toString());
 	}
 
@@ -133,7 +133,7 @@ public class RubyParserTest extends TestCase
 		IParseNode result = fParser.parse(fParseState);
 		IParseNode[] children = result.getChildren();
 		assertEquals(1, children.length);
-		assertEquals(IRubyElement.METHOD, children[0].getType());
+		assertEquals(IRubyElement.METHOD, children[0].getNodeType());
 		assertEquals("foo()", children[0].toString());
 	}
 
@@ -145,7 +145,7 @@ public class RubyParserTest extends TestCase
 		IParseNode result = fParser.parse(fParseState);
 		IParseNode[] children = result.getChildren();
 		assertEquals(1, children.length);
-		assertEquals(IRubyElement.LOCAL_VAR, children[0].getType());
+		assertEquals(IRubyElement.LOCAL_VAR, children[0].getNodeType());
 		assertEquals("foo", children[0].toString());
 	}
 
@@ -157,7 +157,7 @@ public class RubyParserTest extends TestCase
 		IParseNode result = fParser.parse(fParseState);
 		IParseNode[] children = result.getChildren();
 		assertEquals(1, children.length);
-		assertEquals(IRubyElement.LOCAL_VAR, children[0].getType());
+		assertEquals(IRubyElement.LOCAL_VAR, children[0].getNodeType());
 		assertEquals("foo", children[0].toString());
 	}
 
@@ -167,7 +167,7 @@ public class RubyParserTest extends TestCase
 		fParseState.setEditState(source, source, 0, 0);
 
 		IParseNode result = fParser.parse(fParseState);
-		assertEquals(IRubyElement.SCRIPT, result.getType());
+		assertEquals(IRubyElement.SCRIPT, result.getNodeType());
 		assertEquals(0, result.getStartingOffset());
 		assertEquals(59, result.getEndingOffset());
 	}
@@ -200,7 +200,7 @@ public class RubyParserTest extends TestCase
 		IParseNode result = fParser.parse(fParseState);
 		IParseNode[] children = result.getChildren();
 		assertEquals(1, children.length);
-		assertEquals(IRubyElement.LOCAL_VAR, children[0].getType());
+		assertEquals(IRubyElement.LOCAL_VAR, children[0].getNodeType());
 		assertEquals("foo", children[0].toString());
 	}
 

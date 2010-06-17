@@ -84,7 +84,7 @@ public class JSUnaryOperatorNode extends JSNode
 		StringBuilder text = new StringBuilder();
 		JSNode expression = (JSNode) getChildren()[0];
 		String operator = ""; //$NON-NLS-1$
-		int type = getType();
+		int type = getNodeType();
 		switch (type)
 		{
 			case JSNodeTypes.DELETE:
@@ -110,7 +110,7 @@ public class JSUnaryOperatorNode extends JSNode
 				break;
 			case JSNodeTypes.TYPEOF:
 				operator = "typeof"; //$NON-NLS-1$
-				if (expression.getType() != JSNodeTypes.GROUP)
+				if (expression.getNodeType() != JSNodeTypes.GROUP)
 				{
 					operator += " "; //$NON-NLS-1$
 				}

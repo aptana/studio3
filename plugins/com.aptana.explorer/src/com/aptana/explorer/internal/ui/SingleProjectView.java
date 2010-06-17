@@ -99,6 +99,7 @@ import com.aptana.ide.syncing.ui.dialogs.ChooseSiteConnectionDialog;
 import com.aptana.ide.ui.secureftp.dialogs.CommonFTPConnectionPointPropertyDialog;
 import com.aptana.terminal.views.TerminalView;
 import com.aptana.ui.UIUtils;
+import com.aptana.ui.widgets.SearchComposite;
 
 /**
  * Customized CommonNavigator that adds a project combo and focuses the view on

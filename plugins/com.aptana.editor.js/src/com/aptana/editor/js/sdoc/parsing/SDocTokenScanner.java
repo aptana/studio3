@@ -122,6 +122,7 @@ public class SDocTokenScanner extends RuleBasedScanner
 		tagRules.addWord("@property", getToken(SDocTokenType.PROPERTY));
 		tagRules.addWord("@return", getToken(SDocTokenType.RETURN));
 		tagRules.addWord("@see", getToken(SDocTokenType.SEE));
+		tagRules.addWord("@type", getToken(SDocTokenType.TYPE));
 		rules.add(tagRules);
 		
 		rules.add(new RegexpRule("[^ \\t{\\[\\]#]+", getToken(SDocTokenType.TEXT), true));

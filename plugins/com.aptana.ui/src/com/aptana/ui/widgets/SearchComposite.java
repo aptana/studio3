@@ -1,4 +1,4 @@
-package com.aptana.explorer.internal.ui;
+package com.aptana.ui.widgets;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
-import com.aptana.explorer.ExplorerPlugin;
+import com.aptana.ui.UIPlugin;
 
 public class SearchComposite extends Composite
 {
@@ -106,7 +106,7 @@ public class SearchComposite extends Composite
 		toolbar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
 		final ToolItem caseSensitiveMenuItem = new ToolItem(toolbar, SWT.CHECK);
-		caseSensitiveMenuItem.setImage(ExplorerPlugin.getImage(CASE_SENSITIVE_ICON_PATH));
+		caseSensitiveMenuItem.setImage(UIPlugin.getImage(CASE_SENSITIVE_ICON_PATH));
 		caseSensitiveMenuItem.setToolTipText(Messages.SingleProjectView_CaseSensitive);
 		caseSensitiveMenuItem.setSelection(caseSensitiveSearch);
 		caseSensitiveMenuItem.addSelectionListener(new SelectionAdapter()
@@ -120,7 +120,7 @@ public class SearchComposite extends Composite
 		});
 
 		final ToolItem regularExressionMenuItem = new ToolItem(toolbar, SWT.CHECK);
-		regularExressionMenuItem.setImage(ExplorerPlugin.getImage(REGULAR_EXPRESSION_ICON_PATH));
+		regularExressionMenuItem.setImage(UIPlugin.getImage(REGULAR_EXPRESSION_ICON_PATH));
 		regularExressionMenuItem.setToolTipText(Messages.SingleProjectView_RegularExpression);
 		regularExressionMenuItem.setSelection(regularExpressionSearch);
 		regularExressionMenuItem.addSelectionListener(new SelectionAdapter()

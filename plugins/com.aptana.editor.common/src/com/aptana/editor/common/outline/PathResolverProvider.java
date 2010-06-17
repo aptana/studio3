@@ -37,14 +37,13 @@ package com.aptana.editor.common.outline;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.IURIEditorInput;
-import org.eclipse.ui.part.FileEditorInput;
 
-import com.aptana.editor.common.internal.outline.URIResolver;
+import com.aptana.editor.common.resolver.IPathResolver;
+import com.aptana.editor.common.resolver.URIResolver;
 
 /**
  * @author Pavel Petrochenko
@@ -52,13 +51,14 @@ import com.aptana.editor.common.internal.outline.URIResolver;
  */
 public final class PathResolverProvider
 {
+
 	/**
 	 * @author Pavel Petrochenko resolver which is not able to resolve anything
 	 */
 	private static final class NullResolver implements IPathResolver
 	{
 		/**
-		 * @see com.aptana.ide.views.outline.IPathResolver#resolveSource(java.lang.String)
+		 * @see com.aptana.editor.common.resolver.ide.views.outline.IPathResolver#resolveSource(java.lang.String)
 		 */
 		public String resolveSource(String path, IProgressMonitor monitor) throws Exception
 		{
@@ -74,8 +74,6 @@ public final class PathResolverProvider
 			}
 			catch (URISyntaxException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 			return null;
 		}
@@ -93,28 +91,25 @@ public final class PathResolverProvider
 	 */
 	public static IPathResolver getResolver(IEditorInput input)
 	{
-		if (input instanceof FileEditorInput)
-		{
-			FileEditorInput fi = (FileEditorInput) input;
-			IFile file = fi.getFile();
-			return new URIResolver(file.getLocationURI());
-		}
-		if (input instanceof IPathEditorInput)
-		{
-			IPathEditorInput fInput = (IPathEditorInput) (input);
-			return new URIResolver(fInput.getPath().toFile().toURI());
-		}
 		if (input instanceof IURIEditorInput)
 		{
 			URI uri = ((IURIEditorInput) input).getURI();
 			return new URIResolver(uri);
 		}
-		IPathEditorInput adapter = (IPathEditorInput) input.getAdapter(IPathEditorInput.class);
-		if (adapter != null)
+
+		IPathEditorInput fInput;
+		if (input instanceof IPathEditorInput)
 		{
-			return new URIResolver(adapter.getPath().toFile().toURI());
+			fInput = (IPathEditorInput) (input);
+		}
+		else
+		{
+			fInput = (IPathEditorInput) input.getAdapter(IPathEditorInput.class);
+		}
+		if (fInput != null)
+		{
+			return new URIResolver(fInput.getPath().toFile().toURI());
 		}
 		return new NullResolver();
 	}
-
 }

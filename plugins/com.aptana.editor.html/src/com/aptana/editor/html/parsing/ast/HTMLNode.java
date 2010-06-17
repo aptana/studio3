@@ -23,7 +23,7 @@ public class HTMLNode extends ParseBaseNode
 		setChildren(children);
 	}
 
-	public short getType()
+	public short getNodeType()
 	{
 		return fType;
 	}

@@ -1,5 +1,7 @@
 package com.aptana.editor.js.parsing.ast;
 
+import com.aptana.parsing.ast.IParseNode;
+
 public class JSVarNode extends JSNaryNode
 {
 	/**
@@ -21,5 +23,15 @@ public class JSVarNode extends JSNaryNode
 	protected void appendOpenText(StringBuilder buffer)
 	{
 		buffer.append("var "); //$NON-NLS-1$
+	}
+	
+	/**
+	 * getDeclarations
+	 * 
+	 * @return
+	 */
+	public IParseNode[] getDeclarations()
+	{
+		return this.getChildren();
 	}
 }

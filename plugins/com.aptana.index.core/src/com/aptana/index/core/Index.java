@@ -274,6 +274,7 @@ public class Index
 	 */
 	public void addEntry(String category, String key, String documentPath)
 	{
+		// TODO Convert documentPath arg to URI, resolve it's relative path to base path of container passed into index constructor!
 		this.memoryIndex.addEntry(category, key, documentPath);
 	}
 
@@ -346,6 +347,7 @@ public class Index
 	 */
 	public void remove(String containerRelativePath)
 	{
+		// TODO Convert containerRelativePath arg to URI, resolve it's relative path to base path of container passed into index constructor!
 		this.memoryIndex.remove(containerRelativePath);
 	}
 

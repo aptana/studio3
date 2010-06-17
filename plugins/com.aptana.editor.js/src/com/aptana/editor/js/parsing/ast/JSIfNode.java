@@ -30,7 +30,7 @@ public class JSIfNode extends JSNode
 
 		if (!((JSNode) children[2]).isEmpty())
 		{
-			if (children[1].getType() != JSNodeTypes.STATEMENTS)
+			if (children[1].getNodeType() != JSNodeTypes.STATEMENTS)
 			{
 				buffer.append(";"); //$NON-NLS-1$
 			}

@@ -1,90 +1,23 @@
 package com.aptana.editor.js.contentassist;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
-import com.aptana.core.util.IOUtil;
-import com.aptana.core.util.ResourceUtil;
-import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.contentassist.JSASTQueryHelper.Classification;
 import com.aptana.editor.js.parsing.JSParser;
+import com.aptana.editor.js.tests.FileContentBasedTests;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
 
-public class ASTQueryTests extends TestCase
+public class ASTQueryTests extends FileContentBasedTests
 {
 	private static final String CURSOR = "${cursor}";
 	private static final int CURSOR_LENGTH = CURSOR.length();
 	private JSASTQueryHelper _queryHelper;
-
-	/**
-	 * getContent
-	 * 
-	 * @param file
-	 * @return
-	 */
-	protected String getContent(File file)
-	{
-		String result = "";
-
-		try
-		{
-			FileInputStream input = new FileInputStream(file);
-
-			result = IOUtil.read(input);
-		}
-		catch (IOException e)
-		{
-		}
-
-		return result;
-	}
-
-	/**
-	 * getFile
-	 * 
-	 * @param path
-	 * @return
-	 */
-	protected File getFile(IPath path)
-	{
-		File result = null;
-
-		try
-		{
-			URL url = FileLocator.find(Activator.getDefault().getBundle(), path, null);
-			URL fileURL = FileLocator.toFileURL(url);
-			URI fileURI = ResourceUtil.toURI(fileURL);
-
-			result = new File(fileURI);
-		}
-		catch (IOException e)
-		{
-			fail(e.getMessage());
-		}
-		catch (URISyntaxException e)
-		{
-			fail(e.getMessage());
-		}
-
-		assertNotNull(result);
-		assertTrue(result.exists());
-
-		return result;
-	}
 
 	/**
 	 * getAST
@@ -137,7 +70,7 @@ public class ASTQueryTests extends TestCase
 
 		for (int o : offsets)
 		{
-			IParseNode targetNode = (ast != null && ast.contains(o)) ? ast.getNodeAt(o) : ast;
+			IParseNode targetNode = (ast != null && ast.contains(o)) ? ast.getNodeAtOffset(o) : ast;
 
 			targetNodes.add(targetNode);
 		}

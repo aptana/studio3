@@ -17,7 +17,8 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.index.core,
  com.aptana.core,
  beaver;bundle-version="1.0.0",
- org.jrubyparser;bundle-version="1.0.0"
+ org.jrubyparser;bundle-version="1.0.0",
+ org.eclipse.core.filesystem
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
@@ -25,6 +26,7 @@ Export-Package: com.aptana.editor.ruby,
  com.aptana.editor.ruby.core,
  com.aptana.editor.ruby.index,
  com.aptana.editor.ruby.outline,
- com.aptana.editor.ruby.parsing
+ com.aptana.editor.ruby.parsing,
+ com.aptana.editor.ruby.parsing.ast
 Bundle-ClassPath: .
 Eclipse-ExtensibleAPI: true
