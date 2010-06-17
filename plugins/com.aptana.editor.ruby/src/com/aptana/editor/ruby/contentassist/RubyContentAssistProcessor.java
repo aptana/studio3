@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -208,7 +210,19 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 			}
 		}
 
-		// TODO For rails we need to include the rails gem indices!
+		String gemEnvOutput = ProcessUtil.outputForCommand("gem", null, ShellExecutable.getEnvironment(),
+				"env", "gempath"); //$NON-NLS-1$
+		String[] gemPaths = gemEnvOutput.split(":"); // FIXME Does this need to be File.pathSeparator?
+		for (String gemPath : gemPaths)
+		{
+			IPath gemsPath = new Path(gemPath).append("gems");
+			Index index = IndexManager.getInstance().getIndex(gemsPath.toPortableString());
+			if (index != null)
+			{
+				indices.add(index);
+			}
+		}
+
 		return indices;
 	}
 
@@ -269,6 +283,7 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 		Set<String> set = new HashSet<String>();
 		for (String doc : result.getDocuments())
 		{
+			// TODO Compare document path to index and cut off the index's common prefix?
 			// HACK Detect when it's a core stub and change the reported name to "Ruby Core"
 			if (doc.contains(".metadata")) //$NON-NLS-1$
 			{

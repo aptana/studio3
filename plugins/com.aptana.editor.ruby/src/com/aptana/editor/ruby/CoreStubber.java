@@ -3,7 +3,10 @@ package com.aptana.editor.ruby;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,6 +26,7 @@ import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.editor.ruby.index.RubyFileIndexingParticipant;
 import com.aptana.index.core.Index;
+import com.aptana.index.core.IndexActivator;
 import com.aptana.index.core.IndexManager;
 
 public class CoreStubber extends Job
@@ -36,8 +40,8 @@ public class CoreStubber extends Job
 
 	public CoreStubber()
 	{
-		super("Stubbing and Indexing Core Ruby..."); //$NON-NLS-1$
-		setSystem(true);
+		super("Generating stubs for Ruby Core"); //$NON-NLS-1$
+		// setSystem(true);
 		setPriority(Job.LONG);
 	}
 
@@ -58,41 +62,20 @@ public class CoreStubber extends Job
 			// Skip if we already generated core stubs for this ruby...
 			if (!finishMarker.exists())
 			{
-				URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(CORE_STUBBER_PATH), null);
-				url = FileLocator.toFileURL(url);
-
-				Map<Integer, String> stubberResult = ProcessUtil.runInBackground(RUBY_EXE, null,
-						ShellExecutable.getEnvironment(), url.getFile(), outputDir.getAbsolutePath());
-				int exitCode = stubberResult.keySet().iterator().next();
-				if (exitCode != 0)
-				{
-					String stubberOutput = stubberResult.values().iterator().next();
-					Activator.getDefault().getLog()
-							.log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, stubberOutput, null));
-				}
-				else
-				{
-					// Now write empty file as a marker that core stubs were generated to completion...
-					finishMarker.createNewFile();
-				}
+				generateCoreStubs(outputDir, finishMarker);
 			}
-			sub.setWorkRemaining(75);
+			sub.setWorkRemaining(90);
 
-			// FIXME Don't re-index the core stubs if not necessary
-			Index coreIndex = IndexManager.getInstance().getIndex(rubyVersion);
-			indexFiles(coreIndex, addFiles(outputDir), sub.newChild(10));
-
-			// FIXME Don't re-index the loadpaths if not necessary
-			// Now index the loadpaths (Std Lib!)
-			String rawLoadPathOutput = ProcessUtil.outputForCommand(RUBY_EXE, null, ShellExecutable.getEnvironment(),
-					"-e", "puts $:"); //$NON-NLS-1$ //$NON-NLS-2$
-			String[] loadpaths = rawLoadPathOutput.split("\r\n|\r|\n"); //$NON-NLS-1$
-			for (String loadpath : loadpaths)
+			IProgressMonitor pm = Job.getJobManager().createProgressGroup();
+			List<Job> jobs = new ArrayList<Job>();
+			jobs.add(indexCoreStubs(rubyVersion, outputDir));
+			jobs.addAll(indexStdLib());
+			jobs.addAll(indexGems());
+			pm.beginTask("Indexing Ruby environment", jobs.size());
+			for (Job job : jobs)
 			{
-				if (loadpath.equals(".")) //$NON-NLS-1$
-					continue;
-				Index index = IndexManager.getInstance().getIndex(loadpath);
-				indexFiles(index, addFiles(new File(loadpath)), sub.newChild(65));
+				job.setProgressGroup(pm, 1);
+				job.schedule();
 			}
 		}
 		catch (Exception e)
@@ -103,27 +86,74 @@ public class CoreStubber extends Job
 		return Status.OK_STATUS;
 	}
 
-	protected void indexFiles(Index index, Set<IFileStore> files, IProgressMonitor monitor) throws CoreException,
-			IOException
+	protected List<Job> indexGems()
 	{
-		SubMonitor sub = SubMonitor.convert(monitor, files.size() * 2);
-
-		// First cleanup indices for files
-		for (IFileStore file : files)
+		List<Job> jobs = new ArrayList<Job>();
+		String gemEnvOutput = ProcessUtil.outputForCommand("gem", null, ShellExecutable.getEnvironment(),
+				"env", "gempath"); //$NON-NLS-1$
+		String[] gemPaths = gemEnvOutput.split(":"); // FIXME Does this need to be File.pathSeparator?
+		for (String gemPath : gemPaths)
 		{
-			if (sub.isCanceled())
-			{
-				throw new CoreException(Status.CANCEL_STATUS);
-			}
-			// FIXME I'm storing everything in indices via URI's path, which is not right. We should store URI string and if it's a file for convenience then in proposals we can lop off the "file:" portion
-			index.remove(file.toURI().getPath());
-			sub.worked(1);
+			IPath gemsPath = new Path(gemPath).append("gems");
+			Index index = IndexManager.getInstance().getIndex(gemsPath.toPortableString());
+			jobs.add(indexFiles(MessageFormat.format("Indexing {0}", gemsPath.toPortableString()), index,
+					addFiles(gemsPath.toFile())));
 		}
+		return jobs;
+	}
 
-		// Now parse and index the source
-		RubyFileIndexingParticipant fileIndexingParticipant = new RubyFileIndexingParticipant();
-		fileIndexingParticipant.index(files, index, sub.newChild(files.size()));
-		index.save();
+	protected List<Job> indexStdLib()
+	{
+		List<Job> jobs = new ArrayList<Job>();
+		// Now index the loadpaths (Std Lib!)
+		String rawLoadPathOutput = ProcessUtil.outputForCommand(RUBY_EXE, null, ShellExecutable.getEnvironment(),
+				"-e", "puts $:"); //$NON-NLS-1$ //$NON-NLS-2$
+		String[] loadpaths = rawLoadPathOutput.split("\r\n|\r|\n"); //$NON-NLS-1$
+		for (String loadpath : loadpaths)
+		{
+			if (loadpath.equals(".")) //$NON-NLS-1$
+				continue;
+			Index index = IndexManager.getInstance().getIndex(loadpath);
+			Job job = indexFiles(MessageFormat.format("Indexing {0}", loadpath), index, addFiles(new File(loadpath)));
+			if (job != null)
+			{
+				jobs.add(job);
+			}
+		}
+		return jobs;
+	}
+
+	protected Job indexCoreStubs(String rubyVersion, File outputDir)
+	{
+		Index coreIndex = IndexManager.getInstance().getIndex(rubyVersion);
+		return indexFiles("Indexing Ruby Core", coreIndex, addFiles(outputDir));
+	}
+
+	protected void generateCoreStubs(File outputDir, File finishMarker) throws IOException
+	{
+		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(CORE_STUBBER_PATH), null);
+		url = FileLocator.toFileURL(url);
+
+		Map<Integer, String> stubberResult = ProcessUtil.runInBackground(RUBY_EXE, null,
+				ShellExecutable.getEnvironment(), url.getFile(), outputDir.getAbsolutePath());
+		int exitCode = stubberResult.keySet().iterator().next();
+		if (exitCode != 0)
+		{
+			String stubberOutput = stubberResult.values().iterator().next();
+			Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, stubberOutput, null));
+		}
+		else
+		{
+			// Now write empty file as a marker that core stubs were generated to completion...
+			finishMarker.createNewFile();
+		}
+	}
+
+	protected Job indexFiles(String message, Index index, Set<IFileStore> files)
+	{
+		if (files == null || files.size() == 0)
+			return null;
+		return new IndexFileStoresJob(message, index, files);
 	}
 
 	private Set<IFileStore> addFiles(File file)
@@ -158,6 +188,74 @@ public class CoreStubber extends Job
 			}
 		}
 		return files;
+	}
+
+	private static class IndexFileStoresJob extends Job
+	{
+
+		private final Set<IFileStore> files;
+		private Index index;
+
+		public IndexFileStoresJob(String message, Index index, Set<IFileStore> files)
+		{
+			super(message);
+			this.files = files;
+			this.index = index;
+		}
+
+		@Override
+		public boolean belongsTo(Object family)
+		{
+			return index.getIndexFile().equals(family);
+		}
+
+		@Override
+		public IStatus run(IProgressMonitor monitor)
+		{
+			SubMonitor sub = SubMonitor.convert(monitor, 2 * files.size());
+			if (sub.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
+
+			try
+			{
+				// First cleanup indices for files
+				for (IFileStore file : files)
+				{
+					if (sub.isCanceled())
+					{
+						return Status.CANCEL_STATUS;
+					}
+					// FIXME I'm storing everything in indices via URI's path, which is not right. We should store URI
+					// string
+					// and if it's a file for convenience then in proposals we can lop off the "file:" portion
+					index.remove(file.toURI().getPath());
+					sub.worked(1);
+				}
+
+				// Now parse and index the source
+				RubyFileIndexingParticipant fileIndexingParticipant = new RubyFileIndexingParticipant();
+				fileIndexingParticipant.index(files, index, sub.newChild(files.size()));
+			}
+			catch (CoreException e)
+			{
+				return e.getStatus();
+			}
+			finally
+			{
+				try
+				{
+					index.save();
+				}
+				catch (IOException e)
+				{
+					IndexActivator.logError("An error occurred while saving an index", e);
+				}
+			}
+			return Status.OK_STATUS;
+		}
+
 	}
 
 }
