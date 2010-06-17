@@ -433,7 +433,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		this._targetNode = this.getActiveASTNode(offset);
 		this._statementNode = null;
 		
-		if (this._targetNode != null)
+		if (this._targetNode != null && this._targetNode instanceof JSNode)
 		{
 			this._statementNode = ((JSNode) this._targetNode).getContainingStatementNode();
 			
