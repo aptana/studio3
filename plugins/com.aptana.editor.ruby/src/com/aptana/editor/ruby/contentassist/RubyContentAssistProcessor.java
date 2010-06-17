@@ -85,16 +85,43 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 				if (fullPrefix.contains(NAMESPACE_DELIMITER))
 				{
 					// Search for types in namespace
-					String enclosing = fullPrefix.substring(0, fullPrefix.lastIndexOf(NAMESPACE_DELIMITER));
+					String enclosing = getNamespace(fullPrefix);
 					String subPrefix = getShortPrefix(fullPrefix);
 
 					String searchKey = "^" + subPrefix + "(.*)?" + IRubyIndexConstants.SEPARATOR + enclosing
 							+ IRubyIndexConstants.SEPARATOR + ".*$";
-
 					partialResults = index.query(new String[] { IRubyIndexConstants.TYPE_DECL }, searchKey,
 							SearchPattern.REGEX_MATCH | SearchPattern.CASE_SENSITIVE);
-					// TODO Also search for methods/constants under the type!
-					
+
+					// HACK This is pretty ugly. We search for a type matching the namespace in the prefix. 
+					// If we find a match, we then look for all methods and constants matching the prefix after the namespace.
+					// We then limit those results to only the ones defined in the same file as the type we just found.
+					// This doesn't guarantee the method or constant actually lives on that type, but it does guarantee it's in the same file for now.
+					String enclosingTypeSearchKey = getShortPrefix(enclosing) + IRubyIndexConstants.SEPARATOR
+							+ getNamespace(enclosing) + IRubyIndexConstants.SEPARATOR;
+					List<QueryResult> results = index.query(new String[] { IRubyIndexConstants.TYPE_DECL },
+							enclosingTypeSearchKey, SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
+					if (results != null && !results.isEmpty())
+					{
+						if (partialResults == null)
+						{
+							partialResults = new ArrayList<QueryResult>();
+						}
+
+						QueryResult result = results.get(0);
+						String document = result.getDocuments()[0];
+
+						List<QueryResult> constantsAndMethods = index.query(new String[] {
+								IRubyIndexConstants.CONSTANT_DECL, IRubyIndexConstants.METHOD_DECL }, subPrefix,
+								SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
+						for (QueryResult cAndMResult : constantsAndMethods)
+						{
+							if (StringUtil.contains(cAndMResult.getDocuments(), document))
+							{
+								partialResults.add(cAndMResult);
+							}
+						}
+					}
 				}
 				else
 				{
@@ -167,6 +194,16 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 
 		// return results
 		return proposals.toArray(new ICompletionProposal[proposals.size()]);
+	}
+
+	private String getNamespace(String fullPrefix)
+	{
+		int index = fullPrefix.lastIndexOf(NAMESPACE_DELIMITER);
+		if (index == -1)
+		{
+			return "";
+		}
+		return fullPrefix.substring(0, index);
 	}
 
 	/**
