@@ -6,6 +6,7 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -77,6 +78,7 @@ public class CoreStubber extends Job
 				job.setProgressGroup(pm, 1);
 				job.schedule();
 			}
+			// TODO How can we ever call done on this progress monitor? it's sticking in the progress view..
 		}
 		catch (Exception e)
 		{
@@ -221,6 +223,9 @@ public class CoreStubber extends Job
 
 			try
 			{
+				// Should check timestamp of index versus timestamps of files, only index files that are out of date!
+				filterFiles();
+
 				// First cleanup indices for files
 				for (IFileStore file : files)
 				{
@@ -255,6 +260,20 @@ public class CoreStubber extends Job
 				}
 			}
 			return Status.OK_STATUS;
+		}
+
+		private void filterFiles()
+		{
+			long indexLastModified = index.getIndexFile().lastModified();
+			Iterator<IFileStore> iter = files.iterator();
+			while (iter.hasNext())
+			{
+				IFileStore file = iter.next();
+				if (file.fetchInfo().getLastModified() < indexLastModified)
+				{
+					iter.remove();
+				}
+			}
 		}
 
 	}
