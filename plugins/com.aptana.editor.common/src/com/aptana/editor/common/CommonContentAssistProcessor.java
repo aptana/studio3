@@ -413,12 +413,6 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 			IURIEditorInput fileEditorInput = (IURIEditorInput) editorInput;
 			return fileEditorInput.getURI();
 		}
-		if (editorInput instanceof IFileEditorInput)
-		{
-			IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
-			IFile file = fileEditorInput.getFile();
-			return file.getLocationURI();
-		}
 		return null;
 	}
 
