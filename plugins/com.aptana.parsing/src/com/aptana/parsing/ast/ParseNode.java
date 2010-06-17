@@ -9,7 +9,7 @@ import beaver.spec.ast.TreeWalker;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Range;
 
-public class ParseBaseNode extends Node implements IParseNode
+public class ParseNode extends Node implements IParseNode
 {
 	protected static final class NameNode implements INameNode
 	{
@@ -48,7 +48,7 @@ public class ParseBaseNode extends Node implements IParseNode
 	 * 
 	 * @param language
 	 */
-	public ParseBaseNode(String language)
+	public ParseNode(String language)
 	{
 		fLanguage = language;
 		fChildren = new IParseNode[0];
@@ -83,9 +83,9 @@ public class ParseBaseNode extends Node implements IParseNode
 			fChildren = newList;
 		}
 		fChildren[fChildrenCount++] = child;
-		if (child instanceof ParseBaseNode)
+		if (child instanceof ParseNode)
 		{
-			((ParseBaseNode) child).setParent(this);
+			((ParseNode) child).setParent(this);
 		}
 	}
 
@@ -598,9 +598,9 @@ public class ParseBaseNode extends Node implements IParseNode
 			throw new IndexOutOfBoundsException(index + " >= " + fChildrenCount); //$NON-NLS-1$
 		}
 		fChildren[index] = child;
-		if (child instanceof ParseBaseNode)
+		if (child instanceof ParseNode)
 		{
-			((ParseBaseNode) child).setParent(this);
+			((ParseNode) child).setParent(this);
 		}
 	}
 
@@ -615,7 +615,7 @@ public class ParseBaseNode extends Node implements IParseNode
 		fChildrenCount = children.length;
 		for (IParseNode child : children)
 		{
-			((ParseBaseNode) child).setParent(this);
+			((ParseNode) child).setParent(this);
 		}
 	}
 

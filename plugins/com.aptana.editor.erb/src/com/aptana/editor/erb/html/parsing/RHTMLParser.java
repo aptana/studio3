@@ -12,7 +12,7 @@ import com.aptana.editor.ruby.parsing.IRubyParserConstants;
 import com.aptana.editor.ruby.parsing.RubyParser;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ast.IParseNode;
-import com.aptana.parsing.ast.ParseBaseNode;
+import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 
 public class RHTMLParser extends CompositeParser
@@ -29,7 +29,7 @@ public class RHTMLParser extends CompositeParser
 	{
 		String source = new String(parseState.getSource());
 		int startingOffset = parseState.getStartingOffset();
-		IParseNode root = new ParseRootNode(IRubyParserConstants.LANGUAGE, new ParseBaseNode[0], startingOffset,
+		IParseNode root = new ParseRootNode(IRubyParserConstants.LANGUAGE, new ParseNode[0], startingOffset,
 				startingOffset + source.length());
 
 		advance();
