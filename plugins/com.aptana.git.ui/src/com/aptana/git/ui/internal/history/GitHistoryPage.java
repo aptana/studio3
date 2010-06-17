@@ -20,6 +20,7 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -41,6 +42,8 @@ import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.theme.Theme;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitRepository;
@@ -48,8 +51,9 @@ import com.aptana.git.core.model.GitRevList;
 import com.aptana.git.core.model.GitRevSpecifier;
 import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.ui.GitUIPlugin;
+import com.aptana.ui.IAptanaHistory;
 
-public class GitHistoryPage extends HistoryPage
+public class GitHistoryPage extends HistoryPage implements IAptanaHistory
 {
 
 	private static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat(Messages.GitHistoryPage_DateFormat);
@@ -395,5 +399,40 @@ public class GitHistoryPage extends HistoryPage
 		}
 		return false;
 	}
+	
+	public void setTheme(boolean revert)
+	{
+		
+		Theme theme = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme();
+		applyTheme(ourControl, theme, revert);
+		applyTheme(graphDetailSplit, theme, revert);
+		applyTheme(revInfoSplit, theme, revert);
+		applyTheme(graph.getControl(), theme, revert);
+		applyTheme(commentViewer, theme, revert);
+		applyTheme(fileViewer.getControl(), theme, revert);
+
+	}
+	
+	private void applyTheme(Control control, Theme theme, boolean revert)
+	{
+
+		control.setRedraw(false);
+		if (revert)
+		{
+			control.setBackground(null);
+			control.setForeground(null);
+			control.setFont(null);
+		}
+		else
+		{
+			control.setBackground(CommonEditorPlugin.getDefault().getColorManager()
+					.getColor(theme.getBackground()));
+			control.setForeground(CommonEditorPlugin.getDefault().getColorManager()
+					.getColor(theme.getForeground()));
+			control.setFont(JFaceResources.getTextFont());
+		}
+		control.setRedraw(true);
+	}
+
 
 }

@@ -25,6 +25,8 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.team.ui.history.HistoryPage;
+import org.eclipse.team.ui.history.IHistoryView;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPageLayout;
@@ -56,6 +58,7 @@ import com.aptana.editor.common.theme.ConsoleThemer;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.Theme;
 import com.aptana.editor.common.theme.TreeThemer;
+import com.aptana.ui.IAptanaHistory;
 
 /**
  * This is a UIJob that tries to expand the influence of our themes to the JDT Editor; all Outline pages; Problems,
@@ -239,6 +242,17 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 			IPage page = outline.getCurrentPage();
 			hookTheme(page.getControl(), revertToDefaults);
 			return;
+		}
+		else if (view instanceof IHistoryView)
+		{
+			if (!hijackHistory(view))
+			{
+				IHistoryView historyView = (IHistoryView) view;
+				HistoryPage page = (HistoryPage) historyView.getHistoryPage();
+				Control control = page.getControl();
+				hookTheme(control, revertToDefaults);
+			}
+			
 		}
 		// else if (view.getClass().getName().equals("org.eclipse.search2.internal.ui.SearchView"))
 		// {
@@ -712,12 +726,30 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 	@Override
 	public void partActivated(IWorkbenchPart part)
 	{
+		if(part instanceof IViewPart)
+			hijackHistory((IViewPart) part);
+		
 		if (!(part instanceof IEditorPart))
 			return;
-
+		
 		hijackOutline();
 	}
 
+	protected boolean hijackHistory(IViewPart view)
+	{
+		if (view instanceof IHistoryView)
+		{
+			IHistoryView historyView = (IHistoryView) view;
+			HistoryPage page = (HistoryPage) historyView.getHistoryPage();
+			if ( page instanceof IAptanaHistory){
+				((IAptanaHistory) page).setTheme(false);
+				return true;
+			}
+			
+		}
+		return false;
+	}
+	
 	protected void hijackOutline()
 	{
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
