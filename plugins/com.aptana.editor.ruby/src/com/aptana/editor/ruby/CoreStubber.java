@@ -109,6 +109,7 @@ public class CoreStubber extends Job
 		String rawLoadPathOutput = ProcessUtil.outputForCommand(RUBY_EXE, null, ShellExecutable.getEnvironment(),
 				"-e", "puts $:"); //$NON-NLS-1$ //$NON-NLS-2$
 		String[] loadpaths = rawLoadPathOutput.split("\r\n|\r|\n"); //$NON-NLS-1$
+		// TODO What about when one loadpath is a parent of another, just filter to parent?
 		for (String loadpath : loadpaths)
 		{
 			if (loadpath.equals(".")) //$NON-NLS-1$
