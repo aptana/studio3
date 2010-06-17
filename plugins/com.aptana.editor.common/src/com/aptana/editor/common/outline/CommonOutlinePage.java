@@ -199,6 +199,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 				return wordMatches(label);
 			}
 		};
+		fFilter.setIncludeLeadingWildcard(true);
 		viewer.addFilter(fFilter);
 		viewer.addDoubleClickListener(new IDoubleClickListener()
 		{
