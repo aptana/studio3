@@ -1,12 +1,15 @@
 package com.aptana.ui.widgets;
 
+import java.util.regex.Pattern;
+
+import org.eclipse.search.internal.core.text.PatternConstructor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -16,7 +19,8 @@ import org.eclipse.swt.widgets.ToolItem;
 
 import com.aptana.ui.UIPlugin;
 
-public class SearchComposite extends Composite
+@SuppressWarnings("restriction")
+public class SearchComposite extends Composite implements KeyListener, SelectionListener
 {
 
 	public static interface Client
@@ -33,6 +37,8 @@ public class SearchComposite extends Composite
 	private boolean regularExpressionSearch;
 
 	private Client client;
+	private ToolItem caseSensitiveMenuItem;
+	private ToolItem regularExressionMenuItem;
 
 	public SearchComposite(Composite parent, Client client)
 	{
@@ -78,60 +84,23 @@ public class SearchComposite extends Composite
 			}
 		});
 
-		searchText.addKeyListener(new KeyListener()
-		{
-			@Override
-			public void keyReleased(KeyEvent e)
-			{
-			}
-
-			@Override
-			public void keyPressed(KeyEvent e)
-			{
-				if (!e.doit)
-				{
-					return;
-				}
-
-				if (e.keyCode == 0x0D)
-				{
-					searchText();
-					e.doit = false;
-				}
-			}
-		});
+		searchText.addKeyListener(this);
 
 		// Button for search options
 		ToolBar toolbar = new ToolBar(this, SWT.NONE);
 		toolbar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
-		final ToolItem caseSensitiveMenuItem = new ToolItem(toolbar, SWT.CHECK);
+		caseSensitiveMenuItem = new ToolItem(toolbar, SWT.CHECK);
 		caseSensitiveMenuItem.setImage(UIPlugin.getImage(CASE_SENSITIVE_ICON_PATH));
 		caseSensitiveMenuItem.setToolTipText(Messages.SingleProjectView_CaseSensitive);
 		caseSensitiveMenuItem.setSelection(caseSensitiveSearch);
-		caseSensitiveMenuItem.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				caseSensitiveSearch = caseSensitiveMenuItem.getSelection();
-				searchText.setFocus();
-			}
-		});
+		caseSensitiveMenuItem.addSelectionListener(this);
 
-		final ToolItem regularExressionMenuItem = new ToolItem(toolbar, SWT.CHECK);
+		regularExressionMenuItem = new ToolItem(toolbar, SWT.CHECK);
 		regularExressionMenuItem.setImage(UIPlugin.getImage(REGULAR_EXPRESSION_ICON_PATH));
 		regularExressionMenuItem.setToolTipText(Messages.SingleProjectView_RegularExpression);
 		regularExressionMenuItem.setSelection(regularExpressionSearch);
-		regularExressionMenuItem.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				regularExpressionSearch = regularExressionMenuItem.getSelection();
-				searchText.setFocus();
-			}
-		});
+		regularExressionMenuItem.addSelectionListener(this);
 	}
 
 	@Override
@@ -145,12 +114,56 @@ public class SearchComposite extends Composite
 		return searchText;
 	}
 
-	private void searchText()
+	protected void searchText()
 	{
 		String text = searchText.getText();
 		if (text.length() > 0 && client != null)
 		{
 			client.search(text, caseSensitiveSearch, regularExpressionSearch);
 		}
+	}
+	
+	/**
+	 * Create a default search pattern taking into consideration case sensitivity and regular expression settings
+	 * @return
+	 */
+	public Pattern createSearchPattern() {
+		return PatternConstructor.createPattern(searchText.getText(), caseSensitiveSearch, regularExpressionSearch);
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		if (!e.doit)
+		{
+			return;
+		}
+
+		if (e.keyCode == 0x0D)
+		{
+			searchText();
+			e.doit = false;
+		}
+	}
+
+	@Override
+	public void widgetDefaultSelected(SelectionEvent e) {
+	}
+
+	@Override
+	public void widgetSelected(SelectionEvent e) {
+		Object source = e.getSource();
+		if (source == caseSensitiveMenuItem)
+		{
+			caseSensitiveSearch = caseSensitiveMenuItem.getSelection();
+		}
+		else if (source == regularExressionMenuItem)
+		{
+			regularExpressionSearch = regularExressionMenuItem.getSelection();
+		}
+		searchText.setFocus();
 	}
 }

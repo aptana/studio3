@@ -45,6 +45,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
@@ -64,6 +66,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
@@ -119,6 +122,7 @@ import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants;
 import com.aptana.ide.ui.io.preferences.PermissionsGroup;
 import com.aptana.ui.SWTUtils;
 import com.aptana.ui.UIPlugin;
+import com.aptana.ui.widgets.SearchComposite;
 
 /**
  * @author Kevin Sawicki (ksawicki@aptana.com)
@@ -207,6 +211,8 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 	private ViewerFilter viewerFilter;
 	private String searchText;
 	private Button saveLog;
+	private Pattern searchPattern;
+	private SearchComposite searchComposite;
 
 	/**
 	 * Creates a new sync dialog.
@@ -558,16 +564,35 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		deletedLabel = new Label(status, SWT.LEFT);
 		deletedLabel.setText(DELETED_LABEL);
 
-		createSearchComposite(status);
+		searchComposite = createSearchComposite(status);
 		filterComp = createFilterComposite(status);
 		
 		return top;
 	}
 
-	private Composite createSearchComposite(Composite myComposite) {
-		SearchComposite search = new SearchComposite(myComposite, this);
-		search.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+	private SearchComposite createSearchComposite(Composite myComposite) {
+		SearchComposite search = new SearchComposite(myComposite, this) {
 
+			@Override
+			public void keyPressed(KeyEvent e) {
+				this.searchText();
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if (!e.doit)
+				{
+					return;
+				}
+			}
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				super.widgetSelected(e);
+				this.searchText();
+			}
+		};
+		search.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		return search;
 	}
 	private Composite createFilterComposite(final Composite myComposite) {
@@ -978,7 +1003,14 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 				if (element instanceof SyncFile || element instanceof SyncFolder)
 				{
 					ISyncResource resource = (ISyncResource)element;
-					if(searchText == null || resource.getPath().toString().contains(searchText)) {
+					if(searchText == null) {
+						return true;
+					}
+
+					String path = resource.getPath().toString();
+					Matcher m = searchPattern.matcher(path);
+
+					if(m.find()) {
 						return true;
 					}
 					else
@@ -1060,14 +1092,14 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		startSync.setLayoutData(gridData);
 		startSync.addSelectionListener(this);
 		
-		cancel = createButton(parent, IDialogConstants.CANCEL_ID,
-				IDialogConstants.CANCEL_LABEL, false);
-		cancel.addSelectionListener(this);
-
 		saveLog = createButton(parent, IDialogConstants.DETAILS_ID,
 				"Save Log...", false);
 		saveLog.addSelectionListener(this);
 		saveLog.setEnabled(false);
+
+		cancel = createButton(parent, IDialogConstants.CANCEL_ID,
+				IDialogConstants.CANCEL_LABEL, false);
+		cancel.addSelectionListener(this);
 	}
 
 	private void setEnabled(boolean enabled)
@@ -1998,6 +2030,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 	public void search(String text, boolean isCaseSensitive,
 			boolean isRegularExpression) {
 		searchText = text;
+		searchPattern = searchComposite.createSearchPattern();
 		syncViewer.refresh();
 	}
 
