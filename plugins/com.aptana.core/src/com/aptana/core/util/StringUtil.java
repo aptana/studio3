@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -50,6 +51,11 @@ public abstract class StringUtil
 			result = sb.toString();
 		}
 		return result;
+	}
+	
+	public static String join(String delimiter, Collection<String> items)
+	{
+		return join(delimiter, items.toArray(new String[items.size()]));
 	}
 	
 	/**

@@ -27,7 +27,7 @@ public class JSDoNode extends JSNode
 
 		buffer.append("do ").append(children[0]); //$NON-NLS-1$
 
-		if (children[0].getType() != JSNodeTypes.STATEMENTS)
+		if (children[0].getNodeType() != JSNodeTypes.STATEMENTS)
 		{
 			buffer.append(";"); //$NON-NLS-1$
 		}

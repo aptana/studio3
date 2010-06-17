@@ -16,7 +16,7 @@ public class RubyImportContainer extends RubyElement implements IImportContainer
 	}
 
 	@Override
-	public short getType()
+	public short getNodeType()
 	{
 		return IRubyElement.IMPORT_CONTAINER;
 	}

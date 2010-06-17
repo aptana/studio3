@@ -5,9 +5,12 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.resources.IFile;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.content.IContentType;
@@ -18,18 +21,20 @@ import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.contentassist.JSASTQueryHelper;
 import com.aptana.editor.js.parsing.IJSParserConstants;
-import com.aptana.editor.js.parsing.JSParseState;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
-import com.aptana.index.core.IFileIndexingParticipant;
+import com.aptana.editor.js.parsing.ast.JSParseRootNode;
+import com.aptana.editor.js.sdoc.model.DocumentationBlock;
+import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.IParserPool;
+import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.Scope;
 import com.aptana.parsing.ast.IParseNode;
 
-public class JSFileIndexingParticipant implements IFileIndexingParticipant
+public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 {
 	private static final String JS_EXTENSION = "js"; //$NON-NLS-1$
 
@@ -39,13 +44,13 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public void index(Set<IFile> files, Index index, IProgressMonitor monitor)
+	public void index(Set<IFileStore> files, Index index, IProgressMonitor monitor)
 	{
-		monitor = SubMonitor.convert(monitor, files.size());
+		SubMonitor sub = SubMonitor.convert(monitor, files.size());
 
-		for (IFile file : files)
+		for (IFileStore file : files)
 		{
-			if (monitor.isCanceled())
+			if (sub.isCanceled())
 			{
 				return;
 			}
@@ -57,12 +62,12 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 					continue;
 				}
 
-				monitor.subTask(file.getLocation().toPortableString());
+				sub.subTask(file.getName());
 
 				try
 				{
 					// grab the source of the file we're going to parse
-					String source = IOUtil.read(file.getContents());
+					String source = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(-1)));
 
 					// minor optimization when creating a new empty file
 					if (source != null && source.length() > 0)
@@ -74,16 +79,15 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 						{
 							IParser parser = pool.checkOut();
 
-							JSParseState parseState = new JSParseState();
-
 							// apply the source to the parse state and parse
+							ParseState parseState = new ParseState();
 							parseState.setEditState(source, source, 0, 0);
 							parser.parse(parseState);
 
 							pool.checkIn(parser);
-
+							
 							// process results
-							this.processParseResults(index, file, parseState);
+							this.processParseResults(index, file, parseState.getParseResult());
 						}
 					}
 				}
@@ -98,7 +102,7 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 			}
 			finally
 			{
-				monitor.worked(1);
+				sub.worked(1);
 			}
 		}
 
@@ -111,14 +115,14 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 	 * @param file
 	 * @return
 	 */
-	private boolean isJSFile(IFile file)
+	private boolean isJSFile(IFileStore file)
 	{
 		InputStream stream = null;
 		IContentTypeManager manager = Platform.getContentTypeManager();
 
 		try
 		{
-			stream = file.getContents();
+			stream = file.openInputStream(EFS.NONE, new NullProgressMonitor());
 
 			IContentType[] types = manager.findContentTypesFor(stream, file.getName());
 
@@ -149,7 +153,7 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 			}
 		}
 
-		return JS_EXTENSION.equalsIgnoreCase(file.getFileExtension());
+		return JS_EXTENSION.equalsIgnoreCase(new Path(file.getName()).getFileExtension());
 	}
 
 	/**
@@ -159,12 +163,12 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 	 * @param file
 	 * @param parseState
 	 */
-	private void processParseResults(Index index, IFile file, JSParseState parseState)
+	private void processParseResults(Index index, IFileStore file, IParseNode ast)
 	{
 		if (Platform.inDevelopmentMode())
 		{
-			String location = file.getProjectRelativePath().toPortableString();
-			Scope<JSNode> globals = parseState.getGlobalScope();
+			String location = file.toURI().getPath();
+			Scope<JSNode> globals = ((JSParseRootNode) ast).getGlobalScope();
 			
 			for (String symbol: globals.getLocalSymbolNames())
 			{
@@ -173,6 +177,13 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 				
 				for (JSNode node : nodes)
 				{
+					DocumentationBlock block = node.getDocumentation();
+					
+					if (block != null)
+					{
+//						System.out.println("Found block for " + symbol + "\n" + block.toSource());
+					}
+					
 					if (node instanceof JSFunctionNode)
 					{
 						category = JSIndexConstants.FUNCTION;
@@ -185,8 +196,6 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 		}
 		else
 		{
-			IParseNode ast = parseState.getParseResult();
-			
 			this.walkAST(index, file, ast);
 		}
 	}
@@ -198,10 +207,10 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 	 * @param file
 	 * @param ast
 	 */
-	private void walkAST(Index index, IFile file, IParseNode ast)
+	private void walkAST(Index index, IFileStore file, IParseNode ast)
 	{
 		JSASTQueryHelper astHelper = new JSASTQueryHelper();
-		String location = file.getProjectRelativePath().toPortableString();
+		String location = file.toURI().getPath();
 
 		for (String name : astHelper.getChildFunctions(ast))
 		{

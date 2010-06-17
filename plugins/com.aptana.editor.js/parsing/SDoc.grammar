@@ -40,6 +40,18 @@
 	 */
 	public Object parse(String source) throws java.lang.Exception
 	{
+		return parse(source, 0);
+	}
+	
+	/**
+	 * parse
+	 *
+	 * @param source
+	 * @param offset
+	 */
+	public Object parse(String source, int offset) throws java.lang.Exception
+	{
+		fScanner.setOffset(offset);
 		fScanner.setSource(source);
 		
 		return parse(fScanner);
@@ -56,6 +68,7 @@
 %terminals ADVANCED, ALIAS, AUTHOR, CLASS_DESCRIPTION, CONSTRUCTOR, EXAMPLE, EXCEPTION;
 %terminals EXTENDS, INTERNAL, METHOD, NAMESPACE, OVERVIEW, PARAM, RETURN, SEE, UNKNOWN;
 %terminals IDENTIFIER, ARRAY, FUNCTION, PRIVATE, PROPERTY;
+%terminals TYPE;
 
 %typeof IDENTIFIER,FUNCTION,ARRAY = "String";
 %typeof TEXT,LBRACKET,RBRACKET,LCURLY,RCURLY,POUND,COLON,ERROR,UNKNOWN = "String";
@@ -73,17 +86,17 @@ Grammar
 	;
 
 Block
-	=	START_DOCUMENTATION.s Text.text END_DOCUMENTATION.e
+	=	START_DOCUMENTATION Text.text END_DOCUMENTATION
 		{:
-			return new Block((String) text.value, s.getStart(), e.getEnd());
+			return new DocumentationBlock((String) text.value);
 		:}
-	|	START_DOCUMENTATION.s Tags.tags END_DOCUMENTATION.e
+	|	START_DOCUMENTATION Tags.tags END_DOCUMENTATION
 		{:
-			return new Block((List<Tag>) tags.value, s.getStart(), e.getEnd());
+			return new DocumentationBlock((List<Tag>) tags.value);
 		:}
-	|	START_DOCUMENTATION.s Text.text Tags.tags END_DOCUMENTATION.e
+	|	START_DOCUMENTATION Text.text Tags.tags END_DOCUMENTATION
 		{:
-			return new Block((String) text.value, (List<Tag>) tags.value, s.getStart(), e.getEnd());
+			return new DocumentationBlock((String) text.value, (List<Tag>) tags.value);
 		:}
 	;
 
@@ -192,6 +205,10 @@ Tag
 	|	SEE Text.text
 		{:
 			return new Tag(TagType.SEE, (String) text.value);
+		:}
+	|	TYPE LCURLY Types.types RCURLY Text.text?
+		{:
+			return new TagWithTypes(TagType.TYPE, (List<Type>) types.value, (String) text.value);
 		:}
 	|	UNKNOWN.name Text.text?
 		{:

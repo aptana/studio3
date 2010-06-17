@@ -18,7 +18,7 @@ import beaver.Symbol;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.editor.js.Activator;
-import com.aptana.editor.js.sdoc.model.Block;
+import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 
 public class SDocParserTests extends TestCase
 {
@@ -92,7 +92,7 @@ public class SDocParserTests extends TestCase
 			{
 				Object value = ((Symbol) result).value;
 				
-				if (value instanceof Block)
+				if (value instanceof DocumentationBlock)
 				{
 					//System.out.println(((Block) value).toSource());
 				}

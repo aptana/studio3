@@ -2,6 +2,8 @@ package com.aptana.editor.common.contentassist;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IInformationControlCreator;
+import org.eclipse.jface.text.contentassist.ICompletionProposalExtension3;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -9,7 +11,7 @@ import org.eclipse.swt.graphics.Point;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Range;
 
-public class CommonCompletionProposal implements ICommonCompletionProposal
+public class CommonCompletionProposal implements ICommonCompletionProposal, ICompletionProposalExtension3
 {
 	private String _additionalProposalInformation;
 	private IContextInformation _contextInformation;
@@ -250,5 +252,23 @@ public class CommonCompletionProposal implements ICommonCompletionProposal
 	public void setUserAgentImages(Image[] images)
 	{
 		this._userAgentImages = images;
+	}
+
+	@Override
+	public IInformationControlCreator getInformationControlCreator()
+	{
+		return null;
+	}
+
+	@Override
+	public CharSequence getPrefixCompletionText(IDocument document, int completionOffset)
+	{
+		return _replacementString;
+	}
+
+	@Override
+	public int getPrefixCompletionStart(IDocument document, int completionOffset)
+	{
+		return _replacementOffset;
 	}
 }

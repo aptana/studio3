@@ -3,6 +3,7 @@ package com.aptana.editor.common;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,7 @@ import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IURIEditorInput;
 import org.jruby.Ruby;
 import org.jruby.RubyArray;
 import org.jruby.RubyHash;
@@ -393,8 +395,25 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 
 			result = IndexManager.getInstance().getIndex(project.getFullPath().toPortableString());
 		}
+		else if (editorInput instanceof IURIEditorInput)
+		{
+			IURIEditorInput fileEditorInput = (IURIEditorInput) editorInput;
+			URI uri = fileEditorInput.getURI();
+			result = IndexManager.getInstance().getIndex(uri.toString());
+		}
 
 		return result;
+	}
+	
+	protected URI getURI()
+	{
+		IEditorInput editorInput = editor.getEditorInput();
+		if (editorInput instanceof IURIEditorInput)
+		{
+			IURIEditorInput fileEditorInput = (IURIEditorInput) editorInput;
+			return fileEditorInput.getURI();
+		}
+		return null;
 	}
 
 	/**
