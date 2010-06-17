@@ -29,9 +29,10 @@
  * ***** END LICENSE BLOCK ***** */
 package com.aptana.editor.js.contentassist;
 
-enum LocationType
+public enum LocationType
 {
 	UNKNOWN,
+	NONE,
 	IN_GLOBAL,
 	IN_PARAMETERS,
 	IN_CONSTRUCTOR,
