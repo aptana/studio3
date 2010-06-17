@@ -248,6 +248,8 @@ public class Index
 
 	public ReadWriteMonitor monitor;
 
+	private String path;
+
 	/**
 	 * Index
 	 * 
@@ -256,13 +258,22 @@ public class Index
 	 */
 	public Index(String path) throws IOException
 	{
-		IPath containerPath = IndexManager.getInstance().computeIndexLocation(path);
-		String containerPathString = containerPath.getDevice() == null ? containerPath.toString() : containerPath.toOSString();
+		// Raw path of root we're indexing
+		this.path = path;
+		
 		this.memoryIndex = new MemoryIndex();
 		this.monitor = new ReadWriteMonitor();
 
+		// Convert to a filename we can use for the actual index on disk
+		IPath containerPath = IndexManager.getInstance().computeIndexLocation(path);
+		String containerPathString = containerPath.getDevice() == null ? containerPath.toString() : containerPath.toOSString();
 		this.diskIndex = new DiskIndex(containerPathString);
 		this.diskIndex.initialize();
+	}
+	
+	public String getRoot()
+	{
+		return path;
 	}
 
 	/**

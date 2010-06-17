@@ -133,7 +133,7 @@ public class GitPlugin extends Plugin
 	public static void logError(Exception e)
 	{
 		if (getDefault() != null)
-			getDefault().getLog().log(new Status(IStatus.WARNING, getPluginId(), "", e));
+			getDefault().getLog().log(new Status(IStatus.WARNING, getPluginId(), "", e)); //$NON-NLS-1$
 	}
 
 	public static void logInfo(String string)

@@ -158,6 +158,10 @@ public class RubySourceIndexer implements ISourceElementRequestor
 
 	public void enterField(FieldInfo field)
 	{
+		if (field == null || field.name == null || field.name.length() == 0)
+		{
+			return;
+		}
 		String category = IRubyIndexConstants.LOCAL_DECL;
 		if (field.name.startsWith("@@")) //$NON-NLS-1$
 		{
@@ -223,9 +227,12 @@ public class RubySourceIndexer implements ISourceElementRequestor
 	{
 		addIndex(IRubyIndexConstants.REF, getSimpleName(moduleName));
 
-		TypeInfo info = typeStack.peek();
-		String[] enclosingTypes = getEnclosingTypeNames(info.name);
-		addIncludedModuleReference(getSimpleName(info.name), enclosingTypes, moduleName);
+		if (typeStack != null && !typeStack.isEmpty())
+		{			
+			TypeInfo info = typeStack.peek();
+			String[] enclosingTypes = getEnclosingTypeNames(info.name);
+			addIncludedModuleReference(getSimpleName(info.name), enclosingTypes, moduleName);
+		}
 	}
 
 	private void addIncludedModuleReference(String simpleName, String[] enclosingTypes, String moduleName)
@@ -288,7 +295,10 @@ public class RubySourceIndexer implements ISourceElementRequestor
 		StringBuilder builder = new StringBuilder();
 		builder.append(superSimpleName);
 		builder.append(IRubyIndexConstants.SEPARATOR);
-		builder.append(superQualification);
+		if (superQualification != null)
+		{
+			builder.append(superQualification);
+		}
 		builder.append(IRubyIndexConstants.SEPARATOR);
 		builder.append(simpleName);
 		builder.append(IRubyIndexConstants.SEPARATOR);

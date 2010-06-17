@@ -9,7 +9,6 @@ import java.util.StringTokenizer;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -66,19 +65,26 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 				sub.subTask(file.getName());
 				try
 				{
-					String fileContents = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(-1)));
-					HTMLParseState parseState = new HTMLParseState();
-					parseState.setEditState(fileContents, "", 0, 0); //$NON-NLS-1$
 					IParserPool pool = ParserPoolFactory.getInstance().getParserPool(HTMLNode.LANGUAGE);
 					if (pool != null)
 					{
-						IParser htmlParser = pool.checkOut();
-						IParseNode parseNode = htmlParser.parse(parseState);
-						pool.checkIn(htmlParser);
-						walkNode(index, file, parseNode);
+						String fileContents = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(-1)));
+						if (fileContents != null && fileContents.trim().length() > 0)
+						{
+							IParser htmlParser = pool.checkOut();
+							if (htmlParser != null)
+							{
+
+								HTMLParseState parseState = new HTMLParseState();
+								parseState.setEditState(fileContents, "", 0, 0); //$NON-NLS-1$
+								IParseNode parseNode = htmlParser.parse(parseState);
+								pool.checkIn(htmlParser);
+								walkNode(index, file, parseNode);
+							}
+						}
 					}
 				}
-				catch (Exception e)
+				catch (Throwable e)
 				{
 					Activator.logError(
 							MessageFormat.format(Messages.HTMLFileIndexingParticipant_Error_During_Indexing,
@@ -155,7 +161,7 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 				String jsSource = htmlSpecialNode.getAttributeValue(ATTRIBUTE_SRC);
 				if (jsSource != null)
 				{
-					
+
 					IPathResolver resolver = new URIResolver(file.toURI());
 					URI resolved = resolver.resolveURI(jsSource);
 					addIndex(index, file, HTMLIndexConstants.RESOURCE_JS, resolved.toString());

@@ -11,10 +11,10 @@ import com.aptana.editor.js.contentassist.LocationType;
 import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.parsing.ast.IParseNode;
-import com.aptana.parsing.ast.ParseBaseNode;
+import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 
-public class JSNode extends ParseBaseNode
+public class JSNode extends ParseNode
 {
 	protected static final short DEFAULT_TYPE = JSNodeTypes.EMPTY;
 	private static Map<Short, String> typeNameMap;

@@ -39,6 +39,7 @@ import org.jrubyparser.ast.SClassNode;
 import org.jrubyparser.ast.SelfNode;
 import org.jrubyparser.ast.SplatNode;
 import org.jrubyparser.ast.StrNode;
+import org.jrubyparser.ast.UnnamedRestArgNode;
 import org.jrubyparser.ast.VCallNode;
 import org.jrubyparser.ast.YieldNode;
 
@@ -121,7 +122,7 @@ public class SourceElementVisitor extends InOrderVisitor
 			}
 		}
 		ArgumentNode restArg = iVisited.getRest();
-		if (restArg != null)
+		if (restArg != null && !(restArg instanceof UnnamedRestArgNode))
 		{
 			FieldInfo field = createFieldInfo(restArg);
 			// account for the leading "*"

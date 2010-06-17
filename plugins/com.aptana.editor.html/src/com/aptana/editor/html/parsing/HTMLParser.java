@@ -22,7 +22,7 @@ import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
-import com.aptana.parsing.ast.ParseBaseNode;
+import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 
 public class HTMLParser implements IParser
@@ -291,9 +291,9 @@ public class HTMLParser implements IParser
 
 	private void addOffset(IParseNode node, int offset)
 	{
-		if (node instanceof ParseBaseNode)
+		if (node instanceof ParseNode)
 		{
-			ParseBaseNode parseNode = (ParseBaseNode) node;
+			ParseNode parseNode = (ParseNode) node;
 			parseNode.addOffset(offset);
 		}
 		IParseNode[] children = node.getChildren();

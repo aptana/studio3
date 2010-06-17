@@ -9,7 +9,6 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
@@ -30,56 +29,75 @@ import com.aptana.index.core.Index;
 public class RubyFileIndexingParticipant implements IFileStoreIndexingParticipant
 {
 
-	private static final String RUBY_EXTENSION = "rb"; //$NON-NLS-1$
-
 	@Override
 	public void index(Set<IFileStore> files, final Index index, IProgressMonitor monitor) throws CoreException
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, files.size());
-		for (final IFileStore store : files)
+		try
 		{
-			if (sub.isCanceled())
+			RubySourceParser sourceParser = new RubySourceParser();
+			for (final IFileStore store : files)
 			{
-				throw new CoreException(Status.CANCEL_STATUS);
-			}
-			if (store == null)
-			{
-				continue;
-			}
-			sub.subTask(store.getName());
-			if (!isRubyFile(store))
-			{
-				continue;
-			}
-			try
-			{
-				// grab the source of the file we're going to parse
-				String source = IOUtil.read(store.openInputStream(EFS.NONE, monitor));
-
-				// minor optimization when creating a new empty file
-				if (source != null && source.length() > 0)
+				if (sub.isCanceled())
 				{
+					throw new CoreException(Status.CANCEL_STATUS);
+				}
+				try
+				{
+					if (store == null)
+					{
+						continue;
+					}
+					sub.subTask(store.toString());
+					if (!isRubyFile(store))
+					{
+						continue;
+					}
 
-					RubySourceParser sourceParser = new RubySourceParser();
-					ParserResult result = sourceParser.parse(store.getName(), source);
-					Node root = result.getAST();
-					ISourceElementRequestor builder = new RubySourceIndexer(index, store.toURI().getPath());
-					SourceElementVisitor visitor = new SourceElementVisitor(builder);
-					visitor.acceptNode(root);
+					// grab the source of the file we're going to parse
+					String source = IOUtil.read(store.openInputStream(EFS.NONE, monitor));
+
+					// minor optimization when creating a new empty file
+					if (source != null && source.length() > 0)
+					{
+						ParserResult result = sourceParser.parse(store.getName(), source);
+						Node root = result.getAST();
+						ISourceElementRequestor builder = new RubySourceIndexer(index, store.toURI().getPath());
+						SourceElementVisitor visitor = new SourceElementVisitor(builder);
+						visitor.acceptNode(root);
+					}
+				}
+				catch (Throwable e)
+				{
+					Activator.log(e);
+				}
+				finally
+				{
+					sub.worked(1);
 				}
 			}
-			catch (Exception e)
-			{
-				Activator.log(e);
-			}
-			sub.worked(1);
+		}
+		finally
+		{
+			sub.done();
 		}
 	}
 
 	private boolean isRubyFile(IFileStore file)
 	{
-		InputStream stream = null;
+		// Try a faster way, just check filename/extension against ruby content type
 		IContentTypeManager manager = Platform.getContentTypeManager();
+		IContentType rubyType = manager.getContentType(IRubyConstants.CONTENT_TYPE_RUBY);
+		if (rubyType != null)
+		{
+			if (rubyType.isAssociatedWith(file.getName()))
+			{
+				return true;
+			}
+		}
+
+		// Ok, now try slower way where we actually use a stream and grab all content types for file.
+		InputStream stream = null;
 		try
 		{
 			stream = file.openInputStream(EFS.NONE, new NullProgressMonitor());
@@ -93,6 +111,7 @@ public class RubyFileIndexingParticipant implements IFileStoreIndexingParticipan
 		}
 		catch (Exception e)
 		{
+			// TODO This can often be caused by permissions issues. We should probably just ignore them
 			Activator.log(e);
 		}
 		finally
@@ -108,6 +127,6 @@ public class RubyFileIndexingParticipant implements IFileStoreIndexingParticipan
 			}
 		}
 
-		return RUBY_EXTENSION.equalsIgnoreCase(new Path(file.getName()).getFileExtension());
+		return false;
 	}
 }
