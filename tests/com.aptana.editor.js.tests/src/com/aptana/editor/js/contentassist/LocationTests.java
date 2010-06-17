@@ -157,71 +157,42 @@ public class LocationTests extends EditorBasedTests
 			"locations/simpleAssignment2.js",
 			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
 			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 1, 3),
-			new LocationTypeRange(LocationType.IN_GLOBAL, 4),
-			new LocationTypeRange(LocationType.NONE, 5, 6),
-			new LocationTypeRange(LocationType.IN_GLOBAL, 7, 8)
+			new LocationTypeRange(LocationType.IN_GLOBAL, 4, 6),
+			new LocationTypeRange(LocationType.NONE, 7, 8),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 9, 10)
 		);
 	}
 	
 	/**
-	 * testSimpleAssignment3
+	 * testSimpleBinaryOperator1
 	 */
-	public void testSimpleAssignment3()
+	public void testSimpleBinaryOperator1()
 	{
 		this.testLocations(
-			"locations/simpleAssignment3.js",
+			"locations/simpleBinaryOperator1.js",
 			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
 			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 1, 3),
-			new LocationTypeRange(LocationType.IN_GLOBAL, 4, 5),
+			new LocationTypeRange(LocationType.NONE, 4),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 5),
 			new LocationTypeRange(LocationType.NONE, 6, 7),
 			new LocationTypeRange(LocationType.IN_GLOBAL, 8)
 		);
 	}
 	
 	/**
-	 * testSimpleAssignment4
+	 * testSimpleBinaryOperator2
 	 */
-	public void testSimpleAssignment4()
+	public void testSimpleBinaryOperator2()
 	{
 		this.testLocations(
-			"locations/simpleAssignment4.js",
+			"locations/simpleBinaryOperator2.js",
 			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
 			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 1, 3),
-			new LocationTypeRange(LocationType.IN_GLOBAL, 4, 5),
-			new LocationTypeRange(LocationType.NONE, 6, 7),
-			new LocationTypeRange(LocationType.IN_GLOBAL, 8, 9)
-		);
-	}
-	
-	/**
-	 * testSimpleAssignment5
-	 */
-	public void testSimpleAssignment5()
-	{
-		this.testLocations(
-			"locations/simpleAssignment5.js",
-			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
-			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 1, 3),
-			new LocationTypeRange(LocationType.NONE, 4),
-			new LocationTypeRange(LocationType.IN_GLOBAL, 5, 6),
-			new LocationTypeRange(LocationType.NONE, 7, 8),
-			new LocationTypeRange(LocationType.IN_GLOBAL, 9)
-		);
-	}
-	
-	/**
-	 * testSimpleAssignment6
-	 */
-	public void testSimpleAssignment6()
-	{
-		this.testLocations(
-			"locations/simpleAssignment6.js",
-			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
-			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 1, 3),
-			new LocationTypeRange(LocationType.NONE, 4),
-			new LocationTypeRange(LocationType.IN_GLOBAL, 5, 6),
-			new LocationTypeRange(LocationType.NONE, 7, 8),
-			new LocationTypeRange(LocationType.IN_GLOBAL, 9, 10)
+			new LocationTypeRange(LocationType.IN_GLOBAL, 4),
+			new LocationTypeRange(LocationType.NONE, 5),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 6, 7),
+			new LocationTypeRange(LocationType.NONE, 8, 9),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 10)
 		);
 	}
 	
