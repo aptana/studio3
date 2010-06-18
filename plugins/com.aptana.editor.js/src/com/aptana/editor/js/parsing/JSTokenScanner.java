@@ -41,6 +41,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
@@ -53,7 +54,6 @@ import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.common.text.rules.WordDetector;
 import com.aptana.editor.js.IJSTokenScanner;
 import com.aptana.editor.js.JSCodeScanner;
-import com.aptana.editor.js.JSRegexpRule;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 
 /**
@@ -98,7 +98,22 @@ public class JSTokenScanner extends JSCodeScanner implements IJSTokenScanner
 		rules.add(new SingleLineRule("\'", "\'", token, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		// regex
-		rules.add(new JSRegexpRule(createToken(JSTokenType.REGEX)));
+//		IToken regexpToken = createToken(JSTokenType.REGEX);
+//      rules.add(new SingleLineRule("/", "/igm", regexpToken, '\\'));
+//      rules.add(new SingleLineRule("/", "/img", regexpToken, '\\'));
+//      rules.add(new SingleLineRule("/", "/gim", regexpToken, '\\'));
+//      rules.add(new SingleLineRule("/", "/gmi", regexpToken, '\\'));
+//      rules.add(new SingleLineRule("/", "/mgi", regexpToken, '\\'));
+//      rules.add(new SingleLineRule("/", "/mig", regexpToken, '\\'));
+//      rules.add(new SingleLineRule("/", "/ig", regexpToken, '\\'));
+//      rules.add(new SingleLineRule("/", "/im", regexpToken, '\\'));
+//      rules.add(new SingleLineRule("/", "/gm", regexpToken, '\\'));
+//      rules.add(new SingleLineRule("/", "/m", regexpToken, '\\'));
+//      rules.add(new SingleLineRule("/", "/g", regexpToken, '\\'));
+//      rules.add(new SingleLineRule("/", "/i", regexpToken, '\\'));
+//      rules.add(new SingleLineRule("/", "/", regexpToken, '\\'));
+//		rules.add(new WordRule(new RegexDetector(), createToken(JSTokenType.REGEX)));
+		rules.add(new JSRegExpRule(createToken(JSTokenType.REGEX)));
 
 		WordRule wordRule = new WordRule(new LettersAndDigitsWordDetector(), Token.UNDEFINED);
 		for (String keyword : KEYWORD_OPERATORS)
@@ -162,11 +177,23 @@ public class JSTokenScanner extends JSCodeScanner implements IJSTokenScanner
 		rules.add(new SingleCharacterRule('?', createToken(JSTokenType.QUESTION)));
 
 		// numbers
-		rules.add(new RegexpRule("\\b((0(x|X)[0-9a-fA-F]+)|([0-9]+(\\.[0-9]+)?))\\b", //$NON-NLS-1$
-				createToken(JSTokenType.NUMBER)));
+		//rules.add(new RegexpRule("\\b((0(x|X)[0-9a-fA-F]+)|([0-9]+(\\.[0-9]+)?))\\b", //$NON-NLS-1$
+		//		createToken(JSTokenType.NUMBER)));
+		rules.add(new WordRule(new IWordDetector() {
+			public boolean isWordPart(char c)
+			{
+				return Character.isDigit(c);
+			}
+
+			public boolean isWordStart(char c)
+			{
+				return Character.isDigit(c);
+			}
+		}, createToken(JSTokenType.NUMBER)));
 
 		// identifiers
-		rules.add(new RegexpRule("[_a-zA-Z0-9$]+", createToken(JSTokenType.IDENTIFIER), true)); //$NON-NLS-1$
+		rules.add(new WordRule(new LettersAndDigitsWordDetector(), createToken(JSTokenType.IDENTIFIER)));
+//		rules.add(new RegexpRule("[_a-zA-Z0-9$]+", createToken(JSTokenType.IDENTIFIER), true)); //$NON-NLS-1$
 
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}
