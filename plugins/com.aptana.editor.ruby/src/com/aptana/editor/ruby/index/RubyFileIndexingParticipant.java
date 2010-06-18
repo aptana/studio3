@@ -1,5 +1,6 @@
 package com.aptana.editor.ruby.index;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
@@ -109,9 +110,19 @@ public class RubyFileIndexingParticipant implements IFileStoreIndexingParticipan
 					return true;
 			}
 		}
+		catch (CoreException ce)
+		{
+			if (ce.getCause() instanceof FileNotFoundException)
+			{
+				// ignore, probably a permissions issue.
+			}
+			else
+			{
+				Activator.log(ce);
+			}
+		}
 		catch (Exception e)
 		{
-			// TODO This can often be caused by permissions issues. We should probably just ignore them
 			Activator.log(e);
 		}
 		finally
