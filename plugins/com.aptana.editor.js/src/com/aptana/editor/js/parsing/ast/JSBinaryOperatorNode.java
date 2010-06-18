@@ -59,6 +59,9 @@ public class JSBinaryOperatorNode extends JSNode
 			case INSTANCEOF:
 				type = JSNodeTypes.INSTANCE_OF;
 				break;
+			case LBRACKET:
+				type = JSNodeTypes.GET_ELEMENT;
+				break;
 			case LESS:
 				type = JSNodeTypes.LESS_THAN;
 				break;
@@ -109,6 +112,8 @@ public class JSBinaryOperatorNode extends JSNode
 				break;
 			case MINUS:
 				type = JSNodeTypes.SUBTRACT;
+			case DOT:
+				type = JSNodeTypes.GET_PROPERTY;
 				break;
 		}
 		setType(type);
@@ -148,7 +153,7 @@ public class JSBinaryOperatorNode extends JSNode
 				}
 			}
 
-			if (result == LocationType.UNKNOWN)
+			if (result == LocationType.UNKNOWN && this._operator != null)
 			{
 				if (this._operator.getStart() == offset + 1 || this._operator.getEnd() <= offset)
 				{
@@ -164,6 +169,16 @@ public class JSBinaryOperatorNode extends JSNode
 		return result;
 	}
 
+	/**
+	 * getOperator
+	 * 
+	 * @return
+	 */
+	protected Symbol getOperator()
+	{
+		return this._operator;
+	}
+	
 	/**
 	 * getRightHandSide
 	 * 
