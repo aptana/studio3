@@ -45,7 +45,8 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.text.rules.EntityRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
-import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.ThemePlugin;
 
 public class XMLScanner extends RuleBasedScanner
 {
@@ -69,7 +70,7 @@ public class XMLScanner extends RuleBasedScanner
 
 	protected IThemeManager getThemeManager()
 	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
+		return ThemePlugin.getDefault().getThemeManager();
 	}
 
 	/**

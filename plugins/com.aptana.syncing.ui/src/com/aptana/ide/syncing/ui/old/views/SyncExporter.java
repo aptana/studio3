@@ -9,9 +9,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.aptana.core.util.FileUtil;
-import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.ide.syncing.core.old.ISyncResource;
 import com.aptana.ide.syncing.core.old.SyncState;
+import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 
 public class SyncExporter
 {
@@ -59,7 +59,7 @@ public class SyncExporter
 		}
 		catch (IOException e)
 		{
-			CommonEditorPlugin.logError(e);
+			SyncingUIPlugin.logError(e.getLocalizedMessage(), e);
 		}
 		finally
 		{

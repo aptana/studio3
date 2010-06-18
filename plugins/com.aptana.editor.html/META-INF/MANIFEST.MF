@@ -19,7 +19,8 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.parsing,
  org.eclipse.ui.workbench.texteditor,
  org.eclipse.ui.ide;bundle-version="3.4.0",
- beaver;bundle-version="1.0.0"
+ beaver;bundle-version="1.0.0",
+ com.aptana.theme
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

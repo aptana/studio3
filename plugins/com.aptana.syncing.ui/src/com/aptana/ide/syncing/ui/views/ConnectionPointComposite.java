@@ -90,7 +90,7 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 
 import com.aptana.core.CoreStrings;
 import com.aptana.core.util.FileUtil;
-import com.aptana.editor.common.theme.TreeThemer;
+import com.aptana.theme.TreeThemer;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;

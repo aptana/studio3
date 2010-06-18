@@ -100,7 +100,6 @@ import org.eclipse.ui.progress.UIJob;
 import com.aptana.core.ILogger;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.ide.syncing.core.old.ConnectionPointSyncPair;
@@ -1520,7 +1519,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		else if (source == saveLog)
 		{
 			FileDialog fileDialog = new FileDialog(getShell(), SWT.SAVE);
-			IDialogSettings editorSettings = CommonEditorPlugin.getDefault().getDialogSettings();
+			IDialogSettings editorSettings = SyncingUIPlugin.getDefault().getDialogSettings();
 			String value = editorSettings.get(LOG_EXPORT_DIRECTORY);
 			if (value != null)
 			{

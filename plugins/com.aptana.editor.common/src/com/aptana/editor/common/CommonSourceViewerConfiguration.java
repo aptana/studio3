@@ -37,9 +37,9 @@ package com.aptana.editor.common;
 import java.util.Map;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.internal.text.html.HTMLTextPresenter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.DefaultInformationControl;
@@ -72,7 +72,8 @@ import com.aptana.editor.common.text.CommonDoubleClickStrategy;
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
 import com.aptana.editor.common.text.reconciler.CommonCompositeReconcilingStrategy;
 import com.aptana.editor.common.text.reconciler.CommonReconciler;
-import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.ThemePlugin;
 
 @SuppressWarnings("restriction")
 public abstract class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration implements ITopContentTypesProvider
@@ -182,7 +183,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 				}
 			}
 		};
-		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
 		
 		return assistant;
 	}
@@ -304,20 +305,20 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	
 	protected Color getThemeBackground()
 	{
-		RGB bg = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme().getBackground();
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(bg);
+		RGB bg = ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getBackground();
+		return ThemePlugin.getDefault().getColorManager().getColor(bg);
 	}
 	
 	protected Color getThemeForeground()
 	{
-		RGB bg = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme().getForeground();
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(bg);
+		RGB bg = ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getForeground();
+		return ThemePlugin.getDefault().getColorManager().getColor(bg);
 	}
 	
 	protected Color getThemeSelection()
 	{
-		RGB bg = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme().getSelection();
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(bg);
+		RGB bg = ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getSelection();
+		return ThemePlugin.getDefault().getColorManager().getColor(bg);
 	}
 
 	/*

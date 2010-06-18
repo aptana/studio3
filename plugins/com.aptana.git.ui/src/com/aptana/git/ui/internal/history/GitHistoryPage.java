@@ -42,8 +42,6 @@ import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.Theme;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitRepository;
@@ -51,6 +49,8 @@ import com.aptana.git.core.model.GitRevList;
 import com.aptana.git.core.model.GitRevSpecifier;
 import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.ui.GitUIPlugin;
+import com.aptana.theme.Theme;
+import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.IAptanaHistory;
 
 public class GitHistoryPage extends HistoryPage implements IAptanaHistory
@@ -402,20 +402,17 @@ public class GitHistoryPage extends HistoryPage implements IAptanaHistory
 	
 	public void setTheme(boolean revert)
 	{
-		
-		Theme theme = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme();
+		Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
 		applyTheme(ourControl, theme, revert);
 		applyTheme(graphDetailSplit, theme, revert);
 		applyTheme(revInfoSplit, theme, revert);
 		applyTheme(graph.getControl(), theme, revert);
 		applyTheme(commentViewer, theme, revert);
 		applyTheme(fileViewer.getControl(), theme, revert);
-
 	}
 	
 	private void applyTheme(Control control, Theme theme, boolean revert)
 	{
-
 		control.setRedraw(false);
 		if (revert)
 		{
@@ -425,14 +422,13 @@ public class GitHistoryPage extends HistoryPage implements IAptanaHistory
 		}
 		else
 		{
-			control.setBackground(CommonEditorPlugin.getDefault().getColorManager()
+			control.setBackground(ThemePlugin.getDefault().getColorManager()
 					.getColor(theme.getBackground()));
-			control.setForeground(CommonEditorPlugin.getDefault().getColorManager()
+			control.setForeground(ThemePlugin.getDefault().getColorManager()
 					.getColor(theme.getForeground()));
 			control.setFont(JFaceResources.getTextFont());
 		}
 		control.setRedraw(true);
 	}
-
 
 }
