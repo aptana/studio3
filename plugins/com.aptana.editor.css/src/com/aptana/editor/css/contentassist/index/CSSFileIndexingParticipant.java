@@ -71,7 +71,7 @@ public class CSSFileIndexingParticipant implements IFileStoreIndexingParticipant
 				{
 					Activator.logError(e);
 				}
-				catch (Exception e)
+				catch (Throwable e)
 				{
 					Activator.logError(e.getMessage(), e);
 				}

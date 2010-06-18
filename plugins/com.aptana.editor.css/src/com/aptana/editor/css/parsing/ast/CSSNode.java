@@ -1,9 +1,9 @@
 package com.aptana.editor.css.parsing.ast;
 
 import com.aptana.editor.css.parsing.ICSSParserConstants;
-import com.aptana.parsing.ast.ParseBaseNode;
+import com.aptana.parsing.ast.ParseNode;
 
-public class CSSNode extends ParseBaseNode
+public class CSSNode extends ParseNode
 {
 
 	protected CSSNode()

@@ -37,7 +37,7 @@ public class FindBarEntriesHelper
 		OutputStream out = new ByteArrayOutputStream();
 		try
 		{
-			properties.store(out, "");
+			properties.store(out, ""); //$NON-NLS-1$
 		}
 		catch (IOException e)
 		{

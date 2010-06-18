@@ -10,7 +10,7 @@ public class AllTests
 	{
 		TestSuite suite = new TestSuite("Test for com.aptana.parsing.ast");
 		//$JUnit-BEGIN$
-		suite.addTestSuite(ParseBaseNodeTests.class);
+		suite.addTestSuite(ParseNodeTests.class);
 		//$JUnit-END$
 		return suite;
 	}

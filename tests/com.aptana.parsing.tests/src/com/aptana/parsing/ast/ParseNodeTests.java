@@ -2,9 +2,9 @@ package com.aptana.parsing.ast;
 
 import junit.framework.TestCase;
 
-public class ParseBaseNodeTests extends TestCase
+public class ParseNodeTests extends TestCase
 {
-	static class TextNode extends ParseBaseNode
+	static class TextNode extends ParseNode
 	{
 		private String _text;
 		

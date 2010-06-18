@@ -74,7 +74,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 					{
 						// create parser and associated parse state
 						IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IJSParserConstants.LANGUAGE);
-						
+
 						if (pool != null)
 						{
 							IParser parser = pool.checkOut();
@@ -85,7 +85,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 							parser.parse(parseState);
 
 							pool.checkIn(parser);
-							
+
 							// process results
 							this.processParseResults(index, file, parseState.getParseResult());
 						}
@@ -95,7 +95,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 				{
 					Activator.logError(e.getMessage(), e);
 				}
-				catch (Exception e)
+				catch (Throwable e)
 				{
 					Activator.logError(e.getMessage(), e);
 				}
@@ -169,28 +169,28 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 		{
 			String location = file.toURI().getPath();
 			Scope<JSNode> globals = ((JSParseRootNode) ast).getGlobalScope();
-			
-			for (String symbol: globals.getLocalSymbolNames())
+
+			for (String symbol : globals.getLocalSymbolNames())
 			{
 				List<JSNode> nodes = globals.getSymbol(symbol);
 				String category = JSIndexConstants.VARIABLE;
-				
+
 				for (JSNode node : nodes)
 				{
 					DocumentationBlock block = node.getDocumentation();
-					
+
 					if (block != null)
 					{
-//						System.out.println("Found block for " + symbol + "\n" + block.toSource());
+						// System.out.println("Found block for " + symbol + "\n" + block.toSource());
 					}
-					
+
 					if (node instanceof JSFunctionNode)
 					{
 						category = JSIndexConstants.FUNCTION;
 						break;
 					}
 				}
-				
+
 				index.addEntry(category, symbol, location);
 			}
 		}
@@ -199,7 +199,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 			this.walkAST(index, file, ast);
 		}
 	}
-	
+
 	/**
 	 * walkAST
 	 * 

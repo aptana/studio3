@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -34,6 +36,8 @@ import com.aptana.index.core.SearchPattern;
 
 public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 {
+	private static final String NAMESPACE_DELIMITER = "::";
+
 	/**
 	 * Separates file locations when using multiple values for proposal.
 	 */
@@ -70,54 +74,98 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 		// FIXME What about completions of stuff added to current file since last save? Do we need to hit up AST?
 		try
 		{
-			String prefix = getPrefix(viewer, offset);
-			// FIXME This is a giant hack. We try to only search project index for vars/methods/types in current file if
-			// no prefix.
+			String fullPrefix = getPrefix(viewer, offset);
 			// If there is a prefix, widen to Ruby Core, Std Lib and project and limit categories based on prefix (plus
 			// preceding space/./::)
-			List<QueryResult> results = new ArrayList<QueryResult>();
-			List<Index> indices = getIndices(prefix);
+			List<Index> indices = getIndices(fullPrefix);
 			for (Index index : indices)
 			{
-				List<QueryResult> partialResults = index.query(getCategories(index, prefix, viewer, offset), prefix,
-						SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
-				if (partialResults != null)
+				// If prefix contains "::" then we need to split it up!
+				List<QueryResult> partialResults;
+				if (fullPrefix.contains(NAMESPACE_DELIMITER))
 				{
-					results.addAll(partialResults);
-				}
-			}
-			for (QueryResult result : results)
-			{
-				CommonCompletionProposal proposal = createProposal(offset, prefix, result);
-				if (proposal == null)
-				{
-					continue;
-				}
+					// Search for types in namespace
+					String enclosing = getNamespace(fullPrefix);
+					String subPrefix = getShortPrefix(fullPrefix);
 
-				CommonCompletionProposal existing = proposalMap.get(proposal.getDisplayString());
-				if (existing != null)
-				{
-					// Collapse results that have same value into one proposal, combine the filepaths
-					String location = existing.getFileLocation();
-					if (!proposal.getFileLocation().equals(location))
+					String searchKey = "^" + subPrefix + "(.*)?" + IRubyIndexConstants.SEPARATOR + enclosing
+							+ IRubyIndexConstants.SEPARATOR + ".*$";
+					partialResults = index.query(new String[] { IRubyIndexConstants.TYPE_DECL }, searchKey,
+							SearchPattern.REGEX_MATCH | SearchPattern.CASE_SENSITIVE);
+
+					// HACK This is pretty ugly. We search for a type matching the namespace in the prefix. 
+					// If we find a match, we then look for all methods and constants matching the prefix after the namespace.
+					// We then limit those results to only the ones defined in the same file as the type we just found.
+					// This doesn't guarantee the method or constant actually lives on that type, but it does guarantee it's in the same file for now.
+					String enclosingTypeSearchKey = getShortPrefix(enclosing) + IRubyIndexConstants.SEPARATOR
+							+ getNamespace(enclosing) + IRubyIndexConstants.SEPARATOR;
+					List<QueryResult> results = index.query(new String[] { IRubyIndexConstants.TYPE_DECL },
+							enclosingTypeSearchKey, SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
+					if (results != null && !results.isEmpty())
 					{
-						String[] existingLocations = location.split(LOCATIONS_DELIMETER);
-						String[] newLocations = proposal.getFileLocation().split(LOCATIONS_DELIMETER);
-						Set<String> set = new HashSet<String>();
-						for (String l : existingLocations)
+						if (partialResults == null)
 						{
-							set.add(l);
+							partialResults = new ArrayList<QueryResult>();
 						}
-						for (String l : newLocations)
+
+						QueryResult result = results.get(0);
+						String document = result.getDocuments()[0];
+
+						List<QueryResult> constantsAndMethods = index.query(new String[] {
+								IRubyIndexConstants.CONSTANT_DECL, IRubyIndexConstants.METHOD_DECL }, subPrefix,
+								SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
+						for (QueryResult cAndMResult : constantsAndMethods)
 						{
-							set.add(l);
+							if (StringUtil.contains(cAndMResult.getDocuments(), document))
+							{
+								partialResults.add(cAndMResult);
+							}
 						}
-						existing.setFileLocation(StringUtil.join(LOCATIONS_DELIMETER, set));
 					}
 				}
 				else
 				{
-					proposalMap.put(proposal.getDisplayString(), proposal);
+					partialResults = index.query(getCategories(index, fullPrefix, viewer, offset), fullPrefix,
+							SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
+				}
+				if (partialResults == null || partialResults.isEmpty())
+				{
+					continue;
+				}
+
+				for (QueryResult result : partialResults)
+				{
+					CommonCompletionProposal proposal = createProposal(index, offset, fullPrefix, result);
+					if (proposal == null)
+					{
+						continue;
+					}
+
+					CommonCompletionProposal existing = proposalMap.get(proposal.getDisplayString());
+					if (existing != null)
+					{
+						// Collapse results that have same value into one proposal, combine the filepaths
+						String location = existing.getFileLocation();
+						if (!proposal.getFileLocation().equals(location))
+						{
+							String[] existingLocations = location.split(LOCATIONS_DELIMETER);
+							String[] newLocations = proposal.getFileLocation().split(LOCATIONS_DELIMETER);
+							Set<String> set = new HashSet<String>();
+							for (String l : existingLocations)
+							{
+								set.add(l);
+							}
+							for (String l : newLocations)
+							{
+								set.add(l);
+							}
+							existing.setFileLocation(StringUtil.join(LOCATIONS_DELIMETER, set));
+						}
+					}
+					else
+					{
+						proposalMap.put(proposal.getDisplayString(), proposal);
+					}
 				}
 			}
 		}
@@ -146,6 +194,16 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 
 		// return results
 		return proposals.toArray(new ICompletionProposal[proposals.size()]);
+	}
+
+	private String getNamespace(String fullPrefix)
+	{
+		int index = fullPrefix.lastIndexOf(NAMESPACE_DELIMITER);
+		if (index == -1)
+		{
+			return "";
+		}
+		return fullPrefix.substring(0, index);
 	}
 
 	/**
@@ -208,7 +266,19 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 			}
 		}
 
-		// TODO For rails we need to include the rails gem indices!
+		String gemEnvOutput = ProcessUtil.outputForCommand("gem", null, ShellExecutable.getEnvironment(),
+				"env", "gempath"); //$NON-NLS-1$
+		String[] gemPaths = gemEnvOutput.split(":"); // FIXME Does this need to be File.pathSeparator?
+		for (String gemPath : gemPaths)
+		{
+			IPath gemsPath = new Path(gemPath).append("gems");
+			Index index = IndexManager.getInstance().getIndex(gemsPath.toPortableString());
+			if (index != null)
+			{
+				indices.add(index);
+			}
+		}
+
 		return indices;
 	}
 
@@ -218,7 +288,7 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 		return IndexManager.getInstance().getIndex(rubyVersion);
 	}
 
-	protected CommonCompletionProposal createProposal(int offset, String prefix, QueryResult result)
+	protected CommonCompletionProposal createProposal(Index index, int offset, String prefix, QueryResult result)
 	{
 		String value = result.getWord();
 		// We need to "decode" the word since it's the raw key, which has identifier plus a bunch of
@@ -237,14 +307,28 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 
 		String description = ""; //$NON-NLS-1$
 		int replaceLength = prefix.length();
+		if (prefix.contains(NAMESPACE_DELIMITER))
+		{
+			replaceLength = getShortPrefix(prefix).length();
+		}
 		int length = value.length();
 		String displayName = value;
 
 		CommonCompletionProposal proposal = new CommonCompletionProposal(value, offset - replaceLength, replaceLength,
 				length, getImage(result), displayName, null, description);
-		proposal.setFileLocation(getLocations(result));
+		proposal.setFileLocation(getLocations(index, result));
 
 		return proposal;
+	}
+
+	private String getShortPrefix(String prefix)
+	{
+		int index = prefix.lastIndexOf(NAMESPACE_DELIMITER);
+		if (index == -1)
+		{
+			return prefix;
+		}
+		return prefix.substring(index + 2);
 	}
 
 	private boolean isInCurrentFile(QueryResult result)
@@ -264,8 +348,9 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 		return false;
 	}
 
-	protected String getLocations(QueryResult result)
+	protected String getLocations(Index index, QueryResult result)
 	{
+		String root = index.getRoot();
 		Set<String> set = new HashSet<String>();
 		for (String doc : result.getDocuments())
 		{
@@ -274,6 +359,17 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				doc = "Ruby Core"; //$NON-NLS-1$
 			}
+
+			// Compare document path to index and cut off the index's common prefix?
+			if (doc.startsWith(root))
+			{
+				doc = doc.substring(root.length());
+				if (doc.startsWith("/") || doc.startsWith("\\")) //$NON-NLS-1$ //$NON-NLS-2$
+				{
+					doc = doc.substring(1);
+				}
+			}
+
 			set.add(doc);
 		}
 		return StringUtil.join(LOCATIONS_DELIMETER, set);
@@ -349,11 +445,11 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			linePrefix = linePrefix.substring(indexOfPeriod + 1);
 		}
-		indexOfPeriod = linePrefix.lastIndexOf(':');
-		if (indexOfPeriod != -1)
-		{
-			linePrefix = linePrefix.substring(indexOfPeriod + 1);
-		}
+		// indexOfPeriod = linePrefix.lastIndexOf(':');
+		// if (indexOfPeriod != -1)
+		// {
+		// linePrefix = linePrefix.substring(indexOfPeriod + 1);
+		// }
 		indexOfPeriod = linePrefix.lastIndexOf(' ');
 		if (indexOfPeriod != -1)
 		{

@@ -30,7 +30,7 @@ public abstract class StringUtil
 	 *            The array of items to join
 	 * @return The resulting string
 	 */
-	public static String join(String delimiter, String ... items)
+	public static String join(String delimiter, String... items)
 	{
 		if (items == null)
 		{
@@ -52,12 +52,12 @@ public abstract class StringUtil
 		}
 		return result;
 	}
-	
+
 	public static String join(String delimiter, Collection<String> items)
 	{
 		return join(delimiter, items.toArray(new String[items.size()]));
 	}
-	
+
 	/**
 	 * Create a string by concatenating the elements of a string array using a delimited between each item
 	 * 
@@ -73,7 +73,7 @@ public abstract class StringUtil
 		{
 			return null;
 		}
-		
+
 		int length = items.size();
 		String result = ""; //$NON-NLS-1$
 		if (length > 0)
@@ -84,7 +84,7 @@ public abstract class StringUtil
 				sb.append(items.get(i)).append(delimiter);
 			}
 			sb.append(items.get(length - 1));
-			
+
 			result = sb.toString();
 		}
 		return result;
@@ -136,7 +136,7 @@ public abstract class StringUtil
 	public static String ellipsify(String message)
 	{
 		return message + "..."; //$NON-NLS-1$
-	}	
+	}
 
 	/**
 	 * Given a raw input string template, this will do a mass search and replace for the map of variables to values.
@@ -212,7 +212,7 @@ public abstract class StringUtil
 		return null;
 	}
 
-	/**
+/**
 	 * Sanitizes raw HTML to escape '&', '<' and '>' so that it is suitable for embedding into HTML.
 	 * 
 	 * @param raw
@@ -234,7 +234,7 @@ public abstract class StringUtil
 	{
 		return (s1 == null) ? (s2 != null) : (s2 == null) ? true : !s1.equals(s2);
 	}
-	
+
 	/**
 	 * Compares two strings for equality taking into account that none, one, or both may be null
 	 * 
@@ -246,7 +246,7 @@ public abstract class StringUtil
 	{
 		return (s1 == null) ? (s2 == null) : (s2 != null) ? s1.equals(s2) : false;
 	}
-	
+
 	/**
 	 * Formats the string with replacement values
 	 * 
@@ -305,6 +305,22 @@ public abstract class StringUtil
 	public static String format(String str, Object[] replacements)
 	{
 		return MessageFormat.format(str, replacements);
+	}
+
+	public static boolean contains(String[] set, String toFind)
+	{
+		if (set == null)
+		{
+			return false;
+		}
+		for (String value : set)
+		{
+			if (value.equals(toFind))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

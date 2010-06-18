@@ -6,9 +6,9 @@ import java.util.List;
 import com.aptana.editor.ruby.core.IRubyElement;
 import com.aptana.editor.ruby.parsing.IRubyParserConstants;
 import com.aptana.parsing.ast.IParseNode;
-import com.aptana.parsing.ast.ParseBaseNode;
+import com.aptana.parsing.ast.ParseNode;
 
-public class RubyElement extends ParseBaseNode implements IRubyElement
+public class RubyElement extends ParseNode implements IRubyElement
 {
 
 	private static final String EMPTY = ""; //$NON-NLS-1$
