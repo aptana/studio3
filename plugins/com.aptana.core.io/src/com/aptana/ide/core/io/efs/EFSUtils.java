@@ -55,54 +55,63 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 
 /**
  * @author Max Stepanov
- *
  */
 @SuppressWarnings("restriction")
-public final class EFSUtils {
+public final class EFSUtils
+{
 
 	/**
 	 * 
 	 */
-	private EFSUtils() {
+	private EFSUtils()
+	{
 	}
 
-	public static IFileStore getFileStore(IResource resource) {
+	public static IFileStore getFileStore(IResource resource)
+	{
 		return WorkspaceFileSystem.getInstance().getStore(resource.getFullPath());
 	}
-	
-	public static IFileStore getLocalFileStore(File file) {
+
+	public static IFileStore getLocalFileStore(File file)
+	{
 		return EFS.getLocalFileSystem().fromLocalFile(file);
 	}
-	
+
 	/**
 	 * Sets the modification time of the client file
+	 * 
 	 * @param serverFile
 	 * @param clientFile
 	 * @throws CoreException
 	 */
-	public static void setModificationTime(long modifiedTime, IFileStore destFile) throws CoreException {
+	public static void setModificationTime(long modifiedTime, IFileStore destFile) throws CoreException
+	{
 		IFileInfo fi = new FileInfo();
 		fi.setLastModified(modifiedTime);
 		destFile.putInfo(fi, EFS.SET_LAST_MODIFIED, null);
 	}
-	
+
 	/**
 	 * Returns the child files of the filestore
+	 * 
 	 * @param file
-	 * @return 
-	 * @throws CoreException 
+	 * @return
+	 * @throws CoreException
 	 */
-	public static IFileStore[] getFiles(IFileStore file) throws CoreException {
+	public static IFileStore[] getFiles(IFileStore file) throws CoreException
+	{
 		return getFiles(file, false, true);
 	}
-	
+
 	/**
 	 * Returns the child files of the filestore
+	 * 
 	 * @param file
-	 * @return 
-	 * @throws CoreException 
+	 * @return
+	 * @throws CoreException
 	 */
-	public static IFileStore[] getFiles(IFileStore file, IProgressMonitor monitor) throws CoreException {
+	public static IFileStore[] getFiles(IFileStore file, IProgressMonitor monitor) throws CoreException
+	{
 		return getFiles(file, false, true, monitor);
 	}
 
@@ -117,16 +126,20 @@ public final class EFSUtils {
 	 * @return
 	 * @throws CoreException
 	 */
-	public static IFileStore[] getFiles(IFileStore file, boolean recurse, boolean includeCloakedFiles) throws CoreException {
+	public static IFileStore[] getFiles(IFileStore file, boolean recurse, boolean includeCloakedFiles)
+			throws CoreException
+	{
 		return getFiles(file, recurse, includeCloakedFiles, null);
 	}
 
 	/**
 	 * Returns the parent file of this file
+	 * 
 	 * @param file
 	 * @return
 	 */
-	public static String getAbsolutePath(IFileStore file) {
+	public static String getAbsolutePath(IFileStore file)
+	{
 		return file.toURI().getPath();
 	}
 
@@ -137,8 +150,10 @@ public final class EFSUtils {
 	 * @return
 	 * @throws CoreException
 	 */
-	public static String getRelativePath(IFileStore parent, IFileStore file) {
-		if (parent == file || parent.isParentOf(file)) {
+	public static String getRelativePath(IFileStore parent, IFileStore file)
+	{
+		if (parent == file || parent.isParentOf(file))
+		{
 			String rootFile = getAbsolutePath(parent);
 			String childFile = getAbsolutePath(file);
 			return childFile.substring(rootFile.length());
@@ -148,29 +163,34 @@ public final class EFSUtils {
 
 	/**
 	 * Creates the file on the destination store using a relative path
+	 * 
 	 * @param sourceRoot
 	 * @param sourceStore
 	 * @param destinationRoot
 	 * @return
 	 */
-	public static IFileStore createFile(IFileStore sourceRoot, IFileStore sourceStore, IFileStore destinationRoot) {
-        String sourceRootPath = sourceRoot.toURI().getPath();
-        String sourcePath = sourceStore.toURI().getPath();
-        int index = sourcePath.indexOf(sourceRootPath);
-        if (index > -1) {
-            String relativePath = sourcePath.substring(index + sourceRootPath.length());
-            return destinationRoot.getFileStore(new Path(relativePath));
-        }
-        return null;
+	public static IFileStore createFile(IFileStore sourceRoot, IFileStore sourceStore, IFileStore destinationRoot)
+	{
+		String sourceRootPath = sourceRoot.toURI().getPath();
+		String sourcePath = sourceStore.toURI().getPath();
+		int index = sourcePath.indexOf(sourceRootPath);
+		if (index > -1)
+		{
+			String relativePath = sourcePath.substring(index + sourceRootPath.length());
+			return destinationRoot.getFileStore(new Path(relativePath));
+		}
+		return null;
 	}
 
 	/**
 	 * Returns the parent file of this file
+	 * 
 	 * @param file
 	 * @return
-	 * @throws CoreException 
+	 * @throws CoreException
 	 */
-	public static String getRelativePath(IConnectionPoint point, IFileStore file) {
+	public static String getRelativePath(IConnectionPoint point, IFileStore file)
+	{
 		try
 		{
 			return getRelativePath(point.getRoot(), file);
@@ -180,61 +200,63 @@ public final class EFSUtils {
 			return null;
 		}
 	}
-	
-    /**
-     * @param sourceStore
-     *            the file to be copied
-     * @param destinationStore
-     *            the destination location
-     * @param monitor
-     *            the progress monitor
-     * @return true if the file is successfully copied, false if the operation
-     *         did not go through for any reason
-     * @throws CoreException 
-     */
-	public static boolean copyFile(IFileStore sourceStore, IFileStore destinationStore,
-            IProgressMonitor monitor) throws CoreException {
-        if (sourceStore == null || CloakingUtils.isFileCloaked(sourceStore)) {
-            return false;
-        }
 
-        monitor = Policy.monitorFor(monitor);
+	/**
+	 * @param sourceStore
+	 *            the file to be copied
+	 * @param destinationStore
+	 *            the destination location
+	 * @param monitor
+	 *            the progress monitor
+	 * @return true if the file is successfully copied, false if the operation did not go through for any reason
+	 * @throws CoreException
+	 */
+	public static boolean copyFile(IFileStore sourceStore, IFileStore destinationStore, IProgressMonitor monitor)
+			throws CoreException
+	{
+		if (sourceStore == null || CloakingUtils.isFileCloaked(sourceStore))
+		{
+			return false;
+		}
 
-        boolean success = true;
-        monitor.subTask(MessageFormat.format("Copying {0} to {1}", sourceStore
-                .getName(), destinationStore.getName()));
+		monitor = Policy.monitorFor(monitor);
 
-        sourceStore.copy(destinationStore, EFS.OVERWRITE, monitor);
-        return success;
-    }
-    
-    /**
-     * @param sourceStore
-     *            the file to be copied
-     * @param destinationStore
-     *            the destination location
-     * @param monitor
-     *            the progress monitor
-     * @param info
-     * 			  info to transfer
-     * @return true if the file is successfully copied, false if the operation
-     *         did not go through for any reason
-     * @throws CoreException 
-     */
-    public static boolean copyFileWithAttributes(IFileStore sourceStore, IFileStore destinationStore,
-    		IProgressMonitor monitor, IFileInfo info) throws CoreException {
-    	boolean success = copyFile(sourceStore, destinationStore, monitor);
-		if (success) {
+		boolean success = true;
+		monitor.subTask(MessageFormat.format("Copying {0} to {1}", sourceStore.getName(), destinationStore.getName()));
+
+		sourceStore.copy(destinationStore, EFS.OVERWRITE, monitor);
+		return success;
+	}
+
+	/**
+	 * @param sourceStore
+	 *            the file to be copied
+	 * @param destinationStore
+	 *            the destination location
+	 * @param monitor
+	 *            the progress monitor
+	 * @param info
+	 *            info to transfer
+	 * @return true if the file is successfully copied, false if the operation did not go through for any reason
+	 * @throws CoreException
+	 */
+	public static boolean copyFileWithAttributes(IFileStore sourceStore, IFileStore destinationStore,
+			IProgressMonitor monitor, IFileInfo info) throws CoreException
+	{
+		boolean success = copyFile(sourceStore, destinationStore, monitor);
+		if (success)
+		{
 			EFSUtils.setModificationTime(info.getLastModified(), destinationStore);
 		}
 		return success;
-    }
+	}
 
 	/**
-	 * @throws CoreException 
+	 * @throws CoreException
 	 * @see {@link IConnectionPoint}#getFiles(IFileStore, boolean, boolean)
 	 */
-	public static IFileStore[] getFiles(IFileStore file, boolean recurse, boolean includeCloakedFiles, IProgressMonitor monitor) throws CoreException
+	public static IFileStore[] getFiles(IFileStore file, boolean recurse, boolean includeCloakedFiles,
+			IProgressMonitor monitor) throws CoreException
 	{
 		IFileStore[] result = null;
 		ArrayList<IFileStore> list = new ArrayList<IFileStore>();
@@ -249,18 +271,19 @@ public final class EFSUtils {
 	 * @param file
 	 * @param recurse
 	 * @param list
-	 * @throws CoreException 
+	 * @throws CoreException
 	 */
-	private static void getFiles(IFileStore file, boolean recurse, List<IFileStore> list, boolean includeCloakedFiles, IProgressMonitor monitor) throws CoreException
+	private static void getFiles(IFileStore file, boolean recurse, List<IFileStore> list, boolean includeCloakedFiles,
+			IProgressMonitor monitor) throws CoreException
 	{
 		if (file == null)
 		{
 			return;
 		}
 
-        monitor = Policy.monitorFor(monitor);
-        Policy.checkCanceled(monitor);
-        
+		monitor = Policy.monitorFor(monitor);
+		Policy.checkCanceled(monitor);
+
 		IFileStore[] children = file.childStores(EFS.NONE, monitor);
 
 		if (children != null)
@@ -268,7 +291,7 @@ public final class EFSUtils {
 			boolean addingFile;
 			for (int i = 0; i < children.length; i++)
 			{
-		        Policy.checkCanceled(monitor);
+				Policy.checkCanceled(monitor);
 				IFileStore child = children[i];
 				addingFile = false;
 				if (includeCloakedFiles || !CloakingUtils.isFileCloaked(child))
@@ -285,5 +308,5 @@ public final class EFSUtils {
 				}
 			}
 		}
-	}	
+	}
 }
