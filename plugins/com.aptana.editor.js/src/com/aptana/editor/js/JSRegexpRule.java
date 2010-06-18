@@ -2,28 +2,38 @@ package com.aptana.editor.js;
 
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.Token;
+import org.eclipse.jface.text.rules.MultiLineRule;
 
-import com.aptana.editor.common.text.rules.RegexpRule;
-
-public class JSRegexpRule extends RegexpRule
+public class JSRegexpRule extends MultiLineRule
 {
 
 	public JSRegexpRule(IToken successToken)
 	{
-		super("/([^/]|\\\\/)*?([^/\\\\]+|\\\\\\\\|\\\\/)/[igm]*", successToken, true); //$NON-NLS-1$
+		super("/", "/", successToken, '\\'); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Override
-	public IToken evaluate(ICharacterScanner scanner, boolean resume)
+	protected boolean endSequenceDetected(ICharacterScanner scanner)
 	{
-		if (scanner instanceof IJSTokenScanner)
+		boolean result = super.endSequenceDetected(scanner);
+		if (!result)
+			return false;
+		// Gobble up i, g or m if they're next
+		while (true)
 		{
-			if (((IJSTokenScanner) scanner).hasDivisionStart())
+			switch (scanner.read())
 			{
-				return Token.UNDEFINED;
+				case 'i':
+				case 'g':
+				case 'm':
+					// gobble it up!
+					continue;
+				case ICharacterScanner.EOF:
+					return true;
+				default:
+					scanner.unread();
+					return true;
 			}
 		}
-		return super.evaluate(scanner, resume);
 	}
 }
