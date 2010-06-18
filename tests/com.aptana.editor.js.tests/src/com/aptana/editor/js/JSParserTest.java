@@ -339,6 +339,26 @@ public class JSParserTest extends TestCase
 	{
 		parseTest("/abc/;" + EOL); //$NON-NLS-1$
 	}
+	
+	public void testRegexWithEscapedSlash() throws Exception
+	{
+		parseTest("/a\\/bc/;" + EOL); //$NON-NLS-1$
+	}
+	
+	public void testRegexWithTrailingModifiers() throws Exception
+	{
+		parseTest("/abc/ig;" + EOL); //$NON-NLS-1$
+	}
+	
+	public void testComplexRegex() throws Exception
+	{
+		parseTest("/^[1-3]{0,4}\\/.*$/;" + EOL); //$NON-NLS-1$
+	}
+	
+	public void testComplexRegexWithModifiers() throws Exception
+	{
+		parseTest("/^[1-3]{0,4}\\/.*$/gim;" + EOL); //$NON-NLS-1$
+	}
 
 	public void testThis() throws Exception
 	{
