@@ -38,7 +38,6 @@ import com.aptana.filesystem.ftp.Policy;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants;
 
-
 /**
  * @author Michael Xia (mxia@aptana.com)
  */
@@ -52,8 +51,8 @@ public class FilePrefUtils
 	 */
 	public static long getDirectoryPermission()
 	{
-		return Policy.permissionsFromString(SyncingUIPlugin.getDefault()
-        .getPreferenceStore().getString(IPreferenceConstants.DIRECTORY_PERMISSION));
+		return Policy.permissionsFromString(SyncingUIPlugin.getDefault().getPreferenceStore().getString(
+				IPreferenceConstants.DIRECTORY_PERMISSION));
 	}
 
 	/**
@@ -63,8 +62,8 @@ public class FilePrefUtils
 	 */
 	public static long getFilePermission()
 	{
-		return Policy.permissionsFromString(SyncingUIPlugin.getDefault()
-        .getPreferenceStore().getString(IPreferenceConstants.FILE_PERMISSION));
+		return Policy.permissionsFromString(SyncingUIPlugin.getDefault().getPreferenceStore().getString(
+				IPreferenceConstants.FILE_PERMISSION));
 	}
 
 }

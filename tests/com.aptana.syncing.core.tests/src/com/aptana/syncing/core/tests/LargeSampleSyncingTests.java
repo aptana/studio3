@@ -186,7 +186,7 @@ public abstract class LargeSampleSyncingTests extends TestCase
 		String CLIENT_CONTROL = "client_control";
 		String SERVER_LOCAL = "server_local";
 		String SERVER_TEST = "server_test";
-		int timeTolerance = 150000;
+		int timeTolerance = 1000; //150000;
 
 		IFileStore clientTestDirectory = clientDirectory.getFileStore(new Path("/" + CLIENT_TEST + sysTime));
 		IFileStore clientControlDirectory = clientDirectory.getFileStore(new Path("/" + CLIENT_CONTROL + sysTime));

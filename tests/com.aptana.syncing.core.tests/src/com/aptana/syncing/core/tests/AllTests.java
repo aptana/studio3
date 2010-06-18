@@ -13,8 +13,11 @@ public class AllTests
 		TestSuite suite = new ParallelTestSuite(AllTests.class.getName());
 		// $JUnit-BEGIN$
 		suite.addTestSuite(LocalSyncingTests.class);
+		suite.addTestSuite(LocalSyncingTestsWithSpaces.class);
 		suite.addTestSuite(FTPSyncingTests.class);
+		suite.addTestSuite(FTPSyncingTestsWithSpaces.class);
 		suite.addTestSuite(SFTPSyncingTests.class);
+		suite.addTestSuite(SFTPSyncingTestsWithSpaces.class);
 		suite.addTestSuite(LocalLargeSampleSyncingTests.class);
 		suite.addTestSuite(FTPLargeSampleSyncingTests.class);
 
