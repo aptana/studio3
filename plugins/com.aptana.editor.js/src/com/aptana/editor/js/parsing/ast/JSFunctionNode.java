@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseNodeAttribute;
-import com.aptana.parsing.ast.ParseBaseNode;
+import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.ast.ParseNodeAttribute;
 
 public class JSFunctionNode extends JSNode
@@ -58,7 +58,7 @@ public class JSFunctionNode extends JSNode
 		}
 		else
 		{
-			return ParseBaseNode.NO_ATTRIBUTES;
+			return ParseNode.NO_ATTRIBUTES;
 		}
 	}
 
