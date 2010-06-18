@@ -133,7 +133,7 @@ public final class EFSUtils
 	}
 
 	/**
-	 * Returns the parent file of this file
+	 * Returns the absolute path of this file, from the root of the filestore.
 	 * 
 	 * @param file
 	 * @return
@@ -144,7 +144,7 @@ public final class EFSUtils
 	}
 
 	/**
-	 * Returns the parent file of this file
+	 * Returns the path of this file relative to the parent
 	 * 
 	 * @param file
 	 * @return
@@ -171,12 +171,9 @@ public final class EFSUtils
 	 */
 	public static IFileStore createFile(IFileStore sourceRoot, IFileStore sourceStore, IFileStore destinationRoot)
 	{
-		String sourceRootPath = sourceRoot.toURI().getPath();
-		String sourcePath = sourceStore.toURI().getPath();
-		int index = sourcePath.indexOf(sourceRootPath);
-		if (index > -1)
+		String relativePath = getRelativePath(sourceRoot, sourceStore);
+		if (relativePath != null)
 		{
-			String relativePath = sourcePath.substring(index + sourceRootPath.length());
 			return destinationRoot.getFileStore(new Path(relativePath));
 		}
 		return null;

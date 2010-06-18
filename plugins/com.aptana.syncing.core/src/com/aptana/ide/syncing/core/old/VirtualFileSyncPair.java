@@ -45,7 +45,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import com.aptana.ide.core.io.vfs.IExtendedFileStore;
 
-
 /**
  * @author Kevin Lindsey
  */
@@ -91,33 +90,37 @@ public class VirtualFileSyncPair
 
 	/**
 	 * getSourceFileInfo
+	 * 
 	 * @return
 	 */
-	public IFileInfo getSourceFileInfo() {
-		try {
+	public IFileInfo getSourceFileInfo()
+	{
+		try
+		{
 			return getSourceFileInfo(null);
-		} catch (CoreException e) {
+		}
+		catch (CoreException e)
+		{
 			return null;
 		}
 	}
 
 	/**
-	 * getClientFileInfo
+	 * getSourceFileInfo
 	 * 
 	 * @return IVirtualFile
-	 * @throws CoreException 
+	 * @throws CoreException
 	 */
 	public IFileInfo getSourceFileInfo(IProgressMonitor monitor) throws CoreException
 	{
-		if(this._sourceFile == null) {
+		if (this._sourceFile == null)
+		{
 			return null;
 		}
-		
-		if(this._sourceFileInfo != null)
+		if (this._sourceFileInfo == null)
 		{
-			return this._sourceFileInfo;
+			this._sourceFileInfo = _sourceFile.fetchInfo(IExtendedFileStore.DETAILED, monitor);
 		}
-		this._sourceFileInfo = _sourceFile.fetchInfo(IExtendedFileStore.DETAILED, monitor);
 		return this._sourceFileInfo;
 	}
 
@@ -128,7 +131,7 @@ public class VirtualFileSyncPair
 	 * @throws ConnectionException
 	 * @throws VirtualFileManagerException
 	 * @throws IOException
-	 * @throws CoreException 
+	 * @throws CoreException
 	 */
 	public InputStream getSourceInputStream() throws IOException, CoreException
 	{
@@ -165,33 +168,37 @@ public class VirtualFileSyncPair
 
 	/**
 	 * getDestinationFileInfo
+	 * 
 	 * @return
 	 */
-	public IFileInfo getDestinationFileInfo() {
-		try {
+	public IFileInfo getDestinationFileInfo()
+	{
+		try
+		{
 			return getDestinationFileInfo(null);
-		} catch (CoreException e) {
+		}
+		catch (CoreException e)
+		{
 			return null;
 		}
 	}
-	
+
 	/**
 	 * getDestinationFileInfo
 	 * 
 	 * @return IVirtualFile
-	 * @throws CoreException 
+	 * @throws CoreException
 	 */
 	public IFileInfo getDestinationFileInfo(IProgressMonitor monitor) throws CoreException
 	{
-		if(this._destinationFile == null) {
+		if (this._destinationFile == null)
+		{
 			return null;
 		}
-		
-		if(this._destinationFileInfo != null)
+		if (this._destinationFileInfo == null)
 		{
-			return this._destinationFileInfo;
+			this._destinationFileInfo = _destinationFile.fetchInfo(IExtendedFileStore.DETAILED, monitor);
 		}
-		this._destinationFileInfo = _destinationFile.fetchInfo(IExtendedFileStore.DETAILED, monitor);
 		return this._destinationFileInfo;
 	}
 
@@ -202,7 +209,7 @@ public class VirtualFileSyncPair
 	 * @throws ConnectionException
 	 * @throws VirtualFileManagerException
 	 * @throws IOException
-	 * @throws CoreException 
+	 * @throws CoreException
 	 */
 	public InputStream getDestinationInputStream() throws IOException, CoreException
 	{
@@ -259,22 +266,22 @@ public class VirtualFileSyncPair
 
 	/**
 	 * getSyncDirection
+	 * 
 	 * @return int
 	 */
 	public int getSyncDirection()
 	{
 		return _syncDirection;
 	}
-	
+
 	/**
-	 * 
 	 * @param direction
 	 */
 	public void setSyncDirection(int direction)
 	{
 		this._syncDirection = direction;
 	}
-	
+
 	/**
 	 * Am I a folder?
 	 * 

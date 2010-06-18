@@ -66,7 +66,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
@@ -582,31 +581,8 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 
 	private SearchComposite createSearchComposite(Composite myComposite)
 	{
-		SearchComposite search = new SearchComposite(myComposite, this)
-		{
-
-			@Override
-			public void keyPressed(KeyEvent e)
-			{
-				this.searchText();
-			}
-
-			@Override
-			public void keyReleased(KeyEvent e)
-			{
-				if (!e.doit)
-				{
-					return;
-				}
-			}
-
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				super.widgetSelected(e);
-				this.searchText();
-			}
-		};
+		SearchComposite search = new SearchComposite(myComposite, this);
+		search.setSearchOnEnter(true);
 		search.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		return search;
 	}

@@ -8,8 +8,10 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -17,10 +19,11 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.ui.UIPlugin;
 
 @SuppressWarnings("restriction")
-public class SearchComposite extends Composite implements KeyListener, SelectionListener
+public class SearchComposite extends Composite
 {
 
 	public static interface Client
@@ -33,12 +36,15 @@ public class SearchComposite extends Composite implements KeyListener, Selection
 	private static final String INITIAL_TEXT = Messages.SingleProjectView_InitialFileFilterText;
 
 	private Text searchText;
-	private boolean caseSensitiveSearch;
-	private boolean regularExpressionSearch;
-
-	private Client client;
 	private ToolItem caseSensitiveMenuItem;
 	private ToolItem regularExressionMenuItem;
+	private boolean searchOnEnter = true;
+	private String initialText = INITIAL_TEXT;
+	private String lastSearch = StringUtil.EMPTY;
+	private boolean lastCaseSensitiveState;
+	private boolean lastRegularExpressionState;
+
+	private Client client;
 
 	public SearchComposite(Composite parent, Client client)
 	{
@@ -56,7 +62,7 @@ public class SearchComposite extends Composite implements KeyListener, Selection
 		setLayout(searchGridLayout);
 
 		searchText = new Text(this, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
-		searchText.setText(INITIAL_TEXT);
+		searchText.setText(initialText);
 		searchText.setToolTipText(Messages.SingleProjectView_Wildcard);
 		searchText.setForeground(searchText.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		searchText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
@@ -68,7 +74,7 @@ public class SearchComposite extends Composite implements KeyListener, Selection
 			{
 				if (searchText.getText().length() == 0)
 				{
-					searchText.setText(INITIAL_TEXT);
+					searchText.setText(initialText);
 				}
 				searchText.setForeground(searchText.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 			}
@@ -76,7 +82,7 @@ public class SearchComposite extends Composite implements KeyListener, Selection
 			@Override
 			public void focusGained(FocusEvent e)
 			{
-				if (searchText.getText().equals(INITIAL_TEXT))
+				if (searchText.getText().equals(initialText))
 				{
 					searchText.setText(""); //$NON-NLS-1$
 				}
@@ -84,7 +90,35 @@ public class SearchComposite extends Composite implements KeyListener, Selection
 			}
 		});
 
-		searchText.addKeyListener(this);
+		searchText.addKeyListener(new KeyListener()
+		{
+			@Override
+			public void keyReleased(KeyEvent e)
+			{
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e)
+			{
+				if (!e.doit)
+				{
+					return;
+				}
+				if (searchOnEnter && e.keyCode == SWT.CR)
+				{
+					searchText();
+					e.doit = false;
+				}
+			}
+		});
+		searchText.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				if (!searchOnEnter) {
+					searchText();
+				}
+			}
+		});
 
 		// Button for search options
 		ToolBar toolbar = new ToolBar(this, SWT.NONE);
@@ -93,14 +127,52 @@ public class SearchComposite extends Composite implements KeyListener, Selection
 		caseSensitiveMenuItem = new ToolItem(toolbar, SWT.CHECK);
 		caseSensitiveMenuItem.setImage(UIPlugin.getImage(CASE_SENSITIVE_ICON_PATH));
 		caseSensitiveMenuItem.setToolTipText(Messages.SingleProjectView_CaseSensitive);
-		caseSensitiveMenuItem.setSelection(caseSensitiveSearch);
-		caseSensitiveMenuItem.addSelectionListener(this);
+		caseSensitiveMenuItem.setSelection(lastCaseSensitiveState);
+		caseSensitiveMenuItem.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				searchText.setFocus();
+				if (!searchOnEnter) {
+					searchText();
+				}
+			}
+		});
 
 		regularExressionMenuItem = new ToolItem(toolbar, SWT.CHECK);
 		regularExressionMenuItem.setImage(UIPlugin.getImage(REGULAR_EXPRESSION_ICON_PATH));
 		regularExressionMenuItem.setToolTipText(Messages.SingleProjectView_RegularExpression);
-		regularExressionMenuItem.setSelection(regularExpressionSearch);
-		regularExressionMenuItem.addSelectionListener(this);
+		regularExressionMenuItem.setSelection(lastRegularExpressionState);
+		regularExressionMenuItem.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				searchText.setFocus();
+				if (!searchOnEnter) {
+					searchText();
+				}
+			}
+		});
+	}
+
+	/**
+	 * @param searchOnEnter the searchOnEnter to set
+	 */
+	public void setSearchOnEnter(boolean searchOnEnter) {
+		this.searchOnEnter = searchOnEnter;
+	}
+
+	/**
+	 * @param initialText the initialText to set
+	 */
+	public void setInitialText(String initialText) {
+		if (searchText.getText().equals(this.initialText)) {
+			this.initialText = initialText;
+			searchText.setText(initialText);
+		}
+		this.initialText = initialText;
 	}
 
 	@Override
@@ -114,12 +186,22 @@ public class SearchComposite extends Composite implements KeyListener, Selection
 		return searchText;
 	}
 
-	protected void searchText()
+	private void searchText()
 	{
 		String text = searchText.getText();
-		if (text.length() > 0 && client != null)
+		if (initialText.equals(text)) {
+			text = StringUtil.EMPTY;
+		}
+		if (client != null
+				&& (searchOnEnter
+						|| !text.equals(lastSearch)
+						|| (caseSensitiveMenuItem.getSelection() != lastCaseSensitiveState)
+						|| (regularExressionMenuItem.getSelection() != lastRegularExpressionState)))
 		{
-			client.search(text, caseSensitiveSearch, regularExpressionSearch);
+			lastSearch = text;
+			lastCaseSensitiveState = caseSensitiveMenuItem.getSelection();
+			lastRegularExpressionState = regularExressionMenuItem.getSelection();
+			client.search(text, lastCaseSensitiveState, lastRegularExpressionState);
 		}
 	}
 
@@ -130,46 +212,6 @@ public class SearchComposite extends Composite implements KeyListener, Selection
 	 */
 	public Pattern createSearchPattern()
 	{
-		return PatternConstructor.createPattern(searchText.getText(), caseSensitiveSearch, regularExpressionSearch);
-	}
-
-	@Override
-	public void keyPressed(KeyEvent e)
-	{
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e)
-	{
-		if (!e.doit)
-		{
-			return;
-		}
-
-		if (e.keyCode == 0x0D)
-		{
-			searchText();
-			e.doit = false;
-		}
-	}
-
-	@Override
-	public void widgetDefaultSelected(SelectionEvent e)
-	{
-	}
-
-	@Override
-	public void widgetSelected(SelectionEvent e)
-	{
-		Object source = e.getSource();
-		if (source == caseSensitiveMenuItem)
-		{
-			caseSensitiveSearch = caseSensitiveMenuItem.getSelection();
-		}
-		else if (source == regularExressionMenuItem)
-		{
-			regularExpressionSearch = regularExressionMenuItem.getSelection();
-		}
-		searchText.setFocus();
+		return PatternConstructor.createPattern(searchText.getText(), lastCaseSensitiveState, lastRegularExpressionState);
 	}
 }
