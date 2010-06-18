@@ -165,6 +165,24 @@ public class JSCodeScanner extends RuleBasedScanner
 	protected static final char[] SINGLE_CHARACTER_OPERATORS = { '?', '!', '%', '&', '*', '-', '+', '~', '=', '<', '>',
 			'^', '|', '/' };
 
+	@SuppressWarnings("nls")
+	protected static final String[] DOM_CONSTANTS = { "shape", "src", "systemId", "scheme", "scope", "scrolling",
+			"standby", "start", "size", "summary", "specified", "sectionRowIndex", "selectedIndex", "selected",
+			"hspace", "httpEquiv", "htmlFor", "height", "headers", "hreflang", "href", "noResize", "notations",
+			"notationName", "noWrap", "noShade", "noHref", "nodeName", "nodeType", "nodeValue", "nextSibling", "name",
+			"childNodes", "chOff", "checked", "charset", "ch", "cite", "content", "cookie", "coords", "codeBase",
+			"codeType", "code", "cols", "colSpan", "color", "compact", "cells", "cellSpacing", "cellPadding", "clear",
+			"className", "caption", "type", "tBodies", "title", "tHead", "text", "target", "tagName", "tFoot", "isMap",
+			"index", "id", "implementation", "images", "options", "ownerDocument", "object", "disabled", "dir",
+			"doctype", "documentElement", "domain", "declare", "defer", "defaultSelected", "defaultChecked",
+			"defaultValue", "dateTime", "data", "useMap", "publicId", "parentNode", "profile", "prompt",
+			"peviousSibling", "enctype", "entities", "event", "elements", "vspace", "version", "valueType", "value",
+			"vLink", "vAlign", "URL", "firstChild", "forms", "form", "face", "frameBorder", "frame", "width", "links",
+			"link", "longDesc", "lowSrc", "lastChild", "lang", "label", "anchors", "attributes", "applets",
+			"accessKey", "acceptCharset", "accept", "action", "alt", "align", "archive", "areas", "axis", "aLink",
+			"abbr", "rows", "rowSpan", "rowIndex", "rules", "rev", "referrer", "rel", "readOnly", "multiple", "method",
+			"media", "marginHeight", "marginWidth", "maxLength", "body", "border", "background", "bgColor" };
+
 	private static final boolean OPTIMIZE_REGEXP_RULES = true;
 
 	/**
@@ -197,6 +215,7 @@ public class JSCodeScanner extends RuleBasedScanner
 		// Functions where we need period to begin it
 		wordRule = new WordRule(new FunctionCallDetector(), Token.UNDEFINED);
 		addWordRules(wordRule, createToken(JSScopeType.FIREBUG_FUNCTION), FIREBUG_FUNCTIONS);
+		addWordRules(wordRule, createToken(JSScopeType.DOM_CONSTANTS), DOM_CONSTANTS);
 		rules.add(wordRule);
 
 		// Operators
@@ -212,16 +231,9 @@ public class JSCodeScanner extends RuleBasedScanner
 		// TODO Turn these next two rules into word rules using the FunctionCallDetector word rule list
 		// FIXME This rule shouldn't actually match the leading period, but we have no way to capture just the rest as
 		// the token
-		rules
-				.add(new RegexpRule(
-						"\\.(s(ystemLanguage|cr(ipts|ollbars|een(X|Y|Top|Left))|t(yle(Sheets)?|atus(Text|bar)?)|ibling(Below|Above)|ource|uffixes|e(curity(Policy)?|l(ection|f)))|h(istory|ost(name)?|as(h|Focus))|y|X(MLDocument|SLDocument)|n(ext|ame(space(s|URI)|Prop))|M(IN_VALUE|AX_VALUE)|c(haracterSet|o(n(structor|trollers)|okieEnabled|lorDepth|mp(onents|lete))|urrent|puClass|l(i(p(boardData)?|entInformation)|osed|asses)|alle(e|r)|rypto)|t(o(olbar|p)|ext(Transform|Indent|Decoration|Align)|ags)|SQRT(1_2|2)|i(n(ner(Height|Width)|put)|ds|gnoreCase)|zIndex|o(scpu|n(readystatechange|Line)|uter(Height|Width)|p(sProfile|ener)|ffscreenBuffering)|NEGATIVE_INFINITY|d(i(splay|alog(Height|Top|Width|Left|Arguments)|rectories)|e(scription|fault(Status|Ch(ecked|arset)|View)))|u(ser(Profile|Language|Agent)|n(iqueID|defined)|pdateInterval)|_content|p(ixelDepth|ort|ersonalbar|kcs11|l(ugins|atform)|a(thname|dding(Right|Bottom|Top|Left)|rent(Window|Layer)?|ge(X(Offset)?|Y(Offset)?))|r(o(to(col|type)|duct(Sub)?|mpter)|e(vious|fix)))|e(n(coding|abledPlugin)|x(ternal|pando)|mbeds)|v(isibility|endor(Sub)?|Linkcolor)|URLUnencoded|P(I|OSITIVE_INFINITY)|f(ilename|o(nt(Size|Family|Weight)|rmName)|rame(s|Element)|gColor)|E|whiteSpace|l(i(stStyleType|n(eHeight|kColor))|o(ca(tion(bar)?|lName)|wsrc)|e(ngth|ft(Context)?)|a(st(M(odified|atch)|Index|Paren)|yer(s|X)|nguage))|a(pp(MinorVersion|Name|Co(deName|re)|Version)|vail(Height|Top|Width|Left)|ll|r(ity|guments)|Linkcolor|bove)|r(ight(Context)?|e(sponse(XML|Text)|adyState))|global|x|m(imeTypes|ultiline|enubar|argin(Right|Bottom|Top|Left))|L(N(10|2)|OG(10E|2E))|b(o(ttom|rder(RightWidth|BottomWidth|Style|Color|TopWidth|LeftWidth))|ufferDepth|elow|ackground(Color|Image)))\\b", //$NON-NLS-1$
-						createToken(JSScopeType.SUPPORT_CONSTANT), OPTIMIZE_REGEXP_RULES));
-		// FIXME This rule shouldn't actually match the leading period, but we have no way to capture just the rest as
-		// the token
-		rules
-				.add(new RegexpRule(
-						"\\.(s(hape|ystemId|c(heme|ope|rolling)|ta(ndby|rt)|ize|ummary|pecified|e(ctionRowIndex|lected(Index)?)|rc)|h(space|t(tpEquiv|mlFor)|e(ight|aders)|ref(lang)?)|n(o(Resize|tation(s|Name)|Shade|Href|de(Name|Type|Value)|Wrap)|extSibling|ame)|c(h(ildNodes|Off|ecked|arset)?|ite|o(ntent|o(kie|rds)|de(Base|Type)?|l(s|Span|or)|mpact)|ell(s|Spacing|Padding)|l(ear|assName)|aption)|t(ype|Bodies|itle|Head|ext|a(rget|gName)|Foot)|i(sMap|ndex|d|m(plementation|ages))|o(ptions|wnerDocument|bject)|d(i(sabled|r)|o(c(type|umentElement)|main)|e(clare|f(er|ault(Selected|Checked|Value)))|at(eTime|a))|useMap|p(ublicId|arentNode|r(o(file|mpt)|eviousSibling))|e(n(ctype|tities)|vent|lements)|v(space|ersion|alue(Type)?|Link|Align)|URL|f(irstChild|orm(s)?|ace|rame(Border)?)|width|l(ink(s)?|o(ngDesc|wSrc)|a(stChild|ng|bel))|a(nchors|c(ce(ssKey|pt(Charset)?)|tion)|ttributes|pplets|l(t|ign)|r(chive|eas)|xis|Link|bbr)|r(ow(s|Span|Index)|ules|e(v|ferrer|l|adOnly))|m(ultiple|e(thod|dia)|a(rgin(Height|Width)|xLength))|b(o(dy|rder)|ackground|gColor))\\b", //$NON-NLS-1$
-						createToken(JSScopeType.DOM_CONSTANTS), OPTIMIZE_REGEXP_RULES));
+		rules.add(new RegexpRule(
+				"\\.(s(ystemLanguage|cr(ipts|ollbars|een(X|Y|Top|Left))|t(yle(Sheets)?|atus(Text|bar)?)|ibling(Below|Above)|ource|uffixes|e(curity(Policy)?|l(ection|f)))|h(istory|ost(name)?|as(h|Focus))|y|X(MLDocument|SLDocument)|n(ext|ame(space(s|URI)|Prop))|M(IN_VALUE|AX_VALUE)|c(haracterSet|o(n(structor|trollers)|okieEnabled|lorDepth|mp(onents|lete))|urrent|puClass|l(i(p(boardData)?|entInformation)|osed|asses)|alle(e|r)|rypto)|t(o(olbar|p)|ext(Transform|Indent|Decoration|Align)|ags)|SQRT(1_2|2)|i(n(ner(Height|Width)|put)|ds|gnoreCase)|zIndex|o(scpu|n(readystatechange|Line)|uter(Height|Width)|p(sProfile|ener)|ffscreenBuffering)|NEGATIVE_INFINITY|d(i(splay|alog(Height|Top|Width|Left|Arguments)|rectories)|e(scription|fault(Status|Ch(ecked|arset)|View)))|u(ser(Profile|Language|Agent)|n(iqueID|defined)|pdateInterval)|_content|p(ixelDepth|ort|ersonalbar|kcs11|l(ugins|atform)|a(thname|dding(Right|Bottom|Top|Left)|rent(Window|Layer)?|ge(X(Offset)?|Y(Offset)?))|r(o(to(col|type)|duct(Sub)?|mpter)|e(vious|fix)))|e(n(coding|abledPlugin)|x(ternal|pando)|mbeds)|v(isibility|endor(Sub)?|Linkcolor)|URLUnencoded|P(I|OSITIVE_INFINITY)|f(ilename|o(nt(Size|Family|Weight)|rmName)|rame(s|Element)|gColor)|E|whiteSpace|l(i(stStyleType|n(eHeight|kColor))|o(ca(tion(bar)?|lName)|wsrc)|e(ngth|ft(Context)?)|a(st(M(odified|atch)|Index|Paren)|yer(s|X)|nguage))|a(pp(MinorVersion|Name|Co(deName|re)|Version)|vail(Height|Top|Width|Left)|ll|r(ity|guments)|Linkcolor|bove)|r(ight(Context)?|e(sponse(XML|Text)|adyState))|global|x|m(imeTypes|ultiline|enubar|argin(Right|Bottom|Top|Left))|L(N(10|2)|OG(10E|2E))|b(o(ttom|rder(RightWidth|BottomWidth|Style|Color|TopWidth|LeftWidth))|ufferDepth|elow|ackground(Color|Image)))\\b", //$NON-NLS-1$
+				createToken(JSScopeType.SUPPORT_CONSTANT), OPTIMIZE_REGEXP_RULES));
 
 		// Add word rule for keywords, types, and constants.
 		wordRule = new WordRule(new WordDetector(), createToken(JSScopeType.SOURCE));
@@ -266,7 +278,7 @@ public class JSCodeScanner extends RuleBasedScanner
 	{
 		return this.createToken(type.getScope());
 	}
-	
+
 	protected IToken createToken(String string)
 	{
 		return getThemeManager().getToken(string);
