@@ -1,6 +1,5 @@
 package com.aptana.editor.ruby.contentassist;
 
-import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,7 +12,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -38,7 +36,7 @@ import com.aptana.index.core.SearchPattern;
 
 public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 {
-	private static final String NAMESPACE_DELIMITER = "::";
+	private static final String NAMESPACE_DELIMITER = "::"; //$NON-NLS-1$
 
 	/**
 	 * Separates file locations when using multiple values for proposal.
@@ -90,8 +88,8 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 					String enclosing = getNamespace(fullPrefix);
 					String subPrefix = getShortPrefix(fullPrefix);
 
-					String searchKey = "^" + subPrefix + "(.*)?" + IRubyIndexConstants.SEPARATOR + enclosing
-							+ IRubyIndexConstants.SEPARATOR + ".*$";
+					String searchKey = "^" + subPrefix + "(.*)?" + IRubyIndexConstants.SEPARATOR + enclosing //$NON-NLS-1$ //$NON-NLS-2$
+							+ IRubyIndexConstants.SEPARATOR + ".*$"; //$NON-NLS-1$
 					partialResults = index.query(new String[] { IRubyIndexConstants.TYPE_DECL }, searchKey,
 							SearchPattern.REGEX_MATCH | SearchPattern.CASE_SENSITIVE);
 
@@ -203,7 +201,7 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 		int index = fullPrefix.lastIndexOf(NAMESPACE_DELIMITER);
 		if (index == -1)
 		{
-			return "";
+			return ""; //$NON-NLS-1$
 		}
 		return fullPrefix.substring(0, index);
 	}
