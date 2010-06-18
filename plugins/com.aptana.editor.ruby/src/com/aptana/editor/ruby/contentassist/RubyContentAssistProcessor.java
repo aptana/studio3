@@ -1,5 +1,6 @@
 package com.aptana.editor.ruby.contentassist;
 
+import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,6 +29,7 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.ruby.Activator;
+import com.aptana.editor.ruby.CoreStubber;
 import com.aptana.editor.ruby.index.IRubyIndexConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
@@ -250,29 +252,19 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		indices.add(getRubyCoreIndex());
 
-		// TODO Extract common code with CoreStubber out to some class!
 		// Now add the Std Lib indices
-		String rawLoadPathOutput = ProcessUtil.outputForCommand("ruby", null, ShellExecutable.getEnvironment(), "-e", //$NON-NLS-1$//$NON-NLS-2$
-				"puts $:"); //$NON-NLS-1$
-		String[] loadpaths = rawLoadPathOutput.split("\r\n|\r|\n"); //$NON-NLS-1$
-		for (String loadpath : loadpaths)
+		for (IPath loadpath : CoreStubber.getLoadpaths())
 		{
-			if (loadpath.equals(".")) //$NON-NLS-1$
-				continue;
-			Index index = IndexManager.getInstance().getIndex(loadpath);
+			Index index = IndexManager.getInstance().getIndex(loadpath.toOSString());
 			if (index != null)
 			{
 				indices.add(index);
 			}
 		}
-
-		String gemEnvOutput = ProcessUtil.outputForCommand("gem", null, ShellExecutable.getEnvironment(),
-				"env", "gempath"); //$NON-NLS-1$
-		String[] gemPaths = gemEnvOutput.split(":"); // FIXME Does this need to be File.pathSeparator?
-		for (String gemPath : gemPaths)
+		// Now gems
+		for (IPath gemsPath : CoreStubber.getGemPaths())
 		{
-			IPath gemsPath = new Path(gemPath).append("gems");
-			Index index = IndexManager.getInstance().getIndex(gemsPath.toPortableString());
+			Index index = IndexManager.getInstance().getIndex(gemsPath.toOSString());
 			if (index != null)
 			{
 				indices.add(index);
