@@ -1,0 +1,3 @@
+function abc() {
+	throw "Error";
+}
