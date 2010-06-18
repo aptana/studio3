@@ -1,22 +1,70 @@
 package com.aptana.editor.js.parsing.ast;
 
+import com.aptana.editor.js.contentassist.LocationType;
 import com.aptana.parsing.ast.IParseNode;
+
+import beaver.Symbol;
 
 public class JSGetElementOperatorNode extends JSBinaryOperatorNode
 {
+	private Symbol _rightBracket;
+	
 	/**
 	 * JSGetElementOperatorNode
 	 * 
 	 * @param left
 	 * @param right
 	 */
-	public JSGetElementOperatorNode(JSNode left, JSNode right)
+	public JSGetElementOperatorNode(JSNode left, Symbol leftBracket, JSNode right, Symbol rightBracket)
 	{
-		super(left, right);
+		super(left, leftBracket, right);
+		this._rightBracket = rightBracket;
 		this.end = right.getEnd() + 1; // take the end ] into account
 		setType(JSNodeTypes.GET_ELEMENT);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#getLocationType(int)
+	 */
+	@Override
+	LocationType getLocationType(int offset)
+	{
+		LocationType result = LocationType.UNKNOWN;
+
+		if (this.contains(offset))
+		{
+			for (IParseNode child : this)
+			{
+				if (child.contains(offset))
+				{
+					if (child instanceof JSNode)
+					{
+						result = ((JSNode) child).getLocationType(offset);
+					}
+
+					break;
+				}
+			}
+
+			Symbol leftBracket = this.getOperator();
+			
+			if (result == LocationType.UNKNOWN)
+			{
+				if (leftBracket.getStart() == offset + 1 || leftBracket.getEnd() <= offset || this._rightBracket.getEnd() <= offset)
+				{
+					result = LocationType.IN_GLOBAL;
+				}
+				else if (offset <= leftBracket.getStart())
+				{
+					result = LocationType.NONE;
+				}
+			}
+		}
+
+		return result;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSBinaryOperatorNode#toString()
@@ -25,8 +73,12 @@ public class JSGetElementOperatorNode extends JSBinaryOperatorNode
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
-		IParseNode[] children = getChildren();
-		text.append(children[0]).append("[").append(children[1]).append("]"); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		text.append(this.getLeftHandSide());
+		text.append("[");
+		text.append(this.getRightHandSide());
+		text.append("]"); //$NON-NLS-1$ //$NON-NLS-2$
+		
 		this.appendSemicolon(text);
 
 		return text.toString();

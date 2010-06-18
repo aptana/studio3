@@ -1220,13 +1220,13 @@ PropertyName
 MemberExpression
 	=	PrimaryExpression
 	|	FunctionExpression
-	|	MemberExpression.l LBRACKET Expression.r RBRACKET
+	|	MemberExpression.l LBRACKET.lb Expression.r RBRACKET.rb
 		{:
-			return new JSGetElementOperatorNode(l, r);
+			return new JSGetElementOperatorNode(l, lb, r, rb);
 		:}
-	|	MemberExpression.l DOT IDENTIFIER.r
+	|	MemberExpression.l DOT.o IDENTIFIER.r
 		{:
-			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(r));
+			return new JSGetPropertyOperatorNode(l, o, new JSIdentifierNode(r));
 		:}
 	|	NEW.l MemberExpression.e Arguments.a
 		{:
@@ -1236,13 +1236,13 @@ MemberExpression
 
 MemberExpression_NoLBF
 	=	PrimaryExpression_NoLBF
-	|	MemberExpression_NoLBF.l LBRACKET Expression.r RBRACKET
+	|	MemberExpression_NoLBF.l LBRACKET.lb Expression.r RBRACKET.rb
 		{:
-			return new JSGetElementOperatorNode(l, r);
+			return new JSGetElementOperatorNode(l, lb, r, rb);
 		:}
-	|	MemberExpression_NoLBF.l DOT IDENTIFIER.r
+	|	MemberExpression_NoLBF.l DOT.o IDENTIFIER.r
 		{:
-			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(r));
+			return new JSGetPropertyOperatorNode(l, o, new JSIdentifierNode(r));
 		:}
 	|	NEW.l MemberExpression.e Arguments.a
 		{:
@@ -1275,13 +1275,13 @@ CallExpression
 		{:
 			return new JSInvokeNode(l.getStart(), r.getEnd(), l, r);
 		:}
-	|	CallExpression.l LBRACKET Expression.r RBRACKET
+	|	CallExpression.l LBRACKET.lb Expression.r RBRACKET.rb
 		{:
-			return new JSGetElementOperatorNode(l, r);
+			return new JSGetElementOperatorNode(l, lb, r, rb);
 		:}
-	|	CallExpression.l DOT IDENTIFIER.r
+	|	CallExpression.l DOT.o IDENTIFIER.r
 		{:
-			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(r));
+			return new JSGetPropertyOperatorNode(l, o, new JSIdentifierNode(r));
 		:}
 	;
 
@@ -1294,13 +1294,13 @@ CallExpression_NoLBF
 		{:
 			return new JSInvokeNode(l.getStart(), r.getEnd(), l, r);
 		:}
-	|	CallExpression_NoLBF.l LBRACKET Expression.r RBRACKET
+	|	CallExpression_NoLBF.l LBRACKET.lb Expression.r RBRACKET.rb
 		{:
-			return new JSGetElementOperatorNode(l, r);
+			return new JSGetElementOperatorNode(l, lb, r, rb);
 		:}
-	|	CallExpression_NoLBF.l DOT IDENTIFIER.r
+	|	CallExpression_NoLBF.l DOT.o IDENTIFIER.r
 		{:
-			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(r));
+			return new JSGetPropertyOperatorNode(l, o, new JSIdentifierNode(r));
 		:}
 	;
 

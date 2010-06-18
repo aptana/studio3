@@ -1779,22 +1779,25 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSNumberNode(n);
 			}
-			case 149: // MemberExpression = MemberExpression.l LBRACKET Expression.r RBRACKET
+			case 149: // MemberExpression = MemberExpression.l LBRACKET.lb Expression.r RBRACKET.rb
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol lb = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
+					final Symbol rb = _symbols[offset + 4];
 					
-			return new JSGetElementOperatorNode(l, r);
+			return new JSGetElementOperatorNode(l, lb, r, rb);
 			}
-			case 150: // MemberExpression = MemberExpression.l DOT IDENTIFIER.r
+			case 150: // MemberExpression = MemberExpression.l DOT.o IDENTIFIER.r
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol o = _symbols[offset + 2];
 					final Symbol r = _symbols[offset + 3];
 					
-			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(r));
+			return new JSGetPropertyOperatorNode(l, o, new JSIdentifierNode(r));
 			}
 			case 151: // MemberExpression = NEW.l MemberExpression.e Arguments.a
 			{
@@ -1806,22 +1809,25 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSConstructNode(l.getStart(), a.getEnd(), e, a);
 			}
-			case 153: // MemberExpression_NoLBF = MemberExpression_NoLBF.l LBRACKET Expression.r RBRACKET
+			case 153: // MemberExpression_NoLBF = MemberExpression_NoLBF.l LBRACKET.lb Expression.r RBRACKET.rb
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol lb = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
+					final Symbol rb = _symbols[offset + 4];
 					
-			return new JSGetElementOperatorNode(l, r);
+			return new JSGetElementOperatorNode(l, lb, r, rb);
 			}
-			case 154: // MemberExpression_NoLBF = MemberExpression_NoLBF.l DOT IDENTIFIER.r
+			case 154: // MemberExpression_NoLBF = MemberExpression_NoLBF.l DOT.o IDENTIFIER.r
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol o = _symbols[offset + 2];
 					final Symbol r = _symbols[offset + 3];
 					
-			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(r));
+			return new JSGetPropertyOperatorNode(l, o, new JSIdentifierNode(r));
 			}
 			case 155: // MemberExpression_NoLBF = NEW.l MemberExpression.e Arguments.a
 			{
@@ -1867,22 +1873,25 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSInvokeNode(l.getStart(), r.getEnd(), l, r);
 			}
-			case 162: // CallExpression = CallExpression.l LBRACKET Expression.r RBRACKET
+			case 162: // CallExpression = CallExpression.l LBRACKET.lb Expression.r RBRACKET.rb
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol lb = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
+					final Symbol rb = _symbols[offset + 4];
 					
-			return new JSGetElementOperatorNode(l, r);
+			return new JSGetElementOperatorNode(l, lb, r, rb);
 			}
-			case 163: // CallExpression = CallExpression.l DOT IDENTIFIER.r
+			case 163: // CallExpression = CallExpression.l DOT.o IDENTIFIER.r
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol o = _symbols[offset + 2];
 					final Symbol r = _symbols[offset + 3];
 					
-			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(r));
+			return new JSGetPropertyOperatorNode(l, o, new JSIdentifierNode(r));
 			}
 			case 164: // CallExpression_NoLBF = MemberExpression_NoLBF.l Arguments.r
 			{
@@ -1902,22 +1911,25 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSInvokeNode(l.getStart(), r.getEnd(), l, r);
 			}
-			case 166: // CallExpression_NoLBF = CallExpression_NoLBF.l LBRACKET Expression.r RBRACKET
+			case 166: // CallExpression_NoLBF = CallExpression_NoLBF.l LBRACKET.lb Expression.r RBRACKET.rb
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol lb = _symbols[offset + 2];
 					final Symbol _symbol_r = _symbols[offset + 3];
 					final JSNode r = (JSNode) _symbol_r.value;
+					final Symbol rb = _symbols[offset + 4];
 					
-			return new JSGetElementOperatorNode(l, r);
+			return new JSGetElementOperatorNode(l, lb, r, rb);
 			}
-			case 167: // CallExpression_NoLBF = CallExpression_NoLBF.l DOT IDENTIFIER.r
+			case 167: // CallExpression_NoLBF = CallExpression_NoLBF.l DOT.o IDENTIFIER.r
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol o = _symbols[offset + 2];
 					final Symbol r = _symbols[offset + 3];
 					
-			return new JSGetPropertyOperatorNode(l, new JSIdentifierNode(r));
+			return new JSGetPropertyOperatorNode(l, o, new JSIdentifierNode(r));
 			}
 			case 168: // Arguments = LPAREN.l RPAREN.r
 			{
