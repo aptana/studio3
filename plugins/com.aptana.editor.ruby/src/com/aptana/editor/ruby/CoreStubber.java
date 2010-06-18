@@ -72,10 +72,10 @@ public class CoreStubber extends Job
 			{
 				generateCoreStubs(outputDir, finishMarker);
 			}
-			sub.setWorkRemaining(90);
+			sub.setWorkRemaining(10);
 
-			IProgressMonitor pm = Job.getJobManager().createProgressGroup();
-			List<Job> jobs = new ArrayList<Job>();
+			final IProgressMonitor pm = Job.getJobManager().createProgressGroup();
+			final List<Job> jobs = new ArrayList<Job>();
 			jobs.add(indexCoreStubs(rubyVersion, outputDir));
 			jobs.addAll(indexStdLib());
 			jobs.addAll(indexGems());
@@ -89,13 +89,41 @@ public class CoreStubber extends Job
 				job.setProgressGroup(pm, 1);
 				job.schedule();
 			}
-			// TODO How can we ever call done on this progress monitor? it's sticking in the progress view..
+			// Use a thread to report back to progress monitor when all the jobs are done.
+			Thread t = new Thread(new Runnable()
+			{
+
+				@Override
+				public void run()
+				{
+					for (Job job : jobs)
+					{
+						if (job == null)
+						{
+							continue;
+						}
+						try
+						{
+							job.join();
+						}
+						catch (InterruptedException e)
+						{
+							// ignore
+						}
+					}
+					pm.done();
+				}
+			});
+			t.start();
 		}
 		catch (Exception e)
 		{
 			return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e);
 		}
-		sub.done();
+		finally
+		{
+			sub.done();
+		}
 		return Status.OK_STATUS;
 	}
 
@@ -111,7 +139,7 @@ public class CoreStubber extends Job
 		return jobs;
 	}
 
-	public static Set<IPath> getGemPaths() 
+	public static Set<IPath> getGemPaths()
 	{
 		IPath gemCommand = ExecutableUtil.find("gem", true, null);
 		String command = "gem";
@@ -145,7 +173,8 @@ public class CoreStubber extends Job
 		for (IPath loadpath : getLoadpaths())
 		{
 			Index index = IndexManager.getInstance().getIndex(loadpath.toOSString());
-			Job job = indexFiles(MessageFormat.format("Indexing {0}", loadpath.toOSString()), index, addFiles(loadpath.toFile()));
+			Job job = indexFiles(MessageFormat.format("Indexing {0}", loadpath.toOSString()), index,
+					addFiles(loadpath.toFile()));
 			if (job != null)
 			{
 				jobs.add(job);
@@ -153,7 +182,7 @@ public class CoreStubber extends Job
 		}
 		return jobs;
 	}
-	
+
 	public static Set<IPath> getLoadpaths()
 	{
 		String rawLoadPathOutput = ProcessUtil.outputForCommand(RUBY_EXE, null, ShellExecutable.getEnvironment(),
@@ -186,7 +215,7 @@ public class CoreStubber extends Job
 	protected void generateCoreStubs(File outputDir, File finishMarker) throws IOException
 	{
 		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(CORE_STUBBER_PATH), null);
-		File stubberScript = ResourceUtil.resourcePathToFile(url);		
+		File stubberScript = ResourceUtil.resourcePathToFile(url);
 
 		Map<Integer, String> stubberResult = ProcessUtil.runInBackground(RUBY_EXE, null,
 				ShellExecutable.getEnvironment(), stubberScript.getAbsolutePath(), outputDir.getAbsolutePath());
@@ -274,7 +303,8 @@ public class CoreStubber extends Job
 
 			try
 			{
-				// Should check timestamp of index versus timestamps of files, only index files that are out of date (for Ruby)!
+				// Should check timestamp of index versus timestamps of files, only index files that are out of date
+				// (for Ruby)!
 				filterFiles();
 
 				// First cleanup indices for files
@@ -295,7 +325,7 @@ public class CoreStubber extends Job
 				RubyFileIndexingParticipant fileIndexingParticipant = new RubyFileIndexingParticipant();
 				long timestamp = System.currentTimeMillis();
 				fileIndexingParticipant.index(files, index, sub.newChild(files.size()));
-				
+
 				// Store some timestamp we can use to limit next pass indexing
 				IEclipsePreferences prefs = new InstanceScope().getNode(Activator.PLUGIN_ID);
 				prefs.putLong(getIndexTimestampKey(), timestamp);
@@ -304,7 +334,9 @@ public class CoreStubber extends Job
 			catch (CoreException e)
 			{
 				return e.getStatus();
-			} catch (BackingStoreException e) {
+			}
+			catch (BackingStoreException e)
+			{
 				Activator.log(e);
 			}
 			finally
@@ -321,14 +353,16 @@ public class CoreStubber extends Job
 			return Status.OK_STATUS;
 		}
 
-		private String getIndexTimestampKey() {
+		private String getIndexTimestampKey()
+		{
 			return "LastIndex_Ruby_" + index.getIndexFile().getAbsolutePath();
 		}
 
 		private void filterFiles()
 		{
 			// We store something in the prefs for the last timestamp, since we can't go off timestamp of disk index.
-			long indexLastModified = Platform.getPreferencesService().getLong(Activator.PLUGIN_ID, getIndexTimestampKey(), -1, null);
+			long indexLastModified = Platform.getPreferencesService().getLong(Activator.PLUGIN_ID,
+					getIndexTimestampKey(), -1, null);
 			Iterator<IFileStore> iter = files.iterator();
 			while (iter.hasNext())
 			{
