@@ -22,30 +22,6 @@ public class EFSUtilsTest extends TestCase {
 		super.tearDown();
 	}
 
-	public void testGetFileStoreIResource() {
-		//fail("Not yet implemented");
-	}
-
-	public void testGetFileStoreFile() {
-		//fail("Not yet implemented");
-	}
-
-	public void testSetModificationTime() {
-		//fail("Not yet implemented");
-	}
-
-	public void testGetFilesIFileStore() {
-		//fail("Not yet implemented");
-	}
-
-	public void testGetFilesIFileStoreBooleanBoolean() {
-		//fail("Not yet implemented");
-	}
-
-	public void testGetParentFile() {
-		//fail("Not yet implemented");
-	}
-
 	public void testGetAbsolutePath() throws IOException, CoreException {
 		File f = File.createTempFile("test", "txt");
 		LocalConnectionPoint lcp = new LocalConnectionPoint(Path.fromOSString(f.getAbsolutePath()));

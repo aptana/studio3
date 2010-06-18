@@ -36,9 +36,10 @@ package com.aptana.ide.syncing.ui.old.views;
 
 import org.eclipse.osgi.util.NLS;
 
-public class Messages extends NLS {
+public class Messages extends NLS
+{
 
-    private static final String BUNDLE_NAME = "com.aptana.ide.syncing.ui.old.views.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.ide.syncing.ui.old.views.messages"; //$NON-NLS-1$
 
 	/**
 	 * DirectionToolBar_DownloadToolTip
@@ -65,7 +66,6 @@ public class Messages extends NLS {
 	 */
 	public static String DirectionToolBar_UploadToolTip;
 
-
 	public static String SmartSyncDialog_AdvancedOptions;
 	public static String SmartSyncDialog_BothDirection;
 	public static String SmartSyncDialog_Cancel;
@@ -76,7 +76,7 @@ public class Messages extends NLS {
 	public static String SmartSyncDialog_ColumnRemote;
 	public static String SmartSyncDialog_ColumnResources;
 	public static String SmartSyncDialog_ColumnSkip;
-	public static String SmartSyncDialog_Comparing; 
+	public static String SmartSyncDialog_Comparing;
 	public static String SmartSyncDialog_Delete;
 	public static String SmartSyncDialog_DeleteExtra;
 	public static String SmartSyncDialog_DeleteExtraTooltip;
@@ -109,7 +109,7 @@ public class Messages extends NLS {
 	public static String SmartSyncDialog_SkippedFilesInSync;
 	public static String SmartSyncDialog_StartSync;
 	public static String SmartSyncDialog_SyncError;
-    public static String SmartSyncDialog_SyncInBackground;
+	public static String SmartSyncDialog_SyncInBackground;
 	public static String SmartSyncDialog_Title;
 	public static String SmartSyncDialog_TreeView;
 	public static String SmartSyncDialog_UnknownHostError;
@@ -118,7 +118,7 @@ public class Messages extends NLS {
 	public static String SmartSyncDialog_UploadAll;
 	public static String SmartSyncDialog_UseCrc;
 	public static String SmartSyncDialog_ViewOptions;
-			
+
 	public static String SmartSyncEventManager_ERR_ErrorNotifyingSmartSyncListener;
 
 	public static String SmartSyncEventManager_ERR_ExceptionNotifyingSmartSyncListener;
@@ -127,12 +127,14 @@ public class Messages extends NLS {
 	public static String SmartSyncViewer_ColumnSkipTooltip;
 	public static String SmartSyncViewer_LocalTimeTooltip;
 	public static String SmartSyncViewer_RemoteTimeTooltip;
-	
-    static {
-        // initialize resource bundle
-        NLS.initializeMessages(BUNDLE_NAME, Messages.class);
-    }
 
-    private Messages() {
-    }
+	static
+	{
+		// initialize resource bundle
+		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	}
+
+	private Messages()
+	{
+	}
 }
