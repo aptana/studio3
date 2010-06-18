@@ -1,5 +1,8 @@
 package com.aptana.ui.widgets;
 
+import java.util.regex.Pattern;
+
+import org.eclipse.search.internal.core.text.PatternConstructor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -19,6 +22,7 @@ import org.eclipse.swt.widgets.ToolItem;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ui.UIPlugin;
 
+@SuppressWarnings("restriction")
 public class SearchComposite extends Composite
 {
 
@@ -199,5 +203,15 @@ public class SearchComposite extends Composite
 			lastRegularExpressionState = regularExressionMenuItem.getSelection();
 			client.search(text, lastCaseSensitiveState, lastRegularExpressionState);
 		}
+	}
+
+	/**
+	 * Create a default search pattern taking into consideration case sensitivity and regular expression settings
+	 * 
+	 * @return
+	 */
+	public Pattern createSearchPattern()
+	{
+		return PatternConstructor.createPattern(searchText.getText(), lastCaseSensitiveState, lastRegularExpressionState);
 	}
 }
