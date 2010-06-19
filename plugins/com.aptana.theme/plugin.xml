@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            category="com.aptana.common"
+            category="com.aptana.ui.AptanaPreferencePage"
             class="com.aptana.theme.preferences.ThemePreferencePage"
             id="com.aptana.theme.preferencePage"
             name="%preferencePage.themes.name">

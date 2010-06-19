@@ -7,7 +7,6 @@ Bundle-Activator: com.aptana.filesystem.secureftp.internal.SecureFTPPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jsch.core,
- com.aptana.core,
  com.aptana.core.io,
  com.aptana.core.epl,
  com.aptana.filesystem.ftp;visibility:=reexport,

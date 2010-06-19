@@ -1,4 +1,4 @@
-package com.aptana.editor.common.preferences;
+package com.aptana.ui.preferences;
 
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
