@@ -56,7 +56,6 @@ import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.common.text.rules.WordDetector;
 import com.aptana.editor.js.IJSTokenScanner;
 import com.aptana.editor.js.JSCodeScanner;
-import com.aptana.editor.js.JSRegexpRule;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 
 /**
@@ -101,7 +100,7 @@ public class JSTokenScanner extends JSCodeScanner implements IJSTokenScanner
 		rules.add(new SingleLineRule("\'", "\'", token, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// regex
-		rules.add(new JSRegexpRule(createToken(JSTokenType.REGEX)));
+		rules.add(new JSRegExpRule(createToken(JSTokenType.REGEX)));
 
 		WordRule wordRule = new WordRule(new LettersAndDigitsWordDetector(), Token.UNDEFINED);
 		for (String keyword : KEYWORD_OPERATORS)

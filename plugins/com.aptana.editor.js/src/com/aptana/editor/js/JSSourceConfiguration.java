@@ -55,6 +55,7 @@ import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
+import com.aptana.editor.js.parsing.JSRegExpRule;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
 
@@ -85,7 +86,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 			new SingleLineRule("\'", "\'", new Token(STRING_SINGLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
 			new MultiLineRule("/**", "*/", new Token(JS_DOC), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
 			new MultiLineRule("/*", "*/", new Token(JS_MULTILINE_COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
-			new JSRegexpRule(new Token(JS_REGEXP)) };
+			new JSRegExpRule(new Token(JS_REGEXP)) };
 
 	private JSCodeScanner codeScanner;
 	private JSDocScanner docScanner;
