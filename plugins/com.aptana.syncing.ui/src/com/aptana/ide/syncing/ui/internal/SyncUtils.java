@@ -61,85 +61,117 @@ import com.aptana.ide.ui.io.FileSystemUtils;
 /**
  * @author Michael Xia (mxia@aptana.com)
  */
-public class SyncUtils {
+public class SyncUtils
+{
 
-    /**
-     * Computes the intersection of an array of sets.
-     * 
-     * @param sets
-     *            the array of sets
-     * @return a result set that contains the intersection
-     */
-    public static Set<ISiteConnection> getIntersection(Set<ISiteConnection>[] sets) {
-        Set<ISiteConnection> intersectionSet = new HashSet<ISiteConnection>();
+	/**
+	 * Computes the intersection of an array of sets.
+	 * 
+	 * @param sets
+	 *            the array of sets
+	 * @return a result set that contains the intersection
+	 */
+	public static Set<ISiteConnection> getIntersection(Set<ISiteConnection>[] sets)
+	{
+		Set<ISiteConnection> intersectionSet = new HashSet<ISiteConnection>();
 
-        for (Set<ISiteConnection> set : sets) {
-            intersectionSet.addAll(set);
-        }
-        for (Set<ISiteConnection> set : sets) {
-            intersectionSet.retainAll(set);
-        }
-
-        return intersectionSet;
-    }
-
-    /**
-     * @param adaptable
-     *            the IAdaptable object
-     * @return the file store corresponding to the object
-     */
-    public static IFileStore getFileStore(IAdaptable adaptable) {
-        if (adaptable instanceof IResource) {
-            IResource resource = (IResource) adaptable;
-            return EFSUtils.getFileStore(resource);
-        }
-        return (IFileStore) adaptable.getAdapter(IFileStore.class);
-    }
-
-    /**
-     * @param adaptable
-     *            the IAdaptable object
-     * @return the file info corresponding to the object
-     */
-    public static IFileInfo getFileInfo(IAdaptable adaptable) {
-        IFileInfo fileInfo = (IFileInfo) adaptable.getAdapter(IFileInfo.class);
-        if (fileInfo == null) {
-            IFileStore fileStore = getFileStore(adaptable);
-            if (fileStore != null) {
-                fileInfo = FileSystemUtils.fetchFileInfo(fileStore);
-            }
-        }
-        return fileInfo;
-    }
-    
-    public static IConnectionPoint findOrCreateConnectionPointFor(IAdaptable adaptable) {
-        if (adaptable == null) {
-            return null;
-        }
-    	IConnectionPoint connectionPoint = (IConnectionPoint) adaptable.getAdapter(IConnectionPoint.class);
-    	if (connectionPoint != null) {
-    		return connectionPoint;
-    	}
-		IResource resource = (IResource) adaptable.getAdapter(IResource.class);
-		if (resource == null) {
-		    resource = (IResource) adaptable.getAdapter(IContainer.class);
+		for (Set<ISiteConnection> set : sets)
+		{
+			intersectionSet.addAll(set);
 		}
-		if (resource instanceof IContainer) {
-			 return ConnectionPointUtils.findOrCreateWorkspaceConnectionPoint((IContainer) resource);
-		} else {
+		for (Set<ISiteConnection> set : sets)
+		{
+			intersectionSet.retainAll(set);
+		}
+
+		return intersectionSet;
+	}
+
+	/**
+	 * @param adaptable
+	 *            the IAdaptable object
+	 * @return the file store corresponding to the object
+	 */
+	public static IFileStore getFileStore(IAdaptable adaptable)
+	{
+		if (adaptable instanceof IResource)
+		{
+			IResource resource = (IResource) adaptable;
+			return EFSUtils.getFileStore(resource);
+		}
+		return (IFileStore) adaptable.getAdapter(IFileStore.class);
+	}
+
+	/**
+	 * @param adaptable
+	 *            the IAdaptable object
+	 * @return the array of file stores corresponding to the object
+	 */
+	public static IFileStore[] getFileStores(IAdaptable[] adaptable)
+	{
+		IFileStore[] fileStores = new IFileStore[adaptable.length];
+		for (int i = 0; i < fileStores.length; ++i)
+		{
+			fileStores[i] = SyncUtils.getFileStore(adaptable[i]);
+		}
+		return fileStores;
+	}
+
+	/**
+	 * @param adaptable
+	 *            the IAdaptable object
+	 * @return the file info corresponding to the object
+	 */
+	public static IFileInfo getFileInfo(IAdaptable adaptable)
+	{
+		IFileInfo fileInfo = (IFileInfo) adaptable.getAdapter(IFileInfo.class);
+		if (fileInfo == null)
+		{
+			IFileStore fileStore = getFileStore(adaptable);
+			if (fileStore != null)
+			{
+				fileInfo = FileSystemUtils.fetchFileInfo(fileStore);
+			}
+		}
+		return fileInfo;
+	}
+
+	public static IConnectionPoint findOrCreateConnectionPointFor(IAdaptable adaptable)
+	{
+		if (adaptable == null)
+		{
+			return null;
+		}
+		IConnectionPoint connectionPoint = (IConnectionPoint) adaptable.getAdapter(IConnectionPoint.class);
+		if (connectionPoint != null)
+		{
+			return connectionPoint;
+		}
+		IResource resource = (IResource) adaptable.getAdapter(IResource.class);
+		if (resource == null)
+		{
+			resource = (IResource) adaptable.getAdapter(IContainer.class);
+		}
+		if (resource instanceof IContainer)
+		{
+			return ConnectionPointUtils.findOrCreateWorkspaceConnectionPoint((IContainer) resource);
+		}
+		else
+		{
 			File file = (File) adaptable.getAdapter(File.class);
-			if (file != null) {
+			if (file != null)
+			{
 				return ConnectionPointUtils.findOrCreateLocalConnectionPoint(Path.fromOSString(file.getAbsolutePath()));
 			}
 		}
 		return null;
-    }
+	}
 
-	public static IFileStore[] getUploadFiles(IConnectionPoint sourceManager, IConnectionPoint destManager, IFileStore[] files, IProgressMonitor monitor)
-			throws IOException, CoreException
+	public static IFileStore[] getUploadFiles(IConnectionPoint sourceManager, IConnectionPoint destManager,
+			IFileStore[] files, IProgressMonitor monitor) throws IOException, CoreException
 	{
 		Set<IFileStore> newFiles = new HashSet<IFileStore>();
-	
+
 		// show be done via some sort of "import"
 		IFileStore file;
 		IFileStore[] parents;
@@ -148,107 +180,102 @@ public class SyncUtils {
 		{
 			file = files[i];
 			parents = getParentDirectories(file, sourceManager);
-	
+
 			for (int j = 0; j < parents.length; j++)
 			{
 				file2 = parents[j];
-	
-				if (!newFiles.contains(file2))
-				{
-					newFiles.add(file2);
-				}
-			}
-	
-			if (file.fetchInfo().isDirectory())
-			{
-				IFileStore newFile = EFSUtils.createFile(sourceManager.getRoot(), file, destManager.getRoot());
-				newFile.mkdir(EFS.NONE, null);
-				//IFileStore newFile = file; //sourceManager.createVirtualDirectory(EFSUtils.getAbsolutePath(file));
-	
+				IFileStore newFile = EFSUtils.createFile(sourceManager.getRoot(), file2, destManager.getRoot());
+
 				if (!newFiles.contains(newFile))
 				{
 					newFiles.add(newFile);
 				}
-	
-				newFiles.addAll(Arrays.asList(EFSUtils.getFiles(newFile, true, false, null)));
+			}
+
+			if (file.fetchInfo().isDirectory())
+			{
+				IFileStore newFile = EFSUtils.createFile(sourceManager.getRoot(), file, destManager.getRoot());
+				if (!newFiles.contains(newFile))
+				{
+					newFiles.add(newFile);
+				}
+				if (newFile.fetchInfo().exists())
+				{
+					newFiles.addAll(Arrays.asList(EFSUtils.getFiles(newFile, true, false, null)));
+				}
 			}
 			else
 			{
 				IFileStore newFile = EFSUtils.createFile(sourceManager.getRoot(), file, destManager.getRoot());
-				//IFileStore newFile = file; //sourceManager.createVirtualFile(EFSUtils.getAbsolutePath(file));
-	
 				if (!newFiles.contains(newFile))
 				{
 					newFiles.add(newFile);
 				}
 			}
 		}
-	
+
 		return newFiles.toArray(new IFileStore[newFiles.size()]);
 	}
 
-	public static IFileStore[] getDownloadFiles(IConnectionPoint sourceManager, IConnectionPoint destManager, IFileStore[] files, boolean ignoreError, IProgressMonitor monitor) 
+	public static IFileStore[] getDownloadFiles(IConnectionPoint sourceManager, IConnectionPoint destManager,
+			IFileStore[] files, boolean ignoreError, IProgressMonitor monitor)
+	{
+		Set<IFileStore> newFiles = new HashSet<IFileStore>();
+		IFileStore file;
+		IFileStore newFile;
+		for (int i = 0; i < files.length; i++)
 		{
-			Set<IFileStore> newFiles = new HashSet<IFileStore>();
-			IFileStore file;
-			//String filePath;
-			IFileStore newFile;
-			for (int i = 0; i < files.length; i++)
+			file = files[i];
+
+			newFile = null;
+			try
 			{
-				file = files[i];
-	//			filePath = EFSUtils.getRelativePath(file);
-	//			filePath = StringUtil.replace(filePath, file.getFileManager().getFileSeparator(), destManager
-	//					.getFileSeparator());
-	
-				newFile = null;
-				try
+				if (file.fetchInfo().isDirectory())
 				{
-					if (file.fetchInfo().isDirectory())
+					newFile = EFSUtils.createFile(sourceManager.getRoot(), file, destManager.getRoot());
+					newFile.mkdir(EFS.NONE, null);
+					IFileStore[] f = EFSUtils.getFiles(newFile, true, false, null);
+					if (!newFiles.contains(newFile))
 					{
-						newFile = EFSUtils.createFile(sourceManager.getRoot(), file, destManager.getRoot());
-						newFile.mkdir(EFS.NONE, null);
-						//destManager.createVirtualDirectory(destManager.getBasePath() + filePath);
-						IFileStore[] f = EFSUtils.getFiles(newFile, true, false, null);
+						newFiles.add(newFile);
+					}
+					newFiles.addAll(Arrays.asList(f));
+				}
+				else
+				{
+					newFile = EFSUtils.createFile(sourceManager.getRoot(), file, destManager.getRoot());
+					if (newFile.fetchInfo().exists())
+					{
 						if (!newFiles.contains(newFile))
 						{
 							newFiles.add(newFile);
 						}
-						newFiles.addAll(Arrays.asList(f));
-					}
-					else
-					{
-						newFile = EFSUtils.createFile(sourceManager.getRoot(), file, destManager.getRoot());
-						if (newFile.fetchInfo().exists())
-						{
-							if (!newFiles.contains(newFile))
-							{
-								newFiles.add(newFile);
-							}
-						}
-					}
-				}
-				catch (CoreException e)
-				{
-					if (newFile != null && !ignoreError)
-					{
-	//					SyncingConsole.println(StringUtil.format(Messages.FileDownloadAction_FileDoesNotExistAtRemoteSite,
-	//							newFile.getAbsolutePath())); // we ignore files that don't exist on the remote server
 					}
 				}
 			}
-	
-			return newFiles.toArray(new IFileStore[newFiles.size()]);
+			catch (CoreException e)
+			{
+				if (newFile != null && !ignoreError)
+				{
+					// SyncingConsole.println(StringUtils.format(Messages.FileDownloadAction_FileDoesNotExistAtRemoteSite,
+					// newFile.getAbsolutePath())); // we ignore files that don't exist on the remote server
+				}
+			}
 		}
-	
+
+		return newFiles.toArray(new IFileStore[newFiles.size()]);
+	}
+
 	/**
 	 * Creates a list of all parent directories of the current file (or directory)
 	 * 
 	 * @param file
 	 * @param sourceManager
 	 * @return IVirtualFile[]
-	 * @throws CoreException 
+	 * @throws CoreException
 	 */
-	public static IFileStore[] getParentDirectories(IFileStore file, IConnectionPoint sourceManager) throws CoreException
+	public static IFileStore[] getParentDirectories(IFileStore file, IConnectionPoint sourceManager)
+			throws CoreException
 	{
 		List<IFileStore> parentDirs = new ArrayList<IFileStore>();
 

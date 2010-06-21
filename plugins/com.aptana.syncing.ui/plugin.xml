@@ -273,6 +273,144 @@
          </action>
       </objectContribution>
    </extension>
+   
+   <extension
+         point="org.eclipse.ui.menus">
+		<menuContribution locationURI="popup:com.aptana.explorer.view?before=group.edit">
+		  <menu id="transfer.main" label="%Menu.Synchronize.name">
+		    <separator name="group1" visible="true"/>
+		    <separator name="group2" visible="true"/>
+		  </menu>
+		</menuContribution>
+      <menuContribution
+            locationURI="popup:transfer.main?after=group1">
+         <command
+               commandId="com.aptana.ide.syncing.ui.commands.synchronize"
+               icon="icons/full/obj16/sync_vertical.gif">
+         </command>
+         <command
+               commandId="com.aptana.ide.syncing.ui.commands.synchronize.files"
+               icon="icons/full/obj16/sync_both.gif">
+         </command>
+         <command
+               commandId="com.aptana.ide.syncing.ui.commands.upload"
+               icon="icons/full/obj16/put.gif">
+         </command>
+         <command
+               commandId="com.aptana.ide.syncing.ui.commands.download"
+               icon="icons/full/obj16/get.gif">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:transfer.main?after=group2">
+         <command
+               commandId="com.aptana.ide.syncing.ui.commands.cloak">
+         </command>
+         <command
+               commandId="com.aptana.ide.syncing.ui.commands.uncloak">
+         </command>
+      </menuContribution>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <viewerContribution
+            id="com.aptana.syncing.ui.appExplorerContribution"
+            targetID="com.aptana.explorer.view#PopupMenu">
+         <menu
+               id="aptanasynchronize"
+               label="%Menu.Synchronize.name"
+               path="group.edit">
+            <groupMarker
+                  name="syncingGroup">
+            </groupMarker>
+            <separator
+                  name="line">
+            </separator>
+            <groupMarker
+                  name="cloakingGroup">
+            </groupMarker>
+         </menu>
+         <action
+               class="com.aptana.ide.syncing.ui.actions.NewSiteAction"
+               enablesFor="1"
+               id="com.aptana.ide.syncing.ui.actions.ResourceNewSiteAction"
+               label="%Action.NewConnection.name"
+               menubarPath="aptanasynchronize/syncingGroup"
+               tooltip="%Action.NewConnection.tooltip">
+         </action>
+         <action
+               class="com.aptana.ide.syncing.ui.actions.DownloadAction"
+               icon="icons/full/obj16/get.gif"
+               id="com.aptana.ide.syncing.ui.actions.ResourceDownloadAction"
+               label="%Action.Download.name"
+               menubarPath="aptanasynchronize/syncingGroup"
+               tooltip="%Action.Download.tooltip">
+         </action>
+         <action
+               class="com.aptana.ide.syncing.ui.actions.UploadAction"
+               icon="icons/full/obj16/put.gif"
+               id="com.aptana.ide.syncing.ui.actions.ResourceUploadAction"
+               label="%Action.Upload.name"
+               menubarPath="aptanasynchronize/syncingGroup"
+               tooltip="%Action.Upload.tooltip">
+         </action>
+         <action
+               class="com.aptana.ide.syncing.ui.actions.SynchronizeFilesAction"
+               icon="icons/full/obj16/sync_both.gif"
+               id="com.aptana.ide.syncing.ui.actions.ResourceSynchronizeNewAction"
+               label="%Action.SynchronizeNew.name"
+               menubarPath="aptanasynchronize/syncingGroup"
+               tooltip="%Action.SynchronizeNew.tooltip">
+         </action>
+         <action
+               class="com.aptana.ide.syncing.ui.actions.SynchronizeAction"
+               enablesFor="1"
+               icon="icons/full/obj16/sync_vertical.gif"
+               id="com.aptana.ide.syncing.ui.actions.ResourceSynchronizeAction"
+               label="%Action.Synchronize.name"
+               menubarPath="aptanasynchronize/syncingGroup"
+               tooltip="%Action.Synchronize.tooltip">
+         </action>
+         <action
+               class="com.aptana.ide.syncing.ui.actions.UncloakAction"
+               id="com.aptana.ide.syncing.ui.actions.ResourceUncloakAction"
+               label="%Action.Uncloak.name"
+               menubarPath="aptanasynchronize/cloakingGroup"
+               tooltip="%Action.Uncloak.tooltip">
+         </action>
+         <action
+               class="com.aptana.ide.syncing.ui.actions.CloakAction"
+               id="com.aptana.ide.syncing.ui.actions.ResourceCloakAction"
+               label="%Action.Cloak.name"
+               menubarPath="aptanasynchronize/cloakingGroup"
+               tooltip="%Action.Cloak.tooltip">
+         </action>
+         <visibility>
+            <or>
+               <and>
+                  <objectClass
+                        name="org.eclipse.core.resources.IResource">
+                  </objectClass>
+                  <not>
+                     <objectClass
+                           name="org.eclipse.core.resources.IProject">
+                     </objectClass>
+                  </not>
+               </and>
+               <and>
+                  <objectClass
+                        name="org.eclipse.core.resources.IProject">
+                  </objectClass>
+                  <objectState
+                        name="open"
+                        value="true">
+                  </objectState>
+               </and>
+            </or>
+         </visibility>
+      </viewerContribution>
+   </extension>   
    <extension
          point="org.eclipse.ui.decorators">
       <decorator
@@ -338,6 +476,21 @@
       </command>
       <command
             categoryId="com.aptana.ide.syncing.ui.commands.category"
+            id="com.aptana.ide.syncing.ui.commands.synchronize.files"
+            name="%Action.SynchronizeNew.name">
+      </command>
+      <command
+            categoryId="com.aptana.ide.syncing.ui.commands.category"
+            id="com.aptana.ide.syncing.ui.commands.cloak"
+            name="%Action.Cloak.name">
+      </command>
+      <command
+            categoryId="com.aptana.ide.syncing.ui.commands.category"
+            id="com.aptana.ide.syncing.ui.commands.uncloak"
+            name="%Action.Uncloak.name">
+      </command>
+      <command
+            categoryId="com.aptana.ide.syncing.ui.commands.category"
             id="com.aptana.ide.syncing.ui.commands.upload"
             name="%Action.Upload.name">
       </command>
@@ -352,6 +505,69 @@
       <handler
             class="com.aptana.ide.syncing.ui.handlers.SynchronizeHandler"
             commandId="com.aptana.ide.syncing.ui.commands.synchronize">
+         <activeWhen>
+            <iterate>
+               <or>
+                  <instanceof
+                        value="org.eclipse.core.resources.IResource">
+                  </instanceof>
+                  <instanceof
+                        value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+                  </instanceof>
+               </or>
+            </iterate>
+         </activeWhen>
+         <enabledWhen>
+            <count
+                  value="+">
+            </count>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="com.aptana.ide.syncing.ui.handlers.CloakHandler"
+            commandId="com.aptana.ide.syncing.ui.commands.cloak">
+         <activeWhen>
+            <iterate>
+               <or>
+                  <instanceof
+                        value="org.eclipse.core.resources.IResource">
+                  </instanceof>
+                  <instanceof
+                        value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+                  </instanceof>
+               </or>
+            </iterate>
+         </activeWhen>
+         <enabledWhen>
+            <count
+                  value="+">
+            </count>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="com.aptana.ide.syncing.ui.handlers.UncloakHandler"
+            commandId="com.aptana.ide.syncing.ui.commands.uncloak">
+         <activeWhen>
+            <iterate>
+               <or>
+                  <instanceof
+                        value="org.eclipse.core.resources.IResource">
+                  </instanceof>
+                  <instanceof
+                        value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+                  </instanceof>
+               </or>
+            </iterate>
+         </activeWhen>
+         <enabledWhen>
+            <count
+                  value="+">
+            </count>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="com.aptana.ide.syncing.ui.handlers.SynchronizeFilesHandler"
+            commandId="com.aptana.ide.syncing.ui.commands.synchronize.files">
          <activeWhen>
             <iterate>
                <or>

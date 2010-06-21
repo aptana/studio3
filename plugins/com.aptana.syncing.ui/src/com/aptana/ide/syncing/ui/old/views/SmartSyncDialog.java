@@ -1199,8 +1199,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 					if (forceUp)
 					{
 						IFileStore[] clientFiles = (IFileStore[]) ((filesToBeSynced == null) ? EFSUtils.getFiles(
-								source, true, false, null) : SyncUtils.getUploadFiles(sourceConnectionPoint,
-								destConnectionPoint, filesToBeSynced, monitor));
+								source, true, false, null) : EFSUtils.getAllFiles(filesToBeSynced, true, false, monitor));
 						items = syncer.createSyncItems(clientFiles, new IFileStore[0], monitor);
 						Map<String, VirtualFileSyncPair> pairs = new HashMap<String, VirtualFileSyncPair>();
 						for (VirtualFileSyncPair item : items)
@@ -1246,15 +1245,14 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 					{
 						if (filesToBeSynced == null)
 						{
-							items = syncer.getSyncItems(sourceConnectionPoint, destConnectionPoint, source, dest,
-									monitor);
+							items = syncer.getSyncItems(sourceConnectionPoint, destConnectionPoint, source, dest, monitor);
 						}
 						else
 						{
-							IFileStore[] clientFiles = SyncUtils.getUploadFiles(sourceConnectionPoint,
+							IFileStore[] clientFiles = EFSUtils.getAllFiles(filesToBeSynced, true, false, monitor);
+							IFileStore[] serverFiles = SyncUtils.getUploadFiles(sourceConnectionPoint,
 									destConnectionPoint, filesToBeSynced, monitor);
-							IFileStore[] serverFiles = SyncUtils.getDownloadFiles(sourceConnectionPoint,
-									destConnectionPoint, filesToBeSynced, true, monitor);
+
 							items = syncer.createSyncItems(clientFiles, serverFiles, monitor);
 						}
 					}
