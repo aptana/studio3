@@ -41,7 +41,6 @@ import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
-import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.text.rules.EntityRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
