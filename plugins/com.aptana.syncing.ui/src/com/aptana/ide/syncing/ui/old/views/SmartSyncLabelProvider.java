@@ -37,7 +37,7 @@ package com.aptana.ide.syncing.ui.old.views;
 import java.text.DateFormat;
 import java.util.Date;
 
-import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableColorProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -84,7 +84,7 @@ public class SmartSyncLabelProvider implements ITableLabelProvider, ITableColorP
 	{
 		fDisplay = display;
 		fImages = new FileLabelProvider();
-		fNewColor = new Color(fDisplay, new RGB(216, 191, 216));
+		fNewColor = new Color(fDisplay, new RGB(96, 180, 247));
 		fOverwriteColor = new Color(fDisplay, new RGB(255, 165, 0));
 		fUpdateColor = new Color(fDisplay, new RGB(173, 216, 230));
 		fDeleteColor = fDisplay.getSystemColor(SWT.COLOR_RED);
@@ -273,10 +273,10 @@ public class SmartSyncLabelProvider implements ITableLabelProvider, ITableColorP
 					}
 				case 4:
 					VirtualFileSyncPair pair = resource.getPair();
-					return pair == null ? "" : getModificationDate(pair.getSourceFile()); //$NON-NLS-1$
+					return pair == null ? "" : getModificationDate(pair.getSourceFileInfo()); //$NON-NLS-1$
 				case 5:
 					pair = resource.getPair();
-					return pair == null ? "" : getModificationDate(pair.getDestinationFile()); //$NON-NLS-1$
+					return pair == null ? "" : getModificationDate(pair.getDestinationFileInfo()); //$NON-NLS-1$
 				default:
 					return ""; //$NON-NLS-1$
 			}
@@ -468,15 +468,15 @@ public class SmartSyncLabelProvider implements ITableLabelProvider, ITableColorP
 		}
 	}
 
-	private static String getModificationDate(IFileStore file)
+	private static String getModificationDate(IFileInfo file)
 	{
 		if (file == null)
 		{
 			return ""; //$NON-NLS-1$
 		}
-		Date d = new Date(file.fetchInfo().getLastModified());
+		Date d;
+		d = new Date(file.getLastModified());
 		DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
-
 		return df.format(d);
 	}
 

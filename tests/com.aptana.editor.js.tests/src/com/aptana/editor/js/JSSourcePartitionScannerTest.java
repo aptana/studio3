@@ -80,7 +80,27 @@ public class JSSourcePartitionScannerTest extends TestCase
 		assertContentType(JSSourceConfiguration.DEFAULT, source, 1);
 		assertContentType(JSSourceConfiguration.DEFAULT, source, 35);
 	}
+	
+	public void testSimpleRegexp()
+	{
+		String source = "var regexp = /^ace$/;\n";
 
+		assertContentType(JSSourceConfiguration.DEFAULT, source, 0);
+		assertContentType(JSSourceConfiguration.JS_REGEXP, source, 13);
+		assertContentType(JSSourceConfiguration.JS_REGEXP, source, 19);
+		assertContentType(JSSourceConfiguration.DEFAULT, source, 20);
+	}
+
+	public void testRegexpWithEscapeCharacter()
+	{
+		String source = "var regexp = /^\\/ace$/;\n";
+
+		assertContentType(JSSourceConfiguration.DEFAULT, source, 0);
+		assertContentType(JSSourceConfiguration.JS_REGEXP, source, 13);
+		assertContentType(JSSourceConfiguration.JS_REGEXP, source, 21);
+		assertContentType(JSSourceConfiguration.DEFAULT, source, 22);
+	}
+	
 	public void testComplexRegexp()
 	{
 		String source =

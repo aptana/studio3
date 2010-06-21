@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -19,12 +20,18 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.ShellExecutable;
+import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.ProcessUtil;
+import com.aptana.core.util.ResourceUtil;
 import com.aptana.editor.ruby.index.RubyFileIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexActivator;
@@ -65,65 +72,138 @@ public class CoreStubber extends Job
 			{
 				generateCoreStubs(outputDir, finishMarker);
 			}
-			sub.setWorkRemaining(90);
+			sub.setWorkRemaining(10);
 
-			IProgressMonitor pm = Job.getJobManager().createProgressGroup();
-			List<Job> jobs = new ArrayList<Job>();
+			final IProgressMonitor pm = Job.getJobManager().createProgressGroup();
+			final List<Job> jobs = new ArrayList<Job>();
 			jobs.add(indexCoreStubs(rubyVersion, outputDir));
 			jobs.addAll(indexStdLib());
 			jobs.addAll(indexGems());
 			pm.beginTask("Indexing Ruby environment", jobs.size());
 			for (Job job : jobs)
 			{
+				if (job == null)
+				{
+					continue;
+				}
 				job.setProgressGroup(pm, 1);
 				job.schedule();
 			}
-			// TODO How can we ever call done on this progress monitor? it's sticking in the progress view..
+			// Use a thread to report back to progress monitor when all the jobs are done.
+			Thread t = new Thread(new Runnable()
+			{
+
+				@Override
+				public void run()
+				{
+					for (Job job : jobs)
+					{
+						if (job == null)
+						{
+							continue;
+						}
+						try
+						{
+							job.join();
+						}
+						catch (InterruptedException e)
+						{
+							// ignore
+						}
+					}
+					pm.done();
+				}
+			});
+			t.start();
 		}
 		catch (Exception e)
 		{
 			return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e);
 		}
-		sub.done();
+		finally
+		{
+			sub.done();
+		}
 		return Status.OK_STATUS;
 	}
 
 	protected List<Job> indexGems()
 	{
 		List<Job> jobs = new ArrayList<Job>();
-		String gemEnvOutput = ProcessUtil.outputForCommand("gem", null, ShellExecutable.getEnvironment(),
-				"env", "gempath"); //$NON-NLS-1$
-		String[] gemPaths = gemEnvOutput.split(":"); // FIXME Does this need to be File.pathSeparator?
-		for (String gemPath : gemPaths)
+		for (IPath gemPath : getGemPaths())
 		{
-			IPath gemsPath = new Path(gemPath).append("gems");
-			Index index = IndexManager.getInstance().getIndex(gemsPath.toPortableString());
-			jobs.add(indexFiles(MessageFormat.format("Indexing {0}", gemsPath.toPortableString()), index,
-					addFiles(gemsPath.toFile())));
+			Index index = IndexManager.getInstance().getIndex(gemPath.toOSString());
+			jobs.add(indexFiles(MessageFormat.format("Indexing {0}", gemPath.toOSString()), index,
+					addFiles(gemPath.toFile())));
 		}
 		return jobs;
+	}
+
+	public static Set<IPath> getGemPaths()
+	{
+		IPath gemCommand = ExecutableUtil.find("gem", true, null);
+		String command = "gem";
+		if (gemCommand != null)
+		{
+			command = gemCommand.toOSString();
+		}
+		// FIXME Not finding my user gem path on Windows...
+		String gemEnvOutput = ProcessUtil.outputForCommand(command, null, ShellExecutable.getEnvironment(),
+				"env", "gempath"); //$NON-NLS-1$
+		if (gemEnvOutput == null)
+		{
+			return Collections.emptySet();
+		}
+		Set<IPath> paths = new HashSet<IPath>();
+		String[] gemPaths = gemEnvOutput.split(File.pathSeparator);
+		if (gemPaths != null)
+		{
+			for (String gemPath : gemPaths)
+			{
+				IPath gemsPath = new Path(gemPath).append("gems");
+				paths.add(gemsPath);
+			}
+		}
+		return paths;
 	}
 
 	protected List<Job> indexStdLib()
 	{
 		List<Job> jobs = new ArrayList<Job>();
-		// Now index the loadpaths (Std Lib!)
-		String rawLoadPathOutput = ProcessUtil.outputForCommand(RUBY_EXE, null, ShellExecutable.getEnvironment(),
-				"-e", "puts $:"); //$NON-NLS-1$ //$NON-NLS-2$
-		String[] loadpaths = rawLoadPathOutput.split("\r\n|\r|\n"); //$NON-NLS-1$
-		// TODO What about when one loadpath is a parent of another, just filter to parent?
-		for (String loadpath : loadpaths)
+		for (IPath loadpath : getLoadpaths())
 		{
-			if (loadpath.equals(".")) //$NON-NLS-1$
-				continue;
-			Index index = IndexManager.getInstance().getIndex(loadpath);
-			Job job = indexFiles(MessageFormat.format("Indexing {0}", loadpath), index, addFiles(new File(loadpath)));
+			Index index = IndexManager.getInstance().getIndex(loadpath.toOSString());
+			Job job = indexFiles(MessageFormat.format("Indexing {0}", loadpath.toOSString()), index,
+					addFiles(loadpath.toFile()));
 			if (job != null)
 			{
 				jobs.add(job);
 			}
 		}
 		return jobs;
+	}
+
+	public static Set<IPath> getLoadpaths()
+	{
+		String rawLoadPathOutput = ProcessUtil.outputForCommand(RUBY_EXE, null, ShellExecutable.getEnvironment(),
+				"-e", "puts $:"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (rawLoadPathOutput == null)
+		{
+			return Collections.emptySet();
+		}
+		Set<IPath> paths = new HashSet<IPath>();
+		String[] loadpaths = rawLoadPathOutput.split("\r\n|\r|\n"); //$NON-NLS-1$
+		if (loadpaths != null)
+		{
+			// TODO What about when one loadpath is a parent of another, just filter to parent?
+			for (String loadpath : loadpaths)
+			{
+				if (loadpath.equals(".")) //$NON-NLS-1$
+					continue;
+				paths.add(new Path(loadpath));
+			}
+		}
+		return paths;
 	}
 
 	protected Job indexCoreStubs(String rubyVersion, File outputDir)
@@ -135,10 +215,10 @@ public class CoreStubber extends Job
 	protected void generateCoreStubs(File outputDir, File finishMarker) throws IOException
 	{
 		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(CORE_STUBBER_PATH), null);
-		url = FileLocator.toFileURL(url);
+		File stubberScript = ResourceUtil.resourcePathToFile(url);
 
 		Map<Integer, String> stubberResult = ProcessUtil.runInBackground(RUBY_EXE, null,
-				ShellExecutable.getEnvironment(), url.getFile(), outputDir.getAbsolutePath());
+				ShellExecutable.getEnvironment(), stubberScript.getAbsolutePath(), outputDir.getAbsolutePath());
 		int exitCode = stubberResult.keySet().iterator().next();
 		if (exitCode != 0)
 		{
@@ -223,7 +303,8 @@ public class CoreStubber extends Job
 
 			try
 			{
-				// Should check timestamp of index versus timestamps of files, only index files that are out of date!
+				// Should check timestamp of index versus timestamps of files, only index files that are out of date
+				// (for Ruby)!
 				filterFiles();
 
 				// First cleanup indices for files
@@ -242,11 +323,21 @@ public class CoreStubber extends Job
 
 				// Now parse and index the source
 				RubyFileIndexingParticipant fileIndexingParticipant = new RubyFileIndexingParticipant();
+				long timestamp = System.currentTimeMillis();
 				fileIndexingParticipant.index(files, index, sub.newChild(files.size()));
+
+				// Store some timestamp we can use to limit next pass indexing
+				IEclipsePreferences prefs = new InstanceScope().getNode(Activator.PLUGIN_ID);
+				prefs.putLong(getIndexTimestampKey(), timestamp);
+				prefs.flush();
 			}
 			catch (CoreException e)
 			{
 				return e.getStatus();
+			}
+			catch (BackingStoreException e)
+			{
+				Activator.log(e);
 			}
 			finally
 			{
@@ -262,9 +353,16 @@ public class CoreStubber extends Job
 			return Status.OK_STATUS;
 		}
 
+		private String getIndexTimestampKey()
+		{
+			return "LastIndex_Ruby_" + index.getIndexFile().getAbsolutePath();
+		}
+
 		private void filterFiles()
 		{
-			long indexLastModified = index.getIndexFile().lastModified();
+			// We store something in the prefs for the last timestamp, since we can't go off timestamp of disk index.
+			long indexLastModified = Platform.getPreferencesService().getLong(Activator.PLUGIN_ID,
+					getIndexTimestampKey(), -1, null);
 			Iterator<IFileStore> iter = files.iterator();
 			while (iter.hasNext())
 			{

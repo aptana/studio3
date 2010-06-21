@@ -1,10 +1,15 @@
 package com.aptana.ui.widgets;
 
+import java.util.regex.Pattern;
+
+import org.eclipse.search.internal.core.text.PatternConstructor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -14,8 +19,10 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.ui.UIPlugin;
 
+@SuppressWarnings("restriction")
 public class SearchComposite extends Composite
 {
 
@@ -29,8 +36,13 @@ public class SearchComposite extends Composite
 	private static final String INITIAL_TEXT = Messages.SingleProjectView_InitialFileFilterText;
 
 	private Text searchText;
-	private boolean caseSensitiveSearch;
-	private boolean regularExpressionSearch;
+	private ToolItem caseSensitiveMenuItem;
+	private ToolItem regularExressionMenuItem;
+	private boolean searchOnEnter = true;
+	private String initialText = INITIAL_TEXT;
+	private String lastSearch = StringUtil.EMPTY;
+	private boolean lastCaseSensitiveState;
+	private boolean lastRegularExpressionState;
 
 	private Client client;
 
@@ -50,7 +62,7 @@ public class SearchComposite extends Composite
 		setLayout(searchGridLayout);
 
 		searchText = new Text(this, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
-		searchText.setText(INITIAL_TEXT);
+		searchText.setText(initialText);
 		searchText.setToolTipText(Messages.SingleProjectView_Wildcard);
 		searchText.setForeground(searchText.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		searchText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
@@ -62,7 +74,7 @@ public class SearchComposite extends Composite
 			{
 				if (searchText.getText().length() == 0)
 				{
-					searchText.setText(INITIAL_TEXT);
+					searchText.setText(initialText);
 				}
 				searchText.setForeground(searchText.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 			}
@@ -70,7 +82,7 @@ public class SearchComposite extends Composite
 			@Override
 			public void focusGained(FocusEvent e)
 			{
-				if (searchText.getText().equals(INITIAL_TEXT))
+				if (searchText.getText().equals(initialText))
 				{
 					searchText.setText(""); //$NON-NLS-1$
 				}
@@ -92,11 +104,18 @@ public class SearchComposite extends Composite
 				{
 					return;
 				}
-
-				if (e.keyCode == 0x0D)
+				if (searchOnEnter && e.keyCode == SWT.CR)
 				{
 					searchText();
 					e.doit = false;
+				}
+			}
+		});
+		searchText.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				if (!searchOnEnter) {
+					searchText();
 				}
 			}
 		});
@@ -105,33 +124,55 @@ public class SearchComposite extends Composite
 		ToolBar toolbar = new ToolBar(this, SWT.NONE);
 		toolbar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
-		final ToolItem caseSensitiveMenuItem = new ToolItem(toolbar, SWT.CHECK);
+		caseSensitiveMenuItem = new ToolItem(toolbar, SWT.CHECK);
 		caseSensitiveMenuItem.setImage(UIPlugin.getImage(CASE_SENSITIVE_ICON_PATH));
 		caseSensitiveMenuItem.setToolTipText(Messages.SingleProjectView_CaseSensitive);
-		caseSensitiveMenuItem.setSelection(caseSensitiveSearch);
+		caseSensitiveMenuItem.setSelection(lastCaseSensitiveState);
 		caseSensitiveMenuItem.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				caseSensitiveSearch = caseSensitiveMenuItem.getSelection();
 				searchText.setFocus();
+				if (!searchOnEnter) {
+					searchText();
+				}
 			}
 		});
 
-		final ToolItem regularExressionMenuItem = new ToolItem(toolbar, SWT.CHECK);
+		regularExressionMenuItem = new ToolItem(toolbar, SWT.CHECK);
 		regularExressionMenuItem.setImage(UIPlugin.getImage(REGULAR_EXPRESSION_ICON_PATH));
 		regularExressionMenuItem.setToolTipText(Messages.SingleProjectView_RegularExpression);
-		regularExressionMenuItem.setSelection(regularExpressionSearch);
+		regularExressionMenuItem.setSelection(lastRegularExpressionState);
 		regularExressionMenuItem.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				regularExpressionSearch = regularExressionMenuItem.getSelection();
 				searchText.setFocus();
+				if (!searchOnEnter) {
+					searchText();
+				}
 			}
 		});
+	}
+
+	/**
+	 * @param searchOnEnter the searchOnEnter to set
+	 */
+	public void setSearchOnEnter(boolean searchOnEnter) {
+		this.searchOnEnter = searchOnEnter;
+	}
+
+	/**
+	 * @param initialText the initialText to set
+	 */
+	public void setInitialText(String initialText) {
+		if (searchText.getText().equals(this.initialText)) {
+			this.initialText = initialText;
+			searchText.setText(initialText);
+		}
+		this.initialText = initialText;
 	}
 
 	@Override
@@ -148,9 +189,29 @@ public class SearchComposite extends Composite
 	private void searchText()
 	{
 		String text = searchText.getText();
-		if (text.length() > 0 && client != null)
-		{
-			client.search(text, caseSensitiveSearch, regularExpressionSearch);
+		if (initialText.equals(text)) {
+			text = StringUtil.EMPTY;
 		}
+		if (client != null
+				&& (searchOnEnter
+						|| !text.equals(lastSearch)
+						|| (caseSensitiveMenuItem.getSelection() != lastCaseSensitiveState)
+						|| (regularExressionMenuItem.getSelection() != lastRegularExpressionState)))
+		{
+			lastSearch = text;
+			lastCaseSensitiveState = caseSensitiveMenuItem.getSelection();
+			lastRegularExpressionState = regularExressionMenuItem.getSelection();
+			client.search(text, lastCaseSensitiveState, lastRegularExpressionState);
+		}
+	}
+
+	/**
+	 * Create a default search pattern taking into consideration case sensitivity and regular expression settings
+	 * 
+	 * @return
+	 */
+	public Pattern createSearchPattern()
+	{
+		return PatternConstructor.createPattern(searchText.getText(), lastCaseSensitiveState, lastRegularExpressionState);
 	}
 }

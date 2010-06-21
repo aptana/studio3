@@ -126,8 +126,7 @@ public class OptionsToolBar
 	 * Sets the current type of presentation.
 	 * 
 	 * @param type
-	 *            the specific presentation type to be set (could be FLAT_VIEW
-	 *            or TREE_VIEW)
+	 *            the specific presentation type to be set (could be FLAT_VIEW or TREE_VIEW)
 	 */
 	public void setPresentationType(int type)
 	{
@@ -142,14 +141,14 @@ public class OptionsToolBar
 	}
 
 	/**
-     * Sets if showing of the modification dates is selected.
-     * 
-     * @param selected
-     *            true if it is to be selected, false otherwise
-     */
+	 * Sets if showing of the modification dates is selected.
+	 * 
+	 * @param selected
+	 *            true if it is to be selected, false otherwise
+	 */
 	public void setShowDatesSelected(boolean selected)
 	{
-	    fShowDates.setSelection(selected);
+		fShowDates.setSelection(selected);
 	}
 
 	/**
@@ -160,7 +159,10 @@ public class OptionsToolBar
 	 */
 	public void setEnabled(boolean enabled)
 	{
-		fOptionsBar.setEnabled(enabled);
+		if (!fOptionsBar.isDisposed())
+		{
+			fOptionsBar.setEnabled(enabled);
+		}
 	}
 
 	private ToolBar createContents(final Composite parent)
@@ -172,8 +174,9 @@ public class OptionsToolBar
 		optionsBar.setLayout(layout);
 
 		fDropdown = new ToolItem(optionsBar, SWT.DROP_DOWN);
-		fDropdown.setText(Messages.SmartSyncDialog_ViewOptions);
+		// fDropdown.setText(Messages.SmartSyncDialog_ViewOptions);
 		fDropdown.setToolTipText(Messages.SmartSyncDialog_OptionsToolTip);
+		fDropdown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/configure.gif"));
 
 		final Menu menu = new Menu(optionsBar);
 		fDropdown.addSelectionListener(new SelectionAdapter()

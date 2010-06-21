@@ -83,7 +83,7 @@ public class SmartSyncEventManager
 	 * @param completedPairs
 	 * @param sourceManager
 	 * @param destinationManager
-	 * @param comment 
+	 * @param comment
 	 */
 	public void fireEvent(VirtualFileSyncPair[] completedPairs, IConnectionPoint sourceManager,
 			IConnectionPoint destinationManager, String comment)

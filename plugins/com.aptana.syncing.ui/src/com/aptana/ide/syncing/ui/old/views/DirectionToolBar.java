@@ -49,6 +49,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
+import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 
 /**
  * @author Kevin Sawicki (ksawicki@aptana.com)
@@ -120,8 +121,7 @@ public class DirectionToolBar
 	/**
 	 * Returns the current menu selection.
 	 * 
-	 * @return the current menu selection (could be BOTH, UPLOAD, DOWNLOAD,
-	 *         FORCE_UPLOAD, or FORCE_DOWNLOAD)
+	 * @return the current menu selection (could be BOTH, UPLOAD, DOWNLOAD, FORCE_UPLOAD, or FORCE_DOWNLOAD)
 	 */
 	public int getSelection()
 	{
@@ -145,44 +145,43 @@ public class DirectionToolBar
 	}
 
 	/**
-     * Sets the current selected item.
-     * 
-     * @param direction
-     *            the item to be selected (could be BOTH, UPLOAD, DOWNLOAD,
-     *            FORCE_UPLOAD, or FORCE_DOWNLOAD)
-     */
+	 * Sets the current selected item.
+	 * 
+	 * @param direction
+	 *            the item to be selected (could be BOTH, UPLOAD, DOWNLOAD, FORCE_UPLOAD, or FORCE_DOWNLOAD)
+	 */
 	public void setSelection(int direction)
 	{
-	    fBoth.setSelection(false);
-	    fUpload.setSelection(false);
-	    fDownload.setSelection(false);
-	    fForceUpload.setSelection(false);
-	    fForceDownload.setSelection(false);
-	    switch (direction)
-	    {
-	    case BOTH:
-	        fBoth.setSelection(true);
-	        fPreviousSelection = fBoth;
-	        break;
-	    case UPLOAD:
-	        fUpload.setSelection(true);
-	        fPreviousSelection = fUpload;
-	        break;
-	    case DOWNLOAD:
-	        fDownload.setSelection(true);
-	        fPreviousSelection = fDownload;
-	        break;
-	    case FORCE_UPLOAD:
-	        fForceUpload.setSelection(true);
-	        fPreviousSelection = fForceUpload;
-	        break;
-	    case FORCE_DOWNLOAD:
-	        fForceDownload.setSelection(true);
-	        fPreviousSelection = fForceDownload;
-	        break;
-	    }
-	    updateText();
-	    updateToolTip();
+		fBoth.setSelection(false);
+		fUpload.setSelection(false);
+		fDownload.setSelection(false);
+		fForceUpload.setSelection(false);
+		fForceDownload.setSelection(false);
+		switch (direction)
+		{
+			case BOTH:
+				fBoth.setSelection(true);
+				fPreviousSelection = fBoth;
+				break;
+			case UPLOAD:
+				fUpload.setSelection(true);
+				fPreviousSelection = fUpload;
+				break;
+			case DOWNLOAD:
+				fDownload.setSelection(true);
+				fPreviousSelection = fDownload;
+				break;
+			case FORCE_UPLOAD:
+				fForceUpload.setSelection(true);
+				fPreviousSelection = fForceUpload;
+				break;
+			case FORCE_DOWNLOAD:
+				fForceDownload.setSelection(true);
+				fPreviousSelection = fForceDownload;
+				break;
+		}
+		updateText();
+		updateToolTip();
 	}
 
 	/**
@@ -193,7 +192,10 @@ public class DirectionToolBar
 	 */
 	public void setEnabled(boolean enabled)
 	{
-		fDirectionBar.setEnabled(enabled);
+		if (!fDirectionBar.isDisposed())
+		{
+			fDirectionBar.setEnabled(enabled);
+		}
 	}
 
 	private ToolBar createContents(final Composite parent)
@@ -205,6 +207,7 @@ public class DirectionToolBar
 		directionBar.setLayout(layout);
 
 		fDirectionDown = new ToolItem(directionBar, SWT.DROP_DOWN);
+		fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/sync_both.gif"));
 
 		final Menu directionMenu = new Menu(directionBar);
 		fDirectionDown.addSelectionListener(new SelectionAdapter()
@@ -237,7 +240,7 @@ public class DirectionToolBar
 					return;
 				}
 
-				fDirectionDown.setText(item.getText());
+				updateText();
 				updateToolTip();
 				parent.getParent().layout(true, true);
 
@@ -264,22 +267,22 @@ public class DirectionToolBar
 		fBoth.addSelectionListener(directionAdapter);
 
 		fUpload = new MenuItem(directionMenu, SWT.RADIO);
-		fUpload.setText(Messages.SmartSyncDialog_Upload + "  ->"); //$NON-NLS-1$
+		fUpload.setText(Messages.SmartSyncDialog_Upload); //$NON-NLS-1$
 		fUpload.addSelectionListener(directionAdapter);
 
 		fForceUpload = new MenuItem(directionMenu, SWT.RADIO);
-		fForceUpload.setText(Messages.SmartSyncDialog_UploadAll + "  ->"); //$NON-NLS-1$
+		fForceUpload.setText(Messages.SmartSyncDialog_UploadAll); //$NON-NLS-1$
 		fForceUpload.addSelectionListener(directionAdapter);
 
 		fDownload = new MenuItem(directionMenu, SWT.RADIO);
-		fDownload.setText("<-  " + Messages.SmartSyncDialog_Download); //$NON-NLS-1$
+		fDownload.setText(Messages.SmartSyncDialog_Download); //$NON-NLS-1$
 		fDownload.addSelectionListener(directionAdapter);
 
 		fForceDownload = new MenuItem(directionMenu, SWT.RADIO);
-		fForceDownload.setText("<-  " + Messages.SmartSyncDialog_DownloadAll); //$NON-NLS-1$
+		fForceDownload.setText(Messages.SmartSyncDialog_DownloadAll); //$NON-NLS-1$
 		fForceDownload.addSelectionListener(directionAdapter);
 
-		fDirectionDown.setText(fBoth.getText());
+		// fDirectionDown.setText(fBoth.getText());
 		updateToolTip();
 		fPreviousSelection = fBoth;
 
@@ -288,26 +291,31 @@ public class DirectionToolBar
 
 	private void updateText()
 	{
-	    if (fBoth.getSelection())
-        {
-	        fDirectionDown.setText(fBoth.getText());
-        }
-        else if (fUpload.getSelection())
-        {
-            fDirectionDown.setText(fUpload.getText());
-        }
-        else if (fForceUpload.getSelection())
-        {
-            fDirectionDown.setText(fForceUpload.getText());
-        }
-        else if (fDownload.getSelection())
-        {
-            fDirectionDown.setText(fDownload.getText());
-        }
-        else if (fForceDownload.getSelection())
-        {
-            fDirectionDown.setText(fForceDownload.getText());
-        }
+		if (fBoth.getSelection())
+		{
+			fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/direction_both.gif"));
+			// fDirectionDown.setText(fBoth.getText());
+		}
+		else if (fUpload.getSelection())
+		{
+			fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/direction_upload.gif"));
+			// fDirectionDown.setText(fUpload.getText());
+		}
+		else if (fForceUpload.getSelection())
+		{
+			fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/direction_upload_force.gif"));
+			// fDirectionDown.setText(fForceUpload.getText());
+		}
+		else if (fDownload.getSelection())
+		{
+			fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/direction_download.gif"));
+			// fDirectionDown.setText(fDownload.getText());
+		}
+		else if (fForceDownload.getSelection())
+		{
+			fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/direction_download_force.gif"));
+			// fDirectionDown.setText(fForceDownload.getText());
+		}
 	}
 
 	private void updateToolTip()

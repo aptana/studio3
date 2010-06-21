@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -28,6 +27,7 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.ruby.Activator;
+import com.aptana.editor.ruby.CoreStubber;
 import com.aptana.editor.ruby.index.IRubyIndexConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
@@ -36,7 +36,7 @@ import com.aptana.index.core.SearchPattern;
 
 public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 {
-	private static final String NAMESPACE_DELIMITER = "::";
+	private static final String NAMESPACE_DELIMITER = "::"; //$NON-NLS-1$
 
 	/**
 	 * Separates file locations when using multiple values for proposal.
@@ -88,8 +88,8 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 					String enclosing = getNamespace(fullPrefix);
 					String subPrefix = getShortPrefix(fullPrefix);
 
-					String searchKey = "^" + subPrefix + "(.*)?" + IRubyIndexConstants.SEPARATOR + enclosing
-							+ IRubyIndexConstants.SEPARATOR + ".*$";
+					String searchKey = "^" + subPrefix + "(.*)?" + IRubyIndexConstants.SEPARATOR + enclosing //$NON-NLS-1$ //$NON-NLS-2$
+							+ IRubyIndexConstants.SEPARATOR + ".*$"; //$NON-NLS-1$
 					partialResults = index.query(new String[] { IRubyIndexConstants.TYPE_DECL }, searchKey,
 							SearchPattern.REGEX_MATCH | SearchPattern.CASE_SENSITIVE);
 
@@ -201,7 +201,7 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 		int index = fullPrefix.lastIndexOf(NAMESPACE_DELIMITER);
 		if (index == -1)
 		{
-			return "";
+			return ""; //$NON-NLS-1$
 		}
 		return fullPrefix.substring(0, index);
 	}
@@ -250,29 +250,19 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		indices.add(getRubyCoreIndex());
 
-		// TODO Extract common code with CoreStubber out to some class!
 		// Now add the Std Lib indices
-		String rawLoadPathOutput = ProcessUtil.outputForCommand("ruby", null, ShellExecutable.getEnvironment(), "-e", //$NON-NLS-1$//$NON-NLS-2$
-				"puts $:"); //$NON-NLS-1$
-		String[] loadpaths = rawLoadPathOutput.split("\r\n|\r|\n"); //$NON-NLS-1$
-		for (String loadpath : loadpaths)
+		for (IPath loadpath : CoreStubber.getLoadpaths())
 		{
-			if (loadpath.equals(".")) //$NON-NLS-1$
-				continue;
-			Index index = IndexManager.getInstance().getIndex(loadpath);
+			Index index = IndexManager.getInstance().getIndex(loadpath.toOSString());
 			if (index != null)
 			{
 				indices.add(index);
 			}
 		}
-
-		String gemEnvOutput = ProcessUtil.outputForCommand("gem", null, ShellExecutable.getEnvironment(),
-				"env", "gempath"); //$NON-NLS-1$
-		String[] gemPaths = gemEnvOutput.split(":"); // FIXME Does this need to be File.pathSeparator?
-		for (String gemPath : gemPaths)
+		// Now gems
+		for (IPath gemsPath : CoreStubber.getGemPaths())
 		{
-			IPath gemsPath = new Path(gemPath).append("gems");
-			Index index = IndexManager.getInstance().getIndex(gemsPath.toPortableString());
+			Index index = IndexManager.getInstance().getIndex(gemsPath.toOSString());
 			if (index != null)
 			{
 				indices.add(index);
