@@ -39,6 +39,7 @@ import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.console.ConsoleView;
 import org.eclipse.ui.internal.progress.ProgressView;
 import org.eclipse.ui.internal.views.markers.ExtendedMarkersView;
 import org.eclipse.ui.part.IPage;
@@ -271,6 +272,10 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 			{
 				hookTheme(memPane.getControl(), revertToDefaults);
 			}
+		}
+		else if (view instanceof ConsoleView)
+		{
+			hijackConsole(view);
 		}
 		// else if (view.getClass().getName().equals("org.eclipse.search2.internal.ui.SearchView"))
 		// {
@@ -744,9 +749,10 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 	@Override
 	public void partActivated(IWorkbenchPart part)
 	{
-		if(part instanceof IViewPart)
+		if(part instanceof IViewPart){
 			hijackHistory((IViewPart) part);
-		
+			hijackConsole((IViewPart) part);		
+		}
 		if (!(part instanceof IEditorPart))
 			return;
 		
@@ -766,6 +772,15 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 			
 		}
 		return false;
+	}
+	
+	protected void hijackConsole(IViewPart view)
+	{
+		if (view instanceof ConsoleView)
+		{
+			IPage currentPage = ((ConsoleView) view).getCurrentPage();
+			hookTheme(currentPage.getControl(), false);
+		}
 	}
 	
 	protected void hijackOutline()
