@@ -9,8 +9,6 @@ import java.util.zip.CRC32;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
-import com.aptana.internal.index.core.ReadWriteMonitor;
-
 public class IndexManager
 {
 	private static IndexManager instance;
@@ -86,33 +84,6 @@ public class IndexManager
 			}
 		}
 		return index;
-	}
-
-	/**
-	 * removeDocument
-	 * 
-	 * @param container
-	 * @param documentPath
-	 */
-	@SuppressWarnings("unused")
-	private void removeDocument(IPath container, String documentPath)
-	{
-		Index index = getIndex(container.toPortableString());
-		if (index == null)
-			return;
-		ReadWriteMonitor monitor = index.monitor;
-		if (monitor == null)
-			return; // index got deleted since acquired
-
-		try
-		{
-			monitor.enterWrite(); // ask permission to write
-			index.remove(documentPath);
-		}
-		finally
-		{
-			monitor.exitWrite(); // free write lock
-		}
 	}
 
 	/**

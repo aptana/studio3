@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -28,9 +29,13 @@ import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.parsing.JSTokenScanner;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
+import com.aptana.editor.js.parsing.ast.JSFunctionNode;
+import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
+import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.index.core.Index;
+import com.aptana.parsing.Scope;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 import com.aptana.parsing.lexer.Lexeme;
@@ -286,31 +291,78 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		if (this._targetNode != null)
 		{
-			IParseNode node = (this._targetNode.contains(offset)) ? this._targetNode : this.getAST();
 			String fileLocation = this.getFilename();
-			Map<String,Classification> args = this._astHelper.getSymbolsInScope(node);
 			
-			for (Entry<String,Classification> entry : args.entrySet())
+			if (Platform.inDevelopmentMode())
 			{
-				boolean isFunction = (entry.getValue() == Classification.FUNCTION);
-				String name = (isFunction) ? entry.getKey() + PARENS : entry.getKey();
-				String description = null;
-				Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
-				Image[] userAgents = this.getAllUserAgentIcons();
+				IParseNode ast = this.getAST();
 				
-				this.addProposal(proposals, name, image, description, userAgents, fileLocation, offset);
+				if (ast instanceof JSParseRootNode)
+				{
+					JSParseRootNode root = (JSParseRootNode) ast;
+					Scope<JSNode> globalScope = root.getGlobalScope();
+					
+					if (globalScope != null)
+					{
+						Scope<JSNode> currentScope = globalScope.getScopeAtOffset(offset);
+						
+						if (currentScope != null)
+						{
+							List<String> symbols = currentScope.getSymbolNames();
+							
+							for (String symbol : symbols)
+							{
+								boolean isFunction = false;
+								List<JSNode> nodes = currentScope.getSymbol(symbol);
+								
+								if (nodes != null)
+								{
+									for (JSNode node : nodes)
+									{
+										if (node instanceof JSFunctionNode)
+										{
+											isFunction = true;
+											break;
+										}
+									}
+								}
+								
+								String name = (isFunction) ? symbol + PARENS : symbol;
+								String description = null;
+								Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
+								Image[] userAgents = this.getAllUserAgentIcons();
+								
+								this.addProposal(proposals, name, image, description, userAgents, fileLocation, offset);
+							}
+						}
+					}
+				}
+			}
+			else
+			{
+				IParseNode node = (this._targetNode.contains(offset)) ? this._targetNode : this.getAST();
+				Map<String,Classification> args = this._astHelper.getSymbolsInScope(node);
+				
+				for (Entry<String,Classification> entry : args.entrySet())
+				{
+					boolean isFunction = (entry.getValue() == Classification.FUNCTION);
+					String name = (isFunction) ? entry.getKey() + PARENS : entry.getKey();
+					String description = null;
+					Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
+					Image[] userAgents = this.getAllUserAgentIcons();
+					
+					this.addProposal(proposals, name, image, description, userAgents, fileLocation, offset);
+				}
 			}
 		}
 	}
 	
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * com.aptana.editor.common.CommonContentAssistProcessor#computeCompletionProposals(org.eclipse.jface.text.ITextViewer
-	 * , int, char, boolean)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#doComputeCompletionProposals(org.eclipse.jface.text.ITextViewer, int, char, boolean)
 	 */
 	@Override
-	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
+	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
 	{
 		IDocument document = viewer.getDocument();
 		LexemeProvider<JSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
@@ -389,23 +441,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		
 		if (this._targetNode != null)
 		{
-			// move up to nearest statement
-			this._statementNode = this._targetNode;
-			
-			IParseNode parent = this._statementNode.getParent();
-			
-			while (parent != null)
-			{
-				if (parent instanceof ParseRootNode || parent.getType() == JSNodeTypes.STATEMENTS)
-				{
-					break;
-				}
-				else
-				{
-					this._statementNode = parent;
-					parent = parent.getParent();
-				}
-			}
+			this._statementNode = ((JSNode) this._targetNode).getContainingStatementNode();
 			
 			result = new JSLexemeProvider(document, this._statementNode, new JSTokenScanner());
 		}
@@ -433,19 +469,19 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		
 		if (ast != null)
 		{
-			result = ast.getNodeAt(offset);
+			result = ast.getNodeAtOffset(offset);
 
-			// We wont get a current node if the cursor is after the last position
+			// We won't get a current node if the cursor is after the last position
 			// recorded by the AST
 			if (result == null)
 			{
 				if (offset < ast.getStartingOffset())
 				{
-					result = ast.getNodeAt(ast.getStartingOffset());
+					result = ast.getNodeAtOffset(ast.getStartingOffset());
 				}
 				else if (ast.getEndingOffset() < offset)
 				{
-					result = ast.getNodeAt(ast.getEndingOffset());
+					result = ast.getNodeAtOffset(ast.getEndingOffset());
 				}
 			}
 		}
@@ -494,7 +530,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		
 		if (this._targetNode != null)
 		{
-			switch (this._targetNode.getType())
+			switch (this._targetNode.getNodeType())
 			{
 				case JSNodeTypes.ARGUMENTS:
 					lexeme = lexemeProvider.getLexemeFromOffset(offset);
@@ -515,11 +551,11 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 								break;
 								
 							case RPAREN:
-								node = this._targetNode.getNodeAt(offset - 1);
+								node = this._targetNode.getNodeAtOffset(offset - 1);
 								
 								if (node != null)
 								{
-									switch (node.getType())
+									switch (node.getNodeType())
 									{
 										case JSNodeTypes.IDENTIFIER:
 											result = Location.IN_GLOBAL;
@@ -565,7 +601,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					
 				case JSNodeTypes.DECLARATION:
 					// ignore declarations in for-statements for now
-					type = this._statementNode.getType();
+					type = this._statementNode.getNodeType();
 					
 					if (type == JSNodeTypes.FOR || type == JSNodeTypes.FOR_IN)
 					{
@@ -575,7 +611,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					
 				case JSNodeTypes.EMPTY:
 				case JSNodeTypes.STATEMENTS:
-					if (this._targetNode.contains(offset) || this._targetNode.getEndingOffset() == offset - 1)
+					if (this._targetNode.contains(offset) || this._targetNode.getEndingOffset() < offset)
 					{
 						if (this._targetNode.getStartingOffset() != offset)
 						{
@@ -612,13 +648,13 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					
 				case JSNodeTypes.IDENTIFIER:
 					// ignore for-statements for now
-					 type = this._statementNode.getType();
+					 type = this._statementNode.getNodeType();
 					
 					if (type != JSNodeTypes.FOR && type != JSNodeTypes.FOR_IN)
 					{
 						node = this._targetNode.getParent();
 						
-						switch (node.getType())
+						switch (node.getNodeType())
 						{
 							case JSNodeTypes.DECLARATION:
 							case JSNodeTypes.FUNCTION:
@@ -685,9 +721,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					
 					if (lexeme != null)
 					{
-						node = this._statementNode.getNodeAt(lexeme.getStartingOffset());
+						node = this._statementNode.getNodeAtOffset(lexeme.getStartingOffset());
 						
-						if (node != null && node.getType() == JSNodeTypes.IDENTIFIER && node.getParent().getParent() == this._targetNode)
+						if (node != null && node.getNodeType() == JSNodeTypes.IDENTIFIER && node.getParent().getParent() == this._targetNode)
 						{
 							result = Location.IN_GLOBAL;
 						}
@@ -705,9 +741,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					}
 					else
 					{
-						node = this._targetNode.getNodeAt(offset - 1);
+						node = this._targetNode.getNodeAtOffset(offset - 1);
 						
-						if (node != null && node.getType() == JSNodeTypes.IDENTIFIER)
+						if (node != null && node.getNodeType() == JSNodeTypes.IDENTIFIER)
 						{
 							result = Location.IN_GLOBAL;
 						}

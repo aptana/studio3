@@ -679,12 +679,30 @@ public class ParserGenerator
 
 		private void writeClass(String class_name, Options opts, Writer out) throws IOException
 		{
+			out.write("@SuppressWarnings(\"unchecked\")\n");
 			out.write("public class ");
 			out.write(class_name);
 			out.write(" extends ");
 			if (class_name.equals("Parser"))
 				out.write("beaver.");
-			out.write("Parser {\n");
+			if (grammar.impls != null && grammar.impls.length > 0)
+			{
+				out.write("Parser implements ");
+				for (int i = 0; i < grammar.impls.length; i++)
+				{
+					String impl = grammar.impls[i];
+					
+					if (i > 0)
+						out.write(",");
+					
+					out.write(impl);
+				}
+				out.write(" {\n");
+			}
+			else
+			{
+				out.write("Parser {\n");
+			}
 
 			if (!opts.export_terminals)
 			{

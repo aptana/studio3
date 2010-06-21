@@ -1,8 +1,8 @@
 package com.aptana.editor.html.parsing.ast;
 
-import com.aptana.parsing.ast.ParseBaseNode;
+import com.aptana.parsing.ast.ParseNode;
 
-public class HTMLNode extends ParseBaseNode
+public class HTMLNode extends ParseNode
 {
 
 	public static final String LANGUAGE = "text/html"; //$NON-NLS-1$
@@ -23,7 +23,7 @@ public class HTMLNode extends ParseBaseNode
 		setChildren(children);
 	}
 
-	public short getType()
+	public short getNodeType()
 	{
 		return fType;
 	}

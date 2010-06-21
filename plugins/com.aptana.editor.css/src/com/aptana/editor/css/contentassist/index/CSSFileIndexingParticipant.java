@@ -4,9 +4,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
 
-import org.eclipse.core.resources.IFile;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.content.IContentType;
@@ -20,7 +23,7 @@ import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.css.parsing.ast.CSSAttributeSelectorNode;
 import com.aptana.editor.css.parsing.ast.CSSRuleNode;
 import com.aptana.editor.css.parsing.ast.CSSTermNode;
-import com.aptana.index.core.IFileIndexingParticipant;
+import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.IParserPool;
@@ -28,17 +31,17 @@ import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 
-public class CSSFileIndexingParticipant implements IFileIndexingParticipant
+public class CSSFileIndexingParticipant implements IFileStoreIndexingParticipant
 {
 	private static final String CSS_EXTENSION = "css"; //$NON-NLS-1$
 
 	@Override
-	public void index(Set<IFile> files, Index index, IProgressMonitor monitor)
+	public void index(Set<IFileStore> files, Index index, IProgressMonitor monitor)
 	{
-		monitor = SubMonitor.convert(monitor, files.size());
-		for (IFile file : files)
+		SubMonitor sub = SubMonitor.convert(monitor, files.size());
+		for (IFileStore file : files)
 		{
-			if (monitor.isCanceled())
+			if (sub.isCanceled())
 				return;
 			try
 			{
@@ -46,10 +49,10 @@ public class CSSFileIndexingParticipant implements IFileIndexingParticipant
 				{
 					continue;
 				}
-				monitor.subTask(file.getLocation().toPortableString());
+				sub.subTask(file.getName());
 				try
 				{
-					String fileContents = IOUtil.read(file.getContents());
+					String fileContents = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(-1)));
 					if (fileContents != null && fileContents.trim().length() > 0)
 					{
 						ParseState parseState = new ParseState();
@@ -68,7 +71,7 @@ public class CSSFileIndexingParticipant implements IFileIndexingParticipant
 				{
 					Activator.logError(e);
 				}
-				catch (Exception e)
+				catch (Throwable e)
 				{
 					Activator.logError(e.getMessage(), e);
 				}
@@ -81,13 +84,13 @@ public class CSSFileIndexingParticipant implements IFileIndexingParticipant
 		monitor.done();
 	}
 
-	private boolean isCSSFile(IFile file)
+	private boolean isCSSFile(IFileStore file)
 	{
 		InputStream stream = null;
 		IContentTypeManager manager = Platform.getContentTypeManager();
 		try
 		{
-			stream = file.getContents();
+			stream = file.openInputStream(EFS.NONE, new NullProgressMonitor());
 			IContentType[] types = manager.findContentTypesFor(stream, file.getName());
 			for (IContentType type : types)
 			{
@@ -116,10 +119,10 @@ public class CSSFileIndexingParticipant implements IFileIndexingParticipant
 			}
 		}
 
-		return CSS_EXTENSION.equalsIgnoreCase(file.getFileExtension());
+		return CSS_EXTENSION.equalsIgnoreCase(new Path(file.getName()).getFileExtension());
 	}
 
-	public static void walkNode(Index index, IFile file, IParseNode parent)
+	public static void walkNode(Index index, IFileStore file, IParseNode parent)
 	{
 		if (parent == null)
 			return;
@@ -181,9 +184,9 @@ public class CSSFileIndexingParticipant implements IFileIndexingParticipant
 		return false;
 	}
 
-	private static void addIndex(Index index, IFile file, String category, String word)
+	private static void addIndex(Index index, IFileStore file, String category, String word)
 	{
-		index.addEntry(category, word, file.getProjectRelativePath().toPortableString());
+		index.addEntry(category, word, file.toURI().getPath());
 	}
 
 }

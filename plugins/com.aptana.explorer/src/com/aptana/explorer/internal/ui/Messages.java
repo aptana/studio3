@@ -11,9 +11,7 @@ public class Messages extends NLS
 	public static String GitProjectView_AttachGitRepo_button;
 	public static String GitProjectView_AttachGitRepo_jobTitle;
 	public static String GitProjectView_BranchAlreadyExistsMessage;
-
 	public static String GitProjectView_BranchDirtyTooltipMessage;
-
 	public static String GitProjectView_BranchSubmenuLabel;
 	public static String GitProjectView_ChangedFilesFilterTooltip;
 	public static String GitProjectView_Collapse_tooltip;
@@ -27,18 +25,15 @@ public class Messages extends NLS
 	public static String GitProjectView_NonEmptyBranchNameMessage;
 	public static String GitProjectView_NoWhitespaceBranchNameMessage;
 	public static String GitProjectView_PullChangesTooltipMessage;
-
 	public static String GitProjectView_PullJobTitle;
 	public static String GitProjectView_PullTooltip;
 	public static String GitProjectView_PushChangesTooltipMessage;
-
 	public static String GitProjectView_PushJobTitle;
 	public static String GitProjectView_PushTooltip;
 	public static String GitProjectView_ShowGitHubNetworkJobTitle;
 	public static String GitProjectView_StashJobTitle;
 	public static String GitProjectView_StashTooltip;
 	public static String GitProjectView_SwitchToBranch;
-
 	public static String GitProjectView_UnresolvedMerges_msg;
 	public static String GitProjectView_UnstashJobTitle;
 	public static String GitProjectView_UnstashTooltip;
@@ -58,31 +53,24 @@ public class Messages extends NLS
 	public static String GitProjectView_AddRemoteTooltip;
 	public static String GitProjectView_GitDiffDialogTitle;
 	public static String GitProjectView_LBL_ShowInHistory;
-	
-	public static String SingleProjectView_CaseSensitive;
+
 	public static String SingleProjectView_CreateAppMenuItem;
 	public static String SingleProjectView_OpenBrowserItem;
-
 	public static String SingleProjectView_OpenTerminalMenuItem_LBL;
 	public static String SingleProjectView_RefreshJob_title;
-	public static String SingleProjectView_Wildcard;
-	public static String SingleProjectView_RegularExpression;
 	public static String SingleProjectView_Run_TerminalTitle;
 	public static String SingleProjectView_RunMenuTitle;
 	public static String SingleProjectView_SwitchToApplication;
 	public static String SingleProjectView_DeleteProjectMenuItem_LBL;
 	public static String SingleProjectView_DeploySubmenuLabel;
 	public static String SingleProjectView_DeployAppMenuItem;
-
 	public static String SingleProjectView_DeployWizardItem;
 	public static String SingleProjectView_InitialFileFilterText;
 	public static String SingleProjectView_SharingSubmenuLabel;
-
 	public static String SingleProjectView_SynchronizeItem;
 	public static String SingleProjectView_AddCollaboratorItem;
 	public static String SingleProjectView_RemoveCollaboratorItem;
 	public static String SingleProjectView_DatabaseSubmenuLabel;
-
 	public static String SingleProjectView_DownloadItem;
 	public static String SingleProjectView_RakeDBMigrateItem;
 	public static String SingleProjectView_PushLocalDBItem;
@@ -92,23 +80,19 @@ public class Messages extends NLS
 	public static String SingleProjectView_OffMaintenanceItem;
 	public static String SingleProjectView_RemoteSubmenuLabel;
 	public static String SingleProjectView_CommandLabel;
-
 	public static String SingleProjectView_ConsoleItem;
 	public static String SingleProjectView_RakeCommandItem;
 	public static String SingleProjectView_ConfigVarsSubmenuLabel;
 	public static String SingleProjectView_AddConfigVarsItem;
 	public static String SingleProjectView_ClearConfigVarsItem;
 	public static String SingleProjectView_AppInfoItem;
-
 	public static String SingleProjectView_EmailAddressLabel;
-
 	public static String SingleProjectView_FTPSettingItem;
-
 	public static String SingleProjectView_NewAppNameLabel;
 	public static String SingleProjectView_RenameAppItem;
-
+	public static String SingleProjectView_TTP_Commands;
+	public static String SingleProjectView_TTP_Deploy;
 	public static String SingleProjectView_UploadItem;
-
 	public static String SingleProjectView_VariableNameLabel;
 	
 	static

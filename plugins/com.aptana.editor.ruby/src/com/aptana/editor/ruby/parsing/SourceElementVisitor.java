@@ -6,7 +6,42 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.jruby.runtime.Visibility;
-import org.jrubyparser.ast.*;
+import org.jrubyparser.ast.AliasNode;
+import org.jrubyparser.ast.ArgsNode;
+import org.jrubyparser.ast.ArgumentNode;
+import org.jrubyparser.ast.ArrayNode;
+import org.jrubyparser.ast.CallNode;
+import org.jrubyparser.ast.ClassNode;
+import org.jrubyparser.ast.ClassVarAsgnNode;
+import org.jrubyparser.ast.ClassVarDeclNode;
+import org.jrubyparser.ast.ClassVarNode;
+import org.jrubyparser.ast.Colon2Node;
+import org.jrubyparser.ast.ConstDeclNode;
+import org.jrubyparser.ast.ConstNode;
+import org.jrubyparser.ast.DAsgnNode;
+import org.jrubyparser.ast.DStrNode;
+import org.jrubyparser.ast.DefnNode;
+import org.jrubyparser.ast.DefsNode;
+import org.jrubyparser.ast.FCallNode;
+import org.jrubyparser.ast.GlobalAsgnNode;
+import org.jrubyparser.ast.GlobalVarNode;
+import org.jrubyparser.ast.InstAsgnNode;
+import org.jrubyparser.ast.InstVarNode;
+import org.jrubyparser.ast.IterNode;
+import org.jrubyparser.ast.ListNode;
+import org.jrubyparser.ast.LocalAsgnNode;
+import org.jrubyparser.ast.LocalVarNode;
+import org.jrubyparser.ast.MethodDefNode;
+import org.jrubyparser.ast.ModuleNode;
+import org.jrubyparser.ast.Node;
+import org.jrubyparser.ast.RootNode;
+import org.jrubyparser.ast.SClassNode;
+import org.jrubyparser.ast.SelfNode;
+import org.jrubyparser.ast.SplatNode;
+import org.jrubyparser.ast.StrNode;
+import org.jrubyparser.ast.UnnamedRestArgNode;
+import org.jrubyparser.ast.VCallNode;
+import org.jrubyparser.ast.YieldNode;
 
 import com.aptana.editor.ruby.core.IRubyMethod;
 import com.aptana.editor.ruby.parsing.ISourceElementRequestor.FieldInfo;
@@ -87,7 +122,7 @@ public class SourceElementVisitor extends InOrderVisitor
 			}
 		}
 		ArgumentNode restArg = iVisited.getRest();
-		if (restArg != null)
+		if (restArg != null && !(restArg instanceof UnnamedRestArgNode))
 		{
 			FieldInfo field = createFieldInfo(restArg);
 			// account for the leading "*"
@@ -410,7 +445,12 @@ public class SourceElementVisitor extends InOrderVisitor
 
 				field = new FieldInfo();
 				field.declarationStart = node.getPosition().getStartOffset() + 1;
-				field.name = "@" + arguments.get(i); //$NON-NLS-1$
+				String argName = arguments.get(i);
+				if (argName.startsWith(":")) //$NON-NLS-1$
+				{
+					argName.substring(1);
+				}
+				field.name = "@" + argName; //$NON-NLS-1$
 				field.nameSourceStart = node.getPosition().getStartOffset() + 1;
 				field.nameSourceEnd = node.getPosition().getEndOffset() - 1;
 				requestor.enterField(field);

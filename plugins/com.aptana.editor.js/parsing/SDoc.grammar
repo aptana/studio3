@@ -1,0 +1,451 @@
+%package "com.aptana.editor.js.sdoc.parsing";
+%import "java.util.List";
+%import "com.aptana.editor.js.sdoc.model.*";
+%class "SDocParser";
+%embed {:
+	// suppress parser error reporting and let the custom error recovery mechanism handle it
+	private static class SDocEvents extends Events
+	{
+		public void scannerError(Scanner.Exception e)
+		{
+		}
+
+		public void syntaxError(Symbol token)
+		{
+		}
+
+		public void unexpectedTokenRemoved(Symbol token)
+		{
+		}
+
+		public void missingTokenInserted(Symbol token)
+		{
+		}
+
+		public void misspelledTokenReplaced(Symbol token)
+		{
+		}
+
+		public void errorPhraseRemoved(Symbol error)
+		{
+		}
+	}
+	
+	private SDocScanner fScanner;
+	
+	/**
+	 * parse
+	 *
+	 * @param source
+	 */
+	public Object parse(String source) throws java.lang.Exception
+	{
+		return parse(source, 0);
+	}
+	
+	/**
+	 * parse
+	 *
+	 * @param source
+	 * @param offset
+	 */
+	public Object parse(String source, int offset) throws java.lang.Exception
+	{
+		fScanner.setOffset(offset);
+		fScanner.setSource(source);
+		
+		return parse(fScanner);
+	}
+:};
+%init {:
+	report = new SDocEvents();
+	fScanner = new SDocScanner();
+:};
+
+%terminals LBRACKET, RBRACKET, LCURLY, RCURLY, POUND, COLON, ERROR;
+%terminals COMMA, PIPE, LPAREN, RPAREN, LESS_THAN, GREATER_THAN, ARROW, ELLIPSIS;
+%terminals START_DOCUMENTATION, END_DOCUMENTATION, TEXT;
+%terminals ADVANCED, ALIAS, AUTHOR, CLASS_DESCRIPTION, CONSTRUCTOR, EXAMPLE, EXCEPTION;
+%terminals EXTENDS, INTERNAL, METHOD, NAMESPACE, OVERVIEW, PARAM, RETURN, SEE, UNKNOWN;
+%terminals IDENTIFIER, ARRAY, FUNCTION, PRIVATE, PROPERTY;
+%terminals TYPE;
+
+%typeof IDENTIFIER,FUNCTION,ARRAY = "String";
+%typeof TEXT,LBRACKET,RBRACKET,LCURLY,RCURLY,POUND,COLON,ERROR,UNKNOWN = "String";
+
+%typeof Block = "Block";
+%typeof Namespace = "String";
+%typeof ParamName = "Parameter";
+%typeof Tag = "Tag";
+%typeof Type = "Type";
+
+%goal Grammar;
+
+Grammar
+	=	Block
+	;
+
+Block
+	=	START_DOCUMENTATION Text.text END_DOCUMENTATION
+		{:
+			return new DocumentationBlock((String) text.value);
+		:}
+	|	START_DOCUMENTATION Tags.tags END_DOCUMENTATION
+		{:
+			return new DocumentationBlock((List<Tag>) tags.value);
+		:}
+	|	START_DOCUMENTATION Text.text Tags.tags END_DOCUMENTATION
+		{:
+			return new DocumentationBlock((String) text.value, (List<Tag>) tags.value);
+		:}
+	;
+
+Text
+	=	Text.text TextPart.part
+		{:
+			return new Symbol(text.value + " " + part.value);
+		:}
+	|	TextPart
+	;
+
+TextPart
+	=	TEXT
+	|	LBRACKET
+	|	RBRACKET
+	|	LCURLY
+	|	RCURLY
+	|	POUND
+	|	IDENTIFIER
+	|	COLON
+	|	ERROR
+	;
+
+Tags
+	=	Tags.tags Tag.tag
+		{:
+			((List<Tag>) tags.value).add(tag);
+			
+			return tags;
+		:}
+	|	Tag.tag
+		{:
+			List<Tag> tags = new ArrayList<Tag>();
+			
+			tags.add(tag);
+			
+			return new Symbol(tags);
+		:}
+	;
+
+Tag
+	=	ADVANCED Text.text?
+		{:
+			return new Tag(TagType.ADVANCED, (String) text.value);
+		:}
+	|	ALIAS Text.text
+		{:
+			return new Tag(TagType.ALIAS, (String) text.value);
+		:}
+	|	AUTHOR Text.text
+		{:
+			return new Tag(TagType.AUTHOR, (String) text.value);
+		:}
+	|	CLASS_DESCRIPTION LCURLY Namespace.name RCURLY Text.text
+		{:
+			return new TagWithName(TagType.CLASS_DESCRIPTION, name, (String) text.value);
+		:}
+	|	CONSTRUCTOR Text.text?
+		{:
+			return new Tag(TagType.CONSTRUCTOR, (String) text.value);
+		:}
+	|	EXAMPLE Text.text
+		{:
+			return new Tag(TagType.EXAMPLE, (String) text.value);
+		:}
+	|	EXCEPTION LCURLY Types.types RCURLY Text.text?
+		{:
+			return new TagWithTypes(TagType.EXCEPTION, (List<Type>) types.value, (String) text.value);
+		:}
+	|	EXTENDS LCURLY Types.types RCURLY Text.text?
+		{:
+			return new TagWithTypes(TagType.EXTENDS, (List<Type>) types.value, (String) text.value);
+		:}
+	|	INTERNAL Text.text?
+		{:
+			return new Tag(TagType.INTERNAL, (String) text.value);
+		:}
+	|	METHOD Text.text?
+		{:
+			return new Tag(TagType.METHOD, (String) text.value);
+		:}
+	|	NAMESPACE LCURLY Namespace.name RCURLY Text.text?
+		{:
+			return new TagWithName(TagType.NAMESPACE, name, (String) text.value);
+		:}
+	|	OVERVIEW Text.text
+		{:
+			return new Tag(TagType.OVERVIEW, (String) text.value);
+		:}
+	|	PARAM LCURLY Types.types RCURLY ParamName.name Text.text?
+		{:
+			return new ParamTag(name, (List<Type>) types.value, (String) text.value);
+		:}
+	|	PRIVATE Text.text?
+		{:
+			return new Tag(TagType.PRIVATE, (String) text.value);
+		:}
+	|	PROPERTY LCURLY Types.types RCURLY Text.text?
+		{:
+			return new TagWithTypes(TagType.PROPERTY, (List<Type>) types.value, (String) text.value);
+		:}
+	|	RETURN LCURLY Types.types RCURLY Text.text?
+		{:
+			return new TagWithTypes(TagType.RETURN, (List<Type>) types.value, (String) text.value);
+		:}
+	|	SEE Text.text
+		{:
+			return new Tag(TagType.SEE, (String) text.value);
+		:}
+	|	TYPE LCURLY Types.types RCURLY Text.text?
+		{:
+			return new TagWithTypes(TagType.TYPE, (List<Type>) types.value, (String) text.value);
+		:}
+	|	UNKNOWN.name Text.text?
+		{:
+			return new TagWithName(TagType.UNKNOWN, name, (String) text.value);
+		:}
+	;
+
+Types
+	=	Types.types TypeDelimiter Type.type
+		{:
+			((List<Type>) types.value).add(type);
+			
+			return types;
+		:}
+	|	Type.type
+		{:
+			List<Type> types = new ArrayList<Type>();
+			
+			types.add(type);
+			
+			return new Symbol(types);
+		:}
+	;
+
+TypeDelimiter
+	=	COMMA
+	|	PIPE
+	;
+
+Type
+	=	IDENTIFIER.name
+		{:
+			return new Type(name);
+		:}
+	|	IDENTIFIER.name LBRACKET RBRACKET
+		{:
+			return new ArrayType(new Type(name));
+		:}
+	|	ARRAY LBRACKET RBRACKET
+		{:
+			return new ArrayType();
+		:}
+	|	FUNCTION LBRACKET RBRACKET
+		{:
+			return new FunctionType();
+		:}
+	|	ARRAY
+		{:
+			return new ArrayType();
+		:}
+	|	ARRAY LESS_THAN Type.memberType GREATER_THAN
+		{:
+			return new ArrayType(memberType);
+		:}
+	|	FUNCTION
+		{:
+			return new FunctionType();
+		:}
+	|	FUNCTION ReturnDelimiter Type.returnType
+		{:
+			FunctionType function = new FunctionType();
+			
+			function.addReturnType(returnType);
+			
+			return function;
+		:}
+	|	FUNCTION ReturnDelimiter LPAREN Types.returnTypes RPAREN
+		{:
+			FunctionType function = new FunctionType();
+			
+			for (Type returnType : (List<Type>) returnTypes.value)
+			{
+				function.addReturnType(returnType);
+			}
+			
+			return function;
+		:}
+	|	FUNCTION LPAREN RPAREN
+		{:
+			return new FunctionType();
+		:}
+	|	FUNCTION LPAREN RPAREN ReturnDelimiter Type.returnType
+		{:
+			FunctionType function = new FunctionType();
+			
+			function.addReturnType(returnType);
+			
+			return function;
+		:}
+	|	FUNCTION LPAREN RPAREN ReturnDelimiter LPAREN Types.returnTypes RPAREN
+		{:
+			FunctionType function = new FunctionType();
+			
+			for (Type returnType : (List<Type>) returnTypes.value)
+			{
+				function.addReturnType(returnType);
+			}
+			
+			return function;
+		:}
+	|	FUNCTION LPAREN Types.parameterTypes RPAREN
+		{:
+			FunctionType function = new FunctionType();
+			
+			for (Type parameterType : (List<Type>) parameterTypes.value)
+			{
+				function.addParameterType(parameterType);
+			}
+			
+			return function;
+		:}
+	|	FUNCTION LPAREN Types.parameterTypes RPAREN ReturnDelimiter Type.returnType
+		{:
+			FunctionType function = new FunctionType();
+			
+			for (Type parameterType : (List<Type>) parameterTypes.value)
+			{
+				function.addParameterType(parameterType);
+			}
+			
+			function.addReturnType(returnType);
+			
+			return function;
+		:}
+	|	FUNCTION LPAREN Types.parameterTypes RPAREN ReturnDelimiter LPAREN Types.returnTypes RPAREN
+		{:
+			FunctionType function = new FunctionType();
+			
+			for (Type parameterType : (List<Type>) parameterTypes.value)
+			{
+				function.addParameterType(parameterType);
+			}
+			
+			for (Type returnType : (List<Type>) returnTypes.value)
+			{
+				function.addReturnType(returnType);
+			}
+			
+			return function;
+		:}
+//	|	FUNCTION FunctionParameterTypes FunctionReturnTypes
+//		{:
+//			// TestFunction
+//		:}
+	;
+
+//FunctionParameterTypes
+//	=	<empty>
+//		{:
+//			// NoParameterTypes
+//		:}
+//	|	LPAREN RPAREN
+//		{:
+//			// NoParameterTypes
+//		:}
+//	|	LPAREN Types RPAREN
+//		{:
+//			// ParameterTypes
+//		:}
+//	;
+//
+//FunctionReturnTypes
+//	=	<empty>
+//		{:
+//			// NoReturnType
+//		:}
+//	|	returnDelimiter Type
+//		{:
+//			// ReturnType
+//		:}
+//	|	returnDelimiter LPAREN Types RPAREN
+//		{:
+//			// ReturnTypes
+//		:}
+//	;
+
+ReturnDelimiter
+	=	COLON
+	|	ARROW
+	;
+
+ParamName
+	=	TEXT.name
+		{:
+			return new Parameter(name);
+		:}
+	|	LBRACKET TEXT.name RBRACKET
+		{:
+			Parameter result = new Parameter(name);
+			
+			result.setUsage(Usage.OPTIONAL);
+			
+			return result;
+		:}
+	|	ELLIPSIS
+		{:
+			Parameter result = new Parameter("...");
+			
+			result.setUsage(Usage.ONE_OR_MORE);
+			
+			return result;
+		:}
+	|	LBRACKET ELLIPSIS RBRACKET
+		{:
+			Parameter result = new Parameter("...");
+			
+			result.setUsage(Usage.ZERO_OR_MORE);
+			
+			return result;
+		:}
+	;
+
+Namespace
+	=	IDENTIFIER
+	|	FUNCTION
+	|	ARRAY
+	;
+
+/*
+ * Below is a list of tags defined by the sdoc parser that are not supported yet in this parser
+ */
+
+//Param
+//	|	CLASS_DESCRIPTION
+//	|	COPYRIGHT
+//	|	DEPRECATED
+//	|	EXTENDS
+//	|	ID
+//	|	IGNORE
+//	|	LICENSE
+//	|	LINK
+//	|	MEMBER_OF
+//	|	NATIVE
+//	|	PROJECT_DESCRIPTION
+//	|	PROTECTED
+//	|	SDOC
+//	|	SINCE
+//	|	TYPE
+//	|	VERSION
+//	;

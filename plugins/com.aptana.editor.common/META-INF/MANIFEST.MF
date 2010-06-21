@@ -28,7 +28,9 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.core,
  com.aptana.index.core;bundle-version="2.0.0",
  com.aptana.ui;bundle-version="3.0.0",
- beaver;bundle-version="1.0.0"
+ beaver;bundle-version="1.0.0",
+ org.eclipse.team.ui;bundle-version="3.5.0",
+ org.eclipse.debug.ui
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
@@ -38,6 +40,7 @@ Export-Package: com.aptana.editor.common,
  com.aptana.editor.common.outline,
  com.aptana.editor.common.parsing,
  com.aptana.editor.common.preferences,
+ com.aptana.editor.common.resolver,
  com.aptana.editor.common.scripting,
  com.aptana.editor.common.scripting.commands,
  com.aptana.editor.common.scripting.snippets,
@@ -45,3 +48,4 @@ Export-Package: com.aptana.editor.common,
  com.aptana.editor.common.text.rules,
  com.aptana.editor.common.theme
 Eclipse-ExtensibleAPI: true
+Bundle-ClassPath: .

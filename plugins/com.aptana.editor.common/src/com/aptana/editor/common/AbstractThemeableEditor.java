@@ -14,6 +14,10 @@ import org.eclipse.jface.text.source.LineNumberRulerColumn;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.IPostSelectionProvider;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.ShellAdapter;
@@ -59,6 +63,49 @@ import com.aptana.scripting.keybindings.ICommandElementsProvider;
 @SuppressWarnings("restriction")
 public abstract class AbstractThemeableEditor extends AbstractFoldingEditor implements IThemeableEditor
 {
+
+	private class SelectionChangedListener implements ISelectionChangedListener
+	{
+
+		public void install(ISelectionProvider selectionProvider)
+		{
+			if (selectionProvider == null)
+			{
+				return;
+			}
+			if (selectionProvider instanceof IPostSelectionProvider)
+			{
+				((IPostSelectionProvider) selectionProvider).addPostSelectionChangedListener(this);
+			}
+			else
+			{
+				selectionProvider.addSelectionChangedListener(this);
+			}
+		}
+
+		public void uninstall(ISelectionProvider selectionProvider)
+		{
+			if (selectionProvider == null)
+			{
+				return;
+			}
+			if (selectionProvider instanceof IPostSelectionProvider)
+			{
+				((IPostSelectionProvider) selectionProvider).removePostSelectionChangedListener(this);
+			}
+			else
+			{
+				selectionProvider.removeSelectionChangedListener(this);
+			}
+		}
+
+		@Override
+		public void selectionChanged(SelectionChangedEvent event)
+		{
+			AbstractThemeableEditor.this.selectionChanged();
+		}
+	}
+
 	private static final int RULER_EDITOR_GAP = 5;
 
 	private static final char[] DEFAULT_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`',
@@ -71,6 +118,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	private VerifyKeyListener keyListener;
 
 	private boolean fCursorChangeListened;
+	private SelectionChangedListener fSelectionChangedListener;
 
   	/**
 	 * Manages what's needed to make the find bar work.
@@ -126,6 +174,9 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		this.fThemeableEditorColorsExtension.overrideThemeColors();
 		PeerCharacterCloser.install(getSourceViewer(), getAutoClosePairCharacters());
 		fCursorChangeListened = true;
+
+		fSelectionChangedListener= new SelectionChangedListener();
+		fSelectionChangedListener.install(getSelectionProvider());
 
 		IContextService contextService = (IContextService) getSite().getService(IContextService.class);
 		contextService.activateContext(Activator.CONTEXT_ID);
@@ -327,6 +378,10 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			
 			keyListener = null;
 		}
+		if (fSelectionChangedListener != null)  {
+			fSelectionChangedListener.uninstall(getSelectionProvider());
+			fSelectionChangedListener= null;
+		}
 
 		this.fThemeableEditorColorsExtension.dispose();
 		super.dispose();
@@ -413,9 +468,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		selectAndReveal(offset, length);
 	}
 
-	protected void handleCursorPositionChanged()
+	protected void selectionChanged()
 	{
-		super.handleCursorPositionChanged();
 		if (fCursorChangeListened)
 		{
 			if (isLinkedWithEditor())
@@ -498,7 +552,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		{
 			return null;
 		}
-		return root.getNodeAt(offset);
+		return root.getNodeAtOffset(offset);
 	}
 
 	private boolean isLinkedWithEditor()
@@ -541,5 +595,11 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			return config.getTabWidth(getSourceViewer());
 		}
 		return 4;
+	}
+
+	@Override
+	public boolean isSaveAsAllowed()
+	{
+		return true;
 	}
 }

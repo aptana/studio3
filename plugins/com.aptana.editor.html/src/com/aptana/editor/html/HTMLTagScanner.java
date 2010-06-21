@@ -106,10 +106,10 @@ public class HTMLTagScanner extends RuleBasedScanner
 		List<IRule> rules = new ArrayList<IRule>();
 
 		// Add rule for double quotes
-		rules.add(new MultiLineRule("\"", "\"", createToken(HTMLTokenType.DOUBLE_QUOTED_STRING), '\\')); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		rules.add(new MultiLineRule("\"", "\"", createToken(HTMLTokenType.DOUBLE_QUOTED_STRING), '\\')); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Add a rule for single quotes
-		rules.add(new MultiLineRule("'", "'", createToken(HTMLTokenType.SINGLE_QUOTED_STRING), '\\')); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		rules.add(new MultiLineRule("'", "'", createToken(HTMLTokenType.SINGLE_QUOTED_STRING), '\\')); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Add generic whitespace rule.
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
@@ -130,7 +130,7 @@ public class HTMLTagScanner extends RuleBasedScanner
 				return Character.isLetter(c);
 			}
 
-		}, createToken(HTMLTokenType.ATTRIBUTE), true) {//$NON-NLS-1$
+		}, createToken(HTMLTokenType.ATTRIBUTE), true) {
 			@Override
 			protected boolean wordOK(String word, ICharacterScanner scanner)
 			{
@@ -139,37 +139,37 @@ public class HTMLTagScanner extends RuleBasedScanner
 				return ((char) c) == '=';
 			}
 		};
-		wordRule.addWord("id", createToken(HTMLTokenType.ID)); //$NON-NLS-1$ //$NON-NLS-2$
-		wordRule.addWord("class", createToken(HTMLTokenType.CLASS)); //$NON-NLS-1$ //$NON-NLS-2$
+		wordRule.addWord("id", createToken(HTMLTokenType.ID)); //$NON-NLS-1$
+		wordRule.addWord("class", createToken(HTMLTokenType.CLASS)); //$NON-NLS-1$
 		rules.add(wordRule);
 
 		// Tags
-		wordRule = new WordRule(new WordDetector(), createToken(HTMLTokenType.META), true); //$NON-NLS-1$
-		wordRule.addWord("script", createToken(HTMLTokenType.SCRIPT)); //$NON-NLS-1$ //$NON-NLS-2$
-		wordRule.addWord("style", createToken(HTMLTokenType.STYLE)); //$NON-NLS-1$ //$NON-NLS-2$
-		IToken structureDotAnyToken = createToken(HTMLTokenType.STRUCTURE_TAG); //$NON-NLS-1$
+		wordRule = new WordRule(new WordDetector(), createToken(HTMLTokenType.META), true);
+		wordRule.addWord("script", createToken(HTMLTokenType.SCRIPT)); //$NON-NLS-1$
+		wordRule.addWord("style", createToken(HTMLTokenType.STYLE)); //$NON-NLS-1$
+		IToken structureDotAnyToken = createToken(HTMLTokenType.STRUCTURE_TAG);
 		for (String tag : STRUCTURE_DOT_ANY)
 		{
 			wordRule.addWord(tag, structureDotAnyToken);
 		}
-		IToken blockDotAnyToken = createToken(HTMLTokenType.BLOCK_TAG); //$NON-NLS-1$
+		IToken blockDotAnyToken = createToken(HTMLTokenType.BLOCK_TAG);
 		for (String tag : BLOCK_DOT_ANY)
 		{
 			wordRule.addWord(tag, blockDotAnyToken);
 		}
-		IToken inlineAnyToken = createToken(HTMLTokenType.INLINE_TAG); //$NON-NLS-1$
+		IToken inlineAnyToken = createToken(HTMLTokenType.INLINE_TAG);
 		for (String tag : TAG_INLINE_ANY)
 		{
 			wordRule.addWord(tag, inlineAnyToken);
 		}
 		rules.add(wordRule);
 
-		rules.add(new SingleCharacterRule('>', createToken(HTMLTokenType.TAG_END))); //$NON-NLS-1$
-		rules.add(new SingleCharacterRule('=', createToken(HTMLTokenType.EQUAL))); //$NON-NLS-1$
-		rules.add(new RegexpRule("<(/)?", createToken(HTMLTokenType.TAG_START), true)); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new SingleCharacterRule('>', createToken(HTMLTokenType.TAG_END)));
+		rules.add(new SingleCharacterRule('=', createToken(HTMLTokenType.EQUAL)));
+		rules.add(new RegexpRule("<(/)?", createToken(HTMLTokenType.TAG_START), true)); //$NON-NLS-1$
 
 		setRules(rules.toArray(new IRule[rules.size()]));
-		setDefaultReturnToken(createToken(HTMLTokenType.TEXT)); //$NON-NLS-1$
+		setDefaultReturnToken(createToken(HTMLTokenType.TEXT));
 	}
 	
 	/**

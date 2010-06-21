@@ -11,6 +11,7 @@
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the HTML standard that should be used for this document.</description>
@@ -64,6 +65,7 @@
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies either a hyperlink or a target for a hyperlink.</description>
@@ -152,6 +154,7 @@
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="6.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies that a string is an abbreviation for a longer word or phrase.</description>
@@ -192,6 +195,7 @@
         <browser platform="IE" version="4.0+"/>
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies that a string is an acronym for a word or phrase.</description>
@@ -264,6 +268,7 @@
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies name and address information related to the HTML document.</description>
@@ -362,6 +367,7 @@ San Diego, CA 92122
         <browser platform="IE" version="2.0+"/>
         <browser platform="Netscape" version="2.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
       </browsers>
@@ -449,6 +455,7 @@ San Diego, CA 92122
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Used for image maps to define a clickable area on an image.</description>
@@ -822,6 +829,7 @@ San Diego, CA 92122
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Displays the text of the element as boldface text.</description>
@@ -899,6 +907,7 @@ San Diego, CA 92122
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies a base URL for all of the relative URLs in the document to use.</description>
@@ -927,6 +936,7 @@ San Diego, CA 92122
       <browsers>
         <browser platform="IE" version="2.0+"/>
         <browser platform="Netscape" version="1.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <deprecated>Use CSS to format fonts instead.
@@ -970,6 +980,7 @@ San Diego, CA 92122
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the text direction for the document.</description>
@@ -1085,6 +1096,7 @@ San Diego, CA 92122
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Increases the font size for the enclosed text.</description>
@@ -1191,6 +1203,7 @@ San Diego, CA 92122
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies that the enclosed text is a block quotation.</description>
@@ -1296,6 +1309,7 @@ San Diego, CA 92122
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the body of the content  of the document.</description>
@@ -1376,6 +1390,7 @@ San Diego, CA 92122
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies a hard line break in the text.</description>
@@ -1420,6 +1435,7 @@ This sentence is on the second line.
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines a clickable Button element.</description>
@@ -1609,6 +1625,7 @@ This sentence is on the second line.
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines a caption within a table.</description>
@@ -1704,6 +1721,7 @@ This sentence is on the second line.
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <deprecated>Use 'div align="center"' instead.
@@ -1792,6 +1810,7 @@ This sentence is on the second line.
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies that the enclosed text is a citation from another source.</description>
@@ -1876,6 +1895,7 @@ This sentence is on the second line.
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies that the enclosed text is programming code and should be formatted appropriately.</description>
@@ -1963,6 +1983,7 @@ This sentence is on the second line.
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines a table column.</description>
@@ -2029,6 +2050,7 @@ This sentence is on the second line.
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines a table column group.</description>
@@ -2311,6 +2333,7 @@ This sentence is on the second line.
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies that the enclosed text is a definition in a definition list.</description>
@@ -2408,6 +2431,7 @@ This sentence is on the second line.
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies that the enclosed text has been deleted.</description>
@@ -2466,6 +2490,7 @@ This sentence is on the second line.
         <specification name="W3C" version="HTML 5"/>
       </availability>
       <browsers>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies details about a document, or parts of a document.</description>
@@ -2560,6 +2585,7 @@ This sentence is on the second line.
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies that the enclosed text defines a term.</description>
@@ -2638,6 +2664,7 @@ This sentence is on the second line.
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <deprecated>Use UL instead.
@@ -2734,6 +2761,7 @@ This sentence is on the second line.
         <browser platform="Netscape" version="2.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines a special block of content within a document.</description>
@@ -2826,6 +2854,7 @@ This sentence is on the second line.
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines a list of definition terms and definitions.</description>
@@ -2924,6 +2953,7 @@ This sentence is on the second line.
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines a list of definition terms in a definition list.</description>
@@ -3020,6 +3050,7 @@ This sentence is on the second line.
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies that the enclosed text should be emphasized.</description>
@@ -3192,6 +3223,7 @@ This sentence is on the second line.
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines a set of related form controls to be grouped together.</description>
@@ -3474,6 +3506,7 @@ This sentence is on the second line.
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <deprecated>Define fonts using CSS instead.</deprecated>
@@ -3668,6 +3701,7 @@ This sentence is on the second line.
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines a form within a document.</description>
@@ -3778,6 +3812,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="2.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines a window-like frame (as a child of a frameset).</description>
@@ -3843,6 +3878,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="2.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines a set of window-like frames within a parent window.</description>
@@ -3903,6 +3939,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Heading Level 1.</description>
@@ -3991,6 +4028,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Heading Level 2.</description>
@@ -4079,6 +4117,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Heading Level 3.</description>
@@ -4167,6 +4206,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Heading Level 4.</description>
@@ -4255,6 +4295,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Heading Level 5.</description>
@@ -4343,6 +4384,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Heading Level 6.</description>
@@ -4422,6 +4464,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Non-rendered part of an HTML document that may contain meta information and may define links to scripts, stylesheets, and other documents.</description>
@@ -4654,6 +4697,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Creates a horizontal line in the HTML document.</description>
@@ -4738,6 +4782,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines an HTML document.</description>
@@ -4831,6 +4876,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies that the enclosed text should be displayed in italics.</description>
@@ -4932,6 +4978,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="3.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines an inline frame (i.e. a frame embedded in a document).</description>
@@ -5044,6 +5091,7 @@ Sorry, your browser does not support inline frames. ;/iframe&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines an image object that is embedded in the document.</description>
@@ -5158,6 +5206,7 @@ Sorry, your browser does not support inline frames. ;/iframe&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines an input element, such as a text field control or button, within a form.</description>
@@ -5261,6 +5310,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies that the enclosed text has been inserted into the document.</description>
@@ -5321,6 +5371,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <deprecated>Use the INPUT element instead.
@@ -5380,6 +5431,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies that the enclosed text should be formatted as keyboard input.</description>
@@ -5468,6 +5520,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </availability>
       <browsers>
         <browser platform="Mozilla" version="0.1+"/>
+        <browser platform="Chrome" version="1.2+"/>
         <browser platform="Safari" version="1.2+"/>
         <browser platform="Opera" version="9.0+"/>
       </browsers>
@@ -5562,6 +5615,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines a label on a form.</description>
@@ -5696,6 +5750,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines a legend for the fields on a form.</description>
@@ -5789,6 +5844,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines a list item in an ordered list (ol) or in an unordered list (ul).</description>
@@ -5877,6 +5933,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="IE" version="3.0+"/>
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the relationship between the current document and another document.</description>
@@ -5926,6 +5983,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines a client-side image map where hot regions of an image object are hyperlinked to other targets or documents.</description>
@@ -6297,6 +6355,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies general high-level information about a document.</description>
@@ -6605,6 +6664,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="2.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies alternative content to display if a client browser does not support frames.</description>
@@ -6643,6 +6703,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="2.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies alternative content to display if a client browser does not support scripts.</description>
@@ -6703,6 +6764,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines an object embedded in the document.</description>
@@ -6801,6 +6863,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines an ordered (e.g. numbered) list.</description>
@@ -6890,6 +6953,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies a grouping of option elements within a select element.</description>
@@ -6984,6 +7048,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies an option in a select (selection list) element.</description>
@@ -7146,6 +7211,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines a paragraph of text.</description>
@@ -7229,6 +7295,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies a parameter to be passed to an embedded object.</description>
@@ -7274,6 +7341,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies that the enclosed text is preformatted and that whitespace should be preserved appropriately. (i.e. The text will render in the browser the same as it was typed into the HTML Editor.)</description>
@@ -7468,6 +7536,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies that the enclosed text is a short, inline quote from another source.</description>
@@ -7764,6 +7833,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="3.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <deprecated>Use CSS to format text instead.
@@ -7854,6 +7924,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies that the enclosed text is sample text and should be rendered in the browser appropriately.</description>
@@ -7937,6 +8008,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="2.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies that the enclosed content is a client-side script.</description>
@@ -8091,6 +8163,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines a selection list control in a form.</description>
@@ -8182,6 +8255,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="2.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Decreases the font size of the enclosed text by one.</description>
@@ -8380,6 +8454,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="3.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Span element used to surround content blocks for formatting.</description>
@@ -8464,6 +8539,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="3.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <deprecated>Use CSS to format text instead.
@@ -8554,6 +8630,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies that the enclosed text should be rendered in the browser as "strong" (usually bold) text.</description>
@@ -8637,6 +8714,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Creates a style sheet within the document.</description>
@@ -8686,6 +8764,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="2.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies that the enclosed text should be rendered in the browser as subscript.</description>
@@ -8857,6 +8936,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="2.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies that the enclosed text should be rendered in the browser as superscript.</description>
@@ -8960,6 +9040,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines an HTML table in a document.</description>
@@ -9065,6 +9146,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Groups rows in a table together into a table body.</description>
@@ -9186,6 +9268,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines a single cell within a table.</description>
@@ -9293,6 +9376,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines a multi-line text input area.</description>
@@ -9395,6 +9479,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines a group of rows in an HTML table as table footer rows.</description>
@@ -9520,6 +9605,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies that a cell in a table is a header cell.</description>
@@ -9624,6 +9710,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines a group of rows in an HTML table as table header rows.</description>
@@ -9818,6 +9905,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the title of the HTML document.</description>
@@ -9870,6 +9958,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines a row in an HTML table.</description>
@@ -9972,6 +10061,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies that the enclosed text should be rendered in the browser in a monospace font.</description>
@@ -10055,6 +10145,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <deprecated>Use CSS to style text instead.
@@ -10145,6 +10236,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines an unordered list, such as a bulleted list.</description>
@@ -10237,6 +10329,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies that the enclosed text is a variable.</description>
@@ -10590,6 +10683,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Abbreviation for a header cell in a table.</description>
@@ -10611,6 +10705,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies accepted MIME types for file uploads.</description>
@@ -10634,6 +10729,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Comma or space-delimited list of character encodings that are accepted by the server processing the form.</description>
@@ -10649,6 +10745,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </availability>
       <browsers>
         <browser platform="IE" version="5.5+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Hot-key shortcut for the element.</description>
@@ -10663,6 +10760,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>URL for submitting the form.</description>
@@ -10677,6 +10775,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the alignment of the element.</description>
@@ -10700,6 +10799,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <deprecated>Use CSS to style links instead.</deprecated>
@@ -10725,6 +10825,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies alternative text to display if the element cannot be displayed as expected.</description>
@@ -10749,6 +10850,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>URL or list of URLs that need to be preloaded for the element.</description>
@@ -10757,6 +10859,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <attribute name="autocomplete" type="String">
       <browsers>
         <browser platform="IE" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies whether form autocompletion, which automatically completes the fields on a form after the user has typed enough letters, is on or off.</description>
@@ -10792,6 +10895,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies a name for a group of headers.</description>
@@ -10803,6 +10907,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <deprecated>Use CSS to style the background instead.</deprecated>
@@ -10819,6 +10924,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <attribute name="behavior" type="String">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the movement behavior of the element.</description>
@@ -10841,6 +10947,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <deprecated>Use CSS to style the bgcolor instead.</deprecated>
@@ -10850,6 +10957,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <attribute name="bgproperties" type="String">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>If set, specifies that the background image is fixed and will not scroll.</description>
@@ -10866,6 +10974,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Width (in pixels) of the border around the element.</description>
@@ -10908,6 +11017,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Number of pixels between the content of a cell and the edge of a cell.</description>
@@ -10922,6 +11032,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Number of pixels between cells.</description>
@@ -10943,6 +11054,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies which character to use to set the alignment for the element.</description>
@@ -10958,6 +11070,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Number of characters to offset the other column characters from the character specified by char.</description>
@@ -10972,6 +11085,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the character set associated with the element.</description>
@@ -10989,6 +11103,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>If present, specifies that the element should be checked.</description>
@@ -11005,6 +11120,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>URL for the source of the quote.</description>
@@ -11019,6 +11135,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>CSS class assigned to the element.</description>
@@ -11033,6 +11150,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies how the text flows with regards to any surrounding elements.</description>
@@ -11058,6 +11176,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="IE" version="2.0+"/>
         <browser platform="Netscape" version="2.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>URL of the Java class file for the element.</description>
@@ -11071,6 +11190,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="IE" version="2.0+"/>
         <browser platform="Netscape" version="2.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>URL for the code base for the element.</description>
@@ -11085,6 +11205,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Name of the color or RGB code for the color for the element.</description>
@@ -11099,6 +11220,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Number of characters wide that the element should be.</description>
@@ -11113,6 +11235,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Number of columns that the element should span.</description>
@@ -11127,6 +11250,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>If true, specifies that the element should be visually compressed by compacting whitespace between its child elements.</description>
@@ -11143,6 +11267,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>High-level meta description of the contents of the document.</description>
@@ -11157,6 +11282,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <attribute name="contenteditable" type="String">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies whether or not the content of the element is editable, or if the element inherits the value of this property from its parent.</description>
@@ -11195,6 +11321,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Comma-delimited x, y coordinates for the element.</description>
@@ -11216,6 +11343,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the URL for data used by the element.</description>
@@ -11261,6 +11389,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the date and time that the element was modified.</description>
@@ -11275,6 +11404,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="3.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>If present, declares the object associated with the element, but does not instantiate it.</description>
@@ -11291,6 +11421,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="2.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>If present, specifies that execution of the element is deferred.</description>
@@ -11307,6 +11438,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Direction of the element text.</description>
@@ -11318,6 +11450,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <attribute name="direction" type="String">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the direction of movement for the element text.</description>
@@ -11337,6 +11470,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies whether or not the element is disabled.</description>
@@ -11373,6 +11507,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the MIME type for the element data being sent to the server.</description>
@@ -11400,6 +11535,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Name of the font. You can specify more than one font face.</description>
@@ -11413,6 +11549,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="IE" version="4.0+"/>
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Id corresponding to the form or event associated with the element.</description>
@@ -11435,6 +11572,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="2.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies which edges of the element should have a border.</description>
@@ -11459,6 +11597,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="2.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies whether the frame has a border.</description>
@@ -11497,6 +11636,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Space-delimited list of header cell id's for header cells that are related to the element.</description>
@@ -11511,6 +11651,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Height of the element (in pixels).</description>
@@ -11518,6 +11659,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     </attribute>
     <attribute name="hidden" type="Boolean">
       <browsers>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>If true, specifies that the element is hidden.</description>
@@ -11552,6 +11694,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Path or URL for the linked document or object.</description>
@@ -11566,6 +11709,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Language of the linked document.</description>
@@ -11583,6 +11727,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Number of pixels of space to the left and right of the element (i.e. horizontal margin).</description>
@@ -11597,6 +11742,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Sets an HTTP response header for the value in the content attribute.</description>
@@ -11619,6 +11765,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Unique identifier for the element.</description>
@@ -11640,6 +11787,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Short text description for the element.</description>
@@ -11654,6 +11802,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Language code for the content of the element.</description>
@@ -11667,6 +11816,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="IE" version="3.0+"/>
         <browser platform="Netscape" version="2.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Script language for the element.</description>
@@ -11687,6 +11837,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <attribute name="leftmargin" type="String">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Left margin for the body of the document.</description>
@@ -11698,6 +11849,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <deprecated>Use CSS to style links instead.</deprecated>
@@ -11713,6 +11865,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>URL that contains a long description of the contents of the element.</description>
@@ -11721,6 +11874,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <attribute name="loop" type="String">
       <browsers>
         <browser platform="IE" version="2.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Number of times to loop the media file. Specify "infinite" for a continuous loop.</description>
@@ -11749,6 +11903,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Top and bottom margins (in pixels) for the document.</description>
@@ -11763,6 +11918,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Left and right margins (in pixels) for the document.</description>
@@ -11784,6 +11940,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Maximum number of characters that a user may type into the element.</description>
@@ -11792,6 +11949,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <attribute name="mayscript" type="Boolean">
       <browsers>
         <browser platform="Netscape"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>If true, indicates that scripts in the document may access the applet.</description>
@@ -11806,6 +11964,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Media type associated with the element.</description>
@@ -11829,6 +11988,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the method to use to transfer form data to the server.</description>
@@ -11860,6 +12020,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>If present, specifies that a user can select multiple options.</description>
@@ -11876,6 +12037,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Unique name identifier for the element.</description>
@@ -11890,6 +12052,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>If present, specifies that the element has no href.</description>
@@ -11906,6 +12069,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>If present, specifies that the element cannot be resized.</description>
@@ -11922,6 +12086,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>If present, specifies that the element should not have shading.</description>
@@ -11935,6 +12100,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <deprecated>Use CSS to style text wrapping instead.</deprecated>
@@ -11949,6 +12115,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Name of the resource containing a serialized version of the applet.</description>
@@ -11988,6 +12155,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <attribute name="pagex" type="String">
       <browsers>
         <browser platform="Netscape" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Horizontal position of the element in the browser window.</description>
@@ -11996,6 +12164,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <attribute name="pagey" type="String">
       <browsers>
         <browser platform="Netscape" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Vertical position of the element in the browser window.</description>
@@ -12014,6 +12183,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <attribute name="pluginspage" type="String">
       <browsers>
         <browser platform="Netscape" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies a web page with installation information for the plugin for the element.</description>
@@ -12053,6 +12223,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the URL for the meta-information dictionary.</description>
@@ -12084,6 +12255,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>If present, specifies that the element is read-only.</description>
@@ -12099,6 +12271,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="IE" version="3.0+"/>
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the relationship of the linked document to the current document.</description>
@@ -12127,6 +12300,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="IE" version="3.0+"/>
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the relationship of the current document to the linked document.</description>
@@ -12163,6 +12337,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Number of rows in the element.</description>
@@ -12177,6 +12352,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Number of rows that the element should span.</description>
@@ -12191,6 +12367,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the dividing rules for the element.</description>
@@ -12211,6 +12388,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the scheme for the value of the content attribute.</description>
@@ -12225,6 +12403,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies cells that the element is a header for.</description>
@@ -12259,6 +12438,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <attribute name="scrollamount" type="String">
       <browsers>
         <browser platform="IE" version="3.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the number of pixels between the end of one block of content and the start of the next while scrolling.</description>
@@ -12267,6 +12447,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <attribute name="scrolldelay" type="String">
       <browsers>
         <browser platform="IE" version="3.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the delay (in milliseconds) between the end of one block of scrolling content and the start of the next.</description>
@@ -12281,6 +12462,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="2.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies whether or not the element has scroll bars.</description>
@@ -12299,6 +12481,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>If present, specifies that the element selected by default.</description>
@@ -12315,6 +12498,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>For an anchor that defines a hyperlink, shape of the selectable hypertext region.</description>
@@ -12334,6 +12518,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Size of the element.</description>
@@ -12357,6 +12542,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Number of columns that this column should span.</description>
@@ -12382,6 +12568,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>URL for the source for the element.</description>
@@ -12396,6 +12583,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Text content to dislay while the object associated with the element loads.</description>
@@ -12410,6 +12598,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Inline style for the element.</description>
@@ -12424,6 +12613,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Summary of the contents of the element.</description>
@@ -12438,6 +12628,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Position of the element in the tabbing order for the document.</description>
@@ -12452,6 +12643,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Target window to use for opening the linked document.</description>
@@ -12474,6 +12666,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <deprecated>Use CSS to style text instead.</deprecated>
@@ -12489,6 +12682,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Short text description for the element.</description>
@@ -12497,6 +12691,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <attribute name="top" type="String">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Number of pixels that the element is offset from the top.</description>
@@ -12505,6 +12700,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <attribute name="truespeed" type="String">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>If present, specifies that the scrolldelay value should not be rounded up to 60 milliseconds.</description>
@@ -12521,6 +12717,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Type of button element.</description>
@@ -12549,6 +12746,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the type of input control.</description>
@@ -12574,6 +12772,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the MIME type for the element.</description>
@@ -12615,6 +12814,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies a URL to use for an image map or object map.</description>
@@ -12626,6 +12826,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Vertical alignment of the element.</description>
@@ -12646,6 +12847,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Text containing the value of the element.</description>
@@ -12660,6 +12862,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the type of value for the element.</description>
@@ -12686,6 +12889,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <deprecated>Use CSS to style links instead.</deprecated>
@@ -12705,6 +12909,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <deprecated>Use CSS to style space instead.</deprecated>
@@ -12737,6 +12942,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Width of the element  (pixels or percentage).</description>
@@ -12745,6 +12951,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <attribute name="wrap" type="String">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies word wrap behavior within the element.</description>
@@ -12769,6 +12976,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Namespace for XML-based tags.</description>
@@ -12779,6 +12987,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <attribute name="z-index" type="Number">
       <browsers>
         <browser platform="Netscape" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Positive integer specifying where an element is stacked in relation to other layers.</description>
@@ -12789,6 +12998,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <event name="onabort" type="Function">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when the loading of the element is cancelled before it finishes loading.</description>
@@ -12820,6 +13030,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <event name="onbeforecopy" type="Function">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires immediately before the selection is copied to the clipboard.</description>
@@ -12827,6 +13038,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <event name="onbeforecut" type="Function">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires immediately before the selection is cut to the clipboard.</description>
@@ -12846,6 +13058,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <event name="onbeforepaste" type="Function">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires immediately before the selection is pasted from the clipboard to the element.</description>
@@ -12877,6 +13090,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when the element loses focus.</description>
@@ -12920,6 +13134,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when the value of the element changes.</description>
@@ -12933,6 +13148,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when the element is clicked.</description>
@@ -12940,6 +13156,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <event name="oncontextmenu" type="Function">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when the element is right-clicked and the context menu opens.</description>
@@ -12953,6 +13170,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <event name="oncopy" type="Function">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when the element is copied to the clipboard.</description>
@@ -12960,6 +13178,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <event name="oncut" type="Function">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when the element is cut to the clipboard.</description>
@@ -12991,6 +13210,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when the element is double-clicked.</description>
@@ -13004,6 +13224,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <event name="ondrag" type="Function">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when the element is dragged.</description>
@@ -13011,6 +13232,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <event name="ondragend" type="Function">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when the element is released from being dragged.</description>
@@ -13018,6 +13240,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <event name="ondragenter" type="Function">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when the element has another object dragged onto it that can be dropped on the element.</description>
@@ -13025,6 +13248,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <event name="ondragleave" type="Function">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when an element has an object dragged out of it that could be dropped onto the element.</description>
@@ -13032,6 +13256,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <event name="ondragover" type="Function">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when an element has an object dragged over it that could be dropped onto the element.</description>
@@ -13039,6 +13264,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <event name="ondragstart" type="Function">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires immediately before an element is dragged.</description>
@@ -13046,6 +13272,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <event name="ondrop" type="Function">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when an object is dropped onto the element.</description>
@@ -13077,6 +13304,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <event name="onerror" type="Function">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when an error occurs with the object associated with the element.</description>
@@ -13108,6 +13336,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when the element receives focus.</description>
@@ -13175,6 +13404,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when a user presses down on a key while the element has focus.</description>
@@ -13188,6 +13418,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when a user presses a key or holds down the key while the element has focus.</description>
@@ -13201,6 +13432,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when a user releases a key while the element has focus.</description>
@@ -13220,6 +13452,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when the content of the element finishes loading.</description>
@@ -13266,6 +13499,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when a user clicks down on the mouse button while the element has focus.</description>
@@ -13293,6 +13527,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when the mouse moves while the pointer over the element.</description>
@@ -13306,6 +13541,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when the mouse pointer moves off of the element.</description>
@@ -13319,6 +13555,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when the mouse pointer moves over the element.</description>
@@ -13332,6 +13569,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when the user releases the mouse button while the element has focus.</description>
@@ -13363,6 +13601,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <event name="onpaste" type="Function">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when the clipboard contents are pasted onto the element.</description>
@@ -13433,6 +13672,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when the form data is reset.</description>
@@ -13440,6 +13680,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <event name="onresize" type="Function">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires immediately before an element is about to be resized.</description>
@@ -13483,6 +13724,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <event name="onscroll" type="Function">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when a user scrolls the element.</description>
@@ -13514,6 +13756,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when the element is selected.</description>
@@ -13521,6 +13764,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <event name="onselectstart" type="Function">
       <browsers>
         <browser platform="IE" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires immediately before the element is selected.</description>
@@ -13549,6 +13793,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when the form data is submitted.</description>
@@ -13577,6 +13822,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Fires when the content of the element finishes unloading.</description>

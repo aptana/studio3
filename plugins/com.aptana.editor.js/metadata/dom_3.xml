@@ -100,6 +100,7 @@ Note: No verification is done on the value when setting this attribute. Applicat
                 </availability>
                 <browsers>
                     <browser platform="Mozilla" version="1.8.1+"/>
+                    <browser platform="Chrome" version="5.0+"/>
                     <browser platform="Safari" version="3.1+"/>
                     <browser platform="Opera" version="9.51+"/>
                 </browsers>

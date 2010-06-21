@@ -142,7 +142,7 @@ public class ParseNodeNavigator extends DefaultNavigator
 
 				protected IParseNode getNextNode(IParseNode node)
 				{
-					int index = node.getChildIndex();
+					int index = node.getIndex();
 
 					return node.getParent().getChild(index + 1);
 				}

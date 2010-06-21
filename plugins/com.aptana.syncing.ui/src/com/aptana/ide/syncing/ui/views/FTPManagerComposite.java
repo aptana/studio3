@@ -41,6 +41,7 @@ import java.util.List;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
@@ -73,14 +74,19 @@ import org.eclipse.ui.PlatformUI;
 
 import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
+import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.DefaultSiteConnection;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.SyncingPlugin;
 import com.aptana.ide.syncing.core.events.ISiteConnectionListener;
 import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
+import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
+import com.aptana.ide.syncing.core.old.handlers.SyncEventHandlerAdapter;
+import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 import com.aptana.ide.syncing.ui.dialogs.SiteConnectionsEditorDialog;
 import com.aptana.ide.syncing.ui.editors.EditorUtils;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
+import com.aptana.ide.syncing.ui.old.views.SmartSyncDialog;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.actions.CopyFilesOperation;
 import com.aptana.ui.UIUtils;
@@ -100,6 +106,7 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
     private Button fSaveAsButton;
     private ConnectionPointComposite fSource;
     private ConnectionPointComposite fTarget;
+    private Button fTransferSyncButton;
     private Button fTransferRightButton;
     private Button fTransferLeftButton;
 
@@ -171,6 +178,8 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
             dlg.open();
         } else if (source == fSaveAsButton) {
             saveAs();
+        } else if (source == fTransferSyncButton) {
+            syncSourceToDestination();
         } else if (source == fTransferRightButton) {
             transferSourceToDestination();
         } else if (source == fTransferLeftButton) {
@@ -311,6 +320,12 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
         fTransferLeftButton.setLayoutData(new GridData(SWT.CENTER, SWT.BEGINNING, true, true));
         fTransferLeftButton.addSelectionListener(this);
 
+        fTransferSyncButton = new Button(directions, SWT.NONE);
+        fTransferSyncButton.setImage(SyncingUIPlugin.getImage("icons/full/obj16/sync_both.gif")); //$NON-NLS-1$
+        fTransferSyncButton.setToolTipText(Messages.FTPManagerComposite_TTP_Synchronize);
+        fTransferSyncButton.setLayoutData(new GridData(SWT.CENTER, SWT.BEGINNING, true, true));
+        fTransferSyncButton.addSelectionListener(this);
+
         final Sash rightSash = new Sash(main, SWT.VERTICAL);
         rightSash.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
 
@@ -419,12 +434,44 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
         EditorUtils.openConnectionEditor(newSite);
     }
 
+    private void syncSourceToDestination() {
+    	
+    	ISiteConnection selection = (ISiteConnection) ((IStructuredSelection) fSitesViewer.getSelection()).getFirstElement();
+
+		IConnectionPoint source = selection.getSource();
+		IConnectionPoint dest = selection.getDestination();
+        IFileStore sourceStore = SyncUtils.getFileStore(fSource.getCurrentInput());
+        IFileStore targetStore = SyncUtils.getFileStore(fTarget.getCurrentInput());
+
+        SmartSyncDialog dialog = new SmartSyncDialog(UIUtils.getActiveShell(), source, dest, sourceStore, targetStore,
+				source.getName(), dest.getName());
+		dialog.open();
+		dialog.setHandler(new SyncEventHandlerAdapter()
+		{
+			public void syncDone(VirtualFileSyncPair item)
+			{
+                IOUIPlugin.refreshNavigatorView(fSource.getCurrentInput());
+                IOUIPlugin.refreshNavigatorView(fTarget.getCurrentInput());
+                UIUtils.getDisplay().asyncExec(new Runnable() {
+
+                    public void run() {
+                        fSource.refresh();
+                        fTarget.refresh();
+                    }
+                });
+			}
+		});
+    }
+
     private void transferSourceToDestination() {
-        transferItems(fSource.getSelectedElements(), fTarget.getCurrentInput(),
+        transferItems(fSource.getSelectedElements(), fSource.getCurrentInput(), fTarget.getCurrentInput(),
                 new JobChangeAdapter() {
 
                     @Override
                     public void done(IJobChangeEvent event) {
+                    	if (event.getResult() == Status.CANCEL_STATUS) {
+                    		return;
+                    	}
                         IOUIPlugin.refreshNavigatorView(fTarget.getCurrentInput());
                         UIUtils.getDisplay().asyncExec(new Runnable() {
 
@@ -437,11 +484,14 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
     }
 
     private void transferDestinationToSource() {
-        transferItems(fTarget.getSelectedElements(), fSource.getCurrentInput(),
+        transferItems(fTarget.getSelectedElements(), fTarget.getCurrentInput(), fSource.getCurrentInput(),
                 new JobChangeAdapter() {
 
                     @Override
                     public void done(IJobChangeEvent event) {
+                    	if (event.getResult() == Status.CANCEL_STATUS) {
+                    		return;
+                    	}
                         IOUIPlugin.refreshNavigatorView(fSource.getCurrentInput());
                         UIUtils.getDisplay().asyncExec(new Runnable() {
 
@@ -453,12 +503,17 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
                 });
     }
 
-    private void transferItems(IAdaptable[] sourceItems, IAdaptable targetRoot,
+    private void transferItems(IAdaptable[] sourceItems, IAdaptable sourceRoot, IAdaptable targetRoot,
             IJobChangeListener listener) {
-        IFileStore targetStore = SyncUtils.getFileStore(targetRoot);
-        if (targetStore != null) {
+        IFileStore targetRootStore = SyncUtils.getFileStore(targetRoot);
+        if (targetRootStore != null) {
             CopyFilesOperation operation = new CopyFilesOperation(getControl().getShell());
-            operation.copyFiles(sourceItems, targetStore, listener);
+            IFileStore sourceRootStore = SyncUtils.getFileStore(sourceRoot);
+            if (sourceRootStore == null) {
+            	operation.copyFiles(sourceItems, targetRootStore, listener);
+            } else {
+            	operation.copyFiles(sourceItems, sourceRootStore, targetRootStore, listener);
+            }
         }
     }
 

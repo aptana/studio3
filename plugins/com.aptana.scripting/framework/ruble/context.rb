@@ -18,6 +18,8 @@ module Ruble
       exit_with_message(message, :show_as_tooltip)
     end
     
+    alias :exit_show_tooltip :exit_show_tool_tip
+    
     def exit_replace_document(message)
       exit_with_message(message, :replace_document)
     end

@@ -5,7 +5,13 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class JSAssignmentNode extends JSNode
 {
-
+	/**
+	 * JSAssignmentNode
+	 * 
+	 * @param left
+	 * @param assignOperator
+	 * @param right
+	 */
 	public JSAssignmentNode(JSNode left, String assignOperator, JSNode right)
 	{
 		this.start = left.getStart();
@@ -57,12 +63,16 @@ public class JSAssignmentNode extends JSNode
 		setChildren(new JSNode[] { left, right });
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
+	 */
 	@Override
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
 		String operator = "???"; //$NON-NLS-1$
-		switch (getType())
+		switch (getNodeType())
 		{
 			case JSNodeTypes.ASSIGN:
 				operator = "="; //$NON-NLS-1$
@@ -107,6 +117,8 @@ public class JSAssignmentNode extends JSNode
 		text.append(" ").append(operator).append(" "); //$NON-NLS-1$ //$NON-NLS-2$
 		text.append(children[1]);
 
-		return appendSemicolon(text.toString());
+		this.appendSemicolon(text);
+
+		return text.toString();
 	}
 }

@@ -145,5 +145,35 @@ public interface IPreferenceConstants {
      * SHOW_MODIFICATION_TIME
      */
     static final String SHOW_MODIFICATION_TIME = "SHOW_MODIFICATION_TIME"; //$NON-NLS-1$
-    
+
+    /**
+     * FILE_PERMISSION
+     */
+	static final String FILE_PERMISSION = "FILE_PERMISSION"; //$NON-NLS-1$
+
+	/**
+	 * DIRECTORY_PERMISSION
+	 */
+	static final String DIRECTORY_PERMISSION = "DIRECTORY_PERMISSION"; //$NON-NLS-1$
+
+	/**
+	 * COMPARE_IN_BACKGROUND
+	 */
+	static final String COMPARE_IN_BACKGROUND = "COMPARE_IN_BACKGROUND";
+
+	/**
+	 * USE_CRC
+	 */
+	static final String USE_CRC = "USE_CRC";
+
+	/**
+	 * INITIAL_POOL_SIZE
+	 */
+	static final String INITIAL_POOL_SIZE = "INITIAL_POOL_SIZE";
+
+	/**
+	 * MAX_POOL_SIZE
+	 */
+	static final String MAX_POOL_SIZE = "MAX_POOL_SIZE";
+    	    	
 }

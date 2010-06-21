@@ -80,6 +80,8 @@
       <import plugin="org.eclipse.search" version="3.2.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.terminal" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.org.eclipse.tm.terminal" version="3.0.100" match="greaterOrEqual"/>
+      <import plugin="com.aptana.syncing.core"/>
+      <import plugin="com.aptana.syncing.ui"/>
    </requires>
 
    <plugin
@@ -225,6 +227,30 @@
          download-size="0"
          install-size="0"
          version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.syncing.core.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.syncing.ui.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.parsing.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
          unpack="false"/>
 
 </feature>

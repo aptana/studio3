@@ -53,9 +53,10 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 	private static FTPSConnectionPoint setupConnection()
 	{
 		FTPSConnectionPoint ftpcp = new FTPSConnectionPoint();
-		ftpcp.setHost("10.10.1.60"); //$NON-NLS-1$
-		ftpcp.setLogin("ftpuser"); //$NON-NLS-1$
-		ftpcp.setPassword(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'});
+		ftpcp.setHost(getConfig().getProperty("ftps.host", "10.10.1.60")); //$NON-NLS-1$ //$NON-NLS-2$
+		ftpcp.setLogin(getConfig().getProperty("ftps.username", "ftpuser")); //$NON-NLS-1$ //$NON-NLS-2$
+		ftpcp.setPassword(getConfig().getProperty("ftps.password",	//$NON-NLS-1$
+				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'})).toCharArray());
 		ftpcp.setValidateCertificate(false);
 
 		ConnectionContext context = new ConnectionContext();

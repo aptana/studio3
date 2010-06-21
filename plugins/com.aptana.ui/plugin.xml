@@ -48,6 +48,9 @@
          <viewShortcut
                id="com.aptana.terminal.views.terminal">
          </viewShortcut>
+         <viewShortcut
+               id="org.eclipse.ui.console.ConsoleView">
+         </viewShortcut>
          <view
                id="org.eclipse.pde.runtime.LogView"
                relationship="stack"
@@ -95,7 +98,7 @@
             category="com.aptana.ui.wizards.category"
             class="com.aptana.ui.internal.wizards.NewProjectWizard"
             finalPerspective="com.aptana.ui.WebPerspective"
-            icon="icons/new_web_project.gif"
+            icon="icons/new_web_project.png"
             id="com.aptana.ui.wizards.NewWebProject"
             name="%wizard.webproject.name"
             preferredPerspectives="com.aptana.ui.WebPerspective"
@@ -129,6 +132,86 @@
             id="com.aptana.ui.webnature.image"
             natureId="com.aptana.ui.webnature">
       </image>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="com.aptana.ui.category"
+            name="%CommandsCategory.name">
+      </category>
+      <command
+            categoryId="com.aptana.ui.category"
+            defaultHandler="com.aptana.ui.internal.commands.ViewReleaseNotesCommandHandler"
+            description="%ViewReleaseNotes.description"
+            id="com.aptana.ui.command.viewreleasenotes"
+            name="%ViewReleaseNotes.label">
+      </command>
+      <command
+            categoryId="com.aptana.ui.category"
+            defaultHandler="com.aptana.ui.internal.commands.SendFeedbackCommandHandler"
+            description="%SendFeedbackCommand.description"
+            id="com.aptana.ui.command.sendfeedback"
+            name="%SendFeedbackCommand.label">
+      </command>
+      <command
+            categoryId="com.aptana.ui.category"
+            defaultHandler="com.aptana.ui.internal.commands.ReportBugCommandHandler"
+            description="%ReportBugCommand.description"
+            id="com.aptana.ui.command.reportbug"
+            name="%ReportBugCommand.label">
+      </command>
+      <command
+            categoryId="com.aptana.ui.category"
+            defaultHandler="com.aptana.ui.internal.commands.ViewLogCommandHandler"
+            description="%ViewLogCommand.description"
+            id="com.aptana.ui.command.viewlog"
+            name="%ViewLogCommand.Label">
+      </command>
+      <command
+            categoryId="com.aptana.ui.category"
+            defaultHandler="com.aptana.ui.internal.commands.ClearLogCommandHandler"
+            description="%ClearLogCommand.description"
+            id="com.aptana.ui.command.clearlog"
+            name="%ClearLogCommand.Label">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:help?after=additions">
+         <menu
+               id="aptanahelp"
+               label="%Menu.Help.Aptana.label">
+            <command
+                  commandId="com.aptana.ui.command.sendfeedback"
+                  style="push">
+            </command>
+            <command
+                  commandId="com.aptana.ui.command.reportbug"
+                  style="push">
+            </command>
+            <separator
+                  name="slot1"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="com.aptana.ui.command.viewlog"
+                  style="push">
+            </command>
+            <command
+                  commandId="com.aptana.ui.command.clearlog"
+                  style="push">
+            </command>
+            <separator
+                  name="slot2"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="com.aptana.ui.command.viewreleasenotes"
+                  style="push">
+            </command>
+         </menu>
+      </menuContribution>
    </extension>
 
 </plugin>

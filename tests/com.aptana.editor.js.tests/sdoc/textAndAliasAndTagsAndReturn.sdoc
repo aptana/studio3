@@ -1,0 +1,23 @@
+/**
+ * Remove items from an array that do not pass a given criteria. Each item in
+ * the specified array will be passed to the filtering function. If that
+ * function returns true, then the item will be appended to the resulting array.
+ * If the function returns false, the item is not added to the resulting array.
+ * 
+ * Note that the specified array is not altered in place. A new array is created
+ * as a result of this function call.
+ * 
+ * @alias Package1.Package2.methodName
+ * @param {Array} array
+ * 		The source array to be filtered
+ * @param {Function} func
+ * 		The filtering function to apply to each array item. This filter has two
+ * 		parameters. The first parameter is the current item in the array that is
+ *		potentially being filtered. The second parameter is the index of the
+ *		item potentially being filtered. The index can be used in cases where
+ *		the filtering decision needs to be determined based on proximity to
+ *		other items in the array
+ * @return {Array}
+ * 		Returns a new array containing only items that were approved by the
+ * 		filtering function.
+ */

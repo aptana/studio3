@@ -188,6 +188,37 @@ public abstract class MetadataReader extends ValidatingReader
 	}
 	
 	/**
+	 * normalizeText
+	 * 
+	 * @param text
+	 * @return
+	 */
+	public String normalizeText(String text)
+	{
+		String result = null;
+		
+		if (text != null)
+		{
+			result = text.replaceAll("\\s+", " ").trim();
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * start buffering text
+	 * 
+	 * @param ns
+	 * @param name
+	 * @param qname
+	 * @param attributes
+	 */
+	public void startTextBuffer()
+	{
+		this._bufferText = true;
+	}
+	
+	/**
 	 * start buffering text
 	 * 
 	 * @param ns
@@ -197,6 +228,6 @@ public abstract class MetadataReader extends ValidatingReader
 	 */
 	public void startTextBuffer(String ns, String name, String qname, Attributes attributes)
 	{
-		this._bufferText = true;
+		this.startTextBuffer();
 	}
 }

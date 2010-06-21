@@ -28,6 +28,7 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 					Control control = getRootControl();
 					if (!control.isDisposed()) {
 						control.setBackground(ThemedTextLineRenderer.getStyleMap().getBackgroundColor());
+						getCtlText().redraw();
 					}
 				}
 			}

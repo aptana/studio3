@@ -1,12 +1,17 @@
 package com.aptana.editor.js.parsing.ast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseNodeAttribute;
-import com.aptana.parsing.ast.ParseBaseNode;
+import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.ast.ParseNodeAttribute;
 
 public class JSFunctionNode extends JSNode
 {
+	private List<String> fReturnTypes;
+	
 	/**
 	 * JSFunctionNode
 	 * 
@@ -14,9 +19,9 @@ public class JSFunctionNode extends JSNode
 	 * @param start
 	 * @param end
 	 */
-	public JSFunctionNode(JSNode[] children, int start, int end)
+	public JSFunctionNode(int start, int end, JSNode... children)
 	{
-		super(JSNodeTypes.FUNCTION, children, start, end);
+		super(JSNodeTypes.FUNCTION, start, end, children);
 	}
 
 	/**
@@ -28,15 +33,15 @@ public class JSFunctionNode extends JSNode
 	{
 		IParseNode[] result = NO_CHILDREN;
 		IParseNode argsNode = this.getChild(1);
-		
-		if (argsNode != null && argsNode.getType() == JSNodeTypes.PARAMETERS)
+
+		if (argsNode != null && argsNode.getNodeType() == JSNodeTypes.PARAMETERS)
 		{
 			result = argsNode.getChildren();
 		}
-		
+
 		return result;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.ParseBaseNode#getAttributes()
@@ -44,20 +49,19 @@ public class JSFunctionNode extends JSNode
 	public IParseNodeAttribute[] getAttributes()
 	{
 		String name = getName();
-		
+
 		if (name != null && name.length() > 0)
 		{
 			// TODO: possibly cache this
-			return new IParseNodeAttribute[] {
-				new ParseNodeAttribute(this, "name", name) //$NON-NLS-1$
+			return new IParseNodeAttribute[] { new ParseNodeAttribute(this, "name", name) //$NON-NLS-1$
 			};
 		}
 		else
 		{
-			return ParseBaseNode.NO_ATTRIBUTES;
+			return ParseNode.NO_ATTRIBUTES;
 		}
 	}
-	
+
 	/**
 	 * getBody
 	 * 
@@ -67,7 +71,7 @@ public class JSFunctionNode extends JSNode
 	{
 		return this.getChild(2);
 	}
-	
+
 	/**
 	 * getName
 	 * 
@@ -78,6 +82,21 @@ public class JSFunctionNode extends JSNode
 		return getChild(0).getText();
 	}
 
+	/**
+	 * getReturnTypes
+	 * 
+	 * @return
+	 */
+	public List<String> getReturnTypes()
+	{
+		if (fReturnTypes == null)
+		{
+			fReturnTypes = new ArrayList<String>();
+		}
+		
+		return fReturnTypes;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.ParseBaseNode#getText()
@@ -103,6 +122,9 @@ public class JSFunctionNode extends JSNode
 			text.append(name).append(" "); //$NON-NLS-1$
 		}
 		text.append(getChild(1)).append(" ").append(getChild(2)); //$NON-NLS-1$
-		return appendSemicolon(text.toString());
+
+		this.appendSemicolon(text);
+
+		return text.toString();
 	}
 }

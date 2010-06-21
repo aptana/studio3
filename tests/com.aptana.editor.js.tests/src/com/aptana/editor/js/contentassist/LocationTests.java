@@ -5,6 +5,7 @@ import org.eclipse.jface.text.BadLocationException;
 import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.js.contentassist.JSContentAssistProcessor.Location;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
+import com.aptana.editor.js.tests.EditorBasedTests;
 
 public class LocationTests extends EditorBasedTests
 {

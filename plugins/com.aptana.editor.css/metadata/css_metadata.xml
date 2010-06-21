@@ -9,6 +9,7 @@
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a link or a target.</description>
@@ -233,6 +234,7 @@ a:hover {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for an active link.</description>
@@ -457,6 +459,7 @@ a:hover {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a link that currently has focus.</description>
@@ -681,6 +684,7 @@ a:hover {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a link that a user is currently hovering over with the mouse.</description>
@@ -905,6 +909,7 @@ a:hover {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for an unvisited link.</description>
@@ -1129,6 +1134,7 @@ a:hover {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a visited link.</description>
@@ -1352,6 +1358,7 @@ a:hover {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="6.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for an abbreviation.</description>
@@ -1550,6 +1557,7 @@ abbr {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for an address.</description>
@@ -1748,6 +1756,7 @@ address {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a clickable area on an image.</description>
@@ -1943,6 +1952,7 @@ area {
     <element name="article" display-name="Article">
       <browsers>
         <browser platform="Mozilla" version="3.7+"/>
+        <browser platform="Chrome" version="5.0.6+"/>
         <browser platform="Safari" version="4.0.6+"/>
       </browsers>
       <description>Defines the properties for an article.</description>
@@ -2132,6 +2142,7 @@ area {
     <element name="aside" display-name="Aside">
       <browsers>
         <browser platform="Mozilla" version="3.7+"/>
+        <browser platform="Chrome" version="5.0.6+"/>
         <browser platform="Safari" version="4.0.6+"/>
       </browsers>
       <description>Defines the properties for an aside element.</description>
@@ -2323,6 +2334,7 @@ area {
         <browser platform="IE" version="9.0+"/>
         <browser platform="Mozilla" version="3.5+"/>
         <browser platform="Opera" version="10.5+"/>
+        <browser platform="Chrome" version="5.0.5+"/>
         <browser platform="Safari" version="4.0.5+"/>
       </browsers>
       <description>Defines the properties for an audio player.</description>
@@ -2515,6 +2527,7 @@ area {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for bold text.</description>
@@ -2713,6 +2726,7 @@ b {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a base url.</description>
@@ -2905,6 +2919,7 @@ b {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for text direction for the document.</description>
@@ -3097,6 +3112,7 @@ b {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a blockquote.</description>
@@ -3296,6 +3312,7 @@ blockquote {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for the document Body.</description>
@@ -3496,6 +3513,7 @@ body {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a hard line break in the text.</description>
@@ -3688,6 +3706,7 @@ body {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a clickable Button.</description>
@@ -3878,6 +3897,7 @@ body {
       <browsers>
         <browser platform="Mozilla" version="3.7+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0.5+"/>
         <browser platform="Safari" version="4.0.5+"/>
       </browsers>
       <description>Defines the properties for a scriptable bitmap canvas.</description>
@@ -4070,6 +4090,7 @@ body {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a caption within a table.</description>
@@ -4262,6 +4283,7 @@ body {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a citation.</description>
@@ -4454,6 +4476,7 @@ body {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a block of text formatted as code.</description>
@@ -4653,6 +4676,7 @@ code {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a table column.</description>
@@ -4845,6 +4869,7 @@ code {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a table column group.</description>
@@ -5413,6 +5438,7 @@ code {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a definition in a definition list.</description>
@@ -5605,6 +5631,7 @@ code {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for deleted text.</description>
@@ -5793,6 +5820,7 @@ code {
     </element>
     <element name="details" display-name="Details">
       <browsers>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for details about a document.</description>
@@ -5985,6 +6013,7 @@ code {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a definition of a term.</description>
@@ -6177,6 +6206,7 @@ code {
         <browser platform="Netscape" version="2.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a pre-defined content block in a document.</description>
@@ -6376,6 +6406,7 @@ div {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a list of definitions.</description>
@@ -6568,6 +6599,7 @@ div {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a list of definition terms in a list.</description>
@@ -6760,6 +6792,7 @@ div {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a block of text block of text that is formatted for emphasis.</description>
@@ -7149,6 +7182,7 @@ em {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines a set of related form controls to be grouped together.</description>
@@ -7723,6 +7757,7 @@ fieldset {
     <element name="footer" display-name="Footer">
       <browsers>
         <browser platform="Mozilla" version="3.7+"/>
+        <browser platform="Chrome" version="5.0.5+"/>
         <browser platform="Safari" version="4.0.5+"/>
       </browsers>
       <description>Defines the properties for a footer of a section or document.</description>
@@ -7915,6 +7950,7 @@ fieldset {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a form.</description>
@@ -8117,6 +8153,7 @@ form {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a Heading 1 element.</description>
@@ -8319,6 +8356,7 @@ h1 {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a Heading 2 element.</description>
@@ -8521,6 +8559,7 @@ h2 {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a Heading 3 element.</description>
@@ -8723,6 +8762,7 @@ h3 {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a Heading 4 element.</description>
@@ -8925,6 +8965,7 @@ h4 {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a Heading 5 element.</description>
@@ -9127,6 +9168,7 @@ h5 {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a Heading 6 element.</description>
@@ -9328,6 +9370,7 @@ h6 {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a Document Head.</description>
@@ -9517,6 +9560,7 @@ h6 {
     <element name="header" display-name="Header">
       <browsers>
         <browser platform="Mozilla" version="3.7+"/>
+        <browser platform="Chrome" version="5.0.5+"/>
         <browser platform="Safari" version="4.0.5+"/>
       </browsers>
       <description>Defines the properties for an introduction to the document.</description>
@@ -9706,6 +9750,7 @@ h6 {
     <element name="hgroup" display-name="Header Group">
       <browsers>
         <browser platform="Mozilla" version="3.7+"/>
+        <browser platform="Chrome" version="5.0.5+"/>
         <browser platform="Safari" version="4.0.5+"/>
       </browsers>
       <description>Defines the properties for a header group.</description>
@@ -9898,6 +9943,7 @@ h6 {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a horizontal rule.</description>
@@ -10098,6 +10144,7 @@ hr {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a HTML document.</description>
@@ -10290,6 +10337,7 @@ hr {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a block of text formatted as italics.</description>
@@ -10488,6 +10536,7 @@ i {
         <browser platform="Netscape" version="3.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for an inline frame.</description>
@@ -10680,6 +10729,7 @@ i {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for an image object.</description>
@@ -10872,6 +10922,7 @@ i {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for an input field on a form.</description>
@@ -11073,6 +11124,7 @@ input {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for inserted text.</description>
@@ -11265,6 +11317,7 @@ input {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for keyboard input.</description>
@@ -11454,6 +11507,7 @@ input {
     <element name="keygen" display-name="Key Generation">
       <browsers>
         <browser platform="Mozilla" version="0.1+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.2+"/>
         <browser platform="Opera" version="9.0+"/>
       </browsers>
@@ -11647,6 +11701,7 @@ input {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines a label on a form.</description>
@@ -11848,6 +11903,7 @@ label {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines a legend for the fields on a form.</description>
@@ -12049,6 +12105,7 @@ legend {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for an item in a list.</description>
@@ -12246,6 +12303,7 @@ li {
         <browser platform="IE" version="3.0+"/>
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a link.</description>
@@ -12438,6 +12496,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for an image map.</description>
@@ -13006,6 +13065,7 @@ li {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a meta element.</description>
@@ -13574,6 +13634,7 @@ li {
         <browser platform="Netscape" version="2.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a noscript element.</description>
@@ -13766,6 +13827,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for an object embedded in the document.</description>
@@ -13958,6 +14020,7 @@ li {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for an ordered list.</description>
@@ -14156,6 +14219,7 @@ ol {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies a grouping of option elements within a select element.</description>
@@ -14356,6 +14420,7 @@ optgroup {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies an option in a select (selection list) element.</description>
@@ -14745,6 +14810,7 @@ option {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a paragraph element.</description>
@@ -14945,6 +15011,7 @@ p {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for param element.</description>
@@ -15137,6 +15204,7 @@ p {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a block of preformatted text.</description>
@@ -15332,6 +15400,7 @@ pre {
     </element>
     <element name="progress" display-name="Progress">
       <browsers>
+        <browser platform="Chrome" version="5.0.6+"/>
         <browser platform="Safari" version="4.0.6+"/>
       </browsers>
       <description>Defines the properties for the completion progress of a task.</description>
@@ -15524,6 +15593,7 @@ pre {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a quote.</description>
@@ -15712,6 +15782,7 @@ pre {
     </element>
     <element name="rp" display-name="RP">
       <browsers>
+        <browser platform="Chrome" version="5.0.6+"/>
         <browser platform="Safari" version="4.0.6+"/>
         <browser platform="IE" version="8.0+"/>
       </browsers>
@@ -16281,6 +16352,7 @@ pre {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for sample text.</description>
@@ -16473,6 +16545,7 @@ pre {
         <browser platform="Netscape" version="2.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for script element.</description>
@@ -16662,6 +16735,7 @@ pre {
     <element name="section" display-name="Section">
       <browsers>
         <browser platform="Mozilla" version="3.7+"/>
+        <browser platform="Chrome" version="5.0.6+"/>
         <browser platform="Safari" version="4.0.6+"/>
       </browsers>
       <description>Defines the properties for a generic section of a document or application.</description>
@@ -16854,6 +16928,7 @@ pre {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for select element.</description>
@@ -17046,6 +17121,7 @@ pre {
         <browser platform="Netscape" version="2.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a block of text one font size smaller than the base font.</description>
@@ -17243,6 +17319,7 @@ small {
         <browser platform="IE" version="9.0+"/>
         <browser platform="Mozilla" version="3.5+"/>
         <browser platform="Opera" version="10.5+"/>
+        <browser platform="Chrome" version="5.0.5+"/>
         <browser platform="Safari" version="4.0.5+"/>
       </browsers>
       <description>Defines the properties for source element.</description>
@@ -17435,6 +17512,7 @@ small {
         <browser platform="Netscape" version="3.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a pre-defined text span element.</description>
@@ -17633,6 +17711,7 @@ span {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a block of text formatted as "strong."</description>
@@ -17831,6 +17910,7 @@ strong {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for stylesheet within the document.</description>
@@ -18023,6 +18103,7 @@ strong {
         <browser platform="Netscape" version="2.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for subscript element.</description>
@@ -18403,6 +18484,7 @@ strong {
         <browser platform="Netscape" version="2.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for superscript.</description>
@@ -18595,6 +18677,7 @@ strong {
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a table.</description>
@@ -18797,6 +18880,7 @@ table {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for table body element.</description>
@@ -18989,6 +19073,7 @@ table {
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for an individual table cell.</description>
@@ -19191,6 +19276,7 @@ td {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a textarea input field on a form.</description>
@@ -19392,6 +19478,7 @@ textarea {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for table footer element.</description>
@@ -19584,6 +19671,7 @@ textarea {
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a table header cell.</description>
@@ -19786,6 +19874,7 @@ th {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for table header element.</description>
@@ -20166,6 +20255,7 @@ th {
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for the title of an HTML document.</description>
@@ -20358,6 +20448,7 @@ th {
         <browser platform="Netscape" version="1.1+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a table row.</description>
@@ -20560,6 +20651,7 @@ tr {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for an unordered list.</description>
@@ -20758,6 +20850,7 @@ li {
         <browser platform="Netscape" version="1.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for a variable.</description>
@@ -20949,6 +21042,7 @@ li {
         <browser platform="IE" version="9.0+"/>
         <browser platform="Mozilla" version="3.5+"/>
         <browser platform="Opera" version="10.5+"/>
+        <browser platform="Chrome" version="5.0.5+"/>
         <browser platform="Safari" version="4.0.5+"/>
       </browsers>
       <description>Defines the properties for a video.</description>
@@ -21792,6 +21886,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the background properties for an element.</description>
@@ -21828,6 +21923,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies whether or not the background image is fixed or scrollable as a user scrolls the document.</description>
@@ -21867,6 +21963,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the background color for the element. Specify either a color name or RGB color code.</description>
@@ -21885,6 +21982,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the URL for a background image for an element.</description>
@@ -21917,6 +22015,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the position of a background image for an element.</description>
@@ -21935,6 +22034,7 @@ li {
     <property name="background-position-x" type="String">
       <browsers>
         <browser platform="IE" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.2+"/>
       </browsers>
       <description>Specifies the x-position of a background image for an element.</description>
@@ -21950,6 +22050,7 @@ li {
     <property name="background-position-y" type="String">
       <browsers>
         <browser platform="IE" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.2+"/>
       </browsers>
       <description>Specifies the y-position of a background image for an element.</description>
@@ -21971,6 +22072,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies how a background image repeats for an element.</description>
@@ -22086,6 +22188,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the border properties for an element.</description>
@@ -22123,6 +22226,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for the bottom border for the element.</description>
@@ -22157,6 +22261,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the color for a bottom border. Specify either a color name or RGB color code.</description>
@@ -22199,6 +22304,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies a style for a bottom border.</description>
@@ -22226,6 +22332,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the width of the bottom border.</description>
@@ -22250,6 +22357,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.2+"/>
       </browsers>
       <description>Specifies whether the borders for an element are collapsed or separated.</description>
@@ -22273,6 +22381,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the color for the borders for an element. Specify either a color name or RGB color code.</description>
@@ -22287,6 +22396,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for the left border for the element.</description>
@@ -22321,6 +22431,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the color for a left border. Specify either a color name or RGB color code.</description>
@@ -22335,6 +22446,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies a style for a left border.</description>
@@ -22362,6 +22474,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the width of the left border.</description>
@@ -22412,6 +22525,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for the right border for the element.</description>
@@ -22446,6 +22560,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the color for a right border. Specify either a color name or RGB color code.</description>
@@ -22460,6 +22575,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies a style for a right border.</description>
@@ -22487,6 +22603,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the width of the right border.</description>
@@ -22508,6 +22625,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.2+"/>
       </browsers>
       <description>Specifies the number of pixels between the border and its contents.</description>
@@ -22527,6 +22645,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies a style for a border.</description>
@@ -22563,6 +22682,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for the top border for the element.</description>
@@ -22597,6 +22717,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the color for a top border. Specify either a color name or RGB color code.</description>
@@ -22639,6 +22760,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies a style for a top border.</description>
@@ -22666,6 +22788,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the width of the top border.</description>
@@ -22688,6 +22811,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the width of the border.</description>
@@ -22718,6 +22842,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the y-coordinate for the position of the element relative to the bottom edge of the parent element or browser window.</description>
@@ -22885,6 +23010,7 @@ li {
           <description>Only Mozilla supports the values "left" and "right".</description>
         </browser>
         <browser platform="Opera" version="6.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the position of a caption for the element.</description>
@@ -22909,6 +23035,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the position of the element relative to a floating object on the page.</description>
@@ -22931,6 +23058,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the x- and y-coordinates (in pixels) for the clipping rectangle around the element.</description>
@@ -22950,6 +23078,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the color of the text for the element. Specify either a color name or RGB color code.</description>
@@ -23131,6 +23260,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the content to insert before or after the element.</description>
@@ -23246,6 +23376,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0.2+">
         <browser platform="Safari" version="1.3.2+">
           <description>Supports all W3C cursor values except for progress.</description>
         </browser>
@@ -23306,6 +23437,7 @@ li {
         <browser platform="IE" version="5.0+"/>
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the text direction for the element.</description>
@@ -23331,6 +23463,7 @@ li {
 					Compatibility depends only on the values block, inline, none, inline-block, and list-item.</description>
         </browser>
         <browser platform="Opera" version="5.0+"/>
+        <browser platform="Chrome" version="5.0.2+"/>
         <browser platform="Safari" version="1.3.2+"/>
       </browsers>
       <description>Specifies how to display the element.</description>
@@ -23546,6 +23679,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.2+"/>
       </browsers>
       <description>Specifies whether to show or hide borders for empty table cells.</description>
@@ -23609,6 +23743,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="6.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies if an element should float towards the left or right margin of its parent element or web browser.</description>
@@ -23643,6 +23778,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="6.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the properties for the font for the element.</description>
@@ -23771,6 +23907,7 @@ li {
             <browser platform="Netscape" version="4.0+" os="Mac"/>
             <browser platform="Mozilla" version="1.0+" os="Mac"/>
             <browser platform="Opera" version="6.0+" os="Mac"/>
+            <browser platform="Chrome" version="5.0+" os="Mac"/>
             <browser platform="Safari" version="1.0+" os="Mac"/>
           </browsers>
         </value>
@@ -23946,6 +24083,7 @@ li {
             <browser platform="Netscape" version="4.0+" os="Mac"/>
             <browser platform="Mozilla" version="1.0+" os="Mac"/>
             <browser platform="Opera" version="6.0+" os="Mac"/>
+            <browser platform="Chrome" version="5.0+" os="Mac"/>
             <browser platform="Safari" version="1.0+" os="Mac"/>
           </browsers>
         </value>
@@ -23955,6 +24093,7 @@ li {
             <browser platform="Netscape" version="4.0+" os="Mac"/>
             <browser platform="Mozilla" version="1.0+" os="Mac"/>
             <browser platform="Opera" version="6.0+" os="Mac"/>
+            <browser platform="Chrome" version="5.0+" os="Mac"/>
             <browser platform="Safari" version="1.0+" os="Mac"/>
           </browsers>
         </value>
@@ -23981,6 +24120,7 @@ li {
             <browser platform="Netscape" version="4.0+" os="Mac"/>
             <browser platform="Mozilla" version="1.0+" os="Mac"/>
             <browser platform="Opera" version="6.0+" os="Mac"/>
+            <browser platform="Chrome" version="5.0+" os="Mac"/>
             <browser platform="Safari" version="1.0+" os="Mac"/>
           </browsers>
         </value>
@@ -24035,6 +24175,7 @@ li {
             <browser platform="Netscape" version="4.0+" os="Mac"/>
             <browser platform="Mozilla" version="1.0+" os="Mac"/>
             <browser platform="Opera" version="6.0+" os="Mac"/>
+            <browser platform="Chrome" version="5.0+" os="Mac"/>
             <browser platform="Safari" version="1.0+" os="Mac"/>
           </browsers>
         </value>
@@ -24077,6 +24218,7 @@ li {
             <browser platform="Netscape" version="4.0+" os="Mac"/>
             <browser platform="Mozilla" version="1.0+" os="Mac"/>
             <browser platform="Opera" version="6.0+" os="Mac"/>
+            <browser platform="Chrome" version="5.0+" os="Mac"/>
             <browser platform="Safari" version="1.0+" os="Mac"/>
           </browsers>
         </value>
@@ -24150,6 +24292,7 @@ li {
             <browser platform="Netscape" version="4.0+" os="Mac"/>
             <browser platform="Mozilla" version="1.0+" os="Mac"/>
             <browser platform="Opera" version="6.0+" os="Mac"/>
+            <browser platform="Chrome" version="5.0+" os="Mac"/>
             <browser platform="Safari" version="1.0+" os="Mac"/>
           </browsers>
         </value>
@@ -24247,6 +24390,7 @@ li {
             <browser platform="Netscape" version="4.0+" os="Mac"/>
             <browser platform="Mozilla" version="1.0+" os="Mac"/>
             <browser platform="Opera" version="6.0+" os="Mac"/>
+            <browser platform="Chrome" version="5.0+" os="Mac"/>
             <browser platform="Safari" version="1.0+" os="Mac"/>
           </browsers>
         </value>
@@ -24522,6 +24666,7 @@ li {
             <browser platform="Netscape" version="4.0+" os="Mac"/>
             <browser platform="Mozilla" version="1.0+" os="Mac"/>
             <browser platform="Opera" version="6.0+" os="Mac"/>
+            <browser platform="Chrome" version="5.0+" os="Mac"/>
             <browser platform="Safari" version="1.0+" os="Mac"/>
           </browsers>
         </value>
@@ -24582,6 +24727,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the font face for the element.</description>
@@ -24706,6 +24852,7 @@ li {
             <browser platform="Netscape" version="4.0+" os="Mac"/>
             <browser platform="Mozilla" version="1.0+" os="Mac"/>
             <browser platform="Opera" version="4.0+" os="Mac"/>
+            <browser platform="Chrome" version="5.0+" os="Mac"/>
             <browser platform="Safari" version="1.0+" os="Mac"/>
           </browsers>
         </value>
@@ -24881,6 +25028,7 @@ li {
             <browser platform="Netscape" version="4.0+" os="Mac"/>
             <browser platform="Mozilla" version="1.0+" os="Mac"/>
             <browser platform="Opera" version="4.0+" os="Mac"/>
+            <browser platform="Chrome" version="5.0+" os="Mac"/>
             <browser platform="Safari" version="1.0+" os="Mac"/>
           </browsers>
         </value>
@@ -24890,6 +25038,7 @@ li {
             <browser platform="Netscape" version="4.0+" os="Mac"/>
             <browser platform="Mozilla" version="1.0+" os="Mac"/>
             <browser platform="Opera" version="4.0+" os="Mac"/>
+            <browser platform="Chrome" version="5.0+" os="Mac"/>
             <browser platform="Safari" version="1.0+" os="Mac"/>
           </browsers>
         </value>
@@ -24916,6 +25065,7 @@ li {
             <browser platform="Netscape" version="4.0+" os="Mac"/>
             <browser platform="Mozilla" version="1.0+" os="Mac"/>
             <browser platform="Opera" version="4.0+" os="Mac"/>
+            <browser platform="Chrome" version="5.0+" os="Mac"/>
             <browser platform="Safari" version="1.0+" os="Mac"/>
           </browsers>
         </value>
@@ -24970,6 +25120,7 @@ li {
             <browser platform="Netscape" version="4.0+" os="Mac"/>
             <browser platform="Mozilla" version="1.0+" os="Mac"/>
             <browser platform="Opera" version="4.0+" os="Mac"/>
+            <browser platform="Chrome" version="5.0+" os="Mac"/>
             <browser platform="Safari" version="1.0+" os="Mac"/>
           </browsers>
         </value>
@@ -25012,6 +25163,7 @@ li {
             <browser platform="Netscape" version="4.0+" os="Mac"/>
             <browser platform="Mozilla" version="1.0+" os="Mac"/>
             <browser platform="Opera" version="4.0+" os="Mac"/>
+            <browser platform="Chrome" version="5.0+" os="Mac"/>
             <browser platform="Safari" version="1.0+" os="Mac"/>
           </browsers>
         </value>
@@ -25085,6 +25237,7 @@ li {
             <browser platform="Netscape" version="4.0+" os="Mac"/>
             <browser platform="Mozilla" version="1.0+" os="Mac"/>
             <browser platform="Opera" version="4.0+" os="Mac"/>
+            <browser platform="Chrome" version="5.0+" os="Mac"/>
             <browser platform="Safari" version="1.0+" os="Mac"/>
           </browsers>
         </value>
@@ -25176,6 +25329,7 @@ li {
             <browser platform="Netscape" version="4.0+" os="Mac"/>
             <browser platform="Mozilla" version="1.0+" os="Mac"/>
             <browser platform="Opera" version="4.0+" os="Mac"/>
+            <browser platform="Chrome" version="5.0+" os="Mac"/>
             <browser platform="Safari" version="1.0+" os="Mac"/>
           </browsers>
         </value>
@@ -25451,6 +25605,7 @@ li {
             <browser platform="Netscape" version="4.0+" os="Mac"/>
             <browser platform="Mozilla" version="1.0+" os="Mac"/>
             <browser platform="Opera" version="4.0+" os="Mac"/>
+            <browser platform="Chrome" version="5.0+" os="Mac"/>
             <browser platform="Safari" version="1.0+" os="Mac"/>
           </browsers>
         </value>
@@ -25473,6 +25628,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies either the explicit or relative size of the font compared to the base font size.</description>
@@ -25534,6 +25690,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies a style for a font (e.g. italic).</description>
@@ -25554,6 +25711,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies a variation for a font (e.g. small-caps).</description>
@@ -25580,6 +25738,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the weight of a font (e.g. bold).</description>
@@ -25626,6 +25785,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the height (in pixels, points, or as a percentage) of the content of the element.</description>
@@ -25886,6 +26046,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="5.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the x-coordinate for the position of the element relative to the left edge of the parent element or browser window.</description>
@@ -25906,6 +26067,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the amount of space (in points or pixels) between letters in the text of the element.</description>
@@ -25936,6 +26098,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies line height of text in multiline elements, such as paragraphs.</description>
@@ -26022,6 +26185,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0.2+">
         <browser platform="Safari" version="1.3.2+">
           <description>Safari does not support the "box" style.</description>
         </browser>
@@ -26071,6 +26235,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the URL to an image to use for list items.</description>
@@ -26086,6 +26251,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the position of the bullet or number for a list.</description>
@@ -26106,6 +26272,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0.2+">
         <browser platform="Safari" version="1.3.2+">
           <description>Safari does not support the "box" style.</description>
         </browser>
@@ -26148,6 +26315,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Defines the widths (in pixels, points, or a percentage) for the margins for the element.</description>
@@ -26172,6 +26340,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the width (in pixels, points, or a percentage) for the bottom margin of an element.</description>
@@ -26186,6 +26355,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the width (in pixels, points, or a percentage) for the left margin of an element.</description>
@@ -26200,6 +26370,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the width (in pixels, points, or a percentage) for the right margin of an element.</description>
@@ -26214,6 +26385,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the width (in pixels, points, or a percentage) for the top margin of an element.</description>
@@ -26362,6 +26534,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.3+"/>
       </browsers>
       <description>Specifies the maximum height that an element may be.</description>
@@ -26384,6 +26557,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the maximum width that an element may be.</description>
@@ -26406,6 +26580,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.3+"/>
       </browsers>
       <description>Specifies the minimum height that an element may be.</description>
@@ -26428,6 +26603,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the minimum width that an element may be.</description>
@@ -26549,6 +26725,7 @@ li {
         </browser>
         <browser platform="Mozilla" version="1.5+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.2+"/>
       </browsers>
       <description>Specifies the transparency of an element. Specify a value between 0.0-1.0.</description>
@@ -26578,6 +26755,7 @@ li {
       <browsers>
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+">
         <browser platform="Safari" version="1.2+">
           <description>Support for "outline" in Safari is "buggy".</description>
         </browser>
@@ -26614,6 +26792,7 @@ li {
       <browsers>
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+">
         <browser platform="Safari" version="1.2+">
           <description>Support for "outline" in Safari is "buggy".</description>
         </browser>
@@ -26647,6 +26826,7 @@ li {
       <browsers>
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+">
         <browser platform="Safari" version="1.2+">
           <description>Support for "outline" in Safari is "buggy".</description>
         </browser>
@@ -26677,6 +26857,7 @@ li {
       <browsers>
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+">
         <browser platform="Safari" version="1.2+">
           <description>Support for "outline" in Safari is "buggy".</description>
         </browser>
@@ -26708,6 +26889,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0.2+">
         <browser platform="Safari" version="1.3.2+">
           <description>Support for overflow is not dynamic.</description>
         </browser>
@@ -26778,6 +26960,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the amount of padding space between the content of an element and its border.</description>
@@ -26799,6 +26982,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the amount of padding (in pixels, points, or a percentage) at the bottom of an element.</description>
@@ -26810,6 +26994,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the amount of padding (in pixels, points, or a percentage) for the left side of an element.</description>
@@ -26821,6 +27006,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the amount of padding (in pixels, points, or a percentage) for the right side of an element.</description>
@@ -26832,6 +27018,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the amount of padding (in pixels, points, or a percentage) at the top of an element.</description>
@@ -26853,6 +27040,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.2+"/>
       </browsers>
       <description>Defines the way that a page breaks after the element when the page is printed.</description>
@@ -26863,6 +27051,7 @@ li {
             <browser platform="Netscape" version="6.0+"/>
             <browser platform="Mozilla" version="1.0+"/>
             <browser platform="Opera" version="7.0+"/>
+            <browser platform="Chrome" version="5.0+"/>
             <browser platform="Safari" version="1.2+"/>
           </browsers>
         </value>
@@ -26872,6 +27061,7 @@ li {
             <browser platform="Netscape" version="6.0+"/>
             <browser platform="Mozilla" version="1.0+"/>
             <browser platform="Opera" version="7.0+"/>
+            <browser platform="Chrome" version="5.0+"/>
             <browser platform="Safari" version="1.2+"/>
           </browsers>
         </value>
@@ -26881,6 +27071,7 @@ li {
             <browser platform="Netscape" version="6.0+"/>
             <browser platform="Mozilla" version="1.0+"/>
             <browser platform="Opera" version="7.0+"/>
+            <browser platform="Chrome" version="5.0+"/>
             <browser platform="Safari" version="1.2+"/>
           </browsers>
         </value>
@@ -26919,6 +27110,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.2+"/>
       </browsers>
       <description>Defines the way that a page breaks before the element when the page is printed.</description>
@@ -26929,6 +27121,7 @@ li {
             <browser platform="Netscape" version="6.0+"/>
             <browser platform="Mozilla" version="1.0+"/>
             <browser platform="Opera" version="7.0+"/>
+            <browser platform="Chrome" version="5.0+"/>
             <browser platform="Safari" version="1.2+"/>
           </browsers>
         </value>
@@ -26938,6 +27131,7 @@ li {
             <browser platform="Netscape" version="6.0+"/>
             <browser platform="Mozilla" version="1.0+"/>
             <browser platform="Opera" version="7.0+"/>
+            <browser platform="Chrome" version="5.0+"/>
             <browser platform="Safari" version="1.2+"/>
           </browsers>
         </value>
@@ -26947,6 +27141,7 @@ li {
             <browser platform="Netscape" version="6.0+"/>
             <browser platform="Mozilla" version="1.0+"/>
             <browser platform="Opera" version="7.0+"/>
+            <browser platform="Chrome" version="5.0+"/>
             <browser platform="Safari" version="1.2+"/>
           </browsers>
         </value>
@@ -27109,6 +27304,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies how the element is positioned relative to the page or other elements.</description>
@@ -27278,6 +27474,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the x-coordinate for the position of the element relative to the right edge of the parent element or browser window.</description>
@@ -27569,6 +27766,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies whether the layout of table rows, columns, and cells is fixed.</description>
@@ -27659,6 +27857,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the horizontal alignment property for the element.</description>
@@ -27694,6 +27893,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="6.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies a text decoration for the element.</description>
@@ -27754,6 +27954,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the amount (in pixels, points, or a percentage) that the first line of text should be indented in a block of content.</description>
@@ -27821,6 +28022,7 @@ li {
         <specification name="W3C" version="CSS2"/>
       </availability>
       <browsers>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.1+"/>
       </browsers>
       <description>Defines the horizontal depth, vertical depth, blur, and color for a drop-shadow for text content in the element.</description>
@@ -27837,6 +28039,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="6.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies that the text for the element should be converted to the assigned case or format.</description>
@@ -27888,6 +28091,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="6.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the y-coordinate for the position of the element relative to the top edge of the parent element or browser window.</description>
@@ -27981,6 +28185,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the vertical alignment property for the element.</description>
@@ -28010,6 +28215,7 @@ li {
           <description>Supports only the "collapse" for table columns.</description>
         </browser>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies whether an element is visible or hidden.</description>
@@ -28220,6 +28426,7 @@ li {
         <browser platform="Opera" version="9.0+">
           <description>Opera almost has full support for the white-space attribute.</description>
         </browser>
+        <browser platform="Chrome" version="5.0+">
         <browser platform="Safari" version="1.0+">
           <description>Support for white-space is incomplete.</description>
         </browser>
@@ -28276,6 +28483,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the width (in pixels, points, or as a percentage) of the content of the element.</description>
@@ -28312,6 +28520,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the amount of space between words for the element text.</description>
@@ -28348,6 +28557,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
       <description>Specifies the stacking order of the element relative to other layers. A higher z-index value will place the element above layers with lower z-index values.</description>

@@ -8,6 +8,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -28,6 +29,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -60,6 +62,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -91,6 +94,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -115,6 +119,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -144,6 +149,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -154,6 +160,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -180,6 +187,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -210,6 +218,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -221,6 +230,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -232,6 +242,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -243,6 +254,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -267,6 +279,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -302,6 +315,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -319,6 +333,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -341,6 +356,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -359,6 +375,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -381,6 +398,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -392,6 +410,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -407,6 +426,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -421,6 +441,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -435,6 +456,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -450,6 +472,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -461,6 +484,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -476,6 +500,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -490,6 +515,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -504,6 +530,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -527,6 +554,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -538,6 +566,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -552,6 +581,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -566,6 +596,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -604,6 +635,7 @@
 					<browser platform="IE" version="3.0+"/>
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -626,6 +658,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -701,6 +734,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -745,6 +779,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -769,6 +804,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -821,6 +857,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -869,6 +906,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -880,6 +918,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -891,6 +930,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -902,6 +942,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -926,6 +967,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -953,6 +995,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -964,6 +1007,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -988,6 +1032,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -1026,6 +1071,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1046,6 +1092,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1067,6 +1114,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1085,6 +1133,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1099,6 +1148,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1110,6 +1160,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1121,6 +1172,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -1135,6 +1187,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -1149,6 +1202,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -1171,6 +1225,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -1188,6 +1243,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -1221,6 +1277,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -1249,6 +1306,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -1270,6 +1328,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1295,6 +1354,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -1316,6 +1376,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1335,6 +1396,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -1352,6 +1414,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -1378,6 +1441,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -1429,6 +1493,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1450,6 +1515,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1479,6 +1545,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1497,6 +1564,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1516,6 +1584,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1538,6 +1607,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1560,6 +1630,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1582,6 +1653,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1601,6 +1673,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1623,6 +1696,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1649,6 +1723,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="6.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -1670,6 +1745,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="6.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -1684,6 +1760,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="6.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1695,6 +1772,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="6.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1706,6 +1784,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="6.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -1720,6 +1799,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="6.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1734,6 +1814,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="6.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1749,6 +1830,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="6.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1760,6 +1842,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="6.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1771,6 +1854,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="6.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1812,6 +1896,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1823,6 +1908,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="6.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -1834,6 +1920,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="6.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -1880,6 +1967,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="6.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<return-description>Returns the value of the attribute.</return-description>
@@ -1952,6 +2040,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="6.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<return-description>Returns the removed attribute.</return-description>
@@ -1995,6 +2084,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="6.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -2021,6 +2111,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -2045,6 +2136,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -2059,6 +2151,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -2078,6 +2171,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -2089,6 +2183,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -2103,6 +2198,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -2121,6 +2217,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -2154,6 +2251,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -2168,6 +2266,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -2182,6 +2281,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -2203,6 +2303,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -2228,6 +2329,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -2248,6 +2350,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -2268,6 +2371,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -2289,6 +2393,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -2309,6 +2414,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -2324,6 +2430,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -2340,6 +2447,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -2351,6 +2459,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -2365,6 +2474,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -2379,6 +2489,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -2393,6 +2504,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -2407,6 +2519,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -2418,6 +2531,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -2429,6 +2543,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -2449,6 +2564,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -2467,6 +2583,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -2485,6 +2602,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -2503,6 +2621,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -2662,6 +2781,7 @@
 			<browser platform="IE" version="4.0+"/>
 			<browser platform="Mozilla" version="1.0+" />
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -2693,6 +2813,7 @@
 					<browser platform="IE" version="4.0+"/>
 					<browser platform="Mozilla" version="1.0+" />
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<return-description>Returns a Java object representation of the return value of the method.</return-description>
@@ -2713,6 +2834,7 @@
 					<browser platform="IE" version="4.0+"/>
 					<browser platform="Mozilla" version="1.0+" />
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<return-description>Returns a Java object representation of the result of the evaluated expression.</return-description>
@@ -2733,6 +2855,7 @@
 					<browser platform="IE" version="4.0+"/>
 					<browser platform="Mozilla" version="1.0+" />
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<return-description>Returns the value of the JavaScript property.</return-description>
@@ -2753,6 +2876,7 @@
 					<browser platform="IE" version="4.0+"/>
 					<browser platform="Mozilla" version="1.0+" />
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<return-description>Returns the value of an element in a JavaScript array.</return-description>
@@ -2773,6 +2897,7 @@
 					<browser platform="IE" version="4.0+"/>
 					<browser platform="Mozilla" version="1.0+" />
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<return-description>Returns a JSObject representation of a browser window.</return-description>
@@ -2793,6 +2918,7 @@
 					<browser platform="IE" version="4.0+"/>
 					<browser platform="Mozilla" version="1.0+" />
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -2815,6 +2941,7 @@
 					<browser platform="IE" version="4.0+"/>
 					<browser platform="Mozilla" version="1.0+" />
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -2837,6 +2964,7 @@
 					<browser platform="IE" version="4.0+"/>
 					<browser platform="Mozilla" version="1.0+" />
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -2851,6 +2979,7 @@
 					<browser platform="IE" version="4.0+"/>
 					<browser platform="Mozilla" version="1.0+" />
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<return-description>Returns a string representation of the value of the JavaScript object.</return-description>
@@ -3306,6 +3435,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="6.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -3336,6 +3466,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="6.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -3355,6 +3486,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="6.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -3374,6 +3506,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="6.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -3392,6 +3525,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="6.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -3430,6 +3564,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -3502,6 +3637,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -3522,6 +3658,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -3533,6 +3670,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -3544,6 +3682,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -3555,6 +3694,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -3566,6 +3706,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -3577,6 +3718,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -3588,6 +3730,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -3599,6 +3742,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -3623,6 +3767,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -3648,6 +3793,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -3669,6 +3815,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -3688,6 +3835,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -3698,6 +3846,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -3708,6 +3857,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -3718,6 +3868,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -3738,6 +3889,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -3758,6 +3910,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -3769,6 +3922,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -3780,6 +3934,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -3791,6 +3946,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="6.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -3801,6 +3957,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -3811,6 +3968,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -3822,6 +3980,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -3832,6 +3991,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -3850,6 +4010,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -3876,6 +4037,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<return-description>Returns true if Java is supported and enabled by the browser.</return-description>
@@ -3933,6 +4095,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -3947,6 +4110,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -3961,6 +4125,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -3975,6 +4140,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -3989,6 +4155,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -4017,6 +4184,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -4037,6 +4205,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4058,6 +4227,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -4077,6 +4247,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4087,6 +4258,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4097,6 +4269,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4107,6 +4280,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4154,6 +4328,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4165,6 +4340,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4176,6 +4352,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4187,6 +4364,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4210,6 +4388,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -4242,6 +4421,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4253,6 +4433,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4277,6 +4458,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -4297,6 +4479,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4306,6 +4489,7 @@
 				<browsers>
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4315,6 +4499,7 @@
 				<browsers>
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4326,6 +4511,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4337,6 +4523,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4348,6 +4535,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4358,6 +4546,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4369,6 +4558,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4388,6 +4578,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -4419,6 +4610,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4438,6 +4630,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4449,6 +4642,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -4463,6 +4657,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -4477,6 +4672,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -4505,6 +4701,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="6.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -4526,6 +4723,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="6.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -4539,6 +4737,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="6.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -4552,6 +4751,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="6.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -4565,6 +4765,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="6.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -4623,6 +4824,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4634,6 +4836,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4659,6 +4862,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -4689,6 +4893,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4700,6 +4905,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4724,6 +4930,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -4754,6 +4961,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4765,6 +4973,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<availability>
@@ -4794,6 +5003,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="6.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -4819,6 +5029,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -4846,6 +5057,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4865,6 +5077,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4873,6 +5086,7 @@
 				<description>Fires when the loading of the element is cancelled before it finishes loading.</description>
 	            <browsers>
 	               <browser platform="IE" version="4.0+"/>
+				   <browser platform="Chrome" version="5.0+" />
 				   <browser platform="Safari" version="1.0+" />
 	           </browsers>
 	        </property>
@@ -4916,6 +5130,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4927,6 +5142,7 @@
 					<browser platform="Netscape" version="1.0+" />
 					<browser platform="Mozilla" version="1.0+" />
 					<browser platform="Opera" version="4.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 	    	</property>
@@ -4938,6 +5154,7 @@
 					<browser platform="Netscape" version="1.0+" />
 					<browser platform="Mozilla" version="1.0+" />
 					<browser platform="Opera" version="4.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 	     	</property>
@@ -4949,6 +5166,7 @@
 					<browser platform="Netscape" version="1.0+" />
 					<browser platform="Mozilla" version="1.0+" />
 					<browser platform="Opera" version="4.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 	     	</property>
@@ -4971,6 +5189,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -4993,6 +5212,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -5011,6 +5231,7 @@
 					<browser platform="Netscape" version="1.0+" />
 					<browser platform="Mozilla" version="1.0+" />
 					<browser platform="Opera" version="4.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 		    </property>
@@ -5022,6 +5243,7 @@
 					<browser platform="Netscape" version="1.0+" />
 					<browser platform="Mozilla" version="1.0+" />
 					<browser platform="Opera" version="4.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 	        </property>
@@ -5033,6 +5255,7 @@
 					<browser platform="Netscape" version="1.0+" />
 					<browser platform="Mozilla" version="1.0+" />
 					<browser platform="Opera" version="4.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 	        </property>
@@ -5053,6 +5276,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -5064,6 +5288,7 @@
 					<browser platform="Netscape" version="1.0+" />
 					<browser platform="Mozilla" version="1.0+" />
 					<browser platform="Opera" version="4.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 	        </property>
@@ -5075,6 +5300,7 @@
 					<browser platform="Netscape" version="1.0+" />
 					<browser platform="Mozilla" version="1.0+" />
 					<browser platform="Opera" version="4.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 	        </property>
@@ -5086,6 +5312,7 @@
 					<browser platform="Netscape" version="1.0+" />
 					<browser platform="Mozilla" version="1.0+" />
 					<browser platform="Opera" version="4.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 	        </property>
@@ -5097,6 +5324,7 @@
 					<browser platform="Netscape" version="1.0+" />
 					<browser platform="Mozilla" version="1.0+" />
 					<browser platform="Opera" version="4.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 	        </property>
@@ -5108,6 +5336,7 @@
 					<browser platform="Netscape" version="1.0+" />
 					<browser platform="Mozilla" version="1.0+" />
 					<browser platform="Opera" version="4.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 	        </property>
@@ -5118,6 +5347,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -5129,6 +5359,7 @@
 					<browser platform="Netscape" version="1.0+" />
 					<browser platform="Mozilla" version="1.0+" />
 					<browser platform="Opera" version="4.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 	        </property>
@@ -5143,6 +5374,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -5151,6 +5383,7 @@
 				<description>Fires when a user scrolls the element.</description>
 	            <browsers>
 	                <browser platform="IE" version="4.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 	            </browsers>
 	        </property>
@@ -5162,6 +5395,7 @@
 					<browser platform="Netscape" version="1.0+" />
 					<browser platform="Mozilla" version="1.0+" />
 					<browser platform="Opera" version="4.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 	        </property>
@@ -5173,6 +5407,7 @@
 					<browser platform="Netscape" version="1.0+" />
 					<browser platform="Mozilla" version="1.0+" />
 					<browser platform="Opera" version="4.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 	        </property>
@@ -5193,6 +5428,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -5210,6 +5446,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -5221,6 +5458,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -5235,6 +5473,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -5247,6 +5486,7 @@
 				<browsers>
 					<browser platform="IE" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -5258,6 +5498,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -5272,6 +5513,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -5282,6 +5524,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -5292,6 +5535,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>	
@@ -5303,6 +5547,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -5314,6 +5559,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -5340,6 +5586,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="6.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -5351,6 +5598,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -5362,6 +5610,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -5376,6 +5625,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="6.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -5387,6 +5637,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -5398,6 +5649,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -5412,6 +5664,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>
@@ -5425,6 +5678,7 @@
 					<browser platform="IE" version="5.0+"/>
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="7.0+"/>
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.2+" />
 				</browsers>
 				<availability>
@@ -5452,6 +5706,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -5466,6 +5721,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -5486,6 +5742,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -5533,6 +5790,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -5558,6 +5816,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -5579,6 +5838,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -5605,6 +5865,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<return-description>Returns true if the user clicks OK.</return-description>
@@ -5626,6 +5887,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -5725,6 +5987,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -5750,6 +6013,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -5805,6 +6069,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<return-description>The new Window that was opened.</return-description>
@@ -5852,6 +6117,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<return-description>String or number entered by the user.</return-description>
@@ -5900,6 +6166,7 @@
 					<browser platform="IE" version="4.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -5921,6 +6188,7 @@
 					<browser platform="IE" version="4.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -5967,6 +6235,7 @@
 					<browser platform="IE" version="4.0+"/>
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -5992,6 +6261,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -6017,6 +6287,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</method>
@@ -6050,6 +6321,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<return-description>Returns the result of the function or expression.</return-description>
@@ -6086,6 +6358,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<return-description>Result of the function or expression.</return-description>
@@ -6122,6 +6395,7 @@
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	    <constructors>
@@ -6142,6 +6416,7 @@
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.06+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 			</property>

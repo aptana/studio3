@@ -482,7 +482,7 @@
                id="aptana">
             <command
                   commandId="com.aptana.editor.common.commands.toggleOutline"
-                  icon="icons/full/eview16/outline_co.gif"
+                  icon="icons/full/eview16/outline_co.png"
                   style="toggle">
                <visibleWhen>
                   <reference
@@ -531,6 +531,12 @@
              icon-disabled="icons/safari_icon_grey.png"
              id="Safari"
              name="Safari">
+       </user-agent>
+       <user-agent
+             icon="icons/chrome_icon.png"
+             icon-disabled="icons/chrome_icon_grey.png"
+             id="Chrome"
+             name="Chrome">
        </user-agent>
     </extension>
    <extension

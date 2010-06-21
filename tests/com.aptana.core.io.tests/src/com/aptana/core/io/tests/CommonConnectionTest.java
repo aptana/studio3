@@ -37,6 +37,7 @@ package com.aptana.core.io.tests;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,6 +50,7 @@ import java.io.Writer;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Properties;
 import java.util.Random;
 
 import junit.framework.TestCase;
@@ -91,6 +93,21 @@ public abstract class CommonConnectionTest extends TestCase
 
 	protected IConnectionPoint cp;
 	private IPath testPath;
+	private static Properties cachedProperties;
+
+	protected static final Properties getConfig() {
+		if (cachedProperties == null) {
+			cachedProperties = new Properties();
+			String propertiesFile = System.getenv("junit.properties");
+			if (propertiesFile != null && new File(propertiesFile).length() > 0) {
+				try {
+					cachedProperties.load(new FileInputStream(propertiesFile));
+				} catch (IOException ignore) {
+				}
+			}
+		}
+		return cachedProperties;
+	}
 
 	@Override
 	protected void setUp() throws Exception
@@ -248,6 +265,35 @@ public abstract class CommonConnectionTest extends TestCase
 		assertEquals("emptyfile.txt", fi.getName()); //$NON-NLS-1$
 		OutputStream out = fs.openOutputStream(EFS.NONE, null);
 		out.close();
+		fi = fs.fetchInfo();
+		assertNotNull(fi);
+		assertTrue(fi.exists());
+		assertEquals(0, fi.getLength());
+	}
+
+	public final void testCreateEmptyDotFile() throws CoreException, IOException
+	{
+		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/.emptyfile.txt")); //$NON-NLS-1$
+		assertNotNull(fs);
+		IFileInfo fi = fs.fetchInfo();
+		assertNotNull(fi);
+		assertFalse(fi.exists());
+		assertEquals(".emptyfile.txt", fi.getName()); //$NON-NLS-1$
+		try
+		{
+			OutputStream out = fs.openOutputStream(EFS.NONE, null);
+			out.close();
+		}
+		catch (CoreException e)
+		{
+			assertEquals(FileNotFoundException.class, e.getCause().getClass());
+			assertEquals(
+					testPath.append(".emptyfile.txt").toPortableString(), ((FileNotFoundException) e.getCause()).getMessage()); //$NON-NLS-1$
+			fi = fs.fetchInfo();
+			assertNotNull(fi);
+			assertFalse(fi.exists());
+			return;
+		}
 		fi = fs.fetchInfo();
 		assertNotNull(fi);
 		assertTrue(fi.exists());

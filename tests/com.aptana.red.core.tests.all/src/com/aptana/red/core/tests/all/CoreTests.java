@@ -12,9 +12,12 @@ public class CoreTests
 		// $JUnit-BEGIN$
 		suite.addTest(com.aptana.git.core.tests.AllTests.suite());
 		suite.addTest(com.aptana.core.tests.AllTests.suite());
+		suite.addTest(com.aptana.core.io.tests.AllTests.suite());
 		suite.addTest(com.aptana.scripting.tests.AllTests.suite());
 		suite.addTest(com.aptana.filesystem.ftp.tests.AllTests.suite());
 		suite.addTest(com.aptana.filesystem.secureftp.tests.AllTests.suite());
+		suite.addTest(com.aptana.parsing.tests.AllTests.suite());
+		// suite.addTest(com.aptana.syncing.core.tests.AllTests.suite()); // Disables for now as it's causing hudson build to time out
 		// $JUnit-END$
 		return suite;
 	}

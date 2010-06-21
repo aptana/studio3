@@ -11,7 +11,7 @@ public class RubyDynamicVariable extends RubyField
 	}
 
 	@Override
-	public short getType()
+	public short getNodeType()
 	{
 		return IRubyElement.DYNAMIC_VAR;
 	}

@@ -1,9 +1,9 @@
 package com.aptana.editor.xml.parsing.ast;
 
 import com.aptana.editor.xml.parsing.IXMLParserConstants;
-import com.aptana.parsing.ast.ParseBaseNode;
+import com.aptana.parsing.ast.ParseNode;
 
-public class XMLNode extends ParseBaseNode
+public class XMLNode extends ParseNode
 {
 
 	private short fType;
@@ -23,7 +23,7 @@ public class XMLNode extends ParseBaseNode
 	}
 
 	@Override
-	public short getType()
+	public short getNodeType()
 	{
 		return fType;
 	}

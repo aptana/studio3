@@ -929,7 +929,7 @@ public class FilteringProjectView extends GitProjectView
 	private boolean filterOn()
 	{
 		return getFilterString() != null && getFilterString().trim().length() > 0
-				&& !getFilterString().equals(initialText);
+				&& !getFilterString().equals(Messages.SingleProjectView_InitialFileFilterText);
 	}
 
 	protected IResource getResource(final TreeItem t)

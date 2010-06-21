@@ -1,0 +1,6 @@
+/**
+ * This is a description of the MyInstanceProperty instance property
+ *
+ * @property {Function(String,Number)->(String,Number)}
+ * @alias MyClass.prototype.MyInstanceProperty
+ */

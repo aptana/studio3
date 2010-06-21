@@ -3,8 +3,10 @@ package com.aptana.editor.css.contentassist;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
@@ -61,6 +63,22 @@ public class CSSIndexQueryHelper
 	}
 
 	/**
+	 * getColors - Returns the unique set of colors used within the project.
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public Set<String> getColors(Index index)
+	{
+		if (index == null)
+			return Collections.emptySet();
+		Map<String, String> colorMap = this.getReader().getValues(index, CSSIndexConstants.COLOR);
+		if (colorMap == null)
+			return Collections.emptySet();
+		return colorMap.keySet();
+	}
+
+	/**
 	 * getMetadata
 	 */
 	private CSSMetadataReader getMetadata()
@@ -111,7 +129,7 @@ public class CSSIndexQueryHelper
 
 		return this._metadata;
 	}
-	
+
 	/**
 	 * getMetadataResources
 	 * 
