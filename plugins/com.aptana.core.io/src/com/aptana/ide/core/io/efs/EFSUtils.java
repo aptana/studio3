@@ -38,6 +38,7 @@ package com.aptana.ide.core.io.efs;
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.filesystem.EFS;
@@ -262,6 +263,41 @@ public final class EFSUtils
 		return result;
 	}
 
+	/**
+	 * Returns the child files of the filestore array
+	 * 
+	 * @param files
+	 * @return
+	 * @throws CoreException
+	 */
+	public static IFileStore[] getFiles(IFileStore[] files, boolean recurse, boolean includeCloakedFiles,
+			IProgressMonitor monitor) throws CoreException
+	{
+		ArrayList<IFileStore> fileList = new ArrayList<IFileStore>();
+		for (int i = 0; i < files.length; i++)
+		{
+			fileList.addAll(Arrays.asList(getFiles(files[i], recurse, includeCloakedFiles, monitor)));
+		}
+		return fileList.toArray(new IFileStore[0]);
+	}
+	
+	/**
+	 * Returns the files of the filestore array plus all of their children
+	 * 
+	 * @param files
+	 * @return
+	 * @throws CoreException
+	 */
+	public static IFileStore[] getAllFiles(IFileStore[] files, boolean recurse, boolean includeCloakedFiles,
+			IProgressMonitor monitor) throws CoreException
+	{
+		ArrayList<IFileStore> fileList = new ArrayList<IFileStore>();
+		fileList.addAll(Arrays.asList(files));
+		IFileStore[] childFiles = getFiles(files, true, false, monitor);
+		fileList.addAll(Arrays.asList(childFiles));
+		return fileList.toArray(new IFileStore[0]);
+	}	
+	
 	/**
 	 * getFiles
 	 * 

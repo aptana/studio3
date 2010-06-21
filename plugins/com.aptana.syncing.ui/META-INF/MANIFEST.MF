@@ -19,7 +19,9 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.ui.ftp,
  com.aptana.theme,
  org.eclipse.ui.console;bundle-version="3.4.0",
- org.eclipse.compare
+ org.eclipse.compare,
+ org.eclipse.search,
+ org.eclipse.core.expressions
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.ide.syncing.ui,

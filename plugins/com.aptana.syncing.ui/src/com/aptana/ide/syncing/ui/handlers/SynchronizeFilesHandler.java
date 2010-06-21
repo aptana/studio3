@@ -38,13 +38,13 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import com.aptana.ide.syncing.ui.actions.UploadAction;
+import com.aptana.ide.syncing.ui.actions.SynchronizeFilesAction;
 
-public class UploadHandler extends BaseSyncHandler
+public class SynchronizeFilesHandler extends BaseSyncHandler
 {
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
-		UploadAction action = new UploadAction();
+		SynchronizeFilesAction action = new SynchronizeFilesAction();
 		action.setActivePart(null, HandlerUtil.getActivePart(event));
 		action.setSelection(HandlerUtil.getCurrentSelection(event));
 		action.run(null);
