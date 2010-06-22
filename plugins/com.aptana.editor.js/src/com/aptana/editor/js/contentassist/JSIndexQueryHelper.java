@@ -44,6 +44,30 @@ public class JSIndexQueryHelper
 	}
 	
 	/**
+	 * getProjectGlobal
+	 * 
+	 * @param index
+	 * @param name
+	 * @return
+	 */
+	public PropertyElement getProjectGlobal(Index index, String name)
+	{
+		PropertyElement result = null;
+		
+		try
+		{
+			// check in core globals
+			result = this._reader.getProperty(this.getIndex(), "Window", name);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * getProjectGlobals
 	 * 
 	 * @return
