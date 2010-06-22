@@ -47,8 +47,8 @@ import org.eclipse.ui.console.IOConsoleOutputStream;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 
-import com.aptana.editor.common.extensions.ConsoleThemePageParticipant;
 import com.aptana.ide.ui.ftp.FTPUIPlugin;
+import com.aptana.theme.extensions.ConsoleThemePageParticipant;
 
 /**
  * @author Max Stepanov

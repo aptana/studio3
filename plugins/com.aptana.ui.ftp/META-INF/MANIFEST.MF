@@ -15,7 +15,7 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.core,
  com.aptana.core.io,
  com.aptana.filesystem.ftp,
- com.aptana.editor.common
+ com.aptana.theme
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.ide.ui.ftp.actions,

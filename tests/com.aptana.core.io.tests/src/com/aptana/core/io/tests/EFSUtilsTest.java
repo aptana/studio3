@@ -12,30 +12,44 @@ import com.aptana.ide.core.io.efs.EFSUtils;
 
 import junit.framework.TestCase;
 
-public class EFSUtilsTest extends TestCase {
+public class EFSUtilsTest extends TestCase
+{
 
-	protected void setUp() throws Exception {
+	protected void setUp() throws Exception
+	{
 		super.setUp();
 	}
 
-	protected void tearDown() throws Exception {
+	protected void tearDown() throws Exception
+	{
 		super.tearDown();
 	}
 
-	public void testGetAbsolutePath() throws IOException, CoreException {
+	public void testGetAbsolutePath() throws IOException, CoreException
+	{
 		File f = File.createTempFile("test", "txt");
 		LocalConnectionPoint lcp = new LocalConnectionPoint(Path.fromOSString(f.getAbsolutePath()));
 		assertEquals(f.getAbsolutePath(), EFSUtils.getAbsolutePath(lcp.getRoot()));
 	}
 
-	public void testGetPath() throws IOException, CoreException {
+	public void testGetPath() throws IOException, CoreException
+	{
 		File f = File.createTempFile("test", "txt");
 		LocalConnectionPoint lcp = new LocalConnectionPoint(Path.fromOSString(f.getAbsolutePath()));
 		assertEquals(f.getAbsolutePath(), EFSUtils.getAbsolutePath(lcp.getRoot()));
 	}
 
-	public void testGetRelativePath() throws IOException, CoreException {
+	public void testGetRelativePath() throws IOException, CoreException
+	{
 		File f = File.createTempFile("test", "txt");
-		assertEquals("/" + f.getName(), EFSUtils.getRelativePath(EFS.getLocalFileSystem().fromLocalFile(f.getParentFile()), EFS.getLocalFileSystem().fromLocalFile(f)));
+		File f2 = File.createTempFile("test", "txt");
+		assertEquals("/" + f.getName(), EFSUtils.getRelativePath(EFS.getLocalFileSystem().fromLocalFile(
+				f.getParentFile()), EFS.getLocalFileSystem().fromLocalFile(f)));
+
+		assertEquals("", EFSUtils.getRelativePath(EFS.getLocalFileSystem().fromLocalFile(f.getParentFile()), EFS
+				.getLocalFileSystem().fromLocalFile(f.getParentFile())));
+
+		assertNull(EFSUtils.getRelativePath(EFS.getLocalFileSystem().fromLocalFile(f), EFS.getLocalFileSystem()
+				.fromLocalFile(f2)));
 	}
 }

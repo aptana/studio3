@@ -37,6 +37,7 @@ package com.aptana.ide.syncing.core.old;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -132,7 +133,7 @@ public class Synchronizer implements ILoggable
 	 *            The number of milliseconds a client and server file can differ in their modification times to still be
 	 *            considered equal
 	 * @param includeCloakedFiles
-	 * 			  Do we synchronize files marked as cloaked?
+	 *            Do we synchronize files marked as cloaked?
 	 */
 	public Synchronizer(boolean calculateCrc, int timeTolerance, boolean includeCloakedFiles)
 	{
@@ -348,7 +349,7 @@ public class Synchronizer implements ILoggable
 		IFileStore[] serverFiles = new IFileStore[0];
 		IFileInfo clientInfo = client.fetchInfo();
 		IFileInfo serverInfo = server.fetchInfo();
-		
+
 		try
 		{
 			setClientEventHandler(client, server);
@@ -394,15 +395,16 @@ public class Synchronizer implements ILoggable
 	/**
 	 * @param clientFiles
 	 * @param serverFiles
-	 * @param monitor TODO
+	 * @param monitor
+	 *            TODO
 	 * @return VirtualFileSyncPair[]
 	 * @throws ConnectionException
 	 * @throws VirtualFileManagerException
 	 * @throws IOException
 	 * @throws CoreException
 	 */
-	public VirtualFileSyncPair[] createSyncItems(IFileStore[] clientFiles, IFileStore[] serverFiles, IProgressMonitor monitor)
-			throws IOException, CoreException
+	public VirtualFileSyncPair[] createSyncItems(IFileStore[] clientFiles, IFileStore[] serverFiles,
+			IProgressMonitor monitor) throws IOException, CoreException
 	{
 		log(FileUtil.NEW_LINE + "Generating comparison.");
 
@@ -411,8 +413,8 @@ public class Synchronizer implements ILoggable
 		// reset statistics and clear lists
 		this.reset();
 
-        monitor = Policy.monitorFor(monitor);
-        Policy.checkCanceled(monitor);
+		monitor = Policy.monitorFor(monitor);
+		Policy.checkCanceled(monitor);
 
 		// add all client files by default
 		for (int i = 0; i < clientFiles.length; i++)
@@ -420,7 +422,7 @@ public class Synchronizer implements ILoggable
 			if (!syncContinue(monitor))
 				return null;
 
-	        Policy.checkCanceled(monitor);
+			Policy.checkCanceled(monitor);
 
 			monitor.worked(1);
 
@@ -430,7 +432,7 @@ public class Synchronizer implements ILoggable
 
 			String relativePath = getCanonicalPath(_clientFileRoot, clientFile);
 			VirtualFileSyncPair item = new VirtualFileSyncPair(clientFile, null, relativePath, SyncState.ClientItemOnly);
-			fileList.put(item.getRelativePath(), item);			
+			fileList.put(item.getRelativePath(), item);
 		}
 
 		// remove matching server files with the same modification date/time
@@ -439,7 +441,7 @@ public class Synchronizer implements ILoggable
 			if (!syncContinue(monitor))
 				return null;
 
-	        Policy.checkCanceled(monitor);
+			Policy.checkCanceled(monitor);
 
 			monitor.worked(1);
 
@@ -509,12 +511,12 @@ public class Synchronizer implements ILoggable
 				if (timeDiff < 0)
 				{
 					item.setSyncState(SyncState.ClientItemIsNewer);
-					logDebug("Source Newer by " + Math.round(Math.abs(timeDiff/1000)) + " seconds.");
+					logDebug("Source Newer by " + Math.round(Math.abs(timeDiff / 1000)) + " seconds.");
 				}
 				else
 				{
 					item.setSyncState(SyncState.ServerItemIsNewer);
-					logDebug("Destination Newer by " + Math.round(timeDiff/1000) + " seconds.");
+					logDebug("Destination Newer by " + Math.round(timeDiff / 1000) + " seconds.");
 				}
 			}
 		}
@@ -626,8 +628,8 @@ public class Synchronizer implements ILoggable
 			}
 			catch (IOException e)
 			{
-				SyncingPlugin.logError(StringUtil.format(
-						Messages.Synchronizer_ErrorClosingStreams, item.getRelativePath()), e);
+				SyncingPlugin.logError(MessageFormat.format(Messages.Synchronizer_ErrorClosingStreams, item
+						.getRelativePath()), e);
 			}
 
 			result = (clientCRC == serverCRC) ? SyncState.ItemsMatch : SyncState.CRCMismatch;
@@ -729,12 +731,12 @@ public class Synchronizer implements ILoggable
 
 		boolean result = true;
 		int totalItems = fileList.length;
-		//IConnectionPoint client = getClientFileManager();
+		// IConnectionPoint client = getClientFileManager();
 
 		this.reset();
 
-        monitor = Policy.monitorFor(monitor);
-        Policy.checkCanceled(monitor);
+		monitor = Policy.monitorFor(monitor);
+		Policy.checkCanceled(monitor);
 
 		FILE_LOOP: for (int i = 0; i < fileList.length; i++)
 		{
@@ -753,7 +755,7 @@ public class Synchronizer implements ILoggable
 				break;
 			}
 
-	        Policy.checkCanceled(monitor);
+			Policy.checkCanceled(monitor);
 
 			switch (item.getSyncState())
 			{
@@ -777,7 +779,8 @@ public class Synchronizer implements ILoggable
 					break;
 
 				case SyncState.ServerItemOnly:
-					final IFileStore targetClientFile = EFSUtils.createFile(_serverFileRoot, item.getDestinationFile(), _clientFileRoot);
+					final IFileStore targetClientFile = EFSUtils.createFile(_serverFileRoot, item.getDestinationFile(),
+							_clientFileRoot);
 
 					if (serverFileInfo.isDirectory())
 					{
@@ -906,8 +909,8 @@ public class Synchronizer implements ILoggable
 		// reset stats
 		this.reset();
 
-        monitor = Policy.monitorFor(monitor);
-        Policy.checkCanceled(monitor);
+		monitor = Policy.monitorFor(monitor);
+		Policy.checkCanceled(monitor);
 
 		// process all items in our list
 		FILE_LOOP: for (int i = 0; i < fileList.length; i++)
@@ -930,7 +933,7 @@ public class Synchronizer implements ILoggable
 					break FILE_LOOP;
 				}
 
-		        Policy.checkCanceled(monitor);
+				Policy.checkCanceled(monitor);
 
 				switch (item.getSyncState())
 				{
@@ -988,7 +991,8 @@ public class Synchronizer implements ILoggable
 						else
 						{
 							// creates the item on server
-							final IFileStore targetServerFile = EFSUtils.createFile(_clientFileRoot, item.getSourceFile(), _serverFileRoot);
+							final IFileStore targetServerFile = EFSUtils.createFile(_clientFileRoot, item
+									.getSourceFile(), _serverFileRoot);
 
 							if (clientFileInfo.isDirectory())
 							{
@@ -1086,7 +1090,8 @@ public class Synchronizer implements ILoggable
 						else
 						{
 							// creates the item on client
-							final IFileStore targetClientFile = EFSUtils.createFile(_serverFileRoot, item.getDestinationFile(), _clientFileRoot);
+							final IFileStore targetClientFile = EFSUtils.createFile(_serverFileRoot, item
+									.getDestinationFile(), _clientFileRoot);
 
 							if (serverFileInfo.isDirectory())
 							{
@@ -1133,8 +1138,8 @@ public class Synchronizer implements ILoggable
 
 					case SyncState.CRCMismatch:
 						result = false;
-						SyncingPlugin.logError(StringUtil.format(
-								Messages.Synchronizer_FullSyncCRCMismatches, item.getRelativePath()), null);
+						SyncingPlugin.logError(StringUtil.format(Messages.Synchronizer_FullSyncCRCMismatches, item
+								.getRelativePath()), null);
 						if (!syncError(item, null, monitor))
 						{
 							break FILE_LOOP;
@@ -1225,14 +1230,14 @@ public class Synchronizer implements ILoggable
 		checkFileManagers();
 		logBeginUploading();
 
-		//IConnectionPoint server = getServerFileManager();
+		// IConnectionPoint server = getServerFileManager();
 		boolean result = true;
 		int totalItems = fileList.length;
 
 		this.reset();
 
-        monitor = Policy.monitorFor(monitor);
-        Policy.checkCanceled(monitor);
+		monitor = Policy.monitorFor(monitor);
+		Policy.checkCanceled(monitor);
 
 		FILE_LOOP: for (int i = 0; i < fileList.length; i++)
 		{
@@ -1251,13 +1256,14 @@ public class Synchronizer implements ILoggable
 				break;
 			}
 
-	        Policy.checkCanceled(monitor);
+			Policy.checkCanceled(monitor);
 
 			switch (item.getSyncState())
 			{
 				case SyncState.ClientItemOnly:
 					// only exists on client; creates the item on server
-					final IFileStore targetServerFile = EFSUtils.createFile(_clientFileRoot, item.getSourceFile(), _serverFileRoot);
+					final IFileStore targetServerFile = EFSUtils.createFile(_clientFileRoot, item.getSourceFile(),
+							_serverFileRoot);
 
 					if (clientFileInfo.isDirectory())
 					{
@@ -1513,18 +1519,21 @@ public class Synchronizer implements ILoggable
 
 	private void logDebug(String message)
 	{
-		//log(message);
+		// log(message);
 	}
 
 	private void logError(Exception e)
 	{
 		if (this.logger != null)
 		{
-			if(e.getCause() != null) {
-				log(StringUtil.format(Messages.Synchronizer_Error, e.getLocalizedMessage() + " (" + e.getCause().getLocalizedMessage() + ")"));
+			if (e.getCause() != null)
+			{
+				log(StringUtil.format(Messages.Synchronizer_Error, e.getLocalizedMessage() + " ("
+						+ e.getCause().getLocalizedMessage() + ")"));
 			}
-			else {
-				log(StringUtil.format(Messages.Synchronizer_Error, e.getLocalizedMessage()));				
+			else
+			{
+				log(StringUtil.format(Messages.Synchronizer_Error, e.getLocalizedMessage()));
 			}
 		}
 	}
@@ -1545,8 +1554,9 @@ public class Synchronizer implements ILoggable
 		{
 			this._eventHandler.syncDone(item);
 		}
-		
-		if (monitor != null) {
+
+		if (monitor != null)
+		{
 			monitor.worked(1);
 		}
 	}

@@ -3,20 +3,6 @@
 <plugin>
    <extension-point id="userAgent" name="%extension-point.name" schema="schema/userAgent.exsd"/>
    <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            category="com.aptana.common"
-            class="com.aptana.editor.common.theme.preferences.ThemePreferencePage"
-            id="com.aptana.editor.common.theme.page"
-            name="%preferencePage.themes.name">
-      </page>
-      <page
-            class="com.aptana.editor.common.preferences.AptanaPreferencePage"
-            id="com.aptana.common"
-            name="%page.name">
-      </page>
-   </extension>
-   <extension
          point="org.eclipse.ui.commands">
        <command
        		categoryId="org.eclipse.ui.category.edit"
@@ -224,42 +210,6 @@
       </initializer>
    </extension>
    <extension
-         point="org.eclipse.ui.themes">
-      <colorDefinition
-            categoryId="org.eclipse.ui.workbenchMisc"
-            colorFactory="com.aptana.editor.common.internal.theme.fontloader.FontLoader"
-            id="com.aptana.editor.common.internal.theme.fontloader.FontLoader"
-            label="%colorDefinition.label">
-      </colorDefinition>
-      <theme
-            id="com.aptana.editor.common.theme"
-            name="%customThemeName">
-         <fontOverride
-               id="org.eclipse.jface.textfont"
-               value="Inconsolata-regular-14">
-            <fontValue
-                  os="win32"
-                  value="Inconsolata-regular-12">
-            </fontValue>
-         </fontOverride>
-         <fontOverride
-               id="org.eclipse.ui.workbench.texteditor.blockSelectionModeFont"
-               value="Inconsolata-regular-14">
-            <fontValue
-                  os="win32"
-                  value="Inconsolata-regular-12">
-            </fontValue>
-         </fontOverride>
-      </theme>
-      <fontDefinition
-            categoryId="org.eclipse.ui.workbenchMisc"
-            defaultsTo="org.eclipse.jface.textfont"
-            id="com.aptana.explorer.font"
-            isEditable="true"
-            label="%appExplorerFont.label">
-      </fontDefinition>
-   </extension>
-   <extension
          point="org.eclipse.core.runtime.adapters">
       <factory
             adaptableType="org.eclipse.ui.texteditor.ITextEditor"
@@ -272,7 +222,7 @@
    <extension
          point="com.aptana.scripting.loadPaths">
       <loadPath
-            name="RadRails Framework Files"
+            name="Aptana Studio Framework Files"
             path="framework/">
       </loadPath>
    </extension>
@@ -438,29 +388,6 @@
       </menuContribution>
    </extension>
    <extension
-         point="org.eclipse.ui.actionSets">
-      <actionSet
-            id="com.aptana.editor.common.globalActionSet"
-            label="%actionSet.global.label"
-            visible="false">
-      </actionSet>
-   </extension>
-   <extension
-         point="org.eclipse.core.expressions.definitions">
-      <definition
-            id="com.aptana.editor.common.contributions.inGlobalActionSet">
-         <with
-               variable="activeContexts">
-            <iterate
-                  operator="or">
-               <equals
-                     value="com.aptana.editor.common.globalActionSet">
-               </equals>
-            </iterate>
-         </with>
-      </definition>
-   </extension>
-   <extension
          point="org.eclipse.ui.commands">
       <command
             categoryId="org.eclipse.ui.category.views"
@@ -486,7 +413,7 @@
                   style="toggle">
                <visibleWhen>
                   <reference
-                        definitionId="com.aptana.editor.common.contributions.inGlobalActionSet">
+                        definitionId="com.aptana.ui.contributions.inGlobalActionSet">
                   </reference>
                </visibleWhen>
             </command>
@@ -542,17 +469,9 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            category="com.aptana.common"
+            category="com.aptana.ui.AptanaPreferencePage"
             class="com.aptana.editor.common.preferences.UserAgentPreferencePage"
             id="com.aptana.editor.common.preferences.UserAgentPreferencePage"
             name="%page.name.0"/>            
-   </extension>
-   <extension
-         point="org.eclipse.ui.console.consolePageParticipants">
-      <consolePageParticipant
-            class="com.aptana.editor.common.extensions.ConsoleThemePageParticipant"
-            id="com.aptana.editor.common.extensions.consoleThemePageParticipant">
-         <enablement></enablement>
-      </consolePageParticipant>
    </extension>
 </plugin>

@@ -42,10 +42,10 @@ import com.aptana.core.util.IOUtil;
 import com.aptana.deploy.Activator;
 import com.aptana.deploy.internal.wizard.CapifyProjectPage;
 import com.aptana.deploy.internal.wizard.DeployWizardPage;
-import com.aptana.deploy.internal.wizard.FTPDeployComposite.Direction;
 import com.aptana.deploy.internal.wizard.FTPDeployWizardPage;
 import com.aptana.deploy.internal.wizard.HerokuDeployWizardPage;
 import com.aptana.deploy.internal.wizard.HerokuSignupPage;
+import com.aptana.deploy.internal.wizard.FTPDeployComposite.Direction;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
@@ -56,7 +56,7 @@ import com.aptana.ide.syncing.core.SiteConnectionUtils;
 import com.aptana.ide.syncing.core.SyncingPlugin;
 import com.aptana.ide.syncing.ui.actions.BaseSyncAction;
 import com.aptana.ide.syncing.ui.actions.DownloadAction;
-import com.aptana.ide.syncing.ui.actions.SynchronizeFilesAction;
+import com.aptana.ide.syncing.ui.actions.SynchronizeProjectAction;
 import com.aptana.ide.syncing.ui.actions.UploadAction;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleEntry;
@@ -161,7 +161,7 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 								action = new DownloadAction();
 								break;
 							case BOTH:
-								action = new SynchronizeFilesAction();
+								action = new SynchronizeProjectAction();
 						}
 						action.setActivePart(null, activePart);
 						action.setSelection(new StructuredSelection(project));

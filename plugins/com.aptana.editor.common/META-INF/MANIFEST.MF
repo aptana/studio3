@@ -7,10 +7,8 @@ Bundle-Activator: com.aptana.editor.common.CommonEditorPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.core.resources,
  org.eclipse.jface.text,
  org.eclipse.core.expressions,
- org.eclipse.core.filesystem,
  org.eclipse.ui.editors,
  org.eclipse.ui.console,
  org.eclipse.ui.ide,
@@ -20,7 +18,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.workbench.texteditor,
  com.aptana.core;bundle-version="3.0.0",
  com.aptana.ui.epl;bundle-version="1.0.0",
- plistreader;bundle-version="1.0.0",
  com.aptana.parsing,
  org.jruby;bundle-version="1.4.0",
  com.aptana.git.core;bundle-version="1.0.0",
@@ -30,7 +27,8 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.ui;bundle-version="3.0.0",
  beaver;bundle-version="1.0.0",
  org.eclipse.team.ui;bundle-version="3.5.0",
- org.eclipse.debug.ui
+ org.eclipse.debug.ui,
+ com.aptana.theme
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
@@ -45,7 +43,6 @@ Export-Package: com.aptana.editor.common,
  com.aptana.editor.common.scripting.commands,
  com.aptana.editor.common.scripting.snippets,
  com.aptana.editor.common.text,
- com.aptana.editor.common.text.rules,
- com.aptana.editor.common.theme
+ com.aptana.editor.common.text.rules
 Eclipse-ExtensibleAPI: true
 Bundle-ClassPath: .

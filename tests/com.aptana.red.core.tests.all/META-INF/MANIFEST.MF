@@ -36,6 +36,7 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.filesystem.secureftp;bundle-version="3.0.0",
  com.aptana.core.io;bundle-version="3.0.0",
  com.aptana.syncing.core;bundle-version="3.0.0",
- com.aptana.syncing.ui;bundle-version="3.0.0"
+ com.aptana.syncing.ui;bundle-version="3.0.0",
+ com.aptana.theme
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy

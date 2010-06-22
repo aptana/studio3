@@ -85,7 +85,7 @@
                id="com.aptana.ui.wizards.NewWebProject">
          </newWizardShortcut>
          <actionSet
-               id="com.aptana.editor.common.globalActionSet">
+               id="com.aptana.ui.globalActionSet">
          </actionSet>
          <actionSet
                id="com.aptana.terminal.actionSet">
@@ -212,6 +212,37 @@
             </command>
          </menu>
       </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="com.aptana.ui.preferences.AptanaPreferencePage"
+            id="com.aptana.ui.AptanaPreferencePage"
+            name="%page.name">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="com.aptana.ui.globalActionSet"
+            label="%actionSet.global.label"
+            visible="false">
+      </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.definitions">
+      <definition
+            id="com.aptana.ui.contributions.inGlobalActionSet">
+         <with
+               variable="activeContexts">
+            <iterate
+                  operator="or">
+               <equals
+                     value="com.aptana.ui.globalActionSet">
+               </equals>
+            </iterate>
+         </with>
+      </definition>
    </extension>
 
 </plugin>

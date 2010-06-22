@@ -34,8 +34,8 @@ public class JSRegExpRule implements IPredicateRule
 	public IToken evaluate(ICharacterScanner scanner)
 	{
 		State state = State.ERROR;
-		StringBuffer buffer = new StringBuffer();
 		int c = scanner.read();
+		int unreadCount = 0;
 		
 		if (c == '/')
 		{
@@ -44,7 +44,7 @@ public class JSRegExpRule implements IPredicateRule
 			LOOP: while (c != ICharacterScanner.EOF)
 			{
 				c = scanner.read();
-				buffer.append((char) c);
+				unreadCount++;
 				
 				switch (state)
 				{
@@ -56,7 +56,15 @@ public class JSRegExpRule implements IPredicateRule
 								break;
 								
 							case '/':
-								state = State.OPTIONS;
+								if (unreadCount > 1)
+								{
+									state = State.OPTIONS;
+								}
+								else
+								{
+									state = State.ERROR;
+									break LOOP;
+								}
 								break;
 								
 							case '\r':
@@ -97,6 +105,7 @@ public class JSRegExpRule implements IPredicateRule
 			}
 		}
 
+		// we always read at least one character too many, so push that back
 		scanner.unread();
 		
 		if (state == State.OPTIONS && this.token != null && this.token.isUndefined() == false)
@@ -105,7 +114,7 @@ public class JSRegExpRule implements IPredicateRule
 		}
 		else
 		{
-			for (int i = 0; i < buffer.length(); i++)
+			for (int i = 0; i < unreadCount; i++)
 			{
 				scanner.unread();
 			}

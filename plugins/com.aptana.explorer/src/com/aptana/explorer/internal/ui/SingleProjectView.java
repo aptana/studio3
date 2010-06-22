@@ -80,9 +80,6 @@ import com.aptana.core.IScopeReference;
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.ProcessUtil;
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.common.theme.TreeThemer;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IExplorerUIConstants;
 import com.aptana.explorer.IPreferenceConstants;
@@ -98,6 +95,9 @@ import com.aptana.ide.syncing.ui.actions.UploadAction;
 import com.aptana.ide.syncing.ui.dialogs.ChooseSiteConnectionDialog;
 import com.aptana.ide.ui.secureftp.dialogs.CommonFTPConnectionPointPropertyDialog;
 import com.aptana.terminal.views.TerminalView;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.ThemePlugin;
+import com.aptana.theme.TreeThemer;
 import com.aptana.ui.UIUtils;
 import com.aptana.ui.widgets.SearchComposite;
 
@@ -981,7 +981,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	}
 
 	protected IThemeManager getThemeManager() {
-		return CommonEditorPlugin.getDefault().getThemeManager();
+		return ThemePlugin.getDefault().getThemeManager();
 	}
 
 	private IProject detectSelectedProject() {
