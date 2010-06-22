@@ -1,1 +1,1 @@
-var abc = [	"name", "Bill",	"sex", "Male", "age", 32 ];
+var abc = [	"name", "Bill", 32 ];

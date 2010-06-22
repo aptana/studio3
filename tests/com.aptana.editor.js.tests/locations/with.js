@@ -1,2 +1,1 @@
-with (abc) {
-}
+with (abc) {}

@@ -1,1 +1,1 @@
-for (var p in obj) { }
+for (var p in obj) {}

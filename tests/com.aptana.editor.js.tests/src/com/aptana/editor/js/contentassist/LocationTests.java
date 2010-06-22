@@ -208,7 +208,14 @@ public class LocationTests extends EditorBasedTests
 	public void testTryCatchFinally()
 	{
 		this.testLocations(
-			"locations/tryCatchFinally.js"
+			"locations/tryCatchFinally.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 4),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 5, 7),
+			new LocationTypeRange(LocationType.NONE, 8, 19),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 20, 22),
+			new LocationTypeRange(LocationType.NONE, 23, 32),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 33, 36)
 		);
 	}
 	
@@ -218,7 +225,16 @@ public class LocationTests extends EditorBasedTests
 	public void testConditional()
 	{
 		this.testLocations(
-			"locations/conditional.js"
+			"locations/conditional.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0, 7),
+			new LocationTypeRange(LocationType.NONE, 8),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 9, 10),
+			new LocationTypeRange(LocationType.NONE, 13),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 14, 15),
+			new LocationTypeRange(LocationType.NONE, 16, 17),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 18, 19),
+			new LocationTypeRange(LocationType.NONE, 20, 21),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 22, 23)
 		);
 	}
 	
@@ -228,7 +244,12 @@ public class LocationTests extends EditorBasedTests
 	public void testNew()
 	{
 		this.testLocations(
-			"locations/new.js"
+			"locations/new.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 3),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 4, 9),
+			new LocationTypeRange(LocationType.NONE, 9),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 10, 11)
 		);
 	}
 	
@@ -238,7 +259,10 @@ public class LocationTests extends EditorBasedTests
 	public void testVar1()
 	{
 		this.testLocations(
-			"locations/var1.js"
+			"locations/var1.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 8),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 9, 10)
 		);
 	}
 	
@@ -248,7 +272,10 @@ public class LocationTests extends EditorBasedTests
 	public void testVar2()
 	{
 		this.testLocations(
-			"locations/var2.js"
+			"locations/var2.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 12),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 13, 14)
 		);
 	}
 	
@@ -258,7 +285,12 @@ public class LocationTests extends EditorBasedTests
 	public void testVar3()
 	{
 		this.testLocations(
-			"locations/var3.js"
+			"locations/var3.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 8),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 9),
+			new LocationTypeRange(LocationType.NONE, 10, 12),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 13, 14)
 		);
 	}
 	
@@ -268,7 +300,14 @@ public class LocationTests extends EditorBasedTests
 	public void testDo()
 	{
 		this.testLocations(
-			"locations/do.js"
+			"locations/do.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 3),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 4),
+			new LocationTypeRange(LocationType.NONE, 5, 12),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 13),
+			new LocationTypeRange(LocationType.NONE, 14, 18),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 19, 20)
 		);
 	}
 	
@@ -278,7 +317,12 @@ public class LocationTests extends EditorBasedTests
 	public void testForIn()
 	{
 		this.testLocations(
-			"locations/forIn.js"
+			"locations/forIn.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 13),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 14, 17),
+			new LocationTypeRange(LocationType.NONE, 18, 19),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 20, 22)
 		);
 	}
 	
@@ -288,7 +332,18 @@ public class LocationTests extends EditorBasedTests
 	public void testFor()
 	{
 		this.testLocations(
-			"locations/for.js"
+			"locations/for.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 8),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 9, 10),
+			new LocationTypeRange(LocationType.NONE, 11),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 12, 13),
+			new LocationTypeRange(LocationType.NONE, 14),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 15, 20),
+			new LocationTypeRange(LocationType.NONE, 21, 22),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 23, 25),
+			new LocationTypeRange(LocationType.NONE, 26, 29),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 30, 33)
 		);
 	}
 	
@@ -298,7 +353,12 @@ public class LocationTests extends EditorBasedTests
 	public void testIf()
 	{
 		this.testLocations(
-			"locations/if.js"
+			"locations/if.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 10),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 11, 12),
+			new LocationTypeRange(LocationType.NONE, 13, 19),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 20, 23)
 		);
 	}
 	
@@ -308,7 +368,27 @@ public class LocationTests extends EditorBasedTests
 	public void testLabelledFor()
 	{
 		this.testLocations(
-			"locations/labelledFor.js"
+			"locations/labelledFor.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.IN_LABEL, 1, 4),
+			new LocationTypeRange(LocationType.NONE, 5, 14),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 15, 19),
+			new LocationTypeRange(LocationType.NONE, 20),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 21, 26),
+			new LocationTypeRange(LocationType.NONE, 27, 28),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 29, 31),
+			new LocationTypeRange(LocationType.NONE, 32, 35),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 36, 38),
+			new LocationTypeRange(LocationType.NONE, 39, 48),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 49, 53),
+			new LocationTypeRange(LocationType.NONE, 54, 58),
+			new LocationTypeRange(LocationType.IN_LABEL, 59, 63),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 64, 66),
+			new LocationTypeRange(LocationType.NONE, 67, 73),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 74, 77),
+			new LocationTypeRange(LocationType.NONE, 78, 85),
+			new LocationTypeRange(LocationType.IN_LABEL, 86, 90),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 91, 97)
 		);
 	}
 	
@@ -318,7 +398,16 @@ public class LocationTests extends EditorBasedTests
 	public void testArrayLiteral()
 	{
 		this.testLocations(
-			"locations/arrayLiteral.js"
+			"locations/arrayLiteral.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 8),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 9, 12),
+			new LocationTypeRange(LocationType.NONE, 13, 18),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 19, 20),
+			new LocationTypeRange(LocationType.NONE, 21, 26),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 27, 28),
+			new LocationTypeRange(LocationType.NONE, 29, 32),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 33, 34)
 		);
 	}
 	
@@ -328,7 +417,14 @@ public class LocationTests extends EditorBasedTests
 	public void testObjectLiteral()
 	{
 		this.testLocations(
-			"locations/objectLiteral.js"
+			"locations/objectLiteral.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 17),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 18, 19),
+			new LocationTypeRange(LocationType.NONE, 20, 31),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 32, 33),
+			new LocationTypeRange(LocationType.NONE, 34, 37),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 38, 39)
 		);
 	}
 	
@@ -338,7 +434,10 @@ public class LocationTests extends EditorBasedTests
 	public void testSwitch()
 	{
 		this.testLocations(
-			"locations/switch.js"
+			"locations/switch.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 55),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 56, 57)
 		);
 	}
 	
@@ -348,7 +447,14 @@ public class LocationTests extends EditorBasedTests
 	public void testGroup()
 	{
 		this.testLocations(
-			"locations/group.js"
+			"locations/group.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0, 1),
+			new LocationTypeRange(LocationType.NONE, 2, 12),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 13, 15),
+			new LocationTypeRange(LocationType.NONE, 16),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 17),
+			new LocationTypeRange(LocationType.NONE, 18),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 19, 20)
 		);
 	}
 	
@@ -358,7 +464,14 @@ public class LocationTests extends EditorBasedTests
 	public void testFunctionWithReturn()
 	{
 		this.testLocations(
-			"locations/functionWithReturn.js"
+			"locations/functionWithReturn.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 15),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 16, 18),
+			new LocationTypeRange(LocationType.NONE, 19, 23),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 24, 25),
+			new LocationTypeRange(LocationType.NONE, 26, 29),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 30, 33)
 		);
 	}
 	
@@ -368,7 +481,14 @@ public class LocationTests extends EditorBasedTests
 	public void testFunctionWithThrow()
 	{
 		this.testLocations(
-			"locations/functionWithThrow.js"
+			"locations/functionWithThrow.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 15),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 16, 18),
+			new LocationTypeRange(LocationType.NONE, 19, 23),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 24),
+			new LocationTypeRange(LocationType.NONE, 25, 31),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 32, 35)
 		);
 	}
 	
@@ -378,7 +498,12 @@ public class LocationTests extends EditorBasedTests
 	public void testWhile()
 	{
 		this.testLocations(
-			"locations/while.js"
+			"locations/while.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 6),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 7),
+			new LocationTypeRange(LocationType.NONE, 8, 13),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 14, 17)
 		);
 	}
 	
@@ -388,7 +513,12 @@ public class LocationTests extends EditorBasedTests
 	public void testWith()
 	{
 		this.testLocations(
-			"locations/with.js"
+			"locations/with.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 5),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 6, 9),
+			new LocationTypeRange(LocationType.NONE, 10, 11),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 12, 14)
 		);
 	}
 }
