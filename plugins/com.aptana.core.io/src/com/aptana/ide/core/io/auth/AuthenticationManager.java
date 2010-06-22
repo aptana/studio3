@@ -152,7 +152,7 @@ public final class AuthenticationManager implements IAuthenticationManager {
 				}
 				sessionPasswords.put(authId, password);
 			}
-			node.flush();
+			getSecurePreferences().flush();
 		} catch (Exception e) {
 			CoreIOPlugin.log(new Status(IStatus.WARNING, CoreIOPlugin.PLUGIN_ID, Messages.AuthenticationManager_FailedSaveSecurePreference, e));
 		}
