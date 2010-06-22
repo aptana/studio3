@@ -57,7 +57,7 @@
    <extension
          point="com.aptana.scripting.loadPaths">
       <loadPath
-            name="RadRails Framework Files"
+            name="Aptana Studio Framework Files"
             path="framework/">
       </loadPath>
    </extension>
@@ -158,7 +158,7 @@
                   style="toggle">
                <visibleWhen>
                   <reference
-                        definitionId="com.aptana.editor.common.contributions.inGlobalActionSet">
+                        definitionId="com.aptana.ui.contributions.inGlobalActionSet">
                   </reference>
                </visibleWhen>
             </command>

@@ -49,9 +49,10 @@ import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.WorkbenchJob;
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.Theme;
+
 import com.aptana.explorer.ExplorerPlugin;
+import com.aptana.theme.Theme;
+import com.aptana.theme.ThemePlugin;
 
 /**
  * Adds focus filtering and a free form text filter to the Project view.
@@ -918,7 +919,7 @@ public class FilteringProjectView extends GitProjectView
 
 	protected Color getHoverBackgroundColor()
 	{
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(getActiveTheme().getLineHighlight());
+		return ThemePlugin.getDefault().getColorManager().getColor(getActiveTheme().getLineHighlight());
 	}
 
 	protected Theme getActiveTheme()
