@@ -153,7 +153,7 @@ public final class EFSUtils
 	 */
 	public static String getRelativePath(IFileStore parent, IFileStore file)
 	{
-		if (parent == file || parent.isParentOf(file))
+		if (parent.equals(file) || parent.isParentOf(file))
 		{
 			String rootFile = getAbsolutePath(parent);
 			String childFile = getAbsolutePath(file);
