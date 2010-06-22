@@ -9,9 +9,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.internal.ui.views.memory.IMemoryViewPane;
 import org.eclipse.debug.internal.ui.views.memory.MemoryView;
 import org.eclipse.debug.ui.IDebugView;
@@ -58,10 +58,11 @@ import org.osgi.service.prefs.BackingStoreException;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
-import com.aptana.editor.common.theme.ConsoleThemer;
-import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.common.theme.Theme;
-import com.aptana.editor.common.theme.TreeThemer;
+import com.aptana.theme.ConsoleThemer;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.Theme;
+import com.aptana.theme.ThemePlugin;
+import com.aptana.theme.TreeThemer;
 import com.aptana.ui.IAptanaHistory;
 
 /**
@@ -81,13 +82,13 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 	{
 		super("Installing invasive theme hijacker!"); //$NON-NLS-1$
 
-		IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = new InstanceScope().getNode(ThemePlugin.PLUGIN_ID);
 		prefs.addPreferenceChangeListener(this);
 	}
 
 	protected boolean invasiveThemesEnabled()
 	{
-		return Platform.getPreferencesService().getBoolean(CommonEditorPlugin.PLUGIN_ID,
+		return Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID,
 				IPreferenceConstants.INVASIVE_THEMES, false, null);
 	}
 
@@ -330,9 +331,9 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 			}
 			else
 			{
-				control.setBackground(CommonEditorPlugin.getDefault().getColorManager()
+				control.setBackground(ThemePlugin.getDefault().getColorManager()
 						.getColor(getCurrentTheme().getBackground()));
-				control.setForeground(CommonEditorPlugin.getDefault().getColorManager()
+				control.setForeground(ThemePlugin.getDefault().getColorManager()
 						.getColor(getCurrentTheme().getForeground()));
 				control.setFont(JFaceResources.getTextFont());
 			}
@@ -342,7 +343,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 
 	protected Theme getCurrentTheme()
 	{
-		return CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme();
+		return ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
 	}
 
 	private void overrideTreeDrawing(final Tree tree, boolean revertToDefaults)
@@ -667,12 +668,12 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 
 		// Force selection color
 		sourceViewer.getTextWidget().setSelectionBackground(
-				CommonEditorPlugin.getDefault().getColorManager().getColor(getCurrentTheme().getSelection()));
+				ThemePlugin.getDefault().getColorManager().getColor(getCurrentTheme().getSelection()));
 		if (!Platform.getOS().equals(Platform.OS_MACOSX))
 		{
 			// Linux and windows need selection fg set or we just see a block of color.
 			sourceViewer.getTextWidget().setSelectionForeground(
-					CommonEditorPlugin.getDefault().getColorManager().getColor(getCurrentTheme().getForeground()));
+					ThemePlugin.getDefault().getColorManager().getColor(getCurrentTheme().getForeground()));
 		}
 	}
 

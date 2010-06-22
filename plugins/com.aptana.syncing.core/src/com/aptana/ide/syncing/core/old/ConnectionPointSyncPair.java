@@ -80,6 +80,15 @@ public class ConnectionPointSyncPair
 	{
 	}
 
+	/**
+	 * SyncItem
+	 */
+	public ConnectionPointSyncPair(IConnectionPoint source, IConnectionPoint dest)
+	{
+		_sourceFileManager = source;
+		_destinationFileManager = dest;
+	}
+
 	/*
 	 * Methods
 	 */

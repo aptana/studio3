@@ -13,6 +13,7 @@ import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -52,6 +53,7 @@ import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
+import com.aptana.theme.ThemePlugin;
 
 /**
  * Provides a way to override the editor fg, bg caret, highlight and selection from what is set in global text editor
@@ -106,6 +108,16 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		}
 	}
 
+	private class PropertyChangeListener implements IPropertyChangeListener
+	{
+
+		@Override
+		public void propertyChange(PropertyChangeEvent event)
+		{
+			handlePreferenceStoreChanged(event);
+		}
+	}
+
 	private static final int RULER_EDITOR_GAP = 5;
 
 	private static final char[] DEFAULT_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`',
@@ -129,6 +141,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	 * Manages what's needed to make the colors obey the current theme.
 	 */
 	private ThemeableEditorExtension fThemeableEditorColorsExtension;
+
+	private IPropertyChangeListener fThemeListener;
 
 	/**
 	 * AbstractThemeableEditor
@@ -177,6 +191,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 		fSelectionChangedListener= new SelectionChangedListener();
 		fSelectionChangedListener.install(getSelectionProvider());
+		fThemeListener = new PropertyChangeListener();
+		ThemePlugin.getDefault().getPreferenceStore().addPropertyChangeListener(fThemeListener);
 
 		IContextService contextService = (IContextService) getSite().getService(IContextService.class);
 		contextService.activateContext(Activator.CONTEXT_ID);
@@ -382,6 +398,11 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			fSelectionChangedListener.uninstall(getSelectionProvider());
 			fSelectionChangedListener= null;
 		}
+		if (fThemeListener != null)
+		{
+			ThemePlugin.getDefault().getPreferenceStore().removePropertyChangeListener(fThemeListener);
+			fThemeListener = null;
+		}
 
 		this.fThemeableEditorColorsExtension.dispose();
 		super.dispose();
@@ -391,7 +412,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	@Override
 	protected void initializeEditor()
 	{
-		setPreferenceStore(new ChainedPreferenceStore(new IPreferenceStore[] {
+		setPreferenceStore(new ChainedPreferenceStore(new IPreferenceStore[] { 
 				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() }));
 		fFileService = createFileService();
 	}

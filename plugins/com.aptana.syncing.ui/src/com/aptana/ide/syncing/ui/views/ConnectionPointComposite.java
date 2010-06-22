@@ -68,6 +68,7 @@ import org.eclipse.swt.dnd.DropTargetListener;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Font;
@@ -90,7 +91,7 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 
 import com.aptana.core.CoreStrings;
 import com.aptana.core.util.FileUtil;
-import com.aptana.editor.common.theme.TreeThemer;
+import com.aptana.theme.TreeThemer;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
@@ -207,6 +208,14 @@ public class ConnectionPointComposite implements SelectionListener, ISelectionCh
         fTreeViewer.setInput(connection);
     }
 
+    /**
+     * Adds a focus listener to the tree control to allow users the ability to listen for focus events.
+     * @param listener
+     */
+    public void addTreeFocusListener(FocusListener listener) {
+    	fTreeViewer.getControl().addFocusListener(listener);
+    }
+    
     public void refresh() {
         Object input = fTreeViewer.getInput();
         IResource resource = null;

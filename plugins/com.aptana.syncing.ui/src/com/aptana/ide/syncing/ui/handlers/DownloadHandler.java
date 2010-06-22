@@ -34,14 +34,13 @@
  */
 package com.aptana.ide.syncing.ui.handlers;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.aptana.ide.syncing.ui.actions.DownloadAction;
 
-public class DownloadHandler extends AbstractHandler {
+public class DownloadHandler extends BaseSyncHandler {
 
     public Object execute(ExecutionEvent event) throws ExecutionException {
         DownloadAction action = new DownloadAction();

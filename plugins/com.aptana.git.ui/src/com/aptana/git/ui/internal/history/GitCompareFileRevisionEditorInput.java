@@ -43,9 +43,9 @@ import org.eclipse.team.internal.ui.synchronize.LocalResourceTypedElement;
 import org.eclipse.team.ui.synchronize.SaveableCompareEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.TreeThemer;
 import com.aptana.git.ui.GitUIPlugin;
+import com.aptana.theme.ThemePlugin;
+import com.aptana.theme.TreeThemer;
 
 /**
  * The input provider for the compare editor when working on resources under Git control.
@@ -519,7 +519,7 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 
 		if (fPane != null && (fPane.getViewer() instanceof TextMergeViewer))
 		{
-			((TextMergeViewer) fPane.getViewer()).setBackgroundColor(CommonEditorPlugin.getDefault().getThemeManager()
+			((TextMergeViewer) fPane.getViewer()).setBackgroundColor(ThemePlugin.getDefault().getThemeManager()
 					.getCurrentTheme().getBackground());
 		}
 		if (fStructurePane != null && (fStructurePane.getContent() instanceof Tree))

@@ -32,7 +32,8 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
-import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.ThemePlugin;
 
 /**
  * Used to override the colors of the editor (ruler, background, caret, etc.)
@@ -163,7 +164,7 @@ public class ThemeableEditorExtension {
 	
 	protected IThemeManager getThemeManager()
 	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
+		return ThemePlugin.getDefault().getThemeManager();
 	}
 	
 	private void overrideSelectionColor()
@@ -181,13 +182,13 @@ public class ThemeableEditorExtension {
 
 		// Force selection color
 		sourceViewer.getTextWidget().setSelectionBackground(
-				CommonEditorPlugin.getDefault().getColorManager().getColor(
+				ThemePlugin.getDefault().getColorManager().getColor(
 						getThemeManager().getCurrentTheme().getSelection()));
 		if (!Platform.getOS().equals(Platform.OS_MACOSX))
 		{
 			// Linux and windows need selection fg set or we just see a block of color.
 			sourceViewer.getTextWidget().setSelectionForeground(
-					CommonEditorPlugin.getDefault().getColorManager().getColor(
+					ThemePlugin.getDefault().getColorManager().getColor(
 							getThemeManager().getCurrentTheme().getForeground()));
 		}
 

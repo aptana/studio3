@@ -41,8 +41,8 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.tm.internal.terminal.textcanvas.StyleMap;
 import org.eclipse.tm.terminal.model.StyleColor;
 
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.Theme;
+import com.aptana.theme.Theme;
+import com.aptana.theme.ThemePlugin;
 
 /**
  * @author Max Stepanov
@@ -68,7 +68,7 @@ import com.aptana.editor.common.theme.Theme;
 
 		// Just grab colors straight from theme!
 		String ansiName = "ansi." + color.getName().toLowerCase(); //$NON-NLS-1$
-		Theme theme = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme();
+		Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
 		if (theme.hasEntry(ansiName)) {
 			return theme.getForeground(ansiName);
 		}
@@ -77,14 +77,12 @@ import com.aptana.editor.common.theme.Theme;
 	}
 
 	protected Color getBackgroundColor() {
-		Theme theme = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme();
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(theme.getBackground());
+		Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
+		return ThemePlugin.getDefault().getColorManager().getColor(theme.getBackground());
 	}
 
 	protected Color getForegroundColor() {
-		Theme theme = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme();
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(theme.getForeground());
+		Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
+		return ThemePlugin.getDefault().getColorManager().getColor(theme.getForeground());
 	}
-
-
 }

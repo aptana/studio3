@@ -10,9 +10,8 @@ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
 import org.eclipse.tm.internal.terminal.textcanvas.ILinelRenderer;
 import org.eclipse.tm.internal.terminal.textcanvas.ITextCanvasModel;
 
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.IThemeManager;
-
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.ThemePlugin;
 
 public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emulator.VT100TerminalControl {
 
@@ -33,7 +32,7 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 				}
 			}
 		};
-		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(preferenceChangeListener);
+		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(preferenceChangeListener);
 	}
 
 	/* (non-Javadoc)
@@ -41,7 +40,7 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 	 */
 	@Override
 	public void disposeTerminal() {
-		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(preferenceChangeListener);
+		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(preferenceChangeListener);
 		super.disposeTerminal();
 	}
 
