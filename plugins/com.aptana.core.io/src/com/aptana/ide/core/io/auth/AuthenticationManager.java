@@ -147,7 +147,7 @@ public final class AuthenticationManager implements IAuthenticationManager {
 			if (password != null) {
 				if (persistent) {
 					node.put(PROP_PASSWORD, String.copyValueOf(password), true);
-				} else {
+				} else if (getSecurePreferences().nodeExists(authId)) {
 					node.removeNode();
 				}
 				sessionPasswords.put(authId, password);
