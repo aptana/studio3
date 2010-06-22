@@ -20,7 +20,7 @@ import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.SiteConnectionUtils;
-import com.aptana.ide.syncing.ui.actions.SynchronizeFilesAction;
+import com.aptana.ide.syncing.ui.actions.SynchronizeProjectAction;
 import com.aptana.terminal.views.TerminalView;
 
 public class DeployHandler extends AbstractHandler
@@ -39,7 +39,7 @@ public class DeployHandler extends AbstractHandler
 		}
 		else if (selectedProject != null && isFTPProject(selectedProject))
 		{
-			SynchronizeFilesAction action = new SynchronizeFilesAction();
+			SynchronizeProjectAction action = new SynchronizeProjectAction();
 			action.setActivePart(null, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
 					.getActivePart());
 			action.setSelection(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService()

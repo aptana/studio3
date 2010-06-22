@@ -9,9 +9,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.internal.ui.views.memory.IMemoryViewPane;
 import org.eclipse.debug.internal.ui.views.memory.MemoryView;
 import org.eclipse.debug.ui.IDebugView;
@@ -88,8 +88,8 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 
 	protected boolean invasiveThemesEnabled()
 	{
-		return Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID,
-				IPreferenceConstants.INVASIVE_THEMES, false, null);
+		return Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID, IPreferenceConstants.INVASIVE_THEMES,
+				false, null);
 	}
 
 	@Override
@@ -105,7 +105,10 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 		else
 		{
-			window.getActivePage().removePartListener(this);
+			if (window != null && window.getActivePage() != null)
+			{
+				window.getActivePage().removePartListener(this);
+			}
 			applyThemeToJDTEditor(getCurrentTheme(), true);
 			applyThemeToConsole(getCurrentTheme(), true);
 			hijackCurrentViews(window, true);
@@ -127,9 +130,12 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 		else
 		{
-			setColor(prefs, "org.eclipse.debug.ui.errorColor", currentTheme, ConsoleThemer.CONSOLE_ERROR, new RGB(0x80, 0, 0));
-			setColor(prefs, "org.eclipse.debug.ui.outColor", currentTheme, ConsoleThemer.CONSOLE_OUTPUT, currentTheme.getForeground());
-			setColor(prefs, "org.eclipse.debug.ui.inColor", currentTheme, ConsoleThemer.CONSOLE_INPUT, currentTheme.getForeground());
+			setColor(prefs, "org.eclipse.debug.ui.errorColor", currentTheme, ConsoleThemer.CONSOLE_ERROR, new RGB(0x80,
+					0, 0));
+			setColor(prefs, "org.eclipse.debug.ui.outColor", currentTheme, ConsoleThemer.CONSOLE_OUTPUT,
+					currentTheme.getForeground());
+			setColor(prefs, "org.eclipse.debug.ui.inColor", currentTheme, ConsoleThemer.CONSOLE_INPUT,
+					currentTheme.getForeground());
 			prefs.put("org.eclipse.debug.ui.consoleBackground", StringConverter.asString(currentTheme.getBackground()));
 		}
 		try
@@ -155,6 +161,8 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 
 	protected void hijackCurrentViews(IWorkbenchWindow window, boolean revertToDefaults)
 	{
+		if (window == null || window.getActivePage() == null)
+			return;
 		IViewReference[] refs = window.getActivePage().getViewReferences();
 		for (IViewReference ref : refs)
 		{
@@ -181,8 +189,8 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 		else if (view instanceof ExtendedMarkersView) // Problems, Tasks, Bookmarks
 		{
-			if (new Version(EclipseUtil.getPluginVersion("org.eclipse.ui.ide")).compareTo(Version
-					.parseVersion("3.6.0")) >= 0)
+			if (new Version(EclipseUtil.getPluginVersion("org.eclipse.ui.ide"))
+					.compareTo(Version.parseVersion("3.6.0")) >= 0)
 			{
 				try
 				{
@@ -256,7 +264,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 				HistoryPage page = (HistoryPage) historyView.getHistoryPage();
 				hookTheme(page.getControl(), revertToDefaults);
 			}
-			
+
 		}
 		else if (view instanceof IDebugView)
 		{
@@ -267,9 +275,9 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		else if (view instanceof MemoryView)
 		{
 			MemoryView memory = (MemoryView) view;
-			IMemoryViewPane [] memPaneArray = memory.getViewPanes();
-			
-			for( IMemoryViewPane memPane: memPaneArray)
+			IMemoryViewPane[] memPaneArray = memory.getViewPanes();
+
+			for (IMemoryViewPane memPane : memPaneArray)
 			{
 				hookTheme(memPane.getControl(), revertToDefaults);
 			}
@@ -750,31 +758,33 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 	@Override
 	public void partActivated(IWorkbenchPart part)
 	{
-		if(part instanceof IViewPart){
+		if (part instanceof IViewPart)
+		{
 			hijackHistory((IViewPart) part);
-			hijackConsole((IViewPart) part);		
+			hijackConsole((IViewPart) part);
 		}
 		if (!(part instanceof IEditorPart))
 			return;
-		
+
 		hijackOutline();
 	}
-	
+
 	protected boolean hijackHistory(IViewPart view)
 	{
 		if (view instanceof IHistoryView)
 		{
 			IHistoryView historyView = (IHistoryView) view;
 			HistoryPage page = (HistoryPage) historyView.getHistoryPage();
-			if ( page instanceof IAptanaHistory){
+			if (page instanceof IAptanaHistory)
+			{
 				((IAptanaHistory) page).setTheme(false);
 				return true;
 			}
-			
+
 		}
 		return false;
 	}
-	
+
 	protected void hijackConsole(IViewPart view)
 	{
 		if (view instanceof ConsoleView)
@@ -783,7 +793,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 			hookTheme(currentPage.getControl(), false);
 		}
 	}
-	
+
 	protected void hijackOutline()
 	{
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();

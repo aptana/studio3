@@ -269,7 +269,7 @@ public class TreeThemer
 					event.detail &= ~SWT.SELECTED;
 					event.detail &= ~SWT.BACKGROUND;
 					// force foreground color for Windows. Otherwise on dark themes we get black fg
-					if (isWindows)
+					if (!isCocoa)
 					{
 						gc.setForeground(getForeground());
 					}
@@ -308,7 +308,7 @@ public class TreeThemer
 				}
 				gc.setBackground(oldBackground);
 				// force foreground color for Windows. Otherwise on dark themes we get black fg
-				if (isWindows)
+				if (!isCocoa)
 				{
 					gc.setForeground(getForeground());
 				}

@@ -134,7 +134,7 @@ def print_args(arity)
 end
 
 # Now do the actual main loop, which is to get all the types and then print them out to files.
-require 'FileUtils'
+require 'fileutils'
 get_classes.each do |klass|
   file_name = file_name(klass)
   dirs = dir_names(file_name)
