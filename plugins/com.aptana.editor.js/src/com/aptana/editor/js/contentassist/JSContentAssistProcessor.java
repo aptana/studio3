@@ -27,6 +27,7 @@ import com.aptana.editor.js.contentassist.JSASTQueryHelper.Classification;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
+import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.parsing.JSTokenScanner;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
@@ -221,6 +222,66 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 	
 	/**
+	 * addProperties
+	 * 
+	 * @param proposals
+	 * @param offset
+	 */
+	protected void addProperties(Set<ICompletionProposal> proposals, int offset)
+	{
+		if (this._targetNode != null)
+		{
+			if (this._targetNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
+			{
+				IParseNode ast = this.getAST();
+				
+				if (ast instanceof JSParseRootNode)
+				{
+					JSParseRootNode root = (JSParseRootNode) ast;
+					Scope<JSNode> global = root.getGlobalScope();
+					Scope<JSNode> localScope = global.getScopeAtOffset(offset);
+					
+					if (localScope != null)
+					{
+						// TEMP: for debugging
+						String name = this._targetNode.getFirstChild().getText();
+						
+						List<JSNode> nodes = localScope.getSymbol(name);
+						
+						if (nodes.isEmpty() == false)
+						{
+							for (JSNode node : nodes)
+							{
+								// look up type
+								List<String> types = node.getTypes();
+								
+								// add type properties to proposals
+								for (String type : types)
+								{
+									System.out.println(type);
+								}
+							}
+						}
+						else
+						{
+							Index index = this.getIndex();
+							PropertyElement property = this._indexHelper.getProjectGlobal(index, name);
+							
+							if (property != null)
+							{
+								for (ReturnTypeElement type : property.getTypes())
+								{
+									System.out.println(type.getType());
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	/**
 	 * addProposal
 	 * 
 	 * @param proposals
@@ -376,7 +437,10 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		switch (location)
 		{
 			case IN_PROPERTY_NAME:
-				//System.out.println("Property");
+				if (Platform.inDevelopmentMode())
+				{
+					this.addProperties(result, offset);
+				}
 				break;
 				
 			case IN_VARIABLE_NAME:
