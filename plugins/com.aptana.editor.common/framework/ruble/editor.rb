@@ -29,7 +29,7 @@ module Ruble
           else
             desc = org.eclipse.ui.ide.IDE.getDefaultEditor(ifile)
           end
-          editor_id = "org.eclipse.ui.DefaultTextEditor" # FIXME Set to out own text editor if/when we have one!
+          editor_id = "com.aptana.editor.text"
           editor_id = desc.getId unless desc.nil?
           editor = Ruble::Editor.new(org.eclipse.ui.ide.IDE.openEditor(page, java.net.URI.create(uri_string), editor_id, true))
         end
@@ -201,11 +201,14 @@ module Ruble
     end
     
     def caret_line
-      styled_text.nil? ? 0 : styled_text.line_at_offset(caret_offset)
+      doc = document
+      doc.nil? ? 0 : doc.getLineOfOffset(caret_offset)
     end
     
     def caret_offset
-      styled_text.nil? ? 0 : styled_text.caret_offset
+      # Need to convert because there may be folded regions?
+      offset = styled_text.nil? ? 0 : styled_text.caret_offset
+      editor_part.source_viewer.widgetOffset2ModelOffset(offset) rescue offset
     end
     
     def current_line
@@ -214,7 +217,10 @@ module Ruble
     
     # Returns the string content on the line
     def line(line_number)
-      styled_text.nil? ? '' : styled_text.line(line_number)
+      doc = document
+      return '' if doc.nil?
+      region = doc.getLineInformation(line_number)
+      doc.get(region.offset, region.length)
     end
     
     def insert_as_text(text)
@@ -222,7 +228,8 @@ module Ruble
     end
     
     def offset_at_line(line)
-      styled_text.nil? ? 0 : styled_text.offset_at_line(line)
+      doc = document
+      doc.nil? ? 0 : doc.getLineOffset(line)
     end
 
     def insert_as_snippet(snippet)
