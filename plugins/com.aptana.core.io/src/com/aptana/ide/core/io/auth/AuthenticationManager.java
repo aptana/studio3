@@ -147,12 +147,12 @@ public final class AuthenticationManager implements IAuthenticationManager {
 			if (password != null) {
 				if (persistent) {
 					node.put(PROP_PASSWORD, String.copyValueOf(password), true);
-				} else if (getSecurePreferences().nodeExists(authId)) {
+				} else {
 					node.removeNode();
 				}
 				sessionPasswords.put(authId, password);
 			}
-			node.flush();
+			getSecurePreferences().flush();
 		} catch (Exception e) {
 			CoreIOPlugin.log(new Status(IStatus.WARNING, CoreIOPlugin.PLUGIN_ID, Messages.AuthenticationManager_FailedSaveSecurePreference, e));
 		}
