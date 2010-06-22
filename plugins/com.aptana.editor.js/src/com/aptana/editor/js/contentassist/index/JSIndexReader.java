@@ -21,6 +21,42 @@ import com.aptana.index.core.SearchPattern;
 public class JSIndexReader
 {
 	/**
+	 * createProperty
+	 * 
+	 * @param index
+	 * @param key
+	 * @return
+	 * @throws IOException 
+	 */
+	protected PropertyElement createPropertyFromKey(Index index, String key) throws IOException
+	{
+		String[] columns = key.split(JSIndexConstants.DELIMITER);
+		int column = 0;
+		
+		PropertyElement p = new PropertyElement();
+
+		p.setName(columns[column++]);
+		column++;	// skip owning type
+		p.setDescription(this.getDescription(index, columns[column++]));
+		
+		for (ReturnTypeElement returnType : this.getReturnTypes(index, columns[column++]))
+		{
+			p.addType(returnType);
+		}
+		
+		if (column < columns.length)
+		{
+			for (String userAgentKey : columns[column++].split(JSIndexConstants.SUB_DELIMITER))
+			{
+				// get user agent and add to element
+				p.addUserAgent(this.getUserAgent(index, userAgentKey));
+			}
+		}
+		
+		return p;
+	}
+	
+	/**
 	 * getDescription
 	 * 
 	 * @param index
@@ -112,6 +148,18 @@ public class JSIndexReader
 	{
 		return MessageFormat.format("^[^{0}]+{0}{1}(?:{0}|$)", new Object[] { JSIndexConstants.DELIMITER, typeName }); //$NON-NLS-1$
 	}
+	
+	/**
+	 * getMemberPattern
+	 * 
+	 * @param typeName
+	 * @param memberName
+	 * @return
+	 */
+	private String getMemberPattern(String typeName, String memberName)
+	{
+		return MessageFormat.format("^{2}{0}{1}(?:{0}|$)", new Object[] { JSIndexConstants.DELIMITER, typeName, memberName }); //$NON-NLS-1$
+	}
 
 	/**
 	 * getProperties
@@ -131,33 +179,38 @@ public class JSIndexReader
 		{
 			for (QueryResult property : properties)
 			{
-				String[] columns = property.getWord().split(JSIndexConstants.DELIMITER);
-				int column = 0;
-				
-				PropertyElement p = new PropertyElement();
-
-				p.setName(columns[column++]);
-				column++;	// skip owning type
-				p.setDescription(this.getDescription(index, columns[column++]));
-				
-				for (ReturnTypeElement returnType : this.getReturnTypes(index, columns[column++]))
-				{
-					p.addType(returnType);
-				}
-				
-				if (column < columns.length)
-				{
-					for (String userAgentKey : columns[column++].split(JSIndexConstants.SUB_DELIMITER))
-					{
-						// get user agent and add to element
-						p.addUserAgent(this.getUserAgent(index, userAgentKey));
-					}
-				}
+				String key = property.getWord();
+				PropertyElement p = this.createPropertyFromKey(index, key);
 
 				result.add(p);
 			}
 		}
 
+		return result;
+	}
+	
+	/**
+	 * getProperty
+	 * 
+	 * @param index
+	 * @param owningType
+	 * @param propertyName
+	 * @return
+	 * @throws IOException
+	 */
+	public PropertyElement getProperty(Index index, String owningType, String propertyName) throws IOException
+	{
+		List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningType, propertyName), SearchPattern.REGEX_MATCH);
+		PropertyElement result = null;
+		
+		if (properties != null)
+		{
+			QueryResult property = properties.get(0);
+			String key = property.getWord();
+			
+			result = this.createPropertyFromKey(index, key);
+		}
+		
 		return result;
 	}
 
