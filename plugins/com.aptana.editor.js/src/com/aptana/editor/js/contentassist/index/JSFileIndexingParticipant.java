@@ -1,7 +1,5 @@
 package com.aptana.editor.js.contentassist.index;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
@@ -9,16 +7,11 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.core.runtime.content.IContentTypeManager;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.js.Activator;
-import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.contentassist.JSASTQueryHelper;
 import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
@@ -36,7 +29,6 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 {
-	private static final String JS_EXTENSION = "js"; //$NON-NLS-1$
 
 	/*
 	 * (non-Javadoc)
@@ -57,7 +49,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 
 			try
 			{
-				if (file == null || !isJSFile(file))
+				if (file == null)
 				{
 					continue;
 				}
@@ -107,53 +99,6 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 		}
 
 		monitor.done();
-	}
-
-	/**
-	 * isJSFile
-	 * 
-	 * @param file
-	 * @return
-	 */
-	private boolean isJSFile(IFileStore file)
-	{
-		InputStream stream = null;
-		IContentTypeManager manager = Platform.getContentTypeManager();
-
-		try
-		{
-			stream = file.openInputStream(EFS.NONE, new NullProgressMonitor());
-
-			IContentType[] types = manager.findContentTypesFor(stream, file.getName());
-
-			for (IContentType type : types)
-			{
-				if (type.getId().equals(IJSConstants.CONTENT_TYPE_JS))
-				{
-					return true;
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			Activator.logError(e.getMessage(), e);
-		}
-		finally
-		{
-			try
-			{
-				if (stream != null)
-				{
-					stream.close();
-				}
-			}
-			catch (IOException e)
-			{
-				// ignore
-			}
-		}
-
-		return JS_EXTENSION.equalsIgnoreCase(new Path(file.getName()).getFileExtension());
 	}
 
 	/**

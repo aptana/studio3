@@ -1,7 +1,5 @@
 package com.aptana.editor.html.contentassist.index;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.Set;
@@ -9,14 +7,8 @@ import java.util.StringTokenizer;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.core.runtime.content.IContentTypeManager;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.common.resolver.IPathResolver;
@@ -25,7 +17,6 @@ import com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.html.Activator;
-import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
@@ -39,7 +30,6 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipant
 {
-	private static final String[] HTML_EXTENSIONS = { "html", "htm" }; //$NON-NLS-1$ //$NON-NLS-2$
 
 	private static final String ELEMENT_LINK = "link"; //$NON-NLS-1$
 	private static final String ELEMENT_SCRIPT = "script"; //$NON-NLS-1$
@@ -58,7 +48,7 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 			}
 			try
 			{
-				if (file == null || !isHTMLFile(file))
+				if (file == null)
 				{
 					continue;
 				}
@@ -97,46 +87,6 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 			}
 		}
 		sub.done();
-	}
-
-	private boolean isHTMLFile(IFileStore file)
-	{
-		InputStream stream = null;
-		IContentTypeManager manager = Platform.getContentTypeManager();
-		try
-		{
-			stream = file.openInputStream(EFS.NONE, new NullProgressMonitor());
-			IContentType[] types = manager.findContentTypesFor(stream, file.getName());
-			for (IContentType type : types)
-			{
-				if (type.getId().equals(IHTMLConstants.CONTENT_TYPE_HTML))
-					return true;
-			}
-		}
-		catch (CoreException e)
-		{
-			Activator.logError(e);
-		}
-		catch (Exception e)
-		{
-			Activator.logError(e.getMessage(), e);
-		}
-		finally
-		{
-			try
-			{
-				if (stream != null)
-					stream.close();
-			}
-			catch (IOException e)
-			{
-				// ignore
-			}
-		}
-		// fall back to file extensions
-		String fileExtension = new Path(file.getName()).getFileExtension();
-		return (HTML_EXTENSIONS[0].equalsIgnoreCase(fileExtension) || HTML_EXTENSIONS[1]
-				.equalsIgnoreCase(fileExtension));
 	}
 
 	public static void walkNode(Index index, IFileStore file, IParseNode parent)

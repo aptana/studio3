@@ -1,26 +1,18 @@
 package com.aptana.editor.ruby.index;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.core.runtime.content.IContentTypeManager;
 import org.jrubyparser.ast.Node;
 import org.jrubyparser.parser.ParserResult;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.ruby.Activator;
-import com.aptana.editor.ruby.IRubyConstants;
 import com.aptana.editor.ruby.parsing.ISourceElementRequestor;
 import com.aptana.editor.ruby.parsing.RubySourceParser;
 import com.aptana.editor.ruby.parsing.SourceElementVisitor;
@@ -50,10 +42,6 @@ public class RubyFileIndexingParticipant implements IFileStoreIndexingParticipan
 						continue;
 					}
 					sub.subTask(store.toString());
-					if (!isRubyFile(store))
-					{
-						continue;
-					}
 
 					// grab the source of the file we're going to parse
 					String source = IOUtil.read(store.openInputStream(EFS.NONE, monitor));
@@ -82,62 +70,5 @@ public class RubyFileIndexingParticipant implements IFileStoreIndexingParticipan
 		{
 			sub.done();
 		}
-	}
-
-	private boolean isRubyFile(IFileStore file)
-	{
-		// Try a faster way, just check filename/extension against ruby content type
-		IContentTypeManager manager = Platform.getContentTypeManager();
-		IContentType rubyType = manager.getContentType(IRubyConstants.CONTENT_TYPE_RUBY);
-		if (rubyType != null)
-		{
-			if (rubyType.isAssociatedWith(file.getName()))
-			{
-				return true;
-			}
-		}
-
-		// Ok, now try slower way where we actually use a stream and grab all content types for file.
-		InputStream stream = null;
-		try
-		{
-			stream = file.openInputStream(EFS.NONE, new NullProgressMonitor());
-			IContentType[] types = manager.findContentTypesFor(stream, file.getName());
-			for (IContentType type : types)
-			{
-				if (type.getId().equals(IRubyConstants.CONTENT_TYPE_RUBY)
-						|| type.getId().equals(IRubyConstants.CONTENT_TYPE_RUBY_AMBIGUOUS))
-					return true;
-			}
-		}
-		catch (CoreException ce)
-		{
-			if (ce.getCause() instanceof FileNotFoundException)
-			{
-				// ignore, probably a permissions issue.
-			}
-			else
-			{
-				Activator.log(ce);
-			}
-		}
-		catch (Exception e)
-		{
-			Activator.log(e);
-		}
-		finally
-		{
-			try
-			{
-				if (stream != null)
-					stream.close();
-			}
-			catch (IOException e)
-			{
-				// ignore
-			}
-		}
-
-		return false;
 	}
 }
