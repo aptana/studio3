@@ -13103,7 +13103,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     </event>
     <event name="oncanplay" type="Function">
       <availability>
-        <specification name="W3C" version="HTML 5">
+        <specification name="W3C" version="HTML 5"/>
       </availability>  
       <browsers>
       <!-- Not currently supported by any browser -->
@@ -13112,7 +13112,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     </event>
     <event name="oncanplaythrough" type="Function">
       <availability>
-        <specification name="W3C" version="HTML 5">
+        <specification name="W3C" version="HTML 5"/>
       </availability> 
       <browsers>
       <!-- Not currently supported by any browser -->
@@ -13285,7 +13285,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     </event>
     <event name="onemptied" type="Function">
       <availability>
-        <specification name="W3C" version="HTML 5">
+        <specification name="W3C" version="HTML 5"/>
       </availability> 
       <browsers>
       <!-- Not currently supported by any browser -->
@@ -13294,7 +13294,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     </event>
     <event name="onended" type="Function">
       <availability>
-        <specification name="W3C" version="HTML 5">
+        <specification name="W3C" version="HTML 5"/>
       </availability> 
       <browsers>
       <!-- Not currently supported by any browser -->
@@ -13343,7 +13343,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     </event>
     <event name="onformchange" type="Function">
       <availability>
-        <specification name="W3C" version="HTML 5">
+        <specification name="W3C" version="HTML 5"/>
       </availability> 
       <browsers>
       <!-- Not currently supported by any browser -->
@@ -13352,7 +13352,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     </event>
     <event name="onforminput" type="Function">
       <availability>
-        <specification name="W3C" version="HTML 5">
+        <specification name="W3C" version="HTML 5"/>
       </availability> 
       <browsers>
       <!-- Not currently supported by any browser -->
@@ -13379,7 +13379,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     </event>
     <event name="oninput" type="Function">
       <availability>
-        <specification name="W3C" version="HTML 5">
+        <specification name="W3C" version="HTML 5"/>
       </availability> 
       <browsers>
       <!-- Not currently supported by any browser -->
@@ -13388,7 +13388,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     </event>
     <event name="oninvalid" type="Function">
       <availability>
-        <specification name="W3C" version="HTML 5">
+        <specification name="W3C" version="HTML 5"/>
       </availability> 
       <browsers>
       <!-- Not currently supported by any browser -->
@@ -13459,7 +13459,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     </event>
     <event name="onloadeddata" type="Function">
       <availability>
-        <specification name="W3C" version="HTML 5">
+        <specification name="W3C" version="HTML 5"/>
       </availability> 
       <browsers>
       <!-- Not currently supported by any browser -->
@@ -13468,7 +13468,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     </event>
     <event name="onloadedmetadata" type="Function">
       <availability>
-        <specification name="W3C" version="HTML 5">
+        <specification name="W3C" version="HTML 5"/>
       </availability> 
       <browsers>
       <!-- Not currently supported by any browser -->
@@ -13477,7 +13477,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     </event>
     <event name="onloadstart" type="Function">
       <availability>
-        <specification name="W3C" version="HTML 5">
+        <specification name="W3C" version="HTML 5"/>
       </availability> 
       <browsers>
       <!-- Not currently supported by any browser -->
@@ -13608,7 +13608,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     </event>
     <event name="onpause" type="Function">
       <availability>
-        <specification name="W3C" version="HTML 5">
+        <specification name="W3C" version="HTML 5"/>
       </availability> 
       <browsers>
       <!-- Not currently supported by any browser -->
@@ -13617,7 +13617,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     </event>
     <event name="onplay" type="Function">
       <availability>
-        <specification name="W3C" version="HTML 5">
+        <specification name="W3C" version="HTML 5"/>
       </availability> 
       <browsers>
       <!-- Not currently supported by any browser -->
@@ -13626,7 +13626,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     </event>
     <event name="onplaying" type="Function">
       <availability>
-        <specification name="W3C" version="HTML 5">
+        <specification name="W3C" version="HTML 5"/>
       </availability> 
       <browsers>
       <!-- Not currently supported by any browser -->
@@ -13635,7 +13635,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     </event>
     <event name="onprogress" type="Function">
       <availability>
-        <specification name="W3C" version="HTML 5">
+        <specification name="W3C" version="HTML 5"/>
       </availability> 
       <browsers>
       <!-- Not currently supported by any browser -->
@@ -13650,7 +13650,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     </event>
     <event name="onratechange" type="Function">
       <availability>
-        <specification name="W3C" version="HTML 5">
+        <specification name="W3C" version="HTML 5"/>
       </availability> 
       <browsers>
       <!-- Not currently supported by any browser -->
@@ -13731,7 +13731,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     </event>
     <event name="onseeked" type="Function">
       <availability>
-        <specification name="W3C" version="HTML 5">
+        <specification name="W3C" version="HTML 5"/>
       </availability> 
       <browsers>
       <!-- Not currently supported by any browser -->
@@ -13740,7 +13740,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     </event>
     <event name="onseeking" type="Function">
       <availability>
-        <specification name="W3C" version="HTML 5">
+        <specification name="W3C" version="HTML 5"/>
       </availability> 
       <browsers>
       <!-- Not currently supported by any browser -->
@@ -13777,7 +13777,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     </event>
     <event name="onstalled" type="Function">
       <availability>
-        <specification name="W3C" version="HTML 5">
+        <specification name="W3C" version="HTML 5"/>
       </availability> 
       <browsers>
       <!-- Not currently supported by any browser -->
@@ -13800,7 +13800,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     </event>
     <event name="onsuspend" type="Function">
       <availability>
-        <specification name="W3C" version="HTML 5">
+        <specification name="W3C" version="HTML 5"/>
       </availability> 
       <browsers>
       <!-- Not currently supported by any browser -->
@@ -13829,7 +13829,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     </event>
     <event name="onvolumechange" type="Function">
       <availability>
-        <specification name="W3C" version="HTML 5">
+        <specification name="W3C" version="HTML 5"/>
       </availability> 
       <browsers>
       <!-- Not currently supported by any browser -->
@@ -13838,7 +13838,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     </event>
     <event name="onwaiting" type="Function">
       <availability>
-        <specification name="W3C" version="HTML 5">
+        <specification name="W3C" version="HTML 5"/>
       </availability> 
       <browsers>
       <!-- Not currently supported by any browser -->
