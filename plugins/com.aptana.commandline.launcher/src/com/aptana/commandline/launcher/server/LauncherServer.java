@@ -15,6 +15,7 @@ import java.util.List;
 import com.aptana.commandline.launcher.CommandlineArgumentsHandler;
 import com.aptana.commandline.launcher.CommandlineLauncherPlugin;
 import com.aptana.commandline.launcher.server.port.PortManager;
+import com.aptana.core.util.PlatformUtil;
 
 /**
  * @author schitale
@@ -27,6 +28,7 @@ public class LauncherServer
 	 */
 	public static void startServer()
 	{
+		PlatformUtil.expandEnvironmentStrings(PlatformUtil.DESKTOP_DIRECTORY);
 		try
 		{
 			CommandLineArgsServer server = new CommandLineArgsServer();

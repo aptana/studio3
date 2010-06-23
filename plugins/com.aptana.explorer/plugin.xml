@@ -121,6 +121,12 @@
 			</or>
 	     </enablement>
       </commonWizard>
+      <commonWizard
+            associatedExtensionId="org.eclipse.ui.navigator.resourceContent"
+            type="new"
+            wizardId="com.aptana.ui.wizards.NewWebProject">
+         <enablement></enablement>
+      </commonWizard>
    </extension>
    <extension
          point="org.eclipse.ui.commands">

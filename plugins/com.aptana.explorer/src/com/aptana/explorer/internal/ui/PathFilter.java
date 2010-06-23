@@ -122,8 +122,8 @@ class PathFilter extends ViewerFilter
 				String[] documents = result.getDocuments();
 				for (String document : documents)
 				{
-					if ((match(document) && rawPath.equals(result.getWord()))
-							|| (match(result.getWord()) && rawPath.equals(document)))
+					if ((match(document) && resource.getLocationURI().toString().equals(result.getWord()))
+							|| (match(result.getWord()) && resource.getLocation().toPortableString().equals(document)))
 					{
 						return true;
 					}
