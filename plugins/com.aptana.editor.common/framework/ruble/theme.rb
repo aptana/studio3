@@ -15,13 +15,13 @@ module Ruble
     # 'italic', 'bold' and 'underline' are optional font styles that will get applied.
     # e.g. 'string.quoted.single.css' => ['#ff0000', '#00ff00', 'bold', 'italic'] will produce a red fg, green bg with bold and italic font.
     def self.add(hash = {})
-      plugin = com.aptana.editor.common.CommonEditorPlugin.getDefault
+      plugin = com.aptana.theme.ThemePlugin.getDefault
       color_manager = plugin.getColorManager
       theme_manager = plugin.getThemeManager
       # TODO Merge the hash with default values for fg, bg, selection, etc.
       props = java.util.Properties.new
       hash.each {|key, value| props.setProperty(key.to_s.tr("_", "."), value.to_s) }
-      theme = com.aptana.editor.common.theme.Theme.new(color_manager, props)
+      theme = com.aptana.theme.Theme.new(color_manager, props)
       theme_manager.addTheme(theme)
       return theme
     end

@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -40,6 +39,7 @@ import com.aptana.index.core.IndexManager;
 public class CoreStubber extends Job
 {
 
+	private static final String GEM_COMMAND = "gem"; //$NON-NLS-1$
 	private static final String RUBY_EXE = "ruby"; //$NON-NLS-1$
 	private static final String VERSION_SWITCH = "-v"; //$NON-NLS-1$
 
@@ -141,15 +141,15 @@ public class CoreStubber extends Job
 
 	public static Set<IPath> getGemPaths()
 	{
-		IPath gemCommand = ExecutableUtil.find("gem", true, null);
-		String command = "gem";
+		IPath gemCommand = ExecutableUtil.find(GEM_COMMAND, true, null);
+		String command = GEM_COMMAND;
 		if (gemCommand != null)
 		{
 			command = gemCommand.toOSString();
 		}
 		// FIXME Not finding my user gem path on Windows...
 		String gemEnvOutput = ProcessUtil.outputForCommand(command, null, ShellExecutable.getEnvironment(),
-				"env", "gempath"); //$NON-NLS-1$
+				"env", "gempath"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (gemEnvOutput == null)
 		{
 			return Collections.emptySet();
@@ -160,7 +160,7 @@ public class CoreStubber extends Job
 		{
 			for (String gemPath : gemPaths)
 			{
-				IPath gemsPath = new Path(gemPath).append("gems");
+				IPath gemsPath = new Path(gemPath).append("gems"); //$NON-NLS-1$
 				paths.add(gemsPath);
 			}
 		}
@@ -361,8 +361,8 @@ public class CoreStubber extends Job
 		private void filterFiles()
 		{
 			// We store something in the prefs for the last timestamp, since we can't go off timestamp of disk index.
-			long indexLastModified = Platform.getPreferencesService().getLong(Activator.PLUGIN_ID,
-					getIndexTimestampKey(), -1, null);
+			IEclipsePreferences prefs = new InstanceScope().getNode(Activator.PLUGIN_ID);
+			long indexLastModified = prefs.getLong(getIndexTimestampKey(), -1);
 			Iterator<IFileStore> iter = files.iterator();
 			while (iter.hasNext())
 			{

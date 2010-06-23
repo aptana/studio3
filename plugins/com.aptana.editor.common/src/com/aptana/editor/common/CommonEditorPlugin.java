@@ -33,12 +33,9 @@ import org.osgi.framework.BundleContext;
 
 import com.aptana.editor.common.internal.scripting.ContentTypeTranslation;
 import com.aptana.editor.common.internal.scripting.DocumentScopeManager;
-import com.aptana.editor.common.internal.theme.ThemeManager;
 import com.aptana.editor.common.internal.theme.fontloader.EditorFontOverride;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
-import com.aptana.editor.common.theme.ColorManager;
-import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.index.core.IndexActivator;
 import com.aptana.usage.EventLogger;
 
@@ -66,7 +63,6 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	// The shared instance
 	private static CommonEditorPlugin plugin;
 
-	private ColorManager fColorManager;
 	private Map<ContextTypeRegistry, ContributionTemplateStore> fTemplateStoreMap;
 	private InvasiveThemeHijacker themeHijacker;
 	private FilenameDifferentiator differentiator;
@@ -201,7 +197,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 
 		// Activate indexing
 		IndexActivator.getDefault();
-		
+
 		new EditorFontOverride().schedule();
 		themeHijacker = new InvasiveThemeHijacker();
 		themeHijacker.schedule();
@@ -220,9 +216,6 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	{
 		try
 		{
-			if (fColorManager != null)
-				fColorManager.dispose();
-
 			IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
 			prefs.removePreferenceChangeListener(themeHijacker);
 			differentiator.dispose();
@@ -232,7 +225,6 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		finally
 		{
 			themeHijacker = null;
-			fColorManager = null;
 			differentiator = null;
 			plugin = null;
 			super.stop(context);
@@ -247,26 +239,6 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	public static CommonEditorPlugin getDefault()
 	{
 		return plugin;
-	}
-
-	/**
-	 * getColorManager
-	 * 
-	 * @return
-	 */
-	public ColorManager getColorManager()
-	{
-		if (this.fColorManager == null)
-		{
-			this.fColorManager = new ColorManager();
-		}
-
-		return this.fColorManager;
-	}
-
-	public IThemeManager getThemeManager()
-	{
-		return ThemeManager.instance();
 	}
 
 	public static void logError(Exception e)

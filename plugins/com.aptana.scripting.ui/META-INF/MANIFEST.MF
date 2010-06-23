@@ -10,7 +10,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.views,
  org.eclipse.core.runtime,
  com.aptana.scripting;bundle-version="1.0.0",
- com.aptana.editor.common;bundle-version="1.0.0",
+ com.aptana.theme,
  org.eclipse.jface.text
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy

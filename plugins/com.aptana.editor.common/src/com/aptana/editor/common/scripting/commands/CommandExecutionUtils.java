@@ -30,6 +30,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.ITextViewerExtension5;
 import org.eclipse.jface.text.Region;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.StyledText;
@@ -358,18 +359,24 @@ public class CommandExecutionUtils
 		{
 			inputTypes = new InputType[] { InputType.UNDEFINED };
 		}
-		
+
 		FilterInputProvider filterInputProvider = null;
 		if (textViewer != null)
 		{
-			StyledText textWidget = textViewer.getTextWidget();
 			for (InputType inputType : inputTypes)
 			{
-				filterInputProvider = getInputProvider(textWidget, command, inputType);
-				if (filterInputProvider != null)
+				try
 				{
-					selected = inputType;
-					break;
+					filterInputProvider = getInputProvider(textViewer, command, inputType);
+					if (filterInputProvider != null)
+					{
+						selected = inputType;
+						break;
+					}
+				}
+				catch (BadLocationException e)
+				{
+					CommonEditorPlugin.logError(e);
 				}
 			}
 		}
@@ -392,10 +399,10 @@ public class CommandExecutionUtils
 		return command.execute(commandContext);
 	}
 
-	protected static FilterInputProvider getInputProvider(StyledText textWidget, CommandElement command,
-			InputType inputType)
+	protected static FilterInputProvider getInputProvider(ITextViewer textWidget, CommandElement command,
+			InputType inputType) throws BadLocationException
 	{
-		Point selectionRange = textWidget.getSelection();
+		Point selectionRange = textWidget.getSelectedRange();
 		switch (inputType)
 		{
 			// TODO Move this logic into the enum itself
@@ -403,31 +410,28 @@ public class CommandExecutionUtils
 			case NONE:
 				return CommandExecutionUtils.EOF;
 			case SELECTION:
-				if (selectionRange.x == selectionRange.y)
+				if (selectionRange.y == 0)
 					return null;
-				return new CommandExecutionUtils.StringInputProvider(textWidget.getSelectionText());
+				IRegion selectedRegion = getSelectedRegion(textWidget);
+				return new CommandExecutionUtils.StringInputProvider(textWidget.getDocument().get(
+						selectedRegion.getOffset(), selectedRegion.getLength()));
 			case SELECTED_LINES:
-				if (selectionRange.x == selectionRange.y)
+				if (selectionRange.y == 0)
 					return null;
-
-				int selectionStartOffsetLine = textWidget.getLineAtOffset(selectionRange.x);
-				int selectionEndOffsetLine = textWidget.getLineAtOffset(selectionRange.y);
-				int selectionStartOffsetLineStartOffset = textWidget.getOffsetAtLine(selectionStartOffsetLine);
-				int selectionEndOffsetLineEndOffset = textWidget.getOffsetAtLine(selectionEndOffsetLine)
-						+ textWidget.getLine(selectionEndOffsetLine).length();
-				return new CommandExecutionUtils.StringInputProvider(textWidget.getText(
-						selectionStartOffsetLineStartOffset, selectionEndOffsetLineEndOffset));
+				IRegion region = getSelectedLinesRegion(textWidget);
+				return new CommandExecutionUtils.StringInputProvider(textWidget.getDocument().get(region.getOffset(),
+						region.getLength()));
 			case DOCUMENT:
-				return new CommandExecutionUtils.StringInputProvider(textWidget.getText());
+				return new CommandExecutionUtils.StringInputProvider(textWidget.getDocument().get());
 			case LEFT_CHAR:
-				if (textWidget.getCaretOffset() < 1)
+				if (getCaretOffset(textWidget) < 1)
 					return null;
-				return new CommandExecutionUtils.StringInputProvider(textWidget.getTextRange(textWidget
-						.getCaretOffset() - 1, 1));
+				return new CommandExecutionUtils.StringInputProvider(textWidget.getDocument().get(
+						getCaretOffset(textWidget) - 1, 1));
 			case RIGHT_CHAR:
-				if (textWidget.getCaretOffset() < textWidget.getCharCount())
-					return new CommandExecutionUtils.StringInputProvider(textWidget.getTextRange(textWidget
-							.getCaretOffset(), 1));
+				if (getCaretOffset(textWidget) < getEndOffset(textWidget))
+					return new CommandExecutionUtils.StringInputProvider(textWidget.getDocument().get(
+							getCaretOffset(textWidget), 1));
 				return null;
 			case CLIPBOARD:
 				String contents = getClipboardContents();
@@ -435,8 +439,7 @@ public class CommandExecutionUtils
 					return null;
 				return new CommandExecutionUtils.StringInputProvider(contents);
 			case LINE:
-				return new CommandExecutionUtils.StringInputProvider(textWidget.getLine(textWidget
-						.getLineAtOffset(textWidget.getCaretOffset())));
+				return new CommandExecutionUtils.StringInputProvider(getCurrentLineText(textWidget));
 			case WORD:
 				String currentWord = findWord(textWidget);
 				if (currentWord == null || currentWord.trim().length() == 0)
@@ -448,6 +451,12 @@ public class CommandExecutionUtils
 				return new CommandExecutionUtils.FileInputProvider(command.getInputPath());
 		}
 		return null;
+	}
+
+	private static String getCurrentLineText(ITextViewer textWidget) throws BadLocationException
+	{
+		IRegion region = getCurrentLineRegion(textWidget);
+		return textWidget.getDocument().get(region.getOffset(), region.getLength());
 	}
 
 	public static void processCommandResult(CommandElement command, CommandResult commandResult, ITextEditor textEditor)
@@ -500,175 +509,213 @@ public class CommandExecutionUtils
 		{
 			return;
 		}
-		StyledText textWidget = textViewer.getTextWidget();
-		final int caretOffset = textWidget.getCaretOffset();
-		switch (commandResult.getOutputType())
+		try
 		{
-			case REPLACE_SELECTION:
-				if (commandResult.getInputType() == InputType.DOCUMENT)
-				{
-					replaceDocument(textWidget, commandResult);
-				}
-				else if (commandResult.getInputType() == InputType.LINE)
-				{
-					replaceLine(textWidget, commandResult);
-				}
-				else if (commandResult.getInputType() == InputType.WORD)
-				{
-					replaceWord(textWidget, commandResult);
-				}
-				else
-				{
-					IRegion region = getSelectedRegion(textWidget);
-					if (commandResult.getInputType() == InputType.RIGHT_CHAR)
+			final int caretOffset = getCaretOffset(textViewer);
+			switch (commandResult.getOutputType())
+			{
+				case REPLACE_SELECTION:
+					if (commandResult.getInputType() == InputType.DOCUMENT)
 					{
-						region = new Region(textWidget.getCaretOffset(), 1);
+						replaceDocument(textViewer, commandResult);
 					}
-					else if (commandResult.getInputType() == InputType.LEFT_CHAR)
+					else if (commandResult.getInputType() == InputType.LINE)
 					{
-						region = new Region(textWidget.getCaretOffset() - 1, 1);
+						replaceLine(textViewer, commandResult);
+					}
+					else if (commandResult.getInputType() == InputType.WORD)
+					{
+						replaceWord(textViewer, commandResult);
+					}
+					else
+					{
+						IRegion region = getSelectedRegion(textViewer);
+						if (commandResult.getInputType() == InputType.RIGHT_CHAR)
+						{
+							region = new Region(caretOffset, 1);
+						}
+						else if (commandResult.getInputType() == InputType.LEFT_CHAR)
+						{
+							region = new Region(caretOffset - 1, 1);
+						}
+						else if (commandResult.getInputType() == InputType.SELECTED_LINES)
+						{
+							region = getSelectedLinesRegion(textViewer);
+						}
+						replaceTextRange(textViewer, region, commandResult.getOutputString());
+					}
+					break;
+				case REPLACE_SELECTED_LINES:
+					IRegion selectedLines = getSelectedLinesRegion(textViewer);
+					replaceTextRange(textViewer, selectedLines, commandResult.getOutputString());
+					break;
+				case REPLACE_LINE:
+					replaceLine(textViewer, commandResult);
+					break;
+				case REPLACE_WORD:
+					replaceWord(textViewer, commandResult);
+					break;
+				case REPLACE_DOCUMENT:
+					replaceDocument(textViewer, commandResult);
+					break;
+				case INSERT_AS_TEXT:
+					int offsetToInsert = caretOffset;
+					if (commandResult.getInputType() == InputType.SELECTION)
+					{
+						IRegion region = getSelectedRegion(textViewer);
+						offsetToInsert = region.getOffset() + region.getLength();
 					}
 					else if (commandResult.getInputType() == InputType.SELECTED_LINES)
 					{
-						region = getSelectedLinesRegion(textWidget);
+						IRegion region = getSelectedLinesRegion(textViewer);
+						offsetToInsert = region.getOffset() + region.getLength();
 					}
-					textWidget
-							.replaceTextRange(region.getOffset(), region.getLength(), commandResult.getOutputString());
-				}
-				break;
-			case REPLACE_SELECTED_LINES:
-				IRegion selectedLines = getSelectedLinesRegion(textWidget);
-				textWidget.replaceTextRange(selectedLines.getOffset(), selectedLines.getLength(), commandResult
-						.getOutputString());
-				break;
-			case REPLACE_LINE:
-				replaceLine(textWidget, commandResult);
-				break;
-			case REPLACE_WORD:
-				replaceWord(textWidget, commandResult);
-				break;
-			case REPLACE_DOCUMENT:
-				replaceDocument(textWidget, commandResult);
-				break;
-			case INSERT_AS_TEXT:
-				int offsetToInsert = caretOffset;
-				if (commandResult.getInputType() == InputType.SELECTION)
-				{
-					IRegion region = getSelectedRegion(textWidget);
-					offsetToInsert = region.getOffset() + region.getLength();
-				}
-				else if (commandResult.getInputType() == InputType.SELECTED_LINES)
-				{
-					IRegion region = getSelectedLinesRegion(textWidget);
-					offsetToInsert = region.getOffset() + region.getLength();
-				}
-				else if (commandResult.getInputType() == InputType.LINE)
-				{
-					IRegion region = getCurrentLineRegion(textWidget);
-					offsetToInsert = region.getOffset() + region.getLength();
-				}
-				else if (commandResult.getInputType() == InputType.WORD)
-				{
-					IRegion region = findWordRegion(textWidget);
-					offsetToInsert = region.getOffset() + region.getLength();
-				}
-				else if (commandResult.getInputType() == InputType.RIGHT_CHAR)
-				{
-					offsetToInsert = textWidget.getCaretOffset() + 1;
-				}
-				else if (commandResult.getInputType() == InputType.DOCUMENT)
-				{
-					offsetToInsert = textWidget.getCharCount();
-				}
-				String outputString = commandResult.getOutputString();
-				textWidget.replaceTextRange(offsetToInsert, 0, outputString);
-				// Need to place cursor at end of inserted text!
-				textWidget.setCaretOffset(caretOffset + outputString.length());
-				break;
-			case INSERT_AS_SNIPPET:
-				IRegion region = new Region(caretOffset, 0);
-				if (commandResult.getInputType() == InputType.SELECTION)
-				{
-					region = getSelectedRegion(textWidget);
-				}
-				else if (commandResult.getInputType() == InputType.SELECTED_LINES)
-				{
-					region = getSelectedLinesRegion(textWidget);
-				}
-				else if (commandResult.getInputType() == InputType.DOCUMENT)
-				{
-					region = new Region(0, textWidget.getCharCount());
-				}
-				else if (commandResult.getInputType() == InputType.LINE)
-				{
-					region = getCurrentLineRegion(textWidget);
-				}
-				else if (commandResult.getInputType() == InputType.WORD)
-				{
-					region = findWordRegion(textWidget);
-				}
-				else if (commandResult.getInputType() == InputType.RIGHT_CHAR)
-				{
-					region = new Region(textWidget.getCaretOffset(), 1);
-				}
-				else if (commandResult.getInputType() == InputType.LEFT_CHAR)
-				{
-					region = new Region(textWidget.getCaretOffset() - 1, 1);
-				}
-				SnippetsCompletionProcessor.insertAsTemplate(textViewer, region, commandResult.getOutputString(), commandResult.getCommand());
-				break;
-			case SHOW_AS_TOOLTIP:
-				showAsTooltip(commandResult, textWidget, caretOffset);
-				break;
+					else if (commandResult.getInputType() == InputType.LINE)
+					{
+						IRegion region = getCurrentLineRegion(textViewer);
+						offsetToInsert = region.getOffset() + region.getLength();
+					}
+					else if (commandResult.getInputType() == InputType.WORD)
+					{
+						IRegion region = findWordRegion(textViewer);
+						offsetToInsert = region.getOffset() + region.getLength();
+					}
+					else if (commandResult.getInputType() == InputType.RIGHT_CHAR)
+					{
+						offsetToInsert = caretOffset + 1;
+					}
+					else if (commandResult.getInputType() == InputType.DOCUMENT)
+					{
+						offsetToInsert = getEndOffset(textViewer);
+					}
+					String outputString = commandResult.getOutputString();
+					replaceTextRange(textViewer, offsetToInsert, 0, outputString);
+					// Need to place cursor at end of inserted text!
+					setCaretOffset(textViewer, caretOffset + outputString.length());
+					break;
+				case INSERT_AS_SNIPPET:
+					IRegion region = new Region(caretOffset, 0);
+					if (commandResult.getInputType() == InputType.SELECTION)
+					{
+						region = getSelectedRegion(textViewer);
+					}
+					else if (commandResult.getInputType() == InputType.SELECTED_LINES)
+					{
+						region = getSelectedLinesRegion(textViewer);
+					}
+					else if (commandResult.getInputType() == InputType.DOCUMENT)
+					{
+						region = new Region(0, getEndOffset(textViewer));
+					}
+					else if (commandResult.getInputType() == InputType.LINE)
+					{
+						region = getCurrentLineRegion(textViewer);
+					}
+					else if (commandResult.getInputType() == InputType.WORD)
+					{
+						region = findWordRegion(textViewer);
+					}
+					else if (commandResult.getInputType() == InputType.RIGHT_CHAR)
+					{
+						region = new Region(caretOffset, 1);
+					}
+					else if (commandResult.getInputType() == InputType.LEFT_CHAR)
+					{
+						region = new Region(caretOffset - 1, 1);
+					}
+					SnippetsCompletionProcessor.insertAsTemplate(textViewer, region, commandResult.getOutputString(),
+							commandResult.getCommand());
+					break;
+				case SHOW_AS_TOOLTIP:
+					showAsTooltip(commandResult, textViewer, caretOffset);
+					break;
+			}
+		}
+		catch (BadLocationException e)
+		{
+			CommonEditorPlugin.logError(e);
 		}
 	}
 
-	protected static void replaceWord(StyledText textWidget, CommandResult commandResult)
+	private static void setCaretOffset(ITextViewer textViewer, int docOffset)
+	{
+		if (textViewer instanceof ITextViewerExtension5)
+		{
+			docOffset = ((ITextViewerExtension5) textViewer).modelOffset2WidgetOffset(docOffset);
+		}
+		textViewer.getTextWidget().setCaretOffset(docOffset);
+	}
+
+	private static void replaceTextRange(ITextViewer textViewer, IRegion region, String text)
+			throws BadLocationException
+	{
+		replaceTextRange(textViewer, region.getOffset(), region.getLength(), text);
+	}
+
+	private static void replaceTextRange(ITextViewer textViewer, int offset, int length, String text)
+			throws BadLocationException
+	{
+		textViewer.getDocument().replace(offset, length, text);
+	}
+
+	private static int getEndOffset(ITextViewer textViewer)
+	{
+		return textViewer.getDocument().getLength();
+	}
+
+	private static int getCaretOffset(ITextViewer textViewer)
+	{
+		StyledText textWidget = textViewer.getTextWidget();
+		int caretOffset = textWidget.getCaretOffset();
+		if (textViewer instanceof ITextViewerExtension5)
+		{
+			ITextViewerExtension5 extension = (ITextViewerExtension5) textViewer;
+			return extension.widgetOffset2ModelOffset(caretOffset);
+		}
+		return caretOffset;
+	}
+
+	protected static void replaceWord(ITextViewer textWidget, CommandResult commandResult) throws BadLocationException
 	{
 		IRegion wordRegion = findWordRegion(textWidget);
-		textWidget.replaceTextRange(wordRegion.getOffset(), wordRegion.getLength(), commandResult.getOutputString());
+		replaceTextRange(textWidget, wordRegion, commandResult.getOutputString());
 	}
 
-	private static IRegion getSelectedLinesRegion(StyledText textWidget)
+	private static IRegion getSelectedLinesRegion(ITextViewer textWidget) throws BadLocationException
 	{
-		Point selectionRange = textWidget.getSelection();
-		int selectionStartOffsetLine = textWidget.getLineAtOffset(selectionRange.x);
-		int selectionEndOffsetLine = textWidget.getLineAtOffset(selectionRange.y);
+		Point selectionRange = textWidget.getSelectedRange();
+		int startLine = textWidget.getDocument().getLineOfOffset(selectionRange.x);
+		int endLine = textWidget.getDocument().getLineOfOffset(selectionRange.x + selectionRange.y);
 
-		int selectionStartOffsetLineStartOffset = textWidget.getOffsetAtLine(selectionStartOffsetLine);
-		int selectionEndOffsetLineEndOffset = textWidget.getOffsetAtLine(selectionEndOffsetLine)
-				+ textWidget.getLine(selectionEndOffsetLine).length();
-		return new Region(selectionStartOffsetLineStartOffset, selectionEndOffsetLineEndOffset
-				- selectionStartOffsetLineStartOffset);
+		int startOffset = textWidget.getDocument().getLineOffset(startLine);
+		IRegion endRegion = textWidget.getDocument().getLineInformation(endLine);
+		int endOffset = endRegion.getOffset() + endRegion.getLength();
+		return new Region(startOffset, endOffset - startOffset);
 	}
 
-	private static IRegion getSelectedRegion(StyledText textWidget)
+	private static IRegion getSelectedRegion(ITextViewer textWidget)
 	{
-		Point selectionRange = textWidget.getSelection();
-		int start = Math.min(selectionRange.x, selectionRange.y);
-		int end = Math.max(selectionRange.x, selectionRange.y);
-		return new Region(start, end - start);
+		return new Region(textWidget.getSelectedRange().x, textWidget.getSelectedRange().y);
 	}
 
-	protected static IRegion getCurrentLineRegion(StyledText textWidget)
+	protected static IRegion getCurrentLineRegion(ITextViewer textWidget) throws BadLocationException
 	{
-		final int caretOffset = textWidget.getCaretOffset();
-		int lineAtCaret = textWidget.getLineAtOffset(caretOffset);
-		int lineLength = textWidget.getLine(lineAtCaret).length();
-		return new Region(textWidget.getOffsetAtLine(lineAtCaret), lineLength);
+		final int caretOffset = getCaretOffset(textWidget);
+		int lineAtCaret = textWidget.getDocument().getLineOfOffset(caretOffset);
+		return textWidget.getDocument().getLineInformation(lineAtCaret);
 	}
 
-	protected static void replaceDocument(StyledText textWidget, CommandResult commandResult)
+	protected static void replaceDocument(ITextViewer textWidget, CommandResult commandResult)
 	{
-		textWidget.setText(commandResult.getOutputString());
+		textWidget.getDocument().set(commandResult.getOutputString());
 	}
 
-	protected static void replaceLine(StyledText textWidget, CommandResult commandResult)
+	protected static void replaceLine(ITextViewer textWidget, CommandResult commandResult) throws BadLocationException
 	{
 		IRegion region = getCurrentLineRegion(textWidget);
 		String output = commandResult.getOutputString();
-		textWidget.replaceTextRange(region.getOffset(), region.getLength(), output);
-		textWidget.setCaretOffset(region.getOffset() + output.length());
+		replaceTextRange(textWidget, region, output);
+		setCaretOffset(textWidget, region.getOffset() + output.length());
 	}
 
 	private static void outputToConsole(CommandResult commandResult)
@@ -680,10 +727,11 @@ public class CommandExecutionUtils
 		}
 		// Dump any errors or warning to the output
 		String errorString = commandResult.getErrorString();
-		if (errorString != null) {
+		if (errorString != null)
+		{
 			ScriptLogger.printError(errorString);
 		}
-		
+
 	}
 
 	private static void outputToFile(CommandResult commandResult)
@@ -722,11 +770,10 @@ public class CommandExecutionUtils
 	{
 		copyToClipboard(commandResult.getOutputString());
 	}
-	
+
 	public static void copyToClipboard(String contents)
 	{
-		getClipboard().setContents(new Object[] { contents },
-				new Transfer[] { TextTransfer.getInstance() });
+		getClipboard().setContents(new Object[] { contents }, new Transfer[] { TextTransfer.getInstance() });
 	}
 
 	private static String getClipboardContents()
@@ -750,8 +797,8 @@ public class CommandExecutionUtils
 		IEditorInput input = Utilities.createFileEditorInput(file, NEW_DOCUMENT_TITLE);
 		try
 		{
-			IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(input,
-					DEFAULT_TEXT_EDITOR_ID);
+			IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+					.openEditor(input, DEFAULT_TEXT_EDITOR_ID);
 			if (!(part instanceof ITextEditor))
 				return;
 			ITextEditor openedTextEditor = (ITextEditor) part;
@@ -781,7 +828,7 @@ public class CommandExecutionUtils
 		}
 	}
 
-	private static void showAsTooltip(CommandResult commandResult, StyledText textWidget, final int caretOffset)
+	private static void showAsTooltip(CommandResult commandResult, ITextViewer textViewer, final int caretOffset)
 	{
 		String output = commandResult.getOutputString();
 		if (output == null || output.trim().length() == 0)
@@ -837,14 +884,15 @@ public class CommandExecutionUtils
 		Point p = tooltip.computeSizeHint();
 		tooltip.setSize(p.x, p.y);
 
+		StyledText textWidget = textViewer.getTextWidget();
 		Point locationAtOffset = textWidget.getLocationAtOffset(caretOffset);
 		Rectangle bounds = textWidget.getClientArea();
 		// Is caret visible in the client area
 		if (bounds.contains(locationAtOffset))
 		{
 			// Show the tooltip near it
-			locationAtOffset = textWidget.toDisplay(locationAtOffset.x, locationAtOffset.y
-					+ textWidget.getLineHeight(caretOffset) + 2);
+			locationAtOffset = textWidget.toDisplay(locationAtOffset.x,
+					locationAtOffset.y + textWidget.getLineHeight(caretOffset) + 2);
 		}
 		else
 		{
@@ -852,8 +900,8 @@ public class CommandExecutionUtils
 			if (locationAtOffset.y > bounds.y && locationAtOffset.y < bounds.y + bounds.height)
 			{
 				// Show the tooltip near left margin below the current line
-				locationAtOffset = textWidget.toDisplay(bounds.x + 2, locationAtOffset.y
-						+ textWidget.getLineHeight(caretOffset) + 2);
+				locationAtOffset = textWidget.toDisplay(bounds.x + 2,
+						locationAtOffset.y + textWidget.getLineHeight(caretOffset) + 2);
 			}
 			else
 			{
@@ -861,8 +909,8 @@ public class CommandExecutionUtils
 				int offsetAtLine = textWidget.getOffsetAtLine(topIndex);
 				locationAtOffset = textWidget.getLocationAtOffset(offsetAtLine);
 				// Show the tool tip below first visible line
-				locationAtOffset = textWidget.toDisplay(locationAtOffset.x + 2, locationAtOffset.y
-						+ textWidget.getLineHeight(caretOffset) + 2);
+				locationAtOffset = textWidget.toDisplay(locationAtOffset.x + 2,
+						locationAtOffset.y + textWidget.getLineHeight(caretOffset) + 2);
 			}
 		}
 		tooltip.setLocation(locationAtOffset);
@@ -909,8 +957,9 @@ public class CommandExecutionUtils
 						support.createBrowser(
 								IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.LOCATION_BAR
 										| IWorkbenchBrowserSupport.AS_EDITOR | IWorkbenchBrowserSupport.STATUS, "", //$NON-NLS-1$
-										null, // Set the name to null. That way the browser tab will display the title of page loaded in the browser.
-										command.getDisplayName()).openURL(url);
+								null, // Set the name to null. That way the browser tab will display the title of page
+										// loaded in the browser.
+								command.getDisplayName()).openURL(url);
 					}
 					else
 					{
@@ -929,18 +978,19 @@ public class CommandExecutionUtils
 		}
 	}
 
-	private static String findWord(StyledText textWidget)
+	private static String findWord(ITextViewer textWidget) throws BadLocationException
 	{
 		IRegion region = findWordRegion(textWidget);
-		return textWidget.getTextRange(region.getOffset(), region.getLength());
+		return textWidget.getDocument().get(region.getOffset(), region.getLength());
 	}
 
-	private static IRegion findWordRegion(StyledText textWidget)
+	private static IRegion findWordRegion(ITextViewer textWidget) throws BadLocationException
 	{
-		int caretOffset = textWidget.getCaretOffset();
-		int lineAtCaret = textWidget.getLineAtOffset(caretOffset);
-		String currentLine = textWidget.getLine(lineAtCaret);
-		int lineOffset = textWidget.getOffsetAtLine(lineAtCaret);
+		int caretOffset = getCaretOffset(textWidget);
+		int lineAtCaret = textWidget.getDocument().getLineOfOffset(caretOffset);
+		IRegion lineInfo = textWidget.getDocument().getLineInformation(lineAtCaret);
+		String currentLine = textWidget.getDocument().get(lineInfo.getOffset(), lineInfo.getLength());
+		int lineOffset = textWidget.getDocument().getLineOffset(lineAtCaret);
 		int offsetInLine = caretOffset - lineOffset;
 		IRegion region = findWordRegion(currentLine, offsetInLine);
 		return new Region(region.getOffset() + lineOffset, region.getLength());

@@ -9,11 +9,10 @@ import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 
-import com.aptana.editor.common.extensions.ConsoleThemePageParticipant;
-import com.aptana.editor.common.theme.ConsoleThemer;
 import com.aptana.scripting.ScriptLogListener;
 import com.aptana.scripting.ScriptLogger;
-
+import com.aptana.theme.ConsoleThemer;
+import com.aptana.theme.extensions.ConsoleThemePageParticipant;
 
 /**
  * Singleton for the scripting console.
@@ -37,8 +36,8 @@ public class ScriptingConsole
 	{
 		if (console == null)
 		{
-			console = new MessageConsole(Messages.EarlyStartup_SCRIPTING_CONSOLE_NAME,
-					ScriptingUIPlugin.getImageDescriptor(CONSOLE_ICON_PATH));
+			console = new MessageConsole(Messages.EarlyStartup_SCRIPTING_CONSOLE_NAME, ScriptingUIPlugin
+					.getImageDescriptor(CONSOLE_ICON_PATH));
 
 			// create message streams
 			outputConsoleStream = console.newMessageStream();
@@ -49,18 +48,19 @@ public class ScriptingConsole
 
 			// bring console into view when errors occur
 			errorConsoleStream.setActivateOnWrite(true);
-			
+
 			HashMap<MessageConsoleStream, String> themeConsoleStreamToColor = new HashMap<MessageConsoleStream, String>();
 			themeConsoleStreamToColor.put(outputConsoleStream, ConsoleThemer.CONSOLE_OUTPUT);
 			themeConsoleStreamToColor.put(errorConsoleStream, ConsoleThemer.CONSOLE_ERROR);
 			themeConsoleStreamToColor.put(infoConsoleStream, ConsoleThemer.CONSOLE_INFO);
 			themeConsoleStreamToColor.put(warningConsoleStream, ConsoleThemer.CONSOLE_WARNING);
 			themeConsoleStreamToColor.put(traceConsoleStream, ConsoleThemer.CONSOLE_TRACE);
-			
+
 			// Will be used later on by the ConsoleThemePageParticipant to properly set the colors
 			// following the theme.
-			console.setAttribute(ConsoleThemePageParticipant.THEME_CONSOLE_STREAM_TO_COLOR_ATTRIBUTE, themeConsoleStreamToColor);
-			
+			console.setAttribute(ConsoleThemePageParticipant.THEME_CONSOLE_STREAM_TO_COLOR_ATTRIBUTE,
+					themeConsoleStreamToColor);
+
 			// register our console with Eclipse
 			ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { console });
 		}
@@ -192,7 +192,5 @@ public class ScriptingConsole
 			}
 		});
 	}
-
-
 
 }
