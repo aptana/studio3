@@ -34,16 +34,31 @@
  */
 package com.aptana.ide.syncing.ui.navigator;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 
+import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.ide.core.io.LocalConnectionPoint;
+import com.aptana.ide.core.io.WorkspaceConnectionPoint;
 import com.aptana.ide.syncing.core.SyncingPlugin;
+import com.aptana.ide.ui.io.navigator.FileSystemObject;
 import com.aptana.ide.ui.io.navigator.FileTreeContentProvider;
 
 /**
  * @author Michael Xia (mxia@aptana.com)
  */
 public class SiteConnectionsContentProvider extends FileTreeContentProvider { /* using FileTreeContentProvider is correct here! */
+
+	private static final Object[] EMPTY = new Object[0];
 
     @Override
     public Object[] getElements(Object inputElement) {
@@ -63,7 +78,46 @@ public class SiteConnectionsContentProvider extends FileTreeContentProvider { /*
         		children[0] = ProjectSitesManager.getInstance().getProjectSites(project);
         		return children;
         	}
-        }
-        return super.getChildren(element);
+		}
+		else if (element instanceof ProjectSiteConnection)
+		{
+			IConnectionPoint connectionPoint = ((ProjectSiteConnection) element).getSiteConnection().getDestination();
+			if (connectionPoint instanceof LocalConnectionPoint)
+			{
+				try
+				{
+					return fetchFileSystemChildren(((LocalConnectionPoint) connectionPoint).getRoot(),
+							new NullProgressMonitor());
+				}
+				catch (CoreException e)
+				{
+					return EMPTY;
+				}
+			}
+			else if (connectionPoint instanceof WorkspaceConnectionPoint)
+			{
+				try
+				{
+					return ((WorkspaceConnectionPoint) connectionPoint).getResource().members();
+				}
+				catch (CoreException e)
+				{
+					return EMPTY;
+				}
+			}
+		}
+		return super.getChildren(element);
     }
+
+	private static FileSystemObject[] fetchFileSystemChildren(IFileStore parent, IProgressMonitor monitor)
+			throws CoreException
+	{
+		IFileInfo[] fileInfos = parent.childInfos(EFS.NONE, monitor);
+		List<FileSystemObject> list = new ArrayList<FileSystemObject>();
+		for (IFileInfo fi : fileInfos)
+		{
+			list.add(new FileSystemObject(parent.getChild(fi.getName()), fi));
+		}
+		return list.toArray(new FileSystemObject[list.size()]);
+	}
 }
