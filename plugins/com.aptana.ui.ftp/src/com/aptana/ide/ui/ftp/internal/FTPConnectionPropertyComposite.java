@@ -456,6 +456,7 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 					}
 					finally
 					{
+						CoreIOPlugin.clearConnectionContext(connectionPoint);
 						monitor.done();
 					}
 				}

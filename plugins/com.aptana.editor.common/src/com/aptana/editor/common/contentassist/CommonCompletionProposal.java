@@ -315,6 +315,54 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	 */
 	public boolean validate(IDocument document, int offset, DocumentEvent event)
 	{
-		return true;
+		if (offset < this._replacementOffset)
+			return false;
+
+		boolean validated = isValidPrefix(getPrefix(document, offset), getDisplayString());
+
+		if (validated && event != null)
+		{
+			// make sure that we change the replacement length as the document content changes
+			int delta = (event.fText == null ? 0 : event.fText.length()) - event.fLength;
+			final int newLength = Math.max(_replacementLength + delta, 0);
+			_replacementLength = newLength;
+		}
+
+		return validated;
+	}
+
+	/**
+	 * Returns the prefix string from the replacement-offset to the given offset. In case the given offset appears
+	 * before the replacement offset, we return an empty string.
+	 * 
+	 * @param document
+	 * @param offset
+	 */
+	protected String getPrefix(IDocument document, int offset)
+	{
+		try
+		{
+			int length = offset - _replacementOffset;
+			if (length > 0)
+				return document.get(_replacementOffset, length);
+		}
+		catch (BadLocationException x)
+		{
+		}
+		return ""; //$NON-NLS-1$
+	}
+
+	/**
+	 * Returns true if the proposal is still valid as the user types while the content assist popup is visible.
+	 * 
+	 * @param prefix
+	 * @param displayString
+	 */
+	protected boolean isValidPrefix(String prefix, String displayString)
+	{
+		if (prefix == null || displayString == null || prefix.length() > displayString.length())
+			return false;
+		String start = displayString.substring(0, prefix.length());
+		return start.equalsIgnoreCase(prefix);
 	}
 }
