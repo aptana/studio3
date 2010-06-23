@@ -1,24 +1,16 @@
 package com.aptana.editor.css.contentassist.index;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.core.runtime.content.IContentTypeManager;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.css.Activator;
 import com.aptana.editor.css.CSSColors;
-import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.css.parsing.ast.CSSAttributeSelectorNode;
 import com.aptana.editor.css.parsing.ast.CSSRuleNode;
@@ -33,8 +25,6 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class CSSFileIndexingParticipant implements IFileStoreIndexingParticipant
 {
-	private static final String CSS_EXTENSION = "css"; //$NON-NLS-1$
-
 	@Override
 	public void index(Set<IFileStore> files, Index index, IProgressMonitor monitor)
 	{
@@ -45,7 +35,7 @@ public class CSSFileIndexingParticipant implements IFileStoreIndexingParticipant
 				return;
 			try
 			{
-				if (file == null || !isCSSFile(file))
+				if (file == null)
 				{
 					continue;
 				}
@@ -82,44 +72,6 @@ public class CSSFileIndexingParticipant implements IFileStoreIndexingParticipant
 			}
 		}
 		monitor.done();
-	}
-
-	private boolean isCSSFile(IFileStore file)
-	{
-		InputStream stream = null;
-		IContentTypeManager manager = Platform.getContentTypeManager();
-		try
-		{
-			stream = file.openInputStream(EFS.NONE, new NullProgressMonitor());
-			IContentType[] types = manager.findContentTypesFor(stream, file.getName());
-			for (IContentType type : types)
-			{
-				if (type.getId().equals(ICSSConstants.CONTENT_TYPE_CSS))
-					return true;
-			}
-		}
-		catch (CoreException e)
-		{
-			Activator.logError(e);
-		}
-		catch (Exception e)
-		{
-			Activator.logError(e.getMessage(), e);
-		}
-		finally
-		{
-			try
-			{
-				if (stream != null)
-					stream.close();
-			}
-			catch (IOException e)
-			{
-				// ignore
-			}
-		}
-
-		return CSS_EXTENSION.equalsIgnoreCase(new Path(file.getName()).getFileExtension());
 	}
 
 	public static void walkNode(Index index, IFileStore file, IParseNode parent)

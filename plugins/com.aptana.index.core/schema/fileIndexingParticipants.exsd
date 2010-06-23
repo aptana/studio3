@@ -52,6 +52,9 @@
 
    <element name="fileIndexingParticipant">
       <complexType>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <element ref="contentTypeBinding"/>
+         </sequence>
          <attribute name="id" type="string">
             <annotation>
                <documentation>
@@ -73,6 +76,21 @@
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":com.aptana.index.core.IFileStoreIndexingParticipant"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="contentTypeBinding">
+      <complexType>
+         <attribute name="contentTypeId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.core.contenttype.contentTypes/content-type/@id"/>
                </appinfo>
             </annotation>
          </attribute>
