@@ -277,6 +277,7 @@ public class CoreStubber extends Job
 	{
 
 		private final Set<IFileStore> files;
+		private ArrayList<String> fileURIs;
 		private Index index;
 
 		public IndexFileStoresJob(String message, Index index, Set<IFileStore> files)
@@ -360,8 +361,25 @@ public class CoreStubber extends Job
 
 		private void filterFiles()
 		{
-			// We store something in the prefs for the last timestamp, since we can't go off timestamp of disk index.
+			try
+			{
+				Set<String> documents = index.queryDocumentNames(null);
+				for (String docName : documents)
+				{
+					if (!fileExists(docName))
+					{
+						index.remove(docName);
+					}
+				}
+			}
+			catch (IOException e)
+			{
+				IndexActivator.logError("Error occurred while removing stale index entries", e);
+			}
+
 			IEclipsePreferences prefs = new InstanceScope().getNode(Activator.PLUGIN_ID);
+			// We store something in the prefs for the last timestamp, since we can't go off timestamp of disk index.
+			// Now we filter files to only those that have been added/changed since last index.
 			long indexLastModified = prefs.getLong(getIndexTimestampKey(), -1);
 			Iterator<IFileStore> iter = files.iterator();
 			while (iter.hasNext())
@@ -374,6 +392,24 @@ public class CoreStubber extends Job
 			}
 		}
 
+		private boolean fileExists(String lastString)
+		{
+			return Collections.binarySearch(getFileURIs(), lastString) >= 0;
+		}
+
+		protected List<? extends String> getFileURIs()
+		{
+			if (fileURIs == null)
+			{
+				fileURIs = new ArrayList<String>();
+				for (IFileStore store : files)
+				{
+					fileURIs.add(store.toURI().getPath());
+				}
+				Collections.sort(fileURIs);
+			}
+			return fileURIs;
+		}
 	}
 
 }

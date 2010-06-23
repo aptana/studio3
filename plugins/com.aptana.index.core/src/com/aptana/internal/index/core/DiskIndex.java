@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -621,8 +622,8 @@ public class DiskIndex
 				{
 					for (Map.Entry<String, Integer> entry : indexedDocuments.entrySet())
 						if (entry.getKey() != null)
-							newDiskIndex.copyQueryResults(memoryIndex.getCategoriesForDocument(entry.getKey()), entry
-									.getValue());
+							newDiskIndex.copyQueryResults(memoryIndex.getCategoriesForDocument(entry.getKey()),
+									entry.getValue());
 				}
 
 				indexedDocuments = null; // free up the space
@@ -1435,7 +1436,7 @@ public class DiskIndex
 		this.streamEnd += 4;
 		stream.flush();
 	}
-	
+
 	/**
 	 * writeString
 	 * 
@@ -1496,5 +1497,50 @@ public class DiskIndex
 			}
 		}
 		stream.flush();
+	}
+
+	public Set<String> addDocumentNames(String substring, MemoryIndex memoryIndex) throws IOException
+	{
+		// must skip over documents which have been added/changed/deleted in the memory index
+		List<String> docNames = readAllDocumentNames();
+		Set<String> results = new HashSet<String>(docNames.size());
+		if (substring == null)
+		{
+			if (memoryIndex == null)
+			{
+				return new HashSet<String>(docNames);
+			}
+			Map<String, Map<String, Set<String>>> docsToRefs = memoryIndex.getDocumentsToReferences();
+			for (String docName : docNames)
+			{
+				if (!docsToRefs.containsKey(docName))
+				{
+					results.add(docName);
+				}
+			}
+		}
+		else
+		{
+			if (memoryIndex == null)
+			{
+				for (String docName : docNames)
+				{
+					if (docName.startsWith(substring, 0))
+					{
+						results.add(docName);
+					}
+				}
+			}
+			else
+			{
+				Map<String, Map<String, Set<String>>> docsToRefs = memoryIndex.getDocumentsToReferences();
+				for (String docName : docNames)
+				{
+					if (docName.startsWith(substring, 0) && !docsToRefs.containsKey(docName))
+						results.add(docName);
+				}
+			}
+		}
+		return results;
 	}
 }
