@@ -494,7 +494,7 @@ public class ParserGenerator
 			return bytes_stream;
 		}
 
-		static private String encode(byte[] bytes) throws IOException
+		static private String encode(byte[] bytes)
 		{
 			final StringBuffer text = new StringBuffer((bytes.length * 4 + 2) / 3);
 			int i = 0, end = bytes.length - bytes.length % 3;
