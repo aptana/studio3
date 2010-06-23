@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,13 +18,13 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.swt.graphics.Image;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.js.Activator;
-import com.aptana.editor.js.contentassist.JSASTQueryHelper.Classification;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
@@ -229,52 +230,68 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected void addProperties(Set<ICompletionProposal> proposals, int offset)
 	{
-		if (this._targetNode != null)
+		if (this._targetNode != null && this._targetNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
 		{
-			if (this._targetNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
+			Scope<JSNode> global = this.getGlobalScope();
+			
+			if (global != null)
 			{
-				IParseNode ast = this.getAST();
+				Scope<JSNode> localScope = global.getScopeAtOffset(offset);
 				
-				if (ast instanceof JSParseRootNode)
+				if (localScope != null)
 				{
-					JSParseRootNode root = (JSParseRootNode) ast;
-					Scope<JSNode> global = root.getGlobalScope();
-					Scope<JSNode> localScope = global.getScopeAtOffset(offset);
+					// NOTE: we use a list here to preserve order. The additional
+					// overhead involved with checking for duplicates before adding
+					// to the list should be minimal since the type lists will always
+					// be small
+					List<String> typeList = new LinkedList<String>();
 					
-					if (localScope != null)
+					// TEMP: for debugging
+					String name = this._targetNode.getFirstChild().getText();
+					
+					List<JSNode> nodes = localScope.getSymbol(name);
+					
+					if (nodes.isEmpty() == false)
 					{
-						// TEMP: for debugging
-						String name = this._targetNode.getFirstChild().getText();
-						
-						List<JSNode> nodes = localScope.getSymbol(name);
-						
-						if (nodes.isEmpty() == false)
+						for (JSNode node : nodes)
 						{
-							for (JSNode node : nodes)
-							{
-								// look up type
-								List<String> types = node.getTypes();
-								
-								// add type properties to proposals
-								for (String type : types)
-								{
-									System.out.println(type);
-								}
-							}
-						}
-						else
-						{
-							Index index = this.getIndex();
-							PropertyElement property = this._indexHelper.getProjectGlobal(index, name);
+							// look up type
+							List<String> types = node.getTypes();
 							
-							if (property != null)
+							// add type properties to proposals
+							for (String type : types)
 							{
-								for (ReturnTypeElement type : property.getTypes())
+								if (typeList.contains(type) == false)
 								{
-									System.out.println(type.getType());
+									typeList.add(type);
 								}
 							}
 						}
+					}
+					else
+					{
+						Index index = this.getIndex();
+						PropertyElement property = this._indexHelper.getProjectGlobal(index, name);
+						
+						if (property != null)
+						{
+							for (ReturnTypeElement typeElement : property.getTypes())
+							{
+								String type = typeElement.getType();
+								
+								if (typeList.contains(type) == false)
+								{
+									typeList.add(type);
+								}
+							}
+						}
+					}
+					
+					System.out.println("types: " + StringUtil.join(", ", typeList));
+					
+					for (String type : typeList)
+					{
+						this.addTypeProperties(proposals, type, offset);
 					}
 				}
 			}
@@ -347,68 +364,78 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		if (this._targetNode != null)
 		{
 			String fileLocation = this.getFilename();
+			Scope<JSNode> globalScope = this.getGlobalScope();
 			
-			if (Platform.inDevelopmentMode())
+			if (globalScope != null)
 			{
-				IParseNode ast = this.getAST();
+				Scope<JSNode> localScope = globalScope.getScopeAtOffset(offset);
 				
-				if (ast instanceof JSParseRootNode)
+				if (localScope != null)
 				{
-					JSParseRootNode root = (JSParseRootNode) ast;
-					Scope<JSNode> globalScope = root.getGlobalScope();
+					List<String> symbols = localScope.getSymbolNames();
 					
-					if (globalScope != null)
+					for (String symbol : symbols)
 					{
-						Scope<JSNode> currentScope = globalScope.getScopeAtOffset(offset);
+						boolean isFunction = false;
+						List<JSNode> nodes = localScope.getSymbol(symbol);
 						
-						if (currentScope != null)
+						if (nodes != null)
 						{
-							List<String> symbols = currentScope.getSymbolNames();
-							
-							for (String symbol : symbols)
+							for (JSNode node : nodes)
 							{
-								boolean isFunction = false;
-								List<JSNode> nodes = currentScope.getSymbol(symbol);
-								
-								if (nodes != null)
+								if (node instanceof JSFunctionNode)
 								{
-									for (JSNode node : nodes)
-									{
-										if (node instanceof JSFunctionNode)
-										{
-											isFunction = true;
-											break;
-										}
-									}
+									isFunction = true;
+									break;
 								}
-								
-								String name = (isFunction) ? symbol + PARENS : symbol;
-								String description = null;
-								Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
-								Image[] userAgents = this.getAllUserAgentIcons();
-								
-								this.addProposal(proposals, name, image, description, userAgents, fileLocation, offset);
 							}
 						}
+						
+						String name = (isFunction) ? symbol + PARENS : symbol;
+						String description = null;
+						Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
+						Image[] userAgents = this.getAllUserAgentIcons();
+						
+						this.addProposal(proposals, name, image, description, userAgents, fileLocation, offset);
 					}
 				}
 			}
-			else
-			{
-				IParseNode node = (this._targetNode.contains(offset)) ? this._targetNode : this.getAST();
-				Map<String,Classification> args = this._astHelper.getSymbolsInScope(node);
-				
-				for (Entry<String,Classification> entry : args.entrySet())
-				{
-					boolean isFunction = (entry.getValue() == Classification.FUNCTION);
-					String name = (isFunction) ? entry.getKey() + PARENS : entry.getKey();
-					String description = null;
-					Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
-					Image[] userAgents = this.getAllUserAgentIcons();
-					
-					this.addProposal(proposals, name, image, description, userAgents, fileLocation, offset);
-				}
-			}
+		}
+	}
+	
+	/**
+	 * addTypeProperties
+	 * 
+	 * @param proposals
+	 * @param typeName
+	 * @param offset
+	 */
+	protected void addTypeProperties(Set<ICompletionProposal> proposals, String typeName, int offset)
+	{
+		// add properties
+		List<PropertyElement> properties = this._indexHelper.getTypeProperties(this.getIndex(), typeName);
+		
+		for (PropertyElement property : properties)
+		{
+			String name = property.getName();
+			String description = property.getDescription();
+			Image image = JS_PROPERTY;
+			Image[] userAgents = this.getAllUserAgentIcons();
+			
+			this.addProposal(proposals, name, image, description, userAgents, typeName, offset);
+		}
+		
+		// add methods
+		List<FunctionElement> methods = this._indexHelper.getTypeMethods(this.getIndex(), typeName);
+		
+		for (FunctionElement method : methods)
+		{
+			String name = method.getName() + PARENS;
+			String description = method.getDescription();
+			Image image = JS_FUNCTION;
+			Image[] userAgents = this.getAllUserAgentIcons();
+			
+			this.addProposal(proposals, name, image, description, userAgents, typeName, offset);
 		}
 	}
 	
@@ -994,6 +1021,26 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		else if (lexemeProvider.size() == 0)
 		{
 			result = LocationType.IN_GLOBAL;
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * getGlobalScope
+	 * 
+	 * @return
+	 */
+	protected Scope<JSNode> getGlobalScope()
+	{
+		IParseNode ast = this.getAST();
+		Scope<JSNode> result = null;
+		
+		if (ast instanceof JSParseRootNode)
+		{
+			JSParseRootNode root = (JSParseRootNode) ast;
+			
+			result = root.getGlobalScope();
 		}
 		
 		return result;

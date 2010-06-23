@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
+import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
@@ -85,6 +86,50 @@ public class JSIndexQueryHelper
 	public Map<String,List<String>> getProjectVariables(Index index)
 	{
 		return this._reader.getValues(index, JSIndexConstants.VARIABLE);
+	}
+	
+	/**
+	 * getTypeMethods
+	 * 
+	 * @param index
+	 * @param typeName
+	 */
+	public List<FunctionElement> getTypeMethods(Index index, String typeName)
+	{
+		List<FunctionElement> result = null;
+		
+		try
+		{
+			result = this._reader.getFunctions(this.getIndex(), typeName);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * getTypeProperties
+	 * 
+	 * @param index
+	 * @param typeName
+	 */
+	public List<PropertyElement> getTypeProperties(Index index, String typeName)
+	{
+		List<PropertyElement> result = null;
+		
+		try
+		{
+			result = this._reader.getProperties(this.getIndex(), typeName);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return result;
 	}
 	
 	/**
