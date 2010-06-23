@@ -163,18 +163,23 @@ public class ResourceIndexer implements IResourceChangeListener
 				Map<IFileStoreIndexingParticipant, Set<IFileStore>> toDo = mapParticipantsToFiles(fileStores);
 				sub.worked(files.size());
 
-				int increment = (files.size() * 8) / toDo.size();
-				for (Map.Entry<IFileStoreIndexingParticipant, Set<IFileStore>> entry : toDo.entrySet())
+				if (!toDo.isEmpty())
 				{
-					if (sub.isCanceled())
+					int increment = (files.size() * 8) / toDo.size();
+					for (Map.Entry<IFileStoreIndexingParticipant, Set<IFileStore>> entry : toDo.entrySet())
 					{
-						return Status.CANCEL_STATUS;
+						if (sub.isCanceled())
+						{
+							return Status.CANCEL_STATUS;
+						}
+						entry.getKey().index(entry.getValue(), index, sub.newChild(increment));
 					}
-					entry.getKey().index(entry.getValue(), index, sub.newChild(increment));
 				}
 			}
 			finally
 			{
+				sub.done();
+				
 				try
 				{
 					index.save();
