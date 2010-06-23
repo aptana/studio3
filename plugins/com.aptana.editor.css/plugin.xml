@@ -36,6 +36,9 @@
          point="com.aptana.index.core.fileIndexingParticipants">
       <fileIndexingParticipant
             class="com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.css">
+         </contentTypeBinding>
       </fileIndexingParticipant>
    </extension>
    <extension

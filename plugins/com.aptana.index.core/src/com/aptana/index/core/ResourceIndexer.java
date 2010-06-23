@@ -2,7 +2,7 @@ package com.aptana.index.core;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -32,6 +32,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.core.runtime.content.IContentTypeManager;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 
@@ -124,8 +126,7 @@ public class ResourceIndexer implements IResourceChangeListener
 		@Override
 		public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException
 		{
-			IFileStoreIndexingParticipant[] participants = getFileIndexingParticipants();
-			SubMonitor sub = SubMonitor.convert(monitor, (participants.length + 1) * files.size());
+			SubMonitor sub = SubMonitor.convert(monitor, 10 * files.size());
 			if (sub.isCanceled())
 			{
 				return Status.CANCEL_STATUS;
@@ -145,9 +146,9 @@ public class ResourceIndexer implements IResourceChangeListener
 					IFileStore store = EFS.getStore(file.getLocationURI());
 					if (store == null)
 						continue;
-					fileStores.add(store);					
+					fileStores.add(store);
 				}
-				
+
 				// First cleanup indices for files
 				for (IFileStore file : fileStores)
 				{
@@ -158,16 +159,18 @@ public class ResourceIndexer implements IResourceChangeListener
 					index.remove(file.toURI().getPath());
 					sub.worked(1);
 				}
-				
-				// TODO Limit file indexers by content type here so we don't have to check content type for each file in every indexer! indexers should/could register what content types they handle and then we can pre-filter here!
-				// To do so, we'd need to keep a mapping from the store to the content types it matches
-				for (IFileStoreIndexingParticipant fileIndexingParticipant : participants)
+
+				Map<IFileStoreIndexingParticipant, Set<IFileStore>> toDo = mapParticipantsToFiles(fileStores);
+				sub.worked(files.size());
+
+				int increment = (files.size() * 8) / toDo.size();
+				for (Map.Entry<IFileStoreIndexingParticipant, Set<IFileStore>> entry : toDo.entrySet())
 				{
 					if (sub.isCanceled())
 					{
 						return Status.CANCEL_STATUS;
 					}
-					fileIndexingParticipant.index(fileStores, index, sub.newChild(fileStores.size()));
+					entry.getKey().index(entry.getValue(), index, sub.newChild(increment));
 				}
 			}
 			finally
@@ -184,6 +187,59 @@ public class ResourceIndexer implements IResourceChangeListener
 			return Status.OK_STATUS;
 		}
 
+	}
+
+	private static Map<IFileStoreIndexingParticipant, Set<IFileStore>> mapParticipantsToFiles(Set<IFileStore> fileStores)
+	{
+		Map<IFileStoreIndexingParticipant, Set<IFileStore>> result = new HashMap<IFileStoreIndexingParticipant, Set<IFileStore>>();
+
+		Map<IConfigurationElement, Set<IContentType>> participants = getFileIndexingParticipants();
+		for (Map.Entry<IConfigurationElement, Set<IContentType>> entry : participants.entrySet())
+		{
+			Set<IFileStore> filesForParticipant = new HashSet<IFileStore>();
+			for (IFileStore store : fileStores)
+			{
+				if (hasType(store, entry.getValue()))
+				{
+					filesForParticipant.add(store);
+				}
+			}
+			if (filesForParticipant.isEmpty())
+			{
+				continue;
+			}
+			IFileStoreIndexingParticipant participant = createParticipant(entry.getKey());
+			if (participant != null)
+			{
+				result.put(participant, filesForParticipant);
+			}
+		}
+		return result;
+	}
+
+	private static boolean hasType(IFileStore store, Set<IContentType> types)
+	{
+		for (IContentType type : types)
+		{
+			if (type.isAssociatedWith(store.getName()))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static IFileStoreIndexingParticipant createParticipant(IConfigurationElement key)
+	{
+		try
+		{
+			return (IFileStoreIndexingParticipant) key.createExecutableExtension(ATTR_CLASS);
+		}
+		catch (CoreException e)
+		{
+			IndexActivator.logError(e);
+		}
+		return null;
 	}
 
 	private static class RemoveIndexOfFilesOfProjectJob extends WorkspaceJob
@@ -263,8 +319,8 @@ public class ResourceIndexer implements IResourceChangeListener
 					// No need to traverse the delta
 					return false;
 				}
-				if (delta.getKind() == IResourceDelta.ADDED ||
-						(delta.getKind() == IResourceDelta.CHANGED && ((delta.getFlags() & IResourceDelta.OPEN) != 0)))
+				if (delta.getKind() == IResourceDelta.ADDED
+						|| (delta.getKind() == IResourceDelta.CHANGED && ((delta.getFlags() & IResourceDelta.OPEN) != 0)))
 				{
 					resourceDeltas.add(delta);
 					// If the project is now closed we
@@ -287,7 +343,7 @@ public class ResourceIndexer implements IResourceChangeListener
 			{
 				return;
 			}
-			
+
 			Set<IFile> filesToIndex = new LinkedHashSet<IFile>();
 			Set<IFile> filesToRemoveFromIndex = new LinkedHashSet<IFile>();
 
@@ -441,49 +497,50 @@ public class ResourceIndexer implements IResourceChangeListener
 	}
 
 	/**
-	 * getContextContributors
-	 *
+	 * Return a map from classname of the participant to a set of strings for the content type ids it applies to.
+	 * 
 	 * @return
 	 */
-	public static IFileStoreIndexingParticipant[] getFileIndexingParticipants()
+	public static Map<IConfigurationElement, Set<IContentType>> getFileIndexingParticipants()
 	{
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		List<IFileStoreIndexingParticipant> fileIndexingParticipants = new ArrayList<IFileStoreIndexingParticipant>();
-
-		if (registry != null)
+		Map<IConfigurationElement, Set<IContentType>> map = new HashMap<IConfigurationElement, Set<IContentType>>();
+		if (registry == null)
 		{
-			IExtensionPoint extensionPoint = registry.getExtensionPoint(IndexActivator.PLUGIN_ID,
-					FILE_INDEXING_PARTICIPANTS_ID);
+			return map;
+		}
 
-			if (extensionPoint != null)
+		IExtensionPoint extensionPoint = registry.getExtensionPoint(IndexActivator.PLUGIN_ID,
+				FILE_INDEXING_PARTICIPANTS_ID);
+		if (extensionPoint == null)
+		{
+			return map;
+		}
+
+		IContentTypeManager manager = Platform.getContentTypeManager();
+
+		IExtension[] extensions = extensionPoint.getExtensions();
+		for (IExtension extension : extensions)
+		{
+			IConfigurationElement[] elements = extension.getConfigurationElements();
+
+			for (IConfigurationElement element : elements)
 			{
-				IExtension[] extensions = extensionPoint.getExtensions();
-
-				for (IExtension extension : extensions)
+				if (element.getName().equals(TAG_FILE_INDEXING_PARTICIPANT))
 				{
-					IConfigurationElement[] elements = extension.getConfigurationElements();
+					Set<IContentType> types = new HashSet<IContentType>();
 
-					for (IConfigurationElement element : elements)
+					IConfigurationElement[] contentTypes = element.getChildren("contentTypeBinding"); //$NON-NLS-1$
+					for (IConfigurationElement contentTypeBinding : contentTypes)
 					{
-						if (element.getName().equals(TAG_FILE_INDEXING_PARTICIPANT))
-						{
-							try
-							{
-								IFileStoreIndexingParticipant fileIndexingParticipant = (IFileStoreIndexingParticipant) element
-										.createExecutableExtension(ATTR_CLASS);
-
-								fileIndexingParticipants.add(fileIndexingParticipant);
-							}
-							catch (CoreException e)
-							{
-								IndexActivator.logError(e);
-							}
-						}
+						String contentTypeId = contentTypeBinding.getAttribute("contentTypeId"); //$NON-NLS-1$
+						IContentType type = manager.getContentType(contentTypeId);
+						types.add(type);
 					}
+					map.put(element, types);
 				}
 			}
 		}
-
-		return fileIndexingParticipants.toArray(new IFileStoreIndexingParticipant[fileIndexingParticipants.size()]);
+		return map;
 	}
 }
