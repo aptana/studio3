@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -17,8 +18,8 @@ import com.aptana.internal.index.core.ReadWriteMonitor;
 
 public class Index
 {
-	private static final int MATCH_RULE_INDEX_MASK = SearchPattern.EXACT_MATCH | SearchPattern.PREFIX_MATCH | SearchPattern.PATTERN_MATCH
-		| SearchPattern.CASE_SENSITIVE | SearchPattern.REGEX_MATCH;
+	private static final int MATCH_RULE_INDEX_MASK = SearchPattern.EXACT_MATCH | SearchPattern.PREFIX_MATCH
+			| SearchPattern.PATTERN_MATCH | SearchPattern.CASE_SENSITIVE | SearchPattern.REGEX_MATCH;
 
 	private static final Map<String, Pattern> PATTERNS = new HashMap<String, Pattern>();
 
@@ -260,17 +261,18 @@ public class Index
 	{
 		// Raw path of root we're indexing
 		this.path = path;
-		
+
 		this.memoryIndex = new MemoryIndex();
 		this.monitor = new ReadWriteMonitor();
 
 		// Convert to a filename we can use for the actual index on disk
 		IPath containerPath = IndexManager.getInstance().computeIndexLocation(path);
-		String containerPathString = containerPath.getDevice() == null ? containerPath.toString() : containerPath.toOSString();
+		String containerPathString = containerPath.getDevice() == null ? containerPath.toString() : containerPath
+				.toOSString();
 		this.diskIndex = new DiskIndex(containerPathString);
 		this.diskIndex.initialize();
 	}
-	
+
 	public String getRoot()
 	{
 		return path;
@@ -285,7 +287,8 @@ public class Index
 	 */
 	public void addEntry(String category, String key, String documentPath)
 	{
-		// TODO Convert documentPath arg to URI, resolve it's relative path to base path of container passed into index constructor!
+		// TODO Convert documentPath arg to URI, resolve it's relative path to base path of container passed into index
+		// constructor!
 		this.memoryIndex.addEntry(category, key, documentPath);
 	}
 
@@ -358,7 +361,8 @@ public class Index
 	 */
 	public void remove(String containerRelativePath)
 	{
-		// TODO Convert containerRelativePath arg to URI, resolve it's relative path to base path of container passed into index constructor!
+		// TODO Convert containerRelativePath arg to URI, resolve it's relative path to base path of container passed
+		// into index constructor!
 		this.memoryIndex.remove(containerRelativePath);
 	}
 
@@ -396,5 +400,23 @@ public class Index
 		this.memoryIndex = new MemoryIndex();
 		if (numberOfChanges > 1000)
 			System.gc(); // reclaim space if the MemoryIndex was very BIG
+	}
+
+	/**
+	 * Returns the document names that contain the given substring, if null then returns all of them.
+	 */
+	public Set<String> queryDocumentNames(String substring) throws IOException
+	{
+		Set<String> results;
+		if (this.memoryIndex.hasChanged())
+		{
+			results = this.diskIndex.addDocumentNames(substring, this.memoryIndex);
+			results.addAll(this.memoryIndex.addDocumentNames(substring));
+		}
+		else
+		{
+			results = this.diskIndex.addDocumentNames(substring, null);
+		}
+		return results;
 	}
 }
