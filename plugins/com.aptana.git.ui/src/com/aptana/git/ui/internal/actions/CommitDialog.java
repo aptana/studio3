@@ -743,7 +743,7 @@ public class CommitDialog extends StatusDialog
 
 	protected void validate()
 	{
-		if (commitMessage.getText().length() < 3)
+		if (commitMessage.getText().length() < 1)
 		{
 			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), Messages.CommitDialog_EnterMessage_Error));
 			return;

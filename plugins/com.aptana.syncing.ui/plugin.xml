@@ -257,6 +257,7 @@
          </action>
          <action
                class="com.aptana.ide.ui.io.actions.DeleteConnectionAction"
+               definitionId="org.eclipse.ui.edit.delete"
                enablesFor="+"
                icon="icons/full/etool16/delete.png"
                id="com.aptana.ide.ui.io.actions.DeleteConnectionAction"

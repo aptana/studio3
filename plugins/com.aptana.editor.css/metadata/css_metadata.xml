@@ -23376,7 +23376,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
-        <browser platform="Chrome" version="5.0.2+">
+        <browser platform="Chrome" version="5.0.2+"/>
         <browser platform="Safari" version="1.3.2+">
           <description>Supports all W3C cursor values except for progress.</description>
         </browser>
@@ -26185,7 +26185,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
-        <browser platform="Chrome" version="5.0.2+">
+        <browser platform="Chrome" version="5.0.2+"/>
         <browser platform="Safari" version="1.3.2+">
           <description>Safari does not support the "box" style.</description>
         </browser>
@@ -26272,7 +26272,7 @@ li {
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
-        <browser platform="Chrome" version="5.0.2+">
+        <browser platform="Chrome" version="5.0.2+"/>
         <browser platform="Safari" version="1.3.2+">
           <description>Safari does not support the "box" style.</description>
         </browser>
@@ -26755,7 +26755,7 @@ li {
       <browsers>
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Opera" version="7.0+"/>
-        <browser platform="Chrome" version="5.0+">
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.2+">
           <description>Support for "outline" in Safari is "buggy".</description>
         </browser>
@@ -26792,7 +26792,7 @@ li {
       <browsers>
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Opera" version="7.0+"/>
-        <browser platform="Chrome" version="5.0+">
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.2+">
           <description>Support for "outline" in Safari is "buggy".</description>
         </browser>
@@ -26826,7 +26826,7 @@ li {
       <browsers>
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Opera" version="7.0+"/>
-        <browser platform="Chrome" version="5.0+">
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.2+">
           <description>Support for "outline" in Safari is "buggy".</description>
         </browser>
@@ -26857,7 +26857,7 @@ li {
       <browsers>
         <browser platform="Netscape" version="6.0+"/>
         <browser platform="Opera" version="7.0+"/>
-        <browser platform="Chrome" version="5.0+">
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.2+">
           <description>Support for "outline" in Safari is "buggy".</description>
         </browser>
@@ -26889,7 +26889,7 @@ li {
         <browser platform="Netscape" version="4.0+"/>
         <browser platform="Mozilla" version="1.0+"/>
         <browser platform="Opera" version="4.0+"/>
-        <browser platform="Chrome" version="5.0.2+">
+        <browser platform="Chrome" version="5.0.2+"/>
         <browser platform="Safari" version="1.3.2+">
           <description>Support for overflow is not dynamic.</description>
         </browser>
@@ -28426,7 +28426,7 @@ li {
         <browser platform="Opera" version="9.0+">
           <description>Opera almost has full support for the white-space attribute.</description>
         </browser>
-        <browser platform="Chrome" version="5.0+">
+        <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+">
           <description>Support for white-space is incomplete.</description>
         </browser>
