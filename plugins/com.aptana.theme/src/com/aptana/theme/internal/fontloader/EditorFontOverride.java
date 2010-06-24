@@ -1,4 +1,4 @@
-package com.aptana.editor.common.internal.theme.fontloader;
+package com.aptana.theme.internal.fontloader;
 
 import java.text.MessageFormat;
 
@@ -18,7 +18,7 @@ import org.eclipse.ui.themes.IThemeManager;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.util.EclipseUtil;
-import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.theme.ThemePlugin;
 
 /**
  * Copies the included font to the plugin state location. Then sets the theme to a custom one we've added which sets the
@@ -75,8 +75,8 @@ public class EditorFontOverride extends UIJob
 						if (blockSelectionModeFontData.length > 0 && newTextFontData.length > 0
 								&& !blockSelectionModeFontData[0].equals(newTextFontData[0]))
 						{
-							themeManager.getCurrentTheme().getFontRegistry().put(BLOCK_SELECTION_FONT_ID,
-									newTextFontData);
+							themeManager.getCurrentTheme().getFontRegistry()
+									.put(BLOCK_SELECTION_FONT_ID, newTextFontData);
 							// Set the font data and save it to the workbench preferences.
 							// We have to save it directly on 'org.eclipse.ui.workbench', otherwise, it does not
 							// preserve the state on the next Studio run.
@@ -96,7 +96,7 @@ public class EditorFontOverride extends UIJob
 				}
 			}
 		});
-		IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = new InstanceScope().getNode(ThemePlugin.PLUGIN_ID);
 		boolean alreadyForcedFont = prefs.getBoolean(FORCED_EDITOR_FONT, false);
 
 		if (alreadyForcedFont)
@@ -114,18 +114,18 @@ public class EditorFontOverride extends UIJob
 			}
 			catch (BackingStoreException e)
 			{
-				CommonEditorPlugin.logError(e);
+				ThemePlugin.logError(e);
 			}
 		}
 		return Status.OK_STATUS;
 	}
-	
+
 	@Override
 	public boolean shouldRun()
 	{
 		return isStandalone();
 	}
-	
+
 	@Override
 	public boolean shouldSchedule()
 	{

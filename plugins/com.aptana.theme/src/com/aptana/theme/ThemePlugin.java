@@ -9,6 +9,7 @@ import org.osgi.framework.BundleContext;
 
 import com.aptana.theme.internal.InvasiveThemeHijacker;
 import com.aptana.theme.internal.ThemeManager;
+import com.aptana.theme.internal.fontloader.EditorFontOverride;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -40,9 +41,11 @@ public class ThemePlugin extends AbstractUIPlugin
 	{
 		super.start(context);
 		plugin = this;
-		
+
 		themeHijacker = new InvasiveThemeHijacker();
 		themeHijacker.schedule();
+
+		new EditorFontOverride().schedule();
 	}
 
 	/*
@@ -50,7 +53,7 @@ public class ThemePlugin extends AbstractUIPlugin
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception
-	{		
+	{
 		try
 		{
 			IEclipsePreferences prefs = new InstanceScope().getNode(PLUGIN_ID);
