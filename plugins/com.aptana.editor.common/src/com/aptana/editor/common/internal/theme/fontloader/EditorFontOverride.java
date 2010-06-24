@@ -1,5 +1,7 @@
 package com.aptana.editor.common.internal.theme.fontloader;
 
+import java.text.MessageFormat;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -15,6 +17,7 @@ import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.themes.IThemeManager;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 
 /**
@@ -37,7 +40,7 @@ public class EditorFontOverride extends UIJob
 	/**
 	 * ID of the custom Eclipse theme we use to override the fonts.
 	 */
-	private static final String CUSTOM_THEME_ID = "com.aptana.editor.common.theme"; //$NON-NLS-1$
+	private static final String CUSTOM_THEME_ID = "com.aptana.theme"; //$NON-NLS-1$
 
 	/**
 	 * Face name of custom font we use.
@@ -46,7 +49,7 @@ public class EditorFontOverride extends UIJob
 
 	public EditorFontOverride()
 	{
-		super("Default editor font to Inconsolata"); //$NON-NLS-1$
+		super(MessageFormat.format("Default editor font to {0}", CUSTOM_FONT_FACE_NAME)); //$NON-NLS-1$
 		setSystem(true);
 		setPriority(Job.SHORT);
 	}
@@ -115,5 +118,22 @@ public class EditorFontOverride extends UIJob
 			}
 		}
 		return Status.OK_STATUS;
+	}
+	
+	@Override
+	public boolean shouldRun()
+	{
+		return isStandalone();
+	}
+	
+	@Override
+	public boolean shouldSchedule()
+	{
+		return EclipseUtil.isStandalone();
+	}
+
+	private boolean isStandalone()
+	{
+		return EclipseUtil.isStandalone();
 	}
 }
