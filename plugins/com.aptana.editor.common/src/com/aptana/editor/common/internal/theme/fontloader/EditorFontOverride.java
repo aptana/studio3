@@ -68,12 +68,12 @@ public class EditorFontOverride extends UIJob
 					{
 						FontData[] newTextFontData = (FontData[]) event.getNewValue();
 						FontData[] blockSelectionModeFontData = themeManager.getCurrentTheme().getFontRegistry()
-								.getFontData(BLOCK_SELECTION_FONT_ID); //$NON-NLS-1$
+								.getFontData(BLOCK_SELECTION_FONT_ID);
 						if (blockSelectionModeFontData.length > 0 && newTextFontData.length > 0
 								&& !blockSelectionModeFontData[0].equals(newTextFontData[0]))
 						{
 							themeManager.getCurrentTheme().getFontRegistry().put(BLOCK_SELECTION_FONT_ID,
-									newTextFontData); //$NON-NLS-1$
+									newTextFontData);
 							// Set the font data and save it to the workbench preferences.
 							// We have to save it directly on 'org.eclipse.ui.workbench', otherwise, it does not
 							// preserve the state on the next Studio run.
