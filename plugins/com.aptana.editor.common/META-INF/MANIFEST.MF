@@ -5,8 +5,9 @@ Bundle-SymbolicName: com.aptana.editor.common;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.aptana.editor.common.CommonEditorPlugin
 Bundle-Vendor: %providerName
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources;bundle-version="3.4.0",
+ org.eclipse.ui,
  org.eclipse.jface.text,
  org.eclipse.core.expressions,
  org.eclipse.ui.editors,
@@ -26,8 +27,6 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.index.core;bundle-version="2.0.0",
  com.aptana.ui;bundle-version="3.0.0",
  beaver;bundle-version="1.0.0",
- org.eclipse.team.ui;bundle-version="3.5.0",
- org.eclipse.debug.ui,
  com.aptana.theme
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy

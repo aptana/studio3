@@ -12,6 +12,7 @@ public class AllTests
 		//$JUnit-BEGIN$
 		suite.addTestSuite(ContentAssistFineLocationTests.class);
 		suite.addTestSuite(ContentAssistCoarseLocationTests.class);
+		suite.addTestSuite(MetadataTests.class);
 		//$JUnit-END$
 		return suite;
 	}

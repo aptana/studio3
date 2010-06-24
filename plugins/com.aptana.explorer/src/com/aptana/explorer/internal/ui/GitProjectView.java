@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -96,6 +97,7 @@ import com.aptana.git.ui.dialogs.CreateBranchDialog;
  */
 class GitProjectView extends SingleProjectView implements IGitRepositoryListener, IGitRepositoriesListener
 {
+	private static final String DIRTY_SUFFIX = "*";
 	private static final String GIT_CHANGED_FILES_FILTER = "GitChangedFilesFilterEnabled"; //$NON-NLS-1$
 	private static final String PROJECT_DELIMITER = "######"; //$NON-NLS-1$
 	private static final String COMMIT_ICON_PATH = "icons/full/elcl16/disk.png"; //$NON-NLS-1$
@@ -953,11 +955,11 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 
 	protected String stripIndicators(String branchName)
 	{
-		if (branchName.endsWith(" \u2192")) //$NON-NLS-1$
+		if (branchName.endsWith(" " + getRightArrowChar())) //$NON-NLS-1$
 			branchName = branchName.substring(0, branchName.length() - 2);
-		if (branchName.endsWith(" \u2190")) //$NON-NLS-1$
+		if (branchName.endsWith(" " + getLeftArrowChar())) //$NON-NLS-1$
 			branchName = branchName.substring(0, branchName.length() - 2);
-		if (branchName.endsWith("*")) //$NON-NLS-1$
+		if (branchName.endsWith(DIRTY_SUFFIX))
 			branchName = branchName.substring(0, branchName.length() - 1);
 		return branchName;
 	}
@@ -972,7 +974,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			{
 				String currentBranchName = repo.currentBranch();
 				if (repo.isDirty())
-					currentBranchName += "*"; //$NON-NLS-1$
+					currentBranchName += DIRTY_SUFFIX;
 				branchesToolItem.setText(currentBranchName);
 				MenuItem[] menuItems = branchesMenu.getItems();
 				for (MenuItem menuItem : menuItems)
@@ -1042,7 +1044,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			String modifiedBranchName = branchName;
 			if (branchName.equals(currentBranchName) && repo.isDirty())
 			{
-				modifiedBranchName += "*"; //$NON-NLS-1$
+				modifiedBranchName += DIRTY_SUFFIX;
 				tooltip += Messages.GitProjectView_BranchDirtyTooltipMessage;
 			}
 
@@ -1050,7 +1052,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			{
 				if (branchToPullIndicator.containsKey(branchName) && branchToPullIndicator.get(branchName))
 				{
-					modifiedBranchName += " \u2190"; // left arrow //$NON-NLS-1$
+					modifiedBranchName += " " + getLeftArrowChar(); //$NON-NLS-1$
 					if (branchName.equals(currentBranchName))
 						tooltip += Messages.GitProjectView_PullChangesTooltipMessage;
 				}
@@ -1058,7 +1060,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			String[] ahead = repo.commitsAhead(branchName);
 			if (ahead != null && ahead.length > 0)
 			{
-				modifiedBranchName += " \u2192"; // right arrow //$NON-NLS-1$
+				modifiedBranchName += " " + getRightArrowChar(); //$NON-NLS-1$
 				if (branchName.equals(currentBranchName))
 					tooltip += Messages.GitProjectView_PushChangesTooltipMessage;
 			}
@@ -1114,6 +1116,24 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			branchesToolItem.setToolTipText(tooltip);
 		}
 		branchesToolbar.pack();
+	}
+
+	protected String getRightArrowChar()
+	{
+		if (Platform.getOS().equals(Platform.OS_MACOSX))
+		{
+			return "\u2192"; //$NON-NLS-1$
+		}
+		return "->"; //$NON-NLS-1$
+	}
+
+	protected String getLeftArrowChar()
+	{
+		if (Platform.getOS().equals(Platform.OS_MACOSX))
+		{
+			return "\u2190"; //$NON-NLS-1$
+		}
+		return "<-"; //$NON-NLS-1$
 	}
 
 	public void indexChanged(final IndexChangedEvent e)
@@ -1340,7 +1360,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			final MenuItem branchNameMenuItem = new MenuItem(switchBranchesSubMenu, SWT.RADIO);
 			if (branchName.equals(currentBranchName) && repository.isDirty())
 			{
-				branchNameMenuItem.setText(branchName + "*"); //$NON-NLS-1$
+				branchNameMenuItem.setText(branchName + DIRTY_SUFFIX); //$NON-NLS-1$
 			}
 			else
 			{
@@ -1474,7 +1494,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		}
 		return null;
 	}
-	
+
 	protected IGitRepositoryManager getGitRepositoryManager()
 	{
 		return GitPlugin.getDefault().getGitRepositoryManager();

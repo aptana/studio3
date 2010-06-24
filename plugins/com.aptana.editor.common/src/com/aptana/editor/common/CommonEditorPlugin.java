@@ -9,8 +9,6 @@ import org.eclipse.core.commands.State;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
@@ -33,7 +31,6 @@ import org.osgi.framework.BundleContext;
 
 import com.aptana.editor.common.internal.scripting.ContentTypeTranslation;
 import com.aptana.editor.common.internal.scripting.DocumentScopeManager;
-import com.aptana.editor.common.internal.theme.fontloader.EditorFontOverride;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.index.core.IndexActivator;
@@ -64,7 +61,6 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	private static CommonEditorPlugin plugin;
 
 	private Map<ContextTypeRegistry, ContributionTemplateStore> fTemplateStoreMap;
-	private InvasiveThemeHijacker themeHijacker;
 	private FilenameDifferentiator differentiator;
 
 	private final IPartListener fPartListener = new IPartListener()
@@ -197,10 +193,6 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 
 		// Activate indexing
 		IndexActivator.getDefault();
-
-		new EditorFontOverride().schedule();
-		themeHijacker = new InvasiveThemeHijacker();
-		themeHijacker.schedule();
 		
 		differentiator = new FilenameDifferentiator();
 		differentiator.schedule();
@@ -216,15 +208,12 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	{
 		try
 		{
-			IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-			prefs.removePreferenceChangeListener(themeHijacker);
 			differentiator.dispose();
 
 			removePartListener();
 		}
 		finally
 		{
-			themeHijacker = null;
 			differentiator = null;
 			plugin = null;
 			super.stop(context);

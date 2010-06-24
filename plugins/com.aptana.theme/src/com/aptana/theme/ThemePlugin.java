@@ -2,10 +2,14 @@ package com.aptana.theme;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.theme.internal.InvasiveThemeHijacker;
 import com.aptana.theme.internal.ThemeManager;
+import com.aptana.theme.internal.fontloader.EditorFontOverride;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -19,6 +23,7 @@ public class ThemePlugin extends AbstractUIPlugin
 	// The shared instance
 	private static ThemePlugin plugin;
 
+	private InvasiveThemeHijacker themeHijacker;
 	private ColorManager fColorManager;
 
 	/**
@@ -36,6 +41,11 @@ public class ThemePlugin extends AbstractUIPlugin
 	{
 		super.start(context);
 		plugin = this;
+
+		themeHijacker = new InvasiveThemeHijacker();
+		themeHijacker.schedule();
+
+		new EditorFontOverride().schedule();
 	}
 
 	/*
@@ -46,6 +56,9 @@ public class ThemePlugin extends AbstractUIPlugin
 	{
 		try
 		{
+			IEclipsePreferences prefs = new InstanceScope().getNode(PLUGIN_ID);
+			prefs.removePreferenceChangeListener(themeHijacker);
+
 			if (fColorManager != null)
 			{
 				fColorManager.dispose();
@@ -53,6 +66,7 @@ public class ThemePlugin extends AbstractUIPlugin
 		}
 		finally
 		{
+			themeHijacker = null;
 			fColorManager = null;
 			plugin = null;
 			super.stop(context);
