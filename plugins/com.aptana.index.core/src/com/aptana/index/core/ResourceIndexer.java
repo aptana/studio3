@@ -33,8 +33,7 @@ public class ResourceIndexer implements IResourceChangeListener
 						|| (delta.getKind() == IResourceDelta.CHANGED && ((delta.getFlags() & IResourceDelta.OPEN) != 0)))
 				{
 					resourceDeltas.add(delta);
-					// If the project is now closed there's no need to traverse the delta.
-					return resource.isAccessible();
+					return false;
 				}
 			}
 			else if (resource instanceof IFile)

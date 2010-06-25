@@ -76,7 +76,7 @@ class IndexFilesOfProjectJob extends IndexRequestJob
 	private Set<IFileStore> toFileStores(IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, files.size());
-		Set<IFileStore> fileStores = new HashSet<IFileStore>();
+		Set<IFileStore> fileStores = new HashSet<IFileStore>(files.size());
 		for (IFile file : files)
 		{
 			try
