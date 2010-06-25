@@ -243,7 +243,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.texteditor.AbstractDecoratedTextEditor#getAdapter(java.lang.Class)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter)
 	{

@@ -53,7 +53,7 @@ import com.aptana.theme.ThemePlugin;
 	/* (non-Javadoc)
 	 * @see org.eclipse.tm.internal.terminal.textcanvas.StyleMap#getColor(java.util.Map, org.eclipse.tm.terminal.model.StyleColor)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	@Override
 	protected Color getColor(Map map, StyleColor color) {
 		if (color.getName().equalsIgnoreCase(StyleMap.BLACK)) {

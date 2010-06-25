@@ -91,12 +91,12 @@ public class ConnectionActionFilter implements IActionFilter {
 		return false;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static class Factory implements IAdapterFactory {
 		
 		/* (non-Javadoc)
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 		 */
-		@SuppressWarnings("unchecked")
 		public Object getAdapter(Object adaptableObject, Class adapterType) {
 			if (adapterType == IActionFilter.class) {
 				return new ConnectionActionFilter();
@@ -107,7 +107,6 @@ public class ConnectionActionFilter implements IActionFilter {
 		/* (non-Javadoc)
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
 		 */
-		@SuppressWarnings("unchecked")
 		public Class[] getAdapterList() {
 			return new Class[] { IActionFilter.class };
 		}

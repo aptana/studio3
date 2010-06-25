@@ -48,7 +48,7 @@ import com.aptana.core.internal.resources.UniformResourceMarker;
  * @author Max Stepanov
  *
  */
-@SuppressWarnings({"restriction", "unchecked"})
+@SuppressWarnings({"restriction", "unchecked", "rawtypes"})
 public final class MarkerUtils {
 
 	private static final IMarker[] NO_MARKERS = new IMarker[0];

@@ -17,7 +17,7 @@ import java.util.zip.InflaterInputStream;
 /**
  * Parsing Tables
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings("rawtypes")
 public final class ParsingTables
 {
 	/** A table with all actions */

@@ -114,7 +114,7 @@ public class FTPPlugin extends Plugin {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	private Object getContributedAdapter(Class clazz) {
 		Object adapter = null;
 		IAdapterManager manager = Platform.getAdapterManager();

@@ -55,12 +55,12 @@ public class CommonFTPPropertyDialogProvider implements IPropertyDialogProvider 
 		return new CommonFTPConnectionPointPropertyDialog(shellProvider.getShell());
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static class Factory implements IAdapterFactory {
 		
 		/* (non-Javadoc)
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 		 */
-		@SuppressWarnings("unchecked")
 		public Object getAdapter(Object adaptableObject, Class adapterType) {
 			if (IPropertyDialogProvider.class == adapterType) {
 				return new CommonFTPPropertyDialogProvider();
@@ -71,7 +71,6 @@ public class CommonFTPPropertyDialogProvider implements IPropertyDialogProvider 
 		/* (non-Javadoc)
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
 		 */
-		@SuppressWarnings("unchecked")
 		public Class[] getAdapterList() {
 			return new Class[] { IPropertyDialogProvider.class };
 		}

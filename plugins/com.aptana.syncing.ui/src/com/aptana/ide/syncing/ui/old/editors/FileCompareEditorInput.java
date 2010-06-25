@@ -358,7 +358,7 @@ public class FileCompareEditorInput extends CompareEditorInput
 	/**
 	 * @see org.eclipse.compare.CompareEditorInput#getAdapter(java.lang.Class)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter)
 	{
 		if (IFile[].class.equals(adapter))

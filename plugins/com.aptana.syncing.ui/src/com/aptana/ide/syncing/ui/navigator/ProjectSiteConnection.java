@@ -70,7 +70,7 @@ public final class ProjectSiteConnection extends PlatformObject {
     	return connectionPoint == null ? false : connectionPoint.canDisconnect();
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     public Object getAdapter(Class adapter) {
         if (adapter == IProject.class) {
             return project;

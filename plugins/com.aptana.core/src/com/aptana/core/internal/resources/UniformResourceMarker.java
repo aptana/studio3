@@ -54,7 +54,7 @@ import com.aptana.core.resources.IUniformResourceMarker;
  * @author Max Stepanov
  *
  */
-@SuppressWarnings({"restriction", "unchecked"})
+@SuppressWarnings({"restriction", "rawtypes"})
 public class UniformResourceMarker extends PlatformObject implements IUniformResourceMarker {
 
 	private IUniformResource resource;

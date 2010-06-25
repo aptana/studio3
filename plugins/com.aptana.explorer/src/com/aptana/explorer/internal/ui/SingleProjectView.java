@@ -271,7 +271,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		hookToThemes();
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (adapter == IScopeReference.class) {

@@ -15,7 +15,7 @@ import beaver.Symbol;
 /**
  * Represents production rules in the grammar.
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings("rawtypes")
 public class Production
 {
 	static final Comparator NUM_TERM_CMP = new Comparator()

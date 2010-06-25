@@ -50,7 +50,7 @@ public abstract class GenericRootPreferencePage extends PreferencePage implement
 	/**
 	 * Creates the links.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	protected Control createContents(Composite parent)
 	{
 		// pageNameToId = null

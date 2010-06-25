@@ -82,7 +82,7 @@ public class KeybindingsManager implements LoadCycleListener
 
 	private final Listener listener = new Listener()
 	{
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings("rawtypes")
 		public void handleEvent(Event event)
 		{
 			// Not enabled - simply return
@@ -402,7 +402,7 @@ public class KeybindingsManager implements LoadCycleListener
 		}
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	private void processKeyStrokes(Event event, List keyStrokes)
 	{
 		boolean consume = false;

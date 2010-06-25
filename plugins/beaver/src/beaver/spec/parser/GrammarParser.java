@@ -18,7 +18,7 @@ import beaver.*;
  * <a href="http://beaver.sourceforge.net">Beaver</a> v0.9.6.1
  * from the grammar specification "beaver.grammar".
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class GrammarParser extends Parser {
 	static public class Terminals {
 		static public final short EOF = 0;

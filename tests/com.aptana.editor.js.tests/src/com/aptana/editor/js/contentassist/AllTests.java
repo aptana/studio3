@@ -13,6 +13,7 @@ public class AllTests
 		suite.addTestSuite(LocationTests.class);
 		suite.addTestSuite(ASTQueryTests.class);
 		//suite.addTestSuite(RangeTests.class);
+		suite.addTestSuite(MetadataTests.class);
 		//$JUnit-END$
 		return suite;
 	}

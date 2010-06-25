@@ -114,7 +114,7 @@ public class LocalFileStorage extends UniformResourceStorage {
 	/* (non-Javadoc)
 	 * @see com.aptana.ide.core.resources.UniformResourceStorage#getAdapter(java.lang.Class)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (IPath.class == adapter) {

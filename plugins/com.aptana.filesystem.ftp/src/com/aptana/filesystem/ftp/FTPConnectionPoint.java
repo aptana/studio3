@@ -347,7 +347,7 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (IConnectionFileManager.class == adapter) {

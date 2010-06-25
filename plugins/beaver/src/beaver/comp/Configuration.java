@@ -24,7 +24,7 @@ import beaver.spec.Terminal;
  * This class represents an LALR item or a parser configuration. Each configuration consists of a
  * production, a "dot" that marks a position in a production and a set of lookahead symbols.
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({ "unchecked", "rawtypes" })
 class Configuration implements Comparable
 {
 	static class Set
