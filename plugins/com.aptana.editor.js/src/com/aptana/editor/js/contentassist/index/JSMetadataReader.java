@@ -208,6 +208,7 @@ public class JSMetadataReader extends ValidatingReader
 					if (this.isValidTypeIdentifier(superType))
 					{
 						type.addParentType(superType);
+						clas.addParentType("Class<" + superType + ">");
 					}
 					else
 					{
