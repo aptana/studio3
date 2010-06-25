@@ -120,7 +120,7 @@
 			 - - - - - - - - - - - - - - - - - -->
 	<target name="run.director" description="Runs the p2 director installs">
 		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="true" dir="${baseLocation}" timeout="900000">
-			<arg line="-application org.eclipse.equinox.p2.director.app.application" />
+			<arg line="-application org.eclipse.equinox.p2.director" />
 			<arg line="-nosplash" />
 			<arg line="-consoleLog" />
 			<arg line="-metadataRepository ${p2.repo}" />
