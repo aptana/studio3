@@ -103,6 +103,7 @@ public class IndexContainerJob extends IndexRequestJob
 			{
 				IndexActivator.logError("An error occurred while saving an index", e);
 			}
+			sub.done();
 		}
 		return Status.OK_STATUS;
 	}

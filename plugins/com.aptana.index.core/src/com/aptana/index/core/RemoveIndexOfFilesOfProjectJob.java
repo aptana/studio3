@@ -9,6 +9,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 
 class RemoveIndexOfFilesOfProjectJob extends IndexRequestJob
 {
@@ -27,11 +28,11 @@ class RemoveIndexOfFilesOfProjectJob extends IndexRequestJob
 	@Override
 	public IStatus run(IProgressMonitor monitor)
 	{
-		if (monitor.isCanceled())
+		SubMonitor sub = SubMonitor.convert(monitor, files.size());
+		if (sub.isCanceled())
 		{
 			return Status.CANCEL_STATUS;
 		}
-
 		if (!project.isAccessible())
 		{
 			return Status.CANCEL_STATUS;
@@ -48,6 +49,7 @@ class RemoveIndexOfFilesOfProjectJob extends IndexRequestJob
 					return Status.CANCEL_STATUS;
 				}
 				index.remove(file.getLocationURI());
+				sub.worked(1);
 			}
 		}
 		finally
@@ -60,6 +62,7 @@ class RemoveIndexOfFilesOfProjectJob extends IndexRequestJob
 			{
 				IndexActivator.logError(e.getMessage(), e);
 			}
+			sub.done();
 		}
 		return Status.OK_STATUS;
 	}
