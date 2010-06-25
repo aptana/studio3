@@ -7,8 +7,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.IDocument;
@@ -32,6 +32,7 @@ import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.parsing.JSTokenScanner;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
+import com.aptana.editor.js.parsing.ast.JSGetPropertyOperatorNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
@@ -232,67 +233,53 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		if (this._targetNode != null && this._targetNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
 		{
-			Scope<JSNode> global = this.getGlobalScope();
+			JSGetPropertyOperatorNode node = (JSGetPropertyOperatorNode) this._targetNode;
+			Scope<JSNode> localScope = this.getScopeAtOffset(offset);
 			
-			if (global != null)
+			if (localScope != null)
 			{
-				Scope<JSNode> localScope = global.getScopeAtOffset(offset);
+				List<String> typeList = null;
 				
-				if (localScope != null)
+				// lookup in current file
+				IParseNode lhs = node.getLeftHandSide();
+				
+				if (lhs instanceof JSNode)
 				{
-					// NOTE: we use a list here to preserve order. The additional
-					// overhead involved with checking for duplicates before adding
-					// to the list should be minimal since the type lists will always
-					// be small
-					List<String> typeList = new LinkedList<String>();
+					JSNode jsNode = (JSNode) lhs;
+					
+					typeList = jsNode.getTypes(localScope);
+				}
+				
+				// lookup in project
+				if (typeList == null || typeList.isEmpty())
+				{
+					typeList = new LinkedList<String>();
 					
 					// TEMP: for debugging
 					String name = this._targetNode.getFirstChild().getText();
 					
-					List<JSNode> nodes = localScope.getSymbol(name);
+					Index index = this.getIndex();
+					PropertyElement property = this._indexHelper.getProjectGlobal(index, name);
 					
-					if (nodes.isEmpty() == false)
+					if (property != null)
 					{
-						for (JSNode node : nodes)
+						for (ReturnTypeElement typeElement : property.getTypes())
 						{
-							// look up type
-							List<String> types = node.getTypes();
+							String type = typeElement.getType();
 							
-							// add type properties to proposals
-							for (String type : types)
+							if (typeList.contains(type) == false)
 							{
-								if (typeList.contains(type) == false)
-								{
-									typeList.add(type);
-								}
+								typeList.add(type);
 							}
 						}
 					}
-					else
-					{
-						Index index = this.getIndex();
-						PropertyElement property = this._indexHelper.getProjectGlobal(index, name);
-						
-						if (property != null)
-						{
-							for (ReturnTypeElement typeElement : property.getTypes())
-							{
-								String type = typeElement.getType();
-								
-								if (typeList.contains(type) == false)
-								{
-									typeList.add(type);
-								}
-							}
-						}
-					}
-					
-					System.out.println("types: " + StringUtil.join(", ", typeList));
-					
-					for (String type : typeList)
-					{
-						this.addTypeProperties(proposals, type, offset);
-					}
+				}
+				
+				System.out.println("types: " + StringUtil.join(", ", typeList));
+				
+				for (String type : typeList)
+				{
+					this.addTypeProperties(proposals, type, offset);
 				}
 			}
 		}
@@ -1074,6 +1061,27 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 //			{
 //				result = this.getLocationByLexeme(lexemeProvider, offset);
 //			}
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * getScopeAtOffset
+	 * 
+	 * @param offset
+	 * @return
+	 */
+	protected Scope<JSNode> getScopeAtOffset(int offset)
+	{
+		Scope<JSNode> result = null;
+		
+		// grab global scope
+		Scope<JSNode> global = this.getGlobalScope();
+		
+		if (global != null)
+		{
+			result = global.getScopeAtOffset(offset);
 		}
 		
 		return result;
