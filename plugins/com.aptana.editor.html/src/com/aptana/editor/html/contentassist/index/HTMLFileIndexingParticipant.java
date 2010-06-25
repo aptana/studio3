@@ -140,7 +140,10 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 				{
 					IPathResolver resolver = new URIResolver(file.toURI());
 					URI resolved = resolver.resolveURI(cssLink);
-					addIndex(index, file, HTMLIndexConstants.RESOURCE_CSS, resolved.toString());
+					if (resolved != null)
+					{
+						addIndex(index, file, HTMLIndexConstants.RESOURCE_CSS, resolved.toString());
+					}
 				}
 			}
 		}
@@ -153,7 +156,7 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 
 	private static void addIndex(Index index, IFileStore file, String category, String word)
 	{
-		index.addEntry(category, word, file.toURI().getPath());
+		index.addEntry(category, word, file.toURI());
 	}
 
 }

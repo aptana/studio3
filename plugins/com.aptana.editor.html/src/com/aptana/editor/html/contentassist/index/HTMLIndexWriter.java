@@ -1,6 +1,7 @@
 package com.aptana.editor.html.contentassist.index;
 
 import java.io.InputStream;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,9 +33,9 @@ public class HTMLIndexWriter
 	 * 
 	 * @return
 	 */
-	protected String getDocumentPath()
+	protected URI getDocumentPath()
 	{
-		return HTMLIndexConstants.METADATA;
+		return URI.create(HTMLIndexConstants.METADATA);
 	}
 	
 	/**

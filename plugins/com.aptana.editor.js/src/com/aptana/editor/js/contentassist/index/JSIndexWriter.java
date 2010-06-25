@@ -1,6 +1,7 @@
 package com.aptana.editor.js.contentassist.index;
 
 import java.io.InputStream;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,9 +39,9 @@ public class JSIndexWriter
 	 * 
 	 * @return
 	 */
-	protected String getDocumentPath()
+	protected URI getDocumentPath()
 	{
-		return JSIndexConstants.METADATA;
+		return URI.create(JSIndexConstants.METADATA);
 	}
 	
 	/**
@@ -215,7 +216,7 @@ public class JSIndexWriter
 	 */
 	public void writeType(Index index, TypeElement type)
 	{
-		String documentPath = ""; //$NON-NLS-1$
+		URI documentPath = URI.create(""); //$NON-NLS-1$
 
 		// write type entry
 		String[] parentTypes = type.getParentTypes();

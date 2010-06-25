@@ -104,7 +104,7 @@ class PathFilter extends ViewerFilter
 		{
 			// FIXME We should have a search API layer over the top of this and shouldn't be hitting indices directly. Pass a scope object to the search API and it calculates what indices to search within!
 			queryResults = new ArrayList<QueryResult>();
-			Index index = IndexManager.getInstance().getIndex(resource.getProject().getFullPath().toPortableString());
+			Index index = IndexManager.getInstance().getIndex(resource.getProject().getLocationURI());
 			try
 			{
 				queryResults = index.query(new String[] { HTMLIndexConstants.RESOURCE_CSS,

@@ -1,5 +1,6 @@
 package com.aptana.editor.ruby.index;
 
+import java.net.URI;
 import java.util.Stack;
 
 import com.aptana.core.util.StringUtil;
@@ -13,9 +14,9 @@ public class RubySourceIndexer implements ISourceElementRequestor
 
 	private Stack<TypeInfo> typeStack = new Stack<TypeInfo>();
 	private Index index;
-	private String documentPath;
+	private URI documentPath;
 
-	public RubySourceIndexer(Index index, String documentPath)
+	public RubySourceIndexer(Index index, URI documentPath)
 	{
 		this.index = index;
 		this.documentPath = documentPath;

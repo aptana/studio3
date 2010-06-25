@@ -2,17 +2,16 @@ package com.aptana.index.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.zip.CRC32;
 
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
 public class IndexManager
 {
 	private static IndexManager instance;
-	private Map<String, Index> indexes;
+	private Map<URI, Index> indexes;
 
 	static final ISchedulingRule MUTEX_RULE = new ISchedulingRule()
 	{
@@ -44,22 +43,7 @@ public class IndexManager
 	 */
 	private IndexManager()
 	{
-		indexes = new HashMap<String, Index>();
-	}
-
-	/**
-	 * computeIndexLocation
-	 * 
-	 * @param path
-	 * @return
-	 */
-	public IPath computeIndexLocation(String path)
-	{
-		CRC32 crc = new CRC32();
-		crc.reset();
-		crc.update(path.getBytes());
-		String fileName = Long.toString(crc.getValue()) + ".index"; //$NON-NLS-1$
-		return IndexActivator.getDefault().getStateLocation().append(fileName);
+		indexes = new HashMap<URI, Index>();
 	}
 
 	/**
@@ -68,7 +52,7 @@ public class IndexManager
 	 * @param path
 	 * @return
 	 */
-	public Index getIndex(String path)
+	public Index getIndex(URI path)
 	{
 		Index index = indexes.get(path);
 		if (index == null)
@@ -89,7 +73,7 @@ public class IndexManager
 	/**
 	 * Removes the index for a given path. This is a no-op if the index did not exist.
 	 */
-	public synchronized void removeIndex(String path)
+	public synchronized void removeIndex(URI path)
 	{
 		Index index = getIndex(path);
 		File indexFile = null;

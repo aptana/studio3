@@ -51,7 +51,7 @@ public class RubyFileIndexingParticipant implements IFileStoreIndexingParticipan
 					{
 						ParserResult result = sourceParser.parse(store.getName(), source);
 						Node root = result.getAST();
-						ISourceElementRequestor builder = new RubySourceIndexer(index, store.toURI().getPath());
+						ISourceElementRequestor builder = new RubySourceIndexer(index, store.toURI());
 						SourceElementVisitor visitor = new SourceElementVisitor(builder);
 						visitor.acceptNode(root);
 					}

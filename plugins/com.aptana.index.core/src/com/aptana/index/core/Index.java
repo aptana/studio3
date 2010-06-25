@@ -2,6 +2,7 @@ package com.aptana.index.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.zip.CRC32;
 
 import org.eclipse.core.runtime.IPath;
 
@@ -248,34 +250,52 @@ public class Index
 	private DiskIndex diskIndex;
 
 	public ReadWriteMonitor monitor;
-
-	private String path;
+	private URI containerURI;
 
 	/**
 	 * Index
 	 * 
-	 * @param path
+	 * @param containerURI
 	 * @throws IOException
 	 */
-	public Index(String path) throws IOException
+	public Index(URI containerURI) throws IOException
 	{
-		// Raw path of root we're indexing
-		this.path = path;
+		this.containerURI = containerURI;
 
 		this.memoryIndex = new MemoryIndex();
 		this.monitor = new ReadWriteMonitor();
 
 		// Convert to a filename we can use for the actual index on disk
-		IPath containerPath = IndexManager.getInstance().computeIndexLocation(path);
-		String containerPathString = containerPath.getDevice() == null ? containerPath.toString() : containerPath
+		IPath diskIndexPath = computeIndexLocation(containerURI);
+		String diskIndexPathString = diskIndexPath.getDevice() == null ? diskIndexPath.toString() : diskIndexPath
 				.toOSString();
-		this.diskIndex = new DiskIndex(containerPathString);
+		this.diskIndex = new DiskIndex(diskIndexPathString);
 		this.diskIndex.initialize();
 	}
 
-	public String getRoot()
+	/**
+	 * computeIndexLocation
+	 * 
+	 * @param containerPath
+	 * @return
+	 */
+	private static IPath computeIndexLocation(URI containerPath)
 	{
-		return path;
+		CRC32 crc = new CRC32();
+		crc.reset();
+		crc.update(containerPath.toString().getBytes());
+		String fileName = Long.toString(crc.getValue()) + ".index"; //$NON-NLS-1$
+		return IndexActivator.getDefault().getStateLocation().append(fileName);
+	}
+
+	/**
+	 * @deprecated
+	 * @return
+	 */
+	public URI getRoot()
+	{
+		// TODO Remove this! JDT doesn't need it!
+		return containerURI;
 	}
 
 	/**
@@ -283,13 +303,11 @@ public class Index
 	 * 
 	 * @param category
 	 * @param key
-	 * @param documentPath
+	 * @param containerRelativeURI
 	 */
-	public void addEntry(String category, String key, String documentPath)
+	public void addEntry(String category, String key, URI containerRelativeURI)
 	{
-		// TODO Convert documentPath arg to URI, resolve it's relative path to base path of container passed into index
-		// constructor!
-		this.memoryIndex.addEntry(category, key, documentPath);
+		this.memoryIndex.addEntry(category, key, containerRelativeURI.toString());
 	}
 
 	/**
@@ -357,13 +375,11 @@ public class Index
 	/**
 	 * Remove all indices for a given document
 	 * 
-	 * @param containerRelativePath
+	 * @param containerRelativeURI
 	 */
-	public void remove(String containerRelativePath)
+	public void remove(URI containerRelativeURI)
 	{
-		// TODO Convert containerRelativePath arg to URI, resolve it's relative path to base path of container passed
-		// into index constructor!
-		this.memoryIndex.remove(containerRelativePath);
+		this.memoryIndex.remove(containerRelativeURI.toString());
 	}
 
 	/**
@@ -418,5 +434,10 @@ public class Index
 			results = this.diskIndex.addDocumentNames(substring, null);
 		}
 		return results;
+	}
+
+	public String toString()
+	{
+		return "Index for " + this.containerURI; //$NON-NLS-1$
 	}
 }

@@ -14,6 +14,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
 import com.aptana.editor.js.contentassist.index.ScriptDocException;
@@ -59,10 +60,7 @@ public class Activator extends AbstractUIPlugin
 			"/metadata/dom_5.xml" //$NON-NLS-1$
 		);
 		
-		IndexManager manager = IndexManager.getInstance();
-		Index index = manager.getIndex(JSIndexConstants.METADATA);
-		
-		indexer.writeToIndex(index);
+		indexer.writeToIndex(JSIndexQueryHelper.getIndex());
 	}
 
 	/**
