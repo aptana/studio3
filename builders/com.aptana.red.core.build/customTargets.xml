@@ -139,7 +139,7 @@
 	<!-- ===================================================================== -->
 	<target name="postBuild">
 		<antcall target="gatherLogs" />
-		<!-- <antcall target="fix.broken.metadata" /> -->
+		<antcall target="fix.broken.metadata" />
 		<antcall target="updateSite" />
 		<antcall target="publish" />
 	</target>
