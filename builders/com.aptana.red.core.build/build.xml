@@ -33,6 +33,7 @@
 		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="yes">
 			<arg line="-application org.eclipse.ant.core.antRunner -buildfile ${baseLocation}/plugins/${builder.plugin}/scripts/build.xml -Dbuilder=${basedir} -Dbuild.revision=${build.revision} -nosplash" />
 		</java>
+		<antcall target="updateSite.publish" />
 		<antcall target="categorize" />
 		<antcall target="clean.after" />
 	</target>
@@ -50,6 +51,15 @@
 				<propertyref prefix="sun." />
 			</propertyset>
 		</echoproperties>
+	</target>
+
+	<!-- ================================= 
+         target: categorize              
+        ================================= -->
+	<target name="updateSite.publish" description="publish the update site">
+		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="yes">
+			<arg line="-application org.eclipse.equinox.p2.publisher.UpdateSitePublisher -nosplash -console -consolelog -metadataRepository file:${deploy.dir} -artifactRepository file:${deploy.dir} -source file:${deploy.dir} -compress -publishArtifacts" />
+		</java>
 	</target>
 
 	<!-- ================================= 
