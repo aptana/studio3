@@ -2,6 +2,8 @@ package com.aptana.editor.js.parsing.ast;
 
 import java.util.List;
 
+import com.aptana.parsing.Scope;
+
 import beaver.Symbol;
 
 public class JSTrueNode extends JSPrimitiveNode
@@ -31,7 +33,7 @@ public class JSTrueNode extends JSPrimitiveNode
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#addReturnTypes(java.util.List)
 	 */
 	@Override
-	protected void addReturnTypes(List<String> types)
+	protected void addTypes(List<String> types, Scope<JSNode> scope)
 	{
 		types.add("Boolean");
 	}

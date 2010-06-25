@@ -1,9 +1,9 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 import com.aptana.editor.js.contentassist.LocationType;
 import com.aptana.parsing.ast.IParseNode;
-
-import beaver.Symbol;
 
 
 public class JSGetPropertyOperatorNode extends JSBinaryOperatorNode

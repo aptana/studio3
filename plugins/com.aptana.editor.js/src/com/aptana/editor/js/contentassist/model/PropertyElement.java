@@ -6,8 +6,8 @@ import java.util.List;
 public class PropertyElement extends BaseElement
 {
 	private TypeElement _owningType;
-	private boolean _isInstance;
-	private boolean _isInvocationOnly;
+	private boolean _isInstanceProperty;
+	private boolean _isClassProperty;
 	private boolean _isInternal;
 	private List<ReturnTypeElement> _types = new LinkedList<ReturnTypeElement>();
 
@@ -66,13 +66,13 @@ public class PropertyElement extends BaseElement
 	}
 
 	/**
-	 * isInstance
+	 * isInstanceProperty
 	 * 
 	 * @return
 	 */
-	public boolean isInstance()
+	public boolean isInstanceProperty()
 	{
-		return this._isInstance;
+		return this._isInstanceProperty;
 	}
 
 	/**
@@ -86,23 +86,23 @@ public class PropertyElement extends BaseElement
 	}
 
 	/**
-	 * isInvocationOnly
+	 * isClassProperty
 	 * 
 	 * @return
 	 */
-	public boolean isInvocationOnly()
+	public boolean isClassProperty()
 	{
-		return this._isInvocationOnly;
+		return this._isClassProperty;
 	}
 
 	/**
-	 * setIsInstance
+	 * setIsInstanceProperty
 	 * 
 	 * @param value
 	 */
-	public void setIsInstance(boolean value)
+	public void setIsInstanceProperty(boolean value)
 	{
-		this._isInstance = value;
+		this._isInstanceProperty = value;
 	}
 
 	/**
@@ -116,13 +116,13 @@ public class PropertyElement extends BaseElement
 	}
 
 	/**
-	 * setIsInvocationOnly
+	 * setIsClassProperty
 	 * 
 	 * @param value
 	 */
-	public void setIsInvocationOnly(boolean value)
+	public void setIsClassProperty(boolean value)
 	{
-		this._isInvocationOnly = value;
+		this._isClassProperty = value;
 	}
 
 	/**

@@ -87,7 +87,7 @@ public class ScopeTests extends FileContentBasedTests
 		
 		for (JSNode node : value)
 		{
-			typeSet.addAll(node.getTypes());
+			typeSet.addAll(node.getTypes(symbols));
 		}
 		
 		return new LinkedList<String>(typeSet);

@@ -10,6 +10,7 @@ import java.util.Map;
 import com.aptana.editor.js.contentassist.LocationType;
 import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
+import com.aptana.parsing.Scope;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
@@ -82,8 +83,9 @@ public class JSNode extends ParseNode
 	 * addReturnTypes
 	 * 
 	 * @param types
+	 * @param scope TODO
 	 */
-	protected void addReturnTypes(List<String> types)
+	protected void addTypes(List<String> types, Scope<JSNode> scope)
 	{
 		// do nothing, sub-classes should override
 	}
@@ -167,16 +169,17 @@ public class JSNode extends ParseNode
 
 	/**
 	 * getTypes
+	 * @param scope TODO
 	 * 
 	 * @return
 	 */
-	public List<String> getTypes()
+	public List<String> getTypes(Scope<JSNode> scope)
 	{
 		if (fTypes == null)
 		{
 			fTypes = new ArrayList<String>();
 
-			addReturnTypes(fTypes);
+			addTypes(fTypes, scope);
 		}
 
 		return fTypes;

@@ -1,9 +1,15 @@
 package com.aptana.editor.js.parsing.ast;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.aptana.editor.js.contentassist.LocationType;
+import com.aptana.editor.js.sdoc.model.DocumentationBlock;
+import com.aptana.editor.js.sdoc.model.Tag;
+import com.aptana.editor.js.sdoc.model.TagType;
+import com.aptana.editor.js.sdoc.model.TagWithTypes;
+import com.aptana.editor.js.sdoc.model.Type;
+import com.aptana.parsing.Scope;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseNodeAttribute;
 import com.aptana.parsing.ast.ParseNode;
@@ -23,6 +29,15 @@ public class JSFunctionNode extends JSNode
 	public JSFunctionNode(int start, int end, JSNode... children)
 	{
 		super(JSNodeTypes.FUNCTION, start, end, children);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#addReturnTypes(java.util.List, com.aptana.parsing.Scope)
+	 */
+	@Override
+	protected void addTypes(List<String> types, Scope<JSNode> scope)
+	{
+		types.add("Function");
 	}
 
 	/**
@@ -117,7 +132,24 @@ public class JSFunctionNode extends JSNode
 	{
 		if (fReturnTypes == null)
 		{
-			fReturnTypes = new ArrayList<String>();
+			fReturnTypes = new LinkedList<String>(); 
+			DocumentationBlock docs = this.getDocumentation();
+			
+			if (docs != null && docs.hasTags())
+			{
+				for (Tag tag : docs.getTags())
+				{
+					if (tag.getType() == TagType.RETURN)
+					{
+						TagWithTypes tagWithTypes = (TagWithTypes) tag;
+						
+						for (Type type : tagWithTypes.getTypes())
+						{
+							fReturnTypes.add(type.getName());
+						}
+					}
+				}
+			}
 		}
 		
 		return fReturnTypes;
