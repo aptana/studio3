@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?mso-infoPathSolution PIVersion="1.0.0.0" language="en-us" href="http://www.aptana.com/forms/outline.xsn" name="urn:schemas-microsoft-com:office:infopath:outline:" productVersion="11.0.6357" solutionVersion="1.0.0.105" ?>
-<?mso-application progid="InfoPath.Document"?>
-<javascript xmlns:xsd = "http://www.w3.org/2001/XMLSchema" xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance">
+<javascript>
     
 	<class type = "AbstractView" superclass = "Object" visibility = "basic">
         <description>Base interface that all views derive from.</description>
