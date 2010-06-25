@@ -9329,7 +9329,7 @@ document.write("&amp;lt;P&amp;gt;" + worldString.fontsize(7))
 		<return-description>Returns a copy of a string surrounded by &amp;lt;font size="size"&amp;gt;&amp;lt;/font&amp;gt; tags.</return-description>
 	</method>
 	
-	<method name="fromCharCode" scope="static">
+	<method name="fromCharCode">
         <description> Returns a string created by using the specified sequence of Unicode values.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
