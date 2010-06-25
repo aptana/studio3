@@ -203,7 +203,7 @@ public class JSIndexReader
 		List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningType, propertyName), SearchPattern.REGEX_MATCH);
 		PropertyElement result = null;
 		
-		if (properties != null)
+		if (properties != null && properties.size() > 0)
 		{
 			QueryResult property = properties.get(0);
 			String key = property.getWord();
