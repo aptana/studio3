@@ -63,6 +63,7 @@ import java.util.Vector;
  * @author Gie Spaepen
  * @version 1.2
  */
+@SuppressWarnings("rawtypes")
 public class PlistProperties
 {
 
@@ -84,43 +85,36 @@ public class PlistProperties
 	/**
 	 * Class object for a String
 	 */
-	@SuppressWarnings("unchecked")
 	public final static Class<? extends Class> TYPE_STRING = String.class.getClass();
 
 	/**
 	 * Class object for an Integer
 	 */
-	@SuppressWarnings("unchecked")
 	public final static Class<? extends Class> TYPE_INTEGER = Integer.class.getClass();
 
 	/**
 	 * Class object for a Double
 	 */
-	@SuppressWarnings("unchecked")
 	public final static Class<? extends Class> TYPE_DOUBLE = Double.class.getClass();
 
 	/**
 	 * Class object for a Date
 	 */
-	@SuppressWarnings("unchecked")
 	public final static Class<? extends Class> TYPE_DATE = Date.class.getClass();
 
 	/**
 	 * Class object for a Byte[]
 	 */
-	@SuppressWarnings("unchecked")
 	public final static Class<? extends Class> TYPE_DATA = Byte.class.getClass();
 
 	/**
 	 * Class object for a Boolean
 	 */
-	@SuppressWarnings("unchecked")
 	public final static Class<? extends Class> TYPE_BOOLEAN = Boolean.class.getClass();
 
 	/**
 	 * Class object for a Vector (follows <code>PLIST</code> syntax)
 	 */
-	@SuppressWarnings("unchecked")
 	public final static Class<? extends Class> TYPE_ARRAY = Vector.class.getClass();
 
 	/**
@@ -128,13 +122,11 @@ public class PlistProperties
 	 * 
 	 * @see #TYPE_VECTOR
 	 */
-	@SuppressWarnings("unchecked")
 	public final static Class<? extends Class> TYPE_VECTOR = Vector.class.getClass();
 
 	/**
 	 * Class object for a PlistProperties
 	 */
-	@SuppressWarnings("unchecked")
 	public final static Class<? extends Class> TYPE_PLISTPROPERTIES = PlistProperties.class.getClass();
 
 	/**
@@ -142,7 +134,6 @@ public class PlistProperties
 	 * 
 	 * @see #TYPE_PLISTPROPERTIES
 	 */
-	@SuppressWarnings("unchecked")
 	public final static Class<? extends Class> TYPE_DICTIONARY = PlistProperties.class.getClass();
 
 	/**
@@ -212,7 +203,6 @@ public class PlistProperties
 	 *            String
 	 * @return Object
 	 */
-	@SuppressWarnings("unchecked")
 	public Object getPropertyRecursive(String _key)
 	{
 		Object _return = null;
@@ -354,7 +344,6 @@ public class PlistProperties
 	 *            Class
 	 * @return int
 	 */
-	@SuppressWarnings("unchecked")
 	public int propertyTypeCount(Class _type)
 	{
 		return propertyTypeCount(_type, 0);
@@ -371,7 +360,6 @@ public class PlistProperties
 	 *            int
 	 * @return int
 	 */
-	@SuppressWarnings("unchecked")
 	public int propertyTypeCount(Class _type, int _baseCount)
 	{
 		int count = _baseCount;
@@ -535,7 +523,6 @@ public class PlistProperties
 	 *            int
 	 * @throws PlistReaderException
 	 */
-	@SuppressWarnings("unchecked")
 	private void printContent(Object _out, int _tabIndex) throws PlistReaderException
 	{
 		try

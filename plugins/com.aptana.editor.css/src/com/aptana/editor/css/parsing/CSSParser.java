@@ -106,7 +106,7 @@ public class CSSParser extends Parser implements IParser {
 
 	private CSSScanner fScanner;
 
-	@SuppressWarnings("unchecked")	
+	@SuppressWarnings({ "unchecked", "rawtypes" })	
 	public CSSParser() {
 		super(PARSING_TABLES);
 		report = new CSSEvents();

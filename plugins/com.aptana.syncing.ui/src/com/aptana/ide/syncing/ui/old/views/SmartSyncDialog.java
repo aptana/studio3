@@ -557,7 +557,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		layout.marginWidth = 40;
 		layout.marginTop = 12;
 		status.setLayout(layout);
-		status.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, true));
+		status.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		Label updatedSymbol = new Label(status, SWT.VERTICAL);
 		updatedSymbol.setImage(SyncingUIPlugin.getImage(ICON_UPDATE));

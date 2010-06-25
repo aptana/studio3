@@ -111,7 +111,7 @@ public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfigurati
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected Map getHyperlinkDetectorTargets(ISourceViewer sourceViewer)
 	{
 		Map targets = super.getHyperlinkDetectorTargets(sourceViewer);

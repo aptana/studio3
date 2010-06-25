@@ -40,6 +40,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Gie Spaepen
  * @version 1.3
  */
+@SuppressWarnings("rawtypes")
 public class ReaderXMLHandler extends DefaultHandler
 {
 
@@ -78,7 +79,6 @@ public class ReaderXMLHandler extends DefaultHandler
 	/**
 	 * Vector to hold the different data nodes
 	 */
-	@SuppressWarnings("unchecked")
 	private Vector storageObjects = new Vector();
 
 	/**
@@ -406,7 +406,6 @@ public class ReaderXMLHandler extends DefaultHandler
 	 * @param _array
 	 *            boolean - True for arrays and false for dictionaries.
 	 */
-	@SuppressWarnings("unchecked")
 	private void levelDown(boolean _array)
 	{
 		// Determine if there's more than one element

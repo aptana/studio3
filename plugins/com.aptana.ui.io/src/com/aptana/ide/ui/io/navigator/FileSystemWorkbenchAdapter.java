@@ -280,12 +280,12 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
 		return list.toArray(new FileSystemObject[list.size()]);
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static class Factory implements IAdapterFactory {
 		
 		/* (non-Javadoc)
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 		 */
-		@SuppressWarnings("unchecked")
 		public Object getAdapter(Object adaptableObject, Class adapterType) {
 			if (IWorkbenchAdapter.class == adapterType) {
 				return getInstance();
@@ -303,7 +303,6 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
 		/* (non-Javadoc)
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
 		 */
-		@SuppressWarnings("unchecked")
 		public Class[] getAdapterList() {
 			return new Class[] { IWorkbenchAdapter.class, IDeferredWorkbenchAdapter.class };
 		}

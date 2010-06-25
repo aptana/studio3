@@ -42,7 +42,7 @@ import com.aptana.core.CorePlugin;
 /**
  *
  */
-@SuppressWarnings({"restriction", "unchecked"})
+@SuppressWarnings({"restriction", "unchecked", "rawtypes"})
 public class MarkerInfo extends org.eclipse.core.internal.resources.MarkerInfo {
 
 	/** UNDEFINED_ID */
@@ -55,11 +55,11 @@ public class MarkerInfo extends org.eclipse.core.internal.resources.MarkerInfo {
 		Class superClass = getClass().getSuperclass();
 		try {
 			try {
-				superClass.getMethod("setAttributes", Map.class).invoke(this, map);
+				superClass.getMethod("setAttributes", Map.class).invoke(this, map); //$NON-NLS-1$
 				return;
 			} catch (NoSuchMethodException e) {
 			}
-			superClass.getMethod("setAttributes", Map.class, Boolean.class).invoke(this, map, validate);
+			superClass.getMethod("setAttributes", Map.class, Boolean.class).invoke(this, map, validate); //$NON-NLS-1$
 		} catch (Exception e) {
 			CorePlugin.log(e);
 		}
@@ -72,11 +72,11 @@ public class MarkerInfo extends org.eclipse.core.internal.resources.MarkerInfo {
 		Class superClass = getClass().getSuperclass();
 		try {
 			try {
-				superClass.getMethod("setAttribute", String.class, Object.class).invoke(this, attributeName, value);
+				superClass.getMethod("setAttribute", String.class, Object.class).invoke(this, attributeName, value); //$NON-NLS-1$
 				return;
 			} catch (NoSuchMethodException e) {
 			}
-			superClass.getMethod("setAttribute", String.class, Object.class, Boolean.class).invoke(this, attributeName, value, validate);
+			superClass.getMethod("setAttribute", String.class, Object.class, Boolean.class).invoke(this, attributeName, value, validate); //$NON-NLS-1$
 		} catch (Exception e) {
 			CorePlugin.log(e);
 		}
@@ -89,11 +89,11 @@ public class MarkerInfo extends org.eclipse.core.internal.resources.MarkerInfo {
 		Class superClass = getClass().getSuperclass();
 		try {
 			try {
-				superClass.getMethod("setAttributes", String[].class, Object[].class).invoke(this, attributeNames, values);
+				superClass.getMethod("setAttributes", String[].class, Object[].class).invoke(this, attributeNames, values); //$NON-NLS-1$
 				return;
 			} catch (NoSuchMethodException e) {
 			}
-			superClass.getMethod("setAttributes", String[].class, Object[].class, Boolean.class).invoke(this, attributeNames, values, validate);
+			superClass.getMethod("setAttributes", String[].class, Object[].class, Boolean.class).invoke(this, attributeNames, values, validate); //$NON-NLS-1$
 		} catch (Exception e) {
 			CorePlugin.log(e);
 		}

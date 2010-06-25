@@ -25,6 +25,7 @@ import com.aptana.theme.extensions.ConsoleThemePageParticipant;
 /**
  * This extension will make sure that the colors for the console are always following the theme preferences.
  */
+@SuppressWarnings("rawtypes")
 public class ConsoleThemer
 {
 
@@ -53,7 +54,6 @@ public class ConsoleThemer
 	private IPreferenceChangeListener fThemeChangeListener;
 
 	private TextConsole fConsole;
-	@SuppressWarnings("unchecked")
 	private Map fThemeConsoleStreamToColor;
 
 	/**
@@ -66,7 +66,6 @@ public class ConsoleThemer
 	 * @param themeConsoleStreamToColor
 	 *            a map with the stream to the related color name (one of the CONSOLE_XXX constants in this class).
 	 */
-	@SuppressWarnings("unchecked")
 	public ConsoleThemer(TextConsole textConsole, Map themeConsoleStreamToColor)
 	{
 		this.fConsole = textConsole;

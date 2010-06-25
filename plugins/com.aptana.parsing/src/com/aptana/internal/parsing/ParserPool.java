@@ -16,7 +16,7 @@ public class ParserPool extends ObjectPool<IParser> implements IParserPool
 		this.className = className;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	@Override
 	public IParser create()
 	{

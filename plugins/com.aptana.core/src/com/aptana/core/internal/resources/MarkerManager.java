@@ -62,7 +62,7 @@ import com.aptana.core.resources.IUniformResourceChangeListener;
  * @author Max Stepanov
  *
  */
-@SuppressWarnings({"restriction", "unchecked"})
+@SuppressWarnings({"restriction", "unchecked", "rawtypes"})
 public final class MarkerManager {
 
 	private static final MarkerInfo[] NO_MARKER_INFO = new MarkerInfo[0];

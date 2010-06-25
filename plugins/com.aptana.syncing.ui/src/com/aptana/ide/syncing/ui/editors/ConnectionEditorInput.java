@@ -79,7 +79,7 @@ public class ConnectionEditorInput implements IEditorInput {
         return fSite == null ? "" : fSite.toString(); //$NON-NLS-1$
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
         return null;
     }
