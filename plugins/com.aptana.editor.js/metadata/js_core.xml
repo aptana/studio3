@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?mso-infoPathSolution PIVersion="1.0.0.0" href="http://www.aptana.com/forms/types.xsn" language="en-us" name="urn:schemas-microsoft-com:office:infopath:types:" productVersion="11.0.6357" solutionVersion="1.0.0.46" ?><?mso-application progid="InfoPath.Document"?>
-<javascript xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xd="http://schemas.microsoft.com/office/infopath/2003">
+<javascript>
   <class type="Arguments" superclass="Object">
     <description>An array of parameters passed to a function.</description>
 	<browsers>
