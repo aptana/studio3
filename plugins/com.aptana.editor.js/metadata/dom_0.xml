@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?mso-infoPathSolution PIVersion="1.0.0.0" href="http://www.aptana.com/forms/outline.xsn" language="en-us" name="urn:schemas-microsoft-com:office:infopath:outline:" productVersion="11.0.6357" solutionVersion="1.0.0.105" ?><?mso-application progid="InfoPath.Document"?>
-<javascript xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xd="http://schemas.microsoft.com/office/infopath/2003" xmlns:my="http://schemas.microsoft.com/office/infopath/2003/myXSD/2005-12-13T07:47:11">
+<javascript>
 	<class type="Anchor" superclass="HTMLElement" visibility="basic">
 		<description>A target for a hyperlink.</description>
 		<browsers>
@@ -871,35 +870,35 @@
 	      </constructor>
 	    </constructors>  
 		<properties>
-			<property name="layerX" type="Number," scope="instance" access="read" visibility="basic">
+			<property name="layerX" type="Number" scope="instance" access="read" visibility="basic">
 				<description>Horizontal position (in pixels) of the event relative to the current layer.</description>
 				<browsers>
 					<browser platform="Netscape" version="6.0+"/>
 				</browsers>
 			</property>
 			
-			<property name="layerY" type="Number," scope="instance" access="read" visibility="basic">
+			<property name="layerY" type="Number" scope="instance" access="read" visibility="basic">
 				<description>Vertical position (in pixels) of the event relative to the current layer.</description>
 				<browsers>
 					<browser platform="Netscape" version="6.0+"/>
 				</browsers>
 			</property>
 			
-			<property name="pageX" type="Number," scope="instance" access="read" visibility="basic">
+			<property name="pageX" type="Number" scope="instance" access="read" visibility="basic">
 				<description>Horizontal position (in pixels) of the event relative to the current web page.</description>
 				<browsers>
 					<browser platform="Netscape" version="6.0+"/>
 				</browsers>
 			</property>
 			
-			<property name="pageY" type="Number," scope="instance" access="read" visibility="basic">
+			<property name="pageY" type="Number" scope="instance" access="read" visibility="basic">
 				<description>Vertical position (in pixels) of the event relative to the current web page.</description>
 				<browsers>
 					<browser platform="Netscape" version="6.0+"/>
 				</browsers>
 			</property>
 			
-			<property name="screenX" type="Number," scope="instance" access="read-write" visibility="basic">
+			<property name="screenX" type="Number" scope="instance" access="read-write" visibility="basic">
 				<description>Horizontal position (in pixels) of the event on the screen.</description>
 				<browsers>
 					<browser platform="IE" version="4.0+"/>
@@ -911,7 +910,7 @@
 				</browsers>
 			</property>
 		
-			<property name="screenY" type="Number," scope="instance" access="read-write" visibility="basic">
+			<property name="screenY" type="Number" scope="instance" access="read-write" visibility="basic">
 				<description>Vertical position (in pixels) of the event on the screen.</description>
 				<browsers>
 					<browser platform="IE" version="4.0+"/>
@@ -2884,7 +2883,7 @@
 			
 			<method name="getWindow" scope="instance" visibility="basic">
 				<parameters>
-					<parameter name="applet" type="java.applet.Applet" usage="required">
+					<parameter name="applet" type="Applet" usage="required">
 						<description>Applet to obtain a JSObject for.</description>
 					</parameter>
 				</parameters>
@@ -4944,7 +4943,7 @@
 	      </constructor>
 	    </constructors>  
 		<properties>
-			<property name="onchange" type="&lt;textarea&gt;" scope="static" access="read-write" visibility="basic">
+			<property name="onchange" type="Function" scope="static" access="read-write" visibility="basic">
 				<availability>
 					<specification name="JavaScript 1.0"/>
 				</availability>

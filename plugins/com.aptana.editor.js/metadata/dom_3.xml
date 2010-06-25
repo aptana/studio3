@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<javascript xmlns:xsd = "http://www.w3.org/2001/XMLSchema" xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance">
+<javascript>
 	<class type = "Document" superclass = "Node">
         <description>Represents an HTML or XML document.</description>
 		<properties>
@@ -321,7 +321,7 @@ null
 				</parameter>
 				</parameters>
 				<return-types>
-					<return-type type="unsigned short" />
+					<return-type type="Number" />
 				</return-types>
 				<return-description>Returns how the node is positioned relative to the reference node.</return-description>
 				<exceptions>
