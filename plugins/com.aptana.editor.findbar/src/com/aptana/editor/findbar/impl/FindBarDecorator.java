@@ -176,24 +176,16 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	}
 
 	/**
-	 * Create a default button (find, replace, replace/find, replace all) If the image is passed, sets the layout as a
-	 * square. Otherwise only sets the height.
+	 * Create a default button (find, replace, replace/find, replace all).
 	 */
 	private Button createButton(String image, boolean enabled)
 	{
 		GridData layoutData = new GridData(SWT.LEFT, SWT.CENTER, false, false);
-		Button button = new Button(findBar, SWT.PUSH | SWT.FLAT);
+		Button button = new Button(findBar, SWT.PUSH);
 		button.setEnabled(enabled);
 		if (image != null)
 		{
-			// If there's an image, make the hint as a square.
-			layoutData.heightHint = 16;
-			layoutData.widthHint = 16;
 			button.setImage(FindBarPlugin.getDefault().getImage(image));
-		}
-		else
-		{
-			layoutData.heightHint = 20;
 		}
 		button.addSelectionListener(this);
 		button.setLayoutData(layoutData);
