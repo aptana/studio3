@@ -53,9 +53,10 @@ import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
-import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.ruby.IRubyConstants;
 import com.aptana.editor.ruby.RubySourceConfiguration;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.ThemePlugin;
 
 /**
  * @author Chris Williams
@@ -259,6 +260,6 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	protected IThemeManager getThemeManager()
 	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
+		return ThemePlugin.getDefault().getThemeManager();
 	}
 }
