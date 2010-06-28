@@ -1,9 +1,25 @@
 package com.aptana.editor.js.parsing.ast;
 
-import com.aptana.parsing.ast.TreeWalker;
+import com.aptana.parsing.ast.IParseNode;
 
-public class JSTreeWalker extends TreeWalker
+public class JSTreeWalker
 {
+	/**
+	 * visitChildren
+	 * 
+	 * @param node
+	 */
+	protected void visitChildren(JSNode node)
+	{
+		for (IParseNode child : node)
+		{
+			if (child instanceof JSNode)
+			{
+				((JSNode) child).accept(this);
+			}
+		}
+	}
+	
 	public void visit(JSParseRootNode node)
 	{
 	}
@@ -148,6 +164,7 @@ public class JSTreeWalker extends TreeWalker
 
 	public void visit(JSNode node)
 	{
+		node.accept(this);
 	}
 
 	public void visit(JSNullNode node)
