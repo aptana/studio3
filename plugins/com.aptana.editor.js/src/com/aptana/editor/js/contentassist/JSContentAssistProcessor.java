@@ -243,11 +243,13 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				// lookup in current file
 				IParseNode lhs = node.getLeftHandSide();
 				
-				if (lhs instanceof JSNode)
+				if (lhs != null)
 				{
-					JSNode jsNode = (JSNode) lhs;
+					JSTypeWalker typeWalker = new JSTypeWalker(localScope);
 					
-					typeList = jsNode.getTypes(localScope);
+					typeWalker.visit(lhs);
+					
+					typeList = typeWalker.getTypes();
 				}
 				
 				// lookup in project
