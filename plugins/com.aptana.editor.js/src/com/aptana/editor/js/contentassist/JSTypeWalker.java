@@ -1,8 +1,10 @@
 package com.aptana.editor.js.contentassist;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
+import com.aptana.editor.js.contentassist.model.FieldSelector;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.parsing.ast.JSArrayNode;
@@ -173,7 +175,7 @@ public class JSTypeWalker extends JSTreeWalker
 				for (String type : types)
 				{
 					// lookup up rhs name in type and add that value's type here
-					PropertyElement property = this._indexHelper.getCoreTypeProperty(type, name);
+					PropertyElement property = this._indexHelper.getCoreTypeProperty(type, name, EnumSet.of(FieldSelector.TYPES));
 					
 					if (property != null)
 					{
@@ -219,7 +221,7 @@ public class JSTypeWalker extends JSTreeWalker
 			// lookup in core
 			if (property == null)
 			{
-				property = this._indexHelper.getCoreGlobal(name);
+				property = this._indexHelper.getCoreGlobal(name, EnumSet.of(FieldSelector.TYPES));
 			}
 				
 			if (property != null)
@@ -239,21 +241,53 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSInvokeNode node)
 	{
-		IParseNode child = node.getChild(0);
-
-		// TEMP: for debugging
-		String name = child.getText();
-		List<JSNode> symbolNodes = this._scope.getSymbol(name);
-
-		for (JSNode symbolNode : symbolNodes)
+		IParseNode child = node.getExpression();
+		
+		if (child instanceof JSIdentifierNode)
 		{
-			if (symbolNode instanceof JSFunctionNode)
+			String name = child.getText();
+			
+			// lookup in local scope
+			if (this._scope != null && this._scope.hasSymbol(name))
 			{
-				List<String> returnTypes = ((JSFunctionNode) symbolNode).getReturnTypes();
-
-				this.addTypes(returnTypes);
+				List<JSNode> symbolNodes = this._scope.getSymbol(name);
+		
+				for (JSNode symbolNode : symbolNodes)
+				{
+					if (symbolNode instanceof JSFunctionNode)
+					{
+						this.addTypes(((JSFunctionNode) symbolNode).getReturnTypes());
+					}
+				}
 			}
 		}
+		else if (child instanceof JSNode)
+		{
+			JSTypeWalker walker = new JSTypeWalker(this._scope, this._index);
+			
+			((JSNode) child).accept(walker);
+			
+			List<String> types = walker.getTypes();
+			
+			if (types != null)
+			{
+				
+			}
+		}
+
+//		// TEMP: for debugging
+//		String name = child.getText();
+//		List<JSNode> symbolNodes = this._scope.getSymbol(name);
+//
+//		for (JSNode symbolNode : symbolNodes)
+//		{
+//			if (symbolNode instanceof JSFunctionNode)
+//			{
+//				List<String> returnTypes = ((JSFunctionNode) symbolNode).getReturnTypes();
+//
+//				this.addTypes(returnTypes);
+//			}
+//		}
 	}
 
 	/*

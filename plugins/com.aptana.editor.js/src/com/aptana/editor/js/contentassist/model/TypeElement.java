@@ -1,5 +1,6 @@
 package com.aptana.editor.js.contentassist.model;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -52,19 +53,13 @@ public class TypeElement extends BaseElement
 	 * 
 	 * @return
 	 */
-	public String[] getParentTypes()
+	public List<String> getParentTypes()
 	{
-		String[] result;
-		
-		if (this._parentTypes != null && this._parentTypes.size() > 0)
+		if (this._parentTypes == null)
 		{
-			result = this._parentTypes.toArray(new String[this._parentTypes.size()]);
-		}
-		else
-		{
-			result = new String[] { "Object" }; //$NON-NLS-1$
+			this._parentTypes = Collections.emptyList();
 		}
 		
-		return result;
+		return this._parentTypes;
 	}
 }

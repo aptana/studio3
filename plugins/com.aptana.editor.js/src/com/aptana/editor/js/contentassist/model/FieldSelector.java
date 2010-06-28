@@ -1,0 +1,24 @@
+package com.aptana.editor.js.contentassist.model;
+
+public enum FieldSelector
+{
+	DESCRIPTION,
+	EXCEPTIONS,
+	FUNCTIONS,
+	NAME,
+	OWNING_TYPE,
+	OS,
+	OS_VERSION,
+	PARAMETERS,
+	PARENT_TYPES,
+	PLATFORM,
+	PROPERTIES,
+	REFERENCES,
+	RETURN_TYPES,
+	SINCE,
+	TYPE,
+	TYPES,
+	USAGE,
+	USER_AGENTS,
+	VERSION;
+}

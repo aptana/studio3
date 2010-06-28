@@ -1,10 +1,13 @@
 package com.aptana.editor.js.index;
 
+import java.util.EnumSet;
+
 import junit.framework.TestCase;
 
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
+import com.aptana.editor.js.contentassist.model.FieldSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
@@ -47,7 +50,7 @@ public class JSIndexTests extends TestCase
 	{
 		JSIndexReader reader = new JSIndexReader();
 		
-		return reader.getType(this.getIndex(), typeName);
+		return reader.getType(this.getIndex(), typeName, EnumSet.allOf(FieldSelector.class));
 	}
 	
 	/**

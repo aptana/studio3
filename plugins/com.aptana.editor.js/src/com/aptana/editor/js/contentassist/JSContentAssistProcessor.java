@@ -3,6 +3,7 @@ package com.aptana.editor.js.contentassist;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,7 @@ import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
+import com.aptana.editor.js.contentassist.model.FieldSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.parsing.JSTokenScanner;
@@ -46,6 +48,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private static final String PARENS = "()"; //$NON-NLS-1$
 	private static final Image JS_FUNCTION = Activator.getImage("/icons/js_function.gif"); //$NON-NLS-1$
 	private static final Image JS_PROPERTY = Activator.getImage("/icons/js_property.gif"); //$NON-NLS-1$
+	private static final EnumSet<FieldSelector> CORE_GLOBAL_FIELDS = EnumSet.of(FieldSelector.NAME, FieldSelector.DESCRIPTION, FieldSelector.USER_AGENTS);
+	private static final EnumSet<FieldSelector> PROPERTY_FIELDS = EnumSet.of(FieldSelector.NAME, FieldSelector.DESCRIPTION, FieldSelector.USER_AGENTS);
 
 	private JSIndexQueryHelper _indexHelper;
 	private JSASTQueryHelper _astHelper;
@@ -75,7 +79,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private void addCoreFunctions(Set<ICompletionProposal> proposals, int offset)
 	{
-		List<PropertyElement> globals = this._indexHelper.getCoreGlobals();
+		List<PropertyElement> globals = this._indexHelper.getCoreGlobals(CORE_GLOBAL_FIELDS);
 		
 		for (PropertyElement property : globals)
 		{
@@ -103,7 +107,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private void addCoreGlobals(Set<ICompletionProposal> proposals, int offset)
 	{
-		List<PropertyElement> globals = this._indexHelper.getCoreGlobals();
+		List<PropertyElement> globals = this._indexHelper.getCoreGlobals(CORE_GLOBAL_FIELDS);
 
 		for (PropertyElement property : globals)
 		{
@@ -236,7 +240,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			
 			if (localScope != null)
 			{
-				List<String> typeList = Collections.emptyList();
+				List<String> typeList = null;
 				
 				// lookup in current file
 				IParseNode lhs = node.getLeftHandSide();
@@ -250,13 +254,21 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					typeList = typeWalker.getTypes();
 				}
 				
-				// TEMP: Show types for debugging info
-				System.out.println("types: " + StringUtil.join(", ", typeList));
-				
-				// add all properties of each type to our proposal list
-				for (String type : typeList)
+				if (typeList != null)
 				{
-					this.addTypeProperties(proposals, type, offset);
+					// TEMP: Show types for debugging info
+					System.out.println("types: " + StringUtil.join(", ", typeList));
+					
+					// add all properties of each type to our proposal list
+					for (String type : typeList)
+					{
+						this.addTypeProperties(proposals, type, offset);
+					}
+				}
+				else
+				{
+					// TEMP: Show types for debugging info
+					System.out.println("types: ");
 				}
 			}
 		}
@@ -377,7 +389,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	protected void addTypeProperties(Set<ICompletionProposal> proposals, String typeName, int offset)
 	{
 		// add properties
-		List<PropertyElement> properties = this._indexHelper.getCoreTypeProperties(typeName);
+		List<PropertyElement> properties = this._indexHelper.getCoreTypeProperties(typeName, PROPERTY_FIELDS);
 		
 		for (PropertyElement property : properties)
 		{
@@ -390,7 +402,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		
 		// add methods
-		List<FunctionElement> methods = this._indexHelper.getCoreTypeMethods(typeName);
+		List<FunctionElement> methods = this._indexHelper.getCoreTypeMethods(typeName, PROPERTY_FIELDS);
 		
 		for (FunctionElement method : methods)
 		{

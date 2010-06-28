@@ -218,7 +218,7 @@ public class JSIndexWriter
 		String documentPath = ""; //$NON-NLS-1$
 
 		// write type entry
-		String[] parentTypes = type.getParentTypes();
+		List<String> parentTypes = type.getParentTypes();
 		String descriptionKey = this.writeDescription(index, type.getDescription());
 		// SinceElement[] sinceList = type.getSinceList();
 		// UserAgentElement[] userAgents = type.getUserAgents();
@@ -227,7 +227,11 @@ public class JSIndexWriter
 		String value = StringUtil.join(
 			JSIndexConstants.DELIMITER,
 			type.getName(),
-			(parentTypes.length > 0) ? StringUtil.join(",", parentTypes) : "Object", //$NON-NLS-1$ //$NON-NLS-2$
+			(parentTypes != null && parentTypes.size() > 0)
+				? StringUtil.join(",", parentTypes) //$NON-NLS-1$
+				: (type.equals("Object") == false) //$NON-NLS-1$
+					? "Object" //$NON-NLS-1$
+					: "",
 			descriptionKey
 		);
 
