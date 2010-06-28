@@ -238,47 +238,24 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			
 			if (localScope != null)
 			{
-				List<String> typeList = null;
+				List<String> typeList = Collections.emptyList();
 				
 				// lookup in current file
 				IParseNode lhs = node.getLeftHandSide();
 				
-				if (lhs != null)
+				if (lhs instanceof JSNode)
 				{
 					JSTypeWalker typeWalker = new JSTypeWalker(localScope);
 					
-					typeWalker.visit(lhs);
+					typeWalker.visit((JSNode) lhs);
 					
 					typeList = typeWalker.getTypes();
 				}
 				
-				// lookup in project
-				if (typeList == null || typeList.isEmpty())
-				{
-					typeList = new LinkedList<String>();
-					
-					// TEMP: for debugging
-					String name = this._targetNode.getFirstChild().getText();
-					
-					Index index = this.getIndex();
-					PropertyElement property = this._indexHelper.getProjectGlobal(index, name);
-					
-					if (property != null)
-					{
-						for (ReturnTypeElement typeElement : property.getTypes())
-						{
-							String type = typeElement.getType();
-							
-							if (typeList.contains(type) == false)
-							{
-								typeList.add(type);
-							}
-						}
-					}
-				}
-				
+				// TEMP: Show types for debugging info
 				System.out.println("types: " + StringUtil.join(", ", typeList));
 				
+				// add all properties of each type to our proposal list
 				for (String type : typeList)
 				{
 					this.addTypeProperties(proposals, type, offset);
@@ -402,7 +379,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	protected void addTypeProperties(Set<ICompletionProposal> proposals, String typeName, int offset)
 	{
 		// add properties
-		List<PropertyElement> properties = this._indexHelper.getTypeProperties(this.getIndex(), typeName);
+		List<PropertyElement> properties = this._indexHelper.getCoreTypeProperties(typeName);
 		
 		for (PropertyElement property : properties)
 		{
@@ -415,7 +392,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		
 		// add methods
-		List<FunctionElement> methods = this._indexHelper.getTypeMethods(this.getIndex(), typeName);
+		List<FunctionElement> methods = this._indexHelper.getCoreTypeMethods(typeName);
 		
 		for (FunctionElement method : methods)
 		{
