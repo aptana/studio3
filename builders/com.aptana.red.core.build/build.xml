@@ -57,13 +57,8 @@
         ================================= -->
 	<target name="categorize" description="categorize the update site">
 		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="yes">
-			<arg line="-application org.eclipse.equinox.p2.publisher.CategoryPublisher -nosplash -console -consolelog -metadataRepository file:${deploy.dir} -categoryDefinition file:${deploy.dir}/site.xml" />
+			<arg line="-application org.eclipse.equinox.p2.metadata.generator.EclipseGenerator -nosplash -consolelog -updateSite ${deploy.dir} -site file:${deploy.dir}/site.xml -metadataRepository file:${deploy.dir} -metadataRepositoryName &quot;Aptana Studio 3 Core Update Site&quot; -artifactRepository file:${deploy.dir} -artifactRepositoryName &quot;Aptana Studio 3 Core Artifacts&quot; -publishArtifacts -publishArtifactRepository -compress -reusePack200Files -noDefaultIUs -vmargs -Xmx256m" />
 		</java>
-		<!-- Re-JAR the content.xml file! -->
-		<jar destfile="${deploy.dir}/content.jar">
-			<fileset file="${deploy.dir}/content.xml" />
-		</jar>
-		<delete file="${deploy.dir}/content.xml" />
 	</target>
 
 	<!-- ================================= 
