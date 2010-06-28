@@ -1696,6 +1696,8 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		// disables the options when sync has started
 		directionBar.setEnabled(false);
 		optionsBar.setEnabled(false);
+		right_arrow.setEnabled(false);
+		left_arrow.setEnabled(false);
 
 		List<VirtualFileSyncPair> pairs = new ArrayList<VirtualFileSyncPair>();
 		ISyncResource[] resources = syncViewer.getCurrentResources();
@@ -1790,6 +1792,8 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 						synced.setVisible(true);
 						setEnabled(false);
 						swappable.layout(true, true);
+						right_arrow.setEnabled(true);
+						left_arrow.setEnabled(true);
 
 						saveLog.setEnabled(true);
 					}
