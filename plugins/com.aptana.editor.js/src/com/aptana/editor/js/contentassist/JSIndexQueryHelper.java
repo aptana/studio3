@@ -24,24 +24,68 @@ public class JSIndexQueryHelper
 	}
 	
 	/**
+	 * getCoreGlobal
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public PropertyElement getCoreGlobal(String name)
+	{
+		return this.getCoreTypeProperty("Window", name);
+	}
+	
+	/**
 	 * getGlobals
 	 * 
 	 * @return
 	 */
 	public List<PropertyElement> getCoreGlobals()
 	{
-		List<PropertyElement> result = null;
-		
-		try
-		{
-			result = this._reader.getTypeProperties(this.getIndex(), "Window"); //$NON-NLS-1$
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-		
-		return result;
+		return this.getTypeProperties(this.getIndex(), "Window");
+	}
+	
+	/**
+	 * getCoreTypeMethods
+	 * 
+	 * @param typeName
+	 * @return
+	 */
+	public List<FunctionElement> getCoreTypeMethods(String typeName)
+	{
+		return this.getTypeMethods(this.getIndex(), typeName);
+	}
+	
+	/**
+	 * getCoreTypeProperties
+	 * 
+	 * @param typeName
+	 * @return
+	 */
+	public List<PropertyElement> getCoreTypeProperties(String typeName)
+	{
+		return this.getTypeProperties(this.getIndex(), typeName);
+	}
+	
+	/**
+	 * getCoreTypeProperty
+	 * 
+	 * @param typeName
+	 * @param propertyName
+	 * @return
+	 */
+	public PropertyElement getCoreTypeProperty(String typeName, String propertyName)
+	{
+		return this.getTypeProperty(this.getIndex(), typeName, propertyName);
+	}
+	
+	/**
+	 * getIndex
+	 * 
+	 * @return
+	 */
+	private Index getIndex()
+	{
+		return IndexManager.getInstance().getIndex(JSIndexConstants.METADATA);
 	}
 	
 	/**
@@ -55,15 +99,14 @@ public class JSIndexQueryHelper
 	{
 		PropertyElement result = null;
 		
-		try
-		{
-			// check in core globals
-			result = this._reader.getProperty(this.getIndex(), "Window", name);
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+//		try
+//		{
+//			result = this._reader.getProperty(index, name);
+//		}
+//		catch (IOException e)
+//		{
+//			e.printStackTrace();
+//		}
 		
 		return result;
 	}
@@ -100,7 +143,7 @@ public class JSIndexQueryHelper
 		
 		try
 		{
-			result = this._reader.getFunctions(this.getIndex(), typeName);
+			result = this._reader.getFunctions(index, typeName);
 		}
 		catch (IOException e)
 		{
@@ -122,7 +165,7 @@ public class JSIndexQueryHelper
 		
 		try
 		{
-			result = this._reader.getProperties(this.getIndex(), typeName);
+			result = this._reader.getProperties(index, typeName);
 		}
 		catch (IOException e)
 		{
@@ -133,12 +176,27 @@ public class JSIndexQueryHelper
 	}
 	
 	/**
-	 * getIndex
+	 * getTypeProperty
 	 * 
+	 * @param index
+	 * @param typeName
+	 * @param propertyName
 	 * @return
 	 */
-	private Index getIndex()
+	public PropertyElement getTypeProperty(Index index, String typeName, String propertyName)
 	{
-		return IndexManager.getInstance().getIndex(JSIndexConstants.METADATA);
+		PropertyElement result = null;
+		
+		try
+		{
+			// check in core globals
+			result = this._reader.getProperty(index, typeName, propertyName);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return result;
 	}
 }
