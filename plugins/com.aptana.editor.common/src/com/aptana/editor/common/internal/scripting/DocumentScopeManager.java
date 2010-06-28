@@ -110,6 +110,8 @@ public class DocumentScopeManager implements IDocumentScopeManager
 
 	private QualifiedContentType getContentType(IDocument document, int offset) throws BadLocationException
 	{
+		if (document == null)
+			return UNKNOWN;
 		ExtendedDocumentInfo info = infos.get(document);
 		if (info != null)
 		{

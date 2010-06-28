@@ -9,6 +9,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 
 public class OpenTagCloserTest extends TestCase
 {
@@ -18,7 +20,11 @@ public class OpenTagCloserTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		viewer = new TextViewer(Display.getDefault().getActiveShell(), SWT.NONE);
+		Display display = PlatformUI.getWorkbench().getDisplay();
+		Shell shell = display.getActiveShell();
+		if (shell == null)
+			shell = new Shell(display);
+		viewer = new TextViewer(shell, SWT.NONE);
 	}
 
 	public void testDoesntCloseIfIsClosingTag()
@@ -102,7 +108,7 @@ public class OpenTagCloserTest extends TestCase
 		assertFalse(event.doit);
 		assertEquals(3, viewer.getSelectedRange().x);
 	}
-	
+
 	public void testDoesCloseProperlyWithOpenTagContaingAttrsIfNextCharIsLessThanAndWeNeedToClose()
 	{
 		IDocument document = setDocument("<a href=\"\">");
@@ -160,7 +166,7 @@ public class OpenTagCloserTest extends TestCase
 		assertEquals("<br /", document.get());
 		assertTrue(event.doit);
 	}
-	
+
 	public void testDoesntCloseSpecialERBTags()
 	{
 		IDocument document = setDocument("<%= %");
@@ -171,7 +177,7 @@ public class OpenTagCloserTest extends TestCase
 		assertEquals("<%= %", document.get());
 		assertTrue(event.doit);
 	}
-	
+
 	public void testDoesStickCursorBetweenAutoClosedTagPair()
 	{
 		IDocument document = setDocument("<html>");
@@ -184,7 +190,7 @@ public class OpenTagCloserTest extends TestCase
 		assertEquals(6, viewer.getTextWidget().getCaretOffset());
 		assertEquals(6, viewer.getSelectedRange().x);
 	}
-	
+
 	public void testDoesntCloseIfHasSpacesInOpenTagAndHasClosingTag()
 	{
 		IDocument document = setDocument("<script src=\"http://example.org/src.js\">\n\n</script>");
@@ -196,7 +202,7 @@ public class OpenTagCloserTest extends TestCase
 		assertFalse(event.doit); // don't insert it, we'll just overwrite '>'
 		assertEquals(40, viewer.getSelectedRange().x);
 	}
-	
+
 	protected VerifyEvent createGreaterThanKeyEvent(int offset)
 	{
 		Event e = new Event();

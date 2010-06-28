@@ -59,13 +59,15 @@
 		<delete dir="${bundle.dir.name}" failonerror="false"/>
 		<exec executable="/bin/bash" dir="bundles">
 			<arg value="-c" />
-			<arg value="git clone git@github.com:aptana/${bundle.name}.git ${bundle.dir.name}" />
+			<arg value="git clone git://github.com/aptana/${bundle.name}.git ${bundle.dir.name}" />
 		</exec>
 		<!-- Now checkout the revision of the bundle as of the latest commit date for red_core -->
 		<exec executable="/bin/bash" dir="bundles/${bundle.dir.name}">
 			<arg value="-c" />
 			<arg value="git checkout `git rev-list -n 1 --before=${last.commit.date} master`" />
 		</exec>
+		<!-- Now remove the .git subdirectory -->
+		<delete dir="bundles/${bundle.dir.name}/.git" quiet="true" />
 	</target>
 
 	<target name="pre.@dot">
@@ -138,6 +140,22 @@
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="yaml.ruble" />
 		  	<param name="bundle.dir.name" value="yaml.ruble" />
+		</antcall>
+		<antcall target="clone-bundle">
+			<param name="bundle.name" value="capistrano.ruble" />
+			<param name="bundle.dir.name" value="capistrano.ruble" />
+		</antcall>
+		<antcall target="clone-bundle">
+		  	<param name="bundle.name" value="heroku.ruble" />
+		  	<param name="bundle.dir.name" value="heroku.ruble" />
+		</antcall>
+		<antcall target="clone-bundle">
+        <param name="bundle.name" value="shell-script.ruble" />
+        <param name="bundle.dir.name" value="shell-script.ruble" />
+    </antcall>
+		<antcall target="clone-bundle">
+		    <param name="bundle.name" value="zen-coding.ruble" />
+		    <param name="bundle.dir.name" value="zen-coding.ruble" />
 		</antcall>
 	</target>
 

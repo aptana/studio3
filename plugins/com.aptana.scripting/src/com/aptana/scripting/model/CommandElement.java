@@ -1,7 +1,6 @@
 package com.aptana.scripting.model;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,6 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.jruby.Ruby;
@@ -18,6 +19,7 @@ import org.jruby.exceptions.RaiseException;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
+import com.aptana.core.ShellExecutable;
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptUtils;
@@ -25,12 +27,15 @@ import com.aptana.scripting.ScriptingEngine;
 
 public class CommandElement extends AbstractBundleElement
 {
-	private static interface InvokeUnion {
+	private static interface InvokeUnion
+	{
 		String getInvoke();
+
 		RubyProc getInvokeBlock();
 	}
 
-	private static final class Invoke implements InvokeUnion {
+	private static final class Invoke implements InvokeUnion
+	{
 		private final String _invoke;
 
 		private Invoke(String invoke)
@@ -54,7 +59,8 @@ public class CommandElement extends AbstractBundleElement
 		}
 	}
 
-	private static final class InvokeBlock implements InvokeUnion {
+	private static final class InvokeBlock implements InvokeUnion
+	{
 		private final RubyProc _invokeBlock;
 
 		private InvokeBlock(RubyProc invokeBlock)
@@ -111,7 +117,7 @@ public class CommandElement extends AbstractBundleElement
 	private RunType _runType;
 	private Ruby _runtime;
 
-	private String _workingDirectoryPath;
+	private IPath _workingDirectoryPath;
 	private WorkingDirectoryType _workingDirectoryType;
 
 	/**
@@ -179,7 +185,9 @@ public class CommandElement extends AbstractBundleElement
 				// create output stream and attach to context
 				context.setOutputStream(new ByteArrayOutputStream());
 
-				job = new CommandBlockRunner(this, context, this.getOwningBundle().getLoadPaths());
+				BundleElement bundle = this.getOwningBundle();
+				String bundleName = bundle.getDisplayName();
+				job = new CommandBlockRunner(this, context, BundleManager.getInstance().getBundleLoadPaths(bundleName));
 			}
 
 			// run the job, if we have one
@@ -455,23 +463,24 @@ public class CommandElement extends AbstractBundleElement
 	 * 
 	 * @return
 	 */
-	public String getWorkingDirectory()
+	public IPath getWorkingDirectory()
 	{
 		switch (this._workingDirectoryType)
 		{
 			case PATH:
 			case CURRENT_PROJECT:
-				// This case is handled specially because of bundle dependencies. The App Explorer plugin will look for this type and will turn it into a PATH type and set the path to the current project
+				// This case is handled specially because of bundle dependencies. The App Explorer plugin will look for
+				// this type and will turn it into a PATH type and set the path to the current project
 				return this._workingDirectoryPath;
 			case CURRENT_BUNDLE:
-				return getOwningBundle().getBundleDirectory().toString();
+				return Path.fromOSString(getOwningBundle().getBundleDirectory().getAbsolutePath());
 			case UNDEFINED:
 			case CURRENT_FILE:
 			default:
-				return new File(this.getPath()).getParentFile().toString();
+				return Path.fromOSString(this.getPath()).removeLastSegments(1);
 		}
 	}
-	
+
 	public WorkingDirectoryType getWorkingDirectoryType()
 	{
 		return this._workingDirectoryType;
@@ -523,8 +532,10 @@ public class CommandElement extends AbstractBundleElement
 	 * @param contextMap
 	 * @param environment
 	 */
+	@SuppressWarnings("deprecation")
 	void populateEnvironment(Map<String, Object> contextMap, Map<String, String> environment)
 	{
+		environment.putAll(ShellExecutable.getEnvironment());
 		for (Map.Entry<String, Object> entry : contextMap.entrySet())
 		{
 			Object valueObject = entry.getValue();
@@ -833,8 +844,15 @@ public class CommandElement extends AbstractBundleElement
 			{
 				this._keyBindings = new HashMap<Platform, String[]>();
 			}
-
-			this._keyBindings.put(bindingOS, keyBindings);
+			
+			// Force each string to be uppercase, http://aptana.lighthouseapp.com/projects/45260/tickets/393
+			int i = 0;
+			String[] uppercase = new String[keyBindings.length];
+			for(String binding : keyBindings)
+			{
+				uppercase[i++] = binding.toUpperCase();
+			}
+			this._keyBindings.put(bindingOS, uppercase);
 		}
 		else
 		{
@@ -940,7 +958,7 @@ public class CommandElement extends AbstractBundleElement
 	 * 
 	 * @param path
 	 */
-	public void setWorkingDirectoryPath(String path)
+	public void setWorkingDirectoryPath(IPath path)
 	{
 		this._workingDirectoryPath = path;
 	}

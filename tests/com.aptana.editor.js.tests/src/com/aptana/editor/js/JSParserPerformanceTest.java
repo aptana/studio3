@@ -28,7 +28,7 @@ public class JSParserPerformanceTest extends TestCase
 
 	public void testTime() throws Exception
 	{
-		InputStream stream = getClass().getResourceAsStream("dojo.js.uncompressed.js");
+		InputStream stream = getClass().getResourceAsStream("tiny_mce.js");
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		int read = -1;
 		while ((read = stream.read()) != -1)

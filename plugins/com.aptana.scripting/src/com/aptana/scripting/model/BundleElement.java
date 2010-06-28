@@ -4,18 +4,17 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.jruby.RubyRegexp;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.scope.ScopeSelector;
-import com.aptana.util.StringUtil;
 
 public class BundleElement extends AbstractElement
 {
-	private static final String BUNDLE_DIRECTORY_SUFFIX = ".ruble"; //$NON-NLS-1$
-
 	private String _author;
 	private String _copyright;
 	private String _description;
@@ -264,22 +263,7 @@ public class BundleElement extends AbstractElement
 	 */
 	protected String getDefaultName()
 	{
-		String path = this.getPath();
-		String result = null;
-
-		if (path != null && path.length() > 0)
-		{
-			File file = new File(path).getParentFile();
-
-			result = file.getName();
-
-			if (result.endsWith(BUNDLE_DIRECTORY_SUFFIX))
-			{
-				result = result.substring(0, result.length() - BUNDLE_DIRECTORY_SUFFIX.length());
-			}
-		}
-
-		return result;
+		return BundleUtils.getDefaultBundleName(this.getPath());
 	}
 
 	/**
@@ -414,9 +398,11 @@ public class BundleElement extends AbstractElement
 	 */
 	public List<String> getLoadPaths()
 	{
-		File bundleDirectory = new File(this.getPath()).getParentFile();
+		List<String> result = new LinkedList<String>();
+		
+		result.add(BundleUtils.getBundleLibDirectory(this.getBundleDirectory()));
 
-		return BundleManager.getInstance().getBundleLoadPaths(bundleDirectory);
+		return result;
 	}
 
 	/**

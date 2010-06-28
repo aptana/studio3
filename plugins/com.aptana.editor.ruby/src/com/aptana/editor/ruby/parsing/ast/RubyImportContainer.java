@@ -2,6 +2,7 @@ package com.aptana.editor.ruby.parsing.ast;
 
 import com.aptana.editor.ruby.core.IImportContainer;
 import com.aptana.editor.ruby.core.IRubyElement;
+import com.aptana.parsing.ast.IParseNode;
 
 public class RubyImportContainer extends RubyElement implements IImportContainer
 {
@@ -15,7 +16,7 @@ public class RubyImportContainer extends RubyElement implements IImportContainer
 	}
 
 	@Override
-	public short getType()
+	public short getNodeType()
 	{
 		return IRubyElement.IMPORT_CONTAINER;
 	}
@@ -23,7 +24,7 @@ public class RubyImportContainer extends RubyElement implements IImportContainer
 	@Override
 	public int getStart()
 	{
-		if (getChildrenCount() == 0)
+		if (getChildCount() == 0)
 		{
 			return super.getStart();
 		}
@@ -33,12 +34,26 @@ public class RubyImportContainer extends RubyElement implements IImportContainer
 	@Override
 	public int getEnd()
 	{
-		int size = getChildrenCount();
+		int size = getChildCount();
 		if (size == 0)
 		{
 			return super.getEnd();
 		}
 		return getChild(size - 1).getEndingOffset();
+	}
+
+	@Override
+	public IParseNode getNodeAtOffset(int offset)
+	{
+		IParseNode[] children = getChildren();
+		for (IParseNode child : children)
+		{
+			if (child.getStartingOffset() <= offset && offset <= child.getEndingOffset())
+			{
+				return child.getNodeAtOffset(offset);
+			}
+		}
+		return null;
 	}
 
 	@Override

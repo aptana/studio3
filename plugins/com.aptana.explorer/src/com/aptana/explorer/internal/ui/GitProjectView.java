@@ -1,22 +1,30 @@
 package com.aptana.explorer.internal.ui;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ContributionItem;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -40,6 +48,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.team.core.RepositoryProvider;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
@@ -48,13 +57,15 @@ import org.eclipse.ui.navigator.ICommonMenuConstants;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.explorer.ExplorerPlugin;
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.BranchAddedEvent;
 import com.aptana.git.core.model.BranchChangedEvent;
 import com.aptana.git.core.model.BranchRemovedEvent;
 import com.aptana.git.core.model.ChangedFile;
-import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.IGitRepositoriesListener;
 import com.aptana.git.core.model.IGitRepositoryListener;
+import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.core.model.IndexChangedEvent;
 import com.aptana.git.core.model.PullEvent;
 import com.aptana.git.core.model.PushEvent;
@@ -84,9 +95,11 @@ import com.aptana.git.ui.dialogs.CreateBranchDialog;
  * 
  * @author cwilliams
  */
-class GitProjectView extends SingleProjectView implements IGitRepositoryListener
+class GitProjectView extends SingleProjectView implements IGitRepositoryListener, IGitRepositoriesListener
 {
+	private static final String DIRTY_SUFFIX = "*";
 	private static final String GIT_CHANGED_FILES_FILTER = "GitChangedFilesFilterEnabled"; //$NON-NLS-1$
+	private static final String PROJECT_DELIMITER = "######"; //$NON-NLS-1$
 	private static final String COMMIT_ICON_PATH = "icons/full/elcl16/disk.png"; //$NON-NLS-1$
 	private static final String PUSH_ICON_PATH = "icons/full/elcl16/arrow_right.png"; //$NON-NLS-1$
 	private static final String PULL_ICON_PATH = "icons/full/elcl16/arrow_left.png"; //$NON-NLS-1$
@@ -114,19 +127,25 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	private Menu branchesMenu;
 
 	private GitChangedFilesFilter fChangedFilesFilter;
-	private boolean filterOnInitially;
+	// keeps the list of projects which has turned on the changed files filter
+	private Set<IProject> fChangedFilesFilterProjects;
 	private Job pullCalc;
 	private HashMap<String, Boolean> branchToPullIndicator = new HashMap<String, Boolean>();
 	private UIJob refreshUIJob;
+
+	public GitProjectView()
+	{
+		fChangedFilesFilterProjects = new HashSet<IProject>();
+	}
 
 	@Override
 	public void createPartControl(Composite aParent)
 	{
 		super.createPartControl(aParent);
 
-		GitRepository.addListener(this);
+		getGitRepositoryManager().addListener(this);
 
-		if (filterOnInitially)
+		if (fChangedFilesFilterProjects.contains(selectedProject))
 		{
 			UIJob job = new UIJob("Turn on git filter initially") //$NON-NLS-1$
 			{
@@ -153,7 +172,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 				if (monitor != null && monitor.isCanceled())
 					return Status.CANCEL_STATUS;
 
-				GitRepository repo = GitRepository.getAttached(selectedProject);
+				GitRepository repo = getGitRepositoryManager().getAttached(selectedProject);
 				if (repo == null)
 				{
 					schedule(5 * 60 * 1000); // reschedule for 5 minutes after we return!
@@ -166,9 +185,13 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 				synchronized (branchToPullIndicator)
 				{
 					branchToPullIndicator.clear();
-					for (String branch : repo.localBranches())
+				}
+				for (String branch : repo.localBranches())
+				{
+					boolean shouldPull = repo.shouldPull(branch);
+					synchronized (branchToPullIndicator)
 					{
-						branchToPullIndicator.put(branch, repo.shouldPull(branch));
+						branchToPullIndicator.put(branch, shouldPull);
 					}
 				}
 
@@ -231,9 +254,9 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	{
 		super.fillCommandsMenu(menuManager);
 
-		if (selectedProject == null || !selectedProject.exists())
+		if (selectedProject == null || !selectedProject.isAccessible())
 			return;
-		final GitRepository repository = GitRepository.getAttached(selectedProject);
+		final GitRepository repository = getGitRepositoryManager().getAttached(selectedProject);
 		if (repository != null)
 		{
 			// Set up Git groups
@@ -308,7 +331,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			{
 				if (repository == null)
 				{
-					createAttachRepoMenuItem(menu);
+					createAttachRepoMenuItem(menu, -1);
 				}
 				else
 				{
@@ -333,7 +356,13 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	@Override
 	public void dispose()
 	{
-		GitRepository.removeListener(this);
+		if (selectedProject != null)
+		{
+			GitRepository repo = getGitRepositoryManager().getAttached(selectedProject);
+			if (repo != null)
+				repo.removeListener(this);
+		}
+		getGitRepositoryManager().removeListener(this);
 
 		branchToPullIndicator = null;
 		if (pullCalc != null)
@@ -379,13 +408,18 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		{
 			getCommonViewer().removeFilter(fChangedFilesFilter);
 			fChangedFilesFilter = null;
+			fChangedFilesFilterProjects.remove(selectedProject);
 		}
 		super.removeFilter();
 	}
 
-	private void createAttachRepoMenuItem(Menu menu)
+	private void createAttachRepoMenuItem(Menu menu, int index)
 	{
-		MenuItem createRepo = new MenuItem(menu, SWT.PUSH);
+		if (index < 0)
+		{
+			index = menu.getItemCount();
+		}
+		MenuItem createRepo = new MenuItem(menu, SWT.PUSH, index);
 		createRepo.setText(Messages.GitProjectView_AttachGitRepo_button);
 		createRepo.addSelectionListener(new SelectionAdapter()
 		{
@@ -400,23 +434,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 						SubMonitor sub = SubMonitor.convert(monitor, 100);
 						try
 						{
-							if (GitExecutable.instance() == null)
-							{
-								throw new CoreException(new Status(IStatus.ERROR, ExplorerPlugin.PLUGIN_ID,
-										Messages.GitProjectView_UnableToFindGitExecutableError));
-							}
-
-							GitRepository repo = GitRepository.getUnattachedExisting(selectedProject.getLocationURI());
-							if (repo == null)
-							{
-								if (sub.isCanceled())
-									return Status.CANCEL_STATUS;
-								GitRepository.create(selectedProject.getLocationURI().getPath());
-							}
-							sub.worked(50);
-							if (sub.isCanceled())
-								return Status.CANCEL_STATUS;
-							GitRepository.attachExisting(selectedProject, sub.newChild(50));
+							getGitRepositoryManager().createOrAttach(selectedProject, sub);
 						}
 						catch (CoreException e)
 						{
@@ -445,24 +463,26 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		}
 		MenuItem commit = new MenuItem(menu, SWT.PUSH, index);
 		commit.setText(Messages.GitProjectView_DiffTooltip);
-		commit.setEnabled(GitRepository.getAttached(selectedProject) != null && !getSelectedFiles().isEmpty());
+		commit.setEnabled(getGitRepositoryManager().getAttached(selectedProject) != null
+				&& !getSelectedChangedFiles().isEmpty());
 		commit.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				GitRepository repo = GitRepository.getAttached(selectedProject);
+				GitRepository repo = getGitRepositoryManager().getAttached(selectedProject);
 				if (repo == null)
 					return;
 
 				Map<String, String> diffs = new HashMap<String, String>();
-				Set<IResource> resources = getSelectedFiles();
-				for (IResource resource : resources)
+				List<ChangedFile> changedFiles = getSelectedChangedFiles();
+				for (ChangedFile file : changedFiles)
 				{
-					ChangedFile file = repo.getChangedFileForResource(resource);
 					if (file == null)
 						continue;
 
+					if (diffs.containsKey(file.getPath()))
+						continue; // already calculated diff...
 					String diff = repo.index().diffForFile(file, file.hasStagedChanges(), 3);
 					diffs.put(file.getPath(), diff);
 				}
@@ -504,6 +524,20 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		});
 	}
 
+	private List<ChangedFile> getSelectedChangedFiles()
+	{
+		GitRepository repo = getGitRepositoryManager().getAttached(selectedProject);
+		List<ChangedFile> changedFiles = new ArrayList<ChangedFile>();
+		if (repo != null)
+		{
+			for (IResource resource : getSelectedFiles())
+			{
+				changedFiles.addAll(getChangedFilesForResource(repo, resource));
+			}
+		}
+		return changedFiles;
+	}
+
 	private void createRevertMenuItem(Menu menu, int index)
 	{
 		createSimpleGitAction(menu, index, getSelectedUnstagedFiles(), Messages.GitProjectView_RevertTooltip,
@@ -525,17 +559,23 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	protected Set<IResource> getSelectedStagedFiles()
 	{
 		// Limit to only those changed files which have staged changes
-		GitRepository repo = GitRepository.getAttached(selectedProject);
+		GitRepository repo = getGitRepositoryManager().getAttached(selectedProject);
 		final Set<IResource> selected = new HashSet<IResource>();
 		if (repo != null)
 		{
 			for (IResource resource : getSelectedFiles())
 			{
-				ChangedFile changedFile = repo.getChangedFileForResource(resource);
-				if (changedFile == null)
-					continue;
-				if (changedFile.hasStagedChanges())
-					selected.add(resource);
+				List<ChangedFile> changedFiles = getChangedFilesForResource(repo, resource);
+				for (ChangedFile changedFile : changedFiles)
+				{
+					if (changedFile == null)
+						continue;
+					if (changedFile.hasStagedChanges())
+					{
+						selected.add(resource);
+						break;
+					}
+				}
 			}
 		}
 		return selected;
@@ -543,20 +583,42 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 
 	protected Set<IResource> getSelectedUnstagedFiles()
 	{
-		GitRepository repo = GitRepository.getAttached(selectedProject);
+		GitRepository repo = getGitRepositoryManager().getAttached(selectedProject);
 		final Set<IResource> selected = new HashSet<IResource>();
 		if (repo != null)
 		{
 			for (IResource resource : getSelectedFiles())
 			{
-				ChangedFile changedFile = repo.getChangedFileForResource(resource);
-				if (changedFile == null)
-					continue;
-				if (changedFile.hasUnstagedChanges())
-					selected.add(resource);
+				List<ChangedFile> changedFiles = getChangedFilesForResource(repo, resource);
+				for (ChangedFile changedFile : changedFiles)
+				{
+					if (changedFile == null)
+						continue;
+					if (changedFile.hasUnstagedChanges())
+					{
+						selected.add(resource);
+						break;
+					}
+				}
 			}
 		}
 		return selected;
+	}
+
+	private List<ChangedFile> getChangedFilesForResource(GitRepository repo, IResource resource)
+	{
+		List<ChangedFile> files = new ArrayList<ChangedFile>();
+		if (resource instanceof IContainer)
+		{
+			files.addAll(repo.getChangedFilesForContainer((IContainer) resource));
+		}
+		else
+		{
+			ChangedFile changedFile = repo.getChangedFileForResource(resource);
+			if (changedFile != null)
+				files.add(changedFile);
+		}
+		return files;
 	}
 
 	private void createSimpleGitAction(Menu menu, int index, final Set<IResource> selected, String tooltip,
@@ -582,7 +644,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 					protected IStatus run(IProgressMonitor monitor)
 					{
 						action.run();
-						refreshUI(GitRepository.getAttached(selectedProject));
+						refreshUI(getGitRepositoryManager().getAttached(selectedProject));
 						return Status.OK_STATUS;
 					}
 				};
@@ -733,7 +795,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 					protected IStatus run(IProgressMonitor monitor)
 					{
 						action.run();
-						refreshUI(GitRepository.getAttached(selectedProject));
+						refreshUI(getGitRepositoryManager().getAttached(selectedProject));
 						return Status.OK_STATUS;
 					}
 				};
@@ -763,7 +825,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 					protected IStatus run(IProgressMonitor monitor)
 					{
 						action.run();
-						refreshUI(GitRepository.getAttached(selectedProject));
+						refreshUI(getGitRepositoryManager().getAttached(selectedProject));
 						return Status.OK_STATUS;
 					}
 				};
@@ -784,12 +846,15 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			public void widgetSelected(SelectionEvent e)
 			{
 				final DisconnectAction action = new DisconnectAction();
-				action.selectionChanged(null, new StructuredSelection(selectedProject));
-				Job job = new Job(Messages.GitProjectView_DisconnectJobTitle)
+				IAction duh = new Action()
+				{
+				};
+				action.setActivePart(duh, GitProjectView.this);
+				UIJob job = new UIJob(Messages.GitProjectView_DisconnectJobTitle)
 				{
 
 					@Override
-					protected IStatus run(IProgressMonitor monitor)
+					public IStatus runInUIThread(IProgressMonitor monitor)
 					{
 						action.run();
 						refreshUI(null);
@@ -815,6 +880,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			{
 				final ShowResourceInHistoryAction action = new ShowResourceInHistoryAction();
 				action.selectionChanged(null, new StructuredSelection(getSelectedFiles().toArray()));
+				action.run(null);
 			}
 		});
 	}
@@ -823,20 +889,21 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	{
 		MenuItem showGitHubNetwork = new MenuItem(menu, SWT.PUSH);
 		showGitHubNetwork.setText(Messages.GitProjectView_LBL_ShowGitHubNetwork);
+		final GithubNetworkAction action = new GithubNetworkAction();
+		action.selectionChanged(null, new StructuredSelection(selectedProject));
 		showGitHubNetwork.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				final GithubNetworkAction action = new GithubNetworkAction();
-				action.selectionChanged(null, new StructuredSelection(selectedProject));
+
 				Job job = new UIJob(Messages.GitProjectView_ShowGitHubNetworkJobTitle)
 				{
 					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor)
 					{
 						action.run();
-						refreshUI(GitRepository.getAttached(selectedProject));
+						refreshUI(getGitRepositoryManager().getAttached(selectedProject));
 						return Status.OK_STATUS;
 					}
 				};
@@ -845,6 +912,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 				job.schedule();
 			}
 		});
+		showGitHubNetwork.setEnabled(action.isEnabled());
 	}
 
 	protected boolean setNewBranch(String branchName)
@@ -852,7 +920,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		// Strip off the indicators...
 		branchName = stripIndicators(branchName);
 
-		final GitRepository repo = GitRepository.getAttached(selectedProject);
+		final GitRepository repo = getGitRepositoryManager().getAttached(selectedProject);
 		if (repo == null)
 			return false;
 		if (branchName.equals(repo.currentBranch()))
@@ -887,11 +955,11 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 
 	protected String stripIndicators(String branchName)
 	{
-		if (branchName.endsWith(" \u2192")) //$NON-NLS-1$
+		if (branchName.endsWith(" " + getRightArrowChar())) //$NON-NLS-1$
 			branchName = branchName.substring(0, branchName.length() - 2);
-		if (branchName.endsWith(" \u2190")) //$NON-NLS-1$
+		if (branchName.endsWith(" " + getLeftArrowChar())) //$NON-NLS-1$
 			branchName = branchName.substring(0, branchName.length() - 2);
-		if (branchName.endsWith("*")) //$NON-NLS-1$
+		if (branchName.endsWith(DIRTY_SUFFIX))
 			branchName = branchName.substring(0, branchName.length() - 1);
 		return branchName;
 	}
@@ -906,7 +974,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			{
 				String currentBranchName = repo.currentBranch();
 				if (repo.isDirty())
-					currentBranchName += "*"; //$NON-NLS-1$
+					currentBranchName += DIRTY_SUFFIX;
 				branchesToolItem.setText(currentBranchName);
 				MenuItem[] menuItems = branchesMenu.getItems();
 				for (MenuItem menuItem : menuItems)
@@ -926,13 +994,28 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	@Override
 	protected void projectChanged(IProject oldProject, IProject newProject)
 	{
-		super.projectChanged(oldProject, newProject);
-		if (fChangedFilesFilter != null)
+		GitRepository oldRepo = getGitRepositoryManager().getAttached(oldProject);
+		if (oldRepo != null)
 		{
-			removeFilter();
+			oldRepo.removeListener(this);
+		}
+
+		super.projectChanged(oldProject, newProject);
+
+		if (fChangedFilesFilterProjects.contains(newProject))
+		{
 			addGitChangedFilesFilter();
 		}
-		refreshUI(GitRepository.getAttached(newProject));
+		else
+		{
+			removeFilter();
+		}
+		GitRepository repo = getGitRepositoryManager().getAttached(newProject);
+		refreshUI(repo);
+		if (repo != null)
+		{
+			repo.addListener(this);
+		}
 	}
 
 	private void populateBranches(GitRepository repo, IProgressMonitor monitor) throws CoreException
@@ -953,6 +1036,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			throw new CoreException(Status.CANCEL_STATUS);
 
 		String currentBranchName = repo.currentBranch();
+		String tooltip = currentBranchName;
 		for (String branchName : repo.localBranches())
 		{
 			// Construct the menu item to for this project
@@ -960,19 +1044,26 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			String modifiedBranchName = branchName;
 			if (branchName.equals(currentBranchName) && repo.isDirty())
 			{
-				modifiedBranchName += "*"; //$NON-NLS-1$
+				modifiedBranchName += DIRTY_SUFFIX;
+				tooltip += Messages.GitProjectView_BranchDirtyTooltipMessage;
 			}
 
 			synchronized (branchToPullIndicator)
 			{
 				if (branchToPullIndicator.containsKey(branchName) && branchToPullIndicator.get(branchName))
 				{
-					modifiedBranchName += " \u2190"; // left arrow //$NON-NLS-1$
+					modifiedBranchName += " " + getLeftArrowChar(); //$NON-NLS-1$
+					if (branchName.equals(currentBranchName))
+						tooltip += Messages.GitProjectView_PullChangesTooltipMessage;
 				}
 			}
 			String[] ahead = repo.commitsAhead(branchName);
 			if (ahead != null && ahead.length > 0)
-				modifiedBranchName += " \u2192"; // right arrow //$NON-NLS-1$
+			{
+				modifiedBranchName += " " + getRightArrowChar(); //$NON-NLS-1$
+				if (branchName.equals(currentBranchName))
+					tooltip += Messages.GitProjectView_PushChangesTooltipMessage;
+			}
 
 			branchNameMenuItem.setText(modifiedBranchName);
 			branchNameMenuItem.setSelection(branchName.equals(currentBranchName));
@@ -1020,7 +1111,29 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			}
 		});
 		branchesToolItem.setText(currentBranchName);
+		if (tooltip != null)
+		{
+			branchesToolItem.setToolTipText(tooltip);
+		}
 		branchesToolbar.pack();
+	}
+
+	protected String getRightArrowChar()
+	{
+		if (Platform.getOS().equals(Platform.OS_MACOSX))
+		{
+			return "\u2192"; //$NON-NLS-1$
+		}
+		return "->"; //$NON-NLS-1$
+	}
+
+	protected String getLeftArrowChar()
+	{
+		if (Platform.getOS().equals(Platform.OS_MACOSX))
+		{
+			return "\u2190"; //$NON-NLS-1$
+		}
+		return "<-"; //$NON-NLS-1$
 	}
 
 	public void indexChanged(final IndexChangedEvent e)
@@ -1109,7 +1222,10 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	{
 		IProject changed = e.getProject();
 		if (changed != null && changed.equals(selectedProject))
+		{
 			refreshUI(e.getRepository());
+			e.getRepository().addListener(this);
+		}
 	}
 
 	public void branchChanged(BranchChangedEvent e)
@@ -1137,7 +1253,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 
 	private boolean isCurrentProjectsRepository(GitRepository repo)
 	{
-		GitRepository selectedRepo = GitRepository.getAttached(selectedProject);
+		GitRepository selectedRepo = getGitRepositoryManager().getAttached(selectedProject);
 		return selectedRepo != null && selectedRepo.equals(repo);
 	}
 
@@ -1145,22 +1261,37 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	{
 		IProject changed = e.getProject();
 		if (changed != null && changed.equals(selectedProject))
+		{
+			e.getRepository().removeListener(this);
 			refreshUI(null);
+		}
 	}
 
 	protected void addGitChangedFilesFilter()
 	{
+		removeFilter();
 		fChangedFilesFilter = new GitChangedFilesFilter();
 		getCommonViewer().addFilter(fChangedFilesFilter);
 		getCommonViewer().expandAll();
 		showFilterLabel(ExplorerPlugin.getImage(CHANGED_FILE_FILTER_ICON_PATH),
 				Messages.GitProjectView_ChangedFilesFilterTooltip);
+		fChangedFilesFilterProjects.add(selectedProject);
 	}
 
 	@Override
 	public void saveState(IMemento aMemento)
 	{
-		aMemento.putInteger(GIT_CHANGED_FILES_FILTER, (fChangedFilesFilter == null) ? 0 : 1);
+		StringBuilder text = new StringBuilder();
+		for (IProject project : fChangedFilesFilterProjects)
+		{
+			text.append(project.getName()).append(PROJECT_DELIMITER);
+		}
+		int length = text.length();
+		if (length > 0)
+		{
+			text.delete(length - PROJECT_DELIMITER.length(), length);
+		}
+		aMemento.putString(GIT_CHANGED_FILES_FILTER, text.toString());
 		super.saveState(aMemento);
 	}
 
@@ -1177,10 +1308,27 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		memento = aMemento;
 		if (memento != null)
 		{
-			Integer gitFilterEnabled = memento.getInteger(GIT_CHANGED_FILES_FILTER);
-			if (gitFilterEnabled != null && gitFilterEnabled.intValue() == 1)
+			String filteredProjects = memento.getString(GIT_CHANGED_FILES_FILTER);
+			if (filteredProjects != null && filteredProjects.length() > 0)
 			{
-				filterOnInitially = true;
+				String[] projectNames = filteredProjects.split(PROJECT_DELIMITER);
+				IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+				IProject project;
+				for (String name : projectNames)
+				{
+					try
+					{
+						project = workspaceRoot.getProject(name);
+						if (project.exists())
+						{
+							fChangedFilesFilterProjects.add(project);
+						}
+					}
+					catch (Exception e)
+					{
+						ExplorerPlugin.logError(e.getMessage(), e);
+					}
+				}
 			}
 		}
 	}
@@ -1212,7 +1360,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			final MenuItem branchNameMenuItem = new MenuItem(switchBranchesSubMenu, SWT.RADIO);
 			if (branchName.equals(currentBranchName) && repository.isDirty())
 			{
-				branchNameMenuItem.setText(branchName + "*"); //$NON-NLS-1$
+				branchNameMenuItem.setText(branchName + DIRTY_SUFFIX); //$NON-NLS-1$
 			}
 			else
 			{
@@ -1266,8 +1414,43 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	@Override
 	protected void mangleContextMenu(Menu menu)
 	{
+		GitRepository repo = getGitRepositoryManager().getAttached(selectedProject);
+		// Remove Team menu if project is attached to our git provider.
+		if (repo != null || selectedProject == null || !selectedProject.isAccessible())
+		{
+			Set<String> toRemove = new HashSet<String>();
+			toRemove.add("team.main"); //$NON-NLS-1$
+			removeMenuItems(menu, toRemove);
+		}
+		else
+		{
+			RepositoryProvider provider = RepositoryProvider.getProvider(selectedProject);
+			if (provider == null)
+			{
+				// no other provider, keep Team menu, but modify it's submenu
+				MenuItem[] menuItems = menu.getItems();
+				for (int i = 0; i < menuItems.length; i++)
+				{
+					MenuItem menuItem = menuItems[i];
+					Object data = menuItem.getData();
+					if (data instanceof IContributionItem)
+					{
+						IContributionItem contrib = (IContributionItem) data;
+						// Just replace team with initialize git repo
+						if ("team.main".equals(contrib.getId())) //$NON-NLS-1$
+						{
+							createAttachRepoMenuItem(menu, i + 1);
+							break;
+						}
+					}
+				}
+				Set<String> toRemove = new HashSet<String>();
+				toRemove.add("team.main"); //$NON-NLS-1$
+				removeMenuItems(menu, toRemove);
+			}
+		}
+		// Remove all the other stuff we normally do...
 		super.mangleContextMenu(menu);
-		GitRepository repo = GitRepository.getAttached(selectedProject);
 		if (repo == null)
 			return;
 
@@ -1310,5 +1493,10 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			}
 		}
 		return null;
+	}
+
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 }

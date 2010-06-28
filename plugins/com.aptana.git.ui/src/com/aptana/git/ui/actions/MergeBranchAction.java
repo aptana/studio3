@@ -3,9 +3,11 @@ package com.aptana.git.ui.actions;
 import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.jface.action.IAction;
@@ -20,6 +22,7 @@ import org.eclipse.swt.widgets.MenuItem;
 
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.internal.Launcher;
 import com.aptana.git.ui.internal.dialogs.BranchDialog;
 
@@ -35,7 +38,7 @@ public class MergeBranchAction extends MenuAction
 		if (resource == null)
 			return;
 
-		final GitRepository repo = GitRepository.getAttached(resource.getProject());
+		final GitRepository repo = getGitRepositoryManager().getAttached(resource.getProject());
 		if (repo == null)
 			return;
 
@@ -64,13 +67,27 @@ public class MergeBranchAction extends MenuAction
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				ILaunch launch = Launcher.launch(GitExecutable.instance().path(), repo.workingDirectory(), "merge", //$NON-NLS-1$
-						branchName);
-				while (!launch.isTerminated())
+				try
 				{
-					Thread.yield();
+					SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
+					ILaunch launch = Launcher.launch(GitExecutable.instance().path().toOSString(), repo.workingDirectory(), subMonitor.newChild(75), "merge", //$NON-NLS-1$
+							branchName);
+					while (!launch.isTerminated())
+					{
+						Thread.sleep(50);
+					}
+					repo.index().refresh(subMonitor.newChild(25));
 				}
-				repo.index().refresh();
+				catch (CoreException e)
+				{
+					GitUIPlugin.logError(e);
+					return e.getStatus();
+				}
+				catch (Throwable e)
+				{
+					GitUIPlugin.logError(e.getMessage(), e);
+					return new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage());
+				}
 				return Status.OK_STATUS;
 			}
 		};
@@ -86,7 +103,7 @@ public class MergeBranchAction extends MenuAction
 		if (resource == null)
 			return;
 
-		final GitRepository repo = GitRepository.getAttached(resource.getProject());
+		final GitRepository repo = getGitRepositoryManager().getAttached(resource.getProject());
 		if (repo == null)
 			return;
 

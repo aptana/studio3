@@ -64,31 +64,31 @@ public class CSSParser extends Parser implements IParser {
 		}
 	}
 
-    static final ParsingTables PARSING_TABLES = new ParsingTables(
-		"U9oTLbTqb4KK$lujw8eaOWGI2G6Zo6v8M598GB89f8e55Mo8W0KxbeXYvHmynrTVVF0Soml" +
-		"dsCM2YbXYxmsne1BiMB2B1JlNR#xCRYR97xEwET$SEtVkdU$EdVbd0WIhq80PQCL8b61FLA" +
-		"45zQZ4S1o0wUmtOmhIc8fgrA0MTPY694PfH1T6Op5ceGcp6P72xXfH41An52TY3nJXL9o0K" +
-		"rn48#ClnVbOWKNoAVR3PUZ0KRWSuz6ElH137CEm2tP5WXbbS10pYdWHDwEO4MKQiGywKU57" +
-		"Y62vSexbJ9Qp41VWGcTTXadMAa#hzMoCm#7O3MFaAOpevI3lP79KaYCgMvdXINsoidFjpJL" +
-		"RXeCzXb8SugnjQZqiou3ZoB0l9c9$784ZSzO5$NWpMLuimSauBOIt0cSuXbPbE5FthOjHTW" +
-		"wpFmjnLewXdWmppVx8a$B4WFqntajOVs2UVCRwryFyp6u2yqEzEzJZKFg2tfqvRmpmjlcQd" +
-		"ystqwjJMyvgwsH#1s8EgzEhjM42ohNVWRdKZY5drkTeNCJMp7GiH#nCVTakfdOwERjm2Ijp" +
-		"F2jZVkVWN9n76vmjuDbAiSO5F2TLN462AqZmF8zWlv0dToI$WoAUfL4yyMDuUXCQaUHu1S$" +
-		"h19x017SrhX6j8H4HxkHinjWzj17bZ4ynVZBtpEnlckEcQaOFMDC6rdC6gpfJCueoerbUH0" +
-		"VdIpDV6r76RywFWEONPKIMCyvJCDnP0y9QesfDy5iguKaUo$uuZwFAsyk1MTcvObopdIlm6" +
-		"6BCp5fJQetb65h8OCz5mhF61kLDiXV6synpuJEqQrIIKNOEuvNcTvXbI92XIVUdb7$zzyVk" +
-		"Pi1x8wuhvGr2dTvi2qAz0$MWBzi4ohBUb67UKHsn#PPvTKhbhBeAzTBgz6eSQKH6#u7HD3$" +
-		"dOyuhMpEJ6R4pzMKRJwsKd4dUNreP7JFtpoGagTbg0IjNwOU1JUPxCVfWqBC5b3cza5XcT4" +
-		"wxqzbgGc8wERw3ybhNlz79kKIBqnTQ6KJOD7gnvbxOPl9sVVct$8O2vn$DfZX$VzuSm1N4L" +
-		"Qw$chYUynIx$XedrvhIE7szu#BwWddErktaSjggd3w5#YAFw#eG$WtqcU$q5SH6f$SGMqBM" +
-		"jpIF6aptvYyY5WyLamMtOIknVMWEb3XPwUHr7dzHFzyhGtWsKvIxyRpp6oINTJx$$vyd6FB" +
-		"SmExln7wsRjhck7NzH76JDxPwa7ckSVA6F3XxyiWzUuPMMY4xvI$vK$wGt#Kt#LKjExJzXV" +
-		"YP#48#bsVb6UVDhEL7rROJFwZsaNoYyWDvd#qMUKVUbWTblJmWw#H#kK$kbRLoZzmjTycTw" +
-		"hTDUkHnUKmUbMxPBE$AU$AXc$rZ9xydlbFjM#8RrRuclY8soPkoKLwN3V8AUo$BI$AYlA0U" +
-		"pslxdBQtoQroYxmghyaQkKDkbpVa4NbO7f8lvItvcmuB#7O6V1aZ#ZhM389wtgaDYXXV7eC" +
-		"utvye4IECFeolKPI8yKsA4Z5zcwhqfRUlVQCYeZ93cQ6iewoZhALFBMDggJTHRwAzIVM0Tu" +
-		"95DUtLb6bzomBUr14YK5HGhw1CAY8EsNwKYFC$aK0npQ7TeRaVMZnC$O#ezD3c8VKFlud$T" +
-		"m==");
+	static final ParsingTables PARSING_TABLES = new ParsingTables(
+		"U9obLkTt55KK$ytE1Xo1H0n8mBX0B6H9Deb9I8naav2sAXRiKXGL2oAeO1SvyWTuZfpZ9p$" +
+		"b4oZOKEnTx0BsGYnOi5TYhrn$xxwtkyEoIwBEdD$SE$VTzkwxyzu0tlLeHWkwC1hZiIyIw4" +
+		"GJgZ42X#CmlhUZ1hMemw6eHmCQCGsL6AiMIx4Vpa07sZ235d6CL8lYF1Rdu2piWrASXpDnh" +
+		"hDefVqrM8OhSBfinq5OZbwSZ6in4JqOWoYAC0p3iHS2PfJ4KSme4h9OZJ9QnDHYCbAO6hQG" +
+		"dRXKO#vFJpPc2Ix3vI9EFaKsMhayQUGu0BEmDyRH$oZh7wVWIipDo6TIdetziMPx5MFxE0v" +
+		"7u#fTihKH9k1i5$aaZM2bvQoGbNQhzFXCX3cCS20EnY6OZVaPwO9mNDQXYd6hDUxvkWBXk4" +
+		"su08jq1IwK9tPR0QEzc1MUZnFa4rQuIHx74jK6JiohtGjp7KDTq7UAJwkDtRJjtCnbvvOAp" +
+		"JWhHKZQdP7QEfZh21p9sMUvRan21Unrh79TRiHqw4BMmNWwZIFMqqMu69UucDETp7HEBpM1" +
+		"KpcFfQJBC8#Lp79WvnIwKl3OSt7Mk9Zza#2y0yuxO9#Fudi9EteqluzIzjXOVWdZsDM1MbH" +
+		"oV2hxU18xC#2g5gb5LnwB25To1cti6bgB2jh7QL$5lCtwrdBSrDhm7bUYcQlGmhMOhXdvpA" +
+		"WZPD5BVxNCrrh4#2s6BQ3v#RH8nonYdut8oCrjvRxAoxWZJE1NLCcEjFvD9MepSe$ot6mdk" +
+		"jZ5$4h2iMs4Q2PoL2EafIETDAxI81EXan5ibqKPAIrDx18t4Uf8Jps6umRif1vTWNBUkIjW" +
+		"j8rD9NCt#GVKqHNcNb6SNrju6Lq#0yJuL6tIVDg#ZjYvnR8ppaf9itM8PtIr3ggbiyzo76b" +
+		"5KlIo72LsnDIXd7KmdZZYF9azPOgDoGwrCgFfeSxE0vMajf8PZhHT2boS1x1YfVr65fhlsl" +
+		"25eBq5n1nVGYmsF1tjTBBwF3OfZlz2kjgzhr#PtWc0JiVFTVH7eZLaQ$QJVfEfUz#nf$m60" +
+		"zCVpaVPqFMvLuDxDd2ZUx#1M4K$WNk$oT4Dn83Zrpcwd7fB7B$HnMUzlRYJrP2V7OgrDa$y" +
+		"hTH9Elu7OfFZDnFRyinlmH1gq1ZoNqei6imc3Ix3Tc9Wy1WOxsYresj2yKjoT5VbYTDFKf5" +
+		"h#r$0U3mLlFR$uyFv6JE4ULz7lSavidcKpNJpCltT5nhhA#2dRq$ZERfRXf3xBAUxmXBvM$" +
+		"wKF#Ht#Kr#rMyJyhC#VoAOetmcdyhJyfJJPkV9W78xYE#L#q0#Klg#lCVdE$AMl2dtotroh" +
+		"zmZ6#HkkKlMovroXzmkjwdUvz8lZycZyeWyB5lbRNbNjZdl7phw7V6jSjyGNolt5V4byOQy" +
+		"9Y$BAx95Dl7jHNb1dfVdLEDPVJwZprlaPbaZc#KbkLNMoLfvLHwI1#K1#K9Ubx#eC8TdggT" +
+		"$GntSHSt9MLy0JTntcnLHdZu6HJo3VFrFQr5#64yaduZoNFA9g9wB2VqBi7y2hOg8qYHfah" +
+		"IHj96qWJeDj6aWtqQ#ZV8svJtTpslqJy4dF9w74Vrpg2AjKkfnPuyGvgmpY3Yattqz0xl86" +
+		"qnpw75epq5d27N$4jKXT8SG$mS4WHW4");
 
 	static final Action RETURN3 = new Action() {
 		public Symbol reduce(Symbol[] _symbols, int offset) {
@@ -106,7 +106,7 @@ public class CSSParser extends Parser implements IParser {
 
 	private CSSScanner fScanner;
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })	
 	public CSSParser() {
 		super(PARSING_TABLES);
 		report = new CSSEvents();
@@ -114,30 +114,35 @@ public class CSSParser extends Parser implements IParser {
 
 		actions = new Action[] {
 			new Action() {	// [0] Program = Statements.p
-                public Symbol reduce(Symbol[] _symbols, int offset) {
+				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_p = _symbols[offset + 1];
 					final ArrayList _list_p = (ArrayList) _symbol_p.value;
 					final beaver.Symbol[] p = _list_p == null ? new beaver.Symbol[0] : (beaver.Symbol[]) _list_p.toArray(new beaver.Symbol[_list_p.size()]);
 					return new ParseRootNode(ICSSParserConstants.LANGUAGE, p, _symbol_p.getStart(), _symbol_p.getEnd());
 				}
 			},
-			new Action() {	// [1] Statements = Statements Statement
+			new Action() {	// [1] Program = 
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					return new ParseRootNode(ICSSParserConstants.LANGUAGE, new Symbol[0], 0, 0);
+				}
+			},
+			new Action() {	// [2] Statements = Statements Statement
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 2]); return _symbols[offset + 1];
 				}
 			},
-			new Action() {	// [2] Statements = Statement
+			new Action() {	// [3] Statements = Statement
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1]); return new Symbol(lst);
 				}
 			},
-			Action.RETURN,	// [3] Statement = CharSet
-			Action.RETURN,	// [4] Statement = Import
-			Action.RETURN,	// [5] Statement = Media
-			Action.RETURN,	// [6] Statement = Page
-			Action.RETURN,	// [7] Statement = AtRule
-			Action.RETURN,	// [8] Statement = Rule
-			new Action() {	// [9] CharSet = CHARSET.c STRING.s SEMICOLON.e
+			Action.RETURN,	// [4] Statement = CharSet
+			Action.RETURN,	// [5] Statement = Import
+			Action.RETURN,	// [6] Statement = Media
+			Action.RETURN,	// [7] Statement = Page
+			Action.RETURN,	// [8] Statement = AtRule
+			Action.RETURN,	// [9] Statement = Rule
+			new Action() {	// [10] CharSet = CHARSET.c STRING.s SEMICOLON.e
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol c = _symbols[offset + 1];
 					final Symbol _symbol_s = _symbols[offset + 2];
@@ -146,7 +151,7 @@ public class CSSParser extends Parser implements IParser {
 					return new CSSCharSetNode(s, c.getStart(), e.getEnd());
 				}
 			},
-			new Action() {	// [10] Import = IMPORT.i ImportWord.s SEMICOLON.e
+			new Action() {	// [11] Import = IMPORT.i ImportWord.s SEMICOLON.e
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol i = _symbols[offset + 1];
 					final Symbol _symbol_s = _symbols[offset + 2];
@@ -155,7 +160,7 @@ public class CSSParser extends Parser implements IParser {
 					return new CSSImportNode(s, i.getStart(), e.getEnd());
 				}
 			},
-			new Action() {	// [11] Import = IMPORT.i ImportWord.s List.m SEMICOLON.e
+			new Action() {	// [12] Import = IMPORT.i ImportWord.s List.m SEMICOLON.e
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol i = _symbols[offset + 1];
 					final Symbol _symbol_s = _symbols[offset + 2];
@@ -167,7 +172,7 @@ public class CSSParser extends Parser implements IParser {
 					return new CSSImportNode(s, m, i.getStart(), e.getEnd());
 				}
 			},
-			new Action() {	// [12] Media = MEDIA.m List.l LCURLY RCURLY.r
+			new Action() {	// [13] Media = MEDIA.m List.l LCURLY RCURLY.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol m = _symbols[offset + 1];
 					final Symbol _symbol_l = _symbols[offset + 2];
@@ -177,7 +182,7 @@ public class CSSParser extends Parser implements IParser {
 					return new CSSMediaNode(l, m.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [13] Media = MEDIA.m List.l LCURLY Statements RCURLY.r
+			new Action() {	// [14] Media = MEDIA.m List.l LCURLY Statements RCURLY.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol m = _symbols[offset + 1];
 					final Symbol _symbol_l = _symbols[offset + 2];
@@ -187,14 +192,14 @@ public class CSSParser extends Parser implements IParser {
 					return new CSSMediaNode(l, m.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [14] Page = PAGE.p LCURLY RCURLY.r
+			new Action() {	// [15] Page = PAGE.p LCURLY RCURLY.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol p = _symbols[offset + 1];
 					final Symbol r = _symbols[offset + 3];
 					return new CSSPageNode(p.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [15] Page = PAGE.p LCURLY Declarations.d RCURLY.r
+			new Action() {	// [16] Page = PAGE.p LCURLY Declarations.d RCURLY.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol p = _symbols[offset + 1];
 					final Symbol d = _symbols[offset + 3];
@@ -202,7 +207,7 @@ public class CSSParser extends Parser implements IParser {
 					return new CSSPageNode(d.value, p.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [16] Page = PAGE.p COLON IDENTIFIER.s LCURLY RCURLY.r
+			new Action() {	// [17] Page = PAGE.p COLON IDENTIFIER.s LCURLY RCURLY.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol p = _symbols[offset + 1];
 					final Symbol _symbol_s = _symbols[offset + 3];
@@ -211,7 +216,7 @@ public class CSSParser extends Parser implements IParser {
 					return new CSSPageNode(s, p.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [17] Page = PAGE.p COLON IDENTIFIER.s LCURLY Declarations.d RCURLY.r
+			new Action() {	// [18] Page = PAGE.p COLON IDENTIFIER.s LCURLY Declarations.d RCURLY.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol p = _symbols[offset + 1];
 					final Symbol _symbol_s = _symbols[offset + 3];
@@ -221,9 +226,9 @@ public class CSSParser extends Parser implements IParser {
 					return new CSSPageNode(s, d.value, p.getStart(), r.getEnd());
 				}
 			},
-			RETURN3,	// [18] AtRule = AT_KEYWORD STRING SEMICOLON; returns 'SEMICOLON' although none is marked
-			RETURN4,	// [19] AtRule = AT_KEYWORD STRING LCURLY RCURLY; returns 'RCURLY' although none is marked
-			new Action() {	// [20] Rule = Selectors.s LCURLY RCURLY.r
+			RETURN3,	// [19] AtRule = AT_KEYWORD STRING SEMICOLON; returns 'SEMICOLON' although none is marked
+			RETURN4,	// [20] AtRule = AT_KEYWORD STRING LCURLY RCURLY; returns 'RCURLY' although none is marked
+			new Action() {	// [21] Rule = Selectors.s LCURLY RCURLY.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_s = _symbols[offset + 1];
 					final ArrayList _list_s = (ArrayList) _symbol_s.value;
@@ -232,7 +237,7 @@ public class CSSParser extends Parser implements IParser {
 					return new CSSRuleNode(s, r.getEnd());
 				}
 			},
-			new Action() {	// [21] Rule = Selectors.s LCURLY Declarations.d RCURLY.r
+			new Action() {	// [22] Rule = Selectors.s LCURLY Declarations.d RCURLY.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_s = _symbols[offset + 1];
 					final ArrayList _list_s = (ArrayList) _symbol_s.value;
@@ -242,8 +247,8 @@ public class CSSParser extends Parser implements IParser {
 					return new CSSRuleNode(s, d.value, r.getEnd());
 				}
 			},
-			Action.RETURN,	// [22] Rule = error
-			new Action() {	// [23] Function = FUNCTION.l Expression.e RPAREN.r
+			Action.RETURN,	// [23] Rule = error
+			new Action() {	// [24] Function = FUNCTION.l Expression.e RPAREN.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 2];
@@ -252,18 +257,18 @@ public class CSSParser extends Parser implements IParser {
 					return new CSSFunctionNode(e, l.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [24] List = List COMMA IDENTIFIER
+			new Action() {	// [25] List = List COMMA IDENTIFIER
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3].value); return _symbols[offset + 1];
 				}
 			},
-			new Action() {	// [25] List = IDENTIFIER
+			new Action() {	// [26] List = IDENTIFIER
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 				}
 			},
-			Action.RETURN,	// [26] Declarations = Subdeclarations
-			new Action() {	// [27] Declarations = Subdeclarations.l Declaration2.d
+			Action.RETURN,	// [27] Declarations = Subdeclarations
+			new Action() {	// [28] Declarations = Subdeclarations.l Declaration2.d
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final ArrayList _list_l = (ArrayList) _symbol_l.value;
@@ -272,32 +277,32 @@ public class CSSParser extends Parser implements IParser {
 					_list_l.add(d); return _symbol_l;
 				}
 			},
-			Action.RETURN,	// [28] Declarations = Declaration2
-			new Action() {	// [29] Subdeclarations = Subdeclarations Declaration
+			Action.RETURN,	// [29] Declarations = Declaration2
+			new Action() {	// [30] Subdeclarations = Subdeclarations Declaration
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 2].value); return _symbols[offset + 1];
 				}
 			},
-			new Action() {	// [30] Subdeclarations = Declaration
+			new Action() {	// [31] Subdeclarations = Declaration
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 				}
 			},
-			new Action() {	// [31] Declaration = Declaration2.d SEMICOLON.s
+			new Action() {	// [32] Declaration = Declaration2.d SEMICOLON.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_d = _symbols[offset + 1];
 					final CSSDeclarationNode d = (CSSDeclarationNode) _symbol_d.value;
 					final Symbol s = _symbols[offset + 2];
-					((CSSDeclarationNode) d).setHasSemicolon(s); return d;
+					d.setHasSemicolon(s); return d;
 				}
 			},
-			new Action() {	// [32] Declaration = SEMICOLON.s
+			new Action() {	// [33] Declaration = SEMICOLON.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol s = _symbols[offset + 1];
 					return new CSSDeclarationNode(s);
 				}
 			},
-			new Action() {	// [33] Declaration2 = Identifier.i COLON Expression.e
+			new Action() {	// [34] Declaration2 = Identifier.i COLON Expression.e
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_i = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 3];
@@ -305,7 +310,7 @@ public class CSSParser extends Parser implements IParser {
 					return new CSSDeclarationNode(_symbol_i, e);
 				}
 			},
-			new Action() {	// [34] Declaration2 = Identifier.i COLON Expression.e IMPORTANT.s
+			new Action() {	// [35] Declaration2 = Identifier.i COLON Expression.e IMPORTANT.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_i = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 3];
@@ -314,13 +319,13 @@ public class CSSParser extends Parser implements IParser {
 					return new CSSDeclarationNode(_symbol_i, e, _symbol_s);
 				}
 			},
-			new Action() {	// [35] Declaration2 = error.e
+			new Action() {	// [36] Declaration2 = error.e
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol e = _symbols[offset + 1];
 					return new CSSErrorDeclarationNode(e.getStart(), e.getEnd());
 				}
 			},
-			new Action() {	// [36] Expression = Expression.e Separator.s Term.t
+			new Action() {	// [37] Expression = Expression.e Separator.s Term.t
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_e = _symbols[offset + 1];
 					final CSSExpressionNode e = (CSSExpressionNode) _symbol_e.value;
@@ -331,7 +336,7 @@ public class CSSParser extends Parser implements IParser {
 					return new CSSTermListNode(e, t, s);
 				}
 			},
-			new Action() {	// [37] Expression = Expression.e Term.t
+			new Action() {	// [38] Expression = Expression.e Term.t
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_e = _symbols[offset + 1];
 					final CSSExpressionNode e = (CSSExpressionNode) _symbol_e.value;
@@ -340,41 +345,41 @@ public class CSSParser extends Parser implements IParser {
 					return new CSSTermListNode(e, t);
 				}
 			},
-			Action.RETURN,	// [38] Expression = Term
-			new Action() {	// [39] Expression = error.e
+			Action.RETURN,	// [39] Expression = Term
+			new Action() {	// [40] Expression = error.e
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol e = _symbols[offset + 1];
 					return new CSSErrorExpressionNode(e.getStart(), e.getEnd());
 				}
 			},
-			new Action() {	// [40] Term = Primitive.p
+			new Action() {	// [41] Term = Primitive.p
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_p = _symbols[offset + 1];
 					return new CSSTermNode(_symbol_p);
 				}
 			},
-			Action.RETURN,	// [41] Term = Function
-			new Action() {	// [42] Selectors = Selectors Combinator Selector
+			Action.RETURN,	// [42] Term = Function
+			new Action() {	// [43] Selectors = Selectors Combinator Selector
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3]); return _symbols[offset + 1];
 				}
 			},
-			new Action() {	// [43] Selectors = Selector
+			new Action() {	// [44] Selectors = Selector
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1]); return new Symbol(lst);
 				}
 			},
-			new Action() {	// [44] Selector = Selector SimpleSelector
+			new Action() {	// [45] Selector = Selector SimpleSelector
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 2]); return _symbols[offset + 1];
 				}
 			},
-			new Action() {	// [45] Selector = SimpleSelector
+			new Action() {	// [46] Selector = SimpleSelector
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1]); return new Symbol(lst);
 				}
 			},
-			new Action() {	// [46] SimpleSelector = TypeOrUniversalSelector.t AttributeSelectors.a
+			new Action() {	// [47] SimpleSelector = TypeOrUniversalSelector.t AttributeSelectors.a
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_t = _symbols[offset + 1];
 					final Symbol _symbol_a = _symbols[offset + 2];
@@ -383,13 +388,13 @@ public class CSSParser extends Parser implements IParser {
 					return new CSSSimpleSelectorNode(_symbol_t, a);
 				}
 			},
-			new Action() {	// [47] SimpleSelector = TypeOrUniversalSelector.t
+			new Action() {	// [48] SimpleSelector = TypeOrUniversalSelector.t
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_t = _symbols[offset + 1];
 					return new CSSSimpleSelectorNode(_symbol_t);
 				}
 			},
-			new Action() {	// [48] SimpleSelector = AttributeSelectors.a
+			new Action() {	// [49] SimpleSelector = AttributeSelectors.a
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_a = _symbols[offset + 1];
 					final ArrayList _list_a = (ArrayList) _symbol_a.value;
@@ -397,24 +402,24 @@ public class CSSParser extends Parser implements IParser {
 					return new CSSSimpleSelectorNode(a);
 				}
 			},
-			new Action() {	// [49] AttributeSelectors = AttributeSelectors AttributeSelector
+			new Action() {	// [50] AttributeSelectors = AttributeSelectors AttributeSelector
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 2].value); return _symbols[offset + 1];
 				}
 			},
-			new Action() {	// [50] AttributeSelectors = AttributeSelector
+			new Action() {	// [51] AttributeSelectors = AttributeSelector
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 				}
 			},
-			new Action() {	// [51] AttributeSelector = CLASS.c
+			new Action() {	// [52] AttributeSelector = CLASS.c
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_c = _symbols[offset + 1];
 					final String c = (String) _symbol_c.value;
 					return new CSSAttributeSelectorNode(c, _symbol_c.getStart(), _symbol_c.getEnd());
 				}
 			},
-			new Action() {	// [52] AttributeSelector = COLON.c IDENTIFIER.i
+			new Action() {	// [53] AttributeSelector = COLON.c IDENTIFIER.i
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol c = _symbols[offset + 1];
 					final Symbol _symbol_i = _symbols[offset + 2];
@@ -422,7 +427,7 @@ public class CSSParser extends Parser implements IParser {
 					return new CSSAttributeSelectorNode(":" + i, c.getStart(), _symbol_i.getEnd());
 				}
 			},
-			new Action() {	// [53] AttributeSelector = COLON.c Function.f
+			new Action() {	// [54] AttributeSelector = COLON.c Function.f
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol c = _symbols[offset + 1];
 					final Symbol _symbol_f = _symbols[offset + 2];
@@ -430,21 +435,21 @@ public class CSSParser extends Parser implements IParser {
 					return new CSSAttributeSelectorNode(f, c.getStart());
 				}
 			},
-			new Action() {	// [54] AttributeSelector = COLOR.c
+			new Action() {	// [55] AttributeSelector = COLOR.c
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_c = _symbols[offset + 1];
 					final String c = (String) _symbol_c.value;
 					return new CSSAttributeSelectorNode(c, _symbol_c.getStart(), _symbol_c.getEnd());
 				}
 			},
-			new Action() {	// [55] AttributeSelector = HASH.h
+			new Action() {	// [56] AttributeSelector = HASH.h
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_h = _symbols[offset + 1];
 					final String h = (String) _symbol_h.value;
 					return new CSSAttributeSelectorNode(h, _symbol_h.getStart(), _symbol_h.getEnd());
 				}
 			},
-			new Action() {	// [56] AttributeSelector = LBRACKET.l IDENTIFIER.i RBRACKET.r
+			new Action() {	// [57] AttributeSelector = LBRACKET.l IDENTIFIER.i RBRACKET.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_i = _symbols[offset + 2];
@@ -453,7 +458,7 @@ public class CSSParser extends Parser implements IParser {
 					return new CSSAttributeSelectorNode("[" + i + "]", l.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [57] AttributeSelector = LBRACKET.l IDENTIFIER.i AttributeValueOperator.o IdentiferOrString.s RBRACKET.r
+			new Action() {	// [58] AttributeSelector = LBRACKET.l IDENTIFIER.i AttributeValueOperator.o IdentiferOrString.s RBRACKET.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_i = _symbols[offset + 2];
@@ -463,40 +468,41 @@ public class CSSParser extends Parser implements IParser {
 					final Symbol _symbol_s = _symbols[offset + 4];
 					final String s = (String) _symbol_s.value;
 					final Symbol r = _symbols[offset + 5];
-					return new CSSAttributeSelectorNode("[" + i + " " + o + " " + s + "]", l.getStart(), r.getEnd());
+					
+			return new CSSAttributeSelectorNode("[" + i + " " + o + " " + s + "]", l.getStart(), r.getEnd());
 				}
 			},
-			Action.RETURN,	// [58] ImportWord = STRING
-			Action.RETURN,	// [59] ImportWord = URL
-			Action.RETURN,	// [60] Identifier = IDENTIFIER
-			Action.RETURN,	// [61] Identifier = PROPERTY
-			Action.RETURN,	// [62] IdentiferOrString = IDENTIFIER
-			Action.RETURN,	// [63] IdentiferOrString = STRING
-			Action.RETURN,	// [64] Separator = FORWARD_SLASH
-			Action.RETURN,	// [65] Separator = COMMA
-			Action.RETURN,	// [66] Separator = PLUS
-			Action.RETURN,	// [67] Separator = MINUS
-			Action.RETURN,	// [68] Combinator = COMMA
-			Action.RETURN,	// [69] Combinator = PLUS
-			Action.RETURN,	// [70] Combinator = GREATER
-			Action.RETURN,	// [71] Primitive = NUMBER
-			Action.RETURN,	// [72] Primitive = PERCENTAGE
-			Action.RETURN,	// [73] Primitive = LENGTH
-			Action.RETURN,	// [74] Primitive = EMS
-			Action.RETURN,	// [75] Primitive = EXS
-			Action.RETURN,	// [76] Primitive = ANGLE
-			Action.RETURN,	// [77] Primitive = TIME
-			Action.RETURN,	// [78] Primitive = FREQUENCY
-			Action.RETURN,	// [79] Primitive = STRING
-			Action.RETURN,	// [80] Primitive = IDENTIFIER
-			Action.RETURN,	// [81] Primitive = URL
-			Action.RETURN,	// [82] Primitive = COLOR
-			Action.RETURN,	// [83] TypeOrUniversalSelector = IDENTIFIER
-			Action.RETURN,	// [84] TypeOrUniversalSelector = STAR
-			Action.RETURN,	// [85] TypeOrUniversalSelector = SELECTOR
-			Action.RETURN,	// [86] AttributeValueOperator = EQUAL
-			Action.RETURN,	// [87] AttributeValueOperator = INCLUDES
-			Action.RETURN	// [88] AttributeValueOperator = DASHMATCH
+			Action.RETURN,	// [59] ImportWord = STRING
+			Action.RETURN,	// [60] ImportWord = URL
+			Action.RETURN,	// [61] Identifier = IDENTIFIER
+			Action.RETURN,	// [62] Identifier = PROPERTY
+			Action.RETURN,	// [63] IdentiferOrString = IDENTIFIER
+			Action.RETURN,	// [64] IdentiferOrString = STRING
+			Action.RETURN,	// [65] Separator = FORWARD_SLASH
+			Action.RETURN,	// [66] Separator = COMMA
+			Action.RETURN,	// [67] Separator = PLUS
+			Action.RETURN,	// [68] Separator = MINUS
+			Action.RETURN,	// [69] Combinator = COMMA
+			Action.RETURN,	// [70] Combinator = PLUS
+			Action.RETURN,	// [71] Combinator = GREATER
+			Action.RETURN,	// [72] Primitive = NUMBER
+			Action.RETURN,	// [73] Primitive = PERCENTAGE
+			Action.RETURN,	// [74] Primitive = LENGTH
+			Action.RETURN,	// [75] Primitive = EMS
+			Action.RETURN,	// [76] Primitive = EXS
+			Action.RETURN,	// [77] Primitive = ANGLE
+			Action.RETURN,	// [78] Primitive = TIME
+			Action.RETURN,	// [79] Primitive = FREQUENCY
+			Action.RETURN,	// [80] Primitive = STRING
+			Action.RETURN,	// [81] Primitive = IDENTIFIER
+			Action.RETURN,	// [82] Primitive = URL
+			Action.RETURN,	// [83] Primitive = COLOR
+			Action.RETURN,	// [84] TypeOrUniversalSelector = IDENTIFIER
+			Action.RETURN,	// [85] TypeOrUniversalSelector = STAR
+			Action.RETURN,	// [86] TypeOrUniversalSelector = SELECTOR
+			Action.RETURN,	// [87] AttributeValueOperator = EQUAL
+			Action.RETURN,	// [88] AttributeValueOperator = INCLUDES
+			Action.RETURN	// [89] AttributeValueOperator = DASHMATCH
 		};
 	}
 
@@ -505,7 +511,7 @@ public class CSSParser extends Parser implements IParser {
 	}
 
 	@Override
-	public IParseNode parse(IParseState parseState) throws java.lang.Exception
+	public synchronized IParseNode parse(IParseState parseState) throws java.lang.Exception
 	{
 		fScanner.setSource(new String(parseState.getSource()));
 		IParseNode result = (IParseNode) parse(fScanner);

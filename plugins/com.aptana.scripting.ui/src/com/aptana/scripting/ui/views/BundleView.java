@@ -9,9 +9,15 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -21,6 +27,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IWorkbench;
@@ -28,12 +35,12 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
 
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.ColorManager;
-import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.common.theme.Theme;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.LoadCycleListener;
+import com.aptana.theme.ColorManager;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.Theme;
+import com.aptana.theme.ThemePlugin;
 
 public class BundleView extends ViewPart
 {
@@ -66,7 +73,7 @@ public class BundleView extends ViewPart
 	 */
 	private void applyTheme()
 	{
-		CommonEditorPlugin plugin = CommonEditorPlugin.getDefault();
+		ThemePlugin plugin = ThemePlugin.getDefault();
 		ColorManager colorManager = plugin.getColorManager();
 		IThemeManager themeManager = plugin.getThemeManager();
 		Theme currentTheme = themeManager.getCurrentTheme();
@@ -93,6 +100,7 @@ public class BundleView extends ViewPart
 
 		// listen to theme changes
 		this.overrideTreeDrawing();
+		this.hookContextMenu();
 		this.addListeners();
 		this.applyTheme();
 	}
@@ -118,11 +126,65 @@ public class BundleView extends ViewPart
 		// remove theme change listener
 		if (this._themeChangeListener != null)
 		{
-			new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
+			new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(
 					this._themeChangeListener);
 		}
 
 		super.dispose();
+	}
+
+	/**
+	 * fillContextMenu
+	 * 
+	 * @param manager
+	 */
+	private void fillContextMenu(IMenuManager manager)
+	{
+		ISelection selection = this._treeViewer.getSelection();
+
+		if (selection instanceof TreeSelection)
+		{
+			TreeSelection treeSelection = (TreeSelection) selection;
+			Object item = treeSelection.getFirstElement();
+			
+			if (item instanceof BaseNode)
+			{
+				BaseNode node = (BaseNode) item;
+				Action[] actions = node.getActions();
+				
+				if (actions != null)
+				{
+					for (Action action : actions)
+					{
+						manager.add(action);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * hookContextMenu
+	 */
+	private void hookContextMenu()
+	{
+		MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener()
+		{
+			public void menuAboutToShow(IMenuManager manager)
+			{
+				fillContextMenu(manager);
+			}
+		});
+
+		// Create menu.
+		Menu menu = menuMgr.createContextMenu(this._treeViewer.getControl());
+		this._treeViewer.getControl().setMenu(menu);
+
+		// Register menu for extension.
+		getSite().registerContextMenu(menuMgr, this._treeViewer);
 	}
 
 	/**
@@ -144,7 +206,7 @@ public class BundleView extends ViewPart
 					}
 					catch (IllegalStateException e)
 					{
-						CommonEditorPlugin.logError(e);
+						ThemePlugin.logError(e);
 					}
 
 					if (workbench != null)
@@ -214,7 +276,7 @@ public class BundleView extends ViewPart
 			}
 		};
 
-		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID)
+		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID)
 				.addPreferenceChangeListener(this._themeChangeListener);
 	}
 
@@ -238,7 +300,7 @@ public class BundleView extends ViewPart
 					GC gc = event.gc;
 					Color oldBackground = gc.getBackground();
 
-					CommonEditorPlugin plugin = CommonEditorPlugin.getDefault();
+					ThemePlugin plugin = ThemePlugin.getDefault();
 					ColorManager colorManager = plugin.getColorManager();
 					IThemeManager themeManager = plugin.getThemeManager();
 

@@ -1,9 +1,9 @@
 package com.aptana.git.ui.internal;
 
-import java.io.File;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
@@ -12,67 +12,45 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.BaseLabelProvider;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.team.ui.ISharedImages;
 import org.eclipse.team.ui.TeamImages;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.UIJob;
 
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.common.theme.Theme;
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.BranchAddedEvent;
 import com.aptana.git.core.model.BranchChangedEvent;
 import com.aptana.git.core.model.BranchRemovedEvent;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.IGitRepositoriesListener;
 import com.aptana.git.core.model.IGitRepositoryListener;
+import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.core.model.IndexChangedEvent;
 import com.aptana.git.core.model.PullEvent;
 import com.aptana.git.core.model.PushEvent;
 import com.aptana.git.core.model.RepositoryAddedEvent;
 import com.aptana.git.core.model.RepositoryRemovedEvent;
 import com.aptana.git.ui.GitUIPlugin;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.ThemePlugin;
 
-public class GitLightweightDecorator extends LabelProvider implements ILightweightLabelDecorator,
-		IGitRepositoryListener
+public class GitLightweightDecorator extends BaseLabelProvider implements ILightweightLabelDecorator,
+		IGitRepositoryListener, IGitRepositoriesListener
 {
-	/**
-	 * Default colors to use for staged/unstaged files when the theme doesn't define overrides.
-	 */
-	private static final RGB DEFAULT_RED_BG = new RGB(255, 238, 238);
-	private static final RGB DEFAULT_RED_FG = new RGB(154, 11, 11);
-	private static final RGB DEFAULT_GREEN_BG = new RGB(221, 255, 221);
-	private static final RGB DEFAULT_GREEN_FG = new RGB(60, 168, 60);
-
-	/**
-	 * Default set to use when bg is very dark!
-	 */
-	private static final RGB DEFAULT_DARK_RED_BG = new RGB(74, 11, 11);
-	private static final RGB DEFAULT_LIGHT_RED_FG = new RGB(255, 224, 224);
-	private static final RGB DEFAULT_DARK_GREEN_BG = new RGB(0, 51, 0);
-	private static final RGB DEFAULT_LIGHT_GREEN_FG = new RGB(212, 255, 212);
-
-	/**
-	 * The token used from the theme for staged file decorations.
-	 */
-	private static final String STAGED_TOKEN = "markup.inserted"; //$NON-NLS-1$
-
-	/**
-	 * The token used from the theme for unstaged file decorations.
-	 */
-	private static final String UNSTAGED_TOKEN = "markup.deleted"; //$NON-NLS-1$
 
 	private static final String DIRTY_PREFIX = "* "; //$NON-NLS-1$
 	private static final String DECORATOR_ID = "com.aptana.git.ui.internal.GitLightweightDecorator"; //$NON-NLS-1$
@@ -105,6 +83,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 	private static ImageDescriptor untrackedImage;
 	private static ImageDescriptor stagedAddedImage;
 	private static ImageDescriptor stagedRemovedImage;
+	private static UIJob refreshJob;
 
 	static
 	{
@@ -118,10 +97,12 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 	}
 
 	private IPreferenceChangeListener fThemeChangeListener;
+	private Map<RepoBranch, TimestampedString> cache = new HashMap<RepoBranch, TimestampedString>();
 
 	public GitLightweightDecorator()
 	{
-		GitRepository.addListener(this);
+		getGitRepositoryManager().addListener(this);
+		getGitRepositoryManager().addListenerToEachRepository(this);
 		fThemeChangeListener = new IPreferenceChangeListener()
 		{
 
@@ -134,7 +115,12 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 				}
 			}
 		};
-		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+	}
+
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 
 	public void decorate(Object element, IDecoration decoration)
@@ -180,20 +166,9 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		if (repo == null)
 			return;
 
-		List<ChangedFile> changedFiles = repo.index().changedFiles();
-		if (changedFiles == null || changedFiles.isEmpty())
+		if (repo.resourceOrChildHasChanges(resource))
 		{
-			return;
-		}
-		String workingDirectory = repo.workingDirectory();
-		for (ChangedFile changedFile : changedFiles)
-		{
-			String fullPath = workingDirectory + File.separator + changedFile.getPath();
-			if (fullPath.startsWith(resource.getLocationURI().getPath()))
-			{
-				decoration.addPrefix(DIRTY_PREFIX);
-				return;
-			}
+			decoration.addPrefix(DIRTY_PREFIX);
 		}
 	}
 
@@ -214,8 +189,8 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		// Unstaged trumps staged when decorating. One file may have both staged and unstaged changes.
 		if (changed.hasUnstagedChanges())
 		{
-			decoration.setForegroundColor(redFG());
-			decoration.setBackgroundColor(redBG());
+			decoration.setForegroundColor(GitColors.redFG());
+			decoration.setBackgroundColor(GitColors.redBG());
 			if (changed.getStatus() == ChangedFile.Status.NEW)
 			{
 				overlay = untrackedImage;
@@ -227,8 +202,8 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		}
 		else if (changed.hasStagedChanges())
 		{
-			decoration.setForegroundColor(greenFG());
-			decoration.setBackgroundColor(greenBG());
+			decoration.setForegroundColor(GitColors.greenFG());
+			decoration.setBackgroundColor(GitColors.greenBG());
 			if (changed.getStatus() == ChangedFile.Status.DELETED)
 			{
 				overlay = stagedRemovedImage;
@@ -249,9 +224,20 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		if (repo == null)
 			return;
 
+		String branch = repo.currentBranch();
+		// Adds a temporal cache per repo/branch for this data so we
+		// don't recalculate for a ton of projects, Just store it for like a second...?
+		RepoBranch repoBranch = new RepoBranch(repo, branch);
+		TimestampedString result = cache.get(repoBranch);
+		if (result != null && !result.isOlderThan(1000))
+		{
+			decoration.addSuffix(result.string);
+			return;
+		}
+		cache.remove(repoBranch);
+
 		StringBuilder builder = new StringBuilder();
 		builder.append(" ["); //$NON-NLS-1$
-		String branch = repo.currentBranch();
 		builder.append(branch);
 		String[] commits = repo.commitsAhead(branch);
 		if (commits != null && commits.length > 0)
@@ -267,85 +253,9 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 				builder.append("-").append(commits.length); //$NON-NLS-1$
 		}
 		builder.append("]"); //$NON-NLS-1$
-		decoration.addSuffix(builder.toString());
-	}
-
-	private Color greenFG()
-	{
-		if (getActiveTheme().hasEntry(STAGED_TOKEN))
-		{
-			return getActiveTheme().getForeground(STAGED_TOKEN);
-		}
-		if (currentThemeHasDarkBG())
-		{
-			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_LIGHT_GREEN_FG);
-		}
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_GREEN_FG);
-	}
-
-	private Color greenBG()
-	{
-		if (getActiveTheme().hasEntry(STAGED_TOKEN))
-		{
-			return getActiveTheme().getBackground(STAGED_TOKEN);
-		}
-		if (currentThemeHasLightFG())
-		{
-			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_DARK_GREEN_BG);
-		}
-		// TODO Test if current theme's bg is too close to color we return here?
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_GREEN_BG);
-	}
-
-	private Color redFG()
-	{
-		if (getActiveTheme().hasEntry(UNSTAGED_TOKEN))
-		{
-			return getActiveTheme().getForeground(UNSTAGED_TOKEN);
-		}
-		if (currentThemeHasDarkBG())
-		{
-			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_LIGHT_RED_FG);
-		}
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_RED_FG);
-	}
-
-	private Color redBG()
-	{
-		if (getActiveTheme().hasEntry(UNSTAGED_TOKEN))
-		{
-			return getActiveTheme().getBackground(UNSTAGED_TOKEN);
-		}
-		if (currentThemeHasLightFG())
-		{
-			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_DARK_RED_BG);
-		}
-		// TODO Test if current theme's bg is too close to color we return here?
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_RED_BG);
-	}
-
-	private boolean currentThemeHasDarkBG()
-	{
-		RGB themeBG = getActiveTheme().getBackground();
-		double grey = 0.3 * themeBG.red + 0.59 * themeBG.green + 0.11 * themeBG.blue;
-		return grey <= 128;
-	}
-
-	private boolean currentThemeHasLightFG()
-	{
-		RGB themeBG = getActiveTheme().getForeground();
-		double grey = 0.3 * themeBG.red + 0.59 * themeBG.green + 0.11 * themeBG.blue;
-		return grey >= 90;
-	}
-
-	protected Theme getActiveTheme()
-	{
-		return getThemeManager().getCurrentTheme();
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
+		String value = builder.toString();
+		cache.put(repoBranch, new TimestampedString(value));
+		decoration.addSuffix(value);
 	}
 
 	@Override
@@ -353,9 +263,12 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 	{
 		try
 		{
-			GitRepository.removeListener(this);
-			new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
+			getGitRepositoryManager().removeListener(this);
+			getGitRepositoryManager().removeListenerFromEachRepository(this);
+			new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(
 					fThemeChangeListener);
+			cache.clear();
+			cache = null;
 		}
 		finally
 		{
@@ -386,7 +299,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		IProject project = resource.getProject();
 		if (project == null)
 			return null;
-		return GitRepository.getAttached(project);
+		return getGitRepositoryManager().getAttached(project);
 	}
 
 	/**
@@ -408,15 +321,19 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	public void indexChanged(IndexChangedEvent e)
 	{
-		// FIXME Force a total refresh if the number of changed files is over some maximum!
-		Set<IResource> resources = addChangedFiles(e.getRepository(), e.changedFiles());
+		// TODO Force a total refresh if the number of changed files is over some maximum?
+		Set<IResource> resources = e.getFilesWithChanges();
+
 		// Need to mark all parents up to project for refresh so the dirty flag can get recomputed for these
 		// ancestor folders!
 		resources.addAll(getAllAncestors(resources));
+		// TODO On a commit clear the cache?
+		// FIXME Only add projects if this was a commit (so the plus/minus changes), not just a file
+		// edited/staged/unstaged
 		// Also refresh any project sharing this repo (so the +/- commits ahead can be refreshed)
 		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
 		{
-			GitRepository repo = GitRepository.getAttached(project);
+			GitRepository repo = getGitRepositoryManager().getAttached(project);
 			if (repo != null && repo.equals(e.getRepository()))
 				resources.add(project);
 		}
@@ -441,47 +358,43 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		return ancestors;
 	}
 
-	private Set<IResource> addChangedFiles(GitRepository repository, Collection<ChangedFile> changedFiles)
-	{
-		String workingDir = repository.workingDirectory();
-		Set<IResource> resources = new HashSet<IResource>();
-		for (ChangedFile changedFile : changedFiles)
-		{
-			IResource resource = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(
-					new Path(workingDir).append(changedFile.getPath()));
-			if (resource != null)
-				resources.add(resource);
-		}
-		return resources;
-	}
-
 	public void repositoryAdded(RepositoryAddedEvent e)
 	{
-		Set<IResource> resources = addChangedFiles(e.getRepository(), e.getRepository().index().changedFiles());
+		e.getRepository().addListener(this);
+		Set<IResource> resources = e.getRepository().getChangedResources();
 		resources.add(e.getProject());
 		postLabelEvent(new LabelProviderChangedEvent(this, resources.toArray()));
 	}
 
 	public void repositoryRemoved(RepositoryRemovedEvent e)
 	{
-		Set<IResource> resources = addChangedFiles(e.getRepository(), e.getRepository().index().changedFiles());
-		resources.add(e.getProject());
-		postLabelEvent(new LabelProviderChangedEvent(this, resources.toArray()));
+		e.getRepository().removeListener(this);
 	}
 
 	/**
-	 * Perform a blanket refresh of all decorations this is very bad performance wise. Need to avoid using this and
+	 * Perform a blanket refresh of all decorations. This is very bad performance wise. Need to avoid using this and
 	 * always just use deltas if possible!
 	 */
 	private static void refresh()
 	{
-		Display.getDefault().asyncExec(new Runnable()
+		if (refreshJob == null)
 		{
-			public void run()
+			refreshJob = new UIJob("Refresh Git labels") //$NON-NLS-1$
 			{
-				GitUIPlugin.getDefault().getWorkbench().getDecoratorManager().update(DECORATOR_ID);
-			}
-		});
+
+				@Override
+				public IStatus runInUIThread(IProgressMonitor monitor)
+				{
+					if (monitor != null && monitor.isCanceled())
+						return Status.CANCEL_STATUS;
+					GitUIPlugin.getDefault().getWorkbench().getDecoratorManager().update(DECORATOR_ID);
+					return Status.OK_STATUS;
+				}
+			};
+			refreshJob.setSystem(true);
+		}
+		refreshJob.cancel();
+		refreshJob.schedule(50);
 	}
 
 	public void branchChanged(BranchChangedEvent e)
@@ -491,22 +404,26 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 		for (IProject project : projects)
 		{
-			if (repo.equals(GitRepository.getAttached(project)))
+			if (repo.equals(getGitRepositoryManager().getAttached(project)))
 				resources.add(project);
 		}
+		// Project labels need to change, but the dirty/stage/unstaged flags should stay same (can't change branch with
+		// staged/unstaged changes, dirty carry over).
 		postLabelEvent(new LabelProviderChangedEvent(this, resources.toArray()));
 	}
 
 	@Override
 	public void pulled(PullEvent e)
 	{
-		// FIXME do nothing? Call refresh?
+		cache.clear();
+		refresh();
 	}
 
 	@Override
 	public void pushed(PushEvent e)
 	{
-		// FIXME do nothing? Call refresh?
+		cache.clear();
+		refresh();
 	}
 
 	@Override
@@ -519,5 +436,66 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 	public void branchRemoved(BranchRemovedEvent e)
 	{
 		// do nothing
+	}
+
+	// Simple classes used for a time-based cache on the project decorations
+
+	private static class TimestampedString
+	{
+		String string;
+		Long timestamp;
+
+		public TimestampedString(String value)
+		{
+			this.string = value;
+			this.timestamp = System.currentTimeMillis();
+		}
+
+		public boolean isOlderThan(int millis)
+		{
+			return (timestamp + millis) < System.currentTimeMillis();
+		}
+
+		@Override
+		public boolean equals(Object obj)
+		{
+			if (!(obj instanceof TimestampedString))
+				return false;
+			TimestampedString other = (TimestampedString) obj;
+			return other.string.equals(string) && other.timestamp.equals(timestamp);
+		}
+
+		@Override
+		public int hashCode()
+		{
+			return (31 + string.hashCode()) * (31 + timestamp.hashCode());
+		}
+	}
+
+	private static class RepoBranch
+	{
+		GitRepository repo;
+		String branch;
+
+		RepoBranch(GitRepository repo, String branch)
+		{
+			this.repo = repo;
+			this.branch = branch;
+		}
+
+		@Override
+		public boolean equals(Object obj)
+		{
+			if (!(obj instanceof RepoBranch))
+				return false;
+			RepoBranch other = (RepoBranch) obj;
+			return other.repo.equals(repo) && other.branch.equals(branch);
+		}
+
+		@Override
+		public int hashCode()
+		{
+			return (31 + repo.hashCode()) * (31 + branch.hashCode());
+		}
 	}
 }

@@ -1,5 +1,7 @@
 package com.aptana.filewatcher;
 
+import org.eclipse.core.runtime.Platform;
+
 import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
@@ -15,9 +17,7 @@ public class FileWatcher
 	{
 		if (_instance == null)
 		{
-			String osName = System.getProperty("os.name").toLowerCase(); //$NON-NLS-1$
-			String osArch = System.getProperty("os.arch").toLowerCase(); //$NON-NLS-1$
-			if (osName.equals("linux") && !osArch.equals("amd64")) //$NON-NLS-1$
+			if (Platform.OS_LINUX.equals(Platform.getOS()))
 			{
 				try
 				{
@@ -29,7 +29,7 @@ public class FileWatcher
 					FileWatcherPlugin.log(e);
 				}
 			}
-			else if (osName.startsWith("windows")) //$NON-NLS-1$
+			else if (Platform.OS_WIN32.equals(Platform.getOS()))
 			{
 				try
 				{
@@ -41,7 +41,7 @@ public class FileWatcher
 					FileWatcherPlugin.log(e);
 				}
 			}
-			else if (osName.startsWith("mac os x")) //$NON-NLS-1$
+			else if (Platform.OS_MACOSX.equals(Platform.getOS()))
 			{
 				try
 				{

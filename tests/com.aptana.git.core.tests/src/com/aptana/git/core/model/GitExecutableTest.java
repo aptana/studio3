@@ -36,10 +36,10 @@ public class GitExecutableTest extends TestCase
 	{
 		URL url = makeURLForExecutableFile(new Path(FAKE_GIT_1_5));
 
-		assertFalse(GitExecutable.acceptBinary(url.getPath()));
+		assertFalse(GitExecutable.acceptBinary(Path.fromOSString(url.getPath())));
 
 		url = makeURLForExecutableFile(new Path(FAKE_GIT_1_6));
-		assertTrue(GitExecutable.acceptBinary(url.getPath()));
+		assertTrue(GitExecutable.acceptBinary(Path.fromOSString(url.getPath())));
 	}
 
 	protected URL makeURLForExecutableFile(IPath path) throws IOException
@@ -61,7 +61,7 @@ public class GitExecutableTest extends TestCase
 		prefs.flush();
 
 		GitExecutable executable = GitExecutable.instance();
-		assertEquals(url.getPath(), executable.path());
+		assertEquals(Path.fromOSString(url.getPath()), executable.path());
 	}
 
 	public void testDetectsInStandardLocation() throws Throwable
@@ -69,10 +69,11 @@ public class GitExecutableTest extends TestCase
 		GitExecutable executable = GitExecutable.instance();
 		// FIXME This is hacky for test, but basically on my machine I have it in /usr.local.bin.git, while test box has
 		// /usr/bin/git
-		String expectedLocation = "/usr/bin/git";
-		if (new File("/usr/local/bin/git").exists())
+		IPath expectedLocation = Path.fromOSString("/usr/bin/git");
+		IPath local = Path.fromOSString("/usr/local/bin/git");
+		if (local.toFile().exists())
 		{
-			expectedLocation = "/usr/local/bin/git";
+			expectedLocation = local;
 		}
 		assertEquals(expectedLocation, executable.path());
 	}

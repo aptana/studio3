@@ -11,7 +11,7 @@ public class RubyBlock extends RubyElement
 	}
 
 	@Override
-	public short getType()
+	public short getNodeType()
 	{
 		return IRubyElement.BLOCK;
 	}

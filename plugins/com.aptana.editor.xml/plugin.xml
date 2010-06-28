@@ -22,5 +22,12 @@
             class="com.aptana.editor.xml.preferences.PreferenceInitializer">
       </initializer>
    </extension>
+   <extension
+         point="com.aptana.parsing.parser">
+      <parser
+            class="com.aptana.editor.xml.parsing.XMLParser"
+            language="text/xml">
+      </parser>
+   </extension>
 
 </plugin>

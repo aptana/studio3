@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -36,6 +36,8 @@
 package com.aptana.editor.erb.xml;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.ITextDoubleClickStrategy;
+import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -47,6 +49,7 @@ import com.aptana.editor.common.text.rules.CompositePartitionScanner;
 import com.aptana.editor.erb.ERBPartitionerSwitchStrategy;
 import com.aptana.editor.erb.IERBConstants;
 import com.aptana.editor.ruby.RubySourceConfiguration;
+import com.aptana.editor.ruby.core.RubyDoubleClickStrategy;
 import com.aptana.editor.xml.XMLSourceConfiguration;
 
 /**
@@ -68,6 +71,8 @@ public class RXMLSourceViewerConfiguration extends CompositeSourceViewerConfigur
 				CompositePartitionScanner.END_SWITCH_TAG), new QualifiedContentType(
 				"text.xml.ruby", "source.erb.embedded.xml")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
+
+	private RubyDoubleClickStrategy fDoubleClickStrategy;
 
 	public RXMLSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor)
 	{
@@ -97,6 +102,16 @@ public class RXMLSourceViewerConfiguration extends CompositeSourceViewerConfigur
 	protected String getStartEndTokenType()
 	{
 		return "punctuation.section.embedded.ruby"; //$NON-NLS-1$
+	}
+	
+	@Override
+	public ITextDoubleClickStrategy getDoubleClickStrategy(ISourceViewer sourceViewer, String contentType)
+	{
+		if (fDoubleClickStrategy == null)
+		{
+			fDoubleClickStrategy = new RubyDoubleClickStrategy();
+		}
+		return fDoubleClickStrategy;
 	}
 
 }

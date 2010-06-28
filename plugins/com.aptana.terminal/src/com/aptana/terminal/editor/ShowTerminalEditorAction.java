@@ -29,7 +29,7 @@ public class ShowTerminalEditorAction implements IWorkbenchWindowActionDelegate
 	@Override
 	public void run(IAction action)
 	{
-		Utils.openEditor(TerminalEditor.ID, true);
+		Utils.openTerminalEditor(TerminalEditor.ID, true);
 	}
 
 	@Override

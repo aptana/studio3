@@ -26,27 +26,31 @@ public class RubyMethod extends NamedMember implements IRubyMethod
 		blockVars.add(name);
 	}
 
+	@Override
 	public String[] getBlockVars()
 	{
 		return blockVars.toArray(new String[blockVars.size()]);
 	}
 
+	@Override
 	public String[] getParameters()
 	{
 		return fParameters;
 	}
 
+	@Override
 	public Visibility getVisibility()
 	{
 		return fVisibility;
 	}
 
 	@Override
-	public short getType()
+	public short getNodeType()
 	{
 		return IRubyElement.METHOD;
 	}
 
+	@Override
 	public boolean isSingleton()
 	{
 		return isSingleton;
@@ -68,10 +72,11 @@ public class RubyMethod extends NamedMember implements IRubyMethod
 		StringBuilder text = new StringBuilder();
 		text.append(getName());
 		text.append("("); //$NON-NLS-1$
-		for (int i = 0; i < fParameters.length; ++i)
+		String[] params = getParameters();
+		for (int i = 0; i < params.length; ++i)
 		{
-			text.append(fParameters[i]);
-			if (i < fParameters.length - 1)
+			text.append(params[i]);
+			if (i < params.length - 1)
 			{
 				text.append(", "); //$NON-NLS-1$
 			}

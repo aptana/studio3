@@ -1,11 +1,16 @@
 package com.aptana.editor.js.parsing.ast;
 
-import com.aptana.editor.js.parsing.lexer.JSTokens;
+import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSBinaryOperatorNode extends JSNode
 {
-
+	/**
+	 * JSBinaryOperatorNode
+	 * 
+	 * @param left
+	 * @param right
+	 */
 	protected JSBinaryOperatorNode(JSNode left, JSNode right)
 	{
 		this.start = left.getStart();
@@ -14,93 +19,104 @@ public class JSBinaryOperatorNode extends JSNode
 		setChildren(new JSNode[] { left, right });
 	}
 
+	/**
+	 * JSBinaryOperatorNode
+	 * 
+	 * @param left
+	 * @param operator
+	 * @param right
+	 */
 	public JSBinaryOperatorNode(JSNode left, String operator, JSNode right)
 	{
 		this(left, right);
 
 		short type = DEFAULT_TYPE;
-		short token = JSTokens.getToken(operator);
+		JSTokenType token = JSTokenType.get(operator);
 		switch (token)
 		{
-			case JSTokens.EQUAL_EQUAL:
+			case EQUAL_EQUAL:
 				type = JSNodeTypes.EQUAL;
 				break;
-			case JSTokens.GREATER:
+			case GREATER:
 				type = JSNodeTypes.GREATER_THAN;
 				break;
-			case JSTokens.GREATER_EQUAL:
+			case GREATER_EQUAL:
 				type = JSNodeTypes.GREATER_THAN_OR_EQUAL;
 				break;
-			case JSTokens.EQUAL_EQUAL_EQUAL:
+			case EQUAL_EQUAL_EQUAL:
 				type = JSNodeTypes.IDENTITY;
 				break;
-			case JSTokens.IN:
+			case IN:
 				type = JSNodeTypes.IN;
 				break;
-			case JSTokens.INSTANCEOF:
+			case INSTANCEOF:
 				type = JSNodeTypes.INSTANCE_OF;
 				break;
-			case JSTokens.LESS:
+			case LESS:
 				type = JSNodeTypes.LESS_THAN;
 				break;
-			case JSTokens.LESS_EQUAL:
+			case LESS_EQUAL:
 				type = JSNodeTypes.LESS_THAN_OR_EQUAL;
 				break;
-			case JSTokens.AMPERSAND_AMPERSAND:
+			case AMPERSAND_AMPERSAND:
 				type = JSNodeTypes.LOGICAL_AND;
 				break;
-			case JSTokens.PIPE_PIPE:
+			case PIPE_PIPE:
 				type = JSNodeTypes.LOGICAL_OR;
 				break;
-			case JSTokens.EXCLAMATION_EQUAL:
+			case EXCLAMATION_EQUAL:
 				type = JSNodeTypes.NOT_EQUAL;
 				break;
-			case JSTokens.EXCLAMATION_EQUAL_EQUAL:
+			case EXCLAMATION_EQUAL_EQUAL:
 				type = JSNodeTypes.NOT_IDENTITY;
 				break;
-			case JSTokens.PLUS:
+			case PLUS:
 				type = JSNodeTypes.ADD;
 				break;
-			case JSTokens.GREATER_GREATER_GREATER:
+			case GREATER_GREATER_GREATER:
 				type = JSNodeTypes.ARITHMETIC_SHIFT_RIGHT;
 				break;
-			case JSTokens.AMPERSAND:
+			case AMPERSAND:
 				type = JSNodeTypes.BITWISE_AND;
 				break;
-			case JSTokens.PIPE:
+			case PIPE:
 				type = JSNodeTypes.BITWISE_OR;
 				break;
-			case JSTokens.CARET:
+			case CARET:
 				type = JSNodeTypes.BITWISE_XOR;
 				break;
-			case JSTokens.FORWARD_SLASH:
+			case FORWARD_SLASH:
 				type = JSNodeTypes.DIVIDE;
 				break;
-			case JSTokens.PERCENT:
+			case PERCENT:
 				type = JSNodeTypes.MOD;
 				break;
-			case JSTokens.STAR:
+			case STAR:
 				type = JSNodeTypes.MULTIPLY;
 				break;
-			case JSTokens.LESS_LESS:
+			case LESS_LESS:
 				type = JSNodeTypes.SHIFT_LEFT;
 				break;
-			case JSTokens.GREATER_GREATER:
+			case GREATER_GREATER:
 				type = JSNodeTypes.SHIFT_RIGHT;
 				break;
-			case JSTokens.MINUS:
+			case MINUS:
 				type = JSNodeTypes.SUBTRACT;
 				break;
 		}
 		setType(type);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
+	 */
 	@Override
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
 		String operator = "??"; //$NON-NLS-1$
-		switch (getType())
+		switch (getNodeType())
 		{
 			case JSNodeTypes.EQUAL:
 				operator = "=="; //$NON-NLS-1$
@@ -180,6 +196,8 @@ public class JSBinaryOperatorNode extends JSNode
 		text.append(" ").append(operator).append(" "); //$NON-NLS-1$ //$NON-NLS-2$
 		text.append(children[1]);
 
-		return appendSemicolon(text.toString());
+		this.appendSemicolon(text);
+
+		return text.toString();
 	}
 }

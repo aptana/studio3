@@ -1,12 +1,12 @@
 package com.aptana.editor.text;
 
-import org.eclipse.core.runtime.Plugin;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
  */
-public class TextEditorPlugin extends Plugin
+public class TextEditorPlugin extends AbstractUIPlugin
 {
 
 	// The plug-in ID

@@ -35,7 +35,7 @@ public class CSSFunctionNode extends CSSExpressionNode
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
-		text.append("(").append(getChild(0)).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
+		text.append("(").append(getExpression()).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
 		return text.toString();
 	}
 }

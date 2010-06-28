@@ -18,7 +18,8 @@
 %goal Program;
 
 Program
-	=	Statements.p {:return new ParseRootNode(CSSNode.LANGUAGE, p, _symbol_p.getStart(), _symbol_p.getEnd());:}
+	=	Statements.p {:return new ParseRootNode(ICSSParserConstants.LANGUAGE, p, _symbol_p.getStart(), _symbol_p.getEnd());:}
+	|	{:return new ParseRootNode(ICSSParserConstants.LANGUAGE, new Symbol[0], 0, 0);:}
 	;
 
 Statements

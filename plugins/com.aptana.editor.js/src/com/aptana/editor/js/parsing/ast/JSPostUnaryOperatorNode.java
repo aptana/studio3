@@ -1,35 +1,46 @@
 package com.aptana.editor.js.parsing.ast;
 
-import com.aptana.editor.js.parsing.lexer.JSTokens;
+import com.aptana.editor.js.parsing.lexer.JSTokenType;
 
 public class JSPostUnaryOperatorNode extends JSUnaryOperatorNode
 {
-
-	public JSPostUnaryOperatorNode(JSNode expression, String operator, int start, int end)
+	/**
+	 * JSPostUnaryOperatorNode
+	 * 
+	 * @param operator
+	 * @param start
+	 * @param end
+	 * @param expression
+	 */
+	public JSPostUnaryOperatorNode(String operator, int start, int end, JSNode expression)
 	{
-		super(expression, start, end);
+		super(start, end, expression);
 
 		short type = DEFAULT_TYPE;
-		short token = JSTokens.getToken(operator);
+		JSTokenType token = JSTokenType.get(operator);
 		switch (token)
 		{
-			case JSTokens.MINUS_MINUS:
+			case MINUS_MINUS:
 				type = JSNodeTypes.POST_DECREMENT;
 				break;
-			case JSTokens.PLUS_PLUS:
+			case PLUS_PLUS:
 				type = JSNodeTypes.POST_INCREMENT;
 				break;
 		}
 		setType(type);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSUnaryOperatorNode#toString()
+	 */
 	@Override
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
 		text.append(getChildren()[0]);
 		String operator = ""; //$NON-NLS-1$
-		switch (getType())
+		switch (getNodeType())
 		{
 			case JSNodeTypes.POST_DECREMENT:
 				operator = "--"; //$NON-NLS-1$
@@ -40,6 +51,8 @@ public class JSPostUnaryOperatorNode extends JSUnaryOperatorNode
 		}
 		text.append(operator);
 
-		return appendSemicolon(text.toString());
+		this.appendSemicolon(text);
+
+		return text.toString();
 	}
 }

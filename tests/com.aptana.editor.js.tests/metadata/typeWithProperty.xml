@@ -1,0 +1,7 @@
+<javascript>
+	<class type="MyClass">
+		<properties>
+			<property name="myProperty" scope="instance" type="Boolean"></property>
+		</properties>
+	</class>
+</javascript>

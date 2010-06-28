@@ -1,7 +1,11 @@
 package com.aptana.editor.html.outline;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 
+import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CompositeOutlineLabelProvider;
 import com.aptana.editor.css.outline.CSSOutlineLabelProvider;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
@@ -25,9 +29,18 @@ public class HTMLOutlineLabelProvider extends CompositeOutlineLabelProvider
 	@Override
 	protected Image getDefaultImage(Object element)
 	{
-		if (element instanceof HTMLOutlineItem)
+		if (element instanceof CommonOutlineItem)
 		{
-			return getDefaultImage(((HTMLOutlineItem) element).getReferenceNode());
+			return getDefaultImage(((CommonOutlineItem) element).getReferenceNode());
+		}
+		if (element instanceof OutlinePlaceholderItem)
+		{
+			OutlinePlaceholderItem item = (OutlinePlaceholderItem) element;
+			if (item.status() == IStatus.ERROR)
+				return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK);
+			if (item.status() == IStatus.INFO)
+				return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_INFO_TSK);
+			return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_WARN_TSK);
 		}
 		if (element instanceof HTMLNode)
 		{
@@ -39,9 +52,9 @@ public class HTMLOutlineLabelProvider extends CompositeOutlineLabelProvider
 	@Override
 	protected String getDefaultText(Object element)
 	{
-		if (element instanceof HTMLOutlineItem)
+		if (element instanceof CommonOutlineItem)
 		{
-			return getDefaultText(((HTMLOutlineItem) element).getReferenceNode());
+			return getDefaultText(((CommonOutlineItem) element).getReferenceNode());
 		}
 		if (element instanceof HTMLElementNode)
 		{

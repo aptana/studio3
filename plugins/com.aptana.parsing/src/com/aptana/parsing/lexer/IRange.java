@@ -2,6 +2,13 @@ package com.aptana.parsing.lexer;
 
 public interface IRange
 {
+	/**
+	 * Determines if the specified offset is contained within this range
+	 * 
+	 * @param offset
+	 * @return
+	 */
+	boolean contains(int offset);
 
 	/**
 	 * Gets the starting offset for this range.
@@ -23,4 +30,10 @@ public interface IRange
 	 * @return the length of this range
 	 */
 	int getLength();
+	
+	/**
+	 * Determines if this range is empty. This is equivalent to having a zero or negative length
+	 * @return
+	 */
+	boolean isEmpty();
 }

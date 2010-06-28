@@ -23,5 +23,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		IEclipsePreferences prefs = new DefaultScope().getNode(Activator.PLUGIN_ID);
 
 		prefs.putBoolean(IPreferenceConstants.FIRST_RUN, true);
+		prefs.putBoolean(IPreferenceConstants.CLOSE_VIEW_ON_EXIT, true);
 	}
 }

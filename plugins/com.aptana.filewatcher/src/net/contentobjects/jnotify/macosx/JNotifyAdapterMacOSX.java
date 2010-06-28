@@ -78,7 +78,7 @@ public class JNotifyAdapterMacOSX implements IJNotify
 		@Override
 		public int hashCode()
 		{
-			return toString().hashCode();
+			return (inode + "," + deviceid).hashCode(); //$NON-NLS-1$
 		}
 
 		@Override
@@ -180,20 +180,14 @@ public class JNotifyAdapterMacOSX implements IJNotify
 		TreeMap<String, String> renamed;
 
 		JNEvents(int mask) {
-			if ((mask & (FILE_CREATED | FILE_RENAMED)) != 0)
-			{
-				created = new TreeMap<JNFile, TreeSet<String>>();
-			}
 			if ((mask & FILE_MODIFIED) != 0)
 			{
 				modified = new TreeSet<String>();
 			}
-			if ((mask & (FILE_DELETED | FILE_RENAMED)) != 0)
+			if ((mask & (FILE_CREATED | FILE_DELETED | FILE_RENAMED)) != 0)
 			{
+				created = new TreeMap<JNFile, TreeSet<String>>();
 				deleted = new TreeMap<JNFile, TreeSet<String>>();
-			}
-			if ((mask & FILE_RENAMED) != 0)
-			{
 				renamed = new TreeMap<String, String>();
 			}
 		}
@@ -335,7 +329,7 @@ public class JNotifyAdapterMacOSX implements IJNotify
 						{
 							// deleted and recreated
 							// remove this path from its old inode
-							TreeSet<String> oldPaths = paths.get(jnf);
+							TreeSet<String> oldPaths = paths.get(oldjnf);
 							if (oldPaths == null)
 							{
 								// this shouldn't happen!
@@ -348,18 +342,18 @@ public class JNotifyAdapterMacOSX implements IJNotify
 								}
 								if (oldPaths.size() == 0) {
 									// inode is gone
-									paths.remove(jnf);
+									paths.remove(oldjnf);
 								}
 							}
 							// record this change in events
 							// the create event is recorded earlier
 							if (events != null && events.deleted != null)
 							{
-								TreeSet<String> eplist = events.deleted.get(jnf);
+								TreeSet<String> eplist = events.deleted.get(oldjnf);
 								if (eplist == null)
 								{
 									eplist = new TreeSet<String>();
-									events.deleted.put(jnf, eplist);
+									events.deleted.put(oldjnf, eplist);
 								}
 								eplist.add(path);
 							}
@@ -510,7 +504,7 @@ public class JNotifyAdapterMacOSX implements IJNotify
 			// these are guesses
 			// we can't handle a file being renamed and hardlinked in a single batch
 			// we can't detect files being renamed into our directory from outside
-			if (e.created != null && e.deleted != null)
+			if (e.created != null && e.deleted != null && e.renamed != null)
 			{
 				Iterator<Map.Entry<JNFile, TreeSet<String>>> createdIt = e.created.entrySet().iterator();
 				Iterator<Map.Entry<JNFile, TreeSet<String>>> deletedIt = e.deleted.entrySet().iterator();

@@ -5,13 +5,24 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Display;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.resolver.IPathResolver;
 import com.aptana.parsing.ast.IParseNode;
 
 public class CommonOutlineContentProvider implements ITreeContentProvider
 {
 
-	private static final Object[] EMPTY = new Object[0];
+	protected static final Object[] EMPTY = new Object[0];
 	private IParseListener fListener;
+	protected IPathResolver resolver;
+
+	public CommonOutlineItem getOutlineItem(IParseNode node)
+	{
+		if (node == null)
+		{
+			return null;
+		}
+		return new CommonOutlineItem(node.getNameNode().getNameRange(), node);
+	}
 
 	@Override
 	public Object[] getChildren(Object parentElement)
@@ -28,6 +39,11 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 		{
 			return filter(((IParseNode) parentElement).getChildren());
 		}
+		else if (parentElement instanceof CommonOutlineItem)
+		{
+			// delegates to the parse node it references to
+			return getChildren(((CommonOutlineItem) parentElement).getReferenceNode());
+		}
 		return EMPTY;
 	}
 
@@ -37,6 +53,11 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 		if (element instanceof IParseNode)
 		{
 			return ((IParseNode) element).getParent();
+		}
+		if (element instanceof CommonOutlineItem)
+		{
+			IParseNode node = ((CommonOutlineItem) element).getReferenceNode();
+			return getOutlineItem(node.getParent());
 		}
 		return null;
 	}
@@ -78,23 +99,27 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 						public void run()
 						{
 							CommonOutlinePage page = editor.getOutlinePage();
-							// FIXME What if the parse failed! We don't really want to wipe the existing results! This is just a hack!
+							// FIXME What if the parse failed! We don't really want to wipe the existing results! This
+							// is just a hack!
 							IParseNode node = editor.getFileService().getParseResult();
-							if (node.getChildrenCount() > 0)
+							if (node != null)
 							{
 								page.refresh();
+								page.expandToLevel(2);
 							}
 						}
 					});
 				}
 			};
 			editor.getFileService().addListener(fListener);
+			this.resolver = PathResolverProvider.getResolver(editor.getEditorInput());
 		}
 		else if (!isCU && fListener != null)
 		{
 			AbstractThemeableEditor editor = (AbstractThemeableEditor) oldInput;
 			editor.getFileService().removeListener(fListener);
 			fListener = null;
+			this.resolver = PathResolverProvider.getResolver(editor.getEditorInput());
 		}
 	}
 

@@ -19,12 +19,12 @@ public class BrowserContextContributor implements ContextContributor
 			Ruby runtime = command.getRuntime();
 			if (runtime != null)
 			{
-				IRubyObject rubyInstance = ScriptUtils.instantiateClass(runtime, ScriptUtils.RUBLE_MODULE, "Browser");
-				context.put("browser", rubyInstance);
+				IRubyObject rubyInstance = ScriptUtils.instantiateClass(runtime, ScriptUtils.RUBLE_MODULE, "Browser"); //$NON-NLS-1$
+				context.put("browser", rubyInstance); //$NON-NLS-1$
 			}
 			else
 			{
-				context.put("browser", null);
+				context.put("browser", null); //$NON-NLS-1$
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -49,13 +49,21 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 	private char[][] sequences;
 	private boolean found = false;
 	private boolean eof = false;
-	
+	private boolean ignored;
+
+	private boolean ignoreCase;
+
 	/**
 	 * @param baseCharacterScanner
 	 */
 	public SequenceCharacterScanner(ICharacterScanner characterScanner, IPartitionScannerSwitchStrategy switchStrategy) {
+		this(characterScanner, switchStrategy, false);
+	}
+
+	public SequenceCharacterScanner(ICharacterScanner characterScanner, IPartitionScannerSwitchStrategy switchStrategy, boolean ignoreCase) {
 		this.characterScanner = characterScanner;
 		this.sequences = switchStrategy.getSwitchSequences();
+		this.ignoreCase = ignoreCase;
 	}
 
 	/* (non-Javadoc)
@@ -78,7 +86,7 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 	public int read() {
 		eof = false;
 		int c = characterScanner.read();
-		if (c != ICharacterScanner.EOF) {
+		if (c != ICharacterScanner.EOF && !ignored) {
 			for (char[] sequence : sequences) {
 				if (c == sequence[0] && sequenceDetected(sequence)) {
 					found = true;
@@ -102,7 +110,7 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 		found = false;
 		characterScanner.unread();
 	}
-		
+
 	public boolean foundSequence() {
 		try {
 			return found;
@@ -110,11 +118,17 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 			found = false;
 		}
 	}
-	
+
+	public void setSequenceIgnored(boolean ignored)
+	{
+		this.ignored = ignored;
+	}
+
 	private boolean sequenceDetected(char[] sequence) {
 		for (int i = 1; i < sequence.length; ++i) {
 			int c = characterScanner.read();
-			if (c != sequence[i]) {
+			if ((ignoreCase && Character.toLowerCase(c) != Character.toLowerCase(sequence[i]))
+					|| (!ignoreCase && c != sequence[i])) {
 				// Non-matching character detected, rewind the scanner back to the start.
 				// Do not unread the first character.
 				characterScanner.unread();

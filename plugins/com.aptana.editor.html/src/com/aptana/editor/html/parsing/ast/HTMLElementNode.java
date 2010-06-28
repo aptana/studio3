@@ -1,6 +1,7 @@
 package com.aptana.editor.html.parsing.ast;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -9,38 +10,12 @@ import beaver.Symbol;
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
-import com.aptana.parsing.lexer.Range;
 
 public class HTMLElementNode extends HTMLNode
 {
 
 	private static final String ID = "id"; //$NON-NLS-1$
 	private static final String CLASS = "class"; //$NON-NLS-1$
-
-	private static final class NameNode implements INameNode
-	{
-
-		private final String fName;
-		private final IRange fRange;
-
-		public NameNode(String name, int start, int end)
-		{
-			fName = name;
-			fRange = new Range(start, end);
-		}
-
-		@Override
-		public String getName()
-		{
-			return fName;
-		}
-
-		@Override
-		public IRange getNameRange()
-		{
-			return fRange;
-		}
-	}
 
 	private INameNode fNameNode;
 	private Map<String, String> fAttributes;
@@ -74,6 +49,15 @@ public class HTMLElementNode extends HTMLNode
 		}
 		fNameNode = new NameNode(tag, tagSymbol.getStart(), tagSymbol.getEnd());
 		fAttributes = new HashMap<String, String>();
+	}
+
+	@Override
+	public void addOffset(int offset)
+	{
+		IRange range = fNameNode.getNameRange();
+		fNameNode = new NameNode(fNameNode.getName(), range.getStartingOffset() + offset, range.getEndingOffset()
+				+ offset);
+		super.addOffset(offset);
 	}
 
 	public String getName()
@@ -113,6 +97,11 @@ public class HTMLElementNode extends HTMLNode
 		return fAttributes.get(CLASS);
 	}
 
+	public String getAttributeValue(String name)
+	{
+		return fAttributes.get(name);
+	}
+
 	public void setAttribute(String name, String value)
 	{
 		fAttributes.put(name, value);
@@ -126,13 +115,17 @@ public class HTMLElementNode extends HTMLNode
 		if (!(obj instanceof HTMLElementNode))
 			return false;
 
-		return getName().equals(((HTMLElementNode) obj).getName());
+		HTMLElementNode other = (HTMLElementNode) obj;
+		return getName().equals(other.getName()) && fAttributes.equals(other.fAttributes);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return 31 * super.hashCode() + getName().hashCode();
+		int hash = super.hashCode();
+		hash = 31 * hash + getName().hashCode();
+		hash = 31 * hash + fAttributes.hashCode();
+		return hash;
 	}
 
 	@Override
@@ -143,6 +136,14 @@ public class HTMLElementNode extends HTMLNode
 		if (name.length() > 0)
 		{
 			text.append("<").append(name); //$NON-NLS-1$
+			Iterator<String> iter = fAttributes.keySet().iterator();
+			String key, value;
+			while (iter.hasNext())
+			{
+				key = iter.next();
+				value = fAttributes.get(key);
+				text.append(" ").append(key).append("=\"").append(value).append("\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			}
 			text.append(">"); //$NON-NLS-1$
 			IParseNode[] children = getChildren();
 			for (IParseNode child : children)

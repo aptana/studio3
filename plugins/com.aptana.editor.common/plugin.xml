@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            class="com.aptana.editor.common.theme.preferences.ThemePreferencePage"
-            id="com.aptana.editor.common.theme.page"
-            name="%preferencePage.themes.name">
-      </page>
-   </extension>
+   <extension-point id="userAgent" name="%extension-point.name" schema="schema/userAgent.exsd"/>
    <extension
          point="org.eclipse.ui.commands">
        <command
@@ -17,6 +10,32 @@
             id="com.aptana.editor.common.scripting.commands.FilterThroughCommand"
             name="%command.filter.name">
       </command>
+       <command
+             categoryId="org.eclipse.ui.category.views"
+             defaultHandler="com.aptana.editor.common.internal.commands.ExpandAllHandler"
+             description="%command.expandall.description"
+             id="com.aptana.editor.commands.ExpandAll"
+             name="%command.expandall.name">
+       </command>
+       <command
+             categoryId="org.eclipse.ui.category.views"
+             defaultHandler="com.aptana.editor.common.internal.commands.CollapseAllHandler"
+             description="%command.collapseall.description"
+             id="com.aptana.editor.commands.CollapseAll"
+             name="%command.collapseall.name">
+       </command>
+       <command
+             categoryId="org.eclipse.ui.category.views"
+             defaultHandler="com.aptana.editor.common.internal.commands.ExpandLevelHandler"
+             description="%command.expandLevel.description"
+             id="com.aptana.editor.commands.ExpandLevel"
+             name="%command.expandLevel.name">
+          <commandParameter
+                id="level"
+                name="%commandParameter.level.name"
+                optional="true">
+          </commandParameter>
+       </command>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -39,6 +58,107 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+T">
       </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandAll"
+            contextId="com.aptana.editor.common.outline"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3++">
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.CollapseAll"
+            contextId="com.aptana.editor.common.outline"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+-">
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="com.aptana.editor.common.outline"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+1">
+         <parameter
+               id="level"
+               value="1"></parameter>
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="com.aptana.editor.common.outline"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+2">
+         <parameter
+               id="level"
+               value="2">
+         </parameter>
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="com.aptana.editor.common.outline"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+3">
+         <parameter
+               id="level"
+               value="3">
+         </parameter>
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="com.aptana.editor.common.outline"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+4">
+         <parameter
+               id="level"
+               value="4">
+         </parameter>
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="com.aptana.editor.common.outline"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+5">
+         <parameter
+               id="level"
+               value="5">
+         </parameter>
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="com.aptana.editor.common.outline"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+6">
+         <parameter
+               id="level"
+               value="6">
+         </parameter>
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="com.aptana.editor.common.outline"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+7">
+         <parameter
+               id="level"
+               value="7">
+         </parameter>
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="com.aptana.editor.common.outline"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+8">
+         <parameter
+               id="level"
+               value="8">
+         </parameter>
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="com.aptana.editor.common.outline"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+9">
+         <parameter
+               id="level"
+               value="9">
+         </parameter>
+      </key>
 
    </extension>
    <extension
@@ -46,7 +166,7 @@
       <command
             defaultHandler="com.aptana.editor.common.scripting.commands.ShowCommandsMenuHandler"
             id="com.aptana.editor.common.scripting.commands.show"
-            name="Show Commands Menu">
+            name="%command.name">
       </command>
    </extension>
    <extension
@@ -63,15 +183,6 @@
          <dynamic
                class="com.aptana.editor.common.scripting.commands.EditorCommandsMenuContributor"
                id="com.aptana.editor.common.dynamic">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="activePart">
-                  <instanceof
-                        value="com.aptana.editor.common.AbstractThemeableEditor">
-                  </instanceof>
-               </with>
-            </visibleWhen>
          </dynamic>
       </menuContribution>
       <menuContribution
@@ -84,7 +195,7 @@
                <with
                      variable="activePart">
                   <instanceof
-                        value="com.aptana.editor.common.AbstractThemeableEditor">
+                        value="org.eclipse.ui.texteditor.ITextEditor">
                   </instanceof>
                </with>
             </visibleWhen>
@@ -99,71 +210,6 @@
       </initializer>
    </extension>
    <extension
-         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
-      <hyperlinkDetector
-            class="com.aptana.editor.common.hyperlinks.CommonHyperlinkDetector"
-            id="com.aptana.editor.common.hyperlinkDetector"
-            name="Aptana Editor Detector"
-            targetId="com.aptana.editor.ui.hyperlinkTarget">
-      </hyperlinkDetector>
-   </extension>
-   <extension
-         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectorTargets">
-      <target
-            id="com.aptana.editor.ui.hyperlinkTarget"
-            name="Aptana Editor">
-         <context
-               type="org.eclipse.ui.texteditor.ITextEditor">
-         </context>
-      </target>
-   </extension>
-   <extension
-         point="org.eclipse.ui.themes">
-      <colorDefinition
-            categoryId="org.eclipse.ui.workbenchMisc"
-            colorFactory="com.aptana.editor.common.internal.theme.fontloader.FontLoader"
-            id="com.aptana.editor.common.internal.theme.fontloader.FontLoader"
-            label="FontLoader">
-      </colorDefinition>
-      <theme
-            id="com.aptana.editor.common.theme"
-            name="%customThemeName">
-         <fontOverride
-               id="org.eclipse.jface.textfont"
-               value="Inconsolata-regular-14">
-            <fontValue
-                  os="win32"
-                  value="Inconsolata-regular-12">
-            </fontValue>
-         </fontOverride>
-         <fontOverride
-               id="org.eclipse.ui.workbench.texteditor.blockSelectionModeFont"
-               value="Inconsolata-regular-14">
-            <fontValue
-                  os="win32"
-                  value="Inconsolata-regular-12">
-            </fontValue>
-         </fontOverride>
-      </theme>
-      <fontDefinition
-            categoryId="org.eclipse.ui.workbenchMisc"
-            defaultsTo="org.eclipse.jface.textfont"
-            id="com.aptana.explorer.font"
-            isEditable="true"
-            label="%appExplorerFont.label">
-      </fontDefinition>
-   </extension>
-   <extension
-         point="org.eclipse.core.runtime.adapters">
-      <factory
-            adaptableType="org.eclipse.ui.texteditor.ITextEditor"
-            class="com.aptana.editor.common.FindBarDecoratedAdapterFactory">
-         <adapter
-               type="com.aptana.editor.findbar.api.IFindBarDecorated">
-         </adapter>
-      </factory>
-   </extension>
-   <extension
          point="org.eclipse.core.runtime.adapters">
       <factory
             adaptableType="org.eclipse.ui.texteditor.ITextEditor"
@@ -176,7 +222,7 @@
    <extension
          point="com.aptana.scripting.loadPaths">
       <loadPath
-            name="RadRails Framework Files"
+            name="Aptana Studio Framework Files"
             path="framework/">
       </loadPath>
    </extension>
@@ -246,5 +292,186 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="CTRL+SHIFT+TAB">
       </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            id="com.aptana.editor.common.outline"
+            name="%context.outline.name">
+      </context>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.views.ContentOutline?after=additions">
+         <command
+               commandId="com.aptana.editor.commands.ExpandAll">
+         </command>
+         <command
+               commandId="com.aptana.editor.commands.CollapseAll">
+         </command>
+         <menu
+               label="%menu.expand.label">
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="%command.label">
+               <parameter
+                     name="level"
+                     value="1">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="%command.label.0">
+               <parameter
+                     name="level"
+                     value="2">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="%command.label.1">
+               <parameter
+                     name="level"
+                     value="3">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="%command.label.2">
+               <parameter
+                     name="level"
+                     value="4">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="%command.label.3">
+               <parameter
+                     name="level"
+                     value="5">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="%command.label.4">
+               <parameter
+                     name="level"
+                     value="6">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="%command.label.5">
+               <parameter
+                     name="level"
+                     value="7">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="%command.label.6">
+               <parameter
+                     name="level"
+                     value="8">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="%command.label.7">
+               <parameter
+                     name="level"
+                     value="9">
+               </parameter>
+            </command>
+         </menu>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.ui.category.views"
+            defaultHandler="com.aptana.editor.common.internal.handlers.ToggleOutlineHandler"
+            description="%command.toggleoutline.description"
+            id="com.aptana.editor.common.commands.toggleOutline"
+            name="%command.toggleoutline.name">
+         <state
+               class="org.eclipse.ui.handlers.RegistryToggleState:true"
+               id="org.eclipse.ui.commands.toggleState">
+         </state>
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="aptana">
+            <command
+                  commandId="com.aptana.editor.common.commands.toggleOutline"
+                  icon="icons/full/eview16/outline_co.png"
+                  style="toggle">
+               <visibleWhen>
+                  <reference
+                        definitionId="com.aptana.ui.contributions.inGlobalActionSet">
+                  </reference>
+               </visibleWhen>
+            </command>
+         </toolbar>
+      </menuContribution>
+	</extension>
+	<extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectorTargets">
+      <target
+            id="com.aptana.editor.ui.hyperlinkTarget"
+            name="%target.name">
+      </target>
+   </extension>
+    <extension
+          point="com.aptana.editor.common.userAgent">
+       <user-agent
+             icon="icons/ie_icon.png"
+             icon-disabled="icons/ie_icon_grey.png"
+             id="IE"
+             name="Internet Explorer">
+       </user-agent>
+       <user-agent
+             icon="icons/firefox_icon.png"
+             icon-disabled="icons/firefox_icon_grey.png"
+             id="Mozilla"
+             name="Firefox">
+       </user-agent>
+       <user-agent
+             icon="icons/netscape_icon.png"
+             icon-disabled="icons/netscape_icon_grey.png"
+             id="Netscape"
+             name="Netscape">
+       </user-agent>
+       <user-agent
+             icon="icons/opera_icon.png"
+             icon-disabled="icons/opera_icon_grey.png"
+             id="Opera"
+             name="Opera">
+       </user-agent>
+       <user-agent
+             icon="icons/safari_icon.png"
+             icon-disabled="icons/safari_icon_grey.png"
+             id="Safari"
+             name="Safari">
+       </user-agent>
+       <user-agent
+             icon="icons/chrome_icon.png"
+             icon-disabled="icons/chrome_icon_grey.png"
+             id="Chrome"
+             name="Chrome">
+       </user-agent>
+    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.ui.AptanaPreferencePage"
+            class="com.aptana.editor.common.preferences.UserAgentPreferencePage"
+            id="com.aptana.editor.common.preferences.UserAgentPreferencePage"
+            name="%page.name.0"/>            
    </extension>
 </plugin>

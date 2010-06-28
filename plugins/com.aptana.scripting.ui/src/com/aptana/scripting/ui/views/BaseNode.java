@@ -1,5 +1,6 @@
 package com.aptana.scripting.ui.views;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
@@ -8,6 +9,15 @@ class BaseNode implements IBundleViewNode, IPropertySource
 {
 	protected IPropertyDescriptor[] NO_DESCRIPTORS = new IPropertyDescriptor[0];
 	protected Object[] NO_OBJECTS = new Object[0];
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scripting.ui.views.IBundleViewNode#getActions()
+	 */
+	public Action[] getActions()
+	{
+		return null;
+	}
 
 	/*
 	 * (non-Javadoc)

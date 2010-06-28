@@ -3,6 +3,7 @@ package com.aptana.editor.ruby.outline;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
+import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.ruby.Activator;
 import com.aptana.editor.ruby.core.IRubyElement;
 import com.aptana.editor.ruby.core.IRubyMethod;
@@ -28,6 +29,10 @@ public class RubyOutlineLabelProvider extends LabelProvider
 	@Override
 	public Image getImage(Object element)
 	{
+		if (element instanceof CommonOutlineItem)
+		{
+			return getImage(((CommonOutlineItem) element).getReferenceNode());
+		}
 		if (element instanceof IRubyType)
 		{
 			return ((IRubyType) element).isModule() ? MODULE : CLASS;
@@ -47,7 +52,7 @@ public class RubyOutlineLabelProvider extends LabelProvider
 		}
 		else if (element instanceof IRubyElement)
 		{
-			short type = ((IRubyElement) element).getType();
+			short type = ((IRubyElement) element).getNodeType();
 			switch (type)
 			{
 				case IRubyElement.CLASS_VAR:
@@ -68,5 +73,15 @@ public class RubyOutlineLabelProvider extends LabelProvider
 			}
 		}
 		return super.getImage(element);
+	}
+
+	@Override
+	public String getText(Object element)
+	{
+		if (element instanceof CommonOutlineItem)
+		{
+			return getText(((CommonOutlineItem) element).getReferenceNode());
+		}
+		return super.getText(element);
 	}
 }

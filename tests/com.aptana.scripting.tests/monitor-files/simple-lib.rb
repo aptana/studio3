@@ -1,0 +1,3 @@
+class SimpleLib
+
+end

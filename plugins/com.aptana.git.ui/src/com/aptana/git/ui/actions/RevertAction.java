@@ -1,5 +1,6 @@
 package com.aptana.git.ui.actions;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,7 +35,7 @@ public class RevertAction extends StagingAction
 		{
 			for (ChangedFile changedFile : changedFiles)
 			{
-				if (resource.getLocationURI().getPath().endsWith(changedFile.getPath()))
+				if (new File(resource.getLocationURI()).getAbsolutePath().endsWith(changedFile.getPath()))
 				{
 					changedResources.add(resource);
 					break;

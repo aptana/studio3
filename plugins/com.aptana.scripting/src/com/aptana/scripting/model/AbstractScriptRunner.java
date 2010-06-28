@@ -1,5 +1,7 @@
 package com.aptana.scripting.model;
 
+import java.io.File;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -48,7 +50,7 @@ public abstract class AbstractScriptRunner extends Job implements Runnable
 		{
 			IRubyObject object = runtime.getLoadService().getLoadPath();
 
-			if (object != null && object instanceof RubyArray)
+			if (object instanceof RubyArray)
 			{
 				RubyArray loadPathArray = (RubyArray) object;
 
@@ -61,6 +63,67 @@ public abstract class AbstractScriptRunner extends Job implements Runnable
 					RubyString toAdd = runtime.newString(loadPath.replace('\\', '/'));
 
 					loadPathArray.append(toAdd);
+				}
+			}
+		}
+	}
+
+	/**
+	 * register
+	 * 
+	 * @param runtime
+	 */
+	protected void registerLibraries(Ruby runtime, String filename)
+	{
+		if (this._loadPaths != null && this._loadPaths.size() > 0)
+		{
+			// TODO: only use bundle lib paths
+			// build list of load paths that are bundle libs only
+			List<File> paths = new LinkedList<File>();
+
+			for (String loadPath : this._loadPaths)
+			{
+				File path = new File(loadPath);
+
+				if (path.isDirectory() && path.getName().equals(BundleUtils.LIB_DIRECTORY_NAME))
+				{
+					paths.add(path);
+				}
+			}
+
+			if (paths.size() > 0)
+			{
+				IRubyObject object = runtime.getLoadService().getLoadedFeatures();
+				LibraryCrossReference xref = LibraryCrossReference.getInstance();
+
+				if (object instanceof RubyArray)
+				{
+					RubyArray loadedFeaturesArray = (RubyArray) object;
+
+					for (Object featureObject : loadedFeaturesArray)
+					{
+						if (featureObject instanceof String)
+						{
+							String feature = (String) featureObject;
+							
+							// Windows-ify, if necessary
+							if (File.separatorChar == '\\')
+							{
+								feature = feature.replace('/', '\\');
+							}
+
+							for (File path : paths)
+							{
+								File lib = new File(path, feature);
+
+								if (lib.isFile())
+								{
+									xref.registerLibraryReference(filename, lib.getAbsolutePath());
+									break;
+								}
+							}
+						}
+					}
 				}
 			}
 		}

@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
@@ -19,6 +20,7 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -38,15 +40,20 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 
+import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.StringUtil;
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.GitRevList;
 import com.aptana.git.core.model.GitRevSpecifier;
+import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.ui.GitUIPlugin;
-import com.aptana.util.IOUtil;
-import com.aptana.util.StringUtil;
+import com.aptana.theme.Theme;
+import com.aptana.theme.ThemePlugin;
+import com.aptana.ui.IAptanaHistory;
 
-public class GitHistoryPage extends HistoryPage
+public class GitHistoryPage extends HistoryPage implements IAptanaHistory
 {
 
 	private static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat(Messages.GitHistoryPage_DateFormat);
@@ -89,17 +96,17 @@ public class GitHistoryPage extends HistoryPage
 			{
 				SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
 				// Generate the commit list and set the components up with it!
-				GitRepository repo = GitRepository.getAttached(theResource.getProject());
+				GitRepository repo = getGitRepositoryManager().getAttached(theResource.getProject());
 				if (repo == null)
 					return Status.OK_STATUS;
 				GitRevList revList = new GitRevList(repo);
 				// Need the repo relative path
-				String resourcePath = repo.relativePath(theResource);
+				IPath resourcePath = repo.relativePath(theResource);
 				if (subMonitor.isCanceled())
 					return Status.CANCEL_STATUS;
 				repo.lazyReload();
 				subMonitor.worked(5);
-				revList.walkRevisionListWithSpecifier(new GitRevSpecifier(resourcePath), subMonitor.newChild(95));
+				revList.walkRevisionListWithSpecifier(new GitRevSpecifier(resourcePath.toOSString()), subMonitor.newChild(95));
 				final List<GitCommit> commits = revList.getCommits();
 				Display.getDefault().asyncExec(new Runnable()
 				{
@@ -117,6 +124,11 @@ public class GitHistoryPage extends HistoryPage
 		job.setPriority(Job.SHORT);
 		schedule(job);
 		return true;
+	}
+
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 
 	private IWorkbenchPartSite getWorkbenchSite()
@@ -291,7 +303,7 @@ public class GitHistoryPage extends HistoryPage
 		// TODO Force a reload of the index and the refs and set input.
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter)
 	{
 		return null;
@@ -386,6 +398,37 @@ public class GitHistoryPage extends HistoryPage
 				return true;
 		}
 		return false;
+	}
+	
+	public void setTheme(boolean revert)
+	{
+		Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
+		applyTheme(ourControl, theme, revert);
+		applyTheme(graphDetailSplit, theme, revert);
+		applyTheme(revInfoSplit, theme, revert);
+		applyTheme(graph.getControl(), theme, revert);
+		applyTheme(commentViewer, theme, revert);
+		applyTheme(fileViewer.getControl(), theme, revert);
+	}
+	
+	private void applyTheme(Control control, Theme theme, boolean revert)
+	{
+		control.setRedraw(false);
+		if (revert)
+		{
+			control.setBackground(null);
+			control.setForeground(null);
+			control.setFont(null);
+		}
+		else
+		{
+			control.setBackground(ThemePlugin.getDefault().getColorManager()
+					.getColor(theme.getBackground()));
+			control.setForeground(ThemePlugin.getDefault().getColorManager()
+					.getColor(theme.getForeground()));
+			control.setFont(JFaceResources.getTextFont());
+		}
+		control.setRedraw(true);
 	}
 
 }

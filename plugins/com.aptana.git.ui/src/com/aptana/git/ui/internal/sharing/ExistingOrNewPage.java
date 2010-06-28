@@ -36,8 +36,10 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.ui.GitUIPlugin;
 
 /**
@@ -85,7 +87,7 @@ class ExistingOrNewPage extends WizardPage
 			treeItem.setData(project);
 			treeItem.setText(0, project.getName());
 			treeItem.setText(1, project.getLocation().toOSString());
-			URI gitDir = GitRepository.gitDirForURL(project.getLocationURI());
+			URI gitDir = getGitRepositoryManager().gitDirForURL(project.getLocationURI());
 			if (gitDir == null)
 				treeItem.setText(2, ""); //$NON-NLS-1$
 			else
@@ -99,16 +101,15 @@ class ExistingOrNewPage extends WizardPage
 		{
 			public void widgetSelected(SelectionEvent e)
 			{
-				File gitDir = new File(repositoryToCreate.getText(), GitRepository.GIT_DIR);
+				IPath gitDir = Path.fromOSString(repositoryToCreate.getText()).append(GitRepository.GIT_DIR);
 				try
 				{
 					if (GitExecutable.instance() == null)
 					{
-						throw new CoreException(
-								new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
-										Messages.ExistingOrNewPage_UnabletoFindGitExecutableError));
+						throw new CoreException(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
+								Messages.ExistingOrNewPage_UnabletoFindGitExecutableError));
 					}
-					GitRepository.create(gitDir.getParentFile().getAbsolutePath());
+					getGitRepositoryManager().create(gitDir.removeLastSegments(1));
 					for (IProject project : getProjects())
 					{
 						// If we don't refresh the project directories right
@@ -172,6 +173,11 @@ class ExistingOrNewPage extends WizardPage
 		});
 		updateCreateOptions();
 		setControl(g);
+	}
+
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 
 	private void updateCreateOptions()

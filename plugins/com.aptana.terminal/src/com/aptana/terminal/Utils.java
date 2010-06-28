@@ -2,6 +2,7 @@ package com.aptana.terminal;
 
 import java.text.MessageFormat;
 
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -28,11 +29,11 @@ public class Utils
 	 *            true if the editor should be activated, false otherwise
 	 * @return
 	 */
-	public static IEditorPart openEditor(String editorId, boolean activate)
+	public static IEditorPart openTerminalEditor(String editorId, boolean activate)
 	{
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		
-		return openEditor(window, editorId, activate);
+		return openTerminalEditor(window, editorId, activate);
 	}
 	
 	/**
@@ -43,13 +44,16 @@ public class Utils
 	 * @param activate
 	 * @return
 	 */
-	public static IEditorPart openEditor(IWorkbenchWindow window, String editorId, boolean activate)
+	public static IEditorPart openTerminalEditor(IWorkbenchWindow window, String editorId, boolean activate)
 	{
 		
 		if (window != null)
 		{
 			IWorkbenchPage page = window.getActivePage();
-			
+			if (page == null)
+			{
+				return null;
+			}
 			try
 			{
 				// TODO: changed MATCH pattern from MATCH_ID to MATCH_INPUT, so we'll probably need our own version
@@ -96,4 +100,16 @@ public class Utils
 		
 		return buffer.toString();
 	}
+	
+	/**
+	 * @param runnable run in display thread
+	 */
+	public static void runInDisplayThread(Runnable runnable) {
+		if (Display.findDisplay(Thread.currentThread()) != null) {
+			runnable.run();
+		} else if( PlatformUI.isWorkbenchRunning() ) {
+			PlatformUI.getWorkbench().getDisplay().syncExec(runnable);
+		}
+	}
+
 }

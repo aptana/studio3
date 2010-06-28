@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -36,10 +36,12 @@
 package com.aptana.editor.erb.html;
 
 import com.aptana.editor.common.outline.CommonOutlinePage;
+import com.aptana.editor.common.parsing.FileService;
+import com.aptana.editor.erb.IERBConstants;
 import com.aptana.editor.erb.html.outline.RHTMLOutlineContentProvider;
 import com.aptana.editor.erb.html.outline.RHTMLOutlineLabelProvider;
-import com.aptana.editor.erb.html.parsing.RHTMLParser;
 import com.aptana.editor.html.HTMLEditor;
+import com.aptana.editor.html.parsing.HTMLParseState;
 
 /**
  * @author Max Stepanov
@@ -56,9 +58,13 @@ public class RHTMLEditor extends HTMLEditor {
 
         setSourceViewerConfiguration(new RHTMLSourceViewerConfiguration(getPreferenceStore(), this));
         setDocumentProvider(new RHTMLDocumentProvider());
-        
-        getFileService().setParser(new RHTMLParser());
     }
+	
+	@Override
+	protected FileService createFileService()
+	{
+		return new FileService(IERBConstants.LANGUAGE_ERB, new HTMLParseState());
+	}
 
 	@Override
 	protected CommonOutlinePage createOutlinePage()
@@ -68,5 +74,16 @@ public class RHTMLEditor extends HTMLEditor {
 		outline.setLabelProvider(new RHTMLOutlineLabelProvider(getFileService().getParseState()));
 
 		return outline;
+	}
+	
+	@Override
+	protected char[] getPairMatchingCharacters()
+	{
+		char[] orig = super.getPairMatchingCharacters();
+		char[] modified = new char[orig.length + 2];
+		System.arraycopy(orig, 0, modified, 0, orig.length);
+		modified[orig.length] ='%';
+		modified[orig.length + 1] ='%';
+		return modified;
 	}
 }

@@ -9,11 +9,12 @@ import javax.script.ScriptException;
 
 import org.eclipse.core.runtime.Platform;
 
+import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.ProcessUtil;
 import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.ContextContributor;
 import com.aptana.scripting.model.EnvironmentContributor;
-import com.aptana.util.IOUtil;
 
 public class FullnameEnvContextContributor implements ContextContributor, EnvironmentContributor
 {
@@ -79,7 +80,7 @@ public class FullnameEnvContextContributor implements ContextContributor, Enviro
 			{
 				try 
 				{
-					Process p = Runtime.getRuntime().exec("/usr/bin/getent passwd " + username);
+					Process p = ProcessUtil.run("/usr/bin/getent", null, "passwd", username);
 					String read = IOUtil.read(p.getInputStream(), "UTF-8");
 					String raw = read.split(":")[4];
 					String fullname = raw.split(",")[0];

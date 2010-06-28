@@ -15,11 +15,11 @@ import org.eclipse.ui.texteditor.ITextEditorExtension2;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
-import com.aptana.scripting.model.AndFilter;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
-import com.aptana.scripting.model.HasTriggerFilter;
-import com.aptana.scripting.model.ScopeFilter;
+import com.aptana.scripting.model.filters.AndFilter;
+import com.aptana.scripting.model.filters.HasTriggerFilter;
+import com.aptana.scripting.model.filters.ScopeFilter;
 
 public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 {

@@ -1,25 +1,9 @@
 package com.aptana.editor.common.scripting;
 
-import java.io.ByteArrayInputStream;
-
-import junit.framework.TestCase;
-
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jface.text.ITextOperationTarget;
-import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.swt.custom.StyledText;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.ide.IDE;
-import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.scripting.commands.CommandExecutionUtils;
+import com.aptana.editor.common.tests.SingleEditorTestCase;
 import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
@@ -32,40 +16,10 @@ import com.aptana.scripting.model.OutputType;
  * 
  * @author cwilliams
  */
-public class ScriptingInputOutputTest extends TestCase
+public class ScriptingInputOutputTest extends SingleEditorTestCase
 {
 
-	private IProject project;
-	private IFile file;
-	private ITextEditor editor;
-
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-		project = createProject();
-	}
-
-	@Override
-	protected void tearDown() throws Exception
-	{
-		try
-		{
-			// Need to force the editor shut!
-			editor.close(false);
-			// Delete the generated file
-			file.delete(true, new NullProgressMonitor());
-			// Delete the generated project
-			project.delete(true, new NullProgressMonitor());
-		}
-		finally
-		{
-			editor = null;
-			file = null;
-			project = null;
-			super.tearDown();
-		}
-	}
+	private static final String PROJECT_NAME = "scripting_io";
 
 	public void testReplaceSelection() throws Exception
 	{
@@ -549,53 +503,12 @@ public class ScriptingInputOutputTest extends TestCase
 		assertContents("output\nSecond line!");
 	}
 
-	protected IFile createAndOpenFile(String fileName, String contents) throws CoreException, PartInitException
-	{
-		if (file == null)
-		{
-			file = createFile(project, fileName, contents);
-			getEditor();
-		}
-		return file;
-	}
-
-	protected void select(int offset, int length) throws PartInitException
-	{
-		setCaretOffset(offset);
-		getEditor().selectAndReveal(offset, length);
-	}
-
-	protected void setCaretOffset(int offset) throws PartInitException
-	{
-		getTextWidget().setCaretOffset(offset);
-	}
-
-	protected StyledText getTextWidget() throws PartInitException
-	{
-		ITextViewer adapter = (ITextViewer) getEditor().getAdapter(ITextOperationTarget.class);
-		return adapter.getTextWidget();
-	}
-
-	private ITextEditor getEditor() throws PartInitException
-	{
-		if (editor == null)
-		{
-			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-			editor = (ITextEditor) IDE.openEditor(page, file);
-		}
-		return editor;
-	}
-
-	protected void assertContents(String expected) throws PartInitException
-	{
-		assertEquals(expected, getTextWidget().getText());
-	}
-
 	protected void applyCommandResult(InputType inputType, OutputType outputType, String output)
+			throws PartInitException
 	{
 		CommandElement commandElement = new CommandElement("fake/path.rb");
 		CommandResult commandResult = createCommandResult(commandElement, inputType, outputType, "output");
-		CommandExecutionUtils.processCommandResult(commandElement, commandResult, editor);
+		CommandExecutionUtils.processCommandResult(commandElement, commandResult, getEditor());
 	}
 
 	protected CommandResult createCommandResult(CommandElement commandElement, final InputType inputType,
@@ -631,21 +544,10 @@ public class ScriptingInputOutputTest extends TestCase
 		return commandResult;
 	}
 
-	protected IFile createFile(IProject project, String fileName, String contents) throws CoreException
+	@Override
+	protected String getProjectName()
 	{
-		IFile file = project.getFile(fileName);
-		ByteArrayInputStream source = new ByteArrayInputStream(contents.getBytes());
-		file.create(source, true, new NullProgressMonitor());
-		return file;
-	}
-
-	protected IProject createProject() throws CoreException
-	{
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IProject project = workspace.getRoot().getProject("myTest");
-		project.create(new NullProgressMonitor());
-		project.open(new NullProgressMonitor());
-		return project;
+		return PROJECT_NAME;
 	}
 
 }

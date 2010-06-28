@@ -1,17 +1,14 @@
 package com.aptana.editor.html.parsing;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Stack;
 
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.rules.IToken;
 
-import beaver.Symbol;
 import beaver.Scanner.Exception;
+import beaver.Symbol;
 
-import com.aptana.editor.css.parsing.CSSParserFactory;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.html.parsing.HTMLTagScanner.TokenType;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
@@ -19,16 +16,29 @@ import com.aptana.editor.html.parsing.ast.HTMLNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.editor.html.parsing.lexer.HTMLTokens;
 import com.aptana.editor.js.parsing.IJSParserConstants;
-import com.aptana.editor.js.parsing.JSParserFactory;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
+import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParseState;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
-import com.aptana.parsing.ast.ParseBaseNode;
+import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 
 public class HTMLParser implements IParser
 {
+
+	private static final String ATTR_TYPE = "type"; //$NON-NLS-1$
+	private static final String ATTR_LANG = "language"; //$NON-NLS-1$
+
+	@SuppressWarnings("nls")
+	private static final String[] CSS_VALID_TYPE_ATTR = new String[] { "text/css" };
+	@SuppressWarnings("nls")
+	private static final String[] JS_VALID_TYPE_ATTR = new String[] { "application/javascript",
+			"application/ecmascript", "application/x-javascript", "application/x-ecmascript", "text/javascript",
+			"text/ecmascript", "text/jscript" };
+	@SuppressWarnings("nls")
+	private static final String[] JS_VALID_LANG_ATTR = new String[] { "JavaScript" };
 
 	private HTMLParserScanner fScanner;
 	private HTMLParseState fParseState;
@@ -37,8 +47,6 @@ public class HTMLParser implements IParser
 
 	private IParseNode fCurrentElement;
 	private Symbol fCurrentSymbol;
-
-	private Map<String, IParser> fLanguageParsers;
 
 	public HTMLParser()
 	{
@@ -50,13 +58,10 @@ public class HTMLParser implements IParser
 		fScanner = scanner;
 		fElementStack = new Stack<IParseNode>();
 		fTagScanner = new HTMLTagScanner();
-		fLanguageParsers = new HashMap<String, IParser>();
-		fLanguageParsers.put(ICSSParserConstants.LANGUAGE, CSSParserFactory.getInstance().getParser());
-		fLanguageParsers.put(IJSParserConstants.LANGUAGE, JSParserFactory.getInstance().getParser());
 	}
 
 	@Override
-	public IParseNode parse(IParseState parseState) throws java.lang.Exception
+	public synchronized IParseNode parse(IParseState parseState) throws java.lang.Exception
 	{
 		fParseState = (HTMLParseState) parseState;
 		String source = new String(parseState.getSource());
@@ -82,10 +87,10 @@ public class HTMLParser implements IParser
 				processEndTag();
 				break;
 			case HTMLTokens.STYLE:
-				processLanguage(ICSSParserConstants.LANGUAGE, HTMLTokens.STYLE_END);
+				processStyleTag();
 				break;
 			case HTMLTokens.SCRIPT:
-				processLanguage(IJSParserConstants.LANGUAGE, HTMLTokens.SCRIPT_END);
+				processScriptTag();
 				break;
 		}
 	}
@@ -105,17 +110,31 @@ public class HTMLParser implements IParser
 			id = fCurrentSymbol.getId();
 		}
 
-		IParseNode[] nested = getParseResult(fLanguageParsers.get(language), start, end);
+		IParseNode[] nested = new IParseNode[0];
+		IParserPool pool = ParserPoolFactory.getInstance().getParserPool(language);
+		if (pool != null)
+		{
+			IParser parser = pool.checkOut();	
+			if (parser != null)
+			{
+				nested = getParseResult(parser, start, end);
+			}
+			pool.checkIn(parser);
+		}
 		if (fCurrentElement != null)
 		{
-			fCurrentElement
-					.addChild(new HTMLSpecialNode(startTag, nested, startTag.getStart(), fCurrentSymbol.getEnd()));
+			HTMLSpecialNode node = new HTMLSpecialNode(startTag, nested, startTag.getStart(), fCurrentSymbol.getEnd());
+			parseAttribute(node, startTag.value.toString());
+			fCurrentElement.addChild(node);
 		}
 	}
 
-	protected void addLanguageParser(String language, IParser parser)
+	protected HTMLElementNode processCurrentTag()
 	{
-		fLanguageParsers.put(language, parser);
+		HTMLElementNode element = new HTMLElementNode(fCurrentSymbol, fCurrentSymbol.getStart(), fCurrentSymbol
+				.getEnd());
+		parseAttribute(element, fCurrentSymbol.value.toString());
+		return element;
 	}
 
 	private void parseAll(IParseNode root) throws IOException, Exception
@@ -153,17 +172,14 @@ public class HTMLParser implements IParser
 		return new IParseNode[0];
 	}
 
-	private void processStartTag() throws IOException, Exception
+	private void processStartTag()
 	{
-		HTMLElementNode element = new HTMLElementNode(fCurrentSymbol, fCurrentSymbol.getStart(), fCurrentSymbol
-				.getEnd());
+		HTMLElementNode element = processCurrentTag();
 		// pushes the element onto the stack
 		openElement(element);
-
-		parseAttribute(element, fCurrentSymbol.value.toString());
 	}
 
-	private void processEndTag() throws IOException, Exception
+	private void processEndTag()
 	{
 		// only closes current element if current lexeme and element have the same tag name
 		if (fCurrentElement != null)
@@ -178,6 +194,34 @@ public class HTMLParser implements IParser
 				closeElement();
 			}
 		}
+	}
+
+	private void processStyleTag() throws IOException, Exception
+	{
+		HTMLElementNode node = processCurrentTag();
+		String language = null;
+		String type = node.getAttributeValue(ATTR_TYPE);
+		if (type == null || isInArray(type, CSS_VALID_TYPE_ATTR))
+		{
+			language = ICSSParserConstants.LANGUAGE;
+		}
+		else if (isJavaScript(node))
+		{
+			language = IJSParserConstants.LANGUAGE;
+		}
+		processLanguage(language, HTMLTokens.STYLE_END);
+	}
+
+	private void processScriptTag() throws IOException, Exception
+	{
+		HTMLElementNode node = processCurrentTag();
+		String language = null;
+		String type = node.getAttributeValue(ATTR_TYPE);
+		if (type == null || isJavaScript(node))
+		{
+			language = IJSParserConstants.LANGUAGE;
+		}
+		processLanguage(language, HTMLTokens.SCRIPT_END);
 	}
 
 	private void parseAttribute(HTMLElementNode element, String tag)
@@ -247,9 +291,9 @@ public class HTMLParser implements IParser
 
 	private void addOffset(IParseNode node, int offset)
 	{
-		if (node instanceof ParseBaseNode)
+		if (node instanceof ParseNode)
 		{
-			ParseBaseNode parseNode = (ParseBaseNode) node;
+			ParseNode parseNode = (ParseNode) node;
 			parseNode.addOffset(offset);
 		}
 		IParseNode[] children = node.getChildren();
@@ -257,5 +301,32 @@ public class HTMLParser implements IParser
 		{
 			addOffset(child, offset);
 		}
+	}
+
+	private static boolean isJavaScript(HTMLElementNode node)
+	{
+		String type = node.getAttributeValue(ATTR_TYPE);
+		if (isInArray(type, JS_VALID_TYPE_ATTR))
+		{
+			return true;
+		}
+		String langAttr = node.getAttributeValue(ATTR_LANG);
+		if (langAttr != null && isInArray(langAttr, JS_VALID_LANG_ATTR))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	private static boolean isInArray(String element, String[] array)
+	{
+		for (String arrayElement : array)
+		{
+			if (element.startsWith(arrayElement))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 }

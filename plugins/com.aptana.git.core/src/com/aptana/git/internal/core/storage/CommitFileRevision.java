@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.team.core.history.IFileRevision;
 
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitCommit;
@@ -44,7 +45,7 @@ public class CommitFileRevision extends GitFileRevision
 		return new IStorage()
 		{
 
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings("rawtypes")
 			public Object getAdapter(Class adapter)
 			{
 				return null;
@@ -77,7 +78,7 @@ public class CommitFileRevision extends GitFileRevision
 				{
 					throw new CoreException(new Status(IStatus.ERROR, GitPlugin.getPluginId(), e.getMessage(), e));
 				}
-				
+
 			}
 		};
 	}
@@ -104,5 +105,15 @@ public class CommitFileRevision extends GitFileRevision
 	public String getContentIdentifier()
 	{
 		return commit.sha();
+	}
+
+	public boolean isDescendantOf(IFileRevision revision)
+	{
+		if (!(revision instanceof CommitFileRevision))
+			return false;
+		if (!commit.hasParent())
+			return false;
+		CommitFileRevision other = (CommitFileRevision) revision;
+		return commit.parents().contains(other.commit.sha());
 	}
 }

@@ -5,80 +5,139 @@ import java.util.Set;
 
 import org.eclipse.jface.text.IDocument;
 
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.Messages;
 import com.aptana.editor.common.outline.IParseListener;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
+import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParseState;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 
 public class FileService
 {
-
 	private IDocument fDocument;
-	private IParser fParser;
 	private IParseState fParseState;
+	private int fLastSourceHash;
 	private Set<IParseListener> listeners = new HashSet<IParseListener>();
+	private String fLanguage;
 
-	public FileService()
+	public FileService(String language)
 	{
-		fParseState = new ParseState();
+		this(language, new ParseState());
 	}
 
-	public void parse()
+	public FileService(String language, IParseState parseState)
 	{
-		if (fParser == null || fDocument == null)
-		{
-			return;
-		}
-
-		String source = fDocument.get();
-		fParseState.setEditState(source, source, 0, 0);
-		try
-		{
-			fParser.parse(fParseState);
-			for (IParseListener listener : listeners)
-				listener.parseFinished();
-		}
-		catch (Exception e)
-		{
-			CommonEditorPlugin.logError(Messages.FileService_FailedToParse, e);
-		}
+		this.fLanguage = language;
+		this.fParseState = parseState;
 	}
 
-	public IParseState getParseState()
+	/**
+	 * addListener
+	 * 
+	 * @param listener
+	 */
+	public void addListener(IParseListener listener)
 	{
-		return fParseState;
+		listeners.add(listener);
 	}
 
+	/**
+	 * getParseResult
+	 * 
+	 * @return
+	 */
 	public IParseNode getParseResult()
 	{
 		return fParseState.getParseResult();
 	}
 
-	public void setParser(IParser parser)
+	/**
+	 * getParseState
+	 * 
+	 * @return
+	 */
+	public IParseState getParseState()
 	{
-		fParser = parser;
+		return fParseState;
 	}
 
-	public void setParseState(IParseState parseState)
+	/**
+	 * Parse.<br>
+	 * This call is just like calling {@link #parse(boolean)} with false.
+	 */
+	public synchronized void parse()
 	{
-		fParseState = parseState;
+		parse(false);
 	}
 
-	public void setDocument(IDocument document)
+	/**
+	 * Parse, with an option to force a parsing even when the source did not change.
+	 * 
+	 * @param force
+	 */
+	public synchronized void parse(boolean force)
 	{
-		fDocument = document;
-	}
+		if (fLanguage != null && fDocument != null)
+		{
+			String source = fDocument.get();
+			int sourceHash = source.hashCode();
 
-	public void addListener(IParseListener listener)
-	{
-		listeners.add(listener);		
-	}
+			if (force || sourceHash != fLastSourceHash)
+			{
+				fLastSourceHash = sourceHash;
 
+				IParserPool pool = ParserPoolFactory.getInstance().getParserPool(fLanguage);
+				if (pool != null)
+				{
+					IParser parser = pool.checkOut();
+					if (parser != null)
+					{
+						// TODO: at some point, we'll want to use this call to indicate the
+						// actual edit with the theory that we'll be able to perform
+						// incremental lexing and parsing based on that info.
+						fParseState.setEditState(source, source, 0, 0);
+		
+						try
+						{
+							parser.parse(fParseState);
+		
+							for (IParseListener listener : listeners)
+							{
+								listener.parseFinished();
+							}
+						}
+						catch (Exception e)
+						{
+							// not logging the parsing error here since the source could be in an intermediate state of being
+							// edited
+							// by
+							// the user
+						}
+						pool.checkIn(parser);
+					}
+				}
+			}
+		}
+	}
+	
+	/**
+	 * removeListener
+	 * 
+	 * @param fListener
+	 */
 	public void removeListener(IParseListener fListener)
 	{
 		listeners.remove(fListener);
+	}
+
+	/**
+	 * setDocument
+	 * 
+	 * @param document
+	 */
+	public void setDocument(IDocument document)
+	{
+		fDocument = document;
 	}
 }

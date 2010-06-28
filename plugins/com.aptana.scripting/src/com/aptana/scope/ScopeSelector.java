@@ -149,30 +149,40 @@ public class ScopeSelector
 				// process negative lookaheads
 				if (i < ands.length && stack.size() > startingSize)
 				{
-					for (; i < ands.length; i++)
+					String operator = ands[i];
+					
+					if (operator != null && operator.equals("-"))
 					{
-						String operator = ands[i];
-
-						if (operator != null && operator.equals("-"))
+						if (i + 1 < ands.length)
 						{
-							// advance
+							// advance over '-'
 							i++;
-
-							if (i < ands.length)
+							
+							// remember current position
+							startingSize = stack.size();
+							
+							for (; i < ands.length; i++)
 							{
 								String simpleSelector = ands[i];
-								NameSelector right = new NameSelector(simpleSelector);
-								ISelectorNode left = stack.pop();
+	
+								stack.push(new NameSelector(simpleSelector));
+								
+								if (stack.size() > startingSize + 1)
+								{
+									ISelectorNode right = stack.pop();
+									ISelectorNode left = stack.pop();
 
-								stack.push(new NegativeLookaheadSelector(left, right));
+									stack.push(new AndSelector(left, right));
+								}
 							}
-						}
-						else
-						{
-							// don't know what this is, so bail out
-							break;
+							
+							ISelectorNode right = stack.pop();
+							ISelectorNode left = stack.pop();
+							
+							stack.push(new NegativeLookaheadSelector(left, right));
 						}
 					}
+					// else parse error
 				}
 
 				if (stack.size() > 1)

@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -34,10 +34,10 @@
  */
 package com.aptana.parsing.lexer;
 
-public interface ILexeme extends IRange {
-
-    /**
-     * @return the text of this lexeme
-     */
-    public String getText();
+public interface ILexeme extends IRange
+{
+	/**
+	 * @return the text of this lexeme
+	 */
+	public String getText();
 }

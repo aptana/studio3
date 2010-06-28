@@ -4,10 +4,10 @@
    <extension
          point="org.eclipse.ui.views">
       <view
-            allowMultiple="false"
+            allowMultiple="true"
             category="org.eclipse.ui"
             class="com.aptana.explorer.internal.ui.FilteringProjectView"
-            icon="icons/full/cview16/filenav_nav.gif"
+            icon="icons/full/cview16/filenav_nav.png"
             id="com.aptana.explorer.view"
             name="%view.name"
             restorable="true">
@@ -57,7 +57,7 @@
    <extension
          point="com.aptana.scripting.loadPaths">
       <loadPath
-            name="RadRails Framework Files"
+            name="Aptana Studio Framework Files"
             path="framework/">
       </loadPath>
    </extension>
@@ -121,5 +121,104 @@
 			</or>
 	     </enablement>
       </commonWizard>
+      <commonWizard
+            associatedExtensionId="org.eclipse.ui.navigator.resourceContent"
+            type="new"
+            wizardId="com.aptana.ui.wizards.NewWebProject">
+         <enablement></enablement>
+      </commonWizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.ui.category.views"
+            defaultHandler="com.aptana.explorer.internal.handlers.ToggleAppExplorerHandler"
+            description="%command.toggleappexplorer.description"
+            id="com.aptana.explorer.commands.toggleAppExplorer"
+            name="%command.toggleappexplorer.name">
+         <state
+               class="org.eclipse.ui.handlers.RegistryToggleState:true"
+               id="org.eclipse.ui.commands.toggleState">
+         </state>
+      </command>
+      <command
+            defaultHandler="com.aptana.explorer.internal.handlers.DeployHandler"
+            id="com.aptana.explorer.deploy"
+            name="%Deploy.label">
+      </command>
+      <command
+            defaultHandler="com.aptana.explorer.internal.handlers.OpenTerminalHandler"
+            id="com.aptana.explorer.commands.openTerminal"
+            name="%command.openTerminal.name">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="aptana">
+            <command
+                  commandId="com.aptana.explorer.commands.toggleAppExplorer"
+                  icon="icons/full/cview16/filenav_nav.png"
+                  style="toggle">
+               <visibleWhen>
+                  <reference
+                        definitionId="com.aptana.ui.contributions.inGlobalActionSet">
+                  </reference>
+               </visibleWhen>
+            </command>
+         </toolbar>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:com.aptana.explorer.deploy?before=group.deploy">
+         <command
+               commandId="com.aptana.explorer.deploy"
+               label="%Deploy.label"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:com.aptana.explorer.deploy?before=group.cap">
+         <command
+               commandId="com.aptana.explorer.deploy"
+               label="%Deploy.label"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:com.aptana.explorer.deploy?before=group.ftp">
+         <command
+               commandId="com.aptana.explorer.deploy"
+               label="%FTPDeploy.label"
+               icon="icons/full/elcl16/network_arrow.png"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:com.aptana.explorer.deploy?before=group.wizard">
+         <command
+               commandId="com.aptana.explorer.deploy"
+               label="%DeployWizard.label"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:com.aptana.explorer.gear?after=group.run">
+         <command
+               commandId="com.aptana.explorer.commands.openTerminal"
+               label="%command.openTerminal.name"
+               style="push">
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="com.aptana.explorer.deploy"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="CTRL+M3+D">
+      </key>
    </extension>
 </plugin>

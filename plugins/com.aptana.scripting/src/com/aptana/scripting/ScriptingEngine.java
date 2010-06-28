@@ -20,9 +20,9 @@ import org.jruby.embed.LocalVariableBehavior;
 import org.jruby.embed.ScriptingContainer;
 import org.osgi.framework.Bundle;
 
+import com.aptana.core.util.ResourceUtil;
 import com.aptana.scripting.model.RunType;
 import com.aptana.scripting.model.ScriptLoadJob;
-import com.aptana.util.ResourceUtils;
 
 public class ScriptingEngine
 {
@@ -71,7 +71,7 @@ public class ScriptingEngine
 
 			if (url != null)
 			{
-				File lib = ResourceUtils.resourcePathToFile(url);
+				File lib = ResourceUtil.resourcePathToFile(url);
 				// Ok, now use the parent of exploded lib dir as JRuby Home
 				jrubyHome = lib.getParentFile();
 			}
@@ -81,7 +81,7 @@ public class ScriptingEngine
 				jrubyHome = FileLocator.getBundleFile(jruby);
 			}
 
-			result.getProvider().getRubyInstanceConfig().setJRubyHome(jrubyHome.getAbsolutePath());
+			result.setHomeDirectory(jrubyHome.getAbsolutePath());
 		}
 		catch (IOException e)
 		{
@@ -129,7 +129,7 @@ public class ScriptingEngine
 								String declaringPluginID = declaring.getNamespaceIdentifier();
 								Bundle bundle = Platform.getBundle(declaringPluginID);
 								URL url = bundle.getEntry(path);
-								String urlAsPath = ResourceUtils.resourcePathToString(url);
+								String urlAsPath = ResourceUtil.resourcePathToString(url);
 
 								if (urlAsPath != null && urlAsPath.length() > 0)
 								{
@@ -233,7 +233,7 @@ public class ScriptingEngine
 	 */
 	public Object runScript(String fullPath, List<String> loadPaths)
 	{
-		return this.runScript(fullPath, loadPaths, false);
+		return this.runScript(fullPath, loadPaths, this._runType, false);
 	}
 
 	/**
@@ -246,11 +246,25 @@ public class ScriptingEngine
 	 */
 	public Object runScript(String fullPath, List<String> loadPaths, boolean async)
 	{
+		return this.runScript(fullPath, loadPaths, this._runType, async);
+	}
+	
+	/**
+	 * runScript
+	 * 
+	 * @param fullPath
+	 * @param loadPaths
+	 * @param runType
+	 * @param async
+	 * @return
+	 */
+	public Object runScript(String fullPath, List<String> loadPaths, RunType runType, boolean async)
+	{
 		ScriptLoadJob job = new ScriptLoadJob(fullPath, loadPaths);
 
 		try
 		{
-			job.run("Load '" + fullPath + "'", this._runType, async); //$NON-NLS-1$ //$NON-NLS-2$
+			job.run("Load '" + fullPath + "'", runType, async); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		catch (InterruptedException e)
 		{

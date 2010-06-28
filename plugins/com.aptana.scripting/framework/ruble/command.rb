@@ -79,7 +79,7 @@ module Ruble
     end
 
     def key_binding=(key_binding)
-      @key_binding[:all] = key_binding
+      @key_binding.all = key_binding
     end
 
     def output

@@ -1,0 +1,32 @@
+package com.aptana.editor.common.scripting.commands;
+
+import com.aptana.editor.common.tests.SingleEditorTestCase;
+
+public class TextEditorUtilsTest extends SingleEditorTestCase
+{
+	private static final String PROJECT_NAME = "text_editors_util";
+
+	public void testNonZeroCaretOffset() throws Exception
+	{
+		createAndOpenFile("non_zero_caret.txt", "Hello world!");
+		setCaretOffset(5);
+		assertEquals(5, TextEditorUtils.getCaretOffset(getEditor()));
+	}
+
+	public void testCaretOffsetWithNull()
+	{
+		assertEquals(-1, TextEditorUtils.getCaretOffset(null));
+	}
+
+	public void testCaretOffset() throws Exception
+	{
+		createAndOpenFile("newfile.txt", "This is a brand new file!");
+		assertEquals(0, TextEditorUtils.getCaretOffset(getEditor()));
+	}
+
+	@Override
+	protected String getProjectName()
+	{
+		return PROJECT_NAME;
+	}
+}

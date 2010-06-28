@@ -1,5 +1,6 @@
 package com.aptana.git.internal.core;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -15,8 +16,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 	public void initializeDefaultPreferences()
 	{
 		IEclipsePreferences prefs = new DefaultScope().getNode(GitPlugin.getPluginId());
-
-		prefs.putBoolean(IPreferenceConstants.GIT_CALCULATE_PULL_INDICATOR, true);
+		// turn on git pull indicator calculation on all non-win OSes
+		prefs.putBoolean(IPreferenceConstants.GIT_CALCULATE_PULL_INDICATOR, !Platform.getOS().equals(Platform.OS_WIN32));
 
 		try
 		{

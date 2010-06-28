@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.git.core.model.GitRepository;
@@ -44,7 +45,7 @@ public class DeleteBranchAction extends MenuAction
 		if (resource == null)
 			return;
 
-		final GitRepository repo = GitRepository.getAttached(resource.getProject());
+		final GitRepository repo = getGitRepositoryManager().getAttached(resource.getProject());
 		if (repo == null)
 			return;
 
@@ -73,7 +74,7 @@ public class DeleteBranchAction extends MenuAction
 		if (resource == null)
 			return;
 
-		final GitRepository repo = GitRepository.getAttached(resource.getProject());
+		final GitRepository repo = getGitRepositoryManager().getAttached(resource.getProject());
 		if (repo == null)
 			return;
 
@@ -138,7 +139,17 @@ public class DeleteBranchAction extends MenuAction
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
-				final Shell shell = Display.getDefault().getActiveShell();
+				Display display = PlatformUI.getWorkbench().getDisplay();
+				if (display == null)
+				{
+					display = Display.getDefault();
+				}
+				Shell aShell = display.getActiveShell();
+				if (aShell == null)
+				{
+					aShell = new Shell(display);					
+				}
+				final Shell shell = aShell;
 				String text = MessageFormat.format(Messages.DeleteBranchAction_BranchDelete_Msg, branchName);
 				DefaultToolTip toolTip = new DefaultToolTip(shell)
 				{

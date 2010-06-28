@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?NLS TYPE="org.eclipse.help.contexts"?>
+<!--
+Copyright (c) 2008 Wind River Systems, Inc.
+All rights reserved. This program and the accompanying materials 
+are made available under the terms of the Eclipse Public License v1.0 
+which accompanies this distribution, and is available at 
+http://www.eclipse.org/legal/epl-v10.html 
+
+Contributors: 
+Martin Oberhuber (Wind River) - initial API and implementation  
+-->
+<contexts>
+  <context id="terminal_view">
+    <description>The Terminal View supports direct connections to remote systems via serial or network connections.
+    </description>
+  </context>
+</contexts>

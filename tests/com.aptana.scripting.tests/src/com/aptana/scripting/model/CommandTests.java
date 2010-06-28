@@ -32,7 +32,10 @@ public class CommandTests extends BundleTestBase
 	{
 		String resultText = this.executeCommand("invokeString", "Test");
 		
-		assertEquals("hello string", resultText);
+		// NOTE: we have to use endsWith here because msysgit prints out /etc/motd
+		// when using 'bash -l'. Most likely users will turn this off, but we need
+		// to perform the test this way to pass in a default install
+		assertTrue(resultText.endsWith("hello string"));
 	}
 
 	/**

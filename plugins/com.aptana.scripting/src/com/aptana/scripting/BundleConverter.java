@@ -10,14 +10,17 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.xml.sax.InputSource;
 
 import plistreader.AbstractReader;
 import plistreader.PlistFactory;
 import plistreader.PlistProperties;
+
+import com.aptana.core.util.ProcessUtil;
 
 /**
  * This is a rather ugly but mostly working converter for textmate bundles. Run with no args it will search the user's
@@ -123,7 +126,7 @@ public class BundleConverter
 		});
 	}
 
-	private static void convertBundle(File bundleDir, String outputBundlePath) throws IOException
+	public static void convertBundle(File bundleDir, String outputBundlePath) throws IOException
 	{
 		Map<String, String> uuidToName = new HashMap<String, String>();
 		// Run SnippetConverter on snippets sub dir
@@ -152,15 +155,18 @@ public class BundleConverter
 
 	private static boolean copyDir(String srcPath, String destPath)
 	{
-		if (!new File(srcPath).exists())
+		return copyDir(Path.fromOSString(srcPath), Path.fromOSString(destPath));
+	}
+
+	private static boolean copyDir(IPath srcPath, IPath destPath)
+	{
+		if (!srcPath.toFile().exists())
 			return true;
 		try
 		{
-			File dest = new File(destPath);
-			dest.mkdirs();
+			destPath.toFile().mkdirs();
 
-			ProcessBuilder builder = new ProcessBuilder("cp", "-R", srcPath, destPath);
-			Process p = builder.start();
+			Process p = ProcessUtil.run("cp", null, "-R", srcPath.toOSString(), destPath.toOSString());
 			p.waitFor();
 			return true;
 		}
@@ -170,6 +176,11 @@ public class BundleConverter
 			e.printStackTrace();
 		}
 		catch (InterruptedException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (CoreException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -189,11 +200,11 @@ public class BundleConverter
 		// Author
 		buffer.append("  bundle.author = '").append(sanitize(properties, "contactName")).append("'\n");
 		// Contact Email
-		buffer.append("  bundle.contact_email_rot_13 = '").append(sanitize(properties, "contactEmailRot13")).append(
-				"'\n");
+		buffer.append("  bundle.contact_email_rot_13 = '").append(sanitize(properties, "contactEmailRot13"))
+				.append("'\n");
 		// Description
-		buffer.append("  bundle.description =  <<END\n").append((String) properties.getProperty("description")).append(
-				"\nEND\n");
+		buffer.append("  bundle.description =  <<END\n").append((String) properties.getProperty("description"))
+				.append("\nEND\n");
 
 		buffer.append(addIndents(new File(plistFile.getParentFile(), "Preferences")));
 
@@ -405,11 +416,15 @@ public class BundleConverter
 
 	static PlistProperties parse(File plistFile)
 	{
+		return parse(Path.fromOSString(plistFile.getAbsolutePath()));
+	}
+
+	static PlistProperties parse(IPath plistPath)
+	{
 		try
 		{
-			ProcessBuilder builder = new ProcessBuilder("/usr/bin/plutil", "-convert", "xml1", plistFile.getName());
-			builder.directory(plistFile.getParentFile());
-			Process p = builder.start();
+			Process p = ProcessUtil.run("/usr/bin/plutil", plistPath.removeLastSegments(1), "-convert", "xml1",
+					plistPath.lastSegment());
 			int exitCode = p.waitFor();
 			if (exitCode != 0)
 			{
@@ -419,14 +434,15 @@ public class BundleConverter
 			AbstractReader reader = PlistFactory.createReader();
 			// FIXME Often these files will have special characters that aren't proper in XML (like say Ctrl+C as a
 			// keybinding, 0x03 so we need it to become "&#x03;"), we need to massage the XML now!
-			InputSource source = new InputSource(new InputStreamReader(new FileInputStream(plistFile), "UTF-8"));
+			InputSource source = new InputSource(
+					new InputStreamReader(new FileInputStream(plistPath.toFile()), "UTF-8"));
 			source.setEncoding("UTF-8");
 			reader.setSource(source);
 			return reader.parse();
 		}
 		catch (Exception e)
 		{
-			System.err.println("An error occurred processing: " + plistFile.getAbsolutePath());
+			System.err.println("An error occurred processing: " + plistPath.toOSString());
 		}
 		return null;
 	}
@@ -472,60 +488,75 @@ public class BundleConverter
 			char c = keyBinding.charAt(i);
 			switch (c)
 			{
-				case '':
+				case '': // 63236
+					builder.append("F1+"); //$NON-NLS-1$
+					break;
+				case 63237:
+					builder.append("F2+"); //$NON-NLS-1$
+					break;
+				case '': // 63238
+					builder.append("F3+"); //$NON-NLS-1$
+					break;
+				case 63239:
+					builder.append("F4+"); //$NON-NLS-1$
+					break;
+				case '': // 63240
 					builder.append("F5+"); //$NON-NLS-1$
 					break;
-				case '@':
-					builder.append("M1+M2+"); //$NON-NLS-1$
+				case 63241:
+					builder.append("F6+"); //$NON-NLS-1$
 					break;
-				case '^':
-					if ((keyBinding.length() > (i + 1)) && (keyBinding.charAt(i + 1) == '@'))
-					{
-						builder.append("CONTROL+COMMAND+SHIFT+"); //$NON-NLS-1$
-						i++;
-					}
-					else
-					{
-						builder.append("CONTROL+M2+"); //$NON-NLS-1$
-					}
+				case 63242:
+					builder.append("F7+"); //$NON-NLS-1$
 					break;
-				case '~':
-					if ((keyBinding.length() > (i + 1)) && (keyBinding.charAt(i + 1) == '@'))
-					{
-						builder.append("OPTION+COMMAND+"); //$NON-NLS-1$
-						i++;
-					}
-					else
-					{
-						builder.append(c).append('+');
-					}
+				case 63243:
+					builder.append("F8+"); //$NON-NLS-1$
+					break;
+				case 63244:
+					builder.append("F9+"); //$NON-NLS-1$
+					break;
+				case 63245:
+					builder.append("F10+"); //$NON-NLS-1$
+					break;
+				case 63246:
+					builder.append("F11+"); //$NON-NLS-1$
+					break;
+				case 63247:
+					builder.append("F12+"); //$NON-NLS-1$
+					break;
+				case '@': // COMMAND, which is M1 on Mac
+					builder.append("M1+"); //$NON-NLS-1$				
+					break;
+				case '^': // CTRL, which is M4 on Mac
+					builder.append("M4+"); //$NON-NLS-1$					
+					break;
+				case '~': // M3, ALT/OPTION
+					builder.append("M3+"); //$NON-NLS-1$
+					break;
+				case '$':
+					builder.append("M2+"); //$NON-NLS-1$
+					break;
+				case '\n':
+					builder.append("ENTER+"); //$NON-NLS-1$
+					break;
+				case '': // invisible escape character
+					builder.append("ESCAPE+"); //$NON-NLS-1$
+					break;
+				case '': // invisible backspace character
+					builder.append("DEL+"); //$NON-NLS-1$
 					break;
 				default:
-					builder.append(c).append('+');
+					if (Character.isLetter(c) && Character.isUpperCase(c))
+					{
+						builder.append("M2+"); //$NON-NLS-1$
+					}
+					builder.append(Character.toUpperCase(c)).append('+');
 					break;
 			}
 		}
 		if (keyBinding.length() > 0)
 			builder.deleteCharAt(builder.length() - 1);
 
-		// Turn Shift+lowercase_letter into uppercase_letter
-		String result = builder.toString();
-		Pattern p = Pattern.compile("(SHIFT|M2)\\+([a-z])");
-		Matcher m = p.matcher(result);
-		StringBuffer sb = new StringBuffer();
-		while (m.find())
-		{
-			m.appendReplacement(sb, m.group(2).toUpperCase());
-		}
-		m.appendTail(sb);
-		result = sb.toString();
-
-		// We really need to convert any characters that only occur with a shift into their "unshifted chars + shift"
-		for (Map.Entry<Character, Character> entry : shiftChars.entrySet())
-		{
-			result = result.replace("SHIFT+" + entry.getKey(), "SHIFT+" + entry.getValue());
-			result = result.replace("M2+" + entry.getKey(), "M2+" + entry.getValue());
-		}
-		return result;
+		return builder.toString();
 	}
 }

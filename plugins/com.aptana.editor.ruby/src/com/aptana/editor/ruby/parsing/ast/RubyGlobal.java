@@ -11,7 +11,7 @@ public class RubyGlobal extends RubyField
 	}
 
 	@Override
-	public short getType()
+	public short getNodeType()
 	{
 		return IRubyElement.GLOBAL;
 	}

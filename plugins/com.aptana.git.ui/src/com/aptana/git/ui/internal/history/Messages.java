@@ -5,6 +5,7 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.git.ui.internal.history.messages"; //$NON-NLS-1$
+
 	public static String CommitFileDiffViewer_Created;
 	public static String CommitFileDiffViewer_Deleted;
 	public static String CommitFileDiffViewer_Modified;
@@ -12,9 +13,18 @@ public class Messages extends NLS
 	public static String CommitFileDiffViewer_Renamed;
 	public static String CommitGraphTable_AuthorColumn_Label;
 	public static String CommitGraphTable_DateColumn_Label;
+	public static String GitCompareFileRevisionEditorInput_workspace;
+	public static String GitCompareFileRevisionEditorInput_localRevision;
+	public static String GitCompareFileRevisionEditorInput_repository;
+	public static String GitCompareFileRevisionEditorInput_0;
+	public static String GitCompareFileRevisionEditorInput_1;
+	public static String GitCompareFileRevisionEditorInput_2;
+	public static String GitCompareFileRevisionEditorInput_CompareInputTitle;
+	public static String GitCompareFileRevisionEditorInput_CompareResourceAndVersion;
+	public static String GitCompareFileRevisionEditorInput_ProblemGettingContent_Error;
 	public static String GitHistoryPage_DateFormat;
 	public static String GitHistoryPage_GeneratingHistoryJob_title;
-	
+
 	static
 	{
 		// initialize resource bundle

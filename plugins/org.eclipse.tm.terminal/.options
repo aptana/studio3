@@ -1,0 +1,8 @@
+org.eclipse.tm.terminal/debug/log/directory = /tmp/
+org.eclipse.tm.terminal/debug/log = true
+org.eclipse.tm.terminal/debug/log/error = true
+org.eclipse.tm.terminal/debug/log/info = false
+org.eclipse.tm.terminal/debug/log/char = false
+org.eclipse.tm.terminal/debug/log/buffer/size = false
+org.eclipse.tm.terminal/debug/log/VT100Backend = false
+org.eclipse.tm.terminal/debug/use_old_implementation = false

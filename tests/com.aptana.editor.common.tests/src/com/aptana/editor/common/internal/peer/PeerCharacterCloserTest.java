@@ -46,6 +46,8 @@ public class PeerCharacterCloserTest extends TestCase
 		super.tearDown();
 	}
 
+	// TODO Add tests so we can verify that newline inside () inserts it, but in "" moves to exit of linked mode
+	
 	public void testDoesntDoubleEndingUnclosedPair()
 	{
 		setDocument("\" ");

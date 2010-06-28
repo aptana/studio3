@@ -8,8 +8,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -18,11 +21,14 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.jruby.RubyRegexp;
 
+import com.aptana.core.util.ResourceUtil;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptingEngine;
-import com.aptana.util.ResourceUtils;
+import com.aptana.scripting.model.filters.AndFilter;
+import com.aptana.scripting.model.filters.IModelFilter;
+import com.aptana.scripting.model.filters.IsExecutableCommandFilter;
 
 public class BundleManager
 {
@@ -40,7 +46,6 @@ public class BundleManager
 	private static final String BUILTIN_BUNDLES = "bundles"; //$NON-NLS-1$
 	private static final String BUNDLE_FILE = "bundle.rb"; //$NON-NLS-1$
 	private static final String RUBY_FILE_EXTENSION = ".rb"; //$NON-NLS-1$
-	private static final String LIB_DIRECTORY_NAME = "lib"; //$NON-NLS-1$
 	private static final String USER_HOME_PROPERTY = "user.home"; //$NON-NLS-1$
 	private static final String USER_BUNDLE_DIRECTORY_GENERAL = "Aptana Rubles"; //$NON-NLS-1$
 	private static final String USER_BUNDLE_DIRECTORY_MACOSX = "/Documents/Aptana Rubles"; //$NON-NLS-1$
@@ -55,10 +60,9 @@ public class BundleManager
 
 	private Object bundlePathsLock = new Object();
 	private Object entryNamesLock = new Object();
+	
 	private List<BundleChangeListener> _bundleListeners;
-
 	private List<ElementChangeListener> _elementListeners;
-
 	private List<LoadCycleListener> _loadCycleListeners;
 
 	/**
@@ -90,7 +94,7 @@ public class BundleManager
 
 			if (url != null)
 			{
-				INSTANCE.applicationBundlesPath = ResourceUtils.resourcePathToString(url);
+				INSTANCE.applicationBundlesPath = ResourceUtil.resourcePathToString(url);
 			}
 
 			String OS = Platform.getOS();
@@ -518,6 +522,19 @@ public class BundleManager
 	}
 
 	/**
+	 * getBundleDirectory
+	 * 
+	 * @param script
+	 * @return
+	 */
+	public File getBundleDirectory(File script)
+	{
+		String scriptPath = script.getAbsolutePath();
+		
+		return scriptPath.endsWith(BUNDLE_FILE) ? script.getParentFile() : script.getParentFile().getParentFile();
+	}
+	
+	/**
 	 * getBundles
 	 * 
 	 * @param bundlesDirectory
@@ -619,11 +636,58 @@ public class BundleManager
 	 */
 	protected List<String> getBundleLoadPaths(File bundleDirectory)
 	{
+		List<String> result = null;
+		
+		if (bundleDirectory != null)
+		{
+			File bundleFile = new File(bundleDirectory, BUNDLE_FILE);
+			String bundleName = BundleUtils.getBundleName(bundleFile);
+			
+			if (bundleName != null)
+			{
+				String defaultName = BundleUtils.getDefaultBundleName(bundleFile.getAbsolutePath());
+				
+				if (bundleName.equals(defaultName) == false)
+				{
+					result = this.getBundleLoadPaths(bundleName);
+				}
+			}
+			
+			if (result == null)
+			{
+				result = new LinkedList<String>();
+				
+				result.addAll(ScriptingEngine.getInstance().getContributedLoadPaths());
+			}
+			
+			result.add(0, BundleUtils.getBundleLibDirectory(bundleDirectory));
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * getBundleLoadPaths
+	 * 
+	 * @param bundleDirectory
+	 * @return
+	 */
+	protected List<String> getBundleLoadPaths(String name)
+	{
 		List<String> result = new ArrayList<String>();
-		List<String> paths = ScriptingEngine.getInstance().getContributedLoadPaths();
 
-		result.addAll(paths);
-		result.add(bundleDirectory.getAbsolutePath() + File.separator + LIB_DIRECTORY_NAME);
+		synchronized (entryNamesLock)
+		{
+			if (this._entriesByName != null && this._entriesByName.containsKey(name))
+			{
+				// grab all bundles of the given name
+				BundleEntry entry = this._entriesByName.get(name);
+				
+				result.addAll(entry.getLoadPaths());
+			}
+		}
+		
+		result.addAll(ScriptingEngine.getInstance().getContributedLoadPaths());
 
 		return result;
 	}
@@ -709,10 +773,11 @@ public class BundleManager
 
 		return result;
 	}
-
+	
 	/**
 	 * getBundleScripts
 	 * 
+	 * @param bundleDirectory
 	 * @return
 	 */
 	protected File[] getBundleScripts(File bundleDirectory)
@@ -798,6 +863,47 @@ public class BundleManager
 		}
 
 		return result.toArray(new CommandElement[result.size()]);
+	}
+	
+	/**
+	 * getContentAssists
+	 * 
+	 * @param filter
+	 * @return
+	 */
+	public ContentAssistElement[] getContentAssists(IModelFilter filter)
+	{
+		IModelFilter caFilter = new IModelFilter()
+		{
+
+			@Override
+			public boolean include(AbstractElement element)
+			{
+				return element instanceof ContentAssistElement;
+			}
+		};
+		if (filter != null)
+		{
+			filter = new AndFilter(filter, caFilter);
+		}
+		else
+		{
+			filter = caFilter;
+		}
+		
+		List<ContentAssistElement> result = new ArrayList<ContentAssistElement>();
+		for (String name : this.getBundleNames())
+		{
+			for (CommandElement command : this.getBundleCommands(name))
+			{
+				if (filter.include(command))
+				{
+					result.add((ContentAssistElement) command);
+				}
+			}
+		}
+
+		return result.toArray(new ContentAssistElement[result.size()]);
 	}
 
 	/**
@@ -1051,24 +1157,33 @@ public class BundleManager
 	}
 
 	/**
-	 * isValidBundleDirectory
+	 * hasBndleAtPath
 	 * 
 	 * @param bundleDirectory
 	 * @return
 	 */
-	protected boolean isValidBundleDirectory(File bundleDirectory)
+	public boolean hasBundleAtPath(File bundleDirectory)
 	{
-		return this.isValidBundleDirectory(bundleDirectory, true);
+		boolean result = false;
+
+		synchronized (bundlePathsLock)
+		{
+			if (this._bundlesByPath != null)
+			{
+				result = this._bundlesByPath.containsKey(bundleDirectory);
+			}
+		}
+		
+		return result;
 	}
 
 	/**
 	 * isValidBundleDirectory
 	 * 
 	 * @param bundleDirectory
-	 * @param logErrors
 	 * @return
 	 */
-	protected boolean isValidBundleDirectory(File bundleDirectory, boolean logErrors)
+	protected boolean isValidBundleDirectory(File bundleDirectory)
 	{
 		String message = null;
 		boolean result = false;
@@ -1111,7 +1226,7 @@ public class BundleManager
 					new Object[] { bundleDirectory.getAbsolutePath() });
 		}
 
-		if (result == false && logErrors && message != null && message.length() > 0)
+		if (result == false  && message != null && message.length() > 0)
 		{
 			ScriptLogger.logError(message);
 		}
@@ -1164,7 +1279,7 @@ public class BundleManager
 	{
 		// clear out any existing bundles since we're rebuilding from scratch
 		this.reset();
-
+		
 		this.loadApplicationBundles();
 		this.loadUserBundles();
 		this.loadProjectBundles();
@@ -1208,17 +1323,7 @@ public class BundleManager
 		if (script != null)
 		{
 			// determine bundle root directory
-			String scriptPath = script.getAbsolutePath();
-			File bundleDirectory = null;
-
-			if (scriptPath.endsWith(BUNDLE_FILE))
-			{
-				bundleDirectory = script.getParentFile();
-			}
-			else
-			{
-				bundleDirectory = script.getParentFile().getParentFile();
-			}
+			File bundleDirectory = this.getBundleDirectory(script);
 
 			// get bundle load paths
 			List<String> bundleLoadPaths = this.getBundleLoadPaths(bundleDirectory);
@@ -1286,6 +1391,19 @@ public class BundleManager
 	}
 
 	/**
+	 * reloadBundle
+	 * 
+	 * @param bundle
+	 */
+	public void reloadBundle(BundleElement bundle)
+	{
+		File bundleDirectory = bundle.getBundleDirectory();
+		
+		this.unloadBundle(bundleDirectory);
+		this.loadBundle(bundleDirectory);
+	}
+	
+	/**
 	 * reloadScript
 	 * 
 	 * @param script
@@ -1295,8 +1413,17 @@ public class BundleManager
 		if (script != null)
 		{
 			this.unloadScript(script, false);
-			this.loadScript(script, false);
+			
+			// determine bundle root directory
+			File bundleDirectory = this.getBundleDirectory(script);
 
+			// get bundle load paths
+			List<String> loadPaths = this.getBundleLoadPaths(bundleDirectory);
+			
+			// execute script
+			ScriptingEngine.getInstance().runScript(script.getAbsolutePath(), loadPaths, RunType.THREAD, true);
+
+			// fire reload event
 			this.fireScriptReloadedEvent(script);
 		}
 		else
@@ -1417,6 +1544,30 @@ public class BundleManager
 	}
 
 	/**
+	 * unloadBundle
+	 * 
+	 * @param bundleDirectory
+	 */
+	public void unloadBundle(File bundleDirectory)
+	{
+		AbstractElement[] elements = AbstractElement.getElementsByDirectory(bundleDirectory.getAbsolutePath());
+		Set<File> scripts = new HashSet<File>();
+		
+		if (elements != null)
+		{
+			for (AbstractElement element : elements)
+			{
+				scripts.add(new File(element.getPath()));
+			}
+		}
+		
+		for (File script : scripts)
+		{
+			this.unloadScript(script);
+		}
+	}
+	
+	/**
 	 * unloadScript
 	 * 
 	 * @param script
@@ -1437,7 +1588,7 @@ public class BundleManager
 		if (script != null)
 		{
 			String scriptPath = script.getAbsolutePath();
-			AbstractElement[] elements = AbstractElement.getRegisteredElements(scriptPath);
+			AbstractElement[] elements = AbstractElement.getElementsByPath(scriptPath);
 
 			// remove bundle members in pass 1
 			for (AbstractElement element : elements)
@@ -1486,5 +1637,4 @@ public class BundleManager
 			ScriptLogger.logError(message);
 		}
 	}
-
 }

@@ -7,6 +7,7 @@
             class="com.aptana.editor.text.TextEditor"
             contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
             default="true"
+            extensions="log,opts"
             icon="icons/text.png"
             id="com.aptana.editor.text"
             name="%editor.text.name">

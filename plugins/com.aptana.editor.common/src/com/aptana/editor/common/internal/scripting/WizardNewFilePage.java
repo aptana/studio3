@@ -3,19 +3,24 @@ package com.aptana.editor.common.internal.scripting;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 
 import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
-import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandElement;
-import com.aptana.scripting.model.CommandResult;
-import com.aptana.scripting.model.IModelFilter;
 import com.aptana.scripting.model.TemplateElement;
+import com.aptana.scripting.model.filters.IModelFilter;
 
 public class WizardNewFilePage extends WizardNewFileCreationPage
 {
+
+	private TemplateElement[] templates;
 
 	public WizardNewFilePage(String pageName, IStructuredSelection selection)
 	{
@@ -23,57 +28,79 @@ public class WizardNewFilePage extends WizardNewFileCreationPage
 	}
 
 	@Override
+	public void handleEvent(Event event)
+	{
+		// Hook into the event handling to get the typed file name.
+		// In case we have a template for that, the canFlipToNextPage method call will show the Next button
+		if (event.type == SWT.Modify)
+		{
+			collectTemplates();
+		}
+		super.handleEvent(event);
+	}
+
+	/**
+	 * Returns the templates that are associated with the typed file extension.
+	 * 
+	 * @return TemplateElement array.
+	 */
+	public TemplateElement[] getTemplates()
+	{
+		return templates;
+	}
+
+	@Override
+	public boolean canFlipToNextPage()
+	{
+		return templates != null && templates.length > 0;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.dialogs.WizardNewFileCreationPage#getInitialContents()
+	 */
 	protected InputStream getInitialContents()
 	{
-		CommandElement[] commands = BundleManager.getInstance().getCommands(new IModelFilter()
+		IWizard wizard = getWizard();
+		TemplateSelectionPage templateSelectionPage = (TemplateSelectionPage) wizard
+				.getPage(NewFileWizard.TEMPLATE_PAGE_NAME);
+		String templateContent = NewFileWizard.getTemplateContent(templateSelectionPage.getSelectedTemplate());
+		if (templateContent != null)
 		{
-
-			@Override
-			public boolean include(AbstractElement element)
-			{
-				// TODO Filter here by matching the filetype?
-				return element instanceof TemplateElement;
-			}
-		});
-		if (commands != null && commands.length > 0)
-		{
-			for (CommandElement command : commands)
-			{
-				if (!(command instanceof TemplateElement))
-					continue;
-				TemplateElement template = (TemplateElement) command;
-				String pattern = template.getFiletype();
-				if (pattern.isEmpty())
-					continue;
-
-				// TODO This code was copy-pasted from BundleManager.getTopLevelScope
-				// Escape periods in pattern (for regexp)
-				pattern = pattern.replaceAll("\\.", "\\\\."); //$NON-NLS-1$ //$NON-NLS-2$
-
-				// Replace * wildcard pattern with .+? regexp
-				pattern = pattern.replaceAll("\\*", "\\.\\+\\?"); //$NON-NLS-1$ //$NON-NLS-2$
-				if (getFileName().matches(pattern))
-				{
-					CommandContext context = template.createCommandContext();
-					context.getMap().put("TM_NEW_FILE_BASENAME", getFileBaseName()); //$NON-NLS-1$
-					CommandResult result = template.execute(context);
-					String output = result.getOutputString();
-					return new ByteArrayInputStream(output.getBytes());
-				}
-			}
+			return new ByteArrayInputStream(templateContent.getBytes());
 		}
 		return super.getInitialContents();
 	}
 
-	private String getFileBaseName()
+	private void collectTemplates()
 	{
-		String filename = getFileName();
-		int index = filename.indexOf('.');
-		if (index != -1)
+		IPath path = Path.fromOSString(getFileName());
+		String extension = path.getFileExtension();
+		final String fileExtension = extension != null ? ("*." + extension) : null; //$NON-NLS-1$
+		CommandElement[] commands = BundleManager.getInstance().getCommands(new IModelFilter()
 		{
-			return filename.substring(0, index);
+			public boolean include(AbstractElement element)
+			{
+				if (element instanceof TemplateElement)
+				{
+					TemplateElement te = (TemplateElement) element;
+					String filetype = te.getFiletype();
+					return filetype != null && filetype.equals(fileExtension);
+				}
+				return false;
+			}
+		});
+		if (commands != null && commands.length > 0)
+		{
+			templates = new TemplateElement[commands.length];
+			for (int i = 0; i < commands.length; i++)
+			{
+				templates[i] = (TemplateElement) commands[i];
+			}
 		}
-		return filename;
+		else
+		{
+			templates = new TemplateElement[0];
+		}
 	}
-
 }

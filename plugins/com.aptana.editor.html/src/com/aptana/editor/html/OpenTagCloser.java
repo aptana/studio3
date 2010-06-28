@@ -118,7 +118,7 @@ public class OpenTagCloser implements VerifyKeyListener
 		}
 	}
 
-	private boolean tagClosed(IDocument document, int offset, String openTag) throws BadLocationException
+	private boolean tagClosed(IDocument document, int offset, String openTag)
 	{
 		// Actually make a "stack" of open and close tags for this tag name and see if it's unbalanced
 		String tagName = getTagName(openTag);

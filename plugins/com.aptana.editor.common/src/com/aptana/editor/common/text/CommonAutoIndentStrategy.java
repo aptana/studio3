@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -43,8 +43,6 @@ import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 
-import com.aptana.editor.common.CommonSourceViewerConfiguration;
-
 /**
  * This class will auto-indent after curly braces {} by default (and won't auto dedent on close brace). Subclasses
  * should override to provide their own rules for indenting.
@@ -52,7 +50,7 @@ import com.aptana.editor.common.CommonSourceViewerConfiguration;
  * @author Ingo Muschenetz
  * @author Michael Xia (mxia@aptana.com)
  */
-public class CommonAutoIndentStrategy implements IAutoEditStrategy
+public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 {
 
 	private String fContentType;
@@ -65,17 +63,6 @@ public class CommonAutoIndentStrategy implements IAutoEditStrategy
 		fContentType = contentType;
 		fViewerConfiguration = configuration;
 		fSourceViewer = sourceViewer;
-	}
-
-	public void customizeDocumentCommand(IDocument document, DocumentCommand command)
-	{
-		if (command.length == 0 && command.text != null && isLineDelimiter(document, command.text))
-		{
-			if (shouldAutoIndent() && !autoIndent(document, command))
-			{
-				autoIndentAfterNewLine(document, command);
-			}
-		}
 	}
 
 	protected SourceViewerConfiguration getSourceViewerConfiguration()
@@ -131,52 +118,7 @@ public class CommonAutoIndentStrategy implements IAutoEditStrategy
 	 *            the command to deal with
 	 * @return true if the indentation occurred, false otherwise
 	 */
-	protected boolean autoIndent(IDocument d, DocumentCommand c)
-	{
-		int offset = c.offset;
-
-		if (offset != -1 && d.getLength() != 0)
-		{
-			String indent = getAutoIndentAfterNewLine(d, c);
-			String newline = c.text;
-			String tab = "\t"; //$NON-NLS-1$
-
-			if (fViewerConfiguration instanceof CommonSourceViewerConfiguration)
-			{
-				tab = ((CommonSourceViewerConfiguration) fViewerConfiguration).getIndent();
-			}
-
-			try
-			{
-				if (c.offset > 0)
-				{
-					char ch = d.getChar(c.offset - 1);
-
-					if (ch == '{')
-					{
-						String startIndent = newline + indent + tab;
-						if (c.offset < d.getLength() && d.getChar(c.offset) == '}')
-						{
-							c.text = startIndent + newline + indent;
-						}
-						else
-						{
-							c.text = startIndent;
-						}
-
-						c.shiftsCaret = false;
-						c.caretOffset = c.offset + startIndent.length();
-
-						return true;
-					}
-				}
-			}
-			catch (BadLocationException e)
-			{
-			}
-		}
-		return false;
-	}
+	abstract protected boolean autoIndent(IDocument d, DocumentCommand c);
 
 	/**
 	 * Gets the indentation of the previous line.
@@ -203,10 +145,42 @@ public class CommonAutoIndentStrategy implements IAutoEditStrategy
 			// finds the white spaces
 			int end = findEndOfWhiteSpace(d, start, c.offset);
 
+			String indent = ""; //$NON-NLS-1$
+			char c1 = d.getChar(end);
 			if (end > start)
 			{
-				// append to input
-				buf.append(d.get(start, end - start));
+				indent = d.get(start, end - start);
+			}
+			// append to input
+			buf.append(indent);
+
+			String line = d.get(info.getOffset(), info.getLength());
+			line = line.trim();
+			if (c1 == '*' && !line.endsWith("*/")) //$NON-NLS-1$
+			{
+				buf.append("* "); //$NON-NLS-1$
+			}
+			else if (line.startsWith("/*") && !line.endsWith("*/")) //$NON-NLS-1$ //$NON-NLS-2$
+			{
+				buf.append(" * "); //$NON-NLS-1$
+				try
+				{
+					IRegion nextLineInfo = d.getLineInformationOfOffset(c.offset + 1);
+					String nextLine = d.get(nextLineInfo.getOffset(), nextLineInfo.getLength()).trim();
+					if (nextLine.startsWith("*") || nextLine.endsWith("*/")) //$NON-NLS-1$ //$NON-NLS-2$
+					{
+						return buf.toString();
+					}
+				}
+				catch (BadLocationException e)
+				{
+				}
+				String toEnd = " */"; //$NON-NLS-1$
+				if (line.startsWith("/**")) //$NON-NLS-1$
+				{
+					toEnd = " */"; //$NON-NLS-1$
+				}
+				d.replace(c.offset, 0, "\n" + indent + toEnd); //$NON-NLS-1$
 			}
 		}
 		catch (BadLocationException e)

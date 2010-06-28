@@ -60,7 +60,7 @@ public class CSSDeclarationNode extends CSSNode
 		if (fIdentifier != null)
 		{
 			text.append(fIdentifier);
-			text.append(": ").append(getChild(0)); //$NON-NLS-1$
+			text.append(": ").append(getAssignedValue()); //$NON-NLS-1$
 			if (fStatus != null)
 			{
 				text.append(" ").append(fStatus); //$NON-NLS-1$

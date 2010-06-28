@@ -70,7 +70,7 @@ public class XMLParser implements IParser
 		}
 	}
 
-	private void processStartTag(Symbol symbol) throws IOException, Exception
+	private void processStartTag(Symbol symbol)
 	{
 		XMLElementNode element = new XMLElementNode(symbol.value.toString(), symbol.getStart(), symbol.getEnd());
 		// pushes the element onto the stack
@@ -81,8 +81,10 @@ public class XMLParser implements IParser
 		}
 	}
 
-	private void processEndTag(Symbol symbol) throws IOException, Exception
+	private void processEndTag(Symbol symbol)
 	{
+		// adjusts the ending offset of current element to include the entire block
+		((XMLElementNode) fCurrentElement).setLocation(fCurrentElement.getStartingOffset(), symbol.getEnd());
 		closeElement();
 	}
 

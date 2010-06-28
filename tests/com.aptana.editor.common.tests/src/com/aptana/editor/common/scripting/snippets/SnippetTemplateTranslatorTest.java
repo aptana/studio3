@@ -121,6 +121,11 @@ public class SnippetTemplateTranslatorTest extends TestCase
 	{
 		assertTranslatesTo("# vars = \\`find cookbooks\\`${0}", "# vars = `find cookbooks`${cursor}");
 	}
+	
+	public void testEscapedBackticksInsideTabstopValue()
+	{
+		assertTranslatesTo("${1:# vars = \\`find cookbooks\\`}", "${1:tabstop('# vars = `find cookbooks`')}");
+	}
 
 	public void testEscapedForwardSlashes()
 	{

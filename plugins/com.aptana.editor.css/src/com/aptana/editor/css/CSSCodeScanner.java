@@ -12,18 +12,38 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
-import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.text.rules.ExtendedWordRule;
 import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
-import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.editor.css.parsing.lexer.CSSTokenType;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.ThemePlugin;
 
 /**
  * @author Chris Williams
  */
 public class CSSCodeScanner extends BufferedRuleBasedScanner
 {
+	/**
+	 * Detects words consisting only of letters, digits, '-', and '_'. Must start with letter
+	 * 
+	 * @author cwilliams
+	 */
+	protected static class KeywordIdentifierDetector implements IWordDetector
+	{
+		@Override
+		public boolean isWordPart(char c)
+		{
+			return Character.isLetterOrDigit(c) || c == '-' || c == '_';
+		}
+
+		@Override
+		public boolean isWordStart(char c)
+		{
+			return Character.isLetter(c);
+		}
+	}
 
 	@SuppressWarnings("nls")
 	private static final String[] MEASUREMENTS = new String[] { "em", "ex", "px", "cm", "mm", "in", "pt", "pc", "deg",
@@ -64,7 +84,8 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			"h4", "h5", "h6", "i", "iframe", "img", "input", "ins", "kbd", "label", "legend", "li", "link", "map",
 			"meta", "noframes", "noscript", "object", "ol", "optgroup", "option", "p", "param", "pre", "q", "samp",
 			"script", "select", "small", "span", "strike", "strong", "style", "sub", "sup", "table", "tbody", "td",
-			"textarea", "tfoot", "th", "thead", "title", "tr", "tt", "ul", "var" };
+			"textarea", "tfoot", "th", "thead", "title", "tr", "tt", "ul", "var", "header", "nav", "section",
+			"article", "footer", "aside", "audio", "video", "canvas", "hgroup" };
 
 	@SuppressWarnings("nls")
 	private static final String[] FUNCTIONS = { "rgb", "url", "attr", "counters", "counter" };
@@ -138,23 +159,23 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 
 		IWordDetector identifierDetector = new KeywordIdentifierDetector();
 		WordRule wordRule = new WordRule(identifierDetector, Token.UNDEFINED);
-		addWordsToRule(wordRule, getPropertyNames(), "support.type.property-name.css"); //$NON-NLS-1$
-		addWordsToRule(wordRule, PROPERTY_VALUES, "support.constant.property-value.css"); //$NON-NLS-1$
-		addWordsToRule(wordRule, MEASUREMENTS, "keyword.other.unit.css"); //$NON-NLS-1$
+		addWordsToRule(wordRule, getPropertyNames(), CSSTokenType.PROPERTY);
+		addWordsToRule(wordRule, PROPERTY_VALUES, CSSTokenType.VALUE);
+		addWordsToRule(wordRule, MEASUREMENTS, CSSTokenType.UNIT);
 		rules.add(wordRule);
 
 		// normal words
 		wordRule = new WordRule(identifierDetector, Token.UNDEFINED);
-		addWordsToRule(wordRule, HTML_TAGS, "entity.name.tag.css"); //$NON-NLS-1$
-		addWordsToRule(wordRule, MEDIA, "support.constant.media.css"); //$NON-NLS-1$
-		addWordsToRule(wordRule, FUNCTIONS, "support.function.misc.css"); //$NON-NLS-1$
-		addWordsToRule(wordRule, STANDARD_COLORS, "support.constant.color.w3c-standard-color-name.css"); //$NON-NLS-1$
-		addWordsToRule(wordRule, DEPRECATED_COLORS, "invalid.deprecated.color.w3c-non-standard-color-name.css"); //$NON-NLS-1$
+		addWordsToRule(wordRule, HTML_TAGS, CSSTokenType.ELEMENT);
+		addWordsToRule(wordRule, MEDIA, CSSTokenType.MEDIA);
+		addWordsToRule(wordRule, FUNCTIONS, CSSTokenType.FUNCTION);
+		addWordsToRule(wordRule, STANDARD_COLORS, CSSTokenType.COLOR);
+		addWordsToRule(wordRule, DEPRECATED_COLORS, CSSTokenType.DEPRECATED_COLOR);
 		rules.add(wordRule);
 
 		// ignore case
 		wordRule = new WordRule(identifierDetector, Token.UNDEFINED, true);
-		addWordsToRule(wordRule, FONT_NAMES, "support.constant.font-name.css"); //$NON-NLS-1$
+		addWordsToRule(wordRule, FONT_NAMES, CSSTokenType.FONT);
 		rules.add(wordRule);
 
 		// Browser-specific property names
@@ -166,7 +187,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 				return c == '-';
 			}
 		};
-		rules.add(new ExtendedWordRule(browserSpecificProperties, createToken("support.type.property-name.css"), true) //$NON-NLS-1$
+		rules.add(new ExtendedWordRule(browserSpecificProperties, createToken(CSSTokenType.PROPERTY), true)
 				{
 					@Override
 					protected boolean wordOK(String word, ICharacterScanner scanner)
@@ -189,92 +210,102 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 				});
 
 		// curly braces
-		rules.add(new SingleCharacterRule('{', createToken("punctuation.section.property-list.css"))); //$NON-NLS-1$
-		rules.add(new SingleCharacterRule('}', createToken("punctuation.section.property-list.css"))); //$NON-NLS-1$
+		rules.add(new SingleCharacterRule('{', createToken(CSSTokenType.CURLY_BRACE)));
+		rules.add(new SingleCharacterRule('}', createToken(CSSTokenType.CURLY_BRACE)));
 		// colon
-		rules.add(new SingleCharacterRule(':', createToken("punctuation.separator.key-value.css"))); //$NON-NLS-1$
+		rules.add(new SingleCharacterRule(':', createToken(CSSTokenType.COLON)));
 		// semicolon
-		rules.add(new SingleCharacterRule(';', createToken("punctuation.terminator.rule.css"))); //$NON-NLS-1$
+		rules.add(new SingleCharacterRule(';', createToken(CSSTokenType.SEMICOLON)));
 		// parens
 		// HACK these rules are more correct, but for now we eat up the stuff inside parens too, to avoid weirder
 		// coloring
-		//		rules.add(new SingleCharacterRule('(', createToken("punctuation.section.function.css"))); //$NON-NLS-1$
-		//		rules.add(new SingleCharacterRule(')', createToken("punctuation.section.function.css"))); //$NON-NLS-1$
-		rules.add(new RegexpRule("\\([^)]*?\\)", //$NON-NLS-1$
-				createToken("punctuation.section.function.css"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
+		//		rules.add(new SingleCharacterRule('(', createToken("punctuation.section.function.css")));
+		//		rules.add(new SingleCharacterRule(')', createToken("punctuation.section.function.css")));
+		rules.add(new RegexpRule("\\([^)]*?\\)", createToken(CSSTokenType.ARGS), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
 
 		// Now onto to more expensive regexp rules
 		// rgb values
 		rules.add(new RegexpRule("#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\\b", //$NON-NLS-1$
-				createToken("constant.other.color.rgb-value.css"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
+				createToken(CSSTokenType.RGB), OPTIMIZE_REGEXP_RULES));
 		// ids
-		rules.add(new RegexpRule(
-				"#[_a-zA-Z0-9-]+", createToken("entity.other.attribute-name.id.css"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new RegexpRule("#[_a-zA-Z0-9-]+", createToken(CSSTokenType.ID), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
 		// classes
-		rules.add(new RegexpRule(
-				"\\.[_a-zA-Z0-9-]+", createToken("entity.other.attribute-name.class.css"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new RegexpRule("\\.[_a-zA-Z0-9-]+", createToken(CSSTokenType.CLASS), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
 
 		// numbers
 		rules.add(new RegexpRule("(\\-|\\+)?\\s*[0-9]+(\\.[0-9]+)?", //$NON-NLS-1$
-				createToken("constant.numeric.css"))); //$NON-NLS-1$
+				createToken(CSSTokenType.NUMBER)));
 
 		// %
-		rules.add(new SingleCharacterRule('%', createToken("keyword.other.unit.css"))); //$NON-NLS-1$
+		rules.add(new SingleCharacterRule('%', createToken(CSSTokenType.UNIT)));
 		// !important
-		rules.add(new RegexpRule(
-				"!important", createToken("support.constant.property-value.css"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new RegexpRule("!important", createToken(CSSTokenType.VALUE), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
 		// FIXME name of keyword should be in token!
 		// @ rules
-		rules.add(new RegexpRule(
-				"@[_a-zA-Z0-9-]+", createToken("keyword.control.at-rule.media.css"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new RegexpRule("@[_a-zA-Z0-9-]+", createToken(CSSTokenType.AT_RULE), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
 
 		// identifiers
-		rules.add(new RegexpRule("[_a-zA-Z0-9-]+", createToken("source.css"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new RegexpRule("[_a-zA-Z0-9-]+", createToken(CSSTokenType.IDENTIFIER), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
 
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}
 
-	protected String[] getPropertyNames()
-	{
-		return PROPERTY_NAMES;
-	}
-
-	private void addWordsToRule(WordRule wordRule, String[] words, String tokenType)
+	/**
+	 * addWordsToRule
+	 * 
+	 * @param wordRule
+	 * @param words
+	 * @param tokenType
+	 */
+	private void addWordsToRule(WordRule wordRule, String[] words, CSSTokenType tokenType)
 	{
 		IToken token = createToken(tokenType);
+
 		for (String word : words)
 		{
 			wordRule.addWord(word, token);
 		}
 	}
 
+	/**
+	 * createToken
+	 * 
+	 * @param type
+	 * @return
+	 */
+	private IToken createToken(CSSTokenType type)
+	{
+		return this.createToken(type.getScope());
+	}
+
+	/**
+	 * createToken
+	 * 
+	 * @param string
+	 * @return
+	 */
 	protected IToken createToken(String string)
 	{
 		return getThemeManager().getToken(string);
 	}
 
-	protected IThemeManager getThemeManager()
+	/**
+	 * getPropertyNames
+	 * 
+	 * @return
+	 */
+	protected String[] getPropertyNames()
 	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
+		return PROPERTY_NAMES;
 	}
 
 	/**
-	 * Detects words consisting only of letters, digits, '-', and '_'. Must start with letter
+	 * getThemeManager
 	 * 
-	 * @author cwilliams
+	 * @return
 	 */
-	protected static class KeywordIdentifierDetector implements IWordDetector
+	protected IThemeManager getThemeManager()
 	{
-		@Override
-		public boolean isWordPart(char c)
-		{
-			return Character.isLetterOrDigit(c) || c == '-' || c == '_';
-		}
-
-		@Override
-		public boolean isWordStart(char c)
-		{
-			return Character.isLetter(c);
-		}
+		return ThemePlugin.getDefault().getThemeManager();
 	}
 }

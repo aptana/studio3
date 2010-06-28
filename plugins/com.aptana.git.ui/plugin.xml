@@ -141,7 +141,7 @@
                menubarPath="team.main/targetGroup"
                tooltip="%StageAction_tooltip">
          </action>
-         <action
+          <action
                class="com.aptana.git.ui.internal.actions.MergeConflictsAction"
                definitionId="com.aptana.git.ui.command.merge_conflicts"
                enablesFor="+"
@@ -149,6 +149,15 @@
                label="%MergeConflictsAction_label"
                menubarPath="team.main/targetGroup"
                tooltip="%MergeConflictsAction_tooltip">
+         </action>
+         <action
+               class="com.aptana.git.ui.internal.actions.CompareWithHEADAction"
+               definitionId="com.aptana.git.ui.command.compare_with_HEAD"
+               enablesFor="+"
+               id="com.aptana.git.ui.actions.CompareWithHEADAction"
+               label="%CompareWithHEADAction_label"
+               menubarPath="compareWithMenu/compareWithGroup"
+               tooltip="%CompareWithHEADAction_tooltip">
          </action>
       </objectContribution>
    </extension>
@@ -292,6 +301,11 @@
             id="com.aptana.git.ui.command.merge_conflicts"
             name="%MergeConflictsAction_tooltip">
       </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.compare_with_HEAD"
+            name="%CompareWithHEADAction_tooltip">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -379,6 +393,12 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="CTRL+M2+G">
       </key>
+      <key
+            commandId="com.aptana.git.ui.command.compare_with_HEAD"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="CTRL+M2+G">
+      </key>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
@@ -388,5 +408,13 @@
             id="com.aptana.git.ui.GitExecutableLocationPage"
             name="Git">
       </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.quickDiffReferenceProvider">
+      <referenceprovider
+            class="com.aptana.git.ui.internal.QuickDiffReferenceProvider"
+            id="com.aptana.git.ui.quickdiff"
+            label="Git Quick Diff">
+      </referenceprovider>
    </extension>
 </plugin>

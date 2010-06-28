@@ -2,7 +2,7 @@ package com.aptana.editor.findbar.impl;
 
 import java.util.ResourceBundle;
 
-import org.eclipse.ui.IWorkbenchCommandConstants;
+import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.texteditor.FindReplaceAction;
 import org.eclipse.ui.texteditor.ITextEditor;
 
@@ -16,7 +16,7 @@ public class ShowFindBarAction extends FindReplaceAction {
 	public ShowFindBarAction(ITextEditor textEditor) {
 		super(ResourceBundle.getBundle(ShowFindBarAction.class.getName()), ShowFindBarAction.class.getSimpleName()+".", textEditor); //$NON-NLS-1$
 		this.textEditor = textEditor;
-		setActionDefinitionId(IWorkbenchCommandConstants.EDIT_FIND_AND_REPLACE);
+		setActionDefinitionId(ActionFactory.FIND.create(textEditor.getSite().getWorkbenchWindow()).getActionDefinitionId());
 	}
 
 	@Override

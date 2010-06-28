@@ -1,8 +1,8 @@
 package com.aptana.git.ui.internal.actions;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,8 +12,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -42,15 +42,21 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -72,6 +78,7 @@ public class CommitDialog extends StatusDialog
 	private String fMessage;
 	private Table unstagedTable;
 	private Table stagedTable;
+	private Control draggingFromTable;
 
 	private Image newFileImage;
 	private Image deletedFileImage;
@@ -102,12 +109,12 @@ public class CommitDialog extends StatusDialog
 		}
 		return dialogSettings;
 	}
-	
+
 	@Override
 	protected Control createDialogArea(Composite parent)
 	{
 		Composite container = (Composite) super.createDialogArea(parent);
-		parent.getShell().setText(Messages.CommitDialog_3);
+		parent.getShell().setText(Messages.CommitDialog_Changes);
 
 		container.setLayout(new GridLayout(1, true));
 
@@ -122,12 +129,48 @@ public class CommitDialog extends StatusDialog
 		createCommitMessageArea(sashForm);
 		createStagedFileArea(sashForm);
 
-		sashForm.setSashWidth(10);
-		sashForm.setWeights(new int[] { 25, 50, 25 });
+		sashForm.setSashWidth(5);
+		sashForm.setWeights(new int[] { 35, 30, 35 });
 
 		validate();
-
+		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				packTable(stagedTable);
+				packTable(unstagedTable);
+			}
+		});
 		return container;
+	}
+
+	/**
+	 * Override the default implementation to get a bigger commit dialog on large monitors.
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#getInitialSize()
+	 */
+	protected Point getInitialSize()
+	{
+		IDialogSettings dialogSettings = getDialogBoundsSettings();
+		try
+		{
+			dialogSettings.getInt("DIALOG_WIDTH"); //$NON-NLS-1$
+		}
+		catch (NumberFormatException e)
+		{
+			// The dialog settings are empty, so we need to compute the initial
+			// size according to the size of the monitor. Large monitors will get a bigger commit dialog.
+			Composite parent = getShell().getParent();
+			Monitor monitor = getShell().getDisplay().getPrimaryMonitor();
+			if (parent != null)
+			{
+				monitor = parent.getMonitor();
+			}
+			Rectangle monitorBounds = monitor.getClientArea();
+			return new Point((int) (0.618 * monitorBounds.width), (int) (0.618 * monitorBounds.height));
+		}
+		return super.getInitialSize();
 	}
 
 	private void createDiffArea(Composite container)
@@ -136,7 +179,7 @@ public class CommitDialog extends StatusDialog
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 		data.heightHint = 300;
 		diffArea.setLayoutData(data);
-		diffArea.setText(Messages.CommitDialog_4);
+		diffArea.setText(Messages.CommitDialog_NoFileSelected);
 	}
 
 	private void createUnstagedFileArea(SashForm sashForm)
@@ -152,26 +195,67 @@ public class CommitDialog extends StatusDialog
 	private void createFileArea(SashForm sashForm, boolean staged)
 	{
 		Composite composite = new Composite(sashForm, SWT.NONE);
-		composite.setLayout(new GridLayout(1, true));
-		Label label = new Label(composite, SWT.NONE);
-		String text = Messages.CommitDialog_5;
-		if (!staged)
-			text = Messages.CommitDialog_6;
-		label.setText(text);
-		Table table = createTable(composite, staged);
+		composite.setLayout(new GridLayout(2, false));
+		StagingButtons buttons = null;
+		if (staged)
+		{
+			buttons = new StagingButtons(composite, Messages.CommitDialog_UnstageAllMarker,
+					Messages.CommitDialog_UnstageAll, Messages.CommitDialog_UnstageSelectedMarker,
+					Messages.CommitDialog_UnstageSelected);
+			createTableComposite(composite, staged);
+			buttons.setTable(stagedTable, staged);
+		}
+		else
+		{
+			createTableComposite(composite, staged);
+			buttons = new StagingButtons(composite, Messages.CommitDialog_StageAllMarker,
+					Messages.CommitDialog_StageAll, Messages.CommitDialog_StageSelectedMarker,
+					Messages.CommitDialog_StageSelected);
+			buttons.setTable(unstagedTable, staged);
+		}
+	}
+
+	// Creates a table with a title label on top of it.
+	private Composite createTableComposite(Composite parent, boolean staged)
+	{
+		Composite tableComp = new Composite(parent, SWT.NONE);
+		GridLayout layout = new GridLayout(1, false);
+		layout.horizontalSpacing = 1;
+		layout.marginWidth = 1;
+		tableComp.setLayout(layout);
+		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+		data.heightHint = 200;
+		data.widthHint = 250;
+		tableComp.setLayoutData(data);
+		Label label = new Label(tableComp, SWT.NONE);
+		Table table = null;
+		if (staged)
+		{
+			label.setText(Messages.CommitDialog_StagedChanges);
+			table = createTable(tableComp, true);
+		}
+		else
+		{
+			label.setText(Messages.CommitDialog_UnstagedChanges);
+			table = createTable(tableComp, false);
+		}
 		if (staged)
 			stagedTable = table;
 		else
 			unstagedTable = table;
+		return tableComp;
 	}
 
 	private void createCommitMessageArea(SashForm sashForm)
 	{
 		Composite msgComp = new Composite(sashForm, SWT.NONE);
-		msgComp.setLayout(new GridLayout(1, true));
+		GridLayout layout = new GridLayout(1, true);
+		layout.horizontalSpacing = 0;
+		layout.marginWidth = 0;
+		msgComp.setLayout(layout);
 		Label messageLabel = new Label(msgComp, SWT.NONE);
 		messageLabel.setText(Messages.CommitDialog_MessageLabel);
-		commitMessage = new Text(msgComp, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
+		commitMessage = new Text(msgComp, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.WRAP);
 		commitMessage.addKeyListener(new KeyListener()
 		{
 
@@ -192,8 +276,6 @@ public class CommitDialog extends StatusDialog
 
 	private Table createTable(Composite composite, final boolean staged)
 	{
-		// TODO Make list entries be able to be truncated when too long to fit, like GitX does
-		// TODO Sort list entries
 		Table table = new Table(composite, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.FULL_SELECTION);
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
@@ -202,12 +284,16 @@ public class CommitDialog extends StatusDialog
 		data.widthHint = 250;
 		table.setLayoutData(data);
 		String[] titles = { " ", Messages.CommitDialog_PathColumnLabel }; //$NON-NLS-1$
+		int[] widths = new int[] { 20, 250 };
 		for (int i = 0; i < titles.length; i++)
 		{
 			TableColumn column = new TableColumn(table, SWT.NONE);
 			column.setText(titles[i]);
+			column.setWidth(widths[i]);
 		}
-		for (ChangedFile file : gitRepository.index().changedFiles())
+		List<ChangedFile> changedFiles = gitRepository.index().changedFiles();
+		Collections.sort(changedFiles);
+		for (ChangedFile file : changedFiles)
 		{
 			boolean match = false;
 			if (staged && file.hasStagedChanges())
@@ -217,10 +303,9 @@ public class CommitDialog extends StatusDialog
 
 			if (match)
 			{
-				createTableItem(table, file);
+				createTableItem(table, file, false);
 			}
 		}
-		packTable(table);
 
 		// Drag and Drop
 		// FIXME If user drags and drops while we're still crunching on last drag/drop then we end up hanging
@@ -232,6 +317,12 @@ public class CommitDialog extends StatusDialog
 		source.setTransfer(types);
 		source.addDragListener(new DragSourceAdapter()
 		{
+			public void dragStart(DragSourceEvent event)
+			{
+				DragSource ds = (DragSource) event.widget;
+				draggingFromTable = ds.getControl();
+			}
+
 			public void dragSetData(DragSourceEvent event)
 			{
 				// Get the selected items in the drag source
@@ -257,6 +348,14 @@ public class CommitDialog extends StatusDialog
 			target.setDropTargetEffect(null);
 		target.addDropListener(new DropTargetAdapter()
 		{
+			public void dropAccept(DropTargetEvent event)
+			{
+				DropTarget dp = (DropTarget) event.widget;
+				if (dp.getControl() == draggingFromTable)
+				{
+					event.detail = DND.DROP_NONE;
+				}
+			}
 
 			public void dragEnter(DropTargetEvent event)
 			{
@@ -312,44 +411,34 @@ public class CommitDialog extends StatusDialog
 				super.widgetSelected(e);
 				if (e.item == null)
 					return;
-				String path = ((TableItem) e.item).getText(1);
-				ChangedFile file = findChangedFile(path);
-				if (file == null)
-					return;
-				if (gitRepository.index().hasBinaryAttributes(file)
-						&& !file.getStatus().equals(ChangedFile.Status.DELETED))
-				{
-					// Special code to draw the image if the binary file is an image
-					String[] imageExtensions = new String[] { ".png", ".gif", ".jpeg", ".jpg", ".ico" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-					for (String extension : imageExtensions)
-					{
-						if (file.getPath().endsWith(extension))
-						{
-							String fullPath = gitRepository.workingDirectory() + File.separator + file.getPath();
-							updateDiff(file, "<img src=\"" + fullPath + "\" />"); //$NON-NLS-1$ //$NON-NLS-2$
-							return;
-						}
-					}
-				}
-				// Don't recalc if it's the same file as we are already showing
-				if (fLastDiffFile != null && file.equals(fLastDiffFile))
-					return;
-
-				String diff = gitRepository.index().diffForFile(file, staged, 3);
-				try
-				{
-					diff = DiffFormatter.toHTML(file.getPath(), diff);
-				}
-				catch (Throwable t)
-				{
-					GitUIPlugin.logError("Failed to turn diff into HTML", t); //$NON-NLS-1$
-				}
-				updateDiff(file, diff);
+				TableItem item = (TableItem) e.item;
+				String filePath = item.getText(1);
+				updateDiff(staged, filePath);
 			}
 		});
 		// Allow double-clicking to toggle staged/unstaged
 		table.addMouseListener(new MouseAdapter()
 		{
+			@Override
+			public void mouseDown(MouseEvent e)
+			{
+				if (e.getSource() == null)
+					return;
+				Table table = (Table) e.getSource();
+				Point point = new Point(e.x, e.y);
+				TableItem item = table.getItem(point);
+				if (item == null)
+				{
+					return;
+				}
+				// did user click on file image? If so, toggle staged/unstage
+				Rectangle imageBounds = item.getBounds(0);
+				if (imageBounds.contains(point))
+				{
+					moveItems(staged, new TableItem[] { item });
+				}
+			}
+
 			@Override
 			public void mouseDoubleClick(MouseEvent e)
 			{
@@ -357,27 +446,72 @@ public class CommitDialog extends StatusDialog
 					return;
 				Table table = (Table) e.getSource();
 				TableItem[] selected = table.getSelection();
-				Map<String, ChangedFile> selectedFiles = new HashMap<String, ChangedFile>();
-				for (TableItem item : selected)
-				{
-					String path = item.getText(1);
-					ChangedFile file = findChangedFile(path);
-					if (file == null)
-						continue;
-					selectedFiles.put(path, file);
-				}
-				if (selectedFiles.isEmpty())
+				moveItems(staged, selected);
+			}
+		});
+		// Custom drawing so we can truncate filepaths in middle...
+		table.addListener(SWT.EraseItem, new Listener()
+		{
+
+			@Override
+			public void handleEvent(Event event)
+			{
+				// Only draw the text custom
+				if (event.index != 1)
 					return;
 
-				// Actually stage or unstage the files
-				if (staged)
+				event.detail &= ~SWT.FOREGROUND;
+			}
+		});
+		table.addListener(SWT.PaintItem, new Listener()
+		{
+
+			@Override
+			public void handleEvent(Event event)
+			{
+				// Only draw the text custom
+				if (event.index != 1)
+					return;
+				TableItem item = (TableItem) event.item;
+				String text = item.getText(event.index);
+
+				// Truncate middle of string
+				Table theTable = (Table) event.widget;
+				int width = theTable.getColumn(event.index).getWidth();
+				Point p = event.gc.stringExtent(text); // is text wider than available width?
+				if (p.x > width)
 				{
-					unstageFiles(selectedFiles);
+					// chop string in half and drop a few characters
+					int middle = text.length() / 2;
+					String beginning = text.substring(0, middle - 1);
+					String end = text.substring(middle + 2, text.length());
+					// Now repeatedly chop off one char from each end until we fit
+					// TODO Chop each side separately? it'd take more loops, but text would fit tighter when uneven
+					// lengths work better..
+					while (event.gc.stringExtent(beginning + "..." + end).x > width) //$NON-NLS-1$
+					{
+						if (beginning.length() > 0)
+						{
+							beginning = beginning.substring(0, beginning.length() - 1);
+						}
+						else
+						{
+							break;
+						}
+						if (end.length() > 0)
+						{
+							end = end.substring(1);
+						}
+						else
+						{
+							break;
+						}
+					}
+					text = beginning + "..." + end; //$NON-NLS-1$
 				}
-				else
-				{
-					stageFiles(selectedFiles);
-				}
+				event.gc.drawText(text, event.x, event.y, true);
+
+				event.detail &= ~SWT.FOREGROUND;
 			}
 		});
 
@@ -398,10 +532,10 @@ public class CommitDialog extends StatusDialog
 					{
 						String filePath = item.getText(1);
 
-						String workingDirectory = gitRepository.workingDirectory();
+						IPath workingDirectory = gitRepository.workingDirectory();
 
 						IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(
-								new Path(workingDirectory).append(filePath));
+								workingDirectory.append(filePath));
 						if (file != null)
 						{
 							files.add(file);
@@ -428,7 +562,7 @@ public class CommitDialog extends StatusDialog
 										{
 											if (file != null && file.equals(fLastDiffFile))
 											{
-												updateDiff(null, Messages.CommitDialog_4);
+												updateDiff(null, Messages.CommitDialog_NoFileSelected);
 											}
 										}
 									}
@@ -474,7 +608,7 @@ public class CommitDialog extends StatusDialog
 		to.setRedraw(false);
 		for (ChangedFile changedFile : files.values())
 		{
-			createTableItem(to, changedFile); // add it to our new table
+			createTableItem(to, changedFile, true); // add it to our new table
 		}
 		packTable(to);
 		to.setRedraw(true);
@@ -484,6 +618,55 @@ public class CommitDialog extends StatusDialog
 		validate();
 	}
 
+	/**
+	 * Update the diff area.
+	 * 
+	 * @param staged
+	 * @param filePath
+	 * @see #updateDiff(ChangedFile, String)
+	 */
+	private void updateDiff(final boolean staged, String filePath)
+	{
+		ChangedFile file = findChangedFile(filePath);
+		if (file == null)
+			return;
+		if (gitRepository.index().hasBinaryAttributes(file) && !file.getStatus().equals(ChangedFile.Status.DELETED))
+		{
+			// Special code to draw the image if the binary file is an image
+			String[] imageExtensions = new String[] { ".png", ".gif", ".jpeg", ".jpg", ".ico" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+			for (String extension : imageExtensions)
+			{
+				if (file.getPath().endsWith(extension))
+				{
+					IPath fullPath = gitRepository.workingDirectory().append(file.getPath());
+					updateDiff(file, "<img src=\"" + fullPath.toOSString() + "\" />"); //$NON-NLS-1$ //$NON-NLS-2$
+					return;
+				}
+			}
+		}
+		// Don't recalc if it's the same file as we are already showing
+		if (fLastDiffFile != null && file.equals(fLastDiffFile))
+			return;
+
+		String diff = gitRepository.index().diffForFile(file, staged, 3);
+		try
+		{
+			diff = DiffFormatter.toHTML(file.getPath(), diff);
+		}
+		catch (Throwable t)
+		{
+			GitUIPlugin.logError("Failed to turn diff into HTML", t); //$NON-NLS-1$
+		}
+		updateDiff(file, diff);
+	}
+
+	/**
+	 * Update the diff area.
+	 * 
+	 * @param file
+	 * @param diff
+	 * @see #updateDiff(boolean, String)
+	 */
 	protected void updateDiff(ChangedFile file, String diff)
 	{
 		if (diffArea != null && !diffArea.isDisposed())
@@ -495,15 +678,7 @@ public class CommitDialog extends StatusDialog
 
 	protected ChangedFile findChangedFile(String path)
 	{
-		List<ChangedFile> changedFiles = gitRepository.index().changedFiles();
-		for (ChangedFile changedFile : changedFiles)
-		{
-			if (changedFile.getPath().equals(path))
-			{
-				return changedFile;
-			}
-		}
-		return null;
+		return gitRepository.index().findChangedFile(path);
 	}
 
 	/**
@@ -512,37 +687,63 @@ public class CommitDialog extends StatusDialog
 	 * @param table
 	 * @param file
 	 */
-	protected void createTableItem(Table table, ChangedFile file)
+	protected void createTableItem(Table table, ChangedFile file, boolean sort)
 	{
-		TableItem item = new TableItem(table, SWT.NONE);
+		TableItem item = null;
+		if (sort)
+		{
+			// insert into sorted table
+			TableItem[] items = table.getItems();
+			int index = 0;
+			for (TableItem existing : items)
+			{
+				String path = existing.getText(1);
+				if (file.getPath().compareTo(path) < 0)
+				{
+					break;
+				}
+				index++;
+			}
+			item = new TableItem(table, SWT.NONE, index);
+		}
+		else
+		{
+			// Just insert at end
+			item = new TableItem(table, SWT.NONE);
+		}
 		Image image = emptyFileImage;
-		String text = Messages.CommitDialog_modified;
+		// String text = Messages.CommitDialog_modified;
 		if (file.getStatus() == ChangedFile.Status.DELETED)
 		{
 			image = deletedFileImage;
-			text = Messages.CommitDialog_deleted;
+			// text = Messages.CommitDialog_deleted;
 		}
 		else if (file.getStatus() == ChangedFile.Status.NEW)
 		{
 			image = newFileImage;
-			text = Messages.CommitDialog_new;
+			// text = Messages.CommitDialog_new;
 		}
-		item.setText(0, text);
+		// item.setText(0, text);
 		item.setImage(0, image);
 		item.setText(1, file.getPath());
 	}
 
 	private void packTable(Table table)
 	{
-		for (int i = 0; i < table.getColumnCount(); i++)
+		// pack first column (image)
+		table.getColumn(0).pack();
+		// Make the second column take all the available width!
+		int totalWidth = table.getClientArea().width;
+		if (totalWidth > 0)
 		{
-			table.getColumn(i).pack();
+			totalWidth -= table.getColumn(0).getWidth();
+			table.getColumn(1).setWidth(totalWidth);
 		}
 	}
 
 	protected void validate()
 	{
-		if (commitMessage.getText().length() < 3)
+		if (commitMessage.getText().length() < 1)
 		{
 			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), Messages.CommitDialog_EnterMessage_Error));
 			return;
@@ -632,5 +833,178 @@ public class CommitDialog extends StatusDialog
 	protected boolean isResizable()
 	{
 		return true;
+	}
+
+	/*
+	 * Stage or Un-Stage the selected items (files).
+	 * @param staged
+	 * @param selected
+	 */
+	private void moveItems(final boolean staged, TableItem[] selected)
+	{
+		Map<String, ChangedFile> selectedFiles = new HashMap<String, ChangedFile>();
+		for (TableItem item : selected)
+		{
+			String path = item.getText(1);
+			ChangedFile file = findChangedFile(path);
+			if (file == null)
+				continue;
+			selectedFiles.put(path, file);
+		}
+		if (selectedFiles.isEmpty())
+			return;
+
+		// Actually stage or unstage the files
+		if (staged)
+		{
+			unstageFiles(selectedFiles);
+		}
+		else
+		{
+			stageFiles(selectedFiles);
+		}
+	}
+
+	/*
+	 * This class will create buttons next to the tables in order to allow staging and un-staging operations.
+	 */
+	private class StagingButtons implements SelectionListener
+	{
+		private String doAllLabel;
+		private String doAllTooltip;
+		private String doSelectionLabel;
+		private String doSelectionTooltip;
+		private Table table;
+		private boolean staged;
+		private Button doSelectionBt;
+		private Button doAllBt;
+
+		/**
+		 * Constructs a new StagingButtons instance.
+		 * 
+		 * @param parent
+		 * @param doAllLabel
+		 * @param doAllTooltip
+		 * @param doSelectionLabel
+		 * @param doSelectionTooltip
+		 */
+		protected StagingButtons(Composite parent, String doAllLabel, String doAllTooltip, String doSelectionLabel,
+				String doSelectionTooltip)
+		{
+			this.doAllLabel = doAllLabel;
+			this.doAllTooltip = doAllTooltip;
+			this.doSelectionLabel = doSelectionLabel;
+			this.doSelectionTooltip = doSelectionTooltip;
+			createComponent(parent);
+		}
+
+		/**
+		 * Set the table (staged or un-staged) that this component controls.
+		 * 
+		 * @param table
+		 * @param staged
+		 */
+		protected void setTable(Table table, boolean staged)
+		{
+			this.table = table;
+			this.staged = staged;
+			table.addSelectionListener(this);
+			updateSelectionButton();
+		}
+
+		protected void createComponent(Composite parent)
+		{
+			Composite comp = new Composite(parent, SWT.NONE);
+			GridLayout layout = new GridLayout(1, true);
+			layout.horizontalSpacing = 0;
+			layout.marginWidth = 1;
+			comp.setLayout(layout);
+
+			doAllBt = new Button(comp, SWT.PUSH | SWT.FLAT);
+			doAllBt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			doAllBt.setText(doAllLabel);
+			doAllBt.setToolTipText(doAllTooltip);
+			doAllBt.addSelectionListener(this);
+			doSelectionBt = new Button(comp, SWT.PUSH | SWT.FLAT);
+			doSelectionBt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			doSelectionBt.setText(doSelectionLabel);
+			doSelectionBt.setToolTipText(doSelectionTooltip);
+			doSelectionBt.addSelectionListener(this);
+
+			// minimize the width of this component
+			Point doAllSize = doAllBt.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+			Point doSelectionSize = doSelectionBt.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+			Point bigger = null;
+			if (doAllSize.x > doSelectionSize.x)
+				bigger = doAllSize;
+			else
+				bigger = doSelectionSize;
+			GridData data = new GridData(SWT.CENTER, SWT.CENTER, false, false);
+			data.widthHint = bigger.x + 10;
+			comp.setLayoutData(data);
+		}
+
+		@Override
+		public void widgetDefaultSelected(SelectionEvent e)
+		{
+		}
+
+		@Override
+		public void widgetSelected(SelectionEvent e)
+		{
+			Object source = e.getSource();
+			if (source instanceof Table)
+			{
+				updateSelectionButton();
+			}
+			else if (source == doAllBt)
+			{
+				if (table != null)
+				{
+					moveItems(staged, table.getItems());
+					updateSelectionDiff(-1);
+					updateSelectionButton();
+				}
+			}
+			else if (source == doSelectionBt)
+			{
+				if (table != null)
+				{
+					int selectionIndex = table.getSelectionIndex();
+					TableItem[] selection = table.getSelection();
+					moveItems(staged, selection);
+					updateSelectionDiff(selectionIndex);
+					updateSelectionButton();
+				}
+			}
+		}
+
+		// Enable the doSelectionBt when the table has a selection
+		private void updateSelectionButton()
+		{
+			doSelectionBt.setEnabled(table.getSelectionCount() > 0);
+		}
+
+		private void updateSelectionDiff(int previousSelectionIndex)
+		{
+			// Select the next file in line (if exists)
+			if (table.getItemCount() > 0 && previousSelectionIndex > -1)
+			{
+				if (table.getItemCount() > previousSelectionIndex)
+				{
+					table.select(previousSelectionIndex);
+				}
+				else
+				{
+					table.select(table.getItemCount() - 1);
+				}
+				String filePath = table.getSelection()[0].getText(1);
+				updateDiff(!staged, filePath);
+			}
+			else
+			{
+				updateDiff(null, Messages.CommitDialog_NoFileSelected);
+			}
+		}
 	}
 }

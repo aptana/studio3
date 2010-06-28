@@ -1,0 +1,27 @@
+/**
+ * This is a description
+ * 
+ * @alias MyType.functions
+ * @param {Function} simpleProcedure
+ *		Function without parens or return type
+ * @param {Function()} simpleProcedure2
+ *		Function without params or return type
+ * @param {Function(String)} procedureOneParam
+ *		Function with one parameter an no return type
+ * @param {Function(String,Number)} procedureTwoParams
+ *		Functions with two parameters and no return type
+ * @param {Function()->String} simpleFunction
+ *		Function without params but with a return type
+ * @param {Function()->(String|Number)} simpleFunctionComplexReturn
+ *		Function without params but with a complex return type
+ * @param {Function(String)->Number} functionOneParam
+ *		Function with one parameter and a return type
+ * @param {Function(String)->(String|Number)} functionOneParamComplexReturn
+ *		Function with one parameter and a complex return type
+ * @param {Function(String,Number)->Object} functionTwoParams
+ *		Functions with two parameters and a return type
+ * @param {Function(String,Number)->(String|Number)} functionTwoParamsComplexReturn
+ *		Functions with two parameters and a complex return type
+ * @param {Function(Function(String)->String,Function(Array<String>)->String)->String} functionGenerics
+ *		Functions with two generic parameters and a generic return type
+ */

@@ -9,7 +9,9 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.ISources;
-import org.eclipse.ui.IWorkbenchCommandConstants;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
  * This handles the Cut, Copy, Paste and SelectAll commands in the search in project text field.
@@ -30,19 +32,20 @@ public class SearchTextHandler extends AbstractHandler implements IExecutableExt
 			if (focusControlObject instanceof Text)
 			{
 				Text focusControl = (Text) focusControlObject;
-				if (commandId.equals(IWorkbenchCommandConstants.EDIT_CUT))
+				IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
+				if (commandId.equals(ActionFactory.CUT.create(window).getActionDefinitionId()))
 				{
 					focusControl.cut();
 				}
-				else if (commandId.equals(IWorkbenchCommandConstants.EDIT_COPY))
+				else if (commandId.equals(ActionFactory.COPY.create(window).getActionDefinitionId()))
 				{
 					focusControl.copy();
 				}
-				else if (commandId.equals(IWorkbenchCommandConstants.EDIT_PASTE))
+				else if (commandId.equals(ActionFactory.PASTE.create(window).getActionDefinitionId()))
 				{
 					focusControl.paste();
 				}
-				else if (commandId.equals(IWorkbenchCommandConstants.EDIT_SELECT_ALL))
+				else if (commandId.equals(ActionFactory.SELECT_ALL.create(window).getActionDefinitionId()))
 				{
 					focusControl.selectAll();
 				}

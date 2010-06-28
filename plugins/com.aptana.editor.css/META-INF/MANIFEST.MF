@@ -10,13 +10,18 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  org.eclipse.ui.editors,
  org.eclipse.ui.views,
+ com.aptana.index.core,
  com.aptana.editor.common,
- com.aptana.parsing
+ com.aptana.parsing,
+ com.aptana.core;bundle-version="3.0.0",
+ beaver;bundle-version="1.0.0",
+ com.aptana.theme
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.css,
- com.aptana.editor.css.internal;x-friends:="com.aptana.editor.html,com.aptana.editor.erb",
+ com.aptana.editor.css.contentassist;x-friends:="com.aptana.editor.html,com.aptana.editor.erb",
+ com.aptana.editor.css.contentassist.index,
  com.aptana.editor.css.outline,
  com.aptana.editor.css.parsing
 Eclipse-ExtensibleAPI: true

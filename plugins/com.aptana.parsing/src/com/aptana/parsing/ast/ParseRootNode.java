@@ -5,7 +5,7 @@ import java.util.List;
 
 import beaver.Symbol;
 
-public class ParseRootNode extends ParseBaseNode
+public class ParseRootNode extends ParseNode
 {
 
 	public ParseRootNode(String language, Symbol[] children, int start, int end)

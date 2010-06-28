@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -55,11 +55,12 @@ import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.NonRuleBasedDamagerRepairer;
 import com.aptana.editor.common.text.rules.TagRule;
-import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSSourceConfiguration;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.ThemePlugin;
 
 /**
  * @author Max Stepanov
@@ -85,9 +86,9 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
 			new MultiLineRule("<!DOCTYPE ", ">", new Token(HTML_DOCTYPE)), //$NON-NLS-1$ //$NON-NLS-2$
-			new DocTypeRule(new Token(CDATA)), new MultiLineRule("<!--", "-->", new Token(HTML_COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
-			new TagRule("script", new Token(HTML_SCRIPT)), //$NON-NLS-1$
-			new TagRule("style", new Token(HTML_STYLE)), //$NON-NLS-1$
+			new DocTypeRule(new Token(CDATA)), new HTMLCommentRule(new Token(HTML_COMMENT)),
+			new TagRule("script", new Token(HTML_SCRIPT), true), //$NON-NLS-1$
+			new TagRule("style", new Token(HTML_STYLE), true), //$NON-NLS-1$
 			new TagRule("/", new Token(HTML_TAG)), //$NON-NLS-1$
 			new TagRule(new Token(HTML_TAG)) };
 
@@ -263,7 +264,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	protected IThemeManager getThemeManager()
 	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
+		return ThemePlugin.getDefault().getThemeManager();
 	}
 
 }

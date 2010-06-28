@@ -27,6 +27,7 @@ class WorkspaceFileRevision extends GitFileRevision
 
 	WorkspaceFileRevision(final IResource resource)
 	{
+		// FIXME We need the git repo relative path, not just the last segment!
 		super(resource.getName());
 		rsrc = resource;
 	}

@@ -13,6 +13,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension6;
 import org.eclipse.jface.text.link.ILinkedModeListener;
+import org.eclipse.jface.text.link.InclusivePositionUpdater;
 import org.eclipse.jface.text.link.LinkedModeModel;
 import org.eclipse.jface.text.link.LinkedModeUI;
 import org.eclipse.jface.text.link.LinkedPosition;
@@ -42,6 +43,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 	private final TemplateContext fContext;
 	private final IRegion fRegion;
 
+	private ICompletionProposal delegateTemplateProposal;
 	private IRegion fSelectedRegion; // initialized by apply()
 
 	private InclusivePositionUpdater fUpdater;
@@ -70,6 +72,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 	@Override
 	public void apply(final ITextViewer viewer, char trigger, int stateMask, final int offset)
 	{
+		delegateTemplateProposal = null;
 		if (contains(triggerChars, trigger))
 		{
 			if (triggerChar == trigger)
@@ -78,6 +81,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 			}
 			else
 			{
+				delegateTemplateProposal = templateProposals[trigger - '1'];
 				((ICompletionProposalExtension2) templateProposals[trigger - '1']).apply(viewer, trigger, stateMask,
 						offset);
 			}
@@ -337,7 +341,11 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 	 */
 	public Point getSelection(IDocument document)
 	{
-		return new Point(fSelectedRegion.getOffset(), fSelectedRegion.getLength());
+		if (delegateTemplateProposal == null)
+		{
+			return new Point(fSelectedRegion.getOffset(), fSelectedRegion.getLength());
+		}
+		return delegateTemplateProposal.getSelection(document);
 	}
 
 	@Override

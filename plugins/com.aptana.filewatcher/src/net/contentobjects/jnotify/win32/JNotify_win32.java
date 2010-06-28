@@ -35,16 +35,13 @@ package net.contentobjects.jnotify.win32;
 
 import net.contentobjects.jnotify.JNotifyException;
 
+
 @SuppressWarnings("nls")
 public class JNotify_win32
 {
 	static
 	{
-		if (System.getProperty("os.arch").equals("amd64")) {
-			System.loadLibrary("64-jnotify");
-		} else {
-			System.loadLibrary("jnotify");
-		}
+		System.loadLibrary("jnotify");
 		int res = nativeInit();
 		if (res != 0)
 		{

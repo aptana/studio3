@@ -42,6 +42,9 @@
       <file
             name="ruble/template.rb">
       </file>
+      <file
+            name="ruble/content_assist.rb">
+      </file>
    </extension>
    <extension
          point="com.aptana.scripting.contextContributors">

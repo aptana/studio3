@@ -10,12 +10,6 @@ public abstract class AbstractGitRepositoryListener implements IGitRepositoryLis
 	}
 
 	@Override
-	public void repositoryAdded(RepositoryAddedEvent e)
-	{
-		// do nothing
-	}
-
-	@Override
 	public void branchChanged(BranchChangedEvent e)
 	{
 		// do nothing
@@ -29,12 +23,6 @@ public abstract class AbstractGitRepositoryListener implements IGitRepositoryLis
 
 	@Override
 	public void branchRemoved(BranchRemovedEvent e)
-	{
-		// do nothing
-	}
-
-	@Override
-	public void repositoryRemoved(RepositoryRemovedEvent e)
 	{
 		// do nothing
 	}

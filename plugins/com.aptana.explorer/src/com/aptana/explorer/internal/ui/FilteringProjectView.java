@@ -1,7 +1,12 @@
 package com.aptana.explorer.internal.ui;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
@@ -9,13 +14,14 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -42,20 +48,17 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.navigator.framelist.FrameList;
-import org.eclipse.ui.internal.navigator.framelist.TreeFrame;
 import org.eclipse.ui.progress.WorkbenchJob;
 
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.Theme;
 import com.aptana.explorer.ExplorerPlugin;
+import com.aptana.theme.Theme;
+import com.aptana.theme.ThemePlugin;
 
 /**
  * Adds focus filtering and a free form text filter to the Project view.
  * 
  * @author cwilliams
  */
-@SuppressWarnings("restriction")
 public class FilteringProjectView extends GitProjectView
 {
 	/**
@@ -65,7 +68,9 @@ public class FilteringProjectView extends GitProjectView
 	private static final String TAG_EXPANDED = "expanded"; //$NON-NLS-1$
 	private static final String TAG_ELEMENT = "element"; //$NON-NLS-1$
 	private static final String TAG_PATH = "path"; //$NON-NLS-1$
-	private static final String TAG_CURRENT_FRAME = "currentFrame"; //$NON-NLS-1$
+	private static final String TAG_PROJECT = "project"; //$NON-NLS-1$
+	private static final String TAG_FILTER = "filter"; //$NON-NLS-1$
+	private static final String KEY_NAME = "name"; //$NON-NLS-1$
 
 	/**
 	 * Maximum time spent expanding the tree after the filter text has been updated (this is only used if we were able
@@ -89,6 +94,23 @@ public class FilteringProjectView extends GitProjectView
 	private Composite customComposite;
 	private IResourceChangeListener fResourceListener;
 
+	// Since the IMemento model does not fit our 'live' project switching,
+	// we maintain the states of all the projects in these data structures and
+	// flush them into the IMemento when needed (in the saveState call).
+	private Map<IProject, List<String>> projectExpansions;
+	private Map<IProject, List<String>> projectSelections;
+	private Map<IProject, String> projectFilters;
+
+	/**
+	 * Constructs a new FilteringProjectView.
+	 */
+	public FilteringProjectView()
+	{
+		projectExpansions = new HashMap<IProject, List<String>>();
+		projectSelections = new HashMap<IProject, List<String>>();
+		projectFilters = new HashMap<IProject, String>();
+	}
+
 	@Override
 	public void createPartControl(Composite aParent)
 	{
@@ -99,28 +121,122 @@ public class FilteringProjectView extends GitProjectView
 		customComposite.setLayout(gridLayout);
 
 		super.createPartControl(customComposite);
-
 		patternFilter = new PathFilter();
 		createRefreshJob();
 
 		// Add eyeball hover
 		addFocusHover();
-		if (memento != null)
-		{
-			restoreState(memento);
-		}
-		memento = null;
 		addResourceListener();
 	}
 
 	@Override
 	public void init(IViewSite aSite, IMemento aMemento) throws PartInitException
 	{
-		this.memento = aMemento;
 		super.init(aSite, aMemento);
+		loadMementoCache();
 
 		eyeball = ExplorerPlugin.getImage("icons/full/obj16/eye.png"); //$NON-NLS-1$
+	}
 
+	/**
+	 * Load the memento's relevant data into this view's internal memento data structure.
+	 */
+	protected void loadMementoCache()
+	{
+		if (this.memento == null)
+		{
+			return;
+		}
+		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+		IMemento[] projectMementoes = memento.getChildren(TAG_PROJECT);
+		for (IMemento projMemento : projectMementoes)
+		{
+			String projectName = projMemento.getString(KEY_NAME);
+			IProject project = workspaceRoot.getProject(projectName);
+			// Load only projects that exist and open in the workspace.
+			if (project != null && project.isAccessible())
+			{
+				List<String> expanded = new ArrayList<String>();
+				IMemento childMem = projMemento.getChild(TAG_EXPANDED);
+				if (childMem != null)
+				{
+					IMemento[] elementMem = childMem.getChildren(TAG_ELEMENT);
+					for (int i = 0; i < elementMem.length; i++)
+					{
+						expanded.add(elementMem[i].getString(TAG_PATH));
+					}
+				}
+				List<String> selected = new ArrayList<String>();
+				childMem = projMemento.getChild(TAG_SELECTION);
+				if (childMem != null)
+				{
+					IMemento[] elementMem = childMem.getChildren(TAG_ELEMENT);
+					for (int i = 0; i < elementMem.length; i++)
+					{
+						selected.add(elementMem[i].getString(TAG_PATH));
+					}
+				}
+				// Cache the loaded mementoes
+				projectExpansions.put(project, expanded);
+				projectSelections.put(project, selected);
+
+				childMem = projMemento.getChild(TAG_FILTER);
+				if (childMem != null)
+				{
+					projectFilters.put(project, childMem.getString(TAG_PATH));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Update the in-memory memento for a given project. This update method should be called before saving the memento
+	 * and before every project switch.
+	 * 
+	 * @param project
+	 */
+	protected void updateProjectMementoCache(IProject project)
+	{
+		TreeViewer viewer = getCommonViewer();
+		if (viewer == null || project == null)
+		{
+			return;
+		}
+		List<String> expanded = new ArrayList<String>();
+		List<String> selected = new ArrayList<String>();
+
+		// Save the expansion state
+		Object expandedElements[] = viewer.getVisibleExpandedElements();
+		if (expandedElements.length > 0)
+		{
+			for (int i = 0; i < expandedElements.length; i++)
+			{
+				if (expandedElements[i] instanceof IResource)
+				{
+					expanded.add(((IResource) expandedElements[i]).getFullPath().toString());
+				}
+			}
+		}
+		// Save the selection state
+		Object selectedElements[] = ((IStructuredSelection) viewer.getSelection()).toArray();
+		if (selectedElements.length > 0)
+		{
+			for (int i = 0; i < selectedElements.length; i++)
+			{
+				if (selectedElements[i] instanceof IResource)
+				{
+					selected.add(((IResource) selectedElements[i]).getFullPath().toString());
+				}
+			}
+		}
+		projectExpansions.put(project, expanded);
+		projectSelections.put(project, selected);
+	
+		String filter = getFilterString();
+		if (filter != null)
+		{
+			projectFilters.put(project, filter);
+		}
 	}
 
 	private void addFocusHover()
@@ -135,7 +251,7 @@ public class FilteringProjectView extends GitProjectView
 		// Do our hover bg coloring
 		tree.addListener(SWT.EraseItem, createHoverBGColorer());
 		// Paint Eyeball
-		tree.addListener(SWT.PaintItem, createEyeballPainter(eyeball, IMAGE_MARGIN, tree));
+		tree.addListener(SWT.Paint, createEyeballPainter(eyeball, IMAGE_MARGIN, tree));
 		// Track hovered item and force it's coloring
 		getCommonViewer().getControl().addMouseMoveListener(createHoverTracker());
 		// Remove hover on exit of tree
@@ -243,16 +359,16 @@ public class FilteringProjectView extends GitProjectView
 		{
 			public void handleEvent(Event event)
 			{
-				TreeItem item = (TreeItem) event.item;
-				if (hoveredItem == null || !hoveredItem.equals(item))
+				if (hoveredItem == null || hoveredItem.isDisposed())
 					return;
 				if (eyeball != null)
 				{
-					int itemWidth = item.getParent().getClientArea().width;
-					lastDrawnX = itemWidth - (IMAGE_MARGIN + eyeball.getBounds().width);
+					int endOfClientAreaX = tree.getClientArea().width + tree.getClientArea().x;
+					int endOfItemX = hoveredItem.getBounds().width + hoveredItem.getBounds().x;
+					lastDrawnX = Math.max(endOfClientAreaX, endOfItemX) - (IMAGE_MARGIN + eyeball.getBounds().width);
 					int itemHeight = tree.getItemHeight();
-					int imageHeight = eyeball.getBounds().height;
-					int y = event.y + (itemHeight - imageHeight) / 2;
+					int imageHeight = eyeball.getBounds().height;					
+					int y = hoveredItem.getBounds().y + (itemHeight - imageHeight) / 2;
 					event.gc.drawImage(eyeball, lastDrawnX, y);
 				}
 			}
@@ -307,126 +423,153 @@ public class FilteringProjectView extends GitProjectView
 			return;
 		}
 
-		FrameList frameList = getCommonViewer().getFrameList();
-		if (frameList.getCurrentIndex() > 0)
+		// Make sure we are up-to-date
+		updateProjectMementoCache(selectedProject);
+		// Collect all the projects in the cache
+		Set<IProject> projects = new TreeSet<IProject>(new Comparator<IProject>()
 		{
-			// save frame, it's not the "home"/workspace frame
-			TreeFrame currentFrame = (TreeFrame) frameList.getCurrentFrame();
-			IMemento frameMemento = memento.createChild(TAG_CURRENT_FRAME);
-			currentFrame.saveState(frameMemento);
-		}
-		else
-		{
-			// save visible expanded elements
-			Object expandedElements[] = viewer.getVisibleExpandedElements();
-			if (expandedElements.length > 0)
+			public int compare(IProject o1, IProject o2)
 			{
-				IMemento expandedMem = memento.createChild(TAG_EXPANDED);
-				for (int i = 0; i < expandedElements.length; i++)
+				return o1 == o2 ? 0 : o1.getName().compareTo(o2.getName());
+			}
+		});
+		projects.addAll(projectExpansions.keySet());
+		projects.addAll(projectSelections.keySet());
+
+		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+		// Create a memento for every accessible project that has expanded/selected paths.
+		for (IProject project : projects)
+		{
+			if (project.isAccessible()
+					&& !(projectExpansions.get(project).isEmpty() && projectSelections.get(project).isEmpty() && projectFilters.get(project) == null))
+			{
+				IMemento projectMemento = memento.createChild(TAG_PROJECT);
+				projectMemento.putString(KEY_NAME, project.getName());
+				// Create the expansions memento
+				List<String> expanded = projectExpansions.get(project);
+				if (!expanded.isEmpty())
 				{
-					if (expandedElements[i] instanceof IResource)
+					IMemento expansionMem = projectMemento.createChild(TAG_EXPANDED);
+					for (String expandedPath : expanded)
 					{
-						IMemento elementMem = expandedMem.createChild(TAG_ELEMENT);
-						elementMem.putString(TAG_PATH, ((IResource) expandedElements[i]).getFullPath().toString());
+						if (workspaceRoot.findMember(expandedPath) != null)
+						{
+							IMemento elementMem = expansionMem.createChild(TAG_ELEMENT);
+							elementMem.putString(TAG_PATH, expandedPath);
+						}
 					}
 				}
-			}
-			// save selection
-			Object elements[] = ((IStructuredSelection) viewer.getSelection()).toArray();
-			if (elements.length > 0)
-			{
-				IMemento selectionMem = memento.createChild(TAG_SELECTION);
-				for (int i = 0; i < elements.length; i++)
+				// Create the selection memento
+				List<String> selected = projectSelections.get(project);
+				if (!selected.isEmpty())
 				{
-					if (elements[i] instanceof IResource)
+					IMemento selectionMem = projectMemento.createChild(TAG_SELECTION);
+					for (String selectedPath : selected)
 					{
-						IMemento elementMem = selectionMem.createChild(TAG_ELEMENT);
-						elementMem.putString(TAG_PATH, ((IResource) elements[i]).getFullPath().toString());
+						if (workspaceRoot.findMember(selectedPath) != null)
+						{
+							IMemento elementMem = selectionMem.createChild(TAG_ELEMENT);
+							elementMem.putString(TAG_PATH, selectedPath);
+						}
 					}
+				}
+
+				String filter = projectFilters.get(project);
+				if (filter != null)
+				{
+					IMemento filterMem = projectMemento.createChild(TAG_FILTER);
+					filterMem.putString(TAG_PATH, filter);
 				}
 			}
 		}
 	}
 
 	/**
-	 * Restores the state of the receiver to the state described in the specified memento.
+	 * Restore the expansion and selection state in a job.
 	 * 
-	 * @param memento
-	 *            the memento
+	 * @param project
+	 */
+	protected void restoreStateJob(final IProject project)
+	{
+		Job job = new WorkbenchJob("Restoring State") {//$NON-NLS-1$
+			public IStatus runInUIThread(IProgressMonitor monitor)
+			{
+				restoreState(project);
+				return Status.OK_STATUS;
+			}
+		};
+		job.setSystem(true);
+		// We have to delay it a bit, otherwise, the tree collapse back due
+		// to other jobs.
+		job.schedule(getRefreshJobDelay() * 2);
+	}
+
+	/**
+	 * Restores the expansion and selection state of given project.
+	 * 
+	 * @param project
+	 *            the {@link IProject}
+	 * @see #restoreStateJob(IProject)
+	 * @see #saveState(IMemento)
 	 * @since 2.0
 	 */
-	protected void restoreState(IMemento memento)
+	protected void restoreState(IProject project)
 	{
 		TreeViewer viewer = getCommonViewer();
-		IMemento frameMemento = memento.getChild(TAG_CURRENT_FRAME);
 
-		if (frameMemento != null)
+		IContainer container = ResourcesPlugin.getWorkspace().getRoot();
+		List<String> expansions = projectExpansions.get(project);
+		List<String> selections = projectSelections.get(project);
+		viewer.getControl().setRedraw(false);
+		String filter = projectFilters.get(project);
+		if (filter == null || filter.length() == 0)
 		{
-			TreeFrame frame = new TreeFrame(viewer);
-			frame.restoreState(frameMemento);
-			frame.setName(getFrameName(frame.getInput()));
-			frame.setToolTipText(getFrameToolTipText(frame.getInput()));
-			viewer.setSelection(new StructuredSelection(frame.getInput()));
-			getCommonViewer().getFrameList().gotoFrame(frame);
-		}
-		else
-		{
-			IContainer container = ResourcesPlugin.getWorkspace().getRoot();
-			IMemento childMem = memento.getChild(TAG_EXPANDED);
-			if (childMem != null)
+			if (currentFilterText != null && currentFilterText.length() > 0)
 			{
-				List<IResource> elements = new ArrayList<IResource>();
-				IMemento[] elementMem = childMem.getChildren(TAG_ELEMENT);
-				for (int i = 0; i < elementMem.length; i++)
-				{
-					IResource element = container.findMember(elementMem[i].getString(TAG_PATH));
-					if (element != null)
-					{
-						elements.add(element);
-					}
-				}
-				viewer.setExpandedElements(elements.toArray());
-			}
-			childMem = memento.getChild(TAG_SELECTION);
-			if (childMem != null)
-			{
-				List<IResource> list = new ArrayList<IResource>();
-				IMemento[] elementMem = childMem.getChildren(TAG_ELEMENT);
-				for (int i = 0; i < elementMem.length; i++)
-				{
-					IResource element = container.findMember(elementMem[i].getString(TAG_PATH));
-					if (element != null)
-					{
-						list.add(element);
-					}
-				}
-				viewer.setSelection(new StructuredSelection(list));
+				clearText();
 			}
 		}
-	}
-
-	/**
-	 * Returns the name for the given element. Used as the name for the current frame.
-	 */
-	private String getFrameName(Object element)
-	{
-		if (element instanceof IResource)
+		else if (!filter.equals(currentFilterText))
 		{
-			return ((IResource) element).getName();
+			setFilterText(filter);
 		}
-		String text = ((ILabelProvider) getCommonViewer().getLabelProvider()).getText(element);
-		if (text == null)
+		if (selections != null)
 		{
-			return "";//$NON-NLS-1$
+			List<IResource> elements = new ArrayList<IResource>();
+			for (String selectionPath : selections)
+			{
+				IResource element = container.findMember(selectionPath);
+				if (element != null)
+				{
+					elements.add(element);
+				}
+			}
+			viewer.setSelection(new StructuredSelection(elements), true);
 		}
-		return text;
+		if (expansions != null)
+		{
+			List<IResource> elements = new ArrayList<IResource>();
+			for (String expansionPath : expansions)
+			{
+				IResource element = container.findMember(expansionPath);
+				if (element != null)
+				{
+					elements.add(element);
+				}
+			}
+			viewer.setExpandedElements(elements.toArray());
+		}
+		viewer.getControl().setRedraw(true);
 	}
 
 	@Override
 	protected void projectChanged(IProject oldProject, IProject newProject)
 	{
+		// Update the memento cache when the project is changed.
+		updateProjectMementoCache(oldProject);
 		super.projectChanged(oldProject, newProject);
-		clearText();
+		// Restore the displayed project state.
+		restoreStateJob(newProject);		
 	}
 
 	@Override
@@ -456,15 +599,15 @@ public class FilteringProjectView extends GitProjectView
 						continue;
 					if (resource.getProject().equals(selectedProject))
 					{
-						PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() 
+						PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 						{
-							
+
 							@Override
-							public void run() 
+							public void run()
 							{
 								getCommonViewer().refresh();
 							}
-						});						
+						});
 						return;
 					}
 				}
@@ -580,7 +723,11 @@ public class FilteringProjectView extends GitProjectView
 							getCommonViewer().setExpandedState(item.getData(), false);
 						}
 					}
-					getCommonViewer().refresh(true);
+					try {
+						getCommonViewer().refresh(true);
+					} catch (Exception e) {
+						// ignore. This seems to just happen on windows and appears to be benign
+					}
 
 					if (text.length() > 0 && !initial)
 					{
@@ -772,7 +919,7 @@ public class FilteringProjectView extends GitProjectView
 
 	protected Color getHoverBackgroundColor()
 	{
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(getActiveTheme().getLineHighlight());
+		return ThemePlugin.getDefault().getColorManager().getColor(getActiveTheme().getLineHighlight());
 	}
 
 	protected Theme getActiveTheme()
@@ -783,7 +930,7 @@ public class FilteringProjectView extends GitProjectView
 	private boolean filterOn()
 	{
 		return getFilterString() != null && getFilterString().trim().length() > 0
-				&& !getFilterString().equals(initialText);
+				&& !getFilterString().equals(Messages.SingleProjectView_InitialFileFilterText);
 	}
 
 	protected IResource getResource(final TreeItem t)

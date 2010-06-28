@@ -10,8 +10,8 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
-import com.aptana.util.IOUtil;
-import com.aptana.util.StringUtil;
+import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.StringUtil;
 
 /**
  * Used to share common code for formatting Diffs for display.
@@ -40,82 +40,90 @@ public abstract class DiffFormatter
 
 	protected static String convertDiff(String title, String diff)
 	{
-		if (!diff.startsWith("diff")) //$NON-NLS-1$
-		{
-			return "<pre>" + StringUtil.sanitizeHTML(diff) + "</pre>"; //$NON-NLS-1$ //$NON-NLS-2$
-		}
 		if (title == null)
 			title = ""; //$NON-NLS-1$
 		StringBuilder html = new StringBuilder();
 		html.append("<div class=\"file\">"); //$NON-NLS-1$
 		html.append("<div class=\"fileHeader\">").append(title).append("</div>"); //$NON-NLS-1$ //$NON-NLS-2$
 		html.append("<div class=\"diffContent\">"); //$NON-NLS-1$
-		String[] lines = diff.split("\r\n|\r|\n"); //$NON-NLS-1$
-		StringBuilder diffContent = new StringBuilder();
-		StringBuilder line1 = new StringBuilder();
-		StringBuilder line2 = new StringBuilder();
-		String lineNumberNewline = "\n"; //$NON-NLS-1$
-		if (Platform.getOS().equals(Platform.OS_WIN32))
+		if (!diff.startsWith("diff")) //$NON-NLS-1$
 		{
-			// BUGFIX Have to force breakread/newlines in HTML for IE...
-			lineNumberNewline = "<br />\n"; //$NON-NLS-1$
-		}
-		int hunkStartLine1 = 0;
-		int hunkStartLine2 = 0;
-		for (int i = 4; i < lines.length; i++)
-		{
-			String line = lines[i];
-			if (line == null || line.length() == 0)
-				continue;
-			char c = line.charAt(0);
-			switch (c)
+			// New file, no "diff", all lines are added. TODO Maybe split all lines and pretend like they have a + in front?
+			if (diff.length() == 0)
 			{
-				case '@':
-					Matcher m = gitDiffHeaderRegexp.matcher(line);
-					if (m.find())
-					{
-						hunkStartLine1 = Integer.parseInt(m.group(1)) - 1;
-						hunkStartLine2 = Integer.parseInt(m.group(2)) - 1;
-					}
-					line1.append("..").append(lineNumberNewline); //$NON-NLS-1$
-					line2.append("..").append(lineNumberNewline); //$NON-NLS-1$
-					diffContent.append("<div class=\"hunkheader\">").append(StringUtil.sanitizeHTML(line)).append( //$NON-NLS-1$
-							"</div>"); //$NON-NLS-1$
-					break;
-
-				case '+':
-					if (line.equals("+++ /dev/null")) //$NON-NLS-1$
-						continue;
-					// Highlight trailing whitespace
-					line = StringUtil.sanitizeHTML(line);
-					line = line.replaceFirst("\\s+$", "<span class=\"whitespace\">$0</span>"); //$NON-NLS-1$ //$NON-NLS-2$
-					line1.append(lineNumberNewline);
-					line2.append(++hunkStartLine2).append(lineNumberNewline);
-					diffContent.append("<div class=\"addline\">").append(line).append("</div>"); //$NON-NLS-1$ //$NON-NLS-2$
-					break;
-
-				case ' ':
-					line1.append(++hunkStartLine1).append(lineNumberNewline);
-					line2.append(++hunkStartLine2).append(lineNumberNewline);
-					diffContent.append("<div class=\"noopline\">").append(StringUtil.sanitizeHTML(line)).append( //$NON-NLS-1$
-							"</div>"); //$NON-NLS-1$
-					break;
-
-				case '-':
-					line1.append(++hunkStartLine1).append(lineNumberNewline);
-					line2.append(lineNumberNewline);
-					diffContent.append("<div class=\"delline\">").append(StringUtil.sanitizeHTML(line)) //$NON-NLS-1$
-							.append("</div>"); //$NON-NLS-1$
-					break;
-
-				default:
-					break;
+				diff = Messages.DiffFormatter_NoContent;
 			}
-
+			html.append("<pre>" + StringUtil.sanitizeHTML(diff) + "</pre>"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		html.append("<div class=\"lineno\">").append(line1).append("</div>"); //$NON-NLS-1$ //$NON-NLS-2$
-		html.append("<div class=\"lineno\">").append(line2).append("</div>"); //$NON-NLS-1$ //$NON-NLS-2$
-		html.append("<div class=\"lines\">").append(diffContent).append("</div>"); //$NON-NLS-1$ //$NON-NLS-2$
+		else
+		{
+			String[] lines = diff.split("\r\n|\r|\n"); //$NON-NLS-1$
+			StringBuilder diffContent = new StringBuilder();
+			StringBuilder line1 = new StringBuilder();
+			StringBuilder line2 = new StringBuilder();
+			String lineNumberNewline = "\n"; //$NON-NLS-1$
+			if (Platform.getOS().equals(Platform.OS_WIN32))
+			{
+				// BUGFIX Have to force breakread/newlines in HTML for IE...
+				lineNumberNewline = "<br />\n"; //$NON-NLS-1$
+			}
+			int hunkStartLine1 = 0;
+			int hunkStartLine2 = 0;
+			for (int i = 4; i < lines.length; i++)
+			{
+				String line = lines[i];
+				if (line == null || line.length() == 0)
+					continue;
+				char c = line.charAt(0);
+				switch (c)
+				{
+					case '@':
+						Matcher m = gitDiffHeaderRegexp.matcher(line);
+						if (m.find())
+						{
+							hunkStartLine1 = Integer.parseInt(m.group(1)) - 1;
+							hunkStartLine2 = Integer.parseInt(m.group(2)) - 1;
+						}
+						line1.append("..").append(lineNumberNewline); //$NON-NLS-1$
+						line2.append("..").append(lineNumberNewline); //$NON-NLS-1$
+						diffContent.append("<div class=\"hunkheader\">").append(StringUtil.sanitizeHTML(line)).append( //$NON-NLS-1$
+								"</div>"); //$NON-NLS-1$
+						break;
+
+					case '+':
+						if (line.equals("+++ /dev/null")) //$NON-NLS-1$
+							continue;
+						// Highlight trailing whitespace
+						line = StringUtil.sanitizeHTML(line);
+						line = line.replaceFirst("\\s+$", "<span class=\"whitespace\">$0</span>"); //$NON-NLS-1$ //$NON-NLS-2$
+						line1.append(lineNumberNewline);
+						line2.append(++hunkStartLine2).append(lineNumberNewline);
+						diffContent.append("<div class=\"addline\">").append(line).append("</div>"); //$NON-NLS-1$ //$NON-NLS-2$
+						break;
+
+					case ' ':
+						line1.append(++hunkStartLine1).append(lineNumberNewline);
+						line2.append(++hunkStartLine2).append(lineNumberNewline);
+						diffContent.append("<div class=\"noopline\">").append(StringUtil.sanitizeHTML(line)).append( //$NON-NLS-1$
+								"</div>"); //$NON-NLS-1$
+						break;
+
+					case '-':
+						line1.append(++hunkStartLine1).append(lineNumberNewline);
+						line2.append(lineNumberNewline);
+						diffContent.append("<div class=\"delline\">").append(StringUtil.sanitizeHTML(line)) //$NON-NLS-1$
+								.append("</div>"); //$NON-NLS-1$
+						break;
+
+					default:
+						break;
+				}
+
+			}
+			html.append("<div class=\"lineno\">").append(line1).append("</div>"); //$NON-NLS-1$ //$NON-NLS-2$
+			html.append("<div class=\"lineno\">").append(line2).append("</div>"); //$NON-NLS-1$ //$NON-NLS-2$
+			html.append("<div class=\"lines\">").append(diffContent).append("</div>"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 		html.append("</div>").append("</div>"); //$NON-NLS-1$ //$NON-NLS-2$
 		return html.toString();
 	}
@@ -129,7 +137,7 @@ public abstract class DiffFormatter
 					.append("diff.html"), false); //$NON-NLS-1$
 			String template = IOUtil.read(stream);
 			Map<String, String> variables = new HashMap<String, String>();
-			variables.put("\\{diff\\}", html); //$NON-NLS-1$
+			variables.put("\\{diff\\}", Matcher.quoteReplacement(html)); //$NON-NLS-1$
 			return StringUtil.replaceAll(template, variables);
 		}
 		catch (Exception e)

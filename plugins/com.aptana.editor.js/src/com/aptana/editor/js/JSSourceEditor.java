@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -38,9 +38,10 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlinePage;
+import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
 import com.aptana.editor.js.outline.JSOutlineLabelProvider;
-import com.aptana.editor.js.parsing.JSParserFactory;
+import com.aptana.editor.js.parsing.IJSParserConstants;
 
 public class JSSourceEditor extends AbstractThemeableEditor
 {
@@ -52,8 +53,12 @@ public class JSSourceEditor extends AbstractThemeableEditor
 
 		setSourceViewerConfiguration(new JSSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new JSDocumentProvider());
-
-		getFileService().setParser(JSParserFactory.getInstance().getParser());
+	}
+	
+	@Override
+	protected FileService createFileService()
+	{
+		return new FileService(IJSParserConstants.LANGUAGE);
 	}
 
 	@Override

@@ -6,18 +6,26 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.aptana.editor.html.Activator
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources,
  org.eclipse.ui,
  org.eclipse.jface.text,
  org.eclipse.ui.editors,
  org.eclipse.ui.views,
+ org.eclipse.ui.ide;bundle-version="3.4.0",
+ com.aptana.core,
+ com.aptana.index.core,
  com.aptana.editor.common,
  com.aptana.editor.js,
  com.aptana.editor.css,
- com.aptana.parsing
+ com.aptana.parsing,
+ beaver;bundle-version="1.0.0",
+ com.aptana.theme
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.html,
+ com.aptana.editor.html.contentassist.index,
  com.aptana.editor.html.outline,
- com.aptana.editor.html.parsing
+ com.aptana.editor.html.parsing,
+ com.aptana.editor.html.parsing.lexer
 Eclipse-ExtensibleAPI: true

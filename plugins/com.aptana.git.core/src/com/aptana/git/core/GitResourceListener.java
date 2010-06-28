@@ -17,7 +17,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
+import com.aptana.git.core.model.GitIndex;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.IGitRepositoryManager;
 
 class GitResourceListener implements IResourceChangeListener
 {
@@ -37,12 +39,8 @@ class GitResourceListener implements IResourceChangeListener
 	 */
 	public void resourceChanged(IResourceChangeEvent event)
 	{
-		if (event.getType() == IResourceChangeEvent.PRE_DELETE)
-		{
-			IProject project = (IProject) event.getResource();
-			GitRepository.removeRepository(project);
-			return;			
-		}
+		if (event == null || event.getDelta() == null)
+			return;
 		final Set<GitRepository> resourcesToUpdate = new HashSet<GitRepository>();
 		final Set<IProject> projectsToAttach = new HashSet<IProject>();
 
@@ -96,7 +94,9 @@ class GitResourceListener implements IResourceChangeListener
 							return false;
 					}
 
-					// All seems good, schedule the repo for update
+					// All seems good, schedule the repo for update.
+					// TODO We force a refresh of the whole index for this repo. Maybe we should see if there's a way to
+					// refresh the status of just this file?
 					resourcesToUpdate.add(mapping);
 
 					if (delta.getKind() == IResourceDelta.CHANGED && (delta.getFlags() & IResourceDelta.OPEN) > 1)
@@ -124,7 +124,8 @@ class GitResourceListener implements IResourceChangeListener
 					{
 						try
 						{
-							GitRepository.attachExisting(project, sub.newChild(10));
+							if (project.isAccessible())
+								getGitRepositoryManager().attachExisting(project, sub.newChild(10));
 						}
 						catch (CoreException e)
 						{
@@ -144,21 +145,17 @@ class GitResourceListener implements IResourceChangeListener
 
 		for (final GitRepository repo : resourcesToUpdate)
 		{
-			Job job = new Job("Updating Git repo index") //$NON-NLS-1$
-			{
-				@Override
-				protected IStatus run(IProgressMonitor monitor)
-				{
-					// FIXME This seems to be getting triggered even when we're staging/unstaging files through the
-					// model
-					repo.index().refresh();
-					return Status.OK_STATUS;
-				}
-			};
-			job.setSystem(true);
-			job.setPriority(Job.SHORT);
-			job.schedule();
+			if (repo == null)
+				continue;
+			GitIndex index = repo.index();
+			if (index != null)
+				index.refreshAsync(); // queue up a refresh
 		}
+	}
+
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 
 	protected GitRepository getRepo(IResource resource)
@@ -168,6 +165,6 @@ class GitResourceListener implements IResourceChangeListener
 		IProject project = resource.getProject();
 		if (project == null)
 			return null;
-		return GitRepository.getAttached(project);
+		return getGitRepositoryManager().getAttached(project);
 	}
 }

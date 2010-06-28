@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -35,6 +35,7 @@
 package com.aptana.editor.sass;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.parsing.FileService;
 
 public class SassSourceEditor extends AbstractThemeableEditor
 {
@@ -46,5 +47,11 @@ public class SassSourceEditor extends AbstractThemeableEditor
 
 		setSourceViewerConfiguration(new SassSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new SassDocumentProvider());
+	}
+	
+	@Override
+	protected FileService createFileService()
+	{
+		return new FileService(ISassConstants.LANGUAGE);
 	}
 }

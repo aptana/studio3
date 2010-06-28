@@ -1,5 +1,5 @@
 require "java"
-require "uri"
+require "addressable/uri"
 require "ruble/ui"
 
 module Ruble
@@ -11,7 +11,8 @@ module Ruble
       # there's a registered handler for the scheme. Local files should always open.
       def open(absolute_path)
         uri = absolute_path
-        uri = URI.parse(uri) if !uri.respond_to? :scheme
+        # We use Addressable::URI instead of standard URI class to be able to parse windows paths correctly
+        uri = Addressable::URI.convert_path(uri) if !uri.respond_to? :scheme
         absolute_path = uri.path
         uri_string = uri.scheme ? uri.to_s : "file:#{absolute_path}"
         editor = nil
@@ -28,7 +29,7 @@ module Ruble
           else
             desc = org.eclipse.ui.ide.IDE.getDefaultEditor(ifile)
           end
-          editor_id = "org.eclipse.ui.DefaultTextEditor" # FIXME Set to out own text editor if/when we have one!
+          editor_id = "com.aptana.editor.text"
           editor_id = desc.getId unless desc.nil?
           editor = Ruble::Editor.new(org.eclipse.ui.ide.IDE.openEditor(page, java.net.URI.create(uri_string), editor_id, true))
         end
@@ -124,8 +125,12 @@ module Ruble
     end
     
     def document
+      if editor_part.respond_to? :document_provider
       # TODO Wrap in a proxy class/object so we can use array notation for getting/replacing portions of the text
-      editor_part.document_provider.getDocument(editor_input)
+        editor_part.document_provider.getDocument(editor_input)
+      else
+        nil
+      end
     end
     
     def document=(src)
@@ -140,7 +145,17 @@ module Ruble
     # Replace a portion of the editor's contents
     # Assumes that the args in the brackets are offset and length, and that the value is a string
     def []=(offset, length, src)    
-      Ruble::UI.run("Replacing Editor Contents") { document.replace(offset, length, src) }
+      Ruble::UI.run("Replacing Editor Contents") do
+        # Send along verify event so this is treated like user actually inserted text live, since events don't get sent when replacing programmatically
+        event = org.eclipse.swt.widgets.Event.new
+        event.type = org.eclipse.swt.SWT::Verify
+        event.keyCode = 0
+        event.text = src
+        event.start = offset
+        event.end = offset + length
+        styled_text.notifyListeners(event.type, event) # Send Verify, for auto-indent
+        document.replace(offset, length, src) if event.doit
+      end
     end
     
     # TODO Just forward missing methods over to editor_part?
@@ -182,24 +197,40 @@ module Ruble
     end
     
     def caret_column
-      selection.offset - styled_text.offset_at_line(selection.start_line)
+      selection.offset - offset_at_line(selection.start_line)
     end
     
     def caret_line
-      styled_text.line_at_offset(caret_offset)
+      doc = document
+      doc.nil? ? 0 : doc.getLineOfOffset(caret_offset)
     end
     
     def caret_offset
-      styled_text.caret_offset
+      # Need to convert because there may be folded regions?
+      offset = styled_text.nil? ? 0 : styled_text.caret_offset
+      editor_part.source_viewer.widgetOffset2ModelOffset(offset) rescue offset
     end
     
     def current_line
-      styled_text.line(caret_line)
-    end    
+      line(caret_line)
+    end
+    
+    # Returns the string content on the line
+    def line(line_number)
+      doc = document
+      return '' if doc.nil?
+      region = doc.getLineInformation(line_number)
+      doc.get(region.offset, region.length)
+    end
     
     def insert_as_text(text)
       self[caret_offset, 0] = snippet
-    end    
+    end
+    
+    def offset_at_line(line)
+      doc = document
+      doc.nil? ? 0 : doc.getLineOffset(line)
+    end
 
     def insert_as_snippet(snippet)
       region = org.eclipse.jface.text.Region.new(caret_offset, 0)
@@ -219,7 +250,7 @@ module Ruble
         result['TM_TAB_SIZE'] = 4
       end
       
-      if input
+      if input.respond_to? :file
         ifile = input.file
         file = ifile.location.to_file
         
@@ -274,9 +305,17 @@ module Ruble
         
         result["TM_CURRENT_SCOPE"] = current_scope
         result["TM_SCOPE"] = result["TM_CURRENT_SCOPE"]
-      end
+        # Allow each bundle to modify env vars based on scope, in order.
+        scopes = current_scope.split(' ')
+        scopes.each { |scope| result = modify_env(scope, result) } 
+      end           
       
       result
+    end
+    
+    # Default impl returns back unmodified
+    def modify_env(scope, env)
+      env
     end
     
   end

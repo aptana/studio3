@@ -9,10 +9,10 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.ColorManager;
-import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.common.theme.Theme;
+import com.aptana.theme.ColorManager;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.Theme;
+import com.aptana.theme.ThemePlugin;
 
 class BundleViewLabelProvider implements ILabelProvider, IColorProvider, IFontProvider
 {
@@ -64,7 +64,7 @@ class BundleViewLabelProvider implements ILabelProvider, IColorProvider, IFontPr
 	 */
 	public Color getForeground(Object element)
 	{
-		CommonEditorPlugin plugin = CommonEditorPlugin.getDefault();
+		ThemePlugin plugin = ThemePlugin.getDefault();
 		ColorManager colorManager = plugin.getColorManager();
 		IThemeManager themeManager = plugin.getThemeManager();
 		Theme currentTheme = themeManager.getCurrentTheme();

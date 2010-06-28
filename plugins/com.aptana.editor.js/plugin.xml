@@ -7,6 +7,7 @@
             class="com.aptana.editor.js.JSSourceEditor"
             contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
             default="true"
+            extensions="js,htc,jsx"
             icon="icons/js.png"
             id="com.aptana.editor.js"
             name="%editor.js.name">
@@ -30,6 +31,22 @@
       <initializer
             class="com.aptana.editor.js.preferences.PreferenceInitializer">
       </initializer>
+   </extension>
+   <extension
+         point="com.aptana.index.core.fileIndexingParticipants">
+      <fileIndexingParticipant
+            class="com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.js">
+         </contentTypeBinding>
+      </fileIndexingParticipant>
+   </extension>
+   <extension
+         point="com.aptana.parsing.parser">
+      <parser
+            class="com.aptana.editor.js.parsing.JSParser"
+            language="text/javascript">
+      </parser>
    </extension>
 
 </plugin>

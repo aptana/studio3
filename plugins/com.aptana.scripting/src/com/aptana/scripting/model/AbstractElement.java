@@ -1,16 +1,18 @@
 package com.aptana.scripting.model;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.aptana.util.StringUtil;
+import com.aptana.core.util.StringUtil;
 
 public abstract class AbstractElement implements Comparable<AbstractElement>
 {
-	private static final Map<String, List<AbstractElement>> ELEMENTS_BY_PATH;
 	private static final AbstractElement[] NO_ELEMENTS = new AbstractElement[0];
+	private static final Map<String, List<AbstractElement>> ELEMENTS_BY_PATH;
 
 	private String _path;
 	private String _displayName;
@@ -25,6 +27,35 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	{
 		ELEMENTS_BY_PATH = new HashMap<String, List<AbstractElement>>();
 	}
+	
+	/**
+	 * getElementsByDirectory
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public static AbstractElement[] getElementsByDirectory(String path)
+	{
+		List<AbstractElement> result = new LinkedList<AbstractElement>();
+		
+		if (path.endsWith(File.separator) == false)
+		{
+			path += File.separator;
+		}
+		
+		synchronized (ELEMENTS_BY_PATH)
+		{
+			 for (String key : ELEMENTS_BY_PATH.keySet())
+			 {
+				 if (key.startsWith(path))
+				 {
+					 result.addAll(ELEMENTS_BY_PATH.get(key));
+				 }
+			 }
+		}
+		
+		return result.toArray(new AbstractElement[result.size()]);
+	}
 
 	/**
 	 * getRegisteredElements
@@ -32,7 +63,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	 * @param path
 	 * @return
 	 */
-	public static AbstractElement[] getRegisteredElements(String path)
+	public static AbstractElement[] getElementsByPath(String path)
 	{
 		AbstractElement[] result = NO_ELEMENTS;
 
@@ -77,7 +108,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 			}
 		}
 	}
-
+	
 	/**
 	 * unregisterElement
 	 * 
@@ -105,6 +136,8 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 						}
 					}
 				}
+				
+				LibraryCrossReference.getInstance().unregisterPath(path);
 			}
 		}
 	}

@@ -111,6 +111,10 @@
 				<include name="**/*" />
 			</fileset>
 		</copy>
+		<antcall target="run.director">
+      <param name="p2.installIU" value="com.aptana.ide.feature.libraries.subscription.feature.group" />
+      <param name="p2.repo" value="${libraries-com.p2.repo}" />
+    </antcall>
 		<!-- Install Red Core feature -->
 		<antcall target="install.red.core" />
 		<!-- FIXME For some reason even though we install RED Core, it doesn't pick it up for building the test plugins/fragments! -->
@@ -121,8 +125,8 @@
          - - - - - - - - - - - - - - - - - -->
 	<target name="install.red.core" unless="dont.install.red.core">
 		<antcall target="run.director">
-			<param name="p2.installIU" value="com.aptana.red.core.feature.group" />
-			<param name="p2.repo" value="${red-core.p2.repo}" />
+			<param name="p2.installIU" value="com.aptana.feature.feature.group" />
+			<param name="p2.repo" value="file:${red-core.p2.repo}" />
 		</antcall>
 	</target>
 	<!-- - - - - - - - - - - - - - - - - - 
@@ -197,10 +201,14 @@
 
 		<property name="library-file" value="${baseLocation}/test-framework/eclipse/plugins/org.eclipse.test_3.2.0/library.xml" />
 		<!-- Run the tests. -->
-		<antcall target="run-ui-test">
+		<antcall target="run-core-test">
 			<param name="test.plugin" value="com.aptana.red.core.tests.all" />
-			<param name="test.classname" value="com.aptana.red.core.tests.all.AllTests" />
+			<param name="test.classname" value="com.aptana.red.core.tests.all.CoreTests" />
 		</antcall>
+		<antcall target="run-ui-test">
+      <param name="test.plugin" value="com.aptana.red.core.tests.all" />
+      <param name="test.classname" value="com.aptana.red.core.tests.all.UITests" />
+    </antcall>
 
 		<!-- Collect all test results into single file and move to results directory. -->
 		<ant target="collect" antfile="${library-file}" dir="${baseLocation}">

@@ -1,0 +1,585 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<javascript xmlns:xsd = "http://www.w3.org/2001/XMLSchema" xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance">
+	<class type = "Document" superclass = "Node">
+        <description>Represents an HTML or XML document.</description>
+		<properties>
+			<property name="documentURI" type="DOMString" scope="instance" access="read-write">
+                <browsers>
+                    <browser platform = "Mozilla" version = "1.7+"/>
+                    <browser platform = "Safari" version = "1.0+"/>
+                </browsers>
+                <description>The location of the document or null if undefined or if the Document was created using DOMImplementation.createDocument. No lexical checking is performed when setting this attribute; this could result in a null value returned when using Node.baseURI. Beware that when the Document supports the feature "HTML" [DOM Level 2 HTML], the href attribute of the HTML BASE element takes precedence over this attribute when computing Node.baseURI.</description>
+            </property>
+			<property name="inputEncoding" type="DOMString" scope="instance" access="read">
+                <description>An attribute specifying the encoding used for this document at the time of the parsing. This is null when it is not known, such as when the Document was created in memory.</description>
+				<availability>
+                    <specification name="HTML DOM Level 3"/>
+					<specification name="W3C" version="HTML DOM Level 3"/>
+                </availability>
+                <browsers>
+                    <browser platform = "Mozilla" version = "1.8.1+"/>
+				</browsers>
+            </property>
+			<property name="xmlEncoding" type="DOMString" scope="instance" access="read">
+                <description>An attribute specifying, as part of the XML declaration, the encoding of this document. This is null when unspecified or when it is not known, such as when the Document was created in memory.</description>
+				<availability>
+                    <specification name="HTML DOM Level 3"/>
+					<specification name="W3C" version="HTML DOM Level 3"/>
+                </availability>
+                <browsers>
+                    <browser platform = "Mozilla" version = "1.8.1+"/>
+				</browsers>
+            </property>
+			<property name="xmlStandalone" type="boolean" scope="instance" access="read-write">
+                <description>An attribute specifying, as part of the XML declaration, whether this document is standalone. This is false when unspecified.
+
+Note: No verification is done on the value when setting this attribute. Applications should use &lt;code&gt;Document.normalizeDocument()&lt;/code&gt; with the "validate" parameter to verify if the value matches the validity constraint for standalone document declaration as defined in [XML 1.0].</description>
+				<exceptions>
+					<exception type="DOMException">
+						<description>Exceptions on setting&lt;br&gt;
+						NOT_SUPPORTED_ERR: Raised if this document does not support the "XML" feature. </description>
+					</exception>
+				</exceptions>
+				<availability>
+                    <specification name="HTML DOM Level 3"/>
+					<specification name="W3C" version="HTML DOM Level 3"/>
+                </availability>
+                <browsers>
+                    <browser platform = "Mozilla" version = "1.8.1+"/>
+				</browsers>
+            </property>
+			<property name="xmlVersion" type="DOMString" scope="instance" access="read-write">
+                <description>An attribute specifying, as part of the XML declaration, the version number of this document. If there is no declaration and if this document supports the "XML" feature, the value is "1.0". If this document does not support the "XML" feature, the value is always null. Changing this attribute will affect methods that check for invalid characters in XML names. Application should invoke &lt;code&gt;Document.normalizeDocument()&lt;/code&gt; in order to check for invalid characters in the Nodes that are already part of this Document.</description>
+				<exceptions>
+					<exception type="DOMException">
+						<description>Exceptions on setting&lt;br&gt;
+						NOT_SUPPORTED_ERR: Raised if the version is set to a value that is not supported by this Document or if this document does not support the "XML" feature. </description>	
+					</exception>
+				</exceptions>
+				<availability>
+                    <specification name="HTML DOM Level 3"/>
+					<specification name="W3C" version="HTML DOM Level 3"/>
+                </availability>
+                <browsers>
+                    <browser platform = "Mozilla" version = "1.8.1+"/>
+				</browsers>
+            </property>
+			<property name="strictErrorChecking" type="boolean" scope="instance" access="read-write">
+                <description>An attribute specifying whether error checking is enforced or not. When set to false, the implementation is free to not test every possible error case normally defined on DOM operations, and not raise any DOMException on DOM operations or report errors while using &lt;code&gt;Document.normalizeDocument()&lt;/code&gt;. In case of error, the behavior is undefined. This attribute is true by default.</description>
+				<availability>
+                    <specification name="HTML DOM Level 3"/>
+					<specification name="W3C" version="HTML DOM Level 3"/>
+                </availability>
+                <browsers>
+                    <browser platform = "Mozilla" version = "1.8.1+"/>
+				</browsers>
+            </property>
+			<property name="domConfig" type="DOMConfiguration" scope="instance" access="read-write">
+                <description>The configuration used when &lt;code&gt;Document.normalizeDocument()&lt;/code&gt; is invoked.</description>
+				<availability>
+                    <specification name="HTML DOM Level 3"/>
+					<specification name="W3C" version="HTML DOM Level 3"/>
+                </availability>
+            </property>
+		</properties>
+		<methods>
+	    <method name="adoptNode" scope="instance">
+                <description>Adopts a node from an external document. The node and its subtree is removed from the document it's in (if any), and its &lt;code&gt;ownerDocument&lt;/code&gt; is changed to the current document. The node can then be inserted into the current document.</description>
+                <parameters>
+                    <parameter name="externalNode" type="Node" usage="required">
+                        <description>The node to be adopted from another document. </description>
+                    </parameter>
+                </parameters>
+                <return-types>
+                    <return-type type = "Node"/>
+                </return-types>
+                <return-description>The adopted node that can be used in the current document. The new node's &lt;code&gt;parentNode&lt;/code&gt; is null, since it has not yet been inserted into the document tree. </return-description>
+				<availability>
+                    <specification name="HTML DOM Level 3"/>
+					<specification name="W3C" version="HTML DOM Level 3"/>
+                </availability>
+                <browsers>
+                    <browser platform="Mozilla" version="1.8.1+"/>
+                    <browser platform="Chrome" version="5.0+"/>
+                    <browser platform="Safari" version="3.1+"/>
+                    <browser platform="Opera" version="9.51+"/>
+                </browsers>
+         </method>
+	    <method name="normalizeDocument" scope="instance">
+                <description>This method acts as if the document was going through a save and load cycle, putting the document in a "normal" form. As a consequence, this method updates the replacement tree of EntityReference nodes and normalizes Text nodes, as defined in the method &lt;code&gt;Node.normalize()&lt;/code&gt;. Otherwise, the actual result depends on the features being set on the &lt;code&gt;Document.domConfig&lt;/code&gt; object and governing what operations actually take place. Noticeably this method could also make the document namespace well-formed according to the algorithm described in Namespace Normalization, check the character normalization, remove the CDATASection nodes, etc.</description>
+				<availability>
+                    <specification name="HTML DOM Level 3"/>
+					<specification name="W3C" version="HTML DOM Level 3"/>
+                </availability>
+            </method>
+	    <method name="renameNode" scope="instance">
+                <description>Rename an existing node of type ELEMENT_NODE or ATTRIBUTE_NODE.
+When possible this simply changes the name of the given node, otherwise this creates a new node with the specified name and replaces the existing node with the new node as described below.
+
+If simply changing the name of the given node is not possible, the following operations are performed: a new node is created, any registered event listener is registered on the new node, any user data attached to the old node is removed from that node, the old node is removed from its parent if it has one, the children are moved to the new node, if the renamed node is an Element its attributes are moved to the new node, the new node is inserted at the position the old node used to have in its parent's child nodes list if it has one, the user data that was attached to the old node is attached to the new node.
+
+When the node being renamed is an Element only the specified attributes are moved, default attributes originated from the DTD are updated according to the new element name. In addition, the implementation may update default attributes from other schemas. Applications should use Document.normalizeDocument() to guarantee these attributes are up-to-date.
+
+When the node being renamed is an Attr that is attached to an Element, the node is first removed from the Element attributes map. Then, once renamed, either by modifying the existing node or creating a new one as described above, it is put back.
+In addition,
+
+    * a user data event NODE_RENAMED is fired,
+    * when the implementation supports the feature "MutationNameEvents", each mutation operation involved in this method fires the appropriate event, and in the end the event {http://www.w3.org/2001/xml-events, DOMElementNameChanged} or {http://www.w3.org/2001/xml-events, DOMAttributeNameChanged} is fired.
+</description>
+                <parameters>
+                    <parameter name="node" type="Node" usage="required">
+                        <description>The node to rename.</description>
+                    </parameter>
+                    <parameter name="namespaceURI" type="DOMString" usage="required">
+                        <description>The new namespace URI.</description>
+                    </parameter>
+                    <parameter name="qualifiedName" type="DOMString" usage="required">
+                        <description>The new qualified name.</description>
+                    </parameter>
+                </parameters>
+                <return-types>
+                    <return-type type="Node"/>
+                </return-types>
+                <return-description>The renamed node. This is either the specified node or the new node that was created to replace the specified node.</return-description>
+				<availability>
+                    <specification name="HTML DOM Level 3"/>
+					<specification name="W3C" version="HTML DOM Level 3"/>
+                </availability>
+				<exceptions>
+					<exception type="DOMException">
+						<description>NOT_SUPPORTED_ERR: Raised when the type of the specified node is neither ELEMENT_NODE nor ATTRIBUTE_NODE, or if the implementation does not support the renaming of the document element.</description>
+					</exception>
+					<exception type="DOMException">
+						<description>INVALID_CHARACTER_ERR: Raised if the new qualified name is not an XML name according to the XML version in use specified in the Document.xmlVersion attribute.</description>
+					</exception>
+					<exception type="DOMException">
+						<description>WRONG_DOCUMENT_ERR: Raised when the specified node was created from a different document than this document.</description>
+					</exception>
+					<exception type="DOMException">
+						<description>NAMESPACE_ERR: Raised if the qualifiedName is a malformed qualified name, if the qualifiedName has a prefix and the namespaceURI is null, or if the qualifiedName has a prefix that is "xml" and the namespaceURI is different from "http://www.w3.org/XML/1998/namespace" [XML Namespaces]. Also raised, when the node being renamed is an attribute, if the qualifiedName, or its prefix, is "xmlns" and the namespaceURI is different from "http://www.w3.org/2000/xmlns/".</description>
+					</exception>
+				</exceptions>
+            </method>
+       </methods>
+    </class>    
+    <class type="DOMImplementation" superclass="Object">
+		<methods>
+	    <method name="getFeature" scope="instance">
+                <description>This method returns a specialized object which implements the specialized APIs of the specified feature and version, as specified in DOM Features. The specialized object may also be obtained by using binding-specific casting methods but is not necessarily expected to, as discussed in Mixed DOM Implementations. This method also allow the implementation to provide specialized objects which do not support the DOMImplementation interface.</description>
+                <parameters>
+                    <parameter name="feature" type="DOMString" usage="required">
+                        <description>The name of the feature requested. Note that any plus sign "+" prepended to the name of the feature will be ignored since it is not significant in the context of this method.</description>
+                    </parameter>
+                    <parameter name="version" type="DOMString" usage="required">
+                        <description>This is the version number of the feature to test.</description>
+                    </parameter>
+                </parameters>
+                <return-types>
+                    <return-type type="DOMObject"/>
+                </return-types>
+                <return-description>Returns an object which implements the specialized APIs of the specified feature and version, if any, or null if there is no object which implements interfaces associated with that feature. If the DOMObject returned by this method implements the DOMImplementation interface, it must delegate to the primary core DOMImplementation and not return results inconsistent with the primary core DOMImplementation such as hasFeature, getFeature, etc.</return-description>
+				<availability>
+                    <specification name="HTML DOM Level 3"/>
+					<specification name="W3C" version="HTML DOM Level 3"/>
+                </availability>
+            </method>	
+		</methods>
+	</class>
+	<class type="Entity" superclass="Node">
+		<properties>
+			<property name="inputEncoding" type="DOMString" scope="instance" access="read">
+                <description>An attribute specifying the encoding used for this entity at the time of parsing, when it is an external parsed entity. This is null if it an entity from the internal subset or if it is not known.</description>
+            </property>
+			<property name="xmlEncoding" type="DOMString" scope="instance" access="read">
+                <description>An attribute specifying, as part of the text declaration, the encoding of this entity, when it is an external parsed entity. This is null otherwise.</description>
+            </property>
+			<property name="xmlVersion" type="DOMString" scope="instance" access="read">
+                <description>An attribute specifying, as part of the text declaration, the version number of this entity, when it is an external parsed entity. This is null otherwise.</description>
+            </property>
+		</properties>
+	</class>
+	<class type="Element" superclass="Node">
+		<properties>
+			<property name="schemaTypeInfo" type="TypeInfo" scope="instance" access="read">
+                <description>The type information associated with this element. </description>
+            </property>
+		</properties>
+		<methods>
+	    <method name="setIdAttribute" scope="instance">
+                <description>If the parameter isId is true, this method declares the specified attribute to be a user-determined ID attribute. This affects the value of Attr.isId and the behavior of Document.getElementById, but does not change any schema that may be in use, in particular this does not affect the Attr.schemaTypeInfo of the specified Attr node. Use the value false for the parameter isId to undeclare an attribute for being a user-determined ID attribute.
+				
+To specify an attribute by local name and namespace URI, use the setIdAttributeNS method.</description>
+                <parameters>
+                    <parameter name="name" type="DOMString" usage="required">
+                        <description>The name of the attribute.</description>
+                    </parameter>
+                    <parameter name="isId" type="boolean" usage="required">
+                        <description>Whether the attribute is a of type ID.</description>
+                    </parameter>
+                </parameters>
+				<exceptions>
+					<exception type="DOMException">
+						<description>NO_MODIFICATION_ALLOWED_ERR: Raised if this node is readonly.</description>
+					</exception>
+					<exception type="DOMException">
+						<description>NOT_FOUND_ERR: Raised if the specified node is not an attribute of this element.</description>
+					</exception>
+				</exceptions>
+				<availability>
+                    <specification name="HTML DOM Level 3"/>
+					<specification name="W3C" version="HTML DOM Level 3"/>
+                </availability>
+         </method>
+	    <method name="setIdAttributeNS" scope="instance">
+                <description>If the parameter isId is true, this method declares the specified attribute to be a user-determined ID attribute. This affects the value of Attr.isId and the behavior of Document.getElementById, but does not change any schema that may be in use, in particular this does not affect the Attr.schemaTypeInfo of the specified Attr node. Use the value false for the parameter isId to undeclare an attribute for being a user-determined ID attribute.</description>
+                <parameters>
+                    <parameter name="namespaceURI" type="DOMString" usage="required">
+                        <description>The namespace URI of the attribute.</description>
+                    </parameter>
+                    <parameter name="localName" type="DOMString" usage="required">
+                        <description>The local name of the attribute.</description>
+                    </parameter>
+                    <parameter name="isId" type="boolean" usage="required">
+                        <description>Whether the attribute is a of type ID.</description>
+                    </parameter>
+                </parameters>
+				<exceptions>
+					<exception type="DOMException">
+						<description>NO_MODIFICATION_ALLOWED_ERR: Raised if this node is readonly.</description>
+					</exception>
+					<exception type="DOMException">
+						<description>NOT_FOUND_ERR: Raised if the specified node is not an attribute of this element.</description>
+					</exception>
+				</exceptions>
+				<availability>
+                    <specification name="HTML DOM Level 3"/>
+					<specification name="W3C" version="HTML DOM Level 3"/>
+                </availability>
+         </method>
+	    <method name="setIdAttributeNode" scope="instance">
+                <description>If the parameter isId is true, this method declares the specified attribute to be a user-determined ID attribute. This affects the value of Attr.isId and the behavior of Document.getElementById, but does not change any schema that may be in use, in particular this does not affect the Attr.schemaTypeInfo of the specified Attr node. Use the value false for the parameter isId to undeclare an attribute for being a user-determined ID attribute.</description>
+                <parameters>
+                    <parameter name="idAttr" type="Attr" usage="required">
+                        <description>The attribute node.</description>
+                    </parameter>
+					<parameter name="isId" type="boolean" usage="required">
+                        <description>Whether the attribute is a of type ID.</description>
+                    </parameter>
+                </parameters>
+				<exceptions>
+					<exception type="DOMException">
+						<description>NO_MODIFICATION_ALLOWED_ERR: Raised if this node is readonly.</description>
+					</exception>
+					<exception type="DOMException">
+						<description>NOT_FOUND_ERR: Raised if the specified node is not an attribute of this element.</description>
+					</exception>
+				</exceptions>
+				<availability>
+                    <specification name="HTML DOM Level 3"/>
+					<specification name="W3C" version="HTML DOM Level 3"/>
+                </availability>
+         </method>
+		 </methods>
+	</class>
+	<class type="Node" superclass="Object">
+		<properties>
+			<property name="baseURI" type="DOMString" scope="instance" access="read-write">
+                <browsers>
+                    <browser platform = "Mozilla" version = "1.8.1+"/>
+                    <browser platform = "Safari" version = "1.0+"/>
+                </browsers>
+                <description>The absolute base URI of this node or null if the implementation wasn't able to obtain an absolute URI. This value is computed as described in Base URIs. However, when the Document supports the feature "HTML" [DOM Level 2 HTML], the base URI is computed using first the value of the href attribute of the HTML BASE element if any, and the value of the documentURI  attribute from the Document interface otherwise.</description>
+            </property>
+			<property name="textContent" type="DOMString" scope="instance" access="read-write">
+                <browsers>
+                    <browser platform = "Mozilla" version = "1.8.1+"/>
+                    <browser platform = "Safari" version = "1.0+"/>
+                </browsers>
+                <description>This attribute returns the text content of this node and its descendants. When it is defined to be null, setting it has no effect. On setting, any possible children this node may have are removed and, if it the new string is not empty or null, replaced by a single Text node containing the string this attribute is set to.
+				
+On getting, no serialization is performed, the returned string does not contain any markup. No whitespace normalization is performed and the returned string does not contain the white spaces in element content (see the attribute Text.isElementContentWhitespace). Similarly, on setting, no parsing is performed either, the input string is taken as pure textual content.
+
+The string returned is made of the text content of this node depending on its type, as defined below:
+
+ELEMENT_NODE, ATTRIBUTE_NODE, ENTITY_NODE, ENTITY_REFERENCE_NODE, DOCUMENT_FRAGMENT_NODE
+concatenation of the textContent attribute value of every child node, excluding COMMENT_NODE and PROCESSING_INSTRUCTION_NODE nodes. This is the empty string if the node has no children.
+
+TEXT_NODE, CDATA_SECTION_NODE, COMMENT_NODE, PROCESSING_INSTRUCTION_NODE
+nodeValue
+
+DOCUMENT_NODE, DOCUMENT_TYPE_NODE, NOTATION_NODE
+null
+</description>
+            </property>
+		</properties>	
+		<methods>
+	    <method name="compareDocumentPosition" scope="instance">
+				<description>Compares the reference node, i.e. the node on which this method is being called, with a node, i.e. the one passed as a parameter, with regard to their position in the document and according to the document order.</description>
+        <parameters>
+        <parameter name="otherNode" type="Node" usage="required">
+           	<description>The node to compare against the reference node.</description>
+				</parameter>
+				</parameters>
+				<return-types>
+					<return-type type="unsigned short" />
+				</return-types>
+				<return-description>Returns how the node is positioned relative to the reference node.</return-description>
+				<exceptions>
+					<exception type="DOMException">
+						<description>NOT_SUPPORTED_ERR: when the compared nodes are from different DOM implementations that do not coordinate to return consistent implementation-specific results.</description>
+					</exception>
+				</exceptions>
+				<availability>
+					<specification name="HTML DOM Level 3"/>
+					<specification name="W3C" version="HTML DOM Level 3"/>
+				</availability>
+			</method>
+	    <method name="getFeature" scope="instance">
+				<description>This method returns a specialized object which implements the specialized APIs of the specified feature and version, as specified in DOM Features. The specialized object may also be obtained by using binding-specific casting methods but is not necessarily expected to, as discussed in Mixed DOM Implementations. This method also allows the implementation to provide specialized objects which do not support the Node interface.</description>
+        <parameters>
+	        <parameter name="feature" type="DOMString" usage="required">
+	           	<description>The name of the feature requested. Note that any plus sign "+" prepended to the name of the feature will be ignored since it is not significant in the context of this method.</description>
+					</parameter>
+	        <parameter name="version" type="DOMString" usage="required">
+	           	<description>The version number of the feature to test.</description>
+					</parameter>
+				</parameters>
+				<return-types>
+					<return-type type="DOMObject" />
+				</return-types>
+				<return-description>Returns an object which implements the specialized APIs of the specified feature and version, if any, or null if there is no object which implements interfaces associated with that feature. If the DOMObject returned by this method implements the Node interface, it must delegate to the primary core Node and not return results inconsistent with the primary core Node such as attributes, childNodes, etc.</return-description>
+				<availability>
+					<specification name="HTML DOM Level 3"/>
+					<specification name="W3C" version="HTML DOM Level 3"/>
+				</availability>
+			</method>
+	    <method name="getUserData" scope="instance">
+				<description>Retrieves the object associated to a key on a this node. The object must first have been set to this node by calling &lt;code&gt;setUserData&lt;/code&gt; with the same key.</description>
+        <parameters>
+	        <parameter name="key" type="DOMString" usage="required">
+	           	<description>The key the object is associated to.</description>
+					</parameter>
+				</parameters>
+				<return-types>
+					<return-type type="DOMUserData" />
+				</return-types>
+				<return-description>Returns the DOMUserData associated to the given key on this node, or null if there was none.</return-description>
+				<availability>
+					<specification name="HTML DOM Level 3"/>
+					<specification name="W3C" version="HTML DOM Level 3"/>
+				</availability>
+			</method>
+	    <method name="insertBefore" scope="instance">
+				<return-types>
+					<return-type type="Node" />
+				</return-types>
+				<return-description>The node being inserted.</return-description>
+				<availability>
+					<specification name="HTML DOM Level 3"/>
+					<specification name="W3C" version="HTML DOM Level 3"/>
+				</availability>
+				<exceptions>
+					<exception type="DOMException">
+						<description>HIERARCHY_REQUEST_ERR: Raised if this node is of a type that does not allow children of the type of the newChild node, or if the node to insert is one of this node's ancestors or this node itself, or if this node is of type Document and the DOM application attempts to insert a second DocumentType or Element node.</description>
+					</exception>
+					<exception type="DOMException">
+						<description>WRONG_DOCUMENT_ERR: Raised if newChild was created from a different document than the one that created this node.</description>
+					</exception>
+					<exception type="DOMException">
+						<description>NO_MODIFICATION_ALLOWED_ERR: Raised if this node is readonly or if the parent of the node being inserted is readonly.</description>
+					</exception>
+					<exception type="DOMException">
+						<description>NOT_FOUND_ERR: Raised if refChild is not a child of this node.</description>
+					</exception>
+					<exception type="DOMException">
+						<description>NOT_SUPPORTED_ERR: if this node is of type Document, this exception might be raised if the DOM implementation doesn't support the insertion of a DocumentType or Element node.</description>
+					</exception>
+				</exceptions>
+			</method>
+	    <method name="isDefaultNamespace" scope="instance">
+				<description>Checks whether the specified namespaceURI is the default namespace.</description>
+        <parameters>
+	        <parameter name="namespaceURI" type="DOMString" usage="required">
+	           	<description>The namespace URI to look for.</description>
+					</parameter>
+				</parameters>
+				<return-types>
+					<return-type type="boolean" />
+				</return-types>
+				<return-description>Returns true if the specified namespaceURI is the default namespace, false otherwise.</return-description>
+				<availability>
+					<specification name="HTML DOM Level 3"/>
+					<specification name="W3C" version="HTML DOM Level 3"/>
+				</availability>
+			</method>
+	    <method name="isEqualNode" scope="instance">
+				<description>Tests whether two nodes are equal.
+
+This method tests for equality of nodes, not sameness (i.e., whether the two nodes are references to the same object) which can be tested with Node.isSameNode(). All nodes that are the same will also be equal, though the reverse may not be true.
+Two nodes are equal if and only if the following conditions are satisfied:
+
+    * The two nodes are of the same type.
+    * The following string attributes are equal: nodeName, localName, namespaceURI, prefix, nodeValue. This is: they are both null, or they have the same length and are character for character identical.
+    * The attributes NamedNodeMaps are equal. This is: they are both null, or they have the same length and for each node that exists in one map there is a node that exists in the other map and is equal, although not necessarily at the same index.
+    * The childNodes NodeLists are equal. This is: they are both null, or they have the same length and contain equal nodes at the same index. Note that normalization can affect equality; to avoid this, nodes should be normalized before being compared.
+		
+		For two DocumentType nodes to be equal, the following conditions must also be satisfied:
+
+    * The following string attributes are equal: publicId, systemId, internalSubset.
+    * The entities NamedNodeMaps are equal.
+    * The notations NamedNodeMaps are equal.
+
+
+On the other hand, the following do not affect equality: the ownerDocument, baseURI, and parentNode attributes, the specified attribute for Attr nodes, the schemaTypeInfo attribute for Attr and Element nodes, the Text.isElementContentWhitespace attribute for Text nodes, as well as any user data or event listeners registered on the nodes.
+
+Note: As a general rule, anything not mentioned in the description above is not significant in consideration of equality checking. Note that future versions of this specification may take into account more attributes and implementations conform to this specification are expected to be updated accordingly.
+</description>
+
+        <parameters>
+	        <parameter name="otherNode" type="Node" usage="required">
+	           	<description>The node to compare equality with.</description>
+					</parameter>
+				</parameters>
+				<return-types>
+					<return-type type="boolean" />
+				</return-types>
+				<return-description>Returns true if the nodes are equal, false  otherwise.</return-description>
+				<availability>
+					<specification name="HTML DOM Level 3"/>
+					<specification name="W3C" version="HTML DOM Level 3"/>
+				</availability>
+			</method>
+	    <method name="isSameNode" scope="instance">
+				<description>Returns whether this node is the same node as the given one.
+				
+This method provides a way to determine whether two Node references returned by the implementation reference the same object. When two Node references are references to the same object, even if through a proxy, the references may be used completely interchangeably, such that all attributes have the same values and calling the same DOM method on either reference always has exactly the same effect.</description>
+        <parameters>
+	        <parameter name="otherNode" type="Node" usage="required">
+	           	<description>The node to test against.</description>
+					</parameter>
+				</parameters>
+				<return-types>
+					<return-type type="boolean" />
+				</return-types>
+				<return-description>Returns true if the nodes are the same, false otherwise.</return-description>
+				<availability>
+					<specification name="HTML DOM Level 3"/>
+					<specification name="W3C" version="HTML DOM Level 3"/>
+				</availability>
+			</method>
+	    <method name="lookupNamespaceURI" scope="instance">
+				<description>Look up the namespace URI associated to the given prefix, starting from this node.</description>
+        <parameters>
+	        <parameter name="prefix" type="DOMString" usage="optional">
+	           	<description>The prefix to look for. If this parameter is null, the method will return the default namespace URI if any.</description>
+					</parameter>
+				</parameters>
+				<return-types>
+					<return-type type="DOMString" />
+				</return-types>
+				<return-description>Returns the associated namespace URI or null if none is found.</return-description>
+				<availability>
+					<specification name="HTML DOM Level 3"/>
+					<specification name="W3C" version="HTML DOM Level 3"/>
+				</availability>
+			</method>
+	    <method name="lookupPrefix" scope="instance">
+				<description>Look up the prefix associated to the given namespace URI, starting from this node. The default namespace declarations are ignored by this method.</description>
+        <parameters>
+	        <parameter name="namespaceURI" type="DOMString" usage="required">
+	           	<description>The namespace URI to look for.</description>
+					</parameter>
+				</parameters>
+				<return-types>
+					<return-type type="DOMString" />
+				</return-types>
+				<return-description>Returns an associated namespace prefix if found or null if none is found. If more than one prefix are associated to the namespace prefix, the returned namespace prefix is implementation dependent.</return-description>
+				<availability>
+					<specification name="HTML DOM Level 3"/>
+					<specification name="W3C" version="HTML DOM Level 3"/>
+				</availability>
+			</method>
+	    <method name="normalize" scope="instance">
+				<description>Puts all Text nodes in the full depth of the sub-tree underneath this Node, including attribute nodes, into a "normal" form where only structure (e.g., elements, comments, processing instructions, CDATA sections, and entity references) separates Text nodes, i.e., there are neither adjacent Text nodes nor empty Text nodes. This can be used to ensure that the DOM view of a document is the same as if it were saved and re-loaded, and is useful when operations (such as XPointer [XPointer] lookups) that depend on a particular document tree structure are to be used. If the parameter "normalize-characters" of the DOMConfiguration object attached to the Node.ownerDocument is true, this method will also fully normalize the characters of the Text nodes.</description>
+				<availability>
+					<specification name="HTML DOM Level 3"/>
+					<specification name="W3C" version="HTML DOM Level 3"/>
+				</availability>
+			</method>
+	    <method name="setUserData" scope="instance">
+				<description>Associate an object to a key on this node. The object can later be retrieved from this node by calling getUserData with the same key.</description>
+        <parameters>
+	        <parameter name="key" type="DOMString" usage="required">
+	           	<description>The key with which to associate the object.</description>
+					</parameter>
+	        <parameter name="userData" type="DOMUserData" usage="optional">
+	           	<description>The object to associate to the given key, or null to remove any existing association to that key.</description>
+					</parameter>
+				</parameters>
+				<return-types>
+					<return-type type="DOMString" />
+				</return-types>
+				<return-description>Returns an associated namespace prefix if found or null if none is found. If more than one prefix are associated to the namespace prefix, the returned namespace prefix is implementation dependent.</return-description>
+				<availability>
+					<specification name="HTML DOM Level 3"/>
+					<specification name="W3C" version="HTML DOM Level 3"/>
+				</availability>
+			</method>
+		</methods>
+	</class>
+	<class type="Text" superclass="CharacterData">
+	<properties>
+		<property name="wholeText" type="DOMString" scope="instance" access="read">
+        	<description>Returns all text of Text nodes logically-adjacent to this node, concatenated in document order.</description>
+			<example>For the following code (an Element node containing two Text nodes separated by an Entity reference):
+			
+			&lt;p&gt;bar &amp; foo&lt;/p&gt;
+			
+			The value of &lt;code&gt;wholeText&lt;/code&gt; for the Text node containing "bar" is "barfoo". The value of &lt;code&gt;wholeText&lt;/code&gt; for the Text node containing "foo" is also "barfoo".</example>
+			<availability>
+            	<specification name="HTML DOM Level 3"/>
+				<specification name="W3C" version="HTML DOM Level 3"/>
+			</availability>
+		</property>
+		<property name="isElementContentWhitespace" type="Boolean" scope="instance" access="read">
+        	<description>Returns whether this text node contains element content whitespace, often called "ignorable whitespace". The text node is determined to contain whitespace in element content during the load of the document or if validation occurs while using &lt;code&gt;Document.normalizeDocument()&lt;/code&gt;.</description>
+			<availability>
+            	<specification name="HTML DOM Level 3"/>
+				<specification name="W3C" version="HTML DOM Level 3"/>
+			</availability>
+		</property>
+	</properties>
+	<methods>
+		<method name="replaceWholeText" scope="instance">
+        	<description>Replaces the text of the current node and all logically-adjacent text nodes with the specified text. All logically-adjacent text nodes are removed including the current node unless it was the recipient of the replacement text. This method returns the node which received the replacement text. The returned node is:
+
+    * null, when the replacement text is the empty string;
+    * the current node, except when the current node is read-only;
+    * a new Text node of the same type (Text or CDATASection) as the current node inserted at the location of the replacement.
+</description>
+        	<parameters>
+	        	<parameter name="content" type="DOMString" usage="required">
+	           	<description>The content of the replacing Text node.</description>
+				</parameter>
+			</parameters>
+			<return-types>
+				<return-type type="Text" />
+			</return-types>
+			<return-description>The Text node created with the specified content.</return-description>
+			<example>For the following code (an Element node containing two Text nodes separated by an Entity reference):
+			
+			&lt;p&gt;bar &amp; foo&lt;/p&gt;
+			
+			Calling &lt;code&gt;replaceWhole Text&lt;/code&gt; on the Text node that contains "bar" with "yo" in argument results in the following: 
+			
+			&lt;p&gt;yo&lt;/p&gt;
+
+			</example>
+			<availability>
+            	<specification name="HTML DOM Level 3"/>
+				<specification name="W3C" version="HTML DOM Level 3"/>
+			</availability>
+		</method>
+		</methods>
+	</class>
+</javascript>

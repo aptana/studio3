@@ -1,65 +1,109 @@
 package com.aptana.editor.js.parsing.ast;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.aptana.editor.js.parsing.IJSParserConstants;
+import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.parsing.ast.IParseNode;
-import com.aptana.parsing.ast.ParseBaseNode;
+import com.aptana.parsing.ast.ParseNode;
+import com.aptana.parsing.ast.ParseRootNode;
 
-public class JSNode extends ParseBaseNode
+public class JSNode extends ParseNode
 {
-
 	protected static final short DEFAULT_TYPE = JSNodeTypes.EMPTY;
+	private static Map<Short, String> typeNameMap;
 
 	private short fType;
-
 	private boolean fSemicolonIncluded;
 
+	private DocumentationBlock fDocumentation;
+	private List<String> fTypes;
+
+	/**
+	 * static initializer
+	 */
+	static
+	{
+		typeNameMap = new HashMap<Short, String>();
+
+		Class<?> klass = JSNodeTypes.class;
+
+		for (Field field : klass.getFields())
+		{
+			String name = field.getName().toLowerCase();
+
+			try
+			{
+				Short value = field.getShort(klass);
+
+				typeNameMap.put(value, name);
+			}
+			catch (IllegalArgumentException e)
+			{
+			}
+			catch (IllegalAccessException e)
+			{
+			}
+		}
+	}
+
+	/**
+	 * JSNode
+	 */
 	public JSNode()
 	{
 		this(DEFAULT_TYPE, 0, 0);
 	}
 
-	public JSNode(short type, int start, int end)
+	/**
+	 * JSNode
+	 * 
+	 * @param type
+	 * @param start
+	 * @param end
+	 * @param children
+	 */
+	public JSNode(short type, int start, int end, JSNode... children)
 	{
 		super(IJSParserConstants.LANGUAGE);
 		fType = type;
 		this.start = start;
 		this.end = end;
-	}
-
-	public JSNode(short type, int start, int end, boolean semicolon)
-	{
-		this(type, start, end);
-		fSemicolonIncluded = semicolon;
-	}
-
-	public JSNode(short type, JSNode[] children, int start, int end)
-	{
-		this(type, start, end);
 		setChildren(children);
 	}
 
-	public short getType()
+	/**
+	 * addReturnTypes
+	 * 
+	 * @param types
+	 */
+	protected void addReturnTypes(List<String> types)
 	{
-		return fType;
+		// do nothing, sub-classes should override
 	}
 
-	public boolean getSemicolonIncluded()
+	/**
+	 * appendSemicolon
+	 * 
+	 * @param buffer
+	 */
+	protected void appendSemicolon(StringBuilder buffer)
 	{
-		return fSemicolonIncluded;
+		if (getSemicolonIncluded())
+		{
+			buffer.append(";");
+		}
 	}
 
-	public void setSemicolonIncluded(boolean included)
-	{
-		fSemicolonIncluded = included;
-	}
-
-	public boolean isEmpty()
-	{
-		return getType() == JSNodeTypes.EMPTY;
-	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseBaseNode#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -68,134 +112,161 @@ public class JSNode extends ParseBaseNode
 			return false;
 		}
 		JSNode other = (JSNode) obj;
-		return getType() == other.getType() && getSemicolonIncluded() == other.getSemicolonIncluded()
-				&& Arrays.equals(getChildren(), other.getChildren());
+		return getNodeType() == other.getNodeType() && getSemicolonIncluded() == other.getSemicolonIncluded() && Arrays.equals(getChildren(), other.getChildren());
 	}
 
+	/**
+	 * getContainingStatementNode
+	 * 
+	 * @return
+	 */
+	public IParseNode getContainingStatementNode()
+	{
+		// move up to nearest statement
+		IParseNode result = this;
+		IParseNode parent = result.getParent();
+
+		while (parent != null)
+		{
+			if (parent instanceof ParseRootNode || parent.getNodeType() == JSNodeTypes.STATEMENTS)
+			{
+				break;
+			}
+			else
+			{
+				result = parent;
+				parent = parent.getParent();
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getDocumentation
+	 * 
+	 * @return
+	 */
+	public DocumentationBlock getDocumentation()
+	{
+		return this.fDocumentation;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseBaseNode#getElementName()
+	 */
+	@Override
+	public String getElementName()
+	{
+		String result = typeNameMap.get(this.getNodeType());
+
+		return (result == null) ? super.getElementName() : result;
+	}
+
+	/**
+	 * getTypes
+	 * 
+	 * @return
+	 */
+	public List<String> getTypes()
+	{
+		if (fTypes == null)
+		{
+			fTypes = new ArrayList<String>();
+
+			addReturnTypes(fTypes);
+		}
+
+		return fTypes;
+	}
+
+	/**
+	 * getSemicolonIncluded
+	 * 
+	 * @return
+	 */
+	public boolean getSemicolonIncluded()
+	{
+		return fSemicolonIncluded;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseBaseNode#getType()
+	 */
+	public short getNodeType()
+	{
+		return fType;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseBaseNode#hashCode()
+	 */
 	@Override
 	public int hashCode()
 	{
-		int hash = getType();
+		int hash = getNodeType();
 		hash = 31 * hash + (getSemicolonIncluded() ? 1 : 0);
 		hash = 31 * hash + Arrays.hashCode(getChildren());
 		return hash;
 	}
 
-	@Override
-	public String toString()
+	/**
+	 * isEmpty
+	 * 
+	 * @return
+	 */
+	public boolean isEmpty()
 	{
-		StringBuilder text = new StringBuilder();
-		IParseNode[] children = getChildren();
-		int type = getType();
-		switch (type)
-		{
-			case JSNodeTypes.ASSIGN:
-				text.append(children[0]).append(" = ").append(children[1]); //$NON-NLS-1$
-				break;
-			case JSNodeTypes.INVOKE:
-				text.append(children[0]).append("(").append(children[1]).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
-				break;
-			case JSNodeTypes.DECLARATION:
-				text.append(children[0]);
-				if (!((JSNode) children[1]).isEmpty())
-				{
-					text.append(" = ").append(children[1]); //$NON-NLS-1$
-				}
-				break;
-			case JSNodeTypes.TRY:
-				text.append("try "); //$NON-NLS-1$
-				text.append(children[0]);
-				if (!((JSNode) children[1]).isEmpty())
-				{
-					text.append(" ").append(children[1]); //$NON-NLS-1$
-				}
-				if (!((JSNode) children[2]).isEmpty())
-				{
-					text.append(" ").append(children[2]); //$NON-NLS-1$
-				}
-				break;
-			case JSNodeTypes.CATCH:
-				text.append("catch (").append(children[0]).append(") ").append(children[1]); //$NON-NLS-1$ //$NON-NLS-2$
-				break;
-			case JSNodeTypes.FINALLY:
-				text.append("finally ").append(children[0]); //$NON-NLS-1$
-				break;
-			case JSNodeTypes.CONDITIONAL:
-				text.append(children[0]).append(" ? ").append(children[1]).append(" : ").append(children[2]); //$NON-NLS-1$ //$NON-NLS-2$
-				break;
-			case JSNodeTypes.CONSTRUCT:
-				text.append("new ").append(children[0]).append("(").append(children[1]).append(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				break;
-			case JSNodeTypes.NAME_VALUE_PAIR:
-			case JSNodeTypes.LABELLED:
-				text.append(children[0]).append(": ").append(children[1]); //$NON-NLS-1$
-				break;
-			case JSNodeTypes.WHILE:
-				text.append("while (").append(children[0]).append(") ").append(children[1]); //$NON-NLS-1$ //$NON-NLS-2$
-				break;
-			case JSNodeTypes.WITH:
-				text.append("with (").append(children[0]).append(") ").append(children[1]); //$NON-NLS-1$ //$NON-NLS-2$
-				break;
-			case JSNodeTypes.IF:
-				text.append("if (").append(children[0]).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
-				text.append(children[1]);
-				if (!((JSNode) children[2]).isEmpty())
-				{
-					if (children[1].getType() != JSNodeTypes.STATEMENTS)
-					{
-						text.append(";"); //$NON-NLS-1$
-					}
-					text.append(" else ").append(children[2]); //$NON-NLS-1$
-				}
-				break;
-			case JSNodeTypes.DO:
-				text.append("do ").append(children[0]); //$NON-NLS-1$
-				if (children[0].getType() != JSNodeTypes.STATEMENTS)
-				{
-					text.append(";"); //$NON-NLS-1$
-				}
-				text.append(" while (").append(children[1]).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
-				break;
-			case JSNodeTypes.FOR:
-				text.append("for ("); //$NON-NLS-1$
-				if (!((JSNode) children[0]).isEmpty())
-				{
-					text.append(children[0]);
-				}
-				text.append(";"); //$NON-NLS-1$
-				if (!((JSNode) children[1]).isEmpty())
-				{
-					text.append(" ").append(children[1]); //$NON-NLS-1$
-				}
-				text.append(";"); //$NON-NLS-1$
-				if (!((JSNode) children[2]).isEmpty())
-				{
-					text.append(" ").append(children[2]); //$NON-NLS-1$
-				}
-				text.append(") ").append(children[3]); //$NON-NLS-1$
-				break;
-			case JSNodeTypes.FOR_IN:
-				text.append("for (").append(children[0]).append(" in ").append(children[1]).append(") ").append( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						children[2]);
-				break;
-			default:
-				text.append(super.toString());
-		}
-
-		return appendSemicolon(text.toString());
+		return getNodeType() == JSNodeTypes.EMPTY;
 	}
 
+	/**
+	 * setDocumentation
+	 * 
+	 * @param block
+	 */
+	public void setDocumentation(DocumentationBlock block)
+	{
+		fDocumentation = block;
+	}
+
+	/**
+	 * setSemicolonIncluded
+	 * 
+	 * @param included
+	 */
+	public void setSemicolonIncluded(boolean included)
+	{
+		fSemicolonIncluded = included;
+	}
+
+	/**
+	 * setType
+	 * 
+	 * @param type
+	 */
 	protected void setType(short type)
 	{
 		fType = type;
 	}
 
-	protected String appendSemicolon(String text)
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseBaseNode#toString()
+	 */
+	@Override
+	public String toString()
 	{
-		if (getSemicolonIncluded())
+		if (this.getSemicolonIncluded())
 		{
-			return text + ";"; //$NON-NLS-1$
+			return super.toString() + ";";
 		}
-		return text;
+		else
+		{
+			return super.toString();
+		}
 	}
 }

@@ -53,7 +53,7 @@ public class CSSTermListNode extends CSSExpressionNode
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
-		text.append(getChild(0));
+		text.append(getLeftExpression());
 		if (fSeparator == null)
 		{
 			text.append(" "); //$NON-NLS-1$
@@ -62,7 +62,7 @@ public class CSSTermListNode extends CSSExpressionNode
 		{
 			text.append(fSeparator);
 		}
-		text.append(getChild(1));
+		text.append(getRightExpression());
 		return text.toString();
 	}
 }

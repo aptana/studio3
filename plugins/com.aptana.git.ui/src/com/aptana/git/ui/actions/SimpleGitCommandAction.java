@@ -1,8 +1,9 @@
 package com.aptana.git.ui.actions;
 
-import java.io.File;
 import java.text.MessageFormat;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -22,7 +23,7 @@ public abstract class SimpleGitCommandAction extends GitAction
 	@Override
 	public void run()
 	{
-		File workingDir = getWorkingDir();
+		final IPath workingDir = getWorkingDir();
 		if (workingDir == null)
 		{
 			GitRepository theRepo = getSelectedRepository();
@@ -39,7 +40,6 @@ public abstract class SimpleGitCommandAction extends GitAction
 				return;
 			}
 		}
-		final String finWorking = workingDir.toString();
 		final String[] command = getCommand();
 		if (command == null || command.length == 0)
 			return;
@@ -53,23 +53,30 @@ public abstract class SimpleGitCommandAction extends GitAction
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				ILaunch launch = Launcher.launch(GitExecutable.instance().path(), finWorking, command);
-				while (!launch.isTerminated())
-				{
-					Thread.yield();
-					if (monitor.isCanceled())
-						return Status.CANCEL_STATUS;
-				}
 				try
 				{
+					ILaunch launch = Launcher.launch(GitExecutable.instance().path().toOSString(), workingDir, command);
+					while (!launch.isTerminated())
+					{
+						Thread.yield();
+						if (monitor.isCanceled())
+							return Status.CANCEL_STATUS;
+					}
+
 					int exitValue = launch.getProcesses()[0].getExitValue();
 					if (exitValue != 0)
 						GitPlugin.trace(MessageFormat.format(
-								"command returned non-zero exit value. wd: {0}, command: {1}", finWorking, command)); //$NON-NLS-1$
+								"command returned non-zero exit value. wd: {0}, command: {1}", workingDir, command)); //$NON-NLS-1$
+				}
+				catch (CoreException e)
+				{
+					GitPlugin.logError(e);
+					return e.getStatus();
 				}
 				catch (Throwable e)
 				{
 					GitPlugin.logError(e.getMessage(), e);
+					// TODO Return back an error status!
 				}
 				postLaunch();
 				return Status.OK_STATUS;
@@ -87,18 +94,18 @@ public abstract class SimpleGitCommandAction extends GitAction
 	 */
 	protected abstract void postLaunch();
 
-	private File getWorkingDir()
+	private IPath getWorkingDir()
 	{
 		GitRepository repo = getSelectedRepository();
 		if (repo == null)
 			return null;
-		return new File(repo.workingDirectory());
+		return repo.workingDirectory();
 	}
 
 	protected void refreshRepoIndex()
 	{
 		GitRepository repo = getSelectedRepository();
 		if (repo != null)
-			repo.index().refresh();
+			repo.index().refreshAsync(); // queue up a refresh
 	}
 }

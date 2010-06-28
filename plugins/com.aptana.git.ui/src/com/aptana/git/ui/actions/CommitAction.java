@@ -29,7 +29,11 @@ public class CommitAction extends GitAction
 		CommitDialog dialog = new CommitDialog(getTargetPart().getSite().getShell(), theRepo);
 		if (dialog.open() == Window.OK)
 		{
-			theRepo.index().commit(dialog.getCommitMessage());
+			boolean success = theRepo.index().commit(dialog.getCommitMessage());
+			if (!success)
+			{
+				// TODO Open an error dialog?
+			}
 		}
 	}
 }

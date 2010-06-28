@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -108,7 +108,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 			myOffset = partitionOffset;
 			length += diff;
 			this.fContentType = contentType;
-			if (this.fContentType.equals(RubySourceConfiguration.SINGLE_LINE_COMMENT))
+			if (this.fContentType.equals(RubySourceConfiguration.SINGLE_LINE_COMMENT) || this.fContentType.equals(IDocument.DEFAULT_CONTENT_TYPE))
 				this.fContentType = RubySourceConfiguration.DEFAULT;
 			// FIXME What if a heredoc with dynamic code inside is broken? contents will start with "}" rather than
 			// expected
@@ -477,7 +477,44 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 
 	private int findEnd(String possible)
 	{
-		return new EndBraceFinder(possible).find();
+		int end = new EndBraceFinder(possible).find();
+		if (this.insideHeredoc())
+		{
+			String marker = fOpeningString.trim();
+			int offset = possible.indexOf(marker);
+			if (offset != -1)
+			{
+				int endingOffset = offset + marker.length();
+				boolean allowLeadingWhitespace = true; // TODO: set based on existence of '-' operator
+				while (offset > 0)
+				{
+					char c = possible.charAt(offset - 1);
+					if (c == '\r' || c == '\n')
+					{
+						break;
+					}
+					else if (allowLeadingWhitespace && (c == ' ' || c == '\t'))
+					{
+						offset--;
+					}
+					else
+					{
+						// try to advance to the next potential end marker. Note
+						// that if this fails, offset will be -1 and then we'll
+						// exit the while loop
+						offset = possible.indexOf(marker, endingOffset);
+						endingOffset = offset + marker.length();
+					}
+				}
+				// if we found an end marker, use it if it comes before the
+				// ending brace
+				if (end == -1 || (offset != -1 && offset < end))
+				{
+					end = offset - 1;
+				}
+			}
+		}
+		return end;
 	}
 
 	private void addPoundBraceToken()
@@ -815,7 +852,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 
 	/**
 	 * Used to find the end of string interpolation (the '}'). Uses a stack to maintain nesting of strings/regexp, and
-	 * knowledge of esacape chars.
+	 * knowledge of escape chars.
 	 * 
 	 * @author cwilliams
 	 */
@@ -859,6 +896,11 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 						}
 						else
 						{
+							// if we hit an '"' with an open '/' we assume we're done. Ticket #372
+							if (stack.contains("/") && !stack.contains("\"") && lastEndBrace != -1) //$NON-NLS-1$ //$NON-NLS-2$
+							{
+								return lastEndBrace;
+							}
 							if (!topEquals("'")) //$NON-NLS-1$
 								push("\""); //$NON-NLS-1$
 						}

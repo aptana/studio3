@@ -21,5 +21,5 @@ public interface IRubyElement extends IParseNode
 
 	public String getName();
 
-	public short getType();
+	public short getNodeType();
 }

@@ -4,21 +4,25 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.MessageFormat;
 import java.util.Map;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
+import com.aptana.core.ShellExecutable;
+import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.ProcessUtil;
+import com.aptana.scripting.Activator;
 import com.aptana.scripting.ScriptLogger;
-import com.aptana.util.IOUtil;
-import com.aptana.util.ProcessUtil;
 
 public class CommandScriptRunner extends AbstractCommandRunner
 {
 	private int _exitValue;
 	private File _tempFile;
-	private String _shell;
 
 	/**
 	 * CommandScriptJob
@@ -47,8 +51,6 @@ public class CommandScriptRunner extends AbstractCommandRunner
 	protected void beforeExecute() throws IOException
 	{
 		this.createScriptFile();
-
-		this.createShellCommand();
 	}
 
 	/**
@@ -63,9 +65,7 @@ public class CommandScriptRunner extends AbstractCommandRunner
 		String OS = org.eclipse.core.runtime.Platform.getOS();
 
 		// create temporary file for execution
-		this._tempFile = File.createTempFile("command_temp_", //$NON-NLS-1$
-				(OS.equals(org.eclipse.core.runtime.Platform.OS_WIN32) ? ".bat" : ".sh") //$NON-NLS-1$ //$NON-NLS-2$
-				);
+		this._tempFile = File.createTempFile("command_temp_", ".sh"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// dump "invoke" content into temp file
 		PrintWriter pw = new PrintWriter(this._tempFile);
@@ -75,26 +75,15 @@ public class CommandScriptRunner extends AbstractCommandRunner
 	}
 
 	/**
-	 * createShellCommand
+	 * getCommandLineArguments
+	 * 
+	 * @return
 	 */
-	protected void createShellCommand()
+	protected String[] getCommandLineArguments()
 	{
-		String OS = org.eclipse.core.runtime.Platform.getOS();
-
-		// create the shell to execute
-		if (OS.equals(org.eclipse.core.runtime.Platform.OS_MACOSX)
-				|| OS.equals(org.eclipse.core.runtime.Platform.OS_LINUX))
-		{
-			// FIXME: should we be using the user's preferred shell instead of hardcoding?
-			this._shell = "/bin/bash"; //$NON-NLS-1$
-		}
-		else
-		{
-			// FIXME: we should allow use of other shells on Windows: PowerShell, cygwin, etc.
-			this._shell = "cmd"; //$NON-NLS-1$
-		}
+		return new String[] { "-l", this._tempFile.getAbsolutePath() };
 	}
-
+	
 	/**
 	 * executeScript
 	 * 
@@ -102,12 +91,26 @@ public class CommandScriptRunner extends AbstractCommandRunner
 	 */
 	public String executeScript()
 	{
-		String resultText = null;
-
+		IPath shell;
+		try {
+			shell = ShellExecutable.getPath();
+		} catch (CoreException e) {
+			Activator.logError("Could not locate shell", e);
+			this._exitValue = 1;
+			this.setExecutedSuccessfully(false);
+			return MessageFormat.format(
+					"Unable to locate a shell with which to execute this command: {0}",
+					new Object[]
+					{
+						this.getCommand().getPath()
+					}
+				);
+		}
+		String[] commandLine = this.getCommandLineArguments();
+		String resultText = null;		
 		String input = IOUtil.read(this.getContext().getInputStream(), "UTF-8"); //$NON-NLS-1$			
-		Map<Integer, String> result = ProcessUtil.runInBackground(this._shell, this.getCommand().getWorkingDirectory(),
-				input, this.getContributedEnvironment(), new String[] { this._tempFile.getAbsolutePath() });
-
+		Map<Integer, String> result = ProcessUtil.runInBackground(shell.toOSString(), this.getCommand().getWorkingDirectory(), input, this.getContributedEnvironment(), commandLine);
+		
 		if (result == null)
 		{
 			this._exitValue = 1;
@@ -119,7 +122,6 @@ public class CommandScriptRunner extends AbstractCommandRunner
 			resultText = result.values().iterator().next();
 			this.setExecutedSuccessfully(this._exitValue == 0);
 		}
-
 		return resultText;
 	}
 
@@ -149,10 +151,16 @@ public class CommandScriptRunner extends AbstractCommandRunner
 		}
 
 		CommandResult result = new CommandResult(this.getCommand(), this.getContext());
-		result.setOutputString(resultText);
 		result.setReturnValue(this._exitValue);
 		result.setExecutedSuccessfully(this.getExecutedSuccessfully());
-
+		if (result.executedSuccessfully())
+		{
+			result.setOutputString(resultText);
+		}
+		else
+		{
+			result.setErrorString(resultText);
+		}
 		// save result
 		this.setCommandResult(result);
 

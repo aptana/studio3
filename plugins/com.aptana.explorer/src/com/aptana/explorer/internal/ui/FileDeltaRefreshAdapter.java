@@ -58,8 +58,6 @@ class FileDeltaRefreshAdapter extends JNotifyAdapter
 	public void fileCreated(int wd, String rootPath, String name)
 	{
 		File file = new File(rootPath, name);
-		// TODO What do we do when the files are part of the git dir? Ignore? Force a refresh of the
-		// git index?
 		IResource resource = null;
 		Integer depth = IResource.DEPTH_ZERO;
 		if (file.isFile())
@@ -79,6 +77,11 @@ class FileDeltaRefreshAdapter extends JNotifyAdapter
 	{
 		if (resource == null)
 			return;
+		// Don't refresh stuff we don't want/can't access/can't see (i.e. .git and it's sub-tree)
+		if (resource.isPhantom() || resource.isHidden() || resource.isTeamPrivateMember(IResource.CHECK_ANCESTORS))
+		{
+			return;
+		}
 		try
 		{
 			synchronized (toRefresh)
@@ -96,7 +99,8 @@ class FileDeltaRefreshAdapter extends JNotifyAdapter
 						if (refreshing instanceof IContainer)
 						{
 							IContainer container = (IContainer) refreshing;
-							if (resource.getLocation() != null && container.getLocation().isPrefixOf(resource.getLocation()))
+							if (resource.getLocation() != null
+									&& container.getLocation().isPrefixOf(resource.getLocation()))
 							{
 								// We already have an ancestor in the map. If it's refreshing infinitely don't add this
 								// resource
@@ -132,8 +136,6 @@ class FileDeltaRefreshAdapter extends JNotifyAdapter
 	public void fileModified(int wd, String rootPath, String name)
 	{
 		File file = new File(rootPath, name);
-		// TODO What do we do when the files are part of the git dir? Ignore? Force a refresh of the
-		// git index?
 		IResource resource = null;
 		Integer depth = IResource.DEPTH_ZERO;
 		if (file.isFile())

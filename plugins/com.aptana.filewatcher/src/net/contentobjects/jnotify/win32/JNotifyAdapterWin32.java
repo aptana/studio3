@@ -39,7 +39,6 @@ import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
 import net.contentobjects.jnotify.Util;
 
-@SuppressWarnings("nls")
 public class JNotifyAdapterWin32 implements IJNotify
 {
 	private Hashtable<Integer, WatchData> _id2Data;
@@ -78,7 +77,6 @@ public class JNotifyAdapterWin32 implements IJNotify
 		{
 			if (_id2Data.containsKey(Integer.valueOf(wd)))
 			{
-				System.out.println("JNotifyAdapterWin32: removeWatch(" + wd + ")");
 				_id2Data.remove(Integer.valueOf(wd));
 				JNotify_win32.removeWatch(wd);
 				return true;
@@ -103,7 +101,7 @@ public class JNotifyAdapterWin32 implements IJNotify
 		
 		public String toString()
 		{
-			return "wd=" + _wd + ", action " + Util.getMaskDesc(_mask);
+			return "wd=" + _wd + ", action " + Util.getMaskDesc(_mask);  //$NON-NLS-1$//$NON-NLS-2$
 		}
 	}
 
@@ -142,47 +140,46 @@ public class JNotifyAdapterWin32 implements IJNotify
 					watchData.renameOldName = null;
 				}
 			}
-			else
-			{
-				System.out
-					.println("JNotifyAdapterWin32: IGNORED Unregistered : " + wd + " . " +getDebugWinAction(action) + " root=" + rootPath + " , path=" + filePath);
-			}
+//			else
+//			{
+//				System.out.println("JNotifyAdapterWin32: IGNORED Unregistered : " + wd + " . " +getDebugWinAction(action) + " root=" + rootPath + " , path=" + filePath);
+//			}
 		}
 	}
 
-	private static String getDebugWinAction(int action)
-	{
-		switch (action)
-		{
-		case JNotify_win32.FILE_ACTION_ADDED:
-			return "FILE_ACTION_ADDED";
-		case JNotify_win32.FILE_ACTION_MODIFIED:
-			return "FILE_ACTION_MODIFIED";
-		case JNotify_win32.FILE_ACTION_REMOVED:
-			return "FILE_ACTION_REMOVED";
-		case JNotify_win32.FILE_ACTION_RENAMED_NEW_NAME:
-			return "FILE_ACTION_RENAMED_NEW_NAME";
-		case JNotify_win32.FILE_ACTION_RENAMED_OLD_NAME:
-			return "FILE_ACTION_RENAMED_OLD_NAME";
-		default:
-			return "UNKNOWN " + action; 
-		}
-	}	
+//	private static String getDebugWinAction(int action)
+//	{
+//		switch (action)
+//		{
+//		case JNotify_win32.FILE_ACTION_ADDED:
+//			return "FILE_ACTION_ADDED";
+//		case JNotify_win32.FILE_ACTION_MODIFIED:
+//			return "FILE_ACTION_MODIFIED";
+//		case JNotify_win32.FILE_ACTION_REMOVED:
+//			return "FILE_ACTION_REMOVED";
+//		case JNotify_win32.FILE_ACTION_RENAMED_NEW_NAME:
+//			return "FILE_ACTION_RENAMED_NEW_NAME";
+//		case JNotify_win32.FILE_ACTION_RENAMED_OLD_NAME:
+//			return "FILE_ACTION_RENAMED_OLD_NAME";
+//		default:
+//			return "UNKNOWN " + action; 
+//		}
+//	}	
 	
 	private int mapAction(int action)
 	{
 		switch (action)
 		{
 		case JNotify_win32.FILE_ACTION_ADDED:
-			return FILE_CREATED;
+			return IJNotify.FILE_CREATED;
 		case JNotify_win32.FILE_ACTION_MODIFIED:
-			return FILE_MODIFIED;
+			return IJNotify.FILE_MODIFIED;
 		case JNotify_win32.FILE_ACTION_REMOVED:
-			return FILE_DELETED;
+			return IJNotify.FILE_DELETED;
 		case JNotify_win32.FILE_ACTION_RENAMED_NEW_NAME:
-			return FILE_RENAMED;
+			return IJNotify.FILE_RENAMED;
 		case JNotify_win32.FILE_ACTION_RENAMED_OLD_NAME:
-			return FILE_RENAMED;
+			return IJNotify.FILE_RENAMED;
 		default:
 			return -1; // silently fail, in case future windows versions will add more actions.
 		}

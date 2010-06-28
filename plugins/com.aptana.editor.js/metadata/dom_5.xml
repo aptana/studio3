@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<javascript xmlns:xsd = "http://www.w3.org/2001/XMLSchema" xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance">
+	<class type="Window">
+		<methods>
+			<method name="postMessage" scope="static">
+				<description>Causes a &lt;code&gt;MessageEvent&lt;/code&gt; to be dispatched at the target window when any pending script that must be executed completes (e.g., remaining event handlers if &lt;code&gt;window.postMessage&lt;/code&gt; is called from an event handler, previously-set pending timeouts, etc.). The &lt;code&gt;MessageEvent&lt;/code&gt; has the type &lt;code&gt;message&lt;/code&gt;, a &lt;code&gt;data&lt;/code&gt; property which is set to the string value of the first argument provided to &lt;code&gt;window.postMessage&lt;/code&gt;, an &lt;code&gt;origin&lt;/code&gt; property corresponding to the origin of the main document in the window calling &lt;code&gt;window.postMessage&lt;/code&gt; at the time &lt;code&gt;window.postMessage&lt;/code&gt; was called, and a &lt;code&gt;source&lt;/code&gt; property which is the window from which &lt;code&gt;window.postMessage&lt;/code&gt; is called. (Other standard properties of events are present with their expected values.) The &lt;code&gt;window&lt;/code&gt; object on which &lt;code&gt;postMessage&lt;/code&gt; is called is a reference to another window; such a reference may be obtained, for example, using the &lt;code&gt;contentWindow&lt;/code&gt; property of an &lt;code&gt;iframe&lt;/code&gt; element, the object returned by &lt;code&gt;window.open&lt;/code&gt;, or by named or numeric index on &lt;code&gt;window.frames&lt;/code&gt;.</description>
+				<parameters>
+					<parameter name="message" type="String" usage="required">
+						<description>String data to be sent to the window.</description>
+					</parameter>
+					<parameter name="targetOrigin" type="String" usage="required">
+						<description>Specifies what the origin of the &lt;code&gt;window&lt;/code&gt; object must be for the event to be dispatched, either as the literal string &lt;code&gt;"*"&lt;/code&gt; (indicating no preference) or as a URI. If at the time the event is scheduled to be dispatched the scheme, hostname, or port of the window's document does not match that provided in &lt;code&gt;targetOrigin&lt;/code&gt;, the event will not be dispatched; only if all three match will the event be dispatched. This mechanism provides control over where messages are sent; for example, if &lt;code&gt;postMessage&lt;/code&gt; were used to transmit a password, it would be absolutely critical that this argument be a URI whose origin is the same as the intended receiver of the message containing the password, to prevent interception of the password by a malicious third party.</description>
+					</parameter>
+				</parameters>
+			</method>
+		</methods>
+	</class>    
+    
+	<class type="HTMLDocument" superclass="Document">
+		<methods>
+    	<method name="getElementsByClassName" scope="static">
+      	<description>Returns a NodeList containing all the &lt;code&gt;Element&lt;/code&gt; nodes with the specified classNames.</description>
+       	<parameters>
+        	<parameter name="classNames" type="String" usage="one-or-more">
+          	<description>A string representing the class name(s) of the elements to return. Multiple class names should be separated by spaces.</description>
+          </parameter>
+        </parameters>
+        <references>
+        	<reference name="Document.getElementsByClassName" />
+          <reference name="Element.getElementsByClassName" />
+					<reference name="HTMLDocument.getElementsByClassName" />
+        </references>
+        <return-types>
+        	<return-type type="NodeList"/>
+				</return-types>
+				<return-description>Returns a NodeList containing all the &lt;code&gt;Element&lt;/code&gt; nodes with the specified classNames.</return-description>
+				<availability>
+					<specification name="HTML 5"/>
+					<specification name="W3C" version="HTML 5"/>
+					<specification name="W3C" version="DOM5 HTML"/>
+				</availability>
+        <browsers>
+	        <browser platform="Mozilla" version="1.9+"/>
+	        <browser platform="Chrome" version="5.0+"/>
+	        <browser platform="Safari" version="3.1+"/>
+	        <browser platform="Opera" version="9.51+"/>
+        </browsers>
+        <example>
+	        &lt;h3&gt;Using getElementsByClassName&lt;/h3&gt;
+					&lt;pre&gt;
+	        document.getElementsByClassName("question");&lt;/pre&gt;
+					&lt;p&gt;Would return a NodeList of all elements in the document to which the class "question" applies.&lt;/p&gt;
+					&lt;pre&gt;
+	        document.getElementsByClassName("question issue");&lt;/pre&gt;
+	&lt;p&gt;Would return a NodeList of all elements in the document to which both the classes "question" and "issue" apply.&lt;/p&gt;
+        </example>
+        <remarks>
+	        &lt;p&gt;
+	        Returns a list of elements in the document to which the specified &lt;code&gt;className&lt;/code&gt; applies.
+	        The returned &lt;code&gt;NodeList&lt;/code&gt; is sorted in tree order (the order the elements were found during
+	        a depth-first &lt;code&gt;preorder traversal&lt;/code&gt; through the node tree).
+	        &lt;/p&gt;
+        </remarks>
+      </method>
+    </methods>
+  </class>      
+	<class type="HTMLElement" superclass="Node">
+		<methods>
+	    <method name="getElementsByClassName" scope="static">
+        <description>Returns a NodeList containing all the &lt;code&gt;Element&lt;/code&gt; nodes with the specified classNames.</description>
+        <parameters>
+					<parameter name="classNames" type="String" usage="one-or-more">
+          	<description>A string representing the class name(s) of the elements to return. Multiple class names should be separated by spaces.</description>
+        	</parameter>
+        </parameters>
+        <references>
+					<reference name="Document.getElementsByClassName"/>
+					<reference name="Element.getElementsByClassName"/>
+					<reference name="HTMLDocument.getElementsByClassName" />
+        </references>
+        <return-types>
+					<return-type type="NodeList"/>
+        </return-types>
+        <return-description>Returns a NodeList containing all the &lt;code&gt;Element&lt;/code&gt; nodes with the specified classNames.</return-description>
+        <availability>
+					<specification name="HTML 5"/>
+					<specification name="W3C" version="HTML 5"/>
+					<specification name="W3C" version="DOM5 HTML"/>
+				</availability>
+				<browsers>
+					<browser platform="Mozilla" version="1.9+"/>
+					<browser platform="Chrome" version="5.0+"/>
+					<browser platform="Safari" version="3.1+"/>
+					<browser platform="Opera" version="9.51+"/>
+				</browsers>
+				<example>
+					&lt;h3&gt;Using getElementsByClassName&lt;/h3&gt;
+					&lt;pre&gt;
+	                    document.getElementById("useCases").getElementsByClassName("question");&lt;/pre&gt;
+						&lt;p&gt;Would return a NodeList of all elements inside the element with the id "useCases" to which the class "question" applies.&lt;/p&gt;
+						&lt;pre&gt;
+	                    document.getElementById("useCases").getElementsByClassName("question issue");&lt;/pre&gt;
+						&lt;p&gt;Would return a NodeList of all elements inside the element with the id "useCases" to which both the classes "question" and "issue" apply.&lt;/p&gt;
+				</example>
+				<remarks>
+          &lt;p&gt;
+          Returns a list of child elements to which the specified &lt;code&gt;className&lt;/code&gt; applies.
+          The returned &lt;code&gt;NodeList&lt;/code&gt; is sorted in tree order (the order the elements were found during
+          a depth-first &lt;code&gt;preorder traversal&lt;/code&gt; through the node tree).
+          &lt;/p&gt;
+				</remarks>
+			</method>
+		</methods>
+	</class>
+</javascript>

@@ -1,0 +1,2 @@
+com.aptana.filesystem.ftp/perf=true
+com.aptana.filesystem.ftp/ftplib_debug=false

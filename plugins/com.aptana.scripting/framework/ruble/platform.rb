@@ -22,6 +22,10 @@ module Ruble
     os_name == "Windows Vista"
   end
   
+  def Ruble.is_windows?
+    Ruble.platforms.include? :windows
+  end
+  
   def Ruble.os_name
     java.lang.System.getProperty("os.name")
   end  

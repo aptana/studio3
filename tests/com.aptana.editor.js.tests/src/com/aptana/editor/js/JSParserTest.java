@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -338,6 +338,26 @@ public class JSParserTest extends TestCase
 	public void testRegex() throws Exception
 	{
 		parseTest("/abc/;" + EOL); //$NON-NLS-1$
+	}
+	
+	public void testRegexWithEscapedSlash() throws Exception
+	{
+		parseTest("/a\\/bc/;" + EOL); //$NON-NLS-1$
+	}
+	
+	public void testRegexWithTrailingModifiers() throws Exception
+	{
+		parseTest("/abc/ig;" + EOL); //$NON-NLS-1$
+	}
+	
+	public void testComplexRegex() throws Exception
+	{
+		parseTest("/^[1-3]{0,4}\\/.*$/;" + EOL); //$NON-NLS-1$
+	}
+	
+	public void testComplexRegexWithModifiers() throws Exception
+	{
+		parseTest("/^[1-3]{0,4}\\/.*$/gim;" + EOL); //$NON-NLS-1$
 	}
 
 	public void testThis() throws Exception

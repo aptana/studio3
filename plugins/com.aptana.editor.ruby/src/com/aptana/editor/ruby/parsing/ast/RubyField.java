@@ -12,7 +12,7 @@ public class RubyField extends NamedMember implements IRubyField
 	}
 
 	@Override
-	public short getType()
+	public short getNodeType()
 	{
 		return IRubyElement.FIELD;
 	}

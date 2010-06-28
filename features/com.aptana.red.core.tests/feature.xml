@@ -17,25 +17,72 @@
       [Enter License Description here.]
    </license>
 
-   <includes
-         id="com.aptana.red.core"
-         version="0.0.0"/>
-
    <requires>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.jface.text"/>
-      <import plugin="com.aptana.editor.ruby" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="com.aptana.util" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.resources"/>
-      <import plugin="com.aptana.scripting" version="1.0.0" match="greaterOrEqual"/>
-      <import feature="com.aptana.red.core" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="com.aptana.editor.common" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.junit" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.editor.common" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.editor.ruby" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.core" version="3.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.css" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.html" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.js" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.editor.sass" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.scripting" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.xml" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="com.aptana.editor.erb"/>
+      <import plugin="com.aptana.git.core" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.git.ui" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.resources" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.editor.erb" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.editor.findbar" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.editor.text" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.ui.epl" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.filewatcher" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.parsing" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.scripting.ui" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.workbench.texteditor" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.views"/>
+      <import plugin="org.eclipse.ui.workbench" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.ide" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.commands" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.jface" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.filesystem.ftp" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.filesystem.secureftp" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.runtime" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.equinox.common"/>
+      <import plugin="org.eclipse.equinox.registry"/>
+      <import plugin="org.eclipse.core.jobs"/>
+      <import plugin="org.eclipse.equinox.preferences"/>
+      <import plugin="org.eclipse.core.filesystem" version="1.2.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.equinox.security" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="plistreader" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.jruby" version="1.4.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.index.core" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.ui" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.ide.libraries.subscription" version="2.0.2" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.debug.core" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.debug.ui" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.team.core" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.team.ui" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.externaltools"/>
+      <import plugin="org.eclipse.jface.text" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.compare" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.browser" version="3.2.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.editors" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.console" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.console" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.libraries" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.osgi" version="3.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.jsch.core"/>
+      <import plugin="org.eclipse.ui.navigator.resources"/>
+      <import plugin="org.eclipse.ui.forms"/>
+      <import plugin="org.eclipse.ui.navigator" version="3.3.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.expressions" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.search" version="3.2.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.terminal" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.org.eclipse.tm.terminal" version="3.0.100" match="greaterOrEqual"/>
+      <import plugin="com.aptana.syncing.core"/>
+      <import plugin="com.aptana.syncing.ui"/>
+      <import plugin="com.aptana.theme"/>
    </requires>
 
    <plugin
@@ -48,14 +95,6 @@
 
    <plugin
          id="com.aptana.editor.ruby.tests"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="com.aptana.util.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -133,6 +172,90 @@
 
    <plugin
          id="com.aptana.editor.erb.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.core.io.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.filesystem.ftp.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.filesystem.secureftp.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.testing.mocks"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="com.aptana.testing.utils"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.core.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.kohsuke.junit"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.syncing.core.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.syncing.ui.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.parsing.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.theme.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"

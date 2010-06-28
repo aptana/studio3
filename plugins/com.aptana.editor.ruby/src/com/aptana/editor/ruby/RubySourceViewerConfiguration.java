@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -36,6 +36,9 @@ package com.aptana.editor.ruby;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITextDoubleClickStrategy;
+import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
+import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -43,9 +46,14 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
+import com.aptana.editor.common.contentassist.ContentAssistant;
+import com.aptana.editor.ruby.contentassist.RubyContentAssistProcessor;
+import com.aptana.editor.ruby.core.RubyDoubleClickStrategy;
 
 public class RubySourceViewerConfiguration extends CommonSourceViewerConfiguration
 {
+
+	private RubyDoubleClickStrategy fDoubleClickStrategy;
 
 	public RubySourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor)
 	{
@@ -74,6 +82,25 @@ public class RubySourceViewerConfiguration extends CommonSourceViewerConfigurati
 		return RubySourceConfiguration.getDefault().getTopContentTypes();
 	}
 
+	@Override
+	public IContentAssistant getContentAssistant(ISourceViewer sourceViewer)
+	{
+		IContentAssistant assistant = super.getContentAssistant(sourceViewer);
+		if (assistant instanceof ContentAssistant)
+		{
+			// Turn on prefix completion (complete partially if all proposals share same prefix), and auto insert if only one proposal
+			((ContentAssistant) assistant).enableAutoInsert(true);
+			((ContentAssistant) assistant).enablePrefixCompletion(true);
+		}
+		return assistant;
+	}
+
+	@Override
+	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
+	{
+		return new RubyContentAssistProcessor(getAbstractThemeableEditor());
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -86,5 +113,15 @@ public class RubySourceViewerConfiguration extends CommonSourceViewerConfigurati
 		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
 		RubySourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		return reconciler;
+	}
+
+	@Override
+	public ITextDoubleClickStrategy getDoubleClickStrategy(ISourceViewer sourceViewer, String contentType)
+	{
+		if (fDoubleClickStrategy == null)
+		{
+			fDoubleClickStrategy = new RubyDoubleClickStrategy();
+		}
+		return fDoubleClickStrategy;
 	}
 }

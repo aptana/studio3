@@ -1,0 +1,11 @@
+/**
+ * Remove items from an array that do not pass a given criteria. Each item in
+ * the specified array will be passed to the filtering function. If that
+ * function returns true, then the item will be appended to the resulting array.
+ * If the function returns false, the item is not added to the resulting array.
+ * 
+ * Note that the specified array is not altered in place. A new array is created
+ * as a result of this function call.
+ * 
+ * @alias Package1.Package2.className
+ */

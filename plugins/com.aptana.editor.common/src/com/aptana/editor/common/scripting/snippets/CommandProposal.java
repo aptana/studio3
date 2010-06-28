@@ -7,6 +7,7 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -78,6 +79,16 @@ public class CommandProposal extends SnippetTemplateProposal
 			CommandResult commandResult = CommandExecutionUtils.executeCommand(commandElement, InvocationType.TRIGGER, viewer, textEditor);
 			CommandExecutionUtils.processCommandResult(commandElement, commandResult, viewer);
 		}
+	}
+
+	/*
+	 * @see ICompletionProposal#getSelection(IDocument)
+	 */
+	@Override
+	public Point getSelection(IDocument document)
+	{
+		// Return null for Command Proposal
+		return null;
 	}
 
 }

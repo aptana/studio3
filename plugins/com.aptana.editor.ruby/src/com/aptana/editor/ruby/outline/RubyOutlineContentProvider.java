@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.aptana.editor.common.outline.CommonOutlineContentProvider;
+import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.ruby.core.IRubyElement;
 import com.aptana.parsing.ast.IParseNode;
 
@@ -13,7 +14,7 @@ public class RubyOutlineContentProvider extends CommonOutlineContentProvider
 	@Override
 	protected Object[] filter(IParseNode[] nodes)
 	{
-		List<IRubyElement> list = new ArrayList<IRubyElement>();
+		List<CommonOutlineItem> list = new ArrayList<CommonOutlineItem>();
 		IRubyElement element;
 		for (IParseNode node : nodes)
 		{
@@ -21,12 +22,12 @@ public class RubyOutlineContentProvider extends CommonOutlineContentProvider
 			{
 				element = (IRubyElement) node;
 				// filters out block elements
-				if (element.getType() != IRubyElement.BLOCK)
+				if (element.getNodeType() != IRubyElement.BLOCK)
 				{
-					list.add(element);
+					list.add(getOutlineItem(element));
 				}
 			}
 		}
-		return list.toArray(new IRubyElement[list.size()]);
+		return list.toArray(new CommonOutlineItem[list.size()]);
 	}
 }

@@ -2,10 +2,9 @@ package com.aptana.editor.erb.html.parsing;
 
 import com.aptana.editor.ruby.core.IRubyScript;
 import com.aptana.editor.ruby.parsing.IRubyParserConstants;
-import com.aptana.parsing.ast.IParseNode;
-import com.aptana.parsing.ast.ParseBaseNode;
+import com.aptana.parsing.ast.ParseNode;
 
-public class ERBScript extends ParseBaseNode
+public class ERBScript extends ParseNode
 {
 
 	private IRubyScript fScript;
@@ -19,8 +18,8 @@ public class ERBScript extends ParseBaseNode
 		fStartTag = startTag;
 		fEndTag = endTag;
 
-		this.start = script.getStartingOffset();
-		this.end = script.getEndingOffset();
+		setChildren(fScript.getChildren());
+		setLocation(script.getStartingOffset(), script.getEndingOffset());
 	}
 
 	public String getStartTag()
@@ -33,28 +32,9 @@ public class ERBScript extends ParseBaseNode
 		return fEndTag;
 	}
 
-	@Override
-	public IParseNode getChild(int index)
+	public IRubyScript getScript()
 	{
-		return fScript.getChild(index);
-	}
-
-	@Override
-	public IParseNode[] getChildren()
-	{
-		return fScript.getChildren();
-	}
-
-	@Override
-	public int getChildrenCount()
-	{
-		return fScript.getChildrenCount();
-	}
-
-	@Override
-	public int getIndex(IParseNode child)
-	{
-		return fScript.getIndex(child);
+		return fScript;
 	}
 
 	@Override
@@ -68,12 +48,15 @@ public class ERBScript extends ParseBaseNode
 		{
 			return false;
 		}
-		return fScript.equals(((ERBScript) obj).fScript);
+		ERBScript other = (ERBScript) obj;
+		return start == other.start && end == other.end && fScript.equals(other.fScript);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return fScript.hashCode();
+		int hash = start * 31 + end;
+		hash = hash * 31 + fScript.hashCode();
+		return hash;
 	}
 }

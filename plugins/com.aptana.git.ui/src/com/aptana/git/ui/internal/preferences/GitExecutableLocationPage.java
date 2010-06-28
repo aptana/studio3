@@ -1,5 +1,6 @@
 package com.aptana.git.ui.internal.preferences;
 
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -47,7 +48,7 @@ public class GitExecutableLocationPage extends FieldEditorPreferencePage impleme
 				String text = getTextControl().getText();
 				if (text != null && text.trim().length() > 0)
 				{
-					if (!GitExecutable.acceptBinary(text))
+					if (!GitExecutable.acceptBinary(Path.fromOSString(text)))
 					{
 						showErrorMessage(NLS.bind(Messages.GitExecutableLocationPage_InvalidLocationErrorMessage,
 								GitExecutable.MIN_GIT_VERSION));

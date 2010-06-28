@@ -75,7 +75,16 @@ public class CSSPageNode extends CSSNode
 			text.append(":").append(fPageSelector).append(" "); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		text.append("{"); //$NON-NLS-1$
-		text.append(super.toString());
+		CSSDeclarationNode[] declarations = getDeclarations();
+		int size = declarations.length;
+		for (int i = 0; i < size; ++i)
+		{
+			text.append(declarations[i]);
+			if (i < size - 1)
+			{
+				text.append(" "); //$NON-NLS-1$
+			}
+		}
 		text.append("}"); //$NON-NLS-1$
 		return text.toString();
 	}

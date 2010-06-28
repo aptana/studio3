@@ -1,0 +1,7 @@
+<javascript>
+	<class type="MyClass">
+		<methods>
+			<method name="myMethod" scope="instance"></method>
+		</methods>
+	</class>
+</javascript>

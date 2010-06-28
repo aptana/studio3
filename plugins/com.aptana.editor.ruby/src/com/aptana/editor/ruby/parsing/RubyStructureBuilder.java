@@ -259,25 +259,29 @@ public class RubyStructureBuilder implements ISourceElementRequestor
 	@Override
 	public void exitField(int endOffset)
 	{
-		modelStack.pop();
+		RubyElement element = modelStack.pop();
+		element.setLocation(element.getStartingOffset(), endOffset + 1);
 	}
 
 	@Override
 	public void exitMethod(int endOffset)
 	{
-		modelStack.pop();
+		RubyElement element = modelStack.pop();
+		element.setLocation(element.getStartingOffset(), endOffset + 1);
 	}
 
 	@Override
 	public void exitScript(int endOffset)
 	{
-		modelStack.pop();
+		RubyElement element = modelStack.pop();
+		element.setLocation(element.getStartingOffset(), endOffset + 1);
 	}
 
 	@Override
 	public void exitType(int endOffset)
 	{
-		modelStack.pop();
+		RubyElement element = modelStack.pop();
+		element.setLocation(element.getStartingOffset(), endOffset + 1);
 	}
 
 	private static IRubyElement findChild(RubyElement parent, int type, String name)
@@ -332,7 +336,7 @@ public class RubyStructureBuilder implements ISourceElementRequestor
 		for (IParseNode node : nodes)
 		{
 			element = (IRubyElement) node;
-			if (element.getName().equals(child.getName()) && element.getType() == child.getType())
+			if (element.getName().equals(child.getName()) && element.getNodeType() == child.getNodeType())
 			{
 				return true;
 			}

@@ -12,16 +12,16 @@ import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
-import com.aptana.parsing.ast.ParseBaseNode;
+import com.aptana.parsing.ast.ParseNode;
 
 public class CompositeParser implements IParser
 {
 
-	private CompositeParserScanner fScanner;
-	private IParser fParser;
+	protected CompositeParserScanner fScanner;
+	protected IParser fParser;
 
-	private IParseNode fEmbeddedlanguageRoot;
-	private Symbol fCurrentSymbol;
+	protected IParseNode fEmbeddedlanguageRoot;
+	protected Symbol fCurrentSymbol;
 
 	public CompositeParser(CompositeParserScanner defaultScanner, IParser primaryParser)
 	{
@@ -77,7 +77,7 @@ public class CompositeParser implements IParser
 						// the node locates at the end of the parent node
 						newList.add(node);
 					}
-					((ParseBaseNode) parent).setChildren(newList.toArray(new IParseNode[newList.size()]));
+					((ParseNode) parent).setChildren(newList.toArray(new IParseNode[newList.size()]));
 				}
 			}
 		}
@@ -121,7 +121,7 @@ public class CompositeParser implements IParser
 		return null;
 	}
 
-	private static void getAllNodes(IParseNode node, List<IParseNode> list)
+	protected static void getAllNodes(IParseNode node, List<IParseNode> list)
 	{
 		IParseNode[] children = node.getChildren();
 		for (IParseNode child : children)
@@ -131,7 +131,7 @@ public class CompositeParser implements IParser
 		list.add(node);
 	}
 
-	private static IParseNode findNode(IParseNode node, List<IParseNode> list)
+	protected static IParseNode findNode(IParseNode node, List<IParseNode> list)
 	{
 		for (IParseNode element : list)
 		{
@@ -144,11 +144,11 @@ public class CompositeParser implements IParser
 		return null;
 	}
 
-	private static void addOffset(IParseNode node, int offset)
+	protected static void addOffset(IParseNode node, int offset)
 	{
-		if (node instanceof ParseBaseNode)
+		if (node instanceof ParseNode)
 		{
-			ParseBaseNode parseNode = (ParseBaseNode) node;
+			ParseNode parseNode = (ParseNode) node;
 			parseNode.addOffset(offset);
 		}
 		IParseNode[] children = node.getChildren();

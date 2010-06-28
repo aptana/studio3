@@ -1,0 +1,230 @@
+<?xml version="1.0"?>
+<schema xmlns="http://www.aptana.com/2005/schema/1.0">
+
+	<element name="alias" onEnter="enterAlias">
+		<attribute name="name" />
+		<attribute name="type" />
+	</element>
+	
+	<element name="aliases">
+		<child-element name="alias" />
+	</element>
+	
+	<element name="availability">
+		<child-element name="specification" />
+	</element>
+
+	<element name="class" onEnter="enterClass" onExit="exitClass">
+		<attribute name="type" />
+		<attribute name="visibility" usage="optional" />
+		<attribute name="superclass" usage="optional" />
+		<child-element name="aliases" />
+		<child-element name="availability" />
+		<child-element name="browsers" />
+		<child-element name="constructors" />
+        <child-element name="deprecated" />
+		<child-element name="description" />
+		<child-element name="example" />
+		<child-element name="examples" />
+		<child-element name="interfaces" />
+		<child-element name="methods" />
+		<child-element name="properties" />
+		<child-element name="references" />
+		<child-element name="remarks" />
+		<child-element name="mixins" />
+	</element>
+
+	<element name="constructor" onEnter="enterMethod" onExit="exitMethod">
+		<attribute name="scope" />
+		<attribute name="visibility" usage="optional" />		
+		<child-element name="availability" />
+		<child-element name="browsers" />
+        <child-element name="deprecated" />
+		<child-element name="description" />
+		<child-element name="example" />
+		<child-element name="examples" />
+		<child-element name="exceptions" />
+		<child-element name="parameters" />
+		<child-element name="references" />
+		<child-element name="return-types" />
+		<child-element name="return-description" />
+		<child-element name="remarks" />
+	</element>
+
+	<element name="constructors" onEnter="enterConstructors" onExit="exitConstructors">
+		<child-element name="constructor" />
+	</element>
+
+	<element
+		name="deprecated"
+		onEnter="startTextBuffer"
+		onExit="exitDeprecated"
+		hasText="yes" />
+		
+	<element
+		name="description"
+		onEnter="startTextBuffer"
+		onExit="exitDescription"
+		hasText="yes" />
+
+	<element name="examples">
+		<child-element name="example" />
+	</element>
+
+	<element
+		name="example"
+		onEnter="startTextBuffer"
+		onExit="exitExample"
+		hasText = "yes" />
+
+	<element name="exception" onEnter="enterException" onExit="exitException">
+		<attribute name="type" />
+		<child-element name="description" />
+	</element>
+
+	<element name="exceptions">
+		<child-element name="exception" />
+	</element>
+
+	<element name="interface">
+		<attribute name="type" />
+	</element>
+
+	<element name="interfaces">
+		<child-element name="interface" />
+	</element>
+
+	<element name="javascript" type="root" onExit="exitJavaScript">
+		<child-element name="aliases"/>
+		<child-element name="class" />
+		<child-element name="overview"/>
+	</element>
+
+	<element name="method" onEnter="enterMethod" onExit="exitMethod">
+		<attribute name="name" />
+		<attribute name="scope" />
+		<attribute name="deprecated" usage="optional" />
+		<attribute name="visibility" usage="optional" />
+		<child-element name="availability" />
+		<child-element name="browsers" />
+		<child-element name="example" />
+		<child-element name="examples" />
+		<child-element name="exceptions" />
+        <child-element name="deprecated" />
+		<child-element name="description" />
+		<child-element name="parameters" />
+		<child-element name="references" />
+		<child-element name="return-types" />
+		<child-element name="return-description" />
+		<child-element name="remarks" />
+	</element>
+
+	<element name="methods">
+		<child-element name="method" />
+	</element>
+
+	<element name="mixins" onEnter="enterMixins">
+		<attribute name="scope" />
+		<child-element name="mixin" />
+	</element>
+	
+	<element name="mixin" onEnter="enterMixin">
+		<attribute name="scope" />
+		<attribute name="type" />
+	</element>
+	
+	<element name="overview"/>
+
+	<element name="parameter" onEnter="enterParameter" onExit="exitParameter">
+		<attribute name="name" />
+		<attribute name="type" />
+		<attribute name="usage" />
+		<child-element name="description" />
+		<child-element name="values" />		
+	</element>
+
+	<element name="parameters">
+		<child-element name="parameter" />
+	</element>
+
+	<element name="properties">
+		<child-element name="property" />
+	</element>
+
+	<element name="property" onEnter="enterProperty" onExit="exitProperty">
+		<attribute name="name" />
+		<attribute name="type" />
+		<attribute name="scope" />
+		<attribute name="access" usage="optional" />
+		<attribute name="deprecated" usage="optional" />
+		<attribute name="visibility" usage="optional" />
+		<child-element name="availability" />
+		<child-element name="browsers" />
+        <child-element name="deprecated" />
+		<child-element name="description" />
+		<child-element name="example" />
+		<child-element name="examples" />
+		<child-element name="exceptions" />
+		<child-element name="hint" />
+		<child-element name="references" />
+		<child-element name="remarks" />
+	</element>
+
+	<element name="reference" onEnter="enterReference">
+		<attribute name="name" />
+	</element>
+
+	<element name="references">
+		<child-element name="reference" />
+	</element>
+
+	<element
+		name="remarks"
+		onEnter="startTextBuffer"
+		onExit="exitRemarks"
+		hasText="yes" />
+
+	<element
+		name="return-description"
+		onEnter="startTextBuffer"
+		onExit="exitReturnDescription"
+		hasText="yes" />
+		
+	<element name="return-type" onEnter="enterReturnType" onExit="exitReturnType">
+		<attribute name="type" />
+		<child-element name="description"/>
+	</element>
+
+	<element name="return-types">
+		<child-element name="return-type" />
+	</element>
+
+	<element name="specification" onEnter="enterSpecification">
+		<attribute name="name" />
+		<attribute name="version" usage="optional" />	
+	</element>
+
+	<element name="values">
+		<child-element name="value" />
+	</element>
+
+	<element name="value" onEnter="enterValue" onExit="exitValue">
+		<attribute name="name" />	
+		<attribute name="description" usage="optional" />	
+	</element>
+	
+	<element name="description" onEnter="startTextBuffer" onExit="exitDescription" />
+		
+	<element name="browsers">
+		<child-element name="browser" />
+	</element>
+
+	<element name="browser" onEnter="enterBrowser" onExit="exitBrowser">
+		<attribute name="platform" />	
+		<attribute name="version" usage="optional" />	
+		<attribute name="os" usage="optional" />	
+		<attribute name="osVersion" usage="optional" />	
+        <child-element name="description" />
+    </element>
+
+</schema>

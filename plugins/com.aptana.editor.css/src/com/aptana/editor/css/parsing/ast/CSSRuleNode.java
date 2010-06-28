@@ -107,24 +107,28 @@ public class CSSRuleNode extends CSSNode
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
-		for (int i = 0; i < fSelectors.length; ++i)
+		CSSSelectorNode[] selectors = getSelectors();
+		for (int i = 0; i < selectors.length; ++i)
 		{
-			text.append(fSelectors[i]);
-			if (i < fSelectors.length - 1)
+			text.append(selectors[i]);
+			if (i < selectors.length - 1)
 			{
 				text.append(", "); //$NON-NLS-1$
 			}
 		}
+
+		CSSDeclarationNode[] declarations = getDeclarations();
 		text.append(" {"); //$NON-NLS-1$
-		for (int i = 0; i < fDeclarations.length; ++i)
+		for (int i = 0; i < declarations.length; ++i)
 		{
-			text.append(fDeclarations[i]);
-			if (i < fDeclarations.length - 1)
+			text.append(declarations[i]);
+			if (i < declarations.length - 1)
 			{
 				text.append(" "); //$NON-NLS-1$
 			}
 		}
 		text.append("}"); //$NON-NLS-1$
+
 		return text.toString();
 	}
 }

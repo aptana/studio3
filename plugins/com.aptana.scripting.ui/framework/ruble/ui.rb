@@ -220,6 +220,7 @@ module Ruble
 		    # TODO set selection to first item
 		    # TODO Open to caret, not mouse?
 		    index = dialog.open
+		    return nil if index == -1
         return return_hash ? options[index] : index
       end
       

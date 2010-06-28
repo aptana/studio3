@@ -1,7 +1,12 @@
 .DS_Store
 bin/
+CVS/
 *~
 *.swp
+*.aps
+*.ncb
+*.suo
+*.user
 
 build/
 *.pbxuser

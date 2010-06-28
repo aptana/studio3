@@ -11,13 +11,6 @@ public interface IGitRepositoryListener
 	public void indexChanged(IndexChangedEvent e);
 
 	/**
-	 * A project has been mapped to a new repository (new to us, may have already existed on disk).
-	 * 
-	 * @param e
-	 */
-	public void repositoryAdded(RepositoryAddedEvent e);
-
-	/**
 	 * The working branch has been changed for a repository
 	 * 
 	 * @param e
@@ -39,21 +32,14 @@ public interface IGitRepositoryListener
 	public void branchRemoved(BranchRemovedEvent e);
 
 	/**
-	 * Called when a repository is unmapped from a project
-	 * 
-	 * @param e
-	 */
-	public void repositoryRemoved(RepositoryRemovedEvent e);
-
-	/**
-	 * Users has run a pull via our UI. FIXME Detect pulls externally!
+	 * Users has run a pull via our UI.
 	 * 
 	 * @param e
 	 */
 	public void pulled(PullEvent e);
 
 	/**
-	 * Users has run a push via our UI. FIXME Detect pushes externally!
+	 * Users has run a push via our UI.
 	 * 
 	 * @param e
 	 */

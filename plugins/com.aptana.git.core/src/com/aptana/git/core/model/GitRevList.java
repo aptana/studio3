@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -77,7 +78,7 @@ public class GitRevList
 		else
 			arguments.addAll(rev.parameters());
 
-		String directory = repository.workingDirectory();
+		IPath directory = repository.workingDirectory();
 
 		if (subMonitor.isCanceled())
 			return Status.CANCEL_STATUS;
