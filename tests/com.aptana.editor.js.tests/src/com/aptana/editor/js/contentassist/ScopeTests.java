@@ -82,12 +82,21 @@ public class ScopeTests extends FileContentBasedTests
 	 */
 	protected List<String> getTypes(Scope<JSNode> symbols, String symbol)
 	{
-		List<JSNode> value = symbols.getLocalSymbol(symbol);
+		List<JSNode> nodes = symbols.getLocalSymbol(symbol);
 		Set<String> typeSet = new HashSet<String>();
 		
-		for (JSNode node : value)
+		for (JSNode node : nodes)
 		{
-			typeSet.addAll(node.getTypes(symbols));
+			JSTypeWalker typeWalker = new JSTypeWalker(symbols);
+			
+			typeWalker.visit(node);
+			
+			List<String> types = typeWalker.getTypes();
+			
+			if (types != null)
+			{
+				typeSet.addAll(types);
+			}
 		}
 		
 		return new LinkedList<String>(typeSet);
