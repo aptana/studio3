@@ -6,7 +6,9 @@ import java.util.List;
 import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.WhitespaceRule;
+import org.eclipse.jface.text.rules.WordRule;
 
 import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
@@ -28,13 +30,62 @@ public class HAMLScanner extends BufferedRuleBasedScanner
 
 		// FIXME Must be at end of line (only \s*\n can follow)
 		rules.add(new SingleCharacterRule('|', createToken("punctuation.separator.continuation.haml"))); //$NON-NLS-1$
-		// TODO Optimize by turning these into WordRules!
+
 		// tags
-		rules.add(new RegexpRule("%[\\w-]+", createToken("entity.name.tag.haml"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
+		WordRule rule = new WordRule(new IWordDetector()
+		{
+
+			@Override
+			public boolean isWordStart(char c)
+			{
+				return c == '%';
+			}
+
+			@Override
+			public boolean isWordPart(char c)
+			{
+				return Character.isLetterOrDigit(c) || c == '_' || c == '-';
+			}
+		}, createToken("entity.name.tag.haml")); //$NON-NLS-1$
+		rules.add(rule);
+
 		// ids
-		rules.add(new RegexpRule("#[\\w-]+", createToken("entity.name.tag.id.haml"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
+		rule = new WordRule(new IWordDetector()
+		{
+
+			@Override
+			public boolean isWordStart(char c)
+			{
+				return c == '#';
+			}
+
+			@Override
+			public boolean isWordPart(char c)
+			{
+				return Character.isLetterOrDigit(c) || c == '_' || c == '-';
+			}
+		}, createToken("entity.other.attribute-name.id")); //$NON-NLS-1$
+		rules.add(rule);
+
 		// classes
-		rules.add(new RegexpRule("\\.[\\w-]+", createToken("entity.name.tag.class.haml"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
+		rule = new WordRule(new IWordDetector()
+		{
+
+			@Override
+			public boolean isWordStart(char c)
+			{
+				return c == '.';
+			}
+
+			@Override
+			public boolean isWordPart(char c)
+			{
+				return Character.isLetterOrDigit(c) || c == '_' || c == '-';
+			}
+		}, createToken("entity.other.attribute-name.class")); //$NON-NLS-1$
+		rules.add(rule);
+
+		// TODO Optimize by turning this into WordRules!
 		// escape character FIXME Must be at beginning of line (can only be preceded by spaces*)
 		rules.add(new RegexpRule("\\\\.", createToken("meta.escape.haml"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
 		setRules(rules.toArray(new IRule[rules.size()]));
