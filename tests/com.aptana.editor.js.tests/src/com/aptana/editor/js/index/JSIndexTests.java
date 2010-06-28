@@ -47,7 +47,7 @@ public class JSIndexTests extends TestCase
 	{
 		JSIndexReader reader = new JSIndexReader();
 		
-		return reader.loadType(this.getIndex(), typeName);
+		return reader.getType(this.getIndex(), typeName);
 	}
 	
 	/**

@@ -162,59 +162,6 @@ public class JSIndexReader
 	}
 
 	/**
-	 * getProperties
-	 * 
-	 * @param index
-	 * @param owningType
-	 * @return
-	 * @throws IOException
-	 */
-	public List<PropertyElement> getProperties(Index index, String owningType) throws IOException
-	{
-		// read properties
-		List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningType), SearchPattern.REGEX_MATCH);
-		List<PropertyElement> result = new LinkedList<PropertyElement>();
-
-		if (properties != null)
-		{
-			for (QueryResult property : properties)
-			{
-				String key = property.getWord();
-				PropertyElement p = this.createPropertyFromKey(index, key);
-
-				result.add(p);
-			}
-		}
-
-		return result;
-	}
-	
-	/**
-	 * getProperty
-	 * 
-	 * @param index
-	 * @param owningType
-	 * @param propertyName
-	 * @return
-	 * @throws IOException
-	 */
-	public PropertyElement getProperty(Index index, String owningType, String propertyName) throws IOException
-	{
-		List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningType, propertyName), SearchPattern.REGEX_MATCH);
-		PropertyElement result = null;
-		
-		if (properties != null && properties.size() > 0)
-		{
-			QueryResult property = properties.get(0);
-			String key = property.getWord();
-			
-			result = this.createPropertyFromKey(index, key);
-		}
-		
-		return result;
-	}
-
-	/**
 	 * getParameters
 	 * 
 	 * @param index
@@ -251,6 +198,59 @@ public class JSIndexReader
 			}
 		}
 
+		return result;
+	}
+	
+	/**
+	 * getProperties
+	 * 
+	 * @param index
+	 * @param owningType
+	 * @return
+	 * @throws IOException
+	 */
+	public List<PropertyElement> getProperties(Index index, String owningType) throws IOException
+	{
+		// read properties
+		List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningType), SearchPattern.REGEX_MATCH);
+		List<PropertyElement> result = new LinkedList<PropertyElement>();
+
+		if (properties != null)
+		{
+			for (QueryResult property : properties)
+			{
+				String key = property.getWord();
+				PropertyElement p = this.createPropertyFromKey(index, key);
+
+				result.add(p);
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getProperty
+	 * 
+	 * @param index
+	 * @param owningType
+	 * @param propertyName
+	 * @return
+	 * @throws IOException
+	 */
+	public PropertyElement getProperty(Index index, String owningType, String propertyName) throws IOException
+	{
+		List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningType, propertyName), SearchPattern.REGEX_MATCH);
+		PropertyElement result = null;
+		
+		if (properties != null && properties.size() > 0)
+		{
+			QueryResult property = properties.get(0);
+			String key = property.getWord();
+			
+			result = this.createPropertyFromKey(index, key);
+		}
+		
 		return result;
 	}
 
@@ -290,6 +290,64 @@ public class JSIndexReader
 	}
 	
 	/**
+	 * getType
+	 * 
+	 * @param index
+	 * @param typeName
+	 * @return
+	 */
+	public TypeElement getType(Index index, String typeName)
+	{
+		TypeElement result = null;
+
+		try
+		{
+			String pattern = typeName + JSIndexConstants.DELIMITER;
+			List<QueryResult> types = index.query(new String[] { JSIndexConstants.TYPE }, pattern, SearchPattern.PREFIX_MATCH);
+
+			if (types != null && types.size() > 0)
+			{
+				String[] columns = types.get(0).getWord().split(JSIndexConstants.DELIMITER);
+				String retrievedName = columns[0];
+				String[] parentTypes = columns[1].split(JSIndexConstants.SUB_DELIMITER); //$NON-NLS-1$
+				String descriptionKey = columns[2];
+
+				// create type
+				result = new TypeElement();
+				
+				// set its name
+				result.setName(retrievedName);
+				
+				// add in the types it inherits
+				for (String parentType : parentTypes)
+				{
+					result.addParentType(parentType);
+				}
+				
+				// set the description
+				result.setDescription(this.getDescription(index, descriptionKey));
+
+				// add properties
+				for (PropertyElement property : this.getProperties(index, retrievedName))
+				{
+					result.addProperty(property);
+				}
+
+				// add functions
+				for (FunctionElement function: this.getFunctions(index, retrievedName))
+				{
+					result.addProperty(function);
+				}
+			}
+		}
+		catch (IOException e)
+		{
+		}
+
+		return result;
+	}
+
+	/**
 	 * getTypeProperties
 	 * 
 	 * @return
@@ -303,7 +361,7 @@ public class JSIndexReader
 		
 		return properties;
 	}
-
+	
 	/**
 	 * getUserAgent
 	 * 
@@ -375,64 +433,6 @@ public class JSIndexReader
 			{
 				e.printStackTrace();
 			}
-		}
-
-		return result;
-	}
-	
-	/**
-	 * loadType
-	 * 
-	 * @param index
-	 * @param typeName
-	 * @return
-	 */
-	public TypeElement loadType(Index index, String typeName)
-	{
-		TypeElement result = null;
-
-		try
-		{
-			String pattern = typeName + JSIndexConstants.DELIMITER;
-			List<QueryResult> types = index.query(new String[] { JSIndexConstants.TYPE }, pattern, SearchPattern.PREFIX_MATCH);
-
-			if (types != null && types.size() > 0)
-			{
-				String[] columns = types.get(0).getWord().split(JSIndexConstants.DELIMITER);
-				String retrievedName = columns[0];
-				String[] parentTypes = columns[1].split(","); //$NON-NLS-1$
-				String descriptionKey = columns[2];
-
-				// create type
-				result = new TypeElement();
-				
-				// set its name
-				result.setName(retrievedName);
-				
-				// add in the types it inherits
-				for (String parentType : parentTypes)
-				{
-					result.addParentType(parentType);
-				}
-				
-				// set the description
-				result.setDescription(this.getDescription(index, descriptionKey));
-
-				// add properties
-				for (PropertyElement property : this.getProperties(index, retrievedName))
-				{
-					result.addProperty(property);
-				}
-
-				// add functions
-				for (FunctionElement function: this.getFunctions(index, retrievedName))
-				{
-					result.addProperty(function);
-				}
-			}
-		}
-		catch (IOException e)
-		{
 		}
 
 		return result;
