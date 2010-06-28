@@ -5685,6 +5685,14 @@
 				</availability>
 			</property>
 			
+			<property name="Array" type="Class&lt;Array&gt;" access="read-only" visibility="basic"/>
+			<property name="Boolean" type="Class&lt;Boolean&gt;" access="read-only" visibility="basic"/>
+			<property name="Function" type="Class&lt;Function&gt;" access="read-only" visibility="basic"/>
+			<property name="Number" type="Class&lt;Number&gt;" access="read-only" visibility="basic"/>
+			<property name="Object" type="Class&lt;Object&gt;" access="read-only" visibility="basic"/>
+			<property name="RegExp" type="Class&lt;RegExp&gt;" access="read-only" visibility="basic"/>
+			<property name="String" type="Class&lt;String&gt;" access="read-only" visibility="basic"/>
+			
 		</properties>
 		
 		<methods>
