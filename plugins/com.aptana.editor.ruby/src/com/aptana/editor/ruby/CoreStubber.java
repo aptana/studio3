@@ -62,6 +62,10 @@ public class CoreStubber extends Job
 		{
 			String rubyVersion = ProcessUtil.outputForCommand(RUBY_EXE, null, ShellExecutable.getEnvironment(),
 					VERSION_SWITCH);
+			if (rubyVersion == null)
+			{
+				return Status.CANCEL_STATUS;
+			}
 			// Store core stubs based on ruby version string...
 			IPath outputPath = Activator.getDefault().getStateLocation()
 					.append(Integer.toString(rubyVersion.hashCode())).append(RUBY_EXE);
