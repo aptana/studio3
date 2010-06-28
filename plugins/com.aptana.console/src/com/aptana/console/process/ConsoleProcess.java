@@ -54,7 +54,7 @@ import org.eclipse.debug.core.model.RuntimeProcess;
 	 * @param name
 	 * @param attributes
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public ConsoleProcess(ILaunch launch, Process process, String name, Map attributes) {
 		super(launch, process, name, attributes);
 	}

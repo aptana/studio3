@@ -69,7 +69,7 @@ public class CommonAnnotationHover extends DefaultAnnotationHover {
      * (non-Javadoc)
      * @see org.eclipse.jface.text.source.DefaultAnnotationHover#formatMultipleMessages(java.util.List)
      */
-    @SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	protected String formatMultipleMessages(List messages) {
         StringBuffer buffer = new StringBuffer();
 

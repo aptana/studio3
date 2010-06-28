@@ -75,7 +75,7 @@ public abstract class UniformResourceStorage extends PlatformObject implements I
 	/**
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		if ( IUniformResource.class == adapter )
 		{

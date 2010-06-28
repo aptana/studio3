@@ -257,7 +257,6 @@ class EditBundleJob extends Job
 	 * @param repoURI
 	 * @return
 	 */
-	@SuppressWarnings("nls")
 	private boolean looksLikeSVNURI(String repoURI)
 	{
 		return repoURI.startsWith("svn:") || repoURI.startsWith("svn+") || repoURI.contains("/trunk") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -270,7 +269,6 @@ class EditBundleJob extends Job
 	 * @param repoURI
 	 * @return
 	 */
-	@SuppressWarnings("nls")
 	private boolean looksLikeGitURI(String repoURI)
 	{
 		return repoURI.startsWith("git:") || repoURI.endsWith(".git") || repoURI.contains("github.com"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

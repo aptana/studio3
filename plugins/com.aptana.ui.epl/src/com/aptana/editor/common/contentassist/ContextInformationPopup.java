@@ -527,10 +527,11 @@ class ContextInformationPopup implements IContentAssistListener
 	private void resize(int offset)
 	{
 		Point size = fContextInfoText.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-		size.x += 2;
+		size.x += 3;
 		fContextInfoText.setSize(size);
-		size.x += 8;
-		size.y += 10;
+		fContextInfoText.setLocation(1, 1);
+		size.x += 2;
+		size.y += 2;
 		fContextInfoPopup.setSize(size);
 	}
 

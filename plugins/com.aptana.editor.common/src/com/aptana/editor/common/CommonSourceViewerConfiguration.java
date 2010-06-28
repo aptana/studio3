@@ -234,8 +234,8 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getHyperlinkDetectorTargets(org.eclipse.jface.text.source.ISourceViewer)
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	@SuppressWarnings("unchecked")
 	protected Map getHyperlinkDetectorTargets(ISourceViewer sourceViewer)
 	{
 		Map targets = super.getHyperlinkDetectorTargets(sourceViewer);
