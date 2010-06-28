@@ -27,6 +27,16 @@ public class JSInvokeNode extends JSNode
 		walker.visit(this);
 	}
 
+	/**
+	 * getExpression
+	 * 
+	 * @return
+	 */
+	public IParseNode getExpression()
+	{
+		return this.getChild(0);
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#getLocationType(int)
@@ -58,6 +68,16 @@ public class JSInvokeNode extends JSNode
 		return result;
 	}
 
+	/**
+	 * getParameters
+	 * 
+	 * @return
+	 */
+	public IParseNode getParameters()
+	{
+		return this.getChild(1);
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
