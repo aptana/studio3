@@ -5,13 +5,6 @@ import com.aptana.parsing.lexer.ILexeme;
 public interface IParseNode extends ILexeme, ILanguageNode, Iterable<IParseNode>
 {
 	/**
-	 * accept
-	 * 
-	 * @param walker
-	 */
-	public void accept(ITreeWalker walker);
-	
-	/**
 	 * addChild
 	 * 
 	 * @param child

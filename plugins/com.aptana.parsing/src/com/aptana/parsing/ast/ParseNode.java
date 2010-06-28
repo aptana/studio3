@@ -53,15 +53,6 @@ public class ParseNode extends Node implements IParseNode
 		fLanguage = language;
 		fChildren = new IParseNode[0];
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.IParseNode#accept(com.aptana.parsing.ast.ITreeWalker)
-	 */
-	public void accept(ITreeWalker walker)
-	{
-		walker.visit(this);
-	}
 	
 	/*
 	 * (non-Javadoc)
