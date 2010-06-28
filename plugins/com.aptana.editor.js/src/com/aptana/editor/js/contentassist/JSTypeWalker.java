@@ -3,10 +3,13 @@ package com.aptana.editor.js.contentassist;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.aptana.editor.js.contentassist.model.PropertyElement;
+import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.parsing.ast.JSArrayNode;
 import com.aptana.editor.js.parsing.ast.JSConstructNode;
 import com.aptana.editor.js.parsing.ast.JSFalseNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
+import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
 import com.aptana.editor.js.parsing.ast.JSIdentifierNode;
 import com.aptana.editor.js.parsing.ast.JSInvokeNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
@@ -16,20 +19,36 @@ import com.aptana.editor.js.parsing.ast.JSRegexNode;
 import com.aptana.editor.js.parsing.ast.JSStringNode;
 import com.aptana.editor.js.parsing.ast.JSTreeWalker;
 import com.aptana.editor.js.parsing.ast.JSTrueNode;
+import com.aptana.index.core.Index;
 import com.aptana.parsing.Scope;
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSTypeWalker extends JSTreeWalker
 {
 	private Scope<JSNode> _scope;
+	private Index _index;
 	private List<String> _types;
+	private JSIndexQueryHelper _indexHelper;
 
 	/**
 	 * JSTypeWalker
 	 */
 	public JSTypeWalker(Scope<JSNode> scope)
 	{
+		this(scope, null);
+	}
+	
+	/**
+	 * JSTypeWalker
+	 * 
+	 * @param scope
+	 * @param projectIndex
+	 */
+	public JSTypeWalker(Scope<JSNode> scope, Index projectIndex)
+	{
 		this._scope = scope;
+		this._index = projectIndex;
+		this._indexHelper = new JSIndexQueryHelper();
 	}
 
 	/**
@@ -130,6 +149,44 @@ public class JSTypeWalker extends JSTreeWalker
 		this.addType("Function");
 	}
 
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSGetPropertyNode)
+	 */
+	@Override
+	public void visit(JSGetPropertyNode node)
+	{
+		IParseNode lhs = node.getLeftHandSide();
+		
+		if (lhs instanceof JSNode)
+		{
+			JSTypeWalker walker = new JSTypeWalker(this._scope, this._index);
+			
+			walker.visit((JSNode) lhs);
+			
+			List<String> types = walker.getTypes();
+			
+			if (types != null)
+			{
+				IParseNode rhs = node.getRightHandSide();
+				String name = rhs.getText();
+				
+				for (String type : types)
+				{
+					// lookup up rhs name in type and add that value's type here
+					PropertyElement property = this._indexHelper.getCoreTypeProperty(type, name);
+					
+					if (property != null)
+					{
+						for (ReturnTypeElement typeElement : property.getTypes())
+						{
+							this.addType(typeElement.getType());
+						}
+					}
+				}
+			}
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSIdentifierNode)
@@ -138,13 +195,39 @@ public class JSTypeWalker extends JSTreeWalker
 	public void visit(JSIdentifierNode node)
 	{
 		String name = node.getText();
-		List<JSNode> symbolNodes = this._scope.getSymbol(name);
-
-		if (symbolNodes.isEmpty() == false)
+		
+		// lookup in local scope
+		if (this._scope != null && this._scope.hasSymbol(name))
 		{
+			List<JSNode> symbolNodes = this._scope.getSymbol(name);
+	
 			for (JSNode symbolNode : symbolNodes)
 			{
 				symbolNode.accept(this);
+			}
+		}
+		else
+		{
+			PropertyElement property = null;
+			
+			// lookup in project
+			if (this._index != null)
+			{
+				property = this._indexHelper.getProjectGlobal(this._index, name);
+			}
+
+			// lookup in core
+			if (property == null)
+			{
+				property = this._indexHelper.getCoreGlobal(name);
+			}
+				
+			if (property != null)
+			{
+				for (ReturnTypeElement typeElement : property.getTypes())
+				{
+					this.addType(typeElement.getType());
+				}
 			}
 		}
 	}
