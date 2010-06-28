@@ -25,4 +25,14 @@ public class JSNumberNode extends JSPrimitiveNode
 	{
 		super(JSNodeTypes.NUMBER, start, end, text);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
+	 */
+	@Override
+	public void accept(JSTreeWalker walker)
+	{
+		walker.visit(this);
+	}
 }

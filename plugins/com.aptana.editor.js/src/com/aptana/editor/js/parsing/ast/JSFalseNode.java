@@ -25,4 +25,14 @@ public class JSFalseNode extends JSPrimitiveNode
 	{
 		super(JSNodeTypes.FALSE, start, end, "false");
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
+	 */
+	@Override
+	public void accept(JSTreeWalker walker)
+	{
+		walker.visit(this);
+	}
 }

@@ -30,6 +30,16 @@ public class JSFunctionNode extends JSNode
 		super(JSNodeTypes.FUNCTION, start, end, children);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
+	 */
+	@Override
+	public void accept(JSTreeWalker walker)
+	{
+		walker.visit(this);
+	}
+
 	/**
 	 * getArgs
 	 * 

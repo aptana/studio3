@@ -24,4 +24,14 @@ public class JSTrueNode extends JSPrimitiveNode
 	{
 		super(JSNodeTypes.TRUE, start, end, "true");
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
+	 */
+	@Override
+	public void accept(JSTreeWalker walker)
+	{
+		walker.visit(this);
+	}
 }

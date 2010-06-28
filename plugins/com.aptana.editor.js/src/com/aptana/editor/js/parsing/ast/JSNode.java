@@ -76,6 +76,15 @@ public class JSNode extends ParseNode
 	}
 
 	/**
+	 * accept
+	 * 
+	 * @param walker
+	 */
+	public void accept(JSTreeWalker walker)
+	{
+	}
+	
+	/**
 	 * appendSemicolon
 	 * 
 	 * @param buffer
