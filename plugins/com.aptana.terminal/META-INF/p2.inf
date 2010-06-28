@@ -1,6 +1,0 @@
- instructions.install = \
-    chmod(targetDir:@artifact,targetFile:os/linux/x86/redtty,permissions:755);\
-    chmod(targetDir:@artifact,targetFile:os/linux/x86_64/redtty,permissions:755);\
-    chmod(targetDir:@artifact,targetFile:os/macosx/redtty,permissions:755);
- instructions.install.import= \
-    org.eclipse.equinox.p2.touchpoint.natives.chmod
