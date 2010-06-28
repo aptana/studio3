@@ -23,91 +23,115 @@ public class JSTypeWalker extends JSTreeWalker
 {
 	private Scope<JSNode> _scope;
 	private List<String> _types;
-	
+
 	/**
 	 * JSTypeWalker
 	 */
 	public JSTypeWalker(Scope<JSNode> scope)
 	{
 		this._scope = scope;
-		this._types = new ArrayList<String>();
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * addType
+	 * 
+	 * @param type
+	 */
+	protected void addType(String type)
+	{
+		if (type != null && type.length() > 0)
+		{
+			if (this._types == null)
+			{
+				this._types = new ArrayList<String>();
+			}
+
+			this._types.add(type);
+		}
+	}
+
+	/**
+	 * addTypes
+	 * 
+	 * @param types
+	 */
+	protected void addTypes(List<String> types)
+	{
+		if (types != null)
+		{
+			for (String type : types)
+			{
+				this.addType(type);
+			}
+		}
+	}
+
+	/**
+	 * getTypes
+	 * 
+	 * @return
+	 */
+	public List<String> getTypes()
+	{
+		return this._types;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSArrayNode)
+	 */
+	@Override
+	public void visit(JSArrayNode node)
+	{
+		this.addType("Array");
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSConstructNode)
 	 */
 	@Override
 	public void visit(JSConstructNode node)
 	{
 		IParseNode child = node.getChild(0);
-		
+
 		// TEMP: for debugging
 		String name = child.getText();
 		List<JSNode> symbolNodes = this._scope.getSymbol(name);
-		
+
 		for (JSNode symbolNode : symbolNodes)
 		{
 			if (symbolNode instanceof JSFunctionNode)
 			{
 				List<String> returnTypes = ((JSFunctionNode) symbolNode).getReturnTypes();
-				
-				this._types.addAll(returnTypes);
+
+				this.addTypes(returnTypes);
 			}
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSFunctionNode)
-	 */
-	@Override
-	public void visit(JSFunctionNode node)
-	{
-		this._types.add("Function");
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSInvokeNode)
-	 */
-	@Override
-	public void visit(JSInvokeNode node)
-	{
-		IParseNode child = node.getChild(0);
-		
-		// TEMP: for debugging
-		String name = child.getText();
-		List<JSNode> symbolNodes = this._scope.getSymbol(name);
-		
-		for (JSNode symbolNode : symbolNodes)
-		{
-			if (symbolNode instanceof JSFunctionNode)
-			{
-				List<String> returnTypes = ((JSFunctionNode) symbolNode).getReturnTypes();
-				
-				this._types.addAll(returnTypes);
-			}
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSArrayNode)
-	 */
-	@Override
-	public void visit(JSArrayNode node)
-	{
-		this._types.add("Array");
-	}
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSFalseNode)
 	 */
 	@Override
 	public void visit(JSFalseNode node)
 	{
-		this._types.add("Boolean");
+		this.addType("Boolean");
 	}
 
-	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSFunctionNode)
+	 */
+	@Override
+	public void visit(JSFunctionNode node)
+	{
+		this.addType("Function");
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSIdentifierNode)
 	 */
 	@Override
@@ -115,7 +139,7 @@ public class JSTypeWalker extends JSTreeWalker
 	{
 		String name = node.getText();
 		List<JSNode> symbolNodes = this._scope.getSymbol(name);
-		
+
 		if (symbolNodes.isEmpty() == false)
 		{
 			for (JSNode symbolNode : symbolNodes)
@@ -125,48 +149,77 @@ public class JSTypeWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSInvokeNode)
+	 */
+	@Override
+	public void visit(JSInvokeNode node)
+	{
+		IParseNode child = node.getChild(0);
+
+		// TEMP: for debugging
+		String name = child.getText();
+		List<JSNode> symbolNodes = this._scope.getSymbol(name);
+
+		for (JSNode symbolNode : symbolNodes)
+		{
+			if (symbolNode instanceof JSFunctionNode)
+			{
+				List<String> returnTypes = ((JSFunctionNode) symbolNode).getReturnTypes();
+
+				this.addTypes(returnTypes);
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSNumberNode)
 	 */
 	@Override
 	public void visit(JSNumberNode node)
 	{
-		this._types.add("Number");
+		this.addType("Number");
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSObjectNode)
 	 */
 	@Override
 	public void visit(JSObjectNode node)
 	{
-		this._types.add("Object");
+		this.addType("Object");
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSRegexNode)
 	 */
 	@Override
 	public void visit(JSRegexNode node)
 	{
-		this._types.add("RegExp");
+		this.addType("RegExp");
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSStringNode)
 	 */
 	@Override
 	public void visit(JSStringNode node)
 	{
-		this._types.add("String");
+		this.addType("String");
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSTrueNode)
 	 */
 	@Override
 	public void visit(JSTrueNode node)
 	{
-		this._types.add("Boolean");
+		this.addType("Boolean");
 	}
 }
