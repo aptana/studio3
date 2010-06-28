@@ -32,7 +32,7 @@ import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.parsing.JSTokenScanner;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
-import com.aptana.editor.js.parsing.ast.JSGetPropertyOperatorNode;
+import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
@@ -233,7 +233,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		if (this._targetNode != null && this._targetNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
 		{
-			JSGetPropertyOperatorNode node = (JSGetPropertyOperatorNode) this._targetNode;
+			JSGetPropertyNode node = (JSGetPropertyNode) this._targetNode;
 			Scope<JSNode> localScope = this.getScopeAtOffset(offset);
 			
 			if (localScope != null)

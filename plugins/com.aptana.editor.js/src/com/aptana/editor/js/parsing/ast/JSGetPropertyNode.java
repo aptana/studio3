@@ -6,7 +6,7 @@ import com.aptana.editor.js.contentassist.LocationType;
 import com.aptana.parsing.ast.IParseNode;
 
 
-public class JSGetPropertyOperatorNode extends JSBinaryOperatorNode
+public class JSGetPropertyNode extends JSBinaryOperatorNode
 {
 	/**
 	 * JSGetPropertyOperatorNode
@@ -14,7 +14,7 @@ public class JSGetPropertyOperatorNode extends JSBinaryOperatorNode
 	 * @param left
 	 * @param right
 	 */
-	public JSGetPropertyOperatorNode(JSNode left, Symbol operator, JSNode right)
+	public JSGetPropertyNode(JSNode left, Symbol operator, JSNode right)
 	{
 		super(left, operator, right);
 	}

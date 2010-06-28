@@ -1222,11 +1222,11 @@ MemberExpression
 	|	FunctionExpression
 	|	MemberExpression.l LBRACKET.lb Expression.r RBRACKET.rb
 		{:
-			return new JSGetElementOperatorNode(l, lb, r, rb);
+			return new JSGetElementNode(l, lb, r, rb);
 		:}
 	|	MemberExpression.l DOT.o IDENTIFIER.r
 		{:
-			return new JSGetPropertyOperatorNode(l, o, new JSIdentifierNode(r));
+			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
 		:}
 	|	NEW.l MemberExpression.e Arguments.a
 		{:
@@ -1238,11 +1238,11 @@ MemberExpression_NoLBF
 	=	PrimaryExpression_NoLBF
 	|	MemberExpression_NoLBF.l LBRACKET.lb Expression.r RBRACKET.rb
 		{:
-			return new JSGetElementOperatorNode(l, lb, r, rb);
+			return new JSGetElementNode(l, lb, r, rb);
 		:}
 	|	MemberExpression_NoLBF.l DOT.o IDENTIFIER.r
 		{:
-			return new JSGetPropertyOperatorNode(l, o, new JSIdentifierNode(r));
+			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
 		:}
 	|	NEW.l MemberExpression.e Arguments.a
 		{:
@@ -1277,11 +1277,11 @@ CallExpression
 		:}
 	|	CallExpression.l LBRACKET.lb Expression.r RBRACKET.rb
 		{:
-			return new JSGetElementOperatorNode(l, lb, r, rb);
+			return new JSGetElementNode(l, lb, r, rb);
 		:}
 	|	CallExpression.l DOT.o IDENTIFIER.r
 		{:
-			return new JSGetPropertyOperatorNode(l, o, new JSIdentifierNode(r));
+			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
 		:}
 	;
 
@@ -1296,11 +1296,11 @@ CallExpression_NoLBF
 		:}
 	|	CallExpression_NoLBF.l LBRACKET.lb Expression.r RBRACKET.rb
 		{:
-			return new JSGetElementOperatorNode(l, lb, r, rb);
+			return new JSGetElementNode(l, lb, r, rb);
 		:}
 	|	CallExpression_NoLBF.l DOT.o IDENTIFIER.r
 		{:
-			return new JSGetPropertyOperatorNode(l, o, new JSIdentifierNode(r));
+			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
 		:}
 	;
 

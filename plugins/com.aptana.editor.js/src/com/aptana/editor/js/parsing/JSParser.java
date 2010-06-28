@@ -1788,7 +1788,7 @@ public class JSParser extends Parser implements IParser {
 					final JSNode r = (JSNode) _symbol_r.value;
 					final Symbol rb = _symbols[offset + 4];
 					
-			return new JSGetElementOperatorNode(l, lb, r, rb);
+			return new JSGetElementNode(l, lb, r, rb);
 			}
 			case 150: // MemberExpression = MemberExpression.l DOT.o IDENTIFIER.r
 			{
@@ -1797,7 +1797,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol o = _symbols[offset + 2];
 					final Symbol r = _symbols[offset + 3];
 					
-			return new JSGetPropertyOperatorNode(l, o, new JSIdentifierNode(r));
+			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
 			}
 			case 151: // MemberExpression = NEW.l MemberExpression.e Arguments.a
 			{
@@ -1818,7 +1818,7 @@ public class JSParser extends Parser implements IParser {
 					final JSNode r = (JSNode) _symbol_r.value;
 					final Symbol rb = _symbols[offset + 4];
 					
-			return new JSGetElementOperatorNode(l, lb, r, rb);
+			return new JSGetElementNode(l, lb, r, rb);
 			}
 			case 154: // MemberExpression_NoLBF = MemberExpression_NoLBF.l DOT.o IDENTIFIER.r
 			{
@@ -1827,7 +1827,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol o = _symbols[offset + 2];
 					final Symbol r = _symbols[offset + 3];
 					
-			return new JSGetPropertyOperatorNode(l, o, new JSIdentifierNode(r));
+			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
 			}
 			case 155: // MemberExpression_NoLBF = NEW.l MemberExpression.e Arguments.a
 			{
@@ -1882,7 +1882,7 @@ public class JSParser extends Parser implements IParser {
 					final JSNode r = (JSNode) _symbol_r.value;
 					final Symbol rb = _symbols[offset + 4];
 					
-			return new JSGetElementOperatorNode(l, lb, r, rb);
+			return new JSGetElementNode(l, lb, r, rb);
 			}
 			case 163: // CallExpression = CallExpression.l DOT.o IDENTIFIER.r
 			{
@@ -1891,7 +1891,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol o = _symbols[offset + 2];
 					final Symbol r = _symbols[offset + 3];
 					
-			return new JSGetPropertyOperatorNode(l, o, new JSIdentifierNode(r));
+			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
 			}
 			case 164: // CallExpression_NoLBF = MemberExpression_NoLBF.l Arguments.r
 			{
@@ -1920,7 +1920,7 @@ public class JSParser extends Parser implements IParser {
 					final JSNode r = (JSNode) _symbol_r.value;
 					final Symbol rb = _symbols[offset + 4];
 					
-			return new JSGetElementOperatorNode(l, lb, r, rb);
+			return new JSGetElementNode(l, lb, r, rb);
 			}
 			case 167: // CallExpression_NoLBF = CallExpression_NoLBF.l DOT.o IDENTIFIER.r
 			{
@@ -1929,7 +1929,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol o = _symbols[offset + 2];
 					final Symbol r = _symbols[offset + 3];
 					
-			return new JSGetPropertyOperatorNode(l, o, new JSIdentifierNode(r));
+			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
 			}
 			case 168: // Arguments = LPAREN.l RPAREN.r
 			{

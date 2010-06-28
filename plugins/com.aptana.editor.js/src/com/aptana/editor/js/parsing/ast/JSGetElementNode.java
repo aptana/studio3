@@ -5,7 +5,7 @@ import com.aptana.parsing.ast.IParseNode;
 
 import beaver.Symbol;
 
-public class JSGetElementOperatorNode extends JSBinaryOperatorNode
+public class JSGetElementNode extends JSBinaryOperatorNode
 {
 	private Symbol _rightBracket;
 	
@@ -15,7 +15,7 @@ public class JSGetElementOperatorNode extends JSBinaryOperatorNode
 	 * @param left
 	 * @param right
 	 */
-	public JSGetElementOperatorNode(JSNode left, Symbol leftBracket, JSNode right, Symbol rightBracket)
+	public JSGetElementNode(JSNode left, Symbol leftBracket, JSNode right, Symbol rightBracket)
 	{
 		super(left, leftBracket, right);
 		this._rightBracket = rightBracket;
