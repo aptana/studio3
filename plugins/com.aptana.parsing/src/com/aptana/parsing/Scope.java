@@ -254,6 +254,33 @@ public class Scope<T>
 	}
 	
 	/**
+	 * hasSymbol
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public boolean hasSymbol(String name)
+	{
+		boolean result = false;
+		Scope<T> current = this;
+		
+		while (current != null)
+		{
+			if (current.hasLocalSymbol(name))
+			{
+				result = true;
+				break;
+			}
+			else
+			{
+				current = current.getParentScope();
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * setParent
 	 * 
 	 * @param parent
