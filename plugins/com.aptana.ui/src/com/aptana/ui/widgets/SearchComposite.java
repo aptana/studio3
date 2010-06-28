@@ -106,7 +106,7 @@ public class SearchComposite extends Composite
 				{
 					return;
 				}
-				if (searchOnEnter && e.keyCode == SWT.CR)
+				if (searchOnEnter && e.character == '\r')
 				{
 					searchText();
 					e.doit = false;
