@@ -1,9 +1,5 @@
 package com.aptana.editor.js.parsing.ast;
 
-import java.util.List;
-
-import com.aptana.parsing.Scope;
-
 public class JSObjectNode extends JSNaryNode
 {
 	/**
@@ -35,14 +31,5 @@ public class JSObjectNode extends JSNaryNode
 	protected void appendOpenText(StringBuilder buffer)
 	{
 		buffer.append("{"); //$NON-NLS-1$
-	}
-	
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#addReturnTypes(java.util.List)
-	 */
-	@Override
-	protected void addTypes(List<String> types, Scope<JSNode> scope)
-	{
-		types.add("Object");
 	}
 }

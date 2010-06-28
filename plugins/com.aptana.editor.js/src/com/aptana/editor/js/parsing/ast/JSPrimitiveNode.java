@@ -39,7 +39,8 @@ public class JSPrimitiveNode extends JSNode
 		return fText.equals(((JSPrimitiveNode) obj).fText);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#getLocationType(int)
 	 */
 	@Override

@@ -25,7 +25,7 @@ public class JSDeclarationNode extends JSNode
 	{
 		return this.getChild(0);
 	}
-	
+
 	/**
 	 * getValue
 	 * 
@@ -35,7 +35,7 @@ public class JSDeclarationNode extends JSNode
 	{
 		return this.getChild(1);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()

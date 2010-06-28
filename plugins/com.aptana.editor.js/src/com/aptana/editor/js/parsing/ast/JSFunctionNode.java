@@ -9,7 +9,6 @@ import com.aptana.editor.js.sdoc.model.Tag;
 import com.aptana.editor.js.sdoc.model.TagType;
 import com.aptana.editor.js.sdoc.model.TagWithTypes;
 import com.aptana.editor.js.sdoc.model.Type;
-import com.aptana.parsing.Scope;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseNodeAttribute;
 import com.aptana.parsing.ast.ParseNode;
@@ -18,7 +17,7 @@ import com.aptana.parsing.ast.ParseNodeAttribute;
 public class JSFunctionNode extends JSNode
 {
 	private List<String> fReturnTypes;
-	
+
 	/**
 	 * JSFunctionNode
 	 * 
@@ -29,15 +28,6 @@ public class JSFunctionNode extends JSNode
 	public JSFunctionNode(int start, int end, JSNode... children)
 	{
 		super(JSNodeTypes.FUNCTION, start, end, children);
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#addReturnTypes(java.util.List, com.aptana.parsing.Scope)
-	 */
-	@Override
-	protected void addTypes(List<String> types, Scope<JSNode> scope)
-	{
-		types.add("Function");
 	}
 
 	/**
@@ -88,18 +78,19 @@ public class JSFunctionNode extends JSNode
 		return this.getChild(2);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#getLocationType(int)
 	 */
 	@Override
 	LocationType getLocationType(int offset)
 	{
 		LocationType result = LocationType.UNKNOWN;
-		
+
 		if (this.contains(offset))
 		{
 			IParseNode body = this.getBody();
-			
+
 			if (body.contains(offset))
 			{
 				result = ((JSNode) body).getLocationType(offset);
@@ -109,7 +100,7 @@ public class JSFunctionNode extends JSNode
 				result = LocationType.NONE;
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -132,9 +123,9 @@ public class JSFunctionNode extends JSNode
 	{
 		if (fReturnTypes == null)
 		{
-			fReturnTypes = new LinkedList<String>(); 
+			fReturnTypes = new LinkedList<String>();
 			DocumentationBlock docs = this.getDocumentation();
-			
+
 			if (docs != null && docs.hasTags())
 			{
 				for (Tag tag : docs.getTags())
@@ -142,7 +133,7 @@ public class JSFunctionNode extends JSNode
 					if (tag.getType() == TagType.RETURN)
 					{
 						TagWithTypes tagWithTypes = (TagWithTypes) tag;
-						
+
 						for (Type type : tagWithTypes.getTypes())
 						{
 							fReturnTypes.add(type.getName());
@@ -151,10 +142,10 @@ public class JSFunctionNode extends JSNode
 				}
 			}
 		}
-		
+
 		return fReturnTypes;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.ParseBaseNode#getText()

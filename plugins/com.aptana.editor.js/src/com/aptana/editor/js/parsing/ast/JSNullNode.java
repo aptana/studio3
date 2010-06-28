@@ -13,7 +13,7 @@ public class JSNullNode extends JSPrimitiveNode
 	{
 		this(identifier.getStart(), identifier.getEnd());
 	}
-	
+
 	/**
 	 * JSNullNode
 	 * 

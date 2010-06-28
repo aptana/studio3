@@ -36,14 +36,15 @@ public class JSArgumentsNode extends JSNaryNode
 		buffer.append("("); //$NON-NLS-1$
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#getLocationType(int)
 	 */
 	@Override
 	LocationType getLocationType(int offset)
 	{
 		LocationType result = LocationType.IN_GLOBAL;
-		
+
 		if (this.contains(offset) && this.hasChildren())
 		{
 			for (IParseNode child : this)
@@ -58,12 +59,12 @@ public class JSArgumentsNode extends JSNaryNode
 					{
 						result = LocationType.UNKNOWN;
 					}
-					
+
 					break;
 				}
 			}
 		}
-		
+
 		return result;
 	}
 }

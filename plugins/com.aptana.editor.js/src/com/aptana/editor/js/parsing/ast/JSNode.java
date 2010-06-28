@@ -1,16 +1,13 @@
 package com.aptana.editor.js.parsing.ast;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.aptana.editor.js.contentassist.LocationType;
 import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
-import com.aptana.parsing.Scope;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
@@ -24,7 +21,6 @@ public class JSNode extends ParseNode
 	private boolean fSemicolonIncluded;
 
 	private DocumentationBlock fDocumentation;
-	private List<String> fTypes;
 
 	/**
 	 * static initializer
@@ -78,17 +74,6 @@ public class JSNode extends ParseNode
 		this.end = end;
 		setChildren(children);
 	}
-	
-	/**
-	 * addReturnTypes
-	 * 
-	 * @param types
-	 * @param scope TODO
-	 */
-	protected void addTypes(List<String> types, Scope<JSNode> scope)
-	{
-		// do nothing, sub-classes should override
-	}
 
 	/**
 	 * appendSemicolon
@@ -115,7 +100,8 @@ public class JSNode extends ParseNode
 			return false;
 		}
 		JSNode other = (JSNode) obj;
-		return getNodeType() == other.getNodeType() && getSemicolonIncluded() == other.getSemicolonIncluded() && Arrays.equals(getChildren(), other.getChildren());
+		return getNodeType() == other.getNodeType() && getSemicolonIncluded() == other.getSemicolonIncluded()
+			&& Arrays.equals(getChildren(), other.getChildren());
 	}
 
 	/**
@@ -168,24 +154,6 @@ public class JSNode extends ParseNode
 	}
 
 	/**
-	 * getTypes
-	 * @param scope TODO
-	 * 
-	 * @return
-	 */
-	public List<String> getTypes(Scope<JSNode> scope)
-	{
-		if (fTypes == null)
-		{
-			fTypes = new ArrayList<String>();
-
-			addTypes(fTypes, scope);
-		}
-
-		return fTypes;
-	}
-
-	/**
 	 * getSemicolonIncluded
 	 * 
 	 * @return
@@ -204,7 +172,7 @@ public class JSNode extends ParseNode
 	LocationType getLocationType(int offset)
 	{
 		LocationType result = LocationType.UNKNOWN;
-		
+
 		if (this.contains(offset) && this.hasChildren())
 		{
 			for (IParseNode child : this)
@@ -215,15 +183,15 @@ public class JSNode extends ParseNode
 					{
 						result = ((JSNode) child).getLocationType(offset);
 					}
-					
+
 					break;
 				}
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.ParseBaseNode#getType()

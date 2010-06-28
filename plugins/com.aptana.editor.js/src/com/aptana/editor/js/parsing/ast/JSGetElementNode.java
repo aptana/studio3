@@ -8,7 +8,7 @@ import beaver.Symbol;
 public class JSGetElementNode extends JSBinaryOperatorNode
 {
 	private Symbol _rightBracket;
-	
+
 	/**
 	 * JSGetElementOperatorNode
 	 * 
@@ -48,7 +48,7 @@ public class JSGetElementNode extends JSBinaryOperatorNode
 			}
 
 			Symbol leftBracket = this.getOperator();
-			
+
 			if (result == LocationType.UNKNOWN)
 			{
 				if (leftBracket.getStart() == offset + 1 || leftBracket.getEnd() <= offset || this._rightBracket.getEnd() <= offset)
@@ -64,7 +64,7 @@ public class JSGetElementNode extends JSBinaryOperatorNode
 
 		return result;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSBinaryOperatorNode#toString()
@@ -73,12 +73,12 @@ public class JSGetElementNode extends JSBinaryOperatorNode
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
-		
+
 		text.append(this.getLeftHandSide());
 		text.append("[");
 		text.append(this.getRightHandSide());
 		text.append("]"); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		this.appendSemicolon(text);
 
 		return text.toString();

@@ -5,7 +5,6 @@ import beaver.Symbol;
 import com.aptana.editor.js.contentassist.LocationType;
 import com.aptana.parsing.ast.IParseNode;
 
-
 public class JSGetPropertyNode extends JSBinaryOperatorNode
 {
 	/**
@@ -32,7 +31,7 @@ public class JSGetPropertyNode extends JSBinaryOperatorNode
 		{
 			IParseNode lhs = this.getLeftHandSide();
 			Symbol operator = this.getOperator();
-			
+
 			if (lhs.contains(offset) || lhs.getEndingOffset() <= offset && offset < operator.getStart())
 			{
 				result = ((JSNode) lhs).getLocationType(offset);
@@ -45,7 +44,7 @@ public class JSGetPropertyNode extends JSBinaryOperatorNode
 
 		return result;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSBinaryOperatorNode#toString()
@@ -54,11 +53,11 @@ public class JSGetPropertyNode extends JSBinaryOperatorNode
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
-		
+
 		text.append(this.getLeftHandSide());
 		text.append("."); //$NON-NLS-1$
 		text.append(this.getRightHandSide());
-		
+
 		this.appendSemicolon(text);
 
 		return text.toString();

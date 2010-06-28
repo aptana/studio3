@@ -41,11 +41,11 @@ public class JSParseRootNode extends ParseRootNode
 	public LocationType getLocationType(int offset)
 	{
 		LocationType result = LocationType.IN_GLOBAL;
-		
+
 		// shift offset to the left by one to avoid special casing starting and
 		// ending conditions
 		offset -= 1;
-		
+
 		if (this.contains(offset) && this.hasChildren())
 		{
 			for (IParseNode child : this)
@@ -60,15 +60,15 @@ public class JSParseRootNode extends ParseRootNode
 					{
 						result = LocationType.UNKNOWN;
 					}
-					
+
 					break;
 				}
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getGlobalScope
 	 * 

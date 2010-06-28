@@ -45,7 +45,7 @@ public class JSStatementsNode extends JSNaryNode
 	{
 		return "";
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#getLocationType(int)
@@ -53,11 +53,11 @@ public class JSStatementsNode extends JSNaryNode
 	LocationType getLocationType(int offset)
 	{
 		LocationType result = LocationType.UNKNOWN;
-		
+
 		if (this.contains(offset))
 		{
 			result = LocationType.IN_GLOBAL;
-			
+
 			for (IParseNode child : this)
 			{
 				if (child.contains(offset))
@@ -66,12 +66,12 @@ public class JSStatementsNode extends JSNaryNode
 					{
 						result = ((JSNode) child).getLocationType(offset);
 					}
-					
+
 					break;
 				}
 			}
 		}
-		
+
 		return result;
 	}
 }

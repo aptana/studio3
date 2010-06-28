@@ -178,7 +178,7 @@ public class JSBinaryOperatorNode extends JSNode
 	{
 		return this._operator;
 	}
-	
+
 	/**
 	 * getRightHandSide
 	 * 

@@ -24,7 +24,7 @@ public class JSVarNode extends JSNaryNode
 	{
 		buffer.append("var "); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * getDeclarations
 	 * 
