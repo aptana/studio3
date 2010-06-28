@@ -405,7 +405,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 		// Custom code for our impl!
 		// TODO: grab value from preferences
 		final IPreferenceStore store = UIEplPlugin.getDefault().getPreferenceStore();
-		_insertOnTab = false; // store.getBoolean(IPreferenceConstants.INSERT_ON_TAB);
+		_insertOnTab = true; // store.getBoolean(IPreferenceConstants.INSERT_ON_TAB);
 
 		String agents = store.getString(IPreferenceConstants.USER_AGENT_PREFERENCE);
 		if (agents != null && !agents.equals("")) //$NON-NLS-1$
