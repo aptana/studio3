@@ -78,7 +78,7 @@ public class JSNode extends ParseNode
 		this.end = end;
 		setChildren(children);
 	}
-
+	
 	/**
 	 * addReturnTypes
 	 * 

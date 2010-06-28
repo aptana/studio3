@@ -56,6 +56,15 @@ public class ParseNode extends Node implements IParseNode
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.IParseNode#accept(com.aptana.parsing.ast.ITreeWalker)
+	 */
+	public void accept(ITreeWalker walker)
+	{
+		walker.visit(this);
+	}
+	
+	/*
+	 * (non-Javadoc)
 	 * @see beaver.spec.ast.Node#accept(beaver.spec.ast.TreeWalker)
 	 */
 	@Override
