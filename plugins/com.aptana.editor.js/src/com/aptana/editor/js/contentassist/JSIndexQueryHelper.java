@@ -75,7 +75,7 @@ public class JSIndexQueryHelper
 	 */
 	public TypeElement getCoreType(String typeName, EnumSet<FieldSelector> fields)
 	{
-		return this._reader.getType(this.getIndex(), typeName, fields);
+		return this._reader.getType(getIndex(), typeName, fields);
 	}
 
 	/**
@@ -129,7 +129,7 @@ public class JSIndexQueryHelper
 		
 		try
 		{
-			result = this._reader.getFunction(this.getIndex(), typeName, methodName, fields);
+			result = this._reader.getFunction(getIndex(), typeName, methodName, fields);
 		}
 		catch (IOException e)
 		{
@@ -152,7 +152,7 @@ public class JSIndexQueryHelper
 		
 		try
 		{
-			result = this._reader.getFunctions(this.getIndex(), typeName, fields);
+			result = this._reader.getFunctions(getIndex(), typeName, fields);
 		}
 		catch (IOException e)
 		{
@@ -175,7 +175,7 @@ public class JSIndexQueryHelper
 		
 		try
 		{
-			result = this._reader.getProperties(this.getIndex(), typeName, fields);
+			result = this._reader.getProperties(getIndex(), typeName, fields);
 		}
 		catch (IOException e)
 		{
@@ -199,7 +199,7 @@ public class JSIndexQueryHelper
 		
 		try
 		{
-			result = this._reader.getProperty(this.getIndex(), typeName, propertyName, fields);
+			result = this._reader.getProperty(getIndex(), typeName, propertyName, fields);
 		}
 		catch (IOException e)
 		{
