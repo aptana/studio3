@@ -6,9 +6,7 @@ import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.IDocument;
@@ -133,8 +131,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		// add globals from core
 		this.addCoreGlobals(proposals, offset);
-		this.addProjectGlobalFunctions(proposals, offset);
-		this.addProjectVariables(proposals, offset);
+		this.addProjectGlobals(proposals, offset);
 		this.addLocalGlobalFunctions(proposals, offset);
 	}
 
@@ -173,52 +170,21 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param proposals
 	 * @param offset
 	 */
-	private void addProjectGlobalFunctions(Set<ICompletionProposal> proposals, int offset)
+	private void addProjectGlobals(Set<ICompletionProposal> proposals, int offset)
 	{
 		Index index = this.getIndex();
-		Map<String,List<String>> projectGlobals = this._indexHelper.getProjectGlobals(index);
+		List<PropertyElement> projectGlobals = this._indexHelper.getProjectGlobals(index, EnumSet.of(FieldSelector.NAME, FieldSelector.DESCRIPTION));
 		
 		if (projectGlobals != null)
 		{
-			for (Entry<String,List<String>> entry : projectGlobals.entrySet())
+			for (PropertyElement property : projectGlobals)
 			{
-				List<String> files = entry.getValue();
-				boolean hasFiles = (files != null && files.size() > 0);
-				
-				String name = entry.getKey() + PARENS;
-				String description = (hasFiles) ? JSModelFormatter.getDescription(Messages.JSContentAssistProcessor_Referencing_Files, files) : null;
-				Image image = JS_FUNCTION;
+				boolean isFunction = (property instanceof FunctionElement);
+				String name = (isFunction) ? property.getName() + PARENS : property.getName();
+				String description = property.getDescription();
+				Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
 				Image[] userAgents = this.getAllUserAgentIcons();
-				String location = (hasFiles) ? files.get(0) : null;
-				
-				this.addProposal(proposals, name, image, description, userAgents, location, offset);
-			}
-		}
-	}
-	
-	/**
-	 * addProjectVariables
-	 * 
-	 * @param proposals
-	 * @param offset
-	 */
-	private void addProjectVariables(Set<ICompletionProposal> proposals, int offset)
-	{
-		Index index = this.getIndex();
-		Map<String,List<String>> projectVariables = this._indexHelper.getProjectVariables(index);
-		
-		if (projectVariables != null)
-		{
-			for (Entry<String,List<String>> entry : projectVariables.entrySet())
-			{
-				List<String> files = entry.getValue();
-				boolean hasFiles = (files != null && files.size() > 0);
-				
-				String name = entry.getKey();
-				String description = (hasFiles) ? JSModelFormatter.getDescription(Messages.JSContentAssistProcessor_Referencing_Files, files) : null;;
-				Image image = JS_PROPERTY;
-				Image[] userAgents = this.getAllUserAgentIcons();
-				String location = (hasFiles) ? files.get(0) : null;
+				String location = null;
 				
 				this.addProposal(proposals, name, image, description, userAgents, location, offset);
 			}
@@ -247,7 +213,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				
 				if (lhs instanceof JSNode)
 				{
-					JSTypeWalker typeWalker = new JSTypeWalker(localScope);
+					JSTypeWalker typeWalker = new JSTypeWalker(localScope, this.getIndex());
 					
 					typeWalker.visit((JSNode) lhs);
 					
@@ -388,28 +354,17 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected void addTypeProperties(Set<ICompletionProposal> proposals, String typeName, int offset)
 	{
-		// add properties
-		List<PropertyElement> properties = this._indexHelper.getCoreTypeProperties(typeName, PROPERTY_FIELDS);
+		// add properties and methods
+		List<PropertyElement> properties = this._indexHelper.getTypeMembers(this.getIndex(), typeName, PROPERTY_FIELDS);
 		
 		for (PropertyElement property : properties)
 		{
-			String name = property.getName();
+			boolean isFunction = (property instanceof FunctionElement);
+			String name = (isFunction) ? property.getName() + PARENS : property.getName();
 			String description = property.getDescription();
-			Image image = JS_PROPERTY;
-			Image[] userAgents = this.getAllUserAgentIcons();
-			
-			this.addProposal(proposals, name, image, description, userAgents, typeName, offset);
-		}
-		
-		// add methods
-		List<FunctionElement> methods = this._indexHelper.getCoreTypeMethods(typeName, PROPERTY_FIELDS);
-		
-		for (FunctionElement method : methods)
-		{
-			String name = method.getName() + PARENS;
-			String description = method.getDescription();
-			Image image = JS_FUNCTION;
-			Image[] userAgents = this.getAllUserAgentIcons();
+			Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
+			String[] userAgentNames = property.getUserAgentNames();
+			Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(userAgentNames);
 			
 			this.addProposal(proposals, name, image, description, userAgents, typeName, offset);
 		}
@@ -457,7 +412,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				
 			case IN_CONSTRUCTOR:
 				this.addCoreFunctions(result, offset);
-				this.addProjectGlobalFunctions(result, offset);
+				this.addProjectGlobals(result, offset);
 				this.addLocalGlobalFunctions(result, offset);
 				break;
 				
