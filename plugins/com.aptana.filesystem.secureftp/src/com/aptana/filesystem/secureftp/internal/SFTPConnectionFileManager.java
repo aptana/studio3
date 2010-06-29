@@ -78,6 +78,7 @@ import com.enterprisedt.net.ftp.ssh.SSHFTPException;
 import com.enterprisedt.net.ftp.ssh.SSHFTPInputStream;
 import com.enterprisedt.net.ftp.ssh.SSHFTPOutputStream;
 import com.enterprisedt.net.j2ssh.configuration.SshConnectionProperties;
+import com.enterprisedt.net.j2ssh.sftp.SshFxpStatus;
 import com.enterprisedt.net.j2ssh.transport.publickey.InvalidSshKeyException;
 import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 
@@ -313,7 +314,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 
 	private static void throwFileNotFound(FTPException e, IPath path) throws FileNotFoundException, FTPException {
 		int reply = e.getReplyCode();
-		if (reply == -1 || reply == 2) {
+		if (reply == -1 || reply == SshFxpStatus.STATUS_FX_NO_SUCH_FILE || reply == SshFxpStatus.STATUS_FX_NO_SUCH_PATH) {
 			throw new FileNotFoundException(path.toPortableString());
 		}
 		throw e;
@@ -422,7 +423,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			// forces one connection retry
 			if (connectionRetryCount < 1) {
 				connectionRetryCount++;
-				connect(monitor);
+				testOrConnect(monitor);
 				return fetchFile(path, options, monitor);
 			} else {
 				connectionRetryCount = 0;
@@ -465,7 +466,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			// forces one connection retry
 			if (connectionRetryCount < 1) {
 				connectionRetryCount++;
-				connect(monitor);
+				testOrConnect(monitor);
 				return fetchFiles(path, options, monitor);
 			} else {
 				connectionRetryCount = 0;
@@ -741,9 +742,13 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	}
 
 	private FTPFile[] listFiles(IPath dirPath, IProgressMonitor monitor) throws IOException, ParseException, FTPException {
-		changeCurrentDir(dirPath);
 		Policy.checkCanceled(monitor);
-		return ftpClient.dirDetails("."); //$NON-NLS-1$
+		try {
+			return ftpClient.dirDetails(dirPath.toPortableString());
+		} catch (FTPException e) {
+			throwFileNotFound(e, dirPath);
+			return null; // never runs
+		}
 	}
 
 	private void recursiveDeleteTree(IPath path, IProgressMonitor monitor, MultiStatus status) throws IOException, ParseException {
