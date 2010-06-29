@@ -54,5 +54,11 @@
             label="%appExplorerFont.label">
       </fontDefinition>
    </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="com.aptana.theme.internal.InvasiveThemeHijacker">
+      </startup>
+   </extension>
 
 </plugin>

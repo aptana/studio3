@@ -303,7 +303,7 @@ public class GitHistoryPage extends HistoryPage implements IAptanaHistory
 		// TODO Force a reload of the index and the refs and set input.
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter)
 	{
 		return null;

@@ -13,7 +13,7 @@ import java.util.Comparator;
 /**
  * Represents symbols of the grammar.
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings("rawtypes")
 public abstract class GrammarSymbol
 {
 	/** This symbol's ID */

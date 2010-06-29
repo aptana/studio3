@@ -1,5 +1,6 @@
 package com.aptana.editor.js.contentassist.index;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
@@ -112,7 +113,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 	{
 		if (Platform.inDevelopmentMode())
 		{
-			String location = file.toURI().getPath();
+			URI location = file.toURI();
 			Scope<JSNode> globals = ((JSParseRootNode) ast).getGlobalScope();
 
 			for (String symbol : globals.getLocalSymbolNames())
@@ -155,7 +156,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 	private void walkAST(Index index, IFileStore file, IParseNode ast)
 	{
 		JSASTQueryHelper astHelper = new JSASTQueryHelper();
-		String location = file.toURI().getPath();
+		URI location = file.toURI();
 
 		for (String name : astHelper.getChildFunctions(ast))
 		{

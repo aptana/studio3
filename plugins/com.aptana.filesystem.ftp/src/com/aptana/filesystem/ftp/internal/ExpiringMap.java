@@ -177,7 +177,7 @@ public class ExpiringMap<K, V> implements Map<K, V> {
 		/* (non-Javadoc)
 		 * @see java.lang.Object#equals(java.lang.Object)
 		 */
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings("rawtypes")
 		@Override
 		public boolean equals(Object obj) {
 			if (obj instanceof ExpiringMap.Item) {

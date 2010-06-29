@@ -23,7 +23,7 @@ import com.aptana.git.ui.internal.actions.DisconnectProviderOperation;
  */
 public class DisconnectAction extends AbstractOperationAction
 {
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected IWorkspaceRunnable createOperation(final IAction act, final List sel)
 	{
 		return sel.isEmpty() ? null : new DisconnectProviderOperation(sel);

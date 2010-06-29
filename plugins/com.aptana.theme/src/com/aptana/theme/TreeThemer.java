@@ -284,33 +284,40 @@ public class TreeThemer
 			@Override
 			public void handleEvent(Event event)
 			{
-				TreeItem[] items = tree.getSelection();
-				if (items == null || items.length == 0)
-					return;
-				Rectangle clientArea = tree.getClientArea();
-				int clientWidth = clientArea.x + clientArea.width;
-
-				GC gc = event.gc;
-				Color oldBackground = gc.getBackground();
-
-				gc.setBackground(getSelection());
-				for (TreeItem item : items)
+				try
 				{
-					if (item != null)
+					TreeItem[] items = tree.getSelection();
+					if (items == null || items.length == 0)
+						return;
+					Rectangle clientArea = tree.getClientArea();
+					int clientWidth = clientArea.x + clientArea.width;
+
+					GC gc = event.gc;
+					Color oldBackground = gc.getBackground();
+
+					gc.setBackground(getSelection());
+					for (TreeItem item : items)
 					{
-						Rectangle bounds = item.getBounds();
-						int x = bounds.x + bounds.width;
-						if (x < clientWidth)
+						if (item != null)
 						{
-							gc.fillRectangle(x, bounds.y, clientWidth - x, bounds.height);
+							Rectangle bounds = item.getBounds();
+							int x = bounds.x + bounds.width;
+							if (x < clientWidth)
+							{
+								gc.fillRectangle(x, bounds.y, clientWidth - x, bounds.height);
+							}
 						}
 					}
+					gc.setBackground(oldBackground);
+					// force foreground color for Windows. Otherwise on dark themes we get black fg
+					if (!isCocoa)
+					{
+						gc.setForeground(getForeground());
+					}
 				}
-				gc.setBackground(oldBackground);
-				// force foreground color for Windows. Otherwise on dark themes we get black fg
-				if (!isCocoa)
+				catch (Exception e)
 				{
-					gc.setForeground(getForeground());
+					// ignore
 				}
 			}
 		};

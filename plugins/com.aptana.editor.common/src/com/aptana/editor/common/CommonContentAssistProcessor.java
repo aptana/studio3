@@ -146,10 +146,10 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 			if (proposal instanceof CommonCompletionProposal)
 			{
 				((CommonCompletionProposal) proposal).setIsDefaultSelection(true);
-			}		
+			}
 			return proposals.toArray(new ICompletionProposal[proposals.size()]);
 		}
-		
+
 		// Combine the two, leave selection as is
 		ICompletionProposal[] combined = new ICompletionProposal[proposals.size() + others.length];
 		proposals.toArray(combined);
@@ -382,29 +382,24 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		}
 		IEditorInput editorInput = editor.getEditorInput();
 		Index result = null;
-
-		// FIXME: For non-workspace files, the editor input would be FileStoreEditorInput.
-		// Both it and FileEditorInput implements IURIEditorInput, so we could use that once
-		// we're adapting to handle indexing non-workspace files.
-
 		if (editorInput instanceof IFileEditorInput)
 		{
 			IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
 			IFile file = fileEditorInput.getFile();
 			IProject project = file.getProject();
-
-			result = IndexManager.getInstance().getIndex(project.getFullPath().toPortableString());
+			result = IndexManager.getInstance().getIndex(project.getLocationURI());
 		}
 		else if (editorInput instanceof IURIEditorInput)
 		{
-			IURIEditorInput fileEditorInput = (IURIEditorInput) editorInput;
-			URI uri = fileEditorInput.getURI();
-			result = IndexManager.getInstance().getIndex(uri.toString());
+			IURIEditorInput uriEditorInput = (IURIEditorInput) editorInput;
+			URI uri = uriEditorInput.getURI();
+			// FIXME This file may be a child, we need to check to see if there's an index with a parent URI.
+			result = IndexManager.getInstance().getIndex(uri);
 		}
 
 		return result;
 	}
-	
+
 	protected URI getURI()
 	{
 		IEditorInput editorInput = editor.getEditorInput();
@@ -425,7 +420,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	{
 		return editor.getFileService().getParseState();
 	}
-	
+
 	/**
 	 * getAllUserAgentIcons
 	 * 

@@ -20,8 +20,6 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.texteditor.HippieProposalProcessor;
 
-import com.aptana.core.ShellExecutable;
-import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
@@ -80,6 +78,10 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 			List<Index> indices = getIndices(fullPrefix);
 			for (Index index : indices)
 			{
+				if (index == null)
+				{
+					continue;
+				}
 				// If prefix contains "::" then we need to split it up!
 				List<QueryResult> partialResults;
 				if (fullPrefix.contains(NAMESPACE_DELIMITER))
@@ -93,10 +95,12 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 					partialResults = index.query(new String[] { IRubyIndexConstants.TYPE_DECL }, searchKey,
 							SearchPattern.REGEX_MATCH | SearchPattern.CASE_SENSITIVE);
 
-					// HACK This is pretty ugly. We search for a type matching the namespace in the prefix. 
-					// If we find a match, we then look for all methods and constants matching the prefix after the namespace.
+					// HACK This is pretty ugly. We search for a type matching the namespace in the prefix.
+					// If we find a match, we then look for all methods and constants matching the prefix after the
+					// namespace.
 					// We then limit those results to only the ones defined in the same file as the type we just found.
-					// This doesn't guarantee the method or constant actually lives on that type, but it does guarantee it's in the same file for now.
+					// This doesn't guarantee the method or constant actually lives on that type, but it does guarantee
+					// it's in the same file for now.
 					String enclosingTypeSearchKey = getShortPrefix(enclosing) + IRubyIndexConstants.SEPARATOR
 							+ getNamespace(enclosing) + IRubyIndexConstants.SEPARATOR;
 					List<QueryResult> results = index.query(new String[] { IRubyIndexConstants.TYPE_DECL },
@@ -253,7 +257,7 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 		// Now add the Std Lib indices
 		for (IPath loadpath : CoreStubber.getLoadpaths())
 		{
-			Index index = IndexManager.getInstance().getIndex(loadpath.toOSString());
+			Index index = IndexManager.getInstance().getIndex(loadpath.toFile().toURI());
 			if (index != null)
 			{
 				indices.add(index);
@@ -262,7 +266,7 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 		// Now gems
 		for (IPath gemsPath : CoreStubber.getGemPaths())
 		{
-			Index index = IndexManager.getInstance().getIndex(gemsPath.toOSString());
+			Index index = IndexManager.getInstance().getIndex(gemsPath.toFile().toURI());
 			if (index != null)
 			{
 				indices.add(index);
@@ -274,8 +278,7 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 
 	protected Index getRubyCoreIndex()
 	{
-		String rubyVersion = ProcessUtil.outputForCommand("ruby", null, ShellExecutable.getEnvironment(), "-v"); //$NON-NLS-1$ //$NON-NLS-2$
-		return IndexManager.getInstance().getIndex(rubyVersion);
+		return CoreStubber.getRubyCoreIndex();
 	}
 
 	protected CommonCompletionProposal createProposal(Index index, int offset, String prefix, QueryResult result)
@@ -340,7 +343,7 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 
 	protected String getLocations(Index index, QueryResult result)
 	{
-		String root = index.getRoot();
+		String root = index.getRoot().toString();
 		Set<String> set = new HashSet<String>();
 		for (String doc : result.getDocuments())
 		{
@@ -349,10 +352,9 @@ public class RubyContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				doc = "Ruby Core"; //$NON-NLS-1$
 			}
-
-			// Compare document path to index and cut off the index's common prefix?
-			if (doc.startsWith(root))
+			else if (doc.startsWith(root))
 			{
+				// Compare document path to index and cut off the index's common prefix?
 				doc = doc.substring(root.length());
 				if (doc.startsWith("/") || doc.startsWith("\\")) //$NON-NLS-1$ //$NON-NLS-2$
 				{

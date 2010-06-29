@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.expressions.IEvaluationContext;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IContributionItem;
@@ -127,8 +128,8 @@ public class EditorCommandsMenuContributor extends ContributionItem
 				IDocument document = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput());
 				int caretOffset = TextEditorUtils.getCaretOffset(textEditor);
 				// Get the scope at caret offset
-				scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(
-						document, caretOffset);
+				scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
+						.getScopeAtOffset(document, caretOffset);
 			}
 			catch (BadLocationException e)
 			{
@@ -233,8 +234,8 @@ public class EditorCommandsMenuContributor extends ContributionItem
 	 * @param textEditor
 	 * @param scope
 	 */
-	private static void buildMenu(Menu menu, MenuElement[] menusFromScope, final ITextEditor textEditor,
-			String scope, IContributionItem contributionItem)
+	private static void buildMenu(Menu menu, MenuElement[] menusFromScope, final ITextEditor textEditor, String scope,
+			IContributionItem contributionItem)
 	{
 		for (MenuElement menuForScope : menusFromScope)
 		{
@@ -284,7 +285,7 @@ public class EditorCommandsMenuContributor extends ContributionItem
 						if (triggers != null && triggers.length > 0)
 						{
 							// Use first trigger
-							displayName += " " + triggers[0] + TAB; //$NON-NLS-1$
+							displayName += " " + triggers[0] + getTabChar(); //$NON-NLS-1$
 						}
 					}
 				}
@@ -299,8 +300,8 @@ public class EditorCommandsMenuContributor extends ContributionItem
 							// There is no associated command. Show a message to the user.
 							MessageDialog.openError(menuItem.getParent().getShell(),
 									Messages.EditorCommandsMenuContributor_TITLE_CommandNotDefined, Messages.bind(
-											Messages.EditorCommandsMenuContributor_MSG_CommandNotDefined, menuItem
-													.getText()));
+											Messages.EditorCommandsMenuContributor_MSG_CommandNotDefined,
+											menuItem.getText()));
 						}
 						else
 						{
@@ -352,6 +353,15 @@ public class EditorCommandsMenuContributor extends ContributionItem
 				});
 			}
 		}
+	}
+
+	private static String getTabChar()
+	{
+		if (Platform.getOS().equals(Platform.OS_MACOSX))
+		{
+			return "\u21E5"; // char which looks like: ->| //$NON-NLS-1$ 
+		}
+		return TAB;
 	}
 
 	protected static void editBundle(final BundleElement owningBundle)

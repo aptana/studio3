@@ -1,4 +1,4 @@
-package com.aptana.editor.common;
+package com.aptana.theme.internal;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -34,6 +34,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IStartup;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPart;
@@ -56,13 +57,12 @@ import org.osgi.framework.Version;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.util.EclipseUtil;
-import com.aptana.editor.common.outline.CommonOutlinePage;
-import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.theme.ConsoleThemer;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.theme.TreeThemer;
+import com.aptana.theme.preferences.IPreferenceConstants;
 import com.aptana.ui.IAptanaHistory;
 
 /**
@@ -72,7 +72,7 @@ import com.aptana.ui.IAptanaHistory;
  * @author cwilliams
  */
 @SuppressWarnings({ "restriction", "deprecation" })
-class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceChangeListener
+public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceChangeListener, IStartup
 {
 
 	private Map<Tree, TreeThemer> themers = new HashMap<Tree, TreeThemer>();
@@ -144,7 +144,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 		catch (BackingStoreException e)
 		{
-			CommonEditorPlugin.logError(e);
+			ThemePlugin.logError(e);
 		}
 	}
 
@@ -225,7 +225,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		{
 			ContentOutline outline = (ContentOutline) view;
 			IPage page = outline.getCurrentPage();
-			if (page instanceof CommonOutlinePage)
+			if (page.getClass().getName().endsWith("CommonOutlinePage"))
 				return; // we already handle our own outlines
 			Control control = page.getControl();
 			if (control instanceof PageBook)
@@ -449,7 +449,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 		catch (BackingStoreException e)
 		{
-			CommonEditorPlugin.logError(e);
+			ThemePlugin.logError(e);
 		}
 	}
 
@@ -495,7 +495,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 		catch (BackingStoreException e)
 		{
-			CommonEditorPlugin.logError(e);
+			ThemePlugin.logError(e);
 		}
 	}
 
@@ -530,7 +530,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 		catch (BackingStoreException e)
 		{
-			CommonEditorPlugin.logError(e);
+			ThemePlugin.logError(e);
 		}
 	}
 
@@ -553,7 +553,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 		catch (BackingStoreException e)
 		{
-			CommonEditorPlugin.logError(e);
+			ThemePlugin.logError(e);
 		}
 	}
 
@@ -588,7 +588,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 		catch (BackingStoreException e)
 		{
-			CommonEditorPlugin.logError(e);
+			ThemePlugin.logError(e);
 		}
 	}
 
@@ -657,8 +657,15 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 
 	protected void overrideSelectionColor(AbstractTextEditor editor)
 	{
-		if (editor instanceof AbstractThemeableEditor) // we already handle our own editors
-			return;
+		try
+		{
+			if (Class.forName("com.aptana.editor.common.extensions.IThemeableEditor").isInstance(editor)) // we already handle our own editors //$NON-NLS-1$
+				return;
+		}
+		catch (ClassNotFoundException e1)
+		{
+			// ignore
+		}
 
 		ISourceViewer sourceViewer = null;
 		try
@@ -806,5 +813,11 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 				return;
 			}
 		}
+	}
+
+	@Override
+	public void earlyStartup()
+	{
+		schedule();
 	}
 }

@@ -103,6 +103,8 @@ public class Messages extends NLS
 	public static String SmartSyncDialog_RemoteTime;
 	public static String SmartSyncDialog_Retry;
 	public static String SmartSyncDialog_RunInBackground;
+
+	public static String SmartSyncDialog_searchText;
 	public static String SmartSyncDialog_ShowDates;
 	public static String SmartSyncDialog_ShowDiffs;
 	public static String SmartSyncDialog_Skipped;

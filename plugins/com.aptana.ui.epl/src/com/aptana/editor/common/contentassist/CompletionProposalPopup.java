@@ -78,6 +78,9 @@ import com.aptana.ui.epl.UIEplPlugin;
  */
 public class CompletionProposalPopup implements IContentAssistListener
 {
+	// use the hard-coded value for cocoa since the constant is not defined until Eclipse 3.5
+	private static final boolean isCocoa = Platform.getWS().equals("cocoa"); //$NON-NLS-1$
+	
 	/**
 	 * Set to <code>true</code> to use a Table with SWT.VIRTUAL.
 	 * XXX: This is a workaround for: https://bugs.eclipse.org/bugs/show_bug.cgi?id=90321
@@ -402,7 +405,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 		// Custom code for our impl!
 		// TODO: grab value from preferences
 		final IPreferenceStore store = UIEplPlugin.getDefault().getPreferenceStore();
-		_insertOnTab = false; // store.getBoolean(IPreferenceConstants.INSERT_ON_TAB);
+		_insertOnTab = true; // store.getBoolean(IPreferenceConstants.INSERT_ON_TAB);
 
 		String agents = store.getString(IPreferenceConstants.USER_AGENT_PREFERENCE);
 		if (agents != null && !agents.equals("")) //$NON-NLS-1$
@@ -512,6 +515,11 @@ public class CompletionProposalPopup implements IContentAssistListener
 
 					event.detail &= ~SWT.SELECTED;
 					event.detail &= ~SWT.BACKGROUND;
+					// force foreground color for Windows. Otherwise on dark themes we get black fg
+					if (!isCocoa)
+					{
+						gc.setForeground(getForegroundColor(fContentAssistSubjectControlAdapter.getControl()));
+					}
 				}
 			}
 		};

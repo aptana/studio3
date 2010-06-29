@@ -52,7 +52,7 @@ public class GitFileHistoryProviderTest extends TestCase
 			}
 
 			
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings("rawtypes")
 			public Object getAdapter(Class adapter)
 			{
 				return null;
@@ -104,8 +104,7 @@ public class GitFileHistoryProviderTest extends TestCase
 			{
 			}
 
-			
-			@SuppressWarnings("unused")
+
 			public void setDerived(boolean isDerived, IProgressMonitor monitor) throws CoreException
 			{
 			}
@@ -147,8 +146,7 @@ public class GitFileHistoryProviderTest extends TestCase
 			{
 			}
 
-			
-			@SuppressWarnings("unused")
+
 			public boolean isVirtual()
 			{
 				return false;
@@ -258,7 +256,7 @@ public class GitFileHistoryProviderTest extends TestCase
 			}
 
 			
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings("rawtypes")
 			public Map getSessionProperties() throws CoreException
 			{
 				return null;
@@ -301,14 +299,13 @@ public class GitFileHistoryProviderTest extends TestCase
 			}
 
 			
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings("rawtypes")
 			public Map getPersistentProperties() throws CoreException
 			{
 				return null;
 			}
 
-			
-			@SuppressWarnings("unused")
+
 			public IPathVariableManager getPathVariableManager()
 			{
 				return null;
