@@ -33,7 +33,6 @@ public class IndexContainerJob extends IndexRequestJob
 		super(name, containerURI);
 	}
 
-	@SuppressWarnings("null")
 	@Override
 	public IStatus run(IProgressMonitor monitor)
 	{

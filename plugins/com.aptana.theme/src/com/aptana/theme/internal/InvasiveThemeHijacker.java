@@ -1,5 +1,6 @@
 package com.aptana.theme.internal;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +28,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.team.ui.history.HistoryPage;
 import org.eclipse.team.ui.history.IHistoryView;
@@ -314,6 +317,40 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 				Method m = view.getClass().getMethod("getTreeViewer");
 				TreeViewer treeViewer = (TreeViewer) m.invoke(view);
 				hookTheme(treeViewer.getTree(), revertToDefaults);
+			}
+			catch (Exception e)
+			{
+				// ignore
+			}
+		}
+		else if (view.getClass().getName().endsWith("CallHierarchyViewPart"))
+		{
+			try
+			{
+				Field f = view.getClass().getDeclaredField("fPagebook");
+				f.setAccessible(true);
+				PageBook pageBook = (PageBook) f.get(view);
+
+				f = pageBook.getClass().getDeclaredField("currentPage");
+				f.setAccessible(true);
+				Control control = (Control) f.get(pageBook);
+				if (control instanceof Label)
+				{
+					hookTheme(control, revertToDefaults);
+					return;
+				}
+
+				Method m = view.getClass().getMethod("getViewer");
+				TreeViewer treeViewer = (TreeViewer) m.invoke(view);
+				hookTheme(treeViewer.getTree(), revertToDefaults);
+
+				m = view.getClass().getDeclaredMethod("getLocationViewer");
+				if (m != null)
+				{
+					m.setAccessible(true);
+					Viewer viewer = (Viewer) m.invoke(view);
+					hookTheme(viewer.getControl(), revertToDefaults);
+				}
 			}
 			catch (Exception e)
 			{
@@ -763,12 +800,24 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 	}
 
 	@Override
-	public void partActivated(IWorkbenchPart part)
+	public void partActivated(final IWorkbenchPart part)
 	{
 		if (part instanceof IViewPart)
 		{
 			hijackHistory((IViewPart) part);
 			hijackConsole((IViewPart) part);
+			if (part.getClass().getName().endsWith("CallHierarchyViewPart")) //$NON-NLS-1$
+			{
+				Display.getCurrent().asyncExec(new Runnable()
+				{
+
+					@Override
+					public void run()
+					{
+						hijackView((IViewPart) part, false);
+					}
+				});
+			}
 		}
 		if (!(part instanceof IEditorPart))
 			return;
