@@ -129,7 +129,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 		Assert.isTrue(ftpClient == null, Messages.FTPConnectionFileManager_already_initialized);
 		try {
 			this.pool = new FTPClientPool(this);
-			this.ftpClient = new ProFTPClient();
+			this.ftpClient = createFTPClient();
 			this.host = host;
 			this.port = port;
 			this.login = login;
@@ -143,6 +143,14 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 			FTPPlugin.log(new Status(IStatus.WARNING, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_initialization_failed, e));
 			ftpClient = null;
 		}
+	}
+
+	/**
+	 * Creates the internal FTP client. Can be overriden by subclasses.
+	 * @return
+	 */
+	protected FTPClient createFTPClient() {
+		return new ProFTPClient();
 	}
 
 	protected static void initFTPClient(FTPClient ftpClient, boolean passive, String encoding) throws IOException, FTPException {

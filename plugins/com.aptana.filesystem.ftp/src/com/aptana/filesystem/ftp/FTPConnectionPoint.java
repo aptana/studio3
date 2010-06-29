@@ -66,17 +66,17 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	private static final String ELEMENT_ENCODING = "encoding"; //$NON-NLS-1$
 	private static final String ELEMENT_TIMEZONE = "timezone"; //$NON-NLS-1$
 		
-	private String host;
-	private int port = IFTPConstants.FTP_PORT_DEFAULT;
-	private IPath path = Path.ROOT;
-	private String login = ""; //$NON-NLS-1$
-	private char[] password;
-	private boolean passiveMode = true;
-	private String transferType = IFTPConstants.TRANSFER_TYPE_BINARY;
-	private String encoding = IFTPConstants.ENCODING_DEFAULT;
-	private String timezone = null;
+	protected String host;
+	protected int port = IFTPConstants.FTP_PORT_DEFAULT;
+	protected IPath path = Path.ROOT;
+	protected String login = ""; //$NON-NLS-1$
+	protected char[] password;
+	protected boolean passiveMode = true;
+	protected String transferType = IFTPConstants.TRANSFER_TYPE_BINARY;
+	protected String encoding = IFTPConstants.ENCODING_DEFAULT;
+	protected String timezone = null;
 	
-	private IFTPConnectionFileManager connectionFileManager;
+	protected IFTPConnectionFileManager connectionFileManager;
 	
 	/**
 	 * Default constructor
@@ -356,11 +356,11 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 		return super.getAdapter(adapter);
 	}
 	
-	private synchronized void resetConnectionFileManager() {
+	protected synchronized void resetConnectionFileManager() {
 		connectionFileManager = null;
 	}
 	
-	private synchronized IConnectionFileManager getConnectionFileManager() {
+	protected synchronized IConnectionFileManager getConnectionFileManager() {
 		if (connectionFileManager == null) {
 			// find contributed first
 			connectionFileManager = (IFTPConnectionFileManager) super.getAdapter(IFTPConnectionFileManager.class);
