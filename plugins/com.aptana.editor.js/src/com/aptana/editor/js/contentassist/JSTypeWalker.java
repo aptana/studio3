@@ -1,12 +1,15 @@
 package com.aptana.editor.js.contentassist;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
 import com.aptana.editor.js.contentassist.model.FieldSelector;
+import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
+import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.parsing.ast.JSArrayNode;
 import com.aptana.editor.js.parsing.ast.JSConstructNode;
 import com.aptana.editor.js.parsing.ast.JSFalseNode;
@@ -96,6 +99,34 @@ public class JSTypeWalker extends JSTreeWalker
 	{
 		return this._types;
 	}
+	
+	/**
+	 * getTypes
+	 * 
+	 * @param node
+	 * @return
+	 */
+	public List<String> getTypes(JSNode node)
+	{
+		List<String> result;
+		
+		// create new nested walker
+		JSTypeWalker walker = new JSTypeWalker(this._scope, this._index);
+		
+		// collect types
+		walker.visit(node);
+		
+		// grab result
+		result = walker.getTypes();
+		
+		// be sure we return some type of list
+		if (result == null)
+		{
+			result = Collections.emptyList();
+		}
+		
+		return walker.getTypes();
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -161,23 +192,22 @@ public class JSTypeWalker extends JSTreeWalker
 		
 		if (lhs instanceof JSNode)
 		{
-			JSTypeWalker walker = new JSTypeWalker(this._scope, this._index);
+			IParseNode rhs = node.getRightHandSide();
+			String name = rhs.getText();
+			List<String> types = this.getTypes((JSNode) lhs);
 			
-			walker.visit((JSNode) lhs);
-			
-			List<String> types = walker.getTypes();
-			
-			if (types != null)
+			for (String type : types)
 			{
-				IParseNode rhs = node.getRightHandSide();
-				String name = rhs.getText();
+				// lookup up rhs name in type and add that value's type here
+				PropertyElement property = this._indexHelper.getCoreTypeMember(type, name, EnumSet.of(FieldSelector.TYPES));
 				
-				for (String type : types)
+				if (property != null)
 				{
-					// lookup up rhs name in type and add that value's type here
-					PropertyElement property = this._indexHelper.getCoreTypeProperty(type, name, EnumSet.of(FieldSelector.TYPES));
-					
-					if (property != null)
+					if (property instanceof FunctionElement)
+					{
+						this.addType("Function");
+					}
+					else
 					{
 						for (ReturnTypeElement typeElement : property.getTypes())
 						{
@@ -199,32 +229,25 @@ public class JSTypeWalker extends JSTreeWalker
 		String name = node.getText();
 		
 		// lookup in local scope
-		if (this._scope != null && this._scope.hasSymbol(name))
+//		if (this._scope != null && this._scope.hasSymbol(name))
+//		{
+//			List<JSNode> symbolNodes = this._scope.getSymbol(name);
+//	
+//			for (JSNode symbolNode : symbolNodes)
+//			{
+//				symbolNode.accept(this);
+//			}
+//		}
+		
+		PropertyElement property = this._indexHelper.getGlobal(this._index, name, EnumSet.of(FieldSelector.TYPES, FieldSelector.RETURN_TYPES));
+		
+		if (property != null)
 		{
-			List<JSNode> symbolNodes = this._scope.getSymbol(name);
-	
-			for (JSNode symbolNode : symbolNodes)
+			if (property instanceof FunctionElement)
 			{
-				symbolNode.accept(this);
+				this.addType("Function");
 			}
-		}
-		else
-		{
-			PropertyElement property = null;
-			
-			// lookup in project
-			if (this._index != null)
-			{
-				property = this._indexHelper.getProjectGlobal(this._index, name);
-			}
-
-			// lookup in core
-			if (property == null)
-			{
-				property = this._indexHelper.getCoreGlobal(name, EnumSet.of(FieldSelector.TYPES));
-			}
-				
-			if (property != null)
+			else
 			{
 				for (ReturnTypeElement typeElement : property.getTypes())
 				{
@@ -247,47 +270,53 @@ public class JSTypeWalker extends JSTreeWalker
 		{
 			String name = child.getText();
 			
-			// lookup in local scope
-			if (this._scope != null && this._scope.hasSymbol(name))
+			PropertyElement function = this._indexHelper.getGlobalFunction(this._index, name, EnumSet.of(FieldSelector.RETURN_TYPES));
+			
+			if (function != null)
 			{
-				List<JSNode> symbolNodes = this._scope.getSymbol(name);
-		
-				for (JSNode symbolNode : symbolNodes)
+				for (String type : function.getTypeNames())
 				{
-					if (symbolNode instanceof JSFunctionNode)
+					this.addType(type);
+				}
+			}
+			
+//			// lookup in local scope
+//			if (this._scope != null && this._scope.hasSymbol(name))
+//			{
+//				List<JSNode> symbolNodes = this._scope.getSymbol(name);
+//		
+//				for (JSNode symbolNode : symbolNodes)
+//				{
+//					if (symbolNode instanceof JSFunctionNode)
+//					{
+//						this.addTypes(((JSFunctionNode) symbolNode).getReturnTypes());
+//					}
+//				}
+//			}
+		}
+		else if (child instanceof JSNode)
+		{
+			JSReferenceWalker walker = new JSReferenceWalker(this._scope, this._index);
+			
+			((JSNode) child).accept(walker);
+			
+			String methodName = walker.getPropertyName();
+			
+			for (TypeElement type : walker.getTypes())
+			{
+				String typeName = type.getName();
+				
+				FunctionElement function = this._indexHelper.getTypeMethod(this._index, typeName, methodName, EnumSet.of(FieldSelector.RETURN_TYPES));
+				
+				if (function != null)
+				{
+					for (String returnType : function.getTypeNames())
 					{
-						this.addTypes(((JSFunctionNode) symbolNode).getReturnTypes());
+						this.addType(returnType);
 					}
 				}
 			}
 		}
-		else if (child instanceof JSNode)
-		{
-			JSTypeWalker walker = new JSTypeWalker(this._scope, this._index);
-			
-			((JSNode) child).accept(walker);
-			
-			List<String> types = walker.getTypes();
-			
-			if (types != null)
-			{
-				
-			}
-		}
-
-//		// TEMP: for debugging
-//		String name = child.getText();
-//		List<JSNode> symbolNodes = this._scope.getSymbol(name);
-//
-//		for (JSNode symbolNode : symbolNodes)
-//		{
-//			if (symbolNode instanceof JSFunctionNode)
-//			{
-//				List<String> returnTypes = ((JSFunctionNode) symbolNode).getReturnTypes();
-//
-//				this.addTypes(returnTypes);
-//			}
-//		}
 	}
 
 	/*
