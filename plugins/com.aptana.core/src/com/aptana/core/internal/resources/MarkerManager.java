@@ -312,15 +312,6 @@ public final class MarkerManager {
 	public void removeResourceChangeListener( IUniformResourceChangeListener listener ) {
 		listeners.remove(listener);
 	}
-	
-	/**
-	 * Notifies manager that external resource is changed.
-	 * @param resource - resource that is changed.
-	 */
-	public void externalResourceChanged(IUniformResource resource)
-	{
-	    handleResourceChanged();
-	}
 
 	private void handleResourceChanged() {
 		if ( currentDeltas == null ) {

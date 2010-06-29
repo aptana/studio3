@@ -39,7 +39,11 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Status;
 
+import com.aptana.core.CorePlugin;
 import com.aptana.core.internal.resources.MarkerInfo;
 import com.aptana.core.internal.resources.MarkerManager;
 import com.aptana.core.internal.resources.UniformResourceMarker;
@@ -77,21 +81,6 @@ public final class MarkerUtils {
 	}
 	
 	/**
-     * Creates marker for external resource.
-     *
-     * @param resource - resource.
-     * @param attributes - marker attributes.
-     * @param markerType - marker type.
-     * @return marker.
-     * @throws CoreException IF exception occurs.
-     */
-    public static IMarker createMarkerForExternalResource(IUniformResource resource, Map attributes, String markerType ) throws CoreException {
-        IMarker marker = createMarker(resource, attributes, markerType);
-        getMarkerManager().externalResourceChanged(resource);
-        return marker;
-    }
-	
-	/**
 	 * findMarkers
 	 *
 	 * @param resource
@@ -110,6 +99,37 @@ public final class MarkerUtils {
 			return NO_MARKERS;
 		}
 		return (IMarker[]) result.toArray(new IMarker[result.size()]);
+	}
+	
+	/**
+	 *  Delete all Markers with the given type.
+	 *
+	 * @param resource
+	 * @param type
+	 * @param includeSubtypes
+	 * @return IMarker[]
+	 * @throws CoreException with a multi-status problems in case some markers where not successfully deleted.
+	 */
+	public static void deleteMarkers(IUniformResource resource, String type, boolean includeSubtypes)
+			throws CoreException
+	{
+		IMarker[] toDelete = findMarkers(resource, type, includeSubtypes);
+		MultiStatus status = new MultiStatus(CorePlugin.PLUGIN_ID, 0, "Errors deleting markers", null); //$NON-NLS-1$
+		for (IMarker marker : toDelete)
+		{
+			try
+			{
+				marker.delete();
+			}
+			catch (CoreException e)
+			{
+				status.add(new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, e.getMessage(), e));
+			}
+		}
+		if (status.getChildren().length > 0)
+		{
+			throw new CoreException(status);
+		}
 	}
 
 	private static MarkerManager getMarkerManager() {

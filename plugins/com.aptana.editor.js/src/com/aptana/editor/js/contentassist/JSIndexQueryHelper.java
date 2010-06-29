@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.LinkedList;
+import java.net.URI;
 import java.util.List;
 
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
@@ -253,9 +254,9 @@ public class JSIndexQueryHelper
 	 * 
 	 * @return
 	 */
-	private Index getIndex()
+	public static Index getIndex()
 	{
-		return IndexManager.getInstance().getIndex(JSIndexConstants.METADATA);
+		return IndexManager.getInstance().getIndex(URI.create(JSIndexConstants.METADATA));
 	}
 
 	/**

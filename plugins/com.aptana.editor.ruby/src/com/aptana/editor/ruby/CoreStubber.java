@@ -2,19 +2,17 @@ package com.aptana.editor.ruby;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -23,17 +21,15 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.editor.ruby.index.RubyFileIndexingParticipant;
+import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
-import com.aptana.index.core.IndexActivator;
+import com.aptana.index.core.IndexContainerJob;
 import com.aptana.index.core.IndexManager;
 
 public class CoreStubber extends Job
@@ -49,7 +45,6 @@ public class CoreStubber extends Job
 	public CoreStubber()
 	{
 		super("Generating stubs for Ruby Core"); //$NON-NLS-1$
-		// setSystem(true);
 		setPriority(Job.LONG);
 	}
 
@@ -60,16 +55,11 @@ public class CoreStubber extends Job
 
 		try
 		{
-			String rubyVersion = ProcessUtil.outputForCommand(RUBY_EXE, null, ShellExecutable.getEnvironment(),
-					VERSION_SWITCH);
-			if (rubyVersion == null)
+			File outputDir = getRubyCoreStubDir();
+			if (outputDir == null)
 			{
 				return Status.CANCEL_STATUS;
 			}
-			// Store core stubs based on ruby version string...
-			IPath outputPath = Activator.getDefault().getStateLocation()
-					.append(Integer.toString(rubyVersion.hashCode())).append(RUBY_EXE);
-			File outputDir = outputPath.toFile();
 			File finishMarker = new File(outputDir, FINISH_MARKER_FILENAME);
 			// Skip if we already generated core stubs for this ruby...
 			if (!finishMarker.exists())
@@ -80,7 +70,7 @@ public class CoreStubber extends Job
 
 			final IProgressMonitor pm = Job.getJobManager().createProgressGroup();
 			final List<Job> jobs = new ArrayList<Job>();
-			jobs.add(indexCoreStubs(rubyVersion, outputDir));
+			jobs.add(indexCoreStubs(outputDir));
 			jobs.addAll(indexStdLib());
 			jobs.addAll(indexGems());
 			pm.beginTask("Indexing Ruby environment", jobs.size());
@@ -131,14 +121,36 @@ public class CoreStubber extends Job
 		return Status.OK_STATUS;
 	}
 
+	public static Index getRubyCoreIndex()
+	{
+		File stubDir = getRubyCoreStubDir();
+		if (stubDir == null)
+		{
+			return null;
+		}
+		return IndexManager.getInstance().getIndex(stubDir.toURI());
+	}
+
+	protected static File getRubyCoreStubDir()
+	{
+		String rubyVersion = ProcessUtil.outputForCommand(RUBY_EXE, null, ShellExecutable.getEnvironment(),
+				VERSION_SWITCH);
+		if (rubyVersion == null)
+		{
+			return null;
+		}
+		// Store core stubs based on ruby version string...
+		IPath outputPath = Activator.getDefault().getStateLocation().append(Integer.toString(rubyVersion.hashCode()))
+				.append(RUBY_EXE);
+		return outputPath.toFile();
+	}
+
 	protected List<Job> indexGems()
 	{
 		List<Job> jobs = new ArrayList<Job>();
 		for (IPath gemPath : getGemPaths())
 		{
-			Index index = IndexManager.getInstance().getIndex(gemPath.toOSString());
-			jobs.add(indexFiles(MessageFormat.format("Indexing {0}", gemPath.toOSString()), index,
-					addFiles(gemPath.toFile())));
+			jobs.add(indexFiles(gemPath.toFile().toURI()));
 		}
 		return jobs;
 	}
@@ -176,9 +188,7 @@ public class CoreStubber extends Job
 		List<Job> jobs = new ArrayList<Job>();
 		for (IPath loadpath : getLoadpaths())
 		{
-			Index index = IndexManager.getInstance().getIndex(loadpath.toOSString());
-			Job job = indexFiles(MessageFormat.format("Indexing {0}", loadpath.toOSString()), index,
-					addFiles(loadpath.toFile()));
+			Job job = indexFiles(loadpath.toFile().toURI());
 			if (job != null)
 			{
 				jobs.add(job);
@@ -210,10 +220,9 @@ public class CoreStubber extends Job
 		return paths;
 	}
 
-	protected Job indexCoreStubs(String rubyVersion, File outputDir)
+	protected Job indexCoreStubs(File outputDir)
 	{
-		Index coreIndex = IndexManager.getInstance().getIndex(rubyVersion);
-		return indexFiles("Indexing Ruby Core", coreIndex, addFiles(outputDir));
+		return indexFiles("Indexing Ruby Core", outputDir.toURI());
 	}
 
 	protected void generateCoreStubs(File outputDir, File finishMarker) throws IOException
@@ -236,184 +245,32 @@ public class CoreStubber extends Job
 		}
 	}
 
-	protected Job indexFiles(String message, Index index, Set<IFileStore> files)
+	protected Job indexFiles(String message, URI outputDir)
 	{
-		if (files == null || files.size() == 0)
-			return null;
-		return new IndexFileStoresJob(message, index, files);
+		return new IndexContainerJob(message, outputDir)
+		{
+			protected Map<IFileStoreIndexingParticipant, Set<IFileStore>> mapParticipantsToFiles(
+					Set<IFileStore> fileStores)
+			{
+				Map<IFileStoreIndexingParticipant, Set<IFileStore>> map = new HashMap<IFileStoreIndexingParticipant, Set<IFileStore>>();
+				map.put(new RubyFileIndexingParticipant(), fileStores);
+				return map;
+			}
+		};
 	}
 
-	private Set<IFileStore> addFiles(File file)
+	protected Job indexFiles(URI outputDir)
 	{
-		Set<IFileStore> files = new HashSet<IFileStore>();
-		if (file == null || !file.exists())
-			return files;
-		if (file.isDirectory())
+		return new IndexContainerJob(outputDir)
 		{
-			File[] fileList = file.listFiles();
-			if (fileList == null)
-				return files;
-
-			for (File child : fileList)
+			protected Map<IFileStoreIndexingParticipant, Set<IFileStore>> mapParticipantsToFiles(
+					Set<IFileStore> fileStores)
 			{
-				files.addAll(addFiles(child));
+				Map<IFileStoreIndexingParticipant, Set<IFileStore>> map = new HashMap<IFileStoreIndexingParticipant, Set<IFileStore>>();
+				map.put(new RubyFileIndexingParticipant(), fileStores);
+				return map;
 			}
-		}
-		else
-		{
-			try
-			{
-				IFileStore store = EFS.getStore(file.toURI());
-				if (store != null)
-				{
-					files.add(store);
-				}
-			}
-			catch (CoreException e)
-			{
-				Activator.log(e);
-			}
-		}
-		return files;
-	}
-
-	private static class IndexFileStoresJob extends Job
-	{
-
-		private final Set<IFileStore> files;
-		private ArrayList<String> fileURIs;
-		private Index index;
-
-		public IndexFileStoresJob(String message, Index index, Set<IFileStore> files)
-		{
-			super(message);
-			this.files = files;
-			this.index = index;
-		}
-
-		@Override
-		public boolean belongsTo(Object family)
-		{
-			return index.getIndexFile().equals(family);
-		}
-
-		@Override
-		public IStatus run(IProgressMonitor monitor)
-		{
-			SubMonitor sub = SubMonitor.convert(monitor, 2 * files.size());
-			if (sub.isCanceled())
-			{
-				return Status.CANCEL_STATUS;
-			}
-
-			try
-			{
-				// Should check timestamp of index versus timestamps of files, only index files that are out of date
-				// (for Ruby)!
-				filterFiles();
-
-				// First cleanup indices for files
-				for (IFileStore file : files)
-				{
-					if (sub.isCanceled())
-					{
-						return Status.CANCEL_STATUS;
-					}
-					// FIXME I'm storing everything in indices via URI's path, which is not right. We should store URI
-					// string
-					// and if it's a file for convenience then in proposals we can lop off the "file:" portion
-					index.remove(file.toURI().getPath());
-					sub.worked(1);
-				}
-
-				// Now parse and index the source
-				RubyFileIndexingParticipant fileIndexingParticipant = new RubyFileIndexingParticipant();
-				long timestamp = System.currentTimeMillis();
-				fileIndexingParticipant.index(files, index, sub.newChild(files.size()));
-
-				// Store some timestamp we can use to limit next pass indexing
-				IEclipsePreferences prefs = new InstanceScope().getNode(Activator.PLUGIN_ID);
-				prefs.putLong(getIndexTimestampKey(), timestamp);
-				prefs.flush();
-			}
-			catch (CoreException e)
-			{
-				return e.getStatus();
-			}
-			catch (BackingStoreException e)
-			{
-				Activator.log(e);
-			}
-			finally
-			{
-				try
-				{
-					index.save();
-				}
-				catch (IOException e)
-				{
-					IndexActivator.logError("An error occurred while saving an index", e);
-				}
-			}
-			return Status.OK_STATUS;
-		}
-
-		private String getIndexTimestampKey()
-		{
-			return "LastIndex_Ruby_" + index.getIndexFile().getAbsolutePath();
-		}
-
-		private void filterFiles()
-		{
-			try
-			{
-				Set<String> documents = index.queryDocumentNames(null);
-				for (String docName : documents)
-				{
-					if (!fileExists(docName))
-					{
-						index.remove(docName);
-					}
-				}
-			}
-			catch (IOException e)
-			{
-				IndexActivator.logError("Error occurred while removing stale index entries", e);
-			}
-
-			IEclipsePreferences prefs = new InstanceScope().getNode(Activator.PLUGIN_ID);
-			// We store something in the prefs for the last timestamp, since we can't go off timestamp of disk index.
-			// Now we filter files to only those that have been added/changed since last index.
-			long indexLastModified = prefs.getLong(getIndexTimestampKey(), -1);
-			Iterator<IFileStore> iter = files.iterator();
-			while (iter.hasNext())
-			{
-				IFileStore file = iter.next();
-				if (file.fetchInfo().getLastModified() < indexLastModified)
-				{
-					iter.remove();
-				}
-			}
-		}
-
-		private boolean fileExists(String lastString)
-		{
-			return Collections.binarySearch(getFileURIs(), lastString) >= 0;
-		}
-
-		protected List<? extends String> getFileURIs()
-		{
-			if (fileURIs == null)
-			{
-				fileURIs = new ArrayList<String>();
-				for (IFileStore store : files)
-				{
-					fileURIs.add(store.toURI().getPath());
-				}
-				Collections.sort(fileURIs);
-			}
-			return fileURIs;
-		}
+		};
 	}
 
 }
