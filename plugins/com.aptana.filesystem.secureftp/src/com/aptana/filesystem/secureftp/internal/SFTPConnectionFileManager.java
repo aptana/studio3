@@ -422,7 +422,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			// forces one connection retry
 			if (connectionRetryCount < 1) {
 				connectionRetryCount++;
-				connect(monitor);
+				testOrConnect(monitor);
 				return fetchFile(path, options, monitor);
 			} else {
 				connectionRetryCount = 0;
@@ -465,7 +465,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			// forces one connection retry
 			if (connectionRetryCount < 1) {
 				connectionRetryCount++;
-				connect(monitor);
+				testOrConnect(monitor);
 				return fetchFiles(path, options, monitor);
 			} else {
 				connectionRetryCount = 0;
