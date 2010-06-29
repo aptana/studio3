@@ -23,6 +23,79 @@ import com.aptana.index.core.SearchPattern;
 public class JSIndexReader
 {
 	/**
+	 * createFunctionFromKey
+	 * 
+	 * @param index
+	 * @param key
+	 * @param fields
+	 * @return
+	 * @throws IOException
+	 */
+	protected FunctionElement createFunctionFromKey(Index index, String key, EnumSet<FieldSelector> fields) throws IOException
+	{
+		String[] columns = key.split(JSIndexConstants.DELIMITER);
+		int column = 0;
+		
+		FunctionElement f = new FunctionElement();
+
+		if (fields.isEmpty() == false)
+		{
+			// name
+			if (fields.contains(FieldSelector.NAME))
+			{
+				f.setName(columns[column]);
+			}
+			column++;
+			
+			// owning type
+			column++;	// skip owning type
+			
+			// description
+			if (fields.contains(FieldSelector.DESCRIPTION))
+			{
+				f.setDescription(this.getDescription(index, columns[column]));
+			}
+			column++;
+			
+			// parameters
+			if (fields.contains(FieldSelector.PARAMETERS))
+			{
+				for (ParameterElement parameter : this.getParameters(index, columns[column]))
+				{
+					f.addParameter(parameter);
+				}
+			}
+			column++;
+	
+			// return types
+			if (fields.contains(FieldSelector.RETURN_TYPES))
+			{
+				for (ReturnTypeElement returnType : this.getReturnTypes(index, columns[column]))
+				{
+					f.addReturnType(returnType);
+				}
+			}
+			column++;
+			
+			if (column < columns.length)
+			{
+				// user agents
+				if (fields.contains(FieldSelector.USER_AGENTS))
+				{
+					for (String userAgentKey : columns[column].split(JSIndexConstants.SUB_DELIMITER))
+					{
+						// get user agent and add to element
+						f.addUserAgent(this.getUserAgent(index, userAgentKey));
+					}
+				}
+				column++;
+			}
+		}
+		
+		return f;
+	}
+	
+	/**
 	 * createProperty
 	 * 
 	 * @param index
@@ -38,44 +111,47 @@ public class JSIndexReader
 		
 		PropertyElement p = new PropertyElement();
 
-		// name
-		if (fields.contains(FieldSelector.NAME))
+		if (fields.isEmpty() == false)
 		{
-			p.setName(columns[column]);
-		}
-		column++;
-		
-		// owning type
-		column++;
-		
-		// description
-		if (fields.contains(FieldSelector.DESCRIPTION))
-		{
-			p.setDescription(this.getDescription(index, columns[column]));
-		}
-		column++;
-		
-		// types
-		if (fields.contains(FieldSelector.TYPES))
-		{
-			for (ReturnTypeElement returnType : this.getReturnTypes(index, columns[column]))
+			// name
+			if (fields.contains(FieldSelector.NAME))
 			{
-				p.addType(returnType);
+				p.setName(columns[column]);
 			}
-		}
-		column++;
-		
-		if (column < columns.length)
-		{
-			if (fields.contains(FieldSelector.USER_AGENTS))
+			column++;
+			
+			// owning type
+			column++;
+			
+			// description
+			if (fields.contains(FieldSelector.DESCRIPTION))
 			{
-				// user agents
-				for (String userAgentKey : columns[column].split(JSIndexConstants.SUB_DELIMITER))
+				p.setDescription(this.getDescription(index, columns[column]));
+			}
+			column++;
+			
+			// types
+			if (fields.contains(FieldSelector.TYPES))
+			{
+				for (ReturnTypeElement returnType : this.getReturnTypes(index, columns[column]))
 				{
-					// get user agent and add to element
-					p.addUserAgent(this.getUserAgent(index, userAgentKey));
+					p.addType(returnType);
 				}
-				column++;
+			}
+			column++;
+			
+			if (column < columns.length)
+			{
+				if (fields.contains(FieldSelector.USER_AGENTS))
+				{
+					// user agents
+					for (String userAgentKey : columns[column].split(JSIndexConstants.SUB_DELIMITER))
+					{
+						// get user agent and add to element
+						p.addUserAgent(this.getUserAgent(index, userAgentKey));
+					}
+					column++;
+				}
 			}
 		}
 		
@@ -112,6 +188,32 @@ public class JSIndexReader
 	}
 	
 	/**
+	 * getFunction
+	 * 
+	 * @param index
+	 * @param owningType
+	 * @param propertyName
+	 * @param fields
+	 * @return
+	 * @throws IOException
+	 */
+	public FunctionElement getFunction(Index index, String owningType, String propertyName, EnumSet<FieldSelector> fields) throws IOException
+	{
+		List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(owningType, propertyName), SearchPattern.REGEX_MATCH);
+		FunctionElement result = null;
+		
+		if (functions != null && functions.size() > 0)
+		{
+			QueryResult property = functions.get(0);
+			String key = property.getWord();
+			
+			result = this.createFunctionFromKey(index, key, fields);
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * getFunctions
 	 * 
 	 * @param index
@@ -130,61 +232,8 @@ public class JSIndexReader
 		{
 			for (QueryResult function : functions)
 			{
-				String[] columns = function.getWord().split(JSIndexConstants.DELIMITER);
-				int column = 0;
-				
-				FunctionElement f = new FunctionElement();
-
-				// name
-				if (fields.contains(FieldSelector.NAME))
-				{
-					f.setName(columns[column]);
-				}
-				column++;
-				
-				// owning type
-				column++;	// skip owning type
-				
-				// description
-				if (fields.contains(FieldSelector.DESCRIPTION))
-				{
-					f.setDescription(this.getDescription(index, columns[column]));
-				}
-				column++;
-				
-				// parameters
-				if (fields.contains(FieldSelector.PARAMETERS))
-				{
-					for (ParameterElement parameter : this.getParameters(index, columns[column]))
-					{
-						f.addParameter(parameter);
-					}
-				}
-				column++;
-
-				// return types
-				if (fields.contains(FieldSelector.RETURN_TYPES))
-				{
-					for (ReturnTypeElement returnType : this.getReturnTypes(index, columns[column]))
-					{
-						f.addReturnType(returnType);
-					}
-				}
-				column++;
-				
-				if (column < columns.length)
-				{
-					// user agents
-					if (fields.contains(FieldSelector.USER_AGENTS))
-					{
-						for (String userAgentKey : columns[column].split(JSIndexConstants.SUB_DELIMITER))
-						{
-							// get user agent and add to element
-							f.addUserAgent(this.getUserAgent(index, userAgentKey));
-						}
-					}
-					column++;
-				}
+				String key = function.getWord();
+				FunctionElement f = this.createFunctionFromKey(index, key, fields);
 				
 				result.add(f);
 			}
@@ -371,45 +420,48 @@ public class JSIndexReader
 				// create type
 				result = new TypeElement();
 				
-				// name
-				if (fields.contains(FieldSelector.NAME))
+				if (fields.isEmpty() == false)
 				{
-					result.setName(columns[column]);
-				}
-				column++;
-				
-				// super types
-				if (fields.contains(FieldSelector.PARENT_TYPES))
-				{
-					for (String parentType : columns[column].split(JSIndexConstants.SUB_DELIMITER))
+					// name
+					if (fields.contains(FieldSelector.NAME))
 					{
-						result.addParentType(parentType);
+						result.setName(columns[column]);
 					}
-				}
-				column++;
-				
-				// description
-				if (fields.contains(FieldSelector.DESCRIPTION))
-				{
-					result.setDescription(this.getDescription(index, columns[column]));
-				}
-				column++;
-
-				// properties
-				if (fields.contains(FieldSelector.PROPERTIES))
-				{
-					for (PropertyElement property : this.getProperties(index, retrievedName, EnumSet.allOf(FieldSelector.class)))
+					column++;
+					
+					// super types
+					if (fields.contains(FieldSelector.PARENT_TYPES))
 					{
-						result.addProperty(property);
+						for (String parentType : columns[column].split(JSIndexConstants.SUB_DELIMITER))
+						{
+							result.addParentType(parentType);
+						}
 					}
-				}
-
-				// functions
-				if (fields.contains(FieldSelector.FUNCTIONS))
-				{
-					for (FunctionElement function: this.getFunctions(index, retrievedName, EnumSet.allOf(FieldSelector.class)))
+					column++;
+					
+					// description
+					if (fields.contains(FieldSelector.DESCRIPTION))
 					{
-						result.addProperty(function);
+						result.setDescription(this.getDescription(index, columns[column]));
+					}
+					column++;
+	
+					// properties
+					if (fields.contains(FieldSelector.PROPERTIES))
+					{
+						for (PropertyElement property : this.getProperties(index, retrievedName, EnumSet.allOf(FieldSelector.class)))
+						{
+							result.addProperty(property);
+						}
+					}
+	
+					// functions
+					if (fields.contains(FieldSelector.FUNCTIONS))
+					{
+						for (FunctionElement function: this.getFunctions(index, retrievedName, EnumSet.allOf(FieldSelector.class)))
+						{
+							result.addProperty(function);
+						}
 					}
 				}
 			}
