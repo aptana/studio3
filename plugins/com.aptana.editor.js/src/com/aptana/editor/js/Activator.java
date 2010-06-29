@@ -15,11 +15,8 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
-import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
 import com.aptana.editor.js.contentassist.index.ScriptDocException;
-import com.aptana.index.core.Index;
-import com.aptana.index.core.IndexManager;
 
 /**
  * The activator class controls the plug-in life cycle
