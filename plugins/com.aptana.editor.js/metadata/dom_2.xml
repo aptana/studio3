@@ -1886,7 +1886,7 @@
                 <description>Specifies the color of active links.</description>
             </property>
             
-			<property name = "anchors" type = "Array" scope = "instance" access = "read" visibility = "basic">
+			<property name = "anchors" type = "Anchor[]" scope = "instance" access = "read" visibility = "basic">
                 <availability>
                     <specification name = "HTML DOM Level 1"/>
                 </availability>

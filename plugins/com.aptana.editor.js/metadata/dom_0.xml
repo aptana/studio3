@@ -418,7 +418,7 @@
 				<deprecated>Deprecated in "Document". Use "alinkColor" as part of "Body" instead.</deprecated>
 			</property>
 			
-			<property name="anchors" type="Array" scope="instance" access="read-write" visibility="basic">
+			<property name="anchors" type="Anchor[]" scope="instance" access="read-write" visibility="basic">
 				<description>Array of all of the anchors contained in the document.</description>
 				<browsers>
 					<browser platform="IE" version="3.0+"/>
