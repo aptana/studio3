@@ -2,6 +2,7 @@ package com.aptana.editor.js.index;
 
 import junit.framework.TestCase;
 
+import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
@@ -20,7 +21,7 @@ public class JSIndexTests extends TestCase
 	@Override
 	protected void tearDown() throws Exception
 	{
-		IndexManager.getInstance().removeIndex(JSIndexConstants.METADATA);
+		IndexManager.getInstance().removeIndex(getIndex().getRoot());
 		
 		super.tearDown();
 	}
@@ -32,9 +33,7 @@ public class JSIndexTests extends TestCase
 	 */
 	private Index getIndex()
 	{
-		IndexManager manager = IndexManager.getInstance();
-
-		return manager.getIndex(JSIndexConstants.METADATA);
+		return JSIndexQueryHelper.getIndex();
 	}
 	
 	/**

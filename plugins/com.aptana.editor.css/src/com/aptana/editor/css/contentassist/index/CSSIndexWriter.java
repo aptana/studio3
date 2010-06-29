@@ -1,6 +1,7 @@
 package com.aptana.editor.css.contentassist.index;
 
 import java.io.InputStream;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,9 +35,9 @@ public class CSSIndexWriter
 	 * 
 	 * @return
 	 */
-	protected String getDocumentPath()
+	protected URI getDocumentPath()
 	{
-		return CSSIndexConstants.METADATA;
+		return URI.create(CSSIndexConstants.METADATA);
 	}
 	
 	/**

@@ -138,7 +138,7 @@ public class CSSFileIndexingParticipant implements IFileStoreIndexingParticipant
 
 	private static void addIndex(Index index, IFileStore file, String category, String word)
 	{
-		index.addEntry(category, word, file.toURI().getPath());
+		index.addEntry(category, word, file.toURI());
 	}
 
 }
