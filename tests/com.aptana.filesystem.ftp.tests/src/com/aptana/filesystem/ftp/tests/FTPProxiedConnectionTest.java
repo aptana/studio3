@@ -35,15 +35,18 @@
 
 package com.aptana.filesystem.ftp.tests;
 
-import com.aptana.core.io.tests.CommonConnectionTest;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.OperationCanceledException;
+
+import com.aptana.core.io.tests.BaseConnectionTest;
 import com.aptana.filesystem.ftp.FTPConnectionPoint;
 
 /**
  * @author Max Stepanov
  */
-public class FTPProxiedConnectionTest extends CommonConnectionTest
-{
-
+public class FTPProxiedConnectionTest extends BaseConnectionTest
+{	
 	@Override
 	protected void setUp() throws Exception
 	{
@@ -56,33 +59,84 @@ public class FTPProxiedConnectionTest extends CommonConnectionTest
 		super.setUp();
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsSetModificationTime()
-	 */
-	@Override
-	protected boolean supportsSetModificationTime()
+	public final void testConnectDisconnectException() throws CoreException
 	{
-		return true;
+		cp.connect(null);
+		assertTrue(cp.isConnected());
+		assertTrue(cp.canDisconnect());
+		cp.disconnect(null);
+		assertFalse(cp.isConnected());
+		assertFalse(cp.canDisconnect());
+
+		FTPConnectionPoint ftpcp = (FTPConnectionPoint)cp;
+		
+		// set host to non-existent version
+		String oldHost = ftpcp.getHost();
+		try {
+			ftpcp.setHost(null);
+			ftpcp.connect(null);
+			fail();
+		}
+		catch(CoreException e) {
+			
+		}
+		cp.disconnect(null);
+		ftpcp.setHost(oldHost);
+		
+		// set port to non-existent version
+		int oldPort = ftpcp.getPort();
+		try {
+			ftpcp.setPort(0);
+			ftpcp.connect(null);
+			fail();
+		}
+		catch(CoreException e) {
+			
+		}
+		cp.disconnect(null);
+		ftpcp.setPort(oldPort);
+
+		// set username to null
+		String username = ftpcp.getLogin();
+		try {
+			ftpcp.setLogin(null);
+			ftpcp.connect(null);
+			fail();
+		}
+		catch(OperationCanceledException e) {
+			
+		}
+		cp.disconnect(null);
+		ftpcp.setLogin(username);
+
+		char[] pass = ftpcp.getPassword();
+
+		// null password means it will try and get a saved value
+		ftpcp.setPassword(null);
+		ftpcp.connect(null);
+		assertTrue(cp.isConnected());
+
+		try {
+			ftpcp.setPassword(new char[] {'a'});
+			ftpcp.connect(null);
+			fail();
+		}
+		catch(OperationCanceledException e) {
+			
+		}
+		cp.disconnect(null);
+		ftpcp.setPassword(pass);
+	
 	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangeGroup()
-	 */
-	@Override
-	protected boolean supportsChangeGroup()
+	
+	public final void testIncorrectPaths() throws CoreException
 	{
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangePermissions()
-	 */
-	@Override
-	protected boolean supportsChangePermissions()
-	{
-		return true;
+		FTPConnectionPoint ftpcp = (FTPConnectionPoint)cp;
+		IPath basePath = ftpcp.getPath();
+		
+		ftpcp.setPath(null);
+		ftpcp.connect(null);
+		
+		ftpcp.setPath(basePath);
 	}
 }

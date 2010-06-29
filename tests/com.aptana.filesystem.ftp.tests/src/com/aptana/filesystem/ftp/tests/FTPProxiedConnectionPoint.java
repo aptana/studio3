@@ -35,19 +35,12 @@
 
 package com.aptana.filesystem.ftp.tests;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
-import com.aptana.core.epl.IMemento;
 import com.aptana.filesystem.ftp.FTPConnectionPoint;
 import com.aptana.filesystem.ftp.IFTPConnectionFileManager;
-import com.aptana.filesystem.ftp.IFTPConstants;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.CoreIOPlugin;
-import com.aptana.ide.core.io.IConnectionPoint15Constants;
 import com.aptana.ide.core.io.vfs.IConnectionFileManager;
 
 /**
@@ -56,8 +49,53 @@ import com.aptana.ide.core.io.vfs.IConnectionFileManager;
  */
 public class FTPProxiedConnectionPoint extends FTPConnectionPoint {
 
+	public void setFTPException(boolean value) {
+		((FTPProxiedConnectionFileManager)connectionFileManager).setFTPException(value);
+	}
 	
-	//protected IFTPConnectionFileManager connectionFileManager;
+	public boolean getFTPException() {
+		return ((FTPProxiedConnectionFileManager)connectionFileManager).getFTPException();
+	}
+
+	public void setIOException(boolean value) {
+		((FTPProxiedConnectionFileManager)connectionFileManager).setIOException(value);
+	}
+
+	public boolean getIOException() {
+		return ((FTPProxiedConnectionFileManager)connectionFileManager).getIOException();
+	}
+
+	public void setOperationCanceledException(boolean value) {
+		((FTPProxiedConnectionFileManager)connectionFileManager).setOperationCanceledException(value);
+	}
+	
+	public boolean getOperationCanceledException() {
+		return ((FTPProxiedConnectionFileManager)connectionFileManager).getOperationCanceledException();
+	}
+
+	public void setCoreException(boolean value) {
+		((FTPProxiedConnectionFileManager)connectionFileManager).setCoreException(value);
+	}
+	
+	public boolean getCoreException() {
+		return ((FTPProxiedConnectionFileManager)connectionFileManager).getCoreException();
+	}
+
+	public void setUnknownHostException(boolean value) {
+		((FTPProxiedConnectionFileManager)connectionFileManager).setUnknownHostException(value);
+	}
+	
+	public boolean getUnknownHostException() {
+		return ((FTPProxiedConnectionFileManager)connectionFileManager).getUnknownHostException();
+	}
+
+	public void setFileNotFoundException(boolean value) {
+		((FTPProxiedConnectionFileManager)connectionFileManager).setFileNotFoundException(value);
+	}
+	
+	public boolean getFileNotFoundException() {
+		return ((FTPProxiedConnectionFileManager)connectionFileManager).getFileNotFoundException();
+	}
 	
 	/**
 	 * Default constructor
