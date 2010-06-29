@@ -91,6 +91,16 @@ public class JSTypeWalker extends JSTreeWalker
 	}
 
 	/**
+	 * createReferenceWalker
+	 * 
+	 * @return
+	 */
+	protected JSReferenceWalker createReferenceWalker()
+	{
+		return new JSReferenceWalker(this._scope, this._index);
+	}
+	
+	/**
 	 * getTypes
 	 * 
 	 * @return
@@ -296,7 +306,7 @@ public class JSTypeWalker extends JSTreeWalker
 		}
 		else if (child instanceof JSNode)
 		{
-			JSReferenceWalker walker = new JSReferenceWalker(this._scope, this._index);
+			JSReferenceWalker walker = this.createReferenceWalker();
 			
 			((JSNode) child).accept(walker);
 			
