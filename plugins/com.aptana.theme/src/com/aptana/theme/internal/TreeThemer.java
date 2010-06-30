@@ -78,10 +78,14 @@ class TreeThemer extends ControlThemer
 	{
 		ViewerColumn viewer = (ViewerColumn) getTree().getData("org.eclipse.jface.columnViewer"); //$NON-NLS-1$
 		if (viewer == null)
+		{
 			return;
+		}
 		ColumnViewer colViewer = viewer.getViewer();
 		if (colViewer == null)
+		{
 			return;
+		}
 		DelegatingCellLabelProvider existing = getExistingDelegator(viewer);
 		if (existing != null)
 		{
@@ -120,7 +124,9 @@ class TreeThemer extends ControlThemer
 			m.setAccessible(true);
 			CellLabelProvider provider = (CellLabelProvider) m.invoke(viewer);
 			if (provider instanceof DelegatingCellLabelProvider)
+			{
 				return (DelegatingCellLabelProvider) provider;
+			}
 		}
 		catch (Exception e)
 		{
@@ -200,7 +206,9 @@ class TreeThemer extends ControlThemer
 		public Image getImage(Object element)
 		{
 			if (cellProvider instanceof ILabelProvider)
+			{
 				return ((ILabelProvider) cellProvider).getImage(element);
+			}
 			return null;
 		}
 
@@ -208,7 +216,9 @@ class TreeThemer extends ControlThemer
 		public String getText(Object element)
 		{
 			if (cellProvider instanceof ILabelProvider)
+			{
 				return ((ILabelProvider) cellProvider).getText(element);
+			}
 			return null;
 		}
 	}
@@ -216,10 +226,14 @@ class TreeThemer extends ControlThemer
 	private void revertLabelProvider()
 	{
 		if (getTree() == null || getTree().isDisposed())
+		{
 			return;
+		}
 		ViewerColumn viewer = (ViewerColumn) getTree().getData("org.eclipse.jface.columnViewer"); //$NON-NLS-1$
 		if (viewer == null)
+		{
 			return;
+		}
 		DelegatingCellLabelProvider existing = getExistingDelegator(viewer);
 		if (existing != null)
 		{
@@ -227,7 +241,9 @@ class TreeThemer extends ControlThemer
 		}
 		ColumnViewer colViewer = viewer.getViewer();
 		if (colViewer == null)
+		{
 			return;
+		}
 		IBaseLabelProvider provider = colViewer.getLabelProvider();
 		if (provider instanceof ThemedDelegatingLabelProvider)
 		{
@@ -257,7 +273,9 @@ class TreeThemer extends ControlThemer
 				{
 					TreeItem[] items = tree.getSelection();
 					if (items == null || items.length == 0)
+					{
 						return;
+					}
 					Rectangle clientArea = tree.getClientArea();
 					int clientWidth = clientArea.x + clientArea.width;
 
@@ -297,7 +315,9 @@ class TreeThemer extends ControlThemer
 	{
 		// Hack to overdraw the native tree expand/collapse controls and use custom plus/minus box.
 		if (!isWindows)
+		{
 			return;
+		}
 		final Tree tree = getTree();
 		customDrawingListener = new Listener()
 		{
@@ -316,7 +336,9 @@ class TreeThemer extends ControlThemer
 					draw = tItem.getItemCount() > 0;
 				}
 				if (!draw)
+				{
 					return;
+				}
 				final int width = 10;
 				final int height = 12;
 				final int x = event.x - 16;
@@ -369,7 +391,9 @@ class TreeThemer extends ControlThemer
 					int width = event.gc.stringExtent(item.getText()).x + 24; // minimum width we need for text plus eye
 					event.height = height;
 					if (width > event.width)
+					{
 						event.width = width;
+					}
 				}
 			}
 		};
@@ -386,7 +410,9 @@ class TreeThemer extends ControlThemer
 			public void propertyChange(PropertyChangeEvent event)
 			{
 				if (!event.getProperty().equals(IThemeManager.VIEW_FONT_NAME))
+				{
 					return;
+				}
 				Display.getCurrent().asyncExec(new Runnable()
 				{
 
@@ -435,7 +461,9 @@ class TreeThemer extends ControlThemer
 										{
 											Method m = widget.getClass().getMethod("setRowHeight", Double.TYPE); //$NON-NLS-1$
 											if (m != null)
+											{
 												m.invoke(widget, height);
+											}
 										}
 									}
 								}
@@ -447,7 +475,9 @@ class TreeThemer extends ControlThemer
 						}
 						// OK, the app explorer font changed. We need to force a refresh of the app explorer tree
 						if (fTreeViewer != null)
+						{
 							fTreeViewer.refresh();
+						}
 						tree.redraw();
 						tree.update();
 					}
@@ -523,7 +553,9 @@ class TreeThemer extends ControlThemer
 	private void removeFontListener()
 	{
 		if (fontListener != null)
+		{
 			JFaceResources.getFontRegistry().removeListener(fontListener);
+		}
 		fontListener = null;
 	}
 
