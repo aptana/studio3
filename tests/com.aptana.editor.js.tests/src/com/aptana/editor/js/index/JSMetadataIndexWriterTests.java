@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.EnumSet;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -12,7 +13,6 @@ import org.eclipse.core.runtime.Path;
 
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
-import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
 import com.aptana.editor.js.contentassist.index.ScriptDocException;
@@ -137,12 +137,12 @@ public class JSMetadataIndexWriterTests extends TestCase
 		assertEquals(typeName, retrievedType.getName());
 		
 		// make sure we have one property
-		PropertyElement[] properties = retrievedType.getProperties();
+		List<PropertyElement> properties = retrievedType.getProperties();
 		assertNotNull(properties);
-		assertTrue(properties.length == 1);
+		assertTrue(properties.size() == 1);
 		
 		// make sure it is a function
-		PropertyElement property = properties[0];
+		PropertyElement property = properties.get(0);
 		assertTrue(property instanceof FunctionElement);
 		
 		// make sure it is the function we added earlier
@@ -168,12 +168,12 @@ public class JSMetadataIndexWriterTests extends TestCase
 		assertEquals(typeName, retrievedType.getName());
 		
 		// make sure we have one property
-		PropertyElement[] properties = retrievedType.getProperties();
+		List<PropertyElement> properties = retrievedType.getProperties();
 		assertNotNull(properties);
-		assertTrue(properties.length == 1);
+		assertTrue(properties.size() == 1);
 		
 		// make sure it is a function
-		PropertyElement property = properties[0];
+		PropertyElement property = properties.get(0);
 		assertEquals(propertyName, property.getName());
 	}
 	

@@ -1,11 +1,11 @@
 package com.aptana.editor.js.index;
 
 import java.util.EnumSet;
+import java.util.List;
 
 import junit.framework.TestCase;
 
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
-import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
 import com.aptana.editor.js.contentassist.model.FieldSelector;
@@ -108,12 +108,12 @@ public class JSIndexTests extends TestCase
 		assertEquals(typeName, retrievedType.getName());
 		
 		// make sure we have one property
-		PropertyElement[] properties = retrievedType.getProperties();
+		List<PropertyElement> properties = retrievedType.getProperties();
 		assertNotNull(properties);
-		assertTrue(properties.length == 1);
+		assertTrue(properties.size() == 1);
 		
 		// make sure it is a function
-		PropertyElement property = properties[0];
+		PropertyElement property = properties.get(0);
 		assertTrue(property instanceof FunctionElement);
 		
 		// make sure it is the function we added earlier
@@ -148,12 +148,12 @@ public class JSIndexTests extends TestCase
 		assertEquals(typeName, retrievedType.getName());
 		
 		// make sure we have one property
-		PropertyElement[] properties = retrievedType.getProperties();
+		List<PropertyElement> properties = retrievedType.getProperties();
 		assertNotNull(properties);
-		assertTrue(properties.length == 1);
+		assertTrue(properties.size() == 1);
 		
 		// make sure the name is correct
-		PropertyElement retrievedProperty = properties[0];
+		PropertyElement retrievedProperty = properties.get(0);
 		assertEquals(propertyName, retrievedProperty.getName());
 	}
 }

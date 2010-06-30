@@ -23,7 +23,10 @@ public class TypeElement extends BaseElement
 	 */
 	public void addParentType(String type)
 	{
-		this._parentTypes.add(type);
+		if (this._parentTypes.contains(type) == false)
+		{
+			this._parentTypes.add(type);
+		}
 	}
 
 	/**
@@ -33,9 +36,23 @@ public class TypeElement extends BaseElement
 	 */
 	public void addProperty(PropertyElement property)
 	{
-		this._properties.add(property);
-		
-		property.setOwningType(this);
+		if (property != null)
+		{
+			int index = this.getPropertyIndex(property.getName());
+			
+			if (index >= 0)
+			{
+				// replace existing property with the same name
+				this._properties.set(index, property);
+			}
+			else
+			{
+				// add to the end of our list
+				this._properties.add(property);
+			}
+			
+			property.setOwningType(this);
+		}
 	}
 
 	/**
@@ -43,11 +60,38 @@ public class TypeElement extends BaseElement
 	 * 
 	 * @return
 	 */
-	public PropertyElement[] getProperties()
+	public List<PropertyElement> getProperties()
 	{
-		return this._properties.toArray(new PropertyElement[this._properties.size()]);
+		return this._properties;
 	}
 
+	/**
+	 * getPropertyIndex
+	 * 
+	 * @param name
+	 * @return
+	 */
+	protected int getPropertyIndex(String name)
+	{
+		int result = -1;
+		
+		if (name != null && name.length() > 0)
+		{
+			for (int i = 0; i < this._properties.size(); i++)
+			{
+				PropertyElement property = this._properties.get(i);
+				
+				if (name.equals(property.getName()))
+				{
+					result = i;
+					break;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
 	/**
 	 * getParentTypes
 	 * 
@@ -59,7 +103,7 @@ public class TypeElement extends BaseElement
 		{
 			this._parentTypes = Collections.emptyList();
 		}
-		
+
 		return this._parentTypes;
 	}
 }
