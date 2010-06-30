@@ -59,9 +59,6 @@ public class JSBinaryOperatorNode extends JSNode
 			case INSTANCEOF:
 				type = JSNodeTypes.INSTANCE_OF;
 				break;
-			case LBRACKET:
-				type = JSNodeTypes.GET_ELEMENT;
-				break;
 			case LESS:
 				type = JSNodeTypes.LESS_THAN;
 				break;
@@ -112,6 +109,12 @@ public class JSBinaryOperatorNode extends JSNode
 				break;
 			case MINUS:
 				type = JSNodeTypes.SUBTRACT;
+				
+			// these two cases are here to simplify the constructors of the
+			// sub-classes associated with these node types
+			case LBRACKET:
+				type = JSNodeTypes.GET_ELEMENT;
+				break;
 			case DOT:
 				type = JSNodeTypes.GET_PROPERTY;
 				break;
