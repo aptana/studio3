@@ -2,7 +2,7 @@ package com.aptana.editor.js.parsing.ast;
 
 import com.aptana.parsing.ast.IParseNode;
 
-public class JSThrowNode extends JSUnaryOperatorNode
+public class JSThrowNode extends JSPreUnaryOperatorNode
 {
 	/**
 	 * JSThrowNode

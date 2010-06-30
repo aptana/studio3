@@ -221,7 +221,7 @@ public class JSTreeWalker
 	{
 	}
 
-	public void visit(JSUnaryOperatorNode node)
+	public void visit(JSPreUnaryOperatorNode node)
 	{
 	}
 

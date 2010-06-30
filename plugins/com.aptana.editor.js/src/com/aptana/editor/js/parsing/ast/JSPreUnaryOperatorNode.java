@@ -1,8 +1,9 @@
 package com.aptana.editor.js.parsing.ast;
 
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
+import com.aptana.parsing.ast.IParseNode;
 
-public class JSUnaryOperatorNode extends JSNode
+public class JSPreUnaryOperatorNode extends JSNode
 {
 	/**
 	 * JSUnaryOperatorNode
@@ -11,7 +12,7 @@ public class JSUnaryOperatorNode extends JSNode
 	 * @param end
 	 * @param expression
 	 */
-	protected JSUnaryOperatorNode(int start, int end, JSNode expression)
+	protected JSPreUnaryOperatorNode(int start, int end, JSNode expression)
 	{
 		setLocation(start, end);
 		setChildren(new JSNode[] { expression });
@@ -25,7 +26,7 @@ public class JSUnaryOperatorNode extends JSNode
 	 * @param end
 	 * @param expression
 	 */
-	public JSUnaryOperatorNode(short type, int start, int end, JSNode expression)
+	public JSPreUnaryOperatorNode(short type, int start, int end, JSNode expression)
 	{
 		this(start, end, expression);
 		setType(type);
@@ -39,7 +40,7 @@ public class JSUnaryOperatorNode extends JSNode
 	 * @param end
 	 * @param expression
 	 */
-	public JSUnaryOperatorNode(String operator, int start, int end, JSNode expression)
+	public JSPreUnaryOperatorNode(String operator, int start, int end, JSNode expression)
 	{
 		this(start, end, expression);
 
@@ -91,47 +92,73 @@ public class JSUnaryOperatorNode extends JSNode
 		setType(type);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
+	 */
+	@Override
+	public void accept(JSTreeWalker walker)
+	{
+		walker.visit(this);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
+	 */
 	@Override
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
-		JSNode expression = (JSNode) getChildren()[0];
+		IParseNode expression = this.getChild(0);
 		String operator = ""; //$NON-NLS-1$
-		int type = getNodeType();
+		
+		int type = this.getNodeType();
+		
 		switch (type)
 		{
 			case JSNodeTypes.DELETE:
 				operator = "delete "; //$NON-NLS-1$
 				break;
+				
 			case JSNodeTypes.LOGICAL_NOT:
 				operator = "!"; //$NON-NLS-1$
 				break;
+				
 			case JSNodeTypes.NEGATIVE:
 				operator = "-"; //$NON-NLS-1$
 				break;
+				
 			case JSNodeTypes.PRE_DECREMENT:
 				operator = "--"; //$NON-NLS-1$
 				break;
+				
 			case JSNodeTypes.POSITIVE:
 				operator = "+"; //$NON-NLS-1$
 				break;
+				
 			case JSNodeTypes.PRE_INCREMENT:
 				operator = "++"; //$NON-NLS-1$
 				break;
+				
 			case JSNodeTypes.BITWISE_NOT:
 				operator = "~"; //$NON-NLS-1$
 				break;
+				
 			case JSNodeTypes.TYPEOF:
 				operator = "typeof"; //$NON-NLS-1$
+				
 				if (expression.getNodeType() != JSNodeTypes.GROUP)
 				{
 					operator += " "; //$NON-NLS-1$
 				}
 				break;
+				
 			case JSNodeTypes.VOID:
 				operator = "void "; //$NON-NLS-1$
 				break;
 		}
+		
 		text.append(operator).append(expression);
 
 		this.appendSemicolon(text);

@@ -2,7 +2,7 @@ package com.aptana.editor.js.parsing.ast;
 
 import com.aptana.parsing.ast.IParseNode;
 
-public class JSGroupNode extends JSUnaryOperatorNode
+public class JSGroupNode extends JSPreUnaryOperatorNode
 {
 	/**
 	 * JSGroupNode

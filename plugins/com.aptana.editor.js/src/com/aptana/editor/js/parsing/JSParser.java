@@ -1981,7 +1981,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final JSNode e = (JSNode) _symbol_e.value;
 					
-			return new JSUnaryOperatorNode(o, _symbol_o.getStart(), e.getEnd(), e);
+			return new JSPreUnaryOperatorNode(o, _symbol_o.getStart(), e.getEnd(), e);
 			}
 			case 185: // UnaryExpression_NoLBF = UnaryOperator.o UnaryExpression.e
 			{
@@ -1990,7 +1990,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final JSNode e = (JSNode) _symbol_e.value;
 					
-			return new JSUnaryOperatorNode(o, _symbol_o.getStart(), e.getEnd(), e);
+			return new JSPreUnaryOperatorNode(o, _symbol_o.getStart(), e.getEnd(), e);
 			}
 			case 196: // MultiplicativeExpression = MultiplicativeExpression.l MultiplicativeOperator.o UnaryExpression.r
 			{

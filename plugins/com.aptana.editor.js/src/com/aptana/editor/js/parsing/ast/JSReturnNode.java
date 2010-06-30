@@ -2,7 +2,7 @@ package com.aptana.editor.js.parsing.ast;
 
 import com.aptana.parsing.ast.IParseNode;
 
-public class JSReturnNode extends JSUnaryOperatorNode
+public class JSReturnNode extends JSPreUnaryOperatorNode
 {
 	/**
 	 * JSReturnNode

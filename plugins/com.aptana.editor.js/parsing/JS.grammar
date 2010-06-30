@@ -1355,7 +1355,7 @@ UnaryExpression
 	=	PostfixExpression
 	|	UnaryOperator.o UnaryExpression.e
 		{:
-			return new JSUnaryOperatorNode(o, _symbol_o.getStart(), e.getEnd(), e);
+			return new JSPreUnaryOperatorNode(o, _symbol_o.getStart(), e.getEnd(), e);
 		:}
 	;
 
@@ -1363,7 +1363,7 @@ UnaryExpression_NoLBF
 	=	PostfixExpression_NoLBF
 	|	UnaryOperator.o UnaryExpression.e
 		{:
-			return new JSUnaryOperatorNode(o, _symbol_o.getStart(), e.getEnd(), e);
+			return new JSPreUnaryOperatorNode(o, _symbol_o.getStart(), e.getEnd(), e);
 		:}
 	;
 
