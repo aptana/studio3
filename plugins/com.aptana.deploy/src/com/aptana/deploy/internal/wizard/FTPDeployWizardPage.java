@@ -1,6 +1,9 @@
 package com.aptana.deploy.internal.wizard;
 
+import java.text.MessageFormat;
+
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.Dialog;
@@ -35,11 +38,15 @@ public class FTPDeployWizardPage extends WizardPage implements FTPConnectionProp
 		super(NAME, Messages.FTPDeployWizardPage_Title, Activator.getImageDescriptor(ICON_PATH));
 		// checks if the project already has an associated FTP connection and fills the info automatically if one exists
 		ISiteConnection[] sites = SiteConnectionUtils.findSitesForSource(project, true);
+		String lastConnection = Platform.getPreferencesService().getString(Activator.getPluginIdentifier(),
+				MessageFormat.format("{0}:{1}", IPreferenceConstants.PROJECT_DEPLOY_ENDPOINT, project.getName()), null, //$NON-NLS-1$
+				null);
 		IConnectionPoint connection;
 		for (ISiteConnection site : sites)
 		{
 			connection = site.getDestination();
-			if (connection instanceof IBaseRemoteConnectionPoint)
+			if (connection.getName().equals(lastConnection)
+					|| (lastConnection == null && connection instanceof IBaseRemoteConnectionPoint))
 			{
 				connectionPoint = (IBaseRemoteConnectionPoint) connection;
 				break;

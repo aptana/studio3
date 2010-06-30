@@ -241,6 +241,7 @@ public class DeployWizardPage extends WizardPage
 	private static String getDeployEndpoint(IProject project)
 	{
 		return Platform.getPreferencesService().getString(Activator.getPluginIdentifier(),
-				IPreferenceConstants.PROJECT_DEPLOY_ENDPOINT, null, null);
+				MessageFormat.format("{0}:{1}", IPreferenceConstants.PROJECT_DEPLOY_ENDPOINT, project.getName()), null, //$NON-NLS-1$
+				null);
 	}
 }

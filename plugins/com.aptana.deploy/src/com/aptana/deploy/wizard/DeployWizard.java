@@ -16,6 +16,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -121,7 +122,8 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 					type.toString());
 			if (deployEndpointName != null)
 			{
-				prefs.put(IPreferenceConstants.PROJECT_DEPLOY_ENDPOINT, deployEndpointName);
+				prefs.put(MessageFormat.format("{0}:{1}", IPreferenceConstants.PROJECT_DEPLOY_ENDPOINT, //$NON-NLS-1$
+						project.getName()), deployEndpointName);
 			}
 			try
 			{
@@ -167,7 +169,7 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 				SubMonitor sub = SubMonitor.convert(monitor, 100);
 				try
 				{
-					ISiteConnection site;
+					ISiteConnection site = null;
 					ISiteConnection[] sites = SiteConnectionUtils.findSites(project, connectionPoint);
 					if (sites.length == 0)
 					{
@@ -177,10 +179,30 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 								ConnectionPointUtils.createWorkspaceConnectionPoint(project), connectionPoint);
 						SyncingPlugin.getSiteConnectionManager().addSiteConnection(site);
 					}
-					else
+					else if (sites.length == 1)
 					{
 						// the site to link the project with the FTP connection already exists
 						site = sites[0];
+					}
+					else
+					{
+						// multiple FTP connections are associated with the project; finds the last one
+						// try for last remembered site first
+						String lastConnection = Platform.getPreferencesService().getString(
+								Activator.getPluginIdentifier(),
+								MessageFormat.format("{0}:{1}", IPreferenceConstants.PROJECT_DEPLOY_ENDPOINT, //$NON-NLS-1$
+										project.getName()), null, null);
+						if (lastConnection != null)
+						{
+							for (ISiteConnection siteConnection : sites)
+							{
+								if (siteConnection.getDestination().getName().equals(lastConnection))
+								{
+									site = siteConnection;
+									break;
+								}
+							}
+						}
 					}
 
 					if (isAutoSyncSelected)

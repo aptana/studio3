@@ -9,7 +9,6 @@ import java.util.Set;
 import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -494,9 +493,44 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		return null;
 	}
 
+	private static String getDeployEndpointFromPreference(IProject project)
+	{
+		return Platform.getPreferencesService().getString(Activator.getPluginIdentifier(),
+				MessageFormat.format("{0}:{1}", //$NON-NLS-1$
+						com.aptana.deploy.preferences.IPreferenceConstants.PROJECT_DEPLOY_ENDPOINT, project.getName()),
+				null, null);
+	}
+
 	private void addFTPMenuCommands(MenuManager menuManager)
 	{
 		menuManager.add(new Separator(GROUP_FTP));
+
+		ISiteConnection site = null;
+		if (siteConnections.length > 1)
+		{
+			// try for last remembered site first
+			String lastConnection = ResourceSynchronizationUtils.getLastSyncConnection(selectedProject);
+			if (lastConnection == null)
+			{
+				lastConnection = getDeployEndpointFromPreference(selectedProject);
+			}
+			if (lastConnection != null)
+			{
+				for (ISiteConnection siteConnection : siteConnections)
+				{
+					if (siteConnection.getDestination().getName().equals(lastConnection))
+					{
+						site = siteConnection;
+						break;
+					}
+				}
+			}
+		}
+		else if (siteConnections.length == 1)
+		{
+			site = siteConnections[0];
+		}
+		final ISiteConnection lastSiteConnection = site;
 		menuManager.appendToGroup(GROUP_FTP, new ContributionItem()
 		{
 
@@ -515,6 +549,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 								.getActivePart());
 						action.setSelection(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService()
 								.getSelection());
+						action.setSelectedSite(lastSiteConnection);
 						action.addJobListener(new JobChangeAdapter()
 						{
 
@@ -558,6 +593,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 								.getActivePart());
 						action.setSelection(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService()
 								.getSelection());
+						action.setSelectedSite(lastSiteConnection);
 						action.addJobListener(new JobChangeAdapter()
 						{
 
@@ -613,54 +649,32 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 					@Override
 					public void widgetSelected(SelectionEvent e)
 					{
-						IConnectionPoint siteConnection;
 						CommonFTPConnectionPointPropertyDialog settingsDialog = new CommonFTPConnectionPointPropertyDialog(
 								PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-						siteConnection = siteConnections[0].getDestination();
-
-						if (siteConnections.length != 1)
+						if (lastSiteConnection != null)
 						{
-							// try for last remembered site first
-							IContainer container = selectedProject;
-							String lastConnection = ResourceSynchronizationUtils.getLastSyncConnection(container);
-							Boolean remember = ResourceSynchronizationUtils.isRememberDecision(container);
-
-							if (!remember || (lastConnection == null))
-							{
-								ChooseSiteConnectionDialog dialog = new ChooseSiteConnectionDialog(PlatformUI
-										.getWorkbench().getActiveWorkbenchWindow().getShell(), siteConnections);
-								dialog.setShowRememberMyDecision(true);
-								dialog.open();
-
-								siteConnection = dialog.getSelectedSite().getDestination();
-								if (siteConnection != null)
-								{
-									Boolean rememberMyDecision = dialog.isRememberMyDecision();
-									if (rememberMyDecision)
-									{
-										ResourceSynchronizationUtils.setRememberDecision(container, rememberMyDecision);
-									}
-
-									// remembers the last sync connection
-									ResourceSynchronizationUtils.setLastSyncConnection(container,
-											siteConnection.getName());
-								}
-							}
-							else
-							{
-								String target;
-								for (ISiteConnection site : siteConnections)
-								{
-									target = site.getDestination().getName();
-									if (target.equals(lastConnection))
-									{
-										siteConnection = site.getDestination();
-										break;
-									}
-								}
-							}
+							settingsDialog.setPropertySource(lastSiteConnection.getDestination());
 						}
-						settingsDialog.setPropertySource(siteConnection);
+						else if (siteConnections.length > 1)
+						{
+							ChooseSiteConnectionDialog dialog = new ChooseSiteConnectionDialog(PlatformUI
+									.getWorkbench().getActiveWorkbenchWindow().getShell(), siteConnections);
+							dialog.setShowRememberMyDecision(true);
+							dialog.open();
+
+							IConnectionPoint destination = dialog.getSelectedSite().getDestination();
+							if (destination != null)
+							{
+								Boolean rememberMyDecision = dialog.isRememberMyDecision();
+								if (rememberMyDecision)
+								{
+									ResourceSynchronizationUtils.setRememberDecision(selectedProject, rememberMyDecision);
+								}
+								// remembers the last sync connection
+								ResourceSynchronizationUtils.setLastSyncConnection(selectedProject, destination.getName());
+							}
+							settingsDialog.setPropertySource(destination);
+						}
 						settingsDialog.open();
 					}
 				});
