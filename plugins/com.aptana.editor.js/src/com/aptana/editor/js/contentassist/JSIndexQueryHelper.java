@@ -63,7 +63,7 @@ public class JSIndexQueryHelper
 	 */
 	public List<PropertyElement> getCoreGlobals(EnumSet<FieldSelector> fields)
 	{
-		return this.getCoreTypeProperties(WINDOW_TYPE, fields);
+		return this.getCoreTypeMembers(WINDOW_TYPE, fields);
 	}
 
 	/**
