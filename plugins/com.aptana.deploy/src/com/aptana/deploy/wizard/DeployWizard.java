@@ -42,10 +42,10 @@ import com.aptana.core.util.IOUtil;
 import com.aptana.deploy.Activator;
 import com.aptana.deploy.internal.wizard.CapifyProjectPage;
 import com.aptana.deploy.internal.wizard.DeployWizardPage;
+import com.aptana.deploy.internal.wizard.FTPDeployComposite.Direction;
 import com.aptana.deploy.internal.wizard.FTPDeployWizardPage;
 import com.aptana.deploy.internal.wizard.HerokuDeployWizardPage;
 import com.aptana.deploy.internal.wizard.HerokuSignupPage;
-import com.aptana.deploy.internal.wizard.FTPDeployComposite.Direction;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
@@ -283,6 +283,10 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 			private CommandElement getCommand(String bundleName, String commandName)
 			{
 				BundleEntry entry = BundleManager.getInstance().getBundleEntry(bundleName);
+				if (entry == null)
+				{
+					return null;
+				}
 				for (BundleElement bundle : entry.getContributingBundles())
 				{
 					CommandElement command = bundle.getCommandByName(commandName);
