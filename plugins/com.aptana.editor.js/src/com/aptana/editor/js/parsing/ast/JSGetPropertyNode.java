@@ -16,6 +16,8 @@ public class JSGetPropertyNode extends JSBinaryOperatorNode
 	public JSGetPropertyNode(JSNode left, Symbol operator, JSNode right)
 	{
 		super(left, operator, right);
+		
+		this.setType(JSNodeTypes.GET_PROPERTY);
 	}
 
 	/*
