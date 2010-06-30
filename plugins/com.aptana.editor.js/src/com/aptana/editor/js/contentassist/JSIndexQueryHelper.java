@@ -294,7 +294,7 @@ public class JSIndexQueryHelper
 	 */
 	public List<PropertyElement> getProjectGlobals(Index index, EnumSet<FieldSelector> fields)
 	{
-		return this.getProjectTypeProperties(index, WINDOW_TYPE, fields);
+		return this.getProjectTypeMembers(index, WINDOW_TYPE, fields);
 	}
 
 	/**
