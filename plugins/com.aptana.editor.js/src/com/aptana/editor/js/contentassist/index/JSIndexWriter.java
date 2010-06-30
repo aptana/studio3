@@ -85,10 +85,10 @@ public class JSIndexWriter
 	 * writeFunction
 	 * 
 	 * @param index
-	 * @param type
 	 * @param function
+	 * @param location
 	 */
-	protected void writeFunction(Index index, FunctionElement function)
+	protected void writeFunction(Index index, FunctionElement function, URI location)
 	{
 		String parametersKey = this.writeParameters(index, function.getParameters());
 		String returnTypesKey = this.writeReturnTypes(index, function.getReturnTypes());
@@ -106,7 +106,7 @@ public class JSIndexWriter
 			StringUtil.join(JSIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, function.getUserAgents()))
 		);
 
-		index.addEntry(JSIndexConstants.FUNCTION, value, this.getDocumentPath());
+		index.addEntry(JSIndexConstants.FUNCTION, value, location);
 	}
 
 	/**
@@ -144,10 +144,10 @@ public class JSIndexWriter
 	 * writeProperty
 	 * 
 	 * @param index
-	 * @param type
 	 * @param property
+	 * @param location
 	 */
-	protected void writeProperty(Index index, PropertyElement property)
+	protected void writeProperty(Index index, PropertyElement property, URI location)
 	{
 		String propertyTypesKey = this.writeReturnTypes(index, property.getTypes());
 		String descriptionKey = this.writeDescription(index, property.getDescription());
@@ -162,7 +162,7 @@ public class JSIndexWriter
 			StringUtil.join(JSIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, property.getUserAgents()))
 		);
 
-		index.addEntry(JSIndexConstants.PROPERTY, value, this.getDocumentPath());
+		index.addEntry(JSIndexConstants.PROPERTY, value, location);
 	}
 
 	/**
@@ -254,11 +254,11 @@ public class JSIndexWriter
 		{
 			if (property instanceof FunctionElement)
 			{
-				this.writeFunction(index, (FunctionElement) property);
+				this.writeFunction(index, (FunctionElement) property, location);
 			}
 			else
 			{
-				this.writeProperty(index, property);
+				this.writeProperty(index, property, location);
 			}
 		}
 	}
