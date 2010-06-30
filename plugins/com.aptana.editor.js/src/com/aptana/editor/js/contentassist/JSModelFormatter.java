@@ -10,6 +10,9 @@ import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 
 public class JSModelFormatter
 {
+	private static final String GENERIC_CLASS_CLOSE = ">";
+	private static final String GENERIC_CLASS_OPEN = "Class<";
+
 	private JSModelFormatter()
 	{
 	}
@@ -146,7 +149,14 @@ public class JSModelFormatter
 					first = false;
 				}
 				
-				buffer.append(returnType.getType());
+				String type = returnType.getType();
+				
+				if (type.startsWith(GENERIC_CLASS_OPEN) && type.endsWith(GENERIC_CLASS_CLOSE))
+				{
+					type = type.substring(GENERIC_CLASS_OPEN.length(), type.length() - 1);
+				}
+				
+				buffer.append(type);
 			}
 		}
 		else
