@@ -327,7 +327,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 	}
 
 	private void hookToThemes()
-	{		
+	{
 		getIControlThemerFactory().apply(getTreeViewer());
 	}
 
