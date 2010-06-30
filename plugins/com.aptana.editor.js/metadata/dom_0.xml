@@ -5677,6 +5677,7 @@
 					<browser platform="IE" version="5.0+"/>
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="7.0+"/>
+					<browser platform="Opera" version="7.0+" />
 					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.2+" />
 				</browsers>
@@ -5685,13 +5686,118 @@
 				</availability>
 			</property>
 			
-			<property name="Array" type="Class&lt;Array&gt;" access="read-only" visibility="basic"/>
-			<property name="Boolean" type="Class&lt;Boolean&gt;" access="read-only" visibility="basic"/>
-			<property name="Function" type="Class&lt;Function&gt;" access="read-only" visibility="basic"/>
-			<property name="Number" type="Class&lt;Number&gt;" access="read-only" visibility="basic"/>
-			<property name="Object" type="Class&lt;Object&gt;" access="read-only" visibility="basic"/>
-			<property name="RegExp" type="Class&lt;RegExp&gt;" access="read-only" visibility="basic"/>
-			<property name="String" type="Class&lt;String&gt;" access="read-only" visibility="basic"/>
+			<property name="Array" type="Class&lt;Array&gt;" access="read-only" visibility="basic">
+				<availability>
+					<specification name="JavaScript" version="1.1"/>
+				</availability>
+				<description>A function responsible for creating new instances of Array objects</description>
+				<browsers>
+					<browser platform="IE" version="5.0+"/>
+					<browser platform="Mozilla" version="1.0+"/>
+					<browser platform="Netscape" version="7.0+"/>
+					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
+					<browser platform="Safari" version="1.2+" />
+				</browsers>
+			</property>
+			<property name="Boolean" type="Class&lt;Boolean&gt;" access="read-only" visibility="basic">
+				<availability>
+					<specification name="JavaScript" version="1.1"/>
+				</availability>
+				<description>A function responsible for creating new instances of Boolean objects</description>
+				<browsers>
+					<browser platform="IE" version="5.0+"/>
+					<browser platform="Mozilla" version="1.0+"/>
+					<browser platform="Netscape" version="7.0+"/>
+					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
+					<browser platform="Safari" version="1.2+" />
+				</browsers>
+			</property>
+			<property name="Date" type="Class&lt;Date&gt;" access="read-only" visibility="basic">
+				<availability>
+					<specification name="JavaScript" version="1.1"/>
+				</availability>
+				<description>A function responsible for creating new instances of Date objects</description>
+				<browsers>
+					<browser platform="IE" version="5.0+"/>
+					<browser platform="Mozilla" version="1.0+"/>
+					<browser platform="Netscape" version="7.0+"/>
+					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
+					<browser platform="Safari" version="1.2+" />
+				</browsers>
+			</property>
+			<property name="Function" type="Class&lt;Function&gt;" access="read-only" visibility="basic">
+				<availability>
+					<specification name="JavaScript" version="1.0"/>
+				</availability>
+				<description>A function responsible for creating new instances of Function objects</description>
+				<browsers>
+					<browser platform="IE" version="5.0+"/>
+					<browser platform="Mozilla" version="1.0+"/>
+					<browser platform="Netscape" version="7.0+"/>
+					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
+					<browser platform="Safari" version="1.2+" />
+				</browsers>
+			</property>
+			<property name="Number" type="Class&lt;Number&gt;" access="read-only" visibility="basic">
+				<availability>
+					<specification name="JavaScript" version="1.1"/>
+				</availability>
+				<description>A function responsible for creating new instances of Number objects</description>
+				<browsers>
+					<browser platform="IE" version="5.0+"/>
+					<browser platform="Mozilla" version="1.0+"/>
+					<browser platform="Netscape" version="7.0+"/>
+					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
+					<browser platform="Safari" version="1.2+" />
+				</browsers>
+			</property>
+			<property name="Object" type="Class&lt;Object&gt;" access="read-only" visibility="basic">
+				<availability>
+					<specification name="JavaScript" version="1.0"/>
+				</availability>
+				<description>A function responsible for creating new instances of Object objects</description>
+				<browsers>
+					<browser platform="IE" version="5.0+"/>
+					<browser platform="Mozilla" version="1.0+"/>
+					<browser platform="Netscape" version="7.0+"/>
+					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
+					<browser platform="Safari" version="1.2+" />
+				</browsers>
+			</property>
+			<property name="RegExp" type="Class&lt;RegExp&gt;" access="read-only" visibility="basic">
+				<availability>
+					<specification name="JavaScript" version="1.2"/>
+				</availability>
+				<description>A function responsible for creating new instances of RegExp objects</description>
+				<browsers>
+					<browser platform="IE" version="5.0+"/>
+					<browser platform="Mozilla" version="1.0+"/>
+					<browser platform="Netscape" version="7.0+"/>
+					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
+					<browser platform="Safari" version="1.2+" />
+				</browsers>
+			</property>
+			<property name="String" type="Class&lt;String&gt;" access="read-only" visibility="basic">
+				<availability>
+					<specification name="JavaScript" version="1.0"/>
+				</availability>
+				<description>A function responsible for creating new instances of String objects</description>
+				<browsers>
+					<browser platform="IE" version="5.0+"/>
+					<browser platform="Mozilla" version="1.0+"/>
+					<browser platform="Netscape" version="7.0+"/>
+					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
+					<browser platform="Safari" version="1.2+" />
+				</browsers>
+			</property>
 			
 		</properties>
 		
