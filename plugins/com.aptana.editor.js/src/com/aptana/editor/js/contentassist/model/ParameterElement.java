@@ -48,9 +48,9 @@ public class ParameterElement
 	 * 
 	 * @return
 	 */
-	public String[] getTypes()
+	public List<String> getTypes()
 	{
-		return this._types.toArray(new String[this._types.size()]);
+		return this._types;
 	}
 
 	/**
