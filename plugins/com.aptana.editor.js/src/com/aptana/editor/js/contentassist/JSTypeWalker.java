@@ -25,6 +25,8 @@ import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSNumberNode;
 import com.aptana.editor.js.parsing.ast.JSObjectNode;
+import com.aptana.editor.js.parsing.ast.JSPostUnaryOperatorNode;
+import com.aptana.editor.js.parsing.ast.JSPreUnaryOperatorNode;
 import com.aptana.editor.js.parsing.ast.JSRegexNode;
 import com.aptana.editor.js.parsing.ast.JSStringNode;
 import com.aptana.editor.js.parsing.ast.JSTreeWalker;
@@ -512,6 +514,43 @@ public class JSTypeWalker extends JSTreeWalker
 	public void visit(JSObjectNode node)
 	{
 		this.addType(OBJECT_TYPE);
+	}
+
+	
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSPostUnaryOperatorNode)
+	 */
+	@Override
+	public void visit(JSPostUnaryOperatorNode node)
+	{
+		this.addType(NUMBER_TYPE);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSPreUnaryOperatorNode)
+	 */
+	@Override
+	public void visit(JSPreUnaryOperatorNode node)
+	{
+		switch (node.getNodeType())
+		{
+			case JSNodeTypes.DELETE:
+			case JSNodeTypes.LOGICAL_NOT:
+				this.addType(BOOLEAN_TYPE);
+				break;
+				
+			case JSNodeTypes.TYPEOF:
+				this.addType(STRING_TYPE);
+				break;
+				
+			case JSNodeTypes.VOID:
+				// technically this returns 'undefined', but we return nothing
+				break;
+				
+			default:
+				this.addType(NUMBER_TYPE);
+				break;
+		}
 	}
 
 	/*
