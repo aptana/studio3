@@ -183,7 +183,33 @@ public class JSCodeScanner extends RuleBasedScanner
 			"abbr", "rows", "rowSpan", "rowIndex", "rules", "rev", "referrer", "rel", "readOnly", "multiple", "method",
 			"media", "marginHeight", "marginWidth", "maxLength", "body", "border", "background", "bgColor" };
 
-	private static final boolean OPTIMIZE_REGEXP_RULES = true;
+	@SuppressWarnings("nls")
+	protected static final String[] SUPPORT_CONSTANTS = { "systemLanguage", "scripts", "scrollbars", "screenX",
+			"screenY", "screenTop", "screenLeft", "styleSheets", "style", "statusText", "statusbar", "status",
+			"siblingBelow", "siblingAbove", "source", "suffixes", "securityPolicy", "security", "selection", "self",
+			"history", "hostname", "host", "hash", "hasFocus", "y", "XMLDocument", "XSLDocument", "next", "namespaces",
+			"namespaceURI", "nameProp", "MIN_VALUE", "MAX_VALUE", "characterSet", "constructor", "controllers",
+			"cookieEnabled", "colorDepth", "components", "complete", "current", "cpuClass", "clipboardData", "clip",
+			"clientInformation", "closed", "classes", "callee", "caller", "crypto", "toolbar", "top", "textTransform",
+			"textIndent", "textDecoration", "textAlign", "tags", "SQRT1_2", "SQRT2", "innerHeight", "innerWidth",
+			"input", "ids", "ignoreCase", "zIndex", "oscpu", "onreadystatechange", "onLine", "outerHeight",
+			"outerWidth", "opsProfile", "opener", "offscreenBuffering", "NEGATIVE_INFINITY", "display", "dialogHeight",
+			"dialogTop", "dialogWidth", "dialogLeft", "dialogArguments", "directories", "description", "defaultStatus",
+			"defaultChecked", "defaultCharset", "defaultView", "userProfile", "userLanguage", "userAgent", "undefined",
+			"uniqueID", "updateInterval", "_content", "pixelDepth", "port", "personalbar", "pkcs11", "plugins",
+			"platform", "pathname", "paddingRight", "paddingBottom", "paddingTop", "paddingLeft", "parentWindow",
+			"parentLayer", "parent", "pageXOffset", "pageX", "pageYOffset", "pageY", "protocol", "prototype",
+			"product", "productSub", "prompter", "previous", "prefix", "encoding", "enabledPlugin", "external",
+			"expando", "embeds", "visibility", "vendorSub", "vendor", "vLinkcolor", "URLUnencoded", "PI",
+			"POSITIVE_INFINITY", "filename", "fontSize", "fontFamily", "fontWeight", "formName", "frames",
+			"frameElement", "fgColor", "E", "whiteSpace", "listStyleType", "lineHeight", "linkColor", "locationbar",
+			"location", "localName", "lowsrc", "length", "leftContext", "left", "lastModified", "lastMatch",
+			"lastIndex", "lastParen", "layers", "layerX", "language", "appMinorVersion", "appName", "appCodeName",
+			"appCore", "appVersion", "availHeight", "availTop", "availWidth", "availLeft", "all", "arity", "arguments",
+			"aLinkcolor", "above", "rightContext", "right", "responseXML", "responseext", "readyState", "global", "x",
+			"mimeTypes", "multiline", "menubar", "marginRight", "marginBottom", "marginTop", "marginLeft", "LN10",
+			"LN2", "LOG10E", "LOG2E", "bottom", "borderRightWidth", "borderBottomWidth", "borderStyle", "borderColor",
+			"borderTopWidth", "borderLeftWidth", "bufferDepth", "below", "backgroundColor", "backgroundImage", };
 
 	/**
 	 * CodeScanner
@@ -212,10 +238,13 @@ public class JSCodeScanner extends RuleBasedScanner
 		addWordRules(wordRule, createToken(JSScopeType.DOM_FUNCTION), DOM_FUNCTIONS);
 		rules.add(wordRule);
 
+		// FIXME These rules shouldn't actually match the leading period, but we have no way to capture just the rest as
+		// the token
 		// Functions where we need period to begin it
 		wordRule = new WordRule(new FunctionCallDetector(), Token.UNDEFINED);
 		addWordRules(wordRule, createToken(JSScopeType.FIREBUG_FUNCTION), FIREBUG_FUNCTIONS);
 		addWordRules(wordRule, createToken(JSScopeType.DOM_CONSTANTS), DOM_CONSTANTS);
+		addWordRules(wordRule, createToken(JSScopeType.SUPPORT_CONSTANT), SUPPORT_CONSTANTS);
 		rules.add(wordRule);
 
 		// Operators
@@ -227,13 +256,6 @@ public class JSCodeScanner extends RuleBasedScanner
 		{
 			rules.add(new SingleCharacterRule(operator, createToken(JSScopeType.KEYWORD)));
 		}
-
-		// TODO Turn these next two rules into word rules using the FunctionCallDetector word rule list
-		// FIXME This rule shouldn't actually match the leading period, but we have no way to capture just the rest as
-		// the token
-		rules.add(new RegexpRule(
-				"\\.(s(ystemLanguage|cr(ipts|ollbars|een(X|Y|Top|Left))|t(yle(Sheets)?|atus(Text|bar)?)|ibling(Below|Above)|ource|uffixes|e(curity(Policy)?|l(ection|f)))|h(istory|ost(name)?|as(h|Focus))|y|X(MLDocument|SLDocument)|n(ext|ame(space(s|URI)|Prop))|M(IN_VALUE|AX_VALUE)|c(haracterSet|o(n(structor|trollers)|okieEnabled|lorDepth|mp(onents|lete))|urrent|puClass|l(i(p(boardData)?|entInformation)|osed|asses)|alle(e|r)|rypto)|t(o(olbar|p)|ext(Transform|Indent|Decoration|Align)|ags)|SQRT(1_2|2)|i(n(ner(Height|Width)|put)|ds|gnoreCase)|zIndex|o(scpu|n(readystatechange|Line)|uter(Height|Width)|p(sProfile|ener)|ffscreenBuffering)|NEGATIVE_INFINITY|d(i(splay|alog(Height|Top|Width|Left|Arguments)|rectories)|e(scription|fault(Status|Ch(ecked|arset)|View)))|u(ser(Profile|Language|Agent)|n(iqueID|defined)|pdateInterval)|_content|p(ixelDepth|ort|ersonalbar|kcs11|l(ugins|atform)|a(thname|dding(Right|Bottom|Top|Left)|rent(Window|Layer)?|ge(X(Offset)?|Y(Offset)?))|r(o(to(col|type)|duct(Sub)?|mpter)|e(vious|fix)))|e(n(coding|abledPlugin)|x(ternal|pando)|mbeds)|v(isibility|endor(Sub)?|Linkcolor)|URLUnencoded|P(I|OSITIVE_INFINITY)|f(ilename|o(nt(Size|Family|Weight)|rmName)|rame(s|Element)|gColor)|E|whiteSpace|l(i(stStyleType|n(eHeight|kColor))|o(ca(tion(bar)?|lName)|wsrc)|e(ngth|ft(Context)?)|a(st(M(odified|atch)|Index|Paren)|yer(s|X)|nguage))|a(pp(MinorVersion|Name|Co(deName|re)|Version)|vail(Height|Top|Width|Left)|ll|r(ity|guments)|Linkcolor|bove)|r(ight(Context)?|e(sponse(XML|Text)|adyState))|global|x|m(imeTypes|ultiline|enubar|argin(Right|Bottom|Top|Left))|L(N(10|2)|OG(10E|2E))|b(o(ttom|rder(RightWidth|BottomWidth|Style|Color|TopWidth|LeftWidth))|ufferDepth|elow|ackground(Color|Image)))\\b", //$NON-NLS-1$
-				createToken(JSScopeType.SUPPORT_CONSTANT), OPTIMIZE_REGEXP_RULES));
 
 		// Add word rule for keywords, types, and constants.
 		wordRule = new WordRule(new WordDetector(), createToken(JSScopeType.SOURCE));
@@ -264,6 +286,7 @@ public class JSCodeScanner extends RuleBasedScanner
 		rules.add(new SingleCharacterRule('}', createToken(JSScopeType.CURLY_BRACE)));
 		rules.add(new SingleCharacterRule(',', createToken(JSScopeType.COMMA)));
 
+		// TODO Turn these next two rules into word rules
 		// Numbers
 		rules.add(new RegexpRule("\\b((0(x|X)[0-9a-fA-F]+)|([0-9]+(\\.[0-9]+)?))\\b", //$NON-NLS-1$
 				createToken(JSScopeType.NUMBER)));

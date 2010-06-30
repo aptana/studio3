@@ -17,6 +17,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -37,15 +39,17 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.internal.browser.BrowserViewer;
 import org.eclipse.ui.internal.browser.WebBrowserEditor;
 import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
+import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.deploy.Activator;
 import com.aptana.deploy.internal.wizard.CapifyProjectPage;
 import com.aptana.deploy.internal.wizard.DeployWizardPage;
+import com.aptana.deploy.internal.wizard.FTPDeployComposite.Direction;
 import com.aptana.deploy.internal.wizard.FTPDeployWizardPage;
 import com.aptana.deploy.internal.wizard.HerokuDeployWizardPage;
 import com.aptana.deploy.internal.wizard.HerokuSignupPage;
-import com.aptana.deploy.internal.wizard.FTPDeployComposite.Direction;
+import com.aptana.deploy.preferences.IPreferenceConstants;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
@@ -68,6 +72,8 @@ import com.aptana.usage.PingStartup;
 @SuppressWarnings("restriction")
 public class DeployWizard extends Wizard implements IWorkbenchWizard
 {
+
+	private static final String BUNDLE_HEROKU = "Heroku"; //$NON-NLS-1$
 
 	private IProject project;
 
@@ -229,6 +235,18 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		IRunnableWithProgress runnable;
 		final String appName = page.getAppName();
 		final boolean publishImmediately = page.publishImmediately();
+
+		// persists the auto-publish setting
+		IEclipsePreferences prefs = (new InstanceScope()).getNode(Activator.getPluginIdentifier());
+		prefs.putBoolean(IPreferenceConstants.HEROKU_AUTO_PUBLISH, publishImmediately);
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+		}
+
 		runnable = new IRunnableWithProgress()
 		{
 
@@ -249,26 +267,31 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 					sub.worked(10);
 
 					// Run commands to create/deploy
-					final String bundleName = "Heroku"; //$NON-NLS-1$
 					PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
 					{
 
 						@Override
 						public void run()
 						{
-							CommandElement command = getCommand(bundleName, "Create App"); //$NON-NLS-1$
+							CommandElement command;
 							if (publishImmediately)
 							{
-								command = getCommand(bundleName, "Create and Deploy App"); //$NON-NLS-1$
+								command = getCommand(BUNDLE_HEROKU, "Create and Deploy App"); //$NON-NLS-1$
+							}
+							else
+							{
+								command = getCommand(BUNDLE_HEROKU, "Create App"); //$NON-NLS-1$
 							}
 							// TODO What if command is null!?
-							// Send along the app name
-							CommandContext context = command.createCommandContext();
-							context.put("HEROKU_APP_NAME", appName); //$NON-NLS-1$
-							command.execute(context);
+							if (command != null)
+							{
+								// Send along the app name
+								CommandContext context = command.createCommandContext();
+								context.put("HEROKU_APP_NAME", appName); //$NON-NLS-1$
+								command.execute(context);
+							}
 						}
 					});
-
 				}
 				catch (CoreException ce)
 				{
@@ -283,6 +306,10 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 			private CommandElement getCommand(String bundleName, String commandName)
 			{
 				BundleEntry entry = BundleManager.getInstance().getBundleEntry(bundleName);
+				if (entry == null)
+				{
+					return null;
+				}
 				for (BundleElement bundle : entry.getContributingBundles())
 				{
 					CommandElement command = bundle.getCommandByName(commandName);
