@@ -292,8 +292,7 @@ public class JSTypeWalker extends JSTreeWalker
 	{
 		// TODO: Should check subscript to determine if the type is a Number or
 		// a String. If it is a String, then this should behave like get-property
-		// assuming we can retrieve a literal string. For now, we're assuming
-		// this notation is being used for Array element access.
+		// assuming we can retrieve a literal string.
 		IParseNode lhs = node.getLeftHandSide();
 		
 		if (lhs instanceof JSNode)
