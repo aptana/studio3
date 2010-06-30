@@ -144,6 +144,10 @@ public class JSTypeWalker extends JSTreeWalker
 					result = ARRAY_TYPE;
 				}
 			}
+			else if (type.equals(ARRAY_TYPE))
+			{
+				result = OBJECT_TYPE;
+			}
 		}
 		
 		return result;
