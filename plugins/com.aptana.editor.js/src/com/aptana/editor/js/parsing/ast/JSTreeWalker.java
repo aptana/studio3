@@ -8,7 +8,7 @@ public class JSTreeWalker
 	{
 	}
 
-	public void visit(JSArithmeticOperatorNode node)
+	public void visit(JSBinaryArithmeticOperatorNode node)
 	{
 	}
 
@@ -20,7 +20,7 @@ public class JSTreeWalker
 	{
 	}
 
-	public void visit(JSBooleanOperatorNode node)
+	public void visit(JSBinaryBooleanOperatorNode node)
 	{
 	}
 

@@ -5,7 +5,7 @@ import beaver.Symbol;
 
 
 
-public class JSBooleanOperatorNode extends JSBinaryOperatorNode
+public class JSBinaryBooleanOperatorNode extends JSBinaryOperatorNode
 {
 	/**
 	 * JSBooleanOperatorNode
@@ -14,7 +14,7 @@ public class JSBooleanOperatorNode extends JSBinaryOperatorNode
 	 * @param operator
 	 * @param right
 	 */
-	public JSBooleanOperatorNode(JSNode left, Symbol operator, JSNode right)
+	public JSBinaryBooleanOperatorNode(JSNode left, Symbol operator, JSNode right)
 	{
 		super(left, operator, right);
 		

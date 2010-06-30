@@ -10,9 +10,9 @@ import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
-import com.aptana.editor.js.parsing.ast.JSArithmeticOperatorNode;
+import com.aptana.editor.js.parsing.ast.JSBinaryArithmeticOperatorNode;
 import com.aptana.editor.js.parsing.ast.JSArrayNode;
-import com.aptana.editor.js.parsing.ast.JSBooleanOperatorNode;
+import com.aptana.editor.js.parsing.ast.JSBinaryBooleanOperatorNode;
 import com.aptana.editor.js.parsing.ast.JSConstructNode;
 import com.aptana.editor.js.parsing.ast.JSFalseNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
@@ -196,7 +196,7 @@ public class JSTypeWalker extends JSTreeWalker
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSArithmeticOperatorNode)
 	 */
 	@Override
-	public void visit(JSArithmeticOperatorNode node)
+	public void visit(JSBinaryArithmeticOperatorNode node)
 	{
 		String type = NUMBER_TYPE;
 		
@@ -234,7 +234,7 @@ public class JSTypeWalker extends JSTreeWalker
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSBooleanOperatorNode)
 	 */
 	@Override
-	public void visit(JSBooleanOperatorNode node)
+	public void visit(JSBinaryBooleanOperatorNode node)
 	{
 		this.addType(BOOLEAN_TYPE);
 	}

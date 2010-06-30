@@ -4,7 +4,7 @@ import beaver.Symbol;
 
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 
-public class JSArithmeticOperatorNode extends JSBinaryOperatorNode
+public class JSBinaryArithmeticOperatorNode extends JSBinaryOperatorNode
 {
 	/**
 	 * JSArithmeticOperatorNode
@@ -13,7 +13,7 @@ public class JSArithmeticOperatorNode extends JSBinaryOperatorNode
 	 * @param operator
 	 * @param right
 	 */
-	public JSArithmeticOperatorNode(JSNode left, Symbol operator, JSNode right)
+	public JSBinaryArithmeticOperatorNode(JSNode left, Symbol operator, JSNode right)
 	{
 		super(left, operator, right);
 
