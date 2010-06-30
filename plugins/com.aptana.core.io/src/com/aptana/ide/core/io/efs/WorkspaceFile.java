@@ -358,7 +358,7 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 		if (localFileStore != null) {
 			return localFileStore.toLocalFile(options, monitor);
 		}
-		return null;
+		return new LocalFile(workspaceRoot.getFile(path).getLocation().toFile()).toLocalFile(options, monitor);
 	}
 
 	/* (non-Javadoc)
