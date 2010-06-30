@@ -70,11 +70,6 @@ public class ResourceIndexer implements IResourceChangeListener
 						{
 							indexProject(project);
 						}
-						// Why were we deleting the index if the project got closed?!
-						// else
-						// {
-						// removeIndexOfProject(project);
-						// }
 					}
 				}
 				if (resource instanceof IFile)
@@ -147,6 +142,10 @@ public class ResourceIndexer implements IResourceChangeListener
 
 	private static void removeIndexOfProject(IProject project)
 	{
+		if (project == null)
+		{
+			return;
+		}
 		new RemoveIndexOfProjectJob(project).schedule();
 	}
 
@@ -161,15 +160,16 @@ public class ResourceIndexer implements IResourceChangeListener
 	{
 		switch (event.getType())
 		{
+			case IResourceChangeEvent.PRE_DELETE:
+				removeIndexOfProject((IProject) event.getResource());
+				break;
 			case IResourceChangeEvent.POST_BUILD:
 				ISavedState savedState = processIResourceChangeEventPOST_BUILD.get();
 				if (savedState == null)
 				{
 					return;
 				}
-			case IResourceChangeEvent.PRE_DELETE:
-				removeIndexOfProject((IProject) event.getResource());
-				break;
+				// intentional fall-through!!!!!
 			case IResourceChangeEvent.POST_CHANGE:
 				IResourceDelta delta = event.getDelta();
 				if (delta != null)
