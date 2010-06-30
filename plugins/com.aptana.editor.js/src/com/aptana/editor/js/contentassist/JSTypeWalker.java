@@ -14,6 +14,7 @@ import com.aptana.editor.js.parsing.ast.JSArrayNode;
 import com.aptana.editor.js.parsing.ast.JSConstructNode;
 import com.aptana.editor.js.parsing.ast.JSFalseNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
+import com.aptana.editor.js.parsing.ast.JSGetElementNode;
 import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
 import com.aptana.editor.js.parsing.ast.JSIdentifierNode;
 import com.aptana.editor.js.parsing.ast.JSInvokeNode;
@@ -30,6 +31,11 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class JSTypeWalker extends JSTreeWalker
 {
+	private static final String ARRAY_LITERAL = "[]";
+	private static final String OBJECT_TYPE = "Object";
+	private static final String ARRAY_TYPE = "Array";
+	private static final String GENERIC_ARRAY_CLOSE = ">";
+	private static final String GENERIC_ARRAY_OPEN = "Array<";
 	private Scope<JSNode> _scope;
 	private Index _index;
 	private List<String> _types;
@@ -101,6 +107,38 @@ public class JSTypeWalker extends JSTreeWalker
 	}
 	
 	/**
+	 * getElementType
+	 * 
+	 * @param type
+	 * @return
+	 */
+	protected String getElementType(String type)
+	{
+		String result = null;
+		
+		if (type != null && type.length() > 0)
+		{
+			if (type.endsWith(ARRAY_LITERAL))
+			{
+				result = type.substring(0, type.length() - 2);
+			}
+			else if (type.startsWith(GENERIC_ARRAY_OPEN) && type.endsWith(GENERIC_ARRAY_CLOSE))
+			{
+				result = type.substring(GENERIC_ARRAY_OPEN.length() + 1, type.length() - 1);
+				
+				// TODO: handle generalized nesting like Array<Array<String>>. Just return
+				// ARRAY type for now
+				if (result.startsWith(ARRAY_TYPE))
+				{
+					result = ARRAY_TYPE;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * getTypes
 	 * 
 	 * @return
@@ -145,7 +183,7 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSArrayNode node)
 	{
-		this.addType("Array");
+		this.addType(ARRAY_TYPE);
 	}
 
 	/*
@@ -190,6 +228,65 @@ public class JSTypeWalker extends JSTreeWalker
 	public void visit(JSFunctionNode node)
 	{
 		this.addType("Function");
+	}
+
+	
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSGetElementNode)
+	 */
+	@Override
+	public void visit(JSGetElementNode node)
+	{
+		// TODO: Should check subscript to determine if the type is a Number or
+		// a String. If it is a String, then this should behave like get-property
+		// assuming we can retrieve a literal string. For now, we're assuming
+		// this notation is being used for Array element access.
+		IParseNode lhs = node.getLeftHandSide();
+		
+		if (lhs instanceof JSNode)
+		{
+			JSReferenceWalker walker = this.createReferenceWalker();
+			
+			((JSNode) lhs).accept(walker);
+			
+			String memberName = walker.getPropertyName();
+			
+			for (TypeElement type : walker.getTypes())
+			{
+				String typeName = type.getName();
+				PropertyElement property = this._indexHelper.getTypeMember(this._index, typeName, memberName, EnumSet.of(FieldSelector.TYPES, FieldSelector.RETURN_TYPES));
+				
+				if (property != null)
+				{
+					ReturnTypeElement[] returnTypes = property.getTypes();
+					
+					if (returnTypes != null && returnTypes.length > 0)
+					{
+						for (ReturnTypeElement returnType : property.getTypes())
+						{
+							String typeString = this.getElementType(returnType.getType());
+							
+							if (typeString != null)
+							{
+								this.addType(typeString);
+							}
+							else
+							{
+								this.addType(OBJECT_TYPE);
+							}
+						}
+					}
+					else
+					{
+						this.addType(OBJECT_TYPE);
+					}
+				}
+				else
+				{
+					this.addType(OBJECT_TYPE);
+				}
+			}
+		}
 	}
 
 	/* (non-Javadoc)
@@ -346,7 +443,7 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSObjectNode node)
 	{
-		this.addType("Object");
+		this.addType(OBJECT_TYPE);
 	}
 
 	/*
