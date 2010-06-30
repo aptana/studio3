@@ -4,27 +4,11 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class JSTreeWalker
 {
-	/**
-	 * visitChildren
-	 * 
-	 * @param node
-	 */
-	protected void visitChildren(JSNode node)
-	{
-		for (IParseNode child : node)
-		{
-			if (child instanceof JSNode)
-			{
-				((JSNode) child).accept(this);
-			}
-		}
-	}
-	
-	public void visit(JSParseRootNode node)
+	public void visit(JSArgumentsNode node)
 	{
 	}
 
-	public void visit(JSArgumentsNode node)
+	public void visit(JSArithmeticOperatorNode node)
 	{
 	}
 
@@ -36,7 +20,7 @@ public class JSTreeWalker
 	{
 	}
 
-	public void visit(JSBinaryOperatorNode node)
+	public void visit(JSBooleanOperatorNode node)
 	{
 	}
 
@@ -185,6 +169,10 @@ public class JSTreeWalker
 	{
 	}
 
+	public void visit(JSParseRootNode node)
+	{
+	}
+
 	public void visit(JSPostUnaryOperatorNode node)
 	{
 	}
@@ -247,5 +235,21 @@ public class JSTreeWalker
 
 	public void visit(JSWithNode node)
 	{
+	}
+
+	/**
+	 * visitChildren
+	 * 
+	 * @param node
+	 */
+	protected void visitChildren(JSNode node)
+	{
+		for (IParseNode child : node)
+		{
+			if (child instanceof JSNode)
+			{
+				((JSNode) child).accept(this);
+			}
+		}
 	}
 }
