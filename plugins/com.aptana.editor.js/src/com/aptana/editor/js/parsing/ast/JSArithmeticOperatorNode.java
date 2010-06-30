@@ -76,4 +76,14 @@ public class JSArithmeticOperatorNode extends JSBinaryOperatorNode
 		
 		this.setType(type);
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
+	 */
+	@Override
+	public void accept(JSTreeWalker walker)
+	{
+		walker.visit(this);
+	}
 }
