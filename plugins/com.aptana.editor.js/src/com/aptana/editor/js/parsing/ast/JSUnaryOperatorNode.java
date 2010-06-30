@@ -43,38 +43,51 @@ public class JSUnaryOperatorNode extends JSNode
 	{
 		this(start, end, expression);
 
-		short type = DEFAULT_TYPE;
+		short type;
 		JSTokenType token = JSTokenType.get(operator);
+		
 		switch (token)
 		{
 			case DELETE:
 				type = JSNodeTypes.DELETE;
 				break;
+				
 			case EXCLAMATION:
 				type = JSNodeTypes.LOGICAL_NOT;
 				break;
+				
 			case MINUS:
 				type = JSNodeTypes.NEGATIVE;
 				break;
+				
 			case MINUS_MINUS:
 				type = JSNodeTypes.PRE_DECREMENT;
 				break;
+				
 			case PLUS:
 				type = JSNodeTypes.POSITIVE;
 				break;
+				
 			case PLUS_PLUS:
 				type = JSNodeTypes.PRE_INCREMENT;
 				break;
+				
 			case TILDE:
 				type = JSNodeTypes.BITWISE_NOT;
 				break;
+				
 			case TYPEOF:
 				type = JSNodeTypes.TYPEOF;
 				break;
+				
 			case VOID:
 				type = JSNodeTypes.VOID;
 				break;
+				
+			default:
+				throw new IllegalArgumentException("Unrecognized operator: " + token);
 		}
+		
 		setType(type);
 	}
 
