@@ -141,11 +141,9 @@ class ControlThemer implements IControlThemer
 
 					event.detail &= ~SWT.SELECTED;
 					event.detail &= ~SWT.BACKGROUND;
-					// force foreground color for Windows. Otherwise on dark themes we get black fg
-					if (!isCocoa)
-					{
-						gc.setForeground(getForeground());
-					}
+					
+					// force foreground color. Otherwise on dark themes we get black FG (all the time on Win, on non-focus for Mac)
+					gc.setForeground(getForeground());
 				}
 			}
 		};
