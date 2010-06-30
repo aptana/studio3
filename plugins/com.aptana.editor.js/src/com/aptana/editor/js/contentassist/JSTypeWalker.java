@@ -160,7 +160,20 @@ public class JSTypeWalker extends JSTreeWalker
 	 */
 	public List<String> getTypes()
 	{
-		return this._types;
+		List<String> result;
+		
+		if (this._types != null)
+		{
+			result = this._types;
+		}
+		else
+		{
+			// be sure we return some type of list so we don't have to check for
+			// null return values
+			result = Collections.emptyList();
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -171,24 +184,13 @@ public class JSTypeWalker extends JSTreeWalker
 	 */
 	public List<String> getTypes(JSNode node)
 	{
-		List<String> result;
-		
 		// create new nested walker
 		JSTypeWalker walker = new JSTypeWalker(this._scope, this._index);
 		
 		// collect types
 		walker.visit(node);
 		
-		// grab result
-		result = walker.getTypes();
-		
-		// be sure we return some type of list so we don't have to check for
-		// null return values
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-		
+		// return collected types
 		return walker.getTypes();
 	}
 
