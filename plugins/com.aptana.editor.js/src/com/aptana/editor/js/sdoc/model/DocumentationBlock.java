@@ -1,11 +1,13 @@
 package com.aptana.editor.js.sdoc.model;
 
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.aptana.parsing.io.SourceWriter;
-
 import beaver.Symbol;
+
+import com.aptana.parsing.io.SourceWriter;
 
 public class DocumentationBlock extends Symbol
 {
@@ -55,6 +57,47 @@ public class DocumentationBlock extends Symbol
 	}
 
 	/**
+	 * getTags
+	 * 
+	 * @param tagSelector
+	 * @return
+	 */
+	public List<Tag> getTags(EnumSet<TagType> tagSelector)
+	{
+		List<Tag> result;
+
+		if (this._tags != null && this._tags.isEmpty() == false)
+		{
+			result = new LinkedList<Tag>();
+
+			for (Tag tag : this._tags)
+			{
+				if (tagSelector.contains(tag.getType()))
+				{
+					result.add(tag);
+				}
+			}
+		}
+		else
+		{
+			result = Collections.emptyList();
+		}
+
+		return result;
+	}
+
+	/**
+	 * getTags
+	 * 
+	 * @param type
+	 * @return
+	 */
+	public List<Tag> getTags(TagType type)
+	{
+		return this.getTags(EnumSet.of(type));
+	}
+
+	/**
 	 * getText
 	 * 
 	 * @return
@@ -63,7 +106,7 @@ public class DocumentationBlock extends Symbol
 	{
 		return this._text;
 	}
-	
+
 	/**
 	 * hasTags
 	 * 
@@ -73,7 +116,7 @@ public class DocumentationBlock extends Symbol
 	{
 		return (this._tags != null && this._tags.isEmpty() == false);
 	}
-	
+
 	/**
 	 * setRange
 	 * 
@@ -85,7 +128,7 @@ public class DocumentationBlock extends Symbol
 		this.start = start;
 		this.end = end;
 	}
-	
+
 	/**
 	 * toSource
 	 * 
@@ -94,12 +137,12 @@ public class DocumentationBlock extends Symbol
 	public String toSource()
 	{
 		SourceWriter writer = new SourceWriter(" * ");
-		
+
 		this.toSource(writer);
-		
+
 		return writer.toString();
 	}
-	
+
 	/**
 	 * toSource
 	 * 
@@ -108,17 +151,17 @@ public class DocumentationBlock extends Symbol
 	public void toSource(SourceWriter writer)
 	{
 		writer.println("/**").increaseIndent();
-		
+
 		if (this._text != null && this._text.isEmpty() == false)
 		{
 			writer.printlnWithIndent(this._text);
-			
+
 			if (this.hasTags())
 			{
 				writer.printIndent().println();
 			}
 		}
-		
+
 		if (this.hasTags())
 		{
 			for (Tag tag : this._tags)
@@ -128,7 +171,7 @@ public class DocumentationBlock extends Symbol
 				writer.println();
 			}
 		}
-		
+
 		writer.decreaseIndent().println(" */");
 	}
 }
