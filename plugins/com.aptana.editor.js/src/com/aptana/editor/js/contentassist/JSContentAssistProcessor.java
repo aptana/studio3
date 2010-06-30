@@ -70,6 +70,17 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 	
 	/**
+	 * addAllGlobals
+	 */
+	protected void addAllGlobals(Set<ICompletionProposal> proposals, int offset)
+	{
+		// add globals from core
+		this.addCoreGlobals(proposals, offset);
+		this.addProjectGlobals(proposals, offset);
+		this.addLocalGlobalFunctions(proposals, offset);
+	}
+	
+	/**
 	 * addCoreFunctions
 	 * 
 	 * @param proposals
@@ -89,14 +100,13 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				String name = JSModelFormatter.getName(property);
 				String description = JSModelFormatter.getDescription(property);
 				Image image = JS_FUNCTION;
-				String[] userAgentNames = property.getUserAgentNames();
-				Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(userAgentNames);
+				Image[] userAgents = this.getUserAgentImages(property.getUserAgentNames());
 				
 				this.addProposal(proposals, name, image, description, userAgents, offset);
 			}
 		}
 	}
-	
+
 	/**
 	 * addCoreGlobals
 	 * 
@@ -114,27 +124,14 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 			// grab the interesting parts
 			String name = JSModelFormatter.getName(property);
-			//int length = isFunction ? name.length() - 1 : name.length();
 			String description = JSModelFormatter.getDescription(property);
 			Image image = isFunction ? JS_FUNCTION : JS_PROPERTY;
-			String[] userAgentNames = property.getUserAgentNames();
-			Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(userAgentNames);
+			Image[] userAgents = this.getUserAgentImages(property.getUserAgentNames());
 			
 			this.addProposal(proposals, name, image, description, userAgents, offset);
 		}
 	}
 	
-	/**
-	 * addAllGlobals
-	 */
-	protected void addAllGlobals(Set<ICompletionProposal> proposals, int offset)
-	{
-		// add globals from core
-		this.addCoreGlobals(proposals, offset);
-		this.addProjectGlobals(proposals, offset);
-		this.addLocalGlobalFunctions(proposals, offset);
-	}
-
 	/**
 	 * addGlobalFunctions
 	 * 
@@ -190,7 +187,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			}
 		}
 	}
-	
+
 	/**
 	 * addProperties
 	 * 
@@ -295,7 +292,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		// add it to the list
 		proposals.add(proposal);
 	}
-
+	
 	/**
 	 * addSymbolsInScope
 	 * 
@@ -344,7 +341,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			}
 		}
 	}
-	
+
 	/**
 	 * addTypeProperties
 	 * 
@@ -364,10 +361,38 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			String description = property.getDescription();
 			Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
 			String[] userAgentNames = property.getUserAgentNames();
-			Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(userAgentNames);
+			Image[] userAgents = getUserAgentImages(userAgentNames);
 			
 			this.addProposal(proposals, name, image, description, userAgents, typeName, offset);
 		}
+	}
+	
+	/**
+	 * createLexemeProvider
+	 * 
+	 * @param document
+	 * @param offset
+	 * @return
+	 */
+	LexemeProvider<JSTokenType> createLexemeProvider(IDocument document, int offset)
+	{
+		LexemeProvider<JSTokenType> result;
+		
+		this._targetNode = this.getActiveASTNode(offset);
+		this._statementNode = null;
+		
+		if (this._targetNode != null && this._targetNode instanceof JSNode)
+		{
+			this._statementNode = ((JSNode) this._targetNode).getContainingStatementNode();
+			
+			result = new JSLexemeProvider(document, this._statementNode, new JSTokenScanner());
+		}
+		else
+		{
+			result = new JSLexemeProvider(document, offset, new JSTokenScanner());
+		}
+		
+		return result;
 	}
 	
 	/*
@@ -442,34 +467,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
-	 * createLexemeProvider
-	 * 
-	 * @param document
-	 * @param offset
-	 * @return
-	 */
-	LexemeProvider<JSTokenType> createLexemeProvider(IDocument document, int offset)
-	{
-		LexemeProvider<JSTokenType> result;
-		
-		this._targetNode = this.getActiveASTNode(offset);
-		this._statementNode = null;
-		
-		if (this._targetNode != null && this._targetNode instanceof JSNode)
-		{
-			this._statementNode = ((JSNode) this._targetNode).getContainingStatementNode();
-			
-			result = new JSLexemeProvider(document, this._statementNode, new JSTokenScanner());
-		}
-		else
-		{
-			result = new JSLexemeProvider(document, offset, new JSTokenScanner());
-		}
-		
-		return result;
-	}
-	
-	/**
 	 * getActiveASTNode
 	 * 
 	 * @param offset
@@ -514,7 +511,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		return new char[] { /*'.'*/ };
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.CommonContentAssistProcessor#getContextInformationValidator()
@@ -530,6 +527,59 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		return this._validator;
 	}
 
+	/**
+	 * getGlobalScope
+	 * 
+	 * @return
+	 */
+	protected Scope<JSNode> getGlobalScope()
+	{
+		IParseNode ast = this.getAST();
+		Scope<JSNode> result = null;
+		
+		if (ast instanceof JSParseRootNode)
+		{
+			JSParseRootNode root = (JSParseRootNode) ast;
+			
+			result = root.getGlobalScope();
+		}
+		
+		return result;
+	}
+
+	/**
+	 * getLocation
+	 * 
+	 * @param lexemeProvider
+	 * @param offset
+	 * @return
+	 */
+	LocationType getLocation(LexemeProvider<JSTokenType> lexemeProvider, int offset)
+	{
+		LocationType result = LocationType.UNKNOWN;
+		
+		if (Platform.inDevelopmentMode())
+		{
+			IParseNode ast = this.getAST();
+			
+			if (ast instanceof JSParseRootNode)
+			{
+				result = ((JSParseRootNode) ast).getLocationType(offset);
+			}
+		}
+		else
+		{
+			result = this.getLocationByAST(lexemeProvider, offset);
+			
+//			if (result == Location.ERROR)
+//			{
+//				result = this.getLocationByLexeme(lexemeProvider, offset);
+//			}
+		}
+		
+		return result;
+	}
+	
 	/**
 	 * getLocationByAST
 	 * 
@@ -958,59 +1008,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 	
 	/**
-	 * getGlobalScope
-	 * 
-	 * @return
-	 */
-	protected Scope<JSNode> getGlobalScope()
-	{
-		IParseNode ast = this.getAST();
-		Scope<JSNode> result = null;
-		
-		if (ast instanceof JSParseRootNode)
-		{
-			JSParseRootNode root = (JSParseRootNode) ast;
-			
-			result = root.getGlobalScope();
-		}
-		
-		return result;
-	}
-	
-	/**
-	 * getLocation
-	 * 
-	 * @param lexemeProvider
-	 * @param offset
-	 * @return
-	 */
-	LocationType getLocation(LexemeProvider<JSTokenType> lexemeProvider, int offset)
-	{
-		LocationType result = LocationType.UNKNOWN;
-		
-		if (Platform.inDevelopmentMode())
-		{
-			IParseNode ast = this.getAST();
-			
-			if (ast instanceof JSParseRootNode)
-			{
-				result = ((JSParseRootNode) ast).getLocationType(offset);
-			}
-		}
-		else
-		{
-			result = this.getLocationByAST(lexemeProvider, offset);
-			
-//			if (result == Location.ERROR)
-//			{
-//				result = this.getLocationByLexeme(lexemeProvider, offset);
-//			}
-		}
-		
-		return result;
-	}
-	
-	/**
 	 * getScopeAtOffset
 	 * 
 	 * @param offset
@@ -1029,5 +1026,16 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * getUserAgentImages
+	 * 
+	 * @param userAgentNames
+	 * @return
+	 */
+	protected Image[] getUserAgentImages(String[] userAgentNames)
+	{
+		return UserAgentManager.getInstance().getUserAgentImages(userAgentNames);
 	}
 }
