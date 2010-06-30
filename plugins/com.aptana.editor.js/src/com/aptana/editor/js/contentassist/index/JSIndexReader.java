@@ -33,13 +33,13 @@ public class JSIndexReader
 	 */
 	protected FunctionElement createFunctionFromKey(Index index, String key, EnumSet<FieldSelector> fields) throws IOException
 	{
-		String[] columns = key.split(JSIndexConstants.DELIMITER);
-		int column = 0;
-		
 		FunctionElement f = new FunctionElement();
 
 		if (fields.isEmpty() == false)
 		{
+			String[] columns = key.split(JSIndexConstants.DELIMITER);
+			int column = 0;
+			
 			// name
 			if (fields.contains(FieldSelector.NAME))
 			{
@@ -106,13 +106,13 @@ public class JSIndexReader
 	 */
 	protected PropertyElement createPropertyFromKey(Index index, String key, EnumSet<FieldSelector> fields) throws IOException
 	{
-		String[] columns = key.split(JSIndexConstants.DELIMITER);
-		int column = 0;
-		
 		PropertyElement p = new PropertyElement();
 
 		if (fields.isEmpty() == false)
 		{
+			String[] columns = key.split(JSIndexConstants.DELIMITER);
+			int column = 0;
+			
 			// name
 			if (fields.contains(FieldSelector.NAME))
 			{
