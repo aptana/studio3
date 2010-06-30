@@ -46,7 +46,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private static final String PARENS = "()"; //$NON-NLS-1$
 	private static final Image JS_FUNCTION = Activator.getImage("/icons/js_function.gif"); //$NON-NLS-1$
 	private static final Image JS_PROPERTY = Activator.getImage("/icons/js_property.gif"); //$NON-NLS-1$
-	private static final EnumSet<FieldSelector> CORE_GLOBAL_FIELDS = EnumSet.of(FieldSelector.NAME, FieldSelector.DESCRIPTION, FieldSelector.USER_AGENTS);
+	private static final EnumSet<FieldSelector> CORE_GLOBAL_FIELDS = EnumSet.of(FieldSelector.NAME, FieldSelector.DESCRIPTION, FieldSelector.USER_AGENTS, FieldSelector.TYPES, FieldSelector.RETURN_TYPES);
+	private static final EnumSet<FieldSelector> PROJECT_GLOBAL_FIELDS = EnumSet.of(FieldSelector.NAME, FieldSelector.DESCRIPTION, FieldSelector.TYPES, FieldSelector.RETURN_TYPES);
 	private static final EnumSet<FieldSelector> PROPERTY_FIELDS = EnumSet.of(FieldSelector.NAME, FieldSelector.DESCRIPTION, FieldSelector.USER_AGENTS);
 
 	private JSIndexQueryHelper _indexHelper;
@@ -170,7 +171,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private void addProjectGlobals(Set<ICompletionProposal> proposals, int offset)
 	{
 		Index index = this.getIndex();
-		List<PropertyElement> projectGlobals = this._indexHelper.getProjectGlobals(index, EnumSet.of(FieldSelector.NAME, FieldSelector.DESCRIPTION));
+		List<PropertyElement> projectGlobals = this._indexHelper.getProjectGlobals(index, PROJECT_GLOBAL_FIELDS);
 		
 		if (projectGlobals != null)
 		{
@@ -178,7 +179,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				boolean isFunction = (property instanceof FunctionElement);
 				String name = (isFunction) ? property.getName() + PARENS : property.getName();
-				String description = property.getDescription();
+				String description = JSModelFormatter.getDescription(property);
 				Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
 				Image[] userAgents = this.getAllUserAgentIcons();
 				String location = null;
