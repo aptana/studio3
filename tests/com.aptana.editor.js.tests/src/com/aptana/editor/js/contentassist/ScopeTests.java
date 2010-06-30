@@ -91,12 +91,7 @@ public class ScopeTests extends FileContentBasedTests
 			
 			typeWalker.visit(node);
 			
-			List<String> types = typeWalker.getTypes();
-			
-			if (types != null)
-			{
-				typeSet.addAll(types);
-			}
+			typeSet.addAll(typeWalker.getTypes());
 		}
 		
 		return new LinkedList<String>(typeSet);
