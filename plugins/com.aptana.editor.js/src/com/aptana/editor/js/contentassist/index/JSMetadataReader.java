@@ -74,7 +74,7 @@ import com.aptana.sax.ValidatingReader;
 public class JSMetadataReader extends ValidatingReader
 {
 	private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("[$_a-zA-Z][$_a-zA-Z0-9]*");
-	private static final Pattern TYPE_PATTERN = Pattern.compile("[$_a-zA-Z][$_a-zA-Z0-9]*(?:<[$_a-zA-Z][$_a-zA-Z0-9]*>)?");
+	private static final Pattern TYPE_PATTERN = Pattern.compile("[$_a-zA-Z][$_a-zA-Z0-9]*(?:(?:<[$_a-zA-Z][$_a-zA-Z0-9]*>)|(?:\\[\\]))?");
 	
 	private Schema _metadataSchema;
 	private StringBuffer _textBuffer = new StringBuffer();
