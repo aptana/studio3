@@ -1,9 +1,7 @@
 package com.aptana.theme.internal;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -52,7 +50,14 @@ public class ControlThemerFactory implements IControlThemerFactory
 
 	private IControlThemer getThemer(Control control)
 	{
-		// FIXME If a themer already exists for the control, just return it?
+		// If a themer already exists for the control, just return it
+		IControlThemer themer = themers.get(control);
+		if (themer != null)
+		{
+			return themer;
+		}
+
+		// No themer exists, create a new one
 		if (control instanceof Tree)
 		{
 			return new TreeThemer((Tree) control);
@@ -66,8 +71,17 @@ public class ControlThemerFactory implements IControlThemerFactory
 
 	private IControlThemer getThemer(Viewer viewer)
 	{
+
 		if (viewer instanceof TreeViewer)
 		{
+			// If a themer already exists for the control, just return it
+			IControlThemer themer = themers.get(viewer.getControl());
+			if (themer != null)
+			{
+				return themer;
+			}
+
+			// No themer exists, create a new one
 			return new TreeThemer((TreeViewer) viewer);
 		}
 		return getThemer(viewer.getControl());
@@ -79,19 +93,12 @@ public class ControlThemerFactory implements IControlThemerFactory
 	 */
 	public void dispose()
 	{
-		Set<Control> set = null;
 		synchronized (themers)
 		{
-			set = new HashSet<Control>(themers.keySet());
-		}
-
-		for (Control control : set)
-		{
-			dispose(control);
-		}
-
-		synchronized (themers)
-		{
+			for (Control control : themers.keySet())
+			{
+				dispose(control);
+			}
 			themers.clear();
 		}
 	}
