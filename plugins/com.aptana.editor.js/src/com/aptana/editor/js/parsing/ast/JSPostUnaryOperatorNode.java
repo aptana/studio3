@@ -39,6 +39,16 @@ public class JSPostUnaryOperatorNode extends JSNode
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
+	 */
+	@Override
+	public void accept(JSTreeWalker walker)
+	{
+		walker.visit(this);
+	}
+	
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSUnaryOperatorNode#toString()
 	 */
 	@Override
