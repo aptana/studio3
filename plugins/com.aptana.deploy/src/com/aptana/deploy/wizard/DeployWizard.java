@@ -50,6 +50,7 @@ import com.aptana.deploy.internal.wizard.FTPDeployWizardPage;
 import com.aptana.deploy.internal.wizard.HerokuDeployWizardPage;
 import com.aptana.deploy.internal.wizard.HerokuSignupPage;
 import com.aptana.deploy.preferences.IPreferenceConstants;
+import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
@@ -83,25 +84,52 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		IRunnableWithProgress runnable = null;
 		// check what the user chose, then do the heavy lifting, or tell the page to finish...
 		IWizardPage currentPage = getContainer().getCurrentPage();
-		if (currentPage.getName().equals(HerokuDeployWizardPage.NAME))
+		String pageName = currentPage.getName();
+		DeployType type = null;
+		String deployEndpointName = null;
+		if (pageName.equals(HerokuDeployWizardPage.NAME))
 		{
 			HerokuDeployWizardPage page = (HerokuDeployWizardPage) currentPage;
 			runnable = createHerokuDeployRunnable(page);
+			type = DeployType.HEROKU;
+			deployEndpointName = page.getAppName();
 		}
-		else if (currentPage.getName().equals(FTPDeployWizardPage.NAME))
+		else if (pageName.equals(FTPDeployWizardPage.NAME))
 		{
 			FTPDeployWizardPage page = (FTPDeployWizardPage) currentPage;
 			runnable = createFTPDeployRunnable(page);
+			type = DeployType.FTP;
+			deployEndpointName = page.getConnectionPoint().getName();
 		}
-		else if (currentPage.getName().equals(HerokuSignupPage.NAME))
+		else if (pageName.equals(HerokuSignupPage.NAME))
 		{
 			HerokuSignupPage page = (HerokuSignupPage) currentPage;
 			runnable = createHerokuSignupRunnable(page);
 		}
-		else if (currentPage.getName().equals(CapifyProjectPage.NAME))
+		else if (pageName.equals(CapifyProjectPage.NAME))
 		{
 			CapifyProjectPage page = (CapifyProjectPage) currentPage;
 			runnable = createCapifyRunnable(page);
+			type = DeployType.CAPISTRANO;
+		}
+
+		// stores the deploy type and what application or FTP connection it's deploying to
+		if (type != null)
+		{
+			IEclipsePreferences prefs = (new InstanceScope()).getNode(Activator.getPluginIdentifier());
+			prefs.put(MessageFormat.format("{0}:{1}", IPreferenceConstants.PROJECT_DEPLOY_TYPE, project.getName()), //$NON-NLS-1$
+					type.toString());
+			if (deployEndpointName != null)
+			{
+				prefs.put(IPreferenceConstants.PROJECT_DEPLOY_ENDPOINT, deployEndpointName);
+			}
+			try
+			{
+				prefs.flush();
+			}
+			catch (BackingStoreException e)
+			{
+			}
 		}
 
 		if (runnable != null)

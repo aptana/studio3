@@ -1,5 +1,6 @@
 package com.aptana.explorer.internal.ui;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -80,6 +81,8 @@ import com.aptana.core.IScopeReference;
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.ProcessUtil;
+import com.aptana.deploy.Activator;
+import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IExplorerUIConstants;
 import com.aptana.explorer.IPreferenceConstants;
@@ -433,27 +436,62 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 
 	protected void fillDeployMenu(MenuManager menuManager)
 	{
-		if (selectedProject == null || !selectedProject.isAccessible())
+		if (selectedProject != null && selectedProject.isAccessible())
 		{
-			menuManager.add(new Separator(GROUP_WIZARD));
+			DeployType type = getDeployTypeFromPreference(selectedProject);
+			if (type == null)
+			{
+				if (isCapistranoProject())
+				{
+					// insert commands for capistrano here
+					menuManager.add(new Separator(GROUP_CAP));
+				}
+				else if (isHerokuProject())
+				{
+					addHerokuMenuCommands(menuManager);
+				}
+				else if (isFTPProject())
+				{
+					addFTPMenuCommands(menuManager);
+				}
+			}
+			else if (type == DeployType.HEROKU)
+			{
+				addHerokuMenuCommands(menuManager);
+			}
+			else if (type == DeployType.FTP)
+			{
+				addFTPMenuCommands(menuManager);
+			}
+			else if (type == DeployType.CAPISTRANO)
+			{
+				menuManager.add(new Separator(GROUP_CAP));
+			}
 		}
-		else if (isCapistranoProject())
+		menuManager.add(new Separator(GROUP_WIZARD));
+	}
+
+	private static DeployType getDeployTypeFromPreference(IProject project)
+	{
+		String type = Platform.getPreferencesService().getString(Activator.getPluginIdentifier(),
+				MessageFormat.format("{0}:{1}", com.aptana.deploy.preferences.IPreferenceConstants.PROJECT_DEPLOY_TYPE, //$NON-NLS-1$
+						project.getName()), null, null);
+		if (type != null)
 		{
-			// insert commands for capistrano here
-			menuManager.add(new Separator(GROUP_CAP));
+			if (type.equals(DeployType.HEROKU.toString()))
+			{
+				return DeployType.HEROKU;
+			}
+			if (type.equals(DeployType.FTP.toString()))
+			{
+				return DeployType.FTP;
+			}
+			if (type.equals(DeployType.CAPISTRANO.toString()))
+			{
+				return DeployType.CAPISTRANO;
+			}
 		}
-		else if (isHerokuProject())
-		{
-			addHerokuMenuCommands(menuManager);
-		}
-		else if (isFTPProject())
-		{
-			addFTPMenuCommands(menuManager);
-		}
-		else
-		{
-			menuManager.add(new Separator(GROUP_WIZARD));
-		}
+		return null;
 	}
 
 	private void addFTPMenuCommands(MenuManager menuManager)

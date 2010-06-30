@@ -151,6 +151,11 @@
             id="com.aptana.explorer.commands.openTerminal"
             name="%command.openTerminal.name">
       </command>
+      <command
+            defaultHandler="com.aptana.explorer.internal.handlers.RunDeployWizardHandler"
+            id="com.aptana.explorer.deploywizard"
+            name="%DeployWizard.label">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -198,7 +203,7 @@
       <menuContribution
             locationURI="toolbar:com.aptana.explorer.deploy?before=group.wizard">
          <command
-               commandId="com.aptana.explorer.deploy"
+               commandId="com.aptana.explorer.deploywizard"
                label="%DeployWizard.label"
                style="push">
          </command>
