@@ -1,5 +1,6 @@
 package com.aptana.git.ui.internal.actions;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -114,7 +115,7 @@ public class CommitDialog extends StatusDialog
 	protected Control createDialogArea(Composite parent)
 	{
 		Composite container = (Composite) super.createDialogArea(parent);
-		parent.getShell().setText(Messages.CommitDialog_Changes);
+		parent.getShell().setText(MessageFormat.format(Messages.CommitDialog_Changes, this.gitRepository.currentBranch()));
 
 		container.setLayout(new GridLayout(1, true));
 
