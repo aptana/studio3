@@ -18,7 +18,6 @@ public interface JSIndexConstants
 	static final String PARAMETERS = PREFIX + "parameters"; //$NON-NLS-1$
 	static final String RETURN_TYPES = PREFIX + "return_types"; //$NON-NLS-1$
 	static final String USER_AGENT = PREFIX + "user_agent"; //$NON-NLS-1$
-	static final String VARIABLE = PREFIX + "variable"; //$NON-NLS-1$
 
 	// special values
 	static final String NO_ENTRY = "-1"; //$NON-NLS-1$
