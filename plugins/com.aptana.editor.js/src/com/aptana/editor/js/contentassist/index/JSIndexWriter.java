@@ -18,6 +18,7 @@ import com.aptana.index.core.Index;
 
 public class JSIndexWriter
 {
+	private static final URI METADATA_LOCATION = URI.create("");
 	private static Map<UserAgentElement,String> keysByUserAgent = new HashMap<UserAgentElement,String>();
 	static Map<String,UserAgentElement> userAgentsByKey = new HashMap<String,UserAgentElement>();
 	
@@ -216,8 +217,18 @@ public class JSIndexWriter
 	 */
 	public void writeType(Index index, TypeElement type)
 	{
-		URI documentPath = URI.create(""); //$NON-NLS-1$
-
+		this.writeType(index, type, METADATA_LOCATION);
+	}
+	
+	/**
+	 * writeType
+	 * 
+	 * @param index
+	 * @param type
+	 * @param location
+	 */
+	public void writeType(Index index, TypeElement type, URI location)
+	{
 		// write type entry
 		List<String> parentTypes = type.getParentTypes();
 		String descriptionKey = this.writeDescription(index, type.getDescription());
@@ -236,9 +247,9 @@ public class JSIndexWriter
 			descriptionKey
 		);
 
-		index.addEntry(JSIndexConstants.TYPE, value, documentPath);
+		index.addEntry(JSIndexConstants.TYPE, value, location);
 
-		// write type properties (that are not functions)
+		// write properties
 		for (PropertyElement property : type.getProperties())
 		{
 			if (property instanceof FunctionElement)
