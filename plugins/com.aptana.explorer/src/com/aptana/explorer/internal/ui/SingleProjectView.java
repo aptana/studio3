@@ -26,9 +26,9 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
@@ -95,9 +95,9 @@ import com.aptana.ide.syncing.ui.actions.UploadAction;
 import com.aptana.ide.syncing.ui.dialogs.ChooseSiteConnectionDialog;
 import com.aptana.ide.ui.secureftp.dialogs.CommonFTPConnectionPointPropertyDialog;
 import com.aptana.terminal.views.TerminalView;
+import com.aptana.theme.IControlThemerFactory;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
-import com.aptana.theme.TreeThemer;
 import com.aptana.ui.UIUtils;
 import com.aptana.ui.widgets.SearchComposite;
 
@@ -161,15 +161,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	// listen for external changes to active project
 	private IPreferenceChangeListener fActiveProjectPrefChangeListener;
 
-	protected boolean isWindows = Platform.getOS().equals(Platform.OS_WIN32);
-	protected boolean isMacOSX = Platform.getOS().equals(Platform.OS_MACOSX);
-	// use the hard-coded constant since it is only defined in Eclipse 3.5
-	protected boolean isCocoa = Platform.getWS().equals("cocoa"); //$NON-NLS-1$
-
-	private TreeThemer treeThemer;
-
-	// memento wasn't declared protected until Eclipse 3.5, so store it
-	// ourselves
+	// memento wasn't declared protected until Eclipse 3.5, so store it ourselves
 	protected IMemento memento;
 
 	private static final String GEAR_MENU_ICON = "icons/full/elcl16/command.png"; //$NON-NLS-1$
@@ -559,7 +551,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 
 						if (siteConnections.length != 1) {
 							// try for last remembered site first
-							IContainer container = (IContainer) selectedProject;
+							IContainer container = selectedProject;
 							String lastConnection = ResourceSynchronizationUtils
 									.getLastSyncConnection(container);
 							Boolean remember = ResourceSynchronizationUtils
@@ -660,8 +652,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 						}
 						catch (Exception e1)
 						{
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
+							ExplorerPlugin.logError(e1.getMessage(), e1);
 						}
 					}
 				});
@@ -977,8 +968,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	 * Hooks up to the active theme.
 	 */
 	private void hookToThemes() {
-		treeThemer = new TreeThemer(getCommonViewer());
-		treeThemer.apply();
+		getControlThemerFactory().apply(getCommonViewer());
 	}
 
 	protected IThemeManager getThemeManager() {
@@ -1120,11 +1110,15 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	@Override
 	public void dispose() {
 		removeFileWatcher();
-		treeThemer.dispose();
-		treeThemer = null;
+		getControlThemerFactory().dispose(getCommonViewer());
 		removeProjectResourceListener();
 		removeActiveProjectPrefListener();
 		super.dispose();
+	}
+
+	protected IControlThemerFactory getControlThemerFactory()
+	{
+		return ThemePlugin.getDefault().getControlThemerFactory();
 	}
 
 	private void removeProjectResourceListener() {

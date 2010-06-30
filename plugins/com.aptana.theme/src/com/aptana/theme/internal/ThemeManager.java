@@ -96,9 +96,14 @@ public class ThemeManager implements IThemeManager
 				// TODO: in the plugin case, we shouldn't force a theme at all
 				Theme defaultTheme = getTheme(Messages.ThemeManager_DefaultThemeName);
 				// if we can't find the default theme, just use the first one in the list (as we did previously)
-				if (defaultTheme == null)
+				if (defaultTheme == null && !getThemeMap().values().isEmpty())
+				{
 					defaultTheme = getThemeMap().values().iterator().next();
-				setCurrentTheme(defaultTheme);
+				}
+				if (defaultTheme != null)
+				{
+					setCurrentTheme(defaultTheme);
+				}
 			}
 		}
 		return fCurrentTheme;

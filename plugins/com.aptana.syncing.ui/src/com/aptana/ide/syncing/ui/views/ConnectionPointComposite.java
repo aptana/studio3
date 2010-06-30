@@ -91,7 +91,6 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 
 import com.aptana.core.CoreStrings;
 import com.aptana.core.util.FileUtil;
-import com.aptana.theme.TreeThemer;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
@@ -103,6 +102,8 @@ import com.aptana.ide.ui.io.navigator.FileTreeNameSorter;
 import com.aptana.ide.ui.io.navigator.actions.FileSystemDeleteAction;
 import com.aptana.ide.ui.io.navigator.actions.FileSystemRenameAction;
 import com.aptana.ide.ui.io.navigator.actions.OpenFileAction;
+import com.aptana.theme.IControlThemerFactory;
+import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.SWTUtils;
 import com.aptana.ui.UIUtils;
 
@@ -140,8 +141,6 @@ public class ConnectionPointComposite implements SelectionListener, ISelectionCh
     private List<IAdaptable> fEndPointData;
     private Client fClient;
 
-	private TreeThemer treeThemer;
-
     public ConnectionPointComposite(Composite parent, String name, Client client) {
         fName = name;
         fClient = client;
@@ -149,9 +148,13 @@ public class ConnectionPointComposite implements SelectionListener, ISelectionCh
 
         fMain = createControl(parent);
 
-        treeThemer = new TreeThemer(fTreeViewer);
-		treeThemer.apply();
+        getControlThemerFactory().apply(fTreeViewer);
     }
+
+	protected IControlThemerFactory getControlThemerFactory()
+	{
+		return ThemePlugin.getDefault().getControlThemerFactory();
+	}
 
     public Control getControl() {
         return fMain;
@@ -396,8 +399,7 @@ public class ConnectionPointComposite implements SelectionListener, ISelectionCh
 			@Override
 			public void widgetDisposed(DisposeEvent e)
 			{
-				treeThemer.dispose();
-				treeThemer = null;
+				getControlThemerFactory().dispose(fTreeViewer);
 			}
         });
 

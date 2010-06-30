@@ -2,8 +2,6 @@ package com.aptana.theme.internal;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -16,7 +14,6 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.internal.ui.views.memory.IMemoryViewPane;
 import org.eclipse.debug.internal.ui.views.memory.MemoryView;
 import org.eclipse.debug.ui.IDebugView;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -30,7 +27,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Tree;
 import org.eclipse.team.ui.history.HistoryPage;
 import org.eclipse.team.ui.history.IHistoryView;
 import org.eclipse.ui.IEditorPart;
@@ -61,10 +57,10 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.theme.ConsoleThemer;
+import com.aptana.theme.IControlThemerFactory;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
-import com.aptana.theme.TreeThemer;
 import com.aptana.theme.preferences.IPreferenceConstants;
 import com.aptana.ui.IAptanaHistory;
 
@@ -78,7 +74,6 @@ import com.aptana.ui.IAptanaHistory;
 public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceChangeListener, IStartup
 {
 
-	private Map<Tree, TreeThemer> themers = new HashMap<Tree, TreeThemer>();
 	private ISelectionChangedListener pageListener;
 
 	public InvasiveThemeHijacker()
@@ -361,50 +356,24 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 
 	protected void hookTheme(Control control, boolean revert)
 	{
-		if (control instanceof Tree)
+		if (revert)
 		{
-			overrideTreeDrawing((Tree) control, revert);
+			getControlThemerFactory().dispose(control);
 		}
 		else
 		{
-			control.setRedraw(false);
-			if (revert)
-			{
-				control.setBackground(null);
-				control.setForeground(null);
-				control.setFont(null);
-			}
-			else
-			{
-				control.setBackground(ThemePlugin.getDefault().getColorManager()
-						.getColor(getCurrentTheme().getBackground()));
-				control.setForeground(ThemePlugin.getDefault().getColorManager()
-						.getColor(getCurrentTheme().getForeground()));
-				control.setFont(JFaceResources.getTextFont());
-			}
-			control.setRedraw(true);
+			getControlThemerFactory().apply(control);
 		}
+	}
+
+	protected IControlThemerFactory getControlThemerFactory()
+	{
+		return ThemePlugin.getDefault().getControlThemerFactory();
 	}
 
 	protected Theme getCurrentTheme()
 	{
 		return ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
-	}
-
-	private void overrideTreeDrawing(final Tree tree, boolean revertToDefaults)
-	{
-		if (revertToDefaults)
-		{
-			TreeThemer themer = themers.remove(tree);
-			if (themer != null)
-				themer.dispose();
-		}
-		else
-		{
-			TreeThemer themer = new TreeThemer(tree);
-			themers.put(tree, themer);
-			themer.apply();
-		}
 	}
 
 	@SuppressWarnings("nls")
@@ -830,10 +799,18 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		if (view instanceof IHistoryView)
 		{
 			IHistoryView historyView = (IHistoryView) view;
-			HistoryPage page = (HistoryPage) historyView.getHistoryPage();
+			final HistoryPage page = (HistoryPage) historyView.getHistoryPage();
 			if (page instanceof IAptanaHistory)
 			{
-				((IAptanaHistory) page).setTheme(false);
+				Display.getCurrent().asyncExec(new Runnable()
+				{
+
+					@Override
+					public void run()
+					{
+						((IAptanaHistory) page).setTheme(false);
+					}
+				});
 				return true;
 			}
 

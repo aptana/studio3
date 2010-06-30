@@ -1,9 +1,8 @@
-package com.aptana.theme;
+package com.aptana.theme.internal;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -34,41 +33,39 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
 
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.ThemePlugin;
+import com.aptana.theme.ThemedDelegatingLabelProvider;
+
 /**
  * A Utility class that makes "hijacking" a Tree and hooking it up to our themes easy.
  * 
  * @author cwilliams
  */
-public class TreeThemer
+class TreeThemer extends ControlThemer
 {
 
-	private static final boolean isWindows = Platform.getOS().equals(Platform.OS_WIN32);
-	private static final boolean isMacOSX = Platform.getOS().equals(Platform.OS_MACOSX);
-	// use the hard-coded value for cocoa since the constant is not defined until Eclipse 3.5
-	private static final boolean isCocoa = Platform.getWS().equals("cocoa"); //$NON-NLS-1$
-
 	private TreeViewer fTreeViewer;
-	private Tree fTree;
 	private IPropertyChangeListener fontListener;
 	private IPreferenceChangeListener fThemeChangeListener;
 	private Listener measureItemListener;
-	private Listener selectionOverride;
 	private Listener customDrawingListener;
 	private Listener selectionPaintListener;
 
 	public TreeThemer(TreeViewer treeViewer)
 	{
+		super(treeViewer.getTree());
 		this.fTreeViewer = treeViewer;
 	}
 
 	public TreeThemer(Tree tree)
 	{
-		this.fTree = tree;
+		super(tree);
 	}
 
 	public void apply()
 	{
-		applyTheme();
+		super.apply();
 		addSelectionColorOverride();
 		addCustomTreeControlDrawing();
 		addMeasureItemListener();
@@ -147,8 +144,8 @@ public class TreeThemer
 			{
 				DelegatingStyledCellLabelProvider delegating = (DelegatingStyledCellLabelProvider) cellProvider;
 				IStyledLabelProvider styled = delegating.getStyledStringProvider();
-				if (styled.getClass().getName().equals(
-						"org.eclipse.jdt.internal.ui.packageview.PackageExplorerLabelProvider")) //$NON-NLS-1$
+				if (styled.getClass().getName()
+						.equals("org.eclipse.jdt.internal.ui.packageview.PackageExplorerLabelProvider")) //$NON-NLS-1$
 				{
 					try
 					{
@@ -245,38 +242,10 @@ public class TreeThemer
 		colViewer.refresh();
 	}
 
-	private void addSelectionColorOverride()
+	protected void addSelectionColorOverride()
 	{
+		super.addSelectionColorOverride();
 		final Tree tree = getTree();
-		// Override selection color to match what is set in theme
-		selectionOverride = new Listener()
-		{
-			public void handleEvent(Event event)
-			{
-				if ((event.detail & SWT.SELECTED) != 0)
-				{
-					Tree tree = (Tree) event.widget;
-					Rectangle clientArea = tree.getClientArea();
-					int clientWidth = clientArea.width;
-
-					GC gc = event.gc;
-					Color oldBackground = gc.getBackground();
-
-					gc.setBackground(getSelection());
-					gc.fillRectangle(clientArea.x, event.y, clientWidth, event.height);
-					gc.setBackground(oldBackground);
-
-					event.detail &= ~SWT.SELECTED;
-					event.detail &= ~SWT.BACKGROUND;
-					// force foreground color for Windows. Otherwise on dark themes we get black fg
-					if (!isCocoa)
-					{
-						gc.setForeground(getForeground());
-					}
-				}
-			}
-		};
-		tree.addListener(SWT.EraseItem, selectionOverride);
 		// This draws from right end of item to full width of tree, needed on windows so selection is full width of view
 		selectionPaintListener = new Listener()
 		{
@@ -489,16 +458,6 @@ public class TreeThemer
 		JFaceResources.getFontRegistry().addListener(fontListener);
 	}
 
-	protected Font getFont()
-	{
-		Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
-		if (font == null)
-		{
-			font = JFaceResources.getTextFont();
-		}
-		return font;
-	}
-
 	private void addThemeChangeListener()
 	{
 		fThemeChangeListener = new IPreferenceChangeListener()
@@ -516,28 +475,9 @@ public class TreeThemer
 		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
 	}
 
-	private void applyTheme()
-	{
-		if (getTree() != null && !getTree().isDisposed())
-		{
-			getTree().setBackground(getBackground());
-			getTree().setForeground(getForeground());
-			getTree().setFont(getFont());
-			if (fTreeViewer != null)
-			{
-				fTreeViewer.refresh(true);
-			}
-		}
-	}
-
 	public void dispose()
 	{
-		if (getTree() != null && !getTree().isDisposed())
-		{
-			getTree().setBackground(null);
-			getTree().setForeground(null);
-			getTree().setFont(null);
-		}
+		super.dispose();
 		revertLabelProvider();
 		removeSelectionOverride();
 		removeCustomTreeControlDrawing();
@@ -555,13 +495,9 @@ public class TreeThemer
 		customDrawingListener = null;
 	}
 
-	private void removeSelectionOverride()
+	protected void removeSelectionOverride()
 	{
-		if (selectionOverride != null && getTree() != null && !getTree().isDisposed())
-		{
-			getTree().removeListener(SWT.EraseItem, selectionOverride);
-		}
-		selectionOverride = null;
+		super.removeSelectionOverride();
 
 		if (selectionPaintListener != null && getTree() != null && !getTree().isDisposed())
 		{
@@ -579,11 +515,9 @@ public class TreeThemer
 		measureItemListener = null;
 	}
 
-	private Tree getTree()
+	protected Tree getTree()
 	{
-		if (fTree == null && fTreeViewer != null)
-			fTree = fTreeViewer.getTree();
-		return fTree;
+		return (Tree) getControl();
 	}
 
 	private void removeFontListener()
@@ -600,36 +534,5 @@ public class TreeThemer
 			new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
 			fThemeChangeListener = null;
 		}
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return ThemePlugin.getDefault().getThemeManager();
-	}
-
-	protected Color getForeground()
-	{
-		return getColorManager().getColor(getThemeManager().getCurrentTheme().getForeground());
-	}
-
-	/**
-	 * @return
-	 */
-	protected Color getBackground()
-	{
-		return getColorManager().getColor(getThemeManager().getCurrentTheme().getBackground());
-	}
-
-	protected Color getSelection()
-	{
-		return getColorManager().getColor(getThemeManager().getCurrentTheme().getSelection());
-	}
-
-	/**
-	 * @return
-	 */
-	protected ColorManager getColorManager()
-	{
-		return ThemePlugin.getDefault().getColorManager();
 	}
 }
