@@ -29,6 +29,16 @@ public class ParamTag extends TagWithTypes
 	}
 	
 	/**
+	 * getUsage
+	 * 
+	 * @return
+	 */
+	public Usage getUsage()
+	{
+		return this._parameter.getUsage();
+	}
+	
+	/**
 	 * toSource
 	 * 
 	 * @param writer
