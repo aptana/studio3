@@ -8,11 +8,14 @@ import org.xml.sax.Attributes;
 
 import com.aptana.editor.common.contentassist.MetadataReader;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
+import com.aptana.editor.js.sdoc.model.ExampleTag;
+import com.aptana.editor.js.sdoc.model.ExceptionTag;
 import com.aptana.editor.js.sdoc.model.ParamTag;
 import com.aptana.editor.js.sdoc.model.Parameter;
+import com.aptana.editor.js.sdoc.model.PrivateTag;
+import com.aptana.editor.js.sdoc.model.ReturnTag;
+import com.aptana.editor.js.sdoc.model.SeeTag;
 import com.aptana.editor.js.sdoc.model.Tag;
-import com.aptana.editor.js.sdoc.model.TagType;
-import com.aptana.editor.js.sdoc.model.TagWithTypes;
 import com.aptana.editor.js.sdoc.model.Type;
 import com.aptana.editor.js.sdoc.model.Usage;
 
@@ -114,7 +117,7 @@ public class VSDocReader extends MetadataReader
 	{
 		String type = attributes.getValue("cref");
 
-		this._tags.add(new Tag(TagType.SEE, type));
+		this._tags.add(new SeeTag(type));
 	}
 	
 	/**
@@ -159,7 +162,7 @@ public class VSDocReader extends MetadataReader
 	{
 		String text = this.getText();
 
-		this._tags.add(new Tag(TagType.EXAMPLE, text));
+		this._tags.add(new ExampleTag(text));
 	}
 
 	/**
@@ -176,7 +179,7 @@ public class VSDocReader extends MetadataReader
 		List<Type> types = new ArrayList<Type>();
 		types.add(new Type(this._exceptionType != null ? this._exceptionType : "Object"));
 
-		this._tags.add(new TagWithTypes(TagType.EXCEPTION, types, text));
+		this._tags.add(new ExceptionTag(types, text));
 
 		// clean up
 		this._exceptionType = null;
@@ -215,7 +218,7 @@ public class VSDocReader extends MetadataReader
 	{
 		String text = this.getText();
 
-		this._tags.add(new Tag(TagType.PRIVATE, text));
+		this._tags.add(new PrivateTag(text));
 	}
 
 	/**
@@ -232,7 +235,7 @@ public class VSDocReader extends MetadataReader
 		List<Type> types = new ArrayList<Type>();
 		types.add(new Type(this._currentType != null ? this._currentType : "Object"));
 
-		this._tags.add(new TagWithTypes(TagType.RETURN, types, text));
+		this._tags.add(new ReturnTag(types, text));
 
 		// reset
 		this._currentType = null;

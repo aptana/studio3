@@ -4,7 +4,7 @@ import beaver.Symbol;
 
 import com.aptana.parsing.io.SourceWriter;
 
-public class Tag extends Symbol
+public abstract class Tag extends Symbol
 {
 	private TagType _type;
 	private String _text;

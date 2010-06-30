@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.aptana.parsing.io.SourceWriter;
 
-public class TagWithTypes extends Tag
+public abstract class TagWithTypes extends Tag
 {
 	private List<Type> _types;
 	

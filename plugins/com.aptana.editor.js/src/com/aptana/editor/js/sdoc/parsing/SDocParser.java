@@ -10,7 +10,7 @@ import beaver.*;
  * <a href="http://beaver.sourceforge.net">Beaver</a> v0.9.6.1
  * from the grammar specification "SDoc.grammar".
  */
-@SuppressWarnings({ "unchecked" })
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class SDocParser extends Parser {
 
 	static final ParsingTables PARSING_TABLES = new ParsingTables(
@@ -154,19 +154,19 @@ public class SDocParser extends Parser {
 			{
 					final Symbol text = _symbols[offset + 2];
 					
-			return new Tag(TagType.ADVANCED, (String) text.value);
+			return new AdvancedTag((String) text.value);
 			}
 			case 20: // Tag = ALIAS Text.text
 			{
 					final Symbol text = _symbols[offset + 2];
 					
-			return new Tag(TagType.ALIAS, (String) text.value);
+			return new AliasTag((String) text.value);
 			}
 			case 21: // Tag = AUTHOR Text.text
 			{
 					final Symbol text = _symbols[offset + 2];
 					
-			return new Tag(TagType.AUTHOR, (String) text.value);
+			return new AuthorTag((String) text.value);
 			}
 			case 22: // Tag = CLASS_DESCRIPTION LCURLY Namespace.name RCURLY Text.text
 			{
@@ -174,45 +174,45 @@ public class SDocParser extends Parser {
 					final String name = (String) _symbol_name.value;
 					final Symbol text = _symbols[offset + 5];
 					
-			return new TagWithName(TagType.CLASS_DESCRIPTION, name, (String) text.value);
+			return new ClassDescriptionTag(name, (String) text.value);
 			}
 			case 23: // Tag = CONSTRUCTOR opt$Text.text
 			{
 					final Symbol text = _symbols[offset + 2];
 					
-			return new Tag(TagType.CONSTRUCTOR, (String) text.value);
+			return new ConstructorTag((String) text.value);
 			}
 			case 24: // Tag = EXAMPLE Text.text
 			{
 					final Symbol text = _symbols[offset + 2];
 					
-			return new Tag(TagType.EXAMPLE, (String) text.value);
+			return new ExampleTag((String) text.value);
 			}
 			case 25: // Tag = EXCEPTION LCURLY Types.types RCURLY opt$Text.text
 			{
 					final Symbol types = _symbols[offset + 3];
 					final Symbol text = _symbols[offset + 5];
 					
-			return new TagWithTypes(TagType.EXCEPTION, (List<Type>) types.value, (String) text.value);
+			return new ExceptionTag((List<Type>) types.value, (String) text.value);
 			}
 			case 26: // Tag = EXTENDS LCURLY Types.types RCURLY opt$Text.text
 			{
 					final Symbol types = _symbols[offset + 3];
 					final Symbol text = _symbols[offset + 5];
 					
-			return new TagWithTypes(TagType.EXTENDS, (List<Type>) types.value, (String) text.value);
+			return new ExtendsTag((List<Type>) types.value, (String) text.value);
 			}
 			case 27: // Tag = INTERNAL opt$Text.text
 			{
 					final Symbol text = _symbols[offset + 2];
 					
-			return new Tag(TagType.INTERNAL, (String) text.value);
+			return new InternalTag((String) text.value);
 			}
 			case 28: // Tag = METHOD opt$Text.text
 			{
 					final Symbol text = _symbols[offset + 2];
 					
-			return new Tag(TagType.METHOD, (String) text.value);
+			return new MethodTag((String) text.value);
 			}
 			case 29: // Tag = NAMESPACE LCURLY Namespace.name RCURLY opt$Text.text
 			{
@@ -220,13 +220,13 @@ public class SDocParser extends Parser {
 					final String name = (String) _symbol_name.value;
 					final Symbol text = _symbols[offset + 5];
 					
-			return new TagWithName(TagType.NAMESPACE, name, (String) text.value);
+			return new NamespaceTag(name, (String) text.value);
 			}
 			case 30: // Tag = OVERVIEW Text.text
 			{
 					final Symbol text = _symbols[offset + 2];
 					
-			return new Tag(TagType.OVERVIEW, (String) text.value);
+			return new OverviewTag((String) text.value);
 			}
 			case 31: // Tag = PARAM LCURLY Types.types RCURLY ParamName.name opt$Text.text
 			{
@@ -241,34 +241,34 @@ public class SDocParser extends Parser {
 			{
 					final Symbol text = _symbols[offset + 2];
 					
-			return new Tag(TagType.PRIVATE, (String) text.value);
+			return new PrivateTag((String) text.value);
 			}
 			case 33: // Tag = PROPERTY LCURLY Types.types RCURLY opt$Text.text
 			{
 					final Symbol types = _symbols[offset + 3];
 					final Symbol text = _symbols[offset + 5];
 					
-			return new TagWithTypes(TagType.PROPERTY, (List<Type>) types.value, (String) text.value);
+			return new PropertyTag((List<Type>) types.value, (String) text.value);
 			}
 			case 34: // Tag = RETURN LCURLY Types.types RCURLY opt$Text.text
 			{
 					final Symbol types = _symbols[offset + 3];
 					final Symbol text = _symbols[offset + 5];
 					
-			return new TagWithTypes(TagType.RETURN, (List<Type>) types.value, (String) text.value);
+			return new ReturnTag((List<Type>) types.value, (String) text.value);
 			}
 			case 35: // Tag = SEE Text.text
 			{
 					final Symbol text = _symbols[offset + 2];
 					
-			return new Tag(TagType.SEE, (String) text.value);
+			return new SeeTag((String) text.value);
 			}
 			case 36: // Tag = TYPE LCURLY Types.types RCURLY opt$Text.text
 			{
 					final Symbol types = _symbols[offset + 3];
 					final Symbol text = _symbols[offset + 5];
 					
-			return new TagWithTypes(TagType.TYPE, (List<Type>) types.value, (String) text.value);
+			return new TypeTag((List<Type>) types.value, (String) text.value);
 			}
 			case 37: // Tag = UNKNOWN.name opt$Text.text
 			{
@@ -276,7 +276,7 @@ public class SDocParser extends Parser {
 					final String name = (String) _symbol_name.value;
 					final Symbol text = _symbols[offset + 2];
 					
-			return new TagWithName(TagType.UNKNOWN, name, (String) text.value);
+			return new UnknownTag(name, (String) text.value);
 			}
 			case 38: // Types = Types.types TypeDelimiter Type.type
 			{

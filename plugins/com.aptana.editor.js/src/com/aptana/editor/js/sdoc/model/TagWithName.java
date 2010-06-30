@@ -2,7 +2,7 @@ package com.aptana.editor.js.sdoc.model;
 
 import com.aptana.parsing.io.SourceWriter;
 
-public class TagWithName extends Tag
+public abstract class TagWithName extends Tag
 {
 	private String _name;
 
