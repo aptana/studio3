@@ -10,15 +10,19 @@ import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
+import com.aptana.editor.js.parsing.ast.JSArithmeticOperatorNode;
 import com.aptana.editor.js.parsing.ast.JSArrayNode;
+import com.aptana.editor.js.parsing.ast.JSBooleanOperatorNode;
 import com.aptana.editor.js.parsing.ast.JSConstructNode;
 import com.aptana.editor.js.parsing.ast.JSFalseNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSGetElementNode;
 import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
+import com.aptana.editor.js.parsing.ast.JSGroupNode;
 import com.aptana.editor.js.parsing.ast.JSIdentifierNode;
 import com.aptana.editor.js.parsing.ast.JSInvokeNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
+import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSNumberNode;
 import com.aptana.editor.js.parsing.ast.JSObjectNode;
 import com.aptana.editor.js.parsing.ast.JSRegexNode;
@@ -31,11 +35,18 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class JSTypeWalker extends JSTreeWalker
 {
-	private static final String ARRAY_LITERAL = "[]";
-	private static final String OBJECT_TYPE = "Object";
 	private static final String ARRAY_TYPE = "Array";
+	private static final String BOOLEAN_TYPE = "Boolean";
+	private static final String FUNCTION_TYPE = "Function";
+	private static final String NUMBER_TYPE = "Number";
+	private static final String OBJECT_TYPE = "Object";
+	private static final String REG_EXP_TYPE = "RegExp";
+	private static final String STRING_TYPE = "String";
+	
+	private static final String ARRAY_LITERAL = "[]";
 	private static final String GENERIC_ARRAY_CLOSE = ">";
 	private static final String GENERIC_ARRAY_OPEN = "Array<";
+	
 	private Scope<JSNode> _scope;
 	private Index _index;
 	private List<String> _types;
@@ -167,13 +178,42 @@ public class JSTypeWalker extends JSTreeWalker
 		// grab result
 		result = walker.getTypes();
 		
-		// be sure we return some type of list
+		// be sure we return some type of list so we don't have to check for
+		// null return values
 		if (result == null)
 		{
 			result = Collections.emptyList();
 		}
 		
 		return walker.getTypes();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSArithmeticOperatorNode)
+	 */
+	@Override
+	public void visit(JSArithmeticOperatorNode node)
+	{
+		String type = NUMBER_TYPE;
+		
+		if (node.getNodeType() == JSNodeTypes.ADD)
+		{
+			IParseNode lhs = node.getLeftHandSide();
+			IParseNode rhs = node.getRightHandSide();
+			
+			if (lhs instanceof JSNode && rhs instanceof JSNode)
+			{
+				List<String> lhsTypes = this.getTypes((JSNode) lhs);
+				List<String> rhsTypes = this.getTypes((JSNode) rhs);
+				
+				if (lhsTypes.contains(STRING_TYPE) || rhsTypes.contains(STRING_TYPE))
+				{
+					type = STRING_TYPE;
+				}
+			}
+		}
+		
+		this.addType(type);
 	}
 
 	/*
@@ -184,6 +224,15 @@ public class JSTypeWalker extends JSTreeWalker
 	public void visit(JSArrayNode node)
 	{
 		this.addType(ARRAY_TYPE);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSBooleanOperatorNode)
+	 */
+	@Override
+	public void visit(JSBooleanOperatorNode node)
+	{
+		this.addType(BOOLEAN_TYPE);
 	}
 
 	/*
@@ -217,7 +266,7 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSFalseNode node)
 	{
-		this.addType("Boolean");
+		this.addType(BOOLEAN_TYPE);
 	}
 
 	/*
@@ -227,7 +276,7 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSFunctionNode node)
 	{
-		this.addType("Function");
+		this.addType(FUNCTION_TYPE);
 	}
 
 	
@@ -312,7 +361,7 @@ public class JSTypeWalker extends JSTreeWalker
 				{
 					if (property instanceof FunctionElement)
 					{
-						this.addType("Function");
+						this.addType(FUNCTION_TYPE);
 					}
 					else
 					{
@@ -323,6 +372,20 @@ public class JSTypeWalker extends JSTreeWalker
 					}
 				}
 			}
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSGroupNode)
+	 */
+	@Override
+	public void visit(JSGroupNode node)
+	{
+		IParseNode expression = node.getExpression();
+		
+		if (expression instanceof JSNode)
+		{
+			((JSNode) expression).accept(this);
 		}
 	}
 
@@ -352,7 +415,7 @@ public class JSTypeWalker extends JSTreeWalker
 		{
 			if (property instanceof FunctionElement)
 			{
-				this.addType("Function");
+				this.addType(FUNCTION_TYPE);
 			}
 			else
 			{
@@ -433,7 +496,7 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSNumberNode node)
 	{
-		this.addType("Number");
+		this.addType(NUMBER_TYPE);
 	}
 
 	/*
@@ -453,7 +516,7 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSRegexNode node)
 	{
-		this.addType("RegExp");
+		this.addType(REG_EXP_TYPE);
 	}
 
 	/*
@@ -463,7 +526,7 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSStringNode node)
 	{
-		this.addType("String");
+		this.addType(STRING_TYPE);
 	}
 
 	/*
@@ -473,6 +536,6 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSTrueNode node)
 	{
-		this.addType("Boolean");
+		this.addType(BOOLEAN_TYPE);
 	}
 }
