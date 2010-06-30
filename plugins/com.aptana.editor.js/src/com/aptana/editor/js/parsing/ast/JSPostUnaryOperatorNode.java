@@ -2,7 +2,7 @@ package com.aptana.editor.js.parsing.ast;
 
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 
-public class JSPostUnaryOperatorNode extends JSUnaryOperatorNode
+public class JSPostUnaryOperatorNode extends JSNode
 {
 	/**
 	 * JSPostUnaryOperatorNode
@@ -14,19 +14,26 @@ public class JSPostUnaryOperatorNode extends JSUnaryOperatorNode
 	 */
 	public JSPostUnaryOperatorNode(String operator, int start, int end, JSNode expression)
 	{
-		super(start, end, expression);
+		setLocation(start, end);
+		setChildren(new JSNode[] { expression });
 
 		short type = DEFAULT_TYPE;
 		JSTokenType token = JSTokenType.get(operator);
+		
 		switch (token)
 		{
 			case MINUS_MINUS:
 				type = JSNodeTypes.POST_DECREMENT;
 				break;
+				
 			case PLUS_PLUS:
 				type = JSNodeTypes.POST_INCREMENT;
 				break;
+				
+			default:
+				throw new IllegalArgumentException("Unrecognized operator: " + token);
 		}
+		
 		setType(type);
 	}
 
@@ -38,13 +45,17 @@ public class JSPostUnaryOperatorNode extends JSUnaryOperatorNode
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
-		text.append(getChildren()[0]);
+		
+		text.append(this.getChild(0));
+		
 		String operator = ""; //$NON-NLS-1$
+		
 		switch (getNodeType())
 		{
 			case JSNodeTypes.POST_DECREMENT:
 				operator = "--"; //$NON-NLS-1$
 				break;
+				
 			case JSNodeTypes.POST_INCREMENT:
 				operator = "++"; //$NON-NLS-1$
 				break;
