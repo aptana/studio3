@@ -68,6 +68,16 @@ public class JSAssignmentNode extends JSNode
 		this.setChildren(new JSNode[] { left, right });
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
+	 */
+	@Override
+	public void accept(JSTreeWalker walker)
+	{
+		walker.visit(this);
+	}
+	
 	/**
 	 * getLeftHandSide
 	 * 

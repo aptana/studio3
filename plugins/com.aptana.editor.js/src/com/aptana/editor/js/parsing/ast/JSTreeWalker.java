@@ -130,19 +130,7 @@ public class JSTreeWalker
 	{
 	}
 
-	public void visit(JSLabelStatementNode node)
-	{
-	}
-
 	public void visit(JSNameValuePairNode node)
-	{
-	}
-
-	public void visit(JSNaryAndExpressionNode node)
-	{
-	}
-
-	public void visit(JSNaryNode node)
 	{
 	}
 
@@ -175,11 +163,6 @@ public class JSTreeWalker
 
 	public void visit(JSPostUnaryOperatorNode node)
 	{
-	}
-
-	public void visit(JSPrimitiveNode node)
-	{
-		// leaf
 	}
 
 	public void visit(JSRegexNode node)

@@ -1,6 +1,7 @@
 package com.aptana.editor.js.parsing.ast;
 
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
+import com.aptana.parsing.ast.IParseNode;
 
 public class JSPostUnaryOperatorNode extends JSNode
 {
@@ -42,6 +43,16 @@ public class JSPostUnaryOperatorNode extends JSNode
 	public void accept(JSTreeWalker walker)
 	{
 		walker.visit(this);
+	}
+	
+	/**
+	 * getExpression
+	 * 
+	 * @return
+	 */
+	public IParseNode getExpression()
+	{
+		return this.getChild(0);
 	}
 	
 	/*

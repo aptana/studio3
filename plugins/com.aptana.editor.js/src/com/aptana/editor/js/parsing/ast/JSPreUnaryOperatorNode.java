@@ -96,6 +96,16 @@ public class JSPreUnaryOperatorNode extends JSNode
 		walker.visit(this);
 	}
 	
+	/**
+	 * getExpression
+	 * 
+	 * @return
+	 */
+	public IParseNode getExpression()
+	{
+		return this.getChild(0);
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()

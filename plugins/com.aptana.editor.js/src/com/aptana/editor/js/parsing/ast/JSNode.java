@@ -84,6 +84,8 @@ public class JSNode extends ParseNode
 	 */
 	public void accept(JSTreeWalker walker)
 	{
+		// sub-classes must override this method so their types will be
+		// recognized properly
 	}
 	
 	/**

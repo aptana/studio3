@@ -2,7 +2,7 @@ package com.aptana.editor.js.parsing.ast;
 
 import com.aptana.parsing.ast.IParseNode;
 
-public class JSNaryNode extends JSNode
+public abstract class JSNaryNode extends JSNode
 {
 	/**
 	 * JSNaryNode

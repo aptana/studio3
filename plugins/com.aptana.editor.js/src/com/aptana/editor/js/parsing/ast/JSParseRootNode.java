@@ -38,6 +38,26 @@ public class JSParseRootNode extends ParseRootNode
 	}
 
 	/**
+	 * accept
+	 * 
+	 * @param walker
+	 */
+	public void accept(JSTreeWalker walker)
+	{
+		walker.visit(this);
+	}
+	
+	/**
+	 * getGlobalScope
+	 * 
+	 * @return
+	 */
+	public Scope<JSNode> getGlobalScope()
+	{
+		return this._globalScope;
+	}
+
+	/**
 	 * getLocationType
 	 * 
 	 * @param offset
@@ -72,16 +92,6 @@ public class JSParseRootNode extends ParseRootNode
 		}
 
 		return result;
-	}
-
-	/**
-	 * getGlobalScope
-	 * 
-	 * @return
-	 */
-	public Scope<JSNode> getGlobalScope()
-	{
-		return this._globalScope;
 	}
 
 	/**

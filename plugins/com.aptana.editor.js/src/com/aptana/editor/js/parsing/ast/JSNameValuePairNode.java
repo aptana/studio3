@@ -16,6 +16,34 @@ public class JSNameValuePairNode extends JSNode
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
+	 */
+	@Override
+	public void accept(JSTreeWalker walker)
+	{
+		walker.visit(this);
+	}
+	
+	/**
+	 * getName
+	 */
+	public IParseNode getName()
+	{
+		return this.getChild(0);
+	}
+	
+	/**
+	 * getValue
+	 * 
+	 * @return
+	 */
+	public IParseNode getValue()
+	{
+		return this.getChild(1);
+	}
+	
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
 	 */
 	public String toString()

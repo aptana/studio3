@@ -24,16 +24,6 @@ public class JSGroupNode extends JSPreUnaryOperatorNode
 		walker.visit(this);
 	}
 	
-	/**
-	 * getExpression
-	 * 
-	 * @return
-	 */
-	public IParseNode getExpression()
-	{
-		return this.getChild(0);
-	}
-	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSUnaryOperatorNode#toString()

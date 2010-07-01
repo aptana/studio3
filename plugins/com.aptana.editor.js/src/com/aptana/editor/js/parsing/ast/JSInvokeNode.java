@@ -67,11 +67,11 @@ public class JSInvokeNode extends JSNode
 	}
 
 	/**
-	 * getParameters
+	 * getArguments
 	 * 
 	 * @return
 	 */
-	public IParseNode getParameters()
+	public IParseNode getArguments()
 	{
 		return this.getChild(1);
 	}

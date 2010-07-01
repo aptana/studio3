@@ -2,7 +2,7 @@ package com.aptana.editor.js.parsing.ast;
 
 import com.aptana.editor.js.contentassist.LocationType;
 
-public class JSPrimitiveNode extends JSNode
+public abstract class JSPrimitiveNode extends JSNode
 {
 	private String fText;
 
