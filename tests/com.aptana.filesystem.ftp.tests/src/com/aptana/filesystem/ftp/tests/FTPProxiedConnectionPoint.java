@@ -96,7 +96,17 @@ public class FTPProxiedConnectionPoint extends FTPConnectionPoint {
 	public boolean getFileNotFoundException() {
 		return ((FTPProxiedConnectionFileManager)connectionFileManager).getFileNotFoundException();
 	}
-	
+
+	public void forceStreamException(boolean value)
+	{
+		((FTPProxiedConnectionFileManager)connectionFileManager).forceStreamException(value);
+	}
+
+	public boolean getStreamException()
+	{
+		return ((FTPProxiedConnectionFileManager)connectionFileManager).getStreamException();
+	}
+
 	/**
 	 * Default constructor
 	 */

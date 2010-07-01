@@ -57,6 +57,9 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.filesystem.IFileTree;
 import org.eclipse.core.filesystem.provider.FileInfo;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.ide.core.io.vfs.ExtendedFileInfo;
@@ -86,7 +89,7 @@ public abstract class CommonConnectionTest extends BaseConnectionTest
 		assertFalse(cp.isConnected());
 		assertFalse(cp.canDisconnect());
 	}
-    
+
 	public final void testFetchRootInfo() throws CoreException
 	{
 		IFileStore fs = cp.getRoot();
@@ -372,34 +375,42 @@ public abstract class CommonConnectionTest extends BaseConnectionTest
 	public final void testWriteReadTextFileSimultanesously() throws CoreException, IOException
 	{
 		IFileStore[] fslist = new IFileStore[4];
-		for (int i = 0; i < fslist.length; ++i) {
-			IFileStore fs = fslist[i] = cp.getRoot().getFileStore(testPath.append(MessageFormat.format("/rwfile{0}.txt", i))); //$NON-NLS-1$
+		for (int i = 0; i < fslist.length; ++i)
+		{
+			IFileStore fs = fslist[i] = cp.getRoot().getFileStore(
+					testPath.append(MessageFormat.format("/rwfile{0}.txt", i))); //$NON-NLS-1$
 			assertNotNull(fs);
 			IFileInfo fi = fs.fetchInfo();
 			assertNotNull(fi);
 			assertFalse(fi.exists());
 		}
 		Writer[] writers = new Writer[fslist.length];
-		for (int i = 0; i < fslist.length; ++i) {
+		for (int i = 0; i < fslist.length; ++i)
+		{
 			writers[i] = new OutputStreamWriter(fslist[i].openOutputStream(EFS.NONE, null));
 		}
-		for (int i = 0; i < writers.length; ++i) {
+		for (int i = 0; i < writers.length; ++i)
+		{
 			writers[i].write(TEXT);
 		}
-		for (int i = 0; i < writers.length; ++i) {
+		for (int i = 0; i < writers.length; ++i)
+		{
 			writers[i].close();
 		}
-		for (int i = 0; i < fslist.length; ++i) {
+		for (int i = 0; i < fslist.length; ++i)
+		{
 			IFileInfo fi = fslist[i].fetchInfo();
 			assertNotNull(fi);
 			assertTrue(fi.exists());
 			assertEquals(TEXT.length(), fi.getLength());
 		}
 		Reader[] readers = new Reader[fslist.length];
-		for (int i = 0; i < fslist.length; ++i) {
+		for (int i = 0; i < fslist.length; ++i)
+		{
 			readers[i] = new InputStreamReader(fslist[i].openInputStream(EFS.NONE, null));
 		}
-		for (int i = 0; i < readers.length; ++i) {
+		for (int i = 0; i < readers.length; ++i)
+		{
 			StringWriter sw = new StringWriter(TEXT.length());
 			char[] buffer = new char[256];
 			int count;
@@ -410,7 +421,8 @@ public abstract class CommonConnectionTest extends BaseConnectionTest
 			sw.close();
 			assertTrue(Arrays.equals(TEXT.toCharArray(), sw.toString().toCharArray()));
 		}
-		for (int i = 0; i < readers.length; ++i) {
+		for (int i = 0; i < readers.length; ++i)
+		{
 			readers[i].close();
 		}
 	}
@@ -574,7 +586,7 @@ public abstract class CommonConnectionTest extends BaseConnectionTest
 		long lastModified = fi.getLastModified();
 		if (supportsSetModificationTime())
 		{
-			lastModified -= new Random().nextInt(7 * 24 * 60)*1000;
+			lastModified -= new Random().nextInt(7 * 24 * 60) * 1000;
 			lastModified -= lastModified % 1000; // remove milliseconds
 		}
 		IFileInfo pfi = new FileInfo();
@@ -598,7 +610,8 @@ public abstract class CommonConnectionTest extends BaseConnectionTest
 		assertTrue(fi.isDirectory());
 
 		long lastModified = fi.getLastModified();
-		if (supportsSetModificationTime()) {
+		if (supportsSetModificationTime())
+		{
 			lastModified -= new Random().nextInt(7 * 24) * 60000;
 			lastModified -= lastModified % 60000; // remove seconds/milliseconds
 		}
@@ -970,6 +983,120 @@ public abstract class CommonConnectionTest extends BaseConnectionTest
 				}
 			}
 			assertNotNull(fs);
+		}
+	}
+
+	protected final IFileStore populateRemoteFolder(String folderName, int numFiles) throws CoreException, IOException
+	{
+
+		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/" + folderName)); //$NON-NLS-1$
+		assertNotNull(fs);
+		fs.mkdir(EFS.SHALLOW, null);
+		assertTrue(fs.fetchInfo().exists());
+		for (int i = 0; i < numFiles; i++)
+		{
+			OutputStream out = fs.getChild("file" + i + ".txt").openOutputStream(EFS.NONE, null); //$NON-NLS-1$
+			out.write(BYTES);
+			out.close();
+			assertTrue(fs.getChild("file" + i + ".txt").fetchInfo().exists()); //$NON-NLS-1$			
+		}
+		return fs;
+	}
+
+	public final void testCancelMoveFolder() throws CoreException, IOException
+	{
+		IFileStore remoteFolder = populateRemoteFolder("moveFolder", 3);
+
+		File file = File.createTempFile("testMoveFolderToLocal", ".tmp"); //$NON-NLS-1$ //$NON-NLS-2$
+		file.delete();
+		file.deleteOnExit();
+		IFileStore fs2 = EFS.getLocalFileSystem().fromLocalFile(file);
+		assertNotNull(fs2);
+		assertFalse(fs2.fetchInfo().exists());
+
+		IProgressMonitor monitor = new NullProgressMonitor()
+		{
+
+			private int work_total = 0;
+
+			@Override
+			public void worked(int work)
+			{
+				work_total += work;
+				if (work_total >= 2)
+				{
+					this.setCanceled(true);
+				}
+			}
+		};
+
+		try
+		{
+			// move across file systems is the same as a copy.
+			remoteFolder.move(fs2, EFS.NONE, monitor);
+		}
+		catch (OperationCanceledException e)
+		{
+			assertTrue(remoteFolder.fetchInfo().exists());
+			assertTrue(fs2.fetchInfo().exists());
+
+			IFileInfo fi = fs2.getChild("file0.txt").fetchInfo(); //$NON-NLS-1$
+			assertNotNull(fi);
+			assertTrue(fi.exists());
+			assertEquals(BYTES.length, fi.getLength());
+
+			// FTP should cancel after copying folder and one file
+			IFileInfo fi2 = fs2.getChild("file1.txt").fetchInfo(); //$NON-NLS-1$
+			assertNotNull(fi2);
+			assertFalse(fi2.exists());
+		}
+	}
+
+	public final void testCancelCopyFiles() throws CoreException, IOException
+	{
+		IFileStore remoteFolder = populateRemoteFolder("moveFolder", 3);
+
+		File file = File.createTempFile("testMoveFolderToLocal", ".tmp"); //$NON-NLS-1$ //$NON-NLS-2$
+		file.delete();
+		file.deleteOnExit();
+		IFileStore fs2 = EFS.getLocalFileSystem().fromLocalFile(file);
+		assertNotNull(fs2);
+		assertFalse(fs2.fetchInfo().exists());
+
+		IProgressMonitor monitor = new NullProgressMonitor()
+		{
+
+			private int work_total = 0;
+
+			@Override
+			public void worked(int work)
+			{
+				work_total += work;
+				if (work_total >= 2)
+				{
+					this.setCanceled(true);
+				}
+			}
+		};
+
+		try
+		{
+			remoteFolder.copy(fs2, EFS.NONE, monitor);
+		}
+		catch (OperationCanceledException e)
+		{
+			assertTrue(remoteFolder.fetchInfo().exists());
+			assertTrue(fs2.fetchInfo().exists());
+
+			IFileInfo fi = fs2.getChild("file0.txt").fetchInfo(); //$NON-NLS-1$
+			assertNotNull(fi);
+			assertTrue(fi.exists());
+			assertEquals(BYTES.length, fi.getLength());
+
+			// FTP should cancel after copying folder and one file
+			IFileInfo fi2 = fs2.getChild("file1.txt").fetchInfo(); //$NON-NLS-1$
+			assertNotNull(fi2);
+			assertFalse(fi2.exists());
 		}
 	}
 }

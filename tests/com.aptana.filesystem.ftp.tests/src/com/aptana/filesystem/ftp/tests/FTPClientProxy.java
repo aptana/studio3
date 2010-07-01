@@ -36,6 +36,7 @@ public class FTPClientProxy extends ProFTPClient
 	protected boolean throwCoreException; // Exception
 	protected boolean throwUnknownHostException; //IOException
 	protected boolean throwFileNotFoundException; // IOException
+	protected boolean forceStreamException;
 
 	public void setIOException(boolean value) {
 		throwIOException = value;
@@ -83,6 +84,16 @@ public class FTPClientProxy extends ProFTPClient
 	
 	public boolean getFileNotFoundException() {
 		return throwFileNotFoundException;
+	}
+
+	public void forceStreamException(boolean value)
+	{
+		forceStreamException = value;
+	}
+
+	public boolean getStreamException()
+	{
+		return forceStreamException;
 	}
 
 	@Override
