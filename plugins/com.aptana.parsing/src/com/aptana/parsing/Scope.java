@@ -18,6 +18,7 @@ public class Scope<T>
 	private List<Scope<T>> _children;
 	private Map<String, List<T>> _symbols;
 	private IRange _range;
+	private List<T> _assignments;
 
 	/**
 	 * Scope
@@ -26,6 +27,25 @@ public class Scope<T>
 	{
 	}
 
+	/**
+	 * addAssignment
+	 * 
+	 * @param lhs
+	 * @param rhs
+	 */
+	public void addAssignment(T assignment)
+	{
+		if (assignment != null)
+		{
+			if (this._assignments == null)
+			{
+				this._assignments = new LinkedList<T>();
+			}
+			
+			this._assignments.add(assignment);
+		}
+	}
+	
 	/**
 	 * addScope
 	 * 
@@ -88,6 +108,16 @@ public class Scope<T>
 	}
 
 	/**
+	 * getAssignments
+	 * 
+	 * @return
+	 */
+	public List<T> getAssignments()
+	{
+		return this._assignments;
+	}
+	
+	/**
 	 * getChildren
 	 * 
 	 * @return
@@ -104,35 +134,6 @@ public class Scope<T>
 		return result;
 	}
 
-	/**
-	 * getScopeAtOffset
-	 * 
-	 * @param offset
-	 * @return
-	 */
-	public Scope<T> getScopeAtOffset(int offset)
-	{
-		Scope<T> result = null;
-		
-		if (this.getRange().contains(offset))
-		{
-			result = this;
-			
-			for (Scope<T> child : this.getChildren())
-			{
-				Scope<T> candidate = child.getScopeAtOffset(offset);
-				
-				if (candidate != null)
-				{
-					result = candidate;
-					break;
-				}
-			}
-		}
-		
-		return result;
-	}
-	
 	/**
 	 * getLocalSymbol
 	 * 
@@ -191,6 +192,35 @@ public class Scope<T>
 	public IRange getRange()
 	{
 		return (this._range != null) ? this._range : Range.EMPTY;
+	}
+	
+	/**
+	 * getScopeAtOffset
+	 * 
+	 * @param offset
+	 * @return
+	 */
+	public Scope<T> getScopeAtOffset(int offset)
+	{
+		Scope<T> result = null;
+		
+		if (this.getRange().contains(offset))
+		{
+			result = this;
+			
+			for (Scope<T> child : this.getChildren())
+			{
+				Scope<T> candidate = child.getScopeAtOffset(offset);
+				
+				if (candidate != null)
+				{
+					result = candidate;
+					break;
+				}
+			}
+		}
+		
+		return result;
 	}
 	
 	/**
