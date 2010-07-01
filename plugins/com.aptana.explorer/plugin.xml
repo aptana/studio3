@@ -201,7 +201,7 @@
          </command>
       </menuContribution>
       <menuContribution
-            locationURI="toolbar:com.aptana.explorer.deploy?before=group.wizard">
+            locationURI="toolbar:com.aptana.explorer.deploy?after=group.wizard">
          <command
                commandId="com.aptana.explorer.deploywizard"
                label="%DeployWizard.label"
