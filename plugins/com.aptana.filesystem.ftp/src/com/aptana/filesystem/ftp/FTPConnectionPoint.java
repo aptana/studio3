@@ -199,7 +199,7 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	 * @see com.aptana.ide.core.ftp.IBaseRemoteConnectionPoint#setPath(org.eclipse.core.runtime.IPath)
 	 */
 	public void setPath(IPath path) {
-		if (path.isEmpty()) {
+		if (path == null || path.isEmpty()) {
 			path = Path.ROOT;
 		}
 		this.path = path;

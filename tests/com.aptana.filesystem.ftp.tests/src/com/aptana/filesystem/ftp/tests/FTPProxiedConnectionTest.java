@@ -35,9 +35,11 @@
 
 package com.aptana.filesystem.ftp.tests;
 
+import java.io.IOException;
+
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.OperationCanceledException;
 
 import com.aptana.core.io.tests.BaseConnectionTest;
 import com.aptana.filesystem.ftp.FTPConnectionPoint;
@@ -46,97 +48,49 @@ import com.aptana.filesystem.ftp.FTPConnectionPoint;
  * @author Max Stepanov
  */
 public class FTPProxiedConnectionTest extends BaseConnectionTest
-{	
+{
 	@Override
 	protected void setUp() throws Exception
 	{
 		FTPConnectionPoint ftpcp = new FTPProxiedConnectionPoint();
 		ftpcp.setHost(getConfig().getProperty("ftp.host", "10.10.1.60")); //$NON-NLS-1$ //$NON-NLS-2$
 		ftpcp.setLogin(getConfig().getProperty("ftp.username", "ftpuser")); //$NON-NLS-1$ //$NON-NLS-2$
-		ftpcp.setPassword(getConfig().getProperty("ftp.password",	//$NON-NLS-1$
-				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'})).toCharArray());
+		ftpcp.setPassword(getConfig().getProperty("ftp.password", //$NON-NLS-1$
+				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n' })).toCharArray());
 		cp = ftpcp;
 		super.setUp();
 	}
 
-	public final void testConnectDisconnectException() throws CoreException
+	public final void testNavigateRemoteSystem() throws CoreException, IOException
 	{
-		cp.connect(null);
-		assertTrue(cp.isConnected());
-		assertTrue(cp.canDisconnect());
-		cp.disconnect(null);
-		assertFalse(cp.isConnected());
-		assertFalse(cp.canDisconnect());
+		FTPProxiedConnectionPoint ftpcp = (FTPProxiedConnectionPoint) cp;
+		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/test_folder")); //$NON-NLS-1$
 
-		FTPConnectionPoint ftpcp = (FTPConnectionPoint)cp;
-		
-		// set host to non-existent version
-		String oldHost = ftpcp.getHost();
-		try {
-			ftpcp.setHost(null);
-			ftpcp.connect(null);
+		cp.disconnect(null);
+		fs.mkdir(EFS.SHALLOW, null);
+		assertTrue(fs.fetchInfo().exists());
+
+		cp.disconnect(null);
+		ftpcp.forceStreamException(true);
+		try
+		{
+			fs.getChild("file.txt").openOutputStream(EFS.NONE, null); //$NON-NLS-1$
 			fail();
 		}
-		catch(CoreException e) {
-			
+		catch (CoreException e)
+		{
+			assertFalse(fs.getChild("file.txt").fetchInfo().exists()); //$NON-NLS-1$			
 		}
-		cp.disconnect(null);
-		ftpcp.setHost(oldHost);
-		
-		// set port to non-existent version
-		int oldPort = ftpcp.getPort();
-		try {
-			ftpcp.setPort(0);
-			ftpcp.connect(null);
+
+		ftpcp.forceStreamException(true);
+		try
+		{
+			fs.getChild("file2.txt").openOutputStream(EFS.NONE, null); //$NON-NLS-1$
 			fail();
 		}
-		catch(CoreException e) {
-			
+		catch (CoreException e)
+		{
+			assertFalse(fs.getChild("file.txt").fetchInfo().exists()); //$NON-NLS-1$			
 		}
-		cp.disconnect(null);
-		ftpcp.setPort(oldPort);
-
-		// set username to null
-		String username = ftpcp.getLogin();
-		try {
-			ftpcp.setLogin(null);
-			ftpcp.connect(null);
-			fail();
-		}
-		catch(OperationCanceledException e) {
-			
-		}
-		cp.disconnect(null);
-		ftpcp.setLogin(username);
-
-		char[] pass = ftpcp.getPassword();
-
-		// null password means it will try and get a saved value
-		ftpcp.setPassword(null);
-		ftpcp.connect(null);
-		assertTrue(cp.isConnected());
-
-		try {
-			ftpcp.setPassword(new char[] {'a'});
-			ftpcp.connect(null);
-			fail();
-		}
-		catch(OperationCanceledException e) {
-			
-		}
-		cp.disconnect(null);
-		ftpcp.setPassword(pass);
-	
-	}
-	
-	public final void testIncorrectPaths() throws CoreException
-	{
-		FTPConnectionPoint ftpcp = (FTPConnectionPoint)cp;
-		IPath basePath = ftpcp.getPath();
-		
-		ftpcp.setPath(null);
-		ftpcp.connect(null);
-		
-		ftpcp.setPath(basePath);
 	}
 }

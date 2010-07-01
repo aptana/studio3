@@ -35,6 +35,10 @@
 
 package com.aptana.filesystem.ftp.tests;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.OperationCanceledException;
+
 import com.aptana.core.io.tests.CommonConnectionTest;
 import com.aptana.filesystem.ftp.FTPConnectionPoint;
 
@@ -50,13 +54,135 @@ public class FTPConnectionTest extends CommonConnectionTest
 		FTPConnectionPoint ftpcp = new FTPConnectionPoint();
 		ftpcp.setHost(getConfig().getProperty("ftp.host", "10.10.1.60")); //$NON-NLS-1$ //$NON-NLS-2$
 		ftpcp.setLogin(getConfig().getProperty("ftp.username", "ftpuser")); //$NON-NLS-1$ //$NON-NLS-2$
-		ftpcp.setPassword(getConfig().getProperty("ftp.password",	//$NON-NLS-1$
-				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'})).toCharArray());
+		ftpcp.setPassword(getConfig().getProperty("ftp.password", //$NON-NLS-1$
+				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n' })).toCharArray());
 		cp = ftpcp;
 		super.setUp();
 	}
 
-	/* (non-Javadoc)
+	public final void testConnectDisconnectException() throws CoreException
+	{
+		cp.connect(null);
+		assertTrue(cp.isConnected());
+		assertTrue(cp.canDisconnect());
+		cp.disconnect(null);
+		assertFalse(cp.isConnected());
+		assertFalse(cp.canDisconnect());
+
+		FTPConnectionPoint ftpcp = (FTPConnectionPoint) cp;
+
+		// set host to non-existent version
+		String oldHost = ftpcp.getHost();
+		try
+		{
+			ftpcp.setHost(null);
+			ftpcp.connect(null);
+			fail();
+		}
+		catch (CoreException e)
+		{
+
+		}
+		cp.disconnect(null);
+		ftpcp.setHost(oldHost);
+
+		// set port to non-existent version
+		int oldPort = ftpcp.getPort();
+		try
+		{
+			ftpcp.setPort(0);
+			ftpcp.connect(null);
+			fail();
+		}
+		catch (CoreException e)
+		{
+
+		}
+		cp.disconnect(null);
+		ftpcp.setPort(oldPort);
+
+		// set username to null
+		String username = ftpcp.getLogin();
+		try
+		{
+			ftpcp.setLogin(null);
+			ftpcp.connect(null);
+			fail();
+		}
+		catch (OperationCanceledException e)
+		{
+
+		}
+		cp.disconnect(null);
+		ftpcp.setLogin(username);
+
+		char[] pass = ftpcp.getPassword();
+
+		// null password means it will try and get a saved value
+		ftpcp.setPassword(null);
+		ftpcp.connect(null);
+		assertTrue(cp.isConnected());
+
+		try
+		{
+			ftpcp.setPassword(new char[] { 'a' });
+			ftpcp.connect(null);
+			fail();
+		}
+		catch (OperationCanceledException e)
+		{
+
+		}
+		cp.disconnect(null);
+		ftpcp.setPassword(pass);
+
+	}
+	
+	public final void testIncorrectTimezone() throws CoreException
+	{
+		FTPConnectionPoint ftpcp = (FTPConnectionPoint) cp;
+		String timezone = ftpcp.getTimezone();
+
+		// Erroneous timezone will set timezone as GMT
+		ftpcp.setTimezone("ERROR");
+		ftpcp.connect(null);
+
+		ftpcp.setTimezone(timezone);
+	}
+
+
+	public final void testIncorrectEncoding() throws CoreException
+	{
+		FTPConnectionPoint ftpcp = (FTPConnectionPoint) cp;
+		String encoding = ftpcp.getEncoding();
+
+		try
+		{
+			ftpcp.setEncoding(null);
+			ftpcp.connect(null);
+			fail();
+		}
+		catch (CoreException e)
+		{
+
+		}
+
+		ftpcp.setEncoding(encoding);
+	}
+
+	public final void testIncorrectPaths() throws CoreException
+	{
+		FTPConnectionPoint ftpcp = (FTPConnectionPoint) cp;
+		IPath basePath = ftpcp.getPath();
+
+		ftpcp.setPath(null);
+		ftpcp.connect(null);
+
+		ftpcp.setPath(basePath);
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsSetModificationTime()
 	 */
 	@Override
@@ -64,7 +190,6 @@ public class FTPConnectionTest extends CommonConnectionTest
 	{
 		return true;
 	}
-
 
 	/*
 	 * (non-Javadoc)
