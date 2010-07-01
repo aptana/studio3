@@ -506,6 +506,10 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		menuManager.add(new Separator(GROUP_FTP));
 
 		ISiteConnection site = null;
+		if (siteConnections == null)
+		{
+			siteConnections = SiteConnectionUtils.findSitesForSource(selectedProject, true);
+		}
 		if (siteConnections.length > 1)
 		{
 			// try for last remembered site first
