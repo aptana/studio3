@@ -246,7 +246,7 @@ public class JSTokenScanner extends JSCodeScanner implements IJSTokenScanner
 
 	private static class JSNumberRule extends ExtendedWordRule
 	{
-		private static final String REGEXP = "((0(x|X)[0-9a-fA-F]+)|([0-9]+(\\.[0-9]+)?))"; //$NON-NLS-1$
+		private static final String REGEXP = "(0(x|X)[0-9a-fA-F]+)|([0-9]+(\\.[0-9]+)?(?:[eE]\\d+)?)"; //$NON-NLS-1$
 		private static Pattern pattern;
 
 		JSNumberRule(IToken token)
