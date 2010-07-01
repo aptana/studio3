@@ -18,6 +18,46 @@ public class JSConditionalNode extends JSNode
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
+	 */
+	@Override
+	public void accept(JSTreeWalker walker)
+	{
+		walker.visit(this);
+	}
+
+	/**
+	 * getFalseExpression
+	 * 
+	 * @return
+	 */
+	public IParseNode getFalseExpression()
+	{
+		return this.getChild(2);
+	}
+
+	/**
+	 * getTestExpression
+	 * 
+	 * @return
+	 */
+	public IParseNode getTestExpression()
+	{
+		return this.getChild(0);
+	}
+
+	/**
+	 * getTrueExpression
+	 * 
+	 * @return
+	 */
+	public IParseNode getTrueExpression()
+	{
+		return this.getChild(1);
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
 	 */
 	public String toString()
