@@ -70,7 +70,7 @@ public class HTMLDocumentProvider extends CommonDocumentProvider
 		}
 	}
 
-	protected String getDefaultContentType()
+	protected String getDefaultContentType(String filename)
 	{
 		return IHTMLConstants.CONTENT_TYPE_HTML;
 	}

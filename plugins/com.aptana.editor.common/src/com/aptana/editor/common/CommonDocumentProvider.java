@@ -38,11 +38,11 @@ public class CommonDocumentProvider extends TextFileDocumentProvider
 				fileName = new Path(input.getURI().getPath()).lastSegment();
 			}
 			CommonEditorPlugin.getDefault().getDocumentScopeManager().setDocumentScope(document,
-					getDefaultContentType(), fileName);
+					getDefaultContentType(fileName), fileName);
 		}
 	}
 
-	protected String getDefaultContentType()
+	protected String getDefaultContentType(String filename)
 	{
 		return "source"; //$NON-NLS-1$
 	}
