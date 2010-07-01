@@ -42,4 +42,5 @@ package com.aptana.editor.js;
 public interface IJSConstants {
 
 	public String CONTENT_TYPE_JS = "com.aptana.contenttype.js"; //$NON-NLS-1$
+	public String CONTENT_TYPE_JSON = "com.aptana.contenttype.json"; //$NON-NLS-1$
 }
