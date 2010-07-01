@@ -32,6 +32,7 @@ public class DeployWizardPage extends WizardPage
 
 	public static final String NAME = "Deployment"; //$NON-NLS-1$
 	private static final String HEROKU_IMG_PATH = "icons/heroku.png"; //$NON-NLS-1$
+	private static final String FTP_IMG_PATH = "icons/ftp.png"; //$NON-NLS-1$
 
 	private Button deployWithFTP;
 	private Button deployWithCapistrano;
@@ -72,8 +73,12 @@ public class DeployWizardPage extends WizardPage
 			deployWithHeroku.setSelection(couldDeploy);
 			if (!couldDeploy)
 			{
-				deployWithHeroku.setText(MessageFormat.format(Messages.DeployWizardPage_AlreadyDeployedToHeroku,
-						getDeployEndpoint(project)));
+				String app = getDeployEndpoint(project);
+				if (app == null)
+				{
+					app = "Heroku"; //$NON-NLS-1$
+				}
+				deployWithHeroku.setText(MessageFormat.format(Messages.DeployWizardPage_AlreadyDeployedToHeroku, app));
 			}
 
 			deployWithHeroku.addMouseListener(new MouseAdapter()
@@ -121,12 +126,13 @@ public class DeployWizardPage extends WizardPage
 		deployWithFTP.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				setImageDescriptor(null);
+				setImageDescriptor(Activator.getImageDescriptor(FTP_IMG_PATH));
 			}
 		});
 		if (deployWithHeroku == null || !deployWithHeroku.getEnabled())
 		{
 			deployWithFTP.setSelection(true);
+			setImageDescriptor(Activator.getImageDescriptor(FTP_IMG_PATH));
 		}
 
 		deployWithCapistrano = new Button(composite, SWT.RADIO);
