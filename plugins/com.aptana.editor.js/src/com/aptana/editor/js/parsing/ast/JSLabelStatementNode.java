@@ -12,25 +12,22 @@ public abstract class JSLabelStatementNode extends JSNode
 	 * JSLabelStatementNode
 	 * 
 	 * @param type
-	 * @param start
-	 * @param end
 	 */
-	public JSLabelStatementNode(short type, int start, int end)
+	public JSLabelStatementNode(short type)
 	{
-		this(type, start, end, null);
+		this(type, null);
 	}
 
 	/**
 	 * JSLabelStatementNode
 	 * 
 	 * @param type
-	 * @param start
-	 * @param end
 	 * @param identifier
 	 */
-	public JSLabelStatementNode(short type, int start, int end, String identifier)
+	public JSLabelStatementNode(short type, String identifier)
 	{
-		super(type, start, end);
+		super(type);
+		
 		fIdentifier = identifier;
 	}
 

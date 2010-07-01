@@ -8,41 +8,35 @@ public class JSPreUnaryOperatorNode extends JSNode
 	/**
 	 * JSUnaryOperatorNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param expression
 	 */
-	protected JSPreUnaryOperatorNode(int start, int end, JSNode expression)
+	protected JSPreUnaryOperatorNode(JSNode expression)
 	{
-		setLocation(start, end);
-		setChildren(new JSNode[] { expression });
+		this.setChildren(new JSNode[] { expression });
 	}
 
 	/**
 	 * JSUnaryOperatorNode
 	 * 
 	 * @param type
-	 * @param start
-	 * @param end
 	 * @param expression
 	 */
-	public JSPreUnaryOperatorNode(short type, int start, int end, JSNode expression)
+	public JSPreUnaryOperatorNode(short type, JSNode expression)
 	{
-		this(start, end, expression);
-		setType(type);
+		this(expression);
+		
+		this.setType(type);
 	}
 
 	/**
 	 * JSUnaryOperatorNode
 	 * 
 	 * @param operator
-	 * @param start
-	 * @param end
 	 * @param expression
 	 */
-	public JSPreUnaryOperatorNode(String operator, int start, int end, JSNode expression)
+	public JSPreUnaryOperatorNode(String operator, JSNode expression)
 	{
-		this(start, end, expression);
+		this(expression);
 
 		short type;
 		JSTokenType token = JSTokenType.get(operator);

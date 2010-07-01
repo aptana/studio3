@@ -7,13 +7,11 @@ public class JSForInNode extends JSNode
 	/**
 	 * JSForInNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param children
 	 */
-	public JSForInNode(int start, int end, JSNode... children)
+	public JSForInNode(JSNode... children)
 	{
-		super(JSNodeTypes.FOR_IN, start, end, children);
+		super(JSNodeTypes.FOR_IN, children);
 	}
 
 	/*

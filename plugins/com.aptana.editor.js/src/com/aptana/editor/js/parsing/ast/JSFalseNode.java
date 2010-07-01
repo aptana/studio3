@@ -11,7 +11,7 @@ public class JSFalseNode extends JSPrimitiveNode
 	 */
 	public JSFalseNode(Symbol identifier)
 	{
-		this(identifier.getStart(), identifier.getEnd());
+		this();
 	}
 
 	/**
@@ -21,9 +21,9 @@ public class JSFalseNode extends JSPrimitiveNode
 	 * @param start
 	 * @param end
 	 */
-	public JSFalseNode(int start, int end)
+	public JSFalseNode()
 	{
-		super(JSNodeTypes.FALSE, start, end, "false");
+		super(JSNodeTypes.FALSE, "false");
 	}
 
 	/*

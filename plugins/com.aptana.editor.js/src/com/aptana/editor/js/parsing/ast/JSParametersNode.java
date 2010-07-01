@@ -5,12 +5,11 @@ public class JSParametersNode extends JSNaryNode
 	/**
 	 * JSParametersNode
 	 * 
-	 * @param start
-	 * @param end
+	 * @param children
 	 */
-	public JSParametersNode(int start, int end, JSNode... children)
+	public JSParametersNode(JSNode... children)
 	{
-		super(JSNodeTypes.PARAMETERS, start, end, children);
+		super(JSNodeTypes.PARAMETERS, children);
 	}
 
 	/*

@@ -5,11 +5,10 @@ public class JSElementsNode extends JSNaryNode
 	/**
 	 * JSElementsNode
 	 * 
-	 * @param start
-	 * @param end
+	 * @param children
 	 */
-	public JSElementsNode(int start, int end, JSNode... children)
+	public JSElementsNode(JSNode... children)
 	{
-		super(JSNodeTypes.ELEMENTS, start, end, children);
+		super(JSNodeTypes.ELEMENTS, children);
 	}
 }

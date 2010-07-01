@@ -5,8 +5,8 @@ public class JSErrorNode extends JSNode
 	/**
 	 * JSErrorNode
 	 */
-	public JSErrorNode(int start, int end)
+	public JSErrorNode()
 	{
-		super(JSNodeTypes.ERROR, start, end);
+		super(JSNodeTypes.ERROR);
 	}
 }

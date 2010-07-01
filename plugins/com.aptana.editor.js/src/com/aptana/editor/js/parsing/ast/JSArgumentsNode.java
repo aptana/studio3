@@ -8,12 +8,11 @@ public class JSArgumentsNode extends JSNaryNode
 	/**
 	 * JSArgumentsNode
 	 * 
-	 * @param start
-	 * @param end
+	 * @param children
 	 */
-	public JSArgumentsNode(int start, int end, JSNode... children)
+	public JSArgumentsNode(JSNode... children)
 	{
-		super(JSNodeTypes.ARGUMENTS, start, end, children);
+		super(JSNodeTypes.ARGUMENTS, children);
 	}
 
 	/*

@@ -8,9 +8,9 @@ public class JSDefaultNode extends JSNaryNode
 	 * @param start
 	 * @param end
 	 */
-	public JSDefaultNode(int start, int end, JSNode... children)
+	public JSDefaultNode(JSNode... children)
 	{
-		super(JSNodeTypes.DEFAULT, start, end, children);
+		super(JSNodeTypes.DEFAULT, children);
 	}
 
 	/*

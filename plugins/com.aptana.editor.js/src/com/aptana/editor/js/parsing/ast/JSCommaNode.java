@@ -5,11 +5,10 @@ public class JSCommaNode extends JSNaryNode
 	/**
 	 * JSCommaNode
 	 * 
-	 * @param start
-	 * @param end
+	 * @param children
 	 */
-	public JSCommaNode(int start, int end, JSNode... children)
+	public JSCommaNode(JSNode... children)
 	{
-		super(JSNodeTypes.COMMA, start, end, children);
+		super(JSNodeTypes.COMMA, children);
 	}
 }

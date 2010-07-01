@@ -6,22 +6,19 @@ public class JSThisNode extends JSPrimitiveNode
 {
 	/**
 	 * JSThisNode
-	 * 
-	 * @param identifier
 	 */
-	public JSThisNode(Symbol identifier)
+	public JSThisNode()
 	{
-		this(identifier.getStart(), identifier.getEnd());
+		super(JSNodeTypes.THIS, "this");
 	}
 
 	/**
 	 * JSThisNode
 	 * 
-	 * @param start
-	 * @param end
+	 * @param identifier
 	 */
-	public JSThisNode(int start, int end)
+	public JSThisNode(Symbol identifier)
 	{
-		super(JSNodeTypes.THIS, start, end, "this");
+		this();
 	}
 }

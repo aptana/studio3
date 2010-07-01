@@ -7,13 +7,11 @@ public class JSCaseNode extends JSNaryAndExpressionNode
 	/**
 	 * JSCaseNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param children
 	 */
-	public JSCaseNode(int start, int end, JSNode... children)
+	public JSCaseNode(JSNode... children)
 	{
-		super(JSNodeTypes.CASE, start, end, children);
+		super(JSNodeTypes.CASE, children);
 	}
 
 	/*

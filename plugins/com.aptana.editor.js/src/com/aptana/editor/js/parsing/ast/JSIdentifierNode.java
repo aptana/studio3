@@ -13,19 +13,17 @@ public class JSIdentifierNode extends JSPrimitiveNode
 	 */
 	public JSIdentifierNode(Symbol identifier)
 	{
-		this(identifier.getStart(), identifier.getEnd(), (String) identifier.value);
+		this((String) identifier.value);
 	}
 
 	/**
 	 * JSIdentifierNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param text
 	 */
-	public JSIdentifierNode(int start, int end, String text)
+	public JSIdentifierNode(String text)
 	{
-		super(JSNodeTypes.IDENTIFIER, start, end, text);
+		super(JSNodeTypes.IDENTIFIER, text);
 	}
 
 	/*

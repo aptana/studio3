@@ -5,12 +5,11 @@ public class JSArrayNode extends JSNaryNode
 	/**
 	 * JSArrayNode
 	 * 
-	 * @param start
-	 * @param end
+	 * @param children
 	 */
-	public JSArrayNode(int start, int end, JSNode... children)
+	public JSArrayNode(JSNode... children)
 	{
-		super(JSNodeTypes.ARRAY_LITERAL, start, end, children);
+		super(JSNodeTypes.ARRAY_LITERAL, children);
 	}
 
 	/*

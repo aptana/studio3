@@ -8,9 +8,9 @@ public class JSBreakNode extends JSLabelStatementNode
 	 * @param start
 	 * @param end
 	 */
-	public JSBreakNode(int start, int end)
+	public JSBreakNode()
 	{
-		super(JSNodeTypes.BREAK, start, end);
+		super(JSNodeTypes.BREAK);
 	}
 
 	/**
@@ -20,9 +20,9 @@ public class JSBreakNode extends JSLabelStatementNode
 	 * @param end
 	 * @param identifier
 	 */
-	public JSBreakNode(int start, int end, String identifier)
+	public JSBreakNode(String identifier)
 	{
-		super(JSNodeTypes.BREAK, start, end, identifier);
+		super(JSNodeTypes.BREAK, identifier);
 	}
 
 	/*

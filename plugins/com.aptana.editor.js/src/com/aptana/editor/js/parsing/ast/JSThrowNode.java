@@ -7,13 +7,11 @@ public class JSThrowNode extends JSPreUnaryOperatorNode
 	/**
 	 * JSThrowNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param expression
 	 */
-	public JSThrowNode(int start, int end, JSNode expression)
+	public JSThrowNode(JSNode expression)
 	{
-		super(JSNodeTypes.THROW, start, end, expression);
+		super(JSNodeTypes.THROW, expression);
 	}
 
 	/*

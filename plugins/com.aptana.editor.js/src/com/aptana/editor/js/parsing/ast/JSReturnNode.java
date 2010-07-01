@@ -7,13 +7,11 @@ public class JSReturnNode extends JSPreUnaryOperatorNode
 	/**
 	 * JSReturnNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param expression
 	 */
-	public JSReturnNode(int start, int end, JSNode expression)
+	public JSReturnNode(JSNode expression)
 	{
-		super(JSNodeTypes.RETURN, start, end, expression);
+		super(JSNodeTypes.RETURN, expression);
 	}
 
 	/*

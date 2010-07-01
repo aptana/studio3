@@ -6,22 +6,19 @@ public class JSNullNode extends JSPrimitiveNode
 {
 	/**
 	 * JSNullNode
-	 * 
-	 * @param identifier
 	 */
-	public JSNullNode(Symbol identifier)
+	public JSNullNode()
 	{
-		this(identifier.getStart(), identifier.getEnd());
+		super(JSNodeTypes.NULL, "null");
 	}
 
 	/**
 	 * JSNullNode
 	 * 
-	 * @param start
-	 * @param end
+	 * @param identifier
 	 */
-	public JSNullNode(int start, int end)
+	public JSNullNode(Symbol identifier)
 	{
-		super(JSNodeTypes.NULL, start, end, "null");
+		super(JSNodeTypes.NULL, (String) identifier.value);
 	}
 }

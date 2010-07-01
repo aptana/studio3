@@ -5,11 +5,10 @@ public class JSElisionNode extends JSNaryNode
 	/**
 	 * JSElisionNode
 	 * 
-	 * @param start
-	 * @param end
+	 * @param children
 	 */
-	public JSElisionNode(int start, int end, JSNode... children)
+	public JSElisionNode(JSNode... children)
 	{
-		super(JSNodeTypes.ELISION, start, end, children);
+		super(JSNodeTypes.ELISION, children);
 	}
 }

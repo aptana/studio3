@@ -55,7 +55,7 @@ public class JSNode extends ParseNode
 	 */
 	public JSNode()
 	{
-		this(DEFAULT_TYPE, 0, 0);
+		this(DEFAULT_TYPE);
 	}
 
 	/**
@@ -66,13 +66,15 @@ public class JSNode extends ParseNode
 	 * @param end
 	 * @param children
 	 */
-	public JSNode(short type, int start, int end, JSNode... children)
+	public JSNode(short type, JSNode... children)
 	{
 		super(IJSParserConstants.LANGUAGE);
-		fType = type;
-		this.start = start;
-		this.end = end;
-		setChildren(children);
+		
+		// set node type
+		this.fType = type;
+		
+		// store children
+		this.setChildren(children);
 	}
 
 	/**

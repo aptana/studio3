@@ -20,11 +20,10 @@ public class JSAssignmentNode extends JSNode
 	public JSAssignmentNode(JSNode left, Symbol assignOperator, JSNode right)
 	{
 		this._operator = assignOperator;
-		this.start = left.getStart();
-		this.end = right.getEnd();
 
 		short type = DEFAULT_TYPE;
 		JSTokenType token = JSTokenType.get((String) assignOperator.value);
+		
 		switch (token)
 		{
 			case EQUAL:
@@ -64,9 +63,9 @@ public class JSAssignmentNode extends JSNode
 				type = JSNodeTypes.SUBTRACT_AND_ASSIGN;
 				break;
 		}
-		setType(type);
-
-		setChildren(new JSNode[] { left, right });
+		
+		this.setType(type);
+		this.setChildren(new JSNode[] { left, right });
 	}
 
 	/**

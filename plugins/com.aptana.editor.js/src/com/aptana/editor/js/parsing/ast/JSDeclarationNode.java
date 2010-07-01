@@ -7,13 +7,11 @@ public class JSDeclarationNode extends JSNode
 	/**
 	 * JSDeclarationNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param children
 	 */
-	public JSDeclarationNode(int start, int end, JSNode... children)
+	public JSDeclarationNode(JSNode... children)
 	{
-		super(JSNodeTypes.DECLARATION, start, end, children);
+		super(JSNodeTypes.DECLARATION, children);
 	}
 
 	/**

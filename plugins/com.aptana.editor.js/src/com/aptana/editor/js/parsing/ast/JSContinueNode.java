@@ -4,25 +4,20 @@ public class JSContinueNode extends JSLabelStatementNode
 {
 	/**
 	 * JSContinueNode
-	 * 
-	 * @param start
-	 * @param end
 	 */
-	public JSContinueNode(int start, int end)
+	public JSContinueNode()
 	{
-		super(JSNodeTypes.CONTINUE, start, end);
+		super(JSNodeTypes.CONTINUE);
 	}
 
 	/**
 	 * JSContinueNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param identifier
 	 */
-	public JSContinueNode(int start, int end, String identifier)
+	public JSContinueNode(String identifier)
 	{
-		super(JSNodeTypes.CONTINUE, start, end, identifier);
+		super(JSNodeTypes.CONTINUE, identifier);
 	}
 
 	/*

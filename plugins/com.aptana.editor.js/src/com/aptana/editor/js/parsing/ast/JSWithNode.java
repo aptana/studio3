@@ -7,13 +7,11 @@ public class JSWithNode extends JSNode
 	/**
 	 * JSWithNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param children
 	 */
-	public JSWithNode(int start, int end, JSNode... children)
+	public JSWithNode(JSNode... children)
 	{
-		super(JSNodeTypes.WITH, start, end, children);
+		super(JSNodeTypes.WITH, children);
 	}
 
 	/*

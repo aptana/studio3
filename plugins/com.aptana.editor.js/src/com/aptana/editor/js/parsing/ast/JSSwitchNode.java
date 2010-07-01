@@ -7,13 +7,11 @@ public class JSSwitchNode extends JSNaryAndExpressionNode
 	/**
 	 * JSSwitchNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param children
 	 */
-	public JSSwitchNode(int start, int end, JSNode... children)
+	public JSSwitchNode(JSNode... children)
 	{
-		super(JSNodeTypes.SWITCH, start, end, children);
+		super(JSNodeTypes.SWITCH, children);
 	}
 
 	/*

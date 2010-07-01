@@ -8,13 +8,11 @@ public class JSNaryNode extends JSNode
 	 * JSNaryNode
 	 * 
 	 * @param type
-	 * @param start
-	 * @param end
 	 * @param children
 	 */
-	public JSNaryNode(short type, int start, int end, JSNode... children)
+	public JSNaryNode(short type, JSNode... children)
 	{
-		super(type, start, end, children);
+		super(type, children);
 	}
 
 	/**

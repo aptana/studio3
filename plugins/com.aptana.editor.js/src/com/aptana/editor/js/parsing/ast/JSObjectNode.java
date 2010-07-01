@@ -5,12 +5,11 @@ public class JSObjectNode extends JSNaryNode
 	/**
 	 * JSObjectNode
 	 * 
-	 * @param start
-	 * @param end
+	 * @param children
 	 */
-	public JSObjectNode(int start, int end, JSNode... children)
+	public JSObjectNode(JSNode... children)
 	{
-		super(JSNodeTypes.OBJECT_LITERAL, start, end, children);
+		super(JSNodeTypes.OBJECT_LITERAL, children);
 	}
 
 	/*

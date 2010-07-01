@@ -5,8 +5,8 @@ public class JSEmptyNode extends JSNode
 	/**
 	 * JSEmptyNode
 	 */
-	public JSEmptyNode(int start, int end)
+	public JSEmptyNode()
 	{
-		super(JSNodeTypes.EMPTY, start, end);
+		super(JSNodeTypes.EMPTY);
 	}
 }

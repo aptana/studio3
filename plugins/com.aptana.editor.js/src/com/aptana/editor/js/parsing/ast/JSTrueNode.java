@@ -6,23 +6,20 @@ public class JSTrueNode extends JSPrimitiveNode
 {
 	/**
 	 * JSTrueNode
-	 * 
-	 * @param identifier
 	 */
-	public JSTrueNode(Symbol identifier)
+	public JSTrueNode()
 	{
-		this(identifier.getStart(), identifier.getEnd());
+		super(JSNodeTypes.TRUE, "true");
 	}
 
 	/**
 	 * JSTrueNode
 	 * 
-	 * @param start
-	 * @param end
+	 * @param identifier
 	 */
-	public JSTrueNode(int start, int end)
+	public JSTrueNode(Symbol identifier)
 	{
-		super(JSNodeTypes.TRUE, start, end, "true");
+		this();
 	}
 
 	/*

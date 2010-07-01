@@ -14,9 +14,10 @@ public class JSPrimitiveNode extends JSNode
 	 * @param end
 	 * @param text
 	 */
-	public JSPrimitiveNode(short type, int start, int end, String text)
+	public JSPrimitiveNode(short type, String text)
 	{
-		super(type, start, end);
+		super(type);
+		
 		fText = text;
 	}
 

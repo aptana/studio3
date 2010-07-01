@@ -22,12 +22,10 @@ public class JSFunctionNode extends JSNode
 	 * JSFunctionNode
 	 * 
 	 * @param children
-	 * @param start
-	 * @param end
 	 */
-	public JSFunctionNode(int start, int end, JSNode... children)
+	public JSFunctionNode(JSNode... children)
 	{
-		super(JSNodeTypes.FUNCTION, start, end, children);
+		super(JSNodeTypes.FUNCTION, children);
 	}
 
 	/*

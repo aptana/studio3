@@ -8,14 +8,11 @@ public class JSPostUnaryOperatorNode extends JSNode
 	 * JSPostUnaryOperatorNode
 	 * 
 	 * @param operator
-	 * @param start
-	 * @param end
 	 * @param expression
 	 */
-	public JSPostUnaryOperatorNode(String operator, int start, int end, JSNode expression)
+	public JSPostUnaryOperatorNode(String operator, JSNode expression)
 	{
-		setLocation(start, end);
-		setChildren(new JSNode[] { expression });
+		this.setChildren(new JSNode[] { expression });
 
 		short type = DEFAULT_TYPE;
 		JSTokenType token = JSTokenType.get(operator);
@@ -34,7 +31,7 @@ public class JSPostUnaryOperatorNode extends JSNode
 				throw new IllegalArgumentException("Unrecognized operator: " + token);
 		}
 		
-		setType(type);
+		this.setType(type);
 	}
 
 	/*

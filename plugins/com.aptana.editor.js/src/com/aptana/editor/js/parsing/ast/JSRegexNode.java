@@ -11,19 +11,17 @@ public class JSRegexNode extends JSPrimitiveNode
 	 */
 	public JSRegexNode(Symbol identifier)
 	{
-		this(identifier.getStart(), identifier.getEnd(), (String) identifier.value);
+		this((String) identifier.value);
 	}
 
 	/**
 	 * JSRegexNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param text
 	 */
-	public JSRegexNode(int start, int end, String text)
+	public JSRegexNode(String text)
 	{
-		super(JSNodeTypes.REGEX, start, end, text);
+		super(JSNodeTypes.REGEX, text);
 	}
 
 	/*

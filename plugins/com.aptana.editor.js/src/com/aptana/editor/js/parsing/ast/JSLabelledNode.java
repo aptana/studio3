@@ -7,13 +7,11 @@ public class JSLabelledNode extends JSNode
 	/**
 	 * JSLabelledNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param children
 	 */
-	public JSLabelledNode(int start, int end, JSNode... children)
+	public JSLabelledNode(JSNode... children)
 	{
-		super(JSNodeTypes.LABELLED, start, end, children);
+		super(JSNodeTypes.LABELLED, children);
 	}
 
 	/*

@@ -11,19 +11,17 @@ public class JSNumberNode extends JSPrimitiveNode
 	 */
 	public JSNumberNode(Symbol identifier)
 	{
-		this(identifier.getStart(), identifier.getEnd(), (String) identifier.value);
+		this((String) identifier.value);
 	}
 
 	/**
 	 * JSNumberNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param text
 	 */
-	public JSNumberNode(int start, int end, String text)
+	public JSNumberNode(String text)
 	{
-		super(JSNodeTypes.NUMBER, start, end, text);
+		super(JSNodeTypes.NUMBER, text);
 	}
 
 	/*

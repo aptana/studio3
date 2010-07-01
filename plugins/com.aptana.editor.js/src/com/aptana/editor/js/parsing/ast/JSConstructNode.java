@@ -7,13 +7,11 @@ public class JSConstructNode extends JSNode
 	/**
 	 * JSConstructNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param children
 	 */
-	public JSConstructNode(int start, int end, JSNode... children)
+	public JSConstructNode(JSNode... children)
 	{
-		super(JSNodeTypes.CONSTRUCT, start, end, children);
+		super(JSNodeTypes.CONSTRUCT, children);
 	}
 
 	/*
