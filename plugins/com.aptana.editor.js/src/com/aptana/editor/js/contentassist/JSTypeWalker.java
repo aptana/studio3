@@ -13,6 +13,7 @@ import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.parsing.ast.JSBinaryArithmeticOperatorNode;
 import com.aptana.editor.js.parsing.ast.JSArrayNode;
 import com.aptana.editor.js.parsing.ast.JSBinaryBooleanOperatorNode;
+import com.aptana.editor.js.parsing.ast.JSConditionalNode;
 import com.aptana.editor.js.parsing.ast.JSConstructNode;
 import com.aptana.editor.js.parsing.ast.JSFalseNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
@@ -89,7 +90,10 @@ public class JSTypeWalker extends JSTreeWalker
 				this._types = new ArrayList<String>();
 			}
 
-			this._types.add(type);
+			if (this._types.contains(type) == false)
+			{
+				this._types.add(type);
+			}
 		}
 	}
 
@@ -241,6 +245,26 @@ public class JSTypeWalker extends JSTreeWalker
 	public void visit(JSBinaryBooleanOperatorNode node)
 	{
 		this.addType(BOOLEAN_TYPE);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSConditionalNode)
+	 */
+	@Override
+	public void visit(JSConditionalNode node)
+	{
+		IParseNode trueExpression = node.getTrueExpression();
+		IParseNode falseExpression = node.getFalseExpression();
+		
+		if (trueExpression instanceof JSNode)
+		{
+			this.addTypes(this.getTypes((JSNode) trueExpression));
+		}
+		
+		if (falseExpression instanceof JSNode)
+		{
+			this.addTypes(this.getTypes((JSNode) falseExpression));
+		}
 	}
 
 	/*
