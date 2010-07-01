@@ -288,7 +288,7 @@ public class JSCodeScanner extends RuleBasedScanner
 
 		// TODO Turn these next two rules into word rules
 		// Numbers
-		rules.add(new RegexpRule("\\b((0(x|X)[0-9a-fA-F]+)|([0-9]+(\\.[0-9]+)?))\\b", //$NON-NLS-1$
+		rules.add(new RegexpRule("\\b((0(x|X)[0-9a-fA-F]+)|([0-9]+(\\.[0-9]+)?(?:[eE]\\d+)?))\\b", //$NON-NLS-1$
 				createToken(JSScopeType.NUMBER)));
 
 		// identifiers
