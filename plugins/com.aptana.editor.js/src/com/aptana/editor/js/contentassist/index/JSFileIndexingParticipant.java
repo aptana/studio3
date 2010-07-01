@@ -99,6 +99,12 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 		}
 	}
 	
+	/**
+	 * applyDocumentation
+	 * 
+	 * @param property
+	 * @param block
+	 */
 	protected void applyDocumentation(PropertyElement property, DocumentationBlock block)
 	{
 		if (block != null)
