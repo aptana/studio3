@@ -10,7 +10,6 @@ public class Messages extends NLS
 	public static String ThemeManager_InvalidCharInThemeName;
 	public static String ThemeManager_NameAlreadyExistsMsg;
 	public static String ThemeManager_NameNonEmptyMsg;
-	public static String ThemeManager_DefaultThemeName;
 
 	static
 	{
