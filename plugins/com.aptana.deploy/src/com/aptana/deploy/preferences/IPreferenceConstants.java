@@ -2,7 +2,8 @@ package com.aptana.deploy.preferences;
 
 public interface IPreferenceConstants
 {
-	public enum DeployType {
+	public enum DeployType
+	{
 		HEROKU, FTP, CAPISTRANO;
 	}
 

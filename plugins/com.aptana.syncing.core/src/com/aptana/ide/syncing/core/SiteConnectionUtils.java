@@ -187,6 +187,18 @@ public final class SiteConnectionUtils {
         return list.toArray(new ISiteConnection[list.size()]);
     }
 
+	public static ISiteConnection getSiteWithDestination(String destinationName, ISiteConnection[] sites)
+	{
+		for (ISiteConnection site : sites)
+		{
+			if (site.getDestination().getName().equals(destinationName))
+			{
+				return site;
+			}
+		}
+		return null;
+	}
+
 	private static boolean contains(IContainer container, IResource resource) {
 		return container.getFullPath().isPrefixOf(resource.getFullPath());
 	}

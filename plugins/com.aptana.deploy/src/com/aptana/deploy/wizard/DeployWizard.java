@@ -16,7 +16,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -50,6 +49,7 @@ import com.aptana.deploy.internal.wizard.FTPDeployComposite.Direction;
 import com.aptana.deploy.internal.wizard.FTPDeployWizardPage;
 import com.aptana.deploy.internal.wizard.HerokuDeployWizardPage;
 import com.aptana.deploy.internal.wizard.HerokuSignupPage;
+import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.deploy.preferences.IPreferenceConstants;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.git.core.GitPlugin;
@@ -117,20 +117,10 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		// stores the deploy type and what application or FTP connection it's deploying to
 		if (type != null)
 		{
-			IEclipsePreferences prefs = (new InstanceScope()).getNode(Activator.getPluginIdentifier());
-			prefs.put(MessageFormat.format("{0}:{1}", IPreferenceConstants.PROJECT_DEPLOY_TYPE, project.getName()), //$NON-NLS-1$
-					type.toString());
+			DeployPreferenceUtil.setDeployType(project, type);
 			if (deployEndpointName != null)
 			{
-				prefs.put(MessageFormat.format("{0}:{1}", IPreferenceConstants.PROJECT_DEPLOY_ENDPOINT, //$NON-NLS-1$
-						project.getName()), deployEndpointName);
-			}
-			try
-			{
-				prefs.flush();
-			}
-			catch (BackingStoreException e)
-			{
+				DeployPreferenceUtil.setDeployEndpoint(project, deployEndpointName);
 			}
 		}
 
@@ -188,20 +178,10 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 					{
 						// multiple FTP connections are associated with the project; finds the last one
 						// try for last remembered site first
-						String lastConnection = Platform.getPreferencesService().getString(
-								Activator.getPluginIdentifier(),
-								MessageFormat.format("{0}:{1}", IPreferenceConstants.PROJECT_DEPLOY_ENDPOINT, //$NON-NLS-1$
-										project.getName()), null, null);
+						String lastConnection = DeployPreferenceUtil.getDeployEndpoint(project);
 						if (lastConnection != null)
 						{
-							for (ISiteConnection siteConnection : sites)
-							{
-								if (siteConnection.getDestination().getName().equals(lastConnection))
-								{
-									site = siteConnection;
-									break;
-								}
-							}
+							site = SiteConnectionUtils.getSiteWithDestination(lastConnection, sites);
 						}
 					}
 

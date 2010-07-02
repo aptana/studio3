@@ -1,7 +1,5 @@
 package com.aptana.explorer.internal.handlers;
 
-import java.text.MessageFormat;
-
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -9,14 +7,12 @@ import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.PlatformUI;
 
-import com.aptana.deploy.Activator;
-import com.aptana.deploy.preferences.IPreferenceConstants;
+import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.ide.syncing.core.ISiteConnection;
@@ -52,18 +48,11 @@ public class DeployHandler extends AbstractHandler
 				String lastConnection = ResourceSynchronizationUtils.getLastSyncConnection(selectedProject);
 				if (lastConnection == null)
 				{
-					lastConnection = getDeployEndpointFromPreference(selectedProject);
+					lastConnection = DeployPreferenceUtil.getDeployEndpoint(selectedProject);
 				}
 				if (lastConnection != null)
 				{
-					for (ISiteConnection siteConnection : sites)
-					{
-						if (siteConnection.getDestination().getName().equals(lastConnection))
-						{
-							action.setSelectedSite(siteConnection);
-							break;
-						}
-					}
+					action.setSelectedSite(SiteConnectionUtils.getSiteWithDestination(lastConnection, sites));
 				}
 			}
 			action.run(null);
@@ -147,12 +136,5 @@ public class DeployHandler extends AbstractHandler
 			}
 		}
 		return false;
-	}
-
-	private static String getDeployEndpointFromPreference(IProject project)
-	{
-		return Platform.getPreferencesService().getString(Activator.getPluginIdentifier(),
-				MessageFormat.format("{0}:{1}", IPreferenceConstants.PROJECT_DEPLOY_ENDPOINT, project.getName()), null,//$NON-NLS-1$
-				null);
 	}
 }

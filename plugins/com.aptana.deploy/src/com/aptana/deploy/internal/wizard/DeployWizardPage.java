@@ -5,7 +5,6 @@ import java.text.MessageFormat;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
@@ -23,7 +22,7 @@ import org.eclipse.swt.widgets.Label;
 
 import com.aptana.deploy.Activator;
 import com.aptana.deploy.HerokuAPI;
-import com.aptana.deploy.preferences.IPreferenceConstants;
+import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.deploy.wizard.DeployWizard;
 
@@ -59,7 +58,7 @@ public class DeployWizardPage extends WizardPage
 		// Actual contents
 		Label label = new Label(composite, SWT.NONE);
 
-		DeployType type = getExistingDeployType(project);
+		DeployType type = DeployPreferenceUtil.getDeployType(project);
 		if (isRailsProject())
 		{
 			setImageDescriptor(Activator.getImageDescriptor(HEROKU_IMG_PATH));
@@ -73,7 +72,7 @@ public class DeployWizardPage extends WizardPage
 			deployWithHeroku.setSelection(couldDeploy);
 			if (!couldDeploy)
 			{
-				String app = getDeployEndpoint(project);
+				String app = DeployPreferenceUtil.getDeployEndpoint(project);
 				if (app == null)
 				{
 					app = "Heroku"; //$NON-NLS-1$
@@ -219,35 +218,5 @@ public class DeployWizardPage extends WizardPage
 	public IWizardPage getPreviousPage()
 	{
 		return null;
-	}
-
-	private static DeployType getExistingDeployType(IProject project)
-	{
-		String type = Platform.getPreferencesService().getString(Activator.getPluginIdentifier(),
-				MessageFormat.format("{0}:{1}", IPreferenceConstants.PROJECT_DEPLOY_TYPE, project.getName()), null, //$NON-NLS-1$
-				null);
-		if (type != null)
-		{
-			if (type.equals(DeployType.HEROKU.toString()))
-			{
-				return DeployType.HEROKU;
-			}
-			if (type.equals(DeployType.FTP.toString()))
-			{
-				return DeployType.FTP;
-			}
-			if (type.equals(DeployType.CAPISTRANO.toString()))
-			{
-				return DeployType.CAPISTRANO;
-			}
-		}
-		return null;
-	}
-
-	private static String getDeployEndpoint(IProject project)
-	{
-		return Platform.getPreferencesService().getString(Activator.getPluginIdentifier(),
-				MessageFormat.format("{0}:{1}", IPreferenceConstants.PROJECT_DEPLOY_ENDPOINT, project.getName()), null, //$NON-NLS-1$
-				null);
 	}
 }

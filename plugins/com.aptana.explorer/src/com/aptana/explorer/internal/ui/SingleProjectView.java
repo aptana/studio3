@@ -1,6 +1,5 @@
 package com.aptana.explorer.internal.ui;
 
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -80,7 +79,7 @@ import com.aptana.core.IScopeReference;
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.ProcessUtil;
-import com.aptana.deploy.Activator;
+import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IExplorerUIConstants;
@@ -437,7 +436,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	{
 		if (selectedProject != null && selectedProject.isAccessible())
 		{
-			DeployType type = getDeployTypeFromPreference(selectedProject);
+			DeployType type = DeployPreferenceUtil.getDeployType(selectedProject);
 			if (type == null)
 			{
 				if (isCapistranoProject())
@@ -470,37 +469,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		menuManager.add(new Separator(GROUP_WIZARD));
 	}
 
-	private static DeployType getDeployTypeFromPreference(IProject project)
-	{
-		String type = Platform.getPreferencesService().getString(Activator.getPluginIdentifier(),
-				MessageFormat.format("{0}:{1}", com.aptana.deploy.preferences.IPreferenceConstants.PROJECT_DEPLOY_TYPE, //$NON-NLS-1$
-						project.getName()), null, null);
-		if (type != null)
-		{
-			if (type.equals(DeployType.HEROKU.toString()))
-			{
-				return DeployType.HEROKU;
-			}
-			if (type.equals(DeployType.FTP.toString()))
-			{
-				return DeployType.FTP;
-			}
-			if (type.equals(DeployType.CAPISTRANO.toString()))
-			{
-				return DeployType.CAPISTRANO;
-			}
-		}
-		return null;
-	}
-
-	private static String getDeployEndpointFromPreference(IProject project)
-	{
-		return Platform.getPreferencesService().getString(Activator.getPluginIdentifier(),
-				MessageFormat.format("{0}:{1}", //$NON-NLS-1$
-						com.aptana.deploy.preferences.IPreferenceConstants.PROJECT_DEPLOY_ENDPOINT, project.getName()),
-				null, null);
-	}
-
 	private void addFTPMenuCommands(MenuManager menuManager)
 	{
 		menuManager.add(new Separator(GROUP_FTP));
@@ -516,18 +484,11 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 			String lastConnection = ResourceSynchronizationUtils.getLastSyncConnection(selectedProject);
 			if (lastConnection == null)
 			{
-				lastConnection = getDeployEndpointFromPreference(selectedProject);
+				lastConnection = DeployPreferenceUtil.getDeployEndpoint(selectedProject);
 			}
 			if (lastConnection != null)
 			{
-				for (ISiteConnection siteConnection : siteConnections)
-				{
-					if (siteConnection.getDestination().getName().equals(lastConnection))
-					{
-						site = siteConnection;
-						break;
-					}
-				}
+				site = SiteConnectionUtils.getSiteWithDestination(lastConnection, siteConnections);
 			}
 		}
 		else if (siteConnections.length == 1)
