@@ -15,10 +15,7 @@
 %import "com.aptana.parsing.IParseState";
 %import "com.aptana.parsing.IParser";
 %import "com.aptana.parsing.IRecoveryStrategy";
-%import "com.aptana.parsing.Scope";
 %import "com.aptana.parsing.ast.IParseNode";
-%import "com.aptana.parsing.lexer.IRange";
-%import "com.aptana.parsing.lexer.Range";
 
 %implements "IParser";
 
@@ -53,47 +50,6 @@
 	
 	private final IRecoveryStrategy[] recoveryStrategies;
 	private JSScanner fScanner;
-	private Scope<JSNode> fScope;
-	
-	/**
-	 * addSymbol
-	 *
-	 * @param name
-	 * @param value
-	 */
-	protected void addSymbol(String name, JSNode value)
-	{
-		if (fScope != null)
-		{
-			fScope.addSymbol(name, value);
-		}
-	}
-	
-	/**
-	 * popScope
-	 */
-	protected void popScope()
-	{
-		if (fScope != null)
-		{
-			fScope = fScope.getParentScope();
-		}
-	}
-	
-	/**
-	 * pushScope
-	 */
-	protected void pushScope()
-	{
-		Scope<JSNode> childScope = new Scope<JSNode>();
-		
-		if (fScope != null)
-		{
-			fScope.addScope(childScope);
-		}
-		
-		fScope = childScope;
-	}
 	
 	/**
 	 * getNextSymbolIndex
@@ -111,16 +67,6 @@
 
 		return result;
 	}
-	
-	/**
-	 * getScope
-	 *
-	 * @return
-	 */
-	public Scope<JSNode> getScope()
-	{
-		return fScope;
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -129,22 +75,21 @@
 	@Override
 	public synchronized IParseNode parse(IParseState parseState) throws java.lang.Exception
 	{
+		// grab source
 		String source = new String(parseState.getSource());
 		
+		// send source to the scanner
 		fScanner.setSource(source);
 		
-		fScope = new Scope<JSNode>();
-		fScope.setRange(new Range(0, source.length()));
-		
+		// parse
 		IParseNode result = (IParseNode) parse(fScanner);
+		
+		// save AST into the parse result
 		parseState.setParseResult(result);
 		
 		if (result instanceof JSParseRootNode)
 		{
 			JSParseRootNode root = (JSParseRootNode) result;
-			
-			// save reference to scope information
-			root.setGlobalScope(fScope);
 			
 			// process each pre-documentation block
 			for (DocumentationBlock block : this.parsePreDocumentationBlocks())
@@ -163,6 +108,7 @@
 					switch (node.getNodeType())
 					{
 						case JSNodeTypes.VAR:
+							// associate documentation with first declared variable's value
 							JSVarNode varNode = (JSVarNode) node;
 							((JSNode) varNode.getFirstChild().getLastChild()).setDocumentation(block);
 							break;
@@ -350,16 +296,6 @@
 			super.recoverFromError(token, in);
 		}
 	}
-	
-	/**
-	 * setScopeRange
-	 *
-	 * @param range
-	 */
-	protected void setScopeRange(IRange range)
-	{
-		this.fScope.setRange(range);
-	}
 :};
 
 %init {:
@@ -504,34 +440,17 @@ SourceElement
 FunctionDeclaration
 	=	FUNCTION IDENTIFIER.ident FunctionParameters.params FunctionBody.body
 		{:
-			JSNode identifier = new JSIdentifierNode(ident);
-			
-			// set scope range to function body
-			this.setScopeRange(body);
-			
-			this.popScope();
-			
-			JSFunctionNode function = new JSFunctionNode(
+			return new JSFunctionNode(
 				new JSIdentifierNode(ident),
 				params,
 				body
 			);
-			
-			// add symbol for this function to new scope
-			this.addSymbol(identifier.getText(), function);
-			
-			return function;
 		:}
 	;
 
 FunctionExpression
 	=	FUNCTION FunctionParameters.params FunctionBody.body
 		{:
-			// set scope range to function body
-			this.setScopeRange(body);
-			
-			this.popScope();
-			
 			return new JSFunctionNode(
 				new JSNode(),
 				params,
@@ -544,24 +463,10 @@ FunctionExpression
 FunctionParameters
 	=	LPAREN RPAREN
 		{:
-			// create a new scope to contain this function and its siblings
-			this.pushScope();
-			
 			return new JSParametersNode();
 		:}
 	|	LPAREN FormalParameterList.params RPAREN
 		{:
-			// create a new scope to contain this function and its siblings
-			this.pushScope();
-			
-			// add params to current scope
-			for (IParseNode node : params)
-			{
-				JSNode param = (JSNode) node;
-				
-				this.addSymbol(param.getText(), param);
-			}
-			
 			return params;
 		:}
 	;
@@ -694,40 +599,22 @@ VariableDeclarationList_NoIn
 VariableDeclaration
 	=	IDENTIFIER.i
 		{:
-			JSNode ident = new JSIdentifierNode(i);
-			JSNode expression = new JSNode();
-			
-			this.addSymbol(ident.getText(), expression);
-			
-			return new JSDeclarationNode(ident, expression);
+			return new JSDeclarationNode(new JSIdentifierNode(i), new JSNode());
 		:}
 	|	IDENTIFIER.i EQUAL AssignmentExpression.expression
 		{:
-			JSNode ident = new JSIdentifierNode(i);
-			
-			this.addSymbol(ident.getText(), expression);
-			
-			return new JSDeclarationNode(ident, expression);
+			return new JSDeclarationNode(new JSIdentifierNode(i), expression);
 		:}
 	;
 
 VariableDeclaration_NoIn
 	=	IDENTIFIER.i
 		{:
-			JSNode ident = new JSIdentifierNode(i);
-			JSNode expression = new JSNode();
-			
-			this.addSymbol(ident.getText(), expression);
-			
-			return new JSDeclarationNode(ident, expression);
+			return new JSDeclarationNode(new JSIdentifierNode(i), new JSNode());
 		:}
 	|	IDENTIFIER.i EQUAL AssignmentExpression_NoIn.expression
 		{:
-			JSNode ident = new JSIdentifierNode(i);
-			
-			this.addSymbol(ident.getText(), expression);
-			
-			return new JSDeclarationNode(ident, expression);
+			return new JSDeclarationNode(new JSIdentifierNode(i), expression);
 		:}
 	;
 

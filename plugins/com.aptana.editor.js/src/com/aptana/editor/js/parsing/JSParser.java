@@ -8,14 +8,11 @@ import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import java.io.IOException;
 import com.aptana.parsing.IRecoveryStrategy;
 import com.aptana.editor.js.sdoc.parsing.SDocParser;
-import com.aptana.parsing.lexer.IRange;
 import com.aptana.editor.js.parsing.ast.*;
 import beaver.*;
 import com.aptana.parsing.IParser;
-import com.aptana.parsing.lexer.Range;
 import com.aptana.parsing.ast.IParseNode;
 import java.io.ByteArrayInputStream;
-import com.aptana.parsing.Scope;
 import com.aptana.parsing.IParseState;
 
 /**
@@ -167,47 +164,6 @@ public class JSParser extends Parser implements IParser {
 	
 	private final IRecoveryStrategy[] recoveryStrategies;
 	private JSScanner fScanner;
-	private Scope<JSNode> fScope;
-	
-	/**
-	 * addSymbol
-	 *
-	 * @param name
-	 * @param value
-	 */
-	protected void addSymbol(String name, JSNode value)
-	{
-		if (fScope != null)
-		{
-			fScope.addSymbol(name, value);
-		}
-	}
-	
-	/**
-	 * popScope
-	 */
-	protected void popScope()
-	{
-		if (fScope != null)
-		{
-			fScope = fScope.getParentScope();
-		}
-	}
-	
-	/**
-	 * pushScope
-	 */
-	protected void pushScope()
-	{
-		Scope<JSNode> childScope = new Scope<JSNode>();
-		
-		if (fScope != null)
-		{
-			fScope.addScope(childScope);
-		}
-		
-		fScope = childScope;
-	}
 	
 	/**
 	 * getNextSymbolIndex
@@ -225,16 +181,6 @@ public class JSParser extends Parser implements IParser {
 
 		return result;
 	}
-	
-	/**
-	 * getScope
-	 *
-	 * @return
-	 */
-	public Scope<JSNode> getScope()
-	{
-		return fScope;
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -243,22 +189,21 @@ public class JSParser extends Parser implements IParser {
 	@Override
 	public synchronized IParseNode parse(IParseState parseState) throws java.lang.Exception
 	{
+		// grab source
 		String source = new String(parseState.getSource());
 		
+		// send source to the scanner
 		fScanner.setSource(source);
 		
-		fScope = new Scope<JSNode>();
-		fScope.setRange(new Range(0, source.length()));
-		
+		// parse
 		IParseNode result = (IParseNode) parse(fScanner);
+		
+		// save AST into the parse result
 		parseState.setParseResult(result);
 		
 		if (result instanceof JSParseRootNode)
 		{
 			JSParseRootNode root = (JSParseRootNode) result;
-			
-			// save reference to scope information
-			root.setGlobalScope(fScope);
 			
 			// process each pre-documentation block
 			for (DocumentationBlock block : this.parsePreDocumentationBlocks())
@@ -277,6 +222,7 @@ public class JSParser extends Parser implements IParser {
 					switch (node.getNodeType())
 					{
 						case JSNodeTypes.VAR:
+							// associate documentation with first declared variable's value
 							JSVarNode varNode = (JSVarNode) node;
 							((JSNode) varNode.getFirstChild().getLastChild()).setDocumentation(block);
 							break;
@@ -464,16 +410,6 @@ public class JSParser extends Parser implements IParser {
 			super.recoverFromError(token, in);
 		}
 	}
-	
-	/**
-	 * setScopeRange
-	 *
-	 * @param range
-	 */
-	protected void setScopeRange(IRange range)
-	{
-		this.fScope.setRange(range);
-	}
 
 	public JSParser() {
 		super(PARSING_TABLES);
@@ -609,23 +545,11 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_body = _symbols[offset + 4];
 					final JSNode body = (JSNode) _symbol_body.value;
 					
-			JSNode identifier = new JSIdentifierNode(ident);
-			
-			// set scope range to function body
-			this.setScopeRange(body);
-			
-			this.popScope();
-			
-			JSFunctionNode function = new JSFunctionNode(
+			return new JSFunctionNode(
 				new JSIdentifierNode(ident),
 				params,
 				body
 			);
-			
-			// add symbol for this function to new scope
-			this.addSymbol(identifier.getText(), function);
-			
-			return function;
 			}
 			case 6: // FunctionExpression = FUNCTION FunctionParameters.params FunctionBody.body
 			{
@@ -634,11 +558,6 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_body = _symbols[offset + 3];
 					final JSNode body = (JSNode) _symbol_body.value;
 					
-			// set scope range to function body
-			this.setScopeRange(body);
-			
-			this.popScope();
-			
 			return new JSFunctionNode(
 				new JSNode(),
 				params,
@@ -648,9 +567,6 @@ public class JSParser extends Parser implements IParser {
 			case 8: // FunctionParameters = LPAREN RPAREN
 			{
 					
-			// create a new scope to contain this function and its siblings
-			this.pushScope();
-			
 			return new JSParametersNode();
 			}
 			case 9: // FunctionParameters = LPAREN FormalParameterList.params RPAREN
@@ -658,17 +574,6 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_params = _symbols[offset + 2];
 					final JSNode params = (JSNode) _symbol_params.value;
 					
-			// create a new scope to contain this function and its siblings
-			this.pushScope();
-			
-			// add params to current scope
-			for (IParseNode node : params)
-			{
-				JSNode param = (JSNode) node;
-				
-				this.addSymbol(param.getText(), param);
-			}
-			
 			return params;
 			}
 			case 10: // FormalParameterList = FormalParameterList.list COMMA IDENTIFIER.ident
@@ -804,12 +709,7 @@ public class JSParser extends Parser implements IParser {
 			{
 					final Symbol i = _symbols[offset + 1];
 					
-			JSNode ident = new JSIdentifierNode(i);
-			JSNode expression = new JSNode();
-			
-			this.addSymbol(ident.getText(), expression);
-			
-			return new JSDeclarationNode(ident, expression);
+			return new JSDeclarationNode(new JSIdentifierNode(i), new JSNode());
 			}
 			case 55: // VariableDeclaration = IDENTIFIER.i EQUAL AssignmentExpression.expression
 			{
@@ -817,22 +717,13 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_expression = _symbols[offset + 3];
 					final JSNode expression = (JSNode) _symbol_expression.value;
 					
-			JSNode ident = new JSIdentifierNode(i);
-			
-			this.addSymbol(ident.getText(), expression);
-			
-			return new JSDeclarationNode(ident, expression);
+			return new JSDeclarationNode(new JSIdentifierNode(i), expression);
 			}
 			case 56: // VariableDeclaration_NoIn = IDENTIFIER.i
 			{
 					final Symbol i = _symbols[offset + 1];
 					
-			JSNode ident = new JSIdentifierNode(i);
-			JSNode expression = new JSNode();
-			
-			this.addSymbol(ident.getText(), expression);
-			
-			return new JSDeclarationNode(ident, expression);
+			return new JSDeclarationNode(new JSIdentifierNode(i), new JSNode());
 			}
 			case 57: // VariableDeclaration_NoIn = IDENTIFIER.i EQUAL AssignmentExpression_NoIn.expression
 			{
@@ -840,11 +731,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_expression = _symbols[offset + 3];
 					final JSNode expression = (JSNode) _symbol_expression.value;
 					
-			JSNode ident = new JSIdentifierNode(i);
-			
-			this.addSymbol(ident.getText(), expression);
-			
-			return new JSDeclarationNode(ident, expression);
+			return new JSDeclarationNode(new JSIdentifierNode(i), expression);
 			}
 			case 58: // IfStatement = IF LPAREN Expression.e RPAREN Statement_NoIf.sn ELSE Statement.s
 			{
