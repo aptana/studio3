@@ -79,7 +79,7 @@ public class JSASTQueryHelper
 					final JSFunctionNode function = (JSFunctionNode) item;
 					
 					// add args
-					for (IParseNode arg : function.getArgs())
+					for (IParseNode arg : function.getParameters())
 					{
 						result.put(arg.toString(), Classification.PROPERTY);
 					}
@@ -179,7 +179,7 @@ public class JSASTQueryHelper
 				{
 					JSFunctionNode function = (JSFunctionNode) item;
 					
-					result.add(function.getName());
+					result.add(function.getName().getText());
 				}
 			}
 		);
@@ -207,7 +207,7 @@ public class JSASTQueryHelper
 					
 					IParseNode identifier = (IParseNode) item;
 					JSFunctionNode function = (JSFunctionNode) identifier.getParent().getChild(1);
-					String name = function.getName();
+					String name = function.getName().getText();
 					
 					if (name != null && name.length() > 0)
 					{

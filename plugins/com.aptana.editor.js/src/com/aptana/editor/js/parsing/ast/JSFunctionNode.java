@@ -39,21 +39,13 @@ public class JSFunctionNode extends JSNode
 	}
 
 	/**
-	 * getArgs
+	 * getParameters
 	 * 
 	 * @return
 	 */
-	public IParseNode[] getArgs()
+	public IParseNode getParameters()
 	{
-		IParseNode[] result = NO_CHILDREN;
-		IParseNode argsNode = this.getChild(1);
-
-		if (argsNode != null && argsNode.getNodeType() == JSNodeTypes.PARAMETERS)
-		{
-			result = argsNode.getChildren();
-		}
-
-		return result;
+		return this.getChild(1);
 	}
 
 	/*
@@ -62,7 +54,7 @@ public class JSFunctionNode extends JSNode
 	 */
 	public IParseNodeAttribute[] getAttributes()
 	{
-		String name = getName();
+		String name = this.getName().getText();
 
 		if (name != null && name.length() > 0)
 		{
@@ -117,9 +109,9 @@ public class JSFunctionNode extends JSNode
 	 * 
 	 * @return
 	 */
-	public String getName()
+	public IParseNode getName()
 	{
-		return getChild(0).getText();
+		return this.getChild(0);
 	}
 
 	/**
@@ -161,7 +153,7 @@ public class JSFunctionNode extends JSNode
 	@Override
 	public String getText()
 	{
-		return getName();
+		return this.getName().getText();
 	}
 
 	/*
@@ -173,7 +165,7 @@ public class JSFunctionNode extends JSNode
 	{
 		StringBuilder text = new StringBuilder();
 		text.append("function "); //$NON-NLS-1$
-		String name = getName();
+		String name = this.getName().getText();
 		if (name.length() > 0)
 		{
 			text.append(name).append(" "); //$NON-NLS-1$
