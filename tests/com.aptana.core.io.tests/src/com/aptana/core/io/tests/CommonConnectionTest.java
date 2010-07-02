@@ -71,6 +71,10 @@ import com.aptana.ide.core.io.vfs.IExtendedFileStore;
  */
 public abstract class CommonConnectionTest extends BaseConnectionTest
 {
+	protected boolean supportsSetModificationTime = false;
+	protected boolean supportsChangeGroup = false;
+	protected boolean supportsChangePermissions = false;
+
 	public final void testURI() throws CoreException
 	{
 		assertEquals(cp.getRootURI(), cp.getRoot().toURI());
@@ -570,7 +574,7 @@ public abstract class CommonConnectionTest extends BaseConnectionTest
 
 	protected boolean supportsSetModificationTime()
 	{
-		return false;
+		return supportsSetModificationTime;
 	}
 
 	public final void testPutInfoFileBase() throws CoreException, IOException
@@ -628,7 +632,7 @@ public abstract class CommonConnectionTest extends BaseConnectionTest
 
 	protected boolean supportsChangePermissions()
 	{
-		return false;
+		return supportsChangePermissions;
 	}
 
 	public final void testPutInfoPermissions() throws CoreException, IOException
@@ -661,7 +665,7 @@ public abstract class CommonConnectionTest extends BaseConnectionTest
 
 	protected boolean supportsChangeGroup()
 	{
-		return false;
+		return supportsChangeGroup;
 	}
 
 	public final void testPutInfoGroup() throws CoreException, IOException

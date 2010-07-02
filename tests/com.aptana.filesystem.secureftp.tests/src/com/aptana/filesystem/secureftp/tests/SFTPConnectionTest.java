@@ -45,7 +45,6 @@ import com.aptana.filesystem.secureftp.SFTPConnectionPoint;
  */
 public class SFTPConnectionTest extends CommonConnectionTest
 {
-
 	@Override
 	protected void setUp() throws Exception
 	{
@@ -56,36 +55,10 @@ public class SFTPConnectionTest extends CommonConnectionTest
 				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'})).toCharArray());
 		ftpcp.setPort(Integer.valueOf(getConfig().getProperty("sftp.port", "22"))); //$NON-NLS-1$ //$NON-NLS-2$
 		ftpcp.setPath(Path.fromPortableString(getConfig().getProperty("sftp.path","/home/ftpuser"))); //$NON-NLS-1$ //$NON-NLS-2$
+		supportsSetModificationTime = Boolean.valueOf(getConfig().getProperty("sftp.supportsSetModificationTime", "true"));
+		supportsChangeGroup = Boolean.valueOf(getConfig().getProperty("sftp.supportsChangeGroup", "false"));
+		supportsChangePermissions = Boolean.valueOf(getConfig().getProperty("sftp.supportsChangePermissions", "true"));
 		cp = ftpcp;
 		super.setUp();
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsSetModificationTime()
-	 */
-	@Override
-	protected boolean supportsSetModificationTime()
-	{
-		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangeGroup()
-	 */
-	@Override
-	protected boolean supportsChangeGroup()
-	{
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangePermissions()
-	 */
-	@Override
-	protected boolean supportsChangePermissions()
-	{
-		return true;
 	}
 }

@@ -43,47 +43,20 @@ import com.aptana.filesystem.secureftp.FTPSConnectionPoint;
  */
 public class FTPSConnectionTest extends CommonConnectionTest
 {
-
 	@Override
 	protected void setUp() throws Exception
 	{
 		FTPSConnectionPoint ftpcp = new FTPSConnectionPoint();
 		ftpcp.setHost(getConfig().getProperty("ftps.host", "10.10.1.60")); //$NON-NLS-1$ //$NON-NLS-2$
 		ftpcp.setLogin(getConfig().getProperty("ftps.username", "ftpuser")); //$NON-NLS-1$ //$NON-NLS-2$
-		ftpcp.setPassword(getConfig().getProperty("ftps.password",	//$NON-NLS-1$
-				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'})).toCharArray());
+		ftpcp.setPassword(getConfig().getProperty("ftps.password", //$NON-NLS-1$
+				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n' })).toCharArray());
 		ftpcp.setValidateCertificate(false);
+		supportsSetModificationTime = Boolean.valueOf(getConfig().getProperty("ftps.supportsSetModificationTime",
+				"true"));
+		supportsChangeGroup = Boolean.valueOf(getConfig().getProperty("ftps.supportsChangeGroup", "false"));
+		supportsChangePermissions = Boolean.valueOf(getConfig().getProperty("ftps.supportsChangePermissions", "true"));
 		cp = ftpcp;
 		super.setUp();
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsSetModificationTime()
-	 */
-	@Override
-	protected boolean supportsSetModificationTime()
-	{
-		return true;
-	}
-
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangeGroup()
-	 */
-	@Override
-	protected boolean supportsChangeGroup()
-	{
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangePermissions()
-	 */
-	@Override
-	protected boolean supportsChangePermissions()
-	{
-		return true;
 	}
 }
