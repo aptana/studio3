@@ -46,10 +46,14 @@ import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.filesystem.provider.FileInfo;
 import org.eclipse.core.internal.filesystem.Policy;
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.SubProgressMonitor;
 
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.preferences.CloakingUtils;
@@ -280,7 +284,7 @@ public final class EFSUtils
 		}
 		return fileList.toArray(new IFileStore[0]);
 	}
-	
+
 	/**
 	 * Returns the files of the filestore array plus all of their children
 	 * 
@@ -296,8 +300,28 @@ public final class EFSUtils
 		IFileStore[] childFiles = getFiles(files, true, false, monitor);
 		fileList.addAll(Arrays.asList(childFiles));
 		return fileList.toArray(new IFileStore[0]);
-	}	
-	
+	}
+
+	/**
+	 * Creates a sub progress monitor
+	 * 
+	 * @param monitor
+	 * @param ticks
+	 * @return
+	 */
+	private static IProgressMonitor subMonitorFor(IProgressMonitor monitor, int ticks)
+	{
+		if (monitor == null)
+		{
+			return new NullProgressMonitor();
+		}
+		if (monitor instanceof NullProgressMonitor)
+		{
+			return monitor;
+		}
+		return new SubProgressMonitor(monitor, ticks);
+	}
+
 	/**
 	 * getFiles
 	 * 
@@ -317,29 +341,65 @@ public final class EFSUtils
 		monitor = Policy.monitorFor(monitor);
 		Policy.checkCanceled(monitor);
 
-		IFileStore[] children = file.childStores(EFS.NONE, monitor);
-
-		if (children != null)
+		if (isFolder(file, monitor))
 		{
-			boolean addingFile;
-			for (int i = 0; i < children.length; i++)
+			IFileStore[] children = file.childStores(EFS.NONE, monitor);
+			if (children != null)
 			{
-				Policy.checkCanceled(monitor);
-				IFileStore child = children[i];
-				addingFile = false;
-				if (includeCloakedFiles || !CloakingUtils.isFileCloaked(child))
+
+				IProgressMonitor subMonitor = subMonitorFor(monitor, 2);
+				subMonitor.beginTask(MessageFormat.format("Fetching children of {0}", file.getName()), children.length);
+
+				boolean addingFile;
+				for (int i = 0; i < children.length; i++)
 				{
-					list.add(child);
-					addingFile = true;
-					monitor.worked(1);
+					Policy.checkCanceled(monitor);
+					IFileStore child = children[i];
+					addingFile = false;
+					if (includeCloakedFiles || !CloakingUtils.isFileCloaked(child))
+					{
+						list.add(child);
+						addingFile = true;
+						subMonitor.worked(1);
+					}
+
+					if (recurse && addingFile && isFolder(child, monitor))
+					{
+						getFiles(child, recurse, list, includeCloakedFiles, subMonitor);
+					}
 				}
 
-				if (recurse && child.fetchInfo(EFS.NONE, monitor).isDirectory() && addingFile)
-				{
-					monitor.subTask(MessageFormat.format("Fetching children of {0}", child.getName()));
-					getFiles(child, recurse, list, includeCloakedFiles, monitor);
-				}
+				subMonitor.done();
+
 			}
+		}
+	}
+
+	/**
+	 * Determines if the listed item is a file or a folder.
+	 * 
+	 * @param file
+	 * @param monitor
+	 * @return
+	 * @throws CoreException
+	 */
+	private static boolean isFolder(IFileStore file, IProgressMonitor monitor) throws CoreException
+	{
+		// if we are an IContainer, folder == true;
+		// if we are an IFile, folder == false
+		// if neither, then check info for isDirectory()
+		IResource resource = (IResource) file.getAdapter(IResource.class);
+		if (resource instanceof IContainer)
+		{
+			return true;
+		}
+		else if (!(resource instanceof IFile) && file.fetchInfo(EFS.NONE, monitor).isDirectory())
+		{
+			return true;
+		}
+		else
+		{
+			return false;
 		}
 	}
 }
