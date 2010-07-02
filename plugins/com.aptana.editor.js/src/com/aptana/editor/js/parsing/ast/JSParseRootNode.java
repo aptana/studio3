@@ -4,14 +4,11 @@ import beaver.Symbol;
 
 import com.aptana.editor.js.contentassist.LocationType;
 import com.aptana.editor.js.parsing.IJSParserConstants;
-import com.aptana.parsing.Scope;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 
 public class JSParseRootNode extends ParseRootNode
 {
-	private Scope<JSNode> _globalScope;
-
 	/**
 	 * JSParseRootNode
 	 */
@@ -45,16 +42,6 @@ public class JSParseRootNode extends ParseRootNode
 	public void accept(JSTreeWalker walker)
 	{
 		walker.visit(this);
-	}
-	
-	/**
-	 * getGlobalScope
-	 * 
-	 * @return
-	 */
-	public Scope<JSNode> getGlobalScope()
-	{
-		return this._globalScope;
 	}
 
 	/**
@@ -92,15 +79,5 @@ public class JSParseRootNode extends ParseRootNode
 		}
 
 		return result;
-	}
-
-	/**
-	 * setGlobalScope
-	 * 
-	 * @param globalScope
-	 */
-	public void setGlobalScope(Scope<JSNode> globalScope)
-	{
-		this._globalScope = globalScope;
 	}
 }
