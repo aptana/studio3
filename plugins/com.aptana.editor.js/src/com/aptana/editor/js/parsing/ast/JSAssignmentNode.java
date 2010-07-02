@@ -22,7 +22,7 @@ public class JSAssignmentNode extends JSNode
 
 		short type = DEFAULT_TYPE;
 		JSTokenType token = JSTokenType.get((String) assignOperator.value);
-		
+
 		switch (token)
 		{
 			case EQUAL:
@@ -62,8 +62,8 @@ public class JSAssignmentNode extends JSNode
 				type = JSNodeTypes.SUBTRACT_AND_ASSIGN;
 				break;
 		}
-		
-		this.setType(type);
+
+		this.setNodeType(type);
 		this.setChildren(new JSNode[] { left, right });
 	}
 
@@ -76,7 +76,7 @@ public class JSAssignmentNode extends JSNode
 	{
 		walker.visit(this);
 	}
-	
+
 	/**
 	 * getLeftHandSide
 	 * 
@@ -96,7 +96,7 @@ public class JSAssignmentNode extends JSNode
 	{
 		return this._operator;
 	}
-	
+
 	/**
 	 * getRightHandSide
 	 * 
@@ -105,23 +105,5 @@ public class JSAssignmentNode extends JSNode
 	public IParseNode getRightHandSide()
 	{
 		return this.getChild(1);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		StringBuilder text = new StringBuilder();
-
-		text.append(this.getLeftHandSide());
-		text.append(" ").append(this._operator.value).append(" "); //$NON-NLS-1$ //$NON-NLS-2$
-		text.append(this.getRightHandSide());
-
-		this.appendSemicolon(text);
-
-		return text.toString();
 	}
 }

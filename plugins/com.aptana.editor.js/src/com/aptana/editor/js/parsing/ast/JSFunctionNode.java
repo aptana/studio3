@@ -37,16 +37,6 @@ public class JSFunctionNode extends JSNode
 		walker.visit(this);
 	}
 
-	/**
-	 * getParameters
-	 * 
-	 * @return
-	 */
-	public IParseNode getParameters()
-	{
-		return this.getChild(1);
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.ParseBaseNode#getAttributes()
@@ -85,6 +75,16 @@ public class JSFunctionNode extends JSNode
 	public IParseNode getName()
 	{
 		return this.getChild(0);
+	}
+
+	/**
+	 * getParameters
+	 * 
+	 * @return
+	 */
+	public IParseNode getParameters()
+	{
+		return this.getChild(1);
 	}
 
 	/**
@@ -127,26 +127,5 @@ public class JSFunctionNode extends JSNode
 	public String getText()
 	{
 		return this.getName().getText();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		StringBuilder text = new StringBuilder();
-		text.append("function "); //$NON-NLS-1$
-		String name = this.getName().getText();
-		if (name.length() > 0)
-		{
-			text.append(name).append(" "); //$NON-NLS-1$
-		}
-		text.append(getChild(1)).append(" ").append(getChild(2)); //$NON-NLS-1$
-
-		this.appendSemicolon(text);
-
-		return text.toString();
 	}
 }

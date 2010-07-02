@@ -11,7 +11,7 @@ public class JSCommaNode extends JSNaryNode
 	{
 		super(JSNodeTypes.COMMA, children);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)

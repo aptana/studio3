@@ -6,7 +6,6 @@ package com.aptana.editor.js.parsing.ast;
 public abstract class JSLabelStatementNode extends JSNode
 {
 	private String fIdentifier;
-	private String fText;
 
 	/**
 	 * JSLabelStatementNode
@@ -27,7 +26,7 @@ public abstract class JSLabelStatementNode extends JSNode
 	public JSLabelStatementNode(short type, String identifier)
 	{
 		super(type);
-		
+
 		fIdentifier = identifier;
 	}
 
@@ -47,11 +46,14 @@ public abstract class JSLabelStatementNode extends JSNode
 	}
 
 	/**
-	 * geKeyword
+	 * getIdentifier
 	 * 
 	 * @return
 	 */
-	protected abstract String getKeyword();
+	public String getIdentifier()
+	{
+		return fIdentifier;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -62,31 +64,5 @@ public abstract class JSLabelStatementNode extends JSNode
 	{
 		int hash = super.hashCode();
 		return hash * 31 + (fIdentifier == null ? 0 : fIdentifier.hashCode());
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		if (fText == null)
-		{
-			StringBuilder text = new StringBuilder();
-
-			text.append(this.getKeyword());
-
-			if (fIdentifier != null)
-			{
-				text.append(" ").append(fIdentifier); //$NON-NLS-1$
-			}
-
-			this.appendSemicolon(text);
-
-			fText = text.toString();
-		}
-
-		return fText;
 	}
 }

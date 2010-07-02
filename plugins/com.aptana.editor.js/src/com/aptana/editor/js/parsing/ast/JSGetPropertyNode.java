@@ -13,8 +13,8 @@ public class JSGetPropertyNode extends JSBinaryOperatorNode
 	public JSGetPropertyNode(JSNode left, Symbol operator, JSNode right)
 	{
 		super(left, operator, right);
-		
-		this.setType(JSNodeTypes.GET_PROPERTY);
+
+		this.setNodeType(JSNodeTypes.GET_PROPERTY);
 	}
 
 	/*
@@ -25,23 +25,5 @@ public class JSGetPropertyNode extends JSBinaryOperatorNode
 	public void accept(JSTreeWalker walker)
 	{
 		walker.visit(this);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSBinaryOperatorNode#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		StringBuilder text = new StringBuilder();
-
-		text.append(this.getLeftHandSide());
-		text.append("."); //$NON-NLS-1$
-		text.append(this.getRightHandSide());
-
-		this.appendSemicolon(text);
-
-		return text.toString();
 	}
 }

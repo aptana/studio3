@@ -23,7 +23,7 @@ public class JSForInNode extends JSNode
 	{
 		walker.visit(this);
 	}
-	
+
 	/**
 	 * getBody
 	 * 
@@ -49,28 +49,8 @@ public class JSForInNode extends JSNode
 	 * 
 	 * @return
 	 */
-	public IParseNode getInitialization()
+	public IParseNode getInitializer()
 	{
 		return this.getChild(0);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
-	 */
-	public String toString()
-	{
-		StringBuilder buffer = new StringBuilder();
-		IParseNode[] children = getChildren();
-
-		buffer.append("for ("); //$NON-NLS-1$
-		buffer.append(children[0]);
-		buffer.append(" in "); //$NON-NLS-1$
-		buffer.append(children[1]).append(") "); //$NON-NLS-1$
-		buffer.append(children[2]);
-
-		this.appendSemicolon(buffer);
-
-		return buffer.toString();
 	}
 }

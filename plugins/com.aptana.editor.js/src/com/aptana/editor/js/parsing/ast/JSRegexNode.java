@@ -7,21 +7,21 @@ public class JSRegexNode extends JSPrimitiveNode
 	/**
 	 * JSRegexNode
 	 * 
-	 * @param identifier
-	 */
-	public JSRegexNode(Symbol identifier)
-	{
-		this((String) identifier.value);
-	}
-
-	/**
-	 * JSRegexNode
-	 * 
 	 * @param text
 	 */
 	public JSRegexNode(String text)
 	{
 		super(JSNodeTypes.REGEX, text);
+	}
+
+	/**
+	 * JSRegexNode
+	 * 
+	 * @param identifier
+	 */
+	public JSRegexNode(Symbol identifier)
+	{
+		this((String) identifier.value);
 	}
 
 	/*

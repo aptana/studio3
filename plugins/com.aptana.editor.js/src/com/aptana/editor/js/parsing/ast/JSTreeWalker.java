@@ -8,15 +8,15 @@ public class JSTreeWalker
 	{
 	}
 
-	public void visit(JSBinaryArithmeticOperatorNode node)
-	{
-	}
-
 	public void visit(JSArrayNode node)
 	{
 	}
 
 	public void visit(JSAssignmentNode node)
+	{
+	}
+
+	public void visit(JSBinaryArithmeticOperatorNode node)
 	{
 	}
 
@@ -165,6 +165,10 @@ public class JSTreeWalker
 	{
 	}
 
+	public void visit(JSPreUnaryOperatorNode node)
+	{
+	}
+
 	public void visit(JSRegexNode node)
 	{
 		// leaf
@@ -201,10 +205,6 @@ public class JSTreeWalker
 	}
 
 	public void visit(JSTryNode node)
-	{
-	}
-
-	public void visit(JSPreUnaryOperatorNode node)
 	{
 	}
 

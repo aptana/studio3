@@ -9,7 +9,7 @@ public class JSErrorNode extends JSNode
 	{
 		super(JSNodeTypes.ERROR);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)

@@ -23,7 +23,7 @@ public class JSTryNode extends JSNode
 	{
 		walker.visit(this);
 	}
-	
+
 	/**
 	 * getBody
 	 * 
@@ -33,7 +33,7 @@ public class JSTryNode extends JSNode
 	{
 		return this.getChild(0);
 	}
-	
+
 	/**
 	 * getCatchBlock
 	 * 
@@ -43,7 +43,7 @@ public class JSTryNode extends JSNode
 	{
 		return this.getChild(1);
 	}
-	
+
 	/**
 	 * getFinallyBlock
 	 * 
@@ -52,32 +52,5 @@ public class JSTryNode extends JSNode
 	public IParseNode getFinallyBlock()
 	{
 		return this.getChild(2);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
-	 */
-	public String toString()
-	{
-		StringBuilder buffer = new StringBuilder();
-		IParseNode[] children = getChildren();
-
-		buffer.append("try "); //$NON-NLS-1$
-		buffer.append(children[0]);
-
-		if (!((JSNode) children[1]).isEmpty())
-		{
-			buffer.append(" ").append(children[1]); //$NON-NLS-1$
-		}
-
-		if (!((JSNode) children[2]).isEmpty())
-		{
-			buffer.append(" ").append(children[2]); //$NON-NLS-1$
-		}
-
-		this.appendSemicolon(buffer);
-
-		return buffer.toString();
 	}
 }

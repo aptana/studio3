@@ -34,14 +34,4 @@ public class JSBreakNode extends JSLabelStatementNode
 	{
 		walker.visit(this);
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSLabelStatementNode#getKeyword()
-	 */
-	@Override
-	protected String getKeyword()
-	{
-		return "break"; //$NON-NLS-1$
-	}
 }

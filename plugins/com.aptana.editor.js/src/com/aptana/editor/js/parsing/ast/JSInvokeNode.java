@@ -25,16 +25,6 @@ public class JSInvokeNode extends JSNode
 	}
 
 	/**
-	 * getExpression
-	 * 
-	 * @return
-	 */
-	public IParseNode getExpression()
-	{
-		return this.getChild(0);
-	}
-
-	/**
 	 * getArguments
 	 * 
 	 * @return
@@ -43,21 +33,14 @@ public class JSInvokeNode extends JSNode
 	{
 		return this.getChild(1);
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
+
+	/**
+	 * getExpression
+	 * 
+	 * @return
 	 */
-	public String toString()
+	public IParseNode getExpression()
 	{
-		StringBuilder buffer = new StringBuilder();
-		IParseNode[] children = getChildren();
-
-		buffer.append(children[0]);
-		buffer.append(children[1]);
-
-		this.appendSemicolon(buffer);
-
-		return buffer.toString();
+		return this.getChild(0);
 	}
 }

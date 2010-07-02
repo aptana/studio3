@@ -24,21 +24,23 @@ public class JSConstructNode extends JSNode
 		walker.visit(this);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
+	/**
+	 * getArguments
+	 * 
+	 * @return
 	 */
-	public String toString()
+	public IParseNode getArguments()
 	{
-		StringBuilder buffer = new StringBuilder();
-		IParseNode[] children = getChildren();
+		return this.getChild(1);
+	}
 
-		buffer.append("new "); //$NON-NLS-1$
-		buffer.append(children[0]);
-		buffer.append(children[1]);
-
-		this.appendSemicolon(buffer);
-
-		return buffer.toString();
+	/**
+	 * getIdentifier
+	 * 
+	 * @return
+	 */
+	public IParseNode getIdentifier()
+	{
+		return this.getChild(0);
 	}
 }

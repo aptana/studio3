@@ -7,21 +7,21 @@ public class JSNumberNode extends JSPrimitiveNode
 	/**
 	 * JSNumberNode
 	 * 
-	 * @param identifier
-	 */
-	public JSNumberNode(Symbol identifier)
-	{
-		this((String) identifier.value);
-	}
-
-	/**
-	 * JSNumberNode
-	 * 
 	 * @param text
 	 */
 	public JSNumberNode(String text)
 	{
 		super(JSNodeTypes.NUMBER, text);
+	}
+
+	/**
+	 * JSNumberNode
+	 * 
+	 * @param identifier
+	 */
+	public JSNumberNode(Symbol identifier)
+	{
+		this((String) identifier.value);
 	}
 
 	/*

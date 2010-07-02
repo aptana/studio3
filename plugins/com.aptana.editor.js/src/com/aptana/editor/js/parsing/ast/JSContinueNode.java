@@ -29,14 +29,4 @@ public class JSContinueNode extends JSLabelStatementNode
 	{
 		walker.visit(this);
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSLabelStatementNode#getKeyword()
-	 */
-	@Override
-	protected String getKeyword()
-	{
-		return "continue"; //$NON-NLS-1$
-	}
 }

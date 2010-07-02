@@ -15,9 +15,9 @@ public class JSGetElementNode extends JSBinaryOperatorNode
 	public JSGetElementNode(JSNode left, Symbol leftBracket, JSNode right, Symbol rightBracket)
 	{
 		super(left, leftBracket, right);
-		
+
 		this._rightBracket = rightBracket;
-		this.setType(JSNodeTypes.GET_ELEMENT);
+		this.setNodeType(JSNodeTypes.GET_ELEMENT);
 	}
 
 	/*
@@ -29,7 +29,7 @@ public class JSGetElementNode extends JSBinaryOperatorNode
 	{
 		walker.visit(this);
 	}
-	
+
 	/**
 	 * getLeftBracket
 	 * 
@@ -39,7 +39,7 @@ public class JSGetElementNode extends JSBinaryOperatorNode
 	{
 		return this.getOperator();
 	}
-	
+
 	/**
 	 * getRightBracket
 	 * 
@@ -48,24 +48,5 @@ public class JSGetElementNode extends JSBinaryOperatorNode
 	public Symbol getRightBracket()
 	{
 		return this._rightBracket;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSBinaryOperatorNode#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		StringBuilder text = new StringBuilder();
-
-		text.append(this.getLeftHandSide());
-		text.append("[");
-		text.append(this.getRightHandSide());
-		text.append("]"); //$NON-NLS-1$ //$NON-NLS-2$
-
-		this.appendSemicolon(text);
-
-		return text.toString();
 	}
 }

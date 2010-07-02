@@ -14,7 +14,7 @@ public abstract class JSNaryAndExpressionNode extends JSNaryNode
 	{
 		super(type, children);
 	}
-	
+
 	/**
 	 * getExpression
 	 * 

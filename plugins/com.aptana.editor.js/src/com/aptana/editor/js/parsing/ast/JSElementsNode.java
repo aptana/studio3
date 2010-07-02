@@ -11,7 +11,7 @@ public class JSElementsNode extends JSNaryNode
 	{
 		super(JSNodeTypes.ELEMENTS, children);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)

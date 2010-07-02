@@ -1,6 +1,5 @@
 package com.aptana.editor.js.parsing.ast;
 
-
 public abstract class JSPrimitiveNode extends JSNode
 {
 	private String fText;
@@ -16,7 +15,7 @@ public abstract class JSPrimitiveNode extends JSNode
 	public JSPrimitiveNode(short type, String text)
 	{
 		super(type);
-		
+
 		fText = text;
 	}
 
@@ -57,22 +56,5 @@ public abstract class JSPrimitiveNode extends JSNode
 	public int hashCode()
 	{
 		return 31 * super.hashCode() + fText.hashCode();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		if (getSemicolonIncluded())
-		{
-			return fText + ";";
-		}
-		else
-		{
-			return fText;
-		}
 	}
 }

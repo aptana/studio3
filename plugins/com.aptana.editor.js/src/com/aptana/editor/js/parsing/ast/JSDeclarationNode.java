@@ -23,7 +23,7 @@ public class JSDeclarationNode extends JSNode
 	{
 		walker.visit(this);
 	}
-	
+
 	/**
 	 * getIdentifier
 	 * 
@@ -42,26 +42,5 @@ public class JSDeclarationNode extends JSNode
 	public IParseNode getValue()
 	{
 		return this.getChild(1);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
-	 */
-	public String toString()
-	{
-		StringBuilder buffer = new StringBuilder();
-		IParseNode[] children = getChildren();
-
-		buffer.append(children[0]);
-
-		if (!((JSNode) children[1]).isEmpty())
-		{
-			buffer.append(" = ").append(children[1]); //$NON-NLS-1$
-		}
-
-		this.appendSemicolon(buffer);
-
-		return buffer.toString();
 	}
 }

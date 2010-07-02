@@ -24,12 +24,8 @@ public class JSParseRootNode extends ParseRootNode
 	 */
 	public JSParseRootNode(Symbol[] children)
 	{
-		super(
-			IJSParserConstants.LANGUAGE,
-			children,
-			(children != null && children.length > 0) ? children[0].getStart() : 0,
-			(children != null && children.length > 0) ? children[0].getEnd() : 0
-		);
+		super(IJSParserConstants.LANGUAGE, children, (children != null && children.length > 0) ? children[0].getStart() : 0,
+			(children != null && children.length > 0) ? children[0].getEnd() : 0);
 	}
 
 	/**
@@ -40,5 +36,18 @@ public class JSParseRootNode extends ParseRootNode
 	public void accept(JSTreeWalker walker)
 	{
 		walker.visit(this);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#toString()
+	 */
+	public String toString()
+	{
+		JSFormatWalker walker = new JSFormatWalker();
+		
+		this.accept(walker);
+		
+		return walker.getText();
 	}
 }

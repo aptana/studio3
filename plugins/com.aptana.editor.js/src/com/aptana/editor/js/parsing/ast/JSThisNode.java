@@ -21,7 +21,7 @@ public class JSThisNode extends JSPrimitiveNode
 	{
 		this();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)

@@ -65,22 +65,4 @@ public abstract class JSBinaryOperatorNode extends JSNode
 	{
 		return this.getChild(1);
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		StringBuilder text = new StringBuilder();
-
-		text.append(this.getLeftHandSide());
-		text.append(" ").append(this._operator.value).append(" "); //$NON-NLS-1$ //$NON-NLS-2$
-		text.append(this.getRightHandSide());
-
-		this.appendSemicolon(text);
-
-		return text.toString();
-	}
 }

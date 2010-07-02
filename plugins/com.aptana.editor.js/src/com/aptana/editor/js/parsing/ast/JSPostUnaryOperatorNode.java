@@ -17,22 +17,22 @@ public class JSPostUnaryOperatorNode extends JSNode
 
 		short type = DEFAULT_TYPE;
 		JSTokenType token = JSTokenType.get(operator);
-		
+
 		switch (token)
 		{
 			case MINUS_MINUS:
 				type = JSNodeTypes.POST_DECREMENT;
 				break;
-				
+
 			case PLUS_PLUS:
 				type = JSNodeTypes.POST_INCREMENT;
 				break;
-				
+
 			default:
 				throw new IllegalArgumentException("Unrecognized operator: " + token);
 		}
-		
-		this.setType(type);
+
+		this.setNodeType(type);
 	}
 
 	/*
@@ -44,7 +44,7 @@ public class JSPostUnaryOperatorNode extends JSNode
 	{
 		walker.visit(this);
 	}
-	
+
 	/**
 	 * getExpression
 	 * 
@@ -53,35 +53,5 @@ public class JSPostUnaryOperatorNode extends JSNode
 	public IParseNode getExpression()
 	{
 		return this.getChild(0);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSUnaryOperatorNode#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		StringBuilder text = new StringBuilder();
-		
-		text.append(this.getChild(0));
-		
-		String operator = ""; //$NON-NLS-1$
-		
-		switch (getNodeType())
-		{
-			case JSNodeTypes.POST_DECREMENT:
-				operator = "--"; //$NON-NLS-1$
-				break;
-				
-			case JSNodeTypes.POST_INCREMENT:
-				operator = "++"; //$NON-NLS-1$
-				break;
-		}
-		text.append(operator);
-
-		this.appendSemicolon(text);
-
-		return text.toString();
 	}
 }

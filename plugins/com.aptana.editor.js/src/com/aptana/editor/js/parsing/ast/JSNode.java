@@ -68,10 +68,10 @@ public class JSNode extends ParseNode
 	public JSNode(short type, JSNode... children)
 	{
 		super(IJSParserConstants.LANGUAGE);
-		
+
 		// set node type
 		this.fType = type;
-		
+
 		// store children
 		this.setChildren(children);
 	}
@@ -85,19 +85,6 @@ public class JSNode extends ParseNode
 	{
 		// sub-classes must override this method so their types will be
 		// recognized properly
-	}
-	
-	/**
-	 * appendSemicolon
-	 * 
-	 * @param buffer
-	 */
-	protected void appendSemicolon(StringBuilder buffer)
-	{
-		if (getSemicolonIncluded())
-		{
-			buffer.append(";");
-		}
 	}
 
 	/*
@@ -165,6 +152,15 @@ public class JSNode extends ParseNode
 		return (result == null) ? super.getElementName() : result;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseBaseNode#getType()
+	 */
+	public short getNodeType()
+	{
+		return fType;
+	}
+
 	/**
 	 * getSemicolonIncluded
 	 * 
@@ -173,15 +169,6 @@ public class JSNode extends ParseNode
 	public boolean getSemicolonIncluded()
 	{
 		return fSemicolonIncluded;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseBaseNode#getType()
-	 */
-	public short getNodeType()
-	{
-		return fType;
 	}
 
 	/*
@@ -218,6 +205,16 @@ public class JSNode extends ParseNode
 	}
 
 	/**
+	 * setType
+	 * 
+	 * @param type
+	 */
+	protected void setNodeType(short type)
+	{
+		fType = type;
+	}
+
+	/**
 	 * setSemicolonIncluded
 	 * 
 	 * @param included
@@ -226,31 +223,17 @@ public class JSNode extends ParseNode
 	{
 		fSemicolonIncluded = included;
 	}
-
-	/**
-	 * setType
-	 * 
-	 * @param type
-	 */
-	protected void setType(short type)
-	{
-		fType = type;
-	}
-
+	
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseBaseNode#toString()
+	 * @see com.aptana.parsing.ast.ParseNode#toString()
 	 */
-	@Override
 	public String toString()
 	{
-		if (this.getSemicolonIncluded())
-		{
-			return super.toString() + ";";
-		}
-		else
-		{
-			return super.toString();
-		}
+		JSFormatWalker walker = new JSFormatWalker();
+		
+		this.accept(walker);
+		
+		return walker.getText();
 	}
 }

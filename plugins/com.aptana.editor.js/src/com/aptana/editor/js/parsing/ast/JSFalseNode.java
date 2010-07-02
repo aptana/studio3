@@ -7,16 +7,6 @@ public class JSFalseNode extends JSPrimitiveNode
 	/**
 	 * JSFalseNode
 	 * 
-	 * @param identifier
-	 */
-	public JSFalseNode(Symbol identifier)
-	{
-		this();
-	}
-
-	/**
-	 * JSFalseNode
-	 * 
 	 * @param text
 	 * @param start
 	 * @param end
@@ -24,6 +14,16 @@ public class JSFalseNode extends JSPrimitiveNode
 	public JSFalseNode()
 	{
 		super(JSNodeTypes.FALSE, "false");
+	}
+
+	/**
+	 * JSFalseNode
+	 * 
+	 * @param identifier
+	 */
+	public JSFalseNode(Symbol identifier)
+	{
+		this();
 	}
 
 	/*

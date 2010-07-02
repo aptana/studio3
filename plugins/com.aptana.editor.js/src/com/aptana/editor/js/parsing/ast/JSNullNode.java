@@ -21,7 +21,7 @@ public class JSNullNode extends JSPrimitiveNode
 	{
 		super(JSNodeTypes.NULL, (String) identifier.value);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)

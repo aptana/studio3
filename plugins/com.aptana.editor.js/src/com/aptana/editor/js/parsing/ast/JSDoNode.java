@@ -23,7 +23,7 @@ public class JSDoNode extends JSNode
 	{
 		walker.visit(this);
 	}
-	
+
 	/**
 	 * getBody
 	 * 
@@ -33,7 +33,7 @@ public class JSDoNode extends JSNode
 	{
 		return this.getChild(0);
 	}
-	
+
 	/**
 	 * getCondition
 	 * 
@@ -42,28 +42,5 @@ public class JSDoNode extends JSNode
 	public IParseNode getCondition()
 	{
 		return this.getChild(1);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
-	 */
-	public String toString()
-	{
-		StringBuilder buffer = new StringBuilder();
-		IParseNode[] children = getChildren();
-
-		buffer.append("do ").append(children[0]); //$NON-NLS-1$
-
-		if (children[0].getNodeType() != JSNodeTypes.STATEMENTS)
-		{
-			buffer.append(";"); //$NON-NLS-1$
-		}
-
-		buffer.append(" while (").append(children[1]).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
-
-		this.appendSemicolon(buffer);
-
-		return buffer.toString();
 	}
 }

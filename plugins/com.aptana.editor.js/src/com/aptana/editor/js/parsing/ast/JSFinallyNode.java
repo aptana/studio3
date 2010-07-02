@@ -23,7 +23,7 @@ public class JSFinallyNode extends JSNode
 	{
 		walker.visit(this);
 	}
-	
+
 	/**
 	 * getBlock
 	 * 
@@ -32,22 +32,5 @@ public class JSFinallyNode extends JSNode
 	public IParseNode getBlock()
 	{
 		return this.getChild(0);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
-	 */
-	public String toString()
-	{
-		StringBuilder buffer = new StringBuilder();
-		IParseNode[] children = getChildren();
-
-		buffer.append("finally "); //$NON-NLS-1$
-		buffer.append(children[0]);
-
-		this.appendSemicolon(buffer);
-
-		return buffer.toString();
 	}
 }

@@ -7,21 +7,21 @@ public class JSStringNode extends JSPrimitiveNode
 	/**
 	 * JSStringNode
 	 * 
-	 * @param identifier
-	 */
-	public JSStringNode(Symbol identifier)
-	{
-		this((String) identifier.value);
-	}
-
-	/**
-	 * JSStringNode
-	 * 
 	 * @param text
 	 */
 	public JSStringNode(String text)
 	{
 		super(JSNodeTypes.STRING, text);
+	}
+
+	/**
+	 * JSStringNode
+	 * 
+	 * @param identifier
+	 */
+	public JSStringNode(Symbol identifier)
+	{
+		this((String) identifier.value);
 	}
 
 	/*

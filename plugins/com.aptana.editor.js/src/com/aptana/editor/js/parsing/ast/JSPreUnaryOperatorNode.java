@@ -24,8 +24,8 @@ public class JSPreUnaryOperatorNode extends JSNode
 	public JSPreUnaryOperatorNode(short type, JSNode expression)
 	{
 		this(expression);
-		
-		this.setType(type);
+
+		this.setNodeType(type);
 	}
 
 	/**
@@ -40,50 +40,50 @@ public class JSPreUnaryOperatorNode extends JSNode
 
 		short type;
 		JSTokenType token = JSTokenType.get(operator);
-		
+
 		switch (token)
 		{
 			case DELETE:
 				type = JSNodeTypes.DELETE;
 				break;
-				
+
 			case EXCLAMATION:
 				type = JSNodeTypes.LOGICAL_NOT;
 				break;
-				
+
 			case MINUS:
 				type = JSNodeTypes.NEGATIVE;
 				break;
-				
+
 			case MINUS_MINUS:
 				type = JSNodeTypes.PRE_DECREMENT;
 				break;
-				
+
 			case PLUS:
 				type = JSNodeTypes.POSITIVE;
 				break;
-				
+
 			case PLUS_PLUS:
 				type = JSNodeTypes.PRE_INCREMENT;
 				break;
-				
+
 			case TILDE:
 				type = JSNodeTypes.BITWISE_NOT;
 				break;
-				
+
 			case TYPEOF:
 				type = JSNodeTypes.TYPEOF;
 				break;
-				
+
 			case VOID:
 				type = JSNodeTypes.VOID;
 				break;
-				
+
 			default:
 				throw new IllegalArgumentException("Unrecognized operator: " + token);
 		}
-		
-		setType(type);
+
+		setNodeType(type);
 	}
 
 	/*
@@ -95,7 +95,7 @@ public class JSPreUnaryOperatorNode extends JSNode
 	{
 		walker.visit(this);
 	}
-	
+
 	/**
 	 * getExpression
 	 * 
@@ -104,69 +104,5 @@ public class JSPreUnaryOperatorNode extends JSNode
 	public IParseNode getExpression()
 	{
 		return this.getChild(0);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		StringBuilder text = new StringBuilder();
-		IParseNode expression = this.getChild(0);
-		String operator = ""; //$NON-NLS-1$
-		
-		int type = this.getNodeType();
-		
-		switch (type)
-		{
-			case JSNodeTypes.DELETE:
-				operator = "delete "; //$NON-NLS-1$
-				break;
-				
-			case JSNodeTypes.LOGICAL_NOT:
-				operator = "!"; //$NON-NLS-1$
-				break;
-				
-			case JSNodeTypes.NEGATIVE:
-				operator = "-"; //$NON-NLS-1$
-				break;
-				
-			case JSNodeTypes.PRE_DECREMENT:
-				operator = "--"; //$NON-NLS-1$
-				break;
-				
-			case JSNodeTypes.POSITIVE:
-				operator = "+"; //$NON-NLS-1$
-				break;
-				
-			case JSNodeTypes.PRE_INCREMENT:
-				operator = "++"; //$NON-NLS-1$
-				break;
-				
-			case JSNodeTypes.BITWISE_NOT:
-				operator = "~"; //$NON-NLS-1$
-				break;
-				
-			case JSNodeTypes.TYPEOF:
-				operator = "typeof"; //$NON-NLS-1$
-				
-				if (expression.getNodeType() != JSNodeTypes.GROUP)
-				{
-					operator += " "; //$NON-NLS-1$
-				}
-				break;
-				
-			case JSNodeTypes.VOID:
-				operator = "void "; //$NON-NLS-1$
-				break;
-		}
-		
-		text.append(operator).append(expression);
-
-		this.appendSemicolon(text);
-
-		return text.toString();
 	}
 }
