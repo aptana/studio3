@@ -71,10 +71,6 @@ import com.aptana.ide.core.io.vfs.IExtendedFileStore;
  */
 public abstract class CommonConnectionTest extends BaseConnectionTest
 {
-	protected boolean supportsSetModificationTime = false;
-	protected boolean supportsChangeGroup = false;
-	protected boolean supportsChangePermissions = false;
-
 	public final void testURI() throws CoreException
 	{
 		assertEquals(cp.getRootURI(), cp.getRoot().toURI());

@@ -51,6 +51,67 @@ import org.eclipse.core.runtime.IProgressMonitor;
  */
 public interface IConnectionFileManager {
 
+	
+	/**
+	 * Retrieves the host name or IP address
+	 * @return
+	 */
+	public String getHost();
+
+	/**
+	 * Sets the remote host name or IP address
+	 * @param host
+	 */
+	public void setHost(String host);
+
+	/**
+	 * Retrieves the numeric port
+	 * @return
+	 */
+	public int getPort();
+
+	/**
+	 * Sets the communication port
+	 * @param port
+	 */
+	public void setPort(int port);
+
+	/**
+	 * Retrieves the username or login used while connection
+	 * @return
+	 */
+	public String getLogin();
+
+	/**
+	 * Sets the username or login used to connect
+	 * @param login
+	 */
+	public void setLogin(String login);
+	
+	/**
+	 * Gets the password used to connect
+	 * @return
+	 */
+	public char[] getPassword();
+
+	/**
+	 * Sets the password used to connect
+	 * @param password
+	 */
+	public void setPassword(char[] password);
+
+	/**
+	 * Retrieves the base path of this connection point
+	 * @return
+	 */
+	public IPath getBasePath();
+
+	/**
+	 * Sets the base path of this connection point
+	 * @param basePath
+	 */
+	public void setBasePath(IPath basePath);
+	
 	public void connect(IProgressMonitor monitor) throws CoreException;
 	public boolean isConnected();
 	public void disconnect(IProgressMonitor monitor) throws CoreException;

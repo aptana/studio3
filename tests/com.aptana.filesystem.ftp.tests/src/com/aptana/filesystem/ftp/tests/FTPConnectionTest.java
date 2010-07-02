@@ -39,8 +39,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.OperationCanceledException;
 
+import com.aptana.core.epl.IMemento;
+import com.aptana.core.epl.XMLMemento;
 import com.aptana.core.io.tests.CommonConnectionTest;
 import com.aptana.filesystem.ftp.FTPConnectionPoint;
+import com.aptana.filesystem.ftp.IFTPConstants;
 
 /**
  * @author Max Stepanov
@@ -150,6 +153,24 @@ public class FTPConnectionTest extends CommonConnectionTest
 		ftpcp.connect(null);
 
 		ftpcp.setTimezone(timezone);
+	}
+
+	public final void testIncorrectTransferType() throws CoreException
+	{
+		FTPConnectionPoint ftpcp = (FTPConnectionPoint) cp;
+
+		// Should be set to BINARY by default
+		assertTrue(ftpcp.getTransferType().equals(IFTPConstants.TRANSFER_TYPE_BINARY));		
+
+		// set to ASCII
+		ftpcp.setTransferType(IFTPConstants.TRANSFER_TYPE_ASCII);
+		assertTrue(ftpcp.getTransferType().equals(IFTPConstants.TRANSFER_TYPE_ASCII));		
+
+		// set to ERROR, which should set to BINARY
+		ftpcp.setTransferType("ERROR");
+		ftpcp.connect(null);
+		ftpcp.getRoot().fetchInfo();
+		assertTrue(ftpcp.getTransferType().equals(IFTPConstants.TRANSFER_TYPE_BINARY));		
 	}
 
 

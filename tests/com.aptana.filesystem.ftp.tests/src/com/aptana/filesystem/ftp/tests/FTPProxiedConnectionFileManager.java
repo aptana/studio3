@@ -14,6 +14,7 @@ import com.enterprisedt.net.ftp.FTPClient;
 
 public class FTPProxiedConnectionFileManager extends FTPConnectionFileManager
 {
+	// Exceptions we could set/force on the client
 	public void setFTPException(boolean value) {
 		((FTPClientProxy)ftpClient).setFTPException(value);
 	}

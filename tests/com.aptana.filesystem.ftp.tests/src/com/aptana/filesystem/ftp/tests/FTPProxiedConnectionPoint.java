@@ -89,7 +89,7 @@ public class FTPProxiedConnectionPoint extends FTPConnectionPoint {
 		return ((FTPProxiedConnectionFileManager)connectionFileManager).getUnknownHostException();
 	}
 
-	public void setFileNotFoundException(boolean value) {
+	public void forceFileNotFoundException(boolean value) {
 		((FTPProxiedConnectionFileManager)connectionFileManager).setFileNotFoundException(value);
 	}
 	

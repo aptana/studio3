@@ -57,6 +57,9 @@ public class FTPProxiedConnectionTest extends BaseConnectionTest
 		ftpcp.setLogin(getConfig().getProperty("ftp.username", "ftpuser")); //$NON-NLS-1$ //$NON-NLS-2$
 		ftpcp.setPassword(getConfig().getProperty("ftp.password", //$NON-NLS-1$
 				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n' })).toCharArray());
+		supportsSetModificationTime = Boolean.valueOf(getConfig().getProperty("ftp.supportsSetModificationTime", "true"));
+		supportsChangeGroup = Boolean.valueOf(getConfig().getProperty("ftp.supportsChangeGroup", "false"));
+		supportsChangePermissions = Boolean.valueOf(getConfig().getProperty("ftp.supportsChangePermissions", "true"));
 		cp = ftpcp;
 		super.setUp();
 	}

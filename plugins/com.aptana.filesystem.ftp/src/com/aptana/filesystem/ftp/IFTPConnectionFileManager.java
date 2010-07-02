@@ -35,9 +35,12 @@
 
 package com.aptana.filesystem.ftp;
 
+import java.io.IOException;
+
 import org.eclipse.core.runtime.IPath;
 
 import com.aptana.ide.core.io.vfs.IConnectionFileManager;
+import com.enterprisedt.net.ftp.FTPException;
 
 /**
  * @author Max Stepanov
@@ -45,6 +48,31 @@ import com.aptana.ide.core.io.vfs.IConnectionFileManager;
  */
 public interface IFTPConnectionFileManager extends IConnectionFileManager {
 
+	/**
+	 * Returns the transfer type of the connection
+	 * @return
+	 */
+	public String getTransferType();
+
+	/**
+	 * Sets the transfer type of the connection
+	 * @param transferType
+	 */
+	public void setTransferType(String transferType) throws FTPException, IOException;
+
+	/**
+	 * Returns the timezone of the connection
+	 * @return
+	 */
+	public String getTimezone();
+
+	/**
+	 * Sets the timezone of the connection. Set to GMT if timezone value is incorrect.
+	 * @param timezone
+	 */
+	public void setTimezone(String timezone);
+	
+	
 	public void init(String host, int port, IPath basePath, String login, char[] password, boolean passive, String transferType, String encoding, String timezone);
 	
 }
