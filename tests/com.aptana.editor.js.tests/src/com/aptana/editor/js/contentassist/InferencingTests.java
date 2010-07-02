@@ -6,6 +6,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import com.aptana.editor.js.parsing.JSParser;
+import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.parsing.ParseState;
@@ -15,13 +16,12 @@ import com.aptana.parsing.ast.IParseNode;
 public class InferencingTests extends TestCase
 {
 	/**
-	 * getGlobals
+	 * getParseRootNode
 	 * 
 	 * @param source
 	 * @return
-	 * @throws Exception 
 	 */
-	protected Scope<JSNode> getGlobals(String source)
+	protected IParseNode getParseRootNode(String source)
 	{
 		JSParser parser = new JSParser();
 		ParseState parseState = new ParseState();
@@ -37,13 +37,39 @@ public class InferencingTests extends TestCase
 			fail(e.getMessage());
 		}
 		
-		IParseNode root = parseState.getParseResult();
+		return parseState.getParseResult();
+	}
+	
+	/**
+	 * getGlobals
+	 * 
+	 * @param source
+	 * @return
+	 */
+	protected Scope<JSNode> getGlobals(String source)
+	{
+		IParseNode root = this.getParseRootNode(source);
 		assertTrue(root instanceof JSParseRootNode);
 		
 		JSSymbolCollector s = new JSSymbolCollector();
 		((JSParseRootNode) root).accept(s);
 		
 		return s.getScope();
+	}
+	
+	/**
+	 * getTypes
+	 * 
+	 * @param node
+	 * @return
+	 */
+	protected List<String> getTypes(Scope<JSNode> globals, JSNode node)
+	{
+		JSTypeWalker walker = new JSTypeWalker(globals, null);
+		
+		node.accept(walker);
+		
+		return walker.getTypes();
 	}
 	
 	/**
@@ -71,13 +97,40 @@ public class InferencingTests extends TestCase
 	}
 	
 	/**
-	 * typeTests
+	 * assignmentTypeTests
+	 * 
+	 * @param source
+	 * @param types
+	 */
+	public void assignmentTypeTests(String source, String... types)
+	{
+		Scope<JSNode> globals = this.getGlobals(source);
+		List<JSNode> assignments = globals.getAssignments();
+		
+		assertNotNull(assignments);
+		assertEquals(1, assignments.size());
+		
+		JSNode assignment = assignments.get(0);
+		assertTrue(assignment instanceof JSAssignmentNode);
+		
+		List<String> symbolTypes = this.getTypes(globals, assignment);
+		assertNotNull(types);
+		assertEquals(types.length, symbolTypes.size());
+		
+		for (String type : types)
+		{
+			assertTrue(symbolTypes.contains(type));
+		}
+	}
+	
+	/**
+	 * varTypeTests
 	 * 
 	 * @param source
 	 * @param symbol
 	 * @param types
 	 */
-	public void typeTests(String source, String symbol, String... types)
+	public void varTypeTests(String source, String symbol, String... types)
 	{
 		Scope<JSNode> globals = this.getGlobals(source);
 		
@@ -103,7 +156,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testTrueVar()
 	{
-		this.typeTests("var trueVar = true;", "trueVar", "Boolean");
+		this.varTypeTests("var trueVar = true;", "trueVar", "Boolean");
 	}
 	
 	/**
@@ -111,7 +164,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testFalseVar()
 	{
-		this.typeTests("var falseVar = false;", "falseVar", "Boolean");
+		this.varTypeTests("var falseVar = false;", "falseVar", "Boolean");
 	}
 	
 	/**
@@ -119,7 +172,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testIntVar()
 	{
-		this.typeTests("var intVar = 10;", "intVar", "Number");
+		this.varTypeTests("var intVar = 10;", "intVar", "Number");
 	}
 	
 	/**
@@ -127,7 +180,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testHexVar()
 	{
-		this.typeTests("var hexVar = 0x10;", "hexVar", "Number");
+		this.varTypeTests("var hexVar = 0x10;", "hexVar", "Number");
 	}
 	
 	/**
@@ -135,7 +188,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testFloatVar()
 	{
-		this.typeTests("var floatVar = 10.01;", "floatVar", "Number");
+		this.varTypeTests("var floatVar = 10.01;", "floatVar", "Number");
 	}
 	
 	/**
@@ -143,7 +196,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testArrayLiteralVar()
 	{
-		this.typeTests("var arrayLiteralVar = [];", "arrayLiteralVar", "Array");
+		this.varTypeTests("var arrayLiteralVar = [];", "arrayLiteralVar", "Array");
 	}
 	
 	/**
@@ -151,7 +204,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testObjectLiteralVar()
 	{
-		this.typeTests("var objectLiteralVar = {};", "objectLiteralVar", "Object");
+		this.varTypeTests("var objectLiteralVar = {};", "objectLiteralVar", "Object");
 	}
 	
 	/**
@@ -159,7 +212,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testRegExpLiteralVar()
 	{
-		this.typeTests("var regExpLiteralVar = /abc/i;", "regExpLiteralVar", "RegExp");
+		this.varTypeTests("var regExpLiteralVar = /abc/i;", "regExpLiteralVar", "RegExp");
 	}
 	
 	/**
@@ -167,7 +220,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testFunctionLiteralVar()
 	{
-		this.typeTests("var functionLiteralVar = function() {};", "functionLiteralVar", "Function");
+		this.varTypeTests("var functionLiteralVar = function() {};", "functionLiteralVar", "Function");
 	}
 	
 	/**
@@ -175,7 +228,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testSingleQuotedStringVar()
 	{
-		this.typeTests("var singleQuotedStringVar = 'abc';", "singleQuotedStringVar", "String");
+		this.varTypeTests("var singleQuotedStringVar = 'abc';", "singleQuotedStringVar", "String");
 	}
 	
 	/**
@@ -183,7 +236,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testDoubleQuotedStringVar()
 	{
-		this.typeTests("var doubleQuotedStringVar = \"abc\";", "doubleQuotedStringVar", "String");
+		this.varTypeTests("var doubleQuotedStringVar = \"abc\";", "doubleQuotedStringVar", "String");
 	}
 	
 	/* arithmetic operators */
@@ -193,7 +246,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testAddNumbersVar()
 	{
-		this.typeTests("var addNumbersVar = 4 + 5;", "addNumbersVar", "Number");
+		this.varTypeTests("var addNumbersVar = 4 + 5;", "addNumbersVar", "Number");
 	}
 	
 	/**
@@ -201,7 +254,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testAddStringsVar()
 	{
-		this.typeTests("var addStringsVar = 'ab' + 'cd';", "addStringsVar", "String");
+		this.varTypeTests("var addStringsVar = 'ab' + 'cd';", "addStringsVar", "String");
 	}
 	
 	/**
@@ -209,7 +262,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testAddMixedVar()
 	{
-		this.typeTests("var addMixedVar = 'ab' + 10;", "addMixedVar", "String");
+		this.varTypeTests("var addMixedVar = 'ab' + 10;", "addMixedVar", "String");
 	}
 	
 	/**
@@ -217,7 +270,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testSubtractVar()
 	{
-		this.typeTests("var subVar = a - b;", "subVar", "Number");
+		this.varTypeTests("var subVar = a - b;", "subVar", "Number");
 	}
 	
 	/* shift operators */
@@ -227,7 +280,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testShiftLeftVar()
 	{
-		this.typeTests("var shiftLeftVar = a << b;", "shiftLeftVar", "Number");
+		this.varTypeTests("var shiftLeftVar = a << b;", "shiftLeftVar", "Number");
 	}
 	
 	/**
@@ -235,7 +288,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testShiftRightVar()
 	{
-		this.typeTests("var shiftRightVar = a >> b;", "shiftRightVar", "Number");
+		this.varTypeTests("var shiftRightVar = a >> b;", "shiftRightVar", "Number");
 	}
 	
 	/**
@@ -243,7 +296,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testArithmeticShiftRightVar()
 	{
-		this.typeTests("var arithmeticShiftRightVar = a >> b;", "arithmeticShiftRightVar", "Number");
+		this.varTypeTests("var arithmeticShiftRightVar = a >> b;", "arithmeticShiftRightVar", "Number");
 	}
 	
 	/* bit operators */
@@ -253,7 +306,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testBitAndVar()
 	{
-		this.typeTests("var bitAndVar = a & b;", "bitAndVar", "Number");
+		this.varTypeTests("var bitAndVar = a & b;", "bitAndVar", "Number");
 	}
 	
 	/**
@@ -261,7 +314,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testBitXorVar()
 	{
-		this.typeTests("var bitXorVar = a ^ b;", "bitXorVar", "Number");
+		this.varTypeTests("var bitXorVar = a ^ b;", "bitXorVar", "Number");
 	}
 	
 	/**
@@ -269,7 +322,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testBitOrVar()
 	{
-		this.typeTests("var bitOrVar = a | b;", "bitOrVar", "Number");
+		this.varTypeTests("var bitOrVar = a | b;", "bitOrVar", "Number");
 	}
 	
 	/* multiplicative operators */
@@ -279,7 +332,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testMultiplyVar()
 	{
-		this.typeTests("var multiplyVar = a * b;", "multiplyVar", "Number");
+		this.varTypeTests("var multiplyVar = a * b;", "multiplyVar", "Number");
 	}
 	
 	/**
@@ -287,7 +340,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testDivideVar()
 	{
-		this.typeTests("var divideVar = a * b;", "divideVar", "Number");
+		this.varTypeTests("var divideVar = a * b;", "divideVar", "Number");
 	}
 	
 	/**
@@ -295,7 +348,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testModVar()
 	{
-		this.typeTests("var modVar = a % b;", "modVar", "Number");
+		this.varTypeTests("var modVar = a % b;", "modVar", "Number");
 	}
 	
 	/* equality operators */
@@ -305,7 +358,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testEqualVar()
 	{
-		this.typeTests("var equalVar = a == b;", "equalVar", "Boolean");
+		this.varTypeTests("var equalVar = a == b;", "equalVar", "Boolean");
 	}
 	
 	/**
@@ -313,7 +366,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testNotEqualVar()
 	{
-		this.typeTests("var notEqualVar = a != b;", "notEqualVar", "Boolean");
+		this.varTypeTests("var notEqualVar = a != b;", "notEqualVar", "Boolean");
 	}
 	
 	/**
@@ -321,7 +374,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testInstanceEqualVar()
 	{
-		this.typeTests("var equalVar = a === b;", "equalVar", "Boolean");
+		this.varTypeTests("var equalVar = a === b;", "equalVar", "Boolean");
 	}
 	
 	/**
@@ -329,7 +382,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testInstanceNotEqualVar()
 	{
-		this.typeTests("var notEqualVar = a !== b;", "notEqualVar", "Boolean");
+		this.varTypeTests("var notEqualVar = a !== b;", "notEqualVar", "Boolean");
 	}
 	
 	/* relational operators */
@@ -339,7 +392,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testLessThanVar()
 	{
-		this.typeTests("var lessThanVar = a < b;", "lessThanVar", "Boolean");
+		this.varTypeTests("var lessThanVar = a < b;", "lessThanVar", "Boolean");
 	}
 	
 	/**
@@ -347,7 +400,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testGreaterThanVar()
 	{
-		this.typeTests("var greaterThanVar = a > b;", "greaterThanVar", "Boolean");
+		this.varTypeTests("var greaterThanVar = a > b;", "greaterThanVar", "Boolean");
 	}
 	
 	/**
@@ -355,7 +408,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testLessThanEqualVar()
 	{
-		this.typeTests("var lessThanEqualVar = a <= b;", "lessThanEqualVar", "Boolean");
+		this.varTypeTests("var lessThanEqualVar = a <= b;", "lessThanEqualVar", "Boolean");
 	}
 	
 	/**
@@ -363,7 +416,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testGreaterThanEqualVar()
 	{
-		this.typeTests("var greaterThanEqualVar = a >= b;", "greaterThanEqualVar", "Boolean");
+		this.varTypeTests("var greaterThanEqualVar = a >= b;", "greaterThanEqualVar", "Boolean");
 	}
 	
 	/**
@@ -371,7 +424,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testInstanceOfVar()
 	{
-		this.typeTests("var instanceOfVar = a instanceof b;", "instanceOfVar", "Boolean");
+		this.varTypeTests("var instanceOfVar = a instanceof b;", "instanceOfVar", "Boolean");
 	}
 	
 	/**
@@ -379,7 +432,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testInVar()
 	{
-		this.typeTests("var inVar = a in b;", "inVar", "Boolean");
+		this.varTypeTests("var inVar = a in b;", "inVar", "Boolean");
 	}
 	
 	/* logical operators */
@@ -389,7 +442,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testLogicalAndVar()
 	{
-		this.typeTests("var logicalAndVar = a && b;", "logicalAndVar", "Boolean");
+		this.varTypeTests("var logicalAndVar = a && b;", "logicalAndVar", "Boolean");
 	}
 	
 	/**
@@ -397,7 +450,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testLogicalOrVar()
 	{
-		this.typeTests("var logicalOrVar = a || b;", "logicalOrVar", "Boolean");
+		this.varTypeTests("var logicalOrVar = a || b;", "logicalOrVar", "Boolean");
 	}
 	
 	/* pre-unary operators */
@@ -407,7 +460,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testDeleteVar()
 	{
-		this.typeTests("var deleteVar = delete a.b;", "deleteVar", "Boolean");
+		this.varTypeTests("var deleteVar = delete a.b;", "deleteVar", "Boolean");
 	}
 	
 	/**
@@ -415,7 +468,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testLogicalNotVar()
 	{
-		this.typeTests("var logicalNotVar = !b;", "logicalNotVar", "Boolean");
+		this.varTypeTests("var logicalNotVar = !b;", "logicalNotVar", "Boolean");
 	}
 	
 	/**
@@ -423,7 +476,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testNegationVar()
 	{
-		this.typeTests("var negationVar = -a;", "negationVar", "Number");
+		this.varTypeTests("var negationVar = -a;", "negationVar", "Number");
 	}
 	
 	/**
@@ -431,7 +484,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testPreDecrementVar()
 	{
-		this.typeTests("var preDecrementVar = --a;", "preDecrementVar", "Number");
+		this.varTypeTests("var preDecrementVar = --a;", "preDecrementVar", "Number");
 	}
 	
 	/**
@@ -439,7 +492,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testPreIncrementVar()
 	{
-		this.typeTests("var preIncrementVar = ++a;", "preIncrementVar", "Number");
+		this.varTypeTests("var preIncrementVar = ++a;", "preIncrementVar", "Number");
 	}
 	
 	/**
@@ -447,7 +500,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testBitNotVar()
 	{
-		this.typeTests("var bitNotVar = ~a;", "bitNotVar", "Number");
+		this.varTypeTests("var bitNotVar = ~a;", "bitNotVar", "Number");
 	}
 	
 	/**
@@ -455,7 +508,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testTypeofVar()
 	{
-		this.typeTests("var typeofVar = typeof a;", "typeofVar", "String");
+		this.varTypeTests("var typeofVar = typeof a;", "typeofVar", "String");
 	}
 	
 	/**
@@ -463,7 +516,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testVoidVar()
 	{
-		this.typeTests("var voidVar = void a;", "voidVar");
+		this.varTypeTests("var voidVar = void a;", "voidVar");
 	}
 	
 	/* post-unary operators */
@@ -473,7 +526,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testPostDecrementVar()
 	{
-		this.typeTests("var postDecrementVar = a--;", "postDecrementVar", "Number");
+		this.varTypeTests("var postDecrementVar = a--;", "postDecrementVar", "Number");
 	}
 	
 	/**
@@ -481,7 +534,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testPostIncrementVar()
 	{
-		this.typeTests("var postIncrementVar = a++;", "postIncrementVar", "Number");
+		this.varTypeTests("var postIncrementVar = a++;", "postIncrementVar", "Number");
 	}
 	
 	/* trinary operators */
@@ -491,7 +544,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testConditionalVar()
 	{
-		this.typeTests("var conditionalVar = (a == true) ? 10 : 20;", "conditionalVar", "Number");
+		this.varTypeTests("var conditionalVar = (a == true) ? 10 : 20;", "conditionalVar", "Number");
 	}
 	
 	/**
@@ -499,10 +552,132 @@ public class InferencingTests extends TestCase
 	 */
 	public void testMixedConditionalVar()
 	{
-		this.typeTests("var mixedConditionalVar = (a == true) ? 10 : '20';", "mixedConditionalVar", "Number", "String");
+		this.varTypeTests("var mixedConditionalVar = (a == true) ? 10 : '20';", "mixedConditionalVar", "Number", "String");
 	}
 	
 	/* new operator */
 	
 	// TODO: add tests for 'new' Array, Boolean, Date, Function, Object, Number, String, RegExp
+	
+	/* assignment operators */
+	
+	/**
+	 * testSimpleAssignment
+	 */
+	public void testSimpleAssignment()
+	{
+		this.assignmentTypeTests("abc = 10;", "Number");
+	}
+	
+	/**
+	 * testMultiAssignment
+	 */
+	public void testMultiAssignment()
+	{
+		this.assignmentTypeTests("abc = def = 10;", "Number");
+	}
+	
+	/**
+	 * testPlusAssignNumbers
+	 */
+	public void testPlusAssignNumbers()
+	{
+		this.assignmentTypeTests("var abc = 10; abc += 20", "Number");
+	}
+	
+	/**
+	 * testPlusAssignStrings
+	 */
+	public void testPlusAssignStrings()
+	{
+		this.assignmentTypeTests("var abc = '10'; abc += '20'", "String");
+	}
+	
+	/**
+	 * testPlusAssignMixed
+	 */
+	public void testPlusAssignMixed()
+	{
+		this.assignmentTypeTests("var abc = 10; abc += '20'", "String");
+	}
+	
+	/**
+	 * testArithmeticShiftRightAssign
+	 */
+	public void testArithmeticShiftRightAssign()
+	{
+		this.assignmentTypeTests("abc >>= b;", "Number");
+	}
+	
+	/**
+	 * testBitwiseAndAssign
+	 */
+	public void testBitwiseAndAssign()
+	{
+		this.assignmentTypeTests("abc &= b;", "Number");
+	}
+	
+	/**
+	 * testBitwiseOrAssign
+	 */
+	public void testBitwiseOrAssign()
+	{
+		this.assignmentTypeTests("abc |= b;", "Number");
+	}
+	
+	/**
+	 * testBitwiseXorAssign
+	 */
+	public void testBitwiseXorAssign()
+	{
+		this.assignmentTypeTests("abc ^= b;", "Number");
+	}
+	
+	/**
+	 * testBitwiseDivideAssign
+	 */
+	public void testBitwiseDivideAssign()
+	{
+		this.assignmentTypeTests("abc /= b;", "Number");
+	}
+	
+	/**
+	 * testModAssign
+	 */
+	public void testModAssign()
+	{
+		this.assignmentTypeTests("abc %= b;", "Number");
+	}
+	
+	/**
+	 * testMultiplyAssign
+	 */
+	public void testMultiplyAssign()
+	{
+		this.assignmentTypeTests("abc *= b;", "Number");
+	}
+	
+	/**
+	 * testShiftLeftAssign
+	 */
+	public void testShiftLeftAssign()
+	{
+		this.assignmentTypeTests("abc <<= b;", "Number");
+	}
+	
+	/**
+	 * testShiftRightAssign
+	 */
+	public void testShiftRightAssign()
+	{
+		this.assignmentTypeTests("abc >>= b;", "Number");
+	}
+	
+	/**
+	 * testSubtractAssign
+	 */
+	public void testSubtractAssign()
+	{
+		this.assignmentTypeTests("abc -= b;", "Number");
+	}
 }
