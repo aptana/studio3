@@ -1,6 +1,6 @@
 package com.aptana.editor.js.sdoc.model;
 
-import com.aptana.parsing.io.SourceWriter;
+import com.aptana.parsing.io.SourcePrinter;
 
 import beaver.Symbol;
 
@@ -57,7 +57,7 @@ public class Parameter extends Symbol
 	 */
 	public String toSource()
 	{
-		SourceWriter writer = new SourceWriter();
+		SourcePrinter writer = new SourcePrinter();
 		
 		this.toSource(writer);
 		
@@ -69,7 +69,7 @@ public class Parameter extends Symbol
 	 * 
 	 * @param writer
 	 */
-	public void toSource(SourceWriter writer)
+	public void toSource(SourcePrinter writer)
 	{
 		switch (this._usage)
 		{

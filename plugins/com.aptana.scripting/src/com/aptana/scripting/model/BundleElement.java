@@ -11,6 +11,7 @@ import java.util.Map;
 import org.jruby.RubyRegexp;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.parsing.io.SourcePrinter;
 import com.aptana.scope.ScopeSelector;
 
 public class BundleElement extends AbstractElement

@@ -43,7 +43,7 @@ import java.util.Stack;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-import com.aptana.parsing.io.SourceWriter;
+import com.aptana.parsing.io.SourcePrinter;
 
 /**
  * @author Kevin Lindsey
@@ -210,7 +210,7 @@ public class Schema
 		{
 			Object[] messageArgs = new Object[] { localName, this._currentElement.getName() };
 			String message = MessageFormat.format(Messages.Schema_Invalid_Child, messageArgs);
-			SourceWriter writer = new SourceWriter();
+			SourcePrinter writer = new SourcePrinter();
 
 			writer.println();
 			writer.println(message);
@@ -244,7 +244,7 @@ public class Schema
 	 * @param localName
 	 * @param attributes
 	 */
-	public void buildErrorMessage(SourceWriter writer, String localName, Attributes attributes)
+	public void buildErrorMessage(SourcePrinter writer, String localName, Attributes attributes)
 	{
 		writer.println().println(Messages.Schema_Element_Stack_Trace);
 

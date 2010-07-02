@@ -1,6 +1,6 @@
 package com.aptana.editor.js.sdoc.model;
 
-import com.aptana.parsing.io.SourceWriter;
+import com.aptana.parsing.io.SourcePrinter;
 
 public class ArrayType extends Type
 {
@@ -41,7 +41,7 @@ public class ArrayType extends Type
 	 * 
 	 * @param writer
 	 */
-	public void toSource(SourceWriter writer)
+	public void toSource(SourcePrinter writer)
 	{
 		writer.print("Array");
 		

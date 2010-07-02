@@ -1,6 +1,6 @@
 package com.aptana.editor.js.sdoc.model;
 
-import com.aptana.parsing.io.SourceWriter;
+import com.aptana.parsing.io.SourcePrinter;
 
 public abstract class TagWithName extends Tag
 {
@@ -30,7 +30,7 @@ public abstract class TagWithName extends Tag
 	 * @see com.aptana.editor.js.sdoc.model.Tag#toSource(com.aptana.parsing.io.SourceWriter)
 	 */
 	@Override
-	public void toSource(SourceWriter writer)
+	public void toSource(SourcePrinter writer)
 	{
 		TagType type = this.getType();
 		

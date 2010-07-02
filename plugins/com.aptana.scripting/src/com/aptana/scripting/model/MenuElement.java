@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import com.aptana.parsing.io.SourcePrinter;
 import com.aptana.scope.ScopeSelector;
 
 public class MenuElement extends AbstractBundleElement

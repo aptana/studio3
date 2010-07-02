@@ -36,43 +36,43 @@ package com.aptana.parsing.io;
 
 /**
  * @author Kevin Lindsey
- * @author Pavel Petrochenko
  */
-public class SourceWriter
+public class SourcePrinter
 {
 	private static final String DEFAULT_NEWLINE = System.getProperty("line.separator"); //$NON-NLS-1$
 
 	private StringBuffer _buffer;
 	private String _indentText;
 	private String _currentIndent;
-	private String newLine = DEFAULT_NEWLINE;
+	private String _newLine;
 
 	/**
-	 * Create a new instance of SourceWriter
+	 * SourcePrinter
 	 */
-	public SourceWriter()
+	public SourcePrinter()
 	{
-		this(null);
+		this("  "); //$NON-NLS-1$
 	}
 
 	/**
-	 * SourceWriter
+	 * SourcePrinter
 	 * 
-	 * @param indentText
+	 * @param indent
 	 */
-	public SourceWriter(String indentText)
+	public SourcePrinter(String indent)
 	{
 		this._buffer = new StringBuffer();
-		this._indentText = (indentText != null && indentText.length() > 0) ? indentText : "    "; //$NON-NLS-1$
+		this._indentText = indent; //$NON-NLS-1$
 		this._currentIndent = ""; //$NON-NLS-1$
+		this._newLine = DEFAULT_NEWLINE;
 	}
-
+	
 	/**
 	 * Decrease the current line indent count
 	 * 
 	 * @return SourceWriter
 	 */
-	public SourceWriter decreaseIndent()
+	public SourcePrinter decreaseIndent()
 	{
 		if (this._currentIndent.length() > 0)
 		{
@@ -86,11 +86,46 @@ public class SourceWriter
 	}
 
 	/**
+	 * Gets the buffer of this source writer
+	 * 
+	 * @return - string buffer
+	 */
+	public StringBuffer getBuffer()
+	{
+		return this._buffer;
+	}
+
+	/**
+	 * Gets the current indent level
+	 * 
+	 * @return - int indent level
+	 */
+	public int getIndentLevel()
+	{
+		if (this._indentText.length() == 0)
+		{
+			return 0;
+		}
+		else
+		{
+			return this._currentIndent.length() / this._indentText.length();
+		}
+	}
+
+	/**
+	 * @return current indent
+	 */
+	public String getIndentString()
+	{
+		return this._currentIndent;
+	}
+
+	/**
 	 * @return current line delimeter
 	 */
 	public String getLineDelimeter()
 	{
-		return this.newLine;
+		return this._newLine;
 	}
 
 	/**
@@ -98,7 +133,7 @@ public class SourceWriter
 	 * 
 	 * @return SourceWriter
 	 */
-	public SourceWriter increaseIndent()
+	public SourcePrinter increaseIndent()
 	{
 		this._currentIndent += this._indentText;
 
@@ -111,7 +146,7 @@ public class SourceWriter
 	 * @param c
 	 * @return Returns self
 	 */
-	public SourceWriter print(char c)
+	public SourcePrinter print(char c)
 	{
 		this._buffer.append(c);
 
@@ -124,9 +159,22 @@ public class SourceWriter
 	 * @param text
 	 * @return Returns self
 	 */
-	public SourceWriter print(String text)
+	public SourcePrinter print(String text)
 	{
 		this._buffer.append(text);
+
+		return this;
+	}
+
+	/**
+	 * print
+	 * 
+	 * @param object
+	 * @return
+	 */
+	public SourcePrinter print(Object object)
+	{
+		this._buffer.append(object);
 
 		return this;
 	}
@@ -136,7 +184,7 @@ public class SourceWriter
 	 * 
 	 * @return Returns self
 	 */
-	public SourceWriter printIndent()
+	public SourcePrinter printIndent()
 	{
 		this._buffer.append(this._currentIndent);
 
@@ -148,7 +196,7 @@ public class SourceWriter
 	 * 
 	 * @return Returns self
 	 */
-	public SourceWriter println()
+	public SourcePrinter println()
 	{
 		this.println(""); //$NON-NLS-1$
 
@@ -162,9 +210,9 @@ public class SourceWriter
 	 *            The text to append to this buffer
 	 * @return Returns self
 	 */
-	public SourceWriter println(String text)
+	public SourcePrinter println(String text)
 	{
-		this._buffer.append(text).append(newLine);
+		this._buffer.append(text).append(_newLine);
 
 		return this;
 	}
@@ -175,9 +223,9 @@ public class SourceWriter
 	 * @param text
 	 * @return Returns self
 	 */
-	public SourceWriter printlnWithIndent(String text)
+	public SourcePrinter printlnWithIndent(String text)
 	{
-		this._buffer.append(this._currentIndent).append(text).append(newLine);
+		this._buffer.append(this._currentIndent).append(text).append(_newLine);
 
 		return this;
 	}
@@ -188,7 +236,7 @@ public class SourceWriter
 	 * @param text
 	 * @return Returns self
 	 */
-	public SourceWriter printWithIndent(String text)
+	public SourcePrinter printWithIndent(String text)
 	{
 		this._buffer.append(this._currentIndent).append(text);
 
@@ -200,7 +248,7 @@ public class SourceWriter
 	 */
 	public void setLineDelimeter(String separator)
 	{
-		this.newLine = separator;
+		this._newLine = separator;
 	}
 
 	/**

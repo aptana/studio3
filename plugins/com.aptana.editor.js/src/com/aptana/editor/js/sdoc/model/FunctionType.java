@@ -3,7 +3,7 @@ package com.aptana.editor.js.sdoc.model;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.aptana.parsing.io.SourceWriter;
+import com.aptana.parsing.io.SourcePrinter;
 
 public class FunctionType extends Type
 {
@@ -59,7 +59,7 @@ public class FunctionType extends Type
 	 * 
 	 * @param writer
 	 */
-	public void toSource(SourceWriter writer)
+	public void toSource(SourcePrinter writer)
 	{
 		writer.print("Function");
 		

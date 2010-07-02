@@ -2,7 +2,7 @@ package com.aptana.editor.js.sdoc.model;
 
 import beaver.Symbol;
 
-import com.aptana.parsing.io.SourceWriter;
+import com.aptana.parsing.io.SourcePrinter;
 
 public abstract class Tag extends Symbol
 {
@@ -57,7 +57,7 @@ public abstract class Tag extends Symbol
 	 */
 	public String toSource()
 	{
-		SourceWriter writer = new SourceWriter();
+		SourcePrinter writer = new SourcePrinter();
 		
 		this.toSource(writer);
 		
@@ -71,7 +71,7 @@ public abstract class Tag extends Symbol
 	 * 
 	 * @param writer
 	 */
-	public void toSource(SourceWriter writer)
+	public void toSource(SourcePrinter writer)
 	{
 		writer.print(this._type.toString());
 		

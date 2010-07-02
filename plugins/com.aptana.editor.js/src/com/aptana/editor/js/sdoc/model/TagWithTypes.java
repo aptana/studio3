@@ -2,7 +2,7 @@ package com.aptana.editor.js.sdoc.model;
 
 import java.util.List;
 
-import com.aptana.parsing.io.SourceWriter;
+import com.aptana.parsing.io.SourcePrinter;
 
 public abstract class TagWithTypes extends Tag
 {
@@ -32,7 +32,7 @@ public abstract class TagWithTypes extends Tag
 	 * @see com.aptana.editor.js.sdoc.model.Tag#toSource(com.aptana.parsing.io.SourceWriter)
 	 */
 	@Override
-	public void toSource(SourceWriter writer)
+	public void toSource(SourcePrinter writer)
 	{
 		writer.print(this.getType().toString());
 		

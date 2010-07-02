@@ -7,7 +7,7 @@ import java.util.List;
 
 import beaver.Symbol;
 
-import com.aptana.parsing.io.SourceWriter;
+import com.aptana.parsing.io.SourcePrinter;
 
 public class DocumentationBlock extends Symbol
 {
@@ -136,7 +136,7 @@ public class DocumentationBlock extends Symbol
 	 */
 	public String toSource()
 	{
-		SourceWriter writer = new SourceWriter(" * ");
+		SourcePrinter writer = new SourcePrinter(" * ");
 
 		this.toSource(writer);
 
@@ -148,7 +148,7 @@ public class DocumentationBlock extends Symbol
 	 * 
 	 * @param writer
 	 */
-	public void toSource(SourceWriter writer)
+	public void toSource(SourcePrinter writer)
 	{
 		writer.println("/**").increaseIndent();
 
