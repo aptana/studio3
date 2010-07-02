@@ -1256,4 +1256,38 @@ public class GitRepository
 		return index().getChangedResources();
 	}
 
+	public IStatus addRemoteTrackingBranch(String localBranchName, String remoteName)
+	{
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(),
+				"config", MessageFormat.format("branch.{0}.remote", localBranchName), remoteName); //$NON-NLS-1$ //$NON-NLS-2$
+		if (result == null)
+		{
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), MessageFormat.format(
+					"Failed to set github remote {0} for local branch {1}", remoteName, localBranchName));
+		}
+		// Non-zero exit code!
+		if (result.keySet().iterator().next() != 0)
+		{
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.values().iterator().next());
+		}
+
+		// set merge for our local branch
+		result = GitExecutable
+				.instance()
+				.runInBackground(
+						workingDirectory(),
+						"config", MessageFormat.format("branch.{0}.merge", localBranchName), GitRef.REFS_HEADS + localBranchName); //$NON-NLS-1$ //$NON-NLS-2$
+		if (result == null)
+		{
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), MessageFormat.format(
+					"Failed to set merge point for branch {0}", localBranchName));
+		}
+		// Non-zero exit code!
+		if (result.keySet().iterator().next() != 0)
+		{
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.values().iterator().next());
+		}
+		return Status.OK_STATUS;
+	}
+
 }
