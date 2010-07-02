@@ -14,6 +14,7 @@ public class AllTests
 		suite.addTestSuite(ASTQueryTests.class);
 		//suite.addTestSuite(RangeTests.class);
 		suite.addTestSuite(MetadataTests.class);
+		suite.addTestSuite(ScopeTests.class);
 		//$JUnit-END$
 		return suite;
 	}
