@@ -47,10 +47,9 @@ import com.aptana.editor.common.actions.BaseToggleLinkingAction;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
-import com.aptana.theme.IThemeManager;
+import com.aptana.theme.IControlThemerFactory;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.theme.ThemedDelegatingLabelProvider;
-import com.aptana.theme.TreeThemer;
 
 public class CommonOutlinePage extends ContentOutlinePage implements IPropertyChangeListener
 {
@@ -106,8 +105,6 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 	private ToggleLinkingAction fToggleLinkingAction;
 
 	private IPreferenceStore fPrefs;
-
-	private TreeThemer treeThemer;
 
 	public CommonOutlinePage(AbstractThemeableEditor editor, IPreferenceStore prefs)
 	{
@@ -331,20 +328,18 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 
 	private void hookToThemes()
 	{
-		treeThemer = new TreeThemer(getTreeViewer());
-		treeThemer.apply();
+		getIControlThemerFactory().apply(getTreeViewer());
 	}
 
-	protected IThemeManager getThemeManager()
+	protected IControlThemerFactory getIControlThemerFactory()
 	{
-		return ThemePlugin.getDefault().getThemeManager();
+		return ThemePlugin.getDefault().getControlThemerFactory();
 	}
 
 	@Override
 	public void dispose()
 	{
-		treeThemer.dispose();
-		treeThemer = null;
+		getIControlThemerFactory().dispose(getTreeViewer());
 		fPrefs.removePropertyChangeListener(this);
 		super.dispose();
 	}

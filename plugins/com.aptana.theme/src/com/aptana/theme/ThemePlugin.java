@@ -7,6 +7,7 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.theme.internal.ControlThemerFactory;
 import com.aptana.theme.internal.InvasiveThemeHijacker;
 import com.aptana.theme.internal.ThemeManager;
 import com.aptana.theme.internal.fontloader.EditorFontOverride;
@@ -25,6 +26,8 @@ public class ThemePlugin extends AbstractUIPlugin
 
 	private InvasiveThemeHijacker themeHijacker;
 	private ColorManager fColorManager;
+
+	private IControlThemerFactory fControlThemerFactory;
 
 	/**
 	 * The constructor
@@ -63,11 +66,17 @@ public class ThemePlugin extends AbstractUIPlugin
 			{
 				fColorManager.dispose();
 			}
+			
+			if (fControlThemerFactory != null)
+			{
+				fControlThemerFactory.dispose();
+			}
 		}
 		finally
 		{
 			themeHijacker = null;
 			fColorManager = null;
+			fControlThemerFactory = null;
 			plugin = null;
 			super.stop(context);
 		}
@@ -116,5 +125,14 @@ public class ThemePlugin extends AbstractUIPlugin
 	public static void logWarning(String message)
 	{
 		getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message, null));
+	}
+
+	public synchronized IControlThemerFactory getControlThemerFactory()
+	{
+		if (fControlThemerFactory == null)
+		{
+			fControlThemerFactory = new ControlThemerFactory();
+		}
+		return fControlThemerFactory;
 	}
 }

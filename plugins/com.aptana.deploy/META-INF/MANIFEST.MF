@@ -22,4 +22,6 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.syncing.ui
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Export-Package: com.aptana.deploy.wizard
+Export-Package: com.aptana.deploy,
+ com.aptana.deploy.preferences,
+ com.aptana.deploy.wizard

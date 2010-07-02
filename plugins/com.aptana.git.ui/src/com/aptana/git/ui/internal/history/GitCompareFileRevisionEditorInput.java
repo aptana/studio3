@@ -44,8 +44,8 @@ import org.eclipse.team.ui.synchronize.SaveableCompareEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 
 import com.aptana.git.ui.GitUIPlugin;
+import com.aptana.theme.IControlThemerFactory;
 import com.aptana.theme.ThemePlugin;
-import com.aptana.theme.TreeThemer;
 
 /**
  * The input provider for the compare editor when working on resources under Git control.
@@ -58,7 +58,6 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 	private ITypedElement right;
 	private CompareViewerSwitchingPane fPane;
 	private CompareViewerPane fStructurePane;
-	private TreeThemer fTreeThemer;
 
 	/**
 	 * Creates a new CompareFileRevisionEditorInput.
@@ -307,8 +306,8 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 		IFileRevision fileObject = element.getFileRevision();
 		if (fileObject instanceof LocalFileRevision)
 		{
-			return NLS.bind(Messages.GitCompareFileRevisionEditorInput_localRevision, new Object[] {
-					element.getName(), element.getTimestamp() });
+			return NLS.bind(Messages.GitCompareFileRevisionEditorInput_localRevision, new Object[] { element.getName(),
+					element.getTimestamp() });
 		}
 		return NLS.bind(Messages.GitCompareFileRevisionEditorInput_repository, new Object[] { element.getName(),
 				element.getContentIdentifier() });
@@ -466,8 +465,8 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 		getCompareConfiguration().setRightEditable(isRightEditable(input));
 		ensureContentsCached(getLeftRevision(), getRightRevision(), monitor);
 		initLabels(input);
-		setTitle(NLS.bind(Messages.GitCompareFileRevisionEditorInput_CompareInputTitle, new String[] { input
-				.getName() }));
+		setTitle(NLS.bind(Messages.GitCompareFileRevisionEditorInput_CompareInputTitle,
+				new String[] { input.getName() }));
 
 		// The compare editor (Structure Compare) will show the diff filenames
 		// with their project relative path. So, no need to also show directory entries.
@@ -524,18 +523,20 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 		}
 		if (fStructurePane != null && (fStructurePane.getContent() instanceof Tree))
 		{
-			fTreeThemer = new TreeThemer((Tree) fStructurePane.getContent());
-			fTreeThemer.apply();
+			getControlThemerFactory().apply(fStructurePane.getContent());
 		}
 	}
 
 	protected void handleDispose()
 	{
-		if (fTreeThemer != null)
-			fTreeThemer.dispose();
-		fTreeThemer = null;
+		getControlThemerFactory().dispose(fStructurePane.getContent());
 		fPane = null;
 		super.handleDispose();
+	}
+
+	protected IControlThemerFactory getControlThemerFactory()
+	{
+		return ThemePlugin.getDefault().getControlThemerFactory();
 	}
 
 	protected CompareViewerPane createStructureInputPane(Composite parent)

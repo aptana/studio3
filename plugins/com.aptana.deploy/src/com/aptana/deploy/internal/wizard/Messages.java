@@ -33,6 +33,7 @@ public class Messages extends NLS
 	public static String HerokuSignupPage_SignupButtonLabel;
 	public static String HerokuSignupPage_SignupNote;
 	public static String HerokuSignupPage_Title;
+	public static String DeployWizardPage_AlreadyDeployedToHeroku;
 	public static String DeployWizardPage_CapistranoLabel;
 	public static String DeployWizardPage_FTPLabel;
 	public static String DeployWizardPage_OtherDeploymentOptionsLabel;
