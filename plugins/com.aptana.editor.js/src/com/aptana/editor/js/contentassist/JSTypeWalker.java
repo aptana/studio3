@@ -10,6 +10,7 @@ import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
+import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSBinaryArithmeticOperatorNode;
 import com.aptana.editor.js.parsing.ast.JSArrayNode;
 import com.aptana.editor.js.parsing.ast.JSBinaryBooleanOperatorNode;
@@ -241,6 +242,37 @@ public class JSTypeWalker extends JSTreeWalker
 	public void visit(JSArrayNode node)
 	{
 		this.addType(ARRAY_TYPE);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSAssignmentNode)
+	 */
+	@Override
+	public void visit(JSAssignmentNode node)
+	{
+		switch (node.getNodeType())
+		{
+			case JSNodeTypes.EQUAL:
+				this.addTypes(this.getTypes(node.getRightHandSide()));
+				break;
+				
+			case JSNodeTypes.ADD_AND_ASSIGN:
+				String type = NUMBER_TYPE;
+				List<String> lhsTypes = this.getTypes(node.getLeftHandSide());
+				List<String> rhsTypes = this.getTypes(node.getRightHandSide());
+				
+				if (lhsTypes.contains(STRING_TYPE) || rhsTypes.contains(STRING_TYPE))
+				{
+					type = STRING_TYPE;
+				}
+				
+				this.addType(type);
+				break;
+				
+			default:
+				this.addType(NUMBER_TYPE);
+				break;
+		}
 	}
 
 	/* (non-Javadoc)
