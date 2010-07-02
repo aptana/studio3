@@ -10,6 +10,7 @@ import org.eclipse.core.runtime.Path;
 
 import com.aptana.editor.js.parsing.JSParser;
 import com.aptana.editor.js.parsing.ast.JSNode;
+import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.editor.js.tests.FileContentBasedTests;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.Scope;
@@ -48,6 +49,8 @@ public class ScopeTests extends FileContentBasedTests
 	 */
 	protected Scope<JSNode> getSymbols(String resource) throws Exception
 	{
+		Scope<JSNode> result = null;
+		
 		// get source from resource
 		File file = this.getFile(new Path(resource));
 		String source = this.getContent(file);
@@ -70,7 +73,18 @@ public class ScopeTests extends FileContentBasedTests
 		parseState.setEditState(source, source, 0, 0);
 		parser.parse(parseState);
 		
-		return parser.getScope();
+		IParseNode root = parseState.getParseResult();
+		
+		if (root instanceof JSParseRootNode)
+		{
+			JSSymbolCollector s = new JSSymbolCollector();
+			
+			((JSParseRootNode) root).accept(s);
+			
+			result = s.getScope();
+		}
+		
+		return result;
 	}
 	
 	/**
