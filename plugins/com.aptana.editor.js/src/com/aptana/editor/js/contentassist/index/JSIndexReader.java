@@ -170,7 +170,7 @@ public class JSIndexReader
 	{
 		String result = ""; //$NON-NLS-1$
 
-		if (descriptionKey != null && descriptionKey.length() > 0 && !descriptionKey.equals(JSIndexConstants.NO_ENTRY))
+		if (index != null && descriptionKey != null && descriptionKey.length() > 0 && !descriptionKey.equals(JSIndexConstants.NO_ENTRY))
 		{
 			// grab description
 			String descriptionPattern = descriptionKey + JSIndexConstants.DELIMITER;
@@ -199,15 +199,19 @@ public class JSIndexReader
 	 */
 	public FunctionElement getFunction(Index index, String owningType, String propertyName, EnumSet<FieldSelector> fields) throws IOException
 	{
-		List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(owningType, propertyName), SearchPattern.REGEX_MATCH);
 		FunctionElement result = null;
 		
-		if (functions != null && functions.size() > 0)
+		if (index != null)
 		{
-			QueryResult property = functions.get(0);
-			String key = property.getWord();
+			List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(owningType, propertyName), SearchPattern.REGEX_MATCH);
 			
-			result = this.createFunctionFromKey(index, key, fields);
+			if (functions != null && functions.size() > 0)
+			{
+				QueryResult property = functions.get(0);
+				String key = property.getWord();
+				
+				result = this.createFunctionFromKey(index, key, fields);
+			}
 		}
 		
 		return result;
@@ -224,18 +228,22 @@ public class JSIndexReader
 	 */
 	public List<FunctionElement> getFunctions(Index index, String owningType, EnumSet<FieldSelector> fields) throws IOException
 	{
-		// read properties
-		List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(owningType), SearchPattern.REGEX_MATCH);
 		List<FunctionElement> result = new LinkedList<FunctionElement>();
-
-		if (functions != null)
+		
+		if (index != null)
 		{
-			for (QueryResult function : functions)
+			// read properties
+			List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(owningType), SearchPattern.REGEX_MATCH);
+	
+			if (functions != null)
 			{
-				String key = function.getWord();
-				FunctionElement f = this.createFunctionFromKey(index, key, fields);
-				
-				result.add(f);
+				for (QueryResult function : functions)
+				{
+					String key = function.getWord();
+					FunctionElement f = this.createFunctionFromKey(index, key, fields);
+					
+					result.add(f);
+				}
 			}
 		}
 
@@ -275,30 +283,34 @@ public class JSIndexReader
 	 */
 	protected List<ParameterElement> getParameters(Index index, String parametersKey) throws IOException
 	{
-		String descriptionPattern = parametersKey + JSIndexConstants.DELIMITER;
-		List<QueryResult> parameters = index.query(new String[] { JSIndexConstants.PARAMETERS }, descriptionPattern, SearchPattern.PREFIX_MATCH);
 		List<ParameterElement> result = new LinkedList<ParameterElement>();
-
-		if (parameters != null && parameters.size() > 0)
+		
+		if (index != null)
 		{
-			String parametersValue = parameters.get(0).getWord();
-			String[] parameterValues = parametersValue.split(JSIndexConstants.DELIMITER);
-
-			for (int i = 1; i < parameterValues.length; i++)
+			String descriptionPattern = parametersKey + JSIndexConstants.DELIMITER;
+			List<QueryResult> parameters = index.query(new String[] { JSIndexConstants.PARAMETERS }, descriptionPattern, SearchPattern.PREFIX_MATCH);
+	
+			if (parameters != null && parameters.size() > 0)
 			{
-				String parameterValue = parameterValues[i];
-				String[] columns = parameterValue.split(","); //$NON-NLS-1$
-				ParameterElement parameter = new ParameterElement();
-
-				parameter.setName(columns[0]);
-				parameter.setUsage(columns[1]);
-
-				for (int j = 2; j < columns.length; j++)
+				String parametersValue = parameters.get(0).getWord();
+				String[] parameterValues = parametersValue.split(JSIndexConstants.DELIMITER);
+	
+				for (int i = 1; i < parameterValues.length; i++)
 				{
-					parameter.addType(columns[j]);
+					String parameterValue = parameterValues[i];
+					String[] columns = parameterValue.split(","); //$NON-NLS-1$
+					ParameterElement parameter = new ParameterElement();
+	
+					parameter.setName(columns[0]);
+					parameter.setUsage(columns[1]);
+	
+					for (int j = 2; j < columns.length; j++)
+					{
+						parameter.addType(columns[j]);
+					}
+					
+					result.add(parameter);
 				}
-				
-				result.add(parameter);
 			}
 		}
 
@@ -316,18 +328,22 @@ public class JSIndexReader
 	 */
 	public List<PropertyElement> getProperties(Index index, String owningType, EnumSet<FieldSelector> fields) throws IOException
 	{
-		// read properties
-		List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningType), SearchPattern.REGEX_MATCH);
 		List<PropertyElement> result = new LinkedList<PropertyElement>();
-
-		if (properties != null)
+		
+		if (index != null)
 		{
-			for (QueryResult property : properties)
+			// read properties
+			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningType), SearchPattern.REGEX_MATCH);
+	
+			if (properties != null)
 			{
-				String key = property.getWord();
-				PropertyElement p = this.createPropertyFromKey(index, key, fields);
-
-				result.add(p);
+				for (QueryResult property : properties)
+				{
+					String key = property.getWord();
+					PropertyElement p = this.createPropertyFromKey(index, key, fields);
+	
+					result.add(p);
+				}
 			}
 		}
 
@@ -346,15 +362,19 @@ public class JSIndexReader
 	 */
 	public PropertyElement getProperty(Index index, String owningType, String propertyName, EnumSet<FieldSelector> fields) throws IOException
 	{
-		List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningType, propertyName), SearchPattern.REGEX_MATCH);
 		PropertyElement result = null;
 		
-		if (properties != null && properties.size() > 0)
+		if (index != null)
 		{
-			QueryResult property = properties.get(0);
-			String key = property.getWord();
+			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningType, propertyName), SearchPattern.REGEX_MATCH);
 			
-			result = this.createPropertyFromKey(index, key, fields);
+			if (properties != null && properties.size() > 0)
+			{
+				QueryResult property = properties.get(0);
+				String key = property.getWord();
+				
+				result = this.createPropertyFromKey(index, key, fields);
+			}
 		}
 		
 		return result;
@@ -370,25 +390,29 @@ public class JSIndexReader
 	 */
 	protected List<ReturnTypeElement> getReturnTypes(Index index, String returnTypesKey) throws IOException
 	{
-		String descriptionPattern = returnTypesKey + JSIndexConstants.DELIMITER;
-		List<QueryResult> returnTypes = index.query(new String[] { JSIndexConstants.RETURN_TYPES }, descriptionPattern, SearchPattern.PREFIX_MATCH);
 		List<ReturnTypeElement> result = new LinkedList<ReturnTypeElement>();
-
-		if (returnTypes != null && returnTypes.size() > 0)
+		
+		if (index != null)
 		{
-			String word = returnTypes.get(0).getWord();
-			String[] returnTypesValues = word.split(JSIndexConstants.DELIMITER);
-
-			for (int i = 1; i < returnTypesValues.length; i++)
+			String descriptionPattern = returnTypesKey + JSIndexConstants.DELIMITER;
+			List<QueryResult> returnTypes = index.query(new String[] { JSIndexConstants.RETURN_TYPES }, descriptionPattern, SearchPattern.PREFIX_MATCH);
+	
+			if (returnTypes != null && returnTypes.size() > 0)
 			{
-				String returnTypeValue = returnTypesValues[i];
-				String[] columns = returnTypeValue.split(","); //$NON-NLS-1$
-				ReturnTypeElement returnType = new ReturnTypeElement();
-
-				returnType.setType(columns[0]);
-				returnType.setDescription(this.getDescription(index, columns[1]));
-
-				result.add(returnType);
+				String word = returnTypes.get(0).getWord();
+				String[] returnTypesValues = word.split(JSIndexConstants.DELIMITER);
+	
+				for (int i = 1; i < returnTypesValues.length; i++)
+				{
+					String returnTypeValue = returnTypesValues[i];
+					String[] columns = returnTypeValue.split(","); //$NON-NLS-1$
+					ReturnTypeElement returnType = new ReturnTypeElement();
+	
+					returnType.setType(columns[0]);
+					returnType.setDescription(this.getDescription(index, columns[1]));
+	
+					result.add(returnType);
+				}
 			}
 		}
 
@@ -406,68 +430,71 @@ public class JSIndexReader
 	{
 		TypeElement result = null;
 
-		try
+		if (index != null)
 		{
-			String pattern = typeName + JSIndexConstants.DELIMITER;
-			List<QueryResult> types = index.query(new String[] { JSIndexConstants.TYPE }, pattern, SearchPattern.PREFIX_MATCH);
-
-			if (types != null && types.size() > 0)
+			try
 			{
-				String[] columns = types.get(0).getWord().split(JSIndexConstants.DELIMITER);
-				String retrievedName = columns[0];
-				int column = 0;
-
-				// create type
-				result = new TypeElement();
-				
-				if (fields.isEmpty() == false)
+				String pattern = typeName + JSIndexConstants.DELIMITER;
+				List<QueryResult> types = index.query(new String[] { JSIndexConstants.TYPE }, pattern, SearchPattern.PREFIX_MATCH);
+	
+				if (types != null && types.size() > 0)
 				{
-					// name
-					if (fields.contains(FieldSelector.NAME))
-					{
-						result.setName(columns[column]);
-					}
-					column++;
-					
-					// super types
-					if (fields.contains(FieldSelector.PARENT_TYPES))
-					{
-						for (String parentType : columns[column].split(JSIndexConstants.SUB_DELIMITER))
-						{
-							result.addParentType(parentType);
-						}
-					}
-					column++;
-					
-					// description
-					if (fields.contains(FieldSelector.DESCRIPTION))
-					{
-						result.setDescription(this.getDescription(index, columns[column]));
-					}
-					column++;
+					String[] columns = types.get(0).getWord().split(JSIndexConstants.DELIMITER);
+					String retrievedName = columns[0];
+					int column = 0;
 	
-					// properties
-					if (fields.contains(FieldSelector.PROPERTIES))
+					// create type
+					result = new TypeElement();
+					
+					if (fields.isEmpty() == false)
 					{
-						for (PropertyElement property : this.getProperties(index, retrievedName, EnumSet.allOf(FieldSelector.class)))
+						// name
+						if (fields.contains(FieldSelector.NAME))
 						{
-							result.addProperty(property);
+							result.setName(columns[column]);
 						}
-					}
-	
-					// functions
-					if (fields.contains(FieldSelector.FUNCTIONS))
-					{
-						for (FunctionElement function: this.getFunctions(index, retrievedName, EnumSet.allOf(FieldSelector.class)))
+						column++;
+						
+						// super types
+						if (fields.contains(FieldSelector.PARENT_TYPES))
 						{
-							result.addProperty(function);
+							for (String parentType : columns[column].split(JSIndexConstants.SUB_DELIMITER))
+							{
+								result.addParentType(parentType);
+							}
+						}
+						column++;
+						
+						// description
+						if (fields.contains(FieldSelector.DESCRIPTION))
+						{
+							result.setDescription(this.getDescription(index, columns[column]));
+						}
+						column++;
+		
+						// properties
+						if (fields.contains(FieldSelector.PROPERTIES))
+						{
+							for (PropertyElement property : this.getProperties(index, retrievedName, EnumSet.allOf(FieldSelector.class)))
+							{
+								result.addProperty(property);
+							}
+						}
+		
+						// functions
+						if (fields.contains(FieldSelector.FUNCTIONS))
+						{
+							for (FunctionElement function: this.getFunctions(index, retrievedName, EnumSet.allOf(FieldSelector.class)))
+							{
+								result.addProperty(function);
+							}
 						}
 					}
 				}
 			}
-		}
-		catch (IOException e)
-		{
+			catch (IOException e)
+			{
+			}
 		}
 
 		return result;
@@ -503,7 +530,7 @@ public class JSIndexReader
 	{
 		UserAgentElement result = JSIndexWriter.userAgentsByKey.get(userAgentKey);
 		
-		if (result == null)
+		if (result == null && index != null)
 		{
 			String searchKey = userAgentKey + JSIndexConstants.DELIMITER;
 			List<QueryResult> items = index.query(new String[] { JSIndexConstants.USER_AGENT }, searchKey,
