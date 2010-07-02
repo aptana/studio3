@@ -188,16 +188,27 @@ public class JSTypeWalker extends JSTreeWalker
 	 * @param node
 	 * @return
 	 */
-	public List<String> getTypes(JSNode node)
+	public List<String> getTypes(IParseNode node)
 	{
-		// create new nested walker
-		JSTypeWalker walker = new JSTypeWalker(this._scope, this._index);
+		List<String> result;
 		
-		// collect types
-		walker.visit(node);
+		if (node instanceof JSNode)
+		{
+			// create new nested walker
+			JSTypeWalker walker = new JSTypeWalker(this._scope, this._index);
+			
+			// collect types
+			walker.visit((JSNode) node);
+			
+			// return collected types
+			result = walker.getTypes();
+		}
+		else
+		{
+			result = Collections.emptyList();
+		}
 		
-		// return collected types
-		return walker.getTypes();
+		return result;
 	}
 
 	/* (non-Javadoc)
@@ -210,18 +221,12 @@ public class JSTypeWalker extends JSTreeWalker
 		
 		if (node.getNodeType() == JSNodeTypes.ADD)
 		{
-			IParseNode lhs = node.getLeftHandSide();
-			IParseNode rhs = node.getRightHandSide();
+			List<String> lhsTypes = this.getTypes(node.getLeftHandSide());
+			List<String> rhsTypes = this.getTypes(node.getRightHandSide());
 			
-			if (lhs instanceof JSNode && rhs instanceof JSNode)
+			if (lhsTypes.contains(STRING_TYPE) || rhsTypes.contains(STRING_TYPE))
 			{
-				List<String> lhsTypes = this.getTypes((JSNode) lhs);
-				List<String> rhsTypes = this.getTypes((JSNode) rhs);
-				
-				if (lhsTypes.contains(STRING_TYPE) || rhsTypes.contains(STRING_TYPE))
-				{
-					type = STRING_TYPE;
-				}
+				type = STRING_TYPE;
 			}
 		}
 		
@@ -253,18 +258,8 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSConditionalNode node)
 	{
-		IParseNode trueExpression = node.getTrueExpression();
-		IParseNode falseExpression = node.getFalseExpression();
-		
-		if (trueExpression instanceof JSNode)
-		{
-			this.addTypes(this.getTypes((JSNode) trueExpression));
-		}
-		
-		if (falseExpression instanceof JSNode)
-		{
-			this.addTypes(this.getTypes((JSNode) falseExpression));
-		}
+		this.addTypes(this.getTypes(node.getTrueExpression()));
+		this.addTypes(this.getTypes(node.getFalseExpression()));
 	}
 
 	/*
@@ -381,9 +376,8 @@ public class JSTypeWalker extends JSTreeWalker
 		{
 			IParseNode rhs = node.getRightHandSide();
 			String name = rhs.getText();
-			List<String> types = this.getTypes((JSNode) lhs);
 			
-			for (String type : types)
+			for (String type : this.getTypes(lhs))
 			{
 				// lookup up rhs name in type and add that value's type here
 				PropertyElement property = this._indexHelper.getCoreTypeMember(type, name, EnumSet.of(FieldSelector.TYPES));
