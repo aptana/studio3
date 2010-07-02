@@ -424,29 +424,31 @@ public class JSTypeWalker extends JSTreeWalker
 		String name = node.getText();
 		
 		// lookup in local scope
-//		if (this._scope != null && this._scope.hasSymbol(name))
-//		{
-//			List<JSNode> symbolNodes = this._scope.getSymbol(name);
-//	
-//			for (JSNode symbolNode : symbolNodes)
-//			{
-//				symbolNode.accept(this);
-//			}
-//		}
-		
-		PropertyElement property = this._indexHelper.getGlobal(this._index, name, EnumSet.of(FieldSelector.TYPES, FieldSelector.RETURN_TYPES));
-		
-		if (property != null)
+		if (this._scope != null && this._scope.hasSymbol(name))
 		{
-			if (property instanceof FunctionElement)
+			List<JSNode> symbolNodes = this._scope.getSymbol(name);
+	
+			for (JSNode symbolNode : symbolNodes)
 			{
-				this.addType(FUNCTION_TYPE);
+				symbolNode.accept(this);
 			}
-			else
+		}
+		else
+		{
+			PropertyElement property = this._indexHelper.getGlobal(this._index, name, EnumSet.of(FieldSelector.TYPES, FieldSelector.RETURN_TYPES));
+			
+			if (property != null)
 			{
-				for (ReturnTypeElement typeElement : property.getTypes())
+				if (property instanceof FunctionElement)
 				{
-					this.addType(typeElement.getType());
+					this.addType(FUNCTION_TYPE);
+				}
+				else
+				{
+					for (ReturnTypeElement typeElement : property.getTypes())
+					{
+						this.addType(typeElement.getType());
+					}
 				}
 			}
 		}
