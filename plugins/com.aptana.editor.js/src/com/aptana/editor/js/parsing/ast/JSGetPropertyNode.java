@@ -2,9 +2,6 @@ package com.aptana.editor.js.parsing.ast;
 
 import beaver.Symbol;
 
-import com.aptana.editor.js.contentassist.LocationType;
-import com.aptana.parsing.ast.IParseNode;
-
 public class JSGetPropertyNode extends JSBinaryOperatorNode
 {
 	/**
@@ -28,33 +25,6 @@ public class JSGetPropertyNode extends JSBinaryOperatorNode
 	public void accept(JSTreeWalker walker)
 	{
 		walker.visit(this);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#getLocationType(int)
-	 */
-	@Override
-	LocationType getLocationType(int offset)
-	{
-		LocationType result = LocationType.UNKNOWN;
-
-		if (this.contains(offset))
-		{
-			IParseNode lhs = this.getLeftHandSide();
-			Symbol operator = this.getOperator();
-
-			if (lhs.contains(offset) || lhs.getEndingOffset() <= offset && offset < operator.getStart())
-			{
-				result = ((JSNode) lhs).getLocationType(offset);
-			}
-			else
-			{
-				result = LocationType.IN_PROPERTY_NAME;
-			}
-		}
-
-		return result;
 	}
 
 	/*

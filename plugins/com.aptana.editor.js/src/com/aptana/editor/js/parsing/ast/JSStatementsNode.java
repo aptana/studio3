@@ -1,7 +1,5 @@
 package com.aptana.editor.js.parsing.ast;
 
-import com.aptana.editor.js.contentassist.LocationType;
-import com.aptana.parsing.ast.IParseNode;
 
 public class JSStatementsNode extends JSNaryNode
 {
@@ -53,34 +51,5 @@ public class JSStatementsNode extends JSNaryNode
 	protected String getDelimiter()
 	{
 		return "";
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#getLocationType(int)
-	 */
-	LocationType getLocationType(int offset)
-	{
-		LocationType result = LocationType.UNKNOWN;
-
-		if (this.contains(offset))
-		{
-			result = LocationType.IN_GLOBAL;
-
-			for (IParseNode child : this)
-			{
-				if (child.contains(offset))
-				{
-					if (child instanceof JSNode)
-					{
-						result = ((JSNode) child).getLocationType(offset);
-					}
-
-					break;
-				}
-			}
-		}
-
-		return result;
 	}
 }

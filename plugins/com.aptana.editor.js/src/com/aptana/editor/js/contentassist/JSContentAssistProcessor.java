@@ -571,7 +571,11 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			
 			if (ast instanceof JSParseRootNode)
 			{
-				result = ((JSParseRootNode) ast).getLocationType(offset);
+				JSLocationWalker walker = new JSLocationWalker(offset);
+				
+				((JSParseRootNode) ast).accept(walker);
+				
+				result = walker.getType();
 			}
 		}
 		else

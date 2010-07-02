@@ -2,7 +2,6 @@ package com.aptana.editor.js.parsing.ast;
 
 import beaver.Symbol;
 
-import com.aptana.editor.js.contentassist.LocationType;
 import com.aptana.parsing.ast.IParseNode;
 
 public abstract class JSBinaryOperatorNode extends JSNode
@@ -47,52 +46,12 @@ public abstract class JSBinaryOperatorNode extends JSNode
 		return this.getChild(0);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#getLocationType(int)
-	 */
-	@Override
-	LocationType getLocationType(int offset)
-	{
-		LocationType result = LocationType.UNKNOWN;
-
-		if (this.contains(offset))
-		{
-			for (IParseNode child : this)
-			{
-				if (child.contains(offset))
-				{
-					if (child instanceof JSNode)
-					{
-						result = ((JSNode) child).getLocationType(offset);
-					}
-
-					break;
-				}
-			}
-
-			if (result == LocationType.UNKNOWN && this._operator != null)
-			{
-				if (this._operator.getStart() == offset + 1 || this._operator.getEnd() <= offset)
-				{
-					result = LocationType.IN_GLOBAL;
-				}
-				else if (offset <= this._operator.getStart())
-				{
-					result = LocationType.NONE;
-				}
-			}
-		}
-
-		return result;
-	}
-
 	/**
 	 * getOperator
 	 * 
 	 * @return
 	 */
-	protected Symbol getOperator()
+	public Symbol getOperator()
 	{
 		return this._operator;
 	}

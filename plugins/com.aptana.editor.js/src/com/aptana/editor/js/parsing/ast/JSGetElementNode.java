@@ -1,8 +1,5 @@
 package com.aptana.editor.js.parsing.ast;
 
-import com.aptana.editor.js.contentassist.LocationType;
-import com.aptana.parsing.ast.IParseNode;
-
 import beaver.Symbol;
 
 public class JSGetElementNode extends JSBinaryOperatorNode
@@ -33,46 +30,24 @@ public class JSGetElementNode extends JSBinaryOperatorNode
 		walker.visit(this);
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#getLocationType(int)
+	/**
+	 * getLeftBracket
+	 * 
+	 * @return
 	 */
-	@Override
-	LocationType getLocationType(int offset)
+	public Symbol getLeftBracket()
 	{
-		LocationType result = LocationType.UNKNOWN;
-
-		if (this.contains(offset))
-		{
-			for (IParseNode child : this)
-			{
-				if (child.contains(offset))
-				{
-					if (child instanceof JSNode)
-					{
-						result = ((JSNode) child).getLocationType(offset);
-					}
-
-					break;
-				}
-			}
-
-			Symbol leftBracket = this.getOperator();
-
-			if (result == LocationType.UNKNOWN)
-			{
-				if (leftBracket.getStart() == offset + 1 || leftBracket.getEnd() <= offset || this._rightBracket.getEnd() <= offset)
-				{
-					result = LocationType.IN_GLOBAL;
-				}
-				else if (offset <= leftBracket.getStart())
-				{
-					result = LocationType.NONE;
-				}
-			}
-		}
-
-		return result;
+		return this.getOperator();
+	}
+	
+	/**
+	 * getRightBracket
+	 * 
+	 * @return
+	 */
+	public Symbol getRightBracket()
+	{
+		return this._rightBracket;
 	}
 
 	/*

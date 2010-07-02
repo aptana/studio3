@@ -2,8 +2,6 @@ package com.aptana.editor.js.parsing.ast;
 
 import beaver.Symbol;
 
-import com.aptana.editor.js.contentassist.LocationType;
-
 public class JSIdentifierNode extends JSPrimitiveNode
 {
 	/**
@@ -34,22 +32,5 @@ public class JSIdentifierNode extends JSPrimitiveNode
 	public void accept(JSTreeWalker walker)
 	{
 		walker.visit(this);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#getLocationType(int)
-	 */
-	@Override
-	LocationType getLocationType(int offset)
-	{
-		LocationType result = LocationType.IN_GLOBAL;
-
-		if (this.contains(offset))
-		{
-			result = LocationType.IN_VARIABLE_NAME;
-		}
-
-		return result;
 	}
 }

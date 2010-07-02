@@ -2,7 +2,6 @@ package com.aptana.editor.js.parsing.ast;
 
 import beaver.Symbol;
 
-import com.aptana.editor.js.contentassist.LocationType;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.parsing.ast.IParseNode;
 
@@ -88,46 +87,16 @@ public class JSAssignmentNode extends JSNode
 		return this.getChild(0);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#getLocationType(int)
+	/**
+	 * getOperator
+	 * 
+	 * @return
 	 */
-	@Override
-	LocationType getLocationType(int offset)
+	public Symbol getOperator()
 	{
-		LocationType result = LocationType.UNKNOWN;
-
-		if (this.contains(offset))
-		{
-			for (IParseNode child : this)
-			{
-				if (child.contains(offset))
-				{
-					if (child instanceof JSNode)
-					{
-						result = ((JSNode) child).getLocationType(offset);
-					}
-
-					break;
-				}
-			}
-
-			if (result == LocationType.UNKNOWN)
-			{
-				if (this._operator.getStart() == offset + 1 || this._operator.getEnd() <= offset)
-				{
-					result = LocationType.IN_GLOBAL;
-				}
-				else if (offset <= this._operator.getStart())
-				{
-					result = LocationType.NONE;
-				}
-			}
-		}
-
-		return result;
+		return this._operator;
 	}
-
+	
 	/**
 	 * getRightHandSide
 	 * 
