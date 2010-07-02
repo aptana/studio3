@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.contentassist.JSSymbolCollector;
 import com.aptana.editor.js.contentassist.JSTypeWalker;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.ParameterElement;
@@ -130,6 +131,28 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 		}
 	}
 	
+	/**
+	 * getGlobals
+	 * 
+	 * @param root
+	 * @return
+	 */
+	protected Scope<JSNode> getGlobals(IParseNode root)
+	{
+		Scope<JSNode> result = null;
+		
+		if (root instanceof JSParseRootNode)
+		{
+			JSSymbolCollector s = new JSSymbolCollector();
+			
+			((JSParseRootNode) root).accept(s);
+			
+			result = s.getScope();
+		}
+		
+		return result;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.index.core.IFileIndexingParticipant#index(java.util.Set, com.aptana.index.core.Index,
@@ -211,7 +234,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 	private void processParseResults(Index index, IFileStore file, IParseNode ast)
 	{
 		URI location = file.toURI();
-		Scope<JSNode> globals = ((JSParseRootNode) ast).getGlobalScope();
+		Scope<JSNode> globals = this.getGlobals(ast);
 
 		if (globals != null)
 		{

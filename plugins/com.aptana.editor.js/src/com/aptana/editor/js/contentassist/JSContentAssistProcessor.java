@@ -56,6 +56,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private Lexeme<JSTokenType> _currentLexeme;
 	private IParseNode _targetNode;
 	private IParseNode _statementNode;
+	private Scope<JSNode> _globals;
 
 	/**
 	 * JSIndexContentAssitProcessor
@@ -535,17 +536,22 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected Scope<JSNode> getGlobalScope()
 	{
-		IParseNode ast = this.getAST();
-		Scope<JSNode> result = null;
-		
-		if (ast instanceof JSParseRootNode)
+		if (this._globals == null)
 		{
-			JSParseRootNode root = (JSParseRootNode) ast;
+			IParseNode root = this.getAST();
 			
-			result = root.getGlobalScope();
+			if (root instanceof JSParseRootNode)
+			{
+				JSSymbolCollector s = new JSSymbolCollector();
+				
+				((JSParseRootNode) root).accept(s);
+				
+				this._globals = s.getScope();
+			}
+			
 		}
 		
-		return result;
+		return this._globals;
 	}
 
 	/**
