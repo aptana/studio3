@@ -166,6 +166,109 @@ public class JSParser extends Parser implements IParser {
 	private JSScanner fScanner;
 	
 	/**
+	 * attachPostDocumentationBlocks
+	 * 
+	 * @param root
+	 * @param source
+	 */
+	private void attachPostDocumentationBlocks(JSParseRootNode root, String source)
+	{
+		// process each post-documentation block
+		for (DocumentationBlock block : this.parsePostDocumentationBlocks())
+		{
+			int index = block.getStart() - 1;
+			
+			while (index >= 0 && Character.isWhitespace(source.charAt(index)))
+			{
+				index--;
+			}
+			
+			IParseNode node = root.getNodeAtOffset(index);
+			
+			if (node instanceof JSNode)
+			{
+				switch (node.getNodeType())
+				{
+					case JSNodeTypes.STATEMENTS:
+						IParseNode parent = node.getParent();
+						
+						if (parent.getNodeType() == JSNodeTypes.FUNCTION)
+						{
+							((JSNode) parent).setDocumentation(block);
+						}
+						break;
+						
+					default:
+						((JSNode) node).setDocumentation(block);
+						break;
+				}
+			}
+		}
+	}
+
+	/**
+	 * attachPreDocumentationBlocks
+	 * 
+	 * @param root
+	 * @param source
+	 */
+	private void attachPreDocumentationBlocks(JSParseRootNode root, String source)
+	{
+		// process each pre-documentation block
+		for (DocumentationBlock block : this.parsePreDocumentationBlocks())
+		{
+			int index = block.getEnd() + 1;
+			
+			while (index < source.length() && Character.isWhitespace(source.charAt(index)))
+			{
+				index++;
+			}
+			
+			IParseNode node = root.getNodeAtOffset(index);
+			
+			if (node instanceof JSNode)
+			{
+				switch (node.getNodeType())
+				{
+					case JSNodeTypes.VAR:
+						// associate documentation with first declared variable's value
+						JSVarNode varNode = (JSVarNode) node;
+						((JSNode) varNode.getFirstChild().getLastChild()).setDocumentation(block);
+						break;
+						
+					default:
+						((JSNode) node).setDocumentation(block);
+						break;
+				}
+			}
+		}
+	}
+	
+	/**
+	 * buildVSDocXML
+	 *
+	 * @param lines
+	 * @return
+	 */
+	private String buildVSDocXML(List<Symbol> lines)
+	{
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("<docs>\n");
+		
+		for (Symbol line : lines)
+		{
+			String text = (String) line.value;
+			
+			buffer.append(text.substring(3));
+			buffer.append("\n");
+		}
+		
+		buffer.append("</docs>");
+		
+		return buffer.toString();
+	}
+	
+	/**
 	 * getNextSymbolIndex
 	 * 
 	 * @return
@@ -198,129 +301,24 @@ public class JSParser extends Parser implements IParser {
 		// parse
 		IParseNode result = (IParseNode) parse(fScanner);
 		
-		// save AST into the parse result
+		// store results in the parse state
 		parseState.setParseResult(result);
 		
+		// TODO: We probably don't need documentation nodes in all cases. For
+		// example, the outline view probably doesn't rely on them. We should
+		// include a flag (maybe in the parseState) that makes this step
+		// optional.
+		
+		// attach documentation
 		if (result instanceof JSParseRootNode)
 		{
 			JSParseRootNode root = (JSParseRootNode) result;
 			
-			// process each pre-documentation block
-			for (DocumentationBlock block : this.parsePreDocumentationBlocks())
-			{
-				int index = block.getEnd() + 1;
-				
-				while (index < source.length() && Character.isWhitespace(source.charAt(index)))
-				{
-					index++;
-				}
-				
-				IParseNode node = root.getNodeAtOffset(index);
-				
-				if (node instanceof JSNode)
-				{
-					switch (node.getNodeType())
-					{
-						case JSNodeTypes.VAR:
-							// associate documentation with first declared variable's value
-							JSVarNode varNode = (JSVarNode) node;
-							((JSNode) varNode.getFirstChild().getLastChild()).setDocumentation(block);
-							break;
-							
-						default:
-							((JSNode) node).setDocumentation(block);
-							break;
-					}
-				}
-			}
-			
-			// process each post-documentation block
-			for (DocumentationBlock block : this.parsePostDocumentationBlocks())
-			{
-				int index = block.getStart() - 1;
-				
-				while (index >= 0 && Character.isWhitespace(source.charAt(index)))
-				{
-					index--;
-				}
-				
-				IParseNode node = root.getNodeAtOffset(index);
-				
-				if (node instanceof JSNode)
-				{
-					switch (node.getNodeType())
-					{
-						case JSNodeTypes.STATEMENTS:
-							IParseNode parent = node.getParent();
-							
-							if (parent.getNodeType() == JSNodeTypes.FUNCTION)
-							{
-								((JSNode) parent).setDocumentation(block);
-							}
-							break;
-							
-						default:
-							((JSNode) node).setDocumentation(block);
-							break;
-					}
-				}
-			}
+			attachPreDocumentationBlocks(root, source);
+			attachPostDocumentationBlocks(root, source);
 		}
 		
 		return result;
-	}
-	
-	/**
-	 * parsePreDocumentationBlocks
-	 * 
-	 * @return
-	 */
-	protected List<DocumentationBlock> parsePreDocumentationBlocks()
-	{
-		SDocParser parser = new SDocParser();
-		List<DocumentationBlock> blocks = new ArrayList<DocumentationBlock>();
-		
-		for (Symbol doc : fScanner.getSDocComments())
-		{
-			try
-			{
-				Object result = parser.parse((String) doc.value, doc.getStart());
-				
-				if (result instanceof DocumentationBlock)
-				{
-					blocks.add((DocumentationBlock) result);
-				}
-			}
-			catch (java.lang.Exception e)
-			{
-			}
-		}
-		
-		return blocks;
-	}
-	
-	/**
-	 * buildVSDocXML
-	 *
-	 * @param lines
-	 * @return
-	 */
-	private String buildVSDocXML(List<Symbol> lines)
-	{
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("<docs>\n");
-		
-		for (Symbol line : lines)
-		{
-			String text = (String) line.value;
-			
-			buffer.append(text.substring(3));
-			buffer.append("\n");
-		}
-		
-		buffer.append("</docs>");
-		
-		return buffer.toString();
 	}
 	
 	/**
@@ -373,6 +371,35 @@ public class JSParser extends Parser implements IParser {
 				catch (IOException e)
 				{
 				}
+			}
+		}
+		
+		return blocks;
+	}
+	
+	/**
+	 * parsePreDocumentationBlocks
+	 * 
+	 * @return
+	 */
+	protected List<DocumentationBlock> parsePreDocumentationBlocks()
+	{
+		SDocParser parser = new SDocParser();
+		List<DocumentationBlock> blocks = new ArrayList<DocumentationBlock>();
+		
+		for (Symbol doc : fScanner.getSDocComments())
+		{
+			try
+			{
+				Object result = parser.parse((String) doc.value, doc.getStart());
+				
+				if (result instanceof DocumentationBlock)
+				{
+					blocks.add((DocumentationBlock) result);
+				}
+			}
+			catch (java.lang.Exception e)
+			{
 			}
 		}
 		
