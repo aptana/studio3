@@ -56,6 +56,19 @@ public class JSSymbolCollector extends JSTreeWalker
 	}
 
 	/**
+	 * accept
+	 * 
+	 * @param node
+	 */
+	protected void accept(IParseNode node)
+	{
+		if (node instanceof JSNode)
+		{
+			((JSNode) node).accept(this);
+		}
+	}
+	
+	/**
 	 * addAssignment
 	 * 
 	 * @param assignment
@@ -201,10 +214,7 @@ public class JSSymbolCollector extends JSTreeWalker
 	{
 		IParseNode body = node.getBody();
 		
-		if (body instanceof JSNode)
-		{
-			((JSNode) body).accept(this);
-		}
+		this.accept(body);
 	}
 
 	/*
@@ -251,6 +261,9 @@ public class JSSymbolCollector extends JSTreeWalker
 		{
 			this.addSymbol(name, (JSNode) value);
 		}
+		
+		// process any complex data structures from this assignment
+		this.accept(value);
 	}
 
 	/*
@@ -343,10 +356,7 @@ public class JSSymbolCollector extends JSTreeWalker
 		// process body
 		IParseNode body = node.getBody();
 		
-		if (body instanceof JSNode)
-		{
-			((JSNode) body).accept(this);
-		}
+		this.accept(body);
 		
 		// set scope range
 		this.setScopeRange(body);
@@ -373,12 +383,7 @@ public class JSSymbolCollector extends JSTreeWalker
 	public void visit(JSGetPropertyNode node)
 	{
 		// No need to process the rhs since it's always an identifier
-		IParseNode lhs = node.getLeftHandSide();
-		
-		if (lhs instanceof JSNode)
-		{
-			((JSNode) lhs).accept(this);
-		}
+		this.accept(node.getLeftHandSide());
 	}
 
 	/*
@@ -419,12 +424,7 @@ public class JSSymbolCollector extends JSTreeWalker
 	public void visit(JSLabelledNode node)
 	{
 		// No need to process the label since it's always an identifier
-		IParseNode block = node.getBlock();
-		
-		if (block instanceof JSNode)
-		{
-			((JSNode) block).accept(this);
-		}
+		this.accept(node.getBlock());
 	}
 
 	/*
@@ -466,10 +466,7 @@ public class JSSymbolCollector extends JSTreeWalker
 	{
 		for (IParseNode child : node)
 		{
-			if (child instanceof JSNode)
-			{
-				((JSNode) child).accept(this);
-			}
+			this.accept(child);
 		}
 		
 		this.setScopeRange(node);
