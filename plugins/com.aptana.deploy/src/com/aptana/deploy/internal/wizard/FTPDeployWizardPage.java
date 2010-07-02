@@ -13,6 +13,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.deploy.Activator;
 import com.aptana.deploy.internal.wizard.FTPDeployComposite.Direction;
+import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.deploy.preferences.IPreferenceConstants;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPoint;
@@ -35,11 +36,13 @@ public class FTPDeployWizardPage extends WizardPage implements FTPConnectionProp
 		super(NAME, Messages.FTPDeployWizardPage_Title, Activator.getImageDescriptor(ICON_PATH));
 		// checks if the project already has an associated FTP connection and fills the info automatically if one exists
 		ISiteConnection[] sites = SiteConnectionUtils.findSitesForSource(project, true);
+		String lastConnection = DeployPreferenceUtil.getDeployEndpoint(project);
 		IConnectionPoint connection;
 		for (ISiteConnection site : sites)
 		{
 			connection = site.getDestination();
-			if (connection instanceof IBaseRemoteConnectionPoint)
+			if (connection.getName().equals(lastConnection)
+					|| (lastConnection == null && connection instanceof IBaseRemoteConnectionPoint))
 			{
 				connectionPoint = (IBaseRemoteConnectionPoint) connection;
 				break;

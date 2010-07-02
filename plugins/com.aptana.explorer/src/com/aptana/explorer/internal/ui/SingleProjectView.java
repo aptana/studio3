@@ -8,7 +8,6 @@ import java.util.Set;
 import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -80,6 +79,8 @@ import com.aptana.core.IScopeReference;
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.ProcessUtil;
+import com.aptana.deploy.preferences.DeployPreferenceUtil;
+import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IExplorerUIConstants;
 import com.aptana.explorer.IPreferenceConstants;
@@ -433,32 +434,68 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 
 	protected void fillDeployMenu(MenuManager menuManager)
 	{
-		if (selectedProject == null || !selectedProject.isAccessible())
+		if (selectedProject != null && selectedProject.isAccessible())
 		{
-			menuManager.add(new Separator(GROUP_WIZARD));
+			DeployType type = DeployPreferenceUtil.getDeployType(selectedProject);
+			if (type == null)
+			{
+				if (isCapistranoProject())
+				{
+					// insert commands for capistrano here
+					menuManager.add(new Separator(GROUP_CAP));
+				}
+				else if (isHerokuProject())
+				{
+					addHerokuMenuCommands(menuManager);
+				}
+				else if (isFTPProject())
+				{
+					addFTPMenuCommands(menuManager);
+				}
+			}
+			else if (type == DeployType.HEROKU)
+			{
+				addHerokuMenuCommands(menuManager);
+			}
+			else if (type == DeployType.FTP)
+			{
+				addFTPMenuCommands(menuManager);
+			}
+			else if (type == DeployType.CAPISTRANO)
+			{
+				menuManager.add(new Separator(GROUP_CAP));
+			}
 		}
-		else if (isCapistranoProject())
-		{
-			// insert commands for capistrano here
-			menuManager.add(new Separator(GROUP_CAP));
-		}
-		else if (isHerokuProject())
-		{
-			addHerokuMenuCommands(menuManager);
-		}
-		else if (isFTPProject())
-		{
-			addFTPMenuCommands(menuManager);
-		}
-		else
-		{
-			menuManager.add(new Separator(GROUP_WIZARD));
-		}
+		menuManager.add(new Separator(GROUP_WIZARD));
 	}
 
 	private void addFTPMenuCommands(MenuManager menuManager)
 	{
 		menuManager.add(new Separator(GROUP_FTP));
+
+		ISiteConnection site = null;
+		if (siteConnections == null)
+		{
+			siteConnections = SiteConnectionUtils.findSitesForSource(selectedProject, true);
+		}
+		if (siteConnections.length > 1)
+		{
+			// try for last remembered site first
+			String lastConnection = ResourceSynchronizationUtils.getLastSyncConnection(selectedProject);
+			if (lastConnection == null)
+			{
+				lastConnection = DeployPreferenceUtil.getDeployEndpoint(selectedProject);
+			}
+			if (lastConnection != null)
+			{
+				site = SiteConnectionUtils.getSiteWithDestination(lastConnection, siteConnections);
+			}
+		}
+		else if (siteConnections.length == 1)
+		{
+			site = siteConnections[0];
+		}
+		final ISiteConnection lastSiteConnection = site;
 		menuManager.appendToGroup(GROUP_FTP, new ContributionItem()
 		{
 
@@ -477,6 +514,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 								.getActivePart());
 						action.setSelection(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService()
 								.getSelection());
+						action.setSelectedSite(lastSiteConnection);
 						action.addJobListener(new JobChangeAdapter()
 						{
 
@@ -520,6 +558,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 								.getActivePart());
 						action.setSelection(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService()
 								.getSelection());
+						action.setSelectedSite(lastSiteConnection);
 						action.addJobListener(new JobChangeAdapter()
 						{
 
@@ -575,54 +614,32 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 					@Override
 					public void widgetSelected(SelectionEvent e)
 					{
-						IConnectionPoint siteConnection;
 						CommonFTPConnectionPointPropertyDialog settingsDialog = new CommonFTPConnectionPointPropertyDialog(
 								PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-						siteConnection = siteConnections[0].getDestination();
-
-						if (siteConnections.length != 1)
+						if (lastSiteConnection != null)
 						{
-							// try for last remembered site first
-							IContainer container = selectedProject;
-							String lastConnection = ResourceSynchronizationUtils.getLastSyncConnection(container);
-							Boolean remember = ResourceSynchronizationUtils.isRememberDecision(container);
-
-							if (!remember || (lastConnection == null))
-							{
-								ChooseSiteConnectionDialog dialog = new ChooseSiteConnectionDialog(PlatformUI
-										.getWorkbench().getActiveWorkbenchWindow().getShell(), siteConnections);
-								dialog.setShowRememberMyDecision(true);
-								dialog.open();
-
-								siteConnection = dialog.getSelectedSite().getDestination();
-								if (siteConnection != null)
-								{
-									Boolean rememberMyDecision = dialog.isRememberMyDecision();
-									if (rememberMyDecision)
-									{
-										ResourceSynchronizationUtils.setRememberDecision(container, rememberMyDecision);
-									}
-
-									// remembers the last sync connection
-									ResourceSynchronizationUtils.setLastSyncConnection(container,
-											siteConnection.getName());
-								}
-							}
-							else
-							{
-								String target;
-								for (ISiteConnection site : siteConnections)
-								{
-									target = site.getDestination().getName();
-									if (target.equals(lastConnection))
-									{
-										siteConnection = site.getDestination();
-										break;
-									}
-								}
-							}
+							settingsDialog.setPropertySource(lastSiteConnection.getDestination());
 						}
-						settingsDialog.setPropertySource(siteConnection);
+						else if (siteConnections.length > 1)
+						{
+							ChooseSiteConnectionDialog dialog = new ChooseSiteConnectionDialog(PlatformUI
+									.getWorkbench().getActiveWorkbenchWindow().getShell(), siteConnections);
+							dialog.setShowRememberMyDecision(true);
+							dialog.open();
+
+							IConnectionPoint destination = dialog.getSelectedSite().getDestination();
+							if (destination != null)
+							{
+								Boolean rememberMyDecision = dialog.isRememberMyDecision();
+								if (rememberMyDecision)
+								{
+									ResourceSynchronizationUtils.setRememberDecision(selectedProject, rememberMyDecision);
+								}
+								// remembers the last sync connection
+								ResourceSynchronizationUtils.setLastSyncConnection(selectedProject, destination.getName());
+							}
+							settingsDialog.setPropertySource(destination);
+						}
 						settingsDialog.open();
 					}
 				});

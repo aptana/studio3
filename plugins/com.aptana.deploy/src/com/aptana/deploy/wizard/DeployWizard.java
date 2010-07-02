@@ -49,7 +49,9 @@ import com.aptana.deploy.internal.wizard.FTPDeployComposite.Direction;
 import com.aptana.deploy.internal.wizard.FTPDeployWizardPage;
 import com.aptana.deploy.internal.wizard.HerokuDeployWizardPage;
 import com.aptana.deploy.internal.wizard.HerokuSignupPage;
+import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.deploy.preferences.IPreferenceConstants;
+import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
@@ -83,25 +85,43 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		IRunnableWithProgress runnable = null;
 		// check what the user chose, then do the heavy lifting, or tell the page to finish...
 		IWizardPage currentPage = getContainer().getCurrentPage();
-		if (currentPage.getName().equals(HerokuDeployWizardPage.NAME))
+		String pageName = currentPage.getName();
+		DeployType type = null;
+		String deployEndpointName = null;
+		if (pageName.equals(HerokuDeployWizardPage.NAME))
 		{
 			HerokuDeployWizardPage page = (HerokuDeployWizardPage) currentPage;
 			runnable = createHerokuDeployRunnable(page);
+			type = DeployType.HEROKU;
+			deployEndpointName = page.getAppName();
 		}
-		else if (currentPage.getName().equals(FTPDeployWizardPage.NAME))
+		else if (pageName.equals(FTPDeployWizardPage.NAME))
 		{
 			FTPDeployWizardPage page = (FTPDeployWizardPage) currentPage;
 			runnable = createFTPDeployRunnable(page);
+			type = DeployType.FTP;
+			deployEndpointName = page.getConnectionPoint().getName();
 		}
-		else if (currentPage.getName().equals(HerokuSignupPage.NAME))
+		else if (pageName.equals(HerokuSignupPage.NAME))
 		{
 			HerokuSignupPage page = (HerokuSignupPage) currentPage;
 			runnable = createHerokuSignupRunnable(page);
 		}
-		else if (currentPage.getName().equals(CapifyProjectPage.NAME))
+		else if (pageName.equals(CapifyProjectPage.NAME))
 		{
 			CapifyProjectPage page = (CapifyProjectPage) currentPage;
 			runnable = createCapifyRunnable(page);
+			type = DeployType.CAPISTRANO;
+		}
+
+		// stores the deploy type and what application or FTP connection it's deploying to
+		if (type != null)
+		{
+			DeployPreferenceUtil.setDeployType(project, type);
+			if (deployEndpointName != null)
+			{
+				DeployPreferenceUtil.setDeployEndpoint(project, deployEndpointName);
+			}
 		}
 
 		if (runnable != null)
@@ -139,7 +159,7 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 				SubMonitor sub = SubMonitor.convert(monitor, 100);
 				try
 				{
-					ISiteConnection site;
+					ISiteConnection site = null;
 					ISiteConnection[] sites = SiteConnectionUtils.findSites(project, connectionPoint);
 					if (sites.length == 0)
 					{
@@ -149,10 +169,20 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 								ConnectionPointUtils.createWorkspaceConnectionPoint(project), connectionPoint);
 						SyncingPlugin.getSiteConnectionManager().addSiteConnection(site);
 					}
-					else
+					else if (sites.length == 1)
 					{
 						// the site to link the project with the FTP connection already exists
 						site = sites[0];
+					}
+					else
+					{
+						// multiple FTP connections are associated with the project; finds the last one
+						// try for last remembered site first
+						String lastConnection = DeployPreferenceUtil.getDeployEndpoint(project);
+						if (lastConnection != null)
+						{
+							site = SiteConnectionUtils.getSiteWithDestination(lastConnection, sites);
+						}
 					}
 
 					if (isAutoSyncSelected)

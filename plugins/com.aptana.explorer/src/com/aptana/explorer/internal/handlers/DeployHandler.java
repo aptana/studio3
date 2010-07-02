@@ -9,16 +9,14 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISources;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 
-import com.aptana.deploy.wizard.DeployWizard;
+import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.ide.syncing.core.ISiteConnection;
+import com.aptana.ide.syncing.core.ResourceSynchronizationUtils;
 import com.aptana.ide.syncing.core.SiteConnectionUtils;
 import com.aptana.ide.syncing.ui.actions.SynchronizeProjectAction;
 import com.aptana.terminal.views.TerminalView;
@@ -44,6 +42,19 @@ public class DeployHandler extends AbstractHandler
 					.getActivePart());
 			action.setSelection(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService()
 					.getSelection());
+			ISiteConnection[] sites = SiteConnectionUtils.findSitesForSource(selectedProject, true);
+			if (sites.length > 1)
+			{
+				String lastConnection = ResourceSynchronizationUtils.getLastSyncConnection(selectedProject);
+				if (lastConnection == null)
+				{
+					lastConnection = DeployPreferenceUtil.getDeployEndpoint(selectedProject);
+				}
+				if (lastConnection != null)
+				{
+					action.setSelectedSite(SiteConnectionUtils.getSiteWithDestination(lastConnection, sites));
+				}
+			}
 			action.run(null);
 		}
 		else if (selectedProject != null && isHerokuProject(selectedProject))
@@ -51,28 +62,6 @@ public class DeployHandler extends AbstractHandler
 			TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
 					selectedProject.getLocation());
 			terminal.sendInput("git push heroku master\n"); //$NON-NLS-1$
-		}
-		else
-		{
-			IWorkbenchPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart();
-
-			// Instantiates and initializes the wizard
-			DeployWizard wizard = new DeployWizard();
-			wizard.init(part.getSite().getWorkbenchWindow().getWorkbench(), (IStructuredSelection) part.getSite().getSelectionProvider()
-					.getSelection());
-			wizard.setWindowTitle(Messages.DeployHandler_Wizard_Title);
-
-			// Instantiates the wizard container with the wizard and opens it
-			Shell shell = part.getSite().getShell();
-			if (shell == null)
-			{
-				shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-			}
-			WizardDialog dialog = new WizardDialog(shell, wizard);
-			dialog.setPageSize(350, 500);
-			dialog.setHelpAvailable(false);
-			dialog.create();
-			dialog.open();
 		}
 
 		return null;
@@ -148,5 +137,4 @@ public class DeployHandler extends AbstractHandler
 		}
 		return false;
 	}
-
 }
