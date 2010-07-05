@@ -41,23 +41,9 @@ import com.aptana.ide.core.io.vfs.IConnectionFileManager;
 
 /**
  * @author Max Stepanov
- *
  */
-public interface ISFTPConnectionFileManager extends IConnectionFileManager {
-
-	/**
-	 * Returns the transfer type of the connection
-	 * @return
-	 */
-	public String getTransferType();
-
-	/**
-	 * Sets the transfer type of the connection
-	 * @param transferType
-	 */
-	public void setTransferType(String transferType);
-
-
-	public void init(String host, int port, IPath basePath, IPath keyFilePath, String login, char[] password, String transferType, String encoding, String compression);
-	
+public interface ISFTPConnectionFileManager extends IConnectionFileManager
+{
+	public void init(String host, int port, IPath basePath, IPath keyFilePath, String login, char[] password,
+			String transferType, String encoding, String compression);
 }

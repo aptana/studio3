@@ -35,6 +35,9 @@
 
 package com.aptana.filesystem.ftp.tests;
 
+import java.io.FileWriter;
+import java.io.IOException;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -202,5 +205,5 @@ public class FTPConnectionTest extends CommonConnectionTest
 		ftpcp.connect(null);
 
 		ftpcp.setPath(basePath);
-	}
+	}	
 }

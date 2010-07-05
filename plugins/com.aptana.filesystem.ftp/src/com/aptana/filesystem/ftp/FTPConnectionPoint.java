@@ -306,14 +306,7 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	 */
 	public String getTransferType()
 	{
-		if (connectionFileManager != null)
-		{
-			return connectionFileManager.getTransferType();
-		}
-		else
-		{
-			return transferType;
-		}
+		return transferType;
 	}
 
 	/**
@@ -351,14 +344,7 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	 */
 	public String getTimezone()
 	{
-		if (connectionFileManager != null)
-		{
-			return connectionFileManager.getTimezone();
-		}
-		else
-		{
-			return transferType;
-		}
+		return timezone;
 	}
 
 	/**
