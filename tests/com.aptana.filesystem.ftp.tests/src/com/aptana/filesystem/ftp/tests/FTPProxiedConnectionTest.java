@@ -36,32 +36,28 @@
 package com.aptana.filesystem.ftp.tests;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 
-import com.aptana.core.io.tests.BaseConnectionTest;
 import com.aptana.filesystem.ftp.FTPConnectionPoint;
+import com.aptana.filesystem.ftp.wrappers.FTPProxiedConnectionFileManager;
+import com.aptana.filesystem.ftp.wrappers.FTPProxiedConnectionPoint;
+import com.aptana.ide.core.io.ConnectionContext;
+import com.aptana.ide.core.io.CoreIOPlugin;
+import com.enterprisedt.net.ftp.FTPException;
 
 /**
  * @author Max Stepanov
  */
-public class FTPProxiedConnectionTest extends BaseConnectionTest
+public class FTPProxiedConnectionTest extends FTPCommonConnectionTest
 {
 	@Override
-	protected void setUp() throws Exception
+	public FTPConnectionPoint getConnectionPoint()
 	{
-		FTPConnectionPoint ftpcp = new FTPProxiedConnectionPoint();
-		ftpcp.setHost(getConfig().getProperty("ftp.host", "10.10.1.60")); //$NON-NLS-1$ //$NON-NLS-2$
-		ftpcp.setLogin(getConfig().getProperty("ftp.username", "ftpuser")); //$NON-NLS-1$ //$NON-NLS-2$
-		ftpcp.setPassword(getConfig().getProperty("ftp.password", //$NON-NLS-1$
-				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n' })).toCharArray());
-		supportsSetModificationTime = Boolean.valueOf(getConfig().getProperty("ftp.supportsSetModificationTime", "true"));
-		supportsChangeGroup = Boolean.valueOf(getConfig().getProperty("ftp.supportsChangeGroup", "false"));
-		supportsChangePermissions = Boolean.valueOf(getConfig().getProperty("ftp.supportsChangePermissions", "true"));
-		cp = ftpcp;
-		super.setUp();
+		return new FTPProxiedConnectionPoint();
 	}
 
 	public final void testNavigateRemoteSystem() throws CoreException, IOException
@@ -96,4 +92,29 @@ public class FTPProxiedConnectionTest extends BaseConnectionTest
 			assertFalse(fs.getChild("file.txt").fetchInfo().exists()); //$NON-NLS-1$			
 		}
 	}
+
+	/**
+	 * Unhappy I have to create wrappers which violate public /protected, but it's the only way I can test a huge chunk
+	 * of code without resorting to refactoring this
+	 * 
+	 * @throws CoreException
+	 * @throws ParseException
+	 * @throws IOException
+	 * @throws FTPException
+	 */
+	public final void testDetectTimezone() throws CoreException, FTPException, IOException, ParseException
+	{
+		FTPProxiedConnectionPoint ftpcp = (FTPProxiedConnectionPoint) cp;
+
+		ConnectionContext context = CoreIOPlugin.getConnectionContext(cp);
+		Boolean detect = context.getBoolean(ConnectionContext.DETECT_TIMEZONE);
+		context.setBoolean(ConnectionContext.DETECT_TIMEZONE, true);
+
+		FTPProxiedConnectionFileManager cfp = (FTPProxiedConnectionFileManager) ftpcp.getConnectionFileManager();
+		cfp.connect(null);
+		cfp.determineServerTimeZoneShift(context, null, testPath, testPath);
+
+		context.setBoolean(ConnectionContext.DETECT_TIMEZONE, detect);
+	}
+
 }

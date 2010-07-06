@@ -71,7 +71,8 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 		initBasePath();
 		FTPConnectionPoint ftpcp = setupConnection();
 		ftpcp.setPath(Path.ROOT.append(getClass().getSimpleName()));
-		supportsSetModificationTime = Boolean.valueOf(getConfig().getProperty("ftp.supportsSetModificationTime", "true"));
+		supportsSetModificationTime = Boolean.valueOf(getConfig()
+				.getProperty("ftp.supportsSetModificationTime", "true"));
 		supportsChangeGroup = Boolean.valueOf(getConfig().getProperty("ftp.supportsChangeGroup", "false"));
 		supportsChangePermissions = Boolean.valueOf(getConfig().getProperty("ftp.supportsChangePermissions", "true"));
 		cp = ftpcp;

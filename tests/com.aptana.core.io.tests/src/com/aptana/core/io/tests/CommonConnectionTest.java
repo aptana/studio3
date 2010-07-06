@@ -57,11 +57,13 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.filesystem.IFileTree;
 import org.eclipse.core.filesystem.provider.FileInfo;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 
+import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.core.io.vfs.ExtendedFileInfo;
 import com.aptana.ide.core.io.vfs.IExtendedFileInfo;
 import com.aptana.ide.core.io.vfs.IExtendedFileStore;
@@ -88,6 +90,106 @@ public abstract class CommonConnectionTest extends BaseConnectionTest
 		cp.disconnect(null);
 		assertFalse(cp.isConnected());
 		assertFalse(cp.canDisconnect());
+	}
+
+	public final void testConnectDisconnectException() throws CoreException
+	{
+		if (!(cp instanceof IBaseRemoteConnectionPoint))
+		{
+			return;
+		}
+
+		cp.connect(null);
+		assertTrue(cp.isConnected());
+		assertTrue(cp.canDisconnect());
+		cp.disconnect(null);
+		assertFalse(cp.isConnected());
+		assertFalse(cp.canDisconnect());
+
+		IBaseRemoteConnectionPoint ftpcp = (IBaseRemoteConnectionPoint) cp;
+
+		// set host to non-existent version
+		String oldHost = ftpcp.getHost();
+		try
+		{
+			ftpcp.setHost(null);
+			ftpcp.connect(null);
+			fail();
+		}
+		catch (CoreException e)
+		{
+
+		}
+		cp.disconnect(null);
+		ftpcp.setHost(oldHost);
+
+		// set port to non-existent version
+		int oldPort = ftpcp.getPort();
+		try
+		{
+			ftpcp.setPort(0);
+			ftpcp.connect(null);
+			fail();
+		}
+		catch (CoreException e)
+		{
+
+		}
+		cp.disconnect(null);
+		ftpcp.setPort(oldPort);
+
+		// set username to null
+		String username = ftpcp.getLogin();
+		try
+		{
+			ftpcp.setLogin(null);
+			ftpcp.connect(null);
+			fail();
+		}
+		catch (OperationCanceledException e)
+		{
+
+		}
+		cp.disconnect(null);
+		ftpcp.setLogin(username);
+
+		char[] pass = ftpcp.getPassword();
+
+		// null password means it will try and get a saved value. Commented out as this may or may
+		// not work based on if a value has been saved before
+		// ftpcp.setPassword(null);
+		// ftpcp.connect(null);
+		// assertFalse(cp.isConnected());
+
+		try
+		{
+			ftpcp.setPassword(new char[] { 'a' });
+			ftpcp.connect(null);
+			fail();
+		}
+		catch (OperationCanceledException e)
+		{
+
+		}
+		cp.disconnect(null);
+		ftpcp.setPassword(pass);
+
+	}
+
+	public final void testIncorrectPaths() throws CoreException
+	{
+		if (!(cp instanceof IBaseRemoteConnectionPoint))
+		{
+			return;
+		}
+
+		IBaseRemoteConnectionPoint ftpcp = (IBaseRemoteConnectionPoint) cp;
+		IPath basePath = ftpcp.getPath();
+
+		ftpcp.setPath(null);
+		ftpcp.connect(null);
+
+		ftpcp.setPath(basePath);
 	}
 
 	public final void testFetchRootInfo() throws CoreException
@@ -1097,6 +1199,34 @@ public abstract class CommonConnectionTest extends BaseConnectionTest
 			IFileInfo fi2 = fs2.getChild("file1.txt").fetchInfo(); //$NON-NLS-1$
 			assertNotNull(fi2);
 			assertFalse(fi2.exists());
+		}
+	}
+	
+	public final void testSymlinks() throws CoreException, IOException, InterruptedException
+	{
+		String targetName = "symlinkTargetFolder";
+		String linkName = "symlinkFolder";
+		
+		if(remoteFileDirectory != null) {
+			Path targetPath = (Path)new Path(remoteFileDirectory).append(testPath).append("/" + targetName);
+			Path linkPath = (Path)new Path(remoteFileDirectory).append(testPath).append("/" + linkName);
+
+			// create target folder
+			File target = new File(targetPath.toPortableString());
+			assertTrue(target.mkdirs());
+			target.deleteOnExit();
+
+			Process process = Runtime.getRuntime().exec( new String[] { "ln", "-s", targetPath.toPortableString(), linkPath.toPortableString() } );
+			process.waitFor();
+			process.destroy();	
+
+			IFileInfo[] children = cp.getRoot().getFileStore(testPath).childInfos(EFS.NONE, null);
+			assertEquals(2, children.length);
+
+			process = Runtime.getRuntime().exec( new String[] { "rm", linkPath.toPortableString() } );
+			process.waitFor();
+			process.destroy();	
+
 		}
 	}
 }
