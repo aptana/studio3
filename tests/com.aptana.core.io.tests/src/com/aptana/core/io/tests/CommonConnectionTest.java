@@ -120,6 +120,10 @@ public abstract class CommonConnectionTest extends BaseConnectionTest
 		{
 
 		}
+		catch (OperationCanceledException e)
+		{
+
+		}
 		cp.disconnect(null);
 		ftpcp.setHost(oldHost);
 
@@ -670,11 +674,6 @@ public abstract class CommonConnectionTest extends BaseConnectionTest
 		}
 	}
 
-	protected boolean supportsSetModificationTime()
-	{
-		return supportsSetModificationTime;
-	}
-
 	public final void testPutInfoFileBase() throws CoreException, IOException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/file.txt")); //$NON-NLS-1$
@@ -728,10 +727,6 @@ public abstract class CommonConnectionTest extends BaseConnectionTest
 		assertEquals(lastModified, fi.getLastModified());
 	}
 
-	protected boolean supportsChangePermissions()
-	{
-		return supportsChangePermissions;
-	}
 
 	public final void testPutInfoPermissions() throws CoreException, IOException
 	{
@@ -761,10 +756,6 @@ public abstract class CommonConnectionTest extends BaseConnectionTest
 		assertEquals(permissions, fi.getPermissions());
 	}
 
-	protected boolean supportsChangeGroup()
-	{
-		return supportsChangeGroup;
-	}
 
 	public final void testPutInfoGroup() throws CoreException, IOException
 	{
@@ -1207,9 +1198,10 @@ public abstract class CommonConnectionTest extends BaseConnectionTest
 		String targetName = "symlinkTargetFolder";
 		String linkName = "symlinkFolder";
 		
-		if(remoteFileDirectory != null) {
-			Path targetPath = (Path)new Path(remoteFileDirectory).append(testPath).append("/" + targetName);
-			Path linkPath = (Path)new Path(remoteFileDirectory).append(testPath).append("/" + linkName);
+		if(getRemoteFileDirectory() != null && cp instanceof IBaseRemoteConnectionPoint) {
+			IBaseRemoteConnectionPoint brcp = (IBaseRemoteConnectionPoint)cp;
+			Path targetPath = (Path)new Path(getRemoteFileDirectory()).append(brcp.getPath()).append(testPath).append("/" + targetName);
+			Path linkPath = (Path)new Path(getRemoteFileDirectory()).append(brcp.getPath()).append(testPath).append("/" + linkName);
 
 			// create target folder
 			File target = new File(targetPath.toPortableString());

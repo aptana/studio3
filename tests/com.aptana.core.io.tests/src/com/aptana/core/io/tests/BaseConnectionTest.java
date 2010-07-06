@@ -56,11 +56,6 @@ import com.aptana.ide.core.io.IConnectionPoint;
  */
 public abstract class BaseConnectionTest extends TestCase
 {
-	protected boolean supportsSetModificationTime = false;
-	protected boolean supportsChangeGroup = false;
-	protected boolean supportsChangePermissions = false;
-	protected String remoteFileDirectory = null; //actual path to the remote filesystem (if remote system can  be accesses via file:// protocol). You must have write privledges to this.
-
 	protected static final String TEXT = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse nunc tellus, condimentum quis luctus fermentum, tincidunt eget dui. Sed bibendum iaculis ligula, fringilla ullamcorper justo ullamcorper non. Curabitur tristique mi a magna vestibulum fermentum. Praesent sed neque feugiat purus egestas tristique. Sed non nisi velit. Maecenas placerat, nisi quis iaculis porta, nisi mauris facilisis est, at rutrum lacus sem non ante. Morbi et cursus nibh. Aliquam tincidunt urna quis quam semper ut congue est auctor. Curabitur malesuada, diam ut congue elementum, orci eros rhoncus felis, vel elementum felis velit id eros. Quisque eros diam, malesuada nec tincidunt eget, gravida iaculis tortor. Donec sollicitudin ultricies ante ac facilisis. In egestas malesuada erat id vehicula.\n" + //$NON-NLS-1$
 			"Integer non urna nunc, et rhoncus eros. Suspendisse tincidunt laoreet enim vel pretium. Nam bibendum sodales risus nec adipiscing. Pellentesque fringilla interdum odio posuere consectetur. Nullam venenatis augue sed felis tempus eu posuere quam facilisis. Pellentesque commodo rutrum bibendum. Ut sit amet sapien in purus vestibulum sodales. Integer pharetra mi in dui auctor in tristique erat malesuada. Integer nec ipsum quam. Quisque non enim et quam consequat mollis id ac sem. Nunc ut elit ac odio adipiscing pretium vel eget mauris. Aenean diam diam, porttitor sit amet lobortis a, accumsan at ante. Phasellus ut nulla enim. In nec diam magna. In molestie vulputate viverra. Etiam at justo tellus, sed rutrum erat.\r\n" //$NON-NLS-1$
 			+ "Duis consectetur ornare ante, sit amet ultricies leo aliquam vitae. In fermentum nisi non dolor viverra non hendrerit nulla malesuada. Mauris adipiscing aliquet fringilla. Curabitur porttitor tristique massa, et semper nulla semper et. Phasellus a ipsum eu lectus pulvinar aliquam eget viverra velit. Sed commodo ultrices pulvinar. In at felis sollicitudin lorem semper scelerisque. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin vel purus id odio malesuada gravida. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Quisque metus mi, eleifend consectetur varius vitae, euismod eget nulla. Morbi justo felis, accumsan vel tempor non, rutrum at augue. Curabitur nulla lorem, ultricies a lobortis in, semper vitae diam. Pellentesque nec orci non turpis dignissim mollis. Quisque quis sapien vitae ligula iaculis dapibus sed at quam. Nullam ut nisl id eros sagittis rutrum a vitae risus. Suspendisse lacinia lacinia rutrum. Fusce molestie pellentesque dapibus. Quisque eu orci dolor, eget venenatis velit.\n" //$NON-NLS-1$
@@ -144,4 +139,25 @@ public abstract class BaseConnectionTest extends TestCase
 			}
 		}
 	}
+	
+	protected boolean supportsSetModificationTime()
+	{
+		return false;
+	}
+
+	protected boolean supportsChangePermissions()
+	{
+		return false;
+	}
+
+	protected boolean supportsChangeGroup()
+	{
+		return false;
+	}
+
+	protected String getRemoteFileDirectory()
+	{
+		return null;
+	}
+
 }

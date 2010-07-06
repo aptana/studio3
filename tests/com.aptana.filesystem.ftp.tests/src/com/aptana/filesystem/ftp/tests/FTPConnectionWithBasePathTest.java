@@ -71,14 +71,47 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 		initBasePath();
 		FTPConnectionPoint ftpcp = setupConnection();
 		ftpcp.setPath(Path.ROOT.append(getClass().getSimpleName()));
-		supportsSetModificationTime = Boolean.valueOf(getConfig()
-				.getProperty("ftp.supportsSetModificationTime", "true"));
-		supportsChangeGroup = Boolean.valueOf(getConfig().getProperty("ftp.supportsChangeGroup", "false"));
-		supportsChangePermissions = Boolean.valueOf(getConfig().getProperty("ftp.supportsChangePermissions", "true"));
 		cp = ftpcp;
 		super.setUp();
 	}
 
+	/* (non-Javadoc)
+	 * @see com.aptana.core.io.tests.BaseConnectionTest#getRemoteFileDirectory()
+	 */
+	@Override
+	protected String getRemoteFileDirectory()
+	{
+		return getConfig().getProperty("ftp.remoteFileDirectory", null);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.core.io.tests.BaseConnectionTest#supportsChangeGroup()
+	 */
+	@Override
+	protected boolean supportsChangeGroup()
+	{
+		return Boolean.valueOf(getConfig().getProperty("ftp.supportsChangeGroup", "false"));
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.core.io.tests.BaseConnectionTest#supportsChangePermissions()
+	 */
+	@Override
+	protected boolean supportsChangePermissions()
+	{
+		return Boolean.valueOf(getConfig().getProperty("ftp.supportsChangePermissions", "true"));
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.core.io.tests.BaseConnectionTest#supportsSetModificationTime()
+	 */
+	@Override
+	protected boolean supportsSetModificationTime()
+	{
+		return Boolean.valueOf(getConfig()
+				.getProperty("ftp.supportsSetModificationTime", "true"));
+	}
+	
 	@Override
 	protected void tearDown() throws Exception
 	{

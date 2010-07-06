@@ -55,10 +55,44 @@ public class SFTPConnectionTest extends CommonConnectionTest
 				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'})).toCharArray());
 		ftpcp.setPort(Integer.valueOf(getConfig().getProperty("sftp.port", "22"))); //$NON-NLS-1$ //$NON-NLS-2$
 		ftpcp.setPath(Path.fromPortableString(getConfig().getProperty("sftp.path","/home/ftpuser"))); //$NON-NLS-1$ //$NON-NLS-2$
-		supportsSetModificationTime = Boolean.valueOf(getConfig().getProperty("sftp.supportsSetModificationTime", "true"));
-		supportsChangeGroup = Boolean.valueOf(getConfig().getProperty("sftp.supportsChangeGroup", "false"));
-		supportsChangePermissions = Boolean.valueOf(getConfig().getProperty("sftp.supportsChangePermissions", "true"));
 		cp = ftpcp;
 		super.setUp();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.core.io.tests.BaseConnectionTest#getRemoteFileDirectory()
+	 */
+	@Override
+	protected String getRemoteFileDirectory()
+	{
+		return getConfig().getProperty("sftp.remoteFileDirectory", null);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.core.io.tests.BaseConnectionTest#supportsChangeGroup()
+	 */
+	@Override
+	protected boolean supportsChangeGroup()
+	{
+		return Boolean.valueOf(getConfig().getProperty("sftp.supportsChangeGroup", "false"));
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.core.io.tests.BaseConnectionTest#supportsChangePermissions()
+	 */
+	@Override
+	protected boolean supportsChangePermissions()
+	{
+		return Boolean.valueOf(getConfig().getProperty("sftp.supportsChangePermissions", "true"));
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.core.io.tests.BaseConnectionTest#supportsSetModificationTime()
+	 */
+	@Override
+	protected boolean supportsSetModificationTime()
+	{
+		return Boolean.valueOf(getConfig()
+				.getProperty("sftp.supportsSetModificationTime", "true"));
 	}
 }
