@@ -301,19 +301,29 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSConstructNode node)
 	{
-		IParseNode child = node.getChild(0);
-
-		// TEMP: for debugging
-		String name = child.getText();
-		List<JSNode> symbolNodes = this._scope.getSymbol(name);
-
-		for (JSNode symbolNode : symbolNodes)
+		IParseNode child = node.getIdentifier();
+		
+		if (child instanceof JSNode)
 		{
-			if (symbolNode instanceof JSFunctionNode)
+			JSReferenceWalker walker = this.createReferenceWalker();
+			
+			((JSNode) child).accept(walker);
+			
+			String methodName = walker.getPropertyName();
+			
+			for (TypeElement type : walker.getTypes())
 			{
-				List<String> returnTypes = ((JSFunctionNode) symbolNode).getReturnTypes();
-
-				this.addTypes(returnTypes);
+				String typeName = type.getName();
+				
+				FunctionElement function = this._indexHelper.getTypeMethod(this._index, typeName, methodName, EnumSet.of(FieldSelector.RETURN_TYPES));
+				
+				if (function != null)
+				{
+					for (String returnType : function.getTypeNames())
+					{
+						this.addType(returnType);
+					}
+				}
 			}
 		}
 	}
