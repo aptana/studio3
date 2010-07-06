@@ -50,6 +50,7 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
@@ -149,12 +150,14 @@ public final class EFSUtils
 
 	/**
 	 * Returns the path of this file relative to the parent
-	 * 
 	 * @param file
+	 * @param obsoleted TODO
+	 * 
 	 * @return
 	 * @throws CoreException
+	 * @deprecated
 	 */
-	public static String getRelativePath(IFileStore parent, IFileStore file)
+	public static String getRelativePath(IFileStore parent, IFileStore file, Object obsoleted)
 	{
 		if (parent.equals(file) || parent.isParentOf(file))
 		{
@@ -175,7 +178,7 @@ public final class EFSUtils
 	 */
 	public static IFileStore createFile(IFileStore sourceRoot, IFileStore sourceStore, IFileStore destinationRoot)
 	{
-		String relativePath = getRelativePath(sourceRoot, sourceStore);
+		String relativePath = getRelativePath(sourceRoot, sourceStore, null);
 		if (relativePath != null)
 		{
 			return destinationRoot.getFileStore(new Path(relativePath));
@@ -185,16 +188,18 @@ public final class EFSUtils
 
 	/**
 	 * Returns the parent file of this file
-	 * 
 	 * @param file
+	 * @param obsoleted TODO
+	 * 
 	 * @return
 	 * @throws CoreException
+	 * @deprecated
 	 */
-	public static String getRelativePath(IConnectionPoint point, IFileStore file)
+	public static String getRelativePath(IConnectionPoint point, IFileStore file, Object obsoleted)
 	{
 		try
 		{
-			return getRelativePath(point.getRoot(), file);
+			return getRelativePath(point.getRoot(), file, obsoleted);
 		}
 		catch (CoreException e)
 		{
@@ -380,4 +385,36 @@ public final class EFSUtils
 		}
 		return false;
 	}
+	
+	/*
+	 * TODO: cleanup everything above
+	 */
+
+	
+	/**
+	 * getRelativePath
+	 * @param connectionPoint
+	 * @param fileStore
+	 * @return
+	 * @throws CoreException
+	 */
+	public static IPath getRelativePath(IConnectionPoint connectionPoint, IFileStore fileStore) throws CoreException {
+		return getRelativePath(connectionPoint.getRoot(), fileStore);
+	}
+	
+	/**
+	 * getRelativePath
+	 * @param parentFileStore
+	 * @param childFileStore
+	 * @return
+	 */
+	public static IPath getRelativePath(IFileStore parentFileStore, IFileStore childFileStore) {
+		if (parentFileStore.isParentOf(childFileStore)) {
+			IPath parentPath = Path.fromPortableString(parentFileStore.toURI().getPath());
+			IPath childPath = Path.fromPortableString(childFileStore.toURI().getPath());
+			return childPath.makeRelativeTo(parentPath);
+		}
+		return null;
+	}
+
 }
