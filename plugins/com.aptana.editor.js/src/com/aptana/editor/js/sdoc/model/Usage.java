@@ -37,7 +37,7 @@ public enum Usage
 	{
 		this._name = name;
 	}
-	
+
 	/**
 	 * fromName
 	 * 
@@ -47,10 +47,10 @@ public enum Usage
 	public static Usage fromName(String name)
 	{
 		Usage result = NAME_MAP.get(name);
-		
+
 		return (result != null) ? result : UNKNOWN;
 	}
-	
+
 	/**
 	 * getName
 	 * 

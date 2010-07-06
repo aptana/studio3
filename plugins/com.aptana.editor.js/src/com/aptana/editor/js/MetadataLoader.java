@@ -24,10 +24,10 @@ public class MetadataLoader extends Job
 	public MetadataLoader()
 	{
 		super("Loading JS metadata...");
-		
+
 		setPriority(Job.LONG);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
@@ -62,7 +62,7 @@ public class MetadataLoader extends Job
 	private void loadMetadata(IProgressMonitor monitor, JSIndexWriter indexer, String... resources)
 	{
 		SubMonitor subMonitor = SubMonitor.convert(monitor, resources.length);
-		
+
 		for (String resource : resources)
 		{
 			URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(resource), null);
@@ -92,7 +92,7 @@ public class MetadataLoader extends Job
 				finally
 				{
 					subMonitor.worked(1);
-					
+
 					if (stream != null)
 					{
 						try

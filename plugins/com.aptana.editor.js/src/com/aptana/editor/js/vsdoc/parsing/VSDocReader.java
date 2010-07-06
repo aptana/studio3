@@ -119,7 +119,7 @@ public class VSDocReader extends MetadataReader
 
 		this._tags.add(new SeeTag(type));
 	}
-	
+
 	/**
 	 * process returns element
 	 * 

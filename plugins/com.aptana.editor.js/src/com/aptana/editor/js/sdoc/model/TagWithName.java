@@ -26,14 +26,15 @@ public abstract class TagWithName extends Tag
 		return this._name;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.sdoc.model.Tag#toSource(com.aptana.parsing.io.SourceWriter)
 	 */
 	@Override
 	public void toSource(SourcePrinter writer)
 	{
 		TagType type = this.getType();
-		
+
 		if (type == TagType.UNKNOWN)
 		{
 			writer.print(this._name);
@@ -42,9 +43,9 @@ public abstract class TagWithName extends Tag
 		{
 			writer.print(type.toString()).print(" {").print(this._name).print("}");
 		}
-		
+
 		String text = this.getText();
-		
+
 		if (text != null && text.isEmpty() == false)
 		{
 			writer.print(" ").print(text);

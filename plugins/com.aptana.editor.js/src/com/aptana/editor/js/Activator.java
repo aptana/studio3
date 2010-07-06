@@ -36,7 +36,7 @@ public class Activator extends AbstractUIPlugin
 	{
 		super.start(context);
 		plugin = this;
-		
+
 		Job job = new MetadataLoader();
 		job.schedule();
 	}

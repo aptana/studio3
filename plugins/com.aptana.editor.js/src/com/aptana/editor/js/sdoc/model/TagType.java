@@ -21,9 +21,9 @@ public enum TagType
 	SEE("@see"),
 	TYPE("@type"),
 	UNKNOWN("@<???>");
-	
+
 	private String _name;
-	
+
 	/**
 	 * TagType
 	 * 
@@ -33,7 +33,7 @@ public enum TagType
 	{
 		this._name = name;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Enum#toString()

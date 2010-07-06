@@ -49,7 +49,7 @@ public abstract class Tag extends Symbol
 	{
 		return this._type;
 	}
-	
+
 	/**
 	 * toSource
 	 * 
@@ -58,14 +58,14 @@ public abstract class Tag extends Symbol
 	public String toSource()
 	{
 		SourcePrinter writer = new SourcePrinter();
-		
+
 		this.toSource(writer);
-		
+
 		writer.println();
-		
+
 		return writer.toString();
 	}
-	
+
 	/**
 	 * toSource
 	 * 
@@ -74,7 +74,7 @@ public abstract class Tag extends Symbol
 	public void toSource(SourcePrinter writer)
 	{
 		writer.print(this._type.toString());
-		
+
 		if (this._text != null && this._text.isEmpty() == false)
 		{
 			writer.print(" ").print(this._text);

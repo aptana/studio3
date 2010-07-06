@@ -284,8 +284,7 @@ public class JSTokenScanner extends JSCodeScanner implements IJSTokenScanner
 			if (isWordStart(c) || c == '.')
 				return true;
 			char lower = Character.toLowerCase(c);
-			return lower == 'a' || lower == 'b' || lower == 'c' || lower == 'd' || lower == 'e' || lower == 'f'
-					|| lower == 'x';
+			return lower == 'a' || lower == 'b' || lower == 'c' || lower == 'd' || lower == 'e' || lower == 'f' || lower == 'x';
 		}
 	}
 

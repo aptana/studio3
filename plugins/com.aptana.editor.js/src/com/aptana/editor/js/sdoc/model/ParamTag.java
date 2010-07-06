@@ -7,17 +7,17 @@ import com.aptana.parsing.io.SourcePrinter;
 public class ParamTag extends TagWithTypes
 {
 	private Parameter _parameter;
-	
+
 	/**
 	 * ParamTag
 	 */
 	public ParamTag(Parameter parameter, List<Type> types, String text)
 	{
 		super(TagType.PARAM, types, text);
-		
+
 		this._parameter = parameter;
 	}
-	
+
 	/**
 	 * getName
 	 * 
@@ -27,7 +27,7 @@ public class ParamTag extends TagWithTypes
 	{
 		return this._parameter.getName();
 	}
-	
+
 	/**
 	 * getUsage
 	 * 
@@ -37,7 +37,7 @@ public class ParamTag extends TagWithTypes
 	{
 		return this._parameter.getUsage();
 	}
-	
+
 	/**
 	 * toSource
 	 * 
@@ -46,7 +46,7 @@ public class ParamTag extends TagWithTypes
 	public void toSource(SourcePrinter writer)
 	{
 		writer.print(this.getType().toString());
-		
+
 		boolean first = true;
 		writer.print(" {");
 		for (Type type : this.getTypes())
@@ -59,15 +59,15 @@ public class ParamTag extends TagWithTypes
 			{
 				first = false;
 			}
-			
+
 			type.toSource(writer);
 		}
 		writer.print("} ");
-		
+
 		this._parameter.toSource(writer);
-		
+
 		String text = this.getText();
-		
+
 		if (text != null && text.isEmpty() == false)
 		{
 			writer.println();

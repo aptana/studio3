@@ -49,7 +49,7 @@ public class Parameter extends Symbol
 	{
 		this._usage = usage;
 	}
-	
+
 	/**
 	 * toSource
 	 * 
@@ -58,12 +58,12 @@ public class Parameter extends Symbol
 	public String toSource()
 	{
 		SourcePrinter writer = new SourcePrinter();
-		
+
 		this.toSource(writer);
-		
+
 		return writer.toString();
 	}
-	
+
 	/**
 	 * toSource
 	 * 
@@ -76,15 +76,15 @@ public class Parameter extends Symbol
 			case REQUIRED:
 				writer.print(this._name);
 				break;
-				
+
 			case OPTIONAL:
 				writer.print("[").print(this._name).print("]");
 				break;
-				
+
 			case ONE_OR_MORE:
 				writer.print("...");
 				break;
-				
+
 			case ZERO_OR_MORE:
 				writer.print("[...]");
 				break;

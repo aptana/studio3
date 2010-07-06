@@ -7,9 +7,9 @@ import beaver.Symbol;
 public class Type extends Symbol
 {
 	public static final Type OBJECT_TYPE = new Type("Object");
-	
+
 	private String _name;
-	
+
 	/**
 	 * Type
 	 * 
@@ -19,7 +19,7 @@ public class Type extends Symbol
 	{
 		this._name = name;
 	}
-	
+
 	/**
 	 * getName
 	 * 
@@ -29,7 +29,7 @@ public class Type extends Symbol
 	{
 		return this._name;
 	}
-	
+
 	/**
 	 * toSource
 	 * 
@@ -38,12 +38,12 @@ public class Type extends Symbol
 	public String toSource()
 	{
 		SourcePrinter writer = new SourcePrinter();
-		
+
 		this.toSource(writer);
-		
+
 		return writer.toString();
 	}
-	
+
 	/**
 	 * toSource
 	 * 

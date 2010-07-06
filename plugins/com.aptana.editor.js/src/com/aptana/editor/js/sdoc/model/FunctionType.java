@@ -9,7 +9,7 @@ public class FunctionType extends Type
 {
 	private List<Type> _parameterTypes = new LinkedList<Type>();
 	private List<Type> _returnTypes = new LinkedList<Type>();
-	
+
 	/**
 	 * FunctionType
 	 */
@@ -17,7 +17,7 @@ public class FunctionType extends Type
 	{
 		super("Function");
 	}
-	
+
 	/**
 	 * addParameterType
 	 * 
@@ -30,7 +30,7 @@ public class FunctionType extends Type
 			this._parameterTypes.add(parameterType);
 		}
 	}
-	
+
 	/**
 	 * addReturnType
 	 * 
@@ -43,7 +43,7 @@ public class FunctionType extends Type
 			this._returnTypes.add(returnType);
 		}
 	}
-	
+
 	/**
 	 * getReturnTypes
 	 * 
@@ -53,7 +53,7 @@ public class FunctionType extends Type
 	{
 		return this._returnTypes;
 	}
-	
+
 	/**
 	 * toSource
 	 * 
@@ -62,15 +62,15 @@ public class FunctionType extends Type
 	public void toSource(SourcePrinter writer)
 	{
 		writer.print("Function");
-		
+
 		boolean first;
-		
+
 		if (this._parameterTypes.isEmpty() == false)
 		{
 			first = true;
-			
+
 			writer.print("(");
-			
+
 			for (Type type : this._parameterTypes)
 			{
 				if (first == false)
@@ -81,24 +81,24 @@ public class FunctionType extends Type
 				{
 					first = false;
 				}
-				
+
 				type.toSource(writer);
 			}
-			
+
 			writer.print(")");
 		}
-		
+
 		if (this._returnTypes.isEmpty() == false)
 		{
 			first = true;
-			
+
 			writer.print("->");
-			
+
 			if (this._returnTypes.size() > 1)
 			{
 				writer.print("(");
 			}
-			
+
 			for (Type type : this._returnTypes)
 			{
 				if (first == false)
@@ -109,10 +109,10 @@ public class FunctionType extends Type
 				{
 					first = false;
 				}
-				
+
 				type.toSource(writer);
 			}
-			
+
 			if (this._returnTypes.size() > 1)
 			{
 				writer.print(")");
