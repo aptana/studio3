@@ -495,35 +495,7 @@ public class JSTypeWalker extends JSTreeWalker
 	{
 		IParseNode child = node.getExpression();
 		
-		if (child instanceof JSIdentifierNode)
-		{
-			String name = child.getText();
-			
-			PropertyElement function = this._indexHelper.getGlobalFunction(this._index, name, EnumSet.of(FieldSelector.RETURN_TYPES));
-			
-			if (function != null)
-			{
-				for (String type : function.getTypeNames())
-				{
-					this.addType(type);
-				}
-			}
-			
-//			// lookup in local scope
-//			if (this._scope != null && this._scope.hasSymbol(name))
-//			{
-//				List<JSNode> symbolNodes = this._scope.getSymbol(name);
-//		
-//				for (JSNode symbolNode : symbolNodes)
-//				{
-//					if (symbolNode instanceof JSFunctionNode)
-//					{
-//						this.addTypes(((JSFunctionNode) symbolNode).getReturnTypes());
-//					}
-//				}
-//			}
-		}
-		else if (child instanceof JSNode)
+		if (child instanceof JSNode)
 		{
 			JSReferenceWalker walker = this.createReferenceWalker();
 			
