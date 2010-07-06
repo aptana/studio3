@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -223,7 +224,9 @@ public class CommandBlockRunner extends AbstractCommandRunner
 				{
 					result = result.inspect();
 				}
-				resultText = result.asString().asJavaString();
+				// Fix for RR3-677 - Incorrect transformation for non-latin characters after #rrinclude HTML
+				// We take the raw bytes returned and force to a UTF-8 String, vs ASCII default.
+				resultText = new String(result.asString().getByteList().getUnsafeBytes(), Charset.forName("UTF-8")); //$NON-NLS-1$
 			}
 		}
 		catch (RaiseException e)
