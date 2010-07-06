@@ -1,5 +1,6 @@
 package com.aptana.theme.internal;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -95,7 +96,7 @@ public class ControlThemerFactory implements IControlThemerFactory
 	{
 		synchronized (themers)
 		{
-			for (Control control : themers.keySet())
+			for (Control control : new ArrayList<Control>(themers.keySet()))
 			{
 				dispose(control);
 			}

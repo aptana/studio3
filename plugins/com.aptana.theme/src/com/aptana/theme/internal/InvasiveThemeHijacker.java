@@ -223,7 +223,8 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		{
 			ContentOutline outline = (ContentOutline) view;
 			IPage page = outline.getCurrentPage();
-			if (page.getClass().getName().endsWith("CommonOutlinePage"))
+			String name = page.getClass().getName();
+            if (name.endsWith("CommonOutlinePage") || name.endsWith("PyOutlinePage"))
 				return; // we already handle our own outlines
 			Control control = page.getControl();
 			if (control instanceof PageBook)

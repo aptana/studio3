@@ -28,10 +28,10 @@ class PathFilter extends ViewerFilter
 {
 
 	private static Object[] EMPTY = new Object[0];
-	
+
 	private StringMatcher singularMatcher;
 	private StringMatcher pluralMatcher;
-	
+
 	/*
 	 * Cache of filtered elements in the tree
 	 */
@@ -70,8 +70,24 @@ class PathFilter extends ViewerFilter
 		IPath path = resource.getProjectRelativePath();
 		String rawPath = path.toPortableString();
 
+		// HACK Ignore tmp and vendor for Rails projects
+		try
+		{
+			if (resource.getProject().hasNature("org.radrails.rails.core.railsnature") //$NON-NLS-1$
+					&& (rawPath.startsWith("tmp/") || rawPath.startsWith("vendor/"))) //$NON-NLS-1$ //$NON-NLS-2$
+			{
+				return false;
+			}
+		}
+		catch (CoreException e)
+		{
+			ExplorerPlugin.logError(e);
+		}
+
 		if (match(rawPath))
+		{
 			return true;
+		}
 
 		// Otherwise check if any of the words of the text matches
 		String[] words = getWords(rawPath);
@@ -102,7 +118,8 @@ class PathFilter extends ViewerFilter
 		// check if the resource is included by the filtered file or vise versa
 		if (queryResults == null)
 		{
-			// FIXME We should have a search API layer over the top of this and shouldn't be hitting indices directly. Pass a scope object to the search API and it calculates what indices to search within!
+			// FIXME We should have a search API layer over the top of this and shouldn't be hitting indices directly.
+			// Pass a scope object to the search API and it calculates what indices to search within!
 			queryResults = new ArrayList<QueryResult>();
 			Index index = IndexManager.getInstance().getIndex(resource.getProject().getLocationURI());
 			try

@@ -35,7 +35,10 @@
 
 package com.aptana.editor.common;
 
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.TypedPosition;
+import org.eclipse.jface.text.TypedRegion;
 import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.jface.text.rules.IPartitionTokenScanner;
 
@@ -51,6 +54,19 @@ public class ExtendedFastPartitioner extends FastPartitioner implements IExtende
 	 */
 	public ExtendedFastPartitioner(IPartitionTokenScanner scanner, String[] legalContentTypes) {
 		super(scanner, legalContentTypes);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.FastPartitioner#getPartition(int, boolean)
+	 */
+	@Override
+	public ITypedRegion getPartition(int offset, boolean preferOpenPartitions) {
+		// let the last offset partition be the same as preceding
+		ITypedRegion region = super.getPartition(offset, preferOpenPartitions);
+		if (region.getOffset() == fDocument.getLength() && region.getType().equals(IDocument.DEFAULT_CONTENT_TYPE)) {
+			region = new TypedRegion(region.getOffset(), region.getLength(), getPartition(region.getOffset()-1).getType());
+		}
+		return region;
 	}
 
 	/* (non-Javadoc)
