@@ -52,11 +52,11 @@ public class JSNode extends ParseNode
 	/**
 	 * JSNode
 	 */
-	public JSNode()
+	protected JSNode()
 	{
 		this(DEFAULT_TYPE);
 	}
-
+	
 	/**
 	 * JSNode
 	 * 
@@ -65,7 +65,7 @@ public class JSNode extends ParseNode
 	 * @param end
 	 * @param children
 	 */
-	public JSNode(short type, JSNode... children)
+	protected JSNode(short type, JSNode... children)
 	{
 		super(IJSParserConstants.LANGUAGE);
 
