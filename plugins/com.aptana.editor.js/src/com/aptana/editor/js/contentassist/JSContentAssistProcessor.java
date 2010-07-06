@@ -567,29 +567,21 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	LocationType getLocation(LexemeProvider<JSTokenType> lexemeProvider, int offset)
 	{
 		LocationType result = LocationType.UNKNOWN;
+		IParseNode ast = this.getAST();
 		
-		if (Platform.inDevelopmentMode())
+		if (ast instanceof JSParseRootNode)
 		{
-			IParseNode ast = this.getAST();
+			JSLocationWalker walker = new JSLocationWalker(offset);
 			
-			if (ast instanceof JSParseRootNode)
-			{
-				JSLocationWalker walker = new JSLocationWalker(offset);
-				
-				((JSParseRootNode) ast).accept(walker);
-				
-				result = walker.getType();
-			}
-		}
-		else
-		{
-			result = this.getLocationByAST(lexemeProvider, offset);
+			((JSParseRootNode) ast).accept(walker);
 			
-//			if (result == Location.ERROR)
-//			{
-//				result = this.getLocationByLexeme(lexemeProvider, offset);
-//			}
+			result = walker.getType();
 		}
+		
+//		if (result == Location.UNKNOWN)
+//		{
+//			result = this.getLocationByLexeme(lexemeProvider, offset);
+//		}
 		
 		return result;
 	}
