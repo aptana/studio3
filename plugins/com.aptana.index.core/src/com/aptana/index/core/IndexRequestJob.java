@@ -181,10 +181,18 @@ abstract class IndexRequestJob extends Job
 		return null;
 	}
 
-	private boolean hasType(IFileStore store, Set<IContentType> types)
+	protected boolean hasType(IFileStore store, Set<IContentType> types)
 	{
+		if (types == null || types.isEmpty())
+		{
+			return false;
+		}
 		for (IContentType type : types)
 		{
+			if (type == null)
+			{
+				continue;
+			}
 			if (type.isAssociatedWith(store.getName()))
 			{
 				return true;
