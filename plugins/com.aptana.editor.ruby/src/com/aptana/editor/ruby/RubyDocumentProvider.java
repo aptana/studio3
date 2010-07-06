@@ -62,7 +62,7 @@ public class RubyDocumentProvider extends CommonDocumentProvider
 		}
 	}
 
-	protected String getDefaultContentType()
+	protected String getDefaultContentType(String filename)
 	{
 		return IRubyConstants.CONTENT_TYPE_RUBY;
 	}

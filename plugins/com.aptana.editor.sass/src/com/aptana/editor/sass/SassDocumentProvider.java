@@ -62,7 +62,7 @@ public class SassDocumentProvider extends CommonDocumentProvider
 		}
 	}
 
-	protected String getDefaultContentType()
+	protected String getDefaultContentType(String filename)
 	{
 		return ISassConstants.CONTENT_TYPE_SASS;
 	}
