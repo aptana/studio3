@@ -1033,7 +1033,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		
 		if (global != null)
 		{
-			result = global.getScopeAtOffset(offset);
+			Scope<JSNode> candidate = global.getScopeAtOffset(offset);
+			
+			result = (candidate != null) ? candidate : global;
 		}
 		
 		return result;
