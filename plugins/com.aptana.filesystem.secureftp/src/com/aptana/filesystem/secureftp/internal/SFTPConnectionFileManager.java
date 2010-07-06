@@ -60,7 +60,6 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 
-import com.aptana.filesystem.ftp.IFTPConstants;
 import com.aptana.filesystem.ftp.Policy;
 import com.aptana.filesystem.ftp.internal.BaseFTPConnectionFileManager;
 import com.aptana.filesystem.ftp.internal.ExpiringMap;
@@ -145,35 +144,6 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 		ftpClient.setValidator(new SSHHostValidator());
 	}
 
-	/**
-	 * Returns the transfer type of the connection
-	 * 
-	 * @return
-	 */
-	public String getTransferType()
-	{
-		if(ftpClient != null) {
-			return (ftpClient.getType().equals(FTPTransferType.ASCII) ? IFTPConstants.TRANSFER_TYPE_ASCII.toString()
-					: IFTPConstants.TRANSFER_TYPE_BINARY.toString());			
-		} else {
-			return transferType;
-		}
-	}
-
-	/**
-	 * Sets the transfer type of the connection
-	 * 
-	 * @param transferType
-	 */
-	public void setTransferType(String transferType)
-	{
-		this.transferType = transferType;
-		if(ftpClient != null) {
-			ftpClient.setType(ISFTPConstants.TRANSFER_TYPE_ASCII.equals(transferType)
-					? FTPTransferType.ASCII : FTPTransferType.BINARY);
-		}
-	}
-	
 	/* (non-Javadoc)
 	 * @see com.aptana.ide.core.io.vfs.IConnectionFileManager#connect(org.eclipse.core.runtime.IProgressMonitor)
 	 */

@@ -45,6 +45,7 @@ import com.aptana.filesystem.secureftp.SFTPConnectionPoint;
  */
 public class SFTPConnectionTest extends CommonConnectionTest
 {
+
 	@Override
 	protected void setUp() throws Exception
 	{
@@ -60,39 +61,31 @@ public class SFTPConnectionTest extends CommonConnectionTest
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.core.io.tests.BaseConnectionTest#getRemoteFileDirectory()
-	 */
-	@Override
-	protected String getRemoteFileDirectory()
-	{
-		return getConfig().getProperty("sftp.remoteFileDirectory", null);
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.core.io.tests.BaseConnectionTest#supportsChangeGroup()
-	 */
-	@Override
-	protected boolean supportsChangeGroup()
-	{
-		return Boolean.valueOf(getConfig().getProperty("sftp.supportsChangeGroup", "false"));
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.core.io.tests.BaseConnectionTest#supportsChangePermissions()
-	 */
-	@Override
-	protected boolean supportsChangePermissions()
-	{
-		return Boolean.valueOf(getConfig().getProperty("sftp.supportsChangePermissions", "true"));
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.core.io.tests.BaseConnectionTest#supportsSetModificationTime()
+	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsSetModificationTime()
 	 */
 	@Override
 	protected boolean supportsSetModificationTime()
 	{
-		return Boolean.valueOf(getConfig()
-				.getProperty("sftp.supportsSetModificationTime", "true"));
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangeGroup()
+	 */
+	@Override
+	protected boolean supportsChangeGroup()
+	{
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangePermissions()
+	 */
+	@Override
+	protected boolean supportsChangePermissions()
+	{
+		return true;
 	}
 }

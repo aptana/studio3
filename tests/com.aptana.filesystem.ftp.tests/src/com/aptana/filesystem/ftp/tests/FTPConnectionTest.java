@@ -35,16 +35,54 @@
 
 package com.aptana.filesystem.ftp.tests;
 
+import com.aptana.core.io.tests.CommonConnectionTest;
 import com.aptana.filesystem.ftp.FTPConnectionPoint;
 
 /**
  * @author Max Stepanov
  */
-public class FTPConnectionTest extends FTPCommonConnectionTest
+public class FTPConnectionTest extends CommonConnectionTest
 {
+
 	@Override
-	public FTPConnectionPoint getConnectionPoint()
+	protected void setUp() throws Exception
 	{
-		return new FTPConnectionPoint();
+		FTPConnectionPoint ftpcp = new FTPConnectionPoint();
+		ftpcp.setHost(getConfig().getProperty("ftp.host", "10.10.1.60")); //$NON-NLS-1$ //$NON-NLS-2$
+		ftpcp.setLogin(getConfig().getProperty("ftp.username", "ftpuser")); //$NON-NLS-1$ //$NON-NLS-2$
+		ftpcp.setPassword(getConfig().getProperty("ftp.password",	//$NON-NLS-1$
+				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'})).toCharArray());
+		cp = ftpcp;
+		super.setUp();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsSetModificationTime()
+	 */
+	@Override
+	protected boolean supportsSetModificationTime()
+	{
+		return true;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangeGroup()
+	 */
+	@Override
+	protected boolean supportsChangeGroup()
+	{
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangePermissions()
+	 */
+	@Override
+	protected boolean supportsChangePermissions()
+	{
+		return true;
 	}
 }

@@ -82,8 +82,7 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 	private IResource resource;
 	private final IPath path;
 	private IFileStore localFileStore;
-	private static boolean refreshed = false;
-	
+
 	/**
 	 * 
 	 */
@@ -383,12 +382,6 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 	}
 	
 	private void ensureResource() throws CoreException {
-
-		if(!refreshed) {
-			workspaceRoot.refreshLocal(IResource.DEPTH_INFINITE, null);
-			refreshed = true;
-		}
-		
 		if (resource != null && (
 				!resource.isSynchronized(IResource.DEPTH_ZERO)
 				|| !resource.exists())) {
@@ -400,10 +393,9 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 			for (String name : path.segments()) {
 				if (res instanceof IContainer) {
 					IContainer container = (IContainer) res;
-					// [IM] commented out as it proves too expensive to compute on the fly. Needs revisiting.
-					// if (!container.isSynchronized(IResource.DEPTH_ONE)) {
-					// 	container.refreshLocal(IResource.DEPTH_ONE, new NullProgressMonitor());
-					// }
+					if (!container.isSynchronized(IResource.DEPTH_ONE)) {
+						container.refreshLocal(IResource.DEPTH_ONE, new NullProgressMonitor());
+					}
 					res = container.findMember(name);
 				} else {
 					res = null;

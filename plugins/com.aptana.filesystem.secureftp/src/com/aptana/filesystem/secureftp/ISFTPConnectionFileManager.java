@@ -41,9 +41,10 @@ import com.aptana.ide.core.io.vfs.IConnectionFileManager;
 
 /**
  * @author Max Stepanov
+ *
  */
-public interface ISFTPConnectionFileManager extends IConnectionFileManager
-{
-	public void init(String host, int port, IPath basePath, IPath keyFilePath, String login, char[] password,
-			String transferType, String encoding, String compression);
+public interface ISFTPConnectionFileManager extends IConnectionFileManager {
+
+	public void init(String host, int port, IPath basePath, IPath keyFilePath, String login, char[] password, String transferType, String encoding, String compression);
+	
 }

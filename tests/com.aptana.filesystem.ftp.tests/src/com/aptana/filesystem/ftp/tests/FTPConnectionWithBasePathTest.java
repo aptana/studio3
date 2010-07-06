@@ -55,9 +55,9 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 		FTPConnectionPoint ftpcp = new FTPConnectionPoint();
 		ftpcp.setHost(getConfig().getProperty("ftp.host", "10.10.1.60")); //$NON-NLS-1$ //$NON-NLS-2$
 		ftpcp.setLogin(getConfig().getProperty("ftp.username", "ftpuser")); //$NON-NLS-1$ //$NON-NLS-2$
-		ftpcp.setPassword(getConfig().getProperty("ftp.password", //$NON-NLS-1$
-				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n' })).toCharArray());
-
+		ftpcp.setPassword(getConfig().getProperty("ftp.password",	//$NON-NLS-1$
+				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'})).toCharArray());
+		
 		ConnectionContext context = new ConnectionContext();
 		context.put(ConnectionContext.COMMAND_LOG, System.out);
 		CoreIOPlugin.setConnectionContext(ftpcp, context);
@@ -75,46 +75,8 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 		super.setUp();
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.core.io.tests.BaseConnectionTest#getRemoteFileDirectory()
-	 */
 	@Override
-	protected String getRemoteFileDirectory()
-	{
-		return getConfig().getProperty("ftp.remoteFileDirectory", null);
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.core.io.tests.BaseConnectionTest#supportsChangeGroup()
-	 */
-	@Override
-	protected boolean supportsChangeGroup()
-	{
-		return Boolean.valueOf(getConfig().getProperty("ftp.supportsChangeGroup", "false"));
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.core.io.tests.BaseConnectionTest#supportsChangePermissions()
-	 */
-	@Override
-	protected boolean supportsChangePermissions()
-	{
-		return Boolean.valueOf(getConfig().getProperty("ftp.supportsChangePermissions", "true"));
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.core.io.tests.BaseConnectionTest#supportsSetModificationTime()
-	 */
-	@Override
-	protected boolean supportsSetModificationTime()
-	{
-		return Boolean.valueOf(getConfig()
-				.getProperty("ftp.supportsSetModificationTime", "true"));
-	}
-	
-	@Override
-	protected void tearDown() throws Exception
-	{
+	protected void tearDown() throws Exception {
 		super.tearDown();
 		cleanupBasePath();
 	}
@@ -145,5 +107,35 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 		}
 		ftpcp.disconnect(null);
 		assertFalse(ftpcp.isConnected());
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsSetModificationTime()
+	 */
+	@Override
+	protected boolean supportsSetModificationTime()
+	{
+		return true;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangeGroup()
+	 */
+	@Override
+	protected boolean supportsChangeGroup()
+	{
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangePermissions()
+	 */
+	@Override
+	protected boolean supportsChangePermissions()
+	{
+		return true;
 	}
 }
