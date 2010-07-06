@@ -9,6 +9,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
@@ -37,6 +38,7 @@ public class MetadataLoader extends Job
 		JSIndexWriter indexer = new JSIndexWriter();
 		
 		this.loadMetadata(
+			monitor,
 			indexer,
 			"/metadata/js_core.xml", //$NON-NLS-1$
 			"/metadata/dom_0.xml", //$NON-NLS-1$
@@ -53,10 +55,14 @@ public class MetadataLoader extends Job
 	/**
 	 * loadMetadata
 	 * 
+	 * @param monitor
+	 * @param indexer
 	 * @param resources
 	 */
-	private void loadMetadata(JSIndexWriter indexer, String... resources)
+	private void loadMetadata(IProgressMonitor monitor, JSIndexWriter indexer, String... resources)
 	{
+		SubMonitor subMonitor = SubMonitor.convert(monitor, resources.length);
+		
 		for (String resource : resources)
 		{
 			URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(resource), null);
@@ -85,6 +91,8 @@ public class MetadataLoader extends Job
 				}
 				finally
 				{
+					subMonitor.worked(1);
+					
 					if (stream != null)
 					{
 						try
