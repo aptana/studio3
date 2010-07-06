@@ -424,14 +424,11 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 		// first step is to determine where we are
 		LocationType location = this.getLocation(lexemeProvider, offset);
-
+		
 		switch (location)
 		{
 			case IN_PROPERTY_NAME:
-				if (Platform.inDevelopmentMode())
-				{
-					this.addProperties(result, offset);
-				}
+				this.addProperties(result, offset);
 				break;
 				
 			case IN_VARIABLE_NAME:
