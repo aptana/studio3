@@ -222,7 +222,10 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				if (typeList != null)
 				{
 					// TEMP: Show types for debugging info
-					System.out.println("types: " + StringUtil.join(", ", typeList));
+					if (Platform.inDevelopmentMode())
+					{
+						System.out.println("types: " + StringUtil.join(", ", typeList));
+					}
 					
 					// add all properties of each type to our proposal list
 					for (String type : typeList)
@@ -233,7 +236,10 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				else
 				{
 					// TEMP: Show types for debugging info
-					System.out.println("types: ");
+					if (Platform.inDevelopmentMode())
+					{
+						System.out.println("types: ");
+					}
 				}
 			}
 		}
