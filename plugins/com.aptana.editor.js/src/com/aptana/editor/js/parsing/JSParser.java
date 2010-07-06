@@ -2072,38 +2072,44 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSBinaryBooleanOperatorNode(l, o, r);
 			}
-			case 269: // ConditionalExpression = LogicalOrExpression.l QUESTION AssignmentExpression.t COLON AssignmentExpression.f
+			case 269: // ConditionalExpression = LogicalOrExpression.l QUESTION.q AssignmentExpression.t COLON.c AssignmentExpression.f
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol q = _symbols[offset + 2];
 					final Symbol _symbol_t = _symbols[offset + 3];
 					final JSNode t = (JSNode) _symbol_t.value;
+					final Symbol c = _symbols[offset + 4];
 					final Symbol _symbol_f = _symbols[offset + 5];
 					final JSNode f = (JSNode) _symbol_f.value;
 					
-			return new JSConditionalNode(l, t, f);
+			return new JSConditionalNode(l, q, t, c, f);
 			}
-			case 271: // ConditionalExpression_NoLBF = LogicalOrExpression_NoLBF.l QUESTION AssignmentExpression.t COLON AssignmentExpression.f
+			case 271: // ConditionalExpression_NoLBF = LogicalOrExpression_NoLBF.l QUESTION.q AssignmentExpression.t COLON.c AssignmentExpression.f
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol q = _symbols[offset + 2];
 					final Symbol _symbol_t = _symbols[offset + 3];
 					final JSNode t = (JSNode) _symbol_t.value;
+					final Symbol c = _symbols[offset + 4];
 					final Symbol _symbol_f = _symbols[offset + 5];
 					final JSNode f = (JSNode) _symbol_f.value;
 					
-			return new JSConditionalNode(l, t, f);
+			return new JSConditionalNode(l, q, t, c, f);
 			}
-			case 273: // ConditionalExpression_NoIn = LogicalOrExpression_NoIn.l QUESTION AssignmentExpression_NoIn.t COLON AssignmentExpression_NoIn.f
+			case 273: // ConditionalExpression_NoIn = LogicalOrExpression_NoIn.l QUESTION.q AssignmentExpression_NoIn.t COLON.c AssignmentExpression_NoIn.f
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol q = _symbols[offset + 2];
 					final Symbol _symbol_t = _symbols[offset + 3];
 					final JSNode t = (JSNode) _symbol_t.value;
+					final Symbol c = _symbols[offset + 4];
 					final Symbol _symbol_f = _symbols[offset + 5];
 					final JSNode f = (JSNode) _symbol_f.value;
 					
-			return new JSConditionalNode(l, t, f);
+			return new JSConditionalNode(l, q, t, c, f);
 			}
 			case 275: // AssignmentExpression = LeftHandSideExpression.l AssignmentOperator.o AssignmentExpression.r
 			{

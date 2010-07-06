@@ -1576,25 +1576,25 @@ LogicalOrExpression_NoIn
 
 ConditionalExpression
 	=	LogicalOrExpression
-	|	LogicalOrExpression.l QUESTION AssignmentExpression.t COLON AssignmentExpression.f
+	|	LogicalOrExpression.l QUESTION.q AssignmentExpression.t COLON.c AssignmentExpression.f
 		{:
-			return new JSConditionalNode(l, t, f);
+			return new JSConditionalNode(l, q, t, c, f);
 		:}
 	;
 
 ConditionalExpression_NoLBF
 	=	LogicalOrExpression_NoLBF
-	|	LogicalOrExpression_NoLBF.l QUESTION AssignmentExpression.t COLON AssignmentExpression.f
+	|	LogicalOrExpression_NoLBF.l QUESTION.q AssignmentExpression.t COLON.c AssignmentExpression.f
 		{:
-			return new JSConditionalNode(l, t, f);
+			return new JSConditionalNode(l, q, t, c, f);
 		:}
 	;
 
 ConditionalExpression_NoIn
 	=	LogicalOrExpression_NoIn
-	|	LogicalOrExpression_NoIn.l QUESTION AssignmentExpression_NoIn.t COLON AssignmentExpression_NoIn.f
+	|	LogicalOrExpression_NoIn.l QUESTION.q AssignmentExpression_NoIn.t COLON.c AssignmentExpression_NoIn.f
 		{:
-			return new JSConditionalNode(l, t, f);
+			return new JSConditionalNode(l, q, t, c, f);
 		:}
 	;
 
