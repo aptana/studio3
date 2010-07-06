@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,7 +38,7 @@ public class Scope<T>
 		{
 			if (this._assignments == null)
 			{
-				this._assignments = new LinkedList<T>();
+				this._assignments = new ArrayList<T>();
 			}
 			
 			this._assignments.add(assignment);
@@ -59,7 +58,7 @@ public class Scope<T>
 
 			if (this._children == null)
 			{
-				this._children = new LinkedList<Scope<T>>();
+				this._children = new ArrayList<Scope<T>>();
 			}
 
 			this._children.add(scope);
@@ -99,7 +98,7 @@ public class Scope<T>
 
 			if (nodes == null)
 			{
-				nodes = new LinkedList<T>();
+				nodes = new ArrayList<T>();
 				this._symbols.put(name, nodes);
 			}
 
