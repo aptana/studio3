@@ -18,7 +18,6 @@ public class JSNode extends ParseNode
 
 	private short fType;
 	private boolean fSemicolonIncluded;
-
 	private DocumentationBlock fDocumentation;
 
 	/**
