@@ -283,14 +283,13 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		
 		IContextInformation contextInfo = null;
-
 		int replaceLength = 0;
 
-		if (this._currentLexeme != null)
-		{
-			offset = this._currentLexeme.getStartingOffset();
-			replaceLength = this._currentLexeme.getLength();
-		}
+//		if (this._currentLexeme != null)
+//		{
+//			offset = this._currentLexeme.getStartingOffset();
+//			replaceLength = this._currentLexeme.getLength();
+//		}
 
 		// build proposal
 		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image, displayName, contextInfo, description);
