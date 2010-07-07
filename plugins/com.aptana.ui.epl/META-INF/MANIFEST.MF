@@ -12,6 +12,7 @@ Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.common.contentassist,
  com.aptana.editor.common.scripting.snippets,
- com.aptana.ui.epl
+ com.aptana.ui.epl,
+ com.aptana.ui.preferences
 Eclipse-ExtensibleAPI: true
 Bundle-Activator: com.aptana.ui.epl.UIEplPlugin

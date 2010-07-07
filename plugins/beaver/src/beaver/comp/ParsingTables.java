@@ -20,7 +20,7 @@ import beaver.spec.Terminal;
 /**
  * Action tables of the automaton.
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({ "unchecked", "rawtypes" })
 class ParsingTables
 {
 	/** Start of the list of all states. */

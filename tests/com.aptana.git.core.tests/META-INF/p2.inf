@@ -1,5 +1,5 @@
 instructions.install.import= \
-   org.eclipse.equinox.p2.touchpoint.natives.chmod
+   org.eclipse.equinox.p2.touchpoint.eclipse.chmod
 instructions.install = \
    chmod(targetDir:@artifact,targetFile:fake_git_1.5.sh,permissions:755);\
    chmod(targetDir:@artifact,targetFile:fake_git_1.6.sh,permissions:755);

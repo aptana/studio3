@@ -1,8 +1,7 @@
-package com.aptana.editor.common;
+package com.aptana.theme.internal;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -15,7 +14,6 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.internal.ui.views.memory.IMemoryViewPane;
 import org.eclipse.debug.internal.ui.views.memory.MemoryView;
 import org.eclipse.debug.ui.IDebugView;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -27,13 +25,15 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.team.ui.history.HistoryPage;
 import org.eclipse.team.ui.history.IHistoryView;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IStartup;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPart;
@@ -56,13 +56,12 @@ import org.osgi.framework.Version;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.util.EclipseUtil;
-import com.aptana.editor.common.outline.CommonOutlinePage;
-import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.theme.ConsoleThemer;
+import com.aptana.theme.IControlThemerFactory;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
-import com.aptana.theme.TreeThemer;
+import com.aptana.theme.preferences.IPreferenceConstants;
 import com.aptana.ui.IAptanaHistory;
 
 /**
@@ -72,10 +71,9 @@ import com.aptana.ui.IAptanaHistory;
  * @author cwilliams
  */
 @SuppressWarnings({ "restriction", "deprecation" })
-class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceChangeListener
+public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceChangeListener, IStartup
 {
 
-	private Map<Tree, TreeThemer> themers = new HashMap<Tree, TreeThemer>();
 	private ISelectionChangedListener pageListener;
 
 	public InvasiveThemeHijacker()
@@ -144,7 +142,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 		catch (BackingStoreException e)
 		{
-			CommonEditorPlugin.logError(e);
+			ThemePlugin.logError(e);
 		}
 	}
 
@@ -225,7 +223,8 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		{
 			ContentOutline outline = (ContentOutline) view;
 			IPage page = outline.getCurrentPage();
-			if (page instanceof CommonOutlinePage)
+			String name = page.getClass().getName();
+            if (name.endsWith("CommonOutlinePage") || name.endsWith("PyOutlinePage"))
 				return; // we already handle our own outlines
 			Control control = page.getControl();
 			if (control instanceof PageBook)
@@ -320,54 +319,62 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 				// ignore
 			}
 		}
+		else if (view.getClass().getName().endsWith("CallHierarchyViewPart"))
+		{
+			try
+			{
+				Field f = view.getClass().getDeclaredField("fPagebook");
+				f.setAccessible(true);
+				PageBook pageBook = (PageBook) f.get(view);
+
+				f = pageBook.getClass().getDeclaredField("currentPage");
+				f.setAccessible(true);
+				Control control = (Control) f.get(pageBook);
+				if (control instanceof Label)
+				{
+					hookTheme(control, revertToDefaults);
+					return;
+				}
+
+				Method m = view.getClass().getMethod("getViewer");
+				TreeViewer treeViewer = (TreeViewer) m.invoke(view);
+				hookTheme(treeViewer.getTree(), revertToDefaults);
+
+				m = view.getClass().getDeclaredMethod("getLocationViewer");
+				if (m != null)
+				{
+					m.setAccessible(true);
+					Viewer viewer = (Viewer) m.invoke(view);
+					hookTheme(viewer.getControl(), revertToDefaults);
+				}
+			}
+			catch (Exception e)
+			{
+				// ignore
+			}
+		}
 	}
 
 	protected void hookTheme(Control control, boolean revert)
 	{
-		if (control instanceof Tree)
+		if (revert)
 		{
-			overrideTreeDrawing((Tree) control, revert);
+			getControlThemerFactory().dispose(control);
 		}
 		else
 		{
-			control.setRedraw(false);
-			if (revert)
-			{
-				control.setBackground(null);
-				control.setForeground(null);
-				control.setFont(null);
-			}
-			else
-			{
-				control.setBackground(ThemePlugin.getDefault().getColorManager()
-						.getColor(getCurrentTheme().getBackground()));
-				control.setForeground(ThemePlugin.getDefault().getColorManager()
-						.getColor(getCurrentTheme().getForeground()));
-				control.setFont(JFaceResources.getTextFont());
-			}
-			control.setRedraw(true);
+			getControlThemerFactory().apply(control);
 		}
+	}
+
+	protected IControlThemerFactory getControlThemerFactory()
+	{
+		return ThemePlugin.getDefault().getControlThemerFactory();
 	}
 
 	protected Theme getCurrentTheme()
 	{
 		return ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
-	}
-
-	private void overrideTreeDrawing(final Tree tree, boolean revertToDefaults)
-	{
-		if (revertToDefaults)
-		{
-			TreeThemer themer = themers.remove(tree);
-			if (themer != null)
-				themer.dispose();
-		}
-		else
-		{
-			TreeThemer themer = new TreeThemer(tree);
-			themers.put(tree, themer);
-			themer.apply();
-		}
 	}
 
 	@SuppressWarnings("nls")
@@ -449,7 +456,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 		catch (BackingStoreException e)
 		{
-			CommonEditorPlugin.logError(e);
+			ThemePlugin.logError(e);
 		}
 	}
 
@@ -495,7 +502,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 		catch (BackingStoreException e)
 		{
-			CommonEditorPlugin.logError(e);
+			ThemePlugin.logError(e);
 		}
 	}
 
@@ -530,7 +537,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 		catch (BackingStoreException e)
 		{
-			CommonEditorPlugin.logError(e);
+			ThemePlugin.logError(e);
 		}
 	}
 
@@ -553,7 +560,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 		catch (BackingStoreException e)
 		{
-			CommonEditorPlugin.logError(e);
+			ThemePlugin.logError(e);
 		}
 	}
 
@@ -588,7 +595,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 		catch (BackingStoreException e)
 		{
-			CommonEditorPlugin.logError(e);
+			ThemePlugin.logError(e);
 		}
 	}
 
@@ -657,8 +664,15 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 
 	protected void overrideSelectionColor(AbstractTextEditor editor)
 	{
-		if (editor instanceof AbstractThemeableEditor) // we already handle our own editors
-			return;
+		try
+		{
+			if (Class.forName("com.aptana.editor.common.extensions.IThemeableEditor").isInstance(editor)) // we already handle our own editors //$NON-NLS-1$
+				return;
+		}
+		catch (ClassNotFoundException e1)
+		{
+			// ignore
+		}
 
 		ISourceViewer sourceViewer = null;
 		try
@@ -756,12 +770,24 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 	}
 
 	@Override
-	public void partActivated(IWorkbenchPart part)
+	public void partActivated(final IWorkbenchPart part)
 	{
 		if (part instanceof IViewPart)
 		{
 			hijackHistory((IViewPart) part);
 			hijackConsole((IViewPart) part);
+			if (part.getClass().getName().endsWith("CallHierarchyViewPart")) //$NON-NLS-1$
+			{
+				Display.getCurrent().asyncExec(new Runnable()
+				{
+
+					@Override
+					public void run()
+					{
+						hijackView((IViewPart) part, false);
+					}
+				});
+			}
 		}
 		if (!(part instanceof IEditorPart))
 			return;
@@ -774,10 +800,18 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		if (view instanceof IHistoryView)
 		{
 			IHistoryView historyView = (IHistoryView) view;
-			HistoryPage page = (HistoryPage) historyView.getHistoryPage();
+			final HistoryPage page = (HistoryPage) historyView.getHistoryPage();
 			if (page instanceof IAptanaHistory)
 			{
-				((IAptanaHistory) page).setTheme(false);
+				Display.getCurrent().asyncExec(new Runnable()
+				{
+
+					@Override
+					public void run()
+					{
+						((IAptanaHistory) page).setTheme(false);
+					}
+				});
 				return true;
 			}
 
@@ -797,6 +831,10 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 	protected void hijackOutline()
 	{
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		if (window == null || window.getActivePage() == null)
+		{
+			return;
+		}
 		IViewReference[] refs = window.getActivePage().getViewReferences();
 		for (IViewReference ref : refs)
 		{
@@ -806,5 +844,11 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 				return;
 			}
 		}
+	}
+
+	@Override
+	public void earlyStartup()
+	{
+		schedule();
 	}
 }

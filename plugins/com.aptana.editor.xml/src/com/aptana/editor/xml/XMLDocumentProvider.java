@@ -62,7 +62,7 @@ public class XMLDocumentProvider extends CommonDocumentProvider
 		}
 	}
 
-	protected String getDefaultContentType()
+	protected String getDefaultContentType(String filename)
 	{
 		return IXMLConstants.CONTENT_TYPE_XML;
 	}

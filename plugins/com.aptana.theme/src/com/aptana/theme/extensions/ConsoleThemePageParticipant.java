@@ -25,7 +25,7 @@ public class ConsoleThemePageParticipant implements IConsolePageParticipant
 	 * @see org.eclipse.ui.console.IConsolePageParticipant#init(org.eclipse.ui.part.IPageBookViewPage,
 	 * org.eclipse.ui.console.IConsole)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void init(IPageBookViewPage page, IConsole console)
 	{
 		if (console instanceof TextConsole)
@@ -81,7 +81,7 @@ public class ConsoleThemePageParticipant implements IConsolePageParticipant
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter)
 	{
 		return null;

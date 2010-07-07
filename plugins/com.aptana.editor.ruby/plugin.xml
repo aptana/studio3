@@ -39,6 +39,12 @@
          point="com.aptana.index.core.fileIndexingParticipants">
       <fileIndexingParticipant
             class="com.aptana.editor.ruby.index.RubyFileIndexingParticipant">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.ruby">
+         </contentTypeBinding>
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.ruby.ambiguous">
+         </contentTypeBinding>
       </fileIndexingParticipant>
    </extension>
    <extension

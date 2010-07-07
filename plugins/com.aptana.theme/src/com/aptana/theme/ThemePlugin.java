@@ -2,10 +2,15 @@ package com.aptana.theme;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.theme.internal.ControlThemerFactory;
+import com.aptana.theme.internal.InvasiveThemeHijacker;
 import com.aptana.theme.internal.ThemeManager;
+import com.aptana.theme.internal.fontloader.EditorFontOverride;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -19,7 +24,10 @@ public class ThemePlugin extends AbstractUIPlugin
 	// The shared instance
 	private static ThemePlugin plugin;
 
+	private InvasiveThemeHijacker themeHijacker;
 	private ColorManager fColorManager;
+
+	private IControlThemerFactory fControlThemerFactory;
 
 	/**
 	 * The constructor
@@ -36,6 +44,11 @@ public class ThemePlugin extends AbstractUIPlugin
 	{
 		super.start(context);
 		plugin = this;
+
+		themeHijacker = new InvasiveThemeHijacker();
+		themeHijacker.schedule();
+
+		new EditorFontOverride().schedule();
 	}
 
 	/*
@@ -46,14 +59,24 @@ public class ThemePlugin extends AbstractUIPlugin
 	{
 		try
 		{
+			IEclipsePreferences prefs = new InstanceScope().getNode(PLUGIN_ID);
+			prefs.removePreferenceChangeListener(themeHijacker);
+
 			if (fColorManager != null)
 			{
 				fColorManager.dispose();
 			}
+			
+			if (fControlThemerFactory != null)
+			{
+				fControlThemerFactory.dispose();
+			}
 		}
 		finally
 		{
+			themeHijacker = null;
 			fColorManager = null;
+			fControlThemerFactory = null;
 			plugin = null;
 			super.stop(context);
 		}
@@ -102,5 +125,14 @@ public class ThemePlugin extends AbstractUIPlugin
 	public static void logWarning(String message)
 	{
 		getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message, null));
+	}
+
+	public synchronized IControlThemerFactory getControlThemerFactory()
+	{
+		if (fControlThemerFactory == null)
+		{
+			fControlThemerFactory = new ControlThemerFactory();
+		}
+		return fControlThemerFactory;
 	}
 }

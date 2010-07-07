@@ -451,7 +451,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		directions.setLayoutData(gridData);
 
 		left_arrow = new Button(directions, SWT.TOGGLE);
-		left_arrow.setImage(SyncingUIPlugin.getImage("icons/full/wizban/sync_arrow_left.png"));
+		left_arrow.setImage(SyncingUIPlugin.getImage("icons/full/wizban/sync_arrow_left.png")); //$NON-NLS-1$
 		gridData = new GridData(SWT.RIGHT, SWT.CENTER, false, true);
 		left_arrow.setLayoutData(gridData);
 		left_arrow.addSelectionListener(new SelectionAdapter()
@@ -477,7 +477,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		});
 
 		right_arrow = new Button(directions, SWT.TOGGLE);
-		right_arrow.setImage(SyncingUIPlugin.getImage("icons/full/wizban/sync_arrow_right.png"));
+		right_arrow.setImage(SyncingUIPlugin.getImage("icons/full/wizban/sync_arrow_right.png")); //$NON-NLS-1$
 		gridData = new GridData(SWT.LEFT, SWT.CENTER, false, true);
 		right_arrow.setLayoutData(gridData);
 		right_arrow.addSelectionListener(new SelectionAdapter()
@@ -540,7 +540,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		gridData = new GridData(SWT.CENTER, SWT.CENTER, false, true);
 		gridData.widthHint = 150;
 		sync_label.setLayoutData(gridData);
-		sync_label.setText("");
+		sync_label.setText(""); //$NON-NLS-1$
 
 		Label end2Label = new Label(endpoints, SWT.CENTER);
 		end2Label.setText(FileUtil.compressPath(dest.toString(), 30));
@@ -557,7 +557,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		layout.marginWidth = 40;
 		layout.marginTop = 12;
 		status.setLayout(layout);
-		status.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, true));
+		status.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		Label updatedSymbol = new Label(status, SWT.VERTICAL);
 		updatedSymbol.setImage(SyncingUIPlugin.getImage(ICON_UPDATE));
@@ -583,6 +583,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		SearchComposite search = new SearchComposite(myComposite, this);
 		search.setSearchOnEnter(true);
 		search.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		search.setInitialText(Messages.SmartSyncDialog_searchText);
 		return search;
 	}
 
@@ -657,15 +658,15 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		deletes.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 
 		deleteLocalFiles = new Button(deletes, SWT.CHECK);
-		deleteLocalFiles.setText(Messages.SmartSyncDialog_DeleteExtra + "'" + end1 + "'");
-		deleteLocalFiles.setToolTipText(Messages.SmartSyncDialog_DeleteExtraTooltip + end1 + "'");
+		deleteLocalFiles.setText(Messages.SmartSyncDialog_DeleteExtra + "'" + end1 + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+		deleteLocalFiles.setToolTipText(Messages.SmartSyncDialog_DeleteExtraTooltip + end1 + "'"); //$NON-NLS-1$
 		deleteLocalFiles.setSelection(getDeleteLocalPreference());
 		deleteLocalFiles.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 		deleteLocalFiles.addSelectionListener(this);
 
 		deleteRemoteFiles = new Button(deletes, SWT.CHECK);
-		deleteRemoteFiles.setText(Messages.SmartSyncDialog_DeleteExtra + "'" + end2 + "'");
-		deleteRemoteFiles.setToolTipText(Messages.SmartSyncDialog_DeleteExtraTooltip + "'" + end2 + "'");
+		deleteRemoteFiles.setText(Messages.SmartSyncDialog_DeleteExtra + "'" + end2 + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+		deleteRemoteFiles.setToolTipText(Messages.SmartSyncDialog_DeleteExtraTooltip + "'" + end2 + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 		deleteRemoteFiles.setSelection(getDeleteRemotePreference());
 		deleteRemoteFiles.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 		deleteRemoteFiles.addSelectionListener(this);
@@ -1093,7 +1094,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		startSync.setLayoutData(gridData);
 		startSync.addSelectionListener(this);
 
-		saveLog = createButton(parent, IDialogConstants.DETAILS_ID, "Save Log...", false);
+		saveLog = createButton(parent, IDialogConstants.DETAILS_ID, "Save Log...", false); //$NON-NLS-1$
 		saveLog.addSelectionListener(this);
 		saveLog.setEnabled(false);
 
@@ -1413,9 +1414,9 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		});
 
 		setTitleImage(titleImage);
-		getShell().setText("Synchronize");
+		getShell().setText("Synchronize"); //$NON-NLS-1$
 
-		setTitle("Synchronize files between two endpoints");
+		setTitle("Synchronize files between two endpoints"); //$NON-NLS-1$
 
 		Composite displayArea = new Composite(dialogArea, SWT.NONE);
 		displayArea.setLayout(new GridLayout());
@@ -1524,9 +1525,9 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 				fileDialog.setFilterPath(value);
 			}
 
-			DateFormat fileFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+			DateFormat fileFormat = new SimpleDateFormat("yyyyMMddHHmmss"); //$NON-NLS-1$
 			Date d = new Date();
-			fileDialog.setFileName("Aptana Synchronize Log " + fileFormat.format(d) + ".txt");
+			fileDialog.setFileName("Aptana Synchronize Log " + fileFormat.format(d) + ".txt"); //$NON-NLS-1$ //$NON-NLS-2$
 			String path = fileDialog.open();
 			if (path == null)
 			{
@@ -1695,6 +1696,8 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		// disables the options when sync has started
 		directionBar.setEnabled(false);
 		optionsBar.setEnabled(false);
+		right_arrow.setEnabled(false);
+		left_arrow.setEnabled(false);
 
 		List<VirtualFileSyncPair> pairs = new ArrayList<VirtualFileSyncPair>();
 		ISyncResource[] resources = syncViewer.getCurrentResources();
@@ -1789,6 +1792,8 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 						synced.setVisible(true);
 						setEnabled(false);
 						swappable.layout(true, true);
+						right_arrow.setEnabled(true);
+						left_arrow.setEnabled(true);
 
 						saveLog.setEnabled(true);
 					}

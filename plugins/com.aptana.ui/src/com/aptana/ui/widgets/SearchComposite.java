@@ -65,7 +65,9 @@ public class SearchComposite extends Composite
 		searchText.setText(initialText);
 		searchText.setToolTipText(Messages.SingleProjectView_Wildcard);
 		searchText.setForeground(searchText.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-		searchText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		GridData layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		layoutData.widthHint = 225;
+		searchText.setLayoutData(layoutData);
 
 		searchText.addFocusListener(new FocusListener()
 		{
@@ -104,7 +106,7 @@ public class SearchComposite extends Composite
 				{
 					return;
 				}
-				if (searchOnEnter && e.keyCode == SWT.CR)
+				if (searchOnEnter && e.character == '\r')
 				{
 					searchText();
 					e.doit = false;

@@ -46,7 +46,7 @@ public class ThemeManager implements IThemeManager
 	/**
 	 * Preference key used to save the active theme.
 	 */
-	private static final String ACTIVE_THEME = "ACTIVE_THEME"; //$NON-NLS-1$
+	public static final String ACTIVE_THEME = "ACTIVE_THEME"; //$NON-NLS-1$
 
 	/**
 	 * Node in preferences used to store themes under. Each theme is a key value pair under this node. The key is the
@@ -90,9 +90,21 @@ public class ThemeManager implements IThemeManager
 			String activeThemeName = Platform.getPreferencesService().getString(ThemePlugin.PLUGIN_ID, ACTIVE_THEME,
 					null, null);
 			if (activeThemeName != null)
+			{
 				fCurrentTheme = getTheme(activeThemeName);
+			}
 			if (fCurrentTheme == null)
-				setCurrentTheme(getThemeMap().values().iterator().next());
+			{
+				// if we can't find the default theme, just use the first one in the list
+				if (!getThemeMap().values().isEmpty())
+				{
+					fCurrentTheme = getThemeMap().values().iterator().next();
+					if (fCurrentTheme != null)
+					{
+						setCurrentTheme(fCurrentTheme);
+					}
+				}
+			}
 		}
 		return fCurrentTheme;
 	}
@@ -137,8 +149,8 @@ public class ThemeManager implements IThemeManager
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND_SYSTEM_DEFAULT, false);
 		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND, toString(theme.getForeground()));
 
-		prefs.put(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR, toString(theme
-				.getLineHighlight()));
+		prefs.put(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR,
+				toString(theme.getLineHighlight()));
 		try
 		{
 			prefs.flush();
@@ -164,8 +176,8 @@ public class ThemeManager implements IThemeManager
 	private static String toString(RGB selection)
 	{
 		StringBuilder builder = new StringBuilder();
-		builder.append(selection.red).append(THEME_NAMES_DELIMETER).append(selection.green).append(
-				THEME_NAMES_DELIMETER).append(selection.blue);
+		builder.append(selection.red).append(THEME_NAMES_DELIMETER).append(selection.green)
+				.append(THEME_NAMES_DELIMETER).append(selection.blue);
 		return builder.toString();
 	}
 

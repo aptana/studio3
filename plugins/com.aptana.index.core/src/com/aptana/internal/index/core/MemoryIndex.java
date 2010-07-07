@@ -38,6 +38,30 @@ public class MemoryIndex
 		words.add(key);
 	}
 
+	public Set<String> addDocumentNames(String substring)
+	{
+		// assumed the disk index already skipped over documents which have been added/changed/deleted
+		Set<String> results = new HashSet<String>();
+		for (Map.Entry<String, Map<String, Set<String>>> entry : documentsToTable.entrySet())
+		{
+			if (substring == null)
+			{ // add all new/changed documents
+				if (entry.getValue() != null)
+				{
+					results.add(entry.getKey());
+				}
+			}
+			else
+			{
+				if (entry.getValue() != null && (entry.getKey()).startsWith(substring, 0))
+				{
+					results.add(entry.getKey());
+				}
+			}
+		}
+		return results;
+	}
+
 	Set<String> getDocumentNames()
 	{
 		return documentsToTable.keySet();

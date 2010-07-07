@@ -259,7 +259,7 @@ public class FileDropAdapterAssistant extends ResourceDropAdapterAssistant {
         return new IAdaptable[0];
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     private static IAdaptable[] getSelectedSourceFiles(IStructuredSelection selection) {
         List<IAdaptable> selectedFiles = new ArrayList<IAdaptable>();
 

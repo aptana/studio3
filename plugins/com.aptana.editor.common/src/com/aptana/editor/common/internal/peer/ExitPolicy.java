@@ -81,7 +81,7 @@ class ExitPolicy implements IExitPolicy
 	 */
 	private boolean shouldInsertNewline()
 	{
-		return !isStringPair() && fExitCharacter != '|' && fExitCharacter != '>';
+		return !isStringPair() && fExitCharacter != '|' && fExitCharacter != '>' && fExitCharacter != ')' && fExitCharacter != ']';
 	}
 	
 	private boolean isStringPair()

@@ -54,6 +54,9 @@
          point="com.aptana.index.core.fileIndexingParticipants">
       <fileIndexingParticipant
             class="com.aptana.editor.html.contentassist.index.HTMLFileIndexingParticipant">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.html">
+         </contentTypeBinding>
       </fileIndexingParticipant>
    </extension>
    <extension

@@ -1,6 +1,7 @@
 package com.aptana.deploy.internal.wizard;
 
 import java.io.File;
+import java.text.MessageFormat;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -21,6 +22,8 @@ import org.eclipse.swt.widgets.Label;
 
 import com.aptana.deploy.Activator;
 import com.aptana.deploy.HerokuAPI;
+import com.aptana.deploy.preferences.DeployPreferenceUtil;
+import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.deploy.wizard.DeployWizard;
 
 public class DeployWizardPage extends WizardPage
@@ -28,6 +31,7 @@ public class DeployWizardPage extends WizardPage
 
 	public static final String NAME = "Deployment"; //$NON-NLS-1$
 	private static final String HEROKU_IMG_PATH = "icons/heroku.png"; //$NON-NLS-1$
+	private static final String FTP_IMG_PATH = "icons/ftp.png"; //$NON-NLS-1$
 
 	private Button deployWithFTP;
 	private Button deployWithCapistrano;
@@ -44,7 +48,6 @@ public class DeployWizardPage extends WizardPage
 	@Override
 	public void createControl(Composite parent)
 	{
-
 		Composite composite = new Composite(parent, SWT.NULL);
 		composite.setLayout(new GridLayout());
 		composite.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_FILL | GridData.HORIZONTAL_ALIGN_FILL));
@@ -55,6 +58,7 @@ public class DeployWizardPage extends WizardPage
 		// Actual contents
 		Label label = new Label(composite, SWT.NONE);
 
+		DeployType type = DeployPreferenceUtil.getDeployType(project);
 		if (isRailsProject())
 		{
 			setImageDescriptor(Activator.getImageDescriptor(HEROKU_IMG_PATH));
@@ -62,7 +66,20 @@ public class DeployWizardPage extends WizardPage
 			// deploy with Heroku
 			deployWithHeroku = new Button(composite, SWT.RADIO);
 			deployWithHeroku.setImage(Activator.getImage(HEROKU_IMG_PATH));
-			deployWithHeroku.setSelection(true);
+			// disable the button if the project is currently deployed to Heroku
+			boolean couldDeploy = (type == null || type != DeployType.HEROKU);
+			deployWithHeroku.setEnabled(couldDeploy);
+			deployWithHeroku.setSelection(couldDeploy);
+			if (!couldDeploy)
+			{
+				String app = DeployPreferenceUtil.getDeployEndpoint(project);
+				if (app == null)
+				{
+					app = "Heroku"; //$NON-NLS-1$
+				}
+				deployWithHeroku.setText(MessageFormat.format(Messages.DeployWizardPage_AlreadyDeployedToHeroku, app));
+			}
+
 			deployWithHeroku.addMouseListener(new MouseAdapter()
 			{
 				@Override
@@ -108,15 +125,15 @@ public class DeployWizardPage extends WizardPage
 		deployWithFTP.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				setImageDescriptor(null);
+				setImageDescriptor(Activator.getImageDescriptor(FTP_IMG_PATH));
 			}
 		});
-		if (deployWithHeroku == null)
+		if (deployWithHeroku == null || !deployWithHeroku.getEnabled())
 		{
 			deployWithFTP.setSelection(true);
+			setImageDescriptor(Activator.getImageDescriptor(FTP_IMG_PATH));
 		}
 
-		
 		deployWithCapistrano = new Button(composite, SWT.RADIO);
 		deployWithCapistrano.setText(Messages.DeployWizardPage_CapistranoLabel);
 		deployWithCapistrano.addSelectionListener(new SelectionAdapter() {
@@ -202,5 +219,4 @@ public class DeployWizardPage extends WizardPage
 	{
 		return null;
 	}
-
 }

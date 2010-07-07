@@ -1,6 +1,7 @@
 package com.aptana.deploy.internal.wizard;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -18,6 +19,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.deploy.Activator;
+import com.aptana.deploy.preferences.IPreferenceConstants;
 import com.aptana.deploy.wizard.DeployWizard;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
@@ -55,8 +57,7 @@ public class HerokuDeployWizardPage extends WizardPage
 		label.setText(Messages.HerokuDeployWizardPage_ApplicationNameLabel);
 
 		appName = new Text(appSettings, SWT.SINGLE | SWT.BORDER);
-		GridData gd = new GridData(250, SWT.DEFAULT);
-		appName.setLayoutData(gd);
+		appName.setLayoutData(new GridData(250, SWT.DEFAULT));
 		// Set default name to project name
 		appName.setText(getProjectName());
 		appName.addModifyListener(new ModifyListener()
@@ -71,7 +72,8 @@ public class HerokuDeployWizardPage extends WizardPage
 
 		publishButton = new Button(composite, SWT.CHECK);
 		publishButton.setText(Messages.HerokuDeployWizardPage_PublishApplicationLabel);
-		publishButton.setSelection(true);
+		publishButton.setSelection(Platform.getPreferencesService().getBoolean(Activator.getPluginIdentifier(),
+				IPreferenceConstants.HEROKU_AUTO_PUBLISH, true, null));
 
 		if (doesntHaveGitRepo())
 		{
@@ -80,12 +82,13 @@ public class HerokuDeployWizardPage extends WizardPage
 			Font dialogFont = JFaceResources.getDialogFont();
 			FontData[] data = dialogFont.getFontData();
 			for (FontData dataElement : data)
+			{
 				dataElement.setStyle(dataElement.getStyle() | SWT.ITALIC);
+			}
 			Font italic = new Font(dialogFont.getDevice(), data);
 			note.setFont(italic);
 
-			gd = new GridData(400, SWT.DEFAULT);
-			note.setLayoutData(gd);
+			note.setLayoutData(new GridData(400, SWT.DEFAULT));
 			note.setText(Messages.HerokuDeployWizardPage_NoGitRepoNote);
 		}
 
@@ -111,18 +114,13 @@ public class HerokuDeployWizardPage extends WizardPage
 		}
 		GitRepository repo = GitPlugin.getDefault().getGitRepositoryManager()
 				.getUnattachedExisting(project.getLocationURI());
-		if (repo != null)
-		{
-			return false;
-		}
-		return true;
+		return repo == null;
 	}
 
 	protected IProject getProject()
 	{
 		DeployWizard wizard = (DeployWizard) getWizard();
-		IProject project = wizard.getProject();
-		return project;
+		return wizard.getProject();
 	}
 
 	@Override

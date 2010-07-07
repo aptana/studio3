@@ -45,7 +45,7 @@ public class CommitFileRevision extends GitFileRevision
 		return new IStorage()
 		{
 
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings("rawtypes")
 			public Object getAdapter(Class adapter)
 			{
 				return null;
