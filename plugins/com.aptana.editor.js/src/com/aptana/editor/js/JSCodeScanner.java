@@ -233,15 +233,15 @@ public class JSCodeScanner extends RuleBasedScanner
 		// Converted word rules
 		WordRule wordRule = new WordRule(new LettersAndDigitsWordDetector(), Token.UNDEFINED);
 		addWordRules(wordRule, createToken(JSScopeType.KEYWORD), KEYWORD_OPERATORS);
-		addWordRules(wordRule, createToken(JSScopeType.SUPPORT_FUNCTION), SUPPORT_FUNCTIONS);
-		addWordRules(wordRule, createToken(JSScopeType.EVENT_HANDLER_FUNCTION), EVENT_HANDLER_FUNCTIONS);
-		addWordRules(wordRule, createToken(JSScopeType.DOM_FUNCTION), DOM_FUNCTIONS);
 		rules.add(wordRule);
 
 		// FIXME These rules shouldn't actually match the leading period, but we have no way to capture just the rest as
 		// the token
 		// Functions where we need period to begin it
 		wordRule = new WordRule(new FunctionCallDetector(), Token.UNDEFINED);
+		addWordRules(wordRule, createToken(JSScopeType.SUPPORT_FUNCTION), SUPPORT_FUNCTIONS);
+		addWordRules(wordRule, createToken(JSScopeType.EVENT_HANDLER_FUNCTION), EVENT_HANDLER_FUNCTIONS);
+		addWordRules(wordRule, createToken(JSScopeType.DOM_FUNCTION), DOM_FUNCTIONS);
 		addWordRules(wordRule, createToken(JSScopeType.FIREBUG_FUNCTION), FIREBUG_FUNCTIONS);
 		addWordRules(wordRule, createToken(JSScopeType.DOM_CONSTANTS), DOM_CONSTANTS);
 		addWordRules(wordRule, createToken(JSScopeType.SUPPORT_CONSTANT), SUPPORT_CONSTANTS);
