@@ -145,7 +145,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		String fileLocation = this.getFilename();
 		
 		// add globals from current file
-		IParseNode node = (this._targetNode.contains(offset)) ? this._targetNode : this.getAST();
+		IParseNode node = (this._targetNode != null && this._targetNode.contains(offset)) ? this._targetNode : this.getAST();
 		
 		List<String> globalFunctions = this._astHelper.getChildFunctions(node);
 		
