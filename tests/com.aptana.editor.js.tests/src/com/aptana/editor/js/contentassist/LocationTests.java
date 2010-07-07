@@ -422,8 +422,8 @@ public class LocationTests extends EditorBasedTests
 			new LocationTypeRange(LocationType.IN_GLOBAL, 19, 20),
 			new LocationTypeRange(LocationType.NONE, 21, 26),
 			new LocationTypeRange(LocationType.IN_GLOBAL, 27, 28),
-			new LocationTypeRange(LocationType.NONE, 29, 32),
-			new LocationTypeRange(LocationType.IN_GLOBAL, 33, 34)
+			new LocationTypeRange(LocationType.NONE, 29, 30),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 31, 34)
 		);
 	}
 	
@@ -435,7 +435,9 @@ public class LocationTests extends EditorBasedTests
 		this.testLocations(
 			"locations/objectLiteral.js",
 			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
-			new LocationTypeRange(LocationType.NONE, 1, 17),
+			new LocationTypeRange(LocationType.NONE, 1, 8),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 9, 10),
+			new LocationTypeRange(LocationType.NONE, 11, 17),
 			new LocationTypeRange(LocationType.IN_GLOBAL, 18, 19),
 			new LocationTypeRange(LocationType.NONE, 20, 31),
 			new LocationTypeRange(LocationType.IN_GLOBAL, 32, 33),
@@ -452,7 +454,18 @@ public class LocationTests extends EditorBasedTests
 		this.testLocations(
 			"locations/switch.js",
 			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
-			new LocationTypeRange(LocationType.NONE, 1, 55),
+			new LocationTypeRange(LocationType.NONE, 1, 7),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 8),
+			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 9, 11),
+			new LocationTypeRange(LocationType.NONE, 12, 22),	// may want 21 to be IN_GLOBAL
+			new LocationTypeRange(LocationType.IN_GLOBAL, 23, 26),
+			new LocationTypeRange(LocationType.NONE, 27, 31),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 32, 37),
+			new LocationTypeRange(LocationType.NONE, 38, 44),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 45, 48),
+			new LocationTypeRange(LocationType.NONE, 49, 53),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 54),
+			new LocationTypeRange(LocationType.NONE, 55),
 			new LocationTypeRange(LocationType.IN_GLOBAL, 56, 57)
 		);
 	}

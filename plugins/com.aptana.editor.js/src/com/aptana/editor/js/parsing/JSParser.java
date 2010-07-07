@@ -1339,24 +1339,30 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSWithNode(l, e, r, s);
 			}
-			case 101: // SwitchStatement = SWITCH LPAREN Expression.e RPAREN LCURLY RCURLY
+			case 101: // SwitchStatement = SWITCH LPAREN.lp Expression.e RPAREN.rp LCURLY.lc RCURLY.rc
 			{
+					final Symbol lp = _symbols[offset + 2];
 					final Symbol _symbol_e = _symbols[offset + 3];
 					final JSNode e = (JSNode) _symbol_e.value;
+					final Symbol rp = _symbols[offset + 4];
+					final Symbol lc = _symbols[offset + 5];
+					final Symbol rc = _symbols[offset + 6];
 					
-			return new JSSwitchNode(e);
+			return new JSSwitchNode(lp, e, rp, lc, rc);
 			}
-			case 102: // SwitchStatement = SWITCH LPAREN Expression.e RPAREN LCURLY CaseClauses.c RCURLY
+			case 102: // SwitchStatement = SWITCH LPAREN.lp Expression.e RPAREN.rp LCURLY.lc CaseClauses.c RCURLY.rc
 			{
+					final Symbol lp = _symbols[offset + 2];
 					final Symbol _symbol_e = _symbols[offset + 3];
 					final JSNode e = (JSNode) _symbol_e.value;
+					final Symbol rp = _symbols[offset + 4];
+					final Symbol lc = _symbols[offset + 5];
 					final Symbol _symbol_c = _symbols[offset + 6];
 					final ArrayList _list_c = (ArrayList) _symbol_c.value;
 					final JSNode[] c = _list_c == null ? new JSNode[0] : (JSNode[]) _list_c.toArray(new JSNode[_list_c.size()]);
+					final Symbol rc = _symbols[offset + 7];
 					
 			List<JSNode> nodes = new ArrayList<JSNode>();
-			
-			nodes.add(e);
 			
 			for (JSNode statement : c)
 			{
@@ -1365,30 +1371,37 @@ public class JSParser extends Parser implements IParser {
 			
 			JSNode[] children = nodes.toArray(new JSNode[nodes.size()]);
 			
-			return new JSSwitchNode(children);
+			return new JSSwitchNode(lp, e, rp, lc, rc, children);
 			}
-			case 103: // SwitchStatement = SWITCH LPAREN Expression.e RPAREN LCURLY DefaultClause.d RCURLY
+			case 103: // SwitchStatement = SWITCH LPAREN.lp Expression.e RPAREN.rp LCURLY.lc DefaultClause.d RCURLY.rc
 			{
+					final Symbol lp = _symbols[offset + 2];
 					final Symbol _symbol_e = _symbols[offset + 3];
 					final JSNode e = (JSNode) _symbol_e.value;
+					final Symbol rp = _symbols[offset + 4];
+					final Symbol lc = _symbols[offset + 5];
 					final Symbol _symbol_d = _symbols[offset + 6];
 					final JSNode d = (JSNode) _symbol_d.value;
+					final Symbol rc = _symbols[offset + 7];
 					
-			return new JSSwitchNode(e, d);
+			return new JSSwitchNode(lp, e, rp, lc, rc, d);
 			}
-			case 104: // SwitchStatement = SWITCH LPAREN Expression.e RPAREN LCURLY DefaultClause.d CaseClauses.c RCURLY
+			case 104: // SwitchStatement = SWITCH LPAREN.lp Expression.e RPAREN.rp LCURLY.lc DefaultClause.d CaseClauses.c RCURLY.rc
 			{
+					final Symbol lp = _symbols[offset + 2];
 					final Symbol _symbol_e = _symbols[offset + 3];
 					final JSNode e = (JSNode) _symbol_e.value;
+					final Symbol rp = _symbols[offset + 4];
+					final Symbol lc = _symbols[offset + 5];
 					final Symbol _symbol_d = _symbols[offset + 6];
 					final JSNode d = (JSNode) _symbol_d.value;
 					final Symbol _symbol_c = _symbols[offset + 7];
 					final ArrayList _list_c = (ArrayList) _symbol_c.value;
 					final JSNode[] c = _list_c == null ? new JSNode[0] : (JSNode[]) _list_c.toArray(new JSNode[_list_c.size()]);
+					final Symbol rc = _symbols[offset + 8];
 					
 			List<JSNode> nodes = new ArrayList<JSNode>();
 			
-			nodes.add(e);
 			nodes.add(d);
 			
 			for (JSNode statement : c)
@@ -1398,21 +1411,23 @@ public class JSParser extends Parser implements IParser {
 			
 			JSNode[] children = nodes.toArray(new JSNode[nodes.size()]);
 			
-			return new JSSwitchNode(children);
+			return new JSSwitchNode(lp, e, rp, lc, rc, children);
 			}
-			case 105: // SwitchStatement = SWITCH LPAREN Expression.e RPAREN LCURLY CaseClauses.c DefaultClause.d RCURLY
+			case 105: // SwitchStatement = SWITCH LPAREN.lp Expression.e RPAREN.rp LCURLY.lc CaseClauses.c DefaultClause.d RCURLY.rc
 			{
+					final Symbol lp = _symbols[offset + 2];
 					final Symbol _symbol_e = _symbols[offset + 3];
 					final JSNode e = (JSNode) _symbol_e.value;
+					final Symbol rp = _symbols[offset + 4];
+					final Symbol lc = _symbols[offset + 5];
 					final Symbol _symbol_c = _symbols[offset + 6];
 					final ArrayList _list_c = (ArrayList) _symbol_c.value;
 					final JSNode[] c = _list_c == null ? new JSNode[0] : (JSNode[]) _list_c.toArray(new JSNode[_list_c.size()]);
 					final Symbol _symbol_d = _symbols[offset + 7];
 					final JSNode d = (JSNode) _symbol_d.value;
+					final Symbol rc = _symbols[offset + 8];
 					
 			List<JSNode> nodes = new ArrayList<JSNode>();
-			
-			nodes.add(e);
 			
 			for (JSNode statement : c)
 			{
@@ -1423,12 +1438,15 @@ public class JSParser extends Parser implements IParser {
 			
 			JSNode[] children = nodes.toArray(new JSNode[nodes.size()]);
 			
-			return new JSSwitchNode(children);
+			return new JSSwitchNode(lp, e, rp, lc, rc, children);
 			}
-			case 106: // SwitchStatement = SWITCH LPAREN Expression.e RPAREN LCURLY CaseClauses.c1 DefaultClause.d CaseClauses.c2 RCURLY
+			case 106: // SwitchStatement = SWITCH LPAREN.lp Expression.e RPAREN.rp LCURLY.lc CaseClauses.c1 DefaultClause.d CaseClauses.c2 RCURLY.rc
 			{
+					final Symbol lp = _symbols[offset + 2];
 					final Symbol _symbol_e = _symbols[offset + 3];
 					final JSNode e = (JSNode) _symbol_e.value;
+					final Symbol rp = _symbols[offset + 4];
+					final Symbol lc = _symbols[offset + 5];
 					final Symbol _symbol_c1 = _symbols[offset + 6];
 					final ArrayList _list_c1 = (ArrayList) _symbol_c1.value;
 					final JSNode[] c1 = _list_c1 == null ? new JSNode[0] : (JSNode[]) _list_c1.toArray(new JSNode[_list_c1.size()]);
@@ -1437,10 +1455,9 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_c2 = _symbols[offset + 8];
 					final ArrayList _list_c2 = (ArrayList) _symbol_c2.value;
 					final JSNode[] c2 = _list_c2 == null ? new JSNode[0] : (JSNode[]) _list_c2.toArray(new JSNode[_list_c2.size()]);
+					final Symbol rc = _symbols[offset + 9];
 					
 			List<JSNode> nodes = new ArrayList<JSNode>();
-			
-			nodes.add(e);
 			
 			for (JSNode statement : c1)
 			{
@@ -1456,7 +1473,7 @@ public class JSParser extends Parser implements IParser {
 			
 			JSNode[] children = nodes.toArray(new JSNode[nodes.size()]);
 			
-			return new JSSwitchNode(children);
+			return new JSSwitchNode(lp, e, rp, lc, rc, children);
 			}
 			case 107: // CaseClauses = CaseClauses CaseClause
 			{

@@ -860,15 +860,13 @@ WithStatement_NoIf
 	;
 
 SwitchStatement
-	=	SWITCH LPAREN Expression.e RPAREN LCURLY RCURLY
+	=	SWITCH LPAREN.lp Expression.e RPAREN.rp LCURLY.lc RCURLY.rc
 		{:
-			return new JSSwitchNode(e);
+			return new JSSwitchNode(lp, e, rp, lc, rc);
 		:}
-	|	SWITCH LPAREN Expression.e RPAREN LCURLY CaseClauses.c RCURLY
+	|	SWITCH LPAREN.lp Expression.e RPAREN.rp LCURLY.lc CaseClauses.c RCURLY.rc
 		{:
 			List<JSNode> nodes = new ArrayList<JSNode>();
-			
-			nodes.add(e);
 			
 			for (JSNode statement : c)
 			{
@@ -877,17 +875,16 @@ SwitchStatement
 			
 			JSNode[] children = nodes.toArray(new JSNode[nodes.size()]);
 			
-			return new JSSwitchNode(children);
+			return new JSSwitchNode(lp, e, rp, lc, rc, children);
 		:}
-	|	SWITCH LPAREN Expression.e RPAREN LCURLY DefaultClause.d RCURLY
+	|	SWITCH LPAREN.lp Expression.e RPAREN.rp LCURLY.lc DefaultClause.d RCURLY.rc
 		{:
-			return new JSSwitchNode(e, d);
+			return new JSSwitchNode(lp, e, rp, lc, rc, d);
 		:}
-	|	SWITCH LPAREN Expression.e RPAREN LCURLY DefaultClause.d CaseClauses.c RCURLY
+	|	SWITCH LPAREN.lp Expression.e RPAREN.rp LCURLY.lc DefaultClause.d CaseClauses.c RCURLY.rc
 		{:
 			List<JSNode> nodes = new ArrayList<JSNode>();
 			
-			nodes.add(e);
 			nodes.add(d);
 			
 			for (JSNode statement : c)
@@ -897,13 +894,11 @@ SwitchStatement
 			
 			JSNode[] children = nodes.toArray(new JSNode[nodes.size()]);
 			
-			return new JSSwitchNode(children);
+			return new JSSwitchNode(lp, e, rp, lc, rc, children);
 		:}
-	|	SWITCH LPAREN Expression.e RPAREN LCURLY CaseClauses.c DefaultClause.d RCURLY
+	|	SWITCH LPAREN.lp Expression.e RPAREN.rp LCURLY.lc CaseClauses.c DefaultClause.d RCURLY.rc
 		{:
 			List<JSNode> nodes = new ArrayList<JSNode>();
-			
-			nodes.add(e);
 			
 			for (JSNode statement : c)
 			{
@@ -914,13 +909,11 @@ SwitchStatement
 			
 			JSNode[] children = nodes.toArray(new JSNode[nodes.size()]);
 			
-			return new JSSwitchNode(children);
+			return new JSSwitchNode(lp, e, rp, lc, rc, children);
 		:}
-	|	SWITCH LPAREN Expression.e RPAREN LCURLY CaseClauses.c1 DefaultClause.d CaseClauses.c2 RCURLY
+	|	SWITCH LPAREN.lp Expression.e RPAREN.rp LCURLY.lc CaseClauses.c1 DefaultClause.d CaseClauses.c2 RCURLY.rc
 		{:
 			List<JSNode> nodes = new ArrayList<JSNode>();
-			
-			nodes.add(e);
 			
 			for (JSNode statement : c1)
 			{
@@ -936,7 +929,7 @@ SwitchStatement
 			
 			JSNode[] children = nodes.toArray(new JSNode[nodes.size()]);
 			
-			return new JSSwitchNode(children);
+			return new JSSwitchNode(lp, e, rp, lc, rc, children);
 		:}
 	;
 

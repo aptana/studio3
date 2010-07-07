@@ -10,12 +10,15 @@ import com.aptana.editor.js.parsing.ast.JSBinaryBooleanOperatorNode;
 import com.aptana.editor.js.parsing.ast.JSBreakNode;
 import com.aptana.editor.js.parsing.ast.JSCaseNode;
 import com.aptana.editor.js.parsing.ast.JSCatchNode;
+import com.aptana.editor.js.parsing.ast.JSCommaNode;
 import com.aptana.editor.js.parsing.ast.JSConditionalNode;
 import com.aptana.editor.js.parsing.ast.JSConstructNode;
 import com.aptana.editor.js.parsing.ast.JSContinueNode;
 import com.aptana.editor.js.parsing.ast.JSDeclarationNode;
 import com.aptana.editor.js.parsing.ast.JSDefaultNode;
 import com.aptana.editor.js.parsing.ast.JSDoNode;
+import com.aptana.editor.js.parsing.ast.JSElementsNode;
+import com.aptana.editor.js.parsing.ast.JSElisionNode;
 import com.aptana.editor.js.parsing.ast.JSFalseNode;
 import com.aptana.editor.js.parsing.ast.JSFinallyNode;
 import com.aptana.editor.js.parsing.ast.JSForInNode;
@@ -120,6 +123,7 @@ public class JSLocationWalker extends JSTreeWalker
 		{
 			// TODO: Need to reconcile element-lists versus elision and need to
 			// track left- and right-brackets
+			this.setType(LocationType.IN_GLOBAL);
 			this.visitChildren(node);
 		}
 	}
@@ -222,6 +226,21 @@ public class JSLocationWalker extends JSTreeWalker
 			{
 				this.setType(LocationType.IN_GLOBAL);
 			}
+			else if (this._offset > colon.getEnd())
+			{
+				this.setType(LocationType.IN_GLOBAL);
+				
+				for (int i = 1; i < node.getChildCount(); i++)
+				{
+					IParseNode child = node.getChild(i);
+					
+					if (child.contains(this._offset))
+					{
+						this.setType(child);
+						break;
+					}
+				}
+			}
 			else
 			{
 				this.setType(LocationType.NONE);
@@ -241,6 +260,16 @@ public class JSLocationWalker extends JSTreeWalker
 			
 			this.visitChildren(node);
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSCommaNode)
+	 */
+	@Override
+	public void visit(JSCommaNode node)
+	{
+		// TODO Auto-generated method stub
+		super.visit(node);
 	}
 
 	/* (non-Javadoc)
@@ -392,6 +421,21 @@ public class JSLocationWalker extends JSTreeWalker
 			{
 				this.setType(LocationType.IN_GLOBAL);
 			}
+			else if (this._offset > colon.getEnd())
+			{
+				this.setType(LocationType.IN_GLOBAL);
+				
+				for (int i = 0; i < node.getChildCount(); i++)
+				{
+					IParseNode child = node.getChild(i);
+					
+					if (child.contains(this._offset))
+					{
+						this.setType(child);
+						break;
+					}
+				}
+			}
 			else
 			{
 				this.setType(LocationType.NONE);
@@ -440,6 +484,30 @@ public class JSLocationWalker extends JSTreeWalker
 			{
 				this.setType(LocationType.NONE);
 			}
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSElementsNode)
+	 */
+	@Override
+	public void visit(JSElementsNode node)
+	{
+		if (node.contains(this._offset))
+		{
+			this.visitChildren(node);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSElisionNode)
+	 */
+	@Override
+	public void visit(JSElisionNode node)
+	{
+		if (node.contains(this._offset))
+		{
+			this.visitChildren(node);
 		}
 	}
 
@@ -816,7 +884,21 @@ public class JSLocationWalker extends JSTreeWalker
 	{
 		if (node.contains(this._offset))
 		{
+			Symbol colon = node.getColon();
+			IParseNode value = node.getValue();
 			
+			if (this._offset < colon.getStart())
+			{
+				this.setType(LocationType.NONE);
+			}
+			else if (this._offset < value.getStartingOffset())
+			{
+				this.setType(LocationType.IN_GLOBAL);
+			}
+			else if (value.contains(this._offset))
+			{
+				this.setType(value);
+			}
 		}
 	}
 
@@ -855,6 +937,7 @@ public class JSLocationWalker extends JSTreeWalker
 		if (node.contains(this._offset))
 		{
 			// TODO: Need to track commas between name-value pairs
+			this.setType(LocationType.NONE);
 			this.visitChildren(node);
 		}
 	}
@@ -1026,10 +1109,58 @@ public class JSLocationWalker extends JSTreeWalker
 	@Override
 	public void visit(JSSwitchNode node)
 	{
-		if (node.contains(this._offset))
+		if (node.contains(this._offset) && this._offset != node.getEndingOffset())
 		{
-			// TODO: Need to track parentheses and curly braces
-			this.visitChildren(node);
+			Symbol lparen = node.getLeftParenthesis();
+			IParseNode expression = node.getExpression();
+			Symbol rparen = node.getRightParenthesis();
+			Symbol lcurly = node.getLeftBrace();
+			IParseNode firstStatement = node.getChild(1);
+			IParseNode lastStatement = node.getLastChild();
+			
+			if (this._offset < lparen.getStart())
+			{
+				this.setType(LocationType.NONE);
+			}
+			else if (this._offset < expression.getStartingOffset())
+			{
+				this.setType(LocationType.IN_GLOBAL);
+			}
+			else if (expression.contains(this._offset))
+			{
+				this.setType(expression);
+			}
+			else if (this._offset < rparen.getStart())
+			{
+				this.setType(LocationType.IN_GLOBAL);
+			}
+			else if (this._offset < lcurly.getStart())
+			{
+				this.setType(LocationType.NONE);
+			}
+			else if (firstStatement != null && this._offset < firstStatement.getStartingOffset())
+			{
+				this.setType(LocationType.NONE);
+			}
+			else if (lastStatement != null && lastStatement.getEndingOffset() < this._offset)
+			{
+				this.setType(LocationType.NONE);
+			}
+			else
+			{
+				this.setType(LocationType.IN_GLOBAL);
+				
+				for (int i = 1; i < node.getChildCount(); i++)
+				{
+					IParseNode child = node.getChild(i);
+					
+					if (child.contains(this._offset))
+					{
+						this.setType(child);
+						break;
+					}
+				}
+			}
 		}
 	}
 

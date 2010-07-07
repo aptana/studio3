@@ -15,6 +15,8 @@ public class JSDefaultNode extends JSNode
 	public JSDefaultNode(Symbol colon, JSNode... children)
 	{
 		super(JSNodeTypes.DEFAULT, children);
+		
+		this._colon = colon;
 	}
 
 	/*

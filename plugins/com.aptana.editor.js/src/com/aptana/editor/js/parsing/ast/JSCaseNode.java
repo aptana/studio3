@@ -21,6 +21,8 @@ public class JSCaseNode extends JSNode
 		{
 			this.addChild(child);
 		}
+		
+		this._colon = colon;
 	}
 
 	/*
