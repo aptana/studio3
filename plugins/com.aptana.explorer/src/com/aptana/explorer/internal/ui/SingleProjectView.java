@@ -546,6 +546,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 
 				MenuItem ul = createSubMenuItemWithListener(menu, Messages.SingleProjectView_UploadItem, uploadAdapter);
 				ul.setImage(ExplorerPlugin.getImage(UPLOAD_MENU_ICON));
+				ul.setAccelerator(SWT.MOD1 | SWT.MOD2 | 'U');
 
 				SelectionAdapter downloadAdapter = new SelectionAdapter()
 				{
@@ -590,6 +591,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				MenuItem dl = createSubMenuItemWithListener(menu, Messages.SingleProjectView_DownloadItem,
 						downloadAdapter);
 				dl.setImage(ExplorerPlugin.getImage(DOWNLOAD_MENU_ICON));
+				dl.setAccelerator(SWT.MOD1 | SWT.MOD2 | 'D');
 			}
 
 			@Override

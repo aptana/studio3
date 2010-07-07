@@ -2,6 +2,7 @@ package com.aptana.git.ui.internal.history;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -312,6 +314,8 @@ public class GitHistoryPage extends HistoryPage implements IAptanaHistory
 	{
 		Map<String, String> variables = new HashMap<String, String>();
 		variables.put("\\{sha\\}", commit.sha()); //$NON-NLS-1$
+		variables.put(
+				"\\{themeBG\\}", toHex(ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getBackground())); //$NON-NLS-1$
 		variables.put("\\{date\\}", TIMESTAMP_FORMAT.format(commit.date())); //$NON-NLS-1$
 		variables.put("\\{author\\}", commit.getAuthor()); //$NON-NLS-1$
 		variables.put("\\{subject\\}", commit.getSubject()); //$NON-NLS-1$
@@ -419,6 +423,20 @@ public class GitHistoryPage extends HistoryPage implements IAptanaHistory
 		{
 			ThemePlugin.getDefault().getControlThemerFactory().apply(control);
 		}
+	}
+
+	// FIXME Copy-pasted from Theme
+	private String toHex(RGB rgb)
+	{
+		return MessageFormat.format("#{0}{1}{2}", pad(Integer.toHexString(rgb.red), 2, '0'), pad(Integer //$NON-NLS-1$
+				.toHexString(rgb.green), 2, '0'), pad(Integer.toHexString(rgb.blue), 2, '0'));
+	}
+
+	private String pad(String string, int desiredLength, char padChar)
+	{
+		while (string.length() < desiredLength)
+			string = padChar + string;
+		return string;
 	}
 
 	@Override
