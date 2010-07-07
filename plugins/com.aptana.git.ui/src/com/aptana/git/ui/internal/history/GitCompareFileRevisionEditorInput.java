@@ -518,8 +518,11 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 
 		if (fPane != null && (fPane.getViewer() instanceof TextMergeViewer))
 		{
+			// TODO Set up source viewer in way so we actually get syntax coloring. We'd need to be able to grab one by the file's content type!
 			((TextMergeViewer) fPane.getViewer()).setBackgroundColor(ThemePlugin.getDefault().getThemeManager()
 					.getCurrentTheme().getBackground());
+			((TextMergeViewer) fPane.getViewer()).setForegroundColor(ThemePlugin.getDefault().getThemeManager()
+					.getCurrentTheme().getForeground());
 		}
 		if (fStructurePane != null && (fStructurePane.getContent() instanceof Tree))
 		{
