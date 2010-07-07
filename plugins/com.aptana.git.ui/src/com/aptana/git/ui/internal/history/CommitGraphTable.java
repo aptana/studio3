@@ -347,7 +347,7 @@ class CommitGraphTable extends TableViewer
 		protected void drawCommitDot(final int x, final int y, final int w, final int h)
 		{
 			g.fillOval(cellX + x, cellY + y, w, h);
-			g.setForeground(sys_black);
+			g.setForeground(cellFG);
 			g.setLineWidth(2);
 			g.drawOval(cellX + x, cellY + y, w, h);
 		}
