@@ -568,7 +568,11 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		LocationType result = LocationType.UNKNOWN;
 		IParseNode ast = this.getAST();
 		
-		if (ast instanceof JSParseRootNode)
+		if (ast == null)
+		{
+			result = LocationType.IN_GLOBAL;
+		}
+		else if (ast instanceof JSParseRootNode)
 		{
 			JSLocationWalker walker = new JSLocationWalker(offset);
 			
