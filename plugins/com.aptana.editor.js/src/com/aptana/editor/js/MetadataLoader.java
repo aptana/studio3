@@ -91,8 +91,6 @@ public class MetadataLoader extends Job
 				}
 				finally
 				{
-					subMonitor.worked(1);
-
 					if (stream != null)
 					{
 						try
@@ -105,6 +103,10 @@ public class MetadataLoader extends Job
 					}
 				}
 			}
+			
+			subMonitor.worked(1);
 		}
+		
+		subMonitor.done();
 	}
 }
