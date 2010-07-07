@@ -6,7 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Aptana, Inc.
 Fragment-Host: com.aptana.editor.css;bundle-version="1.0.0"
 Require-Bundle: org.eclipse.core.runtime,
- org.junit;bundle-version="[3.0.0,4.0.0)",
+ org.junit,
  org.eclipse.jface.text,
  com.aptana.editor.common;bundle-version="1.0.0",
  org.eclipse.core.filesystem,
