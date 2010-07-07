@@ -1,5 +1,7 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 public class JSContinueNode extends JSLabelStatementNode
 {
 	/**
@@ -13,11 +15,11 @@ public class JSContinueNode extends JSLabelStatementNode
 	/**
 	 * JSContinueNode
 	 * 
-	 * @param identifier
+	 * @param label
 	 */
-	public JSContinueNode(String identifier)
+	public JSContinueNode(Symbol label)
 	{
-		super(JSNodeTypes.CONTINUE, identifier);
+		super(JSNodeTypes.CONTINUE, label);
 	}
 
 	/*

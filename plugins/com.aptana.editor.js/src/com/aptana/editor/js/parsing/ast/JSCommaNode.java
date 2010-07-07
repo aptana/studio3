@@ -1,6 +1,6 @@
 package com.aptana.editor.js.parsing.ast;
 
-public class JSCommaNode extends JSNaryNode
+public class JSCommaNode extends JSNode
 {
 	/**
 	 * JSCommaNode

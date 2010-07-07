@@ -1,17 +1,23 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSDeclarationNode extends JSNode
 {
+	private Symbol _equalSign;
+	
 	/**
 	 * JSDeclarationNode
 	 * 
 	 * @param children
 	 */
-	public JSDeclarationNode(JSNode... children)
+	public JSDeclarationNode(JSNode identifier, Symbol equalSign, JSNode value)
 	{
-		super(JSNodeTypes.DECLARATION, children);
+		super(JSNodeTypes.DECLARATION, identifier, value);
+		
+		this._equalSign = equalSign;
 	}
 
 	/*
@@ -24,6 +30,16 @@ public class JSDeclarationNode extends JSNode
 		walker.visit(this);
 	}
 
+	/**
+	 * getEqualSign
+	 * 
+	 * @return
+	 */
+	public Symbol getEqualSign()
+	{
+		return this._equalSign;
+	}
+	
 	/**
 	 * getIdentifier
 	 * 

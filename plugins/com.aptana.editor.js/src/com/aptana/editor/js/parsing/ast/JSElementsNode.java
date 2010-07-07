@@ -1,6 +1,6 @@
 package com.aptana.editor.js.parsing.ast;
 
-public class JSElementsNode extends JSNaryNode
+public class JSElementsNode extends JSNode
 {
 	/**
 	 * JSElementsNode

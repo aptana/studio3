@@ -1,19 +1,13 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSPreUnaryOperatorNode extends JSNode
 {
-	/**
-	 * JSUnaryOperatorNode
-	 * 
-	 * @param expression
-	 */
-	protected JSPreUnaryOperatorNode(JSNode expression)
-	{
-		this.setChildren(new JSNode[] { expression });
-	}
+	private Symbol _operator;
 
 	/**
 	 * JSUnaryOperatorNode
@@ -21,9 +15,9 @@ public class JSPreUnaryOperatorNode extends JSNode
 	 * @param type
 	 * @param expression
 	 */
-	public JSPreUnaryOperatorNode(short type, JSNode expression)
+	protected JSPreUnaryOperatorNode(short type, JSNode expression)
 	{
-		this(expression);
+		this.setChildren(new JSNode[] { expression });
 
 		this.setNodeType(type);
 	}
@@ -34,12 +28,13 @@ public class JSPreUnaryOperatorNode extends JSNode
 	 * @param operator
 	 * @param expression
 	 */
-	public JSPreUnaryOperatorNode(String operator, JSNode expression)
+	public JSPreUnaryOperatorNode(Symbol operator, JSNode expression)
 	{
-		this(expression);
+		this._operator = operator;
+		this.setChildren(new JSNode[] { expression });
 
 		short type;
-		JSTokenType token = JSTokenType.get(operator);
+		JSTokenType token = JSTokenType.get((String) operator.value);
 
 		switch (token)
 		{
@@ -104,5 +99,15 @@ public class JSPreUnaryOperatorNode extends JSNode
 	public IParseNode getExpression()
 	{
 		return this.getChild(0);
+	}
+
+	/**
+	 * getOperator
+	 * 
+	 * @return
+	 */
+	public Symbol getOperator()
+	{
+		return this._operator;
 	}
 }

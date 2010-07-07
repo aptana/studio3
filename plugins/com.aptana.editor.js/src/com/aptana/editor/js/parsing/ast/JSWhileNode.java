@@ -1,17 +1,25 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSWhileNode extends JSNode
 {
+	private Symbol _leftParenthesis;
+	private Symbol _rightParenthesis;
+
 	/**
 	 * JSWhileNode
 	 * 
 	 * @param children
 	 */
-	public JSWhileNode(JSNode... children)
+	public JSWhileNode(Symbol leftParenthesis, JSNode condition, Symbol rightParenthesis, JSNode body)
 	{
-		super(JSNodeTypes.WHILE, children);
+		super(JSNodeTypes.WHILE, condition, body);
+		
+		this._leftParenthesis = leftParenthesis;
+		this._rightParenthesis = rightParenthesis;
 	}
 
 	/*
@@ -42,5 +50,25 @@ public class JSWhileNode extends JSNode
 	public IParseNode getCondition()
 	{
 		return this.getChild(0);
+	}
+
+	/**
+	 * getLeftParenthesis
+	 * 
+	 * @return
+	 */
+	public Symbol getLeftParenthesis()
+	{
+		return this._leftParenthesis;
+	}
+
+	/**
+	 * getRightParenthesis
+	 * 
+	 * @return
+	 */
+	public Symbol getRightParenthesis()
+	{
+		return this._rightParenthesis;
 	}
 }

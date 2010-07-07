@@ -1,22 +1,27 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSPostUnaryOperatorNode extends JSNode
 {
+	private Symbol _operator;
+	
 	/**
 	 * JSPostUnaryOperatorNode
 	 * 
 	 * @param operator
 	 * @param expression
 	 */
-	public JSPostUnaryOperatorNode(String operator, JSNode expression)
+	public JSPostUnaryOperatorNode(Symbol operator, JSNode expression)
 	{
+		this._operator = operator;
 		this.setChildren(new JSNode[] { expression });
 
 		short type = DEFAULT_TYPE;
-		JSTokenType token = JSTokenType.get(operator);
+		JSTokenType token = JSTokenType.get((String) operator.value);
 
 		switch (token)
 		{
@@ -53,5 +58,15 @@ public class JSPostUnaryOperatorNode extends JSNode
 	public IParseNode getExpression()
 	{
 		return this.getChild(0);
+	}
+	
+	/**
+	 * getOperator
+	 * 
+	 * @return
+	 */
+	public Symbol getOperator()
+	{
+		return this._operator;
 	}
 }

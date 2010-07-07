@@ -1,15 +1,25 @@
 package com.aptana.editor.js.parsing.ast;
 
-public class JSObjectNode extends JSNaryNode
+import beaver.Symbol;
+
+public class JSObjectNode extends JSNode
 {
+	private Symbol _leftBrace;
+	private Symbol _rightBrace;
+
 	/**
 	 * JSObjectNode
 	 * 
-	 * @param children
+	 * @param leftBrace
+	 * @param properties
+	 * @param rightBrace
 	 */
-	public JSObjectNode(JSNode... children)
+	public JSObjectNode(Symbol leftBrace, Symbol rightBrace, JSNode... properties)
 	{
-		super(JSNodeTypes.OBJECT_LITERAL, children);
+		super(JSNodeTypes.OBJECT_LITERAL, properties);
+
+		this._leftBrace = leftBrace;
+		this._rightBrace = rightBrace;
 	}
 
 	/*
@@ -20,5 +30,25 @@ public class JSObjectNode extends JSNaryNode
 	public void accept(JSTreeWalker walker)
 	{
 		walker.visit(this);
+	}
+
+	/**
+	 * getLeftBrace
+	 * 
+	 * @return
+	 */
+	public Symbol getLeftBrace()
+	{
+		return this._leftBrace;
+	}
+	
+	/**
+	 * getRightBrace
+	 * 
+	 * @return
+	 */
+	public Symbol getRightBrace()
+	{
+		return this._rightBrace;
 	}
 }

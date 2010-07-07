@@ -182,13 +182,18 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSBreakNode node)
 	{
-		String identifier = node.getIdentifier();
+		Symbol label = node.getLabel();
 
 		this._printer.print("break");
 
-		if (identifier != null && identifier.length() > 0)
+		if (label != null)
 		{
-			this._printer.print(" ").print(identifier);
+			String text = (String) label.value;
+			
+			if (text != null && text.length() > 0)
+			{
+				this._printer.print(" ").print(label);
+			}
 		}
 
 		this.addSemicolon(node);
@@ -280,13 +285,18 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSContinueNode node)
 	{
-		String identifier = node.getIdentifier();
+		Symbol label = node.getLabel();
 
 		this._printer.print("continue");
 
-		if (identifier != null && identifier.length() > 0)
+		if (label != null)
 		{
-			this._printer.print(" ").print(identifier);
+			String text = (String) label.value;
+			
+			if (text != null && text.length() > 0)
+			{
+				this._printer.print(" ").print(label);
+			}
 		}
 
 		this.addSemicolon(node);
@@ -425,7 +435,7 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSForNode node)
 	{
-		IParseNode initializer = node.getInitialization();
+		IParseNode initializer = node.getInitializer();
 		IParseNode condition = node.getCondition();
 		IParseNode advance = node.getAdvance();
 
@@ -540,7 +550,7 @@ public class JSFormatWalker extends JSTreeWalker
 		IParseNode falseBlock = node.getFalseBlock();
 
 		this._printer.print("if (");
-		this.formatNode(node.getExpression());
+		this.formatNode(node.getCondition());
 		this._printer.print(") ");
 		this.formatNode(trueBlock);
 
@@ -577,7 +587,7 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSLabelledNode node)
 	{
-		this.formatNode(node.getIdentifier());
+		this.formatNode(node.getLabel());
 		this._printer.print(": ");
 		this.formatNode(node.getBlock());
 		this.addSemicolon(node);

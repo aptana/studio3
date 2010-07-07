@@ -1,11 +1,13 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 /**
  * Represents continue and break statements.
  */
 public abstract class JSLabelStatementNode extends JSNode
 {
-	private String fIdentifier;
+	private Symbol _label;
 
 	/**
 	 * JSLabelStatementNode
@@ -21,13 +23,13 @@ public abstract class JSLabelStatementNode extends JSNode
 	 * JSLabelStatementNode
 	 * 
 	 * @param type
-	 * @param identifier
+	 * @param label
 	 */
-	public JSLabelStatementNode(short type, String identifier)
+	public JSLabelStatementNode(short type, Symbol label)
 	{
 		super(type);
 
-		fIdentifier = identifier;
+		this._label = label;
 	}
 
 	/*
@@ -41,8 +43,10 @@ public abstract class JSLabelStatementNode extends JSNode
 		{
 			return false;
 		}
+		
 		JSLabelStatementNode other = (JSLabelStatementNode) obj;
-		return fIdentifier == null ? other.fIdentifier == null : fIdentifier.equals(other.fIdentifier);
+		
+		return _label == null ? other._label == null : _label.value.equals(other._label.value);
 	}
 
 	/**
@@ -50,9 +54,9 @@ public abstract class JSLabelStatementNode extends JSNode
 	 * 
 	 * @return
 	 */
-	public String getIdentifier()
+	public Symbol getLabel()
 	{
-		return fIdentifier;
+		return this._label;
 	}
 
 	/*
@@ -63,6 +67,7 @@ public abstract class JSLabelStatementNode extends JSNode
 	public int hashCode()
 	{
 		int hash = super.hashCode();
-		return hash * 31 + (fIdentifier == null ? 0 : fIdentifier.hashCode());
+		
+		return hash * 31 + (_label == null ? 0 : _label.value.hashCode());
 	}
 }

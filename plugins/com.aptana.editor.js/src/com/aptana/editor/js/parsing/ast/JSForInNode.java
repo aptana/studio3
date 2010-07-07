@@ -1,17 +1,27 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSForInNode extends JSNode
 {
+	private Symbol _leftParenthesis;
+	private Symbol _in;
+	private Symbol _rightParenthesis;
+	
 	/**
 	 * JSForInNode
 	 * 
 	 * @param children
 	 */
-	public JSForInNode(JSNode... children)
+	public JSForInNode(Symbol leftParenthesis, JSNode initializer, Symbol in, JSNode expression, Symbol rightParenthesis, JSNode body)
 	{
-		super(JSNodeTypes.FOR_IN, children);
+		super(JSNodeTypes.FOR_IN, initializer, expression, body);
+		
+		this._leftParenthesis = leftParenthesis;
+		this._in = in;
+		this._rightParenthesis = rightParenthesis;
 	}
 
 	/*
@@ -45,6 +55,16 @@ public class JSForInNode extends JSNode
 	}
 
 	/**
+	 * getIn
+	 * 
+	 * @return
+	 */
+	public Symbol getIn()
+	{
+		return this._in;
+	}
+	
+	/**
 	 * getInitialization
 	 * 
 	 * @return
@@ -52,5 +72,25 @@ public class JSForInNode extends JSNode
 	public IParseNode getInitializer()
 	{
 		return this.getChild(0);
+	}
+	
+	/**
+	 * getLeftParenthesis
+	 * 
+	 * @return
+	 */
+	public Symbol getLeftParenthesis()
+	{
+		return this._leftParenthesis;
+	}
+	
+	/**
+	 * getRightParenthesis
+	 * 
+	 * @return
+	 */
+	public Symbol getRightParenthesis()
+	{
+		return this._rightParenthesis;
 	}
 }

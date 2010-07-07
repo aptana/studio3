@@ -1,17 +1,25 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSNameValuePairNode extends JSNode
 {
+	private Symbol _colon;
+	
 	/**
 	 * JSNameValuePairNode
 	 * 
-	 * @param children
+	 * @param name
+	 * @param colon
+	 * @param value
 	 */
-	public JSNameValuePairNode(JSNode... children)
+	public JSNameValuePairNode(JSNode name, Symbol colon, JSNode value)
 	{
-		super(JSNodeTypes.NAME_VALUE_PAIR, children);
+		super(JSNodeTypes.NAME_VALUE_PAIR, name, value);
+		
+		this._colon = colon;
 	}
 
 	/*
@@ -24,6 +32,16 @@ public class JSNameValuePairNode extends JSNode
 		walker.visit(this);
 	}
 
+	/**
+	 * getColon
+	 * 
+	 * @return
+	 */
+	public Symbol getColon()
+	{
+		return this._colon;
+	}
+	
 	/**
 	 * getName
 	 */

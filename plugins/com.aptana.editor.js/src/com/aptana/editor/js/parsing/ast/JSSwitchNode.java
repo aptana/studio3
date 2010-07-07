@@ -1,6 +1,8 @@
 package com.aptana.editor.js.parsing.ast;
 
-public class JSSwitchNode extends JSNaryAndExpressionNode
+import com.aptana.parsing.ast.IParseNode;
+
+public class JSSwitchNode extends JSNode
 {
 	/**
 	 * JSSwitchNode
@@ -20,5 +22,15 @@ public class JSSwitchNode extends JSNaryAndExpressionNode
 	public void accept(JSTreeWalker walker)
 	{
 		walker.visit(this);
+	}
+
+	/**
+	 * getExpression
+	 * 
+	 * @return
+	 */
+	public IParseNode getExpression()
+	{
+		return this.getChild(0);
 	}
 }

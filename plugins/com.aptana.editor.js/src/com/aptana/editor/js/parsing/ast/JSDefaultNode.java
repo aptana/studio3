@@ -1,14 +1,18 @@
 package com.aptana.editor.js.parsing.ast;
 
-public class JSDefaultNode extends JSNaryNode
+import beaver.Symbol;
+
+public class JSDefaultNode extends JSNode
 {
+	private Symbol _colon;
+	
 	/**
 	 * JSDefaultNode
 	 * 
 	 * @param start
 	 * @param end
 	 */
-	public JSDefaultNode(JSNode... children)
+	public JSDefaultNode(Symbol colon, JSNode... children)
 	{
 		super(JSNodeTypes.DEFAULT, children);
 	}
@@ -21,5 +25,15 @@ public class JSDefaultNode extends JSNaryNode
 	public void accept(JSTreeWalker walker)
 	{
 		walker.visit(this);
+	}
+	
+	/**
+	 * getColon
+	 * 
+	 * @return
+	 */
+	public Symbol getColon()
+	{
+		return this._colon;
 	}
 }

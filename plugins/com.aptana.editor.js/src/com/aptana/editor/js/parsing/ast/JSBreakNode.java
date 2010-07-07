@@ -1,12 +1,11 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 public class JSBreakNode extends JSLabelStatementNode
 {
 	/**
 	 * JSBreakNode
-	 * 
-	 * @param start
-	 * @param end
 	 */
 	public JSBreakNode()
 	{
@@ -16,13 +15,11 @@ public class JSBreakNode extends JSLabelStatementNode
 	/**
 	 * JSBreakNode
 	 * 
-	 * @param start
-	 * @param end
-	 * @param identifier
+	 * @param label
 	 */
-	public JSBreakNode(String identifier)
+	public JSBreakNode(Symbol label)
 	{
-		super(JSNodeTypes.BREAK, identifier);
+		super(JSNodeTypes.BREAK, label);
 	}
 
 	/*

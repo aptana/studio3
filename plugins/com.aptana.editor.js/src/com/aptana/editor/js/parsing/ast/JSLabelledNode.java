@@ -1,17 +1,23 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSLabelledNode extends JSNode
 {
+	private Symbol _colon;
+	
 	/**
 	 * JSLabelledNode
 	 * 
 	 * @param children
 	 */
-	public JSLabelledNode(JSNode... children)
+	public JSLabelledNode(JSNode label, Symbol colon, JSNode block)
 	{
-		super(JSNodeTypes.LABELLED, children);
+		super(JSNodeTypes.LABELLED, label, block);
+		
+		this._colon = colon;
 	}
 
 	/*
@@ -33,13 +39,23 @@ public class JSLabelledNode extends JSNode
 	{
 		return this.getChild(1);
 	}
-
+	
 	/**
-	 * getIdentifier
+	 * getColon
 	 * 
 	 * @return
 	 */
-	public IParseNode getIdentifier()
+	public Symbol getColon()
+	{
+		return this._colon;
+	}
+
+	/**
+	 * getLabel
+	 * 
+	 * @return
+	 */
+	public IParseNode getLabel()
 	{
 		return this.getChild(0);
 	}

@@ -1,17 +1,30 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSForNode extends JSNode
 {
+	private Symbol _leftParenthesis;
+	private Symbol _semicolon1;
+	private Symbol _semicolon2;
+	private Symbol _rightParenthesis;
+
 	/**
 	 * JSForNode
 	 * 
 	 * @param children
 	 */
-	public JSForNode(JSNode... children)
+	public JSForNode(Symbol leftParenthesis, JSNode initializer, Symbol semicolon1, JSNode condition, Symbol semicolon2, JSNode advance,
+		Symbol rightParenthesis, JSNode body)
 	{
-		super(JSNodeTypes.FOR, children);
+		super(JSNodeTypes.FOR, initializer, condition, advance, body);
+
+		this._leftParenthesis = leftParenthesis;
+		this._semicolon1 = semicolon1;
+		this._semicolon2 = semicolon2;
+		this._rightParenthesis = rightParenthesis;
 	}
 
 	/*
@@ -59,8 +72,48 @@ public class JSForNode extends JSNode
 	 * 
 	 * @return
 	 */
-	public IParseNode getInitialization()
+	public IParseNode getInitializer()
 	{
 		return this.getChild(0);
+	}
+
+	/**
+	 * getLeftParenthesis
+	 * 
+	 * @return
+	 */
+	public Symbol getLeftParenthesis()
+	{
+		return this._leftParenthesis;
+	}
+
+	/**
+	 * getRightParenthesis
+	 * 
+	 * @return
+	 */
+	public Symbol getRightParenthesis()
+	{
+		return this._rightParenthesis;
+	}
+
+	/**
+	 * getSemicolon1
+	 * 
+	 * @return
+	 */
+	public Symbol getSemicolon1()
+	{
+		return this._semicolon1;
+	}
+
+	/**
+	 * getSemicolon2
+	 * 
+	 * @return
+	 */
+	public Symbol getSemicolon2()
+	{
+		return this._semicolon2;
 	}
 }
