@@ -9,6 +9,7 @@
  *******************************************************************************/
 package com.aptana.git.internal.core.storage;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -70,7 +71,7 @@ public class CommitFileRevision extends GitFileRevision
 			{
 				if (commit == null)
 				{
-					return null;
+					return new ByteArrayInputStream(new byte[0]);
 				}
 				try
 				{
