@@ -198,9 +198,25 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected void addProperties(Set<ICompletionProposal> proposals, int offset)
 	{
+		IParseNode propertyNode = null;
+		
 		if (this._targetNode != null && this._targetNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
 		{
-			JSGetPropertyNode node = (JSGetPropertyNode) this._targetNode;
+			propertyNode = this._targetNode;
+		}
+		else if (this._statementNode != null)
+		{
+			IParseNode child = this._statementNode.getFirstChild();
+			
+			if (child != null && child.getNodeType() == JSNodeTypes.GET_PROPERTY)
+			{
+				propertyNode = child;
+			}
+		}
+		
+		if (propertyNode != null)
+		{
+			JSGetPropertyNode node = (JSGetPropertyNode) propertyNode;
 			Scope<JSNode> localScope = this.getScopeAtOffset(offset);
 			
 			if (localScope != null)
