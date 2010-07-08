@@ -437,9 +437,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				break;
 				
 			case IN_VARIABLE_NAME:
-				//System.out.println("Variable");
-				break;
-				
 			case IN_GLOBAL:
 				this.addAllGlobals(result, offset);
 				this.addSymbolsInScope(result, offset);
