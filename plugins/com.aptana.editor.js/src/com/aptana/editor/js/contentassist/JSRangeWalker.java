@@ -27,7 +27,7 @@ public class JSRangeWalker extends JSTreeWalker
 	 */
 	public JSRangeWalker(int offset)
 	{
-		this._offset = offset;
+		this._offset = offset - 1;
 		this._range = new Range(offset, offset - 1);
 	}
 
@@ -82,7 +82,7 @@ public class JSRangeWalker extends JSTreeWalker
 	{
 		if (node.contains(this._offset))
 		{
-			this.setRange(node.getStart(), this._offset - 1);
+			this.setRange(node.getStart(), this._offset);
 		}
 	}
 
@@ -161,5 +161,23 @@ public class JSRangeWalker extends JSTreeWalker
 	{
 		// do nothing
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visitChildren(com.aptana.editor.js.parsing.ast.JSNode)
+	 */
+	@Override
+	protected void visitChildren(JSNode node)
+	{
+		if (node.contains(this._offset))
+		{
+			for (IParseNode child : node)
+			{
+				if (child.contains(this._offset))
+				{
+					this.setRange(child);
+					break;
+				}
+			}
+		}
+	}
 }
