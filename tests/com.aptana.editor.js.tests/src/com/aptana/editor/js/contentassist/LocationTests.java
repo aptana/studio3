@@ -2,8 +2,6 @@ package com.aptana.editor.js.contentassist;
 
 import java.text.MessageFormat;
 
-import com.aptana.editor.common.contentassist.LexemeProvider;
-import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.editor.js.tests.EditorBasedTests;
 
 public class LocationTests extends EditorBasedTests
@@ -23,8 +21,7 @@ public class LocationTests extends EditorBasedTests
 		{
 			for (int offset = range.startingOffset; offset <= range.endingOffset; offset++)
 			{
-				LexemeProvider<JSTokenType> lexemeProvider = context.processor.createLexemeProvider(context.document, offset);
-				LocationType location = context.processor.getLocation(lexemeProvider, offset);
+				LocationType location = context.processor.getLocation(context.document, offset);
 				String message = MessageFormat.format(
 					"Expected {0} at location {1} of ''{2}'': character = ''{3}''",
 					range.location.toString(),

@@ -28,7 +28,6 @@ import com.aptana.editor.js.contentassist.model.FieldSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.parsing.JSTokenScanner;
-import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
@@ -38,25 +37,29 @@ import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.Scope;
 import com.aptana.parsing.ast.IParseNode;
-import com.aptana.parsing.ast.ParseRootNode;
+import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
+import com.aptana.parsing.lexer.Range;
 
 public class JSContentAssistProcessor extends CommonContentAssistProcessor
 {
-	private static final String PARENS = "()"; //$NON-NLS-1$
 	private static final Image JS_FUNCTION = Activator.getImage("/icons/js_function.gif"); //$NON-NLS-1$
 	private static final Image JS_PROPERTY = Activator.getImage("/icons/js_property.gif"); //$NON-NLS-1$
+	
+	private static final String PARENS = "()"; //$NON-NLS-1$
+	
 	private static final EnumSet<FieldSelector> CORE_GLOBAL_FIELDS = EnumSet.of(FieldSelector.NAME, FieldSelector.DESCRIPTION, FieldSelector.USER_AGENTS, FieldSelector.TYPES, FieldSelector.RETURN_TYPES);
 	private static final EnumSet<FieldSelector> PROJECT_GLOBAL_FIELDS = EnumSet.of(FieldSelector.NAME, FieldSelector.DESCRIPTION, FieldSelector.TYPES, FieldSelector.RETURN_TYPES);
 	private static final EnumSet<FieldSelector> PROPERTY_FIELDS = EnumSet.of(FieldSelector.NAME, FieldSelector.DESCRIPTION, FieldSelector.USER_AGENTS);
+	private static final EnumSet<LocationType> IGNORED_TYPES = EnumSet.of(LocationType.UNKNOWN, LocationType.NONE);
 
 	private JSIndexQueryHelper _indexHelper;
 	private JSASTQueryHelper _astHelper;
 	private IContextInformationValidator _validator;
-	private Lexeme<JSTokenType> _currentLexeme;
 	private IParseNode _targetNode;
 	private IParseNode _statementNode;
 	private Scope<JSNode> _globals;
+	private IRange _replaceRange;
 
 	/**
 	 * JSIndexContentAssitProcessor
@@ -298,21 +301,23 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			length--;
 		}
 		
-		IContextInformation contextInfo = null;
+		// calculate what text will be replaced
 		int replaceLength = 0;
 
-//		if (this._currentLexeme != null)
-//		{
-//			offset = this._currentLexeme.getStartingOffset();
-//			replaceLength = this._currentLexeme.getLength();
-//		}
+		if (this._replaceRange != null)
+		{
+			offset = this._replaceRange.getStartingOffset();
+			replaceLength = this._replaceRange.getLength();
+		}
 
 		// build proposal
+		IContextInformation contextInfo = null;
+		
 		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image, displayName, contextInfo, description);
 		proposal.setFileLocation(fileLocation);
 		proposal.setUserAgentImages(userAgents);
 
-		// add it to the list
+		// add the proposal to the list
 		proposals.add(proposal);
 	}
 	
@@ -401,13 +406,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		LexemeProvider<JSTokenType> result;
 		
-		this._targetNode = this.getActiveASTNode(offset);
-		this._statementNode = null;
-		
-		if (this._targetNode != null && this._targetNode instanceof JSNode)
+		if (this._statementNode != null)
 		{
-			this._statementNode = ((JSNode) this._targetNode).getContainingStatementNode();
-			
 			result = new JSLexemeProvider(document, this._statementNode, new JSTokenScanner());
 		}
 		else
@@ -425,20 +425,10 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	@Override
 	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
 	{
-		IDocument document = viewer.getDocument();
-		LexemeProvider<JSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
 		Set<ICompletionProposal> result = new HashSet<ICompletionProposal>();
-
-		// store a reference to the lexeme at the current position
-		this._currentLexeme = lexemeProvider.getLexemeFromOffset(offset);
 		
-		if (this._currentLexeme == null)
-		{
-			this._currentLexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
-		}
-
 		// first step is to determine where we are
-		LocationType location = this.getLocation(lexemeProvider, offset);
+		LocationType location = this.getLocation(viewer.getDocument(), offset);
 		
 		switch (location)
 		{
@@ -478,10 +468,10 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		});
 
 		// select the current proposal based on the current lexeme
-		if (this._currentLexeme != null)
-		{
-			this.setSelectedProposal(this._currentLexeme.getText(), proposals);
-		}
+//		if (this._currentLexeme != null)
+//		{
+//			this.setSelectedProposal(this._currentLexeme.getText(), proposals);
+//		}
 
 		return proposals.toArray(new ICompletionProposal[proposals.size()]);
 	}
@@ -579,340 +569,53 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	LocationType getLocation(LexemeProvider<JSTokenType> lexemeProvider, int offset)
+	LocationType getLocation(IDocument document, int offset)
 	{
 		LocationType result = LocationType.UNKNOWN;
+		
+		// set up references to AST nodes around the current offset
+		this._targetNode = this.getActiveASTNode(offset);
+		this._statementNode = null;
+		
+		if (this._targetNode != null && this._targetNode instanceof JSNode)
+		{
+			this._statementNode = ((JSNode) this._targetNode).getContainingStatementNode();
+		}
+		
+		// grab the resulting AST
 		IParseNode ast = this.getAST();
 		
+		// try to determine the current offset's CA type via the AST
 		if (ast == null)
 		{
 			result = LocationType.IN_GLOBAL;
+			
+			this._replaceRange = new Range(offset, offset - 1);
 		}
 		else if (ast instanceof JSParseRootNode)
 		{
-			JSLocationWalker walker = new JSLocationWalker(offset);
+			JSLocationWalker typeWalker = new JSLocationWalker(offset);
 			
-			((JSParseRootNode) ast).accept(walker);
+			((JSParseRootNode) ast).accept(typeWalker);
 			
-			result = walker.getType();
+			result = typeWalker.getType();
+			
+			if (IGNORED_TYPES.contains(result) == false)
+			{
+				JSRangeWalker rangeWalker = new JSRangeWalker(offset);
+				
+				((JSParseRootNode) ast).accept(rangeWalker);
+				
+				this._replaceRange = rangeWalker.getRange();
+			}
 		}
 		
-//		if (result == Location.UNKNOWN)
-//		{
-//			result = this.getLocationByLexeme(lexemeProvider, offset);
-//		}
-		
-		return result;
-	}
-	
-	/**
-	 * getLocationByAST
-	 * 
-	 * @param lexemeProvider
-	 * @param offset
-	 * @return
-	 */
-	LocationType getLocationByAST(LexemeProvider<JSTokenType> lexemeProvider, int offset)
-	{
-		Lexeme<JSTokenType> lexeme;
-		IParseNode node;
-		LocationType result = LocationType.UNKNOWN;
-		short type;
-		
-		if (this._targetNode != null)
+		// if we couldn't determine the location type with the AST, then
+		// fallback to using lexemes
+		if (result == LocationType.UNKNOWN)
 		{
-			switch (this._targetNode.getNodeType())
-			{
-				case JSNodeTypes.ARGUMENTS:
-					lexeme = lexemeProvider.getLexemeFromOffset(offset);
-					
-					if (lexeme != null)
-					{
-						switch (lexeme.getType())
-						{
-							case COMMA:
-							case LPAREN:
-								lexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
-								
-								if (lexeme != null && lexeme.getType() == JSTokenType.IDENTIFIER)
-								{
-									this._currentLexeme = lexeme;
-									result = LocationType.IN_GLOBAL;
-								}
-								break;
-								
-							case RPAREN:
-								node = this._targetNode.getNodeAtOffset(offset - 1);
-								
-								if (node != null)
-								{
-									switch (node.getNodeType())
-									{
-										case JSNodeTypes.IDENTIFIER:
-											result = LocationType.IN_GLOBAL;
-											this._currentLexeme = lexemeProvider.getLexemeFromOffset(node.getStartingOffset());
-											break;
-											
-										default:
-											if (node == this._targetNode)
-											{
-												result = LocationType.IN_GLOBAL;
-											}
-											break;
-									}
-								}
-								break;
-								
-							default:
-								result = LocationType.IN_GLOBAL;
-								break;
-						}
-					}
-					else
-					{
-						this._currentLexeme = null;
-						result = LocationType.IN_GLOBAL;
-					}
-					break;
-					
-				case JSNodeTypes.CONSTRUCT:
-					lexeme = lexemeProvider.getLexemeFromOffset(offset);
-					
-					if (lexeme == null)
-					{
-						// see if we're touching
-						lexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
-					}
-					
-					if (lexeme == null || lexeme.getType() != JSTokenType.NEW)
-					{
-						result = LocationType.IN_CONSTRUCTOR;
-					}
-					break;
-					
-				case JSNodeTypes.DECLARATION:
-					// ignore declarations in for-statements for now
-					type = this._statementNode.getNodeType();
-					
-					if (type == JSNodeTypes.FOR || type == JSNodeTypes.FOR_IN)
-					{
-						break;
-					}
-					// else fall through
-					
-				case JSNodeTypes.EMPTY:
-				case JSNodeTypes.STATEMENTS:
-					if (this._targetNode.contains(offset) || this._targetNode.getEndingOffset() < offset)
-					{
-						if (this._targetNode.getStartingOffset() != offset)
-						{
-							result = LocationType.IN_GLOBAL;
-							this._currentLexeme = null;
-						}
-					}
-					break;
-					
-				case JSNodeTypes.FOR:
-					lexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
-					
-					if (lexeme != null && lexeme.getType() == JSTokenType.IDENTIFIER)
-					{
-						result = LocationType.IN_GLOBAL;
-						this._currentLexeme = lexeme;
-					}
-					break;
-					
-				case JSNodeTypes.FOR_IN:
-					break;
-					
-				case JSNodeTypes.GET_ELEMENT:
-				case JSNodeTypes.GET_PROPERTY:
-					result = LocationType.IN_GLOBAL;
-					
-					lexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
-					
-					if (lexeme != null)
-					{
-						this._currentLexeme = lexeme;
-					}
-					break;
-					
-				case JSNodeTypes.IDENTIFIER:
-					// ignore for-statements for now
-					 type = this._statementNode.getNodeType();
-					
-					if (type != JSNodeTypes.FOR && type != JSNodeTypes.FOR_IN)
-					{
-						node = this._targetNode.getParent();
-						
-						switch (node.getNodeType())
-						{
-							case JSNodeTypes.DECLARATION:
-							case JSNodeTypes.FUNCTION:
-							case JSNodeTypes.PARAMETERS:
-								break;
-								
-							case JSNodeTypes.GET_PROPERTY:
-								if (node.getChild(0) == this._targetNode)
-								{
-									result = LocationType.IN_GLOBAL;
-								}
-								break;
-							
-							default:
-								result = LocationType.IN_GLOBAL;
-								break;
-						}
-					}
-					break;
-					
-				case JSNodeTypes.IF:
-				case JSNodeTypes.WHILE:
-					if (this._currentLexeme.getType() == JSTokenType.RPAREN && this._currentLexeme.getStartingOffset() == offset)
-					{
-						result = LocationType.IN_GLOBAL;
-						lexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
-						
-						if (lexeme != null & lexeme.getType() == JSTokenType.IDENTIFIER)
-						{
-							this._currentLexeme = lexeme;
-						}
-						else
-						{
-							this._currentLexeme = null;
-						}
-					}
-					break;
-					
-				case JSNodeTypes.INVOKE:
-					lexeme = lexemeProvider.getLexemeFromOffset(offset);
-					
-					if (lexeme == null)
-					{
-						// see if we're touching
-						lexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
-					}
-					
-					if (lexeme != null && lexeme.getType() == JSTokenType.SEMICOLON && lexeme.getEndingOffset() < offset)
-					{
-						result = LocationType.IN_GLOBAL;
-					}
-					break;
-					
-				case JSNodeTypes.NAME_VALUE_PAIR:
-					if (this._currentLexeme.getType() == JSTokenType.COLON && this._currentLexeme.getEndingOffset() < offset)
-					{
-						result = LocationType.IN_GLOBAL;
-						this._currentLexeme = null;
-					}
-					break;
-					
-				case JSNodeTypes.OBJECT_LITERAL:
-					lexeme = lexemeProvider.getFloorLexeme(offset - 1);
-					
-					if (lexeme != null)
-					{
-						node = this._statementNode.getNodeAtOffset(lexeme.getStartingOffset());
-						
-						if (node != null && node.getNodeType() == JSNodeTypes.IDENTIFIER && node.getParent().getParent() == this._targetNode)
-						{
-							result = LocationType.IN_GLOBAL;
-						}
-					}
-					break;
-					
-				case JSNodeTypes.PARAMETERS:
-					result = LocationType.IN_PARAMETERS;
-					break;
-					
-				case JSNodeTypes.VAR:
-					if (this._targetNode.contains(offset) == false)
-					{
-						result = LocationType.IN_GLOBAL;
-					}
-					else
-					{
-						node = this._targetNode.getNodeAtOffset(offset - 1);
-						
-						if (node != null && node.getNodeType() == JSNodeTypes.IDENTIFIER)
-						{
-							result = LocationType.IN_GLOBAL;
-						}
-					}
-					break;
-					
-				// assignment nodes
-				case JSNodeTypes.ASSIGN:
-				case JSNodeTypes.ADD_AND_ASSIGN:
-				case JSNodeTypes.ARITHMETIC_SHIFT_RIGHT_AND_ASSIGN:
-				case JSNodeTypes.BITWISE_AND_AND_ASSIGN:
-				case JSNodeTypes.BITWISE_OR_AND_ASSIGN:
-				case JSNodeTypes.BITWISE_XOR_AND_ASSIGN:
-				case JSNodeTypes.DIVIDE_AND_ASSIGN:
-				case JSNodeTypes.MOD_AND_ASSIGN:
-				case JSNodeTypes.MULTIPLY_AND_ASSIGN:
-				case JSNodeTypes.SHIFT_LEFT_AND_ASSIGN:
-				case JSNodeTypes.SHIFT_RIGHT_AND_ASSIGN:
-				case JSNodeTypes.SUBTRACT_AND_ASSIGN:
-					if (this._targetNode instanceof JSAssignmentNode)
-					{
-						lexeme = lexemeProvider.getFloorLexeme(offset);
-						
-						if (lexeme != null)
-						{
-							switch (lexeme.getType())
-							{
-								case AMPERSAND_EQUAL:
-								case CARET_EQUAL:
-								case EQUAL:
-								case FORWARD_SLASH_EQUAL:
-								case GREATER_GREATER_EQUAL:
-								case GREATER_GREATER_GREATER_EQUAL:
-								case LESS_LESS_EQUAL:
-								case MINUS_EQUAL:
-								case PERCENT_EQUAL:
-								case PIPE_EQUAL:
-								case PLUS_EQUAL:
-								case STAR_EQUAL:
-									if (offset == lexeme.getStartingOffset())
-									{
-										result = LocationType.IN_VARIABLE_NAME;
-									}
-									break;
-									
-								case IDENTIFIER:
-									result = LocationType.IN_VARIABLE_NAME;
-									break;
-									
-								default:
-									break;
-							}
-						}
-					}
-					break;
-					
-				default:
-					if (this._targetNode instanceof ParseRootNode)
-					{
-						lexeme = lexemeProvider.getFloorLexeme(offset);
-						
-						if (lexeme != null)
-						{
-							switch (lexeme.getType())
-							{
-								case RCURLY:
-								case SEMICOLON:
-									result = LocationType.IN_GLOBAL;
-									this._currentLexeme = null;
-									break;
-									
-								default:
-									break;
-							}
-						}
-					}
-					break;
-			}
+			// NOTE: this method call sets replaceRange as a side-effect
+			result = this.getLocationByLexeme(document, offset);
 		}
 		
 		return result;
@@ -925,9 +628,15 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	LocationType getLocationByLexeme(LexemeProvider<JSTokenType> lexemeProvider, int offset)
+	LocationType getLocationByLexeme(IDocument document, int offset)
 	{
+		// grab relevant lexemes around the current offset
+		LexemeProvider<JSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
+		
+		// assume we can't determine the location type
 		LocationType result = LocationType.UNKNOWN;
+		
+		// find lexeme nearest to our offset
 		int index = lexemeProvider.getLexemeIndex(offset);
 		
 		if (index < 0)
