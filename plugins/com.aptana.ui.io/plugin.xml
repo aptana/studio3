@@ -11,6 +11,13 @@
             properties="isDirectory, isLocal, isSymlink"
             type="com.aptana.ide.ui.io.navigator.FileSystemObject">
       </propertyTester>
+      <propertyTester
+            class="com.aptana.ide.ui.io.internal.ResourcePropertyTester"
+            id="com.aptana.ide.ui.io.navigator.resourcePropertyTester"
+            namespace="com.aptana.ide.ui.io.navigator.resource"
+            properties="isAccessible"
+            type="org.eclipse.core.resources.IResource">
+      </propertyTester>
    </extension>
       <extension
          point="org.eclipse.ui.navigator.viewer">

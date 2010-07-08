@@ -32,63 +32,44 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.syncing.ui.actions;
+package com.aptana.ide.ui.io.internal;
 
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.IObjectActionDelegate;
-import org.eclipse.ui.IViewActionDelegate;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbenchPart;
-
-import com.aptana.ide.syncing.ui.dialogs.SiteConnectionsEditorDialog;
+import org.eclipse.core.expressions.PropertyTester;
+import org.eclipse.core.resources.IResource;
 
 /**
  * @author Michael Xia (mxia@aptana.com)
  */
-public class NewSiteAction implements IObjectActionDelegate, IViewActionDelegate {
+public class ResourcePropertyTester extends PropertyTester
+{
 
-    private IWorkbenchPart fActivePart;
-    private ISelection fSelection;
+	private static final String PROPERTY_IS_ACCESSIBLE = "isAccessible"; //$NON-NLS-1$
 
-    public NewSiteAction() {
-    }
+	public boolean test(Object receiver, String property, Object[] args, Object expectedValue)
+	{
+		if (receiver instanceof IResource)
+		{
+			IResource resource = (IResource) receiver;
 
-    @Override
-    public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-        fActivePart = targetPart;
-    }
-
-    @Override
-    public void run(IAction action) {
-        if (fSelection.isEmpty() || !(fSelection instanceof IStructuredSelection)) {
-            return;
-        }
-        Object element = ((IStructuredSelection) fSelection).getFirstElement();
-        
-        IAdaptable source = null;
-        if (element instanceof IAdaptable) {
-            source = (IAdaptable) element;
-        }
-        SiteConnectionsEditorDialog dlg = new SiteConnectionsEditorDialog(fActivePart.getSite().getShell());
-        dlg.setCreateNew(Messages.NewSiteAction_LBL_New, source, null);
-        dlg.open();
-    }
-
-    @Override
-    public void selectionChanged(IAction action, ISelection selection) {
-        setSelection(selection);
-    }
-
-	@Override
-	public void init(IViewPart view) {
-		fActivePart = view;
+			boolean value = toBoolean(expectedValue);
+			if (PROPERTY_IS_ACCESSIBLE.equals(property))
+			{
+				return resource.isAccessible() == value;
+			}
+		}
+		return false;
 	}
 
-    public void setSelection(ISelection selection)
-    {
-    	fSelection = selection;
-    }
+	private static boolean toBoolean(Object value)
+	{
+		if (value instanceof Boolean)
+		{
+			return ((Boolean) value).booleanValue();
+		}
+		if (value instanceof String)
+		{
+			return Boolean.parseBoolean((String) value);
+		}
+		return false;
+	}
 }
