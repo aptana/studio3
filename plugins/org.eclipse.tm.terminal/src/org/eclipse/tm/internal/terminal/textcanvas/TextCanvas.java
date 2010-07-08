@@ -19,13 +19,12 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.RegistryFactory;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
-import org.eclipse.jface.text.hyperlink.URLHyperlink;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
@@ -40,6 +39,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tm.terminal.model.IHyperlinkDetector;
 import org.eclipse.tm.terminal.model.ITerminalTextData;
 import org.eclipse.tm.terminal.model.ITerminalTextDataReadOnly;
 import org.eclipse.tm.terminal.model.Style;
@@ -50,29 +50,6 @@ import org.eclipse.tm.terminal.model.Style;
  */
 public class TextCanvas extends GridCanvas
 {
-	// Base URL detection
-	// private static final Pattern URL_DETECT_PATTERN = Pattern
-	//			.compile("\\b(https?|ftp|file)://[\\-A-Z0-9\\+&@#/%\\?=~_\\|!:,\\.;]*[A-Z0-9\\+&@#/%=~_\\|]"); //$NON-NLS-1$
-
-	/**
-	 * Detect URLs with protocol, or bare hostnames
-	 */
-	private static final Pattern URL_DETECT_PATTERN = Pattern.compile("\\b\n"
-			+ "  # Match the leading part (proto://hostname, or just hostname)\n" + "  (\n"
-			+ "    # http://, or https:// leading part\n" + "    (https?)://[-\\w]+(\\.\\w[-\\w]*)+\n" + "  |\n"
-			+ "    # or, try to find a hostname with more specific sub-expression\n"
-			+ "    (?i: [a-z0-9] (?:[-a-z0-9]*[a-z0-9])? \\. )+ # sub domains\n"
-			+ "    # Now ending .com, etc. For these, require lowercase\n" + "    (?-i: com\\b\n"
-			+ "        | edu\\b\n" + "        | biz\\b\n" + "        | gov\\b\n"
-			+ "        | in(?:t|fo)\\b # .int or .info\n" + "        | mil\\b\n" + "        | net\\b\n"
-			+ "        | org\\b\n" + "        | [a-z][a-z]\\.[a-z][a-z]\\b # two-letter country code\n" + "    )\n"
-			+ "  )\n" + "\n" + "  # Allow an optional port number\n" + "  ( : \\d+ )?\n" + "		  \n"
-			+ "  # The rest of the URL is optional, and begins with /\n" + "  (\n" + "    /\n"
-			+ "    # The rest are heuristics for what seems to work well\n"
-			+ "    [^.!,?;\"\\'<>()\\[\\]\\{\\}\\s\\x7F-\\xFF]*\n" + "    (\n"
-			+ "      [.!,?]+ [^.!,?;\"\\'<>()\\[\\]\\{\\}\\s\\x7F-\\xFF]+\n" + "    )*\n" + "  )?",
-			Pattern.CASE_INSENSITIVE | Pattern.COMMENTS);
-
 	protected final ITextCanvasModel fCellCanvasModel;
 	/** Renders the cells */
 	private final ILinelRenderer fCellRenderer;
@@ -110,6 +87,7 @@ public class TextCanvas extends GridCanvas
 	private boolean fCursorEnabled;
 
 	private IHyperlink[] fLinks = new IHyperlink[0];
+	private int fLastHash;
 
 	/**
 	 * Create a new CellCanvas with the given SWT style bits. (SWT.H_SCROLL and SWT.V_SCROLL are automatically added).
@@ -148,11 +126,7 @@ public class TextCanvas extends GridCanvas
 				{
 					char[] chars = text.getChars(i);
 					chars = pad(chars, text.getWidth());
-					if (chars != null)
-					{
-						builder.append(chars);
-					}
-					builder.append("\n");
+					builder.append(chars);
 				}
 				fLinks = detectHyperlinks(builder.toString());
 			}
@@ -223,6 +197,19 @@ public class TextCanvas extends GridCanvas
 								int endCol = (region.getOffset() + region.getLength())
 										% fCellCanvasModel.getTerminalText().getWidth();
 
+								// starts and ends on same line, we clicked on that line
+								if ((fDraggingStart.y == line && line == endLine))
+								{
+									// clicked between start and end col
+									if (fDraggingStart.x <= endCol && fDraggingStart.x >= col)
+									{ 
+										// so open link and later break.
+										link.open();
+									}
+									// otherwise we just break
+									break;
+								}
+								// Must be different start and end lines...
 								if ((fDraggingStart.y == line && fDraggingStart.x >= col)
 										|| (fDraggingStart.y == endLine && fDraggingStart.x <= endCol)
 										|| (fDraggingStart.y > line && fDraggingStart.y < endLine))
@@ -261,6 +248,7 @@ public class TextCanvas extends GridCanvas
 		}
 		char[] newChars = new char[width];
 		Arrays.fill(newChars, ' ');
+		newChars[width - 1] = '\n';
 		if (chars != null)
 		{
 			System.arraycopy(chars, 0, newChars, 0, chars.length);
@@ -270,37 +258,33 @@ public class TextCanvas extends GridCanvas
 
 	protected IHyperlink[] detectHyperlinks(String contents)
 	{
+		// Short-circuit if contents didn't actually change
+		int hash = contents.hashCode();
+		if (hash == fLastHash)
+		{
+			return fLinks;
+		}
+		fLastHash = hash;
+
 		// Remove underline from last set of links
 		for (int i = 0; i < fLinks.length; i++)
 		{
 			IHyperlink link = fLinks[i];
 			IRegion region = link.getHyperlinkRegion();
-			// FIXME Duplicate logic in mouseUp()
-			int startLine = region.getOffset() / fCellCanvasModel.getTerminalText().getWidth();
-			int startCol = region.getOffset() % fCellCanvasModel.getTerminalText().getWidth();
-			int endLine = (region.getOffset() + region.getLength()) / fCellCanvasModel.getTerminalText().getWidth();
-			int endCol = (region.getOffset() + region.getLength()) % fCellCanvasModel.getTerminalText().getWidth();
-			setUnderlined(startLine, startCol, endLine, endCol, false);
+			setUnderlined(region, false);
 		}
 
 		// Detect new links
-		// Move to a listener/extension class that contributes hyperlinks!
-		Matcher m = URL_DETECT_PATTERN.matcher(contents);
-		int start = 0;
 		List list = new ArrayList();
-		while (m.find(start))
+		IHyperlinkDetector[] detectors = getHyperlinkDetectors();
+		for (int i = 0; i < detectors.length; i++)
 		{
-			String urlString = new String(m.group().trim());
-			start = m.end();
-			int startLine = contents.substring(0, m.start()).split("\n").length - 1;
-			IRegion region = new Region(m.start() - startLine, urlString.length()); // adjust offset to remove newlines
-																					// we added (so we can convert back
-																					// to lines/cols easier)
-			if (!urlString.startsWith("http://"))
+			IHyperlinkDetector detector = detectors[i];
+			IHyperlink[] links = detector.detectHyperlinks(contents);
+			if (links != null && links.length > 0)
 			{
-				urlString = "http://" + urlString;
+				list.addAll(Arrays.asList(links));
 			}
-			list.add(new URLHyperlink(region, urlString));
 		}
 
 		// Add underline to new set of links
@@ -308,22 +292,22 @@ public class TextCanvas extends GridCanvas
 		{
 			IHyperlink link = (IHyperlink) list.get(i);
 			IRegion region = link.getHyperlinkRegion();
-			// FIXME Duplicate logic in mouseUp()
-			int startLine = region.getOffset() / fCellCanvasModel.getTerminalText().getWidth();
-			int startCol = region.getOffset() % fCellCanvasModel.getTerminalText().getWidth();
-			int endLine = (region.getOffset() + region.getLength()) / fCellCanvasModel.getTerminalText().getWidth();
-			int endCol = (region.getOffset() + region.getLength()) % fCellCanvasModel.getTerminalText().getWidth();
-			setUnderlined(startLine, startCol, endLine, endCol, true);
+			setUnderlined(region, true);
 		}
 		return (IHyperlink[]) list.toArray(new IHyperlink[0]);
 	}
 
-	private void setUnderlined(int startLine, int startCol, int endLine, int endCol, boolean underlined)
+	private void setUnderlined(IRegion region, boolean underlined)
 	{
+		// FIXME Duplicate logic in mouseUp()
+		int startLine = region.getOffset() / fCellCanvasModel.getTerminalText().getWidth();
+		int startCol = region.getOffset() % fCellCanvasModel.getTerminalText().getWidth();
+		int endLine = (region.getOffset() + region.getLength()) / fCellCanvasModel.getTerminalText().getWidth();
+		int endCol = (region.getOffset() + region.getLength()) % fCellCanvasModel.getTerminalText().getWidth();
 		try
 		{
 			ITerminalTextDataReadOnly text = fCellCanvasModel.getTerminalText();
-			Field f = text.getClass().getDeclaredField("fTerminal");
+			Field f = text.getClass().getDeclaredField("fTerminal"); //$NON-NLS-1$
 			f.setAccessible(true);
 			ITerminalTextData data = (ITerminalTextData) f.get(text);
 			for (int line = startLine; line <= endLine; line++)
@@ -352,6 +336,32 @@ public class TextCanvas extends GridCanvas
 		{
 			// ignore
 		}
+	}
+
+	private IHyperlinkDetector[] getHyperlinkDetectors()
+	{
+		// TODO Memo-ize detectors?
+		IConfigurationElement[] config = RegistryFactory.getRegistry().getConfigurationElementsFor(
+				"com.aptana.org.eclipse.tm.terminal.terminalHyperlinkDetectors"); //$NON-NLS-1$
+		List result = new ArrayList();
+		for (int i = 0; i < config.length; i++)
+		{
+			try
+			{
+				result.add(makeConnector(config[i]));
+			}
+			catch (CoreException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return (IHyperlinkDetector[]) result.toArray(new IHyperlinkDetector[result.size()]);
+	}
+
+	static private IHyperlinkDetector makeConnector(final IConfigurationElement config) throws CoreException
+	{
+		return (IHyperlinkDetector) config.createExecutableExtension("class"); //$NON-NLS-1$
 	}
 
 	/**
