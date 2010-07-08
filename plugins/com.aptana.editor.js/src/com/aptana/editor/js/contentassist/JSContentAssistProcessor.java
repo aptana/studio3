@@ -573,14 +573,38 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		// set up references to AST nodes around the current offset
 		this._targetNode = this.getActiveASTNode(offset);
 		this._statementNode = null;
+		IParseNode ast = null;
 		
-		if (this._targetNode != null && this._targetNode instanceof JSNode)
+		if (this._targetNode instanceof JSParseRootNode)
 		{
-			this._statementNode = ((JSNode) this._targetNode).getContainingStatementNode();
+			this._statementNode = this._targetNode;
+			ast = this._targetNode;
 		}
-		
-		// grab the resulting AST
-		IParseNode ast = this.getAST();
+		else if (this._targetNode instanceof JSNode)
+		{
+			// set containing statement
+			this._statementNode = ((JSNode) this._targetNode).getContainingStatementNode();
+			
+			// NOTE: We can't simply grab the AST since this will fail with JS
+			// is embedded in other languages. In those cases, we'll get the
+			// root node for the host langauge and not for JS
+			
+			// find JS root node
+			IParseNode current = this._targetNode;
+			
+			while (current != null)
+			{
+				if (current instanceof JSParseRootNode)
+				{
+					ast = current;
+					break;
+				}
+				else
+				{
+					current = current.getParent();
+				}
+			}
+		}
 		
 		// try to determine the current offset's CA type via the AST
 		if (ast == null)
