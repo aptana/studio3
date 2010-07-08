@@ -65,6 +65,8 @@ public class JSLocationWalker extends JSTreeWalker
 	 */
 	public JSLocationWalker(int offset)
 	{
+		offset--;
+		
 		this._offset = offset;
 		this._type = LocationType.UNKNOWN;
 	}
@@ -962,8 +964,6 @@ public class JSLocationWalker extends JSTreeWalker
 	public void visit(JSParseRootNode node)
 	{
 		this.setType(LocationType.IN_GLOBAL);
-		
-		this._offset--;
 		
 		if (node.contains(this._offset) && node.hasChildren())
 		{
