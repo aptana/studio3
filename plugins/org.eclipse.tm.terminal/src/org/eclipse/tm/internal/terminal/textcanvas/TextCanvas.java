@@ -15,6 +15,7 @@
  *******************************************************************************/
 package org.eclipse.tm.internal.terminal.textcanvas;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,7 +40,9 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tm.terminal.model.ITerminalTextData;
 import org.eclipse.tm.terminal.model.ITerminalTextDataReadOnly;
+import org.eclipse.tm.terminal.model.Style;
 
 /**
  * A cell oriented Canvas. Maintains a list of "cells". It can either be vertically or horizontally scrolled. The
@@ -48,46 +51,28 @@ import org.eclipse.tm.terminal.model.ITerminalTextDataReadOnly;
 public class TextCanvas extends GridCanvas
 {
 	// Base URL detection
-//	private static final Pattern URL_DETECT_PATTERN = Pattern
-//			.compile("\\b(https?|ftp|file)://[\\-A-Z0-9\\+&@#/%\\?=~_\\|!:,\\.;]*[A-Z0-9\\+&@#/%=~_\\|]"); //$NON-NLS-1$
-	
+	// private static final Pattern URL_DETECT_PATTERN = Pattern
+	//			.compile("\\b(https?|ftp|file)://[\\-A-Z0-9\\+&@#/%\\?=~_\\|!:,\\.;]*[A-Z0-9\\+&@#/%=~_\\|]"); //$NON-NLS-1$
+
 	/**
 	 * Detect URLs with protocol, or bare hostnames
 	 */
-	private static final Pattern URL_DETECT_PATTERN = Pattern.compile("\\b\n" +
-"  # Match the leading part (proto://hostname, or just hostname)\n" +
-"  (\n" +
-"    # http://, or https:// leading part\n" +
-"    (https?)://[-\\w]+(\\.\\w[-\\w]*)+\n" +
-"  |\n" +
-"    # or, try to find a hostname with more specific sub-expression\n" +
-"    (?i: [a-z0-9] (?:[-a-z0-9]*[a-z0-9])? \\. )+ # sub domains\n" +
-"    # Now ending .com, etc. For these, require lowercase\n" +
-"    (?-i: com\\b\n" +
-"        | edu\\b\n" +
-"        | biz\\b\n" +
-"        | gov\\b\n" +
-"        | in(?:t|fo)\\b # .int or .info\n" +
-"        | mil\\b\n" +
-"        | net\\b\n" +
-"        | org\\b\n" +
-"        | [a-z][a-z]\\.[a-z][a-z]\\b # two-letter country code\n" +
-"    )\n" +
-"  )\n" +
-"\n" +
-"  # Allow an optional port number\n" +
-"  ( : \\d+ )?\n" +
-"		  \n" +
-"  # The rest of the URL is optional, and begins with /\n" +
-"  (\n" +
-"    /\n" +
-"    # The rest are heuristics for what seems to work well\n" +
-"    [^.!,?;\"\\'<>()\\[\\]\\{\\}\\s\\x7F-\\xFF]*\n" +
-"    (\n" +
-"      [.!,?]+ [^.!,?;\"\\'<>()\\[\\]\\{\\}\\s\\x7F-\\xFF]+\n" +
-"    )*\n" +
-"  )?", Pattern.CASE_INSENSITIVE | Pattern.COMMENTS);
-	
+	private static final Pattern URL_DETECT_PATTERN = Pattern.compile("\\b\n"
+			+ "  # Match the leading part (proto://hostname, or just hostname)\n" + "  (\n"
+			+ "    # http://, or https:// leading part\n" + "    (https?)://[-\\w]+(\\.\\w[-\\w]*)+\n" + "  |\n"
+			+ "    # or, try to find a hostname with more specific sub-expression\n"
+			+ "    (?i: [a-z0-9] (?:[-a-z0-9]*[a-z0-9])? \\. )+ # sub domains\n"
+			+ "    # Now ending .com, etc. For these, require lowercase\n" + "    (?-i: com\\b\n"
+			+ "        | edu\\b\n" + "        | biz\\b\n" + "        | gov\\b\n"
+			+ "        | in(?:t|fo)\\b # .int or .info\n" + "        | mil\\b\n" + "        | net\\b\n"
+			+ "        | org\\b\n" + "        | [a-z][a-z]\\.[a-z][a-z]\\b # two-letter country code\n" + "    )\n"
+			+ "  )\n" + "\n" + "  # Allow an optional port number\n" + "  ( : \\d+ )?\n" + "		  \n"
+			+ "  # The rest of the URL is optional, and begins with /\n" + "  (\n" + "    /\n"
+			+ "    # The rest are heuristics for what seems to work well\n"
+			+ "    [^.!,?;\"\\'<>()\\[\\]\\{\\}\\s\\x7F-\\xFF]*\n" + "    (\n"
+			+ "      [.!,?]+ [^.!,?;\"\\'<>()\\[\\]\\{\\}\\s\\x7F-\\xFF]+\n" + "    )*\n" + "  )?",
+			Pattern.CASE_INSENSITIVE | Pattern.COMMENTS);
+
 	protected final ITextCanvasModel fCellCanvasModel;
 	/** Renders the cells */
 	private final ILinelRenderer fCellRenderer;
@@ -283,9 +268,23 @@ public class TextCanvas extends GridCanvas
 		return newChars;
 	}
 
-	
 	protected IHyperlink[] detectHyperlinks(String contents)
 	{
+		// Remove underline from last set of links
+		for (int i = 0; i < fLinks.length; i++)
+		{
+			IHyperlink link = fLinks[i];
+			IRegion region = link.getHyperlinkRegion();
+			// FIXME Duplicate logic in mouseUp()
+			int startLine = region.getOffset() / fCellCanvasModel.getTerminalText().getWidth();
+			int startCol = region.getOffset() % fCellCanvasModel.getTerminalText().getWidth();
+			int endLine = (region.getOffset() + region.getLength()) / fCellCanvasModel.getTerminalText().getWidth();
+			int endCol = (region.getOffset() + region.getLength()) % fCellCanvasModel.getTerminalText().getWidth();
+			setUnderlined(startLine, startCol, endLine, endCol, false);
+		}
+
+		// Detect new links
+		// Move to a listener/extension class that contributes hyperlinks!
 		Matcher m = URL_DETECT_PATTERN.matcher(contents);
 		int start = 0;
 		List list = new ArrayList();
@@ -293,10 +292,66 @@ public class TextCanvas extends GridCanvas
 		{
 			String urlString = new String(m.group().trim());
 			start = m.end();
-			IRegion region = new Region(m.start(), urlString.length());
+			int startLine = contents.substring(0, m.start()).split("\n").length - 1;
+			IRegion region = new Region(m.start() - startLine, urlString.length()); // adjust offset to remove newlines
+																					// we added (so we can convert back
+																					// to lines/cols easier)
+			if (!urlString.startsWith("http://"))
+			{
+				urlString = "http://" + urlString;
+			}
 			list.add(new URLHyperlink(region, urlString));
 		}
+
+		// Add underline to new set of links
+		for (int i = 0; i < list.size(); i++)
+		{
+			IHyperlink link = (IHyperlink) list.get(i);
+			IRegion region = link.getHyperlinkRegion();
+			// FIXME Duplicate logic in mouseUp()
+			int startLine = region.getOffset() / fCellCanvasModel.getTerminalText().getWidth();
+			int startCol = region.getOffset() % fCellCanvasModel.getTerminalText().getWidth();
+			int endLine = (region.getOffset() + region.getLength()) / fCellCanvasModel.getTerminalText().getWidth();
+			int endCol = (region.getOffset() + region.getLength()) % fCellCanvasModel.getTerminalText().getWidth();
+			setUnderlined(startLine, startCol, endLine, endCol, true);
+		}
 		return (IHyperlink[]) list.toArray(new IHyperlink[0]);
+	}
+
+	private void setUnderlined(int startLine, int startCol, int endLine, int endCol, boolean underlined)
+	{
+		try
+		{
+			ITerminalTextDataReadOnly text = fCellCanvasModel.getTerminalText();
+			Field f = text.getClass().getDeclaredField("fTerminal");
+			f.setAccessible(true);
+			ITerminalTextData data = (ITerminalTextData) f.get(text);
+			for (int line = startLine; line <= endLine; line++)
+			{
+				for (int col = 0; col < text.getWidth(); col++)
+				{
+					if (line == startLine && col < startCol)
+					{
+						continue;
+					}
+					if (line == endLine && col > endCol)
+					{
+						break;
+					}
+					char c = data.getChar(line, col);
+					Style style = data.getStyle(line, col);
+					if (style != null)
+					{
+						style = style.setUnderline(underlined);
+						data.setChar(line, col, c, style);
+					}
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			// ignore
+		}
 	}
 
 	/**

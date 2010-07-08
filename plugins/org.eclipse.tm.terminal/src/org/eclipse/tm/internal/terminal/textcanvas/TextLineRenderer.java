@@ -56,6 +56,10 @@ public class TextLineRenderer implements ILinelRenderer {
 				setupGC(gc, style);
 				String text=segment.getText();
 				drawText(gc, x, y, colFirst, segment.getColumn(), text);
+				if (style != null && style.isUnderline())
+				{
+					underlineText(gc, x, y, colFirst, segment.getColumn(), text);
+				}
 				drawCursor(model, gc, line, x, y, colFirst);
 			}
 			if(fModel.hasLineSelection(line)) {
@@ -135,6 +139,21 @@ public class TextLineRenderer implements ILinelRenderer {
 		} else {
 			text=text.replace('\000', ' ');
 			gc.drawString(text,x+offset,y,false);
+		}
+	}
+	private void underlineText(GC gc, int x, int y, int colFirst, int col, String text) {
+		int offset=(col-colFirst)*getCellWidth();
+		if(fStyleMap.isFontProportional()) {
+			for (int i = 0; i < text.length(); i++) {
+				char c=text.charAt(i);
+				int xx=x+offset+i*fStyleMap.getFontWidth();
+				if(c!=' ' && c!='\000') {
+					gc.drawLine(fStyleMap.getCharOffset(c)+xx, fStyleMap.getFontHeight() + y, fStyleMap.getFontWidth() + fStyleMap.getCharOffset(c)+xx, fStyleMap.getFontHeight() + y);
+				}
+			}
+		} else {
+			text=text.replace('\000', ' ');
+			gc.drawLine(x+offset, fStyleMap.getFontHeight() + y - 2, (fStyleMap.getFontWidth() * text.length()) + x+offset, fStyleMap.getFontHeight() + y - 2);
 		}
 	}
 	private void setupGC(GC gc, Style style) {
