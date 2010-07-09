@@ -39,6 +39,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tm.internal.terminal.control.impl.TerminalPlugin;
 import org.eclipse.tm.terminal.model.IHyperlinkDetector;
 import org.eclipse.tm.terminal.model.ITerminalTextData;
 import org.eclipse.tm.terminal.model.ITerminalTextDataReadOnly;
@@ -117,8 +118,13 @@ public class TextCanvas extends GridCanvas
 					return;
 				// scroll to end (unless scroll lock is active)
 				scrollToEnd();
-				// TODO Grab the content of the terminal, forward it to listeners who can then mark certain regions as
-				// hyperlinks!
+
+				// Now update the hyperlinks
+				fLinks = detectHyperlinks(getTerminalText());
+			}
+
+			protected String getTerminalText()
+			{
 				StringBuilder builder = new StringBuilder();
 				ITerminalTextDataReadOnly text = fCellCanvasModel.getTerminalText();
 				int lines = text.getHeight();
@@ -128,7 +134,7 @@ public class TextCanvas extends GridCanvas
 					chars = pad(chars, text.getWidth());
 					builder.append(chars);
 				}
-				fLinks = detectHyperlinks(builder.toString());
+				return builder.toString();
 			}
 		});
 		// let the cursor blink if the text canvas gets the focus...
@@ -181,46 +187,51 @@ public class TextCanvas extends GridCanvas
 					}
 					else
 					{
+						// clicked down and up in same cell (didn't drag for selection)
 						fCellCanvasModel.setSelection(-1, -1, -1, -1);
 
-						// Detect clicking on hyperlinks
-						for (int i = 0; i < fLinks.length; i++)
-						{
-							IHyperlink link = fLinks[i];
-							IRegion region = link.getHyperlinkRegion();
-							int line = region.getOffset() / fCellCanvasModel.getTerminalText().getWidth();
-							if (fDraggingStart.y >= line)
-							{
-								int col = region.getOffset() % fCellCanvasModel.getTerminalText().getWidth();
-								int endLine = (region.getOffset() + region.getLength())
-										/ fCellCanvasModel.getTerminalText().getWidth();
-								int endCol = (region.getOffset() + region.getLength())
-										% fCellCanvasModel.getTerminalText().getWidth();
-
-								// starts and ends on same line, we clicked on that line
-								if ((fDraggingStart.y == line && line == endLine))
-								{
-									// clicked between start and end col
-									if (fDraggingStart.x <= endCol && fDraggingStart.x >= col)
-									{ 
-										// so open link and later break.
-										link.open();
-									}
-									// otherwise we just break
-									break;
-								}
-								// Must be different start and end lines...
-								if ((fDraggingStart.y == line && fDraggingStart.x >= col)
-										|| (fDraggingStart.y == endLine && fDraggingStart.x <= endCol)
-										|| (fDraggingStart.y > line && fDraggingStart.y < endLine))
-								{
-									link.open();
-									break;
-								}
-							}
-						}
+						detectHyperlinkClicks();
 					}
 					fDraggingStart = null;
+				}
+			}
+
+			protected void detectHyperlinkClicks()
+			{
+				for (int i = 0; i < fLinks.length; i++)
+				{
+					IHyperlink link = fLinks[i];
+					IRegion region = link.getHyperlinkRegion();
+					int line = region.getOffset() / fCellCanvasModel.getTerminalText().getWidth();
+					if (fDraggingStart.y >= line)
+					{
+						int col = region.getOffset() % fCellCanvasModel.getTerminalText().getWidth();
+						int endLine = (region.getOffset() + region.getLength())
+								/ fCellCanvasModel.getTerminalText().getWidth();
+						int endCol = (region.getOffset() + region.getLength())
+								% fCellCanvasModel.getTerminalText().getWidth();
+
+						// starts and ends on same line, we clicked on that line
+						if ((fDraggingStart.y == line && line == endLine))
+						{
+							// clicked between start and end col
+							if (fDraggingStart.x <= endCol && fDraggingStart.x >= col)
+							{
+								// so open link and later break.
+								link.open();
+							}
+							// otherwise we just break
+							break;
+						}
+						// Must be different start and end lines...
+						if ((fDraggingStart.y == line && fDraggingStart.x >= col)
+								|| (fDraggingStart.y == endLine && fDraggingStart.x <= endCol)
+								|| (fDraggingStart.y > line && fDraggingStart.y < endLine))
+						{
+							link.open();
+							break;
+						}
+					}
 				}
 			}
 		});
@@ -256,6 +267,13 @@ public class TextCanvas extends GridCanvas
 		return newChars;
 	}
 
+	/**
+	 * If contents change, remove underlines from old hyperlinks, detect new hyperlinks, then underline hyperlink
+	 * regions in terminal.
+	 * 
+	 * @param contents
+	 * @return
+	 */
 	protected IHyperlink[] detectHyperlinks(String contents)
 	{
 		// Short-circuit if contents didn't actually change
@@ -352,8 +370,7 @@ public class TextCanvas extends GridCanvas
 			}
 			catch (CoreException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				TerminalPlugin.getDefault().getLog().log(e.getStatus());
 			}
 		}
 		return (IHyperlinkDetector[]) result.toArray(new IHyperlinkDetector[result.size()]);
