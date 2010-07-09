@@ -113,7 +113,14 @@ public class Scope<T>
 	 */
 	public List<T> getAssignments()
 	{
-		return this._assignments;
+		List<T> result = this._assignments;
+		
+		if (result == null)
+		{
+			result = Collections.emptyList();
+		}
+		
+		return result;
 	}
 	
 	/**
