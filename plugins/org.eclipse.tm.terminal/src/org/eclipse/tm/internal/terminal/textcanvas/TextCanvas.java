@@ -35,6 +35,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -198,40 +199,10 @@ public class TextCanvas extends GridCanvas
 
 			protected void detectHyperlinkClicks()
 			{
-				for (int i = 0; i < fLinks.length; i++)
+				IHyperlink under = findHyperlink(fDraggingStart);
+				if (under != null)
 				{
-					IHyperlink link = fLinks[i];
-					IRegion region = link.getHyperlinkRegion();
-					int line = region.getOffset() / fCellCanvasModel.getTerminalText().getWidth();
-					if (fDraggingStart.y >= line)
-					{
-						int col = region.getOffset() % fCellCanvasModel.getTerminalText().getWidth();
-						int endLine = (region.getOffset() + region.getLength())
-								/ fCellCanvasModel.getTerminalText().getWidth();
-						int endCol = (region.getOffset() + region.getLength())
-								% fCellCanvasModel.getTerminalText().getWidth();
-
-						// starts and ends on same line, we clicked on that line
-						if ((fDraggingStart.y == line && line == endLine))
-						{
-							// clicked between start and end col
-							if (fDraggingStart.x <= endCol && fDraggingStart.x >= col)
-							{
-								// so open link and later break.
-								link.open();
-							}
-							// otherwise we just break
-							break;
-						}
-						// Must be different start and end lines...
-						if ((fDraggingStart.y == line && fDraggingStart.x >= col)
-								|| (fDraggingStart.y == endLine && fDraggingStart.x <= endCol)
-								|| (fDraggingStart.y > line && fDraggingStart.y < endLine))
-						{
-							link.open();
-							break;
-						}
-					}
+					under.open();
 				}
 			}
 		});
@@ -245,10 +216,58 @@ public class TextCanvas extends GridCanvas
 					updateHasSelection(e);
 					setSelection(screenPointToCell(e.x, e.y));
 				}
+
+				// Change cursor to hand if over a hyperlink
+				IHyperlink link = findHyperlink(screenPointToCell(e.x, e.y));
+				if (link != null)
+				{
+					Cursor c = getDisplay().getSystemCursor(SWT.CURSOR_HAND);
+					setCursor(c);
+				}
+				else
+				{
+					setCursor(null);
+				}
 			}
 		});
 		serVerticalBarVisible(true);
 		setHorizontalBarVisible(false);
+	}
+
+	protected IHyperlink findHyperlink(Point cellCoords)
+	{
+		for (int i = 0; i < fLinks.length; i++)
+		{
+			IHyperlink link = fLinks[i];
+			IRegion region = link.getHyperlinkRegion();
+			int line = region.getOffset() / fCellCanvasModel.getTerminalText().getWidth();
+			if (cellCoords.y >= line)
+			{
+				int col = region.getOffset() % fCellCanvasModel.getTerminalText().getWidth();
+				int endLine = (region.getOffset() + region.getLength()) / fCellCanvasModel.getTerminalText().getWidth();
+				int endCol = (region.getOffset() + region.getLength()) % fCellCanvasModel.getTerminalText().getWidth();
+
+				// starts and ends on same line, we clicked on that line
+				if ((cellCoords.y == line && line == endLine))
+				{
+					// clicked between start and end col
+					if (cellCoords.x <= endCol && cellCoords.x >= col)
+					{
+
+						return link;
+					}
+					continue;
+				}
+				// Must be different start and end lines...
+				if ((cellCoords.y == line && cellCoords.x >= col)
+						|| (cellCoords.y == endLine && cellCoords.x <= endCol)
+						|| (cellCoords.y > line && cellCoords.y < endLine))
+				{
+					return link;
+				}
+			}
+		}
+		return null;
 	}
 
 	protected char[] pad(char[] chars, int width)
