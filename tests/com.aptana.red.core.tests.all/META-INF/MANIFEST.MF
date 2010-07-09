@@ -7,7 +7,7 @@ Bundle-Activator: com.aptana.red.core.tests.all.Activator
 Bundle-Vendor: APTANA
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources;bundle-version="3.4.0",
- org.junit;bundle-version="[3.7.0,4.0.0)",
+ org.junit,
  com.aptana.editor.common;bundle-version="1.0.0",
  com.aptana.editor.css;bundle-version="1.0.0",
  com.aptana.editor.erb;bundle-version="1.0.0",

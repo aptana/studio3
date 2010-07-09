@@ -18,7 +18,7 @@
    </license>
 
    <requires>
-      <import plugin="org.junit" version="3.0.0" match="compatible"/>
+      <import plugin="org.junit"/>
       <import plugin="com.aptana.editor.common" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.ruby" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.core" version="3.0.0" match="greaterOrEqual"/>

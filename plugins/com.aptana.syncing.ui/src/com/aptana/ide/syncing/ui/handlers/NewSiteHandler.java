@@ -32,63 +32,25 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.syncing.ui.actions;
+package com.aptana.ide.syncing.ui.handlers;
 
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.IObjectActionDelegate;
-import org.eclipse.ui.IViewActionDelegate;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.ui.handlers.HandlerUtil;
 
-import com.aptana.ide.syncing.ui.dialogs.SiteConnectionsEditorDialog;
+import com.aptana.ide.syncing.ui.actions.NewSiteAction;
 
-/**
- * @author Michael Xia (mxia@aptana.com)
- */
-public class NewSiteAction implements IObjectActionDelegate, IViewActionDelegate {
+public class NewSiteHandler extends AbstractHandler
+{
 
-    private IWorkbenchPart fActivePart;
-    private ISelection fSelection;
+	public Object execute(ExecutionEvent event) throws ExecutionException
+	{
+		NewSiteAction action = new NewSiteAction();
+		action.setActivePart(null, HandlerUtil.getActivePart(event));
+		action.setSelection(HandlerUtil.getCurrentSelection(event));
+		action.run(null);
 
-    public NewSiteAction() {
-    }
-
-    @Override
-    public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-        fActivePart = targetPart;
-    }
-
-    @Override
-    public void run(IAction action) {
-        if (fSelection.isEmpty() || !(fSelection instanceof IStructuredSelection)) {
-            return;
-        }
-        Object element = ((IStructuredSelection) fSelection).getFirstElement();
-        
-        IAdaptable source = null;
-        if (element instanceof IAdaptable) {
-            source = (IAdaptable) element;
-        }
-        SiteConnectionsEditorDialog dlg = new SiteConnectionsEditorDialog(fActivePart.getSite().getShell());
-        dlg.setCreateNew(Messages.NewSiteAction_LBL_New, source, null);
-        dlg.open();
-    }
-
-    @Override
-    public void selectionChanged(IAction action, ISelection selection) {
-        setSelection(selection);
-    }
-
-	@Override
-	public void init(IViewPart view) {
-		fActivePart = view;
+		return null;
 	}
-
-    public void setSelection(ISelection selection)
-    {
-    	fSelection = selection;
-    }
 }

@@ -9,6 +9,7 @@
  *******************************************************************************/
 package com.aptana.git.internal.core.storage;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -68,6 +69,10 @@ public class CommitFileRevision extends GitFileRevision
 
 			public InputStream getContents() throws CoreException
 			{
+				if (commit == null)
+				{
+					return new ByteArrayInputStream(new byte[0]);
+				}
 				try
 				{
 					Process p = GitExecutable.instance().run(commit.repository().workingDirectory(), "show", //$NON-NLS-1$
@@ -86,30 +91,48 @@ public class CommitFileRevision extends GitFileRevision
 	@Override
 	public String getAuthor()
 	{
+		if (commit == null)
+		{
+			return null;
+		}
 		return commit.getAuthor();
 	}
 
 	@Override
 	public String getComment()
 	{
+		if (commit == null)
+		{
+			return null;
+		}
 		return commit.getComment();
 	}
 
 	@Override
 	public long getTimestamp()
 	{
+		if (commit == null)
+		{
+			return -1L;
+		}
 		return commit.getTimestamp();
 	}
 
 	@Override
 	public String getContentIdentifier()
 	{
+		if (commit == null)
+		{
+			return null;
+		}
 		return commit.sha();
 	}
 
 	public boolean isDescendantOf(IFileRevision revision)
 	{
 		if (!(revision instanceof CommitFileRevision))
+			return false;
+		if (commit == null)
 			return false;
 		if (!commit.hasParent())
 			return false;
