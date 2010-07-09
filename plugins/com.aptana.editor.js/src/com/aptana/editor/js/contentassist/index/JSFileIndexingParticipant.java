@@ -234,13 +234,43 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 	private void processParseResults(Index index, IFileStore file, IParseNode ast)
 	{
 		URI location = file.toURI();
+		TypeElement type = this.createGlobalType(index, location, ast);
+		
+		if (type != null)
+		{
+			this._indexWriter.writeType(index, type, location);
+		}
+		
 		Scope<JSNode> globals = this.getGlobals(ast);
+		
+		if (globals != null)
+		{
+			for (JSNode assignment : globals.getAssignments())
+			{
+				
+			}
+		}
+	}
+	
+	/**
+	 * createGlobalType
+	 * @param index
+	 * @param ast
+	 * 
+	 * @return
+	 */
+	private TypeElement createGlobalType(Index index, URI location, IParseNode ast)
+	{
+		TypeElement result = null;
+		Scope<JSNode> globals = this.getGlobals(ast);
+		
+		JSTypeWalker.clearTypeCache();
 
 		if (globals != null)
 		{
-			TypeElement type = new TypeElement();
+			result = new TypeElement();
 			
-			type.setName("Window");
+			result.setName("Window");
 			
 			for (String symbol : globals.getLocalSymbolNames())
 			{
@@ -261,7 +291,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 						
 						this.applyDocumentation(function, node.getDocumentation());
 						
-						type.addProperty(function);
+						result.addProperty(function);
 					}
 					else
 					{
@@ -280,6 +310,13 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 							
 							node.accept(walker);
 							
+							// write out any generated types
+							for (TypeElement type : walker.getGeneratedTypes())
+							{
+								this._indexWriter.writeType(index, type, location);
+							}
+							
+							// add property types
 							for (String propertyType : walker.getTypes())
 							{
 								ReturnTypeElement returnType = new ReturnTypeElement();
@@ -290,12 +327,12 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 							}
 						}
 						
-						type.addProperty(property);
+						result.addProperty(property);
 					}
 				}
 			}
-			
-			this._indexWriter.writeType(index, type, location);
 		}
+		
+		return result;
 	}
 }
