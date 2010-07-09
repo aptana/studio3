@@ -477,11 +477,11 @@ public class JSIndexQueryHelper
 	 */
 	public PropertyElement getTypeMember(Index index, String typeName, String memberName, EnumSet<FieldSelector> fields)
 	{
-		PropertyElement result = this.getTypeProperty(index, typeName, memberName, fields);
+		PropertyElement result = this.getProjectTypeMember(index, typeName, memberName, fields);
 		
 		if (result == null)
 		{
-			result = this.getTypeMethod(index, typeName, memberName, fields);
+			result = this.getCoreTypeMember(typeName, memberName, fields);
 		}
 		
 		return result;
