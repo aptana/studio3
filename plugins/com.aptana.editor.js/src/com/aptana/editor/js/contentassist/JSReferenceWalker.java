@@ -1,7 +1,8 @@
 package com.aptana.editor.js.contentassist;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
-import java.util.LinkedList;
 import java.util.List;
 
 import com.aptana.editor.js.contentassist.model.FieldSelector;
@@ -14,6 +15,7 @@ import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
 import com.aptana.editor.js.parsing.ast.JSIdentifierNode;
 import com.aptana.editor.js.parsing.ast.JSInvokeNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
+import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSObjectNode;
 import com.aptana.editor.js.parsing.ast.JSRegexNode;
 import com.aptana.editor.js.parsing.ast.JSStringNode;
@@ -28,8 +30,9 @@ public class JSReferenceWalker extends JSTreeWalker implements IReference
 	private Scope<JSNode> _scope;
 	private Index _index;
 	private JSIndexQueryHelper _indexHelper;
+	private JSTypeWalker _typeWalker;
 
-	private List<TypeElement> _types;
+	private List<String> _types;
 	private String _property;
 
 	/**
@@ -40,11 +43,34 @@ public class JSReferenceWalker extends JSTreeWalker implements IReference
 	 */
 	public JSReferenceWalker(Scope<JSNode> scope, Index index)
 	{
+		this(scope, index, null);
+	}
+	
+	/**
+	 * JSReferenceWalker
+	 * 
+	 * @param scope
+	 * @param index
+	 * @param nodeTypeCache
+	 */
+	public JSReferenceWalker(Scope<JSNode> scope, Index index, JSTypeWalker typeWalker)
+	{
 		this._scope = scope;
 		this._index = index;
 		this._indexHelper = new JSIndexQueryHelper();
+		this._typeWalker = typeWalker;
 	}
 
+	/**
+	 * createReferenceWalker
+	 * 
+	 * @return
+	 */
+	protected JSReferenceWalker createReferenceWalker()
+	{
+		return new JSReferenceWalker(this._scope, this._index, this._typeWalker);
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.contentassist.IReference#getPropertyName()
@@ -71,11 +97,10 @@ public class JSReferenceWalker extends JSTreeWalker implements IReference
 		}
 		else if (this._types != null)
 		{
-			result = new JSReferenceWalker(this._scope, this._index);
+			result = this.createReferenceWalker();
 			
-			for (TypeElement type : this._types)
+			for (String typeName : this._types)
 			{
-				String typeName = type.getName();
 				PropertyElement property = this._indexHelper.getTypeProperty(this._index, typeName, this._property, EnumSet.of(FieldSelector.TYPES));
 				
 				if (property != null)
@@ -96,6 +121,16 @@ public class JSReferenceWalker extends JSTreeWalker implements IReference
 				}
 			}
 		}
+		else if (this._typeWalker != null)
+		{
+			// we might have a user-generated type, so look for it directly
+			if (this._typeWalker.hasGeneratedType(this._property))
+			{
+				result = this.createReferenceWalker();
+				result.addType(this._property);
+				result.setProperty(propertyName);
+			}
+		}
 		
 		return result;
 	}
@@ -105,9 +140,16 @@ public class JSReferenceWalker extends JSTreeWalker implements IReference
 	 * @see com.aptana.editor.js.contentassist.IReference#getTypes()
 	 */
 	@Override
-	public List<TypeElement> getTypes()
+	public List<String> getTypes()
 	{
-		return this._types;
+		List<String> result = this._types;
+		
+		if (result == null)
+		{
+			result = Collections.emptyList(); 
+		}
+		
+		return result;
 	}
 
 	/**
@@ -119,7 +161,7 @@ public class JSReferenceWalker extends JSTreeWalker implements IReference
 	{
 		this._property = name;
 	}
-
+	
 	/**
 	 * setType
 	 * 
@@ -127,16 +169,14 @@ public class JSReferenceWalker extends JSTreeWalker implements IReference
 	 */
 	protected void addType(String typeName)
 	{
-		TypeElement type = this._indexHelper.getType(this._index, typeName, EnumSet.of(FieldSelector.NAME));
-		
-		if (type != null)
+		if (typeName != null)
 		{
 			if (this._types == null)
 			{
-				this._types = new LinkedList<TypeElement>();
+				this._types = new ArrayList<String>();
 			}
 			
-			this._types.add(type); 
+			this._types.add(typeName); 
 		}
 	}
 
@@ -173,14 +213,17 @@ public class JSReferenceWalker extends JSTreeWalker implements IReference
 		{
 			IParseNode rhs = node.getRightHandSide();
 			String propertyName = rhs.getText();
-			JSReferenceWalker walker = new JSReferenceWalker(this._scope, this._index);
+			JSReferenceWalker walker = this.createReferenceWalker();
 			
 			((JSNode) lhs).accept(walker);
 			
 			IReference reference = walker.getPropertyReference(propertyName);
 			
-			this._types = reference.getTypes();
-			this._property = reference.getPropertyName();
+			if (reference != null)
+			{
+				this._types = reference.getTypes();
+				this._property = reference.getPropertyName();
+			}
 		}
 	}
 
@@ -193,28 +236,41 @@ public class JSReferenceWalker extends JSTreeWalker implements IReference
 	{
 		String name = node.getText();
 
-//		// lookup in local scope
-//		if (this._scope != null && this._scope.hasSymbol(name))
-//		{
-//			List<JSNode> symbolNodes = this._scope.getSymbol(name);
-//
-//			for (JSNode symbolNode : symbolNodes)
-//			{
-//				symbolNode.accept(this);
-//			}
-//		}
-//		else
-//		{
-		
-		PropertyElement property = this._indexHelper.getGlobal(this._index, name, EnumSet.noneOf(FieldSelector.class));
-
-		if (property != null)
+		// lookup in local scope
+		if (this._scope != null && this._scope.hasSymbol(name))
 		{
-			this.addType("Window");
-			this.setProperty(name);
+			List<JSNode> symbolNodes = this._scope.getSymbol(name);
+
+			for (JSNode symbolNode : symbolNodes)
+			{
+				if (symbolNode instanceof JSIdentifierNode)
+				{
+					if (symbolNode.getParent().getNodeType() == JSNodeTypes.PARAMETERS)
+					{
+						// TODO: look for docs to determine type
+						// OR infer type from calls to the function
+					}
+					else if (symbolNode.getText().equals(name) == false)
+					{
+						((JSIdentifierNode) symbolNode).accept(this);
+					}
+				}
+				else
+				{
+					symbolNode.accept(this);
+				}
+			}
 		}
-		
-//		}
+		else
+		{
+			PropertyElement property = this._indexHelper.getGlobal(this._index, name, EnumSet.noneOf(FieldSelector.class));
+	
+			if (property != null)
+			{
+				this.addType("Window");
+				this.setProperty(name);
+			}
+		}
 	}
 
 	/*
@@ -228,22 +284,41 @@ public class JSReferenceWalker extends JSTreeWalker implements IReference
 		
 		if (expression instanceof JSNode)
 		{
-			JSReferenceWalker walker = new JSReferenceWalker(this._scope, this._index);
+			JSReferenceWalker walker = this.createReferenceWalker();
 			
 			((JSNode) expression).accept(walker);
 			
 			String methodName = walker.getPropertyName();
 			
-			for (TypeElement type : walker.getTypes())
+			if (methodName != null && methodName.length() > 0)
 			{
-				String typeName = type.getName();
-				FunctionElement function = this._indexHelper.getTypeMethod(this._index, typeName, methodName, EnumSet.of(FieldSelector.RETURN_TYPES));
-				
-				if (function != null)
+				for (String typeName : walker.getTypes())
 				{
-					for (String returnType : function.getTypeNames())
+					// try indexes first
+					FunctionElement function = this._indexHelper.getTypeMethod(this._index, typeName, methodName, EnumSet.of(FieldSelector.RETURN_TYPES));
+					
+					// if it's not there, then try the generated types
+					if (function == null && this._typeWalker != null)
 					{
-						this.addType(returnType);
+						TypeElement type = this._typeWalker.getGeneratedType(typeName);
+						
+						if (type != null)
+						{
+							PropertyElement property = type.getProperty(methodName);
+							
+							if (property instanceof FunctionElement)
+							{
+								function = (FunctionElement) property;
+							}
+						}
+					}
+					
+					if (function != null)
+					{
+						for (String returnType : function.getTypeNames())
+						{
+							this.addType(returnType);
+						}
 					}
 				}
 			}
@@ -257,7 +332,19 @@ public class JSReferenceWalker extends JSTreeWalker implements IReference
 	@Override
 	public void visit(JSObjectNode node)
 	{
-		this.setProperty("Object");
+		String name = "Object";
+		
+		if (this._typeWalker != null)
+		{
+			String candidate = this._typeWalker.getNodeType(node);
+			
+			if (candidate != null)
+			{
+				name = candidate;
+			}
+		}
+		
+		this.setProperty(name);
 	}
 
 	/*
