@@ -66,6 +66,25 @@ public class TypeElement extends BaseElement
 	}
 
 	/**
+	 * getProperty
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public PropertyElement getProperty(String name)
+	{
+		int index = this.getPropertyIndex(name);
+		PropertyElement result = null;
+		
+		if (index != -1)
+		{
+			result = this._properties.get(index);
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * getPropertyIndex
 	 * 
 	 * @param name
@@ -105,5 +124,15 @@ public class TypeElement extends BaseElement
 		}
 
 		return this._parentTypes;
+	}
+	
+	/**
+	 * hasProperties
+	 * 
+	 * @return
+	 */
+	public boolean hasProperties()
+	{
+		return this._parentTypes.isEmpty() == false;
 	}
 }
