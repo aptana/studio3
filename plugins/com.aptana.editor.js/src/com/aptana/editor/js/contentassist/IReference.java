@@ -2,8 +2,6 @@ package com.aptana.editor.js.contentassist;
 
 import java.util.List;
 
-import com.aptana.editor.js.contentassist.model.TypeElement;
-
 public interface IReference
 {
 	/**
@@ -18,7 +16,7 @@ public interface IReference
 	 * 
 	 * @return List<TypeElement>
 	 */
-	List<TypeElement> getTypes();
+	List<String> getTypes();
 
 	/**
 	 * This dereferences the current reference. A new reference is created using the resulting types and the specified
