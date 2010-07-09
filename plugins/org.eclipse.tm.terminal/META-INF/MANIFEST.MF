@@ -7,7 +7,8 @@ Bundle-Activator: org.eclipse.tm.internal.terminal.control.impl.TerminalPlugin
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.ui
+ org.eclipse.ui,
+ org.eclipse.jface.text;bundle-version="3.0.0"
 Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true
 Bundle-RequiredExecutionEnvironment: CDC-1.1/Foundation-1.1,
