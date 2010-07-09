@@ -52,6 +52,8 @@ import org.eclipse.tm.terminal.model.Style;
  */
 public class TextCanvas extends GridCanvas
 {
+	private static final String HYPERLINK_DETECTOR_EXT_PT = "com.aptana.org.eclipse.tm.terminal.terminalHyperlinkDetectors"; //$NON-NLS-1$
+	
 	protected final ITextCanvasModel fCellCanvasModel;
 	/** Renders the cells */
 	private final ILinelRenderer fCellRenderer;
@@ -90,6 +92,7 @@ public class TextCanvas extends GridCanvas
 
 	private IHyperlink[] fLinks = new IHyperlink[0];
 	private int fLastHash;
+	private IHyperlinkDetector[] fDetectors;
 
 	/**
 	 * Create a new CellCanvas with the given SWT style bits. (SWT.H_SCROLL and SWT.V_SCROLL are automatically added).
@@ -375,24 +378,27 @@ public class TextCanvas extends GridCanvas
 		}
 	}
 
-	private IHyperlinkDetector[] getHyperlinkDetectors()
+	private synchronized IHyperlinkDetector[] getHyperlinkDetectors()
 	{
-		// TODO Memo-ize detectors?
-		IConfigurationElement[] config = RegistryFactory.getRegistry().getConfigurationElementsFor(
-				"com.aptana.org.eclipse.tm.terminal.terminalHyperlinkDetectors"); //$NON-NLS-1$
-		List result = new ArrayList();
-		for (int i = 0; i < config.length; i++)
+		if (fDetectors == null)
 		{
-			try
+			IConfigurationElement[] config = RegistryFactory.getRegistry().getConfigurationElementsFor(
+					HYPERLINK_DETECTOR_EXT_PT);
+			List result = new ArrayList();
+			for (int i = 0; i < config.length; i++)
 			{
-				result.add(makeConnector(config[i]));
+				try
+				{
+					result.add(makeConnector(config[i]));
+				}
+				catch (CoreException e)
+				{
+					TerminalPlugin.getDefault().getLog().log(e.getStatus());
+				}
 			}
-			catch (CoreException e)
-			{
-				TerminalPlugin.getDefault().getLog().log(e.getStatus());
-			}
+			fDetectors = (IHyperlinkDetector[]) result.toArray(new IHyperlinkDetector[result.size()]);
 		}
-		return (IHyperlinkDetector[]) result.toArray(new IHyperlinkDetector[result.size()]);
+		return fDetectors;
 	}
 
 	static private IHyperlinkDetector makeConnector(final IConfigurationElement config) throws CoreException
