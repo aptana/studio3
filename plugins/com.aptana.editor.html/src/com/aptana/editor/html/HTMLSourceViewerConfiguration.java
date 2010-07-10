@@ -39,6 +39,8 @@ import java.util.Map;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
+import org.eclipse.jface.text.formatter.IContentFormatter;
+import org.eclipse.jface.text.formatter.MultiPassContentFormatter;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -49,6 +51,7 @@ import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.css.contentassist.CSSContentAssistProcessor;
 import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor;
+import com.aptana.editor.html.formatting.HTMLFormattingStrategy;
 import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.editor.js.contentassist.JSContentAssistProcessor;
 
@@ -83,6 +86,22 @@ public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfigurati
 		return HTMLSourceConfiguration.getDefault().getTopContentTypes();
 	}
 
+	/**
+	 * Returns a {@link MultiPassContentFormatter} with {@link HTMLFormattingStrategy} as a master formatter.<br>
+	 * Subclasses may override the master strategy, or add slave strategies.
+	 * 
+	 * @return An {@link IContentFormatter}.
+	 * @see com.aptana.editor.common.CommonSourceViewerConfiguration#getContentFormatter(org.eclipse.jface.text.source.
+	 *      ISourceViewer)
+	 */
+	@Override
+	public IContentFormatter getContentFormatter(ISourceViewer sourceViewer)
+	{
+		MultiPassContentFormatter formatter = (MultiPassContentFormatter) super.getContentFormatter(sourceViewer);
+		formatter.setMasterStrategy(new HTMLFormattingStrategy());
+		return formatter;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -111,7 +130,7 @@ public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfigurati
 	}
 
 	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings( { "unchecked", "rawtypes" })
 	protected Map getHyperlinkDetectorTargets(ISourceViewer sourceViewer)
 	{
 		Map targets = super.getHyperlinkDetectorTargets(sourceViewer);

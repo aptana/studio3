@@ -5,7 +5,8 @@ Bundle-SymbolicName: com.aptana.libraries
 Bundle-Version: 3.0.0.qualifier
 Bundle-Vendor: %providerName
 Bundle-ClassPath: derby.jar,
- uuid.jar
+ uuid.jar,
+ jtidy-r938.jar
 Export-Package: com.eaio.uuid,
  org.apache.derby.authentication,
  org.apache.derby.catalog,
@@ -102,5 +103,7 @@ Export-Package: com.eaio.uuid,
  org.apache.derby.shared.common.error,
  org.apache.derby.shared.common.sanity,
  org.apache.derby.tools,
- org.apache.derby.vti
+ org.apache.derby.vti,
+ org.w3c.tidy,
+ org.w3c.tidy.ant
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

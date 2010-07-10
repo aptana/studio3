@@ -66,7 +66,7 @@ public class FileService
 	 * Parse.<br>
 	 * This call is just like calling {@link #parse(boolean)} with false.
 	 */
-	public synchronized void parse()
+	public void parse()
 	{
 		parse(false);
 	}

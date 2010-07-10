@@ -5,6 +5,7 @@ import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.ITextViewerExtension5;
@@ -34,6 +35,7 @@ import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
+import org.eclipse.ui.texteditor.TextOperationAction;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
@@ -516,8 +518,15 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			((ITextViewerExtension) sourceViewer).prependVerifyKeyListener(new ExpandSnippetVerifyKeyListener(this));
 		}
 		this.fThemeableEditorFindBarExtension.createFindBarActions();
-	}
 
+		// Code formatter setup
+		Action action = new TextOperationAction(Messages.getBundleForConstructedKeys(),
+				"Format.", this, ISourceViewer.FORMAT); //$NON-NLS-1$
+		action.setActionDefinitionId(ICommonConstants.FORMATTER_ACTION_DEFINITION_ID);
+		setAction(ICommonConstants.FORMATTER_ACTION_ID, action);
+		markAsStateDependentAction(ICommonConstants.FORMATTER_ACTION_ID, true);
+		markAsSelectionDependentAction(ICommonConstants.FORMATTER_ACTION_ID, true);
+	}
 
 	ICommandElementsProvider getCommandElementsProvider()
 	{

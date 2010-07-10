@@ -50,7 +50,7 @@ public abstract class GenericRootPreferencePage extends PreferencePage implement
 	/**
 	 * Creates the links.
 	 */
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings( { "rawtypes", "unchecked" })
 	protected Control createContents(Composite parent)
 	{
 		// pageNameToId = null
@@ -60,10 +60,10 @@ public abstract class GenericRootPreferencePage extends PreferencePage implement
 			String pageId = getPageId();
 			// Locate all the pages that are defined as this page children
 			PreferenceManager manager = PlatformUI.getWorkbench().getPreferenceManager();
-			List nodes = manager.getElements(PreferenceManager.POST_ORDER);
-			for (Iterator i = nodes.iterator(); i.hasNext();)
+			List<IPreferenceNode> nodes = manager.getElements(PreferenceManager.POST_ORDER);
+			for (Iterator<IPreferenceNode> i = nodes.iterator(); i.hasNext();)
 			{
-				IPreferenceNode node = (IPreferenceNode) i.next();
+				IPreferenceNode node = i.next();
 				if (node.getId().equals(pageId))
 				{
 					// we found the node, so take its child nodes and add them to the cache
