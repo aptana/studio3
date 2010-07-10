@@ -100,6 +100,28 @@ public class FunctionElement extends PropertyElement
 	}
 
 	/**
+	 * getSignature
+	 * 
+	 * @return
+	 */
+	public String getSignature()
+	{
+		StringBuilder buffer = new StringBuilder();
+		boolean first = true;
+		
+		buffer.append("Function");
+		
+		for (ReturnTypeElement returnType : this.getReturnTypes())
+		{
+			buffer.append(first ? ":" : ",");
+			buffer.append(returnType.getType());
+			first = false;
+		}
+		
+		return buffer.toString();
+	}
+	
+	/**
 	 * isConstructor
 	 * 
 	 * @return
