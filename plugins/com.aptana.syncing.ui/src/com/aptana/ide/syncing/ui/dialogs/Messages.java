@@ -58,8 +58,10 @@ public class Messages extends NLS {
     public static String SiteConnectionsEditorDialog_SaveConfirm_Message;
     public static String SiteConnectionsEditorDialog_SaveConfirm_Title;
     public static String SiteConnectionsEditorDialog_Title;
+    public static String SiteConnectionsEditorDialog_UnresolvedWarning_Message;
+	public static String SiteConnectionsEditorDialog_UnresolvedWarning_Title;
 
-    static {
+	static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);
     }
