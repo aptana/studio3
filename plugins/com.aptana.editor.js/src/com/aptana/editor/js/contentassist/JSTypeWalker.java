@@ -654,16 +654,28 @@ public class JSTypeWalker extends JSTreeWalker
 			IParseNode rhs = node.getRightHandSide();
 			String name = rhs.getText();
 
-			for (String type : this.getTypes(lhs))
+			for (String typeName : this.getTypes(lhs))
 			{
 				// lookup up rhs name in type and add that value's type here
-				PropertyElement property = this._indexHelper.getTypeMember(this._index, type, name, EnumSet.of(FieldSelector.TYPES));
+				PropertyElement property = this._indexHelper.getTypeMember(this._index, typeName, name, EnumSet.of(FieldSelector.RETURN_TYPES, FieldSelector.TYPES));
+				
+				if (property == null)
+				{
+					TypeElement type = this.getGeneratedType(typeName);
+					
+					if (type != null)
+					{
+						property = type.getProperty(name);
+					}
+				}
 
 				if (property != null)
 				{
 					if (property instanceof FunctionElement)
 					{
-						this.addType(FUNCTION_TYPE);
+						FunctionElement function = (FunctionElement) property;
+						
+						this.addType(function.getSignature());
 					}
 					else
 					{
@@ -708,7 +720,22 @@ public class JSTypeWalker extends JSTreeWalker
 
 			for (JSNode symbolNode : symbolNodes)
 			{
-				symbolNode.accept(this);
+				if (symbolNode instanceof JSIdentifierNode)
+				{
+					if (symbolNode.getParent().getNodeType() == JSNodeTypes.PARAMETERS)
+					{
+						// TODO: look for docs to determine type
+						// OR infer type from calls to the function
+					}
+					else if (symbolNode.getText().equals(name) == false)
+					{
+						((JSIdentifierNode) symbolNode).accept(this);
+					}
+				}
+				else
+				{
+					symbolNode.accept(this);
+				}
 			}
 		}
 		else
@@ -719,7 +746,9 @@ public class JSTypeWalker extends JSTreeWalker
 			{
 				if (property instanceof FunctionElement)
 				{
-					this.addType(FUNCTION_TYPE);
+					FunctionElement function = (FunctionElement) property;
+					
+					this.addType(function.getSignature());
 				}
 				else
 				{
@@ -731,7 +760,7 @@ public class JSTypeWalker extends JSTreeWalker
 			}
 		}
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSInvokeNode)
@@ -740,39 +769,20 @@ public class JSTypeWalker extends JSTreeWalker
 	public void visit(JSInvokeNode node)
 	{
 		IParseNode child = node.getExpression();
-
+		
 		if (child instanceof JSNode)
 		{
-			JSReferenceWalker walker = this.createReferenceWalker();
-
-			((JSNode) child).accept(walker);
-
-			String methodName = walker.getPropertyName();
-
-			for (String typeName : walker.getTypes())
+			List<String> types = this.getTypes(child);
+			
+			for (String typeName : types)
 			{
-				FunctionElement function = this._indexHelper.getTypeMethod(this._index, typeName, methodName, EnumSet.of(FieldSelector.RETURN_TYPES));
+				int index = typeName.indexOf(':');
 				
-				if (function == null)
+				if (index != -1)
 				{
-					TypeElement type = this.getGeneratedType(typeName);
-					
-					if (type != null)
+					for (String returnTypeName : typeName.substring(index + 1).split(","))
 					{
-						PropertyElement property = type.getProperty(methodName);
-						
-						if (property instanceof FunctionElement)
-						{
-							function = (FunctionElement) property;
-						}
-					}
-				}
-
-				if (function != null)
-				{
-					for (String returnType : function.getTypeNames())
-					{
-						this.addType(returnType);
+						this.addType(returnTypeName);
 					}
 				}
 			}
@@ -855,11 +865,28 @@ public class JSTypeWalker extends JSTreeWalker
 					
 					for (String valueType : this.getTypes(valueNode))
 					{
-						ReturnTypeElement returnType = new ReturnTypeElement();
-
-						returnType.setType(valueType);
-
-						property.addType(returnType);
+						// process potential function signatures
+						int index = valueType.indexOf(':');
+							
+						if (index != -1)
+						{
+							for (String returnTypeName : valueType.substring(index + 1).split(","))
+							{
+								ReturnTypeElement returnType = new ReturnTypeElement();
+								
+								returnType.setType(returnTypeName);
+		
+								property.addType(returnType);
+							}
+						}
+						else
+						{
+							ReturnTypeElement returnType = new ReturnTypeElement();
+	
+							returnType.setType(valueType);
+	
+							property.addType(returnType);
+						}
 					}
 				}
 
