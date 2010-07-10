@@ -2,6 +2,7 @@ package com.aptana.editor.js.contentassist.index;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -61,7 +62,7 @@ public class JSIndexWriter
 	 * 
 	 * @param description
 	 */
-	protected String writeDescription(Index index, String description)
+	protected String writeDescription(Index index, String description, URI location)
 	{
 		String indexString;
 		
@@ -71,7 +72,7 @@ public class JSIndexWriter
 			
 			String value = indexString + JSIndexConstants.DELIMITER + description;
 			
-			index.addEntry(JSIndexConstants.DESCRIPTION, value, this.getDocumentPath());
+			index.addEntry(JSIndexConstants.DESCRIPTION, value, location);
 		}
 		else
 		{
@@ -90,9 +91,9 @@ public class JSIndexWriter
 	 */
 	protected void writeFunction(Index index, FunctionElement function, URI location)
 	{
-		String parametersKey = this.writeParameters(index, function.getParameters());
-		String returnTypesKey = this.writeReturnTypes(index, function.getReturnTypes());
-		String descriptionKey = this.writeDescription(index, function.getDescription());
+		String parametersKey = this.writeParameters(index, function.getParameters(), location);
+		String returnTypesKey = this.writeReturnTypes(index, function.getReturnTypes(), location);
+		String descriptionKey = this.writeDescription(index, function.getDescription(), location);
 		// SinceElement[] sinceList = function.getSinceList();
 		// UserAgentElement[] userAgents = function.getUserAgents();
 		
@@ -116,9 +117,9 @@ public class JSIndexWriter
 	 * @param parameters
 	 * @return
 	 */
-	protected String writeParameters(Index index, ParameterElement[] parameters)
+	protected String writeParameters(Index index, ParameterElement[] parameters, URI location)
 	{
-		List<String> keyList = new LinkedList<String>();
+		List<String> keyList = new ArrayList<String>();
 		String indexString = Integer.toString(this._parameterCount++);
 		
 		keyList.add(indexString);
@@ -135,7 +136,7 @@ public class JSIndexWriter
 		
 		String value = StringUtil.join(JSIndexConstants.DELIMITER, keyList);
 		
-		index.addEntry(JSIndexConstants.PARAMETERS, value, this.getDocumentPath());
+		index.addEntry(JSIndexConstants.PARAMETERS, value, location);
 		
 		return indexString;
 	}
@@ -149,8 +150,8 @@ public class JSIndexWriter
 	 */
 	protected void writeProperty(Index index, PropertyElement property, URI location)
 	{
-		String propertyTypesKey = this.writeReturnTypes(index, property.getTypes());
-		String descriptionKey = this.writeDescription(index, property.getDescription());
+		String propertyTypesKey = this.writeReturnTypes(index, property.getTypes(), location);
+		String descriptionKey = this.writeDescription(index, property.getDescription(), location);
 		// SinceElement[] sinceList = property.getSinceList();
 		
 		String value = StringUtil.join(
@@ -172,7 +173,7 @@ public class JSIndexWriter
 	 * @param returnTypes
 	 * @return
 	 */
-	protected String writeReturnTypes(Index index, ReturnTypeElement[] returnTypes)
+	protected String writeReturnTypes(Index index, ReturnTypeElement[] returnTypes, URI location)
 	{
 		List<String> keyList = new LinkedList<String>();
 		String indexString = Integer.toString(this._returnTypeCount++);
@@ -182,14 +183,14 @@ public class JSIndexWriter
 		for (ReturnTypeElement returnType : returnTypes)
 		{
 			String type = returnType.getType();
-			String descriptionKey = this.writeDescription(index, returnType.getDescription());
+			String descriptionKey = this.writeDescription(index, returnType.getDescription(), location);
 			
 			keyList.add(type + "," + descriptionKey); //$NON-NLS-1$
 		}
 		
 		String value = StringUtil.join(JSIndexConstants.DELIMITER, keyList);
 		
-		index.addEntry(JSIndexConstants.RETURN_TYPES, value, this.getDocumentPath());
+		index.addEntry(JSIndexConstants.RETURN_TYPES, value, location);
 		
 		return indexString;
 	}
@@ -231,7 +232,7 @@ public class JSIndexWriter
 	{
 		// write type entry
 		List<String> parentTypes = type.getParentTypes();
-		String descriptionKey = this.writeDescription(index, type.getDescription());
+		String descriptionKey = this.writeDescription(index, type.getDescription(), location);
 		// SinceElement[] sinceList = type.getSinceList();
 		// UserAgentElement[] userAgents = type.getUserAgents();
 
