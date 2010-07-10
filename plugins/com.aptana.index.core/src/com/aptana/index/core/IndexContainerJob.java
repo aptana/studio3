@@ -5,7 +5,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -76,7 +75,7 @@ public class IndexContainerJob extends IndexRequestJob
 				// filter...
 				timestamp = index.getIndexFile().lastModified();
 			}
-			filterFiles(timestamp, files);
+			files = filterFiles(timestamp, files);
 			sub.worked(50);
 
 			if (files != null && !files.isEmpty())
@@ -167,17 +166,17 @@ public class IndexContainerJob extends IndexRequestJob
 		}
 	}
 
-	private void filterFiles(long indexLastModified, Set<IFileStore> files)
+	protected Set<IFileStore> filterFiles(long indexLastModified, Set<IFileStore> files)
 	{
-		Iterator<IFileStore> iter = files.iterator();
-		while (iter.hasNext())
+		Set<IFileStore> filtered = new HashSet<IFileStore>();
+		for (IFileStore file : files)
 		{
-			IFileStore file = iter.next();
-			if (file.fetchInfo().getLastModified() < indexLastModified)
+			if (file.fetchInfo().getLastModified() >= indexLastModified)
 			{
-				iter.remove();
+				filtered.add(file);
 			}
 		}
+		return filtered;
 	}
 
 	private boolean fileExists(Set<IFileStore> files, String lastString)

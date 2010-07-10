@@ -473,6 +473,7 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
                 remotesViewer.setSelection(new StructuredSelection(input[0]), true);
             } else {
                 remoteRadio.setEnabled(true);
+                remoteRadio.setSelection(true);
                 remotesViewer.setLabelProvider(WorkbenchLabelProvider
                         .getDecoratingWorkbenchLabelProvider());
                 remotesViewer.setInput(sites);
@@ -611,8 +612,6 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
                 File file = (File) connectionPoint.getAdapter(File.class);
                 filesystemFolderText.setText(Path.fromOSString(file.getAbsolutePath())
                         .toPortableString());
-            } else {
-                setType(-1);
             }
         }
 

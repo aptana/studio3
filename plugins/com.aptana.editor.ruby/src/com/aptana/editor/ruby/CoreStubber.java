@@ -18,8 +18,11 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.core.runtime.content.IContentTypeManager;
 import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.core.ShellExecutable;
@@ -73,14 +76,14 @@ public class CoreStubber extends Job
 			jobs.add(indexCoreStubs(outputDir));
 			jobs.addAll(indexStdLib());
 			jobs.addAll(indexGems());
-			pm.beginTask("Indexing Ruby environment", jobs.size());
+			pm.beginTask("Indexing Ruby environment", jobs.size() * 1000);
 			for (Job job : jobs)
 			{
 				if (job == null)
 				{
 					continue;
 				}
-				job.setProgressGroup(pm, 1);
+				job.setProgressGroup(pm, 1000);
 				job.schedule();
 			}
 			// Use a thread to report back to progress monitor when all the jobs are done.
@@ -247,30 +250,56 @@ public class CoreStubber extends Job
 
 	protected Job indexFiles(String message, URI outputDir)
 	{
-		return new IndexContainerJob(message, outputDir)
-		{
-			protected Map<IFileStoreIndexingParticipant, Set<IFileStore>> mapParticipantsToFiles(
-					Set<IFileStore> fileStores)
-			{
-				Map<IFileStoreIndexingParticipant, Set<IFileStore>> map = new HashMap<IFileStoreIndexingParticipant, Set<IFileStore>>();
-				map.put(new RubyFileIndexingParticipant(), fileStores);
-				return map;
-			}
-		};
+		return new IndexRubyContainerJob(message, outputDir);
 	}
 
 	protected Job indexFiles(URI outputDir)
 	{
-		return new IndexContainerJob(outputDir)
+		return new IndexRubyContainerJob(outputDir);
+	}
+
+	private static class IndexRubyContainerJob extends IndexContainerJob
+	{
+		public IndexRubyContainerJob(URI outputDir)
 		{
-			protected Map<IFileStoreIndexingParticipant, Set<IFileStore>> mapParticipantsToFiles(
-					Set<IFileStore> fileStores)
+			super(outputDir);
+		}
+
+		public IndexRubyContainerJob(String message, URI outputDir)
+		{
+			super(message, outputDir);
+		}
+
+		protected Map<IFileStoreIndexingParticipant, Set<IFileStore>> mapParticipantsToFiles(Set<IFileStore> fileStores)
+		{
+			Map<IFileStoreIndexingParticipant, Set<IFileStore>> map = new HashMap<IFileStoreIndexingParticipant, Set<IFileStore>>();
+			map.put(new RubyFileIndexingParticipant(), fileStores);
+			return map;
+		}
+
+		@Override
+		protected Set<IFileStore> filterFiles(long indexLastModified, Set<IFileStore> files)
+		{
+			Set<IFileStore> firstPass = super.filterFiles(indexLastModified, files);
+			if (firstPass == null || firstPass.isEmpty())
 			{
-				Map<IFileStoreIndexingParticipant, Set<IFileStore>> map = new HashMap<IFileStoreIndexingParticipant, Set<IFileStore>>();
-				map.put(new RubyFileIndexingParticipant(), fileStores);
-				return map;
+				return firstPass;
 			}
-		};
+			// OK, now limit to only files that are ruby type!
+			IContentTypeManager manager = Platform.getContentTypeManager();
+			Set<IContentType> types = new HashSet<IContentType>();
+			types.add(manager.getContentType(IRubyConstants.CONTENT_TYPE_RUBY));
+			types.add(manager.getContentType(IRubyConstants.CONTENT_TYPE_RUBY_AMBIGUOUS));
+			Set<IFileStore> filtered = new HashSet<IFileStore>();
+			for (IFileStore store : firstPass)
+			{
+				if (hasType(store, types))
+				{
+					filtered.add(store);
+				}
+			}
+			return filtered;
+		}
 	}
 
 }

@@ -78,7 +78,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, JS_MULTILINE_COMMENT, JS_SINGLELINE_COMMENT,
 			JS_DOC, STRING_DOUBLE, STRING_SINGLE, JS_REGEXP };
 
-	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IJSConstants.CONTENT_TYPE_JS } };
+	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IJSConstants.CONTENT_TYPE_JS }, { IJSConstants.CONTENT_TYPE_JSON } };
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
 			new EndOfLineRule("//", new Token(JS_SINGLELINE_COMMENT)), //$NON-NLS-1$
@@ -102,6 +102,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	{
 		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 		c.addTranslation(new QualifiedContentType(IJSConstants.CONTENT_TYPE_JS), new QualifiedContentType("source.js")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(IJSConstants.CONTENT_TYPE_JSON), new QualifiedContentType("source.json")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType("string.quoted.double.js")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(STRING_SINGLE), new QualifiedContentType("string.quoted.single.js")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(JS_REGEXP), new QualifiedContentType("string.regexp.js")); //$NON-NLS-1$

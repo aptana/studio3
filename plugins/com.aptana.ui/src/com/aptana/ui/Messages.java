@@ -8,6 +8,8 @@ public class Messages extends NLS
 	private static final String BUNDLE_NAME = "com.aptana.ui.messages"; //$NON-NLS-1$
 
 	public static String DialogUtils_HideMessage;
+	public static String UIPlugin_UpdateWarning_Message;
+	public static String UIPlugin_UpdateWarning_Title;
 	public static String UIUtils_Error;
 
     public static String IDialogConstants_LBL_Apply;

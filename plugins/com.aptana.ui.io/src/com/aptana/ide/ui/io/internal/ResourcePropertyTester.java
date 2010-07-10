@@ -32,40 +32,44 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
+package com.aptana.ide.ui.io.internal;
 
-package com.aptana.ide.syncing.ui.dialogs;
+import org.eclipse.core.expressions.PropertyTester;
+import org.eclipse.core.resources.IResource;
 
-import org.eclipse.osgi.util.NLS;
+/**
+ * @author Michael Xia (mxia@aptana.com)
+ */
+public class ResourcePropertyTester extends PropertyTester
+{
 
-public class Messages extends NLS {
+	private static final String PROPERTY_IS_ACCESSIBLE = "isAccessible"; //$NON-NLS-1$
 
-    private static final String BUNDLE_NAME = "com.aptana.ide.syncing.ui.dialogs.messages"; //$NON-NLS-1$
-    
-    public static String ChooseSiteConnectionDialog_LBL_Connection;
-    public static String ChooseSiteConnectionDialog_LBL_Message;
-    public static String ChooseSiteConnectionDialog_LBL_PropertyPage;
-    public static String ChooseSiteConnectionDialog_LBL_RememberMyDecision;
-    public static String ChooseSiteConnectionDialog_Title;
+	public boolean test(Object receiver, String property, Object[] args, Object expectedValue)
+	{
+		if (receiver instanceof IResource)
+		{
+			IResource resource = (IResource) receiver;
 
-    public static String SiteConnectionsEditorDialog_DeleteConfirm_Message;
-    public static String SiteConnectionsEditorDialog_DeleteConfirm_Title;
-    public static String SiteConnectionsEditorDialog_DialogTitle;
-    public static String SiteConnectionsEditorDialog_ERR_Duplicate;
-    public static String SiteConnectionsEditorDialog_LBL_ConnectionGroup;
-    public static String SiteConnectionsEditorDialog_LBL_Duplicate;
-    public static String SiteConnectionsEditorDialog_LBL_NewConnection;
-    public static String SiteConnectionsEditorDialog_Message;
-    public static String SiteConnectionsEditorDialog_SaveConfirm_Message;
-    public static String SiteConnectionsEditorDialog_SaveConfirm_Title;
-    public static String SiteConnectionsEditorDialog_Title;
-    public static String SiteConnectionsEditorDialog_UnresolvedWarning_Message;
-	public static String SiteConnectionsEditorDialog_UnresolvedWarning_Title;
+			boolean value = toBoolean(expectedValue);
+			if (PROPERTY_IS_ACCESSIBLE.equals(property))
+			{
+				return resource.isAccessible() == value;
+			}
+		}
+		return false;
+	}
 
-	static {
-        // initialize resource bundle
-        NLS.initializeMessages(BUNDLE_NAME, Messages.class);
-    }
-
-    private Messages() {
-    }
+	private static boolean toBoolean(Object value)
+	{
+		if (value instanceof Boolean)
+		{
+			return ((Boolean) value).booleanValue();
+		}
+		if (value instanceof String)
+		{
+			return Boolean.parseBoolean((String) value);
+		}
+		return false;
+	}
 }

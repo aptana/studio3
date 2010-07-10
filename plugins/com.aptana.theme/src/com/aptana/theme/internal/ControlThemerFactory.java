@@ -24,7 +24,14 @@ public class ControlThemerFactory implements IControlThemerFactory
 	 */
 	public void apply(Control control)
 	{
-		IControlThemer themer = getThemer(control);
+		// If a themer already exists for the control, just return it
+		IControlThemer themer = themers.get(control);
+		if (themer != null)
+		{
+			return;
+		}		
+		
+		themer = createThemer(control);
 		synchronized (themers)
 		{
 			themers.put(control, themer);
@@ -49,15 +56,8 @@ public class ControlThemerFactory implements IControlThemerFactory
 		}
 	}
 
-	private IControlThemer getThemer(Control control)
+	private IControlThemer createThemer(Control control)
 	{
-		// If a themer already exists for the control, just return it
-		IControlThemer themer = themers.get(control);
-		if (themer != null)
-		{
-			return themer;
-		}
-
 		// No themer exists, create a new one
 		if (control instanceof Tree)
 		{
@@ -68,24 +68,6 @@ public class ControlThemerFactory implements IControlThemerFactory
 			return new TableThemer((Table) control);
 		}
 		return new ControlThemer(control);
-	}
-
-	private IControlThemer getThemer(Viewer viewer)
-	{
-
-		if (viewer instanceof TreeViewer)
-		{
-			// If a themer already exists for the control, just return it
-			IControlThemer themer = themers.get(viewer.getControl());
-			if (themer != null)
-			{
-				return themer;
-			}
-
-			// No themer exists, create a new one
-			return new TreeThemer((TreeViewer) viewer);
-		}
-		return getThemer(viewer.getControl());
 	}
 
 	/*
@@ -109,7 +91,15 @@ public class ControlThemerFactory implements IControlThemerFactory
 	{
 		if (viewer instanceof TreeViewer)
 		{
-			IControlThemer themer = getThemer(viewer);
+			// If a themer already exists for the control, just return it
+			IControlThemer themer = themers.get(viewer.getControl());
+			if (themer != null)
+			{
+				return;
+			}
+
+			// No themer exists, create a new one
+			themer =  new TreeThemer((TreeViewer) viewer);
 			synchronized (themers)
 			{
 				themers.put(viewer.getControl(), themer);

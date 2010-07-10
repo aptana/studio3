@@ -831,6 +831,10 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 	protected void hijackOutline()
 	{
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		if (window == null || window.getActivePage() == null)
+		{
+			return;
+		}
 		IViewReference[] refs = window.getActivePage().getViewReferences();
 		for (IViewReference ref : refs)
 		{

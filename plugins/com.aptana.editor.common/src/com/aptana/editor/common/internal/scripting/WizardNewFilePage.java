@@ -2,9 +2,8 @@ package com.aptana.editor.common.internal.scripting;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.regex.Pattern;
 
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.swt.SWT;
@@ -74,18 +73,24 @@ public class WizardNewFilePage extends WizardNewFileCreationPage
 
 	private void collectTemplates()
 	{
-		IPath path = Path.fromOSString(getFileName());
-		String extension = path.getFileExtension();
-		final String fileExtension = extension != null ? ("*." + extension) : null; //$NON-NLS-1$
+		final String filename = getFileName();
 		CommandElement[] commands = BundleManager.getInstance().getCommands(new IModelFilter()
 		{
+			@SuppressWarnings("nls")
 			public boolean include(AbstractElement element)
 			{
 				if (element instanceof TemplateElement)
 				{
 					TemplateElement te = (TemplateElement) element;
 					String filetype = te.getFiletype();
-					return filetype != null && filetype.equals(fileExtension);
+					if (filetype == null)
+						return false;
+					filetype = filetype.replaceAll("\\.", "\\\\.");
+					filetype = filetype.replaceAll("\\*", ".*");
+					filetype = filetype.replaceAll("\\?", ".");
+					filetype += "$";
+					filetype = "^" + filetype;
+					return Pattern.matches(filetype, filename);
 				}
 				return false;
 			}
