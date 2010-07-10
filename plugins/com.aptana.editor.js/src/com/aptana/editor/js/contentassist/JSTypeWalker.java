@@ -563,13 +563,17 @@ public class JSTypeWalker extends JSTreeWalker
 			// build function type, including return values
 			if (types.isEmpty() == false)
 			{
-				type = StringUtil.join(",", types);
+				type = FUNCTION_TYPE + ":" + StringUtil.join(",", types);
 			}
 			else if (foundReturnExpression)
 			{
 				// If we couldn't infer a return type and we had a return
 				// expression, then at least return Object from this function
-				type = OBJECT_TYPE;
+				type = FUNCTION_TYPE + ":" + OBJECT_TYPE;
+			}
+			else
+			{
+				type = FUNCTION_TYPE;
 			}
 
 			this.putNodeType(node, type);
