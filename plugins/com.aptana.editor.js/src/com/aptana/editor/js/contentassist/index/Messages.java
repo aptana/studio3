@@ -53,6 +53,12 @@ public final class Messages extends NLS
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
+	public static String JSMetadataReader_10;
+	public static String JSMetadataReader_12;
+	public static String JSMetadataReader_6;
+	public static String JSMetadataReader_7;
+	public static String JSMetadataReader_8;
+	public static String JSMetadataReader_9;
 	public static String JSMetadataReader_Error_Loading_JS_Metadata;
 	public static String JSMetadataReader_Parse_Error;
 	public static String JSMetadataReader_Parse_IO_Error;

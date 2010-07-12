@@ -9,7 +9,7 @@ public class JSTrueNode extends JSPrimitiveNode
 	 */
 	public JSTrueNode()
 	{
-		super(JSNodeTypes.TRUE, "true");
+		super(JSNodeTypes.TRUE, "true"); //$NON-NLS-1$
 	}
 
 	/**

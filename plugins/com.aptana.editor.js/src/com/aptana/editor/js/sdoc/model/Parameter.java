@@ -78,15 +78,15 @@ public class Parameter extends Symbol
 				break;
 
 			case OPTIONAL:
-				writer.print("[").print(this._name).print("]");
+				writer.print("[").print(this._name).print("]"); //$NON-NLS-1$ //$NON-NLS-2$
 				break;
 
 			case ONE_OR_MORE:
-				writer.print("...");
+				writer.print("..."); //$NON-NLS-1$
 				break;
 
 			case ZERO_OR_MORE:
-				writer.print("[...]");
+				writer.print("[...]"); //$NON-NLS-1$
 				break;
 		}
 	}

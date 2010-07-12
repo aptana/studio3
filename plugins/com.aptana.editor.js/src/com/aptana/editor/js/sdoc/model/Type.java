@@ -6,7 +6,7 @@ import beaver.Symbol;
 
 public class Type extends Symbol
 {
-	public static final Type OBJECT_TYPE = new Type("Object");
+	public static final Type OBJECT_TYPE = new Type("Object"); //$NON-NLS-1$
 
 	private String _name;
 

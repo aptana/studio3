@@ -73,8 +73,8 @@ import com.aptana.sax.ValidatingReader;
  */
 public class JSMetadataReader extends ValidatingReader
 {
-	private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("[$_a-zA-Z][$_a-zA-Z0-9]*");
-	private static final Pattern TYPE_PATTERN = Pattern.compile("[$_a-zA-Z][$_a-zA-Z0-9]*(?:(?:<[$_a-zA-Z][$_a-zA-Z0-9]*>)|(?:\\[\\]))?");
+	private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("[$_a-zA-Z][$_a-zA-Z0-9]*"); //$NON-NLS-1$
+	private static final Pattern TYPE_PATTERN = Pattern.compile("[$_a-zA-Z][$_a-zA-Z0-9]*(?:(?:<[$_a-zA-Z][$_a-zA-Z0-9]*>)|(?:\\[\\]))?"); //$NON-NLS-1$
 	
 	private Schema _metadataSchema;
 	private StringBuffer _textBuffer = new StringBuffer();
@@ -190,7 +190,7 @@ public class JSMetadataReader extends ValidatingReader
 		
 		if (this.isValidIdentifier(typeName))
 		{
-			String className = "Class<" + typeName + ">";
+			String className = "Class<" + typeName + ">"; //$NON-NLS-1$ //$NON-NLS-2$
 			
 			// create a new class documentation object
 			TypeElement type = this.getType(typeName);
@@ -208,12 +208,12 @@ public class JSMetadataReader extends ValidatingReader
 					if (this.isValidTypeIdentifier(superType))
 					{
 						type.addParentType(superType);
-						clas.addParentType("Class<" + superType + ">");
+						clas.addParentType("Class<" + superType + ">"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 					else
 					{
 						String message = MessageFormat.format(
-							"Invalid superclass name ''{0}'' in class ''{1}''",
+							Messages.JSMetadataReader_6,
 							superType,
 							typeName
 						);
@@ -230,7 +230,7 @@ public class JSMetadataReader extends ValidatingReader
 		else
 		{
 			String message = MessageFormat.format(
-				"Invalid class name in JS metdata: {0}",
+				Messages.JSMetadataReader_7,
 				typeName
 			);
 			
@@ -273,7 +273,7 @@ public class JSMetadataReader extends ValidatingReader
 		}
 		else
 		{
-			Activator.logError("Invalid exception name: " + exceptionName, null);
+			Activator.logError(Messages.JSMetadataReader_8 + exceptionName, null);
 		}
 	}
 
@@ -382,7 +382,7 @@ public class JSMetadataReader extends ValidatingReader
 				else
 				{
 					String message = MessageFormat.format(
-						"Invalid type ''{0}'' for parameter ''{1}''",
+						Messages.JSMetadataReader_9,
 						type,
 						parameterName
 					);
@@ -451,7 +451,7 @@ public class JSMetadataReader extends ValidatingReader
 				else
 				{
 					String message = MessageFormat.format(
-						"Invalid type name ''{0}'' for property ''{1}''",
+						Messages.JSMetadataReader_10,
 						propertyType,
 						propertyName
 					);
@@ -491,7 +491,7 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public void enterReturnType(String ns, String name, String qname, Attributes attributes)
 	{
-		String type = attributes.getValue("type");
+		String type = attributes.getValue("type"); //$NON-NLS-1$
 		
 		if (this.isValidTypeIdentifier(type))
 		{
@@ -504,7 +504,7 @@ public class JSMetadataReader extends ValidatingReader
 		}
 		else
 		{
-			Activator.logError("Invalid return type: " + type, null);
+			Activator.logError(Messages.JSMetadataReader_12 + type, null);
 		}
 	}
 	

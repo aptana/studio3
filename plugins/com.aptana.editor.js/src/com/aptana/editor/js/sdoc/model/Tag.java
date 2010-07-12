@@ -16,7 +16,7 @@ public abstract class Tag extends Symbol
 	 */
 	public Tag(TagType type)
 	{
-		this(type, "");
+		this(type, ""); //$NON-NLS-1$
 	}
 
 	/**
@@ -77,7 +77,7 @@ public abstract class Tag extends Symbol
 
 		if (this._text != null && this._text.isEmpty() == false)
 		{
-			writer.print(" ").print(this._text);
+			writer.print(" ").print(this._text); //$NON-NLS-1$
 		}
 	}
 }

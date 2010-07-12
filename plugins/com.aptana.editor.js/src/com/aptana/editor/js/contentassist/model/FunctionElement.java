@@ -109,11 +109,11 @@ public class FunctionElement extends PropertyElement
 		StringBuilder buffer = new StringBuilder();
 		boolean first = true;
 		
-		buffer.append("Function");
+		buffer.append("Function"); //$NON-NLS-1$
 		
 		for (ReturnTypeElement returnType : this.getReturnTypes())
 		{
-			buffer.append(first ? ":" : ",");
+			buffer.append(first ? ":" : ","); //$NON-NLS-1$ //$NON-NLS-2$
 			buffer.append(returnType.getType());
 			first = false;
 		}

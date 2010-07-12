@@ -74,7 +74,7 @@ public class JSBinaryBooleanOperatorNode extends JSBinaryOperatorNode
 				break;
 
 			default:
-				throw new IllegalArgumentException("Unrecognized operator: " + token);
+				throw new IllegalArgumentException(Messages.JSBinaryBooleanOperatorNode_0 + token);
 		}
 
 		this.setNodeType(type);

@@ -19,7 +19,7 @@ import com.aptana.index.core.IndexManager;
 public class JSIndexQueryHelper
 {
 	private static final EnumSet<FieldSelector> PARENT_TYPES = EnumSet.of(FieldSelector.PARENT_TYPES);
-	private static final String WINDOW_TYPE = "Window";
+	private static final String WINDOW_TYPE = "Window"; //$NON-NLS-1$
 
 	private JSIndexReader _reader;
 
@@ -668,7 +668,7 @@ public class JSIndexQueryHelper
 				{
 					// prevent possible infinite loop if Object returns Object
 					// as its super-type
-					if (currentType.equals("Object") == false)
+					if (currentType.equals("Object") == false) //$NON-NLS-1$
 					{
 						TypeElement type = this._reader.getType(index, currentType, PARENT_TYPES);
 

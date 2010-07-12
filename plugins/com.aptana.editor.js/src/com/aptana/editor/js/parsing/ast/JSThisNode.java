@@ -9,7 +9,7 @@ public class JSThisNode extends JSPrimitiveNode
 	 */
 	public JSThisNode()
 	{
-		super(JSNodeTypes.THIS, "this");
+		super(JSNodeTypes.THIS, "this"); //$NON-NLS-1$
 	}
 
 	/**

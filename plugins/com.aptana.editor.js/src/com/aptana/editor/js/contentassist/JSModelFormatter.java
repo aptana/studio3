@@ -10,8 +10,8 @@ import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 
 public class JSModelFormatter
 {
-	private static final String GENERIC_CLASS_CLOSE = ">";
-	private static final String GENERIC_CLASS_OPEN = "Class<";
+	private static final String GENERIC_CLASS_CLOSE = ">"; //$NON-NLS-1$
+	private static final String GENERIC_CLASS_OPEN = "Class<"; //$NON-NLS-1$
 
 	private JSModelFormatter()
 	{

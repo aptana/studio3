@@ -9,7 +9,7 @@ public class JSNullNode extends JSPrimitiveNode
 	 */
 	public JSNullNode()
 	{
-		super(JSNodeTypes.NULL, "null");
+		super(JSNodeTypes.NULL, "null"); //$NON-NLS-1$
 	}
 
 	/**

@@ -37,20 +37,20 @@ public abstract class TagWithTypes extends Tag
 	{
 		writer.print(this.getType().toString());
 
-		writer.print(" {");
+		writer.print(" {"); //$NON-NLS-1$
 
 		for (Type type : this._types)
 		{
 			type.toSource(writer);
 		}
 
-		writer.print("}");
+		writer.print("}"); //$NON-NLS-1$
 
 		String text = this.getText();
 
 		if (text != null && text.isEmpty() == false)
 		{
-			writer.print(" ").print(text);
+			writer.print(" ").print(text); //$NON-NLS-1$
 		}
 	}
 }

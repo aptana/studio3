@@ -54,7 +54,7 @@ public class VSDocReader extends MetadataReader
 	 */
 	public void enterException(String ns, String name, String qname, Attributes attributes)
 	{
-		this._exceptionType = attributes.getValue("cref");
+		this._exceptionType = attributes.getValue("cref"); //$NON-NLS-1$
 
 		this.startTextBuffer();
 	}
@@ -69,9 +69,9 @@ public class VSDocReader extends MetadataReader
 	 */
 	public void enterParam(String ns, String name, String qname, Attributes attributes)
 	{
-		String parameterName = attributes.getValue("name");
-		boolean optional = Boolean.parseBoolean(attributes.getValue("optional"));
-		boolean parameterArray = Boolean.parseBoolean(attributes.getValue("parameterArray"));
+		String parameterName = attributes.getValue("name"); //$NON-NLS-1$
+		boolean optional = Boolean.parseBoolean(attributes.getValue("optional")); //$NON-NLS-1$
+		boolean parameterArray = Boolean.parseBoolean(attributes.getValue("parameterArray")); //$NON-NLS-1$
 		Usage usage;
 
 		if (optional)
@@ -100,7 +100,7 @@ public class VSDocReader extends MetadataReader
 		this._currentParameter = new Parameter(parameterName);
 		this._currentParameter.setUsage(usage);
 
-		this._currentType = attributes.getValue("type");
+		this._currentType = attributes.getValue("type"); //$NON-NLS-1$
 
 		this.startTextBuffer();
 	}
@@ -115,7 +115,7 @@ public class VSDocReader extends MetadataReader
 	 */
 	public void enterSee(String ns, String name, String qname, Attributes attributes)
 	{
-		String type = attributes.getValue("cref");
+		String type = attributes.getValue("cref"); //$NON-NLS-1$
 
 		this._tags.add(new SeeTag(type));
 	}
@@ -130,7 +130,7 @@ public class VSDocReader extends MetadataReader
 	 */
 	public void enterReturns(String ns, String name, String qname, Attributes attributes)
 	{
-		this._currentType = attributes.getValue("type");
+		this._currentType = attributes.getValue("type"); //$NON-NLS-1$
 
 		this.startTextBuffer();
 	}
@@ -177,7 +177,7 @@ public class VSDocReader extends MetadataReader
 		String text = this.getText();
 
 		List<Type> types = new ArrayList<Type>();
-		types.add(new Type(this._exceptionType != null ? this._exceptionType : "Object"));
+		types.add(new Type(this._exceptionType != null ? this._exceptionType : "Object")); //$NON-NLS-1$
 
 		this._tags.add(new ExceptionTag(types, text));
 
@@ -197,7 +197,7 @@ public class VSDocReader extends MetadataReader
 		String text = this.getText();
 
 		List<Type> types = new ArrayList<Type>();
-		types.add(new Type(this._currentType != null ? this._currentType : "Object"));
+		types.add(new Type(this._currentType != null ? this._currentType : "Object")); //$NON-NLS-1$
 
 		this._tags.add(new ParamTag(this._currentParameter, types, text));
 
@@ -233,7 +233,7 @@ public class VSDocReader extends MetadataReader
 		String text = this.getText();
 
 		List<Type> types = new ArrayList<Type>();
-		types.add(new Type(this._currentType != null ? this._currentType : "Object"));
+		types.add(new Type(this._currentType != null ? this._currentType : Messages.VSDocReader_9));
 
 		this._tags.add(new ReturnTag(types, text));
 

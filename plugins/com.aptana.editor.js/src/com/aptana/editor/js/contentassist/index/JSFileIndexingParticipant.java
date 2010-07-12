@@ -270,7 +270,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 		{
 			result = new TypeElement();
 			
-			result.setName("Window");
+			result.setName("Window"); //$NON-NLS-1$
 			
 			for (String symbol : globals.getLocalSymbolNames())
 			{

@@ -34,7 +34,7 @@ public class JSPostUnaryOperatorNode extends JSNode
 				break;
 
 			default:
-				throw new IllegalArgumentException("Unrecognized operator: " + token);
+				throw new IllegalArgumentException(Messages.JSPostUnaryOperatorNode_0 + token);
 		}
 
 		this.setNodeType(type);

@@ -28,7 +28,7 @@ public class JSFormatWalker extends JSTreeWalker
 		{
 			if (((JSNode) node).getSemicolonIncluded())
 			{
-				this._printer.print(";");
+				this._printer.print(";"); //$NON-NLS-1$
 			}
 		}
 	}
@@ -129,7 +129,7 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSArgumentsNode node)
 	{
-		this.formatNaryNode(node, "(", ", ", ")");
+		this.formatNaryNode(node, "(", ", ", ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/*
@@ -139,7 +139,7 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSArrayNode node)
 	{
-		this.formatNaryNode(node, "[", ", ", "]");
+		this.formatNaryNode(node, "[", ", ", "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/*
@@ -184,7 +184,7 @@ public class JSFormatWalker extends JSTreeWalker
 	{
 		Symbol label = node.getLabel();
 
-		this._printer.print("break");
+		this._printer.print("break"); //$NON-NLS-1$
 
 		if (label != null)
 		{
@@ -192,7 +192,7 @@ public class JSFormatWalker extends JSTreeWalker
 			
 			if (text != null && text.length() > 0)
 			{
-				this._printer.print(" ").print(label);
+				this._printer.print(" ").print(label); //$NON-NLS-1$
 			}
 		}
 
@@ -206,9 +206,9 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSCaseNode node)
 	{
-		this._printer.print("case ");
+		this._printer.print("case "); //$NON-NLS-1$
 		this.formatNode(node.getExpression());
-		this._printer.print(": ");
+		this._printer.print(": "); //$NON-NLS-1$
 
 		boolean first = true;
 
@@ -247,7 +247,7 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSCommaNode node)
 	{
-		this.formatNaryNode(node, "", ", ", "");
+		this.formatNaryNode(node, "", ", ", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/*
@@ -258,9 +258,9 @@ public class JSFormatWalker extends JSTreeWalker
 	public void visit(JSConditionalNode node)
 	{
 		this.formatNode(node.getTestExpression());
-		this._printer.print(" ? ");
+		this._printer.print(" ? "); //$NON-NLS-1$
 		this.formatNode(node.getTrueExpression());
-		this._printer.print(" : ");
+		this._printer.print(" : "); //$NON-NLS-1$
 		this.formatNode(node.getFalseExpression());
 		this.addSemicolon(node);
 	}
@@ -272,7 +272,7 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSConstructNode node)
 	{
-		this._printer.print("new ");
+		this._printer.print("new "); //$NON-NLS-1$
 		this.formatNode(node.getExpression());
 		this.formatNode(node.getArguments());
 		this.addSemicolon(node);
@@ -287,7 +287,7 @@ public class JSFormatWalker extends JSTreeWalker
 	{
 		Symbol label = node.getLabel();
 
-		this._printer.print("continue");
+		this._printer.print("continue"); //$NON-NLS-1$
 
 		if (label != null)
 		{
@@ -295,7 +295,7 @@ public class JSFormatWalker extends JSTreeWalker
 			
 			if (text != null && text.length() > 0)
 			{
-				this._printer.print(" ").print(label);
+				this._printer.print(" ").print(label); //$NON-NLS-1$
 			}
 		}
 
@@ -317,7 +317,7 @@ public class JSFormatWalker extends JSTreeWalker
 		{
 			if (((JSNode) value).isEmpty() == false)
 			{
-				this._printer.print(" = ");
+				this._printer.print(" = "); //$NON-NLS-1$
 				this.formatNode(value);
 			}
 		}
@@ -332,7 +332,7 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSDefaultNode node)
 	{
-		this.formatNaryNode(node, "default: ", "", "");
+		this.formatNaryNode(node, "default: ", "", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/*
@@ -342,7 +342,7 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSDoNode node)
 	{
-		this._printer.print("do ");
+		this._printer.print("do "); //$NON-NLS-1$
 
 		IParseNode body = node.getBody();
 		
@@ -350,12 +350,12 @@ public class JSFormatWalker extends JSTreeWalker
 
 		if (body.getNodeType() != JSNodeTypes.STATEMENTS)
 		{
-			this._printer.print(";");
+			this._printer.print(";"); //$NON-NLS-1$
 		}
 
-		this._printer.print(" while (");
+		this._printer.print(" while ("); //$NON-NLS-1$
 		this.formatNode(node.getCondition());
-		this._printer.print(")");
+		this._printer.print(")"); //$NON-NLS-1$
 
 		this.addSemicolon(node);
 	}
@@ -367,7 +367,7 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSElementsNode node)
 	{
-		this.formatNaryNode(node, "", ", ", "");
+		this.formatNaryNode(node, "", ", ", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/*
@@ -377,7 +377,7 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSElisionNode node)
 	{
-		this.formatNaryNode(node, "", ", ", "");
+		this.formatNaryNode(node, "", ", ", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/* (non-Javadoc)
@@ -407,7 +407,7 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSFinallyNode node)
 	{
-		this._printer.print("finally ");
+		this._printer.print("finally "); //$NON-NLS-1$
 		this.formatNode(node.getBlock());
 		this.addSemicolon(node);
 	}
@@ -419,11 +419,11 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSForInNode node)
 	{
-		this._printer.print("for (");
+		this._printer.print("for ("); //$NON-NLS-1$
 		this.formatNode(node.getInitializer());
-		this._printer.print(" in ");
+		this._printer.print(" in "); //$NON-NLS-1$
 		this.formatNode(node.getExpression());
-		this._printer.print(") ");
+		this._printer.print(") "); //$NON-NLS-1$
 		this.formatNode(node.getBody());
 		this.addSemicolon(node);
 	}
@@ -439,27 +439,27 @@ public class JSFormatWalker extends JSTreeWalker
 		IParseNode condition = node.getCondition();
 		IParseNode advance = node.getAdvance();
 
-		this._printer.print("for (");
+		this._printer.print("for ("); //$NON-NLS-1$
 
 		if (this.isNotEmpty(initializer))
 		{
 			this.formatNode(initializer);
 		}
-		this._printer.print(";");
+		this._printer.print(";"); //$NON-NLS-1$
 
 		if (this.isNotEmpty(condition))
 		{
-			this._printer.print(" ");
+			this._printer.print(" "); //$NON-NLS-1$
 			this.formatNode(condition);
 		}
-		this._printer.print(";");
+		this._printer.print(";"); //$NON-NLS-1$
 
 		if (this.isNotEmpty(advance))
 		{
-			this._printer.print(" ");
+			this._printer.print(" "); //$NON-NLS-1$
 			this.formatNode(advance);
 		}
-		this._printer.print(") ");
+		this._printer.print(") "); //$NON-NLS-1$
 
 		this.formatNode(node.getBody());
 
@@ -475,15 +475,15 @@ public class JSFormatWalker extends JSTreeWalker
 	{
 		String name = node.getName().getText();
 
-		this._printer.print("function ");
+		this._printer.print("function "); //$NON-NLS-1$
 
 		if (name != null && name.length() > 0)
 		{
-			this._printer.print(name).print(" ");
+			this._printer.print(name).print(" "); //$NON-NLS-1$
 		}
 
 		this.formatNode(node.getParameters());
-		this._printer.print(" ");
+		this._printer.print(" "); //$NON-NLS-1$
 		this.formatNode(node.getBody());
 		this.addSemicolon(node);
 	}
@@ -522,9 +522,9 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSGroupNode node)
 	{
-		this._printer.print("(");
+		this._printer.print("("); //$NON-NLS-1$
 		this.formatNode(node.getExpression());
-		this._printer.print(")");
+		this._printer.print(")"); //$NON-NLS-1$
 		this.addSemicolon(node);
 	}
 
@@ -549,19 +549,19 @@ public class JSFormatWalker extends JSTreeWalker
 		IParseNode trueBlock = node.getTrueBlock();
 		IParseNode falseBlock = node.getFalseBlock();
 
-		this._printer.print("if (");
+		this._printer.print("if ("); //$NON-NLS-1$
 		this.formatNode(node.getCondition());
-		this._printer.print(") ");
+		this._printer.print(") "); //$NON-NLS-1$
 		this.formatNode(trueBlock);
 
 		if (this.isNotEmpty(falseBlock))
 		{
 			if (trueBlock.getNodeType() != JSNodeTypes.STATEMENTS)
 			{
-				this._printer.print(";");
+				this._printer.print(";"); //$NON-NLS-1$
 			}
 
-			this._printer.print(" else ");
+			this._printer.print(" else "); //$NON-NLS-1$
 			this.formatNode(falseBlock);
 		}
 
@@ -588,7 +588,7 @@ public class JSFormatWalker extends JSTreeWalker
 	public void visit(JSLabelledNode node)
 	{
 		this.formatNode(node.getLabel());
-		this._printer.print(": ");
+		this._printer.print(": "); //$NON-NLS-1$
 		this.formatNode(node.getBlock());
 		this.addSemicolon(node);
 	}
@@ -601,7 +601,7 @@ public class JSFormatWalker extends JSTreeWalker
 	public void visit(JSNameValuePairNode node)
 	{
 		this.formatNode(node.getName());
-		this._printer.print(": ");
+		this._printer.print(": "); //$NON-NLS-1$
 		this.formatNode(node.getValue());
 		this.addSemicolon(node);
 	}
@@ -635,7 +635,7 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSObjectNode node)
 	{
-		this.formatNaryNode(node, "{", ", ", "}");
+		this.formatNaryNode(node, "{", ", ", "}"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/*
@@ -645,7 +645,7 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSParametersNode node)
 	{
-		this.formatNaryNode(node, "(", ", ", ")");
+		this.formatNaryNode(node, "(", ", ", ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/*
@@ -685,11 +685,11 @@ public class JSFormatWalker extends JSTreeWalker
 		switch (node.getNodeType())
 		{
 			case JSNodeTypes.POST_DECREMENT:
-				this._printer.print("--");
+				this._printer.print("--"); //$NON-NLS-1$
 				break;
 
 			case JSNodeTypes.POST_INCREMENT:
-				this._printer.print("++");
+				this._printer.print("++"); //$NON-NLS-1$
 				break;
 		}
 
@@ -773,11 +773,11 @@ public class JSFormatWalker extends JSTreeWalker
 	{
 		IParseNode expression = node.getExpression();
 
-		this._printer.print("return");
+		this._printer.print("return"); //$NON-NLS-1$
 
 		if (this.isNotEmpty(expression))
 		{
-			this._printer.print(" ");
+			this._printer.print(" "); //$NON-NLS-1$
 			this.formatNode(expression);
 		}
 
@@ -791,7 +791,7 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSStatementsNode node)
 	{
-		this.formatNaryNode(node, "{", "", "}");
+		this.formatNaryNode(node, "{", "", "}"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/*
@@ -812,9 +812,9 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSSwitchNode node)
 	{
-		this._printer.print("switch (");
+		this._printer.print("switch ("); //$NON-NLS-1$
 		this.formatNode(node.getExpression());
-		this._printer.print(") {");
+		this._printer.print(") {"); //$NON-NLS-1$
 
 		boolean first = true;
 
@@ -829,7 +829,7 @@ public class JSFormatWalker extends JSTreeWalker
 			this.formatNode(child);
 		}
 
-		this._printer.print("}");
+		this._printer.print("}"); //$NON-NLS-1$
 
 		this.addSemicolon(node);
 	}
@@ -852,7 +852,7 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSThrowNode node)
 	{
-		this._printer.print("throw ");
+		this._printer.print("throw "); //$NON-NLS-1$
 		this.formatNode(node.getExpression());
 		this.addSemicolon(node);
 	}
@@ -878,18 +878,18 @@ public class JSFormatWalker extends JSTreeWalker
 		IParseNode catchBlock = node.getCatchBlock();
 		IParseNode finallyBlock = node.getFinallyBlock();
 
-		this._printer.print("try ");
+		this._printer.print("try "); //$NON-NLS-1$
 		this.formatNode(node.getBody());
 
 		if (this.isNotEmpty(catchBlock))
 		{
-			this._printer.print(" ");
+			this._printer.print(" "); //$NON-NLS-1$
 			this.formatNode(catchBlock);
 		}
 
 		if (this.isNotEmpty(finallyBlock))
 		{
-			this._printer.print(" ");
+			this._printer.print(" "); //$NON-NLS-1$
 			this.formatNode(finallyBlock);
 		}
 
@@ -903,7 +903,7 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSVarNode node)
 	{
-		this.formatNaryNode(node, "var ", ", ", "");
+		this.formatNaryNode(node, "var ", ", ", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/*
@@ -913,9 +913,9 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSWhileNode node)
 	{
-		this._printer.print("while (");
+		this._printer.print("while ("); //$NON-NLS-1$
 		this.formatNode(node.getCondition());
-		this._printer.print(") ");
+		this._printer.print(") "); //$NON-NLS-1$
 		this.formatNode(node.getBody());
 		this.addSemicolon(node);
 	}
@@ -927,9 +927,9 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSWithNode node)
 	{
-		this._printer.print("with (");
+		this._printer.print("with ("); //$NON-NLS-1$
 		this.formatNode(node.getExpression());
-		this._printer.print(") ");
+		this._printer.print(") "); //$NON-NLS-1$
 		this.formatNode(node.getBody());
 		this.addSemicolon(node);
 	}

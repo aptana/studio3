@@ -243,7 +243,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					// TEMP: Show types for debugging info
 					if (Platform.inDevelopmentMode())
 					{
-						System.out.println("types: " + StringUtil.join(", ", typeList));
+						System.out.println("types: " + StringUtil.join(", ", typeList)); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 					
 					// add all properties of each type to our proposal list
@@ -257,7 +257,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					// TEMP: Show types for debugging info
 					if (Platform.inDevelopmentMode())
 					{
-						System.out.println("types: ");
+						System.out.println("types: "); //$NON-NLS-1$
 					}
 				}
 			}

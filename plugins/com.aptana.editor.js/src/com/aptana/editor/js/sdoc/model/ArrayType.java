@@ -21,7 +21,7 @@ public class ArrayType extends Type
 	 */
 	public ArrayType(Type memberType)
 	{
-		super("Array");
+		super("Array"); //$NON-NLS-1$
 
 		this._memberType = (memberType != null) ? memberType : Type.OBJECT_TYPE;
 	}
@@ -43,13 +43,13 @@ public class ArrayType extends Type
 	 */
 	public void toSource(SourcePrinter writer)
 	{
-		writer.print("Array");
+		writer.print("Array"); //$NON-NLS-1$
 
 		if (this._memberType != Type.OBJECT_TYPE)
 		{
-			writer.print("<");
+			writer.print("<"); //$NON-NLS-1$
 			this._memberType.toSource(writer);
-			writer.print(">");
+			writer.print(">"); //$NON-NLS-1$
 		}
 	}
 }

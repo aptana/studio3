@@ -75,7 +75,7 @@ public class JSPreUnaryOperatorNode extends JSNode
 				break;
 
 			default:
-				throw new IllegalArgumentException("Unrecognized operator: " + token);
+				throw new IllegalArgumentException(Messages.JSPreUnaryOperatorNode_0 + token);
 		}
 
 		setNodeType(type);

@@ -15,7 +15,7 @@ public class FunctionType extends Type
 	 */
 	public FunctionType()
 	{
-		super("Function");
+		super("Function"); //$NON-NLS-1$
 	}
 
 	/**
@@ -61,7 +61,7 @@ public class FunctionType extends Type
 	 */
 	public void toSource(SourcePrinter writer)
 	{
-		writer.print("Function");
+		writer.print("Function"); //$NON-NLS-1$
 
 		boolean first;
 
@@ -69,13 +69,13 @@ public class FunctionType extends Type
 		{
 			first = true;
 
-			writer.print("(");
+			writer.print("("); //$NON-NLS-1$
 
 			for (Type type : this._parameterTypes)
 			{
 				if (first == false)
 				{
-					writer.print(",");
+					writer.print(","); //$NON-NLS-1$
 				}
 				else
 				{
@@ -85,25 +85,25 @@ public class FunctionType extends Type
 				type.toSource(writer);
 			}
 
-			writer.print(")");
+			writer.print(")"); //$NON-NLS-1$
 		}
 
 		if (this._returnTypes.isEmpty() == false)
 		{
 			first = true;
 
-			writer.print("->");
+			writer.print("->"); //$NON-NLS-1$
 
 			if (this._returnTypes.size() > 1)
 			{
-				writer.print("(");
+				writer.print("("); //$NON-NLS-1$
 			}
 
 			for (Type type : this._returnTypes)
 			{
 				if (first == false)
 				{
-					writer.print(",");
+					writer.print(","); //$NON-NLS-1$
 				}
 				else
 				{
@@ -115,7 +115,7 @@ public class FunctionType extends Type
 
 			if (this._returnTypes.size() > 1)
 			{
-				writer.print(")");
+				writer.print(")"); //$NON-NLS-1$
 			}
 		}
 	}

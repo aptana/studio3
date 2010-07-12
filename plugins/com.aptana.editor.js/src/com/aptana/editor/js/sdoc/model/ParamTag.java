@@ -48,12 +48,12 @@ public class ParamTag extends TagWithTypes
 		writer.print(this.getType().toString());
 
 		boolean first = true;
-		writer.print(" {");
+		writer.print(" {"); //$NON-NLS-1$
 		for (Type type : this.getTypes())
 		{
 			if (first == false)
 			{
-				writer.print(",");
+				writer.print(","); //$NON-NLS-1$
 			}
 			else
 			{
@@ -62,7 +62,7 @@ public class ParamTag extends TagWithTypes
 
 			type.toSource(writer);
 		}
-		writer.print("} ");
+		writer.print("} "); //$NON-NLS-1$
 
 		this._parameter.toSource(writer);
 
@@ -71,7 +71,7 @@ public class ParamTag extends TagWithTypes
 		if (text != null && text.isEmpty() == false)
 		{
 			writer.println();
-			writer.printIndent().print("    ").print(text);
+			writer.printIndent().print("    ").print(text); //$NON-NLS-1$
 		}
 	}
 }

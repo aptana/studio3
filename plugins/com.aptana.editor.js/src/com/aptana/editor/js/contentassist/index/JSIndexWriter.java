@@ -19,7 +19,7 @@ import com.aptana.index.core.Index;
 
 public class JSIndexWriter
 {
-	private static final URI METADATA_LOCATION = URI.create("");
+	private static final URI METADATA_LOCATION = URI.create(""); //$NON-NLS-1$
 	private static Map<UserAgentElement,String> keysByUserAgent = new HashMap<UserAgentElement,String>();
 	static Map<String,UserAgentElement> userAgentsByKey = new HashMap<String,UserAgentElement>();
 	
@@ -244,7 +244,7 @@ public class JSIndexWriter
 				? StringUtil.join(",", parentTypes) //$NON-NLS-1$
 				: (type.equals("Object") == false) //$NON-NLS-1$
 					? "Object" //$NON-NLS-1$
-					: "",
+					: "", //$NON-NLS-1$
 			descriptionKey
 		);
 

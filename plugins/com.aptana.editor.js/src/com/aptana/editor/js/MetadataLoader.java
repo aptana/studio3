@@ -23,7 +23,7 @@ public class MetadataLoader extends Job
 	 */
 	public MetadataLoader()
 	{
-		super("Loading JS metadata...");
+		super(Messages.MetadataLoader_0);
 
 		setPriority(Job.LONG);
 	}

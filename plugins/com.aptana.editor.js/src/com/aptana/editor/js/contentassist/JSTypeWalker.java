@@ -49,17 +49,17 @@ public class JSTypeWalker extends JSTreeWalker
 	private static int TYPE_COUNT = 0;
 	private static Map<JSNode, String> NODE_TYPE_CACHE;
 
-	private static final String ARRAY_TYPE = "Array";
-	private static final String BOOLEAN_TYPE = "Boolean";
-	private static final String FUNCTION_TYPE = "Function";
-	private static final String NUMBER_TYPE = "Number";
-	private static final String OBJECT_TYPE = "Object";
-	private static final String REG_EXP_TYPE = "RegExp";
-	private static final String STRING_TYPE = "String";
+	private static final String ARRAY_TYPE = "Array"; //$NON-NLS-1$
+	private static final String BOOLEAN_TYPE = "Boolean"; //$NON-NLS-1$
+	private static final String FUNCTION_TYPE = "Function"; //$NON-NLS-1$
+	private static final String NUMBER_TYPE = "Number"; //$NON-NLS-1$
+	private static final String OBJECT_TYPE = "Object"; //$NON-NLS-1$
+	private static final String REG_EXP_TYPE = "RegExp"; //$NON-NLS-1$
+	private static final String STRING_TYPE = "String"; //$NON-NLS-1$
 
-	private static final String ARRAY_LITERAL = "[]";
-	private static final String GENERIC_ARRAY_CLOSE = ">";
-	private static final String GENERIC_ARRAY_OPEN = "Array<";
+	private static final String ARRAY_LITERAL = "[]"; //$NON-NLS-1$
+	private static final String GENERIC_ARRAY_CLOSE = ">"; //$NON-NLS-1$
+	private static final String GENERIC_ARRAY_OPEN = "Array<"; //$NON-NLS-1$
 
 	/**
 	 * clearTypeCache
@@ -348,7 +348,7 @@ public class JSTypeWalker extends JSTreeWalker
 	 */
 	private String getUniqueTypeName()
 	{
-		return MessageFormat.format("UserType{0}", TYPE_COUNT++);
+		return MessageFormat.format("UserType{0}", TYPE_COUNT++); //$NON-NLS-1$
 	}
 
 	/**
@@ -500,7 +500,7 @@ public class JSTypeWalker extends JSTreeWalker
 				
 				if (index != -1)
 				{
-					for (String returnTypeName : typeName.substring(index + 1).split(","))
+					for (String returnTypeName : typeName.substring(index + 1).split(",")) //$NON-NLS-1$
 					{
 						this.addType(returnTypeName);
 					}
@@ -550,13 +550,13 @@ public class JSTypeWalker extends JSTreeWalker
 			// build function type, including return values
 			if (types.isEmpty() == false)
 			{
-				type = FUNCTION_TYPE + ":" + StringUtil.join(",", types);
+				type = FUNCTION_TYPE + ":" + StringUtil.join(",", types); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			else if (foundReturnExpression)
 			{
 				// If we couldn't infer a return type and we had a return
 				// expression, then at least return Object from this function
-				type = FUNCTION_TYPE + ":" + OBJECT_TYPE;
+				type = FUNCTION_TYPE + ":" + OBJECT_TYPE; //$NON-NLS-1$
 			}
 			else
 			{
@@ -776,7 +776,7 @@ public class JSTypeWalker extends JSTreeWalker
 				
 				if (index != -1)
 				{
-					for (String returnTypeName : typeName.substring(index + 1).split(","))
+					for (String returnTypeName : typeName.substring(index + 1).split(",")) //$NON-NLS-1$
 					{
 						this.addType(returnTypeName);
 					}
@@ -866,7 +866,7 @@ public class JSTypeWalker extends JSTreeWalker
 							
 						if (index != -1)
 						{
-							for (String returnTypeName : valueType.substring(index + 1).split(","))
+							for (String returnTypeName : valueType.substring(index + 1).split(",")) //$NON-NLS-1$
 							{
 								ReturnTypeElement returnType = new ReturnTypeElement();
 								

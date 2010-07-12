@@ -21,7 +21,7 @@ public class DocumentationBlock extends Symbol
 	 */
 	public DocumentationBlock(List<Tag> tags)
 	{
-		this("", tags);
+		this("", tags); //$NON-NLS-1$
 	}
 
 	/**
@@ -136,7 +136,7 @@ public class DocumentationBlock extends Symbol
 	 */
 	public String toSource()
 	{
-		SourcePrinter writer = new SourcePrinter(" * ");
+		SourcePrinter writer = new SourcePrinter(" * "); //$NON-NLS-1$
 
 		this.toSource(writer);
 
@@ -150,7 +150,7 @@ public class DocumentationBlock extends Symbol
 	 */
 	public void toSource(SourcePrinter writer)
 	{
-		writer.println("/**").increaseIndent();
+		writer.println("/**").increaseIndent(); //$NON-NLS-1$
 
 		if (this._text != null && this._text.isEmpty() == false)
 		{
@@ -172,6 +172,6 @@ public class DocumentationBlock extends Symbol
 			}
 		}
 
-		writer.decreaseIndent().println(" */");
+		writer.decreaseIndent().println(" */"); //$NON-NLS-1$
 	}
 }

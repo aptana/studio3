@@ -41,14 +41,14 @@ public abstract class TagWithName extends Tag
 		}
 		else
 		{
-			writer.print(type.toString()).print(" {").print(this._name).print("}");
+			writer.print(type.toString()).print(" {").print(this._name).print("}"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		String text = this.getText();
 
 		if (text != null && text.isEmpty() == false)
 		{
-			writer.print(" ").print(text);
+			writer.print(" ").print(text); //$NON-NLS-1$
 		}
 	}
 }
