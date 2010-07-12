@@ -1,14 +1,12 @@
 package com.aptana.editor.js.contentassist;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.LinkedList;
-import java.net.URI;
 import java.util.List;
 
 import com.aptana.editor.js.Activator;
-import com.aptana.editor.js.JSTypes;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
 import com.aptana.editor.js.contentassist.model.ContentSelector;
@@ -20,7 +18,6 @@ import com.aptana.index.core.IndexManager;
 
 public class JSIndexQueryHelper
 {
-	private static final EnumSet<ContentSelector> PARENT_TYPES = EnumSet.of(ContentSelector.PARENT_TYPES);
 	private static final String WINDOW_TYPE = "Window"; //$NON-NLS-1$
 
 	private JSIndexReader _reader;
@@ -527,54 +524,6 @@ public class JSIndexQueryHelper
 		
 		return result;
 	}
-	
-	/**
-	 * getTypeMethodRecursive
-	 * 
-	 * @param index
-	 * @param typeName
-	 * @param methodName
-	 * @param fields
-	 * @return
-	 */
-	public FunctionElement getTypeMethodRecursive(Index index, String typeName, String methodName, EnumSet<ContentSelector> fields)
-	{
-		FunctionElement result = null;
-		LinkedList<String> types = new LinkedList<String>();
-
-		types.add(typeName);
-
-		try
-		{
-			while (types.size() > 0)
-			{
-				String currentType = types.remove();
-
-				// check in core globals
-				result = this._reader.getFunction(index, currentType, methodName, fields);
-
-				if (result != null)
-				{
-					break;
-				}
-				else
-				{
-					TypeElement type = this._reader.getType(index, currentType, PARENT_TYPES);
-
-					for (String superclass : type.getParentTypes())
-					{
-						types.add(superclass);
-					}
-				}
-			}
-		}
-		catch (IOException e)
-		{
-			Activator.logError(e.getMessage(), e);
-		}
-
-		return result;
-	}
 
 	/**
 	 * getTypeMethods
@@ -632,59 +581,6 @@ public class JSIndexQueryHelper
 		if (result == null)
 		{
 			result = this.getCoreTypeProperty(typeName, propertyName, fields);
-		}
-
-		return result;
-	}
-
-	/**
-	 * getTypePropertyRecursive
-	 * 
-	 * @param index
-	 * @param typeName
-	 * @param propertyName
-	 * @param fields
-	 * @return
-	 */
-	public PropertyElement getTypePropertyRecursive(Index index, String typeName, String propertyName, EnumSet<ContentSelector> fields)
-	{
-		PropertyElement result = null;
-		LinkedList<String> types = new LinkedList<String>();
-
-		types.add(typeName);
-
-		try
-		{
-			while (types.size() > 0)
-			{
-				String currentType = types.remove();
-
-				// check in core globals
-				result = this._reader.getProperty(index, currentType, propertyName, fields);
-
-				if (result != null)
-				{
-					break;
-				}
-				else
-				{
-					// prevent possible infinite loop if Object returns Object
-					// as its super-type
-					if (currentType.equals(JSTypes.OBJECT) == false) //$NON-NLS-1$
-					{
-						TypeElement type = this._reader.getType(index, currentType, PARENT_TYPES);
-
-						for (String superclass : type.getParentTypes())
-						{
-							types.add(superclass);
-						}
-					}
-				}
-			}
-		}
-		catch (IOException e)
-		{
-			Activator.logError(e.getMessage(), e);
 		}
 
 		return result;
