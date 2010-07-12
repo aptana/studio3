@@ -1,4 +1,4 @@
-package com.aptana.editor.common;
+package com.aptana.editor.common.text.hyperlink;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -16,6 +16,7 @@ import org.eclipse.jface.text.hyperlink.URLHyperlinkDetector;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.outline.PathResolverProvider;
 import com.aptana.editor.common.resolver.IPathResolver;
 

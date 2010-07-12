@@ -1,4 +1,4 @@
-package com.aptana.editor.common;
+package com.aptana.editor.common.text.hyperlink;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -13,6 +13,8 @@ import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
+
+import com.aptana.editor.common.CommonEditorPlugin;
 
 public class URIHyperlink extends URLHyperlink
 {
