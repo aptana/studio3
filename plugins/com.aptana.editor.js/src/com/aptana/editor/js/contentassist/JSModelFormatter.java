@@ -13,56 +13,36 @@ public class JSModelFormatter
 	private static final String GENERIC_CLASS_CLOSE = ">"; //$NON-NLS-1$
 	private static final String GENERIC_CLASS_OPEN = "Class<"; //$NON-NLS-1$
 
-	private JSModelFormatter()
+	private static void addReturnTypes(StringBuilder buffer, ReturnTypeElement[] returnTypes, String defaultType)
 	{
-	}
-	
-	/**
-	 * formatProperty
-	 * 
-	 * @param property
-	 * @return
-	 */
-	public static String getDescription(PropertyElement property)
-	{
-		if (property instanceof FunctionElement)
+		boolean first;
+		
+		if (returnTypes != null && returnTypes.length > 0)
 		{
-			return getDescription((FunctionElement) property);
+			buffer.append(" : "); //$NON-NLS-1$
+			
+			first = true;
+			
+			for (ReturnTypeElement returnType : returnTypes)
+			{
+				if (first == false)
+				{
+					buffer.append("|"); //$NON-NLS-1$
+				}
+				else
+				{
+					first = false;
+				}
+				
+				String type = getTypeDisplayName(returnType.getType());
+				
+				buffer.append(type);
+			}
 		}
-		
-		StringBuilder buffer = new StringBuilder();
-		
-		// title
-		buffer.append("<b>").append(property.getName()).append("</b>"); //$NON-NLS-1$ //$NON-NLS-2$
-		
-		// type
-		addReturnTypes(buffer, property.getTypes(), "undefined"); //$NON-NLS-1$
-		
-		// description
-		buffer.append("<br><br>"); //$NON-NLS-1$
-		buffer.append(property.getDescription());
-		
-		return buffer.toString();
-	}
-	
-	/**
-	 * getDescription
-	 * 
-	 * @param header
-	 * @param items
-	 * @return
-	 */
-	public static String getDescription(String header, List<String> items)
-	{
-		StringBuilder buffer = new StringBuilder();
-		
-		// emit header
-		buffer.append("<b>").append(header).append("</b><br><br>"); //$NON-NLS-1$ //$NON-NLS-2$
-		
-		// emit list
-		buffer.append(StringUtil.join("<br>", items)); //$NON-NLS-1$
-		
-		return buffer.toString();
+		else
+		{
+			buffer.append(" : ").append(defaultType); //$NON-NLS-1$
+		}
 	}
 	
 	/**
@@ -127,42 +107,93 @@ public class JSModelFormatter
 		
 		return buffer.toString();
 	}
-
-	private static void addReturnTypes(StringBuilder buffer, ReturnTypeElement[] returnTypes, String defaultType)
+	
+	/**
+	 * formatProperty
+	 * 
+	 * @param property
+	 * @return
+	 */
+	public static String getDescription(PropertyElement property)
 	{
-		boolean first;
-		
-		if (returnTypes != null && returnTypes.length > 0)
+		if (property instanceof FunctionElement)
 		{
-			buffer.append(" : "); //$NON-NLS-1$
-			
-			first = true;
-			
-			for (ReturnTypeElement returnType : returnTypes)
+			return getDescription((FunctionElement) property);
+		}
+		
+		StringBuilder buffer = new StringBuilder();
+		
+		// title
+		buffer.append("<b>").append(property.getName()).append("</b>"); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		// type
+		addReturnTypes(buffer, property.getTypes(), "undefined"); //$NON-NLS-1$
+		
+		// description
+		buffer.append("<br><br>"); //$NON-NLS-1$
+		buffer.append(property.getDescription());
+		
+		return buffer.toString();
+	}
+	
+	/**
+	 * getDescription
+	 * 
+	 * @param header
+	 * @param items
+	 * @return
+	 */
+	public static String getDescription(String header, List<String> items)
+	{
+		StringBuilder buffer = new StringBuilder();
+		
+		// emit header
+		buffer.append("<b>").append(header).append("</b><br><br>"); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		// emit list
+		buffer.append(StringUtil.join("<br>", items)); //$NON-NLS-1$
+		
+		return buffer.toString();
+	}
+
+	/**
+	 * getDisplayTypeName
+	 * 
+	 * @param type
+	 * @return
+	 */
+	public static String getTypeDisplayName(String type)
+	{
+		String result = null;
+		
+		if (type != null)
+		{
+			if (type.startsWith(GENERIC_CLASS_OPEN) && type.endsWith(GENERIC_CLASS_CLOSE))
 			{
-				if (first == false)
-				{
-					buffer.append("|"); //$NON-NLS-1$
-				}
-				else
-				{
-					first = false;
-				}
-				
-				String type = returnType.getType();
-				
-				if (type.startsWith(GENERIC_CLASS_OPEN) && type.endsWith(GENERIC_CLASS_CLOSE))
-				{
-					type = type.substring(GENERIC_CLASS_OPEN.length(), type.length() - 1);
-				}
-				
-				buffer.append(type);
+				result = type.substring(GENERIC_CLASS_OPEN.length(), type.length() - 1);
+			}
+			else if (type.startsWith(JSTypeWalker.DYNAMIC_CLASS_PREFIX))
+			{
+				result = "Object";
+			}
+			else
+			{
+				result = type;
 			}
 		}
-		else
-		{
-			buffer.append(" : ").append(defaultType); //$NON-NLS-1$
-		}
+		
+		return result;
+	}
+	
+	/**
+	 * getName
+	 * 
+	 * @param function
+	 * @return
+	 */
+	public static String getName(FunctionElement function)
+	{
+		return function.getName() + "()"; //$NON-NLS-1$
 	}
 	
 	/**
@@ -183,14 +214,7 @@ public class JSModelFormatter
 		}
 	}
 	
-	/**
-	 * getName
-	 * 
-	 * @param function
-	 * @return
-	 */
-	public static String getName(FunctionElement function)
+	private JSModelFormatter()
 	{
-		return function.getName() + "()"; //$NON-NLS-1$
 	}
 }
