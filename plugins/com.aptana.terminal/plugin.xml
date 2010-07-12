@@ -162,5 +162,11 @@
          </toolbar>
       </menuContribution>
    </extension>
+   <extension
+         point="com.aptana.org.eclipse.tm.terminal.terminalHyperlinkDetectors">
+      <detector
+            class="com.aptana.terminal.internal.URLHyperlinkDetector">
+      </detector>
+   </extension>
 
 </plugin>
