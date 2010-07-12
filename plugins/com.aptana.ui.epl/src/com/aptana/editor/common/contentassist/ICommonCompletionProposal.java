@@ -32,4 +32,18 @@ public interface ICommonCompletionProposal extends ICompletionProposal
 	 * @return
 	 */
 	boolean isSuggestedSelection();
+
+	/**
+	 * Set this proposal as the default selection.
+	 * 
+	 * @param isDefault
+	 */
+	void setIsDefaultSelection(boolean isDefault);
+
+	/**
+	 * Set this proposal as the suggested selection.
+	 * 
+	 * @param isSuggested
+	 */
+	void setIsSuggestedSelection(boolean isSuggested);
 }
