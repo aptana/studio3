@@ -66,7 +66,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		ContentSelector.DESCRIPTION,		//
 		ContentSelector.INCLUDE_ANCESTORS,	//
 		ContentSelector.PARENT_TYPES,		//
-		ContentSelector.USER_AGENTS			//
+		ContentSelector.USER_AGENTS,		//
+		ContentSelector.TYPES,				//
+		ContentSelector.RETURN_TYPES		//
 	);
 	
 	private static final EnumSet<LocationType> IGNORED_TYPES = EnumSet.of(LocationType.UNKNOWN, LocationType.NONE);
@@ -88,17 +90,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		super(editor);
 
 		this._indexHelper = new JSIndexQueryHelper();
-	}
-	
-	/**
-	 * addAllGlobals
-	 */
-	protected void addAllGlobals(Set<ICompletionProposal> proposals, int offset)
-	{
-		// add globals from core
-		this.addCoreGlobals(proposals, offset);
-		this.addProjectGlobals(proposals, offset);
-		this.addLocalGlobalFunctions(proposals, offset);
 	}
 
 	/**
@@ -124,17 +115,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			
 			this.addProposal(proposals, name, image, description, userAgents, offset);
 		}
-	}
-	
-	/**
-	 * addGlobalFunctions
-	 * 
-	 * @param proposals
-	 * @param offset
-	 */
-	private void addLocalGlobalFunctions(Set<ICompletionProposal> proposals, int offset)
-	{
-		// TODO: re-implement using JSTypeWalker
 	}
 
 	/**
@@ -323,7 +303,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 							}
 						}
 						
-//						String name = (isFunction) ? symbol + PARENS : symbol;
 						String name = symbol;
 						String description = null;
 						Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
@@ -408,7 +387,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			case IN_VARIABLE_NAME:
 			case IN_GLOBAL:
 			case IN_CONSTRUCTOR:
-				this.addAllGlobals(result, offset);
+				this.addCoreGlobals(result, offset);
+				this.addProjectGlobals(result, offset);
 				this.addSymbolsInScope(result, offset);
 				break;
 				
