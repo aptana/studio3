@@ -362,6 +362,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		// add properties and methods
 		List<PropertyElement> properties = this._indexHelper.getTypeMembers(this.getIndex(), typeName, PROPERTY_FIELDS);
 		
+		typeName = JSModelFormatter.getTypeDisplayName(typeName);
+		
 		for (PropertyElement property : properties)
 		{
 			boolean isFunction = (property instanceof FunctionElement);
