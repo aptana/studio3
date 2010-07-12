@@ -7,21 +7,13 @@ public class JSIdentifierNode extends JSPrimitiveNode
 	/**
 	 * JSIdentifierNode
 	 * 
-	 * @param text
-	 */
-	public JSIdentifierNode(String text)
-	{
-		super(JSNodeTypes.IDENTIFIER, text);
-	}
-
-	/**
-	 * JSIdentifierNode
-	 * 
 	 * @param identifier
 	 */
 	public JSIdentifierNode(Symbol identifier)
 	{
-		this((String) identifier.value);
+		super(JSNodeTypes.IDENTIFIER, (String) identifier.value);
+		
+		this.setLocation(identifier.getStart(), identifier.getEnd());
 	}
 
 	/*
