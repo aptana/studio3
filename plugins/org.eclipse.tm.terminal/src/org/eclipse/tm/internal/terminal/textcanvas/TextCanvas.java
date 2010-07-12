@@ -19,7 +19,9 @@ package org.eclipse.tm.internal.terminal.textcanvas;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -55,7 +57,7 @@ import org.eclipse.tm.terminal.model.Style;
 public class TextCanvas extends GridCanvas {
 
 	private static final String HYPERLINK_DETECTOR_EXT_PT = "com.aptana.org.eclipse.tm.terminal.terminalHyperlinkDetectors"; //$NON-NLS-1$
-	private IHyperlink[] fLinks = new IHyperlink[0];
+	private Map fLinks = new HashMap(3);
 	private int fLastHash;
 	private IHyperlinkDetector[] fDetectors;
 	
@@ -107,6 +109,10 @@ public class TextCanvas extends GridCanvas {
 		fCellCanvasModel.addCellCanvasModelListener(new ITextCanvasModelListener(){
 			public void rangeChanged(int col, int line, int width, int height) {
 				repaintRange(col,line,width,height);
+				for (int i = line; i < line + height; i++)
+				{
+					updateLine(line);
+				}
 			}
 			public void dimensionsChanged(int cols, int rows) {
 				calculateGrid();
@@ -116,23 +122,6 @@ public class TextCanvas extends GridCanvas {
 					return;
 				// scroll to end (unless scroll lock is active)
 				scrollToEnd();
-				
-				// Now update the hyperlinks
-				fLinks = detectHyperlinks(getTerminalText());
-			}
-			
-			protected String getTerminalText()
-			{
-				StringBuilder builder = new StringBuilder();
-				ITerminalTextDataReadOnly text = fCellCanvasModel.getTerminalText();
-				int lines = text.getHeight();
-				for (int i = 0; i < lines; i++)
-				{
-					char[] chars = text.getChars(i);
-					chars = pad(chars, text.getWidth());
-					builder.append(chars);
-				}
-				return builder.toString();
 			}
 		});
 		// let the cursor blink if the text canvas gets the focus...
@@ -446,35 +435,22 @@ public class TextCanvas extends GridCanvas {
 	
 	protected IHyperlink findHyperlink(Point cellCoords)
 	{
-		for (int i = 0; i < fLinks.length; i++)
+		IHyperlink[] links = (IHyperlink[]) fLinks.get(new Integer(cellCoords.y));
+		if (links == null)
 		{
-			IHyperlink link = fLinks[i];
+			return null;
+		}
+		for (int i = 0; i < links.length; i++)
+		{
+			IHyperlink link = links[i];
 			IRegion region = link.getHyperlinkRegion();
-			int line = region.getOffset() / fCellCanvasModel.getTerminalText().getWidth();
-			if (cellCoords.y >= line)
+			
+			int col = region.getOffset();
+			int endCol = region.getOffset() + region.getLength() - 1;
+			// clicked between start and end col
+			if (cellCoords.x <= endCol && cellCoords.x >= col)
 			{
-				int col = region.getOffset() % fCellCanvasModel.getTerminalText().getWidth();
-				int endLine = (region.getOffset() + region.getLength()) / fCellCanvasModel.getTerminalText().getWidth();
-				int endCol = (region.getOffset() + region.getLength()) % fCellCanvasModel.getTerminalText().getWidth();
-
-				// starts and ends on same line, we clicked on that line
-				if ((cellCoords.y == line && line == endLine))
-				{
-					// clicked between start and end col
-					if (cellCoords.x <= endCol && cellCoords.x >= col)
-					{
-
-						return link;
-					}
-					continue;
-				}
-				// Must be different start and end lines...
-				if ((cellCoords.y == line && cellCoords.x >= col)
-						|| (cellCoords.y == endLine && cellCoords.x <= endCol)
-						|| (cellCoords.y > line && cellCoords.y < endLine))
-				{
-					return link;
-				}
+				return link;
 			}
 		}
 		return null;
@@ -496,86 +472,25 @@ public class TextCanvas extends GridCanvas {
 		return newChars;
 	}
 
-	/**
-	 * If contents change, remove underlines from old hyperlinks, detect new hyperlinks, then underline hyperlink
-	 * regions in terminal.
-	 * 
-	 * @param contents
-	 * @return
-	 */
-	protected IHyperlink[] detectHyperlinks(String contents)
+	private void setUnderlined(int line, IRegion region, boolean underlined)
 	{
-		// Short-circuit if contents didn't actually change
-		int hash = contents.hashCode();
-		if (hash == fLastHash)
-		{
-			return fLinks;
-		}
-		fLastHash = hash;
-
-		// Remove underline from last set of links
-		for (int i = 0; i < fLinks.length; i++)
-		{
-			IHyperlink link = fLinks[i];
-			IRegion region = link.getHyperlinkRegion();
-			setUnderlined(region, false);
-		}
-
-		// Detect new links
-		List list = new ArrayList();
-		IHyperlinkDetector[] detectors = getHyperlinkDetectors();
-		for (int i = 0; i < detectors.length; i++)
-		{
-			IHyperlinkDetector detector = detectors[i];
-			IHyperlink[] links = detector.detectHyperlinks(contents);
-			if (links != null && links.length > 0)
-			{
-				list.addAll(Arrays.asList(links));
-			}
-		}
-
-		// Add underline to new set of links
-		for (int i = 0; i < list.size(); i++)
-		{
-			IHyperlink link = (IHyperlink) list.get(i);
-			IRegion region = link.getHyperlinkRegion();
-			setUnderlined(region, true);
-		}
-		return (IHyperlink[]) list.toArray(new IHyperlink[0]);
-	}
-
-	private void setUnderlined(IRegion region, boolean underlined)
-	{
-		// FIXME Duplicate logic in mouseUp()
-		int startLine = region.getOffset() / fCellCanvasModel.getTerminalText().getWidth();
-		int startCol = region.getOffset() % fCellCanvasModel.getTerminalText().getWidth();
-		int endLine = (region.getOffset() + region.getLength()) / fCellCanvasModel.getTerminalText().getWidth();
-		int endCol = (region.getOffset() + region.getLength()) % fCellCanvasModel.getTerminalText().getWidth();
+		int startCol = region.getOffset();
+		int endCol = region.getOffset() + region.getLength() - 1;
 		try
 		{
 			ITerminalTextDataReadOnly text = fCellCanvasModel.getTerminalText();
 			Field f = text.getClass().getDeclaredField("fTerminal"); //$NON-NLS-1$
 			f.setAccessible(true);
 			ITerminalTextData data = (ITerminalTextData) f.get(text);
-			for (int line = startLine; line <= endLine; line++)
+			
+			for (int col = startCol; col <= endCol; col++)
 			{
-				for (int col = 0; col < text.getWidth(); col++)
+				char c = data.getChar(line, col);
+				Style style = data.getStyle(line, col);
+				if (style != null)
 				{
-					if (line == startLine && col < startCol)
-					{
-						continue;
-					}
-					if (line == endLine && col > endCol)
-					{
-						break;
-					}
-					char c = data.getChar(line, col);
-					Style style = data.getStyle(line, col);
-					if (style != null)
-					{
-						style = style.setUnderline(underlined);
-						data.setChar(line, col, c, style);
-					}
+					style = style.setUnderline(underlined);
+					data.setChar(line, col, c, style);
 				}
 			}
 		}
@@ -611,6 +526,72 @@ public class TextCanvas extends GridCanvas {
 	static private IHyperlinkDetector makeDetector(final IConfigurationElement config) throws CoreException
 	{
 		return (IHyperlinkDetector) config.createExecutableExtension("class"); //$NON-NLS-1$
+	}
+
+	protected String getTerminalText(int startLine, int endLine)
+	{
+		StringBuilder builder = new StringBuilder();
+		ITerminalTextDataReadOnly text = fCellCanvasModel.getTerminalText();
+		for (int i = startLine; i <= endLine; i++)
+		{
+			char[] chars = text.getChars(i);
+			chars = pad(chars, text.getWidth());
+			builder.append(chars);
+		}
+		return builder.toString();
+	}
+
+	protected synchronized void updateLine(int line)
+	{
+		String text = getTerminalText(line, line);
+		int hash = line * 31 + text.hashCode();
+		if (hash == fLastHash)
+		{
+			return;
+		}
+		fLastHash = hash;
+		
+		IHyperlink[] links = (IHyperlink[]) fLinks.remove(new Integer(line));
+		if (links != null)
+		{
+			// Remove links that were on this line before...
+			for (int i = 0; i < links.length; i++)
+			{
+				IHyperlink link = links[i];
+				IRegion region = link.getHyperlinkRegion();
+				setUnderlined(line, region, false);
+			}
+		}
+		
+		if (text != null && text.trim().length() > 0)
+		{
+			// Detect new links			
+			IHyperlinkDetector[] detectors = getHyperlinkDetectors();
+			for (int i = 0; i < detectors.length; i++)
+			{
+				IHyperlinkDetector detector = detectors[i];
+				links = detector.detectHyperlinks(text);
+				if (links != null && links.length > 0)
+				{
+					fLinks.put(new Integer(line), links);
+					// Add underline to new set of links
+					for (int l = 0; l < links.length; l++)
+					{
+						IHyperlink link = links[l];
+						setUnderlined(line, link.getHyperlinkRegion(), true);
+					}
+				}
+			}
+		}
+	}
+	
+	protected void detectHyperlinkClicks()
+	{
+		IHyperlink under = findHyperlink(fDraggingStart);
+		if (under != null)
+		{
+			under.open();
+		}
 	}
 
 }
