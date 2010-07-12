@@ -551,33 +551,42 @@ public class TextCanvas extends GridCanvas {
 		}
 		fLastHash = hash;
 		
-		IHyperlink[] links = (IHyperlink[]) fLinks.remove(new Integer(line));
-		if (links != null)
-		{
-			// Remove links that were on this line before...
-			for (int i = 0; i < links.length; i++)
-			{
-				IHyperlink link = links[i];
-				IRegion region = link.getHyperlinkRegion();
-				setUnderlined(line, region, false);
-			}
-		}
-		
 		if (text != null && text.trim().length() > 0)
 		{
-			// Detect new links			
+			// Detect new links
+			List list = new ArrayList();
 			IHyperlinkDetector[] detectors = getHyperlinkDetectors();
 			for (int i = 0; i < detectors.length; i++)
 			{
 				IHyperlinkDetector detector = detectors[i];
-				links = detector.detectHyperlinks(text);
-				if (links != null && links.length > 0)
+				IHyperlink[] partialNewLinks = detector.detectHyperlinks(text);
+				if (partialNewLinks != null)
 				{
-					fLinks.put(new Integer(line), links);
-					// Add underline to new set of links
-					for (int l = 0; l < links.length; l++)
+					list.addAll(Arrays.asList(partialNewLinks));
+				}
+			}
+			IHyperlink[] oldLinks = (IHyperlink[]) fLinks.remove(new Integer(line));
+			IHyperlink[] newLinks = (IHyperlink[]) list.toArray(new IHyperlink[0]);
+			// Update map
+			fLinks.put(new Integer(line), newLinks);
+			// Only modify underlines if regions changed in any way...
+			if (regionsChanged(oldLinks, newLinks))
+			{					
+				// Remove links that were on this line before...
+				if (oldLinks != null)
+				{
+					for (int o = 0; o < oldLinks.length; o++)
 					{
-						IHyperlink link = links[l];
+						IHyperlink link = oldLinks[o];
+						setUnderlined(line, link.getHyperlinkRegion(), false);
+					}
+				}
+				if (newLinks != null)
+				{
+					// Add underline to new set of links
+					for (int l = 0; l < newLinks.length; l++)
+					{
+						IHyperlink link = newLinks[l];
 						setUnderlined(line, link.getHyperlinkRegion(), true);
 					}
 				}
@@ -585,6 +594,19 @@ public class TextCanvas extends GridCanvas {
 		}
 	}
 	
+	private boolean regionsChanged(IHyperlink[] oldLinks, IHyperlink[] newLinks)
+	{
+		int oldLinkLength = oldLinks == null ? 0 : oldLinks.length;
+		int newLinkLength = newLinks == null ? 0 : newLinks.length;
+		// size changed, so we definitely have changes
+		if (oldLinkLength != newLinkLength)
+		{
+			return true;
+		}
+		// TODO Compare the links' regions...
+		return false;
+	}
+
 	protected void detectHyperlinkClicks()
 	{
 		IHyperlink under = findHyperlink(fDraggingStart);
