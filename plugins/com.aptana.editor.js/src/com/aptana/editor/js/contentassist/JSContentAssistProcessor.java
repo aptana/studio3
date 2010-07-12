@@ -47,9 +47,10 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private static final Image JS_FUNCTION = Activator.getImage("/icons/js_function.gif"); //$NON-NLS-1$
 	private static final Image JS_PROPERTY = Activator.getImage("/icons/js_property.gif"); //$NON-NLS-1$
 	
-	private static final EnumSet<FieldSelector> CORE_GLOBAL_FIELDS = EnumSet.of(FieldSelector.NAME, FieldSelector.DESCRIPTION, FieldSelector.USER_AGENTS, FieldSelector.TYPES, FieldSelector.RETURN_TYPES);
-	private static final EnumSet<FieldSelector> PROJECT_GLOBAL_FIELDS = EnumSet.of(FieldSelector.NAME, FieldSelector.DESCRIPTION, FieldSelector.DOCUMENTS, FieldSelector.TYPES, FieldSelector.RETURN_TYPES);
-	private static final EnumSet<FieldSelector> PROPERTY_FIELDS = EnumSet.of(FieldSelector.NAME, FieldSelector.DESCRIPTION, FieldSelector.USER_AGENTS);
+	private static final EnumSet<FieldSelector> CORE_GLOBAL_SELECTOR = EnumSet.of(FieldSelector.NAME, FieldSelector.DESCRIPTION, FieldSelector.USER_AGENTS, FieldSelector.TYPES, FieldSelector.RETURN_TYPES);
+	private static final EnumSet<FieldSelector> PROJECT_GLOBAL_SELECTOR = EnumSet.of(FieldSelector.NAME, FieldSelector.DESCRIPTION, FieldSelector.DOCUMENTS, FieldSelector.TYPES, FieldSelector.RETURN_TYPES);
+	private static final EnumSet<FieldSelector> TYPE_PROPERTY_SELECTOR = EnumSet.of(FieldSelector.NAME, FieldSelector.DESCRIPTION, FieldSelector.USER_AGENTS);
+	
 	private static final EnumSet<LocationType> IGNORED_TYPES = EnumSet.of(LocationType.UNKNOWN, LocationType.NONE);
 
 	private JSIndexQueryHelper _indexHelper;
@@ -90,7 +91,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private void addCoreGlobals(Set<ICompletionProposal> proposals, int offset)
 	{
-		List<PropertyElement> globals = this._indexHelper.getCoreGlobals(CORE_GLOBAL_FIELDS);
+		List<PropertyElement> globals = this._indexHelper.getCoreGlobals(CORE_GLOBAL_SELECTOR);
 
 		for (PropertyElement property : globals)
 		{
@@ -127,7 +128,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private void addProjectGlobals(Set<ICompletionProposal> proposals, int offset)
 	{
 		Index index = this.getIndex();
-		List<PropertyElement> projectGlobals = this._indexHelper.getProjectGlobals(index, PROJECT_GLOBAL_FIELDS);
+		List<PropertyElement> projectGlobals = this._indexHelper.getProjectGlobals(index, PROJECT_GLOBAL_SELECTOR);
 		
 		if (projectGlobals != null)
 		{
@@ -327,7 +328,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	protected void addTypeProperties(Set<ICompletionProposal> proposals, String typeName, int offset)
 	{
 		// add properties and methods
-		List<PropertyElement> properties = this._indexHelper.getTypeMembers(this.getIndex(), typeName, PROPERTY_FIELDS);
+		List<PropertyElement> properties = this._indexHelper.getTypeMembers(this.getIndex(), typeName, TYPE_PROPERTY_SELECTOR);
 		
 		typeName = JSModelFormatter.getTypeDisplayName(typeName);
 		
