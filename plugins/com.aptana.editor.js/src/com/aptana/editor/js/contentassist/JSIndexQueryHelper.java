@@ -11,7 +11,7 @@ import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.JSTypes;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
-import com.aptana.editor.js.contentassist.model.FieldSelector;
+import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
@@ -20,7 +20,7 @@ import com.aptana.index.core.IndexManager;
 
 public class JSIndexQueryHelper
 {
-	private static final EnumSet<FieldSelector> PARENT_TYPES = EnumSet.of(FieldSelector.PARENT_TYPES);
+	private static final EnumSet<ContentSelector> PARENT_TYPES = EnumSet.of(ContentSelector.PARENT_TYPES);
 	private static final String WINDOW_TYPE = "Window"; //$NON-NLS-1$
 
 	private JSIndexReader _reader;
@@ -40,7 +40,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public PropertyElement getCoreGlobal(String name, EnumSet<FieldSelector> fields)
+	public PropertyElement getCoreGlobal(String name, EnumSet<ContentSelector> fields)
 	{
 		return this.getCoreTypeMember(WINDOW_TYPE, name, fields);
 	}
@@ -52,7 +52,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public FunctionElement getCoreGlobalFunction(String name, EnumSet<FieldSelector> fields)
+	public FunctionElement getCoreGlobalFunction(String name, EnumSet<ContentSelector> fields)
 	{
 		return this.getCoreTypeMethod(WINDOW_TYPE, name, fields);
 	}
@@ -63,7 +63,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public List<PropertyElement> getCoreGlobals(EnumSet<FieldSelector> fields)
+	public List<PropertyElement> getCoreGlobals(EnumSet<ContentSelector> fields)
 	{
 		return this.getCoreTypeMembers(WINDOW_TYPE, fields);
 	}
@@ -75,7 +75,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public TypeElement getCoreType(String typeName, EnumSet<FieldSelector> fields)
+	public TypeElement getCoreType(String typeName, EnumSet<ContentSelector> fields)
 	{
 		return this._reader.getType(getIndex(), typeName, fields);
 	}
@@ -88,7 +88,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public PropertyElement getCoreTypeMember(String typeName, String memberName, EnumSet<FieldSelector> fields)
+	public PropertyElement getCoreTypeMember(String typeName, String memberName, EnumSet<ContentSelector> fields)
 	{
 		PropertyElement result = this.getCoreTypeProperty(typeName, memberName, fields);
 
@@ -107,7 +107,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public List<PropertyElement> getCoreTypeMembers(String typeName, EnumSet<FieldSelector> fields)
+	public List<PropertyElement> getCoreTypeMembers(String typeName, EnumSet<ContentSelector> fields)
 	{
 		List<PropertyElement> result = new ArrayList<PropertyElement>();
 		
@@ -125,7 +125,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public FunctionElement getCoreTypeMethod(String typeName, String methodName, EnumSet<FieldSelector> fields)
+	public FunctionElement getCoreTypeMethod(String typeName, String methodName, EnumSet<ContentSelector> fields)
 	{
 		FunctionElement result = null;
 		
@@ -148,7 +148,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public List<FunctionElement> getCoreTypeMethods(String typeName, EnumSet<FieldSelector> fields)
+	public List<FunctionElement> getCoreTypeMethods(String typeName, EnumSet<ContentSelector> fields)
 	{
 		List<FunctionElement> result = null;
 		
@@ -171,7 +171,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public List<PropertyElement> getCoreTypeProperties(String typeName, EnumSet<FieldSelector> fields)
+	public List<PropertyElement> getCoreTypeProperties(String typeName, EnumSet<ContentSelector> fields)
 	{
 		List<PropertyElement> result = null;
 		
@@ -195,7 +195,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public PropertyElement getCoreTypeProperty(String typeName, String propertyName, EnumSet<FieldSelector> fields)
+	public PropertyElement getCoreTypeProperty(String typeName, String propertyName, EnumSet<ContentSelector> fields)
 	{
 		PropertyElement result = null;
 		
@@ -219,7 +219,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public PropertyElement getGlobal(Index index, String name, EnumSet<FieldSelector> fields)
+	public PropertyElement getGlobal(Index index, String name, EnumSet<ContentSelector> fields)
 	{
 		PropertyElement result = this.getProjectGlobal(index, name, fields);
 
@@ -239,7 +239,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public FunctionElement getGlobalFunction(Index index, String name, EnumSet<FieldSelector> fields)
+	public FunctionElement getGlobalFunction(Index index, String name, EnumSet<ContentSelector> fields)
 	{
 		FunctionElement result = this.getProjectGlobalFunction(index, name, fields);
 
@@ -269,7 +269,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public PropertyElement getProjectGlobal(Index index, String name, EnumSet<FieldSelector> fields)
+	public PropertyElement getProjectGlobal(Index index, String name, EnumSet<ContentSelector> fields)
 	{
 		return this.getProjectTypeMember(index, WINDOW_TYPE, name, fields);
 	}
@@ -282,7 +282,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public FunctionElement getProjectGlobalFunction(Index index, String name, EnumSet<FieldSelector> fields)
+	public FunctionElement getProjectGlobalFunction(Index index, String name, EnumSet<ContentSelector> fields)
 	{
 		return this.getProjectTypeMethod(index, WINDOW_TYPE, name, fields);
 	}
@@ -294,7 +294,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public List<PropertyElement> getProjectGlobals(Index index, EnumSet<FieldSelector> fields)
+	public List<PropertyElement> getProjectGlobals(Index index, EnumSet<ContentSelector> fields)
 	{
 		return this.getProjectTypeMembers(index, WINDOW_TYPE, fields);
 	}
@@ -307,7 +307,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public TypeElement getProjectType(Index index, String typeName, EnumSet<FieldSelector> fields)
+	public TypeElement getProjectType(Index index, String typeName, EnumSet<ContentSelector> fields)
 	{
 		return this._reader.getType(index, typeName, fields);
 	}
@@ -321,7 +321,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public PropertyElement getProjectTypeMember(Index index, String typeName, String memberName, EnumSet<FieldSelector> fields)
+	public PropertyElement getProjectTypeMember(Index index, String typeName, String memberName, EnumSet<ContentSelector> fields)
 	{
 		PropertyElement result = this.getProjectTypeProperty(index, typeName, memberName, fields);
 
@@ -340,7 +340,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public List<PropertyElement> getProjectTypeMembers(Index index, String typeName, EnumSet<FieldSelector> fields)
+	public List<PropertyElement> getProjectTypeMembers(Index index, String typeName, EnumSet<ContentSelector> fields)
 	{
 		List<PropertyElement> result = new ArrayList<PropertyElement>();
 		
@@ -359,7 +359,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public FunctionElement getProjectTypeMethod(Index index, String typeName, String methodName, EnumSet<FieldSelector> fields)
+	public FunctionElement getProjectTypeMethod(Index index, String typeName, String methodName, EnumSet<ContentSelector> fields)
 	{
 		FunctionElement result = null;
 		
@@ -383,7 +383,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public List<FunctionElement> getProjectTypeMethods(Index index, String typeName, EnumSet<FieldSelector> fields)
+	public List<FunctionElement> getProjectTypeMethods(Index index, String typeName, EnumSet<ContentSelector> fields)
 	{
 		List<FunctionElement> result = null;
 		
@@ -407,7 +407,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public List<PropertyElement> getProjectTypeProperties(Index index, String typeName, EnumSet<FieldSelector> fields)
+	public List<PropertyElement> getProjectTypeProperties(Index index, String typeName, EnumSet<ContentSelector> fields)
 	{
 		List<PropertyElement> result = null;
 		
@@ -432,7 +432,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public PropertyElement getProjectTypeProperty(Index index, String typeName, String propertyName, EnumSet<FieldSelector> fields)
+	public PropertyElement getProjectTypeProperty(Index index, String typeName, String propertyName, EnumSet<ContentSelector> fields)
 	{
 		PropertyElement result = null;
 		
@@ -456,7 +456,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public TypeElement getType(Index index, String typeName, EnumSet<FieldSelector> fields)
+	public TypeElement getType(Index index, String typeName, EnumSet<ContentSelector> fields)
 	{
 		TypeElement result = this.getProjectType(index, typeName, fields);
 
@@ -477,7 +477,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public PropertyElement getTypeMember(Index index, String typeName, String memberName, EnumSet<FieldSelector> fields)
+	public PropertyElement getTypeMember(Index index, String typeName, String memberName, EnumSet<ContentSelector> fields)
 	{
 		PropertyElement result = this.getProjectTypeMember(index, typeName, memberName, fields);
 		
@@ -497,7 +497,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public List<PropertyElement> getTypeMembers(Index index, String typeName, EnumSet<FieldSelector> fields)
+	public List<PropertyElement> getTypeMembers(Index index, String typeName, EnumSet<ContentSelector> fields)
 	{
 		List<PropertyElement> result = new ArrayList<PropertyElement>();
 		
@@ -516,7 +516,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public FunctionElement getTypeMethod(Index index, String typeName, String methodName, EnumSet<FieldSelector> fields)
+	public FunctionElement getTypeMethod(Index index, String typeName, String methodName, EnumSet<ContentSelector> fields)
 	{
 		FunctionElement result = this.getProjectTypeMethod(index, typeName, methodName, fields);
 		
@@ -537,7 +537,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public FunctionElement getTypeMethodRecursive(Index index, String typeName, String methodName, EnumSet<FieldSelector> fields)
+	public FunctionElement getTypeMethodRecursive(Index index, String typeName, String methodName, EnumSet<ContentSelector> fields)
 	{
 		FunctionElement result = null;
 		LinkedList<String> types = new LinkedList<String>();
@@ -584,7 +584,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public List<FunctionElement> getTypeMethods(Index index, String typeName, EnumSet<FieldSelector> fields)
+	public List<FunctionElement> getTypeMethods(Index index, String typeName, EnumSet<ContentSelector> fields)
 	{
 		List<FunctionElement> result = this.getProjectTypeMethods(index, typeName, fields);
 
@@ -604,7 +604,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public List<PropertyElement> getTypeProperties(Index index, String typeName, EnumSet<FieldSelector> fields)
+	public List<PropertyElement> getTypeProperties(Index index, String typeName, EnumSet<ContentSelector> fields)
 	{
 		List<PropertyElement> result = this.getProjectTypeProperties(index, typeName, fields);
 
@@ -625,7 +625,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public PropertyElement getTypeProperty(Index index, String typeName, String propertyName, EnumSet<FieldSelector> fields)
+	public PropertyElement getTypeProperty(Index index, String typeName, String propertyName, EnumSet<ContentSelector> fields)
 	{
 		PropertyElement result = this.getProjectTypeProperty(index, typeName, propertyName, fields);
 
@@ -646,7 +646,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public PropertyElement getTypePropertyRecursive(Index index, String typeName, String propertyName, EnumSet<FieldSelector> fields)
+	public PropertyElement getTypePropertyRecursive(Index index, String typeName, String propertyName, EnumSet<ContentSelector> fields)
 	{
 		PropertyElement result = null;
 		LinkedList<String> types = new LinkedList<String>();

@@ -1,6 +1,6 @@
 package com.aptana.editor.js.contentassist.model;
 
-public enum FieldSelector
+public enum ContentSelector
 {
 	DESCRIPTION,
 	DOCUMENTS,

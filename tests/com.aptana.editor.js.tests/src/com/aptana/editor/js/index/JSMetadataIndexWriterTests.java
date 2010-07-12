@@ -18,7 +18,7 @@ import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
 import com.aptana.editor.js.contentassist.index.ScriptDocException;
-import com.aptana.editor.js.contentassist.model.FieldSelector;
+import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
@@ -58,7 +58,7 @@ public class JSMetadataIndexWriterTests extends TestCase
 	{
 		JSIndexReader reader = new JSIndexReader();
 		
-		return reader.getType(this.getIndex(), typeName, EnumSet.allOf(FieldSelector.class));
+		return reader.getType(this.getIndex(), typeName, EnumSet.allOf(ContentSelector.class));
 	}
 	
 	/**

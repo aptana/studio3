@@ -5,12 +5,12 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import com.aptana.editor.js.Activator;
-import com.aptana.editor.js.contentassist.model.FieldSelector;
+import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
@@ -32,7 +32,7 @@ public class JSIndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	protected FunctionElement createFunction(Index index, QueryResult function, EnumSet<FieldSelector> fields) throws IOException
+	protected FunctionElement createFunction(Index index, QueryResult function, EnumSet<ContentSelector> fields) throws IOException
 	{
 		FunctionElement f = new FunctionElement();
 
@@ -43,7 +43,7 @@ public class JSIndexReader
 			int column = 0;
 			
 			// name
-			if (fields.contains(FieldSelector.NAME))
+			if (fields.contains(ContentSelector.NAME))
 			{
 				f.setName(columns[column]);
 			}
@@ -53,14 +53,14 @@ public class JSIndexReader
 			column++;	// skip owning type
 			
 			// description
-			if (fields.contains(FieldSelector.DESCRIPTION))
+			if (fields.contains(ContentSelector.DESCRIPTION))
 			{
 				f.setDescription(this.getDescription(index, columns[column]));
 			}
 			column++;
 			
 			// parameters
-			if (fields.contains(FieldSelector.PARAMETERS))
+			if (fields.contains(ContentSelector.PARAMETERS))
 			{
 				for (ParameterElement parameter : this.getParameters(index, columns[column]))
 				{
@@ -70,7 +70,7 @@ public class JSIndexReader
 			column++;
 	
 			// return types
-			if (fields.contains(FieldSelector.RETURN_TYPES))
+			if (fields.contains(ContentSelector.RETURN_TYPES))
 			{
 				for (ReturnTypeElement returnType : this.getReturnTypes(index, columns[column]))
 				{
@@ -82,7 +82,7 @@ public class JSIndexReader
 			if (column < columns.length)
 			{
 				// user agents
-				if (fields.contains(FieldSelector.USER_AGENTS))
+				if (fields.contains(ContentSelector.USER_AGENTS))
 				{
 					for (String userAgentKey : columns[column].split(JSIndexConstants.SUB_DELIMITER))
 					{
@@ -94,7 +94,7 @@ public class JSIndexReader
 			}
 			
 			// documents
-			if (fields.contains(FieldSelector.DOCUMENTS))
+			if (fields.contains(ContentSelector.DOCUMENTS))
 			{
 				for (String document : function.getDocuments())
 				{
@@ -115,7 +115,7 @@ public class JSIndexReader
 	 * @return
 	 * @throws IOException 
 	 */
-	protected PropertyElement createProperty(Index index, QueryResult property, EnumSet<FieldSelector> fields) throws IOException
+	protected PropertyElement createProperty(Index index, QueryResult property, EnumSet<ContentSelector> fields) throws IOException
 	{
 		PropertyElement p = new PropertyElement();
 
@@ -126,7 +126,7 @@ public class JSIndexReader
 			int column = 0;
 			
 			// name
-			if (fields.contains(FieldSelector.NAME))
+			if (fields.contains(ContentSelector.NAME))
 			{
 				p.setName(columns[column]);
 			}
@@ -136,14 +136,14 @@ public class JSIndexReader
 			column++;
 			
 			// description
-			if (fields.contains(FieldSelector.DESCRIPTION))
+			if (fields.contains(ContentSelector.DESCRIPTION))
 			{
 				p.setDescription(this.getDescription(index, columns[column]));
 			}
 			column++;
 			
 			// types
-			if (fields.contains(FieldSelector.TYPES))
+			if (fields.contains(ContentSelector.TYPES))
 			{
 				for (ReturnTypeElement returnType : this.getReturnTypes(index, columns[column]))
 				{
@@ -154,7 +154,7 @@ public class JSIndexReader
 			
 			if (column < columns.length)
 			{
-				if (fields.contains(FieldSelector.USER_AGENTS))
+				if (fields.contains(ContentSelector.USER_AGENTS))
 				{
 					// user agents
 					for (String userAgentKey : columns[column].split(JSIndexConstants.SUB_DELIMITER))
@@ -167,7 +167,7 @@ public class JSIndexReader
 			}
 			
 			// documents
-			if (fields.contains(FieldSelector.DOCUMENTS))
+			if (fields.contains(ContentSelector.DOCUMENTS))
 			{
 				for (String document : property.getDocuments())
 				{
@@ -218,7 +218,7 @@ public class JSIndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public FunctionElement getFunction(Index index, String owningType, String propertyName, EnumSet<FieldSelector> fields) throws IOException
+	public FunctionElement getFunction(Index index, String owningType, String propertyName, EnumSet<ContentSelector> fields) throws IOException
 	{
 		FunctionElement result = null;
 		
@@ -244,9 +244,9 @@ public class JSIndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public List<FunctionElement> getFunctions(Index index, String owningType, EnumSet<FieldSelector> fields) throws IOException
+	public List<FunctionElement> getFunctions(Index index, String owningType, EnumSet<ContentSelector> fields) throws IOException
 	{
-		List<FunctionElement> result = new LinkedList<FunctionElement>();
+		List<FunctionElement> result = new ArrayList<FunctionElement>();
 		
 		if (index != null)
 		{
@@ -300,7 +300,7 @@ public class JSIndexReader
 	 */
 	protected List<ParameterElement> getParameters(Index index, String parametersKey) throws IOException
 	{
-		List<ParameterElement> result = new LinkedList<ParameterElement>();
+		List<ParameterElement> result = new ArrayList<ParameterElement>();
 		
 		if (index != null)
 		{
@@ -343,9 +343,9 @@ public class JSIndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public List<PropertyElement> getProperties(Index index, String owningType, EnumSet<FieldSelector> fields) throws IOException
+	public List<PropertyElement> getProperties(Index index, String owningType, EnumSet<ContentSelector> fields) throws IOException
 	{
-		List<PropertyElement> result = new LinkedList<PropertyElement>();
+		List<PropertyElement> result = new ArrayList<PropertyElement>();
 		
 		if (index != null)
 		{
@@ -376,7 +376,7 @@ public class JSIndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public PropertyElement getProperty(Index index, String owningType, String propertyName, EnumSet<FieldSelector> fields) throws IOException
+	public PropertyElement getProperty(Index index, String owningType, String propertyName, EnumSet<ContentSelector> fields) throws IOException
 	{
 		PropertyElement result = null;
 		
@@ -403,7 +403,7 @@ public class JSIndexReader
 	 */
 	protected List<ReturnTypeElement> getReturnTypes(Index index, String returnTypesKey) throws IOException
 	{
-		List<ReturnTypeElement> result = new LinkedList<ReturnTypeElement>();
+		List<ReturnTypeElement> result = new ArrayList<ReturnTypeElement>();
 		
 		if (index != null)
 		{
@@ -439,7 +439,7 @@ public class JSIndexReader
 	 * @param typeName
 	 * @return
 	 */
-	public TypeElement getType(Index index, String typeName, EnumSet<FieldSelector> fields)
+	public TypeElement getType(Index index, String typeName, EnumSet<ContentSelector> fields)
 	{
 		TypeElement result = null;
 
@@ -463,14 +463,14 @@ public class JSIndexReader
 					if (fields.isEmpty() == false)
 					{
 						// name
-						if (fields.contains(FieldSelector.NAME))
+						if (fields.contains(ContentSelector.NAME))
 						{
 							result.setName(columns[column]);
 						}
 						column++;
 						
 						// super types
-						if (fields.contains(FieldSelector.PARENT_TYPES))
+						if (fields.contains(ContentSelector.PARENT_TYPES))
 						{
 							for (String parentType : columns[column].split(JSIndexConstants.SUB_DELIMITER))
 							{
@@ -480,32 +480,32 @@ public class JSIndexReader
 						column++;
 						
 						// description
-						if (fields.contains(FieldSelector.DESCRIPTION))
+						if (fields.contains(ContentSelector.DESCRIPTION))
 						{
 							result.setDescription(this.getDescription(index, columns[column]));
 						}
 						column++;
 		
 						// properties
-						if (fields.contains(FieldSelector.PROPERTIES))
+						if (fields.contains(ContentSelector.PROPERTIES))
 						{
-							for (PropertyElement property : this.getProperties(index, retrievedName, EnumSet.allOf(FieldSelector.class)))
+							for (PropertyElement property : this.getProperties(index, retrievedName, EnumSet.allOf(ContentSelector.class)))
 							{
 								result.addProperty(property);
 							}
 						}
 		
 						// functions
-						if (fields.contains(FieldSelector.FUNCTIONS))
+						if (fields.contains(ContentSelector.FUNCTIONS))
 						{
-							for (FunctionElement function: this.getFunctions(index, retrievedName, EnumSet.allOf(FieldSelector.class)))
+							for (FunctionElement function: this.getFunctions(index, retrievedName, EnumSet.allOf(ContentSelector.class)))
 							{
 								result.addProperty(function);
 							}
 						}
 						
 						// documents
-						if (fields.contains(FieldSelector.DOCUMENTS))
+						if (fields.contains(ContentSelector.DOCUMENTS))
 						{
 							for (String document : type.getDocuments())
 							{
@@ -532,7 +532,7 @@ public class JSIndexReader
 	 * @return
 	 * @throws IOException 
 	 */
-	public List<PropertyElement> getTypeProperties(Index index, String typeName, EnumSet<FieldSelector> fields) throws IOException
+	public List<PropertyElement> getTypeProperties(Index index, String typeName, EnumSet<ContentSelector> fields) throws IOException
 	{
 		List<PropertyElement> properties = this.getProperties(index, typeName, fields);
 		

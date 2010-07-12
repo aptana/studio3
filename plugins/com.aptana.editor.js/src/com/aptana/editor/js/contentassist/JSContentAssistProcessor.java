@@ -25,7 +25,7 @@ import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
-import com.aptana.editor.js.contentassist.model.FieldSelector;
+import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.parsing.JSTokenScanner;
@@ -47,9 +47,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private static final Image JS_FUNCTION = Activator.getImage("/icons/js_function.gif"); //$NON-NLS-1$
 	private static final Image JS_PROPERTY = Activator.getImage("/icons/js_property.gif"); //$NON-NLS-1$
 	
-	private static final EnumSet<FieldSelector> CORE_GLOBAL_SELECTOR = EnumSet.of(FieldSelector.NAME, FieldSelector.DESCRIPTION, FieldSelector.USER_AGENTS, FieldSelector.TYPES, FieldSelector.RETURN_TYPES);
-	private static final EnumSet<FieldSelector> PROJECT_GLOBAL_SELECTOR = EnumSet.of(FieldSelector.NAME, FieldSelector.DESCRIPTION, FieldSelector.DOCUMENTS, FieldSelector.TYPES, FieldSelector.RETURN_TYPES);
-	private static final EnumSet<FieldSelector> TYPE_PROPERTY_SELECTOR = EnumSet.of(FieldSelector.NAME, FieldSelector.DESCRIPTION, FieldSelector.USER_AGENTS);
+	private static final EnumSet<ContentSelector> CORE_GLOBAL_SELECTOR = EnumSet.of(ContentSelector.NAME, ContentSelector.DESCRIPTION, ContentSelector.USER_AGENTS, ContentSelector.TYPES, ContentSelector.RETURN_TYPES);
+	private static final EnumSet<ContentSelector> PROJECT_GLOBAL_SELECTOR = EnumSet.of(ContentSelector.NAME, ContentSelector.DESCRIPTION, ContentSelector.DOCUMENTS, ContentSelector.TYPES, ContentSelector.RETURN_TYPES);
+	private static final EnumSet<ContentSelector> TYPE_PROPERTY_SELECTOR = EnumSet.of(ContentSelector.NAME, ContentSelector.DESCRIPTION, ContentSelector.USER_AGENTS);
 	
 	private static final EnumSet<LocationType> IGNORED_TYPES = EnumSet.of(LocationType.UNKNOWN, LocationType.NONE);
 

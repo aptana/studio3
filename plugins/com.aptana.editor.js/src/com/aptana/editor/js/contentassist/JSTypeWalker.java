@@ -14,7 +14,7 @@ import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.common.contentassist.UserAgentManager.UserAgent;
 import com.aptana.editor.js.JSTypes;
 import com.aptana.editor.js.contentassist.model.BaseElement;
-import com.aptana.editor.js.contentassist.model.FieldSelector;
+import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
@@ -610,7 +610,7 @@ public class JSTypeWalker extends JSTreeWalker
 			for (String typeName : this.getTypes(lhs))
 			{
 				// lookup up rhs name in type and add that value's type here
-				PropertyElement property = this._indexHelper.getTypeMember(this._index, typeName, memberName, EnumSet.of(FieldSelector.RETURN_TYPES, FieldSelector.TYPES));
+				PropertyElement property = this._indexHelper.getTypeMember(this._index, typeName, memberName, EnumSet.of(ContentSelector.RETURN_TYPES, ContentSelector.TYPES));
 				
 				if (property == null)
 				{
@@ -674,7 +674,7 @@ public class JSTypeWalker extends JSTreeWalker
 			for (String typeName : this.getTypes(lhs))
 			{
 				// lookup up rhs name in type and add that value's type here
-				PropertyElement property = this._indexHelper.getTypeMember(this._index, typeName, memberName, EnumSet.of(FieldSelector.RETURN_TYPES, FieldSelector.TYPES));
+				PropertyElement property = this._indexHelper.getTypeMember(this._index, typeName, memberName, EnumSet.of(ContentSelector.RETURN_TYPES, ContentSelector.TYPES));
 				
 				if (property == null)
 				{
@@ -757,7 +757,7 @@ public class JSTypeWalker extends JSTreeWalker
 		}
 		else
 		{
-			PropertyElement property = this._indexHelper.getGlobal(this._index, name, EnumSet.of(FieldSelector.TYPES, FieldSelector.RETURN_TYPES));
+			PropertyElement property = this._indexHelper.getGlobal(this._index, name, EnumSet.of(ContentSelector.TYPES, ContentSelector.RETURN_TYPES));
 
 			if (property != null)
 			{
