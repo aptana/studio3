@@ -32,12 +32,13 @@ public class JSIndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	protected FunctionElement createFunctionFromKey(Index index, String key, EnumSet<FieldSelector> fields) throws IOException
+	protected FunctionElement createFunction(Index index, QueryResult function, EnumSet<FieldSelector> fields) throws IOException
 	{
 		FunctionElement f = new FunctionElement();
 
 		if (fields.isEmpty() == false)
 		{
+			String key = function.getWord();
 			String[] columns = key.split(JSIndexConstants.DELIMITER);
 			int column = 0;
 			
@@ -91,6 +92,15 @@ public class JSIndexReader
 				}
 				column++;
 			}
+			
+			// documents
+			if (fields.contains(FieldSelector.DOCUMENTS))
+			{
+				for (String document : function.getDocuments())
+				{
+					f.addDocument(document);
+				}
+			}
 		}
 		
 		return f;
@@ -105,12 +115,13 @@ public class JSIndexReader
 	 * @return
 	 * @throws IOException 
 	 */
-	protected PropertyElement createPropertyFromKey(Index index, String key, EnumSet<FieldSelector> fields) throws IOException
+	protected PropertyElement createProperty(Index index, QueryResult property, EnumSet<FieldSelector> fields) throws IOException
 	{
 		PropertyElement p = new PropertyElement();
 
 		if (fields.isEmpty() == false)
 		{
+			String key = property.getWord();
 			String[] columns = key.split(JSIndexConstants.DELIMITER);
 			int column = 0;
 			
@@ -152,6 +163,15 @@ public class JSIndexReader
 						p.addUserAgent(this.getUserAgent(index, userAgentKey));
 					}
 					column++;
+				}
+			}
+			
+			// documents
+			if (fields.contains(FieldSelector.DOCUMENTS))
+			{
+				for (String document : property.getDocuments())
+				{
+					p.addDocument(document);
 				}
 			}
 		}
@@ -208,10 +228,7 @@ public class JSIndexReader
 			
 			if (functions != null && functions.size() > 0)
 			{
-				QueryResult property = functions.get(0);
-				String key = property.getWord();
-				
-				result = this.createFunctionFromKey(index, key, fields);
+				result = this.createFunction(index, functions.get(0), fields);
 			}
 		}
 		
@@ -240,8 +257,7 @@ public class JSIndexReader
 			{
 				for (QueryResult function : functions)
 				{
-					String key = function.getWord();
-					FunctionElement f = this.createFunctionFromKey(index, key, fields);
+					FunctionElement f = this.createFunction(index, function, fields);
 					
 					result.add(f);
 				}
@@ -340,9 +356,8 @@ public class JSIndexReader
 			{
 				for (QueryResult property : properties)
 				{
-					String key = property.getWord();
-					PropertyElement p = this.createPropertyFromKey(index, key, fields);
-	
+					PropertyElement p = this.createProperty(index, property, fields);
+					
 					result.add(p);
 				}
 			}
@@ -371,10 +386,7 @@ public class JSIndexReader
 			
 			if (properties != null && properties.size() > 0)
 			{
-				QueryResult property = properties.get(0);
-				String key = property.getWord();
-				
-				result = this.createPropertyFromKey(index, key, fields);
+				result = this.createProperty(index, properties.get(0), fields);
 			}
 		}
 		
@@ -440,7 +452,8 @@ public class JSIndexReader
 	
 				if (types != null && types.size() > 0)
 				{
-					String[] columns = types.get(0).getWord().split(JSIndexConstants.DELIMITER);
+					QueryResult type = types.get(0);
+					String[] columns = type.getWord().split(JSIndexConstants.DELIMITER);
 					String retrievedName = columns[0];
 					int column = 0;
 	
@@ -488,6 +501,15 @@ public class JSIndexReader
 							for (FunctionElement function: this.getFunctions(index, retrievedName, EnumSet.allOf(FieldSelector.class)))
 							{
 								result.addProperty(function);
+							}
+						}
+						
+						// documents
+						if (fields.contains(FieldSelector.DOCUMENTS))
+						{
+							for (String document : type.getDocuments())
+							{
+								result.addDocument(document);
 							}
 						}
 					}
