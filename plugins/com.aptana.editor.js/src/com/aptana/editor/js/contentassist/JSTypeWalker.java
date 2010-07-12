@@ -530,6 +530,10 @@ public class JSTypeWalker extends JSTreeWalker
 
 		if (type == null)
 		{
+			// We temporarily store the default function type to prevent
+			// infinite recursion in potential invoke cycles
+			this.putNodeType(node, FUNCTION_TYPE);
+			
 			List<String> types = new ArrayList<String>();
 			Scope<JSNode> scope = this._scope.getScopeAtOffset(node.getBody().getStartingOffset());
 			boolean foundReturnExpression = false;
