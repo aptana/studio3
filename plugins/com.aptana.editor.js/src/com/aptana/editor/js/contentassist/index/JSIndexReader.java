@@ -2,16 +2,14 @@ package com.aptana.editor.js.contentassist.index;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import com.aptana.editor.js.Activator;
-import com.aptana.editor.js.JSTypes;
 import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.ParameterElement;
@@ -25,8 +23,6 @@ import com.aptana.index.core.SearchPattern;
 
 public class JSIndexReader
 {
-	private static final EnumSet<ContentSelector> PARENT_TYPES = EnumSet.of(ContentSelector.PARENT_TYPES);
-	
 	/**
 	 * createFunctionFromKey
 	 * 
@@ -252,45 +248,18 @@ public class JSIndexReader
 	{
 		List<FunctionElement> result = new ArrayList<FunctionElement>();
 		
-		// NOTE: Using LinkedList since it implements Queue<T>
-		LinkedList<String> types = new LinkedList<String>();
-
-		types.add(owningType);
-		
 		if (index != null)
 		{
-			while (types.isEmpty() == false)
+			// read functions
+			List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(owningType), SearchPattern.REGEX_MATCH);
+	
+			if (functions != null)
 			{
-				String currentType = types.remove();
-				
-				// read functions
-				List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(owningType), SearchPattern.REGEX_MATCH);
-		
-				if (functions != null)
+				for (QueryResult function : functions)
 				{
-					for (QueryResult function : functions)
-					{
-						FunctionElement f = this.createFunction(index, function, fields);
-						
-						result.add(f);
-					}
-				}
-				
-				// possibly traverse ancestor axis
-				if (fields.contains(ContentSelector.INCLUDE_ANCESTORS))
-				{
-					if (currentType.equals(JSTypes.OBJECT) == false)
-					{
-						TypeElement type = this.getType(index, currentType, PARENT_TYPES);
-						
-						if (type != null)
-						{
-							for (String parentType : type.getParentTypes())
-							{
-								types.add(parentType);
-							}
-						}
-					}
+					FunctionElement f = this.createFunction(index, function, fields);
+					
+					result.add(f);
 				}
 			}
 		}
@@ -378,45 +347,18 @@ public class JSIndexReader
 	{
 		List<PropertyElement> result = new ArrayList<PropertyElement>();
 		
-		// NOTE: Using LinkedList since it implements Queue<T>
-		LinkedList<String> types = new LinkedList<String>();
-
-		types.add(owningType);
-		
 		if (index != null)
 		{
-			while (types.isEmpty() == false)
+			// read properties
+			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningType), SearchPattern.REGEX_MATCH);
+	
+			if (properties != null)
 			{
-				String currentType = types.remove();
-				
-				// read properties
-				List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(currentType), SearchPattern.REGEX_MATCH);
-		
-				if (properties != null)
+				for (QueryResult property : properties)
 				{
-					for (QueryResult property : properties)
-					{
-						PropertyElement p = this.createProperty(index, property, fields);
-						
-						result.add(p);
-					}
-				}
-				
-				// possibly traverse ancestor axis
-				if (fields.contains(ContentSelector.INCLUDE_ANCESTORS))
-				{
-					if (currentType.equals(JSTypes.OBJECT) == false)
-					{
-						TypeElement type = this.getType(index, currentType, PARENT_TYPES);
-						
-						if (type != null)
-						{
-							for (String parentType : type.getParentTypes())
-							{
-								types.add(parentType);
-							}
-						}
-					}
+					PropertyElement p = this.createProperty(index, property, fields);
+					
+					result.add(p);
 				}
 			}
 		}
