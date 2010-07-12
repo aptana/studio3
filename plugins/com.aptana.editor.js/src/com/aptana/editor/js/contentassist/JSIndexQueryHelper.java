@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.net.URI;
 import java.util.List;
 
+import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
 import com.aptana.editor.js.contentassist.model.FieldSelector;
@@ -133,7 +134,7 @@ public class JSIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			Activator.logError(e.getMessage(), e);
 		}
 		
 		return result;
@@ -156,7 +157,7 @@ public class JSIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			Activator.logError(e.getMessage(), e);
 		}
 		
 		return result;
@@ -179,7 +180,7 @@ public class JSIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			Activator.logError(e.getMessage(), e);
 		}
 		
 		return result;
@@ -203,7 +204,7 @@ public class JSIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			Activator.logError(e.getMessage(), e);
 		}
 		
 		return result;
@@ -367,7 +368,7 @@ public class JSIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			Activator.logError(e.getMessage(), e);
 		}
 		
 		return result;
@@ -391,7 +392,7 @@ public class JSIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			Activator.logError(e.getMessage(), e);
 		}
 		
 		return result;
@@ -415,7 +416,7 @@ public class JSIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			Activator.logError(e.getMessage(), e);
 		}
 		
 		return result;
@@ -440,7 +441,7 @@ public class JSIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			Activator.logError(e.getMessage(), e);
 		}
 		
 		return result;
@@ -568,7 +569,7 @@ public class JSIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			Activator.logError(e.getMessage(), e);
 		}
 
 		return result;
@@ -682,7 +683,7 @@ public class JSIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			Activator.logError(e.getMessage(), e);
 		}
 
 		return result;

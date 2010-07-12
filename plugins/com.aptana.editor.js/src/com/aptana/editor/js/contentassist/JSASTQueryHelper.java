@@ -5,10 +5,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.Platform;
 import org.jaxen.JaxenException;
 import org.jaxen.XPath;
 
+import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.parsing.ast.IParseNode;
@@ -46,10 +46,7 @@ public class JSASTQueryHelper
 		}
 		catch (JaxenException e)
 		{
-			if (Platform.inDevelopmentMode())
-			{
-				e.printStackTrace();
-			}
+			Activator.logError(e.getMessage(), e);
 		}
 	}
 	
@@ -247,7 +244,7 @@ public class JSASTQueryHelper
 			}
 			catch (JaxenException e)
 			{
-				e.printStackTrace();
+				Activator.logError(e.getMessage(), e);
 			}
 		}
 	}

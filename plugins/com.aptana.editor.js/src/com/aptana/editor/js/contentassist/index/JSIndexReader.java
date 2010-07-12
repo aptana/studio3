@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.contentassist.model.FieldSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.ParameterElement;
@@ -588,7 +589,7 @@ public class JSIndexReader
 			}
 			catch (IOException e)
 			{
-				e.printStackTrace();
+				Activator.logError(e.getMessage(), e);
 			}
 		}
 
