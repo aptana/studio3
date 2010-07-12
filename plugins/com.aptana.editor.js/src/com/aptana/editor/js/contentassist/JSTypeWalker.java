@@ -161,16 +161,6 @@ public class JSTypeWalker extends JSTreeWalker
 	}
 
 	/**
-	 * createReferenceWalker
-	 * 
-	 * @return
-	 */
-	protected JSReferenceWalker createReferenceWalker()
-	{
-		return new JSReferenceWalker(this._scope, this._index, this);
-	}
-
-	/**
 	 * getElementType
 	 * 
 	 * @param type
@@ -497,25 +487,22 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSConstructNode node)
 	{
-		IParseNode child = node.getIdentifier();
-
+		// TODO: Need to handle any property assignments off of "this"
+		IParseNode child = node.getExpression();
+		
 		if (child instanceof JSNode)
 		{
-			JSReferenceWalker walker = this.createReferenceWalker();
-
-			((JSNode) child).accept(walker);
-
-			String methodName = walker.getPropertyName();
-
-			for (String typeName : walker.getTypes())
+			List<String> types = this.getTypes(child);
+			
+			for (String typeName : types)
 			{
-				FunctionElement function = this._indexHelper.getTypeMethod(this._index, typeName, methodName, EnumSet.of(FieldSelector.RETURN_TYPES));
-
-				if (function != null)
+				int index = typeName.indexOf(':');
+				
+				if (index != -1)
 				{
-					for (String returnType : function.getTypeNames())
+					for (String returnTypeName : typeName.substring(index + 1).split(","))
 					{
-						this.addType(returnType);
+						this.addType(returnTypeName);
 					}
 				}
 			}
@@ -596,17 +583,24 @@ public class JSTypeWalker extends JSTreeWalker
 
 		if (lhs instanceof JSNode)
 		{
-			JSReferenceWalker walker = this.createReferenceWalker();
+			IParseNode rhs = node.getRightHandSide();
+			String memberName = rhs.getText();
 
-			((JSNode) lhs).accept(walker);
-
-			String memberName = walker.getPropertyName();
-
-			for (String typeName : walker.getTypes())
+			for (String typeName : this.getTypes(lhs))
 			{
-				PropertyElement property = this._indexHelper.getTypeMember(this._index, typeName, memberName, EnumSet.of(FieldSelector.TYPES,
-					FieldSelector.RETURN_TYPES));
-
+				// lookup up rhs name in type and add that value's type here
+				PropertyElement property = this._indexHelper.getTypeMember(this._index, typeName, memberName, EnumSet.of(FieldSelector.RETURN_TYPES, FieldSelector.TYPES));
+				
+				if (property == null)
+				{
+					TypeElement type = this.getGeneratedType(typeName);
+					
+					if (type != null)
+					{
+						property = type.getProperty(memberName);
+					}
+				}
+				
 				if (property != null)
 				{
 					ReturnTypeElement[] returnTypes = property.getTypes();
@@ -629,11 +623,13 @@ public class JSTypeWalker extends JSTreeWalker
 					}
 					else
 					{
+						// couldn't find a return type, so default to "Object"
 						this.addType(OBJECT_TYPE);
 					}
 				}
 				else
 				{
+					// couldn't find a property, so default to at least "Object"
 					this.addType(OBJECT_TYPE);
 				}
 			}
@@ -652,12 +648,12 @@ public class JSTypeWalker extends JSTreeWalker
 		if (lhs instanceof JSNode)
 		{
 			IParseNode rhs = node.getRightHandSide();
-			String name = rhs.getText();
+			String memberName = rhs.getText();
 
 			for (String typeName : this.getTypes(lhs))
 			{
 				// lookup up rhs name in type and add that value's type here
-				PropertyElement property = this._indexHelper.getTypeMember(this._index, typeName, name, EnumSet.of(FieldSelector.RETURN_TYPES, FieldSelector.TYPES));
+				PropertyElement property = this._indexHelper.getTypeMember(this._index, typeName, memberName, EnumSet.of(FieldSelector.RETURN_TYPES, FieldSelector.TYPES));
 				
 				if (property == null)
 				{
@@ -665,7 +661,7 @@ public class JSTypeWalker extends JSTreeWalker
 					
 					if (type != null)
 					{
-						property = type.getProperty(name);
+						property = type.getProperty(memberName);
 					}
 				}
 
