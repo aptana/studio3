@@ -10,11 +10,15 @@ import java.util.List;
 import java.util.Map;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.common.contentassist.UserAgentManager;
+import com.aptana.editor.common.contentassist.UserAgentManager.UserAgent;
+import com.aptana.editor.js.contentassist.model.BaseElement;
 import com.aptana.editor.js.contentassist.model.FieldSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
+import com.aptana.editor.js.contentassist.model.UserAgentElement;
 import com.aptana.editor.js.parsing.ast.JSArrayNode;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSBinaryArithmeticOperatorNode;
@@ -46,6 +50,8 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class JSTypeWalker extends JSTreeWalker
 {
+	public static final String DYNAMIC_CLASS_PREFIX = "-dynamic-type-";
+	
 	private static int TYPE_COUNT = 0;
 	private static Map<JSNode, String> NODE_TYPE_CACHE;
 
@@ -123,6 +129,24 @@ public class JSTypeWalker extends JSTreeWalker
 		this._generatedTypes.add(type);
 	}
 
+	/**
+	 * addUserAgents
+	 * 
+	 * @param element
+	 */
+	protected void addUserAgents(BaseElement element)
+	{
+		// make valid in all user agents
+		for (UserAgent userAgent : UserAgentManager.getInstance().getAllUserAgents())
+		{
+			UserAgentElement ua = new UserAgentElement();
+			
+			ua.setPlatform(userAgent.ID);
+			
+			element.addUserAgent(ua);
+		}
+	}
+	
 	/**
 	 * addType
 	 * 
@@ -348,7 +372,7 @@ public class JSTypeWalker extends JSTreeWalker
 	 */
 	private String getUniqueTypeName()
 	{
-		return MessageFormat.format("UserType{0}", TYPE_COUNT++); //$NON-NLS-1$
+		return MessageFormat.format("{0}{1}", DYNAMIC_CLASS_PREFIX, TYPE_COUNT++); //$NON-NLS-1$
 	}
 
 	/**
@@ -822,7 +846,8 @@ public class JSTypeWalker extends JSTreeWalker
 
 				newType.setName(this.getUniqueTypeName());
 				newType.addParentType(OBJECT_TYPE);
-
+				this.addUserAgents(newType);
+				
 				// temporary container to collect properties and their value
 				// sub-trees so we can infer property types after we have all
 				// of the object's properties
@@ -840,6 +865,9 @@ public class JSTypeWalker extends JSTreeWalker
 
 						// trim off leading and trailing quotes, if necessary
 						property.setName((nameNode instanceof JSStringNode) ? name.substring(1, name.length() - 1) : name);
+						
+						// make valid in all user agents
+						this.addUserAgents(property);
 
 						newType.addProperty(property);
 						
