@@ -400,6 +400,37 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		return result;
 	}
 
+	/**
+	 * getProjectURI
+	 * 
+	 * @return
+	 */
+	protected URI getProjectURI()
+	{
+		URI result = null;
+		
+		if (editor != null)
+		{
+			IEditorInput editorInput = editor.getEditorInput();
+			
+			if (editorInput instanceof IFileEditorInput)
+			{
+				IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
+				IFile file = fileEditorInput.getFile();
+				IProject project = file.getProject();
+				
+				result = project.getLocationURI();
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * getURI
+	 * 
+	 * @return
+	 */
 	protected URI getURI()
 	{
 		IEditorInput editorInput = editor.getEditorInput();
