@@ -20,8 +20,10 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -584,8 +586,37 @@ public class TextCanvas extends GridCanvas {
 		{
 			return true;
 		}
-		// TODO Compare the links' regions...
-		return false;
+		// Compare the links' regions...
+		Set oldUnderlines = new HashSet();
+		for (int i = 0; i < oldLinkLength; i++)
+		{
+			IHyperlink link = oldLinks[i];
+			IRegion region = link.getHyperlinkRegion();
+			for (int x = 0; x < region.getLength(); x++)
+			{
+				oldUnderlines.add(new Integer(region.getOffset() + x));
+			}
+		}
+		for (int i = 0; i < newLinkLength; i++)
+		{
+			IHyperlink link = newLinks[i];
+			IRegion region = link.getHyperlinkRegion();
+			for (int x = 0; x < region.getLength(); x++)
+			{
+				Integer integ = new Integer(region.getOffset() + x);
+				if (oldUnderlines.contains(integ))
+				{
+					oldUnderlines.remove(integ);
+				}
+				else
+				{
+					// hit an offset in new links that wasn't in old!
+					return true;
+				}
+			}
+		}
+		// if there are any offsets left, then there was a change
+		return !oldUnderlines.isEmpty();
 	}
 
 	protected void detectHyperlinkClicks()
