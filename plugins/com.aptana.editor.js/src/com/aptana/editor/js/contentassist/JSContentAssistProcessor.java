@@ -54,7 +54,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private static final EnumSet<LocationType> IGNORED_TYPES = EnumSet.of(LocationType.UNKNOWN, LocationType.NONE);
 
 	private JSIndexQueryHelper _indexHelper;
-	private JSASTQueryHelper _astHelper;
 	private IContextInformationValidator _validator;
 	private IParseNode _targetNode;
 	private IParseNode _statementNode;
@@ -71,7 +70,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		super(editor);
 
 		this._indexHelper = new JSIndexQueryHelper();
-		this._astHelper = new JSASTQueryHelper();
 	}
 	
 	/**
@@ -145,25 +143,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private void addLocalGlobalFunctions(Set<ICompletionProposal> proposals, int offset)
 	{
-		String fileLocation = this.getFilename();
-		
-		// add globals from current file
-		IParseNode node = (this._targetNode != null && this._targetNode.contains(offset)) ? this._targetNode : this.getAST();
-		
-		List<String> globalFunctions = this._astHelper.getChildFunctions(node);
-		
-		if (globalFunctions != null)
-		{
-			for (String function : globalFunctions)
-			{
-				String name = function + PARENS;
-				String description = null;
-				Image image = JS_FUNCTION;
-				Image[] userAgents = this.getAllUserAgentIcons();
-				
-				this.addProposal(proposals, name, image, description, userAgents, fileLocation, offset);
-			}
-		}
+		// TODO: re-implement using JSTypeWalker
 	}
 
 	/**
