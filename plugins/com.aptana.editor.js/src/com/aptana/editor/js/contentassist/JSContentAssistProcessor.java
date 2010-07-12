@@ -64,11 +64,12 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private static final EnumSet<ContentSelector> TYPE_PROPERTY_SELECTOR = EnumSet.of(
 		ContentSelector.NAME,				//
 		ContentSelector.DESCRIPTION,		//
+		ContentSelector.DOCUMENTS,			//
 		ContentSelector.INCLUDE_ANCESTORS,	//
 		ContentSelector.PARENT_TYPES,		//
-		ContentSelector.USER_AGENTS,		//
+		ContentSelector.RETURN_TYPES,		//
 		ContentSelector.TYPES,				//
-		ContentSelector.RETURN_TYPES		//
+		ContentSelector.USER_AGENTS			//
 	);
 	
 	private static final EnumSet<LocationType> IGNORED_TYPES = EnumSet.of(LocationType.UNKNOWN, LocationType.NONE);
