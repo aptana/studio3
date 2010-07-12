@@ -3,6 +3,7 @@ package com.aptana.editor.js.contentassist.model;
 public enum FieldSelector
 {
 	DESCRIPTION,
+	DOCUMENTS,
 	EXCEPTIONS,
 	FUNCTIONS,
 	NAME,
