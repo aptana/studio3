@@ -110,7 +110,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 			// grab the interesting parts
 			String name = property.getName();
-			String description = JSModelFormatter.getDescription(property);
+			String description = JSModelFormatter.getDescription(property, this.getProjectURI());
 			Image image = isFunction ? JS_FUNCTION : JS_PROPERTY;
 			Image[] userAgents = this.getUserAgentImages(property.getUserAgentNames());
 			
@@ -135,7 +135,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				boolean isFunction = (property instanceof FunctionElement);
 				String name = property.getName();
-				String description = JSModelFormatter.getDescription(property);
+				String description = JSModelFormatter.getDescription(property, this.getProjectURI());
 				Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
 				Image[] userAgents = this.getAllUserAgentIcons();
 				List<String> documents = property.getDocuments();
@@ -334,7 +334,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			boolean isFunction = (property instanceof FunctionElement);
 			String name = property.getName();
-			String description = JSModelFormatter.getDescription(property);
+			String description = JSModelFormatter.getDescription(property, this.getProjectURI());
 			Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
 			String[] userAgentNames = property.getUserAgentNames();
 			Image[] userAgents = getUserAgentImages(userAgentNames);

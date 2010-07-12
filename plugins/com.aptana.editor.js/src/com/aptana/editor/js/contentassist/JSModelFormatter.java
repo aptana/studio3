@@ -1,5 +1,6 @@
 package com.aptana.editor.js.contentassist;
 
+import java.net.URI;
 import java.util.List;
 
 import com.aptana.core.util.StringUtil;
@@ -14,6 +15,82 @@ public class JSModelFormatter
 	private static final String GENERIC_CLASS_CLOSE = ">"; //$NON-NLS-1$
 	private static final String GENERIC_CLASS_OPEN = "Class<"; //$NON-NLS-1$
 
+	/**
+	 * addDefiningFiles
+	 * 
+	 * @param buffer
+	 * @param property
+	 */
+	private static void addDefiningFiles(StringBuilder buffer, PropertyElement property, URI projectURI)
+	{
+		List<String> documents = property.getDocuments();
+
+		if (documents != null && documents.isEmpty() == false)
+		{
+			String prefix = (projectURI != null) ? projectURI.toString() : null;
+
+			// back up one segment so we include the project name in the document
+			if (prefix != null && prefix.length() > 2)
+			{
+				int index = prefix.lastIndexOf('/', prefix.length() - 2);
+
+				if (index != -1 && index > 0)
+				{
+					prefix = prefix.substring(0, index - 1);
+				}
+			}
+
+			buffer.append("<br><br>"); //$NON-NLS-1$
+			buffer.append("Defined In:"); //$NON-NLS-1$
+			buffer.append("<br>"); //$NON-NLS-1$
+
+			boolean first = true;
+
+			for (String document : documents)
+			{
+				if (prefix != null && document.startsWith(prefix))
+				{
+					document = document.substring(prefix.length() + 1);
+				}
+
+				if (first)
+				{
+					first = false;
+				}
+				else
+				{
+					buffer.append("<br>");
+				}
+
+				buffer.append(document);
+			}
+		}
+	}
+
+	/**
+	 * addDescription
+	 * 
+	 * @param buffer
+	 * @param property
+	 */
+	private static void addDescription(StringBuilder buffer, PropertyElement property)
+	{
+		String description = property.getDescription();
+
+		if (description != null && description.length() > 0)
+		{
+			buffer.append("<br><br>"); //$NON-NLS-1$
+			buffer.append(description);
+		}
+	}
+
+	/**
+	 * addReturnTypes
+	 * 
+	 * @param buffer
+	 * @param returnTypes
+	 * @param defaultType
+	 */
 	private static void addReturnTypes(StringBuilder buffer, ReturnTypeElement[] returnTypes, String defaultType)
 	{
 		boolean first;
@@ -50,9 +127,10 @@ public class JSModelFormatter
 	 * formatFunction
 	 * 
 	 * @param function
+	 * @param projectURI
 	 * @return
 	 */
-	public static String getDescription(FunctionElement function)
+	public static String getDescription(FunctionElement function, URI projectURI)
 	{
 		StringBuilder buffer = new StringBuilder();
 
@@ -99,12 +177,9 @@ public class JSModelFormatter
 
 		buffer.append(")"); //$NON-NLS-1$
 
-		// return type
 		addReturnTypes(buffer, function.getReturnTypes(), "void"); //$NON-NLS-1$
-
-		// description
-		buffer.append("<br><br>"); //$NON-NLS-1$
-		buffer.append(function.getDescription());
+		addDescription(buffer, function);
+		addDefiningFiles(buffer, function, projectURI);
 
 		return buffer.toString();
 	}
@@ -113,13 +188,14 @@ public class JSModelFormatter
 	 * formatProperty
 	 * 
 	 * @param property
+	 * @param projectURI
 	 * @return
 	 */
-	public static String getDescription(PropertyElement property)
+	public static String getDescription(PropertyElement property, URI projectURI)
 	{
 		if (property instanceof FunctionElement)
 		{
-			return getDescription((FunctionElement) property);
+			return getDescription((FunctionElement) property, projectURI);
 		}
 
 		StringBuilder buffer = new StringBuilder();
@@ -127,12 +203,9 @@ public class JSModelFormatter
 		// title
 		buffer.append("<b>").append(property.getName()).append("</b>"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		// type
 		addReturnTypes(buffer, property.getTypes(), "undefined"); //$NON-NLS-1$
-
-		// description
-		buffer.append("<br><br>"); //$NON-NLS-1$
-		buffer.append(property.getDescription());
+		addDescription(buffer, property);
+		addDefiningFiles(buffer, property, projectURI);
 
 		return buffer.toString();
 	}
