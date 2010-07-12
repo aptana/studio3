@@ -7,6 +7,7 @@ import java.util.List;
 import org.xml.sax.Attributes;
 
 import com.aptana.editor.common.contentassist.MetadataReader;
+import com.aptana.editor.js.JSTypes;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.editor.js.sdoc.model.ExampleTag;
 import com.aptana.editor.js.sdoc.model.ExceptionTag;
@@ -177,7 +178,7 @@ public class VSDocReader extends MetadataReader
 		String text = this.getText();
 
 		List<Type> types = new ArrayList<Type>();
-		types.add(new Type(this._exceptionType != null ? this._exceptionType : "Object")); //$NON-NLS-1$
+		types.add(new Type(this._exceptionType != null ? this._exceptionType : JSTypes.OBJECT)); //$NON-NLS-1$
 
 		this._tags.add(new ExceptionTag(types, text));
 
@@ -197,7 +198,7 @@ public class VSDocReader extends MetadataReader
 		String text = this.getText();
 
 		List<Type> types = new ArrayList<Type>();
-		types.add(new Type(this._currentType != null ? this._currentType : "Object")); //$NON-NLS-1$
+		types.add(new Type(this._currentType != null ? this._currentType : JSTypes.OBJECT)); //$NON-NLS-1$
 
 		this._tags.add(new ParamTag(this._currentParameter, types, text));
 

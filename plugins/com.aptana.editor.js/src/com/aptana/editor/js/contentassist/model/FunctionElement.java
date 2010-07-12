@@ -3,6 +3,8 @@ package com.aptana.editor.js.contentassist.model;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.aptana.editor.js.JSTypes;
+
 public class FunctionElement extends PropertyElement
 {
 	private List<ParameterElement> _parameters = new LinkedList<ParameterElement>();
@@ -109,7 +111,7 @@ public class FunctionElement extends PropertyElement
 		StringBuilder buffer = new StringBuilder();
 		boolean first = true;
 		
-		buffer.append("Function"); //$NON-NLS-1$
+		buffer.append(JSTypes.FUNCTION); //$NON-NLS-1$
 		
 		for (ReturnTypeElement returnType : this.getReturnTypes())
 		{

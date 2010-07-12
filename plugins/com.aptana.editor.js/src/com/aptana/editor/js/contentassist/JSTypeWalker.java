@@ -12,6 +12,7 @@ import java.util.Map;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.common.contentassist.UserAgentManager.UserAgent;
+import com.aptana.editor.js.JSTypes;
 import com.aptana.editor.js.contentassist.model.BaseElement;
 import com.aptana.editor.js.contentassist.model.FieldSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
@@ -54,14 +55,6 @@ public class JSTypeWalker extends JSTreeWalker
 	
 	private static int TYPE_COUNT = 0;
 	private static Map<JSNode, String> NODE_TYPE_CACHE;
-
-	private static final String ARRAY_TYPE = "Array"; //$NON-NLS-1$
-	private static final String BOOLEAN_TYPE = "Boolean"; //$NON-NLS-1$
-	private static final String FUNCTION_TYPE = "Function"; //$NON-NLS-1$
-	private static final String NUMBER_TYPE = "Number"; //$NON-NLS-1$
-	private static final String OBJECT_TYPE = "Object"; //$NON-NLS-1$
-	private static final String REG_EXP_TYPE = "RegExp"; //$NON-NLS-1$
-	private static final String STRING_TYPE = "String"; //$NON-NLS-1$
 
 	private static final String ARRAY_LITERAL = "[]"; //$NON-NLS-1$
 	private static final String GENERIC_ARRAY_CLOSE = ">"; //$NON-NLS-1$
@@ -206,14 +199,14 @@ public class JSTypeWalker extends JSTreeWalker
 
 				// TODO: handle generalized nesting like Array<Array<String>>. Just return
 				// ARRAY type for now
-				if (result.startsWith(ARRAY_TYPE))
+				if (result.startsWith(JSTypes.ARRAY))
 				{
-					result = ARRAY_TYPE;
+					result = JSTypes.ARRAY;
 				}
 			}
-			else if (type.equals(ARRAY_TYPE))
+			else if (type.equals(JSTypes.ARRAY))
 			{
-				result = OBJECT_TYPE;
+				result = JSTypes.OBJECT;
 			}
 		}
 
@@ -424,7 +417,7 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSArrayNode node)
 	{
-		this.addType(ARRAY_TYPE);
+		this.addType(JSTypes.ARRAY);
 	}
 
 	/*
@@ -441,20 +434,20 @@ public class JSTypeWalker extends JSTreeWalker
 				break;
 
 			case JSNodeTypes.ADD_AND_ASSIGN:
-				String type = NUMBER_TYPE;
+				String type = JSTypes.NUMBER;
 				List<String> lhsTypes = this.getTypes(node.getLeftHandSide());
 				List<String> rhsTypes = this.getTypes(node.getRightHandSide());
 
-				if (lhsTypes.contains(STRING_TYPE) || rhsTypes.contains(STRING_TYPE))
+				if (lhsTypes.contains(JSTypes.STRING) || rhsTypes.contains(JSTypes.STRING))
 				{
-					type = STRING_TYPE;
+					type = JSTypes.STRING;
 				}
 
 				this.addType(type);
 				break;
 
 			default:
-				this.addType(NUMBER_TYPE);
+				this.addType(JSTypes.NUMBER);
 				break;
 		}
 	}
@@ -467,16 +460,16 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSBinaryArithmeticOperatorNode node)
 	{
-		String type = NUMBER_TYPE;
+		String type = JSTypes.NUMBER;
 
 		if (node.getNodeType() == JSNodeTypes.ADD)
 		{
 			List<String> lhsTypes = this.getTypes(node.getLeftHandSide());
 			List<String> rhsTypes = this.getTypes(node.getRightHandSide());
 
-			if (lhsTypes.contains(STRING_TYPE) || rhsTypes.contains(STRING_TYPE))
+			if (lhsTypes.contains(JSTypes.STRING) || rhsTypes.contains(JSTypes.STRING))
 			{
-				type = STRING_TYPE;
+				type = JSTypes.STRING;
 			}
 		}
 
@@ -490,7 +483,7 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSBinaryBooleanOperatorNode node)
 	{
-		this.addType(BOOLEAN_TYPE);
+		this.addType(JSTypes.BOOLEAN);
 	}
 
 	/*
@@ -540,7 +533,7 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSFalseNode node)
 	{
-		this.addType(BOOLEAN_TYPE);
+		this.addType(JSTypes.BOOLEAN);
 	}
 
 	/*
@@ -556,7 +549,7 @@ public class JSTypeWalker extends JSTreeWalker
 		{
 			// We temporarily store the default function type to prevent
 			// infinite recursion in potential invoke cycles
-			this.putNodeType(node, FUNCTION_TYPE);
+			this.putNodeType(node, JSTypes.FUNCTION);
 			
 			List<String> types = new ArrayList<String>();
 			Scope<JSNode> scope = this._scope.getScopeAtOffset(node.getBody().getStartingOffset());
@@ -578,17 +571,17 @@ public class JSTypeWalker extends JSTreeWalker
 			// build function type, including return values
 			if (types.isEmpty() == false)
 			{
-				type = FUNCTION_TYPE + ":" + StringUtil.join(",", types); //$NON-NLS-1$ //$NON-NLS-2$
+				type = JSTypes.FUNCTION + ":" + StringUtil.join(",", types); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			else if (foundReturnExpression)
 			{
 				// If we couldn't infer a return type and we had a return
 				// expression, then at least return Object from this function
-				type = FUNCTION_TYPE + ":" + OBJECT_TYPE; //$NON-NLS-1$
+				type = JSTypes.FUNCTION + ":" + JSTypes.OBJECT; //$NON-NLS-1$
 			}
 			else
 			{
-				type = FUNCTION_TYPE;
+				type = JSTypes.FUNCTION;
 			}
 
 			this.putNodeType(node, type);
@@ -645,20 +638,20 @@ public class JSTypeWalker extends JSTreeWalker
 							}
 							else
 							{
-								this.addType(OBJECT_TYPE);
+								this.addType(JSTypes.OBJECT);
 							}
 						}
 					}
 					else
 					{
 						// couldn't find a return type, so default to "Object"
-						this.addType(OBJECT_TYPE);
+						this.addType(JSTypes.OBJECT);
 					}
 				}
 				else
 				{
 					// couldn't find a property, so default to at least "Object"
-					this.addType(OBJECT_TYPE);
+					this.addType(JSTypes.OBJECT);
 				}
 			}
 		}
@@ -820,7 +813,7 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSNumberNode node)
 	{
-		this.addType(NUMBER_TYPE);
+		this.addType(JSTypes.NUMBER);
 	}
 
 	/*
@@ -836,7 +829,7 @@ public class JSTypeWalker extends JSTreeWalker
 		{
 			if (node.hasChildren() == false)
 			{
-				type = OBJECT_TYPE;
+				type = JSTypes.OBJECT;
 			}
 			else
 			{
@@ -845,7 +838,7 @@ public class JSTypeWalker extends JSTreeWalker
 				TypeElement newType = new TypeElement();
 
 				newType.setName(this.getUniqueTypeName());
-				newType.addParentType(OBJECT_TYPE);
+				newType.addParentType(JSTypes.OBJECT);
 				this.addUserAgents(newType);
 				
 				// temporary container to collect properties and their value
@@ -933,7 +926,7 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSPostUnaryOperatorNode node)
 	{
-		this.addType(NUMBER_TYPE);
+		this.addType(JSTypes.NUMBER);
 	}
 
 	/*
@@ -947,11 +940,11 @@ public class JSTypeWalker extends JSTreeWalker
 		{
 			case JSNodeTypes.DELETE:
 			case JSNodeTypes.LOGICAL_NOT:
-				this.addType(BOOLEAN_TYPE);
+				this.addType(JSTypes.BOOLEAN);
 				break;
 
 			case JSNodeTypes.TYPEOF:
-				this.addType(STRING_TYPE);
+				this.addType(JSTypes.STRING);
 				break;
 
 			case JSNodeTypes.VOID:
@@ -959,7 +952,7 @@ public class JSTypeWalker extends JSTreeWalker
 				break;
 
 			default:
-				this.addType(NUMBER_TYPE);
+				this.addType(JSTypes.NUMBER);
 				break;
 		}
 	}
@@ -971,7 +964,7 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSRegexNode node)
 	{
-		this.addType(REG_EXP_TYPE);
+		this.addType(JSTypes.REG_EXP);
 	}
 
 	/*
@@ -981,7 +974,7 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSStringNode node)
 	{
-		this.addType(STRING_TYPE);
+		this.addType(JSTypes.STRING);
 	}
 
 	/*
@@ -991,6 +984,6 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSTrueNode node)
 	{
-		this.addType(BOOLEAN_TYPE);
+		this.addType(JSTypes.BOOLEAN);
 	}
 }

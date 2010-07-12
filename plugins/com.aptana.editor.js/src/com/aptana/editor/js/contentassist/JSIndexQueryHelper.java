@@ -8,6 +8,7 @@ import java.net.URI;
 import java.util.List;
 
 import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSTypes;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
 import com.aptana.editor.js.contentassist.model.FieldSelector;
@@ -669,7 +670,7 @@ public class JSIndexQueryHelper
 				{
 					// prevent possible infinite loop if Object returns Object
 					// as its super-type
-					if (currentType.equals("Object") == false) //$NON-NLS-1$
+					if (currentType.equals(JSTypes.OBJECT) == false) //$NON-NLS-1$
 					{
 						TypeElement type = this._reader.getType(index, currentType, PARENT_TYPES);
 

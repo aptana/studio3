@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.js.JSTypes;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
@@ -242,8 +243,8 @@ public class JSIndexWriter
 			type.getName(),
 			(parentTypes != null && parentTypes.size() > 0)
 				? StringUtil.join(",", parentTypes) //$NON-NLS-1$
-				: (type.equals("Object") == false) //$NON-NLS-1$
-					? "Object" //$NON-NLS-1$
+				: (type.equals(JSTypes.OBJECT) == false) //$NON-NLS-1$
+					? JSTypes.OBJECT //$NON-NLS-1$
 					: "", //$NON-NLS-1$
 			descriptionKey
 		);

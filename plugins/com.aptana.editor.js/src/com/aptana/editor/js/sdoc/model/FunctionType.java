@@ -3,6 +3,7 @@ package com.aptana.editor.js.sdoc.model;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.aptana.editor.js.JSTypes;
 import com.aptana.parsing.io.SourcePrinter;
 
 public class FunctionType extends Type
@@ -15,7 +16,7 @@ public class FunctionType extends Type
 	 */
 	public FunctionType()
 	{
-		super("Function"); //$NON-NLS-1$
+		super(JSTypes.FUNCTION); //$NON-NLS-1$
 	}
 
 	/**
@@ -61,7 +62,7 @@ public class FunctionType extends Type
 	 */
 	public void toSource(SourcePrinter writer)
 	{
-		writer.print("Function"); //$NON-NLS-1$
+		writer.print(JSTypes.FUNCTION); //$NON-NLS-1$
 
 		boolean first;
 

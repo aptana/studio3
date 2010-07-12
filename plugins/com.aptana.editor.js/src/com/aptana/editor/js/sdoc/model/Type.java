@@ -1,12 +1,13 @@
 package com.aptana.editor.js.sdoc.model;
 
+import com.aptana.editor.js.JSTypes;
 import com.aptana.parsing.io.SourcePrinter;
 
 import beaver.Symbol;
 
 public class Type extends Symbol
 {
-	public static final Type OBJECT_TYPE = new Type("Object"); //$NON-NLS-1$
+	public static final Type OBJECT_TYPE = new Type(JSTypes.OBJECT); //$NON-NLS-1$
 
 	private String _name;
 
