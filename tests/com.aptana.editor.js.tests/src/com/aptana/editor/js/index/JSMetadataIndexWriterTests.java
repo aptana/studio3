@@ -2,6 +2,7 @@ package com.aptana.editor.js.index;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.EnumSet;
 import java.util.List;
@@ -13,6 +14,7 @@ import org.eclipse.core.runtime.Path;
 
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
+import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
 import com.aptana.editor.js.contentassist.index.ScriptDocException;
@@ -31,7 +33,7 @@ public class JSMetadataIndexWriterTests extends TestCase
 	@Override
 	protected void tearDown() throws Exception
 	{
-		IndexManager.getInstance().removeIndex(getIndex().getRoot());
+		IndexManager.getInstance().removeIndex(URI.create(JSIndexConstants.METADATA));
 		
 		super.tearDown();
 	}

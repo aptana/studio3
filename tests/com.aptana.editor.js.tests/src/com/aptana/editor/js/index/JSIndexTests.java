@@ -1,11 +1,13 @@
 package com.aptana.editor.js.index;
 
+import java.net.URI;
 import java.util.EnumSet;
 import java.util.List;
 
 import junit.framework.TestCase;
 
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
+import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
 import com.aptana.editor.js.contentassist.model.FieldSelector;
@@ -24,7 +26,7 @@ public class JSIndexTests extends TestCase
 	@Override
 	protected void tearDown() throws Exception
 	{
-		IndexManager.getInstance().removeIndex(getIndex().getRoot());
+		IndexManager.getInstance().removeIndex(URI.create(JSIndexConstants.METADATA));
 		
 		super.tearDown();
 	}
