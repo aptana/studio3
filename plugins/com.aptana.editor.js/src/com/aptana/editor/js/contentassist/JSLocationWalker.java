@@ -320,7 +320,7 @@ public class JSLocationWalker extends JSTreeWalker
 	{
 		if (node.contains(this._offset) && this._offset != node.getEnd())
 		{
-			IParseNode identifier = node.getIdentifier();
+			IParseNode identifier = node.getExpression();
 			IParseNode arguments = node.getArguments();
 			
 			if (this._offset < node.getStart() + 3)

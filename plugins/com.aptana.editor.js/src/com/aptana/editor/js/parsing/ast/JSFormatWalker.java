@@ -273,7 +273,7 @@ public class JSFormatWalker extends JSTreeWalker
 	public void visit(JSConstructNode node)
 	{
 		this._printer.print("new ");
-		this.formatNode(node.getIdentifier());
+		this.formatNode(node.getExpression());
 		this.formatNode(node.getArguments());
 		this.addSemicolon(node);
 	}

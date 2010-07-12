@@ -39,7 +39,7 @@ public class JSConstructNode extends JSNode
 	 * 
 	 * @return
 	 */
-	public IParseNode getIdentifier()
+	public IParseNode getExpression()
 	{
 		return this.getChild(0);
 	}
