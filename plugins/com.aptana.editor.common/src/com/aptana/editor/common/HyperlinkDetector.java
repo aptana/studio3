@@ -1,12 +1,10 @@
-package com.aptana.editor.html;
+package com.aptana.editor.common;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -41,10 +39,13 @@ public class HyperlinkDetector extends URLHyperlinkDetector
 			// Assume it's a src attribute value, try and grab it...
 			IRegion lineInfo;
 			String line;
+			String value;
+			IRegion hyperLinkRegion = region;
 			try
 			{
 				lineInfo = document.getLineInformationOfOffset(offset);
 				line = document.get(lineInfo.getOffset(), lineInfo.getLength());
+				value = document.get(region.getOffset(), region.getLength());
 			}
 			catch (BadLocationException ex)
 			{
@@ -52,9 +53,17 @@ public class HyperlinkDetector extends URLHyperlinkDetector
 			}
 			int relativeOffset = region.getOffset() - lineInfo.getOffset();
 			int afterIndex = line.indexOf('"', relativeOffset);
-			String prefix = line.substring(0, relativeOffset);
-			int beforeIndex = prefix.lastIndexOf('"');
-			String value = line.substring(beforeIndex + 1, afterIndex);
+			if (afterIndex != -1)
+			{
+				String prefix = line.substring(0, relativeOffset);
+				int beforeIndex = prefix.lastIndexOf('"');
+				value = line.substring(beforeIndex + 1, afterIndex);
+				hyperLinkRegion = new Region(lineInfo.getOffset() + beforeIndex + 1, value.length());
+			}
+			if (value == null || value.trim().length() == 0)
+			{
+				return null;
+			}
 			// Now try and resolve the value as a URI...
 			IEditorPart part = (IEditorPart) getAdapter(IEditorPart.class);
 			IEditorInput input = part.getEditorInput();
@@ -65,13 +74,12 @@ public class HyperlinkDetector extends URLHyperlinkDetector
 				if (uri != null)
 				{
 					// Create a hyperlink to open in an editor
-					IRegion hyperLinkRegion = new Region(lineInfo.getOffset() + beforeIndex + 1, value.length());
 					return new IHyperlink[] { new URIHyperlink(hyperLinkRegion, uri) };
 				}
 			}
 			catch (Exception e)
 			{
-				log(e);
+				CommonEditorPlugin.logError(e);
 			}
 			return null;
 		}
@@ -92,17 +100,11 @@ public class HyperlinkDetector extends URLHyperlinkDetector
 			}
 			catch (URISyntaxException e)
 			{
-				log(e);
+				CommonEditorPlugin.logError(e);
 			}
 		}
 		if (ours.isEmpty())
 			return null;
 		return ours.toArray(new IHyperlink[ours.size()]);
 	}
-
-	private static void log(Exception e)
-	{
-		Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
-	}
-
 }

@@ -1,13 +1,11 @@
-package com.aptana.editor.html;
+package com.aptana.editor.common;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.URLHyperlink;
 import org.eclipse.ui.IEditorDescriptor;
@@ -62,7 +60,7 @@ public class URIHyperlink extends URLHyperlink
 		}
 		catch (Exception e)
 		{
-			Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+			CommonEditorPlugin.logError(e);
 			if (wrapped)
 				super.open();
 		}

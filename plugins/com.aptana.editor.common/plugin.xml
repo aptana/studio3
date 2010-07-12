@@ -474,4 +474,14 @@
             id="com.aptana.editor.common.preferences.UserAgentPreferencePage"
             name="%page.name.0"/>            
    </extension>
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
+      <hyperlinkDetector
+            activate="true"
+            class="com.aptana.editor.common.HyperlinkDetector"
+            id="com.aptana.editor.common.hyperlinkDetector"
+            name="%hyperlinkDetector.name"
+            targetId="com.aptana.editor.ui.hyperlinkTarget">
+      </hyperlinkDetector>
+   </extension>
 </plugin>
