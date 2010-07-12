@@ -6,6 +6,7 @@ public enum ContentSelector
 	DOCUMENTS,
 	EXCEPTIONS,
 	FUNCTIONS,
+	INCLUDE_ANCESTORS,
 	NAME,
 	OWNING_TYPE,
 	OS,
