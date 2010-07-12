@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -46,10 +47,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private static final Image JS_FUNCTION = Activator.getImage("/icons/js_function.gif"); //$NON-NLS-1$
 	private static final Image JS_PROPERTY = Activator.getImage("/icons/js_property.gif"); //$NON-NLS-1$
 	
-	private static final String PARENS = "()"; //$NON-NLS-1$
-	
 	private static final EnumSet<FieldSelector> CORE_GLOBAL_FIELDS = EnumSet.of(FieldSelector.NAME, FieldSelector.DESCRIPTION, FieldSelector.USER_AGENTS, FieldSelector.TYPES, FieldSelector.RETURN_TYPES);
-	private static final EnumSet<FieldSelector> PROJECT_GLOBAL_FIELDS = EnumSet.of(FieldSelector.NAME, FieldSelector.DESCRIPTION, FieldSelector.TYPES, FieldSelector.RETURN_TYPES);
+	private static final EnumSet<FieldSelector> PROJECT_GLOBAL_FIELDS = EnumSet.of(FieldSelector.NAME, FieldSelector.DESCRIPTION, FieldSelector.DOCUMENTS, FieldSelector.TYPES, FieldSelector.RETURN_TYPES);
 	private static final EnumSet<FieldSelector> PROPERTY_FIELDS = EnumSet.of(FieldSelector.NAME, FieldSelector.DESCRIPTION, FieldSelector.USER_AGENTS);
 	private static final EnumSet<LocationType> IGNORED_TYPES = EnumSet.of(LocationType.UNKNOWN, LocationType.NONE);
 
@@ -82,33 +81,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		this.addProjectGlobals(proposals, offset);
 		this.addLocalGlobalFunctions(proposals, offset);
 	}
-	
-	/**
-	 * addCoreFunctions
-	 * 
-	 * @param proposals
-	 * @param offset
-	 */
-	private void addCoreFunctions(Set<ICompletionProposal> proposals, int offset)
-	{
-		List<PropertyElement> globals = this._indexHelper.getCoreGlobals(CORE_GLOBAL_FIELDS);
-		
-		for (PropertyElement property : globals)
-		{
-			boolean isFunction = (property instanceof FunctionElement);
-			
-			if (isFunction)
-			{
-				// grab the interesting parts
-				String name = JSModelFormatter.getName(property);
-				String description = JSModelFormatter.getDescription(property);
-				Image image = JS_FUNCTION;
-				Image[] userAgents = this.getUserAgentImages(property.getUserAgentNames());
-				
-				this.addProposal(proposals, name, image, description, userAgents, offset);
-			}
-		}
-	}
 
 	/**
 	 * addCoreGlobals
@@ -126,7 +98,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			boolean isFunction = (property instanceof FunctionElement);
 
 			// grab the interesting parts
-			String name = JSModelFormatter.getName(property);
+			String name = property.getName();
 			String description = JSModelFormatter.getDescription(property);
 			Image image = isFunction ? JS_FUNCTION : JS_PROPERTY;
 			Image[] userAgents = this.getUserAgentImages(property.getUserAgentNames());
@@ -162,11 +134,12 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			for (PropertyElement property : projectGlobals)
 			{
 				boolean isFunction = (property instanceof FunctionElement);
-				String name = (isFunction) ? property.getName() + PARENS : property.getName();
+				String name = property.getName();
 				String description = JSModelFormatter.getDescription(property);
 				Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
 				Image[] userAgents = this.getAllUserAgentIcons();
-				String location = null;
+				List<String> documents = property.getDocuments();
+				String location = (documents != null && documents.size() > 0) ? JSModelFormatter.getDocumentDisplayName(documents.get(0)) : null;
 				
 				this.addProposal(proposals, name, image, description, userAgents, location, offset);
 			}
@@ -274,13 +247,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		String displayName = name;
 		int length = name.length();
 
-		// back up one if we end with parentheses
-		if (name.endsWith(PARENS))
-		{
-			displayName = name.substring(0, name.length() - PARENS.length());
-			length--;
-		}
-		
 		// calculate what text will be replaced
 		int replaceLength = 0;
 
@@ -338,7 +304,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 							}
 						}
 						
-						String name = (isFunction) ? symbol + PARENS : symbol;
+//						String name = (isFunction) ? symbol + PARENS : symbol;
+						String name = symbol;
 						String description = null;
 						Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
 						Image[] userAgents = this.getAllUserAgentIcons();
@@ -367,8 +334,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		for (PropertyElement property : properties)
 		{
 			boolean isFunction = (property instanceof FunctionElement);
-			String name = (isFunction) ? property.getName() + PARENS : property.getName();
-			String description = property.getDescription();
+			String name = property.getName();
+			String description = JSModelFormatter.getDescription(property);
 			Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
 			String[] userAgentNames = property.getUserAgentNames();
 			Image[] userAgents = getUserAgentImages(userAgentNames);
@@ -407,10 +374,11 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	@Override
 	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
 	{
+		IDocument document = viewer.getDocument();
 		Set<ICompletionProposal> result = new HashSet<ICompletionProposal>();
 		
 		// first step is to determine where we are
-		LocationType location = this.getLocation(viewer.getDocument(), offset);
+		LocationType location = this.getLocation(document, offset);
 		
 		switch (location)
 		{
@@ -420,14 +388,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				
 			case IN_VARIABLE_NAME:
 			case IN_GLOBAL:
+			case IN_CONSTRUCTOR:
 				this.addAllGlobals(result, offset);
 				this.addSymbolsInScope(result, offset);
-				break;
-				
-			case IN_CONSTRUCTOR:
-				this.addCoreFunctions(result, offset);
-				this.addProjectGlobals(result, offset);
-				this.addLocalGlobalFunctions(result, offset);
 				break;
 				
 			default:
@@ -446,11 +409,20 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			}
 		});
 
-		// select the current proposal based on the current lexeme
-//		if (this._currentLexeme != null)
-//		{
-//			this.setSelectedProposal(this._currentLexeme.getText(), proposals);
-//		}
+		// select the current proposal based on the range
+		if (this._replaceRange != null)
+		{
+			try
+			{
+				String prefix = document.get(this._replaceRange.getStartingOffset(), this._replaceRange.getLength());
+				
+				this.setSelectedProposal(prefix, proposals);
+			}
+			catch (BadLocationException e)
+			{
+				// ignore
+			}
+		}
 
 		return proposals.toArray(new ICompletionProposal[proposals.size()]);
 	}
