@@ -56,7 +56,7 @@ import org.eclipse.tm.terminal.model.Style;
  */
 public class TextCanvas extends GridCanvas {
 
-	private static final String HYPERLINK_DETECTOR_EXT_PT = "com.aptana.org.eclipse.tm.terminal.terminalHyperlinkDetectors"; //$NON-NLS-1$
+	private static final String HYPERLINK_DETECTOR_EXT_PT = TerminalPlugin.PLUGIN_ID + ".terminalHyperlinkDetectors"; //$NON-NLS-1$
 	private Map fLinks = new HashMap(3);
 	private int fLastHash;
 	private IHyperlinkDetector[] fDetectors;
@@ -456,22 +456,6 @@ public class TextCanvas extends GridCanvas {
 		return null;
 	}
 
-	protected char[] pad(char[] chars, int width)
-	{
-		if (chars != null && chars.length == width)
-		{
-			return chars;
-		}
-		char[] newChars = new char[width];
-		Arrays.fill(newChars, ' ');
-		newChars[width - 1] = '\n';
-		if (chars != null)
-		{
-			System.arraycopy(chars, 0, newChars, 0, chars.length);
-		}
-		return newChars;
-	}
-
 	private void setUnderlined(int line, IRegion region, boolean underlined)
 	{
 		int startCol = region.getOffset();
@@ -528,22 +512,19 @@ public class TextCanvas extends GridCanvas {
 		return (IHyperlinkDetector) config.createExecutableExtension("class"); //$NON-NLS-1$
 	}
 
-	protected String getTerminalText(int startLine, int endLine)
+	protected String getTerminalText(int line)
 	{
-		StringBuilder builder = new StringBuilder();
-		ITerminalTextDataReadOnly text = fCellCanvasModel.getTerminalText();
-		for (int i = startLine; i <= endLine; i++)
+		char[] c = fCellCanvasModel.getTerminalText().getChars(line);
+		if (c != null)
 		{
-			char[] chars = text.getChars(i);
-			chars = pad(chars, text.getWidth());
-			builder.append(chars);
-		}
-		return builder.toString();
+			return new String(c);
+		}		
+		return ""; //$NON-NLS-1$
 	}
 
 	protected synchronized void updateLine(int line)
 	{
-		String text = getTerminalText(line, line);
+		String text = getTerminalText(line);
 		int hash = line * 31 + text.hashCode();
 		if (hash == fLastHash)
 		{
