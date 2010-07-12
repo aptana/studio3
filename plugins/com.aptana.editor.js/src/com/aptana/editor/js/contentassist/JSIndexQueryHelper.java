@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSTypes;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
 import com.aptana.editor.js.contentassist.model.ContentSelector;
@@ -18,7 +20,18 @@ import com.aptana.index.core.IndexManager;
 
 public class JSIndexQueryHelper
 {
+	private static final EnumSet<ContentSelector> PARENT_TYPES = EnumSet.of(ContentSelector.PARENT_TYPES);
 	private static final String WINDOW_TYPE = "Window"; //$NON-NLS-1$
+
+	/**
+	 * getIndex
+	 * 
+	 * @return
+	 */
+	public static Index getIndex()
+	{
+		return IndexManager.getInstance().getIndex(URI.create(JSIndexConstants.METADATA));
+	}
 
 	private JSIndexReader _reader;
 
@@ -28,6 +41,29 @@ public class JSIndexQueryHelper
 	public JSIndexQueryHelper()
 	{
 		this._reader = new JSIndexReader();
+	}
+
+	/**
+	 * addParentTypes
+	 * 
+	 * @param types
+	 * @param index
+	 * @param type
+	 */
+	protected void addParentTypes(LinkedList<String> types, Index index, String type)
+	{
+		if (type.equals(JSTypes.OBJECT) == false)
+		{
+			TypeElement typeElement = this._reader.getType(index, type, PARENT_TYPES);
+
+			if (typeElement != null)
+			{
+				for (String parentType : typeElement.getParentTypes())
+				{
+					types.add(parentType);
+				}
+			}
+		}
 	}
 
 	/**
@@ -107,13 +143,13 @@ public class JSIndexQueryHelper
 	public List<PropertyElement> getCoreTypeMembers(String typeName, EnumSet<ContentSelector> fields)
 	{
 		List<PropertyElement> result = new ArrayList<PropertyElement>();
-		
+
 		result.addAll(this.getCoreTypeProperties(typeName, fields));
 		result.addAll(this.getCoreTypeMethods(typeName, fields));
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getCoreTypeMethod
 	 * 
@@ -125,7 +161,7 @@ public class JSIndexQueryHelper
 	public FunctionElement getCoreTypeMethod(String typeName, String methodName, EnumSet<ContentSelector> fields)
 	{
 		FunctionElement result = null;
-		
+
 		try
 		{
 			result = this._reader.getFunction(getIndex(), typeName, methodName, fields);
@@ -134,7 +170,7 @@ public class JSIndexQueryHelper
 		{
 			Activator.logError(e.getMessage(), e);
 		}
-		
+
 		return result;
 	}
 
@@ -147,18 +183,7 @@ public class JSIndexQueryHelper
 	 */
 	public List<FunctionElement> getCoreTypeMethods(String typeName, EnumSet<ContentSelector> fields)
 	{
-		List<FunctionElement> result = null;
-		
-		try
-		{
-			result = this._reader.getFunctions(getIndex(), typeName, fields);
-		}
-		catch (IOException e)
-		{
-			Activator.logError(e.getMessage(), e);
-		}
-		
-		return result;
+		return this.getFunctions(getIndex(), typeName, fields);
 	}
 
 	/**
@@ -170,18 +195,7 @@ public class JSIndexQueryHelper
 	 */
 	public List<PropertyElement> getCoreTypeProperties(String typeName, EnumSet<ContentSelector> fields)
 	{
-		List<PropertyElement> result = null;
-		
-		try
-		{
-			result = this._reader.getProperties(getIndex(), typeName, fields);
-		}
-		catch (IOException e)
-		{
-			Activator.logError(e.getMessage(), e);
-		}
-		
-		return result;
+		return this.getProperties(getIndex(), typeName, fields);
 	}
 
 	/**
@@ -195,7 +209,7 @@ public class JSIndexQueryHelper
 	public PropertyElement getCoreTypeProperty(String typeName, String propertyName, EnumSet<ContentSelector> fields)
 	{
 		PropertyElement result = null;
-		
+
 		try
 		{
 			result = this._reader.getProperty(getIndex(), typeName, propertyName, fields);
@@ -204,7 +218,49 @@ public class JSIndexQueryHelper
 		{
 			Activator.logError(e.getMessage(), e);
 		}
-		
+
+		return result;
+	}
+
+	/**
+	 * getFunctions
+	 * 
+	 * @param index
+	 * @param typeName
+	 * @param fields
+	 * @return
+	 */
+	private List<FunctionElement> getFunctions(Index index, String typeName, EnumSet<ContentSelector> fields)
+	{
+		List<FunctionElement> result = null;
+
+		try
+		{
+			result = this._reader.getFunctions(index, typeName, fields);
+
+			// possibly include ancestor types
+			if (fields.contains(ContentSelector.INCLUDE_ANCESTORS))
+			{
+				// NOTE: Using LinkedList since it implements Queue<T>
+				LinkedList<String> types = new LinkedList<String>();
+
+				this.addParentTypes(types, index, typeName);
+
+				while (types.isEmpty() == false)
+				{
+					String currentType = types.remove();
+
+					result.addAll(this.getTypeMethods(index, currentType, fields));
+
+					this.addParentTypes(types, index, currentType);
+				}
+			}
+		}
+		catch (IOException e)
+		{
+			Activator.logError(e.getMessage(), e);
+		}
+
 		return result;
 	}
 
@@ -246,16 +302,6 @@ public class JSIndexQueryHelper
 		}
 
 		return result;
-	}
-
-	/**
-	 * getIndex
-	 * 
-	 * @return
-	 */
-	public static Index getIndex()
-	{
-		return IndexManager.getInstance().getIndex(URI.create(JSIndexConstants.METADATA));
 	}
 
 	/**
@@ -329,7 +375,7 @@ public class JSIndexQueryHelper
 
 		return result;
 	}
-	
+
 	/**
 	 * getProjectTypeMembers
 	 * 
@@ -340,13 +386,13 @@ public class JSIndexQueryHelper
 	public List<PropertyElement> getProjectTypeMembers(Index index, String typeName, EnumSet<ContentSelector> fields)
 	{
 		List<PropertyElement> result = new ArrayList<PropertyElement>();
-		
+
 		result.addAll(this.getProjectTypeProperties(index, typeName, fields));
 		result.addAll(this.getProjectTypeMethods(index, typeName, fields));
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getProjectTypeMethod
 	 * 
@@ -359,7 +405,7 @@ public class JSIndexQueryHelper
 	public FunctionElement getProjectTypeMethod(Index index, String typeName, String methodName, EnumSet<ContentSelector> fields)
 	{
 		FunctionElement result = null;
-		
+
 		try
 		{
 			result = this._reader.getFunction(index, typeName, methodName, fields);
@@ -368,10 +414,10 @@ public class JSIndexQueryHelper
 		{
 			Activator.logError(e.getMessage(), e);
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getProjectTypeMethods
 	 * 
@@ -382,18 +428,7 @@ public class JSIndexQueryHelper
 	 */
 	public List<FunctionElement> getProjectTypeMethods(Index index, String typeName, EnumSet<ContentSelector> fields)
 	{
-		List<FunctionElement> result = null;
-		
-		try
-		{
-			result = this._reader.getFunctions(index, typeName, fields);
-		}
-		catch (IOException e)
-		{
-			Activator.logError(e.getMessage(), e);
-		}
-		
-		return result;
+		return this.getFunctions(index, typeName, fields);
 	}
 
 	/**
@@ -406,20 +441,9 @@ public class JSIndexQueryHelper
 	 */
 	public List<PropertyElement> getProjectTypeProperties(Index index, String typeName, EnumSet<ContentSelector> fields)
 	{
-		List<PropertyElement> result = null;
-		
-		try
-		{
-			result = this._reader.getProperties(index, typeName, fields);
-		}
-		catch (IOException e)
-		{
-			Activator.logError(e.getMessage(), e);
-		}
-		
-		return result;
+		return this.getProperties(index, typeName, fields);
 	}
-	
+
 	/**
 	 * getProjectTypeProperty
 	 * 
@@ -432,7 +456,7 @@ public class JSIndexQueryHelper
 	public PropertyElement getProjectTypeProperty(Index index, String typeName, String propertyName, EnumSet<ContentSelector> fields)
 	{
 		PropertyElement result = null;
-		
+
 		try
 		{
 			result = this._reader.getProperty(index, typeName, propertyName, fields);
@@ -441,7 +465,49 @@ public class JSIndexQueryHelper
 		{
 			Activator.logError(e.getMessage(), e);
 		}
-		
+
+		return result;
+	}
+
+	/**
+	 * getProperties
+	 * 
+	 * @param index
+	 * @param typeName
+	 * @param fields
+	 * @return
+	 */
+	private List<PropertyElement> getProperties(Index index, String typeName, EnumSet<ContentSelector> fields)
+	{
+		List<PropertyElement> result = null;
+
+		try
+		{
+			result = this._reader.getProperties(index, typeName, fields);
+
+			// possibly include ancestor types
+			if (fields.contains(ContentSelector.INCLUDE_ANCESTORS))
+			{
+				// NOTE: Using LinkedList since it implements Queue<T>
+				LinkedList<String> types = new LinkedList<String>();
+
+				this.addParentTypes(types, index, typeName);
+
+				while (types.isEmpty() == false)
+				{
+					String currentType = types.remove();
+
+					result.addAll(this.getTypeProperties(index, currentType, fields));
+
+					this.addParentTypes(types, index, currentType);
+				}
+			}
+		}
+		catch (IOException e)
+		{
+			Activator.logError(e.getMessage(), e);
+		}
+
 		return result;
 	}
 
@@ -477,15 +543,15 @@ public class JSIndexQueryHelper
 	public PropertyElement getTypeMember(Index index, String typeName, String memberName, EnumSet<ContentSelector> fields)
 	{
 		PropertyElement result = this.getProjectTypeMember(index, typeName, memberName, fields);
-		
+
 		if (result == null)
 		{
 			result = this.getCoreTypeMember(typeName, memberName, fields);
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getTypeMembers
 	 * 
@@ -497,13 +563,13 @@ public class JSIndexQueryHelper
 	public List<PropertyElement> getTypeMembers(Index index, String typeName, EnumSet<ContentSelector> fields)
 	{
 		List<PropertyElement> result = new ArrayList<PropertyElement>();
-		
+
 		result.addAll(this.getCoreTypeMembers(typeName, fields));
 		result.addAll(this.getProjectTypeMembers(index, typeName, fields));
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getTypeMethod
 	 * 
@@ -516,12 +582,12 @@ public class JSIndexQueryHelper
 	public FunctionElement getTypeMethod(Index index, String typeName, String methodName, EnumSet<ContentSelector> fields)
 	{
 		FunctionElement result = this.getProjectTypeMethod(index, typeName, methodName, fields);
-		
+
 		if (result == null)
 		{
 			result = this.getCoreTypeMethod(typeName, methodName, fields);
 		}
-		
+
 		return result;
 	}
 
@@ -535,12 +601,10 @@ public class JSIndexQueryHelper
 	 */
 	public List<FunctionElement> getTypeMethods(Index index, String typeName, EnumSet<ContentSelector> fields)
 	{
-		List<FunctionElement> result = this.getProjectTypeMethods(index, typeName, fields);
+		List<FunctionElement> result = new ArrayList<FunctionElement>();
 
-		if (result == null)
-		{
-			result = this.getCoreTypeMethods(typeName, fields);
-		}
+		result.addAll(this.getProjectTypeMethods(index, typeName, fields));
+		result.addAll(this.getCoreTypeMethods(typeName, fields));
 
 		return result;
 	}
@@ -555,12 +619,10 @@ public class JSIndexQueryHelper
 	 */
 	public List<PropertyElement> getTypeProperties(Index index, String typeName, EnumSet<ContentSelector> fields)
 	{
-		List<PropertyElement> result = this.getProjectTypeProperties(index, typeName, fields);
+		List<PropertyElement> result = new ArrayList<PropertyElement>();
 
-		if (result == null)
-		{
-			result = this.getCoreTypeProperties(typeName, fields);
-		}
+		result.addAll(this.getProjectTypeProperties(index, typeName, fields));
+		result.addAll(this.getCoreTypeProperties(typeName, fields));
 
 		return result;
 	}
