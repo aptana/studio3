@@ -1,20 +1,34 @@
 package com.aptana.editor.js.contentassist.model;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BaseElement
 {
 	private String _name;
 	private String _description;
-	private List<UserAgentElement> _userAgents = new LinkedList<UserAgentElement>();
-	private List<SinceElement> _sinceList = new LinkedList<SinceElement>();
+	private List<UserAgentElement> _userAgents = new ArrayList<UserAgentElement>();
+	private List<SinceElement> _sinceList = new ArrayList<SinceElement>();
+	private List<String> _documents = new ArrayList<String>();
 	
 	/**
 	 * BaseElement
 	 */
 	public BaseElement()
 	{
+	}
+	
+	/**
+	 * addDocument
+	 * 
+	 * @param document
+	 */
+	public void addDocument(String document)
+	{
+		if (document != null && document.length() > 0)
+		{
+			this._documents.add(document);
+		}
 	}
 	
 	/**
@@ -48,6 +62,16 @@ public class BaseElement
 	}
 	
 	/**
+	 * getDocuments
+	 * 
+	 * @return
+	 */
+	public List<String> getDocuments()
+	{
+		return this._documents;
+	}
+	
+	/**
 	 * getName
 	 * 
 	 * @return
@@ -62,9 +86,9 @@ public class BaseElement
 	 * 
 	 * @return
 	 */
-	public SinceElement[] getSinceList()
+	public List<SinceElement> getSinceList()
 	{
-		return this._sinceList.toArray(new SinceElement[this._sinceList.size()]);
+		return this._sinceList;
 	}
 	
 	/**
