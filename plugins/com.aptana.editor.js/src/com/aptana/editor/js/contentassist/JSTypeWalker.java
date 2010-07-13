@@ -1,5 +1,6 @@
 package com.aptana.editor.js.contentassist;
 
+import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,9 +15,11 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.common.contentassist.UserAgentManager.UserAgent;
 import com.aptana.editor.js.JSTypes;
+import com.aptana.editor.js.contentassist.index.JSIndexWriter;
 import com.aptana.editor.js.contentassist.model.BaseElement;
 import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
+import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
@@ -46,6 +49,13 @@ import com.aptana.editor.js.parsing.ast.JSReturnNode;
 import com.aptana.editor.js.parsing.ast.JSStringNode;
 import com.aptana.editor.js.parsing.ast.JSTreeWalker;
 import com.aptana.editor.js.parsing.ast.JSTrueNode;
+import com.aptana.editor.js.sdoc.model.DocumentationBlock;
+import com.aptana.editor.js.sdoc.model.ParamTag;
+import com.aptana.editor.js.sdoc.model.ReturnTag;
+import com.aptana.editor.js.sdoc.model.Tag;
+import com.aptana.editor.js.sdoc.model.TagType;
+import com.aptana.editor.js.sdoc.model.Type;
+import com.aptana.editor.js.sdoc.model.TypeTag;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.Scope;
 import com.aptana.parsing.ast.IParseNode;
@@ -63,7 +73,7 @@ public class JSTypeWalker extends JSTreeWalker
 	/**
 	 * clearTypeCache
 	 */
-	public static void clearTypeCache()
+	protected static void clearTypeCache()
 	{
 		if (NODE_TYPE_CACHE != null)
 		{
@@ -177,6 +187,86 @@ public class JSTypeWalker extends JSTreeWalker
 		}
 	}
 
+	/**
+	 * applyDocumentation
+	 * 
+	 * @param function
+	 * @param block
+	 */
+	protected static void applyDocumentation(FunctionElement function, DocumentationBlock block)
+	{
+		if (block != null)
+		{
+			// apply description
+			function.setDescription(block.getText());
+			
+			// apply parameters
+			for (Tag tag : block.getTags(TagType.PARAM))
+			{
+				ParamTag paramTag = (ParamTag) tag;
+				ParameterElement parameter = new ParameterElement();
+				
+				parameter.setName(paramTag.getName());
+				parameter.setDescription(paramTag.getText());
+				parameter.setUsage(paramTag.getUsage().getName());
+				
+				for (Type type : paramTag.getTypes())
+				{
+					parameter.addType(type.toSource());
+				}
+				
+				function.addParameter(parameter);
+			}
+			
+			// apply return types
+			for (Tag tag : block.getTags(TagType.RETURN))
+			{
+				ReturnTag returnTag = (ReturnTag) tag;
+				
+				for (Type type : returnTag.getTypes())
+				{
+					ReturnTypeElement returnType = new ReturnTypeElement();
+					
+					returnType.setType(type.toSource());
+					returnType.setDescription(returnTag.getText());
+					
+					function.addReturnType(returnType);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * applyDocumentation
+	 * 
+	 * @param property
+	 * @param block
+	 */
+	protected static void applyDocumentation(PropertyElement property, DocumentationBlock block)
+	{
+		if (block != null)
+		{
+			// apply description
+			property.setDescription(block.getText());
+			
+			// apply types
+			for (Tag tag : block.getTags(TagType.TYPE))
+			{
+				TypeTag typeTag = (TypeTag) tag;
+				
+				for (Type type : typeTag.getTypes())
+				{
+					ReturnTypeElement returnType = new ReturnTypeElement();
+					
+					returnType.setType(type.toSource());
+					returnType.setDescription(typeTag.getText());
+					
+					property.addType(returnType);
+				}
+			}
+		}
+	}
+	
 	/**
 	 * getActiveScope
 	 * 
@@ -430,6 +520,90 @@ public class JSTypeWalker extends JSTreeWalker
 		return result;
 	}
 
+	/**
+	 * getScopeProperties
+	 * 
+	 * @param scope
+	 * @param index
+	 * @param location
+	 * @return
+	 */
+	public static List<PropertyElement> getScopeProperties(Scope<JSNode> scope, Index index, URI location)
+	{
+		clearTypeCache();
+		
+		List<PropertyElement> properties = new ArrayList<PropertyElement>();
+		
+		for (String symbol : scope.getLocalSymbolNames())
+		{
+			List<JSNode> nodes = scope.getSymbol(symbol);
+
+			if (nodes != null && nodes.size() > 0)
+			{
+				// TODO: We may want to process all nodes and potentially
+				// create a new type that is the union of all types. For
+				// now last definition wins.
+				JSNode node = nodes.get(nodes.size() - 1);
+				
+				if (node instanceof JSFunctionNode)
+				{
+					FunctionElement function = new FunctionElement();
+					
+					function.setName(symbol);
+					
+					applyDocumentation(function, node.getDocumentation());
+					
+					properties.add(function);
+				}
+				else
+				{
+					PropertyElement property = new PropertyElement();
+					DocumentationBlock block = node.getDocumentation();
+					
+					property.setName(symbol);
+					
+					if (block != null)
+					{
+						applyDocumentation(property, node.getDocumentation());
+					}
+					else
+					{
+						JSTypeWalker walker = new JSTypeWalker(scope, index);
+						
+						node.accept(walker);
+						
+						List<TypeElement> generatedTypes = walker.getGeneratedTypes();
+						
+						if (generatedTypes.isEmpty() == false)
+						{
+							JSIndexWriter writer = new JSIndexWriter();
+							
+							// write out any generated types
+							for (TypeElement type : walker.getGeneratedTypes())
+							{
+								writer.writeType(index, type, location);
+							}
+						}
+						
+						// add property types
+						for (String propertyType : walker.getTypes())
+						{
+							ReturnTypeElement returnType = new ReturnTypeElement();
+							
+							returnType.setType(propertyType);
+							
+							property.addType(returnType);
+						}
+					}
+					
+					properties.add(property);
+				}
+			}
+		}
+		
+		return properties;
+	}
+	
 	/**
 	 * putTypeElement
 	 * 
@@ -853,7 +1027,7 @@ public class JSTypeWalker extends JSTreeWalker
 				// temporary container to collect properties and their value
 				// sub-trees so we can infer property types after we have all
 				// of the object's properties
-				Map<PropertyElement,IParseNode> propertyNodeMap = new LinkedHashMap<PropertyElement,IParseNode>();
+				Map<PropertyElement,JSNode> propertyNodeMap = new LinkedHashMap<PropertyElement,JSNode>();
 
 				for (IParseNode child : node)
 				{
@@ -862,20 +1036,24 @@ public class JSTypeWalker extends JSTreeWalker
 						JSNameValuePairNode nameValue = (JSNameValuePairNode) child;
 						IParseNode nameNode = nameValue.getName();
 						IParseNode valueNode = nameValue.getValue();
-						PropertyElement property = (valueNode instanceof JSFunctionNode) ? new FunctionElement() : new PropertyElement();
-						String name = nameNode.getText();
-
-						// trim off leading and trailing quotes, if necessary
-						property.setName((nameNode instanceof JSStringNode) ? name.substring(1, name.length() - 1) : name);
 						
-						// make valid in all user agents
-						this.addUserAgents(property);
-
-						newType.addProperty(property);
-						
-						// save property value for inferencing after all
-						// properties have been collected
-						propertyNodeMap.put(property, valueNode);
+						if (valueNode instanceof JSNode)
+						{
+							PropertyElement property = (valueNode instanceof JSFunctionNode) ? new FunctionElement() : new PropertyElement();
+							String name = nameNode.getText();
+	
+							// trim off leading and trailing quotes, if necessary
+							property.setName((nameNode instanceof JSStringNode) ? name.substring(1, name.length() - 1) : name);
+							
+							// make valid in all user agents
+							this.addUserAgents(property);
+	
+							newType.addProperty(property);
+							
+							// save property value for inferencing after all
+							// properties have been collected
+							propertyNodeMap.put(property, (JSNode) valueNode);
+						}
 					}
 				}
 				
@@ -888,34 +1066,51 @@ public class JSTypeWalker extends JSTreeWalker
 				this.addGeneratedType(newType);
 				
 				// now infer the property types
-				for (Map.Entry<PropertyElement, IParseNode> entry : propertyNodeMap.entrySet())
+				for (Map.Entry<PropertyElement, JSNode> entry : propertyNodeMap.entrySet())
 				{
 					PropertyElement property = entry.getKey();
-					IParseNode valueNode = entry.getValue();
+					JSNode valueNode = entry.getValue();
+					DocumentationBlock docs = valueNode.getDocumentation();
 					
-					for (String valueType : this.getTypes(valueNode))
+					if (docs != null)
 					{
-						// process potential function signatures
-						int index = valueType.indexOf(':');
-							
-						if (index != -1)
+						// get type from the docs
+						if (property instanceof FunctionElement)
 						{
-							for (String returnTypeName : valueType.substring(index + 1).split(",")) //$NON-NLS-1$
-							{
-								ReturnTypeElement returnType = new ReturnTypeElement();
-								
-								returnType.setType(returnTypeName);
-		
-								property.addType(returnType);
-							}
+							applyDocumentation((FunctionElement) property, docs);
 						}
 						else
 						{
-							ReturnTypeElement returnType = new ReturnTypeElement();
-	
-							returnType.setType(valueType);
-	
-							property.addType(returnType);
+							applyDocumentation(property, docs);
+						}
+					}
+					else
+					{
+						// infer the type
+						for (String valueType : this.getTypes(valueNode))
+						{
+							// process potential function signatures
+							int index = valueType.indexOf(':');
+								
+							if (index != -1)
+							{
+								for (String returnTypeName : valueType.substring(index + 1).split(",")) //$NON-NLS-1$
+								{
+									ReturnTypeElement returnType = new ReturnTypeElement();
+									
+									returnType.setType(returnTypeName);
+			
+									property.addType(returnType);
+								}
+							}
+							else
+							{
+								ReturnTypeElement returnType = new ReturnTypeElement();
+		
+								returnType.setType(valueType);
+		
+								property.addType(returnType);
+							}
 						}
 					}
 				}

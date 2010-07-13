@@ -1,7 +1,6 @@
 package com.aptana.editor.js.contentassist.index;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
@@ -14,22 +13,11 @@ import com.aptana.core.util.IOUtil;
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.contentassist.JSSymbolCollector;
 import com.aptana.editor.js.contentassist.JSTypeWalker;
-import com.aptana.editor.js.contentassist.model.FunctionElement;
-import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
-import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.parsing.IJSParserConstants;
-import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
-import com.aptana.editor.js.sdoc.model.DocumentationBlock;
-import com.aptana.editor.js.sdoc.model.ParamTag;
-import com.aptana.editor.js.sdoc.model.ReturnTag;
-import com.aptana.editor.js.sdoc.model.Tag;
-import com.aptana.editor.js.sdoc.model.TagType;
-import com.aptana.editor.js.sdoc.model.Type;
-import com.aptana.editor.js.sdoc.model.TypeTag;
 import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.IParser;
@@ -49,86 +37,6 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 	public JSFileIndexingParticipant()
 	{
 		this._indexWriter = new JSIndexWriter();
-	}
-	
-	/**
-	 * applyDocumentation
-	 * 
-	 * @param function
-	 * @param block
-	 */
-	protected void applyDocumentation(FunctionElement function, DocumentationBlock block)
-	{
-		if (block != null)
-		{
-			// apply description
-			function.setDescription(block.getText());
-			
-			// apply parameters
-			for (Tag tag : block.getTags(TagType.PARAM))
-			{
-				ParamTag paramTag = (ParamTag) tag;
-				ParameterElement parameter = new ParameterElement();
-				
-				parameter.setName(paramTag.getName());
-				parameter.setDescription(paramTag.getText());
-				parameter.setUsage(paramTag.getUsage().getName());
-				
-				for (Type type : paramTag.getTypes())
-				{
-					parameter.addType(type.toSource());
-				}
-				
-				function.addParameter(parameter);
-			}
-			
-			// apply return types
-			for (Tag tag : block.getTags(TagType.RETURN))
-			{
-				ReturnTag returnTag = (ReturnTag) tag;
-				
-				for (Type type : returnTag.getTypes())
-				{
-					ReturnTypeElement returnType = new ReturnTypeElement();
-					
-					returnType.setType(type.toSource());
-					returnType.setDescription(returnTag.getText());
-					
-					function.addReturnType(returnType);
-				}
-			}
-		}
-	}
-	
-	/**
-	 * applyDocumentation
-	 * 
-	 * @param property
-	 * @param block
-	 */
-	protected void applyDocumentation(PropertyElement property, DocumentationBlock block)
-	{
-		if (block != null)
-		{
-			// apply description
-			property.setDescription(block.getText());
-			
-			// apply types
-			for (Tag tag : block.getTags(TagType.TYPE))
-			{
-				TypeTag typeTag = (TypeTag) tag;
-				
-				for (Type type : typeTag.getTypes())
-				{
-					ReturnTypeElement returnType = new ReturnTypeElement();
-					
-					returnType.setType(type.toSource());
-					returnType.setDescription(typeTag.getText());
-					
-					property.addType(returnType);
-				}
-			}
-		}
 	}
 	
 	/**
@@ -234,105 +142,28 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 	private void processParseResults(Index index, IFileStore file, IParseNode ast)
 	{
 		URI location = file.toURI();
-		TypeElement type = this.createGlobalType(index, location, ast);
+		Scope<JSNode> globals = this.getGlobals(ast);
 		
-		if (type != null)
+		if (globals != null)
 		{
+			TypeElement type = new TypeElement();
+			
+			// set type
+			type.setName("Window"); //$NON-NLS-1$
+			
+			// add properties
+			for (PropertyElement property : JSTypeWalker.getScopeProperties(globals, index, location))
+			{
+				type.addProperty(property);
+			}
+			
 			this._indexWriter.writeType(index, type, location);
-		}
-		
-		Scope<JSNode> globals = this.getGlobals(ast);
-		
-		if (globals != null)
-		{
-			for (JSNode assignment : globals.getAssignments())
-			{
-				
-			}
-		}
-	}
-	
-	/**
-	 * createGlobalType
-	 * @param index
-	 * @param ast
-	 * 
-	 * @return
-	 */
-	private TypeElement createGlobalType(Index index, URI location, IParseNode ast)
-	{
-		TypeElement result = null;
-		Scope<JSNode> globals = this.getGlobals(ast);
-		
-		JSTypeWalker.clearTypeCache();
-
-		if (globals != null)
-		{
-			result = new TypeElement();
 			
-			result.setName("Window"); //$NON-NLS-1$
-			
-			for (String symbol : globals.getLocalSymbolNames())
-			{
-				List<JSNode> nodes = globals.getSymbol(symbol);
-
-				if (nodes != null && nodes.size() > 0)
-				{
-					// TODO: We may want to process all nodes and potentially
-					// create a new type that is the union of all types. For
-					// now we grab the last definition
-					JSNode node = nodes.get(nodes.size() - 1);
-					
-					if (node instanceof JSFunctionNode)
-					{
-						FunctionElement function = new FunctionElement();
-						
-						function.setName(symbol);
-						
-						this.applyDocumentation(function, node.getDocumentation());
-						
-						result.addProperty(function);
-					}
-					else
-					{
-						PropertyElement property = new PropertyElement();
-						DocumentationBlock block = node.getDocumentation();
-						
-						property.setName(symbol);
-						
-						if (block != null)
-						{
-							this.applyDocumentation(property, node.getDocumentation());
-						}
-						else
-						{
-							JSTypeWalker walker = new JSTypeWalker(globals, index);
-							
-							node.accept(walker);
-							
-							// write out any generated types
-							for (TypeElement type : walker.getGeneratedTypes())
-							{
-								this._indexWriter.writeType(index, type, location);
-							}
-							
-							// add property types
-							for (String propertyType : walker.getTypes())
-							{
-								ReturnTypeElement returnType = new ReturnTypeElement();
-								
-								returnType.setType(propertyType);
-								
-								property.addType(returnType);
-							}
-						}
-						
-						result.addProperty(property);
-					}
-				}
-			}
+			// TODO: process assignments
+//			for (JSNode assignment : globals.getAssignments())
+//			{
+//				
+//			}
 		}
-		
-		return result;
 	}
 }
