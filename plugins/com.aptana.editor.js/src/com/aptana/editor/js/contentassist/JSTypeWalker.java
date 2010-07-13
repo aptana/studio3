@@ -320,13 +320,6 @@ public class JSTypeWalker extends JSTreeWalker
 			else if (type.startsWith(GENERIC_ARRAY_OPEN) && type.endsWith(GENERIC_ARRAY_CLOSE))
 			{
 				result = type.substring(GENERIC_ARRAY_OPEN.length(), type.length() - 1);
-
-				// TODO: handle generalized nesting like Array<Array<String>>. Just return
-				// ARRAY type for now
-				if (result.startsWith(JSTypes.ARRAY))
-				{
-					result = JSTypes.ARRAY;
-				}
 			}
 			else if (type.equals(JSTypes.ARRAY))
 			{
