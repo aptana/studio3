@@ -494,11 +494,23 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected Scope<JSNode> getGlobalScope()
 	{
-		if (this._globals == null)
+		if (this._globals == null && this._targetNode != null)
 		{
-			IParseNode root = this.getAST();
+			IParseNode root = this._targetNode;
 			
-			if (root instanceof JSParseRootNode)
+			while (root != null)
+			{
+				if (root instanceof JSParseRootNode)
+				{
+					break;
+				}
+				else
+				{
+					root = root.getParent();
+				}
+			}
+			
+			if (root != null)
 			{
 				JSSymbolCollector s = new JSSymbolCollector();
 				
