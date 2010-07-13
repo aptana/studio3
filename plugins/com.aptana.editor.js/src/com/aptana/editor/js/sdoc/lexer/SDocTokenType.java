@@ -18,39 +18,40 @@ public enum SDocTokenType
 	ERROR,				// 9
 	FUNCTION,			// 10
 	ARRAY,				// 11
-	COMMA,				// 12
-	PIPE,				// 13
-	RPAREN,				// 14
-	LPAREN,				// 15
-	CLASS_DESCRIPTION,	// 16
-	EXCEPTION,			// 17
-	EXTENDS,			// 18
-	NAMESPACE,			// 19
-	PARAM,				// 20
-	PROPERTY,			// 21
-	RETURN,				// 22
-	TYPE,				// 23
-	ADVANCED,			// 24
-	ALIAS,				// 25
-	AUTHOR,				// 26
-	CONSTRUCTOR,		// 27
-	EXAMPLE,			// 28
-	INTERNAL,			// 29
-	METHOD,				// 30
-	OVERVIEW,			// 31
-	PRIVATE,			// 32
-	SEE,				// 33
-	UNKNOWN,			// 34
-	END_DOCUMENTATION,	// 35
-	ARROW,				// 36
-	ELLIPSIS,			// 37
+	CLASS,				// 12
+	COMMA,				// 13
+	PIPE,				// 14
+	RPAREN,				// 15
+	LPAREN,				// 16
+	CLASS_DESCRIPTION,	// 17
+	EXCEPTION,			// 18
+	EXTENDS,			// 19
+	NAMESPACE,			// 20
+	PARAM,				// 21
+	PROPERTY,			// 22
+	RETURN,				// 23
+	TYPE,				// 24
+	ADVANCED,			// 25
+	ALIAS,				// 26
+	AUTHOR,				// 27
+	CONSTRUCTOR,		// 28
+	EXAMPLE,			// 29
+	INTERNAL,			// 30
+	METHOD,				// 31
+	OVERVIEW,			// 32
+	PRIVATE,			// 33
+	SEE,				// 34
+	UNKNOWN,			// 35
+	END_DOCUMENTATION,	// 36
+	ARROW,				// 37
 	LESS_THAN,			// 38
 	GREATER_THAN,		// 39
-	START_DOCUMENTATION,// 40
+	ELLIPSIS,			// 40
+	START_DOCUMENTATION,// 41
 	
-	WHITESPACE,			// 41
-	TYPES,				// 42
-	VALUE;				// 43
+	WHITESPACE,			// 42
+	TYPES,				// 43
+	VALUE;				// 44
 	
 	private short _index;
 

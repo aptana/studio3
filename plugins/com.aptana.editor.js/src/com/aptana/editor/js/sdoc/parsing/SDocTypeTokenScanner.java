@@ -138,6 +138,7 @@ public class SDocTypeTokenScanner extends RuleBasedScanner
 		WordRule keywordRules = new WordRule(new IdentifierDetector(), getToken(SDocTokenType.IDENTIFIER));
 		keywordRules.addWord("Array", getToken(SDocTokenType.ARRAY)); //$NON-NLS-1$
 		keywordRules.addWord("Function", getToken(SDocTokenType.FUNCTION)); //$NON-NLS-1$
+		keywordRules.addWord("Class", getToken(SDocTokenType.CLASS)); //$NON-NLS-1$
 		rules.add(keywordRules);
 
 		this.setDefaultReturnToken(getToken(SDocTokenType.ERROR));
