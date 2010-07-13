@@ -195,7 +195,7 @@ public class JSIndexReader
 		{
 			// grab description
 			String descriptionPattern = descriptionKey + JSIndexConstants.DELIMITER;
-			List<QueryResult> descriptions = index.query(new String[] { JSIndexConstants.DESCRIPTION }, descriptionPattern, SearchPattern.PREFIX_MATCH);
+			List<QueryResult> descriptions = index.query(new String[] { JSIndexConstants.DESCRIPTION }, descriptionPattern, SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
 	
 			if (descriptions != null)
 			{
@@ -305,7 +305,7 @@ public class JSIndexReader
 		if (index != null)
 		{
 			String descriptionPattern = parametersKey + JSIndexConstants.DELIMITER;
-			List<QueryResult> parameters = index.query(new String[] { JSIndexConstants.PARAMETERS }, descriptionPattern, SearchPattern.PREFIX_MATCH);
+			List<QueryResult> parameters = index.query(new String[] { JSIndexConstants.PARAMETERS }, descriptionPattern, SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
 	
 			if (parameters != null && parameters.size() > 0)
 			{
@@ -408,7 +408,7 @@ public class JSIndexReader
 		if (index != null)
 		{
 			String descriptionPattern = returnTypesKey + JSIndexConstants.DELIMITER;
-			List<QueryResult> returnTypes = index.query(new String[] { JSIndexConstants.RETURN_TYPES }, descriptionPattern, SearchPattern.PREFIX_MATCH);
+			List<QueryResult> returnTypes = index.query(new String[] { JSIndexConstants.RETURN_TYPES }, descriptionPattern, SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
 	
 			if (returnTypes != null && returnTypes.size() > 0)
 			{
