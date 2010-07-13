@@ -4,6 +4,7 @@ public class JSTypes
 {
 	public static final String ARRAY = "Array"; //$NON-NLS-1$
 	public static final String BOOLEAN = "Boolean"; //$NON-NLS-1$
+	public static final String CLASS = "Class"; //$NON-NLS-1$
 	public static final String FUNCTION = "Function"; //$NON-NLS-1$
 	public static final String NUMBER = "Number"; //$NON-NLS-1$
 	public static final String OBJECT = "Object"; //$NON-NLS-1$
