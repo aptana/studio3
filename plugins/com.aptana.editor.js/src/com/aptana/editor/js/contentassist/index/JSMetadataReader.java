@@ -535,6 +535,14 @@ public class JSMetadataReader extends ValidatingReader
 		{
 			this._currentFunction.addSince(since);
 		}
+		else if (this._currentProperty != null)
+		{
+			this._currentProperty.addSince(since);
+		}
+		else if (this._currentType != null)
+		{
+			this._currentType.addSince(since);
+		}
 	}
 
 	/**
