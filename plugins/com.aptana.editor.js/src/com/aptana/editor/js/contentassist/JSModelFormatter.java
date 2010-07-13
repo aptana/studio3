@@ -9,6 +9,7 @@ import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
+import com.aptana.editor.js.contentassist.model.SinceElement;
 
 public class JSModelFormatter
 {
@@ -124,6 +125,30 @@ public class JSModelFormatter
 	}
 
 	/**
+	 * addSpecifications
+	 * 
+	 * @param buffer
+	 * @param property
+	 */
+	protected static void addSpecifications(StringBuilder buffer, PropertyElement property)
+	{
+		List<SinceElement> sinceList = property.getSinceList();
+		
+		if (sinceList != null && sinceList.isEmpty() == false)
+		{
+			buffer.append("<br><br>");
+			buffer.append("Specifications:");
+			buffer.append("<br>");
+			
+			for (SinceElement since : property.getSinceList())
+			{
+				buffer.append(since.getName()).append(" ").append(since.getVersion());
+				buffer.append("<br>");
+			}
+		}
+	}
+	
+	/**
 	 * formatFunction
 	 * 
 	 * @param function
@@ -180,6 +205,7 @@ public class JSModelFormatter
 		addReturnTypes(buffer, function.getReturnTypes(), "void"); //$NON-NLS-1$
 		addDescription(buffer, function);
 		addDefiningFiles(buffer, function, projectURI);
+		addSpecifications(buffer, function);
 
 		return buffer.toString();
 	}
@@ -206,6 +232,7 @@ public class JSModelFormatter
 		addReturnTypes(buffer, property.getTypes(), "undefined"); //$NON-NLS-1$
 		addDescription(buffer, property);
 		addDefiningFiles(buffer, property, projectURI);
+		addSpecifications(buffer, property);
 
 		return buffer.toString();
 	}
