@@ -24,6 +24,7 @@ import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSTypes;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
@@ -202,7 +203,18 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					// add all properties of each type to our proposal list
 					for (String type : typeList)
 					{
-						this.addTypeProperties(proposals, type, offset);
+						if (type.startsWith("Function:"))
+						{
+							this.addTypeProperties(proposals, JSTypes.FUNCTION, offset);
+						}
+						else if (type.startsWith("Array<"))
+						{
+							this.addTypeProperties(proposals, JSTypes.ARRAY, offset);
+						}
+						else
+						{
+							this.addTypeProperties(proposals, type, offset);
+						}
 					}
 				}
 				else
