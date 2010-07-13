@@ -38,7 +38,10 @@ public class BaseElement
 	 */
 	public void addSince(SinceElement since)
 	{
-		this._sinceList.add(since);
+		if (since != null)
+		{
+			this._sinceList.add(since);
+		}
 	}
 	
 	/**
@@ -48,7 +51,10 @@ public class BaseElement
 	 */
 	public void addUserAgent(UserAgentElement userAgent)
 	{
-		this._userAgents.add(userAgent);
+		if (userAgent != null)
+		{
+			this._userAgents.add(userAgent);
+		}
 	}
 	
 	/**
@@ -125,7 +131,10 @@ public class BaseElement
 	 */
 	public void setDescription(String description)
 	{
-		this._description = description;
+		if (description != null)
+		{
+			this._description = description;
+		}
 	}
 	
 	/**
@@ -135,6 +144,9 @@ public class BaseElement
 	 */
 	public void setName(String name)
 	{
-		this._name = name;
+		if (name != null)
+		{
+			this._name = name;
+		}
 	}
 }
