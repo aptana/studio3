@@ -195,7 +195,7 @@ public class JSTypeWalker extends JSTreeWalker
 			}
 			else if (type.startsWith(GENERIC_ARRAY_OPEN) && type.endsWith(GENERIC_ARRAY_CLOSE))
 			{
-				result = type.substring(GENERIC_ARRAY_OPEN.length() + 1, type.length() - 1);
+				result = type.substring(GENERIC_ARRAY_OPEN.length(), type.length() - 1);
 
 				// TODO: handle generalized nesting like Array<Array<String>>. Just return
 				// ARRAY type for now
@@ -417,7 +417,17 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSArrayNode node)
 	{
-		this.addType(JSTypes.ARRAY);
+		if (node.hasChildren() == false)
+		{
+			this.addType(JSTypes.ARRAY);
+		}
+		else
+		{
+			for (String type : this.getTypes(node.getFirstChild()))
+			{
+				this.addType(GENERIC_ARRAY_OPEN + type + GENERIC_ARRAY_CLOSE);
+			}
+		}
 	}
 
 	/*
@@ -604,53 +614,16 @@ public class JSTypeWalker extends JSTreeWalker
 
 		if (lhs instanceof JSNode)
 		{
-			IParseNode rhs = node.getRightHandSide();
-			String memberName = rhs.getText();
-
 			for (String typeName : this.getTypes(lhs))
 			{
-				// lookup up rhs name in type and add that value's type here
-				PropertyElement property = this._indexHelper.getTypeMember(this._index, typeName, memberName, EnumSet.of(ContentSelector.RETURN_TYPES, ContentSelector.TYPES));
+				String typeString = this.getElementType(typeName);
 				
-				if (property == null)
+				if (typeString != null)
 				{
-					TypeElement type = this.getGeneratedType(typeName);
-					
-					if (type != null)
-					{
-						property = type.getProperty(memberName);
-					}
-				}
-				
-				if (property != null)
-				{
-					ReturnTypeElement[] returnTypes = property.getTypes();
-
-					if (returnTypes != null && returnTypes.length > 0)
-					{
-						for (ReturnTypeElement returnType : property.getTypes())
-						{
-							String typeString = this.getElementType(returnType.getType());
-
-							if (typeString != null)
-							{
-								this.addType(typeString);
-							}
-							else
-							{
-								this.addType(JSTypes.OBJECT);
-							}
-						}
-					}
-					else
-					{
-						// couldn't find a return type, so default to "Object"
-						this.addType(JSTypes.OBJECT);
-					}
+					this.addType(typeString);
 				}
 				else
 				{
-					// couldn't find a property, so default to at least "Object"
 					this.addType(JSTypes.OBJECT);
 				}
 			}
