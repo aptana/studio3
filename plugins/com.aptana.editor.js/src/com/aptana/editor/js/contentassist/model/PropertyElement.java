@@ -1,6 +1,6 @@
 package com.aptana.editor.js.contentassist.model;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PropertyElement extends BaseElement
@@ -9,7 +9,7 @@ public class PropertyElement extends BaseElement
 	private boolean _isInstanceProperty;
 	private boolean _isClassProperty;
 	private boolean _isInternal;
-	private List<ReturnTypeElement> _types = new LinkedList<ReturnTypeElement>();
+	private List<ReturnTypeElement> _types = new ArrayList<ReturnTypeElement>();
 
 	/**
 	 * PropertyElement

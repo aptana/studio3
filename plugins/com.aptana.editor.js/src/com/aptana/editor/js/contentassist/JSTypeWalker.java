@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.UserAgentManager;
@@ -53,7 +54,6 @@ public class JSTypeWalker extends JSTreeWalker
 {
 	public static final String DYNAMIC_CLASS_PREFIX = "-dynamic-type-";
 	
-	private static int TYPE_COUNT = 0;
 	private static Map<JSNode, String> NODE_TYPE_CACHE;
 
 	private static final String ARRAY_LITERAL = "[]"; //$NON-NLS-1$
@@ -123,24 +123,6 @@ public class JSTypeWalker extends JSTreeWalker
 	}
 
 	/**
-	 * addUserAgents
-	 * 
-	 * @param element
-	 */
-	protected void addUserAgents(BaseElement element)
-	{
-		// make valid in all user agents
-		for (UserAgent userAgent : UserAgentManager.getInstance().getAllUserAgents())
-		{
-			UserAgentElement ua = new UserAgentElement();
-			
-			ua.setPlatform(userAgent.ID);
-			
-			element.addUserAgent(ua);
-		}
-	}
-	
-	/**
 	 * addType
 	 * 
 	 * @param type
@@ -160,7 +142,7 @@ public class JSTypeWalker extends JSTreeWalker
 			}
 		}
 	}
-
+	
 	/**
 	 * addTypes
 	 * 
@@ -175,6 +157,58 @@ public class JSTypeWalker extends JSTreeWalker
 				this.addType(type);
 			}
 		}
+	}
+
+	/**
+	 * addUserAgents
+	 * 
+	 * @param element
+	 */
+	protected void addUserAgents(BaseElement element)
+	{
+		// make valid in all user agents
+		for (UserAgent userAgent : UserAgentManager.getInstance().getAllUserAgents())
+		{
+			UserAgentElement ua = new UserAgentElement();
+			
+			ua.setPlatform(userAgent.ID);
+			
+			element.addUserAgent(ua);
+		}
+	}
+
+	/**
+	 * getActiveScope
+	 * 
+	 * @param offset
+	 * @return
+	 */
+	protected Scope<JSNode> getActiveScope(int offset)
+	{
+		Scope<JSNode> result = null;
+		
+		if (this._scope != null)
+		{
+			Scope<JSNode> root = this._scope;
+			
+			while (true)
+			{
+				Scope<JSNode> candidate = root.getParentScope();
+				
+				if (candidate == null)
+				{
+					break;
+				}
+				else
+				{
+					root = candidate;
+				}
+			}
+			
+			result = root.getScopeAtOffset(offset);
+		}
+		
+		return result;
 	}
 
 	/**
@@ -212,7 +246,7 @@ public class JSTypeWalker extends JSTreeWalker
 
 		return result;
 	}
-
+	
 	/**
 	 * getGeneratedType
 	 * 
@@ -234,7 +268,7 @@ public class JSTypeWalker extends JSTreeWalker
 		
 		return result;
 	}
-	
+
 	/**
 	 * getGeneratedTypes
 	 * 
@@ -365,9 +399,11 @@ public class JSTypeWalker extends JSTreeWalker
 	 */
 	private String getUniqueTypeName()
 	{
-		return MessageFormat.format("{0}{1}", DYNAMIC_CLASS_PREFIX, TYPE_COUNT++); //$NON-NLS-1$
+		UUID uuid = UUID.randomUUID();
+		
+		return MessageFormat.format("{0}{1}", DYNAMIC_CLASS_PREFIX, uuid); //$NON-NLS-1$
 	}
-
+	
 	/**
 	 * hasGeneratedType
 	 * 
@@ -393,7 +429,7 @@ public class JSTypeWalker extends JSTreeWalker
 		
 		return result;
 	}
-	
+
 	/**
 	 * putTypeElement
 	 * 
@@ -545,7 +581,7 @@ public class JSTypeWalker extends JSTreeWalker
 	{
 		this.addType(JSTypes.BOOLEAN);
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSFunctionNode)
@@ -562,7 +598,7 @@ public class JSTypeWalker extends JSTreeWalker
 			this.putNodeType(node, JSTypes.FUNCTION);
 			
 			List<String> types = new ArrayList<String>();
-			Scope<JSNode> scope = this._scope.getScopeAtOffset(node.getBody().getStartingOffset());
+			Scope<JSNode> scope = this.getActiveScope(node.getBody().getStartingOffset());
 			boolean foundReturnExpression = false;
 
 			// infer return types
@@ -847,8 +883,8 @@ public class JSTypeWalker extends JSTreeWalker
 				// avoid potential infinite recursion
 				this.putNodeType(node, newType.getName());
 				
-				// add to generated types so references can have access to the
-				// type before we finish processing
+				// add to generated types so we have easy access to the type
+				// when performing property lookups during inferencing
 				this.addGeneratedType(newType);
 				
 				// now infer the property types

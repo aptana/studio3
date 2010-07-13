@@ -1,15 +1,15 @@
 package com.aptana.editor.js.contentassist.model;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.aptana.editor.js.JSTypes;
 
 public class FunctionElement extends PropertyElement
 {
-	private List<ParameterElement> _parameters = new LinkedList<ParameterElement>();
-	private List<String> _references = new LinkedList<String>();
-	private List<ExceptionElement> _exceptions = new LinkedList<ExceptionElement>();
+	private List<ParameterElement> _parameters = new ArrayList<ParameterElement>();
+	private List<String> _references = new ArrayList<String>();
+	private List<ExceptionElement> _exceptions = new ArrayList<ExceptionElement>();
 
 	private boolean _isConstructor;
 	private boolean _isMethod;
