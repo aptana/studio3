@@ -236,6 +236,17 @@ public class JSParser extends Parser implements IParser {
 						((JSNode) varNode.getFirstChild().getLastChild()).setDocumentation(block);
 						break;
 						
+					case JSNodeTypes.IDENTIFIER:
+						IParseNode parent = node.getParent();
+						
+						if (parent instanceof JSNameValuePairNode)
+						{
+							// associate documentation with property's value
+							JSNameValuePairNode entry = (JSNameValuePairNode) parent;
+							((JSNode) entry.getValue()).setDocumentation(block);
+						}
+						break;
+						
 					default:
 						((JSNode) node).setDocumentation(block);
 						break;
