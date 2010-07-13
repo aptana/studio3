@@ -39,8 +39,19 @@ public abstract class TagWithTypes extends Tag
 
 		writer.print(" {"); //$NON-NLS-1$
 
+		boolean first = true;
+		
 		for (Type type : this._types)
 		{
+			if (first)
+			{
+				first = false;
+			}
+			else
+			{
+				writer.print(",");
+			}
+			
 			type.toSource(writer);
 		}
 
