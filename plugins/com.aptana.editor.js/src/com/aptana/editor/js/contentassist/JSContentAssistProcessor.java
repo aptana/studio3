@@ -163,11 +163,18 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		else if (this._statementNode != null)
 		{
-			IParseNode child = this._statementNode.getFirstChild();
-			
-			if (child != null && child.getNodeType() == JSNodeTypes.GET_PROPERTY)
+			if (this._statementNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
 			{
-				propertyNode = child;
+				propertyNode = this._statementNode;
+			}
+			else
+			{
+				IParseNode child = this._statementNode.getFirstChild();
+				
+				if (child != null && child.getNodeType() == JSNodeTypes.GET_PROPERTY)
+				{
+					propertyNode = child;
+				}
 			}
 		}
 		
