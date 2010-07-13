@@ -96,7 +96,6 @@ public class JSIndexWriter
 		String returnTypesKey = this.writeReturnTypes(index, function.getReturnTypes(), location);
 		String descriptionKey = this.writeDescription(index, function.getDescription(), location);
 		// SinceElement[] sinceList = function.getSinceList();
-		// UserAgentElement[] userAgents = function.getUserAgents();
 		
 		String value = StringUtil.join(
 			JSIndexConstants.DELIMITER,
