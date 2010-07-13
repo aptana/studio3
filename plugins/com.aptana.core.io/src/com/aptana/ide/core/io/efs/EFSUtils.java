@@ -53,6 +53,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 
 import com.aptana.ide.core.io.IConnectionPoint;
@@ -303,31 +304,15 @@ public final class EFSUtils
 	}
 
 	/**
-	 * Creates a sub progress monitor
-	 * 
-	 * @param monitor
-	 * @param ticks
-	 * @return
-	 */
-	private static IProgressMonitor subMonitorFor(IProgressMonitor monitor, int ticks)
-	{
-		if (monitor == null)
-		{
-			return new NullProgressMonitor();
-		}
-		if (monitor instanceof NullProgressMonitor)
-		{
-			return monitor;
-		}
-		return new SubProgressMonitor(monitor, ticks);
-	}
-
-	/**
 	 * getFiles
 	 * 
 	 * @param file
 	 * @param recurse
 	 * @param list
+	 * @param includeCloakedFiles
+	 * @param monitor the progress monitor to use for reporting progress to the user. It is the caller's responsibility
+        to call done() on the given monitor. Accepts null, indicating that no progress should be
+        reported and that the operation cannot be cancelled.
 	 * @throws CoreException
 	 */
 	private static void getFiles(IFileStore file, boolean recurse, List<IFileStore> list, boolean includeCloakedFiles,
@@ -338,39 +323,37 @@ public final class EFSUtils
 			return;
 		}
 
-		monitor = Policy.monitorFor(monitor);
-		Policy.checkCanceled(monitor);
-
+		if(monitor != null) {
+			Policy.checkCanceled(monitor);
+		}
+		
 		if (isFolder(file, monitor))
 		{
 			IFileStore[] children = file.childStores(EFS.NONE, monitor);
 			if (children != null)
 			{
-
-				IProgressMonitor subMonitor = subMonitorFor(monitor, 2);
-				subMonitor.beginTask(MessageFormat.format("Fetching children of {0}", file.getName()), children.length);
-
+				SubMonitor progress = SubMonitor.convert(monitor, children.length);		
 				boolean addingFile;
 				for (int i = 0; i < children.length; i++)
 				{
-					Policy.checkCanceled(monitor);
+					if(monitor != null) {
+						Policy.checkCanceled(monitor);
+					}
+
 					IFileStore child = children[i];
 					addingFile = false;
 					if (includeCloakedFiles || !CloakingUtils.isFileCloaked(child))
 					{
 						list.add(child);
 						addingFile = true;
-						subMonitor.worked(1);
+						progress.worked(1);
 					}
 
 					if (recurse && addingFile && isFolder(child, monitor))
 					{
-						getFiles(child, recurse, list, includeCloakedFiles, subMonitor);
+						getFiles(child, recurse, list, includeCloakedFiles, progress.newChild(1));
 					}
 				}
-
-				subMonitor.done();
-
 			}
 		}
 	}
