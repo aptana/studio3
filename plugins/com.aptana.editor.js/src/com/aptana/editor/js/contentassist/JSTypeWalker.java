@@ -911,53 +911,81 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSIdentifierNode node)
 	{
-		String name = node.getText();
-
-		// lookup in local scope
-		if (this._scope != null && this._scope.hasSymbol(name))
+		String type = this.getNodeType(node);
+		
+		if (type == null)
 		{
-			List<JSNode> symbolNodes = this._scope.getSymbol(name);
-
-			for (JSNode symbolNode : symbolNodes)
+			String name = node.getText();
+	
+			// lookup in local scope
+			if (this._scope != null && this._scope.hasSymbol(name))
 			{
-				if (symbolNode instanceof JSIdentifierNode)
+				List<JSNode> symbolNodes = this._scope.getSymbol(name);
+	
+				for (JSNode symbolNode : symbolNodes)
 				{
-					if (symbolNode.getParent().getNodeType() == JSNodeTypes.PARAMETERS)
+					if (symbolNode instanceof JSIdentifierNode)
 					{
-						// TODO: look for docs to determine type
-						// OR infer type from calls to the function
+						if (symbolNode.getParent().getNodeType() == JSNodeTypes.PARAMETERS)
+						{
+							// TODO: look for docs to determine type
+							// OR infer type from calls to the function
+						}
+						else if (symbolNode.getText().equals(name) == false)
+						{
+							((JSIdentifierNode) symbolNode).accept(this);
+						}
 					}
-					else if (symbolNode.getText().equals(name) == false)
+					else
 					{
-						((JSIdentifierNode) symbolNode).accept(this);
+						DocumentationBlock docs = symbolNode.getDocumentation();
+						
+						if (docs != null)
+						{
+							for (Tag tag : docs.getTags(TagType.TYPE))
+							{
+								TypeTag typeTag = (TypeTag) tag;
+								
+								for (Type t : typeTag.getTypes())
+								{
+									this.addType(t.getName());
+								}
+							}
+						}
+						else
+						{
+							symbolNode.accept(this);
+						}
 					}
-				}
-				else
-				{
-					symbolNode.accept(this);
 				}
 			}
+			else
+			{
+				PropertyElement property = this._indexHelper.getGlobal(this._index, name, EnumSet.of(ContentSelector.TYPES, ContentSelector.RETURN_TYPES));
+	
+				if (property != null)
+				{
+					if (property instanceof FunctionElement)
+					{
+						FunctionElement function = (FunctionElement) property;
+						
+						this.addType(function.getSignature());
+					}
+					else
+					{
+						for (ReturnTypeElement typeElement : property.getTypes())
+						{
+							this.addType(typeElement.getType());
+						}
+					}
+				}
+			}
+			
+			this.putNodeType(node, StringUtil.join(",", this.getTypes()));
 		}
 		else
 		{
-			PropertyElement property = this._indexHelper.getGlobal(this._index, name, EnumSet.of(ContentSelector.TYPES, ContentSelector.RETURN_TYPES));
-
-			if (property != null)
-			{
-				if (property instanceof FunctionElement)
-				{
-					FunctionElement function = (FunctionElement) property;
-					
-					this.addType(function.getSignature());
-				}
-				else
-				{
-					for (ReturnTypeElement typeElement : property.getTypes())
-					{
-						this.addType(typeElement.getType());
-					}
-				}
-			}
+			this.addType(type);
 		}
 	}
 	
