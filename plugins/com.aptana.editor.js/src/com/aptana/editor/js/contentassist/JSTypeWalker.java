@@ -948,7 +948,7 @@ public class JSTypeWalker extends JSTreeWalker
 								
 								for (Type t : typeTag.getTypes())
 								{
-									this.addType(t.getName());
+									this.addType(t.toSource());
 								}
 							}
 						}
