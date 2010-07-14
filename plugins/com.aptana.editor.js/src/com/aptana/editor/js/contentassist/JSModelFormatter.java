@@ -134,19 +134,27 @@ public class JSModelFormatter
 	 * @param buffer
 	 * @param property
 	 */
-	protected static void addSpecifications(StringBuilder buffer, PropertyElement property)
+	private static void addSpecifications(StringBuilder buffer, PropertyElement property)
 	{
 		List<SinceElement> sinceList = property.getSinceList();
 
 		if (sinceList != null && sinceList.isEmpty() == false)
 		{
 			buffer.append("<br><br>");
-			buffer.append("Specifications:");
+			buffer.append("<b>").append("Specifications:").append("</b>");
 			buffer.append("<br>");
 
 			for (SinceElement since : property.getSinceList())
 			{
-				buffer.append(since.getName()).append(" ").append(since.getVersion());
+				buffer.append("- ").append(since.getName());
+				
+				String version = since.getVersion();
+				
+				if (version != null && version.length() > 0)
+				{
+					buffer.append(" ").append(since.getVersion());
+				}
+				
 				buffer.append("<br>");
 			}
 		}
