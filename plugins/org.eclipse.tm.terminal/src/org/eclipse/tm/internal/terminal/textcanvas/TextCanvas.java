@@ -113,7 +113,7 @@ public class TextCanvas extends GridCanvas {
 				repaintRange(col,line,width,height);
 				for (int i = line; i < line + height; i++)
 				{
-					updateLine(line);
+					updateLine(i);
 				}
 			}
 			public void dimensionsChanged(int cols, int rows) {
