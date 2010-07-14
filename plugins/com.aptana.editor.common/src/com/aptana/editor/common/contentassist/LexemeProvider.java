@@ -97,12 +97,12 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 				int tokenLength = scanner.getTokenLength();
 				int endingOffset = tokenOffset + tokenLength;
 				String text = document.get(tokenOffset, tokenLength);
-				T type = this.getTypeFromData(data);
-				Lexeme<T> lexeme = new Lexeme<T>(type, tokenOffset, endingOffset - 1, text);
-
+				T type = null;
 				// skip tokens with null data (typically whitespace)
 				if (data != null)
 				{
+					type = this.getTypeFromData(data);
+					Lexeme<T> lexeme = new Lexeme<T>(type, tokenOffset, endingOffset - 1, text);
 					// add it to our list
 					this.addLexeme(lexeme);
 				}
@@ -113,7 +113,7 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 				{
 					if (data != null)
 					{
-						if (type.isDefined() == false)
+						if (type == null || type.isDefined() == false)
 						{
 							System.out.println("Possible missed token type for text: [" + data + "]~" + text + "~"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						}

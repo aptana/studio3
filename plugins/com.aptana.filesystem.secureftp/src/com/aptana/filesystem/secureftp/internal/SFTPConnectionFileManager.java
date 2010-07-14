@@ -90,7 +90,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 
 	protected static final int SLEEP_INTERVAL = 10; /* 10 secs */
 
-	private SSHFTPClient ftpClient;
+	private SSHFTPClientTemp ftpClient;
 	private IPath keyFilePath;
 	private String transferType;
 	private IPath cwd;
@@ -104,7 +104,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	public void init(String host, int port, IPath basePath, IPath keyFilePath, String login, char[] password, String transferType, String encoding, String compression) {
 		Assert.isTrue(ftpClient == null, Messages.SFTPConnectionFileManager_ConnectionHasBeenInitialized);
 		try {
-			ftpClient = new SSHFTPClient();
+			ftpClient = new SSHFTPClientTemp();
 			this.host = host;
 			this.port = port;
 			this.keyFilePath = keyFilePath;
