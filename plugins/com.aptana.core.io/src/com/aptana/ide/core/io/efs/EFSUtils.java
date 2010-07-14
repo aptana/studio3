@@ -263,6 +263,12 @@ public final class EFSUtils
 	{
 		IFileStore[] result = null;
 		ArrayList<IFileStore> list = new ArrayList<IFileStore>();
+
+		Object resource = file.getAdapter(IResource.class);
+		if(resource != null && resource instanceof IContainer) {
+			((IResource)resource).refreshLocal(IResource.DEPTH_INFINITE, monitor);
+		}
+
 		getFiles(file, recurse, list, includeCloakedFiles, monitor);
 		result = list.toArray(new IFileStore[0]);
 		return result;
