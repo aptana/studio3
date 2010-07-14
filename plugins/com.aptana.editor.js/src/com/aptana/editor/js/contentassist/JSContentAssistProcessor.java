@@ -66,6 +66,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		ContentSelector.NAME,				//
 		ContentSelector.DESCRIPTION,		//
 		ContentSelector.DOCUMENTS,			//
+		ContentSelector.EXAMPLES,			//
 		ContentSelector.INCLUDE_ANCESTORS,	//
 		ContentSelector.PARENT_TYPES,		//
 		ContentSelector.RETURN_TYPES,		//
