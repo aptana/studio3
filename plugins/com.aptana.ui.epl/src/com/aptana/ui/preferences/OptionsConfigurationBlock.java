@@ -381,10 +381,13 @@ public abstract class OptionsConfigurationBlock
 		return true;
 	}
 
-	protected Job[] createBuildJobs(IProject project)
-	{
-		return new Job[] { CoreUtility.getBuildJob(project) };
-	}
+	/**
+	 * Create build Jobs for the given project.
+	 * 
+	 * @param project
+	 * @return Job array for building the given project
+	 */
+	protected abstract Job[] createBuildJobs(IProject project);
 
 	public void performDefaults()
 	{

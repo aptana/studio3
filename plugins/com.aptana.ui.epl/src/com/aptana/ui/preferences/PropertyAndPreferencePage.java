@@ -59,7 +59,7 @@ public abstract class PropertyAndPreferencePage extends PreferencePage implement
 	private Composite fParentComposite;
 
 	private IProject fProject; // project or null
-	private Map fData; // page data
+	private Map<?, ?> fData; // page data
 
 	public static final String DATA_NO_LINK = "PropertyAndPreferencePage.nolink"; //$NON-NLS-1$
 
@@ -84,7 +84,7 @@ public abstract class PropertyAndPreferencePage extends PreferencePage implement
 		return getPropertyPageId() != null;
 	}
 
-	protected String getNatureId()
+	protected String getContentType()
 	{
 		return null;
 	}
@@ -118,13 +118,14 @@ public abstract class PropertyAndPreferencePage extends PreferencePage implement
 
 			fUseProjectSettings = new SelectionButtonDialogField(SWT.CHECK);
 			fUseProjectSettings.setDialogFieldListener(listener);
-			fUseProjectSettings.setLabelText("Enable pr&oject specific settings");
+			fUseProjectSettings.setLabelText(Messages.PropertyAndPreferencePage_enableProjectSpecific);
 			fUseProjectSettings.doFillIntoGrid(composite, 1);
 			LayoutUtil.setHorizontalGrabbing(fUseProjectSettings.getSelectionButton(null));
 
 			if (offerLink())
 			{
-				fChangeWorkspaceSettings = createLink(composite, "Configure Workspace Settings...");
+				fChangeWorkspaceSettings = createLink(composite,
+						Messages.PropertyAndPreferencePage_configureWorkspaceSettings);
 				fChangeWorkspaceSettings.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
 			}
 			else
@@ -138,8 +139,7 @@ public abstract class PropertyAndPreferencePage extends PreferencePage implement
 		}
 		else if (supportsProjectSpecificOptions() && offerLink())
 		{
-			fChangeWorkspaceSettings = createLink(parent,
-					"Configure Project Specific Settings...");
+			fChangeWorkspaceSettings = createLink(parent, Messages.PropertyAndPreferencePage_configureProjectSettings);
 			fChangeWorkspaceSettings.setLayoutData(new GridData(SWT.END, SWT.CENTER, true, false));
 		}
 
@@ -210,7 +210,7 @@ public abstract class PropertyAndPreferencePage extends PreferencePage implement
 
 	protected void doLinkActivated(Link link)
 	{
-		Map data = new HashMap();
+		Map<String, Boolean> data = new HashMap<String, Boolean>();
 		data.put(DATA_NO_LINK, Boolean.TRUE);
 
 		if (isProjectPreferencePage())
@@ -219,7 +219,7 @@ public abstract class PropertyAndPreferencePage extends PreferencePage implement
 		}
 		else
 		{
-			HashSet projectsWithSpecifics = new HashSet();
+			HashSet<IProject> projectsWithSpecifics = new HashSet<IProject>();
 			IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 			for (int i = 0; i < projects.length; i++)
 			{
@@ -229,7 +229,7 @@ public abstract class PropertyAndPreferencePage extends PreferencePage implement
 					projectsWithSpecifics.add(curr);
 				}
 			}
-			ProjectSelectionDialog dialog = new ProjectSelectionDialog(getShell(), projectsWithSpecifics, getNatureId());
+			ProjectSelectionDialog dialog = new ProjectSelectionDialog(getShell(), projectsWithSpecifics, getContentType());
 			if (dialog.open() == Window.OK)
 			{
 				IProject res = (IProject) dialog.getFirstResult();
@@ -379,9 +379,9 @@ public abstract class PropertyAndPreferencePage extends PreferencePage implement
 	 */
 	public void applyData(Object data)
 	{
-		if (data instanceof Map)
+		if (data instanceof Map<?, ?>)
 		{
-			fData = (Map) data;
+			fData = (Map<?, ?>) data;
 		}
 		if (fChangeWorkspaceSettings != null)
 		{
@@ -393,7 +393,7 @@ public abstract class PropertyAndPreferencePage extends PreferencePage implement
 		}
 	}
 
-	protected Map getData()
+	protected Map<?, ?> getData()
 	{
 		return fData;
 	}

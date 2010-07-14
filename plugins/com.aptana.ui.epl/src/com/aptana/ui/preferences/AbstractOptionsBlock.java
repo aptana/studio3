@@ -15,6 +15,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PreferenceLinkArea;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
+import com.aptana.ui.dialogs.PropToPrefLinkArea;
 import com.aptana.ui.util.IStatusChangeListener;
 
 public abstract class AbstractOptionsBlock extends OptionsConfigurationBlock

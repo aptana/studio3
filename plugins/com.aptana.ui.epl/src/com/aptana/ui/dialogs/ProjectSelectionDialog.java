@@ -51,7 +51,7 @@ public class ProjectSelectionDialog extends SelectionStatusDialog
 
 	// the visual selection widget group
 	private TableViewer fTableViewer;
-	private Set fProjectsWithSpecifics;
+	private Set<IProject> fProjectsWithSpecifics;
 
 	// sizing constants
 	private final static int SIZING_SELECTION_WIDGET_HEIGHT = 250;
@@ -68,7 +68,7 @@ public class ProjectSelectionDialog extends SelectionStatusDialog
 	 * @param parentShell
 	 * @param projectsWithSpecifics
 	 */
-	public ProjectSelectionDialog(Shell parentShell, Set projectsWithSpecifics)
+	public ProjectSelectionDialog(Shell parentShell, Set<IProject> projectsWithSpecifics)
 	{
 		this(parentShell, projectsWithSpecifics, null);
 	}
@@ -80,11 +80,11 @@ public class ProjectSelectionDialog extends SelectionStatusDialog
 	 * @param projectsWithSpecifics
 	 * @param natureId
 	 */
-	public ProjectSelectionDialog(Shell parentShell, Set projectsWithSpecifics, String natureId)
+	public ProjectSelectionDialog(Shell parentShell, Set<IProject> projectsWithSpecifics, String natureId)
 	{
 		super(parentShell);
-		setTitle("Project selection Dialog");
-		setMessage("please select project");
+		setTitle(Messages.ProjectSelectionDialog_projectSelectionTitle);
+		setMessage(Messages.ProjectSelectionDialog_projectSelectionDescription);
 		fProjectsWithSpecifics = projectsWithSpecifics;
 		this.natureId = natureId;
 		int shellStyle = getShellStyle();
@@ -163,7 +163,7 @@ public class ProjectSelectionDialog extends SelectionStatusDialog
 		}
 
 		Button checkbox = new Button(composite, SWT.CHECK);
-		checkbox.setText("Filter");
+		checkbox.setText(Messages.ProjectSelectionDialog_filter);
 		checkbox.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, true, false));
 		checkbox.addSelectionListener(new SelectionListener()
 		{
