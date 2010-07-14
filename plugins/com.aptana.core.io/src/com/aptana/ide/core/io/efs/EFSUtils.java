@@ -261,15 +261,18 @@ public final class EFSUtils
 	public static IFileStore[] getFiles(IFileStore file, boolean recurse, boolean includeCloakedFiles,
 			IProgressMonitor monitor) throws CoreException
 	{
+		SubMonitor progress = SubMonitor.convert(monitor);
+
 		IFileStore[] result = null;
 		ArrayList<IFileStore> list = new ArrayList<IFileStore>();
 
 		Object resource = file.getAdapter(IResource.class);
-		if(resource != null && resource instanceof IContainer) {
-			((IResource)resource).refreshLocal(IResource.DEPTH_INFINITE, monitor);
+		if (resource != null && resource instanceof IContainer)
+		{
+			((IResource) resource).refreshLocal(IResource.DEPTH_INFINITE, progress);
 		}
 
-		getFiles(file, recurse, list, includeCloakedFiles, monitor);
+		getFiles(file, recurse, list, includeCloakedFiles, progress);
 		result = list.toArray(new IFileStore[0]);
 		return result;
 	}
@@ -316,9 +319,10 @@ public final class EFSUtils
 	 * @param recurse
 	 * @param list
 	 * @param includeCloakedFiles
-	 * @param monitor the progress monitor to use for reporting progress to the user. It is the caller's responsibility
-        to call done() on the given monitor. Accepts null, indicating that no progress should be
-        reported and that the operation cannot be cancelled.
+	 * @param monitor
+	 *            the progress monitor to use for reporting progress to the user. It is the caller's responsibility to
+	 *            call done() on the given monitor. Accepts null, indicating that no progress should be reported and
+	 *            that the operation cannot be cancelled.
 	 * @throws CoreException
 	 */
 	private static void getFiles(IFileStore file, boolean recurse, List<IFileStore> list, boolean includeCloakedFiles,
@@ -329,21 +333,23 @@ public final class EFSUtils
 			return;
 		}
 
-		if(monitor != null) {
+		if (monitor != null)
+		{
 			Policy.checkCanceled(monitor);
 		}
-		
+
 		if (isFolder(file, monitor))
 		{
 			IFileStore[] children = file.childStores(EFS.NONE, monitor);
 			if (children != null)
 			{
-				SubMonitor progress = SubMonitor.convert(monitor, children.length);		
+				SubMonitor progress = SubMonitor.convert(monitor, children.length);
 				boolean addingFile;
 				for (int i = 0; i < children.length; i++)
 				{
-					if(monitor != null) {
-						Policy.checkCanceled(monitor);
+					if (progress != null)
+					{
+						Policy.checkCanceled(progress);
 					}
 
 					IFileStore child = children[i];
@@ -355,7 +361,7 @@ public final class EFSUtils
 						progress.worked(1);
 					}
 
-					if (recurse && addingFile && isFolder(child, monitor))
+					if (recurse && addingFile && isFolder(child, progress))
 					{
 						getFiles(child, recurse, list, includeCloakedFiles, progress.newChild(1));
 					}
