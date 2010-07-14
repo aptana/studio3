@@ -9,7 +9,7 @@ public abstract class ContributedExtension implements IContributedExtension, IEx
 	private String description;
 	private String id;
 	private String name;
-	private String natureId;
+	private String contentType;
 	private String propertyPageId;
 	private String preferencePageId;
 	private int priority;
@@ -43,7 +43,7 @@ public abstract class ContributedExtension implements IContributedExtension, IEx
 	 */
 	public String getContentType()
 	{
-		return natureId;
+		return contentType;
 	}
 
 	/*
@@ -85,9 +85,9 @@ public abstract class ContributedExtension implements IContributedExtension, IEx
 		propertyPageId = config.getAttribute(PROP_PAGE_ID);
 		preferencePageId = config.getAttribute(PREF_PAGE_ID);
 
-		// get the natureId from the parent
+		// get the contentType from the parent
 		final Object parent = config.getParent();
 		if (parent instanceof IConfigurationElement)
-			natureId = ((IConfigurationElement) parent).getAttribute(NATURE_ID);
+			contentType = ((IConfigurationElement) parent).getAttribute(CONTENT_TYPE);
 	}
 }

@@ -52,21 +52,16 @@ public abstract class ContributionExtensionManager
 
 	public IContributedExtension getSelectedContribution(IProject project, String natureId)
 	{
-
 		IContributedExtension[] contributions = getContributions(natureId);
-
 		if (contributions.length > 0)
 		{
-
 			IContributionSelector selector = getSelector(natureId);
 			if (selector == null)
 			{
 				selector = defaultSelector;
 			}
-
 			return selector.select(contributions, project);
 		}
-
 		return null;
 	}
 

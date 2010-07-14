@@ -20,7 +20,7 @@ public interface IContributedExtension {
 	static final String PREF_PAGE_ID = "preferencePageId"; //$NON-NLS-1$
 	static final String PROP_PAGE_ID = "propertyPageId"; //$NON-NLS-1$
 	static final String PRIORITY = "priority"; //$NON-NLS-1$
-	static final String NATURE_ID = "natureId"; //$NON-NLS-1$
+	static final String CONTENT_TYPE = "contentType"; //$NON-NLS-1$
 
 	/**
 	 * Returns the contribution id
