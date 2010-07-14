@@ -3,6 +3,9 @@ package com.aptana.editor.js.contentassist.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.aptana.core.util.StringUtil;
+import com.aptana.parsing.io.SourcePrinter;
+
 public class PropertyElement extends BaseElement
 {
 	private TypeElement _owningType;
@@ -66,6 +69,16 @@ public class PropertyElement extends BaseElement
 	}
 
 	/**
+	 * isClassProperty
+	 * 
+	 * @return
+	 */
+	public boolean isClassProperty()
+	{
+		return this._isClassProperty;
+	}
+
+	/**
 	 * isInstanceProperty
 	 * 
 	 * @return
@@ -86,13 +99,13 @@ public class PropertyElement extends BaseElement
 	}
 
 	/**
-	 * isClassProperty
+	 * setIsClassProperty
 	 * 
-	 * @return
+	 * @param value
 	 */
-	public boolean isClassProperty()
+	public void setIsClassProperty(boolean value)
 	{
-		return this._isClassProperty;
+		this._isClassProperty = value;
 	}
 
 	/**
@@ -116,16 +129,6 @@ public class PropertyElement extends BaseElement
 	}
 
 	/**
-	 * setIsClassProperty
-	 * 
-	 * @param value
-	 */
-	public void setIsClassProperty(boolean value)
-	{
-		this._isClassProperty = value;
-	}
-
-	/**
 	 * setOwningType
 	 * 
 	 * @param type
@@ -133,5 +136,43 @@ public class PropertyElement extends BaseElement
 	void setOwningType(TypeElement type)
 	{
 		this._owningType = type;
+	}
+
+	/**
+	 * toSource
+	 * 
+	 * @return
+	 */
+	public String toSource()
+	{
+		SourcePrinter printer = new SourcePrinter();
+		
+		this.toSource(printer);
+		
+		return printer.toString();
+	}
+	
+	/**
+	 * toSource
+	 * 
+	 * @param printer
+	 */
+	public void toSource(SourcePrinter printer)
+	{
+		printer.printIndent();
+		
+		if (this.isInstanceProperty())
+		{
+			printer.print("static ");
+		}
+		if (this.isInternal())
+		{
+			printer.print("internal ");
+		}
+		
+		printer.print(this.getName());
+		printer.print(" : ");
+		printer.print(StringUtil.join(",", this.getTypeNames()));
+		printer.println(";");
 	}
 }

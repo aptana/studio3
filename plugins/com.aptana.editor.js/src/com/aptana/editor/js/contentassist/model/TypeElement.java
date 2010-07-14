@@ -4,6 +4,9 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.aptana.core.util.StringUtil;
+import com.aptana.parsing.io.SourcePrinter;
+
 public class TypeElement extends BaseElement
 {
 	private List<String> _parentTypes = new LinkedList<String>();
@@ -127,12 +130,60 @@ public class TypeElement extends BaseElement
 	}
 	
 	/**
+	 * hasParentTypes
+	 * 
+	 * @return
+	 */
+	public boolean hasParentTypes()
+	{
+		return this._parentTypes.isEmpty() == false;
+	}
+	
+	/**
 	 * hasProperties
 	 * 
 	 * @return
 	 */
 	public boolean hasProperties()
 	{
-		return this._parentTypes.isEmpty() == false;
+		return this._properties.isEmpty() == false;
+	}
+	
+	/**
+	 * toSource
+	 * 
+	 * @return
+	 */
+	public String toSource()
+	{
+		SourcePrinter printer = new SourcePrinter();
+		
+		this.toSource(printer);
+		
+		return printer.toString();
+	}
+	
+	/**
+	 * toSource
+	 * 
+	 * @param printer
+	 */
+	public void toSource(SourcePrinter printer)
+	{
+		printer.print(this.getName());
+		
+		if (this.hasParentTypes())
+		{
+			printer.print(" : ").print(StringUtil.join(", ", this.getParentTypes()));
+		}
+		
+		printer.println().print("{").increaseIndent().println();
+		
+		for (PropertyElement property : this.getProperties())
+		{
+			property.toSource(printer);
+		}
+		
+		printer.decreaseIndent().println("}");
 	}
 }
