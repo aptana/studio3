@@ -13,6 +13,7 @@ public class PropertyElement extends BaseElement
 	private boolean _isClassProperty;
 	private boolean _isInternal;
 	private List<ReturnTypeElement> _types = new ArrayList<ReturnTypeElement>();
+	private List<String> _examples = new ArrayList<String>();
 
 	/**
 	 * PropertyElement
@@ -21,6 +22,19 @@ public class PropertyElement extends BaseElement
 	{
 	}
 
+	/**
+	 * addExample
+	 * 
+	 * @param example
+	 */
+	public void addExample(String example)
+	{
+		if (example != null && example.length() > 0)
+		{
+			this._examples.add(example);
+		}
+	}
+	
 	/**
 	 * addType
 	 * 
@@ -31,6 +45,16 @@ public class PropertyElement extends BaseElement
 		this._types.add(type);
 	}
 
+	/**
+	 * getExamples
+	 * 
+	 * @return
+	 */
+	public List<String> getExamples()
+	{
+		return this._examples;
+	}
+	
 	/**
 	 * getOwningType
 	 * 
