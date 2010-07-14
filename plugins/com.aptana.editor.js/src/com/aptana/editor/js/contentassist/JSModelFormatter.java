@@ -1,6 +1,8 @@
 package com.aptana.editor.js.contentassist;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.util.List;
 
 import com.aptana.core.util.StringUtil;
@@ -28,7 +30,7 @@ public class JSModelFormatter
 
 		if (documents != null && documents.isEmpty() == false)
 		{
-			String prefix = (projectURI != null) ? projectURI.toString() : null;
+			String prefix = (projectURI != null) ? decodeURI(projectURI.toString()) : null;
 
 			// back up one segment so we include the project name in the document
 			if (prefix != null && prefix.length() > 2)
@@ -49,6 +51,8 @@ public class JSModelFormatter
 
 			for (String document : documents)
 			{
+				document = decodeURI(document);
+
 				if (prefix != null && document.startsWith(prefix))
 				{
 					document = document.substring(prefix.length() + 1);
@@ -133,13 +137,13 @@ public class JSModelFormatter
 	protected static void addSpecifications(StringBuilder buffer, PropertyElement property)
 	{
 		List<SinceElement> sinceList = property.getSinceList();
-		
+
 		if (sinceList != null && sinceList.isEmpty() == false)
 		{
 			buffer.append("<br><br>");
 			buffer.append("Specifications:");
 			buffer.append("<br>");
-			
+
 			for (SinceElement since : property.getSinceList())
 			{
 				buffer.append(since.getName()).append(" ").append(since.getVersion());
@@ -147,7 +151,32 @@ public class JSModelFormatter
 			}
 		}
 	}
-	
+
+	/**
+	 * decodeURI
+	 * 
+	 * @param uri
+	 * @return
+	 */
+	private static String decodeURI(String uri)
+	{
+		String result = null;
+
+		if (uri != null)
+		{
+			try
+			{
+				result = URLDecoder.decode(uri.toString(), "utf-8");
+			}
+			catch (UnsupportedEncodingException e)
+			{
+				e.printStackTrace();
+			}
+		}
+
+		return result;
+	}
+
 	/**
 	 * formatFunction
 	 * 
