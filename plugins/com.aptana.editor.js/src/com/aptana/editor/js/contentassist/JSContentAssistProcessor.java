@@ -79,7 +79,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private IContextInformationValidator _validator;
 	private IParseNode _targetNode;
 	private IParseNode _statementNode;
-	private Scope<JSNode> _globals;
 	private IRange _replaceRange;
 
 	/**
@@ -514,7 +513,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected Scope<JSNode> getGlobalScope()
 	{
-		if (this._globals == null && this._targetNode != null)
+		Scope<JSNode> result = null;
+		
+		if (this._targetNode != null)
 		{
 			IParseNode root = this._targetNode;
 			
@@ -536,12 +537,12 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				
 				((JSParseRootNode) root).accept(s);
 				
-				this._globals = s.getScope();
+				result = s.getScope();
 			}
 			
 		}
 		
-		return this._globals;
+		return result;
 	}
 
 	/**
