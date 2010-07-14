@@ -80,6 +80,16 @@ public class JSIndexReader
 			}
 			column++;
 			
+			// examples
+			if (fields.contains(ContentSelector.EXAMPLES))
+			{
+				for (String example : this.getExamples(index, columns[column]))
+				{
+					f.addExample(example);
+				}
+			}
+			column++;
+			
 			// since list
 			if (fields.contains(ContentSelector.SINCE))
 			{
@@ -163,6 +173,16 @@ public class JSIndexReader
 			}
 			column++;
 			
+			// examples
+			if (fields.contains(ContentSelector.EXAMPLES))
+			{
+				for (String example : this.getExamples(index, columns[column]))
+				{
+					p.addExample(example);
+				}
+			}
+			column++;
+			
 			// since list
 			if (fields.contains(ContentSelector.SINCE))
 			{
@@ -226,6 +246,39 @@ public class JSIndexReader
 			}
 		}
 
+		return result;
+	}
+	
+	/**
+	 * getExamples
+	 * 
+	 * @param index
+	 * @param examplesKey
+	 * @return
+	 * @throws IOException
+	 */
+	protected List<String> getExamples(Index index, String examplesKey) throws IOException
+	{
+		List<String> result = new ArrayList<String>();
+		
+		if (index != null && examplesKey != null && examplesKey.length() > 0 && !examplesKey.equals(JSIndexConstants.NO_ENTRY))
+		{
+			// grab description
+			String examplePattern = examplesKey + JSIndexConstants.DELIMITER;
+			List<QueryResult> queryResult = index.query(new String[] { JSIndexConstants.EXAMPLES }, examplePattern, SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
+			
+			if (queryResult != null && queryResult.size() > 0)
+			{
+				String word = queryResult.get(0).getWord();
+				String[] examples = word.split(JSIndexConstants.DELIMITER);
+				
+				for (int i = 1; i < examples.length; i++)
+				{
+					result.add(examples[i]);
+				}
+			}
+		}
+		
 		return result;
 	}
 	

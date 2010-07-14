@@ -27,6 +27,7 @@ public class JSIndexWriter
 	private static int parameterCount;
 	private static int returnTypeCount;
 	private static int sinceListCount;
+	private static int exampleCount;
 
 	/**
 	 * JSMetadataIndexer
@@ -71,6 +72,33 @@ public class JSIndexWriter
 	}
 	
 	/**
+	 * writeExamples
+	 * 
+	 * @param index
+	 * @param examples
+	 * @param location
+	 */
+	protected String writeExamples(Index index, List<String> examples, URI location)
+	{
+		String indexString;
+		
+		if (examples != null && examples.isEmpty() == false)
+		{
+			indexString = Integer.toString(exampleCount++);
+			
+			String value = indexString + JSIndexConstants.DELIMITER + StringUtil.join(JSIndexConstants.DELIMITER, examples);
+			
+			index.addEntry(JSIndexConstants.EXAMPLES, value, location);
+		}
+		else
+		{
+			indexString = JSIndexConstants.NO_ENTRY;
+		}
+		
+		return indexString;
+	}
+	
+	/**
 	 * writeFunction
 	 * 
 	 * @param index
@@ -82,6 +110,7 @@ public class JSIndexWriter
 		String parametersKey = this.writeParameters(index, function.getParameters(), location);
 		String returnTypesKey = this.writeReturnTypes(index, function.getReturnTypes(), location);
 		String descriptionKey = this.writeDescription(index, function.getDescription(), location);
+		String examplesKey = this.writeExamples(index, function.getExamples(), location);
 		String sinceListKey = this.writeSinceList(index, function.getSinceList(), location);
 		
 		String value = StringUtil.join(
@@ -91,6 +120,7 @@ public class JSIndexWriter
 			descriptionKey,
 			parametersKey,
 			returnTypesKey,
+			examplesKey,
 			sinceListKey,
 			StringUtil.join(JSIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, function.getUserAgents()))
 		);
@@ -139,6 +169,7 @@ public class JSIndexWriter
 	{
 		String propertyTypesKey = this.writeReturnTypes(index, property.getTypes(), location);
 		String descriptionKey = this.writeDescription(index, property.getDescription(), location);
+		String examplesKey = this.writeExamples(index, property.getExamples(), location);
 		String sinceListKey = this.writeSinceList(index, property.getSinceList(), location);
 		
 		String value = StringUtil.join(
@@ -147,6 +178,7 @@ public class JSIndexWriter
 			property.getOwningType().getName(),
 			descriptionKey,
 			propertyTypesKey,
+			examplesKey,
 			sinceListKey,
 			StringUtil.join(JSIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, property.getUserAgents()))
 		);
