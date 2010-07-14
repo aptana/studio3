@@ -12,6 +12,7 @@ import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
+import com.aptana.editor.js.contentassist.model.SinceElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.contentassist.model.UserAgentElement;
 import com.aptana.index.core.Index;
@@ -25,6 +26,7 @@ public class JSIndexWriter
 	private static int descriptionCount;
 	private static int parameterCount;
 	private static int returnTypeCount;
+	private static int sinceListCount;
 
 	/**
 	 * JSMetadataIndexer
@@ -80,7 +82,7 @@ public class JSIndexWriter
 		String parametersKey = this.writeParameters(index, function.getParameters(), location);
 		String returnTypesKey = this.writeReturnTypes(index, function.getReturnTypes(), location);
 		String descriptionKey = this.writeDescription(index, function.getDescription(), location);
-		// SinceElement[] sinceList = function.getSinceList();
+		String sinceListKey = this.writeSinceList(index, function.getSinceList(), location);
 		
 		String value = StringUtil.join(
 			JSIndexConstants.DELIMITER,
@@ -89,6 +91,7 @@ public class JSIndexWriter
 			descriptionKey,
 			parametersKey,
 			returnTypesKey,
+			sinceListKey,
 			StringUtil.join(JSIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, function.getUserAgents()))
 		);
 
@@ -136,7 +139,7 @@ public class JSIndexWriter
 	{
 		String propertyTypesKey = this.writeReturnTypes(index, property.getTypes(), location);
 		String descriptionKey = this.writeDescription(index, property.getDescription(), location);
-		// SinceElement[] sinceList = property.getSinceList();
+		String sinceListKey = this.writeSinceList(index, property.getSinceList(), location);
 		
 		String value = StringUtil.join(
 			JSIndexConstants.DELIMITER,
@@ -144,6 +147,7 @@ public class JSIndexWriter
 			property.getOwningType().getName(),
 			descriptionKey,
 			propertyTypesKey,
+			sinceListKey,
 			StringUtil.join(JSIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, property.getUserAgents()))
 		);
 
@@ -175,6 +179,52 @@ public class JSIndexWriter
 		String value = StringUtil.join(JSIndexConstants.DELIMITER, keyList);
 		
 		index.addEntry(JSIndexConstants.RETURN_TYPES, value, location);
+		
+		return indexString;
+	}
+
+	/**
+	 * writeSinceList
+	 * 
+	 * @param index
+	 * @param sinceList
+	 * @param location
+	 * @return
+	 */
+	protected String writeSinceList(Index index, List<SinceElement> sinceList, URI location)
+	{
+		String indexString;
+		
+		if (sinceList != null && sinceList.isEmpty() == false)
+		{
+			// generate new key
+			indexString = Integer.toString(sinceListCount++);
+			
+			// create temporary list and add key
+			List<String> keyList = new ArrayList<String>();
+			
+			keyList.add(indexString);
+			
+			// process the list
+			for (SinceElement since : sinceList)
+			{
+				String version = since.getVersion();
+				String value = (version != null && version.length() > 0)
+					? since.getName() + JSIndexConstants.SUB_DELIMITER + since.getVersion()
+					: since.getName();
+				
+				keyList.add(value);
+			}
+			
+			// generate the key
+			String key = StringUtil.join(JSIndexConstants.DELIMITER, keyList);
+			
+			index.addEntry(JSIndexConstants.SINCE_LIST, key, location);
+		}
+		else
+		{
+			indexString = JSIndexConstants.NO_ENTRY;
+		}
 		
 		return indexString;
 	}

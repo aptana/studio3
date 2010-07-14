@@ -15,6 +15,7 @@ import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
+import com.aptana.editor.js.contentassist.model.SinceElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.contentassist.model.UserAgentElement;
 import com.aptana.index.core.Index;
@@ -75,6 +76,16 @@ public class JSIndexReader
 				for (ReturnTypeElement returnType : this.getReturnTypes(index, columns[column]))
 				{
 					f.addReturnType(returnType);
+				}
+			}
+			column++;
+			
+			// since list
+			if (fields.contains(ContentSelector.SINCE))
+			{
+				for (SinceElement since : this.getSinceList(index, columns[column]))
+				{
+					f.addSince(since);
 				}
 			}
 			column++;
@@ -148,6 +159,16 @@ public class JSIndexReader
 				for (ReturnTypeElement returnType : this.getReturnTypes(index, columns[column]))
 				{
 					p.addType(returnType);
+				}
+			}
+			column++;
+			
+			// since list
+			if (fields.contains(ContentSelector.SINCE))
+			{
+				for (SinceElement since : this.getSinceList(index, columns[column]))
+				{
+					p.addSince(since);
 				}
 			}
 			column++;
@@ -429,6 +450,49 @@ public class JSIndexReader
 			}
 		}
 
+		return result;
+	}
+	
+	/**
+	 * getSinceList
+	 * 
+	 * @param index
+	 * @param sinceListKey
+	 * @return
+	 * @throws IOException 
+	 */
+	protected List<SinceElement> getSinceList(Index index, String sinceListKey) throws IOException
+	{
+		List<SinceElement> result = new ArrayList<SinceElement>();
+		
+		if (index != null && sinceListKey != null && sinceListKey.length() > 0 && !sinceListKey.equals(JSIndexConstants.NO_ENTRY))
+		{
+			String descriptionPattern = sinceListKey + JSIndexConstants.DELIMITER;
+			List<QueryResult> queryResult = index.query(new String[] { JSIndexConstants.SINCE_LIST }, descriptionPattern, SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
+	
+			if (queryResult != null && queryResult.size() > 0)
+			{
+				String word = queryResult.get(0).getWord();
+				String[] sinceListItems = word.split(JSIndexConstants.DELIMITER);
+				
+				for (int i = 1; i < sinceListItems.length; i++)
+				{
+					String sinceListItem = sinceListItems[i];
+					String[] parts = sinceListItem.split(JSIndexConstants.SUB_DELIMITER);
+					SinceElement since = new SinceElement();
+					
+					since.setName(parts[0]);
+					
+					if (parts.length > 1)
+					{
+						since.setVersion(parts[1]);
+					}
+					
+					result.add(since);
+				}
+			}
+		}
+		
 		return result;
 	}
 	
