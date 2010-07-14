@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -175,7 +174,7 @@ public class JSIndexWriter
 	 */
 	protected String writeReturnTypes(Index index, ReturnTypeElement[] returnTypes, URI location)
 	{
-		List<String> keyList = new LinkedList<String>();
+		List<String> keyList = new ArrayList<String>();
 		String indexString = Integer.toString(this._returnTypeCount++);
 		
 		keyList.add(indexString);
@@ -240,7 +239,7 @@ public class JSIndexWriter
 		String value = StringUtil.join(
 			JSIndexConstants.DELIMITER,
 			type.getName(),
-			(parentTypes != null && parentTypes.size() > 0)
+			(parentTypes != null && parentTypes.isEmpty() == false)
 				? StringUtil.join(",", parentTypes) //$NON-NLS-1$
 				: (type.equals(JSTypes.OBJECT) == false) //$NON-NLS-1$
 					? JSTypes.OBJECT //$NON-NLS-1$
@@ -305,7 +304,7 @@ public class JSIndexWriter
 	 */
 	protected List<String> writeUserAgents(Index index, List<UserAgentElement> userAgents)
 	{
-		List<String> keys = new LinkedList<String>();
+		List<String> keys = new ArrayList<String>();
 		
 		for (UserAgentElement userAgent : userAgents)
 		{
