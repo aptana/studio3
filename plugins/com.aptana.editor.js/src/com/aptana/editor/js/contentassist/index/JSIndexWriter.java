@@ -22,9 +22,9 @@ public class JSIndexWriter
 	private static Map<UserAgentElement,String> keysByUserAgent = new HashMap<UserAgentElement,String>();
 	static Map<String,UserAgentElement> userAgentsByKey = new HashMap<String,UserAgentElement>();
 	
-	private int _descriptionCount;
-	private int _parameterCount;
-	private int _returnTypeCount;
+	private static int descriptionCount;
+	private static int parameterCount;
+	private static int returnTypeCount;
 
 	/**
 	 * JSMetadataIndexer
@@ -54,7 +54,7 @@ public class JSIndexWriter
 		
 		if (description != null && description.length() > 0)
 		{
-			indexString = Integer.toString(this._descriptionCount++);
+			indexString = Integer.toString(descriptionCount++);
 			
 			String value = indexString + JSIndexConstants.DELIMITER + description;
 			
@@ -105,7 +105,7 @@ public class JSIndexWriter
 	protected String writeParameters(Index index, List<ParameterElement> parameters, URI location)
 	{
 		List<String> keyList = new ArrayList<String>();
-		String indexString = Integer.toString(this._parameterCount++);
+		String indexString = Integer.toString(parameterCount++);
 		
 		keyList.add(indexString);
 		
@@ -160,7 +160,7 @@ public class JSIndexWriter
 	protected String writeReturnTypes(Index index, ReturnTypeElement[] returnTypes, URI location)
 	{
 		List<String> keyList = new ArrayList<String>();
-		String indexString = Integer.toString(this._returnTypeCount++);
+		String indexString = Integer.toString(returnTypeCount++);
 		
 		keyList.add(indexString);
 		
