@@ -16,11 +16,11 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.internal.misc.StatusUtil;
 
 import com.aptana.ui.epl.UIEplPlugin;
 import com.aptana.ui.util.IStatusChangeListener;
 import com.aptana.ui.util.StatusInfo;
+import com.aptana.ui.util.StatusUtil;
 
 /**
  */

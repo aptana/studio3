@@ -26,15 +26,15 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PreferencesUtil;
-import org.eclipse.ui.internal.misc.StatusUtil;
-import org.eclipse.ui.internal.wizards.preferences.PreferencesMessages;
 
+import com.aptana.ui.dialogs.ProjectSelectionDialog;
 import com.aptana.ui.preferences.dialogfields.DialogField;
 import com.aptana.ui.preferences.dialogfields.IDialogFieldListener;
 import com.aptana.ui.preferences.dialogfields.LayoutUtil;
 import com.aptana.ui.preferences.dialogfields.SelectionButtonDialogField;
 import com.aptana.ui.util.IStatusChangeListener;
 import com.aptana.ui.util.StatusInfo;
+import com.aptana.ui.util.StatusUtil;
 
 /**
  * Direct port from the jdt ui, this class should not be extended by anyone but the internal dltk ui.
@@ -118,14 +118,13 @@ public abstract class PropertyAndPreferencePage extends PreferencePage implement
 
 			fUseProjectSettings = new SelectionButtonDialogField(SWT.CHECK);
 			fUseProjectSettings.setDialogFieldListener(listener);
-			fUseProjectSettings.setLabelText(PreferencesMessages.PropertyAndPreferencePage_useprojectsettings_label);
+			fUseProjectSettings.setLabelText("Enable pr&oject specific settings");
 			fUseProjectSettings.doFillIntoGrid(composite, 1);
 			LayoutUtil.setHorizontalGrabbing(fUseProjectSettings.getSelectionButton(null));
 
 			if (offerLink())
 			{
-				fChangeWorkspaceSettings = createLink(composite,
-						PreferencesMessages.PropertyAndPreferencePage_useworkspacesettings_change);
+				fChangeWorkspaceSettings = createLink(composite, "Configure Workspace Settings...");
 				fChangeWorkspaceSettings.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
 			}
 			else
@@ -140,7 +139,7 @@ public abstract class PropertyAndPreferencePage extends PreferencePage implement
 		else if (supportsProjectSpecificOptions() && offerLink())
 		{
 			fChangeWorkspaceSettings = createLink(parent,
-					PreferencesMessages.PropertyAndPreferencePage_showprojectspecificsettings_label);
+					"Configure Project Specific Settings...");
 			fChangeWorkspaceSettings.setLayoutData(new GridData(SWT.END, SWT.CENTER, true, false));
 		}
 
