@@ -1,6 +1,5 @@
 package com.aptana.editor.js.contentassist.index;
 
-import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +22,6 @@ public class JSIndexWriter
 	private static Map<UserAgentElement,String> keysByUserAgent = new HashMap<UserAgentElement,String>();
 	static Map<String,UserAgentElement> userAgentsByKey = new HashMap<String,UserAgentElement>();
 	
-	private JSMetadataReader _reader;
 	private int _descriptionCount;
 	private int _parameterCount;
 	private int _returnTypeCount;
@@ -33,7 +31,6 @@ public class JSIndexWriter
 	 */
 	public JSIndexWriter()
 	{
-		this._reader = new JSMetadataReader();
 	}
 
 	/**
@@ -44,17 +41,6 @@ public class JSIndexWriter
 	protected URI getDocumentPath()
 	{
 		return URI.create(JSIndexConstants.METADATA);
-	}
-	
-	/**
-	 * loadXML
-	 * 
-	 * @param stream
-	 * @throws ScriptDocException
-	 */
-	public void loadXML(InputStream stream) throws ScriptDocException
-	{
-		this._reader.loadXML(stream);
 	}
 
 	/**
@@ -116,16 +102,15 @@ public class JSIndexWriter
 	 * @param parameters
 	 * @return
 	 */
-	protected String writeParameters(Index index, ParameterElement[] parameters, URI location)
+	protected String writeParameters(Index index, List<ParameterElement> parameters, URI location)
 	{
 		List<String> keyList = new ArrayList<String>();
 		String indexString = Integer.toString(this._parameterCount++);
 		
 		keyList.add(indexString);
 		
-		for (int i = 0; i < parameters.length; i++)
+		for (ParameterElement parameter : parameters)
 		{
-			ParameterElement parameter = parameters[i];
 			String name = parameter.getName();
 			String usage = parameter.getUsage();
 			String types = StringUtil.join(",", parameter.getTypes()); //$NON-NLS-1$
@@ -192,21 +177,6 @@ public class JSIndexWriter
 		index.addEntry(JSIndexConstants.RETURN_TYPES, value, location);
 		
 		return indexString;
-	}
-	
-	/**
-	 * writeToIndex
-	 * 
-	 * @param index
-	 */
-	public void writeToIndex(Index index)
-	{
-		TypeElement[] types = this._reader.getTypes();
-
-		for (TypeElement type : types)
-		{
-			this.writeType(index, type);
-		}
 	}
 
 	/**

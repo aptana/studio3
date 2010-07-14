@@ -14,7 +14,10 @@ import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
+import com.aptana.editor.js.contentassist.index.JSMetadataReader;
 import com.aptana.editor.js.contentassist.index.ScriptDocException;
+import com.aptana.editor.js.contentassist.model.TypeElement;
+import com.aptana.index.core.Index;
 
 public class MetadataLoader extends Job
 {
@@ -35,11 +38,11 @@ public class MetadataLoader extends Job
 	@Override
 	protected IStatus run(IProgressMonitor monitor)
 	{
-		JSIndexWriter indexer = new JSIndexWriter();
+		JSMetadataReader reader = new JSMetadataReader();
 		
 		this.loadMetadata(
 			monitor,
-			indexer,
+			reader,
 			"/metadata/js_core.xml", //$NON-NLS-1$
 			"/metadata/dom_0.xml", //$NON-NLS-1$
 			"/metadata/dom_2.xml", //$NON-NLS-1$
@@ -47,7 +50,13 @@ public class MetadataLoader extends Job
 			"/metadata/dom_5.xml" //$NON-NLS-1$
 		);
 		
-		indexer.writeToIndex(JSIndexQueryHelper.getIndex());
+		JSIndexWriter indexer = new JSIndexWriter();
+		Index index = JSIndexQueryHelper.getIndex();
+
+		for (TypeElement type : reader.getTypes())
+		{
+			indexer.writeType(index, type);
+		}
 		
 		return Status.OK_STATUS;
 	}
@@ -56,10 +65,9 @@ public class MetadataLoader extends Job
 	 * loadMetadata
 	 * 
 	 * @param monitor
-	 * @param indexer
 	 * @param resources
 	 */
-	private void loadMetadata(IProgressMonitor monitor, JSIndexWriter indexer, String... resources)
+	private void loadMetadata(IProgressMonitor monitor, JSMetadataReader reader, String... resources)
 	{
 		SubMonitor subMonitor = SubMonitor.convert(monitor, resources.length);
 
@@ -75,11 +83,7 @@ public class MetadataLoader extends Job
 				{
 					stream = url.openStream();
 
-					indexer.loadXML(stream);
-				}
-				catch (IOException e)
-				{
-					Activator.logError(Messages.Activator_Error_Loading_Metadata, e);
+					reader.loadXML(stream);
 				}
 				catch (ScriptDocException e)
 				{

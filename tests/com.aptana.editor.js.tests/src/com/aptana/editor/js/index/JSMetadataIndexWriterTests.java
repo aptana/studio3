@@ -17,6 +17,7 @@ import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
+import com.aptana.editor.js.contentassist.index.JSMetadataReader;
 import com.aptana.editor.js.contentassist.index.ScriptDocException;
 import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
@@ -98,10 +99,15 @@ public class JSMetadataIndexWriterTests extends TestCase
 		InputStream stream = this.loadResource(resource);
 		assertNotNull(stream);
 		
+		JSMetadataReader reader = new JSMetadataReader();
+		reader.loadXML(stream);
 		JSIndexWriter writer = new JSIndexWriter();
-		writer.loadXML(stream);
+		Index index = this.getIndex();
 		
-		writer.writeToIndex(this.getIndex());
+		for (TypeElement type : reader.getTypes())
+		{
+			writer.writeType(index, type);
+		}
 	}
 
 	/**
