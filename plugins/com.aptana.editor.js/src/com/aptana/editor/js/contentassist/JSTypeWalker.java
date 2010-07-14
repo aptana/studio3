@@ -244,24 +244,31 @@ public class JSTypeWalker extends JSTreeWalker
 	 */
 	protected static void applyDocumentation(PropertyElement property, DocumentationBlock block)
 	{
-		if (block != null)
+		if (property instanceof FunctionElement)
 		{
-			// apply description
-			property.setDescription(block.getText());
-			
-			// apply types
-			for (Tag tag : block.getTags(TagType.TYPE))
+			applyDocumentation((FunctionElement) property, block);
+		}
+		else
+		{
+			if (block != null)
 			{
-				TypeTag typeTag = (TypeTag) tag;
+				// apply description
+				property.setDescription(block.getText());
 				
-				for (Type type : typeTag.getTypes())
+				// apply types
+				for (Tag tag : block.getTags(TagType.TYPE))
 				{
-					ReturnTypeElement returnType = new ReturnTypeElement();
+					TypeTag typeTag = (TypeTag) tag;
 					
-					returnType.setType(type.toSource());
-					returnType.setDescription(typeTag.getText());
-					
-					property.addType(returnType);
+					for (Type type : typeTag.getTypes())
+					{
+						ReturnTypeElement returnType = new ReturnTypeElement();
+						
+						returnType.setType(type.toSource());
+						returnType.setDescription(typeTag.getText());
+						
+						property.addType(returnType);
+					}
 				}
 			}
 		}
@@ -537,60 +544,46 @@ public class JSTypeWalker extends JSTreeWalker
 				// create a new type that is the union of all types. For
 				// now last definition wins.
 				JSNode node = nodes.get(nodes.size() - 1);
+				DocumentationBlock block = node.getDocumentation();
+				PropertyElement property = (node instanceof JSFunctionNode) ? new FunctionElement() : new PropertyElement();
 				
-				if (node instanceof JSFunctionNode)
+				property.setName(symbol);
+				
+				if (block != null)
 				{
-					FunctionElement function = new FunctionElement();
-					
-					function.setName(symbol);
-					
-					applyDocumentation(function, node.getDocumentation());
-					
-					properties.add(function);
+					applyDocumentation(property, block);
 				}
 				else
 				{
-					PropertyElement property = new PropertyElement();
-					DocumentationBlock block = node.getDocumentation();
+					JSTypeWalker walker = new JSTypeWalker(scope, index);
 					
-					property.setName(symbol);
+					node.accept(walker);
 					
-					if (block != null)
+					List<TypeElement> generatedTypes = walker.getGeneratedTypes();
+					
+					if (generatedTypes.isEmpty() == false)
 					{
-						applyDocumentation(property, block);
-					}
-					else
-					{
-						JSTypeWalker walker = new JSTypeWalker(scope, index);
+						JSIndexWriter writer = new JSIndexWriter();
 						
-						node.accept(walker);
-						
-						List<TypeElement> generatedTypes = walker.getGeneratedTypes();
-						
-						if (generatedTypes.isEmpty() == false)
+						// write out any generated types
+						for (TypeElement type : walker.getGeneratedTypes())
 						{
-							JSIndexWriter writer = new JSIndexWriter();
-							
-							// write out any generated types
-							for (TypeElement type : walker.getGeneratedTypes())
-							{
-								writer.writeType(index, type, location);
-							}
-						}
-						
-						// add property types
-						for (String propertyType : walker.getTypes())
-						{
-							ReturnTypeElement returnType = new ReturnTypeElement();
-							
-							returnType.setType(propertyType);
-							
-							property.addType(returnType);
+							writer.writeType(index, type, location);
 						}
 					}
 					
-					properties.add(property);
+					// add property types
+					for (String propertyType : walker.getTypes())
+					{
+						ReturnTypeElement returnType = new ReturnTypeElement();
+						
+						returnType.setType(propertyType);
+						
+						property.addType(returnType);
+					}
 				}
+				
+				properties.add(property);
 			}
 		}
 		
@@ -1047,7 +1040,8 @@ public class JSTypeWalker extends JSTreeWalker
 				
 				// temporary container to collect properties and their value
 				// sub-trees so we can infer property types after we have all
-				// of the object's properties
+				// of the object's properties. We use a LinkedHashMap to
+				// preserve order.
 				Map<PropertyElement,JSNode> propertyNodeMap = new LinkedHashMap<PropertyElement,JSNode>();
 
 				for (IParseNode child : node)
@@ -1096,14 +1090,7 @@ public class JSTypeWalker extends JSTreeWalker
 					if (docs != null)
 					{
 						// get type from the docs
-						if (property instanceof FunctionElement)
-						{
-							applyDocumentation((FunctionElement) property, docs);
-						}
-						else
-						{
-							applyDocumentation(property, docs);
-						}
+						applyDocumentation(property, docs);
 					}
 					else
 					{
