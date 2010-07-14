@@ -69,6 +69,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		ContentSelector.INCLUDE_ANCESTORS,	//
 		ContentSelector.PARENT_TYPES,		//
 		ContentSelector.RETURN_TYPES,		//
+		ContentSelector.SINCE,				//
 		ContentSelector.TYPES,				//
 		ContentSelector.USER_AGENTS			//
 	);
