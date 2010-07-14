@@ -73,7 +73,7 @@ public class JSTypeWalker extends JSTreeWalker
 	/**
 	 * clearTypeCache
 	 */
-	protected static void clearTypeCache()
+	public static void clearTypeCache()
 	{
 		if (NODE_TYPE_CACHE != null)
 		{
@@ -531,7 +531,7 @@ public class JSTypeWalker extends JSTreeWalker
 		{
 			List<JSNode> nodes = scope.getSymbol(symbol);
 
-			if (nodes != null && nodes.size() > 0)
+			if (nodes != null && nodes.isEmpty() == false)
 			{
 				// TODO: We may want to process all nodes and potentially
 				// create a new type that is the union of all types. For
@@ -557,7 +557,7 @@ public class JSTypeWalker extends JSTreeWalker
 					
 					if (block != null)
 					{
-						applyDocumentation(property, node.getDocumentation());
+						applyDocumentation(property, block);
 					}
 					else
 					{
