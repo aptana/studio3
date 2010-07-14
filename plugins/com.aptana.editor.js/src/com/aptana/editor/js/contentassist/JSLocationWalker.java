@@ -258,9 +258,16 @@ public class JSLocationWalker extends JSTreeWalker
 	{
 		if (node.contains(this._offset))
 		{
-			this.setType(LocationType.NONE);
+			IParseNode body = node.getBody();
 			
-			this.visitChildren(node);
+			if (body instanceof JSNode && body.contains(this._offset))
+			{
+				((JSNode) body).accept(this);
+			}
+			else
+			{
+				this.setType(LocationType.NONE);
+			}
 		}
 	}
 
