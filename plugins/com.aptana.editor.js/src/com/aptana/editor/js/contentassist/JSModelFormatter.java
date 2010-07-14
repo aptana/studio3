@@ -90,6 +90,27 @@ public class JSModelFormatter
 	}
 
 	/**
+	 * addExamples
+	 * 
+	 * @param buffer
+	 * @param examples
+	 */
+	private static void addExamples(StringBuilder buffer, List<String> examples)
+	{
+		if (examples != null && examples.size() > 0)
+		{
+			buffer.append("<br><br>"); //$NON-NLS-1$
+			buffer.append("<b>").append("Examples:").append("</b>");//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			buffer.append("<br>"); //$NON-NLS-1$
+
+			// emit list
+			buffer.append("<pre>");
+			buffer.append(StringUtil.join("<br><br>", examples)); //$NON-NLS-1$
+			buffer.append("</pre>");
+		}
+	}
+	
+	/**
 	 * addReturnTypes
 	 * 
 	 * @param buffer
@@ -242,6 +263,7 @@ public class JSModelFormatter
 		addReturnTypes(buffer, function.getReturnTypes(), "void"); //$NON-NLS-1$
 		addDescription(buffer, function);
 		addDefiningFiles(buffer, function, projectURI);
+		addExamples(buffer, function.getExamples());
 		addSpecifications(buffer, function);
 
 		return buffer.toString();
@@ -269,27 +291,8 @@ public class JSModelFormatter
 		addReturnTypes(buffer, property.getTypes(), "undefined"); //$NON-NLS-1$
 		addDescription(buffer, property);
 		addDefiningFiles(buffer, property, projectURI);
+		addExamples(buffer, property.getExamples());
 		addSpecifications(buffer, property);
-
-		return buffer.toString();
-	}
-
-	/**
-	 * getDescription
-	 * 
-	 * @param header
-	 * @param items
-	 * @return
-	 */
-	public static String getDescription(String header, List<String> items)
-	{
-		StringBuilder buffer = new StringBuilder();
-
-		// emit header
-		buffer.append("<b>").append(header).append("</b><br><br>"); //$NON-NLS-1$ //$NON-NLS-2$
-
-		// emit list
-		buffer.append(StringUtil.join("<br>", items)); //$NON-NLS-1$
 
 		return buffer.toString();
 	}
