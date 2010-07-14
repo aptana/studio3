@@ -92,9 +92,9 @@ public class JSMetadataIndexWriterTests extends TestCase
 	 * writeMetadataResource
 	 * 
 	 * @param resource
-	 * @throws ScriptDocException
+	 * @throws Exception 
 	 */
-	private void writeMetadataResource(String resource) throws ScriptDocException
+	private void writeMetadataResource(String resource) throws Exception
 	{
 		InputStream stream = this.loadResource(resource);
 		assertNotNull(stream);
@@ -115,7 +115,7 @@ public class JSMetadataIndexWriterTests extends TestCase
 	 * 
 	 * @throws ScriptDocException
 	 */
-	public void testType() throws ScriptDocException
+	public void testType() throws Exception
 	{
 		String typeName = "MyClass";
 
@@ -132,7 +132,7 @@ public class JSMetadataIndexWriterTests extends TestCase
 	 * 
 	 * @throws ScriptDocException
 	 */
-	public void testMethod() throws ScriptDocException
+	public void testMethod() throws Exception
 	{
 		String typeName = "MyClass";
 		String methodName = "myMethod";
@@ -163,7 +163,7 @@ public class JSMetadataIndexWriterTests extends TestCase
 	 * 
 	 * @throws ScriptDocException
 	 */
-	public void testProperty() throws ScriptDocException
+	public void testProperty() throws Exception
 	{
 		String typeName = "MyClass";
 		String propertyName = "myProperty";
@@ -190,7 +190,7 @@ public class JSMetadataIndexWriterTests extends TestCase
 	 * 
 	 * @throws ScriptDocException
 	 */
-	public void testTypeDescription() throws ScriptDocException
+	public void testTypeDescription() throws Exception
 	{
 		String typeName = "MyClass";
 		

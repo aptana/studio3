@@ -34,9 +34,7 @@
  */
 package com.aptana.editor.js.contentassist.index;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashMap;
@@ -44,15 +42,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
+import com.aptana.editor.common.contentassist.MetadataReader;
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.contentassist.model.AliasElement;
 import com.aptana.editor.js.contentassist.model.ExceptionElement;
@@ -63,24 +55,17 @@ import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.SinceElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.contentassist.model.UserAgentElement;
-import com.aptana.sax.Schema;
-import com.aptana.sax.SchemaBuilder;
-import com.aptana.sax.SchemaInitializationException;
-import com.aptana.sax.ValidatingReader;
 
 /**
  * ScriptDocReader
  */
-public class JSMetadataReader extends ValidatingReader
+public class JSMetadataReader extends MetadataReader
 {
+	private static final String JS_METADATA_SCHEMA = "/metadata/JSMetadataSchema.xml";
 	private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("[$_a-zA-Z][$_a-zA-Z0-9]*"); //$NON-NLS-1$
 	private static final Pattern TYPE_PATTERN = Pattern.compile("[$_a-zA-Z][$_a-zA-Z0-9]*(?:(?:<[$_a-zA-Z][$_a-zA-Z0-9]*>)|(?:\\[\\]))?"); //$NON-NLS-1$
 	
-	private Schema _metadataSchema;
-	private StringBuffer _textBuffer = new StringBuffer();
-
 	// state flags
-	private boolean _bufferText;
 	private boolean _parsingCtors;
 	private TypeElement _currentClass;
 	private TypeElement _currentType;
@@ -98,21 +83,6 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public JSMetadataReader()
 	{
-	}
-
-	/**
-	 * Process character data
-	 * 
-	 * @param buffer
-	 * @param offset
-	 * @param length
-	 */
-	public void characters(char[] buffer, int offset, int length)
-	{
-		if (this._bufferText)
-		{
-			this._textBuffer.append(new String(buffer, offset, length));
-		}
 	}
 
 	/**
@@ -642,7 +612,7 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public void exitDescription(String ns, String name, String qname)
 	{
-		String description = this.getTextBuffer();
+		String description = this.normalizeText(this.getText());
 		
 		if (this._currentParameter != null)
 		{
@@ -686,8 +656,6 @@ public class JSMetadataReader extends ValidatingReader
 		{
 			// throw error
 		}
-		
-		this.stopTextBuffer();
 	}
 
 	/**
@@ -699,7 +667,18 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public void exitExample(String ns, String name, String qname)
 	{
-		this.stopTextBuffer();
+		String example = this.getText();
+		
+		if (this._currentProperty != null)
+		{
+			this._currentProperty.addExample(example);
+		}
+		else if (this._currentFunction != null)
+		{
+			this._currentFunction.addExample(example);
+		}
+		
+		// TODO: The schema allows these on classes as well
 	}
 
 	/**
@@ -840,7 +819,7 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public void exitRemarks(String ns, String name, String qname)
 	{
-		this.stopTextBuffer();
+		this.getText();
 	}
 
 	/**
@@ -852,7 +831,7 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public void exitReturnDescription(String ns, String name, String qname)
 	{
-		this.stopTextBuffer();
+		this.getText();
 	}
 
 	/**
@@ -885,15 +864,15 @@ public class JSMetadataReader extends ValidatingReader
 	public void exitValue(String ns, String name, String qname)
 	{
 	}
-
-	/**
-	 * getTextBuffer
-	 * 
-	 * @return
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.MetadataReader#getSchemaStream()
 	 */
-	public String getTextBuffer()
+	@Override
+	protected InputStream getSchemaStream()
 	{
-		return this._textBuffer.toString();
+		return this.getClass().getResourceAsStream(JS_METADATA_SCHEMA);
 	}
 	
 	/**
@@ -950,7 +929,7 @@ public class JSMetadataReader extends ValidatingReader
 		
 		return result;
 	}
-	
+
 	/**
 	 * isValidTypeIdentifier
 	 * 
@@ -969,135 +948,5 @@ public class JSMetadataReader extends ValidatingReader
 		}
 		
 		return result;
-	}
-	
-	/**
-	 * @throws IOException
-	 * @throws SchemaInitializationException
-	 */
-	private void loadMetadataSchema()
-	{
-		if (this._metadataSchema == null)
-		{
-			// get schema for our documentation XML format
-			URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(
-					"/metadata/JSMetadataSchema.xml"), null); //$NON-NLS-1$
-			InputStream schemaStream = null;
-
-			try
-			{
-				schemaStream = url.openStream();
-
-				// create the schema
-				this._schema = this._metadataSchema = SchemaBuilder.fromXML(schemaStream, this);
-			}
-			catch (IOException e)
-			{
-				Activator.logError(Messages.JSMetadataReader_Error_Loading_JS_Metadata, e);
-			}
-			catch (SchemaInitializationException e)
-			{
-				Activator.logError(Messages.JSMetadataReader_Error_Loading_JS_Metadata, e);
-			}
-			finally
-			{
-				// close the input stream
-				if (schemaStream != null)
-				{
-					try
-					{
-						schemaStream.close();
-					}
-					catch (IOException e)
-					{
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Load the JavaScript built-in objects documentation using a stream.
-	 * 
-	 * @param stream
-	 *            The input stream for the source XML
-	 * @throws ScriptDocException
-	 */
-	public void loadXML(InputStream stream) throws ScriptDocException
-	{
-		this.loadMetadataSchema();
-
-		if (this._metadataSchema != null)
-		{
-			// create a new SAX factory class
-			SAXParserFactory factory = SAXParserFactory.newInstance();
-			factory.setNamespaceAware(true);
-
-			// clear properties
-			this.stopTextBuffer();
-			SAXParser saxParser = null;
-
-			// parse the XML file
-			try
-			{
-				saxParser = factory.newSAXParser();
-				saxParser.parse(stream, this);
-			}
-			catch (ParserConfigurationException e)
-			{
-				String msg = Messages.JSMetadataReader_SAX_Error;
-				ScriptDocException de = new ScriptDocException(msg, e);
-
-				throw de;
-			}
-			catch (SAXException e)
-			{
-				Exception ex = e.getException();
-				String msg = Messages.JSMetadataReader_Parse_Error;
-
-				if (ex != null)
-				{
-					msg += ex.getMessage();
-				}
-				else
-				{
-					msg += e.getMessage();
-				}
-
-				ScriptDocException de = new ScriptDocException(msg, e);
-
-				throw de;
-			}
-			catch (IOException e)
-			{
-				String msg = Messages.JSMetadataReader_Parse_IO_Error;
-				ScriptDocException de = new ScriptDocException(msg, e);
-
-				throw de;
-			}
-		}
-	}
-
-	/**
-	 * start buffering text
-	 * 
-	 * @param ns
-	 * @param name
-	 * @param qname
-	 * @param attributes
-	 */
-	public void startTextBuffer(String ns, String name, String qname, Attributes attributes)
-	{
-		this._bufferText = true;
-	}
-
-	/**
-	 * stop buffering text
-	 */
-	protected void stopTextBuffer()
-	{
-		// clear buffer and reset text buffering state
-		this._textBuffer.setLength(0);
-		this._bufferText = false;
 	}
 }
