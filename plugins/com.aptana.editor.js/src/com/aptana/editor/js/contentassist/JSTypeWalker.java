@@ -897,81 +897,70 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSIdentifierNode node)
 	{
-		String type = this.getNodeType(node);
-		
-		if (type == null)
+		String name = node.getText();
+
+		// lookup in local scope
+		if (this._scope != null && this._scope.hasSymbol(name))
 		{
-			String name = node.getText();
-	
-			// lookup in local scope
-			if (this._scope != null && this._scope.hasSymbol(name))
+			List<JSNode> symbolNodes = this._scope.getSymbol(name);
+
+			for (JSNode symbolNode : symbolNodes)
 			{
-				List<JSNode> symbolNodes = this._scope.getSymbol(name);
-	
-				for (JSNode symbolNode : symbolNodes)
+				if (symbolNode instanceof JSIdentifierNode)
 				{
-					if (symbolNode instanceof JSIdentifierNode)
+					if (symbolNode.getParent().getNodeType() == JSNodeTypes.PARAMETERS)
 					{
-						if (symbolNode.getParent().getNodeType() == JSNodeTypes.PARAMETERS)
-						{
-							// TODO: look for docs to determine type
-							// OR infer type from calls to the function
-						}
-						else if (symbolNode.getText().equals(name) == false)
-						{
-							((JSIdentifierNode) symbolNode).accept(this);
-						}
+						// TODO: look for docs to determine type
+						// OR infer type from calls to the function
 					}
-					else
+					else if (symbolNode.getText().equals(name) == false)
 					{
-						DocumentationBlock docs = symbolNode.getDocumentation();
-						
-						if (docs != null)
+						((JSIdentifierNode) symbolNode).accept(this);
+					}
+				}
+				else
+				{
+					DocumentationBlock docs = symbolNode.getDocumentation();
+					
+					if (docs != null)
+					{
+						for (Tag tag : docs.getTags(TagType.TYPE))
 						{
-							for (Tag tag : docs.getTags(TagType.TYPE))
+							TypeTag typeTag = (TypeTag) tag;
+							
+							for (Type t : typeTag.getTypes())
 							{
-								TypeTag typeTag = (TypeTag) tag;
-								
-								for (Type t : typeTag.getTypes())
-								{
-									this.addType(t.toSource());
-								}
+								this.addType(t.toSource());
 							}
 						}
-						else
-						{
-							symbolNode.accept(this);
-						}
-					}
-				}
-			}
-			else
-			{
-				PropertyElement property = this._indexHelper.getGlobal(this._index, name, EnumSet.of(ContentSelector.TYPES, ContentSelector.RETURN_TYPES));
-	
-				if (property != null)
-				{
-					if (property instanceof FunctionElement)
-					{
-						FunctionElement function = (FunctionElement) property;
-						
-						this.addType(function.getSignature());
 					}
 					else
 					{
-						for (ReturnTypeElement typeElement : property.getTypes())
-						{
-							this.addType(typeElement.getType());
-						}
+						symbolNode.accept(this);
 					}
 				}
 			}
-			
-			this.putNodeType(node, StringUtil.join(",", this.getTypes()));
 		}
 		else
 		{
-			this.addType(type);
+			PropertyElement property = this._indexHelper.getGlobal(this._index, name, EnumSet.of(ContentSelector.TYPES, ContentSelector.RETURN_TYPES));
+
+			if (property != null)
+			{
+				if (property instanceof FunctionElement)
+				{
+					FunctionElement function = (FunctionElement) property;
+					
+					this.addType(function.getSignature());
+				}
+				else
+				{
+					for (ReturnTypeElement typeElement : property.getTypes())
+					{
+						this.addType(typeElement.getType());
+					}
+				}
+			}
 		}
 	}
 	
