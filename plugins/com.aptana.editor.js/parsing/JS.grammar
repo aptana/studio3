@@ -1,3 +1,4 @@
+// java -jar beaver.jar -T -w JS.grammar
 %package "com.aptana.editor.js.parsing";
 
 %class "JSParser";

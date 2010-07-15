@@ -1,3 +1,4 @@
+// java -jar beaver.jar -T -w SDoc.grammar
 %package "com.aptana.editor.js.sdoc.parsing";
 %import "java.util.List";
 %import "com.aptana.editor.js.sdoc.model.*";
