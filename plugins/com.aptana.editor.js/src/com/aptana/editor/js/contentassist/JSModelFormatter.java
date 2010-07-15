@@ -104,9 +104,7 @@ public class JSModelFormatter
 			buffer.append("<br>"); //$NON-NLS-1$
 
 			// emit list
-			buffer.append("<pre>");
 			buffer.append(StringUtil.join("<br><br>", examples)); //$NON-NLS-1$
-			buffer.append("</pre>");
 		}
 	}
 	
@@ -262,8 +260,8 @@ public class JSModelFormatter
 
 		addReturnTypes(buffer, function.getReturnTypes(), "void"); //$NON-NLS-1$
 		addDescription(buffer, function);
-		addDefiningFiles(buffer, function, projectURI);
 		addExamples(buffer, function.getExamples());
+		addDefiningFiles(buffer, function, projectURI);
 		addSpecifications(buffer, function);
 
 		return buffer.toString();
@@ -290,8 +288,8 @@ public class JSModelFormatter
 
 		addReturnTypes(buffer, property.getTypes(), "undefined"); //$NON-NLS-1$
 		addDescription(buffer, property);
-		addDefiningFiles(buffer, property, projectURI);
 		addExamples(buffer, property.getExamples());
+		addDefiningFiles(buffer, property, projectURI);
 		addSpecifications(buffer, property);
 
 		return buffer.toString();
