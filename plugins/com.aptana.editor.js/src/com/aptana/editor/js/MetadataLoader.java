@@ -36,7 +36,7 @@ public class MetadataLoader extends Job
 	 */
 	public MetadataLoader()
 	{
-		super(Messages.MetadataLoader_0);
+		super(Messages.Loading_Metadata);
 
 		setPriority(Job.LONG);
 	}
