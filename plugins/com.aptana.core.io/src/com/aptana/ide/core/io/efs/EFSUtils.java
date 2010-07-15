@@ -246,6 +246,7 @@ public final class EFSUtils
 	public static boolean copyFileWithAttributes(IFileStore sourceStore, IFileStore destinationStore,
 			IProgressMonitor monitor, IFileInfo info) throws CoreException
 	{
+		
 		boolean success = copyFile(sourceStore, destinationStore, monitor);
 		if (success)
 		{
@@ -261,7 +262,7 @@ public final class EFSUtils
 	public static IFileStore[] getFiles(IFileStore file, boolean recurse, boolean includeCloakedFiles,
 			IProgressMonitor monitor) throws CoreException
 	{
-		SubMonitor progress = SubMonitor.convert(monitor);
+		SubMonitor progress = SubMonitor.convert(monitor, 100);
 
 		IFileStore[] result = null;
 		ArrayList<IFileStore> list = new ArrayList<IFileStore>();
@@ -269,10 +270,10 @@ public final class EFSUtils
 		Object resource = file.getAdapter(IResource.class);
 		if (resource != null && resource instanceof IContainer)
 		{
-			((IResource) resource).refreshLocal(IResource.DEPTH_INFINITE, progress);
+			((IResource) resource).refreshLocal(IResource.DEPTH_INFINITE, progress.newChild(10));
 		}
 
-		getFiles(file, recurse, list, includeCloakedFiles, progress);
+		getFiles(file, recurse, list, includeCloakedFiles, progress.newChild(90));
 		result = list.toArray(new IFileStore[0]);
 		return result;
 	}
@@ -347,18 +348,13 @@ public final class EFSUtils
 				boolean addingFile;
 				for (int i = 0; i < children.length; i++)
 				{
-					if (progress != null)
-					{
-						Policy.checkCanceled(progress);
-					}
-
+					Policy.checkCanceled(progress);
 					IFileStore child = children[i];
 					addingFile = false;
 					if (includeCloakedFiles || !CloakingUtils.isFileCloaked(child))
 					{
 						list.add(child);
 						addingFile = true;
-						progress.worked(1);
 					}
 
 					if (recurse && addingFile && isFolder(child, progress))
