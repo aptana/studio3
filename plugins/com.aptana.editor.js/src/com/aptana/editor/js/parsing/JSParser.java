@@ -306,6 +306,12 @@ public class JSParser extends Parser implements IParser {
 		// grab source
 		String source = new String(parseState.getSource());
 		
+		// make sure we have some source
+		if (source == null)
+		{
+			source = "";
+		}
+		
 		// send source to the scanner
 		fScanner.setSource(source);
 		
