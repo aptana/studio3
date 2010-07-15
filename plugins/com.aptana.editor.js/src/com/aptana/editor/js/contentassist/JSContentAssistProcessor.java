@@ -51,16 +51,19 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private static final EnumSet<ContentSelector> CORE_GLOBAL_SELECTOR = EnumSet.of(
 		ContentSelector.NAME,				//
 		ContentSelector.DESCRIPTION,		//
-		ContentSelector.USER_AGENTS,		//
+		ContentSelector.EXAMPLES,			//
+		ContentSelector.RETURN_TYPES,		//
+		ContentSelector.SINCE,				//
 		ContentSelector.TYPES,				//
-		ContentSelector.RETURN_TYPES		//
+		ContentSelector.USER_AGENTS			//
 	);
 	private static final EnumSet<ContentSelector> PROJECT_GLOBAL_SELECTOR = EnumSet.of(
 		ContentSelector.NAME,				//
 		ContentSelector.DESCRIPTION,		//
 		ContentSelector.DOCUMENTS,			//
-		ContentSelector.TYPES,				//
-		ContentSelector.RETURN_TYPES		//
+		ContentSelector.EXAMPLES,			//
+		ContentSelector.RETURN_TYPES,		//
+		ContentSelector.TYPES				//
 	);
 	private static final EnumSet<ContentSelector> TYPE_PROPERTY_SELECTOR = EnumSet.of(
 		ContentSelector.NAME,				//
