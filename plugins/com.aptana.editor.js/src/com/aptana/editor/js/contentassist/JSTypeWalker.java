@@ -50,6 +50,7 @@ import com.aptana.editor.js.parsing.ast.JSStringNode;
 import com.aptana.editor.js.parsing.ast.JSTreeWalker;
 import com.aptana.editor.js.parsing.ast.JSTrueNode;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
+import com.aptana.editor.js.sdoc.model.ExampleTag;
 import com.aptana.editor.js.sdoc.model.ParamTag;
 import com.aptana.editor.js.sdoc.model.ReturnTag;
 import com.aptana.editor.js.sdoc.model.Tag;
@@ -233,6 +234,14 @@ public class JSTypeWalker extends JSTreeWalker
 					function.addReturnType(returnType);
 				}
 			}
+			
+			// apply examples
+			for (Tag tag : block.getTags(TagType.EXAMPLE))
+			{
+				ExampleTag exampleTag = (ExampleTag) tag;
+				
+				function.addExample(exampleTag.getText());
+			}
 		}
 	}
 	
@@ -269,6 +278,14 @@ public class JSTypeWalker extends JSTreeWalker
 						
 						property.addType(returnType);
 					}
+				}
+				
+				// apply examples
+				for (Tag tag : block.getTags(TagType.EXAMPLE))
+				{
+					ExampleTag exampleTag = (ExampleTag) tag;
+					
+					property.addExample(exampleTag.getText());
 				}
 			}
 		}
