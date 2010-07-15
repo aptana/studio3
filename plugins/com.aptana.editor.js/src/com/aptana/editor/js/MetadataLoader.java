@@ -106,6 +106,11 @@ public class MetadataLoader extends Job
 		if (expectedVersion != JSIndexConstants.INDEX_VERSION)
 		{
 			IndexManager manager = IndexManager.getInstance();
+			
+			// TODO: We are temporarily deleting the entire project index
+			// because it appears that Index#removeCategories doesn't clean up
+			// the index's list of documents. This prevents the files from
+			// being indexed during the timestamp comparison step in Index.
 			boolean deleteIndex = true;
 			
 			for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
