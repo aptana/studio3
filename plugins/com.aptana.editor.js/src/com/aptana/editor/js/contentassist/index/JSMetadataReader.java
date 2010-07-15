@@ -61,7 +61,7 @@ import com.aptana.editor.js.contentassist.model.UserAgentElement;
  */
 public class JSMetadataReader extends MetadataReader
 {
-	private static final String JS_METADATA_SCHEMA = "/metadata/JSMetadataSchema.xml";
+	private static final String JS_METADATA_SCHEMA = "/metadata/JSMetadataSchema.xml"; //$NON-NLS-1$
 	private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("[$_a-zA-Z][$_a-zA-Z0-9]*"); //$NON-NLS-1$
 	private static final Pattern TYPE_PATTERN = Pattern.compile("[$_a-zA-Z][$_a-zA-Z0-9]*(?:(?:<[$_a-zA-Z][$_a-zA-Z0-9]*>)|(?:\\[\\]))?"); //$NON-NLS-1$
 	
@@ -183,7 +183,7 @@ public class JSMetadataReader extends MetadataReader
 					else
 					{
 						String message = MessageFormat.format(
-							Messages.JSMetadataReader_6,
+							Messages.JSMetadataReader_Invalid_Supertype_Name,
 							superType,
 							typeName
 						);
@@ -200,7 +200,7 @@ public class JSMetadataReader extends MetadataReader
 		else
 		{
 			String message = MessageFormat.format(
-				Messages.JSMetadataReader_7,
+				Messages.JSMetadataReader_Invalid_Type_Name,
 				typeName
 			);
 			
@@ -243,7 +243,7 @@ public class JSMetadataReader extends MetadataReader
 		}
 		else
 		{
-			Activator.logError(Messages.JSMetadataReader_8 + exceptionName, null);
+			Activator.logError(Messages.JSMetadataReader_Invalid_Exception_Name + exceptionName, null);
 		}
 	}
 
@@ -352,7 +352,7 @@ public class JSMetadataReader extends MetadataReader
 				else
 				{
 					String message = MessageFormat.format(
-						Messages.JSMetadataReader_9,
+						Messages.JSMetadataReader_Invalid_Parameter_Type,
 						type,
 						parameterName
 					);
@@ -421,7 +421,7 @@ public class JSMetadataReader extends MetadataReader
 				else
 				{
 					String message = MessageFormat.format(
-						Messages.JSMetadataReader_10,
+						Messages.JSMetadataReader_Invalid_Property_Type,
 						propertyType,
 						propertyName
 					);
@@ -474,7 +474,7 @@ public class JSMetadataReader extends MetadataReader
 		}
 		else
 		{
-			Activator.logError(Messages.JSMetadataReader_12 + type, null);
+			Activator.logError(Messages.JSMetadataReader_Invalid_Return_Type + type, null);
 		}
 	}
 	
