@@ -288,7 +288,7 @@ public class JSParser extends Parser implements IParser {
 	{
 		Symbol result = null;
 
-		if (this.top != -1)
+		if (0 <= this.top && this.top < this._symbols.length)
 		{
 			result = this._symbols[this.top];
 		}
