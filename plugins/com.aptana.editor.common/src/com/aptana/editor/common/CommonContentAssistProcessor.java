@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -235,16 +236,27 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 								Image fromReg = reg.get(imagePath);
 								if (fromReg == null)
 								{
+									URL imageURL = null;
 									try
 									{
-										ImageDescriptor desc = ImageDescriptor.createFromURL(new File(imagePath)
-												.toURI().toURL());
-										reg.put(imagePath, desc);
-										image = reg.get(imagePath);
+										imageURL = new URL(imagePath);
 									}
 									catch (MalformedURLException e)
 									{
-										CommonEditorPlugin.logError(e);
+										try
+										{
+											imageURL = new File(imagePath).toURI().toURL();
+										}
+										catch (MalformedURLException e1)
+										{
+											CommonEditorPlugin.logError(e1);
+										}
+									}
+									if (imageURL != null)
+									{
+										ImageDescriptor desc = ImageDescriptor.createFromURL(imageURL);
+										reg.put(imagePath, desc);
+										image = reg.get(imagePath);
 									}
 								}
 								else
