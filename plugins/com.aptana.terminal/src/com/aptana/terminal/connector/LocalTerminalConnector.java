@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -38,7 +38,9 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -51,6 +53,8 @@ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
 import org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl;
 
+import com.aptana.core.util.PlatformUtil;
+import com.aptana.core.util.PlatformUtil.ProcessItem;
 import com.aptana.terminal.Activator;
 import com.aptana.terminal.IProcessConfiguration;
 import com.aptana.terminal.internal.IProcessListener;
@@ -63,11 +67,13 @@ import com.aptana.terminal.internal.StreamsProxyOutputStream;
  *
  */
 @SuppressWarnings("restriction")
-public class LocalTerminalConnector extends TerminalConnectorImpl implements IProcessListener {
+public class LocalTerminalConnector extends TerminalConnectorImpl implements IProcessListener, IOutputFilter {
 
 	public static final String ID = "com.aptana.terminal.connector.local"; //$NON-NLS-1$
 	
 	private static final String ENCODING = "ISO-8859-1"; //$NON-NLS-1$
+	private static final char DLE = '\u0010';
+	private static final int PROCESS_LIST_TIMEOUT = 1500;
 
 	// TODO: These shouldn't be in here. We're pulling the values from the explorer plugin
 	// so as not to create a dependency on the two projects.
@@ -82,6 +88,9 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 	
 	private int currentWidth = 0;
 	private int currentHeight = 0;
+	
+	private StringBuffer filteredSequence = new StringBuffer();
+	private List<Integer> processList = new ArrayList<Integer>();
 	
 	private IPath initialDirectory;
 	
@@ -105,8 +114,11 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 	public void connect(ITerminalControl control) {
 		super.connect(control);
 		control.setState(TerminalState.CONNECTING);
-		startProcess(control);
-		control.setState(TerminalState.CONNECTED);
+		if (startProcess(control)) {
+			control.setState(TerminalState.CONNECTED);
+		} else {
+			control.setState(TerminalState.CLOSED);			
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -130,7 +142,29 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			streamsProxy.write("\u001b[8;"+Integer.toString(currentHeight)+";"+Integer.toString(currentWidth)+"t"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		} catch (IOException e) {
 			Activator.logError("Send terminal size failed.", e); //$NON-NLS-1$
-		}		
+		}
+	}
+	
+	private Integer[] getProcessList() {
+		processList.clear();
+		if (streamsProxy != null) {
+			try {
+				streamsProxy.write(DLE+"$p"); //$NON-NLS-1$
+			} catch (IOException e) {
+				Activator.logError("Get terminal process list failed.", e); //$NON-NLS-1$
+				return null;
+			}
+			synchronized (processList) {
+				if (processList.isEmpty()) {
+					try {
+						processList.wait(PROCESS_LIST_TIMEOUT);
+					} catch (InterruptedException e) {
+					}
+				}
+				return processList.toArray(new Integer[processList.size()]);
+			}
+		}
+		return null;
 	}
 	
 	/* (non-Javadoc)
@@ -180,7 +214,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 		return initialDirectory;
 	}
 
-	private void startProcess(ITerminalControl control) {
+	private boolean startProcess(ITerminalControl control) {
 		try {
 			
 			processLauncher = new ProcessLauncher(getCurrentConfiguration(), initialDirectory = getInitialDirectory());
@@ -197,20 +231,22 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			// Hook up standard output:
 			//
 			IStreamMonitor outputMonitor = streamsProxy.getOutputStreamMonitor();
-			LocalTerminalOutputListener outputListener = new LocalTerminalOutputListener(control);
+			LocalTerminalOutputListener outputListener = new LocalTerminalOutputListener(control, this);
 			outputMonitor.addListener(outputListener);
 			outputListener.streamAppended(outputMonitor.getContents(), outputMonitor);
 
 			// Hook up standard error:
 			//
 			IStreamMonitor errorMonitor = streamsProxy.getErrorStreamMonitor();
-			LocalTerminalOutputListener errorListener = new LocalTerminalOutputListener(control);
+			LocalTerminalOutputListener errorListener = new LocalTerminalOutputListener(control, null);
 			errorMonitor.addListener(errorListener);
 			errorListener.streamAppended(errorMonitor.getContents(), errorMonitor);
-
+			return true;
 		} catch (Exception e) {
 			Activator.logError("Starting terminal process failed.", e); //$NON-NLS-1$
 		}
+		control.displayTextInTerminal(Messages.LocalTerminalConnector_NoShellErrorMessage);
+		return false;
 	}
 	
 	private IProcessConfiguration getCurrentConfiguration() {
@@ -241,9 +277,86 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.aptana.terminal.connector.IOutputFilter#filterOutput(char[])
+	 */
+	@Override
+	public char[] filterOutput(char[] output) {
+		StringBuffer result = new StringBuffer(output.length);
+		boolean filtering = filteredSequence.length() != 0;
+		for (int i = 0; i < output.length; ++i) {
+			if (filtering) {
+				filteredSequence.append(output[i]);
+				if (Character.isLetter(output[i])) {
+					processCommandResponse(filteredSequence.toString());
+					filteredSequence.setLength(0);
+					filtering = false;
+				}
+			} else if (output[i] == DLE) {
+				filteredSequence.append(output[i]);
+				filtering = true;
+			} else {
+				result.append(output[i]);
+			}
+		}
+		return result.length() == output.length ? output : result.toString().toCharArray();
+	}
+	
+	private void processCommandResponse(String response) {
+		if (response.startsWith(DLE+"$") && response.endsWith("p")) { //$NON-NLS-1$ //$NON-NLS-2$
+			synchronized (processList) {
+				processList.notifyAll();
+				processList.clear();
+				response = response.substring(2, response.length()-1);
+				for (String pid : response.split(",")) { //$NON-NLS-1$
+					try {
+						processList.add(Integer.parseInt(pid));
+					} catch (NumberFormatException ignore) {
+					}
+				}
+			}
+		} else {
+			Activator.logWarning("LocalTerminalConnector:UNKNOWN COMMAND RESPONSE: "+response); //$NON-NLS-1$
+		}
+	}
+
 	public List<String> getRunningProcesses() {
 		List<String> processes = new ArrayList<String>();
-		processes.add("bash");
+		Integer[] list = getProcessList();
+		if (list != null && list.length > 0) {
+			Map<Integer, String> map = new HashMap<Integer, String>();
+			for (ProcessItem i : PlatformUtil.getRunningProcesses()) {
+				map.put(i.getPid(), i.getExecutableName());
+			}
+			if (Platform.OS_WIN32.equals(Platform.getOS())) {
+				String processName = map.get(list[0]);
+				Map<String, String> env = System.getenv();
+				if (env != null && processName != null && processName.equals(env.get("ComSpec"))) { //$NON-NLS-1$
+					map.remove(list[0]);
+				}
+			}
+			for (int pid : list) {
+				String processName = map.get(pid);
+				if (processName != null) {
+					if (Platform.OS_WIN32.equals(Platform.getOS())) {
+						processName = Path.fromOSString(processName).removeFileExtension().lastSegment();
+					} else {
+						if (processName.startsWith("-")) { //$NON-NLS-1$
+							processName = processName.substring(1);
+						}
+						int index = processName.indexOf(' ');
+						if (index > 0) {
+							processName = processName.substring(0, index);
+						}
+						index = processName.lastIndexOf('/');
+						if (index != -1) {
+							processName = processName.substring(index+1, processName.length());
+						}
+					}
+					processes.add(processName);
+				}
+			}
+		}
 		return processes;
 	}
 

@@ -17,8 +17,8 @@ import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.Bundle;
 
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.ui.SWTUtils;
+import com.aptana.ui.epl.UIEplPlugin;
 
 public class UserAgentManager
 {
@@ -86,7 +86,7 @@ public class UserAgentManager
 	 */
 	public String[] getActiveUserAgentIDs()
 	{
-		IPreferenceStore prefs = CommonEditorPlugin.getDefault().getPreferenceStore();
+		IPreferenceStore prefs = UIEplPlugin.getDefault().getPreferenceStore();
 		String agentsValue = prefs.getString(IPreferenceConstants.USER_AGENT_PREFERENCE);
 		
 		return agentsValue.split(","); //$NON-NLS-1$

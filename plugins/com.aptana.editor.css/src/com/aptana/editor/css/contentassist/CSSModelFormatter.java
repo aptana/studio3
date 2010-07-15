@@ -42,7 +42,7 @@ public class CSSModelFormatter
 		if (userAgents != null && userAgents.size() > 0)
 		{
 			buffer.append("<br>"); //$NON-NLS-1$
-			buffer.append("<b>").append(Messages.CSSModelFormatter_Supported_User_Agents).append("</b><br>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			buffer.append("<b>").append(Messages.CSSModelFormatter_Supported_User_Agents).append("</b><br>"); //$NON-NLS-1$ //$NON-NLS-2$
 			
 			for (int i = 0; i < userAgents.size(); i++)
 			{
@@ -87,7 +87,7 @@ public class CSSModelFormatter
 		if (userAgents != null && userAgents.size() > 0)
 		{
 			buffer.append("<br>"); //$NON-NLS-1$
-			buffer.append("<b>").append(Messages.CSSModelFormatter_Supported_User_Agents).append("</b><br>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			buffer.append("<b>").append(Messages.CSSModelFormatter_Supported_User_Agents).append("</b><br>"); //$NON-NLS-1$ //$NON-NLS-2$
 			
 			for (int i = 0; i < userAgents.size(); i++)
 			{

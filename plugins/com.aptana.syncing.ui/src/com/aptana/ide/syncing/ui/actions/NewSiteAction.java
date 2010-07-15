@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -56,10 +56,12 @@ public class NewSiteAction implements IObjectActionDelegate, IViewActionDelegate
     public NewSiteAction() {
     }
 
+    @Override
     public void setActivePart(IAction action, IWorkbenchPart targetPart) {
         fActivePart = targetPart;
     }
 
+    @Override
     public void run(IAction action) {
         if (fSelection.isEmpty() || !(fSelection instanceof IStructuredSelection)) {
             return;
@@ -75,12 +77,18 @@ public class NewSiteAction implements IObjectActionDelegate, IViewActionDelegate
         dlg.open();
     }
 
+    @Override
     public void selectionChanged(IAction action, ISelection selection) {
-        fSelection = selection;
+        setSelection(selection);
     }
 
 	@Override
 	public void init(IViewPart view) {
 		fActivePart = view;
 	}
+
+    public void setSelection(ISelection selection)
+    {
+    	fSelection = selection;
+    }
 }

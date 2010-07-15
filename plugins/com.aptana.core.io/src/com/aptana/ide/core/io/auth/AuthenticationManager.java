@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -152,7 +152,7 @@ public final class AuthenticationManager implements IAuthenticationManager {
 				}
 				sessionPasswords.put(authId, password);
 			}
-			node.flush();
+			getSecurePreferences().flush();
 		} catch (Exception e) {
 			CoreIOPlugin.log(new Status(IStatus.WARNING, CoreIOPlugin.PLUGIN_ID, Messages.AuthenticationManager_FailedSaveSecurePreference, e));
 		}

@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -53,7 +53,7 @@ import com.aptana.ide.core.io.IConnectionPoint;
  * @author Max Stepanov
  * 
  */
-public class SiteConnection extends PlatformObject implements ISiteConnection {
+/* package */ class SiteConnection extends PlatformObject implements ISiteConnection {
 
     private static final String ELEMENT_NAME = "name"; //$NON-NLS-1$
     private static final String ELEMENT_SOURCE = "source"; //$NON-NLS-1$
@@ -68,7 +68,6 @@ public class SiteConnection extends PlatformObject implements ISiteConnection {
     private List<Object> excludes = new ArrayList<Object>();
 
     private boolean dirty;
-    private boolean shouldRestore;
 
     /**
 	 * 
@@ -186,7 +185,6 @@ public class SiteConnection extends PlatformObject implements ISiteConnection {
     }
 
     protected void loadState(IMemento memento) {
-        shouldRestore = true;
         IMemento child = memento.getChild(ELEMENT_NAME);
         if (child != null) {
             name = child.getTextData();
@@ -194,20 +192,12 @@ public class SiteConnection extends PlatformObject implements ISiteConnection {
         child = memento.getChild(ELEMENT_SOURCE);
         if (child != null) {
             URI uri = URI.create(child.getTextData());
-            IConnectionPoint connectionPoint = ConnectionPointUtils.findConnectionPoint(uri);
-            if (connectionPoint == null) {
-                shouldRestore = false;
-            }
-            sourceConnectionPoint = connectionPoint;
+            sourceConnectionPoint = ConnectionPointUtils.findConnectionPoint(uri);
         }
         child = memento.getChild(ELEMENT_DESTINATION);
         if (child != null) {
             URI uri = URI.create(child.getTextData());
-            IConnectionPoint connectionPoint = ConnectionPointUtils.findConnectionPoint(uri);
-            if (connectionPoint == null) {
-                shouldRestore = false;
-            }
-            destinationConnectionPoint = connectionPoint;
+            destinationConnectionPoint = ConnectionPointUtils.findConnectionPoint(uri);
         }
         child = memento.getChild(ELEMENT_EXCLUDES);
         if (child != null) {
@@ -255,7 +245,7 @@ public class SiteConnection extends PlatformObject implements ISiteConnection {
         }
     }
 
-    final boolean shouldRestore() {
-        return shouldRestore;
+    /* package */final boolean isValid() {
+        return sourceConnectionPoint != null && destinationConnectionPoint != null;
     }
 }

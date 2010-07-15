@@ -142,7 +142,7 @@ public class ParseNodeNavigator extends DefaultNavigator
 
 				protected IParseNode getNextNode(IParseNode node)
 				{
-					int index = node.getChildIndex();
+					int index = node.getIndex();
 
 					return node.getParent().getChild(index + 1);
 				}
@@ -243,6 +243,61 @@ public class ParseNodeNavigator extends DefaultNavigator
 	public String getNamespaceStringValue(Object ns)
 	{
 		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.jaxen.DefaultNavigator#getParentAxisIterator(java.lang.Object)
+	 */
+	public Iterator<?> getParentAxisIterator(final Object contextNode) throws UnsupportedAxisException
+	{
+		if (isAttribute(contextNode))
+		{
+			throw new UnsupportedAxisException("Need to add an iterator that supports attributes");
+		}
+		else
+		{
+			return new Iterator<Object>()
+			{
+				IParseNode next;
+
+				{
+					if (contextNode != null)
+					{
+						if (isAttribute(contextNode))
+						{
+							next = ((IParseNodeAttribute) contextNode).getParent();
+						}
+						else if (isElement(contextNode))
+						{
+							next = ((IParseNode) contextNode).getParent();
+						}
+					}
+				}
+
+				@Override
+				public boolean hasNext()
+				{
+					return next != null;
+				}
+
+				@Override
+				public Object next()
+				{
+					Object result = next;
+
+					next = next.getParent();
+
+					return result;
+				}
+
+				@Override
+				public void remove()
+				{
+					// do nothing
+				}
+			};
+		}
 	}
 
 	/**

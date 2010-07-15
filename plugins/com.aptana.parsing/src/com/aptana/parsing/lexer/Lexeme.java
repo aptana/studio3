@@ -100,10 +100,20 @@ public class Lexeme<T> implements ILexeme
 
 		if (secondLexeme != null)
 		{
-			result = this.getEndingOffset() == secondLexeme.getStartingOffset();
+			result = this.getEndingOffset() + 1 == secondLexeme.getStartingOffset();
 		}
 
 		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.lexer.IRange#isEmpty()
+	 */
+	@Override
+	public boolean isEmpty()
+	{
+		return this._endingOffset < this._startingOffset;
 	}
 
 	/*
@@ -116,7 +126,11 @@ public class Lexeme<T> implements ILexeme
 		StringBuilder buffer = new StringBuilder();
 		String type = this._type.toString();
 
-		buffer.append("[").append(type).append("]~").append(this.getText()).append("~");
+		buffer.append(type);
+		buffer.append(" [");
+		buffer.append(this.getStartingOffset()).append("-").append(this.getEndingOffset());
+		buffer.append(",").append(this.getText());
+		buffer.append("]");
 
 		return buffer.toString();
 	}

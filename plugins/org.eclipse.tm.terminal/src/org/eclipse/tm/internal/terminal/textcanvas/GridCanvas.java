@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0 
  * which accompanies this distribution, and is available at 
@@ -7,6 +7,7 @@
  * 
  * Contributors: 
  * Michael Scharf (Wind River) - initial API and implementation
+ * Anton Leherbauer (Wind River) - [294468] Fix scroller and text line rendering
  *******************************************************************************/
 package org.eclipse.tm.internal.terminal.textcanvas;
 
@@ -18,6 +19,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.ScrollBar;
 
 /**
  * A Grid based Canvas. The canvas has rows and columns.
@@ -45,20 +47,6 @@ abstract public class GridCanvas extends VirtualCanvas {
 
 	}
 
-	public void setBounds(int x, int y, int width, int height) {
-		// adjust the height so that there are no characters cut
-		// Maybe it would be better to use a custom Layout...
-		int shiftH=0;
-		if(getCellHeight()!=0)
-			shiftH=height % getCellHeight();
-		super.setBounds(x, y+shiftH, width, height-shiftH);
-	}
-
-	public void setBounds(Rectangle rect) {
-		// just to be sure our set bounds is called!
-		setBounds(rect.x,rect.y,rect.width,rect.height);
-	}
-
 	/** template method paint.
 	 * iterates over all cells in the clipping rectangle and paints them.
 	 */
@@ -73,6 +61,9 @@ abstract public class GridCanvas extends VirtualCanvas {
 		int colFirst=virtualXToCell(xOffset+clipping.x);
 		if(colFirst>getCols())
 			colFirst=getCols();
+		else if (colFirst < 0) {
+			colFirst = 0;
+		}
 		int rowFirst=virtualYToCell(yOffset+clipping.y);
 		// End coordinates
 		int colLast=virtualXToCell(xOffset+clipping.x+clipping.width+fCellWidth);
@@ -172,10 +163,10 @@ abstract public class GridCanvas extends VirtualCanvas {
 		int cellX=virtualXToCell(x);
 		int cellY=virtualYToCell(y);
 		// End coordinates
-		int xE=virtualXToCell(x+fCellWidth+width-1);
+		int xE=virtualXToCell(x+width);
 //		if(xE>getCols())
 //			xE=getCols();
-		int yE=virtualYToCell(y+fCellHeight+height-1);
+		int yE=virtualYToCell(y+height);
 //		if(yE>getRows())
 //			yE=getRows();
 		visibleCellRectangleChanged(cellX,cellY,xE-cellX,yE-cellY);
@@ -193,5 +184,49 @@ abstract public class GridCanvas extends VirtualCanvas {
 	protected void visibleCellRectangleChanged(int x, int y, int width, int height) {
 	}
 	
+	protected void setVirtualExtend(int width, int height) {
+		int cellHeight = getCellHeight();
+		if (cellHeight > 0) {
+			height -= height % cellHeight;
+		}
+		super.setVirtualExtend(width, height);
+	}
+	
+	protected void setVirtualOrigin(int x, int y) {
+		int cellHeight = getCellHeight();
+		if (cellHeight > 0) {
+			int remainder = y % cellHeight;
+			if (remainder < 0) {
+				y -= (cellHeight + remainder);
+			} else {
+				y -= remainder;
+			}
+		}
+		super.setVirtualOrigin(x, y);
+	}
+	
+	protected void scrollY(ScrollBar vBar) {
+		int vSelection = vBar.getSelection ();
+		Rectangle bounds = getVirtualBounds();
+		int y = -vSelection;
+		int cellHeight = getCellHeight();
+		if (cellHeight > 0) {
+			int remainder = y % cellHeight;
+			if (remainder < 0) {
+				y -= (cellHeight + remainder);
+			} else {
+				y -= remainder;
+			}
+		}
+		int deltaY = y - bounds.y;
+		if(deltaY!=0) {
+			scrollSmart(0,deltaY);
+			setVirtualOrigin(bounds.x, bounds.y += deltaY);
+		}
+		if (-bounds.y + getRows() * getCellHeight() >= bounds.height) {
+			// scrolled to bottom - need to redraw bottom area
+			Rectangle clientRect = getClientArea();
+			redraw(0, clientRect.height - fCellHeight, clientRect.width, fCellHeight, false);
+		}
+	}
 }
-

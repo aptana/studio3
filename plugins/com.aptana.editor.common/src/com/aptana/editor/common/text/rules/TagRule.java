@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -147,7 +147,12 @@ public class TagRule extends MultiLineRule
 				return true;
 			}
 		}
-
+		if (scanner instanceof SequenceCharacterScanner && ((SequenceCharacterScanner) scanner).foundSequence())
+		{
+			// this means the EOF came from seeing a switching sequence, so assumes the end is detected and no need to
+			// rewind one character
+			return true;
+		}
 		scanner.unread();
 		return false;
 	}

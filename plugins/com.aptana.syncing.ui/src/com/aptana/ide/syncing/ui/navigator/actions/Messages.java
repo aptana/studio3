@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -41,6 +41,8 @@ public class Messages extends NLS {
     private static final String BUNDLE_NAME = "com.aptana.ide.syncing.ui.navigator.actions.messages"; //$NON-NLS-1$
 
     public static String DoubleClickAction_NewConnection;
+
+	public static String ProjectConnectionDisconnectAction_Disconnecting;
 
     static {
         // initialize resource bundle

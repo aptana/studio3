@@ -11,3 +11,4 @@ Export-Package: org.jrubyparser,
  org.jrubyparser.rewriter.utils,
  org.jrubyparser.util
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: jruby.org

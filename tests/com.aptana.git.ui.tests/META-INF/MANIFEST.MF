@@ -6,4 +6,4 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: APTANA
 Fragment-Host: com.aptana.git.ui;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: org.junit;bundle-version="[3.7.0,4.0.0)"
+Require-Bundle: org.junit

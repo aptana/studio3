@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2009 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,10 +10,26 @@
  * Michael Scharf (Wind River) - [240098] The cursor should not blink when the terminal is disconnected
  * Uwe Stieber (Wind River) - [281328] The very first few characters might be missing in the terminal control if opened and connected programmatically
  * Martin Oberhuber (Wind River) - [294327] After logging in, the remote prompt is hidden
+ * Anton Leherbauer (Wind River) - [294468] Fix scroller and text line rendering
+ * Uwe Stieber (Wind River) - [205486] Fix ScrollLock always moving to line 1
  *******************************************************************************/
 package org.eclipse.tm.internal.terminal.textcanvas;
 
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.RegistryFactory;
+import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
@@ -23,10 +39,17 @@ import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tm.internal.terminal.control.impl.TerminalPlugin;
+import org.eclipse.tm.terminal.model.IHyperlinkDetector;
+import org.eclipse.tm.terminal.model.ITerminalTextData;
+import org.eclipse.tm.terminal.model.ITerminalTextDataReadOnly;
+import org.eclipse.tm.terminal.model.Style;
 
 /**
  * A cell oriented Canvas. Maintains a list of "cells".
@@ -34,6 +57,12 @@ import org.eclipse.swt.widgets.Composite;
  * The CellRenderer is responsible for painting the cell.
  */
 public class TextCanvas extends GridCanvas {
+
+	private static final String HYPERLINK_DETECTOR_EXT_PT = TerminalPlugin.PLUGIN_ID + ".terminalHyperlinkDetectors"; //$NON-NLS-1$
+	private Map fLinks = new HashMap(3);
+	private int fLastHash;
+	private IHyperlinkDetector[] fDetectors;
+	
 	protected final ITextCanvasModel fCellCanvasModel;
 	/** Renders the cells */
 	private final ILinelRenderer fCellRenderer;
@@ -66,7 +95,7 @@ public class TextCanvas extends GridCanvas {
 	// since it allows switching the terminal viewport small/large as needed,
 	// without destroying the backing store. For a complete solution, 
 	// Bug 196462 tracks the request for a user-defined fixed-widow-size-mode.
-	private int fMinColumns=20;
+	private int fMinColumns=80;
 	private int fMinLines=4;
 	private boolean fCursorEnabled;
 	/**
@@ -82,14 +111,18 @@ public class TextCanvas extends GridCanvas {
 		fCellCanvasModel.addCellCanvasModelListener(new ITextCanvasModelListener(){
 			public void rangeChanged(int col, int line, int width, int height) {
 				repaintRange(col,line,width,height);
+				for (int i = line; i < line + height; i++)
+				{
+					updateLine(i);
+				}
 			}
 			public void dimensionsChanged(int cols, int rows) {
-				setVirtualExtend(cols+getCellWidth(), rows+getCellHeight());
 				calculateGrid();
 			}
 			public void terminalDataChanged() {
 				if(isDisposed())
 					return;
+				// scroll to end (unless scroll lock is active)
 				scrollToEnd();
 			}
 		});
@@ -123,9 +156,20 @@ public class TextCanvas extends GridCanvas {
 					updateHasSelection(e);
 					if(fHasSelection)
 						setSelection(screenPointToCell(e.x, e.y));
-					else
+					else {
 						fCellCanvasModel.setSelection(-1,-1,-1,-1);
+						detectHyperlinkClicks();
+					}
 					fDraggingStart=null;
+				}
+			}
+			
+			protected void detectHyperlinkClicks()
+			{
+				IHyperlink under = findHyperlink(fDraggingStart);
+				if (under != null)
+				{
+					under.open();
 				}
 			}
 		});
@@ -135,6 +179,18 @@ public class TextCanvas extends GridCanvas {
 				if (fDraggingStart != null) {
 					updateHasSelection(e);
 					setSelection(screenPointToCell(e.x, e.y));
+				}
+				
+				// Change cursor to hand if over a hyperlink
+				IHyperlink link = findHyperlink(screenPointToCell(e.x, e.y));
+				if (link != null)
+				{
+					Cursor c = getDisplay().getSystemCursor(SWT.CURSOR_HAND);
+					setCursor(c);
+				}
+				else
+				{
+					setCursor(null);
 				}
 			}
 		});
@@ -206,8 +262,10 @@ public class TextCanvas extends GridCanvas {
 	protected void onResize(boolean init) {
 		if(fResizeListener!=null) {
 			Rectangle bonds=getClientArea();
-			int lines=bonds.height/getCellHeight();
-			int columns=bonds.width/getCellWidth();
+			int cellHeight = getCellHeight();
+			int cellWidth = getCellWidth();
+			int lines=bonds.height/cellHeight;
+			int columns=bonds.width/cellWidth;
 			// when the view is minimised, its size is set to 0
 			// we don't sent this to the terminal!
 			if((lines>0 && columns>0) || init) {
@@ -215,15 +273,14 @@ public class TextCanvas extends GridCanvas {
 					if(!isHorizontalBarVisble()) {
 						setHorizontalBarVisible(true);
 						bonds=getClientArea();
-						lines=bonds.height/getCellHeight();
+						lines=bonds.height/cellHeight;
 					}
 					columns=fMinColumns;
 				} else if(columns>=fMinColumns && isHorizontalBarVisble()) {
 					setHorizontalBarVisible(false);
 					bonds=getClientArea();
-					lines=bonds.height/getCellHeight();
-					columns=bonds.width/getCellWidth();
-
+					lines=bonds.height/cellHeight;
+					columns=bonds.width/cellWidth;
 				}
 				if(lines<fMinLines)
 					lines=fMinLines;
@@ -240,22 +297,28 @@ public class TextCanvas extends GridCanvas {
 
 	private void calculateGrid() {
 		setVirtualExtend(getCols()*getCellWidth(),getRows()*getCellHeight());
-		// scroll to end
-		scrollToEnd();
-		// make sure the scroll area is correct:
-		scrollY(getVerticalBar());
-		scrollX(getHorizontalBar());
-
-		getParent().layout();
-		redraw();
+		setRedraw(false);
+		try {
+			// scroll to end (unless scroll lock is active)
+			scrollToEnd();
+			getParent().layout();
+		} finally {
+			setRedraw(true);
+		}
 	}
 	void scrollToEnd() {
 		if(!fScrollLock) {
 			int y=-(getRows()*getCellHeight()-getClientArea().height);
+			if (y > 0) {
+				y = 0;
+			}
 			Rectangle v=getViewRectangle();
-			if(v.y!=y) {
+			if(v.y!=-y) {
 				setVirtualOrigin(v.x,y);
 			}
+			// make sure the scroll area is correct:
+			scrollY(getVerticalBar());
+			scrollX(getHorizontalBar());
 		}
 	}
 	/**
@@ -267,7 +330,6 @@ public class TextCanvas extends GridCanvas {
 	}
 	/**
 	 * If set then if the size changes
-	 * @param scrollLock
 	 */
 	public void setScrollLock(boolean scrollLock) {
 		fScrollLock=scrollLock;
@@ -279,9 +341,9 @@ public class TextCanvas extends GridCanvas {
 	}
 	protected void drawLine(GC gc, int line, int x, int y, int colFirst, int colLast) {
 		fCellRenderer.drawLine(fCellCanvasModel, gc,line,x,y,colFirst, colLast);
-
 	}
-	protected void paintUnoccupiedSpace(GC gc, Rectangle clipping) {
+	protected Color getTerminalBackgroundColor() {
+		return fCellRenderer.getDefaultBackgroundColor();
 	}
 	protected void visibleCellRectangleChanged(int x, int y, int width, int height) {
 		fCellCanvasModel.setVisibleRectangle(y,x,height,width);
@@ -371,6 +433,199 @@ public class TextCanvas extends GridCanvas {
 			fCellCanvasModel.setCursorEnabled(fCursorEnabled);
 		}
 
+	}
+	
+	protected IHyperlink findHyperlink(Point cellCoords)
+	{
+		IHyperlink[] links = (IHyperlink[]) fLinks.get(new Integer(cellCoords.y));
+		if (links == null)
+		{
+			return null;
+		}
+		for (int i = 0; i < links.length; i++)
+		{
+			IHyperlink link = links[i];
+			IRegion region = link.getHyperlinkRegion();
+			
+			int col = region.getOffset();
+			int endCol = region.getOffset() + region.getLength() - 1;
+			// clicked between start and end col
+			if (cellCoords.x <= endCol && cellCoords.x >= col)
+			{
+				return link;
+			}
+		}
+		return null;
+	}
+
+	private void setUnderlined(int line, IRegion region, boolean underlined)
+	{
+		int startCol = region.getOffset();
+		int endCol = region.getOffset() + region.getLength() - 1;
+		try
+		{
+			ITerminalTextDataReadOnly text = fCellCanvasModel.getTerminalText();
+			Field f = text.getClass().getDeclaredField("fTerminal"); //$NON-NLS-1$
+			f.setAccessible(true);
+			ITerminalTextData data = (ITerminalTextData) f.get(text);
+			
+			for (int col = startCol; col <= endCol; col++)
+			{
+				char c = data.getChar(line, col);
+				Style style = data.getStyle(line, col);
+				if (style != null)
+				{
+					style = style.setUnderline(underlined);
+					data.setChar(line, col, c, style);
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			// ignore
+		}
+	}
+
+	private synchronized IHyperlinkDetector[] getHyperlinkDetectors()
+	{
+		if (fDetectors == null)
+		{
+			IConfigurationElement[] config = RegistryFactory.getRegistry().getConfigurationElementsFor(
+					HYPERLINK_DETECTOR_EXT_PT);
+			List result = new ArrayList();
+			for (int i = 0; i < config.length; i++)
+			{
+				try
+				{
+					result.add(makeDetector(config[i]));
+				}
+				catch (CoreException e)
+				{
+					TerminalPlugin.getDefault().getLog().log(e.getStatus());
+				}
+			}
+			fDetectors = (IHyperlinkDetector[]) result.toArray(new IHyperlinkDetector[result.size()]);
+		}
+		return fDetectors;
+	}
+
+	static private IHyperlinkDetector makeDetector(final IConfigurationElement config) throws CoreException
+	{
+		return (IHyperlinkDetector) config.createExecutableExtension("class"); //$NON-NLS-1$
+	}
+
+	protected String getTerminalText(int line)
+	{
+		char[] c = fCellCanvasModel.getTerminalText().getChars(line);
+		if (c != null)
+		{
+			return new String(c);
+		}		
+		return ""; //$NON-NLS-1$
+	}
+
+	protected synchronized void updateLine(int line)
+	{
+		String text = getTerminalText(line);
+		int hash = line * 31 + text.hashCode();
+		if (hash == fLastHash)
+		{
+			return;
+		}
+		fLastHash = hash;
+		
+		if (text != null && text.trim().length() > 0)
+		{
+			// Detect new links
+			List list = new ArrayList();
+			IHyperlinkDetector[] detectors = getHyperlinkDetectors();
+			for (int i = 0; i < detectors.length; i++)
+			{
+				IHyperlinkDetector detector = detectors[i];
+				IHyperlink[] partialNewLinks = detector.detectHyperlinks(text);
+				if (partialNewLinks != null)
+				{
+					list.addAll(Arrays.asList(partialNewLinks));
+				}
+			}
+			IHyperlink[] oldLinks = (IHyperlink[]) fLinks.remove(new Integer(line));
+			IHyperlink[] newLinks = (IHyperlink[]) list.toArray(new IHyperlink[0]);
+			// Update map
+			fLinks.put(new Integer(line), newLinks);
+			// Only modify underlines if regions changed in any way...
+			if (regionsChanged(oldLinks, newLinks))
+			{					
+				// Remove links that were on this line before...
+				if (oldLinks != null)
+				{
+					for (int o = 0; o < oldLinks.length; o++)
+					{
+						IHyperlink link = oldLinks[o];
+						setUnderlined(line, link.getHyperlinkRegion(), false);
+					}
+				}
+				if (newLinks != null)
+				{
+					// Add underline to new set of links
+					for (int l = 0; l < newLinks.length; l++)
+					{
+						IHyperlink link = newLinks[l];
+						setUnderlined(line, link.getHyperlinkRegion(), true);
+					}
+				}
+			}
+		}
+	}
+	
+	private boolean regionsChanged(IHyperlink[] oldLinks, IHyperlink[] newLinks)
+	{
+		int oldLinkLength = oldLinks == null ? 0 : oldLinks.length;
+		int newLinkLength = newLinks == null ? 0 : newLinks.length;
+		// size changed, so we definitely have changes
+		if (oldLinkLength != newLinkLength)
+		{
+			return true;
+		}
+		// Compare the links' regions...
+		Set oldUnderlines = new HashSet();
+		for (int i = 0; i < oldLinkLength; i++)
+		{
+			IHyperlink link = oldLinks[i];
+			IRegion region = link.getHyperlinkRegion();
+			for (int x = 0; x < region.getLength(); x++)
+			{
+				oldUnderlines.add(new Integer(region.getOffset() + x));
+			}
+		}
+		for (int i = 0; i < newLinkLength; i++)
+		{
+			IHyperlink link = newLinks[i];
+			IRegion region = link.getHyperlinkRegion();
+			for (int x = 0; x < region.getLength(); x++)
+			{
+				Integer integ = new Integer(region.getOffset() + x);
+				if (oldUnderlines.contains(integ))
+				{
+					oldUnderlines.remove(integ);
+				}
+				else
+				{
+					// hit an offset in new links that wasn't in old!
+					return true;
+				}
+			}
+		}
+		// if there are any offsets left, then there was a change
+		return !oldUnderlines.isEmpty();
+	}
+
+	protected void detectHyperlinkClicks()
+	{
+		IHyperlink under = findHyperlink(fDraggingStart);
+		if (under != null)
+		{
+			under.open();
+		}
 	}
 
 }

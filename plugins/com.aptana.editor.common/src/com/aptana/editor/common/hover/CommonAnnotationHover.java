@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -69,7 +69,7 @@ public class CommonAnnotationHover extends DefaultAnnotationHover {
      * (non-Javadoc)
      * @see org.eclipse.jface.text.source.DefaultAnnotationHover#formatMultipleMessages(java.util.List)
      */
-    @SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	protected String formatMultipleMessages(List messages) {
         StringBuffer buffer = new StringBuffer();
 

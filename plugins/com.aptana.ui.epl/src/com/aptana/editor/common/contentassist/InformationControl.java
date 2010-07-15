@@ -10,11 +10,11 @@
  *******************************************************************************/
 package com.aptana.editor.common.contentassist;
 
+import org.eclipse.jface.text.DefaultInformationControl.IInformationPresenter;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlExtension;
 import org.eclipse.jface.text.IInformationControlExtension3;
 import org.eclipse.jface.text.TextPresentation;
-import org.eclipse.jface.text.DefaultInformationControl.IInformationPresenter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.DisposeEvent;
@@ -103,8 +103,7 @@ public class InformationControl implements IInformationControl, IInformationCont
 		GridData gd;
 
 		fShell= new Shell(parent, SWT.NO_FOCUS | SWT.ON_TOP | shellStyle);
-		Display display= fShell.getDisplay();
-		fShell.setBackground(display.getSystemColor(SWT.COLOR_BLACK));
+		fShell.setBackground(getBorderColor());
 
 		Composite composite= fShell;
 		layout= new GridLayout(1, false);
@@ -123,8 +122,8 @@ public class InformationControl implements IInformationControl, IInformationCont
 		composite.setLayout(layout);
 		gd= new GridData(GridData.FILL_BOTH);
 		composite.setLayoutData(gd);
-		composite.setForeground(display.getSystemColor(SWT.COLOR_INFO_FOREGROUND));
-		composite.setBackground(display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+		composite.setForeground(getForeground());
+		composite.setBackground(getBackground());
 
 		// Browser control
 		//fText = new Browser(composite, style);
@@ -135,8 +134,8 @@ public class InformationControl implements IInformationControl, IInformationCont
 		gd.horizontalIndent= INNER_BORDER;
 		gd.verticalIndent= INNER_BORDER;
 		fText.setLayoutData(gd);
-		fText.setForeground(display.getSystemColor(SWT.COLOR_INFO_FOREGROUND));
-		fText.setBackground(display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+		fText.setForeground(getForeground());
+		fText.setBackground(getBackground());
 		fText.addKeyListener(new KeyListener() {
 
 			public void keyPressed(KeyEvent e)  {
@@ -173,13 +172,36 @@ public class InformationControl implements IInformationControl, IInformationCont
 			statusField.setFont(fStatusTextFont);
 			gd= new GridData(GridData.FILL_HORIZONTAL | GridData.HORIZONTAL_ALIGN_BEGINNING | GridData.VERTICAL_ALIGN_BEGINNING);
 			statusField.setLayoutData(gd);
-
-			statusField.setForeground(display.getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW));
-
-			statusField.setBackground(display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+			
+			statusField.setForeground(getStatusFieldFG());
+			statusField.setBackground(getBackground());
 		}
 
 		addDisposeListener(this);
+	}
+	
+	protected Color getStatusFieldFG()
+	{
+		Display display= fShell.getDisplay();
+		return display.getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW);
+	}
+
+	protected Color getBorderColor()
+	{
+		Display display= fShell.getDisplay();
+		return display.getSystemColor(SWT.COLOR_WIDGET_BORDER);
+	}
+
+	protected Color getForeground()
+	{
+		Display display= fShell.getDisplay();
+		return display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
+	}
+	
+	protected Color getBackground()
+	{
+		Display display= fShell.getDisplay();
+		return display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
 	}
 
 	/**

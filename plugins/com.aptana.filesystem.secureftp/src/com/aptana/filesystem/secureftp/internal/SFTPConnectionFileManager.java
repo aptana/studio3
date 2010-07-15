@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -60,17 +60,15 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 
+import com.aptana.filesystem.ftp.Policy;
 import com.aptana.filesystem.ftp.internal.BaseFTPConnectionFileManager;
 import com.aptana.filesystem.ftp.internal.ExpiringMap;
-import com.aptana.filesystem.ftp.internal.FTPFileDownloadInputStream;
-import com.aptana.filesystem.ftp.internal.FTPFileUploadOutputStream;
+import com.aptana.filesystem.secureftp.ISFTPConnectionFileManager;
+import com.aptana.filesystem.secureftp.ISFTPConstants;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.preferences.PreferenceUtils;
 import com.aptana.ide.core.io.vfs.ExtendedFileInfo;
-import com.aptana.filesystem.ftp.Policy;
-import com.aptana.filesystem.secureftp.ISFTPConnectionFileManager;
-import com.aptana.filesystem.secureftp.ISFTPConstants;
 import com.enterprisedt.net.ftp.FTPException;
 import com.enterprisedt.net.ftp.FTPFile;
 import com.enterprisedt.net.ftp.FTPTransferType;
@@ -80,6 +78,7 @@ import com.enterprisedt.net.ftp.ssh.SSHFTPException;
 import com.enterprisedt.net.ftp.ssh.SSHFTPInputStream;
 import com.enterprisedt.net.ftp.ssh.SSHFTPOutputStream;
 import com.enterprisedt.net.j2ssh.configuration.SshConnectionProperties;
+import com.enterprisedt.net.j2ssh.sftp.SshFxpStatus;
 import com.enterprisedt.net.j2ssh.transport.publickey.InvalidSshKeyException;
 import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 
@@ -91,11 +90,9 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 
 	protected static final int SLEEP_INTERVAL = 10; /* 10 secs */
 
-	private SSHFTPClient ftpClient;
+	private SSHFTPClientTemp ftpClient;
 	private IPath keyFilePath;
 	private String transferType;
-	private String controlEncoding;
-	private String compression;
 	private IPath cwd;
 	private Map<IPath, FTPFile> ftpFileCache = new ExpiringMap<IPath, FTPFile>(CACHE_TTL);
 
@@ -107,7 +104,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	public void init(String host, int port, IPath basePath, IPath keyFilePath, String login, char[] password, String transferType, String encoding, String compression) {
 		Assert.isTrue(ftpClient == null, Messages.SFTPConnectionFileManager_ConnectionHasBeenInitialized);
 		try {
-			ftpClient = new SSHFTPClient();
+			ftpClient = new SSHFTPClientTemp();
 			this.host = host;
 			this.port = port;
 			this.keyFilePath = keyFilePath;
@@ -120,8 +117,6 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 				this.authId = Policy.generateAuthId("SFTP", login, host, port); //$NON-NLS-1$
 			}
 			this.transferType = transferType;
-			this.controlEncoding = encoding;
-			this.compression = compression;
 			initFTPClient(ftpClient, encoding, compression);
 		} catch (Exception e) {
 			SecureFTPPlugin.log(new Status(IStatus.WARNING, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_InitializationFailed, e));
@@ -318,10 +313,11 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	}
 
 	private static void throwFileNotFound(FTPException e, IPath path) throws FileNotFoundException, FTPException {
-		if (e.getReplyCode() == -1) {
+		int reply = e.getReplyCode();
+		if (reply == -1 || reply == SshFxpStatus.STATUS_FX_NO_SUCH_FILE || reply == SshFxpStatus.STATUS_FX_NO_SUCH_PATH) {
 			throw new FileNotFoundException(path.toPortableString());
 		}
-		throw e;		
+		throw e;
 	}
 
 	private static void fillFileInfo(ExtendedFileInfo fileInfo, FTPFile ftpFile) {
@@ -427,12 +423,12 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			// forces one connection retry
 			if (connectionRetryCount < 1) {
 				connectionRetryCount++;
-				connect(monitor);
+				testOrConnect(monitor);
 				return fetchFile(path, options, monitor);
 			} else {
 				connectionRetryCount = 0;
 				throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedFetchFileInfo, e));
-			}	
+			}
 		}
 		ExtendedFileInfo fileInfo = new ExtendedFileInfo(path.lastSegment());
 		fileInfo.setExists(false);
@@ -470,7 +466,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			// forces one connection retry
 			if (connectionRetryCount < 1) {
 				connectionRetryCount++;
-				connect(monitor);
+				testOrConnect(monitor);
 				return fetchFiles(path, options, monitor);
 			} else {
 				connectionRetryCount = 0;
@@ -627,51 +623,18 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	@Override
 	protected InputStream readFile(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
 		monitor.beginTask(Messages.SFTPConnectionFileManager_InitiatingFileDownload, 4);
-		SSHFTPClient downloadFtpClient = new SSHFTPClient();
 		try {
-			initFTPClient(downloadFtpClient, controlEncoding, compression);
-			downloadFtpClient.setValidator(ftpClient.getValidator());
-			downloadFtpClient.setRemoteHost(host);
-			downloadFtpClient.setRemotePort(port);
 			Policy.checkCanceled(monitor);
-			if (keyFilePath != null) {
-				downloadFtpClient.setAuthentication(keyFilePath.toOSString(), login, String.copyValueOf(password));
-			} else {
-				downloadFtpClient.setAuthentication(login, String.copyValueOf(password));
-			}
-			downloadFtpClient.connect();
-			monitor.worked(1);
-			Policy.checkCanceled(monitor);
-			downloadFtpClient.setType(ISFTPConstants.TRANSFER_TYPE_ASCII.equals(transferType)
-					? FTPTransferType.ASCII : FTPTransferType.BINARY);
-			try {
-				downloadFtpClient.chdir(path.removeLastSegments(1).toPortableString());
-			} catch (FTPException e) {
-				throwFileNotFound(e, path.removeLastSegments(1));
-			}
+			changeCurrentDir(path.removeLastSegments(1));
 			monitor.worked(1);
 			Policy.checkCanceled(monitor);
 			try {
-				return new FTPFileDownloadInputStream(downloadFtpClient,
-						new SSHFTPInputStream(downloadFtpClient, path.lastSegment()));
+				return new SFTPFileDownloadInputStream(new SSHFTPInputStream(ftpClient, path.toPortableString()));
 			} catch (FTPException e) {
 				throwFileNotFound(e, path);
 				return null;
 			}
 		} catch (Exception e) {
-			if (downloadFtpClient.connected()) {
-				try {
-					if (e instanceof OperationCanceledException
-							|| e instanceof FTPException
-							|| e instanceof FileNotFoundException) {
-						downloadFtpClient.quit();
-					} else {
-						downloadFtpClient.quitImmediately();
-					}
-				} catch (IOException ignore) {
-				} catch (FTPException ignore) {
-				}
-			}
 			if (e instanceof OperationCanceledException) {
 				throw (OperationCanceledException) e;
 			} else if (e instanceof FileNotFoundException) {
@@ -689,49 +652,16 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	@Override
 	protected OutputStream writeFile(IPath path, long permissions, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
 		monitor.beginTask(Messages.SFTPConnectionFileManager_FailedInitiatingFile, 4);
-		SSHFTPClient uploadFtpClient = new SSHFTPClient();
 		try {
-			initFTPClient(uploadFtpClient, controlEncoding, compression);
-			uploadFtpClient.setValidator(ftpClient.getValidator());
-			uploadFtpClient.setRemoteHost(host);
-			uploadFtpClient.setRemotePort(port);
-			if (keyFilePath != null) {
-				uploadFtpClient.setAuthentication(keyFilePath.toOSString(), login, String.copyValueOf(password));
-			} else {
-				uploadFtpClient.setAuthentication(login, String.copyValueOf(password));
-			}
 			Policy.checkCanceled(monitor);
-			uploadFtpClient.connect();
+			changeCurrentDir(path.removeLastSegments(1));
 			monitor.worked(1);
 			Policy.checkCanceled(monitor);
-			uploadFtpClient.setType(ISFTPConstants.TRANSFER_TYPE_ASCII.equals(transferType)
-					? FTPTransferType.ASCII : FTPTransferType.BINARY);
-			IPath dirPath = path.removeLastSegments(1);
-			try {
-				uploadFtpClient.chdir(dirPath.toPortableString());
-			} catch (FTPException e) {
-				throwFileNotFound(e, dirPath);
-			}
-			monitor.worked(1);
-			Policy.checkCanceled(monitor);
-			return new FTPFileUploadOutputStream(uploadFtpClient,
-					new SSHFTPOutputStream(uploadFtpClient, generateTempFileName(path.lastSegment())),
-					path.lastSegment(),
+			return new SFTPFileUploadOutputStream(ftpClient,
+					new SSHFTPOutputStream(ftpClient, path.removeLastSegments(1).append(generateTempFileName(path.lastSegment())).toPortableString()),
+					path.toPortableString(),
 					new Date(), permissions);
 		} catch (Exception e) {
-			if (uploadFtpClient.connected()) {
-				try {
-					if (e instanceof OperationCanceledException
-							|| e instanceof FTPException
-							|| e instanceof FileNotFoundException) {
-						uploadFtpClient.quit();
-					} else {
-						uploadFtpClient.quitImmediately();
-					}
-				} catch (IOException ignore) {
-				} catch (FTPException ignore) {
-				}
-			}
 			if (e instanceof OperationCanceledException) {
 				throw (OperationCanceledException) e;
 			} else if (e instanceof FileNotFoundException) {
@@ -812,9 +742,13 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	}
 
 	private FTPFile[] listFiles(IPath dirPath, IProgressMonitor monitor) throws IOException, ParseException, FTPException {
-		changeCurrentDir(dirPath);
 		Policy.checkCanceled(monitor);
-		return ftpClient.dirDetails("."); //$NON-NLS-1$
+		try {
+			return ftpClient.dirDetails(dirPath.toPortableString());
+		} catch (FTPException e) {
+			throwFileNotFound(e, dirPath);
+			return null; // never runs
+		}
 	}
 
 	private void recursiveDeleteTree(IPath path, IProgressMonitor monitor, MultiStatus status) throws IOException, ParseException {
@@ -860,7 +794,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 
 	private static String generateTempFileName(String base) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(TMP_UPLOAD_PREFIX).append(base);
+		sb.append(base).append(TMP_UPLOAD_SUFFIX);
 		return sb.toString();
 	}
 }

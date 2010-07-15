@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -34,14 +34,13 @@
  */
 package com.aptana.ide.syncing.ui.handlers;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.aptana.ide.syncing.ui.actions.DownloadAction;
 
-public class DownloadHandler extends AbstractHandler {
+public class DownloadHandler extends BaseSyncHandler {
 
     public Object execute(ExecutionEvent event) throws ExecutionException {
         DownloadAction action = new DownloadAction();

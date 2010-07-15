@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -56,6 +56,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.PerformanceStats;
 import org.eclipse.core.runtime.Status;
 
+import com.aptana.filesystem.ftp.internal.FTPClientPool;
 import com.aptana.filesystem.ftp.internal.FTPConnectionFileManager;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.CoreIOPlugin;
@@ -65,6 +66,7 @@ import com.aptana.filesystem.ftp.Policy;
 import com.aptana.filesystem.secureftp.IFTPSConnectionFileManager;
 import com.aptana.filesystem.secureftp.IFTPSConstants;
 import com.enterprisedt.net.ftp.FTPClient;
+import com.enterprisedt.net.ftp.FTPClientInterface;
 import com.enterprisedt.net.ftp.FTPConnectMode;
 import com.enterprisedt.net.ftp.FTPException;
 import com.enterprisedt.net.ftp.FTPTransferType;
@@ -93,7 +95,8 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 	public void init(String host, int port, IPath basePath, String login, char[] password, boolean explicit, boolean passive, String transferType, String encoding, String timezone, boolean validateCertificate) {
 		Assert.isTrue(ftpClient == null, Messages.FTPSConnectionFileManager_ConnectionHasBeenInitiated);
 		try {
-			ftpClient = createFTPClient();
+			this.pool = new FTPClientPool(this);
+			ftpClient = newClient();
 			this.host = host;
 			this.port = port;
 			this.login = login;
@@ -247,11 +250,12 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.filesystem.secureftp.FTPConnectionFileManager#createFTPClient()
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.filesystem.ftp.internal.FTPConnectionFileManager#newClient()
 	 */
 	@Override
-	protected FTPClient createFTPClient() {
+	public FTPClient newClient() {
 		try {
 			return new SSLFTPClient();
 		} catch (FTPException e) {
@@ -274,19 +278,23 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 	 * @see com.aptana.filesystem.secureftp.FTPConnectionFileManager#initAndAuthFTPClient(com.enterprisedt.net.ftp.FTPClient, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	protected void initAndAuthFTPClient(FTPClient newFtpClient, IProgressMonitor monitor) throws IOException, FTPException {
+	public void initAndAuthFTPClient(FTPClientInterface newFtpClient, IProgressMonitor monitor) throws IOException, FTPException {
+		if (newFtpClient.connected())
+		{
+			return;
+		}
 		SSLFTPClient newFtpsClient = (SSLFTPClient) newFtpClient;
 		initFTPSClient(newFtpsClient, !((SSLFTPClient) ftpClient).isImplicitFTPS(), ftpClient.getConnectMode() == FTPConnectMode.PASV, ftpClient.getControlEncoding(), validateCertificate);
 		newFtpClient.setRemoteHost(host);
 		newFtpClient.setRemotePort(port);
 		Policy.checkCanceled(monitor);
-		connectFTPClient(newFtpClient);
+		connectFTPClient(newFtpsClient);
 		monitor.worked(1);
 		Policy.checkCanceled(monitor);
 		if (!newFtpsClient.isImplicitFTPS()) {
 			newFtpsClient.auth(securityMechanism);
 		}
-		newFtpClient.login(login, String.copyValueOf(password));
+		newFtpsClient.login(login, String.copyValueOf(password));
 		monitor.worked(1);
 	}
 

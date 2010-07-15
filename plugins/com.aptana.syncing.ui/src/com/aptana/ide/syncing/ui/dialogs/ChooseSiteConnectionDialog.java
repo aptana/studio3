@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -37,6 +37,8 @@ package com.aptana.ide.syncing.ui.dialogs;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
@@ -214,6 +216,15 @@ public class ChooseSiteConnectionDialog extends TrayDialog implements SelectionL
         fSiteCombo = new Combo(comp, SWT.DROP_DOWN | SWT.READ_ONLY);
         fSiteCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
         fSiteCombo.addSelectionListener(this);
+        fSiteCombo.addModifyListener(new ModifyListener()
+		{
+			
+			@Override
+			public void modifyText(ModifyEvent e)
+			{
+				validate();
+			}
+		});
 
         // left padding
         new Label(comp, SWT.NONE);
@@ -274,9 +285,9 @@ public class ChooseSiteConnectionDialog extends TrayDialog implements SelectionL
      */
     private boolean validate() {
         boolean success = true;
-        if (!SWTUtils.testWidgetValue(fSiteCombo, 0)) {
+        if (!SWTUtils.validateCombo(fSiteCombo, 0)) {
             success = false;
-        }
+        }        
 
         return success;
     }

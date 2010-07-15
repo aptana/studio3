@@ -79,7 +79,7 @@ public class JSCodeScannerTest extends TestCase
 
 	public void testNumbers()
 	{
-		String src = "0xff 0X123 1 9.234";
+		String src = "0xff 0X123 1 9.234 1E8";
 		IDocument document = new Document(src);
 		scanner.setRange(document, 0, src.length());
 
@@ -90,6 +90,8 @@ public class JSCodeScannerTest extends TestCase
 		assertToken(getToken("constant.numeric.js"), 11, 1);
 		assertToken(Token.WHITESPACE, 12, 1);
 		assertToken(getToken("constant.numeric.js"), 13, 5);
+		assertToken(Token.WHITESPACE, 18, 1);
+		assertToken(getToken("constant.numeric.js"), 19, 3);
 	}
 
 	public void testConstantWords()

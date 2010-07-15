@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -40,8 +40,6 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 
     private static final String BUNDLE_NAME = "com.aptana.ide.syncing.ui.dialogs.messages"; //$NON-NLS-1$
-
-    public static String IDialogConstants_LBL_Apply;
     
     public static String ChooseSiteConnectionDialog_LBL_Connection;
     public static String ChooseSiteConnectionDialog_LBL_Message;
@@ -60,8 +58,10 @@ public class Messages extends NLS {
     public static String SiteConnectionsEditorDialog_SaveConfirm_Message;
     public static String SiteConnectionsEditorDialog_SaveConfirm_Title;
     public static String SiteConnectionsEditorDialog_Title;
+    public static String SiteConnectionsEditorDialog_UnresolvedWarning_Message;
+	public static String SiteConnectionsEditorDialog_UnresolvedWarning_Title;
 
-    static {
+	static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);
     }

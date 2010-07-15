@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -41,6 +41,8 @@ import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.io.tests.CommonConnectionTest;
 import com.aptana.filesystem.secureftp.FTPSConnectionPoint;
+import com.aptana.ide.core.io.ConnectionContext;
+import com.aptana.ide.core.io.CoreIOPlugin;
 
 /**
  * @author Max Stepanov
@@ -51,10 +53,16 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 	private static FTPSConnectionPoint setupConnection()
 	{
 		FTPSConnectionPoint ftpcp = new FTPSConnectionPoint();
-		ftpcp.setHost("10.10.1.60"); //$NON-NLS-1$
-		ftpcp.setLogin("ftpuser"); //$NON-NLS-1$
-		ftpcp.setPassword(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'});
+		ftpcp.setHost(getConfig().getProperty("ftps.host", "10.10.1.60")); //$NON-NLS-1$ //$NON-NLS-2$
+		ftpcp.setLogin(getConfig().getProperty("ftps.username", "ftpuser")); //$NON-NLS-1$ //$NON-NLS-2$
+		ftpcp.setPassword(getConfig().getProperty("ftps.password",	//$NON-NLS-1$
+				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'})).toCharArray());
 		ftpcp.setValidateCertificate(false);
+
+		ConnectionContext context = new ConnectionContext();
+		context.put(ConnectionContext.COMMAND_LOG, System.out);
+		CoreIOPlugin.setConnectionContext(ftpcp, context);
+
 		return ftpcp;
 	}
 
@@ -108,7 +116,7 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 	@Override
 	protected boolean supportsSetModificationTime()
 	{
-		return false;
+		return true;
 	}
 
 
@@ -129,6 +137,6 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 	@Override
 	protected boolean supportsChangePermissions()
 	{
-		return false;
+		return true;
 	}
 }

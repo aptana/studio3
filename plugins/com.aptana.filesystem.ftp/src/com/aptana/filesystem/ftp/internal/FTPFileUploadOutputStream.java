@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -43,7 +43,6 @@ import com.enterprisedt.net.ftp.FTPClient;
 import com.enterprisedt.net.ftp.FTPClientInterface;
 import com.enterprisedt.net.ftp.FTPException;
 import com.enterprisedt.net.ftp.FileTransferOutputStream;
-import com.enterprisedt.net.ftp.ssh.SSHFTPClient;
 
 /**
  * @author Max Stepanov
@@ -56,35 +55,45 @@ public class FTPFileUploadOutputStream extends OutputStream {
 	private String filename;
 	private Date modificationTime;
 	private long permissions;
+	private FTPClientPool pool;
 	
 	/**
+	 * @param pool 
 	 * 
 	 */
-	public FTPFileUploadOutputStream(FTPClientInterface ftpClient, FileTransferOutputStream ftpOutputStream, String filename, Date modificationTime, long permissions) {
+	public FTPFileUploadOutputStream(FTPClientPool pool, FTPClientInterface ftpClient, FileTransferOutputStream ftpOutputStream, String filename, Date modificationTime, long permissions) {
 		this.ftpClient = ftpClient;
 		this.ftpOutputStream = ftpOutputStream;
 		this.filename = filename;
 		this.modificationTime = modificationTime;
 		this.permissions = permissions;
+		this.pool = pool;
 	}
 
-	private void safeQuit(boolean failed) {
-		if (ftpClient instanceof FTPClient) {
-			((FTPClient) ftpClient).setMessageListener(null);
-		}
+	private void safeQuit(boolean failed) {		
 		try {
 			if (ftpClient.connected()) {
 				if (failed) {
 					ftpClient.delete(ftpOutputStream.getRemoteFile());
 				}
-				ftpClient.quit();
 			}
-		} catch (Exception e) {
-			try {
-				ftpClient.quitImmediately();
-			} catch (Exception ignore) {
+		}
+		catch (Exception e)
+		{
+			// ignore
+		}
+		finally 
+		{
+			try
+			{
+				ftpOutputStream.close();
 			}
-		}		
+			catch (IOException e)
+			{
+				// ignore
+			}
+			pool.checkIn(ftpClient);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -119,8 +128,6 @@ public class FTPFileUploadOutputStream extends OutputStream {
                     if (ftpClient instanceof FTPClient) {
                         ((FTPClient) ftpClient).site("CHMOD " + Long.toOctalString(permissions) //$NON-NLS-1$
                                 + " " + filename); //$NON-NLS-1$
-                    } else if (ftpClient instanceof SSHFTPClient) {
-                        ((SSHFTPClient) ftpClient).changeMode((int) (permissions & 0777), filename);
                     }
 				}
 			} catch (FTPException e) {

@@ -10,6 +10,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
@@ -28,7 +29,7 @@ public class JSMetadataIndexWriterTests extends TestCase
 	@Override
 	protected void tearDown() throws Exception
 	{
-		IndexManager.getInstance().removeIndex(JSIndexConstants.METADATA);
+		IndexManager.getInstance().removeIndex(getIndex().getRoot());
 		
 		super.tearDown();
 	}
@@ -40,9 +41,7 @@ public class JSMetadataIndexWriterTests extends TestCase
 	 */
 	private Index getIndex()
 	{
-		IndexManager manager = IndexManager.getInstance();
-
-		return manager.getIndex(JSIndexConstants.METADATA);
+		return JSIndexQueryHelper.getIndex();
 	}
 
 	/**

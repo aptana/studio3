@@ -15,9 +15,9 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.BaseLabelProvider;
 import org.eclipse.jface.viewers.IDecoration;
@@ -30,8 +30,6 @@ import org.eclipse.team.ui.TeamImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.BranchAddedEvent;
 import com.aptana.git.core.model.BranchChangedEvent;
@@ -47,6 +45,8 @@ import com.aptana.git.core.model.PushEvent;
 import com.aptana.git.core.model.RepositoryAddedEvent;
 import com.aptana.git.core.model.RepositoryRemovedEvent;
 import com.aptana.git.ui.GitUIPlugin;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.ThemePlugin;
 
 public class GitLightweightDecorator extends BaseLabelProvider implements ILightweightLabelDecorator,
 		IGitRepositoryListener, IGitRepositoriesListener
@@ -115,7 +115,7 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 				}
 			}
 		};
-		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
 	}
 
 	protected IGitRepositoryManager getGitRepositoryManager()
@@ -265,7 +265,7 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		{
 			getGitRepositoryManager().removeListener(this);
 			getGitRepositoryManager().removeListenerFromEachRepository(this);
-			new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
+			new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(
 					fThemeChangeListener);
 			cache.clear();
 			cache = null;

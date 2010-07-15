@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -35,6 +35,9 @@
 package com.aptana.editor.js;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.core.runtime.content.IContentTypeManager;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
@@ -62,8 +65,14 @@ public class JSDocumentProvider extends CommonDocumentProvider
 		}
 	}
 
-	protected String getDefaultContentType()
+	protected String getDefaultContentType(String filename)
 	{
+		IContentTypeManager manager = Platform.getContentTypeManager();
+		IContentType type = manager.getContentType(IJSConstants.CONTENT_TYPE_JSON);
+		if (type.isAssociatedWith(filename))
+		{
+			return IJSConstants.CONTENT_TYPE_JSON;
+		}		
 		return IJSConstants.CONTENT_TYPE_JS;
 	}
 }

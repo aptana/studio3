@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -187,7 +187,7 @@ public final class PlatformUtil
 			Process process2 = null;
 			try
 			{
-				process = Runtime.getRuntime().exec("/usr/bin/perl"); //$NON-NLS-1$
+				process = Runtime.getRuntime().exec("/usr/bin/perl", new String[] { "VERSIONER_PERL_PREFER_32_BIT=yes" }); //$NON-NLS-1$
 				InputStream in = process.getInputStream();
 				OutputStream out = process.getOutputStream();
 				String command = "use Mac::Processes; while ( ($psn, $psi) = each(%Process) ) { print GetProcessPID($psi->processNumber).\" \".$psi->processAppSpec.\"\\n\"; }"; //$NON-NLS-1$
@@ -195,21 +195,22 @@ public final class PlatformUtil
 				out.close();
 				LineNumberReader reader = new LineNumberReader(new InputStreamReader(in, "ISO-8859-1")); //$NON-NLS-1$
 
-				process2 = Runtime.getRuntime().exec("/bin/ps xo pid,ppid"); //$NON-NLS-1$
+				process2 = Runtime.getRuntime().exec("/bin/ps xo pid=,ppid=,command="); //$NON-NLS-1$
 				LineNumberReader reader2 = new LineNumberReader(new InputStreamReader(process2.getInputStream(), "ISO-8859-1")); //$NON-NLS-1$
-				Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+				Map<Integer, Integer> pid2ppid = new HashMap<Integer, Integer>();
+				Map<Integer, String> pid2command = new HashMap<Integer, String>();
 				String line;
 				while ((line = reader2.readLine()) != null) {
 					line = line.trim();
-					if (!Character.isDigit(line.charAt(0))) {
-						continue;
-					}
 					int index = line.indexOf(' ');
 					if (index > 0) {
 						int pid = Integer.parseInt(line.substring(0, index));
 						line = line.substring(index+1).trim();
-						int ppid = Integer.parseInt(line);
-						map.put(new Integer(pid), new Integer(ppid));
+						index = line.indexOf(' ');
+						int ppid = Integer.parseInt(line.substring(0, index));
+						line = line.substring(index+1).trim();
+						pid2ppid.put(pid, ppid);
+						pid2command.put(pid, line.trim());
 					}
 				}
 
@@ -219,9 +220,12 @@ public final class PlatformUtil
 					int index = line.indexOf(' ');
 					if (index > 0) {
 						int pid = Integer.parseInt(line.substring(0, index));
-						Integer ppid = (Integer) map.get(new Integer(pid));
-						list.add(new ProcessItem(line.substring(index+1).trim(), pid, ppid != null ? ppid.intValue() : 0));
+						pid2command.put(pid, line.substring(index+1).trim());
 					}
+				}
+				for (int pid : pid2command.keySet()) {
+					Integer ppid = pid2ppid.get(pid);
+					list.add(new ProcessItem(pid2command.get(pid), pid, ppid != null ? ppid.intValue() : 0));
 				}
 				return list.toArray(new ProcessItem[list.size()]);
 			}
@@ -269,7 +273,7 @@ public final class PlatformUtil
 			Process process = null;
 			try
 			{
-				process = Runtime.getRuntime().exec("/bin/ps xo ppid,command"); //$NON-NLS-1$
+				process = Runtime.getRuntime().exec("/bin/ps xo ppid=,command="); //$NON-NLS-1$
 				InputStream in = process.getInputStream();
 				LineNumberReader reader = new LineNumberReader(new InputStreamReader(in, "ISO-8859-1")); //$NON-NLS-1$
 				String line;

@@ -59,7 +59,6 @@ public class GitIndex
 
 	private int refreshStatus = 0;
 	private boolean notify;
-	private Map<String, String> amendEnvironment;
 
 	private Job indexRefreshJob;
 
@@ -338,6 +337,10 @@ public class GitIndex
 
 	private void addFilesFromDictionary(Map<String, List<String>> dictionary, boolean staged, boolean tracked)
 	{
+		if (this.files == null)
+		{
+			return;
+		}
 		// Iterate over all existing files
 		synchronized (this.files)
 		{
@@ -472,12 +475,14 @@ public class GitIndex
 		args.add("update-index"); //$NON-NLS-1$
 		args.add("--add"); //$NON-NLS-1$
 		args.add("--remove"); //$NON-NLS-1$
+		args.add("--stdin"); //$NON-NLS-1$
+		StringBuffer input = new StringBuffer(stageFiles.size()*stageFiles.iterator().next().getPath().length());
 		for (ChangedFile file : stageFiles)
 		{
-			args.add(file.getPath());
+			input.append(file.getPath()).append('\n');
 		}
 
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, input.toString(), null,
 				args.toArray(new String[args.size()]));
 		if (result == null)
 			return false;
@@ -580,7 +585,6 @@ public class GitIndex
 
 		repository.hasChanged();
 
-		amendEnvironment = null;
 		if (amend)
 			this.amend = false;
 		else
@@ -683,7 +687,7 @@ public class GitIndex
 		int ret = 1;
 		String commit = ""; //$NON-NLS-1$
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, commitMessage,
-				amendEnvironment, arguments.toArray(new String[arguments.size()]));
+				null, arguments.toArray(new String[arguments.size()]));
 		if (result != null && !result.isEmpty())
 		{
 			commit = result.values().iterator().next();

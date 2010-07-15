@@ -11,6 +11,13 @@
             properties="isDirectory, isLocal, isSymlink"
             type="com.aptana.ide.ui.io.navigator.FileSystemObject">
       </propertyTester>
+      <propertyTester
+            class="com.aptana.ide.ui.io.internal.ResourcePropertyTester"
+            id="com.aptana.ide.ui.io.navigator.resourcePropertyTester"
+            namespace="com.aptana.ide.ui.io.navigator.resource"
+            properties="isAccessible"
+            type="org.eclipse.core.resources.IResource">
+      </propertyTester>
    </extension>
       <extension
          point="org.eclipse.ui.navigator.viewer">
@@ -74,9 +81,17 @@
                class="com.aptana.ide.ui.io.navigator.resources.FileDropAdapterAssistant"
                id="com.aptana.ide.ui.io.navigator.resources.fileDropAdapter">
             <possibleDropTargets>
-               <instanceof
-                     value="com.aptana.ide.ui.io.navigator.FileSystemObject">
-               </instanceof></possibleDropTargets>
+               <or>
+                  <instanceof
+                        value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+                  </instanceof>
+                  <instanceof
+                        value="org.eclipse.core.resources.IResource">
+                  </instanceof>
+                  <adapt
+                        type="org.eclipse.core.resources.IProject">
+                  </adapt>
+               </or></possibleDropTargets>
          </dropAssistant>
       </navigatorContent>
       <actionProvider

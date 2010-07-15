@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -45,16 +45,17 @@ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
  * @author Max Stepanov
  *
  */
-@SuppressWarnings("restriction")
-public class LocalTerminalOutputListener implements IStreamListener {
+/* package */ class LocalTerminalOutputListener implements IStreamListener {
 
 	private PrintStream printStream;
+	private IOutputFilter outputFilter;
 
 	/**
 	 * 
 	 */
-	public LocalTerminalOutputListener(ITerminalControl control) {
+	public LocalTerminalOutputListener(ITerminalControl control, IOutputFilter outputFilter) {
 		printStream = new PrintStream(control.getRemoteToTerminalOutputStream(), true);
+		this.outputFilter = outputFilter;
 	}
 
 	/* (non-Javadoc)
@@ -62,7 +63,11 @@ public class LocalTerminalOutputListener implements IStreamListener {
 	 */
 	@Override
 	public void streamAppended(String text, IStreamMonitor monitor) {
-		printStream.print(text);
+		if (outputFilter != null) {
+			printStream.print(outputFilter.filterOutput(text.toCharArray()));
+		} else {
+			printStream.print(text);
+		}
 	}
 
 }

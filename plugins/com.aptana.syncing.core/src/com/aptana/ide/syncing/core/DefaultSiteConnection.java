@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -52,7 +52,7 @@ import com.aptana.ide.core.io.IConnectionPoint;
  * 
  * @author Michael Xia (mxia@aptana.com)
  */
-public class DefaultSiteConnection extends SiteConnection {
+public final class DefaultSiteConnection extends SiteConnection {
 
     public static final String NAME = "Default"; //$NON-NLS-1$
 

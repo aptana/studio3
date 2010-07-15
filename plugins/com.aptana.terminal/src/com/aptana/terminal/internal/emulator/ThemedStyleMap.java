@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -41,20 +41,19 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.tm.internal.terminal.textcanvas.StyleMap;
 import org.eclipse.tm.terminal.model.StyleColor;
 
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.Theme;
+import com.aptana.theme.Theme;
+import com.aptana.theme.ThemePlugin;
 
 /**
  * @author Max Stepanov
  *
  */
-@SuppressWarnings("restriction")
 /* package */ class ThemedStyleMap extends StyleMap {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tm.internal.terminal.textcanvas.StyleMap#getColor(java.util.Map, org.eclipse.tm.terminal.model.StyleColor)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	@Override
 	protected Color getColor(Map map, StyleColor color) {
 		if (color.getName().equalsIgnoreCase(StyleMap.BLACK)) {
@@ -68,8 +67,8 @@ import com.aptana.editor.common.theme.Theme;
 		}
 
 		// Just grab colors straight from theme!
-		String ansiName = "ansi." + color.getName().toLowerCase();
-		Theme theme = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme();
+		String ansiName = "ansi." + color.getName().toLowerCase(); //$NON-NLS-1$
+		Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
 		if (theme.hasEntry(ansiName)) {
 			return theme.getForeground(ansiName);
 		}
@@ -78,14 +77,12 @@ import com.aptana.editor.common.theme.Theme;
 	}
 
 	protected Color getBackgroundColor() {
-		Theme theme = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme();
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(theme.getBackground());
+		Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
+		return ThemePlugin.getDefault().getColorManager().getColor(theme.getBackground());
 	}
 
 	protected Color getForegroundColor() {
-		Theme theme = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme();
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(theme.getForeground());
+		Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
+		return ThemePlugin.getDefault().getColorManager().getColor(theme.getForeground());
 	}
-
-
 }

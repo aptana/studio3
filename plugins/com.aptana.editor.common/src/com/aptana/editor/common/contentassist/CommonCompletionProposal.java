@@ -1,25 +1,35 @@
 package com.aptana.editor.common.contentassist;
 
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IInformationControlCreator;
+import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
+import org.eclipse.jface.text.contentassist.ICompletionProposalExtension3;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 
-public class CommonCompletionProposal implements ICommonCompletionProposal
+import com.aptana.parsing.lexer.IRange;
+import com.aptana.parsing.lexer.Range;
+
+public class CommonCompletionProposal implements ICommonCompletionProposal, ICompletionProposalExtension2,
+		ICompletionProposalExtension3
 {
 	private String _additionalProposalInformation;
 	private IContextInformation _contextInformation;
 	private String _displayString;
 	private Image _image;
-	private int _cursorPosition;
-	private int _replacementOffset;
-	private int _replacementLength;
-	private String _replacementString;
+	protected int _cursorPosition;
+	protected int _replacementOffset;
+	protected int _replacementLength;
+	protected String _replacementString;
 	private String _fileLocation;
-	private boolean _isDefaultSelection;
+	protected boolean _isDefaultSelection;
 	private boolean _isSuggestedSelection;
 	private Image[] _userAgentImages;
+	private int _hash;
 
 	/**
 	 * CommonCompletionProposal
@@ -33,18 +43,20 @@ public class CommonCompletionProposal implements ICommonCompletionProposal
 	 * @param contextInformation
 	 * @param additionalProposalInfo
 	 */
-	public CommonCompletionProposal(String replacementString, int replacementOffset, int replacementLength, int cursorPosition, Image image, String displayString, IContextInformation contextInformation, String additionalProposalInfo)
+	public CommonCompletionProposal(String replacementString, int replacementOffset, int replacementLength,
+			int cursorPosition, Image image, String displayString, IContextInformation contextInformation,
+			String additionalProposalInfo)
 	{
-		this._replacementString = replacementString;
+		this._replacementString = (replacementString == null) ? "" : replacementString; //$NON-NLS-1$
 		this._replacementOffset = replacementOffset;
 		this._replacementLength = replacementLength;
 		this._cursorPosition = cursorPosition;
 		this._image = image;
-		this._displayString = displayString;
+		this._displayString = (displayString == null) ? "" : displayString; //$NON-NLS-1$
 		this._contextInformation = contextInformation;
 		this._additionalProposalInformation = additionalProposalInfo;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.ICompletionProposal#apply(org.eclipse.jface.text.IDocument)
@@ -52,14 +64,52 @@ public class CommonCompletionProposal implements ICommonCompletionProposal
 	@Override
 	public void apply(IDocument document)
 	{
-		try
+		// not called anymore
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj)
+	{
+		boolean result = false;
+
+		if (this == obj)
 		{
-			document.replace(this._replacementOffset, this._replacementLength, this._replacementString);
+			result = true;
 		}
-		catch (BadLocationException x)
+		else if (obj instanceof CommonCompletionProposal)
 		{
-			// ignore
+			CommonCompletionProposal that = (CommonCompletionProposal) obj;
+
+			result = this._replacementString.equals(that._replacementString)
+					&& this._replacementOffset == that._replacementOffset
+					&& this._replacementLength == that._replacementLength
+					&& this._cursorPosition == that._cursorPosition && this._displayString.equals(that._displayString);
 		}
+
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode()
+	{
+		if (this._hash == 0)
+		{
+			this._hash = this._hash * 31 + this._replacementString.hashCode();
+			this._hash = this._hash * 31 + this._replacementOffset;
+			this._hash = this._hash * 31 + this._replacementLength;
+			this._hash = this._hash * 31 + this._cursorPosition;
+			this._hash = this._hash * 31 + this._displayString.hashCode();
+		}
+
+		return this._hash;
 	}
 
 	/*
@@ -112,6 +162,16 @@ public class CommonCompletionProposal implements ICommonCompletionProposal
 		return this._image;
 	}
 
+	/**
+	 * getReplaceRange
+	 * 
+	 * @return
+	 */
+	public IRange getReplaceRange()
+	{
+		return new Range(this._replacementOffset, this._replacementOffset + this._replacementLength - 1);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.ICompletionProposal#getSelection(org.eclipse.jface.text.IDocument)
@@ -141,7 +201,7 @@ public class CommonCompletionProposal implements ICommonCompletionProposal
 	{
 		return this._isDefaultSelection;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.contentassist.ICommonCompletionProposal#isSuggestedSelection()
@@ -151,7 +211,7 @@ public class CommonCompletionProposal implements ICommonCompletionProposal
 	{
 		return this._isSuggestedSelection;
 	}
-	
+
 	/**
 	 * setLocation
 	 * 
@@ -161,7 +221,7 @@ public class CommonCompletionProposal implements ICommonCompletionProposal
 	{
 		this._fileLocation = location;
 	}
-	
+
 	/**
 	 * setIsDefaultSelection
 	 * 
@@ -171,7 +231,7 @@ public class CommonCompletionProposal implements ICommonCompletionProposal
 	{
 		this._isDefaultSelection = value;
 	}
-	
+
 	/**
 	 * setIsSuggstedSelection
 	 * 
@@ -181,7 +241,7 @@ public class CommonCompletionProposal implements ICommonCompletionProposal
 	{
 		this._isSuggestedSelection = value;
 	}
-	
+
 	/**
 	 * setUserAgentImages
 	 * 
@@ -190,5 +250,119 @@ public class CommonCompletionProposal implements ICommonCompletionProposal
 	public void setUserAgentImages(Image[] images)
 	{
 		this._userAgentImages = images;
+	}
+
+	@Override
+	public IInformationControlCreator getInformationControlCreator()
+	{
+		return null;
+	}
+
+	@Override
+	public CharSequence getPrefixCompletionText(IDocument document, int completionOffset)
+	{
+		return _replacementString;
+	}
+
+	@Override
+	public int getPrefixCompletionStart(IDocument document, int completionOffset)
+	{
+		return _replacementOffset;
+	}
+
+	@Override
+	public void apply(ITextViewer viewer, char trigger, int stateMask, int offset)
+	{
+		IDocument document = viewer.getDocument();
+		int shift = offset - this._replacementOffset;
+		if (shift >= this._replacementString.length())
+		{
+			return;
+		}
+		int length = Math.max(0, this._replacementLength - shift);
+		String toReplace = this._replacementString.substring(shift);
+		try
+		{
+			document.replace(offset, length, toReplace);
+		}
+		catch (BadLocationException x)
+		{
+			// ignore
+		}
+	}
+
+	/*
+	 * @see
+	 * org.eclipse.jface.text.contentassist.ICompletionProposalExtension2#selected(org.eclipse.jface.text.ITextViewer,
+	 * boolean)
+	 */
+	public void selected(ITextViewer viewer, boolean smartToggle)
+	{
+	}
+
+	/*
+	 * @see
+	 * org.eclipse.jface.text.contentassist.ICompletionProposalExtension2#unselected(org.eclipse.jface.text.ITextViewer)
+	 */
+	public void unselected(ITextViewer viewer)
+	{
+	}
+
+	/*
+	 * @see
+	 * org.eclipse.jface.text.contentassist.ICompletionProposalExtension2#validate(org.eclipse.jface.text.IDocument,
+	 * int, org.eclipse.jface.text.DocumentEvent)
+	 */
+	public boolean validate(IDocument document, int offset, DocumentEvent event)
+	{
+		if (offset < this._replacementOffset)
+			return false;
+
+		boolean validated = isValidPrefix(getPrefix(document, offset), getDisplayString());
+
+		if (validated && event != null)
+		{
+			// make sure that we change the replacement length as the document content changes
+			int delta = (event.fText == null ? 0 : event.fText.length()) - event.fLength;
+			final int newLength = Math.max(_replacementLength + delta, 0);
+			_replacementLength = newLength;
+		}
+
+		return validated;
+	}
+
+	/**
+	 * Returns the prefix string from the replacement-offset to the given offset. In case the given offset appears
+	 * before the replacement offset, we return an empty string.
+	 * 
+	 * @param document
+	 * @param offset
+	 */
+	protected String getPrefix(IDocument document, int offset)
+	{
+		try
+		{
+			int length = offset - _replacementOffset;
+			if (length > 0)
+				return document.get(_replacementOffset, length);
+		}
+		catch (BadLocationException x)
+		{
+		}
+		return ""; //$NON-NLS-1$
+	}
+
+	/**
+	 * Returns true if the proposal is still valid as the user types while the content assist popup is visible.
+	 * 
+	 * @param prefix
+	 * @param displayString
+	 */
+	protected boolean isValidPrefix(String prefix, String displayString)
+	{
+		if (prefix == null || displayString == null || prefix.length() > displayString.length())
+			return false;
+		String start = displayString.substring(0, prefix.length());
+		return start.equalsIgnoreCase(prefix);
 	}
 }

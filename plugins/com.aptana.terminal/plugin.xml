@@ -97,14 +97,14 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            category="com.aptana.common"
+            category="com.aptana.ui.AptanaPreferencePage"
             class="com.aptana.terminal.preferences.TerminalPreferencePage"
             id="com.aptana.terminal.page"
             name="%page.name">
       </page>
    </extension>
    <extension
-         point="org.eclipse.tm.terminal.terminalConnectors">
+         point="com.aptana.org.eclipse.tm.terminal.terminalConnectors">
       <connector
             class="com.aptana.terminal.connector.LocalTerminalConnector"
             hidden="false"
@@ -155,12 +155,18 @@
                   style="push">
                <visibleWhen>
                   <reference
-                        definitionId="com.aptana.editor.common.contributions.inGlobalActionSet">
+                        definitionId="com.aptana.ui.contributions.inGlobalActionSet">
                   </reference>
                </visibleWhen>
             </command>
          </toolbar>
       </menuContribution>
+   </extension>
+   <extension
+         point="com.aptana.org.eclipse.tm.terminal.terminalHyperlinkDetectors">
+      <detector
+            class="com.aptana.terminal.internal.URLHyperlinkDetector">
+      </detector>
    </extension>
 
 </plugin>

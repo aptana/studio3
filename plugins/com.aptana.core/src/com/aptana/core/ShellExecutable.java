@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -48,6 +48,9 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.PlatformUtil;
@@ -64,6 +67,8 @@ public class ShellExecutable {
 		"%PROGRAMFILES%\\Git\\bin", //$NON-NLS-1$
 		"%PROGRAMFILES(X86)%\\Git\\bin" //$NON-NLS-1$
 	};
+	
+	public static final String PATH_SEPARATOR = ":"; //$NON-NLS-1$
 	
 	private static final String SH_EXE = "sh.exe"; //$NON-NLS-1$
 	private static final String BASH = "bash"; //$NON-NLS-1$
@@ -84,7 +89,10 @@ public class ShellExecutable {
 			boolean isWin32 = Platform.OS_WIN32.equals(Platform.getOS());
 			try {
 				initilizing = true;
-				shellPath = ExecutableUtil.find(isWin32 ? SH_EXE : BASH, false, getPossibleShellLocations());
+				shellPath = getPreferenceShellPath();
+				if (shellPath == null) {
+					shellPath = ExecutableUtil.find(isWin32 ? SH_EXE : BASH, false, getPossibleShellLocations());
+				}
 			} finally {
 				initilizing = false;
 			}
@@ -107,6 +115,38 @@ public class ShellExecutable {
 			return list;
 		}
 		return null;
+	}
+	
+	private static IPath getPreferenceShellPath() {
+		String pref = new InstanceScope().getNode(CorePlugin.PLUGIN_ID).get(ICorePreferenceConstants.SHELL_EXECUTABLE_PATH, null);
+		if (pref != null && !pref.isEmpty()) {
+			IPath path = Path.fromOSString(pref);
+			if (path.toFile().isDirectory()) {
+				boolean isWin32 = Platform.OS_WIN32.equals(Platform.getOS());
+				path = path.append(isWin32 ? SH_EXE : BASH);
+			}
+			if (path.toFile().canExecute()) {
+				return path;
+			}
+			CorePlugin.logWarning("Shell executable path preference point to an invalid location"); //$NON-NLS-1$
+		}
+		return null;
+	}
+	
+	public static void setPreferenceShellPath(IPath path) {
+		IEclipsePreferences prefs = new InstanceScope().getNode(CorePlugin.PLUGIN_ID);
+		if (path != null) {
+			prefs.put(ICorePreferenceConstants.SHELL_EXECUTABLE_PATH, path.toOSString());			
+		} else {
+			prefs.remove(ICorePreferenceConstants.SHELL_EXECUTABLE_PATH);
+		}
+		try {
+			prefs.flush();
+		} catch (BackingStoreException e) {
+			CorePlugin.logError("Saving preferences failed.", e); //$NON-NLS-1$
+		}
+		shellPath = null;
+		shellEnvironment = null;
 	}
 	
 	public synchronized static Map<String, String> getEnvironment() {

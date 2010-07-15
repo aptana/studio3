@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -56,70 +56,112 @@ import com.aptana.ide.syncing.ui.internal.SyncUtils;
  * 
  * @author Michael Xia (mxia@aptana.com)
  */
-public class CloakAction implements IObjectActionDelegate, IViewActionDelegate {
+public class CloakAction implements IObjectActionDelegate, IViewActionDelegate
+{
 
-    private List<IFileStore> fSelectedFiles;
+	private List<IFileStore> fSelectedFiles;
 
-    public CloakAction() {
-        fSelectedFiles = new ArrayList<IFileStore>();
-    }
-
-    /**
-     * @see org.eclipse.ui.IActionDelegate#run(IAction)
-     */
-    public void run(IAction action) {
-        String expression;
-        for (IFileStore fileStore : fSelectedFiles) {
-            expression = getFileType(fileStore);
-            CloakingUtils.addCloakFileType(expression);
-        }
-
-        DecoratorUtils.updateCloakDecorator();
-    }
-
-    /**
-     * @see org.eclipse.ui.IActionDelegate#selectionChanged(IAction, ISelection)
-     */
-    public void selectionChanged(IAction action, ISelection selection) {
-        action.setEnabled(false);
-        fSelectedFiles.clear();
-
-        if (!(selection instanceof IStructuredSelection) || selection.isEmpty()) {
-            return;
-        }
-
-        Object[] elements = ((IStructuredSelection) selection).toArray();
-        IFileStore fileStore;
-        for (Object element : elements) {
-            if (element instanceof IAdaptable) {
-                fileStore = SyncUtils.getFileStore((IAdaptable) element);
-                if (fileStore != null) {
-                    if (!CloakingUtils.isFileCloaked(fileStore)) {
-                        fSelectedFiles.add(fileStore);
-                    }
-                }
-            }
-        }
-        action.setEnabled(fSelectedFiles.size() > 0);
-    }
-
-    /**
-     * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.action.IAction,
-     *      org.eclipse.ui.IWorkbenchPart)
-     */
-    public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-    }
-
-	@Override
-	public void init(IViewPart view) {
+	public CloakAction()
+	{
+		fSelectedFiles = new ArrayList<IFileStore>();
 	}
 
-    private static String getFileType(IFileStore fileStore) {
-        String name = fileStore.getName();
-        int index = name.lastIndexOf("."); //$NON-NLS-1$
-        if (index < 0) {
-            return name;
-        }
-        return "*." + name.substring(index + 1); //$NON-NLS-1$
-    }
+	/**
+	 * @see org.eclipse.ui.IActionDelegate#run(IAction)
+	 */
+	public void run(IAction action)
+	{
+		String expression;
+		for (IFileStore fileStore : fSelectedFiles)
+		{
+			expression = getFileType(fileStore);
+			CloakingUtils.addCloakFileType(expression);
+		}
+
+		DecoratorUtils.updateCloakDecorator();
+	}
+
+	/**
+	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(IAction, ISelection)
+	 */
+	public void selectionChanged(IAction action, ISelection selection)
+	{
+		action.setEnabled(false);
+		fSelectedFiles.clear();
+
+		if (!(selection instanceof IStructuredSelection) || selection.isEmpty())
+		{
+			return;
+		}
+
+		Object[] elements = ((IStructuredSelection) selection).toArray();
+		IFileStore fileStore;
+		for (Object element : elements)
+		{
+			if (element instanceof IAdaptable)
+			{
+				fileStore = SyncUtils.getFileStore((IAdaptable) element);
+				if (fileStore != null)
+				{
+					if (!CloakingUtils.isFileCloaked(fileStore))
+					{
+						fSelectedFiles.add(fileStore);
+					}
+				}
+			}
+		}
+		action.setEnabled(fSelectedFiles.size() > 0);
+	}
+
+	/**
+	 * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.action.IAction,
+	 *      org.eclipse.ui.IWorkbenchPart)
+	 */
+	public void setActivePart(IAction action, IWorkbenchPart targetPart)
+	{
+	}
+
+	@Override
+	public void init(IViewPart view)
+	{
+	}
+
+	private static String getFileType(IFileStore fileStore)
+	{
+		String name = fileStore.getName();
+		int index = name.lastIndexOf("."); //$NON-NLS-1$
+		if (index < 0)
+		{
+			return name;
+		}
+		return "*." + name.substring(index + 1); //$NON-NLS-1$
+	}
+
+	public void setSelection(ISelection selection)
+	{
+		fSelectedFiles.clear();
+
+		if (!(selection instanceof IStructuredSelection) || selection.isEmpty())
+		{
+			return;
+		}
+
+		Object[] elements = ((IStructuredSelection) selection).toArray();
+		IFileStore fileStore;
+		for (Object element : elements)
+		{
+			if (element instanceof IAdaptable)
+			{
+				fileStore = SyncUtils.getFileStore((IAdaptable) element);
+				if (fileStore != null)
+				{
+					if (!CloakingUtils.isFileCloaked(fileStore))
+					{
+						fSelectedFiles.add(fileStore);
+					}
+				}
+			}
+		}
+	}
+
 }

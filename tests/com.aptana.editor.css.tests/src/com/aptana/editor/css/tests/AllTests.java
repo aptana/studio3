@@ -21,6 +21,7 @@ public class AllTests
 		suite.addTestSuite(CSSEditorTest.class);
 		suite.addTest(com.aptana.editor.css.parsing.AllTests.suite());
 		suite.addTest(com.aptana.editor.css.outline.AllTests.suite());
+		suite.addTest(com.aptana.editor.css.contentassist.AllTests.suite());
 		// $JUnit-END$
 		return suite;
 	}

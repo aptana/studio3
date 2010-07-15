@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -477,7 +477,44 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 
 	private int findEnd(String possible)
 	{
-		return new EndBraceFinder(possible).find();
+		int end = new EndBraceFinder(possible).find();
+		if (this.insideHeredoc())
+		{
+			String marker = fOpeningString.trim();
+			int offset = possible.indexOf(marker);
+			if (offset != -1)
+			{
+				int endingOffset = offset + marker.length();
+				boolean allowLeadingWhitespace = true; // TODO: set based on existence of '-' operator
+				while (offset > 0)
+				{
+					char c = possible.charAt(offset - 1);
+					if (c == '\r' || c == '\n')
+					{
+						break;
+					}
+					else if (allowLeadingWhitespace && (c == ' ' || c == '\t'))
+					{
+						offset--;
+					}
+					else
+					{
+						// try to advance to the next potential end marker. Note
+						// that if this fails, offset will be -1 and then we'll
+						// exit the while loop
+						offset = possible.indexOf(marker, endingOffset);
+						endingOffset = offset + marker.length();
+					}
+				}
+				// if we found an end marker, use it if it comes before the
+				// ending brace
+				if (end == -1 || (offset != -1 && offset < end))
+				{
+					end = offset - 1;
+				}
+			}
+		}
+		return end;
 	}
 
 	private void addPoundBraceToken()

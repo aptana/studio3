@@ -1,11 +1,19 @@
 package com.aptana.editor.common;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -15,6 +23,12 @@ import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IURIEditorInput;
+import org.jruby.Ruby;
+import org.jruby.RubyArray;
+import org.jruby.RubyHash;
+import org.jruby.RubySymbol;
+import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.ICommonContentAssistProcessor;
@@ -23,9 +37,29 @@ import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
+import com.aptana.parsing.IParseState;
+import com.aptana.parsing.ast.IParseNode;
+import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.CommandContext;
+import com.aptana.scripting.model.CommandElement;
+import com.aptana.scripting.model.CommandResult;
+import com.aptana.scripting.model.filters.ScopeFilter;
 
 public class CommonContentAssistProcessor implements IContentAssistProcessor, ICommonContentAssistProcessor
 {
+	/**
+	 * Default image to use for ruble-contributed proposals (that don't override image)
+	 */
+	private static final String DEFAULT_IMAGE = "icons/proposal.png"; //$NON-NLS-1$
+
+	/**
+	 * Strings used in hash for content assist coming from Rubles
+	 */
+	private static final String INSERT = "insert"; //$NON-NLS-1$
+	private static final String DISPLAY = "display"; //$NON-NLS-1$
+	private static final String IMAGE = "image"; //$NON-NLS-1$
+	private static final String TOOL_TIP = "tool_tip"; //$NON-NLS-1$
+
 	protected final AbstractThemeableEditor editor;
 
 	/**
@@ -47,12 +81,13 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 * @param completionProposals
 	 * @param category
 	 */
-	protected void addCompletionProposalsForCategory(ITextViewer viewer, int offset, Index index, List<ICompletionProposal> completionProposals, String category)
+	protected void addCompletionProposalsForCategory(ITextViewer viewer, int offset, Index index,
+			List<ICompletionProposal> completionProposals, String category)
 	{
 		try
 		{
 			List<QueryResult> queryResults = index.query(new String[] { category }, "", SearchPattern.PREFIX_MATCH); //$NON-NLS-1$
-			
+
 			if (queryResults != null)
 			{
 				for (QueryResult queryResult : queryResults)
@@ -60,7 +95,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 					String text = queryResult.getWord();
 					int length = text.length();
 					String info = category + " : " + text; //$NON-NLS-1$
-					
+
 					completionProposals.add(new CompletionProposal(text, offset, 0, length, null, text, null, info));
 				}
 			}
@@ -92,14 +127,179 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.ICommonContentAssistProcessor#computeCompletionProposals(org.eclipse.jface.text.ITextViewer, int, char, boolean)
+	 * @see
+	 * com.aptana.editor.common.ICommonContentAssistProcessor#computeCompletionProposals(org.eclipse.jface.text.ITextViewer
+	 * , int, char, boolean)
 	 */
 	@Override
-	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
+	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
+			boolean autoActivated)
+	{
+		List<ICompletionProposal> proposals = addRubleProposals(viewer, offset);
+		ICompletionProposal[] others = this.doComputeCompletionProposals(viewer, offset, activationChar, autoActivated);
+		if (proposals == null || proposals.isEmpty())
+		{
+			return others;
+		}
+
+		if (others == null || others.length == 0)
+		{
+			// Pre-select the first ruble-contributed proposal
+			ICompletionProposal proposal = proposals.get(0);
+			if (proposal instanceof CommonCompletionProposal)
+			{
+				((CommonCompletionProposal) proposal).setIsDefaultSelection(true);
+			}
+			return proposals.toArray(new ICompletionProposal[proposals.size()]);
+		}
+
+		// Combine the two, leave selection as is
+		ICompletionProposal[] combined = new ICompletionProposal[proposals.size() + others.length];
+		proposals.toArray(combined);
+		System.arraycopy(others, 0, combined, proposals.size(), others.length);
+		return combined;
+	}
+
+	/**
+	 * This hooks our Ruble scripting up to Content Assist, allowing them to contribute possible proposals. Experimental
+	 * right now as the way to return results is... interesting.
+	 * 
+	 * @param viewer
+	 * @param offset
+	 * @return
+	 */
+	protected List<ICompletionProposal> addRubleProposals(ITextViewer viewer, int offset)
+	{
+		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
+		try
+		{
+			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
+					.getScopeAtOffset(viewer.getDocument(), offset);
+			CommandElement[] commands = BundleManager.getInstance().getContentAssists(new ScopeFilter(scope));
+			if (commands != null && commands.length > 0)
+			{
+				Ruby ruby = Ruby.newInstance();
+
+				for (CommandElement ce : commands)
+				{
+					CommandContext context = ce.createCommandContext();
+					context.setInputStream(new ByteArrayInputStream(viewer.getDocument().get().getBytes()));
+					CommandResult result = ce.execute(context);
+
+					if (!result.executedSuccessfully())
+					{
+						continue;
+					}
+					String output = result.getOutputString();
+					if (output == null || output.trim().length() == 0)
+					{
+						continue;
+					}
+					// This assumes that the command is returning an array that is output as a
+					// string I can eval (via inspect)!
+					RubyArray object = (RubyArray) ruby.evalScriptlet(output);
+					RubySymbol insertSymbol = RubySymbol.newSymbol(ruby, INSERT);
+					RubySymbol displaySymbol = RubySymbol.newSymbol(ruby, DISPLAY);
+					RubySymbol imageSymbol = RubySymbol.newSymbol(ruby, IMAGE);
+					RubySymbol tooltipSymbol = RubySymbol.newSymbol(ruby, TOOL_TIP);
+					for (IRubyObject element : object.toJavaArray())
+					{
+						String name;
+						String displayName;
+						String description = null;
+						int length;
+						IContextInformation contextInfo = null;
+						int replaceLength = 0;
+						Image image = CommonEditorPlugin.getImage(DEFAULT_IMAGE);
+						if (element instanceof RubyHash)
+						{
+							RubyHash hash = (RubyHash) element;
+							if (!hash.containsKey(insertSymbol))
+							{
+								continue;
+							}
+							name = hash.get(insertSymbol).toString();
+							length = name.length();
+							if (hash.containsKey(displaySymbol))
+							{
+								displayName = hash.get(displaySymbol).toString();
+							}
+							else
+							{
+								displayName = name;
+							}
+							if (hash.containsKey(imageSymbol))
+							{
+								String imagePath = hash.get(imageSymbol).toString();
+								// Turn into image!
+								ImageRegistry reg = CommonEditorPlugin.getDefault().getImageRegistry();
+								Image fromReg = reg.get(imagePath);
+								if (fromReg == null)
+								{
+									URL imageURL = null;
+									try
+									{
+										imageURL = new URL(imagePath);
+									}
+									catch (MalformedURLException e)
+									{
+										try
+										{
+											imageURL = new File(imagePath).toURI().toURL();
+										}
+										catch (MalformedURLException e1)
+										{
+											CommonEditorPlugin.logError(e1);
+										}
+									}
+									if (imageURL != null)
+									{
+										ImageDescriptor desc = ImageDescriptor.createFromURL(imageURL);
+										reg.put(imagePath, desc);
+										image = reg.get(imagePath);
+									}
+								}
+								else
+								{
+									image = fromReg;
+								}
+							}
+							if (hash.containsKey(tooltipSymbol))
+							{
+								description = hash.get(tooltipSymbol).toString();
+							}
+							// TODO Allow hash to set offset to insert and replace length?
+						}
+						else
+						{
+							// Array of strings
+							name = element.toString();
+							displayName = name;
+							length = name.length();
+						}
+						// build proposal
+						CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength,
+								length, image, displayName, contextInfo, description);
+
+						// add it to the list
+						proposals.add(proposal);
+					}
+				}
+			}
+		}
+		catch (BadLocationException e)
+		{
+			CommonEditorPlugin.logError(e.getMessage(), e);
+		}
+		return proposals;
+	}
+
+	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
+			boolean autoActivated)
 	{
 		// NOTE: This is the default implementation. Specific language CA processors
 		// should override this method
-		return this.computeCompletionProposals(viewer, offset);
+		return computeCompletionProposals(viewer, offset);
 	}
 
 	/**
@@ -110,7 +310,8 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 * @param index
 	 * @param completionProposals
 	 */
-	protected void computeCompletionProposalsUsingIndex(ITextViewer viewer, int offset, Index index, List<ICompletionProposal> completionProposals)
+	protected void computeCompletionProposalsUsingIndex(ITextViewer viewer, int offset, Index index,
+			List<ICompletionProposal> completionProposals)
 	{
 	}
 
@@ -125,6 +326,16 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	{
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	/**
+	 * getAST
+	 * 
+	 * @return
+	 */
+	protected IParseNode getAST()
+	{
+		return editor.getFileService().getParseResult();
 	}
 
 	/*
@@ -166,7 +377,17 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
+	/**
+	 * getFilename
+	 * 
+	 * @return
+	 */
+	protected String getFilename()
+	{
+		return editor.getEditorInput().getName();
+	}
+
 	/**
 	 * getIndex
 	 * 
@@ -174,21 +395,51 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 */
 	protected Index getIndex()
 	{
+		if (editor == null)
+		{
+			return null;
+		}
 		IEditorInput editorInput = editor.getEditorInput();
 		Index result = null;
-
 		if (editorInput instanceof IFileEditorInput)
 		{
 			IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
 			IFile file = fileEditorInput.getFile();
 			IProject project = file.getProject();
-			
-			result = IndexManager.getInstance().getIndex(project.getFullPath().toPortableString());
+			result = IndexManager.getInstance().getIndex(project.getLocationURI());
 		}
-		
+		else if (editorInput instanceof IURIEditorInput)
+		{
+			IURIEditorInput uriEditorInput = (IURIEditorInput) editorInput;
+			URI uri = uriEditorInput.getURI();
+			// FIXME This file may be a child, we need to check to see if there's an index with a parent URI.
+			result = IndexManager.getInstance().getIndex(uri);
+		}
+
 		return result;
 	}
-	
+
+	protected URI getURI()
+	{
+		IEditorInput editorInput = editor.getEditorInput();
+		if (editorInput instanceof IURIEditorInput)
+		{
+			IURIEditorInput fileEditorInput = (IURIEditorInput) editorInput;
+			return fileEditorInput.getURI();
+		}
+		return null;
+	}
+
+	/**
+	 * getParseState
+	 * 
+	 * @return
+	 */
+	protected IParseState getParseState()
+	{
+		return editor.getFileService().getParseState();
+	}
+
 	/**
 	 * getAllUserAgentIcons
 	 * 
@@ -199,10 +450,10 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		UserAgentManager manager = UserAgentManager.getInstance();
 		String[] userAgents = manager.getActiveUserAgentIDs();
 		Image[] userAgentIcons = manager.getUserAgentImages(userAgents);
-		
+
 		return userAgentIcons;
 	}
-	
+
 	/**
 	 * setSelectedProposal
 	 * 
@@ -213,7 +464,6 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	{
 		ICompletionProposal caseSensitiveProposal = null;
 		ICompletionProposal caseInsensitiveProposal = null;
-		ICompletionProposal suggestedProposal = null;
 
 		for (ICompletionProposal proposal : proposals)
 		{
@@ -244,16 +494,12 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		{
 			((CommonCompletionProposal) caseInsensitiveProposal).setIsDefaultSelection(true);
 		}
-		else if (suggestedProposal instanceof CommonCompletionProposal)
-		{
-			((CommonCompletionProposal) suggestedProposal).setIsSuggestedSelection(true);
-		}
 		else
 		{
 			if (proposals.size() > 0)
 			{
 				ICompletionProposal proposal = proposals.get(0);
-				
+
 				if (proposal instanceof CommonCompletionProposal)
 				{
 					((CommonCompletionProposal) proposal).setIsSuggestedSelection(true);

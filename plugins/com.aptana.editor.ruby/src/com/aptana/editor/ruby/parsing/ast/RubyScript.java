@@ -26,7 +26,7 @@ public class RubyScript extends RubyElement implements IRubyScript
 	}
 
 	@Override
-	public short getType()
+	public short getNodeType()
 	{
 		return IRubyElement.SCRIPT;
 	}

@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -41,9 +41,9 @@ import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 
-import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.text.rules.RegexpRule;
-import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.ThemePlugin;
 
 public class JSSingleQuotedStringScanner extends BufferedRuleBasedScanner
 {
@@ -65,6 +65,6 @@ public class JSSingleQuotedStringScanner extends BufferedRuleBasedScanner
 
 	protected IThemeManager getThemeManager()
 	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
+		return ThemePlugin.getDefault().getThemeManager();
 	}
 }

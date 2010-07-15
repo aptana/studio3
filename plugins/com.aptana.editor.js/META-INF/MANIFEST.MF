@@ -15,11 +15,13 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.index.core,
  com.aptana.editor.common,
  com.aptana.parsing,
- beaver;bundle-version="1.0.0"
+ beaver;bundle-version="1.0.0",
+ com.aptana.theme
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.js,
+ com.aptana.editor.js.contentassist,
  com.aptana.editor.js.contentassist.index,
  com.aptana.editor.js.outline,
  com.aptana.editor.js.parsing

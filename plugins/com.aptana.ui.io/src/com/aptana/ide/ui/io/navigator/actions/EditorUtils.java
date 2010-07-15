@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -55,7 +55,6 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.progress.UIJob;
 
-import com.aptana.ide.core.io.efs.LocalFile;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ui.UIUtils;
 
@@ -227,7 +226,7 @@ public class EditorUtils {
         } catch (IOException e) {
             return fileStore;
         }
-        IFileStore localFileStore = new LocalFile(file);
+        IFileStore localFileStore = EFS.getLocalFileSystem().fromLocalFile(file);
         fileStore.copy(localFileStore, EFS.OVERWRITE, monitor);
         file.deleteOnExit();
 

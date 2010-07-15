@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -37,7 +37,6 @@ package com.aptana.filesystem.secureftp.internal;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -61,7 +60,7 @@ public class SSHHostValidator extends SSHFTPValidator {
 		if (knownHosts.exists() && knownHosts.isFile()) {
 			try {
 				loadKnownHosts(new FileInputStream(knownHosts));
-			} catch (IOException e) {
+			} catch (Exception e) {
 				SecureFTPPlugin.log(new Status(IStatus.WARNING, SecureFTPPlugin.PLUGIN_ID, Messages.SSHHostValidator_FailedLoadKnownHosts, e));
 			}
 		}

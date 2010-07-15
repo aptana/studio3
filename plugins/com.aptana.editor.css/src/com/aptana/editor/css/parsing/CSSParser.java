@@ -106,7 +106,7 @@ public class CSSParser extends Parser implements IParser {
 
 	private CSSScanner fScanner;
 
-	@SuppressWarnings("unchecked")	
+	@SuppressWarnings({ "unchecked", "rawtypes" })	
 	public CSSParser() {
 		super(PARSING_TABLES);
 		report = new CSSEvents();
@@ -293,7 +293,7 @@ public class CSSParser extends Parser implements IParser {
 					final Symbol _symbol_d = _symbols[offset + 1];
 					final CSSDeclarationNode d = (CSSDeclarationNode) _symbol_d.value;
 					final Symbol s = _symbols[offset + 2];
-					((CSSDeclarationNode) d).setHasSemicolon(s); return d;
+					d.setHasSemicolon(s); return d;
 				}
 			},
 			new Action() {	// [33] Declaration = SEMICOLON.s

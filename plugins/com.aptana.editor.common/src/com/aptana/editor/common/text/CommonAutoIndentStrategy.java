@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -163,9 +163,23 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 			else if (line.startsWith("/*") && !line.endsWith("*/")) //$NON-NLS-1$ //$NON-NLS-2$
 			{
 				buf.append(" * "); //$NON-NLS-1$
+				try
+				{
+					IRegion nextLineInfo = d.getLineInformationOfOffset(c.offset + 1);
+					String nextLine = d.get(nextLineInfo.getOffset(), nextLineInfo.getLength()).trim();
+					if (nextLine.startsWith("*") || nextLine.endsWith("*/")) //$NON-NLS-1$ //$NON-NLS-2$
+					{
+						return buf.toString();
+					}
+				}
+				catch (BadLocationException e)
+				{
+				}
 				String toEnd = " */"; //$NON-NLS-1$
 				if (line.startsWith("/**")) //$NON-NLS-1$
-					toEnd = " **/"; //$NON-NLS-1$
+				{
+					toEnd = " */"; //$NON-NLS-1$
+				}
 				d.replace(c.offset, 0, "\n" + indent + toEnd); //$NON-NLS-1$
 			}
 		}

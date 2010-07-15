@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -47,7 +47,6 @@ public class Messages extends NLS {
     public static String ConnectionPointComposite_LBL_Transfer;
     public static String ConnectionPointComposite_TTP_Home;
     public static String ConnectionPointComposite_TTP_Refresh;
-    public static String ConnectionPointComposite_TTP_Up;
 
     public static String FTPManagerComposite_ERR_CreateNewSiteFailed;
     public static String FTPManagerComposite_ERR_EmptyName;
@@ -60,9 +59,11 @@ public class Messages extends NLS {
     public static String FTPManagerComposite_NameInput_Title;
     public static String FTPManagerComposite_TTP_Edit;
     public static String FTPManagerComposite_TTP_SaveAs;
+	public static String FTPManagerComposite_TTP_Synchronize;
     public static String FTPManagerComposite_TTP_TransferLeft;
     public static String FTPManagerComposite_TTP_TransferRight;
 
+	
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

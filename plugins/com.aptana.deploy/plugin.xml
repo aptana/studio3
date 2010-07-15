@@ -2,19 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         point="org.eclipse.ui.popupMenus">
-      <objectContribution
-            adaptable="true"
-            id="com.aptana.deploy.resourceContribution"
-            objectClass="org.eclipse.core.resources.IResource">
-         <action
-               class="com.aptana.deploy.actions.DeployAction"
-               id="com.aptana.deploy.action"
-               label="Deploy">
-         </action>
-      </objectContribution>
-   </extension>
-   <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
             class="com.aptana.deploy.preferences.PreferenceInitializer">

@@ -85,7 +85,7 @@
          version="0.0.0"/>
 
    <plugin
-         id="org.eclipse.tm.terminal"
+         id="com.aptana.org.eclipse.tm.terminal"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -356,6 +356,27 @@
 
    <plugin
          id="org.jrubyparser"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.portablegit.win32"
+         os="win32"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="com.aptana.editor.diff"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.theme"
          download-size="0"
          install-size="0"
          version="0.0.0"

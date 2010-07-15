@@ -39,8 +39,9 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.contentassist.UserAgentManager;
+import com.aptana.editor.common.contentassist.IPreferenceConstants;
+import com.aptana.ui.epl.UIEplPlugin;
 
 /**
  * Allows the user to edit the set of user agents
@@ -240,7 +241,7 @@ public final class UserAgentPreferencePage extends PreferencePage implements IWo
 	public void init(IWorkbench workbench)
 	{
 		this.workbench = workbench;
-		setPreferenceStore(CommonEditorPlugin.getDefault().getPreferenceStore());
+		setPreferenceStore(UIEplPlugin.getDefault().getPreferenceStore());
 	}
 
 	/**
@@ -273,6 +274,6 @@ public final class UserAgentPreferencePage extends PreferencePage implements IWo
 	{
 		super.performDefaults();
 
-		categoryViewer.setCheckedElements(UserAgentManager.getInstance().getDefaultActiveUserAgents()); //$NON-NLS-1$
+		categoryViewer.setCheckedElements(UserAgentManager.getInstance().getDefaultActiveUserAgents());
 	}
 }

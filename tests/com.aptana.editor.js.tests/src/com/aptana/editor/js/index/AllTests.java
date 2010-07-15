@@ -7,7 +7,7 @@ public class AllTests
 {
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite("Test for com.aptana.editor.js.index");
+		TestSuite suite = new TestSuite("Tests for com.aptana.editor.js.index");
 		// $JUnit-BEGIN$
 		suite.addTestSuite(JSMetadataIndexWriterTests.class);
 		suite.addTestSuite(JSIndexTests.class);

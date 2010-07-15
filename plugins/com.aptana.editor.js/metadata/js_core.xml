@@ -8,6 +8,7 @@
 		<browser platform="Mozilla" version="1.0+"/>
 		<browser platform="Netscape" version="3.0+"/>
 		<browser platform="Opera" version="7.0+" />
+		<browser platform="Chrome" version="5.0+" />
 		<browser platform="Safari" version="1.0+" />
 	</browsers>
 	    <constructors>
@@ -97,6 +98,7 @@ var result = makeFactorialFunc()(5); // returns 120 (5 * 4 * 3 * 2 * 1)
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -128,6 +130,7 @@ var result = makeFactorialFunc()(5); // returns 120 (5 * 4 * 3 * 2 * 1)
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 	</browsers>
     <constructors>
@@ -158,6 +161,7 @@ var result = makeFactorialFunc()(5); // returns 120 (5 * 4 * 3 * 2 * 1)
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Netscape" version="3.0+"/>
 				<browser platform="Opera" version="7.0+" />
+				<browser platform="Chrome" version="5.0+" />
 				<browser platform="Safari" version="1.0+" />
 			</browsers>
 			<availability>
@@ -205,6 +209,7 @@ var result = makeFactorialFunc()(5); // returns 120 (5 * 4 * 3 * 2 * 1)
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Netscape" version="3.0+"/>
 				<browser platform="Opera" version="7.0+" />
+				<browser platform="Chrome" version="5.0+" />
 				<browser platform="Safari" version="1.0+" />
 			</browsers>
 
@@ -249,6 +254,7 @@ var result = makeFactorialFunc()(5); // returns 120 (5 * 4 * 3 * 2 * 1)
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 		<description>Represents the Array prototype object.</description>
@@ -265,6 +271,7 @@ var result = makeFactorialFunc()(5); // returns 120 (5 * 4 * 3 * 2 * 1)
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a new array comprised of this array joined with other array(s) and/or value(s).</return-description>
@@ -506,6 +513,7 @@ while (idx != -1) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string version of the array.</return-description>
@@ -657,6 +665,7 @@ roots = numbers.map(Math.sqrt);
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description/>
@@ -692,6 +701,7 @@ popped = myFish.pop();&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the new length of the array.</return-description>
@@ -737,6 +747,7 @@ pushed = myFish.push("drum", "lion");&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the array with its elements reversed.</return-description>
@@ -775,6 +786,7 @@ myArray.reverse()&lt;/pre&gt;&lt;p&gt;This code changes &lt;code&gt;myArray&lt;/
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the element removed from the array.</return-description>
@@ -815,6 +827,7 @@ Removed this element: angel&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a new array containing the specified slice.</return-description>
@@ -940,6 +953,7 @@ passed = [12, 5, 8, 1, 44].some(isBigEnough);
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a reference to the sorted array.</return-description>
@@ -1073,6 +1087,7 @@ ant, zebra, undefined, undefined, undefined, undefined&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the array with the elements removed or replaced.</return-description>
@@ -1153,6 +1168,7 @@ removed is: ["angel", "clown"]&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a localized string version of the array.</return-description>
@@ -1216,6 +1232,7 @@ alpha.toSource() //returns ["a", "b", "c"]&lt;/pre&gt;</example>
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string version of the array with its elements separated by commas.</return-description>
@@ -1263,6 +1280,7 @@ myVar=monthNames.toString() // assigns "Jan,Feb,Mar,Apr" to myVar&lt;/pre&gt;&lt
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the new length of the array.</return-description>
@@ -1337,6 +1355,7 @@ New length: 4&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 		<return-description>Returns the primitive value of an array or the primitive value of its elements.</return-description>
@@ -1443,6 +1462,7 @@ myArray = myRe.exec("cdbBdbsbz");&lt;/pre&gt;&lt;p&gt;The properties and element
 		<browser platform="Mozilla" version="1.0+"/>
 		<browser platform="Netscape" version="3.0+"/>
 		<browser platform="Opera" version="7.0+" />
+		<browser platform="Chrome" version="5.0+" />
 		<browser platform="Safari" version="1.0+" />
 	</browsers>
     <constructors>
@@ -1466,6 +1486,7 @@ myArray = myRe.exec("cdbBdbsbz");&lt;/pre&gt;&lt;p&gt;The properties and element
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Netscape" version="3.0+"/>
 				<browser platform="Opera" version="7.0+" />
+				<browser platform="Chrome" version="5.0+" />
 				<browser platform="Safari" version="1.0+" />
 			</browsers>
 			<availability>
@@ -1485,6 +1506,7 @@ myArray = myRe.exec("cdbBdbsbz");&lt;/pre&gt;&lt;p&gt;The properties and element
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Netscape" version="3.0+"/>
 				<browser platform="Opera" version="7.0+" />
+				<browser platform="Chrome" version="5.0+" />
 				<browser platform="Safari" version="1.0+" />
 			</browsers>
 			<availability>
@@ -1541,6 +1563,7 @@ myArray = myRe.exec("cdbBdbsbz");&lt;/pre&gt;&lt;p&gt;The properties and element
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string representation of the specified Boolean object.</return-description>
@@ -1580,6 +1603,7 @@ var myVar=flag.toString()&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the primitive value of a Boolean object.</return-description>
@@ -1664,6 +1688,7 @@ s = new Boolean(myString);      //initial value of true&lt;/pre&gt;&lt;p&gt;Do n
 		<browser platform="Mozilla" version="1.0+"/>
 		<browser platform="Netscape" version="2.0+"/>
 		<browser platform="Opera" version="7.0+" />
+		<browser platform="Chrome" version="5.0+" />
 		<browser platform="Safari" version="1.0+" />
 	</browsers>
     <constructors>
@@ -1697,6 +1722,7 @@ s = new Boolean(myString);      //initial value of true&lt;/pre&gt;&lt;p&gt;Do n
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -1715,6 +1741,7 @@ s = new Boolean(myString);      //initial value of true&lt;/pre&gt;&lt;p&gt;Do n
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -1740,6 +1767,7 @@ s = new Boolean(myString);      //initial value of true&lt;/pre&gt;&lt;p&gt;Do n
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -1782,6 +1810,7 @@ day = Xmas95.getDate()&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -1826,6 +1855,7 @@ weekday = Xmas95.getDay();&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.06+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -1873,6 +1903,7 @@ yr = Today.getFullYear();&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -1915,6 +1946,7 @@ hours = Xmas95.getHours()&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.06+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -1957,6 +1989,7 @@ ms = Today.getMilliseconds();&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -1999,6 +2032,7 @@ minutes = Xmas95.getMinutes()&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -2042,6 +2076,7 @@ month = Xmas95.getMonth()&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -2084,6 +2119,7 @@ secs = Xmas95.getSeconds()&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -2132,6 +2168,7 @@ sameAsBigDay.setTime(theBigDay.getTime())&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -2167,6 +2204,7 @@ currentTimeZoneOffsetInHours = x.getTimezoneOffset()/60&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.06+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -2210,6 +2248,7 @@ d = Today.getUTCDate();&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.06+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -2255,6 +2294,7 @@ weekday = Today.getUTCDay()&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.06+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -2298,6 +2338,7 @@ yr = Today.getUTCFullYear();&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.06+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -2340,6 +2381,7 @@ hrs = Today.getUTCHours();&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.06+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -2382,6 +2424,7 @@ ms = Today.getUTCMilliseconds();&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.06+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -2424,6 +2467,7 @@ min = Today.getUTCMinutes();&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.06+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -2467,6 +2511,7 @@ mon = Today.getUTCMonth();&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.06+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -2509,6 +2554,7 @@ sec = Today.getUTCSeconds();&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -2591,6 +2637,7 @@ year = Xmas.getYear() // returns 95&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -2655,6 +2702,7 @@ year = Xmas.getYear() // returns 95&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the adjusted date in milliseconds.</return-description>
@@ -2695,6 +2743,7 @@ theBigDay.setDate(24)&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.06+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the adjusted date in milliseconds.</return-description>
@@ -2751,6 +2800,7 @@ theBigDay.setFullYear(1997);&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the adjusted date in milliseconds.</return-description>
@@ -2809,6 +2859,7 @@ theBigDay.setFullYear(1997);&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.06+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the adjusted date in milliseconds.</return-description>
@@ -2853,6 +2904,7 @@ theBigDay.setMilliseconds(100);&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the adjusted date in milliseconds.</return-description>
@@ -2908,6 +2960,7 @@ theBigDay.setMilliseconds(100);&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the adjusted date in milliseconds.</return-description>
@@ -2957,6 +3010,7 @@ theBigDay.setMilliseconds(100);&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the adjusted date in milliseconds.</return-description>
@@ -3007,6 +3061,7 @@ theBigDay.setMilliseconds(100);&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the timeValue argument in milliseconds.</return-description>
@@ -3048,6 +3103,7 @@ sameAsBigDay.setTime(theBigDay.getTime());&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.06+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the adjusted date in milliseconds.</return-description>
@@ -3094,6 +3150,7 @@ theBigDay.setUTCDate(20);&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.06+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the adjusted date in milliseconds.</return-description>
@@ -3149,6 +3206,7 @@ theBigDay.setUTCFullYear(1997);&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.06+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the adjusted date in milliseconds.</return-description>
@@ -3208,6 +3266,7 @@ theBigDay.setUTCHours(8);&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.06+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the adjusted date in milliseconds.</return-description>
@@ -3252,6 +3311,7 @@ theBigDay.setUTCMilliseconds(500);&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.06+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the adjusted date in milliseconds.</return-description>
@@ -3308,6 +3368,7 @@ theBigDay.setUTCMinutes(43);&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.06+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the adjusted date in milliseconds.</return-description>
@@ -3358,6 +3419,7 @@ theBigDay.setUTCMonth(11);&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.06+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the adjusted date in milliseconds.</return-description>
@@ -3409,6 +3471,7 @@ theBigDay.setUTCSeconds(20);&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the adjusted date in milliseconds.</return-description>
@@ -3459,6 +3522,7 @@ theBigDay.setYear(2000)&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string version of the Date object expressed in local time.</return-description>
@@ -3488,6 +3552,7 @@ theBigDay.setYear(2000)&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string version of the Date object expressed in GMT time.</return-description>
@@ -3533,6 +3598,7 @@ theBigDay.setYear(2000)&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string version of the Date object expressed in local time and formatted to local conventions.</return-description>
@@ -3594,6 +3660,7 @@ today.toLocaleDateString()&lt;/pre&gt;&lt;p&gt;In this example, &lt;code&gt;toLo
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string version of the date expressed in local time and formatted to local conventions.</return-description>
@@ -3651,6 +3718,7 @@ today.toLocaleString();&lt;/pre&gt;&lt;p&gt;In this example, &lt;code&gt;toLocal
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string representation of the time portion of a Date object, expressed in local time and formatted according to local conventions.</return-description>
@@ -3740,6 +3808,7 @@ today.toLocaleTimeString()&lt;/pre&gt;&lt;p&gt;In this example, &lt;code&gt;toLo
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string representing the specified Date object.</return-description>
@@ -3787,6 +3856,7 @@ myVar=x.toString();   //assigns a value to myVar similar to:
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string representation of the time portion of a Date object, expressed in local time.</return-description>
@@ -3819,6 +3889,7 @@ myVar=x.toString();   //assigns a value to myVar similar to:
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.06+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string representatin of the date, expressed in UTC time.</return-description>
@@ -3861,6 +3932,7 @@ UTCstring = Today.toUTCString();&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the number of milliseconds in a Date object since January 1, 1970, 00:00:00, universal time.</return-description>
@@ -3935,6 +4007,7 @@ UTCstring = Today.toUTCString();&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the value of a Date object in milliseconds.</return-description>
@@ -4119,6 +4192,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 		<browser platform="Mozilla" version="1.0+"/>
 		<browser platform="Netscape" version="6.0+"/>
 		<browser platform="Opera" version="7.0+" />
+		<browser platform="Chrome" version="5.0+" />
 		<browser platform="Safari" version="1.0+" />
 	</browsers>
     <constructors>
@@ -4148,6 +4222,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="6.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	</property>
@@ -4189,6 +4264,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="6.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -4205,6 +4281,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="6.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -4236,6 +4313,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="6.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	</property>
@@ -4261,6 +4339,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="6.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string defined by the implementation.</return-description>
@@ -4405,6 +4484,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 		<browser platform="Mozilla" version="1.0+"/>
 		<browser platform="Netscape" version="3.0+"/>
 		<browser platform="Opera" version="7.0+" />
+		<browser platform="Chrome" version="5.0+" />
 		<browser platform="Safari" version="1.0+" />
 	</browsers>
     <constructors>
@@ -4439,6 +4519,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 			<browser platform="IE" version="4.0+"/>
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -4521,6 +4602,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Netscape" version="3.0+"/>
 				<browser platform="Opera" version="7.0+" />
+				<browser platform="Chrome" version="5.0+" />
 				<browser platform="Safari" version="1.0+" />
 			</browsers>
 		</property>
@@ -4532,6 +4614,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Netscape" version="3.0+"/>
 				<browser platform="Opera" version="7.0+" />
+				<browser platform="Chrome" version="5.0+" />
 				<browser platform="Safari" version="1.0+" />
 			</browsers>
       	 	<availability>
@@ -4574,6 +4657,7 @@ addNumbers(103,104) // returns 207&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -4677,6 +4761,7 @@ myObject.alert2();&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.06+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the value of the invoked function.</return-description>
@@ -4773,6 +4858,7 @@ car = new prod_dept("honda", 5000, "auto");&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.06+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the value of the invoked function.</return-description>
@@ -4880,6 +4966,7 @@ car = new prod_dept("honda", 5000, "auto");&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -4957,6 +5044,7 @@ theDog = new Dog("Gabby","Lab","chocolate","girl")&lt;/pre&gt;&lt;p&gt;Any time 
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 		<return-description>Returns a string representing the source code of the function.</return-description>
@@ -5039,6 +5127,7 @@ if (myAge &amp;gt;= 39)
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Netscape" version="4.06+"/>
 				<browser platform="Opera" version="7.0+" />
+				<browser platform="Chrome" version="5.0+" />
 				<browser platform="Safari" version="1.0+" />
 			</browsers>
 		</property>
@@ -5068,6 +5157,7 @@ if (myAge &amp;gt;= 39)
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Netscape" version="4.06+"/>
 				<browser platform="Opera" version="7.0+" />
+				<browser platform="Chrome" version="5.0+" />
 				<browser platform="Safari" version="1.0+" />
 			</browsers>
 		</property>
@@ -5105,6 +5195,7 @@ if (typeof x == 'undefined') {
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Netscape" version="4.06+"/>
 				<browser platform="Opera" version="7.0+" />
+				<browser platform="Chrome" version="5.0+" />
 				<browser platform="Safari" version="1.0+" />
 			</browsers>
 		</property>
@@ -5287,6 +5378,7 @@ if (typeof x == 'undefined') {
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<return-description>Returns a URI-encoded version of a string.</return-description>
@@ -5380,6 +5472,7 @@ document.write("The field named ", field, " has value of ",
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<return-description>Returns the result of the evaluation.</return-description>
@@ -5422,6 +5515,7 @@ document.write("The field named ", field, " has value of ",
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="4.06+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<return-description>Returns true if the argument is a finite number.</return-description>
@@ -5469,6 +5563,7 @@ if (isNaN(floatValue)) {
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="3.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<return-description>Returns true if the argument is NaN.</return-description>
@@ -5521,6 +5616,7 @@ if (isNaN(floatValue)) {
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<return-description>Returns a number version of the string. </return-description>
@@ -5600,6 +5696,7 @@ if (isNaN(floatValue)) {
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<return-description>Returns an integer of the specified argument.</return-description>
@@ -5629,6 +5726,7 @@ if (isNaN(floatValue)) {
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="2.0+"/>
 					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.0+" />
 				</browsers>
 				<return-description>Returns a URI-decoded version of a string.</return-description>
@@ -5656,6 +5754,7 @@ if (isNaN(floatValue)) {
 		<browser platform="Mozilla" version="1.0+"/>
 		<browser platform="Netscape" version="2.0+"/>
 		<browser platform="Opera" version="7.0+" />
+		<browser platform="Chrome" version="5.0+" />
 		<browser platform="Safari" version="1.0+" />
 	</browsers>
     <constructors/>
@@ -5670,6 +5769,7 @@ if (isNaN(floatValue)) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -5698,6 +5798,7 @@ if (isNaN(floatValue)) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -5727,6 +5828,7 @@ if (isNaN(floatValue)) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -5755,6 +5857,7 @@ if (isNaN(floatValue)) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -5783,6 +5886,7 @@ if (isNaN(floatValue)) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -5814,6 +5918,7 @@ if (isNaN(floatValue)) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -5844,6 +5949,7 @@ if (isNaN(floatValue)) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -5872,6 +5978,7 @@ if (isNaN(floatValue)) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -5902,6 +6009,7 @@ if (isNaN(floatValue)) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the absolute value of a number.</return-description>
@@ -5940,6 +6048,7 @@ if (isNaN(floatValue)) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the arccosine (in radians) of a number.</return-description>
@@ -5991,6 +6100,7 @@ if (isNaN(floatValue)) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the arcsine (in radians) of a number.</return-description>
@@ -6043,6 +6153,7 @@ if (isNaN(floatValue)) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the arctangent (in radians) of a number.</return-description>
@@ -6095,6 +6206,7 @@ if (isNaN(floatValue)) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -6160,6 +6272,7 @@ if (isNaN(floatValue)) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -6205,6 +6318,7 @@ if (isNaN(floatValue)) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the cosine of a number.</return-description>
@@ -6260,6 +6374,7 @@ if (isNaN(floatValue)) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -6310,6 +6425,7 @@ if (isNaN(floatValue)) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -6358,6 +6474,7 @@ if (isNaN(floatValue)) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the natural logarithm (base E) of a number.</return-description>
@@ -6405,6 +6522,7 @@ if (isNaN(floatValue)) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the larger of two numbers.</return-description>
@@ -6452,6 +6570,7 @@ if (isNaN(floatValue)) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the smaller of two numbers.</return-description>
@@ -6492,6 +6611,7 @@ if (isNaN(floatValue)) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns base to the exponent power, that is, baseexponent.</return-description>
@@ -6535,6 +6655,7 @@ if (isNaN(floatValue)) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -6575,6 +6696,7 @@ function getRandom() {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -6627,6 +6749,7 @@ x=Math.round(-20.51)&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the sine of a number.</return-description>
@@ -6676,6 +6799,7 @@ x=Math.round(-20.51)&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the square root of a number.</return-description>
@@ -6717,6 +6841,7 @@ x=Math.round(-20.51)&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the tangent of a number.</return-description>
@@ -6794,6 +6919,7 @@ x=Math.round(-20.51)&lt;/pre&gt;
 		<browser platform="Mozilla" version="1.0+"/>
 		<browser platform="Netscape" version="3.0+"/>
 		<browser platform="Opera" version="7.0+" />
+		<browser platform="Chrome" version="5.0+" />
 		<browser platform="Safari" version="1.0+" />
 	</browsers>
     <constructors>
@@ -6822,6 +6948,7 @@ x=Math.round(-20.51)&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -6859,6 +6986,7 @@ else
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -6894,6 +7022,7 @@ else
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -6940,6 +7069,7 @@ if (month &amp;lt; 1 || month &amp;gt; 12) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -6959,6 +7089,7 @@ if (month &amp;lt; 1 || month &amp;gt; 12) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -6984,6 +7115,7 @@ if (month &amp;lt; 1 || month &amp;gt; 12) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	</property>
@@ -6997,6 +7129,7 @@ if (month &amp;lt; 1 || month &amp;gt; 12) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 		<description>Reference to the Number prototype object.</description>
@@ -7011,6 +7144,7 @@ if (month &amp;lt; 1 || month &amp;gt; 12) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="6.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string representing the number in exponential notation.</return-description>
@@ -7049,6 +7183,7 @@ if (month &amp;lt; 1 || month &amp;gt; 12) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="6.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string representing the number in fixed-point notation.</return-description>
@@ -7087,6 +7222,7 @@ if (month &amp;lt; 1 || month &amp;gt; 12) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="6.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string representation of a number that follows local formatting conventions.</return-description>
@@ -7118,6 +7254,7 @@ if (month &amp;lt; 1 || month &amp;gt; 12) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="6.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string representing the number to a specified precision in fixed-point notation.</return-description>
@@ -7172,6 +7309,7 @@ if (month &amp;lt; 1 || month &amp;gt; 12) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string representing the specified object.</return-description>
@@ -7207,6 +7345,7 @@ if (month &amp;lt; 1 || month &amp;gt; 12) {
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the primitive value of the specified object.</return-description>
@@ -7282,6 +7421,7 @@ document.write(x + "&amp;lt;BR&amp;gt;");&lt;/pre&gt;&lt;p&gt;You can convert an
 		<browser platform="Mozilla" version="1.0+"/>
 		<browser platform="Netscape" version="2.0+"/>
 		<browser platform="Opera" version="7.0+" />
+		<browser platform="Chrome" version="5.0+" />
 		<browser platform="Safari" version="1.0+" />
 	</browsers>
     <constructors>
@@ -7310,6 +7450,7 @@ document.write(x + "&amp;lt;BR&amp;gt;");&lt;/pre&gt;&lt;p&gt;You can convert an
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -7330,6 +7471,7 @@ document.write(x + "&amp;lt;BR&amp;gt;");&lt;/pre&gt;&lt;p&gt;You can convert an
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -7379,6 +7521,7 @@ document.write(x + "&amp;lt;BR&amp;gt;");&lt;/pre&gt;&lt;p&gt;You can convert an
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Netscape" version="3.0+"/>
 				<browser platform="Opera" version="7.0+" />
+				<browser platform="Chrome" version="5.0+" />
 				<browser platform="Safari" version="1.0+" />
 			</browsers>
 			<return-description>Returns the result of the evaluation.</return-description>
@@ -7484,6 +7627,7 @@ document.write(x + "&amp;lt;BR&amp;gt;");&lt;/pre&gt;&lt;p&gt;You can convert an
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a localized string representation of an object.</return-description>
@@ -7557,6 +7701,7 @@ theDog = new Dog("Gabby","Lab","chocolate","girl")&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string representing the specified object.</return-description>
@@ -7651,6 +7796,7 @@ o.toString // returns [object Object]&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the primitive value of the specified object</return-description>
@@ -7888,6 +8034,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 		<browser platform="Mozilla" version="1.0+"/>
 		<browser platform="Netscape" version="4.0+"/>
 		<browser platform="Opera" version="7.0+" />
+		<browser platform="Chrome" version="5.0+" />
 		<browser platform="Safari" version="1.0+" />
 	</browsers>
     <constructors>
@@ -7945,6 +8092,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	</property>
@@ -7959,6 +8107,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -7986,6 +8135,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -8035,6 +8185,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -8127,6 +8278,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 			<browser platform="IE" version="5.5+"/>
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.0+"/>
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	</property>
@@ -8143,6 +8295,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	</property>
@@ -8171,6 +8324,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -8223,6 +8377,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a result array.</return-description>
@@ -8336,6 +8491,7 @@ Found ab. Next match starts at 9. &lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns true if there is a match.</return-description>
@@ -8423,6 +8579,7 @@ Found ab. Next match starts at 9. &lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string representing the specified object.</return-description>
@@ -8643,6 +8800,7 @@ re = /\w+/&lt;/pre&gt;&lt;h3&gt;Special characters in regular expressions&lt;/h3
 		<browser platform="Mozilla" version="1.0+"/>
 		<browser platform="Netscape" version="2.0+"/>
 		<browser platform="Opera" version="7.0+" />
+		<browser platform="Chrome" version="5.0+" />
 		<browser platform="Safari" version="1.0+" />
 	</browsers>
     <constructors>
@@ -8676,6 +8834,7 @@ re = /\w+/&lt;/pre&gt;&lt;h3&gt;Special characters in regular expressions&lt;/h3
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="3.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	</property>
@@ -8687,6 +8846,7 @@ re = /\w+/&lt;/pre&gt;&lt;h3&gt;Special characters in regular expressions&lt;/h3
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <availability>
@@ -8718,6 +8878,7 @@ alert("The string length is " + x.length);&lt;/pre&gt;
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Netscape" version="3.0+"/>
 				<browser platform="Opera" version="7.0+" />
+				<browser platform="Chrome" version="5.0+" />
 				<browser platform="Safari" version="1.0+" />
 			</browsers>
 		</property>
@@ -8763,6 +8924,7 @@ document.writeln(myString.anchor("contents_anchor"));
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 		<return-description>Returns a copy of a string as an HTML anchor. (e.g &amp;lt;a name="name"&amp;gt;</return-description>
@@ -8847,6 +9009,7 @@ document.write("&amp;lt;P&amp;gt;" + worldString.strike())
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 		<return-description>Returns a copy of a string surrounded by &amp;lt;blink&gt;&amp;lt;/blink&gt; HTML tags.</return-description>
@@ -8893,6 +9056,7 @@ document.write("&amp;lt;P&amp;gt;" + worldString.strike())
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 		<return-description>Returns a copy of a string surrounded by &amp;lt;bold&amp;gt;&amp;lt;/bold&amp;gt; HTML tags.</return-description>
@@ -8905,6 +9069,7 @@ document.write("&amp;lt;P&amp;gt;" + worldString.strike())
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the specified character from a string.</return-description>
@@ -8959,6 +9124,7 @@ The character at index 4 is e &lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the the Unicode value of the character at the specified index.</return-description>
@@ -8998,6 +9164,7 @@ The character at index 4 is e &lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a new string.</return-description>
@@ -9050,6 +9217,7 @@ document.write(worldString.fixed())
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 		<return-description>Returns a copy of a string surrounded by &amp;lt;tt&amp;gt;&amp;lt;/tt&amp;gt; tags.</return-description>
@@ -9104,6 +9272,7 @@ document.write("&amp;lt;P&amp;gt;" + worldString.fontcolor("FF00") + " is red in
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 		<return-description>Returns a copy of a string surrounded by &amp;lt;font color = "color"&amp;gt;&amp;lt;/font&amp;gt; tags.</return-description>
@@ -9155,6 +9324,7 @@ document.write("&amp;lt;P&amp;gt;" + worldString.fontsize(7))
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 		<return-description>Returns a copy of a string surrounded by &amp;lt;font size="size"&amp;gt;&amp;lt;/font&amp;gt; tags.</return-description>
@@ -9167,6 +9337,7 @@ document.write("&amp;lt;P&amp;gt;" + worldString.fontsize(7))
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description> Returns a string created by using the specified sequence of Unicode values.</return-description>
@@ -9206,6 +9377,7 @@ document.write("&amp;lt;P&amp;gt;" + worldString.fontsize(7))
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -9337,6 +9509,7 @@ document.write("&amp;lt;P&amp;gt;" + worldString.strike())
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 		<return-description>Returns a copy of a string surrounded by &amp;lt;i&amp;gt;&amp;lt;/i&amp;gt; tags.</return-description>
@@ -9355,6 +9528,7 @@ document.write("&amp;lt;P&amp;gt;" + worldString.strike())
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -9452,6 +9626,7 @@ document.write("Click to return to " + hotText.link(URL))
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 		<return-description>Returns a copy of a string surrounded by &amp;lt;a href="href"&amp;gt;&amp;lt;/a&amp;gt; tags.</return-description>
@@ -9464,6 +9639,7 @@ document.write("Click to return to " + hotText.link(URL))
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a number less than zero if the string object is less than target. Returns a number greater than zero if the string object is greater than the target. Returns 0 if the string object is equal to the target.</return-description>
@@ -9490,6 +9666,7 @@ document.write("Click to return to " + hotText.link(URL))
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>If the regular expression does not include the g flag, returns the same result that RegExp.exec would return on the regular expression and string. If the regular expression includes the g flag, returns an array of all the matches of the regular expression in the string.</return-description>
@@ -9558,6 +9735,7 @@ document.write(newArray);
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a new string with the specified replacements.</return-description>
@@ -9682,6 +9860,7 @@ document.write(newstr)
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="4.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the index of the regular expression inside the string. If no match is found, returns -1.</return-description>
@@ -9736,6 +9915,7 @@ document.write(newstr)
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a new string containing the specified slice.</return-description>
@@ -9817,6 +9997,7 @@ document.write("&amp;lt;P&amp;gt;" + worldString.fontsize(7))
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 		<return-description>Returns a copy of a string surrounded by &amp;lt;small&amp;gt;&amp;lt;/small&amp;gt; tags.</return-description>
@@ -9979,6 +10160,7 @@ document.write("&amp;lt;P&amp;gt;" + worldString.strike())
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 		<return-description>Returns a copy of a string surrounded by &lt;strike&gt;&lt;/strike&gt; tags.</return-description>
@@ -10020,6 +10202,7 @@ document.write("&amp;lt;P&amp;gt;This is what a " + subText.sub() + " looks like
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 		<return-description>Returns a copy of a string surrounded by &amp;lt;sub&amp;gt;&amp;lt;/sub&amp;gt; tags.</return-description>
@@ -10032,6 +10215,7 @@ document.write("&amp;lt;P&amp;gt;This is what a " + subText.sub() + " looks like
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>
@@ -10099,6 +10283,7 @@ document.writeln("(20, 2): ", str.substr(20,2));&lt;/pre&gt;&lt;p&gt;This script
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a subset of a String object.</return-description>
@@ -10219,6 +10404,7 @@ document.write("&amp;lt;P&amp;gt;This is what a " + subText.sub() + " looks like
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 		<return-description>Returns a copy of a string surrounded by &amp;lt;sup&amp;gt;&amp;lt;/sup&amp;gt; tags.</return-description>
@@ -10277,6 +10463,7 @@ document.write("&amp;lt;P&amp;gt;This is what a " + subText.sub() + " looks like
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the calling string value converted to lowercase.</return-description>
@@ -10312,6 +10499,7 @@ document.write(upperText.toLowerCase())&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string representing the specified object.</return-description>
@@ -10363,6 +10551,7 @@ document.write(lowerText.toUpperCase())&lt;/pre&gt;</example>
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 		<return-description>Returns the string value converted to all uppercase.</return-description>
@@ -10397,6 +10586,7 @@ alert(x.valueOf())          // Displays "Hello world"&lt;/pre&gt;</example>
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="2.0+"/>
 			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 		<return-description>Returns the primitive value of a String object.</return-description>

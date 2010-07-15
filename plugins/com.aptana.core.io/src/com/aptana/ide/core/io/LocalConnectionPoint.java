@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -38,13 +38,13 @@ package com.aptana.ide.core.io;
 import java.io.File;
 import java.net.URI;
 
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.epl.IMemento;
-import com.aptana.ide.core.io.efs.LocalFile;
 
 /**
  * @author Max Stepanov
@@ -99,10 +99,9 @@ public class LocalConnectionPoint extends ConnectionPoint {
 	/* (non-Javadoc)
 	 * @see com.aptana.ide.core.io.ConnectionPoint#getRootURI()
 	 */
-	@SuppressWarnings("restriction")
 	@Override
 	public URI getRootURI() {
-		return (new LocalFile(path.toFile())).toURI();
+		return (EFS.getLocalFileSystem().fromLocalFile(path.toFile())).toURI();
 	}
 
 	/* (non-Javadoc)
@@ -110,13 +109,13 @@ public class LocalConnectionPoint extends ConnectionPoint {
 	 */
 	@Override
 	public IFileStore getRoot() throws CoreException {
-		return new LocalFile(path.toFile());
+		return EFS.getLocalFileSystem().fromLocalFile(path.toFile());
 	}
 
     /* (non-Javadoc)
      * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
      */
-    @SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
 	    if (adapter == File.class) {

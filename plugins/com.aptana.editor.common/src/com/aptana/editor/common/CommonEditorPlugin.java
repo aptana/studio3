@@ -9,8 +9,6 @@ import org.eclipse.core.commands.State;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
@@ -33,14 +31,10 @@ import org.osgi.framework.BundleContext;
 
 import com.aptana.editor.common.internal.scripting.ContentTypeTranslation;
 import com.aptana.editor.common.internal.scripting.DocumentScopeManager;
-import com.aptana.editor.common.internal.theme.ThemeManager;
-import com.aptana.editor.common.internal.theme.fontloader.EditorFontOverride;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
-import com.aptana.editor.common.theme.ColorManager;
-import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.usage.EventLogger;
 import com.aptana.index.core.IndexActivator;
+import com.aptana.usage.EventLogger;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -49,7 +43,6 @@ import com.aptana.index.core.IndexActivator;
 public class CommonEditorPlugin extends AbstractUIPlugin
 {
 
-	public static final String PENCIL_ICON = "icons/pencil.png"; //$NON-NLS-1$
 	public static final String SNIPPET = "/icons/snippet.png"; //$NON-NLS-1$
 	public static final String COMMAND = "/icons/command.png"; //$NON-NLS-1$
 	public static final String IBEAM_BLACK = "/icons/ibeam-black.gif"; //$NON-NLS-1$
@@ -67,9 +60,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	// The shared instance
 	private static CommonEditorPlugin plugin;
 
-	private ColorManager fColorManager;
 	private Map<ContextTypeRegistry, ContributionTemplateStore> fTemplateStoreMap;
-	private InvasiveThemeHijacker themeHijacker;
 	private FilenameDifferentiator differentiator;
 
 	private final IPartListener fPartListener = new IPartListener()
@@ -203,10 +194,6 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		// Activate indexing
 		IndexActivator.getDefault();
 		
-		new EditorFontOverride().schedule();
-		themeHijacker = new InvasiveThemeHijacker();
-		themeHijacker.schedule();
-		
 		differentiator = new FilenameDifferentiator();
 		differentiator.schedule();
 
@@ -221,19 +208,12 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	{
 		try
 		{
-			if (fColorManager != null)
-				fColorManager.dispose();
-
-			IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-			prefs.removePreferenceChangeListener(themeHijacker);
 			differentiator.dispose();
 
 			removePartListener();
 		}
 		finally
 		{
-			themeHijacker = null;
-			fColorManager = null;
 			differentiator = null;
 			plugin = null;
 			super.stop(context);
@@ -248,26 +228,6 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	public static CommonEditorPlugin getDefault()
 	{
 		return plugin;
-	}
-
-	/**
-	 * getColorManager
-	 * 
-	 * @return
-	 */
-	public ColorManager getColorManager()
-	{
-		if (this.fColorManager == null)
-		{
-			this.fColorManager = new ColorManager();
-		}
-
-		return this.fColorManager;
-	}
-
-	public IThemeManager getThemeManager()
-	{
-		return ThemeManager.instance();
 	}
 
 	public static void logError(Exception e)
@@ -304,14 +264,6 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message, null));
 	}
 
-	@Override
-	protected ImageRegistry createImageRegistry()
-	{
-		ImageRegistry reg = super.createImageRegistry();
-		reg.put(PENCIL_ICON, imageDescriptorFromPlugin(PLUGIN_ID, PENCIL_ICON));
-		return reg;
-	}
-
 	public static Image getImage(String path)
 	{
 		ImageRegistry registry = plugin.getImageRegistry();
@@ -337,7 +289,6 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	@Override
 	protected void initializeImageRegistry(ImageRegistry reg)
 	{
-		reg.put(PENCIL_ICON, imageDescriptorFromPlugin(PLUGIN_ID, PENCIL_ICON));
 		reg.put(SNIPPET, imageDescriptorFromPlugin(PLUGIN_ID, SNIPPET));
 		reg.put(COMMAND, imageDescriptorFromPlugin(PLUGIN_ID, COMMAND));
 		reg.put(IBEAM_BLACK, imageDescriptorFromPlugin(PLUGIN_ID, IBEAM_BLACK));

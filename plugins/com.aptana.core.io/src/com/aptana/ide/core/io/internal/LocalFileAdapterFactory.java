@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -50,13 +50,12 @@ import com.aptana.ide.core.io.CoreIOPlugin;
  * @author Max Stepanov
  *
  */
-@SuppressWarnings("restriction")
+@SuppressWarnings({"restriction", "rawtypes"})
 public class LocalFileAdapterFactory implements IAdapterFactory {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 	 */
-	@SuppressWarnings("unchecked")
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (adapterType == File.class && adaptableObject instanceof LocalFile) {
 			try {
@@ -71,7 +70,6 @@ public class LocalFileAdapterFactory implements IAdapterFactory {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
 	 */
-	@SuppressWarnings("unchecked")
 	public Class[] getAdapterList() {
 		return new Class[] { File.class };
 	}

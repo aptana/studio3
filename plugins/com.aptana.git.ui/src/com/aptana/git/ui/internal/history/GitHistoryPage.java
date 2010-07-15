@@ -2,6 +2,7 @@ package com.aptana.git.ui.internal.history;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -48,8 +50,10 @@ import com.aptana.git.core.model.GitRevList;
 import com.aptana.git.core.model.GitRevSpecifier;
 import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.ui.GitUIPlugin;
+import com.aptana.theme.ThemePlugin;
+import com.aptana.ui.IAptanaHistory;
 
-public class GitHistoryPage extends HistoryPage
+public class GitHistoryPage extends HistoryPage implements IAptanaHistory
 {
 
 	private static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat(Messages.GitHistoryPage_DateFormat);
@@ -102,7 +106,8 @@ public class GitHistoryPage extends HistoryPage
 					return Status.CANCEL_STATUS;
 				repo.lazyReload();
 				subMonitor.worked(5);
-				revList.walkRevisionListWithSpecifier(new GitRevSpecifier(resourcePath.toOSString()), subMonitor.newChild(95));
+				revList.walkRevisionListWithSpecifier(new GitRevSpecifier(resourcePath.toOSString()),
+						subMonitor.newChild(95));
 				final List<GitCommit> commits = revList.getCommits();
 				Display.getDefault().asyncExec(new Runnable()
 				{
@@ -299,7 +304,7 @@ public class GitHistoryPage extends HistoryPage
 		// TODO Force a reload of the index and the refs and set input.
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter)
 	{
 		return null;
@@ -309,6 +314,8 @@ public class GitHistoryPage extends HistoryPage
 	{
 		Map<String, String> variables = new HashMap<String, String>();
 		variables.put("\\{sha\\}", commit.sha()); //$NON-NLS-1$
+		variables.put(
+				"\\{themeBG\\}", toHex(ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getBackground())); //$NON-NLS-1$
 		variables.put("\\{date\\}", TIMESTAMP_FORMAT.format(commit.date())); //$NON-NLS-1$
 		variables.put("\\{author\\}", commit.getAuthor()); //$NON-NLS-1$
 		variables.put("\\{subject\\}", commit.getSubject()); //$NON-NLS-1$
@@ -396,4 +403,46 @@ public class GitHistoryPage extends HistoryPage
 		return false;
 	}
 
+	public void setTheme(boolean revert)
+	{
+		applyTheme(ourControl, revert);
+		applyTheme(graphDetailSplit, revert);
+		applyTheme(revInfoSplit, revert);
+		applyTheme(graph.getControl(), revert);
+		applyTheme(commentViewer, revert);
+		applyTheme(fileViewer.getControl(), revert);
+	}
+
+	private void applyTheme(Control control, boolean revert)
+	{
+		if (revert)
+		{
+			ThemePlugin.getDefault().getControlThemerFactory().dispose(control);
+		}
+		else
+		{
+			ThemePlugin.getDefault().getControlThemerFactory().apply(control);
+		}
+	}
+
+	// FIXME Copy-pasted from Theme
+	private String toHex(RGB rgb)
+	{
+		return MessageFormat.format("#{0}{1}{2}", pad(Integer.toHexString(rgb.red), 2, '0'), pad(Integer //$NON-NLS-1$
+				.toHexString(rgb.green), 2, '0'), pad(Integer.toHexString(rgb.blue), 2, '0'));
+	}
+
+	private String pad(String string, int desiredLength, char padChar)
+	{
+		while (string.length() < desiredLength)
+			string = padChar + string;
+		return string;
+	}
+
+	@Override
+	public void dispose()
+	{
+		setTheme(false);
+		super.dispose();
+	}
 }

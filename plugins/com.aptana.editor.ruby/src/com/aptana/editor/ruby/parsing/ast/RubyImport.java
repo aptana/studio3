@@ -14,7 +14,7 @@ public class RubyImport extends RubyElement
 	}
 
 	@Override
-	public short getType()
+	public short getNodeType()
 	{
 		return IRubyElement.IMPORT_DECLARATION;
 	}

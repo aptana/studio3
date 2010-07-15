@@ -1,5 +1,7 @@
 package com.aptana.editor.js.contentassist;
 
+import java.util.List;
+
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.ParameterElement;
@@ -36,6 +38,26 @@ public class JSModelFormatter
 		// description
 		buffer.append("<br><br>"); //$NON-NLS-1$
 		buffer.append(property.getDescription());
+		
+		return buffer.toString();
+	}
+	
+	/**
+	 * getDescription
+	 * 
+	 * @param header
+	 * @param items
+	 * @return
+	 */
+	public static String getDescription(String header, List<String> items)
+	{
+		StringBuilder buffer = new StringBuilder();
+		
+		// emit header
+		buffer.append("<b>").append(header).append("</b><br><br>"); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		// emit list
+		buffer.append(StringUtil.join("<br>", items)); //$NON-NLS-1$
 		
 		return buffer.toString();
 	}

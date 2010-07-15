@@ -1,30 +1,35 @@
 package com.aptana.editor.js.contentassist.index;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.net.URI;
+import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.resources.IFile;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.core.runtime.content.IContentTypeManager;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.js.Activator;
-import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.contentassist.JSASTQueryHelper;
-import com.aptana.editor.js.parsing.JSParser;
-import com.aptana.index.core.IFileIndexingParticipant;
+import com.aptana.editor.js.parsing.IJSParserConstants;
+import com.aptana.editor.js.parsing.ast.JSFunctionNode;
+import com.aptana.editor.js.parsing.ast.JSNode;
+import com.aptana.editor.js.parsing.ast.JSParseRootNode;
+import com.aptana.editor.js.sdoc.model.DocumentationBlock;
+import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
+import com.aptana.parsing.IParser;
+import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParseState;
+import com.aptana.parsing.ParserPoolFactory;
+import com.aptana.parsing.Scope;
 import com.aptana.parsing.ast.IParseNode;
 
-public class JSFileIndexingParticipant implements IFileIndexingParticipant
+public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 {
-	private static final String JS_EXTENSION = "js"; //$NON-NLS-1$
 
 	/*
 	 * (non-Javadoc)
@@ -32,104 +37,113 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public void index(Set<IFile> files, Index index, IProgressMonitor monitor)
+	public void index(Set<IFileStore> files, Index index, IProgressMonitor monitor)
 	{
-		monitor = SubMonitor.convert(monitor, files.size());
-		for (IFile file : files)
+		SubMonitor sub = SubMonitor.convert(monitor, files.size());
+
+		for (IFileStore file : files)
 		{
-			if (monitor.isCanceled())
+			if (sub.isCanceled())
+			{
 				return;
+			}
+
 			try
 			{
-				if (file == null || !isJSFile(file))
+				if (file == null)
 				{
 					continue;
 				}
-				monitor.subTask(file.getLocation().toPortableString());
+
+				sub.subTask(file.getName());
+
 				try
 				{
-					// create parser and associated parse state
-					JSParser parser = new JSParser();
-					ParseState parseState = new ParseState();
-
 					// grab the source of the file we're going to parse
-					String source = IOUtil.read(file.getContents());
+					String source = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(-1)));
 
 					// minor optimization when creating a new empty file
 					if (source != null && source.length() > 0)
 					{
-						// apply the source to the parse state
-						parseState.setEditState(source, source, 0, 0);
+						// create parser and associated parse state
+						IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IJSParserConstants.LANGUAGE);
 
-						// parse and grab the result
-						IParseNode ast = parser.parse(parseState);
+						if (pool != null)
+						{
+							IParser parser = pool.checkOut();
 
-						// now walk the parse tree
-						this.walkAST(index, file, ast);
+							// apply the source to the parse state and parse
+							ParseState parseState = new ParseState();
+							parseState.setEditState(source, source, 0, 0);
+							parser.parse(parseState);
+
+							pool.checkIn(parser);
+
+							// process results
+							this.processParseResults(index, file, parseState.getParseResult());
+						}
 					}
 				}
 				catch (CoreException e)
 				{
 					Activator.logError(e.getMessage(), e);
 				}
-				catch (Exception e)
+				catch (Throwable e)
 				{
 					Activator.logError(e.getMessage(), e);
 				}
 			}
 			finally
 			{
-				monitor.worked(1);
+				sub.worked(1);
 			}
 		}
+
 		monitor.done();
 	}
 
 	/**
-	 * isJSFile
+	 * processParseResults
 	 * 
+	 * @param index
 	 * @param file
-	 * @return
+	 * @param parseState
 	 */
-	private boolean isJSFile(IFile file)
+	private void processParseResults(Index index, IFileStore file, IParseNode ast)
 	{
-		InputStream stream = null;
-		IContentTypeManager manager = Platform.getContentTypeManager();
-
-		try
+		if (Platform.inDevelopmentMode())
 		{
-			stream = file.getContents();
+			URI location = file.toURI();
+			Scope<JSNode> globals = ((JSParseRootNode) ast).getGlobalScope();
 
-			IContentType[] types = manager.findContentTypesFor(stream, file.getName());
-
-			for (IContentType type : types)
+			for (String symbol : globals.getLocalSymbolNames())
 			{
-				if (type.getId().equals(IJSConstants.CONTENT_TYPE_JS))
+				List<JSNode> nodes = globals.getSymbol(symbol);
+				String category = JSIndexConstants.VARIABLE;
+
+				for (JSNode node : nodes)
 				{
-					return true;
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			Activator.logError(e.getMessage(), e);
-		}
-		finally
-		{
-			try
-			{
-				if (stream != null)
-				{
-					stream.close();
-				}
-			}
-			catch (IOException e)
-			{
-				// ignore
-			}
-		}
+					DocumentationBlock block = node.getDocumentation();
 
-		return JS_EXTENSION.equalsIgnoreCase(file.getFileExtension());
+					if (block != null)
+					{
+						// System.out.println("Found block for " + symbol + "\n" + block.toSource());
+					}
+
+					if (node instanceof JSFunctionNode)
+					{
+						category = JSIndexConstants.FUNCTION;
+						break;
+					}
+				}
+
+				index.addEntry(category, symbol, location);
+			}
+		}
+		else
+		{
+			this.walkAST(index, file, ast);
+		}
 	}
 
 	/**
@@ -139,22 +153,23 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 	 * @param file
 	 * @param ast
 	 */
-	private void walkAST(Index index, IFile file, IParseNode ast)
+	private void walkAST(Index index, IFileStore file, IParseNode ast)
 	{
-		JSASTQueryHelper queryHelper = new JSASTQueryHelper();
-		
-		for (String name : queryHelper.getGlobalFunctions(ast))
+		JSASTQueryHelper astHelper = new JSASTQueryHelper();
+		URI location = file.toURI();
+
+		for (String name : astHelper.getChildFunctions(ast))
 		{
-			System.out.println(name + "()");
-			index.addEntry(JSIndexConstants.FUNCTION, name, file.getProjectRelativePath().toPortableString());
+			index.addEntry(JSIndexConstants.FUNCTION, name, location);
 		}
-		for (String varName : queryHelper.getGlobalDeclarations(ast))
+		for (String varName : astHelper.getChildVarNonFunctions(ast))
 		{
-			System.out.println(varName);
+			index.addEntry(JSIndexConstants.VARIABLE, varName, location);
 		}
-		for (String varName : queryHelper.getAccidentalGlobals(ast))
-		{
-			System.out.println(varName);
-		}
+		// for (String varName : astHelper.getAccidentalGlobals(ast))
+		// {
+		// System.out.println("accidental global: " + varName);
+		// index.addEntry(JSIndexConstants.VARIABLE, varName, location);
+		// }
 	}
 }

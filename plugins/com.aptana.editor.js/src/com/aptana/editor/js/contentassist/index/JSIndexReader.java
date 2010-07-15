@@ -2,14 +2,18 @@ package com.aptana.editor.js.contentassist.index;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
+import com.aptana.editor.js.contentassist.model.UserAgentElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
@@ -64,26 +68,31 @@ public class JSIndexReader
 			for (QueryResult function : functions)
 			{
 				String[] columns = function.getWord().split(JSIndexConstants.DELIMITER);
-				String functionName = columns[0];
-				String descriptionKey = columns[2];
-				String parametersKey = columns[3];
-				String returnTypesKey = columns[4];
-				List<ParameterElement> parameters = this.getParameters(index, parametersKey);
-				List<ReturnTypeElement> returnTypes = this.getReturnTypes(index, returnTypesKey);
+				int column = 0;
 				
 				FunctionElement f = new FunctionElement();
 
-				f.setName(functionName);
-				f.setDescription(this.getDescription(index, descriptionKey));
+				f.setName(columns[column++]);
+				column++;	// skip owning type
+				f.setDescription(this.getDescription(index, columns[column++]));
 				
-				for (ParameterElement parameter : parameters)
+				for (ParameterElement parameter : this.getParameters(index, columns[column++]))
 				{
 					f.addParameter(parameter);
 				}
 
-				for (ReturnTypeElement returnType : returnTypes)
+				for (ReturnTypeElement returnType : this.getReturnTypes(index, columns[column++]))
 				{
 					f.addReturnType(returnType);
+				}
+				
+				if (column < columns.length)
+				{
+					for (String userAgentKey : columns[column++].split(JSIndexConstants.SUB_DELIMITER))
+					{
+						// get user agent and add to element
+						f.addUserAgent(this.getUserAgent(index, userAgentKey));
+					}
 				}
 				
 				result.add(f);
@@ -123,19 +132,26 @@ public class JSIndexReader
 			for (QueryResult property : properties)
 			{
 				String[] columns = property.getWord().split(JSIndexConstants.DELIMITER);
-				String propertyName = columns[0];
-				String descriptionKey = columns[2];
-				String returnTypesKey = columns[3];
-				List<ReturnTypeElement> returnTypes = this.getReturnTypes(index, returnTypesKey);
+				int column = 0;
 				
 				PropertyElement p = new PropertyElement();
 
-				p.setName(propertyName);
-				p.setDescription(this.getDescription(index, descriptionKey));
+				p.setName(columns[column++]);
+				column++;	// skip owning type
+				p.setDescription(this.getDescription(index, columns[column++]));
 				
-				for (ReturnTypeElement returnType : returnTypes)
+				for (ReturnTypeElement returnType : this.getReturnTypes(index, columns[column++]))
 				{
 					p.addType(returnType);
+				}
+				
+				if (column < columns.length)
+				{
+					for (String userAgentKey : columns[column++].split(JSIndexConstants.SUB_DELIMITER))
+					{
+						// get user agent and add to element
+						p.addUserAgent(this.getUserAgent(index, userAgentKey));
+					}
 				}
 
 				result.add(p);
@@ -236,7 +252,83 @@ public class JSIndexReader
 	}
 
 	/**
-	 * readType
+	 * getUserAgent
+	 * 
+	 * @param userAgentKey
+	 * @return
+	 * @throws IOException
+	 */
+	protected UserAgentElement getUserAgent(Index index, String userAgentKey) throws IOException
+	{
+		UserAgentElement result = JSIndexWriter.userAgentsByKey.get(userAgentKey);
+		
+		if (result == null)
+		{
+			String searchKey = userAgentKey + JSIndexConstants.DELIMITER;
+			List<QueryResult> items = index.query(new String[] { JSIndexConstants.USER_AGENT }, searchKey,
+					SearchPattern.PREFIX_MATCH);
+	
+			if (items != null && items.size() > 0)
+			{
+				String key = items.get(0).getWord();
+				String[] columns = key.split(JSIndexConstants.DELIMITER);
+				int column = 1; // skip index
+	
+				result = new UserAgentElement();
+				result.setDescription(columns[column++]);
+				result.setOS(columns[column++]);
+				result.setPlatform(columns[column++]);
+	
+				// NOTE: split does not return a final empty element if the string being split
+				// ends with the delimiter.
+				if (column < columns.length)
+				{
+					result.setVersion(columns[column++]);
+				}
+			}
+		}
+
+		return result;
+	}
+	
+	/**
+	 * getValues
+	 * 
+	 * @return
+	 */
+	public Map<String, List<String>> getValues(Index index, String category)
+	{
+		Map<String, List<String>> result = null;
+
+		if (index != null)
+		{
+			String pattern = "*"; //$NON-NLS-1$
+
+			try
+			{
+				List<QueryResult> items = index.query(new String[] { category }, pattern, SearchPattern.PATTERN_MATCH);
+
+				if (items != null && items.size() > 0)
+				{
+					result = new HashMap<String, List<String>>();
+
+					for (QueryResult item : items)
+					{
+						result.put(item.getWord(), Arrays.asList(item.getDocuments()));
+					}
+				}
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
+
+		return result;
+	}
+	
+	/**
+	 * loadType
 	 * 
 	 * @param index
 	 * @param typeName

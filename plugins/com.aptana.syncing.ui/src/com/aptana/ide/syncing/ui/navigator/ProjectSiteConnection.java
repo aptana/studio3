@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -65,7 +65,12 @@ public final class ProjectSiteConnection extends PlatformObject {
         return siteConnection;
     }
 
-    @SuppressWarnings("unchecked")
+    public boolean canDisconnect() {
+    	IConnectionPoint connectionPoint = siteConnection.getDestination();
+    	return connectionPoint == null ? false : connectionPoint.canDisconnect();
+    }
+
+    @SuppressWarnings("rawtypes")
     public Object getAdapter(Class adapter) {
         if (adapter == IProject.class) {
             return project;

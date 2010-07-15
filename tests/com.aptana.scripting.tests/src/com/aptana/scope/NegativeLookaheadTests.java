@@ -33,4 +33,16 @@ public class NegativeLookaheadTests extends TestCase
 
 		assertTrue(selector.matches("A B"));
 	}
+	
+	/**
+	 * testMultipleLookahead
+	 */
+	public void testMultipleLookahead()
+	{
+		ScopeSelector selector = new ScopeSelector("A B - C D");
+		
+		assertTrue(selector.matches("A B"));
+		assertTrue(selector.matches("A B C"));
+		assertFalse(selector.matches("A B C D"));
+	}
 }

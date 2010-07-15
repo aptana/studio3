@@ -784,11 +784,11 @@ public class JSMetadataReader extends ValidatingReader
 			}
 			catch (IOException e)
 			{
-				Activator.logError("An error occurred while loading the JS metadata schema", e);
+				Activator.logError(Messages.JSMetadataReader_Error_Loading_JS_Metadata, e);
 			}
 			catch (SchemaInitializationException e)
 			{
-				Activator.logError("An error occurred while loading the JS metadata schema", e);
+				Activator.logError(Messages.JSMetadataReader_Error_Loading_JS_Metadata, e);
 			}
 			finally
 			{

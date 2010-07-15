@@ -26,6 +26,7 @@ public class FTPDeployComposite extends CommonFTPConnectionPropertyComposite imp
 	private Button autoSyncCheckbox;
 	private Button uploadButton;
 	private Button downloadButton;
+	private Button syncButton;
 
 	public FTPDeployComposite(Composite parent, int style, IBaseRemoteConnectionPoint connectionPoint, Listener listener)
 	{
@@ -67,11 +68,15 @@ public class FTPDeployComposite extends CommonFTPConnectionPropertyComposite imp
 		uploadButton = new Button(sync, SWT.RADIO);
 		uploadButton.setText(Messages.FTPDeployComposite_Upload);
 		uploadButton.setLayoutData(GridDataFactory.swtDefaults().indent(10, 0).create());
-		uploadButton.setSelection(true);
 
 		downloadButton = new Button(sync, SWT.RADIO);
 		downloadButton.setText(Messages.FTPDeployComposite_Download);
 		downloadButton.setLayoutData(GridDataFactory.swtDefaults().indent(10, 0).create());
+
+		syncButton = new Button(sync, SWT.RADIO);
+		syncButton.setText(Messages.FTPDeployComposite_Synchronize);
+		syncButton.setLayoutData(GridDataFactory.swtDefaults().indent(10, 0).create());
+		syncButton.setSelection(true);
 
 		updateEnableState();
 	}
@@ -97,5 +102,6 @@ public class FTPDeployComposite extends CommonFTPConnectionPropertyComposite imp
 		boolean enabled = autoSyncCheckbox.getSelection();
 		uploadButton.setEnabled(enabled);
 		downloadButton.setEnabled(enabled);
+		syncButton.setEnabled(enabled);
 	}
 }

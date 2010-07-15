@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -54,7 +54,7 @@ import org.eclipse.debug.core.model.RuntimeProcess;
 	 * @param name
 	 * @param attributes
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public ConsoleProcess(ILaunch launch, Process process, String name, Map attributes) {
 		super(launch, process, name, attributes);
 	}

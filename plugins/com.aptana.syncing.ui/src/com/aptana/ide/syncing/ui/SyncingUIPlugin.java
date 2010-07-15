@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -48,7 +48,6 @@ import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.events.ConnectionPointEvent;
 import com.aptana.ide.core.io.events.IConnectionPointListener;
 import com.aptana.ide.syncing.core.ISiteConnection;
-import com.aptana.ide.syncing.core.SiteConnection;
 import com.aptana.ide.syncing.core.SyncingPlugin;
 import com.aptana.ide.syncing.core.events.ISiteConnectionListener;
 import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
@@ -96,10 +95,10 @@ public class SyncingUIPlugin extends AbstractUIPlugin {
                 ISiteConnection[] siteConnections = SyncingPlugin.getSiteConnectionManager().getSiteConnections();
                 for (ISiteConnection siteConnection : siteConnections) {
                     if (siteConnection.getSource() == connectionPoint) {
-                        ((SiteConnection) siteConnection).setSource(null);
+                        siteConnection.setSource(null);
                     }
                     if (siteConnection.getDestination() == connectionPoint) {
-                        ((SiteConnection) siteConnection).setDestination(null);
+                        siteConnection.setDestination(null);
                         refreshProjectSiteConnection(siteConnection);
                     }
                 }
@@ -193,6 +192,10 @@ public class SyncingUIPlugin extends AbstractUIPlugin {
     }
 
     public static void logError(String msg, Exception e) {
+        log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, msg, e));
+    }
+
+    public static void logError(String msg, Error e) {
         log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, msg, e));
     }
 

@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -38,7 +38,6 @@ package com.aptana.filesystem.ftp.internal;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.enterprisedt.net.ftp.FTPClient;
 import com.enterprisedt.net.ftp.FTPClientInterface;
 import com.enterprisedt.net.ftp.FileTransferInputStream;
 
@@ -50,29 +49,28 @@ public class FTPFileDownloadInputStream extends InputStream {
 
 	private FTPClientInterface ftpClient;
 	private FileTransferInputStream ftpInputStream;
+	private FTPClientPool pool;
 	
 	/**
+	 * @param pool 
 	 * 
 	 */
-	public FTPFileDownloadInputStream(FTPClientInterface ftpClient, FileTransferInputStream ftpInputStream) {
+	public FTPFileDownloadInputStream(FTPClientPool pool, FTPClientInterface ftpClient, FileTransferInputStream ftpInputStream) {
 		this.ftpClient = ftpClient;
+		this.pool = pool;
 		this.ftpInputStream = ftpInputStream;
 	}
 	
 	private void safeQuit() {
-		if (ftpClient instanceof FTPClient) {
-			((FTPClient) ftpClient).setMessageListener(null);
+		try
+		{
+			ftpInputStream.close();
 		}
-		try {
-			if (ftpClient.connected()) {
-				ftpClient.quit();
-			}
-		} catch (Exception e) {
-			try {
-				ftpClient.quitImmediately();
-			} catch (Exception ignore) {
-			}
-		}		
+		catch (IOException e)
+		{
+			// ignore
+		}
+		pool.checkIn(ftpClient);
 	}
 
 	/* (non-Javadoc)

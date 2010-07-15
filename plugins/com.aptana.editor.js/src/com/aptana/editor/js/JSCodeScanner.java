@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -45,13 +45,13 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
-import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.common.text.rules.WordDetector;
-import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.js.parsing.lexer.JSTokenType;
+import com.aptana.editor.js.parsing.lexer.JSScopeType;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.ThemePlugin;
 
 /**
  * @author Kevin Lindsey
@@ -165,7 +165,51 @@ public class JSCodeScanner extends RuleBasedScanner
 	protected static final char[] SINGLE_CHARACTER_OPERATORS = { '?', '!', '%', '&', '*', '-', '+', '~', '=', '<', '>',
 			'^', '|', '/' };
 
-	private static final boolean OPTIMIZE_REGEXP_RULES = true;
+	@SuppressWarnings("nls")
+	protected static final String[] DOM_CONSTANTS = { "shape", "src", "systemId", "scheme", "scope", "scrolling",
+			"standby", "start", "size", "summary", "specified", "sectionRowIndex", "selectedIndex", "selected",
+			"hspace", "httpEquiv", "htmlFor", "height", "headers", "hreflang", "href", "noResize", "notations",
+			"notationName", "noWrap", "noShade", "noHref", "nodeName", "nodeType", "nodeValue", "nextSibling", "name",
+			"childNodes", "chOff", "checked", "charset", "ch", "cite", "content", "cookie", "coords", "codeBase",
+			"codeType", "code", "cols", "colSpan", "color", "compact", "cells", "cellSpacing", "cellPadding", "clear",
+			"className", "caption", "type", "tBodies", "title", "tHead", "text", "target", "tagName", "tFoot", "isMap",
+			"index", "id", "implementation", "images", "options", "ownerDocument", "object", "disabled", "dir",
+			"doctype", "documentElement", "domain", "declare", "defer", "defaultSelected", "defaultChecked",
+			"defaultValue", "dateTime", "data", "useMap", "publicId", "parentNode", "profile", "prompt",
+			"peviousSibling", "enctype", "entities", "event", "elements", "vspace", "version", "valueType", "value",
+			"vLink", "vAlign", "URL", "firstChild", "forms", "form", "face", "frameBorder", "frame", "width", "links",
+			"link", "longDesc", "lowSrc", "lastChild", "lang", "label", "anchors", "attributes", "applets",
+			"accessKey", "acceptCharset", "accept", "action", "alt", "align", "archive", "areas", "axis", "aLink",
+			"abbr", "rows", "rowSpan", "rowIndex", "rules", "rev", "referrer", "rel", "readOnly", "multiple", "method",
+			"media", "marginHeight", "marginWidth", "maxLength", "body", "border", "background", "bgColor" };
+
+	@SuppressWarnings("nls")
+	protected static final String[] SUPPORT_CONSTANTS = { "systemLanguage", "scripts", "scrollbars", "screenX",
+			"screenY", "screenTop", "screenLeft", "styleSheets", "style", "statusText", "statusbar", "status",
+			"siblingBelow", "siblingAbove", "source", "suffixes", "securityPolicy", "security", "selection", "self",
+			"history", "hostname", "host", "hash", "hasFocus", "y", "XMLDocument", "XSLDocument", "next", "namespaces",
+			"namespaceURI", "nameProp", "MIN_VALUE", "MAX_VALUE", "characterSet", "constructor", "controllers",
+			"cookieEnabled", "colorDepth", "components", "complete", "current", "cpuClass", "clipboardData", "clip",
+			"clientInformation", "closed", "classes", "callee", "caller", "crypto", "toolbar", "top", "textTransform",
+			"textIndent", "textDecoration", "textAlign", "tags", "SQRT1_2", "SQRT2", "innerHeight", "innerWidth",
+			"input", "ids", "ignoreCase", "zIndex", "oscpu", "onreadystatechange", "onLine", "outerHeight",
+			"outerWidth", "opsProfile", "opener", "offscreenBuffering", "NEGATIVE_INFINITY", "display", "dialogHeight",
+			"dialogTop", "dialogWidth", "dialogLeft", "dialogArguments", "directories", "description", "defaultStatus",
+			"defaultChecked", "defaultCharset", "defaultView", "userProfile", "userLanguage", "userAgent", "undefined",
+			"uniqueID", "updateInterval", "_content", "pixelDepth", "port", "personalbar", "pkcs11", "plugins",
+			"platform", "pathname", "paddingRight", "paddingBottom", "paddingTop", "paddingLeft", "parentWindow",
+			"parentLayer", "parent", "pageXOffset", "pageX", "pageYOffset", "pageY", "protocol", "prototype",
+			"product", "productSub", "prompter", "previous", "prefix", "encoding", "enabledPlugin", "external",
+			"expando", "embeds", "visibility", "vendorSub", "vendor", "vLinkcolor", "URLUnencoded", "PI",
+			"POSITIVE_INFINITY", "filename", "fontSize", "fontFamily", "fontWeight", "formName", "frames",
+			"frameElement", "fgColor", "E", "whiteSpace", "listStyleType", "lineHeight", "linkColor", "locationbar",
+			"location", "localName", "lowsrc", "length", "leftContext", "left", "lastModified", "lastMatch",
+			"lastIndex", "lastParen", "layers", "layerX", "language", "appMinorVersion", "appName", "appCodeName",
+			"appCore", "appVersion", "availHeight", "availTop", "availWidth", "availLeft", "all", "arity", "arguments",
+			"aLinkcolor", "above", "rightContext", "right", "responseXML", "responseext", "readyState", "global", "x",
+			"mimeTypes", "multiline", "menubar", "marginRight", "marginBottom", "marginTop", "marginLeft", "LN10",
+			"LN2", "LOG10E", "LOG2E", "bottom", "borderRightWidth", "borderBottomWidth", "borderStyle", "borderColor",
+			"borderTopWidth", "borderLeftWidth", "bufferDepth", "below", "backgroundColor", "backgroundImage", };
 
 	/**
 	 * CodeScanner
@@ -188,85 +232,76 @@ public class JSCodeScanner extends RuleBasedScanner
 
 		// Converted word rules
 		WordRule wordRule = new WordRule(new LettersAndDigitsWordDetector(), Token.UNDEFINED);
-		addWordRules(wordRule, createToken(JSTokenType.KEYWORD), KEYWORD_OPERATORS); //$NON-NLS-1$
-		addWordRules(wordRule, createToken(JSTokenType.SUPPORT_FUNCTION), SUPPORT_FUNCTIONS); //$NON-NLS-1$
-		addWordRules(wordRule, createToken(JSTokenType.EVENT_HANDLER_FUNCTION), EVENT_HANDLER_FUNCTIONS); //$NON-NLS-1$
-		addWordRules(wordRule, createToken(JSTokenType.DOM_FUNCTION), DOM_FUNCTIONS); //$NON-NLS-1$
+		addWordRules(wordRule, createToken(JSScopeType.KEYWORD), KEYWORD_OPERATORS);
 		rules.add(wordRule);
 
+		// FIXME These rules shouldn't actually match the leading period, but we have no way to capture just the rest as
+		// the token
 		// Functions where we need period to begin it
 		wordRule = new WordRule(new FunctionCallDetector(), Token.UNDEFINED);
-		addWordRules(wordRule, createToken(JSTokenType.FIREBUG_FUNCTION), FIREBUG_FUNCTIONS); //$NON-NLS-1$
+		addWordRules(wordRule, createToken(JSScopeType.SUPPORT_FUNCTION), SUPPORT_FUNCTIONS);
+		addWordRules(wordRule, createToken(JSScopeType.EVENT_HANDLER_FUNCTION), EVENT_HANDLER_FUNCTIONS);
+		addWordRules(wordRule, createToken(JSScopeType.DOM_FUNCTION), DOM_FUNCTIONS);
+		addWordRules(wordRule, createToken(JSScopeType.FIREBUG_FUNCTION), FIREBUG_FUNCTIONS);
+		addWordRules(wordRule, createToken(JSScopeType.DOM_CONSTANTS), DOM_CONSTANTS);
+		addWordRules(wordRule, createToken(JSScopeType.SUPPORT_CONSTANT), SUPPORT_CONSTANTS);
 		rules.add(wordRule);
 
 		// Operators
 		wordRule = new WordRule(new OperatorDetector(), Token.UNDEFINED);
-		addWordRules(wordRule, createToken(JSTokenType.OPERATOR), OPERATORS); //$NON-NLS-1$
+		addWordRules(wordRule, createToken(JSScopeType.OPERATOR), OPERATORS);
 		rules.add(wordRule);
 
 		for (char operator : SINGLE_CHARACTER_OPERATORS)
 		{
-			rules.add(new SingleCharacterRule(operator, createToken(JSTokenType.KEYWORD))); //$NON-NLS-1$
+			rules.add(new SingleCharacterRule(operator, createToken(JSScopeType.KEYWORD)));
 		}
 
-		// TODO Turn these next two rules into word rules using the FunctionCallDetector word rule list
-		// FIXME This rule shouldn't actually match the leading period, but we have no way to capture just the rest as
-		// the token
-		rules
-				.add(new RegexpRule(
-						"\\.(s(ystemLanguage|cr(ipts|ollbars|een(X|Y|Top|Left))|t(yle(Sheets)?|atus(Text|bar)?)|ibling(Below|Above)|ource|uffixes|e(curity(Policy)?|l(ection|f)))|h(istory|ost(name)?|as(h|Focus))|y|X(MLDocument|SLDocument)|n(ext|ame(space(s|URI)|Prop))|M(IN_VALUE|AX_VALUE)|c(haracterSet|o(n(structor|trollers)|okieEnabled|lorDepth|mp(onents|lete))|urrent|puClass|l(i(p(boardData)?|entInformation)|osed|asses)|alle(e|r)|rypto)|t(o(olbar|p)|ext(Transform|Indent|Decoration|Align)|ags)|SQRT(1_2|2)|i(n(ner(Height|Width)|put)|ds|gnoreCase)|zIndex|o(scpu|n(readystatechange|Line)|uter(Height|Width)|p(sProfile|ener)|ffscreenBuffering)|NEGATIVE_INFINITY|d(i(splay|alog(Height|Top|Width|Left|Arguments)|rectories)|e(scription|fault(Status|Ch(ecked|arset)|View)))|u(ser(Profile|Language|Agent)|n(iqueID|defined)|pdateInterval)|_content|p(ixelDepth|ort|ersonalbar|kcs11|l(ugins|atform)|a(thname|dding(Right|Bottom|Top|Left)|rent(Window|Layer)?|ge(X(Offset)?|Y(Offset)?))|r(o(to(col|type)|duct(Sub)?|mpter)|e(vious|fix)))|e(n(coding|abledPlugin)|x(ternal|pando)|mbeds)|v(isibility|endor(Sub)?|Linkcolor)|URLUnencoded|P(I|OSITIVE_INFINITY)|f(ilename|o(nt(Size|Family|Weight)|rmName)|rame(s|Element)|gColor)|E|whiteSpace|l(i(stStyleType|n(eHeight|kColor))|o(ca(tion(bar)?|lName)|wsrc)|e(ngth|ft(Context)?)|a(st(M(odified|atch)|Index|Paren)|yer(s|X)|nguage))|a(pp(MinorVersion|Name|Co(deName|re)|Version)|vail(Height|Top|Width|Left)|ll|r(ity|guments)|Linkcolor|bove)|r(ight(Context)?|e(sponse(XML|Text)|adyState))|global|x|m(imeTypes|ultiline|enubar|argin(Right|Bottom|Top|Left))|L(N(10|2)|OG(10E|2E))|b(o(ttom|rder(RightWidth|BottomWidth|Style|Color|TopWidth|LeftWidth))|ufferDepth|elow|ackground(Color|Image)))\\b", //$NON-NLS-1$
-						createToken(JSTokenType.SUPPORT_CONSTANT), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
-		// FIXME This rule shouldn't actually match the leading period, but we have no way to capture just the rest as
-		// the token
-		rules
-				.add(new RegexpRule(
-						"\\.(s(hape|ystemId|c(heme|ope|rolling)|ta(ndby|rt)|ize|ummary|pecified|e(ctionRowIndex|lected(Index)?)|rc)|h(space|t(tpEquiv|mlFor)|e(ight|aders)|ref(lang)?)|n(o(Resize|tation(s|Name)|Shade|Href|de(Name|Type|Value)|Wrap)|extSibling|ame)|c(h(ildNodes|Off|ecked|arset)?|ite|o(ntent|o(kie|rds)|de(Base|Type)?|l(s|Span|or)|mpact)|ell(s|Spacing|Padding)|l(ear|assName)|aption)|t(ype|Bodies|itle|Head|ext|a(rget|gName)|Foot)|i(sMap|ndex|d|m(plementation|ages))|o(ptions|wnerDocument|bject)|d(i(sabled|r)|o(c(type|umentElement)|main)|e(clare|f(er|ault(Selected|Checked|Value)))|at(eTime|a))|useMap|p(ublicId|arentNode|r(o(file|mpt)|eviousSibling))|e(n(ctype|tities)|vent|lements)|v(space|ersion|alue(Type)?|Link|Align)|URL|f(irstChild|orm(s)?|ace|rame(Border)?)|width|l(ink(s)?|o(ngDesc|wSrc)|a(stChild|ng|bel))|a(nchors|c(ce(ssKey|pt(Charset)?)|tion)|ttributes|pplets|l(t|ign)|r(chive|eas)|xis|Link|bbr)|r(ow(s|Span|Index)|ules|e(v|ferrer|l|adOnly))|m(ultiple|e(thod|dia)|a(rgin(Height|Width)|xLength))|b(o(dy|rder)|ackground|gColor))\\b", //$NON-NLS-1$
-						createToken(JSTokenType.DOM_CONSTANTS), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
-
 		// Add word rule for keywords, types, and constants.
-		wordRule = new WordRule(new WordDetector(), createToken(JSTokenType.SOURCE)); //$NON-NLS-1$
-		addWordRules(wordRule, createToken(JSTokenType.CONTROL_KEYWORD), KEYWORD_CONTROL); //$NON-NLS-1$
-		addWordRules(wordRule, createToken(JSTokenType.CONTROL_KEYWORD), KEYWORD_CONTROL_FUTURE); //$NON-NLS-1$
-		addWordRules(wordRule, createToken(JSTokenType.STORAGE_TYPE), STORAGE_TYPES); //$NON-NLS-1$
-		addWordRules(wordRule, createToken(JSTokenType.STORAGE_MODIFIER), STORAGE_MODIFIERS); //$NON-NLS-1$
-		addWordRules(wordRule, createToken(JSTokenType.SUPPORT_CLASS), SUPPORT_CLASSES); //$NON-NLS-1$
-		addWordRules(wordRule, createToken(JSTokenType.SUPPORT_DOM_CONSTANT), SUPPORT_DOM_CONSTANTS); //$NON-NLS-1$
-		wordRule.addWord("true", createToken(JSTokenType.TRUE)); //$NON-NLS-1$ //$NON-NLS-2$
-		wordRule.addWord("false", createToken(JSTokenType.FALSE)); //$NON-NLS-1$ //$NON-NLS-2$
-		wordRule.addWord("null", createToken(JSTokenType.NULL)); //$NON-NLS-1$ //$NON-NLS-2$
-		wordRule.addWord("Infinity", createToken(JSTokenType.CONSTANT)); //$NON-NLS-1$ //$NON-NLS-2$
-		wordRule.addWord("NaN", createToken(JSTokenType.CONSTANT)); //$NON-NLS-1$ //$NON-NLS-2$
-		wordRule.addWord("undefined", createToken(JSTokenType.CONSTANT)); //$NON-NLS-1$ //$NON-NLS-2$
-		wordRule.addWord("super", createToken(JSTokenType.VARIABLE)); //$NON-NLS-1$ //$NON-NLS-2$
-		wordRule.addWord("this", createToken(JSTokenType.VARIABLE)); //$NON-NLS-1$ //$NON-NLS-2$
-		wordRule.addWord("debugger", createToken(JSTokenType.OTHER_KEYWORD)); //$NON-NLS-1$ //$NON-NLS-2$
+		wordRule = new WordRule(new WordDetector(), createToken(JSScopeType.SOURCE));
+		addWordRules(wordRule, createToken(JSScopeType.CONTROL_KEYWORD), KEYWORD_CONTROL);
+		addWordRules(wordRule, createToken(JSScopeType.CONTROL_KEYWORD), KEYWORD_CONTROL_FUTURE);
+		addWordRules(wordRule, createToken(JSScopeType.STORAGE_TYPE), STORAGE_TYPES);
+		addWordRules(wordRule, createToken(JSScopeType.STORAGE_MODIFIER), STORAGE_MODIFIERS);
+		addWordRules(wordRule, createToken(JSScopeType.SUPPORT_CLASS), SUPPORT_CLASSES);
+		addWordRules(wordRule, createToken(JSScopeType.SUPPORT_DOM_CONSTANT), SUPPORT_DOM_CONSTANTS);
+		wordRule.addWord("true", createToken(JSScopeType.TRUE)); //$NON-NLS-1$
+		wordRule.addWord("false", createToken(JSScopeType.FALSE)); //$NON-NLS-1$
+		wordRule.addWord("null", createToken(JSScopeType.NULL)); //$NON-NLS-1$
+		wordRule.addWord("Infinity", createToken(JSScopeType.CONSTANT)); //$NON-NLS-1$
+		wordRule.addWord("NaN", createToken(JSScopeType.CONSTANT)); //$NON-NLS-1$
+		wordRule.addWord("undefined", createToken(JSScopeType.CONSTANT)); //$NON-NLS-1$
+		wordRule.addWord("super", createToken(JSScopeType.VARIABLE)); //$NON-NLS-1$
+		wordRule.addWord("this", createToken(JSScopeType.VARIABLE)); //$NON-NLS-1$
+		wordRule.addWord("debugger", createToken(JSScopeType.OTHER_KEYWORD)); //$NON-NLS-1$
 		rules.add(wordRule);
 
 		// Punctuation
-		rules.add(new SingleCharacterRule(';', createToken(JSTokenType.SEMICOLON))); //$NON-NLS-1$
-		rules.add(new SingleCharacterRule('(', createToken(JSTokenType.PARENTHESIS))); //$NON-NLS-1$
-		rules.add(new SingleCharacterRule(')', createToken(JSTokenType.PARENTHESIS))); //$NON-NLS-1$
-		rules.add(new SingleCharacterRule('[', createToken(JSTokenType.BRACKET))); //$NON-NLS-1$
-		rules.add(new SingleCharacterRule(']', createToken(JSTokenType.BRACKET))); //$NON-NLS-1$
-		rules.add(new SingleCharacterRule('{', createToken(JSTokenType.CURLY_BRACE))); //$NON-NLS-1$
-		rules.add(new SingleCharacterRule('}', createToken(JSTokenType.CURLY_BRACE))); //$NON-NLS-1$
-		rules.add(new SingleCharacterRule(',', createToken(JSTokenType.COMMA))); //$NON-NLS-1$
+		rules.add(new SingleCharacterRule(';', createToken(JSScopeType.SEMICOLON)));
+		rules.add(new SingleCharacterRule('(', createToken(JSScopeType.PARENTHESIS)));
+		rules.add(new SingleCharacterRule(')', createToken(JSScopeType.PARENTHESIS)));
+		rules.add(new SingleCharacterRule('[', createToken(JSScopeType.BRACKET)));
+		rules.add(new SingleCharacterRule(']', createToken(JSScopeType.BRACKET)));
+		rules.add(new SingleCharacterRule('{', createToken(JSScopeType.CURLY_BRACE)));
+		rules.add(new SingleCharacterRule('}', createToken(JSScopeType.CURLY_BRACE)));
+		rules.add(new SingleCharacterRule(',', createToken(JSScopeType.COMMA)));
 
+		// TODO Turn these next two rules into word rules
 		// Numbers
-		rules.add(new RegexpRule("\\b((0(x|X)[0-9a-fA-F]+)|([0-9]+(\\.[0-9]+)?))\\b", //$NON-NLS-1$
-				createToken(JSTokenType.NUMBER))); //$NON-NLS-1$
+		rules.add(new RegexpRule("\\b((0(x|X)[0-9a-fA-F]+)|([0-9]+(\\.[0-9]+)?(?:[eE]\\d+)?))\\b", //$NON-NLS-1$
+				createToken(JSScopeType.NUMBER)));
 
 		// identifiers
-		rules.add(new RegexpRule("[_a-zA-Z0-9$]+", createToken(JSTokenType.SOURCE), true)); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new RegexpRule("[_a-zA-Z0-9$]+", createToken(JSScopeType.SOURCE), true)); //$NON-NLS-1$
 
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}
 
-	protected IToken createToken(JSTokenType type)
+	protected IToken createToken(JSScopeType type)
 	{
 		return this.createToken(type.getScope());
 	}
-	
+
 	protected IToken createToken(String string)
 	{
 		return getThemeManager().getToken(string);
@@ -274,7 +309,7 @@ public class JSCodeScanner extends RuleBasedScanner
 
 	protected IThemeManager getThemeManager()
 	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
+		return ThemePlugin.getDefault().getThemeManager();
 	}
 
 	protected void addWordRules(WordRule wordRule, IToken keywordOperators, String... words)

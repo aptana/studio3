@@ -52,7 +52,7 @@ public class RubyOutlineLabelProvider extends LabelProvider
 		}
 		else if (element instanceof IRubyElement)
 		{
-			short type = ((IRubyElement) element).getType();
+			short type = ((IRubyElement) element).getNodeType();
 			switch (type)
 			{
 				case IRubyElement.CLASS_VAR:

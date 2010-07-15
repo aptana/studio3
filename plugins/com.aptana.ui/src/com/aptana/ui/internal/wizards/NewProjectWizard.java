@@ -118,7 +118,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 	@Override
 	protected void initializeDefaultPageImageDescriptor()
 	{
-		ImageDescriptor desc = UIPlugin.imageDescriptorFromPlugin(UIPlugin.PLUGIN_ID, "icons/web_project_wiz.gif"); //$NON-NLS-1$
+		ImageDescriptor desc = UIPlugin.imageDescriptorFromPlugin(UIPlugin.PLUGIN_ID, "icons/web_project_wiz.png"); //$NON-NLS-1$
 		setDefaultPageImageDescriptor(desc);
 	}
 

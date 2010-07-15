@@ -35,12 +35,12 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
 
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.ColorManager;
-import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.common.theme.Theme;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.LoadCycleListener;
+import com.aptana.theme.ColorManager;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.Theme;
+import com.aptana.theme.ThemePlugin;
 
 public class BundleView extends ViewPart
 {
@@ -73,7 +73,7 @@ public class BundleView extends ViewPart
 	 */
 	private void applyTheme()
 	{
-		CommonEditorPlugin plugin = CommonEditorPlugin.getDefault();
+		ThemePlugin plugin = ThemePlugin.getDefault();
 		ColorManager colorManager = plugin.getColorManager();
 		IThemeManager themeManager = plugin.getThemeManager();
 		Theme currentTheme = themeManager.getCurrentTheme();
@@ -126,7 +126,7 @@ public class BundleView extends ViewPart
 		// remove theme change listener
 		if (this._themeChangeListener != null)
 		{
-			new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
+			new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(
 					this._themeChangeListener);
 		}
 
@@ -168,7 +168,7 @@ public class BundleView extends ViewPart
 	 */
 	private void hookContextMenu()
 	{
-		MenuManager menuMgr = new MenuManager("#PopupMenu");
+		MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener()
@@ -206,7 +206,7 @@ public class BundleView extends ViewPart
 					}
 					catch (IllegalStateException e)
 					{
-						CommonEditorPlugin.logError(e);
+						ThemePlugin.logError(e);
 					}
 
 					if (workbench != null)
@@ -276,7 +276,7 @@ public class BundleView extends ViewPart
 			}
 		};
 
-		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID)
+		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID)
 				.addPreferenceChangeListener(this._themeChangeListener);
 	}
 
@@ -300,7 +300,7 @@ public class BundleView extends ViewPart
 					GC gc = event.gc;
 					Color oldBackground = gc.getBackground();
 
-					CommonEditorPlugin plugin = CommonEditorPlugin.getDefault();
+					ThemePlugin plugin = ThemePlugin.getDefault();
 					ColorManager colorManager = plugin.getColorManager();
 					IThemeManager themeManager = plugin.getThemeManager();
 

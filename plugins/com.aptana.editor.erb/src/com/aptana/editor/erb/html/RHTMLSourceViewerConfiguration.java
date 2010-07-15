@@ -37,6 +37,7 @@ package com.aptana.editor.erb.html;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.ITextDoubleClickStrategy;
+import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -50,6 +51,7 @@ import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.erb.ERBPartitionerSwitchStrategy;
 import com.aptana.editor.erb.IERBConstants;
 import com.aptana.editor.html.HTMLSourceConfiguration;
+import com.aptana.editor.html.HTMLSourceViewerConfiguration;
 import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.ruby.IRubyConstants;
@@ -127,5 +129,14 @@ public class RHTMLSourceViewerConfiguration extends CompositeSourceViewerConfigu
 			fDoubleClickStrategy = new RubyDoubleClickStrategy();
 		}
 		return fDoubleClickStrategy;
+	}
+
+	@Override
+	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
+	{
+		// Just uses the HTML content assist processor for now
+		// TODO: needs to check for ruby content type when the content assist is available there
+		AbstractThemeableEditor editor = getAbstractThemeableEditor();
+		return HTMLSourceViewerConfiguration.getContentAssistProcessor(contentType, editor);
 	}
 }

@@ -1,0 +1,7 @@
+/**
+ * This is a description of the MyClass constructor
+ *
+ * @constructor
+ * @alias MyClass
+ * @exception {Error} The constructor randomly throws an Error when called
+ */

@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -72,7 +72,7 @@ public final class SiteConnectionUtils {
      */
     public static ISiteConnection createSite(String name, IConnectionPoint source,
             IConnectionPoint destination) {
-        SiteConnection site = new SiteConnection();
+        ISiteConnection site = SiteConnectionManager.getInstance().createSiteConnection();
         site.setName(name);
         site.setSource(source);
         site.setDestination(destination);
@@ -186,6 +186,18 @@ public final class SiteConnectionUtils {
         }
         return list.toArray(new ISiteConnection[list.size()]);
     }
+
+	public static ISiteConnection getSiteWithDestination(String destinationName, ISiteConnection[] sites)
+	{
+		for (ISiteConnection site : sites)
+		{
+			if (site.getDestination().getName().equals(destinationName))
+			{
+				return site;
+			}
+		}
+		return null;
+	}
 
 	private static boolean contains(IContainer container, IResource resource) {
 		return container.getFullPath().isPrefixOf(resource.getFullPath());

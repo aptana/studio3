@@ -8,13 +8,16 @@ Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
- org.eclipse.core.expressions,
- org.eclipse.ui.workbench,
  org.eclipse.ui.ide,
  org.eclipse.ui.console,
- com.aptana.core
+ org.eclipse.search,
+ com.aptana.core,
+ com.aptana.ui.epl
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.ui,
- com.aptana.ui.projects
+ com.aptana.ui.actions,
+ com.aptana.ui.preferences,
+ com.aptana.ui.projects,
+ com.aptana.ui.widgets
 Eclipse-ExtensibleAPI: true

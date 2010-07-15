@@ -9,7 +9,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends Plugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "beaver";
+	public static final String PLUGIN_ID = "beaver"; //$NON-NLS-1$
 
 	// The shared instance
 	private static Activator plugin;

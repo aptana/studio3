@@ -25,6 +25,13 @@
             name="%content-type.js.name"
             priority="normal">
       </content-type>
+      <content-type
+            base-type="com.aptana.contenttype.js"
+            file-extensions="json"
+            id="com.aptana.contenttype.json"
+            name="%content-type.json.name"
+            priority="normal">
+      </content-type>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
@@ -36,7 +43,17 @@
          point="com.aptana.index.core.fileIndexingParticipants">
       <fileIndexingParticipant
             class="com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.js">
+         </contentTypeBinding>
       </fileIndexingParticipant>
+   </extension>
+   <extension
+         point="com.aptana.parsing.parser">
+      <parser
+            class="com.aptana.editor.js.parsing.JSParser"
+            language="text/javascript">
+      </parser>
    </extension>
 
 </plugin>

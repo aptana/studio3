@@ -5,7 +5,6 @@ import com.aptana.parsing.lexer.IRange;
 
 public class CommonOutlineItem implements IRange, Comparable<IRange>
 {
-
 	private IRange fSourceRange;
 	private IParseNode fReferenceNode;
 
@@ -15,14 +14,31 @@ public class CommonOutlineItem implements IRange, Comparable<IRange>
 		fReferenceNode = referenceNode;
 	}
 
-	public IRange getSourceRange()
+	public String getLabel()
 	{
-		return fSourceRange;
+		return fReferenceNode == null ? "" : fReferenceNode.getText(); //$NON-NLS-1$
 	}
 
-	public IParseNode getReferenceNode()
+	@Override
+	public int compareTo(IRange o)
 	{
-		return fReferenceNode;
+		return getStartingOffset() - o.getStartingOffset();
+	}
+
+	@Override
+	public boolean contains(int offset)
+	{
+		return fSourceRange.contains(offset);
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof CommonOutlineItem))
+		{
+			return false;
+		}
+		return fReferenceNode.equals(((CommonOutlineItem) obj).fReferenceNode);
 	}
 
 	@Override
@@ -37,20 +53,20 @@ public class CommonOutlineItem implements IRange, Comparable<IRange>
 		return fSourceRange.getLength();
 	}
 
+	public IParseNode getReferenceNode()
+	{
+		return fReferenceNode;
+	}
+
+	public IRange getSourceRange()
+	{
+		return fSourceRange;
+	}
+
 	@Override
 	public int getStartingOffset()
 	{
 		return fSourceRange.getStartingOffset();
-	}
-
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (!(obj instanceof CommonOutlineItem))
-		{
-			return false;
-		}
-		return fReferenceNode.equals(((CommonOutlineItem) obj).fReferenceNode);
 	}
 
 	@Override
@@ -60,14 +76,8 @@ public class CommonOutlineItem implements IRange, Comparable<IRange>
 	}
 
 	@Override
-	public int compareTo(IRange o)
+	public boolean isEmpty()
 	{
-		return getStartingOffset() - o.getStartingOffset();
-	}
-
-	@Override
-	public boolean contains(int offset)
-	{
-		return fSourceRange.contains(offset);
+		return fSourceRange.isEmpty();
 	}
 }

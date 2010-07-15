@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -46,6 +46,7 @@ import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.text.MessageFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -76,6 +77,7 @@ import com.aptana.ide.core.io.preferences.PreferenceUtils;
 import com.aptana.ide.core.io.vfs.ExtendedFileInfo;
 import com.aptana.ide.core.io.vfs.IExtendedFileStore;
 import com.enterprisedt.net.ftp.FTPClient;
+import com.enterprisedt.net.ftp.FTPClientInterface;
 import com.enterprisedt.net.ftp.FTPConnectMode;
 import com.enterprisedt.net.ftp.FTPConnectionClosedException;
 import com.enterprisedt.net.ftp.FTPException;
@@ -92,11 +94,16 @@ import com.enterprisedt.net.ftp.pro.ProFTPClient;
  * @author Max Stepanov
  *
  */
-public class FTPConnectionFileManager extends BaseFTPConnectionFileManager implements IFTPConnectionFileManager {
+public class FTPConnectionFileManager extends BaseFTPConnectionFileManager implements IFTPConnectionFileManager, IPoolConnectionManager {
 	
 	private static final String TMP_TIMEZONE_CHECK = "_tmp_tz_check"; //$NON-NLS-1$
 
 	private final static String WINDOWS_STR = "WINDOWS"; //$NON-NLS-1$
+	
+	private final static SimpleDateFormat[] UTIME_FORMATS = new SimpleDateFormat[] {
+		new SimpleDateFormat("'UTIME' yyyyMMddHHmmss '{0}'"), //$NON-NLS-1$
+		new SimpleDateFormat("'UTIME {0}' yyyyMMddHHmmss yyyyMMddHHmmss yyyyMMddHHmmss 'UTC'"), //$NON-NLS-1$
+	};
 
 	protected FTPClient ftpClient;
 	private List<String> serverFeatures;
@@ -105,8 +112,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	protected IPath cwd;
 	private FTPFileFactory fileFactory;
 	private Boolean statSupported = null;
-	private Boolean chmodSupported = null;
-	private Boolean chgrpSupported = null;
+	private int utimeFormat = -1;
 	private Map<IPath, FTPFile> ftpFileCache = new ExpiringMap<IPath, FTPFile>(CACHE_TTL);
 	private long serverTimeZoneShift = Integer.MIN_VALUE;
 	protected boolean hasServerInfo;
@@ -114,13 +120,16 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 
 	private int connectionRetryCount;
 
+	protected FTPClientPool pool;
+
 	/* (non-Javadoc)
 	 * @see com.aptana.ide.core.ftp.IFTPConnectionFileManager#init(java.lang.String, int, org.eclipse.core.runtime.IPath, java.lang.String, char[], boolean, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public void init(String host, int port, IPath basePath, String login, char[] password, boolean passive, String transferType, String encoding, String timezone) {
 		Assert.isTrue(ftpClient == null, Messages.FTPConnectionFileManager_already_initialized);
 		try {
-			ftpClient = createFTPClient();
+			this.pool = new FTPClientPool(this);
+			this.ftpClient = new ProFTPClient();
 			this.host = host;
 			this.port = port;
 			this.login = login;
@@ -134,10 +143,6 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 			FTPPlugin.log(new Status(IStatus.WARNING, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_initialization_failed, e));
 			ftpClient = null;
 		}
-	}
-
-	protected FTPClient createFTPClient() {
-		return new ProFTPClient();
 	}
 
 	protected static void initFTPClient(FTPClient ftpClient, boolean passive, String encoding) throws IOException, FTPException {
@@ -162,7 +167,12 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 		}
 	}
 
-	protected void initAndAuthFTPClient(FTPClient newFtpClient, IProgressMonitor monitor) throws IOException, FTPException {
+	protected void initAndAuthFTPClient(FTPClientInterface clientInterface, IProgressMonitor monitor) throws IOException, FTPException {
+		if (clientInterface.connected())
+		{
+			return;
+		}
+		FTPClient newFtpClient = (FTPClient) clientInterface;
 		initFTPClient(newFtpClient, ftpClient.getConnectMode() == FTPConnectMode.PASV, ftpClient.getControlEncoding());
 		newFtpClient.setRemoteHost(host);
 		newFtpClient.setRemotePort(port);
@@ -299,8 +309,8 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	protected void getherServerInfo(ConnectionContext context, IProgressMonitor monitor) {
 		Policy.checkCanceled(monitor);
 		monitor.subTask(Messages.FTPConnectionFileManager_gethering_server_info);
+		serverFeatures = null;
 		try {
-			serverFeatures = null;
 			String[] features = ftpClient.features();
 			if (features != null && features.length > 0) {
 				serverFeatures = new ArrayList<String>();
@@ -311,6 +321,23 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 					}
 					serverFeatures.add(feature);
 				}
+			}
+		} catch (Exception e) {
+		}
+		try {
+	        String[] validCodes = {"214"}; //$NON-NLS-1$
+			FTPReply reply = ftpClient.sendCommand("SITE HELP");
+			ftpClient.validateReply(reply, validCodes);
+			if (serverFeatures == null) {
+				serverFeatures = new ArrayList<String>();
+			}
+			String[] data = reply.getReplyData();
+			for (int i = 0; i < data.length; ++i) {
+				String cmd = data[i].trim();
+				if (cmd.startsWith("214")) {
+					continue;
+				}
+				serverFeatures.add(MessageFormat.format("SITE {0}", cmd));
 			}
 		} catch (Exception e) {
 		}
@@ -460,6 +487,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 			throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_disconnect_failed, e));
 		} finally {
 			cwd = null;
+			pool.dispose();
 			cleanup();
 			monitor.done();
 		}
@@ -731,7 +759,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	@Override
 	protected InputStream readFile(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
 		monitor.beginTask(Messages.FTPConnectionFileManager_initiating_download, 4);
-		FTPClient downloadFtpClient = createFTPClient();
+		FTPClient downloadFtpClient = (FTPClient) pool.checkOut();
 		try {
 			initAndAuthFTPClient(downloadFtpClient, monitor);
 			Policy.checkCanceled(monitor);
@@ -746,7 +774,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 			monitor.worked(1);
 			Policy.checkCanceled(monitor);
 			try {
-				return new FTPFileDownloadInputStream(downloadFtpClient,
+				return new FTPFileDownloadInputStream(pool, downloadFtpClient,
 						new FTPInputStream(downloadFtpClient, path.lastSegment()));
 			} catch (FTPException e) {
 				throwFileNotFound(e, path);
@@ -754,25 +782,13 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 			}
 		} catch (Exception e) {
 			setMessageLogger(downloadFtpClient, null);
-			if (downloadFtpClient.connected()) {
-				try {
-					if (e instanceof OperationCanceledException
-							|| e instanceof FTPException
-							|| e instanceof FileNotFoundException) {
-						downloadFtpClient.quit();
-					} else {
-						downloadFtpClient.quitImmediately();
-					}
-				} catch (IOException ignore) {
-				} catch (FTPException ignore) {
-				}
-			}
+			pool.checkIn(downloadFtpClient);
 			if (e instanceof OperationCanceledException) {
 				throw (OperationCanceledException) e;
 			} else if (e instanceof FileNotFoundException) {
 				throw (FileNotFoundException) e;
 			}
-			throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_opening_file_failed, e));			
+			throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_opening_file_read_failed, e));			
 		} finally {
 			monitor.done();
 		}
@@ -784,7 +800,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	@Override
 	protected OutputStream writeFile(IPath path, long permissions, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
 		monitor.beginTask(Messages.FTPConnectionFileManager_initiating_file_upload, 4);
-		FTPClient uploadFtpClient = createFTPClient();
+		FTPClient uploadFtpClient = (FTPClient) pool.checkOut();
 		try {
 			initAndAuthFTPClient(uploadFtpClient, monitor);
 			Policy.checkCanceled(monitor);
@@ -799,30 +815,22 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 			}
 			monitor.worked(1);
 			Policy.checkCanceled(monitor);
-			return new FTPFileUploadOutputStream(uploadFtpClient,
+			return new FTPFileUploadOutputStream(pool, uploadFtpClient,
 					new FTPOutputStream(uploadFtpClient, generateTempFileName(path.lastSegment())),
 					path.lastSegment(), null, permissions);
 		} catch (Exception e) {
 			setMessageLogger(uploadFtpClient, null);
-			if (uploadFtpClient.connected()) {
-				try {
-					if (e instanceof OperationCanceledException
-							|| e instanceof FTPException
-							|| e instanceof FileNotFoundException) {
-						uploadFtpClient.quit();
-					} else {
-						uploadFtpClient.quitImmediately();
-					}
-				} catch (IOException ignore) {
-				} catch (FTPException ignore) {
-				}
-			}
+			pool.checkIn(uploadFtpClient);
 			if (e instanceof OperationCanceledException) {
 				throw (OperationCanceledException) e;
 			} else if (e instanceof FileNotFoundException) {
 				throw (FileNotFoundException) e;
+			} else if (e instanceof FTPException) {
+				if (((FTPException)e).getReplyCode() == 553) {
+					throw (FileNotFoundException) new FileNotFoundException(path.toPortableString()).initCause(e);
+				}
 			}
-			throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_opening_file_failed, e));			
+			throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_opening_file_write_failed, e));			
 		} finally {
 			monitor.done();
 		}
@@ -939,14 +947,32 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	 */
 	@Override
 	protected void setModificationTime(IPath path, long modificationTime, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
-		if (!serverSupportsFeature("MFMT")) { //$NON-NLS-1$
+		if (!serverSupportsFeature("MFMT") && !serverSupportsFeature("SITE UTIME")) { //$NON-NLS-1$ //$NON-NLS-2$
 			return;
 		}
 		try {
 			IPath dirPath = path.removeLastSegments(1);
 			changeCurrentDir(dirPath);
 			Policy.checkCanceled(monitor);
-			ftpClient.setModTime(path.lastSegment(), new Date(modificationTime));
+			if (serverSupportsFeature("MFMT")) {
+				ftpClient.setModTime(path.lastSegment(), new Date(modificationTime));
+			} else if (serverSupportsFeature("SITE UTIME")) {
+				Calendar cal = Calendar.getInstance();
+				long localTimezoneShift = cal.get(Calendar.ZONE_OFFSET)+cal.get(Calendar.DST_OFFSET);
+				Date date = new Date(modificationTime-localTimezoneShift);
+				if (utimeFormat == -1) {
+					for (utimeFormat = 0; utimeFormat < UTIME_FORMATS.length; ++utimeFormat) {
+						String format = UTIME_FORMATS[utimeFormat].format(date);
+						FTPReply reply = ftpClient.sendCommand("SITE "+MessageFormat.format(format, path.lastSegment()));
+						if (!"500".equals(reply.getReplyCode()) && !"501".equals(reply.getReplyCode())) {
+							break;
+						}
+					}
+				} else if (utimeFormat >= 0 && utimeFormat < UTIME_FORMATS.length) {
+					String format = UTIME_FORMATS[utimeFormat].format(date);
+					ftpClient.site(MessageFormat.format(format, path.lastSegment()));
+				}
+			}
 		} catch (FileNotFoundException e) {
 			throw e;
 		} catch (OperationCanceledException e) {
@@ -963,14 +989,14 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	 */
 	@Override
 	protected void changeFilePermissions(IPath path, long permissions, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
-		if (chmodSupported == Boolean.FALSE) {
+		if (!serverSupportsFeature("SITE CHMOD")) { //$NON-NLS-1$
 			return;
 		}
 		try {
 			IPath dirPath = path.removeLastSegments(1);
 			changeCurrentDir(dirPath);
 			Policy.checkCanceled(monitor);
-			chmodSupported = ftpClient.site("CHMOD "+Long.toOctalString(permissions)+" "+path.lastSegment()); //$NON-NLS-1$ //$NON-NLS-2$
+			ftpClient.site(MessageFormat.format("CHMOD {0} {1}", Long.toOctalString(permissions), path.lastSegment())); //$NON-NLS-1$
 		} catch (FileNotFoundException e) {
 			throw e;
 		} catch (OperationCanceledException e) {
@@ -987,14 +1013,14 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	 */
 	@Override
 	protected void changeFileGroup(IPath path, String group, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
-		if (chgrpSupported == Boolean.FALSE) {
+		if (!serverSupportsFeature("SITE CHGRP")) { //$NON-NLS-1$
 			return;
 		}
 		try {
 			IPath dirPath = path.removeLastSegments(1);
 			changeCurrentDir(dirPath);
 			Policy.checkCanceled(monitor);
-			chgrpSupported = ftpClient.site("CHGRP "+group+" "+path.lastSegment()); //$NON-NLS-1$ //$NON-NLS-2$
+			ftpClient.site(MessageFormat.format("CHGRP {0} {1}", group, path.lastSegment())); //$NON-NLS-1$
 		} catch (FileNotFoundException e) {
 			throw e;
 		} catch (OperationCanceledException e) {
@@ -1109,7 +1135,12 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 
 	private static String generateTempFileName(String base) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(TMP_UPLOAD_PREFIX).append(base);
+		sb.append(base).append(TMP_UPLOAD_SUFFIX);
 		return sb.toString();
+	}
+
+	public FTPClient newClient()
+	{
+		return new ProFTPClient();
 	}
 }

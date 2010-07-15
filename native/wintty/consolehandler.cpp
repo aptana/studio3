@@ -35,7 +35,7 @@ static DWORD dwScreenBufferSize = 0;
 
 static WORD wCharAttributes = DEFAULT_ATTRIBUTES;
 
-#define SCREEN_BUFFER_HEIGHT 10000
+#define SCREEN_BUFFER_HEIGHT (10000)
 
 BOOL InitConsoleHandler(void)
 {
@@ -156,6 +156,7 @@ static void FlushBuffer();
 static void TestAndFlushBuffer();
 static void OutputChar(CHAR ch);
 static void OutputNumber(SHORT value);
+static void OutputNumber64(DWORD value);
 static void OutputString(CHAR* szStr);
 
 static void MoveCursorAbs(SHORT x, SHORT y)
@@ -611,6 +612,9 @@ static void ReadConsoleBuffer()
 
 static BOOL ProcessEscSequence(CHAR *chSequence, DWORD dwLength);
 
+#define ESC	'\x1B'
+#define DLE	'\x10'
+
 static void WriteConsole(void)
 {
 	CHAR chBuf[1024];
@@ -637,7 +641,7 @@ static void WriteConsole(void)
 				{
 					hasEscSequence = FALSE;
 					bIgnoreEsc = TRUE;
-					i -= dwSeqIndex + 1;
+					i -= dwSeqIndex;
 					dwSeqIndex = 0;
 				} else {
 					break;
@@ -646,7 +650,7 @@ static void WriteConsole(void)
 			ch = chBuf[i];
 			if ( hasEscSequence ) {
 				chSeq[dwSeqIndex++] = ch;
-				if ( (ch != '\x1B') && !isalpha(ch) ) {
+				if ( (ch != ESC) && (ch != DLE) && !isalpha(ch) ) {
 					continue;
 				}
 				chSeq[dwSeqIndex] = '\0';
@@ -655,12 +659,13 @@ static void WriteConsole(void)
 					dwSeqIndex = 0;
 					continue;
 				} else {
-					i -= dwSeqIndex;
+					i -= dwSeqIndex - 1;
 					ch = chBuf[i];
 					dwSeqIndex = 0;
 				}
-			} else if( (ch == '\x1B') && !bIgnoreEsc ) {
+			} else if( ((ch == ESC) || (ch == DLE)) && !bIgnoreEsc ) {
 				hasEscSequence = TRUE;
+				chSeq[dwSeqIndex++] = ch;
 				continue;
 			}
 			SHORT key = ::VkKeyScan(ch);
@@ -772,13 +777,21 @@ static void SetConsoleSize(SHORT width, SHORT height)
 	::CloseHandle(hConsole);
 }
 
+static void SendProcessList();
+
 static BOOL ProcessEscSequence(CHAR *chSequence, DWORD dwLength)
 {
 	int param[4];
 	switch( chSequence[dwLength-1] ) {
 		case 't':
-			if( (sscanf_s(chSequence, "[%d;%d;%dt", &param[0], &param[1], &param[2]) == 3) && (param[0] == 8) ) {
+			if( (sscanf_s(chSequence, "\x1B[%d;%d;%dt", &param[0], &param[1], &param[2]) == 3) && (param[0] == 8) ) {
 				SetConsoleSize(param[2], param[1]);
+				return TRUE;
+			}
+			break;
+		case 'p':
+			if( strcmp(chSequence, "\x10$p") == 0 ) {
+				SendProcessList();
 				return TRUE;
 			}
 			break;
@@ -863,6 +876,13 @@ static void OutputNumber(SHORT value)
 	OutputString(szBuf);
 }
 
+static void OutputNumber64(DWORD value)
+{
+	CHAR szBuf[128];
+	_i64toa_s(value, szBuf, sizeof(szBuf)/sizeof(szBuf[0]), 10);
+	OutputString(szBuf);
+}
+
 static void OutputString(CHAR* szStr)
 {
 	if( dwBufferFilled + strlen(szStr) > sizeof(chOutputBuffer) ){
@@ -873,3 +893,17 @@ static void OutputString(CHAR* szStr)
 	}
 }
 
+static void SendProcessList()
+{
+	DWORD dwProcesses[64];
+	DWORD dwCount = ::GetConsoleProcessList(dwProcesses, sizeof(dwProcesses)/sizeof(dwProcesses[0]));
+	OutputString("\x10$");
+	for (DWORD i = dwCount; i > 0; --i) {
+		OutputNumber64(dwProcesses[i-1]);
+		if( i > 1 ) {
+			OutputChar(',');
+		}
+	}
+	OutputChar('p');
+	FlushBuffer();
+}

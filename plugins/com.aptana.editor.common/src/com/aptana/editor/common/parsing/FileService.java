@@ -8,22 +8,28 @@ import org.eclipse.jface.text.IDocument;
 import com.aptana.editor.common.outline.IParseListener;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
+import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParseState;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 
 public class FileService
 {
 	private IDocument fDocument;
-	private IParser fParser;
 	private IParseState fParseState;
+	private int fLastSourceHash;
 	private Set<IParseListener> listeners = new HashSet<IParseListener>();
+	private String fLanguage;
 
-	/**
-	 * FileService
-	 */
-	public FileService()
+	public FileService(String language)
 	{
-		fParseState = new ParseState();
+		this(language, new ParseState());
+	}
+
+	public FileService(String language, IParseState parseState)
+	{
+		this.fLanguage = language;
+		this.fParseState = parseState;
 	}
 
 	/**
@@ -57,37 +63,64 @@ public class FileService
 	}
 
 	/**
-	 * parse
+	 * Parse.<br>
+	 * This call is just like calling {@link #parse(boolean)} with false.
 	 */
 	public void parse()
 	{
-		if (fParser != null && fDocument != null)
+		parse(false);
+	}
+
+	/**
+	 * Parse, with an option to force a parsing even when the source did not change.
+	 * 
+	 * @param force
+	 */
+	public synchronized void parse(boolean force)
+	{
+		if (fLanguage != null && fDocument != null)
 		{
 			String source = fDocument.get();
+			int sourceHash = source.hashCode();
 
-			// TODO: at some point, we'll want to use this call to indicate the
-			// actual edit with the theory that we'll be able to perform
-			// incremental lexing and parsing based on that info.
-			fParseState.setEditState(source, source, 0, 0);
-
-			try
+			if (force || sourceHash != fLastSourceHash)
 			{
-				fParser.parse(fParseState);
+				fLastSourceHash = sourceHash;
 
-				for (IParseListener listener : listeners)
+				IParserPool pool = ParserPoolFactory.getInstance().getParserPool(fLanguage);
+				if (pool != null)
 				{
-					listener.parseFinished();
+					IParser parser = pool.checkOut();
+					if (parser != null)
+					{
+						// TODO: at some point, we'll want to use this call to indicate the
+						// actual edit with the theory that we'll be able to perform
+						// incremental lexing and parsing based on that info.
+						fParseState.setEditState(source, source, 0, 0);
+		
+						try
+						{
+							parser.parse(fParseState);
+		
+							for (IParseListener listener : listeners)
+							{
+								listener.parseFinished();
+							}
+						}
+						catch (Exception e)
+						{
+							// not logging the parsing error here since the source could be in an intermediate state of being
+							// edited
+							// by
+							// the user
+						}
+						pool.checkIn(parser);
+					}
 				}
-			}
-			catch (Exception e)
-			{
-				// not logging the parsing error here since the source could be in an intermediate state of being edited
-				// by
-				// the user
 			}
 		}
 	}
-
+	
 	/**
 	 * removeListener
 	 * 
@@ -106,25 +139,5 @@ public class FileService
 	public void setDocument(IDocument document)
 	{
 		fDocument = document;
-	}
-
-	/**
-	 * setParser
-	 * 
-	 * @param parser
-	 */
-	public void setParser(IParser parser)
-	{
-		fParser = parser;
-	}
-
-	/**
-	 * setParseState
-	 * 
-	 * @param parseState
-	 */
-	public void setParseState(IParseState parseState)
-	{
-		fParseState = parseState;
 	}
 }

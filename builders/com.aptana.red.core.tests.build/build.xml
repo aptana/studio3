@@ -181,14 +181,14 @@
 			<param name="p2.repo" value="file:${p2.repo.dir}" />
 		</antcall>
 		<!-- Add Eclipse Testing Framework -->
-		<unzip src="eclipse-test-framework-3.5.zip" dest="${baseLocation}/test-framework" />
+		<unzip src="eclipse-test-framework-3.6.zip" dest="${baseLocation}/test-framework" />
 		<antcall target="run.director">
 			<param name="p2.installIU" value="org.eclipse.test.feature.group" />
 			<param name="p2.repo" value="file:${baseLocation}/test-framework/eclipse" />
 		</antcall>
 
 		<!-- Modify the plugin_custimization.ini to set initial properties for tests! -->
-		<concat append="true" destfile="${baseLocation}/plugins/org.eclipse.sdk_3.4.2.v200902111700/plugin_customization.ini">
+		<concat append="true" destfile="${baseLocation}/plugins/org.eclipse.sdk_3.6.0.v201006080911/plugin_customization.ini">
 			<filelist dir="${basedir}/prefs" files="plugin_customization.ini" />
 		</concat>
 
@@ -199,7 +199,7 @@
 			</instr>
 		</emma>
 
-		<property name="library-file" value="${baseLocation}/test-framework/eclipse/plugins/org.eclipse.test_3.2.0/library.xml" />
+		<property name="library-file" value="${baseLocation}/test-framework/eclipse/plugins/org.eclipse.test_3.3.0/library.xml" />
 		<!-- Run the tests. -->
 		<antcall target="run-core-test">
 			<param name="test.plugin" value="com.aptana.red.core.tests.all" />

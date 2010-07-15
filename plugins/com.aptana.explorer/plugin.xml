@@ -57,7 +57,7 @@
    <extension
          point="com.aptana.scripting.loadPaths">
       <loadPath
-            name="RadRails Framework Files"
+            name="Aptana Studio Framework Files"
             path="framework/">
       </loadPath>
    </extension>
@@ -121,6 +121,12 @@
 			</or>
 	     </enablement>
       </commonWizard>
+      <commonWizard
+            associatedExtensionId="org.eclipse.ui.navigator.resourceContent"
+            type="new"
+            wizardId="com.aptana.ui.wizards.NewWebProject">
+         <enablement></enablement>
+      </commonWizard>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -140,6 +146,16 @@
             id="com.aptana.explorer.deploy"
             name="%Deploy.label">
       </command>
+      <command
+            defaultHandler="com.aptana.explorer.internal.handlers.OpenTerminalHandler"
+            id="com.aptana.explorer.commands.openTerminal"
+            name="%command.openTerminal.name">
+      </command>
+      <command
+            defaultHandler="com.aptana.explorer.internal.handlers.RunDeployWizardHandler"
+            id="com.aptana.explorer.deploywizard"
+            name="%DeployWizard.label">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -153,7 +169,7 @@
                   style="toggle">
                <visibleWhen>
                   <reference
-                        definitionId="com.aptana.editor.common.contributions.inGlobalActionSet">
+                        definitionId="com.aptana.ui.contributions.inGlobalActionSet">
                   </reference>
                </visibleWhen>
             </command>
@@ -180,14 +196,23 @@
          <command
                commandId="com.aptana.explorer.deploy"
                label="%FTPDeploy.label"
+               icon="icons/full/elcl16/network_arrow.png"
                style="push">
          </command>
       </menuContribution>
       <menuContribution
-            locationURI="toolbar:com.aptana.explorer.deploy?before=group.wizard">
+            locationURI="toolbar:com.aptana.explorer.deploy?after=group.wizard">
          <command
-               commandId="com.aptana.explorer.deploy"
+               commandId="com.aptana.explorer.deploywizard"
                label="%DeployWizard.label"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:com.aptana.explorer.gear?after=group.run">
+         <command
+               commandId="com.aptana.explorer.commands.openTerminal"
+               label="%command.openTerminal.name"
                style="push">
          </command>
       </menuContribution>
@@ -198,7 +223,7 @@
             commandId="com.aptana.explorer.deploy"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M4+M3+D">
+            sequence="CTRL+M3+D">
       </key>
    </extension>
 </plugin>

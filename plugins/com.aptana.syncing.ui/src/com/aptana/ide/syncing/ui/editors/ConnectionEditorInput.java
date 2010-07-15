@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -79,7 +79,7 @@ public class ConnectionEditorInput implements IEditorInput {
         return fSite == null ? "" : fSite.toString(); //$NON-NLS-1$
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
         return null;
     }

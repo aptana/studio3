@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -34,22 +34,22 @@
  */
 package com.aptana.ide.syncing.ui.handlers;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.aptana.ide.syncing.ui.actions.SynchronizeAction;
 
-public class SynchronizeHandler extends AbstractHandler {
+public class SynchronizeHandler extends BaseSyncHandler
+{
+	public Object execute(ExecutionEvent event) throws ExecutionException
+	{
+		SynchronizeAction action = new SynchronizeAction();
+		action.setActivePart(null, HandlerUtil.getActivePart(event));
+		action.setSelection(HandlerUtil.getCurrentSelection(event));
+		action.run(null);
 
-    public Object execute(ExecutionEvent event) throws ExecutionException {
-        SynchronizeAction action = new SynchronizeAction();
-        action.setActivePart(null, HandlerUtil.getActivePart(event));
-        action.setSelection(HandlerUtil.getCurrentSelection(event));
-        action.run(null);
-
-        return null;
-    }
+		return null;
+	}
 
 }

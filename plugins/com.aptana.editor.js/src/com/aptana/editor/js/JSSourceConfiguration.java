@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -55,7 +55,9 @@ import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
-import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.editor.js.parsing.JSRegExpRule;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.ThemePlugin;
 
 /**
  * @author Max Stepanov
@@ -76,7 +78,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, JS_MULTILINE_COMMENT, JS_SINGLELINE_COMMENT,
 			JS_DOC, STRING_DOUBLE, STRING_SINGLE, JS_REGEXP };
 
-	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IJSConstants.CONTENT_TYPE_JS } };
+	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IJSConstants.CONTENT_TYPE_JS }, { IJSConstants.CONTENT_TYPE_JSON } };
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
 			new EndOfLineRule("//", new Token(JS_SINGLELINE_COMMENT)), //$NON-NLS-1$
@@ -84,7 +86,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 			new SingleLineRule("\'", "\'", new Token(STRING_SINGLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
 			new MultiLineRule("/**", "*/", new Token(JS_DOC), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
 			new MultiLineRule("/*", "*/", new Token(JS_MULTILINE_COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
-			new JSRegexpRule(new Token(JS_REGEXP)) };
+			new JSRegExpRule(new Token(JS_REGEXP)) };
 
 	private JSCodeScanner codeScanner;
 	private JSDocScanner docScanner;
@@ -100,6 +102,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	{
 		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 		c.addTranslation(new QualifiedContentType(IJSConstants.CONTENT_TYPE_JS), new QualifiedContentType("source.js")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(IJSConstants.CONTENT_TYPE_JSON), new QualifiedContentType("source.json")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType("string.quoted.double.js")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(STRING_SINGLE), new QualifiedContentType("string.quoted.single.js")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(JS_REGEXP), new QualifiedContentType("string.regexp.js")); //$NON-NLS-1$
@@ -278,6 +281,6 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 
 	protected IThemeManager getThemeManager()
 	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
+		return ThemePlugin.getDefault().getThemeManager();
 	}
 }

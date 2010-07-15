@@ -11,7 +11,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.views,
  com.aptana.editor.common,
  com.aptana.parsing,
- beaver;bundle-version="1.0.0"
+ beaver;bundle-version="1.0.0",
+ com.aptana.theme
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.xml

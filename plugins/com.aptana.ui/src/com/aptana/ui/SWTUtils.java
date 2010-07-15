@@ -15,6 +15,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
 
@@ -22,9 +23,9 @@ public class SWTUtils
 {
 
 	private static final String SMALL_FONT = "com.aptana.ui.small_font"; //$NON-NLS-1$
-
 	private static Color errorColor;
-
+	private static ModifyListener modifyListener;
+	
 	static
 	{
 		ColorRegistry cm = JFaceResources.getColorRegistry();
@@ -169,50 +170,60 @@ public class SWTUtils
 	}
 
 	/**
-	 * Tests if the widget value is empty. If so, it adds an error color to the background of the cell.
+	 * Tests if the Combo value is empty. If so, it adds an error color to the background of the cell.
 	 * 
-	 * @param widget
-	 *            the widget to set text for
+	 * @param combo
+	 *            the combo to validate
 	 * @param validSelectionIndex
 	 *            the first item that is a "valid" selection
 	 * @return boolean
 	 */
-	public static boolean testWidgetValue(Combo widget, int validSelectionIndex)
+	public static boolean validateCombo(Combo combo, int validSelectionIndex)
 	{
-		final int selectionIndex;
-		if (validSelectionIndex > 0)
+		int selectionIndex = Math.max(validSelectionIndex, 0);
+		String text = combo.getText();
+		if (text == null || text.length() == 0 || combo.getSelectionIndex() < selectionIndex)
 		{
-			selectionIndex = validSelectionIndex;
+			combo.setBackground(errorColor);
+			return false;
 		}
-		else
-		{
-			selectionIndex = 0;
-		}
+		combo.setBackground(null);
+		return true;
+	}
+	
 
-		String text = widget.getText();
-		if (text == null || text.length() == 0 || widget.getSelectionIndex() < selectionIndex)
+	/**
+	 * Tests if the widget value is empty. If so, it adds an error color to the background of the cell;
+	 * 
+	 * @param widget
+	 *            the widget to set text for
+	 * @return boolean
+	 */
+	public static boolean testWidgetValue(Text widget)
+	{
+		if (widget.getText() == null || "".equals(widget.getText())) //$NON-NLS-1$
 		{
 			widget.setBackground(errorColor);
-			final ModifyListener ml = new ModifyListener()
-			{
-
-				public void modifyText(ModifyEvent e)
+			if(modifyListener == null) {
+				modifyListener = new ModifyListener()
 				{
-					Combo c = (Combo) e.widget;
-					String t = c.getText();
-					if (t != null && t.length() > 0 || c.getSelectionIndex() >= selectionIndex)
+					public void modifyText(ModifyEvent e)
 					{
-						c.setBackground(null);
-					}
-					else
-					{
-						c.setBackground(errorColor);
-					}
-				}
-			};
-			widget.addModifyListener(ml);
+						Text t = (Text) e.widget;
+						if (t.getText() != null && !"".equals(t.getText())) //$NON-NLS-1$
+						{
+							t.setBackground(null);
+						}
+						else
+						{
+							t.setBackground(errorColor);
+						}
+					};
+				};
+				widget.addModifyListener(modifyListener);
+			}
 			return false;
 		}
 		return true;
-	}
+	}	
 }

@@ -1,6 +1,6 @@
 package com.aptana.editor.html.contentassist;
 
-import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.Location;
+import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.LocationType;
 
 public class ContentAssistCoarseLocationTests extends LocationTests
 {
@@ -9,14 +9,14 @@ public class ContentAssistCoarseLocationTests extends LocationTests
 	 * 
 	 * @param source
 	 */
-	protected void tagTests(String source, Location mainLocation)
+	protected void tagTests(String source, LocationType mainLocation)
 	{
 		// this ends with Eclipse's default partition
 		this.coarseLocationTests(
 			source,
-			new LocationRange(Location.IN_TEXT, 0),
-			new LocationRange(mainLocation, 1, source.length() - 1),
-			new LocationRange(Location.IN_TEXT, source.length())
+			new LocationTypeRange(LocationType.IN_TEXT, 0),
+			new LocationTypeRange(mainLocation, 1, source.length() - 1),
+			new LocationTypeRange(LocationType.IN_TEXT, source.length())
 		);
 		
 		// this ends with one of our language's default partitions
@@ -24,9 +24,9 @@ public class ContentAssistCoarseLocationTests extends LocationTests
 		
 		this.coarseLocationTests(
 			source,
-			new LocationRange(Location.IN_TEXT, 0),
-			new LocationRange(mainLocation, 1, source.length() - 2),
-			new LocationRange(Location.IN_TEXT, source.length() - 1)
+			new LocationTypeRange(LocationType.IN_TEXT, 0),
+			new LocationTypeRange(mainLocation, 1, source.length() - 2),
+			new LocationTypeRange(LocationType.IN_TEXT, source.length() - 1)
 		);
 	}
 	
@@ -39,8 +39,8 @@ public class ContentAssistCoarseLocationTests extends LocationTests
 		
 		this.coarseLocationTests(
 			source,
-			new LocationRange(Location.IN_TEXT, 0),
-			new LocationRange(Location.IN_OPEN_TAG, 1)
+			new LocationTypeRange(LocationType.IN_TEXT, 0),
+			new LocationTypeRange(LocationType.IN_OPEN_TAG, 1)
 		);
 	}
 	
@@ -53,8 +53,8 @@ public class ContentAssistCoarseLocationTests extends LocationTests
 		
 		this.coarseLocationTests(
 			source,
-			new LocationRange(Location.IN_TEXT, 0),
-			new LocationRange(Location.IN_OPEN_TAG, 1, source.length())
+			new LocationTypeRange(LocationType.IN_TEXT, 0),
+			new LocationTypeRange(LocationType.IN_OPEN_TAG, 1, source.length())
 		);
 	}
 	
@@ -67,8 +67,8 @@ public class ContentAssistCoarseLocationTests extends LocationTests
 		
 		this.coarseLocationTests(
 			source,
-			new LocationRange(Location.IN_TEXT, 0),
-			new LocationRange(Location.IN_OPEN_TAG, 1, source.length())
+			new LocationTypeRange(LocationType.IN_TEXT, 0),
+			new LocationTypeRange(LocationType.IN_OPEN_TAG, 1, source.length())
 		);
 	}
 	
@@ -81,8 +81,8 @@ public class ContentAssistCoarseLocationTests extends LocationTests
 		
 		this.coarseLocationTests(
 			source,
-			new LocationRange(Location.IN_TEXT, 0),
-			new LocationRange(Location.IN_OPEN_TAG, 1, source.length())
+			new LocationTypeRange(LocationType.IN_TEXT, 0),
+			new LocationTypeRange(LocationType.IN_OPEN_TAG, 1, source.length())
 		);
 	}
 	
@@ -95,8 +95,8 @@ public class ContentAssistCoarseLocationTests extends LocationTests
 		
 		this.coarseLocationTests(
 			source,
-			new LocationRange(Location.IN_TEXT, 0),
-			new LocationRange(Location.IN_OPEN_TAG, 1, source.length())
+			new LocationTypeRange(LocationType.IN_TEXT, 0),
+			new LocationTypeRange(LocationType.IN_OPEN_TAG, 1, source.length())
 		);
 	}
 	
@@ -109,8 +109,8 @@ public class ContentAssistCoarseLocationTests extends LocationTests
 		
 		this.coarseLocationTests(
 			source,
-			new LocationRange(Location.IN_TEXT, 0),
-			new LocationRange(Location.IN_OPEN_TAG, 1, source.length())
+			new LocationTypeRange(LocationType.IN_TEXT, 0),
+			new LocationTypeRange(LocationType.IN_OPEN_TAG, 1, source.length())
 		);
 	}
 	
@@ -123,9 +123,9 @@ public class ContentAssistCoarseLocationTests extends LocationTests
 		
 		this.coarseLocationTests(
 			source,
-			new LocationRange(Location.IN_TEXT, 0),
-			new LocationRange(Location.IN_OPEN_TAG, 1),
-			new LocationRange(Location.IN_TEXT, source.length())
+			new LocationTypeRange(LocationType.IN_TEXT, 0),
+			new LocationTypeRange(LocationType.IN_OPEN_TAG, 1),
+			new LocationTypeRange(LocationType.IN_TEXT, source.length())
 		);
 	}
 	
@@ -134,7 +134,7 @@ public class ContentAssistCoarseLocationTests extends LocationTests
 	 */
 	public void testOpenTagElementName()
 	{
-		this.tagTests("<body>", Location.IN_OPEN_TAG);
+		this.tagTests("<body>", LocationType.IN_OPEN_TAG);
 	}
 	
 	/**
@@ -142,7 +142,7 @@ public class ContentAssistCoarseLocationTests extends LocationTests
 	 */
 	public void testOpenScriptElement()
 	{
-		this.tagTests("<script>", Location.IN_OPEN_TAG);
+		this.tagTests("<script>", LocationType.IN_OPEN_TAG);
 	}
 	
 	/**
@@ -150,7 +150,7 @@ public class ContentAssistCoarseLocationTests extends LocationTests
 	 */
 	public void testOpenStyleElement()
 	{
-		this.tagTests("<style>", Location.IN_OPEN_TAG);
+		this.tagTests("<style>", LocationType.IN_OPEN_TAG);
 	}
 	
 	/**
@@ -158,7 +158,7 @@ public class ContentAssistCoarseLocationTests extends LocationTests
 	 */
 	public void testOpenTagWithClassAttribute()
 	{
-		this.tagTests("<body class=\"testing\">", Location.IN_OPEN_TAG);
+		this.tagTests("<body class=\"testing\">", LocationType.IN_OPEN_TAG);
 	}
 	
 	/**
@@ -166,7 +166,7 @@ public class ContentAssistCoarseLocationTests extends LocationTests
 	 */
 	public void testOpenTagWithIDAttribute()
 	{
-		this.tagTests("<body id=\"testing\">", Location.IN_OPEN_TAG);
+		this.tagTests("<body id=\"testing\">", LocationType.IN_OPEN_TAG);
 	}
 
 	/**
@@ -174,7 +174,7 @@ public class ContentAssistCoarseLocationTests extends LocationTests
 	 */
 	public void testSelfClosingTag()
 	{
-		this.tagTests("<body/>", Location.IN_OPEN_TAG);
+		this.tagTests("<body/>", LocationType.IN_OPEN_TAG);
 	}
 	
 	/**
@@ -182,6 +182,6 @@ public class ContentAssistCoarseLocationTests extends LocationTests
 	 */
 	public void testCloseTag()
 	{
-		this.tagTests("</body>", Location.IN_CLOSE_TAG);
+		this.tagTests("</body>", LocationType.IN_CLOSE_TAG);
 	}
 }

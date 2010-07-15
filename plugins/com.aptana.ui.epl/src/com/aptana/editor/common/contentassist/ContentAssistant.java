@@ -395,7 +395,6 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 				if (contains(activation, e.character) && fContextInfoPopup != null && !fContextInfoPopup.isActive())
 				{
 					showStyle = SHOW_CONTEXT_INFO;
-					fContextInfoPopup.setActivationKey(e.character);
 				}
 				else
 				{
@@ -1174,6 +1173,8 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	 * @since 3.0
 	 */
 	private boolean fIsPrefixCompletionEnabled = false;
+
+	private Color fProposalSelectorSelectionColor;
 
 	/**
 	 * Creates a new code assistant. The code assistant is not automatically activated, overlays the completion
@@ -2529,5 +2530,15 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	public boolean hasProposalPopupFocus()
 	{
 		return fProposalPopup.hasFocus();
+	}
+
+	public void setProposalSelectorSelectionColor(Color color)
+	{
+		fProposalSelectorSelectionColor = color;
+	}
+	
+	Color getProposalSelectorSelectionColor()
+	{
+		return fProposalSelectorSelectionColor;
 	}
 }

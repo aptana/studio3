@@ -47,8 +47,10 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.css.CSSSourceConfiguration;
+import com.aptana.editor.css.contentassist.CSSContentAssistProcessor;
 import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor;
 import com.aptana.editor.js.JSSourceConfiguration;
+import com.aptana.editor.js.contentassist.JSContentAssistProcessor;
 
 public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfiguration
 {
@@ -94,9 +96,22 @@ public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfigurati
 		HTMLSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		return reconciler;
 	}
-	
+
+	public static IContentAssistProcessor getContentAssistProcessor(String contentType, AbstractThemeableEditor editor)
+	{
+		if (contentType.startsWith(JSSourceConfiguration.PREFIX))
+		{
+			return new JSContentAssistProcessor(editor);
+		}
+		if (contentType.startsWith(CSSSourceConfiguration.PREFIX))
+		{
+			return new CSSContentAssistProcessor(editor);
+		}
+		return new HTMLContentAssistProcessor(editor);
+	}
+
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected Map getHyperlinkDetectorTargets(ISourceViewer sourceViewer)
 	{
 		Map targets = super.getHyperlinkDetectorTargets(sourceViewer);
@@ -107,6 +122,7 @@ public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfigurati
 	@Override
 	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
 	{
-		return new HTMLContentAssistProcessor(getAbstractThemeableEditor());
+		AbstractThemeableEditor editor = this.getAbstractThemeableEditor();
+		return getContentAssistProcessor(contentType, editor);
 	}
 }

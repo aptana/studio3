@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0 
  * which accompanies this distribution, and is available at 
@@ -7,6 +7,7 @@
  * 
  * Contributors: 
  * Michael Scharf (Wind River) - initial API and implementation
+ * Anton Leherbauer (Wind River) - [294468] Fix scroller and text line rendering
  *******************************************************************************/
 package org.eclipse.tm.internal.terminal.textcanvas;
 
@@ -16,7 +17,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
@@ -72,9 +72,6 @@ public abstract class VirtualCanvas extends Canvas {
 		updateViewRectangle();
 	}
 	protected void scrollX(ScrollBar hBar) {
-		if (!hBar.isVisible()) {
-			return;
-		}
 		int hSelection = hBar.getSelection ();
 		int destX = -hSelection - fVirtualBounds.x;
 		fVirtualBounds.x = -hSelection;
@@ -102,9 +99,11 @@ public abstract class VirtualCanvas extends Canvas {
 	}
 
 
-	private void scrollSmart(int deltaX, int deltaY) {
-		Rectangle rect = getBounds();
-		scroll (deltaX, deltaY, 0, 0, rect.width, rect.height, false);
+	protected void scrollSmart(int deltaX, int deltaY) {
+		if (deltaX != 0 || deltaY != 0) {
+			Rectangle rect = getBounds();
+			scroll (deltaX, deltaY, 0, 0, rect.width, rect.height, false);
+		}
 	}
 
 	/**
@@ -158,8 +157,8 @@ public abstract class VirtualCanvas extends Canvas {
 		return getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
 	}
 	protected void paintUnoccupiedSpace(GC gc, Rectangle clipping) {
-		int width=fVirtualBounds.width;
-		int height=fVirtualBounds.height;
+		int width=fVirtualBounds.width + fVirtualBounds.x;
+		int height=fVirtualBounds.height + fVirtualBounds.y;
 		int marginWidth = (clipping.x+clipping.width) - width;
 		int marginHeight = (clipping.y+clipping.height) - height;
 		if(marginWidth>0||marginHeight>0){
@@ -227,11 +226,13 @@ public abstract class VirtualCanvas extends Canvas {
 	 * @param y
 	 */
 	protected void setVirtualOrigin(int x, int y) {
-		fVirtualBounds.x=x;
-		fVirtualBounds.y=y;
-		getHorizontalBar().setSelection(-x);
-		getVerticalBar().setSelection(-y);
-		updateViewRectangle();
+		if (fVirtualBounds.x != x || fVirtualBounds.y != y) {
+			fVirtualBounds.x=x;
+			fVirtualBounds.y=y;
+			getHorizontalBar().setSelection(-x);
+			getVerticalBar().setSelection(-y);
+			updateViewRectangle();
+		}
 	}
 	protected Rectangle getVirtualBounds() {
 		return cloneRectangle(fVirtualBounds);
@@ -307,44 +308,39 @@ public abstract class VirtualCanvas extends Canvas {
 		}
 	}
 	private void doUpdateScrollbar() {
-		Point size= getSize();
 		Rectangle clientArea= getClientArea();
 		ScrollBar horizontal= getHorizontalBar();
 		// even if setVisible was called on the scrollbar, isVisible
 		// returns false if its parent is not visible. 
 		if(!isVisible() || horizontal.isVisible()) {
 			horizontal.setPageIncrement(clientArea.width - horizontal.getIncrement());
-			int max= fVirtualBounds.width + (size.x - clientArea.width - getVerticalBar().getSize().x);
+			int max= fVirtualBounds.width;
 			horizontal.setMaximum(max);
-			horizontal.setThumb(size.x > max ? max : size.x);
+			horizontal.setThumb(clientArea.width);
 		}
 		ScrollBar vertical= getVerticalBar();
 		// even if setVisible was called on the scrollbar, isVisible
 		// returns false if its parent is not visible. 
 		if(!isVisible() || vertical.isVisible()) {
 			vertical.setPageIncrement(clientArea.height - vertical.getIncrement());
-			int max= fVirtualBounds.height + (size.y - clientArea.height);
+			int max= fVirtualBounds.height;
 			vertical.setMaximum(max);
-			vertical.setThumb(size.y > max ? max : size.y);
+			vertical.setThumb(clientArea.height);
 		}
 	}
 	protected boolean isVertialBarVisible() {
-		ScrollBar vertical= getVerticalBar();
-		return vertical.isVisible() && vertical.isEnabled();
+		return getVerticalBar().isVisible();
 	}
 	protected void serVerticalBarVisible(boolean showVScrollBar) {
 		ScrollBar vertical= getVerticalBar();
-		vertical.setEnabled(showVScrollBar);
 		vertical.setVisible(showVScrollBar);
 		vertical.setSelection(0);
 	}
 	protected boolean isHorizontalBarVisble() {
-		ScrollBar horizontal= getHorizontalBar();
-		return horizontal.getVisible() && horizontal.isEnabled();
+		return getHorizontalBar().isVisible();
 	}
 	protected void setHorizontalBarVisible(boolean showHScrollBar) {
 		ScrollBar horizontal= getHorizontalBar();
-		horizontal.setEnabled(showHScrollBar);
 		horizontal.setVisible(showHScrollBar);
 		horizontal.setSelection(0);
 	}

@@ -2,6 +2,10 @@ package com.aptana.core.util;
 
 public class FileUtil
 {
+	/**
+	 * The newline separator character
+	 */
+	public static String NEW_LINE = System.getProperty("line.separator"); //$NON-NLS-1$
 
 	private FileUtil()
 	{
@@ -73,4 +77,53 @@ public class FileUtil
 		}
 		return "..." + path.substring(lastSlash); //$NON-NLS-1$
 	}
+	
+	/**
+	 * Get the extension.
+	 * 
+	 * @param fileName
+	 *            File name
+	 * @return the extension
+	 */
+	public static String getExtension(String fileName)
+	{
+		// We need kernel api to validate the extension or a filename
+		if (fileName == null || StringUtil.EMPTY.equals(fileName))
+		{
+			return fileName;
+		}
+
+		int index = fileName.lastIndexOf('.');
+		if (index == -1)
+		{
+			return StringUtil.EMPTY;
+		}
+		if (index == fileName.length())
+		{
+			return StringUtil.EMPTY;
+		}
+		return fileName.substring(index + 1, fileName.length());
+	}	
+
+	/**
+	 * Creates a file name with a random integer number inserted between the prefix and suffix
+	 * 
+	 * @param prefix
+	 *            the name of the file (sans extension)
+	 * @param suffix
+	 *            the extension of the file (including the '.')
+	 * @return a new file name like test12534.txt
+	 */
+	public static String getRandomFileName(String prefix, String suffix)
+	{
+		if (suffix == null)
+		{
+			return prefix + (long) (Integer.MAX_VALUE * Math.random());
+		}
+		else
+		{
+			return prefix + (long) (Integer.MAX_VALUE * Math.random()) + suffix;
+		}
+	}
+
 }

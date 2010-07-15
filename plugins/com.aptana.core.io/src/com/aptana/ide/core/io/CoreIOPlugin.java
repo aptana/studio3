@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -62,7 +62,7 @@ import com.aptana.ide.core.io.internal.DeleteResourceShortcutListener;
 /**
  * The activator class controls the plug-in life cycle
  */
-@SuppressWarnings("restriction")
+@SuppressWarnings({"restriction", "deprecation"})
 public class CoreIOPlugin extends Plugin
 {
 
@@ -183,6 +183,15 @@ public class CoreIOPlugin extends Plugin
 	public static void setConnectionContext(Object key, ConnectionContext context)
 	{
 		getDefault().connectionContexts.put(key, context);
+	}
+
+	public static void clearConnectionContext(Object key)
+	{
+		ConnectionContext context = getDefault().connectionContexts.get(key);
+		if (context != null) {
+			context.clear();
+		}
+		getDefault().connectionContexts.remove(key);
 	}
 
 	public static ConnectionContext getConnectionContext(Object key)

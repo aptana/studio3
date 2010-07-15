@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -82,7 +82,7 @@ public abstract class BaseFTPConnectionFileManager implements IConnectionFileMan
 	protected static final int TRANSFER_BUFFER_SIZE = 32768;
 	protected static final int CHECK_CONNECTION_TIMEOUT = 30000;
 	protected static final int CACHE_TTL = 60000; /* 1min */
-	protected static final String TMP_UPLOAD_PREFIX = "_tmp_upload."; //$NON-NLS-1$
+	protected static final String TMP_UPLOAD_SUFFIX = "._tmp_upload"; //$NON-NLS-1$
 	protected static final Pattern PASS_COMMAND_PATTERN = Pattern.compile("^(.*PASS ).+$"); //$NON-NLS-1$
 
 	protected String host;
@@ -611,5 +611,5 @@ public abstract class BaseFTPConnectionFileManager implements IConnectionFileMan
 	
 	private void setLastOperationTime() {
 		lastOperationTime = System.currentTimeMillis();		
-	}
+	}	
 }

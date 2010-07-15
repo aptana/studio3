@@ -1,63 +1,67 @@
 package com.aptana.editor.css.contentassist.index;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Set;
 
-import org.eclipse.core.resources.IFile;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.core.runtime.content.IContentTypeManager;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.css.Activator;
 import com.aptana.editor.css.CSSColors;
-import com.aptana.editor.css.ICSSConstants;
-import com.aptana.editor.css.parsing.CSSParser;
+import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.css.parsing.ast.CSSAttributeSelectorNode;
 import com.aptana.editor.css.parsing.ast.CSSRuleNode;
 import com.aptana.editor.css.parsing.ast.CSSTermNode;
-import com.aptana.index.core.IFileIndexingParticipant;
+import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
+import com.aptana.parsing.IParser;
+import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParseState;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 
-public class CSSFileIndexingParticipant implements IFileIndexingParticipant
+public class CSSFileIndexingParticipant implements IFileStoreIndexingParticipant
 {
-	private static final String CSS_EXTENSION = "css"; //$NON-NLS-1$
-
 	@Override
-	public void index(Set<IFile> files, Index index, IProgressMonitor monitor)
+	public void index(Set<IFileStore> files, Index index, IProgressMonitor monitor)
 	{
-		monitor = SubMonitor.convert(monitor, files.size());
-		for (IFile file : files)
+		SubMonitor sub = SubMonitor.convert(monitor, files.size());
+		for (IFileStore file : files)
 		{
-			if (monitor.isCanceled())
+			if (sub.isCanceled())
 				return;
 			try
 			{
-				if (file == null || !isCSSFile(file))
+				if (file == null)
 				{
 					continue;
 				}
-				monitor.subTask(file.getLocation().toPortableString());
+				sub.subTask(file.getName());
 				try
 				{
-					String fileContents = IOUtil.read(file.getContents());
-					ParseState parseState = new ParseState();
-					parseState.setEditState(fileContents, "", 0, 0); //$NON-NLS-1$
-					CSSParser cssParser = new CSSParser();
-					IParseNode parseNode = cssParser.parse(parseState);
-					walkNode(index, file, parseNode);
+					String fileContents = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(-1)));
+					if (fileContents != null && fileContents.trim().length() > 0)
+					{
+						ParseState parseState = new ParseState();
+						parseState.setEditState(fileContents, "", 0, 0); //$NON-NLS-1$
+						IParserPool pool = ParserPoolFactory.getInstance().getParserPool(ICSSParserConstants.LANGUAGE);
+						if (pool != null)
+						{
+							IParser cssParser = pool.checkOut();
+							IParseNode parseNode = cssParser.parse(parseState);
+							pool.checkIn(cssParser);
+							walkNode(index, file, parseNode);
+						}
+					}
 				}
 				catch (CoreException e)
 				{
 					Activator.logError(e);
 				}
-				catch (Exception e)
+				catch (Throwable e)
 				{
 					Activator.logError(e.getMessage(), e);
 				}
@@ -70,45 +74,7 @@ public class CSSFileIndexingParticipant implements IFileIndexingParticipant
 		monitor.done();
 	}
 
-	private boolean isCSSFile(IFile file)
-	{
-		InputStream stream = null;
-		IContentTypeManager manager = Platform.getContentTypeManager();
-		try
-		{
-			stream = file.getContents();
-			IContentType[] types = manager.findContentTypesFor(stream, file.getName());
-			for (IContentType type : types)
-			{
-				if (type.getId().equals(ICSSConstants.CONTENT_TYPE_CSS))
-					return true;
-			}
-		}
-		catch (CoreException e)
-		{
-			Activator.logError(e);
-		}
-		catch (Exception e)
-		{
-			Activator.logError(e.getMessage(), e);
-		}
-		finally
-		{
-			try
-			{
-				if (stream != null)
-					stream.close();
-			}
-			catch (IOException e)
-			{
-				// ignore
-			}
-		}
-
-		return CSS_EXTENSION.equalsIgnoreCase(file.getFileExtension());
-	}
-
-	public static void walkNode(Index index, IFile file, IParseNode parent)
+	public static void walkNode(Index index, IFileStore file, IParseNode parent)
 	{
 		if (parent == null)
 			return;
@@ -170,9 +136,9 @@ public class CSSFileIndexingParticipant implements IFileIndexingParticipant
 		return false;
 	}
 
-	private static void addIndex(Index index, IFile file, String category, String word)
+	private static void addIndex(Index index, IFileStore file, String category, String word)
 	{
-		index.addEntry(category, word, file.getProjectRelativePath().toPortableString());
+		index.addEntry(category, word, file.toURI());
 	}
 
 }

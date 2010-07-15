@@ -4,7 +4,7 @@ import org.eclipse.core.runtime.IAdapterFactory;
 
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings("rawtypes")
 public class CommandElementsProviderAdapterFactory implements IAdapterFactory
 {
 	private static final Class[] ADAPTERS = new Class[] {ICommandElementsProvider.class};

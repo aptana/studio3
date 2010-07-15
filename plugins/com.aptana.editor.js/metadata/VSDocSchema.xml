@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<schema xmlns="http://www.aptana.com/2005/schema/1.0">
+
+	<element name="docs" type="root" onEnter="enterDocs" onExit="exitDocs">
+		<child-element name="example"/>
+		<child-element name="exception"/>
+		<child-element name="param"/>
+		<child-element name="private"/>
+		<child-element name="returns"/>
+		<child-element name="see"/>
+		<child-element name="seealso"/>
+		<child-element name="summary"/>
+		
+		<!-- unsupported elements -->
+		<child-element name="c"/>
+		<child-element name="code"/>
+		<child-element name="field"/>
+		<child-element name="include"/>
+		<child-element name="list"/>
+		<child-element name="para"/>
+		<child-element name="paramref"/>
+		<child-element name="permission"/>
+		<child-element name="remarks"/>
+		<child-element name="typeparam"/>
+		<child-element name="typeparamref"/>
+		<child-element name="value"/>
+	</element>
+	
+	<element name="example" onEnter="startTextBuffer" onExit="exitExample">
+	</element>
+	
+	<element name="exception" onEnter="enterException" onExit="exitException">
+		<attribute name="cref"/>
+	</element>
+	
+	<element name="field">
+		<attribute name="domElement"        usage="optional"/>	<!-- boolean -->
+		<attribute name="elementDomElement" usage="optional"/>	<!-- boolean -->
+		<attribute name="elementInteger"    usage="optional"/>	<!-- boolean -->
+		<attribute name="elementMayBeNull"  usage="optional"/>	<!-- boolean -->
+		<attribute name="elementType"       usage="optional"/>	<!-- string  -->
+		<attribute name="integer"           usage="optional"/>	<!-- boolean -->
+		<attribute name="mayBeNull"         usage="optional"/>	<!-- boolean -->
+		<attribute name="name"/>								<!-- string  -->
+		<attribute name="type"              usage="optional"/>	<!-- string  -->
+	</element>
+	
+	<element name="param" onEnter="enterParam" onExit="exitParam">
+		<attribute name="domElement"        usage="optional"/>	<!-- boolean -->
+		<attribute name="elementDomElement" usage="optional"/>	<!-- boolean -->
+		<attribute name="elementInteger"    usage="optional"/>	<!-- boolean -->
+		<attribute name="elementMayBeNull"  usage="optional"/>	<!-- boolean -->
+		<attribute name="elementType"       usage="optional"/>	<!-- string  -->
+		<attribute name="integer"           usage="optional"/>	<!-- boolean -->
+		<attribute name="mayBeNull"         usage="optional"/>	<!-- boolean -->
+		<attribute name="name"/>								<!-- string  -->
+		<attribute name="optional"          usage="optional"/>	<!-- boolean -->
+		<attribute name="parameterArray"    usage="optional"/> 	<!-- boolean -->
+		<attribute name="type"              usage="optional"/>	<!-- string  -->
+	</element>
+	
+	<element name="private" onEnter="startTextBuffer" onExit="exitPrivate"/>
+	
+	<element name="returns" onEnter="enterReturns" onExit="exitReturns">
+		<attribute name="domElement"        usage="optional"/>	<!-- boolean -->
+		<attribute name="elementDomElement" usage="optional"/>	<!-- boolean -->
+		<attribute name="elementInteger"    usage="optional"/>	<!-- boolean -->
+		<attribute name="elementMayBeNull"  usage="optional"/>	<!-- boolean -->
+		<attribute name="elementType"       usage="optional"/>	<!-- string  -->
+		<attribute name="mayBeNull"         usage="optional"/>	<!-- boolean -->
+		<attribute name="integer"           usage="optional"/>	<!-- boolean -->
+		<attribute name="type"/>								<!-- string  -->
+	</element>
+	
+	<element name="see" onEnter="enterSee">
+		<attribute name="cref"/>
+	</element>
+	
+	<element name="seealso" onEnter="enterSee">
+		<attribute name="cref"/>
+	</element>
+	
+	<element name="summary" onEnter="startTextBuffer" onExit="exitSummary"/>
+	
+	<element name="value">
+		<attribute name="domElement"        usage="optional"/>	<!-- boolean -->
+		<attribute name="elementDomElement" usage="optional"/>	<!-- boolean -->
+		<attribute name="elementInteger"    usage="optional"/>	<!-- boolean -->
+		<attribute name="elementMayBeNull"  usage="optional"/>	<!-- boolean -->
+		<attribute name="elementType"       usage="optional"/>	<!-- string  -->
+		<attribute name="integer"           usage="optional"/>	<!-- boolean -->
+		<attribute name="mayBeNull"         usage="optional"/>	<!-- boolean -->
+		<attribute name="name"/>								<!-- string  -->
+		<attribute name="type"              usage="optional"/>	<!-- string  -->
+	</element>
+
+</schema>

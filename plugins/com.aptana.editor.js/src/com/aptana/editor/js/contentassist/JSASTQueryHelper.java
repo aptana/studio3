@@ -1,21 +1,58 @@
 package com.aptana.editor.js.contentassist;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
+import org.eclipse.core.runtime.Platform;
 import org.jaxen.JaxenException;
 import org.jaxen.XPath;
 
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
-import com.aptana.editor.js.parsing.ast.JSPrimitiveNode;
+import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.xpath.ParseNodeXPath;
 
 public class JSASTQueryHelper
 {
+	public enum Classification
+	{
+		PROPERTY,
+		FUNCTION
+	}
+	
+	private static XPath ALL_VARS;
+	private static XPath ANCESTOR_FUNCTIONS;
+	private static XPath NAMED_FUNCTIONS;
+	private static XPath NON_FUNCTION_VARS;
+	private static XPath VAR_FUNCTIONS;
+
+	/**
+	 * static initializer
+	 */
+	static
+	{
+		try
+		{
+			// symbol queries
+			ALL_VARS = new ParseNodeXPath("descendant::var/declaration/identifier[position() = 1]"); //$NON-NLS-1$
+			ANCESTOR_FUNCTIONS = new ParseNodeXPath("ancestor::function"); //$NON-NLS-1$
+			
+			// child queries
+			NAMED_FUNCTIONS = new ParseNodeXPath("./function[string-length(@name) > 0]"); //$NON-NLS-1$
+			NON_FUNCTION_VARS = new ParseNodeXPath("./var/declaration/identifier[position() = 1 and count(following-sibling::function) = 0]"); //$NON-NLS-1$
+			VAR_FUNCTIONS = new ParseNodeXPath("./var/declaration/identifier[count(following-sibling::function) > 0]"); //$NON-NLS-1$
+		}
+		catch (JaxenException e)
+		{
+			if (Platform.inDevelopmentMode())
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	/**
 	 * JSASTQueryHelper
 	 */
@@ -24,103 +61,84 @@ public class JSASTQueryHelper
 	}
 	
 	/**
-	 * declaredInScope
-	 * 
-	 * @param ast
-	 * @param name
-	 * @return
-	 */
-	public boolean declaredInScope(IParseNode ast, String name)
-	{
-		boolean result = false;
-		
-		try
-		{
-			XPath xpath = new ParseNodeXPath("ancestor::function/statements/var/declaration/identifier[position() = 1]");
-			Object list = xpath.evaluate(ast);
-			
-			if (list instanceof List<?>)
-			{
-				List<?> items = (List<?>) list;
-				
-				for (Object item : items)
-				{
-					if (name.equals(item.toString()))
-					{
-						result = true;
-						break;
-					}
-				}
-			}
-		}
-		catch (JaxenException e)
-		{
-			e.printStackTrace();
-		}
-		
-		return result;
-	}
-	
-	/**
 	 * getSymbolsInScope
 	 * 
 	 * @param ast
 	 * @return
 	 */
-	public List<String> getSymbolsInScope(IParseNode ast)
+	public Map<String,Classification> getSymbolsInScope(IParseNode ast)
 	{
-		final Set<String> result = new HashSet<String>();
+		final Map<String,Classification> result = new HashMap<String,Classification>();
 		
 		this.processXPath(
-			"ancestor::function",
+			ANCESTOR_FUNCTIONS,
 			ast,
 			new ItemProcessor() {
 				public void process(Object item)
 				{
-					if (item instanceof JSFunctionNode)
+					final JSFunctionNode function = (JSFunctionNode) item;
+					
+					// add args
+					for (IParseNode arg : function.getArgs())
 					{
-						JSFunctionNode function = (JSFunctionNode) item;
-						
-						// add args
-						for (IParseNode arg : function.getArgs())
-						{
-							result.add(arg.toString());
-						}
-						
-						// add vars
-						result.addAll(getGlobalDeclarations(function.getBody()));
+						result.put(arg.toString(), Classification.PROPERTY);
 					}
+					
+					// add all descendant vars not contained by descendant functions
+					processXPath(
+						ALL_VARS,
+						function.getBody(),
+						new ItemProcessor() {
+							public void process(Object item)
+							{
+								IParseNode node = (IParseNode) item;
+								IParseNode nextSibling = node.getParent().getChild(1);
+								IParseNode parent = node.getParent();
+								
+								while (parent != null)
+								{
+									if (parent.getNodeType() == JSNodeTypes.FUNCTION)
+									{
+										if (parent == function)
+										{
+											Classification c = (nextSibling.getNodeType() == JSNodeTypes.FUNCTION) ? Classification.FUNCTION : Classification.PROPERTY;
+											
+											result.put(item.toString(), c);
+										}
+										break;
+									}
+									else
+									{
+										parent = parent.getParent();
+									}
+								}
+							}
+						}
+					);
 				}
 			}
 		);
 		
-		result.addAll(this.getAccidentalGlobals(ast));
-		
-		return new ArrayList<String>(result);
+		return result;
 	}
 	
 	/**
-	 * getGlobalDeclarations
+	 * getChildVarNonFunctions
 	 * 
 	 * @param ast
 	 * @return
 	 */
-	public List<String> getGlobalDeclarations(IParseNode ast)
+	public List<String> getChildVarNonFunctions(IParseNode ast)
 	{
 		final List<String> result = new LinkedList<String>();
 
-		// NOTE: we're using a relative path here so we can use this expression
-		// at the top-level of a file and for function bodies
 		this.processXPath(
-			"var/declaration/identifier[position() = 1 and count(following-sibling::function) = 0]",
+			NON_FUNCTION_VARS,
 			ast,
 			new ItemProcessor() {
 				public void process(Object item)
 				{
-					if (item instanceof JSPrimitiveNode)
-					{
-						result.add(item.toString());
-					}
+					result.add(item.toString());
 				}
 			}
 		);
@@ -129,73 +147,71 @@ public class JSASTQueryHelper
 	}
 
 	/**
-	 * getAccidentalGlobals
+	 * getChildFunctions
 	 * 
 	 * @param ast
 	 * @return
 	 */
-	public List<String> getAccidentalGlobals(IParseNode ast)
+	public List<String> getChildFunctions(IParseNode ast)
 	{
-		final List<String> result = new LinkedList<String>();
-		
-		this.processXPath(
-			"//assign/identifier[position() = 1]",
-			ast,
-			new ItemProcessor() {
-				public void process(Object item)
-				{
-					if (item instanceof IParseNode)
-					{
-						IParseNode node = (IParseNode) item;
-						String name = node.toString();
-						
-						if (declaredInScope(node, name) == false)
-						{
-							result.add(name);
-						}
-					}
-				}
-			}
-		);
-		
+		List<String> result = this.getChildNamedFunctions(ast);
+
+		result.addAll(this.getChildVarFunctions(ast));
+
 		return result;
 	}
 
 	/**
-	 * getGlobalFunctions
+	 * getChildNamedFunctions
 	 * 
 	 * @param ast
 	 * @return
 	 */
-	public List<String> getGlobalFunctions(IParseNode ast)
+	public List<String> getChildNamedFunctions(IParseNode ast)
 	{
 		final List<String> result = new LinkedList<String>();
 
 		this.processXPath(
-			"/function[string-length(@name) > 0]",
+			NAMED_FUNCTIONS,
 			ast,
 			new ItemProcessor() {
 				public void process(Object item)
 				{
-					if (item instanceof JSFunctionNode)
-					{
-						JSFunctionNode function = (JSFunctionNode) item;
-						
-						result.add(function.getName());
-					}
+					JSFunctionNode function = (JSFunctionNode) item;
+					
+					result.add(function.getName());
 				}
 			}
 		);
-
+		
+		return result;
+	}
+	
+	/**
+	 * getChildVarFunctions
+	 * 
+	 * @param ast
+	 * @return
+	 */
+	public List<String> getChildVarFunctions(IParseNode ast)
+	{
+		final List<String> result = new LinkedList<String>();
+		
 		this.processXPath(
-			"/var/declaration/identifier[count(following-sibling::function) > 0]",
+			VAR_FUNCTIONS,
 			ast,
 			new ItemProcessor() {
 				public void process(Object item)
 				{
-					if (item instanceof JSPrimitiveNode)
+					result.add(item.toString());
+					
+					IParseNode identifier = (IParseNode) item;
+					JSFunctionNode function = (JSFunctionNode) identifier.getParent().getChild(1);
+					String name = function.getName();
+					
+					if (name != null && name.length() > 0)
 					{
-						result.add(item.toString());
+						result.add(name);
 					}
 				}
 			}
@@ -203,7 +219,7 @@ public class JSASTQueryHelper
 
 		return result;
 	}
-
+	
 	/**
 	 * processXPath
 	 * 
@@ -211,14 +227,13 @@ public class JSASTQueryHelper
 	 * @param node
 	 * @param processor
 	 */
-	private void processXPath(String expression, IParseNode node, ItemProcessor processor)
+	private void processXPath(XPath expression, IParseNode node, ItemProcessor processor)
 	{
-		if (expression != null && expression.length() > 0 && node != null && processor != null)
+		if (expression != null && node != null && processor != null)
 		{
 			try
 			{
-				XPath xpath = new ParseNodeXPath(expression);
-				Object list = xpath.evaluate(node);
+				Object list = expression.evaluate(node);
 	
 				if (list instanceof List<?>)
 				{

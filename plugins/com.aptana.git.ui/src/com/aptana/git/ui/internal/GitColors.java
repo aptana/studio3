@@ -3,9 +3,9 @@ package com.aptana.git.ui.internal;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.common.theme.Theme;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.Theme;
+import com.aptana.theme.ThemePlugin;
 
 public class GitColors
 {
@@ -43,9 +43,9 @@ public class GitColors
 		}
 		if (currentThemeHasDarkBG())
 		{
-			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_LIGHT_GREEN_FG);
+			return ThemePlugin.getDefault().getColorManager().getColor(DEFAULT_LIGHT_GREEN_FG);
 		}
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_GREEN_FG);
+		return ThemePlugin.getDefault().getColorManager().getColor(DEFAULT_GREEN_FG);
 	}
 
 	public static Color greenBG()
@@ -56,10 +56,10 @@ public class GitColors
 		}
 		if (currentThemeHasLightFG())
 		{
-			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_DARK_GREEN_BG);
+			return ThemePlugin.getDefault().getColorManager().getColor(DEFAULT_DARK_GREEN_BG);
 		}
 		// TODO Test if current theme's bg is too close to color we return here?
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_GREEN_BG);
+		return ThemePlugin.getDefault().getColorManager().getColor(DEFAULT_GREEN_BG);
 	}
 
 	public static Color redFG()
@@ -70,9 +70,9 @@ public class GitColors
 		}
 		if (currentThemeHasDarkBG())
 		{
-			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_LIGHT_RED_FG);
+			return ThemePlugin.getDefault().getColorManager().getColor(DEFAULT_LIGHT_RED_FG);
 		}
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_RED_FG);
+		return ThemePlugin.getDefault().getColorManager().getColor(DEFAULT_RED_FG);
 	}
 
 	public static Color redBG()
@@ -83,10 +83,10 @@ public class GitColors
 		}
 		if (currentThemeHasLightFG())
 		{
-			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_DARK_RED_BG);
+			return ThemePlugin.getDefault().getColorManager().getColor(DEFAULT_DARK_RED_BG);
 		}
 		// TODO Test if current theme's bg is too close to color we return here?
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_RED_BG);
+		return ThemePlugin.getDefault().getColorManager().getColor(DEFAULT_RED_BG);
 	}
 
 	private static boolean currentThemeHasDarkBG()
@@ -106,6 +106,6 @@ public class GitColors
 
 	protected static IThemeManager getThemeManager()
 	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
+		return ThemePlugin.getDefault().getThemeManager();
 	}
 }

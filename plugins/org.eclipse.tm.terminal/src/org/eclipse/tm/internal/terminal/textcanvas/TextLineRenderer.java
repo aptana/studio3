@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  * Michael Scharf (Wind River) - initial API and implementation
  * Michael Scharf (Wind River) - [205260] Terminal does not take the font from the preferences
  * Michael Scharf (Wind River) - [206328] Terminal does not draw correctly with proportional fonts
+ * Anton Leherbauer (Wind River) - [294468] Fix scroller and text line rendering
  *******************************************************************************/
 package org.eclipse.tm.internal.terminal.textcanvas;
 
@@ -55,6 +56,10 @@ public class TextLineRenderer implements ILinelRenderer {
 				setupGC(gc, style);
 				String text=segment.getText();
 				drawText(gc, x, y, colFirst, segment.getColumn(), text);
+				if (style != null && style.isUnderline())
+				{
+					underlineText(gc, x, y, colFirst, segment.getColumn(), text);
+				}
 				drawCursor(model, gc, line, x, y, colFirst);
 			}
 			if(fModel.hasLineSelection(line)) {
@@ -85,15 +90,17 @@ public class TextLineRenderer implements ILinelRenderer {
 
 	private void fillBackground(GC gc, int x, int y, int width, int height) {
 		Color bg=gc.getBackground();
-		gc.setBackground(getBackgroundColor());
+		gc.setBackground(getDefaultBackgroundColor());
 		gc.fillRectangle (x,y,width,height);
 		gc.setBackground(bg);
 
 	}
 
-	private Color getBackgroundColor() {
+	public Color getDefaultBackgroundColor() {
+		// null == default style
 		return fStyleMap.getBackgroundColor(null);
 	}
+	
 	private void drawCursor(ITextCanvasModel model, GC gc, int row, int x, int y, int colFirst) {
 		if(!model.isCursorOn())
 			return;
@@ -132,6 +139,21 @@ public class TextLineRenderer implements ILinelRenderer {
 		} else {
 			text=text.replace('\000', ' ');
 			gc.drawString(text,x+offset,y,false);
+		}
+	}
+	private void underlineText(GC gc, int x, int y, int colFirst, int col, String text) {
+		int offset=(col-colFirst)*getCellWidth();
+		if(fStyleMap.isFontProportional()) {
+			for (int i = 0; i < text.length(); i++) {
+				char c=text.charAt(i);
+				int xx=x+offset+i*fStyleMap.getFontWidth();
+				if(c!=' ' && c!='\000') {
+					gc.drawLine(fStyleMap.getCharOffset(c)+xx, fStyleMap.getFontHeight() + y, fStyleMap.getFontWidth() + fStyleMap.getCharOffset(c)+xx, fStyleMap.getFontHeight() + y);
+				}
+			}
+		} else {
+			text=text.replace('\000', ' ');
+			gc.drawLine(x+offset, fStyleMap.getFontHeight() + y - 2, (fStyleMap.getFontWidth() * text.length()) + x+offset, fStyleMap.getFontHeight() + y - 2);
 		}
 	}
 	private void setupGC(GC gc, Style style) {

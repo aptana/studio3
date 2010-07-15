@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2005-2006 Aptana, Inc.
+ * Copyright (c) 2005-2010 Aptana, Inc.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,23 +9,39 @@
  */
 package com.aptana.editor.common.contentassist;
 
-/***********************************************************************************************************************
- * Copyright (c) 2000, 2005 IBM Corporation and others. All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is
- * available at http://www.eclipse.org/legal/epl-v10.html Contributors: IBM Corporation - initial API and implementation
- **********************************************************************************************************************/
+/*******************************************************************************
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
 
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.internal.text.InformationControlReplacer;
+import org.eclipse.jface.text.AbstractReusableInformationControlCreator;
+import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.IInformationControlExtension3;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension3;
+import org.eclipse.jface.text.contentassist.ICompletionProposalExtension5;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
@@ -34,48 +50,460 @@ import org.eclipse.swt.widgets.TableItem;
  * 
  * @since 2.0
  */
-class AdditionalInfoController extends AbstractInformationControlManager implements Runnable
+@SuppressWarnings("restriction")
+class AdditionalInfoController extends AbstractInformationControlManager
 {
+
+	/**
+	 * A timer thread.
+	 * 
+	 * @since 3.2
+	 */
+	private static abstract class Timer
+	{
+		private static final int DELAY_UNTIL_JOB_IS_SCHEDULED = 50;
+
+		/**
+		 * A <code>Task</code> is {@link Task#run() run} when {@link #delay()} milliseconds have elapsed after it was
+		 * scheduled without a {@link #reset(ICompletionProposal) reset} to occur.
+		 */
+		private abstract class Task implements Runnable
+		{
+			/**
+			 * @return the delay in milliseconds before this task should be run
+			 */
+			public abstract long delay();
+
+			/**
+			 * Runs this task.
+			 */
+			public abstract void run();
+
+			/**
+			 * @return the task to be scheduled after this task has been run
+			 */
+			public abstract Task nextTask();
+		}
+
+		/**
+		 * IDLE: the initial task, and active whenever the info has been shown. It cannot be run, but specifies an
+		 * infinite delay.
+		 */
+		private final Task IDLE = new Task()
+		{
+			public void run()
+			{
+				Assert.isTrue(false);
+			}
+
+			public Task nextTask()
+			{
+				Assert.isTrue(false);
+				return null;
+			}
+
+			public long delay()
+			{
+				return Long.MAX_VALUE;
+			}
+
+			public String toString()
+			{
+				return "IDLE"; //$NON-NLS-1$
+			}
+		};
+
+		/**
+		 * FIRST_WAIT: Schedules a platform {@link Job} to fetch additional info from an
+		 * {@link ICompletionProposalExtension5}.
+		 */
+		private final Task FIRST_WAIT = new Task()
+		{
+			public void run()
+			{
+				final ICompletionProposalExtension5 proposal = getCurrentProposalEx();
+				Job job = new Job(JFaceTextMessages.getString("AdditionalInfoController.job_name")) //$NON-NLS-1$
+				{
+					protected IStatus run(IProgressMonitor monitor)
+					{
+						Object info;
+						try
+						{
+							info = proposal.getAdditionalProposalInfo(monitor);
+						}
+						catch (RuntimeException x)
+						{
+							/*
+							 * XXX: This is the safest fix at this point so close to end of 3.2. Will be revisited when
+							 * fixing https://bugs.eclipse.org/bugs/show_bug.cgi?id=101033
+							 */
+							return new Status(IStatus.WARNING, "com.aptana.ui.epl", IStatus.OK, "", x); //$NON-NLS-1$ //$NON-NLS-2$
+						}
+						setInfo((ICompletionProposal) proposal, info);
+						return new Status(IStatus.OK, "com.aptana.ui.epl", IStatus.OK, "", null); //$NON-NLS-1$ //$NON-NLS-2$
+					}
+				};
+				job.schedule();
+			}
+
+			public Task nextTask()
+			{
+				return SECOND_WAIT;
+			}
+
+			public long delay()
+			{
+				return DELAY_UNTIL_JOB_IS_SCHEDULED;
+			}
+
+			public String toString()
+			{
+				return "FIRST_WAIT"; //$NON-NLS-1$
+			}
+		};
+
+		/**
+		 * SECOND_WAIT: Allows display of additional info obtained from an {@link ICompletionProposalExtension5}.
+		 */
+		private final Task SECOND_WAIT = new Task()
+		{
+			public void run()
+			{
+				// show the info
+				allowShowing();
+			}
+
+			public Task nextTask()
+			{
+				return IDLE;
+			}
+
+			public long delay()
+			{
+				return fDelay - DELAY_UNTIL_JOB_IS_SCHEDULED;
+			}
+
+			public String toString()
+			{
+				return "SECOND_WAIT"; //$NON-NLS-1$
+			}
+		};
+
+		/**
+		 * LEGACY_WAIT: Posts a runnable into the display thread to fetch additional info from non-
+		 * {@link ICompletionProposalExtension5}s.
+		 */
+		private final Task LEGACY_WAIT = new Task()
+		{
+			public void run()
+			{
+				final ICompletionProposal proposal = getCurrentProposal();
+				if (!fDisplay.isDisposed())
+				{
+					fDisplay.asyncExec(new Runnable()
+					{
+						public void run()
+						{
+							synchronized (Timer.this)
+							{
+								if (proposal == getCurrentProposal())
+								{
+									Object info = proposal.getAdditionalProposalInfo();
+									showInformation(proposal, info);
+								}
+							}
+						}
+					});
+				}
+			}
+
+			public Task nextTask()
+			{
+				return IDLE;
+			}
+
+			public long delay()
+			{
+				return fDelay;
+			}
+
+			public String toString()
+			{
+				return "LEGACY_WAIT"; //$NON-NLS-1$
+			}
+		};
+
+		/**
+		 * EXIT: The task that triggers termination of the timer thread.
+		 */
+		private final Task EXIT = new Task()
+		{
+			public long delay()
+			{
+				return 1;
+			}
+
+			public Task nextTask()
+			{
+				Assert.isTrue(false);
+				return EXIT;
+			}
+
+			public void run()
+			{
+				Assert.isTrue(false);
+			}
+
+			public String toString()
+			{
+				return "EXIT"; //$NON-NLS-1$
+			}
+		};
+
+		/** The timer thread. */
+		private final Thread fThread;
+
+		/** The currently waiting / active task. */
+		private Task fTask;
+		/** The next wake up time. */
+		private long fNextWakeup;
+
+		private ICompletionProposal fCurrentProposal = null;
+		private Object fCurrentInfo = null;
+		private boolean fAllowShowing = false;
+
+		private final Display fDisplay;
+		private final int fDelay;
+
+		/**
+		 * Creates a new timer.
+		 * 
+		 * @param display
+		 *            the display to use for display thread posting.
+		 * @param delay
+		 *            the delay until to show additional info
+		 */
+		public Timer(Display display, int delay)
+		{
+			fDisplay = display;
+			fDelay = delay;
+			long current = System.currentTimeMillis();
+			schedule(IDLE, current);
+
+			fThread = new Thread(new Runnable()
+			{
+				public void run()
+				{
+					try
+					{
+						loop();
+					}
+					catch (InterruptedException x)
+					{
+					}
+				}
+			}, JFaceTextMessages.getString("InfoPopup.info_delay_timer_name")); //$NON-NLS-1$
+			fThread.start();
+		}
+
+		/**
+		 * Terminates the timer thread.
+		 */
+		public synchronized final void terminate()
+		{
+			schedule(EXIT, System.currentTimeMillis());
+			notifyAll();
+		}
+
+		/**
+		 * Resets the timer thread as the selection has changed to a new proposal.
+		 * 
+		 * @param p
+		 *            the new proposal
+		 */
+		public final synchronized void reset(ICompletionProposal p)
+		{
+			fCurrentProposal = p;
+			fCurrentInfo = null;
+			fAllowShowing = false;
+
+			long oldWakeup = fNextWakeup;
+			Task task = taskOnReset(p);
+			schedule(task, System.currentTimeMillis());
+			if (fNextWakeup < oldWakeup)
+			{
+				notifyAll();
+			}
+		}
+
+		private Task taskOnReset(ICompletionProposal p)
+		{
+			if (p == null)
+			{
+				return IDLE;
+			}
+			if (isExt5(p))
+			{
+				return FIRST_WAIT;
+			}
+			return LEGACY_WAIT;
+		}
+
+		private synchronized void loop() throws InterruptedException
+		{
+			long current = System.currentTimeMillis();
+			Task task = currentTask();
+
+			while (task != EXIT)
+			{
+				long delay = fNextWakeup - current;
+				if (delay <= 0)
+				{
+					task.run();
+					task = task.nextTask();
+					schedule(task, current);
+				}
+				else
+				{
+					wait(delay);
+					current = System.currentTimeMillis();
+					task = currentTask();
+				}
+			}
+		}
+
+		private Task currentTask()
+		{
+			return fTask;
+		}
+
+		private void schedule(Task task, long current)
+		{
+			fTask = task;
+			long nextWakeup = current + task.delay();
+			if (nextWakeup <= current)
+			{
+				fNextWakeup = Long.MAX_VALUE;
+			}
+			else
+			{
+				fNextWakeup = nextWakeup;
+			}
+		}
+
+		private boolean isExt5(ICompletionProposal p)
+		{
+			return p instanceof ICompletionProposalExtension5;
+		}
+
+		ICompletionProposal getCurrentProposal()
+		{
+			return fCurrentProposal;
+		}
+
+		ICompletionProposalExtension5 getCurrentProposalEx()
+		{
+			Assert.isTrue(fCurrentProposal instanceof ICompletionProposalExtension5);
+			return (ICompletionProposalExtension5) fCurrentProposal;
+		}
+
+		synchronized void setInfo(ICompletionProposal proposal, Object info)
+		{
+			if (proposal == fCurrentProposal)
+			{
+				fCurrentInfo = info;
+				if (fAllowShowing)
+				{
+					triggerShowing();
+				}
+			}
+		}
+
+		private void triggerShowing()
+		{
+			final Object info = fCurrentInfo;
+			if (!fDisplay.isDisposed())
+			{
+				fDisplay.asyncExec(new Runnable()
+				{
+					public void run()
+					{
+						synchronized (Timer.this)
+						{
+							if (info == fCurrentInfo)
+							{
+								showInformation(fCurrentProposal, info);
+							}
+						}
+					}
+				});
+			}
+		}
+
+		/**
+		 * Called in the display thread to show additional info.
+		 * 
+		 * @param proposal
+		 *            the proposal to show information about
+		 * @param info
+		 *            the information about <code>proposal</code>
+		 */
+		protected abstract void showInformation(ICompletionProposal proposal, Object info);
+
+		void allowShowing()
+		{
+			fAllowShowing = true;
+			triggerShowing();
+		}
+	}
 
 	/**
 	 * Internal table selection listener.
 	 */
 	private class TableSelectionListener implements SelectionListener
 	{
-		/**
-		 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+
+		/*
+		 * @see SelectionListener#widgetSelected(SelectionEvent)
 		 */
 		public void widgetSelected(SelectionEvent e)
 		{
 			handleTableSelectionChanged();
 		}
 
-		/**
-		 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
+		/*
+		 * @see SelectionListener#widgetDefaultSelected(SelectionEvent)
 		 */
 		public void widgetDefaultSelected(SelectionEvent e)
 		{
 		}
 	}
 
+	/**
+	 * Default control creator for the information control replacer.
+	 * 
+	 * @since 3.4
+	 */
+	private static class DefaultPresenterControlCreator extends AbstractReusableInformationControlCreator
+	{
+		public IInformationControl doCreateInformationControl(Shell shell)
+		{
+			return new DefaultInformationControl(shell, true);
+		}
+	}
+
 	/** The proposal table. */
 	private Table fProposalTable;
-	/** The thread controlling the delayed display of the additional info. */
-	private Thread fThread;
-	/** Indicates whether the display delay has been reset. */
-	private boolean fIsReset = false;
-	/** Object to synchronize display thread and table selection changes. */
-	private final Object fMutex = new Object();
-	/**
-	 * Thread access lock. since 3.0
-	 */
-	private final Object fThreadAccess = new Object();
-	/** Object to synchronize initial display of additional info */
-	private Object fStartSignal;
 	/** The table selection listener */
 	private SelectionListener fSelectionListener = new TableSelectionListener();
 	/** The delay after which additional information is displayed */
-	private int fDelay;
+	private final int fDelay;
+	/**
+	 * The timer thread.
+	 * 
+	 * @since 3.2
+	 */
+	private Timer fTimer;
 
 	/**
 	 * Creates a new additional information controller.
@@ -90,63 +518,60 @@ class AdditionalInfoController extends AbstractInformationControlManager impleme
 		super(creator);
 		fDelay = delay;
 		setAnchor(ANCHOR_RIGHT);
-		setFallbackAnchors(new Anchor[] { ANCHOR_RIGHT, ANCHOR_LEFT });
+		setFallbackAnchors(new Anchor[] { ANCHOR_RIGHT, ANCHOR_LEFT, ANCHOR_BOTTOM });
+
+		/*
+		 * Adjust the location by one pixel towards the proposal popup, so that the single pixel border of the
+		 * additional info popup overlays with the border of the popup. This avoids having a double black line.
+		 */
+		int spacing = -1;
+		setMargins(spacing, spacing); // see also adjustment in #computeLocation
+
+		InformationControlReplacer replacer = new InformationControlReplacer(new DefaultPresenterControlCreator());
+		getInternalAccessor().setInformationControlReplacer(replacer);
 	}
 
-	/**
-	 * @see com.aptana.ide.editors.unified.contentassist.AbstractInformationControlManager#install(org.eclipse.swt.widgets.Control)
+	/*
+	 * @see AbstractInformationControlManager#install(Control)
 	 */
 	public void install(Control control)
 	{
-
 		if (fProposalTable == control)
 		{
 			// already installed
 			return;
 		}
 
-		super.install(control);
+		super.install(control.getShell());
 
-		//Assert.isTrue(control instanceof Table);
+		// Assert.isTrue(control instanceof Table);
 		fProposalTable = (Table) control;
 		fProposalTable.addSelectionListener(fSelectionListener);
-		synchronized (fThreadAccess)
-		{
-			if (fThread != null)
-			{
-				fThread.interrupt();
-			}
-			fThread = new Thread(this, "Aptana: InfoPopup.info_delay_timer_name"); //$NON-NLS-1$
+		getInternalAccessor().getInformationControlReplacer().install(fProposalTable);
 
-			fStartSignal = new Object();
-			synchronized (fStartSignal)
+		fTimer = new Timer(fProposalTable.getDisplay(), fDelay)
+		{
+			protected void showInformation(ICompletionProposal proposal, Object info)
 			{
-				fThread.start();
-				try
+				InformationControlReplacer replacer = getInternalAccessor().getInformationControlReplacer();
+				if (replacer != null)
 				{
-					// wait until thread is ready
-					fStartSignal.wait();
+					replacer.hideInformationControl();
 				}
-				catch (InterruptedException x)
-				{
-				}
+				AdditionalInfoController.this.showInformation(proposal, info);
 			}
-		}
+		};
 	}
 
-	/**
-	 * @see com.aptana.ide.editors.unified.contentassist.AbstractInformationControlManager#disposeInformationControl()
+	/*
+	 * @see AbstractInformationControlManager#disposeInformationControl()
 	 */
 	public void disposeInformationControl()
 	{
-
-		synchronized (fThreadAccess)
+		if (fTimer != null)
 		{
-			if (fThread != null)
-			{
-				fThread.interrupt();
-				fThread = null;
-			}
+			fTimer.terminate();
+			fTimer = null;
 		}
 
 		if (fProposalTable != null && !fProposalTable.isDisposed())
@@ -159,94 +584,42 @@ class AdditionalInfoController extends AbstractInformationControlManager impleme
 	}
 
 	/**
-	 * @see java.lang.Runnable#run()
-	 */
-	public void run()
-	{
-		try
-		{
-			while (true)
-			{
-
-				synchronized (fMutex)
-				{
-
-					if (fStartSignal != null)
-					{
-						synchronized (fStartSignal)
-						{
-							fStartSignal.notifyAll();
-							fStartSignal = null;
-						}
-					}
-
-					// Wait for a selection event to occur.
-					fMutex.wait();
-
-					while (true)
-					{
-						fIsReset = false;
-						// Delay before showing the popup.
-						fMutex.wait(fDelay);
-						if (!fIsReset)
-						{
-							break;
-						}
-					}
-				}
-
-				if (fProposalTable != null && !fProposalTable.isDisposed())
-				{
-					fProposalTable.getDisplay().asyncExec(new Runnable()
-					{
-						public void run()
-						{
-							if (!fIsReset)
-							{
-								showInformation();
-							}
-						}
-					});
-				}
-
-			}
-		}
-		catch (InterruptedException e)
-		{
-		}
-
-		synchronized (fThreadAccess)
-		{
-			// only null fThread if it is us!
-			if (Thread.currentThread() == fThread)
-			{
-				fThread = null;
-			}
-		}
-	}
-
-	/**
-	 * Handles a change of the line selected in the associated selector.
+	 *Handles a change of the line selected in the associated selector.
 	 */
 	public void handleTableSelectionChanged()
 	{
-
 		if (fProposalTable != null && !fProposalTable.isDisposed() && fProposalTable.isVisible())
 		{
-			synchronized (fMutex)
+			TableItem[] selection = fProposalTable.getSelection();
+			if (selection != null && selection.length > 0)
 			{
-				fIsReset = true;
-				fMutex.notifyAll();
+
+				TableItem item = selection[0];
+
+				Object d = item.getData();
+				if (d instanceof ICompletionProposal)
+				{
+					ICompletionProposal p = (ICompletionProposal) d;
+					fTimer.reset(p);
+				}
 			}
 		}
 	}
 
-	/**
-	 * @see com.aptana.ide.editors.unified.contentassist.AbstractInformationControlManager#computeInformation()
+	void showInformation(ICompletionProposal proposal, Object info)
+	{
+		if (fProposalTable == null || fProposalTable.isDisposed())
+		{
+			return;
+		}
+		showInformation();
+	}
+
+	/*
+	 * @see AbstractInformationControlManager#computeInformation()
 	 */
 	protected void computeInformation()
 	{
-
 		if (fProposalTable == null || fProposalTable.isDisposed())
 		{
 			return;
@@ -255,7 +628,6 @@ class AdditionalInfoController extends AbstractInformationControlManager impleme
 		TableItem[] selection = fProposalTable.getSelection();
 		if (selection != null && selection.length > 0)
 		{
-
 			TableItem item = selection[0];
 
 			// compute information
@@ -291,7 +663,8 @@ class AdditionalInfoController extends AbstractInformationControlManager impleme
 			// The SWT/Cocoa bug ( https://bugs.eclipse.org/bugs/show_bug.cgi?id=275617 ) causes problems
 			// in computation of the y offset of the information pop-up window for alignment with
 			// the selected completion item. Disable the smart positioning behavior for macosx/cocoa.
-			if (Platform.getWS().equals(Platform.WS_COCOA)) {
+			if (Platform.getWS().equals(Platform.WS_COCOA))
+			{
 				verticalOffset = parentBounds.y;
 			}
 
@@ -300,24 +673,44 @@ class AdditionalInfoController extends AbstractInformationControlManager impleme
 		}
 	}
 
-	/**
-	 * @see com.aptana.ide.editors.unified.contentassist.AbstractInformationControlManager#computeSizeConstraints(org.eclipse.swt.widgets.Control,
-	 *      org.eclipse.jface.text.IInformationControl)
+	/*
+	 * @see org.eclipse.jface.text.AbstractInformationControlManager#computeLocation(org.eclipse.swt.graphics.Rectangle,
+	 * org.eclipse.swt.graphics.Point, org.eclipse.jface.text.AbstractInformationControlManager.Anchor)
+	 */
+	protected Point computeLocation(Rectangle subjectArea, Point controlSize, Anchor anchor)
+	{
+		Point location = super.computeLocation(subjectArea, controlSize, anchor);
+
+		/*
+		 * The location is computed using subjectControl.toDisplay(), which does not include the trim of the subject
+		 * control. As we want the additional info popup aligned with the outer coordinates of the proposal popup,
+		 * adjust this here
+		 */
+		Rectangle trim = fProposalTable.getShell().computeTrim(0, 0, 0, 0);
+		location.x += trim.x;
+		location.y += trim.y;
+
+		return location;
+	}
+
+	/*
+	 * @see org.eclipse.jface.text.AbstractInformationControlManager#computeSizeConstraints(Control,
+	 * IInformationControl)
 	 */
 	protected Point computeSizeConstraints(Control subjectControl, IInformationControl informationControl)
 	{
+		// at least as big as the proposal table
 		Point sizeConstraint = super.computeSizeConstraints(subjectControl, informationControl);
-		Point size = subjectControl.getSize();
+		Point size = subjectControl.getShell().getSize();
 
-		Rectangle otherTrim = subjectControl.getShell().computeTrim(0, 0, 0, 0);
-		size.x += otherTrim.width;
-		size.y += otherTrim.height;
-
-		if (informationControl instanceof IInformationControlExtension3)
+		// AbstractInformationControlManager#internalShowInformationControl(Rectangle, Object) adds trims
+		// to the computed constraints. Need to remove them here, to make the outer bounds of the additional
+		// info shell fit the bounds of the proposal shell:
+		if (fInformationControl instanceof IInformationControlExtension3)
 		{
-			Rectangle thisTrim = ((IInformationControlExtension3) informationControl).computeTrim();
-			size.x -= thisTrim.width;
-			size.y -= thisTrim.height;
+			Rectangle shellTrim = ((IInformationControlExtension3) fInformationControl).computeTrim();
+			size.x -= shellTrim.width;
+			size.y -= shellTrim.height;
 		}
 
 		if (sizeConstraint.x < size.x)
@@ -329,5 +722,21 @@ class AdditionalInfoController extends AbstractInformationControlManager impleme
 			sizeConstraint.y = size.y;
 		}
 		return sizeConstraint;
+	}
+
+	/*
+	 * @see org.eclipse.jface.text.AbstractInformationControlManager#hideInformationControl()
+	 */
+	protected void hideInformationControl()
+	{
+		super.hideInformationControl();
+	}
+
+	/**
+	 * @return the current information control, or <code>null</code> if none available
+	 */
+	public IInformationControl getCurrentInformationControl2()
+	{
+		return getInternalAccessor().getCurrentInformationControl();
 	}
 }

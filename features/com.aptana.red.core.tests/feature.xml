@@ -18,7 +18,7 @@
    </license>
 
    <requires>
-      <import plugin="org.junit" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.junit"/>
       <import plugin="com.aptana.editor.common" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.ruby" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.core" version="3.0.0" match="greaterOrEqual"/>
@@ -79,7 +79,10 @@
       <import plugin="org.eclipse.core.expressions" version="3.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.search" version="3.2.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.terminal" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.tm.terminal" version="3.0.100" match="greaterOrEqual"/>
+      <import plugin="com.aptana.org.eclipse.tm.terminal" version="3.0.100" match="greaterOrEqual"/>
+      <import plugin="com.aptana.syncing.core"/>
+      <import plugin="com.aptana.syncing.ui"/>
+      <import plugin="com.aptana.theme"/>
    </requires>
 
    <plugin
@@ -92,14 +95,6 @@
 
    <plugin
          id="com.aptana.editor.ruby.tests"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="com.aptana.util.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -218,6 +213,53 @@
          download-size="0"
          install-size="0"
          version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.core.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.kohsuke.junit"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.syncing.core.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.syncing.ui.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.parsing.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.theme.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
          unpack="false"/>
 
 </feature>

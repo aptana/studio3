@@ -49,9 +49,10 @@ import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.WorkbenchJob;
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.Theme;
+
 import com.aptana.explorer.ExplorerPlugin;
+import com.aptana.theme.Theme;
+import com.aptana.theme.ThemePlugin;
 
 /**
  * Adds focus filtering and a free form text filter to the Project view.
@@ -362,8 +363,9 @@ public class FilteringProjectView extends GitProjectView
 					return;
 				if (eyeball != null)
 				{
-					int itemWidth = tree.getClientArea().width;
-					lastDrawnX = itemWidth - (IMAGE_MARGIN + eyeball.getBounds().width);
+					int endOfClientAreaX = tree.getClientArea().width + tree.getClientArea().x;
+					int endOfItemX = hoveredItem.getBounds().width + hoveredItem.getBounds().x;
+					lastDrawnX = Math.max(endOfClientAreaX, endOfItemX) - (IMAGE_MARGIN + eyeball.getBounds().width);
 					int itemHeight = tree.getItemHeight();
 					int imageHeight = eyeball.getBounds().height;					
 					int y = hoveredItem.getBounds().y + (itemHeight - imageHeight) / 2;
@@ -721,7 +723,11 @@ public class FilteringProjectView extends GitProjectView
 							getCommonViewer().setExpandedState(item.getData(), false);
 						}
 					}
-					getCommonViewer().refresh(true);
+					try {
+						getCommonViewer().refresh(true);
+					} catch (Exception e) {
+						// ignore. This seems to just happen on windows and appears to be benign
+					}
 
 					if (text.length() > 0 && !initial)
 					{
@@ -913,7 +919,7 @@ public class FilteringProjectView extends GitProjectView
 
 	protected Color getHoverBackgroundColor()
 	{
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(getActiveTheme().getLineHighlight());
+		return ThemePlugin.getDefault().getColorManager().getColor(getActiveTheme().getLineHighlight());
 	}
 
 	protected Theme getActiveTheme()
@@ -924,7 +930,7 @@ public class FilteringProjectView extends GitProjectView
 	private boolean filterOn()
 	{
 		return getFilterString() != null && getFilterString().trim().length() > 0
-				&& !getFilterString().equals(initialText);
+				&& !getFilterString().equals(Messages.SingleProjectView_InitialFileFilterText);
 	}
 
 	protected IResource getResource(final TreeItem t)

@@ -14,11 +14,12 @@
 -->
 <plugin>
    <extension-point id="terminalConnectors" name="Terminal Connectors" schema="schema/terminalConnectors.exsd"/>
+   <extension-point id="terminalHyperlinkDetectors" name="Terminal Hyperlink Detectors" schema="schema/terminalHyperlinkDetectors.exsd"/>
    <extension point="org.eclipse.ui.contexts">           
       <context
             name="%terminal.context.name"
             description="%terminal.context.description"
-            id="org.eclipse.tm.terminal.TerminalContext"
+            id="com.aptana.org.eclipse.tm.terminal.TerminalContext"
             />
    </extension>
 	<extension point="org.eclipse.help.contexts">
@@ -28,12 +29,12 @@
          point="org.eclipse.ui.commands">
       <!-- Dummy commands for bindings, see below -->
       <command
-            categoryId="org.eclipse.tm.terminal.category1"
-            id="org.eclipse.tm.terminal.command1"
+            categoryId="com.aptana.org.eclipse.tm.terminal.category1"
+            id="com.aptana.org.eclipse.tm.terminal.command1"
             name="%terminal.insertion.name"/>
       <category
             description="%terminal.view.insertion.description"
-            id="org.eclipse.tm.terminal.category1"
+            id="com.aptana.org.eclipse.tm.terminal.category1"
             name="%terminal.insertion.category.name"/>
    </extension>
    <extension
@@ -46,63 +47,63 @@
       keys.
       -->
       <key
-            commandId="org.eclipse.tm.terminal.command1"
-            contextId="org.eclipse.tm.terminal.TerminalContext"
+            commandId="com.aptana.org.eclipse.tm.terminal.command1"
+            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Alt+A"/> <!-- Search -->
       <key
-            commandId="org.eclipse.tm.terminal.command1"
-            contextId="org.eclipse.tm.terminal.TerminalContext"
+            commandId="com.aptana.org.eclipse.tm.terminal.command1"
+            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Alt+E"/> <!-- Edit -->
       <key
-            commandId="org.eclipse.tm.terminal.command1"
-            contextId="org.eclipse.tm.terminal.TerminalContext"
+            commandId="com.aptana.org.eclipse.tm.terminal.command1"
+            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Alt+F"/> <!-- File -->
       <key
-            commandId="org.eclipse.tm.terminal.command1"
-            contextId="org.eclipse.tm.terminal.TerminalContext"
+            commandId="com.aptana.org.eclipse.tm.terminal.command1"
+            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Alt+G"/> 
       <key
-            commandId="org.eclipse.tm.terminal.command1"
-            contextId="org.eclipse.tm.terminal.TerminalContext"
+            commandId="com.aptana.org.eclipse.tm.terminal.command1"
+            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Alt+H"/> <!-- Help -->
       <key
-            commandId="org.eclipse.tm.terminal.command1"
-            contextId="org.eclipse.tm.terminal.TerminalContext"
+            commandId="com.aptana.org.eclipse.tm.terminal.command1"
+            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Alt+N"/> <!-- Navigate -->
       <key
-            commandId="org.eclipse.tm.terminal.command1"
-            contextId="org.eclipse.tm.terminal.TerminalContext"
+            commandId="com.aptana.org.eclipse.tm.terminal.command1"
+            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Alt+P"/> <!-- Project -->
       <key
-            commandId="org.eclipse.tm.terminal.command1"
-            contextId="org.eclipse.tm.terminal.TerminalContext"
+            commandId="com.aptana.org.eclipse.tm.terminal.command1"
+            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Alt+R"/> <!-- Run -->
       <key
-            commandId="org.eclipse.tm.terminal.command1"
-            contextId="org.eclipse.tm.terminal.TerminalContext"
+            commandId="com.aptana.org.eclipse.tm.terminal.command1"
+            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Alt+S"/> <!-- Source -->
       <key
-            commandId="org.eclipse.tm.terminal.command1"
-            contextId="org.eclipse.tm.terminal.TerminalContext"
+            commandId="com.aptana.org.eclipse.tm.terminal.command1"
+            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Alt+T"/> <!-- Refactor -->
       <key
-            commandId="org.eclipse.tm.terminal.command1"
-            contextId="org.eclipse.tm.terminal.TerminalContext"
+            commandId="com.aptana.org.eclipse.tm.terminal.command1"
+            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Alt+V"/> <!-- CVS -->
       <key
-            commandId="org.eclipse.tm.terminal.command1"
-            contextId="org.eclipse.tm.terminal.TerminalContext"
+            commandId="com.aptana.org.eclipse.tm.terminal.command1"
+            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Alt+W"/> <!-- Window -->
    </extension>

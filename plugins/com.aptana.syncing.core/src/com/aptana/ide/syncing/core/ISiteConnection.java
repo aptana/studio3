@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -52,5 +52,26 @@ public interface ISiteConnection extends IAdaptable {
 	public IConnectionPoint getDestination();
 	
 	public boolean excludes(IPath path);
+
+	/**
+	 * Sets the source connection point.
+	 * 
+	 * @param source
+	 */
+	public void setSource(IConnectionPoint source);
+
+	/**
+	 * Sets the destination connection point.
+	 * 
+	 * @param destination
+	 */
+	public void setDestination(IConnectionPoint destination);
+
+	/**
+	 * set site connection name
+	 * 
+	 * @param name
+	 */
+	public void setName(String name);
 	
 }

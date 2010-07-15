@@ -1,44 +1,29 @@
 package com.aptana.editor.common;
 
 import java.text.MessageFormat;
-import java.util.Iterator;
 import java.util.StringTokenizer;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.text.IPaintPositionManager;
-import org.eclipse.jface.text.IPainter;
-import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewerExtension;
-import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.ITextViewerExtension5;
-import org.eclipse.jface.text.source.CompositeRuler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
-import org.eclipse.jface.text.source.IVerticalRulerColumn;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.swt.custom.LineBackgroundEvent;
-import org.eclipse.swt.custom.LineBackgroundListener;
-import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.graphics.Cursor;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.PaletteData;
-import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Caret;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Layout;
@@ -46,16 +31,16 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.contexts.IContextService;
-import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
-import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
-import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.actions.FilterThroughCommandAction;
+import com.aptana.editor.common.extensions.FindBarEditorExtension;
+import com.aptana.editor.common.extensions.IThemeableEditor;
+import com.aptana.editor.common.extensions.ThemeableEditorExtension;
 import com.aptana.editor.common.internal.AbstractFoldingEditor;
 import com.aptana.editor.common.internal.peer.CharacterPairMatcher;
 import com.aptana.editor.common.internal.peer.PeerCharacterCloser;
@@ -64,14 +49,11 @@ import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.scripting.snippets.ExpandSnippetVerifyKeyListener;
-import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.findbar.api.FindBarDecoratorFactory;
-import com.aptana.editor.findbar.api.IFindBarDecorated;
-import com.aptana.editor.findbar.api.IFindBarDecorator;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
+import com.aptana.theme.ThemePlugin;
 
 /**
  * Provides a way to override the editor fg, bg caret, highlight and selection from what is set in global text editor
@@ -81,40 +63,86 @@ import com.aptana.scripting.keybindings.ICommandElementsProvider;
  * @author schitale
  */
 @SuppressWarnings("restriction")
-public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
+public abstract class AbstractThemeableEditor extends AbstractFoldingEditor implements IThemeableEditor
 {
+
+	private class SelectionChangedListener implements ISelectionChangedListener
+	{
+
+		public void install(ISelectionProvider selectionProvider)
+		{
+			if (selectionProvider == null)
+			{
+				return;
+			}
+			if (selectionProvider instanceof IPostSelectionProvider)
+			{
+				((IPostSelectionProvider) selectionProvider).addPostSelectionChangedListener(this);
+			}
+			else
+			{
+				selectionProvider.addSelectionChangedListener(this);
+			}
+		}
+
+		public void uninstall(ISelectionProvider selectionProvider)
+		{
+			if (selectionProvider == null)
+			{
+				return;
+			}
+			if (selectionProvider instanceof IPostSelectionProvider)
+			{
+				((IPostSelectionProvider) selectionProvider).removePostSelectionChangedListener(this);
+			}
+			else
+			{
+				selectionProvider.removeSelectionChangedListener(this);
+			}
+		}
+
+		@Override
+		public void selectionChanged(SelectionChangedEvent event)
+		{
+			AbstractThemeableEditor.this.selectionChanged();
+		}
+	}
+
+	private class PropertyChangeListener implements IPropertyChangeListener
+	{
+
+		@Override
+		public void propertyChange(PropertyChangeEvent event)
+		{
+			handlePreferenceStoreChanged(event);
+		}
+	}
+
 	private static final int RULER_EDITOR_GAP = 5;
 
 	private static final char[] DEFAULT_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`',
 			'\'', '\'', '"', '"' };
 
-	private Image fCaretImage;
-	private RGB fCaretColor;
-
-	private Cursor fCursor;
-
-	private ISelectionChangedListener selectionListener;
-	private VerifyKeyListener keyListener;
-
-	private LineNumberRulerColumn fLineColumn;
-	private Composite parent;
-
-	// FindBar
-	private IFindBarDecorated findBarDecorated;
-	private IFindBarDecorator findBarDecorator;
-
 	private ICommandElementsProvider commandElementsProvider;
-
-	/**
-	 * This paints the entire line in the background color when there's only one bg color used on that line. To make
-	 * things like block comments with a different bg color look more like Textmate.
-	 */
-	private LineBackgroundPainter fFullLineBackgroundPainter;
 
 	private CommonOutlinePage fOutlinePage;
 	private FileService fFileService;
+	private VerifyKeyListener keyListener;
 
 	private boolean fCursorChangeListened;
+	private SelectionChangedListener fSelectionChangedListener;
+
+  	/**
+	 * Manages what's needed to make the find bar work.
+	 */
+	private FindBarEditorExtension fThemeableEditorFindBarExtension;
+	
+	/**
+	 * Manages what's needed to make the colors obey the current theme.
+	 */
+	private ThemeableEditorExtension fThemeableEditorColorsExtension;
+
+	private IPropertyChangeListener fThemeListener;
 
 	/**
 	 * AbstractThemeableEditor
@@ -122,8 +150,29 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 	public AbstractThemeableEditor()
 	{
 		super();
+		fThemeableEditorFindBarExtension = new FindBarEditorExtension(this);
+		fThemeableEditorColorsExtension = new ThemeableEditorExtension(this);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.extensions.IThemeableEditor#getISourceViewer()
+	 */
+	public final ISourceViewer getISourceViewer() 
+	{
+		return super.getSourceViewer();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.extensions.IThemeableEditor#getIVerticalRuler()
+	 */
+	public final IVerticalRuler getIVerticalRuler() 
+	{
+		return super.getVerticalRuler();
+	}
+	
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.texteditor.AbstractDecoratedTextEditor#createPartControl(org.eclipse.swt.widgets.Composite)
@@ -131,13 +180,19 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 	@Override
 	public void createPartControl(Composite parent)
 	{
-		this.parent = parent;
-		Composite findBarComposite = getFindBarDecorator().createFindBarComposite(parent);
+		this.fThemeableEditorColorsExtension.setParent(parent);
+		Composite findBarComposite = this.fThemeableEditorFindBarExtension.createFindBarComposite(parent);
+		Assert.isNotNull(findBarComposite); //the find bar must be the new parent.
 		super.createPartControl(findBarComposite);
-		getFindBarDecorator().createFindBar(getSourceViewer());
-		overrideThemeColors();
+		this.fThemeableEditorFindBarExtension.createFindBar(getSourceViewer());
+		this.fThemeableEditorColorsExtension.overrideThemeColors();
 		PeerCharacterCloser.install(getSourceViewer(), getAutoClosePairCharacters());
 		fCursorChangeListened = true;
+
+		fSelectionChangedListener= new SelectionChangedListener();
+		fSelectionChangedListener.install(getSelectionProvider());
+		fThemeListener = new PropertyChangeListener();
+		ThemePlugin.getDefault().getPreferenceStore().addPropertyChangeListener(fThemeListener);
 
 		IContextService contextService = (IContextService) getSite().getService(IContextService.class);
 		contextService.activateContext(Activator.CONTEXT_ID);
@@ -188,7 +243,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.texteditor.AbstractDecoratedTextEditor#getAdapter(java.lang.Class)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter)
 	{
@@ -200,6 +255,11 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		if (IContentOutlinePage.class.equals(adapter))
 		{
 			return getOutlinePage();
+		}
+		
+		Object adaptable = this.fThemeableEditorFindBarExtension.getFindBarDecoratorAdapter(adapter);
+		if(adaptable != null){
+			return adaptable;
 		}
 		return super.getAdapter(adapter);
 	}
@@ -218,35 +278,12 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		return new CommonOutlinePage(this, getOutlinePreferenceStore());
 	}
 
-	private void overrideThemeColors()
-	{
-		overrideSelectionColor();
-		overrideCursor();
-		overrideCaretColor();
-		overrideRulerColors();
-	}
-
-	@SuppressWarnings("unchecked")
-	private void overrideRulerColors()
-	{
-		// Use normal parent gray bg
-		if (parent == null || fLineColumn == null)
-			return;
-		fLineColumn.setBackground(parent.getBackground());
-		// force the colors for all the ruler columns (specifically so we force the folding bg to match).
-		Iterator<IVerticalRulerColumn> iter = ((CompositeRuler) getVerticalRuler()).getDecoratorIterator();
-		while (iter.hasNext())
-		{
-			IVerticalRulerColumn column = iter.next();
-			column.getControl().setBackground(parent.getBackground());
-		}
-	}
 
 	@Override
 	protected void initializeLineNumberRulerColumn(LineNumberRulerColumn rulerColumn)
 	{
 		super.initializeLineNumberRulerColumn(rulerColumn);
-		this.fLineColumn = rulerColumn;
+		this.fThemeableEditorColorsExtension.initializeLineNumberRulerColumn(rulerColumn);
 	}
 
 	@Override
@@ -283,15 +320,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		// ensure decoration support has been created and configured.
 		getSourceViewerDecorationSupport(viewer);
 
-		if (fFullLineBackgroundPainter == null)
-		{
-			if (viewer instanceof ITextViewerExtension2)
-			{
-				fFullLineBackgroundPainter = new LineBackgroundPainter(viewer);
-				ITextViewerExtension2 extension = (ITextViewerExtension2) viewer;
-				extension.addPainter(fFullLineBackgroundPainter);
-			}
-		}
+		fThemeableEditorColorsExtension.createBackgroundPainter(viewer);
 
 		return viewer;
 	}
@@ -349,276 +378,11 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		return getPairMatchingCharacters();
 	}
 
-	/**
-	 * A class that colors the entire line in token bg if there's only one background color specified in styling. This
-	 * extends block comment bg colors to entire line in the most common use case, rather than having the bg color
-	 * revert to the editor bg on the preceding spaces and trailing newline and empty space.
-	 * 
-	 * @author cwilliams
-	 */
-	private static class LineBackgroundPainter implements IPainter, LineBackgroundListener
-	{
 
-		private ISourceViewer fViewer;
-		private boolean fIsActive;
-
-		public LineBackgroundPainter(ISourceViewer viewer)
-		{
-			this.fViewer = viewer;
-		}
-
-		@Override
-		public void deactivate(boolean redraw)
-		{
-			// do nothing
-		}
-
-		/*
-		 * @see IPainter#dispose()
-		 */
-		public void dispose()
-		{
-		}
-
-		/*
-		 * @see IPainter#paint(int)
-		 */
-		public void paint(int reason)
-		{
-			if (fViewer.getDocument() == null)
-			{
-				deactivate(false);
-				return;
-			}
-
-			StyledText textWidget = fViewer.getTextWidget();
-			// initialization
-			if (!fIsActive)
-			{
-				textWidget.addLineBackgroundListener(this);
-				fIsActive = true;
-			}
-		}
-
-		@Override
-		public void setPositionManager(IPaintPositionManager manager)
-		{
-			// do nothing
-		}
-
-		@Override
-		public void lineGetBackground(LineBackgroundEvent event)
-		{
-			// FIXME What about when there's other style ranges but we begin and end on same bg color? Do we color the
-			// line background anyways and force style ranges with null bg colors to specify the editor bg?
-			StyledText textWidget = fViewer.getTextWidget();
-			if (textWidget == null)
-				return;
-			String text = event.lineText;
-			if (text == null || text.length() == 0)
-				return;
-			int offset = event.lineOffset;
-			int leadingWhitespace = 0;
-			while (Character.isWhitespace(text.charAt(0)))
-			{
-				leadingWhitespace++;
-				text = text.substring(1);
-				if (text.length() <= 0)
-					break;
-			}
-			int length = text.length();
-			if (length > 0)
-			{
-				StyleRange[] ranges = textWidget.getStyleRanges(offset + leadingWhitespace, length);
-
-				if (ranges != null && ranges.length == 1)
-				{
-					event.lineBackground = ranges[0].background;
-				}
-			}
-		}
-	}
-
-	protected void overrideSelectionColor()
-	{
-		if (getSourceViewer().getTextWidget() == null)
-			return;
-
-		// Force selection color
-		getSourceViewer().getTextWidget().setSelectionBackground(
-				CommonEditorPlugin.getDefault().getColorManager().getColor(
-						getThemeManager().getCurrentTheme().getSelection()));
-		if (!Platform.getOS().equals(Platform.OS_MACOSX))
-		{
-			// Linux and windows need selection fg set or we just see a block of color.
-			getSourceViewer().getTextWidget().setSelectionForeground(
-					CommonEditorPlugin.getDefault().getColorManager().getColor(
-							getThemeManager().getCurrentTheme().getForeground()));
-		}
-
-		if (selectionListener != null)
-			return;
-		final boolean defaultHighlightCurrentLine = Platform.getPreferencesService().getBoolean(EditorsUI.PLUGIN_ID,
-				AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE, false, null);
-		// Don't auto toggle the current line highlight if it's off (so it should remain off)
-		if (!defaultHighlightCurrentLine)
-			return;
-
-		selectionListener = new ISelectionChangedListener()
-		{
-
-			@Override
-			public void selectionChanged(SelectionChangedEvent event)
-			{
-				ISelection selection = event.getSelection();
-				if (selection instanceof ITextSelection)
-				{
-					// Auto turn off line highlight when there's a selection > 0
-					ITextSelection textSelection = (ITextSelection) selection;
-					if (textSelection.getLength() > 0)
-					{
-						final boolean defaultHighlightCurrentLine = Platform.getPreferencesService().getBoolean(
-								EditorsUI.PLUGIN_ID,
-								AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE, false, null);
-						if (!defaultHighlightCurrentLine)
-							return;
-					}
-					IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-					prefs.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE, textSelection
-							.getLength() == 0);
-					try
-					{
-						prefs.flush();
-					}
-					catch (BackingStoreException e)
-					{
-						// ignore
-					}
-				}
-			}
-		};
-		getSelectionProvider().addSelectionChangedListener(selectionListener);
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
-	}
-
-	protected void overrideCursor()
-	{
-		if (getSourceViewer().getTextWidget() == null)
-			return;
-
-		Image cursorImage = null;
-		if (getThemeManager().getCurrentTheme().hasDarkBG())
-		{
-			cursorImage = CommonEditorPlugin.getImage(CommonEditorPlugin.IBEAM_WHITE);
-		}
-		else
-		{
-			cursorImage = CommonEditorPlugin.getImage(CommonEditorPlugin.IBEAM_BLACK);
-		}
-
-		Display display = getSourceViewer().getTextWidget().getDisplay();
-		Cursor oldCursor = fCursor;
-
-		fCursor = new Cursor(display, cursorImage.getImageData(), 7, 11);
-		getSourceViewer().getTextWidget().setCursor(fCursor);
-
-		if (oldCursor != null)
-		{
-			oldCursor.dispose();
-		}
-	}
-
-	protected void overrideCaretColor()
-	{
-		if (getSourceViewer().getTextWidget() == null)
-			return;
-
-		Caret caret = getSourceViewer().getTextWidget().getCaret();
-		RGB caretColor = getThemeManager().getCurrentTheme().getCaret();
-		if (caretColor == null)
-			return;
-
-		// Set the character pair matching color to this
-		setCharacterPairColor(caretColor);
-
-		// This is an ugly hack. Setting a black image doesn't work for some reason, but setting no image will cause it
-		// to be black.
-		if (caretColor.equals(new RGB(0, 0, 0)))
-		{
-			caret.setImage(null);
-			return;
-		}
-
-		// Shortcut for when color is same, don't do any heavy lifting
-		if (this.fCaretImage != null && fCaretColor.equals(caretColor))
-			return;
-
-		PaletteData data = new PaletteData(new RGB[] { caretColor });
-		int x = caret.getSize().x;
-		int y = caret.getSize().y;
-		// Apparently the current caret may have invalid sizings
-		// that will cause errors when an attempt to
-		// change the color is made. So perform the check and catch
-		// errors and exceptions so caret coloring
-		// doesn't affect opening the editor.
-		if (x > 0 && y > 0)
-		{
-			try
-			{
-				ImageData iData = new ImageData(x, y, 1, data);
-				caret.setImage(null);
-				if (this.fCaretImage != null)
-				{
-					this.fCaretImage.dispose();
-					this.fCaretImage = null;
-				}
-				this.fCaretImage = new Image(caret.getDisplay(), iData);
-				caret.setImage(this.fCaretImage);
-				fCaretColor = caretColor;
-			}
-			catch (Error e)
-			{
-			}
-			catch (Exception e)
-			{
-			}
-		}
-	}
-
-	private void setCharacterPairColor(RGB rgb)
-	{
-		IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-		prefs.put(IPreferenceConstants.CHARACTER_PAIR_COLOR, MessageFormat.format(
-				"{0},{1},{2}", rgb.red, rgb.green, rgb.blue)); //$NON-NLS-1$
-		try
-		{
-			prefs.flush();
-		}
-		catch (BackingStoreException e)
-		{
-			CommonEditorPlugin.logError(e);
-		}
-	}
 
 	@Override
 	public void dispose()
 	{
-		if (fCaretImage != null)
-		{
-			fCaretImage.dispose();
-			fCaretImage = null;
-		}
-
-		if (fCursor != null)
-		{
-			fCursor.dispose();
-			fCursor = null;
-		}
-		
 		if (keyListener != null)
 		{
 			ISourceViewer viewer = this.getSourceViewer();
@@ -630,32 +394,37 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 			
 			keyListener = null;
 		}
+		if (fSelectionChangedListener != null)  {
+			fSelectionChangedListener.uninstall(getSelectionProvider());
+			fSelectionChangedListener= null;
+		}
+		if (fThemeListener != null)
+		{
+			ThemePlugin.getDefault().getPreferenceStore().removePropertyChangeListener(fThemeListener);
+			fThemeListener = null;
+		}
 
-		removeLineHighlightListener();
+		this.fThemeableEditorColorsExtension.dispose();
 		super.dispose();
 	}
 
-	private void removeLineHighlightListener()
-	{
-		if (getSelectionProvider() != null)
-		{
-			getSelectionProvider().removeSelectionChangedListener(selectionListener);
-		}
-		selectionListener = null;
-	}
 
 	@Override
 	protected void initializeEditor()
 	{
-		setPreferenceStore(new ChainedPreferenceStore(new IPreferenceStore[] {
+		setPreferenceStore(new ChainedPreferenceStore(new IPreferenceStore[] { 
 				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() }));
-		fFileService = new FileService();
+		fFileService = createFileService();
+	}
+
+	protected FileService createFileService()
+	{
+		return new FileService(null);
 	}
 
 	@Override
 	protected void initializeViewerColors(ISourceViewer viewer)
 	{
-		getThemeManager().getCurrentTheme();
 		if (viewer == null || viewer.getTextWidget() == null)
 			return;
 		super.initializeViewerColors(viewer);
@@ -665,18 +434,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 	protected void handlePreferenceStoreChanged(PropertyChangeEvent event)
 	{
 		super.handlePreferenceStoreChanged(event);
-		if (event.getProperty().equals(IThemeManager.THEME_CHANGED))
-		{
-			overrideThemeColors();
-			getSourceViewer().invalidateTextPresentation();
-		}
-		if (event.getProperty().equals(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE))
-		{
-			if (selectionListener == null)
-			{
-				overrideSelectionColor();
-			}
-		}
+		this.fThemeableEditorColorsExtension.handlePreferenceStoreChanged(event);
 	}
 
 	public FileService getFileService()
@@ -731,9 +489,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		selectAndReveal(offset, length);
 	}
 
-	protected void handleCursorPositionChanged()
+	protected void selectionChanged()
 	{
-		super.handleCursorPositionChanged();
 		if (fCursorChangeListened)
 		{
 			if (isLinkedWithEditor())
@@ -758,32 +515,9 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		{
 			((ITextViewerExtension) sourceViewer).prependVerifyKeyListener(new ExpandSnippetVerifyKeyListener(this));
 		}
-		getFindBarDecorator().installActions();
+		this.fThemeableEditorFindBarExtension.createFindBarActions();
 	}
 
-	IFindBarDecorated getFindBarDecorated()
-	{
-		if (findBarDecorated == null)
-		{
-			findBarDecorated = new IFindBarDecorated()
-			{
-				public IFindBarDecorator getFindBarDecorator()
-				{
-					return AbstractThemeableEditor.this.getFindBarDecorator();
-				}
-			};
-		}
-		return findBarDecorated;
-	}
-
-	private IFindBarDecorator getFindBarDecorator()
-	{
-		if (findBarDecorator == null)
-		{
-			findBarDecorator = FindBarDecoratorFactory.createFindBarDecorator(this, getStatusLineManager());
-		}
-		return findBarDecorator;
-	}
 
 	ICommandElementsProvider getCommandElementsProvider()
 	{
@@ -839,7 +573,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		{
 			return null;
 		}
-		return root.getNodeAt(offset);
+		return root.getNodeAtOffset(offset);
 	}
 
 	private boolean isLinkedWithEditor()
@@ -882,5 +616,11 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 			return config.getTabWidth(getSourceViewer());
 		}
 		return 4;
+	}
+
+	@Override
+	public boolean isSaveAsAllowed()
+	{
+		return true;
 	}
 }

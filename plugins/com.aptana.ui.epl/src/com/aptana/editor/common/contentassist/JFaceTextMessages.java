@@ -26,25 +26,32 @@ import java.util.ResourceBundle;
 /**
  * Helper class to get NLSed messages.
  */
-class JFaceTextMessages {
+class JFaceTextMessages
+{
 
-	private static final String RESOURCE_BUNDLE= JFaceTextMessages.class.getName();
+	private static final String RESOURCE_BUNDLE = JFaceTextMessages.class.getName();
 
-	private static ResourceBundle fgResourceBundle= ResourceBundle.getBundle(RESOURCE_BUNDLE);
+	private static ResourceBundle fgResourceBundle = ResourceBundle.getBundle(RESOURCE_BUNDLE);
 
-	private JFaceTextMessages() {
+	private JFaceTextMessages()
+	{
 	}
 
 	/**
 	 * Gets a string from the resource bundle.
-	 *
-	 * @param key the string used to get the bundle value, must not be <code>null</code>
+	 * 
+	 * @param key
+	 *            the string used to get the bundle value, must not be <code>null</code>
 	 * @return the string from the resource bundle
 	 */
-	public static String getString(String key) {
-		try {
+	public static String getString(String key)
+	{
+		try
+		{
 			return fgResourceBundle.getString(key);
-		} catch (MissingResourceException e) {
+		}
+		catch (MissingResourceException e)
+		{
 			return "!" + key + "!";//$NON-NLS-2$ //$NON-NLS-1$
 		}
 	}

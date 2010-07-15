@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -51,6 +51,7 @@ import org.eclipse.core.filesystem.provider.FileInfo;
 import org.eclipse.core.filesystem.provider.FileStore;
 import org.eclipse.core.internal.filesystem.Messages;
 import org.eclipse.core.internal.filesystem.Policy;
+import org.eclipse.core.internal.filesystem.local.LocalFile;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceProxy;
@@ -108,7 +109,7 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (IResource.class == adapter) {
@@ -357,7 +358,7 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 		if (localFileStore != null) {
 			return localFileStore.toLocalFile(options, monitor);
 		}
-		return null;
+		return new LocalFile(workspaceRoot.getFile(path).getLocation().toFile()).toLocalFile(options, monitor);
 	}
 
 	/* (non-Javadoc)

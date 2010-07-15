@@ -5,6 +5,9 @@
 #include <string.h>
 #include <ctype.h>
 #include <sys/ioctl.h>
+#include <sys/types.h>
+#include <sys/sysctl.h>
+#include <sys/stat.h>
 
 #ifdef LINUX 
 #include <pty.h> 
@@ -15,9 +18,16 @@
 #include <util.h> 
 #endif
 
+#ifndef MAXCOMLEN
+#define MAXCOMLEN 255
+#endif
+
 #define ESC '\033'
+#define DLE	'\020'
+
 #define MAX_ESC_SEQUENCE_LENGTH	16
-#define MIN(a,b)	((a) < (b) ? (a) : (b))
+
+static void send_process_list(char* ptyname);
 
 int 
 main (int argc, char** argv) 
@@ -32,28 +42,29 @@ main (int argc, char** argv)
 	fd_set descriptor_set;
 	
 	int pty;
+	char ptyname[MAXCOMLEN+1];
+	struct winsize size = { 0, 0 };
+
+	if( argc > 1 ) {
+		unsigned int width, height;
+		if( sscanf(argv[1], "%ux%u", &width, &height) == 2 ) {
+			size.ws_col = width;
+			size.ws_row = height;
+		}
+	}
 	
-	switch (forkpty(&pty,  /* pseudo-terminal master end descriptor */ 
-					 NULL,  /* This can be a char[] buffer used to get... */ 
+	switch (forkpty(&pty,	/* pseudo-terminal master end descriptor */ 
+					ptyname,/* This can be a char[] buffer used to get... */ 
 							/* ...the device name of the pseudo-terminal */ 
-					 NULL,  /* This can be a struct termios pointer used... */ 
-					        /* to set the terminal attributes */ 
-					 NULL)) /* This can be a struct winsize pointer used... */ 
-    {                       /* ...to set the screen size of the terminal */ 
+					NULL,	/* This can be a struct termios pointer used... */ 
+							/* to set the terminal attributes */ 
+					size.ws_col != 0 ? &size : NULL))	/* This can be a struct winsize pointer used... */ 
+    {						/* ...to set the screen size of the terminal */ 
 		case -1: /* Error */ 
 			perror ("fork()"); 
 			exit (EXIT_FAILURE); 
 			
 		case 0: /* This is the child process */ 
-			if( argc > 1 ) {
-				unsigned int width, height;
-				if( sscanf(argv[1], "%ux%u", &width, &height) == 2 ) {
-					struct winsize size;
-					size.ws_col = width;
-					size.ws_row = height;
-					ioctl(STDOUT_FILENO, TIOCSWINSZ, &size);
-				}
-			}
 			execl("/bin/bash", "-bash", "-li", NULL); 
 			
 			perror("exec()"); /* Since exec* never return */ 
@@ -97,6 +108,32 @@ main (int argc, char** argv)
 								char *ch;
 								int i = 0;
 								
+								ch = strchr(&buffer[buffer_offset], DLE);
+								if (ch != NULL)
+								{
+									for( i = ch - buffer; (i < buffer_index) && !((buffer[i] >= 64) && (buffer[i] <= 126)); ++i)
+									{
+										/* noop */
+									}
+									if (i < buffer_index)
+									{
+										if( buffer[i] == ESC )
+										{
+											buffer_index -= i;
+											memmove(ch, &buffer[i], buffer_index+1);
+											--i;
+										} else {
+											if (strcmp(ch, "\020$p") == 0) {
+												send_process_list(ptyname);
+											}
+											buffer_index -= i + 1;
+											if (buffer_index > 0) {
+												memmove(ch, &buffer[i+1], buffer_index+1);
+												continue;
+											}
+										}
+									}
+								}
 								ch = strchr(&buffer[buffer_offset], ESC);
 								if (ch == NULL)
 								{
@@ -187,3 +224,47 @@ main (int argc, char** argv)
 	
 	return EXIT_FAILURE; 
 } 
+
+static void
+send_process_list(char* ptyname)
+{
+#ifdef __APPLE__
+	struct stat sb;
+	int mib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_TTY, 0};
+	int i;
+	int kp_count = 0;
+	struct kinfo_proc* kp = NULL;
+	if (!stat(ptyname, &sb))
+	{
+		size_t len = 0;
+		mib[3] = sb.st_rdev;
+		if (!sysctl(mib, 4, NULL, &len, NULL, 0))
+		{
+			kp_count = len/sizeof(struct kinfo_proc);
+			len = 2*kp_count*sizeof(struct kinfo_proc);
+			kp = malloc(len);
+			if (!sysctl(mib, 4, kp, &len, NULL, 0))
+			{
+				kp_count = len/sizeof(struct kinfo_proc);
+			} else {
+				kp_count = 0;
+			}
+		}
+	}
+	if (kp_count) {
+		char* buffer = malloc(kp_count*5+3);
+		char* bp = stpcpy(buffer, "\020$");
+		for (i = kp_count-1; i >= 0; --i) {
+			bp += sprintf(bp, "%i,", kp[i].kp_proc.p_pid);
+		}
+		bp = stpcpy(bp-1, "p");
+		write(STDOUT_FILENO, buffer, bp-buffer);
+	} else {
+		write(STDOUT_FILENO, "\020$p", 3);
+	}
+	if (kp != NULL)
+		free(kp);
+#else
+	write(STDOUT_FILENO, "\020$p", 3);
+#endif
+}

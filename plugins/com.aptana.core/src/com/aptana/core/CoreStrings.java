@@ -22,4 +22,9 @@ public interface CoreStrings
 	public static final String REFRESH = Messages.CoreStrings_Refresh;
 
 	public static final String PROPERTIES = Messages.CoreStrings_Properties;
+	
+	public static final String CONTINUE = Messages.CoreStrings_Continue;
+
+	public static final String CANCEL = Messages.CoreStrings_Cancel;
+
 }

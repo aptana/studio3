@@ -197,19 +197,29 @@ class EditBundleJob extends Job
 		Map<Integer, String> result = null;
 		if (looksLikeGitURI(repoURI))
 		{
+			if (GitExecutable.instance() == null)
+			{
+				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+						Messages.EditBundleJob_RequiresGitError));
+			}
 			// definitely looks like a git repo
 			result = GitExecutable.instance().runInBackground(workingDirectory, "clone", repoURI, //$NON-NLS-1$
 					destRuble.toOSString());
 		}
 		else if (looksLikeSVNURI(repoURI))
 		{
+			// FIXME What if svn isn't installed?
 			// wasn't git, but appears it's probably SVN
-			result = ProcessUtil.runInBackground(
-					"svn", workingDirectory, new String[] { "checkout", repoURI, //$NON-NLS-1$ //$NON-NLS-2$
-							destRuble.toOSString() });
+			result = ProcessUtil.runInBackground("svn", workingDirectory, new String[] { "checkout", repoURI, //$NON-NLS-1$ //$NON-NLS-2$
+					destRuble.toOSString() });
 		}
 		else
 		{
+			if (GitExecutable.instance() == null)
+			{
+				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+						Messages.EditBundleJob_RequiresGitError));
+			}
 			// we couldn't determine git or SVN, so let's just assume git.
 			result = GitExecutable.instance().runInBackground(workingDirectory, "clone", repoURI, //$NON-NLS-1$
 					destRuble.toOSString());
@@ -247,7 +257,6 @@ class EditBundleJob extends Job
 	 * @param repoURI
 	 * @return
 	 */
-	@SuppressWarnings("nls")
 	private boolean looksLikeSVNURI(String repoURI)
 	{
 		return repoURI.startsWith("svn:") || repoURI.startsWith("svn+") || repoURI.contains("/trunk") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -260,7 +269,6 @@ class EditBundleJob extends Job
 	 * @param repoURI
 	 * @return
 	 */
-	@SuppressWarnings("nls")
 	private boolean looksLikeGitURI(String repoURI)
 	{
 		return repoURI.startsWith("git:") || repoURI.endsWith(".git") || repoURI.contains("github.com"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

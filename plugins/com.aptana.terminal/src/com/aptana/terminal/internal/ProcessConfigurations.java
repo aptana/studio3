@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -51,12 +51,12 @@ import com.aptana.terminal.IProcessConfiguration;
  */
 public final class ProcessConfigurations {
 
-	private static final String EXTENSION_POINT_ID = Activator.PLUGIN_ID + ".processConfigurations";
-	private static final String TAG_CONFIGURATION = "configuration";
-	private static final String ATT_ID = "id";
-	private static final String ATT_NAME = "name";
-	private static final String ATT_CLASS = "class";
-	private static final String ATT_PLATFORM = "platform";
+	private static final String EXTENSION_POINT_ID = Activator.PLUGIN_ID + ".processConfigurations"; //$NON-NLS-1$
+	private static final String TAG_CONFIGURATION = "configuration"; //$NON-NLS-1$
+	private static final String ATT_ID = "id"; //$NON-NLS-1$
+	private static final String ATT_NAME = "name"; //$NON-NLS-1$
+	private static final String ATT_CLASS = "class"; //$NON-NLS-1$
+	private static final String ATT_PLATFORM = "platform"; //$NON-NLS-1$
 
 	private static ProcessConfigurations instance = null;
 	private List<IProcessConfiguration> configurations = new ArrayList<IProcessConfiguration>();
@@ -108,7 +108,7 @@ public final class ProcessConfigurations {
 				try {
 					configurations.add((IProcessConfiguration) element.createExecutableExtension(ATT_CLASS));
 				} catch (CoreException e) {
-					Activator.logError("Process configuration instantiation failed.", e);
+					Activator.logError("Process configuration instantiation failed.", e); //$NON-NLS-1$
 				}
 			}
 		}

@@ -1,9 +1,6 @@
 package com.aptana.terminal.editor;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -43,8 +40,6 @@ import org.eclipse.ui.internal.keys.WorkbenchKeyboard.KeyDownFilter;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.EditorPart;
 
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.terminal.Activator;
 import com.aptana.terminal.Utils;
 import com.aptana.terminal.internal.IProcessListener;
@@ -52,7 +47,7 @@ import com.aptana.terminal.preferences.IPreferenceConstants;
 import com.aptana.terminal.widget.TerminalComposite;
 
 @SuppressWarnings("restriction")
-public class TerminalEditor extends EditorPart implements ISaveablePart2, ITerminalListener, IProcessListener, IPreferenceChangeListener {
+public class TerminalEditor extends EditorPart implements ISaveablePart2, ITerminalListener, IProcessListener {
 	public static final String ID = "com.aptana.terminal.TerminalEditor"; //$NON-NLS-1$
 
 	private TerminalComposite terminalComposite;
@@ -345,16 +340,6 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, ITermi
 		setPartName(Messages.TerminalEditor_Part_Name);
 		setTitleToolTip(Messages.TerminalEditor_Title_Tool_Tip);
 		setTitleImage(Activator.getImage("icons/terminal.png")); //$NON-NLS-1$
-		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(this);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
-	 */
-	@Override
-	public void dispose() {
-		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(this);
-		super.dispose();
 	}
 	
 	/*
@@ -364,17 +349,5 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, ITermi
 	@Override
 	public void setFocus() {
 		terminalComposite.setFocus();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener#preferenceChange(org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent)
-	 */
-	@Override
-	public void preferenceChange(PreferenceChangeEvent event) {
-		if (IThemeManager.THEME_CHANGED.equals(event.getKey())) {
-			if (terminalComposite != null && !terminalComposite.isDisposed()) {
-				terminalComposite.getTerminalControl().redraw();
-			}
-		}
 	}
 }
