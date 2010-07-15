@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.aptana.editor.js.Activator;
-import com.aptana.editor.js.JSTypes;
+import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
 import com.aptana.editor.js.contentassist.model.ContentSelector;
@@ -52,7 +52,7 @@ public class JSIndexQueryHelper
 	 */
 	protected void addParentTypes(LinkedList<String> types, Index index, String type)
 	{
-		if (type.equals(JSTypes.OBJECT) == false)
+		if (type.equals(JSTypeConstants.OBJECT) == false)
 		{
 			TypeElement typeElement = this._reader.getType(index, type, PARENT_TYPES);
 

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.aptana.editor.js.JSTypes;
+import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.parsing.io.SourcePrinter;
 
 public class FunctionType extends Type
@@ -17,7 +17,7 @@ public class FunctionType extends Type
 	 */
 	public FunctionType()
 	{
-		super(JSTypes.FUNCTION); //$NON-NLS-1$
+		super(JSTypeConstants.FUNCTION); //$NON-NLS-1$
 	}
 
 	/**
@@ -80,7 +80,7 @@ public class FunctionType extends Type
 	 */
 	public void toSource(SourcePrinter writer)
 	{
-		writer.print(JSTypes.FUNCTION); //$NON-NLS-1$
+		writer.print(JSTypeConstants.FUNCTION); //$NON-NLS-1$
 
 		boolean first;
 

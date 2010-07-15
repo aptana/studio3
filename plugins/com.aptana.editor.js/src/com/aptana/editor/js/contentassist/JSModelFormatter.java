@@ -6,7 +6,7 @@ import java.net.URLDecoder;
 import java.util.List;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.js.JSTypes;
+import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
@@ -340,7 +340,7 @@ public class JSModelFormatter
 			}
 			else if (type.startsWith(JSTypeWalker.DYNAMIC_CLASS_PREFIX))
 			{
-				result = JSTypes.OBJECT;
+				result = JSTypeConstants.OBJECT;
 			}
 			else
 			{

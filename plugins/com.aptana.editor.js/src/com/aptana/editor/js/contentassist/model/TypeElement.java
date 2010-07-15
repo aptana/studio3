@@ -158,14 +158,7 @@ public class TypeElement extends BaseElement
 	 */
 	public boolean hasParentTypes()
 	{
-		boolean result = false;
-		
-		if (this._parentTypes != null)
-		{
-			result = this._parentTypes.isEmpty() == false;
-		}
-		
-		return result;
+		return this._parentTypes != null && this._parentTypes.isEmpty() == false;
 	}
 	
 	/**
@@ -175,14 +168,7 @@ public class TypeElement extends BaseElement
 	 */
 	public boolean hasProperties()
 	{
-		boolean result = false;
-		
-		if (this._properties != null)
-		{
-			result = this._properties.isEmpty() == false;
-		}
-		
-		return result;
+		return this._properties != null && this._properties.isEmpty() == false;
 	}
 	
 	/**

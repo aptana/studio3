@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.js.JSTypes;
+import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.parsing.io.SourcePrinter;
 
 public class FunctionElement extends PropertyElement
@@ -150,7 +150,7 @@ public class FunctionElement extends PropertyElement
 
 		for (ParameterElement parameter : this.getParameters())
 		{
-			result.add(StringUtil.join("|", parameter.getTypes()));
+			result.add(StringUtil.join(JSTypeConstants.PARAMETER_TYPE_DELIMITER, parameter.getTypes()));
 		}
 
 		return result;
@@ -193,7 +193,7 @@ public class FunctionElement extends PropertyElement
 		StringBuilder buffer = new StringBuilder();
 		boolean first = true;
 
-		buffer.append(JSTypes.FUNCTION); //$NON-NLS-1$
+		buffer.append(JSTypeConstants.FUNCTION); //$NON-NLS-1$
 
 		for (ReturnTypeElement returnType : this.getReturnTypes())
 		{
@@ -212,14 +212,7 @@ public class FunctionElement extends PropertyElement
 	 */
 	public boolean hasExceptions()
 	{
-		boolean result = false;
-		
-		if (this._exceptions != null)
-		{
-			result = this._exceptions.isEmpty() == false;
-		}
-		
-		return result;
+		return this._exceptions != null && this._exceptions.isEmpty() == false;
 	}
 
 	/**
@@ -229,14 +222,7 @@ public class FunctionElement extends PropertyElement
 	 */
 	public boolean hasParameters()
 	{
-		boolean result = false;
-		
-		if (this._parameters != null)
-		{
-			result = this._parameters.isEmpty() == false;
-		}
-		
-		return result;
+		return this._parameters != null && this._parameters.isEmpty() == false;
 	}
 
 	/**

@@ -1,6 +1,6 @@
 package com.aptana.editor.js;
 
-public class JSTypes
+public class JSTypeConstants
 {
 	public static final String ARRAY = "Array"; //$NON-NLS-1$
 	public static final String BOOLEAN = "Boolean"; //$NON-NLS-1$
@@ -11,7 +11,9 @@ public class JSTypes
 	public static final String REG_EXP = "RegExp"; //$NON-NLS-1$
 	public static final String STRING = "String"; //$NON-NLS-1$
 	
-	private JSTypes()
+	public static final String PARAMETER_TYPE_DELIMITER = "|"; //$NON-NLS-1$
+	
+	private JSTypeConstants()
 	{
 	}
 }

@@ -14,7 +14,7 @@ import java.util.UUID;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.common.contentassist.UserAgentManager.UserAgent;
-import com.aptana.editor.js.JSTypes;
+import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
 import com.aptana.editor.js.contentassist.model.BaseElement;
 import com.aptana.editor.js.contentassist.model.ContentSelector;
@@ -345,9 +345,9 @@ public class JSTypeWalker extends JSTreeWalker
 			{
 				result = type.substring(GENERIC_ARRAY_OPEN.length(), type.length() - 1);
 			}
-			else if (type.equals(JSTypes.ARRAY))
+			else if (type.equals(JSTypeConstants.ARRAY))
 			{
-				result = JSTypes.OBJECT;
+				result = JSTypeConstants.OBJECT;
 			}
 		}
 
@@ -632,7 +632,7 @@ public class JSTypeWalker extends JSTreeWalker
 	{
 		if (node.hasChildren() == false)
 		{
-			this.addType(JSTypes.ARRAY);
+			this.addType(JSTypeConstants.ARRAY);
 		}
 		else
 		{
@@ -657,20 +657,20 @@ public class JSTypeWalker extends JSTreeWalker
 				break;
 
 			case JSNodeTypes.ADD_AND_ASSIGN:
-				String type = JSTypes.NUMBER;
+				String type = JSTypeConstants.NUMBER;
 				List<String> lhsTypes = this.getTypes(node.getLeftHandSide());
 				List<String> rhsTypes = this.getTypes(node.getRightHandSide());
 
-				if (lhsTypes.contains(JSTypes.STRING) || rhsTypes.contains(JSTypes.STRING))
+				if (lhsTypes.contains(JSTypeConstants.STRING) || rhsTypes.contains(JSTypeConstants.STRING))
 				{
-					type = JSTypes.STRING;
+					type = JSTypeConstants.STRING;
 				}
 
 				this.addType(type);
 				break;
 
 			default:
-				this.addType(JSTypes.NUMBER);
+				this.addType(JSTypeConstants.NUMBER);
 				break;
 		}
 	}
@@ -683,16 +683,16 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSBinaryArithmeticOperatorNode node)
 	{
-		String type = JSTypes.NUMBER;
+		String type = JSTypeConstants.NUMBER;
 
 		if (node.getNodeType() == JSNodeTypes.ADD)
 		{
 			List<String> lhsTypes = this.getTypes(node.getLeftHandSide());
 			List<String> rhsTypes = this.getTypes(node.getRightHandSide());
 
-			if (lhsTypes.contains(JSTypes.STRING) || rhsTypes.contains(JSTypes.STRING))
+			if (lhsTypes.contains(JSTypeConstants.STRING) || rhsTypes.contains(JSTypeConstants.STRING))
 			{
-				type = JSTypes.STRING;
+				type = JSTypeConstants.STRING;
 			}
 		}
 
@@ -706,7 +706,7 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSBinaryBooleanOperatorNode node)
 	{
-		this.addType(JSTypes.BOOLEAN);
+		this.addType(JSTypeConstants.BOOLEAN);
 	}
 
 	/*
@@ -756,7 +756,7 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSFalseNode node)
 	{
-		this.addType(JSTypes.BOOLEAN);
+		this.addType(JSTypeConstants.BOOLEAN);
 	}
 	
 	/*
@@ -772,7 +772,7 @@ public class JSTypeWalker extends JSTreeWalker
 		{
 			// We temporarily store the default function type to prevent
 			// infinite recursion in potential invoke cycles
-			this.putNodeType(node, JSTypes.FUNCTION);
+			this.putNodeType(node, JSTypeConstants.FUNCTION);
 			
 			List<String> types = new ArrayList<String>();
 			Scope<JSNode> scope = this.getActiveScope(node.getBody().getStartingOffset());
@@ -794,17 +794,17 @@ public class JSTypeWalker extends JSTreeWalker
 			// build function type, including return values
 			if (types.isEmpty() == false)
 			{
-				type = JSTypes.FUNCTION + ":" + StringUtil.join(",", types); //$NON-NLS-1$ //$NON-NLS-2$
+				type = JSTypeConstants.FUNCTION + ":" + StringUtil.join(",", types); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			else if (foundReturnExpression)
 			{
 				// If we couldn't infer a return type and we had a return
 				// expression, then at least return Object from this function
-				type = JSTypes.FUNCTION + ":" + JSTypes.OBJECT; //$NON-NLS-1$
+				type = JSTypeConstants.FUNCTION + ":" + JSTypeConstants.OBJECT; //$NON-NLS-1$
 			}
 			else
 			{
-				type = JSTypes.FUNCTION;
+				type = JSTypeConstants.FUNCTION;
 			}
 
 			this.putNodeType(node, type);
@@ -837,7 +837,7 @@ public class JSTypeWalker extends JSTreeWalker
 				}
 				else
 				{
-					this.addType(JSTypes.OBJECT);
+					this.addType(JSTypeConstants.OBJECT);
 				}
 			}
 		}
@@ -1016,7 +1016,7 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSNumberNode node)
 	{
-		this.addType(JSTypes.NUMBER);
+		this.addType(JSTypeConstants.NUMBER);
 	}
 
 	/*
@@ -1032,7 +1032,7 @@ public class JSTypeWalker extends JSTreeWalker
 		{
 			if (node.hasChildren() == false)
 			{
-				type = JSTypes.OBJECT;
+				type = JSTypeConstants.OBJECT;
 			}
 			else
 			{
@@ -1041,7 +1041,7 @@ public class JSTypeWalker extends JSTreeWalker
 				TypeElement newType = new TypeElement();
 
 				newType.setName(this.getUniqueTypeName());
-				newType.addParentType(JSTypes.OBJECT);
+				newType.addParentType(JSTypeConstants.OBJECT);
 				this.addUserAgents(newType);
 				
 				// temporary container to collect properties and their value
@@ -1144,7 +1144,7 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSPostUnaryOperatorNode node)
 	{
-		this.addType(JSTypes.NUMBER);
+		this.addType(JSTypeConstants.NUMBER);
 	}
 
 	/*
@@ -1158,11 +1158,11 @@ public class JSTypeWalker extends JSTreeWalker
 		{
 			case JSNodeTypes.DELETE:
 			case JSNodeTypes.LOGICAL_NOT:
-				this.addType(JSTypes.BOOLEAN);
+				this.addType(JSTypeConstants.BOOLEAN);
 				break;
 
 			case JSNodeTypes.TYPEOF:
-				this.addType(JSTypes.STRING);
+				this.addType(JSTypeConstants.STRING);
 				break;
 
 			case JSNodeTypes.VOID:
@@ -1170,7 +1170,7 @@ public class JSTypeWalker extends JSTreeWalker
 				break;
 
 			default:
-				this.addType(JSTypes.NUMBER);
+				this.addType(JSTypeConstants.NUMBER);
 				break;
 		}
 	}
@@ -1182,7 +1182,7 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSRegexNode node)
 	{
-		this.addType(JSTypes.REG_EXP);
+		this.addType(JSTypeConstants.REG_EXP);
 	}
 
 	/*
@@ -1192,7 +1192,7 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSStringNode node)
 	{
-		this.addType(JSTypes.STRING);
+		this.addType(JSTypeConstants.STRING);
 	}
 
 	/*
@@ -1202,6 +1202,6 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSTrueNode node)
 	{
-		this.addType(JSTypes.BOOLEAN);
+		this.addType(JSTypeConstants.BOOLEAN);
 	}
 }
