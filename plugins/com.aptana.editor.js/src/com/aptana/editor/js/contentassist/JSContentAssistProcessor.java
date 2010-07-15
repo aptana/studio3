@@ -136,13 +136,14 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		
 		if (projectGlobals != null)
 		{
+			Image[] userAgents = this.getAllUserAgentIcons();
+			
 			for (PropertyElement property : projectGlobals)
 			{
 				boolean isFunction = (property instanceof FunctionElement);
 				String name = property.getName();
 				String description = JSModelFormatter.getDescription(property, this.getProjectURI());
 				Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
-				Image[] userAgents = this.getAllUserAgentIcons();
 				List<String> documents = property.getDocuments();
 				String location = (documents != null && documents.size() > 0) ? JSModelFormatter.getDocumentDisplayName(documents.get(0)) : null;
 				
@@ -308,6 +309,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				
 				if (localScope != null)
 				{
+					Image[] userAgents = this.getAllUserAgentIcons();
 					List<String> symbols = localScope.getSymbolNames();
 					
 					for (String symbol : symbols)
@@ -330,7 +332,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 						String name = symbol;
 						String description = null;
 						Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
-						Image[] userAgents = this.getAllUserAgentIcons();
 						
 						this.addProposal(proposals, name, image, description, userAgents, fileLocation, offset);
 					}
