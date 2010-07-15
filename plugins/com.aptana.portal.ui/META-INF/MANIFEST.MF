@@ -20,7 +20,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.equinox.p2.metadata.repository,
  org.eclipse.equinox.p2.artifact.repository,
  org.eclipse.equinox.p2.ui,
- org.mortbay.jetty.util
+ org.mortbay.jetty.util,
+ com.aptana.theme
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.portal.ui,
@@ -35,6 +36,5 @@ Export-Package: com.aptana.portal.ui,
  com.aptana.portal.ui.internal.startup
 Import-Package: com.aptana.configurations,
  com.aptana.editor.common,
- com.aptana.editor.common.theme,
  com.aptana.usage
 Eclipse-ExtensibleAPI: true

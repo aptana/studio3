@@ -28,10 +28,10 @@ import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.util.EclipseUtil;
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.browser.PortalBrowserEditor;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.ThemePlugin;
 import com.aptana.usage.PingStartup;
 
 /**
@@ -269,7 +269,7 @@ public class Portal
 	 */
 	protected IThemeManager getThemeManager()
 	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
+		return ThemePlugin.getDefault().getThemeManager();
 	}
 
 	/**

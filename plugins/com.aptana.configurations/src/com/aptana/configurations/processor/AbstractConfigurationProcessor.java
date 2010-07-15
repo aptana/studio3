@@ -9,7 +9,6 @@ import org.eclipse.core.runtime.ListenerList;
 
 import com.aptana.configurations.ConfigurationsPlugin;
 import com.aptana.core.ShellExecutable;
-import com.aptana.scripting.ScriptUtils;
 
 /**
  * A base class that should be used for all {@link IConfigurationProcessor} implementations.
