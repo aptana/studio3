@@ -25,7 +25,14 @@ public class ParamTag extends TagWithTypes
 	 */
 	public String getName()
 	{
-		return this._parameter.getName();
+		String result = "";
+		
+		if (this._parameter != null)
+		{
+			result = this._parameter.getName();
+		}
+		
+		return result;
 	}
 
 	/**
@@ -35,7 +42,14 @@ public class ParamTag extends TagWithTypes
 	 */
 	public Usage getUsage()
 	{
-		return this._parameter.getUsage();
+		Usage result = Usage.UNKNOWN;
+		
+		if (this._parameter != null)
+		{
+			result = this._parameter.getUsage();
+		}
+		
+		return result;
 	}
 
 	/**
@@ -64,7 +78,10 @@ public class ParamTag extends TagWithTypes
 		}
 		writer.print("} "); //$NON-NLS-1$
 
-		this._parameter.toSource(writer);
+		if (this._parameter != null)
+		{
+			this._parameter.toSource(writer);
+		}
 
 		String text = this.getText();
 

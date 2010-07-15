@@ -73,7 +73,14 @@ public abstract class Tag extends Symbol
 	 */
 	public void toSource(SourcePrinter writer)
 	{
-		writer.print(this._type.toString());
+		if (this._type != null)
+		{
+			writer.print(this._type.toString());
+		}
+		else
+		{
+			writer.print(TagType.UNKNOWN.toString());
+		}
 
 		if (this._text != null && this._text.isEmpty() == false)
 		{

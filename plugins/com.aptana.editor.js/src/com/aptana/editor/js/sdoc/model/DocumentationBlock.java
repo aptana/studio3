@@ -1,8 +1,8 @@
 package com.aptana.editor.js.sdoc.model;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.LinkedList;
 import java.util.List;
 
 import beaver.Symbol;
@@ -31,7 +31,7 @@ public class DocumentationBlock extends Symbol
 	 */
 	public DocumentationBlock(String text)
 	{
-		this(text, new LinkedList<Tag>());
+		this(text, new ArrayList<Tag>());
 	}
 
 	/**
@@ -53,7 +53,14 @@ public class DocumentationBlock extends Symbol
 	 */
 	public List<Tag> getTags()
 	{
-		return this._tags;
+		List<Tag> result = this._tags;
+		
+		if (result == null)
+		{
+			result = Collections.emptyList();
+		}
+		
+		return result;
 	}
 
 	/**
@@ -68,7 +75,7 @@ public class DocumentationBlock extends Symbol
 
 		if (this._tags != null && this._tags.isEmpty() == false)
 		{
-			result = new LinkedList<Tag>();
+			result = new ArrayList<Tag>();
 
 			for (Tag tag : this._tags)
 			{

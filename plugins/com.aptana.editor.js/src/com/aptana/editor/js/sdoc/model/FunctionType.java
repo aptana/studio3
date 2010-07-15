@@ -1,6 +1,7 @@
 package com.aptana.editor.js.sdoc.model;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.aptana.editor.js.JSTypes;
@@ -8,8 +9,8 @@ import com.aptana.parsing.io.SourcePrinter;
 
 public class FunctionType extends Type
 {
-	private List<Type> _parameterTypes = new LinkedList<Type>();
-	private List<Type> _returnTypes = new LinkedList<Type>();
+	private List<Type> _parameterTypes;
+	private List<Type> _returnTypes;
 
 	/**
 	 * FunctionType
@@ -28,6 +29,11 @@ public class FunctionType extends Type
 	{
 		if (parameterType != null)
 		{
+			if (this._parameterTypes == null)
+			{
+				this._parameterTypes = new ArrayList<Type>();
+			}
+			
 			this._parameterTypes.add(parameterType);
 		}
 	}
@@ -41,6 +47,11 @@ public class FunctionType extends Type
 	{
 		if (returnType != null)
 		{
+			if (this._returnTypes == null)
+			{
+				this._returnTypes = new ArrayList<Type>();
+			}
+			
 			this._returnTypes.add(returnType);
 		}
 	}
@@ -52,7 +63,14 @@ public class FunctionType extends Type
 	 */
 	public List<Type> getReturnTypes()
 	{
-		return this._returnTypes;
+		List<Type> result = this._returnTypes;
+		
+		if (result == null)
+		{
+			result = Collections.emptyList();
+		}
+		
+		return result;
 	}
 
 	/**
@@ -66,7 +84,7 @@ public class FunctionType extends Type
 
 		boolean first;
 
-		if (this._parameterTypes.isEmpty() == false)
+		if (this._parameterTypes != null && this._parameterTypes.isEmpty() == false)
 		{
 			first = true;
 
@@ -89,7 +107,7 @@ public class FunctionType extends Type
 			writer.print(")"); //$NON-NLS-1$
 		}
 
-		if (this._returnTypes.isEmpty() == false)
+		if (this._returnTypes != null && this._returnTypes.isEmpty() == false)
 		{
 			first = true;
 
