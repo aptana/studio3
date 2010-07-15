@@ -1,12 +1,13 @@
 package com.aptana.editor.js.contentassist.model;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ParameterElement
 {
 	private String _name;
-	private List<String> _types = new LinkedList<String>();
+	private List<String> _types;
 	private String _usage;
 	private String _description;
 
@@ -24,7 +25,15 @@ public class ParameterElement
 	 */
 	public void addType(String type)
 	{
-		this._types.add(type);
+		if (type != null && type.length() > 0)
+		{
+			if (this._types == null)
+			{
+				this._types = new ArrayList<String>();
+			}
+			
+			this._types.add(type);
+		}
 	}
 
 	/**
@@ -50,7 +59,14 @@ public class ParameterElement
 	 */
 	public List<String> getTypes()
 	{
-		return this._types;
+		List<String> result = this._types;
+		
+		if (result == null)
+		{
+			result = Collections.emptyList();
+		}
+		
+		return result;
 	}
 
 	/**

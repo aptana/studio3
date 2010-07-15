@@ -1,6 +1,7 @@
 package com.aptana.editor.js.contentassist.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.aptana.core.util.StringUtil;
@@ -12,8 +13,8 @@ public class PropertyElement extends BaseElement
 	private boolean _isInstanceProperty;
 	private boolean _isClassProperty;
 	private boolean _isInternal;
-	private List<ReturnTypeElement> _types = new ArrayList<ReturnTypeElement>();
-	private List<String> _examples = new ArrayList<String>();
+	private List<ReturnTypeElement> _types;
+	private List<String> _examples;
 
 	/**
 	 * PropertyElement
@@ -31,6 +32,11 @@ public class PropertyElement extends BaseElement
 	{
 		if (example != null && example.length() > 0)
 		{
+			if (this._examples == null)
+			{
+				this._examples = new ArrayList<String>();
+			}
+			
 			this._examples.add(example);
 		}
 	}
@@ -42,7 +48,15 @@ public class PropertyElement extends BaseElement
 	 */
 	public void addType(ReturnTypeElement type)
 	{
-		this._types.add(type);
+		if (type != null)
+		{
+			if (this._types == null)
+			{
+				this._types = new ArrayList<ReturnTypeElement>();
+			}
+			
+			this._types.add(type);
+		}
 	}
 
 	/**
@@ -52,7 +66,14 @@ public class PropertyElement extends BaseElement
 	 */
 	public List<String> getExamples()
 	{
-		return this._examples;
+		List<String> result = this._examples;
+		
+		if (result == null)
+		{
+			result = Collections.emptyList();
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -70,13 +91,22 @@ public class PropertyElement extends BaseElement
 	 * 
 	 * @return
 	 */
-	public String[] getTypeNames()
+	public List<String> getTypeNames()
 	{
-		String[] result = new String[this._types.size()];
-
-		for (int i = 0; i < result.length; i++)
+		List<String> result;
+		
+		if (this._types != null)
 		{
-			result[i] = this._types.get(i).getType();
+			result = new ArrayList<String>(this._types.size());
+	
+			for (ReturnTypeElement type : this._types)
+			{
+				result.add(type.getType());
+			}
+		}
+		else
+		{
+			result = Collections.emptyList();
 		}
 
 		return result;
@@ -87,9 +117,16 @@ public class PropertyElement extends BaseElement
 	 * 
 	 * @return
 	 */
-	public ReturnTypeElement[] getTypes()
+	public List<ReturnTypeElement> getTypes()
 	{
-		return this._types.toArray(new ReturnTypeElement[this._types.size()]);
+		List<ReturnTypeElement> result = this._types;
+		
+		if (result == null)
+		{
+			result = Collections.emptyList();
+		}
+		
+		return result;
 	}
 
 	/**

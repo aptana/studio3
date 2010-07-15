@@ -1,6 +1,7 @@
 package com.aptana.editor.js.contentassist.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.aptana.core.util.StringUtil;
@@ -9,9 +10,9 @@ import com.aptana.parsing.io.SourcePrinter;
 
 public class FunctionElement extends PropertyElement
 {
-	private List<ParameterElement> _parameters = new ArrayList<ParameterElement>();
-	private List<String> _references = new ArrayList<String>();
-	private List<ExceptionElement> _exceptions = new ArrayList<ExceptionElement>();
+	private List<ParameterElement> _parameters;
+	private List<String> _references;
+	private List<ExceptionElement> _exceptions;
 
 	private boolean _isConstructor;
 	private boolean _isMethod;
@@ -30,7 +31,15 @@ public class FunctionElement extends PropertyElement
 	 */
 	public void addException(ExceptionElement exception)
 	{
-		this._exceptions.add(exception);
+		if (exception != null)
+		{
+			if (this._exceptions == null)
+			{
+				this._exceptions = new ArrayList<ExceptionElement>();
+			}
+			
+			this._exceptions.add(exception);
+		}
 	}
 
 	/**
@@ -40,7 +49,15 @@ public class FunctionElement extends PropertyElement
 	 */
 	public void addParameter(ParameterElement parameter)
 	{
-		this._parameters.add(parameter);
+		if (parameter != null)
+		{
+			if (this._parameters == null)
+			{
+				this._parameters = new ArrayList<ParameterElement>();
+			}
+			
+			this._parameters.add(parameter);
+		}
 	}
 
 	/**
@@ -50,7 +67,15 @@ public class FunctionElement extends PropertyElement
 	 */
 	public void addReference(String reference)
 	{
-		this._references.add(reference);
+		if (reference != null && reference.length() > 0)
+		{
+			if (this._references == null)
+			{
+				this._references = new ArrayList<String>();
+			}
+			
+			this._references.add(reference);
+		}
 	}
 
 	/**
@@ -70,7 +95,14 @@ public class FunctionElement extends PropertyElement
 	 */
 	public List<ExceptionElement> getExceptions()
 	{
-		return this._exceptions;
+		List<ExceptionElement> result = this._exceptions;
+		
+		if (result == null)
+		{
+			result = Collections.emptyList();
+		}
+		
+		return result;
 	}
 
 	/**
@@ -97,7 +129,14 @@ public class FunctionElement extends PropertyElement
 	 */
 	public List<ParameterElement> getParameters()
 	{
-		return this._parameters;
+		List<ParameterElement> result = this._parameters;
+		
+		if (result == null)
+		{
+			result = Collections.emptyList();
+		}
+		
+		return result;
 	}
 
 	/**
@@ -124,7 +163,14 @@ public class FunctionElement extends PropertyElement
 	 */
 	public List<String> getReferences()
 	{
-		return this._references;
+		List<String> result = this._references;
+		
+		if (result == null)
+		{
+			result = Collections.emptyList();
+		}
+		
+		return result;
 	}
 
 	/**
@@ -132,7 +178,7 @@ public class FunctionElement extends PropertyElement
 	 * 
 	 * @return
 	 */
-	public ReturnTypeElement[] getReturnTypes()
+	public List<ReturnTypeElement> getReturnTypes()
 	{
 		return this.getTypes();
 	}
@@ -166,7 +212,14 @@ public class FunctionElement extends PropertyElement
 	 */
 	public boolean hasExceptions()
 	{
-		return this._exceptions.isEmpty() == false;
+		boolean result = false;
+		
+		if (this._exceptions != null)
+		{
+			result = this._exceptions.isEmpty() == false;
+		}
+		
+		return result;
 	}
 
 	/**
@@ -176,7 +229,14 @@ public class FunctionElement extends PropertyElement
 	 */
 	public boolean hasParameters()
 	{
-		return this._parameters.isEmpty() == false;
+		boolean result = false;
+		
+		if (this._parameters != null)
+		{
+			result = this._parameters.isEmpty() == false;
+		}
+		
+		return result;
 	}
 
 	/**

@@ -193,7 +193,7 @@ public class JSIndexWriter
 	 * @param returnTypes
 	 * @return
 	 */
-	protected String writeReturnTypes(Index index, ReturnTypeElement[] returnTypes, URI location)
+	protected String writeReturnTypes(Index index, List<ReturnTypeElement> returnTypes, URI location)
 	{
 		List<String> keyList = new ArrayList<String>();
 		String indexString = Integer.toString(returnTypeCount++);

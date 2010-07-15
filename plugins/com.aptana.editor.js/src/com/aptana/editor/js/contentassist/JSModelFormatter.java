@@ -115,11 +115,11 @@ public class JSModelFormatter
 	 * @param returnTypes
 	 * @param defaultType
 	 */
-	private static void addReturnTypes(StringBuilder buffer, ReturnTypeElement[] returnTypes, String defaultType)
+	private static void addReturnTypes(StringBuilder buffer, List<ReturnTypeElement> returnTypes, String defaultType)
 	{
 		boolean first;
 
-		if (returnTypes != null && returnTypes.length > 0)
+		if (returnTypes != null && returnTypes.isEmpty() == false)
 		{
 			buffer.append(" : "); //$NON-NLS-1$
 

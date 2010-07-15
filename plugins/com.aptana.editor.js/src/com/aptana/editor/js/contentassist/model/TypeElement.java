@@ -1,7 +1,7 @@
 package com.aptana.editor.js.contentassist.model;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import com.aptana.core.util.StringUtil;
@@ -9,8 +9,8 @@ import com.aptana.parsing.io.SourcePrinter;
 
 public class TypeElement extends BaseElement
 {
-	private List<String> _parentTypes = new LinkedList<String>();
-	private List<PropertyElement> _properties = new LinkedList<PropertyElement>();
+	private List<String> _parentTypes;
+	private List<PropertyElement> _properties;
 
 	/**
 	 * TypeElement
@@ -26,9 +26,17 @@ public class TypeElement extends BaseElement
 	 */
 	public void addParentType(String type)
 	{
-		if (this._parentTypes.contains(type) == false)
+		if (type != null && type.length() > 0)
 		{
-			this._parentTypes.add(type);
+			if (this._parentTypes == null)
+			{
+				this._parentTypes = new ArrayList<String>();
+			}
+			
+			if (this._parentTypes.contains(type) == false)
+			{
+				this._parentTypes.add(type);
+			}
 		}
 	}
 
@@ -41,6 +49,11 @@ public class TypeElement extends BaseElement
 	{
 		if (property != null)
 		{
+			if (this._properties == null)
+			{
+				this._properties = new ArrayList<PropertyElement>();
+			}
+			
 			int index = this.getPropertyIndex(property.getName());
 			
 			if (index >= 0)
@@ -65,7 +78,14 @@ public class TypeElement extends BaseElement
 	 */
 	public List<PropertyElement> getProperties()
 	{
-		return this._properties;
+		List<PropertyElement> result = this._properties;
+		
+		if (result == null)
+		{
+			result = Collections.emptyList();
+		}
+		
+		return result;
 	}
 
 	/**
@@ -97,7 +117,7 @@ public class TypeElement extends BaseElement
 	{
 		int result = -1;
 		
-		if (name != null && name.length() > 0)
+		if (name != null && name.length() > 0 && this._properties != null)
 		{
 			for (int i = 0; i < this._properties.size(); i++)
 			{
@@ -121,12 +141,14 @@ public class TypeElement extends BaseElement
 	 */
 	public List<String> getParentTypes()
 	{
-		if (this._parentTypes == null)
+		List<String> result = this._parentTypes;
+		
+		if (result == null)
 		{
-			this._parentTypes = Collections.emptyList();
+			result = Collections.emptyList();
 		}
 
-		return this._parentTypes;
+		return result;
 	}
 	
 	/**
@@ -136,7 +158,14 @@ public class TypeElement extends BaseElement
 	 */
 	public boolean hasParentTypes()
 	{
-		return this._parentTypes.isEmpty() == false;
+		boolean result = false;
+		
+		if (this._parentTypes != null)
+		{
+			result = this._parentTypes.isEmpty() == false;
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -146,7 +175,14 @@ public class TypeElement extends BaseElement
 	 */
 	public boolean hasProperties()
 	{
-		return this._properties.isEmpty() == false;
+		boolean result = false;
+		
+		if (this._properties != null)
+		{
+			result = this._properties.isEmpty() == false;
+		}
+		
+		return result;
 	}
 	
 	/**

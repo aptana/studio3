@@ -359,7 +359,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			String name = property.getName();
 			String description = JSModelFormatter.getDescription(property, this.getProjectURI());
 			Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
-			String[] userAgentNames = property.getUserAgentNames();
+			List<String> userAgentNames = property.getUserAgentNames();
 			Image[] userAgents = getUserAgentImages(userAgentNames);
 			
 			this.addProposal(proposals, name, image, description, userAgents, typeName, offset);
@@ -782,7 +782,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param userAgentNames
 	 * @return
 	 */
-	protected Image[] getUserAgentImages(String[] userAgentNames)
+	protected Image[] getUserAgentImages(List<String> userAgentNames)
 	{
 		return UserAgentManager.getInstance().getUserAgentImages(userAgentNames);
 	}
