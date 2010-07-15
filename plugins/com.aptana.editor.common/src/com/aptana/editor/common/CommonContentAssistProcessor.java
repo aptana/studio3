@@ -1,9 +1,11 @@
 package com.aptana.editor.common;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +40,7 @@ import com.aptana.index.core.SearchPattern;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.filters.ScopeFilter;
@@ -179,7 +182,9 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 
 				for (CommandElement ce : commands)
 				{
-					CommandResult result = ce.execute();
+					CommandContext context = ce.createCommandContext();
+					context.setInputStream(new ByteArrayInputStream(viewer.getDocument().get().getBytes()));
+					CommandResult result = ce.execute(context);
 
 					if (!result.executedSuccessfully())
 					{
@@ -193,6 +198,10 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 					// This assumes that the command is returning an array that is output as a
 					// string I can eval (via inspect)!
 					RubyArray object = (RubyArray) ruby.evalScriptlet(output);
+					RubySymbol insertSymbol = RubySymbol.newSymbol(ruby, INSERT);
+					RubySymbol displaySymbol = RubySymbol.newSymbol(ruby, DISPLAY);
+					RubySymbol imageSymbol = RubySymbol.newSymbol(ruby, IMAGE);
+					RubySymbol tooltipSymbol = RubySymbol.newSymbol(ruby, TOOL_TIP);
 					for (IRubyObject element : object.toJavaArray())
 					{
 						String name;
@@ -205,39 +214,49 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 						if (element instanceof RubyHash)
 						{
 							RubyHash hash = (RubyHash) element;
-							// TODO Move symbol creation to top and re-use them?
-							if (hash.containsKey(RubySymbol.newSymbol(ruby, INSERT)))
+							if (!hash.containsKey(insertSymbol))
 							{
 								continue;
 							}
-							name = hash.get(RubySymbol.newSymbol(ruby, INSERT)).toString();
+							name = hash.get(insertSymbol).toString();
 							length = name.length();
-							if (hash.containsKey(RubySymbol.newSymbol(ruby, DISPLAY)))
+							if (hash.containsKey(displaySymbol))
 							{
-								displayName = hash.get(RubySymbol.newSymbol(ruby, DISPLAY)).toString();
+								displayName = hash.get(displaySymbol).toString();
 							}
 							else
 							{
 								displayName = name;
 							}
-							if (hash.containsKey(RubySymbol.newSymbol(ruby, IMAGE)))
+							if (hash.containsKey(imageSymbol))
 							{
-								String imagePath = hash.get(RubySymbol.newSymbol(ruby, IMAGE)).toString();
+								String imagePath = hash.get(imageSymbol).toString();
 								// Turn into image!
 								ImageRegistry reg = CommonEditorPlugin.getDefault().getImageRegistry();
 								Image fromReg = reg.get(imagePath);
 								if (fromReg == null)
 								{
+									URL imageURL = null;
 									try
 									{
-										ImageDescriptor desc = ImageDescriptor.createFromURL(new File(imagePath)
-												.toURI().toURL());
-										reg.put(imagePath, desc);
-										image = reg.get(imagePath);
+										imageURL = new URL(imagePath);
 									}
 									catch (MalformedURLException e)
 									{
-										CommonEditorPlugin.logError(e);
+										try
+										{
+											imageURL = new File(imagePath).toURI().toURL();
+										}
+										catch (MalformedURLException e1)
+										{
+											CommonEditorPlugin.logError(e1);
+										}
+									}
+									if (imageURL != null)
+									{
+										ImageDescriptor desc = ImageDescriptor.createFromURL(imageURL);
+										reg.put(imagePath, desc);
+										image = reg.get(imagePath);
 									}
 								}
 								else
@@ -245,9 +264,9 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 									image = fromReg;
 								}
 							}
-							if (hash.containsKey(RubySymbol.newSymbol(ruby, TOOL_TIP)))
+							if (hash.containsKey(tooltipSymbol))
 							{
-								description = hash.get(RubySymbol.newSymbol(ruby, TOOL_TIP)).toString();
+								description = hash.get(tooltipSymbol).toString();
 							}
 							// TODO Allow hash to set offset to insert and replace length?
 						}
