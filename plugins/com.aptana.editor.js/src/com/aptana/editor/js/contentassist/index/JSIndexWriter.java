@@ -242,7 +242,7 @@ public class JSIndexWriter
 			{
 				String version = since.getVersion();
 				String value = (version != null && version.length() > 0)
-					? since.getName() + JSIndexConstants.SUB_DELIMITER + since.getVersion()
+					? since.getName() + JSIndexConstants.SUB_DELIMITER + version
 					: since.getName();
 				
 				keyList.add(value);
