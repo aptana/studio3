@@ -234,7 +234,7 @@ public class VSDocReader extends MetadataReader
 		String text = this.getText();
 
 		List<Type> types = new ArrayList<Type>();
-		types.add(new Type(this._currentType != null ? this._currentType : Messages.VSDocReader_9));
+		types.add(new Type(this._currentType != null ? this._currentType : "Object")); //$NON-NLS-1$
 
 		this._tags.add(new ReturnTag(types, text));
 
