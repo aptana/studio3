@@ -304,13 +304,10 @@ public class JSParser extends Parser implements IParser {
 	public synchronized IParseNode parse(IParseState parseState) throws java.lang.Exception
 	{
 		// grab source
-		String source = new String(parseState.getSource());
+		char[] characters = parseState.getSource();
 		
 		// make sure we have some source
-		if (source == null)
-		{
-			source = "";
-		}
+		String source = (characters != null) ? new String(characters) : "";
 		
 		// send source to the scanner
 		fScanner.setSource(source);
