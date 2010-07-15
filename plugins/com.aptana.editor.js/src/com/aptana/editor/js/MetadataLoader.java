@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -99,9 +100,7 @@ public class MetadataLoader extends Job
 	 */
 	private void removeOutdatedIndexes()
 	{
-		IEclipsePreferences prefs = (new InstanceScope()).getNode(Activator.PLUGIN_ID);
-		
-		double expectedVersion = prefs.getDouble(IPreferenceConstants.JS_INDEX_VERSION, 0.0);
+		double expectedVersion = Platform.getPreferencesService().getDouble(Activator.PLUGIN_ID, IPreferenceConstants.JS_INDEX_VERSION, 0.0, null);
 
 		if (expectedVersion != JSIndexConstants.INDEX_VERSION)
 		{
@@ -133,6 +132,8 @@ public class MetadataLoader extends Job
 				new IndexProjectJob(project).schedule();
 			}
 
+			IEclipsePreferences prefs = (new InstanceScope()).getNode(Activator.PLUGIN_ID);
+			
 			prefs.putDouble(IPreferenceConstants.JS_INDEX_VERSION, JSIndexConstants.INDEX_VERSION);
 			
 			try
