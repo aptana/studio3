@@ -393,9 +393,6 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 			for (String name : path.segments()) {
 				if (res instanceof IContainer) {
 					IContainer container = (IContainer) res;
-					if (!container.isSynchronized(IResource.DEPTH_ONE)) {
-						container.refreshLocal(IResource.DEPTH_ONE, new NullProgressMonitor());
-					}
 					res = container.findMember(name);
 				} else {
 					res = null;
