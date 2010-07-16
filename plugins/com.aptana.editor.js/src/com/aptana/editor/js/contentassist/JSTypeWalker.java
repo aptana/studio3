@@ -845,43 +845,56 @@ public class JSTypeWalker extends JSTreeWalker
 
 		if (type == null)
 		{
-			// We temporarily store the default function type to prevent
-			// infinite recursion in potential invoke cycles
-			this.putNodeType(node, JSTypeConstants.FUNCTION);
-
-			List<String> types = new ArrayList<String>();
-			Scope<JSNode> scope = this.getActiveScope(node.getBody().getStartingOffset());
-			boolean foundReturnExpression = false;
-
-			// infer return types
-			for (JSReturnNode returnValue : this.getReturnNodes(node))
+			DocumentationBlock block = node.getDocumentation();
+			
+			if (block != null)
 			{
-				IParseNode expression = returnValue.getExpression();
-
-				if (expression.isEmpty() == false)
-				{
-					foundReturnExpression = true;
-
-					types.addAll(this.getTypes(expression, scope));
-				}
-			}
-
-			// build function type, including return values
-			if (types.isEmpty() == false)
-			{
-				type = JSTypeConstants.FUNCTION + ":" + StringUtil.join(",", types); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			else if (foundReturnExpression)
-			{
-				// If we couldn't infer a return type and we had a return
-				// expression, then at least return Object from this function
-				type = JSTypeConstants.FUNCTION + ":" + JSTypeConstants.OBJECT; //$NON-NLS-1$
+				FunctionElement function = new FunctionElement();
+				
+				applyDocumentation(function, block);
+				
+				type = function.getSignature();
 			}
 			else
 			{
-				type = JSTypeConstants.FUNCTION;
+				// We temporarily store the default function type to prevent
+				// infinite recursion in potential invoke cycles
+				this.putNodeType(node, JSTypeConstants.FUNCTION);
+	
+				List<String> types = new ArrayList<String>();
+				Scope<JSNode> scope = this.getActiveScope(node.getBody().getStartingOffset());
+				boolean foundReturnExpression = false;
+	
+				// infer return types
+				for (JSReturnNode returnValue : this.getReturnNodes(node))
+				{
+					IParseNode expression = returnValue.getExpression();
+	
+					if (expression.isEmpty() == false)
+					{
+						foundReturnExpression = true;
+	
+						types.addAll(this.getTypes(expression, scope));
+					}
+				}
+	
+				// build function type, including return values
+				if (types.isEmpty() == false)
+				{
+					type = JSTypeConstants.FUNCTION + ":" + StringUtil.join(",", types); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+				else if (foundReturnExpression)
+				{
+					// If we couldn't infer a return type and we had a return
+					// expression, then at least return Object from this function
+					type = JSTypeConstants.FUNCTION + ":" + JSTypeConstants.OBJECT; //$NON-NLS-1$
+				}
+				else
+				{
+					type = JSTypeConstants.FUNCTION;
+				}
 			}
-
+			
 			this.putNodeType(node, type);
 		}
 
