@@ -111,7 +111,7 @@ public class JSIndexWriter
 		String value = StringUtil.join(
 			JSIndexConstants.DELIMITER,
 			function.getName(),
-			function.getOwningType().getName(),
+			function.getOwningType(),
 			descriptionKey,
 			parametersKey,
 			returnTypesKey,
@@ -170,7 +170,7 @@ public class JSIndexWriter
 		String value = StringUtil.join(
 			JSIndexConstants.DELIMITER,
 			property.getName(),
-			property.getOwningType().getName(),
+			property.getOwningType(),
 			descriptionKey,
 			propertyTypesKey,
 			examplesKey,
