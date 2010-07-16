@@ -101,8 +101,15 @@ abstract class IndexRequestJob extends Job
 
 			if (!toDo.isEmpty())
 			{
+				// Determine work remaining
+				int sum = 0;
+				for (Map.Entry<IFileStoreIndexingParticipant, Set<IFileStore>> entry : toDo.entrySet())
+				{
+					sum += entry.getValue().size();
+				}
+				sub.setWorkRemaining(sum);
+				
 				// Now do the indexing...
-				int increment = (fileStores.size() * 8) / toDo.size();
 				for (Map.Entry<IFileStoreIndexingParticipant, Set<IFileStore>> entry : toDo.entrySet())
 				{
 					if (sub.isCanceled())
@@ -111,7 +118,7 @@ abstract class IndexRequestJob extends Job
 					}
 					try
 					{
-						entry.getKey().index(entry.getValue(), index, sub.newChild(increment));
+						entry.getKey().index(entry.getValue(), index, sub.newChild(entry.getValue().size()));
 					}
 					catch (CoreException e)
 					{

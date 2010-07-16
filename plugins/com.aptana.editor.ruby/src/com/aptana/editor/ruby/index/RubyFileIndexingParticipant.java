@@ -25,50 +25,53 @@ public class RubyFileIndexingParticipant implements IFileStoreIndexingParticipan
 	@Override
 	public void index(Set<IFileStore> files, final Index index, IProgressMonitor monitor) throws CoreException
 	{
-		SubMonitor sub = SubMonitor.convert(monitor, files.size());
+		SubMonitor sub = SubMonitor.convert(monitor, files.size() * 100);
+		for (final IFileStore store : files)
+		{
+			if (sub.isCanceled())
+			{
+				throw new CoreException(Status.CANCEL_STATUS);
+			}
+			indexFileStore(index, store, sub.newChild(100));
+		}
+	}
+
+	private void indexFileStore(final Index index, IFileStore store, IProgressMonitor monitor)
+	{
+		SubMonitor sub = SubMonitor.convert(monitor, 100);
+		if (store == null)
+		{
+			return;
+		}
 		try
 		{
-			RubySourceParser sourceParser = new RubySourceParser();
-			for (final IFileStore store : files)
+			sub.subTask(store.toString());
+
+			// grab the source of the file we're going to parse
+			String source = IOUtil.read(store.openInputStream(EFS.NONE, sub.newChild(20)));
+
+			// minor optimization when creating a new empty file
+			if (source == null || source.length() <= 0)
 			{
-				if (sub.isCanceled())
-				{
-					throw new CoreException(Status.CANCEL_STATUS);
-				}
-				try
-				{
-					if (store == null)
-					{
-						continue;
-					}
-					sub.subTask(store.toString());
-
-					// grab the source of the file we're going to parse
-					String source = IOUtil.read(store.openInputStream(EFS.NONE, monitor));
-
-					// minor optimization when creating a new empty file
-					if (source != null && source.length() > 0)
-					{
-						ParserResult result = sourceParser.parse(store.getName(), source);
-						Node root = result.getAST();
-						ISourceElementRequestor builder = new RubySourceIndexer(index, store.toURI());
-						SourceElementVisitor visitor = new SourceElementVisitor(builder);
-						visitor.acceptNode(root);
-					}
-				}
-				catch (Throwable e)
-				{
-					Activator.log(e);
-				}
-				finally
-				{
-					sub.worked(1);
-				}
+				return;
 			}
+			
+			RubySourceParser sourceParser = new RubySourceParser();
+			ParserResult result = sourceParser.parse(store.getName(), source);
+			sub.worked(50);
+			Node root = result.getAST();
+			ISourceElementRequestor builder = new RubySourceIndexer(index, store.toURI());
+			SourceElementVisitor visitor = new SourceElementVisitor(builder);
+			visitor.acceptNode(root);
+		}
+		catch (Throwable e)
+		{
+			Activator.log(e);
 		}
 		finally
 		{
 			sub.done();
 		}
 	}
+
 }
