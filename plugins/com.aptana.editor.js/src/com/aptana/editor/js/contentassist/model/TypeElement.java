@@ -204,6 +204,7 @@ public class TypeElement extends BaseElement
 		for (PropertyElement property : this.getProperties())
 		{
 			property.toSource(printer);
+			printer.println(";");
 		}
 		
 		printer.decreaseIndent().println("}");
