@@ -1,5 +1,6 @@
 package com.aptana.editor.js.contentassist;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -36,7 +37,6 @@ import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
-import com.aptana.index.core.Index;
 import com.aptana.parsing.Scope;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
@@ -52,6 +52,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		ContentSelector.NAME,				//
 		ContentSelector.DESCRIPTION,		//
 		ContentSelector.EXAMPLES,			//
+		ContentSelector.PARAMETERS,			//
 		ContentSelector.RETURN_TYPES,		//
 		ContentSelector.SINCE,				//
 		ContentSelector.TYPES,				//
@@ -62,6 +63,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		ContentSelector.DESCRIPTION,		//
 		ContentSelector.DOCUMENTS,			//
 		ContentSelector.EXAMPLES,			//
+		ContentSelector.PARAMETERS,			//
 		ContentSelector.RETURN_TYPES,		//
 		ContentSelector.TYPES				//
 	);
@@ -71,6 +73,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		ContentSelector.DOCUMENTS,			//
 		ContentSelector.EXAMPLES,			//
 		ContentSelector.INCLUDE_ANCESTORS,	//
+		ContentSelector.PARAMETERS,			//
 		ContentSelector.PARENT_TYPES,		//
 		ContentSelector.RETURN_TYPES,		//
 		ContentSelector.SINCE,				//
@@ -107,19 +110,21 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private void addCoreGlobals(Set<ICompletionProposal> proposals, int offset)
 	{
 		List<PropertyElement> globals = this._indexHelper.getCoreGlobals(CORE_GLOBAL_SELECTOR);
-
-		for (PropertyElement property : globals)
+		
+		if (globals != null)
 		{
-			// slightly change behavior if this is a function
-			boolean isFunction = (property instanceof FunctionElement);
-
-			// grab the interesting parts
-			String name = property.getName();
-			String description = JSModelFormatter.getDescription(property, this.getProjectURI());
-			Image image = isFunction ? JS_FUNCTION : JS_PROPERTY;
-			Image[] userAgents = this.getUserAgentImages(property.getUserAgentNames());
-			
-			this.addProposal(proposals, name, image, description, userAgents, offset);
+			URI projectURI = this.getProjectURI();
+			String location = JSIndexConstants.CORE;
+	
+			for (PropertyElement property : globals)
+			{
+				String name = property.getName();
+				String description = JSModelFormatter.getDescription(property, projectURI);
+				Image image = (property instanceof FunctionElement) ? JS_FUNCTION : JS_PROPERTY;
+				Image[] userAgents = this.getUserAgentImages(property.getUserAgentNames());
+				
+				this.addProposal(proposals, name, image, description, userAgents, location, offset);
+			}
 		}
 	}
 
@@ -131,19 +136,18 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private void addProjectGlobals(Set<ICompletionProposal> proposals, int offset)
 	{
-		Index index = this.getIndex();
-		List<PropertyElement> projectGlobals = this._indexHelper.getProjectGlobals(index, PROJECT_GLOBAL_SELECTOR);
+		List<PropertyElement> projectGlobals = this._indexHelper.getProjectGlobals(this.getIndex(), PROJECT_GLOBAL_SELECTOR);
 		
 		if (projectGlobals != null)
 		{
 			Image[] userAgents = this.getAllUserAgentIcons();
+			URI projectURI = this.getProjectURI();
 			
 			for (PropertyElement property : projectGlobals)
 			{
-				boolean isFunction = (property instanceof FunctionElement);
 				String name = property.getName();
-				String description = JSModelFormatter.getDescription(property, this.getProjectURI());
-				Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
+				String description = JSModelFormatter.getDescription(property, projectURI);
+				Image image = (property instanceof FunctionElement) ? JS_FUNCTION : JS_PROPERTY;
 				List<String> documents = property.getDocuments();
 				String location = (documents != null && documents.size() > 0) ? JSModelFormatter.getDocumentDisplayName(documents.get(0)) : null;
 				
@@ -239,20 +243,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				}
 			}
 		}
-	}
-	
-	/**
-	 * addProposal
-	 * 
-	 * @param proposals
-	 * @param name
-	 * @param icon
-	 * @param userAgents
-	 * @param offset
-	 */
-	private void addProposal(Set<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, int offset)
-	{
-		this.addProposal(proposals, name, image, description, userAgents, JSIndexConstants.CORE, offset);
 	}
 	
 	/**
@@ -363,7 +353,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			List<String> userAgentNames = property.getUserAgentNames();
 			Image[] userAgents = getUserAgentImages(userAgentNames);
 			
-			this.addProposal(proposals, name, image, description, userAgents, typeName, offset);
+			this.addProposal(proposals, name, image, description, userAgents, property.getOwningType(), offset);
 		}
 	}
 	
