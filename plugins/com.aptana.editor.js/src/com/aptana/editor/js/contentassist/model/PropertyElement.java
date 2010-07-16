@@ -9,7 +9,7 @@ import com.aptana.parsing.io.SourcePrinter;
 
 public class PropertyElement extends BaseElement
 {
-	private TypeElement _owningType;
+	private String _owningType;
 	private boolean _isInstanceProperty;
 	private boolean _isClassProperty;
 	private boolean _isInternal;
@@ -81,7 +81,7 @@ public class PropertyElement extends BaseElement
 	 * 
 	 * @return
 	 */
-	public TypeElement getOwningType()
+	public String getOwningType()
 	{
 		return this._owningType;
 	}
@@ -194,7 +194,7 @@ public class PropertyElement extends BaseElement
 	 * 
 	 * @param type
 	 */
-	void setOwningType(TypeElement type)
+	public void setOwningType(String type)
 	{
 		this._owningType = type;
 	}
@@ -233,7 +233,16 @@ public class PropertyElement extends BaseElement
 		
 		printer.print(this.getName());
 		printer.print(" : ");
-		printer.print(StringUtil.join(",", this.getTypeNames()));
-		printer.println(";");
+		
+		List<String> types = this.getTypeNames();
+		
+		if (types != null && types.size() > 0)
+		{
+			printer.print(StringUtil.join(",", this.getTypeNames()));
+		}
+		else
+		{
+			printer.print("undefined");
+		}
 	}
 }

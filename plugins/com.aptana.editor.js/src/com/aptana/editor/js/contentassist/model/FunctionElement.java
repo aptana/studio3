@@ -292,20 +292,22 @@ public class FunctionElement extends PropertyElement
 		}
 
 		printer.print(this.getName());
+		printer.print("(").print(StringUtil.join(", ", this.getParameterTypes())).print(")");
 
-		if (this.hasParameters())
-		{
-			printer.print("(").print(StringUtil.join(", ", this.getParameterTypes())).print(")");
-		}
-
+		List<String> returnTypes = this.getTypeNames();
 		printer.print(" : ");
-		printer.print(StringUtil.join(",", this.getTypeNames()));
+		if (returnTypes != null && returnTypes.isEmpty() == false)
+		{
+			printer.print(StringUtil.join(",", this.getTypeNames()));
+		}
+		else
+		{
+			printer.print("void");
+		}
 		
 		if (this.hasExceptions())
 		{
 			printer.print(" throws ").print(StringUtil.join(", ", this.getExceptionTypes()));
 		}
-		
-		printer.println(";");
 	}
 }

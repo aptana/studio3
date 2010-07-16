@@ -303,6 +303,8 @@ public class JSIndexReader
 			if (functions != null && functions.size() > 0)
 			{
 				result = this.createFunction(index, functions.get(0), fields);
+				
+				result.setOwningType(owningType);
 			}
 		}
 		
@@ -332,6 +334,8 @@ public class JSIndexReader
 				for (QueryResult function : functions)
 				{
 					FunctionElement f = this.createFunction(index, function, fields);
+					
+					f.setOwningType(owningType);
 					
 					result.add(f);
 				}
@@ -432,6 +436,8 @@ public class JSIndexReader
 				{
 					PropertyElement p = this.createProperty(index, property, fields);
 					
+					p.setOwningType(owningType);
+					
 					result.add(p);
 				}
 			}
@@ -461,6 +467,8 @@ public class JSIndexReader
 			if (properties != null && properties.size() > 0)
 			{
 				result = this.createProperty(index, properties.get(0), fields);
+				
+				result.setOwningType(owningType);
 			}
 		}
 		

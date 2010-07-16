@@ -67,7 +67,7 @@ public class TypeElement extends BaseElement
 				this._properties.add(property);
 			}
 			
-			property.setOwningType(this);
+			property.setOwningType(this.getName());
 		}
 	}
 
