@@ -95,12 +95,6 @@ public class RubySourceViewerConfiguration extends CommonSourceViewerConfigurati
 		return assistant;
 	}
 
-	@Override
-	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
-	{
-		return new RubyContentAssistProcessor(getAbstractThemeableEditor());
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see
