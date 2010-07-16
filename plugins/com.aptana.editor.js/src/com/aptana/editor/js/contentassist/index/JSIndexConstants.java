@@ -3,7 +3,7 @@ package com.aptana.editor.js.contentassist.index;
 public interface JSIndexConstants
 {
 	// the content format version of the JS index files
-	public static final double INDEX_VERSION = 0.1;
+	public static final double INDEX_VERSION = 0.11;
 	
 	// general constants
 	static final String PREFIX = "js."; //$NON-NLS-1$

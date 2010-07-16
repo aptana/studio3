@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
@@ -23,12 +24,6 @@ public class JSIndexWriter
 	private static Map<UserAgentElement,String> keysByUserAgent = new HashMap<UserAgentElement,String>();
 	static Map<String,UserAgentElement> userAgentsByKey = new HashMap<String,UserAgentElement>();
 	
-	private static int descriptionCount;
-	private static int parameterCount;
-	private static int returnTypeCount;
-	private static int sinceListCount;
-	private static int exampleCount;
-
 	/**
 	 * JSMetadataIndexer
 	 */
@@ -57,7 +52,7 @@ public class JSIndexWriter
 		
 		if (description != null && description.length() > 0)
 		{
-			indexString = Integer.toString(descriptionCount++);
+			indexString = UUID.randomUUID().toString();
 			
 			String value = indexString + JSIndexConstants.DELIMITER + description;
 			
@@ -84,7 +79,7 @@ public class JSIndexWriter
 		
 		if (examples != null && examples.isEmpty() == false)
 		{
-			indexString = Integer.toString(exampleCount++);
+			indexString = UUID.randomUUID().toString();
 			
 			String value = indexString + JSIndexConstants.DELIMITER + StringUtil.join(JSIndexConstants.DELIMITER, examples);
 			
@@ -138,7 +133,7 @@ public class JSIndexWriter
 	protected String writeParameters(Index index, List<ParameterElement> parameters, URI location)
 	{
 		List<String> keyList = new ArrayList<String>();
-		String indexString = Integer.toString(parameterCount++);
+		String indexString = UUID.randomUUID().toString();
 		
 		keyList.add(indexString);
 		
@@ -196,7 +191,7 @@ public class JSIndexWriter
 	protected String writeReturnTypes(Index index, List<ReturnTypeElement> returnTypes, URI location)
 	{
 		List<String> keyList = new ArrayList<String>();
-		String indexString = Integer.toString(returnTypeCount++);
+		String indexString = UUID.randomUUID().toString();
 		
 		keyList.add(indexString);
 		
@@ -230,7 +225,7 @@ public class JSIndexWriter
 		if (sinceList != null && sinceList.isEmpty() == false)
 		{
 			// generate new key
-			indexString = Integer.toString(sinceListCount++);
+			indexString = UUID.randomUUID().toString();
 			
 			// create temporary list and add key
 			List<String> keyList = new ArrayList<String>();
