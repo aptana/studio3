@@ -8,16 +8,11 @@ import java.util.List;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
-import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
-import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.SinceElement;
 
 public class JSModelFormatter
 {
-	private static final String GENERIC_CLASS_CLOSE = ">"; //$NON-NLS-1$
-	private static final String GENERIC_CLASS_OPEN = "Class<"; //$NON-NLS-1$
-
 	/**
 	 * addDefiningFiles
 	 * 
@@ -107,45 +102,6 @@ public class JSModelFormatter
 			buffer.append(StringUtil.join("<br><br>", examples)); //$NON-NLS-1$
 		}
 	}
-	
-	/**
-	 * addReturnTypes
-	 * 
-	 * @param buffer
-	 * @param returnTypes
-	 * @param defaultType
-	 */
-	private static void addReturnTypes(StringBuilder buffer, List<ReturnTypeElement> returnTypes, String defaultType)
-	{
-		boolean first;
-
-		if (returnTypes != null && returnTypes.isEmpty() == false)
-		{
-			buffer.append(" : "); //$NON-NLS-1$
-
-			first = true;
-
-			for (ReturnTypeElement returnType : returnTypes)
-			{
-				if (first == false)
-				{
-					buffer.append("|"); //$NON-NLS-1$
-				}
-				else
-				{
-					first = false;
-				}
-
-				String type = getTypeDisplayName(returnType.getType());
-
-				buffer.append(type);
-			}
-		}
-		else
-		{
-			buffer.append(" : ").append(defaultType); //$NON-NLS-1$
-		}
-	}
 
 	/**
 	 * addSpecifications
@@ -214,51 +170,9 @@ public class JSModelFormatter
 	public static String getDescription(FunctionElement function, URI projectURI)
 	{
 		StringBuilder buffer = new StringBuilder();
+		
+		buffer.append(function.toSource());
 
-		// title
-		buffer.append("<b>").append(function.getName()).append("</b>").append("("); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
-		// append parameters
-		boolean first = true;
-
-		for (ParameterElement parameter : function.getParameters())
-		{
-			if (first == false)
-			{
-				buffer.append(", "); //$NON-NLS-1$
-			}
-			else
-			{
-				first = false;
-			}
-
-			String usage = parameter.getUsage();
-			boolean isOptional = ("zero-or-more".equals(usage) || "optional".equals(usage)); //$NON-NLS-1$ //$NON-NLS-2$
-			boolean isRepeating = ("zero-or-more".equals(usage) || "one-or-more".equals(usage)); //$NON-NLS-1$ //$NON-NLS-2$
-
-			if (isOptional)
-			{
-				buffer.append("["); //$NON-NLS-1$
-			}
-
-			buffer.append("<b>").append(parameter.getName()).append("</b>"); //$NON-NLS-1$ //$NON-NLS-2$
-
-			if (isRepeating)
-			{
-				buffer.append("+"); //$NON-NLS-1$
-			}
-
-			buffer.append(" : ").append(StringUtil.join("|", parameter.getTypes())); //$NON-NLS-1$ //$NON-NLS-2$
-
-			if (isOptional)
-			{
-				buffer.append("]"); //$NON-NLS-1$
-			}
-		}
-
-		buffer.append(")"); //$NON-NLS-1$
-
-		addReturnTypes(buffer, function.getReturnTypes(), "void"); //$NON-NLS-1$
 		addDescription(buffer, function);
 		addExamples(buffer, function.getExamples());
 		addDefiningFiles(buffer, function, projectURI);
@@ -283,10 +197,8 @@ public class JSModelFormatter
 
 		StringBuilder buffer = new StringBuilder();
 
-		// title
-		buffer.append("<b>").append(property.getName()).append("</b>"); //$NON-NLS-1$ //$NON-NLS-2$
+		buffer.append(property.toSource()); //$NON-NLS-1$ //$NON-NLS-2$
 
-		addReturnTypes(buffer, property.getTypes(), "undefined"); //$NON-NLS-1$
 		addDescription(buffer, property);
 		addExamples(buffer, property.getExamples());
 		addDefiningFiles(buffer, property, projectURI);
@@ -334,9 +246,9 @@ public class JSModelFormatter
 
 		if (type != null)
 		{
-			if (type.startsWith(GENERIC_CLASS_OPEN) && type.endsWith(GENERIC_CLASS_CLOSE))
+			if (type.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN) && type.endsWith(JSTypeConstants.GENERIC_CLASS_CLOSE))
 			{
-				result = type.substring(GENERIC_CLASS_OPEN.length(), type.length() - 1);
+				result = type.substring(JSTypeConstants.GENERIC_CLASS_OPEN.length(), type.length() - 1);
 			}
 			else if (type.startsWith(JSTypeWalker.DYNAMIC_CLASS_PREFIX))
 			{

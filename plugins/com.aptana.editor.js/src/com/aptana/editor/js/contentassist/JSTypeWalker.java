@@ -66,127 +66,12 @@ public class JSTypeWalker extends JSTreeWalker
 	public static final String DYNAMIC_CLASS_PREFIX = "-dynamic-type-";
 	
 	private static Map<JSNode, String> NODE_TYPE_CACHE;
-
-	private static final String ARRAY_LITERAL = "[]"; //$NON-NLS-1$
-	private static final String GENERIC_ARRAY_CLOSE = ">"; //$NON-NLS-1$
-	private static final String GENERIC_ARRAY_OPEN = "Array<"; //$NON-NLS-1$
-
-	/**
-	 * clearTypeCache
-	 */
-	public static void clearTypeCache()
-	{
-		if (NODE_TYPE_CACHE != null)
-		{
-			NODE_TYPE_CACHE.clear();
-		}
-	}
-
+	
 	private Scope<JSNode> _scope;
 	private Index _index;
 	private List<String> _types;
 	private JSIndexQueryHelper _indexHelper;
-
 	private List<TypeElement> _generatedTypes;
-
-	/**
-	 * JSTypeWalker
-	 */
-	public JSTypeWalker(Scope<JSNode> scope)
-	{
-		this(scope, null);
-	}
-
-	/**
-	 * JSTypeWalker
-	 * 
-	 * @param scope
-	 * @param projectIndex
-	 */
-	public JSTypeWalker(Scope<JSNode> scope, Index projectIndex)
-	{
-		this(scope, projectIndex, new ArrayList<TypeElement>());
-	}
-	
-	/**
-	 * JSTypeWalker
-	 * 
-	 * @param scope
-	 * @param projectIndex
-	 * @param generatedTypes
-	 */
-	protected JSTypeWalker(Scope<JSNode> scope, Index projectIndex, List<TypeElement> generatedTypes)
-	{
-		this._scope = scope;
-		this._index = projectIndex;
-		this._indexHelper = new JSIndexQueryHelper();
-		this._generatedTypes = generatedTypes;
-	}
-
-	/**
-	 * addGeneratedType
-	 * 
-	 * @param type
-	 */
-	protected void addGeneratedType(TypeElement type)
-	{
-		this._generatedTypes.add(type);
-	}
-
-	/**
-	 * addType
-	 * 
-	 * @param type
-	 */
-	protected void addType(String type)
-	{
-		if (type != null && type.length() > 0)
-		{
-			if (this._types == null)
-			{
-				this._types = new ArrayList<String>();
-			}
-
-			if (this._types.contains(type) == false)
-			{
-				this._types.add(type);
-			}
-		}
-	}
-	
-	/**
-	 * addTypes
-	 * 
-	 * @param types
-	 */
-	protected void addTypes(List<String> types)
-	{
-		if (types != null)
-		{
-			for (String type : types)
-			{
-				this.addType(type);
-			}
-		}
-	}
-
-	/**
-	 * addUserAgents
-	 * 
-	 * @param element
-	 */
-	protected void addUserAgents(BaseElement element)
-	{
-		// make valid in all user agents
-		for (UserAgent userAgent : UserAgentManager.getInstance().getAllUserAgents())
-		{
-			UserAgentElement ua = new UserAgentElement();
-			
-			ua.setPlatform(userAgent.ID);
-			
-			element.addUserAgent(ua);
-		}
-	}
 
 	/**
 	 * applyDocumentation
@@ -244,7 +129,7 @@ public class JSTypeWalker extends JSTreeWalker
 			}
 		}
 	}
-	
+
 	/**
 	 * applyDocumentation
 	 * 
@@ -292,6 +177,265 @@ public class JSTypeWalker extends JSTreeWalker
 	}
 	
 	/**
+	 * clearTypeCache
+	 */
+	public static void clearTypeCache()
+	{
+		if (NODE_TYPE_CACHE != null)
+		{
+			NODE_TYPE_CACHE.clear();
+		}
+	}
+	
+	/**
+	 * getScopeProperties
+	 * 
+	 * @param scope
+	 * @param index
+	 * @param location
+	 * @return
+	 */
+	public static List<PropertyElement> getScopeProperties(Scope<JSNode> scope, Index index, URI location)
+	{
+		clearTypeCache();
+		
+		List<PropertyElement> properties = new ArrayList<PropertyElement>();
+		
+		for (String symbol : scope.getLocalSymbolNames())
+		{
+			List<JSNode> nodes = scope.getSymbol(symbol);
+
+			if (nodes != null && nodes.isEmpty() == false)
+			{
+				// TODO: We may want to process all nodes and potentially
+				// create a new type that is the union of all types. For
+				// now last definition wins.
+				JSNode node = nodes.get(nodes.size() - 1);
+				DocumentationBlock block = node.getDocumentation();
+				PropertyElement property = (node instanceof JSFunctionNode) ? new FunctionElement() : new PropertyElement();
+				
+				property.setName(symbol);
+				
+				if (block != null)
+				{
+					applyDocumentation(property, block);
+				}
+				else
+				{
+					JSTypeWalker walker = new JSTypeWalker(scope, index);
+					
+					node.accept(walker);
+					
+					List<TypeElement> generatedTypes = walker.getGeneratedTypes();
+					
+					if (generatedTypes.isEmpty() == false)
+					{
+						JSIndexWriter writer = new JSIndexWriter();
+						
+						// write out any generated types
+						for (TypeElement type : walker.getGeneratedTypes())
+						{
+							writer.writeType(index, type, location);
+						}
+					}
+					
+					// add property types
+					for (String propertyType : walker.getTypes())
+					{
+						ReturnTypeElement returnType = new ReturnTypeElement();
+						
+						returnType.setType(propertyType);
+						
+						property.addType(returnType);
+					}
+				}
+				
+				properties.add(property);
+			}
+		}
+		
+		return properties;
+	}
+
+	/**
+	 * JSTypeWalker
+	 */
+	public JSTypeWalker(Scope<JSNode> scope)
+	{
+		this(scope, null);
+	}
+
+	/**
+	 * JSTypeWalker
+	 * 
+	 * @param scope
+	 * @param projectIndex
+	 */
+	public JSTypeWalker(Scope<JSNode> scope, Index projectIndex)
+	{
+		this(scope, projectIndex, new ArrayList<TypeElement>());
+	}
+	
+	/**
+	 * JSTypeWalker
+	 * 
+	 * @param scope
+	 * @param projectIndex
+	 * @param generatedTypes
+	 */
+	protected JSTypeWalker(Scope<JSNode> scope, Index projectIndex, List<TypeElement> generatedTypes)
+	{
+		this._scope = scope;
+		this._index = projectIndex;
+		this._indexHelper = new JSIndexQueryHelper();
+		this._generatedTypes = generatedTypes;
+	}
+
+	/**
+	 * addGeneratedType
+	 * 
+	 * @param type
+	 */
+	protected void addGeneratedType(TypeElement type)
+	{
+		this._generatedTypes.add(type);
+	}
+
+	/**
+	 * addIdentifierTypes
+	 * 
+	 * @param name
+	 * @param identifierNode
+	 */
+	private void addIdentifierTypes(String name, JSIdentifierNode identifierNode)
+	{
+		IParseNode parent = identifierNode.getParent();
+		
+		if (parent.getNodeType() == JSNodeTypes.PARAMETERS)
+		{
+			IParseNode grandparent = parent.getParent();
+			int typeCount = this.getTypes().size();
+			
+			if (grandparent.getNodeType() == JSNodeTypes.FUNCTION)
+			{
+				DocumentationBlock docs = ((JSNode) grandparent).getDocumentation();
+				
+				if (docs != null)
+				{
+					int index = identifierNode.getIndex();
+					List<Tag> params = docs.getTags(TagType.PARAM);
+					
+					if (params != null && index < params.size())
+					{
+						ParamTag param = (ParamTag) params.get(index);
+						
+						if (name.equals(param.getName()))
+						{
+							for (Type parameterType : param.getTypes())
+							{
+								this.addType(parameterType.getName());
+							}
+						}
+					}
+				}
+			}
+			
+			// Use "Object" as parameter type if we didn't find types by other
+			// means
+			if (this.getTypes().size() == typeCount)
+			{
+				this.addType(JSTypeConstants.OBJECT);
+			}
+		}
+		else if (identifierNode.getText().equals(name) == false)	// prevent recursion
+		{
+			identifierNode.accept(this);
+		}
+	}
+	
+	/**
+	 * addNonIdentifierTypes
+	 * 
+	 * @param symbolNode
+	 */
+	private void addNonIdentifierTypes(JSNode symbolNode)
+	{
+		DocumentationBlock docs = symbolNode.getDocumentation();
+		
+		if (symbolNode.getNodeType() != JSNodeTypes.FUNCTION && docs != null)
+		{
+			for (Tag tag : docs.getTags(TagType.TYPE))
+			{
+				TypeTag typeTag = (TypeTag) tag;
+				
+				for (Type t : typeTag.getTypes())
+				{
+					this.addType(t.toSource());
+				}
+			}
+		}
+		else
+		{
+			symbolNode.accept(this);
+		}
+	}
+	
+	/**
+	 * addType
+	 * 
+	 * @param type
+	 */
+	protected void addType(String type)
+	{
+		if (type != null && type.length() > 0)
+		{
+			if (this._types == null)
+			{
+				this._types = new ArrayList<String>();
+			}
+
+			if (this._types.contains(type) == false)
+			{
+				this._types.add(type);
+			}
+		}
+	}
+
+	/**
+	 * addTypes
+	 * 
+	 * @param types
+	 */
+	protected void addTypes(List<String> types)
+	{
+		if (types != null)
+		{
+			for (String type : types)
+			{
+				this.addType(type);
+			}
+		}
+	}
+	
+	/**
+	 * addUserAgents
+	 * 
+	 * @param element
+	 */
+	protected void addUserAgents(BaseElement element)
+	{
+		// make valid in all user agents
+		for (UserAgent userAgent : UserAgentManager.getInstance().getAllUserAgents())
+		{
+			UserAgentElement ua = new UserAgentElement();
+			
+			ua.setPlatform(userAgent.ID);
+			
+			element.addUserAgent(ua);
+		}
+	}
+
+	/**
 	 * getActiveScope
 	 * 
 	 * @param offset
@@ -337,13 +481,13 @@ public class JSTypeWalker extends JSTreeWalker
 
 		if (type != null && type.length() > 0)
 		{
-			if (type.endsWith(ARRAY_LITERAL))
+			if (type.endsWith(JSTypeConstants.ARRAY_LITERAL))
 			{
 				result = type.substring(0, type.length() - 2);
 			}
-			else if (type.startsWith(GENERIC_ARRAY_OPEN) && type.endsWith(GENERIC_ARRAY_CLOSE))
+			else if (type.startsWith(JSTypeConstants.GENERIC_ARRAY_OPEN) && type.endsWith(JSTypeConstants.GENERIC_ARRAY_CLOSE))
 			{
-				result = type.substring(GENERIC_ARRAY_OPEN.length(), type.length() - 1);
+				result = type.substring(JSTypeConstants.GENERIC_ARRAY_OPEN.length(), type.length() - 1);
 			}
 			else if (type.equals(JSTypeConstants.ARRAY))
 			{
@@ -353,7 +497,7 @@ public class JSTypeWalker extends JSTreeWalker
 
 		return result;
 	}
-	
+
 	/**
 	 * getGeneratedType
 	 * 
@@ -445,22 +589,16 @@ public class JSTypeWalker extends JSTreeWalker
 	 */
 	public List<String> getTypes()
 	{
-		List<String> result;
+		List<String> result = this._types;
 
-		if (this._types != null)
+		if (result == null)
 		{
-			result = this._types;
-		}
-		else
-		{
-			// be sure we return some type of list so we don't have to check for
-			// null return values
 			result = Collections.emptyList();
 		}
 
 		return result;
 	}
-
+	
 	/**
 	 * getTypes
 	 * 
@@ -500,7 +638,7 @@ public class JSTypeWalker extends JSTreeWalker
 
 		return result;
 	}
-
+	
 	/**
 	 * @return
 	 */
@@ -510,7 +648,7 @@ public class JSTypeWalker extends JSTreeWalker
 		
 		return MessageFormat.format("{0}{1}", DYNAMIC_CLASS_PREFIX, uuid); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * hasGeneratedType
 	 * 
@@ -537,76 +675,6 @@ public class JSTypeWalker extends JSTreeWalker
 		return result;
 	}
 
-	/**
-	 * getScopeProperties
-	 * 
-	 * @param scope
-	 * @param index
-	 * @param location
-	 * @return
-	 */
-	public static List<PropertyElement> getScopeProperties(Scope<JSNode> scope, Index index, URI location)
-	{
-		clearTypeCache();
-		
-		List<PropertyElement> properties = new ArrayList<PropertyElement>();
-		
-		for (String symbol : scope.getLocalSymbolNames())
-		{
-			List<JSNode> nodes = scope.getSymbol(symbol);
-
-			if (nodes != null && nodes.isEmpty() == false)
-			{
-				// TODO: We may want to process all nodes and potentially
-				// create a new type that is the union of all types. For
-				// now last definition wins.
-				JSNode node = nodes.get(nodes.size() - 1);
-				DocumentationBlock block = node.getDocumentation();
-				PropertyElement property = (node instanceof JSFunctionNode) ? new FunctionElement() : new PropertyElement();
-				
-				property.setName(symbol);
-				
-				if (block != null)
-				{
-					applyDocumentation(property, block);
-				}
-				else
-				{
-					JSTypeWalker walker = new JSTypeWalker(scope, index);
-					
-					node.accept(walker);
-					
-					List<TypeElement> generatedTypes = walker.getGeneratedTypes();
-					
-					if (generatedTypes.isEmpty() == false)
-					{
-						JSIndexWriter writer = new JSIndexWriter();
-						
-						// write out any generated types
-						for (TypeElement type : walker.getGeneratedTypes())
-						{
-							writer.writeType(index, type, location);
-						}
-					}
-					
-					// add property types
-					for (String propertyType : walker.getTypes())
-					{
-						ReturnTypeElement returnType = new ReturnTypeElement();
-						
-						returnType.setType(propertyType);
-						
-						property.addType(returnType);
-					}
-				}
-				
-				properties.add(property);
-			}
-		}
-		
-		return properties;
-	}
-	
 	/**
 	 * putTypeElement
 	 * 
@@ -638,7 +706,7 @@ public class JSTypeWalker extends JSTreeWalker
 		{
 			for (String type : this.getTypes(node.getFirstChild()))
 			{
-				this.addType(GENERIC_ARRAY_OPEN + type + GENERIC_ARRAY_CLOSE);
+				this.addType(JSTypeConstants.GENERIC_ARRAY_OPEN + type + JSTypeConstants.GENERIC_ARRAY_CLOSE);
 			}
 		}
 	}
@@ -719,7 +787,7 @@ public class JSTypeWalker extends JSTreeWalker
 		this.addTypes(this.getTypes(node.getTrueExpression()));
 		this.addTypes(this.getTypes(node.getFalseExpression()));
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSConstructNode)
@@ -758,7 +826,7 @@ public class JSTypeWalker extends JSTreeWalker
 	{
 		this.addType(JSTypeConstants.BOOLEAN);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSFunctionNode)
@@ -925,36 +993,11 @@ public class JSTypeWalker extends JSTreeWalker
 			{
 				if (symbolNode instanceof JSIdentifierNode)
 				{
-					if (symbolNode.getParent().getNodeType() == JSNodeTypes.PARAMETERS)
-					{
-						// TODO: look for docs to determine type
-						// OR infer type from calls to the function
-					}
-					else if (symbolNode.getText().equals(name) == false)
-					{
-						((JSIdentifierNode) symbolNode).accept(this);
-					}
+					addIdentifierTypes(name, (JSIdentifierNode) symbolNode);
 				}
 				else
 				{
-					DocumentationBlock docs = symbolNode.getDocumentation();
-					
-					if (docs != null)
-					{
-						for (Tag tag : docs.getTags(TagType.TYPE))
-						{
-							TypeTag typeTag = (TypeTag) tag;
-							
-							for (Type t : typeTag.getTypes())
-							{
-								this.addType(t.toSource());
-							}
-						}
-					}
-					else
-					{
-						symbolNode.accept(this);
-					}
+					addNonIdentifierTypes(symbolNode);
 				}
 			}
 		}
