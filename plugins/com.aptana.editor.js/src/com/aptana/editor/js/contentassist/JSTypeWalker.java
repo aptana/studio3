@@ -356,27 +356,34 @@ public class JSTypeWalker extends JSTreeWalker
 	/**
 	 * addNonIdentifierTypes
 	 * 
-	 * @param symbolNode
+	 * @param node
 	 */
-	private void addNonIdentifierTypes(JSNode symbolNode)
+	private void addNonIdentifierTypes(JSNode node)
 	{
-		DocumentationBlock docs = symbolNode.getDocumentation();
-		
-		if (symbolNode.getNodeType() != JSNodeTypes.FUNCTION && docs != null)
+		DocumentationBlock block = node.getDocumentation();
+
+		if (block != null)
 		{
-			for (Tag tag : docs.getTags(TagType.TYPE))
+			if (node instanceof JSFunctionNode)
 			{
-				TypeTag typeTag = (TypeTag) tag;
+				FunctionElement function = new FunctionElement();
 				
-				for (Type t : typeTag.getTypes())
-				{
-					this.addType(t.toSource());
-				}
+				applyDocumentation(function, block);
+				
+				this.addType(function.getSignature());
+			}
+			else
+			{
+				PropertyElement property = new PropertyElement();
+				
+				applyDocumentation(property, block);
+				
+				this.addTypes(property.getTypeNames());
 			}
 		}
 		else
 		{
-			symbolNode.accept(this);
+			node.accept(this);
 		}
 	}
 	
@@ -984,7 +991,6 @@ public class JSTypeWalker extends JSTreeWalker
 	{
 		String name = node.getText();
 
-		// lookup in local scope
 		if (this._scope != null && this._scope.hasSymbol(name))
 		{
 			List<JSNode> symbolNodes = this._scope.getSymbol(name);
@@ -993,11 +999,11 @@ public class JSTypeWalker extends JSTreeWalker
 			{
 				if (symbolNode instanceof JSIdentifierNode)
 				{
-					addIdentifierTypes(name, (JSIdentifierNode) symbolNode);
+					this.addIdentifierTypes(name, (JSIdentifierNode) symbolNode);
 				}
 				else
 				{
-					addNonIdentifierTypes(symbolNode);
+					this.addNonIdentifierTypes(symbolNode);
 				}
 			}
 		}
