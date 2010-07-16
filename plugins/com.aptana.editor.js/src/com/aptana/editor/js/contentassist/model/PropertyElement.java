@@ -36,11 +36,11 @@ public class PropertyElement extends BaseElement
 			{
 				this._examples = new ArrayList<String>();
 			}
-			
+
 			this._examples.add(example);
 		}
 	}
-	
+
 	/**
 	 * addType
 	 * 
@@ -54,7 +54,7 @@ public class PropertyElement extends BaseElement
 			{
 				this._types = new ArrayList<ReturnTypeElement>();
 			}
-			
+
 			this._types.add(type);
 		}
 	}
@@ -67,15 +67,15 @@ public class PropertyElement extends BaseElement
 	public List<String> getExamples()
 	{
 		List<String> result = this._examples;
-		
+
 		if (result == null)
 		{
 			result = Collections.emptyList();
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getOwningType
 	 * 
@@ -94,11 +94,11 @@ public class PropertyElement extends BaseElement
 	public List<String> getTypeNames()
 	{
 		List<String> result;
-		
+
 		if (this._types != null)
 		{
 			result = new ArrayList<String>(this._types.size());
-	
+
 			for (ReturnTypeElement type : this._types)
 			{
 				result.add(type.getType());
@@ -120,12 +120,12 @@ public class PropertyElement extends BaseElement
 	public List<ReturnTypeElement> getTypes()
 	{
 		List<ReturnTypeElement> result = this._types;
-		
+
 		if (result == null)
 		{
 			result = Collections.emptyList();
 		}
-		
+
 		return result;
 	}
 
@@ -207,12 +207,12 @@ public class PropertyElement extends BaseElement
 	public String toSource()
 	{
 		SourcePrinter printer = new SourcePrinter();
-		
+
 		this.toSource(printer);
-		
+
 		return printer.toString();
 	}
-	
+
 	/**
 	 * toSource
 	 * 
@@ -221,7 +221,7 @@ public class PropertyElement extends BaseElement
 	public void toSource(SourcePrinter printer)
 	{
 		printer.printIndent();
-		
+
 		if (this.isInstanceProperty())
 		{
 			printer.print("static ");
@@ -230,12 +230,12 @@ public class PropertyElement extends BaseElement
 		{
 			printer.print("internal ");
 		}
-		
+
 		printer.print(this.getName());
 		printer.print(" : ");
-		
+
 		List<String> types = this.getTypeNames();
-		
+
 		if (types != null && types.size() > 0)
 		{
 			printer.print(StringUtil.join(",", this.getTypeNames()));

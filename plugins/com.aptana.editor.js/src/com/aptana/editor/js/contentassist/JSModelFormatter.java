@@ -122,14 +122,14 @@ public class JSModelFormatter
 			for (SinceElement since : property.getSinceList())
 			{
 				buffer.append("- ").append(since.getName());
-				
+
 				String version = since.getVersion();
-				
+
 				if (version != null && version.length() > 0)
 				{
 					buffer.append(" ").append(since.getVersion());
 				}
-				
+
 				buffer.append("<br>");
 			}
 		}
@@ -170,7 +170,7 @@ public class JSModelFormatter
 	public static String getDescription(FunctionElement function, URI projectURI)
 	{
 		StringBuilder buffer = new StringBuilder();
-		
+
 		buffer.append(function.toSource());
 
 		addDescription(buffer, function);

@@ -42,24 +42,24 @@ public class JSIndexReader
 			String key = function.getWord();
 			String[] columns = key.split(JSIndexConstants.DELIMITER);
 			int column = 0;
-			
+
 			// name
 			if (fields.contains(ContentSelector.NAME))
 			{
 				f.setName(columns[column]);
 			}
 			column++;
-			
+
 			// owning type
-			column++;	// skip owning type
-			
+			column++; // skip owning type
+
 			// description
 			if (fields.contains(ContentSelector.DESCRIPTION))
 			{
 				f.setDescription(this.getDescription(index, columns[column]));
 			}
 			column++;
-			
+
 			// parameters
 			if (fields.contains(ContentSelector.PARAMETERS))
 			{
@@ -69,7 +69,7 @@ public class JSIndexReader
 				}
 			}
 			column++;
-	
+
 			// return types
 			if (fields.contains(ContentSelector.RETURN_TYPES))
 			{
@@ -79,7 +79,7 @@ public class JSIndexReader
 				}
 			}
 			column++;
-			
+
 			// examples
 			if (fields.contains(ContentSelector.EXAMPLES))
 			{
@@ -89,7 +89,7 @@ public class JSIndexReader
 				}
 			}
 			column++;
-			
+
 			// since list
 			if (fields.contains(ContentSelector.SINCE))
 			{
@@ -99,7 +99,7 @@ public class JSIndexReader
 				}
 			}
 			column++;
-			
+
 			if (column < columns.length)
 			{
 				// user agents
@@ -113,7 +113,7 @@ public class JSIndexReader
 				}
 				column++;
 			}
-			
+
 			// documents
 			if (fields.contains(ContentSelector.DOCUMENTS))
 			{
@@ -123,10 +123,10 @@ public class JSIndexReader
 				}
 			}
 		}
-		
+
 		return f;
 	}
-	
+
 	/**
 	 * createProperty
 	 * 
@@ -134,7 +134,7 @@ public class JSIndexReader
 	 * @param key
 	 * @param fields
 	 * @return
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	protected PropertyElement createProperty(Index index, QueryResult property, EnumSet<ContentSelector> fields) throws IOException
 	{
@@ -145,24 +145,24 @@ public class JSIndexReader
 			String key = property.getWord();
 			String[] columns = key.split(JSIndexConstants.DELIMITER);
 			int column = 0;
-			
+
 			// name
 			if (fields.contains(ContentSelector.NAME))
 			{
 				p.setName(columns[column]);
 			}
 			column++;
-			
+
 			// owning type
 			column++;
-			
+
 			// description
 			if (fields.contains(ContentSelector.DESCRIPTION))
 			{
 				p.setDescription(this.getDescription(index, columns[column]));
 			}
 			column++;
-			
+
 			// types
 			if (fields.contains(ContentSelector.TYPES))
 			{
@@ -172,7 +172,7 @@ public class JSIndexReader
 				}
 			}
 			column++;
-			
+
 			// examples
 			if (fields.contains(ContentSelector.EXAMPLES))
 			{
@@ -182,7 +182,7 @@ public class JSIndexReader
 				}
 			}
 			column++;
-			
+
 			// since list
 			if (fields.contains(ContentSelector.SINCE))
 			{
@@ -192,7 +192,7 @@ public class JSIndexReader
 				}
 			}
 			column++;
-			
+
 			if (column < columns.length)
 			{
 				if (fields.contains(ContentSelector.USER_AGENTS))
@@ -206,7 +206,7 @@ public class JSIndexReader
 					column++;
 				}
 			}
-			
+
 			// documents
 			if (fields.contains(ContentSelector.DOCUMENTS))
 			{
@@ -216,10 +216,10 @@ public class JSIndexReader
 				}
 			}
 		}
-		
+
 		return p;
 	}
-	
+
 	/**
 	 * getDescription
 	 * 
@@ -236,19 +236,20 @@ public class JSIndexReader
 		{
 			// grab description
 			String descriptionPattern = descriptionKey + JSIndexConstants.DELIMITER;
-			List<QueryResult> descriptions = index.query(new String[] { JSIndexConstants.DESCRIPTION }, descriptionPattern, SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
-	
+			List<QueryResult> descriptions = index.query(new String[] { JSIndexConstants.DESCRIPTION }, descriptionPattern, SearchPattern.PREFIX_MATCH
+				| SearchPattern.CASE_SENSITIVE);
+
 			if (descriptions != null)
 			{
 				String descriptionValue = descriptions.get(0).getWord();
-	
+
 				result = descriptionValue.substring(descriptionValue.indexOf(JSIndexConstants.DELIMITER) + 1);
 			}
 		}
 
 		return result;
 	}
-	
+
 	/**
 	 * getExamples
 	 * 
@@ -260,28 +261,29 @@ public class JSIndexReader
 	protected List<String> getExamples(Index index, String examplesKey) throws IOException
 	{
 		List<String> result = new ArrayList<String>();
-		
+
 		if (index != null && examplesKey != null && examplesKey.length() > 0 && !examplesKey.equals(JSIndexConstants.NO_ENTRY))
 		{
 			// grab description
 			String examplePattern = examplesKey + JSIndexConstants.DELIMITER;
-			List<QueryResult> queryResult = index.query(new String[] { JSIndexConstants.EXAMPLES }, examplePattern, SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
-			
+			List<QueryResult> queryResult = index.query(new String[] { JSIndexConstants.EXAMPLES }, examplePattern, SearchPattern.PREFIX_MATCH
+				| SearchPattern.CASE_SENSITIVE);
+
 			if (queryResult != null && queryResult.size() > 0)
 			{
 				String word = queryResult.get(0).getWord();
 				String[] examples = word.split(JSIndexConstants.DELIMITER);
-				
+
 				for (int i = 1; i < examples.length; i++)
 				{
 					result.add(examples[i]);
 				}
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getFunction
 	 * 
@@ -295,22 +297,23 @@ public class JSIndexReader
 	public FunctionElement getFunction(Index index, String owningType, String propertyName, EnumSet<ContentSelector> fields) throws IOException
 	{
 		FunctionElement result = null;
-		
+
 		if (index != null)
 		{
-			List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(owningType, propertyName), SearchPattern.REGEX_MATCH);
-			
+			List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(owningType, propertyName),
+				SearchPattern.REGEX_MATCH);
+
 			if (functions != null && functions.size() > 0)
 			{
 				result = this.createFunction(index, functions.get(0), fields);
-				
+
 				result.setOwningType(owningType);
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getFunctions
 	 * 
@@ -323,20 +326,20 @@ public class JSIndexReader
 	public List<FunctionElement> getFunctions(Index index, String owningType, EnumSet<ContentSelector> fields) throws IOException
 	{
 		List<FunctionElement> result = new ArrayList<FunctionElement>();
-		
+
 		if (index != null)
 		{
 			// read functions
 			List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(owningType), SearchPattern.REGEX_MATCH);
-	
+
 			if (functions != null)
 			{
 				for (QueryResult function : functions)
 				{
 					FunctionElement f = this.createFunction(index, function, fields);
-					
+
 					f.setOwningType(owningType);
-					
+
 					result.add(f);
 				}
 			}
@@ -355,7 +358,7 @@ public class JSIndexReader
 	{
 		return MessageFormat.format("^[^{0}]+{0}{1}(?:{0}|$)", new Object[] { JSIndexConstants.DELIMITER, typeName }); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * getMemberPattern
 	 * 
@@ -379,31 +382,32 @@ public class JSIndexReader
 	protected List<ParameterElement> getParameters(Index index, String parametersKey) throws IOException
 	{
 		List<ParameterElement> result = new ArrayList<ParameterElement>();
-		
+
 		if (index != null)
 		{
 			String descriptionPattern = parametersKey + JSIndexConstants.DELIMITER;
-			List<QueryResult> parameters = index.query(new String[] { JSIndexConstants.PARAMETERS }, descriptionPattern, SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
-	
+			List<QueryResult> parameters = index.query(new String[] { JSIndexConstants.PARAMETERS }, descriptionPattern, SearchPattern.PREFIX_MATCH
+				| SearchPattern.CASE_SENSITIVE);
+
 			if (parameters != null && parameters.size() > 0)
 			{
 				String parametersValue = parameters.get(0).getWord();
 				String[] parameterValues = parametersValue.split(JSIndexConstants.DELIMITER);
-	
+
 				for (int i = 1; i < parameterValues.length; i++)
 				{
 					String parameterValue = parameterValues[i];
 					String[] columns = parameterValue.split(","); //$NON-NLS-1$
 					ParameterElement parameter = new ParameterElement();
-	
+
 					parameter.setName(columns[0]);
 					parameter.setUsage(columns[1]);
-	
+
 					for (int j = 2; j < columns.length; j++)
 					{
 						parameter.addType(columns[j]);
 					}
-					
+
 					result.add(parameter);
 				}
 			}
@@ -411,7 +415,7 @@ public class JSIndexReader
 
 		return result;
 	}
-	
+
 	/**
 	 * getProperties
 	 * 
@@ -424,20 +428,21 @@ public class JSIndexReader
 	public List<PropertyElement> getProperties(Index index, String owningType, EnumSet<ContentSelector> fields) throws IOException
 	{
 		List<PropertyElement> result = new ArrayList<PropertyElement>();
-		
+
 		if (index != null)
 		{
 			// read properties
-			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningType), SearchPattern.REGEX_MATCH);
-	
+			List<QueryResult> properties = index
+				.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningType), SearchPattern.REGEX_MATCH);
+
 			if (properties != null)
 			{
 				for (QueryResult property : properties)
 				{
 					PropertyElement p = this.createProperty(index, property, fields);
-					
+
 					p.setOwningType(owningType);
-					
+
 					result.add(p);
 				}
 			}
@@ -459,19 +464,20 @@ public class JSIndexReader
 	public PropertyElement getProperty(Index index, String owningType, String propertyName, EnumSet<ContentSelector> fields) throws IOException
 	{
 		PropertyElement result = null;
-		
+
 		if (index != null)
 		{
-			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningType, propertyName), SearchPattern.REGEX_MATCH);
-			
+			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningType, propertyName),
+				SearchPattern.REGEX_MATCH);
+
 			if (properties != null && properties.size() > 0)
 			{
 				result = this.createProperty(index, properties.get(0), fields);
-				
+
 				result.setOwningType(owningType);
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -481,31 +487,32 @@ public class JSIndexReader
 	 * @param index
 	 * @param returnTypesKey
 	 * @return
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	protected List<ReturnTypeElement> getReturnTypes(Index index, String returnTypesKey) throws IOException
 	{
 		List<ReturnTypeElement> result = new ArrayList<ReturnTypeElement>();
-		
+
 		if (index != null)
 		{
 			String descriptionPattern = returnTypesKey + JSIndexConstants.DELIMITER;
-			List<QueryResult> returnTypes = index.query(new String[] { JSIndexConstants.RETURN_TYPES }, descriptionPattern, SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
-	
+			List<QueryResult> returnTypes = index.query(new String[] { JSIndexConstants.RETURN_TYPES }, descriptionPattern, SearchPattern.PREFIX_MATCH
+				| SearchPattern.CASE_SENSITIVE);
+
 			if (returnTypes != null && returnTypes.size() > 0)
 			{
 				String word = returnTypes.get(0).getWord();
 				String[] returnTypesValues = word.split(JSIndexConstants.DELIMITER);
-	
+
 				for (int i = 1; i < returnTypesValues.length; i++)
 				{
 					String returnTypeValue = returnTypesValues[i];
 					String[] columns = returnTypeValue.split(","); //$NON-NLS-1$
 					ReturnTypeElement returnType = new ReturnTypeElement();
-	
+
 					returnType.setType(columns[0]);
 					returnType.setDescription(this.getDescription(index, columns[1]));
-	
+
 					result.add(returnType);
 				}
 			}
@@ -513,50 +520,51 @@ public class JSIndexReader
 
 		return result;
 	}
-	
+
 	/**
 	 * getSinceList
 	 * 
 	 * @param index
 	 * @param sinceListKey
 	 * @return
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	protected List<SinceElement> getSinceList(Index index, String sinceListKey) throws IOException
 	{
 		List<SinceElement> result = new ArrayList<SinceElement>();
-		
+
 		if (index != null && sinceListKey != null && sinceListKey.length() > 0 && !sinceListKey.equals(JSIndexConstants.NO_ENTRY))
 		{
 			String descriptionPattern = sinceListKey + JSIndexConstants.DELIMITER;
-			List<QueryResult> queryResult = index.query(new String[] { JSIndexConstants.SINCE_LIST }, descriptionPattern, SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
-	
+			List<QueryResult> queryResult = index.query(new String[] { JSIndexConstants.SINCE_LIST }, descriptionPattern, SearchPattern.PREFIX_MATCH
+				| SearchPattern.CASE_SENSITIVE);
+
 			if (queryResult != null && queryResult.size() > 0)
 			{
 				String word = queryResult.get(0).getWord();
 				String[] sinceListItems = word.split(JSIndexConstants.DELIMITER);
-				
+
 				for (int i = 1; i < sinceListItems.length; i++)
 				{
 					String sinceListItem = sinceListItems[i];
 					String[] parts = sinceListItem.split(JSIndexConstants.SUB_DELIMITER);
 					SinceElement since = new SinceElement();
-					
+
 					since.setName(parts[0]);
-					
+
 					if (parts.length > 1)
 					{
 						since.setVersion(parts[1]);
 					}
-					
+
 					result.add(since);
 				}
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getType
 	 * 
@@ -574,17 +582,17 @@ public class JSIndexReader
 			{
 				String pattern = typeName + JSIndexConstants.DELIMITER;
 				List<QueryResult> types = index.query(new String[] { JSIndexConstants.TYPE }, pattern, SearchPattern.PREFIX_MATCH);
-	
+
 				if (types != null && types.size() > 0)
 				{
 					QueryResult type = types.get(0);
 					String[] columns = type.getWord().split(JSIndexConstants.DELIMITER);
 					String retrievedName = columns[0];
 					int column = 0;
-	
+
 					// create type
 					result = new TypeElement();
-					
+
 					if (fields.isEmpty() == false)
 					{
 						// name
@@ -593,7 +601,7 @@ public class JSIndexReader
 							result.setName(columns[column]);
 						}
 						column++;
-						
+
 						// super types
 						if (fields.contains(ContentSelector.PARENT_TYPES))
 						{
@@ -603,14 +611,14 @@ public class JSIndexReader
 							}
 						}
 						column++;
-						
+
 						// description
 						if (fields.contains(ContentSelector.DESCRIPTION))
 						{
 							result.setDescription(this.getDescription(index, columns[column]));
 						}
 						column++;
-		
+
 						// properties
 						if (fields.contains(ContentSelector.PROPERTIES))
 						{
@@ -619,16 +627,16 @@ public class JSIndexReader
 								result.addProperty(property);
 							}
 						}
-		
+
 						// functions
 						if (fields.contains(ContentSelector.FUNCTIONS))
 						{
-							for (FunctionElement function: this.getFunctions(index, retrievedName, EnumSet.allOf(ContentSelector.class)))
+							for (FunctionElement function : this.getFunctions(index, retrievedName, EnumSet.allOf(ContentSelector.class)))
 							{
 								result.addProperty(function);
 							}
 						}
-						
+
 						// documents
 						if (fields.contains(ContentSelector.DOCUMENTS))
 						{
@@ -655,17 +663,17 @@ public class JSIndexReader
 	 * @param typeName
 	 * @param fields
 	 * @return
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public List<PropertyElement> getTypeProperties(Index index, String typeName, EnumSet<ContentSelector> fields) throws IOException
 	{
 		List<PropertyElement> properties = this.getProperties(index, typeName, fields);
-		
+
 		properties.addAll(this.getFunctions(index, typeName, fields));
-		
+
 		return properties;
 	}
-	
+
 	/**
 	 * getUserAgent
 	 * 
@@ -677,24 +685,23 @@ public class JSIndexReader
 	protected UserAgentElement getUserAgent(Index index, String userAgentKey) throws IOException
 	{
 		UserAgentElement result = JSIndexWriter.userAgentsByKey.get(userAgentKey);
-		
+
 		if (result == null && index != null)
 		{
 			String searchKey = userAgentKey + JSIndexConstants.DELIMITER;
-			List<QueryResult> items = index.query(new String[] { JSIndexConstants.USER_AGENT }, searchKey,
-					SearchPattern.PREFIX_MATCH);
-	
+			List<QueryResult> items = index.query(new String[] { JSIndexConstants.USER_AGENT }, searchKey, SearchPattern.PREFIX_MATCH);
+
 			if (items != null && items.size() > 0)
 			{
 				String key = items.get(0).getWord();
 				String[] columns = key.split(JSIndexConstants.DELIMITER);
 				int column = 1; // skip index
-	
+
 				result = new UserAgentElement();
 				result.setDescription(columns[column++]);
 				result.setOS(columns[column++]);
 				result.setPlatform(columns[column++]);
-	
+
 				// NOTE: split does not return a final empty element if the string being split
 				// ends with the delimiter.
 				if (column < columns.length)
@@ -706,7 +713,7 @@ public class JSIndexReader
 
 		return result;
 	}
-	
+
 	/**
 	 * getValues
 	 * 

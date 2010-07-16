@@ -32,7 +32,7 @@ public class TypeElement extends BaseElement
 			{
 				this._parentTypes = new ArrayList<String>();
 			}
-			
+
 			if (this._parentTypes.contains(type) == false)
 			{
 				this._parentTypes.add(type);
@@ -53,9 +53,9 @@ public class TypeElement extends BaseElement
 			{
 				this._properties = new ArrayList<PropertyElement>();
 			}
-			
+
 			int index = this.getPropertyIndex(property.getName());
-			
+
 			if (index >= 0)
 			{
 				// replace existing property with the same name
@@ -66,7 +66,7 @@ public class TypeElement extends BaseElement
 				// add to the end of our list
 				this._properties.add(property);
 			}
-			
+
 			property.setOwningType(this.getName());
 		}
 	}
@@ -79,12 +79,12 @@ public class TypeElement extends BaseElement
 	public List<PropertyElement> getProperties()
 	{
 		List<PropertyElement> result = this._properties;
-		
+
 		if (result == null)
 		{
 			result = Collections.emptyList();
 		}
-		
+
 		return result;
 	}
 
@@ -98,15 +98,15 @@ public class TypeElement extends BaseElement
 	{
 		int index = this.getPropertyIndex(name);
 		PropertyElement result = null;
-		
+
 		if (index != -1)
 		{
 			result = this._properties.get(index);
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getPropertyIndex
 	 * 
@@ -116,13 +116,13 @@ public class TypeElement extends BaseElement
 	protected int getPropertyIndex(String name)
 	{
 		int result = -1;
-		
+
 		if (name != null && name.length() > 0 && this._properties != null)
 		{
 			for (int i = 0; i < this._properties.size(); i++)
 			{
 				PropertyElement property = this._properties.get(i);
-				
+
 				if (name.equals(property.getName()))
 				{
 					result = i;
@@ -130,10 +130,10 @@ public class TypeElement extends BaseElement
 				}
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getParentTypes
 	 * 
@@ -142,7 +142,7 @@ public class TypeElement extends BaseElement
 	public List<String> getParentTypes()
 	{
 		List<String> result = this._parentTypes;
-		
+
 		if (result == null)
 		{
 			result = Collections.emptyList();
@@ -150,7 +150,7 @@ public class TypeElement extends BaseElement
 
 		return result;
 	}
-	
+
 	/**
 	 * hasParentTypes
 	 * 
@@ -160,7 +160,7 @@ public class TypeElement extends BaseElement
 	{
 		return this._parentTypes != null && this._parentTypes.isEmpty() == false;
 	}
-	
+
 	/**
 	 * hasProperties
 	 * 
@@ -170,7 +170,7 @@ public class TypeElement extends BaseElement
 	{
 		return this._properties != null && this._properties.isEmpty() == false;
 	}
-	
+
 	/**
 	 * toSource
 	 * 
@@ -179,12 +179,12 @@ public class TypeElement extends BaseElement
 	public String toSource()
 	{
 		SourcePrinter printer = new SourcePrinter();
-		
+
 		this.toSource(printer);
-		
+
 		return printer.toString();
 	}
-	
+
 	/**
 	 * toSource
 	 * 
@@ -193,20 +193,20 @@ public class TypeElement extends BaseElement
 	public void toSource(SourcePrinter printer)
 	{
 		printer.print(this.getName());
-		
+
 		if (this.hasParentTypes())
 		{
 			printer.print(" : ").print(StringUtil.join(", ", this.getParentTypes()));
 		}
-		
+
 		printer.println().print("{").increaseIndent().println();
-		
+
 		for (PropertyElement property : this.getProperties())
 		{
 			property.toSource(printer);
 			printer.println(";");
 		}
-		
+
 		printer.decreaseIndent().println("}");
 	}
 }

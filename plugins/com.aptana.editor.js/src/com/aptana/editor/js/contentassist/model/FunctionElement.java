@@ -37,7 +37,7 @@ public class FunctionElement extends PropertyElement
 			{
 				this._exceptions = new ArrayList<ExceptionElement>();
 			}
-			
+
 			this._exceptions.add(exception);
 		}
 	}
@@ -55,7 +55,7 @@ public class FunctionElement extends PropertyElement
 			{
 				this._parameters = new ArrayList<ParameterElement>();
 			}
-			
+
 			this._parameters.add(parameter);
 		}
 	}
@@ -73,7 +73,7 @@ public class FunctionElement extends PropertyElement
 			{
 				this._references = new ArrayList<String>();
 			}
-			
+
 			this._references.add(reference);
 		}
 	}
@@ -96,12 +96,12 @@ public class FunctionElement extends PropertyElement
 	public List<ExceptionElement> getExceptions()
 	{
 		List<ExceptionElement> result = this._exceptions;
-		
+
 		if (result == null)
 		{
 			result = Collections.emptyList();
 		}
-		
+
 		return result;
 	}
 
@@ -130,12 +130,12 @@ public class FunctionElement extends PropertyElement
 	public List<ParameterElement> getParameters()
 	{
 		List<ParameterElement> result = this._parameters;
-		
+
 		if (result == null)
 		{
 			result = Collections.emptyList();
 		}
-		
+
 		return result;
 	}
 
@@ -164,12 +164,12 @@ public class FunctionElement extends PropertyElement
 	public List<String> getReferences()
 	{
 		List<String> result = this._references;
-		
+
 		if (result == null)
 		{
 			result = Collections.emptyList();
 		}
-		
+
 		return result;
 	}
 
@@ -304,7 +304,7 @@ public class FunctionElement extends PropertyElement
 		{
 			printer.print("void");
 		}
-		
+
 		if (this.hasExceptions())
 		{
 			printer.print(" throws ").print(StringUtil.join(", ", this.getExceptionTypes()));
