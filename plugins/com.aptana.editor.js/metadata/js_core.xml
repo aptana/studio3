@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?mso-infoPathSolution PIVersion="1.0.0.0" href="http://www.aptana.com/forms/types.xsn" language="en-us" name="urn:schemas-microsoft-com:office:infopath:types:" productVersion="11.0.6357" solutionVersion="1.0.0.46" ?><?mso-application progid="InfoPath.Document"?>
-<javascript xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xd="http://schemas.microsoft.com/office/infopath/2003">
+<javascript>
   <class type="Arguments" superclass="Object">
     <description>An array of parameters passed to a function.</description>
 	<browsers>
@@ -12,7 +11,7 @@
 		<browser platform="Safari" version="1.0+" />
 	</browsers>
 	    <constructors>
-	      <constructor scope="instance" visibility="internal">
+	      <constructor visibility="internal">
 	        <description>Creates a new instance of the Arguments array.</description>
 	        <parameters/>
 	        <exceptions/>
@@ -22,7 +21,7 @@
 	      </constructor>
 	    </constructors>  
     <properties>
-      <property name="callee" type="String" scope="instance" access="read-write">
+      <property name="callee" type="String" access="read-write">
         <description>Name of the function being executed.</description>
 		<browsers>
 			<browser platform="IE" version="5.5+"/>
@@ -61,7 +60,7 @@ var result = makeFactorialFunc()(5); // returns 120 (5 * 4 * 3 * 2 * 1)
 
 			&lt;p&gt;The &lt;code&gt;this&lt;/code&gt; keyword does not refer to the currently executing function. Use the &lt;code&gt;callee&lt;/code&gt; property to refer to a function within the function body.&lt;/p&gt;</remarks>
       </property>
-      <property name="caller" type="String" scope="instance" access="read">
+      <property name="caller" type="String" access="read">
 		<availability>
 			<specification name="JavaScript 1.2"/>
 			<specification name="Deprecated by JavaScript 1.3"/>
@@ -91,7 +90,7 @@ var result = makeFactorialFunc()(5); // returns 120 (5 * 4 * 3 * 2 * 1)
 			<browser platform="Mozilla" version="1.0" />
 		</browsers>
 		</property>
-		<property name="length" type="Number" scope="instance" access="read-write">
+		<property name="length" type="Number" access="read-write">
         <description>Number of arguments passed to the function.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -134,7 +133,7 @@ var result = makeFactorialFunc()(5); // returns 120 (5 * 4 * 3 * 2 * 1)
 			<browser platform="Safari" version="1.0+" />
 	</browsers>
     <constructors>
-      <constructor scope="instance">
+      <constructor>
         <description>Constructs a new instance of an array.</description>
         <parameters>
           <parameter name="arrayLength" type="Number" usage="required">
@@ -155,7 +154,7 @@ var result = makeFactorialFunc()(5); // returns 120 (5 * 4 * 3 * 2 * 1)
       </constructor>
     </constructors>
     <properties>
-      <property name="constructor" type="Object" scope="instance" access="read-write">
+      <property name="constructor" type="Object" access="read-write">
 			<browsers>
 				<browser platform="IE" version="4.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
@@ -174,7 +173,7 @@ var result = makeFactorialFunc()(5); // returns 120 (5 * 4 * 3 * 2 * 1)
 			</references>
 			<description>Specifies the function that creates the Array prototype.</description>
 		</property>
-		<property name="index" type="Number" scope="instance" access="read-write">
+		<property name="index" type="Number" access="read-write">
 			<browsers>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Netscape" version="3.0+"/>
@@ -186,7 +185,7 @@ var result = makeFactorialFunc()(5); // returns 120 (5 * 4 * 3 * 2 * 1)
 			<remarks>Only applicable to an array created by a RegExp match.</remarks>
 			<description>Zero-based index number for the corresponding string in a RegExp match.</description>
 		</property>
-		<property name="input" type="String" scope="instance" access="read-write">
+		<property name="input" type="String" access="read-write">
 			<browsers>
 				<browser platform="Mozilla" version="1.0+"/>
 				<browser platform="Netscape" version="3.0+"/>
@@ -198,7 +197,7 @@ var result = makeFactorialFunc()(5); // returns 120 (5 * 4 * 3 * 2 * 1)
 			<remarks>Only applicable to an array created by a RegExp match.</remarks>
 			<description>String in a RegExp match.</description>
 		</property>
-		<property name="length" type="Number" scope="instance" access="read-write">
+		<property name="length" type="Number" access="read-write">
     		<description>Integer specifying the number of elements in an array. </description>
     		<availability>
     			<specification name="JavaScript 1.1, JScript 2.0"/>
@@ -243,7 +242,7 @@ var result = makeFactorialFunc()(5); // returns 120 (5 * 4 * 3 * 2 * 1)
           array still contains only 2 elements.&lt;/p&gt;
         </remarks>
       </property>
-    <property name="prototype" type="Object" scope="instance" access="read-write">
+    <property name="prototype" type="Object" access="read-write">
 		<availability>
 			<specification name="JavaScript 1.1"/>
 			<specification name="JScript 2.0"/>
@@ -261,7 +260,7 @@ var result = makeFactorialFunc()(5); // returns 120 (5 * 4 * 3 * 2 * 1)
 	</property>
 	</properties>
     <methods>
-      <method name="concat" scope="instance">
+      <method name="concat">
         <description>
           Returns a new array comprised of this array joined
           with other array(s) and/or value(s).
@@ -322,7 +321,7 @@ alphaNumeric = alpha.concat(1, 2, 3); // creates array ["a", "b", "c", 1, 2, 3]&
           the original arrays, and vice versa.&lt;/p&gt;
         </remarks>
       </method>
-      <method name="every" scope="instance" visibility="">
+      <method name="every">
 		<parameters>
 			<parameter name="callback" type="Function" usage="required">
 				<description>Function that tests each element of an array.</description>
@@ -360,7 +359,7 @@ passed = [12, 54, 18, 130, 44].every(isBigEnough);
 		</browsers>
 		<return-description>Returns true if every element in an array meets the specified criteria.</return-description>
 	</method>
-	<method name="filter" scope="instance" visibility="">
+	<method name="filter">
 			<parameters>
 				<parameter name="callback" type="Function" usage="required">
 					<description>Function that tests each element of an array.</description>
@@ -395,7 +394,7 @@ filtered = [12, 5, 8, 130, 44].filter(isBigEnough);&lt;/pre&gt;</example>
 			</browsers>
 			<return-description>Returns a new array containing elements that met the specified criteria.</return-description>
 		</method>
-		<method name="forEach" scope="instance">
+		<method name="forEach">
 			<parameters>
 				<parameter name="callBack" type="Function" usage="required">
 					<description>Function to call once on each array element.</description>
@@ -460,7 +459,7 @@ print(writer.toString());
 			</browsers>
 			<return-description>Returns the result of callback for each element.</return-description>
 		</method>
-		<method name="indexOf" scope="instance" visibility="">
+		<method name="indexOf">
 		<parameters>
 			<parameter name="searchElement" type="Object" usage="optional">
 				<description>Element to search for in the array.</description>
@@ -506,7 +505,7 @@ while (idx != -1) {
 		</browsers>
 		<return-description>Returns the first index number at which the specified element can be found in the array, or -1 if it is not present.</return-description>
 	</method>
-	<method name="join" scope="instance">
+	<method name="join">
         <description>Joins all elements of an array into a string.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -549,7 +548,7 @@ myVar3=a.join(" + ") // assigns "Wind + Rain + Fire" to myVar3&lt;/pre&gt;
           joined into one string.&lt;/p&gt;
         </remarks>
       </method>
-      <method name="lastIndexOf" scope="instance" visibility="">
+      <method name="lastIndexOf">
 		<parameters>
 			<parameter name="searchElement" type="Object" usage="optional">
 				<description>Element to search for in the array.</description>
@@ -605,7 +604,7 @@ while (idx != -1) {
 		</browsers>
 		<return-description>Returns the last index number at which the specified element can be found in the array. Returns -1 if the element is not present.</return-description>
 	</method>
-	<method name="map" scope="instance" visibility="">
+	<method name="map">
 		<parameters>
 		<parameter name="callBack" type="Function" usage="required">
 			<description>Function that creates an element of the new Array from an element of the current one.</description>
@@ -654,7 +653,7 @@ roots = numbers.map(Math.sqrt);
 		</browsers>
 		<return-description>Returns a new array.</return-description>
 	</method>
-	<method name="pop" scope="instance">
+	<method name="pop">
         <description>
           Removes the last element from an array and returns
           that element. This method changes the length of the
@@ -690,7 +689,7 @@ popped = myFish.pop();&lt;/pre&gt;
           <reference name="unshift"/>
         </references>
       </method>
-      <method name="push" scope="instance">
+      <method name="push">
         <description>
           Adds one or more elements to the end of an array and
           returns the new length of the array. This method changes
@@ -736,7 +735,7 @@ pushed = myFish.push("drum", "lion");&lt;/pre&gt;
           analogous to the &lt;code&gt;push&lt;/code&gt; function in Perl 4 (not Perl 5).&lt;/p&gt;
         </remarks>
       </method>
-      <method name="reverse" scope="instance">
+      <method name="reverse">
         <description>
           Transposes the elements of an array: the first array
           element becomes the last and the last becomes the
@@ -775,7 +774,7 @@ myArray.reverse()&lt;/pre&gt;&lt;p&gt;This code changes &lt;code&gt;myArray&lt;/
           elements of the calling array object.&lt;/p&gt;
         </remarks>
       </method>
-      <method name="shift" scope="instance">
+      <method name="shift">
         <description>
           Removes the first element from an array and returns
           that element. This method changes the length of the
@@ -817,7 +816,7 @@ Removed this element: angel&lt;/pre&gt;
           <reference name="unshift"/>
         </references>
       </method>
-      <method name="slice" scope="instance">
+      <method name="slice">
         <description>
           Extracts a section of an array and returns a new
           array.
@@ -904,7 +903,7 @@ newCar[0].color = purple&lt;/pre&gt;
           array is not affected.&lt;/p&gt;
         </remarks>
       </method>
-      <method name="some" scope="instance" visibility="">
+      <method name="some">
 		<parameters>
 			<parameter name="searchElement" type="Object" usage="optional">
 				<description>Element to search for in the array.</description>
@@ -946,7 +945,7 @@ passed = [12, 5, 8, 1, 44].some(isBigEnough);
 		<return-description>Returns true if some element in the array passes the test implemented by the provided function.</return-description>
 	</method>
 	
-	<method name="sort" scope="instance">
+	<method name="sort">
         <description>Sorts the elements of an array.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -1080,7 +1079,7 @@ ant, zebra, undefined, undefined, undefined, undefined&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="splice" scope="instance">
+	  <method name="splice">
         <description>Returns the array with the specified elements inserted or removed.</description>
 		<browsers>
 			<browser platform="IE" version="5.5+"/>
@@ -1161,7 +1160,7 @@ removed is: ["angel", "clown"]&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="toLocaleString" scope="instance">
+	  <method name="toLocaleString">
         <description>Returns a localized string version of the array.</description>
 		<browsers>
 			<browser platform="IE" version="5.5+"/>
@@ -1192,7 +1191,7 @@ removed is: ["angel", "clown"]&lt;/pre&gt;
         </availability>
     </method>
     
-	<method name="toSource" scope="instance" visibility="">
+	<method name="toSource">
 		<references>
 			<reference name="toString"/>
 		</references>
@@ -1222,7 +1221,7 @@ alpha.toSource() //returns ["a", "b", "c"]&lt;/pre&gt;</example>
 		<return-description>Returns a string representing the source code of the array.</return-description>
 	</method>
 	
-	<method name="toString" scope="instance">
+	<method name="toString">
         <description>
           Returns a string representing the specified array and
           its elements.
@@ -1270,7 +1269,7 @@ myVar=monthNames.toString() // assigns "Jan,Feb,Mar,Apr" to myVar&lt;/pre&gt;&lt
         </remarks>
       </method>
 	  
-      <method name="unshift" scope="instance">
+      <method name="unshift">
         <description>
           Adds one or more elements to the beginning of an array
           and returns the new length of the array.
@@ -1315,7 +1314,7 @@ New length: 4&lt;/pre&gt;
         </references>
       </method>
    
-    <method name="valueOf" scope="" visibility="">
+    <method name="valueOf">
 		<references>
 			<reference name="Object.valueOf"/>
 		</references>
@@ -1466,7 +1465,7 @@ myArray = myRe.exec("cdbBdbsbz");&lt;/pre&gt;&lt;p&gt;The properties and element
 		<browser platform="Safari" version="1.0+" />
 	</browsers>
     <constructors>
-      <constructor scope="instance">
+      <constructor>
         <description>Creates a new instance of a Boolean object.</description>
         <parameters>
           <parameter name="value" type="Boolean" usage="required">
@@ -1480,7 +1479,7 @@ myArray = myRe.exec("cdbBdbsbz");&lt;/pre&gt;&lt;p&gt;The properties and element
       </constructor>
     </constructors>
     <properties>
-		<property name="constructor" type="Object" scope="instance" access="" visibility="">
+		<property name="constructor" type="Object">
 			<browsers>
 				<browser platform="IE" version="4.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
@@ -1500,7 +1499,7 @@ myArray = myRe.exec("cdbBdbsbz");&lt;/pre&gt;&lt;p&gt;The properties and element
 			<description>Specifies the function that creates the Boolean prototype.</description>
 		</property>
 		
-		<property name="prototype" type="Object" scope="instance" access="" visibility="">
+		<property name="prototype" type="Object">
 			<browsers>
 				<browser platform="IE" version="4.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
@@ -1523,7 +1522,7 @@ myArray = myRe.exec("cdbBdbsbz");&lt;/pre&gt;&lt;p&gt;The properties and element
     
 	<methods>
       
-	  <method name="toSource" scope="" visibility="">
+	  <method name="toSource">
 		<references>
 			<reference name="Object.toSource"/>
 		</references>
@@ -1553,7 +1552,7 @@ myArray = myRe.exec("cdbBdbsbz");&lt;/pre&gt;&lt;p&gt;The properties and element
 		<return-description>Returns a string representing the source code of a Boolean object.</return-description>
 	</method>
 	
-	<method name="toString" scope="instance">
+	<method name="toString">
         <description>
           Returns a string representing the specified Boolean
           object.
@@ -1596,7 +1595,7 @@ var myVar=flag.toString()&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="valueOf" scope="instance">
+	  <method name="valueOf">
         <description>Returns the primitive value of a Boolean object.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -1692,7 +1691,7 @@ s = new Boolean(myString);      //initial value of true&lt;/pre&gt;&lt;p&gt;Do n
 		<browser platform="Safari" version="1.0+" />
 	</browsers>
     <constructors>
-      <constructor scope="instance">
+      <constructor>
         <description>Creates a new instance of a Date object.</description>
         <parameters>
           <parameter name="milliseconds" type="Number" usage="optional">
@@ -1715,7 +1714,7 @@ s = new Boolean(myString);      //initial value of true&lt;/pre&gt;&lt;p&gt;Do n
     </constructors>
     <properties>
       
-	  <property name="constructor" type="Function" scope="instance" access="read-write">
+	  <property name="constructor" type="Function" access="read-write">
         <description>Specifies the function that creates an object's prototype. Note that the value of this property is a reference to the function itself, not a string containing the function's name.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -1734,7 +1733,7 @@ s = new Boolean(myString);      //initial value of true&lt;/pre&gt;&lt;p&gt;Do n
           <reference name="Object.constructor"/>
         </references>
       </property>
-      <property name="prototype" type="Date" scope="instance" access="read-write">
+      <property name="prototype" type="Date" access="read-write">
         <description>Represents the prototype for this class. You can use the prototype to add properties or methods to all instances of a class.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -1757,7 +1756,7 @@ s = new Boolean(myString);      //initial value of true&lt;/pre&gt;&lt;p&gt;Do n
     
 	<methods>
       
-	  <method name="getDate" scope="instance">
+	  <method name="getDate">
         <description>
           Returns the day of the month for the specified date
           according to local time.
@@ -1801,7 +1800,7 @@ day = Xmas95.getDate()&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="getDay" scope="instance">
+	  <method name="getDay">
         <description>
           Returns a number representing the day of the week for the specified date (according to local time).
         </description>
@@ -1845,7 +1844,7 @@ weekday = Xmas95.getDay();&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="getFullYear" scope="instance">
+	  <method name="getFullYear">
         <description>
           Returns the year of the specified date according to
           local time.
@@ -1893,7 +1892,7 @@ yr = Today.getFullYear();&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="getHours" scope="instance">
+	  <method name="getHours">
         <description>
           Returns the hour for the specified date according to
           local time.
@@ -1936,7 +1935,7 @@ hours = Xmas95.getHours()&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="getMilliseconds" scope="instance">
+	  <method name="getMilliseconds">
         <description>
           Returns the number of milliseconds in the specified date
           according to local time.
@@ -1979,7 +1978,7 @@ ms = Today.getMilliseconds();&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="getMinutes" scope="instance">
+	  <method name="getMinutes">
         <description>
           Returns the minutes in the specified date according to
           local time.
@@ -2022,7 +2021,7 @@ minutes = Xmas95.getMinutes()&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="getMonth" scope="instance">
+	  <method name="getMonth">
         <description>
           Returns the month (from 0-11) in the specified date according to
           local time.
@@ -2066,7 +2065,7 @@ month = Xmas95.getMonth()&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="getSeconds" scope="instance">
+	  <method name="getSeconds">
         <description>
           Returns the seconds in the specified date according to
           local time.
@@ -2109,7 +2108,7 @@ secs = Xmas95.getSeconds()&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="getTime" scope="instance">
+	  <method name="getTime">
         <description>
           Returns the numeric value corresponding to the time
           for the specified date according to universal time.
@@ -2158,7 +2157,7 @@ sameAsBigDay.setTime(theBigDay.getTime())&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="getTimezoneOffset" scope="instance">
+	  <method name="getTimezoneOffset">
         <description>
           Returns the time-zone offset in minutes for the
           current locale.
@@ -2194,7 +2193,7 @@ currentTimeZoneOffsetInHours = x.getTimezoneOffset()/60&lt;/pre&gt;
           prevents this value from being a constant.</remarks>
       </method>
       
-	  <method name="getUTCDate" scope="instance">
+	  <method name="getUTCDate">
         <description>
           Returns the day (date) of the month in the specified
           date according to universal time.
@@ -2238,7 +2237,7 @@ d = Today.getUTCDate();&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="getUTCDay" scope="instance">
+	  <method name="getUTCDay">
         <description>
           Returns the day of the week in the specified date
           according to universal time.
@@ -2284,7 +2283,7 @@ weekday = Today.getUTCDay()&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="getUTCFullYear" scope="instance">
+	  <method name="getUTCFullYear">
         <description>
           Returns the year in the specified date according to
           universal time.
@@ -2328,7 +2327,7 @@ yr = Today.getUTCFullYear();&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="getUTCHours" scope="instance">
+	  <method name="getUTCHours">
         <description>
           Returns the hours in the specified date according to
           universal time.
@@ -2371,7 +2370,7 @@ hrs = Today.getUTCHours();&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="getUTCMilliseconds" scope="instance">
+	  <method name="getUTCMilliseconds">
         <description>
           Returns the milliseconds in the specified date
           according to universal time.
@@ -2414,7 +2413,7 @@ ms = Today.getUTCMilliseconds();&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="getUTCMinutes" scope="instance">
+	  <method name="getUTCMinutes">
         <description>
           Returns the minutes in the specified date according to
           universal time.
@@ -2457,7 +2456,7 @@ min = Today.getUTCMinutes();&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="getUTCMonth" scope="instance">
+	  <method name="getUTCMonth">
         <description>
           Returns the month of the specified date according to
           universal time.
@@ -2501,7 +2500,7 @@ mon = Today.getUTCMonth();&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="getUTCSeconds" scope="instance">
+	  <method name="getUTCSeconds">
         <description>
           Returns the seconds in the specified date according to
           universal time.
@@ -2544,7 +2543,7 @@ sec = Today.getUTCSeconds();&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="getYear" scope="instance">
+	  <method name="getYear">
         <description>
           Returns the year in the specified date according to
           local time.
@@ -2610,7 +2609,7 @@ year = Xmas.getYear() // returns 95&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="now" scope="instance" visibility="">
+	  <method name="now">
 		<return-types>
 			<return-type type="Number"/>
 		</return-types>
@@ -2692,7 +2691,7 @@ year = Xmas.getYear() // returns 95&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="setDate" scope="instance">
+	  <method name="setDate">
         <description>
           Sets the day of the month for a specified date
           according to local time.
@@ -2733,7 +2732,7 @@ theBigDay.setDate(24)&lt;/pre&gt;
         </references>
       </method>
       
-	  <method name="setFullYear" scope="instance">
+	  <method name="setFullYear">
         <description>
           Sets the full year for a specified date according to
           local time.
@@ -2790,7 +2789,7 @@ theBigDay.setFullYear(1997);&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="setHours" scope="instance">
+	  <method name="setHours">
         <description>
           Sets the hours for a specified date according to local
           time.
@@ -2849,7 +2848,7 @@ theBigDay.setFullYear(1997);&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="setMilliseconds" scope="instance">
+	  <method name="setMilliseconds">
         <description>
           Sets the milliseconds for a specified date according
           to local time.
@@ -2894,7 +2893,7 @@ theBigDay.setMilliseconds(100);&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="setMinutes" scope="instance">
+	  <method name="setMinutes">
         <description>
           Sets the minutes for a specified date according to
           local time.
@@ -2950,7 +2949,7 @@ theBigDay.setMilliseconds(100);&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="setMonth" scope="instance">
+	  <method name="setMonth">
         <description>
           Set the month for a specified date according to local
           time.
@@ -3000,7 +2999,7 @@ theBigDay.setMilliseconds(100);&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="setSeconds" scope="instance">
+	  <method name="setSeconds">
         <description>
           Sets the seconds for a specified date according to
           local time.
@@ -3051,7 +3050,7 @@ theBigDay.setMilliseconds(100);&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="setTime" scope="instance">
+	  <method name="setTime">
         <description>
           Sets the value of a Date object according
           to local time.
@@ -3093,7 +3092,7 @@ sameAsBigDay.setTime(theBigDay.getTime());&lt;/pre&gt;
           date and time to another &lt;code&gt;Date&lt;/code&gt; object.&lt;/p&gt;
         </remarks>
       </method>
-      <method name="setUTCDate" scope="instance">
+      <method name="setUTCDate">
         <description>
           Sets the day of the month for a specified date
           according to universal time.
@@ -3140,7 +3139,7 @@ theBigDay.setUTCDate(20);&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="setUTCFullYear" scope="instance">
+	  <method name="setUTCFullYear">
         <description>
           Sets the full year for a specified date according to
           universal time.
@@ -3196,7 +3195,7 @@ theBigDay.setUTCFullYear(1997);&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="setUTCHours" scope="instance">
+	  <method name="setUTCHours">
         <description>
           Sets the hour for a specified date according to
           universal time.
@@ -3256,7 +3255,7 @@ theBigDay.setUTCHours(8);&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="setUTCMilliseconds" scope="instance">
+	  <method name="setUTCMilliseconds">
         <description>
           Sets the milliseconds for a specified date according
           to universal time.
@@ -3302,7 +3301,7 @@ theBigDay.setUTCMilliseconds(500);&lt;/pre&gt;
           100 will be used for milliseconds.&lt;/p&gt;
         </remarks>
       </method>
-      <method name="setUTCMinutes" scope="instance">
+      <method name="setUTCMinutes">
         <description>
           Sets the minutes for a specified date according to universal time.
         </description>
@@ -3358,7 +3357,7 @@ theBigDay.setUTCMinutes(43);&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="setUTCMonth" scope="instance">
+	  <method name="setUTCMonth">
         <description>
           Sets the month for a specified date according to
           universal time.
@@ -3409,7 +3408,7 @@ theBigDay.setUTCMonth(11);&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="setUTCSeconds" scope="instance">
+	  <method name="setUTCSeconds">
         <description>
           Sets the seconds for a specified date according to
           universal time.
@@ -3461,7 +3460,7 @@ theBigDay.setUTCSeconds(20);&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="setYear" scope="instance">
+	  <method name="setYear">
         <description>
           Sets the year for a specified date according to local
           time.
@@ -3515,7 +3514,7 @@ theBigDay.setYear(2000)&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="toDateString" scope="instance">
+	  <method name="toDateString">
         <description>Returns a string version of the Date object expressed in local time.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -3545,7 +3544,7 @@ theBigDay.setYear(2000)&lt;/pre&gt;
         </availability>
       </method>
       
-	  <method name="toGMTString" scope="instance">
+	  <method name="toGMTString">
         <description>Converts a date to a string, using Internet GMT conventions. </description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -3588,7 +3587,7 @@ theBigDay.setYear(2000)&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="toLocaleDateString" scope="instance">
+	  <method name="toLocaleDateString">
         <description>
           Converts a date to a string, returning the "date"
           portion using the current locale's conventions.
@@ -3650,7 +3649,7 @@ today.toLocaleDateString()&lt;/pre&gt;&lt;p&gt;In this example, &lt;code&gt;toLo
         </remarks>
       </method>
       
-	  <method name="toLocaleString" scope="instance">
+	  <method name="toLocaleString">
         <description>
           Converts a date to a string, using the current
           locale's conventions.
@@ -3708,7 +3707,7 @@ today.toLocaleString();&lt;/pre&gt;&lt;p&gt;In this example, &lt;code&gt;toLocal
         </remarks>
       </method>
       
-	  <method name="toLocaleTimeString" scope="instance">
+	  <method name="toLocaleTimeString">
         <description>
           Converts a date to a string, returning the "date"
           portion using the current locale's conventions.
@@ -3770,7 +3769,7 @@ today.toLocaleTimeString()&lt;/pre&gt;&lt;p&gt;In this example, &lt;code&gt;toLo
         </remarks>
       </method>
       
-	  <method name="toSource" scope="" visibility="">
+	  <method name="toSource">
 		<references>
 			<reference name="Object.toSource"/>
 		</references>
@@ -3798,7 +3797,7 @@ today.toLocaleTimeString()&lt;/pre&gt;&lt;p&gt;In this example, &lt;code&gt;toLo
 		<return-description>Returns a string representing the source code of a Date object.</return-description>
 	</method>
 	
-	<method name="toString" scope="instance">
+	<method name="toString">
         <description>
           Returns a string representing the specified Date
           object.
@@ -3849,7 +3848,7 @@ myVar=x.toString();   //assigns a value to myVar similar to:
         </remarks>
       </method>
       
-	  <method name="toTimeString" scope="instance">
+	  <method name="toTimeString">
         <description>Returns a string representation of the time portion of a Date object, expressed in local time.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -3879,7 +3878,7 @@ myVar=x.toString();   //assigns a value to myVar similar to:
         </availability>
       </method>
       
-	  <method name="toUTCString" scope="instance">
+	  <method name="toUTCString">
         <description>
           Converts a date to a string, using the universal time
           convention.
@@ -4000,7 +3999,7 @@ UTCstring = Today.toUTCString();&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="valueOf" scope="instance">
+	  <method name="valueOf">
         <description>Returns the primitive value of a Date object.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -4087,13 +4086,13 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
     </remarks>
 </class>
 
-<class type="Enumerator" superclass="Object" visibility="">
+<class type="Enumerator" superclass="Object">
 	<description>Enumerator is a proprietary Microsoft object that iterates over items in a group.</description>
 	<browsers>
 		<browser platform="IE" version="4.0+"/>
 	</browsers>
 	<constructors>
-		<constructor scope="">
+		<constructor>
 			<description>Creates a new instance of an Enumerator object.</description>
 				<parameters>
 					<parameter name="group" type="Object" usage="required">
@@ -4108,14 +4107,14 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 			
             <!--
 			<properties>
-				<property name="" type="" scope="" access="" visibility="">
+				<property name="" type="">
 					<description>No properties in Enumerator.</description>
 				</property>
 			</properties>
 			-->
 
 			<methods>
-				<method name="atEnd" scope="" visibility="">
+				<method name="atEnd">
 					<return-types>
 						<return-type type="Boolean"/>
 					</return-types>
@@ -4130,7 +4129,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 					<return-description>Returns true if the current item is the last one in the group.</return-description>
 				</method>
 				
-				<method name="item" scope="" visibility="">
+				<method name="item">
 					<return-types>
 						<return-type type="Object"/>
 					</return-types>
@@ -4145,7 +4144,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 					<return-description>Returns the current item in the group.</return-description>
 				</method>
 				
-				<method name="moveFirst" scope="" visibility="">
+				<method name="moveFirst">
 					<return-types>
 						<return-type type="Object"/>
 					</return-types>
@@ -4160,7 +4159,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 					<return-description>Returns the current item in its new position.</return-description>
 				</method>
 				
-				<method name="moveNext" scope="" visibility="">
+				<method name="moveNext">
 					<return-types>
 						<return-type type="Object"/>
 					</return-types>
@@ -4196,7 +4195,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 		<browser platform="Safari" version="1.0+" />
 	</browsers>
     <constructors>
-      <constructor scope="instance">
+      <constructor>
         <description>Constructs a new instance of an Error object.</description>
         <parameters>
           <parameter name="message" type="String" usage="optional">
@@ -4210,7 +4209,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
       </constructor>
     </constructors>
     <properties>
-      <property name="constructor" type="Object" scope="instance" access="" >
+      <property name="constructor" type="Object" >
 		<availability>
 			<specification name="JavaScript 1.5"/>
 			<specification name="JScript 5.0"/>
@@ -4226,7 +4225,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 	</property>
-	<property name="description" type="String" scope="" access="">
+	<property name="description" type="String">
 		<availability>
 			<specification name="JScript 5.0"/>
 		</availability>
@@ -4235,7 +4234,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 			<browser platform="IE" version="5.0+"/>
 		</browsers>
 	</property>
-	<property name="fileName" type="String" scope="" access="">
+	<property name="fileName" type="String">
 		<availability>
 			<specification name="JavaScript 1.5"/>
 		</availability>
@@ -4246,7 +4245,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 		</browsers>
 	</property>
 	
-	<property name="lineNumber" type="Number" scope="" access="">
+	<property name="lineNumber" type="Number">
 		<availability>
 			<specification name="JavaScript 1.5"/>
 		</availability>
@@ -4257,7 +4256,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 		</browsers>
 	</property>
 	
-	<property name="message" type="String" scope="instance" access="read-write">
+	<property name="message" type="String" access="read-write">
         <description>Error message.</description>
 		<browsers>
 			<browser platform="IE" version="5.5+"/>
@@ -4274,7 +4273,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
         </availability>
     </property>
     
-	<property name="name" type="String" scope="instance" access="read-write">
+	<property name="name" type="String" access="read-write">
         <description>Error name.</description>
 		<browsers>
 			<browser platform="IE" version="5.5+"/>
@@ -4291,7 +4290,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
         </availability>
       </property>
 	  
-	  <property name="number" type="Number" scope="" access="">
+	  <property name="number" type="Number">
 		<availability>
 			<specification name="JScript 5.0"/>
 		</availability>
@@ -4301,7 +4300,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 		</browsers>
 	</property>
 	
-    <property name="prototype" type="Object" scope="" access="">
+    <property name="prototype" type="Object">
 		<availability>
 			<specification name="JavaScript 1.5"/>
 			<specification name="JScript 5.0"/>
@@ -4318,7 +4317,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 		</browsers>
 	</property>
 	
-	<property name="stack" type="String" scope="" access="">
+	<property name="stack" type="String">
 		<availability>
 			<specification name="JavaScript 1.5"/>
 		</availability>
@@ -4332,7 +4331,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 </properties>
 
     <methods>
-      <method name="toString" scope="instance">
+      <method name="toString">
         <description>Converts an Error object to a string.</description>
 		<browsers>
 			<browser platform="IE" version="5.0+"/>
@@ -4430,7 +4429,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 		<browser platform="Netscape" version="6.0+"/>
 	</browsers>
     <constructors>
-      <constructor scope="instance">
+      <constructor>
         <description>Creates a new instance of EvalError.</description>
         <parameters>
           <parameter name="message" type="String" usage="optional">
@@ -4444,12 +4443,12 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
       </constructor>
     </constructors>
     <properties>
-      <property name="message" type="String" scope="instance" access="read-write">
+      <property name="message" type="String" access="read-write">
         <description>An error message associated with the EvalError object.</description>
         <availability/>
 
       </property>
-      <property name="name" type="String" scope="instance" access="read-write">
+      <property name="name" type="String" access="read-write">
         <description>Name of the EvalError object.</description>
 		<browsers>
 			<browser platform="IE" version="5.0+"/>
@@ -4488,7 +4487,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 		<browser platform="Safari" version="1.0+" />
 	</browsers>
     <constructors>
-      <constructor scope="instance">
+      <constructor>
         <description>Creates a new instance of the Function object.</description>
         <parameters>
           <parameter name="arg1, arg2, ... argN" type="String" usage="zero-or-more">
@@ -4538,7 +4537,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
         </remarks>
       </property>
       <!--
-      <property name="arity" type="Number" scope="" access="" visibility="">
+      <property name="arity" type="Number">
 		<availability>
 			<specification name="JavaScript 1.2"/>
 			<specification name="Deprecated in JavaScript 1.4"/>
@@ -4587,7 +4586,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
         </remarks>
       </property>
 	  
-      <property name="constructor" type="Object" scope="" access="" visibility="">
+      <property name="constructor" type="Object">
 			<availability>
 				<specification name="JavaScript 1.1"/>
 				<specification name="JScript 2.0"/>
@@ -4607,7 +4606,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 			</browsers>
 		</property>
 		
-		<property name="length" type="Number" scope="instance" access="read-write">
+		<property name="length" type="Number" access="read-write">
         	<description>Specifies the number of arguments expected by the function.</description>
 			<browsers>
 				<browser platform="IE" version="4.0+"/>
@@ -4650,7 +4649,7 @@ addNumbers(103,104) // returns 207&lt;/pre&gt;
           function.&lt;/p&gt;
         </remarks>
       </property>
-      <property name="prototype" type="Object" scope="instance" access="read-write">
+      <property name="prototype" type="Object" access="read-write">
         <description>Creates an instance of a Function class.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -4751,7 +4750,7 @@ myObject.alert2();&lt;/pre&gt;
     </properties>
     
 	<methods>
-      <method name="apply" scope="instance">
+      <method name="apply">
         <description>
           Allows you to apply a method of another object in the
           context of a different object (the calling object).
@@ -4847,7 +4846,7 @@ car = new prod_dept("honda", 5000, "auto");&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="call" scope="instance">
+	  <method name="call">
         <description>
           Allows you to call (execute) a method of another
           object in the context of a different object (the calling
@@ -4925,7 +4924,7 @@ car = new prod_dept("honda", 5000, "auto");&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="toSource" scope="" visibility="">
+	  <method name="toSource">
 		<references>
 			<reference name="toString"/>
 			<reference name="Object.valueOf"/>
@@ -4956,7 +4955,7 @@ car = new prod_dept("honda", 5000, "auto");&lt;/pre&gt;
 		<return-description>Returns a string representing the source code of the function.</return-description>
 	</method>
 	
-	<method name="toString" scope="instance">
+	<method name="toString">
         <description>
           Returns a string representing the source code of the
           function.
@@ -5018,7 +5017,7 @@ theDog = new Dog("Gabby","Lab","chocolate","girl")&lt;/pre&gt;&lt;p&gt;Any time 
         </remarks>
       </method>
     
-	<method name="valueOf" scope="" visibility="">
+	<method name="valueOf">
 		<references>
 			<reference name="toString"/>
 			<reference name="Object.valueOf"/>
@@ -5099,7 +5098,7 @@ if (myAge &amp;gt;= 39)
 		<browser platform="Opera" version="7.0+" />
 	</browsers>
 	<constructors>
-		<constructor scope="instance">
+		<constructor>
 			<description>The Global object does not have a constructor.</description>
 	        <return-types>
 	          <return-type type="Object"/>
@@ -5107,7 +5106,7 @@ if (myAge &amp;gt;= 39)
 		</constructor>
 	</constructors>
 	<properties>
-		<property name="Infinity" type="Infinity" scope="static" access="">
+		<property name="Infinity" type="Infinity" scope="static">
 			<availability>
 				<specification name="JavaScript 1.3"/>
 				<specification name="JScript 3.0"/>
@@ -5132,7 +5131,7 @@ if (myAge &amp;gt;= 39)
 			</browsers>
 		</property>
 			
-		<property name="NaN" type="NaN" scope="" access="">
+		<property name="NaN" type="NaN">
 			<availability>
 				<specification name="JavaScript 1.3"/>
 				<specification name="JScript 3.0"/>
@@ -5162,7 +5161,7 @@ if (myAge &amp;gt;= 39)
 			</browsers>
 		</property>
 		
-		<property name="undefined" type="undefined" scope="" access="">
+		<property name="undefined" type="undefined">
 			<availability>
 				<specification name="JavaScript 1.3"/>
 				<specification name="JScript 5.5"/>
@@ -5204,7 +5203,7 @@ if (typeof x == 'undefined') {
 		
 		<methods>
 			
-			<method name="decodeURI" scope="">
+			<method name="decodeURI">
 				<parameters>
 					<parameter name="encodedURI" type="String" usage="required">
 						<description>A complete, encoded Uniform Resource Identifier.</description>
@@ -5237,7 +5236,7 @@ if (typeof x == 'undefined') {
 				<return-description>Returns a URI-decoded string.</return-description>
 			</method>
 			
-			<method name="decodeURIComponent" scope="">
+			<method name="decodeURIComponent">
 				<parameters>
 					<parameter name="encodedURI" type="String" usage="required">
 						<description>An encoded component of a URI.</description>
@@ -5267,7 +5266,7 @@ if (typeof x == 'undefined') {
 				<return-description>Returns a decoded URI.</return-description>
 			</method>
 			
-			<method name="encodeURI" scope="">
+			<method name="encodeURI">
 				<parameters>
 					<parameter name="URI" type="String" usage="required">
 						<description>A complete Uniform Resource Identifier.</description>
@@ -5321,7 +5320,7 @@ if (typeof x == 'undefined') {
 				<return-description>Returns an encoded URI.</return-description>
 			</method>
 			
-			<method name="encodeURIComponent" scope="">
+			<method name="encodeURIComponent">
 				<parameters>
 					<parameter name="String" type="String" usage="required">
 						<description>A component of a Uniform Resource Identifier.</description>
@@ -5354,7 +5353,7 @@ if (typeof x == 'undefined') {
 				<return-description>Returns an encoded URI string.</return-description>
 			</method>
 			
-			<method name="escape" scope="">
+			<method name="escape">
 				<parameters>
 					<parameter name="string" type="string" usage="required">
 						<description>String to be URI-encoded.</description>
@@ -5384,7 +5383,7 @@ if (typeof x == 'undefined') {
 				<return-description>Returns a URI-encoded version of a string.</return-description>
 			</method>
 			
-			<method name="eval" scope="">
+			<method name="eval">
 				<parameters>
 					<parameter name="string" type="String" usage="required">
 						<description>A string representing a JavaScript expression, statement, or sequence of statements. string can include variables and properties of existing objects.</description>
@@ -5478,7 +5477,7 @@ document.write("The field named ", field, " has value of ",
 				<return-description>Returns the result of the evaluation.</return-description>
 			</method>
 			
-			<method name="isFinite" scope="">
+			<method name="isFinite">
 				<parameters>
 					<parameter name="number" type="Number" usage="required">
 						<description>Number to be evaluated.</description>
@@ -5521,7 +5520,7 @@ document.write("The field named ", field, " has value of ",
 				<return-description>Returns true if the argument is a finite number.</return-description>
 			</method>
 			
-			<method name="isNaN" scope="">
+			<method name="isNaN">
 				<parameters>
 					<parameter name="value" type="String" usage="required">
 						<description>The value you want to evaluate.</description>
@@ -5569,7 +5568,7 @@ if (isNaN(floatValue)) {
 				<return-description>Returns true if the argument is NaN.</return-description>
 			</method>
 			
-			<method name="parseFloat" scope="">
+			<method name="parseFloat">
 				<parameters>
 					<parameter name="string" type="String" usage="required">
 						<description>A string that represents the value you want to parse.</description>
@@ -5622,7 +5621,7 @@ if (isNaN(floatValue)) {
 				<return-description>Returns a number version of the string. </return-description>
 			</method>
 			
-			<method name="parseInt" scope="">
+			<method name="parseInt">
 				<parameters>
 					<parameter name="string" type="String" usage="required">
 						<description>A string that represents the value you want to parse.</description>
@@ -5702,7 +5701,7 @@ if (isNaN(floatValue)) {
 				<return-description>Returns an integer of the specified argument.</return-description>
 			</method>
 			
-			<method name="unescape" scope="">
+			<method name="unescape">
 				<parameters>
 					<parameter name="string" type="String" usage="required">
 						<description>URI-encoded string to be decoded.</description>
@@ -6923,7 +6922,7 @@ x=Math.round(-20.51)&lt;/pre&gt;
 		<browser platform="Safari" version="1.0+" />
 	</browsers>
     <constructors>
-      <constructor scope="instance">
+      <constructor>
         <description>Creates a new instance of a Number.</description>
         <parameters>
           <parameter name="value" type="Number" usage="required">
@@ -7102,7 +7101,7 @@ if (month &amp;lt; 1 || month &amp;gt; 12) {
         </references>
     </property>
     
-	<property name="constructor" type="Object" scope="" access="">
+	<property name="constructor" type="Object">
 		<availability>
 			<specification name="JavaScript 1.1"/>
 		</availability>
@@ -7120,7 +7119,7 @@ if (month &amp;lt; 1 || month &amp;gt; 12) {
 		</browsers>
 	</property>
 	
-	<property name="prototype" type="Object" scope="" access="">
+	<property name="prototype" type="Object">
 		<availability>
 			<specification name="JavaScript 1.1"/>
 		</availability>
@@ -7137,7 +7136,7 @@ if (month &amp;lt; 1 || month &amp;gt; 12) {
 </properties>
 
 <methods>
-      <method name="toExponential" scope="instance">
+      <method name="toExponential">
         <description>Returns a string representing the number in exponential notation.</description>
 		<browsers>
 			<browser platform="IE" version="5.5+"/>
@@ -7176,7 +7175,7 @@ if (month &amp;lt; 1 || month &amp;gt; 12) {
         </availability>
       </method>
       
-	  <method name="toFixed" scope="instance">
+	  <method name="toFixed">
         <description>Returns a string representing the number in fixed-point notation.</description>
 		<browsers>
 			<browser platform="IE" version="5.5+"/>
@@ -7215,7 +7214,7 @@ if (month &amp;lt; 1 || month &amp;gt; 12) {
         </availability>
       </method>
       
-	  <method name="toLocaleString" scope="instance">
+	  <method name="toLocaleString">
         <description>Returns a string representing the number that follows local formatting conventions.</description>
 		<browsers>
 			<browser platform="IE" version="5.5+"/>
@@ -7247,7 +7246,7 @@ if (month &amp;lt; 1 || month &amp;gt; 12) {
         </availability>
       </method>
       
-	  <method name="toPrecision" scope="instance">
+	  <method name="toPrecision">
         <description>Returns a string representing the number to a specified precision in fixed-point notation.</description>
 		<browsers>
 			<browser platform="IE" version="5.5+"/>
@@ -7286,7 +7285,7 @@ if (month &amp;lt; 1 || month &amp;gt; 12) {
         </availability>
       </method>
       
-	  <method name="toSource" scope="" visibility="">
+	  <method name="toSource">
 		<return-types>
 			<return-type type="Object"/>
 		</return-types>
@@ -7302,7 +7301,7 @@ if (month &amp;lt; 1 || month &amp;gt; 12) {
 		<return-description>Returns an object literal representing the specified Number object; you can use this value to create a new object.</return-description>
 	</method>
 	
-	<method name="toString" scope="instance">
+	<method name="toString">
         <description>Returns a string representing the specified object.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -7338,7 +7337,7 @@ if (month &amp;lt; 1 || month &amp;gt; 12) {
         </availability>
       </method>
       
-	  <method name="valueOf" scope="instance">
+	  <method name="valueOf">
         <description>Returns the primitive value of the specified object.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -7425,7 +7424,7 @@ document.write(x + "&amp;lt;BR&amp;gt;");&lt;/pre&gt;&lt;p&gt;You can convert an
 		<browser platform="Safari" version="1.0+" />
 	</browsers>
     <constructors>
-      <constructor scope="instance">
+      <constructor>
         <description>Creates a new instance of an Object.</description>
         <parameters>
           <parameter name="value" type="String" usage="optional">
@@ -7443,7 +7442,7 @@ document.write(x + "&amp;lt;BR&amp;gt;");&lt;/pre&gt;&lt;p&gt;You can convert an
     </constructors>
     
 	<properties>
-      <property name="constructor" type="Function" scope="instance" access="read-write">
+      <property name="constructor" type="Function" access="read-write">
         <description>Specifies the function that creates a prototype of an object.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -7464,7 +7463,7 @@ document.write(x + "&amp;lt;BR&amp;gt;");&lt;/pre&gt;&lt;p&gt;You can convert an
         <remarks/>
       </property>
       
-	  <property name="prototype" type="Object" scope="instance" access="read-write">
+	  <property name="prototype" type="Object" access="read-write">
         <description>Represents the prototype for this class. You can use the prototype to add properties or methods to all instances of a class.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -7487,7 +7486,7 @@ document.write(x + "&amp;lt;BR&amp;gt;");&lt;/pre&gt;&lt;p&gt;You can convert an
     
 	<methods>
       
-	  <method name="eval" scope="">
+	  <method name="eval">
 			<parameters>
 				<parameter name="string" type="string" usage="required">
 					<description>Any string representing a JavaScript expression, statement, or sequence of statements. The expression can include variables and properties of existing objects.</description>
@@ -7527,7 +7526,7 @@ document.write(x + "&amp;lt;BR&amp;gt;");&lt;/pre&gt;&lt;p&gt;You can convert an
 			<return-description>Returns the result of the evaluation.</return-description>
 		</method>
 		
-		<method name="hasOwnProperty" scope="instance">
+		<method name="hasOwnProperty">
         <description>Checks whether a property is inherited.</description>
 		<browsers>
 			<browser platform="IE" version="5.5+"/>
@@ -7558,7 +7557,7 @@ document.write(x + "&amp;lt;BR&amp;gt;");&lt;/pre&gt;&lt;p&gt;You can convert an
         <remarks/>
       </method>
       
-	  <method name="isPrototypeOf" scope="instance">
+	  <method name="isPrototypeOf">
         <description>Returns true if the object is a prototype of another.</description>
 		<browsers>
 			<browser platform="IE" version="5.5+"/>
@@ -7589,7 +7588,7 @@ document.write(x + "&amp;lt;BR&amp;gt;");&lt;/pre&gt;&lt;p&gt;You can convert an
         <remarks/>
       </method>
       
-	  <method name="propertyIsEnumerable" scope="instance">
+	  <method name="propertyIsEnumerable">
         <description>Returns true if the property can be enumerated in a for/in loop.</description>
 		<browsers>
 			<browser platform="IE" version="5.5+"/>
@@ -7620,7 +7619,7 @@ document.write(x + "&amp;lt;BR&amp;gt;");&lt;/pre&gt;&lt;p&gt;You can convert an
         <remarks/>
       </method>
       
-	  <method name="toLocaleString" scope="instance">
+	  <method name="toLocaleString">
         <description>Returns a localized string representation of an object.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -7650,7 +7649,7 @@ document.write(x + "&amp;lt;BR&amp;gt;");&lt;/pre&gt;&lt;p&gt;You can convert an
         <remarks/>
       </method>
       
-	  <method name="toSource" scope="">
+	  <method name="toSource">
 			<references>
 				<reference name="toString"/>
 			</references>
@@ -7694,7 +7693,7 @@ theDog = new Dog("Gabby","Lab","chocolate","girl")&lt;/pre&gt;
 			<return-description>Returns a string representing the source code of the object.</return-description>
 	</method>
 	
-	<method name="toString" scope="instance">
+	<method name="toString">
         <description>Returns a string representing the specified object.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -7765,7 +7764,7 @@ o.toString // returns [object Object]&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="unwatch" scope="" visibility="">
+	  <method name="unwatch">
 		<parameters>
 			<parameter name="prop" type="String" usage="required">
 				<description>The name of a property of the object.</description>
@@ -7789,7 +7788,7 @@ o.toString // returns [object Object]&lt;/pre&gt;
 		<return-description>Returns the object with the watchpoint removed.</return-description>
 	</method>
 	
-	<method name="valueOf" scope="instance">
+	<method name="valueOf">
         <description>Returns the primitive value of the specified object </description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -7836,7 +7835,7 @@ o.toString // returns [object Object]&lt;/pre&gt;
         </remarks>
     </method>
     
-	<method name="watch" scope="" visibility="">
+	<method name="watch">
 		<parameters>
 			<parameter name="prop" type="String" usage="required">
 				<description>Name of the property to set.</description>
@@ -7923,7 +7922,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 		<browser platform="Netscape" version="6.0+"/>
 	</browsers>
     <constructors>
-      <constructor scope="instance">
+      <constructor>
         <description>Creates a new instance of RangeError.</description>
         <parameters>
           <parameter name="message" type="String" usage="optional">
@@ -7937,7 +7936,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
       </constructor>
     </constructors>
     <properties>
-      <property name="message" type="String" scope="instance" access="read-write">
+      <property name="message" type="String" access="read-write">
         <description>An error message associated with the RangeError.</description>
 		<browsers>
 			<browser platform="IE" version="5.0+"/>
@@ -7947,7 +7946,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
         <availability/>
     </property>
       
-	<property name="name" type="String" scope="instance" access="read-write">
+	<property name="name" type="String" access="read-write">
         <description>Specifies the type of exception.</description>
 		<browsers>
 			<browser platform="IE" version="5.0+"/>
@@ -7979,7 +7978,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 		<browser platform="Netscape" version="6.0+"/>
 	</browsers>
     <constructors>
-      <constructor scope="instance">
+      <constructor>
         <description>Creates a new instance of ReferenceError.</description>
         <parameters>
           <parameter name="message" type="String" usage="optional">
@@ -7993,7 +7992,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
       </constructor>
     </constructors>
     <properties>
-      <property name="message" type="String" scope="instance" access="read-write">
+      <property name="message" type="String" access="read-write">
         <description>An error message associated with the ReferenceError.</description>
 		<browsers>
 			<browser platform="IE" version="5.0+"/>
@@ -8003,7 +8002,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
         <availability/>
       </property>
       
-	  <property name="name" type="String" scope="instance" access="read-write">
+	  <property name="name" type="String" access="read-write">
         <description>Specifies the type of exception.</description>
 		<browsers>
 			<browser platform="IE" version="5.0+"/>
@@ -8038,7 +8037,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 		<browser platform="Safari" version="1.0+" />
 	</browsers>
     <constructors>
-      <constructor scope="instance">
+      <constructor>
         <description>Creates a new instance of RegExp.</description>
         <parameters>
           <parameter name="pattern" type="String" usage="optional">
@@ -8063,7 +8062,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
     </constructors>
     <properties>
       
-	  <property name="$n" type="String" scope="" access="read">
+	  <property name="$n" type="String" access="read">
 		<availability>
 			<specification name="JavaScript 1.2"/>
 			<specification name="JScript 3.0"/>
@@ -8077,7 +8076,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 		</browsers>
 	</property>
 	
-	<property name="constructor" type="Object" scope="" access="">
+	<property name="constructor" type="Object">
 		<availability>
 			<specification name="JavaScript 1.2"/>
 			<specification name="JScript 3.0"/>
@@ -8097,7 +8096,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 		</browsers>
 	</property>
 	
-	<property name="global" type="Boolean" scope="instance" access="read">
+	<property name="global" type="Boolean" access="read">
         <description>
           Whether or not the "g" flag is used with
           the regular expression.
@@ -8125,7 +8124,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
         </remarks>
       </property>
       
-	  <property name="ignoreCase" type="Boolean" scope="instance" access="read">
+	  <property name="ignoreCase" type="Boolean" access="read">
         <description>
           Whether or not the "i" flag is used with
           the regular expression.
@@ -8152,7 +8151,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
         </remarks>
       </property>
       
-	  <property name="index" type="Number" scope="instance" access="read">
+	  <property name="index" type="Number" access="read">
 		<availability>
 			<specification name="JScript 3.0"/>
 		</availability>
@@ -8162,7 +8161,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 		</browsers>
 	</property>
 	
-	<property name="input" type="String" scope="instance" access="read">
+	<property name="input" type="String" access="read">
 		<availability>
 			<specification name="JavaScript 1.2"/>
 			<specification name="JScript 3.0"/>
@@ -8175,7 +8174,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 		</browsers>
 	</property>
 	
-	<property name="lastIndex" type="Number" scope="instance" access="read-write">
+	<property name="lastIndex" type="Number" access="read-write">
         <description>
           A read/write integer property that specifies the index
           at which to start the next match.
@@ -8221,7 +8220,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
         </remarks>
     </property>
       
-	<property name="lastMatch" type="String" scope="instance" access="read">
+	<property name="lastMatch" type="String" access="read">
 		<availability>
 			<specification name="JavaScript 1.2"/>
 			<specification name="JScript 5.5"/>
@@ -8234,7 +8233,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 		</browsers>
 	</property>
 	
-	<property name="lastParen" type="String" scope="instance" access="read">
+	<property name="lastParen" type="String" access="read">
 		<availability>
 			<specification name="JavaScript 1.2"/>
 			<specification name="JScript 5.5"/>
@@ -8247,7 +8246,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 		</browsers>
 	</property>
 	
-	<property name="leftContext" type="String" scope="instance" access="read">
+	<property name="leftContext" type="String" access="read">
 		<availability>
 			<specification name="JavaScript 1.2"/>
 			<specification name="JScript 5.5"/>
@@ -8260,7 +8259,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 		</browsers>
 	</property>
 	
-	<property name="multiline" type="Boolean" scope="instance" access="read">
+	<property name="multiline" type="Boolean" access="read">
 		<availability>
 			<specification name="JavaScript 1.2"/>
 			<specification name="JScript 5.5"/>
@@ -8283,7 +8282,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 		</browsers>
 	</property>
 	
-	<property name="prototype" type="Object" scope="instance" access="read-write">
+	<property name="prototype" type="Object" access="read-write">
 		<availability>
 			<specification name="JavaScript 1.2"/>
 			<specification name="JScript 3.0"/>
@@ -8300,7 +8299,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 		</browsers>
 	</property>
 	
-	<property name="rightContext" type="String" scope="instance" access="read">
+	<property name="rightContext" type="String" access="read">
 		<availability>
 			<specification name="JavaScript 1.2"/>
 			<specification name="JScript 5.5"/>
@@ -8314,7 +8313,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 		</browsers>
 	</property>
 	
-	<property name="source" type="String" scope="instance" access="read">
+	<property name="source" type="String" access="read">
         <description>
           A read-only property that contains the text of the
           pattern, excluding the forward slashes.
@@ -8340,7 +8339,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
     </properties>
    
     <methods>
-      <method name="compile" scope="">
+      <method name="compile">
 		<parameters>
 			<parameter name="expr" type="Object" usage="required">
 				<description>The regular expression to be compiled.</description>
@@ -8367,7 +8366,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 		<return-description>Returns a new regular expression created by compiling the specified regular expression with the specified flags.</return-description>
 	</method>
 	
-	<method name="exec" scope="instance">
+	<method name="exec">
         <description>
           Executes the search for a match in a specified string.
           Returns a result array.
@@ -8484,7 +8483,7 @@ Found ab. Next match starts at 9. &lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="test" scope="instance">
+	  <method name="test">
         <description>Executes the search for a match between a regular expression and a specified string.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -8544,7 +8543,7 @@ Found ab. Next match starts at 9. &lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="toSource" scope="" visibility="">
+	  <method name="toSource">
 		<references>
 			<reference name="Object.toSource"/>
 		</references>
@@ -8572,7 +8571,7 @@ Found ab. Next match starts at 9. &lt;/pre&gt;
 	<return-description>Returns a string representing the source code of the object.</return-description>
 	</method>
 	
-	<method name="toString" scope="instance">
+	<method name="toString">
         <description>Returns a string representing the specified object.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -8804,7 +8803,7 @@ re = /\w+/&lt;/pre&gt;&lt;h3&gt;Special characters in regular expressions&lt;/h3
 		<browser platform="Safari" version="1.0+" />
 	</browsers>
     <constructors>
-      <constructor scope="instance">
+      <constructor>
         <description>Constructs an instance of a String.</description>
         <parameters>
           <parameter name="string" type="String" usage="required">
@@ -8819,7 +8818,7 @@ re = /\w+/&lt;/pre&gt;&lt;h3&gt;Special characters in regular expressions&lt;/h3
     </constructors>
     <properties>
       
-	<property name="constructor" type="Object" scope="" access="">
+	<property name="constructor" type="Object">
 		<availability>
 			<specification name="JavaScript 1.1"/>
 			<specification name="JScript 2.0"/>
@@ -8839,7 +8838,7 @@ re = /\w+/&lt;/pre&gt;&lt;h3&gt;Special characters in regular expressions&lt;/h3
 		</browsers>
 	</property>
 	
-	<property name="length" type="Number" scope="instance" access="read-write">
+	<property name="length" type="Number" access="read-write">
         <description>Number of characters in the string.</description>
 		<browsers>
 			<browser platform="IE" version="3.0+"/>
@@ -8866,7 +8865,7 @@ alert("The string length is " + x.length);&lt;/pre&gt;
         </remarks>
       	</property>
     	
-		<property name="prototype" type="Object" scope="" access="">
+		<property name="prototype" type="Object">
 			<availability>
 				<specification name="JavaScript 1.1"/>
 				<specification name="JScript 2.0"/>
@@ -8887,7 +8886,7 @@ alert("The string length is " + x.length);&lt;/pre&gt;
     
 	<methods>
       
-	  <method name="anchor" scope="instance">
+	  <method name="anchor">
 		<parameters>
 			<parameter name="name" type="String" usage="required">
 				<description>String to be copied into an HTML anchor.</description>
@@ -8930,7 +8929,7 @@ document.writeln(myString.anchor("contents_anchor"));
 		<return-description>Returns a copy of a string as an HTML anchor. (e.g &amp;lt;a name="name"&amp;gt;</return-description>
 	</method>
 	
-	<method name="big" scope="instance">
+	<method name="big">
 		<references>
 			<reference name="fontsize"/>
 			<reference name="small"/>
@@ -8972,7 +8971,7 @@ document.write("&amp;lt;P&amp;gt;" + worldString.fontsize(7))
 		<return-description>Returns a copy of a string surrounded by &amp;lt;big&amp;gt;&amp;lt;/big&amp;gt; HTML tags.</return-description>
 	</method>
 	
-	<method name="blink" scope="instance">
+	<method name="blink">
 		<references>
 			<reference name="bold"/>
 			<reference name="italics"/>
@@ -9015,7 +9014,7 @@ document.write("&amp;lt;P&amp;gt;" + worldString.strike())
 		<return-description>Returns a copy of a string surrounded by &amp;lt;blink&gt;&amp;lt;/blink&gt; HTML tags.</return-description>
 	</method>
 	
-	<method name="bold" scope="instance">
+	<method name="bold">
 		<references>
 			<reference name="blink"/>
 			<reference name="italics"/>
@@ -9062,7 +9061,7 @@ document.write("&amp;lt;P&amp;gt;" + worldString.strike())
 		<return-description>Returns a copy of a string surrounded by &amp;lt;bold&amp;gt;&amp;lt;/bold&amp;gt; HTML tags.</return-description>
 	</method>
 	
-	<method name="charAt" scope="instance">
+	<method name="charAt">
         <description>Returns the specified character from a string.</description>
 		<browsers>
 			<browser platform="IE" version="3.0+"/>
@@ -9117,7 +9116,7 @@ The character at index 4 is e &lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="charCodeAt" scope="instance">
+	  <method name="charCodeAt">
         <description>Returns the the Unicode value of the character at the specified index.</description>
 		<browsers>
 			<browser platform="IE" version="5.5+"/>
@@ -9157,7 +9156,7 @@ The character at index 4 is e &lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="concat" scope="instance">
+	  <method name="concat">
         <description> Combines the text of two or more strings and returns a new string.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -9197,7 +9196,7 @@ s4=s1.concat(s2,s3) // returns "Oh what a beautiful mornin'."&lt;/pre&gt;
           one string do not affect the other string.</remarks>
       </method>
       
-	  <method name="fixed" scope="instance">
+	  <method name="fixed">
 		<availability>
 			<specification name="JavaScript 1.0"/>
 			<specification name="JScript 1.0"/>
@@ -9223,7 +9222,7 @@ document.write(worldString.fixed())
 		<return-description>Returns a copy of a string surrounded by &amp;lt;tt&amp;gt;&amp;lt;/tt&amp;gt; tags.</return-description>
 	</method>
 	
-	<method name="fontcolor" scope="instance">
+	<method name="fontcolor">
 		<parameters>
 			<parameter name="color" type="String" usage="required">
 				<description>A string expressing the color as either a hexadecimal RGB triplet or as a string literal.</description>
@@ -9278,7 +9277,7 @@ document.write("&amp;lt;P&amp;gt;" + worldString.fontcolor("FF00") + " is red in
 		<return-description>Returns a copy of a string surrounded by &amp;lt;font color = "color"&amp;gt;&amp;lt;/font&amp;gt; tags.</return-description>
 	</method>
 	
-	<method name="fontsize" scope="instance">
+	<method name="fontsize">
 		<parameters>
 			<parameter name="size" type="Number" usage="required">
 				<description>An integer between 1 and 7, or a string representing a signed integer between 1 and 7, specifiying what the font size should be set to.</description>
@@ -9330,7 +9329,7 @@ document.write("&amp;lt;P&amp;gt;" + worldString.fontsize(7))
 		<return-description>Returns a copy of a string surrounded by &amp;lt;font size="size"&amp;gt;&amp;lt;/font&amp;gt; tags.</return-description>
 	</method>
 	
-	<method name="fromCharCode" scope="static">
+	<method name="fromCharCode">
         <description> Returns a string created by using the specified sequence of Unicode values.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -9370,7 +9369,7 @@ document.write("&amp;lt;P&amp;gt;" + worldString.fontsize(7))
         </remarks>
       </method>
       
-	  <method name="indexOf" scope="instance">
+	  <method name="indexOf">
         <description>Returns the index within the calling String object of the first occurrence of the specified value, starting the search at fromIndex, or -1 if the value is not found.</description>
 		<browsers>
 			<browser platform="IE" version="3.0+"/>
@@ -9469,7 +9468,7 @@ while ( pos != -1 ) {
         </remarks>
     </method>
 	  
-    <method name="italics" scope="instance">
+    <method name="italics">
 		<references>
 			<reference name="bold"/>
 			<reference name="italics"/>
@@ -9515,7 +9514,7 @@ document.write("&amp;lt;P&amp;gt;" + worldString.strike())
 		<return-description>Returns a copy of a string surrounded by &amp;lt;i&amp;gt;&amp;lt;/i&amp;gt; tags.</return-description>
 	</method>
 	
-	<method name="lastIndexOf" scope="instance">
+	<method name="lastIndexOf">
         <description>
           Returns the index within the calling
           String object of the last occurrence of the
@@ -9590,7 +9589,7 @@ document.write("&amp;lt;P&amp;gt;The index of 'new' from the end is " +
         </remarks>
      </method>
      
-	 <method name="link" scope="instance">
+	 <method name="link">
 		<parameters>
 			<parameter name="href" type="String" usage="required">
 				<description>String specifying the URL for the link.</description>
@@ -9632,7 +9631,7 @@ document.write("Click to return to " + hotText.link(URL))
 		<return-description>Returns a copy of a string surrounded by &amp;lt;a href="href"&amp;gt;&amp;lt;/a&amp;gt; tags.</return-description>
 	</method>
 		
-	<method name="localeCompare" scope="instance">
+	<method name="localeCompare">
         <description>Uses locale-specific ordering to compare two strings.</description>
 		<browsers>
 			<browser platform="IE" version="5.5+"/>
@@ -9659,7 +9658,7 @@ document.write("Click to return to " + hotText.link(URL))
         </availability>
       </method>
       
-	  <method name="match" scope="instance">
+	  <method name="match">
         <description>Used to match a regular expression against a string.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -9728,7 +9727,7 @@ document.write(newArray);
         </remarks>
       </method>
       
-	  <method name="replace" scope="instance">
+	  <method name="replace">
         <description>Finds a match between a regular expression and a string, and replaces the matched substring with a new substring.</description>
 		<browsers>
 			<browser platform="IE" version="3.0+"/>
@@ -9853,7 +9852,7 @@ document.write(newstr)
         </remarks>
       </method>
       
-	  <method name="search" scope="instance">
+	  <method name="search">
         <description>Executes the search for a match between a regular expression and this String object.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -9908,7 +9907,7 @@ document.write(newstr)
         </remarks>
       </method>
       
-	  <method name="slice" scope="instance">
+	  <method name="slice">
         <description>Extracts a section of a string and returns a new string.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -9962,7 +9961,7 @@ document.write(str2)
         </remarks>
       </method>
       
-	  <method name="small" scope="instance">
+	  <method name="small">
 		<references>
 			<reference name="big"/>
 			<reference name="fontsize"/>
@@ -10003,7 +10002,7 @@ document.write("&amp;lt;P&amp;gt;" + worldString.fontsize(7))
 		<return-description>Returns a copy of a string surrounded by &amp;lt;small&amp;gt;&amp;lt;/small&amp;gt; tags.</return-description>
 	</method>
 	
-	<method name="split" scope="instance">
+	<method name="split">
         <description>Splits a String object into an array of strings by separating the string into substrings.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -10120,7 +10119,7 @@ document.write(splits)
         </remarks>
       </method>
       
-	  <method name="strike" scope="instance">
+	  <method name="strike">
 		<references>
 			<reference name="blink"/>
 			<reference name="bold"/>
@@ -10166,7 +10165,7 @@ document.write("&amp;lt;P&amp;gt;" + worldString.strike())
 		<return-description>Returns a copy of a string surrounded by &lt;strike&gt;&lt;/strike&gt; tags.</return-description>
 	</method>
 	
-	<method name="sub" scope="instance">
+	<method name="sub">
 		<references>
 			<reference name="sup"/>
 		</references>
@@ -10208,7 +10207,7 @@ document.write("&amp;lt;P&amp;gt;This is what a " + subText.sub() + " looks like
 		<return-description>Returns a copy of a string surrounded by &amp;lt;sub&amp;gt;&amp;lt;/sub&amp;gt; tags.</return-description>
 	</method>
 	
-	<method name="substr" scope="instance">
+	<method name="substr">
         <description>Returns the characters in a string beginning at the specified location through the specified number of characters.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -10276,7 +10275,7 @@ document.writeln("(20, 2): ", str.substr(20,2));&lt;/pre&gt;&lt;p&gt;This script
         </remarks>
       </method>
       
-	  <method name="substring" scope="instance">
+	  <method name="substring">
         <description>Returns a subset of a String object.</description>
 		<browsers>
 			<browser platform="IE" version="3.0+"/>
@@ -10369,7 +10368,7 @@ document.write(str.substring(3,0));
         </remarks>
       </method>
       
-	  <method name="sup" scope="instance">
+	  <method name="sup">
 		<references>
 			<reference name="sub"/>
 		</references>
@@ -10410,7 +10409,7 @@ document.write("&amp;lt;P&amp;gt;This is what a " + subText.sub() + " looks like
 		<return-description>Returns a copy of a string surrounded by &amp;lt;sup&amp;gt;&amp;lt;/sup&amp;gt; tags.</return-description>
 	</method>
 	
-	<method name="toLocaleLowerCase" scope="instance">
+	<method name="toLocaleLowerCase">
         <description>Returns a copy of a string in lowercase letters in a locale-specific format.</description>
 		<browsers>
 			<browser platform="IE" version="3.0+"/>
@@ -10433,7 +10432,7 @@ document.write("&amp;lt;P&amp;gt;This is what a " + subText.sub() + " looks like
         </availability>
       </method>
 	      
-	  <method name="toLocaleUpperCase" scope="instance">
+	  <method name="toLocaleUpperCase">
         <description>Returns a copy of a string in uppercase letters in a locale-specific format.</description>
 		<browsers>
 			<browser platform="IE" version="3.0+"/>
@@ -10456,7 +10455,7 @@ document.write("&amp;lt;P&amp;gt;This is what a " + subText.sub() + " looks like
         </availability>
       </method>
       
-	  <method name="toLowerCase" scope="instance">
+	  <method name="toLowerCase">
         <description>Returns the string value converted to lowercase. </description>
 		<browsers>
 			<browser platform="IE" version="3.0+"/>
@@ -10492,7 +10491,7 @@ document.write(upperText.toLowerCase())&lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="toString" scope="instance">
+	  <method name="toString">
         <description>Returns a string representing the specified object.</description>
 		<browsers>
 			<browser platform="IE" version="3.0+"/>
@@ -10526,7 +10525,7 @@ alert(x.toString())      // Displays "Hello world"&lt;/pre&gt;
         </example>
       </method>
       
-	  <method name="toUpperCase" scope="instance">
+	  <method name="toUpperCase">
 		<references>
 			<reference name="toLowerCase"/>
 		</references>
@@ -10557,7 +10556,7 @@ document.write(lowerText.toUpperCase())&lt;/pre&gt;</example>
 		<return-description>Returns the string value converted to all uppercase.</return-description>
 	</method>
 	
-    <method name="valueOf" scope="instance">
+    <method name="valueOf">
 		<references>
 			<reference name="toString"/>
 			<reference name="Object.valueOf"/>
@@ -10607,7 +10606,7 @@ alert(x.valueOf())          // Displays "Hello world"&lt;/pre&gt;</example>
 		<browser platform="Netscape" version="6.0+"/>
 	</browsers>
 		<constructors>
-			<constructor scope="">
+			<constructor>
 				<description>Creates a new instance of SyntaxError.</description>
 				<parameters>
 					<parameter name="message" type="String" usage="optional">
@@ -10621,7 +10620,7 @@ alert(x.valueOf())          // Displays "Hello world"&lt;/pre&gt;</example>
 		</constructors>
 		
 		<properties>
-			<property name="message" type="String" scope="instance" access="read-write">
+			<property name="message" type="String" access="read-write">
 				<availability>
 					<specification name="JavaScript 1.5"/>
 					<specification name="JScript 5.5"/>
@@ -10639,7 +10638,7 @@ alert(x.valueOf())          // Displays "Hello world"&lt;/pre&gt;</example>
 				</browsers>
 			</property>
 			
-			<property name="name" type="String" scope="instance" access="read-write">
+			<property name="name" type="String" access="read-write">
 				<availability>
 					<specification name="JavaScript 1.5"/>
 					<specification name="JScript 5.5"/>
@@ -10680,7 +10679,7 @@ alert(x.valueOf())          // Displays "Hello world"&lt;/pre&gt;</example>
 		<browser platform="Netscape" version="6.0+"/>
 	</browsers>
 	<constructors>
-		<constructor scope="instance">
+		<constructor>
 			<description>Creates a new instance of TypeError.</description>
 			<parameters>
 				<parameter name="message" type="String" usage="optional">
@@ -10695,7 +10694,7 @@ alert(x.valueOf())          // Displays "Hello world"&lt;/pre&gt;</example>
 	
 	<properties>
 		
-		<property name="message" type="String" scope="instance" access="read-write">
+		<property name="message" type="String" access="read-write">
 			<availability>
 				<specification name="JavaScript 1.5"/>
 				<specification name="JScript 5.5"/>
@@ -10712,7 +10711,7 @@ alert(x.valueOf())          // Displays "Hello world"&lt;/pre&gt;</example>
 			</browsers>
 		</property>
 		
-		<property name="name" type="String" scope="instance" access="read-write">
+		<property name="name" type="String" access="read-write">
 			<availability>
 				<specification name="JavaScript 1.5"/>
 				<specification name="JScript 5.5"/>
@@ -10752,7 +10751,7 @@ alert(x.valueOf())          // Displays "Hello world"&lt;/pre&gt;</example>
 		<browser platform="Netscape" version="6.0+"/>
 	</browsers>
 	<constructors>
-		<constructor scope="instance">
+		<constructor>
 			<description>Creates a new instance of URIError.</description>
 			<parameters>
 				<parameter name="message" type="String" usage="optional">
@@ -10766,7 +10765,7 @@ alert(x.valueOf())          // Displays "Hello world"&lt;/pre&gt;</example>
 	</constructors>
 	
 	<properties>
-		<property name="message" type="String" scope="instance" access="read-write">
+		<property name="message" type="String" access="read-write">
 			<availability>
 				<specification name="JavaScript 1.5"/>
 				<specification name="JScript 5.5"/>
@@ -10783,7 +10782,7 @@ alert(x.valueOf())          // Displays "Hello world"&lt;/pre&gt;</example>
 			</browsers>
 		</property>
 		
-		<property name="name" type="String" scope="instance" access="read-write">
+		<property name="name" type="String" access="read-write">
 			<availability>
 				<specification name="JavaScript 1.5"/>
 				<specification name="JScript 5.5"/>

@@ -1,11 +1,12 @@
 package com.aptana.editor.js.sdoc.model;
 
-import com.aptana.parsing.io.SourceWriter;
+import com.aptana.editor.js.JSTypeConstants;
+import com.aptana.parsing.io.SourcePrinter;
 
 public class ArrayType extends Type
 {
 	private Type _memberType;
-	
+
 	/**
 	 * ArrayType
 	 */
@@ -13,7 +14,7 @@ public class ArrayType extends Type
 	{
 		this(Type.OBJECT_TYPE);
 	}
-	
+
 	/**
 	 * ArrayType
 	 * 
@@ -21,11 +22,11 @@ public class ArrayType extends Type
 	 */
 	public ArrayType(Type memberType)
 	{
-		super("Array");
-		
+		super(JSTypeConstants.ARRAY); //$NON-NLS-1$
+
 		this._memberType = (memberType != null) ? memberType : Type.OBJECT_TYPE;
 	}
-	
+
 	/**
 	 * getMemberType
 	 * 
@@ -35,21 +36,21 @@ public class ArrayType extends Type
 	{
 		return this._memberType;
 	}
-	
+
 	/**
 	 * toSource
 	 * 
 	 * @param writer
 	 */
-	public void toSource(SourceWriter writer)
+	public void toSource(SourcePrinter writer)
 	{
-		writer.print("Array");
-		
+		writer.print(JSTypeConstants.ARRAY); //$NON-NLS-1$
+
 		if (this._memberType != Type.OBJECT_TYPE)
 		{
-			writer.print("<");
+			writer.print("<"); //$NON-NLS-1$
 			this._memberType.toSource(writer);
-			writer.print(">");
+			writer.print(">"); //$NON-NLS-1$
 		}
 	}
 }

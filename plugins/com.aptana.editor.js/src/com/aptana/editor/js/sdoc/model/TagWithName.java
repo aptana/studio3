@@ -1,8 +1,8 @@
 package com.aptana.editor.js.sdoc.model;
 
-import com.aptana.parsing.io.SourceWriter;
+import com.aptana.parsing.io.SourcePrinter;
 
-public class TagWithName extends Tag
+public abstract class TagWithName extends Tag
 {
 	private String _name;
 
@@ -26,28 +26,29 @@ public class TagWithName extends Tag
 		return this._name;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.sdoc.model.Tag#toSource(com.aptana.parsing.io.SourceWriter)
 	 */
 	@Override
-	public void toSource(SourceWriter writer)
+	public void toSource(SourcePrinter writer)
 	{
 		TagType type = this.getType();
-		
+
 		if (type == TagType.UNKNOWN)
 		{
 			writer.print(this._name);
 		}
 		else
 		{
-			writer.print(type.toString()).print(" {").print(this._name).print("}");
+			writer.print(type.toString()).print(" {").print(this._name).print("}"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		
+
 		String text = this.getText();
-		
+
 		if (text != null && text.isEmpty() == false)
 		{
-			writer.print(" ").print(text);
+			writer.print(" ").print(text); //$NON-NLS-1$
 		}
 	}
 }

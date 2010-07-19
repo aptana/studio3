@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?mso-infoPathSolution PIVersion="1.0.0.0" href="http://www.aptana.com/forms/outline.xsn" language="en-us" name="urn:schemas-microsoft-com:office:infopath:outline:" productVersion="11.0.6357" solutionVersion="1.0.0.105" ?><?mso-application progid="InfoPath.Document"?>
-<javascript xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xd="http://schemas.microsoft.com/office/infopath/2003" xmlns:my="http://schemas.microsoft.com/office/infopath/2003/myXSD/2005-12-13T07:47:11">
+<javascript>
 	<class type="Anchor" superclass="HTMLElement" visibility="basic">
 		<description>A target for a hyperlink.</description>
 		<browsers>
@@ -419,7 +418,7 @@
 				<deprecated>Deprecated in "Document". Use "alinkColor" as part of "Body" instead.</deprecated>
 			</property>
 			
-			<property name="anchors" type="Array" scope="instance" access="read-write" visibility="basic">
+			<property name="anchors" type="Anchor[]" scope="instance" access="read-write" visibility="basic">
 				<description>Array of all of the anchors contained in the document.</description>
 				<browsers>
 					<browser platform="IE" version="3.0+"/>
@@ -871,35 +870,35 @@
 	      </constructor>
 	    </constructors>  
 		<properties>
-			<property name="layerX" type="Number," scope="instance" access="read" visibility="basic">
+			<property name="layerX" type="Number" scope="instance" access="read" visibility="basic">
 				<description>Horizontal position (in pixels) of the event relative to the current layer.</description>
 				<browsers>
 					<browser platform="Netscape" version="6.0+"/>
 				</browsers>
 			</property>
 			
-			<property name="layerY" type="Number," scope="instance" access="read" visibility="basic">
+			<property name="layerY" type="Number" scope="instance" access="read" visibility="basic">
 				<description>Vertical position (in pixels) of the event relative to the current layer.</description>
 				<browsers>
 					<browser platform="Netscape" version="6.0+"/>
 				</browsers>
 			</property>
 			
-			<property name="pageX" type="Number," scope="instance" access="read" visibility="basic">
+			<property name="pageX" type="Number" scope="instance" access="read" visibility="basic">
 				<description>Horizontal position (in pixels) of the event relative to the current web page.</description>
 				<browsers>
 					<browser platform="Netscape" version="6.0+"/>
 				</browsers>
 			</property>
 			
-			<property name="pageY" type="Number," scope="instance" access="read" visibility="basic">
+			<property name="pageY" type="Number" scope="instance" access="read" visibility="basic">
 				<description>Vertical position (in pixels) of the event relative to the current web page.</description>
 				<browsers>
 					<browser platform="Netscape" version="6.0+"/>
 				</browsers>
 			</property>
 			
-			<property name="screenX" type="Number," scope="instance" access="read-write" visibility="basic">
+			<property name="screenX" type="Number" scope="instance" access="read-write" visibility="basic">
 				<description>Horizontal position (in pixels) of the event on the screen.</description>
 				<browsers>
 					<browser platform="IE" version="4.0+"/>
@@ -911,7 +910,7 @@
 				</browsers>
 			</property>
 		
-			<property name="screenY" type="Number," scope="instance" access="read-write" visibility="basic">
+			<property name="screenY" type="Number" scope="instance" access="read-write" visibility="basic">
 				<description>Vertical position (in pixels) of the event on the screen.</description>
 				<browsers>
 					<browser platform="IE" version="4.0+"/>
@@ -2884,7 +2883,7 @@
 			
 			<method name="getWindow" scope="instance" visibility="basic">
 				<parameters>
-					<parameter name="applet" type="java.applet.Applet" usage="required">
+					<parameter name="applet" type="Applet" usage="required">
 						<description>Applet to obtain a JSObject for.</description>
 					</parameter>
 				</parameters>
@@ -4944,7 +4943,7 @@
 	      </constructor>
 	    </constructors>  
 		<properties>
-			<property name="onchange" type="&lt;textarea&gt;" scope="static" access="read-write" visibility="basic">
+			<property name="onchange" type="Function" scope="static" access="read-write" visibility="basic">
 				<availability>
 					<specification name="JavaScript 1.0"/>
 				</availability>
@@ -5678,12 +5677,126 @@
 					<browser platform="IE" version="5.0+"/>
 					<browser platform="Mozilla" version="1.0+"/>
 					<browser platform="Netscape" version="7.0+"/>
+					<browser platform="Opera" version="7.0+" />
 					<browser platform="Chrome" version="5.0+" />
 					<browser platform="Safari" version="1.2+" />
 				</browsers>
 				<availability>
 					<specification name="HTML DOM Level 3"/>
 				</availability>
+			</property>
+			
+			<property name="Array" type="Class&lt;Array&gt;" access="read-only" visibility="basic">
+				<availability>
+					<specification name="JavaScript" version="1.1"/>
+				</availability>
+				<description>A function responsible for creating new instances of Array objects</description>
+				<browsers>
+					<browser platform="IE" version="5.0+"/>
+					<browser platform="Mozilla" version="1.0+"/>
+					<browser platform="Netscape" version="7.0+"/>
+					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
+					<browser platform="Safari" version="1.2+" />
+				</browsers>
+			</property>
+			<property name="Boolean" type="Class&lt;Boolean&gt;" access="read-only" visibility="basic">
+				<availability>
+					<specification name="JavaScript" version="1.1"/>
+				</availability>
+				<description>A function responsible for creating new instances of Boolean objects</description>
+				<browsers>
+					<browser platform="IE" version="5.0+"/>
+					<browser platform="Mozilla" version="1.0+"/>
+					<browser platform="Netscape" version="7.0+"/>
+					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
+					<browser platform="Safari" version="1.2+" />
+				</browsers>
+			</property>
+			<property name="Date" type="Class&lt;Date&gt;" access="read-only" visibility="basic">
+				<availability>
+					<specification name="JavaScript" version="1.1"/>
+				</availability>
+				<description>A function responsible for creating new instances of Date objects</description>
+				<browsers>
+					<browser platform="IE" version="5.0+"/>
+					<browser platform="Mozilla" version="1.0+"/>
+					<browser platform="Netscape" version="7.0+"/>
+					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
+					<browser platform="Safari" version="1.2+" />
+				</browsers>
+			</property>
+			<property name="Function" type="Class&lt;Function&gt;" access="read-only" visibility="basic">
+				<availability>
+					<specification name="JavaScript" version="1.0"/>
+				</availability>
+				<description>A function responsible for creating new instances of Function objects</description>
+				<browsers>
+					<browser platform="IE" version="5.0+"/>
+					<browser platform="Mozilla" version="1.0+"/>
+					<browser platform="Netscape" version="7.0+"/>
+					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
+					<browser platform="Safari" version="1.2+" />
+				</browsers>
+			</property>
+			<property name="Number" type="Class&lt;Number&gt;" access="read-only" visibility="basic">
+				<availability>
+					<specification name="JavaScript" version="1.1"/>
+				</availability>
+				<description>A function responsible for creating new instances of Number objects</description>
+				<browsers>
+					<browser platform="IE" version="5.0+"/>
+					<browser platform="Mozilla" version="1.0+"/>
+					<browser platform="Netscape" version="7.0+"/>
+					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
+					<browser platform="Safari" version="1.2+" />
+				</browsers>
+			</property>
+			<property name="Object" type="Class&lt;Object&gt;" access="read-only" visibility="basic">
+				<availability>
+					<specification name="JavaScript" version="1.0"/>
+				</availability>
+				<description>A function responsible for creating new instances of Object objects</description>
+				<browsers>
+					<browser platform="IE" version="5.0+"/>
+					<browser platform="Mozilla" version="1.0+"/>
+					<browser platform="Netscape" version="7.0+"/>
+					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
+					<browser platform="Safari" version="1.2+" />
+				</browsers>
+			</property>
+			<property name="RegExp" type="Class&lt;RegExp&gt;" access="read-only" visibility="basic">
+				<availability>
+					<specification name="JavaScript" version="1.2"/>
+				</availability>
+				<description>A function responsible for creating new instances of RegExp objects</description>
+				<browsers>
+					<browser platform="IE" version="5.0+"/>
+					<browser platform="Mozilla" version="1.0+"/>
+					<browser platform="Netscape" version="7.0+"/>
+					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
+					<browser platform="Safari" version="1.2+" />
+				</browsers>
+			</property>
+			<property name="String" type="Class&lt;String&gt;" access="read-only" visibility="basic">
+				<availability>
+					<specification name="JavaScript" version="1.0"/>
+				</availability>
+				<description>A function responsible for creating new instances of String objects</description>
+				<browsers>
+					<browser platform="IE" version="5.0+"/>
+					<browser platform="Mozilla" version="1.0+"/>
+					<browser platform="Netscape" version="7.0+"/>
+					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
+					<browser platform="Safari" version="1.2+" />
+				</browsers>
 			</property>
 			
 		</properties>

@@ -349,6 +349,48 @@ public class GitMoveDeleteHookTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	// Add test to ensure that we don't delete .git dir if user doesn't check to delete project!
+	public void testDeleteProjectButNotContentsDoesntDeleteGitDir()
+	{
+		context.checking(new Expectations()
+		{
+			{
+				oneOf(repo).workingDirectory();
+
+				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
+
+				oneOf(project).getLocation();
+				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator
+						+ "project")));
+
+				// Repo relative path
+				oneOf(repo).workingDirectory();
+
+				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
+				oneOf(project).getLocation();
+				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator
+						+ "project")));
+								
+				// Don't ever delete .git folder!
+				never(tree).standardDeleteFolder(folder, IResource.DEPTH_INFINITE, null);
+
+				// We're forcing, so no need to check if file is synched
+				never(tree).isSynchronized(project, IResource.DEPTH_INFINITE);		
+
+				oneOf(project).isOpen();
+				will(returnValue(true));
+
+				// Now actually delete contents
+				never(repo).deleteFolder(Path.fromOSString("project"));
+				
+				// repo says we deleted ok, so we should mark that on the tree
+				oneOf(tree).deletedProject(project);
+			}
+		});
+		assertTrue(hook.deleteProject(tree, project, IResource.NEVER_DELETE_PROJECT_CONTENT | IResource.FORCE, new NullProgressMonitor()));
+		context.assertIsSatisfied();
+	}
+	
 	public void testDeleteProjectUnforcedSucceeds()
 	{
 		context.checking(new Expectations()

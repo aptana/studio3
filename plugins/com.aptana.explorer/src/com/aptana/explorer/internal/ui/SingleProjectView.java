@@ -26,7 +26,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IContributionItem;
@@ -253,7 +252,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		{
 			setActiveProject(project.getName());
 		}
-		listenToActiveProjectPrefChanges();
 
 		hookToThemes();
 	}
@@ -303,6 +301,16 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	{
 		super.init(aSite, aMemento);
 		this.memento = aMemento;
+	}
+	
+	@Override
+	public void saveState(IMemento aMemento)
+	{
+		if (aMemento != null && this.selectedProject != null)
+		{
+			aMemento.putString(IPreferenceConstants.ACTIVE_PROJECT, this.selectedProject.getName());
+		}
+		super.saveState(aMemento);
 	}
 
 	protected abstract void doCreateToolbar(Composite toolbarComposite);
@@ -635,10 +643,12 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 								Boolean rememberMyDecision = dialog.isRememberMyDecision();
 								if (rememberMyDecision)
 								{
-									ResourceSynchronizationUtils.setRememberDecision(selectedProject, rememberMyDecision);
+									ResourceSynchronizationUtils.setRememberDecision(selectedProject,
+											rememberMyDecision);
 								}
 								// remembers the last sync connection
-								ResourceSynchronizationUtils.setLastSyncConnection(selectedProject, destination.getName());
+								ResourceSynchronizationUtils.setLastSyncConnection(selectedProject,
+										destination.getName());
 							}
 							settingsDialog.setPropertySource(destination);
 						}
@@ -995,46 +1005,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(fProjectsListener, IResourceChangeEvent.POST_CHANGE);
 	}
 
-	private void listenToActiveProjectPrefChanges()
-	{
-		fActiveProjectPrefChangeListener = new IPreferenceChangeListener()
-		{
-
-			@Override
-			public void preferenceChange(PreferenceChangeEvent event)
-			{
-				if (!event.getKey().equals(IPreferenceConstants.ACTIVE_PROJECT))
-				{
-					return;
-				}
-				final IProject oldActiveProject = selectedProject;
-				Object obj = event.getNewValue();
-				if (obj == null)
-				{
-					return;
-				}
-				String newProjectName = (String) obj;
-				if (oldActiveProject != null && newProjectName.equals(oldActiveProject.getName()))
-				{
-					return;
-				}
-				final IProject newSelectedProject = ResourcesPlugin.getWorkspace().getRoot().getProject(newProjectName);
-				selectedProject = newSelectedProject;
-				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
-				{
-
-					@Override
-					public void run()
-					{
-						projectChanged(oldActiveProject, newSelectedProject);
-					}
-				});
-			}
-		};
-		new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID).addPreferenceChangeListener(
-				fActiveProjectPrefChangeListener);
-	}
-
 	/**
 	 * Hooks up to the active theme.
 	 */
@@ -1049,22 +1019,34 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	}
 
 	private IProject detectSelectedProject()
-	{
-		String value = Platform.getPreferencesService().getString(ExplorerPlugin.PLUGIN_ID,
-				IPreferenceConstants.ACTIVE_PROJECT, null, null);
+	{		
 		IProject project = null;
-		if (value != null)
+		String activeProjectName = null;
+		if (this.memento != null)
 		{
-			project = ResourcesPlugin.getWorkspace().getRoot().getProject(value);
+			activeProjectName = this.memento.getString(IPreferenceConstants.ACTIVE_PROJECT);
+		}
+		if (activeProjectName != null)
+		{
+			project = ResourcesPlugin.getWorkspace().getRoot().getProject(activeProjectName);
 		}
 		if (project == null)
 		{
-			IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-			if (projects == null || projects.length == 0)
+			String value = Platform.getPreferencesService().getString(ExplorerPlugin.PLUGIN_ID,
+					IPreferenceConstants.ACTIVE_PROJECT, null, null);
+			if (value != null)
 			{
-				return null;
+				project = ResourcesPlugin.getWorkspace().getRoot().getProject(value);
 			}
-			project = projects[0];
+			if (project == null)
+			{
+				IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+				if (projects == null || projects.length == 0)
+				{
+					return null;
+				}
+				project = projects[0];
+			}
 		}
 		return project;
 	}
@@ -1600,5 +1582,10 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		{
 			return fScope;
 		}
+	}
+
+	public IProject getActiveProject()
+	{
+		return selectedProject;
 	}
 }

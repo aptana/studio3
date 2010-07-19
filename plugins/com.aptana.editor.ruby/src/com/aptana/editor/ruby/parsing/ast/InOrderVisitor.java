@@ -40,12 +40,28 @@ public class InOrderVisitor extends AbstractVisitor
 	public Object visitArgsNode(ArgsNode iVisited)
 	{
 		handleNode(iVisited);
-		acceptNode(iVisited.getBlock());
+//		if (iVisited.getPre() != null)
+//		{
+//			visitIter(iVisited.getPre().childNodes().iterator());
+//		}
 		if (iVisited.getOptional() != null)
 		{
 			visitIter(iVisited.getOptional().childNodes().iterator());
 		}
+//		acceptNode(iVisited.getRest());
+//		if (iVisited.getPost() != null)
+//		{
+//			visitIter(iVisited.getPost().childNodes().iterator());
+//		}
+		acceptNode(iVisited.getBlock());
 		return super.visitArgsNode(iVisited);
+	}
+	
+	@Override
+	public Object visitRestArgNode(RestArgNode iVisited)
+	{
+		handleNode(iVisited);
+		return super.visitRestArgNode(iVisited);
 	}
 
 	@Override
@@ -185,6 +201,7 @@ public class InOrderVisitor extends AbstractVisitor
 	public Object visitClassNode(ClassNode iVisited)
 	{
 		handleNode(iVisited);
+		acceptNode(iVisited.getCPath());
 		acceptNode(iVisited.getSuperNode());
 		acceptNode(iVisited.getBodyNode());
 		return super.visitClassNode(iVisited);

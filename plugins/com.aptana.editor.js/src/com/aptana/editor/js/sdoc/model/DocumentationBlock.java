@@ -1,11 +1,13 @@
 package com.aptana.editor.js.sdoc.model;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 
-import com.aptana.parsing.io.SourceWriter;
-
 import beaver.Symbol;
+
+import com.aptana.parsing.io.SourcePrinter;
 
 public class DocumentationBlock extends Symbol
 {
@@ -19,7 +21,7 @@ public class DocumentationBlock extends Symbol
 	 */
 	public DocumentationBlock(List<Tag> tags)
 	{
-		this("", tags);
+		this("", tags); //$NON-NLS-1$
 	}
 
 	/**
@@ -29,7 +31,7 @@ public class DocumentationBlock extends Symbol
 	 */
 	public DocumentationBlock(String text)
 	{
-		this(text, new LinkedList<Tag>());
+		this(text, new ArrayList<Tag>());
 	}
 
 	/**
@@ -51,7 +53,55 @@ public class DocumentationBlock extends Symbol
 	 */
 	public List<Tag> getTags()
 	{
-		return this._tags;
+		List<Tag> result = this._tags;
+		
+		if (result == null)
+		{
+			result = Collections.emptyList();
+		}
+		
+		return result;
+	}
+
+	/**
+	 * getTags
+	 * 
+	 * @param tagSelector
+	 * @return
+	 */
+	public List<Tag> getTags(EnumSet<TagType> tagSelector)
+	{
+		List<Tag> result;
+
+		if (this._tags != null && this._tags.isEmpty() == false)
+		{
+			result = new ArrayList<Tag>();
+
+			for (Tag tag : this._tags)
+			{
+				if (tagSelector.contains(tag.getType()))
+				{
+					result.add(tag);
+				}
+			}
+		}
+		else
+		{
+			result = Collections.emptyList();
+		}
+
+		return result;
+	}
+
+	/**
+	 * getTags
+	 * 
+	 * @param type
+	 * @return
+	 */
+	public List<Tag> getTags(TagType type)
+	{
+		return this.getTags(EnumSet.of(type));
 	}
 
 	/**
@@ -63,7 +113,7 @@ public class DocumentationBlock extends Symbol
 	{
 		return this._text;
 	}
-	
+
 	/**
 	 * hasTags
 	 * 
@@ -73,7 +123,7 @@ public class DocumentationBlock extends Symbol
 	{
 		return (this._tags != null && this._tags.isEmpty() == false);
 	}
-	
+
 	/**
 	 * setRange
 	 * 
@@ -85,7 +135,7 @@ public class DocumentationBlock extends Symbol
 		this.start = start;
 		this.end = end;
 	}
-	
+
 	/**
 	 * toSource
 	 * 
@@ -93,32 +143,32 @@ public class DocumentationBlock extends Symbol
 	 */
 	public String toSource()
 	{
-		SourceWriter writer = new SourceWriter(" * ");
-		
+		SourcePrinter writer = new SourcePrinter(" * "); //$NON-NLS-1$
+
 		this.toSource(writer);
-		
+
 		return writer.toString();
 	}
-	
+
 	/**
 	 * toSource
 	 * 
 	 * @param writer
 	 */
-	public void toSource(SourceWriter writer)
+	public void toSource(SourcePrinter writer)
 	{
-		writer.println("/**").increaseIndent();
-		
+		writer.println("/**").increaseIndent(); //$NON-NLS-1$
+
 		if (this._text != null && this._text.isEmpty() == false)
 		{
 			writer.printlnWithIndent(this._text);
-			
+
 			if (this.hasTags())
 			{
 				writer.printIndent().println();
 			}
 		}
-		
+
 		if (this.hasTags())
 		{
 			for (Tag tag : this._tags)
@@ -128,7 +178,7 @@ public class DocumentationBlock extends Symbol
 				writer.println();
 			}
 		}
-		
-		writer.decreaseIndent().println(" */");
+
+		writer.decreaseIndent().println(" */"); //$NON-NLS-1$
 	}
 }

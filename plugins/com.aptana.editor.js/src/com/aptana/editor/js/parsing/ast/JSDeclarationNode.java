@@ -1,21 +1,45 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSDeclarationNode extends JSNode
 {
+	private Symbol _equalSign;
+	
 	/**
 	 * JSDeclarationNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param children
 	 */
-	public JSDeclarationNode(int start, int end, JSNode... children)
+	public JSDeclarationNode(JSNode identifier, Symbol equalSign, JSNode value)
 	{
-		super(JSNodeTypes.DECLARATION, start, end, children);
+		super(JSNodeTypes.DECLARATION, identifier, value);
+		
+		this._equalSign = equalSign;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
+	 */
+	@Override
+	public void accept(JSTreeWalker walker)
+	{
+		walker.visit(this);
+	}
+
+	/**
+	 * getEqualSign
+	 * 
+	 * @return
+	 */
+	public Symbol getEqualSign()
+	{
+		return this._equalSign;
+	}
+	
 	/**
 	 * getIdentifier
 	 * 
@@ -25,7 +49,7 @@ public class JSDeclarationNode extends JSNode
 	{
 		return this.getChild(0);
 	}
-	
+
 	/**
 	 * getValue
 	 * 
@@ -34,26 +58,5 @@ public class JSDeclarationNode extends JSNode
 	public IParseNode getValue()
 	{
 		return this.getChild(1);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
-	 */
-	public String toString()
-	{
-		StringBuilder buffer = new StringBuilder();
-		IParseNode[] children = getChildren();
-
-		buffer.append(children[0]);
-
-		if (!((JSNode) children[1]).isEmpty())
-		{
-			buffer.append(" = ").append(children[1]); //$NON-NLS-1$
-		}
-
-		this.appendSemicolon(buffer);
-
-		return buffer.toString();
 	}
 }

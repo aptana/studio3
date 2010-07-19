@@ -5,8 +5,18 @@ public class JSErrorNode extends JSNode
 	/**
 	 * JSErrorNode
 	 */
-	public JSErrorNode(int start, int end)
+	public JSErrorNode()
 	{
-		super(JSNodeTypes.ERROR, start, end);
+		super(JSNodeTypes.ERROR);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
+	 */
+	@Override
+	public void accept(JSTreeWalker walker)
+	{
+		walker.visit(this);
 	}
 }

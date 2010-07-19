@@ -41,16 +41,6 @@
    </extension>
 
    <extension
-         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
-      <hyperlinkDetector
-            activate="true"
-            class="com.aptana.editor.html.HyperlinkDetector"
-            id="com.aptana.editor.html.hyperlinkDetector"
-            name="%hyperlinkDetector.name"
-            targetId="com.aptana.editor.html">
-      </hyperlinkDetector>
-   </extension>
-   <extension
          point="com.aptana.index.core.fileIndexingParticipants">
       <fileIndexingParticipant
             class="com.aptana.editor.html.contentassist.index.HTMLFileIndexingParticipant">

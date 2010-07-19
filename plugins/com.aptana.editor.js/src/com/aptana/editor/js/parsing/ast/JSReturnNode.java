@@ -1,40 +1,24 @@
 package com.aptana.editor.js.parsing.ast;
 
-import com.aptana.parsing.ast.IParseNode;
-
-public class JSReturnNode extends JSUnaryOperatorNode
+public class JSReturnNode extends JSPreUnaryOperatorNode
 {
 	/**
 	 * JSReturnNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param expression
 	 */
-	public JSReturnNode(int start, int end, JSNode expression)
+	public JSReturnNode(JSNode expression)
 	{
-		super(JSNodeTypes.RETURN, start, end, expression);
+		super(JSNodeTypes.RETURN, expression);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSUnaryOperatorNode#toString()
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
-	public String toString()
+	@Override
+	public void accept(JSTreeWalker walker)
 	{
-		StringBuilder buffer = new StringBuilder();
-		IParseNode[] children = this.getChildren();
-
-		buffer.append("return"); //$NON-NLS-1$
-
-		if (!children[0].isEmpty())
-		{
-			buffer.append(" ");
-			buffer.append(children[0]);
-		}
-
-		this.appendSemicolon(buffer);
-
-		return buffer.toString();
+		walker.visit(this);
 	}
 }

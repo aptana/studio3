@@ -1,7 +1,5 @@
 package com.aptana.editor.js.parsing.ast;
 
-import java.util.List;
-
 import beaver.Symbol;
 
 public class JSFalseNode extends JSPrimitiveNode
@@ -9,31 +7,32 @@ public class JSFalseNode extends JSPrimitiveNode
 	/**
 	 * JSFalseNode
 	 * 
-	 * @param identifier
+	 * @param text
+	 * @param start
+	 * @param end
 	 */
-	public JSFalseNode(Symbol identifier)
+	public JSFalseNode()
 	{
-		this(identifier.getStart(), identifier.getEnd());
+		super(JSNodeTypes.FALSE, "false"); //$NON-NLS-1$
 	}
 
 	/**
 	 * JSFalseNode
 	 * 
-	 * @param text
-	 * @param start
-	 * @param end
+	 * @param identifier
 	 */
-	public JSFalseNode(int start, int end)
+	public JSFalseNode(Symbol identifier)
 	{
-		super(JSNodeTypes.FALSE, start, end, "false");
+		this();
 	}
-	
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#addReturnTypes(java.util.List)
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
 	@Override
-	protected void addReturnTypes(List<String> types)
+	public void accept(JSTreeWalker walker)
 	{
-		types.add("Boolean");
+		walker.visit(this);
 	}
 }

@@ -1,7 +1,5 @@
 package com.aptana.editor.js.parsing.ast;
 
-import java.util.List;
-
 import beaver.Symbol;
 
 public class JSNumberNode extends JSPrimitiveNode
@@ -9,31 +7,30 @@ public class JSNumberNode extends JSPrimitiveNode
 	/**
 	 * JSNumberNode
 	 * 
-	 * @param identifier
+	 * @param text
 	 */
-	public JSNumberNode(Symbol identifier)
+	public JSNumberNode(String text)
 	{
-		this(identifier.getStart(), identifier.getEnd(), (String) identifier.value);
+		super(JSNodeTypes.NUMBER, text);
 	}
 
 	/**
 	 * JSNumberNode
 	 * 
-	 * @param start
-	 * @param end
-	 * @param text
+	 * @param identifier
 	 */
-	public JSNumberNode(int start, int end, String text)
+	public JSNumberNode(Symbol identifier)
 	{
-		super(JSNodeTypes.NUMBER, start, end, text);
+		this((String) identifier.value);
 	}
-	
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#addReturnTypes(java.util.List)
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
 	@Override
-	protected void addReturnTypes(List<String> types)
+	public void accept(JSTreeWalker walker)
 	{
-		types.add("Number");
+		walker.visit(this);
 	}
 }

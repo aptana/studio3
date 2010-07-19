@@ -45,7 +45,7 @@ import java.util.Map;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-import com.aptana.parsing.io.SourceWriter;
+import com.aptana.parsing.io.SourcePrinter;
 
 /**
  * @author Kevin Lindsey
@@ -466,7 +466,7 @@ public class SchemaElement
 
 			if (value == null)
 			{
-				SourceWriter writer = new SourceWriter();
+				SourcePrinter writer = new SourcePrinter();
 
 				writer.print("<").print(this._name).print("> requires a '").print(name).println("' attribute"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				this._owningSchema.buildErrorMessage(writer, this._name, attributes);
@@ -489,7 +489,7 @@ public class SchemaElement
 						this._name
 					}
 				);
-				SourceWriter writer = new SourceWriter();
+				SourcePrinter writer = new SourcePrinter();
 				
 				writer.println(message);
 				this._owningSchema.buildErrorMessage(writer, this._name, attributes);

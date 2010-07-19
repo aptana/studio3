@@ -1,38 +1,96 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSForInNode extends JSNode
 {
+	private Symbol _leftParenthesis;
+	private Symbol _in;
+	private Symbol _rightParenthesis;
+	
 	/**
 	 * JSForInNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param children
 	 */
-	public JSForInNode(int start, int end, JSNode... children)
+	public JSForInNode(Symbol leftParenthesis, JSNode initializer, Symbol in, JSNode expression, Symbol rightParenthesis, JSNode body)
 	{
-		super(JSNodeTypes.FOR_IN, start, end, children);
+		super(JSNodeTypes.FOR_IN, initializer, expression, body);
+		
+		this._leftParenthesis = leftParenthesis;
+		this._in = in;
+		this._rightParenthesis = rightParenthesis;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
-	public String toString()
+	@Override
+	public void accept(JSTreeWalker walker)
 	{
-		StringBuilder buffer = new StringBuilder();
-		IParseNode[] children = getChildren();
+		walker.visit(this);
+	}
 
-		buffer.append("for ("); //$NON-NLS-1$
-		buffer.append(children[0]);
-		buffer.append(" in "); //$NON-NLS-1$
-		buffer.append(children[1]).append(") "); //$NON-NLS-1$
-		buffer.append(children[2]);
+	/**
+	 * getBody
+	 * 
+	 * @return
+	 */
+	public IParseNode getBody()
+	{
+		return this.getChild(2);
+	}
 
-		this.appendSemicolon(buffer);
+	/**
+	 * getExpression
+	 * 
+	 * @return
+	 */
+	public IParseNode getExpression()
+	{
+		return this.getChild(1);
+	}
 
-		return buffer.toString();
+	/**
+	 * getIn
+	 * 
+	 * @return
+	 */
+	public Symbol getIn()
+	{
+		return this._in;
+	}
+	
+	/**
+	 * getInitialization
+	 * 
+	 * @return
+	 */
+	public IParseNode getInitializer()
+	{
+		return this.getChild(0);
+	}
+	
+	/**
+	 * getLeftParenthesis
+	 * 
+	 * @return
+	 */
+	public Symbol getLeftParenthesis()
+	{
+		return this._leftParenthesis;
+	}
+	
+	/**
+	 * getRightParenthesis
+	 * 
+	 * @return
+	 */
+	public Symbol getRightParenthesis()
+	{
+		return this._rightParenthesis;
 	}
 }

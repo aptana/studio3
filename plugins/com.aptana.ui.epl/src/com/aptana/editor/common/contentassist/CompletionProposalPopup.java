@@ -1655,7 +1655,17 @@ public class CompletionProposalPopup implements IContentAssistListener
 				return fComputedProposals;
 			}
 		}
-
+		if (!filtered.isEmpty())
+		{
+			// pick the first and make it as the default selection
+			ICompletionProposal proposal = filtered.get(0);
+			if (proposal instanceof ICommonCompletionProposal)
+			{
+				ICommonCompletionProposal commonProp = (ICommonCompletionProposal) proposal;
+				commonProp.setIsDefaultSelection(true);
+				commonProp.setIsSuggestedSelection(true);
+			}
+		}
 		return filtered.toArray(new ICompletionProposal[filtered.size()]);
 	}
 

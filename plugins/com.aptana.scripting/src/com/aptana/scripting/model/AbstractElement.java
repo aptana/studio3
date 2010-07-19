@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.parsing.io.SourcePrinter;
 
 public abstract class AbstractElement implements Comparable<AbstractElement>
 {

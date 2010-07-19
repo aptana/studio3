@@ -1,15 +1,24 @@
 package com.aptana.editor.js.parsing.ast;
 
-public class JSCommaNode extends JSNaryNode
+public class JSCommaNode extends JSNode
 {
 	/**
 	 * JSCommaNode
 	 * 
-	 * @param start
-	 * @param end
+	 * @param children
 	 */
-	public JSCommaNode(int start, int end, JSNode... children)
+	public JSCommaNode(JSNode... children)
 	{
-		super(JSNodeTypes.COMMA, start, end, children);
+		super(JSNodeTypes.COMMA, children);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
+	 */
+	@Override
+	public void accept(JSTreeWalker walker)
+	{
+		walker.visit(this);
 	}
 }

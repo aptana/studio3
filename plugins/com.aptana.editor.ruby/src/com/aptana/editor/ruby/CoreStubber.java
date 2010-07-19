@@ -76,7 +76,7 @@ public class CoreStubber extends Job
 			jobs.add(indexCoreStubs(outputDir));
 			jobs.addAll(indexStdLib());
 			jobs.addAll(indexGems());
-			pm.beginTask("Indexing Ruby environment", jobs.size() * 1000);
+			pm.beginTask(Messages.CoreStubber_IndexingRuby, jobs.size() * 1000);
 			for (Job job : jobs)
 			{
 				if (job == null)
@@ -225,7 +225,7 @@ public class CoreStubber extends Job
 
 	protected Job indexCoreStubs(File outputDir)
 	{
-		return indexFiles("Indexing Ruby Core", outputDir.toURI());
+		return indexFiles(Messages.CoreStubber_IndexingRubyCore, outputDir.toURI());
 	}
 
 	protected void generateCoreStubs(File outputDir, File finishMarker) throws IOException

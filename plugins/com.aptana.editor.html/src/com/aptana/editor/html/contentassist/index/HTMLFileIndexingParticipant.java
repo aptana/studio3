@@ -111,10 +111,13 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 				String jsSource = htmlSpecialNode.getAttributeValue(ATTRIBUTE_SRC);
 				if (jsSource != null)
 				{
-
 					IPathResolver resolver = new URIResolver(file.toURI());
 					URI resolved = resolver.resolveURI(jsSource);
-					addIndex(index, file, HTMLIndexConstants.RESOURCE_JS, resolved.toString());
+					
+					if (resolved != null)
+					{
+						addIndex(index, file, HTMLIndexConstants.RESOURCE_JS, resolved.toString());
+					}
 				}
 			}
 		}

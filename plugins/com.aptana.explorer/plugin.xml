@@ -162,7 +162,7 @@
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
          <toolbar
-               id="aptana">
+               id="com.aptana.ui.globalActionSet">
             <command
                   commandId="com.aptana.explorer.commands.toggleAppExplorer"
                   icon="icons/full/cview16/filenav_nav.png"

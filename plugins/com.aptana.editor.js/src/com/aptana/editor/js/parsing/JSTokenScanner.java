@@ -246,7 +246,7 @@ public class JSTokenScanner extends JSCodeScanner implements IJSTokenScanner
 
 	private static class JSNumberRule extends ExtendedWordRule
 	{
-		private static final String REGEXP = "((0(x|X)[0-9a-fA-F]+)|([0-9]+(\\.[0-9]+)?))"; //$NON-NLS-1$
+		private static final String REGEXP = "(0(x|X)[0-9a-fA-F]+)|([0-9]+(\\.[0-9]+)?(?:[eE]\\d+)?)"; //$NON-NLS-1$
 		private static Pattern pattern;
 
 		JSNumberRule(IToken token)
@@ -284,8 +284,7 @@ public class JSTokenScanner extends JSCodeScanner implements IJSTokenScanner
 			if (isWordStart(c) || c == '.')
 				return true;
 			char lower = Character.toLowerCase(c);
-			return lower == 'a' || lower == 'b' || lower == 'c' || lower == 'd' || lower == 'e' || lower == 'f'
-					|| lower == 'x';
+			return lower == 'a' || lower == 'b' || lower == 'c' || lower == 'd' || lower == 'e' || lower == 'f' || lower == 'x';
 		}
 	}
 

@@ -1,53 +1,119 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSForNode extends JSNode
 {
+	private Symbol _leftParenthesis;
+	private Symbol _semicolon1;
+	private Symbol _semicolon2;
+	private Symbol _rightParenthesis;
+
 	/**
 	 * JSForNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param children
 	 */
-	public JSForNode(int start, int end, JSNode... children)
+	public JSForNode(Symbol leftParenthesis, JSNode initializer, Symbol semicolon1, JSNode condition, Symbol semicolon2, JSNode advance,
+		Symbol rightParenthesis, JSNode body)
 	{
-		super(JSNodeTypes.FOR, start, end, children);
+		super(JSNodeTypes.FOR, initializer, condition, advance, body);
+
+		this._leftParenthesis = leftParenthesis;
+		this._semicolon1 = semicolon1;
+		this._semicolon2 = semicolon2;
+		this._rightParenthesis = rightParenthesis;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
-	public String toString()
+	@Override
+	public void accept(JSTreeWalker walker)
 	{
-		StringBuilder buffer = new StringBuilder();
-		IParseNode[] children = getChildren();
+		walker.visit(this);
+	}
 
-		buffer.append("for ("); //$NON-NLS-1$
+	/**
+	 * getAdvance
+	 * 
+	 * @return
+	 */
+	public IParseNode getAdvance()
+	{
+		return this.getChild(2);
+	}
 
-		if (!((JSNode) children[0]).isEmpty())
-		{
-			buffer.append(children[0]);
-		}
-		buffer.append(";"); //$NON-NLS-1$
+	/**
+	 * getBody
+	 * 
+	 * @return
+	 */
+	public IParseNode getBody()
+	{
+		return this.getChild(3);
+	}
 
-		if (!((JSNode) children[1]).isEmpty())
-		{
-			buffer.append(" ").append(children[1]); //$NON-NLS-1$
-		}
-		buffer.append(";"); //$NON-NLS-1$
+	/**
+	 * getCondition
+	 * 
+	 * @return
+	 */
+	public IParseNode getCondition()
+	{
+		return this.getChild(1);
+	}
 
-		if (!((JSNode) children[2]).isEmpty())
-		{
-			buffer.append(" ").append(children[2]); //$NON-NLS-1$
-		}
+	/**
+	 * getInitialization
+	 * 
+	 * @return
+	 */
+	public IParseNode getInitializer()
+	{
+		return this.getChild(0);
+	}
 
-		buffer.append(") ").append(children[3]); //$NON-NLS-1$
+	/**
+	 * getLeftParenthesis
+	 * 
+	 * @return
+	 */
+	public Symbol getLeftParenthesis()
+	{
+		return this._leftParenthesis;
+	}
 
-		this.appendSemicolon(buffer);
+	/**
+	 * getRightParenthesis
+	 * 
+	 * @return
+	 */
+	public Symbol getRightParenthesis()
+	{
+		return this._rightParenthesis;
+	}
 
-		return buffer.toString();
+	/**
+	 * getSemicolon1
+	 * 
+	 * @return
+	 */
+	public Symbol getSemicolon1()
+	{
+		return this._semicolon1;
+	}
+
+	/**
+	 * getSemicolon2
+	 * 
+	 * @return
+	 */
+	public Symbol getSemicolon2()
+	{
+		return this._semicolon2;
 	}
 }

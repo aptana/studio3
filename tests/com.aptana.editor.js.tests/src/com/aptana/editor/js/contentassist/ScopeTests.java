@@ -10,6 +10,7 @@ import org.eclipse.core.runtime.Path;
 
 import com.aptana.editor.js.parsing.JSParser;
 import com.aptana.editor.js.parsing.ast.JSNode;
+import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.editor.js.tests.FileContentBasedTests;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.Scope;
@@ -48,6 +49,8 @@ public class ScopeTests extends FileContentBasedTests
 	 */
 	protected Scope<JSNode> getSymbols(String resource) throws Exception
 	{
+		Scope<JSNode> result = null;
+		
 		// get source from resource
 		File file = this.getFile(new Path(resource));
 		String source = this.getContent(file);
@@ -70,7 +73,18 @@ public class ScopeTests extends FileContentBasedTests
 		parseState.setEditState(source, source, 0, 0);
 		parser.parse(parseState);
 		
-		return parser.getScope();
+		IParseNode root = parseState.getParseResult();
+		
+		if (root instanceof JSParseRootNode)
+		{
+			JSSymbolCollector s = new JSSymbolCollector();
+			
+			((JSParseRootNode) root).accept(s);
+			
+			result = s.getScope();
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -82,12 +96,16 @@ public class ScopeTests extends FileContentBasedTests
 	 */
 	protected List<String> getTypes(Scope<JSNode> symbols, String symbol)
 	{
-		List<JSNode> value = symbols.getLocalSymbol(symbol);
+		List<JSNode> nodes = symbols.getLocalSymbol(symbol);
 		Set<String> typeSet = new HashSet<String>();
 		
-		for (JSNode node : value)
+		for (JSNode node : nodes)
 		{
-			typeSet.addAll(node.getTypes());
+			JSTypeWalker typeWalker = new JSTypeWalker(symbols);
+			
+			typeWalker.visit(node);
+			
+			typeSet.addAll(typeWalker.getTypes());
 		}
 		
 		return new LinkedList<String>(typeSet);

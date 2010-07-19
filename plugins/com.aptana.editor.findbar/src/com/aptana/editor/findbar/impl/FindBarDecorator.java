@@ -229,7 +229,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 		List<String> list = FindBarEntriesHelper.loadEntries(preferenceName);
 		list.add(0, EMPTY);
-		combo.setItems((String[]) list.toArray(new String[list.size()]));
+		combo.setItems(list.toArray(new String[list.size()]));
 		combo.select(0);
 
 		combo.addFocusListener(new FocusListener()

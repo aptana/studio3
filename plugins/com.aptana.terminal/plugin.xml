@@ -148,7 +148,7 @@
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
          <toolbar
-               id="aptana">
+               id="com.aptana.ui.globalActionSet">
             <command
                   commandId="com.aptana.terminal.commands.showTerminal"
                   icon="icons/terminal.png"
@@ -161,6 +161,12 @@
             </command>
          </toolbar>
       </menuContribution>
+   </extension>
+   <extension
+         point="com.aptana.org.eclipse.tm.terminal.terminalHyperlinkDetectors">
+      <detector
+            class="com.aptana.terminal.internal.URLHyperlinkDetector">
+      </detector>
    </extension>
 
 </plugin>

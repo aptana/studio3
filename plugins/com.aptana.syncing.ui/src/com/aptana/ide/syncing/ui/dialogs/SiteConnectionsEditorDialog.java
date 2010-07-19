@@ -284,6 +284,11 @@ public class SiteConnectionsEditorDialog extends TitleAreaDialog implements Site
 			case 1:
 				if (sitePropertiesWidget.applyChanges()) {
 					break;
+				} else {
+					// unresolved error exists in the current selection
+					MessageDialog.openWarning(getShell(),
+							Messages.SiteConnectionsEditorDialog_UnresolvedWarning_Title,
+							Messages.SiteConnectionsEditorDialog_UnresolvedWarning_Message);
 				}
 			case 2:
 				return false;

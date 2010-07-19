@@ -1,52 +1,547 @@
 package com.aptana.editor.js.contentassist;
 
-import org.eclipse.jface.text.BadLocationException;
+import java.text.MessageFormat;
 
-import com.aptana.editor.common.contentassist.LexemeProvider;
-import com.aptana.editor.js.contentassist.JSContentAssistProcessor.Location;
-import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.editor.js.tests.EditorBasedTests;
 
 public class LocationTests extends EditorBasedTests
 {
 	/**
-	 * testEmptyArgs
+	 * testLocations
 	 * 
-	 * @throws BadLocationException 
+	 * @param resource
+	 * @param ranges
 	 */
-	public void testEmptyArgs()
+	protected void testLocations(String resource, LocationTypeRange... ranges)
 	{
 		// setup everything for the test
-		TestContext context = this.getTestContext("locations/global_in_empty_args.js");
+		TestContext context = this.getTestContext(resource);
 		
-		// find the offset to test within the source
-		int offset = context.source.lastIndexOf(")");
-		assertTrue(offset != -1);
-		
-		// lex around the offset
-		LexemeProvider<JSTokenType> lexemeProvider = context.processor.createLexemeProvider(context.document, offset);
-
-		Location location = context.processor.getLocation(lexemeProvider, offset);
-		assertEquals(Location.IN_GLOBAL, location);
+		for (LocationTypeRange range : ranges)
+		{
+			for (int offset = range.startingOffset; offset <= range.endingOffset; offset++)
+			{
+				LocationType location = context.processor.getLocation(context.document, offset);
+				String message = MessageFormat.format(
+					"Expected {0} at location {1} of ''{2}'': character = ''{3}''",
+					range.location.toString(),
+					Integer.toString(offset),
+					context.source,
+					(offset < context.source.length()) ? context.source.charAt(offset) : '\0'
+				);
+				assertEquals(message, range.location, location);
+			}
+		}
 	}
 	
 	/**
-	 * testInArg
+	 * testInvokeWithoutParams
 	 */
-	public void testInArgs()
+	public void testInvokeWithoutParams()
 	{
-		// setup everything for the test
-		TestContext context = this.getTestContext("locations/global_in_arg.js");
-		
-		// find the offset to test within the source
-		int offset = context.source.lastIndexOf(",");
-		assertTrue(offset != -1);
-		offset++;
-		
-		// lex around the offset
-		LexemeProvider<JSTokenType> lexemeProvider = context.processor.createLexemeProvider(context.document, offset);
-
-		Location location = context.processor.getLocation(lexemeProvider, offset);
-		assertEquals(Location.IN_GLOBAL, location);
+		this.testLocations(
+			"locations/functionAndInvokeWithoutParams.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 15),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 16, 20),
+			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 21, 23),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 24, 25)
+		);
+	}
+	
+	/**
+	 * testInvokeWithIncompleteParams
+	 */
+	public void testInvokeWithIncompleteParams()
+	{
+		this.testLocations(
+			"locations/functionAndInvokeWithIncompleteParams.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 15),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 16, 20),
+			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 21, 23),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 24),
+			new LocationTypeRange(LocationType.NONE, 25, 31),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 32, 33)
+		);
+	}
+	
+	/**
+	 * testSimpleAssignment1
+	 */
+	public void testSimpleAssignment1()
+	{
+		this.testLocations(
+			"locations/simpleAssignment1.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 1, 3),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 4),
+			new LocationTypeRange(LocationType.NONE, 5, 6),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 7)
+		);
+	}
+	
+	/**
+	 * testSimpleAssignment2
+	 */
+	public void testSimpleAssignment2()
+	{
+		this.testLocations(
+			"locations/simpleAssignment2.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 1, 3),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 4, 6),
+			new LocationTypeRange(LocationType.NONE, 7, 8),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 9, 10)
+		);
+	}
+	
+	/**
+	 * testSimpleBinaryOperator1
+	 */
+	public void testSimpleBinaryOperator1()
+	{
+		this.testLocations(
+			"locations/simpleBinaryOperator1.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 1, 3),
+			new LocationTypeRange(LocationType.NONE, 4),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 5),
+			new LocationTypeRange(LocationType.NONE, 6, 7),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 8)
+		);
+	}
+	
+	/**
+	 * testSimpleBinaryOperator2
+	 */
+	public void testSimpleBinaryOperator2()
+	{
+		this.testLocations(
+			"locations/simpleBinaryOperator2.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 1, 3),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 4),
+			new LocationTypeRange(LocationType.NONE, 5),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 6, 7),
+			new LocationTypeRange(LocationType.NONE, 8, 9),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 10, 11)
+		);
+	}
+	
+	/**
+	 * testGetSimpleProperty1
+	 */
+	public void testGetSimpleProperty1()
+	{
+		this.testLocations(
+			"locations/simpleGetProperty1.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 1, 3),
+			new LocationTypeRange(LocationType.IN_PROPERTY_NAME, 4, 7),
+			new LocationTypeRange(LocationType.NONE, 8),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 9),
+			new LocationTypeRange(LocationType.NONE, 10, 11),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 12)
+		);
+	}
+	
+	/**
+	 * testSimpleGetProperty2
+	 */
+	public void testSimpleGetProperty2()
+	{
+		this.testLocations(
+			"locations/simpleGetProperty2.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 1, 3),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 4),
+			new LocationTypeRange(LocationType.IN_PROPERTY_NAME, 5, 9),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 10),
+			new LocationTypeRange(LocationType.NONE, 11),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 12, 13),
+			new LocationTypeRange(LocationType.NONE, 14, 15),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 16, 17)
+		);
+	}
+	
+	/**
+	 * testSimpleGetElement1
+	 */
+	public void testSimpleGetElement1()
+	{
+		this.testLocations(
+			"locations/simpleGetElement1.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 1, 3),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 4),
+			new LocationTypeRange(LocationType.NONE, 5, 6),				// should 7 be NONE?
+			new LocationTypeRange(LocationType.IN_GLOBAL, 7, 8),
+			new LocationTypeRange(LocationType.NONE, 9, 10),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 11)
+		);
+	}
+	
+	/**
+	 * testSimpleGetElement2
+	 */
+	public void testSimpleGetElement2()
+	{
+		this.testLocations(
+			"locations/simpleGetElement2.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 1, 3),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 4, 6),
+			new LocationTypeRange(LocationType.NONE, 7, 8),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 9, 13),
+			new LocationTypeRange(LocationType.NONE, 14, 15),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 16, 17)
+		);
+	}
+	
+	/**
+	 * testTryCatchFinally
+	 */
+	public void testTryCatchFinally()
+	{
+		this.testLocations(
+			"locations/tryCatchFinally.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 4),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 5, 7),
+			new LocationTypeRange(LocationType.NONE, 8, 19),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 20, 22),
+			new LocationTypeRange(LocationType.NONE, 23, 32),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 33, 36)
+		);
+	}
+	
+	/**
+	 * testConditional
+	 */
+	public void testConditional()
+	{
+		this.testLocations(
+			"locations/conditional.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 1),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 2, 5),
+			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 6),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 7),
+			new LocationTypeRange(LocationType.NONE, 8),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 9, 10),
+			new LocationTypeRange(LocationType.NONE, 11, 13),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 14, 15),
+			new LocationTypeRange(LocationType.NONE, 16, 17),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 18, 20),
+			new LocationTypeRange(LocationType.NONE, 21),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 22, 23)
+		);
+	}
+	
+	/**
+	 * testNew
+	 */
+	public void testNew()
+	{
+		this.testLocations(
+			"locations/new.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 3),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 4),
+			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 5, 7),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 8),
+			new LocationTypeRange(LocationType.NONE, 9),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 10, 11)
+		);
+	}
+	
+	/**
+	 * testVar1
+	 */
+	public void testVar1()
+	{
+		this.testLocations(
+			"locations/var1.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 7),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 8, 9)
+		);
+	}
+	
+	/**
+	 * testVar2
+	 */
+	public void testVar2()
+	{
+		this.testLocations(
+			"locations/var2.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 12),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 13, 14)
+		);
+	}
+	
+	/**
+	 * testVar3
+	 */
+	public void testVar3()
+	{
+		this.testLocations(
+			"locations/var3.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 8),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 9, 10),
+			new LocationTypeRange(LocationType.NONE, 11, 12),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 13, 14)
+		);
+	}
+	
+	/**
+	 * testDo
+	 */
+	public void testDo()
+	{
+		this.testLocations(
+			"locations/do.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 3),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 4),
+			new LocationTypeRange(LocationType.NONE, 5, 12),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 13),
+			new LocationTypeRange(LocationType.NONE, 14, 18),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 19, 20)
+		);
+	}
+	
+	/**
+	 * testForIn
+	 */
+	public void testForIn()
+	{
+		this.testLocations(
+			"locations/forIn.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 13),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 14),
+			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 15, 17),
+			new LocationTypeRange(LocationType.NONE, 18, 19),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 20, 22)
+		);
+	}
+	
+	/**
+	 * testFor
+	 */
+	public void testFor()
+	{
+		this.testLocations(
+			"locations/for.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 8),
+			new LocationTypeRange(LocationType.NONE, 9, 11),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 12, 13),
+			new LocationTypeRange(LocationType.NONE, 14),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 15, 16),
+			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 17),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 18, 20),
+			new LocationTypeRange(LocationType.NONE, 21, 22),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 23, 24),
+			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 25),
+			new LocationTypeRange(LocationType.NONE, 26, 29),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 30, 33)
+		);
+	}
+	
+	/**
+	 * testIf
+	 */
+	public void testIf()
+	{
+		this.testLocations(
+			"locations/if.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 3),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 4),
+			new LocationTypeRange(LocationType.NONE, 5, 10),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 11, 12),
+			new LocationTypeRange(LocationType.NONE, 13, 19),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 20, 23)
+		);
+	}
+	
+	/**
+	 * testLabelledFor
+	 */
+	public void testLabelledFor()
+	{
+		this.testLocations(
+			"locations/labelledFor.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.IN_LABEL, 1, 4),
+			new LocationTypeRange(LocationType.NONE, 5, 17),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 18, 19),
+			new LocationTypeRange(LocationType.NONE, 20),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 21, 22),
+			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 23),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 24, 26),
+			new LocationTypeRange(LocationType.NONE, 27, 28),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 29, 30),
+			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 31),
+			new LocationTypeRange(LocationType.NONE, 32, 35),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 36, 38),
+			new LocationTypeRange(LocationType.NONE, 39, 41),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 42),
+			new LocationTypeRange(LocationType.NONE, 43, 48),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 49, 52),
+			new LocationTypeRange(LocationType.NONE, 53, 57),
+			new LocationTypeRange(LocationType.IN_LABEL, 58, 62),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 63, 65),
+			new LocationTypeRange(LocationType.NONE, 66, 72),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 73, 76),
+			new LocationTypeRange(LocationType.NONE, 77, 84),
+			new LocationTypeRange(LocationType.IN_LABEL, 85, 89),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 90, 96)
+		);
+	}
+	
+	/**
+	 * testArrayLiteral
+	 */
+	public void testArrayLiteral()
+	{
+		this.testLocations(
+			"locations/arrayLiteral.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 8),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 9, 12),
+			new LocationTypeRange(LocationType.NONE, 13, 18),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 19, 20),
+			new LocationTypeRange(LocationType.NONE, 21, 26),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 27, 28),
+			new LocationTypeRange(LocationType.NONE, 29, 30),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 31, 34)
+		);
+	}
+	
+	/**
+	 * testObjectLiteral
+	 */
+	public void testObjectLiteral()
+	{
+		this.testLocations(
+			"locations/objectLiteral.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 8),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 9, 10),
+			new LocationTypeRange(LocationType.NONE, 11, 17),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 18, 19),
+			new LocationTypeRange(LocationType.NONE, 20, 31),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 32, 33),
+			new LocationTypeRange(LocationType.NONE, 34, 37),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 38, 39)
+		);
+	}
+	
+	/**
+	 * testSwitch
+	 */
+	public void testSwitch()
+	{
+		this.testLocations(
+			"locations/switch.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 7),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 8),
+			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 9, 11),
+			new LocationTypeRange(LocationType.NONE, 12, 22),	// may want 21 to be IN_GLOBAL
+			new LocationTypeRange(LocationType.IN_GLOBAL, 23, 26),
+			new LocationTypeRange(LocationType.NONE, 27, 31),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 32, 37),
+			new LocationTypeRange(LocationType.NONE, 38, 44),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 45, 48),
+			new LocationTypeRange(LocationType.NONE, 49, 53),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 54),
+			new LocationTypeRange(LocationType.NONE, 55),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 56, 57)
+		);
+	}
+	
+	/**
+	 * testGroup
+	 */
+	public void testGroup()
+	{
+		this.testLocations(
+			"locations/group.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0, 1),
+			new LocationTypeRange(LocationType.NONE, 2, 12),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 13, 20)
+		);
+	}
+	
+	/**
+	 * testFunctionWithReturn
+	 */
+	public void testFunctionWithReturn()
+	{
+		this.testLocations(
+			"locations/functionWithReturn.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 15),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 16, 18),
+			new LocationTypeRange(LocationType.NONE, 19, 24),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 25),
+			new LocationTypeRange(LocationType.NONE, 26, 29),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 30, 33)
+		);
+	}
+	
+	/**
+	 * testFunctionWithThrow
+	 */
+	public void testFunctionWithThrow()
+	{
+		this.testLocations(
+			"locations/functionWithThrow.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 15),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 16, 18),
+			new LocationTypeRange(LocationType.NONE, 19, 23),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 24),
+			new LocationTypeRange(LocationType.NONE, 25, 31),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 32, 35)
+		);
+	}
+	
+	/**
+	 * testWhile
+	 */
+	public void testWhile()
+	{
+		this.testLocations(
+			"locations/while.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 6),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 7),
+			new LocationTypeRange(LocationType.NONE, 8, 13),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 14, 17)
+		);
+	}
+	
+	/**
+	 * testWith
+	 */
+	public void testWith()
+	{
+		this.testLocations(
+			"locations/with.js",
+			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
+			new LocationTypeRange(LocationType.NONE, 1, 5),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 6),
+			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 7, 9),
+			new LocationTypeRange(LocationType.NONE, 10, 11),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 12, 14)
+		);
 	}
 }

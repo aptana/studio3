@@ -1,44 +1,98 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 import com.aptana.parsing.ast.IParseNode;
 
-public class JSSwitchNode extends JSNaryAndExpressionNode
+public class JSSwitchNode extends JSNode
 {
+	private Symbol _leftParenthesis;
+	private Symbol _rightParenthesis;
+	private Symbol _leftBrace;
+	private Symbol _rightBrace;
+
 	/**
 	 * JSSwitchNode
 	 * 
-	 * @param start
-	 * @param end
+	 * @param leftParenthesis
+	 * @param expression
+	 * @param rightParenthesis
+	 * @param leftBrace
+	 * @param rightBrace
 	 * @param children
 	 */
-	public JSSwitchNode(int start, int end, JSNode... children)
+	public JSSwitchNode(Symbol leftParenthesis, JSNode expression, Symbol rightParenthesis, Symbol leftBrace, Symbol rightBrace, JSNode... children)
 	{
-		super(JSNodeTypes.SWITCH, start, end, children);
+		super(JSNodeTypes.SWITCH, expression);
+		
+		for (JSNode child : children)
+		{
+			this.addChild(child);
+		}
+
+		this._leftParenthesis = leftParenthesis;
+		this._rightParenthesis = rightParenthesis;
+		this._leftBrace = leftBrace;
+		this._rightBrace = rightBrace;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNaryAndExpressionNode#toString()
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
 	@Override
-	public String toString()
+	public void accept(JSTreeWalker walker)
 	{
-		StringBuilder buffer = new StringBuilder();
-		IParseNode[] children = getChildren();
+		walker.visit(this);
+	}
 
-		buffer.append("switch ("); //$NON-NLS-1$
-		buffer.append(children[0]);
-		buffer.append(") {"); //$NON-NLS-1$
+	/**
+	 * getExpression
+	 * 
+	 * @return
+	 */
+	public IParseNode getExpression()
+	{
+		return this.getChild(0);
+	}
 
-		for (int i = 1; i < children.length; ++i)
-		{
-			buffer.append(children[i]);
-		}
+	/**
+	 * getLeftBrace
+	 * 
+	 * @return
+	 */
+	public Symbol getLeftBrace()
+	{
+		return this._leftBrace;
+	}
 
-		buffer.append("}"); //$NON-NLS-1$
+	/**
+	 * getLeftParenthesis
+	 * 
+	 * @return
+	 */
+	public Symbol getLeftParenthesis()
+	{
+		return this._leftParenthesis;
+	}
 
-		this.appendSemicolon(buffer);
+	/**
+	 * getRightBrace
+	 * 
+	 * @return
+	 */
+	public Symbol getRightBrace()
+	{
+		return this._rightBrace;
+	}
 
-		return buffer.toString();
+	/**
+	 * getRightParenthesis
+	 * 
+	 * @return
+	 */
+	public Symbol getRightParenthesis()
+	{
+		return this._rightParenthesis;
 	}
 }

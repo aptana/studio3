@@ -7,30 +7,40 @@ public class JSConstructNode extends JSNode
 	/**
 	 * JSConstructNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param children
 	 */
-	public JSConstructNode(int start, int end, JSNode... children)
+	public JSConstructNode(JSNode... children)
 	{
-		super(JSNodeTypes.CONSTRUCT, start, end, children);
+		super(JSNodeTypes.CONSTRUCT, children);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
-	public String toString()
+	@Override
+	public void accept(JSTreeWalker walker)
 	{
-		StringBuilder buffer = new StringBuilder();
-		IParseNode[] children = getChildren();
+		walker.visit(this);
+	}
 
-		buffer.append("new "); //$NON-NLS-1$
-		buffer.append(children[0]);
-		buffer.append(children[1]);
+	/**
+	 * getArguments
+	 * 
+	 * @return
+	 */
+	public IParseNode getArguments()
+	{
+		return this.getChild(1);
+	}
 
-		this.appendSemicolon(buffer);
-
-		return buffer.toString();
+	/**
+	 * getIdentifier
+	 * 
+	 * @return
+	 */
+	public IParseNode getExpression()
+	{
+		return this.getChild(0);
 	}
 }
