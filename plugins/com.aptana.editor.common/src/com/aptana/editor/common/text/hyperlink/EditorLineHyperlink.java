@@ -1,8 +1,6 @@
 package com.aptana.editor.common.text.hyperlink;
 
 import java.io.File;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -10,6 +8,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.BadLocationException;
@@ -30,6 +29,8 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.terminal.editor.TerminalEditor;
+import com.aptana.terminal.views.TerminalView;
 
 public class EditorLineHyperlink implements IHyperlink
 {
@@ -100,13 +101,13 @@ public class EditorLineHyperlink implements IHyperlink
 					return file.getLocation().toFile();
 				}
 			}
-			// TODO This is all one giant ball of yuck!
-			// That didn't work. Now let's try getting active terminals and reflecting to get the working directory!
+
+			// That didn't work. Now let's try getting active terminals and getting the working directory!
 			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 			IEditorReference[] refs = page.getEditorReferences();
 			for (IEditorReference ref : refs)
 			{
-				if (ref.getId().equals("com.aptana.terminal.TerminalEditor")) //$NON-NLS-1$
+				if (TerminalEditor.ID.equals(ref.getId()))
 				{
 					File relative = getFileRelativeToWorkingDir(ref.getPart(false));
 					if (relative != null)
@@ -120,7 +121,7 @@ public class EditorLineHyperlink implements IHyperlink
 			IViewReference[] viewRefs = page.getViewReferences();
 			for (IViewReference ref : viewRefs)
 			{
-				if (ref.getId().equals("com.aptana.terminal.views.terminal")) //$NON-NLS-1$
+				if (TerminalView.ID.equals(ref.getId()))
 				{
 					File relative = getFileRelativeToWorkingDir(ref.getPart(false));
 					if (relative != null)
@@ -139,24 +140,23 @@ public class EditorLineHyperlink implements IHyperlink
 		{
 			return null;
 		}
-
-		try
+		IPath workingDir = null;
+		if (part instanceof TerminalView)
 		{
-			Field f = part.getClass().getDeclaredField("terminalComposite"); //$NON-NLS-1$
-			f.setAccessible(true);
-			Object comp = f.get(part);
-
-			Method m = comp.getClass().getMethod("getWorkingDirectory"); //$NON-NLS-1$
-			String workingDir = (String) m.invoke(comp);
-			File relative = new File(workingDir, filepath);
-			if (relative.exists())
-			{
-				return relative;
-			}
+			workingDir = ((TerminalView) part).getWorkingDirectory();
 		}
-		catch (Exception e)
+		else if (part instanceof TerminalEditor)
 		{
-			CommonEditorPlugin.logError(e);
+			workingDir = ((TerminalEditor) part).getWorkingDirectory();
+		}
+		if (workingDir == null)
+		{
+			return null;
+		}
+		File relative = workingDir.append(filepath).toFile();
+		if (relative.exists())
+		{
+			return relative;
 		}
 		return null;
 	}
