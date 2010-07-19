@@ -42,11 +42,11 @@ import com.aptana.usage.PingStartup;
 @SuppressWarnings("restriction")
 public class Portal
 {
-	public static final String BASE_URL_PREFIX = "http://toolbox.aptana.com/toolbox"; //$NON-NLS-1$
-	private static final String BASE_REMOTE_URL = "http://toolbox.aptana.com/toolbox"; //$NON-NLS-1$
+	//	public static final String BASE_URL_PREFIX = "http://toolbox.aptana.com/toolbox"; //$NON-NLS-1$
+	//	private static final String BASE_REMOTE_URL = "http://toolbox.aptana.com/toolbox"; //$NON-NLS-1$
 	// for debugging, do NOT check in with these uncommented:
-	// public static final String BASE_URL_PREFIX = "http://localhost:3000/toolbox"; //$NON-NLS-1$
-	// private static final String BASE_REMOTE_URL = "http://localhost:3000/toolbox"; //$NON-NLS-1$
+	public static final String BASE_URL_PREFIX = "http://localhost:3000/toolbox"; //$NON-NLS-1$
+	private static final String BASE_REMOTE_URL = "http://localhost:3000/toolbox"; //$NON-NLS-1$
 	private static final String BASE_LOCAL_URL = "/content/index.html"; //$NON-NLS-1$
 
 	private static final String EXPLORER_PLUGIN_ID = "com.aptana.explorer"; //$NON-NLS-1$
@@ -328,7 +328,9 @@ public class Portal
 	private String pad(String string, int desiredLength, char padChar)
 	{
 		while (string.length() < desiredLength)
+		{
 			string = padChar + string;
+		}
 		return string;
 	}
 
