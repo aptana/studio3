@@ -51,7 +51,7 @@ abstract class IndexRequestJob extends Job
 	@Override
 	public boolean belongsTo(Object family)
 	{
-		return getContainerURI().equals(family);
+		return (family == null && getContainerURI() == null) || getContainerURI().equals(family);
 	}
 
 	protected URI getContainerURI()
