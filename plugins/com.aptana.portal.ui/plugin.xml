@@ -88,5 +88,10 @@
             id="portal.system.versions"
             name="Apps Versions Action Controller">
       </actionController>
+      <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.ConsoleController"
+            id="console"
+            name="Console Controller">
+      </actionController>
    </extension>
 </plugin>

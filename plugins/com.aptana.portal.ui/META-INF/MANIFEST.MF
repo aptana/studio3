@@ -20,6 +20,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.equinox.p2.metadata.repository,
  org.eclipse.equinox.p2.artifact.repository,
  org.eclipse.equinox.p2.ui,
+ org.eclipse.ui.console,
  org.mortbay.jetty.util,
  com.aptana.theme
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
