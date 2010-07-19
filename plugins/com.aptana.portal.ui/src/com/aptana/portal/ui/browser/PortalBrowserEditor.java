@@ -85,8 +85,9 @@ public class PortalBrowserEditor extends WebBrowserEditor implements IBrowserVie
 				{
 					public void changed(LocationEvent event)
 					{
-						browser.removeLocationListener(this);
-						unregisterBrowserFunctions();
+						//browser.removeLocationListener(this);
+						refreshBrowserRegistration(browser);
+						
 					}
 				});
 			}
@@ -110,9 +111,28 @@ public class PortalBrowserEditor extends WebBrowserEditor implements IBrowserVie
 				IBrowserNotificationConstants.DISPATCH_FUNCTION_NAME);
 		browserFunctions.add(dispatcherFunction);
 
-		// Make sure that all the Javascript errors are being surfaced out of the internal
-		// browser.
+		browser.execute(
+				"console = {}; " +
+				"console.log   = function(msg) { dispatch($H({controller:\"console\", action:\"log\", args:msg.toJSON()}).toJSON()); }; " +
+				"console.debug = function(msg) { dispatch($H({controller:\"console\", action:\"log\", args:msg.toJSON()}).toJSON()); }");
+		// Make sure that all the Javascript errors are being surfaced out of the internal browser.
 		browser.execute("window.onerror=customErrorHandler"); //$NON-NLS-1$
+	}
+
+	/**
+	 * Refresh the browser functions by removing them from the given browser and re-installing them if the browser URL
+	 * is legal.
+	 * 
+	 * @param browser
+	 */
+	protected synchronized void refreshBrowserRegistration(Browser browser)
+	{
+		unregisterBrowserFunctions();
+		String url = browser.getUrl();
+		if (url != null && (url.startsWith(Portal.BASE_URL_PREFIX) || url.startsWith("file:"))) //$NON-NLS-1$
+		{
+			registerBrowserFunctions(browser);
+		}
 	}
 
 	/**
@@ -144,12 +164,7 @@ public class PortalBrowserEditor extends WebBrowserEditor implements IBrowserVie
 		{
 			// Dispose all BrowserFunctions when the location of the browser is no longer under
 			// Aptana.com or the local machine.
-			unregisterBrowserFunctions();
-			String url = browser.getUrl();
-			if (url != null && (url.startsWith(Portal.BASE_URL_PREFIX) || url.startsWith("file:"))) //$NON-NLS-1$
-			{
-				registerBrowserFunctions(browser);
-			}
+			refreshBrowserRegistration(browser);
 		}
 	}
 }
