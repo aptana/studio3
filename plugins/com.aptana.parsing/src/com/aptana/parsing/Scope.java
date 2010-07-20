@@ -18,7 +18,7 @@ public class Scope<T>
 	private Map<String, List<T>> _symbols;
 	private IRange _range;
 	private List<T> _assignments;
-	private List<T> _secondaryAssignments;
+	private Map<String,List<T>> _secondaryAssignments;
 
 	/**
 	 * addAssignment
@@ -75,19 +75,27 @@ public class Scope<T>
 	/**
 	 * addSecondaryAssignment
 	 * 
-	 * @param lhs
-	 * @param rhs
+	 * @param name
+	 * @param assignment
 	 */
-	public void addSecondaryAssignment(T assignment)
+	public void addSecondaryAssignment(String name, T assignment)
 	{
 		if (assignment != null)
 		{
 			if (this._secondaryAssignments == null)
 			{
-				this._secondaryAssignments = new ArrayList<T>();
+				this._secondaryAssignments = new HashMap<String,List<T>>();
+			}
+			
+			List<T> assignments = this._secondaryAssignments.get(name);
+			
+			if (assignments == null)
+			{
+				assignments = new ArrayList<T>();
+				this._secondaryAssignments.put(name, assignments);
 			}
 
-			this._secondaryAssignments.add(assignment);
+			assignments.add(assignment);
 		}
 	}
 
@@ -242,13 +250,44 @@ public class Scope<T>
 	}
 
 	/**
-	 * getSecondaryAssignments
+	 * getScopeWithSymbol
 	 * 
+	 * @param name
 	 * @return
 	 */
-	public List<T> getSecondaryAssignments()
+	public Scope<T> getScopeWithSymbol(String name)
 	{
-		List<T> result = this._secondaryAssignments;
+		Scope<T> current = this;
+
+		while (current != null)
+		{
+			if (current.hasLocalSymbol(name))
+			{
+				break;
+			}
+			else
+			{
+				current = current.getParentScope();
+			}
+		}
+
+		return current;
+	}
+	
+	/**
+	 * getSecondaryAssignments
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public List<T> getSecondaryAssignments(String name)
+	{
+		List<T> result = null;
+		
+		if (this._secondaryAssignments != null)
+		{
+			result = this._secondaryAssignments.get(name);
+		}
 
 		if (result == null)
 		{
