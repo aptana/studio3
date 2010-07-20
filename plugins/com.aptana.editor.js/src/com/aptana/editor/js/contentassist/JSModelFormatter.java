@@ -1,11 +1,10 @@
 package com.aptana.editor.js.contentassist;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLDecoder;
 import java.util.List;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.core.util.URIUtil;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
@@ -25,7 +24,7 @@ public class JSModelFormatter
 
 		if (documents != null && documents.isEmpty() == false)
 		{
-			String prefix = (projectURI != null) ? decodeURI(projectURI.toString()) : null;
+			String prefix = (projectURI != null) ? URIUtil.decodeURI(projectURI.toString()) : null;
 
 			// back up one segment so we include the project name in the document
 			if (prefix != null && prefix.length() > 2)
@@ -46,7 +45,7 @@ public class JSModelFormatter
 
 			for (String document : documents)
 			{
-				document = decodeURI(document);
+				document = URIUtil.decodeURI(document);
 
 				if (prefix != null && document.startsWith(prefix))
 				{
@@ -136,31 +135,6 @@ public class JSModelFormatter
 	}
 
 	/**
-	 * decodeURI
-	 * 
-	 * @param uri
-	 * @return
-	 */
-	private static String decodeURI(String uri)
-	{
-		String result = null;
-
-		if (uri != null)
-		{
-			try
-			{
-				result = URLDecoder.decode(uri.toString(), "utf-8");
-			}
-			catch (UnsupportedEncodingException e)
-			{
-				e.printStackTrace();
-			}
-		}
-
-		return result;
-	}
-
-	/**
 	 * formatFunction
 	 * 
 	 * @param function
@@ -229,6 +203,8 @@ public class JSModelFormatter
 			{
 				result = document;
 			}
+
+			result = URIUtil.decodeURI(result);
 		}
 
 		return result;
