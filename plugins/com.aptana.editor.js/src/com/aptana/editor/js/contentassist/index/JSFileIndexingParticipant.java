@@ -15,7 +15,6 @@ import org.jaxen.JaxenException;
 import org.jaxen.XPath;
 
 import com.aptana.core.util.IOUtil;
-import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.contentassist.JSSymbolCollector;
 import com.aptana.editor.js.contentassist.JSTypeWalker;
@@ -141,56 +140,23 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 
 		monitor.done();
 	}
-
-	/**
-	 * processAssignments
-	 * 
-	 * @param index
-	 * @param globals
-	 */
-	@SuppressWarnings("unchecked")
-	private void processAssignments(Index index, Scope<JSNode> globals)
-	{
-		try
-		{
-			XPath xpath = new ParseNodeXPath("get_property[position() = 1 and descendant-or-self::get_property[identifier[position() = last() and string()='prototype']]]");
-			Object result = xpath.evaluate(globals.getAssignments());
-
-			if (result != null)
-			{
-				List<IParseNode> leftHandSides = (List<IParseNode>) result;
-				
-				for (IParseNode lhs : leftHandSides)
-				{
-					IParseNode rhs = lhs.getNextSibling();
-					JSTypeWalker walker = new JSTypeWalker(globals, index);
-
-					((JSNode) rhs).accept(walker);
-					
-					System.out.println(lhs + ": " + StringUtil.join(", ", walker.getTypes()));
-				}
-			}
-		}
-		catch (JaxenException e)
-		{
-			e.printStackTrace();
-		}
-	}
 	
 	/**
 	 * processScopes
 	 * 
 	 * @param index
 	 * @param globals
+	 * @param ast
+	 * @param location
 	 */
 	@SuppressWarnings("unchecked")
-	private List<PropertyElement> processScopes(Index index, Scope<JSNode> globals, IParseNode ast)
+	private List<PropertyElement> processLambdas(Index index, Scope<JSNode> globals, IParseNode ast, URI location)
 	{
 		List<PropertyElement> result = Collections.emptyList();
 		
 		try
 		{
-			XPath xpath = new ParseNodeXPath("invoke[position() = 1]/group/function");
+			XPath xpath = new ParseNodeXPath("invoke[position() = 1]/group/function|invoke[position() = 1]/function");
 			Object queryResult = xpath.evaluate(ast);
 			
 			if (queryResult != null)
@@ -200,6 +166,8 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 				for (JSFunctionNode function : functions)
 				{
 					Scope<JSNode> scope = globals.getScopeAtOffset(function.getBody().getStartingOffset());
+					
+					JSTypeWalker.getScopeProperties(scope, index, location);
 					
 					if (scope != null)
 					{
@@ -309,7 +277,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 			// set type
 			type.setName("Window"); //$NON-NLS-1$
 
-			// add properties
+			// add declared variables and functions from the global scope
 			for (PropertyElement property : JSTypeWalker.getScopeProperties(globals, index, location))
 			{
 				type.addProperty(property);
@@ -322,16 +290,13 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 			}
 			
 			// process scopes (self-invoking functions)
-			for (PropertyElement property : processScopes(index, globals, ast))
+			for (PropertyElement property : processLambdas(index, globals, ast, location))
 			{
 				type.addProperty(property);
 			}
 			
 			// write new Window type to index
 			this._indexWriter.writeType(index, type, location);
-
-			// process assignments
-			processAssignments(index, globals);
 		}
 	}
 }
