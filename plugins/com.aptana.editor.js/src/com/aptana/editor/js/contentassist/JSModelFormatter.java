@@ -229,7 +229,7 @@ public class JSModelFormatter
 			{
 				result = document;
 			}
-			
+
 			result = decodeURI(result);
 		}
 
