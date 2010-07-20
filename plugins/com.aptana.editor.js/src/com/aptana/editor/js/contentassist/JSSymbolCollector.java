@@ -7,6 +7,7 @@ import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
 import com.aptana.editor.js.parsing.ast.JSLabelledNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
+import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.editor.js.parsing.ast.JSTreeWalker;
 import com.aptana.editor.js.parsing.ast.JSWithNode;
@@ -16,14 +17,14 @@ import com.aptana.parsing.lexer.IRange;
 
 public class JSSymbolCollector extends JSTreeWalker
 {
-	private Scope<JSNode> fScope;
+	private Scope<JSNode> _scope;
 
 	/**
 	 * JSSymbolCollector
 	 */
 	public JSSymbolCollector()
 	{
-		fScope = new Scope<JSNode>();
+		this._scope = new Scope<JSNode>();
 	}
 
 	/**
@@ -46,9 +47,23 @@ public class JSSymbolCollector extends JSTreeWalker
 	 */
 	protected void addAssignment(JSAssignmentNode assignment)
 	{
-		if (fScope != null)
+		if (this._scope != null)
 		{
-			fScope.addAssignment(assignment);
+			this._scope.addAssignment(assignment);
+		}
+	}
+	
+	/**
+	 * addSecondaryAssignment
+	 * 
+	 * @param name
+	 * @param assignment
+	 */
+	protected void addSecondaryAssignment(String name, JSAssignmentNode assignment)
+	{
+		if (this._scope != null)
+		{
+			this._scope.addSecondaryAssignment(name, assignment);
 		}
 	}
 	
@@ -60,9 +75,9 @@ public class JSSymbolCollector extends JSTreeWalker
 	 */
 	protected void addSymbol(String name, JSNode value)
 	{
-		if (fScope != null)
+		if (this._scope != null)
 		{
-			fScope.addSymbol(name, value);
+			this._scope.addSymbol(name, value);
 		}
 	}
 
@@ -73,7 +88,7 @@ public class JSSymbolCollector extends JSTreeWalker
 	 */
 	public Scope<JSNode> getScope()
 	{
-		return fScope;
+		return this._scope;
 	}
 
 	/**
@@ -81,9 +96,9 @@ public class JSSymbolCollector extends JSTreeWalker
 	 */
 	protected void popScope()
 	{
-		if (fScope != null)
+		if (this._scope != null)
 		{
-			fScope = fScope.getParentScope();
+			this._scope = this._scope.getParentScope();
 		}
 	}
 
@@ -94,12 +109,12 @@ public class JSSymbolCollector extends JSTreeWalker
 	{
 		Scope<JSNode> childScope = new Scope<JSNode>();
 
-		if (fScope != null)
+		if (this._scope != null)
 		{
-			fScope.addScope(childScope);
+			this._scope.addScope(childScope);
 		}
 
-		fScope = childScope;
+		this._scope = childScope;
 	}
 	
 	/**
@@ -109,9 +124,9 @@ public class JSSymbolCollector extends JSTreeWalker
 	 */
 	protected void setScopeRange(IRange range)
 	{
-		if (fScope != null)
+		if (this._scope != null)
 		{
-			fScope.setRange(range);
+			this._scope.setRange(range);
 		}
 	}
 
@@ -122,7 +137,40 @@ public class JSSymbolCollector extends JSTreeWalker
 	@Override
 	public void visit(JSAssignmentNode node)
 	{
-		this.addAssignment(node);
+		IParseNode lhs = node.getLeftHandSide();
+		
+		switch (lhs.getNodeType())
+		{
+			case JSNodeTypes.IDENTIFIER:
+				this.addAssignment(node);
+				break;
+				
+			default:
+				while (lhs != null)
+				{
+					if (lhs.getNodeType() == JSNodeTypes.IDENTIFIER)
+					{
+						String name = lhs.getText();
+						
+						if (this._scope.hasSymbol(name))
+						{
+							this.addSecondaryAssignment(name, node);
+						}
+						// else secondary assignment without declared symbol
+						break;
+					}
+					else
+					{
+						lhs = lhs.getFirstChild();
+					}
+				}
+				
+				if (lhs == null)
+				{
+					System.out.println("unprocessed assignment: " + node);
+				}
+				break;
+		}
 	}
 
 	/*
