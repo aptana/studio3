@@ -16,5 +16,6 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.terminal,
  com.aptana.terminal.views,
- com.aptana.terminal.widget
+ com.aptana.terminal.widget,
+ com.aptana.terminal.editor
 Eclipse-ExtensibleAPI: true

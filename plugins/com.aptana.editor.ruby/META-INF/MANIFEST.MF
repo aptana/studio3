@@ -18,7 +18,9 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.core,
  org.jrubyparser;bundle-version="1.0.0",
  com.aptana.theme,
- beaver
+ beaver,
+ com.aptana.org.eclipse.tm.terminal;bundle-version="3.0.100",
+ org.eclipse.ui.ide;bundle-version="3.4.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

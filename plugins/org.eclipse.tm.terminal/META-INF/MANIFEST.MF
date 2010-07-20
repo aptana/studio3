@@ -20,4 +20,4 @@ Export-Package: org.eclipse.tm.internal.terminal.control;x-friends:="com.aptana.
  org.eclipse.tm.internal.terminal.provisional.api;x-friends:="com.aptana.terminal",
  org.eclipse.tm.internal.terminal.provisional.api.provider;x-friends:="com.aptana.terminal",
  org.eclipse.tm.internal.terminal.textcanvas;x-friends:="com.aptana.terminal",
- org.eclipse.tm.terminal.model;x-friends:="com.aptana.terminal"
+ org.eclipse.tm.terminal.model

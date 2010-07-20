@@ -185,6 +185,9 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 	 */
 	@Override
 	public IFileStore getParent() {
+		if (path.equals(Path.ROOT)) {
+			return null;
+		}
 		return new WorkspaceFile(path.removeLastSegments(1));
 	}
 
