@@ -207,9 +207,9 @@ public class JSTypeWalker extends JSTreeWalker
 
 			if (nodes != null && nodes.isEmpty() == false)
 			{
-				// TODO: We may want to process all nodes and potentially
-				// create a new type that is the union of all types. For
-				// now last definition wins.
+				// TODO: We may want to process all nodes and potentially create
+				// a new type that is the union of all types. For now last
+				// definition wins.
 				JSNode node = nodes.get(nodes.size() - 1);
 				DocumentationBlock block = node.getDocumentation();
 				PropertyElement property = (node instanceof JSFunctionNode) ? new FunctionElement() : new PropertyElement();
@@ -226,13 +226,13 @@ public class JSTypeWalker extends JSTreeWalker
 
 					node.accept(walker);
 
+					// write out any generated types
 					List<TypeElement> generatedTypes = walker.getGeneratedTypes();
 
 					if (generatedTypes.isEmpty() == false)
 					{
 						JSIndexWriter writer = new JSIndexWriter();
 
-						// write out any generated types
 						for (TypeElement type : walker.getGeneratedTypes())
 						{
 							writer.writeType(index, type, location);
@@ -247,6 +247,20 @@ public class JSTypeWalker extends JSTreeWalker
 						returnType.setType(propertyType);
 
 						property.addType(returnType);
+					}
+				}
+				
+				List<JSNode> assignments = scope.getSecondaryAssignments(symbol);
+				
+				if (assignments != null && assignments.isEmpty() == false)
+				{
+					System.out.println(symbol);
+					
+					System.out.println("  " + scope.getSymbol(symbol));
+					
+					for (JSNode assignment : assignments)
+					{
+						System.out.println("  " + assignment);
 					}
 				}
 
