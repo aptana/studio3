@@ -443,5 +443,10 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 		};
 		fOpenEditorAction.setToolTipText(Messages.TerminalView_Create_Terminal_Editor_Tooltip);
 	}
+	
+	public IPath getWorkingDirectory()
+	{
+		return terminalComposite.getWorkingDirectory();
+	}
 
 }

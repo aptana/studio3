@@ -35,7 +35,7 @@
 	</element>
 
 	<element name="constructor" onEnter="enterMethod" onExit="exitMethod">
-		<attribute name="scope" />
+		<attribute name="scope" usage="optional" />
 		<attribute name="visibility" usage="optional" />		
 		<child-element name="availability" />
 		<child-element name="browsers" />
@@ -102,7 +102,7 @@
 
 	<element name="method" onEnter="enterMethod" onExit="exitMethod">
 		<attribute name="name" />
-		<attribute name="scope" />
+		<attribute name="scope" usage="optional" />
 		<attribute name="deprecated" usage="optional" />
 		<attribute name="visibility" usage="optional" />
 		<child-element name="availability" />
@@ -154,7 +154,7 @@
 	<element name="property" onEnter="enterProperty" onExit="exitProperty">
 		<attribute name="name" />
 		<attribute name="type" />
-		<attribute name="scope" />
+		<attribute name="scope" usage="optional" />
 		<attribute name="access" usage="optional" />
 		<attribute name="deprecated" usage="optional" />
 		<attribute name="visibility" usage="optional" />

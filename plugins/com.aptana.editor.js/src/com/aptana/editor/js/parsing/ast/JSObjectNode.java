@@ -1,46 +1,54 @@
 package com.aptana.editor.js.parsing.ast;
 
-import java.util.List;
+import beaver.Symbol;
 
-public class JSObjectNode extends JSNaryNode
+public class JSObjectNode extends JSNode
 {
+	private Symbol _leftBrace;
+	private Symbol _rightBrace;
+
 	/**
 	 * JSObjectNode
 	 * 
-	 * @param start
-	 * @param end
+	 * @param leftBrace
+	 * @param properties
+	 * @param rightBrace
 	 */
-	public JSObjectNode(int start, int end, JSNode... children)
+	public JSObjectNode(Symbol leftBrace, Symbol rightBrace, JSNode... properties)
 	{
-		super(JSNodeTypes.OBJECT_LITERAL, start, end, children);
+		super(JSNodeTypes.OBJECT_LITERAL, properties);
+
+		this._leftBrace = leftBrace;
+		this._rightBrace = rightBrace;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNaryNode#appendCloseText(java.lang.StringBuilder)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
 	@Override
-	protected void appendCloseText(StringBuilder buffer)
+	public void accept(JSTreeWalker walker)
 	{
-		buffer.append("}"); //$NON-NLS-1$
+		walker.visit(this);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNaryNode#appendOpenText(java.lang.StringBuilder)
+	/**
+	 * getLeftBrace
+	 * 
+	 * @return
 	 */
-	@Override
-	protected void appendOpenText(StringBuilder buffer)
+	public Symbol getLeftBrace()
 	{
-		buffer.append("{"); //$NON-NLS-1$
+		return this._leftBrace;
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#addReturnTypes(java.util.List)
+	/**
+	 * getRightBrace
+	 * 
+	 * @return
 	 */
-	@Override
-	protected void addReturnTypes(List<String> types)
+	public Symbol getRightBrace()
 	{
-		types.add("Object");
+		return this._rightBrace;
 	}
 }

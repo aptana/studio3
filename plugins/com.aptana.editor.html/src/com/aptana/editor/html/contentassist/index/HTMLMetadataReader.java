@@ -54,7 +54,7 @@ import com.aptana.editor.html.contentassist.model.ValueElement;
  */
 public class HTMLMetadataReader extends MetadataReader
 {
-	private static final String METADATA_SCHEMA_XML = "/metadata/HTMLMetadataSchema.xml"; //$NON-NLS-1$
+	private static final String HTML_METADATA_SCHEMA = "/metadata/HTMLMetadataSchema.xml"; //$NON-NLS-1$
 
 	private List<ElementElement> _elements = new LinkedList<ElementElement>();
 	private ElementElement _currentElement;
@@ -532,6 +532,6 @@ public class HTMLMetadataReader extends MetadataReader
 	@Override
 	protected InputStream getSchemaStream()
 	{
-		return this.getClass().getResourceAsStream(METADATA_SCHEMA_XML);
+		return this.getClass().getResourceAsStream(HTML_METADATA_SCHEMA);
 	}
 }

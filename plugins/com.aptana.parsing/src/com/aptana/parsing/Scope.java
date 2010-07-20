@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,6 +17,7 @@ public class Scope<T>
 	private List<Scope<T>> _children;
 	private Map<String, List<T>> _symbols;
 	private IRange _range;
+	private List<T> _assignments;
 
 	/**
 	 * Scope
@@ -26,6 +26,25 @@ public class Scope<T>
 	{
 	}
 
+	/**
+	 * addAssignment
+	 * 
+	 * @param lhs
+	 * @param rhs
+	 */
+	public void addAssignment(T assignment)
+	{
+		if (assignment != null)
+		{
+			if (this._assignments == null)
+			{
+				this._assignments = new ArrayList<T>();
+			}
+			
+			this._assignments.add(assignment);
+		}
+	}
+	
 	/**
 	 * addScope
 	 * 
@@ -39,7 +58,7 @@ public class Scope<T>
 
 			if (this._children == null)
 			{
-				this._children = new LinkedList<Scope<T>>();
+				this._children = new ArrayList<Scope<T>>();
 			}
 
 			this._children.add(scope);
@@ -79,7 +98,7 @@ public class Scope<T>
 
 			if (nodes == null)
 			{
-				nodes = new LinkedList<T>();
+				nodes = new ArrayList<T>();
 				this._symbols.put(name, nodes);
 			}
 
@@ -87,6 +106,23 @@ public class Scope<T>
 		}
 	}
 
+	/**
+	 * getAssignments
+	 * 
+	 * @return
+	 */
+	public List<T> getAssignments()
+	{
+		List<T> result = this._assignments;
+		
+		if (result == null)
+		{
+			result = Collections.emptyList();
+		}
+		
+		return result;
+	}
+	
 	/**
 	 * getChildren
 	 * 
@@ -104,35 +140,6 @@ public class Scope<T>
 		return result;
 	}
 
-	/**
-	 * getScopeAtOffset
-	 * 
-	 * @param offset
-	 * @return
-	 */
-	public Scope<T> getScopeAtOffset(int offset)
-	{
-		Scope<T> result = null;
-		
-		if (this.getRange().contains(offset))
-		{
-			result = this;
-			
-			for (Scope<T> child : this.getChildren())
-			{
-				Scope<T> candidate = child.getScopeAtOffset(offset);
-				
-				if (candidate != null)
-				{
-					result = candidate;
-					break;
-				}
-			}
-		}
-		
-		return result;
-	}
-	
 	/**
 	 * getLocalSymbol
 	 * 
@@ -194,6 +201,35 @@ public class Scope<T>
 	}
 	
 	/**
+	 * getScopeAtOffset
+	 * 
+	 * @param offset
+	 * @return
+	 */
+	public Scope<T> getScopeAtOffset(int offset)
+	{
+		Scope<T> result = null;
+		
+		if (this.getRange().contains(offset))
+		{
+			result = this;
+			
+			for (Scope<T> child : this.getChildren())
+			{
+				Scope<T> candidate = child.getScopeAtOffset(offset);
+				
+				if (candidate != null)
+				{
+					result = candidate;
+					break;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * getSymbol
 	 * 
 	 * @param name
@@ -251,6 +287,33 @@ public class Scope<T>
 	public boolean hasLocalSymbol(String name)
 	{
 		return (this._symbols != null) ? this._symbols.containsKey(name) : false;
+	}
+	
+	/**
+	 * hasSymbol
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public boolean hasSymbol(String name)
+	{
+		boolean result = false;
+		Scope<T> current = this;
+		
+		while (current != null)
+		{
+			if (current.hasLocalSymbol(name))
+			{
+				result = true;
+				break;
+			}
+			else
+			{
+				current = current.getParentScope();
+			}
+		}
+		
+		return result;
 	}
 	
 	/**

@@ -59,6 +59,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	private static final String DISPLAY = "display"; //$NON-NLS-1$
 	private static final String IMAGE = "image"; //$NON-NLS-1$
 	private static final String TOOL_TIP = "tool_tip"; //$NON-NLS-1$
+	private static final String LOCATION = "location"; //$NON-NLS-1$
 
 	protected final AbstractThemeableEditor editor;
 
@@ -202,12 +203,14 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 					RubySymbol displaySymbol = RubySymbol.newSymbol(ruby, DISPLAY);
 					RubySymbol imageSymbol = RubySymbol.newSymbol(ruby, IMAGE);
 					RubySymbol tooltipSymbol = RubySymbol.newSymbol(ruby, TOOL_TIP);
+					RubySymbol locationSymbol = RubySymbol.newSymbol(ruby, LOCATION);
 					for (IRubyObject element : object.toJavaArray())
 					{
 						String name;
 						String displayName;
 						String description = null;
 						int length;
+						String location = null;
 						IContextInformation contextInfo = null;
 						int replaceLength = 0;
 						Image image = CommonEditorPlugin.getImage(DEFAULT_IMAGE);
@@ -227,6 +230,10 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 							else
 							{
 								displayName = name;
+							}
+							if (hash.containsKey(locationSymbol))
+							{
+								location = hash.get(locationSymbol).toString();
 							}
 							if (hash.containsKey(imageSymbol))
 							{
@@ -280,7 +287,10 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 						// build proposal
 						CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength,
 								length, image, displayName, contextInfo, description);
-
+						if (location != null)
+						{
+							proposal.setFileLocation(location);
+						}
 						// add it to the list
 						proposals.add(proposal);
 					}
@@ -419,6 +429,37 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		return result;
 	}
 
+	/**
+	 * getProjectURI
+	 * 
+	 * @return
+	 */
+	protected URI getProjectURI()
+	{
+		URI result = null;
+		
+		if (editor != null)
+		{
+			IEditorInput editorInput = editor.getEditorInput();
+			
+			if (editorInput instanceof IFileEditorInput)
+			{
+				IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
+				IFile file = fileEditorInput.getFile();
+				IProject project = file.getProject();
+				
+				result = project.getLocationURI();
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * getURI
+	 * 
+	 * @return
+	 */
 	protected URI getURI()
 	{
 		IEditorInput editorInput = editor.getEditorInput();

@@ -11,6 +11,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.expressions,
  com.aptana.filewatcher;bundle-version="1.0.0",
  com.aptana.core;bundle-version="3.0.0",
+ com.aptana.parsing;bundle-version="1.0.0",
  plistreader;bundle-version="1.0.0",
  org.jruby;bundle-version="1.4.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

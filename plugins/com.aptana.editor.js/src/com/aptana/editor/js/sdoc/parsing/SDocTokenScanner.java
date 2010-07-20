@@ -29,17 +29,17 @@ public class SDocTokenScanner extends RuleBasedScanner
 			return Character.isLetter(c);
 		}
 	}
-	
+
 	static class OperatorDetector implements IWordDetector
 	{
 		private int fPosition;
-		
+
 		public boolean isWordPart(char c)
 		{
 			boolean result = false;
-			
+
 			fPosition++;
-			
+
 			if (fPosition == 1)
 			{
 				switch (c)
@@ -59,16 +59,16 @@ public class SDocTokenScanner extends RuleBasedScanner
 						break;
 				}
 			}
-			
+
 			return result;
 		}
 
 		public boolean isWordStart(char c)
 		{
 			boolean result = false;
-			
+
 			fPosition = 0;
-			
+
 			switch (c)
 			{
 				case '/':
@@ -76,18 +76,19 @@ public class SDocTokenScanner extends RuleBasedScanner
 					result = true;
 					break;
 			}
-			
+
 			return result;
 		}
 	}
-	
+
 	/**
 	 * SDocTokenScanner
 	 */
+	@SuppressWarnings("nls")
 	public SDocTokenScanner()
 	{
 		List<IRule> rules = new LinkedList<IRule>();
-		
+
 		rules.add(new RegexpRule("[ \\t]+", getToken(SDocTokenType.WHITESPACE), true));
 		rules.add(new RegexpRule("^[ \\t]*\\*(?!/)[ \\t]*", getToken(SDocTokenType.WHITESPACE), true));
 		rules.add(new SingleCharacterRule('\r', getToken(SDocTokenType.WHITESPACE)));
@@ -96,14 +97,14 @@ public class SDocTokenScanner extends RuleBasedScanner
 		rules.add(new SingleCharacterRule('#', getToken(SDocTokenType.POUND)));
 		rules.add(new SingleCharacterRule('[', getToken(SDocTokenType.LBRACKET)));
 		rules.add(new SingleCharacterRule(']', getToken(SDocTokenType.RBRACKET)));
-		
+
 		WordRule operatorRules = new WordRule(new OperatorDetector(), getToken(SDocTokenType.UNKNOWN));
 		operatorRules.addWord("/**", getToken(SDocTokenType.START_DOCUMENTATION));
 		operatorRules.addWord("*/", getToken(SDocTokenType.END_DOCUMENTATION));
 		rules.add(operatorRules);
-		
+
 		rules.add(new PatternRule("{", "}", getToken(SDocTokenType.TYPES), '\0', false));
-		
+
 		WordRule tagRules = new WordRule(new TagDetector(), getToken(SDocTokenType.UNKNOWN));
 		tagRules.addWord("@advanced", getToken(SDocTokenType.ADVANCED));
 		tagRules.addWord("@alias", getToken(SDocTokenType.ALIAS));
@@ -124,13 +125,13 @@ public class SDocTokenScanner extends RuleBasedScanner
 		tagRules.addWord("@see", getToken(SDocTokenType.SEE));
 		tagRules.addWord("@type", getToken(SDocTokenType.TYPE));
 		rules.add(tagRules);
-		
+
 		rules.add(new RegexpRule("[^ \\t{\\[\\]#]+", getToken(SDocTokenType.TEXT), true));
-		
+
 		this.setDefaultReturnToken(getToken(SDocTokenType.ERROR));
 		this.setRules(rules.toArray(new IRule[rules.size()]));
 	}
-	
+
 	/**
 	 * getToken
 	 * 

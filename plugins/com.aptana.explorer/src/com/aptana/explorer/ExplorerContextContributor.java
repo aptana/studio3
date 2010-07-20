@@ -9,12 +9,15 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.jruby.Ruby;
 import org.jruby.javasupport.JavaEmbedUtils;
 import org.jruby.runtime.builtin.IRubyObject;
 
+import com.aptana.explorer.internal.ui.SingleProjectView;
 import com.aptana.scripting.ScriptUtils;
 import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandElement;
@@ -41,6 +44,46 @@ public class ExplorerContextContributor implements ContextContributor
 	 */
 	private IProject getActiveProject()
 	{
+		// First try and get the active project for the instance of the App Explorer open in the active window
+		final IProject[] projects = new IProject[1];
+		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
+		{
+
+			@Override
+			public void run()
+			{
+				IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+				if (window == null)
+				{
+					return;
+				}
+				IWorkbenchPage page = window.getActivePage();
+				if (page == null)
+				{
+					return;
+				}
+				IViewReference[] refs = page.getViewReferences();
+				for (IViewReference ref : refs)
+				{
+					if (ref.getId().equals(IExplorerUIConstants.VIEW_ID))
+					{
+						SingleProjectView view = (SingleProjectView) ref.getPart(false);
+						IProject activeProject = view.getActiveProject();
+						if (activeProject != null)
+						{
+							projects[0] = activeProject;
+							return;
+						}
+					}
+				}
+			}
+		});
+		if (projects[0] != null)
+		{
+			return projects[0];
+		}
+
+		// Fall back to using project stored in prefs.
 		IPreferencesService preferencesService = Platform.getPreferencesService();
 		String activeProjectName = preferencesService.getString(ExplorerPlugin.PLUGIN_ID,
 				IPreferenceConstants.ACTIVE_PROJECT, null, null);

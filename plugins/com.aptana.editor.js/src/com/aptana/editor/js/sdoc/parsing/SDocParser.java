@@ -10,34 +10,34 @@ import beaver.*;
  * <a href="http://beaver.sourceforge.net">Beaver</a> v0.9.6.1
  * from the grammar specification "SDoc.grammar".
  */
-@SuppressWarnings({ "unchecked" })
+@SuppressWarnings("unchecked")
 public class SDocParser extends Parser {
 
 	static final ParsingTables PARSING_TABLES = new ParsingTables(
-		"U9pjLcji55KOFJExswvO5WHiHSGMQ6cNjhkqfKN55rWLK7o2A8AAYW$01oegogC8Fdxu82Q" +
-		"QO69Yr4GJVv4O4wEe#00L1HH52eX51AL0GGkYWbpF$UQRsN6jTUC$4hOvztpdVD#zSsVkdJ" +
-		"i5t0Rqn77eZcv8e1UweWUEHo6EHGHTu9gbw8DoN8QhSJrcu5xCmJ4eGcyCG1d6uofSXplm8" +
-		"1v2hEDHZ44f#OGSHycjAZ$7kaSwcDDHvqXt2X75AHY5b3cCXKZXOJed8euH68eQQjkURWxX" +
-		"7CQ5A1PTW1BYF8aNOZJoS37weJyh2Z18TdiAbQAyCSx2sH9vwYJXlkAUYPD3DIEblJ3eEKx" +
-		"qfQfkDU$X5d7ic$0khf0hbU1AqUzW0ljLO8hCn6QgSAtqgvO#z#1sdTdDmeDnf$ZU7Lfd5c" +
-		"QYDgIRy40mSwj7ORv$TSOBo0Cnd7z9d25y0SvdEmINi9sAiSnF5lz6tCrdD1nft4zljiHrc" +
-		"8TwDE0qd8fXd6aZpcLRXJ6u2DF9bnCJCGdNyDvlO7mJfk4stCNeFg80Szd6pPzmuF9aYVAy" +
-		"oEDx7EURc#GAL30xXEDtvshtu9htadKkuhdHcslRXolGby#zcC$EFgi1$p8AE8hbt4R9zLh" +
-		"$Vqv7dIFTiRl9AeTxAyssHfmqpwCkVASSQRinbs1iCrOd9VOgqlpwrGJLIOvlgnpkKwiyju" +
-		"3dceqy5H6k5JV1#anDGbk$fwlQKp7gV77i5Lnz4nnbLwuOqV6iaw9Zuqhfu$BB6QwFoZlRL" +
-		"U$G7o6MfVsPMvsdseyjL$AlcdyP7YXjFjjmlfGSKy$6KQagvuaNbLDviBGUbv4ZWbfvcZQk" +
-		"OrrKtPHwQTZVeqriZ35RIIcYFsC3E1CPrvEdDaaPfYlFj9mh#9jhhq4i8XPpl2U86SGpr2y" +
-		"Ihp6sM4AyIVswzbjABAVt5Z6Rc4EzsiivyprsyndxNZDrGkC5H9l6O#dtr7Y2CkVZFFRFkJ" +
-		"gJYEt45DLF4azbrJnDx2AcgRRtz9pEfvZn2yHB5ElrFhOejsfDF#RV89TIj6lk4BqOlJBos" +
-		"mJltNc5I8IkUv3vSXsZ8kGNgSUptLb5V4AKg5V5U1snWKXgVIqnZ3cklhEP#9verDoOpBZy" +
-		"6iAjjp6tGxFckJ#SaHhN#RNCjwWtElkPTWR#xFgD8uRQ$QPZJ5Pk96PbrKSqjv9e2iNF4kD" +
-		"LFz$vDPqTeNXxADwj$1cniuD#gubMOg$gDVuU2zNiiHwnJ$LQeZsKjskntzzxvCUL5uLgT4" +
-		"yuYvKt4eT3CVU1Su1ukRFxrFfNG$4chgVb9I6lXPvhtplLswZZ$hDXp3tfB5Ez8jFFZNaix" +
-		"$NVVcQlQJExp6vpqFnkVZC7pAzclzbdsiqlvcVp1$CxYTQWUeToc$c9xO#1uhLDi$cQxLVc" +
-		"2xPhnLzZk0RcIsALwC$DDsQTMS#8QsPMYlUfMMu#8lCjC1#Bio8OTHln0x4rSBZtpPPWDcs" +
-		"cnNmeqGV4ClC#dU#2tEOW#fRjfa1j93QOFJh829wP3lzFYoYYyXqO95#a$qODQsla2mFv6g" +
-		"MfCuXbnTdQSbu7UO#hEPzgZfbIL0eY8JZoNSduiH3dQowFYFChumZg1960Qya#6lu239Iyx" +
-		"W==");
+		"U9pjLbbm5LKGFJFlvIL2C975c8GG80GX2IyX2r5Y4C7W0W4HHHGNS4LHL5nGKOYe851#g5L" +
+		"MAHzMMPQb7tvPBXyWuX8KGK4GD20OWyObHWK11Krxxfr#avbdqEWVLIHr#lGztTEtP#RUEm" +
+		"zm9w4FJa8cCd0Y#g8NUgCVJaPFHD03ut4snY4Nfs8whiBrk0ltuK6SW2naem25c8ahS2tkm" +
+		"68iHKhNTKGmnDQPrCqwtSjAxMRUYYwwEguSwqhShj0uYktAka0wK8CgZ5Gxbf5pa4PheXV3" +
+		"bTMX#FcyEeffjiefU9Iy77MqmpKU3sMVWNfVzsQzJFx0179wA2#Ub7MvZYSdPNdHAoqFn3M" +
+		"XQ3e6OJ2Ao9Uohr68CUCMt8YRgPXxCJ0PzRZ7#gP6Vyor$03kzBM7SIyv1wVvodmiylt9UC" +
+		"HoFPQHyucXlFywd8KfbYVY8jfvcC78TLQPWmMqURYVIWEz0NY8LT9bhRmfQzZRC9HW14fHX" +
+		"d9Ke1BLE1rZS1j6enPdCdOkpgCjmLHSI7i9CGkpSJMll87#JRWLj#DkUWk9T2oXJPC$uS3b" +
+		"AHJboHBZVa$Z3Y$Y6n$EcNfnBMHmLVJcskXhpvailibitd4kdqSU#yldapDFge2dJzTry1$" +
+		"hT7Us$z$LSUNOLypASloL1Nv3Ut95UpQJaGpk4KUZLTpXuRYvEbEhcBnoxWI7fuKNTqBPPj" +
+		"Q4dfWLUdKmp$bRbZSkJCfAHCDPdlKgkcINVQMmBuVMvLqNsNinC1anQiOtDI9QozMdaV0D3" +
+		"$MLOO5eeKPZoWRcr8ZplvDJQSEH2bznwHNQBbtRROHdKWaxZNB64lvUYDAEv9oULqhVs0H7" +
+		"B2hyAokP5LMrLBKocB#L3JGYyXMfb2YWBu0pc$ueyjCDDWtpb1SOxYwKbXDF4AjORnUn6d2" +
+		"pE7wUU9b#Bj6VoEFuDRrkBV4#jG7CNqWqShp5YpcBFNRpYK7g6tq9sT6SzVGBrLz6FwR#2l" +
+		"f5wizGVZBHQBXtPoQnbPYZuwTeXYJbJ2KE4dDr$0mnItkgelySmVj0azvNYtARvbGpleayc" +
+		"eC36kkWbagjXlm2yH6nWSZidDUD4hNgZmdqawtQMFel4PyHWrKRH$zLefaerlnAefQnEl8R" +
+		"H2inGMDJEklobmRSYQhN9EB4gg1cmEMpHxNvoS$qdy3yQSIpn3hYHTMQbRSH#yBvY6Xikta" +
+		"7waydzXDbEZvqbBcE74Nl2FY7EtqtC9UtnfAks#6jGN#TDPbt5CvnK$IzzT2SdVJJ0ZLscr" +
+		"XWBIrIVYnG8qsrnvLRgFK9#9b4ElrNkhg$f9vV3$XxULq$yfg0rkhjKwTHnsrcZmRy7F967" +
+		"MyEz9ZZCLOYwKz#bdPfan$bYFmklyaXEIW7v5VPB$la5pdC#0$4ztxsTyhjyYrjgp$wXlPp" +
+		"#PHscsfRPJFj9zR$MBXVP0knoOutoWxPBjm7yY6nmMeVo7loBfaxKzPRfT6l$ZMnbsZn5Pw" +
+		"DqkntrIvVoZlMUvjuIzPHsUF7TllU5xIx$D5Eeab#qYBZUROw$6f6557xHIcstwv$Hpbpo$" +
+		"KhEO9SPhzb2QGa#SbZmx4kuXx7sK#SDKiL9HOH8geSKIqQYAK4E5LZCVFRbzyZnwBI8k9p1" +
+		"Jc1why0dDIymG==");
 
 	// suppress parser error reporting and let the custom error recovery mechanism handle it
 	private static class SDocEvents extends Events
@@ -154,19 +154,19 @@ public class SDocParser extends Parser {
 			{
 					final Symbol text = _symbols[offset + 2];
 					
-			return new Tag(TagType.ADVANCED, (String) text.value);
+			return new AdvancedTag((String) text.value);
 			}
 			case 20: // Tag = ALIAS Text.text
 			{
 					final Symbol text = _symbols[offset + 2];
 					
-			return new Tag(TagType.ALIAS, (String) text.value);
+			return new AliasTag((String) text.value);
 			}
 			case 21: // Tag = AUTHOR Text.text
 			{
 					final Symbol text = _symbols[offset + 2];
 					
-			return new Tag(TagType.AUTHOR, (String) text.value);
+			return new AuthorTag((String) text.value);
 			}
 			case 22: // Tag = CLASS_DESCRIPTION LCURLY Namespace.name RCURLY Text.text
 			{
@@ -174,45 +174,45 @@ public class SDocParser extends Parser {
 					final String name = (String) _symbol_name.value;
 					final Symbol text = _symbols[offset + 5];
 					
-			return new TagWithName(TagType.CLASS_DESCRIPTION, name, (String) text.value);
+			return new ClassDescriptionTag(name, (String) text.value);
 			}
 			case 23: // Tag = CONSTRUCTOR opt$Text.text
 			{
 					final Symbol text = _symbols[offset + 2];
 					
-			return new Tag(TagType.CONSTRUCTOR, (String) text.value);
+			return new ConstructorTag((String) text.value);
 			}
 			case 24: // Tag = EXAMPLE Text.text
 			{
 					final Symbol text = _symbols[offset + 2];
 					
-			return new Tag(TagType.EXAMPLE, (String) text.value);
+			return new ExampleTag((String) text.value);
 			}
 			case 25: // Tag = EXCEPTION LCURLY Types.types RCURLY opt$Text.text
 			{
 					final Symbol types = _symbols[offset + 3];
 					final Symbol text = _symbols[offset + 5];
 					
-			return new TagWithTypes(TagType.EXCEPTION, (List<Type>) types.value, (String) text.value);
+			return new ExceptionTag((List<Type>) types.value, (String) text.value);
 			}
 			case 26: // Tag = EXTENDS LCURLY Types.types RCURLY opt$Text.text
 			{
 					final Symbol types = _symbols[offset + 3];
 					final Symbol text = _symbols[offset + 5];
 					
-			return new TagWithTypes(TagType.EXTENDS, (List<Type>) types.value, (String) text.value);
+			return new ExtendsTag((List<Type>) types.value, (String) text.value);
 			}
 			case 27: // Tag = INTERNAL opt$Text.text
 			{
 					final Symbol text = _symbols[offset + 2];
 					
-			return new Tag(TagType.INTERNAL, (String) text.value);
+			return new InternalTag((String) text.value);
 			}
 			case 28: // Tag = METHOD opt$Text.text
 			{
 					final Symbol text = _symbols[offset + 2];
 					
-			return new Tag(TagType.METHOD, (String) text.value);
+			return new MethodTag((String) text.value);
 			}
 			case 29: // Tag = NAMESPACE LCURLY Namespace.name RCURLY opt$Text.text
 			{
@@ -220,13 +220,13 @@ public class SDocParser extends Parser {
 					final String name = (String) _symbol_name.value;
 					final Symbol text = _symbols[offset + 5];
 					
-			return new TagWithName(TagType.NAMESPACE, name, (String) text.value);
+			return new NamespaceTag(name, (String) text.value);
 			}
 			case 30: // Tag = OVERVIEW Text.text
 			{
 					final Symbol text = _symbols[offset + 2];
 					
-			return new Tag(TagType.OVERVIEW, (String) text.value);
+			return new OverviewTag((String) text.value);
 			}
 			case 31: // Tag = PARAM LCURLY Types.types RCURLY ParamName.name opt$Text.text
 			{
@@ -241,34 +241,34 @@ public class SDocParser extends Parser {
 			{
 					final Symbol text = _symbols[offset + 2];
 					
-			return new Tag(TagType.PRIVATE, (String) text.value);
+			return new PrivateTag((String) text.value);
 			}
 			case 33: // Tag = PROPERTY LCURLY Types.types RCURLY opt$Text.text
 			{
 					final Symbol types = _symbols[offset + 3];
 					final Symbol text = _symbols[offset + 5];
 					
-			return new TagWithTypes(TagType.PROPERTY, (List<Type>) types.value, (String) text.value);
+			return new PropertyTag((List<Type>) types.value, (String) text.value);
 			}
 			case 34: // Tag = RETURN LCURLY Types.types RCURLY opt$Text.text
 			{
 					final Symbol types = _symbols[offset + 3];
 					final Symbol text = _symbols[offset + 5];
 					
-			return new TagWithTypes(TagType.RETURN, (List<Type>) types.value, (String) text.value);
+			return new ReturnTag((List<Type>) types.value, (String) text.value);
 			}
 			case 35: // Tag = SEE Text.text
 			{
 					final Symbol text = _symbols[offset + 2];
 					
-			return new Tag(TagType.SEE, (String) text.value);
+			return new SeeTag((String) text.value);
 			}
 			case 36: // Tag = TYPE LCURLY Types.types RCURLY opt$Text.text
 			{
 					final Symbol types = _symbols[offset + 3];
 					final Symbol text = _symbols[offset + 5];
 					
-			return new TagWithTypes(TagType.TYPE, (List<Type>) types.value, (String) text.value);
+			return new TypeTag((List<Type>) types.value, (String) text.value);
 			}
 			case 37: // Tag = UNKNOWN.name opt$Text.text
 			{
@@ -276,7 +276,7 @@ public class SDocParser extends Parser {
 					final String name = (String) _symbol_name.value;
 					final Symbol text = _symbols[offset + 2];
 					
-			return new TagWithName(TagType.UNKNOWN, name, (String) text.value);
+			return new UnknownTag(name, (String) text.value);
 			}
 			case 38: // Types = Types.types TypeDelimiter Type.type
 			{
@@ -313,34 +313,41 @@ public class SDocParser extends Parser {
 					
 			return new ArrayType(new Type(name));
 			}
-			case 44: // Type = ARRAY LBRACKET RBRACKET
+			case 44: // Type = CLASS LESS_THAN Type.memberType GREATER_THAN
+			{
+					final Symbol _symbol_memberType = _symbols[offset + 3];
+					final Type memberType = (Type) _symbol_memberType.value;
+					
+			return new ClassType(memberType);
+			}
+			case 45: // Type = ARRAY LBRACKET RBRACKET
 			{
 					
 			return new ArrayType();
 			}
-			case 45: // Type = FUNCTION LBRACKET RBRACKET
+			case 46: // Type = FUNCTION LBRACKET RBRACKET
 			{
 					
 			return new FunctionType();
 			}
-			case 46: // Type = ARRAY
+			case 47: // Type = ARRAY
 			{
 					
 			return new ArrayType();
 			}
-			case 47: // Type = ARRAY LESS_THAN Type.memberType GREATER_THAN
+			case 48: // Type = ARRAY LESS_THAN Type.memberType GREATER_THAN
 			{
 					final Symbol _symbol_memberType = _symbols[offset + 3];
 					final Type memberType = (Type) _symbol_memberType.value;
 					
 			return new ArrayType(memberType);
 			}
-			case 48: // Type = FUNCTION
+			case 49: // Type = FUNCTION
 			{
 					
 			return new FunctionType();
 			}
-			case 49: // Type = FUNCTION ReturnDelimiter Type.returnType
+			case 50: // Type = FUNCTION ReturnDelimiter Type.returnType
 			{
 					final Symbol _symbol_returnType = _symbols[offset + 3];
 					final Type returnType = (Type) _symbol_returnType.value;
@@ -351,7 +358,7 @@ public class SDocParser extends Parser {
 			
 			return function;
 			}
-			case 50: // Type = FUNCTION ReturnDelimiter LPAREN Types.returnTypes RPAREN
+			case 51: // Type = FUNCTION ReturnDelimiter LPAREN Types.returnTypes RPAREN
 			{
 					final Symbol returnTypes = _symbols[offset + 4];
 					
@@ -364,12 +371,12 @@ public class SDocParser extends Parser {
 			
 			return function;
 			}
-			case 51: // Type = FUNCTION LPAREN RPAREN
+			case 52: // Type = FUNCTION LPAREN RPAREN
 			{
 					
 			return new FunctionType();
 			}
-			case 52: // Type = FUNCTION LPAREN RPAREN ReturnDelimiter Type.returnType
+			case 53: // Type = FUNCTION LPAREN RPAREN ReturnDelimiter Type.returnType
 			{
 					final Symbol _symbol_returnType = _symbols[offset + 5];
 					final Type returnType = (Type) _symbol_returnType.value;
@@ -380,7 +387,7 @@ public class SDocParser extends Parser {
 			
 			return function;
 			}
-			case 53: // Type = FUNCTION LPAREN RPAREN ReturnDelimiter LPAREN Types.returnTypes RPAREN
+			case 54: // Type = FUNCTION LPAREN RPAREN ReturnDelimiter LPAREN Types.returnTypes RPAREN
 			{
 					final Symbol returnTypes = _symbols[offset + 6];
 					
@@ -393,7 +400,7 @@ public class SDocParser extends Parser {
 			
 			return function;
 			}
-			case 54: // Type = FUNCTION LPAREN Types.parameterTypes RPAREN
+			case 55: // Type = FUNCTION LPAREN Types.parameterTypes RPAREN
 			{
 					final Symbol parameterTypes = _symbols[offset + 3];
 					
@@ -406,7 +413,7 @@ public class SDocParser extends Parser {
 			
 			return function;
 			}
-			case 55: // Type = FUNCTION LPAREN Types.parameterTypes RPAREN ReturnDelimiter Type.returnType
+			case 56: // Type = FUNCTION LPAREN Types.parameterTypes RPAREN ReturnDelimiter Type.returnType
 			{
 					final Symbol parameterTypes = _symbols[offset + 3];
 					final Symbol _symbol_returnType = _symbols[offset + 6];
@@ -423,7 +430,7 @@ public class SDocParser extends Parser {
 			
 			return function;
 			}
-			case 56: // Type = FUNCTION LPAREN Types.parameterTypes RPAREN ReturnDelimiter LPAREN Types.returnTypes RPAREN
+			case 57: // Type = FUNCTION LPAREN Types.parameterTypes RPAREN ReturnDelimiter LPAREN Types.returnTypes RPAREN
 			{
 					final Symbol parameterTypes = _symbols[offset + 3];
 					final Symbol returnTypes = _symbols[offset + 7];
@@ -442,14 +449,14 @@ public class SDocParser extends Parser {
 			
 			return function;
 			}
-			case 59: // ParamName = TEXT.name
+			case 60: // ParamName = TEXT.name
 			{
 					final Symbol _symbol_name = _symbols[offset + 1];
 					final String name = (String) _symbol_name.value;
 					
 			return new Parameter(name);
 			}
-			case 60: // ParamName = LBRACKET TEXT.name RBRACKET
+			case 61: // ParamName = LBRACKET TEXT.name RBRACKET
 			{
 					final Symbol _symbol_name = _symbols[offset + 2];
 					final String name = (String) _symbol_name.value;
@@ -460,7 +467,7 @@ public class SDocParser extends Parser {
 			
 			return result;
 			}
-			case 61: // ParamName = ELLIPSIS
+			case 62: // ParamName = ELLIPSIS
 			{
 					
 			Parameter result = new Parameter("...");
@@ -469,7 +476,7 @@ public class SDocParser extends Parser {
 			
 			return result;
 			}
-			case 62: // ParamName = LBRACKET ELLIPSIS RBRACKET
+			case 63: // ParamName = LBRACKET ELLIPSIS RBRACKET
 			{
 					
 			Parameter result = new Parameter("...");
@@ -496,11 +503,11 @@ public class SDocParser extends Parser {
 			case 18: // opt$Text = Text
 			case 40: // TypeDelimiter = COMMA
 			case 41: // TypeDelimiter = PIPE
-			case 57: // ReturnDelimiter = COLON
-			case 58: // ReturnDelimiter = ARROW
-			case 63: // Namespace = IDENTIFIER
-			case 64: // Namespace = FUNCTION
-			case 65: // Namespace = ARRAY
+			case 58: // ReturnDelimiter = COLON
+			case 59: // ReturnDelimiter = ARROW
+			case 64: // Namespace = IDENTIFIER
+			case 65: // Namespace = FUNCTION
+			case 66: // Namespace = ARRAY
 			{
 				return _symbols[offset + 1];
 			}

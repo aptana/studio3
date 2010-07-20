@@ -210,8 +210,6 @@ public class DiskIndex
 			}
 		}
 
-		if (results == null)
-			return null;
 		return results;
 	}
 

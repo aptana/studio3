@@ -53,7 +53,7 @@ public class ParseNode extends Node implements IParseNode
 		fLanguage = language;
 		fChildren = new IParseNode[0];
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see beaver.spec.ast.Node#accept(beaver.spec.ast.TreeWalker)

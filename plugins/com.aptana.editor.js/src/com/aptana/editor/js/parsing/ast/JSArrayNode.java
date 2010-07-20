@@ -1,46 +1,52 @@
 package com.aptana.editor.js.parsing.ast;
 
-import java.util.List;
+import beaver.Symbol;
 
-public class JSArrayNode extends JSNaryNode
+public class JSArrayNode extends JSNode
 {
+	private Symbol _leftBracket;
+	private Symbol _rightBracket;
+
 	/**
 	 * JSArrayNode
 	 * 
-	 * @param start
-	 * @param end
+	 * @param elements
 	 */
-	public JSArrayNode(int start, int end, JSNode... children)
+	public JSArrayNode(Symbol leftBracket, Symbol rightBracket, JSNode... elements)
 	{
-		super(JSNodeTypes.ARRAY_LITERAL, start, end, children);
+		super(JSNodeTypes.ARRAY_LITERAL, elements);
+
+		this._leftBracket = leftBracket;
+		this._rightBracket = rightBracket;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNaryNode#appendCloseText(java.lang.StringBuilder)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
 	@Override
-	protected void appendCloseText(StringBuilder buffer)
+	public void accept(JSTreeWalker walker)
 	{
-		buffer.append("]"); //$NON-NLS-1$
+		walker.visit(this);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNaryNode#appendOpenText(java.lang.StringBuilder)
+	/**
+	 * getLeftBracket
+	 * 
+	 * @return
 	 */
-	@Override
-	protected void appendOpenText(StringBuilder buffer)
+	public Symbol getLeftBracket()
 	{
-		buffer.append("["); //$NON-NLS-1$
+		return this._leftBracket;
 	}
-	
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#addReturnTypes(java.util.List)
+
+	/**
+	 * getRightBracket
+	 * 
+	 * @return
 	 */
-	@Override
-	protected void addReturnTypes(List<String> types)
+	public Symbol getRightBracket()
 	{
-		types.add("Array");
+		return this._rightBracket;
 	}
 }

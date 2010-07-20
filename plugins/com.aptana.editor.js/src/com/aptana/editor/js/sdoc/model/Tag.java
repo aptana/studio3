@@ -2,9 +2,9 @@ package com.aptana.editor.js.sdoc.model;
 
 import beaver.Symbol;
 
-import com.aptana.parsing.io.SourceWriter;
+import com.aptana.parsing.io.SourcePrinter;
 
-public class Tag extends Symbol
+public abstract class Tag extends Symbol
 {
 	private TagType _type;
 	private String _text;
@@ -16,7 +16,7 @@ public class Tag extends Symbol
 	 */
 	public Tag(TagType type)
 	{
-		this(type, "");
+		this(type, ""); //$NON-NLS-1$
 	}
 
 	/**
@@ -49,7 +49,7 @@ public class Tag extends Symbol
 	{
 		return this._type;
 	}
-	
+
 	/**
 	 * toSource
 	 * 
@@ -57,27 +57,34 @@ public class Tag extends Symbol
 	 */
 	public String toSource()
 	{
-		SourceWriter writer = new SourceWriter();
-		
+		SourcePrinter writer = new SourcePrinter();
+
 		this.toSource(writer);
-		
+
 		writer.println();
-		
+
 		return writer.toString();
 	}
-	
+
 	/**
 	 * toSource
 	 * 
 	 * @param writer
 	 */
-	public void toSource(SourceWriter writer)
+	public void toSource(SourcePrinter writer)
 	{
-		writer.print(this._type.toString());
-		
+		if (this._type != null)
+		{
+			writer.print(this._type.toString());
+		}
+		else
+		{
+			writer.print(TagType.UNKNOWN.toString());
+		}
+
 		if (this._text != null && this._text.isEmpty() == false)
 		{
-			writer.print(" ").print(this._text);
+			writer.print(" ").print(this._text); //$NON-NLS-1$
 		}
 	}
 }

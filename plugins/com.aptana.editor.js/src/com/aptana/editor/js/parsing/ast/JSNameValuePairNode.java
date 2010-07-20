@@ -1,36 +1,62 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSNameValuePairNode extends JSNode
 {
+	private Symbol _colon;
+	
 	/**
 	 * JSNameValuePairNode
 	 * 
-	 * @param start
-	 * @param end
-	 * @param children
+	 * @param name
+	 * @param colon
+	 * @param value
 	 */
-	public JSNameValuePairNode(int start, int end, JSNode... children)
+	public JSNameValuePairNode(JSNode name, Symbol colon, JSNode value)
 	{
-		super(JSNodeTypes.NAME_VALUE_PAIR, start, end, children);
+		super(JSNodeTypes.NAME_VALUE_PAIR, name, value);
+		
+		this._colon = colon;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
-	public String toString()
+	@Override
+	public void accept(JSTreeWalker walker)
 	{
-		StringBuilder buffer = new StringBuilder();
-		IParseNode[] children = getChildren();
+		walker.visit(this);
+	}
 
-		buffer.append(children[0]);
-		buffer.append(": "); //$NON-NLS-1$
-		buffer.append(children[1]);
+	/**
+	 * getColon
+	 * 
+	 * @return
+	 */
+	public Symbol getColon()
+	{
+		return this._colon;
+	}
+	
+	/**
+	 * getName
+	 */
+	public IParseNode getName()
+	{
+		return this.getChild(0);
+	}
 
-		this.appendSemicolon(buffer);
-
-		return buffer.toString();
+	/**
+	 * getValue
+	 * 
+	 * @return
+	 */
+	public IParseNode getValue()
+	{
+		return this.getChild(1);
 	}
 }

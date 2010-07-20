@@ -21,25 +21,25 @@ public class SDocTypeTokenScanner extends RuleBasedScanner
 		public boolean isWordStart(char c)
 		{
 			boolean result = false;
-			
+
 			switch (c)
 			{
 				case '$':
 				case '_':
 					result = true;
 					break;
-					
+
 				default:
 					result = Character.isJavaIdentifierStart(c);
 			}
-			
+
 			return result;
 		}
-		
+
 		public boolean isWordPart(char c)
 		{
 			boolean result = false;
-			
+
 			switch (c)
 			{
 				case '$':
@@ -47,25 +47,25 @@ public class SDocTypeTokenScanner extends RuleBasedScanner
 				case '.':
 					result = true;
 					break;
-					
+
 				default:
 					result = Character.isJavaIdentifierPart(c);
 			}
-			
+
 			return result;
 		}
 	}
-	
+
 	static class OperatorDetector implements IWordDetector
 	{
 		private int fPosition;
-		
+
 		public boolean isWordPart(char c)
 		{
 			boolean result = false;
-			
+
 			fPosition++;
-			
+
 			if (fPosition == 1)
 			{
 				switch (c)
@@ -85,16 +85,16 @@ public class SDocTypeTokenScanner extends RuleBasedScanner
 						break;
 				}
 			}
-			
+
 			return result;
 		}
 
 		public boolean isWordStart(char c)
 		{
 			boolean result = false;
-			
+
 			fPosition = 0;
-			
+
 			switch (c)
 			{
 				case '-':
@@ -102,22 +102,22 @@ public class SDocTypeTokenScanner extends RuleBasedScanner
 					result = true;
 					break;
 			}
-			
+
 			return result;
 		}
 	}
-	
+
 	/**
 	 * SDocTypeTokenScanner
 	 */
 	public SDocTypeTokenScanner()
 	{
 		List<IRule> rules = new LinkedList<IRule>();
-		
-		rules.add(new RegexpRule("[ \\t]+", getToken(SDocTokenType.WHITESPACE), true));
+
+		rules.add(new RegexpRule("[ \\t]+", getToken(SDocTokenType.WHITESPACE), true)); //$NON-NLS-1$
 		rules.add(new SingleCharacterRule('\r', getToken(SDocTokenType.WHITESPACE)));
 		rules.add(new SingleCharacterRule('\n', getToken(SDocTokenType.WHITESPACE)));
-		
+
 		rules.add(new SingleCharacterRule('(', getToken(SDocTokenType.LPAREN)));
 		rules.add(new SingleCharacterRule(')', getToken(SDocTokenType.RPAREN)));
 		rules.add(new SingleCharacterRule('{', getToken(SDocTokenType.LCURLY)));
@@ -129,21 +129,22 @@ public class SDocTypeTokenScanner extends RuleBasedScanner
 		rules.add(new SingleCharacterRule(':', getToken(SDocTokenType.COLON)));
 		rules.add(new SingleCharacterRule(',', getToken(SDocTokenType.COMMA)));
 		rules.add(new SingleCharacterRule('|', getToken(SDocTokenType.PIPE)));
-		
+
 		WordRule operatorRules = new WordRule(new OperatorDetector(), getToken(SDocTokenType.ERROR));
-		operatorRules.addWord("...", getToken(SDocTokenType.ELLIPSIS));
-		operatorRules.addWord("->", getToken(SDocTokenType.ARROW));
+		operatorRules.addWord("...", getToken(SDocTokenType.ELLIPSIS)); //$NON-NLS-1$
+		operatorRules.addWord("->", getToken(SDocTokenType.ARROW)); //$NON-NLS-1$
 		rules.add(operatorRules);
-		
+
 		WordRule keywordRules = new WordRule(new IdentifierDetector(), getToken(SDocTokenType.IDENTIFIER));
-		keywordRules.addWord("Array", getToken(SDocTokenType.ARRAY));
-		keywordRules.addWord("Function", getToken(SDocTokenType.FUNCTION));
+		keywordRules.addWord("Array", getToken(SDocTokenType.ARRAY)); //$NON-NLS-1$
+		keywordRules.addWord("Function", getToken(SDocTokenType.FUNCTION)); //$NON-NLS-1$
+		keywordRules.addWord("Class", getToken(SDocTokenType.CLASS)); //$NON-NLS-1$
 		rules.add(keywordRules);
-		
+
 		this.setDefaultReturnToken(getToken(SDocTokenType.ERROR));
 		this.setRules(rules.toArray(new IRule[rules.size()]));
 	}
-	
+
 	/**
 	 * getToken
 	 * 

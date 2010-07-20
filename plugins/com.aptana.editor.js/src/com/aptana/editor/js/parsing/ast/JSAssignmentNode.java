@@ -1,10 +1,14 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSAssignmentNode extends JSNode
 {
+	private Symbol _operator;
+
 	/**
 	 * JSAssignmentNode
 	 * 
@@ -12,13 +16,13 @@ public class JSAssignmentNode extends JSNode
 	 * @param assignOperator
 	 * @param right
 	 */
-	public JSAssignmentNode(JSNode left, String assignOperator, JSNode right)
+	public JSAssignmentNode(JSNode left, Symbol assignOperator, JSNode right)
 	{
-		this.start = left.getStart();
-		this.end = right.getEnd();
+		this._operator = assignOperator;
 
 		short type = DEFAULT_TYPE;
-		JSTokenType token = JSTokenType.get(assignOperator);
+		JSTokenType token = JSTokenType.get((String) assignOperator.value);
+
 		switch (token)
 		{
 			case EQUAL:
@@ -58,67 +62,48 @@ public class JSAssignmentNode extends JSNode
 				type = JSNodeTypes.SUBTRACT_AND_ASSIGN;
 				break;
 		}
-		setType(type);
 
-		setChildren(new JSNode[] { left, right });
+		this.setNodeType(type);
+		this.setChildren(new JSNode[] { left, right });
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
 	@Override
-	public String toString()
+	public void accept(JSTreeWalker walker)
 	{
-		StringBuilder text = new StringBuilder();
-		String operator = "???"; //$NON-NLS-1$
-		switch (getNodeType())
-		{
-			case JSNodeTypes.ASSIGN:
-				operator = "="; //$NON-NLS-1$
-				break;
-			case JSNodeTypes.ADD_AND_ASSIGN:
-				operator = "+="; //$NON-NLS-1$
-				break;
-			case JSNodeTypes.ARITHMETIC_SHIFT_RIGHT_AND_ASSIGN:
-				operator = ">>>="; //$NON-NLS-1$
-				break;
-			case JSNodeTypes.BITWISE_AND_AND_ASSIGN:
-				operator = "&="; //$NON-NLS-1$
-				break;
-			case JSNodeTypes.BITWISE_OR_AND_ASSIGN:
-				operator = "|="; //$NON-NLS-1$
-				break;
-			case JSNodeTypes.BITWISE_XOR_AND_ASSIGN:
-				operator = "^="; //$NON-NLS-1$
-				break;
-			case JSNodeTypes.DIVIDE_AND_ASSIGN:
-				operator = "/="; //$NON-NLS-1$
-				break;
-			case JSNodeTypes.MOD_AND_ASSIGN:
-				operator = "%="; //$NON-NLS-1$
-				break;
-			case JSNodeTypes.MULTIPLY_AND_ASSIGN:
-				operator = "*="; //$NON-NLS-1$
-				break;
-			case JSNodeTypes.SHIFT_LEFT_AND_ASSIGN:
-				operator = "<<="; //$NON-NLS-1$
-				break;
-			case JSNodeTypes.SHIFT_RIGHT_AND_ASSIGN:
-				operator = ">>="; //$NON-NLS-1$
-				break;
-			case JSNodeTypes.SUBTRACT_AND_ASSIGN:
-				operator = "-="; //$NON-NLS-1$
-				break;
+		walker.visit(this);
+	}
 
-		}
-		IParseNode[] children = getChildren();
-		text.append(children[0]);
-		text.append(" ").append(operator).append(" "); //$NON-NLS-1$ //$NON-NLS-2$
-		text.append(children[1]);
+	/**
+	 * getLeftHandSide
+	 * 
+	 * @return
+	 */
+	public IParseNode getLeftHandSide()
+	{
+		return this.getChild(0);
+	}
 
-		this.appendSemicolon(text);
+	/**
+	 * getOperator
+	 * 
+	 * @return
+	 */
+	public Symbol getOperator()
+	{
+		return this._operator;
+	}
 
-		return text.toString();
+	/**
+	 * getRightHandSide
+	 * 
+	 * @return
+	 */
+	public IParseNode getRightHandSide()
+	{
+		return this.getChild(1);
 	}
 }

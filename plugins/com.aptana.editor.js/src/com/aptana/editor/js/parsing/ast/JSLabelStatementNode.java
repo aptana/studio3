@@ -1,37 +1,35 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 /**
  * Represents continue and break statements.
  */
 public abstract class JSLabelStatementNode extends JSNode
 {
-	private String fIdentifier;
-	private String fText;
+	private Symbol _label;
 
 	/**
 	 * JSLabelStatementNode
 	 * 
 	 * @param type
-	 * @param start
-	 * @param end
 	 */
-	public JSLabelStatementNode(short type, int start, int end)
+	public JSLabelStatementNode(short type)
 	{
-		this(type, start, end, null);
+		this(type, null);
 	}
 
 	/**
 	 * JSLabelStatementNode
 	 * 
 	 * @param type
-	 * @param start
-	 * @param end
-	 * @param identifier
+	 * @param label
 	 */
-	public JSLabelStatementNode(short type, int start, int end, String identifier)
+	public JSLabelStatementNode(short type, Symbol label)
 	{
-		super(type, start, end);
-		fIdentifier = identifier;
+		super(type);
+
+		this._label = label;
 	}
 
 	/*
@@ -45,16 +43,21 @@ public abstract class JSLabelStatementNode extends JSNode
 		{
 			return false;
 		}
+		
 		JSLabelStatementNode other = (JSLabelStatementNode) obj;
-		return fIdentifier == null ? other.fIdentifier == null : fIdentifier.equals(other.fIdentifier);
+		
+		return _label == null ? other._label == null : _label.value.equals(other._label.value);
 	}
 
 	/**
-	 * geKeyword
+	 * getIdentifier
 	 * 
 	 * @return
 	 */
-	protected abstract String getKeyword();
+	public Symbol getLabel()
+	{
+		return this._label;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -64,32 +67,7 @@ public abstract class JSLabelStatementNode extends JSNode
 	public int hashCode()
 	{
 		int hash = super.hashCode();
-		return hash * 31 + (fIdentifier == null ? 0 : fIdentifier.hashCode());
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		if (fText == null)
-		{
-			StringBuilder text = new StringBuilder();
-
-			text.append(this.getKeyword());
-
-			if (fIdentifier != null)
-			{
-				text.append(" ").append(fIdentifier); //$NON-NLS-1$
-			}
-
-			this.appendSemicolon(text);
-
-			fText = text.toString();
-		}
-
-		return fText;
+		
+		return hash * 31 + (_label == null ? 0 : _label.value.hashCode());
 	}
 }

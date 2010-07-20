@@ -359,7 +359,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 
 		};
 		disconnectJob.setPriority(Job.INTERACTIVE);
-		disconnectJob.setSystem(true);
+		disconnectJob.setSystem(false);
 		disconnectJob.schedule();
 		close();
 	}
@@ -1380,7 +1380,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 
 		};
 		buildSmartSync.setPriority(Job.LONG);
-		buildSmartSync.setSystem(!compareInBackground);
+		buildSmartSync.setSystem(false);
 		buildSmartSync.schedule();
 	}
 

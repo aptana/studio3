@@ -7,39 +7,50 @@ public class JSTryNode extends JSNode
 	/**
 	 * JSTryNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param children
 	 */
-	public JSTryNode(int start, int end, JSNode... children)
+	public JSTryNode(JSNode... children)
 	{
-		super(JSNodeTypes.TRY, start, end, children);
+		super(JSNodeTypes.TRY, children);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
-	public String toString()
+	@Override
+	public void accept(JSTreeWalker walker)
 	{
-		StringBuilder buffer = new StringBuilder();
-		IParseNode[] children = getChildren();
+		walker.visit(this);
+	}
 
-		buffer.append("try "); //$NON-NLS-1$
-		buffer.append(children[0]);
+	/**
+	 * getBody
+	 * 
+	 * @return
+	 */
+	public IParseNode getBody()
+	{
+		return this.getChild(0);
+	}
 
-		if (!((JSNode) children[1]).isEmpty())
-		{
-			buffer.append(" ").append(children[1]); //$NON-NLS-1$
-		}
+	/**
+	 * getCatchBlock
+	 * 
+	 * @return
+	 */
+	public IParseNode getCatchBlock()
+	{
+		return this.getChild(1);
+	}
 
-		if (!((JSNode) children[2]).isEmpty())
-		{
-			buffer.append(" ").append(children[2]); //$NON-NLS-1$
-		}
-
-		this.appendSemicolon(buffer);
-
-		return buffer.toString();
+	/**
+	 * getFinallyBlock
+	 * 
+	 * @return
+	 */
+	public IParseNode getFinallyBlock()
+	{
+		return this.getChild(2);
 	}
 }

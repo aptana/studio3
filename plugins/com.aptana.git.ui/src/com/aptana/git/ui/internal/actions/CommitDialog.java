@@ -146,6 +146,14 @@ public class CommitDialog extends StatusDialog
 		return container;
 	}
 
+	@Override
+	public void create()
+	{
+		super.create();
+		// forces initial validation when the dialog first comes up
+		validate();
+	}
+
 	/**
 	 * Override the default implementation to get a bigger commit dialog on large monitors.
 	 * 

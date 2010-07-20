@@ -1,35 +1,24 @@
 package com.aptana.editor.js.parsing.ast;
 
-import com.aptana.parsing.ast.IParseNode;
-
-public class JSThrowNode extends JSUnaryOperatorNode
+public class JSThrowNode extends JSPreUnaryOperatorNode
 {
 	/**
 	 * JSThrowNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param expression
 	 */
-	public JSThrowNode(int start, int end, JSNode expression)
+	public JSThrowNode(JSNode expression)
 	{
-		super(JSNodeTypes.THROW, start, end, expression);
+		super(JSNodeTypes.THROW, expression);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSUnaryOperatorNode#toString()
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
-	public String toString()
+	@Override
+	public void accept(JSTreeWalker walker)
 	{
-		StringBuilder buffer = new StringBuilder();
-		IParseNode[] children = this.getChildren();
-
-		buffer.append("throw "); //$NON-NLS-1$
-		buffer.append(children[0]);
-
-		this.appendSemicolon(buffer);
-
-		return buffer.toString();
+		walker.visit(this);
 	}
 }

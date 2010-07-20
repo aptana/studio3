@@ -7,12 +7,16 @@ import java.util.List;
 import org.xml.sax.Attributes;
 
 import com.aptana.editor.common.contentassist.MetadataReader;
+import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
+import com.aptana.editor.js.sdoc.model.ExampleTag;
+import com.aptana.editor.js.sdoc.model.ExceptionTag;
 import com.aptana.editor.js.sdoc.model.ParamTag;
 import com.aptana.editor.js.sdoc.model.Parameter;
+import com.aptana.editor.js.sdoc.model.PrivateTag;
+import com.aptana.editor.js.sdoc.model.ReturnTag;
+import com.aptana.editor.js.sdoc.model.SeeTag;
 import com.aptana.editor.js.sdoc.model.Tag;
-import com.aptana.editor.js.sdoc.model.TagType;
-import com.aptana.editor.js.sdoc.model.TagWithTypes;
 import com.aptana.editor.js.sdoc.model.Type;
 import com.aptana.editor.js.sdoc.model.Usage;
 
@@ -51,7 +55,7 @@ public class VSDocReader extends MetadataReader
 	 */
 	public void enterException(String ns, String name, String qname, Attributes attributes)
 	{
-		this._exceptionType = attributes.getValue("cref");
+		this._exceptionType = attributes.getValue("cref"); //$NON-NLS-1$
 
 		this.startTextBuffer();
 	}
@@ -66,9 +70,9 @@ public class VSDocReader extends MetadataReader
 	 */
 	public void enterParam(String ns, String name, String qname, Attributes attributes)
 	{
-		String parameterName = attributes.getValue("name");
-		boolean optional = Boolean.parseBoolean(attributes.getValue("optional"));
-		boolean parameterArray = Boolean.parseBoolean(attributes.getValue("parameterArray"));
+		String parameterName = attributes.getValue("name"); //$NON-NLS-1$
+		boolean optional = Boolean.parseBoolean(attributes.getValue("optional")); //$NON-NLS-1$
+		boolean parameterArray = Boolean.parseBoolean(attributes.getValue("parameterArray")); //$NON-NLS-1$
 		Usage usage;
 
 		if (optional)
@@ -97,7 +101,7 @@ public class VSDocReader extends MetadataReader
 		this._currentParameter = new Parameter(parameterName);
 		this._currentParameter.setUsage(usage);
 
-		this._currentType = attributes.getValue("type");
+		this._currentType = attributes.getValue("type"); //$NON-NLS-1$
 
 		this.startTextBuffer();
 	}
@@ -112,11 +116,11 @@ public class VSDocReader extends MetadataReader
 	 */
 	public void enterSee(String ns, String name, String qname, Attributes attributes)
 	{
-		String type = attributes.getValue("cref");
+		String type = attributes.getValue("cref"); //$NON-NLS-1$
 
-		this._tags.add(new Tag(TagType.SEE, type));
+		this._tags.add(new SeeTag(type));
 	}
-	
+
 	/**
 	 * process returns element
 	 * 
@@ -127,7 +131,7 @@ public class VSDocReader extends MetadataReader
 	 */
 	public void enterReturns(String ns, String name, String qname, Attributes attributes)
 	{
-		this._currentType = attributes.getValue("type");
+		this._currentType = attributes.getValue("type"); //$NON-NLS-1$
 
 		this.startTextBuffer();
 	}
@@ -159,7 +163,7 @@ public class VSDocReader extends MetadataReader
 	{
 		String text = this.getText();
 
-		this._tags.add(new Tag(TagType.EXAMPLE, text));
+		this._tags.add(new ExampleTag(text));
 	}
 
 	/**
@@ -174,9 +178,9 @@ public class VSDocReader extends MetadataReader
 		String text = this.getText();
 
 		List<Type> types = new ArrayList<Type>();
-		types.add(new Type(this._exceptionType != null ? this._exceptionType : "Object"));
+		types.add(new Type(this._exceptionType != null ? this._exceptionType : JSTypeConstants.OBJECT)); //$NON-NLS-1$
 
-		this._tags.add(new TagWithTypes(TagType.EXCEPTION, types, text));
+		this._tags.add(new ExceptionTag(types, text));
 
 		// clean up
 		this._exceptionType = null;
@@ -194,7 +198,7 @@ public class VSDocReader extends MetadataReader
 		String text = this.getText();
 
 		List<Type> types = new ArrayList<Type>();
-		types.add(new Type(this._currentType != null ? this._currentType : "Object"));
+		types.add(new Type(this._currentType != null ? this._currentType : JSTypeConstants.OBJECT)); //$NON-NLS-1$
 
 		this._tags.add(new ParamTag(this._currentParameter, types, text));
 
@@ -215,7 +219,7 @@ public class VSDocReader extends MetadataReader
 	{
 		String text = this.getText();
 
-		this._tags.add(new Tag(TagType.PRIVATE, text));
+		this._tags.add(new PrivateTag(text));
 	}
 
 	/**
@@ -230,9 +234,9 @@ public class VSDocReader extends MetadataReader
 		String text = this.getText();
 
 		List<Type> types = new ArrayList<Type>();
-		types.add(new Type(this._currentType != null ? this._currentType : "Object"));
+		types.add(new Type(this._currentType != null ? this._currentType : "Object")); //$NON-NLS-1$
 
-		this._tags.add(new TagWithTypes(TagType.RETURN, types, text));
+		this._tags.add(new ReturnTag(types, text));
 
 		// reset
 		this._currentType = null;

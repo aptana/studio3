@@ -1,15 +1,16 @@
 package com.aptana.editor.js.sdoc.model;
 
-import com.aptana.parsing.io.SourceWriter;
+import com.aptana.editor.js.JSTypeConstants;
+import com.aptana.parsing.io.SourcePrinter;
 
 import beaver.Symbol;
 
 public class Type extends Symbol
 {
-	public static final Type OBJECT_TYPE = new Type("Object");
-	
+	public static final Type OBJECT_TYPE = new Type(JSTypeConstants.OBJECT); //$NON-NLS-1$
+
 	private String _name;
-	
+
 	/**
 	 * Type
 	 * 
@@ -19,7 +20,7 @@ public class Type extends Symbol
 	{
 		this._name = name;
 	}
-	
+
 	/**
 	 * getName
 	 * 
@@ -29,7 +30,7 @@ public class Type extends Symbol
 	{
 		return this._name;
 	}
-	
+
 	/**
 	 * toSource
 	 * 
@@ -37,19 +38,19 @@ public class Type extends Symbol
 	 */
 	public String toSource()
 	{
-		SourceWriter writer = new SourceWriter();
-		
+		SourcePrinter writer = new SourcePrinter();
+
 		this.toSource(writer);
-		
+
 		return writer.toString();
 	}
-	
+
 	/**
 	 * toSource
 	 * 
 	 * @param writer
 	 */
-	public void toSource(SourceWriter writer)
+	public void toSource(SourcePrinter writer)
 	{
 		writer.print(this._name);
 	}

@@ -4,7 +4,7 @@ import java.text.MessageFormat;
 
 import org.eclipse.core.resources.IProject;
 
-class IndexProjectJob extends IndexContainerJob
+public class IndexProjectJob extends IndexContainerJob
 {
 
 	public IndexProjectJob(IProject project)

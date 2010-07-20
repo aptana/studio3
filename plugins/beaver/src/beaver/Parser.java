@@ -352,7 +352,7 @@ public abstract class Parser
 			return true;
 		}
 
-		private void initStack() throws IOException
+		private void initStack()
 		{
 			if (states == null || states.length < Parser.this.states.length)
 			{

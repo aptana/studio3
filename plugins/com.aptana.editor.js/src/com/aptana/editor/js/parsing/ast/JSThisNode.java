@@ -6,22 +6,29 @@ public class JSThisNode extends JSPrimitiveNode
 {
 	/**
 	 * JSThisNode
-	 * 
-	 * @param identifier
 	 */
-	public JSThisNode(Symbol identifier)
+	public JSThisNode()
 	{
-		this(identifier.getStart(), identifier.getEnd());
+		super(JSNodeTypes.THIS, "this"); //$NON-NLS-1$
 	}
 
 	/**
 	 * JSThisNode
 	 * 
-	 * @param start
-	 * @param end
+	 * @param identifier
 	 */
-	public JSThisNode(int start, int end)
+	public JSThisNode(Symbol identifier)
 	{
-		super(JSNodeTypes.THIS, start, end, "this");
+		this();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
+	 */
+	@Override
+	public void accept(JSTreeWalker walker)
+	{
+		walker.visit(this);
 	}
 }

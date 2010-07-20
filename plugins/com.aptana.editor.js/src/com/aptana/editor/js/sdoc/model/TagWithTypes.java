@@ -2,22 +2,22 @@ package com.aptana.editor.js.sdoc.model;
 
 import java.util.List;
 
-import com.aptana.parsing.io.SourceWriter;
+import com.aptana.parsing.io.SourcePrinter;
 
-public class TagWithTypes extends Tag
+public abstract class TagWithTypes extends Tag
 {
 	private List<Type> _types;
-	
+
 	/**
 	 * ExceptionTag
 	 */
 	public TagWithTypes(TagType type, List<Type> types, String text)
 	{
 		super(type, text);
-		
+
 		this._types = types;
 	}
-	
+
 	/**
 	 * getTypes
 	 * 
@@ -28,28 +28,52 @@ public class TagWithTypes extends Tag
 		return this._types;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.sdoc.model.Tag#toSource(com.aptana.parsing.io.SourceWriter)
 	 */
 	@Override
-	public void toSource(SourceWriter writer)
+	public void toSource(SourcePrinter writer)
 	{
-		writer.print(this.getType().toString());
+		TagType tagType = this.getType();
 		
-		writer.print(" {");
-		
-		for (Type type : this._types)
+		if (tagType != null)
 		{
-			type.toSource(writer);
+			writer.print(tagType);
 		}
+		else
+		{
+			writer.print(TagType.UNKNOWN);
+		}
+
+		writer.print(" {"); //$NON-NLS-1$
+
+		boolean first = true;
 		
-		writer.print("}");
-		
+		if (this._types != null)
+		{
+			for (Type type : this._types)
+			{
+				if (first)
+				{
+					first = false;
+				}
+				else
+				{
+					writer.print(",");
+				}
+				
+				type.toSource(writer);
+			}
+		}
+
+		writer.print("}"); //$NON-NLS-1$
+
 		String text = this.getText();
-		
+
 		if (text != null && text.isEmpty() == false)
 		{
-			writer.print(" ").print(text);
+			writer.print(" ").print(text); //$NON-NLS-1$
 		}
 	}
 }

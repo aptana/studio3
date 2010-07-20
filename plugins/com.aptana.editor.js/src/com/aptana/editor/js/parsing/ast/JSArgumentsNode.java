@@ -1,35 +1,24 @@
 package com.aptana.editor.js.parsing.ast;
 
-public class JSArgumentsNode extends JSNaryNode
+public class JSArgumentsNode extends JSNode
 {
 	/**
 	 * JSArgumentsNode
 	 * 
-	 * @param start
-	 * @param end
+	 * @param children
 	 */
-	public JSArgumentsNode(int start, int end, JSNode... children)
+	public JSArgumentsNode(JSNode... children)
 	{
-		super(JSNodeTypes.ARGUMENTS, start, end, children);
+		super(JSNodeTypes.ARGUMENTS, children);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNaryNode#appendCloseText(java.lang.StringBuilder)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
 	@Override
-	protected void appendCloseText(StringBuilder buffer)
+	public void accept(JSTreeWalker walker)
 	{
-		buffer.append(")"); //$NON-NLS-1$
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNaryNode#appendOpenText(java.lang.StringBuilder)
-	 */
-	@Override
-	protected void appendOpenText(StringBuilder buffer)
-	{
-		buffer.append("("); //$NON-NLS-1$
+		walker.visit(this);
 	}
 }

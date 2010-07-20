@@ -6,22 +6,29 @@ public class JSNullNode extends JSPrimitiveNode
 {
 	/**
 	 * JSNullNode
+	 */
+	public JSNullNode()
+	{
+		super(JSNodeTypes.NULL, "null"); //$NON-NLS-1$
+	}
+
+	/**
+	 * JSNullNode
 	 * 
 	 * @param identifier
 	 */
 	public JSNullNode(Symbol identifier)
 	{
-		this(identifier.getStart(), identifier.getEnd());
+		super(JSNodeTypes.NULL, (String) identifier.value);
 	}
-	
-	/**
-	 * JSNullNode
-	 * 
-	 * @param start
-	 * @param end
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
-	public JSNullNode(int start, int end)
+	@Override
+	public void accept(JSTreeWalker walker)
 	{
-		super(JSNodeTypes.NULL, start, end, "null");
+		walker.visit(this);
 	}
 }

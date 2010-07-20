@@ -3,19 +3,16 @@ package com.aptana.editor.js.parsing.ast;
 import beaver.Symbol;
 
 import com.aptana.editor.js.parsing.IJSParserConstants;
-import com.aptana.parsing.Scope;
 import com.aptana.parsing.ast.ParseRootNode;
 
 public class JSParseRootNode extends ParseRootNode
 {
-	private Scope<JSNode> _globalScope;
-
 	/**
 	 * JSParseRootNode
 	 */
 	public JSParseRootNode()
 	{
-		this(new Symbol[0], 0, 0);
+		this(new Symbol[0]);
 	}
 
 	/**
@@ -25,28 +22,32 @@ public class JSParseRootNode extends ParseRootNode
 	 * @param start
 	 * @param end
 	 */
-	public JSParseRootNode(Symbol[] children, int start, int end)
+	public JSParseRootNode(Symbol[] children)
 	{
-		super(IJSParserConstants.LANGUAGE, children, start, end);
+		super(IJSParserConstants.LANGUAGE, children, (children != null && children.length > 0) ? children[0].getStart() : 0,
+			(children != null && children.length > 0) ? children[0].getEnd() : 0);
 	}
 
 	/**
-	 * getGlobalScope
+	 * accept
 	 * 
-	 * @return
+	 * @param walker
 	 */
-	public Scope<JSNode> getGlobalScope()
+	public void accept(JSTreeWalker walker)
 	{
-		return this._globalScope;
+		walker.visit(this);
 	}
-
-	/**
-	 * setGlobalScope
-	 * 
-	 * @param globalScope
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#toString()
 	 */
-	public void setGlobalScope(Scope<JSNode> globalScope)
+	public String toString()
 	{
-		this._globalScope = globalScope;
+		JSFormatWalker walker = new JSFormatWalker();
+		
+		this.accept(walker);
+		
+		return walker.getText();
 	}
 }

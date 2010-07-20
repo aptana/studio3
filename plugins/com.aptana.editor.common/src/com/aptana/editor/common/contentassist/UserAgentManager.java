@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -130,6 +131,28 @@ public class UserAgentManager
 		return result;
 	}
 
+	/**
+	 * getUserAgentImages
+	 * 
+	 * @param userAgents
+	 * @return
+	 */
+	public Image[] getUserAgentImages(List<String> userAgents)
+	{
+		Image[] result;
+		
+		if (userAgents != null)
+		{
+			result = this.getUserAgentImages(userAgents.toArray(new String[userAgents.size()]));
+		}
+		else
+		{
+			result = new Image[0];
+		}
+		
+		return result;
+	}
+	
 	/**
 	 * getUserAgentImages
 	 */

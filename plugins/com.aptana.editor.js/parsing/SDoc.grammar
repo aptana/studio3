@@ -1,3 +1,4 @@
+// java -jar beaver.jar -T -w SDoc.grammar
 %package "com.aptana.editor.js.sdoc.parsing";
 %import "java.util.List";
 %import "com.aptana.editor.js.sdoc.model.*";
@@ -68,7 +69,7 @@
 %terminals ADVANCED, ALIAS, AUTHOR, CLASS_DESCRIPTION, CONSTRUCTOR, EXAMPLE, EXCEPTION;
 %terminals EXTENDS, INTERNAL, METHOD, NAMESPACE, OVERVIEW, PARAM, RETURN, SEE, UNKNOWN;
 %terminals IDENTIFIER, ARRAY, FUNCTION, PRIVATE, PROPERTY;
-%terminals TYPE;
+%terminals TYPE,CLASS;
 
 %typeof IDENTIFIER,FUNCTION,ARRAY = "String";
 %typeof TEXT,LBRACKET,RBRACKET,LCURLY,RCURLY,POUND,COLON,ERROR,UNKNOWN = "String";
@@ -140,51 +141,51 @@ Tags
 Tag
 	=	ADVANCED Text.text?
 		{:
-			return new Tag(TagType.ADVANCED, (String) text.value);
+			return new AdvancedTag((String) text.value);
 		:}
 	|	ALIAS Text.text
 		{:
-			return new Tag(TagType.ALIAS, (String) text.value);
+			return new AliasTag((String) text.value);
 		:}
 	|	AUTHOR Text.text
 		{:
-			return new Tag(TagType.AUTHOR, (String) text.value);
+			return new AuthorTag((String) text.value);
 		:}
 	|	CLASS_DESCRIPTION LCURLY Namespace.name RCURLY Text.text
 		{:
-			return new TagWithName(TagType.CLASS_DESCRIPTION, name, (String) text.value);
+			return new ClassDescriptionTag(name, (String) text.value);
 		:}
 	|	CONSTRUCTOR Text.text?
 		{:
-			return new Tag(TagType.CONSTRUCTOR, (String) text.value);
+			return new ConstructorTag((String) text.value);
 		:}
 	|	EXAMPLE Text.text
 		{:
-			return new Tag(TagType.EXAMPLE, (String) text.value);
+			return new ExampleTag((String) text.value);
 		:}
 	|	EXCEPTION LCURLY Types.types RCURLY Text.text?
 		{:
-			return new TagWithTypes(TagType.EXCEPTION, (List<Type>) types.value, (String) text.value);
+			return new ExceptionTag((List<Type>) types.value, (String) text.value);
 		:}
 	|	EXTENDS LCURLY Types.types RCURLY Text.text?
 		{:
-			return new TagWithTypes(TagType.EXTENDS, (List<Type>) types.value, (String) text.value);
+			return new ExtendsTag((List<Type>) types.value, (String) text.value);
 		:}
 	|	INTERNAL Text.text?
 		{:
-			return new Tag(TagType.INTERNAL, (String) text.value);
+			return new InternalTag((String) text.value);
 		:}
 	|	METHOD Text.text?
 		{:
-			return new Tag(TagType.METHOD, (String) text.value);
+			return new MethodTag((String) text.value);
 		:}
 	|	NAMESPACE LCURLY Namespace.name RCURLY Text.text?
 		{:
-			return new TagWithName(TagType.NAMESPACE, name, (String) text.value);
+			return new NamespaceTag(name, (String) text.value);
 		:}
 	|	OVERVIEW Text.text
 		{:
-			return new Tag(TagType.OVERVIEW, (String) text.value);
+			return new OverviewTag((String) text.value);
 		:}
 	|	PARAM LCURLY Types.types RCURLY ParamName.name Text.text?
 		{:
@@ -192,27 +193,27 @@ Tag
 		:}
 	|	PRIVATE Text.text?
 		{:
-			return new Tag(TagType.PRIVATE, (String) text.value);
+			return new PrivateTag((String) text.value);
 		:}
 	|	PROPERTY LCURLY Types.types RCURLY Text.text?
 		{:
-			return new TagWithTypes(TagType.PROPERTY, (List<Type>) types.value, (String) text.value);
+			return new PropertyTag((List<Type>) types.value, (String) text.value);
 		:}
 	|	RETURN LCURLY Types.types RCURLY Text.text?
 		{:
-			return new TagWithTypes(TagType.RETURN, (List<Type>) types.value, (String) text.value);
+			return new ReturnTag((List<Type>) types.value, (String) text.value);
 		:}
 	|	SEE Text.text
 		{:
-			return new Tag(TagType.SEE, (String) text.value);
+			return new SeeTag((String) text.value);
 		:}
 	|	TYPE LCURLY Types.types RCURLY Text.text?
 		{:
-			return new TagWithTypes(TagType.TYPE, (List<Type>) types.value, (String) text.value);
+			return new TypeTag((List<Type>) types.value, (String) text.value);
 		:}
 	|	UNKNOWN.name Text.text?
 		{:
-			return new TagWithName(TagType.UNKNOWN, name, (String) text.value);
+			return new UnknownTag(name, (String) text.value);
 		:}
 	;
 
@@ -246,6 +247,10 @@ Type
 	|	IDENTIFIER.name LBRACKET RBRACKET
 		{:
 			return new ArrayType(new Type(name));
+		:}
+	|	CLASS LESS_THAN Type.memberType GREATER_THAN
+		{:
+			return new ClassType(memberType);
 		:}
 	|	ARRAY LBRACKET RBRACKET
 		{:

@@ -1,15 +1,24 @@
 package com.aptana.editor.js.parsing.ast;
 
-public class JSElisionNode extends JSNaryNode
+public class JSElisionNode extends JSNode
 {
 	/**
 	 * JSElisionNode
 	 * 
-	 * @param start
-	 * @param end
+	 * @param children
 	 */
-	public JSElisionNode(int start, int end, JSNode... children)
+	public JSElisionNode(JSNode... children)
 	{
-		super(JSNodeTypes.ELISION, start, end, children);
+		super(JSNodeTypes.ELISION, children);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
+	 */
+	@Override
+	public void accept(JSTreeWalker walker)
+	{
+		walker.visit(this);
 	}
 }

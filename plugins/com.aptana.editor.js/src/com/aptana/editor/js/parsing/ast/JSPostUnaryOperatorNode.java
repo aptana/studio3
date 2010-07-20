@@ -1,58 +1,72 @@
 package com.aptana.editor.js.parsing.ast;
 
-import com.aptana.editor.js.parsing.lexer.JSTokenType;
+import beaver.Symbol;
 
-public class JSPostUnaryOperatorNode extends JSUnaryOperatorNode
+import com.aptana.editor.js.parsing.lexer.JSTokenType;
+import com.aptana.parsing.ast.IParseNode;
+
+public class JSPostUnaryOperatorNode extends JSNode
 {
+	private Symbol _operator;
+	
 	/**
 	 * JSPostUnaryOperatorNode
 	 * 
 	 * @param operator
-	 * @param start
-	 * @param end
 	 * @param expression
 	 */
-	public JSPostUnaryOperatorNode(String operator, int start, int end, JSNode expression)
+	public JSPostUnaryOperatorNode(Symbol operator, JSNode expression)
 	{
-		super(start, end, expression);
+		this._operator = operator;
+		this.setChildren(new JSNode[] { expression });
 
 		short type = DEFAULT_TYPE;
-		JSTokenType token = JSTokenType.get(operator);
+		JSTokenType token = JSTokenType.get((String) operator.value);
+
 		switch (token)
 		{
 			case MINUS_MINUS:
 				type = JSNodeTypes.POST_DECREMENT;
 				break;
+
 			case PLUS_PLUS:
 				type = JSNodeTypes.POST_INCREMENT;
 				break;
+
+			default:
+				throw new IllegalArgumentException(Messages.JSPostUnaryOperatorNode_0 + token);
 		}
-		setType(type);
+
+		this.setNodeType(type);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSUnaryOperatorNode#toString()
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
 	@Override
-	public String toString()
+	public void accept(JSTreeWalker walker)
 	{
-		StringBuilder text = new StringBuilder();
-		text.append(getChildren()[0]);
-		String operator = ""; //$NON-NLS-1$
-		switch (getNodeType())
-		{
-			case JSNodeTypes.POST_DECREMENT:
-				operator = "--"; //$NON-NLS-1$
-				break;
-			case JSNodeTypes.POST_INCREMENT:
-				operator = "++"; //$NON-NLS-1$
-				break;
-		}
-		text.append(operator);
+		walker.visit(this);
+	}
 
-		this.appendSemicolon(text);
-
-		return text.toString();
+	/**
+	 * getExpression
+	 * 
+	 * @return
+	 */
+	public IParseNode getExpression()
+	{
+		return this.getChild(0);
+	}
+	
+	/**
+	 * getOperator
+	 * 
+	 * @return
+	 */
+	public Symbol getOperator()
+	{
+		return this._operator;
 	}
 }

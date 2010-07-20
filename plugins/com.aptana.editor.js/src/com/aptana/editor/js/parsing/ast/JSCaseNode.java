@@ -1,42 +1,57 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 import com.aptana.parsing.ast.IParseNode;
 
-public class JSCaseNode extends JSNaryAndExpressionNode
+public class JSCaseNode extends JSNode
 {
+	private Symbol _colon;
+
 	/**
 	 * JSCaseNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param children
 	 */
-	public JSCaseNode(int start, int end, JSNode... children)
+	public JSCaseNode(JSNode expression, Symbol colon, JSNode... children)
 	{
-		super(JSNodeTypes.CASE, start, end, children);
+		super(JSNodeTypes.CASE, expression);
+
+		for (JSNode child : children)
+		{
+			this.addChild(child);
+		}
+		
+		this._colon = colon;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNaryAndExpressionNode#toString()
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
 	@Override
-	public String toString()
+	public void accept(JSTreeWalker walker)
 	{
-		StringBuilder buffer = new StringBuilder();
-		IParseNode[] children = getChildren();
+		walker.visit(this);
+	}
 
-		buffer.append("case "); //$NON-NLS-1$
-		buffer.append(children[0]);
-		buffer.append(": "); //$NON-NLS-1$
+	/**
+	 * getColon
+	 * 
+	 * @return
+	 */
+	public Symbol getColon()
+	{
+		return this._colon;
+	}
 
-		for (int i = 1; i < children.length; ++i)
-		{
-			buffer.append(children[i]);
-		}
-
-		this.appendSemicolon(buffer);
-
-		return buffer.toString();
+	/**
+	 * getExpression
+	 * 
+	 * @return
+	 */
+	public IParseNode getExpression()
+	{
+		return this.getChild(0);
 	}
 }

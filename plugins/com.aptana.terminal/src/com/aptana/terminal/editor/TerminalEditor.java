@@ -1,5 +1,6 @@
 package com.aptana.terminal.editor;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -349,5 +350,10 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, ITermi
 	@Override
 	public void setFocus() {
 		terminalComposite.setFocus();
+	}
+	
+	public IPath getWorkingDirectory()
+	{
+		return terminalComposite.getWorkingDirectory();
 	}
 }

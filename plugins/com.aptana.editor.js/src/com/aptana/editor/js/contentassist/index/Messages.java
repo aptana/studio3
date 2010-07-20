@@ -53,16 +53,10 @@ public final class Messages extends NLS
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
-	public static String JSMetadataReader_Error_Loading_JS_Metadata;
-	public static String JSMetadataReader_Parse_Error;
-	public static String JSMetadataReader_Parse_IO_Error;
-	public static String JSMetadataReader_SAX_Error;
-	public static String NativeObjectsReader_UnalbeToLocateXMLFile;
-	public static String NativeObjectsReader_IOError;
-	public static String NativeObjectsReader2_ERR_Loading_scriptdoc_file;
-	public static String ScriptDocReader_SchemaError;
-	public static String ScriptDocReader_IOError;
-	public static String ScriptDocReader_XMLLocationError;
-	public static String ScriptDocReader_ParamNullError;
-	public static String ScriptDocReader_PropertyNullError;
+	public static String JSMetadataReader_Invalid_Exception_Name;
+	public static String JSMetadataReader_Invalid_Parameter_Type;
+	public static String JSMetadataReader_Invalid_Property_Type;
+	public static String JSMetadataReader_Invalid_Return_Type;
+	public static String JSMetadataReader_Invalid_Supertype_Name;
+	public static String JSMetadataReader_Invalid_Type_Name;
 }

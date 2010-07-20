@@ -1,24 +1,23 @@
 package com.aptana.editor.js.contentassist.index;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.js.Activator;
-import com.aptana.editor.js.contentassist.JSASTQueryHelper;
+import com.aptana.editor.js.contentassist.JSSymbolCollector;
+import com.aptana.editor.js.contentassist.JSTypeWalker;
+import com.aptana.editor.js.contentassist.model.PropertyElement;
+import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.parsing.IJSParserConstants;
-import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
-import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.IParser;
@@ -30,7 +29,38 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 {
-
+	private JSIndexWriter _indexWriter;
+	
+	/**
+	 * JSFileIndexingParticipant
+	 */
+	public JSFileIndexingParticipant()
+	{
+		this._indexWriter = new JSIndexWriter();
+	}
+	
+	/**
+	 * getGlobals
+	 * 
+	 * @param root
+	 * @return
+	 */
+	protected Scope<JSNode> getGlobals(IParseNode root)
+	{
+		Scope<JSNode> result = null;
+		
+		if (root instanceof JSParseRootNode)
+		{
+			JSSymbolCollector s = new JSSymbolCollector();
+			
+			((JSParseRootNode) root).accept(s);
+			
+			result = s.getScope();
+		}
+		
+		return result;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.index.core.IFileIndexingParticipant#index(java.util.Set, com.aptana.index.core.Index,
@@ -111,65 +141,29 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 	 */
 	private void processParseResults(Index index, IFileStore file, IParseNode ast)
 	{
-		if (Platform.inDevelopmentMode())
-		{
-			URI location = file.toURI();
-			Scope<JSNode> globals = ((JSParseRootNode) ast).getGlobalScope();
-
-			for (String symbol : globals.getLocalSymbolNames())
-			{
-				List<JSNode> nodes = globals.getSymbol(symbol);
-				String category = JSIndexConstants.VARIABLE;
-
-				for (JSNode node : nodes)
-				{
-					DocumentationBlock block = node.getDocumentation();
-
-					if (block != null)
-					{
-						// System.out.println("Found block for " + symbol + "\n" + block.toSource());
-					}
-
-					if (node instanceof JSFunctionNode)
-					{
-						category = JSIndexConstants.FUNCTION;
-						break;
-					}
-				}
-
-				index.addEntry(category, symbol, location);
-			}
-		}
-		else
-		{
-			this.walkAST(index, file, ast);
-		}
-	}
-
-	/**
-	 * walkAST
-	 * 
-	 * @param index
-	 * @param file
-	 * @param ast
-	 */
-	private void walkAST(Index index, IFileStore file, IParseNode ast)
-	{
-		JSASTQueryHelper astHelper = new JSASTQueryHelper();
 		URI location = file.toURI();
-
-		for (String name : astHelper.getChildFunctions(ast))
+		Scope<JSNode> globals = this.getGlobals(ast);
+		
+		if (globals != null)
 		{
-			index.addEntry(JSIndexConstants.FUNCTION, name, location);
+			TypeElement type = new TypeElement();
+			
+			// set type
+			type.setName("Window"); //$NON-NLS-1$
+			
+			// add properties
+			for (PropertyElement property : JSTypeWalker.getScopeProperties(globals, index, location))
+			{
+				type.addProperty(property);
+			}
+			
+			this._indexWriter.writeType(index, type, location);
+			
+			// TODO: process assignments
+//			for (JSNode assignment : globals.getAssignments())
+//			{
+//				
+//			}
 		}
-		for (String varName : astHelper.getChildVarNonFunctions(ast))
-		{
-			index.addEntry(JSIndexConstants.VARIABLE, varName, location);
-		}
-		// for (String varName : astHelper.getAccidentalGlobals(ast))
-		// {
-		// System.out.println("accidental global: " + varName);
-		// index.addEntry(JSIndexConstants.VARIABLE, varName, location);
-		// }
 	}
 }

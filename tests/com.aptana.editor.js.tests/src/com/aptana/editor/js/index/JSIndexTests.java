@@ -1,11 +1,16 @@
 package com.aptana.editor.js.index;
 
+import java.net.URI;
+import java.util.EnumSet;
+import java.util.List;
+
 import junit.framework.TestCase;
 
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
+import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
@@ -21,7 +26,7 @@ public class JSIndexTests extends TestCase
 	@Override
 	protected void tearDown() throws Exception
 	{
-		IndexManager.getInstance().removeIndex(getIndex().getRoot());
+		IndexManager.getInstance().removeIndex(URI.create(JSIndexConstants.METADATA));
 		
 		super.tearDown();
 	}
@@ -46,7 +51,7 @@ public class JSIndexTests extends TestCase
 	{
 		JSIndexReader reader = new JSIndexReader();
 		
-		return reader.loadType(this.getIndex(), typeName);
+		return reader.getType(this.getIndex(), typeName, EnumSet.allOf(ContentSelector.class));
 	}
 	
 	/**
@@ -105,12 +110,12 @@ public class JSIndexTests extends TestCase
 		assertEquals(typeName, retrievedType.getName());
 		
 		// make sure we have one property
-		PropertyElement[] properties = retrievedType.getProperties();
+		List<PropertyElement> properties = retrievedType.getProperties();
 		assertNotNull(properties);
-		assertTrue(properties.length == 1);
+		assertTrue(properties.size() == 1);
 		
 		// make sure it is a function
-		PropertyElement property = properties[0];
+		PropertyElement property = properties.get(0);
 		assertTrue(property instanceof FunctionElement);
 		
 		// make sure it is the function we added earlier
@@ -145,12 +150,12 @@ public class JSIndexTests extends TestCase
 		assertEquals(typeName, retrievedType.getName());
 		
 		// make sure we have one property
-		PropertyElement[] properties = retrievedType.getProperties();
+		List<PropertyElement> properties = retrievedType.getProperties();
 		assertNotNull(properties);
-		assertTrue(properties.length == 1);
+		assertTrue(properties.size() == 1);
 		
 		// make sure the name is correct
-		PropertyElement retrievedProperty = properties[0];
+		PropertyElement retrievedProperty = properties.get(0);
 		assertEquals(propertyName, retrievedProperty.getName());
 	}
 }
