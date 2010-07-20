@@ -18,19 +18,12 @@ public class Scope<T>
 	private Map<String, List<T>> _symbols;
 	private IRange _range;
 	private List<T> _assignments;
-
-	/**
-	 * Scope
-	 */
-	public Scope()
-	{
-	}
+	private List<T> _secondaryAssignments;
 
 	/**
 	 * addAssignment
 	 * 
-	 * @param lhs
-	 * @param rhs
+	 * @param assignment
 	 */
 	public void addAssignment(T assignment)
 	{
@@ -40,11 +33,11 @@ public class Scope<T>
 			{
 				this._assignments = new ArrayList<T>();
 			}
-			
+
 			this._assignments.add(assignment);
 		}
 	}
-	
+
 	/**
 	 * addScope
 	 * 
@@ -62,20 +55,39 @@ public class Scope<T>
 			}
 
 			this._children.add(scope);
-			
+
 			if (this.getRange().isEmpty())
 			{
 				this.setRange(scope.getRange());
 			}
 			else
 			{
-				this.setRange(
-					new Range(
-						Math.min(this.getRange().getStartingOffset(), scope.getRange().getStartingOffset()),
-						Math.max(this.getRange().getEndingOffset(), scope.getRange().getEndingOffset())
-					)
+				this.setRange( //
+					new Range( //
+						Math.min(this.getRange().getStartingOffset(), scope.getRange().getStartingOffset()), //
+						Math.max(this.getRange().getEndingOffset(), scope.getRange().getEndingOffset()) //
+					) //
 				);
 			}
+		}
+	}
+
+	/**
+	 * addSecondaryAssignment
+	 * 
+	 * @param lhs
+	 * @param rhs
+	 */
+	public void addSecondaryAssignment(T assignment)
+	{
+		if (assignment != null)
+		{
+			if (this._secondaryAssignments == null)
+			{
+				this._secondaryAssignments = new ArrayList<T>();
+			}
+
+			this._secondaryAssignments.add(assignment);
 		}
 	}
 
@@ -114,15 +126,15 @@ public class Scope<T>
 	public List<T> getAssignments()
 	{
 		List<T> result = this._assignments;
-		
+
 		if (result == null)
 		{
 			result = Collections.emptyList();
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getChildren
 	 * 
@@ -131,12 +143,12 @@ public class Scope<T>
 	public List<Scope<T>> getChildren()
 	{
 		List<Scope<T>> result = Collections.emptyList();
-		
+
 		if (this._children != null)
 		{
 			result = this._children;
 		}
-		
+
 		return result;
 	}
 
@@ -149,20 +161,20 @@ public class Scope<T>
 	public List<T> getLocalSymbol(String name)
 	{
 		List<T> result = Collections.emptyList();
-		
+
 		if (this._symbols != null)
 		{
 			List<T> candidate = this._symbols.get(name);
-			
+
 			if (candidate != null)
 			{
 				result = candidate;
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getLocalSymbolNames
 	 * 
@@ -171,15 +183,15 @@ public class Scope<T>
 	public List<String> getLocalSymbolNames()
 	{
 		List<String> result = Collections.emptyList();
-		
+
 		if (this._symbols != null)
 		{
 			result = new ArrayList<String>(this._symbols.keySet());
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getParent
 	 * 
@@ -189,7 +201,7 @@ public class Scope<T>
 	{
 		return this._parent;
 	}
-	
+
 	/**
 	 * getRange
 	 * 
@@ -199,7 +211,7 @@ public class Scope<T>
 	{
 		return (this._range != null) ? this._range : Range.EMPTY;
 	}
-	
+
 	/**
 	 * getScopeAtOffset
 	 * 
@@ -209,15 +221,15 @@ public class Scope<T>
 	public Scope<T> getScopeAtOffset(int offset)
 	{
 		Scope<T> result = null;
-		
+
 		if (this.getRange().contains(offset))
 		{
 			result = this;
-			
+
 			for (Scope<T> child : this.getChildren())
 			{
 				Scope<T> candidate = child.getScopeAtOffset(offset);
-				
+
 				if (candidate != null)
 				{
 					result = candidate;
@@ -225,10 +237,27 @@ public class Scope<T>
 				}
 			}
 		}
-		
+
 		return result;
 	}
-	
+
+	/**
+	 * getSecondaryAssignments
+	 * 
+	 * @return
+	 */
+	public List<T> getSecondaryAssignments()
+	{
+		List<T> result = this._secondaryAssignments;
+
+		if (result == null)
+		{
+			result = Collections.emptyList();
+		}
+
+		return result;
+	}
+
 	/**
 	 * getSymbol
 	 * 
@@ -238,9 +267,9 @@ public class Scope<T>
 	public List<T> getSymbol(String name)
 	{
 		List<T> result = Collections.emptyList();
-		
+
 		Scope<T> current = this;
-		
+
 		while (current != null)
 		{
 			if (current.hasLocalSymbol(name))
@@ -253,10 +282,10 @@ public class Scope<T>
 				current = current.getParentScope();
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getSymbolNames
 	 * 
@@ -265,16 +294,16 @@ public class Scope<T>
 	public List<String> getSymbolNames()
 	{
 		Set<String> result = new HashSet<String>();
-		
+
 		Scope<T> current = this;
-		
+
 		while (current != null)
 		{
 			result.addAll(this.getLocalSymbolNames());
-			
+
 			current = current.getParentScope();
 		}
-		
+
 		return new ArrayList<String>(result);
 	}
 
@@ -288,7 +317,7 @@ public class Scope<T>
 	{
 		return (this._symbols != null) ? this._symbols.containsKey(name) : false;
 	}
-	
+
 	/**
 	 * hasSymbol
 	 * 
@@ -299,7 +328,7 @@ public class Scope<T>
 	{
 		boolean result = false;
 		Scope<T> current = this;
-		
+
 		while (current != null)
 		{
 			if (current.hasLocalSymbol(name))
@@ -312,10 +341,10 @@ public class Scope<T>
 				current = current.getParentScope();
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * setParent
 	 * 
