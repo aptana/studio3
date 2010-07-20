@@ -19,6 +19,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.contentassist.JSSymbolCollector;
 import com.aptana.editor.js.contentassist.JSTypeWalker;
+import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
@@ -242,12 +243,34 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 
 					((JSNode) rhs).accept(walker);
 					
-					PropertyElement property = new PropertyElement();
+					List<String> types = walker.getTypes();
 					
+					boolean isFunction = true;
+					
+					for (String type : types)
+					{
+						if (type.startsWith("Function:") == false)
+						{
+							isFunction = false;
+							break;
+						}
+					}
+					
+					PropertyElement property = (isFunction) ? new FunctionElement() : new PropertyElement();
 					property.setName(lhs.getLastChild().getText());
 					
 					for (String type : walker.getTypes())
 					{
+						if (isFunction)
+						{
+							int i = type.indexOf(':');
+							
+							if (i != -1)
+							{
+								type = type.substring(i + 1);
+							}
+						}
+						
 						ReturnTypeElement returnType = new ReturnTypeElement();
 						
 						returnType.setType(type);
