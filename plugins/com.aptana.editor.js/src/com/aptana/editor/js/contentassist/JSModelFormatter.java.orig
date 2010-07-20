@@ -203,8 +203,13 @@ public class JSModelFormatter
 			{
 				result = document;
 			}
+<<<<<<< HEAD
+			
+			result = decodeURI(result);
+=======
 
 			result = URIUtil.decodeURI(result);
+>>>>>>> development
 		}
 
 		return result;
