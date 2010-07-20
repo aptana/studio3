@@ -727,6 +727,7 @@ public class JSTypeWalker extends JSTreeWalker
 	{
 		switch (node.getNodeType())
 		{
+			case JSNodeTypes.ASSIGN:
 			case JSNodeTypes.EQUAL:
 				this.addTypes(this.getTypes(node.getRightHandSide()));
 				break;
@@ -857,8 +858,8 @@ public class JSTypeWalker extends JSTreeWalker
 			}
 			else
 			{
-				// We temporarily store the default function type to prevent
-				// infinite recursion in potential invoke cycles
+				// We store the default function type to prevent infinite
+				// recursion in potential invoke cycles
 				this.putNodeType(node, JSTypeConstants.FUNCTION);
 	
 				List<String> types = new ArrayList<String>();
