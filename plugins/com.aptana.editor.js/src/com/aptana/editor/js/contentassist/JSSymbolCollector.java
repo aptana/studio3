@@ -146,22 +146,29 @@ public class JSSymbolCollector extends JSTreeWalker
 				break;
 				
 			default:
-				while (lhs != null)
+				LOOP: while (lhs != null)
 				{
-					if (lhs.getNodeType() == JSNodeTypes.IDENTIFIER)
+					switch (lhs.getNodeType())
 					{
-						String name = lhs.getText();
-						
-						if (this._scope.hasSymbol(name))
-						{
-							this.addSecondaryAssignment(name, node);
-						}
-						// else secondary assignment without declared symbol
-						break;
-					}
-					else
-					{
-						lhs = lhs.getFirstChild();
+						case JSNodeTypes.IDENTIFIER:
+							String name = lhs.getText();
+							
+							if (this._scope.hasSymbol(name))
+							{
+								this.addSecondaryAssignment(name, node);
+							}
+							// else secondary assignment without declared symbol
+							break LOOP;
+							
+						case JSNodeTypes.THIS:
+							// TODO: implement this once we're properly handling
+							// [[proto]]
+							System.out.println("unprocessed assignment: " + node);
+							break LOOP;
+							
+						default:
+							lhs = lhs.getFirstChild();
+							break;
 					}
 				}
 				
