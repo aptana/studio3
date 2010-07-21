@@ -413,6 +413,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		tableViewer.setLabelProvider(new TokenLabelProvider());
 		tableViewer.getTable().addMouseListener(new MouseAdapter()
 		{
+			@SuppressWarnings("unchecked")
 			@Override
 			public void mouseDown(MouseEvent e)
 			{
