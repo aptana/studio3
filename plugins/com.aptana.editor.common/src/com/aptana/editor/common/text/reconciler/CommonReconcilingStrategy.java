@@ -85,7 +85,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	@Override
 	public void reconcile(DirtyRegion dirtyRegion, IRegion subRegion)
 	{
-		// TODO Only recalculate the folding diff in the dirty region?
+		// TODO Only recalculate the folding diff in the dirty region? Requires us to set this as an "incremental reconciler" to get just dirty region
 		reconcile(false);
 	}
 
