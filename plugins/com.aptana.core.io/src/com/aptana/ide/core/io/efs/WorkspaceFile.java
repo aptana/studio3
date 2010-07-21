@@ -345,7 +345,8 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 	 */
 	@Override
 	public void putInfo(IFileInfo info, int options, IProgressMonitor monitor) throws CoreException {
-		ensureLocalFileStore();
+		// passing "true" because the file store doesn't need to be physically exist when doing putInfo()
+		ensureLocalFileStore(true);
 		if (localFileStore != null) {
 			localFileStore.putInfo(info, options, monitor);
 		} else {
