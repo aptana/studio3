@@ -302,7 +302,17 @@ public class PluginsConfigurationProcessor extends AbstractConfigurationProcesso
 						}
 
 						IProfile profile = ProvisioningUtil.getProfile(profileId);
-						roots = profile.query(query, roots, monitor);
+						if (profile != null)
+						{
+							roots = profile.query(query, roots, monitor);
+						}
+						else
+						{
+							// Log this
+							PortalUIPlugin.logError(
+									"Error while retrieving the profile for '" + updateSite + "' update site", //$NON-NLS-1$  //$NON-NLS-2$
+									new RuntimeException("The profile for '" + profileId + "' was null")); //$NON-NLS-1$  //$NON-NLS-2$
+						}
 					}
 					units.addAll(roots.toCollection());
 					sub.worked(2);

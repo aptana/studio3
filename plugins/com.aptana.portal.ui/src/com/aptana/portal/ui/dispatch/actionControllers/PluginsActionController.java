@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.progress.UIJob;
@@ -122,6 +123,23 @@ public class PluginsActionController extends AbstractActionController
 		};
 		computationJob.schedule();
 		return IBrowserNotificationConstants.JSON_OK;
+	}
+
+	/**
+	 * Make a synchronous call to compute the status of the given lookup list. This call will return a JSON status
+	 * string that contains the list of plugins/features IDs that were found. It's up to the caller to determine it the
+	 * list contains the requested item (plugin). If it's not in the list, it's not installed.
+	 * 
+	 * @param lookup Expected an multi-dimensional Object array with rows that contain: plugin-id, min-version, update-site, feature-id.
+	 * @return A JSON status for the given plugin(s)
+	 */
+	@ControllerAction
+	public Object synchronousComputeInstalledPlugins(final Object lookup)
+	{
+		final IConfigurationProcessor processor = getProcessor();
+		ConfigurationStatus status = processor.getStatus(new NullProgressMonitor(), lookup, true);
+		String jsonStatus = JSON.toString(status);
+		return jsonStatus;
 	}
 
 	/*
