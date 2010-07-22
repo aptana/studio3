@@ -40,7 +40,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -97,7 +96,7 @@ import com.aptana.git.ui.dialogs.CreateBranchDialog;
  */
 class GitProjectView extends SingleProjectView implements IGitRepositoryListener, IGitRepositoriesListener
 {
-	private static final String DIRTY_SUFFIX = "*";
+	private static final String DIRTY_SUFFIX = "*"; //$NON-NLS-1$
 	private static final String GIT_CHANGED_FILES_FILTER = "GitChangedFilesFilterEnabled"; //$NON-NLS-1$
 	private static final String PROJECT_DELIMITER = "######"; //$NON-NLS-1$
 	private static final String COMMIT_ICON_PATH = "icons/full/elcl16/disk.png"; //$NON-NLS-1$
