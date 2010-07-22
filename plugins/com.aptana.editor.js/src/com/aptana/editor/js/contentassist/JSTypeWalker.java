@@ -200,6 +200,7 @@ public class JSTypeWalker extends JSTreeWalker
 		clearTypeCache();
 
 		List<PropertyElement> properties = new ArrayList<PropertyElement>();
+		JSPropertyCollector collector = new JSPropertyCollector();
 
 		for (String symbol : scope.getLocalSymbolNames())
 		{
@@ -250,32 +251,28 @@ public class JSTypeWalker extends JSTreeWalker
 					}
 				}
 				
-				List<JSNode> assignments = scope.getSecondaryAssignments(symbol);
+				// BEGIN: New JSObject-based code
+				// add values from original declaration
+				collector.resetGlobal();
+				collector.addPropertyValues(symbol, scope.getSymbol(symbol));
 				
-				if (assignments != null && assignments.isEmpty() == false)
+				// process all additional assignments for this symbol 
+				for (JSNode assignment : scope.getSecondaryAssignments(symbol))
 				{
-					JSPropertyCollector collector = new JSPropertyCollector();
-					
-					// add values from original declaration
-					collector.addPropertyValues(symbol, scope.getSymbol(symbol));
-					
-					// process all additional assignments for this symbol 
-					for (JSNode assignment : assignments)
-					{
-						assignment.accept(collector);
-					}
-					
-					// do something with the result
-					JSObject object = collector.getObject();
-					
-					if (object != null)
-					{
-						System.out.println(object.toSource());
-					}
+					assignment.accept(collector);
 				}
-
+				// END: New JSObject-based code
+				
 				properties.add(property);
 			}
+		}
+		
+		// TEMP: for debugging
+		JSObject global = collector.getObject();
+		
+		if (global != null)
+		{
+			System.out.println(global.toSource());
 		}
 
 		return properties;
