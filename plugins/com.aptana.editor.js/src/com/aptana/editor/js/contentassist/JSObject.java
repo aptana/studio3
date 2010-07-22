@@ -70,6 +70,27 @@ public class JSObject
 	}
 
 	/**
+	 * getPropertyNames
+	 * 
+	 * @return
+	 */
+	public List<String> getPropertyNames()
+	{
+		List<String> result;
+		
+		if (this._properties != null)
+		{
+			result = new ArrayList<String>(this._properties.keySet());
+		}
+		else
+		{
+			result = Collections.emptyList();
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * getTypes
 	 * 
 	 * @return
