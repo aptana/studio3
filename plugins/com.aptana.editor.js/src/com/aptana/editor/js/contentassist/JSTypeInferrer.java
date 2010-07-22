@@ -1,15 +1,12 @@
 package com.aptana.editor.js.contentassist;
 
 import java.net.URI;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.UserAgentManager;
@@ -37,7 +34,6 @@ import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
 import com.aptana.editor.js.parsing.ast.JSGroupNode;
 import com.aptana.editor.js.parsing.ast.JSIdentifierNode;
 import com.aptana.editor.js.parsing.ast.JSInvokeNode;
-import com.aptana.editor.js.parsing.ast.JSNameValuePairNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSNumberNode;
@@ -58,16 +54,13 @@ import com.aptana.editor.js.sdoc.model.TagType;
 import com.aptana.editor.js.sdoc.model.Type;
 import com.aptana.editor.js.sdoc.model.TypeTag;
 import com.aptana.index.core.Index;
-import com.aptana.parsing.Scope;
 import com.aptana.parsing.ast.IParseNode;
 
-public class JSTypeWalker extends JSTreeWalker
+public class JSTypeInferrer extends JSTreeWalker
 {
-	public static final String DYNAMIC_CLASS_PREFIX = "-dynamic-type-";
-
 	private static Map<JSNode, String> NODE_TYPE_CACHE;
 
-	private Scope<JSNode> _scope;
+	private JSScope _scope;
 	private Index _index;
 	private List<String> _types;
 	private JSIndexQueryHelper _indexHelper;
@@ -195,16 +188,16 @@ public class JSTypeWalker extends JSTreeWalker
 	 * @param location
 	 * @return
 	 */
-	public static List<PropertyElement> getScopeProperties(Scope<JSNode> scope, Index index, URI location)
+	public static List<PropertyElement> getScopeProperties(JSScope scope, Index index, URI location)
 	{
 		clearTypeCache();
 
 		List<PropertyElement> properties = new ArrayList<PropertyElement>();
-		JSPropertyCollector collector = new JSPropertyCollector();
 
 		for (String symbol : scope.getLocalSymbolNames())
 		{
-			List<JSNode> nodes = scope.getSymbol(symbol);
+			JSObject object = scope.getSymbol(symbol);
+			List<JSNode> nodes = object.getValues();
 
 			if (nodes != null && nodes.isEmpty() == false)
 			{
@@ -212,6 +205,9 @@ public class JSTypeWalker extends JSTreeWalker
 				// a new type that is the union of all types. For now last
 				// definition wins.
 				JSNode node = nodes.get(nodes.size() - 1);
+				
+				if (node instanceof JSObjectNode) continue;
+				
 				DocumentationBlock block = node.getDocumentation();
 				PropertyElement property = (node instanceof JSFunctionNode) ? new FunctionElement() : new PropertyElement();
 
@@ -223,7 +219,7 @@ public class JSTypeWalker extends JSTreeWalker
 				}
 				else
 				{
-					JSTypeWalker walker = new JSTypeWalker(scope, index);
+					JSTypeInferrer walker = new JSTypeInferrer(scope, index);
 
 					node.accept(walker);
 
@@ -251,37 +247,17 @@ public class JSTypeWalker extends JSTreeWalker
 					}
 				}
 				
-				// BEGIN: New JSObject-based code
-				// add values from original declaration
-				collector.resetGlobal();
-				collector.addPropertyValues(symbol, scope.getSymbol(symbol));
-				
-				// process all additional assignments for this symbol 
-				for (JSNode assignment : scope.getSecondaryAssignments(symbol))
-				{
-					assignment.accept(collector);
-				}
-				// END: New JSObject-based code
-				
 				properties.add(property);
 			}
 		}
 		
-		// TEMP: for debugging
-		JSObject global = collector.getObject();
-		
-		if (global != null)
-		{
-			System.out.println(global.toSource());
-		}
-
 		return properties;
 	}
 
 	/**
 	 * JSTypeWalker
 	 */
-	public JSTypeWalker(Scope<JSNode> scope)
+	public JSTypeInferrer(JSScope scope)
 	{
 		this(scope, null);
 	}
@@ -292,7 +268,7 @@ public class JSTypeWalker extends JSTreeWalker
 	 * @param scope
 	 * @param projectIndex
 	 */
-	public JSTypeWalker(Scope<JSNode> scope, Index projectIndex)
+	public JSTypeInferrer(JSScope scope, Index projectIndex)
 	{
 		this(scope, projectIndex, new ArrayList<TypeElement>());
 	}
@@ -304,7 +280,7 @@ public class JSTypeWalker extends JSTreeWalker
 	 * @param projectIndex
 	 * @param generatedTypes
 	 */
-	protected JSTypeWalker(Scope<JSNode> scope, Index projectIndex, List<TypeElement> generatedTypes)
+	protected JSTypeInferrer(JSScope scope, Index projectIndex, List<TypeElement> generatedTypes)
 	{
 		this._scope = scope;
 		this._index = projectIndex;
@@ -469,17 +445,17 @@ public class JSTypeWalker extends JSTreeWalker
 	 * @param offset
 	 * @return
 	 */
-	protected Scope<JSNode> getActiveScope(int offset)
+	protected JSScope getActiveScope(int offset)
 	{
-		Scope<JSNode> result = null;
+		JSScope result = null;
 
 		if (this._scope != null)
 		{
-			Scope<JSNode> root = this._scope;
+			JSScope root = this._scope;
 
 			while (true)
 			{
-				Scope<JSNode> candidate = root.getParentScope();
+				JSScope candidate = root.getParentScope();
 
 				if (candidate == null)
 				{
@@ -644,14 +620,14 @@ public class JSTypeWalker extends JSTreeWalker
 	 * @param node
 	 * @return
 	 */
-	public List<String> getTypes(IParseNode node, Scope<JSNode> scope)
+	public List<String> getTypes(IParseNode node, JSScope scope)
 	{
 		List<String> result;
 
 		if (node instanceof JSNode)
 		{
 			// create new nested walker
-			JSTypeWalker walker = new JSTypeWalker(scope, this._index, this._generatedTypes);
+			JSTypeInferrer walker = new JSTypeInferrer(scope, this._index, this._generatedTypes);
 
 			// collect types
 			walker.visit((JSNode) node);
@@ -665,16 +641,6 @@ public class JSTypeWalker extends JSTreeWalker
 		}
 
 		return result;
-	}
-
-	/**
-	 * @return
-	 */
-	private String getUniqueTypeName()
-	{
-		UUID uuid = UUID.randomUUID();
-
-		return MessageFormat.format("{0}{1}", DYNAMIC_CLASS_PREFIX, uuid); //$NON-NLS-1$
 	}
 
 	/**
@@ -884,7 +850,7 @@ public class JSTypeWalker extends JSTreeWalker
 				this.putNodeType(node, JSTypeConstants.FUNCTION);
 	
 				List<String> types = new ArrayList<String>();
-				Scope<JSNode> scope = this.getActiveScope(node.getBody().getStartingOffset());
+				JSScope scope = this.getActiveScope(node.getBody().getStartingOffset());
 				boolean foundReturnExpression = false;
 	
 				// infer return types
@@ -1029,7 +995,8 @@ public class JSTypeWalker extends JSTreeWalker
 
 		if (this._scope != null && this._scope.hasSymbol(name))
 		{
-			List<JSNode> symbolNodes = this._scope.getSymbol(name);
+			JSObject object = this._scope.getSymbol(name);
+			List<JSNode> symbolNodes = object.getValues();
 
 			for (JSNode symbolNode : symbolNodes)
 			{
@@ -1111,114 +1078,7 @@ public class JSTypeWalker extends JSTreeWalker
 	@Override
 	public void visit(JSObjectNode node)
 	{
-		String type = this.getNodeType(node);
-
-		if (type == null)
-		{
-			if (node.hasChildren() == false)
-			{
-				type = JSTypeConstants.OBJECT;
-			}
-			else
-			{
-				// TODO: Ideally we should hash the properties and their types to
-				// see if a type like this one already exists
-				TypeElement newType = new TypeElement();
-
-				newType.setName(this.getUniqueTypeName());
-				newType.addParentType(JSTypeConstants.OBJECT);
-				this.addUserAgents(newType);
-
-				// temporary container to collect properties and their value
-				// sub-trees so we can infer property types after we have all
-				// of the object's properties. We use a LinkedHashMap to
-				// preserve order.
-				Map<PropertyElement, JSNode> propertyNodeMap = new LinkedHashMap<PropertyElement, JSNode>();
-
-				for (IParseNode child : node)
-				{
-					if (child instanceof JSNameValuePairNode)
-					{
-						JSNameValuePairNode nameValue = (JSNameValuePairNode) child;
-						IParseNode nameNode = nameValue.getName();
-						IParseNode valueNode = nameValue.getValue();
-
-						if (valueNode instanceof JSNode)
-						{
-							PropertyElement property = (valueNode instanceof JSFunctionNode) ? new FunctionElement() : new PropertyElement();
-							String name = nameNode.getText();
-
-							// trim off leading and trailing quotes, if necessary
-							property.setName((nameNode instanceof JSStringNode) ? name.substring(1, name.length() - 1) : name);
-
-							// make valid in all user agents
-							this.addUserAgents(property);
-
-							newType.addProperty(property);
-
-							// save property value for inferencing after all
-							// properties have been collected
-							propertyNodeMap.put(property, (JSNode) valueNode);
-						}
-					}
-				}
-
-				// save reference to type before inferring property types to
-				// avoid potential infinite recursion
-				this.putNodeType(node, newType.getName());
-
-				// add to generated types so we have easy access to the type
-				// when performing property lookups during inferencing
-				this.addGeneratedType(newType);
-
-				// now infer the property types
-				for (Map.Entry<PropertyElement, JSNode> entry : propertyNodeMap.entrySet())
-				{
-					PropertyElement property = entry.getKey();
-					JSNode valueNode = entry.getValue();
-					DocumentationBlock docs = valueNode.getDocumentation();
-
-					if (docs != null)
-					{
-						// get type from the docs
-						applyDocumentation(property, docs);
-					}
-					else
-					{
-						// infer the type
-						for (String valueType : this.getTypes(valueNode))
-						{
-							// process potential function signatures
-							int index = valueType.indexOf(':');
-
-							if (index != -1)
-							{
-								for (String returnTypeName : valueType.substring(index + 1).split(",")) //$NON-NLS-1$
-								{
-									ReturnTypeElement returnType = new ReturnTypeElement();
-
-									returnType.setType(returnTypeName);
-
-									property.addType(returnType);
-								}
-							}
-							else
-							{
-								ReturnTypeElement returnType = new ReturnTypeElement();
-
-								returnType.setType(valueType);
-
-								property.addType(returnType);
-							}
-						}
-					}
-				}
-
-				type = newType.getName();
-			}
-		}
-
-		this.addType(type);
+		this.addType(JSTypeConstants.OBJECT);
 	}
 
 	/*

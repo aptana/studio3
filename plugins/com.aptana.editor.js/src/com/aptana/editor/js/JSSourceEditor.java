@@ -40,7 +40,7 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.outline.IParseListener;
 import com.aptana.editor.common.parsing.FileService;
-import com.aptana.editor.js.contentassist.JSTypeWalker;
+import com.aptana.editor.js.contentassist.JSTypeInferrer;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
 import com.aptana.editor.js.outline.JSOutlineLabelProvider;
 import com.aptana.editor.js.parsing.IJSParserConstants;
@@ -65,7 +65,7 @@ public class JSSourceEditor extends AbstractThemeableEditor
 		result.addListener(new IParseListener() {
 			public void parseFinished()
 			{
-				JSTypeWalker.clearTypeCache();
+				JSTypeInferrer.clearTypeCache();
 			}
 		});
 		
