@@ -165,7 +165,7 @@ public class JSPropertyCollector extends JSTreeWalker
 
 			this._currentObject.addValue((JSNode) rhs);
 			
-			// TODO: Do we really want to potentially expand a object hierarchy
+			// TODO: Do we really want to potentially expand an object hierarchy
 			// once for each assignment or can we take advantage of the fact
 			// that we have multiple assignments to the same object and then
 			// re-use the generated type for each?
