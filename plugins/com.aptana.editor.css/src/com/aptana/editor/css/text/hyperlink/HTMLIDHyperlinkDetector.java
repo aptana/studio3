@@ -12,13 +12,16 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.text.hyperlink.EditorSearchHyperlink;
 import com.aptana.editor.common.text.hyperlink.IndexQueryingHyperlinkDetector;
 import com.aptana.editor.css.Activator;
+import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
+import com.aptana.scope.ScopeSelector;
 
 /**
  * Links IDs in CSS to usages in HTML.
@@ -41,10 +44,17 @@ public class HTMLIDHyperlinkDetector extends IndexQueryingHyperlinkDetector
 		List<IHyperlink> hyperlinks = new ArrayList<IHyperlink>();
 		try
 		{
-			// TODO Only look in CSS and style tags in HTML type files. Maybe we can grab scope and bail out if we're not in CSS?
 			IDocument doc = textViewer.getDocument();
+			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
+					.getScopeAtOffset(doc, region.getOffset());
+			// Match scope against source.css
+			ScopeSelector selector = new ScopeSelector(ICSSConstants.CSS_SCOPE);
+			if (!selector.matches(scope))
+			{
+				return null;
+			}
+			
 			IRegion lineRegion = doc.getLineInformationOfOffset(region.getOffset());
-
 			String line = doc.get(lineRegion.getOffset(), lineRegion.getLength());
 			Matcher m = HTML_ID.matcher(line);
 			if (!m.find())
