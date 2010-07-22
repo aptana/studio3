@@ -113,7 +113,7 @@ public class CommandlineArgumentsHandler
 			// new, must create a project
 			projectName = dotProject.getParentFile().getName();
 			description = workspace.newProjectDescription(projectName);
-			IPath locationPath = Path.fromOSString(dotProject.getAbsolutePath());
+			IPath locationPath = Path.fromOSString(dotProject.getParent());
 
 			// If it is under the root use the default location
 			if (Platform.getLocation().isPrefixOf(locationPath))
