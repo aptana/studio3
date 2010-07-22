@@ -1,0 +1,178 @@
+package com.aptana.editor.js.contentassist;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.aptana.editor.js.parsing.ast.JSNode;
+import com.aptana.parsing.io.SourcePrinter;
+
+public class JSObject
+{
+	private List<JSNode> _values;
+	private Map<String, JSObject> _properties;
+
+	/**
+	 * addValue
+	 * 
+	 * @param value
+	 */
+	public void addValue(JSNode value)
+	{
+		if (value != null)
+		{
+			if (this._values == null)
+			{
+				this._values = new ArrayList<JSNode>();
+			}
+
+			this._values.add(value);
+		}
+	}
+
+	/**
+	 * getProperty
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public JSObject getProperty(String name)
+	{
+		JSObject result = null;
+
+		if (this._properties != null)
+		{
+			result = this._properties.get(name);
+		}
+
+		return result;
+	}
+
+	/**
+	 * getValues
+	 * 
+	 * @return
+	 */
+	public List<JSNode> getValues()
+	{
+		List<JSNode> result = this._values;
+
+		if (result == null)
+		{
+			result = Collections.emptyList();
+		}
+
+		return result;
+	}
+
+	/**
+	 * hasProperties
+	 * 
+	 * @return
+	 */
+	public boolean hasProperties()
+	{
+		boolean result = false;
+
+		if (this._properties != null)
+		{
+			result = this._properties.isEmpty() == false;
+		}
+
+		return result;
+	}
+
+	/**
+	 * hasProperty
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public boolean hasProperty(String name)
+	{
+		boolean result = false;
+
+		if (this._properties != null)
+		{
+			result = this._properties.containsKey(name);
+		}
+
+		return result;
+	}
+
+	/**
+	 * setProperty
+	 * 
+	 * @param name
+	 * @param property
+	 */
+	public void setProperty(String name, JSObject property)
+	{
+		if (name != null && name.length() > 0 && property != null)
+		{
+			if (this._properties == null)
+			{
+				// Using a linked hash map to preserve order in which
+				// properties were added
+				this._properties = new LinkedHashMap<String, JSObject>();
+			}
+
+			this._properties.put(name, property);
+		}
+	}
+
+	/**
+	 * toSource
+	 * 
+	 * @return
+	 */
+	public String toSource()
+	{
+		SourcePrinter printer = new SourcePrinter();
+
+		this.toSource(printer);
+
+		return printer.toString();
+	}
+
+	/**
+	 * toSource
+	 * 
+	 * @param printer
+	 */
+	protected void toSource(SourcePrinter printer)
+	{
+		if (this._properties != null)
+		{
+			for (Map.Entry<String, JSObject> entry : this._properties.entrySet())
+			{
+				String name = entry.getKey();
+				JSObject object = entry.getValue();
+
+				printer.printIndent().print(name);
+
+				if (object._values != null)
+				{
+					printer.print(object._values);
+				}
+				else
+				{
+					printer.print("[]");
+				}
+
+				if (object.hasProperties())
+				{
+					printer.println(" {").increaseIndent();
+					entry.getValue().toSource(printer);
+					printer.decreaseIndent().printlnWithIndent("}");
+				}
+				else
+				{
+					printer.println();
+				}
+			}
+		}
+	}
+}
