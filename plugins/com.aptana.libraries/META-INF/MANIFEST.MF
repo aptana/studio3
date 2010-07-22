@@ -5,8 +5,13 @@ Bundle-SymbolicName: com.aptana.libraries
 Bundle-Version: 3.0.0.qualifier
 Bundle-Vendor: %providerName
 Bundle-ClassPath: derby.jar,
- uuid.jar
-Export-Package: com.eaio.uuid,
+ uuid.jar,
+ 7zip.jar
+Export-Package: SevenZip,
+ SevenZip.Compression.LZ,
+ SevenZip.Compression.LZMA,
+ SevenZip.Compression.RangeCoder,
+ com.eaio.uuid,
  org.apache.derby.authentication,
  org.apache.derby.catalog,
  org.apache.derby.catalog.types,
