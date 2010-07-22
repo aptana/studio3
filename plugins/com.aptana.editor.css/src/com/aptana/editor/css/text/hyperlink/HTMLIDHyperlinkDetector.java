@@ -88,6 +88,7 @@ public class HTMLIDHyperlinkDetector extends IndexQueryingHyperlinkDetector
 				for (String filepath : documents)
 				{
 					// FIXME Don't suggest current file/occurrence
+					// FIXME Don't suggest usages in embedded CSS inside HTML
 					hyperlinks.add(new EditorSearchHyperlink(linkRegion, htmlId, new URI(filepath)));
 					if (!canShowMultipleHyperlinks)
 					{
