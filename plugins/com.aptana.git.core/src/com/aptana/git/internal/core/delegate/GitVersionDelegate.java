@@ -28,7 +28,7 @@ public class GitVersionDelegate extends AbstractProcessorDelegate
 	}
 
 	@Override
-	public Object runCommand(String commandType)
+	public Object runCommand(String commandType, IPath workingDir)
 	{
 		String command = supportedCommands.get(commandType);
 		if (command != null)
@@ -36,7 +36,7 @@ public class GitVersionDelegate extends AbstractProcessorDelegate
 			IPath gitPath = GitExecutable.instance().path();
 			if (gitPath != null)
 			{
-				return ProcessUtil.outputForCommand(gitPath.toString(), null, command);
+				return ProcessUtil.outputForCommand(gitPath.toString(), workingDir, command);
 			}
 		}
 		return null;

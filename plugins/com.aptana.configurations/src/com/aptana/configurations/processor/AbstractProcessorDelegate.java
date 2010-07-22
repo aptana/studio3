@@ -5,8 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 
+import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.ProcessUtil;
 
 /**
@@ -42,12 +44,14 @@ public abstract class AbstractProcessorDelegate implements IConfigurationProcess
 	 * 
 	 * @param commandType
 	 *            One of the supported command types
+	 * @param workingDir
+	 *            The work directory to run the command from (can be null)
 	 * @return The run command output
 	 * @throws IllegalArgumentException
 	 *             In case the command type is not supported or a shell was not found
 	 */
 	@Override
-	public Object runCommand(String commandType)
+	public Object runCommand(String commandType, IPath workingDir)
 	{
 		String command = supportedCommands.get(commandType);
 		if (command == null)
@@ -65,7 +69,8 @@ public abstract class AbstractProcessorDelegate implements IConfigurationProcess
 			commandSwitch = "/C"; //$NON-NLS-1$
 		}
 		command = getSupportedApplication() + ' ' + command;
-		String versionOutput = ProcessUtil.outputForCommand(shellCommandPath, null, new String[] { commandSwitch,
+		System.out.println(ShellExecutable.getEnvironment());
+		String versionOutput = ProcessUtil.outputForCommand(shellCommandPath, workingDir, ShellExecutable.getEnvironment(), new String[] { commandSwitch,
 				command });
 		return versionOutput;
 	}

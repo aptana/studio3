@@ -5,7 +5,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.mortbay.util.ajax.JSON;
 import org.osgi.framework.Version;
 
@@ -13,6 +18,8 @@ import com.aptana.configurations.processor.AbstractConfigurationProcessor;
 import com.aptana.configurations.processor.ConfigurationProcessorsRegistry;
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.configurations.processor.IConfigurationProcessorDelegate;
+import com.aptana.explorer.ExplorerPlugin;
+import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.processorDelegates.BaseVersionProcessor;
 
@@ -79,7 +86,7 @@ public class VersionsConfigurationProcessor extends AbstractConfigurationProcess
 				continue;
 			}
 			IConfigurationProcessorDelegate delegate = processorDelegators.get(app);
-			Object commandResult = delegate.runCommand(IConfigurationProcessorDelegate.VERSION_COMMAND);
+			Object commandResult = delegate.runCommand(IConfigurationProcessorDelegate.VERSION_COMMAND, getActiveWorkingDir());
 			if (commandResult != null)
 			{
 				Version version = BaseVersionProcessor.parseVersion(commandResult.toString());
@@ -147,5 +154,30 @@ public class VersionsConfigurationProcessor extends AbstractConfigurationProcess
 			}
 		}
 		return delegators;
+	}
+	
+
+	/**
+	 * Returns the active working directory according to the <b>last</b> active project in the Project Explorer.<br>
+	 * The value is taken from the preferences, therefore, this method can also return null if it fails.
+	 * 
+	 * @return The active project's working directory (can be null)
+	 */
+	protected IPath getActiveWorkingDir()
+	{
+		IPreferencesService preferencesService = Platform.getPreferencesService();
+		String activeProjectName = preferencesService.getString(ExplorerPlugin.PLUGIN_ID,
+				IPreferenceConstants.ACTIVE_PROJECT, null, null);
+		IProject result = null;
+
+		if (activeProjectName != null)
+		{
+			result = ResourcesPlugin.getWorkspace().getRoot().getProject(activeProjectName);
+		}
+		if (result == null)
+		{
+			return null;
+		}
+		return result.getLocation();
 	}
 }

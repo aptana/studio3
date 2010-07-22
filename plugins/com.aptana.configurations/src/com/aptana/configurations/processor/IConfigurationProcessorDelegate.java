@@ -2,6 +2,8 @@ package com.aptana.configurations.processor;
 
 import java.util.Set;
 
+import org.eclipse.core.runtime.IPath;
+
 /**
  * A base interface for configuration processor delegates.<br>
  * These delegates usually support a specific set of commands, and this class can be queried about those commands, along
@@ -45,7 +47,9 @@ public interface IConfigurationProcessorDelegate
 	 * @param commandType
 	 *            One of the commands that was returned in the {@link #getSupportedCommands()} as available for this
 	 *            delegate.
+	 * @param workingDir
+	 *            The work directory to run the command from (can be null)
 	 * @return An object representing the result of this command (can be null).
 	 */
-	public Object runCommand(String commandType);
+	public Object runCommand(String commandType, IPath workingDir);
 }

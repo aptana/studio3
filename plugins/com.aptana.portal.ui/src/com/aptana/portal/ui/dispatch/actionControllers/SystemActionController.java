@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.mortbay.util.ajax.JSON;
@@ -49,6 +50,22 @@ public class SystemActionController extends AbstractActionController
 		return IBrowserNotificationConstants.JSON_OK;
 	}
 
+	/**
+	 * This method checks if the list of items are installed in the system and returns metadata information regarding each item.<br>
+	 * This method runs synchronously (unlike {@link #computeInstalledVersions(Object)})
+	 * 
+	 * @param itemsAttributes
+	 * @return A JSON metadata for the given item(s)
+	 */
+	@ControllerAction
+	public Object synchronousComputeInstalledVersions(final Object itemsAttributes)
+	{
+		final IConfigurationProcessor processor = getProcessor();
+		ConfigurationStatus status = processor.getStatus(new NullProgressMonitor(), itemsAttributes, true);
+		String jsonStatus = JSON.toString(status);
+		return jsonStatus;
+	}
+	
 	/**
 	 * Returns a browser notification with the current known installed versions.
 	 * 

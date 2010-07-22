@@ -22,7 +22,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.equinox.p2.ui,
  org.eclipse.ui.console,
  org.mortbay.jetty.util,
- com.aptana.theme
+ com.aptana.theme,
+ com.aptana.libraries,
+ com.aptana.explorer
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.portal.ui,
