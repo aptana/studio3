@@ -89,8 +89,12 @@ public class URIResolver implements IPathResolver
 		catch (IllegalArgumentException e)
 		{
 			// fails to parse, try resolving against base URI
-			uri = baseURI.resolve(path);
-			// TODO What if it fails here, then what do we do?
+			try {
+				uri = baseURI.resolve(path);
+			} catch (IllegalArgumentException e2) {
+				// TODO What if it fails here, then what do we do?
+				return null;
+			}
 		}
 
 		try
