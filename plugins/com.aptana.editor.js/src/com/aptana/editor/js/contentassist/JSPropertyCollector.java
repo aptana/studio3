@@ -138,6 +138,14 @@ public class JSPropertyCollector extends JSTreeWalker
 		return this._object;
 	}
 
+	/**
+	 * resetGlobal
+	 */
+	public void resetGlobal()
+	{
+		this._currentObject = this._object;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSAssignmentNode)
@@ -151,7 +159,7 @@ public class JSPropertyCollector extends JSTreeWalker
 		if (lhs instanceof JSNode && rhs instanceof JSNode)
 		{
 			// start from global
-			this._currentObject = this._object;
+			this.resetGlobal();
 
 			((JSNode) lhs).accept(this);
 
