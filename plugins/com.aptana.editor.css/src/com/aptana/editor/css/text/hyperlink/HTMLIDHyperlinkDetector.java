@@ -41,6 +41,7 @@ public class HTMLIDHyperlinkDetector extends IndexQueryingHyperlinkDetector
 		List<IHyperlink> hyperlinks = new ArrayList<IHyperlink>();
 		try
 		{
+			// TODO Only look in CSS and style tags in HTML type files. Maybe we can grab scope and bail out if we're not in CSS?
 			IDocument doc = textViewer.getDocument();
 			IRegion lineRegion = doc.getLineInformationOfOffset(region.getOffset());
 
