@@ -998,8 +998,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			File themeFile = new File(path);
 			editorSettings.put(THEME_EXPORT_DIRECTORY, themeFile.getParent());
 
-			Theme theme = getThemeManager().getCurrentTheme();
-			new ThemeExporter().export(themeFile, theme);
+			new ThemeExporter().export(themeFile, getTheme());
 		}
 		else if (source == fAddTokenButton)
 		{
