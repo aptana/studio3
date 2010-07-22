@@ -12,8 +12,27 @@ import com.aptana.parsing.io.SourcePrinter;
 public class JSObject
 {
 	private List<JSNode> _values;
+	private List<String> _types;
 	private Map<String, JSObject> _properties;
 
+	/**
+	 * addType
+	 * 
+	 * @param type
+	 */
+	public void addType(String type)
+	{
+		if (type != null && type.length() > 0)
+		{
+			if (this._types == null)
+			{
+				this._types = new ArrayList<String>();
+			}
+			
+			this._types.add(type);
+		}
+	}
+	
 	/**
 	 * addValue
 	 * 
@@ -50,6 +69,23 @@ public class JSObject
 		return result;
 	}
 
+	/**
+	 * getTypes
+	 * 
+	 * @return
+	 */
+	public List<String> getTypes()
+	{
+		List<String> result = this._types;
+		
+		if (result == null)
+		{
+			Collections.emptyList();
+		}
+		
+		return result;
+	}
+	
 	/**
 	 * getValues
 	 * 
