@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -1460,22 +1459,8 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		if (index > 0)
 			index++;
 		createDiffMenuItem(menu, index++);
-
-		// Don't add the following unless a file is selected!
-		Set<IResource> selected = getSelectedFiles();
-		boolean add = false;
-		for (IResource resource : selected)
-		{
-			if (resource instanceof IFile)
-			{
-				add = true;
-				break;
-			}
-		}
-		if (!add)
-			return;
 		createStageMenuItem(menu, index++);
-		createUnstageMenuItem(menu, index++);
+		createUnstageMenuItem(menu, index++);	
 		createRevertMenuItem(menu, index);
 	}
 
