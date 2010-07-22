@@ -27,7 +27,7 @@ public class CSSClassHyperlinkDetector extends IndexQueryingHyperlinkDetector
 		super();
 	}
 
-	private static final Pattern CSS_CLASS_PATTERN = Pattern.compile("class=[\"']([_a-zA-Z0-9-]+)[\"']"); //$NON-NLS-1$
+	private static final Pattern CSS_CLASS_PATTERN = Pattern.compile("class=[\"'Ò]([_a-zA-Z0-9-]+)[\"'Ó]"); //$NON-NLS-1$
 
 	@Override
 	public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region, boolean canShowMultipleHyperlinks)
@@ -50,8 +50,9 @@ public class CSSClassHyperlinkDetector extends IndexQueryingHyperlinkDetector
 				return null;
 			}
 
+			// FIXME What if it uses multiple classes?
 			String cssClass = m.group(1);
-			// TODO Make this smarter, find the best match (i.e. div.class or #some-id.class)
+			// TODO Make this smarter, find the best match (i.e. div.class or #some-id.class)?
 			List<QueryResult> results = index.query(new String[] { CSSIndexConstants.CLASS }, cssClass,
 					SearchPattern.EXACT_MATCH | SearchPattern.CASE_SENSITIVE);
 			if (results == null || results.isEmpty())
