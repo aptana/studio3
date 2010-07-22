@@ -13,6 +13,12 @@
             priority="lowest">
          <enablement>
             <or>
+               <adapt
+                     type="org.eclipse.core.resources.IProject">
+               </adapt>
+               <instanceof
+                     value="org.eclipse.core.resources.IResource">
+               </instanceof>
                <instanceof
                      value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnections">
                </instanceof>
@@ -20,14 +26,8 @@
                      value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection">
                </instanceof>
                <instanceof
-                     value="org.eclipse.core.resources.IResource">
-               </instanceof>
-               <instanceof
                      value="com.aptana.ide.ui.io.navigator.FileSystemObject">
                </instanceof>
-               <adapt
-                     type="org.eclipse.core.resources.IProject">
-               </adapt>
             </or>
          </enablement>
          <dropAssistant
@@ -39,15 +39,23 @@
                </instanceof>
             </possibleDropTargets>
          </dropAssistant>
+      </navigatorContent>
+      <navigatorContent
+            activeByDefault="true"
+            appearsBefore="com.aptana.ide.ui.io.navigatorContent"
+            id="com.aptana.ide.syncing.ui.navigatorContent.sorter"
+            name="%navigatorContent.site.sorter.name"
+            priority="lowest"
+            sortOnly="true">
          <commonSorter
                class="com.aptana.ide.syncing.ui.navigator.SiteTreeNameSorter">
             <parentExpression>
                <or>
                   <instanceof
-                        value="org.eclipse.core.resources.IResource">
+                        value="org.eclipse.core.resources.IProject">
                   </instanceof>
                   <instanceof
-                        value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+                        value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnections">
                   </instanceof>
                   <instanceof
                         value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection">
