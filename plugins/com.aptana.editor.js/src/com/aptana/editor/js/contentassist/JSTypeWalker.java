@@ -254,13 +254,23 @@ public class JSTypeWalker extends JSTreeWalker
 				
 				if (assignments != null && assignments.isEmpty() == false)
 				{
-					System.out.println(symbol);
+					JSPropertyCollector collector = new JSPropertyCollector();
 					
-					System.out.println("  " + scope.getSymbol(symbol));
+					// add values from original declaration
+					collector.addPropertyValues(symbol, scope.getSymbol(symbol));
 					
+					// process all additional assignments for this symbol 
 					for (JSNode assignment : assignments)
 					{
-						System.out.println("  " + assignment);
+						assignment.accept(collector);
+					}
+					
+					// do something with the result
+					JSObject object = collector.getObject();
+					
+					if (object != null)
+					{
+						System.out.println(object.toSource());
 					}
 				}
 
