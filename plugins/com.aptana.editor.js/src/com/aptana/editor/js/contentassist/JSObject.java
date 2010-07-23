@@ -55,6 +55,14 @@ public class JSObject
 	}
 
 	/**
+	 * clearTypes
+	 */
+	public void clearTypes()
+	{
+		this._types = null;
+	}
+	
+	/**
 	 * getProperty
 	 * 
 	 * @param name
