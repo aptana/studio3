@@ -167,11 +167,9 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 
 				for (JSFunctionNode function : functions)
 				{
-					JSScope scope = globals.getScopeAtOffset(function.getBody().getStartingOffset());
+					// JSScope scope = globals.getScopeAtOffset(function.getBody().getStartingOffset());
+					// JSObject object = scope.getObject();
 
-					JSObject object = scope.getObject();
-
-					System.out.println(object.toSource());
 					// JSTypeWalker.getScopeProperties(scope, index, location);
 					//					
 					// if (scope != null)
