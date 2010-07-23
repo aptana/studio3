@@ -992,42 +992,48 @@ public class JSTypeInferrer extends JSTreeWalker
 	public void visit(JSIdentifierNode node)
 	{
 		String name = node.getText();
+		PropertyElement property = null;
 
 		if (this._scope != null && this._scope.hasSymbol(name))
 		{
-			JSObject object = this._scope.getSymbol(name);
-			List<JSNode> symbolNodes = object.getValues();
-
-			for (JSNode symbolNode : symbolNodes)
-			{
-				if (symbolNode instanceof JSIdentifierNode)
-				{
-					this.addIdentifierTypes(name, (JSIdentifierNode) symbolNode);
-				}
-				else
-				{
-					this.addNonIdentifierTypes(symbolNode);
-				}
-			}
+			JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(this._index, this._scope);
+			
+			property = symbolInferrer.getSymbolPropertyElement(name);
+			
+			// TODO: need to write out the generated types to make them visible to CA!
+			
+//			List<JSNode> symbolNodes = object.getValues();
+//
+//			for (JSNode symbolNode : symbolNodes)
+//			{
+//				if (symbolNode instanceof JSIdentifierNode)
+//				{
+//					this.addIdentifierTypes(name, (JSIdentifierNode) symbolNode);
+//				}
+//				else
+//				{
+//					this.addNonIdentifierTypes(symbolNode);
+//				}
+//			}
 		}
 		else
 		{
-			PropertyElement property = this._indexHelper.getGlobal(this._index, name, EnumSet.of(ContentSelector.TYPES, ContentSelector.RETURN_TYPES));
+			property = this._indexHelper.getGlobal(this._index, name, EnumSet.of(ContentSelector.TYPES, ContentSelector.RETURN_TYPES));
+		}
 
-			if (property != null)
+		if (property != null)
+		{
+			if (property instanceof FunctionElement)
 			{
-				if (property instanceof FunctionElement)
-				{
-					FunctionElement function = (FunctionElement) property;
+				FunctionElement function = (FunctionElement) property;
 
-					this.addType(function.getSignature());
-				}
-				else
+				this.addType(function.getSignature());
+			}
+			else
+			{
+				for (ReturnTypeElement typeElement : property.getTypes())
 				{
-					for (ReturnTypeElement typeElement : property.getTypes())
-					{
-						this.addType(typeElement.getType());
-					}
+					this.addType(typeElement.getType());
 				}
 			}
 		}
