@@ -112,7 +112,7 @@ public class JSObject
 		
 		if (result == null)
 		{
-			Collections.emptyList();
+			result = Collections.emptyList();
 		}
 		
 		return result;
