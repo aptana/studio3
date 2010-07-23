@@ -60,6 +60,23 @@ public class PropertyElement extends BaseElement
 	}
 
 	/**
+	 * addType
+	 * 
+	 * @param type
+	 */
+	public void addType(String type)
+	{
+		if (type != null && type.length() > 0)
+		{
+			ReturnTypeElement returnType = new ReturnTypeElement();
+
+			returnType.setType(type);
+
+			this.addType(returnType);
+		}
+	}
+
+	/**
 	 * getExamples
 	 * 
 	 * @return
