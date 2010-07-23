@@ -3,11 +3,7 @@ package com.aptana.editor.js.contentassist.index;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
@@ -20,13 +16,11 @@ import org.jaxen.XPath;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.js.Activator;
-import com.aptana.editor.js.contentassist.JSContentAssistUtil;
-import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.JSObject;
 import com.aptana.editor.js.contentassist.JSScope;
 import com.aptana.editor.js.contentassist.JSSymbolCollector;
+import com.aptana.editor.js.contentassist.JSSymbolTypeInferrer;
 import com.aptana.editor.js.contentassist.JSTypeInferrer;
-import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
@@ -46,10 +40,7 @@ import com.aptana.parsing.xpath.ParseNodeXPath;
 
 public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 {
-	private static final EnumSet<ContentSelector> MEMBER_CONTENT = EnumSet.of(ContentSelector.NAME, ContentSelector.TYPES, ContentSelector.RETURN_TYPES);
-
 	private JSIndexWriter _indexWriter;
-	private List<TypeElement> _generatedTypes;
 
 	/**
 	 * JSFileIndexingParticipant
@@ -57,28 +48,6 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 	public JSFileIndexingParticipant()
 	{
 		this._indexWriter = new JSIndexWriter();
-	}
-
-	/**
-	 * generateType
-	 * 
-	 * @return
-	 */
-	private TypeElement generateType()
-	{
-		// create new type and give it a unique name
-		TypeElement result = new TypeElement();
-		result.setName(JSContentAssistUtil.getUniqueTypeName());
-
-		// save type for future reference
-		if (this._generatedTypes == null)
-		{
-			this._generatedTypes = new ArrayList<TypeElement>();
-		}
-
-		this._generatedTypes.add(result);
-
-		return result;
 	}
 
 	/**
@@ -101,102 +70,6 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 		}
 
 		return result;
-	}
-
-	/**
-	 * getScopeProperties
-	 * 
-	 * @param index
-	 * @param globals
-	 * @return
-	 */
-	private List<PropertyElement> getScopeProperties(Index index, JSScope globals)
-	{
-		List<PropertyElement> result = new ArrayList<PropertyElement>();
-
-		for (String symbol : globals.getLocalSymbolNames())
-		{
-			PropertyElement p = this.getSymbolPropertyElement(index, globals, globals.getObject(), symbol);
-
-			result.add(p);
-		}
-
-		return result;
-	}
-
-	/**
-	 * getSymbolPropertyElement
-	 * 
-	 * @param index
-	 * @param globals
-	 * @param name
-	 * @return
-	 */
-	private PropertyElement getSymbolPropertyElement(Index index, JSScope globals, JSObject activeObject, String symbol)
-	{
-		// create resulting property element
-		PropertyElement result = new PropertyElement();
-		result.setName(symbol);
-
-		JSObject property = activeObject.getProperty(symbol);
-		List<String> types = new ArrayList<String>();
-
-		// infer types
-		for (JSNode value : property.getValues())
-		{
-			JSTypeInferrer inferrer = new JSTypeInferrer(globals);
-
-			inferrer.visit(value);
-
-			types.addAll(inferrer.getTypes());
-		}
-
-		// if property has child properties, determine if they already exist in
-		// one of the types (or their ancestors)
-		if (property.hasProperties())
-		{
-			processSubProperties(index, globals, property, types);
-		}
-
-		// add types to property
-		for (String typeName : types)
-		{
-			result.addType(typeName);
-		}
-
-		return result;
-	}
-
-	/**
-	 * getTypePropertyMap
-	 * 
-	 * @param index
-	 * @param type
-	 * @return
-	 */
-	private Map<String, PropertyElement> getTypePropertyMap(Index index, List<String> types)
-	{
-		JSIndexQueryHelper helper = new JSIndexQueryHelper();
-
-		// create a set from the specified types and their ancestors
-		Set<String> ancestors = new HashSet<String>();
-
-		for (String type : types)
-		{
-			ancestors.add(type);
-			ancestors.addAll(helper.getTypeAncestorNames(index, type));
-		}
-
-		List<String> typesAndAncestors = new ArrayList<String>(ancestors);
-		List<PropertyElement> typeMembers = helper.getTypeMembers(index, typesAndAncestors, MEMBER_CONTENT);
-		Map<String, PropertyElement> propertyMap = new HashMap<String, PropertyElement>();
-
-		for (PropertyElement propertyElement : typeMembers)
-		{
-			propertyMap.put(propertyElement.getName(), propertyElement);
-		}
-
-		return propertyMap;
 	}
 
 	/*
@@ -333,9 +206,11 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 			// create new Window type for this file
 			TypeElement type = new TypeElement();
 			type.setName("Window"); //$NON-NLS-1$
+			
+			JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(index, globals);
 
 			// add declared variables and functions from the global scope
-			for (PropertyElement property : this.getScopeProperties(index, globals))
+			for (PropertyElement property : symbolInferrer.getScopeProperties())
 			{
 				type.addProperty(property);
 			}
@@ -353,69 +228,13 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 			}
 
 			// write generated types
-			if (this._generatedTypes != null)
+			for (TypeElement generatedType : symbolInferrer.getGeneratedTypes())
 			{
-				for (TypeElement generatedType : this._generatedTypes)
-				{
-					this._indexWriter.writeType(index, generatedType, location);
-				}
-
-				this._generatedTypes.clear();
+				this._indexWriter.writeType(index, generatedType, location);
 			}
 
 			// write new Window type to index
 			this._indexWriter.writeType(index, type, location);
-		}
-	}
-
-	/**
-	 * processSubProperties
-	 * 
-	 * @param index
-	 * @param globals
-	 * @param activeObject
-	 * @param types
-	 */
-	private void processSubProperties(Index index, JSScope globals, JSObject activeObject, List<String> types)
-	{
-		Map<String, PropertyElement> propertyMap = this.getTypePropertyMap(index, types);
-		List<String> additionalProperties = new ArrayList<String>();
-
-		// create a list of properties that are not in the ancestor chain of the
-		// types passed into this method
-		for (String name : activeObject.getPropertyNames())
-		{
-			// TODO: Treat as new property if types don't match?
-			if (propertyMap.containsKey(name) == false)
-			{
-				additionalProperties.add(name);
-			}
-		}
-
-		// if we have new properties, create a new sub-type and add the new
-		// properties to it
-		if (additionalProperties.isEmpty() == false)
-		{
-			// create new type
-			TypeElement subType = this.generateType();
-
-			// make the current list of types parent types of this type
-			for (String superType : types)
-			{
-				subType.addParentType(superType);
-			}
-
-			// reset the type list to this newly generated type
-			types.clear();
-			types.add(subType.getName());
-
-			// infer types of the
-			for (String pname : additionalProperties)
-			{
-				PropertyElement p = this.getSymbolPropertyElement(index, globals, activeObject, pname);
-
-				subType.addProperty(p);
-			}
 		}
 	}
 
