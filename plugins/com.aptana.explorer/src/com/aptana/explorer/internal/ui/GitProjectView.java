@@ -96,7 +96,7 @@ import com.aptana.git.ui.dialogs.CreateBranchDialog;
  */
 class GitProjectView extends SingleProjectView implements IGitRepositoryListener, IGitRepositoriesListener
 {
-	private static final String DIRTY_SUFFIX = "*";
+	private static final String DIRTY_SUFFIX = "*"; //$NON-NLS-1$
 	private static final String GIT_CHANGED_FILES_FILTER = "GitChangedFilesFilterEnabled"; //$NON-NLS-1$
 	private static final String PROJECT_DELIMITER = "######"; //$NON-NLS-1$
 	private static final String COMMIT_ICON_PATH = "icons/full/elcl16/disk.png"; //$NON-NLS-1$
@@ -210,20 +210,25 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 
 	protected void doCreateToolbar(Composite toolbarComposite)
 	{
-		createGitBranchCombo(toolbarComposite);
+		Composite branchComp = new Composite(toolbarComposite, SWT.NONE);
+		
+		GridLayout toolbarGridLayout = new GridLayout(3, false);
+		toolbarGridLayout.marginWidth = 2;
+		toolbarGridLayout.marginHeight = 0;
+		toolbarGridLayout.horizontalSpacing = 0;
+		
+		branchComp.setLayout(toolbarGridLayout);
+		createGitBranchCombo(branchComp);
 	}
 
 	private void createGitBranchCombo(Composite parent)
 	{
-		// Increment number of columns of the layout
-		((GridLayout) parent.getLayout()).numColumns += 3;
-
 		leftLabel = new Label(parent, SWT.NONE);
 		leftLabel.setText("["); //$NON-NLS-1$
-		leftLabelGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
+		leftLabelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
 		leftLabel.setLayoutData(leftLabelGridData);
 
-		branchesToolbar = new ToolBar(parent, SWT.FLAT);
+		branchesToolbar = new ToolBar(parent, SWT.FLAT | SWT.BORDER);
 		branchesToolbarGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
 		branchesToolbar.setLayoutData(branchesToolbarGridData);
 
@@ -245,6 +250,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		rightLabel = new Label(parent, SWT.NONE);
 		rightLabel.setText("]"); //$NON-NLS-1$
 		rightLabelGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
+		rightLabelGridData.horizontalIndent = -2;
 		rightLabel.setLayoutData(rightLabelGridData);
 	}
 
@@ -1460,7 +1466,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			index++;
 		createDiffMenuItem(menu, index++);
 		createStageMenuItem(menu, index++);
-		createUnstageMenuItem(menu, index++);	
+		createUnstageMenuItem(menu, index++);
 		createRevertMenuItem(menu, index);
 	}
 
