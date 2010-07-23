@@ -228,10 +228,12 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 			}
 
 			// write generated types
-			for (TypeElement generatedType : symbolInferrer.getGeneratedTypes())
+			for (TypeElement generatedType : JSSymbolTypeInferrer.getGeneratedTypes())
 			{
 				this._indexWriter.writeType(index, generatedType, location);
 			}
+			
+			JSSymbolTypeInferrer.clearGeneratedTypes();
 
 			// write new Window type to index
 			this._indexWriter.writeType(index, type, location);

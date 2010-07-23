@@ -25,6 +25,7 @@ public class JSSymbolTypeInferrer
 {
 	private static final EnumSet<ContentSelector> MEMBER_CONTENT = EnumSet.of(ContentSelector.NAME, ContentSelector.TYPES, ContentSelector.RETURN_TYPES);
 	private static List<TypeElement> GENERATED_TYPES;
+	private static final Object TYPE_LOCK = new Object();
 
 	private Index _index;
 	private JSScope _activeScope;
@@ -41,6 +42,17 @@ public class JSSymbolTypeInferrer
 		this._activeScope = activeScope;
 	}
 
+	/**
+	 * clearGeneratedTypes
+	 */
+	public static void clearGeneratedTypes()
+	{
+		synchronized (TYPE_LOCK)
+		{
+			GENERATED_TYPES = null;
+		}
+	}
+	
 	/**
 	 * createPropertyElement
 	 * 
@@ -90,7 +102,7 @@ public class JSSymbolTypeInferrer
 	 * 
 	 * @return
 	 */
-	private TypeElement generateType(Set<String> types)
+	private static TypeElement generateType(Set<String> types)
 	{
 		// create new type
 		TypeElement result = new TypeElement();
@@ -107,13 +119,16 @@ public class JSSymbolTypeInferrer
 			}
 		}
 
-		// save type for future reference
-		if (GENERATED_TYPES == null)
+		synchronized (TYPE_LOCK)
 		{
-			GENERATED_TYPES = new ArrayList<TypeElement>();
+			// save type for future reference
+			if (GENERATED_TYPES == null)
+			{
+				GENERATED_TYPES = new ArrayList<TypeElement>();
+			}
+	
+			GENERATED_TYPES.add(result);
 		}
-
-		GENERATED_TYPES.add(result);
 
 		return result;
 	}
@@ -149,13 +164,20 @@ public class JSSymbolTypeInferrer
 	 * 
 	 * @return
 	 */
-	public List<TypeElement> getGeneratedTypes()
+	public static List<TypeElement> getGeneratedTypes()
 	{
-		List<TypeElement> result = GENERATED_TYPES;
-
-		if (result == null)
+		List<TypeElement> result;
+		
+		synchronized (TYPE_LOCK)
 		{
-			result = Collections.emptyList();
+			if (GENERATED_TYPES != null)
+			{
+				result = new ArrayList<TypeElement>(GENERATED_TYPES);
+			}
+			else
+			{
+				result = Collections.emptyList();
+			}
 		}
 
 		return result;
@@ -236,6 +258,14 @@ public class JSSymbolTypeInferrer
 
 			for (String typeName : types)
 			{
+				if (result instanceof FunctionElement)
+				{
+					if (typeName.startsWith(JSTypeConstants.FUNCTION + ":"))
+					{
+						typeName = typeName.substring(JSTypeConstants.FUNCTION.length() + 1);
+					}
+				}
+				
 				result.addType(typeName);
 			}
 		}
@@ -307,20 +337,21 @@ public class JSSymbolTypeInferrer
 			if (additionalProperties.isEmpty() == false)
 			{
 				// create new type
-				TypeElement subType = this.generateType(types);
+				TypeElement subType = generateType(types);
 
 				// reset list to contain only this newly generated type
 				types.clear();
 				types.add(subType.getName());
 
+				// go ahead and cache this new type to prevent possible recursion
 				property.addType(subType.getName());
 
 				// infer types of the
 				for (String pname : additionalProperties)
 				{
-					PropertyElement p = this.getSymbolPropertyElement(property, pname);
+					PropertyElement pe = this.getSymbolPropertyElement(property, pname);
 
-					subType.addProperty(p);
+					subType.addProperty(pe);
 				}
 			}
 		}
