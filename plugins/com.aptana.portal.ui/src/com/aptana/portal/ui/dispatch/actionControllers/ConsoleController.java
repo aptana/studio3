@@ -31,7 +31,7 @@ import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
 public class ConsoleController extends AbstractActionController
 {
 
-	private static final String BROWSER_CONSOLE_NAME = "Browser Console";
+	private static final String BROWSER_CONSOLE_NAME = Messages.ConsoleController_devToolboxConsoleName;
 
 	public ConsoleController()
 	{

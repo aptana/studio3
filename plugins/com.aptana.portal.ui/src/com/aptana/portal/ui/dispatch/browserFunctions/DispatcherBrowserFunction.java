@@ -53,7 +53,7 @@ public class DispatcherBrowserFunction extends BrowserFunction
 	 * @see IBrowserNotificationConstants#JSON_ERROR_UNKNOWN_CONTROLLER
 	 * @see IBrowserNotificationConstants#JSON_ERROR_UNKNOWN_ACTION
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Object function(Object[] arguments)
 	{
 		if (arguments == null || arguments.length != 1 || arguments[0] == null)

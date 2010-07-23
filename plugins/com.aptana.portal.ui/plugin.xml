@@ -27,12 +27,6 @@
             name="Gems">
       </processor>
       <processor
-            category="plugins"
-            class="com.aptana.portal.ui.dispatch.configurationProcessors.PluginsConfigurationProcessor"
-            id="com.aptana.portal.plugins.processor"
-            name="Plugins">
-      </processor>
-      <processor
             category="configurations"
             class="com.aptana.portal.ui.dispatch.configurationProcessors.VersionsConfigurationProcessor"
             id="com.aptana.portal.versions.processor"

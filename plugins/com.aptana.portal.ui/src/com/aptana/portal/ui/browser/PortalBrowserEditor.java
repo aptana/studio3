@@ -85,9 +85,9 @@ public class PortalBrowserEditor extends WebBrowserEditor implements IBrowserVie
 				{
 					public void changed(LocationEvent event)
 					{
-						//browser.removeLocationListener(this);
+						// browser.removeLocationListener(this);
 						refreshBrowserRegistration(browser);
-						
+
 					}
 				});
 			}
@@ -111,10 +111,9 @@ public class PortalBrowserEditor extends WebBrowserEditor implements IBrowserVie
 				IBrowserNotificationConstants.DISPATCH_FUNCTION_NAME);
 		browserFunctions.add(dispatcherFunction);
 
-		browser.execute(
-				"console = {}; " +
-				"console.log   = function(msg) { dispatch($H({controller:\"console\", action:\"log\", args:msg.toJSON()}).toJSON()); }; " +
-				"console.debug = function(msg) { dispatch($H({controller:\"console\", action:\"log\", args:msg.toJSON()}).toJSON()); }");
+		browser.execute("console = {}; " //$NON-NLS-1$
+				+ "console.log   = function(msg) { dispatch($H({controller:\"console\", action:\"log\", args:msg.toJSON()}).toJSON()); }; " //$NON-NLS-1$
+				+ "console.debug = function(msg) { dispatch($H({controller:\"console\", action:\"log\", args:msg.toJSON()}).toJSON()); }"); //$NON-NLS-1$
 		// Make sure that all the Javascript errors are being surfaced out of the internal browser.
 		browser.execute("window.onerror=customErrorHandler"); //$NON-NLS-1$
 	}
