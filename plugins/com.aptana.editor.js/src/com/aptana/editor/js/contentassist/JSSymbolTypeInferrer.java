@@ -16,8 +16,10 @@ import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
+import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
+import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.index.core.Index;
 
@@ -404,6 +406,12 @@ public class JSSymbolTypeInferrer
 				if (isFunction)
 				{
 					property.addType(JSTypeConstants.FUNCTION);
+					inferrer.visit(value);
+					property.clearTypes();
+				}
+				else if (value instanceof JSAssignmentNode && value.getNodeType() != JSNodeTypes.ASSIGN)
+				{
+					property.addType("");
 					inferrer.visit(value);
 					property.clearTypes();
 				}
