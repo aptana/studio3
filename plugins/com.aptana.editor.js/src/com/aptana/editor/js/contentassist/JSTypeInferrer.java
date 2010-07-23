@@ -4,9 +4,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.UserAgentManager;
@@ -54,24 +52,11 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class JSTypeInferrer extends JSTreeWalker
 {
-	private static Map<JSNode, String> NODE_TYPE_CACHE;
-
 	private JSScope _scope;
 	private Index _index;
 	private List<String> _types;
 	private JSIndexQueryHelper _indexHelper;
 	private List<TypeElement> _generatedTypes;
-
-	/**
-	 * clearTypeCache
-	 */
-	public static void clearTypeCache()
-	{
-		if (NODE_TYPE_CACHE != null)
-		{
-			NODE_TYPE_CACHE.clear();
-		}
-	}
 
 	/**
 	 * getScopeProperties
@@ -83,8 +68,6 @@ public class JSTypeInferrer extends JSTreeWalker
 	 */
 	public static List<PropertyElement> getScopeProperties(JSScope scope, Index index, URI location)
 	{
-		clearTypeCache();
-
 		List<PropertyElement> properties = new ArrayList<PropertyElement>();
 
 		for (String symbol : scope.getLocalSymbolNames())
@@ -387,24 +370,6 @@ public class JSTypeInferrer extends JSTreeWalker
 	}
 
 	/**
-	 * getTypeElement
-	 * 
-	 * @param node
-	 * @return
-	 */
-	protected String getNodeType(JSNode node)
-	{
-		String result = null;
-
-		if (NODE_TYPE_CACHE != null)
-		{
-			result = NODE_TYPE_CACHE.get(node);
-		}
-
-		return result;
-	}
-
-	/**
 	 * getReturnNodes
 	 * 
 	 * @param node
@@ -493,48 +458,6 @@ public class JSTypeInferrer extends JSTreeWalker
 		}
 
 		return result;
-	}
-
-	/**
-	 * hasGeneratedType
-	 * 
-	 * @param type
-	 * @return
-	 */
-	public boolean hasGeneratedType(String type)
-	{
-		boolean result = false;
-
-		if (type != null && type.length() > 0 && NODE_TYPE_CACHE != null)
-		{
-			// we might have a user-generated type, so look for it directly
-			for (String typeName : NODE_TYPE_CACHE.values())
-			{
-				if (typeName.equals(type))
-				{
-					result = true;
-					break;
-				}
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * putTypeElement
-	 * 
-	 * @param node
-	 * @param type
-	 */
-	protected void putNodeType(JSNode node, String type)
-	{
-		if (NODE_TYPE_CACHE == null)
-		{
-			NODE_TYPE_CACHE = new HashMap<JSNode, String>();
-		}
-
-		NODE_TYPE_CACHE.put(node, type);
 	}
 
 	/*

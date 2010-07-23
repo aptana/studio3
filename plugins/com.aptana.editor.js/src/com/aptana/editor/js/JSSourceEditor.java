@@ -60,16 +60,7 @@ public class JSSourceEditor extends AbstractThemeableEditor
 	@Override
 	protected FileService createFileService()
 	{
-		FileService result = new FileService(IJSParserConstants.LANGUAGE);
-		
-		result.addListener(new IParseListener() {
-			public void parseFinished()
-			{
-				JSTypeInferrer.clearTypeCache();
-			}
-		});
-		
-		return result;
+		return new FileService(IJSParserConstants.LANGUAGE);
 	}
 
 	@Override
