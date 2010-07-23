@@ -411,6 +411,34 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			}
 		});
 		tableViewer.setLabelProvider(new TokenLabelProvider());
+		tableViewer.getTable().addMouseListener(new MouseAdapter()
+		{
+			@SuppressWarnings("unchecked")
+			@Override
+			public void mouseDown(MouseEvent e)
+			{
+				Table table = tableViewer.getTable();
+				// If user is clicking in the BG column when it's empty, pop open a color dialog
+				int myX = table.getColumn(0).getWidth();
+				myX += table.getColumn(1).getWidth();
+				int width = table.getColumn(2).getWidth() + 2;
+				if (!(e.x > myX && e.x < (myX + width)))
+					return;
+				TableItem tableItem = table.getItem(new Point(e.x, e.y));
+				ColorDialog colorDialog = new ColorDialog(table.getShell());
+				colorDialog.setRGB(getTheme().getBackground());
+				RGB newRGB = colorDialog.open();
+				if (newRGB == null)
+					return;
+				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) tableItem.getData();
+				Color fg = token.getValue().getForeground();
+				Color bg = ThemePlugin.getDefault().getColorManager().getColor(newRGB);
+
+				TextAttribute at = new TextAttribute(fg, bg, token.getValue().getStyle(), token.getValue().getFont());
+				getTheme().update(token.getKey(), at);
+				setTheme(fSelectedTheme);
+			}
+		});
 
 		TableViewerColumn column = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tokenName = column.getColumn();
@@ -680,32 +708,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				createButton(table, items[i], 2, commit.getValue().getBackground());
 			createFontStyle(table, items[i], commit.getValue());
 		}
-		table.addMouseListener(new MouseAdapter()
-		{
-			@Override
-			public void mouseDown(MouseEvent e)
-			{
-				// If user is clicking in the BG column when it's empty, pop open a color dialog
-				int myX = table.getColumn(0).getWidth();
-				myX += table.getColumn(1).getWidth();
-				int width = table.getColumn(2).getWidth() + 2;
-				if (!(e.x > myX && e.x < (myX + width)))
-					return;
-				TableItem tableItem = table.getItem(new Point(e.x, e.y));
-				ColorDialog colorDialog = new ColorDialog(table.getShell());
-				colorDialog.setRGB(getTheme().getBackground());
-				RGB newRGB = colorDialog.open();
-				if (newRGB == null)
-					return;
-				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) tableItem.getData();
-				Color fg = token.getValue().getForeground();
-				Color bg = ThemePlugin.getDefault().getColorManager().getColor(newRGB);
-
-				TextAttribute at = new TextAttribute(fg, bg, token.getValue().getStyle(), token.getValue().getFont());
-				getTheme().update(token.getKey(), at);
-				setTheme(fSelectedTheme);
-			}
-		});
 	}
 
 	private void clearTableEditors()
@@ -996,8 +998,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			File themeFile = new File(path);
 			editorSettings.put(THEME_EXPORT_DIRECTORY, themeFile.getParent());
 
-			Theme theme = getThemeManager().getCurrentTheme();
-			new ThemeExporter().export(themeFile, theme);
+			new ThemeExporter().export(themeFile, getTheme());
 		}
 		else if (source == fAddTokenButton)
 		{

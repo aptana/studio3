@@ -22,7 +22,7 @@ public class SSHFTPClientTemp extends SSHFTPClient
 		try
 		{
 			// SSHFTPClient is obfuscated, so internal private SftpClient property is strangely named.
-			Field f = SSHFTPClient.class.getDeclaredField("€"); //$NON-NLS-1$
+			Field f = SSHFTPClient.class.getDeclaredField("Ã„"); //$NON-NLS-1$
 			f.setAccessible(true);
 			SftpClient sftp = (SftpClient) f.get(this);
 			return sftp == null ? false : !sftp.isClosed();

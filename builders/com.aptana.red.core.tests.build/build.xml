@@ -133,7 +133,7 @@
           target: wipe.plugins                      
          - - - - - - - - - - - - - - - - - -->
 	<target name="wipe.plugins" unless="dont.wipe.plugins">
-		<delete verbose="true">
+		<delete verbose="false">
 			<fileset dir="${buildDirectory}/plugins">
 				<include name="**/*" />
 			</fileset>

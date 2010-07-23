@@ -74,13 +74,10 @@ public abstract class CSSColors
 			int blue = Integer.decode(HASH + color.substring(2, 3) + color.substring(2, 3));
 			return new RGB(red, green, blue);
 		}
-		else
-		{
-			int red = Integer.decode(HASH + color.substring(0, 2));
-			int green = Integer.decode(HASH + color.substring(2, 4));
-			int blue = Integer.decode(HASH + color.substring(4, 6));
-			return new RGB(red, green, blue);
-		}
+		int red = Integer.decode(HASH + color.substring(0, 2));
+		int green = Integer.decode(HASH + color.substring(2, 4));
+		int blue = Integer.decode(HASH + color.substring(4, 6));
+		return new RGB(red, green, blue);
 	}
 
 	public static String to6CharHexWithLeadingHash(String color)
@@ -98,10 +95,7 @@ public abstract class CSSColors
 			return (HASH + color.charAt(0) + color.charAt(0) + color.charAt(1) + color.charAt(1) + color.charAt(2) + color
 					.charAt(2)).toUpperCase();
 		}
-		else
-		{
-			return HASH + color.toUpperCase();
-		}
+		return HASH + color.toUpperCase();
 	}
 
 	public static Image toImage(String color, int height, int width)
