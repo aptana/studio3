@@ -10,5 +10,13 @@
             name="Plugins">
       </processor>
    </extension>
-
+   <extension
+       point="com.aptana.portal.ui.browserInteractions">
+       <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.PluginsActionController"
+            configurationProcessor="com.aptana.portal.plugins.processor"
+            id="portal.plugins"
+            name="Plugins Actions">
+      </actionController>
+   </extension>
 </plugin>

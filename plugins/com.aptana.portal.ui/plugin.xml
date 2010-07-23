@@ -71,12 +71,6 @@
             name="Ruby Gems Actions">
       </actionController>
       <actionController
-            class="com.aptana.portal.ui.dispatch.actionControllers.PluginsActionController"
-            configurationProcessor="com.aptana.portal.plugins.processor"
-            id="portal.plugins"
-            name="Plugins Actions">
-      </actionController>
-      <actionController
             class="com.aptana.portal.ui.dispatch.actionControllers.SystemActionController"
             configurationProcessor="com.aptana.portal.versions.processor"
             id="portal.system.versions"
