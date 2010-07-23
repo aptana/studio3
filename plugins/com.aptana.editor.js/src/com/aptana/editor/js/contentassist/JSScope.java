@@ -24,7 +24,7 @@ public class JSScope
 	{
 		this._object = new JSObject();
 	}
-	
+
 	/**
 	 * addScope
 	 * 
@@ -54,7 +54,7 @@ public class JSScope
 						Math.min(this.getRange().getStartingOffset(), scope.getRange().getStartingOffset()), //
 						Math.max(this.getRange().getEndingOffset(), scope.getRange().getEndingOffset()) //
 					) //
-				);
+					);
 			}
 		}
 	}
@@ -68,7 +68,7 @@ public class JSScope
 	public void addSymbol(String name, JSNode value)
 	{
 		JSObject property;
-		
+
 		if (this._object.hasProperty(name))
 		{
 			property = this._object.getProperty(name);
@@ -76,10 +76,10 @@ public class JSScope
 		else
 		{
 			property = new JSObject();
-			
+
 			this._object.setProperty(name, property);
 		}
-		
+
 		property.addValue(value);
 	}
 
@@ -119,6 +119,16 @@ public class JSScope
 	public List<String> getLocalSymbolNames()
 	{
 		return this._object.getPropertyNames();
+	}
+
+	/**
+	 * getObject
+	 * 
+	 * @return
+	 */
+	public JSObject getObject()
+	{
+		return this._object;
 	}
 
 	/**
@@ -194,7 +204,7 @@ public class JSScope
 
 		return current;
 	}
-	
+
 	/**
 	 * getSymbol
 	 * 
