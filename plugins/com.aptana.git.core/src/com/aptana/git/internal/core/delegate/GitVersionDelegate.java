@@ -33,10 +33,14 @@ public class GitVersionDelegate extends AbstractProcessorDelegate
 		String command = supportedCommands.get(commandType);
 		if (command != null)
 		{
-			IPath gitPath = GitExecutable.instance().path();
-			if (gitPath != null)
+			GitExecutable gitExecutable = GitExecutable.instance();
+			if (gitExecutable != null)
 			{
-				return ProcessUtil.outputForCommand(gitPath.toString(), workingDir, command);
+				IPath gitPath = gitExecutable.path();
+				if (gitPath != null)
+				{
+					return ProcessUtil.outputForCommand(gitPath.toString(), workingDir, command);
+				}
 			}
 		}
 		return null;
