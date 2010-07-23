@@ -29,7 +29,10 @@ public class JSObject
 				this._types = new ArrayList<String>();
 			}
 			
-			this._types.add(type);
+			if (this._types.contains(type) == false)
+			{
+				this._types.add(type);
+			}
 		}
 	}
 	
