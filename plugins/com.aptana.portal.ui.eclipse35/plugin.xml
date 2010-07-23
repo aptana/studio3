@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="com.aptana.configurations.configurationProcessors">
+      <processor
+            category="plugins"
+            class="com.aptana.portal.ui.eclipse35.dispatch.configurationProcessors.PluginsConfigurationProcessor"
+            id="com.aptana.portal.plugins.processor"
+            name="Plugins">
+      </processor>
+   </extension>
+
+</plugin>
