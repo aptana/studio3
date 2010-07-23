@@ -69,13 +69,13 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 		// create new type and give it a unique name
 		TypeElement result = new TypeElement();
 		result.setName(JSContentAssistUtil.getUniqueTypeName());
-		
+
 		// save type for future reference
 		if (this._generatedTypes == null)
 		{
 			this._generatedTypes = new ArrayList<TypeElement>();
 		}
-		
+
 		this._generatedTypes.add(result);
 
 		return result;
@@ -351,7 +351,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 			{
 				type.addProperty(property);
 			}
-			
+
 			// write generated types
 			if (this._generatedTypes != null)
 			{
@@ -359,7 +359,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 				{
 					this._indexWriter.writeType(index, generatedType, location);
 				}
-				
+
 				this._generatedTypes.clear();
 			}
 
