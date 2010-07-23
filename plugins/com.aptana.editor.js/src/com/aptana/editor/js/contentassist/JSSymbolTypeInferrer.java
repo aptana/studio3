@@ -42,6 +42,50 @@ public class JSSymbolTypeInferrer
 	}
 
 	/**
+	 * createPropertyElement
+	 * 
+	 * @param types
+	 * @return
+	 */
+	private PropertyElement createPropertyElement(Set<String> types)
+	{
+		PropertyElement result;
+
+		if (types != null && types.size() > 0)
+		{
+			boolean hasFunction = false;
+			boolean hasNonFunction = false;
+
+			for (String type : types)
+			{
+				if (type.startsWith(JSTypeConstants.FUNCTION))
+				{
+					hasFunction = true;
+				}
+				else
+				{
+					hasNonFunction = true;
+				}
+			}
+
+			if (hasFunction && hasNonFunction == false)
+			{
+				result = new FunctionElement();
+			}
+			else
+			{
+				result = new PropertyElement();
+			}
+		}
+		else
+		{
+			result = new PropertyElement();
+		}
+
+		return result;
+	}
+
+	/**
 	 * generateType
 	 * 
 	 * @return
@@ -189,7 +233,7 @@ public class JSSymbolTypeInferrer
 
 			// add types to property
 			result = this.createPropertyElement(types);
-			
+
 			for (String typeName : types)
 			{
 				result.addType(typeName);
@@ -203,50 +247,6 @@ public class JSSymbolTypeInferrer
 		// set name
 		result.setName(symbol);
 
-		return result;
-	}
-
-	/**
-	 * createPropertyElement
-	 * 
-	 * @param types
-	 * @return
-	 */
-	private PropertyElement createPropertyElement(Set<String> types)
-	{
-		PropertyElement result;
-		
-		if (types != null && types.size() > 0)
-		{
-			boolean hasFunction = false;
-			boolean hasNonFunction = false;
-			
-			for (String type : types)
-			{
-				if (type.startsWith(JSTypeConstants.FUNCTION))
-				{
-					hasFunction = true;
-				}
-				else
-				{
-					hasNonFunction = true;
-				}
-			}
-			
-			if (hasFunction && hasNonFunction == false)
-			{
-				result = new FunctionElement();
-			}
-			else
-			{
-				result = new PropertyElement();
-			}
-		}
-		else
-		{
-			result = new PropertyElement();
-		}
-		
 		return result;
 	}
 
