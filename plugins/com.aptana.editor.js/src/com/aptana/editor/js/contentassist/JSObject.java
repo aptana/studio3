@@ -163,6 +163,16 @@ public class JSObject
 	}
 
 	/**
+	 * hasTypes
+	 * 
+	 * @return
+	 */
+	public boolean hasTypes()
+	{
+		 return this._types != null && this._types.isEmpty() == false;
+	}
+	
+	/**
 	 * setProperty
 	 * 
 	 * @param name
