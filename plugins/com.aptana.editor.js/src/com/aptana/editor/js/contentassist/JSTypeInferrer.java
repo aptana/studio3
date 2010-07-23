@@ -16,7 +16,6 @@ import com.aptana.editor.js.contentassist.index.JSIndexWriter;
 import com.aptana.editor.js.contentassist.model.BaseElement;
 import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
-import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
@@ -46,13 +45,10 @@ import com.aptana.editor.js.parsing.ast.JSStringNode;
 import com.aptana.editor.js.parsing.ast.JSTreeWalker;
 import com.aptana.editor.js.parsing.ast.JSTrueNode;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
-import com.aptana.editor.js.sdoc.model.ExampleTag;
 import com.aptana.editor.js.sdoc.model.ParamTag;
-import com.aptana.editor.js.sdoc.model.ReturnTag;
 import com.aptana.editor.js.sdoc.model.Tag;
 import com.aptana.editor.js.sdoc.model.TagType;
 import com.aptana.editor.js.sdoc.model.Type;
-import com.aptana.editor.js.sdoc.model.TypeTag;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.ast.IParseNode;
 
@@ -65,109 +61,6 @@ public class JSTypeInferrer extends JSTreeWalker
 	private List<String> _types;
 	private JSIndexQueryHelper _indexHelper;
 	private List<TypeElement> _generatedTypes;
-
-	/**
-	 * applyDocumentation
-	 * 
-	 * @param function
-	 * @param block
-	 */
-	protected static void applyDocumentation(FunctionElement function, DocumentationBlock block)
-	{
-		if (block != null)
-		{
-			// apply description
-			function.setDescription(block.getText());
-
-			// apply parameters
-			for (Tag tag : block.getTags(TagType.PARAM))
-			{
-				ParamTag paramTag = (ParamTag) tag;
-				ParameterElement parameter = new ParameterElement();
-
-				parameter.setName(paramTag.getName());
-				parameter.setDescription(paramTag.getText());
-				parameter.setUsage(paramTag.getUsage().getName());
-
-				for (Type type : paramTag.getTypes())
-				{
-					parameter.addType(type.toSource());
-				}
-
-				function.addParameter(parameter);
-			}
-
-			// apply return types
-			for (Tag tag : block.getTags(TagType.RETURN))
-			{
-				ReturnTag returnTag = (ReturnTag) tag;
-
-				for (Type type : returnTag.getTypes())
-				{
-					ReturnTypeElement returnType = new ReturnTypeElement();
-
-					returnType.setType(type.toSource());
-					returnType.setDescription(returnTag.getText());
-
-					function.addReturnType(returnType);
-				}
-			}
-
-			// apply examples
-			for (Tag tag : block.getTags(TagType.EXAMPLE))
-			{
-				ExampleTag exampleTag = (ExampleTag) tag;
-
-				function.addExample(exampleTag.getText());
-			}
-		}
-	}
-
-	/**
-	 * applyDocumentation
-	 * 
-	 * @param property
-	 * @param block
-	 */
-	protected static void applyDocumentation(PropertyElement property, DocumentationBlock block)
-	{
-		if (property instanceof FunctionElement)
-		{
-			applyDocumentation((FunctionElement) property, block);
-		}
-		else
-		{
-			if (block != null)
-			{
-				// apply description
-				property.setDescription(block.getText());
-
-				// apply types
-				for (Tag tag : block.getTags(TagType.TYPE))
-				{
-					TypeTag typeTag = (TypeTag) tag;
-
-					for (Type type : typeTag.getTypes())
-					{
-						ReturnTypeElement returnType = new ReturnTypeElement();
-
-						returnType.setType(type.toSource());
-						returnType.setDescription(typeTag.getText());
-
-						property.addType(returnType);
-					}
-				}
-
-				// apply examples
-				for (Tag tag : block.getTags(TagType.EXAMPLE))
-				{
-					ExampleTag exampleTag = (ExampleTag) tag;
-
-					property.addExample(exampleTag.getText());
-				}
-			}
-		}
-	}
 
 	/**
 	 * clearTypeCache
@@ -215,7 +108,7 @@ public class JSTypeInferrer extends JSTreeWalker
 
 				if (block != null)
 				{
-					applyDocumentation(property, block);
+					JSTypeUtil.applyDocumentation(property, block);
 				}
 				else
 				{
@@ -301,86 +194,45 @@ public class JSTypeInferrer extends JSTreeWalker
 	/**
 	 * addIdentifierTypes
 	 * 
-	 * @param name
 	 * @param identifierNode
 	 */
-	private void addIdentifierTypes(String name, JSIdentifierNode identifierNode)
+	private void addParameterTypes(JSIdentifierNode identifierNode)
 	{
 		IParseNode parent = identifierNode.getParent();
+		IParseNode grandparent = (parent != null) ? parent.getParent() : null;
+		boolean foundType = false;
 
-		if (parent.getNodeType() == JSNodeTypes.PARAMETERS)
+		if (grandparent != null && grandparent.getNodeType() == JSNodeTypes.FUNCTION)
 		{
-			IParseNode grandparent = parent.getParent();
-			int typeCount = this.getTypes().size();
+			DocumentationBlock docs = ((JSNode) grandparent).getDocumentation();
 
-			if (grandparent.getNodeType() == JSNodeTypes.FUNCTION)
+			if (docs != null)
 			{
-				DocumentationBlock docs = ((JSNode) grandparent).getDocumentation();
+				String name = identifierNode.getText();
+				int index = identifierNode.getIndex();
+				List<Tag> params = docs.getTags(TagType.PARAM);
 
-				if (docs != null)
+				if (params != null && index < params.size())
 				{
-					int index = identifierNode.getIndex();
-					List<Tag> params = docs.getTags(TagType.PARAM);
+					ParamTag param = (ParamTag) params.get(index);
 
-					if (params != null && index < params.size())
+					if (name.equals(param.getName()))
 					{
-						ParamTag param = (ParamTag) params.get(index);
-
-						if (name.equals(param.getName()))
+						for (Type parameterType : param.getTypes())
 						{
-							for (Type parameterType : param.getTypes())
-							{
-								this.addType(parameterType.getName());
-							}
+							this.addType(parameterType.getName());
+							foundType = true;
 						}
 					}
 				}
 			}
-
-			// Use "Object" as parameter type if we didn't find types by other
-			// means
-			if (this.getTypes().size() == typeCount)
-			{
-				this.addType(JSTypeConstants.OBJECT);
-			}
 		}
-		else if (identifierNode.getText().equals(name) == false) // prevent recursion
+		
+		// Use "Object" as parameter type if we didn't find types by other
+		// means
+		if (foundType == false)
 		{
-			identifierNode.accept(this);
-		}
-	}
-
-	/**
-	 * addNonIdentifierTypes
-	 * 
-	 * @param node
-	 */
-	private void addNonIdentifierTypes(JSNode node)
-	{
-		DocumentationBlock block = node.getDocumentation();
-
-		if (block != null)
-		{
-			if (node instanceof JSFunctionNode)
-			{
-				FunctionElement function = new FunctionElement();
-
-				applyDocumentation(function, block);
-
-				this.addType(function.getSignature());
-			}
-			else
-			{
-				PropertyElement property = new PropertyElement();
-
-				applyDocumentation(property, block);
-
-				this.addTypes(property.getTypeNames());
-			}
-		}
-		else
-		{
-			node.accept(this);
+			this.addType(JSTypeConstants.OBJECT);
 		}
 	}
 
@@ -829,63 +681,41 @@ public class JSTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSFunctionNode node)
 	{
-		String type = this.getNodeType(node);
+		List<String> types = new ArrayList<String>();
+		JSScope scope = this.getActiveScope(node.getBody().getStartingOffset());
+		boolean foundReturnExpression = false;
 
-		if (type == null)
+		// infer return types
+		for (JSReturnNode returnValue : this.getReturnNodes(node))
 		{
-			DocumentationBlock block = node.getDocumentation();
-			
-			if (block != null)
+			IParseNode expression = returnValue.getExpression();
+
+			if (expression.isEmpty() == false)
 			{
-				FunctionElement function = new FunctionElement();
-				
-				applyDocumentation(function, block);
-				
-				type = function.getSignature();
+				foundReturnExpression = true;
+
+				types.addAll(this.getTypes(expression, scope));
 			}
-			else
-			{
-				// We store the default function type to prevent infinite
-				// recursion in potential invoke cycles
-				this.putNodeType(node, JSTypeConstants.FUNCTION);
-	
-				List<String> types = new ArrayList<String>();
-				JSScope scope = this.getActiveScope(node.getBody().getStartingOffset());
-				boolean foundReturnExpression = false;
-	
-				// infer return types
-				for (JSReturnNode returnValue : this.getReturnNodes(node))
-				{
-					IParseNode expression = returnValue.getExpression();
-	
-					if (expression.isEmpty() == false)
-					{
-						foundReturnExpression = true;
-	
-						types.addAll(this.getTypes(expression, scope));
-					}
-				}
-	
-				// build function type, including return values
-				if (types.isEmpty() == false)
-				{
-					type = JSTypeConstants.FUNCTION + ":" + StringUtil.join(",", types); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-				else if (foundReturnExpression)
-				{
-					// If we couldn't infer a return type and we had a return
-					// expression, then at least return Object from this function
-					type = JSTypeConstants.FUNCTION + ":" + JSTypeConstants.OBJECT; //$NON-NLS-1$
-				}
-				else
-				{
-					type = JSTypeConstants.FUNCTION;
-				}
-			}
-			
-			this.putNodeType(node, type);
 		}
 
+		String type;
+		
+		// build function type, including return values
+		if (types.isEmpty() == false)
+		{
+			type = JSTypeConstants.FUNCTION + ":" + StringUtil.join(",", types); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		else if (foundReturnExpression)
+		{
+			// If we couldn't infer a return type and we had a return
+			// expression, then have it return Object
+			type = JSTypeConstants.FUNCTION + ":" + JSTypeConstants.OBJECT; //$NON-NLS-1$
+		}
+		else
+		{
+			type = JSTypeConstants.FUNCTION;
+		}
+		
 		this.addType(type);
 	}
 
@@ -996,25 +826,23 @@ public class JSTypeInferrer extends JSTreeWalker
 
 		if (this._scope != null && this._scope.hasSymbol(name))
 		{
-			JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(this._index, this._scope);
+			IParseNode parent = node.getParent();
 			
-			property = symbolInferrer.getSymbolPropertyElement(name);
-			
-			// TODO: need to write out the generated types to make them visible to CA!
-			
-//			List<JSNode> symbolNodes = object.getValues();
-//
-//			for (JSNode symbolNode : symbolNodes)
-//			{
-//				if (symbolNode instanceof JSIdentifierNode)
-//				{
-//					this.addIdentifierTypes(name, (JSIdentifierNode) symbolNode);
-//				}
-//				else
-//				{
-//					this.addNonIdentifierTypes(symbolNode);
-//				}
-//			}
+			if (parent != null && parent.getNodeType() == JSNodeTypes.PARAMETERS)
+			{
+				// special handling of parameters to potentially get the type
+				// from documentation and to prevent an infinite loop since
+				// parameters point to themselves in the symbol table
+				this.addParameterTypes(node);
+			}
+			else
+			{
+				JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(this._index, this._scope);
+				
+				property = symbolInferrer.getSymbolPropertyElement(name);
+				
+				// TODO: need to write out the generated types to make them visible to CA!
+			}
 		}
 		else
 		{
