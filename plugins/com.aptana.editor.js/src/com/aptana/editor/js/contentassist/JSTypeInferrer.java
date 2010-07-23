@@ -1,5 +1,6 @@
 package com.aptana.editor.js.contentassist;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -51,27 +52,22 @@ public class JSTypeInferrer extends JSTreeWalker
 {
 	private JSScope _scope;
 	private Index _index;
+	private URI _location;
 	private List<String> _types;
 	private JSIndexQueryHelper _indexHelper;
-
-	/**
-	 * JSTypeWalker
-	 */
-	public JSTypeInferrer(JSScope scope)
-	{
-		this(scope, null);
-	}
 
 	/**
 	 * JSTypeWalker
 	 * 
 	 * @param scope
 	 * @param projectIndex
+	 * @param location
 	 */
-	public JSTypeInferrer(JSScope scope, Index projectIndex)
+	public JSTypeInferrer(JSScope scope, Index projectIndex, URI location)
 	{
 		this._scope = scope;
 		this._index = projectIndex;
+		this._location = location;
 		this._indexHelper = new JSIndexQueryHelper();
 	}
 
@@ -313,7 +309,7 @@ public class JSTypeInferrer extends JSTreeWalker
 		if (node instanceof JSNode)
 		{
 			// create new nested walker
-			JSTypeInferrer walker = new JSTypeInferrer(scope, this._index);
+			JSTypeInferrer walker = new JSTypeInferrer(scope, this._index, this._location);
 
 			// collect types
 			walker.visit((JSNode) node);
@@ -628,11 +624,9 @@ public class JSTypeInferrer extends JSTreeWalker
 			}
 			else
 			{
-				JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(this._index, this._scope);
+				JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(this._scope, this._index, this._location);
 				
 				property = symbolInferrer.getSymbolPropertyElement(name);
-				
-				// TODO: need to write out the generated types to make them visible to CA!
 			}
 		}
 		else

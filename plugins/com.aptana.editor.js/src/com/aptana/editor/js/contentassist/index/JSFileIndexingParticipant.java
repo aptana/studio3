@@ -207,7 +207,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 			TypeElement type = new TypeElement();
 			type.setName("Window"); //$NON-NLS-1$
 			
-			JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(index, globals);
+			JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(globals, index, location);
 
 			// add declared variables and functions from the global scope
 			for (PropertyElement property : symbolInferrer.getScopeProperties())
@@ -216,7 +216,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 			}
 
 			// // include any assignments to Window
-			// for (PropertyElement property : processWindowAssignments(index, globals))
+			// for (PropertyElement property : processWindowAssignments(index, globals, location))
 			// {
 			// type.addProperty(property);
 			// }
@@ -226,14 +226,6 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 			{
 				type.addProperty(property);
 			}
-
-			// write generated types
-			for (TypeElement generatedType : JSSymbolTypeInferrer.getGeneratedTypes())
-			{
-				this._indexWriter.writeType(index, generatedType, location);
-			}
-			
-			JSSymbolTypeInferrer.clearGeneratedTypes();
 
 			// write new Window type to index
 			this._indexWriter.writeType(index, type, location);
@@ -245,9 +237,10 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 	 * 
 	 * @param index
 	 * @param symbols
+	 * @param location
 	 */
 	@SuppressWarnings("unchecked")
-	private List<PropertyElement> processWindowAssignments(Index index, JSScope symbols)
+	private List<PropertyElement> processWindowAssignments(Index index, JSScope symbols, URI location)
 	{
 		List<PropertyElement> properties = new ArrayList<PropertyElement>();
 
@@ -263,7 +256,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 			for (IParseNode lhs : leftHandSides)
 			{
 				IParseNode rhs = lhs.getNextSibling();
-				JSTypeInferrer walker = new JSTypeInferrer(symbols, index);
+				JSTypeInferrer walker = new JSTypeInferrer(symbols, index, location);
 
 				((JSNode) rhs).accept(walker);
 

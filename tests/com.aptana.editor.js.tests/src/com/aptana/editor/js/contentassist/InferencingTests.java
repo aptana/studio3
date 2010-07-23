@@ -63,7 +63,7 @@ public class InferencingTests extends TestCase
 	 */
 	protected List<String> getTypes(JSScope globals, JSNode node)
 	{
-		JSTypeInferrer walker = new JSTypeInferrer(globals, null);
+		JSTypeInferrer walker = new JSTypeInferrer(globals, null, null);
 		
 		node.accept(walker);
 		
@@ -82,7 +82,7 @@ public class InferencingTests extends TestCase
 		
 		for (IParseNode node : nodes)
 		{
-			JSTypeInferrer walker = new JSTypeInferrer(globals, null);
+			JSTypeInferrer walker = new JSTypeInferrer(globals, null, null);
 			
 			assertTrue(node instanceof JSNode);
 			
@@ -110,7 +110,7 @@ public class InferencingTests extends TestCase
 		
 		// NOTE: getting property elements of all symbols in the specified scope
 		// as a side-effect caches each JSObject's type values.
-		JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(null, globals);
+		JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(globals, null, null);
 		symbolInferrer.getScopeProperties();
 		
 		List<String> symbolTypes = object.getTypes();

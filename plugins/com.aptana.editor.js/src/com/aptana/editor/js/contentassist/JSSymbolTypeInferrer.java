@@ -1,7 +1,7 @@
 package com.aptana.editor.js.contentassist;
 
+import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.aptana.editor.js.JSTypeConstants;
+import com.aptana.editor.js.contentassist.index.JSIndexWriter;
 import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
@@ -26,33 +27,23 @@ import com.aptana.index.core.Index;
 public class JSSymbolTypeInferrer
 {
 	private static final EnumSet<ContentSelector> MEMBER_CONTENT = EnumSet.of(ContentSelector.NAME, ContentSelector.TYPES, ContentSelector.RETURN_TYPES);
-	private static List<TypeElement> GENERATED_TYPES;
-	private static final Object TYPE_LOCK = new Object();
 
 	private Index _index;
 	private JSScope _activeScope;
+	private URI _location;
+	private JSIndexWriter _writer;
 
 	/**
 	 * JSSymbolTypeInferrer
-	 * 
-	 * @param index
 	 * @param activeScope
+	 * @param index
+	 * @param location
 	 */
-	public JSSymbolTypeInferrer(Index index, JSScope activeScope)
+	public JSSymbolTypeInferrer(JSScope activeScope, Index index, URI location)
 	{
 		this._index = index;
 		this._activeScope = activeScope;
-	}
-
-	/**
-	 * clearGeneratedTypes
-	 */
-	public static void clearGeneratedTypes()
-	{
-		synchronized (TYPE_LOCK)
-		{
-			GENERATED_TYPES = null;
-		}
+		this._location = location;
 	}
 	
 	/**
@@ -121,17 +112,6 @@ public class JSSymbolTypeInferrer
 			}
 		}
 
-		synchronized (TYPE_LOCK)
-		{
-			// save type for future reference
-			if (GENERATED_TYPES == null)
-			{
-				GENERATED_TYPES = new ArrayList<TypeElement>();
-			}
-	
-			GENERATED_TYPES.add(result);
-		}
-
 		return result;
 	}
 
@@ -159,30 +139,6 @@ public class JSSymbolTypeInferrer
 		}
 
 		return additionalProperties;
-	}
-
-	/**
-	 * getGeneratedTypes
-	 * 
-	 * @return
-	 */
-	public static List<TypeElement> getGeneratedTypes()
-	{
-		List<TypeElement> result;
-		
-		synchronized (TYPE_LOCK)
-		{
-			if (GENERATED_TYPES != null)
-			{
-				result = new ArrayList<TypeElement>(GENERATED_TYPES);
-			}
-			else
-			{
-				result = Collections.emptyList();
-			}
-		}
-
-		return result;
 	}
 
 	/**
@@ -355,6 +311,8 @@ public class JSSymbolTypeInferrer
 
 					subType.addProperty(pe);
 				}
+				
+				this.writeType(subType);
 			}
 		}
 
@@ -401,7 +359,7 @@ public class JSSymbolTypeInferrer
 			}
 			else
 			{
-				JSTypeInferrer inferrer = new JSTypeInferrer(this._activeScope);
+				JSTypeInferrer inferrer = new JSTypeInferrer(this._activeScope, this._index, this._location);
 
 				if (isFunction)
 				{
@@ -423,5 +381,20 @@ public class JSSymbolTypeInferrer
 				types.addAll(inferrer.getTypes());
 			}
 		}
+	}
+	
+	/**
+	 * writeType
+	 * 
+	 * @param type
+	 */
+	private void writeType(TypeElement type)
+	{
+		if (this._writer == null)
+		{
+			this._writer = new JSIndexWriter();
+		}
+		
+		this._writer.writeType(this._index, type, this._location);
 	}
 }
