@@ -1,6 +1,7 @@
 package com.aptana.editor.js.contentassist;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.aptana.core.util.StringUtil;
@@ -135,6 +136,33 @@ public class JSModelFormatter
 	}
 
 	/**
+	 * addTypes
+	 * 
+	 * @param buffer
+	 * @param types
+	 */
+	private static void addTypes(StringBuilder buffer, List<String> types)
+	{
+		buffer.append(" : ");
+		
+		if (types != null && types.size() > 0)
+		{
+			List<String> typeDisplayNames = new ArrayList<String>();
+
+			for (String type : types)
+			{
+				typeDisplayNames.add(getTypeDisplayName(type));
+			}
+
+			buffer.append(StringUtil.join(",", typeDisplayNames));
+		}
+		else
+		{
+			buffer.append("undefined");
+		}
+	}
+
+	/**
 	 * formatFunction
 	 * 
 	 * @param function
@@ -145,8 +173,10 @@ public class JSModelFormatter
 	{
 		StringBuilder buffer = new StringBuilder();
 
-		buffer.append(function.toSource());
+		buffer.append(function.getName());
+		buffer.append("(").append(StringUtil.join(", ", function.getParameterTypes())).append(")");
 
+		addTypes(buffer, function.getTypeNames());
 		addDescription(buffer, function);
 		addExamples(buffer, function.getExamples());
 		addDefiningFiles(buffer, function, projectURI);
@@ -170,9 +200,9 @@ public class JSModelFormatter
 		}
 
 		StringBuilder buffer = new StringBuilder();
+		buffer.append(property.getName());
 
-		buffer.append(property.toSource()); //$NON-NLS-1$ //$NON-NLS-2$
-
+		addTypes(buffer, property.getTypeNames());
 		addDescription(buffer, property);
 		addExamples(buffer, property.getExamples());
 		addDefiningFiles(buffer, property, projectURI);
@@ -226,9 +256,9 @@ public class JSModelFormatter
 			{
 				result = type.substring(JSTypeConstants.GENERIC_CLASS_OPEN.length(), type.length() - 1);
 			}
-			else if (type.startsWith(JSTypeWalker.DYNAMIC_CLASS_PREFIX))
+			else if (type.startsWith(JSTypeConstants.DYNAMIC_CLASS_PREFIX))
 			{
-				result = JSTypeConstants.OBJECT;
+				result = "UserType";
 			}
 			else
 			{
