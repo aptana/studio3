@@ -103,9 +103,18 @@ public class InferencingTests extends TestCase
 	public void assignmentTypeTests(String source, String... types)
 	{
 		JSScope globals = this.getGlobals(source);
+		assertNotNull(globals);
+		
 		JSObject object = globals.getSymbol("abc");
+		assertNotNull(object);
+		
+		// NOTE: getting property elements of all symbols in the specified scope
+		// as a side-effect caches each JSObject's type values.
+		JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(null, globals);
+		symbolInferrer.getScopeProperties();
 		
 		List<String> symbolTypes = object.getTypes();
+		assertNotNull(symbolTypes);
 		assertNotNull(types);
 		assertEquals(types.length, symbolTypes.size());
 		
@@ -591,7 +600,7 @@ public class InferencingTests extends TestCase
 	 */
 	public void testPlusAssignMixed()
 	{
-		this.assignmentTypeTests("var abc = 10; abc += '20'", "String");
+		this.assignmentTypeTests("var abc = 10; abc += '20'", "Number", "String");
 	}
 	
 	/**
