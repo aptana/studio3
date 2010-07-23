@@ -22,20 +22,22 @@ public class JSObject
 	 */
 	public void addType(String type)
 	{
-		if (type != null && type.length() > 0)
+		// NOTE: Type caching is used to prevent redundant inferencing and more
+		// importantly to prevent infinite recursion with some constructs. We
+		// allow empty types to generate a new array, but we don't add them to
+		// it. This indicates that this object's types have been inferred. See
+		// JSObject#hasTypes for more info
+		if (this._types == null)
 		{
-			if (this._types == null)
-			{
-				this._types = new ArrayList<String>();
-			}
-			
-			if (this._types.contains(type) == false)
-			{
-				this._types.add(type);
-			}
+			this._types = new ArrayList<String>();
+		}
+
+		if (type != null && type.length() > 0 && this._types.contains(type) == false)
+		{
+			this._types.add(type);
 		}
 	}
-	
+
 	/**
 	 * addValue
 	 * 
@@ -61,7 +63,7 @@ public class JSObject
 	{
 		this._types = null;
 	}
-	
+
 	/**
 	 * getProperty
 	 * 
@@ -88,7 +90,7 @@ public class JSObject
 	public List<String> getPropertyNames()
 	{
 		List<String> result;
-		
+
 		if (this._properties != null)
 		{
 			result = new ArrayList<String>(this._properties.keySet());
@@ -97,10 +99,10 @@ public class JSObject
 		{
 			result = Collections.emptyList();
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getTypes
 	 * 
@@ -109,15 +111,15 @@ public class JSObject
 	public List<String> getTypes()
 	{
 		List<String> result = this._types;
-		
+
 		if (result == null)
 		{
 			result = Collections.emptyList();
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getValues
 	 * 
@@ -177,9 +179,13 @@ public class JSObject
 	 */
 	public boolean hasTypes()
 	{
-		 return this._types != null && this._types.isEmpty() == false;
+		// NOTE: Type caching is used to prevent redundant inferencing and more
+		// importantly to prevent infinite recursion with some constructs. A
+		// non-null types array is all we need to consider that this object has
+		// cached types so we don't the length in this predicate
+		return this._types != null;
 	}
-	
+
 	/**
 	 * setProperty
 	 * 
