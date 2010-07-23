@@ -37,7 +37,6 @@ import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
-import com.aptana.parsing.Scope;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
@@ -190,7 +189,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		if (propertyNode != null)
 		{
 			JSGetPropertyNode node = (JSGetPropertyNode) propertyNode;
-			Scope<JSNode> localScope = this.getScopeAtOffset(offset);
+			JSScope localScope = this.getScopeAtOffset(offset);
 
 			if (localScope != null)
 			{
@@ -201,7 +200,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 				if (lhs instanceof JSNode)
 				{
-					JSTypeWalker typeWalker = new JSTypeWalker(localScope, this.getIndex());
+					JSTypeInferrer typeWalker = new JSTypeInferrer(localScope, this.getIndex());
 
 					typeWalker.visit((JSNode) lhs);
 
@@ -223,7 +222,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 						{
 							this.addTypeProperties(proposals, JSTypeConstants.FUNCTION, offset);
 						}
-						else if (type.startsWith("Array<"))
+						else if (type.startsWith(JSTypeConstants.GENERIC_ARRAY_OPEN))
 						{
 							this.addTypeProperties(proposals, JSTypeConstants.ARRAY, offset);
 						}
@@ -292,11 +291,11 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		if (this._targetNode != null)
 		{
 			String fileLocation = this.getFilename();
-			Scope<JSNode> globalScope = this.getGlobalScope();
+			JSScope globalScope = this.getGlobalScope();
 
 			if (globalScope != null)
 			{
-				Scope<JSNode> localScope = globalScope.getScopeAtOffset(offset);
+				JSScope localScope = globalScope.getScopeAtOffset(offset);
 
 				if (localScope != null)
 				{
@@ -306,7 +305,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					for (String symbol : symbols)
 					{
 						boolean isFunction = false;
-						List<JSNode> nodes = localScope.getSymbol(symbol);
+						JSObject object = localScope.getSymbol(symbol);
+						List<JSNode> nodes = object.getValues();
 
 						if (nodes != null)
 						{
@@ -353,8 +353,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
 			List<String> userAgentNames = property.getUserAgentNames();
 			Image[] userAgents = getUserAgentImages(userAgentNames);
+			String owningType = JSModelFormatter.getTypeDisplayName(property.getOwningType());
 
-			this.addProposal(proposals, name, image, description, userAgents, property.getOwningType(), offset);
+			this.addProposal(proposals, name, image, description, userAgents, owningType, offset);
 		}
 	}
 
@@ -510,9 +511,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * 
 	 * @return
 	 */
-	protected Scope<JSNode> getGlobalScope()
+	protected JSScope getGlobalScope()
 	{
-		Scope<JSNode> result = null;
+		JSScope result = null;
 
 		if (this._targetNode != null)
 		{
@@ -753,16 +754,16 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	protected Scope<JSNode> getScopeAtOffset(int offset)
+	protected JSScope getScopeAtOffset(int offset)
 	{
-		Scope<JSNode> result = null;
+		JSScope result = null;
 
 		// grab global scope
-		Scope<JSNode> global = this.getGlobalScope();
+		JSScope global = this.getGlobalScope();
 
 		if (global != null)
 		{
-			Scope<JSNode> candidate = global.getScopeAtOffset(offset);
+			JSScope candidate = global.getScopeAtOffset(offset);
 
 			result = (candidate != null) ? candidate : global;
 		}
