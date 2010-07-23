@@ -38,9 +38,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlinePage;
-import com.aptana.editor.common.outline.IParseListener;
 import com.aptana.editor.common.parsing.FileService;
-import com.aptana.editor.js.contentassist.JSTypeInferrer;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
 import com.aptana.editor.js.outline.JSOutlineLabelProvider;
 import com.aptana.editor.js.parsing.IJSParserConstants;
