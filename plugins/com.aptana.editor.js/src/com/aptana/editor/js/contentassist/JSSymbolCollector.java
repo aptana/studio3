@@ -134,12 +134,11 @@ public class JSSymbolCollector extends JSTreeWalker
 	public void visit(JSAssignmentNode node)
 	{
 		IParseNode lhs = node.getLeftHandSide();
-		IParseNode rhs = node.getRightHandSide();
 
 		switch (lhs.getNodeType())
 		{
 			case JSNodeTypes.IDENTIFIER:
-				this.addPropertyValue(lhs.getText(), (JSNode) rhs);
+				this.addPropertyValue(lhs.getText(), node);
 				break;
 
 			default:
