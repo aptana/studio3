@@ -111,11 +111,24 @@ public class PortalBrowserEditor extends WebBrowserEditor implements IBrowserVie
 				IBrowserNotificationConstants.DISPATCH_FUNCTION_NAME);
 		browserFunctions.add(dispatcherFunction);
 
-		browser.execute("console = {}; " //$NON-NLS-1$
-				+ "console.log   = function(msg) { dispatch($H({controller:\"console\", action:\"log\", args:msg.toJSON()}).toJSON()); }; " //$NON-NLS-1$
-				+ "console.debug = function(msg) { dispatch($H({controller:\"console\", action:\"log\", args:msg.toJSON()}).toJSON()); }"); //$NON-NLS-1$
+		boolean executionResult = browser
+				.execute("console = {}; " //$NON-NLS-1$
+						+ "console.log   = function(msg) {dispatch($H({controller:\"console\", action:\"log\", args:msg.toJSON()}).toJSON()); return false;};" //$NON-NLS-1$
+						+ "console.debug = function(msg) {dispatch($H({controller:\"console\", action:\"log\", args:msg.toJSON()}).toJSON()); return false;};"); //$NON-NLS-1$
+		/*
+		 * This custom error handler is needed when the Portal is viewed in the Studio internal browser. We also make a
+		 * call to window.onerror=customErrorHandler to hook the window.onerror event to this handler. We return false,
+		 * so the error will also propagate to other error handlers, in case registered.
+		 */
+		executionResult = browser.execute("function customErrorHandler(desc,page,line) { " + //$NON-NLS-1$
+				"dispatch($H({controller:\"console\", action:\"error\", args:[desc,page,line].toJSON()}).toJSON());" + //$NON-NLS-1$
+				"return false;};"); //$NON-NLS-1$
 		// Make sure that all the Javascript errors are being surfaced out of the internal browser.
-		browser.execute("window.onerror=customErrorHandler"); //$NON-NLS-1$
+		executionResult = browser.execute("window.onerror=customErrorHandler;"); //$NON-NLS-1$
+		if (!executionResult)
+		{
+			PortalUIPlugin.logError("Error registering the Portal browser functions", new IllegalStateException()); //$NON-NLS-1$
+		}
 	}
 
 	/**
