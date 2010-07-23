@@ -18,6 +18,8 @@ public class JSTypeConstants
 	public static final String GENERIC_ARRAY_OPEN = "Array<"; //$NON-NLS-1$
 
 	public static final String PARAMETER_TYPE_DELIMITER = "|"; //$NON-NLS-1$
+	
+	public static final String DYNAMIC_CLASS_PREFIX = "-dynamic-type-";  //$NON-NLS-1$
 
 	private JSTypeConstants()
 	{
