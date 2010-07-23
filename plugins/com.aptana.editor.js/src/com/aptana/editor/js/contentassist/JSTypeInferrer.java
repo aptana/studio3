@@ -1,6 +1,5 @@
 package com.aptana.editor.js.contentassist;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -10,13 +9,11 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.common.contentassist.UserAgentManager.UserAgent;
 import com.aptana.editor.js.JSTypeConstants;
-import com.aptana.editor.js.contentassist.index.JSIndexWriter;
 import com.aptana.editor.js.contentassist.model.BaseElement;
 import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
-import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.contentassist.model.UserAgentElement;
 import com.aptana.editor.js.parsing.ast.JSArrayNode;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
@@ -56,79 +53,6 @@ public class JSTypeInferrer extends JSTreeWalker
 	private Index _index;
 	private List<String> _types;
 	private JSIndexQueryHelper _indexHelper;
-	private List<TypeElement> _generatedTypes;
-
-	/**
-	 * getScopeProperties
-	 * 
-	 * @param scope
-	 * @param index
-	 * @param location
-	 * @return
-	 */
-	public static List<PropertyElement> getScopeProperties(JSScope scope, Index index, URI location)
-	{
-		List<PropertyElement> properties = new ArrayList<PropertyElement>();
-
-		for (String symbol : scope.getLocalSymbolNames())
-		{
-			JSObject object = scope.getSymbol(symbol);
-			List<JSNode> nodes = object.getValues();
-
-			if (nodes != null && nodes.isEmpty() == false)
-			{
-				// TODO: We may want to process all nodes and potentially create
-				// a new type that is the union of all types. For now last
-				// definition wins.
-				JSNode node = nodes.get(nodes.size() - 1);
-				
-				if (node instanceof JSObjectNode) continue;
-				
-				DocumentationBlock block = node.getDocumentation();
-				PropertyElement property = (node instanceof JSFunctionNode) ? new FunctionElement() : new PropertyElement();
-
-				property.setName(symbol);
-
-				if (block != null)
-				{
-					JSTypeUtil.applyDocumentation(property, block);
-				}
-				else
-				{
-					JSTypeInferrer walker = new JSTypeInferrer(scope, index);
-
-					node.accept(walker);
-
-					// write out any generated types
-					List<TypeElement> generatedTypes = walker.getGeneratedTypes();
-
-					if (generatedTypes.isEmpty() == false)
-					{
-						JSIndexWriter writer = new JSIndexWriter();
-
-						for (TypeElement type : walker.getGeneratedTypes())
-						{
-							writer.writeType(index, type, location);
-						}
-					}
-
-					// add property types
-					for (String propertyType : walker.getTypes())
-					{
-						ReturnTypeElement returnType = new ReturnTypeElement();
-
-						returnType.setType(propertyType);
-
-						property.addType(returnType);
-					}
-				}
-				
-				properties.add(property);
-			}
-		}
-		
-		return properties;
-	}
 
 	/**
 	 * JSTypeWalker
@@ -146,32 +70,9 @@ public class JSTypeInferrer extends JSTreeWalker
 	 */
 	public JSTypeInferrer(JSScope scope, Index projectIndex)
 	{
-		this(scope, projectIndex, new ArrayList<TypeElement>());
-	}
-
-	/**
-	 * JSTypeWalker
-	 * 
-	 * @param scope
-	 * @param projectIndex
-	 * @param generatedTypes
-	 */
-	protected JSTypeInferrer(JSScope scope, Index projectIndex, List<TypeElement> generatedTypes)
-	{
 		this._scope = scope;
 		this._index = projectIndex;
 		this._indexHelper = new JSIndexQueryHelper();
-		this._generatedTypes = generatedTypes;
-	}
-
-	/**
-	 * addGeneratedType
-	 * 
-	 * @param type
-	 */
-	protected void addGeneratedType(TypeElement type)
-	{
-		this._generatedTypes.add(type);
 	}
 
 	/**
@@ -338,38 +239,6 @@ public class JSTypeInferrer extends JSTreeWalker
 	}
 
 	/**
-	 * getGeneratedType
-	 * 
-	 * @param name
-	 * @return
-	 */
-	public TypeElement getGeneratedType(String name)
-	{
-		TypeElement result = null;
-
-		for (TypeElement type : this._generatedTypes)
-		{
-			if (type.getName().equals(name))
-			{
-				result = type;
-				break;
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * getGeneratedTypes
-	 * 
-	 * @return
-	 */
-	public List<TypeElement> getGeneratedTypes()
-	{
-		return this._generatedTypes;
-	}
-
-	/**
 	 * getReturnNodes
 	 * 
 	 * @param node
@@ -444,7 +313,7 @@ public class JSTypeInferrer extends JSTreeWalker
 		if (node instanceof JSNode)
 		{
 			// create new nested walker
-			JSTypeInferrer walker = new JSTypeInferrer(scope, this._index, this._generatedTypes);
+			JSTypeInferrer walker = new JSTypeInferrer(scope, this._index);
 
 			// collect types
 			walker.visit((JSNode) node);
@@ -490,7 +359,6 @@ public class JSTypeInferrer extends JSTreeWalker
 		switch (node.getNodeType())
 		{
 			case JSNodeTypes.ASSIGN:
-			case JSNodeTypes.EQUAL:
 				this.addTypes(this.getTypes(node.getRightHandSide()));
 				break;
 
@@ -692,15 +560,15 @@ public class JSTypeInferrer extends JSTreeWalker
 				PropertyElement property = this._indexHelper.getTypeMember(this._index, typeName, memberName, EnumSet.of(ContentSelector.RETURN_TYPES,
 					ContentSelector.TYPES));
 
-				if (property == null)
-				{
-					TypeElement type = this.getGeneratedType(typeName);
-
-					if (type != null)
-					{
-						property = type.getProperty(memberName);
-					}
-				}
+//				if (property == null)
+//				{
+//					TypeElement type = this.getGeneratedType(typeName);
+//
+//					if (type != null)
+//					{
+//						property = type.getProperty(memberName);
+//					}
+//				}
 
 				if (property != null)
 				{
