@@ -8,23 +8,23 @@ import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
 import com.aptana.editor.js.parsing.ast.JSLabelledNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
+import com.aptana.editor.js.parsing.ast.JSObjectNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.editor.js.parsing.ast.JSTreeWalker;
 import com.aptana.editor.js.parsing.ast.JSWithNode;
-import com.aptana.parsing.Scope;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 
 public class JSSymbolCollector extends JSTreeWalker
 {
-	private Scope<JSNode> _scope;
+	private JSScope _scope;
 
 	/**
 	 * JSSymbolCollector
 	 */
 	public JSSymbolCollector()
 	{
-		this._scope = new Scope<JSNode>();
+		this._scope = new JSScope();
 	}
 
 	/**
@@ -39,54 +39,50 @@ public class JSSymbolCollector extends JSTreeWalker
 			((JSNode) node).accept(this);
 		}
 	}
-	
+
 	/**
-	 * addAssignment
-	 * 
-	 * @param assignment
-	 */
-	protected void addAssignment(JSAssignmentNode assignment)
-	{
-		if (this._scope != null)
-		{
-			this._scope.addAssignment(assignment);
-		}
-	}
-	
-	/**
-	 * addSecondaryAssignment
-	 * 
-	 * @param name
-	 * @param assignment
-	 */
-	protected void addSecondaryAssignment(String name, JSAssignmentNode assignment)
-	{
-		if (this._scope != null)
-		{
-			this._scope.addSecondaryAssignment(name, assignment);
-		}
-	}
-	
-	/**
-	 * addSymbol
+	 * addPropertyValue
 	 * 
 	 * @param name
 	 * @param value
 	 */
-	protected void addSymbol(String name, JSNode value)
+	public void addPropertyValue(String name, JSNode value)
 	{
-		if (this._scope != null)
+		if (name != null && name.length() > 0 && value != null)
 		{
-			this._scope.addSymbol(name, value);
+			JSObject object = this._scope.getObject();
+			JSObject property;
+			
+			if (object.hasProperty(name))
+			{
+				// use the currently existing property
+				property = object.getProperty(name);
+			}
+			else
+			{
+				// create a new property
+				property = new JSObject();
+				
+				// add it to the current object
+				object.setProperty(name, property);
+			}
+			
+			if (value instanceof JSObjectNode)
+			{
+				JSPropertyCollector collector = new JSPropertyCollector(property);
+				collector.visit((JSObjectNode) value);
+			}
+			
+			property.addValue(value);
 		}
 	}
-
+	
 	/**
 	 * getScope
 	 * 
 	 * @return Scope<JSNode>
 	 */
-	public Scope<JSNode> getScope()
+	public JSScope getScope()
 	{
 		return this._scope;
 	}
@@ -107,7 +103,7 @@ public class JSSymbolCollector extends JSTreeWalker
 	 */
 	protected void pushScope()
 	{
-		Scope<JSNode> childScope = new Scope<JSNode>();
+		JSScope childScope = new JSScope();
 
 		if (this._scope != null)
 		{
@@ -116,10 +112,10 @@ public class JSSymbolCollector extends JSTreeWalker
 
 		this._scope = childScope;
 	}
-	
+
 	/**
 	 * setScopeRange
-	 *
+	 * 
 	 * @param range
 	 */
 	protected void setScopeRange(IRange range)
@@ -138,13 +134,14 @@ public class JSSymbolCollector extends JSTreeWalker
 	public void visit(JSAssignmentNode node)
 	{
 		IParseNode lhs = node.getLeftHandSide();
-		
+		IParseNode rhs = node.getRightHandSide();
+
 		switch (lhs.getNodeType())
 		{
 			case JSNodeTypes.IDENTIFIER:
-				this.addAssignment(node);
+				this.addPropertyValue(lhs.getText(), (JSNode) rhs);
 				break;
-				
+
 			default:
 				LOOP: while (lhs != null)
 				{
@@ -152,26 +149,27 @@ public class JSSymbolCollector extends JSTreeWalker
 					{
 						case JSNodeTypes.IDENTIFIER:
 							String name = lhs.getText();
-							
+
 							if (this._scope.hasSymbol(name))
 							{
-								this.addSecondaryAssignment(name, node);
+								JSPropertyCollector collector = new JSPropertyCollector(this._scope.getObject());
+								collector.visit(node);
 							}
 							// else secondary assignment without declared symbol
 							break LOOP;
-							
+
 						case JSNodeTypes.THIS:
 							// TODO: implement this once we're properly handling
 							// [[proto]]
 							System.out.println("unprocessed assignment: " + node);
 							break LOOP;
-							
+
 						default:
 							lhs = lhs.getFirstChild();
 							break;
 					}
 				}
-				
+
 				if (lhs == null)
 				{
 					System.out.println("unprocessed assignment: " + node);
@@ -188,7 +186,7 @@ public class JSSymbolCollector extends JSTreeWalker
 	public void visit(JSCatchNode node)
 	{
 		IParseNode body = node.getBody();
-		
+
 		this.accept(body);
 	}
 
@@ -204,9 +202,9 @@ public class JSSymbolCollector extends JSTreeWalker
 
 		if (value instanceof JSNode)
 		{
-			this.addSymbol(name, (JSNode) value);
+			this.addPropertyValue(name, (JSNode) value);
 		}
-		
+
 		// process any complex data structures from this assignment
 		this.accept(value);
 	}
@@ -220,36 +218,36 @@ public class JSSymbolCollector extends JSTreeWalker
 	{
 		// add symbol if this has a name
 		String name = node.getName().getText();
-		
+
 		if (name != null && name.length() > 0)
 		{
-			this.addSymbol(name, node);
+			this.addPropertyValue(name, node);
 		}
-		
+
 		// create a new scope
 		this.pushScope();
-		
+
 		// add parameters
 		for (IParseNode parameter : node.getParameters())
 		{
 			if (parameter instanceof JSNode)
 			{
-				this.addSymbol(parameter.getText(), (JSNode) parameter);
+				this.addPropertyValue(parameter.getText(), (JSNode) parameter);
 			}
 		}
-		
+
 		// process body
 		IParseNode body = node.getBody();
-		
+
 		this.accept(body);
-		
+
 		// set scope range
 		this.setScopeRange(body);
-		
+
 		// restore original scope
 		this.popScope();
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSGetPropertyNode)
@@ -260,7 +258,7 @@ public class JSSymbolCollector extends JSTreeWalker
 		// No need to process the rhs since it's always an identifier
 		this.accept(node.getLeftHandSide());
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSLabelledNode)
@@ -271,7 +269,7 @@ public class JSSymbolCollector extends JSTreeWalker
 		// No need to process the label since it's always an identifier
 		this.accept(node.getBlock());
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSParseRootNode)
@@ -283,7 +281,7 @@ public class JSSymbolCollector extends JSTreeWalker
 		{
 			this.accept(child);
 		}
-		
+
 		this.setScopeRange(node);
 	}
 
@@ -294,6 +292,7 @@ public class JSSymbolCollector extends JSTreeWalker
 	@Override
 	public void visit(JSWithNode node)
 	{
-		// TODO: This does "interesting" things to the current scope. We need to make sure we understand all cases before implementing this
+		// TODO: This does "interesting" things to the current scope. We need to make sure we understand all cases
+		// before implementing this
 	}
 }
