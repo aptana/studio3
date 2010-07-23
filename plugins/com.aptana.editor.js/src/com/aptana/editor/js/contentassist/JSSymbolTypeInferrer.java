@@ -5,13 +5,18 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.ContentSelector;
+import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
+import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
+import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.index.core.Index;
@@ -19,7 +24,7 @@ import com.aptana.index.core.Index;
 public class JSSymbolTypeInferrer
 {
 	private static final EnumSet<ContentSelector> MEMBER_CONTENT = EnumSet.of(ContentSelector.NAME, ContentSelector.TYPES, ContentSelector.RETURN_TYPES);
-	private static List<TypeElement> _generatedTypes;
+	private static List<TypeElement> GENERATED_TYPES;
 
 	private Index _index;
 	private JSScope _activeScope;
@@ -41,19 +46,30 @@ public class JSSymbolTypeInferrer
 	 * 
 	 * @return
 	 */
-	private TypeElement generateType()
+	private TypeElement generateType(Set<String> types)
 	{
-		// create new type and give it a unique name
+		// create new type
 		TypeElement result = new TypeElement();
+
+		// give type a unique name
 		result.setName(JSTypeUtil.getUniqueTypeName());
 
-		// save type for future reference
-		if (_generatedTypes == null)
+		// set parent types
+		if (types != null)
 		{
-			_generatedTypes = new ArrayList<TypeElement>();
+			for (String superType : types)
+			{
+				result.addParentType(superType);
+			}
 		}
 
-		_generatedTypes.add(result);
+		// save type for future reference
+		if (GENERATED_TYPES == null)
+		{
+			GENERATED_TYPES = new ArrayList<TypeElement>();
+		}
+
+		GENERATED_TYPES.add(result);
 
 		return result;
 	}
@@ -65,7 +81,7 @@ public class JSSymbolTypeInferrer
 	 * @param types
 	 * @return
 	 */
-	private List<String> getAdditionalProperties(JSObject activeObject, List<String> types)
+	private List<String> getAdditionalProperties(JSObject activeObject, Set<String> types)
 	{
 		Map<String, PropertyElement> propertyMap = this.getTypePropertyMap(types);
 		List<String> additionalProperties = new ArrayList<String>();
@@ -80,7 +96,7 @@ public class JSSymbolTypeInferrer
 				additionalProperties.add(name);
 			}
 		}
-		
+
 		return additionalProperties;
 	}
 
@@ -91,7 +107,7 @@ public class JSSymbolTypeInferrer
 	 */
 	public List<TypeElement> getGeneratedTypes()
 	{
-		List<TypeElement> result = _generatedTypes;
+		List<TypeElement> result = GENERATED_TYPES;
 
 		if (result == null)
 		{
@@ -121,19 +137,14 @@ public class JSSymbolTypeInferrer
 	}
 
 	/**
-	 * getSymbolPropertyElement
+	 * getSymbolProperty
 	 * 
-	 * @param name
+	 * @param activeObject
+	 * @param symbol
 	 * @return
 	 */
-	public PropertyElement getSymbolPropertyElement(JSObject activeObject, String symbol)
+	private JSObject getSymbolProperty(JSObject activeObject, String symbol)
 	{
-		List<String> types = new ArrayList<String>();
-
-		// create resulting property element
-		PropertyElement result = new PropertyElement();
-		result.setName(symbol);
-
 		// try to grab property from active object
 		JSObject property = activeObject.getProperty(symbol);
 
@@ -143,81 +154,99 @@ public class JSSymbolTypeInferrer
 			property = this._activeScope.getSymbol(symbol);
 		}
 
+		return property;
+	}
+
+	/**
+	 * getSymbolPropertyElement
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public PropertyElement getSymbolPropertyElement(JSObject activeObject, String symbol)
+	{
+		JSObject property = this.getSymbolProperty(activeObject, symbol);
+		PropertyElement result = null;
+
 		if (property != null)
 		{
+			// Using linked hash set to preserve add order
+			Set<String> types = new LinkedHashSet<String>();
+
 			if (property.hasTypes())
 			{
-				types = property.getTypes();
+				// used cached types
+				types.addAll(property.getTypes());
 			}
 			else
 			{
 				// infer types
-				for (JSNode value : property.getValues())
+				this.processValues(property, types);
+
+				// process additional properties, possibly generating a new type
+				this.processProperties(property, types);
+			}
+
+			// add types to property
+			result = this.createPropertyElement(types);
+			
+			for (String typeName : types)
+			{
+				result.addType(typeName);
+			}
+		}
+		else
+		{
+			result = new PropertyElement();
+		}
+
+		// set name
+		result.setName(symbol);
+
+		return result;
+	}
+
+	/**
+	 * createPropertyElement
+	 * 
+	 * @param types
+	 * @return
+	 */
+	private PropertyElement createPropertyElement(Set<String> types)
+	{
+		PropertyElement result;
+		
+		if (types != null && types.size() > 0)
+		{
+			boolean hasFunction = false;
+			boolean hasNonFunction = false;
+			
+			for (String type : types)
+			{
+				if (type.startsWith(JSTypeConstants.FUNCTION))
 				{
-					DocumentationBlock docs = value.getDocumentation();
-	
-					if (docs != null)
-					{
-						JSTypeUtil.applyDocumentation(result, docs);
-					}
-					else
-					{
-						JSTypeInferrer inferrer = new JSTypeInferrer(this._activeScope);
-	
-						inferrer.visit(value);
-	
-						types.addAll(inferrer.getTypes());
-					}
-				}
-	
-				// process additional properties, possibly creating a new type in the
-				// process
-				if (property.hasProperties())
-				{
-					List<String> additionalProperties = getAdditionalProperties(property, types);
-	
-					if (additionalProperties.isEmpty() == false)
-					{
-						// create new type
-						TypeElement subType = this.generateType();
-	
-						// make the current list of types parent types of this type
-						for (String superType : types)
-						{
-							subType.addParentType(superType);
-						}
-	
-						// reset list to contain only this newly generated type
-						types.clear();
-						types.add(subType.getName());
-						
-						property.addType(subType.getName());
-	
-						// infer types of the
-						for (String pname : additionalProperties)
-						{
-							PropertyElement p = this.getSymbolPropertyElement(property, pname);
-	
-							subType.addProperty(p);
-						}
-					}
+					hasFunction = true;
 				}
 				else
 				{
-					for (String typeName : types)
-					{
-						property.addType(typeName);
-					}
+					hasNonFunction = true;
 				}
 			}
+			
+			if (hasFunction && hasNonFunction == false)
+			{
+				result = new FunctionElement();
+			}
+			else
+			{
+				result = new PropertyElement();
+			}
 		}
-
-		// add types to property
-		for (String typeName : types)
+		else
 		{
-			result.addType(typeName);
+			result = new PropertyElement();
 		}
-
+		
 		return result;
 	}
 
@@ -238,7 +267,7 @@ public class JSSymbolTypeInferrer
 	 * @param type
 	 * @return
 	 */
-	private Map<String, PropertyElement> getTypePropertyMap(List<String> types)
+	private Map<String, PropertyElement> getTypePropertyMap(Set<String> types)
 	{
 		JSIndexQueryHelper helper = new JSIndexQueryHelper();
 
@@ -261,5 +290,99 @@ public class JSSymbolTypeInferrer
 		}
 
 		return propertyMap;
+	}
+
+	/**
+	 * processProperties
+	 * 
+	 * @param property
+	 * @param types
+	 */
+	private void processProperties(JSObject property, Set<String> types)
+	{
+		if (property.hasProperties())
+		{
+			List<String> additionalProperties = this.getAdditionalProperties(property, types);
+
+			if (additionalProperties.isEmpty() == false)
+			{
+				// create new type
+				TypeElement subType = this.generateType(types);
+
+				// reset list to contain only this newly generated type
+				types.clear();
+				types.add(subType.getName());
+
+				property.addType(subType.getName());
+
+				// infer types of the
+				for (String pname : additionalProperties)
+				{
+					PropertyElement p = this.getSymbolPropertyElement(property, pname);
+
+					subType.addProperty(p);
+				}
+			}
+		}
+
+		for (String typeName : types)
+		{
+			property.addType(typeName);
+		}
+	}
+
+	/**
+	 * processValues
+	 * 
+	 * @param property
+	 * @param types
+	 */
+	private void processValues(JSObject property, Set<String> types)
+	{
+		for (JSNode value : property.getValues())
+		{
+			boolean isFunction = value instanceof JSFunctionNode;
+			DocumentationBlock docs = value.getDocumentation();
+
+			if (docs != null)
+			{
+				if (isFunction)
+				{
+					FunctionElement f = new FunctionElement();
+
+					JSTypeUtil.applyDocumentation(f, docs);
+
+					types.add(f.getSignature());
+				}
+				else
+				{
+					PropertyElement p = new PropertyElement();
+
+					JSTypeUtil.applyDocumentation(p, docs);
+
+					for (ReturnTypeElement typeElement : p.getTypes())
+					{
+						types.add(typeElement.getType());
+					}
+				}
+			}
+			else
+			{
+				JSTypeInferrer inferrer = new JSTypeInferrer(this._activeScope);
+
+				if (isFunction)
+				{
+					property.addType(JSTypeConstants.FUNCTION);
+					inferrer.visit(value);
+					property.clearTypes();
+				}
+				else
+				{
+					inferrer.visit(value);
+				}
+
+				types.addAll(inferrer.getTypes());
+			}
+		}
 	}
 }
