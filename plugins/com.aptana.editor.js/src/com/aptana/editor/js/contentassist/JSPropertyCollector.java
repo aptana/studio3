@@ -16,14 +16,6 @@ public class JSPropertyCollector extends JSTreeWalker
 {
 	private JSObject _object;
 	private JSObject _currentObject;
-
-	/**
-	 * JSPropertyCollector
-	 */
-	public JSPropertyCollector()
-	{
-		this._object = this._currentObject = new JSObject();
-	}
 	
 	/**
 	 * JSPropertyCollector
