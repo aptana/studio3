@@ -604,6 +604,14 @@ public class InferencingTests extends TestCase
 	}
 	
 	/**
+	 * testPlusAssignMixed2
+	 */
+	public void testPlusAssignMixed2()
+	{
+		this.assignmentTypeTests("var abc = '10'; abc += 20", "String", "Number");
+	}
+	
+	/**
 	 * testArithmeticShiftRightAssign
 	 */
 	public void testArithmeticShiftRightAssign()
