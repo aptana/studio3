@@ -1,8 +1,6 @@
 package com.aptana.editor.js.contentassist;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import com.aptana.editor.js.JSTypeConstants;
@@ -134,47 +132,6 @@ public class JSTypeUtil
 		UUID uuid = UUID.randomUUID();
 
 		return MessageFormat.format("{0}{1}", JSTypeConstants.DYNAMIC_CLASS_PREFIX, uuid); //$NON-NLS-1$
-	}
-
-	/**
-	 * propertyToDocumentation
-	 * 
-	 * @param function
-	 * @return
-	 */
-	public static DocumentationBlock propertyToDocumentation(FunctionElement function)
-	{
-		return null;
-	}
-
-	/**
-	 * propertyToDocumentation
-	 * 
-	 * @param property
-	 * @return
-	 */
-	public static DocumentationBlock propertyToDocumentation(PropertyElement property)
-	{
-		DocumentationBlock block;
-
-		if (property instanceof FunctionElement)
-		{
-			block = propertyToDocumentation((FunctionElement) property);
-		}
-		else
-		{
-			String description = property.getDescription();
-			List<Tag> tags = new ArrayList<Tag>();
-
-			for (ReturnTypeElement returnType : property.getTypes())
-			{
-				//Type t = new Type(returnType.getType());
-			}
-
-			block = new DocumentationBlock(description, tags);
-		}
-
-		return block;
 	}
 
 	/**
