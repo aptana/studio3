@@ -28,6 +28,12 @@
       </processor>
       <processor
             category="configurations"
+            class="com.aptana.portal.ui.dispatch.configurationProcessors.RubyInstallProcessor"
+            id="com.aptana.portal.ruby.installer.processor"
+            name="Ruby Installer">
+      </processor>
+      <processor
+            category="configurations"
             class="com.aptana.portal.ui.dispatch.configurationProcessors.VersionsConfigurationProcessor"
             id="com.aptana.portal.versions.processor"
             name="Program Version Configurations">
@@ -80,6 +86,12 @@
             class="com.aptana.portal.ui.dispatch.actionControllers.ConsoleController"
             id="console"
             name="Console Controller">
+      </actionController>
+      <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.RubyInstallActionController"
+            configurationProcessor="com.aptana.portal.ruby.installer.processor"
+            id="portal.ruby.installer"
+            name="Ruby Installer Actions">
       </actionController>
    </extension>
 </plugin>

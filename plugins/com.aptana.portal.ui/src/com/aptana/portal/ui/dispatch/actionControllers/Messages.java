@@ -11,6 +11,7 @@ public class Messages extends NLS
 	public static String ConsoleController_devToolboxConsoleName;
 	public static String PluginsActionController_computingInstalledPlugins;
 	public static String PluginsActionController_installNewSoftware;
+	public static String RubyInstallActionController_installingRuby;
 	static
 	{
 		// initialize resource bundle

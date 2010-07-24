@@ -8,6 +8,8 @@ public class Messages extends NLS
 	public static String GemsConfigurationProcessor_errorInvokingGemList;
 	public static String GemsConfigurationProcessor_missingShellError;
 	public static String GemsConfigurationProcessor_wrongGemsRequest;
+	public static String RubyInstallProcessor_missingRubyInstallURLs;
+	public static String RubyInstallProcessor_wrongNumberOfRubyInstallLinks;
 	public static String SystemConfigurationProcessor_missingConfigurationItems;
 	public static String SystemConfigurationProcessor_noShellCommandPath;
 	public static String SystemConfigurationProcessor_wrongConfigurationAttributesStructure;
