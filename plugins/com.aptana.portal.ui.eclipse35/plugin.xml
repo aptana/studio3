@@ -6,7 +6,7 @@
       <processor
             category="plugins"
             class="com.aptana.portal.ui.eclipse35.dispatch.configurationProcessors.PluginsConfigurationProcessor"
-            id="com.aptana.portal.plugins.processor"
+            id="com.aptana.portal.plugins35.processor"
             name="Plugins">
       </processor>
    </extension>
@@ -14,7 +14,7 @@
        point="com.aptana.portal.ui.browserInteractions">
        <actionController
             class="com.aptana.portal.ui.dispatch.actionControllers.PluginsActionController"
-            configurationProcessor="com.aptana.portal.plugins.processor"
+            configurationProcessor="com.aptana.portal.plugins35.processor"
             id="portal.plugins"
             name="Plugins Actions">
       </actionController>
