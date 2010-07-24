@@ -80,11 +80,11 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 	@SuppressWarnings("nls")
 	private static final String[] HTML_TAGS = { "a", "abbr", "acronym", "address", "area", "b", "base", "big",
 			"blockquote", "body", "br", "button", "caption", "cite", "code", "col", "colgroup", "dd", "del", "dfn",
-			"div", "dl", "dt", "em", "fieldset", "form", "frame", "frameset", "head", "hr", "html", "h1", "h2", "h3",
-			"h4", "h5", "h6", "i", "iframe", "img", "input", "ins", "kbd", "label", "legend", "li", "link", "map",
-			"meta", "noframes", "noscript", "object", "ol", "optgroup", "option", "p", "param", "pre", "q", "samp",
-			"script", "select", "small", "span", "strike", "strong", "style", "sub", "sup", "table", "tbody", "td",
-			"textarea", "tfoot", "th", "thead", "title", "tr", "tt", "ul", "var", "header", "nav", "section",
+			"div", "dl", "dt", "em", "embed", "fieldset", "form", "frame", "frameset", "head", "hr", "html", "h1",
+			"h2", "h3", "h4", "h5", "h6", "i", "iframe", "img", "input", "ins", "kbd", "label", "legend", "li", "link",
+			"map", "meta", "noframes", "noscript", "object", "ol", "optgroup", "option", "p", "param", "pre", "q",
+			"samp", "script", "select", "small", "span", "strike", "strong", "style", "sub", "sup", "table", "tbody",
+			"td", "textarea", "tfoot", "th", "thead", "title", "tr", "tt", "ul", "var", "header", "nav", "section",
 			"article", "footer", "aside", "audio", "video", "canvas", "hgroup" };
 
 	@SuppressWarnings("nls")
@@ -99,7 +99,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			"border-image-repeat", "border-image", "border-left-color", "border-left-style", "border-left-width",
 			"border-left", "border-radius", "border-right-color", "border-right-style", "border-right-width",
 			"border-right", "border-spacing", "border-style", "border-top-color", "border-top-style",
-			"border-top-width", "border-top", "border-width", "border", "bottom", "box-decoration-break",
+			"border-top-width", "border-top", "border-width", "border", "bottom", "box-decoration-break", "box-shadow",
 			"caption-side", "clear", "clip", "color", "content", "counter-increment", "counter-reset", "cue-after",
 			"cue-before", "cue", "cursor", "direction", "display", "elevation", "empty-cells", "float", "font-family",
 			"font-size-adjust", "font-size", "font-stretch", "font-style", "font-variant", "font-weight", "font",

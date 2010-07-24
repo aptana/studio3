@@ -58,12 +58,12 @@ public class CSSTokenScanner extends BufferedRuleBasedScanner
 	@SuppressWarnings("nls")
 	private static final String[] HTML_TAGS = { "a", "abbr", "acronym", "address", "area", "b", "base", "big",
 			"blockquote", "body", "br", "button", "caption", "cite", "code", "col", "colgroup", "dd", "del", "dfn",
-			"div", "dl", "dt", "em", "fieldset", "form", "frame", "frameset", "head", "hr", "html", "h1", "h2", "h3",
-			"h4", "h5", "h6", "i", "iframe", "img", "input", "ins", "kbd", "label", "legend", "li", "link", "map",
-			"meta", "noframes", "noscript", "object", "ol", "optgroup", "option", "p", "param", "pre", "q", "samp",
-			"script", "select", "small", "span", "strike", "strong", "style", "sub", "sup", "tbody", "td", "textarea",
-			"tfoot", "th", "thead", "title", "tr", "tt", "ul", "var",
-			"header", "nav", "section", "article", "footer", "aside", "audio", "video", "canvas", "hgroup" };
+			"div", "dl", "dt", "em", "embed", "fieldset", "form", "frame", "frameset", "head", "hr", "html", "h1",
+			"h2", "h3", "h4", "h5", "h6", "i", "iframe", "img", "input", "ins", "kbd", "label", "legend", "li", "link",
+			"map", "meta", "noframes", "noscript", "object", "ol", "optgroup", "option", "p", "param", "pre", "q",
+			"samp", "script", "select", "small", "span", "strike", "strong", "style", "sub", "sup", "tbody", "td",
+			"textarea", "tfoot", "th", "thead", "title", "tr", "tt", "ul", "var", "header", "nav", "section",
+			"article", "footer", "aside", "audio", "video", "canvas", "hgroup" };
 
 	@SuppressWarnings("nls")
 	private static final String[] MEDIAS = { "all", "aural", "braille", "embossed", "handheld", "print", "projection",
