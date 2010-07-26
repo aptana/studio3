@@ -32,6 +32,8 @@ public class JSPropertyCollection
 			this._types = new ArrayList<String>();
 		}
 
+		// NOTE: The number of types in the list will be small, so the contains
+		// test should not have any performance issues.
 		if (type != null && type.length() > 0 && this._types.contains(type) == false)
 		{
 			this._types.add(type);
