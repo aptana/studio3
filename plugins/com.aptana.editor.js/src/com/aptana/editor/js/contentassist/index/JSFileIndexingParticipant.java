@@ -25,6 +25,7 @@ import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.inferencing.JSScope;
 import com.aptana.editor.js.inferencing.JSSymbolCollector;
 import com.aptana.editor.js.inferencing.JSSymbolTypeInferrer;
+import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
@@ -240,6 +241,12 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 				type.addProperty(property);
 			}
 
+			// associate all user agents with these properties
+			for (PropertyElement property : type.getProperties())
+			{
+				JSTypeUtil.addAllUserAgents(property);
+			}
+			
 			// write new Window type to index
 			this._indexWriter.writeType(index, type, location);
 		}

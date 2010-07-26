@@ -74,7 +74,7 @@ public class JSSymbolTypeInferrer
 		this._activeScope = activeScope;
 		this._location = location;
 	}
-
+	
 	/**
 	 * applyDocumentation
 	 * 
@@ -419,11 +419,22 @@ public class JSSymbolTypeInferrer
 	 */
 	private void writeType(TypeElement type)
 	{
-		if (this._writer == null)
+		if (type != null)
 		{
-			this._writer = new JSIndexWriter();
+			// add user agents to all generated properties
+			for (PropertyElement property : type.getProperties())
+			{
+				JSTypeUtil.addAllUserAgents(property);
+			}
+			
+			// make sure we have an index writer
+			if (this._writer == null)
+			{
+				this._writer = new JSIndexWriter();
+			}
+	
+			// write the type to the index
+			this._writer.writeType(this._index, type, this._location);
 		}
-
-		this._writer.writeType(this._index, type, this._location);
 	}
 }
