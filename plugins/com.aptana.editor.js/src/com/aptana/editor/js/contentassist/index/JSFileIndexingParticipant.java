@@ -3,6 +3,7 @@ package com.aptana.editor.js.contentassist.index;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -16,18 +17,15 @@ import org.jaxen.XPath;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.js.Activator;
-import com.aptana.editor.js.contentassist.JSObject;
+import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.JSScope;
 import com.aptana.editor.js.contentassist.JSSymbolCollector;
 import com.aptana.editor.js.contentassist.JSSymbolTypeInferrer;
-import com.aptana.editor.js.contentassist.JSTypeInferrer;
-import com.aptana.editor.js.contentassist.model.FunctionElement;
+import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
-import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
-import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
@@ -163,19 +161,15 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 
 			if (queryResult != null)
 			{
+				result = new ArrayList<PropertyElement>();
+				
 				List<JSFunctionNode> functions = (List<JSFunctionNode>) queryResult;
 
 				for (JSFunctionNode function : functions)
 				{
-					// JSScope scope = globals.getScopeAtOffset(function.getBody().getStartingOffset());
-					// JSObject object = scope.getObject();
-
-					// JSTypeWalker.getScopeProperties(scope, index, location);
-					//					
-					// if (scope != null)
-					// {
-					// result = this.processWindowAssignments(index, scope);
-					// }
+					JSScope scope = globals.getScopeAtOffset(function.getBody().getStartingOffset());
+					
+					result.addAll(this.processWindowAssignments(index, scope, location));
 				}
 			}
 		}
@@ -237,66 +231,27 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 	 * @param symbols
 	 * @param location
 	 */
-	@SuppressWarnings("unchecked")
 	private List<PropertyElement> processWindowAssignments(Index index, JSScope symbols, URI location)
 	{
-		List<PropertyElement> properties = new ArrayList<PropertyElement>();
+		List<PropertyElement> result = Collections.emptyList();
 
-		// XPath xpath = new
-		// ParseNodeXPath("get_property[position() = 1 and descendant-or-self::identifier[position() = 1 and string()='window']]");
-		// Object result = xpath.evaluate(symbols.getAssignments());
-		Object result = null;
-
-		if (result != null)
+		if (symbols != null)
 		{
-			List<IParseNode> leftHandSides = (List<IParseNode>) result;
-
-			for (IParseNode lhs : leftHandSides)
+			if (symbols.hasLocalSymbol("window"))
 			{
-				IParseNode rhs = lhs.getNextSibling();
-				JSTypeInferrer walker = new JSTypeInferrer(symbols, index, location);
-
-				((JSNode) rhs).accept(walker);
-
-				List<String> types = walker.getTypes();
-
-				boolean isFunction = true;
-
-				for (String type : types)
+				JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(symbols, index, location);
+				PropertyElement property = symbolInferrer.getSymbolPropertyElement("window");
+				
+				if (property != null)
 				{
-					if (type.startsWith("Function:") == false)
-					{
-						isFunction = false;
-						break;
-					}
+					List<String> typeNames = property.getTypeNames();
+					JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
+					
+					result = queryHelper.getTypeMembers(index, typeNames, EnumSet.allOf(ContentSelector.class));
 				}
-
-				PropertyElement property = (isFunction) ? new FunctionElement() : new PropertyElement();
-				property.setName(lhs.getLastChild().getText());
-
-				for (String type : walker.getTypes())
-				{
-					if (isFunction)
-					{
-						int i = type.indexOf(':');
-
-						if (i != -1)
-						{
-							type = type.substring(i + 1);
-						}
-					}
-
-					ReturnTypeElement returnType = new ReturnTypeElement();
-
-					returnType.setType(type);
-
-					property.addType(returnType);
-				}
-
-				properties.add(property);
 			}
 		}
-
-		return properties;
+		
+		return result;
 	}
 }
