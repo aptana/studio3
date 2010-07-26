@@ -556,16 +556,6 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				PropertyElement property = this._indexHelper.getTypeMember(this._index, typeName, memberName, EnumSet.of(ContentSelector.RETURN_TYPES,
 					ContentSelector.TYPES));
 
-				// if (property == null)
-				// {
-				// TypeElement type = this.getGeneratedType(typeName);
-				//
-				// if (type != null)
-				// {
-				// property = type.getProperty(memberName);
-				// }
-				// }
-
 				if (property != null)
 				{
 					if (property instanceof FunctionElement)
