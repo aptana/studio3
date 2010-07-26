@@ -27,13 +27,38 @@ import com.aptana.index.core.Index;
 public class JSSymbolTypeInferrer
 {
 	private static final String NO_TYPE = ""; //$NON-NLS-1$
-
 	private static final EnumSet<ContentSelector> MEMBER_CONTENT = EnumSet.of(ContentSelector.NAME, ContentSelector.TYPES, ContentSelector.RETURN_TYPES);
 
 	private Index _index;
 	private JSScope _activeScope;
 	private URI _location;
+
 	private JSIndexWriter _writer;
+	
+	/**
+	 * generateType
+	 * 
+	 * @return
+	 */
+	private static TypeElement generateType(Set<String> types)
+	{
+		// create new type
+		TypeElement result = new TypeElement();
+
+		// give type a unique name
+		result.setName(JSTypeUtil.getUniqueTypeName());
+
+		// set parent types
+		if (types != null)
+		{
+			for (String superType : types)
+			{
+				result.addParentType(superType);
+			}
+		}
+
+		return result;
+	}
 
 	/**
 	 * JSSymbolTypeInferrer
@@ -47,6 +72,28 @@ public class JSSymbolTypeInferrer
 		this._index = index;
 		this._activeScope = activeScope;
 		this._location = location;
+	}
+
+	/**
+	 * applyDocumentation
+	 * 
+	 * @param property
+	 * @param object
+	 */
+	private void applyDocumentation(PropertyElement property, JSPropertyCollection object)
+	{
+		if (property != null && object != null)
+		{
+			for (JSNode value : object.getValues())
+			{
+				DocumentationBlock docs = value.getDocumentation();
+
+				if (docs != null)
+				{
+					JSTypeUtil.applyDocumentation(property, docs);
+				}
+			}
+		}
 	}
 
 	/**
@@ -88,31 +135,6 @@ public class JSSymbolTypeInferrer
 		else
 		{
 			result = new PropertyElement();
-		}
-
-		return result;
-	}
-
-	/**
-	 * generateType
-	 * 
-	 * @return
-	 */
-	private static TypeElement generateType(Set<String> types)
-	{
-		// create new type
-		TypeElement result = new TypeElement();
-
-		// give type a unique name
-		result.setName(JSTypeUtil.getUniqueTypeName());
-
-		// set parent types
-		if (types != null)
-		{
-			for (String superType : types)
-			{
-				result.addParentType(superType);
-			}
 		}
 
 		return result;
@@ -229,6 +251,9 @@ public class JSSymbolTypeInferrer
 
 				result.addType(typeName);
 			}
+
+			// apply any docs info we have to the property
+			this.applyDocumentation(result, property);
 		}
 		else
 		{
