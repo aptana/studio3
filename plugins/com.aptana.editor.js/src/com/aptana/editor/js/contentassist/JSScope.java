@@ -42,20 +42,6 @@ public class JSScope
 			}
 
 			this._children.add(scope);
-
-			if (this.getRange().isEmpty())
-			{
-				this.setRange(scope.getRange());
-			}
-			else
-			{
-				this.setRange( //
-					new Range( //
-						Math.min(this.getRange().getStartingOffset(), scope.getRange().getStartingOffset()), //
-						Math.max(this.getRange().getEndingOffset(), scope.getRange().getEndingOffset()) //
-					) //
-					);
-			}
 		}
 	}
 
