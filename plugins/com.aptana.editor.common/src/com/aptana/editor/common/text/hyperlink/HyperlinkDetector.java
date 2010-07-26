@@ -1,7 +1,6 @@
 package com.aptana.editor.common.text.hyperlink;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -99,7 +98,7 @@ public class HyperlinkDetector extends URLHyperlinkDetector
 					ours.add(wrapped);
 				}
 			}
-			catch (URISyntaxException e)
+			catch (Exception e)
 			{
 				CommonEditorPlugin.logError(e);
 			}
