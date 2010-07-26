@@ -52,8 +52,8 @@ public class JSSymbolCollector extends JSTreeWalker
 	{
 		if (name != null && name.length() > 0 && value != null)
 		{
-			JSObject object = this._scope.getObject();
-			JSObject property;
+			JSPropertyCollection object = this._scope.getObject();
+			JSPropertyCollection property;
 
 			if (object.hasProperty(name))
 			{
@@ -63,7 +63,7 @@ public class JSSymbolCollector extends JSTreeWalker
 			else
 			{
 				// create a new property
-				property = new JSObject();
+				property = new JSPropertyCollection();
 
 				// add it to the current object
 				object.setProperty(name, property);

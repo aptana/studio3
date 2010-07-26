@@ -9,11 +9,11 @@ import java.util.Map;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.parsing.io.SourcePrinter;
 
-public class JSObject
+public class JSPropertyCollection
 {
 	private List<JSNode> _values;
 	private List<String> _types;
-	private Map<String, JSObject> _properties;
+	private Map<String, JSPropertyCollection> _properties;
 
 	/**
 	 * addType
@@ -70,9 +70,9 @@ public class JSObject
 	 * @param name
 	 * @return
 	 */
-	public JSObject getProperty(String name)
+	public JSPropertyCollection getProperty(String name)
 	{
-		JSObject result = null;
+		JSPropertyCollection result = null;
 
 		if (this._properties != null)
 		{
@@ -192,7 +192,7 @@ public class JSObject
 	 * @param name
 	 * @param property
 	 */
-	public void setProperty(String name, JSObject property)
+	public void setProperty(String name, JSPropertyCollection property)
 	{
 		if (name != null && name.length() > 0 && property != null)
 		{
@@ -200,7 +200,7 @@ public class JSObject
 			{
 				// Using a linked hash map to preserve order in which
 				// properties were added
-				this._properties = new LinkedHashMap<String, JSObject>();
+				this._properties = new LinkedHashMap<String, JSPropertyCollection>();
 			}
 
 			this._properties.put(name, property);
@@ -230,10 +230,10 @@ public class JSObject
 	{
 		if (this._properties != null)
 		{
-			for (Map.Entry<String, JSObject> entry : this._properties.entrySet())
+			for (Map.Entry<String, JSPropertyCollection> entry : this._properties.entrySet())
 			{
 				String name = entry.getKey();
-				JSObject object = entry.getValue();
+				JSPropertyCollection object = entry.getValue();
 
 				printer.printIndent().print(name);
 

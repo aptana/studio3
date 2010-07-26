@@ -125,7 +125,7 @@ public class JSSymbolTypeInferrer
 	 * @param types
 	 * @return
 	 */
-	private List<String> getAdditionalProperties(JSObject activeObject, Set<String> types)
+	private List<String> getAdditionalProperties(JSPropertyCollection activeObject, Set<String> types)
 	{
 		Map<String, PropertyElement> propertyMap = this.getTypePropertyMap(types);
 		List<String> additionalProperties = new ArrayList<String>();
@@ -170,10 +170,10 @@ public class JSSymbolTypeInferrer
 	 * @param symbol
 	 * @return
 	 */
-	private JSObject getSymbolProperty(JSObject activeObject, String symbol)
+	private JSPropertyCollection getSymbolProperty(JSPropertyCollection activeObject, String symbol)
 	{
 		// try to grab property from active object
-		JSObject property = activeObject.getProperty(symbol);
+		JSPropertyCollection property = activeObject.getProperty(symbol);
 
 		// if no property, then try a scope-based lookup
 		if (property == null)
@@ -190,9 +190,9 @@ public class JSSymbolTypeInferrer
 	 * @param name
 	 * @return
 	 */
-	public PropertyElement getSymbolPropertyElement(JSObject activeObject, String symbol)
+	public PropertyElement getSymbolPropertyElement(JSPropertyCollection activeObject, String symbol)
 	{
-		JSObject property = this.getSymbolProperty(activeObject, symbol);
+		JSPropertyCollection property = this.getSymbolProperty(activeObject, symbol);
 		PropertyElement result = null;
 
 		if (property != null)
@@ -289,7 +289,7 @@ public class JSSymbolTypeInferrer
 	 * @param property
 	 * @param types
 	 */
-	private void processProperties(JSObject property, Set<String> types)
+	private void processProperties(JSPropertyCollection property, Set<String> types)
 	{
 		if (property.hasProperties())
 		{
@@ -331,7 +331,7 @@ public class JSSymbolTypeInferrer
 	 * @param property
 	 * @param types
 	 */
-	private void processValues(JSObject property, Set<String> types)
+	private void processValues(JSPropertyCollection property, Set<String> types)
 	{
 		for (JSNode value : property.getValues())
 		{

@@ -14,7 +14,7 @@ public class JSScope
 {
 	private JSScope _parent;
 	private List<JSScope> _children;
-	private JSObject _object;
+	private JSPropertyCollection _object;
 	private IRange _range;
 
 	/**
@@ -22,7 +22,7 @@ public class JSScope
 	 */
 	public JSScope()
 	{
-		this._object = new JSObject();
+		this._object = new JSPropertyCollection();
 	}
 
 	/**
@@ -53,7 +53,7 @@ public class JSScope
 	 */
 	public void addSymbol(String name, JSNode value)
 	{
-		JSObject property;
+		JSPropertyCollection property;
 
 		if (this._object.hasProperty(name))
 		{
@@ -61,7 +61,7 @@ public class JSScope
 		}
 		else
 		{
-			property = new JSObject();
+			property = new JSPropertyCollection();
 
 			this._object.setProperty(name, property);
 		}
@@ -92,7 +92,7 @@ public class JSScope
 	 * @param name
 	 * @return
 	 */
-	public JSObject getLocalSymbol(String name)
+	public JSPropertyCollection getLocalSymbol(String name)
 	{
 		return this._object.getProperty(name);
 	}
@@ -112,7 +112,7 @@ public class JSScope
 	 * 
 	 * @return
 	 */
-	public JSObject getObject()
+	public JSPropertyCollection getObject()
 	{
 		return this._object;
 	}
@@ -197,10 +197,10 @@ public class JSScope
 	 * @param name
 	 * @return
 	 */
-	public JSObject getSymbol(String name)
+	public JSPropertyCollection getSymbol(String name)
 	{
 		JSScope current = this;
-		JSObject result = null;
+		JSPropertyCollection result = null;
 
 		while (current != null)
 		{

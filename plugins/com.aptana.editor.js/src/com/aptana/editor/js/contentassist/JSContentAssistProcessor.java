@@ -302,7 +302,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					for (String symbol : symbols)
 					{
 						boolean isFunction = false;
-						JSObject object = localScope.getSymbol(symbol);
+						JSPropertyCollection object = localScope.getSymbol(symbol);
 						List<JSNode> nodes = object.getValues();
 
 						if (nodes != null)

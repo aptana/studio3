@@ -95,7 +95,7 @@ public class ScopeTests extends FileContentBasedTests
 	 */
 	protected List<String> getTypes(JSScope symbols, String symbol)
 	{
-		JSObject object = symbols.getLocalSymbol(symbol);
+		JSPropertyCollection object = symbols.getLocalSymbol(symbol);
 		List<JSNode> nodes = object.getValues();
 		Set<String> typeSet = new HashSet<String>();
 		

@@ -14,15 +14,15 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class JSPropertyCollector extends JSTreeWalker
 {
-	private JSObject _object;
-	private JSObject _currentObject;
+	private JSPropertyCollection _object;
+	private JSPropertyCollection _currentObject;
 
 	/**
 	 * JSPropertyCollector
 	 * 
 	 * @param global
 	 */
-	public JSPropertyCollector(JSObject global)
+	public JSPropertyCollector(JSPropertyCollection global)
 	{
 		this._object = this._currentObject = global;
 	}
@@ -40,7 +40,7 @@ public class JSPropertyCollector extends JSTreeWalker
 		}
 		else
 		{
-			JSObject property = new JSObject();
+			JSPropertyCollection property = new JSPropertyCollection();
 
 			this._currentObject.setProperty(name, property);
 			this._currentObject = property;
@@ -75,7 +75,7 @@ public class JSPropertyCollector extends JSTreeWalker
 	{
 		if (name != null && name.length() > 0 && values != null && values.isEmpty() == false)
 		{
-			JSObject property;
+			JSPropertyCollection property;
 
 			if (this._currentObject.hasProperty(name))
 			{
@@ -85,7 +85,7 @@ public class JSPropertyCollector extends JSTreeWalker
 			else
 			{
 				// create a new property
-				property = new JSObject();
+				property = new JSPropertyCollection();
 
 				// add it to the current object
 				this._currentObject.setProperty(name, property);
@@ -96,7 +96,7 @@ public class JSPropertyCollector extends JSTreeWalker
 				if (value instanceof JSObjectNode)
 				{
 					// save current object
-					JSObject current = this._currentObject;
+					JSPropertyCollection current = this._currentObject;
 
 					this._currentObject = property;
 					this.visit((JSObjectNode) value);
@@ -115,7 +115,7 @@ public class JSPropertyCollector extends JSTreeWalker
 	 * 
 	 * @return the currentObject
 	 */
-	public JSObject getCurrentObject()
+	public JSPropertyCollection getCurrentObject()
 	{
 		return this._currentObject;
 	}
@@ -125,7 +125,7 @@ public class JSPropertyCollector extends JSTreeWalker
 	 * 
 	 * @return the object
 	 */
-	public JSObject getObject()
+	public JSPropertyCollection getObject()
 	{
 		return this._object;
 	}
@@ -247,7 +247,7 @@ public class JSPropertyCollector extends JSTreeWalker
 				JSObjectNode objectLiteral = (JSObjectNode) value;
 
 				// remember current object
-				JSObject currentObject = this._currentObject;
+				JSPropertyCollection currentObject = this._currentObject;
 
 				// create a new one for this object
 				this.activateProperty(name);

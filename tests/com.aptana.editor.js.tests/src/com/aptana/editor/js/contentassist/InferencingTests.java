@@ -105,7 +105,7 @@ public class InferencingTests extends TestCase
 		JSScope globals = this.getGlobals(source);
 		assertNotNull(globals);
 		
-		JSObject object = globals.getSymbol("abc");
+		JSPropertyCollection object = globals.getSymbol("abc");
 		assertNotNull(object);
 		
 		// NOTE: getting property elements of all symbols in the specified scope
@@ -136,7 +136,7 @@ public class InferencingTests extends TestCase
 		JSScope globals = this.getGlobals(source);
 		
 		assertTrue(globals.hasLocalSymbol(symbol));
-		JSObject object = globals.getSymbol(symbol);
+		JSPropertyCollection object = globals.getSymbol(symbol);
 		List<JSNode> values = object.getValues();
 		assertNotNull(values);
 		assertEquals(1, values.size());
