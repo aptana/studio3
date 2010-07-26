@@ -15,7 +15,7 @@ import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Range;
 
-public class JSRangeWalker extends JSTreeWalker
+public class JSRangeFinder extends JSTreeWalker
 {
 	private int _offset;
 	private IRange _range;
@@ -25,7 +25,7 @@ public class JSRangeWalker extends JSTreeWalker
 	 * 
 	 * @param offset
 	 */
-	public JSRangeWalker(int offset)
+	public JSRangeFinder(int offset)
 	{
 		this._offset = offset - 1;
 		this._range = new Range(offset, offset - 1);

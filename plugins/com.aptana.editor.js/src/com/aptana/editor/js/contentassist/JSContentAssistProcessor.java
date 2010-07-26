@@ -606,7 +606,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 			if (IGNORED_TYPES.contains(result) == false)
 			{
-				JSRangeWalker rangeWalker = new JSRangeWalker(offset);
+				JSRangeFinder rangeWalker = new JSRangeFinder(offset);
 
 				((JSParseRootNode) ast).accept(rangeWalker);
 
