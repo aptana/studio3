@@ -78,8 +78,6 @@ import com.aptana.ui.epl.UIEplPlugin;
  */
 public class CompletionProposalPopup implements IContentAssistListener
 {
-	// use the hard-coded value for cocoa since the constant is not defined until Eclipse 3.5
-	private static final boolean isCocoa = Platform.getWS().equals("cocoa"); //$NON-NLS-1$
 	
 	/**
 	 * Set to <code>true</code> to use a Table with SWT.VIRTUAL.
