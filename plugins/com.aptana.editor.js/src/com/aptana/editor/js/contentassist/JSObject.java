@@ -243,14 +243,14 @@ public class JSObject
 				}
 				else
 				{
-					printer.print("[]");
+					printer.print("[]"); //$NON-NLS-1$
 				}
 
 				if (object.hasProperties())
 				{
-					printer.println(" {").increaseIndent();
+					printer.println(" {").increaseIndent(); //$NON-NLS-1$
 					entry.getValue().toSource(printer);
-					printer.decreaseIndent().printlnWithIndent("}");
+					printer.decreaseIndent().printlnWithIndent("}"); //$NON-NLS-1$
 				}
 				else
 				{

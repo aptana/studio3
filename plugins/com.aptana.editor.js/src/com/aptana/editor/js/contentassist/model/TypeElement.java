@@ -196,17 +196,17 @@ public class TypeElement extends BaseElement
 
 		if (this.hasParentTypes())
 		{
-			printer.print(" : ").print(StringUtil.join(", ", this.getParentTypes()));
+			printer.print(" : ").print(StringUtil.join(", ", this.getParentTypes())); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		printer.println().print("{").increaseIndent().println();
+		printer.println().print("{").increaseIndent().println(); //$NON-NLS-1$
 
 		for (PropertyElement property : this.getProperties())
 		{
 			property.toSource(printer);
-			printer.println(";");
+			printer.println(";"); //$NON-NLS-1$
 		}
 
-		printer.decreaseIndent().println("}");
+		printer.decreaseIndent().println("}"); //$NON-NLS-1$
 	}
 }

@@ -13,6 +13,9 @@ import com.aptana.editor.js.contentassist.model.SinceElement;
 
 public class JSModelFormatter
 {
+	private static final String NEW_LINE = "<br>"; //$NON-NLS-1$
+	private static final String DOUBLE_NEW_LINE = NEW_LINE + NEW_LINE;
+
 	/**
 	 * addDefiningFiles
 	 * 
@@ -38,9 +41,9 @@ public class JSModelFormatter
 				}
 			}
 
-			buffer.append("<br><br>"); //$NON-NLS-1$
-			buffer.append("Defined In:"); //$NON-NLS-1$
-			buffer.append("<br>"); //$NON-NLS-1$
+			buffer.append(DOUBLE_NEW_LINE); //$NON-NLS-1$
+			buffer.append(Messages.JSModelFormatter_Defined_Section_Header);
+			buffer.append(NEW_LINE); //$NON-NLS-1$
 
 			boolean first = true;
 
@@ -59,7 +62,7 @@ public class JSModelFormatter
 				}
 				else
 				{
-					buffer.append("<br>");
+					buffer.append(NEW_LINE);
 				}
 
 				buffer.append(document);
@@ -79,7 +82,7 @@ public class JSModelFormatter
 
 		if (description != null && description.length() > 0)
 		{
-			buffer.append("<br><br>"); //$NON-NLS-1$
+			buffer.append(DOUBLE_NEW_LINE); //$NON-NLS-1$
 			buffer.append(description);
 		}
 	}
@@ -94,12 +97,12 @@ public class JSModelFormatter
 	{
 		if (examples != null && examples.size() > 0)
 		{
-			buffer.append("<br><br>"); //$NON-NLS-1$
-			buffer.append("<b>").append("Examples:").append("</b>");//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			buffer.append("<br>"); //$NON-NLS-1$
+			buffer.append(DOUBLE_NEW_LINE); //$NON-NLS-1$
+			buffer.append("<b>").append(Messages.JSModelFormatter_Exampes_Section_Header).append("</b>");//$NON-NLS-1$ //$NON-NLS-2$
+			buffer.append(NEW_LINE); //$NON-NLS-1$
 
 			// emit list
-			buffer.append(StringUtil.join("<br><br>", examples)); //$NON-NLS-1$
+			buffer.append(StringUtil.join(DOUBLE_NEW_LINE, examples)); //$NON-NLS-1$
 		}
 	}
 
@@ -115,22 +118,22 @@ public class JSModelFormatter
 
 		if (sinceList != null && sinceList.isEmpty() == false)
 		{
-			buffer.append("<br><br>");
-			buffer.append("<b>").append("Specifications:").append("</b>");
-			buffer.append("<br>");
+			buffer.append(DOUBLE_NEW_LINE);
+			buffer.append("<b>").append(Messages.JSModelFormatter_Specification_Header).append("</b>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			buffer.append(NEW_LINE);
 
 			for (SinceElement since : property.getSinceList())
 			{
-				buffer.append("- ").append(since.getName());
+				buffer.append("- ").append(since.getName()); //$NON-NLS-1$
 
 				String version = since.getVersion();
 
 				if (version != null && version.length() > 0)
 				{
-					buffer.append(" ").append(since.getVersion());
+					buffer.append(" ").append(since.getVersion()); //$NON-NLS-1$
 				}
 
-				buffer.append("<br>");
+				buffer.append(NEW_LINE);
 			}
 		}
 	}
@@ -143,7 +146,7 @@ public class JSModelFormatter
 	 */
 	private static void addTypes(StringBuilder buffer, List<String> types)
 	{
-		buffer.append(" : ");
+		buffer.append(" : "); //$NON-NLS-1$
 		
 		if (types != null && types.size() > 0)
 		{
@@ -154,11 +157,11 @@ public class JSModelFormatter
 				typeDisplayNames.add(getTypeDisplayName(type));
 			}
 
-			buffer.append(StringUtil.join(",", typeDisplayNames));
+			buffer.append(StringUtil.join(",", typeDisplayNames)); //$NON-NLS-1$
 		}
 		else
 		{
-			buffer.append("undefined");
+			buffer.append(JSTypeConstants.UNDEFINED_TYPE);
 		}
 	}
 
@@ -174,7 +177,7 @@ public class JSModelFormatter
 		StringBuilder buffer = new StringBuilder();
 
 		buffer.append(function.getName());
-		buffer.append("(").append(StringUtil.join(", ", function.getParameterTypes())).append(")");
+		buffer.append("(").append(StringUtil.join(", ", function.getParameterTypes())).append(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		addTypes(buffer, function.getTypeNames());
 		addDescription(buffer, function);
@@ -258,7 +261,7 @@ public class JSModelFormatter
 			}
 			else if (type.startsWith(JSTypeConstants.DYNAMIC_CLASS_PREFIX))
 			{
-				result = "UserType";
+				result = JSTypeConstants.USER_TYPE;
 			}
 			else
 			{

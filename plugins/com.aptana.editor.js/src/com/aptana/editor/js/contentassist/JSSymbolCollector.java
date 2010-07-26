@@ -1,5 +1,7 @@
 package com.aptana.editor.js.contentassist;
 
+import org.eclipse.core.runtime.Platform;
+
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSCatchNode;
 import com.aptana.editor.js.parsing.ast.JSDeclarationNode;
@@ -160,7 +162,10 @@ public class JSSymbolCollector extends JSTreeWalker
 						case JSNodeTypes.THIS:
 							// TODO: implement this once we're properly handling
 							// [[proto]]
-							System.out.println("unprocessed assignment: " + node);
+							if (Platform.inDevelopmentMode())
+							{
+								System.out.println("unprocessed assignment: " + node); //$NON-NLS-1$
+							}
 							break LOOP;
 
 						default:
@@ -169,9 +174,9 @@ public class JSSymbolCollector extends JSTreeWalker
 					}
 				}
 
-				if (lhs == null)
+				if (Platform.inDevelopmentMode() && lhs == null)
 				{
-					System.out.println("unprocessed assignment: " + node);
+					System.out.println("unprocessed assignment: " + node); //$NON-NLS-1$
 				}
 				break;
 		}

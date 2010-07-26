@@ -631,7 +631,7 @@ public class JSIndexQueryHelper
 		
 		if (typeNames != null && typeNames.isEmpty() == false)
 		{
-			String typePattern = "(" + StringUtil.join("|", typeNames) + ")";
+			String typePattern = "(" + StringUtil.join("|", typeNames) + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			
 			result = this.getTypeMembers(index, typePattern, fields);
 		}

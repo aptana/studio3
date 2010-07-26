@@ -39,8 +39,21 @@ import com.aptana.parsing.xpath.ParseNodeXPath;
 
 public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 {
+	private static XPath LAMBDAS_IN_SCOPE;
 	private JSIndexWriter _indexWriter;
 
+	static
+	{
+		try
+		{
+			LAMBDAS_IN_SCOPE = new ParseNodeXPath("invoke[position() = 1]/group/function|invoke[position() = 1]/function"); //$NON-NLS-1$
+		}
+		catch (JaxenException e)
+		{
+			Activator.logError(e.getMessage(), e);
+		}
+	}
+	
 	/**
 	 * JSFileIndexingParticipant
 	 */
@@ -157,8 +170,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 
 		try
 		{
-			XPath xpath = new ParseNodeXPath("invoke[position() = 1]/group/function|invoke[position() = 1]/function");
-			Object queryResult = xpath.evaluate(node);
+			Object queryResult = LAMBDAS_IN_SCOPE.evaluate(node);
 
 			if (queryResult != null)
 			{

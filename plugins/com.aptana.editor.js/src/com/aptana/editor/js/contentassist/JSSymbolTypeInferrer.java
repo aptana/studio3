@@ -26,6 +26,8 @@ import com.aptana.index.core.Index;
 
 public class JSSymbolTypeInferrer
 {
+	private static final String NO_TYPE = ""; //$NON-NLS-1$
+
 	private static final EnumSet<ContentSelector> MEMBER_CONTENT = EnumSet.of(ContentSelector.NAME, ContentSelector.TYPES, ContentSelector.RETURN_TYPES);
 
 	private Index _index;
@@ -218,9 +220,9 @@ public class JSSymbolTypeInferrer
 			{
 				if (result instanceof FunctionElement)
 				{
-					if (typeName.startsWith(JSTypeConstants.FUNCTION_TYPE + ":"))
+					if (typeName.startsWith(JSTypeConstants.FUNCTION_SIGNATURE_PREFIX))
 					{
-						typeName = typeName.substring(JSTypeConstants.FUNCTION_TYPE.length() + 1);
+						typeName = typeName.substring(JSTypeConstants.FUNCTION_SIGNATURE_PREFIX.length());
 					}
 				}
 				
@@ -369,7 +371,7 @@ public class JSSymbolTypeInferrer
 				}
 				else if (value instanceof JSAssignmentNode && value.getNodeType() != JSNodeTypes.ASSIGN)
 				{
-					property.addType("");
+					property.addType(NO_TYPE);
 					inferrer.visit(value);
 					property.clearTypes();
 				}

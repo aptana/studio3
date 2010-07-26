@@ -25,7 +25,7 @@ public class ParamTag extends TagWithTypes
 	 */
 	public String getName()
 	{
-		String result = "";
+		String result = ""; //$NON-NLS-1$
 		
 		if (this._parameter != null)
 		{

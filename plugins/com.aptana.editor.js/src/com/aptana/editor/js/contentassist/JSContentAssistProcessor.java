@@ -218,7 +218,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					// add all properties of each type to our proposal list
 					for (String type : typeList)
 					{
-						if (type.startsWith("Function:"))
+						if (type.startsWith(JSTypeConstants.FUNCTION_SIGNATURE_PREFIX))
 						{
 							this.addTypeProperties(proposals, JSTypeConstants.FUNCTION_TYPE, offset);
 						}
