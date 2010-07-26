@@ -223,8 +223,10 @@ public class JSSymbolCollector extends JSTreeWalker
 			this.addPropertyValue(name, node);
 		}
 
-		// create a new scope
+		// create a new scope and set its range
+		IParseNode body = node.getBody();
 		this.pushScope();
+		this.setScopeRange(body);
 
 		// add parameters
 		for (IParseNode parameter : node.getParameters())
@@ -236,12 +238,7 @@ public class JSSymbolCollector extends JSTreeWalker
 		}
 
 		// process body
-		IParseNode body = node.getBody();
-
 		this.accept(body);
-
-		// set scope range
-		this.setScopeRange(body);
 
 		// restore original scope
 		this.popScope();
@@ -276,12 +273,14 @@ public class JSSymbolCollector extends JSTreeWalker
 	@Override
 	public void visit(JSParseRootNode node)
 	{
+		// set scope range
+		this.setScopeRange(node);
+		
+		// process children
 		for (IParseNode child : node)
 		{
 			this.accept(child);
 		}
-
-		this.setScopeRange(node);
 	}
 
 	/*
