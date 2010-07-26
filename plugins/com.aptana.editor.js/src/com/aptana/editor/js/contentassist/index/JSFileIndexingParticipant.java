@@ -17,6 +17,7 @@ import org.jaxen.XPath;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.JSScope;
 import com.aptana.editor.js.contentassist.JSSymbolCollector;
@@ -146,30 +147,38 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 	 * 
 	 * @param index
 	 * @param globals
-	 * @param ast
+	 * @param node
 	 * @param location
 	 */
 	@SuppressWarnings("unchecked")
-	private List<PropertyElement> processLambdas(Index index, JSScope globals, IParseNode ast, URI location)
+	private List<PropertyElement> processLambdas(Index index, JSScope globals, IParseNode node, URI location)
 	{
 		List<PropertyElement> result = Collections.emptyList();
 
 		try
 		{
 			XPath xpath = new ParseNodeXPath("invoke[position() = 1]/group/function|invoke[position() = 1]/function");
-			Object queryResult = xpath.evaluate(ast);
+			Object queryResult = xpath.evaluate(node);
 
 			if (queryResult != null)
 			{
-				result = new ArrayList<PropertyElement>();
-				
 				List<JSFunctionNode> functions = (List<JSFunctionNode>) queryResult;
 
-				for (JSFunctionNode function : functions)
+				if (functions.isEmpty() == false)
 				{
-					JSScope scope = globals.getScopeAtOffset(function.getBody().getStartingOffset());
-					
-					result.addAll(this.processWindowAssignments(index, scope, location));
+					result = new ArrayList<PropertyElement>();
+
+					for (JSFunctionNode function : functions)
+					{
+						// grab the correct scope for this function's body
+						JSScope scope = globals.getScopeAtOffset(function.getBody().getStartingOffset());
+
+						// add all properties off of "window" to our list
+						result.addAll(this.processWindowAssignments(index, scope, location));
+
+						// handle any nested lambdas in this function
+						this.processLambdas(index, globals, function, location);
+					}
 				}
 			}
 		}
@@ -197,8 +206,8 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 		{
 			// create new Window type for this file
 			TypeElement type = new TypeElement();
-			type.setName("Window"); //$NON-NLS-1$
-			
+			type.setName(JSTypeConstants.WINDOW);
+
 			JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(globals, index, location);
 
 			// add declared variables and functions from the global scope
@@ -207,14 +216,14 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 				type.addProperty(property);
 			}
 
-			// // include any assignments to Window
-			// for (PropertyElement property : processWindowAssignments(index, globals, location))
-			// {
-			// type.addProperty(property);
-			// }
+			// include any assignments to Window
+			for (PropertyElement property : this.processWindowAssignments(index, globals, location))
+			{
+				type.addProperty(property);
+			}
 
 			// process scopes (self-invoking functions)
-			for (PropertyElement property : processLambdas(index, globals, ast, location))
+			for (PropertyElement property : this.processLambdas(index, globals, ast, location))
 			{
 				type.addProperty(property);
 			}
@@ -237,21 +246,21 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 
 		if (symbols != null)
 		{
-			if (symbols.hasLocalSymbol("window"))
+			if (symbols.hasLocalSymbol(JSTypeConstants.WINDOW_PROPERTY))
 			{
 				JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(symbols, index, location);
-				PropertyElement property = symbolInferrer.getSymbolPropertyElement("window");
-				
+				PropertyElement property = symbolInferrer.getSymbolPropertyElement(JSTypeConstants.WINDOW_PROPERTY);
+
 				if (property != null)
 				{
 					List<String> typeNames = property.getTypeNames();
 					JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
-					
+
 					result = queryHelper.getTypeMembers(index, typeNames, EnumSet.allOf(ContentSelector.class));
 				}
 			}
 		}
-		
+
 		return result;
 	}
 }
