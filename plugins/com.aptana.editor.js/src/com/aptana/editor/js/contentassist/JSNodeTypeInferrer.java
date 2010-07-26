@@ -107,7 +107,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				}
 			}
 		}
-		
+
 		// Use "Object" as parameter type if we didn't find types by other
 		// means
 		if (foundType == false)
@@ -486,7 +486,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		}
 
 		String type;
-		
+
 		// build function type, including return values
 		if (types.isEmpty() == false)
 		{
@@ -502,7 +502,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		{
 			type = JSTypeConstants.FUNCTION_TYPE;
 		}
-		
+
 		this.addType(type);
 	}
 
@@ -556,15 +556,15 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				PropertyElement property = this._indexHelper.getTypeMember(this._index, typeName, memberName, EnumSet.of(ContentSelector.RETURN_TYPES,
 					ContentSelector.TYPES));
 
-//				if (property == null)
-//				{
-//					TypeElement type = this.getGeneratedType(typeName);
-//
-//					if (type != null)
-//					{
-//						property = type.getProperty(memberName);
-//					}
-//				}
+				// if (property == null)
+				// {
+				// TypeElement type = this.getGeneratedType(typeName);
+				//
+				// if (type != null)
+				// {
+				// property = type.getProperty(memberName);
+				// }
+				// }
 
 				if (property != null)
 				{
@@ -614,7 +614,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		if (this._scope != null && this._scope.hasSymbol(name))
 		{
 			IParseNode parent = node.getParent();
-			
+
 			if (parent != null && parent.getNodeType() == JSNodeTypes.PARAMETERS)
 			{
 				// special handling of parameters to potentially get the type
@@ -625,7 +625,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 			else
 			{
 				JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(this._scope, this._index, this._location);
-				
+
 				property = symbolInferrer.getSymbolPropertyElement(name);
 			}
 		}

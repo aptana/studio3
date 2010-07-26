@@ -37,6 +37,7 @@ public class JSSymbolTypeInferrer
 
 	/**
 	 * JSSymbolTypeInferrer
+	 * 
 	 * @param activeScope
 	 * @param index
 	 * @param location
@@ -47,7 +48,7 @@ public class JSSymbolTypeInferrer
 		this._activeScope = activeScope;
 		this._location = location;
 	}
-	
+
 	/**
 	 * createPropertyElement
 	 * 
@@ -225,7 +226,7 @@ public class JSSymbolTypeInferrer
 						typeName = typeName.substring(JSTypeConstants.FUNCTION_SIGNATURE_PREFIX.length());
 					}
 				}
-				
+
 				result.addType(typeName);
 			}
 		}
@@ -313,7 +314,7 @@ public class JSSymbolTypeInferrer
 
 					subType.addProperty(pe);
 				}
-				
+
 				this.writeType(subType);
 			}
 		}
@@ -384,7 +385,7 @@ public class JSSymbolTypeInferrer
 			}
 		}
 	}
-	
+
 	/**
 	 * writeType
 	 * 
@@ -396,7 +397,7 @@ public class JSSymbolTypeInferrer
 		{
 			this._writer = new JSIndexWriter();
 		}
-		
+
 		this._writer.writeType(this._index, type, this._location);
 	}
 }

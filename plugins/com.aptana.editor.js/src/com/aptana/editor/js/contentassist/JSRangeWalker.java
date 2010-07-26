@@ -40,7 +40,7 @@ public class JSRangeWalker extends JSTreeWalker
 	{
 		return this._range;
 	}
-	
+
 	/**
 	 * setRange
 	 * 
@@ -51,7 +51,7 @@ public class JSRangeWalker extends JSTreeWalker
 	{
 		this._range = new Range(startingOffset, endingOffset);
 	}
-	
+
 	/**
 	 * setRange
 	 * 
@@ -65,7 +65,8 @@ public class JSRangeWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSFalseNode)
 	 */
 	@Override
@@ -74,7 +75,8 @@ public class JSRangeWalker extends JSTreeWalker
 		// do nothing
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSIdentifierNode)
 	 */
 	@Override
@@ -86,7 +88,8 @@ public class JSRangeWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSNullNode)
 	 */
 	@Override
@@ -95,7 +98,8 @@ public class JSRangeWalker extends JSTreeWalker
 		// do nothing
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSNumberNode)
 	 */
 	@Override
@@ -104,7 +108,8 @@ public class JSRangeWalker extends JSTreeWalker
 		// do nothing
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSParseRootNode)
 	 */
 	@Override
@@ -123,7 +128,8 @@ public class JSRangeWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSRegexNode)
 	 */
 	@Override
@@ -132,7 +138,8 @@ public class JSRangeWalker extends JSTreeWalker
 		// do nothing
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSStringNode)
 	 */
 	@Override
@@ -144,7 +151,8 @@ public class JSRangeWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSThisNode)
 	 */
 	@Override
@@ -153,7 +161,8 @@ public class JSRangeWalker extends JSTreeWalker
 		// do nothing
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSTrueNode)
 	 */
 	@Override
@@ -162,7 +171,8 @@ public class JSRangeWalker extends JSTreeWalker
 		// do nothing
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visitChildren(com.aptana.editor.js.parsing.ast.JSNode)
 	 */
 	@Override

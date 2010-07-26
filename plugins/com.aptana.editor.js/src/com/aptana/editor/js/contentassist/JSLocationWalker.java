@@ -66,7 +66,7 @@ public class JSLocationWalker extends JSTreeWalker
 	public JSLocationWalker(int offset)
 	{
 		offset--;
-		
+
 		this._offset = offset;
 		this._type = LocationType.UNKNOWN;
 	}
@@ -115,7 +115,8 @@ public class JSLocationWalker extends JSTreeWalker
 		this.visitChildren(node);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSArrayNode)
 	 */
 	@Override
@@ -165,7 +166,7 @@ public class JSLocationWalker extends JSTreeWalker
 			IParseNode lhs = node.getLeftHandSide();
 			Symbol operator = node.getOperator();
 			IParseNode rhs = node.getRightHandSide();
-			
+
 			if (lhs.contains(this._offset))
 			{
 				this.setType(lhs);
@@ -189,7 +190,8 @@ public class JSLocationWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSBreakNode)
 	 */
 	@Override
@@ -198,7 +200,7 @@ public class JSLocationWalker extends JSTreeWalker
 		if (node.contains(this._offset))
 		{
 			Symbol label = node.getLabel();
-			
+
 			if (label != null && label.getStart() - 1 <= this._offset && this._offset <= label.getEnd())
 			{
 				this.setType(LocationType.IN_LABEL);
@@ -214,7 +216,8 @@ public class JSLocationWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSCaseNode)
 	 */
 	@Override
@@ -223,7 +226,7 @@ public class JSLocationWalker extends JSTreeWalker
 		if (node.contains(this._offset))
 		{
 			Symbol colon = node.getColon();
-			
+
 			if (this._offset == colon.getEnd())
 			{
 				this.setType(LocationType.IN_GLOBAL);
@@ -231,11 +234,11 @@ public class JSLocationWalker extends JSTreeWalker
 			else if (this._offset > colon.getEnd())
 			{
 				this.setType(LocationType.IN_GLOBAL);
-				
+
 				for (int i = 1; i < node.getChildCount(); i++)
 				{
 					IParseNode child = node.getChild(i);
-					
+
 					if (child.contains(this._offset))
 					{
 						this.setType(child);
@@ -250,7 +253,8 @@ public class JSLocationWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSCatchNode)
 	 */
 	@Override
@@ -259,7 +263,7 @@ public class JSLocationWalker extends JSTreeWalker
 		if (node.contains(this._offset))
 		{
 			IParseNode body = node.getBody();
-			
+
 			if (body instanceof JSNode && body.contains(this._offset))
 			{
 				((JSNode) body).accept(this);
@@ -271,7 +275,8 @@ public class JSLocationWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSCommaNode)
 	 */
 	@Override
@@ -281,7 +286,8 @@ public class JSLocationWalker extends JSTreeWalker
 		super.visit(node);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSConditionalNode)
 	 */
 	@Override
@@ -290,11 +296,11 @@ public class JSLocationWalker extends JSTreeWalker
 		if (node.contains(this._offset))
 		{
 			this.setType(LocationType.IN_GLOBAL);
-			
+
 			// partition by operators
 			Symbol questionMark = node.getQuestionMark();
 			Symbol colon = node.getColon();
-			
+
 			if (this._offset < questionMark.getStart())
 			{
 				this.setType(LocationType.NONE);
@@ -319,7 +325,8 @@ public class JSLocationWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSConstructNode)
 	 */
 	@Override
@@ -329,7 +336,7 @@ public class JSLocationWalker extends JSTreeWalker
 		{
 			IParseNode identifier = node.getExpression();
 			IParseNode arguments = node.getArguments();
-			
+
 			if (this._offset < node.getStart() + 3)
 			{
 				this.setType(LocationType.NONE);
@@ -357,7 +364,8 @@ public class JSLocationWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSContinueNode)
 	 */
 	@Override
@@ -366,7 +374,7 @@ public class JSLocationWalker extends JSTreeWalker
 		if (node.contains(this._offset))
 		{
 			Symbol label = node.getLabel();
-			
+
 			if (label != null && label.getStart() - 1 <= this._offset && this._offset <= label.getEnd())
 			{
 				this.setType(LocationType.IN_LABEL);
@@ -382,7 +390,8 @@ public class JSLocationWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSDeclarationNode)
 	 */
 	@Override
@@ -391,11 +400,11 @@ public class JSLocationWalker extends JSTreeWalker
 		if (node.contains(this._offset))
 		{
 			Symbol equalSign = node.getEqualSign();
-			
+
 			if (equalSign != null)
 			{
 				IParseNode value = node.getValue();
-				
+
 				if (this._offset < equalSign.getStart())
 				{
 					this.setType(LocationType.NONE);
@@ -416,7 +425,8 @@ public class JSLocationWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSDefaultNode)
 	 */
 	@Override
@@ -425,7 +435,7 @@ public class JSLocationWalker extends JSTreeWalker
 		if (node.contains(this._offset))
 		{
 			Symbol colon = node.getColon();
-			
+
 			if (this._offset == colon.getEnd())
 			{
 				this.setType(LocationType.IN_GLOBAL);
@@ -433,11 +443,11 @@ public class JSLocationWalker extends JSTreeWalker
 			else if (this._offset > colon.getEnd())
 			{
 				this.setType(LocationType.IN_GLOBAL);
-				
+
 				for (int i = 0; i < node.getChildCount(); i++)
 				{
 					IParseNode child = node.getChild(i);
-					
+
 					if (child.contains(this._offset))
 					{
 						this.setType(child);
@@ -452,7 +462,8 @@ public class JSLocationWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSDoNode)
 	 */
 	@Override
@@ -464,7 +475,7 @@ public class JSLocationWalker extends JSTreeWalker
 			Symbol lparen = node.getLeftParenthesis();
 			IParseNode condition = node.getCondition();
 			Symbol rparen = node.getRightParenthesis();
-			
+
 			if (this._offset < body.getStartingOffset())
 			{
 				this.setType(LocationType.NONE);
@@ -496,7 +507,8 @@ public class JSLocationWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSElementsNode)
 	 */
 	@Override
@@ -508,7 +520,8 @@ public class JSLocationWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSElisionNode)
 	 */
 	@Override
@@ -533,7 +546,8 @@ public class JSLocationWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSFinallyNode)
 	 */
 	@Override
@@ -542,12 +556,13 @@ public class JSLocationWalker extends JSTreeWalker
 		if (node.contains(this._offset))
 		{
 			this.setType(LocationType.NONE);
-			
+
 			this.visitChildren(node);
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSForInNode)
 	 */
 	@Override
@@ -560,7 +575,7 @@ public class JSLocationWalker extends JSTreeWalker
 			IParseNode expression = node.getExpression();
 			Symbol rightParen = node.getRightParenthesis();
 			IParseNode body = node.getBody();
-			
+
 			if (this._offset < initializer.getStartingOffset())
 			{
 				this.setType(LocationType.NONE);
@@ -596,7 +611,8 @@ public class JSLocationWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSForNode)
 	 */
 	@Override
@@ -611,7 +627,7 @@ public class JSLocationWalker extends JSTreeWalker
 			IParseNode advance = node.getAdvance();
 			Symbol rparen = node.getRightParenthesis();
 			IParseNode body = node.getBody();
-			
+
 			if (this._offset < initializer.getStartingOffset())
 			{
 				this.setType(LocationType.NONE);
@@ -732,7 +748,8 @@ public class JSLocationWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSGroupNode)
 	 */
 	@Override
@@ -742,7 +759,7 @@ public class JSLocationWalker extends JSTreeWalker
 		{
 			IParseNode expression = node.getExpression();
 			Symbol rparen = node.getRightParenthesis();
-			
+
 			if (this._offset < expression.getStartingOffset())
 			{
 				this.setType(LocationType.IN_GLOBAL);
@@ -771,7 +788,8 @@ public class JSLocationWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSIfNode)
 	 */
 	@Override
@@ -784,7 +802,7 @@ public class JSLocationWalker extends JSTreeWalker
 			Symbol rparen = node.getRightParenthesis();
 			IParseNode trueBlock = node.getTrueBlock();
 			IParseNode falseBlock = node.getFalseBlock();
-			
+
 			if (this._offset < lparen.getStart())
 			{
 				this.setType(LocationType.NONE);
@@ -835,7 +853,7 @@ public class JSLocationWalker extends JSTreeWalker
 		{
 			IParseNode expression = node.getExpression();
 			IParseNode arguments = node.getArguments();
-			
+
 			if (expression.contains(this._offset))
 			{
 				this.setType(expression);
@@ -848,14 +866,15 @@ public class JSLocationWalker extends JSTreeWalker
 			{
 				this.setType(arguments);
 			}
-//			else
-//			{
-//				this.setType(LocationType.NONE);
-//			}
+			// else
+			// {
+			// this.setType(LocationType.NONE);
+			// }
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSLabelledNode)
 	 */
 	@Override
@@ -865,7 +884,7 @@ public class JSLocationWalker extends JSTreeWalker
 		{
 			Symbol colon = node.getColon();
 			IParseNode block = node.getBlock();
-			
+
 			if (this._offset < colon.getStart())
 			{
 				this.setType(LocationType.IN_LABEL);
@@ -885,7 +904,8 @@ public class JSLocationWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSNameValuePairNode)
 	 */
 	@Override
@@ -895,7 +915,7 @@ public class JSLocationWalker extends JSTreeWalker
 		{
 			Symbol colon = node.getColon();
 			IParseNode value = node.getValue();
-			
+
 			if (this._offset < colon.getStart())
 			{
 				this.setType(LocationType.NONE);
@@ -937,7 +957,8 @@ public class JSLocationWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSObjectNode)
 	 */
 	@Override
@@ -951,7 +972,8 @@ public class JSLocationWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSParametersNode)
 	 */
 	@Override
@@ -971,7 +993,7 @@ public class JSLocationWalker extends JSTreeWalker
 	public void visit(JSParseRootNode node)
 	{
 		this.setType(LocationType.IN_GLOBAL);
-		
+
 		if (node.contains(this._offset) && node.hasChildren())
 		{
 			for (IParseNode child : node)
@@ -986,8 +1008,10 @@ public class JSLocationWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSPostUnaryOperatorNode)
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSPostUnaryOperatorNode)
 	 */
 	@Override
 	public void visit(JSPostUnaryOperatorNode node)
@@ -996,7 +1020,7 @@ public class JSLocationWalker extends JSTreeWalker
 		{
 			IParseNode expression = node.getExpression();
 			Symbol operator = node.getOperator();
-			
+
 			if (expression.contains(this._offset))
 			{
 				this.setType(expression);
@@ -1012,7 +1036,8 @@ public class JSLocationWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSPreUnaryOperatorNode)
 	 */
 	@Override
@@ -1022,7 +1047,7 @@ public class JSLocationWalker extends JSTreeWalker
 		{
 			IParseNode expression = node.getExpression();
 			Symbol operator = node.getOperator();
-			
+
 			if (this._offset < operator.getEnd())
 			{
 				this.setType(LocationType.NONE);
@@ -1055,7 +1080,8 @@ public class JSLocationWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSReturnNode)
 	 */
 	@Override
@@ -1064,7 +1090,7 @@ public class JSLocationWalker extends JSTreeWalker
 		if (node.contains(this._offset))
 		{
 			IParseNode expression = node.getExpression();
-			
+
 			if (this._offset < expression.getStartingOffset())
 			{
 				if (this._offset + 1 == expression.getStartingOffset())
@@ -1093,12 +1119,13 @@ public class JSLocationWalker extends JSTreeWalker
 		if (node.contains(this._offset) && node.getEndingOffset() != this._offset)
 		{
 			this.setType(LocationType.IN_GLOBAL);
-			
+
 			this.visitChildren(node);
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSStringNode)
 	 */
 	@Override
@@ -1110,7 +1137,8 @@ public class JSLocationWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSSwitchNode)
 	 */
 	@Override
@@ -1124,7 +1152,7 @@ public class JSLocationWalker extends JSTreeWalker
 			Symbol lcurly = node.getLeftBrace();
 			IParseNode firstStatement = node.getChild(1);
 			IParseNode lastStatement = node.getLastChild();
-			
+
 			if (this._offset < lparen.getStart())
 			{
 				this.setType(LocationType.NONE);
@@ -1156,11 +1184,11 @@ public class JSLocationWalker extends JSTreeWalker
 			else
 			{
 				this.setType(LocationType.IN_GLOBAL);
-				
+
 				for (int i = 1; i < node.getChildCount(); i++)
 				{
 					IParseNode child = node.getChild(i);
-					
+
 					if (child.contains(this._offset))
 					{
 						this.setType(child);
@@ -1184,7 +1212,8 @@ public class JSLocationWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSThrowNode)
 	 */
 	@Override
@@ -1193,7 +1222,7 @@ public class JSLocationWalker extends JSTreeWalker
 		if (node.contains(this._offset))
 		{
 			IParseNode expression = node.getExpression();
-			
+
 			if (this._offset < expression.getStartingOffset())
 			{
 				if (this._offset + 1 == expression.getStartingOffset())
@@ -1225,7 +1254,8 @@ public class JSLocationWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSTryNode)
 	 */
 	@Override
@@ -1234,12 +1264,13 @@ public class JSLocationWalker extends JSTreeWalker
 		if (node.contains(this._offset) && node.getEndingOffset() != this._offset)
 		{
 			this.setType(LocationType.NONE);
-			
+
 			this.visitChildren(node);
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSVarNode)
 	 */
 	@Override
@@ -1248,7 +1279,7 @@ public class JSLocationWalker extends JSTreeWalker
 		if (node.contains(this._offset) && this._offset != node.getEndingOffset())
 		{
 			IParseNode firstDeclaration = node.getFirstChild();
-			
+
 			if (this._offset < firstDeclaration.getStartingOffset())
 			{
 				this.setType(LocationType.NONE);
@@ -1261,7 +1292,8 @@ public class JSLocationWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSWhileNode)
 	 */
 	@Override
@@ -1273,7 +1305,7 @@ public class JSLocationWalker extends JSTreeWalker
 			IParseNode condition = node.getCondition();
 			Symbol rparen = node.getRightParenthesis();
 			IParseNode body = node.getBody();
-			
+
 			if (this._offset < lparen.getStart())
 			{
 				this.setType(LocationType.NONE);
@@ -1301,7 +1333,8 @@ public class JSLocationWalker extends JSTreeWalker
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSWithNode)
 	 */
 	@Override
@@ -1313,7 +1346,7 @@ public class JSLocationWalker extends JSTreeWalker
 			IParseNode expression = node.getExpression();
 			Symbol rparen = node.getRightParenthesis();
 			IParseNode body = node.getBody();
-			
+
 			if (this._offset < lparen.getStart())
 			{
 				this.setType(LocationType.NONE);

@@ -147,7 +147,7 @@ public class JSModelFormatter
 	private static void addTypes(StringBuilder buffer, List<String> types)
 	{
 		buffer.append(" : "); //$NON-NLS-1$
-		
+
 		if (types != null && types.size() > 0)
 		{
 			List<String> typeDisplayNames = new ArrayList<String>();

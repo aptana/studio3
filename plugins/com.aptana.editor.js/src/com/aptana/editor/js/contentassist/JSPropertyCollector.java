@@ -16,7 +16,7 @@ public class JSPropertyCollector extends JSTreeWalker
 {
 	private JSObject _object;
 	private JSObject _currentObject;
-	
+
 	/**
 	 * JSPropertyCollector
 	 * 
@@ -46,7 +46,7 @@ public class JSPropertyCollector extends JSTreeWalker
 			this._currentObject = property;
 		}
 	}
-	
+
 	/**
 	 * addPropertyValue
 	 * 
@@ -58,13 +58,13 @@ public class JSPropertyCollector extends JSTreeWalker
 		if (name != null && name.length() > 0 && value instanceof JSNode)
 		{
 			List<JSNode> values = new ArrayList<JSNode>(1);
-			
+
 			values.add((JSNode) value);
-			
+
 			this.addPropertyValues(name, values);
 		}
 	}
-	
+
 	/**
 	 * addPropertyValue
 	 * 
@@ -76,7 +76,7 @@ public class JSPropertyCollector extends JSTreeWalker
 		if (name != null && name.length() > 0 && values != null && values.isEmpty() == false)
 		{
 			JSObject property;
-			
+
 			if (this._currentObject.hasProperty(name))
 			{
 				// use the currently existing property
@@ -86,25 +86,25 @@ public class JSPropertyCollector extends JSTreeWalker
 			{
 				// create a new property
 				property = new JSObject();
-				
+
 				// add it to the current object
 				this._currentObject.setProperty(name, property);
 			}
-			
+
 			for (JSNode value : values)
 			{
 				if (value instanceof JSObjectNode)
 				{
 					// save current object
 					JSObject current = this._currentObject;
-					
+
 					this._currentObject = property;
 					this.visit((JSObjectNode) value);
-					
+
 					// restore original object
 					this._currentObject = current;
 				}
-				
+
 				property.addValue(value);
 			}
 		}
@@ -137,7 +137,7 @@ public class JSPropertyCollector extends JSTreeWalker
 	{
 		this._currentObject = this._object;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSAssignmentNode)
@@ -156,27 +156,27 @@ public class JSPropertyCollector extends JSTreeWalker
 			((JSNode) lhs).accept(this);
 
 			this._currentObject.addValue((JSNode) rhs);
-			
+
 			// TODO: Do we really want to potentially expand an object hierarchy
 			// once for each assignment or can we take advantage of the fact
 			// that we have multiple assignments to the same object and then
 			// re-use the generated type for each?
-			
+
 			// grab the actual value if we have a stream of assignments
 			IParseNode rightmostValue = rhs;
-			
+
 			while (rightmostValue instanceof JSAssignmentNode)
 			{
 				rightmostValue = rightmostValue.getLastChild();
 			}
-			
+
 			// perform special processing on object literals to transform them
 			// to our JSObject structure
 			if (rightmostValue instanceof JSObjectNode)
 			{
 				this.visit((JSObjectNode) rightmostValue);
 			}
-			
+
 			// expand properties of right-hand assignments as well
 			if (rhs instanceof JSAssignmentNode)
 			{
@@ -224,7 +224,8 @@ public class JSPropertyCollector extends JSTreeWalker
 		this.activateProperty(node.getText());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSObjectNode)
 	 */
 	@Override
@@ -235,25 +236,25 @@ public class JSPropertyCollector extends JSTreeWalker
 			IParseNode key = child.getFirstChild();
 			IParseNode value = child.getLastChild();
 			String name = key.getText();
-			
+
 			if (key instanceof JSStringNode)
 			{
 				name = name.substring(1, name.length() - 1);
 			}
-			
+
 			if (value instanceof JSObjectNode)
 			{
 				JSObjectNode objectLiteral = (JSObjectNode) value;
-				
+
 				// remember current object
 				JSObject currentObject = this._currentObject;
-				
+
 				// create a new one for this object
 				this.activateProperty(name);
 				this._currentObject.addValue(objectLiteral);
-				
+
 				this.visit(objectLiteral);
-				
+
 				// reset
 				this._currentObject = currentObject;
 			}

@@ -54,7 +54,7 @@ public class JSSymbolCollector extends JSTreeWalker
 		{
 			JSObject object = this._scope.getObject();
 			JSObject property;
-			
+
 			if (object.hasProperty(name))
 			{
 				// use the currently existing property
@@ -64,21 +64,21 @@ public class JSSymbolCollector extends JSTreeWalker
 			{
 				// create a new property
 				property = new JSObject();
-				
+
 				// add it to the current object
 				object.setProperty(name, property);
 			}
-			
+
 			if (value instanceof JSObjectNode)
 			{
 				JSPropertyCollector collector = new JSPropertyCollector(property);
 				collector.visit((JSObjectNode) value);
 			}
-			
+
 			property.addValue(value);
 		}
 	}
-	
+
 	/**
 	 * getScope
 	 * 
@@ -248,7 +248,7 @@ public class JSSymbolCollector extends JSTreeWalker
 		// restore original scope
 		this.popScope();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSGetPropertyNode)
@@ -259,7 +259,7 @@ public class JSSymbolCollector extends JSTreeWalker
 		// No need to process the rhs since it's always an identifier
 		this.accept(node.getLeftHandSide());
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSLabelledNode)
@@ -270,7 +270,7 @@ public class JSSymbolCollector extends JSTreeWalker
 		// No need to process the label since it's always an identifier
 		this.accept(node.getBlock());
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSParseRootNode)
@@ -280,7 +280,7 @@ public class JSSymbolCollector extends JSTreeWalker
 	{
 		// set scope range
 		this.setScopeRange(node);
-		
+
 		// process children
 		for (IParseNode child : node)
 		{

@@ -11,8 +11,7 @@ import com.aptana.parsing.lexer.Lexeme;
 public class JSLexemeProvider extends LexemeProvider<JSTokenType>
 {
 	/**
-	 * Convert the partition that contains the given offset into a list of
-	 * lexemes.
+	 * Convert the partition that contains the given offset into a list of lexemes.
 	 * 
 	 * @param document
 	 * @param offset
@@ -22,7 +21,7 @@ public class JSLexemeProvider extends LexemeProvider<JSTokenType>
 	{
 		super(document, offset, scanner);
 	}
-	
+
 	/**
 	 * Convert the specified range of text into a list of lexemes
 	 * 
@@ -35,7 +34,8 @@ public class JSLexemeProvider extends LexemeProvider<JSTokenType>
 		super(document, range, scanner);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.contentassist.LexemeProvider#addLexeme(com.aptana.parsing.lexer.Lexeme)
 	 */
 	@Override
@@ -49,7 +49,7 @@ public class JSLexemeProvider extends LexemeProvider<JSTokenType>
 			case SDOC:
 			case VSDOC:
 				break;
-				
+
 			default:
 				super.addLexeme(lexeme);
 		}

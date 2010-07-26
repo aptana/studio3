@@ -546,18 +546,18 @@ public class JSIndexQueryHelper
 	{
 		// Using linked hash set to preserve the order items were added to set
 		Set<String> types = new LinkedHashSet<String>();
-		
+
 		// Using linked list since it provides a queue interface
 		LinkedList<String> queue = new LinkedList<String>();
-		
+
 		// prime the queue
 		queue.offer(typeName);
-		
+
 		while (queue.isEmpty() == false)
 		{
 			String name = queue.poll();
 			TypeElement type = this.getType(index, name, PARENT_TYPES);
-			
+
 			if (type != null)
 			{
 				for (String parentType : type.getParentTypes())
@@ -565,7 +565,7 @@ public class JSIndexQueryHelper
 					if (types.contains(parentType) == false)
 					{
 						types.add(parentType);
-						
+
 						if (JSTypeConstants.OBJECT_TYPE.equals(parentType) == false)
 						{
 							queue.offer(parentType);
@@ -574,10 +574,10 @@ public class JSIndexQueryHelper
 				}
 			}
 		}
-		
+
 		return new ArrayList<String>(types);
 	}
-	
+
 	/**
 	 * getTypeMember
 	 * 
@@ -616,7 +616,7 @@ public class JSIndexQueryHelper
 
 		return result;
 	}
-	
+
 	/**
 	 * getTypeMembers
 	 * 
@@ -628,18 +628,18 @@ public class JSIndexQueryHelper
 	public List<PropertyElement> getTypeMembers(Index index, List<String> typeNames, EnumSet<ContentSelector> fields)
 	{
 		List<PropertyElement> result;
-		
+
 		if (typeNames != null && typeNames.isEmpty() == false)
 		{
 			String typePattern = "(" + StringUtil.join("|", typeNames) + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			
+
 			result = this.getTypeMembers(index, typePattern, fields);
 		}
 		else
 		{
 			result = Collections.emptyList();
 		}
-		
+
 		return result;
 	}
 
