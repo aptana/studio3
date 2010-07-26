@@ -228,7 +228,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		leftLabelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
 		leftLabel.setLayoutData(leftLabelGridData);
 
-		branchesToolbar = new ToolBar(parent, SWT.FLAT | SWT.BORDER);
+		branchesToolbar = new ToolBar(parent, SWT.FLAT);
 		branchesToolbarGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
 		branchesToolbar.setLayoutData(branchesToolbarGridData);
 
