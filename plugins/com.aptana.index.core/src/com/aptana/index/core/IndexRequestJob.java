@@ -51,7 +51,15 @@ abstract class IndexRequestJob extends Job
 	@Override
 	public boolean belongsTo(Object family)
 	{
-		return (family == null && getContainerURI() == null) || getContainerURI().equals(family);
+		if (getContainerURI() == null)
+		{
+			return family == null;
+		}
+		if (family == null)
+		{
+			return false;
+		}
+		return getContainerURI().equals(family);
 	}
 
 	protected URI getContainerURI()
@@ -108,7 +116,7 @@ abstract class IndexRequestJob extends Job
 					sum += entry.getValue().size();
 				}
 				sub.setWorkRemaining(sum);
-				
+
 				// Now do the indexing...
 				for (Map.Entry<IFileStoreIndexingParticipant, Set<IFileStore>> entry : toDo.entrySet())
 				{

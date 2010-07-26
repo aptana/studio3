@@ -78,8 +78,6 @@ import com.aptana.ui.epl.UIEplPlugin;
  */
 public class CompletionProposalPopup implements IContentAssistListener
 {
-	// use the hard-coded value for cocoa since the constant is not defined until Eclipse 3.5
-	private static final boolean isCocoa = Platform.getWS().equals("cocoa"); //$NON-NLS-1$
 	
 	/**
 	 * Set to <code>true</code> to use a Table with SWT.VIRTUAL.
@@ -515,11 +513,8 @@ public class CompletionProposalPopup implements IContentAssistListener
 
 					event.detail &= ~SWT.SELECTED;
 					event.detail &= ~SWT.BACKGROUND;
-					// force foreground color for Windows. Otherwise on dark themes we get black fg
-					if (!isCocoa)
-					{
-						gc.setForeground(getForegroundColor(fContentAssistSubjectControlAdapter.getControl()));
-					}
+					
+					gc.setForeground(getForegroundColor(fContentAssistSubjectControlAdapter.getControl()));
 				}
 			}
 		};

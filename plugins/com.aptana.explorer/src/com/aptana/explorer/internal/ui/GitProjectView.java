@@ -40,6 +40,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -1184,21 +1185,17 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 						return Status.CANCEL_STATUS;
 					if (repository == null)
 					{
-						leftLabelGridData.exclude = true;
-						leftLabel.setVisible(false);
-						branchesToolbarGridData.exclude = true;
-						branchesToolbar.setVisible(false);
-						rightLabelGridData.exclude = true;
-						rightLabel.setVisible(false);
+						RowData rd = new RowData();
+						rd.exclude = true;
+						branchesToolbar.getParent().setLayoutData(rd);
+						branchesToolbar.getParent().setVisible(false);
 					}
 					else
 					{
-						leftLabelGridData.exclude = false;
-						leftLabel.setVisible(true);
-						branchesToolbarGridData.exclude = false;
-						branchesToolbar.setVisible(true);
-						rightLabelGridData.exclude = false;
-						rightLabel.setVisible(true);
+						RowData rd = new RowData();
+						rd.exclude = false;
+						branchesToolbar.getParent().setLayoutData(rd);
+						branchesToolbar.getParent().setVisible(true);
 					}
 					if (monitor != null && monitor.isCanceled())
 						return Status.CANCEL_STATUS;

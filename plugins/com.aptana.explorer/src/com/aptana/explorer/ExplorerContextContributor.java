@@ -68,11 +68,14 @@ public class ExplorerContextContributor implements ContextContributor
 					if (ref.getId().equals(IExplorerUIConstants.VIEW_ID))
 					{
 						SingleProjectView view = (SingleProjectView) ref.getPart(false);
-						IProject activeProject = view.getActiveProject();
-						if (activeProject != null)
+						if (view != null)
 						{
-							projects[0] = activeProject;
-							return;
+							IProject activeProject = view.getActiveProject();
+							if (activeProject != null)
+							{
+								projects[0] = activeProject;
+								return;
+							}
 						}
 					}
 				}
