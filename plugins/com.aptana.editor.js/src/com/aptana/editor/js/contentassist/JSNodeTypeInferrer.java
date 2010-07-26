@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.aptana.core.util.StringUtil;
@@ -244,13 +245,15 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	{
 		List<JSReturnNode> result = new ArrayList<JSReturnNode>();
 
-		// create and prime queue
-		List<IParseNode> queue = new ArrayList<IParseNode>();
+		// Using a linked list since it provides a queue interface
+		LinkedList<IParseNode> queue = new LinkedList<IParseNode>();
+		
+		// prime the queue
 		queue.add(node.getBody());
 
 		while (queue.size() > 0)
 		{
-			IParseNode current = queue.remove(0);
+			IParseNode current = queue.poll();
 
 			if (current instanceof JSReturnNode)
 			{
@@ -260,7 +263,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 			{
 				for (IParseNode child : current)
 				{
-					queue.add(child);
+					queue.offer(child);
 				}
 			}
 		}
