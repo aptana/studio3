@@ -19,10 +19,16 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorRegistry;
+import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.progress.WorkbenchJob;
+
+import com.aptana.explorer.IExplorerUIConstants;
+import com.aptana.explorer.IProjectContext;
 
 /**
  * Process command line arguments.
@@ -52,7 +58,7 @@ public class CommandlineArgumentsHandler
 				SubMonitor sub = SubMonitor.convert(monitor, arguments.length);
 				for (String argument : arguments)
 				{
-					
+
 					processArgument(argument, sub.newChild(1));
 				}
 				return Status.OK_STATUS;
@@ -66,7 +72,7 @@ public class CommandlineArgumentsHandler
 	protected static void processArgument(String argument, IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 1);
-		
+
 		File file = new File(argument);
 		if (!file.exists())
 		{
@@ -87,8 +93,8 @@ public class CommandlineArgumentsHandler
 
 	protected static void processDirectory(File file, IProgressMonitor monitor)
 	{
-		SubMonitor sub = SubMonitor.convert(monitor, 115);
-		
+		SubMonitor sub = SubMonitor.convert(monitor, 130);
+
 		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		// first look for project description files
 		File dotProject = new File(file, IProjectDescription.DESCRIPTION_FILE_NAME);
@@ -128,14 +134,67 @@ public class CommandlineArgumentsHandler
 		sub.worked(15);
 		try
 		{
-			IProject project = workspace.getRoot().getProject(projectName);
-			project.create(description, sub.newChild(30));
-			project.open(IResource.BACKGROUND_REFRESH, sub.newChild(70));
+			boolean forceAsActive = false;
+			final IProject project = workspace.getRoot().getProject(projectName);
+			if (!project.exists())
+			{
+				project.create(description, sub.newChild(30));
+				forceAsActive = true;
+			}
+			sub.setWorkRemaining(85);
+			if (project.isOpen())
+			{
+				forceAsActive = true;
+			}
+			else
+			{
+				project.open(IResource.BACKGROUND_REFRESH, sub.newChild(70));
+			}
+			sub.setWorkRemaining(15);
+			if (forceAsActive)
+			{
+				setActiveProject(project);
+			}
 		}
 		catch (CoreException e)
 		{
 			CommandlineLauncherPlugin.logError(e);
 		}
+	}
+
+	protected static void setActiveProject(final IProject project)
+	{
+		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
+		{
+
+			@Override
+			public void run()
+			{
+				IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+				if (window == null)
+				{
+					return;
+				}
+				IWorkbenchPage page = window.getActivePage();
+				if (page == null)
+				{
+					return;
+				}
+				IViewReference[] refs = page.getViewReferences();
+				for (IViewReference ref : refs)
+				{
+					if (ref.getId().equals(IExplorerUIConstants.VIEW_ID))
+					{
+						IProjectContext view = (IProjectContext) ref.getPart(false);
+						if (view != null)
+						{
+							view.setActiveProject(project);
+							return;
+						}
+					}
+				}
+			}
+		});
 	}
 
 	protected static void processFile(File file, IProgressMonitor monitor)

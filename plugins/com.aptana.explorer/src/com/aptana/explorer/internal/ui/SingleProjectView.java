@@ -84,6 +84,7 @@ import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IExplorerUIConstants;
 import com.aptana.explorer.IPreferenceConstants;
+import com.aptana.explorer.IProjectContext;
 import com.aptana.filewatcher.FileWatcher;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
@@ -108,7 +109,7 @@ import com.aptana.ui.widgets.SearchComposite;
  * @author cwilliams
  */
 @SuppressWarnings("restriction")
-public abstract class SingleProjectView extends CommonNavigator implements SearchComposite.Client
+public abstract class SingleProjectView extends CommonNavigator implements SearchComposite.Client, IProjectContext
 {
 
 	private static final String GEAR_MENU_ID = "com.aptana.explorer.gear"; //$NON-NLS-1$
@@ -1094,6 +1095,11 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 			setActiveProject();
 		}
 		projectChanged(oldActiveProject, newSelectedProject);
+	}
+	
+	public void setActiveProject(IProject project)
+	{
+		setActiveProject(project.getName());
 	}
 
 	private void setActiveProject()
