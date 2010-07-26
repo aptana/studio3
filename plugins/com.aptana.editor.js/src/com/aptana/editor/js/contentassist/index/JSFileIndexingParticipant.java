@@ -206,7 +206,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 		{
 			// create new Window type for this file
 			TypeElement type = new TypeElement();
-			type.setName(JSTypeConstants.WINDOW);
+			type.setName(JSTypeConstants.WINDOW_TYPE);
 
 			JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(globals, index, location);
 

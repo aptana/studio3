@@ -193,7 +193,7 @@ public class FunctionElement extends PropertyElement
 		StringBuilder buffer = new StringBuilder();
 		boolean first = true;
 
-		buffer.append(JSTypeConstants.FUNCTION); //$NON-NLS-1$
+		buffer.append(JSTypeConstants.FUNCTION_TYPE); //$NON-NLS-1$
 
 		for (ReturnTypeElement returnType : this.getReturnTypes())
 		{

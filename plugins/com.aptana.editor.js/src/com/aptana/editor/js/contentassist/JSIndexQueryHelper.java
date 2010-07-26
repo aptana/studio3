@@ -56,7 +56,7 @@ public class JSIndexQueryHelper
 	 */
 	protected void addParentTypes(List<String> types, Index index, String type)
 	{
-		if (type.equals(JSTypeConstants.OBJECT) == false)
+		if (type.equals(JSTypeConstants.OBJECT_TYPE) == false)
 		{
 			TypeElement typeElement = this._reader.getType(index, type, PARENT_TYPES);
 
@@ -566,7 +566,7 @@ public class JSIndexQueryHelper
 					{
 						types.add(parentType);
 						
-						if (JSTypeConstants.OBJECT.equals(parentType) == false)
+						if (JSTypeConstants.OBJECT_TYPE.equals(parentType) == false)
 						{
 							queue.offer(parentType);
 						}

@@ -112,7 +112,7 @@ public class JSTypeInferrer extends JSTreeWalker
 		// means
 		if (foundType == false)
 		{
-			this.addType(JSTypeConstants.OBJECT);
+			this.addType(JSTypeConstants.OBJECT_TYPE);
 		}
 	}
 
@@ -225,9 +225,9 @@ public class JSTypeInferrer extends JSTreeWalker
 			{
 				result = type.substring(JSTypeConstants.GENERIC_ARRAY_OPEN.length(), type.length() - 1);
 			}
-			else if (type.equals(JSTypeConstants.ARRAY))
+			else if (type.equals(JSTypeConstants.ARRAY_TYPE))
 			{
-				result = JSTypeConstants.OBJECT;
+				result = JSTypeConstants.OBJECT_TYPE;
 			}
 		}
 
@@ -334,7 +334,7 @@ public class JSTypeInferrer extends JSTreeWalker
 	{
 		if (node.hasChildren() == false)
 		{
-			this.addType(JSTypeConstants.ARRAY);
+			this.addType(JSTypeConstants.ARRAY_TYPE);
 		}
 		else
 		{
@@ -359,20 +359,20 @@ public class JSTypeInferrer extends JSTreeWalker
 				break;
 
 			case JSNodeTypes.ADD_AND_ASSIGN:
-				String type = JSTypeConstants.NUMBER;
+				String type = JSTypeConstants.NUMBER_TYPE;
 				List<String> lhsTypes = this.getTypes(node.getLeftHandSide());
 				List<String> rhsTypes = this.getTypes(node.getRightHandSide());
 
-				if (lhsTypes.contains(JSTypeConstants.STRING) || rhsTypes.contains(JSTypeConstants.STRING))
+				if (lhsTypes.contains(JSTypeConstants.STRING_TYPE) || rhsTypes.contains(JSTypeConstants.STRING_TYPE))
 				{
-					type = JSTypeConstants.STRING;
+					type = JSTypeConstants.STRING_TYPE;
 				}
 
 				this.addType(type);
 				break;
 
 			default:
-				this.addType(JSTypeConstants.NUMBER);
+				this.addType(JSTypeConstants.NUMBER_TYPE);
 				break;
 		}
 	}
@@ -385,16 +385,16 @@ public class JSTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSBinaryArithmeticOperatorNode node)
 	{
-		String type = JSTypeConstants.NUMBER;
+		String type = JSTypeConstants.NUMBER_TYPE;
 
 		if (node.getNodeType() == JSNodeTypes.ADD)
 		{
 			List<String> lhsTypes = this.getTypes(node.getLeftHandSide());
 			List<String> rhsTypes = this.getTypes(node.getRightHandSide());
 
-			if (lhsTypes.contains(JSTypeConstants.STRING) || rhsTypes.contains(JSTypeConstants.STRING))
+			if (lhsTypes.contains(JSTypeConstants.STRING_TYPE) || rhsTypes.contains(JSTypeConstants.STRING_TYPE))
 			{
-				type = JSTypeConstants.STRING;
+				type = JSTypeConstants.STRING_TYPE;
 			}
 		}
 
@@ -408,7 +408,7 @@ public class JSTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSBinaryBooleanOperatorNode node)
 	{
-		this.addType(JSTypeConstants.BOOLEAN);
+		this.addType(JSTypeConstants.BOOLEAN_TYPE);
 	}
 
 	/*
@@ -458,7 +458,7 @@ public class JSTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSFalseNode node)
 	{
-		this.addType(JSTypeConstants.BOOLEAN);
+		this.addType(JSTypeConstants.BOOLEAN_TYPE);
 	}
 
 	/*
@@ -490,17 +490,17 @@ public class JSTypeInferrer extends JSTreeWalker
 		// build function type, including return values
 		if (types.isEmpty() == false)
 		{
-			type = JSTypeConstants.FUNCTION + ":" + StringUtil.join(",", types); //$NON-NLS-1$ //$NON-NLS-2$
+			type = JSTypeConstants.FUNCTION_TYPE + ":" + StringUtil.join(",", types); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else if (foundReturnExpression)
 		{
 			// If we couldn't infer a return type and we had a return
 			// expression, then have it return Object
-			type = JSTypeConstants.FUNCTION + ":" + JSTypeConstants.OBJECT; //$NON-NLS-1$
+			type = JSTypeConstants.FUNCTION_TYPE + ":" + JSTypeConstants.OBJECT_TYPE; //$NON-NLS-1$
 		}
 		else
 		{
-			type = JSTypeConstants.FUNCTION;
+			type = JSTypeConstants.FUNCTION_TYPE;
 		}
 		
 		this.addType(type);
@@ -530,7 +530,7 @@ public class JSTypeInferrer extends JSTreeWalker
 				}
 				else
 				{
-					this.addType(JSTypeConstants.OBJECT);
+					this.addType(JSTypeConstants.OBJECT_TYPE);
 				}
 			}
 		}
@@ -687,7 +687,7 @@ public class JSTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSNumberNode node)
 	{
-		this.addType(JSTypeConstants.NUMBER);
+		this.addType(JSTypeConstants.NUMBER_TYPE);
 	}
 
 	/*
@@ -697,7 +697,7 @@ public class JSTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSObjectNode node)
 	{
-		this.addType(JSTypeConstants.OBJECT);
+		this.addType(JSTypeConstants.OBJECT_TYPE);
 	}
 
 	/*
@@ -708,7 +708,7 @@ public class JSTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSPostUnaryOperatorNode node)
 	{
-		this.addType(JSTypeConstants.NUMBER);
+		this.addType(JSTypeConstants.NUMBER_TYPE);
 	}
 
 	/*
@@ -722,11 +722,11 @@ public class JSTypeInferrer extends JSTreeWalker
 		{
 			case JSNodeTypes.DELETE:
 			case JSNodeTypes.LOGICAL_NOT:
-				this.addType(JSTypeConstants.BOOLEAN);
+				this.addType(JSTypeConstants.BOOLEAN_TYPE);
 				break;
 
 			case JSNodeTypes.TYPEOF:
-				this.addType(JSTypeConstants.STRING);
+				this.addType(JSTypeConstants.STRING_TYPE);
 				break;
 
 			case JSNodeTypes.VOID:
@@ -734,7 +734,7 @@ public class JSTypeInferrer extends JSTreeWalker
 				break;
 
 			default:
-				this.addType(JSTypeConstants.NUMBER);
+				this.addType(JSTypeConstants.NUMBER_TYPE);
 				break;
 		}
 	}
@@ -746,7 +746,7 @@ public class JSTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSRegexNode node)
 	{
-		this.addType(JSTypeConstants.REG_EXP);
+		this.addType(JSTypeConstants.REG_EXP_TYPE);
 	}
 
 	/*
@@ -756,7 +756,7 @@ public class JSTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSStringNode node)
 	{
-		this.addType(JSTypeConstants.STRING);
+		this.addType(JSTypeConstants.STRING_TYPE);
 	}
 
 	/*
@@ -766,6 +766,6 @@ public class JSTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSTrueNode node)
 	{
-		this.addType(JSTypeConstants.BOOLEAN);
+		this.addType(JSTypeConstants.BOOLEAN_TYPE);
 	}
 }

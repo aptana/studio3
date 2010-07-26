@@ -220,11 +220,11 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					{
 						if (type.startsWith("Function:"))
 						{
-							this.addTypeProperties(proposals, JSTypeConstants.FUNCTION, offset);
+							this.addTypeProperties(proposals, JSTypeConstants.FUNCTION_TYPE, offset);
 						}
 						else if (type.startsWith(JSTypeConstants.GENERIC_ARRAY_OPEN))
 						{
-							this.addTypeProperties(proposals, JSTypeConstants.ARRAY, offset);
+							this.addTypeProperties(proposals, JSTypeConstants.ARRAY_TYPE, offset);
 						}
 						else
 						{

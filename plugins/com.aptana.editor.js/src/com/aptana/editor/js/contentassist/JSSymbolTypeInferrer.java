@@ -63,7 +63,7 @@ public class JSSymbolTypeInferrer
 
 			for (String type : types)
 			{
-				if (type.startsWith(JSTypeConstants.FUNCTION))
+				if (type.startsWith(JSTypeConstants.FUNCTION_TYPE))
 				{
 					hasFunction = true;
 				}
@@ -218,9 +218,9 @@ public class JSSymbolTypeInferrer
 			{
 				if (result instanceof FunctionElement)
 				{
-					if (typeName.startsWith(JSTypeConstants.FUNCTION + ":"))
+					if (typeName.startsWith(JSTypeConstants.FUNCTION_TYPE + ":"))
 					{
-						typeName = typeName.substring(JSTypeConstants.FUNCTION.length() + 1);
+						typeName = typeName.substring(JSTypeConstants.FUNCTION_TYPE.length() + 1);
 					}
 				}
 				
@@ -363,7 +363,7 @@ public class JSSymbolTypeInferrer
 
 				if (isFunction)
 				{
-					property.addType(JSTypeConstants.FUNCTION);
+					property.addType(JSTypeConstants.FUNCTION_TYPE);
 					inferrer.visit(value);
 					property.clearTypes();
 				}
