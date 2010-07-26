@@ -15,7 +15,7 @@ public class ParserPoolFactory
 {
 
 	private static ParserPoolFactory fgInstance;
-	private Map<String, String> parsers;
+	private Map<String, IConfigurationElement> parsers;
 	private HashMap<String, IParserPool> pools;
 
 	/**
@@ -38,10 +38,10 @@ public class ParserPoolFactory
 			{
 				parsers = getParsers();
 			}
-			String className = parsers.get(language);
-			if (className == null)
+			IConfigurationElement parserExtension = parsers.get(language);
+			if (parserExtension == null)
 				return null;
-			pool = new ParserPool(className);
+			pool = new ParserPool(parserExtension);
 			pools.put(language, pool);
 		}
 		return pool;
@@ -69,15 +69,15 @@ public class ParserPoolFactory
 	}
 
 	/**
-	 * Returns a map from language to parser class name. We don't want instances of parsers yet, just info on how to
-	 * generate instances, which we can with the class name.
+	 * Returns a map from language to parser extension. We don't want instances of parsers yet, just info on how to
+	 * generate instances, which we can with the configuration element.
 	 * 
 	 * @return
 	 */
-	private static Map<String, String> getParsers()
+	private static Map<String, IConfigurationElement> getParsers()
 	{
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		Map<String, String> parsers = new HashMap<String, String>();
+		Map<String, IConfigurationElement> parsers = new HashMap<String, IConfigurationElement>();
 		if (registry != null)
 		{
 			IExtensionPoint extensionPoint = registry.getExtensionPoint(ParsingPlugin.PLUGIN_ID, "parser"); //$NON-NLS-1$
@@ -93,8 +93,7 @@ public class ParserPoolFactory
 					for (IConfigurationElement element : elements)
 					{
 						String language = element.getAttribute("language"); //$NON-NLS-1$
-						String klass = element.getAttribute("class"); //$NON-NLS-1$
-						parsers.put(language, klass);
+						parsers.put(language, element);
 					}
 				}
 			}

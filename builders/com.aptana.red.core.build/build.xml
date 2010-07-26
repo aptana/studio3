@@ -170,6 +170,7 @@
 				<dirset dir="${buildDirectory}" defaultexcludes="true">
 					<include name="plugins/*" />
 					<include name="features/*" />
+					<exclude name="plugins/com.aptana.usage" />
 					<exclude name="${topLevelElementType}s/${topLevelElementId}" />
 				</dirset>
 			</path>

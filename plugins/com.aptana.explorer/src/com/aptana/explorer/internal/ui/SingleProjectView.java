@@ -52,6 +52,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
@@ -83,6 +84,7 @@ import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IExplorerUIConstants;
 import com.aptana.explorer.IPreferenceConstants;
+import com.aptana.explorer.IProjectContext;
 import com.aptana.filewatcher.FileWatcher;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
@@ -107,7 +109,7 @@ import com.aptana.ui.widgets.SearchComposite;
  * @author cwilliams
  */
 @SuppressWarnings("restriction")
-public abstract class SingleProjectView extends CommonNavigator implements SearchComposite.Client
+public abstract class SingleProjectView extends CommonNavigator implements SearchComposite.Client, IProjectContext
 {
 
 	private static final String GEAR_MENU_ID = "com.aptana.explorer.gear"; //$NON-NLS-1$
@@ -192,31 +194,53 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 
 		// Create toolbar
 		Composite toolbarComposite = new Composite(parent, SWT.NONE);
-		toolbarComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		toolbarComposite.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
-		GridLayout toolbarGridLayout = new GridLayout(3, false);
-		toolbarGridLayout.marginWidth = 2;
+		GridLayout toolbarGridLayout = new GridLayout(2, false);
+		toolbarGridLayout.marginWidth = 0;
 		toolbarGridLayout.marginHeight = 0;
 		toolbarGridLayout.horizontalSpacing = 0;
 		toolbarComposite.setLayout(toolbarGridLayout);
+		
+		// For project and branch....
+		Composite pulldowns = new Composite(toolbarComposite, SWT.NONE);
+		pulldowns.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+		RowLayout rowLayout = new RowLayout();
+		rowLayout.wrap = true;
+		rowLayout.spacing = 0;
+		rowLayout.marginLeft = 0;
+		rowLayout.marginRight = 0;
+		rowLayout.marginBottom = 0;
+		rowLayout.marginTop = 0;
+		pulldowns.setLayout(rowLayout);
 
 		// Projects combo
-		createProjectCombo(toolbarComposite);
+		createProjectCombo(pulldowns);
 
-		// Let sub classes add to the toolbar
-		doCreateToolbar(toolbarComposite);
+		// Let sub classes add to the toolbar (git branch)
+		doCreateToolbar(pulldowns);
 
+		// Now deploy button and gear...
+		Composite toolbarButtons = new Composite(toolbarComposite, SWT.NONE);
+		GridData buttonsData = new GridData(SWT.END, SWT.BEGINNING, false, false);
+		buttonsData.minimumWidth = 68;
+		toolbarButtons.setLayoutData(buttonsData);
+		GridLayout toolbarButtonsLayout = new GridLayout(2, false);
+		toolbarButtonsLayout.marginHeight = 0;
+		toolbarButtonsLayout.marginWidth = 0;
+		toolbarButtons.setLayout(toolbarButtonsLayout);
+		
 		// Create Deploy menu
-		createDeployMenu(toolbarComposite);
+		createDeployMenu(toolbarButtons);
 
 		// Now create Commands menu
-		final ToolBar commandsToolBar = new ToolBar(toolbarComposite, SWT.FLAT);
+		final ToolBar commandsToolBar = new ToolBar(toolbarButtons, SWT.FLAT);
 		ToolItem commandsToolItem = new ToolItem(commandsToolBar, SWT.DROP_DOWN);
 		commandsToolItem.setImage(ExplorerPlugin.getImage(GEAR_MENU_ICON));
 		commandsToolItem.setToolTipText(Messages.SingleProjectView_TTP_Commands);
-		GridData branchComboData = new GridData(SWT.END, SWT.CENTER, false, false);
-		branchComboData.minimumWidth = 24;
-		commandsToolBar.setLayoutData(branchComboData);
+		GridData gearMenuData = new GridData(SWT.END, SWT.CENTER, false, false);
+		gearMenuData.minimumWidth = 24;
+		commandsToolBar.setLayoutData(gearMenuData);
 
 		commandsToolItem.addSelectionListener(new SelectionAdapter()
 		{
@@ -800,8 +824,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	{
 		final ToolBar projectsToolbar = new ToolBar(parent, SWT.FLAT);
 		projectToolItem = new ToolItem(projectsToolbar, SWT.DROP_DOWN);
-		GridData projectsToolbarGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
-		projectsToolbar.setLayoutData(projectsToolbarGridData);
 		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 		projectsMenu = new Menu(projectsToolbar);
 		for (IProject iProject : projects)
@@ -1073,6 +1095,11 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 			setActiveProject();
 		}
 		projectChanged(oldActiveProject, newSelectedProject);
+	}
+	
+	public void setActiveProject(IProject project)
+	{
+		setActiveProject(project.getName());
 	}
 
 	private void setActiveProject()
