@@ -8,16 +8,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.common.contentassist.UserAgentManager;
-import com.aptana.editor.common.contentassist.UserAgentManager.UserAgent;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
-import com.aptana.editor.js.contentassist.model.BaseElement;
 import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
-import com.aptana.editor.js.contentassist.model.UserAgentElement;
 import com.aptana.editor.js.parsing.ast.JSArrayNode;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSBinaryArithmeticOperatorNode;
@@ -152,24 +148,6 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 			{
 				this.addType(type);
 			}
-		}
-	}
-
-	/**
-	 * addUserAgents
-	 * 
-	 * @param element
-	 */
-	protected void addUserAgents(BaseElement element)
-	{
-		// make valid in all user agents
-		for (UserAgent userAgent : UserAgentManager.getInstance().getAllUserAgents())
-		{
-			UserAgentElement ua = new UserAgentElement();
-
-			ua.setPlatform(userAgent.ID);
-
-			element.addUserAgent(ua);
 		}
 	}
 
