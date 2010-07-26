@@ -101,7 +101,7 @@ public class ScopeTests extends FileContentBasedTests
 		
 		for (JSNode node : nodes)
 		{
-			JSTypeInferrer typeWalker = new JSTypeInferrer(symbols, null, null);
+			JSNodeTypeInferrer typeWalker = new JSNodeTypeInferrer(symbols, null, null);
 			
 			typeWalker.visit(node);
 			

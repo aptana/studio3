@@ -361,7 +361,7 @@ public class JSSymbolTypeInferrer
 			}
 			else
 			{
-				JSTypeInferrer inferrer = new JSTypeInferrer(this._activeScope, this._index, this._location);
+				JSNodeTypeInferrer inferrer = new JSNodeTypeInferrer(this._activeScope, this._index, this._location);
 
 				if (isFunction)
 				{

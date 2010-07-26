@@ -48,7 +48,7 @@ import com.aptana.editor.js.sdoc.model.Type;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.ast.IParseNode;
 
-public class JSTypeInferrer extends JSTreeWalker
+public class JSNodeTypeInferrer extends JSTreeWalker
 {
 	private JSScope _scope;
 	private Index _index;
@@ -63,7 +63,7 @@ public class JSTypeInferrer extends JSTreeWalker
 	 * @param projectIndex
 	 * @param location
 	 */
-	public JSTypeInferrer(JSScope scope, Index projectIndex, URI location)
+	public JSNodeTypeInferrer(JSScope scope, Index projectIndex, URI location)
 	{
 		this._scope = scope;
 		this._index = projectIndex;
@@ -309,7 +309,7 @@ public class JSTypeInferrer extends JSTreeWalker
 		if (node instanceof JSNode)
 		{
 			// create new nested walker
-			JSTypeInferrer walker = new JSTypeInferrer(scope, this._index, this._location);
+			JSNodeTypeInferrer walker = new JSNodeTypeInferrer(scope, this._index, this._location);
 
 			// collect types
 			walker.visit((JSNode) node);

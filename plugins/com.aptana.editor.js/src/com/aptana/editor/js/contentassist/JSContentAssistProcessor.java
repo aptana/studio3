@@ -200,7 +200,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 				if (lhs instanceof JSNode)
 				{
-					JSTypeInferrer typeWalker = new JSTypeInferrer(localScope, this.getIndex(), this.getURI());
+					JSNodeTypeInferrer typeWalker = new JSNodeTypeInferrer(localScope, this.getIndex(), this.getURI());
 
 					typeWalker.visit((JSNode) lhs);
 

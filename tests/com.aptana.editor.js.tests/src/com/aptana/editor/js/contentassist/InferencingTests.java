@@ -63,7 +63,7 @@ public class InferencingTests extends TestCase
 	 */
 	protected List<String> getTypes(JSScope globals, JSNode node)
 	{
-		JSTypeInferrer walker = new JSTypeInferrer(globals, null, null);
+		JSNodeTypeInferrer walker = new JSNodeTypeInferrer(globals, null, null);
 		
 		node.accept(walker);
 		
@@ -82,7 +82,7 @@ public class InferencingTests extends TestCase
 		
 		for (IParseNode node : nodes)
 		{
-			JSTypeInferrer walker = new JSTypeInferrer(globals, null, null);
+			JSNodeTypeInferrer walker = new JSNodeTypeInferrer(globals, null, null);
 			
 			assertTrue(node instanceof JSNode);
 			
