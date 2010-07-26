@@ -5,6 +5,11 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import com.aptana.editor.js.inferencing.JSNodeTypeInferrer;
+import com.aptana.editor.js.inferencing.JSPropertyCollection;
+import com.aptana.editor.js.inferencing.JSScope;
+import com.aptana.editor.js.inferencing.JSSymbolCollector;
+import com.aptana.editor.js.inferencing.JSSymbolTypeInferrer;
 import com.aptana.editor.js.parsing.JSParser;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;

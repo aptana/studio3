@@ -8,6 +8,10 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.Path;
 
+import com.aptana.editor.js.inferencing.JSNodeTypeInferrer;
+import com.aptana.editor.js.inferencing.JSPropertyCollection;
+import com.aptana.editor.js.inferencing.JSScope;
+import com.aptana.editor.js.inferencing.JSSymbolCollector;
 import com.aptana.editor.js.parsing.JSParser;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;

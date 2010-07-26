@@ -1,4 +1,4 @@
-package com.aptana.editor.js.contentassist;
+package com.aptana.editor.js.inferencing;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.aptana.editor.js.JSTypeConstants;
+import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
 import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;

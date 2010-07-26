@@ -1,10 +1,9 @@
-package com.aptana.editor.js.contentassist;
+package com.aptana.editor.js.parsing.lexer;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.ITokenScanner;
 
 import com.aptana.editor.common.contentassist.LexemeProvider;
-import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
 

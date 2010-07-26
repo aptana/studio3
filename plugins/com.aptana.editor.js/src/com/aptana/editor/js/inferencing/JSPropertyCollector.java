@@ -1,4 +1,4 @@
-package com.aptana.editor.js.contentassist;
+package com.aptana.editor.js.inferencing;
 
 import java.util.ArrayList;
 import java.util.List;
