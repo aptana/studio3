@@ -156,7 +156,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 	}
 
 	/**
-	 * processScopes
+	 * processLambdas
 	 * 
 	 * @param index
 	 * @param globals
@@ -234,7 +234,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 				type.addProperty(property);
 			}
 
-			// process scopes (self-invoking functions)
+			// process window assignments in lambdas (self-invoking functions)
 			for (PropertyElement property : this.processLambdas(index, globals, ast, location))
 			{
 				type.addProperty(property);
