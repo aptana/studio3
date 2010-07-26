@@ -515,11 +515,8 @@ public class CompletionProposalPopup implements IContentAssistListener
 
 					event.detail &= ~SWT.SELECTED;
 					event.detail &= ~SWT.BACKGROUND;
-					// force foreground color for Windows. Otherwise on dark themes we get black fg
-					if (!isCocoa)
-					{
-						gc.setForeground(getForegroundColor(fContentAssistSubjectControlAdapter.getControl()));
-					}
+					
+					gc.setForeground(getForegroundColor(fContentAssistSubjectControlAdapter.getControl()));
 				}
 			}
 		};
