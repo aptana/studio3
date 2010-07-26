@@ -95,6 +95,9 @@ public class JSPropertyCollection
 
 		if (this._properties != null)
 		{
+			// NOTE: We're using a LinkedHashMap to preserve the order items are
+			// added to the hash. We return a list to imply the order of those
+			// items...as opposed the set returned by keySet
 			result = new ArrayList<String>(this._properties.keySet());
 		}
 		else
