@@ -2,6 +2,7 @@ package com.aptana.editor.js.contentassist;
 
 import org.eclipse.core.runtime.Platform;
 
+import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSCatchNode;
 import com.aptana.editor.js.parsing.ast.JSDeclarationNode;
@@ -151,7 +152,7 @@ public class JSSymbolCollector extends JSTreeWalker
 						case JSNodeTypes.IDENTIFIER:
 							String name = lhs.getText();
 
-							if (this._scope.hasSymbol(name))
+							if (this._scope.hasSymbol(name) || JSTypeConstants.WINDOW_PROPERTY.equals(name))
 							{
 								JSPropertyCollector collector = new JSPropertyCollector(this._scope.getObject());
 								collector.visit(node);
