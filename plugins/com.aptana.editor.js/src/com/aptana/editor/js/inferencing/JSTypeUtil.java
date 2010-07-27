@@ -3,7 +3,9 @@ package com.aptana.editor.js.inferencing;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import com.aptana.core.util.StringUtil;
@@ -33,6 +35,27 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class JSTypeUtil
 {
+	private static final Set<String> FILTERED_TYPES;
+
+	/**
+	 * static initializer
+	 */
+	static
+	{
+		FILTERED_TYPES = new HashSet<String>();
+		FILTERED_TYPES.add(JSTypeConstants.ARRAY_TYPE);
+		FILTERED_TYPES.add(JSTypeConstants.BOOLEAN_TYPE);
+		FILTERED_TYPES.add(JSTypeConstants.FUNCTION_TYPE);
+		FILTERED_TYPES.add(JSTypeConstants.NUMBER_TYPE);
+		FILTERED_TYPES.add(JSTypeConstants.OBJECT_TYPE);
+		FILTERED_TYPES.add(JSTypeConstants.REG_EXP_TYPE);
+		FILTERED_TYPES.add(JSTypeConstants.STRING_TYPE);
+		FILTERED_TYPES.add(JSTypeConstants.UNDEFINED_TYPE);
+		FILTERED_TYPES.add(JSTypeConstants.VOID_TYPE);
+		FILTERED_TYPES.add(JSTypeConstants.WINDOW_TYPE);
+		FILTERED_TYPES.add(JSTypeConstants.WINDOW_PROPERTY);
+	}
+
 	/**
 	 * addAllUserAgents
 	 * 
@@ -230,8 +253,10 @@ public class JSTypeUtil
 				result = StringUtil.join(".", parts);
 			}
 		}
-		
-		if (JSTypeConstants.WINDOW_PROPERTY.equals(result) || JSTypeConstants.WINDOW_TYPE.equals(result))
+
+		// Don't allow certain names to avoid confusion an to prevent overwriting
+		// core types
+		if (FILTERED_TYPES.contains(result))
 		{
 			result = null;
 		}
