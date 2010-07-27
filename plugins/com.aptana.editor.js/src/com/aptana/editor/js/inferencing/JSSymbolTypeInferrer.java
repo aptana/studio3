@@ -423,15 +423,11 @@ public class JSSymbolTypeInferrer
 					inferrer.visit(value);
 					property.clearTypes();
 				}
-				else if (value instanceof JSAssignmentNode && value.getNodeType() != JSNodeTypes.ASSIGN)
+				else
 				{
 					property.addType(NO_TYPE);
 					inferrer.visit(value);
 					property.clearTypes();
-				}
-				else
-				{
-					inferrer.visit(value);
 				}
 
 				types.addAll(inferrer.getTypes());
