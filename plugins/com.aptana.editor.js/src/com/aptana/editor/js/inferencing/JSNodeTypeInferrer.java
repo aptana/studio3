@@ -227,7 +227,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 
 		// Using a linked list since it provides a queue interface
 		Queue<IParseNode> queue = new ArrayDeque<IParseNode>();
-		
+
 		// prime the queue
 		queue.add(node.getBody());
 

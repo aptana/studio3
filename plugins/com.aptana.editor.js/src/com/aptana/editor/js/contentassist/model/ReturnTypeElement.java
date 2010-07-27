@@ -65,7 +65,7 @@ public class ReturnTypeElement
 	public int hashCode()
 	{
 		int h = 0;
-		
+
 		if (this._type != null)
 		{
 			h = this._type.hashCode();
@@ -74,7 +74,7 @@ public class ReturnTypeElement
 		{
 			h = 31 * h + this._description.hashCode();
 		}
-		
+
 		return h;
 	}
 

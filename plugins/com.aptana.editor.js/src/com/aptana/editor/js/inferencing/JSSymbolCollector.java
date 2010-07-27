@@ -27,8 +27,8 @@ import com.aptana.parsing.lexer.IRange;
 public class JSSymbolCollector extends JSTreeWalker
 {
 	private static List<InvocationProcessor> PROCESSORS;
-	private static Map<String,InvocationProcessor> INVOCATION_PROCESSORS;
-	
+	private static Map<String, InvocationProcessor> INVOCATION_PROCESSORS;
+
 	private JSScope _scope;
 
 	/**
@@ -40,8 +40,8 @@ public class JSSymbolCollector extends JSTreeWalker
 	{
 		if (INVOCATION_PROCESSORS == null)
 		{
-			INVOCATION_PROCESSORS = new HashMap<String,InvocationProcessor>();
-			
+			INVOCATION_PROCESSORS = new HashMap<String, InvocationProcessor>();
+
 			for (InvocationProcessor processor : getInvocationProcessors())
 			{
 				for (String invocationPattern : processor.getInvocationPatterns())
@@ -50,10 +50,10 @@ public class JSSymbolCollector extends JSTreeWalker
 				}
 			}
 		}
-		
+
 		return INVOCATION_PROCESSORS.get(pattern);
 	}
-	
+
 	/**
 	 * getInvocationProcessors
 	 * 
@@ -64,15 +64,15 @@ public class JSSymbolCollector extends JSTreeWalker
 		if (PROCESSORS == null)
 		{
 			PROCESSORS = new ArrayList<InvocationProcessor>();
-			
+
 			// TODO: Eventually, this will be handled via an extension point.
 			// We're targeting jQuery only right now, so we'll hard code this.
 			PROCESSORS.add(new JQueryInvocationProcessor());
 		}
-		
+
 		return PROCESSORS;
 	}
-	
+
 	/**
 	 * JSSymbolCollector
 	 */

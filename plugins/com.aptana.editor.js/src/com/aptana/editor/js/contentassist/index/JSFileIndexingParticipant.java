@@ -54,7 +54,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 			Activator.logError(e.getMessage(), e);
 		}
 	}
-	
+
 	/**
 	 * JSFileIndexingParticipant
 	 */
@@ -246,7 +246,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 			{
 				JSTypeUtil.addAllUserAgents(property);
 			}
-			
+
 			// write new Window type to index
 			this._indexWriter.writeType(index, type, location);
 		}
@@ -273,11 +273,11 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 				if (property != null)
 				{
 					List<String> typeNames = property.getTypeNames();
-					
+
 					if (typeNames != null && typeNames.isEmpty() == false)
 					{
 						JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
-	
+
 						result = queryHelper.getTypeMembers(index, typeNames, EnumSet.allOf(ContentSelector.class));
 					}
 				}

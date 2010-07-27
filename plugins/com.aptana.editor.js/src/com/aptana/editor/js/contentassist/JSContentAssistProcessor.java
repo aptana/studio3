@@ -343,13 +343,13 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	protected void addTypeProperties(Set<ICompletionProposal> proposals, String typeName, int offset)
 	{
 		Index index = this.getIndex();
-		
+
 		// grab all ancestors of the specified type
 		List<String> allTypes = this._indexHelper.getTypeAncestorNames(index, typeName);
-		
+
 		// include the type in the list as well
 		allTypes.add(0, typeName);
-		
+
 		// add properties and methods
 		List<PropertyElement> properties = this._indexHelper.getTypeMembers(index, allTypes, TYPE_PROPERTY_SELECTOR);
 
