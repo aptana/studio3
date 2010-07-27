@@ -114,6 +114,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 		if (element != null)
 		{
+			int length = 2;
+			String postfix = "=\"\""; //$NON-NLS-1$
 			switch (this._currentLexeme.getType())
 			{
 				case EQUAL:
@@ -122,6 +124,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					if (index > 0)
 					{
 						this._replaceRange = this._currentLexeme = lexemeProvider.getLexeme(index - 1);
+						postfix = ""; //$NON-NLS-1$
+						length = 0;
 					}
 					break;
 
@@ -130,6 +134,13 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					break;
 
 				default:
+					index = lexemeProvider.getLexemeFloorIndex(offset);
+					Lexeme<HTMLTokenType> nextlexeme = lexemeProvider.getLexeme(index + 1);
+					if (nextlexeme != null && nextlexeme.getType() == HTMLTokenType.EQUAL)
+					{
+						postfix = ""; //$NON-NLS-1$
+						length = 0;
+					}
 					break;
 			}
 
@@ -138,12 +149,12 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 			for (String attribute : element.getAttributes())
 			{
-				this.addProposal(proposals, attribute, ATTRIBUTE_ICON, null, userAgentIcons, offset);
+				proposals.add(createProposal(attribute, attribute + postfix, ATTRIBUTE_ICON, null, userAgentIcons, HTMLIndexConstants.CORE, offset, attribute.length() + length));
 			}
 
 			for (String event : element.getEvents())
 			{
-				this.addProposal(proposals, event, EVENT_ICON, null, userAgentIcons, offset);
+				proposals.add(createProposal(event, event + postfix, EVENT_ICON, null, userAgentIcons, HTMLIndexConstants.CORE, offset, event.length() + length));
 			}
 		}
 	}
@@ -397,8 +408,20 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, String fileLocation,
 		int offset)
 	{
-		int length = name.length();
-		String displayName = name;
+		CommonCompletionProposal proposal = createProposal(name, image, description, userAgents, fileLocation, offset);
+		// add it to the list
+		proposals.add(proposal);
+	}
+	
+	private CommonCompletionProposal createProposal(String name, Image image, String description, Image[] userAgents,
+			String fileLocation, int offset)
+	{
+		return createProposal(name, name, image, description, userAgents, fileLocation, offset, name.length());
+	}
+	
+	protected CommonCompletionProposal createProposal(String displayName, String name, Image image, String description, Image[] userAgents,
+			String fileLocation, int offset, int length)
+	{
 		IContextInformation contextInfo = null;
 
 		// TEMP:
@@ -414,9 +437,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image, displayName, contextInfo, description);
 		proposal.setFileLocation(fileLocation);
 		proposal.setUserAgentImages(userAgents);
-
-		// add it to the list
-		proposals.add(proposal);
+		return proposal;
 	}
 
 	/*
