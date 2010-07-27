@@ -178,7 +178,7 @@ public class VSDocReader extends MetadataReader
 		String text = this.getText();
 
 		List<Type> types = new ArrayList<Type>();
-		types.add(new Type(this._exceptionType != null ? this._exceptionType : JSTypeConstants.OBJECT)); //$NON-NLS-1$
+		types.add(new Type(this._exceptionType != null ? this._exceptionType : JSTypeConstants.OBJECT_TYPE)); //$NON-NLS-1$
 
 		this._tags.add(new ExceptionTag(types, text));
 
@@ -198,7 +198,7 @@ public class VSDocReader extends MetadataReader
 		String text = this.getText();
 
 		List<Type> types = new ArrayList<Type>();
-		types.add(new Type(this._currentType != null ? this._currentType : JSTypeConstants.OBJECT)); //$NON-NLS-1$
+		types.add(new Type(this._currentType != null ? this._currentType : JSTypeConstants.OBJECT_TYPE)); //$NON-NLS-1$
 
 		this._tags.add(new ParamTag(this._currentParameter, types, text));
 
