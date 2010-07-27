@@ -6,6 +6,8 @@ import org.eclipse.osgi.util.NLS;
 
 	private static final String BUNDLE_NAME = "com.aptana.filesystem.ftp.internal.messages"; //$NON-NLS-1$
 
+	public static String BaseFTPConnectionFileManager_symlink_resolve_failed;
+
 	public static String BaseFTPConnectionFileManager_cant_move;
 	public static String BaseFTPConnectionFileManager_connection_check_failed;
 	public static String BaseFTPConnectionFileManager_creating_folder;
