@@ -230,6 +230,11 @@ public class JSTypeUtil
 				result = StringUtil.join(".", parts);
 			}
 		}
+		
+		if (JSTypeConstants.WINDOW_PROPERTY.equals(result) || JSTypeConstants.WINDOW_TYPE.equals(result))
+		{
+			result = null;
+		}
 
 		return result;
 	}
