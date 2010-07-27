@@ -2,12 +2,13 @@ package com.aptana.editor.js.contentassist;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 import com.aptana.core.util.StringUtil;
@@ -512,7 +513,7 @@ public class JSIndexQueryHelper
 		Set<String> types = new LinkedHashSet<String>();
 
 		// Using linked list since it provides a queue interface
-		LinkedList<String> queue = new LinkedList<String>();
+		Queue<String> queue = new ArrayDeque<String>();
 
 		// prime the queue
 		queue.offer(typeName);
