@@ -322,38 +322,6 @@ public class JSIndexReader
 	 * getFunctions
 	 * 
 	 * @param index
-	 * @param owningType
-	 * @param fields
-	 * @return
-	 * @throws IOException
-	 */
-	public List<FunctionElement> getFunctions(Index index, String owningType, EnumSet<ContentSelector> fields) throws IOException
-	{
-		List<FunctionElement> result = new ArrayList<FunctionElement>();
-
-		if (index != null && owningType != null && owningType.length() > 0)
-		{
-			// read functions
-			String quotedOwningType = Pattern.quote(owningType);
-			List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(quotedOwningType),
-				SearchPattern.REGEX_MATCH);
-
-			if (functions != null)
-			{
-				for (QueryResult function : functions)
-				{
-					result.add(this.createFunction(index, function, fields));
-				}
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * getFunctions
-	 * 
-	 * @param index
 	 * @param owningTypes
 	 * @param fields
 	 * @return
@@ -385,23 +353,35 @@ public class JSIndexReader
 	}
 
 	/**
-	 * getUserTypesPattern
+	 * getFunctions
 	 * 
-	 * @param owningTypes
+	 * @param index
+	 * @param owningType
+	 * @param fields
 	 * @return
+	 * @throws IOException
 	 */
-	protected String getUserTypesPattern(List<String> owningTypes)
+	public List<FunctionElement> getFunctions(Index index, String owningType, EnumSet<ContentSelector> fields) throws IOException
 	{
-		List<String> quotedOwningTypes = new ArrayList<String>(owningTypes.size());
+		List<FunctionElement> result = new ArrayList<FunctionElement>();
 
-		// escape each owning type
-		for (String owningType : owningTypes)
+		if (index != null && owningType != null && owningType.length() > 0)
 		{
-			quotedOwningTypes.add(Pattern.quote(owningType));
+			// read functions
+			String quotedOwningType = Pattern.quote(owningType);
+			List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(quotedOwningType),
+				SearchPattern.REGEX_MATCH);
+
+			if (functions != null)
+			{
+				for (QueryResult function : functions)
+				{
+					result.add(this.createFunction(index, function, fields));
+				}
+			}
 		}
 
-		// build pattern for all types
-		return "(" + StringUtil.join("|", quotedOwningTypes) + ")";
+		return result;
 	}
 
 	/**
@@ -476,20 +456,22 @@ public class JSIndexReader
 	 * getProperties
 	 * 
 	 * @param index
-	 * @param owningType
+	 * @param owningTypes
 	 * @param fields
 	 * @return
 	 * @throws IOException
 	 */
-	public List<PropertyElement> getProperties(Index index, String owningType, EnumSet<ContentSelector> fields) throws IOException
+	public List<PropertyElement> getProperties(Index index, List<String> owningTypes, EnumSet<ContentSelector> fields) throws IOException
 	{
 		List<PropertyElement> result = new ArrayList<PropertyElement>();
 
-		if (index != null && owningType != null && owningType.length() > 0)
+		if (index != null && owningTypes != null && owningTypes.isEmpty() == false)
 		{
+			// build regex pattern to match all owning types at once
+			String typePattern = getUserTypesPattern(owningTypes);
+
 			// read properties
-			String quotedOwningType = Pattern.quote(owningType);
-			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(quotedOwningType),
+			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(typePattern),
 				SearchPattern.REGEX_MATCH);
 
 			if (properties != null)
@@ -508,22 +490,20 @@ public class JSIndexReader
 	 * getProperties
 	 * 
 	 * @param index
-	 * @param owningTypes
+	 * @param owningType
 	 * @param fields
 	 * @return
 	 * @throws IOException
 	 */
-	public List<PropertyElement> getProperties(Index index, List<String> owningTypes, EnumSet<ContentSelector> fields) throws IOException
+	public List<PropertyElement> getProperties(Index index, String owningType, EnumSet<ContentSelector> fields) throws IOException
 	{
 		List<PropertyElement> result = new ArrayList<PropertyElement>();
 
-		if (index != null && owningTypes != null && owningTypes.isEmpty() == false)
+		if (index != null && owningType != null && owningType.length() > 0)
 		{
-			// build regex pattern to match all owning types at once
-			String typePattern = getUserTypesPattern(owningTypes);
-
 			// read properties
-			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(typePattern),
+			String quotedOwningType = Pattern.quote(owningType);
+			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(quotedOwningType),
 				SearchPattern.REGEX_MATCH);
 
 			if (properties != null)
@@ -799,6 +779,26 @@ public class JSIndexReader
 		}
 
 		return result;
+	}
+
+	/**
+	 * getUserTypesPattern
+	 * 
+	 * @param owningTypes
+	 * @return
+	 */
+	protected String getUserTypesPattern(List<String> owningTypes)
+	{
+		List<String> quotedOwningTypes = new ArrayList<String>(owningTypes.size());
+
+		// escape each owning type
+		for (String owningType : owningTypes)
+		{
+			quotedOwningTypes.add(Pattern.quote(owningType));
+		}
+
+		// build pattern for all types
+		return "(" + StringUtil.join("|", quotedOwningTypes) + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/**
