@@ -1,6 +1,7 @@
 package com.aptana.editor.js.inferencing;
 
 import java.net.URI;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 import com.aptana.editor.js.JSTypeConstants;
@@ -20,10 +22,12 @@ import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
+import com.aptana.editor.js.parsing.ast.JSIdentifierNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.index.core.Index;
+import com.aptana.parsing.ast.IParseNode;
 
 public class JSSymbolTypeInferrer
 {
@@ -112,13 +116,50 @@ public class JSSymbolTypeInferrer
 	{
 		if (property != null && object != null)
 		{
-			for (JSNode value : object.getValues())
+			Queue<JSNode> queue = new ArrayDeque<JSNode>();
+			Set<String> visitedSymbols = new HashSet<String>();
+			
+			// prime the queue
+			queue.addAll(object.getValues());
+			
+			while (queue.isEmpty() == false)
 			{
-				DocumentationBlock docs = value.getDocumentation();
-
+				JSNode node = queue.poll();
+				DocumentationBlock docs = node.getDocumentation();
+				
 				if (docs != null)
 				{
 					JSTypeUtil.applyDocumentation(property, docs);
+					break;
+				}
+				else if (node instanceof JSIdentifierNode)
+				{
+					// grab name
+					String symbol = node.getText();
+					
+					visitedSymbols.add(symbol);
+					
+					JSPropertyCollection p = this.getSymbolProperty(this._activeScope.getObject(), symbol);
+					
+					if (p != null)
+					{
+						for (JSNode value : p.getValues())
+						{
+							if (value.getNodeType() != JSNodeTypes.IDENTIFIER || visitedSymbols.contains(value.getText()) == false)
+							{
+								queue.offer(value);
+							}
+						}
+					}
+				}
+				else if (node instanceof JSAssignmentNode)
+				{
+					IParseNode rhs = node.getLastChild();
+					
+					if (rhs instanceof JSNode)
+					{
+						queue.offer((JSNode) rhs);
+					}
 				}
 			}
 		}
