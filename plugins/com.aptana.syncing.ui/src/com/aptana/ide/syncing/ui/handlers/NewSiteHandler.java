@@ -67,7 +67,7 @@ public class NewSiteHandler extends AbstractHandler
 	@Override
 	public boolean isEnabled()
 	{
-		return selectedResource instanceof IContainer;
+		return selectedResource == null || selectedResource instanceof IContainer;
 	}
 
 	@Override
