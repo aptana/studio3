@@ -27,4 +27,5 @@ public interface CoreStrings
 
 	public static final String CANCEL = Messages.CoreStrings_Cancel;
 
+	public static final String ERROR = Messages.CoreStrings_Error;
 }
