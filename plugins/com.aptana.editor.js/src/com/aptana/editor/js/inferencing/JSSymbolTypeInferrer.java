@@ -35,19 +35,44 @@ public class JSSymbolTypeInferrer
 	private URI _location;
 
 	private JSIndexWriter _writer;
-	
+
 	/**
 	 * generateType
 	 * 
+	 * @param property
+	 *            TODO
 	 * @return
 	 */
-	private static TypeElement generateType(Set<String> types)
+	private static TypeElement generateType(JSPropertyCollection property, Set<String> types)
 	{
 		// create new type
 		TypeElement result = new TypeElement();
 
+		String name = null;
+		List<JSNode> values = property.getValues();
+
+		if (values != null && values.size() > 0)
+		{
+			for (int i = values.size() - 1; i >= 0; i--)
+			{
+				JSNode value = values.get(i);
+				String candidate = JSTypeUtil.getName(value);
+
+				if (candidate != null && candidate.length() > 0)
+				{
+					name = candidate;
+					break;
+				}
+			}
+		}
+
+		if (name == null || name.length() == 0)
+		{
+			name = JSTypeUtil.getUniqueTypeName();
+		}
+
 		// give type a unique name
-		result.setName(JSTypeUtil.getUniqueTypeName());
+		result.setName(name);
 
 		// set parent types
 		if (types != null)
@@ -74,7 +99,7 @@ public class JSSymbolTypeInferrer
 		this._activeScope = activeScope;
 		this._location = location;
 	}
-	
+
 	/**
 	 * applyDocumentation
 	 * 
@@ -324,7 +349,7 @@ public class JSSymbolTypeInferrer
 			if (additionalProperties.isEmpty() == false)
 			{
 				// create new type
-				TypeElement subType = generateType(types);
+				TypeElement subType = generateType(property, types);
 
 				// reset list to contain only this newly generated type
 				types.clear();
@@ -426,13 +451,13 @@ public class JSSymbolTypeInferrer
 			{
 				JSTypeUtil.addAllUserAgents(property);
 			}
-			
+
 			// make sure we have an index writer
 			if (this._writer == null)
 			{
 				this._writer = new JSIndexWriter();
 			}
-	
+
 			// write the type to the index
 			this._writer.writeType(this._index, type, this._location);
 		}
