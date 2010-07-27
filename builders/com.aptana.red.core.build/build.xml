@@ -98,12 +98,6 @@
           target: generate.base                      
          - - - - - - - - - - - - - - - - - -->
 	<target name="generate.base" depends="copy.base.windows,copy.base">
-		<!-- Workaround for https://bugs.eclipse.org/241430 shouldn't be necessary when we move to 3.5 -->
-		<delete failonerror="false">
-			<fileset dir="${baseLocation}/configuration/.settings">
-				<include name="org.eclipse.equinox.p2.*.repository.prefs" />
-			</fileset>
-		</delete>
 		<antcall target="run.director">
 			<param name="p2.installIU" value="com.aptana.ide.feature.libraries.subscription.feature.group" />
 			<param name="p2.repo" value="${libraries-com.p2.repo}" />
