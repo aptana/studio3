@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.ecf.filetransfer.UserCancelledException;
 import org.eclipse.osgi.util.NLS;
 
@@ -66,7 +67,7 @@ public class ContentDownloadRequest
 
 	public void execute(IProgressMonitor monitor)
 	{
-		monitor.subTask(NLS.bind("Downloading {0}", url.toString()));
+		monitor.subTask(NLS.bind(Messages.ContentDownloadRequest_downloading, url.toString()));
 		IStatus status = download(monitor);
 		setResult(status);
 	}
@@ -83,6 +84,7 @@ public class ContentDownloadRequest
 		// perform the download
 		try
 		{
+			// Use ECF FileTransferJob implementation to get the remote file.
 			FileReader reader = new FileReader(null);
 			reader.readInto(this.url.toURI(), new FileOutputStream(this.saveTo), 0, monitor);
 
@@ -96,29 +98,6 @@ public class ContentDownloadRequest
 			{
 				throw new CoreException(result);
 			}
-			// try
-			// {
-			// DataInputStream dataInput = new DataInputStream(this.url.openStream());
-			// FileOutputStream dataOut = new FileOutputStream(this.saveTo);
-			// byte[] buffer = new byte[BUFFER_SIZE];
-			// int readCount = -1;
-			// while ((readCount = dataInput.read(buffer, 0, BUFFER_SIZE)) != -1)
-			// {
-			// if (monitor.isCanceled())
-			// {
-			// dataInput.close();
-			// dataOut.flush();
-			// dataOut.close();
-			// monitor.done();
-			// return Status.CANCEL_STATUS;
-			// }
-			// dataOut.write(buffer, 0, readCount);
-			// }
-			// dataInput.close();
-			// dataOut.flush();
-			// dataOut.close();
-			// monitor.done();
-			// }
 		}
 		catch (Throwable t)
 		{
@@ -156,7 +135,7 @@ public class ContentDownloadRequest
 
 		try
 		{
-			return File.createTempFile("aptana", null);
+			return File.createTempFile(Messages.ContentDownloadRequest_tempFilePrefix, null);
 		}
 		catch (IOException e)
 		{

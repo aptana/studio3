@@ -209,7 +209,7 @@ public class ConfigurationStatus implements Convertible
 	 * If a ConfigurationStatus with this ID was previously saved to the preferences, load the previous values into this
 	 * instance.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void load()
 	{
 		IEclipsePreferences prefs = new InstanceScope().getNode(ConfigurationsPlugin.PLUGIN_ID);
@@ -245,7 +245,7 @@ public class ConfigurationStatus implements Convertible
 	}
 
 	// ################# JSON Convertible Implementation ################
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void fromJSON(Map map)
 	{

@@ -303,7 +303,7 @@ public final class FileReader extends FileTransferJob implements IFileTransferLi
 				throw e;
 			}
 
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings({ "unchecked", "rawtypes" })
 			private Throwable unwind(Throwable t)
 			{
 				for (;;)
@@ -343,6 +343,18 @@ public final class FileReader extends FileTransferJob implements IFileTransferLi
 		return family == this;
 	}
 
+	/**
+	 * Read the content into the given output stream.
+	 * 
+	 * @param uri
+	 * @param anOutputStream
+	 * @param startPos
+	 * @param monitor
+	 *            - A progress monitor. It's up to the caller to call done on this one.
+	 * @throws CoreException
+	 * @throws FileNotFoundException
+	 * @throws ProtocolException
+	 */
 	public void readInto(URI uri, OutputStream anOutputStream, long startPos, IProgressMonitor monitor) //
 			throws CoreException, FileNotFoundException, ProtocolException
 	{
@@ -375,7 +387,7 @@ public final class FileReader extends FileTransferJob implements IFileTransferLi
 			if (!monitorStarted)
 				monitor.beginTask(null, 1);
 			monitorStarted = false;
-			monitor.done();
+			// monitor.done();
 		}
 	}
 

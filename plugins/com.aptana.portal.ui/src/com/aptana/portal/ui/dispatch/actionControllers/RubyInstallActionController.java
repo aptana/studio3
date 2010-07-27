@@ -45,6 +45,7 @@ public class RubyInstallActionController extends AbstractActionController
 					processor.addConfigurationProcessorListener(RubyInstallActionController.this);
 					processor.configure(monitor, attributes);
 					processor.removeConfigurationProcessorListener(RubyInstallActionController.this);
+					monitor.done();
 					return Status.OK_STATUS;
 				}
 			};
@@ -66,6 +67,6 @@ public class RubyInstallActionController extends AbstractActionController
 	public void configurationStateChanged(ConfigurationStatus status, Set<String> attributesChanged)
 	{
 		// TODO - Shalom: Notify that the installation is complete?
-		System.out.println(status);
+		System.out.println("configurationStateChanged: " + status.getStatus());
 	}
 }

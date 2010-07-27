@@ -80,12 +80,14 @@ public class DownloadManager
 	 */
 	public IStatus start(IProgressMonitor monitor)
 	{
-		SubMonitor subMonitor = SubMonitor.convert(monitor, "Downloading Content...", 1000);
+		SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.DownloadManager_downloadngContent, 1000);
 		try
 		{
 			if (downloads.isEmpty())
+			{
 				return Status.OK_STATUS;
-			download(subMonitor.newChild(500));
+			}
+			download(subMonitor);
 			return getStatus(monitor);
 		}
 		finally
@@ -101,10 +103,11 @@ public class DownloadManager
 	 */
 	protected void download(SubMonitor monitor)
 	{
+		int workUnits = 1000 / downloads.size();
 		for (Iterator<ContentDownloadRequest> iterator = downloads.iterator(); iterator.hasNext();)
 		{
 			ContentDownloadRequest request = iterator.next();
-			request.execute(monitor);
+			request.execute(monitor.newChild(workUnits));
 			if (request.getResult() != null && request.getResult().isOK())
 			{
 				completedDownloadsPaths.add(request.getDownloadLocation());
