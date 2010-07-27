@@ -273,9 +273,13 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 				if (property != null)
 				{
 					List<String> typeNames = property.getTypeNames();
-					JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
-
-					result = queryHelper.getTypeMembers(index, typeNames, EnumSet.allOf(ContentSelector.class));
+					
+					if (typeNames != null && typeNames.isEmpty() == false)
+					{
+						JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
+	
+						result = queryHelper.getTypeMembers(index, typeNames, EnumSet.allOf(ContentSelector.class));
+					}
 				}
 			}
 		}
