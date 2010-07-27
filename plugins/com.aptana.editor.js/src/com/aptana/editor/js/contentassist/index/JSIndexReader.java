@@ -241,7 +241,7 @@ public class JSIndexReader
 			List<QueryResult> descriptions = index.query(new String[] { JSIndexConstants.DESCRIPTION }, descriptionPattern, SearchPattern.PREFIX_MATCH
 				| SearchPattern.CASE_SENSITIVE);
 
-			if (descriptions != null)
+			if (descriptions != null && descriptions.isEmpty() == false)
 			{
 				String descriptionValue = descriptions.get(0).getWord();
 
