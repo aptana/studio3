@@ -40,6 +40,56 @@ public class Messages extends NLS
 	public static String DeployWizardPage_DeploymentOptionsLabel;
 	public static String DeployWizardPage_ProvidersLabel;
 	public static String DeployWizardPage_Title;
+	public static String EngineYardDeployWizardPage_ApplicationLinkLabel;
+
+	public static String EngineYardDeployWizardPage_ApplicationNameLabel;
+
+	public static String EngineYardDeployWizardPage_ApplicationNoteLabel;
+
+	public static String EngineYardDeployWizardPage_Title;
+
+	public static String EngineYardLoginWizardPage_EmailAddressExample;
+
+	public static String EngineYardLoginWizardPage_EmailAddressLabel;
+
+	public static String EngineYardLoginWizardPage_EmptyEmailAddressLabel;
+
+	public static String EngineYardLoginWizardPage_EmptyPasswordLabel;
+
+	public static String EngineYardLoginWizardPage_EnterCredentialsLabel;
+
+	public static String EngineYardLoginWizardPage_ErrorTitle;
+
+	public static String EngineYardLoginWizardPage_InvalidCredentails_Message;
+
+	public static String EngineYardLoginWizardPage_PasswordExample;
+
+	public static String EngineYardLoginWizardPage_PasswordLabel;
+
+	public static String EngineYardLoginWizardPage_SignupLinkLabel;
+
+	public static String EngineYardLoginWizardPage_SubmitButtonLabel;
+
+	public static String EngineYardLoginWizardPage_Success_Message;
+
+	public static String EngineYardLoginWizardPage_SuccessTitle;
+
+	public static String EngineYardLoginWizardPage_Title;
+
+	public static String EngineYardSignupPage_EmailAddressExample;
+
+	public static String EngineYardSignupPage_EmailAddressLabel;
+
+	public static String EngineYardSignupPage_EmptyEmailAddressLabel;
+
+	public static String EngineYardSignupPage_EnterCredentialsLabel;
+
+	public static String EngineYardSignupPage_SignupButtonLabel;
+
+	public static String EngineYardSignupPage_SignupNote;
+
+	public static String EngineYardSignupPage_Title;
+
 	public static String FTPDeployWizardPage_ProtocolLabel;
 	public static String FTPDeployWizardPage_RemoteInfoLabel;
 	public static String FTPDeployWizardPage_SiteNameLabel;
