@@ -14,6 +14,8 @@ import java.net.URL;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
+import com.aptana.core.util.PlatformUtil;
+
 public class EngineYardAPI
 {
 
@@ -37,12 +39,7 @@ public class EngineYardAPI
 
 	public static File getCredentialsFile()
 	{
-		String userHome = System.getProperty("user.home"); //$NON-NLS-1$
-		if (userHome == null || userHome.trim().length() == 0)
-		{
-			userHome = ""; // FIXME What should we use if we can't resolve user home???? //$NON-NLS-1$
-		}
-		return new File(userHome, ".eyrc"); //$NON-NLS-1$
+		return new File(PlatformUtil.expandEnvironmentStrings("~/.eyrc")); //$NON-NLS-1$
 	}
 
 	public IStatus authenticateFromCredentials()

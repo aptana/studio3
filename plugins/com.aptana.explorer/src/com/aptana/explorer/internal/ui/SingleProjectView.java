@@ -729,11 +729,11 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 								String URL = output.split("Web URL:")[1].split("\n")[0].replace(" ", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 								// Determine which OS and open url
-								if (Platform.getOS().equals(Platform.OS_MACOSX))
+								if (Platform.OS_MACOSX.equals(Platform.getOS()))
 								{
 									ProcessUtil.run("open", null, (Map<String, String>) null, URL); //$NON-NLS-1$
 								}
-								else if (Platform.getOS().equals(Platform.OS_WIN32))
+								else if (Platform.OS_WIN32.equals(Platform.getOS()))
 								{
 									ProcessUtil.run("cmd", null, (Map<String, String>) null, "/c", "start " + URL); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 								}
@@ -1614,7 +1614,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		DeployType type = DeployPreferenceUtil.getDeployType(selectedProject);
 
 		// Engine Yard gem does not work in Windows
-		if (!Platform.getOS().equals(Platform.OS_WIN32))
+		if (!Platform.OS_WIN32.equals(Platform.getOS()))
 		{
 			if (type.equals(DeployType.ENGINEYARD))
 			{

@@ -30,6 +30,8 @@ public class Messages extends NLS
 	public static String HerokuLoginWizardPage_Title;
 	public static String HerokuLoginWizardPage_UserIDExample;
 	public static String HerokuLoginWizardPage_UserIDLabel;
+	public static String HerokuSignupPage_InvalidEmail_Message;
+
 	public static String HerokuSignupPage_SignupButtonLabel;
 	public static String HerokuSignupPage_SignupNote;
 	public static String HerokuSignupPage_Title;
@@ -83,6 +85,8 @@ public class Messages extends NLS
 	public static String EngineYardSignupPage_EmptyEmailAddressLabel;
 
 	public static String EngineYardSignupPage_EnterCredentialsLabel;
+
+	public static String EngineYardSignupPage_InvalidEmail_Message;
 
 	public static String EngineYardSignupPage_SignupButtonLabel;
 

@@ -99,7 +99,15 @@ public class EngineYardDeployWizardPage extends WizardPage
 
 							WebBrowserEditorInput input = new WebBrowserEditorInput(url, style, BROWSER_ID);
 							IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+							if (page == null || input == null)
+							{
+								return;
+							}
 							IEditorPart editorPart = page.openEditor(input, WebBrowserEditor.WEB_BROWSER_EDITOR_ID);
+							if (editorPart == null)
+							{
+								return;
+							}
 							WebBrowserEditor webBrowserEditor = (WebBrowserEditor) editorPart;
 							Field f = WebBrowserEditor.class.getDeclaredField("webBrowser"); //$NON-NLS-1$
 							f.setAccessible(true);

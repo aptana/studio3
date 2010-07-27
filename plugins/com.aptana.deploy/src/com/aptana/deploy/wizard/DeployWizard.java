@@ -92,37 +92,37 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		String pageName = currentPage.getName();
 		DeployType type = null;
 		String deployEndpointName = null;
-		if (pageName.equals(HerokuDeployWizardPage.NAME))
+		if (HerokuDeployWizardPage.NAME.equals(pageName))
 		{
 			HerokuDeployWizardPage page = (HerokuDeployWizardPage) currentPage;
 			runnable = createHerokuDeployRunnable(page);
 			type = DeployType.HEROKU;
 			deployEndpointName = page.getAppName();
 		}
-		else if (pageName.equals(FTPDeployWizardPage.NAME))
+		else if (FTPDeployWizardPage.NAME.equals(pageName))
 		{
 			FTPDeployWizardPage page = (FTPDeployWizardPage) currentPage;
 			runnable = createFTPDeployRunnable(page);
 			type = DeployType.FTP;
 			deployEndpointName = page.getConnectionPoint().getName();
 		}
-		else if (pageName.equals(HerokuSignupPage.NAME))
+		else if (HerokuSignupPage.NAME.equals(pageName))
 		{
 			HerokuSignupPage page = (HerokuSignupPage) currentPage;
 			runnable = createHerokuSignupRunnable(page);
 		}
-		else if (pageName.equals(CapifyProjectPage.NAME))
+		else if (CapifyProjectPage.NAME.equals(pageName))
 		{
 			CapifyProjectPage page = (CapifyProjectPage) currentPage;
 			runnable = createCapifyRunnable(page);
 			type = DeployType.CAPISTRANO;
 		}
-		else if (pageName.equals(EngineYardSignupPage.NAME))
+		else if (EngineYardSignupPage.NAME.equals(pageName))
 		{
 			EngineYardSignupPage page = (EngineYardSignupPage) currentPage;
 			runnable = createEngineYardSignupRunnable(page);
 		}
-		else if (pageName.equals(EngineYardDeployWizardPage.NAME))
+		else if (EngineYardDeployWizardPage.NAME.equals(pageName))
 		{
 			EngineYardDeployWizardPage page = (EngineYardDeployWizardPage) currentPage;
 			runnable = createEngineYardDeployRunnable(page);
@@ -442,44 +442,14 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 					@Override
 					public void run()
 					{
-						try
-						{
-							WebBrowserEditorInput input = new WebBrowserEditorInput(url, style, BROWSER_ID);
-							IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-							IEditorPart editorPart = page.openEditor(input, WebBrowserEditor.WEB_BROWSER_EDITOR_ID);
-							WebBrowserEditor webBrowserEditor = (WebBrowserEditor) editorPart;
-							Field f = WebBrowserEditor.class.getDeclaredField("webBrowser"); //$NON-NLS-1$
-							f.setAccessible(true);
-							BrowserViewer viewer = (BrowserViewer) f.get(webBrowserEditor);
-							final Browser browser = viewer.getBrowser();
-							browser.addProgressListener(new ProgressListener()
-							{
-
-								@Override
-								public void completed(ProgressEvent event)
-								{
-									browser.removeProgressListener(this);
-									browser.execute(javascript);
-								}
-
-								@Override
-								public void changed(ProgressEvent event)
-								{
-									// ignore
-								}
-							});
-						}
-						catch (Exception e)
-						{
-							Activator.logError(e);
-						}
+						openSignupURLinEclipseBrowser(url, style, BROWSER_ID, javascript);
 					}
 				});
 			}
 		};
 		return runnable;
 	}
-
+	
 	protected IRunnableWithProgress createEngineYardSignupRunnable(EngineYardSignupPage page)
 	{
 		IRunnableWithProgress runnable;
@@ -572,37 +542,7 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 					@Override
 					public void run()
 					{
-						try
-						{
-							WebBrowserEditorInput input = new WebBrowserEditorInput(url, style, BROWSER_ID);
-							IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-							IEditorPart editorPart = page.openEditor(input, WebBrowserEditor.WEB_BROWSER_EDITOR_ID);
-							WebBrowserEditor webBrowserEditor = (WebBrowserEditor) editorPart;
-							Field f = WebBrowserEditor.class.getDeclaredField("webBrowser"); //$NON-NLS-1$
-							f.setAccessible(true);
-							BrowserViewer viewer = (BrowserViewer) f.get(webBrowserEditor);
-							final Browser browser = viewer.getBrowser();
-							browser.addProgressListener(new ProgressListener()
-							{
-
-								@Override
-								public void completed(ProgressEvent event)
-								{
-									browser.removeProgressListener(this);
-									browser.execute(javascript);
-								}
-
-								@Override
-								public void changed(ProgressEvent event)
-								{
-									// ignore
-								}
-							});
-						}
-						catch (Exception e)
-						{
-							Activator.logError(e);
-						}
+						openSignupURLinEclipseBrowser(url, style, BROWSER_ID, javascript);
 					}
 				});
 			}
@@ -743,6 +683,41 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 			}
 		}
 		return null;
+	}
+	
+	private void openSignupURLinEclipseBrowser(URL url, int style, String browserId, final String javascript)
+	{
+		try
+		{
+			WebBrowserEditorInput input = new WebBrowserEditorInput(url, style, browserId);
+			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+			IEditorPart editorPart = page.openEditor(input, WebBrowserEditor.WEB_BROWSER_EDITOR_ID);
+			WebBrowserEditor webBrowserEditor = (WebBrowserEditor) editorPart;
+			Field f = WebBrowserEditor.class.getDeclaredField("webBrowser"); //$NON-NLS-1$
+			f.setAccessible(true);
+			BrowserViewer viewer = (BrowserViewer) f.get(webBrowserEditor);
+			final Browser browser = viewer.getBrowser();
+			browser.addProgressListener(new ProgressListener()
+			{
+
+				@Override
+				public void completed(ProgressEvent event)
+				{
+					browser.removeProgressListener(this);
+					browser.execute(javascript);
+				}
+
+				@Override
+				public void changed(ProgressEvent event)
+				{
+					// ignore
+				}
+			});
+		}
+		catch (Exception e)
+		{
+			Activator.logError(e);
+		}
 	}
 
 }

@@ -116,7 +116,7 @@ public class DeployWizardPage extends WizardPage
 			});
 
 			// Deploy with Engine Yard
-			if(!Platform.getOS().equals(Platform.OS_WIN32))
+			if(!Platform.OS_WIN32.equals(Platform.getOS()))
 			{
 				
 				deployWithEngineYard = new Button(composite, SWT.RADIO);
