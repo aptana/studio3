@@ -250,7 +250,7 @@ public class JSTypeUtil
 			{
 				Collections.reverse(parts);
 
-				result = StringUtil.join(".", parts);
+				result = StringUtil.join(".", parts); //$NON-NLS-1$
 			}
 		}
 
