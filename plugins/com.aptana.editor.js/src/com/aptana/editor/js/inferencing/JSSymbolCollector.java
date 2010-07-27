@@ -8,6 +8,7 @@ import com.aptana.editor.js.parsing.ast.JSCatchNode;
 import com.aptana.editor.js.parsing.ast.JSDeclarationNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
+import com.aptana.editor.js.parsing.ast.JSInvokeNode;
 import com.aptana.editor.js.parsing.ast.JSLabelledNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
@@ -99,6 +100,38 @@ public class JSSymbolCollector extends JSTreeWalker
 		{
 			this._scope = this._scope.getParentScope();
 		}
+	}
+
+	/**
+	 * processSpecialInvocation
+	 * 
+	 * @param node
+	 */
+	protected boolean processSpecialInvocation(JSInvokeNode node)
+	{
+		boolean processed = false;
+
+		// TODO: create an extension point and delegate to classes defined there
+		// Right now, this assumes jQuery only.
+		if (this._scope.hasSymbol("jQuery"))
+		{
+			IParseNode args = node.getArguments();
+
+			if (args.getChildCount() == 1)
+			{
+				IParseNode inheritedProperties = args.getFirstChild();
+
+				if (inheritedProperties instanceof JSObjectNode)
+				{
+					JSPropertyCollector collector = new JSPropertyCollector(this._scope.getObject());
+					collector.activateProperty("jQuery");
+					collector.visit((JSObjectNode) inheritedProperties);
+					processed = true;
+				}
+			}
+		}
+
+		return processed;
 	}
 
 	/**
@@ -259,6 +292,34 @@ public class JSSymbolCollector extends JSTreeWalker
 	{
 		// No need to process the rhs since it's always an identifier
 		this.accept(node.getLeftHandSide());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSInvokeNode)
+	 */
+	@Override
+	public void visit(JSInvokeNode node)
+	{
+		IParseNode expression = node.getExpression();
+		boolean processed = false;
+
+		if (expression instanceof JSGetPropertyNode)
+		{
+			String text = expression.toString();
+
+			// TODO: create an extension point and delegate to classes defined
+			// there. Right now, this assumes jQuery only.
+			if ("jQuery.extend".equals(text))
+			{
+				processed = processSpecialInvocation(node);
+			}
+		}
+
+		if (processed == false)
+		{
+			super.visit(node);
+		}
 	}
 
 	/*
