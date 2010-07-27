@@ -3,10 +3,14 @@ package com.aptana.editor.js.contentassist;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
@@ -50,9 +54,9 @@ public class JSIndexQueryHelper
 	 * @param index
 	 * @param type
 	 */
-	protected void addParentTypes(LinkedList<String> types, Index index, String type)
+	protected void addParentTypes(List<String> types, Index index, String type)
 	{
-		if (type.equals(JSTypeConstants.OBJECT) == false)
+		if (type.equals(JSTypeConstants.OBJECT_TYPE) == false)
 		{
 			TypeElement typeElement = this._reader.getType(index, type, PARENT_TYPES);
 
@@ -532,6 +536,49 @@ public class JSIndexQueryHelper
 	}
 
 	/**
+	 * getTypeAncestorNames
+	 * 
+	 * @param index
+	 * @param typeName
+	 * @return
+	 */
+	public List<String> getTypeAncestorNames(Index index, String typeName)
+	{
+		// Using linked hash set to preserve the order items were added to set
+		Set<String> types = new LinkedHashSet<String>();
+
+		// Using linked list since it provides a queue interface
+		LinkedList<String> queue = new LinkedList<String>();
+
+		// prime the queue
+		queue.offer(typeName);
+
+		while (queue.isEmpty() == false)
+		{
+			String name = queue.poll();
+			TypeElement type = this.getType(index, name, PARENT_TYPES);
+
+			if (type != null)
+			{
+				for (String parentType : type.getParentTypes())
+				{
+					if (types.contains(parentType) == false)
+					{
+						types.add(parentType);
+
+						if (JSTypeConstants.OBJECT_TYPE.equals(parentType) == false)
+						{
+							queue.offer(parentType);
+						}
+					}
+				}
+			}
+		}
+
+		return new ArrayList<String>(types);
+	}
+
+	/**
 	 * getTypeMember
 	 * 
 	 * @param index
@@ -566,6 +613,32 @@ public class JSIndexQueryHelper
 
 		result.addAll(this.getCoreTypeMembers(typeName, fields));
 		result.addAll(this.getProjectTypeMembers(index, typeName, fields));
+
+		return result;
+	}
+
+	/**
+	 * getTypeMembers
+	 * 
+	 * @param index
+	 * @param typeNames
+	 * @param fields
+	 * @return
+	 */
+	public List<PropertyElement> getTypeMembers(Index index, List<String> typeNames, EnumSet<ContentSelector> fields)
+	{
+		List<PropertyElement> result;
+
+		if (typeNames != null && typeNames.isEmpty() == false)
+		{
+			String typePattern = "(" + StringUtil.join("|", typeNames) + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+			result = this.getTypeMembers(index, typePattern, fields);
+		}
+		else
+		{
+			result = Collections.emptyList();
+		}
 
 		return result;
 	}

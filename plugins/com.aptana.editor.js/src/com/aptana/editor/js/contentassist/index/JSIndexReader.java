@@ -51,7 +51,8 @@ public class JSIndexReader
 			column++;
 
 			// owning type
-			column++; // skip owning type
+			f.setOwningType(columns[column]);
+			column++;
 
 			// description
 			if (fields.contains(ContentSelector.DESCRIPTION))
@@ -154,6 +155,7 @@ public class JSIndexReader
 			column++;
 
 			// owning type
+			p.setOwningType(columns[column]);
 			column++;
 
 			// description
@@ -306,8 +308,6 @@ public class JSIndexReader
 			if (functions != null && functions.size() > 0)
 			{
 				result = this.createFunction(index, functions.get(0), fields);
-
-				result.setOwningType(owningType);
 			}
 		}
 
@@ -336,11 +336,7 @@ public class JSIndexReader
 			{
 				for (QueryResult function : functions)
 				{
-					FunctionElement f = this.createFunction(index, function, fields);
-
-					f.setOwningType(owningType);
-
-					result.add(f);
+					result.add(this.createFunction(index, function, fields));
 				}
 			}
 		}
@@ -439,11 +435,7 @@ public class JSIndexReader
 			{
 				for (QueryResult property : properties)
 				{
-					PropertyElement p = this.createProperty(index, property, fields);
-
-					p.setOwningType(owningType);
-
-					result.add(p);
+					result.add(this.createProperty(index, property, fields));
 				}
 			}
 		}
@@ -473,8 +465,6 @@ public class JSIndexReader
 			if (properties != null && properties.size() > 0)
 			{
 				result = this.createProperty(index, properties.get(0), fields);
-
-				result.setOwningType(owningType);
 			}
 		}
 

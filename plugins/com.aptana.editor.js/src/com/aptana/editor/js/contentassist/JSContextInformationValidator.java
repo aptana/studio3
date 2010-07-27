@@ -40,19 +40,21 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationPresenter;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 
-public class JSContextInformationValidator implements IContextInformationValidator,
-        IContextInformationPresenter {
+public class JSContextInformationValidator implements IContextInformationValidator, IContextInformationPresenter
+{
+	@Override
+	public void install(IContextInformation info, ITextViewer viewer, int offset)
+	{
+	}
 
-    @Override
-    public void install(IContextInformation info, ITextViewer viewer, int offset) {
-    }
+	@Override
+	public boolean isContextInformationValid(int offset)
+	{
+		return false;
+	}
 
-    @Override
-    public boolean isContextInformationValid(int offset) {
-        return false;
-    }
-
-    public boolean updatePresentation(int offset, TextPresentation presentation) {
-        return false;
-    }
+	public boolean updatePresentation(int offset, TextPresentation presentation)
+	{
+		return false;
+	}
 }

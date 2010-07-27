@@ -288,8 +288,8 @@ public class JSIndexWriter
 			type.getName(),
 			(parentTypes != null && parentTypes.isEmpty() == false)
 				? StringUtil.join(",", parentTypes) //$NON-NLS-1$
-				: (type.equals(JSTypeConstants.OBJECT) == false) //$NON-NLS-1$
-					? JSTypeConstants.OBJECT //$NON-NLS-1$
+				: (type.equals(JSTypeConstants.OBJECT_TYPE) == false) //$NON-NLS-1$
+					? JSTypeConstants.OBJECT_TYPE //$NON-NLS-1$
 					: "", //$NON-NLS-1$
 			descriptionKey
 		);

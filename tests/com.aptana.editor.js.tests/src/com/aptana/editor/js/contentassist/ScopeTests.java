@@ -8,12 +8,15 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.Path;
 
+import com.aptana.editor.js.inferencing.JSNodeTypeInferrer;
+import com.aptana.editor.js.inferencing.JSPropertyCollection;
+import com.aptana.editor.js.inferencing.JSScope;
+import com.aptana.editor.js.inferencing.JSSymbolCollector;
 import com.aptana.editor.js.parsing.JSParser;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.editor.js.tests.FileContentBasedTests;
 import com.aptana.parsing.ParseState;
-import com.aptana.parsing.Scope;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 
@@ -47,9 +50,9 @@ public class ScopeTests extends FileContentBasedTests
 	 * @return
 	 * @throws Exception 
 	 */
-	protected Scope<JSNode> getSymbols(String resource) throws Exception
+	protected JSScope getSymbols(String resource) throws Exception
 	{
-		Scope<JSNode> result = null;
+		JSScope result = null;
 		
 		// get source from resource
 		File file = this.getFile(new Path(resource));
@@ -94,14 +97,15 @@ public class ScopeTests extends FileContentBasedTests
 	 * @param symbol
 	 * @return
 	 */
-	protected List<String> getTypes(Scope<JSNode> symbols, String symbol)
+	protected List<String> getTypes(JSScope symbols, String symbol)
 	{
-		List<JSNode> nodes = symbols.getLocalSymbol(symbol);
+		JSPropertyCollection object = symbols.getLocalSymbol(symbol);
+		List<JSNode> nodes = object.getValues();
 		Set<String> typeSet = new HashSet<String>();
 		
 		for (JSNode node : nodes)
 		{
-			JSTypeWalker typeWalker = new JSTypeWalker(symbols);
+			JSNodeTypeInferrer typeWalker = new JSNodeTypeInferrer(symbols, null, null);
 			
 			typeWalker.visit(node);
 			
@@ -116,7 +120,7 @@ public class ScopeTests extends FileContentBasedTests
 	 * 
 	 * @param symbols
 	 */
-	protected void showSymbols(String title, Scope<JSNode> symbols)
+	protected void showSymbols(String title, JSScope symbols)
 	{
 		IRange range = symbols.getRange();
 		
@@ -133,7 +137,7 @@ public class ScopeTests extends FileContentBasedTests
 	 * @param symbols
 	 * @param indent
 	 */
-	protected void showSymbols(Scope<JSNode> symbols, String indent)
+	protected void showSymbols(JSScope symbols, String indent)
 	{
 		for (String symbol : symbols.getLocalSymbolNames())
 		{
@@ -143,7 +147,7 @@ public class ScopeTests extends FileContentBasedTests
 			System.out.println(symbol + ": " + types);
 		}
 		
-		for (Scope<JSNode> child : symbols.getChildren())
+		for (JSScope child : symbols.getChildren())
 		{
 			IRange range = child.getRange();
 			
@@ -161,7 +165,7 @@ public class ScopeTests extends FileContentBasedTests
 	 */
 	public void testGlobalNamedFunction() throws Exception
 	{
-		Scope<JSNode> symbols = this.getSymbols("ast-queries/globalNamedFunction.js");
+		JSScope symbols = this.getSymbols("ast-queries/globalNamedFunction.js");
 		List<String> names;
 		
 		// global
@@ -172,11 +176,11 @@ public class ScopeTests extends FileContentBasedTests
 		assertEquals("globalFunction", names.get(0));
 		
 		// globalFunction
-		List<Scope<JSNode>> children = symbols.getChildren();
+		List<JSScope> children = symbols.getChildren();
 		assertNotNull(children);
 		assertEquals(1, children.size());
 		
-		Scope<JSNode> child = children.get(0);
+		JSScope child = children.get(0);
 		names = child.getLocalSymbolNames();
 		assertNotNull(names);
 		assertEquals(0, names.size());
@@ -191,7 +195,7 @@ public class ScopeTests extends FileContentBasedTests
 	 */
 	public void testGlobalVarFunction() throws Exception
 	{
-		Scope<JSNode> symbols = this.getSymbols("ast-queries/globalVarFunction.js");
+		JSScope symbols = this.getSymbols("ast-queries/globalVarFunction.js");
 		List<String> names;
 		
 		// global
@@ -202,11 +206,11 @@ public class ScopeTests extends FileContentBasedTests
 		assertEquals("globalVarFunction", names.get(0));
 		
 		// globalVarFunction
-		List<Scope<JSNode>> children = symbols.getChildren();
+		List<JSScope> children = symbols.getChildren();
 		assertNotNull(children);
 		assertEquals(1, children.size());
 		
-		Scope<JSNode> child = children.get(0);
+		JSScope child = children.get(0);
 		names = child.getLocalSymbolNames();
 		assertNotNull(names);
 		assertEquals(0, names.size());
@@ -221,7 +225,7 @@ public class ScopeTests extends FileContentBasedTests
 	 */
 	public void testGlobalNamedVarFunction() throws Exception
 	{
-		Scope<JSNode> symbols = this.getSymbols("ast-queries/globalNamedVarFunction.js");
+		JSScope symbols = this.getSymbols("ast-queries/globalNamedVarFunction.js");
 		List<String> names;
 		
 		// global
@@ -233,11 +237,11 @@ public class ScopeTests extends FileContentBasedTests
 		assertTrue(names.contains("globalFunction"));
 		
 		// globalVarFunction/globalFunction
-		List<Scope<JSNode>> children = symbols.getChildren();
+		List<JSScope> children = symbols.getChildren();
 		assertNotNull(children);
 		assertEquals(1, children.size());
 		
-		Scope<JSNode> child = children.get(0);
+		JSScope child = children.get(0);
 		names = child.getLocalSymbolNames();
 		assertNotNull(names);
 		assertEquals(0, names.size());
@@ -252,7 +256,7 @@ public class ScopeTests extends FileContentBasedTests
 	 */
 	public void testGlobalVars() throws Exception
 	{
-		Scope<JSNode> symbols = this.getSymbols("ast-queries/globalVars.js");
+		JSScope symbols = this.getSymbols("ast-queries/globalVars.js");
 		List<String> names;
 		
 		// global
@@ -267,7 +271,7 @@ public class ScopeTests extends FileContentBasedTests
 		assertTrue(names.contains("localVar5"));
 		assertTrue(names.contains("localVar6"));
 		
-		List<Scope<JSNode>> children = symbols.getChildren();
+		List<JSScope> children = symbols.getChildren();
 		assertNotNull(children);
 		assertEquals(0, children.size());
 		
@@ -281,7 +285,7 @@ public class ScopeTests extends FileContentBasedTests
 	 */
 	public void testLocalVars() throws Exception
 	{
-		Scope<JSNode> symbols = this.getSymbols("ast-queries/localVars.js");
+		JSScope symbols = this.getSymbols("ast-queries/localVars.js");
 		List<String> names;
 		
 		// global
@@ -292,11 +296,11 @@ public class ScopeTests extends FileContentBasedTests
 		assertEquals("globalFunction", names.get(0));
 		
 		// globalFunction
-		List<Scope<JSNode>> children = symbols.getChildren();
+		List<JSScope> children = symbols.getChildren();
 		assertNotNull(children);
 		assertEquals(1, children.size());
 		
-		Scope<JSNode> child = children.get(0);
+		JSScope child = children.get(0);
 		names = child.getLocalSymbolNames();
 		assertNotNull(names);
 		assertEquals(6, names.size());
@@ -317,7 +321,7 @@ public class ScopeTests extends FileContentBasedTests
 	 */
 	public void testParameters() throws Exception
 	{
-		Scope<JSNode> symbols = this.getSymbols("ast-queries/parameters.js");
+		JSScope symbols = this.getSymbols("ast-queries/parameters.js");
 		List<String> names;
 		
 		// global
@@ -328,11 +332,11 @@ public class ScopeTests extends FileContentBasedTests
 		assertEquals("globalFunction", names.get(0));
 		
 		// globalFunction
-		List<Scope<JSNode>> children = symbols.getChildren();
+		List<JSScope> children = symbols.getChildren();
 		assertNotNull(children);
 		assertEquals(1, children.size());
 		
-		Scope<JSNode> child = children.get(0);
+		JSScope child = children.get(0);
 		names = child.getLocalSymbolNames();
 		assertEquals(2, names.size());
 		assertTrue(names.contains("parameter1"));
@@ -348,7 +352,7 @@ public class ScopeTests extends FileContentBasedTests
 	 */
 	public void testNestedFunctions() throws Exception
 	{
-		Scope<JSNode> symbols = this.getSymbols("ast-queries/nestedFunctions.js");
+		JSScope symbols = this.getSymbols("ast-queries/nestedFunctions.js");
 		List<String> names;
 		
 		// global
@@ -359,11 +363,11 @@ public class ScopeTests extends FileContentBasedTests
 		assertEquals("outerFunction", names.get(0));
 		
 		// outerFunction
-		List<Scope<JSNode>> children = symbols.getChildren();
+		List<JSScope> children = symbols.getChildren();
 		assertNotNull(children);
 		assertEquals(1, children.size());
 		
-		Scope<JSNode> child = children.get(0);
+		JSScope child = children.get(0);
 		names = child.getLocalSymbolNames();
 		assertNotNull(names);
 		assertEquals(3, names.size());
@@ -393,7 +397,7 @@ public class ScopeTests extends FileContentBasedTests
 	 */
 	public void testNestedFunctions2() throws Exception
 	{
-		Scope<JSNode> symbols = this.getSymbols("ast-queries/nestedFunctions2.js");
+		JSScope symbols = this.getSymbols("ast-queries/nestedFunctions2.js");
 		List<String> names;
 		
 		// global
@@ -406,11 +410,11 @@ public class ScopeTests extends FileContentBasedTests
 		assertTrue(names.contains("functionA"));
 		
 		// functionA
-		List<Scope<JSNode>> children = symbols.getChildren();
+		List<JSScope> children = symbols.getChildren();
 		assertNotNull(children);
 		assertEquals(1, children.size());
 		
-		Scope<JSNode> child = children.get(0);
+		JSScope child = children.get(0);
 		names = child.getLocalSymbolNames();
 		assertNotNull(names);
 		assertEquals(5, names.size());
@@ -435,11 +439,11 @@ public class ScopeTests extends FileContentBasedTests
 		assertTrue(names.contains("functionC"));
 		
 		// functionC
-		List<Scope<JSNode>> grandchildren = child.getChildren();
+		List<JSScope> grandchildren = child.getChildren();
 		assertNotNull(grandchildren);
 		assertEquals(1, grandchildren.size());
 		
-		Scope<JSNode> grandchild = grandchildren.get(0);
+		JSScope grandchild = grandchildren.get(0);
 		names = grandchild.getLocalSymbolNames();
 		assertNotNull(names);
 		assertEquals(3, names.size());
@@ -465,7 +469,7 @@ public class ScopeTests extends FileContentBasedTests
 	 */
 	public void testPrimitives() throws Exception
 	{
-		Scope<JSNode> symbols = this.getSymbols("ast-queries/primitives.js");
+		JSScope symbols = this.getSymbols("ast-queries/primitives.js");
 		List<String> names;
 		
 		assertNotNull(symbols);
@@ -481,7 +485,7 @@ public class ScopeTests extends FileContentBasedTests
 		assertTrue(names.contains("number"));
 		assertTrue(names.contains("regex"));
 		
-		List<Scope<JSNode>> children = symbols.getChildren();
+		List<JSScope> children = symbols.getChildren();
 		assertNotNull(children);
 		assertEquals(0, children.size());
 		
@@ -495,7 +499,7 @@ public class ScopeTests extends FileContentBasedTests
 	 */
 	public void testMultipleTypes() throws Exception
 	{
-		Scope<JSNode> symbols = this.getSymbols("ast-queries/multipleTypes.js");
+		JSScope symbols = this.getSymbols("ast-queries/multipleTypes.js");
 		List<String> names;
 		
 		assertNotNull(symbols);
@@ -504,7 +508,7 @@ public class ScopeTests extends FileContentBasedTests
 		assertEquals(1, names.size());
 		assertEquals("stringAndNumber", names.get(0));
 		
-		List<Scope<JSNode>> children = symbols.getChildren();
+		List<JSScope> children = symbols.getChildren();
 		assertNotNull(children);
 		assertEquals(0, children.size());
 		

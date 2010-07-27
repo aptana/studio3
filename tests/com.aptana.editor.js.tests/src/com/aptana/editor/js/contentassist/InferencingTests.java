@@ -5,12 +5,15 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import com.aptana.editor.js.inferencing.JSNodeTypeInferrer;
+import com.aptana.editor.js.inferencing.JSPropertyCollection;
+import com.aptana.editor.js.inferencing.JSScope;
+import com.aptana.editor.js.inferencing.JSSymbolCollector;
+import com.aptana.editor.js.inferencing.JSSymbolTypeInferrer;
 import com.aptana.editor.js.parsing.JSParser;
-import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.parsing.ParseState;
-import com.aptana.parsing.Scope;
 import com.aptana.parsing.ast.IParseNode;
 
 public class InferencingTests extends TestCase
@@ -46,7 +49,7 @@ public class InferencingTests extends TestCase
 	 * @param source
 	 * @return
 	 */
-	protected Scope<JSNode> getGlobals(String source)
+	protected JSScope getGlobals(String source)
 	{
 		IParseNode root = this.getParseRootNode(source);
 		assertTrue(root instanceof JSParseRootNode);
@@ -63,9 +66,9 @@ public class InferencingTests extends TestCase
 	 * @param node
 	 * @return
 	 */
-	protected List<String> getTypes(Scope<JSNode> globals, JSNode node)
+	protected List<String> getTypes(JSScope globals, JSNode node)
 	{
-		JSTypeWalker walker = new JSTypeWalker(globals, null);
+		JSNodeTypeInferrer walker = new JSNodeTypeInferrer(globals, null, null);
 		
 		node.accept(walker);
 		
@@ -78,13 +81,13 @@ public class InferencingTests extends TestCase
 	 * @param nodes
 	 * @return
 	 */
-	protected List<String> getTypes(Scope<JSNode> globals, List<JSNode> nodes)
+	protected List<String> getTypes(JSScope globals, List<JSNode> nodes)
 	{
 		List<String> result = new LinkedList<String>();
 		
 		for (IParseNode node : nodes)
 		{
-			JSTypeWalker walker = new JSTypeWalker(globals, null);
+			JSNodeTypeInferrer walker = new JSNodeTypeInferrer(globals, null, null);
 			
 			assertTrue(node instanceof JSNode);
 			
@@ -104,16 +107,19 @@ public class InferencingTests extends TestCase
 	 */
 	public void assignmentTypeTests(String source, String... types)
 	{
-		Scope<JSNode> globals = this.getGlobals(source);
-		List<JSNode> assignments = globals.getAssignments();
+		JSScope globals = this.getGlobals(source);
+		assertNotNull(globals);
 		
-		assertNotNull(assignments);
-		assertEquals(1, assignments.size());
+		JSPropertyCollection object = globals.getSymbol("abc");
+		assertNotNull(object);
 		
-		JSNode assignment = assignments.get(0);
-		assertTrue(assignment instanceof JSAssignmentNode);
+		// NOTE: getting property elements of all symbols in the specified scope
+		// as a side-effect caches each JSObject's type values.
+		JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(globals, null, null);
+		symbolInferrer.getScopeProperties();
 		
-		List<String> symbolTypes = this.getTypes(globals, assignment);
+		List<String> symbolTypes = object.getTypes();
+		assertNotNull(symbolTypes);
 		assertNotNull(types);
 		assertEquals(types.length, symbolTypes.size());
 		
@@ -132,10 +138,11 @@ public class InferencingTests extends TestCase
 	 */
 	public void varTypeTests(String source, String symbol, String... types)
 	{
-		Scope<JSNode> globals = this.getGlobals(source);
+		JSScope globals = this.getGlobals(source);
 		
 		assertTrue(globals.hasLocalSymbol(symbol));
-		List<JSNode> values = globals.getSymbol(symbol);
+		JSPropertyCollection object = globals.getSymbol(symbol);
+		List<JSNode> values = object.getValues();
 		assertNotNull(values);
 		assertEquals(1, values.size());
 		
@@ -598,7 +605,15 @@ public class InferencingTests extends TestCase
 	 */
 	public void testPlusAssignMixed()
 	{
-		this.assignmentTypeTests("var abc = 10; abc += '20'", "String");
+		this.assignmentTypeTests("var abc = 10; abc += '20'", "Number", "String");
+	}
+	
+	/**
+	 * testPlusAssignMixed2
+	 */
+	public void testPlusAssignMixed2()
+	{
+		this.assignmentTypeTests("var abc = '10'; abc += 20", "String", "Number");
 	}
 	
 	/**

@@ -242,6 +242,9 @@
                commandId="com.aptana.ide.syncing.ui.commands.download"
                icon="icons/full/obj16/get.gif">
          </command>
+         <command
+               commandId="com.aptana.ide.syncing.ui.commands.newconnection">
+         </command>
       </menuContribution>
       <menuContribution
             locationURI="popup:transfer.main?after=group2">
