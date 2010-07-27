@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
-import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
@@ -48,7 +46,7 @@ public class JSIndexQueryHelper
 	}
 
 	/**
-	 * getGlobals
+	 * getCoreGlobals
 	 * 
 	 * @param fields
 	 * @return
@@ -59,7 +57,7 @@ public class JSIndexQueryHelper
 	}
 
 	/**
-	 * getProjectTypeMethod
+	 * getFunction
 	 * 
 	 * @param index
 	 * @param typeName
@@ -74,6 +72,30 @@ public class JSIndexQueryHelper
 		try
 		{
 			result = this._reader.getFunction(index, typeName, methodName, fields);
+		}
+		catch (IOException e)
+		{
+			Activator.logError(e.getMessage(), e);
+		}
+
+		return result;
+	}
+
+	/**
+	 * getFunctions
+	 * 
+	 * @param index
+	 * @param typeNames
+	 * @param fields
+	 * @return
+	 */
+	protected List<FunctionElement> getFunctions(Index index, List<String> typeNames, EnumSet<ContentSelector> fields)
+	{
+		List<FunctionElement> result = null;
+
+		try
+		{
+			result = this._reader.getFunctions(index, typeNames, fields);
 		}
 		catch (IOException e)
 		{
@@ -128,7 +150,7 @@ public class JSIndexQueryHelper
 	}
 
 	/**
-	 * getProjectTypeMember
+	 * getMember
 	 * 
 	 * @param index
 	 * @param typeName
@@ -149,6 +171,42 @@ public class JSIndexQueryHelper
 	}
 
 	/**
+	 * getMembers
+	 * 
+	 * @param index
+	 * @param typeNames
+	 * @param fields
+	 * @return
+	 */
+	protected List<PropertyElement> getMembers(Index index, List<String> typeNames, EnumSet<ContentSelector> fields)
+	{
+		List<PropertyElement> result = new ArrayList<PropertyElement>();
+
+		result.addAll(this.getProperties(index, typeNames, fields));
+		result.addAll(this.getFunctions(index, typeNames, fields));
+
+		return result;
+	}
+
+	/**
+	 * getMembers
+	 * 
+	 * @param index
+	 * @param typeName
+	 * @param fields
+	 * @return
+	 */
+	protected List<PropertyElement> getMembers(Index index, String typeName, EnumSet<ContentSelector> fields)
+	{
+		List<PropertyElement> result = new ArrayList<PropertyElement>();
+
+		result.addAll(this.getProperties(index, typeName, fields));
+		result.addAll(this.getFunctions(index, typeName, fields));
+
+		return result;
+	}
+
+	/**
 	 * getProjectGlobals
 	 * 
 	 * @param index
@@ -161,18 +219,25 @@ public class JSIndexQueryHelper
 	}
 
 	/**
-	 * getProjectTypeMembers
+	 * getProperties
 	 * 
-	 * @param typeName
+	 * @param index
+	 * @param typeNames
 	 * @param fields
 	 * @return
 	 */
-	protected List<PropertyElement> getMembers(Index index, String typeName, EnumSet<ContentSelector> fields)
+	protected List<PropertyElement> getProperties(Index index, List<String> typeNames, EnumSet<ContentSelector> fields)
 	{
-		List<PropertyElement> result = new ArrayList<PropertyElement>();
+		List<PropertyElement> result = null;
 
-		result.addAll(this.getProperties(index, typeName, fields));
-		result.addAll(this.getFunctions(index, typeName, fields));
+		try
+		{
+			result = this._reader.getProperties(index, typeNames, fields);
+		}
+		catch (IOException e)
+		{
+			Activator.logError(e.getMessage(), e);
+		}
 
 		return result;
 	}
@@ -202,7 +267,7 @@ public class JSIndexQueryHelper
 	}
 
 	/**
-	 * getProjectTypeProperty
+	 * getProperty
 	 * 
 	 * @param index
 	 * @param typeName
@@ -320,18 +385,10 @@ public class JSIndexQueryHelper
 	 */
 	public List<PropertyElement> getTypeMembers(Index index, List<String> typeNames, EnumSet<ContentSelector> fields)
 	{
-		List<PropertyElement> result;
+		List<PropertyElement> result = new ArrayList<PropertyElement>();
 
-		if (typeNames != null && typeNames.isEmpty() == false)
-		{
-			String typePattern = "(" + StringUtil.join("|", typeNames) + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
-			result = this.getTypeMembers(index, typePattern, fields);
-		}
-		else
-		{
-			result = Collections.emptyList();
-		}
+		result.addAll(this.getMembers(getIndex(), typeNames, fields));
+		result.addAll(this.getMembers(index, typeNames, fields));
 
 		return result;
 	}
