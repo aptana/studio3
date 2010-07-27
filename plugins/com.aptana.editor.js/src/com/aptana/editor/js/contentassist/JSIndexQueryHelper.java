@@ -241,24 +241,6 @@ public class JSIndexQueryHelper
 		try
 		{
 			result = this._reader.getFunctions(index, typeName, fields);
-
-			// possibly include ancestor types
-			if (fields.contains(ContentSelector.INCLUDE_ANCESTORS))
-			{
-				// NOTE: Using LinkedList since it implements Queue<T>
-				LinkedList<String> types = new LinkedList<String>();
-
-				this.addParentTypes(types, index, typeName);
-
-				while (types.isEmpty() == false)
-				{
-					String currentType = types.remove();
-
-					result.addAll(this.getTypeMethods(index, currentType, fields));
-
-					this.addParentTypes(types, index, currentType);
-				}
-			}
 		}
 		catch (IOException e)
 		{
@@ -488,24 +470,6 @@ public class JSIndexQueryHelper
 		try
 		{
 			result = this._reader.getProperties(index, typeName, fields);
-
-			// possibly include ancestor types
-			if (fields.contains(ContentSelector.INCLUDE_ANCESTORS))
-			{
-				// NOTE: Using LinkedList since it implements Queue<T>
-				LinkedList<String> types = new LinkedList<String>();
-
-				this.addParentTypes(types, index, typeName);
-
-				while (types.isEmpty() == false)
-				{
-					String currentType = types.remove();
-
-					result.addAll(this.getTypeProperties(index, currentType, fields));
-
-					this.addParentTypes(types, index, currentType);
-				}
-			}
 		}
 		catch (IOException e)
 		{

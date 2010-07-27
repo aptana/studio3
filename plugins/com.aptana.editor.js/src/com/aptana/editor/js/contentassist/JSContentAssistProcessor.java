@@ -42,6 +42,7 @@ import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.editor.js.parsing.lexer.JSLexemeProvider;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
+import com.aptana.index.core.Index;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
@@ -73,7 +74,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		ContentSelector.DESCRIPTION, //
 		ContentSelector.DOCUMENTS, //
 		ContentSelector.EXAMPLES, //
-		ContentSelector.INCLUDE_ANCESTORS, //
 		ContentSelector.PARAMETERS, //
 		ContentSelector.PARENT_TYPES, //
 		ContentSelector.RETURN_TYPES, //
@@ -342,8 +342,16 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected void addTypeProperties(Set<ICompletionProposal> proposals, String typeName, int offset)
 	{
+		Index index = this.getIndex();
+		
+		// grab all ancestors of the specified type
+		List<String> allTypes = this._indexHelper.getTypeAncestorNames(index, typeName);
+		
+		// include the type in the list as well
+		allTypes.add(0, typeName);
+		
 		// add properties and methods
-		List<PropertyElement> properties = this._indexHelper.getTypeMembers(this.getIndex(), typeName, TYPE_PROPERTY_SELECTOR);
+		List<PropertyElement> properties = this._indexHelper.getTypeMembers(index, allTypes, TYPE_PROPERTY_SELECTOR);
 
 		typeName = JSModelFormatter.getTypeDisplayName(typeName);
 

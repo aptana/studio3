@@ -7,7 +7,6 @@ public enum ContentSelector
 	EXAMPLES,
 	EXCEPTIONS,
 	FUNCTIONS,
-	INCLUDE_ANCESTORS,
 	NAME,
 	OWNING_TYPE,
 	OS,
