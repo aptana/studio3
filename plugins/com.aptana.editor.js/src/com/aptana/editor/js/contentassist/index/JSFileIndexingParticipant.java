@@ -190,7 +190,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 						result.addAll(this.processWindowAssignments(index, scope, location));
 
 						// handle any nested lambdas in this function
-						this.processLambdas(index, globals, function, location);
+						result.addAll(this.processLambdas(index, globals, function, location));
 					}
 				}
 			}
