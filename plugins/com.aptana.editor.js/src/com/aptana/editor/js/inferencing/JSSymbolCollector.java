@@ -1,5 +1,10 @@
 package com.aptana.editor.js.inferencing;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.core.runtime.Platform;
 
 import com.aptana.editor.js.JSTypeConstants;
@@ -21,8 +26,53 @@ import com.aptana.parsing.lexer.IRange;
 
 public class JSSymbolCollector extends JSTreeWalker
 {
+	private static List<InvocationProcessor> PROCESSORS;
+	private static Map<String,InvocationProcessor> INVOCATION_PROCESSORS;
+	
 	private JSScope _scope;
 
+	/**
+	 * getInvocationProcessor
+	 * 
+	 * @return
+	 */
+	private static InvocationProcessor getInvocationProcessor(String pattern)
+	{
+		if (INVOCATION_PROCESSORS == null)
+		{
+			INVOCATION_PROCESSORS = new HashMap<String,InvocationProcessor>();
+			
+			for (InvocationProcessor processor : getInvocationProcessors())
+			{
+				for (String invocationPattern : processor.getInvocationPatterns())
+				{
+					INVOCATION_PROCESSORS.put(invocationPattern, processor);
+				}
+			}
+		}
+		
+		return INVOCATION_PROCESSORS.get(pattern);
+	}
+	
+	/**
+	 * getInvocationProcessors
+	 * 
+	 * @return
+	 */
+	private static List<InvocationProcessor> getInvocationProcessors()
+	{
+		if (PROCESSORS == null)
+		{
+			PROCESSORS = new ArrayList<InvocationProcessor>();
+			
+			// TODO: Eventually, this will be handled via an extension point.
+			// We're targeting jQuery only right now, so we'll hard code this.
+			PROCESSORS.add(new JQueryInvocationProcessor());
+		}
+		
+		return PROCESSORS;
+	}
+	
 	/**
 	 * JSSymbolCollector
 	 */
@@ -100,38 +150,6 @@ public class JSSymbolCollector extends JSTreeWalker
 		{
 			this._scope = this._scope.getParentScope();
 		}
-	}
-
-	/**
-	 * processSpecialInvocation
-	 * 
-	 * @param node
-	 */
-	protected boolean processSpecialInvocation(JSInvokeNode node)
-	{
-		boolean processed = false;
-
-		// TODO: create an extension point and delegate to classes defined there
-		// Right now, this assumes jQuery only.
-		if (this._scope.hasSymbol("jQuery"))
-		{
-			IParseNode args = node.getArguments();
-
-			if (args.getChildCount() == 1)
-			{
-				IParseNode inheritedProperties = args.getFirstChild();
-
-				if (inheritedProperties instanceof JSObjectNode)
-				{
-					JSPropertyCollector collector = new JSPropertyCollector(this._scope.getObject());
-					collector.activateProperty("jQuery");
-					collector.visit((JSObjectNode) inheritedProperties);
-					processed = true;
-				}
-			}
-		}
-
-		return processed;
 	}
 
 	/**
@@ -304,15 +322,14 @@ public class JSSymbolCollector extends JSTreeWalker
 		IParseNode expression = node.getExpression();
 		boolean processed = false;
 
+		// NOTE: limiting to dotted names for efficiency
 		if (expression instanceof JSGetPropertyNode)
 		{
-			String text = expression.toString();
+			InvocationProcessor processor = getInvocationProcessor(expression.toString());
 
-			// TODO: create an extension point and delegate to classes defined
-			// there. Right now, this assumes jQuery only.
-			if ("jQuery.extend".equals(text))
+			if (processor != null)
 			{
-				processed = processSpecialInvocation(node);
+				processed = processor.processInvocation(this._scope, node);
 			}
 		}
 
