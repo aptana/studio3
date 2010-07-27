@@ -2,8 +2,10 @@ package com.aptana.ide.core.io.downloader;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -22,6 +24,7 @@ import com.aptana.ide.core.io.CoreIOPlugin;
 public class DownloadManager
 {
 	private List<ContentDownloadRequest> downloads;
+	private List<String> completedDownloadsPaths;
 
 	/**
 	 * Constructs a new DownloadManager
@@ -29,17 +32,36 @@ public class DownloadManager
 	public DownloadManager()
 	{
 		downloads = new ArrayList<ContentDownloadRequest>();
+		completedDownloadsPaths = new ArrayList<String>();
 	}
 
-	public void addURL(URL url)
+	/**
+	 * Adds a URL for the pending downloads list.<br>
+	 * Note that this method should be called <b>before</b> the {@link #start(IProgressMonitor)} is called.
+	 * 
+	 * @param url
+	 *            A URL with a file-name to be downloaded.
+	 * @throws CoreException
+	 *             In case the URL file name cannot be extracted from the URL.
+	 */
+	public void addURL(URL url) throws CoreException
 	{
 		if (url != null)
 		{
 			this.downloads.add(new ContentDownloadRequest(url));
 		}
 	}
-	
-	public void addURLs(List<URL> urls)
+
+	/**
+	 * Adds a URL list for the pending downloads list.<br>
+	 * Note that this method should be called <b>before</b> the {@link #start(IProgressMonitor)} is called.
+	 * 
+	 * @param urls
+	 *            A URLs list, each URL should hold a file-name to be downloaded.
+	 * @throws CoreException
+	 *             In case one or more of the given URLs do not contain a file name.
+	 */
+	public void addURLs(List<URL> urls) throws CoreException
 	{
 		if (urls != null)
 		{
@@ -52,39 +74,70 @@ public class DownloadManager
 			}
 		}
 	}
-	
+
 	/**
-	 * Starts the downloads.
-	 * Returns a status for the overall operation. 
+	 * Starts the downloads. Returns a status for the overall operation.
 	 */
-	public IStatus start(IProgressMonitor monitor) {
+	public IStatus start(IProgressMonitor monitor)
+	{
 		SubMonitor subMonitor = SubMonitor.convert(monitor, "Downloading Content...", 1000);
-		try {
+		try
+		{
 			if (downloads.isEmpty())
 				return Status.OK_STATUS;
-			// TODO
-			/*IQueryable<IArtifactRepository> repoQueryable = provContext.getArtifactRepositories(subMonitor.newChild(250));
-			IQuery<IArtifactRepository> all = new ExpressionMatchQuery<IArtifactRepository>(IArtifactRepository.class, ExpressionUtil.TRUE_EXPRESSION);
-			IArtifactRepository[] repositories = repoQueryable.query(all, subMonitor.newChild(250)).toArray(IArtifactRepository.class);
-			if (repositories.length == 0)
-				return new Status(IStatus.ERROR, EngineActivator.ID, Messages.download_no_repository, new Exception(Collect.NO_ARTIFACT_REPOSITORIES_AVAILABLE));
-			fetch(repositories, subMonitor.newChild(500));*/
+			download(subMonitor.newChild(500));
 			return getStatus(monitor);
-		} finally {
+		}
+		finally
+		{
 			subMonitor.done();
 		}
 	}
-	
-	private IStatus getStatus(IProgressMonitor monitor) {
-		if (monitor != null && monitor.isCanceled()) {
+
+	/**
+	 * Download the remote content.
+	 * 
+	 * @param monitor
+	 */
+	protected void download(SubMonitor monitor)
+	{
+		for (Iterator<ContentDownloadRequest> iterator = downloads.iterator(); iterator.hasNext();)
+		{
+			ContentDownloadRequest request = iterator.next();
+			request.execute(monitor);
+			if (request.getResult() != null && request.getResult().isOK())
+			{
+				completedDownloadsPaths.add(request.getDownloadLocation());
+				iterator.remove();
+			}
+			monitor.setWorkRemaining(downloads.size());
+		}
+	}
+
+	/**
+	 * Returns the location paths where the requested content was downloaded to.
+	 * 
+	 * @return A string array containing the paths for the file that were downloaded.
+	 */
+	public String[] getContentsLocations()
+	{
+		return completedDownloadsPaths.toArray(new String[completedDownloadsPaths.size()]);
+	}
+
+	private IStatus getStatus(IProgressMonitor monitor)
+	{
+		if (monitor != null && monitor.isCanceled())
+		{
 			return Status.CANCEL_STATUS;
 		}
-		if (downloads.isEmpty()) {
+		if (downloads.isEmpty())
+		{
 			return Status.OK_STATUS;
 		}
 
 		MultiStatus result = new MultiStatus(CoreIOPlugin.PLUGIN_ID, IStatus.OK, null, null);
-		for (ContentDownloadRequest request : downloads) {
+		for (ContentDownloadRequest request : downloads)
+		{
 			IStatus failed = request.getResult();
 			if (failed != null && !failed.isOK())
 				result.add(failed);
