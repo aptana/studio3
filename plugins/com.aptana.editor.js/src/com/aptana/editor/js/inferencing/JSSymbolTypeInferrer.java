@@ -29,7 +29,7 @@ public class JSSymbolTypeInferrer
 {
 	private static final String NO_TYPE = ""; //$NON-NLS-1$
 	private static final EnumSet<ContentSelector> MEMBER_CONTENT = EnumSet.of(ContentSelector.NAME, ContentSelector.TYPES, ContentSelector.RETURN_TYPES);
-
+	
 	private Index _index;
 	private JSScope _activeScope;
 	private URI _location;
@@ -53,6 +53,8 @@ public class JSSymbolTypeInferrer
 
 		if (values != null && values.size() > 0)
 		{
+			// NOTE: Walk backwards so latest definition that has a valid name
+			// wins
 			for (int i = values.size() - 1; i >= 0; i--)
 			{
 				JSNode value = values.get(i);
