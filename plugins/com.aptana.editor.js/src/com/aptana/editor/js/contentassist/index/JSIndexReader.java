@@ -8,7 +8,9 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
@@ -302,7 +304,9 @@ public class JSIndexReader
 
 		if (index != null)
 		{
-			List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(owningType, propertyName),
+			String quotedOwningType = Pattern.quote(owningType);
+			String quotedPropertyName = Pattern.quote(propertyName);
+			List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(quotedOwningType, quotedPropertyName),
 				SearchPattern.REGEX_MATCH);
 
 			if (functions != null && functions.size() > 0)
@@ -327,10 +331,12 @@ public class JSIndexReader
 	{
 		List<FunctionElement> result = new ArrayList<FunctionElement>();
 
-		if (index != null)
+		if (index != null && owningType != null && owningType.length() > 0)
 		{
 			// read functions
-			List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(owningType), SearchPattern.REGEX_MATCH);
+			String quotedOwningType = Pattern.quote(owningType);
+			List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(quotedOwningType),
+				SearchPattern.REGEX_MATCH);
 
 			if (functions != null)
 			{
@@ -342,6 +348,60 @@ public class JSIndexReader
 		}
 
 		return result;
+	}
+
+	/**
+	 * getFunctions
+	 * 
+	 * @param index
+	 * @param owningTypes
+	 * @param fields
+	 * @return
+	 * @throws IOException
+	 */
+	public List<FunctionElement> getFunctions(Index index, List<String> owningTypes, EnumSet<ContentSelector> fields) throws IOException
+	{
+		List<FunctionElement> result = new ArrayList<FunctionElement>();
+
+		if (index != null && owningTypes != null && owningTypes.isEmpty() == false)
+		{
+			// build regex pattern to match all owning types at once
+			String typePattern = getUserTypesPattern(owningTypes);
+
+			// read functions
+			List<QueryResult> functions = index
+				.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(typePattern), SearchPattern.REGEX_MATCH);
+
+			if (functions != null)
+			{
+				for (QueryResult function : functions)
+				{
+					result.add(this.createFunction(index, function, fields));
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getUserTypesPattern
+	 * 
+	 * @param owningTypes
+	 * @return
+	 */
+	protected String getUserTypesPattern(List<String> owningTypes)
+	{
+		List<String> quotedOwningTypes = new ArrayList<String>(owningTypes.size());
+
+		// escape each owning type
+		for (String owningType : owningTypes)
+		{
+			quotedOwningTypes.add(Pattern.quote(owningType));
+		}
+
+		// build pattern for all types
+		return "(" + StringUtil.join("|", quotedOwningTypes) + ")";
 	}
 
 	/**
@@ -425,11 +485,46 @@ public class JSIndexReader
 	{
 		List<PropertyElement> result = new ArrayList<PropertyElement>();
 
-		if (index != null)
+		if (index != null && owningType != null && owningType.length() > 0)
 		{
 			// read properties
-			List<QueryResult> properties = index
-				.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningType), SearchPattern.REGEX_MATCH);
+			String quotedOwningType = Pattern.quote(owningType);
+			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(quotedOwningType),
+				SearchPattern.REGEX_MATCH);
+
+			if (properties != null)
+			{
+				for (QueryResult property : properties)
+				{
+					result.add(this.createProperty(index, property, fields));
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getProperties
+	 * 
+	 * @param index
+	 * @param owningTypes
+	 * @param fields
+	 * @return
+	 * @throws IOException
+	 */
+	public List<PropertyElement> getProperties(Index index, List<String> owningTypes, EnumSet<ContentSelector> fields) throws IOException
+	{
+		List<PropertyElement> result = new ArrayList<PropertyElement>();
+
+		if (index != null && owningTypes != null && owningTypes.isEmpty() == false)
+		{
+			// build regex pattern to match all owning types at once
+			String typePattern = getUserTypesPattern(owningTypes);
+
+			// read properties
+			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(typePattern),
+				SearchPattern.REGEX_MATCH);
 
 			if (properties != null)
 			{
@@ -459,7 +554,9 @@ public class JSIndexReader
 
 		if (index != null)
 		{
-			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningType, propertyName),
+			String quotedOwningType = Pattern.quote(owningType);
+			String quotedPropertyName = Pattern.quote(propertyName);
+			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(quotedOwningType, quotedPropertyName),
 				SearchPattern.REGEX_MATCH);
 
 			if (properties != null && properties.size() > 0)
