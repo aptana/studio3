@@ -56,7 +56,10 @@ public class PropertyElement extends BaseElement
 				this._types = new ArrayList<ReturnTypeElement>();
 			}
 
-			this._types.add(type);
+			if (this._types.contains(type) == false)
+			{
+				this._types.add(type);
+			}
 		}
 	}
 
