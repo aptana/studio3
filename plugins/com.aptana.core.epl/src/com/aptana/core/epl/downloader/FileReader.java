@@ -12,6 +12,7 @@
 package com.aptana.core.epl.downloader;
 
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -362,7 +363,7 @@ public final class FileReader extends FileTransferJob implements IFileTransferLi
 			monitor = new NullProgressMonitor();
 		try
 		{
-			sendRetrieveRequest(uri, anOutputStream, (startPos != -1 ? new DownloadRange(startPos) : null), false,
+			sendRetrieveRequest(uri, anOutputStream, (startPos != -1 ? new DownloadRange(startPos) : null), true,
 					monitor);
 			Job.getJobManager().join(this, new SubProgressMonitor(monitor, 0));
 			if (monitor.isCanceled() && connectEvent != null)
@@ -528,10 +529,13 @@ public final class FileReader extends FileTransferJob implements IFileTransferLi
 		{
 			try
 			{
-				if (aStream instanceof OutputStream)
-					((OutputStream) aStream).close();
-				else if (aStream instanceof InputStream)
+				if (aStream instanceof OutputStream) {
+					OutputStream stream = (OutputStream) aStream;
+					stream.flush();
+					stream.close();
+				} else if (aStream instanceof InputStream) {
 					((InputStream) aStream).close();
+				}
 			}
 			catch (IOException e)
 			{ /* ignore */
