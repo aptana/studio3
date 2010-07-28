@@ -12,8 +12,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
 import com.aptana.core.CorePlugin;
-import com.aptana.core.internal.InputStreamGobbler;
-import com.aptana.core.internal.OutputStreamThread;
 
 /**
  * A Utility for launching process synch and async via ProcessBuilder. Does not go through the Eclipse launching
