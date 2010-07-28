@@ -1,11 +1,12 @@
 package com.aptana.editor.js.inferencing;
 
 import java.net.URI;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
@@ -225,8 +226,8 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		List<JSReturnNode> result = new ArrayList<JSReturnNode>();
 
 		// Using a linked list since it provides a queue interface
-		LinkedList<IParseNode> queue = new LinkedList<IParseNode>();
-		
+		Queue<IParseNode> queue = new ArrayDeque<IParseNode>();
+
 		// prime the queue
 		queue.add(node.getBody());
 

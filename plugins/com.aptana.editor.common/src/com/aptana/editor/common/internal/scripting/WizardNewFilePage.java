@@ -1,7 +1,7 @@
 package com.aptana.editor.common.internal.scripting;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.util.regex.Pattern;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -9,6 +9,7 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
+import org.jruby.embed.io.ReaderInputStream;
 
 import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
@@ -66,7 +67,7 @@ public class WizardNewFilePage extends WizardNewFileCreationPage
 		String templateContent = NewFileWizard.getTemplateContent(templateSelectionPage.getSelectedTemplate());
 		if (templateContent != null)
 		{
-			return new ByteArrayInputStream(templateContent.getBytes());
+			return new ReaderInputStream(new StringReader(templateContent), "UTF-8"); //$NON-NLS-1$
 		}
 		return super.getInitialContents();
 	}

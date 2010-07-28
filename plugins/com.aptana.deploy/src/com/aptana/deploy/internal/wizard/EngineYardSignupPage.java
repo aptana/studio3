@@ -23,18 +23,18 @@ import org.eclipse.swt.widgets.Text;
 
 import com.aptana.deploy.Activator;
 
-public class HerokuSignupPage extends WizardPage
+public class EngineYardSignupPage extends WizardPage
 {
 
-	public static final String NAME = "HerokuSignup"; //$NON-NLS-1$
-	private static final String HEROKU_ICON = "icons/heroku.png"; //$NON-NLS-1$
+	public static final String NAME = "EngineYardSignup"; //$NON-NLS-1$
+	private static final String ENGINE_YARD_ICON = "icons/ey_small.png"; //$NON-NLS-1$
 
 	private Text userId;
 	private String startingUserId;
 
-	protected HerokuSignupPage(String startingUserId)
+	protected EngineYardSignupPage(String startingUserId)
 	{
-		super(NAME, Messages.HerokuSignupPage_Title, Activator.getImageDescriptor(HEROKU_ICON));
+		super(NAME, Messages.EngineYardSignupPage_Title, Activator.getImageDescriptor(ENGINE_YARD_ICON));
 		this.startingUserId = startingUserId;
 	}
 
@@ -50,15 +50,15 @@ public class HerokuSignupPage extends WizardPage
 
 		// Actual contents
 		Label label = new Label(composite, SWT.NONE);
-		label.setText(Messages.HerokuLoginWizardPage_EnterCredentialsLabel);
+		label.setText(Messages.EngineYardSignupPage_EnterCredentialsLabel);
 
 		Composite credentials = new Composite(composite, SWT.NONE);
 		credentials.setLayout(new GridLayout(2, false));
 
 		Label userIdLabel = new Label(credentials, SWT.NONE);
-		userIdLabel.setText(Messages.HerokuLoginWizardPage_UserIDLabel);
+		userIdLabel.setText(Messages.EngineYardSignupPage_EmailAddressLabel);
 		userId = new Text(credentials, SWT.SINGLE | SWT.BORDER);
-		userId.setMessage(Messages.HerokuLoginWizardPage_UserIDExample);
+		userId.setMessage(Messages.EngineYardSignupPage_EmailAddressExample);
 		if (startingUserId != null && startingUserId.trim().length() > 0)
 		{
 			userId.setText(startingUserId);
@@ -67,7 +67,7 @@ public class HerokuSignupPage extends WizardPage
 		userId.setLayoutData(gd);
 
 		Label note = new Label(composite, SWT.WRAP);
-		// We need this italic, we may need to set a font explicitly here to get it
+
 		Font dialogFont = JFaceResources.getDialogFont();
 		FontData[] data = dialogFont.getFontData();
 		for (FontData dataElement : data)
@@ -77,19 +77,20 @@ public class HerokuSignupPage extends WizardPage
 
 		gd = new GridData(400, SWT.DEFAULT);
 		note.setLayoutData(gd);
-		note.setText(Messages.HerokuSignupPage_SignupNote);
+		note.setText(Messages.EngineYardSignupPage_SignupNote);
 
 		// Add signup button
 		Button signup = new Button(composite, SWT.PUSH);
-		signup.setText(Messages.HerokuSignupPage_SignupButtonLabel);
+		signup.setText(Messages.EngineYardSignupPage_SignupButtonLabel);
 		signup.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
+				//check if email address is valid
 				if(!isEmailValid(userId.getText()))
 				{
-					MessageDialog.openError(getShell(), "Error", Messages.HerokuSignupPage_InvalidEmail_Message); //$NON-NLS-1$
+					MessageDialog.openError(getShell(), "Error", Messages.EngineYardSignupPage_InvalidEmail_Message); //$NON-NLS-1$
 					return;
 				}
 				
@@ -123,7 +124,7 @@ public class HerokuSignupPage extends WizardPage
 		String userId = this.userId.getText();
 		if (userId == null || userId.trim().length() < 1)
 		{
-			setErrorMessage(Messages.HerokuLoginWizardPage_EmptyUserIDError);
+			setErrorMessage(Messages.EngineYardSignupPage_EmptyEmailAddressLabel);
 			return false;
 		}
 

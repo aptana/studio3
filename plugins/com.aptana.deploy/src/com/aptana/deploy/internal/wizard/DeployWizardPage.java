@@ -5,6 +5,7 @@ import java.text.MessageFormat;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
@@ -21,6 +22,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
 import com.aptana.deploy.Activator;
+import com.aptana.deploy.EngineYardAPI;
 import com.aptana.deploy.HerokuAPI;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
@@ -32,10 +34,12 @@ public class DeployWizardPage extends WizardPage
 	public static final String NAME = "Deployment"; //$NON-NLS-1$
 	private static final String HEROKU_IMG_PATH = "icons/heroku.png"; //$NON-NLS-1$
 	private static final String FTP_IMG_PATH = "icons/ftp.png"; //$NON-NLS-1$
+	private static final String EY_IMG_PATH = "icons/ey_small.png";
 
 	private Button deployWithFTP;
 	private Button deployWithCapistrano;
 	private Button deployWithHeroku;
+	private Button deployWithEngineYard;
 
 	private IProject project;
 
@@ -67,10 +71,10 @@ public class DeployWizardPage extends WizardPage
 			deployWithHeroku = new Button(composite, SWT.RADIO);
 			deployWithHeroku.setImage(Activator.getImage(HEROKU_IMG_PATH));
 			// disable the button if the project is currently deployed to Heroku
-			boolean couldDeploy = (type == null || type != DeployType.HEROKU);
-			deployWithHeroku.setEnabled(couldDeploy);
-			deployWithHeroku.setSelection(couldDeploy);
-			if (!couldDeploy)
+			boolean couldDeployWithHeroku = (type == null || type != DeployType.HEROKU);
+			deployWithHeroku.setEnabled(couldDeployWithHeroku);
+			deployWithHeroku.setSelection(couldDeployWithHeroku);
+			if (!couldDeployWithHeroku)
 			{
 				String app = DeployPreferenceUtil.getDeployEndpoint(project);
 				if (app == null)
@@ -110,6 +114,39 @@ public class DeployWizardPage extends WizardPage
 					setImageDescriptor(Activator.getImageDescriptor(HEROKU_IMG_PATH));
 				}
 			});
+
+			// Deploy with Engine Yard
+			if(!Platform.OS_WIN32.equals(Platform.getOS()))
+			{
+				
+				deployWithEngineYard = new Button(composite, SWT.RADIO);
+				deployWithEngineYard.setImage(Activator.getImage(EY_IMG_PATH));
+				
+				// disable the button if the project is currently deployed to Engine Yard
+				boolean couldDeployWithEY = (type == null || type != DeployType.ENGINEYARD);
+				deployWithEngineYard.setEnabled(couldDeployWithEY);
+				if (!couldDeployWithHeroku)
+				{
+					deployWithEngineYard.setSelection(couldDeployWithEY);
+					setImageDescriptor(Activator.getImageDescriptor(EY_IMG_PATH));
+				}
+				if (!couldDeployWithEY)
+				{
+					String app = DeployPreferenceUtil.getDeployEndpoint(project);
+					if (app == null)
+					{
+						app = "Engine Yard"; //$NON-NLS-1$
+					}
+					deployWithEngineYard.setText(MessageFormat.format(Messages.DeployWizardPage_AlreadyDeployedToHeroku, app));
+				}
+	
+				deployWithEngineYard.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						setImageDescriptor(Activator.getImageDescriptor(EY_IMG_PATH));
+					}
+				});
+			}
 			
 			label = new Label(composite, SWT.NONE);
 			label.setText(Messages.DeployWizardPage_OtherDeploymentOptionsLabel);
@@ -118,7 +155,8 @@ public class DeployWizardPage extends WizardPage
 		{
 			label.setText(Messages.DeployWizardPage_DeploymentOptionsLabel);
 		}
-
+		
+		
 		// "Other" Deployment options radio button group
 		deployWithFTP = new Button(composite, SWT.RADIO);
 		deployWithFTP.setText(Messages.DeployWizardPage_FTPLabel);
@@ -128,7 +166,7 @@ public class DeployWizardPage extends WizardPage
 				setImageDescriptor(Activator.getImageDescriptor(FTP_IMG_PATH));
 			}
 		});
-		if (deployWithHeroku == null || !deployWithHeroku.getEnabled())
+		if ((deployWithHeroku == null || !deployWithHeroku.getEnabled()) &&( deployWithEngineYard == null || !deployWithEngineYard.getEnabled()))
 		{
 			deployWithFTP.setSelection(true);
 			setImageDescriptor(Activator.getImageDescriptor(FTP_IMG_PATH));
@@ -142,6 +180,7 @@ public class DeployWizardPage extends WizardPage
 				setImageDescriptor(null);
 			}
 		});
+		
 		
 		Dialog.applyDialogFont(composite);
 	}
@@ -202,6 +241,21 @@ public class DeployWizardPage extends WizardPage
 			{
 				nextPage = new InstallCapistranoGemPage();
 			}
+		}
+		else if (deployWithEngineYard.getSelection())
+		{	
+			EngineYardAPI api = new EngineYardAPI();
+			File credentials = EngineYardAPI.getCredentialsFile();
+			// if credentials are valid, go to EngineYardDeployWizardPage
+			if (credentials.exists() && api.authenticateFromCredentials().isOK())
+			{
+				nextPage = new EngineYardDeployWizardPage();
+			}
+			else
+			{
+				nextPage = new EngineYardLoginWizardPage();
+			}
+			
 		}
 		if (nextPage == null)
 		{

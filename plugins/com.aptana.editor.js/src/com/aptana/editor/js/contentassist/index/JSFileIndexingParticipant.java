@@ -11,6 +11,7 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jaxen.JaxenException;
 import org.jaxen.XPath;
@@ -47,14 +48,15 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 	{
 		try
 		{
-			LAMBDAS_IN_SCOPE = new ParseNodeXPath("invoke[position() = 1]/group/function|invoke[position() = 1]/function"); //$NON-NLS-1$
+			LAMBDAS_IN_SCOPE = new ParseNodeXPath(
+					"invoke[position() = 1]/group/function|invoke[position() = 1]/function"); //$NON-NLS-1$
 		}
 		catch (JaxenException e)
 		{
 			Activator.logError(e.getMessage(), e);
 		}
 	}
-	
+
 	/**
 	 * JSFileIndexingParticipant
 	 */
@@ -91,69 +93,71 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public void index(Set<IFileStore> files, Index index, IProgressMonitor monitor)
+	public void index(Set<IFileStore> files, Index index, IProgressMonitor monitor) throws CoreException
 	{
-		SubMonitor sub = SubMonitor.convert(monitor, files.size());
+		SubMonitor sub = SubMonitor.convert(monitor, files.size() * 100);
 
 		for (IFileStore file : files)
 		{
 			if (sub.isCanceled())
 			{
-				return;
+				throw new CoreException(Status.CANCEL_STATUS);
 			}
+			Thread.yield(); // be nice to other threads, let them get in before each file...
+			indexFileStore(index, file, sub.newChild(100));
+		}
+
+		sub.done();
+	}
+
+	private void indexFileStore(Index index, IFileStore file, IProgressMonitor monitor)
+	{
+		SubMonitor sub = SubMonitor.convert(monitor, 100);
+		if (file == null)
+		{
+			return;
+		}
+		try
+		{
+			sub.subTask(file.getName());
 
 			try
 			{
-				if (file == null)
+				// grab the source of the file we're going to parse
+				String source = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(20)));
+
+				// minor optimization when creating a new empty file
+				if (source != null && source.length() > 0)
 				{
-					continue;
-				}
+					// create parser and associated parse state
+					IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IJSParserConstants.LANGUAGE);
 
-				sub.subTask(file.getName());
-
-				try
-				{
-					// grab the source of the file we're going to parse
-					String source = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(-1)));
-
-					// minor optimization when creating a new empty file
-					if (source != null && source.length() > 0)
+					if (pool != null)
 					{
-						// create parser and associated parse state
-						IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IJSParserConstants.LANGUAGE);
+						IParser parser = pool.checkOut();
 
-						if (pool != null)
-						{
-							IParser parser = pool.checkOut();
+						// apply the source to the parse state and parse
+						ParseState parseState = new ParseState();
+						parseState.setEditState(source, source, 0, 0);
+						parser.parse(parseState);
 
-							// apply the source to the parse state and parse
-							ParseState parseState = new ParseState();
-							parseState.setEditState(source, source, 0, 0);
-							parser.parse(parseState);
+						pool.checkIn(parser);
+						sub.worked(50);
 
-							pool.checkIn(parser);
-
-							// process results
-							this.processParseResults(index, file, parseState.getParseResult());
-						}
+						// process results
+						this.processParseResults(index, file, parseState.getParseResult());
 					}
 				}
-				catch (CoreException e)
-				{
-					Activator.logError(e.getMessage(), e);
-				}
-				catch (Throwable e)
-				{
-					Activator.logError(e.getMessage(), e);
-				}
 			}
-			finally
+			catch (Throwable e)
 			{
-				sub.worked(1);
+				Activator.logError(e.getMessage(), e);
 			}
 		}
-
-		monitor.done();
+		finally
+		{
+			sub.done();
+		}
 	}
 
 	/**
@@ -190,7 +194,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 						result.addAll(this.processWindowAssignments(index, scope, location));
 
 						// handle any nested lambdas in this function
-						this.processLambdas(index, globals, function, location);
+						result.addAll(this.processLambdas(index, globals, function, location));
 					}
 				}
 			}
@@ -246,7 +250,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 			{
 				JSTypeUtil.addAllUserAgents(property);
 			}
-			
+
 			// write new Window type to index
 			this._indexWriter.writeType(index, type, location);
 		}
@@ -273,9 +277,13 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 				if (property != null)
 				{
 					List<String> typeNames = property.getTypeNames();
-					JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
 
-					result = queryHelper.getTypeMembers(index, typeNames, EnumSet.allOf(ContentSelector.class));
+					if (typeNames != null && typeNames.isEmpty() == false)
+					{
+						JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
+
+						result = queryHelper.getTypeMembers(index, typeNames, EnumSet.allOf(ContentSelector.class));
+					}
 				}
 			}
 		}

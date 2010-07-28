@@ -31,10 +31,8 @@ import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.window.Window;
 import org.eclipse.search.ui.IContextMenuConstants;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.search.ui.text.FileTextSearchScope;
@@ -96,7 +94,10 @@ import com.aptana.ide.syncing.ui.actions.DownloadAction;
 import com.aptana.ide.syncing.ui.actions.UploadAction;
 import com.aptana.ide.syncing.ui.dialogs.ChooseSiteConnectionDialog;
 import com.aptana.ide.ui.secureftp.dialogs.CommonFTPConnectionPointPropertyDialog;
-import com.aptana.terminal.views.TerminalView;
+import com.aptana.scripting.model.BundleElement;
+import com.aptana.scripting.model.BundleEntry;
+import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.CommandElement;
 import com.aptana.theme.IControlThemerFactory;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
@@ -116,6 +117,8 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	private static final String RAILS_NATURE = "org.radrails.rails.core.railsnature"; //$NON-NLS-1$
 	private static final String WEB_NATURE = "com.aptana.ui.webnature"; //$NON-NLS-1$
 	private static final String DEPLOY_MENU_ID = "com.aptana.explorer.deploy"; //$NON-NLS-1$
+	private static final String BUNDLE_HEROKU = "Heroku"; //$NON-NLS-1$
+	private static final String BUNDLE_ENGINE_YARD = "Engine Yard"; //$NON-NLS-1$
 
 	/**
 	 * Forced removal of context menu entries dynamically to match the context menu Andrew wants...
@@ -184,6 +187,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	protected static final String GROUP_FTP_SETTINGS = "group.ftp_settings"; //$NON-NLS-1$
 	protected static final String GROUP_FTP = "group.ftp"; //$NON-NLS-1$
 	protected static final String GROUP_WIZARD = "group.wizard"; //$NON-NLS-1$
+	protected static final String GROUP_EY_COMMANDS = "group.ey"; //$NON-NLS-1$
 
 	@Override
 	public void createPartControl(final Composite parent)
@@ -326,7 +330,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		super.init(aSite, aMemento);
 		this.memento = aMemento;
 	}
-	
+
 	@Override
 	public void saveState(IMemento aMemento)
 	{
@@ -496,6 +500,10 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 			else if (type == DeployType.CAPISTRANO)
 			{
 				menuManager.add(new Separator(GROUP_CAP));
+			}
+			else if (isEngineYardProject())
+			{
+				addEngineYardMenuCommands(menuManager);
 			}
 		}
 		menuManager.add(new Separator(GROUP_WIZARD));
@@ -671,8 +679,8 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 											rememberMyDecision);
 								}
 								// remembers the last sync connection
-								ResourceSynchronizationUtils.setLastSyncConnection(selectedProject,
-										destination.getName());
+								ResourceSynchronizationUtils.setLastSyncConnection(selectedProject, destination
+										.getName());
 							}
 							settingsDialog.setPropertySource(destination);
 						}
@@ -721,11 +729,11 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 								String URL = output.split("Web URL:")[1].split("\n")[0].replace(" ", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 								// Determine which OS and open url
-								if (Platform.getOS().equals(Platform.OS_MACOSX))
+								if (Platform.OS_MACOSX.equals(Platform.getOS()))
 								{
 									ProcessUtil.run("open", null, (Map<String, String>) null, URL); //$NON-NLS-1$
 								}
-								else if (Platform.getOS().equals(Platform.OS_WIN32))
+								else if (Platform.OS_WIN32.equals(Platform.getOS()))
 								{
 									ProcessUtil.run("cmd", null, (Map<String, String>) null, "/c", "start " + URL); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 								}
@@ -747,12 +755,8 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				sharingMenuItem.setText(Messages.SingleProjectView_SharingSubmenuLabel);
 				Menu sharingSubMenu = new Menu(menu);
 
-				createHerokuSubMenuItemWithInput(
-						sharingSubMenu,
-						"heroku sharing:add ", Messages.SingleProjectView_AddCollaboratorItem, Messages.SingleProjectView_EmailAddressLabel); //$NON-NLS-1$
-				createHerokuSubMenuItemWithInput(
-						sharingSubMenu,
-						"heroku sharing:remove ", Messages.SingleProjectView_RemoveCollaboratorItem, Messages.SingleProjectView_EmailAddressLabel); //$NON-NLS-1$
+				createDeploySubMenuItem(sharingSubMenu, "Add Collaborator", BUNDLE_HEROKU); //$NON-NLS-1$
+				createDeploySubMenuItem(sharingSubMenu, "Remove Collaborator", BUNDLE_HEROKU); //$NON-NLS-1$
 				sharingMenuItem.setMenu(sharingSubMenu);
 
 				// Database
@@ -760,10 +764,9 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				databaseMenuItem.setText(Messages.SingleProjectView_DatabaseSubmenuLabel);
 				Menu databaseSubMenu = new Menu(menu);
 
-				createHerokuSubMenuItem(databaseSubMenu,
-						"heroku rake db:migrate", Messages.SingleProjectView_RakeDBMigrateItem); //$NON-NLS-1$
-				createHerokuSubMenuItem(databaseSubMenu, "heroku db:push", Messages.SingleProjectView_PushLocalDBItem); //$NON-NLS-1$
-				createHerokuSubMenuItem(databaseSubMenu, "heroku db:pull", Messages.SingleProjectView_PullRemoteDBItem); //$NON-NLS-1$
+				createDeploySubMenuItem(databaseSubMenu, "Rake db:migrate on Heroku", BUNDLE_HEROKU); //$NON-NLS-1$
+				createDeploySubMenuItem(databaseSubMenu, "Push Local Database to Heroku", BUNDLE_HEROKU); //$NON-NLS-1$
+				createDeploySubMenuItem(databaseSubMenu, "Pull Remote Database from Heroku", BUNDLE_HEROKU); //$NON-NLS-1$
 
 				databaseMenuItem.setMenu(databaseSubMenu);
 
@@ -772,10 +775,8 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				maintenanceMenuItem.setText(Messages.SingleProjectView_MaintenanceSubmenuLabel);
 				Menu maintanenceSubMenu = new Menu(menu);
 
-				createHerokuSubMenuItem(maintanenceSubMenu,
-						"heroku maintenance:on", Messages.SingleProjectView_OnMaintenanceItem); //$NON-NLS-1$
-				createHerokuSubMenuItem(maintanenceSubMenu,
-						"heroku maintenance:off", Messages.SingleProjectView_OffMaintenanceItem); //$NON-NLS-1$
+				createDeploySubMenuItem(maintanenceSubMenu, "Turn Maintence On", BUNDLE_HEROKU); //$NON-NLS-1$
+				createDeploySubMenuItem(maintanenceSubMenu, "Turn Maintence Off", BUNDLE_HEROKU); //$NON-NLS-1$
 
 				maintenanceMenuItem.setMenu(maintanenceSubMenu);
 
@@ -784,10 +785,8 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				remoteMenuItem.setText(Messages.SingleProjectView_RemoteSubmenuLabel);
 				Menu remoteSubMenu = new Menu(menu);
 
-				createHerokuSubMenuItem(remoteSubMenu, "heroku console", Messages.SingleProjectView_ConsoleItem); //$NON-NLS-1$
-				createHerokuSubMenuItemWithInput(
-						remoteSubMenu,
-						"heroku rake ", Messages.SingleProjectView_RakeCommandItem, Messages.SingleProjectView_CommandLabel); //$NON-NLS-1$
+				createDeploySubMenuItem(remoteSubMenu, "Console", BUNDLE_HEROKU); //$NON-NLS-1$
+				createDeploySubMenuItem(remoteSubMenu, "Rake Command", BUNDLE_HEROKU); //$NON-NLS-1$
 
 				remoteMenuItem.setMenu(remoteSubMenu);
 
@@ -796,20 +795,14 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				configMenuItem.setText(Messages.SingleProjectView_ConfigVarsSubmenuLabel);
 				Menu configSubMenu = new Menu(menu);
 
-				createHerokuSubMenuItemWithInput(
-						configSubMenu,
-						"heroku config:add ", Messages.SingleProjectView_AddConfigVarsItem, Messages.SingleProjectView_VariableNameLabel); //$NON-NLS-1$
-				createHerokuSubMenuItemWithInput(
-						configSubMenu,
-						"heroku config:clear ", Messages.SingleProjectView_ClearConfigVarsItem, Messages.SingleProjectView_VariableNameLabel); //$NON-NLS-1$
+				createDeploySubMenuItem(configSubMenu, "Add Config Var", BUNDLE_HEROKU); //$NON-NLS-1$
+				createDeploySubMenuItem(configSubMenu, "Clear Config Vars", BUNDLE_HEROKU); //$NON-NLS-1$
 
 				configMenuItem.setMenu(configSubMenu);
 
 				// may want to add backup commands
-				createHerokuSubMenuItem(menu, "heroku info", Messages.SingleProjectView_AppInfoItem); //$NON-NLS-1$
-				createHerokuSubMenuItemWithInput(
-						menu,
-						"heroku rename ", Messages.SingleProjectView_RenameAppItem, Messages.SingleProjectView_NewAppNameLabel); //$NON-NLS-1$
+				createDeploySubMenuItem(menu, "App Info", BUNDLE_HEROKU); //$NON-NLS-1$
+				createDeploySubMenuItem(menu, "Rename App", BUNDLE_HEROKU); //$NON-NLS-1$
 			}
 
 			@Override
@@ -818,6 +811,76 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				return true;
 			}
 		});
+	}
+
+	private void addEngineYardMenuCommands(MenuManager menuManager)
+	{
+		menuManager.add(new Separator(GROUP_DEPLOY));
+		menuManager.add(new Separator(GROUP_EY_COMMANDS)); //$NON-NLS-1$
+
+		menuManager.appendToGroup(GROUP_EY_COMMANDS, new ContributionItem() //$NON-NLS-1$
+				{
+
+					@Override
+					public void fill(Menu menu, int index)
+					{
+
+						// open ssh session
+
+						MenuItem item = new MenuItem(menu, SWT.PUSH);
+						item.setText(Messages.SingleProjectView_OpenSSHSubmenuLabel);
+						item.addSelectionListener(new SelectionAdapter()
+						{
+							public void widgetSelected(SelectionEvent e)
+							{
+								final CommandElement command;
+								command = getBundleCommand(BUNDLE_ENGINE_YARD, "Open SSH Session"); //$NON-NLS-1$
+								command.execute();
+							}
+						});
+
+						// Deployment Submenu
+						final MenuItem deploymentMenuItem = new MenuItem(menu, SWT.CASCADE);
+						deploymentMenuItem.setText(Messages.SingleProjectView_DeploymentSubmenuLabel);
+						Menu deploymentSubMenu = new Menu(menu);
+
+						createDeploySubMenuItem(deploymentSubMenu, "List Environments", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+						createDeploySubMenuItem(deploymentSubMenu, "Retrieve Logs", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+						createDeploySubMenuItem(deploymentSubMenu, "Rebuild Environment", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+						createDeploySubMenuItem(deploymentSubMenu, "Rollback App", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+
+						deploymentMenuItem.setMenu(deploymentSubMenu);
+
+						// Recipes Submenu
+						final MenuItem recipesMenuItem = new MenuItem(menu, SWT.CASCADE);
+						recipesMenuItem.setText(Messages.SingleProjectView_RecipesSubmenuLabel);
+						Menu recipesSubMenu = new Menu(menu);
+
+						createDeploySubMenuItem(recipesSubMenu, "Apply Recipes", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+						createDeploySubMenuItem(recipesSubMenu, "Upload Recipes", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+						createDeploySubMenuItem(recipesSubMenu, "Download Recipes", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+
+						recipesMenuItem.setMenu(recipesSubMenu);
+
+						// Maintenance Submenu
+						final MenuItem maintenanceMenuItem = new MenuItem(menu, SWT.CASCADE);
+						maintenanceMenuItem.setText(Messages.SingleProjectView_MaintenanceSubmenuLabel);
+						Menu maintenanceSubMenu = new Menu(menu);
+
+						createDeploySubMenuItem(maintenanceSubMenu, "Turn Maintenance On", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+						createDeploySubMenuItem(maintenanceSubMenu, "Turn Maintenance Off", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+
+						maintenanceMenuItem.setMenu(maintenanceSubMenu);
+
+					}
+
+					@Override
+					public boolean isDynamic()
+					{
+						return true;
+					}
+				});
+
 	}
 
 	private IProject[] createProjectCombo(Composite parent)
@@ -1042,7 +1105,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	}
 
 	private IProject detectSelectedProject()
-	{		
+	{
 		IProject project = null;
 		String activeProjectName = null;
 		if (this.memento != null)
@@ -1496,50 +1559,22 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		return synchronizeItem;
 	}
 
-	private void createHerokuSubMenuItem(Menu menu, String cmd, String text)
+	private void createDeploySubMenuItem(Menu menu, String cmd, String bundle)
 	{
-		final String command = cmd;
+		final CommandElement command;
+		command = getBundleCommand(bundle, cmd);
+
 		MenuItem item = new MenuItem(menu, SWT.PUSH);
-		item.setText(text);
+		item.setText(cmd);
 		item.addSelectionListener(new SelectionAdapter()
 		{
-
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				herokuCmd(command);
+				command.execute();
 			}
 		});
-	}
 
-	private void createHerokuSubMenuItemWithInput(Menu menu, String cmd, String text, String message)
-	{
-		final String command = cmd;
-		final String dialogMessage = message;
-		MenuItem item = new MenuItem(menu, SWT.PUSH);
-		item.setText(text);
-		item.addSelectionListener(new SelectionAdapter()
-		{
-
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				InputDialog dialog = new InputDialog(null, dialogMessage, "", "", null); //$NON-NLS-1$ //$NON-NLS-2$
-				dialog.setBlockOnOpen(true);
-
-				if (dialog.open() == Window.OK)
-				{
-					herokuCmd(command + dialog.getValue());
-				}
-			}
-		});
-	}
-
-	private void herokuCmd(String command)
-	{
-		TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
-				selectedProject.getLocation());
-		terminal.sendInput(command + '\n');
 	}
 
 	private boolean isCapistranoProject()
@@ -1572,6 +1607,40 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 			}
 		}
 		return false;
+	}
+
+	private boolean isEngineYardProject()
+	{
+		DeployType type = DeployPreferenceUtil.getDeployType(selectedProject);
+
+		// Engine Yard gem does not work in Windows
+		if (!Platform.OS_WIN32.equals(Platform.getOS()))
+		{
+			if (type.equals(DeployType.ENGINEYARD))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private CommandElement getBundleCommand(String bundleName, String commandName)
+	{
+		BundleEntry entry = BundleManager.getInstance().getBundleEntry(bundleName);
+		if (entry == null)
+		{
+			return null;
+		}
+		for (BundleElement bundle : entry.getContributingBundles())
+		{
+			CommandElement command = bundle.getCommandByName(commandName);
+			if (command != null)
+			{
+				return command;
+			}
+		}
+		return null;
 	}
 
 	private static class TextSearchPageInput extends TextSearchInput

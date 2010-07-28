@@ -1,8 +1,14 @@
 package com.aptana.editor.js.inferencing;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.common.contentassist.UserAgentManager.UserAgent;
 import com.aptana.editor.js.JSTypeConstants;
@@ -12,6 +18,11 @@ import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.UserAgentElement;
+import com.aptana.editor.js.parsing.ast.JSDeclarationNode;
+import com.aptana.editor.js.parsing.ast.JSFunctionNode;
+import com.aptana.editor.js.parsing.ast.JSNameValuePairNode;
+import com.aptana.editor.js.parsing.ast.JSNode;
+import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.editor.js.sdoc.model.ExampleTag;
 import com.aptana.editor.js.sdoc.model.ParamTag;
@@ -20,9 +31,31 @@ import com.aptana.editor.js.sdoc.model.Tag;
 import com.aptana.editor.js.sdoc.model.TagType;
 import com.aptana.editor.js.sdoc.model.Type;
 import com.aptana.editor.js.sdoc.model.TypeTag;
+import com.aptana.parsing.ast.IParseNode;
 
 public class JSTypeUtil
 {
+	private static final Set<String> FILTERED_TYPES;
+
+	/**
+	 * static initializer
+	 */
+	static
+	{
+		FILTERED_TYPES = new HashSet<String>();
+		FILTERED_TYPES.add(JSTypeConstants.ARRAY_TYPE);
+		FILTERED_TYPES.add(JSTypeConstants.BOOLEAN_TYPE);
+		FILTERED_TYPES.add(JSTypeConstants.FUNCTION_TYPE);
+		FILTERED_TYPES.add(JSTypeConstants.NUMBER_TYPE);
+		FILTERED_TYPES.add(JSTypeConstants.OBJECT_TYPE);
+		FILTERED_TYPES.add(JSTypeConstants.REG_EXP_TYPE);
+		FILTERED_TYPES.add(JSTypeConstants.STRING_TYPE);
+		FILTERED_TYPES.add(JSTypeConstants.UNDEFINED_TYPE);
+		FILTERED_TYPES.add(JSTypeConstants.VOID_TYPE);
+		FILTERED_TYPES.add(JSTypeConstants.WINDOW_TYPE);
+		FILTERED_TYPES.add(JSTypeConstants.WINDOW_PROPERTY);
+	}
+
 	/**
 	 * addAllUserAgents
 	 * 
@@ -145,6 +178,90 @@ public class JSTypeUtil
 				}
 			}
 		}
+	}
+
+	/**
+	 * getName
+	 * 
+	 * @param node
+	 * @return
+	 */
+	public static String getName(JSNode node)
+	{
+		String result = null;
+
+		if (node != null)
+		{
+			List<String> parts = new ArrayList<String>();
+			JSNode current = node;
+
+			while (current != null)
+			{
+				switch (current.getNodeType())
+				{
+					case JSNodeTypes.IDENTIFIER:
+						parts.add(current.getText());
+						break;
+
+					case JSNodeTypes.FUNCTION:
+						JSFunctionNode function = (JSFunctionNode) current;
+						IParseNode functionName = function.getName();
+
+						if (functionName.isEmpty() == false)
+						{
+							parts.add(functionName.getText());
+						}
+						// else
+						// {
+						// parts.add("function-" + node.getStartingOffset());
+						// }
+						break;
+
+					case JSNodeTypes.NAME_VALUE_PAIR:
+						JSNameValuePairNode entry = (JSNameValuePairNode) current;
+						IParseNode entryName = entry.getName();
+						String name = entryName.getText();
+
+						if (entryName.getNodeType() == JSNodeTypes.STRING)
+						{
+							name = name.substring(1, name.length() - 1);
+						}
+
+						parts.add(name);
+						break;
+
+					case JSNodeTypes.DECLARATION:
+						JSDeclarationNode declaration = (JSDeclarationNode) current;
+						IParseNode declarationName = declaration.getIdentifier();
+
+						parts.add(declarationName.getText());
+						break;
+
+					default:
+						break;
+				}
+
+				IParseNode parent = current.getParent();
+
+				current = (parent instanceof JSNode) ? (JSNode) parent : null;
+			}
+
+			if (parts.size() > 0)
+			{
+				Collections.reverse(parts);
+
+				result = StringUtil.join(".", parts); //$NON-NLS-1$
+			}
+		}
+
+		// Don't allow certain names to avoid confusion an to prevent overwriting
+		// core types
+		if (FILTERED_TYPES.contains(result))
+		{
+			result = null;
+		}
+
+		return result;
 	}
 
 	/**

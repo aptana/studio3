@@ -32,7 +32,7 @@ public class JSPropertyCollector extends JSTreeWalker
 	 * 
 	 * @param name
 	 */
-	protected void activateProperty(String name)
+	public void activateProperty(String name)
 	{
 		if (this._currentObject.hasProperty(name))
 		{

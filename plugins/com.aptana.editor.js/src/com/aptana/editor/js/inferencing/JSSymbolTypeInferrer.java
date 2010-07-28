@@ -1,6 +1,7 @@
 package com.aptana.editor.js.inferencing;
 
 import java.net.URI;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 import com.aptana.editor.js.JSTypeConstants;
@@ -20,34 +22,63 @@ import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
+import com.aptana.editor.js.parsing.ast.JSIdentifierNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.index.core.Index;
+import com.aptana.parsing.ast.IParseNode;
 
 public class JSSymbolTypeInferrer
 {
 	private static final String NO_TYPE = ""; //$NON-NLS-1$
 	private static final EnumSet<ContentSelector> MEMBER_CONTENT = EnumSet.of(ContentSelector.NAME, ContentSelector.TYPES, ContentSelector.RETURN_TYPES);
-
+	
 	private Index _index;
 	private JSScope _activeScope;
 	private URI _location;
 
 	private JSIndexWriter _writer;
-	
+
 	/**
 	 * generateType
 	 * 
+	 * @param property
+	 *            TODO
 	 * @return
 	 */
-	private static TypeElement generateType(Set<String> types)
+	private static TypeElement generateType(JSPropertyCollection property, Set<String> types)
 	{
 		// create new type
 		TypeElement result = new TypeElement();
 
+		String name = null;
+		List<JSNode> values = property.getValues();
+
+		if (values != null && values.size() > 0)
+		{
+			// NOTE: Walk backwards so latest definition that has a valid name
+			// wins
+			for (int i = values.size() - 1; i >= 0; i--)
+			{
+				JSNode value = values.get(i);
+				String candidate = JSTypeUtil.getName(value);
+
+				if (candidate != null && candidate.length() > 0)
+				{
+					name = candidate;
+					break;
+				}
+			}
+		}
+
+		if (name == null || name.length() == 0)
+		{
+			name = JSTypeUtil.getUniqueTypeName();
+		}
+
 		// give type a unique name
-		result.setName(JSTypeUtil.getUniqueTypeName());
+		result.setName(name);
 
 		// set parent types
 		if (types != null)
@@ -74,7 +105,7 @@ public class JSSymbolTypeInferrer
 		this._activeScope = activeScope;
 		this._location = location;
 	}
-	
+
 	/**
 	 * applyDocumentation
 	 * 
@@ -85,13 +116,50 @@ public class JSSymbolTypeInferrer
 	{
 		if (property != null && object != null)
 		{
-			for (JSNode value : object.getValues())
+			Queue<JSNode> queue = new ArrayDeque<JSNode>();
+			Set<String> visitedSymbols = new HashSet<String>();
+			
+			// prime the queue
+			queue.addAll(object.getValues());
+			
+			while (queue.isEmpty() == false)
 			{
-				DocumentationBlock docs = value.getDocumentation();
-
+				JSNode node = queue.poll();
+				DocumentationBlock docs = node.getDocumentation();
+				
 				if (docs != null)
 				{
 					JSTypeUtil.applyDocumentation(property, docs);
+					break;
+				}
+				else if (node instanceof JSIdentifierNode)
+				{
+					// grab name
+					String symbol = node.getText();
+					
+					visitedSymbols.add(symbol);
+					
+					JSPropertyCollection p = this.getSymbolProperty(this._activeScope.getObject(), symbol);
+					
+					if (p != null)
+					{
+						for (JSNode value : p.getValues())
+						{
+							if (value.getNodeType() != JSNodeTypes.IDENTIFIER || visitedSymbols.contains(value.getText()) == false)
+							{
+								queue.offer(value);
+							}
+						}
+					}
+				}
+				else if (node instanceof JSAssignmentNode)
+				{
+					IParseNode rhs = node.getLastChild();
+					
+					if (rhs instanceof JSNode)
+					{
+						queue.offer((JSNode) rhs);
+					}
 				}
 			}
 		}
@@ -324,7 +392,7 @@ public class JSSymbolTypeInferrer
 			if (additionalProperties.isEmpty() == false)
 			{
 				// create new type
-				TypeElement subType = generateType(types);
+				TypeElement subType = generateType(property, types);
 
 				// reset list to contain only this newly generated type
 				types.clear();
@@ -396,15 +464,11 @@ public class JSSymbolTypeInferrer
 					inferrer.visit(value);
 					property.clearTypes();
 				}
-				else if (value instanceof JSAssignmentNode && value.getNodeType() != JSNodeTypes.ASSIGN)
+				else
 				{
 					property.addType(NO_TYPE);
 					inferrer.visit(value);
 					property.clearTypes();
-				}
-				else
-				{
-					inferrer.visit(value);
 				}
 
 				types.addAll(inferrer.getTypes());
@@ -426,13 +490,13 @@ public class JSSymbolTypeInferrer
 			{
 				JSTypeUtil.addAllUserAgents(property);
 			}
-			
+
 			// make sure we have an index writer
 			if (this._writer == null)
 			{
 				this._writer = new JSIndexWriter();
 			}
-	
+
 			// write the type to the index
 			this._writer.writeType(this._index, type, this._location);
 		}

@@ -1,5 +1,10 @@
 package com.aptana.editor.js.inferencing;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.core.runtime.Platform;
 
 import com.aptana.editor.js.JSTypeConstants;
@@ -8,6 +13,7 @@ import com.aptana.editor.js.parsing.ast.JSCatchNode;
 import com.aptana.editor.js.parsing.ast.JSDeclarationNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
+import com.aptana.editor.js.parsing.ast.JSInvokeNode;
 import com.aptana.editor.js.parsing.ast.JSLabelledNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
@@ -20,7 +26,52 @@ import com.aptana.parsing.lexer.IRange;
 
 public class JSSymbolCollector extends JSTreeWalker
 {
+	private static List<InvocationProcessor> PROCESSORS;
+	private static Map<String, InvocationProcessor> INVOCATION_PROCESSORS;
+
 	private JSScope _scope;
+
+	/**
+	 * getInvocationProcessor
+	 * 
+	 * @return
+	 */
+	private static InvocationProcessor getInvocationProcessor(String pattern)
+	{
+		if (INVOCATION_PROCESSORS == null)
+		{
+			INVOCATION_PROCESSORS = new HashMap<String, InvocationProcessor>();
+
+			for (InvocationProcessor processor : getInvocationProcessors())
+			{
+				for (String invocationPattern : processor.getInvocationPatterns())
+				{
+					INVOCATION_PROCESSORS.put(invocationPattern, processor);
+				}
+			}
+		}
+
+		return INVOCATION_PROCESSORS.get(pattern);
+	}
+
+	/**
+	 * getInvocationProcessors
+	 * 
+	 * @return
+	 */
+	private static List<InvocationProcessor> getInvocationProcessors()
+	{
+		if (PROCESSORS == null)
+		{
+			PROCESSORS = new ArrayList<InvocationProcessor>();
+
+			// TODO: Eventually, this will be handled via an extension point.
+			// We're targeting jQuery only right now, so we'll hard code this.
+			PROCESSORS.add(new JQueryInvocationProcessor());
+		}
+
+		return PROCESSORS;
+	}
 
 	/**
 	 * JSSymbolCollector
@@ -259,6 +310,33 @@ public class JSSymbolCollector extends JSTreeWalker
 	{
 		// No need to process the rhs since it's always an identifier
 		this.accept(node.getLeftHandSide());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSInvokeNode)
+	 */
+	@Override
+	public void visit(JSInvokeNode node)
+	{
+		IParseNode expression = node.getExpression();
+		boolean processed = false;
+
+		// NOTE: limiting to dotted names for efficiency
+		if (expression instanceof JSGetPropertyNode)
+		{
+			InvocationProcessor processor = getInvocationProcessor(expression.toString());
+
+			if (processor != null)
+			{
+				processed = processor.processInvocation(this._scope, node);
+			}
+		}
+
+		if (processed == false)
+		{
+			super.visit(node);
+		}
 	}
 
 	/*
