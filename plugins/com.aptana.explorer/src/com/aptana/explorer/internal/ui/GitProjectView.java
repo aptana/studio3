@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -41,6 +40,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -97,7 +97,7 @@ import com.aptana.git.ui.dialogs.CreateBranchDialog;
  */
 class GitProjectView extends SingleProjectView implements IGitRepositoryListener, IGitRepositoriesListener
 {
-	private static final String DIRTY_SUFFIX = "*";
+	private static final String DIRTY_SUFFIX = "*"; //$NON-NLS-1$
 	private static final String GIT_CHANGED_FILES_FILTER = "GitChangedFilesFilterEnabled"; //$NON-NLS-1$
 	private static final String PROJECT_DELIMITER = "######"; //$NON-NLS-1$
 	private static final String COMMIT_ICON_PATH = "icons/full/elcl16/disk.png"; //$NON-NLS-1$
@@ -211,17 +211,22 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 
 	protected void doCreateToolbar(Composite toolbarComposite)
 	{
-		createGitBranchCombo(toolbarComposite);
+		Composite branchComp = new Composite(toolbarComposite, SWT.NONE);
+		
+		GridLayout toolbarGridLayout = new GridLayout(3, false);
+		toolbarGridLayout.marginWidth = 2;
+		toolbarGridLayout.marginHeight = 0;
+		toolbarGridLayout.horizontalSpacing = 0;
+		
+		branchComp.setLayout(toolbarGridLayout);
+		createGitBranchCombo(branchComp);
 	}
 
 	private void createGitBranchCombo(Composite parent)
 	{
-		// Increment number of columns of the layout
-		((GridLayout) parent.getLayout()).numColumns += 3;
-
 		leftLabel = new Label(parent, SWT.NONE);
 		leftLabel.setText("["); //$NON-NLS-1$
-		leftLabelGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
+		leftLabelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
 		leftLabel.setLayoutData(leftLabelGridData);
 
 		branchesToolbar = new ToolBar(parent, SWT.FLAT);
@@ -246,6 +251,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		rightLabel = new Label(parent, SWT.NONE);
 		rightLabel.setText("]"); //$NON-NLS-1$
 		rightLabelGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
+		rightLabelGridData.horizontalIndent = -2;
 		rightLabel.setLayoutData(rightLabelGridData);
 	}
 
@@ -1179,21 +1185,17 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 						return Status.CANCEL_STATUS;
 					if (repository == null)
 					{
-						leftLabelGridData.exclude = true;
-						leftLabel.setVisible(false);
-						branchesToolbarGridData.exclude = true;
-						branchesToolbar.setVisible(false);
-						rightLabelGridData.exclude = true;
-						rightLabel.setVisible(false);
+						RowData rd = new RowData();
+						rd.exclude = true;
+						branchesToolbar.getParent().setLayoutData(rd);
+						branchesToolbar.getParent().setVisible(false);
 					}
 					else
 					{
-						leftLabelGridData.exclude = false;
-						leftLabel.setVisible(true);
-						branchesToolbarGridData.exclude = false;
-						branchesToolbar.setVisible(true);
-						rightLabelGridData.exclude = false;
-						rightLabel.setVisible(true);
+						RowData rd = new RowData();
+						rd.exclude = false;
+						branchesToolbar.getParent().setLayoutData(rd);
+						branchesToolbar.getParent().setVisible(true);
 					}
 					if (monitor != null && monitor.isCanceled())
 						return Status.CANCEL_STATUS;
@@ -1460,20 +1462,6 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		if (index > 0)
 			index++;
 		createDiffMenuItem(menu, index++);
-
-		// Don't add the following unless a file is selected!
-		Set<IResource> selected = getSelectedFiles();
-		boolean add = false;
-		for (IResource resource : selected)
-		{
-			if (resource instanceof IFile)
-			{
-				add = true;
-				break;
-			}
-		}
-		if (!add)
-			return;
 		createStageMenuItem(menu, index++);
 		createUnstageMenuItem(menu, index++);
 		createRevertMenuItem(menu, index);

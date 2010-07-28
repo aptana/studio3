@@ -1,7 +1,9 @@
 package com.aptana.editor.common.text.hyperlink;
 
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.IPath;
@@ -14,6 +16,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
+import com.aptana.core.util.URLEncoder;
 import com.aptana.editor.common.CommonEditorPlugin;
 
 public class URIHyperlink extends URLHyperlink
@@ -28,9 +31,9 @@ public class URIHyperlink extends URLHyperlink
 		this.uri = uri;
 	}
 
-	public URIHyperlink(URLHyperlink hyperlink) throws URISyntaxException
+	public URIHyperlink(URLHyperlink hyperlink) throws URISyntaxException, MalformedURLException
 	{
-		this(hyperlink.getHyperlinkRegion(), new URI(hyperlink.getURLString()));
+		this(hyperlink.getHyperlinkRegion(), URLEncoder.encode(new URL(hyperlink.getURLString())).toURI());
 		wrapped = true;
 	}
 

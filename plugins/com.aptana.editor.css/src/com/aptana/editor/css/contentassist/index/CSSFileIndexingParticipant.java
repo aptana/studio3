@@ -6,6 +6,7 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.util.IOUtil;
@@ -26,52 +27,60 @@ import com.aptana.parsing.ast.IParseNode;
 public class CSSFileIndexingParticipant implements IFileStoreIndexingParticipant
 {
 	@Override
-	public void index(Set<IFileStore> files, Index index, IProgressMonitor monitor)
+	public void index(Set<IFileStore> files, Index index, IProgressMonitor monitor) throws CoreException
 	{
-		SubMonitor sub = SubMonitor.convert(monitor, files.size());
+		SubMonitor sub = SubMonitor.convert(monitor, files.size() * 100);
 		for (IFileStore file : files)
 		{
 			if (sub.isCanceled())
-				return;
-			try
 			{
-				if (file == null)
-				{
-					continue;
-				}
-				sub.subTask(file.getName());
-				try
-				{
-					String fileContents = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(-1)));
-					if (fileContents != null && fileContents.trim().length() > 0)
-					{
-						ParseState parseState = new ParseState();
-						parseState.setEditState(fileContents, "", 0, 0); //$NON-NLS-1$
-						IParserPool pool = ParserPoolFactory.getInstance().getParserPool(ICSSParserConstants.LANGUAGE);
-						if (pool != null)
-						{
-							IParser cssParser = pool.checkOut();
-							IParseNode parseNode = cssParser.parse(parseState);
-							pool.checkIn(cssParser);
-							walkNode(index, file, parseNode);
-						}
-					}
-				}
-				catch (CoreException e)
-				{
-					Activator.logError(e);
-				}
-				catch (Throwable e)
-				{
-					Activator.logError(e.getMessage(), e);
-				}
+				throw new CoreException(Status.CANCEL_STATUS);
 			}
-			finally
+			Thread.yield(); // be nice to other threads, let them get in before each file...
+			indexFileStore(index, file, sub.newChild(100));
+		}
+		sub.done();
+	}
+
+	private void indexFileStore(Index index, IFileStore file, IProgressMonitor monitor)
+	{
+		SubMonitor sub = SubMonitor.convert(monitor, 100);
+		if (file == null)
+		{
+			return;
+		}
+		try
+		{
+			sub.subTask(file.getName());
+
+			String fileContents = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(20)));
+			if (fileContents != null && fileContents.trim().length() > 0)
 			{
-				monitor.worked(1);
+				ParseState parseState = new ParseState();
+				parseState.setEditState(fileContents, "", 0, 0); //$NON-NLS-1$
+				IParserPool pool = ParserPoolFactory.getInstance().getParserPool(ICSSParserConstants.LANGUAGE);
+				if (pool != null)
+				{
+					IParser cssParser = pool.checkOut();
+					IParseNode parseNode = cssParser.parse(parseState);
+					pool.checkIn(cssParser);
+					sub.worked(50);
+					walkNode(index, file, parseNode);
+				}
 			}
 		}
-		monitor.done();
+		catch (CoreException e)
+		{
+			Activator.logError(e);
+		}
+		catch (Throwable e)
+		{
+			Activator.logError(e.getMessage(), e);
+		}
+		finally
+		{
+			sub.done();
+		}
 	}
 
 	public static void walkNode(Index index, IFileStore file, IParseNode parent)

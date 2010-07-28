@@ -1,5 +1,7 @@
 package com.aptana.internal.parsing;
 
+import org.eclipse.core.runtime.IConfigurationElement;
+
 import com.aptana.core.util.ObjectPool;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.IParserPool;
@@ -8,22 +10,20 @@ import com.aptana.parsing.ParsingPlugin;
 public class ParserPool extends ObjectPool<IParser> implements IParserPool
 {
 
-	private String className;
+	private IConfigurationElement parserExtension;
 
-	public ParserPool(String className)
+	public ParserPool(IConfigurationElement parserExtension)
 	{
 		super(-1);
-		this.className = className;
+		this.parserExtension = parserExtension;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public IParser create()
-	{
+	{		
 		try
 		{
-			Class klass = Class.forName(className);
-			return (IParser) klass.newInstance();
+			return (IParser) parserExtension.createExecutableExtension("class"); //$NON-NLS-1$
 		}
 		catch (Exception e)
 		{

@@ -1076,6 +1076,8 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 					statSupported = Boolean.FALSE;
 				}
 				return ftpLIST(dirPath, monitor);
+			} else if (ftpFiles[0].isLink()) {
+				return ftpLIST(dirPath, monitor);
 			} else if (statSupported == null) {
 				statSupported = Boolean.TRUE;
 			}

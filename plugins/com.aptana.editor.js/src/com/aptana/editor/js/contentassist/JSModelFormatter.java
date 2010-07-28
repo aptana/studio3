@@ -1,11 +1,11 @@
 package com.aptana.editor.js.contentassist;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.core.util.URIUtil;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
@@ -13,6 +13,9 @@ import com.aptana.editor.js.contentassist.model.SinceElement;
 
 public class JSModelFormatter
 {
+	private static final String NEW_LINE = "<br>"; //$NON-NLS-1$
+	private static final String DOUBLE_NEW_LINE = NEW_LINE + NEW_LINE;
+
 	/**
 	 * addDefiningFiles
 	 * 
@@ -25,7 +28,7 @@ public class JSModelFormatter
 
 		if (documents != null && documents.isEmpty() == false)
 		{
-			String prefix = (projectURI != null) ? decodeURI(projectURI.toString()) : null;
+			String prefix = (projectURI != null) ? URIUtil.decodeURI(projectURI.toString()) : null;
 
 			// back up one segment so we include the project name in the document
 			if (prefix != null && prefix.length() > 2)
@@ -38,15 +41,15 @@ public class JSModelFormatter
 				}
 			}
 
-			buffer.append("<br><br>"); //$NON-NLS-1$
-			buffer.append("Defined In:"); //$NON-NLS-1$
-			buffer.append("<br>"); //$NON-NLS-1$
+			buffer.append(DOUBLE_NEW_LINE); //$NON-NLS-1$
+			buffer.append(Messages.JSModelFormatter_Defined_Section_Header);
+			buffer.append(NEW_LINE); //$NON-NLS-1$
 
 			boolean first = true;
 
 			for (String document : documents)
 			{
-				document = decodeURI(document);
+				document = URIUtil.decodeURI(document);
 
 				if (prefix != null && document.startsWith(prefix))
 				{
@@ -59,7 +62,7 @@ public class JSModelFormatter
 				}
 				else
 				{
-					buffer.append("<br>");
+					buffer.append(NEW_LINE);
 				}
 
 				buffer.append(document);
@@ -79,7 +82,7 @@ public class JSModelFormatter
 
 		if (description != null && description.length() > 0)
 		{
-			buffer.append("<br><br>"); //$NON-NLS-1$
+			buffer.append(DOUBLE_NEW_LINE); //$NON-NLS-1$
 			buffer.append(description);
 		}
 	}
@@ -94,12 +97,12 @@ public class JSModelFormatter
 	{
 		if (examples != null && examples.size() > 0)
 		{
-			buffer.append("<br><br>"); //$NON-NLS-1$
-			buffer.append("<b>").append("Examples:").append("</b>");//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			buffer.append("<br>"); //$NON-NLS-1$
+			buffer.append(DOUBLE_NEW_LINE); //$NON-NLS-1$
+			buffer.append("<b>").append(Messages.JSModelFormatter_Exampes_Section_Header).append("</b>");//$NON-NLS-1$ //$NON-NLS-2$
+			buffer.append(NEW_LINE); //$NON-NLS-1$
 
 			// emit list
-			buffer.append(StringUtil.join("<br><br>", examples)); //$NON-NLS-1$
+			buffer.append(StringUtil.join(DOUBLE_NEW_LINE, examples)); //$NON-NLS-1$
 		}
 	}
 
@@ -115,49 +118,51 @@ public class JSModelFormatter
 
 		if (sinceList != null && sinceList.isEmpty() == false)
 		{
-			buffer.append("<br><br>");
-			buffer.append("<b>").append("Specifications:").append("</b>");
-			buffer.append("<br>");
+			buffer.append(DOUBLE_NEW_LINE);
+			buffer.append("<b>").append(Messages.JSModelFormatter_Specification_Header).append("</b>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			buffer.append(NEW_LINE);
 
 			for (SinceElement since : property.getSinceList())
 			{
-				buffer.append("- ").append(since.getName());
+				buffer.append("- ").append(since.getName()); //$NON-NLS-1$
 
 				String version = since.getVersion();
 
 				if (version != null && version.length() > 0)
 				{
-					buffer.append(" ").append(since.getVersion());
+					buffer.append(" ").append(since.getVersion()); //$NON-NLS-1$
 				}
 
-				buffer.append("<br>");
+				buffer.append(NEW_LINE);
 			}
 		}
 	}
 
 	/**
-	 * decodeURI
+	 * addTypes
 	 * 
-	 * @param uri
-	 * @return
+	 * @param buffer
+	 * @param types
 	 */
-	private static String decodeURI(String uri)
+	private static void addTypes(StringBuilder buffer, List<String> types)
 	{
-		String result = null;
+		buffer.append(" : "); //$NON-NLS-1$
 
-		if (uri != null)
+		if (types != null && types.size() > 0)
 		{
-			try
-			{
-				result = URLDecoder.decode(uri.toString(), "utf-8");
-			}
-			catch (UnsupportedEncodingException e)
-			{
-				e.printStackTrace();
-			}
-		}
+			List<String> typeDisplayNames = new ArrayList<String>();
 
-		return result;
+			for (String type : types)
+			{
+				typeDisplayNames.add(getTypeDisplayName(type));
+			}
+
+			buffer.append(StringUtil.join(",", typeDisplayNames)); //$NON-NLS-1$
+		}
+		else
+		{
+			buffer.append(JSTypeConstants.UNDEFINED_TYPE);
+		}
 	}
 
 	/**
@@ -171,8 +176,10 @@ public class JSModelFormatter
 	{
 		StringBuilder buffer = new StringBuilder();
 
-		buffer.append(function.toSource());
+		buffer.append(function.getName());
+		buffer.append("(").append(StringUtil.join(", ", function.getParameterTypes())).append(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
+		addTypes(buffer, function.getTypeNames());
 		addDescription(buffer, function);
 		addExamples(buffer, function.getExamples());
 		addDefiningFiles(buffer, function, projectURI);
@@ -196,9 +203,9 @@ public class JSModelFormatter
 		}
 
 		StringBuilder buffer = new StringBuilder();
+		buffer.append(property.getName());
 
-		buffer.append(property.toSource()); //$NON-NLS-1$ //$NON-NLS-2$
-
+		addTypes(buffer, property.getTypeNames());
 		addDescription(buffer, property);
 		addExamples(buffer, property.getExamples());
 		addDefiningFiles(buffer, property, projectURI);
@@ -229,6 +236,8 @@ public class JSModelFormatter
 			{
 				result = document;
 			}
+
+			result = URIUtil.decodeURI(result);
 		}
 
 		return result;
@@ -250,9 +259,9 @@ public class JSModelFormatter
 			{
 				result = type.substring(JSTypeConstants.GENERIC_CLASS_OPEN.length(), type.length() - 1);
 			}
-			else if (type.startsWith(JSTypeWalker.DYNAMIC_CLASS_PREFIX))
+			else if (type.startsWith(JSTypeConstants.DYNAMIC_CLASS_PREFIX))
 			{
-				result = JSTypeConstants.OBJECT;
+				result = JSTypeConstants.USER_TYPE;
 			}
 			else
 			{

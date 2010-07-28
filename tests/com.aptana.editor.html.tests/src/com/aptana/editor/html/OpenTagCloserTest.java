@@ -177,6 +177,17 @@ public class OpenTagCloserTest extends TestCase
 		assertEquals("<%= %", document.get());
 		assertTrue(event.doit);
 	}
+	
+	public void testDoesntCloseComments()
+	{
+		IDocument document = setDocument("<!-- ");
+		OpenTagCloser closer = new OpenTagCloser(viewer);
+		VerifyEvent event = createGreaterThanKeyEvent(5);
+		closer.verifyKey(event);
+
+		assertEquals("<!-- ", document.get());
+		assertTrue(event.doit);
+	}
 
 	public void testDoesStickCursorBetweenAutoClosedTagPair()
 	{

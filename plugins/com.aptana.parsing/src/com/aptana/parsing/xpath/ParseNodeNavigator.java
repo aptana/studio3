@@ -226,7 +226,14 @@ public class ParseNodeNavigator extends DefaultNavigator
 	 */
 	public String getElementStringValue(Object element)
 	{
-		return null;
+		String result = null;
+
+		if (element instanceof IParseNode)
+		{
+			result = ((IParseNode) element).getText();
+		}
+
+		return result;
 	}
 
 	/**

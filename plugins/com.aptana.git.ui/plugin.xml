@@ -12,6 +12,30 @@
                value="org.eclipse.team.core.repository=com.aptana.git.core.GitRepositoryProvider">
          </filter>
          <action
+               class="com.aptana.git.ui.actions.RevertAction"
+               definitionId="com.aptana.git.ui.command.revert"
+               id="com.aptana.git.ui.actions.RevertAction"
+               label="%RevertAction_label"
+               menubarPath="team.main/targetGroup"
+               tooltip="%RevertAction_tooltip">
+         </action>
+         <action
+               class="com.aptana.git.ui.actions.UnstageAction"
+               definitionId="com.aptana.git.ui.command.unstage"
+               id="com.aptana.git.ui.actions.UnstageAction"
+               label="%UnstageAction_label"
+               menubarPath="team.main/targetGroup"
+               tooltip="%UnstageAction_tooltip">
+         </action>
+         <action
+               class="com.aptana.git.ui.actions.StageAction"
+               definitionId="com.aptana.git.ui.command.stage"
+               id="com.aptana.git.ui.actions.StageAction"
+               label="%StageAction_label"
+               menubarPath="team.main/targetGroup"
+               tooltip="%StageAction_tooltip">
+         </action>
+         <action
                class="com.aptana.git.ui.actions.GithubNetworkAction"
                definitionId="com.aptana.git.ui.command.github.network"
                icon="icons/obj16/github.gif"
@@ -117,30 +141,6 @@
                name="projectPersistentProperty"
                value="org.eclipse.team.core.repository=com.aptana.git.core.GitRepositoryProvider">
          </filter>
-         <action
-               class="com.aptana.git.ui.actions.RevertAction"
-               definitionId="com.aptana.git.ui.command.revert"
-               id="com.aptana.git.ui.actions.RevertAction"
-               label="%RevertAction_label"
-               menubarPath="team.main/targetGroup"
-               tooltip="%RevertAction_tooltip">
-         </action>
-         <action
-               class="com.aptana.git.ui.actions.UnstageAction"
-               definitionId="com.aptana.git.ui.command.unstage"
-               id="com.aptana.git.ui.actions.UnstageAction"
-               label="%UnstageAction_label"
-               menubarPath="team.main/targetGroup"
-               tooltip="%UnstageAction_tooltip">
-         </action>
-         <action
-               class="com.aptana.git.ui.actions.StageAction"
-               definitionId="com.aptana.git.ui.command.stage"
-               id="com.aptana.git.ui.actions.StageAction"
-               label="%StageAction_label"
-               menubarPath="team.main/targetGroup"
-               tooltip="%StageAction_tooltip">
-         </action>
           <action
                class="com.aptana.git.ui.internal.actions.MergeConflictsAction"
                definitionId="com.aptana.git.ui.command.merge_conflicts"

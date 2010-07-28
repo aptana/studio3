@@ -115,28 +115,37 @@
 			
 			if (node instanceof JSNode)
 			{
-				switch (node.getNodeType())
+				IParseNode statement = ((JSNode) node).getContainingStatementNode();
+
+				if (statement instanceof JSAssignmentNode)
 				{
-					case JSNodeTypes.VAR:
-						// associate documentation with first declared variable's value
-						JSVarNode varNode = (JSVarNode) node;
-						((JSNode) varNode.getFirstChild().getLastChild()).setDocumentation(block);
-						break;
-						
-					case JSNodeTypes.IDENTIFIER:
-						IParseNode parent = node.getParent();
-						
-						if (parent instanceof JSNameValuePairNode)
-						{
-							// associate documentation with property's value
-							JSNameValuePairNode entry = (JSNameValuePairNode) parent;
-							((JSNode) entry.getValue()).setDocumentation(block);
-						}
-						break;
-						
-					default:
-						((JSNode) node).setDocumentation(block);
-						break;
+					((JSNode) statement.getLastChild()).setDocumentation(block);
+				}
+				else
+				{
+					switch (node.getNodeType())
+					{
+						case JSNodeTypes.VAR:
+							// associate documentation with first declared variable's value
+							JSVarNode varNode = (JSVarNode) node;
+							((JSNode) varNode.getFirstChild().getLastChild()).setDocumentation(block);
+							break;
+							
+						case JSNodeTypes.IDENTIFIER:
+							IParseNode parent = node.getParent();
+							
+							if (parent instanceof JSNameValuePairNode)
+							{
+								// associate documentation with property's value
+								JSNameValuePairNode entry = (JSNameValuePairNode) parent;
+								((JSNode) entry.getValue()).setDocumentation(block);
+							}
+							break;
+							
+						default:
+							((JSNode) node).setDocumentation(block);
+							break;
+					}
 				}
 			}
 		}

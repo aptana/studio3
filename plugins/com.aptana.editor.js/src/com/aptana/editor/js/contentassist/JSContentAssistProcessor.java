@@ -30,14 +30,19 @@ import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
+import com.aptana.editor.js.inferencing.JSNodeTypeInferrer;
+import com.aptana.editor.js.inferencing.JSPropertyCollection;
+import com.aptana.editor.js.inferencing.JSScope;
+import com.aptana.editor.js.inferencing.JSSymbolCollector;
 import com.aptana.editor.js.parsing.JSTokenScanner;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
+import com.aptana.editor.js.parsing.lexer.JSLexemeProvider;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
-import com.aptana.parsing.Scope;
+import com.aptana.index.core.Index;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
@@ -47,40 +52,36 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 {
 	private static final Image JS_FUNCTION = Activator.getImage("/icons/js_function.gif"); //$NON-NLS-1$
 	private static final Image JS_PROPERTY = Activator.getImage("/icons/js_property.gif"); //$NON-NLS-1$
-	
-	private static final EnumSet<ContentSelector> CORE_GLOBAL_SELECTOR = EnumSet.of(
-		ContentSelector.NAME,				//
-		ContentSelector.DESCRIPTION,		//
-		ContentSelector.EXAMPLES,			//
-		ContentSelector.PARAMETERS,			//
-		ContentSelector.RETURN_TYPES,		//
-		ContentSelector.SINCE,				//
-		ContentSelector.TYPES,				//
-		ContentSelector.USER_AGENTS			//
-	);
-	private static final EnumSet<ContentSelector> PROJECT_GLOBAL_SELECTOR = EnumSet.of(
-		ContentSelector.NAME,				//
-		ContentSelector.DESCRIPTION,		//
-		ContentSelector.DOCUMENTS,			//
-		ContentSelector.EXAMPLES,			//
-		ContentSelector.PARAMETERS,			//
-		ContentSelector.RETURN_TYPES,		//
-		ContentSelector.TYPES				//
-	);
-	private static final EnumSet<ContentSelector> TYPE_PROPERTY_SELECTOR = EnumSet.of(
-		ContentSelector.NAME,				//
-		ContentSelector.DESCRIPTION,		//
-		ContentSelector.DOCUMENTS,			//
-		ContentSelector.EXAMPLES,			//
-		ContentSelector.INCLUDE_ANCESTORS,	//
-		ContentSelector.PARAMETERS,			//
-		ContentSelector.PARENT_TYPES,		//
-		ContentSelector.RETURN_TYPES,		//
-		ContentSelector.SINCE,				//
-		ContentSelector.TYPES,				//
-		ContentSelector.USER_AGENTS			//
-	);
-	
+
+	private static final EnumSet<ContentSelector> CORE_GLOBAL_SELECTOR = EnumSet.of(ContentSelector.NAME, //
+		ContentSelector.DESCRIPTION, //
+		ContentSelector.EXAMPLES, //
+		ContentSelector.PARAMETERS, //
+		ContentSelector.RETURN_TYPES, //
+		ContentSelector.SINCE, //
+		ContentSelector.TYPES, //
+		ContentSelector.USER_AGENTS //
+		);
+	private static final EnumSet<ContentSelector> PROJECT_GLOBAL_SELECTOR = EnumSet.of(ContentSelector.NAME, //
+		ContentSelector.DESCRIPTION, //
+		ContentSelector.DOCUMENTS, //
+		ContentSelector.EXAMPLES, //
+		ContentSelector.PARAMETERS, //
+		ContentSelector.RETURN_TYPES, //
+		ContentSelector.TYPES //
+		);
+	private static final EnumSet<ContentSelector> TYPE_PROPERTY_SELECTOR = EnumSet.of(ContentSelector.NAME, //
+		ContentSelector.DESCRIPTION, //
+		ContentSelector.DOCUMENTS, //
+		ContentSelector.EXAMPLES, //
+		ContentSelector.PARAMETERS, //
+		ContentSelector.PARENT_TYPES, //
+		ContentSelector.RETURN_TYPES, //
+		ContentSelector.SINCE, //
+		ContentSelector.TYPES, //
+		ContentSelector.USER_AGENTS //
+		);
+
 	private static final EnumSet<LocationType> IGNORED_TYPES = EnumSet.of(LocationType.UNKNOWN, LocationType.NONE);
 
 	private JSIndexQueryHelper _indexHelper;
@@ -190,7 +191,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		if (propertyNode != null)
 		{
 			JSGetPropertyNode node = (JSGetPropertyNode) propertyNode;
-			Scope<JSNode> localScope = this.getScopeAtOffset(offset);
+			JSScope localScope = this.getScopeAtOffset(offset);
 
 			if (localScope != null)
 			{
@@ -201,7 +202,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 				if (lhs instanceof JSNode)
 				{
-					JSTypeWalker typeWalker = new JSTypeWalker(localScope, this.getIndex());
+					JSNodeTypeInferrer typeWalker = new JSNodeTypeInferrer(localScope, this.getIndex(), this.getURI());
 
 					typeWalker.visit((JSNode) lhs);
 
@@ -219,13 +220,13 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					// add all properties of each type to our proposal list
 					for (String type : typeList)
 					{
-						if (type.startsWith("Function:"))
+						if (type.startsWith(JSTypeConstants.FUNCTION_SIGNATURE_PREFIX))
 						{
-							this.addTypeProperties(proposals, JSTypeConstants.FUNCTION, offset);
+							this.addTypeProperties(proposals, JSTypeConstants.FUNCTION_TYPE, offset);
 						}
-						else if (type.startsWith("Array<"))
+						else if (type.startsWith(JSTypeConstants.GENERIC_ARRAY_OPEN))
 						{
-							this.addTypeProperties(proposals, JSTypeConstants.ARRAY, offset);
+							this.addTypeProperties(proposals, JSTypeConstants.ARRAY_TYPE, offset);
 						}
 						else
 						{
@@ -292,11 +293,11 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		if (this._targetNode != null)
 		{
 			String fileLocation = this.getFilename();
-			Scope<JSNode> globalScope = this.getGlobalScope();
+			JSScope globalScope = this.getGlobalScope();
 
 			if (globalScope != null)
 			{
-				Scope<JSNode> localScope = globalScope.getScopeAtOffset(offset);
+				JSScope localScope = globalScope.getScopeAtOffset(offset);
 
 				if (localScope != null)
 				{
@@ -306,7 +307,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					for (String symbol : symbols)
 					{
 						boolean isFunction = false;
-						List<JSNode> nodes = localScope.getSymbol(symbol);
+						JSPropertyCollection object = localScope.getSymbol(symbol);
+						List<JSNode> nodes = object.getValues();
 
 						if (nodes != null)
 						{
@@ -340,8 +342,16 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected void addTypeProperties(Set<ICompletionProposal> proposals, String typeName, int offset)
 	{
+		Index index = this.getIndex();
+
+		// grab all ancestors of the specified type
+		List<String> allTypes = this._indexHelper.getTypeAncestorNames(index, typeName);
+
+		// include the type in the list as well
+		allTypes.add(0, typeName);
+
 		// add properties and methods
-		List<PropertyElement> properties = this._indexHelper.getTypeMembers(this.getIndex(), typeName, TYPE_PROPERTY_SELECTOR);
+		List<PropertyElement> properties = this._indexHelper.getTypeMembers(index, allTypes, TYPE_PROPERTY_SELECTOR);
 
 		typeName = JSModelFormatter.getTypeDisplayName(typeName);
 
@@ -353,8 +363,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
 			List<String> userAgentNames = property.getUserAgentNames();
 			Image[] userAgents = getUserAgentImages(userAgentNames);
+			String owningType = JSModelFormatter.getTypeDisplayName(property.getOwningType());
 
-			this.addProposal(proposals, name, image, description, userAgents, property.getOwningType(), offset);
+			this.addProposal(proposals, name, image, description, userAgents, owningType, offset);
 		}
 	}
 
@@ -510,9 +521,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * 
 	 * @return
 	 */
-	protected Scope<JSNode> getGlobalScope()
+	protected JSScope getGlobalScope()
 	{
-		Scope<JSNode> result = null;
+		JSScope result = null;
 
 		if (this._targetNode != null)
 		{
@@ -608,7 +619,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 			if (IGNORED_TYPES.contains(result) == false)
 			{
-				JSRangeWalker rangeWalker = new JSRangeWalker(offset);
+				JSRangeFinder rangeWalker = new JSRangeFinder(offset);
 
 				((JSParseRootNode) ast).accept(rangeWalker);
 
@@ -753,16 +764,16 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	protected Scope<JSNode> getScopeAtOffset(int offset)
+	protected JSScope getScopeAtOffset(int offset)
 	{
-		Scope<JSNode> result = null;
+		JSScope result = null;
 
 		// grab global scope
-		Scope<JSNode> global = this.getGlobalScope();
+		JSScope global = this.getGlobalScope();
 
 		if (global != null)
 		{
-			Scope<JSNode> candidate = global.getScopeAtOffset(offset);
+			JSScope candidate = global.getScopeAtOffset(offset);
 
 			result = (candidate != null) ? candidate : global;
 		}

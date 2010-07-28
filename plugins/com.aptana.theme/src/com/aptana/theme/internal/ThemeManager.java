@@ -30,6 +30,8 @@ import org.osgi.service.prefs.BackingStoreException;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
+import com.aptana.theme.internal.preferences.ThemerPreferenceInitializer;
+import com.aptana.theme.preferences.IPreferenceConstants;
 
 public class ThemeManager implements IThemeManager
 {
@@ -42,11 +44,6 @@ public class ThemeManager implements IThemeManager
 	 * Preference key used to store the list of known themes.
 	 */
 	private static final String THEME_LIST_PREF_KEY = "themeList"; //$NON-NLS-1$
-
-	/**
-	 * Preference key used to save the active theme.
-	 */
-	public static final String ACTIVE_THEME = "ACTIVE_THEME"; //$NON-NLS-1$
 
 	/**
 	 * Node in preferences used to store themes under. Each theme is a key value pair under this node. The key is the
@@ -87,8 +84,8 @@ public class ThemeManager implements IThemeManager
 	{
 		if (fCurrentTheme == null)
 		{
-			String activeThemeName = Platform.getPreferencesService().getString(ThemePlugin.PLUGIN_ID, ACTIVE_THEME,
-					null, null);
+			String activeThemeName = Platform.getPreferencesService().getString(ThemePlugin.PLUGIN_ID,
+					IPreferenceConstants.ACTIVE_THEME, ThemerPreferenceInitializer.DEFAULT_THEME, null);
 			if (activeThemeName != null)
 			{
 				fCurrentTheme = getTheme(activeThemeName);
@@ -99,11 +96,11 @@ public class ThemeManager implements IThemeManager
 				if (!getThemeMap().values().isEmpty())
 				{
 					fCurrentTheme = getThemeMap().values().iterator().next();
-					if (fCurrentTheme != null)
-					{
-						setCurrentTheme(fCurrentTheme);
-					}
 				}
+			}
+			if (fCurrentTheme != null)
+			{
+				setCurrentTheme(fCurrentTheme);
 			}
 		}
 		return fCurrentTheme;
@@ -161,7 +158,7 @@ public class ThemeManager implements IThemeManager
 		}
 
 		prefs = new InstanceScope().getNode(ThemePlugin.PLUGIN_ID);
-		prefs.put(ACTIVE_THEME, theme.getName());
+		prefs.put(IPreferenceConstants.ACTIVE_THEME, theme.getName());
 		prefs.putLong(THEME_CHANGED, System.currentTimeMillis());
 		try
 		{

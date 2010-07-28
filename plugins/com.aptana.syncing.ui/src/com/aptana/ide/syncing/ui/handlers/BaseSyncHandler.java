@@ -2,7 +2,6 @@ package com.aptana.ide.syncing.ui.handlers;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.expressions.EvaluationContext;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.ISelection;
@@ -14,18 +13,18 @@ import com.aptana.ide.syncing.core.SiteConnectionUtils;
 public abstract class BaseSyncHandler extends AbstractHandler
 {
 
-	private IProject selectedProject;
+	private IResource selectedResource;
 
 	@Override
 	public boolean isEnabled()
 	{
-		return selectedProject != null && SiteConnectionUtils.findSitesForSource(selectedProject).length > 0;
+		return selectedResource != null && SiteConnectionUtils.findSitesForSource(selectedResource).length > 0;
 	}
 
 	@Override
 	public void setEnabled(Object evaluationContext)
 	{
-		selectedProject = null;
+		selectedResource = null;
 		if (evaluationContext instanceof EvaluationContext)
 		{
 			Object value = ((EvaluationContext) evaluationContext).getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
@@ -46,7 +45,7 @@ public abstract class BaseSyncHandler extends AbstractHandler
 					}
 					if (resource != null)
 					{
-						selectedProject = resource.getProject();
+						selectedResource = resource;
 					}
 				}
 			}
