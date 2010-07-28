@@ -7,9 +7,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.progress.IProgressService;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.configurations.processor.IConfigurationProcessor;
+import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
 
 /**
@@ -49,6 +52,12 @@ public class RubyInstallActionController extends AbstractActionController
 					return Status.OK_STATUS;
 				}
 			};
+			IWorkbench workbench = PortalUIPlugin.getDefault().getWorkbench();
+			IProgressService progressService = workbench.getProgressService();
+
+			computationJob.setPriority(Job.INTERACTIVE);
+			// Display the progress bar on screen.
+			progressService.showInDialog(workbench.getActiveWorkbenchWindow().getShell(), computationJob);
 			computationJob.schedule();
 			return IBrowserNotificationConstants.JSON_OK;
 		}
@@ -67,6 +76,6 @@ public class RubyInstallActionController extends AbstractActionController
 	public void configurationStateChanged(ConfigurationStatus status, Set<String> attributesChanged)
 	{
 		// TODO - Shalom: Notify that the installation is complete?
-		System.out.println("configurationStateChanged: " + status.getStatus());
+		//System.out.println("configurationStateChanged: " + status.getStatus());
 	}
 }

@@ -10,6 +10,12 @@ public class Messages extends NLS
 	public static String ConnectionPointManager_CategoryUnknown;
 	public static String ConnectionPointManager_FailedStoreConnectionProperties;
 
+	public static String LockUtils_failedToLock;
+
+	public static String LockUtils_failedToWrite;
+
+	public static String LockUtils_seeErrorLog;
+
 	static
 	{
 		// initialize resource bundle

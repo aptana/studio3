@@ -2,13 +2,8 @@ package com.aptana.portal.ui.dispatch.configurationProcessors;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.LineNumberReader;
-import java.io.RandomAccessFile;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +38,7 @@ import org.eclipse.ui.progress.UIJob;
 import com.aptana.configurations.processor.AbstractConfigurationProcessor;
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.core.util.InputStreamGobbler;
+import com.aptana.ide.core.io.LockUtils;
 import com.aptana.ide.core.io.downloader.DownloadManager;
 import com.aptana.portal.ui.PortalUIPlugin;
 
@@ -263,7 +259,7 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 
 					// Try to get a file lock first, before running the process. This file was just downloaded, so there
 					// is a chance it's still being held by the OS or by the downloader.
-					IStatus fileLockStatus = getFileLock(downloadedPaths[0]);
+					IStatus fileLockStatus = LockUtils.waitForLockRelease(downloadedPaths[0], 10000L);
 					if (!fileLockStatus.isOK())
 					{
 						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID,
@@ -341,15 +337,15 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 				try
 				{
 					// We get a folder status first, before unzipping into the folder. This folder was just created,
-					// so there is a chance it's still being held by the OS or by the Ruby intaller.
-					IStatus folderStatus = getFolderStatus(installDir);
+					// so there is a chance it's still being held by the OS or by the Ruby installer.
+					IStatus folderStatus = LockUtils.waitForFolderAccess(installDir, 10000);
 					if (!folderStatus.isOK())
 					{
 						PortalUIPlugin.getDefault().getLog().log(folderStatus);
 						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID,
 								Messages.RubyInstallProcessor_failedToinstallDevKit);
 					}
-					// DevKit arrives as a 7Zip package, so we use a specific Windows decoder to extract it.
+					// DevKit arrives as a 7zip package, so we use a specific Windows decoder to extract it.
 					// This extraction process follows the instructions at:
 					// http://wiki.github.com/oneclick/rubyinstaller/development-kit
 					extract(downloadedPaths[1], installDir);
@@ -372,144 +368,6 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 			return Status.CANCEL_STATUS;
 		}
 		return job.getResult();
-	}
-
-	/**
-	 * Obtains a lock on the given file and release it at the end. This method should be called before trying to create
-	 * a process executing this file. It verifies that the file is ready to be executed and no other JVM process is
-	 * holding into it. <br>
-	 * This method will try to obtain a lock repeatedly for about 10 seconds. If not successful, an error status is
-	 * returned.
-	 * 
-	 * @param fileName
-	 * @return The status for the locking procedure (OK or Error)
-	 */
-	protected IStatus getFileLock(String fileName)
-	{
-		RandomAccessFile randomAccessFile = null;
-		try
-		{
-			int retries = 20;
-			Throwable lastException = null;
-			boolean isLocked = true;
-			FileLock fileLock = null;
-			randomAccessFile = new RandomAccessFile(fileName, "rw"); //$NON-NLS-1$
-			FileChannel channel = randomAccessFile.getChannel();
-			while (isLocked)
-			{
-				try
-				{
-					// fileLock = channel.lock(0L, Long.MAX_VALUE, true);
-					fileLock = channel.tryLock(0L, Long.MAX_VALUE, true);
-					lastException = null;
-				}
-				catch (Exception e)
-				{
-					lastException = e;
-				}
-				if (lastException != null || fileLock == null)
-				{
-					retries--;
-					if (retries == 0)
-					{
-						// give up
-						break;
-					}
-					Thread.sleep(500L);
-				}
-				else
-				{
-					isLocked = false;
-				}
-			}
-			if (lastException != null || fileLock == null)
-			{
-				PortalUIPlugin.logError("Failed to lock " + fileName, lastException); //$NON-NLS-1$
-				return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, Messages.RubyInstallProcessor_failedToLock
-						+ fileName + Messages.RubyInstallProcessor_seeErrorLog, lastException);
-			}
-			if (fileLock != null)
-			{
-				fileLock.release();
-				randomAccessFile.close();
-				fileLock = null;
-			}
-		}
-		catch (Exception e)
-		{
-			return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, e.getMessage(), e);
-		}
-		finally
-		{
-			if (randomAccessFile != null)
-			{
-				try
-				{
-					randomAccessFile.close();
-				}
-				catch (IOException e)
-				{
-					// ignore
-				}
-			}
-		}
-		return Status.OK_STATUS;
-	}
-
-	/**
-	 * This method tries to access the given folder and write a test file into it before it can return an OK status.<br>
-	 * The check is done repeatedly for about 10 seconds, and if not successful, an Error status is returned.
-	 * 
-	 * @param installDir
-	 * @return The status for the check procedure (OK or Error)
-	 */
-	protected IStatus getFolderStatus(String installDir)
-	{
-		int retries = 20;
-		Throwable lastException = null;
-		boolean isLocked = true;
-		File tempFile = new File(installDir, ".tmp"); //$NON-NLS-1$
-		while (isLocked)
-		{
-			try
-			{
-				// fileLock = channel.lock(0L, Long.MAX_VALUE, true);
-				isLocked = !tempFile.createNewFile();
-				lastException = null;
-			}
-			catch (Exception e)
-			{
-				lastException = e;
-			}
-			if (isLocked)
-			{
-				retries--;
-				if (retries == 0)
-				{
-					// give up
-					break;
-				}
-				try
-				{
-					Thread.sleep(500L);
-				}
-				catch (InterruptedException e)
-				{
-					// ignore
-				}
-			}
-		}
-		if (isLocked)
-		{
-			PortalUIPlugin.logError("Failed to write to " + installDir, lastException); //$NON-NLS-1$
-			return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, Messages.RubyInstallProcessor_failedToWrite
-					+ installDir + Messages.RubyInstallProcessor_seeErrorLog, lastException);
-		}
-		if (tempFile != null)
-		{
-			tempFile.delete();
-		}
-		return Status.OK_STATUS;
 	}
 
 	public static IStatus extract(String zipFile, String targetFolder)
