@@ -101,6 +101,6 @@ public class NewFileWizard extends BasicNewFileResourceWizard
 		pattern = pattern.replaceAll("\\*", "\\.\\+\\?"); //$NON-NLS-1$ //$NON-NLS-2$
 		CommandContext context = template.createCommandContext();
 		CommandResult result = template.execute(context);
-		return result.getOutputString().trim() + "\n"; //$NON-NLS-1$
+		return result.getOutputString();
 	}
 }
