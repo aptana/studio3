@@ -101,6 +101,7 @@ public class NewFileWizard extends BasicNewFileResourceWizard
 		pattern = pattern.replaceAll("\\*", "\\.\\+\\?"); //$NON-NLS-1$ //$NON-NLS-2$
 		CommandContext context = template.createCommandContext();
 		CommandResult result = template.execute(context);
-		return result.getOutputString();
+		// FIXME When I use vi on the resulting files, it complains of no eol. Somehow fix that here?
+		return result.getOutputString().trim();
 	}
 }
