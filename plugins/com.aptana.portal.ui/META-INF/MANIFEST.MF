@@ -16,7 +16,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.console,
  org.mortbay.jetty.util,
  com.aptana.theme,
- com.aptana.libraries,
  com.aptana.explorer,
  com.aptana.core.io
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

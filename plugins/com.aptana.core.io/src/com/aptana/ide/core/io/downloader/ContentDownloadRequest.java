@@ -85,8 +85,8 @@ public class ContentDownloadRequest
 		{
 			// Use ECF FileTransferJob implementation to get the remote file.
 			FileReader reader = new FileReader(null);
-			reader.readInto(this.url.toURI(), new FileOutputStream(this.saveTo), 0, monitor);
-
+			FileOutputStream anOutputStream = new FileOutputStream(this.saveTo);
+			reader.readInto(this.url.toURI(), anOutputStream, 0, monitor);
 			// check that job ended ok - throw exceptions otherwise
 			IStatus result = reader.getResult();
 			if (result.getSeverity() == IStatus.CANCEL)

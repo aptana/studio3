@@ -1,15 +1,26 @@
 package com.aptana.portal.ui.dispatch.configurationProcessors;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.io.RandomAccessFile;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
@@ -25,13 +36,13 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.configurations.processor.AbstractConfigurationProcessor;
 import com.aptana.configurations.processor.ConfigurationStatus;
+import com.aptana.core.util.InputStreamGobbler;
 import com.aptana.ide.core.io.downloader.DownloadManager;
 import com.aptana.portal.ui.PortalUIPlugin;
 
@@ -46,6 +57,9 @@ import com.aptana.portal.ui.PortalUIPlugin;
 public class RubyInstallProcessor extends AbstractConfigurationProcessor
 {
 	protected static String RUBY_DEFAULT_INSTALL_PATH = "C:\\Ruby"; //$NON-NLS-1$
+	private static final String WINDOWS_7ZIP_EXECUTABLE = "$os$/7za.exe"; //$NON-NLS-1$
+	// The process return code for a Ruby installer cancel.
+	private static final int RUBY_INSTALLER_PROCESS_CANCEL = 5;
 	private static boolean installationInProgress;
 	private String[] downloadedPaths;
 
@@ -94,7 +108,8 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 
 			// Start the installation...
 			configurationStatus.setStatus(ConfigurationStatus.PROCESSING);
-			// TODO - Attache: download(attrArray, progressMonitor);
+			download(attrArray, progressMonitor);
+			// downloadedPaths = new String[] {};
 			install(progressMonitor);
 			configurationStatus.setStatus(ConfigurationStatus.OK);
 			return configurationStatus;
@@ -152,10 +167,22 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 	 */
 	private void install(IProgressMonitor progressMonitor)
 	{
-		SubMonitor subMonitor = SubMonitor.convert(progressMonitor, "Installing...", IProgressMonitor.UNKNOWN);
+		if (downloadedPaths == null || downloadedPaths[0] == null || downloadedPaths[1] == null)
+		{
+			String failureMessge = Messages.RubyInstallProcessor_couldNotLocateRubyinstaller;
+			if (downloadedPaths != null && downloadedPaths[0] != null)
+			{
+				failureMessge = Messages.RubyInstallProcessor_couldNotLocateDevKit;
+			}
+			displayMessageInUIThread(Messages.RubyInstallProcessor_installationErrorTitle,
+					Messages.RubyInstallProcessor_failedToInstallRuby + failureMessge);
+			return;
+		}
+		SubMonitor subMonitor = SubMonitor.convert(progressMonitor,
+				Messages.RubyInstallProcessor_installerProgressInfo, IProgressMonitor.UNKNOWN);
 		try
 		{
-			subMonitor.beginTask("Installing Ruby...", IProgressMonitor.UNKNOWN);
+			subMonitor.beginTask(Messages.RubyInstallProcessor_installingRubyTask, IProgressMonitor.UNKNOWN);
 			final String[] installDir = new String[1];
 			Job installRubyDialog = new UIJob("Ruby installer options") //$NON-NLS-1$
 			{
@@ -187,13 +214,400 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 			{
 				return;
 			}
-			System.out.println("Installing to :" + installDir[0]);
-			// ProcessBuilder processBuilder = new ProcessBuilder();
+
+			IStatus status = installRuby(installDir[0]);
+			if (!status.isOK())
+			{
+				if (status.getSeverity() != IStatus.CANCEL)
+				{
+					displayMessageInUIThread(Messages.RubyInstallProcessor_installationErrorTitle, status.getMessage());
+				}
+				return;
+			}
+			PortalUIPlugin.logInfo(
+					"Successfully installed Ruby into " + installDir[0] + ". Starting to install DevKit...", null); //$NON-NLS-1$ //$NON-NLS-2$
+			// Ruby was installed successfully. Now we need to extract DevKit into the Ruby dir and change its
+			// configurations to match the installation location.
+			status = installDevKit(installDir[0]);
+			if (!status.isOK())
+			{
+				displayMessageInUIThread(Messages.RubyInstallProcessor_installationErrorTitle, status.getMessage());
+				return;
+			}
+			PortalUIPlugin.logInfo(
+					"Successfully installed DevKit into " + installDir[0] + ". Ruby installation completed.", null); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		catch (Exception e)
+		{
+			PortalUIPlugin.logError("Error while installing Ruby", e); //$NON-NLS-1$
 		}
 		finally
 		{
 			subMonitor.done();
 		}
+	}
+
+	protected IStatus installRuby(final String installDir)
+	{
+		Job job = new Job(Messages.RubyInstallProcessor_rubyInstallerJobName)
+		{
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				try
+				{
+					SubMonitor subMonitor = SubMonitor.convert(monitor, IProgressMonitor.UNKNOWN);
+					subMonitor
+							.beginTask(Messages.RubyInstallProcessor_installingRubyTaskName, IProgressMonitor.UNKNOWN);
+					PortalUIPlugin.logInfo("Installing Ruby into " + installDir, null); //$NON-NLS-1$
+
+					// Try to get a file lock first, before running the process. This file was just downloaded, so there
+					// is a chance it's still being held by the OS or by the downloader.
+					IStatus fileLockStatus = getFileLock(downloadedPaths[0]);
+					if (!fileLockStatus.isOK())
+					{
+						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID,
+								Messages.RubyInstallProcessor_installationError_generic);
+					}
+
+					ProcessBuilder processBuilder = new ProcessBuilder(downloadedPaths[0],
+							"/silent", "/dir=\"" + installDir + "\"", "/tasks=\"modpath\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+					Process process = processBuilder.start();
+					int res = process.waitFor();
+					if (res == RUBY_INSTALLER_PROCESS_CANCEL)
+					{
+						PortalUIPlugin.logInfo("Ruby installation cancelled", null); //$NON-NLS-1$
+						return Status.CANCEL_STATUS;
+					}
+					if (res != 0)
+					{
+						// We had an error while installing
+						PortalUIPlugin
+								.logError(
+										"Failed to install Ruby. The ruby installer process returned a termination code of " + res, null); //$NON-NLS-1$
+						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, res,
+								Messages.RubyInstallProcessor_installationErrorMessage, null);
+					}
+					else if (!new File(installDir).exists())
+					{
+						// Just to be sure that we got everything in place
+						PortalUIPlugin.logError(
+								"Failed to install Ruby. The " + installDir + " directory was not created", null); //$NON-NLS-1$ //$NON-NLS-2$
+						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, res,
+								Messages.RubyInstallProcessor_installationError_installDirMissing, null);
+					}
+					return Status.OK_STATUS;
+				}
+				catch (Exception e)
+				{
+					PortalUIPlugin.logError(e);
+					return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID,
+							Messages.RubyInstallProcessor_installationError_generic, e);
+				}
+				finally
+				{
+					monitor.done();
+				}
+			}
+		};
+		// Give it a little delay, just in case the downloader still holds on to the rubyinstaller file.
+		job.schedule(3000);
+		try
+		{
+			job.join();
+		}
+		catch (InterruptedException e)
+		{
+			PortalUIPlugin.logError(e);
+			return Status.CANCEL_STATUS;
+		}
+		return job.getResult();
+	}
+
+	/**
+	 * Extract the downloaded DevKit into the install dir and configure it to work.<br>
+	 * At this stage, we assume that the install dir and the DevKit package have been verified and valid!
+	 * 
+	 * @param installDir
+	 * @throws Exception
+	 */
+	protected IStatus installDevKit(final String installDir)
+	{
+		Job job = new Job(Messages.RubyInstallProcessor_installingDevKitJobName)
+		{
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				try
+				{
+					// We get a folder status first, before unzipping into the folder. This folder was just created,
+					// so there is a chance it's still being held by the OS or by the Ruby intaller.
+					IStatus folderStatus = getFolderStatus(installDir);
+					if (!folderStatus.isOK())
+					{
+						PortalUIPlugin.getDefault().getLog().log(folderStatus);
+						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID,
+								Messages.RubyInstallProcessor_failedToinstallDevKit);
+					}
+					// DevKit arrives as a 7Zip package, so we use a specific Windows decoder to extract it.
+					// This extraction process follows the instructions at:
+					// http://wiki.github.com/oneclick/rubyinstaller/development-kit
+					extract(downloadedPaths[1], installDir);
+				}
+				catch (Throwable t)
+				{
+					return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID,
+							Messages.RubyInstallProcessor_failedToinstallDevKit, t);
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.schedule(500);
+		try
+		{
+			job.join();
+		}
+		catch (InterruptedException e)
+		{
+			return Status.CANCEL_STATUS;
+		}
+		return job.getResult();
+	}
+
+	/**
+	 * Obtains a lock on the given file and release it at the end. This method should be called before trying to create
+	 * a process executing this file. It verifies that the file is ready to be executed and no other JVM process is
+	 * holding into it. <br>
+	 * This method will try to obtain a lock repeatedly for about 10 seconds. If not successful, an error status is
+	 * returned.
+	 * 
+	 * @param fileName
+	 * @return The status for the locking procedure (OK or Error)
+	 */
+	protected IStatus getFileLock(String fileName)
+	{
+		RandomAccessFile randomAccessFile = null;
+		try
+		{
+			int retries = 20;
+			Throwable lastException = null;
+			boolean isLocked = true;
+			FileLock fileLock = null;
+			randomAccessFile = new RandomAccessFile(fileName, "rw"); //$NON-NLS-1$
+			FileChannel channel = randomAccessFile.getChannel();
+			while (isLocked)
+			{
+				try
+				{
+					// fileLock = channel.lock(0L, Long.MAX_VALUE, true);
+					fileLock = channel.tryLock(0L, Long.MAX_VALUE, true);
+					lastException = null;
+				}
+				catch (Exception e)
+				{
+					lastException = e;
+				}
+				if (lastException != null || fileLock == null)
+				{
+					retries--;
+					if (retries == 0)
+					{
+						// give up
+						break;
+					}
+					Thread.sleep(500L);
+				}
+				else
+				{
+					isLocked = false;
+				}
+			}
+			if (lastException != null || fileLock == null)
+			{
+				PortalUIPlugin.logError("Failed to lock " + fileName, lastException); //$NON-NLS-1$
+				return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, Messages.RubyInstallProcessor_failedToLock
+						+ fileName + Messages.RubyInstallProcessor_seeErrorLog, lastException);
+			}
+			if (fileLock != null)
+			{
+				fileLock.release();
+				randomAccessFile.close();
+				fileLock = null;
+			}
+		}
+		catch (Exception e)
+		{
+			return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, e.getMessage(), e);
+		}
+		finally
+		{
+			if (randomAccessFile != null)
+			{
+				try
+				{
+					randomAccessFile.close();
+				}
+				catch (IOException e)
+				{
+					// ignore
+				}
+			}
+		}
+		return Status.OK_STATUS;
+	}
+
+	/**
+	 * This method tries to access the given folder and write a test file into it before it can return an OK status.<br>
+	 * The check is done repeatedly for about 10 seconds, and if not successful, an Error status is returned.
+	 * 
+	 * @param installDir
+	 * @return The status for the check procedure (OK or Error)
+	 */
+	protected IStatus getFolderStatus(String installDir)
+	{
+		int retries = 20;
+		Throwable lastException = null;
+		boolean isLocked = true;
+		File tempFile = new File(installDir, ".tmp"); //$NON-NLS-1$
+		while (isLocked)
+		{
+			try
+			{
+				// fileLock = channel.lock(0L, Long.MAX_VALUE, true);
+				isLocked = !tempFile.createNewFile();
+				lastException = null;
+			}
+			catch (Exception e)
+			{
+				lastException = e;
+			}
+			if (isLocked)
+			{
+				retries--;
+				if (retries == 0)
+				{
+					// give up
+					break;
+				}
+				try
+				{
+					Thread.sleep(500L);
+				}
+				catch (InterruptedException e)
+				{
+					// ignore
+				}
+			}
+		}
+		if (isLocked)
+		{
+			PortalUIPlugin.logError("Failed to write to " + installDir, lastException); //$NON-NLS-1$
+			return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, Messages.RubyInstallProcessor_failedToWrite
+					+ installDir + Messages.RubyInstallProcessor_seeErrorLog, lastException);
+		}
+		if (tempFile != null)
+		{
+			tempFile.delete();
+		}
+		return Status.OK_STATUS;
+	}
+
+	public static IStatus extract(String zipFile, String targetFolder)
+	{
+		IStatus errorStatus = new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID,
+				Messages.RubyInstallProcessor_unableToExtractDevKit);
+		if (zipFile == null || targetFolder == null)
+		{
+			PortalUIPlugin.logError("Undefined zip file or target folder", new Exception()); //$NON-NLS-1$
+			return errorStatus;
+		}
+		IPath zipExecutable = getBundlePath(WINDOWS_7ZIP_EXECUTABLE);
+		File destinationFolder = new File(targetFolder);
+		if (!destinationFolder.exists() && !destinationFolder.mkdirs())
+		{
+			PortalUIPlugin.logError("Failed to create destination directory " + destinationFolder, new Exception()); //$NON-NLS-1$
+			return errorStatus;
+		}
+		ProcessBuilder processBuilder = new ProcessBuilder(zipExecutable.toOSString(), "x", //$NON-NLS-1$
+				"-o" + targetFolder, //$NON-NLS-1$
+				"-y", //$NON-NLS-1$
+				zipFile);
+		processBuilder.directory(destinationFolder);
+		processBuilder.redirectErrorStream(true);
+		String output = null;
+		try
+		{
+			Process process = processBuilder.start();
+			InputStreamGobbler errorGobbler = new InputStreamGobbler(process.getErrorStream(), "\n", null); //$NON-NLS-1$
+			InputStreamGobbler outputGobbler = new InputStreamGobbler(process.getInputStream(), "\n", null); //$NON-NLS-1$
+			outputGobbler.start();
+			errorGobbler.start();
+			process.waitFor();
+			outputGobbler.interrupt();
+			errorGobbler.interrupt();
+			outputGobbler.join();
+			errorGobbler.join();
+			output = outputGobbler.getResult();
+			String errors = errorGobbler.getResult();
+			int exitVal = process.exitValue();
+			if (exitVal == 0)
+			{
+				return Status.OK_STATUS;
+			}
+			else
+			{
+				PortalUIPlugin
+						.logError(
+								"DevKit extraction failed. The process returned " + exitVal, new Exception("Process output:\n" + errors)); //$NON-NLS-1$ //$NON-NLS-2$
+				return errorStatus;
+			}
+		}
+		catch (Exception e)
+		{
+			PortalUIPlugin.logError(e);
+			return errorStatus;
+		}
+		finally
+		{
+			if (output != null)
+			{
+				PortalUIPlugin.logInfo(output, null);
+			}
+		}
+	}
+
+	private static IPath getBundlePath(String path)
+	{
+		URL url = FileLocator.find(PortalUIPlugin.getDefault().getBundle(), Path.fromPortableString(path), null);
+		if (url != null)
+		{
+			try
+			{
+				url = FileLocator.toFileURL(url);
+				File file = new File(url.getPath());
+				if (file.exists())
+				{
+					return Path.fromOSString(file.getAbsolutePath());
+				}
+			}
+			catch (IOException e)
+			{
+				PortalUIPlugin.logError(e);
+			}
+		}
+		return null;
+	}
+
+	private void displayMessageInUIThread(final String title, final String message)
+	{
+		Display.getDefault().syncExec(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				MessageDialog.openInformation(null, title, message);
+			}
+		});
 	}
 
 	/*
@@ -216,6 +630,7 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 		public RubyInstallerOptionsDialog()
 		{
 			super(Display.getDefault().getActiveShell());
+			setTitleImage(PortalUIPlugin.getDefault().getImageRegistry().get(PortalUIPlugin.RUBY));
 			setBlockOnOpen(true);
 			setHelpAvailable(false);
 			installDir = RUBY_DEFAULT_INSTALL_PATH;
@@ -225,7 +640,7 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 		protected void configureShell(Shell newShell)
 		{
 			super.configureShell(newShell);
-			newShell.setText("Installer");
+			newShell.setText(Messages.RubyInstallProcessor_installerShellTitle);
 		}
 
 		/**
@@ -251,15 +666,15 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 			layout.marginTop = 4;
 			layout.marginBottom = 4;
 			inner.setLayout(layout);
-			
+
 			Group group = new Group(inner, SWT.NONE);
-			group.setText("Installer");
+			group.setText(Messages.RubyInstallProcessor_installerGroupTitle);
 			group.setLayout(new GridLayout());
 			GridData layoutData = new GridData(GridData.FILL_BOTH);
 			group.setLayoutData(layoutData);
-			
+
 			Label l = new Label(group, SWT.WRAP);
-			l.setText("Ruby will be installed into the following folder. \nClick ok to install, or select a different folder before you continue.");
+			l.setText(Messages.RubyInstallProcessor_installerMessage);
 			Composite installLocation = new Composite(group, SWT.NONE);
 			installLocation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			installLocation.setLayout(new GridLayout(2, false));
@@ -281,7 +696,7 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 				}
 			});
 			Button browse = new Button(installLocation, SWT.PUSH);
-			browse.setText("Browse");
+			browse.setText(Messages.RubyInstallProcessor_browse);
 			browse.addSelectionListener(new SelectionAdapter()
 			{
 				@Override
@@ -296,7 +711,7 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 					}
 				}
 			});
-			setTitle("Ruby Installer");
+			setTitle(Messages.RubyInstallProcessor_installerTitle);
 			return composite;
 		}
 	}

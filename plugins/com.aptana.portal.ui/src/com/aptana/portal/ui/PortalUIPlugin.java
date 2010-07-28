@@ -2,6 +2,7 @@ package com.aptana.portal.ui;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -17,6 +18,11 @@ public class PortalUIPlugin extends AbstractUIPlugin
 	// The browser Portal ID
 	public static final String PORTAL_ID = "com.aptana.portal.main"; //$NON-NLS-1$
 
+	/**
+	 * Ruby image key
+	 */
+	public static final String RUBY = "/icons/wizban/ruby.png"; //$NON-NLS-1$
+	
 	// The shared instance
 	private static PortalUIPlugin plugin;
 
@@ -55,19 +61,25 @@ public class PortalUIPlugin extends AbstractUIPlugin
 		return plugin;
 	}
 
-	public static void logInfo(String string, Exception e)
+	@Override
+	protected void initializeImageRegistry(ImageRegistry reg)
 	{
-		getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, string, e));
+		reg.put(RUBY, imageDescriptorFromPlugin(PLUGIN_ID, RUBY));
+	}
+	
+	public static void logInfo(String string, Throwable t)
+	{
+		getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, string, t));
 	}
 
-	public static void logError(Exception e)
+	public static void logError(Throwable t)
 	{
-		logError(e.getLocalizedMessage(), e);
+		logError(t.getLocalizedMessage(), t);
 	}
 
-	public static void logError(String string, Exception e)
+	public static void logError(String string, Throwable t)
 	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, string, e));
+		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, string, t));
 	}
 
 	public static void logWarning(String message)
