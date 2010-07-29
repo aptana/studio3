@@ -103,16 +103,26 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 			{
 				throw new CoreException(Status.CANCEL_STATUS);
 			}
+			
 			Thread.yield(); // be nice to other threads, let them get in before each file...
-			indexFileStore(index, file, sub.newChild(100));
+			
+			this.indexFileStore(index, file, sub.newChild(100));
 		}
 
 		sub.done();
 	}
 
+	/**
+	 * indexFileStore
+	 * 
+	 * @param index
+	 * @param file
+	 * @param monitor
+	 */
 	private void indexFileStore(Index index, IFileStore file, IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
+		
 		if (file == null)
 		{
 			return;
