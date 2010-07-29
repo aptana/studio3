@@ -8,10 +8,6 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.Path;
 
-import com.aptana.editor.js.inferencing.JSNodeTypeInferrer;
-import com.aptana.editor.js.inferencing.JSPropertyCollection;
-import com.aptana.editor.js.inferencing.JSScope;
-import com.aptana.editor.js.inferencing.JSSymbolCollector;
 import com.aptana.editor.js.parsing.JSParser;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
@@ -80,11 +76,7 @@ public class ScopeTests extends FileContentBasedTests
 		
 		if (root instanceof JSParseRootNode)
 		{
-			JSSymbolCollector s = new JSSymbolCollector();
-			
-			((JSParseRootNode) root).accept(s);
-			
-			result = s.getScope();
+			result = ((JSParseRootNode) root).getGlobals();
 		}
 		
 		return result;
