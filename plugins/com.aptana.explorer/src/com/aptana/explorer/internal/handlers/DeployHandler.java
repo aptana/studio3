@@ -7,12 +7,14 @@ import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.PlatformUI;
 
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
+import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.ide.syncing.core.ISiteConnection;
@@ -29,41 +31,44 @@ public class DeployHandler extends AbstractHandler
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
-		if (isCapistranoProject(selectedProject))
+		
+		DeployType type = DeployPreferenceUtil.getDeployType(selectedProject);
+		
+		if (type == null)
 		{
-			TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
-					selectedProject.getLocation());
-			terminal.sendInput("cap deploy\n"); //$NON-NLS-1$
-		}
-		else if (selectedProject != null && isFTPProject(selectedProject))
-		{
-			SynchronizeProjectAction action = new SynchronizeProjectAction();
-			action.setActivePart(null, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-					.getActivePart());
-			action.setSelection(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService()
-					.getSelection());
-			ISiteConnection[] sites = SiteConnectionUtils.findSitesForSource(selectedProject, true);
-			if (sites.length > 1)
+			if (isCapistranoProject(selectedProject))
 			{
-				String lastConnection = ResourceSynchronizationUtils.getLastSyncConnection(selectedProject);
-				if (lastConnection == null)
-				{
-					lastConnection = DeployPreferenceUtil.getDeployEndpoint(selectedProject);
-				}
-				if (lastConnection != null)
-				{
-					action.setSelectedSite(SiteConnectionUtils.getSiteWithDestination(lastConnection, sites));
-				}
+				deployWithCapistrano();
 			}
-			action.run(null);
+			else if (selectedProject != null && isFTPProject(selectedProject))
+			{
+				deployWithFTP();
+			}
+			else if (selectedProject != null && isHerokuProject(selectedProject))
+			{
+				deployWithHeroku();
+			}
+			else if (selectedProject != null && isEYProject(selectedProject))
+			{
+				deployWithEngineYard();
+			}
 		}
-		else if (selectedProject != null && isHerokuProject(selectedProject))
+		else if (type == DeployType.HEROKU)
 		{
-			TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
-					selectedProject.getLocation());
-			terminal.sendInput("git push heroku master\n"); //$NON-NLS-1$
+			deployWithHeroku();
 		}
-
+		else if (type == DeployType.FTP)
+		{
+			deployWithFTP();
+		}
+		else if (type == DeployType.CAPISTRANO)
+		{
+			deployWithCapistrano();
+		}
+		else if (isEYProject(selectedProject))
+		{
+			deployWithEngineYard();
+		}
 		return null;
 	}
 
@@ -104,6 +109,62 @@ public class DeployHandler extends AbstractHandler
 		}
 	}
 
+	private void deployWithCapistrano(){
+		TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
+				selectedProject.getLocation());
+		terminal.sendInput("cap deploy\n");
+	}
+	
+	private void deployWithEngineYard(){
+		TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
+				selectedProject.getLocation());
+		terminal.sendInput("ey deploy\n");
+	}
+	private void deployWithHeroku(){
+		TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
+				selectedProject.getLocation());
+		terminal.sendInput("git push heroku master\n");
+	}
+	
+	private void deployWithFTP(){
+		SynchronizeProjectAction action = new SynchronizeProjectAction();
+		action.setActivePart(null, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+				.getActivePart());
+		action.setSelection(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService()
+				.getSelection());
+		ISiteConnection[] sites = SiteConnectionUtils.findSitesForSource(selectedProject, true);
+		if (sites.length > 1)
+		{
+			String lastConnection = ResourceSynchronizationUtils.getLastSyncConnection(selectedProject);
+			if (lastConnection == null)
+			{
+				lastConnection = DeployPreferenceUtil.getDeployEndpoint(selectedProject);
+			}
+			if (lastConnection != null)
+			{
+				action.setSelectedSite(SiteConnectionUtils.getSiteWithDestination(lastConnection, sites));
+			}
+		}
+		action.run(null);
+	}
+	
+	private boolean isEYProject(IProject selectedProject)
+	{
+
+		DeployType type = DeployPreferenceUtil.getDeployType(selectedProject);
+		
+		// Engine Yard gem does not work in Windows
+		if(!Platform.getOS().equals(Platform.OS_WIN32))
+		{
+			if (type.equals(DeployType.ENGINEYARD))
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	private boolean isCapistranoProject(IProject selectedProject)
 	{
 		return selectedProject.getFile("Capfile").exists(); //$NON-NLS-1$

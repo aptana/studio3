@@ -32,6 +32,7 @@ public class RubyFileIndexingParticipant implements IFileStoreIndexingParticipan
 			{
 				throw new CoreException(Status.CANCEL_STATUS);
 			}
+			Thread.yield(); // be nice to other threads, let them get in before each file...
 			indexFileStore(index, store, sub.newChild(100));
 		}
 	}
