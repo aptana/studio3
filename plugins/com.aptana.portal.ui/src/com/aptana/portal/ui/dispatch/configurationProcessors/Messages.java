@@ -8,10 +8,13 @@ public class Messages extends NLS
 	public static String GemsConfigurationProcessor_errorInvokingGemList;
 	public static String GemsConfigurationProcessor_missingShellError;
 	public static String GemsConfigurationProcessor_wrongGemsRequest;
+	public static String RubyInstallProcessor_aptanaFileComment;
 	public static String RubyInstallProcessor_browse;
 	public static String RubyInstallProcessor_corruptedDevKitZip;
 	public static String RubyInstallProcessor_couldNotLocateDevKit;
 	public static String RubyInstallProcessor_couldNotLocateRubyinstaller;
+	public static String RubyInstallProcessor_errorWhileInstallingRuby;
+	public static String RubyInstallProcessor_extractingDevKitTaskName;
 	public static String RubyInstallProcessor_failedToinstallDevKit;
 	public static String RubyInstallProcessor_failedToInstallRuby;
 	public static String RubyInstallProcessor_failedToLock;
@@ -32,6 +35,7 @@ public class Messages extends NLS
 	public static String RubyInstallProcessor_rubyInstallerJobName;
 	public static String RubyInstallProcessor_seeErrorLog;
 	public static String RubyInstallProcessor_unableToExtractDevKit;
+	public static String RubyInstallProcessor_updatingDevKitTaskName;
 	public static String RubyInstallProcessor_wrongNumberOfRubyInstallLinks;
 	public static String SystemConfigurationProcessor_missingConfigurationItems;
 	public static String SystemConfigurationProcessor_noShellCommandPath;

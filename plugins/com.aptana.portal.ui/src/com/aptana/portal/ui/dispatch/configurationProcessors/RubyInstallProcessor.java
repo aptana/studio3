@@ -1,11 +1,16 @@
 package com.aptana.portal.ui.dispatch.configurationProcessors;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
@@ -52,12 +57,16 @@ import com.aptana.portal.ui.PortalUIPlugin;
  */
 public class RubyInstallProcessor extends AbstractConfigurationProcessor
 {
-	protected static String RUBY_DEFAULT_INSTALL_PATH = "C:\\Ruby"; //$NON-NLS-1$
+	protected static final String RUBY_DEFAULT_INSTALL_PATH = "C:\\Ruby19"; //$NON-NLS-1$
+	protected static final String DEVKIT_FSTAB_PATH = "\\devkit\\msys\\1.0.11\\etc\\fstab"; //$NON-NLS-1$
+	protected static final String DEVKIT_FSTAB_LOCATION_PREFIX = "C:/Ruby/"; //$NON-NLS-1$
+	protected static final String APTANA_PROPERTIES_FILE_NAME = ".aptana"; //$NON-NLS-1$
 	private static final String WINDOWS_7ZIP_EXECUTABLE = "$os$/7za.exe"; //$NON-NLS-1$
 	// The process return code for a Ruby installer cancel.
 	private static final int RUBY_INSTALLER_PROCESS_CANCEL = 5;
 	private static boolean installationInProgress;
 	private String[] downloadedPaths;
+	private String[] urls;
 
 	/**
 	 * Configure Ruby on the machine.<br>
@@ -104,10 +113,27 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 
 			// Start the installation...
 			configurationStatus.setStatus(ConfigurationStatus.PROCESSING);
-			download(attrArray, progressMonitor);
-			// downloadedPaths = new String[] {};
-			install(progressMonitor);
-			configurationStatus.setStatus(ConfigurationStatus.OK);
+			IStatus status = download(attrArray, progressMonitor);
+			if (status.isOK())
+			{
+				status = install(progressMonitor);
+			}
+			switch (status.getCode())
+			{
+				case IStatus.OK:
+				case IStatus.INFO:
+				case IStatus.WARNING:
+					configurationStatus.setStatus(ConfigurationStatus.OK);
+					break;
+				case IStatus.ERROR:
+					configurationStatus.setStatus(ConfigurationStatus.ERROR);
+					break;
+				case IStatus.CANCEL:
+					configurationStatus.setStatus(ConfigurationStatus.INCOMPLETE);
+					break;
+				default:
+					configurationStatus.setStatus(ConfigurationStatus.UNKNOWN);
+			}
 			return configurationStatus;
 		}
 		finally
@@ -125,16 +151,19 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 	 * @param URLs
 	 * @param progressMonitor
 	 */
-	private void download(Object[] URLs, IProgressMonitor progressMonitor)
+	private IStatus download(Object[] URLs, IProgressMonitor progressMonitor)
 	{
 		downloadedPaths = null;
 		DownloadManager downloadManager = new DownloadManager();
+		urls = new String[URLs.length];
 		List<URL> urlsList = new ArrayList<URL>(URLs.length);
-		for (Object o : URLs)
+		for (int i = 0; i < URLs.length; i++)
 		{
 			try
 			{
-				urlsList.add(new URL(o.toString()));
+				Object o = URLs[i];
+				urls[i] = o.toString();
+				urlsList.add(new URL(urls[i]));
 			}
 			catch (MalformedURLException mue)
 			{
@@ -149,19 +178,22 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 			{
 				downloadedPaths = downloadManager.getContentsLocations();
 			}
+			return status;
 		}
 		catch (Exception e)
 		{
 			PortalUIPlugin.logError(e);
 		}
+		return Status.CANCEL_STATUS;
 	}
 
 	/**
 	 * Install Ruby and DevKit.
 	 * 
 	 * @param progressMonitor
+	 * @return
 	 */
-	private void install(IProgressMonitor progressMonitor)
+	private IStatus install(IProgressMonitor progressMonitor)
 	{
 		if (downloadedPaths == null || downloadedPaths[0] == null || downloadedPaths[1] == null)
 		{
@@ -171,8 +203,9 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 				failureMessge = Messages.RubyInstallProcessor_couldNotLocateDevKit;
 			}
 			displayMessageInUIThread(Messages.RubyInstallProcessor_installationErrorTitle,
-					Messages.RubyInstallProcessor_failedToInstallRuby + failureMessge);
-			return;
+					Messages.RubyInstallProcessor_failedToInstallRuby + ' ' + failureMessge);
+			return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID,
+					Messages.RubyInstallProcessor_failedToInstallRuby + ' ' + failureMessge);
 		}
 		SubMonitor subMonitor = SubMonitor.convert(progressMonitor,
 				Messages.RubyInstallProcessor_installerProgressInfo, IProgressMonitor.UNKNOWN);
@@ -208,7 +241,7 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 			IStatus result = installRubyDialog.getResult();
 			if (!result.isOK())
 			{
-				return;
+				return result;
 			}
 
 			IStatus status = installRuby(installDir[0]);
@@ -218,7 +251,7 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 				{
 					displayMessageInUIThread(Messages.RubyInstallProcessor_installationErrorTitle, status.getMessage());
 				}
-				return;
+				return status;
 			}
 			PortalUIPlugin.logInfo(
 					"Successfully installed Ruby into " + installDir[0] + ". Starting to install DevKit...", null); //$NON-NLS-1$ //$NON-NLS-2$
@@ -228,14 +261,18 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 			if (!status.isOK())
 			{
 				displayMessageInUIThread(Messages.RubyInstallProcessor_installationErrorTitle, status.getMessage());
-				return;
+				return status;
 			}
+			finalizeInstallation(installDir[0]);
 			PortalUIPlugin.logInfo(
 					"Successfully installed DevKit into " + installDir[0] + ". Ruby installation completed.", null); //$NON-NLS-1$ //$NON-NLS-2$
+			return Status.OK_STATUS;
 		}
 		catch (Exception e)
 		{
 			PortalUIPlugin.logError("Error while installing Ruby", e); //$NON-NLS-1$
+			return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID,
+					Messages.RubyInstallProcessor_errorWhileInstallingRuby);
 		}
 		finally
 		{
@@ -243,6 +280,12 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 		}
 	}
 
+	/**
+	 * Run the Ruby installer and install Ruby into the given directory.
+	 * 
+	 * @param installDir
+	 * @return The status of this installation
+	 */
 	protected IStatus installRuby(final String installDir)
 	{
 		Job job = new Job(Messages.RubyInstallProcessor_rubyInstallerJobName)
@@ -325,6 +368,7 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 	 * At this stage, we assume that the install dir and the DevKit package have been verified and valid!
 	 * 
 	 * @param installDir
+	 * @return The result status of the installation
 	 * @throws Exception
 	 */
 	protected IStatus installDevKit(final String installDir)
@@ -336,6 +380,8 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 			{
 				try
 				{
+					SubMonitor subMonitor = SubMonitor.convert(monitor, 1000);
+					subMonitor.beginTask(Messages.RubyInstallProcessor_extractingDevKitTaskName + installDir, 900);
 					// We get a folder status first, before unzipping into the folder. This folder was just created,
 					// so there is a chance it's still being held by the OS or by the Ruby installer.
 					IStatus folderStatus = LockUtils.waitForFolderAccess(installDir, 10000);
@@ -349,11 +395,45 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 					// This extraction process follows the instructions at:
 					// http://wiki.github.com/oneclick/rubyinstaller/development-kit
 					extract(downloadedPaths[1], installDir);
+					subMonitor.worked(900);
+
+					subMonitor.beginTask(Messages.RubyInstallProcessor_updatingDevKitTaskName, 100);
+					// Update the /devkit/msys/1.0.11/etc/fstab with the Ruby installation path
+					File fstab = new File(installDir, DEVKIT_FSTAB_PATH);
+					StringBuilder builder = new StringBuilder();
+					// read the content of the original file and update the Ruby location to the selected one. Then,
+					// save the new content and override the file.
+					String pathReplacement = installDir.replaceAll("\\\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$
+					if (!pathReplacement.endsWith("/")) //$NON-NLS-1$
+					{
+						pathReplacement = pathReplacement + '/';
+					}
+					String newLine = System.getProperty("line.separator", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+					BufferedReader reader = new BufferedReader(new FileReader(fstab));
+					String line = null;
+					while ((line = reader.readLine()) != null)
+					{
+						line = line.replaceAll(DEVKIT_FSTAB_LOCATION_PREFIX, pathReplacement);
+						builder.append(line);
+						builder.append(newLine);
+					}
+					reader.close();
+					// Now save the modified content into the same file
+					FileWriter writer = new FileWriter(fstab);
+					writer.write(builder.toString());
+					writer.flush();
+					writer.close();
+					subMonitor.worked(100);
 				}
 				catch (Throwable t)
 				{
+					PortalUIPlugin.logError("Failed to install DevKit", t); //$NON-NLS-1$
 					return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID,
 							Messages.RubyInstallProcessor_failedToinstallDevKit, t);
+				}
+				finally
+				{
+					monitor.done();
 				}
 				return Status.OK_STATUS;
 			}
@@ -370,6 +450,50 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 		return job.getResult();
 	}
 
+	/**
+	 * Finalize the installation by placing a .aptana file in the installed directory, specifying some properties.
+	 * 
+	 * @param installDir
+	 */
+	protected void finalizeInstallation(String installDir)
+	{
+		File propertiesFile = new File(installDir, APTANA_PROPERTIES_FILE_NAME);
+		Properties properties = new Properties();
+		properties.put("ruby_install", urls[0]); //$NON-NLS-1$
+		properties.put("devkit_install", urls[1]); //$NON-NLS-1$
+		FileOutputStream fileOutputStream = null;
+		try
+		{
+			fileOutputStream = new FileOutputStream(propertiesFile);
+			properties.store(fileOutputStream, Messages.RubyInstallProcessor_aptanaFileComment);
+		}
+		catch (IOException e)
+		{
+			PortalUIPlugin.logError(e);
+		}
+		finally
+		{
+			if (fileOutputStream != null)
+			{
+				try
+				{
+					fileOutputStream.flush();
+					fileOutputStream.close();
+				}
+				catch (IOException e)
+				{
+				}
+			}
+		}
+	}
+
+	/**
+	 * Extract the given zip file into the target folder.
+	 * 
+	 * @param zipFile
+	 * @param targetFolder
+	 * @return The status of that extraction result.
+	 */
 	public static IStatus extract(String zipFile, String targetFolder)
 	{
 		IStatus errorStatus = new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID,
@@ -434,6 +558,9 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 		}
 	}
 
+	/*
+	 * Returns an IPath from the given portable string.
+	 */
 	private static IPath getBundlePath(String path)
 	{
 		URL url = FileLocator.find(PortalUIPlugin.getDefault().getBundle(), Path.fromPortableString(path), null);
