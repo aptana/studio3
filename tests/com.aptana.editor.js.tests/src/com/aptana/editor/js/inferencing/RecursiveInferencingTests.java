@@ -9,16 +9,37 @@ public class RecursiveInferencingTests extends InferencingTestsBase
 	public void testIdentifierCycle()
 	{
 		this.varTypeTests("var a = b, b = a;", "a");
-		this.varTypeTests("var a = b, b = a;", "b");
 	}
-
+	
 	/**
 	 * testIdentifierCycle2
 	 */
 	public void testIdentifierCycle2()
 	{
+		this.varTypeTests("var a = b, b = a;", "b");
+	}
+
+	/**
+	 * testIdentifierCycle3
+	 */
+	public void testIdentifierCycle3()
+	{
 		this.varTypeTests("var a = b, b = c, c = a;", "a");
+	}
+	
+	/**
+	 * testIdentifierCycle4
+	 */
+	public void testIdentifierCycle4()
+	{
 		this.varTypeTests("var a = b, b = c, c = a;", "b");
+	}
+	
+	/**
+	 * testIdentifierCycle5
+	 */
+	public void testIdentifierCycle5()
+	{
 		this.varTypeTests("var a = b, b = c, c = a;", "c");
 	}
 
