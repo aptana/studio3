@@ -416,10 +416,10 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				item.setText(Messages.SingleProjectView_DeleteProjectMenuItem_LBL);
 				item.addSelectionListener(new SelectionAdapter()
 				{
-
 					@Override
 					public void widgetSelected(SelectionEvent e)
 					{
+						DeployPreferenceUtil.setDeployType(selectedProject, DeployType.NONE);
 						DeleteResourceAction action = new DeleteResourceAction(getSite());
 						action.selectionChanged(new StructuredSelection(selectedProject));
 						action.run();
