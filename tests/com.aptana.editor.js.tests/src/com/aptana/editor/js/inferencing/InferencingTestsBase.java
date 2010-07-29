@@ -1,11 +1,26 @@
 package com.aptana.editor.js.inferencing;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.text.MessageFormat;
 import java.util.LinkedList;
 import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+
+import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.ResourceUtil;
+import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSTypeConstants;
+import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
 import com.aptana.editor.js.parsing.JSParser;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
@@ -14,8 +29,86 @@ import com.aptana.index.core.IndexManager;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
 
-public class InferencingTestsBase extends TestCase
+public abstract class InferencingTestsBase extends TestCase
 {
+	public class Indexer extends JSFileIndexingParticipant
+	{
+		public void indexTree(Index index, JSParseRootNode root, URI location)
+		{
+			this.processParseResults(index, root, location);
+		}
+	}
+
+	/**
+	 * getContent
+	 * 
+	 * @param file
+	 * @return
+	 */
+	protected String getContent(File file)
+	{
+		String result = "";
+
+		try
+		{
+			FileInputStream input = new FileInputStream(file);
+
+			result = IOUtil.read(input);
+		}
+		catch (IOException e)
+		{
+			fail(e.getMessage());
+		}
+
+		return result;
+	}
+
+	/**
+	 * getContent
+	 * 
+	 * @param path
+	 * @return
+	 */
+	protected String getContent(String path)
+	{
+		File file = this.getFile(new Path(path));
+
+		return this.getContent(file);
+	}
+
+	/**
+	 * getFile
+	 * 
+	 * @param path
+	 * @return
+	 */
+	protected File getFile(IPath path)
+	{
+		File result = null;
+
+		try
+		{
+			URL url = FileLocator.find(Activator.getDefault().getBundle(), path, null);
+			URL fileURL = FileLocator.toFileURL(url);
+			URI fileURI = ResourceUtil.toURI(fileURL);
+
+			result = new File(fileURI);
+		}
+		catch (IOException e)
+		{
+			fail(e.getMessage());
+		}
+		catch (URISyntaxException e)
+		{
+			fail(e.getMessage());
+		}
+
+		assertNotNull(result);
+		assertTrue(result.exists());
+
+		return result;
+	}
+
 	/**
 	 * JSScope
 	 * 
@@ -66,7 +159,32 @@ public class InferencingTestsBase extends TestCase
 	 */
 	protected URI getIndexURI()
 	{
-		return null;
+		return URI.create("inference.testing");
+	}
+
+	/**
+	 * getLastStatementTypes
+	 * 
+	 * @param source
+	 * @return
+	 */
+	public List<String> getLastStatementTypes(String source)
+	{
+		IParseNode root = this.getParseRootNode(source);
+		assertNotNull(root);
+		assertTrue(root instanceof JSParseRootNode);
+
+		IParseNode invocation = root.getLastChild();
+		assertNotNull(invocation);
+		assertTrue(invocation instanceof JSNode);
+
+		JSScope globals = this.getGlobals((JSParseRootNode) root);
+		assertNotNull(globals);
+
+		Indexer indexer = new Indexer();
+		indexer.indexTree(this.getIndex(), (JSParseRootNode) root, this.getLocation());
+
+		return this.getTypes(globals, (JSNode) invocation);
 	}
 
 	/**
@@ -76,7 +194,7 @@ public class InferencingTestsBase extends TestCase
 	 */
 	protected URI getLocation()
 	{
-		return null;
+		return URI.create("inference_file.js");
 	}
 
 	/**
@@ -141,6 +259,48 @@ public class InferencingTestsBase extends TestCase
 		}
 
 		return result;
+	}
+
+	/**
+	 * invocationTypeTests
+	 * 
+	 * @param source
+	 * @param types
+	 */
+	public void lastStatementTypeTests(String source, String... types)
+	{
+		List<String> invocationTypes = this.getLastStatementTypes(source);
+		assertNotNull(invocationTypes);
+
+		assertEquals(types.length, invocationTypes.size());
+
+		for (String type : types)
+		{
+			String message = MessageFormat.format("Unable to locate {0} in {1}", type, invocationTypes);
+
+			if (JSTypeConstants.DYNAMIC_CLASS_PREFIX.equals(type))
+			{
+				boolean match = false;
+
+				for (String returnedType : invocationTypes)
+				{
+					if (returnedType.startsWith(JSTypeConstants.DYNAMIC_CLASS_PREFIX))
+					{
+						match = true;
+						break;
+					}
+				}
+
+				if (match == false)
+				{
+					fail(message);
+				}
+			}
+			else
+			{
+				assertTrue(message, invocationTypes.contains(type));
+			}
+		}
 	}
 
 	/*
