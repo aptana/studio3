@@ -98,7 +98,10 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		{
 			applyThemeToJDTEditor(getCurrentTheme(), false);
 			applyThemeToConsole(getCurrentTheme(), false);
-			window.getActivePage().addPartListener(this);
+			if (window != null && window.getActivePage() != null)
+			{
+				window.getActivePage().addPartListener(this);
+			}
 			hijackCurrentViews(window, false);
 		}
 		else
