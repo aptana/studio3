@@ -19,22 +19,21 @@ import org.eclipse.swt.widgets.Text;
 
 import com.aptana.deploy.Activator;
 import com.aptana.deploy.EngineYardAPI;
+import com.aptana.deploy.ILoginValidator;
 
-public class EngineYardLoginWizardPage extends WizardPage
+public class EngineYardLoginWizardPage extends WizardPage implements ILoginValidator
 {
 	private static final String NAME = "EngineYardLogin"; //$NON-NLS-1$
 	private static final String ENGINE_YARD_ICON = "icons/ey_small.png"; //$NON-NLS-1$
 
 	private Text userId;
 	private Text password;
-	private static Boolean pageComplete;
 
 	private IWizardPage fNextPage;
 
 	protected EngineYardLoginWizardPage()
 	{
 		super(NAME, Messages.EngineYardLoginWizardPage_Title, Activator.getImageDescriptor(ENGINE_YARD_ICON));
-		pageComplete = false;
 	}
 
 	@Override
@@ -92,22 +91,10 @@ public class EngineYardLoginWizardPage extends WizardPage
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				// Try to verify credentials with Engine Yard and write them to a file
-				EngineYardAPI api = new EngineYardAPI();
-				if (!api.writeCredentials(userId.getText(), password.getText()))
+				if (validateLogin() && isPageComplete())
 				{
-					MessageDialog.openError(getShell(), Messages.EngineYardLoginWizardPage_ErrorTitle,
-							Messages.EngineYardLoginWizardPage_InvalidCredentails_Message);
+					getContainer().showPage(getNextPage());
 				}
-				else
-				{
-					// Enable next button if credentials were valid, and we were able to write it into a file
-					pageComplete = true;
-					setPageComplete(true);
-					MessageDialog.openInformation(getShell(), Messages.EngineYardLoginWizardPage_SuccessTitle,
-							Messages.EngineYardLoginWizardPage_Success_Message);
-				}
-
 			}
 		});
 
@@ -132,6 +119,7 @@ public class EngineYardLoginWizardPage extends WizardPage
 	@Override
 	public IWizardPage getNextPage()
 	{
+
 		if (fNextPage == null)
 		{
 			fNextPage = new EngineYardDeployWizardPage();
@@ -158,7 +146,21 @@ public class EngineYardLoginWizardPage extends WizardPage
 		}
 
 		setErrorMessage(null);
-		return pageComplete;
+		return true;
+	}
+
+	public Boolean validateLogin()
+	{
+		// Try to verify credentials with Engine Yard and write them to a file
+		EngineYardAPI api = new EngineYardAPI();
+		if (!api.writeCredentials(userId.getText(), password.getText()))
+		{
+			MessageDialog.openError(getShell(), Messages.EngineYardLoginWizardPage_ErrorTitle,
+					Messages.EngineYardLoginWizardPage_InvalidCredentails_Message);
+			return false;
+		}
+
+		return true;
 	}
 
 }

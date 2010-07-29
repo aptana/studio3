@@ -23,8 +23,9 @@ import org.eclipse.swt.widgets.Text;
 
 import com.aptana.deploy.Activator;
 import com.aptana.deploy.HerokuAPI;
+import com.aptana.deploy.ILoginValidator;
 
-public class HerokuLoginWizardPage extends WizardPage
+public class HerokuLoginWizardPage extends WizardPage implements ILoginValidator
 {
 	private static final String NAME = "HerokuLogin"; //$NON-NLS-1$
 	private static final String HEROKU_ICON = "icons/heroku.png"; //$NON-NLS-1$
@@ -94,20 +95,10 @@ public class HerokuLoginWizardPage extends WizardPage
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				HerokuAPI api = new HerokuAPI(userId.getText(), password.getText());
-				IStatus status = api.authenticate();
-				if (!status.isOK())
+//				api.writeCredentials(); // we write them automatically via a page changed listener below...
+				if (validateLogin() && isPageComplete())
 				{
-					setErrorMessage(status.getMessage());
-				}
-				else
-				{
-//					api.writeCredentials(); // we write them automatically via a page changed listener below...
-					// if page is complete move on to next page
-					if (isPageComplete())
-					{
-						getContainer().showPage(getNextPage());
-					}
+					getContainer().showPage(getNextPage());
 				}
 			}
 		});
@@ -177,6 +168,19 @@ public class HerokuLoginWizardPage extends WizardPage
 		}
 
 		setErrorMessage(null);
+		return true;
+	}
+	
+	public Boolean validateLogin()
+	{
+		HerokuAPI api = new HerokuAPI(userId.getText(), password.getText());
+		IStatus status = api.authenticate();
+		if (!status.isOK())
+		{
+			setErrorMessage(status.getMessage());
+			return false;
+		}
+		
 		return true;
 	}
 
