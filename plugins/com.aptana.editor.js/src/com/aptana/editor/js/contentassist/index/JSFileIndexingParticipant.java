@@ -150,7 +150,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 						sub.worked(50);
 
 						// process results
-						this.processParseResults(index, file, parseState.getParseResult());
+						this.processParseResults(index, parseState.getParseResult(), file.toURI());
 					}
 				}
 			}
@@ -219,9 +219,8 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 	 * @param file
 	 * @param parseState
 	 */
-	private void processParseResults(Index index, IFileStore file, IParseNode ast)
+	protected void processParseResults(Index index, IParseNode ast, URI location)
 	{
-		URI location = file.toURI();
 		JSScope globals = this.getGlobals(ast);
 
 		if (globals != null)
