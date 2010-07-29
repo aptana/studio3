@@ -1,4 +1,4 @@
-package com.aptana.editor.js.contentassist;
+package com.aptana.editor.js.inferencing;
 
 import java.io.File;
 import java.util.HashSet;
