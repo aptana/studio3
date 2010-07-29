@@ -6,17 +6,10 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -40,11 +33,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.progress.UIJob;
 
-import com.aptana.configurations.processor.AbstractConfigurationProcessor;
 import com.aptana.configurations.processor.ConfigurationStatus;
-import com.aptana.core.util.InputStreamGobbler;
 import com.aptana.ide.core.io.LockUtils;
-import com.aptana.ide.core.io.downloader.DownloadManager;
 import com.aptana.portal.ui.PortalUIPlugin;
 
 /**
@@ -55,18 +45,14 @@ import com.aptana.portal.ui.PortalUIPlugin;
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
-public class RubyInstallProcessor extends AbstractConfigurationProcessor
+public class RubyInstallProcessor extends InstallerConfigurationProcessor
 {
 	protected static final String RUBY_DEFAULT_INSTALL_PATH = "C:\\Ruby19"; //$NON-NLS-1$
 	protected static final String DEVKIT_FSTAB_PATH = "\\devkit\\msys\\1.0.11\\etc\\fstab"; //$NON-NLS-1$
 	protected static final String DEVKIT_FSTAB_LOCATION_PREFIX = "C:/Ruby/"; //$NON-NLS-1$
-	protected static final String APTANA_PROPERTIES_FILE_NAME = ".aptana"; //$NON-NLS-1$
-	private static final String WINDOWS_7ZIP_EXECUTABLE = "$os$/7za.exe"; //$NON-NLS-1$
 	// The process return code for a Ruby installer cancel.
 	private static final int RUBY_INSTALLER_PROCESS_CANCEL = 5;
 	private static boolean installationInProgress;
-	private String[] downloadedPaths;
-	private String[] urls;
 
 	/**
 	 * Configure Ruby on the machine.<br>
@@ -123,6 +109,9 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 				case IStatus.OK:
 				case IStatus.INFO:
 				case IStatus.WARNING:
+					displayMessageInUIThread(MessageDialog.INFORMATION,
+							Messages.RubyInstallProcessor_installationErrorTitle,
+							Messages.RubyInstallProcessor_rubyInstallationSuccessful);
 					configurationStatus.setStatus(ConfigurationStatus.OK);
 					break;
 				case IStatus.ERROR:
@@ -146,48 +135,6 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 	}
 
 	/**
-	 * Download the remote content and store it the temp directory.
-	 * 
-	 * @param URLs
-	 * @param progressMonitor
-	 */
-	private IStatus download(Object[] URLs, IProgressMonitor progressMonitor)
-	{
-		downloadedPaths = null;
-		DownloadManager downloadManager = new DownloadManager();
-		urls = new String[URLs.length];
-		List<URL> urlsList = new ArrayList<URL>(URLs.length);
-		for (int i = 0; i < URLs.length; i++)
-		{
-			try
-			{
-				Object o = URLs[i];
-				urls[i] = o.toString();
-				urlsList.add(new URL(urls[i]));
-			}
-			catch (MalformedURLException mue)
-			{
-				PortalUIPlugin.logError(mue);
-			}
-		}
-		try
-		{
-			downloadManager.addURLs(urlsList);
-			IStatus status = downloadManager.start(progressMonitor);
-			if (status.isOK())
-			{
-				downloadedPaths = downloadManager.getContentsLocations();
-			}
-			return status;
-		}
-		catch (Exception e)
-		{
-			PortalUIPlugin.logError(e);
-		}
-		return Status.CANCEL_STATUS;
-	}
-
-	/**
 	 * Install Ruby and DevKit.
 	 * 
 	 * @param progressMonitor
@@ -202,7 +149,7 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 			{
 				failureMessge = Messages.RubyInstallProcessor_couldNotLocateDevKit;
 			}
-			displayMessageInUIThread(Messages.RubyInstallProcessor_installationErrorTitle,
+			displayMessageInUIThread(MessageDialog.ERROR, Messages.RubyInstallProcessor_installationErrorTitle,
 					Messages.RubyInstallProcessor_failedToInstallRuby + ' ' + failureMessge);
 			return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID,
 					Messages.RubyInstallProcessor_failedToInstallRuby + ' ' + failureMessge);
@@ -249,7 +196,8 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 			{
 				if (status.getSeverity() != IStatus.CANCEL)
 				{
-					displayMessageInUIThread(Messages.RubyInstallProcessor_installationErrorTitle, status.getMessage());
+					displayMessageInUIThread(MessageDialog.ERROR, Messages.RubyInstallProcessor_installationErrorTitle,
+							status.getMessage());
 				}
 				return status;
 			}
@@ -260,7 +208,8 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 			status = installDevKit(installDir[0]);
 			if (!status.isOK())
 			{
-				displayMessageInUIThread(Messages.RubyInstallProcessor_installationErrorTitle, status.getMessage());
+				displayMessageInUIThread(MessageDialog.ERROR, Messages.RubyInstallProcessor_installationErrorTitle,
+						status.getMessage());
 				return status;
 			}
 			finalizeInstallation(installDir[0]);
@@ -394,7 +343,7 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 					// DevKit arrives as a 7zip package, so we use a specific Windows decoder to extract it.
 					// This extraction process follows the instructions at:
 					// http://wiki.github.com/oneclick/rubyinstaller/development-kit
-					extract(downloadedPaths[1], installDir);
+					extractWin(downloadedPaths[1], installDir);
 					subMonitor.worked(900);
 
 					subMonitor.beginTask(Messages.RubyInstallProcessor_updatingDevKitTaskName, 100);
@@ -457,6 +406,7 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 	 */
 	protected void finalizeInstallation(String installDir)
 	{
+		super.finalizeInstallation(installDir);
 		File propertiesFile = new File(installDir, APTANA_PROPERTIES_FILE_NAME);
 		Properties properties = new Properties();
 		properties.put("ruby_install", urls[0]); //$NON-NLS-1$
@@ -485,114 +435,6 @@ public class RubyInstallProcessor extends AbstractConfigurationProcessor
 				}
 			}
 		}
-	}
-
-	/**
-	 * Extract the given zip file into the target folder.
-	 * 
-	 * @param zipFile
-	 * @param targetFolder
-	 * @return The status of that extraction result.
-	 */
-	public static IStatus extract(String zipFile, String targetFolder)
-	{
-		IStatus errorStatus = new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID,
-				Messages.RubyInstallProcessor_unableToExtractDevKit);
-		if (zipFile == null || targetFolder == null)
-		{
-			PortalUIPlugin.logError("Undefined zip file or target folder", new Exception()); //$NON-NLS-1$
-			return errorStatus;
-		}
-		IPath zipExecutable = getBundlePath(WINDOWS_7ZIP_EXECUTABLE);
-		File destinationFolder = new File(targetFolder);
-		if (!destinationFolder.exists() && !destinationFolder.mkdirs())
-		{
-			PortalUIPlugin.logError("Failed to create destination directory " + destinationFolder, new Exception()); //$NON-NLS-1$
-			return errorStatus;
-		}
-		ProcessBuilder processBuilder = new ProcessBuilder(zipExecutable.toOSString(), "x", //$NON-NLS-1$
-				"-o" + targetFolder, //$NON-NLS-1$
-				"-y", //$NON-NLS-1$
-				zipFile);
-		processBuilder.directory(destinationFolder);
-		processBuilder.redirectErrorStream(true);
-		String output = null;
-		try
-		{
-			Process process = processBuilder.start();
-			InputStreamGobbler errorGobbler = new InputStreamGobbler(process.getErrorStream(), "\n", null); //$NON-NLS-1$
-			InputStreamGobbler outputGobbler = new InputStreamGobbler(process.getInputStream(), "\n", null); //$NON-NLS-1$
-			outputGobbler.start();
-			errorGobbler.start();
-			process.waitFor();
-			outputGobbler.interrupt();
-			errorGobbler.interrupt();
-			outputGobbler.join();
-			errorGobbler.join();
-			output = outputGobbler.getResult();
-			String errors = errorGobbler.getResult();
-			int exitVal = process.exitValue();
-			if (exitVal == 0)
-			{
-				return Status.OK_STATUS;
-			}
-			else
-			{
-				PortalUIPlugin
-						.logError(
-								"DevKit extraction failed. The process returned " + exitVal, new Exception("Process output:\n" + errors)); //$NON-NLS-1$ //$NON-NLS-2$
-				return errorStatus;
-			}
-		}
-		catch (Exception e)
-		{
-			PortalUIPlugin.logError(e);
-			return errorStatus;
-		}
-		finally
-		{
-			if (output != null)
-			{
-				PortalUIPlugin.logInfo(output, null);
-			}
-		}
-	}
-
-	/*
-	 * Returns an IPath from the given portable string.
-	 */
-	private static IPath getBundlePath(String path)
-	{
-		URL url = FileLocator.find(PortalUIPlugin.getDefault().getBundle(), Path.fromPortableString(path), null);
-		if (url != null)
-		{
-			try
-			{
-				url = FileLocator.toFileURL(url);
-				File file = new File(url.getPath());
-				if (file.exists())
-				{
-					return Path.fromOSString(file.getAbsolutePath());
-				}
-			}
-			catch (IOException e)
-			{
-				PortalUIPlugin.logError(e);
-			}
-		}
-		return null;
-	}
-
-	private void displayMessageInUIThread(final String title, final String message)
-	{
-		Display.getDefault().syncExec(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				MessageDialog.openInformation(null, title, message);
-			}
-		});
 	}
 
 	/*

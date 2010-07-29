@@ -47,7 +47,7 @@ public class Portal
 	// for debugging, do NOT check in with these uncommented:
 	public static final String BASE_URL_PREFIX = Platform.inDevelopmentMode() ? System.getProperty(
 			"toolboxURL", "http://localhost:3000/toolbox") : "http://localhost:3000/toolbox"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	private static final String BASE_REMOTE_URL = BASE_URL_PREFIX; //$NON-NLS-1$
+	private static final String BASE_REMOTE_URL = BASE_URL_PREFIX;
 	private static final String BASE_LOCAL_URL = "/content/index.html"; //$NON-NLS-1$
 
 	private static final String EXPLORER_PLUGIN_ID = "com.aptana.explorer"; //$NON-NLS-1$

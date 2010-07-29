@@ -76,6 +76,6 @@ public class RubyInstallActionController extends AbstractActionController
 	public void configurationStateChanged(ConfigurationStatus status, Set<String> attributesChanged)
 	{
 		// TODO - Shalom: Notify that the installation is complete?
-		//System.out.println("configurationStateChanged: " + status.getStatus());
+		// System.out.println("configurationStateChanged: " + status.getStatus());
 	}
 }
