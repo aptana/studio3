@@ -55,7 +55,7 @@ import com.aptana.editor.js.parsing.ast.JSWhileNode;
 import com.aptana.editor.js.parsing.ast.JSWithNode;
 import com.aptana.parsing.ast.IParseNode;
 
-public class JSLocationWalker extends JSTreeWalker
+public class JSLocationIdentifier extends JSTreeWalker
 {
 	private int _offset;
 	private LocationType _type;
@@ -63,7 +63,7 @@ public class JSLocationWalker extends JSTreeWalker
 	/**
 	 * JSLocationWalker
 	 */
-	public JSLocationWalker(int offset)
+	public JSLocationIdentifier(int offset)
 	{
 		offset--;
 

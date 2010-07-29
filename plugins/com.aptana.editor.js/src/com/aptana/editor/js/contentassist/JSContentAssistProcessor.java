@@ -611,7 +611,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		else if (ast instanceof JSParseRootNode)
 		{
-			JSLocationWalker typeWalker = new JSLocationWalker(offset);
+			JSLocationIdentifier typeWalker = new JSLocationIdentifier(offset);
 
 			((JSParseRootNode) ast).accept(typeWalker);
 
