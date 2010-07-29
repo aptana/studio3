@@ -149,7 +149,7 @@ public class EngineYardLoginWizardPage extends WizardPage implements ILoginValid
 		return true;
 	}
 
-	public Boolean validateLogin()
+	public boolean validateLogin()
 	{
 		// Try to verify credentials with Engine Yard and write them to a file
 		EngineYardAPI api = new EngineYardAPI();

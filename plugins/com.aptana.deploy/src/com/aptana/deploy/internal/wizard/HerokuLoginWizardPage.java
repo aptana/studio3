@@ -171,7 +171,7 @@ public class HerokuLoginWizardPage extends WizardPage implements ILoginValidator
 		return true;
 	}
 	
-	public Boolean validateLogin()
+	public boolean validateLogin()
 	{
 		HerokuAPI api = new HerokuAPI(userId.getText(), password.getText());
 		IStatus status = api.authenticate();
