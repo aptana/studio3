@@ -2,23 +2,17 @@ package com.aptana.editor.js.contentassist;
 
 import beaver.Symbol;
 
-import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
 import com.aptana.editor.js.parsing.ast.JSArrayNode;
-import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
-import com.aptana.editor.js.parsing.ast.JSBinaryArithmeticOperatorNode;
 import com.aptana.editor.js.parsing.ast.JSBinaryBooleanOperatorNode;
 import com.aptana.editor.js.parsing.ast.JSBreakNode;
 import com.aptana.editor.js.parsing.ast.JSCaseNode;
 import com.aptana.editor.js.parsing.ast.JSCatchNode;
-import com.aptana.editor.js.parsing.ast.JSCommaNode;
 import com.aptana.editor.js.parsing.ast.JSConditionalNode;
 import com.aptana.editor.js.parsing.ast.JSConstructNode;
 import com.aptana.editor.js.parsing.ast.JSContinueNode;
 import com.aptana.editor.js.parsing.ast.JSDeclarationNode;
 import com.aptana.editor.js.parsing.ast.JSDefaultNode;
 import com.aptana.editor.js.parsing.ast.JSDoNode;
-import com.aptana.editor.js.parsing.ast.JSElementsNode;
-import com.aptana.editor.js.parsing.ast.JSElisionNode;
 import com.aptana.editor.js.parsing.ast.JSFalseNode;
 import com.aptana.editor.js.parsing.ast.JSFinallyNode;
 import com.aptana.editor.js.parsing.ast.JSForInNode;
