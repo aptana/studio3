@@ -11,6 +11,7 @@ public class AllTests
 		TestSuite suite = new TestSuite("Tests for com.aptana.editor.js.contentassist");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(ConstructorInferencingTests.class);
+		suite.addTestSuite(GeneralInferencingTests.class);
 		suite.addTestSuite(OperatorInferencingTests.class);
 		suite.addTestSuite(PrimitiveInferencingTests.class);
 		suite.addTestSuite(ScopeTests.class);
