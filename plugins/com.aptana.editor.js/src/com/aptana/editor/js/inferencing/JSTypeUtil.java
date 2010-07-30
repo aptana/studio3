@@ -219,19 +219,10 @@ public class JSTypeUtil
 				}
 				
 				// chop off the signature to continue processing the type
-				typeName = typeName.substring(0, delimiter - 1);
+				typeName = typeName.substring(0, delimiter);
 			}
 			
-			if (typeName.startsWith(JSTypeConstants.GENERIC_FUNCTION_OPEN) && typeName.endsWith(JSTypeConstants.GENERIC_CLOSE))
-			{
-				typeName = typeName.substring(JSTypeConstants.GENERIC_FUNCTION_OPEN.length(), typeName.length() - 1);
-				
-				function.addType(typeName);
-			}
-			else
-			{
-				function.addType(JSTypeConstants.FUNCTION_TYPE);
-			}
+			function.addType(typeName);
 		}
 	}
 
