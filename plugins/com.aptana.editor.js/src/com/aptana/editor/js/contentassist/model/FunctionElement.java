@@ -93,7 +93,13 @@ public class FunctionElement extends PropertyElement
 				this._returnTypes = new ArrayList<ReturnTypeElement>();
 			}
 			
-			if (this._returnTypes.contains(returnType) == false)
+			int index = this._returnTypes.indexOf(returnType);
+			
+			if (index != -1)
+			{
+				this._returnTypes.set(index, returnType);
+			}
+			else
 			{
 				this._returnTypes.add(returnType);
 			}

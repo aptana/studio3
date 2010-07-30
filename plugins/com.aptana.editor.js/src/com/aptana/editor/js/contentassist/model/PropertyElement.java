@@ -56,7 +56,13 @@ public class PropertyElement extends BaseElement
 				this._types = new ArrayList<ReturnTypeElement>();
 			}
 
-			if (this._types.contains(type) == false)
+			int index = this._types.indexOf(type);
+			
+			if (index != -1)
+			{
+				this._types.set(index, type);
+			}
+			else
 			{
 				this._types.add(type);
 			}
