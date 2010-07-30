@@ -92,9 +92,9 @@ public class FunctionElement extends PropertyElement
 			{
 				this._returnTypes = new ArrayList<ReturnTypeElement>();
 			}
-			
+
 			int index = this._returnTypes.indexOf(returnType);
-			
+
 			if (index != -1)
 			{
 				this._returnTypes.set(index, returnType);
@@ -122,7 +122,7 @@ public class FunctionElement extends PropertyElement
 			this.addReturnType(returnType);
 		}
 	}
-	
+
 	/**
 	 * getExceptions
 	 * 
@@ -216,15 +216,15 @@ public class FunctionElement extends PropertyElement
 	public List<ReturnTypeElement> getReturnTypes()
 	{
 		List<ReturnTypeElement> result = this._returnTypes;
-		
+
 		if (result == null)
 		{
 			result = Collections.emptyList();
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getReturnTypeNames
 	 * 
@@ -263,7 +263,7 @@ public class FunctionElement extends PropertyElement
 
 		// include actual type in custom notation, if not a function
 		List<String> types = this.getTypeNames();
-		
+
 		if (types != null && types.size() > 0)
 		{
 			buffer.append(StringUtil.join(JSTypeConstants.RETURN_TYPE_DELIMITER, types));
@@ -373,15 +373,15 @@ public class FunctionElement extends PropertyElement
 
 		// print name
 		printer.print(this.getName());
-		
+
 		// print parameter types
 		printer.print("(").print(StringUtil.join(JSTypeConstants.PARAMETER_TYPE_DELIMITER, this.getParameterTypes())).print(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		// print return types
 		List<String> returnTypes = this.getReturnTypeNames();
-		
+
 		printer.print(JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER); //$NON-NLS-1$
-		
+
 		if (returnTypes != null && returnTypes.isEmpty() == false)
 		{
 			printer.print(StringUtil.join(JSTypeConstants.RETURN_TYPE_DELIMITER, returnTypes)); //$NON-NLS-1$

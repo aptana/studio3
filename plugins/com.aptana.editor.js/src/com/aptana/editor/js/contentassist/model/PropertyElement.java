@@ -57,7 +57,7 @@ public class PropertyElement extends BaseElement
 			}
 
 			int index = this._types.indexOf(type);
-			
+
 			if (index != -1)
 			{
 				this._types.set(index, type);

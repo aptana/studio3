@@ -34,7 +34,7 @@ public class JSSymbolTypeInferrer
 {
 	private static final String NO_TYPE = ""; //$NON-NLS-1$
 	private static final EnumSet<ContentSelector> MEMBER_CONTENT = EnumSet.of(ContentSelector.NAME, ContentSelector.TYPES, ContentSelector.RETURN_TYPES);
-	
+
 	private Index _index;
 	private JSScope _activeScope;
 	private URI _location;
@@ -52,10 +52,10 @@ public class JSSymbolTypeInferrer
 	{
 		// create new type
 		TypeElement result = new TypeElement();
-		
+
 		// set parent types
 		boolean isFunction = false;
-		
+
 		if (types != null)
 		{
 			for (String superType : types)
@@ -63,7 +63,7 @@ public class JSSymbolTypeInferrer
 				if (JSTypeUtil.isFunctionPrefix(superType))
 				{
 					isFunction = true;
-					
+
 					result.addParentType(JSTypeConstants.FUNCTION_TYPE);
 				}
 				else
@@ -98,7 +98,7 @@ public class JSSymbolTypeInferrer
 		{
 			name = JSTypeUtil.getUniqueTypeName();
 		}
-		
+
 		// wrap the name
 		if (isFunction)
 		{
@@ -137,15 +137,15 @@ public class JSSymbolTypeInferrer
 		{
 			Queue<JSNode> queue = new ArrayDeque<JSNode>();
 			Set<String> visitedSymbols = new HashSet<String>();
-			
+
 			// prime the queue
 			queue.addAll(object.getValues());
-			
+
 			while (queue.isEmpty() == false)
 			{
 				JSNode node = queue.poll();
 				DocumentationBlock docs = node.getDocumentation();
-				
+
 				if (docs != null)
 				{
 					JSTypeUtil.applyDocumentation(property, docs);
@@ -155,11 +155,11 @@ public class JSSymbolTypeInferrer
 				{
 					// grab name
 					String symbol = node.getText();
-					
+
 					visitedSymbols.add(symbol);
-					
+
 					JSPropertyCollection p = this.getSymbolProperty(this._activeScope.getObject(), symbol);
-					
+
 					if (p != null)
 					{
 						for (JSNode value : p.getValues())
@@ -174,7 +174,7 @@ public class JSSymbolTypeInferrer
 				else if (node instanceof JSAssignmentNode)
 				{
 					IParseNode rhs = node.getLastChild();
-					
+
 					if (rhs instanceof JSNode)
 					{
 						queue.offer((JSNode) rhs);
@@ -403,7 +403,7 @@ public class JSSymbolTypeInferrer
 
 				// Preserve function return types and add to property type
 				List<String> returnTypes = new ArrayList<String>();
-				
+
 				for (String type : types)
 				{
 					if (JSTypeUtil.isFunctionPrefix(type))
@@ -411,18 +411,18 @@ public class JSSymbolTypeInferrer
 						returnTypes.addAll(JSTypeUtil.getFunctionSignatureReturnTypeNames(type));
 					}
 				}
-				
+
 				String propertyType = subType.getName();
-				
+
 				if (returnTypes.isEmpty() == false)
 				{
 					propertyType += JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER + StringUtil.join(JSTypeConstants.RETURN_TYPE_DELIMITER, returnTypes);
 				}
-				
+
 				// reset list to contain only this newly generated type
 				types.clear();
 				types.add(propertyType);
-				
+
 				// go ahead and cache this new type to prevent possible recursion
 				property.addType(propertyType);
 

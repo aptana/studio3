@@ -199,7 +199,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					if (JSTypeUtil.isFunctionPrefix(type))
 					{
 						String functionType = JSTypeUtil.getFunctionSignatureType(type);
-						
+
 						this.addTypeProperties(proposals, functionType, offset);
 					}
 					else if (type.startsWith(JSTypeConstants.GENERIC_ARRAY_OPEN))

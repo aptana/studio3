@@ -198,7 +198,7 @@ public class JSTypeUtil
 			property.addType(typeName);
 		}
 	}
-	
+
 	/**
 	 * applySignature
 	 * 
@@ -210,18 +210,18 @@ public class JSTypeUtil
 		if (function != null && typeName != null)
 		{
 			int delimiter = typeName.indexOf(JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER);
-			
+
 			if (delimiter != -1)
 			{
 				for (String returnType : typeName.substring(delimiter + 1).split(JSTypeConstants.RETURN_TYPE_DELIMITER))
 				{
 					function.addReturnType(returnType);
 				}
-				
+
 				// chop off the signature to continue processing the type
 				typeName = typeName.substring(0, delimiter);
 			}
-			
+
 			function.addType(typeName);
 		}
 	}
@@ -265,7 +265,7 @@ public class JSTypeUtil
 
 		return result;
 	}
-	
+
 	/**
 	 * getFunctionSignatureReturnTypeNames
 	 * 
@@ -296,7 +296,7 @@ public class JSTypeUtil
 
 		return result;
 	}
-	
+
 	/**
 	 * getFunctionSignatureType
 	 * 
@@ -306,18 +306,18 @@ public class JSTypeUtil
 	public static String getFunctionSignatureType(String typeName)
 	{
 		String result = typeName;
-		
+
 		if (typeName != null)
 		{
 			int delimiter = typeName.indexOf(JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER);
-			
+
 			if (delimiter != -1)
 			{
 				// chop off the signature to continue processing the type
 				result = typeName.substring(0, delimiter);
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -416,7 +416,7 @@ public class JSTypeUtil
 
 		return MessageFormat.format("{0}{1}", JSTypeConstants.DYNAMIC_CLASS_PREFIX, uuid); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * isFunctionPrefix
 	 * 
@@ -426,14 +426,14 @@ public class JSTypeUtil
 	public static boolean isFunctionPrefix(String type)
 	{
 		boolean result = false;
-		
+
 		if (type != null)
 		{
 			Matcher m = JSTypeConstants.FUNCTION_PREFIX.matcher(type);
-			
+
 			result = m.find();
 		}
-		
+
 		return result;
 	}
 
