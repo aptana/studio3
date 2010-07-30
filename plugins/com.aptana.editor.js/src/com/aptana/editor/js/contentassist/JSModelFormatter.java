@@ -255,13 +255,17 @@ public class JSModelFormatter
 
 		if (type != null)
 		{
-			if (type.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN) && type.endsWith(JSTypeConstants.GENERIC_CLASS_CLOSE))
+			if (type.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN) && type.endsWith(JSTypeConstants.GENERIC_CLOSE))
 			{
 				result = type.substring(JSTypeConstants.GENERIC_CLASS_OPEN.length(), type.length() - 1);
 			}
 			else if (type.startsWith(JSTypeConstants.DYNAMIC_CLASS_PREFIX))
 			{
 				result = JSTypeConstants.USER_TYPE;
+			}
+			else if (type.startsWith(JSTypeConstants.GENERIC_FUNCTION_OPEN) && type.endsWith(JSTypeConstants.GENERIC_CLOSE))
+			{
+				result = type.substring(JSTypeConstants.GENERIC_FUNCTION_OPEN.length(), type.length() - 1);
 			}
 			else
 			{
