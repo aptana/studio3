@@ -421,12 +421,12 @@ public class JSSymbolTypeInferrer
 				
 				// reset list to contain only this newly generated type
 				types.clear();
-				types.add(subType.getName());
+				types.add(propertyType);
 				
 				// go ahead and cache this new type to prevent possible recursion
 				property.addType(propertyType);
 
-				// infer types of the
+				// infer types of the additional properties
 				for (String pname : additionalProperties)
 				{
 					PropertyElement pe = this.getSymbolPropertyElement(property, pname);
@@ -434,6 +434,7 @@ public class JSSymbolTypeInferrer
 					subType.addProperty(pe);
 				}
 
+				// push type to the current index
 				this.writeType(subType);
 			}
 		}
