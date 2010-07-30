@@ -3,7 +3,10 @@ package com.aptana.editor.js.contentassist.index;
 public interface JSIndexConstants
 {
 	// the content format version of the JS index files
-	public static final double INDEX_VERSION = 0.11;
+	// 0.1 - Initial version
+	// 0.11 - Use UUIDs for foreign keys 
+	// 0.12 - FunctionElements have types and returnTypes now
+	public static final double INDEX_VERSION = 0.12;
 	
 	// general constants
 	static final String PREFIX = "js."; //$NON-NLS-1$

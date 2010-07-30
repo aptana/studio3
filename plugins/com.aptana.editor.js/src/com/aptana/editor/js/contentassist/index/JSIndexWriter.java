@@ -102,6 +102,7 @@ public class JSIndexWriter
 	 */
 	protected void writeFunction(Index index, FunctionElement function, URI location)
 	{
+		String functionTypesKey = this.writeReturnTypes(index, function.getTypes(), location);
 		String parametersKey = this.writeParameters(index, function.getParameters(), location);
 		String returnTypesKey = this.writeReturnTypes(index, function.getReturnTypes(), location);
 		String descriptionKey = this.writeDescription(index, function.getDescription(), location);
@@ -113,6 +114,7 @@ public class JSIndexWriter
 			function.getName(),
 			function.getOwningType(),
 			descriptionKey,
+			functionTypesKey,
 			parametersKey,
 			returnTypesKey,
 			examplesKey,
