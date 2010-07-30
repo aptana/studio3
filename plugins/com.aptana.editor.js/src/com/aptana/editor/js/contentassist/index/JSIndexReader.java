@@ -62,7 +62,7 @@ public class JSIndexReader
 				f.setDescription(this.getDescription(index, columns[column]));
 			}
 			column++;
-			
+
 			// types
 			if (fields.contains(ContentSelector.TYPES))
 			{

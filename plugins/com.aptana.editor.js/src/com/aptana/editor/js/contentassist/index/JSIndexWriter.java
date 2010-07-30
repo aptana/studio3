@@ -21,9 +21,9 @@ import com.aptana.index.core.Index;
 public class JSIndexWriter
 {
 	private static final URI METADATA_LOCATION = URI.create(""); //$NON-NLS-1$
-	private static Map<UserAgentElement,String> keysByUserAgent = new HashMap<UserAgentElement,String>();
-	static Map<String,UserAgentElement> userAgentsByKey = new HashMap<String,UserAgentElement>();
-	
+	private static Map<UserAgentElement, String> keysByUserAgent = new HashMap<UserAgentElement, String>();
+	static Map<String, UserAgentElement> userAgentsByKey = new HashMap<String, UserAgentElement>();
+
 	/**
 	 * JSMetadataIndexer
 	 */
@@ -49,23 +49,23 @@ public class JSIndexWriter
 	protected String writeDescription(Index index, String description, URI location)
 	{
 		String indexString;
-		
+
 		if (description != null && description.length() > 0)
 		{
 			indexString = UUID.randomUUID().toString();
-			
+
 			String value = indexString + JSIndexConstants.DELIMITER + description;
-			
+
 			index.addEntry(JSIndexConstants.DESCRIPTION, value, location);
 		}
 		else
 		{
 			indexString = JSIndexConstants.NO_ENTRY;
 		}
-		
+
 		return indexString;
 	}
-	
+
 	/**
 	 * writeExamples
 	 * 
@@ -76,23 +76,23 @@ public class JSIndexWriter
 	protected String writeExamples(Index index, List<String> examples, URI location)
 	{
 		String indexString;
-		
+
 		if (examples != null && examples.isEmpty() == false)
 		{
 			indexString = UUID.randomUUID().toString();
-			
+
 			String value = indexString + JSIndexConstants.DELIMITER + StringUtil.join(JSIndexConstants.DELIMITER, examples);
-			
+
 			index.addEntry(JSIndexConstants.EXAMPLES, value, location);
 		}
 		else
 		{
 			indexString = JSIndexConstants.NO_ENTRY;
 		}
-		
+
 		return indexString;
 	}
-	
+
 	/**
 	 * writeFunction
 	 * 
@@ -108,19 +108,10 @@ public class JSIndexWriter
 		String descriptionKey = this.writeDescription(index, function.getDescription(), location);
 		String examplesKey = this.writeExamples(index, function.getExamples(), location);
 		String sinceListKey = this.writeSinceList(index, function.getSinceList(), location);
-		
-		String value = StringUtil.join(
-			JSIndexConstants.DELIMITER,
-			function.getName(),
-			function.getOwningType(),
-			descriptionKey,
-			functionTypesKey,
-			parametersKey,
-			returnTypesKey,
-			examplesKey,
-			sinceListKey,
-			StringUtil.join(JSIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, function.getUserAgents()))
-		);
+
+		String value = StringUtil.join(JSIndexConstants.DELIMITER, function.getName(), function.getOwningType(), descriptionKey, functionTypesKey,
+			parametersKey, returnTypesKey, examplesKey, sinceListKey, StringUtil.join(JSIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, function
+				.getUserAgents())));
 
 		index.addEntry(JSIndexConstants.FUNCTION, value, location);
 	}
@@ -136,25 +127,25 @@ public class JSIndexWriter
 	{
 		List<String> keyList = new ArrayList<String>();
 		String indexString = UUID.randomUUID().toString();
-		
+
 		keyList.add(indexString);
-		
+
 		for (ParameterElement parameter : parameters)
 		{
 			String name = parameter.getName();
 			String usage = parameter.getUsage();
 			String types = StringUtil.join(",", parameter.getTypes()); //$NON-NLS-1$
-			
+
 			keyList.add(name + "," + usage + "," + types); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		
+
 		String value = StringUtil.join(JSIndexConstants.DELIMITER, keyList);
-		
+
 		index.addEntry(JSIndexConstants.PARAMETERS, value, location);
-		
+
 		return indexString;
 	}
-	
+
 	/**
 	 * writeProperty
 	 * 
@@ -168,17 +159,9 @@ public class JSIndexWriter
 		String descriptionKey = this.writeDescription(index, property.getDescription(), location);
 		String examplesKey = this.writeExamples(index, property.getExamples(), location);
 		String sinceListKey = this.writeSinceList(index, property.getSinceList(), location);
-		
-		String value = StringUtil.join(
-			JSIndexConstants.DELIMITER,
-			property.getName(),
-			property.getOwningType(),
-			descriptionKey,
-			propertyTypesKey,
-			examplesKey,
-			sinceListKey,
-			StringUtil.join(JSIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, property.getUserAgents()))
-		);
+
+		String value = StringUtil.join(JSIndexConstants.DELIMITER, property.getName(), property.getOwningType(), descriptionKey, propertyTypesKey, examplesKey,
+			sinceListKey, StringUtil.join(JSIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, property.getUserAgents())));
 
 		index.addEntry(JSIndexConstants.PROPERTY, value, location);
 	}
@@ -194,21 +177,21 @@ public class JSIndexWriter
 	{
 		List<String> keyList = new ArrayList<String>();
 		String indexString = UUID.randomUUID().toString();
-		
+
 		keyList.add(indexString);
-		
+
 		for (ReturnTypeElement returnType : returnTypes)
 		{
 			String type = returnType.getType();
 			String descriptionKey = this.writeDescription(index, returnType.getDescription(), location);
-			
+
 			keyList.add(type + "," + descriptionKey); //$NON-NLS-1$
 		}
-		
+
 		String value = StringUtil.join(JSIndexConstants.DELIMITER, keyList);
-		
+
 		index.addEntry(JSIndexConstants.RETURN_TYPES, value, location);
-		
+
 		return indexString;
 	}
 
@@ -223,38 +206,36 @@ public class JSIndexWriter
 	protected String writeSinceList(Index index, List<SinceElement> sinceList, URI location)
 	{
 		String indexString;
-		
+
 		if (sinceList != null && sinceList.isEmpty() == false)
 		{
 			// generate new key
 			indexString = UUID.randomUUID().toString();
-			
+
 			// create temporary list and add key
 			List<String> keyList = new ArrayList<String>();
-			
+
 			keyList.add(indexString);
-			
+
 			// process the list
 			for (SinceElement since : sinceList)
 			{
 				String version = since.getVersion();
-				String value = (version != null && version.length() > 0)
-					? since.getName() + JSIndexConstants.SUB_DELIMITER + version
-					: since.getName();
-				
+				String value = (version != null && version.length() > 0) ? since.getName() + JSIndexConstants.SUB_DELIMITER + version : since.getName();
+
 				keyList.add(value);
 			}
-			
+
 			// generate the key
 			String key = StringUtil.join(JSIndexConstants.DELIMITER, keyList);
-			
+
 			index.addEntry(JSIndexConstants.SINCE_LIST, key, location);
 		}
 		else
 		{
 			indexString = JSIndexConstants.NO_ENTRY;
 		}
-		
+
 		return indexString;
 	}
 
@@ -268,7 +249,7 @@ public class JSIndexWriter
 	{
 		this.writeType(index, type, METADATA_LOCATION);
 	}
-	
+
 	/**
 	 * writeType
 	 * 
@@ -285,21 +266,17 @@ public class JSIndexWriter
 			String descriptionKey = this.writeDescription(index, type.getDescription(), location);
 			// SinceElement[] sinceList = type.getSinceList();
 			// UserAgentElement[] userAgents = type.getUserAgents();
-	
+
 			// calculate key value and add to index
-			String value = StringUtil.join(
-				JSIndexConstants.DELIMITER,
-				type.getName(),
-				(parentTypes != null && parentTypes.isEmpty() == false)
-					? StringUtil.join(",", parentTypes) //$NON-NLS-1$
-					: (type.equals(JSTypeConstants.OBJECT_TYPE) == false) //$NON-NLS-1$
-						? JSTypeConstants.OBJECT_TYPE //$NON-NLS-1$
-						: "", //$NON-NLS-1$
-				descriptionKey
-			);
-	
+			String value = StringUtil.join(JSIndexConstants.DELIMITER, type.getName(), (parentTypes != null && parentTypes.isEmpty() == false) ? StringUtil
+				.join(",", parentTypes) //$NON-NLS-1$
+				: (type.equals(JSTypeConstants.OBJECT_TYPE) == false) //$NON-NLS-1$
+				? JSTypeConstants.OBJECT_TYPE //$NON-NLS-1$
+					: "", //$NON-NLS-1$
+				descriptionKey);
+
 			index.addEntry(JSIndexConstants.TYPE, value, location);
-	
+
 			// write properties
 			for (PropertyElement property : type.getProperties())
 			{
@@ -314,7 +291,7 @@ public class JSIndexWriter
 			}
 		}
 	}
-	
+
 	/**
 	 * writeUserAgent
 	 * 
@@ -325,29 +302,23 @@ public class JSIndexWriter
 	protected String writeUserAgent(Index index, UserAgentElement userAgent)
 	{
 		String key = keysByUserAgent.get(userAgent);
-		
+
 		if (key == null)
 		{
 			key = Integer.toString(keysByUserAgent.size());
-			
-			String[] columns = new String[] {
-				key,
-				userAgent.getDescription(),
-				userAgent.getOS(),
-				userAgent.getPlatform(),
-				userAgent.getVersion()
-			};
+
+			String[] columns = new String[] { key, userAgent.getDescription(), userAgent.getOS(), userAgent.getPlatform(), userAgent.getVersion() };
 			String value = StringUtil.join(JSIndexConstants.DELIMITER, columns);
-			
+
 			index.addEntry(JSIndexConstants.USER_AGENT, value, this.getDocumentPath());
-			
+
 			keysByUserAgent.put(userAgent, key);
 			userAgentsByKey.put(key, userAgent);
 		}
-		
+
 		return key;
 	}
-	
+
 	/**
 	 * writeUserAgents
 	 * 
@@ -357,12 +328,12 @@ public class JSIndexWriter
 	protected List<String> writeUserAgents(Index index, List<UserAgentElement> userAgents)
 	{
 		List<String> keys = new ArrayList<String>();
-		
+
 		for (UserAgentElement userAgent : userAgents)
 		{
 			keys.add(this.writeUserAgent(index, userAgent));
 		}
-		
+
 		return keys;
 	}
 }
