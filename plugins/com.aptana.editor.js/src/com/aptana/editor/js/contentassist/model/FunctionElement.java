@@ -255,19 +255,16 @@ public class FunctionElement extends PropertyElement
 		StringBuilder buffer = new StringBuilder();
 		boolean first = true;
 
-		buffer.append(JSTypeConstants.FUNCTION_TYPE); //$NON-NLS-1$
-		
 		// include actual type in custom notation, if not a function
 		List<String> types = this.getTypeNames();
 		
 		if (types != null && types.size() > 0)
 		{
-			if (types.size() != 1 || JSTypeConstants.FUNCTION_TYPE.equals(types.get(0)) == false)
-			{
-				buffer.append(JSTypeConstants.GENERIC_OPEN);
-				buffer.append(StringUtil.join(JSTypeConstants.RETURN_TYPE_DELIMITER, types));
-				buffer.append(JSTypeConstants.GENERIC_CLOSE);
-			}
+			buffer.append(StringUtil.join(JSTypeConstants.RETURN_TYPE_DELIMITER, types));
+		}
+		else
+		{
+			buffer.append(JSTypeConstants.FUNCTION_TYPE);
 		}
 
 		// include return types
