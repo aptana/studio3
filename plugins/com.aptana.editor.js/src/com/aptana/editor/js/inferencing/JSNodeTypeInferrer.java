@@ -1,12 +1,10 @@
 package com.aptana.editor.js.inferencing;
 
 import java.net.URI;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Queue;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
@@ -53,7 +51,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	private Index _index;
 	private URI _location;
 	private List<String> _types;
-	private JSIndexQueryHelper _indexHelper;
+	private JSIndexQueryHelper _queryHelper;
 
 	/**
 	 * JSTypeWalker
@@ -67,11 +65,11 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		this._scope = scope;
 		this._index = projectIndex;
 		this._location = location;
-		this._indexHelper = new JSIndexQueryHelper();
+		this._queryHelper = new JSIndexQueryHelper();
 	}
 
 	/**
-	 * addIdentifierTypes
+	 * addParameterTypes
 	 * 
 	 * @param identifierNode
 	 */
@@ -111,7 +109,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		// means
 		if (foundType == false)
 		{
-			this.addType(JSTypeConstants.OBJECT_TYPE);
+			this.addType(JSTypeConstants.DEFAULT_PARAMETER_TYPE);
 		}
 	}
 
@@ -136,6 +134,18 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		}
 	}
 
+	/**
+	 * addTypes
+	 * 
+	 * @param node
+	 */
+	protected void addTypes(IParseNode node)
+	{
+		if (node instanceof JSNode)
+		{
+			((JSNode) node).accept(this);
+		}
+	}
 	/**
 	 * addTypes
 	 * 
@@ -164,6 +174,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 
 		if (this._scope != null)
 		{
+			// find the global scope
 			JSScope root = this._scope;
 
 			while (true)
@@ -180,72 +191,8 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				}
 			}
 
+			// find scope containing the specified offset
 			result = root.getScopeAtOffset(offset);
-		}
-
-		return result;
-	}
-
-	/**
-	 * getElementType
-	 * 
-	 * @param type
-	 * @return
-	 */
-	protected String getElementType(String type)
-	{
-		String result = null;
-
-		if (type != null && type.length() > 0)
-		{
-			if (type.endsWith(JSTypeConstants.ARRAY_LITERAL))
-			{
-				result = type.substring(0, type.length() - 2);
-			}
-			else if (type.startsWith(JSTypeConstants.GENERIC_ARRAY_OPEN) && type.endsWith(JSTypeConstants.GENERIC_ARRAY_CLOSE))
-			{
-				result = type.substring(JSTypeConstants.GENERIC_ARRAY_OPEN.length(), type.length() - 1);
-			}
-			else if (type.equals(JSTypeConstants.ARRAY_TYPE))
-			{
-				result = JSTypeConstants.OBJECT_TYPE;
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * getReturnNodes
-	 * 
-	 * @param node
-	 * @return
-	 */
-	protected List<JSReturnNode> getReturnNodes(JSFunctionNode node)
-	{
-		List<JSReturnNode> result = new ArrayList<JSReturnNode>();
-
-		// Using a linked list since it provides a queue interface
-		Queue<IParseNode> queue = new ArrayDeque<IParseNode>();
-
-		// prime the queue
-		queue.add(node.getBody());
-
-		while (queue.size() > 0)
-		{
-			IParseNode current = queue.poll();
-
-			if (current instanceof JSReturnNode)
-			{
-				result.add((JSReturnNode) current);
-			}
-			else if (current instanceof JSFunctionNode == false)
-			{
-				for (IParseNode child : current)
-				{
-					queue.offer(child);
-				}
-			}
 		}
 
 		return result;
@@ -321,9 +268,11 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		}
 		else
 		{
+			// TODO: Add all element types?
+			// TODO: Create equivalent of "structure" type if element types vary?
 			for (String type : this.getTypes(node.getFirstChild()))
 			{
-				this.addType(JSTypeConstants.GENERIC_ARRAY_OPEN + type + JSTypeConstants.GENERIC_ARRAY_CLOSE);
+				this.addType(JSTypeUtil.createGenericArrayType(type));
 			}
 		}
 	}
@@ -338,7 +287,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		switch (node.getNodeType())
 		{
 			case JSNodeTypes.ASSIGN:
-				this.addTypes(this.getTypes(node.getRightHandSide()));
+				this.addTypes(node.getRightHandSide());
 				break;
 
 			case JSNodeTypes.ADD_AND_ASSIGN:
@@ -355,7 +304,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				break;
 
 			default:
-				this.addType(JSTypeConstants.NUMBER_TYPE);
+				this.addType(JSTypeConstants.DEFAULT_ASSIGNMENT_TYPE);
 				break;
 		}
 	}
@@ -401,8 +350,8 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSConditionalNode node)
 	{
-		this.addTypes(this.getTypes(node.getTrueExpression()));
-		this.addTypes(this.getTypes(node.getFalseExpression()));
+		this.addTypes(node.getTrueExpression());
+		this.addTypes(node.getFalseExpression());
 	}
 
 	/*
@@ -456,7 +405,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		boolean foundReturnExpression = false;
 
 		// infer return types
-		for (JSReturnNode returnValue : this.getReturnNodes(node))
+		for (JSReturnNode returnValue : node.getReturnNodes())
 		{
 			IParseNode expression = returnValue.getExpression();
 
@@ -473,13 +422,13 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		// build function type, including return values
 		if (types.isEmpty() == false)
 		{
-			type = JSTypeConstants.FUNCTION_TYPE + ":" + StringUtil.join(",", types); //$NON-NLS-1$ //$NON-NLS-2$
+			type = JSTypeConstants.FUNCTION_TYPE + JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER + StringUtil.join(",", types); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else if (foundReturnExpression)
 		{
 			// If we couldn't infer a return type and we had a return
 			// expression, then have it return Object
-			type = JSTypeConstants.FUNCTION_TYPE + ":" + JSTypeConstants.OBJECT_TYPE; //$NON-NLS-1$
+			type = JSTypeConstants.FUNCTION_TYPE + JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER + JSTypeConstants.OBJECT_TYPE; //$NON-NLS-1$
 		}
 		else
 		{
@@ -505,7 +454,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		{
 			for (String typeName : this.getTypes(lhs))
 			{
-				String typeString = this.getElementType(typeName);
+				String typeString = JSTypeUtil.getArrayElementType(typeName);
 
 				if (typeString != null)
 				{
@@ -536,7 +485,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 			for (String typeName : this.getTypes(lhs))
 			{
 				// lookup up rhs name in type and add that value's type here
-				PropertyElement property = this._indexHelper.getTypeMember(this._index, typeName, memberName, EnumSet.of(ContentSelector.RETURN_TYPES,
+				PropertyElement property = this._queryHelper.getTypeMember(this._index, typeName, memberName, EnumSet.of(ContentSelector.RETURN_TYPES,
 					ContentSelector.TYPES));
 
 				if (property != null)
@@ -604,7 +553,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		}
 		else
 		{
-			property = this._indexHelper.getGlobal(this._index, name, EnumSet.of(ContentSelector.TYPES, ContentSelector.RETURN_TYPES));
+			property = this._queryHelper.getGlobal(this._index, name, EnumSet.of(ContentSelector.TYPES, ContentSelector.RETURN_TYPES));
 		}
 
 		if (property != null)
@@ -704,6 +653,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 
 			case JSNodeTypes.VOID:
 				// technically this returns 'undefined', but we return nothing
+				// for both types
 				break;
 
 			default:
