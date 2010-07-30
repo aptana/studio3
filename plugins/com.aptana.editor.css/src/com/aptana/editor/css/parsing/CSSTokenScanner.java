@@ -16,6 +16,9 @@ import org.eclipse.jface.text.rules.WordRule;
 import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
+import com.aptana.editor.css.internal.text.rules.AtWordDetector;
+import com.aptana.editor.css.internal.text.rules.KeywordIdentifierDetector;
+import com.aptana.editor.css.internal.text.rules.SpecialCharacterWordDetector;
 import com.aptana.editor.css.parsing.lexer.CSSTokens;
 
 /**
@@ -260,57 +263,5 @@ public class CSSTokenScanner extends BufferedRuleBasedScanner
 	private static String getTokenName(short token)
 	{
 		return CSSTokens.getTokenName(token);
-	}
-
-	/**
-	 * Detects words consisting only of letters, digits, '-', and '_'. Must start with letter
-	 * 
-	 * @author cwilliams
-	 */
-	protected static class KeywordIdentifierDetector implements IWordDetector
-	{
-		@Override
-		public boolean isWordPart(char c)
-		{
-			return Character.isLetterOrDigit(c) || c == '-' || c == '_';
-		}
-
-		@Override
-		public boolean isWordStart(char c)
-		{
-			return Character.isLetter(c);
-		}
-	}
-
-	private static final class AtWordDetector implements IWordDetector
-	{
-
-		@Override
-		public boolean isWordPart(char c)
-		{
-			return Character.isLetter(c) || c == '@';
-		}
-
-		@Override
-		public boolean isWordStart(char c)
-		{
-			return c == '@';
-		}
-	}
-
-	private static final class SpecialCharacterWordDetector implements IWordDetector
-	{
-
-		@Override
-		public boolean isWordPart(char c)
-		{
-			return !Character.isLetterOrDigit(c);
-		}
-
-		@Override
-		public boolean isWordStart(char c)
-		{
-			return !Character.isLetterOrDigit(c);
-		}
 	}
 }

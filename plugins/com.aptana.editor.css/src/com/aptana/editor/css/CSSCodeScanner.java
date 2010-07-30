@@ -16,6 +16,8 @@ import com.aptana.editor.common.text.rules.ExtendedWordRule;
 import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
+import com.aptana.editor.css.internal.text.rules.IdentifierWithPrefixDetector;
+import com.aptana.editor.css.internal.text.rules.KeywordIdentifierDetector;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
@@ -25,25 +27,6 @@ import com.aptana.theme.ThemePlugin;
  */
 public class CSSCodeScanner extends BufferedRuleBasedScanner
 {
-	/**
-	 * Detects words consisting only of letters, digits, '-', and '_'. Must start with letter
-	 * 
-	 * @author cwilliams
-	 */
-	protected static class KeywordIdentifierDetector implements IWordDetector
-	{
-		@Override
-		public boolean isWordPart(char c)
-		{
-			return Character.isLetterOrDigit(c) || c == '-' || c == '_';
-		}
-
-		@Override
-		public boolean isWordStart(char c)
-		{
-			return Character.isLetter(c);
-		}
-	}
 
 	@SuppressWarnings("nls")
 	private static final String[] MEASUREMENTS = new String[] { "em", "ex", "px", "cm", "mm", "in", "pt", "pc", "deg",
@@ -179,15 +162,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		rules.add(wordRule);
 
 		// Browser-specific property names
-		IWordDetector browserSpecificProperties = new KeywordIdentifierDetector()
-		{
-			@Override
-			public boolean isWordStart(char c)
-			{
-				return c == '-';
-			}
-		};
-		rules.add(new ExtendedWordRule(browserSpecificProperties, createToken(CSSTokenType.PROPERTY), true)
+		rules.add(new ExtendedWordRule(new IdentifierWithPrefixDetector('-'), createToken(CSSTokenType.PROPERTY), true)
 				{
 					@Override
 					protected boolean wordOK(String word, ICharacterScanner scanner)
@@ -228,9 +203,9 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		rules.add(new RegexpRule("#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\\b", //$NON-NLS-1$
 				createToken(CSSTokenType.RGB), OPTIMIZE_REGEXP_RULES));
 		// ids
-		rules.add(new RegexpRule("#[_a-zA-Z0-9-]+", createToken(CSSTokenType.ID), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
+		rules.add(new WordRule(new IdentifierWithPrefixDetector('#'), createToken(CSSTokenType.ID)));
 		// classes
-		rules.add(new RegexpRule("\\.[_a-zA-Z0-9-]+", createToken(CSSTokenType.CLASS), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
+		rules.add(new WordRule(new IdentifierWithPrefixDetector('.'), createToken(CSSTokenType.CLASS)));
 
 		// numbers
 		rules.add(new RegexpRule("(\\-|\\+)?\\s*[0-9]+(\\.[0-9]+)?", //$NON-NLS-1$
@@ -239,13 +214,15 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		// %
 		rules.add(new SingleCharacterRule('%', createToken(CSSTokenType.UNIT)));
 		// !important
-		rules.add(new RegexpRule("!important", createToken(CSSTokenType.VALUE), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
+		WordRule importantRule = new WordRule(new IdentifierWithPrefixDetector('!'), Token.UNDEFINED);
+		importantRule.addWord("!important", createToken(CSSTokenType.VALUE));
+		rules.add(importantRule);
 		// FIXME name of keyword should be in token!
 		// @ rules
-		rules.add(new RegexpRule("@[_a-zA-Z0-9-]+", createToken(CSSTokenType.AT_RULE), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
+		rules.add(new WordRule(new IdentifierWithPrefixDetector('@'), createToken(CSSTokenType.AT_RULE)));
 
 		// identifiers
-		rules.add(new RegexpRule("[_a-zA-Z0-9-]+", createToken(CSSTokenType.IDENTIFIER), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
+		rules.add(new WordRule(new KeywordIdentifierDetector(), createToken(CSSTokenType.IDENTIFIER)));
 
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}
