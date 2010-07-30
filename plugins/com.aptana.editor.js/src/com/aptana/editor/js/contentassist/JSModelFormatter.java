@@ -179,7 +179,7 @@ public class JSModelFormatter
 		buffer.append(function.getName());
 		buffer.append("(").append(StringUtil.join(", ", function.getParameterTypes())).append(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		addTypes(buffer, function.getTypeNames());
+		addTypes(buffer, function.getReturnTypeNames());
 		addDescription(buffer, function);
 		addExamples(buffer, function.getExamples());
 		addDefiningFiles(buffer, function, projectURI);
