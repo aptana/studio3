@@ -51,6 +51,22 @@ public class JSSymbolTypeInferrer
 	{
 		// create new type
 		TypeElement result = new TypeElement();
+		
+		// set parent types
+		boolean isFunction = false;
+		
+		if (types != null)
+		{
+			for (String superType : types)
+			{
+				result.addParentType(superType);
+				
+				if (superType.startsWith(JSTypeConstants.FUNCTION_TYPE))
+				{
+					isFunction = true;
+				}
+			}
+		}
 
 		String name = null;
 		List<JSNode> values = property.getValues();
@@ -76,18 +92,14 @@ public class JSSymbolTypeInferrer
 		{
 			name = JSTypeUtil.getUniqueTypeName();
 		}
+		
+		if (isFunction)
+		{
+			name += "-Function";
+		}
 
 		// give type a unique name
 		result.setName(name);
-
-		// set parent types
-		if (types != null)
-		{
-			for (String superType : types)
-			{
-				result.addParentType(superType);
-			}
-		}
 
 		return result;
 	}
@@ -182,7 +194,7 @@ public class JSSymbolTypeInferrer
 
 			for (String type : types)
 			{
-				if (type.startsWith(JSTypeConstants.FUNCTION_TYPE))
+				if (type.startsWith(JSTypeConstants.FUNCTION_TYPE) || type.endsWith(JSTypeConstants.FUNCTION_TYPE))
 				{
 					hasFunction = true;
 				}
@@ -312,13 +324,15 @@ public class JSSymbolTypeInferrer
 			{
 				if (result instanceof FunctionElement)
 				{
-					if (typeName.startsWith(JSTypeConstants.FUNCTION_SIGNATURE_PREFIX))
+					for (String returnType : JSTypeUtil.getFunctionSignatureReturnTypeNames(typeName))
 					{
-						typeName = typeName.substring(JSTypeConstants.FUNCTION_SIGNATURE_PREFIX.length());
+						result.addType(returnType);
 					}
 				}
-
-				result.addType(typeName);
+				else
+				{
+					result.addType(typeName);
+				}
 			}
 
 			// apply any docs info we have to the property
@@ -412,10 +426,12 @@ public class JSSymbolTypeInferrer
 				this.writeType(subType);
 			}
 		}
-
-		for (String typeName : types)
+		else
 		{
-			property.addType(typeName);
+			for (String typeName : types)
+			{
+				property.addType(typeName);
+			}
 		}
 	}
 

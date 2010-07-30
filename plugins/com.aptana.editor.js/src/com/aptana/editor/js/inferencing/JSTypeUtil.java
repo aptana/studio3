@@ -181,6 +181,37 @@ public class JSTypeUtil
 	}
 
 	/**
+	 * getFunctionSignatureReturnTypeNames
+	 * 
+	 * @param typeName
+	 * @return
+	 */
+	public static List<String> getFunctionSignatureReturnTypeNames(String typeName)
+	{
+		List<String> result;
+		
+		int index = typeName.indexOf(':');
+		
+		if (index != -1)
+		{
+			String returnTypesString = typeName.substring(index + 1);
+			
+			result = new ArrayList<String>();
+			
+			for (String returnType : returnTypesString.split(","))
+			{
+				result.add(returnType);
+			}
+		}
+		else
+		{
+			result = Collections.emptyList();
+		}
+		
+		return result;
+	}
+
+	/**
 	 * getName
 	 * 
 	 * @param node

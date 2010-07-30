@@ -24,7 +24,6 @@ import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.inferencing.JSScope;
-import com.aptana.editor.js.inferencing.JSSymbolCollector;
 import com.aptana.editor.js.inferencing.JSSymbolTypeInferrer;
 import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.editor.js.parsing.IJSParserConstants;
@@ -77,11 +76,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 
 		if (root instanceof JSParseRootNode)
 		{
-			JSSymbolCollector s = new JSSymbolCollector();
-
-			((JSParseRootNode) root).accept(s);
-
-			result = s.getScope();
+			result = ((JSParseRootNode) root).getGlobals();
 		}
 
 		return result;
@@ -103,16 +98,26 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 			{
 				throw new CoreException(Status.CANCEL_STATUS);
 			}
+			
 			Thread.yield(); // be nice to other threads, let them get in before each file...
-			indexFileStore(index, file, sub.newChild(100));
+			
+			this.indexFileStore(index, file, sub.newChild(100));
 		}
 
 		sub.done();
 	}
 
+	/**
+	 * indexFileStore
+	 * 
+	 * @param index
+	 * @param file
+	 * @param monitor
+	 */
 	private void indexFileStore(Index index, IFileStore file, IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
+		
 		if (file == null)
 		{
 			return;
@@ -145,7 +150,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 						sub.worked(50);
 
 						// process results
-						this.processParseResults(index, file, parseState.getParseResult());
+						this.processParseResults(index, parseState.getParseResult(), file.toURI());
 					}
 				}
 			}
@@ -214,9 +219,8 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 	 * @param file
 	 * @param parseState
 	 */
-	private void processParseResults(Index index, IFileStore file, IParseNode ast)
+	protected void processParseResults(Index index, IParseNode ast, URI location)
 	{
-		URI location = file.toURI();
 		JSScope globals = this.getGlobals(ast);
 
 		if (globals != null)

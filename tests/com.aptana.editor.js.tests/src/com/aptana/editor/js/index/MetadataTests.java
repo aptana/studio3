@@ -1,4 +1,4 @@
-package com.aptana.editor.js.contentassist;
+package com.aptana.editor.js.index;
 
 import java.io.IOException;
 import java.io.InputStream;

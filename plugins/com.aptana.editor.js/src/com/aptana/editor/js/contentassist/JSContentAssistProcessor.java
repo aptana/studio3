@@ -33,7 +33,6 @@ import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.inferencing.JSNodeTypeInferrer;
 import com.aptana.editor.js.inferencing.JSPropertyCollection;
 import com.aptana.editor.js.inferencing.JSScope;
-import com.aptana.editor.js.inferencing.JSSymbolCollector;
 import com.aptana.editor.js.parsing.JSTokenScanner;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
@@ -533,6 +532,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				if (root instanceof JSParseRootNode)
 				{
+					result = ((JSParseRootNode) root).getGlobals();
 					break;
 				}
 				else
@@ -540,16 +540,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					root = root.getParent();
 				}
 			}
-
-			if (root != null)
-			{
-				JSSymbolCollector s = new JSSymbolCollector();
-
-				((JSParseRootNode) root).accept(s);
-
-				result = s.getScope();
-			}
-
 		}
 
 		return result;
@@ -611,7 +601,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		else if (ast instanceof JSParseRootNode)
 		{
-			JSLocationWalker typeWalker = new JSLocationWalker(offset);
+			JSLocationIdentifier typeWalker = new JSLocationIdentifier(offset);
 
 			((JSParseRootNode) ast).accept(typeWalker);
 

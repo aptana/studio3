@@ -1,4 +1,4 @@
-package com.aptana.editor.js;
+package com.aptana.editor.js.parsing;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;

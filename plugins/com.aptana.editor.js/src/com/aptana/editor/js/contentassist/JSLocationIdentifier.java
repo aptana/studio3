@@ -2,23 +2,17 @@ package com.aptana.editor.js.contentassist;
 
 import beaver.Symbol;
 
-import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
 import com.aptana.editor.js.parsing.ast.JSArrayNode;
-import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
-import com.aptana.editor.js.parsing.ast.JSBinaryArithmeticOperatorNode;
 import com.aptana.editor.js.parsing.ast.JSBinaryBooleanOperatorNode;
 import com.aptana.editor.js.parsing.ast.JSBreakNode;
 import com.aptana.editor.js.parsing.ast.JSCaseNode;
 import com.aptana.editor.js.parsing.ast.JSCatchNode;
-import com.aptana.editor.js.parsing.ast.JSCommaNode;
 import com.aptana.editor.js.parsing.ast.JSConditionalNode;
 import com.aptana.editor.js.parsing.ast.JSConstructNode;
 import com.aptana.editor.js.parsing.ast.JSContinueNode;
 import com.aptana.editor.js.parsing.ast.JSDeclarationNode;
 import com.aptana.editor.js.parsing.ast.JSDefaultNode;
 import com.aptana.editor.js.parsing.ast.JSDoNode;
-import com.aptana.editor.js.parsing.ast.JSElementsNode;
-import com.aptana.editor.js.parsing.ast.JSElisionNode;
 import com.aptana.editor.js.parsing.ast.JSFalseNode;
 import com.aptana.editor.js.parsing.ast.JSFinallyNode;
 import com.aptana.editor.js.parsing.ast.JSForInNode;
@@ -55,7 +49,7 @@ import com.aptana.editor.js.parsing.ast.JSWhileNode;
 import com.aptana.editor.js.parsing.ast.JSWithNode;
 import com.aptana.parsing.ast.IParseNode;
 
-public class JSLocationWalker extends JSTreeWalker
+public class JSLocationIdentifier extends JSTreeWalker
 {
 	private int _offset;
 	private LocationType _type;
@@ -63,7 +57,7 @@ public class JSLocationWalker extends JSTreeWalker
 	/**
 	 * JSLocationWalker
 	 */
-	public JSLocationWalker(int offset)
+	public JSLocationIdentifier(int offset)
 	{
 		offset--;
 
@@ -106,17 +100,6 @@ public class JSLocationWalker extends JSTreeWalker
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSArgumentsNode)
-	 */
-	@Override
-	public void visit(JSArgumentsNode node)
-	{
-		// TODO: Need to track commas
-		this.visitChildren(node);
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSArrayNode)
 	 */
 	@Override
@@ -129,28 +112,6 @@ public class JSLocationWalker extends JSTreeWalker
 			this.setType(LocationType.IN_GLOBAL);
 			this.visitChildren(node);
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSAssignmentNode)
-	 */
-	@Override
-	public void visit(JSAssignmentNode node)
-	{
-		this.visitChildren(node, node.getOperator());
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSBinaryArithmeticOperatorNode
-	 * )
-	 */
-	@Override
-	public void visit(JSBinaryArithmeticOperatorNode node)
-	{
-		this.visitChildren(node, node.getOperator());
 	}
 
 	/*
@@ -273,17 +234,6 @@ public class JSLocationWalker extends JSTreeWalker
 				this.setType(LocationType.NONE);
 			}
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSCommaNode)
-	 */
-	@Override
-	public void visit(JSCommaNode node)
-	{
-		// TODO Auto-generated method stub
-		super.visit(node);
 	}
 
 	/*
@@ -504,32 +454,6 @@ public class JSLocationWalker extends JSTreeWalker
 			{
 				this.setType(LocationType.NONE);
 			}
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSElementsNode)
-	 */
-	@Override
-	public void visit(JSElementsNode node)
-	{
-		if (node.contains(this._offset))
-		{
-			this.visitChildren(node);
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSElisionNode)
-	 */
-	@Override
-	public void visit(JSElisionNode node)
-	{
-		if (node.contains(this._offset))
-		{
-			this.visitChildren(node);
 		}
 	}
 
@@ -866,10 +790,6 @@ public class JSLocationWalker extends JSTreeWalker
 			{
 				this.setType(arguments);
 			}
-			// else
-			// {
-			// this.setType(LocationType.NONE);
-			// }
 		}
 	}
 

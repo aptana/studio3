@@ -1,4 +1,4 @@
-package com.aptana.editor.js;
+package com.aptana.editor.js.sdoc.parsing;
 
 import java.io.IOException;
 
