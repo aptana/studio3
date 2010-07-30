@@ -34,6 +34,12 @@
       </processor>
       <processor
             category="configurations"
+            class="com.aptana.portal.ui.dispatch.configurationProcessors.XAMPPInstallProcessor"
+            id="com.aptana.portal.xampp.installer.processor"
+            name="XAMPP Installer">
+      </processor>
+      <processor
+            category="configurations"
             class="com.aptana.portal.ui.dispatch.configurationProcessors.VersionsConfigurationProcessor"
             id="com.aptana.portal.versions.processor"
             name="Program Version Configurations">
@@ -88,10 +94,16 @@
             name="Console Controller">
       </actionController>
       <actionController
-            class="com.aptana.portal.ui.dispatch.actionControllers.RubyInstallActionController"
+            class="com.aptana.portal.ui.dispatch.actionControllers.InstallActionController"
             configurationProcessor="com.aptana.portal.ruby.installer.processor"
             id="portal.ruby.installer"
             name="Ruby Installer Actions">
+      </actionController>
+      <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.InstallActionController"
+            configurationProcessor="com.aptana.portal.xampp.installer.processor"
+            id="portal.xampp.installer"
+            name="XAMPP Installer Actions">
       </actionController>
    </extension>
 </plugin>

@@ -19,6 +19,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 
 import com.aptana.configurations.processor.AbstractConfigurationProcessor;
+import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.core.util.InputStreamGobbler;
 import com.aptana.ide.core.io.downloader.DownloadManager;
 import com.aptana.portal.ui.PortalUIPlugin;
@@ -34,6 +35,18 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 	protected static final String WINDOWS_7ZIP_EXECUTABLE = "$os$/7za.exe"; //$NON-NLS-1$
 	protected String[] downloadedPaths;
 	protected String[] urls;
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.configurations.processor.AbstractConfigurationProcessor#computeStatus(org.eclipse.core.runtime.
+	 * IProgressMonitor, java.lang.Object)
+	 */
+	@Override
+	public ConfigurationStatus computeStatus(IProgressMonitor progressMonitor, Object attributes)
+	{
+		// This one does nothing. We should compute the status in the generic VersionsConfigurationProcessor
+		return configurationStatus;
+	}
 
 	/**
 	 * Download the remote content and store it the temp directory.
