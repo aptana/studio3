@@ -116,6 +116,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	private static final String GEAR_MENU_ID = "com.aptana.explorer.gear"; //$NON-NLS-1$
 	private static final String RAILS_NATURE = "org.radrails.rails.core.railsnature"; //$NON-NLS-1$
 	private static final String WEB_NATURE = "com.aptana.ui.webnature"; //$NON-NLS-1$
+	private static final String PHP_NATURE = "com.aptana.editor.php.phpNature"; //$NON-NLS-1$
 	private static final String DEPLOY_MENU_ID = "com.aptana.explorer.deploy"; //$NON-NLS-1$
 	private static final String BUNDLE_HEROKU = "Heroku"; //$NON-NLS-1$
 	private static final String BUNDLE_ENGINE_YARD = "Engine Yard"; //$NON-NLS-1$
@@ -307,6 +308,10 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 							if (selectedProject.hasNature(WEB_NATURE))
 							{
 								return "project.web"; //$NON-NLS-1$
+							}
+							if (selectedProject.hasNature(PHP_NATURE))
+							{
+								return "project.php"; //$NON-NLS-1$
 							}
 						}
 						catch (CoreException e)

@@ -11,7 +11,7 @@ import com.aptana.editor.common.text.hyperlink.EditorLineHyperlink;
 
 public class StacktraceHyperlinkDetector implements IHyperlinkDetector
 {
-	private static Pattern OPEN_TRACE_LINE_PATTERN = Pattern.compile("\\s*(\\S.+*?):(\\d+):\\s+"); //$NON-NLS-1$
+	private static Pattern OPEN_TRACE_LINE_PATTERN = Pattern.compile("\\s*(\\S.+?):(\\d+):\\s+"); //$NON-NLS-1$
 
 	@Override
 	public IHyperlink[] detectHyperlinks(String contents)
