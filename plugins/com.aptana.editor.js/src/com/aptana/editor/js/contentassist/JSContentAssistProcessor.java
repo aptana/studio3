@@ -139,7 +139,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		List<PropertyElement> projectGlobals = this._indexHelper.getProjectGlobals(this.getIndex(), PROJECT_GLOBAL_SELECTOR);
 
-		if (projectGlobals != null)
+		if (projectGlobals != null && projectGlobals.isEmpty() == false)
 		{
 			Image[] userAgents = this.getAllUserAgentIcons();
 			URI projectURI = this.getProjectURI();
