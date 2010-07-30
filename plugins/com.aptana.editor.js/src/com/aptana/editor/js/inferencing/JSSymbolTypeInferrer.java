@@ -64,7 +64,6 @@ public class JSSymbolTypeInferrer
 				{
 					isFunction = true;
 					
-					// TODO: take F<> form into acct
 					result.addParentType(JSTypeConstants.FUNCTION_TYPE);
 				}
 				else
@@ -402,7 +401,7 @@ public class JSSymbolTypeInferrer
 				// create new type
 				TypeElement subType = generateType(property, types);
 
-				// TODO: Preserve function return types and add to property type
+				// Preserve function return types and add to property type
 				List<String> returnTypes = new ArrayList<String>();
 				
 				for (String type : types)
