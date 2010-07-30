@@ -18,7 +18,7 @@ public class JQueryInvocationProcessor implements InvocationProcessor
 	{
 		PATTERNS = new ArrayList<String>();
 
-		PATTERNS.add("jQuery.extend");
+		PATTERNS.add("jQuery.extend"); //$NON-NLS-1$
 	}
 
 	/*

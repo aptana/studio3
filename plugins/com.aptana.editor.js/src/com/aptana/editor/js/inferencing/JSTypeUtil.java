@@ -276,7 +276,7 @@ public class JSTypeUtil
 	{
 		List<String> result;
 
-		int index = typeName.indexOf(':');
+		int index = typeName.indexOf(JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER);
 
 		if (index != -1)
 		{
@@ -284,7 +284,7 @@ public class JSTypeUtil
 
 			result = new ArrayList<String>();
 
-			for (String returnType : returnTypesString.split(","))
+			for (String returnType : returnTypesString.split(JSTypeConstants.RETURN_TYPE_DELIMITER))
 			{
 				result.add(returnType);
 			}
@@ -352,10 +352,6 @@ public class JSTypeUtil
 						{
 							parts.add(functionName.getText());
 						}
-						// else
-						// {
-						// parts.add("function-" + node.getStartingOffset());
-						// }
 						break;
 
 					case JSNodeTypes.NAME_VALUE_PAIR:
