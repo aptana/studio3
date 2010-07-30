@@ -314,7 +314,7 @@ public class JSTypeUtil
 			if (delimiter != -1)
 			{
 				// chop off the signature to continue processing the type
-				result = typeName.substring(0, delimiter - 1);
+				result = typeName.substring(0, delimiter);
 			}
 		}
 		
