@@ -14,7 +14,6 @@ import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
 import com.aptana.editor.common.text.rules.ExtendedWordRule;
-import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.css.internal.text.rules.AtWordDetector;
@@ -139,7 +138,8 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}
 
-	protected List<IRule> createRules() {
+	protected List<IRule> createRules()
+	{
 		List<IRule> rules = new ArrayList<IRule>();
 
 		// Add generic whitespace rule.
@@ -195,45 +195,57 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		rules.add(new WordRule(new IdentifierWithPrefixDetector('#'), createToken(CSSTokenType.ID)));
 		
 		rules.addAll(createScannerSpecificRules());
-
-		// numbers
-		rules.add(new RegexpRule("(\\-|\\+)?\\s*[0-9]+(\\.[0-9]+)?", createToken(CSSTokenType.NUMBER))); //$NON-NLS-1$
 		
+		rules.add(createNumberRule());
+
 		// identifiers
-		rules.add(new WordRule(new KeywordIdentifierDetector(), createToken(CSSTokenType.IDENTIFIER)));
+		rules.add(new ExtendedWordRule(new KeywordIdentifierDetector(), createToken(CSSTokenType.IDENTIFIER), false){
+			
+			@Override
+			protected boolean wordOK(String word, ICharacterScanner scanner)
+			{
+				if (word.charAt(0) == '-')
+					return word.length() > 1;
+				return true;
+			}
+		});
+		
+		rules.add(new SingleCharacterRule('-', createToken(CSSTokenType.MINUS)));
 		
 		return rules;
 	}
 
-	private ExtendedWordRule createVendorPropertyRules() {
+	private ExtendedWordRule createVendorPropertyRules()
+	{
 		return new ExtendedWordRule(new IdentifierWithPrefixDetector('-'), createToken(CSSTokenType.PROPERTY), true)
-				{
-					@Override
-					protected boolean wordOK(String word, ICharacterScanner scanner)
-					{
-						// Table 1. Vendor Extension Prefixes
-						// Prefix Organisation
-						// -ms- Microsoft
-						// mso- Microsoft Office
-						// -moz- Mozilla Foundation (Gecko-based browsers)
-						// -o- Opera Software
-						// -atsc- Advanced Television Standards Committee
-						// -wap- The WAP Forum
-						// -webkit- Safari (and other WebKit-based browsers)
-						// -khtml-
+		{
+			@Override
+			protected boolean wordOK(String word, ICharacterScanner scanner)
+			{
+				// Table 1. Vendor Extension Prefixes
+				// Prefix Organisation
+				// -ms- Microsoft
+				// mso- Microsoft Office
+				// -moz- Mozilla Foundation (Gecko-based browsers)
+				// -o- Opera Software
+				// -atsc- Advanced Television Standards Committee
+				// -wap- The WAP Forum
+				// -webkit- Safari (and other WebKit-based browsers)
+				// -khtml-
 
-						return word.startsWith("-moz-") || word.startsWith("-webkit-") || word.startsWith("-ms-") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-								|| word.startsWith("-o-") || word.startsWith("-atsc-") || word.startsWith("-khtml-") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-								|| word.startsWith("-wap-"); //$NON-NLS-1$
-					}
-				};
+				return word.startsWith("-moz-") || word.startsWith("-webkit-") || word.startsWith("-ms-") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						|| word.startsWith("-o-") || word.startsWith("-atsc-") || word.startsWith("-khtml-") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						|| word.startsWith("-wap-"); //$NON-NLS-1$
+			}
+		};
 	}
 
 	private ExtendedWordRule createRGBRule() {
 		return new ExtendedWordRule(new IdentifierWithPrefixDetector('#'), createToken(CSSTokenType.RGB), false) {
 			
 			@Override
-			protected boolean wordOK(String word, ICharacterScanner scanner) {
+			protected boolean wordOK(String word, ICharacterScanner scanner)
+			{
 				if (word.length() != 4 && word.length() != 7)
 				{
 					return false;
@@ -253,7 +265,8 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		};
 	}
 	
-	protected Collection<? extends IRule> createScannerSpecificRules() {
+	protected Collection<? extends IRule> createScannerSpecificRules()
+	{
 		List<IRule> rules = new ArrayList<IRule>();
 		WordRule wordRule = new WordRule(new KeywordIdentifierDetector(), Token.UNDEFINED);
 		wordRule.addWord("em", createToken(CSSTokenType.EMS));
@@ -274,11 +287,40 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		wordRule.addWord("Hz", createToken(CSSTokenType.FREQUENCY));
 		wordRule.addWord("kHz", createToken(CSSTokenType.FREQUENCY));
 		addWordsToRule(wordRule, FUNCTIONS, CSSTokenType.FUNCTION);
-		rules.add(wordRule);
+		rules.add(wordRule);		
 		return rules;
 	}
 
-	protected Collection<? extends IRule> createPunctuationRules() {
+	protected IRule createNumberRule()
+	{
+//		rules.add(new RegexpRule("(\\-|\\+)?\\s*[0-9]+(\\.[0-9]+)?", createToken(CSSTokenType.NUMBER))); //$NON-NLS-1$
+		return new ExtendedWordRule(new IWordDetector()
+		{
+			
+			@Override
+			public boolean isWordStart(char c)
+			{
+				return c == '-' || c == '+' || c == '.' || Character.isDigit(c);
+			}
+			
+			@Override
+			public boolean isWordPart(char c)
+			{
+				return c == '.' || Character.isDigit(c);
+			}
+		}, createToken(CSSTokenType.NUMBER), false)
+		{
+			
+			@Override
+			protected boolean wordOK(String word, ICharacterScanner scanner)
+			{
+				return word.matches("(\\-|\\+)?\\s*[0-9]+(\\.[0-9]+)?");
+			}
+		};
+	}
+
+	protected Collection<? extends IRule> createPunctuationRules()
+	{
 		List<IRule> rules = new ArrayList<IRule>();
 		// curly braces
 		rules.add(new SingleCharacterRule('{', createToken(CSSTokenType.LCURLY)));
