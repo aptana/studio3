@@ -240,14 +240,15 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, NLS.bind(
 								Messages.InstallProcessor_failedToInstallSeeLog, XAMPP));
 					}
-
+					// TODO - Replace this with the instructions specified here:
+					// http://www.apachefriends.org/en/xampp-windows.html#522
 					ProcessBuilder processBuilder = new ProcessBuilder(downloadedPaths[0],
 							"/silent", "/dir=\"" + installDir + "\"", "/tasks=\"modpath\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					Process process = processBuilder.start();
 					int res = process.waitFor();
 					if (res == 5)
 					{
-						PortalUIPlugin.logInfo("Ruby installation cancelled", null); //$NON-NLS-1$
+						PortalUIPlugin.logInfo("XAMPP installation cancelled", null); //$NON-NLS-1$
 						return Status.CANCEL_STATUS;
 					}
 					if (res != 0)
@@ -255,7 +256,7 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 						// We had an error while installing
 						PortalUIPlugin
 								.logError(
-										"Failed to install Ruby. The ruby installer process returned a termination code of " + res, null); //$NON-NLS-1$
+										"Failed to install XAMPP. The XAMPP installer process returned a termination code of " + res, null); //$NON-NLS-1$
 						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, res, NLS.bind(
 								Messages.InstallProcessor_installationErrorMessage, XAMPP, XAMPP), null);
 					}
@@ -263,7 +264,7 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 					{
 						// Just to be sure that we got everything in place
 						PortalUIPlugin.logError(
-								"Failed to install Ruby. The " + installDir + " directory was not created", null); //$NON-NLS-1$ //$NON-NLS-2$
+								"Failed to install XAMPP. The " + installDir + " directory was not created", null); //$NON-NLS-1$ //$NON-NLS-2$
 						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, res, NLS.bind(
 								Messages.InstallProcessor_installationError_installDirMissing, XAMPP), null);
 					}
