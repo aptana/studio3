@@ -131,12 +131,6 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			"utopia", "verdana", "webdings", "sans-serif", "serif", "monospace" };
 
 	/**
-	 * A flag to turn on or off the optimization of eligible regexp rules. Seems to make a measurable difference on
-	 * large files.
-	 */
-	private static final boolean OPTIMIZE_REGEXP_RULES = true;
-
-	/**
 	 * CodeScanner
 	 */
 	public CSSCodeScanner()
@@ -184,7 +178,35 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		rules.add(wordRule);
 
 		// Browser-specific property names
-		rules.add(new ExtendedWordRule(new IdentifierWithPrefixDetector('-'), createToken(CSSTokenType.PROPERTY), true)
+		rules.add(createVendorPropertyRules());
+
+		// special character keywords
+		wordRule = new WordRule(new SpecialCharacterWordDetector(), Token.UNDEFINED);
+		wordRule.addWord(WORD_INCLUDES, createToken(CSSTokenType.INCLUDES));
+		wordRule.addWord(WORD_DASHMATCH, createToken(CSSTokenType.DASHMATCH));
+		rules.add(wordRule);
+		
+		rules.addAll(createPunctuationRules());
+		
+		// rgb values
+		rules.add(createRGBRule());
+		
+		// ids
+		rules.add(new WordRule(new IdentifierWithPrefixDetector('#'), createToken(CSSTokenType.ID)));
+		
+		rules.addAll(createScannerSpecificRules());
+
+		// numbers
+		rules.add(new RegexpRule("(\\-|\\+)?\\s*[0-9]+(\\.[0-9]+)?", createToken(CSSTokenType.NUMBER))); //$NON-NLS-1$
+		
+		// identifiers
+		rules.add(new WordRule(new KeywordIdentifierDetector(), createToken(CSSTokenType.IDENTIFIER)));
+		
+		return rules;
+	}
+
+	private ExtendedWordRule createVendorPropertyRules() {
+		return new ExtendedWordRule(new IdentifierWithPrefixDetector('-'), createToken(CSSTokenType.PROPERTY), true)
 				{
 					@Override
 					protected boolean wordOK(String word, ICharacterScanner scanner)
@@ -204,33 +226,31 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 								|| word.startsWith("-o-") || word.startsWith("-atsc-") || word.startsWith("-khtml-") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 								|| word.startsWith("-wap-"); //$NON-NLS-1$
 					}
-				});
+				};
+	}
 
-		
-		// special character keywords
-		wordRule = new WordRule(new SpecialCharacterWordDetector(), Token.UNDEFINED);
-		wordRule.addWord(WORD_INCLUDES, createToken(CSSTokenType.INCLUDES));
-		wordRule.addWord(WORD_DASHMATCH, createToken(CSSTokenType.DASHMATCH));
-		rules.add(wordRule);
-		
-		rules.addAll(createPunctuationRules());
-		
-		// rgb values
-		rules.add(new RegexpRule("#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\\b", createToken(CSSTokenType.RGB), //$NON-NLS-1$
-				OPTIMIZE_REGEXP_RULES));
-		
-		// ids
-		rules.add(new WordRule(new IdentifierWithPrefixDetector('#'), createToken(CSSTokenType.ID)));
-		
-		rules.addAll(createScannerSpecificRules());
-
-		// numbers
-		rules.add(new RegexpRule("(\\-|\\+)?\\s*[0-9]+(\\.[0-9]+)?", createToken(CSSTokenType.NUMBER))); //$NON-NLS-1$
-		
-		// identifiers
-		rules.add(new WordRule(new KeywordIdentifierDetector(), createToken(CSSTokenType.IDENTIFIER)));
-		
-		return rules;
+	private ExtendedWordRule createRGBRule() {
+		return new ExtendedWordRule(new IdentifierWithPrefixDetector('#'), createToken(CSSTokenType.RGB), false) {
+			
+			@Override
+			protected boolean wordOK(String word, ICharacterScanner scanner) {
+				if (word.length() != 4 && word.length() != 7)
+				{
+					return false;
+				}
+				word = word.toLowerCase();
+				for (int i = 1; i < word.length(); i++)
+				{
+					char c = word.charAt(i);
+					if (Character.isDigit(c))
+						continue;
+					if (c == 'a' || c =='b' || c == 'c' || c == 'd' || c == 'e' || c == 'f')
+						continue;
+					return false;
+				}
+				return true;
+			}
+		};
 	}
 	
 	protected Collection<? extends IRule> createScannerSpecificRules() {
