@@ -1,6 +1,7 @@
 package com.aptana.editor.css;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
@@ -16,8 +17,10 @@ import com.aptana.editor.common.text.rules.ExtendedWordRule;
 import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
+import com.aptana.editor.css.internal.text.rules.AtWordDetector;
 import com.aptana.editor.css.internal.text.rules.IdentifierWithPrefixDetector;
 import com.aptana.editor.css.internal.text.rules.KeywordIdentifierDetector;
+import com.aptana.editor.css.internal.text.rules.SpecialCharacterWordDetector;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
@@ -27,10 +30,13 @@ import com.aptana.theme.ThemePlugin;
  */
 public class CSSCodeScanner extends BufferedRuleBasedScanner
 {
-
-	@SuppressWarnings("nls")
-	private static final String[] MEASUREMENTS = new String[] { "em", "ex", "px", "cm", "mm", "in", "pt", "pc", "deg",
-			"rad", "grad", "ms", "s", "hz", "khz" };
+	
+	private static final String KEYWORD_IMPORT = "@import"; //$NON-NLS-1$
+	private static final String KEYWORD_PAGE = "@page"; //$NON-NLS-1$
+	private static final String KEYWORD_MEDIA = "@media"; //$NON-NLS-1$
+	private static final String KEYWORD_CHARSET = "@charset"; //$NON-NLS-1$
+	private static final String WORD_INCLUDES = "~="; //$NON-NLS-1$
+	private static final String WORD_DASHMATCH = "|="; //$NON-NLS-1$
 
 	@SuppressWarnings("nls")
 	private static final String[] DEPRECATED_COLORS = new String[] { "aliceblue", "antiquewhite", "aquamarine",
@@ -135,28 +141,44 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 	 */
 	public CSSCodeScanner()
 	{
+		List<IRule> rules = createRules();
+		setRules(rules.toArray(new IRule[rules.size()]));
+	}
+
+	protected List<IRule> createRules() {
 		List<IRule> rules = new ArrayList<IRule>();
 
 		// Add generic whitespace rule.
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 
 		IWordDetector identifierDetector = new KeywordIdentifierDetector();
+		// CSS Properties, values and measurements, HTML tags, media values, functions, color names
 		WordRule wordRule = new WordRule(identifierDetector, Token.UNDEFINED);
 		addWordsToRule(wordRule, getPropertyNames(), CSSTokenType.PROPERTY);
 		addWordsToRule(wordRule, PROPERTY_VALUES, CSSTokenType.VALUE);
-		addWordsToRule(wordRule, MEASUREMENTS, CSSTokenType.UNIT);
-		rules.add(wordRule);
-
-		// normal words
-		wordRule = new WordRule(identifierDetector, Token.UNDEFINED);
 		addWordsToRule(wordRule, HTML_TAGS, CSSTokenType.ELEMENT);
 		addWordsToRule(wordRule, MEDIA, CSSTokenType.MEDIA);
-		addWordsToRule(wordRule, FUNCTIONS, CSSTokenType.FUNCTION);
 		addWordsToRule(wordRule, STANDARD_COLORS, CSSTokenType.COLOR);
 		addWordsToRule(wordRule, DEPRECATED_COLORS, CSSTokenType.DEPRECATED_COLOR);
 		rules.add(wordRule);
+		
+		// classes
+		rules.add(new WordRule(new IdentifierWithPrefixDetector('.'), createToken(CSSTokenType.CLASS)));
+		
+		// keywords that start with @
+		wordRule = new WordRule(new AtWordDetector(), createToken(CSSTokenType.AT_RULE));
+		wordRule.addWord(KEYWORD_CHARSET, createToken(CSSTokenType.CHARSET));
+		wordRule.addWord(KEYWORD_IMPORT, createToken(CSSTokenType.IMPORT));
+		wordRule.addWord(KEYWORD_MEDIA, createToken(CSSTokenType.MEDIA_KEYWORD));
+		wordRule.addWord(KEYWORD_PAGE, createToken(CSSTokenType.PAGE));
+		rules.add(wordRule);
+		
+		// !important
+		WordRule importantRule = new WordRule(new IdentifierWithPrefixDetector('!'), Token.UNDEFINED);
+		importantRule.addWord("!important", createToken(CSSTokenType.IMPORTANT));
+		rules.add(importantRule);
 
-		// ignore case
+		// ignore case for font names
 		wordRule = new WordRule(identifierDetector, Token.UNDEFINED, true);
 		addWordsToRule(wordRule, FONT_NAMES, CSSTokenType.FONT);
 		rules.add(wordRule);
@@ -184,47 +206,88 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 					}
 				});
 
+		
+		// special character keywords
+		wordRule = new WordRule(new SpecialCharacterWordDetector(), Token.UNDEFINED);
+		wordRule.addWord(WORD_INCLUDES, createToken(CSSTokenType.INCLUDES));
+		wordRule.addWord(WORD_DASHMATCH, createToken(CSSTokenType.DASHMATCH));
+		rules.add(wordRule);
+		
+		rules.addAll(createPunctuationRules());
+		
+		// rgb values
+		rules.add(new RegexpRule("#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\\b", createToken(CSSTokenType.RGB), //$NON-NLS-1$
+				OPTIMIZE_REGEXP_RULES));
+		
+		// ids
+		rules.add(new WordRule(new IdentifierWithPrefixDetector('#'), createToken(CSSTokenType.ID)));
+		
+		rules.addAll(createScannerSpecificRules());
+
+		// numbers
+		rules.add(new RegexpRule("(\\-|\\+)?\\s*[0-9]+(\\.[0-9]+)?", createToken(CSSTokenType.NUMBER))); //$NON-NLS-1$
+		
+		// identifiers
+		rules.add(new WordRule(new KeywordIdentifierDetector(), createToken(CSSTokenType.IDENTIFIER)));
+		
+		return rules;
+	}
+	
+	protected Collection<? extends IRule> createScannerSpecificRules() {
+		List<IRule> rules = new ArrayList<IRule>();
+		WordRule wordRule = new WordRule(new KeywordIdentifierDetector(), Token.UNDEFINED);
+		wordRule.addWord("em", createToken(CSSTokenType.EMS));
+		wordRule.addWord("ex", createToken(CSSTokenType.EXS));
+		wordRule.addWord("px", createToken(CSSTokenType.LENGTH));
+		wordRule.addWord("cm", createToken(CSSTokenType.LENGTH));
+		wordRule.addWord("mm", createToken(CSSTokenType.LENGTH));
+		wordRule.addWord("in", createToken(CSSTokenType.LENGTH));
+		wordRule.addWord("pt", createToken(CSSTokenType.LENGTH));
+		wordRule.addWord("pc", createToken(CSSTokenType.LENGTH));
+		wordRule.addWord("deg", createToken(CSSTokenType.ANGLE));
+		wordRule.addWord("rad", createToken(CSSTokenType.ANGLE));
+		wordRule.addWord("grad", createToken(CSSTokenType.ANGLE));
+		wordRule.addWord("ms", createToken(CSSTokenType.TIME));
+		wordRule.addWord("s", createToken(CSSTokenType.TIME));
+		wordRule.addWord("hz", createToken(CSSTokenType.FREQUENCY));
+		wordRule.addWord("khz", createToken(CSSTokenType.FREQUENCY));
+		wordRule.addWord("Hz", createToken(CSSTokenType.FREQUENCY));
+		wordRule.addWord("kHz", createToken(CSSTokenType.FREQUENCY));
+		addWordsToRule(wordRule, FUNCTIONS, CSSTokenType.FUNCTION);
+		rules.add(wordRule);
+		return rules;
+	}
+
+	protected Collection<? extends IRule> createPunctuationRules() {
+		List<IRule> rules = new ArrayList<IRule>();
 		// curly braces
-		rules.add(new SingleCharacterRule('{', createToken(CSSTokenType.CURLY_BRACE)));
-		rules.add(new SingleCharacterRule('}', createToken(CSSTokenType.CURLY_BRACE)));
+		rules.add(new SingleCharacterRule('{', createToken(CSSTokenType.LCURLY)));
+		rules.add(new SingleCharacterRule('}', createToken(CSSTokenType.RCURLY)));
 		// colon
 		rules.add(new SingleCharacterRule(':', createToken(CSSTokenType.COLON)));
 		// semicolon
 		rules.add(new SingleCharacterRule(';', createToken(CSSTokenType.SEMICOLON)));
-		// parens
-		// HACK these rules are more correct, but for now we eat up the stuff inside parens too, to avoid weirder
-		// coloring
-		//		rules.add(new SingleCharacterRule('(', createToken("punctuation.section.function.css")));
-		//		rules.add(new SingleCharacterRule(')', createToken("punctuation.section.function.css")));
-		rules.add(new RegexpRule("\\([^)]*?\\)", createToken(CSSTokenType.ARGS), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
-
-		// Now onto to more expensive regexp rules
-		// rgb values
-		rules.add(new RegexpRule("#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\\b", //$NON-NLS-1$
-				createToken(CSSTokenType.RGB), OPTIMIZE_REGEXP_RULES));
-		// ids
-		rules.add(new WordRule(new IdentifierWithPrefixDetector('#'), createToken(CSSTokenType.ID)));
-		// classes
-		rules.add(new WordRule(new IdentifierWithPrefixDetector('.'), createToken(CSSTokenType.CLASS)));
-
-		// numbers
-		rules.add(new RegexpRule("(\\-|\\+)?\\s*[0-9]+(\\.[0-9]+)?", //$NON-NLS-1$
-				createToken(CSSTokenType.NUMBER)));
-
 		// %
-		rules.add(new SingleCharacterRule('%', createToken(CSSTokenType.UNIT)));
-		// !important
-		WordRule importantRule = new WordRule(new IdentifierWithPrefixDetector('!'), Token.UNDEFINED);
-		importantRule.addWord("!important", createToken(CSSTokenType.VALUE));
-		rules.add(importantRule);
-		// FIXME name of keyword should be in token!
-		// @ rules
-		rules.add(new WordRule(new IdentifierWithPrefixDetector('@'), createToken(CSSTokenType.AT_RULE)));
-
-		// identifiers
-		rules.add(new WordRule(new KeywordIdentifierDetector(), createToken(CSSTokenType.IDENTIFIER)));
-
-		setRules(rules.toArray(new IRule[rules.size()]));
+		rules.add(new SingleCharacterRule('%', createToken(CSSTokenType.PERCENTAGE)));
+		// comma
+		rules.add(new SingleCharacterRule(',', createToken(CSSTokenType.COMMA)));
+		// parens
+		rules.add(new SingleCharacterRule('(', createToken(CSSTokenType.LPAREN)));
+		rules.add(new SingleCharacterRule(')', createToken(CSSTokenType.RPAREN)));
+		// brackets
+		rules.add(new SingleCharacterRule('[', createToken(CSSTokenType.LBRACKET)));
+		rules.add(new SingleCharacterRule(']', createToken(CSSTokenType.RBRACKET)));
+		// plus
+		rules.add(new SingleCharacterRule('+', createToken(CSSTokenType.PLUS)));
+		// star
+		rules.add(new SingleCharacterRule('*', createToken(CSSTokenType.STAR)));
+		// greater
+		rules.add(new SingleCharacterRule('>', createToken(CSSTokenType.GREATER)));
+		// forward slash
+		rules.add(new SingleCharacterRule('/', createToken(CSSTokenType.SLASH)));
+		// equal
+		rules.add(new SingleCharacterRule('=', createToken(CSSTokenType.EQUAL)));
+		return rules;
 	}
 
 	/**
@@ -250,20 +313,14 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 	 * @param type
 	 * @return
 	 */
-	private IToken createToken(CSSTokenType type)
+	protected IToken createToken(CSSTokenType type)
 	{
-		return this.createToken(type.getScope());
+		return createToken(type.getScope());
 	}
-
-	/**
-	 * createToken
-	 * 
-	 * @param string
-	 * @return
-	 */
-	protected IToken createToken(String string)
+	
+	protected IToken createToken(String scope)
 	{
-		return getThemeManager().getToken(string);
+		return getThemeManager().getToken(scope);
 	}
 
 	/**

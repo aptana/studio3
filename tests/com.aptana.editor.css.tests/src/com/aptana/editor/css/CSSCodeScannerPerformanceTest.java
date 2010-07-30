@@ -10,6 +10,8 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 
+import com.aptana.editor.css.parsing.lexer.CSSTokenType;
+
 public class CSSCodeScannerPerformanceTest extends TestCase
 {
 
@@ -21,9 +23,9 @@ public class CSSCodeScannerPerformanceTest extends TestCase
 		fScanner = new CSSCodeScanner()
 		{
 			@Override
-			protected IToken createToken(String string)
+			protected IToken createToken(CSSTokenType string)
 			{
-				return new Token(string);
+				return new Token(string.getScope());
 			}
 		};
 	}
