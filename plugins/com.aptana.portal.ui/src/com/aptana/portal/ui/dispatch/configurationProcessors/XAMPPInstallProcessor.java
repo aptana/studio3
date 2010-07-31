@@ -1,6 +1,13 @@
 package com.aptana.portal.ui.dispatch.configurationProcessors;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -9,29 +16,20 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.ide.core.io.LockUtils;
 import com.aptana.portal.ui.PortalUIPlugin;
+import com.aptana.portal.ui.dispatch.configurationProcessors.installer.InstallerOptionsDialog;
 
 /**
  * A XAMPP install processor.<br>
@@ -43,8 +41,12 @@ import com.aptana.portal.ui.PortalUIPlugin;
  */
 public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 {
+	protected static final String XAMPP_DEFAULT_INSTALL_PATH = "C:\\"; //$NON-NLS-1$
+	protected static final String EXECUTE_SETUP_SCRIPT_ATTR = "execute_setup_script"; //$NON-NLS-1$
+	private static final String XAMPP_DEFAULT_FOLDER = "xampp\\"; //$NON-NLS-1$
+	private static final String XAMPP_CONTROL = "xampp-control.exe"; //$NON-NLS-1$
 	private static final String XAMPP = "XAMPP"; //$NON-NLS-1$
-	protected static final String XAMPP_DEFAULT_INSTALL_PATH = "C:\\XAMPP"; //$NON-NLS-1$
+	protected static final int XAMPP_INSTALLER_PROCESS_CANCEL_CODE = 255;
 	private static boolean installationInProgress;
 
 	/**
@@ -75,6 +77,7 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 			String err = "The XAMPP installer processor is designed to work on Windows."; //$NON-NLS-1$
 			PortalUIPlugin.logError(err, new Exception());
 			applyErrorAttributes(err);
+			installationInProgress = false;
 			return configurationStatus;
 		}
 		try
@@ -89,7 +92,7 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 				return configurationStatus;
 			}
 			Object[] attrArray = (Object[]) attributes;
-			if (attrArray.length != 2)
+			if (attrArray.length != 1)
 			{
 				// structure error
 				String err = NLS.bind(Messages.InstallProcessor_wrongNumberOfInstallLinks, new Object[] { XAMPP, 1,
@@ -106,7 +109,7 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 			{
 				status = install(progressMonitor);
 			}
-			switch (status.getCode())
+			switch (status.getSeverity())
 			{
 				case IStatus.OK:
 				case IStatus.INFO:
@@ -136,9 +139,19 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 		}
 	}
 
+	/**
+	 * Returns the application name.
+	 * 
+	 * @return "XAMPP"
+	 */
+	protected String getApplicationName()
+	{
+		return XAMPP;
+	}
+
 	protected IStatus install(IProgressMonitor progressMonitor)
 	{
-		if (downloadedPaths == null || downloadedPaths[0] == null || downloadedPaths[1] == null)
+		if (downloadedPaths == null || downloadedPaths[0] == null)
 		{
 			String failureMessge = Messages.InstallProcessor_couldNotLocateInstaller;
 			String err = NLS.bind(Messages.InstallProcessor_failedToInstall, XAMPP);
@@ -148,6 +161,7 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 		}
 		SubMonitor subMonitor = SubMonitor.convert(progressMonitor, Messages.InstallProcessor_installerProgressInfo,
 				IProgressMonitor.UNKNOWN);
+		final Map<String, Object> installationAttributes = new HashMap<String, Object>();
 		try
 		{
 			subMonitor.beginTask(NLS.bind(Messages.InstallProcessor_installingTaskName, XAMPP),
@@ -161,7 +175,7 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 					XAMPPInstallerOptionsDialog dialog = new XAMPPInstallerOptionsDialog();
 					if (dialog.open() == Window.OK)
 					{
-						installDir[0] = dialog.getInstallDir();
+						installationAttributes.putAll(dialog.getAttributes());
 						return Status.OK_STATUS;
 					}
 					else
@@ -184,19 +198,14 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 				return result;
 			}
 
-			IStatus status = installXAMPP(installDir[0]);
+			IStatus status = installXAMPP(installationAttributes);
 			if (!status.isOK())
 			{
-				if (status.getSeverity() != IStatus.CANCEL)
-				{
-					displayMessageInUIThread(MessageDialog.ERROR, Messages.InstallProcessor_installationErrorTitle,
-							status.getMessage());
-				}
 				return status;
 			}
-			finalizeInstallation(installDir[0]);
 			PortalUIPlugin.logInfo(
 					"Successfully installed XAMPP into " + installDir[0] + ". XAMPP installation completed.", null); //$NON-NLS-1$ //$NON-NLS-2$
+			// note that we called the finalizeInstallation from the installXAMPP Job.
 			return Status.OK_STATUS;
 		}
 		catch (Exception e)
@@ -214,10 +223,12 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 	/**
 	 * Run the XAMPP installer and install XMAPP into the given directory.
 	 * 
-	 * @param installDir
+	 * @param installationAttributes
+	 *            - Attributes map that contains the installation directory and a specification whether to run the XAMPP
+	 *            auto-install script.
 	 * @return The status of this installation
 	 */
-	protected IStatus installXAMPP(final String installDir)
+	protected IStatus installXAMPP(final Map<String, Object> installationAttributes)
 	{
 		Job job = new Job(NLS.bind(Messages.InstallProcessor_installerJobName, XAMPP + ' '
 				+ Messages.InstallProcessor_installerGroupTitle))
@@ -227,6 +238,10 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 			{
 				try
 				{
+					// extract the values from the attributes:
+					String installDir = (String) installationAttributes.get(InstallerOptionsDialog.INSTALL_DIR_ATTR);
+					boolean runAutoInstallScript = (Boolean) installationAttributes.get(EXECUTE_SETUP_SCRIPT_ATTR);
+
 					SubMonitor subMonitor = SubMonitor.convert(monitor, IProgressMonitor.UNKNOWN);
 					subMonitor.beginTask(NLS.bind(Messages.InstallProcessor_installingTaskName, XAMPP),
 							IProgressMonitor.UNKNOWN);
@@ -240,13 +255,20 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, NLS.bind(
 								Messages.InstallProcessor_failedToInstallSeeLog, XAMPP));
 					}
-					// TODO - Replace this with the instructions specified here:
+					// Run the XAMPP installer, as specified in this link:
 					// http://www.apachefriends.org/en/xampp-windows.html#522
-					ProcessBuilder processBuilder = new ProcessBuilder(downloadedPaths[0],
-							"/silent", "/dir=\"" + installDir + "\"", "/tasks=\"modpath\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+					List<String> command = new ArrayList<String>(4);
+					command.add(downloadedPaths[0]);
+					command.add("-d" + installDir); //$NON-NLS-1$
+					command.add("-s2"); //$NON-NLS-1$
+					if (runAutoInstallScript)
+					{
+						command.add("-spauto"); //$NON-NLS-1$
+					}
+					ProcessBuilder processBuilder = new ProcessBuilder(command);
 					Process process = processBuilder.start();
 					int res = process.waitFor();
-					if (res == 5)
+					if (res == XAMPP_INSTALLER_PROCESS_CANCEL_CODE)
 					{
 						PortalUIPlugin.logInfo("XAMPP installation cancelled", null); //$NON-NLS-1$
 						return Status.CANCEL_STATUS;
@@ -268,6 +290,12 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, res, NLS.bind(
 								Messages.InstallProcessor_installationError_installDirMissing, XAMPP), null);
 					}
+					// In case we had the auto-setup script on, open the XAMPP control
+					if (runAutoInstallScript)
+					{
+						openXAMPPConsole(installDir + XAMPP_DEFAULT_FOLDER);
+					}
+					finalizeInstallation(installDir + XAMPP_DEFAULT_FOLDER);
 					return Status.OK_STATUS;
 				}
 				catch (Exception e)
@@ -282,8 +310,8 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 				}
 			}
 		};
-		// Give it a little delay, just in case the downloader still holds on to the rubyinstaller file.
-		job.schedule(3000);
+		// Give it a little delay, just in case the downloader still holds on to the installer file.
+		job.schedule(1000);
 		try
 		{
 			job.join();
@@ -296,97 +324,138 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 		return job.getResult();
 	}
 
-	private class XAMPPInstallerOptionsDialog extends TitleAreaDialog
+	/**
+	 * Opens the XAMPP console right after XAMPP was installed.
+	 * 
+	 * @param installDir
+	 */
+	protected void openXAMPPConsole(final String installDir)
 	{
-		private Text path;
-		private String installDir;
+		Job job = new Job(Messages.XAMPPInstallProcessor_openXAMPPConsoleJobName)
+		{
+
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
+			{
+
+				try
+				{
+					ProcessBuilder processBuilder = new ProcessBuilder(installDir + XAMPP_CONTROL);
+					// We might stumble into 'Access Denied' errors when running this one. So this will try to
+					// re-initiate it several times.
+					int attempts = 5;
+					long timeOut = 3000L;
+					Throwable lastException = null;
+					do
+					{
+						if (monitor.isCanceled())
+						{
+							break;
+						}
+						try
+						{
+							processBuilder.start();
+							lastException = null;
+							break;
+						}
+						catch (Throwable t)
+						{
+							attempts--;
+							lastException = t;
+						}
+						Thread.sleep(timeOut);
+					}
+					while (attempts > 0);
+					if (lastException != null)
+					{
+						PortalUIPlugin.logError(lastException);
+					}
+				}
+				catch (Throwable t)
+				{
+					// Just log any error here, but don't display any error message
+					PortalUIPlugin.logError(t);
+				}
+				return Status.OK_STATUS;
+			}
+
+		};
+		job.schedule(3000L);
+	}
+
+	/**
+	 * Finalize the installation by placing a .aptana file in the installed directory, specifying some properties.
+	 * 
+	 * @param installDir
+	 */
+	protected void finalizeInstallation(String installDir)
+	{
+		super.finalizeInstallation(installDir);
+		File propertiesFile = new File(installDir, APTANA_PROPERTIES_FILE_NAME);
+		Properties properties = new Properties();
+		properties.put("xampp_install", urls[0]); //$NON-NLS-1$
+		FileOutputStream fileOutputStream = null;
+		try
+		{
+			fileOutputStream = new FileOutputStream(propertiesFile);
+			properties.store(fileOutputStream, Messages.XAMPPInstallProcessor_aptanaFileXAMPPComment);
+		}
+		catch (IOException e)
+		{
+			PortalUIPlugin.logError(e);
+		}
+		finally
+		{
+			if (fileOutputStream != null)
+			{
+				try
+				{
+					fileOutputStream.flush();
+					fileOutputStream.close();
+				}
+				catch (IOException e)
+				{
+				}
+			}
+		}
+	}
+
+	private class XAMPPInstallerOptionsDialog extends InstallerOptionsDialog
+	{
+		private Button executeScriptBt;
 
 		public XAMPPInstallerOptionsDialog()
 		{
-			super(Display.getDefault().getActiveShell());
-			setTitleImage(PortalUIPlugin.getDefault().getImageRegistry().get(PortalUIPlugin.RUBY));
-			setBlockOnOpen(true);
-			setHelpAvailable(false);
-			installDir = XAMPP_DEFAULT_INSTALL_PATH;
+			super(Display.getDefault().getActiveShell(), XAMPP);
+			setTitleImage(PortalUIPlugin.getDefault().getImageRegistry().get(PortalUIPlugin.XAMPP_IMAGE));
 		}
 
 		@Override
-		protected void configureShell(Shell newShell)
+		protected void setAttributes()
 		{
-			super.configureShell(newShell);
-			newShell.setText(Messages.InstallProcessor_installerShellTitle);
+			attributes.put(INSTALL_DIR_ATTR, XAMPP_DEFAULT_INSTALL_PATH);
+			attributes.put(EXECUTE_SETUP_SCRIPT_ATTR, Boolean.TRUE);
 		}
 
 		/**
-		 * Returns the installation dir selected in the text field.
-		 * 
-		 * @return the installation directory
+		 * Add the 'Auto-Setup' checkbox.
 		 */
-		public String getInstallDir()
-		{
-			return installDir;
-		}
-
 		@Override
-		protected Control createDialogArea(Composite parent)
+		protected Composite createInstallerGroupControls(Composite group)
 		{
-			Composite composite = (Composite) super.createDialogArea(parent);
-			// Create a inner composite so we can control the margins
-			Composite inner = new Composite(composite, SWT.NONE);
-			inner.setLayoutData(new GridData(GridData.FILL_BOTH));
-			GridLayout layout = new GridLayout();
-			layout.marginLeft = 4;
-			layout.marginRight = 4;
-			layout.marginTop = 4;
-			layout.marginBottom = 4;
-			inner.setLayout(layout);
-
-			Group group = new Group(inner, SWT.NONE);
-			group.setText(Messages.InstallProcessor_installerGroupTitle);
-			group.setLayout(new GridLayout());
-			GridData layoutData = new GridData(GridData.FILL_BOTH);
-			group.setLayoutData(layoutData);
-
-			Label l = new Label(group, SWT.WRAP);
-			l.setText(NLS.bind(Messages.InstallProcessor_installerMessage, XAMPP));
-			Composite installLocation = new Composite(group, SWT.NONE);
-			installLocation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			installLocation.setLayout(new GridLayout(2, false));
-			path = new Text(installLocation, SWT.SINGLE | SWT.BORDER);
-			path.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			path.setText(installDir);
-			path.addKeyListener(new KeyListener()
-			{
-				@Override
-				public void keyReleased(org.eclipse.swt.events.KeyEvent e)
-				{
-					installDir = path.getText();
-				}
-
-				@Override
-				public void keyPressed(org.eclipse.swt.events.KeyEvent e)
-				{
-					installDir = path.getText();
-				}
-			});
-			Button browse = new Button(installLocation, SWT.PUSH);
-			browse.setText(Messages.InstallProcessor_browse);
-			browse.addSelectionListener(new SelectionAdapter()
+			Composite control = super.createInstallerGroupControls(group);
+			executeScriptBt = new Button(group, SWT.CHECK);
+			executeScriptBt.setText(Messages.XAMPPInstallProcessor_executeXAMPPAutoSetup);
+			executeScriptBt.setSelection(true);
+			executeScriptBt.addSelectionListener(new SelectionAdapter()
 			{
 				@Override
 				public void widgetSelected(SelectionEvent e)
 				{
-					DirectoryDialog dirDialog = new DirectoryDialog(getParentShell());
-					String dir = dirDialog.open();
-					if (dir != null)
-					{
-						path.setText(dir);
-						installDir = dir;
-					}
+					attributes.put(EXECUTE_SETUP_SCRIPT_ATTR, executeScriptBt.getSelection());
 				}
 			});
-			setTitle(NLS.bind(Messages.InstallProcessor_installerTitle, XAMPP));
-			return composite;
+			return control;
 		}
 	}
 }

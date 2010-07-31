@@ -1,5 +1,6 @@
 package com.aptana.portal.ui.dispatch.configurationProcessors.installer;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,6 +48,16 @@ public abstract class InstallerOptionsDialog extends TitleAreaDialog
 	}
 
 	/**
+	 * Returns an unmodifiable Map of the attributes this install dialog is holding.
+	 * 
+	 * @return
+	 */
+	public Map<String, Object> getAttributes()
+	{
+		return Collections.unmodifiableMap(attributes);
+	}
+
+	/**
 	 * Set attributes that can later be used when creating the dialog area.
 	 * 
 	 * @param attributeName
@@ -85,6 +96,21 @@ public abstract class InstallerOptionsDialog extends TitleAreaDialog
 		GridData layoutData = new GridData(GridData.FILL_BOTH);
 		group.setLayoutData(layoutData);
 
+		createInstallerGroupControls(group);
+		createExtendedControls(inner);
+		setTitle(NLS.bind(Messages.InstallProcessor_installerTitle, installerName));
+		return composite;
+	}
+
+	/**
+	 * Creates the components inside the 'Installer' group. <br>
+	 * The default creation is only for the installation path. This can be overwritten, or extended, by a subclass.
+	 * 
+	 * @param group
+	 * @return A composite.
+	 */
+	protected Composite createInstallerGroupControls(Composite group)
+	{
 		Label l = new Label(group, SWT.WRAP);
 		l.setText(NLS.bind(Messages.InstallProcessor_installerMessage, installerName));
 		Composite installLocation = new Composite(group, SWT.NONE);
@@ -123,8 +149,19 @@ public abstract class InstallerOptionsDialog extends TitleAreaDialog
 				}
 			}
 		});
-		
-		setTitle(NLS.bind(Messages.InstallProcessor_installerTitle, installerName));
-		return composite;
+		return group;
+	}
+
+	/**
+	 * Create extended controls that will appear under the 'Installer' group.<br>
+	 * The default implementation is empty, and can be sub-classed.
+	 * 
+	 * @param parent
+	 * @return A composite.
+	 */
+	protected Composite createExtendedControls(Composite parent)
+	{
+		// Does nothing special here
+		return parent;
 	}
 }

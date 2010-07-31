@@ -15,7 +15,6 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.configurations.ConfigurationsPlugin;
 
-
 /**
  * This class represents a state of a configuration.<br>
  * The ConfigurationStatus also implements the {@link Convertible} interface, so it can easily be created and stored
@@ -96,7 +95,7 @@ public class ConfigurationStatus implements Convertible
 	 * This call is the same as calling setAttribute(STATUS, status).
 	 * 
 	 * @param status
-	 *            One of {@link #UNKNOWN}, {@link #OK}, {@link #PROCESSING} or {@link #ERROR}
+	 *            One of {@link #UNKNOWN}, {@link #OK}, {@link #PROCESSING}, {@link #ERROR} or {@link #INCOMPLETE}
 	 * @see #setAttribute(String, String)
 	 */
 	public void setStatus(String status)
@@ -108,7 +107,8 @@ public class ConfigurationStatus implements Convertible
 	 * A convenient way to get the status of this ConfigurationStatus instance.<br>
 	 * This call is the same as calling getAttribute(STATUS).
 	 * 
-	 * @return The status - One of {@link #UNKNOWN}, {@link #OK}, {@link #PROCESSING} or {@link #ERROR}
+	 * @return The status - One of {@link #UNKNOWN}, {@link #OK}, {@link #PROCESSING}, {@link #ERROR} or
+	 *         {@link #INCOMPLETE}
 	 */
 	public String getStatus()
 	{
@@ -126,10 +126,11 @@ public class ConfigurationStatus implements Convertible
 		if (STATUS.equals(key))
 		{
 			// Make sure that the key matches our known statuses
-			if (!(UNKNOWN.equals(value) || OK.equals(value) || PROCESSING.equals(value) || ERROR.equals(value)))
+			if (!(UNKNOWN.equals(value) || OK.equals(value) || PROCESSING.equals(value) || ERROR.equals(value) || INCOMPLETE
+					.equals(value)))
 			{
 				throw new IllegalArgumentException(
-						"The given state is unknown to the ConfigurationStatus (state = " + value); //$NON-NLS-1$
+						"The given state is unknown to the ConfigurationStatus (state = " + value + ')'); //$NON-NLS-1$
 			}
 		}
 		attributes.put(key, value);

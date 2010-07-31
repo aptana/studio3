@@ -72,6 +72,7 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 			String err = "The Ruby installer processor is designed to work on Windows."; //$NON-NLS-1$
 			PortalUIPlugin.logError(err, new Exception());
 			applyErrorAttributes(err);
+			installationInProgress = false;
 			return configurationStatus;
 		}
 		try
@@ -103,7 +104,7 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 			{
 				status = install(progressMonitor);
 			}
-			switch (status.getCode())
+			switch (status.getSeverity())
 			{
 				case IStatus.OK:
 				case IStatus.INFO:
@@ -131,6 +132,16 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 				installationInProgress = false;
 			}
 		}
+	}
+
+	/**
+	 * Returns the application name.
+	 * 
+	 * @return "Ruby"
+	 */
+	protected String getApplicationName()
+	{
+		return RUBY;
 	}
 
 	/**
@@ -194,11 +205,6 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 			IStatus status = installRuby(installDir[0]);
 			if (!status.isOK())
 			{
-				if (status.getSeverity() != IStatus.CANCEL)
-				{
-					displayMessageInUIThread(MessageDialog.ERROR, Messages.InstallProcessor_installationErrorTitle,
-							status.getMessage());
-				}
 				return status;
 			}
 			PortalUIPlugin.logInfo(
@@ -300,7 +306,7 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 			}
 		};
 		// Give it a little delay, just in case the downloader still holds on to the rubyinstaller file.
-		job.schedule(3000);
+		job.schedule(1000);
 		try
 		{
 			job.join();
@@ -450,7 +456,7 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 		public RubyInstallerOptionsDialog()
 		{
 			super(Display.getDefault().getActiveShell(), RUBY);
-			setTitleImage(PortalUIPlugin.getDefault().getImageRegistry().get(PortalUIPlugin.RUBY));
+			setTitleImage(PortalUIPlugin.getDefault().getImageRegistry().get(PortalUIPlugin.RUBY_IMAGE));
 		}
 
 		/**

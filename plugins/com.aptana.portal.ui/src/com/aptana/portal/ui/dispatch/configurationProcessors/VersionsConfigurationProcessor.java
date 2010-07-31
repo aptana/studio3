@@ -22,6 +22,7 @@ import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.processorDelegates.BaseVersionProcessor;
+import com.aptana.portal.ui.dispatch.processorDelegates.CachedVersionProcessorDelegate;
 
 /**
  * A configuration processor that can identify the versions of some specific applications. The supported applications
@@ -86,7 +87,8 @@ public class VersionsConfigurationProcessor extends AbstractConfigurationProcess
 				continue;
 			}
 			IConfigurationProcessorDelegate delegate = processorDelegators.get(app);
-			Object commandResult = delegate.runCommand(IConfigurationProcessorDelegate.VERSION_COMMAND, getActiveWorkingDir());
+			Object commandResult = delegate.runCommand(IConfigurationProcessorDelegate.VERSION_COMMAND,
+					getActiveWorkingDir());
 			if (commandResult != null)
 			{
 				Version version = BaseVersionProcessor.parseVersion(commandResult.toString());
@@ -151,11 +153,21 @@ public class VersionsConfigurationProcessor extends AbstractConfigurationProcess
 					&& delegate.getSupportedCommands().contains(IConfigurationProcessorDelegate.VERSION_COMMAND))
 			{
 				delegators.put(delegate.getSupportedApplication(), delegate);
+				// Remove the item from the list, so that at the end of this loop we will end up with all the apps that
+				// did not match to any version delegate.
+				appsSet.remove(delegate.getSupportedApplication());
 			}
 		}
+
+		// For every app that does not have a delegate, add a special delegate that will use the preferences to try to
+		// find out the version.
+		for (String app : appsSet)
+		{
+			delegators.put(app, new CachedVersionProcessorDelegate(app));
+		}
+
 		return delegators;
 	}
-	
 
 	/**
 	 * Returns the active working directory according to the <b>last</b> active project in the Project Explorer.<br>

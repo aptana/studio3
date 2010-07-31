@@ -69,7 +69,7 @@ public abstract class AbstractProcessorDelegate implements IConfigurationProcess
 			commandSwitch = "/C"; //$NON-NLS-1$
 		}
 		command = getSupportedApplication() + ' ' + command;
-		System.out.println(ShellExecutable.getEnvironment());
+		// System.out.println(ShellExecutable.getEnvironment());
 		String versionOutput = ProcessUtil.outputForCommand(shellCommandPath, workingDir, ShellExecutable.getEnvironment(), new String[] { commandSwitch,
 				command });
 		return versionOutput;

@@ -36,10 +36,13 @@ public class Messages extends NLS
 	public static String InstallProcessor_updatingTaskName;
 	public static String InstallProcessor_wrongNumberOfInstallLinks;
 	public static String RubyInstallProcessor_aptanaFileRubyComment;
+	public static String XAMPPInstallProcessor_aptanaFileXAMPPComment;
 	public static String SystemConfigurationProcessor_missingConfigurationItems;
 	public static String SystemConfigurationProcessor_noShellCommandPath;
 	public static String SystemConfigurationProcessor_wrongConfigurationAttributesStructure;
+	public static String XAMPPInstallProcessor_executeXAMPPAutoSetup;
 	public static String XAMPPInstallProcessor_missingXAMPPInstallURLs;
+	public static String XAMPPInstallProcessor_openXAMPPConsoleJobName;
 	static
 	{
 		// initialize resource bundle

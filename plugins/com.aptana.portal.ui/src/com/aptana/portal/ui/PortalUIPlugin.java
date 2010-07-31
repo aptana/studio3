@@ -21,7 +21,8 @@ public class PortalUIPlugin extends AbstractUIPlugin
 	/**
 	 * Ruby image key
 	 */
-	public static final String RUBY = "/icons/wizban/ruby.png"; //$NON-NLS-1$
+	public static final String RUBY_IMAGE = "/icons/wizban/ruby.png"; //$NON-NLS-1$
+	public static final String XAMPP_IMAGE = "/icons/wizban/xampp.png"; //$NON-NLS-1$
 	
 	// The shared instance
 	private static PortalUIPlugin plugin;
@@ -64,7 +65,8 @@ public class PortalUIPlugin extends AbstractUIPlugin
 	@Override
 	protected void initializeImageRegistry(ImageRegistry reg)
 	{
-		reg.put(RUBY, imageDescriptorFromPlugin(PLUGIN_ID, RUBY));
+		reg.put(RUBY_IMAGE, imageDescriptorFromPlugin(PLUGIN_ID, RUBY_IMAGE));
+		reg.put(XAMPP_IMAGE, imageDescriptorFromPlugin(PLUGIN_ID, XAMPP_IMAGE));
 	}
 	
 	public static void logInfo(String string, Throwable t)

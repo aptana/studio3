@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
@@ -15,14 +17,20 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
+import org.mortbay.util.ajax.JSON;
+import org.osgi.framework.Version;
 
 import com.aptana.configurations.processor.AbstractConfigurationProcessor;
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.core.util.InputStreamGobbler;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.downloader.DownloadManager;
+import com.aptana.portal.ui.IPortalPreferences;
 import com.aptana.portal.ui.PortalUIPlugin;
+import com.aptana.portal.ui.dispatch.processorDelegates.BaseVersionProcessor;
 
 /**
  * Basic, abstract implementation, of a processor that deals with installing software.
@@ -47,6 +55,13 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 		// This one does nothing. We should compute the status in the generic VersionsConfigurationProcessor
 		return configurationStatus;
 	}
+
+	/**
+	 * Returns the application name.
+	 * 
+	 * @return The application name (e.g. XAMPP, Ruby)
+	 */
+	protected abstract String getApplicationName();
 
 	/**
 	 * Download the remote content and store it the temp directory.
@@ -88,6 +103,48 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 			PortalUIPlugin.logError(e);
 		}
 		return Status.CANCEL_STATUS;
+	}
+
+	/**
+	 * Cache the installed application location and version in the preferences.
+	 * 
+	 * @param installDir
+	 *            - The directory the application was installed to.
+	 * @param versionedFileLocation
+	 *            - Can be the URL that we grabbed the installer from, or any other string that contains a version
+	 *            information in a form of x.y.z.
+	 * @param appName
+	 *            - The application name (e.g. xampp)
+	 */
+	@SuppressWarnings("unchecked")
+	public void cacheVersion(String installDir, String versionedFileLocation, String appName)
+
+	{
+		IPreferenceStore preferenceStore = PortalUIPlugin.getDefault().getPreferenceStore();
+		String versions = preferenceStore.getString(IPortalPreferences.CACHED_VERSIONS_PROPERTY_NAME);
+		Map<String, Map<String, String>> versionsMap = null;
+		if (versions == null || versions.equals(StringUtil.EMPTY))
+		{
+			versionsMap = new HashMap<String, Map<String, String>>();
+		}
+		else
+		{
+			versionsMap = (Map<String, Map<String, String>>) JSON.parse(versions);
+		}
+		Map<String, String> appVersionMap = new HashMap<String, String>();
+		Version version = BaseVersionProcessor.parseVersion(versionedFileLocation);
+		if (version != null)
+		{
+			appVersionMap.put(IPortalPreferences.CACHED_VERSION_PROPERTY, version.toString());
+			appVersionMap.put(IPortalPreferences.CACHED_LOCATION_PROPERTY, installDir);
+			versionsMap.put(appName.toLowerCase(), appVersionMap);
+			preferenceStore.setValue(IPortalPreferences.CACHED_VERSIONS_PROPERTY_NAME, JSON.toString(versionsMap));
+		}
+		else
+		{
+			PortalUIPlugin.logError("Could not cache the location and version for " + appName + ". Install dir: " //$NON-NLS-1$ //$NON-NLS-2$
+					+ installDir + ", versionedFileLocation: " + versionedFileLocation, new Exception()); //$NON-NLS-1$
+		}
 	}
 
 	/**
@@ -207,6 +264,9 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 				}
 			}
 		}
+		// Cache the version and the location of the installed XAMPP.
+		// We assume here that the version of XAMPP is specified in the install URL!
+		cacheVersion(installDir, urls[0], getApplicationName());
 	}
 
 	/*
