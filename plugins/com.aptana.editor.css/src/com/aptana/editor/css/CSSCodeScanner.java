@@ -319,7 +319,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		};
 	}
 
-	protected Collection<? extends IRule> createPunctuationRules()
+	protected List<IRule> createPunctuationRules()
 	{
 		List<IRule> rules = new ArrayList<IRule>();
 		// curly braces

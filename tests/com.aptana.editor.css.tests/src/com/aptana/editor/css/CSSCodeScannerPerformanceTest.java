@@ -38,7 +38,7 @@ public class CSSCodeScannerPerformanceTest extends TestCase
 
 	public void testTime() throws Exception
 	{
-		InputStream stream = getClass().getResourceAsStream("yui.css");
+		InputStream stream = getClass().getResourceAsStream("wp-admin.css");
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		int read = -1;
 		while ((read = stream.read()) != -1)
