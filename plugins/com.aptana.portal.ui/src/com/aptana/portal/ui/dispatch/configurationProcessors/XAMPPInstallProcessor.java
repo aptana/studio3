@@ -114,9 +114,9 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 				case IStatus.OK:
 				case IStatus.INFO:
 				case IStatus.WARNING:
-					displayMessageInUIThread(MessageDialog.INFORMATION,
-							NLS.bind(Messages.InstallProcessor_installerTitle, XAMPP),
-							NLS.bind(Messages.InstallProcessor_installationSuccessful, XAMPP));
+					displayMessageInUIThread(MessageDialog.INFORMATION, NLS.bind(
+							Messages.InstallProcessor_installerTitle, XAMPP), NLS.bind(
+							Messages.InstallProcessor_installationSuccessful, XAMPP));
 					configurationStatus.setStatus(ConfigurationStatus.OK);
 					break;
 				case IStatus.ERROR:
@@ -149,6 +149,12 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 		return XAMPP;
 	}
 
+	/**
+	 * Do the XAMPP installation.
+	 * 
+	 * @param progressMonitor
+	 * @return A status indication of the process success or failure.
+	 */
 	protected IStatus install(IProgressMonitor progressMonitor)
 	{
 		if (downloadedPaths == null || downloadedPaths[0] == null)

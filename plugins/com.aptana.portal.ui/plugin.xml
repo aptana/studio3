@@ -62,6 +62,12 @@
             name="Ruby Version Processor Delegate"
             targetID="com.aptana.portal.versions.processor">
       </delegate>
+      <processor
+            category="configurations"
+            class="com.aptana.portal.ui.dispatch.configurationProcessors.JSLibraryInstallProcessor"
+            id="com.aptana.portal.jsLibrary.installer.processor"
+            name="JS Library Installer">
+      </processor>
    </extension>
    <extension
          point="com.aptana.portal.ui.browserInteractions">
@@ -104,6 +110,12 @@
             configurationProcessor="com.aptana.portal.xampp.installer.processor"
             id="portal.xampp.installer"
             name="XAMPP Installer Actions">
+      </actionController>
+      <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.InstallActionController"
+            configurationProcessor="com.aptana.portal.jsLibrary.installer.processor"
+            id="portal.js_library.installer"
+            name="JS Libraries Installer Actions">
       </actionController>
    </extension>
 </plugin>
