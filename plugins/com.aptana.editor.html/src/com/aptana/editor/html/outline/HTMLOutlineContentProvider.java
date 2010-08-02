@@ -164,7 +164,11 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 			if (isJavascriptTag(item))
 			{
 				String attribute = getExternalJSReference(item);
-				return attribute != null && attribute.length() > 0;
+				
+				if (attribute != null && attribute.length() > 0)
+				{
+					return true;
+				}
 			}
 		}
 		return super.hasChildren(element);
