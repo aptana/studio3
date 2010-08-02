@@ -29,6 +29,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
+import com.aptana.scope.ScopeSelector;
 import com.aptana.theme.internal.ThemeManager;
 
 /**
@@ -201,8 +202,25 @@ public class Theme
 
 		for (String key : sorted)
 		{
-			if (tokenType.startsWith(key))
-				return map.get(key);
+			if (new ScopeSelector(key).matches(tokenType))
+			{
+				// FIXME Need to merge the backgrounds up the scope! We shouldn't be generating these things in advance, we need to handle alpha merges!
+				TextAttribute attr = map.get(key);
+				if (attr.getBackground() == null)
+				{
+					int index = tokenType.lastIndexOf(' ');
+					if (index != -1)
+					{
+						String subType = tokenType.substring(0, index);
+						TextAttribute parentAttr = getTextAttribute(subType);
+						return new TextAttribute(attr.getForeground(), parentAttr.getBackground(), attr.getStyle());
+					}
+				}
+				return attr;
+			}
+			
+//			if (tokenType.startsWith(key))
+//				return map.get(key);
 		}
 
 		// Some tokens are special. They have fallbacks even if not in the theme! Looks like bundles can contribute

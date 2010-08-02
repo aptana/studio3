@@ -43,6 +43,7 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
+import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
@@ -191,7 +192,8 @@ public class HTMLTagScanner extends RuleBasedScanner
 	 */
 	protected IToken createToken(String string)
 	{
-		return getThemeManager().getToken(string);
+		return new Token(string);
+//		return getThemeManager().getToken(string);
 	}
 	
 	/**

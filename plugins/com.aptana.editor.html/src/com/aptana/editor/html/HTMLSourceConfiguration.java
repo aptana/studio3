@@ -55,6 +55,7 @@ import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.NonRuleBasedDamagerRepairer;
 import com.aptana.editor.common.text.rules.TagRule;
+import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.js.IJSConstants;
@@ -198,14 +199,14 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		JSSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		CSSSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getHTMLScanner());
+		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getHTMLScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
-		dr = new DefaultDamagerRepairer(getHTMLTagScanner());
+		dr = new ThemeingDamagerRepairer(getHTMLTagScanner());
 		reconciler.setDamager(dr, HTMLSourceConfiguration.HTML_SCRIPT);
 		reconciler.setRepairer(dr, HTMLSourceConfiguration.HTML_SCRIPT);
 
@@ -223,7 +224,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		reconciler.setDamager(ndr, HTMLSourceConfiguration.HTML_DOCTYPE);
 		reconciler.setRepairer(ndr, HTMLSourceConfiguration.HTML_DOCTYPE);
 
-		dr = new DefaultDamagerRepairer(getCDATAScanner());
+		dr = new ThemeingDamagerRepairer(getCDATAScanner());
 		reconciler.setDamager(dr, CDATA);
 		reconciler.setRepairer(dr, CDATA);
 
@@ -243,7 +244,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		if (cdataScanner == null)
 		{
 			cdataScanner = new RuleBasedScanner();
-			cdataScanner.setDefaultReturnToken(getToken("string.unquoted.cdata.xml")); //$NON-NLS-1$
+			cdataScanner.setDefaultReturnToken(new Token("string.unquoted.cdata.xml")); //$NON-NLS-1$
 		}
 		return cdataScanner;
 	}

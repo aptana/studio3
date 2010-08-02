@@ -55,6 +55,7 @@ import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
+import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 import com.aptana.editor.js.parsing.JSRegExpRule;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
@@ -177,34 +178,34 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
 	{
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getCodeScanner());
+		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getCodeScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
-		dr = new DefaultDamagerRepairer(getJSDocScanner());
+		dr = new ThemeingDamagerRepairer(getJSDocScanner());
 		reconciler.setDamager(dr, JS_DOC);
 		reconciler.setRepairer(dr, JS_DOC);
 
-		dr = new DefaultDamagerRepairer(getMultiLineCommentScanner());
+		dr = new ThemeingDamagerRepairer(getMultiLineCommentScanner());
 		reconciler.setDamager(dr, JS_MULTILINE_COMMENT);
 		reconciler.setRepairer(dr, JS_MULTILINE_COMMENT);
 
-		dr = new DefaultDamagerRepairer(getSingleQuotedStringScanner());
+		dr = new ThemeingDamagerRepairer(getSingleQuotedStringScanner());
 		reconciler.setDamager(dr, STRING_SINGLE);
 		reconciler.setRepairer(dr, STRING_SINGLE);
 
-		dr = new DefaultDamagerRepairer(getDoubleQuotedStringScanner());
+		dr = new ThemeingDamagerRepairer(getDoubleQuotedStringScanner());
 		reconciler.setDamager(dr, STRING_DOUBLE);
 		reconciler.setRepairer(dr, STRING_DOUBLE);
 
-		dr = new DefaultDamagerRepairer(getSingleLineCommentScanner());
+		dr = new ThemeingDamagerRepairer(getSingleLineCommentScanner());
 		reconciler.setDamager(dr, JS_SINGLELINE_COMMENT);
 		reconciler.setRepairer(dr, JS_SINGLELINE_COMMENT);
 
-		dr = new DefaultDamagerRepairer(getRegexpScanner());
+		dr = new ThemeingDamagerRepairer(getRegexpScanner());
 		reconciler.setDamager(dr, JS_REGEXP);
 		reconciler.setRepairer(dr, JS_REGEXP);
 	}
@@ -214,7 +215,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 		if (multiLineCommentScanner == null)
 		{
 			multiLineCommentScanner = new RuleBasedScanner();
-			multiLineCommentScanner.setDefaultReturnToken(getToken("comment.block.js")); //$NON-NLS-1$
+			multiLineCommentScanner.setDefaultReturnToken(new Token("comment.block.js")); //$NON-NLS-1$
 		}
 		return multiLineCommentScanner;
 	}
@@ -224,7 +225,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 		if (singleLineCommentScanner == null)
 		{
 			singleLineCommentScanner = new RuleBasedScanner();
-			singleLineCommentScanner.setDefaultReturnToken(getToken("comment.line.double-slash.js")); //$NON-NLS-1$
+			singleLineCommentScanner.setDefaultReturnToken(new Token("comment.line.double-slash.js")); //$NON-NLS-1$
 		}
 		return singleLineCommentScanner;
 	}

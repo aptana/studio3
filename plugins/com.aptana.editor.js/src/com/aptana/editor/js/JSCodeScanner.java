@@ -304,7 +304,8 @@ public class JSCodeScanner extends RuleBasedScanner
 
 	protected IToken createToken(String string)
 	{
-		return getThemeManager().getToken(string);
+		return new Token(string);
+//		return getThemeManager().getToken(string);
 	}
 
 	protected IThemeManager getThemeManager()

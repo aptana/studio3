@@ -57,6 +57,7 @@ import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
+import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
 
@@ -225,18 +226,18 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
 	{
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(Activator.getDefault().getCodeScanner());
+		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(Activator.getDefault().getCodeScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
-		dr = new DefaultDamagerRepairer(getWordScanner());
+		dr = new ThemeingDamagerRepairer(getWordScanner());
 		reconciler.setDamager(dr, MULTILINE_COMMENT);
 		reconciler.setRepairer(dr, MULTILINE_COMMENT);
 
-		dr = new DefaultDamagerRepairer(getStringScanner());
+		dr = new ThemeingDamagerRepairer(getStringScanner());
 		reconciler.setDamager(dr, STRING);
 		reconciler.setRepairer(dr, STRING);
 	}
@@ -263,7 +264,8 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	protected IToken getToken(String name)
 	{
-		return getThemeManager().getToken(name);
+		return new Token(name);
+//		return getThemeManager().getToken(name);
 	}
 
 	protected IThemeManager getThemeManager()

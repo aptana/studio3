@@ -42,6 +42,7 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
+import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WordRule;
 
 import com.aptana.theme.IThemeManager;
@@ -114,7 +115,8 @@ public class JSDocScanner extends RuleBasedScanner
 
 	protected IToken getToken(String tokenName)
 	{
-		return getThemeManager().getToken(tokenName);
+		return new Token(tokenName);
+//		return getThemeManager().getToken(tokenName);
 	}
 
 	protected IThemeManager getThemeManager()
