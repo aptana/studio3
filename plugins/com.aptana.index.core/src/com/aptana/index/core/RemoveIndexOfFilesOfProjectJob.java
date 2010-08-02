@@ -33,7 +33,7 @@ class RemoveIndexOfFilesOfProjectJob extends IndexRequestJob
 		{
 			return Status.CANCEL_STATUS;
 		}
-		if (!project.isAccessible())
+		if (!project.isAccessible() || getContainerURI() == null)
 		{
 			return Status.CANCEL_STATUS;
 		}

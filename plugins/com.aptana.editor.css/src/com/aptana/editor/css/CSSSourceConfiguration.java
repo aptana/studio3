@@ -146,9 +146,10 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	{
 		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 		c.addTranslation(new QualifiedContentType(ICSSConstants.CONTENT_TYPE_CSS), new QualifiedContentType(
-				"source.css")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(MULTILINE_COMMENT), new QualifiedContentType("comment.block.css")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(STRING), new QualifiedContentType("string.quoted.single.css")); //$NON-NLS-1$
+				ICSSConstants.CSS_SCOPE));
+		c.addTranslation(new QualifiedContentType(MULTILINE_COMMENT), new QualifiedContentType(
+				ICSSConstants.CSS_COMMENT_BLOCK_SCOPE));
+		c.addTranslation(new QualifiedContentType(STRING), new QualifiedContentType(ICSSConstants.CSS_STRING_SCOPE));
 	}
 
 	public static CSSSourceConfiguration getDefault()
@@ -245,7 +246,7 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 		if (multilineCommentScanner == null)
 		{
 			multilineCommentScanner = new RuleBasedScanner();
-			multilineCommentScanner.setDefaultReturnToken(getToken("comment.block.css")); //$NON-NLS-1$
+			multilineCommentScanner.setDefaultReturnToken(getToken(ICSSConstants.CSS_COMMENT_BLOCK_SCOPE));
 		}
 		return multilineCommentScanner;
 	}
@@ -255,7 +256,7 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 		if (stringScanner == null)
 		{
 			stringScanner = new RuleBasedScanner();
-			stringScanner.setDefaultReturnToken(getToken("string.quoted.single.css")); //$NON-NLS-1$
+			stringScanner.setDefaultReturnToken(getToken(ICSSConstants.CSS_STRING_SCOPE));
 		}
 		return stringScanner;
 	}

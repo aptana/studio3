@@ -37,6 +37,7 @@ package com.aptana.filesystem.ftp.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
@@ -68,6 +69,7 @@ import com.aptana.ide.core.io.vfs.ExtendedFileInfo;
 import com.aptana.ide.core.io.vfs.IConnectionFileManager;
 import com.aptana.ide.core.io.vfs.IExtendedFileInfo;
 import com.aptana.ide.core.io.vfs.IExtendedFileStore;
+import com.enterprisedt.net.ftp.FTPException;
 
 /**
  * @author Max Stepanov
@@ -163,7 +165,7 @@ public abstract class BaseFTPConnectionFileManager implements IConnectionFileMan
 				try {
 					fileInfos = cache(path, fetchFiles(basePath.append(path), options, monitor));
 					for (ExtendedFileInfo fileInfo : fileInfos) {
-						postProcessFileInfo(fileInfo, path, options, monitor);
+						postProcessFileInfo(fileInfo, basePath.append(path), options, monitor);
 						cache(path.append(fileInfo.getName()), fileInfo);
 					}
 				} catch (FileNotFoundException e) {
@@ -450,6 +452,7 @@ public abstract class BaseFTPConnectionFileManager implements IConnectionFileMan
 	protected abstract URI getRootCanonicalURI();
 
 	// all methods here accept absolute path
+	protected abstract void changeCurrentDir(IPath path) throws FTPException, IOException;
 	protected abstract ExtendedFileInfo fetchFile(IPath path, int options, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
 	protected abstract ExtendedFileInfo[] fetchFiles(IPath path, int options, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
 	protected abstract String[] listDirectory(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
@@ -486,15 +489,27 @@ public abstract class BaseFTPConnectionFileManager implements IConnectionFileMan
 	
 	private void postProcessFileInfo(ExtendedFileInfo fileInfo, IPath dirPath, int options, IProgressMonitor monitor) throws CoreException {
 		if (fileInfo.getAttribute(EFS.ATTRIBUTE_SYMLINK)) {
-			ExtendedFileInfo targetFileInfo = resolveSymlink(dirPath, fileInfo.getStringAttribute(EFS.ATTRIBUTE_LINK_TARGET), options, monitor);
-			fileInfo.setExists(targetFileInfo.exists());
-			if (targetFileInfo.exists()) {
-				fileInfo.setDirectory(targetFileInfo.isDirectory());
-				fileInfo.setLength(targetFileInfo.getLength());
-				fileInfo.setLastModified(targetFileInfo.getLastModified());
-				fileInfo.setOwner(targetFileInfo.getOwner());
-				fileInfo.setGroup(targetFileInfo.getGroup());
-				fileInfo.setPermissions(targetFileInfo.getPermissions());
+			try {
+				ExtendedFileInfo targetFileInfo = resolveSymlink(dirPath, fileInfo.getStringAttribute(EFS.ATTRIBUTE_LINK_TARGET), options, monitor);
+				fileInfo.setExists(targetFileInfo.exists());
+				if (targetFileInfo.exists()) {
+					fileInfo.setDirectory(targetFileInfo.isDirectory());
+					fileInfo.setLength(targetFileInfo.getLength());
+					fileInfo.setLastModified(targetFileInfo.getLastModified());
+					fileInfo.setOwner(targetFileInfo.getOwner());
+					fileInfo.setGroup(targetFileInfo.getGroup());
+					fileInfo.setPermissions(targetFileInfo.getPermissions());
+				}
+			} catch (FileNotFoundException e) {
+				try {
+					changeCurrentDir(dirPath.append(fileInfo.getName()));
+					fileInfo.setExists(true);
+					fileInfo.setDirectory(true);
+				} catch (FileNotFoundException fnfe) {
+					fileInfo.setExists(false);
+				} catch (Exception ignore) {
+					FTPPlugin.log(new Status(IStatus.WARNING, FTPPlugin.PLUGIN_ID, Messages.BaseFTPConnectionFileManager_symlink_resolve_failed, e));
+				}
 			}
 		}
 		long permissions = fileInfo.getPermissions();
@@ -502,7 +517,7 @@ public abstract class BaseFTPConnectionFileManager implements IConnectionFileMan
 		fileInfo.setAttribute(EFS.ATTRIBUTE_EXECUTABLE, (permissions & IExtendedFileInfo.PERMISSION_OWNER_EXECUTE) != 0);
 	}
 	
-	private ExtendedFileInfo resolveSymlink(IPath dirPath, String linkTarget, int options, IProgressMonitor monitor) throws CoreException {
+	private ExtendedFileInfo resolveSymlink(IPath dirPath, String linkTarget, int options, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
 		Set<IPath> visited = new HashSet<IPath>();
 		visited.add(dirPath);
 		while (linkTarget != null && linkTarget.length() > 0) {
@@ -516,12 +531,8 @@ public abstract class BaseFTPConnectionFileManager implements IConnectionFileMan
 			visited.add(targetPath);
 			ExtendedFileInfo targetFileInfo = getCachedFileInfo(targetPath);
 			if (targetFileInfo == null) {
-				try {
-					Policy.checkCanceled(monitor);
-					targetFileInfo = cache(targetPath, fetchFile(targetPath, options, Policy.subMonitorFor(monitor, 1)));
-				} catch (FileNotFoundException e) {
-					targetFileInfo = new ExtendedFileInfo();
-				}
+				Policy.checkCanceled(monitor);
+				targetFileInfo = cache(targetPath, fetchFile(targetPath, options, Policy.subMonitorFor(monitor, 1)));
 			}
 			cache(targetPath, targetFileInfo);
 			if (targetFileInfo.getAttribute(EFS.ATTRIBUTE_SYMLINK)) {

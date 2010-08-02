@@ -193,7 +193,7 @@ public class FunctionElement extends PropertyElement
 		StringBuilder buffer = new StringBuilder();
 		boolean first = true;
 
-		buffer.append(JSTypeConstants.FUNCTION); //$NON-NLS-1$
+		buffer.append(JSTypeConstants.FUNCTION_TYPE); //$NON-NLS-1$
 
 		for (ReturnTypeElement returnType : this.getReturnTypes())
 		{
@@ -276,38 +276,38 @@ public class FunctionElement extends PropertyElement
 
 		if (this.isInstanceProperty())
 		{
-			printer.print("static ");
+			printer.print("static "); //$NON-NLS-1$
 		}
 		if (this.isInternal())
 		{
-			printer.print("internal ");
+			printer.print("internal "); //$NON-NLS-1$
 		}
 		if (this.isConstructor())
 		{
-			printer.print("constructor ");
+			printer.print("constructor "); //$NON-NLS-1$
 		}
 		if (this.isMethod())
 		{
-			printer.print("method ");
+			printer.print("method "); //$NON-NLS-1$
 		}
 
 		printer.print(this.getName());
-		printer.print("(").print(StringUtil.join(", ", this.getParameterTypes())).print(")");
+		printer.print("(").print(StringUtil.join(", ", this.getParameterTypes())).print(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		List<String> returnTypes = this.getTypeNames();
-		printer.print(" : ");
+		printer.print(" : "); //$NON-NLS-1$
 		if (returnTypes != null && returnTypes.isEmpty() == false)
 		{
-			printer.print(StringUtil.join(",", this.getTypeNames()));
+			printer.print(StringUtil.join(",", this.getTypeNames())); //$NON-NLS-1$
 		}
 		else
 		{
-			printer.print("void");
+			printer.print(JSTypeConstants.VOID_TYPE);
 		}
 
 		if (this.hasExceptions())
 		{
-			printer.print(" throws ").print(StringUtil.join(", ", this.getExceptionTypes()));
+			printer.print(" throws ").print(StringUtil.join(", ", this.getExceptionTypes())); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 }

@@ -12,7 +12,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.console,
  org.eclipse.search,
  com.aptana.core,
- com.aptana.ui.epl
+ com.aptana.ui.epl,
+ org.eclipse.core.expressions
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.ui,

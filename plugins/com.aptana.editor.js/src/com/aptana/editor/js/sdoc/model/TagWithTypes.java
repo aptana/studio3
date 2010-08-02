@@ -60,7 +60,7 @@ public abstract class TagWithTypes extends Tag
 				}
 				else
 				{
-					writer.print(",");
+					writer.print(","); //$NON-NLS-1$
 				}
 				
 				type.toSource(writer);

@@ -4,7 +4,7 @@ public interface IPreferenceConstants
 {
 	public enum DeployType
 	{
-		HEROKU, FTP, CAPISTRANO;
+		HEROKU, FTP, CAPISTRANO, ENGINEYARD, NONE;
 	}
 
 	public static final String AUTO_SYNC = "AutoSyncChangesWithRemote"; //$NON-NLS-1$

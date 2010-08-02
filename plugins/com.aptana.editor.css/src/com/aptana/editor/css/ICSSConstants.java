@@ -42,4 +42,8 @@ package com.aptana.editor.css;
 public interface ICSSConstants {
 
 	public String CONTENT_TYPE_CSS = "com.aptana.contenttype.css"; //$NON-NLS-1$
+	
+	public String CSS_SCOPE = "source.css"; //$NON-NLS-1$
+	public String CSS_COMMENT_BLOCK_SCOPE = "comment.block.css"; //$NON-NLS-1$
+	public String CSS_STRING_SCOPE = "string.quoted.single.css"; //$NON-NLS-1$
 }

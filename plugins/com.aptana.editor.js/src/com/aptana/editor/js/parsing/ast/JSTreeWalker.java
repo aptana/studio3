@@ -247,7 +247,7 @@ public class JSTreeWalker
 
 	public void visit(JSTrueNode node)
 	{
-		this.visitChildren(node);
+		// leaf
 	}
 
 	public void visit(JSTryNode node)

@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.parsing.io.SourcePrinter;
 
 public class PropertyElement extends BaseElement
@@ -55,7 +56,27 @@ public class PropertyElement extends BaseElement
 				this._types = new ArrayList<ReturnTypeElement>();
 			}
 
-			this._types.add(type);
+			if (this._types.contains(type) == false)
+			{
+				this._types.add(type);
+			}
+		}
+	}
+
+	/**
+	 * addType
+	 * 
+	 * @param type
+	 */
+	public void addType(String type)
+	{
+		if (type != null && type.length() > 0)
+		{
+			ReturnTypeElement returnType = new ReturnTypeElement();
+
+			returnType.setType(type);
+
+			this.addType(returnType);
 		}
 	}
 
@@ -224,25 +245,25 @@ public class PropertyElement extends BaseElement
 
 		if (this.isInstanceProperty())
 		{
-			printer.print("static ");
+			printer.print("static "); //$NON-NLS-1$
 		}
 		if (this.isInternal())
 		{
-			printer.print("internal ");
+			printer.print("internal "); //$NON-NLS-1$
 		}
 
 		printer.print(this.getName());
-		printer.print(" : ");
+		printer.print(" : "); //$NON-NLS-1$
 
 		List<String> types = this.getTypeNames();
 
 		if (types != null && types.size() > 0)
 		{
-			printer.print(StringUtil.join(",", this.getTypeNames()));
+			printer.print(StringUtil.join(",", this.getTypeNames())); //$NON-NLS-1$
 		}
 		else
 		{
-			printer.print("undefined");
+			printer.print(JSTypeConstants.UNDEFINED_TYPE);
 		}
 	}
 }

@@ -38,6 +38,11 @@ public interface IPreferenceConstants
 {
 
 	/**
+	 * Preference key used to save the active theme.
+	 */
+	public static final String ACTIVE_THEME = "ACTIVE_THEME"; //$NON-NLS-1$
+
+	/**
 	 * Pref key for enabling "invasive" themes (extend to JDT and other views that are not explicitly ours).
 	 */
 	public static final String INVASIVE_THEMES = "enable_invasive_themes"; //$NON-NLS-1$

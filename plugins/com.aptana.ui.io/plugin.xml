@@ -67,9 +67,13 @@
          <commonSorter
                class="com.aptana.ide.ui.io.navigator.FileTreeNameSorter">
             <parentExpression>
-               <instanceof
-                     value="com.aptana.ide.ui.io.navigator.FileSystemObject">
-               </instanceof>
+               <or>
+                  <instanceof
+                        value="org.eclipse.core.resources.IResource">
+                  </instanceof>
+                  <instanceof
+                        value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+                  </instanceof></or>
             </parentExpression>
          </commonSorter>
          <possibleChildren>

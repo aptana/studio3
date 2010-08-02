@@ -73,7 +73,7 @@ public class OpenTagCloser implements VerifyKeyListener
 			}
 
 			String openTag = isUnclosedOpenTag(document, offset, event);
-			if (openTag == null || openTag.startsWith("<%"))
+			if (openTag == null || openTag.startsWith("<%") || openTag.startsWith("<!"))
 				return;
 
 			String closeTag = getMatchingCloseTag(openTag);

@@ -48,5 +48,15 @@
             language="text/css">
       </parser>
    </extension>
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
+      <hyperlinkDetector
+            activate="true"
+            class="com.aptana.editor.css.text.hyperlink.HTMLIDHyperlinkDetector"
+            id="com.aptana.editor.css.hyperlinkDetector"
+            name="CSS Class Hyperlinks"
+            targetId="com.aptana.editor.ui.hyperlinkTarget">
+      </hyperlinkDetector>
+   </extension>
 
 </plugin>
