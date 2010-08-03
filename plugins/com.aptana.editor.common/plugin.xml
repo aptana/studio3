@@ -419,6 +419,13 @@
             </command>
          </toolbar>
       </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.menus.showInMenu">
+         <command
+               commandId="com.aptana.ui.command.ShowInFileManager"
+               style="push">
+         </command>
+      </menuContribution>
 	</extension>
 	<extension
          point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectorTargets">

@@ -15,6 +15,7 @@ import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.ui.IFileEditorInput;
 
 import com.aptana.core.util.ProcessUtil;
 
@@ -32,11 +33,20 @@ public class OpenInFinderHandler extends AbstractHandler
 		if (context instanceof EvaluationContext)
 		{
 			EvaluationContext evContext = (EvaluationContext) event.getApplicationContext();
-			@SuppressWarnings("unchecked")
-			List<IResource> selectedFiles = (List<IResource>) evContext.getDefaultVariable();
-			for (IResource selected : selectedFiles)
+			Object input = evContext.getVariable("showInInput");
+			if (input instanceof IFileEditorInput)
 			{
-				open(selected);
+				IFileEditorInput fei = (IFileEditorInput) input;
+				open(fei.getFile());
+			}
+			else
+			{
+				@SuppressWarnings("unchecked")
+				List<IResource> selectedFiles = (List<IResource>) evContext.getDefaultVariable();
+				for (IResource selected : selectedFiles)
+				{
+					open(selected);
+				}
 			}
 		}
 		return null;
