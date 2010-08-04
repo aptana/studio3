@@ -64,7 +64,7 @@
       </delegate>
       <processor
             category="configurations"
-            class="com.aptana.portal.ui.dispatch.configurationProcessors.JSLibraryInstallProcessor"
+            class="com.aptana.portal.ui.dispatch.configurationProcessors.JavaScriptLibraryInstallProcessor"
             id="com.aptana.portal.jsLibrary.installer.processor"
             name="JS Library Installer">
       </processor>

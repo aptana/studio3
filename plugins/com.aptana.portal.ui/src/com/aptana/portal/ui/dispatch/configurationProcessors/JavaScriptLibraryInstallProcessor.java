@@ -26,7 +26,7 @@ import org.eclipse.ui.progress.UIJob;
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.core.util.IOUtil;
 import com.aptana.portal.ui.PortalUIPlugin;
-import com.aptana.portal.ui.dispatch.configurationProcessors.installer.ImportJavaScriptLibraryDialog;
+import com.aptana.portal.ui.dispatch.configurationProcessors.installer.JavaScriptImporterOptionsDialog;
 
 /**
  * An installer (import) processor for JavaScript libraries, such as jQuery and Prototype.<br>
@@ -35,7 +35,7 @@ import com.aptana.portal.ui.dispatch.configurationProcessors.installer.ImportJav
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
-public class JSLibraryInstallProcessor extends InstallerConfigurationProcessor
+public class JavaScriptLibraryInstallProcessor extends InstallerConfigurationProcessor
 {
 
 	private static final String JS_LIBRARY = "JS Library"; //$NON-NLS-1$
@@ -163,7 +163,7 @@ public class JSLibraryInstallProcessor extends InstallerConfigurationProcessor
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
-				ImportJavaScriptLibraryDialog dialog = new ImportJavaScriptLibraryDialog(Display.getDefault()
+				JavaScriptImporterOptionsDialog dialog = new JavaScriptImporterOptionsDialog(Display.getDefault()
 						.getActiveShell(), libraryName);
 				if (dialog.open() == Window.OK)
 				{

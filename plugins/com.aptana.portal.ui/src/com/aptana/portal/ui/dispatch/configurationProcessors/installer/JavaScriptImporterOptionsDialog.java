@@ -38,7 +38,13 @@ import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.portal.ui.dispatch.configurationProcessors.Messages;
 
-public class ImportJavaScriptLibraryDialog extends InstallerOptionsDialog
+/**
+ * An import dialog that appears right after we download a JavaScript library through the developer-toolbox. <br>
+ * The dialog lets the user choose the project and the location in the project that the JS library will be saved.
+ * 
+ * @author Shalom Gibly <sgibly@aptana.com>
+ */
+public class JavaScriptImporterOptionsDialog extends InstallerOptionsDialog
 {
 	public static final String ACTIVE_PROJECT_ATTR = "active_project"; //$NON-NLS-1$s
 
@@ -59,7 +65,7 @@ public class ImportJavaScriptLibraryDialog extends InstallerOptionsDialog
 	 * @param parentShell
 	 * @param libraryName
 	 */
-	public ImportJavaScriptLibraryDialog(Shell parentShell, String libraryName)
+	public JavaScriptImporterOptionsDialog(Shell parentShell, String libraryName)
 	{
 		super(Display.getDefault().getActiveShell(), capitalize(libraryName));
 	}
