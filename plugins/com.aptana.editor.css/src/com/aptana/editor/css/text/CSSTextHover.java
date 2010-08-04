@@ -20,6 +20,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Shell;
 
 import com.aptana.editor.common.contentassist.InformationControl;
+import com.aptana.editor.css.Activator;
 import com.aptana.editor.css.CSSColors;
 import com.aptana.theme.ColorManager;
 import com.aptana.theme.Theme;
@@ -70,8 +71,7 @@ public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHover
 		}
 		catch (BadLocationException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Activator.logError(e.getMessage(), e);
 		}
 		return new Region(offset, 0);
 	}
@@ -93,7 +93,7 @@ public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHover
 			}
 			else
 			{
-				// TODO Match against a pattern to verify it's a color
+				// Match against a pattern to verify it's a color
 				if (!RGB_PATTERN.matcher(word).matches())
 				{
 					return null;
@@ -104,8 +104,7 @@ public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHover
 		}
 		catch (BadLocationException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Activator.logError(e.getMessage(), e);
 		}
 		return null;
 	}
@@ -125,13 +124,6 @@ public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHover
 		int g = Integer.parseInt(s, 16);
 		s = token.substring(5, 7);
 		int b = Integer.parseInt(s, 16);
-		// if (token.length() == 9 && alphaMergeWithBG)
-		// {
-		// // Handle RGBa values by mixing against BG, etc
-		// s = token.substring(7, 9);
-		// int a = Integer.parseInt(s, 16);
-		// return alphaBlend(defaultBG, new RGB(r, g, b), a);
-		// }
 		return new RGB(r, g, b);
 	}
 
@@ -200,10 +192,6 @@ public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHover
 		@Override
 		public void setInput(Object input)
 		{
-			if (input == null)
-			{
-				return;
-			}
 			if (input instanceof RGB)
 			{
 				setBackgroundColor(getColorManager().getColor((RGB) input));
