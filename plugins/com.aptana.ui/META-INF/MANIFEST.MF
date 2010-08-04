@@ -18,6 +18,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.ui,
  com.aptana.ui.actions,
+ com.aptana.ui.commands,
  com.aptana.ui.preferences,
  com.aptana.ui.projects,
  com.aptana.ui.widgets

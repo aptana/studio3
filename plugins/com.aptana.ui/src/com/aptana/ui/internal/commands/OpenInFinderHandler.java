@@ -33,7 +33,7 @@ public class OpenInFinderHandler extends AbstractHandler
 		if (context instanceof EvaluationContext)
 		{
 			EvaluationContext evContext = (EvaluationContext) event.getApplicationContext();
-			Object input = evContext.getVariable("showInInput");
+			Object input = evContext.getVariable("showInInput"); //$NON-NLS-1$
 			if (input instanceof IFileEditorInput)
 			{
 				IFileEditorInput fei = (IFileEditorInput) input;
@@ -68,8 +68,8 @@ public class OpenInFinderHandler extends AbstractHandler
 	private boolean openOnLinux(IResource selected)
 	{
 		// TODO Do we also need to try 'gnome-open' or 'dolphin' if nautilus fails?
-		Map<Integer, String> result = ProcessUtil.runInBackground("nautilus", null, "\""
-				+ selected.getLocation().toOSString() + "\"");
+		Map<Integer, String> result = ProcessUtil.runInBackground("nautilus", null, "\"" //$NON-NLS-1$ //$NON-NLS-2$
+				+ selected.getLocation().toOSString() + "\""); //$NON-NLS-1$
 		if (result == null)
 		{
 			return false;
@@ -80,10 +80,10 @@ public class OpenInFinderHandler extends AbstractHandler
 
 	private boolean openInWindowsExplorer(IResource selected)
 	{
-		String systemRoot = System.getenv("SystemRoot");
-		String explorer = systemRoot + "\\explorer.exe";
-		Map<Integer, String> result = ProcessUtil.runInBackground(explorer, null, "/select,\""
-				+ selected.getLocation().toOSString() + "\"");
+		String systemRoot = System.getenv("SystemRoot"); //$NON-NLS-1$
+		String explorer = systemRoot + "\\explorer.exe"; //$NON-NLS-1$
+		Map<Integer, String> result = ProcessUtil.runInBackground(explorer, null, "/select,\"" //$NON-NLS-1$
+				+ selected.getLocation().toOSString() + "\""); //$NON-NLS-1$
 		if (result == null)
 		{
 			return false;
@@ -95,11 +95,11 @@ public class OpenInFinderHandler extends AbstractHandler
 	private boolean openInFinder(IResource selected)
 	{
 		URI uri = selected.getLocationURI();
-		String subcommand = "open";
+		String subcommand = "open"; //$NON-NLS-1$
 		String path = uri.getPath();
 		if (selected instanceof IFile)
 		{
-			subcommand = "reveal";
+			subcommand = "reveal"; //$NON-NLS-1$
 		}
 		try
 		{

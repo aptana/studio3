@@ -177,7 +177,7 @@
       <command
             defaultHandler="com.aptana.ui.internal.commands.OpenInFinderHandler"
             id="com.aptana.ui.command.ShowInFileManager"
-            name="File Manager">
+            name="%ShowInFileManager.label">
       </command>
    </extension>
    <extension
@@ -223,24 +223,10 @@
          <menu
                id="projectExplorerShowIn"
                label="%ShowIn.label">
-            <command
-                  commandId="com.aptana.ui.command.ShowInFileManager"
-                  label="Finder"
-                  style="push">
-            </command>
-         </menu>
-      </menuContribution>
-      <menuContribution
-            allPopups="true"
-            locationURI="popup:com.aptana.explorer.view?before=group.edit">
-         <menu
-               id="appExplorerShowIn"
-               label="%ShowIn.label">
-            <command
-                  commandId="com.aptana.ui.command.ShowInFileManager"
-                  label="Finder"
-                  style="push">
-            </command>
+            <dynamic
+                  class="com.aptana.ui.commands.OpenFileManagerContributionItem"
+                  id="com.aptana.ui.open.file.manager">
+            </dynamic>
          </menu>
       </menuContribution>
    </extension>

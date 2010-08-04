@@ -421,10 +421,10 @@
       </menuContribution>
       <menuContribution
             locationURI="popup:org.eclipse.ui.menus.showInMenu">
-         <command
-               commandId="com.aptana.ui.command.ShowInFileManager"
-               style="push">
-         </command>
+         <dynamic
+               class="com.aptana.ui.commands.OpenFileManagerContributionItem"
+               id="com.aptana.editor.common.open.in.file.manager">
+         </dynamic>
       </menuContribution>
 	</extension>
 	<extension
