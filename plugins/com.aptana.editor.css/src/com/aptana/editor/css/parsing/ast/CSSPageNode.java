@@ -50,19 +50,18 @@ public class CSSPageNode extends CSSNode
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (!(obj instanceof CSSPageNode))
+		if (!super.equals(obj) || !(obj instanceof CSSPageNode))
 		{
 			return false;
 		}
 		CSSPageNode other = (CSSPageNode) obj;
-		return (fPageSelector == null ? other.fPageSelector == null : fPageSelector.equals(other.fPageSelector))
-				&& Arrays.equals(getDeclarations(), other.getDeclarations());
+		return toString().equals(other.toString());
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return 31 * (fPageSelector == null ? 0 : fPageSelector.hashCode()) + Arrays.hashCode(getDeclarations());
+		return super.hashCode() * 31 + toString().hashCode();
 	}
 
 	@Override
