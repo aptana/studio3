@@ -8,6 +8,7 @@ Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ui.browser,
+ org.eclipse.ui.ide,
  com.aptana.usage,
  com.aptana.editor.common,
  com.aptana.core,

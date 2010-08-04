@@ -177,6 +177,7 @@ public class VersionsConfigurationProcessor extends AbstractConfigurationProcess
 	 */
 	protected IPath getActiveWorkingDir()
 	{
+		// FIXME - Shalom: Test is. This might not work after the latest changes to the way we save the active project
 		IPreferencesService preferencesService = Platform.getPreferencesService();
 		String activeProjectName = preferencesService.getString(ExplorerPlugin.PLUGIN_ID,
 				IPreferenceConstants.ACTIVE_PROJECT, null, null);

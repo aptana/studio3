@@ -164,4 +164,19 @@ public abstract class InstallerOptionsDialog extends TitleAreaDialog
 		// Does nothing special here
 		return parent;
 	}
+
+	/**
+	 * Capitalize the word by upper-casing the first letter.
+	 * 
+	 * @param word
+	 * @return A capitalized word.
+	 */
+	protected static String capitalize(String word)
+	{
+		if (word != null && word.length() > 0)
+		{
+			return Character.toUpperCase(word.charAt(0)) + word.substring(1);
+		}
+		return word;
+	}
 }

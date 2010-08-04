@@ -264,9 +264,12 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 				}
 			}
 		}
-		// Cache the version and the location of the installed XAMPP.
-		// We assume here that the version of XAMPP is specified in the install URL!
-		cacheVersion(installDir, urls[0], getApplicationName());
+		// Cache the version and the location of the installed app.
+		// We assume here that the version of app is specified in the install URL!
+		if (installDir != null)
+		{
+			cacheVersion(installDir, urls[0], getApplicationName());
+		}
 	}
 
 	/*
