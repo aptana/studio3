@@ -251,7 +251,7 @@ public class JavaScriptLibraryInstallProcessor extends InstallerConfigurationPro
 					}
 					else
 					{
-						PortalUIPlugin.logError("Unexpected null project when importing JS slibrary!", new Exception()); //$NON-NLS-1$
+						PortalUIPlugin.logError("Unexpected null project when importing a JS library!", new Exception()); //$NON-NLS-1$
 						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID,
 								Messages.JSLibraryInstallProcessor_unexpectedNull);
 					}
