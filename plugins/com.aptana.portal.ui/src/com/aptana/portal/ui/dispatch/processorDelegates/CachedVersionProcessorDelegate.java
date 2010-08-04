@@ -3,9 +3,17 @@ package com.aptana.portal.ui.dispatch.processorDelegates;
 import java.io.File;
 import java.util.Map;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
+import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.mortbay.util.ajax.JSON;
+import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.portal.ui.IPortalPreferences;
@@ -57,8 +65,20 @@ public class CachedVersionProcessorDelegate extends BaseVersionProcessor
 	public Object runCommand(String commandType, IPath workingDir)
 	{
 		// We cache the version and the location in the preferences as a JSON string. So, it's pretty easy to maintain.
-		IPreferenceStore preferenceStore = PortalUIPlugin.getDefault().getPreferenceStore();
-		String versions = preferenceStore.getString(IPortalPreferences.CACHED_VERSIONS_PROPERTY_NAME);
+
+		IPreferencesService service = Platform.getPreferencesService();
+		IScopeContext[] contexts;
+		IProject project = PortalUIPlugin.getActiveProject();
+		if (project != null)
+		{
+			contexts = new IScopeContext[] { new ProjectScope(project), new DefaultScope() };
+		}
+		else
+		{
+			contexts = new IScopeContext[] { new InstanceScope(), new DefaultScope() };
+		}
+		String versions = service.getString(PortalUIPlugin.PLUGIN_ID, IPortalPreferences.CACHED_VERSIONS_PROPERTY_NAME,
+				null, contexts);
 		if (versions == null || versions.equals(StringUtil.EMPTY))
 		{
 			return null;
@@ -77,8 +97,26 @@ public class CachedVersionProcessorDelegate extends BaseVersionProcessor
 				if (!localFile.exists())
 				{
 					mapping.remove(getSupportedApplication().toLowerCase());
-					preferenceStore.setValue(IPortalPreferences.CACHED_VERSIONS_PROPERTY_NAME, JSON.toString(mapping));
-					return null;
+					IEclipsePreferences node = null;
+					if (project != null)
+					{
+						node = contexts[0].getNode(PortalUIPlugin.PLUGIN_ID);
+					}
+					else
+					{
+						node = contexts[1].getNode(PortalUIPlugin.PLUGIN_ID);
+					}
+					node.put(IPortalPreferences.CACHED_VERSIONS_PROPERTY_NAME, JSON.toString(mapping));
+					try
+					{
+						node.flush();
+					}
+					catch (BackingStoreException e)
+					{
+						PortalUIPlugin.logError(e);
+						return null;
+					}
+					return version;
 				}
 				// We are good to return the cached version
 				return version;
