@@ -7,7 +7,6 @@ import java.text.MessageFormat;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -15,7 +14,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -50,7 +48,6 @@ public class Portal
 	private static final String BASE_REMOTE_URL = BASE_URL_PREFIX;
 	private static final String BASE_LOCAL_URL = "/content/index.html"; //$NON-NLS-1$
 
-	private static final String EXPLORER_PLUGIN_ID = "com.aptana.explorer"; //$NON-NLS-1$
 	public static final String ACTIVE_PROJECT_KEY = "activeProject"; //$NON-NLS-1$
 	private static final String RAILS_NATURE = "org.radrails.rails.core.railsnature"; //$NON-NLS-1$
 	private static final String PHP_NATURE = "com.aptana.editor.php.phpnature"; //$NON-NLS-1$
@@ -92,7 +89,7 @@ public class Portal
 			{
 				url = getDefaultURL();
 			}
-			URL urlWithGetParams = new URL(url.toString() + getURLForProject(getActiveProject()));
+			URL urlWithGetParams = new URL(url.toString() + getURLForProject(PortalUIPlugin.getActiveProject()));
 			url = urlWithGetParams;
 		}
 		catch (IOException e)
@@ -271,25 +268,6 @@ public class Portal
 	protected IThemeManager getThemeManager()
 	{
 		return ThemePlugin.getDefault().getThemeManager();
-	}
-
-	/**
-	 * getActiveProject
-	 * 
-	 * @return
-	 */
-	protected IProject getActiveProject()
-	{
-		IPreferencesService preferencesService = Platform.getPreferencesService();
-		String activeProjectName = preferencesService.getString(EXPLORER_PLUGIN_ID, ACTIVE_PROJECT_KEY, null, null);
-		IProject result = null;
-
-		if (activeProjectName != null)
-		{
-			result = ResourcesPlugin.getWorkspace().getRoot().getProject(activeProjectName);
-		}
-
-		return result;
 	}
 
 	protected String getGUID()

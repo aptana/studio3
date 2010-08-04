@@ -109,9 +109,9 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 				case IStatus.OK:
 				case IStatus.INFO:
 				case IStatus.WARNING:
-					displayMessageInUIThread(MessageDialog.INFORMATION,
-							NLS.bind(Messages.InstallProcessor_installerTitle, RUBY),
-							NLS.bind(Messages.InstallProcessor_installationSuccessful, RUBY));
+					displayMessageInUIThread(MessageDialog.INFORMATION, NLS.bind(
+							Messages.InstallProcessor_installerTitle, RUBY), NLS.bind(
+							Messages.InstallProcessor_installationSuccessful, RUBY));
 					configurationStatus.setStatus(ConfigurationStatus.OK);
 					break;
 				case IStatus.ERROR:
@@ -214,8 +214,8 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 			status = installDevKit(installDir[0]);
 			if (!status.isOK())
 			{
-				displayMessageInUIThread(MessageDialog.ERROR, Messages.InstallProcessor_installationErrorTitle,
-						status.getMessage());
+				displayMessageInUIThread(MessageDialog.ERROR, Messages.InstallProcessor_installationErrorTitle, status
+						.getMessage());
 				return status;
 			}
 			finalizeInstallation(installDir[0]);
@@ -337,8 +337,8 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 				try
 				{
 					SubMonitor subMonitor = SubMonitor.convert(monitor, 1000);
-					subMonitor.beginTask(
-							NLS.bind(Messages.InstallProcessor_extractingPackageTaskName, DEVKIT, installDir), 900);
+					subMonitor.beginTask(NLS.bind(Messages.InstallProcessor_extractingPackageTaskName, DEVKIT,
+							installDir), 900);
 					// We get a folder status first, before unzipping into the folder. This folder was just created,
 					// so there is a chance it's still being held by the OS or by the Ruby installer.
 					IStatus folderStatus = LockUtils.waitForFolderAccess(installDir, 10000);

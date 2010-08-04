@@ -22,11 +22,13 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.progress.UIJob;
+import org.osgi.framework.Version;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.core.util.IOUtil;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.configurationProcessors.installer.JavaScriptImporterOptionsDialog;
+import com.aptana.portal.ui.dispatch.processorDelegates.BaseVersionProcessor;
 
 /**
  * An installer (import) processor for JavaScript libraries, such as jQuery and Prototype.<br>
@@ -41,6 +43,7 @@ public class JavaScriptLibraryInstallProcessor extends InstallerConfigurationPro
 	private static final String JS_LIBRARY = "JS Library"; //$NON-NLS-1$
 	private static boolean installationInProgress;
 	private String libraryName;
+	private IProject targetProject;
 
 	/**
 	 * Returns the JS Library name.
@@ -49,6 +52,33 @@ public class JavaScriptLibraryInstallProcessor extends InstallerConfigurationPro
 	protected String getApplicationName()
 	{
 		return libraryName;
+	}
+
+	/**
+	 * Returns the library's version.<br>
+	 * The version extraction will begin by trying to find a version in the library name. If failed, this call will try
+	 * to locate a version pattern in the download URLs. And if that fails, the method returns null.
+	 * 
+	 * @return The library's version; Null, if none is found.
+	 */
+	protected Version getLibraryVersion()
+	{
+		Version version = BaseVersionProcessor.parseVersion(getApplicationName());
+		if (version == null)
+		{
+			for (String url : this.urls)
+			{
+				if (version == null)
+				{
+					version = BaseVersionProcessor.parseVersion(url);
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+		return version;
 	}
 
 	/**
@@ -169,11 +199,11 @@ public class JavaScriptLibraryInstallProcessor extends InstallerConfigurationPro
 				{
 					String selectedLocation = dialog.getSelectedLocation();
 					IPath path = Path.fromOSString(selectedLocation);
-					IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(path.segment(0));
+					targetProject = ResourcesPlugin.getWorkspace().getRoot().getProject(path.segment(0));
 					// Making sure that the project is not null, although this should never happen
-					if (project != null)
+					if (targetProject != null)
 					{
-						String fullPath = project.getLocation().append(path.removeFirstSegments(1)).toOSString();
+						String fullPath = targetProject.getLocation().append(path.removeFirstSegments(1)).toOSString();
 						File targetFolder = new File(fullPath);
 						if (!targetFolder.exists() && !targetFolder.mkdirs())
 						{
@@ -215,8 +245,9 @@ public class JavaScriptLibraryInstallProcessor extends InstallerConfigurationPro
 							return new MultiStatus(PortalUIPlugin.PLUGIN_ID, 0, errors.toArray(new IStatus[errors
 									.size()]), Messages.JSLibraryInstallProcessor_multipleErrorsWhileImportingJS, null);
 						}
-						// TODO - Override this method implementation to deal with project-specific caching.
-						finalizeInstallation(targetFolder.getAbsolutePath());
+						// Since we don't cache the installed location for javascript libraries, we pass null here. This
+						// will only mark for deletion the downloaded content.
+						finalizeInstallation(null);
 					}
 					else
 					{
@@ -226,7 +257,7 @@ public class JavaScriptLibraryInstallProcessor extends InstallerConfigurationPro
 					}
 					try
 					{
-						project.refreshLocal(IResource.DEPTH_INFINITE, SubMonitor.convert(monitor));
+						targetProject.refreshLocal(IResource.DEPTH_INFINITE, SubMonitor.convert(monitor));
 					}
 					catch (CoreException e)
 					{

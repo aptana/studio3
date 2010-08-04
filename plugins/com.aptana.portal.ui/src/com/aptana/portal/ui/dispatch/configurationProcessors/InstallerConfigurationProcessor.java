@@ -57,12 +57,12 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 	}
 
 	/**
-	 * Returns the application name.
+	 * Returns the application's name.
 	 * 
-	 * @return The application name (e.g. XAMPP, Ruby)
+	 * @return The application's name (e.g. XAMPP, Ruby)
 	 */
 	protected abstract String getApplicationName();
-
+	
 	/**
 	 * Download the remote content and store it the temp directory.
 	 * 

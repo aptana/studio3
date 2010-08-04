@@ -7,8 +7,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -34,8 +32,7 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.views.navigator.ResourceComparator;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.explorer.ExplorerPlugin;
-import com.aptana.explorer.IPreferenceConstants;
+import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.configurationProcessors.Messages;
 
 /**
@@ -68,6 +65,7 @@ public class JavaScriptImporterOptionsDialog extends InstallerOptionsDialog
 	public JavaScriptImporterOptionsDialog(Shell parentShell, String libraryName)
 	{
 		super(Display.getDefault().getActiveShell(), capitalize(libraryName));
+		setTitleImage(PortalUIPlugin.getDefault().getImageRegistry().get(PortalUIPlugin.JS_IMAGE));
 	}
 
 	/**
@@ -87,7 +85,7 @@ public class JavaScriptImporterOptionsDialog extends InstallerOptionsDialog
 	@Override
 	protected void setAttributes()
 	{
-		attributes.put(ACTIVE_PROJECT_ATTR, getActiveProject());
+		attributes.put(ACTIVE_PROJECT_ATTR, PortalUIPlugin.getActiveProject());
 	}
 
 	/**
@@ -205,7 +203,7 @@ public class JavaScriptImporterOptionsDialog extends InstallerOptionsDialog
 		{
 			return;
 		}
-		IProject activeProject = getActiveProject();
+		IProject activeProject = PortalUIPlugin.getActiveProject();
 		String activeProjectName = (activeProject != null) ? activeProject.getName() : null;
 		if (activeProject != null && activeProject.isAccessible())
 		{
@@ -375,7 +373,14 @@ public class JavaScriptImporterOptionsDialog extends InstallerOptionsDialog
 			IProject project = (IProject) attributes.get(ACTIVE_PROJECT_ATTR);
 			if (project != null)
 			{
-				if (!uri.getPath().startsWith(project.getFullPath().toString() + '/'))
+				// make sure we add a '/' prefix to the URI path to have this check cross-platform (Windows os returns the URI without it).
+				String projectPath = project.getFullPath().toString();
+				String uriPath = uri.getPath();
+				if (uriPath != null && !uriPath.startsWith("/")) //$NON-NLS-1$
+				{
+					uriPath = '/' + uriPath;
+				}
+				if (uriPath == null || !uriPath.startsWith(projectPath + '/'))
 				{
 					errorMsg = Messages.ImportJavaScriptLibraryDialog_wrongProjectRootError;
 				}
@@ -394,22 +399,5 @@ public class JavaScriptImporterOptionsDialog extends InstallerOptionsDialog
 		locationLb.setEnabled(enabled);
 		path.setEnabled(enabled);
 		browseBt.setEnabled(enabled);
-	}
-
-	/**
-	 * Returns the current active IProject.
-	 * 
-	 * @return The active project; Null, if none was found.
-	 */
-	protected IProject getActiveProject()
-	{
-		IPreferencesService preferencesService = Platform.getPreferencesService();
-		String activeProjectName = preferencesService.getString(ExplorerPlugin.PLUGIN_ID,
-				IPreferenceConstants.ACTIVE_PROJECT, null, null);
-		if (activeProjectName != null)
-		{
-			return ResourcesPlugin.getWorkspace().getRoot().getProject(activeProjectName);
-		}
-		return null;
 	}
 }
