@@ -16,6 +16,7 @@ import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IURIEditorInput;
 
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessUtil;
@@ -40,6 +41,11 @@ public class OpenInFinderHandler extends AbstractHandler
 			{
 				IFileEditorInput fei = (IFileEditorInput) input;
 				open(fei.getFile().getLocationURI());
+			}
+			else if (input instanceof IURIEditorInput)
+			{
+				IURIEditorInput uriInput = (IURIEditorInput) input;
+				open(uriInput.getURI());
 			}
 			else
 			{
