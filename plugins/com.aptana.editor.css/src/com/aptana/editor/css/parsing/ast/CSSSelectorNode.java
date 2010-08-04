@@ -1,7 +1,5 @@
 package com.aptana.editor.css.parsing.ast;
 
-import java.util.Arrays;
-
 public class CSSSelectorNode extends CSSNode
 {
 
@@ -20,17 +18,17 @@ public class CSSSelectorNode extends CSSNode
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (!(obj instanceof CSSSelectorNode))
+		if (!super.equals(obj) || !(obj instanceof CSSSelectorNode))
 		{
 			return false;
 		}
 		CSSSelectorNode other = (CSSSelectorNode) obj;
-		return Arrays.equals(getChildren(), other.getChildren());
+		return toString().equals(other.toString());
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Arrays.hashCode(getChildren());
+		return super.hashCode() * 31 + toString().hashCode();
 	}
 }

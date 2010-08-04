@@ -93,4 +93,17 @@ public class UIPlugin extends AbstractUIPlugin
 		}
 		return getDefault().getImageRegistry().get(string);
 	}
+
+	public static ImageDescriptor getImageDescriptor(String string)
+	{
+		if (getDefault().getImageRegistry().getDescriptor(string) == null)
+		{
+			ImageDescriptor id = imageDescriptorFromPlugin(PLUGIN_ID, string);
+			if (id != null)
+			{
+				getDefault().getImageRegistry().put(string, id);
+			}
+		}
+		return getDefault().getImageRegistry().getDescriptor(string);
+	}
 }

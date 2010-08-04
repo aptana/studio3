@@ -419,6 +419,13 @@
             </command>
          </toolbar>
       </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.menus.showInMenu">
+         <dynamic
+               class="com.aptana.ui.commands.OpenFileManagerContributionItem"
+               id="com.aptana.editor.common.open.in.file.manager">
+         </dynamic>
+      </menuContribution>
 	</extension>
 	<extension
          point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectorTargets">
