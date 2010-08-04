@@ -55,7 +55,7 @@ main (int argc, char** argv)
 	if( argc < 3 ) {
 		return EXIT_FAILURE;
 	}
-	memset(args, MAXARGS, sizeof(char*));
+	memset(args, 0, sizeof(args));
 	for( arg = strtok(argv[2], DELIM); arg != NULL; arg = strtok(NULL, DELIM), ++index ) {
 		if( index >= MAXARGS ) {
 			return EXIT_FAILURE;
