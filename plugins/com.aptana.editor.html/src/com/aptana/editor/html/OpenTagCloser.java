@@ -136,6 +136,10 @@ public class OpenTagCloser implements VerifyKeyListener
 	 */
 	protected boolean shouldAutoClose(IDocument document, int offset, VerifyEvent event)
 	{
+		if (document.getDocumentPartitioner() == null)
+		{
+			return true;
+		}
 		// Only auto-close in HTML
 		ITypedRegion[] typedRegions = document.getDocumentPartitioner().computePartitioning(offset, 0);
 		if (typedRegions != null && typedRegions.length > 0)
