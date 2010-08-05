@@ -2,6 +2,7 @@ package com.aptana.index.core;
 
 import java.io.IOException;
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -42,6 +43,11 @@ public class IndexContainerJob extends IndexRequestJob
 		}
 
 		Index index = getIndex();
+		if (index == null)
+		{
+			IndexActivator.logError(MessageFormat.format("Index is null for container: {0}", getContainerURI()), null);
+			return Status.CANCEL_STATUS;
+		}
 		try
 		{
 			// Collect the full set of files in the project...
