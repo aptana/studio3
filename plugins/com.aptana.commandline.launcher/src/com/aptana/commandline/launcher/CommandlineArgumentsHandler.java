@@ -27,8 +27,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.progress.WorkbenchJob;
 
+import com.aptana.core.resources.IProjectContext;
 import com.aptana.explorer.IExplorerUIConstants;
-import com.aptana.explorer.IProjectContext;
 
 /**
  * Process command line arguments.
