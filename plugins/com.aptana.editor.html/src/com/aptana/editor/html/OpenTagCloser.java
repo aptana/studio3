@@ -8,6 +8,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.graphics.Point;
@@ -72,8 +73,14 @@ public class OpenTagCloser implements VerifyKeyListener
 				}
 			}
 
-			String openTag = isUnclosedOpenTag(document, offset, event);
-			if (openTag == null || openTag.startsWith("<%") || openTag.startsWith("<!"))
+			// give a chance to exit early
+			if (!shouldAutoClose(document, offset, event))
+			{
+				return;
+			}
+
+			String openTag = getOpenTag(document, offset, event);
+			if (openTag == null || skipOpenTag(openTag))
 				return;
 
 			String closeTag = getMatchingCloseTag(openTag);
@@ -116,6 +123,34 @@ public class OpenTagCloser implements VerifyKeyListener
 		{
 			Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
 		}
+	}
+
+	/**
+	 * Allows quick return if we happen to be in a partition where we don't want auto-closed tags. Currently will only
+	 * auto-close when in HTML partitions.
+	 * 
+	 * @param document
+	 * @param offset
+	 * @param event
+	 * @return
+	 */
+	protected boolean shouldAutoClose(IDocument document, int offset, VerifyEvent event)
+	{
+		// Only auto-close in HTML
+		ITypedRegion[] typedRegions = document.getDocumentPartitioner().computePartitioning(offset, 0);
+		if (typedRegions != null && typedRegions.length > 0)
+		{
+			if (typedRegions[0].getType().startsWith(HTMLSourceConfiguration.PREFIX))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	protected boolean skipOpenTag(String openTag)
+	{
+		return openTag == null || openTag.startsWith("<%") || openTag.startsWith("<!");
 	}
 
 	private boolean tagClosed(IDocument document, int offset, String openTag)
@@ -183,7 +218,7 @@ public class OpenTagCloser implements VerifyKeyListener
 		return closeTag;
 	}
 
-	private String isUnclosedOpenTag(IDocument document, int offset, VerifyEvent event) throws BadLocationException
+	private String getOpenTag(IDocument document, int offset, VerifyEvent event) throws BadLocationException
 	{
 		// Read current tag, see if it's self-closing or has been closed later...
 		int start = offset - 1;
@@ -228,14 +263,18 @@ public class OpenTagCloser implements VerifyKeyListener
 		return "<" + tagName + ">";
 	}
 
-	private boolean isAutoInsertCharacter(char character)
+	protected boolean isAutoInsertCharacter(char character)
 	{
 		return character == '>';
 	}
 
-	private boolean isAutoInsertEnabled()
+	protected boolean isAutoInsertEnabled()
 	{
-		// TODO Auto-generated method stub
 		return true;
+	}
+
+	protected ITextViewer getTextViewer()
+	{
+		return textViewer;
 	}
 }
