@@ -68,7 +68,8 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 	@SuppressWarnings("nls")
 	private static final String[] HTML_TAGS = { "a", "abbr", "acronym", "address", "area", "b", "base", "big",
 			"blockquote", "body", "br", "button", "caption", "cite", "code", "col", "colgroup", "dd", "del", "dfn",
-			"div", "dl", "dt", "em", "embed", "fieldset", "form", "frame", "frameset", "head", "hr", "html", "h1",
+			// FIXME Turn "em" back on when we can add hack to determine if we're inside or outside a rule
+			"div", "dl", "dt", /*"em",*/ "embed", "fieldset", "form", "frame", "frameset", "head", "hr", "html", "h1",
 			"h2", "h3", "h4", "h5", "h6", "i", "iframe", "img", "input", "ins", "kbd", "label", "legend", "li", "link",
 			"map", "meta", "noframes", "noscript", "object", "ol", "optgroup", "option", "p", "param", "pre", "q",
 			"samp", "script", "select", "small", "span", "strike", "strong", "style", "sub", "sup", "table", "tbody",
@@ -265,6 +266,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		};
 	}
 	
+	@SuppressWarnings("nls")
 	protected Collection<? extends IRule> createScannerSpecificRules()
 	{
 		List<IRule> rules = new ArrayList<IRule>();

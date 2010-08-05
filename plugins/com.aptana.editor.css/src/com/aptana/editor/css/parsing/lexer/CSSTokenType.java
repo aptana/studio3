@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.aptana.parsing.lexer.ITypePredicate;
 
+@SuppressWarnings("nls")
 public enum CSSTokenType implements ITypePredicate
 {
 	UNDEFINED("undefined.css", -1), //$NON-NLS-1$
