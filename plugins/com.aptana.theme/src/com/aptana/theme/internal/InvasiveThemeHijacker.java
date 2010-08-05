@@ -7,6 +7,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
@@ -79,9 +80,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 	public InvasiveThemeHijacker()
 	{
 		super("Installing invasive theme hijacker!"); //$NON-NLS-1$
-
-		IEclipsePreferences prefs = new InstanceScope().getNode(ThemePlugin.PLUGIN_ID);
-		prefs.addPreferenceChangeListener(this);
 	}
 
 	protected boolean invasiveThemesEnabled()
@@ -91,18 +89,37 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 	}
 
 	@Override
-	public IStatus runInUIThread(IProgressMonitor monitor)
+	public synchronized IStatus runInUIThread(IProgressMonitor monitor)
 	{
+		SubMonitor sub = SubMonitor.convert(monitor, 4);
+		if (sub.isCanceled())
+		{
+			return Status.CANCEL_STATUS;
+		}
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		if (invasiveThemesEnabled())
 		{
-			applyThemeToJDTEditor(getCurrentTheme(), false);
-			applyThemeToConsole(getCurrentTheme(), false);
 			if (window != null && window.getActivePage() != null)
 			{
 				window.getActivePage().addPartListener(this);
 			}
-			hijackCurrentViews(window, false);
+			if (sub.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
+			sub.setWorkRemaining(3);
+
+			applyThemeToJDTEditor(getCurrentTheme(), false, sub.newChild(1));
+			if (sub.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
+			applyThemeToConsole(getCurrentTheme(), false, sub.newChild(1));
+			if (sub.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
+			hijackCurrentViews(window, false, sub.newChild(1));
 		}
 		else
 		{
@@ -110,17 +127,31 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			{
 				window.getActivePage().removePartListener(this);
 			}
-			applyThemeToJDTEditor(getCurrentTheme(), true);
-			applyThemeToConsole(getCurrentTheme(), true);
-			hijackCurrentViews(window, true);
+			if (sub.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
+			sub.setWorkRemaining(3);
+
+			applyThemeToJDTEditor(getCurrentTheme(), true, sub.newChild(1));
+			if (sub.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
+			applyThemeToConsole(getCurrentTheme(), true, sub.newChild(1));
+			if (sub.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
+			hijackCurrentViews(window, true, sub.newChild(1));
 		}
+		sub.done();
 		return Status.OK_STATUS;
 	}
 
 	@SuppressWarnings("nls")
-	private void applyThemeToConsole(Theme currentTheme, boolean revertToDefaults)
+	private void applyThemeToConsole(Theme currentTheme, boolean revertToDefaults, IProgressMonitor monitor)
 	{
-
 		IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.debug.ui");
 		if (revertToDefaults)
 		{
@@ -138,6 +169,10 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			setColor(prefs, "org.eclipse.debug.ui.inColor", currentTheme, ConsoleThemer.CONSOLE_INPUT,
 					currentTheme.getForeground());
 			prefs.put("org.eclipse.debug.ui.consoleBackground", StringConverter.asString(currentTheme.getBackground()));
+		}
+		if (monitor.isCanceled())
+		{
+			return;
 		}
 		try
 		{
@@ -160,18 +195,26 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		prefs.put(prefKey, StringConverter.asString(rgb));
 	}
 
-	protected void hijackCurrentViews(IWorkbenchWindow window, boolean revertToDefaults)
+	protected void hijackCurrentViews(IWorkbenchWindow window, boolean revertToDefaults, IProgressMonitor monitor)
 	{
 		if (window == null || window.getActivePage() == null)
 			return;
 		IViewReference[] refs = window.getActivePage().getViewReferences();
 		for (IViewReference ref : refs)
 		{
+			if (monitor.isCanceled())
+			{
+				return;
+			}
 			hijackView(ref.getView(false), revertToDefaults);
 		}
 		IEditorReference[] editorRefs = window.getActivePage().getEditorReferences();
 		for (IEditorReference ref : editorRefs)
 		{
+			if (monitor.isCanceled())
+			{
+				return;
+			}
 			hijackEditor(ref.getEditor(false), revertToDefaults);
 		}
 	}
@@ -227,7 +270,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			ContentOutline outline = (ContentOutline) view;
 			IPage page = outline.getCurrentPage();
 			String name = page.getClass().getName();
-            if (name.endsWith("CommonOutlinePage") || name.endsWith("PyOutlinePage"))
+			if (name.endsWith("CommonOutlinePage") || name.endsWith("PyOutlinePage"))
 				return; // we already handle our own outlines
 			Control control = page.getControl();
 			if (control instanceof PageBook)
@@ -381,21 +424,36 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 	}
 
 	@SuppressWarnings("nls")
-	protected void applyThemeToJDTEditor(Theme theme, boolean revertToDefaults)
+	protected void applyThemeToJDTEditor(Theme theme, boolean revertToDefaults, IProgressMonitor monitor)
 	{
 		// Set prefs for all editors
 		setGeneralEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.texteditor"), revertToDefaults);
 		setEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.editors"), revertToDefaults);
+
+		if (monitor.isCanceled())
+		{
+			return;
+		}
 
 		// PDE
 		IEclipsePreferences pdePrefs = new InstanceScope().getNode("org.eclipse.pde.ui");
 		setGeneralEditorValues(theme, pdePrefs, revertToDefaults);
 		setPDEEditorValues(theme, pdePrefs, revertToDefaults);
 
+		if (monitor.isCanceled())
+		{
+			return;
+		}
+
 		// Ant
 		IEclipsePreferences antPrefs = new InstanceScope().getNode("org.eclipse.ant.ui");
 		setGeneralEditorValues(theme, antPrefs, revertToDefaults);
 		setAntEditorValues(theme, antPrefs, revertToDefaults);
+
+		if (monitor.isCanceled())
+		{
+			return;
+		}
 
 		// Now set for JDT...
 		IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.jdt.ui");
@@ -656,10 +714,10 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 	@Override
 	public void preferenceChange(PreferenceChangeEvent event)
 	{
-		if (event.getKey().equals(IThemeManager.THEME_CHANGED)
-				|| event.getKey().equals(IPreferenceConstants.INVASIVE_THEMES))
+		// If invaisive themes are on and we changed the theme, schedule. Also schedule if we toggled invasive theming.
+		if (event.getKey().equals(IPreferenceConstants.INVASIVE_THEMES)
+				|| (event.getKey().equals(IThemeManager.THEME_CHANGED) && invasiveThemesEnabled()))
 		{
-			// enablement changed, schedule job to run (it'll stop if it's turned to false in "shouldRun()")
 			cancel();
 			schedule();
 		}
@@ -849,9 +907,29 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		}
 	}
 
+	/**
+	 * Schedules itself to override Java/PDE views and editors' coloring only if invasive themes are enabled.
+	 */
 	@Override
 	public void earlyStartup()
 	{
-		schedule();
+		if (invasiveThemesEnabled())
+		{
+			schedule(); // TODO Don't schedule here, grab singleton from ThemePlugin and schedule that!
+		}
+	}
+
+	public void apply()
+	{
+		IEclipsePreferences prefs = new InstanceScope().getNode(ThemePlugin.PLUGIN_ID);
+		prefs.addPreferenceChangeListener(this);
+	}
+
+	public void dispose()
+	{
+		IEclipsePreferences prefs = new InstanceScope().getNode(ThemePlugin.PLUGIN_ID);
+		prefs.removePreferenceChangeListener(this);
+
+		pageListener = null;
 	}
 }

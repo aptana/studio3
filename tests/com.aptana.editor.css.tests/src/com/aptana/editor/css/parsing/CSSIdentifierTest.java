@@ -34,38 +34,38 @@
  */
 package com.aptana.editor.css.parsing;
 
-import com.aptana.editor.css.parsing.lexer.CSSTokens;
+import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
 public class CSSIdentifierTest extends CSSTokensTest
 {
 
 	public void testSimpleIdentifier()
 	{
-		assertToken("abc", CSSTokens.getTokenName(CSSTokens.IDENTIFIER), 0, 3); //$NON-NLS-1$
+		assertToken("abc", CSSTokenType.IDENTIFIER, 0, 3); //$NON-NLS-1$
 	}
 
 	public void testIdentifierWithNumber()
 	{
-		assertToken("abc0", CSSTokens.getTokenName(CSSTokens.IDENTIFIER), 0, 4); //$NON-NLS-1$
+		assertToken("abc0", CSSTokenType.IDENTIFIER, 0, 4); //$NON-NLS-1$
 	}
 
 	public void testIdentifierWithHyphen()
 	{
-		assertToken("abc-def", CSSTokens.getTokenName(CSSTokens.IDENTIFIER), 0, 7); //$NON-NLS-1$
+		assertToken("abc-def", CSSTokenType.IDENTIFIER, 0, 7); //$NON-NLS-1$
 	}
 
 	public void testIdentifierWithLeadingHyphen()
 	{
-		assertToken("-abc", CSSTokens.getTokenName(CSSTokens.IDENTIFIER), 0, 4); //$NON-NLS-1$
+		assertToken("-abc", CSSTokenType.IDENTIFIER, 0, 4); //$NON-NLS-1$
 	}
 
 	public void testIdentifierWithUnderscore()
 	{
-		assertToken("abc_def", CSSTokens.getTokenName(CSSTokens.IDENTIFIER), 0, 7); //$NON-NLS-1$
+		assertToken("abc_def", CSSTokenType.IDENTIFIER, 0, 7); //$NON-NLS-1$
 	}
 
 	public void testIdentifierWithLeadingUnderscore()
 	{
-		assertToken("_abc", CSSTokens.getTokenName(CSSTokens.IDENTIFIER), 0, 4); //$NON-NLS-1$
+		assertToken("_abc", CSSTokenType.IDENTIFIER, 0, 4); //$NON-NLS-1$
 	}
 }

@@ -24,8 +24,13 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
-import org.eclipse.ui.internal.ide.StatusUtil;
+import org.eclipse.debug.core.ILaunchListener;
+import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.debug.core.IStreamListener;
+import org.eclipse.debug.core.model.IProcess;
+import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.ui.statushandlers.StatusManager;
 
 import com.aptana.git.core.model.GitExecutable;
@@ -34,7 +39,6 @@ import com.aptana.git.ui.internal.sharing.ConnectProviderOperation;
 import com.aptana.git.ui.internal.wizards.Messages;
 
 //FIXME Move to some different package?
-@SuppressWarnings("restriction")
 public class CloneJob extends Job
 {
 
@@ -64,7 +68,7 @@ public class CloneJob extends Job
 	@Override
 	protected IStatus run(IProgressMonitor monitor)
 	{
-		SubMonitor subMonitor = SubMonitor.convert(monitor, 200);
+		SubMonitor subMonitor = SubMonitor.convert(monitor, 500);
 		try
 		{
 			if (GitExecutable.instance() == null)
@@ -72,10 +76,53 @@ public class CloneJob extends Job
 				throw new CoreException(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
 						Messages.CloneJob_UnableToFindGitExecutableError));
 			}
+			ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
+			ILaunchListener listener = new ILaunchListener() {
+				
+				@Override
+				public void launchRemoved(ILaunch launch) {
+				}
+				
+				@Override
+				public void launchChanged(ILaunch launch) {
+					// TODO Make sure this is our launch!
+					IProcess[] processes = launch.getProcesses();
+					if (processes != null)
+					{
+						IProcess process = processes[0];
+						// TODO Sniff the process output for percentages?
+						process.getStreamsProxy().getOutputStreamMonitor().addListener(new IStreamListener() {
+							
+							@Override
+							public void streamAppended(String text, IStreamMonitor monitor) {
+								System.out.println(text);
+							}
+						});
+						process.getStreamsProxy().getErrorStreamMonitor().addListener(new IStreamListener() {
+							
+							@Override
+							public void streamAppended(String text, IStreamMonitor monitor) {
+								System.err.println(text);
+								// TODO Look for "Checking out files: \d+% (\d+/\d+) and report progress accordingly
+							}
+						});
+					}
+				}
+				
+				@Override
+				public void launchAdded(ILaunch launch) {
+					// TODO Auto-generated method stub
+					
+				}
+			};
+			manager.addLaunchListener(listener);
+			
+			// FIXME This doesn't ever run in bg in 3.6!
 			ILaunch launch = Launcher.launch(GitExecutable.instance().path().toOSString(), null,
 					subMonitor.newChild(100), "clone", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$
 			if (launch == null)
 			{
+				manager.removeLaunchListener(listener);
 				throw new CoreException(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), MessageFormat.format(
 						Messages.CloneJob_UnableToLaunchGitError, sourceURI, dest)));
 			}
@@ -85,6 +132,8 @@ public class CloneJob extends Job
 					return Status.CANCEL_STATUS;
 				Thread.yield();
 			}
+			manager.removeLaunchListener(listener);
+			subMonitor.setWorkRemaining(100);
 			Collection<File> existingProjects = new ArrayList<File>();
 			if (!forceRootAsProject)
 			{
@@ -163,7 +212,7 @@ public class CloneJob extends Job
 			{
 				GitUIPlugin.logError(exception.getMessage(), exception);
 				StatusManager.getManager().handle(
-						StatusUtil.newStatus(IStatus.ERROR, exception.getLocalizedMessage(), exception));
+						new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), exception.getLocalizedMessage(), exception));
 			}
 		}
 
@@ -203,7 +252,7 @@ public class CloneJob extends Job
 					{
 						GitUIPlugin.logError(exception.getMessage(), exception);
 						StatusManager.getManager().handle(
-								StatusUtil.newStatus(IStatus.ERROR, exception.getLocalizedMessage(), exception));
+								new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), exception.getLocalizedMessage(), exception));
 
 					}
 					files.addAll(collectProjectFilesFromDirectory(contents[i], directoriesVisited, monitor));
