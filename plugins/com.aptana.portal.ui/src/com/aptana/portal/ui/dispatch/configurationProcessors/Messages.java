@@ -44,6 +44,8 @@ public class Messages extends NLS
 	public static String InstallProcessor_seeErrorLog;
 	public static String InstallProcessor_updatingTaskName;
 	public static String InstallProcessor_wrongNumberOfInstallLinks;
+	public static String InstallerConfigurationProcessor_missingAttributeMap;
+	public static String InstallerConfigurationProcessor_missingDownloadTargets;
 	public static String JSLibraryInstallProcessor_directoriesCreationFailed;
 	public static String JSLibraryInstallProcessor_directorySelection;
 	public static String JSLibraryInstallProcessor_fileConflictMessage;
@@ -57,7 +59,6 @@ public class Messages extends NLS
 	public static String SystemConfigurationProcessor_noShellCommandPath;
 	public static String SystemConfigurationProcessor_wrongConfigurationAttributesStructure;
 	public static String XAMPPInstallProcessor_executeXAMPPAutoSetup;
-	public static String XAMPPInstallProcessor_missingXAMPPInstallURLs;
 	public static String XAMPPInstallProcessor_openXAMPPConsoleJobName;
 	static
 	{

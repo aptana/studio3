@@ -30,7 +30,7 @@ public class InstallActionController extends AbstractActionController
 	 * 
 	 * @param attributes
 	 *            Should contains an array of URLs. The number of URLs, and the type of files they point to, is defined
-	 *            and handled by the processor. should point to the DevKit.7z.
+	 *            and handled by the processor.
 	 * @return An immediate JSON status of 'OK'.
 	 */
 	@ControllerAction

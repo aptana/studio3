@@ -41,8 +41,12 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 {
 	protected static final String APTANA_PROPERTIES_FILE_NAME = ".aptana"; //$NON-NLS-1$
 	protected static final String WINDOWS_7ZIP_EXECUTABLE = "$os$/7za.exe"; //$NON-NLS-1$
+	protected static final String NAME_ATTRIBUTE = "name"; //$NON-NLS-1$
+	protected static final String INSTALL_DIR_ATTRIBUTE = "install_dir"; //$NON-NLS-1$
+
 	protected String[] downloadedPaths;
 	protected String[] urls;
+	protected Map<String, String> attributesMap;
 
 	/*
 	 * (non-Javadoc)
@@ -62,7 +66,7 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 	 * @return The application's name (e.g. XAMPP, Ruby)
 	 */
 	protected abstract String getApplicationName();
-	
+
 	/**
 	 * Download the remote content and store it the temp directory.
 	 * 
@@ -71,6 +75,13 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 	 */
 	public IStatus download(Object[] URLs, IProgressMonitor progressMonitor)
 	{
+		if (URLs.length == 0)
+		{
+			String err = Messages.InstallerConfigurationProcessor_missingDownloadTargets;
+			applyErrorAttributes(err);
+			PortalUIPlugin.logError("We expected an array of URLs, but got an empty array.", new Exception(err)); //$NON-NLS-1$
+			return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, err);
+		}
 		downloadedPaths = null;
 		DownloadManager downloadManager = new DownloadManager();
 		urls = new String[URLs.length];

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,24 +42,31 @@ import com.aptana.portal.ui.dispatch.configurationProcessors.installer.Installer
  */
 public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 {
-	protected static final String XAMPP_DEFAULT_INSTALL_PATH = "C:\\"; //$NON-NLS-1$
+	protected static final String XAMPP_DEFAULT_INSTALL_DIR = "C:\\"; //$NON-NLS-1$
 	protected static final String EXECUTE_SETUP_SCRIPT_ATTR = "execute_setup_script"; //$NON-NLS-1$
 	private static final String XAMPP_DEFAULT_FOLDER = "xampp\\"; //$NON-NLS-1$
 	private static final String XAMPP_CONTROL = "xampp-control.exe"; //$NON-NLS-1$
 	private static final String XAMPP = "XAMPP"; //$NON-NLS-1$
 	protected static final int XAMPP_INSTALLER_PROCESS_CANCEL_CODE = 255;
 	private static boolean installationInProgress;
+	private String installDir;
 
 	/**
 	 * Install XAMPP on the machine.<br>
-	 * The configuration will grab the installer from the given attributes. We expects a single attribute which contains
-	 * the XAMPP installer link (.exe file)
+	 * The configuration will grab the installer from the given attributes. We expect an array of attributes with this
+	 * structure:<br>
+	 * <ul>
+	 * <li>The first (optional) item in the array can be a Map of additional attributes.</li>
+	 * <li>The second item in the array should contain a string array with the XAMPP installer link (.exe file)</li>
+	 * </ul>
 	 * 
 	 * @param attributes
-	 *            An string array of size 1, which contains the URL for the XAMPP installer (.exe).
+	 *            First (optional) map of additional attributes. Second - A string array of size 1, which contains the
+	 *            URL for the XAMPP installer (.exe).
 	 * @see com.aptana.configurations.processor.AbstractConfigurationProcessor#configure(org.eclipse.core.runtime.IProgressMonitor,
 	 *      java.lang.Object)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public ConfigurationStatus configure(IProgressMonitor progressMonitor, Object attributes)
 	{
@@ -92,19 +100,59 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 				return configurationStatus;
 			}
 			Object[] attrArray = (Object[]) attributes;
-			if (attrArray.length != 1)
+			if (attrArray.length == 0 || attrArray.length > 2)
 			{
 				// structure error
-				String err = NLS.bind(Messages.InstallProcessor_wrongNumberOfInstallLinks, new Object[] { XAMPP, 1,
+				String err = NLS.bind(Messages.InstallProcessor_wrongNumberOfInstallLinks, new Object[] { XAMPP, 2,
 						attrArray.length });
 				applyErrorAttributes(err);
 				PortalUIPlugin.logError(new Exception(err));
 				return configurationStatus;
 			}
-
+			Object[] urls;
+			try
+			{
+				if (attrArray.length == 2)
+				{
+					// Check that the first item is a Map
+					if (!(attrArray[0] instanceof Map))
+					{
+						String err = NLS.bind(Messages.InstallerConfigurationProcessor_missingAttributeMap, XAMPP);
+						applyErrorAttributes(err);
+						PortalUIPlugin.logError(
+								"We expected a map of attributes, but got: " + attrArray[0], new Exception(err)); //$NON-NLS-1$
+						return configurationStatus;
+					}
+					else
+					{
+						// assign it
+						attributesMap = (Map<String, String>) attrArray[0];
+						urls = (Object[]) attrArray[1];
+					}
+				}
+				else
+				{
+					// set the map to empty (avoid NPE).
+					attributesMap = Collections.emptyMap();
+					urls = (Object[]) attrArray[0];
+				}
+			}
+			catch (ClassCastException cce)
+			{
+				// this can only happen if the urls did not arrive as an array
+				String err = NLS.bind(Messages.InstallProcessor_missingInstallURLs, XAMPP);
+				applyErrorAttributes(err);
+				PortalUIPlugin.logError("We expected an array of URLs, but got an empty array.", new Exception(err)); //$NON-NLS-1$
+				return configurationStatus;
+			}
+			installDir = attributesMap.get(INSTALL_DIR_ATTRIBUTE);
+			if (installDir == null)
+			{
+				installDir = XAMPP_DEFAULT_INSTALL_DIR;
+			}
 			// Start the installation...
 			configurationStatus.setStatus(ConfigurationStatus.PROCESSING);
-			IStatus status = download(attrArray, progressMonitor);
+			IStatus status = download(urls, progressMonitor);
 			if (status.isOK())
 			{
 				status = install(progressMonitor);
@@ -114,9 +162,9 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 				case IStatus.OK:
 				case IStatus.INFO:
 				case IStatus.WARNING:
-					displayMessageInUIThread(MessageDialog.INFORMATION, NLS.bind(
-							Messages.InstallProcessor_installerTitle, XAMPP), NLS.bind(
-							Messages.InstallProcessor_installationSuccessful, XAMPP));
+					displayMessageInUIThread(MessageDialog.INFORMATION,
+							NLS.bind(Messages.InstallProcessor_installerTitle, XAMPP),
+							NLS.bind(Messages.InstallProcessor_installationSuccessful, XAMPP));
 					configurationStatus.setStatus(ConfigurationStatus.OK);
 					break;
 				case IStatus.ERROR:
@@ -439,7 +487,7 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 		@Override
 		protected void setAttributes()
 		{
-			attributes.put(INSTALL_DIR_ATTR, XAMPP_DEFAULT_INSTALL_PATH);
+			attributes.put(INSTALL_DIR_ATTR, installDir);
 			attributes.put(EXECUTE_SETUP_SCRIPT_ATTR, Boolean.TRUE);
 		}
 

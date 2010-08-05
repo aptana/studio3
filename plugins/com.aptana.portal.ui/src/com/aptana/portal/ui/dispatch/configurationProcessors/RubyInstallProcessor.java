@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Properties;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -37,23 +39,32 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 {
 	private static final String RUBY = "Ruby"; //$NON-NLS-1$
 	private static final String DEVKIT = "DevKit"; //$NON-NLS-1$
-	protected static final String RUBY_DEFAULT_INSTALL_PATH = "C:\\Ruby19"; //$NON-NLS-1$
+	protected static final String RUBY_DEFAULT_INSTALL_DIR = "C:\\Ruby"; //$NON-NLS-1$
 	protected static final String DEVKIT_FSTAB_PATH = "\\devkit\\msys\\1.0.11\\etc\\fstab"; //$NON-NLS-1$
 	protected static final String DEVKIT_FSTAB_LOCATION_PREFIX = "C:/Ruby/"; //$NON-NLS-1$
 	// The process return code for a Ruby installer cancel.
 	private static final int RUBY_INSTALLER_PROCESS_CANCEL = 5;
 	private static boolean installationInProgress;
 
+	private String installDir;
+
 	/**
 	 * Install Ruby on the machine.<br>
-	 * The configuration will grab the installer and the DevKit from the given attributes. We expects the first
-	 * attribute to contain the Ruby installer link, and the second attribute to contain the DevKit 7z package.
+	 * The configuration will grab the installer and the DevKit from the given attributes.<br>
+	 * We expect an array of attributes with this structure:<br>
+	 * <ul>
+	 * <li>The first (optional) item in the array can be a Map of additional attributes.</li>
+	 * <li>The second item in the array should contain a string array with the Ruby installer link, and the DevKit 7z
+	 * package (in this order).</li>
+	 * </ul>
 	 * 
 	 * @param attributes
-	 *            An array of strings holding the rubyinstaller and the devkit URLs.
+	 *            An array of strings holding an optional attributes map and an array of rubyinstaller and the devkit
+	 *            URLs.
 	 * @see com.aptana.configurations.processor.AbstractConfigurationProcessor#configure(org.eclipse.core.runtime.IProgressMonitor,
 	 *      java.lang.Object)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public ConfigurationStatus configure(IProgressMonitor progressMonitor, Object attributes)
 	{
@@ -87,7 +98,7 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 				return configurationStatus;
 			}
 			Object[] attrArray = (Object[]) attributes;
-			if (attrArray.length != 2)
+			if (attrArray.length == 0 || attrArray.length > 2)
 			{
 				// structure error
 				String err = NLS.bind(Messages.InstallProcessor_wrongNumberOfInstallLinks, new Object[] { RUBY, 2,
@@ -96,10 +107,50 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 				PortalUIPlugin.logError(new Exception(err));
 				return configurationStatus;
 			}
-
+			Object[] urls;
+			try
+			{
+				if (attrArray.length == 2)
+				{
+					// Check that the first item is a Map
+					if (!(attrArray[0] instanceof Map))
+					{
+						String err = NLS.bind(Messages.InstallerConfigurationProcessor_missingAttributeMap, RUBY);
+						applyErrorAttributes(err);
+						PortalUIPlugin.logError(
+								"We expected a map of attributes, but got: " + attrArray[0], new Exception(err)); //$NON-NLS-1$
+						return configurationStatus;
+					}
+					else
+					{
+						// assign it
+						attributesMap = (Map<String, String>) attrArray[0];
+						urls = (Object[]) attrArray[1];
+					}
+				}
+				else
+				{
+					// set the map to empty (avoid NPE).
+					attributesMap = Collections.emptyMap();
+					urls = (Object[]) attrArray[0];
+				}
+			}
+			catch (ClassCastException cce)
+			{
+				// this can only happen if the urls did not arrive as an array
+				String err = NLS.bind(Messages.InstallProcessor_missingInstallURLs, RUBY);
+				applyErrorAttributes(err);
+				PortalUIPlugin.logError("We expected an array of URLs, but got an empty array.", new Exception(err)); //$NON-NLS-1$
+				return configurationStatus;
+			}
+			installDir = attributesMap.get(INSTALL_DIR_ATTRIBUTE);
+			if (installDir == null)
+			{
+				installDir = RUBY_DEFAULT_INSTALL_DIR;
+			}
 			// Start the installation...
 			configurationStatus.setStatus(ConfigurationStatus.PROCESSING);
-			IStatus status = download(attrArray, progressMonitor);
+			IStatus status = download(urls, progressMonitor);
 			if (status.isOK())
 			{
 				status = install(progressMonitor);
@@ -109,9 +160,9 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 				case IStatus.OK:
 				case IStatus.INFO:
 				case IStatus.WARNING:
-					displayMessageInUIThread(MessageDialog.INFORMATION, NLS.bind(
-							Messages.InstallProcessor_installerTitle, RUBY), NLS.bind(
-							Messages.InstallProcessor_installationSuccessful, RUBY));
+					displayMessageInUIThread(MessageDialog.INFORMATION,
+							NLS.bind(Messages.InstallProcessor_installerTitle, RUBY),
+							NLS.bind(Messages.InstallProcessor_installationSuccessful, RUBY));
 					configurationStatus.setStatus(ConfigurationStatus.OK);
 					break;
 				case IStatus.ERROR:
@@ -214,8 +265,8 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 			status = installDevKit(installDir[0]);
 			if (!status.isOK())
 			{
-				displayMessageInUIThread(MessageDialog.ERROR, Messages.InstallProcessor_installationErrorTitle, status
-						.getMessage());
+				displayMessageInUIThread(MessageDialog.ERROR, Messages.InstallProcessor_installationErrorTitle,
+						status.getMessage());
 				return status;
 			}
 			finalizeInstallation(installDir[0]);
@@ -337,8 +388,8 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 				try
 				{
 					SubMonitor subMonitor = SubMonitor.convert(monitor, 1000);
-					subMonitor.beginTask(NLS.bind(Messages.InstallProcessor_extractingPackageTaskName, DEVKIT,
-							installDir), 900);
+					subMonitor.beginTask(
+							NLS.bind(Messages.InstallProcessor_extractingPackageTaskName, DEVKIT, installDir), 900);
 					// We get a folder status first, before unzipping into the folder. This folder was just created,
 					// so there is a chance it's still being held by the OS or by the Ruby installer.
 					IStatus folderStatus = LockUtils.waitForFolderAccess(installDir, 10000);
@@ -472,7 +523,7 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 		@Override
 		protected void setAttributes()
 		{
-			attributes.put(INSTALL_DIR_ATTR, RUBY_DEFAULT_INSTALL_PATH);
+			attributes.put(INSTALL_DIR_ATTR, installDir);
 		}
 	}
 }
