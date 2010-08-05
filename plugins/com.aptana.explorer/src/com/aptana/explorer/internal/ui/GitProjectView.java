@@ -251,7 +251,6 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		rightLabel = new Label(parent, SWT.NONE);
 		rightLabel.setText("]"); //$NON-NLS-1$
 		rightLabelGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
-		rightLabelGridData.horizontalIndent = -2;
 		rightLabel.setLayoutData(rightLabelGridData);
 	}
 
@@ -1362,7 +1361,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			final MenuItem branchNameMenuItem = new MenuItem(switchBranchesSubMenu, SWT.RADIO);
 			if (branchName.equals(currentBranchName) && repository.isDirty())
 			{
-				branchNameMenuItem.setText(branchName + DIRTY_SUFFIX); //$NON-NLS-1$
+				branchNameMenuItem.setText(branchName + DIRTY_SUFFIX);
 			}
 			else
 			{

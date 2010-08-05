@@ -112,7 +112,7 @@
             viewerId="org.eclipse.ui.navigator.ProjectExplorer">
          <includes>
             <contentExtension
-                  pattern="com.aptana.ide.syncing.ui.navigatorContent">
+                  pattern="com.aptana.ide.syncing.ui.navigatorContent*">
             </contentExtension>
          </includes>
       </viewerContentBinding>

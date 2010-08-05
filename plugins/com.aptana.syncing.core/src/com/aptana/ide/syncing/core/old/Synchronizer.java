@@ -465,6 +465,7 @@ public class Synchronizer implements ILoggable
 			{
 				if (serverFileInfo.getAttribute(EFS.ATTRIBUTE_SYMLINK))
 					continue;
+				
 				VirtualFileSyncPair item = new VirtualFileSyncPair(null, serverFile, relativePath,
 						SyncState.ServerItemOnly);
 				fileList.put(relativePath, item);
@@ -479,7 +480,13 @@ public class Synchronizer implements ILoggable
 			// associate this server file with that sync item
 			item.setDestinationFile(serverFile);
 
-			if (item.getSourceFileInfo().isDirectory() != serverFileInfo.isDirectory())
+			IFileInfo clientFileInfo = item.getSourceFileInfo(monitor);
+			if(clientFileInfo == null && item.getSyncState() == SyncState.ServerItemOnly) {
+				// This is an item we've seen already. Continue on.
+				continue;
+			}
+			
+			if (clientFileInfo.isDirectory() != serverFileInfo.isDirectory())
 			{
 				// this only occurs if one file is a directory and the other
 				// is not a directory
@@ -488,7 +495,7 @@ public class Synchronizer implements ILoggable
 				continue;
 			}
 
-			if (serverFile.fetchInfo().isDirectory())
+			if (serverFileInfo.isDirectory())
 			{
 				fileList.remove(relativePath);
 				logDebug(Messages.Synchronizer_Directory);
@@ -498,7 +505,7 @@ public class Synchronizer implements ILoggable
 			// calculate modification time difference, taking server
 			// offset into account
 			long serverFileTime = serverFileInfo.getLastModified();
-			long clientFileTime = item.getSourceFileInfo(null).getLastModified();
+			long clientFileTime = clientFileInfo.getLastModified();
 			long timeDiff = serverFileTime - clientFileTime;
 
 			logDebug(MessageFormat.format(Messages.Synchronizer_Times_Modified, new long[] { clientFileTime,

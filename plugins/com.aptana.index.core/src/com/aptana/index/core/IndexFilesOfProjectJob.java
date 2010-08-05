@@ -49,9 +49,18 @@ class IndexFilesOfProjectJob extends IndexRequestJob
 		}
 
 		Index index = getIndex();
+		if (index == null)
+		{
+			IndexActivator.logError(MessageFormat.format("Index is null for container: {0}", getContainerURI()), null); //$NON-NLS-1$
+			return Status.CANCEL_STATUS;
+		}
 		try
 		{
 			Set<IFileStore> fileStores = toFileStores(sub.newChild(files.size()));
+			if (sub.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
 			indexFileStores(index, fileStores, sub.newChild(9 * files.size()));
 		}
 		catch (CoreException e)

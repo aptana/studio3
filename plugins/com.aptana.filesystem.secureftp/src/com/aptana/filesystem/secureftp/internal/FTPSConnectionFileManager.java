@@ -185,11 +185,20 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 
 						} catch (Exception e) {
 						}
-						if (securityMechanism == null) {
-							securityMechanism = supportedMechanisms[0];
+						if (securityMechanism != null) {
+							ftpsClient.auth(securityMechanism);
+						} else {
+							// server didn't indicate its supported auth mechanism, try them one-by-one
+							for (String i : supportedMechanisms) {
+								try {
+									ftpsClient.auth(securityMechanism);
+									securityMechanism = i;
+									break;
+								} catch (FTPException ignore) {
+								}
+							}
 						}
 					}
-					ftpsClient.auth(securityMechanism);
 				}
 				if (password.length == 0 && !IFTPConstants.LOGIN_ANONYMOUS.equals(login) && (context == null || !context.getBoolean(ConnectionContext.NO_PASSWORD_PROMPT))) {
                     getOrPromptPassword(MessageFormat.format(Messages.FTPSConnectionFileManager_FTPSAuthentication, host),

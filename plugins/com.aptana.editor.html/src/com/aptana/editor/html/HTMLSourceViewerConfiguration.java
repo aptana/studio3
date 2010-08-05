@@ -38,6 +38,7 @@ import java.util.Map;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
@@ -48,6 +49,7 @@ import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.css.contentassist.CSSContentAssistProcessor;
+import com.aptana.editor.css.text.CSSTextHover;
 import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor;
 import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.editor.js.contentassist.JSContentAssistProcessor;
@@ -124,5 +126,16 @@ public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfigurati
 	{
 		AbstractThemeableEditor editor = this.getAbstractThemeableEditor();
 		return getContentAssistProcessor(contentType, editor);
+	}
+	
+	@Override
+	public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType)
+	{
+		// When in CSS, use CSSTextHover!
+		if (contentType.startsWith(CSSSourceConfiguration.PREFIX))
+		{
+			return new CSSTextHover();
+		}
+		return super.getTextHover(sourceViewer, contentType);
 	}
 }

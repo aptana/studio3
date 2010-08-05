@@ -21,14 +21,14 @@ import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.progress.WorkbenchJob;
 
-import com.aptana.explorer.IExplorerUIConstants;
-import com.aptana.explorer.IProjectContext;
+import com.aptana.core.resources.IProjectContext;
 
 /**
  * Process command line arguments.
@@ -183,14 +183,12 @@ public class CommandlineArgumentsHandler
 				IViewReference[] refs = page.getViewReferences();
 				for (IViewReference ref : refs)
 				{
-					if (ref.getId().equals(IExplorerUIConstants.VIEW_ID))
+					IWorkbenchPart view = ref.getPart(false);
+					if (view instanceof IProjectContext)
 					{
-						IProjectContext view = (IProjectContext) ref.getPart(false);
-						if (view != null)
-						{
-							view.setActiveProject(project);
-							return;
-						}
+						IProjectContext pc = (IProjectContext) view;
+						pc.setActiveProject(project);
+						return;
 					}
 				}
 			}

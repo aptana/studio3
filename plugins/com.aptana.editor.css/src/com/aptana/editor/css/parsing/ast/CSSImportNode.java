@@ -23,7 +23,7 @@ public class CSSImportNode extends CSSNode
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (!(obj instanceof CSSImportNode))
+		if (!super.equals(obj) || !(obj instanceof CSSImportNode))
 		{
 			return false;
 		}
@@ -34,7 +34,10 @@ public class CSSImportNode extends CSSNode
 	@Override
 	public int hashCode()
 	{
-		return 31 * fUriStr.hashCode() + Arrays.hashCode(fMediaList);
+		int hash = super.hashCode();
+		hash = hash * 31 + fUriStr.hashCode();
+		hash = hash * 31 + Arrays.hashCode(fMediaList);
+		return hash;
 	}
 
 	@Override
