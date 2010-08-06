@@ -7,6 +7,9 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -33,6 +36,7 @@ import org.jruby.runtime.builtin.IRubyObject;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.ICommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.UserAgentManager;
+import com.aptana.editor.common.scripting.snippets.SnippetsCompletionProcessor;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.QueryResult;
@@ -137,15 +141,16 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 			boolean autoActivated)
 	{
 		List<ICompletionProposal> proposals = addRubleProposals(viewer, offset);
+		proposals.addAll(addSnippetProposals(viewer, offset));
 		ICompletionProposal[] others = this.doComputeCompletionProposals(viewer, offset, activationChar, autoActivated);
-		if (proposals == null || proposals.isEmpty())
+		if (proposals.isEmpty())
 		{
 			return others;
 		}
 
 		if (others == null || others.length == 0)
 		{
-			// Pre-select the first ruble-contributed proposal
+			// Pre-select the first ruble-contributed proposal/snippet
 			ICompletionProposal proposal = proposals.get(0);
 			if (proposal instanceof CommonCompletionProposal)
 			{
@@ -159,6 +164,23 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		proposals.toArray(combined);
 		System.arraycopy(others, 0, combined, proposals.size(), others.length);
 		return combined;
+	}
+
+	/**
+	 * Calls the SnippetsCompletionProcessor to contribute any relevant snippets for the offset.
+	 * 
+	 * @param viewer
+	 * @param offset
+	 * @return
+	 */
+	private Collection<? extends ICompletionProposal> addSnippetProposals(ITextViewer viewer, int offset)
+	{
+		ICompletionProposal[] snippets = new SnippetsCompletionProcessor().computeCompletionProposals(viewer, offset);
+		if (snippets == null)
+		{
+			return Collections.emptyList();
+		}
+		return Arrays.asList(snippets);
 	}
 
 	/**
@@ -437,24 +459,24 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	protected URI getProjectURI()
 	{
 		URI result = null;
-		
+
 		if (editor != null)
 		{
 			IEditorInput editorInput = editor.getEditorInput();
-			
+
 			if (editorInput instanceof IFileEditorInput)
 			{
 				IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
 				IFile file = fileEditorInput.getFile();
 				IProject project = file.getProject();
-				
+
 				result = project.getLocationURI();
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getURI
 	 * 
