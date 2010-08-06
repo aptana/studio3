@@ -68,9 +68,4 @@ public interface IPreferenceConstants
 	 * Pref key for sorting the outline view alphabetically
 	 */
 	public static final String SORT_OUTLINE_ALPHABETIC = CommonEditorPlugin.PLUGIN_ID + ".sortOutlineAlphabetic"; //$NON-NLS-1$
-
-	/**
-	 * Pref key for enabling "invasive" themes (extend to JDT and other views that are not explicitly ours).
-	 */
-	public static final String INVASIVE_THEMES = "enable_invasive_themes"; //$NON-NLS-1$
 }
