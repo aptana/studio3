@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -84,20 +83,15 @@ public class JavaScriptLibraryInstallProcessor extends InstallerConfigurationPro
 	/**
 	 * Install a JavaScript library into a user-specified project.<br>
 	 * The configuration will grab the name and the location of the library from the given attributes. <br>
-	 * The expected structure of attributes array is as follows:<br>
-	 * <ul>
-	 * <li>The first item in the array should contain a Map of attributes, with the "name" attribute for the library we
-	 * are installing (e.g. Prototype,jQuery etc.)</li>
-	 * <li>The second item in the array should contain a non-empty array with an arbitrary amount of resource URLs that
-	 * will be downloaded and placed under the 'javascript' directory (or any other user-selected directory).</li>
-	 * </ul>
+	 * We expect an array of attributes with the same structure described at {@link #loadAttributes(Object)}.
 	 * 
 	 * @param attributes
-	 *            A non-empty string array, which contains the URLs for the JS library file(s).
+	 *            A non-empty string array, which contains the URLs for the JS library file(s) and an optional Map of
+	 *            additional attributes.
 	 * @see com.aptana.configurations.processor.AbstractConfigurationProcessor#configure(org.eclipse.core.runtime.IProgressMonitor,
 	 *      java.lang.Object)
+	 * @see #loadAttributes(Object)
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public ConfigurationStatus configure(IProgressMonitor progressMonitor, Object attributes)
 	{
@@ -115,47 +109,29 @@ public class JavaScriptLibraryInstallProcessor extends InstallerConfigurationPro
 		{
 			configurationStatus.removeAttribute(CONFIG_ATTR);
 			clearErrorAttributes();
-			if (attributes == null || !(attributes instanceof Object[]))
+
+			// Load the installer's attributes
+			IStatus loadingStatus = loadAttributes(attributes);
+			if (!loadingStatus.isOK())
 			{
-				String err = NLS.bind(Messages.InstallProcessor_missingInstallURLs, JS_LIBRARY);
-				applyErrorAttributes(err);
-				PortalUIPlugin.logError(new Exception(err));
+				applyErrorAttributes(loadingStatus.getMessage());
+				PortalUIPlugin.logError(new Exception(loadingStatus.getMessage()));
 				return configurationStatus;
 			}
-			Object[] attrArray = (Object[]) attributes;
-			if (attrArray.length != 2)
+
+			// Check that we got the expected single install URL
+
+			if (urls.length == 0)
 			{
 				// structure error
 				String err = NLS.bind(Messages.InstallProcessor_wrongNumberOfInstallLinks, new Object[] { JS_LIBRARY,
-						1, attrArray.length });
+						1, urls.length });
 				applyErrorAttributes(err);
 				PortalUIPlugin.logError(new Exception(err));
 				return configurationStatus;
 			}
-			// Check that the first attribute in the array is a Map and assign it.
-			if (!(attrArray[0] instanceof Map))
-			{
-				String err = NLS.bind(Messages.InstallerConfigurationProcessor_missingAttributeMap, JS_LIBRARY);
-				applyErrorAttributes(err);
-				PortalUIPlugin
-						.logError("We expected a map of attributes, but got: " + attrArray[0], new Exception(err)); //$NON-NLS-1$
-				return configurationStatus;
-			}
-			else
-			{
-				// assign it
-				attributesMap = (Map<String, String>) attrArray[0];
-			}
-			// Check that the second array element contains a non-empty array
-			if (!(attrArray[1] instanceof Object[]) || ((Object[]) attrArray[1]).length == 0)
-			{
-				String err = NLS.bind(Messages.InstallProcessor_missingInstallURLs, JS_LIBRARY);
-				applyErrorAttributes(err);
-				PortalUIPlugin.logError("We expected an array of URLs, but got an empty array.", new Exception(err)); //$NON-NLS-1$
-				return configurationStatus;
-			}
-			// Start the installation...
-			configurationStatus.setStatus(ConfigurationStatus.PROCESSING);
+			// Try to get the library name from the optional attributes. If it's not there, we log a warning and use a
+			// default one.
 			libraryName = attributesMap.get(NAME_ATTRIBUTE);
 			if (libraryName == null)
 			{
@@ -163,7 +139,9 @@ public class JavaScriptLibraryInstallProcessor extends InstallerConfigurationPro
 				libraryName = JS_LIBRARY;
 				PortalUIPlugin.logWarning("Expected a name attribute for the JS library, but got null."); //$NON-NLS-1$
 			}
-			IStatus status = download((Object[]) attrArray[1], progressMonitor);
+			// Start the installation...
+			configurationStatus.setStatus(ConfigurationStatus.PROCESSING);
+			IStatus status = download(urls, progressMonitor);
 			if (status.isOK())
 			{
 				status = install(progressMonitor);
@@ -173,9 +151,9 @@ public class JavaScriptLibraryInstallProcessor extends InstallerConfigurationPro
 				case IStatus.OK:
 				case IStatus.INFO:
 				case IStatus.WARNING:
-					displayMessageInUIThread(MessageDialog.INFORMATION,
-							NLS.bind(Messages.InstallProcessor_installerTitle, libraryName),
-							NLS.bind(Messages.InstallProcessor_installationSuccessful, libraryName));
+					displayMessageInUIThread(MessageDialog.INFORMATION, NLS.bind(
+							Messages.InstallProcessor_installerTitle, libraryName), NLS.bind(
+							Messages.InstallProcessor_installationSuccessful, libraryName));
 					configurationStatus.setStatus(ConfigurationStatus.OK);
 					break;
 				case IStatus.ERROR:
@@ -245,8 +223,7 @@ public class JavaScriptLibraryInstallProcessor extends InstallerConfigurationPro
 								File targetLocation = new File(targetFolder, sourceLocation.getName());
 								if (targetLocation.exists())
 								{
-									if (!MessageDialog.openQuestion(
-											Display.getDefault().getActiveShell(),
+									if (!MessageDialog.openQuestion(Display.getDefault().getActiveShell(),
 											Messages.JSLibraryInstallProcessor_fileConflictTitle,
 											Messages.JSLibraryInstallProcessor_fileConflictMessage
 													+ sourceLocation.getName()

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,20 +52,16 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 
 	/**
 	 * Install XAMPP on the machine.<br>
-	 * The configuration will grab the installer from the given attributes. We expect an array of attributes with this
-	 * structure:<br>
-	 * <ul>
-	 * <li>The first (optional) item in the array can be a Map of additional attributes.</li>
-	 * <li>The second item in the array should contain a string array with the XAMPP installer link (.exe file)</li>
-	 * </ul>
+	 * The configuration will grab the installer from the given attributes.<br>
+	 * We expect an array of attributes with the same structure described at {@link #loadAttributes(Object)}.
 	 * 
 	 * @param attributes
-	 *            First (optional) map of additional attributes. Second - A string array of size 1, which contains the
-	 *            URL for the XAMPP installer (.exe).
+	 *            First - A string array of size 1, which contains the URL for the XAMPP installer (.exe). Second -
+	 *            (optional) map of additional attributes.
 	 * @see com.aptana.configurations.processor.AbstractConfigurationProcessor#configure(org.eclipse.core.runtime.IProgressMonitor,
 	 *      java.lang.Object)
+	 * @see #loadAttributes(Object)
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public ConfigurationStatus configure(IProgressMonitor progressMonitor, Object attributes)
 	{
@@ -92,59 +87,27 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 		{
 			configurationStatus.removeAttribute(CONFIG_ATTR);
 			clearErrorAttributes();
-			if (attributes == null || !(attributes instanceof Object[]))
+
+			// Load the installer's attributes
+			IStatus loadingStatus = loadAttributes(attributes);
+			if (!loadingStatus.isOK())
 			{
-				String err = NLS.bind(Messages.InstallProcessor_missingInstallURLs, XAMPP);
-				applyErrorAttributes(err);
-				PortalUIPlugin.logError(new Exception(err));
+				applyErrorAttributes(loadingStatus.getMessage());
+				PortalUIPlugin.logError(new Exception(loadingStatus.getMessage()));
 				return configurationStatus;
 			}
-			Object[] attrArray = (Object[]) attributes;
-			if (attrArray.length == 0 || attrArray.length > 2)
+
+			// Check that we got the expected single install URL
+			if (urls.length != 1)
 			{
 				// structure error
-				String err = NLS.bind(Messages.InstallProcessor_wrongNumberOfInstallLinks, new Object[] { XAMPP, 2,
-						attrArray.length });
+				String err = NLS.bind(Messages.InstallProcessor_wrongNumberOfInstallLinks, new Object[] { XAMPP, 1,
+						urls.length });
 				applyErrorAttributes(err);
 				PortalUIPlugin.logError(new Exception(err));
 				return configurationStatus;
 			}
-			Object[] urls;
-			try
-			{
-				if (attrArray.length == 2)
-				{
-					// Check that the first item is a Map
-					if (!(attrArray[0] instanceof Map))
-					{
-						String err = NLS.bind(Messages.InstallerConfigurationProcessor_missingAttributeMap, XAMPP);
-						applyErrorAttributes(err);
-						PortalUIPlugin.logError(
-								"We expected a map of attributes, but got: " + attrArray[0], new Exception(err)); //$NON-NLS-1$
-						return configurationStatus;
-					}
-					else
-					{
-						// assign it
-						attributesMap = (Map<String, String>) attrArray[0];
-						urls = (Object[]) attrArray[1];
-					}
-				}
-				else
-				{
-					// set the map to empty (avoid NPE).
-					attributesMap = Collections.emptyMap();
-					urls = (Object[]) attrArray[0];
-				}
-			}
-			catch (ClassCastException cce)
-			{
-				// this can only happen if the urls did not arrive as an array
-				String err = NLS.bind(Messages.InstallProcessor_missingInstallURLs, XAMPP);
-				applyErrorAttributes(err);
-				PortalUIPlugin.logError("We expected an array of URLs, but got an empty array.", new Exception(err)); //$NON-NLS-1$
-				return configurationStatus;
-			}
+			// Try to get the default install directory from the optional attributes
 			installDir = attributesMap.get(INSTALL_DIR_ATTRIBUTE);
 			if (installDir == null)
 			{
@@ -162,9 +125,9 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 				case IStatus.OK:
 				case IStatus.INFO:
 				case IStatus.WARNING:
-					displayMessageInUIThread(MessageDialog.INFORMATION,
-							NLS.bind(Messages.InstallProcessor_installerTitle, XAMPP),
-							NLS.bind(Messages.InstallProcessor_installationSuccessful, XAMPP));
+					displayMessageInUIThread(MessageDialog.INFORMATION, NLS.bind(
+							Messages.InstallProcessor_installerTitle, XAMPP), NLS.bind(
+							Messages.InstallProcessor_installationSuccessful, XAMPP));
 					configurationStatus.setStatus(ConfigurationStatus.OK);
 					break;
 				case IStatus.ERROR:

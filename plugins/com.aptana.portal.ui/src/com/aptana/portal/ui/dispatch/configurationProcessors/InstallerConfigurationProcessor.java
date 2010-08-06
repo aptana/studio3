@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +74,7 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 	 * @param URLs
 	 * @param progressMonitor
 	 */
-	public IStatus download(Object[] URLs, IProgressMonitor progressMonitor)
+	public IStatus download(String[] URLs, IProgressMonitor progressMonitor)
 	{
 		if (URLs.length == 0)
 		{
@@ -84,14 +85,11 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 		}
 		downloadedPaths = null;
 		DownloadManager downloadManager = new DownloadManager();
-		urls = new String[URLs.length];
 		List<URL> urlsList = new ArrayList<URL>(URLs.length);
 		for (int i = 0; i < URLs.length; i++)
 		{
 			try
 			{
-				Object o = URLs[i];
-				urls[i] = o.toString();
 				urlsList.add(new URL(urls[i]));
 			}
 			catch (MalformedURLException mue)
@@ -257,6 +255,68 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 	}
 
 	/**
+	 * Loads the installation attributes.<br>
+	 * We expects a common structure of installation attributes, which follows these rules:
+	 * <p>
+	 * <ul>
+	 * <li>The attributes object is expected to be an array of size 1 or 2.</li>
+	 * <li>The first element of the attributes array is an array of strings, representing the URLs to be used with this
+	 * installer.</li>
+	 * <li>The second element of the attributes array is <b>optional</b>. If exists, it should contain a Map of extra
+	 * attributes key-value strings.</li>
+	 * </ul>
+	 * </p>
+	 * 
+	 * @param attributes
+	 *            An array of attributes, with the structure described above.
+	 * @return A status indicating the loading state.
+	 */
+	@SuppressWarnings("unchecked")
+	protected IStatus loadAttributes(Object attributes)
+	{
+		if (!(attributes instanceof Object[]))
+		{
+			return createErrorStatus("Expected an array of attributes, but got " + attributes);
+		}
+		Object[] attrArray = (Object[]) attributes;
+		if (attrArray.length == 1 || attrArray.length == 2)
+		{
+			// We only expects the URLs array
+			if (!(attrArray[0] instanceof Object[]))
+			{
+				return createErrorStatus("Expected an array of URLs, but got " + attributes);
+			}
+			Object[] attrURL = (Object[]) attrArray[0];
+			if (attrURL.length == 0)
+			{
+				return createErrorStatus("Expected an array of URLs, but got an empty array");
+			}
+			// Load the urls
+			urls = new String[attrURL.length];
+			for (int i = 0; i < attrURL.length; i++)
+			{
+				urls[i] = attrURL[i].toString();
+			}
+			if (attrArray.length == 2)
+			{
+				// We also expects an extra attributes Map
+				if (!(attrArray[1] instanceof Map))
+				{
+					return createErrorStatus("Expected a Map of extended attributes, but got " + attrArray[1]);
+				}
+				// save this map
+				attributesMap = (Map<String, String>) attrArray[1];
+			}
+			else
+			{
+				// assign an empty map
+				attributesMap = Collections.emptyMap();
+			}
+		}
+		return Status.OK_STATUS;
+	}
+
+	/**
 	 * Finalize the installation. <br>
 	 * This implementation just marks to delete on exit any downaloaded file.
 	 * 
@@ -306,5 +366,16 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Creates an returns an error status.
+	 * 
+	 * @param errorMessage
+	 * @return An error status
+	 */
+	protected IStatus createErrorStatus(String errorMessage)
+	{
+		return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, errorMessage);
 	}
 }
