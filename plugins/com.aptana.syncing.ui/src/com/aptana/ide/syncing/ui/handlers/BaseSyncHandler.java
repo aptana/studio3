@@ -1,30 +1,51 @@
 package com.aptana.ide.syncing.ui.handlers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.expressions.EvaluationContext;
-import org.eclipse.core.resources.IResource;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.URIUtil;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.ISources;
+import org.eclipse.ui.IURIEditorInput;
 
 import com.aptana.ide.syncing.core.SiteConnectionUtils;
 
 public abstract class BaseSyncHandler extends AbstractHandler
 {
 
-	private IResource selectedResource;
+	private IAdaptable[] fSelectedResources;
 
 	@Override
 	public boolean isEnabled()
 	{
-		return selectedResource != null && SiteConnectionUtils.findSitesForSource(selectedResource).length > 0;
+		if (fSelectedResources == null || fSelectedResources.length == 0)
+		{
+			return false;
+		}
+		for (IAdaptable resource : fSelectedResources)
+		{
+			if (SiteConnectionUtils.findSitesForSource(resource).length > 0)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
 	public void setEnabled(Object evaluationContext)
 	{
-		selectedResource = null;
+		fSelectedResources = null;
 		if (evaluationContext instanceof EvaluationContext)
 		{
 			Object value = ((EvaluationContext) evaluationContext).getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
@@ -33,23 +54,64 @@ public abstract class BaseSyncHandler extends AbstractHandler
 				ISelection selections = (ISelection) value;
 				if (!selections.isEmpty() && selections instanceof IStructuredSelection)
 				{
-					Object selection = ((IStructuredSelection) selections).getFirstElement();
-					IResource resource = null;
-					if (selection instanceof IResource)
+					Object[] resources = ((IStructuredSelection) selections).toArray();
+					List<IAdaptable> list = new ArrayList<IAdaptable>();
+					for (Object resource : resources)
 					{
-						resource = (IResource) selection;
+						if (resource instanceof IAdaptable)
+						{
+							list.add((IAdaptable) resource);
+						}
 					}
-					else if (selection instanceof IAdaptable)
+					fSelectedResources = list.toArray(new IAdaptable[list.size()]);
+				}
+				else
+				{
+					// checks the active editor
+					value = ((EvaluationContext) evaluationContext).getVariable(ISources.ACTIVE_EDITOR_NAME);
+					if (value instanceof IEditorPart)
 					{
-						resource = (IResource) ((IAdaptable) selection).getAdapter(IResource.class);
-					}
-					if (resource != null)
-					{
-						selectedResource = resource;
+						IAdaptable resource = null;
+						IEditorInput editorInput = ((IEditorPart) value).getEditorInput();
+						if (editorInput instanceof IFileEditorInput)
+						{
+							resource = ((IFileEditorInput) editorInput).getFile();
+						}
+						else if (editorInput instanceof IURIEditorInput)
+						{
+							try
+							{
+								resource = EFS.getStore(((IURIEditorInput) editorInput).getURI());
+							}
+							catch (CoreException e)
+							{
+								// ignores
+							}
+						}
+						else if (editorInput instanceof IPathEditorInput)
+						{
+							try
+							{
+								resource = EFS.getStore(URIUtil.toURI(((IPathEditorInput) editorInput).getPath()));
+							}
+							catch (CoreException e)
+							{
+								// ignores
+							}
+						}
+						if (resource != null)
+						{
+							fSelectedResources = new IAdaptable[1];
+							fSelectedResources[0] = resource;
+						}
 					}
 				}
 			}
 		}
 	}
 
+	protected IAdaptable[] getSelectedResources()
+	{
+		return fSelectedResources;
+	}
 }

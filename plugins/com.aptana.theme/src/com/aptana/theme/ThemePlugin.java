@@ -2,8 +2,6 @@ package com.aptana.theme;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -46,7 +44,7 @@ public class ThemePlugin extends AbstractUIPlugin
 		plugin = this;
 
 		themeHijacker = new InvasiveThemeHijacker();
-		themeHijacker.schedule();
+		themeHijacker.apply();
 
 		new EditorFontOverride().schedule();
 	}
@@ -59,14 +57,16 @@ public class ThemePlugin extends AbstractUIPlugin
 	{
 		try
 		{
-			IEclipsePreferences prefs = new InstanceScope().getNode(PLUGIN_ID);
-			prefs.removePreferenceChangeListener(themeHijacker);
+			if (themeHijacker != null)
+			{
+				themeHijacker.dispose();
+			}
 
 			if (fColorManager != null)
 			{
 				fColorManager.dispose();
 			}
-			
+
 			if (fControlThemerFactory != null)
 			{
 				fControlThemerFactory.dispose();

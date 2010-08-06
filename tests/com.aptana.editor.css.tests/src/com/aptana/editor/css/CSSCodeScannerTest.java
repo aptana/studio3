@@ -84,7 +84,7 @@ public class CSSCodeScannerTest extends TestCase
 		assertToken(getToken("punctuation.separator.key-value.css"), 10, 1);
 		assertToken(Token.WHITESPACE, 11, 1);
 		assertToken(getToken("support.function.misc.css"), 12, 3);		
-		assertToken(getToken("punctuation.section.function.css"), 15, 25);
+		assertToken(getToken("punctuation.section.function.css"), 15, 1);
 	}
 	
 	public void testSmallCaps()
@@ -115,7 +115,7 @@ public class CSSCodeScannerTest extends TestCase
 
 		assertToken(getToken("entity.name.tag.css"), 0, 8);
 		assertToken(getToken("entity.other.attribute-name.class.css"), 8, 8);
-		assertToken(Token.WHITESPACE, 16, 1);
+		assertToken(getToken("punctuation.separator.css"), 16, 1);
 		assertToken(Token.WHITESPACE, 17, 1);
 		assertToken(getToken("entity.name.tag.css"), 18, 8);
 		assertToken(getToken("entity.other.attribute-name.class.css"), 26, 5);
@@ -177,8 +177,8 @@ public class CSSCodeScannerTest extends TestCase
 		assertToken(getToken("punctuation.separator.key-value.css"), 25, 1);
 		assertToken(Token.WHITESPACE, 26, 1);
 		assertToken(getToken("support.function.misc.css"), 27, 3);
-		assertToken(getToken("punctuation.section.function.css"), 30, 2);
-//		assertToken(getToken("punctuation.section.function.css"), 31, 1);
+		assertToken(getToken("punctuation.section.function.css"), 30, 1);
+		assertToken(getToken("punctuation.section.function.css"), 31, 1);
 		assertToken(getToken("punctuation.terminator.rule.css"), 32, 1);
 		assertToken(Token.WHITESPACE, 33, 3);
 		// line 3
@@ -207,16 +207,16 @@ public class CSSCodeScannerTest extends TestCase
 		assertToken(getToken("punctuation.separator.key-value.css"), 139, 1);
 		assertToken(Token.WHITESPACE, 140, 1);
 		assertToken(getToken("support.constant.font-name.css"), 141, 7);
-		assertToken(getToken(null), 148, 1);
+		assertToken(getToken("punctuation.separator.css"), 148, 1);
 		assertToken(Token.WHITESPACE, 149, 1);
 		assertToken(getToken("support.constant.font-name.css"), 150, 6);
-		assertToken(getToken(null), 156, 1);
+		assertToken(getToken("punctuation.separator.css"), 156, 1);
 		assertToken(Token.WHITESPACE, 157, 1);
 		assertToken(getToken("support.constant.font-name.css"), 158, 5);
-		assertToken(getToken(null), 163, 1);
+		assertToken(getToken("punctuation.separator.css"), 163, 1);
 		assertToken(Token.WHITESPACE, 164, 1);
 		assertToken(getToken("support.constant.font-name.css"), 165, 9);
-		assertToken(getToken(null), 174, 1);
+		assertToken(getToken("punctuation.separator.css"), 174, 1);
 		assertToken(Token.WHITESPACE, 175, 1);
 		assertToken(getToken("support.constant.font-name.css"), 176, 10);
 		assertToken(getToken("punctuation.terminator.rule.css"), 186, 1);

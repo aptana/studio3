@@ -31,7 +31,7 @@ public class SSHFTPClientTemp extends SSHFTPClient
 		{
 			SecureFTPPlugin.log(new Status(IStatus.ERROR, SecureFTPPlugin.PLUGIN_ID, MessageFormat.format(
 					"Unable to access interior SFTP property. Error: {0}", e.getLocalizedMessage())));
-			return false;
+			return super.connected();
 		}
 	}
 }

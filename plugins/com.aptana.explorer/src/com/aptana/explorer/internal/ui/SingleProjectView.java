@@ -75,6 +75,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.IScopeReference;
 import com.aptana.core.ShellExecutable;
+import com.aptana.core.resources.IProjectContext;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
@@ -82,7 +83,6 @@ import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IExplorerUIConstants;
 import com.aptana.explorer.IPreferenceConstants;
-import com.aptana.explorer.IProjectContext;
 import com.aptana.filewatcher.FileWatcher;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
@@ -116,6 +116,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	private static final String GEAR_MENU_ID = "com.aptana.explorer.gear"; //$NON-NLS-1$
 	private static final String RAILS_NATURE = "org.radrails.rails.core.railsnature"; //$NON-NLS-1$
 	private static final String WEB_NATURE = "com.aptana.ui.webnature"; //$NON-NLS-1$
+	private static final String PHP_NATURE = "com.aptana.editor.php.phpNature"; //$NON-NLS-1$
 	private static final String DEPLOY_MENU_ID = "com.aptana.explorer.deploy"; //$NON-NLS-1$
 	private static final String BUNDLE_HEROKU = "Heroku"; //$NON-NLS-1$
 	private static final String BUNDLE_ENGINE_YARD = "Engine Yard"; //$NON-NLS-1$
@@ -307,6 +308,10 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 							if (selectedProject.hasNature(WEB_NATURE))
 							{
 								return "project.web"; //$NON-NLS-1$
+							}
+							if (selectedProject.hasNature(PHP_NATURE))
+							{
+								return "project.php"; //$NON-NLS-1$
 							}
 						}
 						catch (CoreException e)

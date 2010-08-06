@@ -58,19 +58,18 @@ public class CSSSimpleSelectorNode extends CSSNode
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (!(obj instanceof CSSSimpleSelectorNode))
+		if (!super.equals(obj) || !(obj instanceof CSSSimpleSelectorNode))
 		{
 			return false;
 		}
 		CSSSimpleSelectorNode other = (CSSSimpleSelectorNode) obj;
-		return (fTypeSelector == null ? other.fTypeSelector == null : fTypeSelector.equals(other.fTypeSelector))
-				&& Arrays.equals(getAttributeSelectors(), other.getAttributeSelectors());
+		return toString().equals(other.toString());
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return 31 * (fTypeSelector == null ? 0 : fTypeSelector.hashCode()) + Arrays.hashCode(getAttributeSelectors());
+		return super.hashCode() * 31 + toString().hashCode();
 	}
 
 	@Override

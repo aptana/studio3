@@ -276,36 +276,39 @@ public class JSIndexWriter
 	 */
 	public void writeType(Index index, TypeElement type, URI location)
 	{
-		// write type entry
-		List<String> parentTypes = type.getParentTypes();
-		String descriptionKey = this.writeDescription(index, type.getDescription(), location);
-		// SinceElement[] sinceList = type.getSinceList();
-		// UserAgentElement[] userAgents = type.getUserAgents();
-
-		// calculate key value and add to index
-		String value = StringUtil.join(
-			JSIndexConstants.DELIMITER,
-			type.getName(),
-			(parentTypes != null && parentTypes.isEmpty() == false)
-				? StringUtil.join(",", parentTypes) //$NON-NLS-1$
-				: (type.equals(JSTypeConstants.OBJECT_TYPE) == false) //$NON-NLS-1$
-					? JSTypeConstants.OBJECT_TYPE //$NON-NLS-1$
-					: "", //$NON-NLS-1$
-			descriptionKey
-		);
-
-		index.addEntry(JSIndexConstants.TYPE, value, location);
-
-		// write properties
-		for (PropertyElement property : type.getProperties())
+		if (index != null && type != null && location != null)
 		{
-			if (property instanceof FunctionElement)
+			// write type entry
+			List<String> parentTypes = type.getParentTypes();
+			String descriptionKey = this.writeDescription(index, type.getDescription(), location);
+			// SinceElement[] sinceList = type.getSinceList();
+			// UserAgentElement[] userAgents = type.getUserAgents();
+	
+			// calculate key value and add to index
+			String value = StringUtil.join(
+				JSIndexConstants.DELIMITER,
+				type.getName(),
+				(parentTypes != null && parentTypes.isEmpty() == false)
+					? StringUtil.join(",", parentTypes) //$NON-NLS-1$
+					: (type.equals(JSTypeConstants.OBJECT_TYPE) == false) //$NON-NLS-1$
+						? JSTypeConstants.OBJECT_TYPE //$NON-NLS-1$
+						: "", //$NON-NLS-1$
+				descriptionKey
+			);
+	
+			index.addEntry(JSIndexConstants.TYPE, value, location);
+	
+			// write properties
+			for (PropertyElement property : type.getProperties())
 			{
-				this.writeFunction(index, (FunctionElement) property, location);
-			}
-			else
-			{
-				this.writeProperty(index, property, location);
+				if (property instanceof FunctionElement)
+				{
+					this.writeFunction(index, (FunctionElement) property, location);
+				}
+				else
+				{
+					this.writeProperty(index, property, location);
+				}
 			}
 		}
 	}
