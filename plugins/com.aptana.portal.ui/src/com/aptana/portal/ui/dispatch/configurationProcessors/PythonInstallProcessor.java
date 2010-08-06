@@ -32,31 +32,29 @@ import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.configurationProcessors.installer.InstallerOptionsDialog;
 
 /**
- * A XAMPP install processor.<br>
- * This class is in charge of downloading and installing XAMPP for Windows operating systems.<br>
+ * A Python install processor.<br>
+ * This class is in charge of downloading and installing Python for Windows operating systems.<br>
  * Note: In case we decide to support something similar for MacOSX and Linux, this processor would probably need
  * delegators set up.
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
-public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
+public class PythonInstallProcessor extends InstallerConfigurationProcessor
 {
-	protected static final String XAMPP_DEFAULT_INSTALL_DIR = "C:\\"; //$NON-NLS-1$
-	protected static final String EXECUTE_SETUP_SCRIPT_ATTR = "execute_setup_script"; //$NON-NLS-1$
-	private static final String XAMPP_DEFAULT_FOLDER = "xampp\\"; //$NON-NLS-1$
-	private static final String XAMPP_CONTROL = "xampp-control.exe"; //$NON-NLS-1$
-	private static final String XAMPP = "XAMPP"; //$NON-NLS-1$
-	protected static final int XAMPP_INSTALLER_PROCESS_CANCEL_CODE = 255;
+	protected static final String PYTHON_DEFAULT_INSTALL_DIR = "C:\\Python"; //$NON-NLS-1$
+	protected static final String INSTALL_FOR_ALL_USERS_ATTR = "install_for_all"; //$NON-NLS-1$
+	private static final String PYTHON = "Python"; //$NON-NLS-1$
+	protected static final int PYTHON_INSTALLER_PROCESS_CANCEL_CODE = 1602;
 	private static boolean installationInProgress;
 	private String installDir;
 
 	/**
-	 * Install XAMPP on the machine.<br>
+	 * Install Python on the machine.<br>
 	 * The configuration will grab the installer from the given attributes.<br>
 	 * We expect an array of attributes with the same structure described at {@link #loadAttributes(Object)}.
 	 * 
 	 * @param attributes
-	 *            First - A string array of size 1, which contains the URL for the XAMPP installer (.exe). Second -
+	 *            First - A string array of size 1, which contains the URL for the Python installer (.exe). Second -
 	 *            (optional) map of additional attributes.
 	 * @see com.aptana.configurations.processor.AbstractConfigurationProcessor#configure(org.eclipse.core.runtime.IProgressMonitor,
 	 *      java.lang.Object)
@@ -66,7 +64,7 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 	public ConfigurationStatus configure(IProgressMonitor progressMonitor, Object attributes)
 	{
 		// Get a Class lock to avoid multiple installations at the same time even with multiple instances of this
-		// RubyInstallProcessor
+		// processor
 		synchronized (this.getClass())
 		{
 			if (installationInProgress)
@@ -77,7 +75,7 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 		}
 		if (!Platform.OS_WIN32.equals(Platform.getOS()))
 		{
-			String err = "The XAMPP installer processor is designed to work on Windows."; //$NON-NLS-1$
+			String err = "The Python installer processor is designed to work on Windows."; //$NON-NLS-1$
 			PortalUIPlugin.logError(err, new Exception());
 			applyErrorAttributes(err);
 			installationInProgress = false;
@@ -101,7 +99,7 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 			if (urls.length != 1)
 			{
 				// structure error
-				String err = NLS.bind(Messages.InstallProcessor_wrongNumberOfInstallLinks, new Object[] { XAMPP, 1,
+				String err = NLS.bind(Messages.InstallProcessor_wrongNumberOfInstallLinks, new Object[] { PYTHON, 1,
 						urls.length });
 				applyErrorAttributes(err);
 				PortalUIPlugin.logError(new Exception(err));
@@ -111,7 +109,7 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 			installDir = attributesMap.get(INSTALL_DIR_ATTRIBUTE);
 			if (installDir == null)
 			{
-				installDir = XAMPP_DEFAULT_INSTALL_DIR;
+				installDir = PYTHON_DEFAULT_INSTALL_DIR;
 			}
 			// Start the installation...
 			configurationStatus.setStatus(ConfigurationStatus.PROCESSING);
@@ -125,9 +123,9 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 				case IStatus.OK:
 				case IStatus.INFO:
 				case IStatus.WARNING:
-					displayMessageInUIThread(MessageDialog.INFORMATION, NLS.bind(
-							Messages.InstallProcessor_installerTitle, XAMPP), NLS.bind(
-							Messages.InstallProcessor_installationSuccessful, XAMPP));
+					displayMessageInUIThread(MessageDialog.INFORMATION,
+							NLS.bind(Messages.InstallProcessor_installerTitle, PYTHON),
+							NLS.bind(Messages.InstallProcessor_installationSuccessful, PYTHON));
 					configurationStatus.setStatus(ConfigurationStatus.OK);
 					break;
 				case IStatus.ERROR:
@@ -153,15 +151,15 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 	/**
 	 * Returns the application name.
 	 * 
-	 * @return "XAMPP"
+	 * @return "PYTHON"
 	 */
 	protected String getApplicationName()
 	{
-		return XAMPP;
+		return PYTHON;
 	}
 
 	/**
-	 * Do the XAMPP installation.
+	 * Do the PYTHON installation.
 	 * 
 	 * @param progressMonitor
 	 * @return A status indication of the process success or failure.
@@ -171,7 +169,7 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 		if (downloadedPaths == null || downloadedPaths[0] == null)
 		{
 			String failureMessge = Messages.InstallProcessor_couldNotLocateInstaller;
-			String err = NLS.bind(Messages.InstallProcessor_failedToInstall, XAMPP);
+			String err = NLS.bind(Messages.InstallProcessor_failedToInstall, PYTHON);
 			displayMessageInUIThread(MessageDialog.ERROR, Messages.InstallProcessor_installationErrorTitle, err + ' '
 					+ failureMessge);
 			return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, err + ' ' + failureMessge);
@@ -181,7 +179,7 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 		final Map<String, Object> installationAttributes = new HashMap<String, Object>();
 		try
 		{
-			subMonitor.beginTask(NLS.bind(Messages.InstallProcessor_installingTaskName, XAMPP),
+			subMonitor.beginTask(NLS.bind(Messages.InstallProcessor_installingTaskName, PYTHON),
 					IProgressMonitor.UNKNOWN);
 			final String[] installDir = new String[1];
 			Job installRubyDialog = new UIJob("Ruby installer options") //$NON-NLS-1$
@@ -189,7 +187,7 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor)
 				{
-					XAMPPInstallerOptionsDialog dialog = new XAMPPInstallerOptionsDialog();
+					PythonInstallerOptionsDialog dialog = new PythonInstallerOptionsDialog();
 					if (dialog.open() == Window.OK)
 					{
 						installationAttributes.putAll(dialog.getAttributes());
@@ -215,21 +213,21 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 				return result;
 			}
 
-			IStatus status = installXAMPP(installationAttributes);
+			IStatus status = installPYTHON(installationAttributes);
 			if (!status.isOK())
 			{
 				return status;
 			}
 			PortalUIPlugin.logInfo(
-					"Successfully installed XAMPP into " + installDir[0] + ". XAMPP installation completed.", null); //$NON-NLS-1$ //$NON-NLS-2$
-			// note that we called the finalizeInstallation from the installXAMPP Job.
+					"Successfully installed PYTHON into " + installDir[0] + ". PYTHON installation completed.", null); //$NON-NLS-1$ //$NON-NLS-2$
+			// note that we called the finalizeInstallation from the installPYTHON Job.
 			return Status.OK_STATUS;
 		}
 		catch (Exception e)
 		{
-			PortalUIPlugin.logError("Error while installing XAMPP", e); //$NON-NLS-1$
+			PortalUIPlugin.logError("Error while installing PYTHON", e); //$NON-NLS-1$
 			return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, NLS.bind(
-					Messages.InstallProcessor_errorWhileInstalling, XAMPP));
+					Messages.InstallProcessor_errorWhileInstalling, PYTHON));
 		}
 		finally
 		{
@@ -238,16 +236,16 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 	}
 
 	/**
-	 * Run the XAMPP installer and install XMAPP into the given directory.
+	 * Run the PYTHON installer and install XMAPP into the given directory.
 	 * 
 	 * @param installationAttributes
-	 *            - Attributes map that contains the installation directory and a specification whether to run the XAMPP
-	 *            auto-install script.
+	 *            - Attributes map that contains the installation directory and a specification whether to run the
+	 *            PYTHON auto-install script.
 	 * @return The status of this installation
 	 */
-	protected IStatus installXAMPP(final Map<String, Object> installationAttributes)
+	protected IStatus installPYTHON(final Map<String, Object> installationAttributes)
 	{
-		Job job = new Job(NLS.bind(Messages.InstallProcessor_installerJobName, XAMPP + ' '
+		Job job = new Job(NLS.bind(Messages.InstallProcessor_installerJobName, PYTHON + ' '
 				+ Messages.InstallProcessor_installerGroupTitle))
 		{
 			@Override
@@ -257,12 +255,13 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 				{
 					// extract the values from the attributes:
 					String installDir = (String) installationAttributes.get(InstallerOptionsDialog.INSTALL_DIR_ATTR);
-					boolean runAutoInstallScript = (Boolean) installationAttributes.get(EXECUTE_SETUP_SCRIPT_ATTR);
-
+					// This installer requires Windows path slashes style (backslashes)
+					installDir = installDir.replaceAll("/", "\\\\"); //$NON-NLS-1$ //$NON-NLS-2$
+					
 					SubMonitor subMonitor = SubMonitor.convert(monitor, IProgressMonitor.UNKNOWN);
-					subMonitor.beginTask(NLS.bind(Messages.InstallProcessor_installingTaskName, XAMPP),
+					subMonitor.beginTask(NLS.bind(Messages.InstallProcessor_installingTaskName, PYTHON),
 							IProgressMonitor.UNKNOWN);
-					PortalUIPlugin.logInfo("Installing XAMPP into " + installDir, null); //$NON-NLS-1$
+					PortalUIPlugin.logInfo("Installing Python into " + installDir, null); //$NON-NLS-1$
 
 					// Try to get a file lock first, before running the process. This file was just downloaded, so there
 					// is a chance it's still being held by the OS or by the downloader.
@@ -270,24 +269,30 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 					if (!fileLockStatus.isOK())
 					{
 						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, NLS.bind(
-								Messages.InstallProcessor_failedToInstallSeeLog, XAMPP));
+								Messages.InstallProcessor_failedToInstallSeeLog, PYTHON));
 					}
-					// Run the XAMPP installer, as specified in this link:
-					// http://www.apachefriends.org/en/xampp-windows.html#522
+					// Run the Python installer, as specified in this link:
+					// http://www.python.org/download/releases/2.5/msi/
 					List<String> command = new ArrayList<String>(4);
+					command.add("msiexec"); //$NON-NLS-1$
+					command.add("/i"); //$NON-NLS-1$
 					command.add(downloadedPaths[0]);
-					command.add("-d" + installDir); //$NON-NLS-1$
-					command.add("-s2"); //$NON-NLS-1$
-					if (runAutoInstallScript)
+					command.add("/qr"); //$NON-NLS-1$
+					command.add("TARGETDIR=\"" + installDir + '\"'); //$NON-NLS-1$
+					if (Boolean.FALSE.toString().equals(attributesMap.get(INSTALL_FOR_ALL_USERS_ATTR)))
 					{
-						command.add("-spauto"); //$NON-NLS-1$
+						command.add("ALLUSERS=0"); //$NON-NLS-1$
+					}
+					else
+					{
+						command.add("ALLUSERS=1"); //$NON-NLS-1$
 					}
 					ProcessBuilder processBuilder = new ProcessBuilder(command);
 					Process process = processBuilder.start();
 					int res = process.waitFor();
-					if (res == XAMPP_INSTALLER_PROCESS_CANCEL_CODE)
+					if (res == PYTHON_INSTALLER_PROCESS_CANCEL_CODE)
 					{
-						PortalUIPlugin.logInfo("XAMPP installation cancelled", null); //$NON-NLS-1$
+						PortalUIPlugin.logInfo("Python installation cancelled", null); //$NON-NLS-1$
 						return Status.CANCEL_STATUS;
 					}
 					if (res != 0)
@@ -295,31 +300,27 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 						// We had an error while installing
 						PortalUIPlugin
 								.logError(
-										"Failed to install XAMPP. The XAMPP installer process returned a termination code of " + res, null); //$NON-NLS-1$
+										"Failed to install Python. The PYTHON installer process returned a termination code of " + res, null); //$NON-NLS-1$
 						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, res, NLS.bind(
-								Messages.InstallProcessor_installationErrorMessage, XAMPP, XAMPP), null);
+								Messages.InstallProcessor_installationErrorMessage, PYTHON, PYTHON), null);
 					}
 					else if (!new File(installDir).exists())
 					{
 						// Just to be sure that we got everything in place
 						PortalUIPlugin.logError(
-								"Failed to install XAMPP. The " + installDir + " directory was not created", null); //$NON-NLS-1$ //$NON-NLS-2$
+								"Failed to install Python. The " + installDir + " directory was not created", null); //$NON-NLS-1$ //$NON-NLS-2$
 						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, res, NLS.bind(
-								Messages.InstallProcessor_installationError_installDirMissing, XAMPP), null);
+								Messages.InstallProcessor_installationError_installDirMissing, PYTHON), null);
 					}
-					// In case we had the auto-setup script on, open the XAMPP control
-					if (runAutoInstallScript)
-					{
-						openXAMPPConsole(installDir + XAMPP_DEFAULT_FOLDER);
-					}
-					finalizeInstallation(installDir + XAMPP_DEFAULT_FOLDER);
+
+					finalizeInstallation(installDir);
 					return Status.OK_STATUS;
 				}
 				catch (Exception e)
 				{
 					PortalUIPlugin.logError(e);
 					return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, NLS.bind(
-							Messages.InstallProcessor_failedToInstallSeeLog, XAMPP), e);
+							Messages.InstallProcessor_failedToInstallSeeLog, PYTHON), e);
 				}
 				finally
 				{
@@ -342,65 +343,6 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 	}
 
 	/**
-	 * Opens the XAMPP console right after XAMPP was installed.
-	 * 
-	 * @param installDir
-	 */
-	protected void openXAMPPConsole(final String installDir)
-	{
-		Job job = new Job(Messages.XAMPPInstallProcessor_openXAMPPConsoleJobName)
-		{
-
-			@Override
-			protected IStatus run(IProgressMonitor monitor)
-			{
-
-				try
-				{
-					ProcessBuilder processBuilder = new ProcessBuilder(installDir + XAMPP_CONTROL);
-					// We might stumble into 'Access Denied' errors when running this one. So this will try to
-					// re-initiate it several times.
-					int attempts = 5;
-					long timeOut = 3000L;
-					Throwable lastException = null;
-					do
-					{
-						if (monitor.isCanceled())
-						{
-							break;
-						}
-						try
-						{
-							processBuilder.start();
-							lastException = null;
-							break;
-						}
-						catch (Throwable t)
-						{
-							attempts--;
-							lastException = t;
-						}
-						Thread.sleep(timeOut);
-					}
-					while (attempts > 0);
-					if (lastException != null)
-					{
-						PortalUIPlugin.logError(lastException);
-					}
-				}
-				catch (Throwable t)
-				{
-					// Just log any error here, but don't display any error message
-					PortalUIPlugin.logError(t);
-				}
-				return Status.OK_STATUS;
-			}
-
-		};
-		job.schedule(3000L);
-	}
-
-	/**
 	 * Finalize the installation by placing a .aptana file in the installed directory, specifying some properties.
 	 * 
 	 * @param installDir
@@ -410,12 +352,12 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 		super.finalizeInstallation(installDir);
 		File propertiesFile = new File(installDir, APTANA_PROPERTIES_FILE_NAME);
 		Properties properties = new Properties();
-		properties.put("xampp_install", urls[0]); //$NON-NLS-1$
+		properties.put("PYTHON_install", urls[0]); //$NON-NLS-1$
 		FileOutputStream fileOutputStream = null;
 		try
 		{
 			fileOutputStream = new FileOutputStream(propertiesFile);
-			properties.store(fileOutputStream, NLS.bind(Messages.InstallProcessor_aptanaInstallationComment, XAMPP));
+			properties.store(fileOutputStream, NLS.bind(Messages.InstallProcessor_aptanaInstallationComment, PYTHON));
 		}
 		catch (IOException e)
 		{
@@ -437,21 +379,21 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 		}
 	}
 
-	private class XAMPPInstallerOptionsDialog extends InstallerOptionsDialog
+	private class PythonInstallerOptionsDialog extends InstallerOptionsDialog
 	{
-		private Button executeScriptBt;
+		private Button installForAllUsersBt;
 
-		public XAMPPInstallerOptionsDialog()
+		public PythonInstallerOptionsDialog()
 		{
-			super(Display.getDefault().getActiveShell(), XAMPP);
-			setTitleImage(PortalUIPlugin.getDefault().getImageRegistry().get(PortalUIPlugin.XAMPP_IMAGE));
+			super(Display.getDefault().getActiveShell(), PYTHON);
+			setTitleImage(PortalUIPlugin.getDefault().getImageRegistry().get(PortalUIPlugin.PYTHON_IMAGE));
 		}
 
 		@Override
 		protected void setAttributes()
 		{
 			attributes.put(INSTALL_DIR_ATTR, installDir);
-			attributes.put(EXECUTE_SETUP_SCRIPT_ATTR, Boolean.TRUE);
+			attributes.put(INSTALL_FOR_ALL_USERS_ATTR, Boolean.TRUE);
 		}
 
 		/**
@@ -461,15 +403,15 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 		protected Composite createInstallerGroupControls(Composite group)
 		{
 			Composite control = super.createInstallerGroupControls(group);
-			executeScriptBt = new Button(group, SWT.CHECK);
-			executeScriptBt.setText(Messages.XAMPPInstallProcessor_executeXAMPPAutoSetup);
-			executeScriptBt.setSelection(true);
-			executeScriptBt.addSelectionListener(new SelectionAdapter()
+			installForAllUsersBt = new Button(group, SWT.CHECK);
+			installForAllUsersBt.setText(Messages.InstallProcessor_InstallForAllUsers);
+			installForAllUsersBt.setSelection(true);
+			installForAllUsersBt.addSelectionListener(new SelectionAdapter()
 			{
 				@Override
 				public void widgetSelected(SelectionEvent e)
 				{
-					attributes.put(EXECUTE_SETUP_SCRIPT_ATTR, executeScriptBt.getSelection());
+					attributes.put(INSTALL_FOR_ALL_USERS_ATTR, installForAllUsersBt.getSelection());
 				}
 			});
 			return control;

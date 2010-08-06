@@ -68,6 +68,12 @@
             id="com.aptana.portal.jsLibrary.installer.processor"
             name="JS Library Installer">
       </processor>
+      <processor
+            category="configurations"
+            class="com.aptana.portal.ui.dispatch.configurationProcessors.PythonInstallProcessor"
+            id="com.aptana.portal.python.installer.processor"
+            name="Python Installer">
+      </processor>
    </extension>
    <extension
          point="com.aptana.portal.ui.browserInteractions">
@@ -116,6 +122,12 @@
             configurationProcessor="com.aptana.portal.jsLibrary.installer.processor"
             id="portal.js_library.installer"
             name="JS Libraries Installer Actions">
+      </actionController>
+      <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.InstallActionController"
+            configurationProcessor="com.aptana.portal.python.installer.processor"
+            id="portal.python.installer"
+            name="Python Installer Actions">
       </actionController>
    </extension>
 </plugin>

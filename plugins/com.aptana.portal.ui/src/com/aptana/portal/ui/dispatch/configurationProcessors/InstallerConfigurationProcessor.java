@@ -276,7 +276,7 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 	{
 		if (!(attributes instanceof Object[]))
 		{
-			return createErrorStatus("Expected an array of attributes, but got " + attributes);
+			return createErrorStatus(Messages.InstallerConfigurationProcessor_expectedArrayError + attributes);
 		}
 		Object[] attrArray = (Object[]) attributes;
 		if (attrArray.length == 1 || attrArray.length == 2)
@@ -284,12 +284,12 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 			// We only expects the URLs array
 			if (!(attrArray[0] instanceof Object[]))
 			{
-				return createErrorStatus("Expected an array of URLs, but got " + attributes);
+				return createErrorStatus(Messages.InstallerConfigurationProcessor_expectedURLsArrayError + attributes);
 			}
 			Object[] attrURL = (Object[]) attrArray[0];
 			if (attrURL.length == 0)
 			{
-				return createErrorStatus("Expected an array of URLs, but got an empty array");
+				return createErrorStatus(Messages.InstallerConfigurationProcessor_emptyURLsArrayError);
 			}
 			// Load the urls
 			urls = new String[attrURL.length];
@@ -302,7 +302,7 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 				// We also expects an extra attributes Map
 				if (!(attrArray[1] instanceof Map))
 				{
-					return createErrorStatus("Expected a Map of extended attributes, but got " + attrArray[1]);
+					return createErrorStatus(Messages.InstallerConfigurationProcessor_expectedMapError + attrArray[1]);
 				}
 				// save this map
 				attributesMap = (Map<String, String>) attrArray[1];

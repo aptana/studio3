@@ -435,7 +435,7 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 		try
 		{
 			fileOutputStream = new FileOutputStream(propertiesFile);
-			properties.store(fileOutputStream, Messages.RubyInstallProcessor_aptanaFileRubyComment);
+			properties.store(fileOutputStream, NLS.bind(Messages.InstallProcessor_aptanaInstallationComment, "Ruby & DevKit")); //$NON-NLS-1$
 		}
 		catch (IOException e)
 		{

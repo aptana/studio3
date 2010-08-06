@@ -17,6 +17,10 @@ public class Messages extends NLS
 	public static String ImportJavaScriptLibraryDialog_projectLable;
 	public static String ImportJavaScriptLibraryDialog_useDefaultLocation;
 	public static String ImportJavaScriptLibraryDialog_wrongProjectRootError;
+	public static String InstallerConfigurationProcessor_emptyURLsArrayError;
+	public static String InstallerConfigurationProcessor_expectedArrayError;
+	public static String InstallerConfigurationProcessor_expectedMapError;
+	public static String InstallerConfigurationProcessor_expectedURLsArrayError;
 	public static String InstallerConfigurationProcessor_unableToExtractZip;
 	public static String InstallProcessor_couldNotLocateInstaller;
 	public static String InstallProcessor_browse;
@@ -43,6 +47,7 @@ public class Messages extends NLS
 	public static String InstallProcessor_installerJobName;
 	public static String InstallProcessor_seeErrorLog;
 	public static String InstallProcessor_updatingTaskName;
+	public static String InstallProcessor_InstallForAllUsers;
 	public static String InstallProcessor_wrongNumberOfInstallLinks;
 	public static String InstallerConfigurationProcessor_missingAttributeMap;
 	public static String InstallerConfigurationProcessor_missingDownloadTargets;
@@ -53,8 +58,7 @@ public class Messages extends NLS
 	public static String JSLibraryInstallProcessor_multipleErrorsWhileImportingJS;
 	public static String JSLibraryInstallProcessor_overwriteQuestion;
 	public static String JSLibraryInstallProcessor_unexpectedNull;
-	public static String RubyInstallProcessor_aptanaFileRubyComment;
-	public static String XAMPPInstallProcessor_aptanaFileXAMPPComment;
+	public static String InstallProcessor_aptanaInstallationComment;
 	public static String SystemConfigurationProcessor_missingConfigurationItems;
 	public static String SystemConfigurationProcessor_noShellCommandPath;
 	public static String SystemConfigurationProcessor_wrongConfigurationAttributesStructure;
