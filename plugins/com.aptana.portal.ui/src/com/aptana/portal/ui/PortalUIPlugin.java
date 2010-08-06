@@ -40,6 +40,7 @@ public class PortalUIPlugin extends AbstractUIPlugin
 	public static final String RUBY_IMAGE = "/icons/wizban/ruby.png"; //$NON-NLS-1$
 	public static final String XAMPP_IMAGE = "/icons/wizban/xampp.png"; //$NON-NLS-1$
 	public static final String JS_IMAGE = "/icons/wizban/js.png"; //$NON-NLS-1$
+	public static final String PYTHON_IMAGE = "/icons/wizban/python.png"; //$NON-NLS-1$
 
 	// The shared instance
 	private static PortalUIPlugin plugin;
@@ -148,10 +149,13 @@ public class PortalUIPlugin extends AbstractUIPlugin
 						for (IEditorReference reference : editorReferences)
 						{
 							IEditorPart editor = reference.getEditor(false);
-							resource = (IResource) editor.getEditorInput().getAdapter(IResource.class);
-							if (resource != null)
+							if (editor != null)
 							{
-								break;
+								resource = (IResource) editor.getEditorInput().getAdapter(IResource.class);
+								if (resource != null)
+								{
+									break;
+								}
 							}
 						}
 					}
@@ -188,6 +192,7 @@ public class PortalUIPlugin extends AbstractUIPlugin
 		reg.put(RUBY_IMAGE, imageDescriptorFromPlugin(PLUGIN_ID, RUBY_IMAGE));
 		reg.put(XAMPP_IMAGE, imageDescriptorFromPlugin(PLUGIN_ID, XAMPP_IMAGE));
 		reg.put(JS_IMAGE, imageDescriptorFromPlugin(PLUGIN_ID, JS_IMAGE));
+		reg.put(PYTHON_IMAGE, imageDescriptorFromPlugin(PLUGIN_ID, PYTHON_IMAGE));
 	}
 
 	public static void logInfo(String string, Throwable t)
