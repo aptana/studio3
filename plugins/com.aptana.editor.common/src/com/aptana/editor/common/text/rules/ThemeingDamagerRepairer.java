@@ -30,7 +30,7 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 				String last = (String) data;
 				int offset = fScanner.getTokenOffset();
 				String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(fDocument, offset);
-				scope += " " + last;
+				scope += " " + last; //$NON-NLS-1$
 				System.out.println(scope);
 				IToken converted = ThemePlugin.getDefault().getThemeManager().getToken(scope);
 				lastAttribute = super.getTokenTextAttribute(converted);
@@ -38,8 +38,7 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 			}
 			catch (BadLocationException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				CommonEditorPlugin.logError(e);
 			}
 		}
 		else if (token.isWhitespace())
@@ -55,10 +54,8 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 			}
 			catch (BadLocationException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				CommonEditorPlugin.logError(e);
 			}
-//			return lastAttribute;
 		}
 		lastAttribute = super.getTokenTextAttribute(token);
 		return lastAttribute;

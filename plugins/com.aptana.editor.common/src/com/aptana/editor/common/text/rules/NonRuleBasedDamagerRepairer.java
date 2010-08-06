@@ -48,6 +48,9 @@ import org.eclipse.jface.text.presentation.IPresentationRepairer;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.swt.custom.StyleRange;
 
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.theme.ThemePlugin;
+
 public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPresentationRepairer
 {
 
@@ -143,7 +146,34 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 	 */
 	public void createPresentation(TextPresentation presentation, ITypedRegion region)
 	{
-		addRange(presentation, region.getOffset(), region.getLength(), (TextAttribute) fDefaultTextAttribute.getData());
+		addRange(presentation, region.getOffset(), region.getLength(), getTextAttribute(region));
+	}
+
+	protected TextAttribute getTextAttribute(ITypedRegion region)
+	{
+		Object data = fDefaultTextAttribute.getData();
+		if (data instanceof String)
+		{
+			try
+			{
+				String last = (String) data;
+				int offset = region.getOffset();
+				String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(fDocument, offset);
+				scope += " " + last; //$NON-NLS-1$
+				System.out.println(scope);
+				IToken converted = ThemePlugin.getDefault().getThemeManager().getToken(scope);
+				data = converted.getData();
+			}
+			catch (BadLocationException e)
+			{
+				CommonEditorPlugin.logError(e);
+			}
+		}
+		if (data instanceof TextAttribute)
+		{
+			return (TextAttribute) data;
+		}
+		return null;
 	}
 
 	/**

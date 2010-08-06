@@ -51,6 +51,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.text.rules.CompositePartitionScanner;
 import com.aptana.editor.common.text.rules.SingleTagRule;
+import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
 
@@ -134,7 +135,7 @@ public abstract class CompositeSourceViewerConfiguration extends CommonSourceVie
 	{
 		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
 
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getStartEndTokenScanner());
+		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getStartEndTokenScanner());
 		reconciler.setDamager(dr, CompositePartitionScanner.START_SWITCH_TAG);
 		reconciler.setRepairer(dr, CompositePartitionScanner.START_SWITCH_TAG);
 		reconciler.setDamager(dr, CompositePartitionScanner.END_SWITCH_TAG);

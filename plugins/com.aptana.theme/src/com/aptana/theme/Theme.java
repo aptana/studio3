@@ -190,6 +190,7 @@ public class Theme
 		{
 			public int compare(String o1, String o2)
 			{
+				// FIXME "Length" should be counted as spaces first, then periods.
 				int blah = o2.length() - o1.length();
 				if (blah != 0)
 					return blah;
@@ -200,27 +201,36 @@ public class Theme
 		SortedSet<String> sorted = new TreeSet<String>(c);
 		sorted.addAll(map.keySet());
 
-		for (String key : sorted)
+		// Match the element deepest down in the scope e.g. string wins over source.php when the scope is source.php
+		// string.quoted.
+		// Match most of the deepest element e.g. string.quoted wins over string.
+		// Rules 1 and 2 applied again to the scope selector when removing the deepest element (in the case of a tie),
+		// e.g. text source string wins over source string.
+		String[] scopeParts = tokenType.split(" "); //$NON-NLS-1$
+		for (int i = 0; i < scopeParts.length; i++)
 		{
-			if (new ScopeSelector(key).matches(tokenType))
+			String subScope = joinLast(scopeParts, i + 1);
+			for (String key : sorted)
 			{
-				// FIXME Need to merge the backgrounds up the scope! We shouldn't be generating these things in advance, we need to handle alpha merges!
-				TextAttribute attr = map.get(key);
-				if (attr.getBackground() == null)
+				if (new ScopeSelector(key).matches(subScope))
 				{
-					int index = tokenType.lastIndexOf(' ');
-					if (index != -1)
-					{
-						String subType = tokenType.substring(0, index);
-						TextAttribute parentAttr = getTextAttribute(subType);
-						return new TextAttribute(attr.getForeground(), parentAttr.getBackground(), attr.getStyle());
-					}
+					TextAttribute attr = map.get(key);
+					// FIXME What if we really needed to alpha merge up the scope?! We need to store values as raw rgb, then convert to colors on demand as we need to!
+					 if (attr.getBackground() == null)
+					 {
+						// Need to merge bg color up the scope!
+						int index = tokenType.lastIndexOf(' ');
+						if (index != -1)
+						{
+							String subType = tokenType.substring(0, index);
+							TextAttribute parentAttr = getTextAttribute(subType);
+							// TODO Do we need to merge font style?
+							return new TextAttribute(attr.getForeground(), parentAttr.getBackground(), attr.getStyle());
+						}
+					 }
+					return attr;
 				}
-				return attr;
 			}
-			
-//			if (tokenType.startsWith(key))
-//				return map.get(key);
 		}
 
 		// Some tokens are special. They have fallbacks even if not in the theme! Looks like bundles can contribute
@@ -246,6 +256,18 @@ public class Theme
 					154, 233)), 0);
 
 		return new TextAttribute(colorManager.getColor(defaultFG));
+	}
+
+	private String joinLast(String[] scopeParts, int lastSegments)
+	{
+		StringBuilder builder = new StringBuilder();
+		int start = scopeParts.length - lastSegments;
+		for (int i = start; i < scopeParts.length; i++)
+		{
+			builder.append(scopeParts[i]).append(" "); //$NON-NLS-1$
+		}
+		builder.deleteCharAt(builder.length() - 1);
+		return builder.toString();
 	}
 
 	public RGB getBackground()
