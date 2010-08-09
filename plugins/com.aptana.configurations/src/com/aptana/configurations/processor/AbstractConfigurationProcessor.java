@@ -1,11 +1,15 @@
 package com.aptana.configurations.processor;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.Status;
 
 import com.aptana.configurations.ConfigurationsPlugin;
 import com.aptana.core.ShellExecutable;
@@ -33,6 +37,9 @@ public abstract class AbstractConfigurationProcessor implements IConfigurationPr
 	private String processorID;
 	private String processorName;
 	private String[] categories;
+
+	protected String[] urls;
+	protected Map<String, String> attributesMap;
 
 	/**
 	 * Constructs a new configuration processor.<br>
@@ -264,5 +271,78 @@ public abstract class AbstractConfigurationProcessor implements IConfigurationPr
 	protected void clearErrorAttributes()
 	{
 		configurationStatus.removeAttribute(ConfigurationStatus.ERROR);
+	}
+
+	/**
+	 * Loads the installation attributes.<br>
+	 * We expects a common structure of installation attributes, which follows these rules:
+	 * <p>
+	 * <ul>
+	 * <li>The attributes object is expected to be an array of size 1 or 2.</li>
+	 * <li>The first element of the attributes array is an array of strings, representing the URLs to be used with this
+	 * installer.</li>
+	 * <li>The second element of the attributes array is <b>optional</b>. If exists, it should contain a Map of extra
+	 * attributes key-value strings.</li>
+	 * </ul>
+	 * </p>
+	 * 
+	 * @param attributes
+	 *            An array of attributes, with the structure described above.
+	 * @return A status indicating the loading state.
+	 */
+	@SuppressWarnings("unchecked")
+	protected IStatus loadAttributes(Object attributes)
+	{
+		if (!(attributes instanceof Object[]))
+		{
+			return createErrorStatus(Messages.AbstractConfigurationProcessor_expectedArrayError + attributes);
+		}
+		Object[] attrArray = (Object[]) attributes;
+		if (attrArray.length == 1 || attrArray.length == 2)
+		{
+			// We only expects the URLs array
+			if (!(attrArray[0] instanceof Object[]))
+			{
+				return createErrorStatus(Messages.AbstractConfigurationProcessor_expectedURLsArrayError + attributes);
+			}
+			Object[] attrURL = (Object[]) attrArray[0];
+			if (attrURL.length == 0)
+			{
+				return createErrorStatus(Messages.AbstractConfigurationProcessor_emptyURLsArrayError);
+			}
+			// Load the urls
+			urls = new String[attrURL.length];
+			for (int i = 0; i < attrURL.length; i++)
+			{
+				urls[i] = attrURL[i].toString();
+			}
+			if (attrArray.length == 2)
+			{
+				// We also expects an extra attributes Map
+				if (!(attrArray[1] instanceof Map))
+				{
+					return createErrorStatus(Messages.AbstractConfigurationProcessor_expectedMapError + attrArray[1]);
+				}
+				// save this map
+				attributesMap = (Map<String, String>) attrArray[1];
+			}
+			else
+			{
+				// assign an empty map
+				attributesMap = Collections.emptyMap();
+			}
+		}
+		return Status.OK_STATUS;
+	}
+
+	/**
+	 * Creates an returns an error status.
+	 * 
+	 * @param errorMessage
+	 * @return An error status
+	 */
+	protected IStatus createErrorStatus(String errorMessage)
+	{
+		return new Status(IStatus.ERROR, ConfigurationsPlugin.PLUGIN_ID, errorMessage);
 	}
 }
