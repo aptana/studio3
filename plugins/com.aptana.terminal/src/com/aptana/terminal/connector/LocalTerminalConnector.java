@@ -262,7 +262,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(activeProjeectName);
 			if (project != null) {
 				IPath location = project.getLocation();
-				if (location != null) {
+				if (location != null && location.toFile().isDirectory()) {
 					return location;
 				}
 			}

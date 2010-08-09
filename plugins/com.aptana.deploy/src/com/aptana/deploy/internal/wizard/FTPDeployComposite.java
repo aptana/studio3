@@ -1,6 +1,5 @@
 package com.aptana.deploy.internal.wizard;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
@@ -9,8 +8,6 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import com.aptana.deploy.Activator;
-import com.aptana.deploy.preferences.IPreferenceConstants;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.ui.secureftp.internal.CommonFTPConnectionPropertyComposite;
 
@@ -61,8 +58,7 @@ public class FTPDeployComposite extends CommonFTPConnectionPropertyComposite imp
 
 		autoSyncCheckbox = new Button(sync, SWT.CHECK);
 		autoSyncCheckbox.setText(Messages.FTPDeployComposite_AutoSync);
-		autoSyncCheckbox.setSelection(Platform.getPreferencesService().getBoolean(Activator.getPluginIdentifier(),
-				IPreferenceConstants.AUTO_SYNC, true, null));
+		autoSyncCheckbox.setSelection(true);
 		autoSyncCheckbox.addSelectionListener(this);
 
 		uploadButton = new Button(sync, SWT.RADIO);

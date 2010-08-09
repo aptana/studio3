@@ -36,6 +36,7 @@ package com.aptana.editor.css;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
@@ -45,6 +46,7 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.css.contentassist.CSSContentAssistProcessor;
+import com.aptana.editor.css.text.CSSTextHover;
 
 public class CSSSourceViewerConfiguration extends CommonSourceViewerConfiguration
 {
@@ -94,5 +96,11 @@ public class CSSSourceViewerConfiguration extends CommonSourceViewerConfiguratio
 	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
 	{
 		return new CSSContentAssistProcessor(getAbstractThemeableEditor());
+	}
+
+	@Override
+	public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType)
+	{
+		return new CSSTextHover();
 	}
 }

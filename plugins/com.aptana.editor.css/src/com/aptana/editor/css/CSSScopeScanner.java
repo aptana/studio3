@@ -45,17 +45,6 @@ public class CSSScopeScanner extends CSSCodeScanner
 
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.css.CSSCodeScanner#createToken(java.lang.String)
-	 */
-	@Override
-	protected IToken createToken(String string)
-	{
-		// Simply use the token type string that is passed in as the data
-		return new Token(string);
-	}
 	
 	/**
 	 * createToken
@@ -65,6 +54,6 @@ public class CSSScopeScanner extends CSSCodeScanner
 	 */
 	protected IToken createToken(CSSTokenType type)
 	{
-		return this.createToken(type.getScope());
+		return new Token(type);
 	}
 }

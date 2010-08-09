@@ -63,20 +63,26 @@ public class ExplorerContextContributor implements ContextContributor
 					return;
 				}
 				IViewReference[] refs = page.getViewReferences();
+				if (refs == null)
+				{
+					return;
+				}
 				for (IViewReference ref : refs)
 				{
-					if (ref.getId().equals(IExplorerUIConstants.VIEW_ID))
+					if (ref == null || !ref.getId().equals(IExplorerUIConstants.VIEW_ID))
 					{
-						SingleProjectView view = (SingleProjectView) ref.getPart(false);
-						if (view != null)
-						{
-							IProject activeProject = view.getActiveProject();
-							if (activeProject != null)
-							{
-								projects[0] = activeProject;
-								return;
-							}
-						}
+						continue;
+					}
+					SingleProjectView view = (SingleProjectView) ref.getPart(false);
+					if (view == null)
+					{
+						continue;
+					}
+					IProject activeProject = view.getActiveProject();
+					if (activeProject != null)
+					{
+						projects[0] = activeProject;
+						return;
 					}
 				}
 			}

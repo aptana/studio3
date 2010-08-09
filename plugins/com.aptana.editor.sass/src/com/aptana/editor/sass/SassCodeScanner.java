@@ -22,20 +22,10 @@ import com.aptana.editor.css.CSSCodeScanner;
 public class SassCodeScanner extends CSSCodeScanner
 {
 
-	/**
-	 * CodeScanner
-	 */
-	public SassCodeScanner()
+	@Override
+	protected List<IRule> createRules()
 	{
-		super();
-
-		// Now manipulate the CSS rules to add a couple extra
-		List<IRule> rules = new ArrayList<IRule>();
-		for (IRule rule : fRules)
-		{
-			rules.add(rule);
-		}
-
+		List<IRule> rules = super.createRules();
 		// Stick in a rule that recognizes mixins and variables
 		// FIXME This rule doesn't properly set the first char (!, =, or +) to it's own different punctuation token type
 		ExtendedWordRule variableRule = new ExtendedWordRule(new VariableWordDetector(),
@@ -49,9 +39,16 @@ public class SassCodeScanner extends CSSCodeScanner
 			}
 		};
 		rules.add(1, variableRule);
+		return rules;
+	}
+
+	@Override
+	protected List<IRule> createPunctuationRules()
+	{
+		List<IRule> rules = super.createPunctuationRules();
+		rules.remove(rules.size() - 1);
 		rules.add(new SingleCharacterRule('=', createToken("punctuation.definition.entity.sass"))); //$NON-NLS-1$
-		
-		setRules(rules.toArray(new IRule[rules.size()]));
+		return rules;
 	}
 
 	/**

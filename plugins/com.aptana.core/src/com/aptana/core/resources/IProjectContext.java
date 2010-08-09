@@ -1,4 +1,4 @@
-package com.aptana.explorer;
+package com.aptana.core.resources;
 
 import org.eclipse.core.resources.IProject;
 

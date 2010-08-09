@@ -15,7 +15,7 @@ public class CSSCharSetNode extends CSSNode
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (!(obj instanceof CSSCharSetNode))
+		if (!super.equals(obj) || !(obj instanceof CSSCharSetNode))
 		{
 			return false;
 		}
@@ -26,7 +26,7 @@ public class CSSCharSetNode extends CSSNode
 	@Override
 	public int hashCode()
 	{
-		return fEncoding.hashCode();
+		return super.hashCode() * 31 + fEncoding.hashCode();
 	}
 
 	@Override
