@@ -14,4 +14,9 @@ public interface IPortalPreferences
 	String CACHED_VERSIONS_PROPERTY_NAME = PortalUIPlugin.PLUGIN_ID + ".cached_versions"; //$NON-NLS-1$
 	String CACHED_VERSION_PROPERTY = "version"; //$NON-NLS-1$
 	String CACHED_LOCATION_PROPERTY = "location"; //$NON-NLS-1$
+	
+	/**
+	 * indicate whether or not the developer toolbox should be displayed on startup
+	 */
+	String SHOULD_OPEN_DEV_TOOLBOX = "open_developer_toolbox"; //$NON-NLS-1$
 }

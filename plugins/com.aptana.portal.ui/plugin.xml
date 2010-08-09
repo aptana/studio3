@@ -9,7 +9,7 @@
             default="false"
             icon="icons/obj16/radrails16.png"
             id="com.aptana.portal.ui.browser.portal"
-            name="Aptana Portal Browser">
+            name="%portalBrowser.name">
       </editor>
    </extension>
    <extension
@@ -129,5 +129,48 @@
             id="portal.python.installer"
             name="Python Installer Actions">
       </actionController>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.aptana.portal.ui.PortalPreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="com.aptana.ui.category"
+            defaultHandler="com.aptana.portal.ui.internal.command.ShowToolboxCommandHandler"
+            description="%openDevToolbox.description"
+            id="com.aptana.portal.command.openToolbox"
+            name="%openDevToolbox.name">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:aptanahelp?after=additions">
+         <command
+               commandId="com.aptana.portal.command.openToolbox"
+               icon="icons/obj16/dev_toolbox.png"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="com.aptana.ui.globalActionSet">
+            <command
+                  commandId="com.aptana.portal.command.openToolbox"
+                  icon="icons/obj16/dev_toolbox.png"
+                  style="push">
+               <visibleWhen>
+                  <reference
+                        definitionId="com.aptana.ui.contributions.inGlobalActionSet">
+                  </reference>
+               </visibleWhen>
+            </command>
+         </toolbar>
+      </menuContribution>
    </extension>
 </plugin>

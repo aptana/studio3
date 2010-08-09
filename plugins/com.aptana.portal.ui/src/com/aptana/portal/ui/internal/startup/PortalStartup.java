@@ -24,7 +24,11 @@ public class PortalStartup implements IStartup
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
-				Portal.getInstance().openPortal(null);
+				Portal portal = Portal.getInstance();
+				if (portal.shouldOpenPortal())
+				{
+					portal.openPortal(null);
+				}
 				return Status.OK_STATUS;
 			}
 		};

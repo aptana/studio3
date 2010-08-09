@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -26,6 +27,7 @@ import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.portal.ui.IPortalPreferences;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.browser.PortalBrowserEditor;
 import com.aptana.theme.IThemeManager;
@@ -74,6 +76,17 @@ public class Portal
 	}
 
 	/**
+	 * Returns true if the open-portal flag was set in the preferences.
+	 * 
+	 * @return True, if we should display the portal as part of the startup; False, otherwise (the user disabled it)
+	 */
+	public boolean shouldOpenPortal()
+	{
+		IPreferenceStore preferenceStore = PortalUIPlugin.getDefault().getPreferenceStore();
+		return preferenceStore.getBoolean(IPortalPreferences.SHOULD_OPEN_DEV_TOOLBOX);
+	}
+
+	/**
 	 * Opens the portal with a given URL. In case the portal is already open, and the given URL is valid, direct the
 	 * portal to the new URL.<br>
 	 * This method must be called from the UI thread (preferably, through a UIJob).
@@ -99,7 +112,9 @@ public class Portal
 		}
 		if (portalBrowser != null && !portalBrowser.isDisposed())
 		{
+			// Refresh the URL and return
 			portalBrowser.setURL(url);
+			return;
 		}
 		final URL finalURL = url;
 		// TODO: Shalom - Put a condition on this startup to not load the portal
