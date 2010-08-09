@@ -244,7 +244,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		if (cdataScanner == null)
 		{
 			cdataScanner = new RuleBasedScanner();
-			cdataScanner.setDefaultReturnToken(new Token("string.unquoted.cdata.xml")); //$NON-NLS-1$
+			cdataScanner.setDefaultReturnToken(getToken("string.unquoted.cdata.xml")); //$NON-NLS-1$
 		}
 		return cdataScanner;
 	}
@@ -260,7 +260,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	protected IToken getToken(String tokenName)
 	{
-		return getThemeManager().getToken(tokenName);
+		return new Token(tokenName);
 	}
 
 	protected IThemeManager getThemeManager()

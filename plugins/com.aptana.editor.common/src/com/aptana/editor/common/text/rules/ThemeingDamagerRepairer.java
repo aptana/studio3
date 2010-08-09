@@ -21,7 +21,7 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 
 	@Override
 	protected TextAttribute getTokenTextAttribute(IToken token)
-	{		
+	{
 		Object data = token.getData();
 		if (data instanceof String)
 		{
@@ -29,9 +29,9 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 			{
 				String last = (String) data;
 				int offset = fScanner.getTokenOffset();
-				String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(fDocument, offset);
+				String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
+						.getScopeAtOffset(fDocument, offset);
 				scope += " " + last; //$NON-NLS-1$
-				System.out.println(scope);
 				IToken converted = ThemePlugin.getDefault().getThemeManager().getToken(scope);
 				lastAttribute = super.getTokenTextAttribute(converted);
 				return lastAttribute;
@@ -46,8 +46,8 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 			try
 			{
 				int offset = fScanner.getTokenOffset();
-				String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(fDocument, offset);
-				System.out.println(scope);
+				String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
+						.getScopeAtOffset(fDocument, offset);
 				IToken converted = ThemePlugin.getDefault().getThemeManager().getToken(scope);
 				lastAttribute = super.getTokenTextAttribute(converted);
 				return lastAttribute;

@@ -158,9 +158,9 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 			{
 				String last = (String) data;
 				int offset = region.getOffset();
-				String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(fDocument, offset);
+				String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
+						.getScopeAtOffset(fDocument, offset);
 				scope += " " + last; //$NON-NLS-1$
-				System.out.println(scope);
 				IToken converted = ThemePlugin.getDefault().getThemeManager().getToken(scope);
 				data = converted.getData();
 			}

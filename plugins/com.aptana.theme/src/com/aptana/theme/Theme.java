@@ -6,9 +6,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.InvalidPropertiesFormatException;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +55,7 @@ public class Theme
 	private static final String LINE_HIGHLIGHT_PROP_KEY = "lineHighlight"; //$NON-NLS-1$
 	private static final String CARET_PROP_KEY = "caret"; //$NON-NLS-1$
 
-	private Map<String, TextAttribute> map;
+	private Map<String, DelayedTextAttribute> delayed;
 	private ColorManager colorManager;
 	private RGB defaultFG;
 	private RGB lineHighlight;
@@ -66,10 +66,12 @@ public class Theme
 
 	private RGB searchResultBG;
 
+	private HashSet<String> printedSet;
+
 	public Theme(ColorManager colormanager, Properties props)
 	{
 		this.colorManager = colormanager;
-		map = new HashMap<String, TextAttribute>();
+		delayed = new HashMap<String, DelayedTextAttribute>();
 		parseProps(props);
 		storeDefaults();
 	}
@@ -90,8 +92,8 @@ public class Theme
 		{
 			String tokenName = (String) entry.getKey();
 			int style = SWT.NORMAL;
-			Color foreground = null;
-			Color background = null;
+			RGBa foreground = null;
+			RGBa background = null;
 			List<String> tokens = tokenize((String) entry.getValue());
 			for (String token : tokens)
 			{
@@ -99,9 +101,9 @@ public class Theme
 				{
 					// it's a color!
 					if (foreground == null)
-						foreground = colorManager.getColor(parseHexRGB(token));
+						foreground = parseHexRGBa(token);
 					else
-						background = colorManager.getColor(parseHexRGB(token, true));
+						background = parseHexRGBa(token);
 				}
 				else
 				{
@@ -114,9 +116,9 @@ public class Theme
 				}
 			}
 			if (foreground == null)
-				foreground = colorManager.getColor(defaultFG);
-			TextAttribute attribute = new TextAttribute(foreground, background, style, null);
-			map.put(tokenName, attribute);
+				foreground = new RGBa(defaultFG);
+			DelayedTextAttribute attribute = new DelayedTextAttribute(foreground, background, style);
+			delayed.put(tokenName, attribute);
 		}
 	}
 
@@ -168,24 +170,74 @@ public class Theme
 		return new RGB(r, g, b);
 	}
 
+	private RGBa parseHexRGBa(String token)
+	{
+		if (token == null)
+			return new RGBa(0, 0, 0);
+		if (token.length() != 7 && token.length() != 9)
+		{
+			ThemePlugin.logError(MessageFormat.format("Received RGBa Hex value with invalid length: {0}", token), null); //$NON-NLS-1$
+			if (defaultFG != null)
+				return new RGBa(defaultFG);
+			return new RGBa(0, 0, 0);
+		}
+		String s = token.substring(1, 3);
+		int r = Integer.parseInt(s, 16);
+		s = token.substring(3, 5);
+		int g = Integer.parseInt(s, 16);
+		s = token.substring(5, 7);
+		int b = Integer.parseInt(s, 16);
+		int a = 255;
+		if (token.length() == 9)
+		{
+			s = token.substring(7, 9);
+			a = Integer.parseInt(s, 16);
+		}
+		return new RGBa(r, g, b, a);
+	}
+
 	public static RGB alphaBlend(RGB baseToBlendWith, RGB colorOnTop, int alpha)
 	{
-		int destRed = baseToBlendWith.red;
-		int destGreen = baseToBlendWith.green;
-		int destBlue = baseToBlendWith.blue;
-
 		// Alpha blending math
-		destRed += (colorOnTop.red - destRed) * alpha / 0xFF;
-		destGreen += (colorOnTop.green - destGreen) * alpha / 0xFF;
-		destBlue += (colorOnTop.blue - destBlue) * alpha / 0xFF;
-
-		return new RGB(destRed, destGreen, destBlue);
+		int new_r = (baseToBlendWith.red * (255 - alpha) + colorOnTop.red * alpha) / 255;
+		int new_g = (baseToBlendWith.green * (255 - alpha) + colorOnTop.green * alpha) / 255;
+		int new_b = (baseToBlendWith.blue * (255 - alpha) + colorOnTop.blue * alpha) / 255;
+		return new RGB(new_r, new_g, new_b);
+		// double alphaAsPercent = (double) alpha / (double) 0xFF;
+		//
+		// double destRed = (colorOnTop.red * alphaAsPercent) + (baseToBlendWith.red * (1.0 - alphaAsPercent));
+		// double destGreen = (colorOnTop.green * alphaAsPercent) + (baseToBlendWith.green * (1.0 - alphaAsPercent));
+		// double destBlue = (colorOnTop.blue * alphaAsPercent) + (baseToBlendWith.blue * (1.0 - alphaAsPercent));
+		//
+		// return new RGB((int) destRed, (int) destGreen, (int) destBlue);
 	}
 
 	public TextAttribute getTextAttribute(String tokenType)
 	{
-		if (map.containsKey(tokenType))
-			return map.get(tokenType);
+		TextAttribute ta = toTextAttribute(getDelayedTextAttribute(tokenType));
+		if (printedSet == null)
+		{
+			printedSet = new HashSet<String>();
+		}
+		if (!printedSet.contains(tokenType))
+		{
+			System.out.print(tokenType + "=" + toHex(ta.getForeground().getRGB()));
+			if (ta.getBackground() != null)
+			{
+				System.out.print("," + toHex(ta.getBackground().getRGB()));
+			}
+			System.out.println();
+			printedSet.add(tokenType);
+		}
+		return ta;
+	}
+
+	private DelayedTextAttribute getDelayedTextAttribute(String tokenType)
+	{
+		if (delayed.containsKey(tokenType))
+		{
+			return delayed.get(tokenType);
+		}
 		Comparator<String> c = new Comparator<String>()
 		{
 			public int compare(String o1, String o2)
@@ -199,63 +251,113 @@ public class Theme
 		};
 		// We need to sort the map keys by length, longest match wins!
 		SortedSet<String> sorted = new TreeSet<String>(c);
-		sorted.addAll(map.keySet());
+		sorted.addAll(delayed.keySet());
 
 		// Match the element deepest down in the scope e.g. string wins over source.php when the scope is source.php
 		// string.quoted.
 		// Match most of the deepest element e.g. string.quoted wins over string.
 		// Rules 1 and 2 applied again to the scope selector when removing the deepest element (in the case of a tie),
 		// e.g. text source string wins over source string.
-		String[] scopeParts = tokenType.split(" "); //$NON-NLS-1$
-		for (int i = 0; i < scopeParts.length; i++)
-		{
-			String subScope = joinLast(scopeParts, i + 1);
+		String subScope = tokenType;
+//		String[] scopeParts = tokenType.split(" "); //$NON-NLS-1$
+//		for (int i = 0; i < scopeParts.length; i++)
+//		{
+//			String subScope = joinLast(scopeParts, i + 1);
 			for (String key : sorted)
 			{
-				if (new ScopeSelector(key).matches(subScope))
+				if (!new ScopeSelector(key).matches(subScope))
+					continue;
+
+				System.out.println("Found match for scope: " + subScope);
+				DelayedTextAttribute attr = delayed.get(key);
+				// if our coloring has no background, we should use parent's. If it has some opacity (alpha != 255), we
+				// need to alpha blend
+				if (attr.getBackground() == null || !attr.getBackground().isFullyOpaque())
 				{
-					TextAttribute attr = map.get(key);
-					// FIXME What if we really needed to alpha merge up the scope?! We need to store values as raw rgb, then convert to colors on demand as we need to!
-					 if (attr.getBackground() == null)
-					 {
-						// Need to merge bg color up the scope!
-						int index = tokenType.lastIndexOf(' ');
-						if (index != -1)
-						{
-							String subType = tokenType.substring(0, index);
-							TextAttribute parentAttr = getTextAttribute(subType);
-							// TODO Do we need to merge font style?
-							return new TextAttribute(attr.getForeground(), parentAttr.getBackground(), attr.getStyle());
-						}
-					 }
-					return attr;
+					// Need to merge bg color up the scope!
+					System.out.println("Transparent background, trying to get parent scope's coloring...");
+
+					DelayedTextAttribute parentAttr = null;
+					int index = tokenType.lastIndexOf(' ');
+					if (index != -1)
+					{
+						String subType = tokenType.substring(0, index);
+						parentAttr = getDelayedTextAttribute(subType);
+					}
+					if (parentAttr == null)
+					{
+						// If we never find a parent, use default bg
+						parentAttr = new DelayedTextAttribute(attr.getForeground(), new RGBa(defaultBG), 0);
+					}
+					System.out.println("Merging background with parent: " + parentAttr);
+
+					// Now do actual merge
+					attr = merge(attr, parentAttr);
 				}
+				delayed.put(tokenType, attr);
+				return attr;
 			}
-		}
+//		}
 
 		// Some tokens are special. They have fallbacks even if not in the theme! Looks like bundles can contribute
 		// them?
 		if (tokenType.startsWith("markup.changed")) //$NON-NLS-1$
-			return new TextAttribute(colorManager.getColor(new RGB(255, 255, 255)), colorManager.getColor(new RGB(248,
-					205, 14)), 0);
+			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(248, 205, 14), 0);
 
 		if (tokenType.startsWith("markup.deleted")) //$NON-NLS-1$
-			return new TextAttribute(colorManager.getColor(new RGB(255, 255, 255)), colorManager.getColor(new RGB(255,
-					86, 77)), 0);
+			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(255, 86, 77), 0);
 
 		if (tokenType.startsWith("markup.inserted")) //$NON-NLS-1$
-			return new TextAttribute(colorManager.getColor(new RGB(0, 0, 0)), colorManager.getColor(new RGB(128, 250,
-					120)), 0);
+			return new DelayedTextAttribute(new RGBa(0, 0, 0), new RGBa(128, 250, 120), 0);
 
 		if (tokenType.startsWith("meta.diff.index") || tokenType.startsWith("meta.diff.range") || tokenType.startsWith("meta.separator.diff")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			return new TextAttribute(colorManager.getColor(new RGB(255, 255, 255)), colorManager.getColor(new RGB(65,
-					126, 218)), SWT.ITALIC);
+			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(65, 126, 218), SWT.ITALIC);
 
 		if (tokenType.startsWith("meta.diff.header")) //$NON-NLS-1$
-			return new TextAttribute(colorManager.getColor(new RGB(255, 255, 255)), colorManager.getColor(new RGB(103,
-					154, 233)), 0);
+			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(103, 154, 233), 0);
 
-		return new TextAttribute(colorManager.getColor(defaultFG));
+		return new DelayedTextAttribute(new RGBa(defaultFG));
+	}
+
+	private DelayedTextAttribute merge(DelayedTextAttribute childAttr, DelayedTextAttribute parentAttr)
+	{
+		// TODO Do we need to merge font style?
+		// Merge the bg up!
+		RGBa bg = childAttr.getBackground();
+		RGBa mergedBG = null;
+		if (bg != null)
+		{
+			RGB bgRGB = bg.toRGB();
+			if (!bg.isFullyOpaque())
+			{
+				bgRGB = alphaBlend(parentAttr.getBackground().toRGB(), bgRGB, bg.getAlpha());
+			}
+			mergedBG = new RGBa(bgRGB);
+		}
+		else
+		{
+			mergedBG = parentAttr.getBackground();
+		}
+		System.out.println(MessageFormat.format("blending {0} onto {1} -> {2}", childAttr.getBackground(),
+				parentAttr.getBackground(), mergedBG));
+		return new DelayedTextAttribute(childAttr.getForeground(), mergedBG, childAttr.getStyle());
+	}
+
+	private TextAttribute toTextAttribute(DelayedTextAttribute attr)
+	{
+		RGBa fg = attr.getForeground(); // TODO Do we ever need to handle FG alpha?!
+		Color bgColor = null;
+		RGBa bg = attr.getBackground();
+		if (bg != null)
+		{
+			RGB bgRGB = bg.toRGB();
+			if (!bg.isFullyOpaque())
+			{
+				bgRGB = alphaBlend(defaultBG, bgRGB, bg.getAlpha());
+			}
+			bgColor = colorManager.getColor(bgRGB);
+		}
+		return new TextAttribute(colorManager.getColor(fg.toRGB()), bgColor, attr.getStyle());
 	}
 
 	private String joinLast(String[] scopeParts, int lastSegments)
@@ -302,7 +404,12 @@ public class Theme
 
 	public Map<String, TextAttribute> getTokens()
 	{
-		return Collections.unmodifiableMap(map);
+		Map<String, TextAttribute> tokens = new HashMap<String, TextAttribute>();
+		for (Map.Entry<String, DelayedTextAttribute> entry : delayed.entrySet())
+		{
+			tokens.put(entry.getKey(), toTextAttribute(entry.getValue()));
+		}
+		return tokens;
 	}
 
 	/**
@@ -313,7 +420,8 @@ public class Theme
 	 */
 	public void update(String key, TextAttribute at)
 	{
-		map.put(key, at);
+		delayed.put(key, new DelayedTextAttribute(new RGBa(at.getForeground().getRGB()), new RGBa(at.getBackground()
+				.getRGB()), at.getStyle()));
 		save();
 	}
 
@@ -326,21 +434,21 @@ public class Theme
 		props.put(FOREGROUND_PROP_KEY, toHex(getForeground()));
 		props.put(BACKGROUND_PROP_KEY, toHex(getBackground()));
 		props.put(CARET_PROP_KEY, toHex(caret));
-		for (Map.Entry<String, TextAttribute> entry : map.entrySet())
+		for (Map.Entry<String, DelayedTextAttribute> entry : delayed.entrySet())
 		{
 			if (entry.getKey() == null)
 				continue;
 			StringBuilder value = new StringBuilder();
-			TextAttribute attr = entry.getValue();
-			Color color = attr.getForeground();
+			DelayedTextAttribute attr = entry.getValue();
+			RGBa color = attr.getForeground();
 			if (color != null)
 			{
-				value.append(toHex(color.getRGB())).append(DELIMETER);
+				value.append(toHex(color)).append(DELIMETER);
 			}
 			color = attr.getBackground();
 			if (color != null)
 			{
-				value.append(toHex(color.getRGB())).append(DELIMETER);
+				value.append(toHex(color)).append(DELIMETER);
 			}
 			int style = attr.getStyle();
 			if ((style & SWT.ITALIC) != 0)
@@ -361,6 +469,16 @@ public class Theme
 			props.put(entry.getKey(), value.toString());
 		}
 		return props;
+	}
+
+	private String toHex(RGBa color)
+	{
+		String rgbString = toHex(color.toRGB());
+		if (color.getAlpha() == 0)
+		{
+			return rgbString;
+		}
+		return rgbString + pad(Integer.toHexString(color.getAlpha()), 2, '0');
 	}
 
 	private String toHex(RGB rgb)
@@ -431,7 +549,7 @@ public class Theme
 			return;
 		Properties props = new Properties();
 		props.loadFromXML(new ByteArrayInputStream(xmlProps.getBytes("UTF-8"))); //$NON-NLS-1$
-		map.clear();
+		delayed.clear();
 		parseProps(props);
 		deleteCustomVersion();
 	}
@@ -471,7 +589,7 @@ public class Theme
 	 */
 	public void remove(String key)
 	{
-		map.remove(key);
+		delayed.remove(key);
 	}
 
 	/**
@@ -479,8 +597,8 @@ public class Theme
 	 */
 	public void addNewDefaultToken(String name)
 	{
-		TextAttribute attr = new TextAttribute(colorManager.getColor(defaultFG));
-		map.put(name, attr);
+		DelayedTextAttribute attr = new DelayedTextAttribute(new RGBa(defaultFG));
+		delayed.put(name, attr);
 		save();
 	}
 
@@ -570,7 +688,7 @@ public class Theme
 	 */
 	public boolean hasEntry(String tokenType)
 	{
-		return map.containsKey(tokenType);
+		return delayed.containsKey(tokenType);
 	}
 
 	public Color getForeground(String tokenType)
