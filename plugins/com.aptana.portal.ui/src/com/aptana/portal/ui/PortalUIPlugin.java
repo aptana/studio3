@@ -17,10 +17,10 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.core.resources.IProjectContext;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IExplorerUIConstants;
 import com.aptana.explorer.IPreferenceConstants;
-import com.aptana.explorer.IProjectContext;
 
 /**
  * The activator class controls the plug-in life cycle
