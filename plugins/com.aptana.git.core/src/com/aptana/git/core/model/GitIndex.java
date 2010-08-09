@@ -482,7 +482,7 @@ public class GitIndex
 			input.append(file.getPath()).append('\n');
 		}
 
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, input.toString(), null,
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(input.toString(), workingDirectory,
 				args.toArray(new String[args.size()]));
 		if (result == null)
 			return false;
@@ -519,8 +519,8 @@ public class GitIndex
 			input.append(file.indexInfo());
 		}
 
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, input.toString(),
-				null, new String[] { "update-index", "-z", "--index-info" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(input.toString(),
+				workingDirectory, new String[] { "update-index", "-z", "--index-info" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (result == null)
 			return false;
 
@@ -557,8 +557,8 @@ public class GitIndex
 		String[] arguments = new String[] { "checkout-index", "--index", "--quiet", "--force", "-z", "--stdin" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
 		int ret = 1;
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, input.toString(),
-				null, arguments);
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(input.toString(),
+				workingDirectory, arguments);
 		ret = result.keySet().iterator().next();
 
 		if (ret != 0)
@@ -686,8 +686,8 @@ public class GitIndex
 		postCommitUpdate("Creating commit"); //$NON-NLS-1$
 		int ret = 1;
 		String commit = ""; //$NON-NLS-1$
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, commitMessage,
-				null, arguments.toArray(new String[arguments.size()]));
+		 
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(commitMessage, workingDirectory, arguments.toArray(new String[arguments.size()]));
 		if (result != null && !result.isEmpty())
 		{
 			commit = result.values().iterator().next();
