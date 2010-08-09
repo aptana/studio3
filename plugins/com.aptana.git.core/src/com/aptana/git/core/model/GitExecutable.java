@@ -241,24 +241,12 @@ public class GitExecutable
 	 * 
 	 * @param workingDirectory
 	 * @param input
-	 * @param amendEnvironment
 	 * @param args
 	 * @return
 	 */
-	public Map<Integer, String> runInBackground(IPath workingDirectory, String input,
-			Map<String, String> amendEnvironment, String... args)
+	public Map<Integer, String> runInBackground(String input, IPath workingDirectory, String... args)
 	{
-		Map<String, String> env = new HashMap<String, String>();
-		env.putAll(ShellExecutable.getEnvironment());
-		if (amendEnvironment != null) {
-			env.putAll(amendEnvironment);
-		}
-
-		IPath git_ssh = GitPlugin.getDefault().getGIT_SSH();
-		if (git_ssh != null) {
-			env.put("GIT_SSH", git_ssh.toOSString()); //$NON-NLS-1$
-		}
-		return ProcessUtil.runInBackground(gitPath.toOSString(), workingDirectory, input, env, args);
+		return ProcessUtil.runInBackground(gitPath.toOSString(), workingDirectory, input, null, args);
 	}
 
 	/**
