@@ -13,7 +13,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 	public void initializeDefaultPreferences()
 	{
 		IEclipsePreferences prefs = (new DefaultScope()).getNode(Activator.getPluginIdentifier());
-		prefs.putBoolean(IPreferenceConstants.AUTO_SYNC, true);
 		prefs.putBoolean(IPreferenceConstants.HEROKU_AUTO_PUBLISH, true);
 	}
 }

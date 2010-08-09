@@ -31,7 +31,8 @@ public class ReturnTypeElement
 		{
 			ReturnTypeElement that = (ReturnTypeElement) obj;
 
-			result = StringUtil.areEqual(this.getDescription(), that.getDescription()) && StringUtil.areEqual(this.getType(), that.getType());
+			// NOTE: we only care if the types match, not the descriptions
+			result = StringUtil.areEqual(this.getType(), that.getType());
 		}
 
 		return result;
@@ -69,10 +70,6 @@ public class ReturnTypeElement
 		if (this._type != null)
 		{
 			h = this._type.hashCode();
-		}
-		if (this._description != null)
-		{
-			h = 31 * h + this._description.hashCode();
 		}
 
 		return h;

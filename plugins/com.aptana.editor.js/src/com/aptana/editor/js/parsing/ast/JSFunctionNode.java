@@ -1,7 +1,10 @@
 package com.aptana.editor.js.parsing.ast;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.editor.js.sdoc.model.Tag;
@@ -85,6 +88,41 @@ public class JSFunctionNode extends JSNode
 	public IParseNode getParameters()
 	{
 		return this.getChild(1);
+	}
+
+	/**
+	 * getReturnNodes
+	 * 
+	 * @return
+	 */
+	public List<JSReturnNode> getReturnNodes()
+	{
+		List<JSReturnNode> result = new ArrayList<JSReturnNode>();
+
+		// Using a linked list since it provides a queue interface
+		Queue<IParseNode> queue = new ArrayDeque<IParseNode>();
+
+		// prime the queue
+		queue.add(this.getBody());
+
+		while (queue.size() > 0)
+		{
+			IParseNode current = queue.poll();
+
+			if (current instanceof JSReturnNode)
+			{
+				result.add((JSReturnNode) current);
+			}
+			else if (current instanceof JSFunctionNode == false)
+			{
+				for (IParseNode child : current)
+				{
+					queue.offer(child);
+				}
+			}
+		}
+
+		return result;
 	}
 
 	/**

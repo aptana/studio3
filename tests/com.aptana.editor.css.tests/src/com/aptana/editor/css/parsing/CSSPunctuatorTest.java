@@ -36,93 +36,93 @@ package com.aptana.editor.css.parsing;
 
 import org.eclipse.jface.text.rules.Token;
 
-import com.aptana.editor.css.parsing.lexer.CSSTokens;
+import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
 public class CSSPunctuatorTest extends CSSTokensTest
 {
 
 	public void testColon()
 	{
-		assertToken(":", CSSTokens.getTokenName(CSSTokens.COLON), 0, 1); //$NON-NLS-1$
+		assertToken(":", CSSTokenType.COLON, 0, 1); //$NON-NLS-1$
 	}
 
 	public void testSemicolon()
 	{
-		assertToken(";", CSSTokens.getTokenName(CSSTokens.SEMICOLON), 0, 1); //$NON-NLS-1$
+		assertToken(";", CSSTokenType.SEMICOLON, 0, 1); //$NON-NLS-1$
 	}
 
 	public void testLCurly()
 	{
-		assertToken("{", CSSTokens.getTokenName(CSSTokens.LCURLY), 0, 1); //$NON-NLS-1$
+		assertToken("{", CSSTokenType.LCURLY, 0, 1); //$NON-NLS-1$
 	}
 
 	public void testRCurly()
 	{
-		assertToken("}", CSSTokens.getTokenName(CSSTokens.RCURLY), 0, 1); //$NON-NLS-1$
+		assertToken("}", CSSTokenType.RCURLY, 0, 1); //$NON-NLS-1$
 	}
 
 	public void testRParen()
 	{
-		assertToken(")", CSSTokens.getTokenName(CSSTokens.RPAREN), 0, 1); //$NON-NLS-1$
+		assertToken(")", CSSTokenType.RPAREN, 0, 1); //$NON-NLS-1$
 	}
 
 	public void testLBracket()
 	{
-		assertToken("[", CSSTokens.getTokenName(CSSTokens.LBRACKET), 0, 1); //$NON-NLS-1$
+		assertToken("[", CSSTokenType.LBRACKET, 0, 1); //$NON-NLS-1$
 	}
 
 	public void testRBracket()
 	{
-		assertToken("]", CSSTokens.getTokenName(CSSTokens.RBRACKET), 0, 1); //$NON-NLS-1$
+		assertToken("]", CSSTokenType.RBRACKET, 0, 1); //$NON-NLS-1$
 	}
 
 	public void testIncludes()
 	{
-		assertToken("~=", CSSTokens.getTokenName(CSSTokens.INCLUDES), 0, 2); //$NON-NLS-1$
+		assertToken("~=", CSSTokenType.INCLUDES, 0, 2); //$NON-NLS-1$
 	}
 
 	public void testDashMatch()
 	{
-		assertToken("|=", CSSTokens.getTokenName(CSSTokens.DASHMATCH), 0, 2); //$NON-NLS-1$
+		assertToken("|=", CSSTokenType.DASHMATCH, 0, 2); //$NON-NLS-1$
 	}
 
 	public void testComma()
 	{
-		assertToken(",", CSSTokens.getTokenName(CSSTokens.COMMA), 0, 1); //$NON-NLS-1$
+		assertToken(",", CSSTokenType.COMMA, 0, 1); //$NON-NLS-1$
 	}
 
 	public void testPlus()
 	{
-		assertToken("+", CSSTokens.getTokenName(CSSTokens.PLUS), 0, 1); //$NON-NLS-1$
+		assertToken("+", CSSTokenType.PLUS, 0, 1); //$NON-NLS-1$
 	}
 
 	public void testMinus()
 	{
 		setSource("10 - 5");
-		assertToken(CSSTokens.getTokenName(CSSTokens.NUMBER), 0, 2); //$NON-NLS-1$
+		assertToken(CSSTokenType.NUMBER, 0, 2); //$NON-NLS-1$
 		assertToken(Token.WHITESPACE.getData(), 2, 1); //$NON-NLS-1$
-		assertToken(CSSTokens.getTokenName(CSSTokens.MINUS), 3, 1); //$NON-NLS-1$
+		assertToken(CSSTokenType.MINUS, 3, 1); //$NON-NLS-1$
 		assertToken(Token.WHITESPACE.getData(), 4, 1); //$NON-NLS-1$
-		assertToken(CSSTokens.getTokenName(CSSTokens.NUMBER), 5, 1); //$NON-NLS-1$
+		assertToken(CSSTokenType.NUMBER, 5, 1); //$NON-NLS-1$
 	}
 
 	public void testStar()
 	{
-		assertToken("*", CSSTokens.getTokenName(CSSTokens.STAR), 0, 1); //$NON-NLS-1$
+		assertToken("*", CSSTokenType.STAR, 0, 1); //$NON-NLS-1$
 	}
 
 	public void testGreater()
 	{
-		assertToken(">", CSSTokens.getTokenName(CSSTokens.GREATER), 0, 1); //$NON-NLS-1$
+		assertToken(">", CSSTokenType.GREATER, 0, 1); //$NON-NLS-1$
 	}
 
 	public void testForwardSlash()
 	{
-		assertToken("/", CSSTokens.getTokenName(CSSTokens.FORWARD_SLASH), 0, 1); //$NON-NLS-1$
+		assertToken("/", CSSTokenType.SLASH, 0, 1); //$NON-NLS-1$
 	}
 
 	public void testEqual()
 	{
-		assertToken("=", CSSTokens.getTokenName(CSSTokens.EQUAL), 0, 1); //$NON-NLS-1$
+		assertToken("=", CSSTokenType.EQUAL, 0, 1); //$NON-NLS-1$
 	}
 }

@@ -34,160 +34,160 @@
  */
 package com.aptana.editor.css.parsing;
 
-import com.aptana.editor.css.parsing.lexer.CSSTokens;
+import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
 public class CSSLiteralTest extends CSSTokensTest
 {
 
 	public void testDoubleQuotedString()
 	{
-		assertToken("\"this is a string\"", CSSTokens.getTokenName(CSSTokens.STRING), 0, 18); //$NON-NLS-1$
+		assertToken("\"this is a string\"", CSSTokenType.DOUBLE_QUOTED_STRING, 0, 18); //$NON-NLS-1$
 	}
 
 	public void testSingleQuotedString()
 	{
-		assertToken("'this is a string'", CSSTokens.getTokenName(CSSTokens.STRING), 0, 18); //$NON-NLS-1$
+		assertToken("'this is a string'", CSSTokenType.SINGLE_QUOTED_STRING, 0, 18); //$NON-NLS-1$
 	}
 
 	public void testNumber()
 	{
-		assertToken("10", CSSTokens.getTokenName(CSSTokens.NUMBER), 0, 2); //$NON-NLS-1$
+		assertToken("10", CSSTokenType.NUMBER, 0, 2); //$NON-NLS-1$
 	}
 
 	public void testClass()
 	{
-		assertToken(".class", CSSTokens.getTokenName(CSSTokens.CLASS), 0, 6); //$NON-NLS-1$
+		assertToken(".class", CSSTokenType.CLASS, 0, 6); //$NON-NLS-1$
 	}
 
 	public void testClassWithDashes()
 	{
-		assertToken(".class-with-dashes", CSSTokens.getTokenName(CSSTokens.CLASS), 0, 18); //$NON-NLS-1$
+		assertToken(".class-with-dashes", CSSTokenType.CLASS, 0, 18); //$NON-NLS-1$
 	}
 
 	public void testHash()
 	{
-		assertToken("#hash", CSSTokens.getTokenName(CSSTokens.HASH), 0, 5); //$NON-NLS-1$
+		assertToken("#hash", CSSTokenType.ID, 0, 5); //$NON-NLS-1$
 	}
 
 	public void testHashLikeRGB1()
 	{
-		assertToken("#a", CSSTokens.getTokenName(CSSTokens.HASH), 0, 2); //$NON-NLS-1$
+		assertToken("#a", CSSTokenType.ID, 0, 2); //$NON-NLS-1$
 	}
 
 	public void testHashLikeRGB2()
 	{
-		assertToken("#ab", CSSTokens.getTokenName(CSSTokens.HASH), 0, 3); //$NON-NLS-1$
+		assertToken("#ab", CSSTokenType.ID, 0, 3); //$NON-NLS-1$
 	}
 
 	public void testHashLikeRGB3()
 	{
-		assertToken("#abcde", CSSTokens.getTokenName(CSSTokens.HASH), 0, 6); //$NON-NLS-1$
+		assertToken("#abcde", CSSTokenType.ID, 0, 6); //$NON-NLS-1$
 	}
 
 	public void testHashLikeRGB4()
 	{
-		assertToken("#abcdefa", CSSTokens.getTokenName(CSSTokens.HASH), 0, 8); //$NON-NLS-1$
+		assertToken("#abcdefa", CSSTokenType.ID, 0, 8); //$NON-NLS-1$
 	}
 
 	public void testHashLikeRGB5()
 	{
-		assertToken("#abcx", CSSTokens.getTokenName(CSSTokens.HASH), 0, 5); //$NON-NLS-1$
+		assertToken("#abcx", CSSTokenType.ID, 0, 5); //$NON-NLS-1$
 	}
 
 	public void testFunction()
 	{
 		setSource("function(");
-		assertToken(CSSTokens.getTokenName(CSSTokens.IDENTIFIER), 0, 8); //$NON-NLS-1$
-		assertToken(CSSTokens.getTokenName(CSSTokens.FUNCTION), 8, 1); //$NON-NLS-1$
+		assertToken(CSSTokenType.IDENTIFIER, 0, 8); //$NON-NLS-1$
+		assertToken(CSSTokenType.LPAREN, 8, 1); //$NON-NLS-1$
 	}
 
 	public void testPercentage()
 	{
-		assertToken("10%", CSSTokens.getTokenName(CSSTokens.PERCENTAGE), 0, 3); //$NON-NLS-1$
+		assertToken("10%", CSSTokenType.PERCENTAGE, 0, 3); //$NON-NLS-1$
 	}
 
 	public void testEms()
 	{
-		assertToken("10em", CSSTokens.getTokenName(CSSTokens.EMS), 0, 4); //$NON-NLS-1$
+		assertToken("10em", CSSTokenType.EMS, 0, 4); //$NON-NLS-1$
 	}
 
 	public void testExs()
 	{
-		assertToken("10ex", CSSTokens.getTokenName(CSSTokens.EXS), 0, 4); //$NON-NLS-1$
+		assertToken("10ex", CSSTokenType.EXS, 0, 4); //$NON-NLS-1$
 	}
 
 	public void testPixels()
 	{
-		assertToken("10px", CSSTokens.getTokenName(CSSTokens.LENGTH), 0, 4); //$NON-NLS-1$
+		assertToken("10px", CSSTokenType.LENGTH, 0, 4); //$NON-NLS-1$
 	}
 
 	public void testCentimeters()
 	{
-		assertToken("10cm", CSSTokens.getTokenName(CSSTokens.LENGTH), 0, 4); //$NON-NLS-1$
+		assertToken("10cm", CSSTokenType.LENGTH, 0, 4); //$NON-NLS-1$
 	}
 
 	public void testMillimeters()
 	{
-		assertToken("10mm", CSSTokens.getTokenName(CSSTokens.LENGTH), 0, 4); //$NON-NLS-1$
+		assertToken("10mm", CSSTokenType.LENGTH, 0, 4); //$NON-NLS-1$
 	}
 
 	public void testInches()
 	{
-		assertToken("10in", CSSTokens.getTokenName(CSSTokens.LENGTH), 0, 4); //$NON-NLS-1$
+		assertToken("10in", CSSTokenType.LENGTH, 0, 4); //$NON-NLS-1$
 	}
 
 	public void testPoints()
 	{
-		assertToken("10pt", CSSTokens.getTokenName(CSSTokens.LENGTH), 0, 4); //$NON-NLS-1$
+		assertToken("10pt", CSSTokenType.LENGTH, 0, 4); //$NON-NLS-1$
 	}
 
 	public void testPicas()
 	{
-		assertToken("10pc", CSSTokens.getTokenName(CSSTokens.LENGTH), 0, 4); //$NON-NLS-1$
+		assertToken("10pc", CSSTokenType.LENGTH, 0, 4); //$NON-NLS-1$
 	}
 
 	public void testDegrees()
 	{
-		assertToken("10deg", CSSTokens.getTokenName(CSSTokens.ANGLE), 0, 5); //$NON-NLS-1$
+		assertToken("10deg", CSSTokenType.ANGLE, 0, 5); //$NON-NLS-1$
 	}
 
 	public void testRads()
 	{
-		assertToken("10rad", CSSTokens.getTokenName(CSSTokens.ANGLE), 0, 5); //$NON-NLS-1$
+		assertToken("10rad", CSSTokenType.ANGLE, 0, 5); //$NON-NLS-1$
 	}
 
 	public void testGrads()
 	{
-		assertToken("10grad", CSSTokens.getTokenName(CSSTokens.ANGLE), 0, 6); //$NON-NLS-1$
+		assertToken("10grad", CSSTokenType.ANGLE, 0, 6); //$NON-NLS-1$
 	}
 
 	public void testMilliseconds()
 	{
-		assertToken("10ms", CSSTokens.getTokenName(CSSTokens.TIME), 0, 4); //$NON-NLS-1$
+		assertToken("10ms", CSSTokenType.TIME, 0, 4); //$NON-NLS-1$
 	}
 
 	public void testSeconds()
 	{
-		assertToken("10s", CSSTokens.getTokenName(CSSTokens.TIME), 0, 3); //$NON-NLS-1$
+		assertToken("10s", CSSTokenType.TIME, 0, 3); //$NON-NLS-1$
 	}
 
 	public void testHertz()
 	{
-		assertToken("10hz", CSSTokens.getTokenName(CSSTokens.FREQUENCY), 0, 4); //$NON-NLS-1$
+		assertToken("10hz", CSSTokenType.FREQUENCY, 0, 4); //$NON-NLS-1$
 	}
 
 	public void testKiloHertz()
 	{
-		assertToken("10khz", CSSTokens.getTokenName(CSSTokens.FREQUENCY), 0, 5); //$NON-NLS-1$
+		assertToken("10khz", CSSTokenType.FREQUENCY, 0, 5); //$NON-NLS-1$
 	}
 
 	public void testColor()
 	{
-		assertToken("#808080", CSSTokens.getTokenName(CSSTokens.COLOR), 0, 7); //$NON-NLS-1$
+		assertToken("#808080", CSSTokenType.RGB, 0, 7); //$NON-NLS-1$
 	}
 
 	public void testColorRGB()
 	{
-		assertToken("#abc", CSSTokens.getTokenName(CSSTokens.COLOR), 0, 4); //$NON-NLS-1$
+		assertToken("#abc", CSSTokenType.RGB, 0, 4); //$NON-NLS-1$
 	}
 }

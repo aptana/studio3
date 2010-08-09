@@ -42,6 +42,8 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
@@ -83,6 +85,26 @@ public final class UIUtils {
 		    }
 		}
 		return shell;
+	}
+
+	/**
+	 * Returns the editor part representing the current active editor.
+	 * 
+	 * @return the active editor
+	 */
+	public static IEditorPart getActiveEditor()
+	{
+		IWorkbenchWindow workbench = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		if (workbench == null)
+		{
+			return null;
+		}
+		IWorkbenchPage workbenchPage = workbench.getActivePage();
+		if (workbenchPage == null)
+		{
+			return null;
+		}
+		return workbenchPage.getActiveEditor();
 	}
 
 	public static void showErrorMessage(String title, String message) {

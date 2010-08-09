@@ -249,6 +249,7 @@ public class Index
 
 	private DiskIndex diskIndex;
 
+	// FIXME We're not using the read write locks at all really!
 	public ReadWriteMonitor monitor;
 	private URI containerURI;
 
@@ -256,9 +257,10 @@ public class Index
 	 * Index
 	 * 
 	 * @param containerURI
+	 * @param reuseExistingFile
 	 * @throws IOException
 	 */
-	public Index(URI containerURI) throws IOException
+	public Index(URI containerURI, boolean reuseExistingFile) throws IOException
 	{
 		this.containerURI = containerURI;
 
@@ -270,7 +272,7 @@ public class Index
 		String diskIndexPathString = diskIndexPath.getDevice() == null ? diskIndexPath.toString() : diskIndexPath
 				.toOSString();
 		this.diskIndex = new DiskIndex(diskIndexPathString);
-		this.diskIndex.initialize();
+		this.diskIndex.initialize(reuseExistingFile);
 	}
 
 	/**

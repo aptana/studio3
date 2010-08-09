@@ -16,10 +16,12 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.osgi.service.prefs.BackingStoreException;
+import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 
+import com.aptana.core.resources.IProjectContext;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -133,35 +135,90 @@ class EditBundleJob extends Job
 	protected void createProjectIfNecessary(IPath projectLocation, IProgressMonitor monitor) throws CoreException
 	{
 		SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		if (findMatchingProject(workspace, projectLocation) != null)
-			return; // A project already exists with this location. Return it.
 
-		// No project exists yet. Let's create on at this location and then open it.
-		IProject theProject = workspace.getRoot().getProject(bundle.getDisplayName());
-		if (!theProject.exists()) // it shouldn't...
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IProject theProject = findMatchingProject(workspace, projectLocation);
+		subMonitor.worked(10);
+		boolean makeActive = true;
+		if (theProject == null)
 		{
-			IProjectDescription description = workspace.newProjectDescription(theProject.getName());
-			description.setLocation(projectLocation);
-			theProject.create(description, subMonitor.newChild(50));
-			theProject.open(subMonitor.newChild(50));
+			// Enforce unique name...
+			int counter = 0;
+			while (true)
+			{
+				String projectName = bundle.getDisplayName();
+				if (counter > 0)
+				{
+					projectName += counter;
+				}
+				counter++;
+				// No project exists yet. Let's create on at this location and then open it.
+				theProject = workspace.getRoot().getProject(projectName);
+				if (!projectExists(theProject)) // it shouldn't...
+				{
+					IProjectDescription description = workspace.newProjectDescription(theProject.getName());
+					description.setLocation(projectLocation);
+					theProject.create(description, subMonitor.newChild(45));
+					theProject.open(subMonitor.newChild(45));
+					makeActive = false;
+					break;
+				}
+			}
 		}
-		else
+
+		if (makeActive)
 		{
-			// FIXME These refer to IDs/prefs in a plugin that depends on this one!
-			try
-			{
-				IEclipsePreferences prefs = new InstanceScope().getNode("com.aptana.explorer"); // ExplorerPlugin.PLUGIN_ID //$NON-NLS-1$
-				prefs.put("activeProject", theProject.getName()); // com.aptana.explorer.IPreferenceConstants.ACTIVE_PROJECT //$NON-NLS-1$
-				prefs.flush();
-			}
-			catch (BackingStoreException e)
-			{
-				CommonEditorPlugin.logError(e);
-			}
+			makeProjectActiveInAppExplorer(theProject);
 		}
 
 		subMonitor.done();
+	}
+
+	private boolean projectExists(IProject theProject)
+	{
+		if (theProject.exists())
+		{
+			return true;
+		}
+		// Could be a case difference on Mac!
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IProject[] projects = workspace.getRoot().getProjects();
+		for (IProject project : projects)
+		{
+			if (project == null)
+			{
+				continue;
+			}
+			if (theProject.getName().equalsIgnoreCase(project.getName()))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	protected void makeProjectActiveInAppExplorer(final IProject theProject)
+	{
+		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
+		{
+
+			@Override
+			public void run()
+			{
+				IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+				IViewReference[] refs = window.getActivePage().getViewReferences();
+				for (IViewReference ref : refs)
+				{
+					IWorkbenchPart part = ref.getPart(false);
+					if (part instanceof IProjectContext)
+					{
+						IProjectContext projectContext = (IProjectContext) part;
+						projectContext.setActiveProject(theProject);
+						return;
+					}
+				}
+			}
+		});
 	}
 
 	/**

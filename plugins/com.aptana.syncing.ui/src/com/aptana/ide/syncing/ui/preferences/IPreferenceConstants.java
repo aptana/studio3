@@ -175,5 +175,9 @@ public interface IPreferenceConstants {
 	 * MAX_POOL_SIZE
 	 */
 	static final String MAX_POOL_SIZE = "MAX_POOL_SIZE";
-    	    	
+
+	/**
+	 * Pref key for uploading the editor on save
+	 */
+	public static final String AUTO_SYNC = "AutoSyncChangesWithRemote"; //$NON-NLS-1$
 }

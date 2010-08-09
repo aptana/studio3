@@ -7,10 +7,10 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
 
-import com.aptana.editor.css.parsing.lexer.CSSTokens;
-
 import beaver.Scanner;
 import beaver.Symbol;
+
+import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
 public class CSSScanner extends Scanner
 {
@@ -39,7 +39,7 @@ public class CSSScanner extends Scanner
 	{
 		IToken token = fTokenScanner.nextToken();
 		Object data = token.getData();
-		while (token.isWhitespace() || (data != null && data.equals(CSSTokens.getTokenName(CSSTokens.COMMENT))))
+		while (token.isWhitespace() || (data != null && data.equals(CSSTokenType.COMMENT)))
 		{
 			// ignores whitespace and comments
 			token = fTokenScanner.nextToken();
@@ -49,10 +49,10 @@ public class CSSScanner extends Scanner
 		int offset = fTokenScanner.getTokenOffset();
 		int length = fTokenScanner.getTokenLength();
 
-		short type = CSSTokens.EOF;
+		short type = CSSTokenType.EOF.getShort();
 		if (data != null)
 		{
-			type = CSSTokens.getToken(data.toString());
+			type = ((CSSTokenType) data).getShort();
 		}
 		try
 		{
