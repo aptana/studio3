@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
@@ -33,7 +34,7 @@ public class JSSymbolTypeInferrer
 {
 	private static final String NO_TYPE = ""; //$NON-NLS-1$
 	private static final EnumSet<ContentSelector> MEMBER_CONTENT = EnumSet.of(ContentSelector.NAME, ContentSelector.TYPES, ContentSelector.RETURN_TYPES);
-	
+
 	private Index _index;
 	private JSScope _activeScope;
 	private URI _location;
@@ -44,26 +45,30 @@ public class JSSymbolTypeInferrer
 	 * generateType
 	 * 
 	 * @param property
-	 *            TODO
+	 * @param types
 	 * @return
 	 */
 	private static TypeElement generateType(JSPropertyCollection property, Set<String> types)
 	{
 		// create new type
 		TypeElement result = new TypeElement();
-		
+
 		// set parent types
 		boolean isFunction = false;
-		
+
 		if (types != null)
 		{
 			for (String superType : types)
 			{
-				result.addParentType(superType);
-				
-				if (superType.startsWith(JSTypeConstants.FUNCTION_TYPE))
+				if (JSTypeUtil.isFunctionPrefix(superType))
 				{
 					isFunction = true;
+
+					result.addParentType(JSTypeConstants.FUNCTION_TYPE);
+				}
+				else
+				{
+					result.addParentType(superType);
 				}
 			}
 		}
@@ -88,14 +93,16 @@ public class JSSymbolTypeInferrer
 			}
 		}
 
+		// generate a unique name if we didn't find one
 		if (name == null || name.length() == 0)
 		{
 			name = JSTypeUtil.getUniqueTypeName();
 		}
-		
+
+		// wrap the name
 		if (isFunction)
 		{
-			name += "-Function";
+			name = JSTypeConstants.FUNCTION_TYPE + JSTypeConstants.GENERIC_OPEN + name + JSTypeConstants.GENERIC_CLOSE;
 		}
 
 		// give type a unique name
@@ -130,15 +137,15 @@ public class JSSymbolTypeInferrer
 		{
 			Queue<JSNode> queue = new ArrayDeque<JSNode>();
 			Set<String> visitedSymbols = new HashSet<String>();
-			
+
 			// prime the queue
 			queue.addAll(object.getValues());
-			
+
 			while (queue.isEmpty() == false)
 			{
 				JSNode node = queue.poll();
 				DocumentationBlock docs = node.getDocumentation();
-				
+
 				if (docs != null)
 				{
 					JSTypeUtil.applyDocumentation(property, docs);
@@ -148,11 +155,11 @@ public class JSSymbolTypeInferrer
 				{
 					// grab name
 					String symbol = node.getText();
-					
+
 					visitedSymbols.add(symbol);
-					
+
 					JSPropertyCollection p = this.getSymbolProperty(this._activeScope.getObject(), symbol);
-					
+
 					if (p != null)
 					{
 						for (JSNode value : p.getValues())
@@ -167,7 +174,7 @@ public class JSSymbolTypeInferrer
 				else if (node instanceof JSAssignmentNode)
 				{
 					IParseNode rhs = node.getLastChild();
-					
+
 					if (rhs instanceof JSNode)
 					{
 						queue.offer((JSNode) rhs);
@@ -189,22 +196,18 @@ public class JSSymbolTypeInferrer
 
 		if (types != null && types.size() > 0)
 		{
-			boolean hasFunction = false;
-			boolean hasNonFunction = false;
+			boolean isFunction = false;
 
 			for (String type : types)
 			{
-				if (type.startsWith(JSTypeConstants.FUNCTION_TYPE) || type.endsWith(JSTypeConstants.FUNCTION_TYPE))
+				if (JSTypeUtil.isFunctionPrefix(type))
 				{
-					hasFunction = true;
-				}
-				else
-				{
-					hasNonFunction = true;
+					isFunction = true;
+					break;
 				}
 			}
 
-			if (hasFunction && hasNonFunction == false)
+			if (isFunction)
 			{
 				result = new FunctionElement();
 			}
@@ -322,17 +325,7 @@ public class JSSymbolTypeInferrer
 
 			for (String typeName : types)
 			{
-				if (result instanceof FunctionElement)
-				{
-					for (String returnType : JSTypeUtil.getFunctionSignatureReturnTypeNames(typeName))
-					{
-						result.addType(returnType);
-					}
-				}
-				else
-				{
-					result.addType(typeName);
-				}
+				JSTypeUtil.applySignature(result, typeName);
 			}
 
 			// apply any docs info we have to the property
@@ -408,14 +401,32 @@ public class JSSymbolTypeInferrer
 				// create new type
 				TypeElement subType = generateType(property, types);
 
+				// Preserve function return types and add to property type
+				List<String> returnTypes = new ArrayList<String>();
+
+				for (String type : types)
+				{
+					if (JSTypeUtil.isFunctionPrefix(type))
+					{
+						returnTypes.addAll(JSTypeUtil.getFunctionSignatureReturnTypeNames(type));
+					}
+				}
+
+				String propertyType = subType.getName();
+
+				if (returnTypes.isEmpty() == false)
+				{
+					propertyType += JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER + StringUtil.join(JSTypeConstants.RETURN_TYPE_DELIMITER, returnTypes);
+				}
+
 				// reset list to contain only this newly generated type
 				types.clear();
-				types.add(subType.getName());
+				types.add(propertyType);
 
 				// go ahead and cache this new type to prevent possible recursion
-				property.addType(subType.getName());
+				property.addType(propertyType);
 
-				// infer types of the
+				// infer types of the additional properties
 				for (String pname : additionalProperties)
 				{
 					PropertyElement pe = this.getSymbolPropertyElement(property, pname);
@@ -423,6 +434,7 @@ public class JSSymbolTypeInferrer
 					subType.addProperty(pe);
 				}
 
+				// push type to the current index
 				this.writeType(subType);
 			}
 		}
