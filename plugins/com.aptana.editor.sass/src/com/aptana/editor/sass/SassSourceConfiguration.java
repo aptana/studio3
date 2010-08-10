@@ -54,8 +54,7 @@ import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
-import com.aptana.theme.IThemeManager;
-import com.aptana.theme.ThemePlugin;
+import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 
 /**
  * @author Max Stepanov
@@ -159,22 +158,22 @@ public class SassSourceConfiguration implements IPartitioningConfiguration, ISou
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
 	{
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getCodeScanner());
+		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getCodeScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
-		dr = new DefaultDamagerRepairer(getCommentScanner());
+		dr = new ThemeingDamagerRepairer(getCommentScanner());
 		reconciler.setDamager(dr, COMMENT);
 		reconciler.setRepairer(dr, COMMENT);
 
-		dr = new DefaultDamagerRepairer(getSingleQuotedStringScanner());
+		dr = new ThemeingDamagerRepairer(getSingleQuotedStringScanner());
 		reconciler.setDamager(dr, STRING_SINGLE);
 		reconciler.setRepairer(dr, STRING_SINGLE);
 
-		dr = new DefaultDamagerRepairer(getDoubleQuotedStringScanner());
+		dr = new ThemeingDamagerRepairer(getDoubleQuotedStringScanner());
 		reconciler.setDamager(dr, STRING_DOUBLE);
 		reconciler.setRepairer(dr, STRING_DOUBLE);
 	}
@@ -218,11 +217,6 @@ public class SassSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	protected IToken getToken(String name)
 	{
-		return getThemeManager().getToken(name);
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return ThemePlugin.getDefault().getThemeManager();
+		return new Token(name);
 	}
 }

@@ -40,10 +40,9 @@ import java.util.List;
 import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.Token;
 
 import com.aptana.editor.common.text.rules.RegexpRule;
-import com.aptana.theme.IThemeManager;
-import com.aptana.theme.ThemePlugin;
 
 public class StringScanner extends BufferedRuleBasedScanner
 {
@@ -59,11 +58,6 @@ public class StringScanner extends BufferedRuleBasedScanner
 
 	protected IToken getToken(String tokenName)
 	{
-		return getThemeManager().getToken(tokenName);
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return ThemePlugin.getDefault().getThemeManager();
+		return new Token(tokenName);
 	}
 }
