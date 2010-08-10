@@ -192,12 +192,12 @@ public class JSSymbolTypeInferrer
 	 */
 	private PropertyElement createPropertyElement(Set<String> types)
 	{
+		boolean isFunction = false;
 		PropertyElement result;
 
+		// determine if any of the types are functions
 		if (types != null && types.size() > 0)
 		{
-			boolean isFunction = false;
-
 			for (String type : types)
 			{
 				if (JSTypeUtil.isFunctionPrefix(type))
@@ -206,15 +206,11 @@ public class JSSymbolTypeInferrer
 					break;
 				}
 			}
+		}
 
-			if (isFunction)
-			{
-				result = new FunctionElement();
-			}
-			else
-			{
-				result = new PropertyElement();
-			}
+		if (isFunction)
+		{
+			result = new FunctionElement();
 		}
 		else
 		{
