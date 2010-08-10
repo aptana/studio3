@@ -60,8 +60,6 @@ import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSSourceConfiguration;
-import com.aptana.theme.IThemeManager;
-import com.aptana.theme.ThemePlugin;
 
 /**
  * @author Max Stepanov
@@ -96,6 +94,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	private HTMLScanner htmlScanner;
 	private HTMLTagScanner tagScanner;
 	private RuleBasedScanner cdataScanner;
+	private HTMLDoctypeScanner docTypeScanner;
 
 	private static HTMLSourceConfiguration instance;
 
@@ -116,7 +115,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		c.addTranslation(new QualifiedContentType(HTML_SCRIPT), new QualifiedContentType("meta.tag.block.any.html")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(HTML_STYLE), new QualifiedContentType("meta.tag.block.any.html")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(CDATA), new QualifiedContentType("string.unquoted.cdata.xml")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(HTML_DOCTYPE), new QualifiedContentType("meta.tag.sgml.doctype")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(HTML_DOCTYPE), new QualifiedContentType("meta.tag.sgml.html", "meta.tag.sgml.doctype.html")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public static HTMLSourceConfiguration getDefault()
@@ -220,9 +219,9 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		reconciler.setDamager(ndr, HTMLSourceConfiguration.HTML_COMMENT);
 		reconciler.setRepairer(ndr, HTMLSourceConfiguration.HTML_COMMENT);
 
-		ndr = new NonRuleBasedDamagerRepairer(getToken("meta.tag.sgml.doctype")); //$NON-NLS-1$
-		reconciler.setDamager(ndr, HTMLSourceConfiguration.HTML_DOCTYPE);
-		reconciler.setRepairer(ndr, HTMLSourceConfiguration.HTML_DOCTYPE);
+		dr = new ThemeingDamagerRepairer(getDoctypeScanner());
+		reconciler.setDamager(dr, HTMLSourceConfiguration.HTML_DOCTYPE);
+		reconciler.setRepairer(dr, HTMLSourceConfiguration.HTML_DOCTYPE);
 
 		dr = new ThemeingDamagerRepairer(getCDATAScanner());
 		reconciler.setDamager(dr, CDATA);
@@ -256,15 +255,19 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		}
 		return tagScanner;
 	}
+	
+	protected ITokenScanner getDoctypeScanner()
+	{
+		if (docTypeScanner == null)
+		{
+			docTypeScanner = new HTMLDoctypeScanner();
+		}
+		return docTypeScanner;
+	}	
 
 	protected IToken getToken(String tokenName)
 	{
 		return new Token(tokenName);
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return ThemePlugin.getDefault().getThemeManager();
 	}
 
 }
