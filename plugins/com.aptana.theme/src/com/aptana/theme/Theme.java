@@ -289,7 +289,15 @@ public class Theme
 			RGB bgRGB = bg.toRGB();
 			if (!bg.isFullyOpaque())
 			{
-				bgRGB = alphaBlend(parentAttr.getBackground().toRGB(), bgRGB, bg.getAlpha());
+				if (parentAttr.getBackground() == null)
+				{
+					// FIXME Is this right? Do we merge with default BG?
+					bgRGB = alphaBlend(defaultBG, bgRGB, bg.getAlpha());
+				}
+				else
+				{
+					bgRGB = alphaBlend(parentAttr.getBackground().toRGB(), bgRGB, bg.getAlpha());
+				}
 			}
 			mergedBG = new RGBa(bgRGB);
 		}
@@ -358,8 +366,9 @@ public class Theme
 	}
 
 	/**
-	 * Updates the TextAttribute for a token and immediately saves the theme.
-	 * TODO take in a ScopeSelector, not a String! 
+	 * Updates the TextAttribute for a token and immediately saves the theme. TODO take in a ScopeSelector, not a
+	 * String!
+	 * 
 	 * @param scopeSelector
 	 * @param at
 	 */
@@ -528,8 +537,8 @@ public class Theme
 	}
 
 	/**
-	 * Removes a scope selector rule from the theme.
-	 * TODO take in a ScopeSelector, not a String! 
+	 * Removes a scope selector rule from the theme. TODO take in a ScopeSelector, not a String!
+	 * 
 	 * @param scopeSelector
 	 */
 	public void remove(String scopeSelector)
@@ -538,8 +547,8 @@ public class Theme
 	}
 
 	/**
-	 * Adds a new token entry with no font styling, no bg, same FG as default for theme.
-	 * TODO take in a ScopeSelector, not a String! 
+	 * Adds a new token entry with no font styling, no bg, same FG as default for theme. TODO take in a ScopeSelector,
+	 * not a String!
 	 */
 	public void addNewDefaultToken(String scopeSelector)
 	{

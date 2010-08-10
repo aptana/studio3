@@ -308,10 +308,10 @@ public class ThemeManager implements IThemeManager
 		}
 	}
 
-	public IToken getToken(String string)
+	public IToken getToken(String scope)
 	{
-		Token token = new Token(getTextAttribute(string));
-		fTokens.put(new WeakReference<Token>(token), string);
+		Token token = new Token(getTextAttribute(scope));
+		fTokens.put(new WeakReference<Token>(token), scope);
 		return token;
 	}
 

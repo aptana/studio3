@@ -8,9 +8,6 @@ import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
 import org.jrubyparser.parser.Tokens;
 
-import com.aptana.theme.IThemeManager;
-import com.aptana.theme.ThemePlugin;
-
 public class RubyCodeScanner implements ITokenScanner
 {
 
@@ -209,12 +206,7 @@ public class RubyCodeScanner implements ITokenScanner
 
 	protected IToken getToken(String tokenName)
 	{
-		return getThemeManager().getToken(tokenName);
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return ThemePlugin.getDefault().getThemeManager();
+		return new Token(tokenName);
 	}
 
 	private IToken pop()

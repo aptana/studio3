@@ -57,8 +57,6 @@ import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 import com.aptana.editor.js.parsing.JSRegExpRule;
-import com.aptana.theme.IThemeManager;
-import com.aptana.theme.ThemePlugin;
 
 /**
  * @author Max Stepanov
@@ -277,11 +275,6 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 
 	protected IToken getToken(String tokenName)
 	{
-		return getThemeManager().getToken(tokenName);
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return ThemePlugin.getDefault().getThemeManager();
+		return new Token(tokenName);
 	}
 }

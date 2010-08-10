@@ -227,7 +227,6 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		dr = new ThemeingDamagerRepairer(getCDATAScanner());
 		reconciler.setDamager(dr, CDATA);
 		reconciler.setRepairer(dr, CDATA);
-
 	}
 
 	protected ITokenScanner getHTMLScanner()
