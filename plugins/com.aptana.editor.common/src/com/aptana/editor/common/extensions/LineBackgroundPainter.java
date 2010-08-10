@@ -11,9 +11,11 @@ import org.eclipse.swt.custom.LineBackgroundEvent;
 import org.eclipse.swt.custom.LineBackgroundListener;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.graphics.Color;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
+import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
 
 /**
@@ -78,16 +80,19 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener
 	{
 		StyledText textWidget = fViewer.getTextWidget();
 		if (textWidget == null)
+		{
 			return;
+		}
 		String text = event.lineText;
 		if (text == null || text.length() == 0)
+		{
 			return;
-
-		int offset = event.lineOffset;
+		}
 
 		// We're coloring whole line based on what the trailing end bg color should be.
 		try
 		{
+			int offset = event.lineOffset;
 			IDocument document = fViewer.getDocument();
 			int line = document.getLineOfOffset(offset);
 			IRegion lineRegion = document.getLineInformation(line);
@@ -95,20 +100,23 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener
 
 			String commonPrefix = getScope(document, line, endOfLineScope);
 
-			TextAttribute at = ThemePlugin.getDefault().getThemeManager().getCurrentTheme()
-					.getTextAttribute(commonPrefix);
+			TextAttribute at = getCurrentTheme().getTextAttribute(commonPrefix);
 			event.lineBackground = at.getBackground();
 			// When we do this, we need to explicitly set the bg color for ranges with no bg color!
 			StyleRange[] ranges = textWidget.getStyleRanges(offset, lineRegion.getLength(), true);
 			if (ranges != null && ranges.length > 0)
 			{
+				Color themeBG = null;
 				for (StyleRange range : ranges)
 				{
 					// FIXME This is rather hacky. We still don't play nice 100% of the time...
 					if (range.background == null)
 					{
-						range.background = ThemePlugin.getDefault().getColorManager()
-								.getColor(ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getBackground());
+						if (themeBG == null)
+						{
+							themeBG = getThemeBG();
+						}
+						range.background = themeBG;
 						textWidget.setStyleRange(range);
 					}
 				}
@@ -120,31 +128,53 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener
 		}
 	}
 
+	protected Color getThemeBG()
+	{
+		return ThemePlugin.getDefault().getColorManager().getColor(getCurrentTheme().getBackground());
+	}
+
+	protected Theme getCurrentTheme()
+	{
+		return ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
+	}
+
 	protected IDocumentScopeManager getScopeManager()
 	{
 		return CommonEditorPlugin.getDefault().getDocumentScopeManager();
 	}
 
+	/**
+	 * Calculates the common scope between the end of one line and the beginning of the next.
+	 * 
+	 * @param document
+	 * @param line
+	 * @param endOfLineScope
+	 * @return
+	 * @throws BadLocationException
+	 */
 	private String getScope(IDocument document, int line, String endOfLineScope) throws BadLocationException
 	{
+		// if this is the last line, just use the scope at the end of it.
 		int lines = document.getNumberOfLines();
 		if (line + 1 >= lines)
 		{
 			return endOfLineScope;
 		}
+		// now grab the scope at the beginning of the next line...
 		int offsetOfNextLine = document.getLineOffset(line + 1);
 		String startOfNextLineScope = getScopeManager().getScopeAtOffset(document, offsetOfNextLine);
 
 		// Calculate the common prefix between the two!
 		StringBuilder builder = new StringBuilder();
-		for (int i = 0; i < endOfLineScope.length(); i++)
+		int length = Math.min(endOfLineScope.length(), startOfNextLineScope.length());
+		for (int i = 0; i < length; i++)
 		{
-			if (i >= startOfNextLineScope.length())
-				break;
 			char c = endOfLineScope.charAt(i);
 			char o = startOfNextLineScope.charAt(i);
 			if (c == o)
+			{
 				builder.append(c);
+			}
 		}
 		return builder.toString();
 	}

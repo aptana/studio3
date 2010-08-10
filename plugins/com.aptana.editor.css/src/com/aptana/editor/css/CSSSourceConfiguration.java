@@ -58,8 +58,6 @@ import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
-import com.aptana.theme.IThemeManager;
-import com.aptana.theme.ThemePlugin;
 
 /**
  * @author Max Stepanov
@@ -265,11 +263,5 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	protected IToken getToken(String name)
 	{
 		return new Token(name);
-//		return getThemeManager().getToken(name);
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return ThemePlugin.getDefault().getThemeManager();
 	}
 }

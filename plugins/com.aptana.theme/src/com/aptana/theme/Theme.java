@@ -85,7 +85,9 @@ public class Theme
 	{
 		name = (String) props.remove(THEME_NAME_PROP_KEY);
 		if (name == null)
+		{
 			throw new IllegalStateException("Invalid theme properties!"); //$NON-NLS-1$
+		}
 		// The general editor colors
 		defaultFG = parseHexRGB((String) props.remove(FOREGROUND_PROP_KEY));
 		defaultBG = parseHexRGB((String) props.remove(BACKGROUND_PROP_KEY));
@@ -106,22 +108,34 @@ public class Theme
 				{
 					// it's a color!
 					if (foreground == null)
+					{
 						foreground = parseHexRGBa(token);
+					}
 					else
+					{
 						background = parseHexRGBa(token);
+					}
 				}
 				else
 				{
 					if (token.equalsIgnoreCase(ITALIC))
+					{
 						style |= SWT.ITALIC;
+					}
 					else if (token.equalsIgnoreCase(UNDERLINE))
+					{
 						style |= TextAttribute.UNDERLINE;
+					}
 					else if (token.equalsIgnoreCase(BOLD))
+					{
 						style |= SWT.BOLD;
+					}
 				}
 			}
 			if (foreground == null)
+			{
 				foreground = new RGBa(defaultFG);
+			}
 			DelayedTextAttribute attribute = new DelayedTextAttribute(foreground, background, style);
 			coloringRules.put(new ScopeSelector(scopeSelector), attribute);
 		}
@@ -150,29 +164,14 @@ public class Theme
 
 	private RGB parseHexRGB(String hex, boolean alphaMergeWithBG)
 	{
-		if (hex == null)
-			return new RGB(0, 0, 0);
-		if (hex.length() != 7 && hex.length() != 9)
-		{
-			ThemePlugin.logError(MessageFormat.format("Received RGB Hex value with invalid length: {0}", hex), null); //$NON-NLS-1$
-			if (defaultFG != null)
-				return defaultFG;
-			return new RGB(0, 0, 0);
-		}
-		String s = hex.substring(1, 3);
-		int r = Integer.parseInt(s, 16);
-		s = hex.substring(3, 5);
-		int g = Integer.parseInt(s, 16);
-		s = hex.substring(5, 7);
-		int b = Integer.parseInt(s, 16);
-		if (hex.length() == 9 && alphaMergeWithBG)
+		RGBa a = parseHexRGBa(hex);
+		RGB rgb = a.toRGB();
+		if (alphaMergeWithBG)
 		{
 			// Handle RGBa values by mixing against BG, etc
-			s = hex.substring(7, 9);
-			int a = Integer.parseInt(s, 16);
-			return alphaBlend(defaultBG, new RGB(r, g, b), a);
+			return alphaBlend(defaultBG, rgb, a.getAlpha());
 		}
-		return new RGB(r, g, b);
+		return rgb;
 	}
 
 	private RGBa parseHexRGBa(String hex)
@@ -183,7 +182,9 @@ public class Theme
 		{
 			ThemePlugin.logError(MessageFormat.format("Received RGBa Hex value with invalid length: {0}", hex), null); //$NON-NLS-1$
 			if (defaultFG != null)
+			{
 				return new RGBa(defaultFG);
+			}
 			return new RGBa(0, 0, 0);
 		}
 		String s = hex.substring(1, 3);
@@ -192,21 +193,28 @@ public class Theme
 		int g = Integer.parseInt(s, 16);
 		s = hex.substring(5, 7);
 		int b = Integer.parseInt(s, 16);
-		int a = 255;
 		if (hex.length() == 9)
 		{
 			s = hex.substring(7, 9);
-			a = Integer.parseInt(s, 16);
+			int a = Integer.parseInt(s, 16);
+			return new RGBa(r, g, b, a);
 		}
-		return new RGBa(r, g, b, a);
+		return new RGBa(r, g, b);
 	}
 
-	public static RGB alphaBlend(RGB baseToBlendWith, RGB colorOnTop, int alpha)
+	public static RGB alphaBlend(RGB base, RGB top, int alpha)
 	{
-		int new_r = (baseToBlendWith.red * (255 - alpha) + colorOnTop.red * alpha) / 255;
-		int new_g = (baseToBlendWith.green * (255 - alpha) + colorOnTop.green * alpha) / 255;
-		int new_b = (baseToBlendWith.blue * (255 - alpha) + colorOnTop.blue * alpha) / 255;
-		return new RGB(new_r, new_g, new_b);
+		int newRed = alphaBlend(base.red, top.red, alpha);
+		int newGreen = alphaBlend(base.green, top.green, alpha);
+		int newBlue = alphaBlend(base.blue, top.blue, alpha);
+		return new RGB(newRed, newGreen, newBlue);
+	}
+
+	private static int alphaBlend(int base, int top, int alpha)
+	{
+		int oneMinusAlpha = 255 - alpha;
+		int r = oneMinusAlpha * base + alpha * top + 128;
+		return ((r + (r >> 8)) >> 8);
 	}
 
 	public TextAttribute getTextAttribute(String scope)
@@ -251,19 +259,19 @@ public class Theme
 		// Some tokens are special. They have fallbacks even if not in the theme! Looks like bundles can contribute
 		// them?
 		if (scope.startsWith("markup.changed")) //$NON-NLS-1$
-			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(248, 205, 14), 0);
+			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(248, 205, 14), SWT.NORMAL);
 
 		if (scope.startsWith("markup.deleted")) //$NON-NLS-1$
-			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(255, 86, 77), 0);
+			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(255, 86, 77), SWT.NORMAL);
 
 		if (scope.startsWith("markup.inserted")) //$NON-NLS-1$
-			return new DelayedTextAttribute(new RGBa(0, 0, 0), new RGBa(128, 250, 120), 0);
+			return new DelayedTextAttribute(new RGBa(0, 0, 0), new RGBa(128, 250, 120), SWT.NORMAL);
 
 		if (scope.startsWith("meta.diff.index") || scope.startsWith("meta.diff.range") || scope.startsWith("meta.separator.diff")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(65, 126, 218), SWT.ITALIC);
 
 		if (scope.startsWith("meta.diff.header")) //$NON-NLS-1$
-			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(103, 154, 233), 0);
+			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(103, 154, 233), SWT.NORMAL);
 
 		return new DelayedTextAttribute(new RGBa(defaultFG));
 	}
@@ -292,32 +300,25 @@ public class Theme
 
 	private DelayedTextAttribute merge(DelayedTextAttribute childAttr, DelayedTextAttribute parentAttr)
 	{
-		// TODO Do we need to merge font style or FG?
-		// Merge the bg up!
-		RGBa bg = childAttr.getBackground();
-		RGBa mergedBG = null;
-		if (bg != null)
+		return new DelayedTextAttribute(merge(childAttr.getForeground(), parentAttr.getForeground(), defaultFG), merge(
+				childAttr.getBackground(), parentAttr.getBackground(), defaultBG), childAttr.getStyle());
+	}
+
+	private RGBa merge(RGBa top, RGBa bottom, RGB defaultParent)
+	{
+		if (top == null) // for some reaosn there is no top.
 		{
-			RGB bgRGB = bg.toRGB();
-			if (!bg.isFullyOpaque())
-			{
-				if (parentAttr.getBackground() == null)
-				{
-					// FIXME Is this right? Do we merge with default BG?
-					bgRGB = alphaBlend(defaultBG, bgRGB, bg.getAlpha());
-				}
-				else
-				{
-					bgRGB = alphaBlend(parentAttr.getBackground().toRGB(), bgRGB, bg.getAlpha());
-				}
-			}
-			mergedBG = new RGBa(bgRGB);
+			return bottom;
 		}
-		else
+		if (top.isFullyOpaque()) // top has no transparency, just return it
 		{
-			mergedBG = parentAttr.getBackground();
+			return top;
 		}
-		return new DelayedTextAttribute(childAttr.getForeground(), mergedBG, childAttr.getStyle());
+		if (bottom == null) // there is no parent, merge onto default FG/BG for theme
+		{
+			return new RGBa(alphaBlend(defaultParent, top.toRGB(), top.getAlpha()));
+		}
+		return new RGBa(alphaBlend(bottom.toRGB(), top.toRGB(), top.getAlpha()));
 	}
 
 	private TextAttribute toTextAttribute(DelayedTextAttribute attr)
@@ -482,7 +483,9 @@ public class Theme
 	{
 		save(new InstanceScope());
 		if (getThemeManager().getCurrentTheme().equals(this))
+		{
 			getThemeManager().setCurrentTheme(this);
+		}
 	}
 
 	protected IThemeManager getThemeManager()
@@ -513,7 +516,9 @@ public class Theme
 		Preferences preferences = prefs.node(ThemeManager.THEMES_NODE);
 		String xmlProps = preferences.get(getName(), null);
 		if (xmlProps == null)
+		{
 			return;
+		}
 		Properties props = new Properties();
 		props.loadFromXML(new ByteArrayInputStream(xmlProps.getBytes("UTF-8"))); //$NON-NLS-1$
 		coloringRules.clear();
@@ -576,30 +581,30 @@ public class Theme
 
 	public void updateCaret(RGB newColor)
 	{
-		if (newColor == null)
+		if (newColor == null || (caret != null && caret.equals(newColor)))
+		{
 			return;
-		if (caret != null && caret.equals(newColor))
-			return;
+		}
 		caret = newColor;
 		save();
 	}
 
 	public void updateFG(RGB newColor)
 	{
-		if (newColor == null)
+		if (newColor == null || (defaultFG != null && defaultFG.equals(newColor)))
+		{
 			return;
-		if (defaultFG != null && defaultFG.equals(newColor))
-			return;
+		}
 		defaultFG = newColor;
 		save();
 	}
 
 	public void updateBG(RGB newColor)
 	{
-		if (newColor == null)
+		if (newColor == null || (defaultBG != null && defaultBG.equals(newColor)))
+		{
 			return;
-		if (defaultBG != null && defaultBG.equals(newColor))
-			return;
+		}
 		wipeCache();
 		defaultBG = newColor;
 		save();
@@ -612,20 +617,20 @@ public class Theme
 
 	public void updateLineHighlight(RGB newColor)
 	{
-		if (newColor == null)
+		if (newColor == null || (lineHighlight != null && lineHighlight.equals(newColor)))
+		{
 			return;
-		if (lineHighlight != null && lineHighlight.equals(newColor))
-			return;
+		}
 		lineHighlight = newColor;
 		save();
 	}
 
 	public void updateSelection(RGB newColor)
 	{
-		if (newColor == null)
+		if (newColor == null || (selection != null && selection.equals(newColor)))
+		{
 			return;
-		if (selection != null && selection.equals(newColor))
-			return;
+		}
 		selection = newColor;
 		save();
 	}
@@ -633,7 +638,9 @@ public class Theme
 	public Theme copy(String value)
 	{
 		if (value == null)
+		{
 			return null;
+		}
 		Properties props = toProps();
 		props.setProperty(THEME_NAME_PROP_KEY, value);
 		Theme newTheme = new Theme(colorManager, props);
@@ -673,7 +680,9 @@ public class Theme
 	{
 		TextAttribute attr = getTextAttribute(scope);
 		if (attr == null)
+		{
 			return null;
+		}
 		return attr.getForeground();
 	}
 
@@ -687,7 +696,9 @@ public class Theme
 	{
 		Color fg = getForeground(scope);
 		if (fg == null)
+		{
 			return null;
+		}
 		return fg.getRGB();
 	}
 
@@ -711,7 +722,9 @@ public class Theme
 	{
 		Color bg = getBackground(scope);
 		if (bg == null)
+		{
 			return null;
+		}
 		return bg.getRGB();
 	}
 

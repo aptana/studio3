@@ -52,8 +52,6 @@ import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
-import com.aptana.theme.IThemeManager;
-import com.aptana.theme.ThemePlugin;
 
 public class HTMLTagScanner extends RuleBasedScanner
 {
@@ -83,13 +81,12 @@ public class HTMLTagScanner extends RuleBasedScanner
 	// the <html> tag itself to the list.
 	// see http://dev.w3.org/html5/spec/Overview.html#sections
 	@SuppressWarnings("nls")
-	private static String[] STRUCTURE_DOT_ANY = { "html", "head", "body", "header", "address",
-	        "nav", "section", "article", "footer", "aside", "hgroup", "h1", "h2", "h3", "h4", "h5", "h6" };
+	private static String[] STRUCTURE_DOT_ANY = { "html", "head", "body", "header", "address", "nav", "section",
+			"article", "footer", "aside", "hgroup", "h1", "h2", "h3", "h4", "h5", "h6" };
 
 	@SuppressWarnings("nls")
-	private static String[] BLOCK_DOT_ANY = { "blockquote", "dd", "div", "dl", "dt", "fieldset", "form",
-			"frame", "frameset", "iframe", "noframes", "object", "ol", "p", "ul",
-			"applet", "center", "dir", "hr", "menu", "pre" };
+	private static String[] BLOCK_DOT_ANY = { "blockquote", "dd", "div", "dl", "dt", "fieldset", "form", "frame",
+			"frameset", "iframe", "noframes", "object", "ol", "p", "ul", "applet", "center", "dir", "hr", "menu", "pre" };
 
 	@SuppressWarnings("nls")
 	private static String[] TAG_INLINE_ANY = { "a", "abbr", "acronym", "area", "b", "base", "basefont", "bdo", "big",
@@ -131,7 +128,8 @@ public class HTMLTagScanner extends RuleBasedScanner
 				return Character.isLetter(c);
 			}
 
-		}, createToken(HTMLTokenType.ATTRIBUTE), true) {
+		}, createToken(HTMLTokenType.ATTRIBUTE), true)
+		{
 			@Override
 			protected boolean wordOK(String word, ICharacterScanner scanner)
 			{
@@ -172,7 +170,7 @@ public class HTMLTagScanner extends RuleBasedScanner
 		setRules(rules.toArray(new IRule[rules.size()]));
 		setDefaultReturnToken(createToken(HTMLTokenType.TEXT));
 	}
-	
+
 	/**
 	 * createToken
 	 * 
@@ -193,16 +191,5 @@ public class HTMLTagScanner extends RuleBasedScanner
 	protected IToken createToken(String string)
 	{
 		return new Token(string);
-//		return getThemeManager().getToken(string);
-	}
-	
-	/**
-	 * getThemeManager
-	 * 
-	 * @return
-	 */
-	protected IThemeManager getThemeManager()
-	{
-		return ThemePlugin.getDefault().getThemeManager();
 	}
 }

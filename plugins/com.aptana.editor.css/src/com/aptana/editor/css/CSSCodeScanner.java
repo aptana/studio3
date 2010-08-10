@@ -174,7 +174,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 
 		// !important
 		WordRule importantRule = new WordRule(new IdentifierWithPrefixDetector('!'), Token.UNDEFINED);
-		importantRule.addWord("!important", createToken(CSSTokenType.IMPORTANT));
+		importantRule.addWord("!important", createToken(CSSTokenType.IMPORTANT)); //$NON-NLS-1$
 		rules.add(importantRule);
 
 		// ignore case for font names
@@ -211,7 +211,9 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			protected boolean wordOK(String word, ICharacterScanner scanner)
 			{
 				if (word.charAt(0) == '-')
+				{
 					return word.length() > 1;
+				}
 				return true;
 			}
 		});
@@ -263,9 +265,13 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 				{
 					char c = word.charAt(i);
 					if (Character.isDigit(c))
+					{
 						continue;
-					if (c == 'a' || c == 'b' || c == 'c' || c == 'd' || c == 'e' || c == 'f')
+					}
+					if ('a' <= c && c <= 'f') // a-f
+					{
 						continue;
+					}
 					return false;
 				}
 				return true;
@@ -302,7 +308,6 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 
 	protected IRule createNumberRule()
 	{
-		//		rules.add(new RegexpRule("(\\-|\\+)?\\s*[0-9]+(\\.[0-9]+)?", createToken(CSSTokenType.NUMBER))); //$NON-NLS-1$
 		return new ExtendedWordRule(new IWordDetector()
 		{
 
@@ -323,7 +328,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			@Override
 			protected boolean wordOK(String word, ICharacterScanner scanner)
 			{
-				return word.matches("(\\-|\\+)?\\s*[0-9]+(\\.[0-9]+)?");
+				return word.matches("(-|\\+)?\\s*[0-9]+(\\.[0-9]+)?"); //$NON-NLS-1$
 			}
 		};
 	}

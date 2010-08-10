@@ -43,8 +43,6 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 
 import com.aptana.editor.common.text.rules.RegexpRule;
-import com.aptana.theme.IThemeManager;
-import com.aptana.theme.ThemePlugin;
 
 public class JSDoubleQuotedStringScanner extends BufferedRuleBasedScanner
 {
@@ -62,11 +60,5 @@ public class JSDoubleQuotedStringScanner extends BufferedRuleBasedScanner
 	protected IToken getToken(String tokenName)
 	{
 		return new Token(tokenName);
-//		return getThemeManager().getToken(tokenName);
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return ThemePlugin.getDefault().getThemeManager();
 	}
 }

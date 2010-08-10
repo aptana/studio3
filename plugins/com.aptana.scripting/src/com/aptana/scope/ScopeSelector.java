@@ -65,12 +65,12 @@ public class ScopeSelector
 				// see if we match at this point within the context
 				if (this._root.matches(context))
 				{
-					// we matched, so report success and stop looking for a match
 					// we need to save what step matched (looking for highest),
 					// plus how much of that step matched (looking for longest)
 					matchOffset = i;
 					matchLength = this._root.matchLength();
 
+					// we matched, so report success and stop looking for a match
 					result = true;
 					break;
 				}
@@ -98,7 +98,7 @@ public class ScopeSelector
 	 * @param scope
 	 * @return
 	 */
-	public static ScopeSelector bestMatch(final Collection<ScopeSelector> selectors, final String scope)
+	public static ScopeSelector bestMatch(Collection<ScopeSelector> selectors, String scope)
 	{
 		int bestOffset = -1;
 		int bestLength = 0;
@@ -124,7 +124,7 @@ public class ScopeSelector
 					}
 					else if (length == bestLength)
 					{
-						// FIXME Need to match higher up steps!
+						// FIXME Need to match higher up steps?
 					}
 				}
 			}

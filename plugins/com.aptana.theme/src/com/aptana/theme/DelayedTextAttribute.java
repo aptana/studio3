@@ -1,5 +1,7 @@
 package com.aptana.theme;
 
+import org.eclipse.swt.SWT;
+
 public class DelayedTextAttribute
 {
 
@@ -16,7 +18,7 @@ public class DelayedTextAttribute
 
 	public DelayedTextAttribute(RGBa foreground)
 	{
-		this(foreground, null, 0);
+		this(foreground, null, SWT.NORMAL);
 	}
 
 	public RGBa getForeground()

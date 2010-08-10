@@ -92,7 +92,9 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 
 		IRegion info = fDocument.getLineInformationOfOffset(offset);
 		if (offset <= info.getOffset() + info.getLength())
+		{
 			return info.getOffset() + info.getLength();
+		}
 
 		int line = fDocument.getLineOfOffset(offset);
 		try
@@ -127,8 +129,9 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 					end = info.getOffset() + info.getLength();
 				}
 				else
+				{
 					end = endOfLineOf(end);
-
+				}
 				end = Math.min(partition.getOffset() + partition.getLength(), end);
 				return new Region(start, end - start);
 
@@ -191,7 +194,9 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 	protected void addRange(TextPresentation presentation, int offset, int length, TextAttribute attr)
 	{
 		if (attr != null)
+		{
 			presentation.addStyleRange(new StyleRange(offset, length, attr.getForeground(), attr.getBackground(), attr
 					.getStyle()));
+		}
 	}
 }
