@@ -386,7 +386,7 @@ public class JSSymbolTypeInferrer
 	 * @param property
 	 * @param types
 	 */
-	private void processProperties(JSPropertyCollection property, Set<String> types)
+	public void processProperties(JSPropertyCollection property, Set<String> types)
 	{
 		if (property.hasProperties())
 		{
