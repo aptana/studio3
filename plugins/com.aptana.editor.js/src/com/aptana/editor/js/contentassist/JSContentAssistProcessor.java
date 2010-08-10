@@ -559,7 +559,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		LocationType result = LocationType.UNKNOWN;
 
 		// set up references to AST nodes around the current offset
-		this._targetNode = this.getActiveASTNode(offset);
+		this._targetNode = this.getActiveASTNode(offset - 1);
 		this._statementNode = null;
 		IParseNode ast = null;
 
