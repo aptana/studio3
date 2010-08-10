@@ -78,6 +78,7 @@ public class PreferenceActionController extends AbstractActionController
 		return IBrowserNotificationConstants.JSON_OK;
 	}
 
+	@SuppressWarnings("unchecked")
 	private Object checkArguments(Object arguments)
 	{
 		if (!(arguments instanceof Object[]))
