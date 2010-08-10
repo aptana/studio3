@@ -83,11 +83,6 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener
 		{
 			return;
 		}
-		String text = event.lineText;
-		if (text == null || text.length() == 0)
-		{
-			return;
-		}
 
 		// We're coloring whole line based on what the trailing end bg color should be.
 		try
@@ -160,9 +155,15 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener
 		{
 			return endOfLineScope;
 		}
+
 		// now grab the scope at the beginning of the next line...
-		int offsetOfNextLine = document.getLineOffset(line + 1);
-		String startOfNextLineScope = getScopeManager().getScopeAtOffset(document, offsetOfNextLine);
+		IRegion nextLine = document.getLineInformation(line + 1);
+		// If the next line is empty, take our end of line scope
+		if (nextLine.getLength() == 0)
+		{
+			return endOfLineScope;
+		}
+		String startOfNextLineScope = getScopeManager().getScopeAtOffset(document, nextLine.getOffset());
 
 		// Calculate the common prefix between the two!
 		StringBuilder builder = new StringBuilder();
