@@ -129,6 +129,11 @@
             id="portal.python.installer"
             name="Python Installer Actions">
       </actionController>
+      <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.PreferenceActionController"
+            id="portal.preferences"
+            name="Preference Actions">
+      </actionController>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

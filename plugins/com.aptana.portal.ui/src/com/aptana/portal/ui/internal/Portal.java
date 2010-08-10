@@ -20,7 +20,9 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
@@ -112,7 +114,10 @@ public class Portal
 		}
 		if (portalBrowser != null && !portalBrowser.isDisposed())
 		{
-			// Refresh the URL and return
+			// Refresh the URL, bring to front, and return
+			IEditorSite editorSite = portalBrowser.getEditorSite();
+			IWorkbenchPart part = editorSite.getPart();
+			editorSite.getPage().activate(part);
 			portalBrowser.setURL(url);
 			return;
 		}
