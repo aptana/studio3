@@ -134,6 +134,11 @@
             id="portal.preferences"
             name="Preference Actions">
       </actionController>
+      <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.BrowserActionController"
+            id="portal.browser"
+            name="Browser Actions">
+      </actionController>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
