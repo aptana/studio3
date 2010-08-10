@@ -26,6 +26,7 @@ import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSIdentifierNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
+import com.aptana.editor.js.parsing.ast.JSObjectNode;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.ast.IParseNode;
@@ -482,7 +483,11 @@ public class JSSymbolTypeInferrer
 			{
 				JSNodeTypeInferrer inferrer = new JSNodeTypeInferrer(this._activeScope, this._index, this._location);
 
-				if (isFunction)
+				if (value instanceof JSObjectNode)
+				{
+					inferrer.addType(JSTypeConstants.OBJECT_TYPE);
+				}
+				else if (isFunction)
 				{
 					property.addType(JSTypeConstants.FUNCTION_TYPE);
 					inferrer.visit(value);
