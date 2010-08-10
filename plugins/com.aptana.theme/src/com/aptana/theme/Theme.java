@@ -67,10 +67,16 @@ public class Theme
 	 */
 	private ScopeSelector lastSelectorMatch;
 
+	/**
+	 * A cache to memoize the ultimate TextAttribute generated for a given fully qualified scope.
+	 */
+	private Map<String, TextAttribute> cache;
+
 	public Theme(ColorManager colormanager, Properties props)
 	{
 		this.colorManager = colormanager;
 		coloringRules = new HashMap<ScopeSelector, DelayedTextAttribute>();
+		cache = new HashMap<String, TextAttribute>();
 		parseProps(props);
 		storeDefaults();
 	}
@@ -205,8 +211,14 @@ public class Theme
 
 	public TextAttribute getTextAttribute(String scope)
 	{
+		if (cache.containsKey(scope))
+		{
+			return cache.get(scope);
+		}
 		lastSelectorMatch = null;
-		return toTextAttribute(getDelayedTextAttribute(scope));
+		TextAttribute ta = toTextAttribute(getDelayedTextAttribute(scope));
+		cache.put(scope, ta);
+		return ta;
 	}
 
 	private DelayedTextAttribute getDelayedTextAttribute(String scope)
@@ -376,6 +388,7 @@ public class Theme
 	{
 		coloringRules.put(new ScopeSelector(scopeSelector), new DelayedTextAttribute(new RGBa(at.getForeground()
 				.getRGB()), new RGBa(at.getBackground().getRGB()), at.getStyle()));
+		wipeCache();
 		save();
 	}
 
@@ -504,6 +517,7 @@ public class Theme
 		Properties props = new Properties();
 		props.loadFromXML(new ByteArrayInputStream(xmlProps.getBytes("UTF-8"))); //$NON-NLS-1$
 		coloringRules.clear();
+		wipeCache();
 		parseProps(props);
 		deleteCustomVersion();
 	}
@@ -544,6 +558,8 @@ public class Theme
 	public void remove(String scopeSelector)
 	{
 		coloringRules.remove(new ScopeSelector(scopeSelector));
+		wipeCache();
+		save();
 	}
 
 	/**
@@ -554,6 +570,7 @@ public class Theme
 	{
 		DelayedTextAttribute attr = new DelayedTextAttribute(new RGBa(defaultFG));
 		coloringRules.put(new ScopeSelector(scopeSelector), attr);
+		wipeCache();
 		save();
 	}
 
@@ -583,8 +600,14 @@ public class Theme
 			return;
 		if (defaultBG != null && defaultBG.equals(newColor))
 			return;
+		wipeCache();
 		defaultBG = newColor;
 		save();
+	}
+
+	private void wipeCache()
+	{
+		cache.clear();
 	}
 
 	public void updateLineHighlight(RGB newColor)
