@@ -219,6 +219,8 @@ public class GitRepository
 				@Override
 				public void fileDeleted(int wd, String rootPath, final String name)
 				{
+					if (name == null || name.endsWith(".lock")) //$NON-NLS-1$
+						return;
 					// Remove branch in model!
 					final GitRevSpecifier rev = new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + name));
 					branches.remove(rev);
@@ -245,6 +247,8 @@ public class GitRepository
 				@Override
 				public void fileCreated(int wd, String rootPath, final String name)
 				{
+					if (name == null || name.endsWith(".lock")) //$NON-NLS-1$
+						return;
 					// a branch has been added
 					addBranch(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + name)));
 
@@ -312,7 +316,7 @@ public class GitRepository
 					// Determine if filename is referring to a remote branch, and not the remote itself.
 					private boolean isProbablyBranch(String newName)
 					{
-						return newName != null && newName.indexOf(File.separator) != -1;
+						return newName != null && newName.indexOf(File.separator) != -1 && !newName.endsWith(".lock"); //$NON-NLS-1$
 					}
 
 					@Override
