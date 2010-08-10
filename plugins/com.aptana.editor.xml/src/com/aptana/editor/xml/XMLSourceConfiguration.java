@@ -55,8 +55,7 @@ import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.NonRuleBasedDamagerRepairer;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.TagRule;
-import com.aptana.theme.IThemeManager;
-import com.aptana.theme.ThemePlugin;
+import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 
 /**
  * @author Max Stepanov
@@ -94,7 +93,8 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		if (instance == null)
 		{
 			IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
-			c.addTranslation(new QualifiedContentType(IXMLConstants.CONTENT_TYPE_XML), new QualifiedContentType("text.xml")); //$NON-NLS-1$
+			c.addTranslation(new QualifiedContentType(IXMLConstants.CONTENT_TYPE_XML), new QualifiedContentType(
+					"text.xml")); //$NON-NLS-1$
 			instance = new XMLSourceConfiguration();
 		}
 		return instance;
@@ -156,22 +156,22 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
 	{
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getXMLScanner());
+		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getXMLScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
-		dr = new DefaultDamagerRepairer(getPreProcessorScanner());
+		dr = new ThemeingDamagerRepairer(getPreProcessorScanner());
 		reconciler.setDamager(dr, PRE_PROCESSOR);
 		reconciler.setRepairer(dr, PRE_PROCESSOR);
 
-		dr = new DefaultDamagerRepairer(getCDATAScanner());
+		dr = new ThemeingDamagerRepairer(getCDATAScanner());
 		reconciler.setDamager(dr, CDATA);
 		reconciler.setRepairer(dr, CDATA);
 
-		dr = new DefaultDamagerRepairer(getXMLTagScanner());
+		dr = new ThemeingDamagerRepairer(getXMLTagScanner());
 		reconciler.setDamager(dr, XML_TAG);
 		reconciler.setRepairer(dr, XML_TAG);
 
@@ -220,11 +220,6 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	protected IToken getToken(String tokenName)
 	{
-		return getThemeManager().getToken(tokenName);
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return ThemePlugin.getDefault().getThemeManager();
+		return new Token(tokenName);
 	}
 }
