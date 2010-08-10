@@ -119,7 +119,7 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 			// Now try to right of caret
 			charOffset = caretOffset;
 			caretOffset += 1;
-			if (caretOffset >= doc.getLength())
+			if (charOffset >= doc.getLength())
 			{
 				return null;
 			}
