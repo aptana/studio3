@@ -531,6 +531,37 @@ public class JSParser extends Parser implements IParser {
 				public boolean recover(IParser parser, Symbol token, TokenStream in) throws IOException
 				{
 					Symbol lastSymbol = getLastSymbol();
+					int type = lastSymbol.getId();
+					boolean result = false;
+					
+					if (type == JSTokenType.DOT.getIndex() || type == JSTokenType.NEW.getIndex())
+					{
+						Symbol term1 = new Symbol(JSTokenType.IDENTIFIER.getIndex(), token.getStart(), token.getStart() - 1, "");
+						
+						Simulator sim = new Simulator();
+						
+						in.alloc(2);
+						in.insert(token);
+						in.insert(term1);
+						in.rewind();
+						
+						if (sim.parse(in))
+						{
+							result = true;
+							
+							in.rewind();
+							
+							report.missingTokenInserted(term1);
+						}
+					}
+					
+					return result;
+				}
+			},
+			new IRecoveryStrategy() {
+				public boolean recover(IParser parser, Symbol token, TokenStream in) throws IOException
+				{
+					Symbol lastSymbol = getLastSymbol();
 					boolean result = false;
 					
 					if (top >= 2)
