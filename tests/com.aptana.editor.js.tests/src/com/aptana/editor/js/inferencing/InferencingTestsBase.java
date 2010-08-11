@@ -344,7 +344,7 @@ public abstract class InferencingTestsBase extends TestCase
 	protected void structureTests(String typeName, String... propertyNames)
 	{
 		assertNotNull(typeName);
-		
+
 		this.structureTests(this.getType(typeName), propertyNames);
 	}
 

@@ -503,14 +503,14 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			else
 			{
 				IParseNode parentNode = this._targetNode.getParent();
-				
+
 				if (parentNode != null && parentNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
 				{
 					propertyNode = (JSGetPropertyNode) parentNode;
 				}
 			}
 		}
-		
+
 		if (propertyNode == null && this._statementNode != null)
 		{
 			if (this._statementNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
@@ -527,7 +527,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				}
 			}
 		}
-		
+
 		return propertyNode;
 	}
 

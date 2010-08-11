@@ -148,6 +148,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 			((JSNode) node).accept(this);
 		}
 	}
+
 	/**
 	 * addTypes
 	 * 
@@ -626,15 +627,15 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 			// collect all descendants into a property collection
 			JSPropertyCollection symbol = new JSPropertyCollection();
 			JSPropertyCollector collector = new JSPropertyCollector(symbol);
-			
+
 			collector.visit(node);
-			
+
 			// infer type
 			JSSymbolTypeInferrer inferrer = new JSSymbolTypeInferrer(this._scope, this._index, this._location);
 			Set<String> types = new LinkedHashSet<String>();
-			
+
 			inferrer.processProperties(symbol, types);
-			
+
 			this.addTypes(new ArrayList<String>(types));
 		}
 		else

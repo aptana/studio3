@@ -161,10 +161,10 @@ public class JSParser extends Parser implements IParser {
 		{
 		}
 	}
-	
+
 	private final IRecoveryStrategy[] recoveryStrategies;
 	private JSScanner fScanner;
-	
+
 	/**
 	 * attachPostDocumentationBlocks
 	 * 
@@ -177,27 +177,27 @@ public class JSParser extends Parser implements IParser {
 		for (DocumentationBlock block : this.parsePostDocumentationBlocks())
 		{
 			int index = block.getStart() - 1;
-			
+
 			while (index >= 0 && Character.isWhitespace(source.charAt(index)))
 			{
 				index--;
 			}
-			
+
 			IParseNode node = root.getNodeAtOffset(index);
-			
+
 			if (node instanceof JSNode)
 			{
 				switch (node.getNodeType())
 				{
 					case JSNodeTypes.STATEMENTS:
 						IParseNode parent = node.getParent();
-						
+
 						if (parent.getNodeType() == JSNodeTypes.FUNCTION)
 						{
 							((JSNode) parent).setDocumentation(block);
 						}
 						break;
-						
+
 					default:
 						((JSNode) node).setDocumentation(block);
 						break;
@@ -218,14 +218,14 @@ public class JSParser extends Parser implements IParser {
 		for (DocumentationBlock block : this.parsePreDocumentationBlocks())
 		{
 			int index = block.getEnd() + 1;
-			
+
 			while (index < source.length() && Character.isWhitespace(source.charAt(index)))
 			{
 				index++;
 			}
-			
+
 			IParseNode node = root.getNodeAtOffset(index);
-			
+
 			if (node instanceof JSNode)
 			{
 				IParseNode statement = ((JSNode) node).getContainingStatementNode();
@@ -243,10 +243,10 @@ public class JSParser extends Parser implements IParser {
 							JSVarNode varNode = (JSVarNode) node;
 							((JSNode) varNode.getFirstChild().getLastChild()).setDocumentation(block);
 							break;
-							
+
 						case JSNodeTypes.IDENTIFIER:
 							IParseNode parent = node.getParent();
-							
+
 							if (parent instanceof JSNameValuePairNode)
 							{
 								// associate documentation with property's value
@@ -254,7 +254,7 @@ public class JSParser extends Parser implements IParser {
 								((JSNode) entry.getValue()).setDocumentation(block);
 							}
 							break;
-							
+
 						default:
 							((JSNode) node).setDocumentation(block);
 							break;
@@ -263,7 +263,7 @@ public class JSParser extends Parser implements IParser {
 			}
 		}
 	}
-	
+
 	/**
 	 * buildVSDocXML
 	 *
@@ -274,20 +274,20 @@ public class JSParser extends Parser implements IParser {
 	{
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("<docs>\n");
-		
+
 		for (Symbol line : lines)
 		{
 			String text = (String) line.value;
-			
+
 			buffer.append(text.substring(3));
 			buffer.append("\n");
 		}
-		
+
 		buffer.append("</docs>");
-		
+
 		return buffer.toString();
 	}
-	
+
 	/**
 	 * getNextSymbolIndex
 	 * 
@@ -314,36 +314,36 @@ public class JSParser extends Parser implements IParser {
 	{
 		// grab source
 		char[] characters = parseState.getSource();
-		
+
 		// make sure we have some source
 		String source = (characters != null) ? new String(characters) : "";
-		
+
 		// send source to the scanner
 		fScanner.setSource(source);
-		
+
 		// parse
 		IParseNode result = (IParseNode) parse(fScanner);
-		
+
 		// store results in the parse state
 		parseState.setParseResult(result);
-		
+
 		// TODO: We probably don't need documentation nodes in all cases. For
 		// example, the outline view probably doesn't rely on them. We should
 		// include a flag (maybe in the parseState) that makes this step
 		// optional.
-		
+
 		// attach documentation
 		if (result instanceof JSParseRootNode)
 		{
 			JSParseRootNode root = (JSParseRootNode) result;
-			
+
 			attachPreDocumentationBlocks(root, source);
 			attachPostDocumentationBlocks(root, source);
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * parsePostDocumentationBlocks
 	 * 
@@ -353,29 +353,29 @@ public class JSParser extends Parser implements IParser {
 	{
 		VSDocReader parser = new VSDocReader();
 		List<DocumentationBlock> blocks = new ArrayList<DocumentationBlock>();
-		
+
 		for (Symbol doc : fScanner.getVSDocComments())
 		{
 			ByteArrayInputStream input = null;
-			
+
 			try
 			{
 				List<Symbol> lines = (List<Symbol>) doc.value;
 				String source = this.buildVSDocXML(lines);
-				
+
 				input = new ByteArrayInputStream(source.getBytes());
-				
+
 				parser.loadXML(input);
-				
+
 				DocumentationBlock result = parser.getBlock(); 
-				
+
 				if (result != null)
 				{
 					if (lines.size() > 0)
 					{
 						result.setRange(lines.get(0).getStart(), lines.get(lines.size() - 1).getEnd());
 					}
-					
+
 					blocks.add(result);
 				}
 			}
@@ -396,10 +396,10 @@ public class JSParser extends Parser implements IParser {
 				}
 			}
 		}
-		
+
 		return blocks;
 	}
-	
+
 	/**
 	 * parsePreDocumentationBlocks
 	 * 
@@ -409,13 +409,13 @@ public class JSParser extends Parser implements IParser {
 	{
 		SDocParser parser = new SDocParser();
 		List<DocumentationBlock> blocks = new ArrayList<DocumentationBlock>();
-		
+
 		for (Symbol doc : fScanner.getSDocComments())
 		{
 			try
 			{
 				Object result = parser.parse((String) doc.value, doc.getStart());
-				
+
 				if (result instanceof DocumentationBlock)
 				{
 					blocks.add((DocumentationBlock) result);
@@ -425,10 +425,10 @@ public class JSParser extends Parser implements IParser {
 			{
 			}
 		}
-		
+
 		return blocks;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see beaver.Parser#recoverFromError(beaver.Symbol, beaver.Parser.TokenStream)
@@ -467,29 +467,29 @@ public class JSParser extends Parser implements IParser {
 
 		fScanner = new JSScanner();
 		report = new JSEvents();
-		
+
 		recoveryStrategies = new IRecoveryStrategy[] {
 			new IRecoveryStrategy() {
 				public boolean recover(IParser parser, Symbol token, TokenStream in) throws IOException
 				{
 					boolean result = false;
-	
+
 					Symbol term = new Symbol(JSTokenType.SEMICOLON.getIndex(), token.getStart(), token.getStart() - 1, ";");
 					Simulator sim = new Simulator();
-	
+
 					in.alloc(2);
 					in.insert(term, token);
 					in.rewind();
-	
+
 					if (sim.parse(in))
 					{
 						result = true;
-	
+
 						in.rewind();
-	
+
 						report.missingTokenInserted(term);
 					}
-	
+
 					return result;
 				}
 			},
@@ -499,31 +499,31 @@ public class JSParser extends Parser implements IParser {
 					Symbol lastSymbol = getLastSymbol();
 					int type = lastSymbol.getId();
 					boolean result = false;
-	
+
 					if (type == JSTokenType.DOT.getIndex() || type == JSTokenType.NEW.getIndex())
 					{
 						Symbol term1 = new Symbol(JSTokenType.IDENTIFIER.getIndex(), token.getStart(), token.getStart() - 1, "");
 						Symbol term2 = new Symbol(JSTokenType.SEMICOLON.getIndex(), token.getStart(), token.getStart() - 1, ";");
-	
+
 						Simulator sim = new Simulator();
-	
+
 						in.alloc(3);
 						in.insert(token);
 						in.insert(term2);
 						in.insert(term1);
 						in.rewind();
-	
+
 						if (sim.parse(in))
 						{
 							result = true;
-							
+
 							in.rewind();
-							
+
 							report.missingTokenInserted(term1);
 							report.missingTokenInserted(term2);
 						}
 					}
-	
+
 					return result;
 				}
 			},
@@ -533,28 +533,28 @@ public class JSParser extends Parser implements IParser {
 					Symbol lastSymbol = getLastSymbol();
 					int type = lastSymbol.getId();
 					boolean result = false;
-					
+
 					if (type == JSTokenType.DOT.getIndex() || type == JSTokenType.NEW.getIndex())
 					{
 						Symbol term1 = new Symbol(JSTokenType.IDENTIFIER.getIndex(), token.getStart(), token.getStart() - 1, "");
-						
+
 						Simulator sim = new Simulator();
-						
+
 						in.alloc(2);
 						in.insert(token);
 						in.insert(term1);
 						in.rewind();
-						
+
 						if (sim.parse(in))
 						{
 							result = true;
-							
+
 							in.rewind();
-							
+
 							report.missingTokenInserted(term1);
 						}
 					}
-					
+
 					return result;
 				}
 			},
@@ -563,32 +563,32 @@ public class JSParser extends Parser implements IParser {
 				{
 					Symbol lastSymbol = getLastSymbol();
 					boolean result = false;
-					
+
 					if (top >= 2)
 					{
 						Symbol symbol1 = _symbols[top - 2];
 						Symbol symbol2 = _symbols[top - 1];
-						                          
+
 						if (lastSymbol.getId() == JSTokenType.COMMA.getIndex() && symbol2.value instanceof List<?> && symbol1.getId() == JSTokenType.LPAREN.getIndex())
 						{
 							Symbol term = new Symbol(JSTokenType.IDENTIFIER.getIndex(), token.getStart(), token.getStart() - 1, "");
 							Simulator sim = new Simulator();
-							
+
 							in.alloc(2);
 							in.insert(term, token);
 							in.rewind();
-			
+
 							if (sim.parse(in))
 							{
 								result = true;
-			
+
 								in.rewind();
-			
+
 								report.missingTokenInserted(term);
 							}
 						}
 					}
-					
+
 					return result;
 				}
 			}
