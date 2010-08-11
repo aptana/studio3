@@ -1,27 +1,21 @@
 package com.aptana.deploy.internal.wizard;
 
-import java.text.MessageFormat;
-
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.deploy.Activator;
-import com.aptana.deploy.internal.wizard.FTPDeployComposite.Direction;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.SiteConnectionUtils;
-import com.aptana.ide.syncing.ui.SyncingUIPlugin;
-import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants;
+import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants.SyncDirection;
+import com.aptana.ide.syncing.ui.preferences.SyncPreferenceUtil;
 import com.aptana.ide.ui.ftp.internal.FTPConnectionPropertyComposite;
 
 @SuppressWarnings("restriction")
@@ -65,7 +59,7 @@ public class FTPDeployWizardPage extends WizardPage implements FTPConnectionProp
 		return ftpConnectionComposite.isAutoSyncSelected();
 	}
 
-	public Direction getSyncDirection()
+	public SyncDirection getSyncDirection()
 	{
 		return ftpConnectionComposite.getSyncDirection();
 	}
@@ -74,15 +68,11 @@ public class FTPDeployWizardPage extends WizardPage implements FTPConnectionProp
 	{
 		boolean complete = ftpConnectionComposite.completeConnection();
 		// persists the auto-sync setting
-		IEclipsePreferences prefs = (new InstanceScope()).getNode(SyncingUIPlugin.PLUGIN_ID);
-		prefs.putBoolean(
-				MessageFormat.format("{0}:{1}", IPreferenceConstants.AUTO_SYNC, project.getName()), isAutoSyncSelected()); //$NON-NLS-1$
-		try
+		boolean autoSync = isAutoSyncSelected();
+		SyncPreferenceUtil.setAutoSync(project, autoSync);
+		if (autoSync)
 		{
-			prefs.flush();
-		}
-		catch (BackingStoreException e)
-		{
+			SyncPreferenceUtil.setAutoSyncDirection(project, getSyncDirection());
 		}
 
 		return complete;

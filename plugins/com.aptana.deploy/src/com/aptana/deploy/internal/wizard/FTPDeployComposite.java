@@ -9,16 +9,12 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
+import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants.SyncDirection;
 import com.aptana.ide.ui.secureftp.internal.CommonFTPConnectionPropertyComposite;
 
 @SuppressWarnings("restriction")
 public class FTPDeployComposite extends CommonFTPConnectionPropertyComposite implements SelectionListener
 {
-
-	public static enum Direction
-	{
-		UPLOAD, DOWNLOAD, BOTH
-	}
 
 	private Button autoSyncCheckbox;
 	private Button uploadButton;
@@ -37,17 +33,17 @@ public class FTPDeployComposite extends CommonFTPConnectionPropertyComposite imp
 		return autoSyncCheckbox.getSelection();
 	}
 
-	public Direction getSyncDirection()
+	public SyncDirection getSyncDirection()
 	{
 		if (uploadButton.getSelection())
 		{
-			return Direction.UPLOAD;
+			return SyncDirection.UPLOAD;
 		}
 		if (downloadButton.getSelection())
 		{
-			return Direction.DOWNLOAD;
+			return SyncDirection.DOWNLOAD;
 		}
-		return Direction.BOTH;
+		return SyncDirection.BOTH;
 	}
 
 	private void createAutoSyncOptions(Composite parent)
