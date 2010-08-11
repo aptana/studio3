@@ -58,8 +58,7 @@ import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
-import com.aptana.theme.IThemeManager;
-import com.aptana.theme.ThemePlugin;
+import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 
 /**
  * @author Max Stepanov
@@ -270,38 +269,38 @@ public class DiffSourceConfiguration implements IPartitioningConfiguration, ISou
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
 	{
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getOneTokenScanner(SOURCE_DIFF));
+		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getOneTokenScanner(SOURCE_DIFF));
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
-		dr = new DefaultDamagerRepairer(getOneTokenScanner(MARKUP_INSERTED_DIFF));
+		dr = new ThemeingDamagerRepairer(getOneTokenScanner(MARKUP_INSERTED_DIFF));
 		reconciler.setDamager(dr, INSERTED);
 		reconciler.setRepairer(dr, INSERTED);
 
-		dr = new DefaultDamagerRepairer(getOneTokenScanner(MARKUP_CHANGED_DIFF));
+		dr = new ThemeingDamagerRepairer(getOneTokenScanner(MARKUP_CHANGED_DIFF));
 		reconciler.setDamager(dr, CHANGED);
 		reconciler.setRepairer(dr, CHANGED);
 
-		dr = new DefaultDamagerRepairer(getOneTokenScanner(MARKUP_DELETED_DIFF));
+		dr = new ThemeingDamagerRepairer(getOneTokenScanner(MARKUP_DELETED_DIFF));
 		reconciler.setDamager(dr, DELETED);
 		reconciler.setRepairer(dr, DELETED);
 
-		dr = new DefaultDamagerRepairer(getOneTokenScanner(META_DIFF_HEADER));
+		dr = new ThemeingDamagerRepairer(getOneTokenScanner(META_DIFF_HEADER));
 		reconciler.setDamager(dr, HEADER);
 		reconciler.setRepairer(dr, HEADER);
 
-		dr = new DefaultDamagerRepairer(getOneTokenScanner(META_DIFF_INDEX));
+		dr = new ThemeingDamagerRepairer(getOneTokenScanner(META_DIFF_INDEX));
 		reconciler.setDamager(dr, INDEX);
 		reconciler.setRepairer(dr, INDEX);
 
-		dr = new DefaultDamagerRepairer(getOneTokenScanner(META_DIFF_RANGE));
+		dr = new ThemeingDamagerRepairer(getOneTokenScanner(META_DIFF_RANGE));
 		reconciler.setDamager(dr, RANGE);
 		reconciler.setRepairer(dr, RANGE);
 
-		dr = new DefaultDamagerRepairer(getOneTokenScanner(META_SEPARATOR_DIFF));
+		dr = new ThemeingDamagerRepairer(getOneTokenScanner(META_SEPARATOR_DIFF));
 		reconciler.setDamager(dr, SEPARATOR);
 		reconciler.setRepairer(dr, SEPARATOR);
 	}
@@ -316,11 +315,6 @@ public class DiffSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	protected IToken getToken(String name)
 	{
-		return getThemeManager().getToken(name);
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return ThemePlugin.getDefault().getThemeManager();
+		return new Token(name);
 	}
 }

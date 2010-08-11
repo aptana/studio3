@@ -50,8 +50,6 @@ import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.common.text.rules.WordDetector;
 import com.aptana.editor.js.parsing.lexer.JSScopeType;
-import com.aptana.theme.IThemeManager;
-import com.aptana.theme.ThemePlugin;
 
 /**
  * @author Kevin Lindsey
@@ -304,12 +302,7 @@ public class JSCodeScanner extends RuleBasedScanner
 
 	protected IToken createToken(String string)
 	{
-		return getThemeManager().getToken(string);
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return ThemePlugin.getDefault().getThemeManager();
+		return new Token(string);
 	}
 
 	protected void addWordRules(WordRule wordRule, IToken keywordOperators, String... words)

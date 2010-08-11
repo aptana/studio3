@@ -175,12 +175,17 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 */
 	private Collection<? extends ICompletionProposal> addSnippetProposals(ITextViewer viewer, int offset)
 	{
-		ICompletionProposal[] snippets = new SnippetsCompletionProcessor().computeCompletionProposals(viewer, offset);
-		if (snippets == null)
+		if (viewer != null && viewer.getSelectionProvider() != null)
 		{
-			return Collections.emptyList();
+			ICompletionProposal[] snippets = new SnippetsCompletionProcessor().computeCompletionProposals(viewer,
+					offset);
+			if (snippets == null)
+			{
+				return Collections.emptyList();
+			}
+			return Arrays.asList(snippets);
 		}
-		return Arrays.asList(snippets);
+		return Collections.emptyList();
 	}
 
 	/**

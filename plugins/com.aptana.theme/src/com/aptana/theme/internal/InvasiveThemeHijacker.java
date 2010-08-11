@@ -76,6 +76,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 {
 
 	private ISelectionChangedListener pageListener;
+	private static boolean ranEarlyStartup = false;
 
 	public InvasiveThemeHijacker()
 	{
@@ -911,16 +912,20 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 	 * Schedules itself to override Java/PDE views and editors' coloring only if invasive themes are enabled.
 	 */
 	@Override
-	public void earlyStartup()
+	public synchronized void earlyStartup()
 	{
+		if (ranEarlyStartup)
+			return;
+		ranEarlyStartup = true;
 		if (invasiveThemesEnabled())
 		{
-			schedule(); // TODO Don't schedule here, grab singleton from ThemePlugin and schedule that!
+			schedule();
 		}
 	}
 
 	public void apply()
 	{
+		earlyStartup();
 		IEclipsePreferences prefs = new InstanceScope().getNode(ThemePlugin.PLUGIN_ID);
 		prefs.addPreferenceChangeListener(this);
 	}

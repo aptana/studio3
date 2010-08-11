@@ -29,7 +29,7 @@ import com.aptana.theme.ThemePlugin;
  */
 public class CSSCodeScanner extends BufferedRuleBasedScanner
 {
-	
+
 	private static final String KEYWORD_IMPORT = "@import"; //$NON-NLS-1$
 	private static final String KEYWORD_PAGE = "@page"; //$NON-NLS-1$
 	private static final String KEYWORD_MEDIA = "@media"; //$NON-NLS-1$
@@ -67,14 +67,18 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 
 	@SuppressWarnings("nls")
 	private static final String[] HTML_TAGS = { "a", "abbr", "acronym", "address", "area", "b", "base", "big",
-			"blockquote", "body", "br", "button", "caption", "cite", "code", "col", "colgroup", "dd", "del", "dfn",
+			"blockquote", "body", "br", "button", "caption", "cite", "code", "col",
+			"colgroup",
+			"dd",
+			"del",
+			"dfn",
 			// FIXME Turn "em" back on when we can add hack to determine if we're inside or outside a rule
-			"div", "dl", "dt", /*"em",*/ "embed", "fieldset", "form", "frame", "frameset", "head", "hr", "html", "h1",
-			"h2", "h3", "h4", "h5", "h6", "i", "iframe", "img", "input", "ins", "kbd", "label", "legend", "li", "link",
-			"map", "meta", "noframes", "noscript", "object", "ol", "optgroup", "option", "p", "param", "pre", "q",
-			"samp", "script", "select", "small", "span", "strike", "strong", "style", "sub", "sup", "table", "tbody",
-			"td", "textarea", "tfoot", "th", "thead", "title", "tr", "tt", "ul", "var", "header", "nav", "section",
-			"article", "footer", "aside", "audio", "video", "canvas", "hgroup" };
+			"div", "dl", "dt", /* "em", */"embed", "fieldset", "form", "frame", "frameset", "head", "hr", "html",
+			"h1", "h2", "h3", "h4", "h5", "h6", "i", "iframe", "img", "input", "ins", "kbd", "label", "legend", "li",
+			"link", "map", "meta", "noframes", "noscript", "object", "ol", "optgroup", "option", "p", "param", "pre",
+			"q", "samp", "script", "select", "small", "span", "strike", "strong", "style", "sub", "sup", "table",
+			"tbody", "td", "textarea", "tfoot", "th", "thead", "title", "tr", "tt", "ul", "var", "header", "nav",
+			"section", "article", "footer", "aside", "audio", "video", "canvas", "hgroup" };
 
 	@SuppressWarnings("nls")
 	private static final String[] FUNCTIONS = { "rgb", "url", "attr", "counters", "counter" };
@@ -156,10 +160,10 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		addWordsToRule(wordRule, STANDARD_COLORS, CSSTokenType.COLOR);
 		addWordsToRule(wordRule, DEPRECATED_COLORS, CSSTokenType.DEPRECATED_COLOR);
 		rules.add(wordRule);
-		
+
 		// classes
 		rules.add(new WordRule(new IdentifierWithPrefixDetector('.'), createToken(CSSTokenType.CLASS)));
-		
+
 		// keywords that start with @
 		wordRule = new WordRule(new AtWordDetector(), createToken(CSSTokenType.AT_RULE));
 		wordRule.addWord(KEYWORD_CHARSET, createToken(CSSTokenType.CHARSET));
@@ -167,10 +171,10 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		wordRule.addWord(KEYWORD_MEDIA, createToken(CSSTokenType.MEDIA_KEYWORD));
 		wordRule.addWord(KEYWORD_PAGE, createToken(CSSTokenType.PAGE));
 		rules.add(wordRule);
-		
+
 		// !important
 		WordRule importantRule = new WordRule(new IdentifierWithPrefixDetector('!'), Token.UNDEFINED);
-		importantRule.addWord("!important", createToken(CSSTokenType.IMPORTANT));
+		importantRule.addWord("!important", createToken(CSSTokenType.IMPORTANT)); //$NON-NLS-1$
 		rules.add(importantRule);
 
 		// ignore case for font names
@@ -186,33 +190,36 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		wordRule.addWord(WORD_INCLUDES, createToken(CSSTokenType.INCLUDES));
 		wordRule.addWord(WORD_DASHMATCH, createToken(CSSTokenType.DASHMATCH));
 		rules.add(wordRule);
-		
+
 		rules.addAll(createPunctuationRules());
-		
+
 		// rgb values
 		rules.add(createRGBRule());
-		
+
 		// ids
 		rules.add(new WordRule(new IdentifierWithPrefixDetector('#'), createToken(CSSTokenType.ID)));
-		
+
 		rules.addAll(createScannerSpecificRules());
-		
+
 		rules.add(createNumberRule());
 
 		// identifiers
-		rules.add(new ExtendedWordRule(new KeywordIdentifierDetector(), createToken(CSSTokenType.IDENTIFIER), false){
-			
+		rules.add(new ExtendedWordRule(new KeywordIdentifierDetector(), createToken(CSSTokenType.IDENTIFIER), false)
+		{
+
 			@Override
 			protected boolean wordOK(String word, ICharacterScanner scanner)
 			{
 				if (word.charAt(0) == '-')
+				{
 					return word.length() > 1;
+				}
 				return true;
 			}
 		});
-		
+
 		rules.add(new SingleCharacterRule('-', createToken(CSSTokenType.MINUS)));
-		
+
 		return rules;
 	}
 
@@ -241,9 +248,11 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		};
 	}
 
-	private ExtendedWordRule createRGBRule() {
-		return new ExtendedWordRule(new IdentifierWithPrefixDetector('#'), createToken(CSSTokenType.RGB), false) {
-			
+	private ExtendedWordRule createRGBRule()
+	{
+		return new ExtendedWordRule(new IdentifierWithPrefixDetector('#'), createToken(CSSTokenType.RGB), false)
+		{
+
 			@Override
 			protected boolean wordOK(String word, ICharacterScanner scanner)
 			{
@@ -256,16 +265,20 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 				{
 					char c = word.charAt(i);
 					if (Character.isDigit(c))
+					{
 						continue;
-					if (c == 'a' || c =='b' || c == 'c' || c == 'd' || c == 'e' || c == 'f')
+					}
+					if ('a' <= c && c <= 'f') // a-f
+					{
 						continue;
+					}
 					return false;
 				}
 				return true;
 			}
 		};
 	}
-	
+
 	@SuppressWarnings("nls")
 	protected Collection<? extends IRule> createScannerSpecificRules()
 	{
@@ -289,22 +302,21 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		wordRule.addWord("Hz", createToken(CSSTokenType.FREQUENCY));
 		wordRule.addWord("kHz", createToken(CSSTokenType.FREQUENCY));
 		addWordsToRule(wordRule, FUNCTIONS, CSSTokenType.FUNCTION);
-		rules.add(wordRule);		
+		rules.add(wordRule);
 		return rules;
 	}
 
 	protected IRule createNumberRule()
 	{
-//		rules.add(new RegexpRule("(\\-|\\+)?\\s*[0-9]+(\\.[0-9]+)?", createToken(CSSTokenType.NUMBER))); //$NON-NLS-1$
 		return new ExtendedWordRule(new IWordDetector()
 		{
-			
+
 			@Override
 			public boolean isWordStart(char c)
 			{
 				return c == '-' || c == '+' || c == '.' || Character.isDigit(c);
 			}
-			
+
 			@Override
 			public boolean isWordPart(char c)
 			{
@@ -312,11 +324,11 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			}
 		}, createToken(CSSTokenType.NUMBER), false)
 		{
-			
+
 			@Override
 			protected boolean wordOK(String word, ICharacterScanner scanner)
 			{
-				return word.matches("(\\-|\\+)?\\s*[0-9]+(\\.[0-9]+)?");
+				return word.matches("(-|\\+)?\\s*[0-9]+(\\.[0-9]+)?"); //$NON-NLS-1$
 			}
 		};
 	}
@@ -381,10 +393,10 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 	{
 		return createToken(type.getScope());
 	}
-	
+
 	protected IToken createToken(String scope)
 	{
-		return getThemeManager().getToken(scope);
+		return new Token(scope);
 	}
 
 	/**
