@@ -81,6 +81,33 @@ public class SDocTokenScanner extends RuleBasedScanner
 		}
 	}
 
+	static class TextDetector implements IWordDetector
+	{
+		public boolean isWordPart(char c)
+		{
+			// [^ \t{\[\]#]
+			boolean result = true;
+			
+			switch (c)
+			{
+				case ' ':
+				case '\t':
+				case '{':
+				case '[':
+				case ']':
+				case '#':
+					result = false;
+			}
+			
+			return result;
+		}
+
+		public boolean isWordStart(char c)
+		{
+			return this.isWordPart(c);
+		}
+	}
+	
 	/**
 	 * SDocTokenScanner
 	 */
@@ -126,7 +153,7 @@ public class SDocTokenScanner extends RuleBasedScanner
 		tagRules.addWord("@type", getToken(SDocTokenType.TYPE));
 		rules.add(tagRules);
 
-		rules.add(new RegexpRule("[^ \\t{\\[\\]#]+", getToken(SDocTokenType.TEXT), true));
+		rules.add(new WordRule(new TextDetector(), getToken(SDocTokenType.TEXT)));
 
 		this.setDefaultReturnToken(getToken(SDocTokenType.ERROR));
 		this.setRules(rules.toArray(new IRule[rules.size()]));
