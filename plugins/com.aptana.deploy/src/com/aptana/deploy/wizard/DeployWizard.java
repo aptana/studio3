@@ -46,9 +46,9 @@ import com.aptana.core.util.IOUtil;
 import com.aptana.deploy.Activator;
 import com.aptana.deploy.internal.wizard.CapifyProjectPage;
 import com.aptana.deploy.internal.wizard.DeployWizardPage;
-import com.aptana.deploy.internal.wizard.FTPDeployComposite.Direction;
 import com.aptana.deploy.internal.wizard.EngineYardDeployWizardPage;
 import com.aptana.deploy.internal.wizard.EngineYardSignupPage;
+import com.aptana.deploy.internal.wizard.FTPDeployComposite.Direction;
 import com.aptana.deploy.internal.wizard.FTPDeployWizardPage;
 import com.aptana.deploy.internal.wizard.HerokuDeployWizardPage;
 import com.aptana.deploy.internal.wizard.HerokuSignupPage;
@@ -58,7 +58,7 @@ import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
-import com.aptana.ide.core.io.ConnectionPointUtils;
+import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.SiteConnectionUtils;
@@ -67,6 +67,7 @@ import com.aptana.ide.syncing.ui.actions.BaseSyncAction;
 import com.aptana.ide.syncing.ui.actions.DownloadAction;
 import com.aptana.ide.syncing.ui.actions.SynchronizeProjectAction;
 import com.aptana.ide.syncing.ui.actions.UploadAction;
+import com.aptana.ide.syncing.ui.internal.SyncUtils;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleEntry;
 import com.aptana.scripting.model.BundleManager;
@@ -159,7 +160,7 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		{
 			return null;
 		}
-		final IConnectionPoint connectionPoint = page.getConnectionPoint();
+		final IConnectionPoint destinationConnectionPoint = page.getConnectionPoint();
 		final boolean isAutoSyncSelected = page.isAutoSyncSelected();
 		final Direction direction = page.getSyncDirection();
 		final IWorkbenchPart activePart = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
@@ -175,13 +176,15 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 				try
 				{
 					ISiteConnection site = null;
-					ISiteConnection[] sites = SiteConnectionUtils.findSites(project, connectionPoint);
+					ISiteConnection[] sites = SiteConnectionUtils.findSites(project, destinationConnectionPoint);
 					if (sites.length == 0)
 					{
 						// creates the site to link the project with the FTP connection
+						IConnectionPoint sourceConnectionPoint = SyncUtils.findOrCreateConnectionPointFor(project);
+						CoreIOPlugin.getConnectionPointManager().addConnectionPoint(sourceConnectionPoint);
 						site = SiteConnectionUtils.createSite(MessageFormat.format("{0} <-> {1}", project.getName(), //$NON-NLS-1$
-								connectionPoint.getName()),
-								ConnectionPointUtils.createWorkspaceConnectionPoint(project), connectionPoint);
+								destinationConnectionPoint.getName()),
+								sourceConnectionPoint, destinationConnectionPoint);
 						SyncingPlugin.getSiteConnectionManager().addSiteConnection(site);
 					}
 					else if (sites.length == 1)

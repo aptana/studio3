@@ -127,7 +127,10 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 				for (IMemento child : memento.getChildren(ELEMENT_CONNECTION)) {
 					ConnectionPoint connectionPoint = restoreConnectionPoint(child, null);
 					if (connectionPoint != null) {
-						connections.add(connectionPoint);
+						// avoids adding duplicate connections
+						if (!connections.contains(connectionPoint)) {
+							connections.add(connectionPoint);
+						}
 					} else {
 						unresolvedConnections.add(child);
 					}
