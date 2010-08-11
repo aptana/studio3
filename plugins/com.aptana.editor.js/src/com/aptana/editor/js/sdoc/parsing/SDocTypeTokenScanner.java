@@ -127,7 +127,7 @@ public class SDocTypeTokenScanner extends RuleBasedScanner
 		cmRule.add(',', getToken(SDocTokenType.COMMA));
 		cmRule.add('|', getToken(SDocTokenType.PIPE));
 		cmRule.add('\r', getToken(SDocTokenType.WHITESPACE));
-		cmRule.add('\r', getToken(SDocTokenType.WHITESPACE));
+		cmRule.add('\n', getToken(SDocTokenType.WHITESPACE));
 		rules.add(cmRule);
 		
 		WordRule keywordRules = new WordRule(new IdentifierDetector(), getToken(SDocTokenType.IDENTIFIER));
