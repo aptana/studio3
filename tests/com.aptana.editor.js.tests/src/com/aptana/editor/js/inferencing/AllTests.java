@@ -11,6 +11,7 @@ public class AllTests
 		// $JUnit-BEGIN$
 		suite.addTestSuite(ConstructorInferencingTests.class);
 		suite.addTestSuite(DocumentationTests.class);
+		suite.addTestSuite(FunctionInferencingTests.class);
 		suite.addTestSuite(ObjectInferencingTests.class);
 		suite.addTestSuite(OperatorInferencingTests.class);
 		suite.addTestSuite(PrimitiveInferencingTests.class);
