@@ -26,6 +26,7 @@ public class FTPDeployComposite extends CommonFTPConnectionPropertyComposite imp
 		super(parent, style, connectionPoint, listener);
 
 		createAutoSyncOptions(this);
+		optionsExpandable.setExpanded(true);
 	}
 
 	public boolean isAutoSyncSelected()
