@@ -98,24 +98,24 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener
 			TextAttribute at = getCurrentTheme().getTextAttribute(commonPrefix);
 			event.lineBackground = at.getBackground();
 			// When we do this, we need to explicitly set the bg color for ranges with no bg color!
-			StyleRange[] ranges = textWidget.getStyleRanges(offset, lineRegion.getLength(), true);
-			if (ranges != null && ranges.length > 0)
-			{
-				Color themeBG = null;
-				for (StyleRange range : ranges)
-				{
-					// FIXME This is rather hacky. We still don't play nice 100% of the time...
-					if (range.background == null)
-					{
-						if (themeBG == null)
-						{
-							themeBG = getThemeBG();
-						}
-						range.background = themeBG;
-						textWidget.setStyleRange(range);
-					}
-				}
-			}
+//			StyleRange[] ranges = textWidget.getStyleRanges(offset, lineRegion.getLength(), true);
+//			if (ranges != null && ranges.length > 0)
+//			{
+//				Color themeBG = null;
+//				for (StyleRange range : ranges)
+//				{
+//					// FIXME This is rather hacky. We still don't play nice 100% of the time...
+//					if (range.background == null)
+//					{
+//						if (themeBG == null)
+//						{
+//							themeBG = getThemeBG();
+//						}
+//						range.background = themeBG;
+//						textWidget.setStyleRange(range);
+//					}
+//				}
+//			}
 		}
 		catch (BadLocationException e)
 		{
