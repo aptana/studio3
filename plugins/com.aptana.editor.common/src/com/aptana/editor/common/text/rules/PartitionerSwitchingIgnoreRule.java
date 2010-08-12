@@ -39,17 +39,15 @@ public class PartitionerSwitchingIgnoreRule implements IPredicateRule
 		{
 			// when checking for the rule, do not search for potential sequence
 			SequenceCharacterScanner seqScanner = (SequenceCharacterScanner) scanner;
-			IToken token = null;
 			try
 			{
 				seqScanner.setSequenceIgnored(true);
-				token = rule.evaluate(scanner, resume);
+				return rule.evaluate(scanner, resume);
 			}
 			finally
 			{
 				seqScanner.setSequenceIgnored(false);
 			}
-			return token;
 		}
 		return rule.evaluate(scanner, resume);
 	}
@@ -75,17 +73,15 @@ public class PartitionerSwitchingIgnoreRule implements IPredicateRule
 		{
 			// when checking for the rule, do not search for potential sequence
 			SequenceCharacterScanner seqScanner = (SequenceCharacterScanner) scanner;
-			IToken token = null;
 			try
 			{
 				seqScanner.setSequenceIgnored(true);
-				token = rule.evaluate(scanner);
+				return rule.evaluate(scanner);
 			}
 			finally
 			{
 				seqScanner.setSequenceIgnored(false);
 			}
-			return token;
 		}
 		return rule.evaluate(scanner);
 	}
