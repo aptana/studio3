@@ -56,7 +56,7 @@ import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
-import com.aptana.editor.js.parsing.JSRegExpRule;
+import com.aptana.editor.js.text.rules.JSRegExpRule;
 
 /**
  * @author Max Stepanov
@@ -89,9 +89,9 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 
 	private JSCodeScanner codeScanner;
 	private JSDocScanner docScanner;
-	private JSSingleQuotedStringScanner singleQuoteScanner;
-	private JSDoubleQuotedStringScanner doubleQuoteScanner;
-	private JSRegexpScanner regexpScanner;
+	private JSEscapeSequenceScanner singleQuoteScanner;
+	private JSEscapeSequenceScanner doubleQuoteScanner;
+	private JSEscapeSequenceScanner regexpScanner;
 	private RuleBasedScanner multiLineCommentScanner;
 	private RuleBasedScanner singleLineCommentScanner;
 
@@ -232,7 +232,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	{
 		if (regexpScanner == null)
 		{
-			regexpScanner = new JSRegexpScanner();
+			regexpScanner = new JSEscapeSequenceScanner("string.regexp.js");
 		}
 		return regexpScanner;
 	}
@@ -241,7 +241,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	{
 		if (doubleQuoteScanner == null)
 		{
-			doubleQuoteScanner = new JSDoubleQuotedStringScanner();
+			doubleQuoteScanner = new JSEscapeSequenceScanner("string.quoted.double.js");
 		}
 		return doubleQuoteScanner;
 	}
@@ -250,7 +250,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	{
 		if (singleQuoteScanner == null)
 		{
-			singleQuoteScanner = new JSSingleQuotedStringScanner();
+			singleQuoteScanner = new JSEscapeSequenceScanner("string.quoted.single.js");
 		}
 		return singleQuoteScanner;
 	}
