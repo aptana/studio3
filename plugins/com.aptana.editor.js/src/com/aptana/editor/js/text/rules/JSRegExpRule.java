@@ -1,4 +1,4 @@
-package com.aptana.editor.js.parsing;
+package com.aptana.editor.js.text.rules;
 
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IPredicateRule;

@@ -1,4 +1,4 @@
-package com.aptana.editor.js.sdoc.parsing;
+package com.aptana.editor.js.text.rules;
 
 import java.util.HashMap;
 import java.util.Map;
