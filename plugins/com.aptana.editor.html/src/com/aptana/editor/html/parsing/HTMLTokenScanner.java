@@ -11,10 +11,10 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
+import com.aptana.editor.common.text.rules.PartitionerSwitchingIgnoreRule;
 import com.aptana.editor.common.text.rules.TagRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.common.text.rules.WordDetector;
-import com.aptana.editor.html.HTMLCommentRule;
 import com.aptana.editor.html.parsing.lexer.HTMLTokens;
 
 public class HTMLTokenScanner extends RuleBasedScanner
@@ -26,7 +26,8 @@ public class HTMLTokenScanner extends RuleBasedScanner
 		// generic whitespace rule
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 		// comments
-		rules.add(new HTMLCommentRule(createToken(getTokenName(HTMLTokens.COMMENT))));
+		rules.add(new PartitionerSwitchingIgnoreRule(new MultiLineRule(
+				"<!--", "-->", createToken(getTokenName(HTMLTokens.COMMENT)), (char) 0, true))); //$NON-NLS-1$ //$NON-NLS-2$
 		// DOCTYPE
 		rules.add(new MultiLineRule("<!DOCTYPE ", ">", createToken(getTokenName(HTMLTokens.DOCTYPE)))); //$NON-NLS-1$ //$NON-NLS-2$
 		// CDATA
