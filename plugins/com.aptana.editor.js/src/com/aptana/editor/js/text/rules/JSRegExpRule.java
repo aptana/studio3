@@ -40,7 +40,7 @@ public class JSRegExpRule implements IPredicateRule
 				return Token.UNDEFINED;
 			}
 		}
-		
+
 		State state = State.ERROR;
 		int c = scanner.read();
 		int unreadCount = 0;

@@ -37,37 +37,37 @@ import org.eclipse.jface.text.rules.IWordDetector;
 class JSEscapeSequenceDetector implements IWordDetector
 {
 	private static final Set<Character> CHARS;
-	
+
 	/**
 	 * static initializer
 	 */
 	static
 	{
 		CHARS = new HashSet<Character>();
-		
-		// type specificer
+
+		// type specifier
 		CHARS.add('x');
 		CHARS.add('u');
-		
+
 		// digits
 		for (char c = '0'; c <= '9'; c++)
 		{
 			CHARS.add(c);
 		}
-		
+
 		// uppercase hex
 		for (char c = 'A'; c <= 'F'; c++)
 		{
 			CHARS.add(c);
 		}
-		
+
 		// lowercase hex
 		for (char c = 'a'; c <= 'f'; c++)
 		{
 			CHARS.add(c);
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.rules.IWordDetector#isWordStart(char)
