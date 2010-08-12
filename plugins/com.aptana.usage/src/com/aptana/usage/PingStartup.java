@@ -148,6 +148,17 @@ public class PingStartup implements IStartup
 		if (sendUpdate(queryString))
 		{
 			EventLogger.getInstance().clearEvents();
+			// stores the has_run flag only when the ping is successfully sent
+			IEclipsePreferences prefs = (new ConfigurationScope()).getNode(UsagePlugin.PLUGIN_ID);
+			prefs.putBoolean(IPreferenceConstants.P_IDE_HAS_RUN, true);
+			try
+			{
+				prefs.flush();
+			}
+			catch (BackingStoreException e)
+			{
+				// ignores
+			}
 		}
 		else
 		{
@@ -161,14 +172,12 @@ public class PingStartup implements IStartup
 	{
 		String id = Platform.getPreferencesService().getString(UsagePlugin.PLUGIN_ID, IPreferenceConstants.P_IDE_ID,
 				null, null);
-
 		if (id == null)
 		{
 			id = UUID.randomUUID().toString();
 			// saves the id in configuration scope so it's shared by all workspaces
 			IEclipsePreferences prefs = (new ConfigurationScope()).getNode(UsagePlugin.PLUGIN_ID);
 			prefs.put(IPreferenceConstants.P_IDE_ID, id);
-			prefs.putBoolean(IPreferenceConstants.P_IDE_HAS_RUN, true);
 			try
 			{
 				prefs.flush();

@@ -48,7 +48,6 @@ import com.aptana.deploy.internal.wizard.CapifyProjectPage;
 import com.aptana.deploy.internal.wizard.DeployWizardPage;
 import com.aptana.deploy.internal.wizard.EngineYardDeployWizardPage;
 import com.aptana.deploy.internal.wizard.EngineYardSignupPage;
-import com.aptana.deploy.internal.wizard.FTPDeployComposite.Direction;
 import com.aptana.deploy.internal.wizard.FTPDeployWizardPage;
 import com.aptana.deploy.internal.wizard.HerokuDeployWizardPage;
 import com.aptana.deploy.internal.wizard.HerokuSignupPage;
@@ -68,6 +67,7 @@ import com.aptana.ide.syncing.ui.actions.DownloadAction;
 import com.aptana.ide.syncing.ui.actions.SynchronizeProjectAction;
 import com.aptana.ide.syncing.ui.actions.UploadAction;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
+import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants.SyncDirection;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleEntry;
 import com.aptana.scripting.model.BundleManager;
@@ -162,7 +162,7 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		}
 		final IConnectionPoint destinationConnectionPoint = page.getConnectionPoint();
 		final boolean isAutoSyncSelected = page.isAutoSyncSelected();
-		final Direction direction = page.getSyncDirection();
+		final SyncDirection direction = page.getSyncDirection();
 		final IWorkbenchPart activePart = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
 				.getActivePart();
 

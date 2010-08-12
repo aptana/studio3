@@ -180,4 +180,11 @@ public interface IPreferenceConstants {
 	 * Pref key for uploading the editor on save
 	 */
 	public static final String AUTO_SYNC = "AutoSyncChangesWithRemote"; //$NON-NLS-1$
+
+	public enum SyncDirection
+	{
+		UPLOAD, DOWNLOAD, BOTH
+	};
+
+	public static final String AUTO_SYNC_DIRECTION = "AutoSyncDirection"; //$NON-NLS-1$
 }
