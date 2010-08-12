@@ -38,7 +38,7 @@ public interface IThemeManager
 
 	public Theme getTheme(String name);
 
-	public IToken getToken(String name);
+	public IToken getToken(String scope);
 
 	/**
 	 * Used to validate that theme name is ok to use.

@@ -498,7 +498,8 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 			{
 				addHerokuMenuCommands(menuManager);
 			}
-			else if (type == DeployType.FTP)
+			//Still need to call isFTPProject to populate siteConnections variable
+			else if ((type == DeployType.FTP) && isFTPProject())
 			{
 				addFTPMenuCommands(menuManager);
 			}

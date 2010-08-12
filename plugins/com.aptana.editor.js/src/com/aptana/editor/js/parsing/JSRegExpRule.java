@@ -5,27 +5,27 @@ import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 
+import com.aptana.editor.js.IJSTokenScanner;
+
 public class JSRegExpRule implements IPredicateRule
 {
 	private enum State
 	{
-		ERROR,
-		NORMAL,
-		ESCAPE_SEQUENCE,
-		OPTIONS;
+		ERROR, NORMAL, ESCAPE_SEQUENCE, OPTIONS;
 	}
-	
+
 	IToken token;
-	
+
 	/**
 	 * JSRegExpRule
+	 * 
 	 * @param token
 	 */
 	public JSRegExpRule(IToken token)
 	{
 		this.token = token;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.rules.IRule#evaluate(org.eclipse.jface.text.rules.ICharacterScanner)
@@ -33,6 +33,14 @@ public class JSRegExpRule implements IPredicateRule
 	@Override
 	public IToken evaluate(ICharacterScanner scanner)
 	{
+		if (scanner instanceof IJSTokenScanner)
+		{
+			if (((IJSTokenScanner) scanner).hasDivisionStart())
+			{
+				return Token.UNDEFINED;
+			}
+		}
+		
 		State state = State.ERROR;
 		int c = scanner.read();
 		int unreadCount = 0;

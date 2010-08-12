@@ -494,11 +494,24 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		JSGetPropertyNode propertyNode = null;
 
-		if (this._targetNode != null && this._targetNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
+		if (this._targetNode != null)
 		{
-			propertyNode = (JSGetPropertyNode) this._targetNode;
+			if (this._targetNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
+			{
+				propertyNode = (JSGetPropertyNode) this._targetNode;
+			}
+			else
+			{
+				IParseNode parentNode = this._targetNode.getParent();
+
+				if (parentNode != null && parentNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
+				{
+					propertyNode = (JSGetPropertyNode) parentNode;
+				}
+			}
 		}
-		else if (this._statementNode != null)
+
+		if (propertyNode == null && this._statementNode != null)
 		{
 			if (this._statementNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
 			{
@@ -514,6 +527,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				}
 			}
 		}
+
 		return propertyNode;
 	}
 
@@ -559,7 +573,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		LocationType result = LocationType.UNKNOWN;
 
 		// set up references to AST nodes around the current offset
-		this._targetNode = this.getActiveASTNode(offset);
+		this._targetNode = this.getActiveASTNode(offset - 1);
 		this._statementNode = null;
 		IParseNode ast = null;
 

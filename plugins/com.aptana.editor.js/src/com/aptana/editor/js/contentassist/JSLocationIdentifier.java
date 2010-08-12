@@ -282,7 +282,7 @@ public class JSLocationIdentifier extends JSTreeWalker
 	@Override
 	public void visit(JSConstructNode node)
 	{
-		if (node.contains(this._offset) && this._offset != node.getEnd())
+		if (node.contains(this._offset))
 		{
 			IParseNode identifier = node.getExpression();
 			IParseNode arguments = node.getArguments();
@@ -307,7 +307,7 @@ public class JSLocationIdentifier extends JSTreeWalker
 			{
 				this.setType(arguments);
 			}
-			else
+			else if (this._offset == arguments.getEndingOffset())
 			{
 				this.setType(LocationType.NONE);
 			}

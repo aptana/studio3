@@ -26,6 +26,7 @@ import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSIdentifierNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
+import com.aptana.editor.js.parsing.ast.JSObjectNode;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.ast.IParseNode;
@@ -192,12 +193,12 @@ public class JSSymbolTypeInferrer
 	 */
 	private PropertyElement createPropertyElement(Set<String> types)
 	{
+		boolean isFunction = false;
 		PropertyElement result;
 
+		// determine if any of the types are functions
 		if (types != null && types.size() > 0)
 		{
-			boolean isFunction = false;
-
 			for (String type : types)
 			{
 				if (JSTypeUtil.isFunctionPrefix(type))
@@ -206,15 +207,11 @@ public class JSSymbolTypeInferrer
 					break;
 				}
 			}
+		}
 
-			if (isFunction)
-			{
-				result = new FunctionElement();
-			}
-			else
-			{
-				result = new PropertyElement();
-			}
+		if (isFunction)
+		{
+			result = new FunctionElement();
 		}
 		else
 		{
@@ -390,7 +387,7 @@ public class JSSymbolTypeInferrer
 	 * @param property
 	 * @param types
 	 */
-	private void processProperties(JSPropertyCollection property, Set<String> types)
+	public void processProperties(JSPropertyCollection property, Set<String> types)
 	{
 		if (property.hasProperties())
 		{
@@ -486,7 +483,11 @@ public class JSSymbolTypeInferrer
 			{
 				JSNodeTypeInferrer inferrer = new JSNodeTypeInferrer(this._activeScope, this._index, this._location);
 
-				if (isFunction)
+				if (value instanceof JSObjectNode)
+				{
+					inferrer.addType(JSTypeConstants.OBJECT_TYPE);
+				}
+				else if (isFunction)
 				{
 					property.addType(JSTypeConstants.FUNCTION_TYPE);
 					inferrer.visit(value);
