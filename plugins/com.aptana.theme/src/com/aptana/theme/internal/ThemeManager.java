@@ -55,7 +55,10 @@ public class ThemeManager implements IThemeManager
 	private Theme fCurrentTheme;
 	private HashMap<String, Theme> fThemeMap;
 	private HashSet<String> fBuiltins;
-	private Map<Token, String> fTokens;
+	
+	// NOTE: We need to specifying WeakHashMap here since most (all other?) Map
+	// implementations will cause a memory leak
+	private WeakHashMap<Token, String> fTokens;
 
 	private static ThemeManager fgInstance;
 
