@@ -11,6 +11,7 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WordRule;
 
 import com.aptana.editor.js.sdoc.lexer.SDocTokenType;
+import com.aptana.editor.js.text.rules.CharacterMapRule;
 
 public class SDocTypeTokenScanner extends RuleBasedScanner
 {
