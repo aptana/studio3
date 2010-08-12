@@ -5,27 +5,27 @@ import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 
+import com.aptana.editor.js.IJSTokenScanner;
+
 public class JSRegExpRule implements IPredicateRule
 {
 	private enum State
 	{
-		ERROR,
-		NORMAL,
-		ESCAPE_SEQUENCE,
-		OPTIONS;
+		ERROR, NORMAL, ESCAPE_SEQUENCE, OPTIONS;
 	}
-	
+
 	IToken token;
-	
+
 	/**
 	 * JSRegExpRule
+	 * 
 	 * @param token
 	 */
 	public JSRegExpRule(IToken token)
 	{
 		this.token = token;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.rules.IRule#evaluate(org.eclipse.jface.text.rules.ICharacterScanner)
@@ -33,19 +33,27 @@ public class JSRegExpRule implements IPredicateRule
 	@Override
 	public IToken evaluate(ICharacterScanner scanner)
 	{
+		if (scanner instanceof IJSTokenScanner)
+		{
+			if (((IJSTokenScanner) scanner).hasDivisionStart())
+			{
+				return Token.UNDEFINED;
+			}
+		}
+		
 		State state = State.ERROR;
 		int c = scanner.read();
 		int unreadCount = 0;
-		
+
 		if (c == '/')
 		{
 			state = State.NORMAL;
-			
+
 			LOOP: while (c != ICharacterScanner.EOF)
 			{
 				c = scanner.read();
 				unreadCount++;
-				
+
 				switch (state)
 				{
 					case NORMAL:
@@ -54,7 +62,7 @@ public class JSRegExpRule implements IPredicateRule
 							case '\\':
 								state = State.ESCAPE_SEQUENCE;
 								break;
-								
+
 							case '/':
 								if (unreadCount > 1)
 								{
@@ -66,14 +74,14 @@ public class JSRegExpRule implements IPredicateRule
 									break LOOP;
 								}
 								break;
-								
+
 							case '\r':
 							case '\n':
 								state = State.ERROR;
 								break LOOP;
 						}
 						break;
-						
+
 					case ESCAPE_SEQUENCE:
 						switch (c)
 						{
@@ -81,22 +89,22 @@ public class JSRegExpRule implements IPredicateRule
 							case '\n':
 								state = State.ERROR;
 								break LOOP;
-								
+
 							default:
 								state = State.NORMAL;
 								break;
 						}
 						break;
-						
+
 					case OPTIONS:
 						switch (c)
 						{
 							case 'i':
 							case 'm':
 							case 'g':
-								//state = State.OPTIONS;
+								// state = State.OPTIONS;
 								break;
-								
+
 							default:
 								break LOOP;
 						}
@@ -107,7 +115,7 @@ public class JSRegExpRule implements IPredicateRule
 
 		// we always read at least one character too many, so push that back
 		scanner.unread();
-		
+
 		if (state == State.OPTIONS && this.token != null && this.token.isUndefined() == false)
 		{
 			return this.token;
@@ -118,7 +126,7 @@ public class JSRegExpRule implements IPredicateRule
 			{
 				scanner.unread();
 			}
-			
+
 			return Token.UNDEFINED;
 		}
 	}

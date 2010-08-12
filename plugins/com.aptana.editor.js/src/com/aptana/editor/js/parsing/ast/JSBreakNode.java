@@ -1,37 +1,34 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 public class JSBreakNode extends JSLabelStatementNode
 {
 	/**
 	 * JSBreakNode
-	 * 
-	 * @param start
-	 * @param end
 	 */
-	public JSBreakNode(int start, int end)
+	public JSBreakNode()
 	{
-		super(JSNodeTypes.BREAK, start, end);
+		super(JSNodeTypes.BREAK);
 	}
 
 	/**
 	 * JSBreakNode
 	 * 
-	 * @param start
-	 * @param end
-	 * @param identifier
+	 * @param label
 	 */
-	public JSBreakNode(int start, int end, String identifier)
+	public JSBreakNode(Symbol label)
 	{
-		super(JSNodeTypes.BREAK, start, end, identifier);
+		super(JSNodeTypes.BREAK, label);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSLabelStatementNode#getKeyword()
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
 	@Override
-	protected String getKeyword()
+	public void accept(JSTreeWalker walker)
 	{
-		return "break"; //$NON-NLS-1$
+		walker.visit(this);
 	}
 }

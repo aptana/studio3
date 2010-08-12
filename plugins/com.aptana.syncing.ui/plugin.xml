@@ -13,6 +13,12 @@
             priority="lowest">
          <enablement>
             <or>
+               <adapt
+                     type="org.eclipse.core.resources.IProject">
+               </adapt>
+               <instanceof
+                     value="org.eclipse.core.resources.IResource">
+               </instanceof>
                <instanceof
                      value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnections">
                </instanceof>
@@ -20,14 +26,8 @@
                      value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection">
                </instanceof>
                <instanceof
-                     value="org.eclipse.core.resources.IResource">
-               </instanceof>
-               <instanceof
                      value="com.aptana.ide.ui.io.navigator.FileSystemObject">
                </instanceof>
-               <adapt
-                     type="org.eclipse.core.resources.IProject">
-               </adapt>
             </or>
          </enablement>
          <dropAssistant
@@ -39,15 +39,23 @@
                </instanceof>
             </possibleDropTargets>
          </dropAssistant>
+      </navigatorContent>
+      <navigatorContent
+            activeByDefault="true"
+            appearsBefore="com.aptana.ide.ui.io.navigatorContent"
+            id="com.aptana.ide.syncing.ui.navigatorContent.sorter"
+            name="%navigatorContent.site.sorter.name"
+            priority="lowest"
+            sortOnly="true">
          <commonSorter
                class="com.aptana.ide.syncing.ui.navigator.SiteTreeNameSorter">
             <parentExpression>
                <or>
                   <instanceof
-                        value="org.eclipse.core.resources.IResource">
+                        value="org.eclipse.core.resources.IProject">
                   </instanceof>
                   <instanceof
-                        value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+                        value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnections">
                   </instanceof>
                   <instanceof
                         value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection">
@@ -97,6 +105,20 @@
             </instanceof>
          </enablement>
       </actionProvider>
+      <actionProvider
+            class="com.aptana.ide.syncing.ui.navigator.actions.SyncingActionProvider"
+            id="com.aptana.ide.syncing.ui.navigator.actions.SyncingActions">
+         <enablement>
+            <or>
+               <instanceof
+                     value="org.eclipse.core.resources.IResource">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+               </instanceof>
+            </or>
+         </enablement>
+      </actionProvider>
    </extension>
    <extension
          point="org.eclipse.ui.navigator.viewer">
@@ -104,7 +126,7 @@
             viewerId="org.eclipse.ui.navigator.ProjectExplorer">
          <includes>
             <contentExtension
-                  pattern="com.aptana.ide.syncing.ui.navigatorContent">
+                  pattern="com.aptana.ide.syncing.ui.navigatorContent*">
             </contentExtension>
          </includes>
       </viewerContentBinding>
@@ -178,6 +200,62 @@
          </action>
       </objectContribution>
    </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            description="%category.sync.description"
+            id="com.aptana.ide.syncing.ui.commands.category"
+            name="%category.sync.name">
+      </category>
+      <command
+            categoryId="com.aptana.ide.syncing.ui.commands.category"
+            defaultHandler="com.aptana.ide.syncing.ui.handlers.SynchronizeHandler"
+            id="com.aptana.ide.syncing.ui.commands.synchronize"
+            name="%Action.Synchronize.name">
+      </command>
+      <command
+            categoryId="com.aptana.ide.syncing.ui.commands.category"
+            defaultHandler="com.aptana.ide.syncing.ui.handlers.SynchronizeFilesHandler"
+            id="com.aptana.ide.syncing.ui.commands.synchronize.files"
+            name="%Action.SynchronizeNew.name">
+      </command>
+      <command
+            categoryId="com.aptana.ide.syncing.ui.commands.category"
+            defaultHandler="com.aptana.ide.syncing.ui.handlers.SynchronizeProjectHandler"
+            id="com.aptana.ide.syncing.ui.commands.synchronize.project"
+            name="%Action.SynchronizeProject.name">
+      </command>
+      <command
+            categoryId="com.aptana.ide.syncing.ui.commands.category"
+            defaultHandler="com.aptana.ide.syncing.ui.handlers.CloakHandler"
+            id="com.aptana.ide.syncing.ui.commands.cloak"
+            name="%Action.Cloak.name">
+      </command>
+      <command
+            categoryId="com.aptana.ide.syncing.ui.commands.category"
+            defaultHandler="com.aptana.ide.syncing.ui.handlers.UncloakHandler"
+            id="com.aptana.ide.syncing.ui.commands.uncloak"
+            name="%Action.Uncloak.name">
+      </command>
+      <command
+            categoryId="com.aptana.ide.syncing.ui.commands.category"
+            defaultHandler="com.aptana.ide.syncing.ui.handlers.UploadHandler"
+            id="com.aptana.ide.syncing.ui.commands.upload"
+            name="%Action.Upload.name">
+      </command>
+      <command
+            categoryId="com.aptana.ide.syncing.ui.commands.category"
+            defaultHandler="com.aptana.ide.syncing.ui.handlers.DownloadHandler"
+            id="com.aptana.ide.syncing.ui.commands.download"
+            name="%Action.Download.name">
+      </command>
+      <command
+            categoryId="com.aptana.ide.syncing.ui.commands.category"
+            defaultHandler="com.aptana.ide.syncing.ui.handlers.NewSiteHandler"
+            id="com.aptana.ide.syncing.ui.commands.newconnection"
+            name="%Action.NewConnection.name">
+      </command>
+   </extension>
    
    <extension
          point="org.eclipse.ui.menus">
@@ -233,6 +311,9 @@
          <command
                commandId="com.aptana.ide.syncing.ui.commands.download"
                icon="icons/full/obj16/get.gif">
+         </command>
+         <command
+               commandId="com.aptana.ide.syncing.ui.commands.newconnection">
          </command>
       </menuContribution>
       <menuContribution
@@ -327,225 +408,6 @@
             </adapt>
          </enabledWhen>
       </page>
-   </extension>
-   <extension
-         point="org.eclipse.ui.commands">
-      <category
-            description="%category.sync.description"
-            id="com.aptana.ide.syncing.ui.commands.category"
-            name="%category.sync.name">
-      </category>
-      <command
-            categoryId="com.aptana.ide.syncing.ui.commands.category"
-            id="com.aptana.ide.syncing.ui.commands.synchronize"
-            name="%Action.Synchronize.name">
-      </command>
-      <command
-            categoryId="com.aptana.ide.syncing.ui.commands.category"
-            id="com.aptana.ide.syncing.ui.commands.synchronize.files"
-            name="%Action.SynchronizeNew.name">
-      </command>
-      <command
-            categoryId="com.aptana.ide.syncing.ui.commands.category"
-            id="com.aptana.ide.syncing.ui.commands.synchronize.project"
-            name="%Action.SynchronizeProject.name">
-      </command>
-      <command
-            categoryId="com.aptana.ide.syncing.ui.commands.category"
-            id="com.aptana.ide.syncing.ui.commands.cloak"
-            name="%Action.Cloak.name">
-      </command>
-      <command
-            categoryId="com.aptana.ide.syncing.ui.commands.category"
-            id="com.aptana.ide.syncing.ui.commands.uncloak"
-            name="%Action.Uncloak.name">
-      </command>
-      <command
-            categoryId="com.aptana.ide.syncing.ui.commands.category"
-            id="com.aptana.ide.syncing.ui.commands.upload"
-            name="%Action.Upload.name">
-      </command>
-      <command
-            categoryId="com.aptana.ide.syncing.ui.commands.category"
-            id="com.aptana.ide.syncing.ui.commands.download"
-            name="%Action.Download.name">
-      </command>
-      <command
-            categoryId="com.aptana.ide.syncing.ui.commands.category"
-            id="com.aptana.ide.syncing.ui.commands.newconnection"
-            name="%Action.NewConnection.name">
-      </command>
-   </extension>
-   <extension
-         point="org.eclipse.ui.handlers">
-      <handler
-            class="com.aptana.ide.syncing.ui.handlers.SynchronizeHandler"
-            commandId="com.aptana.ide.syncing.ui.commands.synchronize">
-         <activeWhen>
-            <iterate>
-               <or>
-                  <instanceof
-                        value="org.eclipse.core.resources.IResource">
-                  </instanceof>
-                  <instanceof
-                        value="com.aptana.ide.ui.io.navigator.FileSystemObject">
-                  </instanceof>
-               </or>
-            </iterate>
-         </activeWhen>
-         <enabledWhen>
-            <count
-                  value="+">
-            </count>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="com.aptana.ide.syncing.ui.handlers.CloakHandler"
-            commandId="com.aptana.ide.syncing.ui.commands.cloak">
-         <activeWhen>
-            <iterate>
-               <or>
-                  <instanceof
-                        value="org.eclipse.core.resources.IResource">
-                  </instanceof>
-                  <instanceof
-                        value="com.aptana.ide.ui.io.navigator.FileSystemObject">
-                  </instanceof>
-               </or>
-            </iterate>
-         </activeWhen>
-         <enabledWhen>
-            <count
-                  value="+">
-            </count>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="com.aptana.ide.syncing.ui.handlers.UncloakHandler"
-            commandId="com.aptana.ide.syncing.ui.commands.uncloak">
-         <activeWhen>
-            <iterate>
-               <or>
-                  <instanceof
-                        value="org.eclipse.core.resources.IResource">
-                  </instanceof>
-                  <instanceof
-                        value="com.aptana.ide.ui.io.navigator.FileSystemObject">
-                  </instanceof>
-               </or>
-            </iterate>
-         </activeWhen>
-         <enabledWhen>
-            <count
-                  value="+">
-            </count>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="com.aptana.ide.syncing.ui.handlers.SynchronizeFilesHandler"
-            commandId="com.aptana.ide.syncing.ui.commands.synchronize.files">
-         <activeWhen>
-            <iterate>
-               <or>
-                  <instanceof
-                        value="org.eclipse.core.resources.IResource">
-                  </instanceof>
-                  <instanceof
-                        value="com.aptana.ide.ui.io.navigator.FileSystemObject">
-                  </instanceof>
-               </or>
-            </iterate>
-         </activeWhen>
-         <enabledWhen>
-            <count
-                  value="+">
-            </count>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="com.aptana.ide.syncing.ui.handlers.SynchronizeProjectHandler"
-            commandId="com.aptana.ide.syncing.ui.commands.synchronize.project">
-         <activeWhen>
-            <iterate>
-               <or>
-                  <instanceof
-                        value="org.eclipse.core.resources.IResource">
-                  </instanceof>
-                  <instanceof
-                        value="com.aptana.ide.ui.io.navigator.FileSystemObject">
-                  </instanceof>
-               </or>
-            </iterate>
-         </activeWhen>
-         <enabledWhen>
-            <count
-                  value="+">
-            </count>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="com.aptana.ide.syncing.ui.handlers.UploadHandler"
-            commandId="com.aptana.ide.syncing.ui.commands.upload">
-         <activeWhen>
-            <iterate>
-               <or>
-                  <instanceof
-                        value="org.eclipse.core.resources.IResource">
-                  </instanceof>
-                  <instanceof
-                        value="com.aptana.ide.ui.io.navigator.FileSystemObject">
-                  </instanceof>
-               </or>
-            </iterate>
-         </activeWhen>
-         <enabledWhen>
-            <count
-                  value="+">
-            </count>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="com.aptana.ide.syncing.ui.handlers.DownloadHandler"
-            commandId="com.aptana.ide.syncing.ui.commands.download">
-         <activeWhen>
-            <iterate>
-               <or>
-                  <instanceof
-                        value="org.eclipse.core.resources.IResource">
-                  </instanceof>
-                  <instanceof
-                        value="com.aptana.ide.ui.io.navigator.FileSystemObject">
-                  </instanceof>
-               </or>
-            </iterate>
-         </activeWhen>
-         <enabledWhen>
-            <count
-                  value="+">
-            </count>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="com.aptana.ide.syncing.ui.handlers.NewSiteHandler"
-            commandId="com.aptana.ide.syncing.ui.commands.newconnection">
-         <activeWhen>
-            <iterate>
-               <or>
-                  <instanceof
-                        value="org.eclipse.core.resources.IResource">
-                  </instanceof>
-                  <instanceof
-                        value="com.aptana.ide.ui.io.navigator.FileSystemObject">
-                  </instanceof>
-               </or>
-            </iterate>
-         </activeWhen>
-         <enabledWhen>
-            <count
-                  value="+">
-            </count>
-         </enabledWhen>
-      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.editors">

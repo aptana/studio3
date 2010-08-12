@@ -17,18 +17,18 @@ public class CSSFunctionNode extends CSSExpressionNode
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (!(obj instanceof CSSFunctionNode))
+		if (!super.equals(obj) || !(obj instanceof CSSFunctionNode))
 		{
 			return false;
 		}
 		CSSFunctionNode other = (CSSFunctionNode) obj;
-		return getExpression().equals(other.getExpression());
+		return toString().equals(other.toString());
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return getExpression().hashCode();
+		return super.hashCode() * 31 + toString().hashCode();
 	}
 
 	@Override

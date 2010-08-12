@@ -20,7 +20,7 @@ public class JSScanner extends Scanner
 	private IDocument fDocument;
 	private List<Symbol> fSDocComments;
 	private List<Symbol> fVSDocComments;
-	
+
 	/**
 	 * JSScanner
 	 */
@@ -43,11 +43,11 @@ public class JSScanner extends Scanner
 		int offset = fTokenScanner.getTokenOffset();
 		int length = fTokenScanner.getTokenLength();
 		JSTokenType type = (data == null) ? JSTokenType.EOF : (JSTokenType) data;
-		
+
 		try
 		{
 			int totalLength = fDocument.getLength();
-			
+
 			if (offset > totalLength)
 			{
 				offset = totalLength;
@@ -56,7 +56,7 @@ public class JSScanner extends Scanner
 			{
 				length = 0;
 			}
-			
+
 			return new Symbol(type.getIndex(), offset, offset + length - 1, fDocument.get(offset, length));
 		}
 		catch (BadLocationException e)
@@ -74,7 +74,7 @@ public class JSScanner extends Scanner
 	{
 		return fSDocComments;
 	}
-	
+
 	/**
 	 * getVSDocComments
 	 * 
@@ -84,7 +84,7 @@ public class JSScanner extends Scanner
 	{
 		return fVSDocComments;
 	}
-	
+
 	/**
 	 * isComment
 	 * 
@@ -94,11 +94,11 @@ public class JSScanner extends Scanner
 	private boolean isComment(Object data)
 	{
 		boolean result = false;
-		
+
 		if (data != null)
 		{
 			JSTokenType type = (JSTokenType) data;
-			
+
 			switch (type)
 			{
 				case SINGLELINE_COMMENT:
@@ -109,7 +109,7 @@ public class JSScanner extends Scanner
 					break;
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -122,53 +122,53 @@ public class JSScanner extends Scanner
 	public Symbol nextToken() throws IOException, Exception
 	{
 		Symbol vsdoc = null;
-		
+
 		IToken token = fTokenScanner.nextToken();
 		Object data = token.getData();
-		
+
 		while (token.isWhitespace() || isComment(data))
 		{
 			// save jsdoc comments for later processing
 			if (data != null)
 			{
 				JSTokenType type = (JSTokenType) data;
-				
+
 				switch (type)
 				{
 					case SDOC:
 						fSDocComments.add(createSymbol(data));
 						break;
-						
+
 					case VSDOC:
 						int offset = fTokenScanner.getTokenOffset();
 						int length = fTokenScanner.getTokenLength();
-						
+
 						if (vsdoc == null)
 						{
 							vsdoc = new Symbol(JSTokenType.VSDOC.getIndex(), offset, offset + length - 1, new LinkedList<Symbol>());
 						}
-						
+
 						((List<Symbol>) vsdoc.value).add(createSymbol(data));
 						break;
-						
+
 					default:
 						break;
 				}
 			}
-			
+
 			// ignores whitespace and comments
 			token = fTokenScanner.nextToken();
 			data = token.getData();
 		}
-		
+
 		if (vsdoc != null)
 		{
 			fVSDocComments.add(vsdoc);
 		}
-		
+
 		return createSymbol(data);
 	}
-	
+
 	/**
 	 * setSource
 	 * 
@@ -178,7 +178,7 @@ public class JSScanner extends Scanner
 	{
 		fDocument = document;
 		fTokenScanner.setRange(fDocument, 0, fDocument.getLength());
-		
+
 		fSDocComments.clear();
 		fVSDocComments.clear();
 	}

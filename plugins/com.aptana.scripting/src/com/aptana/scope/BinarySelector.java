@@ -51,7 +51,14 @@ public abstract class BinarySelector implements ISelectorNode
 	{
 		String left = (this._left == null) ? "null" : this._left.toString(); //$NON-NLS-1$
 		String right = (this._right == null) ? "null" : this._right.toString(); //$NON-NLS-1$
-		
+
 		return left + this.getOperator() + " " + right; //$NON-NLS-1$
+	}
+
+	@Override
+	public int matchLength()
+	{
+		// TODO is this even right?
+		return Math.max(getLeftChild().matchLength(), getRightChild().matchLength());
 	}
 }

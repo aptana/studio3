@@ -41,11 +41,13 @@ import org.eclipse.ui.internal.browser.WebBrowserEditor;
 import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.deploy.Activator;
 import com.aptana.deploy.internal.wizard.CapifyProjectPage;
 import com.aptana.deploy.internal.wizard.DeployWizardPage;
-import com.aptana.deploy.internal.wizard.FTPDeployComposite.Direction;
+import com.aptana.deploy.internal.wizard.EngineYardDeployWizardPage;
+import com.aptana.deploy.internal.wizard.EngineYardSignupPage;
 import com.aptana.deploy.internal.wizard.FTPDeployWizardPage;
 import com.aptana.deploy.internal.wizard.HerokuDeployWizardPage;
 import com.aptana.deploy.internal.wizard.HerokuSignupPage;
@@ -55,7 +57,7 @@ import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
-import com.aptana.ide.core.io.ConnectionPointUtils;
+import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.SiteConnectionUtils;
@@ -64,6 +66,8 @@ import com.aptana.ide.syncing.ui.actions.BaseSyncAction;
 import com.aptana.ide.syncing.ui.actions.DownloadAction;
 import com.aptana.ide.syncing.ui.actions.SynchronizeProjectAction;
 import com.aptana.ide.syncing.ui.actions.UploadAction;
+import com.aptana.ide.syncing.ui.internal.SyncUtils;
+import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants.SyncDirection;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleEntry;
 import com.aptana.scripting.model.BundleManager;
@@ -76,6 +80,7 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 {
 
 	private static final String BUNDLE_HEROKU = "Heroku"; //$NON-NLS-1$
+	private static final String BUNDLE_ENGINEYARD = "Engine Yard";
 
 	private IProject project;
 
@@ -88,30 +93,41 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		String pageName = currentPage.getName();
 		DeployType type = null;
 		String deployEndpointName = null;
-		if (pageName.equals(HerokuDeployWizardPage.NAME))
+		if (HerokuDeployWizardPage.NAME.equals(pageName))
 		{
 			HerokuDeployWizardPage page = (HerokuDeployWizardPage) currentPage;
 			runnable = createHerokuDeployRunnable(page);
 			type = DeployType.HEROKU;
 			deployEndpointName = page.getAppName();
 		}
-		else if (pageName.equals(FTPDeployWizardPage.NAME))
+		else if (FTPDeployWizardPage.NAME.equals(pageName))
 		{
 			FTPDeployWizardPage page = (FTPDeployWizardPage) currentPage;
 			runnable = createFTPDeployRunnable(page);
 			type = DeployType.FTP;
 			deployEndpointName = page.getConnectionPoint().getName();
 		}
-		else if (pageName.equals(HerokuSignupPage.NAME))
+		else if (HerokuSignupPage.NAME.equals(pageName))
 		{
 			HerokuSignupPage page = (HerokuSignupPage) currentPage;
 			runnable = createHerokuSignupRunnable(page);
 		}
-		else if (pageName.equals(CapifyProjectPage.NAME))
+		else if (CapifyProjectPage.NAME.equals(pageName))
 		{
 			CapifyProjectPage page = (CapifyProjectPage) currentPage;
 			runnable = createCapifyRunnable(page);
 			type = DeployType.CAPISTRANO;
+		}
+		else if (EngineYardSignupPage.NAME.equals(pageName))
+		{
+			EngineYardSignupPage page = (EngineYardSignupPage) currentPage;
+			runnable = createEngineYardSignupRunnable(page);
+		}
+		else if (EngineYardDeployWizardPage.NAME.equals(pageName))
+		{
+			EngineYardDeployWizardPage page = (EngineYardDeployWizardPage) currentPage;
+			runnable = createEngineYardDeployRunnable(page);
+			type = DeployType.ENGINEYARD;
 		}
 
 		// stores the deploy type and what application or FTP connection it's deploying to
@@ -144,9 +160,9 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		{
 			return null;
 		}
-		final IConnectionPoint connectionPoint = page.getConnectionPoint();
+		final IConnectionPoint destinationConnectionPoint = page.getConnectionPoint();
 		final boolean isAutoSyncSelected = page.isAutoSyncSelected();
-		final Direction direction = page.getSyncDirection();
+		final SyncDirection direction = page.getSyncDirection();
 		final IWorkbenchPart activePart = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
 				.getActivePart();
 
@@ -160,13 +176,15 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 				try
 				{
 					ISiteConnection site = null;
-					ISiteConnection[] sites = SiteConnectionUtils.findSites(project, connectionPoint);
+					ISiteConnection[] sites = SiteConnectionUtils.findSites(project, destinationConnectionPoint);
 					if (sites.length == 0)
 					{
 						// creates the site to link the project with the FTP connection
+						IConnectionPoint sourceConnectionPoint = SyncUtils.findOrCreateConnectionPointFor(project);
+						CoreIOPlugin.getConnectionPointManager().addConnectionPoint(sourceConnectionPoint);
 						site = SiteConnectionUtils.createSite(MessageFormat.format("{0} <-> {1}", project.getName(), //$NON-NLS-1$
-								connectionPoint.getName()),
-								ConnectionPointUtils.createWorkspaceConnectionPoint(project), connectionPoint);
+								destinationConnectionPoint.getName()),
+								sourceConnectionPoint, destinationConnectionPoint);
 						SyncingPlugin.getSiteConnectionManager().addSiteConnection(site);
 					}
 					else if (sites.length == 1)
@@ -333,23 +351,6 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 				}
 			}
 
-			private CommandElement getCommand(String bundleName, String commandName)
-			{
-				BundleEntry entry = BundleManager.getInstance().getBundleEntry(bundleName);
-				if (entry == null)
-				{
-					return null;
-				}
-				for (BundleElement bundle : entry.getContributingBundles())
-				{
-					CommandElement command = bundle.getCommandByName(commandName);
-					if (command != null)
-					{
-						return command;
-					}
-				}
-				return null;
-			}
 		};
 		return runnable;
 	}
@@ -444,44 +445,142 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 					@Override
 					public void run()
 					{
-						try
-						{
-							WebBrowserEditorInput input = new WebBrowserEditorInput(url, style, BROWSER_ID);
-							IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-							IEditorPart editorPart = page.openEditor(input, WebBrowserEditor.WEB_BROWSER_EDITOR_ID);
-							WebBrowserEditor webBrowserEditor = (WebBrowserEditor) editorPart;
-							Field f = WebBrowserEditor.class.getDeclaredField("webBrowser"); //$NON-NLS-1$
-							f.setAccessible(true);
-							BrowserViewer viewer = (BrowserViewer) f.get(webBrowserEditor);
-							final Browser browser = viewer.getBrowser();
-							browser.addProgressListener(new ProgressListener()
-							{
-
-								@Override
-								public void completed(ProgressEvent event)
-								{
-									browser.removeProgressListener(this);
-									browser.execute(javascript);
-								}
-
-								@Override
-								public void changed(ProgressEvent event)
-								{
-									// ignore
-								}
-							});
-						}
-						catch (Exception e)
-						{
-							Activator.logError(e);
-						}
+						openSignupURLinEclipseBrowser(url, style, BROWSER_ID, javascript);
 					}
 				});
 			}
 		};
 		return runnable;
 	}
+	
+	protected IRunnableWithProgress createEngineYardSignupRunnable(EngineYardSignupPage page)
+	{
+		IRunnableWithProgress runnable;
+		final String userID = page.getUserID();
+		runnable = new IRunnableWithProgress()
+		{
 
+			/**
+			 * Send a ping to aptana.com with email address for referral tracking
+			 * 
+			 * @throws IOException
+			 */
+			private String sendPing(IProgressMonitor monitor) throws IOException
+			{
+				HttpURLConnection connection = null;
+				try
+				{
+					final String HOST = "http://toolbox.aptana.com"; //$NON-NLS-1$
+					StringBuilder builder = new StringBuilder(HOST);
+					builder.append("/webhook/engineyard?request_id="); //$NON-NLS-1$
+					builder.append(URLEncoder.encode(PingStartup.getApplicationId(), "UTF-8")); //$NON-NLS-1$
+					builder.append("&email="); //$NON-NLS-1$
+					builder.append(URLEncoder.encode(userID, "UTF-8")); //$NON-NLS-1$
+					builder.append("&type=signuphook"); //$NON-NLS-1$
+					builder.append("&version=");
+					builder.append(EclipseUtil.getPluginVersion("com.aptana.core"));
+
+					URL url = new URL(builder.toString());
+					connection = (HttpURLConnection) url.openConnection();
+					connection.setUseCaches(false);
+					connection.setAllowUserInteraction(false);
+					int responseCode = connection.getResponseCode();
+					if (responseCode != HttpURLConnection.HTTP_OK)
+					{
+						// Log an error
+						Activator.logError(
+								MessageFormat.format(Messages.DeployWizard_FailureToGrabHerokuSignupJSError,
+										builder.toString()), null);
+					}
+					else
+					{
+						return IOUtil.read(connection.getInputStream());
+					}
+				}
+				finally
+				{
+					if (connection != null)
+					{
+						connection.disconnect();
+					}
+				}
+				return ""; //$NON-NLS-1$
+			}
+
+			@Override
+			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
+			{
+				SubMonitor sub = SubMonitor.convert(monitor, 100);
+				try
+				{
+					String javascriptToInject = sendPing(sub.newChild(40));
+					openSignup(javascriptToInject, sub.newChild(60));
+				}
+				catch (Exception e)
+				{
+					throw new InvocationTargetException(e);
+				}
+				finally
+				{
+					sub.done();
+				}
+			}
+
+			/**
+			 * Open the Engine Yard signup page.
+			 * 
+			 * @param monitor
+			 * @throws Exception
+			 */
+			private void openSignup(final String javascript, IProgressMonitor monitor) throws Exception
+			{
+				final String BROWSER_ID = "Engine-Yard-signup"; //$NON-NLS-1$
+				final URL url = new URL("http://cloud.engineyard.com/ev?code=APTANA_REFERRAL"); //$NON-NLS-1$
+
+				final int style = IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.LOCATION_BAR
+						| IWorkbenchBrowserSupport.STATUS;
+				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
+				{
+
+					@Override
+					public void run()
+					{
+						openSignupURLinEclipseBrowser(url, style, BROWSER_ID, javascript);
+					}
+				});
+			}
+		};
+		return runnable;
+	}
+	
+	protected IRunnableWithProgress createEngineYardDeployRunnable(EngineYardDeployWizardPage page)
+	{
+		IRunnableWithProgress runnable;
+
+		runnable = new IRunnableWithProgress()
+		{
+
+			@Override
+			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
+			{
+				PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
+				{
+
+					@Override
+					public void run()
+					{
+						CommandElement command;
+						command = getCommand(BUNDLE_ENGINEYARD, "Deploy App");
+						command.execute();
+					}
+				});
+			}
+
+		};
+		return runnable;
+	}
+
+	
 	@Override
 	public void addPages()
 	{
@@ -568,6 +667,59 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		finally
 		{
 			super.dispose();
+		}
+	}
+	
+	private CommandElement getCommand(String bundleName, String commandName)
+	{
+		BundleEntry entry = BundleManager.getInstance().getBundleEntry(bundleName);
+		if (entry == null)
+		{
+			return null;
+		}
+		for (BundleElement bundle : entry.getContributingBundles())
+		{
+			CommandElement command = bundle.getCommandByName(commandName);
+			if (command != null)
+			{
+				return command;
+			}
+		}
+		return null;
+	}
+	
+	private void openSignupURLinEclipseBrowser(URL url, int style, String browserId, final String javascript)
+	{
+		try
+		{
+			WebBrowserEditorInput input = new WebBrowserEditorInput(url, style, browserId);
+			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+			IEditorPart editorPart = page.openEditor(input, WebBrowserEditor.WEB_BROWSER_EDITOR_ID);
+			WebBrowserEditor webBrowserEditor = (WebBrowserEditor) editorPart;
+			Field f = WebBrowserEditor.class.getDeclaredField("webBrowser"); //$NON-NLS-1$
+			f.setAccessible(true);
+			BrowserViewer viewer = (BrowserViewer) f.get(webBrowserEditor);
+			final Browser browser = viewer.getBrowser();
+			browser.addProgressListener(new ProgressListener()
+			{
+
+				@Override
+				public void completed(ProgressEvent event)
+				{
+					browser.removeProgressListener(this);
+					browser.execute(javascript);
+				}
+
+				@Override
+				public void changed(ProgressEvent event)
+				{
+					// ignore
+				}
+			});
+		}
+		catch (Exception e)
+		{
+			Activator.logError(e);
 		}
 	}
 

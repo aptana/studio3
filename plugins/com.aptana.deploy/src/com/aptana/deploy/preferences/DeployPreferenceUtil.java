@@ -33,6 +33,10 @@ public class DeployPreferenceUtil
 			{
 				return DeployType.CAPISTRANO;
 			}
+			if (type.equals(DeployType.ENGINEYARD.toString()))
+			{
+				return DeployType.ENGINEYARD;
+			}
 		}
 		return null;
 	}

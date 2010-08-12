@@ -3,7 +3,6 @@ package com.aptana.theme.internal;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Enumeration;
@@ -13,6 +12,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.WeakHashMap;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -30,6 +30,8 @@ import org.osgi.service.prefs.BackingStoreException;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
+import com.aptana.theme.internal.preferences.ThemerPreferenceInitializer;
+import com.aptana.theme.preferences.IPreferenceConstants;
 
 public class ThemeManager implements IThemeManager
 {
@@ -44,11 +46,6 @@ public class ThemeManager implements IThemeManager
 	private static final String THEME_LIST_PREF_KEY = "themeList"; //$NON-NLS-1$
 
 	/**
-	 * Preference key used to save the active theme.
-	 */
-	public static final String ACTIVE_THEME = "ACTIVE_THEME"; //$NON-NLS-1$
-
-	/**
 	 * Node in preferences used to store themes under. Each theme is a key value pair under this node. The key is the
 	 * theme name, value is XML format java Properties object.
 	 */
@@ -58,13 +55,13 @@ public class ThemeManager implements IThemeManager
 	private Theme fCurrentTheme;
 	private HashMap<String, Theme> fThemeMap;
 	private HashSet<String> fBuiltins;
-	private Map<WeakReference<Token>, String> fTokens;
+	private Map<Token, String> fTokens;
 
 	private static ThemeManager fgInstance;
 
 	private ThemeManager()
 	{
-		fTokens = new HashMap<WeakReference<Token>, String>();
+		fTokens = new WeakHashMap<Token, String>();
 	}
 
 	public static ThemeManager instance()
@@ -87,11 +84,15 @@ public class ThemeManager implements IThemeManager
 	{
 		if (fCurrentTheme == null)
 		{
-			String activeThemeName = Platform.getPreferencesService().getString(ThemePlugin.PLUGIN_ID, ACTIVE_THEME,
-					null, null);
+			String activeThemeName = Platform.getPreferencesService().getString(ThemePlugin.PLUGIN_ID,
+					IPreferenceConstants.ACTIVE_THEME, ThemerPreferenceInitializer.DEFAULT_THEME, null);
 			if (activeThemeName != null)
 			{
 				fCurrentTheme = getTheme(activeThemeName);
+				if (fCurrentTheme != null)
+				{
+					return fCurrentTheme;
+				}
 			}
 			if (fCurrentTheme == null)
 			{
@@ -99,11 +100,11 @@ public class ThemeManager implements IThemeManager
 				if (!getThemeMap().values().isEmpty())
 				{
 					fCurrentTheme = getThemeMap().values().iterator().next();
-					if (fCurrentTheme != null)
-					{
-						setCurrentTheme(fCurrentTheme);
-					}
 				}
+			}
+			if (fCurrentTheme != null)
+			{
+				setCurrentTheme(fCurrentTheme);
 			}
 		}
 		return fCurrentTheme;
@@ -161,7 +162,7 @@ public class ThemeManager implements IThemeManager
 		}
 
 		prefs = new InstanceScope().getNode(ThemePlugin.PLUGIN_ID);
-		prefs.put(ACTIVE_THEME, theme.getName());
+		prefs.put(IPreferenceConstants.ACTIVE_THEME, theme.getName());
 		prefs.putLong(THEME_CHANGED, System.currentTimeMillis());
 		try
 		{
@@ -307,18 +308,18 @@ public class ThemeManager implements IThemeManager
 		}
 	}
 
-	public IToken getToken(String string)
+	public IToken getToken(String scope)
 	{
-		Token token = new Token(getTextAttribute(string));
-		fTokens.put(new WeakReference<Token>(token), string);
+		Token token = new Token(getTextAttribute(scope));
+//		fTokens.put(token, scope);
 		return token;
 	}
 
 	private void adaptTokens()
 	{
-		for (Map.Entry<WeakReference<Token>, String> entry : fTokens.entrySet())
+		for (Map.Entry<Token, String> entry : fTokens.entrySet())
 		{
-			Token token = entry.getKey().get();
+			Token token = entry.getKey();
 			if (token != null)
 				token.setData(getTextAttribute(entry.getValue()));
 		}

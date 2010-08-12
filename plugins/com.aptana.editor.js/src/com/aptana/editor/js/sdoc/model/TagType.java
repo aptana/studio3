@@ -2,28 +2,28 @@ package com.aptana.editor.js.sdoc.model;
 
 public enum TagType
 {
-	ADVANCED("@advanced"),
-	ALIAS("@alias"),
-	AUTHOR("@author"),
-	CLASS_DESCRIPTION("@classDescription"),
-	CONSTRUCTOR("@constructor"),
-	EXAMPLE("@example"),
-	EXCEPTION("@exception"),
-	EXTENDS("@extends"),
-	INTERNAL("@internal"),
-	METHOD("@method"),
-	NAMESPACE("@namespace"),
-	OVERVIEW("@overview"),
-	PARAM("@param"),
-	PRIVATE("@private"),
-	PROPERTY("@property"),
-	RETURN("@return"),
-	SEE("@see"),
-	TYPE("@type"),
-	UNKNOWN("@<???>");
-	
+	ADVANCED("@advanced"), //$NON-NLS-1$
+	ALIAS("@alias"), //$NON-NLS-1$
+	AUTHOR("@author"), //$NON-NLS-1$
+	CLASS_DESCRIPTION("@classDescription"), //$NON-NLS-1$
+	CONSTRUCTOR("@constructor"), //$NON-NLS-1$
+	EXAMPLE("@example"), //$NON-NLS-1$
+	EXCEPTION("@exception"), //$NON-NLS-1$
+	EXTENDS("@extends"), //$NON-NLS-1$
+	INTERNAL("@internal"), //$NON-NLS-1$
+	METHOD("@method"), //$NON-NLS-1$
+	NAMESPACE("@namespace"), //$NON-NLS-1$
+	OVERVIEW("@overview"), //$NON-NLS-1$
+	PARAM("@param"), //$NON-NLS-1$
+	PRIVATE("@private"), //$NON-NLS-1$
+	PROPERTY("@property"), //$NON-NLS-1$
+	RETURN("@return"), //$NON-NLS-1$
+	SEE("@see"), //$NON-NLS-1$
+	TYPE("@type"), //$NON-NLS-1$
+	UNKNOWN("@<???>"); //$NON-NLS-1$
+
 	private String _name;
-	
+
 	/**
 	 * TagType
 	 * 
@@ -33,7 +33,7 @@ public enum TagType
 	{
 		this._name = name;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Enum#toString()

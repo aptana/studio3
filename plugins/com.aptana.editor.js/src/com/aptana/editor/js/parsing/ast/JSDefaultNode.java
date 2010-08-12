@@ -1,35 +1,41 @@
 package com.aptana.editor.js.parsing.ast;
 
-public class JSDefaultNode extends JSNaryNode
+import beaver.Symbol;
+
+public class JSDefaultNode extends JSNode
 {
+	private Symbol _colon;
+	
 	/**
 	 * JSDefaultNode
 	 * 
 	 * @param start
 	 * @param end
 	 */
-	public JSDefaultNode(int start, int end, JSNode... children)
+	public JSDefaultNode(Symbol colon, JSNode... children)
 	{
-		super(JSNodeTypes.DEFAULT, start, end, children);
+		super(JSNodeTypes.DEFAULT, children);
+		
+		this._colon = colon;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNaryNode#appendOpenText(java.lang.StringBuilder)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
 	@Override
-	protected void appendOpenText(StringBuilder buffer)
+	public void accept(JSTreeWalker walker)
 	{
-		buffer.append("default: "); //$NON-NLS-1$
+		walker.visit(this);
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNaryNode#getDelimiter()
+	
+	/**
+	 * getColon
+	 * 
+	 * @return
 	 */
-	@Override
-	protected String getDelimiter()
+	public Symbol getColon()
 	{
-		return "";
+		return this._colon;
 	}
 }

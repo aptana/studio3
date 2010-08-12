@@ -113,20 +113,25 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		if (repo == null)
 			return false;
 
+		// force is implied by always delete...
+		boolean alwaysDeleteContent = (updateFlags & IResource.ALWAYS_DELETE_PROJECT_CONTENT) != 0;		
 		// If repo root is same as project root, we need to just punt and return false
 		// so filesystem takes care of it
 		try {
 			if (repo.workingDirectory().toFile().getCanonicalPath()
 					.equals(project.getLocation().toFile().getCanonicalPath()))
 			{
-				GitPlugin.getDefault().getGitRepositoryManager().removeRepository(project);
-				// Force delete the .git dir, since it's probably out of sync and not forcing could cause project delete to fail!
-				IFolder gitDir = project.getFolder(GitRepository.GIT_DIR);
-				if (gitDir.exists())
+				getGitRepositoryManager().removeRepository(project);
+				if (alwaysDeleteContent)
 				{
-					tree.standardDeleteFolder(gitDir, updateFlags | IResource.FORCE,
-						new NullProgressMonitor()); // TODO Use a submonitor here?
-					tree.deletedFolder(gitDir);
+					// Force delete the .git dir, since it's probably out of sync and not forcing could cause project delete to fail!
+					IFolder gitDir = project.getFolder(GitRepository.GIT_DIR);
+					if (gitDir.exists())
+					{
+						tree.standardDeleteFolder(gitDir, updateFlags | IResource.FORCE,
+							new NullProgressMonitor()); // TODO Use a submonitor here?
+						tree.deletedFolder(gitDir);
+					}
 				}
 				return false;
 			}
@@ -138,9 +143,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		// If project contains no already committed files, we need to punt!
 		if (hasNoCommittedFiles(source, repo))
 			return false;
-
-		// force is implied by always delete...
-		boolean alwaysDeleteContent = (updateFlags & IResource.ALWAYS_DELETE_PROJECT_CONTENT) != 0;
+		
 		boolean force = alwaysDeleteContent || (updateFlags & IResource.FORCE) == IResource.FORCE;
 		if (force)
 		{

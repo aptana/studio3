@@ -7,7 +7,9 @@ import java.util.StringTokenizer;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.util.IOUtil;
@@ -37,56 +39,63 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 	private static final String ATTRIBUTE_SRC = "src"; //$NON-NLS-1$
 
 	@Override
-	public void index(Set<IFileStore> files, Index index, IProgressMonitor monitor)
+	public void index(Set<IFileStore> files, Index index, IProgressMonitor monitor) throws CoreException
 	{
-		SubMonitor sub = SubMonitor.convert(monitor, files.size());
+		SubMonitor sub = SubMonitor.convert(monitor, files.size() * 100);
 		for (IFileStore file : files)
 		{
 			if (sub.isCanceled())
 			{
-				return;
+				throw new CoreException(Status.CANCEL_STATUS);
 			}
-			try
-			{
-				if (file == null)
-				{
-					continue;
-				}
-				sub.subTask(file.getName());
-				try
-				{
-					IParserPool pool = ParserPoolFactory.getInstance().getParserPool(HTMLNode.LANGUAGE);
-					if (pool != null)
-					{
-						String fileContents = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(-1)));
-						if (fileContents != null && fileContents.trim().length() > 0)
-						{
-							IParser htmlParser = pool.checkOut();
-							if (htmlParser != null)
-							{
-
-								HTMLParseState parseState = new HTMLParseState();
-								parseState.setEditState(fileContents, "", 0, 0); //$NON-NLS-1$
-								IParseNode parseNode = htmlParser.parse(parseState);
-								pool.checkIn(htmlParser);
-								walkNode(index, file, parseNode);
-							}
-						}
-					}
-				}
-				catch (Throwable e)
-				{
-					Activator.logError(
-							MessageFormat.format(Messages.HTMLFileIndexingParticipant_Error_During_Indexing,
-									file.getName()), e);
-				}
-			}
-			finally
-			{
-				sub.worked(1);
-			}
+			Thread.yield(); // be nice to other threads, let them get in before each file...
+			indexFileStore(index, file, sub.newChild(100));
 		}
 		sub.done();
+	}
+
+	private void indexFileStore(Index index, IFileStore file, IProgressMonitor monitor)
+	{
+		SubMonitor sub = SubMonitor.convert(monitor, 100);
+		if (file == null)
+		{
+			return;
+		}
+		try
+		{
+			sub.subTask(file.getName());
+
+			IParserPool pool = ParserPoolFactory.getInstance().getParserPool(HTMLNode.LANGUAGE);
+			if (pool != null)
+			{
+				String fileContents = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(20)));
+				if (fileContents != null && fileContents.trim().length() > 0)
+				{
+					IParser htmlParser = pool.checkOut();
+					if (htmlParser != null)
+					{
+
+						HTMLParseState parseState = new HTMLParseState();
+						parseState.setEditState(fileContents, "", 0, 0); //$NON-NLS-1$
+						IParseNode parseNode = htmlParser.parse(parseState);
+						pool.checkIn(htmlParser);
+						sub.worked(50);
+						walkNode(index, file, parseNode);
+					}
+				}
+			}
+		}
+		catch (Throwable e)
+		{
+			Activator
+					.logError(
+							MessageFormat.format(Messages.HTMLFileIndexingParticipant_Error_During_Indexing,
+									file.getName()), e);
+		}
+		finally
+		{
+			sub.done();
+		}
 	}
 
 	public static void walkNode(Index index, IFileStore file, IParseNode parent)
@@ -111,10 +120,13 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 				String jsSource = htmlSpecialNode.getAttributeValue(ATTRIBUTE_SRC);
 				if (jsSource != null)
 				{
-
 					IPathResolver resolver = new URIResolver(file.toURI());
 					URI resolved = resolver.resolveURI(jsSource);
-					addIndex(index, file, HTMLIndexConstants.RESOURCE_JS, resolved.toString());
+
+					if (resolved != null)
+					{
+						addIndex(index, file, HTMLIndexConstants.RESOURCE_JS, resolved.toString());
+					}
 				}
 			}
 		}

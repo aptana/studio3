@@ -1,37 +1,34 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 public class JSContinueNode extends JSLabelStatementNode
 {
 	/**
 	 * JSContinueNode
-	 * 
-	 * @param start
-	 * @param end
 	 */
-	public JSContinueNode(int start, int end)
+	public JSContinueNode()
 	{
-		super(JSNodeTypes.CONTINUE, start, end);
+		super(JSNodeTypes.CONTINUE);
 	}
 
 	/**
 	 * JSContinueNode
 	 * 
-	 * @param start
-	 * @param end
-	 * @param identifier
+	 * @param label
 	 */
-	public JSContinueNode(int start, int end, String identifier)
+	public JSContinueNode(Symbol label)
 	{
-		super(JSNodeTypes.CONTINUE, start, end, identifier);
+		super(JSNodeTypes.CONTINUE, label);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSLabelStatementNode#getKeyword()
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
 	@Override
-	protected String getKeyword()
+	public void accept(JSTreeWalker walker)
 	{
-		return "continue"; //$NON-NLS-1$
+		walker.visit(this);
 	}
 }

@@ -369,13 +369,22 @@ public class Synchronizer implements ILoggable
 			else
 			{
 				// get the complete file listings for the client and server
-				log(FileUtil.NEW_LINE + "Gathering list of source files from '" + client.toString() + "'. ");
+				log(FileUtil.NEW_LINE);
+				log(MessageFormat.format(Messages.Synchronizer_Gathering_Source, new Object[] { client.toString() }));
+
+				long start = System.currentTimeMillis();
 				clientFiles = EFSUtils.getFiles(client, true, _includeCloakedFiles, monitor);
-				log("Completed.");
-				log(FileUtil.NEW_LINE + "Gathering list of destination files from '" + server.toString() + "'. ");
+				log(MessageFormat.format(Messages.Synchronizer_Completed, System.currentTimeMillis() - start));
+
+				start = System.currentTimeMillis();
+				log(FileUtil.NEW_LINE);
+				log(MessageFormat.format(Messages.Synchronizer_Gathering_Destination,
+						new Object[] { server.toString() }));
 				serverFiles = EFSUtils.getFiles(server, true, _includeCloakedFiles, monitor);
-				log("Completed.");
-				log(FileUtil.NEW_LINE + "File listing complete.");
+				log(MessageFormat.format(Messages.Synchronizer_Completed, System.currentTimeMillis() - start));
+
+				log(FileUtil.NEW_LINE);
+				log(Messages.Synchronizer_Listing_Complete);
 			}
 		}
 		finally
@@ -406,7 +415,7 @@ public class Synchronizer implements ILoggable
 	public VirtualFileSyncPair[] createSyncItems(IFileStore[] clientFiles, IFileStore[] serverFiles,
 			IProgressMonitor monitor) throws IOException, CoreException
 	{
-		log(FileUtil.NEW_LINE + "Generating comparison.");
+		log(FileUtil.NEW_LINE + Messages.Synchronizer_Generating_Comparison);
 
 		Map<String, VirtualFileSyncPair> fileList = new HashMap<String, VirtualFileSyncPair>();
 
@@ -449,16 +458,18 @@ public class Synchronizer implements ILoggable
 			IFileInfo serverFileInfo = serverFile.fetchInfo(IExtendedFileStore.DETAILED, null);
 			String relativePath = getCanonicalPath(_serverFileRoot, serverFile);
 
-			logDebug(FileUtil.NEW_LINE + "Comparing '" + relativePath + "' with file from destination. ");
+			logDebug(FileUtil.NEW_LINE);
+			logDebug(MessageFormat.format(Messages.Synchronizer_Comparing_Files, new Object[] { relativePath }));
 
 			if (!fileList.containsKey(relativePath)) // Server only
 			{
 				if (serverFileInfo.getAttribute(EFS.ATTRIBUTE_SYMLINK))
 					continue;
+				
 				VirtualFileSyncPair item = new VirtualFileSyncPair(null, serverFile, relativePath,
 						SyncState.ServerItemOnly);
 				fileList.put(relativePath, item);
-				logDebug("Item not on destination.");
+				logDebug(Messages.Synchronizer_Item_Not_On_Destination);
 				continue;
 			}
 
@@ -469,29 +480,36 @@ public class Synchronizer implements ILoggable
 			// associate this server file with that sync item
 			item.setDestinationFile(serverFile);
 
-			if (item.getSourceFileInfo().isDirectory() != serverFileInfo.isDirectory())
+			IFileInfo clientFileInfo = item.getSourceFileInfo(monitor);
+			if(clientFileInfo == null && item.getSyncState() == SyncState.ServerItemOnly) {
+				// This is an item we've seen already. Continue on.
+				continue;
+			}
+			
+			if (clientFileInfo.isDirectory() != serverFileInfo.isDirectory())
 			{
 				// this only occurs if one file is a directory and the other
 				// is not a directory
 				item.setSyncState(SyncState.IncompatibleFileTypes);
-				logDebug("Incompatible types.");
+				logDebug(Messages.Synchronizer_Incompatible_Types);
 				continue;
 			}
 
-			if (serverFile.fetchInfo().isDirectory())
+			if (serverFileInfo.isDirectory())
 			{
 				fileList.remove(relativePath);
-				logDebug("Directory.");
+				logDebug(Messages.Synchronizer_Directory);
 				continue;
 			}
 
 			// calculate modification time difference, taking server
 			// offset into account
 			long serverFileTime = serverFileInfo.getLastModified();
-			long clientFileTime = item.getSourceFileInfo(null).getLastModified();
+			long clientFileTime = clientFileInfo.getLastModified();
 			long timeDiff = serverFileTime - clientFileTime;
 
-			logDebug("Source modified: " + clientFileTime + " Destination modified: " + serverFileTime + ". ");
+			logDebug(MessageFormat.format(Messages.Synchronizer_Times_Modified, new long[] { clientFileTime,
+					serverFileTime }));
 
 			// check modification date
 			if (-this._timeTolerance <= timeDiff && timeDiff <= this._timeTolerance)
@@ -503,7 +521,7 @@ public class Synchronizer implements ILoggable
 				else
 				{
 					item.setSyncState(SyncState.ItemsMatch);
-					logDebug("Items identical.");
+					logDebug(Messages.Synchronizer_Items_Identical);
 				}
 			}
 			else
@@ -511,12 +529,14 @@ public class Synchronizer implements ILoggable
 				if (timeDiff < 0)
 				{
 					item.setSyncState(SyncState.ClientItemIsNewer);
-					logDebug("Source Newer by " + Math.round(Math.abs(timeDiff / 1000)) + " seconds.");
+					logDebug(MessageFormat.format(Messages.Synchronizer_Source_Newer, new long[] { Math.round(Math
+							.abs(timeDiff / 1000)) }));
 				}
 				else
 				{
 					item.setSyncState(SyncState.ServerItemIsNewer);
-					logDebug("Destination Newer by " + Math.round(timeDiff / 1000) + " seconds.");
+					logDebug(MessageFormat.format(Messages.Synchronizer_Destination_Newer, new long[] { Math.round(Math
+							.abs(timeDiff / 1000)) }));
 				}
 			}
 		}
@@ -1528,12 +1548,12 @@ public class Synchronizer implements ILoggable
 		{
 			if (e.getCause() != null)
 			{
-				log(StringUtil.format(Messages.Synchronizer_Error, e.getLocalizedMessage() + " ("
-						+ e.getCause().getLocalizedMessage() + ")"));
+				log(MessageFormat.format(Messages.Synchronizer_Error_Extended, new Object[] { e.getLocalizedMessage(),
+						e.getCause().getLocalizedMessage() }));
 			}
 			else
 			{
-				log(StringUtil.format(Messages.Synchronizer_Error, e.getLocalizedMessage()));
+				log(MessageFormat.format(Messages.Synchronizer_Error, e.getLocalizedMessage()));
 			}
 		}
 	}

@@ -63,10 +63,18 @@ public final class Messages extends NLS
 	 */
 	public static String Synchronizer_ClientFileManagerCannotBeNull;
 
+	public static String Synchronizer_Comparing_Files;
+
+	public static String Synchronizer_Completed;
+
 	/**
 	 * Synchronizer_CreatedDirectory
 	 */
 	public static String Synchronizer_CreatedDirectory;
+
+	public static String Synchronizer_Destination_Newer;
+
+	public static String Synchronizer_Directory;
 
 	/**
 	 * Synchronizer_Downloading
@@ -77,6 +85,11 @@ public final class Messages extends NLS
 	 * Synchronizer_Error
 	 */
 	public static String Synchronizer_Error;
+
+	/**
+	 * Synchronizer_Error_Extended
+	 */
+	public static String Synchronizer_Error_Extended;
 
 	/**
 	 * Synchronizer_ErrorClosingStreams
@@ -103,15 +116,33 @@ public final class Messages extends NLS
 	 */
 	public static String Synchronizer_FullSyncCRCMismatches;
 
+	public static String Synchronizer_Gathering_Destination;
+
+	public static String Synchronizer_Gathering_Source;
+
+	public static String Synchronizer_Generating_Comparison;
+
+	public static String Synchronizer_Incompatible_Types;
+
+	public static String Synchronizer_Item_Not_On_Destination;
+
+	public static String Synchronizer_Items_Identical;
+
+	public static String Synchronizer_Listing_Complete;
+
 	/**
 	 * Synchronizer_ServerFileManagerCannotBeNull
 	 */
 	public static String Synchronizer_ServerFileManagerCannotBeNull;
 
+	public static String Synchronizer_Source_Newer;
+
 	/**
 	 * Synchronizer_Success
 	 */
 	public static String Synchronizer_Success;
+
+	public static String Synchronizer_Times_Modified;
 
 	/**
 	 * Synchronizer_Uploading

@@ -34,21 +34,22 @@
  */
 package com.aptana.ide.syncing.ui.handlers;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.aptana.ide.syncing.ui.actions.NewSiteAction;
 
-public class NewSiteHandler extends AbstractHandler
+public class NewSiteHandler extends BaseSyncHandler
 {
 
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		NewSiteAction action = new NewSiteAction();
 		action.setActivePart(null, HandlerUtil.getActivePart(event));
-		action.setSelection(HandlerUtil.getCurrentSelection(event));
+		action.setSelection(new StructuredSelection(getSelectedResources()));
 		action.run(null);
 
 		return null;

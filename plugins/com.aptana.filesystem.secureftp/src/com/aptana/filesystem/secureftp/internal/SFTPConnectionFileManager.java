@@ -295,7 +295,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 		return ftpClient != null && ftpClient.connected();
 	}
 
-	private void changeCurrentDir(IPath path) throws FTPException, IOException {
+	protected void changeCurrentDir(IPath path) throws FTPException, IOException {
 		try {
 			if (cwd == null) {
 				cwd = new Path(ftpClient.pwd());

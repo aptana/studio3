@@ -7,29 +7,40 @@ public class JSInvokeNode extends JSNode
 	/**
 	 * JSInvokeNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param children
 	 */
-	public JSInvokeNode(int start, int end, JSNode... children)
+	public JSInvokeNode(JSNode... children)
 	{
-		super(JSNodeTypes.INVOKE, start, end, children);
+		super(JSNodeTypes.INVOKE, children);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
-	public String toString()
+	@Override
+	public void accept(JSTreeWalker walker)
 	{
-		StringBuilder buffer = new StringBuilder();
-		IParseNode[] children = getChildren();
+		walker.visit(this);
+	}
 
-		buffer.append(children[0]);
-		buffer.append(children[1]);
+	/**
+	 * getArguments
+	 * 
+	 * @return
+	 */
+	public IParseNode getArguments()
+	{
+		return this.getChild(1);
+	}
 
-		this.appendSemicolon(buffer);
-
-		return buffer.toString();
+	/**
+	 * getExpression
+	 * 
+	 * @return
+	 */
+	public IParseNode getExpression()
+	{
+		return this.getChild(0);
 	}
 }

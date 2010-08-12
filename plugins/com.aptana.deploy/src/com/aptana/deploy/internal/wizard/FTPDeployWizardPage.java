@@ -1,24 +1,21 @@
 package com.aptana.deploy.internal.wizard;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.deploy.Activator;
-import com.aptana.deploy.internal.wizard.FTPDeployComposite.Direction;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
-import com.aptana.deploy.preferences.IPreferenceConstants;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.SiteConnectionUtils;
+import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants.SyncDirection;
+import com.aptana.ide.syncing.ui.preferences.SyncPreferenceUtil;
 import com.aptana.ide.ui.ftp.internal.FTPConnectionPropertyComposite;
 
 @SuppressWarnings("restriction")
@@ -28,12 +25,14 @@ public class FTPDeployWizardPage extends WizardPage implements FTPConnectionProp
 	public static final String NAME = "FTPDeployment"; //$NON-NLS-1$
 	private static final String ICON_PATH = "icons/ftp.png"; //$NON-NLS-1$
 
+	private IProject project;
 	private FTPDeployComposite ftpConnectionComposite;
 	private IBaseRemoteConnectionPoint connectionPoint;
 
 	protected FTPDeployWizardPage(IProject project)
 	{
 		super(NAME, Messages.FTPDeployWizardPage_Title, Activator.getImageDescriptor(ICON_PATH));
+		this.project = project;
 		// checks if the project already has an associated FTP connection and fills the info automatically if one exists
 		ISiteConnection[] sites = SiteConnectionUtils.findSitesForSource(project, true);
 		String lastConnection = DeployPreferenceUtil.getDeployEndpoint(project);
@@ -41,7 +40,7 @@ public class FTPDeployWizardPage extends WizardPage implements FTPConnectionProp
 		for (ISiteConnection site : sites)
 		{
 			connection = site.getDestination();
-			if (connection.getName().equals(lastConnection)
+			if ((connection != null && connection.getName().equals(lastConnection))
 					|| (lastConnection == null && connection instanceof IBaseRemoteConnectionPoint))
 			{
 				connectionPoint = (IBaseRemoteConnectionPoint) connection;
@@ -60,7 +59,7 @@ public class FTPDeployWizardPage extends WizardPage implements FTPConnectionProp
 		return ftpConnectionComposite.isAutoSyncSelected();
 	}
 
-	public Direction getSyncDirection()
+	public SyncDirection getSyncDirection()
 	{
 		return ftpConnectionComposite.getSyncDirection();
 	}
@@ -69,15 +68,13 @@ public class FTPDeployWizardPage extends WizardPage implements FTPConnectionProp
 	{
 		boolean complete = ftpConnectionComposite.completeConnection();
 		// persists the auto-sync setting
-		IEclipsePreferences prefs = (new InstanceScope()).getNode(Activator.getPluginIdentifier());
-		prefs.putBoolean(IPreferenceConstants.AUTO_SYNC, isAutoSyncSelected());
-		try
+		boolean autoSync = isAutoSyncSelected();
+		SyncPreferenceUtil.setAutoSync(project, autoSync);
+		if (autoSync)
 		{
-			prefs.flush();
+			SyncPreferenceUtil.setAutoSyncDirection(project, getSyncDirection());
 		}
-		catch (BackingStoreException e)
-		{
-		}
+
 		return complete;
 	}
 

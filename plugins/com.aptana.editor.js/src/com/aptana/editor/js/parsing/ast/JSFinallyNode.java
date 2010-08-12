@@ -7,29 +7,30 @@ public class JSFinallyNode extends JSNode
 	/**
 	 * JSFinallyNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param children
 	 */
-	public JSFinallyNode(int start, int end, JSNode... children)
+	public JSFinallyNode(JSNode... children)
 	{
-		super(JSNodeTypes.FINALLY, start, end, children);
+		super(JSNodeTypes.FINALLY, children);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
-	public String toString()
+	@Override
+	public void accept(JSTreeWalker walker)
 	{
-		StringBuilder buffer = new StringBuilder();
-		IParseNode[] children = getChildren();
+		walker.visit(this);
+	}
 
-		buffer.append("finally "); //$NON-NLS-1$
-		buffer.append(children[0]);
-
-		this.appendSemicolon(buffer);
-
-		return buffer.toString();
+	/**
+	 * getBlock
+	 * 
+	 * @return
+	 */
+	public IParseNode getBlock()
+	{
+		return this.getChild(0);
 	}
 }

@@ -41,6 +41,7 @@ public class Messages extends NLS {
     private static final String BUNDLE_NAME = "com.aptana.ide.syncing.ui.actions.messages"; //$NON-NLS-1$
 
     public static String BaseSyncAction_MessageTitle;
+	public static String BaseSyncAction_RetrievingItems;
     public static String BaseSyncAction_Warning_NoCommonParent;
 
     public static String DownloadAction_MessageTitle;

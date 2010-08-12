@@ -210,8 +210,6 @@ public class DiskIndex
 			}
 		}
 
-		if (results == null)
-			return null;
 		return results;
 	}
 
@@ -411,52 +409,64 @@ public class DiskIndex
 	 * 
 	 * @throws IOException
 	 */
-	public void initialize() throws IOException
+	public void initialize(boolean reuseExistingFile) throws IOException
 	{
 		if (this.indexFile.exists())
 		{
-			// read it in!
-			InputStream stream = new BufferedInputStream(new FileInputStream(this.indexFile));
-			try
+			if (reuseExistingFile)
 			{
-				streamRead = 0;
-				String signature = readString(stream);
-				if (!signature.equals(SIGNATURE))
-				{
-					throw new IOException(Messages.DiskIndex_Wrong_Format);
-				}
-				this.headerInfoOffset = readStreamInt(stream);
-				if (this.headerInfoOffset > 0)
-				{ // file is empty if its not set
-					skip(stream, this.headerInfoOffset - this.streamRead); // assume that the header info offset is over
-					// current buffer end
-					readHeaderInfo(stream);
-				}
-			}
-			finally
-			{
-				stream.close();
-			}
-			return;
-		}
-		else
-		{
-			// create a new empty one!
-			if (indexFile.createNewFile())
-			{
-				FileOutputStream stream = new FileOutputStream(this.indexFile, false);
+				// read it in!
+				InputStream stream = new BufferedInputStream(new FileInputStream(this.indexFile));
 				try
 				{
-					writeString(stream, SIGNATURE);
-					stream.write(-1);
+					streamRead = 0;
+					String signature = readString(stream);
+					if (!signature.equals(SIGNATURE))
+					{
+						throw new IOException(Messages.DiskIndex_Wrong_Format);
+					}
+					this.headerInfoOffset = readStreamInt(stream);
+					if (this.headerInfoOffset > 0)
+					{ // file is empty if its not set
+						skip(stream, this.headerInfoOffset - this.streamRead); // assume that the header info offset is
+																				// over
+						// current buffer end
+						readHeaderInfo(stream);
+					}
 				}
 				finally
 				{
 					stream.close();
 				}
+				return;
 			}
-			else
-				throw new IOException(Messages.DiskIndex_Unable_To_Create_Index_File + indexFile);
+			if (!this.indexFile.delete())
+			{
+				if (DEBUG)
+					System.out.println("initialize - Failed to delete index " + this.indexFile); //$NON-NLS-1$
+				throw new IOException("Failed to delete index " + this.indexFile); //$NON-NLS-1$
+			}
+		}
+
+		// create a new empty one!
+		if (indexFile.createNewFile())
+		{
+			FileOutputStream stream = new FileOutputStream(this.indexFile, false);
+			try
+			{
+				writeString(stream, SIGNATURE);
+				stream.write(-1);
+			}
+			finally
+			{
+				stream.close();
+			}
+		}
+		else
+		{
+			if (DEBUG)
+				System.out.println("initialize - Failed to create new index " + this.indexFile); //$NON-NLS-1$
+			throw new IOException(Messages.DiskIndex_Unable_To_Create_Index_File + indexFile);
 		}
 	}
 
@@ -600,7 +610,7 @@ public class DiskIndex
 
 			// index is now empty since all the saved documents were removed
 			DiskIndex newDiskIndex = new DiskIndex(this.indexFile.getPath());
-			newDiskIndex.initialize();
+			newDiskIndex.initialize(false);
 			return newDiskIndex;
 		}
 

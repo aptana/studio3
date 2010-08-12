@@ -1270,6 +1270,10 @@ public class VT100Emulator implements ControlListener {
 		} else {
 			c = fReader.read();
 		}
+		// workaround for unicode characters (for some reasons they appear as 137 63 63)
+		if (c == 137) {
+			c = ' ';
+		}
 		// TODO: better end of file handling
 		if(c==-1)
 			c=0;

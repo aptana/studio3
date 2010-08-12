@@ -30,23 +30,18 @@ public class CSSTermListNode extends CSSExpressionNode
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (!(obj instanceof CSSTermListNode))
+		if (!super.equals(obj) || !(obj instanceof CSSTermListNode))
 		{
 			return false;
 		}
 		CSSTermListNode other = (CSSTermListNode) obj;
-		return getLeftExpression().equals(other.getLeftExpression())
-				&& (fSeparator == null ? other.fSeparator == null : fSeparator.equals(other.fSeparator))
-				&& getRightExpression().equals(other.getRightExpression());
+		return toString().equals(other.toString());
 	}
 
 	@Override
 	public int hashCode()
 	{
-		int hash = getLeftExpression().hashCode();
-		hash = 31 * hash + (fSeparator == null ? 0 : fSeparator.hashCode());
-		hash = 31 * hash + getRightExpression().hashCode();
-		return hash;
+		return super.hashCode() * 31 + toString().hashCode();
 	}
 
 	@Override

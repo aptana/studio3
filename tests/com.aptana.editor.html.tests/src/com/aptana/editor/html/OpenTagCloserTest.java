@@ -15,6 +15,7 @@ import org.eclipse.ui.PlatformUI;
 public class OpenTagCloserTest extends TestCase
 {
 	private TextViewer viewer;
+	private OpenTagCloser closer;
 
 	@Override
 	protected void setUp() throws Exception
@@ -25,12 +26,18 @@ public class OpenTagCloserTest extends TestCase
 		if (shell == null)
 			shell = new Shell(display);
 		viewer = new TextViewer(shell, SWT.NONE);
+		closer = new OpenTagCloser(viewer)
+		{
+			protected boolean shouldAutoClose(IDocument document, int offset, VerifyEvent event)
+			{
+				return true;
+			};
+		};
 	}
 
 	public void testDoesntCloseIfIsClosingTag()
 	{
 		IDocument document = setDocument("</p");
-		OpenTagCloser closer = new OpenTagCloser(viewer);
 		VerifyEvent event = createGreaterThanKeyEvent(3);
 		closer.verifyKey(event);
 
@@ -42,7 +49,6 @@ public class OpenTagCloserTest extends TestCase
 	public void testCloseOpenTag()
 	{
 		IDocument document = setDocument("<p");
-		OpenTagCloser closer = new OpenTagCloser(viewer);
 		VerifyEvent event = createGreaterThanKeyEvent(2);
 		closer.verifyKey(event);
 
@@ -53,7 +59,6 @@ public class OpenTagCloserTest extends TestCase
 	public void testDoesntCloseIfNextTagIsClosingTag()
 	{
 		IDocument document = setDocument("<p </p>");
-		OpenTagCloser closer = new OpenTagCloser(viewer);
 		VerifyEvent event = createGreaterThanKeyEvent(2);
 		closer.verifyKey(event);
 
@@ -65,7 +70,6 @@ public class OpenTagCloserTest extends TestCase
 	public void testDoesCloseIfNextTagIsNotClosingTag()
 	{
 		IDocument document = setDocument("<p <div></div>");
-		OpenTagCloser closer = new OpenTagCloser(viewer);
 		VerifyEvent event = createGreaterThanKeyEvent(2);
 		closer.verifyKey(event);
 
@@ -77,7 +81,6 @@ public class OpenTagCloserTest extends TestCase
 	public void testDoesntCloseIfClosedLater()
 	{
 		IDocument document = setDocument("<p <b></b></p>");
-		OpenTagCloser closer = new OpenTagCloser(viewer);
 		VerifyEvent event = createGreaterThanKeyEvent(2);
 		closer.verifyKey(event);
 
@@ -88,7 +91,6 @@ public class OpenTagCloserTest extends TestCase
 	public void testDoesCloseIfNotClosedButPairFollows()
 	{
 		IDocument document = setDocument("<p <b></b><p></p>");
-		OpenTagCloser closer = new OpenTagCloser(viewer);
 		VerifyEvent event = createGreaterThanKeyEvent(2);
 		closer.verifyKey(event);
 
@@ -100,7 +102,6 @@ public class OpenTagCloserTest extends TestCase
 	public void testDoesCloseIfNextCharIsLessThanAndWeNeedToClose()
 	{
 		IDocument document = setDocument("<p>");
-		OpenTagCloser closer = new OpenTagCloser(viewer);
 		VerifyEvent event = createGreaterThanKeyEvent(2);
 		closer.verifyKey(event);
 
@@ -112,7 +113,6 @@ public class OpenTagCloserTest extends TestCase
 	public void testDoesCloseProperlyWithOpenTagContaingAttrsIfNextCharIsLessThanAndWeNeedToClose()
 	{
 		IDocument document = setDocument("<a href=\"\">");
-		OpenTagCloser closer = new OpenTagCloser(viewer);
 		VerifyEvent event = createGreaterThanKeyEvent(10);
 		closer.verifyKey(event);
 
@@ -124,7 +124,6 @@ public class OpenTagCloserTest extends TestCase
 	public void testDoesntCloseIfNextCharIsLessThanAndWeDontNeedToCloseButOverwritesExistingLessThan()
 	{
 		IDocument document = setDocument("<p></p>");
-		OpenTagCloser closer = new OpenTagCloser(viewer);
 		VerifyEvent event = createGreaterThanKeyEvent(2);
 		closer.verifyKey(event);
 
@@ -136,7 +135,6 @@ public class OpenTagCloserTest extends TestCase
 	public void testDoesntCloseImplicitSelfClosingTag()
 	{
 		IDocument document = setDocument("<br");
-		OpenTagCloser closer = new OpenTagCloser(viewer);
 		VerifyEvent event = createGreaterThanKeyEvent(4);
 		closer.verifyKey(event);
 
@@ -147,7 +145,6 @@ public class OpenTagCloserTest extends TestCase
 	public void testDoesntCloseExplicitSelfClosingTag()
 	{
 		IDocument document = setDocument("<br/");
-		OpenTagCloser closer = new OpenTagCloser(viewer);
 		VerifyEvent event = createGreaterThanKeyEvent(4);
 		closer.verifyKey(event);
 
@@ -159,7 +156,6 @@ public class OpenTagCloserTest extends TestCase
 	public void testDoesntCloseExplicitSelfClosingTagWithExtraSpaces()
 	{
 		IDocument document = setDocument("<br /");
-		OpenTagCloser closer = new OpenTagCloser(viewer);
 		VerifyEvent event = createGreaterThanKeyEvent(5);
 		closer.verifyKey(event);
 
@@ -170,7 +166,6 @@ public class OpenTagCloserTest extends TestCase
 	public void testDoesntCloseSpecialERBTags()
 	{
 		IDocument document = setDocument("<%= %");
-		OpenTagCloser closer = new OpenTagCloser(viewer);
 		VerifyEvent event = createGreaterThanKeyEvent(5);
 		closer.verifyKey(event);
 
@@ -178,10 +173,19 @@ public class OpenTagCloserTest extends TestCase
 		assertTrue(event.doit);
 	}
 
+	public void testDoesntCloseComments()
+	{
+		IDocument document = setDocument("<!-- ");
+		VerifyEvent event = createGreaterThanKeyEvent(5);
+		closer.verifyKey(event);
+
+		assertEquals("<!-- ", document.get());
+		assertTrue(event.doit);
+	}
+
 	public void testDoesStickCursorBetweenAutoClosedTagPair()
 	{
 		IDocument document = setDocument("<html>");
-		OpenTagCloser closer = new OpenTagCloser(viewer);
 		VerifyEvent event = createGreaterThanKeyEvent(6);
 		closer.verifyKey(event);
 
@@ -194,7 +198,6 @@ public class OpenTagCloserTest extends TestCase
 	public void testDoesntCloseIfHasSpacesInOpenTagAndHasClosingTag()
 	{
 		IDocument document = setDocument("<script src=\"http://example.org/src.js\">\n\n</script>");
-		OpenTagCloser closer = new OpenTagCloser(viewer);
 		VerifyEvent event = createGreaterThanKeyEvent(39);
 		closer.verifyKey(event);
 

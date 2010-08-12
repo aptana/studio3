@@ -274,20 +274,27 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	public void apply(ITextViewer viewer, char trigger, int stateMask, int offset)
 	{
 		IDocument document = viewer.getDocument();
-		int shift = offset - this._replacementOffset;
-		if (shift >= this._replacementString.length())
+		boolean validPrefix = isValidPrefix(getPrefix(document, offset), getDisplayString());
+		int shift = (validPrefix) ? offset - this._replacementOffset : 0;
+		
+		if (shift < this._replacementString.length())
 		{
-			return;
-		}
-		int length = Math.max(0, this._replacementLength - shift);
-		String toReplace = this._replacementString.substring(shift);
-		try
-		{
-			document.replace(offset, length, toReplace);
-		}
-		catch (BadLocationException x)
-		{
-			// ignore
+			int length = Math.max(0, this._replacementLength - shift);
+			String toReplace = this._replacementString.substring(shift);
+			
+			if (!validPrefix)
+			{
+				offset = this._replacementOffset;
+			}
+			
+			try
+			{
+				document.replace(offset, length, toReplace);
+			}
+			catch (BadLocationException x)
+			{
+				// ignore
+			}
 		}
 	}
 

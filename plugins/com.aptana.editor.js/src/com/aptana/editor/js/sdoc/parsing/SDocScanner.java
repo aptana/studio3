@@ -1,8 +1,8 @@
 package com.aptana.editor.js.sdoc.parsing;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.ArrayDeque;
+import java.util.Queue;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -20,7 +20,7 @@ public class SDocScanner extends Scanner
 	private SDocTokenScanner fTokenScanner;
 	private SDocTypeTokenScanner fTypeTokenScanner;
 	private IDocument fDocument;
-	private List<Symbol> fQueue;
+	private Queue<Symbol> fQueue;
 	private int fOffset;
 
 	/**
@@ -30,7 +30,7 @@ public class SDocScanner extends Scanner
 	{
 		fTokenScanner = new SDocTokenScanner();
 		fTypeTokenScanner = new SDocTypeTokenScanner();
-		fQueue = new LinkedList<Symbol>();
+		fQueue = new ArrayDeque<Symbol>();
 	}
 
 	/*
@@ -41,38 +41,38 @@ public class SDocScanner extends Scanner
 	public Symbol nextToken() throws IOException, Exception
 	{
 		Symbol result;
-		
+
 		if (fQueue.size() > 0)
 		{
-			result = fQueue.remove(0);
+			result = fQueue.poll();
 		}
 		else
 		{
 			IToken token = fTokenScanner.nextToken();
 			Object data = token.getData();
-	
+
 			while (data == SDocTokenType.WHITESPACE)
 			{
 				token = fTokenScanner.nextToken();
 				data = token.getData();
 			}
-	
+
 			int offset = fTokenScanner.getTokenOffset();
 			int length = fTokenScanner.getTokenLength();
 			SDocTokenType type = (data == null) ? SDocTokenType.EOF : (SDocTokenType) data;
-	
+
 			if (type == SDocTokenType.TYPES)
 			{
 				this.queueTypeTokens(offset, length);
-	
-				result = fQueue.remove(0);
+
+				result = fQueue.poll();
 			}
 			else
 			{
 				try
 				{
 					int totalLength = fDocument.getLength();
-	
+
 					if (offset > totalLength)
 					{
 						offset = totalLength;
@@ -81,7 +81,7 @@ public class SDocScanner extends Scanner
 					{
 						length = 0;
 					}
-	
+
 					result = new Symbol(type.getIndex(), offset + fOffset, offset + fOffset + length - 1, fDocument.get(offset, length));
 				}
 				catch (BadLocationException e)
@@ -90,7 +90,7 @@ public class SDocScanner extends Scanner
 				}
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -112,13 +112,13 @@ public class SDocScanner extends Scanner
 			int length = fTypeTokenScanner.getTokenLength();
 			Object data = token.getData();
 			SDocTokenType type = (data == null) ? SDocTokenType.EOF : (SDocTokenType) data;
-			
+
 			try
 			{
 				Symbol symbol = new Symbol(type.getIndex(), offset + fOffset, offset + fOffset + length - 1, fDocument.get(offset, length));
 
-				fQueue.add(symbol);
-				
+				fQueue.offer(symbol);
+
 				token = fTypeTokenScanner.nextToken();
 			}
 			catch (BadLocationException e)
@@ -137,7 +137,7 @@ public class SDocScanner extends Scanner
 	{
 		fOffset = offset;
 	}
-	
+
 	/**
 	 * setSource
 	 * 

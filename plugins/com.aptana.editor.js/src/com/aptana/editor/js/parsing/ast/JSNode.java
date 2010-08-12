@@ -1,10 +1,8 @@
 package com.aptana.editor.js.parsing.ast;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.aptana.editor.js.parsing.IJSParserConstants;
@@ -20,9 +18,7 @@ public class JSNode extends ParseNode
 
 	private short fType;
 	private boolean fSemicolonIncluded;
-
 	private DocumentationBlock fDocumentation;
-	private List<String> fTypes;
 
 	/**
 	 * static initializer
@@ -55,11 +51,11 @@ public class JSNode extends ParseNode
 	/**
 	 * JSNode
 	 */
-	public JSNode()
+	protected JSNode()
 	{
-		this(DEFAULT_TYPE, 0, 0);
+		this(DEFAULT_TYPE);
 	}
-
+	
 	/**
 	 * JSNode
 	 * 
@@ -68,36 +64,26 @@ public class JSNode extends ParseNode
 	 * @param end
 	 * @param children
 	 */
-	public JSNode(short type, int start, int end, JSNode... children)
+	protected JSNode(short type, JSNode... children)
 	{
 		super(IJSParserConstants.LANGUAGE);
-		fType = type;
-		this.start = start;
-		this.end = end;
-		setChildren(children);
+
+		// set node type
+		this.fType = type;
+
+		// store children
+		this.setChildren(children);
 	}
 
 	/**
-	 * addReturnTypes
+	 * accept
 	 * 
-	 * @param types
+	 * @param walker
 	 */
-	protected void addReturnTypes(List<String> types)
+	public void accept(JSTreeWalker walker)
 	{
-		// do nothing, sub-classes should override
-	}
-
-	/**
-	 * appendSemicolon
-	 * 
-	 * @param buffer
-	 */
-	protected void appendSemicolon(StringBuilder buffer)
-	{
-		if (getSemicolonIncluded())
-		{
-			buffer.append(";");
-		}
+		// sub-classes must override this method so their types will be
+		// recognized properly
 	}
 
 	/*
@@ -112,7 +98,8 @@ public class JSNode extends ParseNode
 			return false;
 		}
 		JSNode other = (JSNode) obj;
-		return getNodeType() == other.getNodeType() && getSemicolonIncluded() == other.getSemicolonIncluded() && Arrays.equals(getChildren(), other.getChildren());
+		return getNodeType() == other.getNodeType() && getSemicolonIncluded() == other.getSemicolonIncluded()
+			&& Arrays.equals(getChildren(), other.getChildren());
 	}
 
 	/**
@@ -164,21 +151,13 @@ public class JSNode extends ParseNode
 		return (result == null) ? super.getElementName() : result;
 	}
 
-	/**
-	 * getTypes
-	 * 
-	 * @return
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseBaseNode#getType()
 	 */
-	public List<String> getTypes()
+	public short getNodeType()
 	{
-		if (fTypes == null)
-		{
-			fTypes = new ArrayList<String>();
-
-			addReturnTypes(fTypes);
-		}
-
-		return fTypes;
+		return fType;
 	}
 
 	/**
@@ -189,15 +168,6 @@ public class JSNode extends ParseNode
 	public boolean getSemicolonIncluded()
 	{
 		return fSemicolonIncluded;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseBaseNode#getType()
-	 */
-	public short getNodeType()
-	{
-		return fType;
 	}
 
 	/*
@@ -234,6 +204,16 @@ public class JSNode extends ParseNode
 	}
 
 	/**
+	 * setType
+	 * 
+	 * @param type
+	 */
+	protected void setNodeType(short type)
+	{
+		fType = type;
+	}
+
+	/**
 	 * setSemicolonIncluded
 	 * 
 	 * @param included
@@ -242,31 +222,17 @@ public class JSNode extends ParseNode
 	{
 		fSemicolonIncluded = included;
 	}
-
-	/**
-	 * setType
-	 * 
-	 * @param type
-	 */
-	protected void setType(short type)
-	{
-		fType = type;
-	}
-
+	
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseBaseNode#toString()
+	 * @see com.aptana.parsing.ast.ParseNode#toString()
 	 */
-	@Override
 	public String toString()
 	{
-		if (this.getSemicolonIncluded())
-		{
-			return super.toString() + ";";
-		}
-		else
-		{
-			return super.toString();
-		}
+		JSFormatWalker walker = new JSFormatWalker();
+		
+		this.accept(walker);
+		
+		return walker.getText();
 	}
 }

@@ -54,5 +54,11 @@
             language="text/ruby">
       </parser>
    </extension>
+   <extension
+         point="com.aptana.org.eclipse.tm.terminal.terminalHyperlinkDetectors">
+      <detector
+            class="com.aptana.editor.ruby.internal.hyperlink.StacktraceHyperlinkDetector">
+      </detector>
+   </extension>
 
 </plugin>

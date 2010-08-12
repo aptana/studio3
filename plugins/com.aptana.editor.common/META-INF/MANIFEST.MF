@@ -27,7 +27,9 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.index.core;bundle-version="2.0.0",
  com.aptana.ui;bundle-version="3.0.0",
  beaver;bundle-version="1.0.0",
- com.aptana.theme
+ com.aptana.theme,
+ com.aptana.terminal;bundle-version="1.0.0",
+ com.aptana.org.eclipse.tm.terminal;bundle-version="3.0.100"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
@@ -42,6 +44,7 @@ Export-Package: com.aptana.editor.common,
  com.aptana.editor.common.scripting.commands,
  com.aptana.editor.common.scripting.snippets,
  com.aptana.editor.common.text,
+ com.aptana.editor.common.text.hyperlink,
  com.aptana.editor.common.text.rules
 Eclipse-ExtensibleAPI: true
 Bundle-ClassPath: .

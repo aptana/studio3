@@ -1,41 +1,74 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSDoNode extends JSNode
 {
+	private Symbol _leftParenthesis;
+	private Symbol _rightParenthesis;
+	
 	/**
 	 * JSDoNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param children
 	 */
-	public JSDoNode(int start, int end, JSNode... children)
+	public JSDoNode(JSNode body, Symbol leftParenthesis, JSNode condition, Symbol rightParenthesis)
 	{
-		super(JSNodeTypes.DO, start, end, children);
+		super(JSNodeTypes.DO, body, condition);
+		
+		this._leftParenthesis = leftParenthesis;
+		this._rightParenthesis = rightParenthesis;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
-	public String toString()
+	@Override
+	public void accept(JSTreeWalker walker)
 	{
-		StringBuilder buffer = new StringBuilder();
-		IParseNode[] children = getChildren();
+		walker.visit(this);
+	}
 
-		buffer.append("do ").append(children[0]); //$NON-NLS-1$
+	/**
+	 * getBody
+	 * 
+	 * @return
+	 */
+	public IParseNode getBody()
+	{
+		return this.getChild(0);
+	}
 
-		if (children[0].getNodeType() != JSNodeTypes.STATEMENTS)
-		{
-			buffer.append(";"); //$NON-NLS-1$
-		}
-
-		buffer.append(" while (").append(children[1]).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
-
-		this.appendSemicolon(buffer);
-
-		return buffer.toString();
+	/**
+	 * getCondition
+	 * 
+	 * @return
+	 */
+	public IParseNode getCondition()
+	{
+		return this.getChild(1);
+	}
+	
+	/**
+	 * getLeftParenthesis
+	 * 
+	 * @return
+	 */
+	public Symbol getLeftParenthesis()
+	{
+		return this._leftParenthesis;
+	}
+	
+	/**
+	 * getRightParenthesis
+	 * 
+	 * @return
+	 */
+	public Symbol getRightParenthesis()
+	{
+		return this._rightParenthesis;
 	}
 }

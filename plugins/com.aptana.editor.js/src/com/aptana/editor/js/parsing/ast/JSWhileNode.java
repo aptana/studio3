@@ -1,37 +1,74 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSWhileNode extends JSNode
 {
+	private Symbol _leftParenthesis;
+	private Symbol _rightParenthesis;
+
 	/**
 	 * JSWhileNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param children
 	 */
-	public JSWhileNode(int start, int end, JSNode... children)
+	public JSWhileNode(Symbol leftParenthesis, JSNode condition, Symbol rightParenthesis, JSNode body)
 	{
-		super(JSNodeTypes.WHILE, start, end, children);
+		super(JSNodeTypes.WHILE, condition, body);
+		
+		this._leftParenthesis = leftParenthesis;
+		this._rightParenthesis = rightParenthesis;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
-	public String toString()
+	@Override
+	public void accept(JSTreeWalker walker)
 	{
-		StringBuilder buffer = new StringBuilder();
-		IParseNode[] children = getChildren();
+		walker.visit(this);
+	}
 
-		buffer.append("while ("); //$NON-NLS-1$
-		buffer.append(children[0]);
-		buffer.append(") "); //$NON-NLS-1$
-		buffer.append(children[1]);
+	/**
+	 * getBody
+	 * 
+	 * @return
+	 */
+	public IParseNode getBody()
+	{
+		return this.getChild(1);
+	}
 
-		this.appendSemicolon(buffer);
+	/**
+	 * getCondition
+	 * 
+	 * @return
+	 */
+	public IParseNode getCondition()
+	{
+		return this.getChild(0);
+	}
 
-		return buffer.toString();
+	/**
+	 * getLeftParenthesis
+	 * 
+	 * @return
+	 */
+	public Symbol getLeftParenthesis()
+	{
+		return this._leftParenthesis;
+	}
+
+	/**
+	 * getRightParenthesis
+	 * 
+	 * @return
+	 */
+	public Symbol getRightParenthesis()
+	{
+		return this._rightParenthesis;
 	}
 }

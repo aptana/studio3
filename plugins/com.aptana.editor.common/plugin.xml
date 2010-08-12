@@ -425,7 +425,7 @@
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
          <toolbar
-               id="aptana">
+               id="com.aptana.ui.globalActionSet">
             <command
                   commandId="com.aptana.editor.common.commands.toggleOutline"
                   icon="icons/full/eview16/outline_co.png"
@@ -437,6 +437,13 @@
                </visibleWhen>
             </command>
          </toolbar>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.menus.showInMenu">
+         <dynamic
+               class="com.aptana.ui.commands.OpenFileManagerContributionItem"
+               id="com.aptana.editor.common.open.in.file.manager">
+         </dynamic>
       </menuContribution>
 	</extension>
 	<extension

@@ -546,6 +546,9 @@ public class CopyFilesOperation {
      *         otherwise
      */
     private static String validateDestination(IAdaptable destination, IFileStore[] sourceStores) {
+    	if (destination instanceof IResource && !((IResource) destination).isAccessible()) {
+    		return Messages.CopyFilesOperation_DestinationNotAccessible;
+    	}
         IFileStore destinationStore = getFolderStore(destination);
         IFileStore sourceParentStore;
         for (IFileStore sourceStore : sourceStores) {

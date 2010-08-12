@@ -7,31 +7,40 @@ public class JSCatchNode extends JSNode
 	/**
 	 * JSCatchNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param children
 	 */
-	public JSCatchNode(int start, int end, JSNode... children)
+	public JSCatchNode(JSNode... children)
 	{
-		super(JSNodeTypes.CATCH, start, end, children);
+		super(JSNodeTypes.CATCH, children);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
-	public String toString()
+	@Override
+	public void accept(JSTreeWalker walker)
 	{
-		StringBuilder buffer = new StringBuilder();
-		IParseNode[] children = getChildren();
+		walker.visit(this);
+	}
 
-		buffer.append("catch ("); //$NON-NLS-1$
-		buffer.append(children[0]);
-		buffer.append(") "); //$NON-NLS-1$
-		buffer.append(children[1]);
+	/**
+	 * getBody
+	 * 
+	 * @return
+	 */
+	public IParseNode getBody()
+	{
+		return this.getChild(1);
+	}
 
-		this.appendSemicolon(buffer);
-
-		return buffer.toString();
+	/**
+	 * getIdentifier
+	 * 
+	 * @return
+	 */
+	public IParseNode getIdentifier()
+	{
+		return this.getChild(0);
 	}
 }

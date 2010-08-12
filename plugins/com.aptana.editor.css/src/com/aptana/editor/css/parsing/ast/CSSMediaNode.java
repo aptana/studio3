@@ -17,7 +17,7 @@ public class CSSMediaNode extends CSSNode
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (!(obj instanceof CSSMediaNode))
+		if (!super.equals(obj) || !(obj instanceof CSSMediaNode))
 		{
 			return false;
 		}
@@ -28,7 +28,7 @@ public class CSSMediaNode extends CSSNode
 	@Override
 	public int hashCode()
 	{
-		return Arrays.hashCode(fMedias);
+		return super.hashCode() * 31 + Arrays.hashCode(fMedias);
 	}
 
 	@Override

@@ -76,12 +76,12 @@ class ExitPolicy implements IExitPolicy
 	}
 
 	/**
-	 * Don't insert newline when we're in auto-paired string chars or pipes
+	 * Don't insert newline when we're in auto-paired string chars, pipes ||, or less-than/greater-than <> pair.
 	 * @return
 	 */
 	private boolean shouldInsertNewline()
 	{
-		return !isStringPair() && fExitCharacter != '|' && fExitCharacter != '>' && fExitCharacter != ')' && fExitCharacter != ']';
+		return !isStringPair() && fExitCharacter != '|' && fExitCharacter != '>';
 	}
 	
 	private boolean isStringPair()

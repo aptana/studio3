@@ -1,6 +1,10 @@
 package com.aptana.deploy.internal.wizard;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -83,6 +87,12 @@ public class HerokuSignupPage extends WizardPage
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
+				if(!isEmailValid(userId.getText()))
+				{
+					MessageDialog.openError(getShell(), "Error", Messages.HerokuSignupPage_InvalidEmail_Message); //$NON-NLS-1$
+					return;
+				}
+				
 				// basically just perform finish!
 				if (getWizard().performFinish())
 				{
@@ -119,5 +129,18 @@ public class HerokuSignupPage extends WizardPage
 
 		setErrorMessage(null);
 		return true;
+	}
+	
+	private Boolean isEmailValid(String email)
+	{
+		
+		Pattern p = Pattern.compile("^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+		
+		Matcher m = p.matcher(email);
+		
+		if(m.matches())
+			return true;
+		
+		return false;
 	}
 }

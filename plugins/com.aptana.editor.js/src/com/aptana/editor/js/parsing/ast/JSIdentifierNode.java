@@ -11,18 +11,18 @@ public class JSIdentifierNode extends JSPrimitiveNode
 	 */
 	public JSIdentifierNode(Symbol identifier)
 	{
-		this(identifier.getStart(), identifier.getEnd(), (String) identifier.value);
+		super(JSNodeTypes.IDENTIFIER, (String) identifier.value);
+		
+		this.setLocation(identifier.getStart(), identifier.getEnd());
 	}
-	
-	/**
-	 * JSIdentifierNode
-	 * 
-	 * @param start
-	 * @param end
-	 * @param text
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
-	public JSIdentifierNode(int start, int end, String text)
+	@Override
+	public void accept(JSTreeWalker walker)
 	{
-		super(JSNodeTypes.IDENTIFIER, start, end, text);
+		walker.visit(this);
 	}
 }

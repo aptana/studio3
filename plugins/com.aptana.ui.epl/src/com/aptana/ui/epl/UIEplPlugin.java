@@ -4,6 +4,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -113,5 +115,18 @@ public class UIEplPlugin extends AbstractUIPlugin
 	public static void logError(Throwable t)
 	{
 		logError(t.getMessage(), t);
+	}
+
+    public static Image getImage(String string)
+	{
+		if (getDefault().getImageRegistry().get(string) == null)
+		{
+			ImageDescriptor id = imageDescriptorFromPlugin(PLUGIN_ID, string);
+			if (id != null)
+			{
+				getDefault().getImageRegistry().put(string, id);
+			}
+		}
+		return getDefault().getImageRegistry().get(string);
 	}
 }

@@ -52,19 +52,31 @@ public class IndexManager
 	 * @param path
 	 * @return
 	 */
-	public Index getIndex(URI path)
+	public synchronized Index getIndex(URI path)
 	{
 		Index index = indexes.get(path);
 		if (index == null)
 		{
 			try
 			{
-				index = new Index(path);
+				// First try to re-use an existing file if possible
+				index = new Index(path, true);
 				indexes.put(path, index);
 			}
 			catch (IOException e)
 			{
-				IndexActivator.logError("An error occurred while trying to access an index", e);
+				try
+				{
+					// We failed. Most likely disk index signature changed or got corrupted.
+					// Don't re-use the file (create an empty index file) and then force a rebuild of the index.
+					index = new Index(path, false);
+					indexes.put(path, index);
+					new RebuildIndexJob(path).schedule();
+				}
+				catch (IOException e1)
+				{
+					IndexActivator.logError("An error occurred while trying to access an index", e1); //$NON-NLS-1$
+				}
 			}
 		}
 		return index;
@@ -82,7 +94,7 @@ public class IndexManager
 			index.monitor = null;
 			indexFile = index.getIndexFile();
 		}
-		if (indexFile.exists())
+		if (indexFile != null && indexFile.exists())
 		{
 			indexFile.delete();
 		}

@@ -1,11 +1,17 @@
 package com.aptana.editor.js.parsing.ast;
 
-import java.util.List;
-
 import beaver.Symbol;
 
 public class JSTrueNode extends JSPrimitiveNode
 {
+	/**
+	 * JSTrueNode
+	 */
+	public JSTrueNode()
+	{
+		super(JSNodeTypes.TRUE, "true"); //$NON-NLS-1$
+	}
+
 	/**
 	 * JSTrueNode
 	 * 
@@ -13,26 +19,16 @@ public class JSTrueNode extends JSPrimitiveNode
 	 */
 	public JSTrueNode(Symbol identifier)
 	{
-		this(identifier.getStart(), identifier.getEnd());
-	}
-	
-	/**
-	 * JSTrueNode
-	 * 
-	 * @param start
-	 * @param end
-	 */
-	public JSTrueNode(int start, int end)
-	{
-		super(JSNodeTypes.TRUE, start, end, "true");
+		this();
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#addReturnTypes(java.util.List)
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
 	@Override
-	protected void addReturnTypes(List<String> types)
+	public void accept(JSTreeWalker walker)
 	{
-		types.add("Boolean");
+		walker.visit(this);
 	}
 }

@@ -1,14 +1,16 @@
 package com.aptana.editor.js.contentassist.model;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class BaseElement
 {
 	private String _name;
 	private String _description;
-	private List<UserAgentElement> _userAgents = new LinkedList<UserAgentElement>();
-	private List<SinceElement> _sinceList = new LinkedList<SinceElement>();
+	private List<UserAgentElement> _userAgents;
+	private List<SinceElement> _sinceList;
+	private List<String> _documents;
 	
 	/**
 	 * BaseElement
@@ -18,13 +20,39 @@ public class BaseElement
 	}
 	
 	/**
+	 * addDocument
+	 * 
+	 * @param document
+	 */
+	public void addDocument(String document)
+	{
+		if (document != null && document.length() > 0)
+		{
+			if (this._documents == null)
+			{
+				this._documents = new ArrayList<String>();
+			}
+			
+			this._documents.add(document);
+		}
+	}
+	
+	/**
 	 * addSince
 	 * 
 	 * @param since
 	 */
 	public void addSince(SinceElement since)
 	{
-		this._sinceList.add(since);
+		if (since != null)
+		{
+			if (this._sinceList == null)
+			{
+				this._sinceList = new ArrayList<SinceElement>();
+			}
+			
+			this._sinceList.add(since);
+		}
 	}
 	
 	/**
@@ -34,7 +62,15 @@ public class BaseElement
 	 */
 	public void addUserAgent(UserAgentElement userAgent)
 	{
-		this._userAgents.add(userAgent);
+		if (userAgent != null)
+		{
+			if (this._userAgents == null)
+			{
+				this._userAgents = new ArrayList<UserAgentElement>();
+			}
+			
+			this._userAgents.add(userAgent);
+		}
 	}
 	
 	/**
@@ -45,6 +81,23 @@ public class BaseElement
 	public String getDescription()
 	{
 		return this._description;
+	}
+	
+	/**
+	 * getDocuments
+	 * 
+	 * @return
+	 */
+	public List<String> getDocuments()
+	{
+		List<String> result = this._documents;
+		
+		if (result == null)
+		{
+			result = Collections.emptyList();
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -62,9 +115,16 @@ public class BaseElement
 	 * 
 	 * @return
 	 */
-	public SinceElement[] getSinceList()
+	public List<SinceElement> getSinceList()
 	{
-		return this._sinceList.toArray(new SinceElement[this._sinceList.size()]);
+		List<SinceElement> result = this._sinceList;
+		
+		if (result == null)
+		{
+			result = Collections.emptyList();
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -74,7 +134,14 @@ public class BaseElement
 	 */
 	public List<UserAgentElement> getUserAgents()
 	{
-		return this._userAgents;
+		List<UserAgentElement> result = this._userAgents;
+		
+		if (result == null)
+		{
+			result = Collections.emptyList();
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -82,13 +149,22 @@ public class BaseElement
 	 * 
 	 * @return
 	 */
-	public String[] getUserAgentNames()
+	public List<String> getUserAgentNames()
 	{
-		String[] result = new String[this._userAgents.size()];
+		List<String> result;
 		
-		for (int i = 0; i < result.length; i++)
+		if (this._userAgents != null)
 		{
-			result[i] = this._userAgents.get(i).getPlatform();
+			result = new ArrayList<String>(this._userAgents.size());
+			
+			for (UserAgentElement userAgent : this._userAgents)
+			{
+				result.add(userAgent.getPlatform());
+			}
+		}
+		else
+		{
+			result = Collections.emptyList();
 		}
 		
 		return result;
@@ -101,7 +177,10 @@ public class BaseElement
 	 */
 	public void setDescription(String description)
 	{
-		this._description = description;
+		if (description != null)
+		{
+			this._description = description;
+		}
 	}
 	
 	/**
@@ -111,6 +190,9 @@ public class BaseElement
 	 */
 	public void setName(String name)
 	{
-		this._name = name;
+		if (name != null)
+		{
+			this._name = name;
+		}
 	}
 }

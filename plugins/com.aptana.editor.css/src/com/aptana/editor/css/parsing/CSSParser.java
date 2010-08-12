@@ -32,7 +32,7 @@ import com.aptana.parsing.ast.ParseRootNode;
  * <a href="http://beaver.sourceforge.net">Beaver</a> v0.9.6.1
  * from the grammar specification "CSS.grammar".
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({"rawtypes", "unchecked", "nls"})
 public class CSSParser extends Parser implements IParser {
 
 	// suppress the error printouts
@@ -106,7 +106,6 @@ public class CSSParser extends Parser implements IParser {
 
 	private CSSScanner fScanner;
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })	
 	public CSSParser() {
 		super(PARSING_TABLES);
 		report = new CSSEvents();

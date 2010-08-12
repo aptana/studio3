@@ -1,36 +1,62 @@
 package com.aptana.editor.js.parsing.ast;
 
+import beaver.Symbol;
+
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSLabelledNode extends JSNode
 {
+	private Symbol _colon;
+	
 	/**
 	 * JSLabelledNode
 	 * 
-	 * @param start
-	 * @param end
 	 * @param children
 	 */
-	public JSLabelledNode(int start, int end, JSNode... children)
+	public JSLabelledNode(JSNode label, Symbol colon, JSNode block)
 	{
-		super(JSNodeTypes.LABELLED, start, end, children);
+		super(JSNodeTypes.LABELLED, label, block);
+		
+		this._colon = colon;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
-	public String toString()
+	@Override
+	public void accept(JSTreeWalker walker)
 	{
-		StringBuilder buffer = new StringBuilder();
-		IParseNode[] children = getChildren();
+		walker.visit(this);
+	}
 
-		buffer.append(children[0]);
-		buffer.append(": "); //$NON-NLS-1$
-		buffer.append(children[1]);
+	/**
+	 * getBlock
+	 * 
+	 * @return
+	 */
+	public IParseNode getBlock()
+	{
+		return this.getChild(1);
+	}
+	
+	/**
+	 * getColon
+	 * 
+	 * @return
+	 */
+	public Symbol getColon()
+	{
+		return this._colon;
+	}
 
-		this.appendSemicolon(buffer);
-
-		return buffer.toString();
+	/**
+	 * getLabel
+	 * 
+	 * @return
+	 */
+	public IParseNode getLabel()
+	{
+		return this.getChild(0);
 	}
 }
