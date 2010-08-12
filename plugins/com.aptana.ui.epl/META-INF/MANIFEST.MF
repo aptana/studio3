@@ -24,3 +24,4 @@ Export-Package: com.aptana.editor.common.contentassist,
  com.aptana.ui.util
 Eclipse-ExtensibleAPI: true
 Bundle-Activator: com.aptana.ui.epl.UIEplPlugin
+
