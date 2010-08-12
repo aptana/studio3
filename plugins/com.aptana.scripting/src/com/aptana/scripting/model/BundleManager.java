@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -22,6 +23,7 @@ import org.eclipse.core.runtime.Platform;
 import org.jruby.RubyRegexp;
 
 import com.aptana.core.util.ResourceUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.ScriptLogger;
@@ -32,6 +34,9 @@ import com.aptana.scripting.model.filters.IsExecutableCommandFilter;
 
 public class BundleManager
 {
+	static final Pattern DOT_PATTERN = Pattern.compile("\\."); //$NON-NLS-1$
+	static final Pattern STAR_PATTERN = Pattern.compile("\\*"); //$NON-NLS-1$
+	
 	static final String SNIPPETS_DIRECTORY_NAME = "snippets"; //$NON-NLS-1$
 	static final String COMMANDS_DIRECTORY_NAME = "commands"; //$NON-NLS-1$
 	static final String TEMPLATES_DIRECTORY_NAME = "templates"; //$NON-NLS-1$
@@ -1070,10 +1075,10 @@ public class BundleManager
 				String pattern = entry.getKey();
 
 				// Escape periods in pattern (for regexp)
-				pattern = pattern.replaceAll("\\.", "\\\\."); //$NON-NLS-1$ //$NON-NLS-2$
+				pattern = DOT_PATTERN.matcher(pattern).replaceAll("\\\\."); //$NON-NLS-1$
 
 				// Replace * wildcard pattern with .+? regexp
-				pattern = pattern.replaceAll("\\*", "\\.\\+\\?"); //$NON-NLS-1$ //$NON-NLS-2$
+				pattern = STAR_PATTERN.matcher(pattern).replaceAll(".+?"); //$NON-NLS-1$
 
 				if (fileName.matches(pattern))
 				{
@@ -1088,8 +1093,10 @@ public class BundleManager
 						// return value
 						// TODO: Check for simple case where one is a subset scope of the other, use the more specific
 						// one and move on
-						int existingLength = result.split("\\.").length; // split on periods to see the specificity of scope name //$NON-NLS-1$
-						int newLength = entry.getValue().split("\\.").length; //$NON-NLS-1$
+						
+						// split on periods to see the specificity of scope name
+						int existingLength = StringUtil.characterInstanceCount(result, '.') + 1;  //$NON-NLS-1$
+						int newLength = StringUtil.characterInstanceCount(entry.getValue(), '.') + 1;  //$NON-NLS-1$
 
 						if (newLength > existingLength)
 						{
