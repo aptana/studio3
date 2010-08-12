@@ -9,7 +9,6 @@ import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.custom.LineBackgroundEvent;
 import org.eclipse.swt.custom.LineBackgroundListener;
-import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Color;
 
