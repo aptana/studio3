@@ -933,13 +933,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		{
 			if (removeAddListener)
 			{
-				combo.getDisplay().asyncExec(new Runnable()
-				{
-					public void run()
-					{
-						combo.addModifyListener(modifyListener);
-					}
-				});
+				combo.addModifyListener(modifyListener);
 			}
 		}
 	}
