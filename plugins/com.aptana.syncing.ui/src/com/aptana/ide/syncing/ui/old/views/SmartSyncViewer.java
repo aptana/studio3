@@ -71,7 +71,6 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PlatformUI;
 
-import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.ide.syncing.core.old.ISyncResource;
 import com.aptana.ide.syncing.core.old.SyncFile;
 import com.aptana.ide.syncing.core.old.SyncFolder;
