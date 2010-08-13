@@ -68,6 +68,16 @@ public class JSParserPerformanceTest extends TestCase
 	{
 		time("dojo.js.uncompressed.js");
 	}
+	
+	/**
+	 * testExt
+	 * 
+	 * @throws Exception
+	 */
+	public void testExt() throws Exception
+	{
+		time("ext-core.js");
+	}
 
 	/**
 	 * testTiMobile

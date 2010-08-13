@@ -10,20 +10,12 @@ import org.eclipse.jface.text.rules.Token;
 
 public class JSSingleQuotedStringScannerTest extends TestCase
 {
-
-	private JSSingleQuotedStringScanner fScanner;
+	private JSEscapeSequenceScanner fScanner;
 
 	@Override
 	protected void setUp() throws Exception
 	{
-		fScanner = new JSSingleQuotedStringScanner()
-		{
-			@Override
-			protected IToken getToken(String tokenName)
-			{
-				return JSSingleQuotedStringScannerTest.this.getToken(tokenName);
-			}
-		};
+		fScanner = new JSEscapeSequenceScanner("string.quoted.single.js");
 	}
 
 	@Override

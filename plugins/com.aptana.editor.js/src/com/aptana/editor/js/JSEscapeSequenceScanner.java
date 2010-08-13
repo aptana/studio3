@@ -34,39 +34,37 @@
  */
 package com.aptana.editor.js;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 
-import com.aptana.editor.common.text.rules.RegexpRule;
-import com.aptana.theme.IThemeManager;
-import com.aptana.theme.ThemePlugin;
+import com.aptana.editor.js.text.rules.JSEscapeSequenceRule;
 
-public class JSSingleQuotedStringScanner extends BufferedRuleBasedScanner
+public class JSEscapeSequenceScanner extends BufferedRuleBasedScanner
 {
-
-	public JSSingleQuotedStringScanner()
+	/**
+	 * JSEscapeSequenceScanner
+	 */
+	public JSEscapeSequenceScanner(String defaultScope)
 	{
-		List<IRule> rules = new ArrayList<IRule>();
-		rules.add(new RegexpRule("\\\\(x[0-9a-fA-F]{2}|[0-2][0-7]{0,2}|3[0-6][0-7]|37[0-7]?|[4-7][0-7]?|.)", //$NON-NLS-1$
-				getToken("constant.character.escape.js"))); //$NON-NLS-1$
-		setRules(rules.toArray(new IRule[rules.size()]));
+		IRule[] rules = new IRule[] {
+			new JSEscapeSequenceRule(getToken("constant.character.escape.js")) //$NON-NLS-1$
+		};
 
-		setDefaultReturnToken(getToken("string.quoted.single.js")); //$NON-NLS-1$
+		setRules(rules);
+
+		setDefaultReturnToken(getToken(defaultScope));
 	}
 
+	/**
+	 * getToken
+	 * 
+	 * @param tokenName
+	 * @return
+	 */
 	protected IToken getToken(String tokenName)
 	{
 		return new Token(tokenName);
-//		return getThemeManager().getToken(tokenName);
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return ThemePlugin.getDefault().getThemeManager();
 	}
 }

@@ -1,4 +1,4 @@
-package com.aptana.editor.js.parsing;
+package com.aptana.editor.js.text.rules;
 
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IPredicateRule;
@@ -40,7 +40,7 @@ public class JSRegExpRule implements IPredicateRule
 				return Token.UNDEFINED;
 			}
 		}
-		
+
 		State state = State.ERROR;
 		int c = scanner.read();
 		int unreadCount = 0;

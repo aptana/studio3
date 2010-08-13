@@ -32,40 +32,64 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js;
+package com.aptana.editor.js.text.rules;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
-import org.eclipse.jface.text.rules.IRule;
-import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.Token;
+import org.eclipse.jface.text.rules.IWordDetector;
 
-import com.aptana.editor.common.text.rules.RegexpRule;
-import com.aptana.theme.IThemeManager;
-import com.aptana.theme.ThemePlugin;
-
-public class JSRegexpScanner extends BufferedRuleBasedScanner
+class JSEscapeSequenceDetector implements IWordDetector
 {
+	private static final Set<Character> CHARS;
 
-	public JSRegexpScanner()
+	/**
+	 * static initializer
+	 */
+	static
 	{
-		List<IRule> rules = new ArrayList<IRule>();
-		rules.add(new RegexpRule("\\\\(x[0-9a-fA-F]{2}|[0-2][0-7]{0,2}|3[0-6][0-7]|37[0-7]?|[4-7][0-7]?|.)", //$NON-NLS-1$
-				getToken("constant.character.escape.js"))); //$NON-NLS-1$
-		setRules(rules.toArray(new IRule[rules.size()]));
-		setDefaultReturnToken(getToken("string.regexp.js")); //$NON-NLS-1$
+		CHARS = new HashSet<Character>();
+
+		// type specifier
+		CHARS.add('x');
+		CHARS.add('u');
+
+		// digits
+		for (char c = '0'; c <= '9'; c++)
+		{
+			CHARS.add(c);
+		}
+
+		// uppercase hex
+		for (char c = 'A'; c <= 'F'; c++)
+		{
+			CHARS.add(c);
+		}
+
+		// lowercase hex
+		for (char c = 'a'; c <= 'f'; c++)
+		{
+			CHARS.add(c);
+		}
 	}
 
-	protected IToken getToken(String tokenName)
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.IWordDetector#isWordStart(char)
+	 */
+	@Override
+	public boolean isWordStart(char c)
 	{
-		return new Token(tokenName);
-//		return getThemeManager().getToken(tokenName);
+		return c == '\\';
 	}
 
-	protected IThemeManager getThemeManager()
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.IWordDetector#isWordPart(char)
+	 */
+	@Override
+	public boolean isWordPart(char c)
 	{
-		return ThemePlugin.getDefault().getThemeManager();
+		return CHARS.contains(c);
 	}
 }
