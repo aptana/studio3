@@ -151,10 +151,10 @@ public class IndexFilterManager
 	 */
 	public Set<IFileStore> filterFileStores(Set<IFileStore> fileStores)
 	{
-		if (this._filteredItems == null && this._filteredItems.isEmpty() == false && fileStores != null)
+		if (this._filteredItems != null && this._filteredItems.isEmpty() == false && fileStores != null)
 		{
 			Set<IFileStore> toRemove = new HashSet<IFileStore>();
-
+			
 			for (IFileStore fileStore : fileStores)
 			{
 				if (this.isFilteredItem(fileStore))
