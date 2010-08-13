@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.equinox.preferences.preferences">
+      <initializer
+            class="com.aptana.index.core.ui.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="com.aptana.index.core.indexFilterParticipants">
+      <filter
+            class="com.aptana.index.core.ui.IndexFilterParticipant"
+            name="Preference-based index filter">
+      </filter>
+   </extension>
+</plugin>

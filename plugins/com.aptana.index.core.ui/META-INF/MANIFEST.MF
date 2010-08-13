@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Indexing Core UI Plugin
+Bundle-SymbolicName: com.aptana.index.core.ui;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: com.aptana.index.core.ui.IndexUiActivator
+Bundle-Vendor: Aptana, Inc.
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.filesystem;bundle-version="1.2.1",
+ com.aptana.core;bundle-version="3.0.0",
+ com.aptana.index.core;bundle-version="2.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
