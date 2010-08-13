@@ -9,6 +9,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.filesystem;bundle-version="1.2.1",
  com.aptana.core;bundle-version="3.0.0",
- com.aptana.index.core;bundle-version="2.0.0"
+ com.aptana.index.core;bundle-version="2.0.0",
+ org.eclipse.core.expressions;bundle-version="3.4.101",
+ org.eclipse.core.resources;bundle-version="3.5.2",
+ com.aptana.core.io;bundle-version="3.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
