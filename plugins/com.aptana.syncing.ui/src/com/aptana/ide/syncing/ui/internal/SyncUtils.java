@@ -238,18 +238,20 @@ public class SyncUtils
 					if (fromSource)
 					{
 						newFile = EFSUtils.createFile(sourceManager.getRoot(), file, destManager.getRoot());
-						newFile.mkdir(EFS.NONE, null);
 					}
 					else
 					{
 						newFile = file;
 					}
-					IFileStore[] f = EFSUtils.getFiles(newFile, true, false, null);
-					if (!newFiles.contains(newFile))
+					if (newFile.fetchInfo().exists())
 					{
-						newFiles.add(newFile);
+						IFileStore[] f = EFSUtils.getFiles(newFile, true, false, null);
+						if (!newFiles.contains(newFile))
+						{
+							newFiles.add(newFile);
+						}
+						newFiles.addAll(Arrays.asList(f));
 					}
-					newFiles.addAll(Arrays.asList(f));
 				}
 				else
 				{

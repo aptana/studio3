@@ -67,14 +67,6 @@ public class DownloadAction extends BaseSyncAction
 
 	private static String MESSAGE_TITLE = StringUtil.ellipsify(Messages.DownloadAction_MessageTitle);
 
-	private boolean fFromSource;
-
-    public void setSelection(ISelection selection, boolean fromSource)
-    {
-    	fFromSource = fromSource;
-    	super.setSelection(selection, fromSource);
-    }
-
 	protected void performAction(final IAdaptable[] files, final ISiteConnection site) throws CoreException
 	{
 		final Synchronizer syncer = new Synchronizer();
@@ -108,7 +100,7 @@ public class DownloadAction extends BaseSyncAction
 					{
 						fileStores[i] = SyncUtils.getFileStore(files[i]);
 					}
-					IFileStore[] targetFiles = SyncUtils.getDownloadFiles(source, target, fileStores, fFromSource, true, monitor);
+					IFileStore[] targetFiles = SyncUtils.getDownloadFiles(source, target, fileStores, fSelectedFromSource, true, monitor);
 
 					VirtualFileSyncPair[] items = syncer.createSyncItems(new IFileStore[0], targetFiles, monitor);
 

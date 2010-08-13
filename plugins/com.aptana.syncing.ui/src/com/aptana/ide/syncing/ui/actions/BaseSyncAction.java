@@ -75,6 +75,7 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
 
     protected IFileStore fSourceRoot;
     protected IFileStore fDestinationRoot;
+    protected boolean fSelectedFromSource;
 
     public BaseSyncAction() {
         fSelectedElements = new ArrayList<IAdaptable>();
@@ -206,6 +207,7 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
 	}
 
     public void setSelection(ISelection selection, boolean fromSource) {
+    	fSelectedFromSource = fromSource;
         fSelectedElements.clear();
 
         if (!(selection instanceof IStructuredSelection) || selection.isEmpty()) {
@@ -216,7 +218,7 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
         ISiteConnection[] sites;
         for (Object element : elements) {
             if (element instanceof IAdaptable) {
-            	if (fromSource) {
+            	if (fSelectedFromSource) {
             		sites = SiteConnectionUtils.findSitesForSource((IAdaptable) element);
             	} else {
             		sites = SiteConnectionUtils.findSitesWithDestination((IAdaptable) element);
@@ -249,7 +251,11 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
         Set<ISiteConnection> sitesSet;
         ISiteConnection[] sites;
         for (IAdaptable element : fSelectedElements) {
-            sites = SiteConnectionUtils.findSitesForSource(element);
+        	if (fSelectedFromSource) {
+        		sites = SiteConnectionUtils.findSitesForSource(element);
+        	} else {
+        		sites = SiteConnectionUtils.findSitesWithDestination(element);
+        	}
             sitesSet = new HashSet<ISiteConnection>();
             for (ISiteConnection site : sites) {
                 sitesSet.add(site);
@@ -272,7 +278,7 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
         }
     }
 
-    private static ISiteConnection getLastSyncConnection(IContainer container) {
+    private ISiteConnection getLastSyncConnection(IContainer container) {
         if (container == null) {
             return null;
         }
@@ -282,8 +288,12 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
             return null;
         }
 
-        ISiteConnection[] sites = SiteConnectionUtils.findSitesForSource(container, true);
-        String target;
+        ISiteConnection[] sites;
+        if (fSelectedFromSource) {
+        	sites = SiteConnectionUtils.findSitesForSource(container, true);
+        } else {
+        	sites = SiteConnectionUtils.findSitesWithDestination(container, true);
+        }        String target;
         for (ISiteConnection site : sites) {
             target = site.getDestination().getName();
             if (target.equals(lastConnection)) {
