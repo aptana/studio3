@@ -175,7 +175,7 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 		{
 			return factory;
 		}
-		return ScriptFormatterManager.getSelected(contentType, job.project);
+		return ScriptFormatterManager.getSelected(contentType);
 	}
 
 	@Override

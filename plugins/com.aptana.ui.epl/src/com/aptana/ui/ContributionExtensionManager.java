@@ -35,7 +35,7 @@ public abstract class ContributionExtensionManager
 	private IContributionSelector defaultSelector;
 
 	private Map<String, List<IContributedExtension>> contentTypeToContribMap = new HashMap<String, List<IContributedExtension>>();
-	private Map<String, Object> natureToSelectorMap = new HashMap<String, Object>();
+	private Map<String, Object> contentTypeToSelectorMap = new HashMap<String, Object>();
 
 	protected ContributionExtensionManager()
 	{
@@ -50,17 +50,17 @@ public abstract class ContributionExtensionManager
 		return (IContributedExtension[]) contributions.toArray(new IContributedExtension[contributions.size()]);
 	}
 
-	public IContributedExtension getSelectedContribution(IProject project, String natureId)
+	public IContributedExtension getSelectedContribution(String contentType)
 	{
-		IContributedExtension[] contributions = getContributions(natureId);
+		IContributedExtension[] contributions = getContributions(contentType);
 		if (contributions.length > 0)
 		{
-			IContributionSelector selector = getSelector(natureId);
+			IContributionSelector selector = getSelector(contentType);
 			if (selector == null)
 			{
 				selector = defaultSelector;
 			}
-			return selector.select(contributions, project);
+			return selector.select(contributions, null);
 		}
 		return null;
 	}
@@ -99,7 +99,7 @@ public abstract class ContributionExtensionManager
 
 	protected final IContributionSelector getSelector(String natureId)
 	{
-		return (IContributionSelector) natureToSelectorMap.get(natureId);
+		return (IContributionSelector) contentTypeToSelectorMap.get(natureId);
 	}
 
 	/**
@@ -123,13 +123,13 @@ public abstract class ContributionExtensionManager
 	/**
 	 * Has a selector been configured for the contribution
 	 * 
-	 * @param natureId
-	 *            nature id
+	 * @param contentType
+	 *            the content type
 	 * @return true if a selector has been configured, false otherwise
 	 */
-	public final boolean hasSelector(String natureId)
+	public final boolean hasSelector(String contentType)
 	{
-		return natureToSelectorMap.containsKey(natureId);
+		return contentTypeToSelectorMap.containsKey(contentType);
 	}
 
 	/**
@@ -231,7 +231,7 @@ public abstract class ContributionExtensionManager
 			if (object instanceof IContributionSelector)
 			{
 				// XXX: what if multiple extensions define a selector
-				natureToSelectorMap.put(natureId, object);
+				contentTypeToSelectorMap.put(natureId, object);
 			}
 		}
 		catch (CoreException e)

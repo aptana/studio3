@@ -22,6 +22,7 @@ import org.eclipse.jface.text.source.ISharedTextColors;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.SourceViewer;
+import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -33,6 +34,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.formatter.ui.internal.AbstractFormatterSelectionBlock;
+import com.aptana.formatter.ui.internal.preferences.ScriptSourcePreviewerUpdater;
 import com.aptana.theme.ColorManager;
 import com.aptana.ui.ContributionExtensionManager;
 import com.aptana.ui.preferences.AbstractConfigurationBlockPropertyAndPreferencePage;
@@ -111,8 +113,8 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 			{
 				return null;
 			}
-			ScriptSourceViewerConfiguration configuration = createSimpleSourceViewerConfiguration(fColorManager, store,
-					null, false);
+			SourceViewerConfiguration configuration = (SourceViewerConfiguration) createSimpleSourceViewerConfiguration(
+					fColorManager, store, null, false);
 			fPreviewViewer.configure(configuration);
 			if (fPreviewViewer.getTextWidget().getTabs() == 0)
 			{
@@ -121,8 +123,8 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 			new ScriptSourcePreviewerUpdater(fPreviewViewer, configuration, store);
 			fPreviewViewer.setEditable(false);
 			IDocument document = new Document();
-			IDLTKUILanguageToolkit toolkit = DLTKUILanguageManager.getLanguageToolkit(getContentType());
-			toolkit.getTextTools().setupDocumentPartitioner(document, toolkit.getPartitioningId());
+			// IDLTKUILanguageToolkit toolkit = DLTKUILanguageManager.getLanguageToolkit(getContentType());
+			// toolkit.getTextTools().setupDocumentPartitioner(document, toolkit.getPartitioningId());
 			fPreviewViewer.setDocument(document);
 			return fPreviewViewer;
 		}
@@ -139,7 +141,10 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 		private ProjectionViewer createPreviewViewer(Composite parent, IVerticalRuler verticalRuler,
 				IOverviewRuler overviewRuler, boolean showAnnotationsOverview, int styles, IPreferenceStore store)
 		{
-			return new ScriptSourceViewer(parent, verticalRuler, overviewRuler, showAnnotationsOverview, styles, store);
+			ProjectionViewer viewer = new ProjectionViewer(parent, verticalRuler, overviewRuler,
+					showAnnotationsOverview, styles);
+			// TODO - Shalom - Attach the Theme colors (see AbstractThemableEditor)
+			return viewer;
 		}
 
 		protected String getPreferenceLinkMessage()
@@ -184,8 +189,8 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 	 * @param b
 	 * @return
 	 */
-	protected abstract ISourceViewerConfiguration createSimpleSourceViewerConfiguration(
-			ISharedTextColors colorManager, IPreferenceStore preferenceStore, ITextEditor editor, boolean configureFormatter);
+	protected abstract ISourceViewerConfiguration createSimpleSourceViewerConfiguration(ISharedTextColors colorManager,
+			IPreferenceStore preferenceStore, ITextEditor editor, boolean configureFormatter);
 
 	protected abstract String getContentType();
 

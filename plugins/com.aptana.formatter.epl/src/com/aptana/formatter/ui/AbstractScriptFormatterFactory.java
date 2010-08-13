@@ -47,7 +47,7 @@ public abstract class AbstractScriptFormatterFactory extends ContributedExtensio
 		String lang = getLanguage();
 		if (lang != null && lang.length() > 0)
 		{
-			buffer.append("org.eclipse.dltk."); //$NON-NLS-1$
+			buffer.append("com.aptana."); //$NON-NLS-1$
 			buffer.append(lang.toLowerCase());
 		}
 		else
@@ -254,9 +254,6 @@ public abstract class AbstractScriptFormatterFactory extends ContributedExtensio
 
 	private String getLanguage()
 	{
-		IDLTKLanguageToolkit toolkit = DLTKLanguageManager.getLanguageToolkit(getContentType());
-		if (toolkit != null)
-			return toolkit.getLanguageName();
-		return null;
+		return getContentType();
 	}
 }
