@@ -150,4 +150,11 @@ public class JSLanguageConstants
 	
 	@SuppressWarnings("nls")
 	public static String[] GRAMMAR_KEYWORDS = { "function", "var", "void", "true", "false", "null", "this" };
+
+	/**
+	 * JSLanguageConstants
+	 */
+	private JSLanguageConstants()
+	{
+	}
 }
