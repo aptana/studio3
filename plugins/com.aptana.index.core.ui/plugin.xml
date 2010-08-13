@@ -14,4 +14,38 @@
             name="Preference-based index filter">
       </filter>
    </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.index.core.ui.handlers.ExcludeHandler"
+            id="com.aptana.index.core.ui.commands.exclude"
+            name="Exclude directory from index">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.index.core.ui.handlers.IncludeHandler"
+            id="com.aptana.index.core.ui.commands.include"
+            name="Include directory in index">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="popup:com.aptana.explorer.view?before=group.edit">
+         <menu
+               id="indexing.main"
+               label="Indexing">
+         </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:indexing.main">
+         <command
+               commandId="com.aptana.index.core.ui.commands.exclude">
+         </command>
+         <command
+               commandId="com.aptana.index.core.ui.commands.include">
+         </command>
+      </menuContribution>
+   </extension>
 </plugin>

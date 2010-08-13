@@ -1,0 +1,95 @@
+package com.aptana.index.core.ui.handlers;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.ISources;
+
+import com.aptana.ide.core.io.efs.EFSUtils;
+
+public abstract class BaseHandler extends AbstractHandler
+{
+	private List<IFileStore> _fileStores;
+
+	/**
+	 * BaseHandler
+	 */
+	public BaseHandler()
+	{
+		this._fileStores = new ArrayList<IFileStore>();
+	}
+
+	/**
+	 * getFileStores
+	 * 
+	 * @return
+	 */
+	protected List<IFileStore> getFileStores()
+	{
+		return this._fileStores;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.core.commands.AbstractHandler#isEnabled()
+	 */
+	@Override
+	public boolean isEnabled()
+	{
+		return this._fileStores.isEmpty() == false;
+	}
+
+	/**
+	 * isValid
+	 * 
+	 * @return
+	 */
+	protected abstract boolean isValid(IFileStore fileStore);
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.core.commands.AbstractHandler#setEnabled(java.lang.Object)
+	 */
+	@Override
+	public void setEnabled(Object evaluationContext)
+	{
+		// clear cached selection
+		this._fileStores.clear();
+
+		if (evaluationContext instanceof EvaluationContext)
+		{
+			EvaluationContext context = (EvaluationContext) evaluationContext;
+			Object value = context.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
+
+			if (value instanceof ISelection)
+			{
+				ISelection selection = (ISelection) value;
+
+				if (selection instanceof IStructuredSelection && selection.isEmpty() == false)
+				{
+					IStructuredSelection structuredSelection = (IStructuredSelection) selection;
+
+					for (Object object : structuredSelection.toArray())
+					{
+						if (object instanceof IFolder)
+						{
+							IFolder resource = (IFolder) object;
+							IFileStore fileStore = EFSUtils.getFileStore(resource);
+
+							if (this.isValid(fileStore))
+							{
+								this._fileStores.add(fileStore);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
