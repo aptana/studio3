@@ -64,7 +64,7 @@ public class IndexFilterManager
 			{
 				this._filteredItems = new HashSet<IFileStore>();
 			}
-
+			
 			if (this.isFilteredItem(item) == false)
 			{
 				this._filteredItems.add(item);
@@ -142,7 +142,7 @@ public class IndexFilterManager
 			new IndexProjectJob(p).schedule();
 		}
 	}
-
+	
 	/**
 	 * filterFileStores
 	 * 
