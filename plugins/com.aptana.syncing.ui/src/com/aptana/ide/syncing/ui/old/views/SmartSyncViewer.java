@@ -460,21 +460,24 @@ public class SmartSyncViewer
 								|| file.getSyncState() == SyncState.ServerItemIsNewer)
 						{
 							final VirtualFileSyncPair pair = file.getPair();
-							File local = new File(EFSUtils.getAbsolutePath(pair.getSourceFile()));
+							File local = null;
+							try
+							{
+								local = pair.getSourceFile().toLocalFile(EFS.CACHE, null);
+							} catch (CoreException ex) {
+								ex.printStackTrace();
+							}
+							
 							FileCompareEditorInput input = new FileCompareEditorInput(new CompareConfiguration())
 							{
 
 								protected void prepareFiles()
 								{
-									// IFileStore file = pair.getDestinationFile();
-									File temp = null; //$NON-NLS-1$ //$NON-NLS-2$
+									File temp = null;
 									try
 									{
 										temp = pair.getDestinationFile().toLocalFile(EFS.CACHE, null);
-									}
-									catch (CoreException e)
-									{
-										// TODO Auto-generated catch block
+									} catch (CoreException e) {
 										e.printStackTrace();
 									}
 									setRightResource(temp);
