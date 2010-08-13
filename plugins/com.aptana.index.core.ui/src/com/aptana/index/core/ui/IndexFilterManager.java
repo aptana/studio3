@@ -8,14 +8,22 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexProjectJob;
 import com.aptana.index.core.ui.preferences.IPreferenceConstants;
 
 public class IndexFilterManager
 {
+	private static final String NO_ITEMS = "";
+	private static final String ITEM_DELIMITER = ",";
 	private static IndexFilterManager INSTANCE;
 
 	/**
@@ -33,31 +41,105 @@ public class IndexFilterManager
 		return INSTANCE;
 	}
 
-	private Set<URI> _filteredURIs;
+	private Set<IFileStore> _filteredItems;
 
 	/**
 	 * IndexFilterManager
 	 */
 	private IndexFilterManager()
 	{
-		this.loadFilteredURIs();
+		this._filteredItems = this.loadFilteredItems();
 	}
 
 	/**
-	 * addFilteredURI
+	 * addFilterItem
 	 * 
-	 * @param uri
+	 * @param IFileStore
 	 */
-	public void addFilteredURI(URI uri)
+	public void addFilterItem(IFileStore item)
 	{
-		if (uri != null)
+		if (item != null)
 		{
-			if (this._filteredURIs == null)
+			if (this._filteredItems == null)
 			{
-				this._filteredURIs = new HashSet<URI>();
+				this._filteredItems = new HashSet<IFileStore>();
 			}
 
-			this._filteredURIs.add(uri);
+			if (this.isFilteredItem(item) == false)
+			{
+				this._filteredItems.add(item);
+			}
+		}
+	}
+
+	/**
+	 * commitFilteredItems
+	 */
+	public void commitFilteredItems()
+	{
+		Set<IFileStore> deletedItems = this.loadFilteredItems();
+		Set<IFileStore> addedItems = new HashSet<IFileStore>(this._filteredItems);
+
+		addedItems.removeAll(deletedItems);
+		deletedItems.removeAll(this._filteredItems);
+
+		// now save our new list
+		String value;
+
+		if (this._filteredItems != null)
+		{
+			List<String> uris = new ArrayList<String>();
+
+			for (IFileStore item : this._filteredItems)
+			{
+				URI uri = item.toURI();
+
+				uris.add(uri.toString());
+			}
+
+			value = StringUtil.join(ITEM_DELIMITER, uris);
+		}
+		else
+		{
+			value = NO_ITEMS;
+		}
+
+		IPreferenceStore prefs = IndexUiActivator.getDefault().getPreferenceStore();
+
+		prefs.putValue(IPreferenceConstants.FILTERED_INDEX_URIS, value);
+
+		// determine which projects have been affected by the last set of changes
+		Set<IProject> projects = new HashSet<IProject>();
+		
+		for (IFileStore f : addedItems)
+		{
+			IResource resource = (IResource) f.getAdapter(IResource.class);
+			
+			if (resource != null)
+			{
+				projects.add(resource.getProject());
+			}
+		}
+		for (IFileStore f : deletedItems)
+		{
+			IResource resource = (IResource) f.getAdapter(IResource.class);
+			
+			if (resource != null)
+			{
+				projects.add(resource.getProject());
+			}
+		}
+		
+		// update project indexes that were affected by our settings
+		IndexManager manager = IndexManager.getInstance();
+		
+		for (IProject p : projects)
+		{
+			// remove project index
+			manager.removeIndex(p.getLocationURI());
+			
+			// and then re-build it
+			new IndexProjectJob(p).schedule();
 		}
 	}
 
@@ -69,39 +151,32 @@ public class IndexFilterManager
 	 */
 	public Set<IFileStore> filterFileStores(Set<IFileStore> fileStores)
 	{
-		if (this._filteredURIs == null && this._filteredURIs.isEmpty() == false && fileStores != null)
+		if (this._filteredItems == null && this._filteredItems.isEmpty() == false && fileStores != null)
 		{
 			Set<IFileStore> toRemove = new HashSet<IFileStore>();
-			
-			for (URI uri : this._filteredURIs)
+
+			for (IFileStore fileStore : fileStores)
 			{
-				String uriString = uri.normalize().toString();
-				
-				for (IFileStore fileStore : fileStores)
+				if (this.isFilteredItem(fileStore))
 				{
-					String fileStoreUriString = fileStore.toURI().normalize().toString();
-					
-					if (fileStoreUriString.startsWith(uriString))
-					{
-						toRemove.add(fileStore);
-					}
+					toRemove.add(fileStore);
 				}
 			}
-			
+
 			fileStores.removeAll(toRemove);
 		}
-		
+
 		return fileStores;
 	}
 
 	/**
-	 * getFilteredURIs
+	 * getFilteredItems
 	 * 
 	 * @return
 	 */
-	public Set<URI> getFilteredURIs()
+	public Set<IFileStore> getFilteredItems()
 	{
-		Set<URI> result = this._filteredURIs;
+		Set<IFileStore> result = this._filteredItems;
 
 		if (result == null)
 		{
@@ -112,56 +187,75 @@ public class IndexFilterManager
 	}
 
 	/**
-	 * loadFilteredURIs
+	 * isFilteredItem
+	 * 
+	 * @param item
+	 * @return
 	 */
-	public void loadFilteredURIs()
+	public boolean isFilteredItem(IFileStore item)
 	{
-		this._filteredURIs = new HashSet<URI>();
+		boolean result = false;
+		
+		if (item != null)
+		{
+			for (IFileStore candidate : this._filteredItems)
+			{
+				if (candidate.equals(item) || candidate.isParentOf(item))
+				{
+					result = true;
+					break;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * loadFilteredItems
+	 */
+	public Set<IFileStore> loadFilteredItems()
+	{
+		Set<IFileStore> filteredItems = new HashSet<IFileStore>();
 
 		IPreferenceStore prefs = IndexUiActivator.getDefault().getPreferenceStore();
 		String uris = prefs.getString(IPreferenceConstants.FILTERED_INDEX_URIS);
 
 		if (uris != null && uris.length() != 0)
 		{
-			for (String uri : uris.split(","))
+			for (String uriString : uris.split(ITEM_DELIMITER))
 			{
 				try
 				{
-					this._filteredURIs.add(new URI(uri));
+					URI uri = new URI(uriString);
+					IFileStore item = EFS.getStore(uri);
+
+					filteredItems.add(item);
 				}
 				catch (URISyntaxException e)
 				{
+					IndexUiActivator.logError(e.getMessage(), e);
+				}
+				catch (CoreException e)
+				{
+					IndexUiActivator.logError(e);
 				}
 			}
 		}
 
+		return filteredItems;
 	}
 
 	/**
-	 * saveFilteredURIs
+	 * removeFilterItem
+	 * 
+	 * @param item
 	 */
-	public void saveFilteredURIs()
+	public void removeFilterItem(IFileStore item)
 	{
-		String value;
-
-		if (this._filteredURIs != null)
+		if (item != null && this._filteredItems != null)
 		{
-			List<String> uris = new ArrayList<String>();
-
-			for (URI uri : this._filteredURIs)
-			{
-				uris.add(uri.toString());
-			}
-
-			value = StringUtil.join(",", uris);
+			this._filteredItems.remove(item);
 		}
-		else
-		{
-			value = "";
-		}
-
-		IPreferenceStore prefs = IndexUiActivator.getDefault().getPreferenceStore();
-
-		prefs.putValue(IPreferenceConstants.FILTERED_INDEX_URIS, value);
 	}
 }
