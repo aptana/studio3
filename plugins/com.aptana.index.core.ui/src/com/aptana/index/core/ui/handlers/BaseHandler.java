@@ -7,6 +7,8 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISources;
@@ -77,9 +79,9 @@ public abstract class BaseHandler extends AbstractHandler
 
 					for (Object object : structuredSelection.toArray())
 					{
-						if (object instanceof IFolder)
+						if (object instanceof IFolder || object instanceof IProject)
 						{
-							IFolder resource = (IFolder) object;
+							IResource resource = (IResource) object;
 							IFileStore fileStore = EFSUtils.getFileStore(resource);
 
 							if (this.isValid(fileStore))
