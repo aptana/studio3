@@ -82,13 +82,13 @@ public class UploadAction extends BaseSyncAction
 					IConnectionPoint source = site.getSource();
 					IConnectionPoint target = site.getDestination();
 					// retrieves the root filestore of each end
-					IFileStore sourceRoot = source.getRoot();
+					IFileStore sourceRoot = (fSourceRoot == null) ? source.getRoot() : fSourceRoot;
 					// makes sure the target end point is connected
 					if (!target.isConnected())
 					{
 						target.connect(monitor);
 					}
-					IFileStore targetRoot = target.getRoot();
+					IFileStore targetRoot = (fDestinationRoot == null) ? target.getRoot() : fDestinationRoot;
 					syncer.setClientFileManager(source);
 					syncer.setServerFileManager(target);
 					syncer.setClientFileRoot(sourceRoot);

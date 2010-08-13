@@ -45,6 +45,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.viewers.ISelection;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
@@ -66,6 +67,14 @@ public class DownloadAction extends BaseSyncAction
 
 	private static String MESSAGE_TITLE = StringUtil.ellipsify(Messages.DownloadAction_MessageTitle);
 
+	private boolean fFromSource;
+
+    public void setSelection(ISelection selection, boolean fromSource)
+    {
+    	fFromSource = fromSource;
+    	super.setSelection(selection, fromSource);
+    }
+
 	protected void performAction(final IAdaptable[] files, final ISiteConnection site) throws CoreException
 	{
 		final Synchronizer syncer = new Synchronizer();
@@ -82,12 +91,12 @@ public class DownloadAction extends BaseSyncAction
 					IConnectionPoint source = site.getSource();
 					IConnectionPoint target = site.getDestination();
 					// retrieves the root filestore of each end
-					IFileStore sourceRoot = source.getRoot();
+					IFileStore sourceRoot = (fSourceRoot == null) ? source.getRoot() : fSourceRoot;
 					if (!target.isConnected())
 					{
 						target.connect(monitor);
 					}
-					IFileStore targetRoot = target.getRoot();
+					IFileStore targetRoot = (fDestinationRoot == null) ? target.getRoot() : fDestinationRoot;
 					syncer.setClientFileManager(source);
 					syncer.setServerFileManager(target);
 					syncer.setClientFileRoot(sourceRoot);
@@ -99,7 +108,7 @@ public class DownloadAction extends BaseSyncAction
 					{
 						fileStores[i] = SyncUtils.getFileStore(files[i]);
 					}
-					IFileStore[] targetFiles = SyncUtils.getDownloadFiles(source, target, fileStores, true, monitor);
+					IFileStore[] targetFiles = SyncUtils.getDownloadFiles(source, target, fileStores, fFromSource, true, monitor);
 
 					VirtualFileSyncPair[] items = syncer.createSyncItems(new IFileStore[0], targetFiles, monitor);
 
