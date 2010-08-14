@@ -26,8 +26,7 @@ import com.aptana.index.core.ui.preferences.IPreferenceConstants;
 
 public class IndexFilterManager
 {
-	private static final String NO_ITEMS = "";
-	private static final String ITEM_DELIMITER = ",";
+	private static final String ITEM_DELIMITER = ","; //$NON-NLS-1$
 	private static IndexFilterManager INSTANCE;
 
 	/**
@@ -105,7 +104,7 @@ public class IndexFilterManager
 		}
 		else
 		{
-			value = NO_ITEMS;
+			value = IPreferenceConstants.NO_ITEMS;
 		}
 
 		IPreferenceStore prefs = IndexUiActivator.getDefault().getPreferenceStore();

@@ -20,13 +20,13 @@
             categoryId="com.aptana.git.ui.category"
             defaultHandler="com.aptana.index.core.ui.handlers.ExcludeHandler"
             id="com.aptana.index.core.ui.commands.exclude"
-            name="Exclude from index">
+            name="%command.name">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
             defaultHandler="com.aptana.index.core.ui.handlers.IncludeHandler"
             id="com.aptana.index.core.ui.commands.include"
-            name="Include in index">
+            name="%command.name.0">
       </command>
    </extension>
    <extension
@@ -35,14 +35,14 @@
             locationURI="popup:com.aptana.explorer.view?before=group.edit">
          <menu
                id="indexing.main"
-               label="Indexing">
+               label="%menu.label">
          </menu>
       </menuContribution>
       <menuContribution
             locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?before=group.edit">
          <menu
                id="projectexplorer.indexing.main"
-               label="Indexing">
+               label="%menu.label.0">
             <visibleWhen
                   checkEnabled="false">
                <iterate>

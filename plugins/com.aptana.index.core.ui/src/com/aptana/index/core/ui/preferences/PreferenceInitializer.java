@@ -17,6 +17,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 	{
 		IEclipsePreferences prefs = (new DefaultScope()).getNode(IndexUiActivator.PLUGIN_ID);
 		
-		prefs.put(IPreferenceConstants.FILTERED_INDEX_URIS, "");
+		prefs.put(IPreferenceConstants.FILTERED_INDEX_URIS, IPreferenceConstants.NO_ITEMS); //$NON-NLS-1$
 	}
 }

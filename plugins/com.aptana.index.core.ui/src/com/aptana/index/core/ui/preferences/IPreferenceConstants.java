@@ -37,4 +37,5 @@ package com.aptana.index.core.ui.preferences;
 public interface IPreferenceConstants
 {
 	public static final String FILTERED_INDEX_URIS = "FILTERED_INDEX_URIS"; //$NON-NLS-1$
+	public static final String NO_ITEMS = ""; //$NON-NLS-1$
 }
