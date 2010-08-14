@@ -10,12 +10,16 @@ import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexProjectJob;
 import com.aptana.index.core.ui.preferences.IPreferenceConstants;
@@ -153,13 +157,25 @@ public class IndexFilterManager
 	{
 		if (this._filteredItems != null && this._filteredItems.isEmpty() == false && fileStores != null)
 		{
+			IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 			Set<IFileStore> toRemove = new HashSet<IFileStore>();
 			
+			// NOTE: The indexing system creates LocalFiles but filters are based
+			// on WorkspaceFiles. The following tries to convert each LocalFile
+			// in the set to a WorkspaceFile before testing if the item needs to
+			// be filtered.
 			for (IFileStore fileStore : fileStores)
 			{
-				if (this.isFilteredItem(fileStore))
+				IContainer[] containers = workspaceRoot.findContainersForLocationURI(fileStore.toURI());
+				
+				if (containers.length > 0)
 				{
-					toRemove.add(fileStore);
+					IFileStore workspaceFileStore = EFSUtils.getFileStore(containers[0]);
+					
+					if (this.isFilteredItem(workspaceFileStore))
+					{
+						toRemove.add(fileStore);
+					}
 				}
 			}
 
