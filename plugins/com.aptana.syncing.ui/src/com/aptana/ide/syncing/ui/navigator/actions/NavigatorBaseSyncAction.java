@@ -11,6 +11,9 @@ public class NavigatorBaseSyncAction extends BaseSelectionListenerAction
 {
 
 	private IWorkbenchPart fActivePart;
+	// a flag indicating if the selected elements belongs to the source or destination within a sync connection
+	// by default, assume the selection is from source
+	private boolean fSelectedFromSource = true;
 
 	public NavigatorBaseSyncAction(String text, IWorkbenchPart activePart)
 	{
@@ -25,10 +28,18 @@ public class NavigatorBaseSyncAction extends BaseSelectionListenerAction
 		Object[] elements = ((IStructuredSelection) selection).toArray();
 		for (Object element : elements)
 		{
-			if (element instanceof IAdaptable
-					&& SiteConnectionUtils.findSitesForSource((IAdaptable) element).length > 0)
+			if (element instanceof IAdaptable)
 			{
-				return true;
+				if (SiteConnectionUtils.findSitesForSource((IAdaptable) element).length > 0)
+				{
+					fSelectedFromSource = true;
+					return true;
+				}
+				if (SiteConnectionUtils.findSitesWithDestination((IAdaptable) element).length > 0)
+				{
+					fSelectedFromSource = false;
+					return true;
+				}
 			}
 		}
 		return false;
@@ -37,5 +48,10 @@ public class NavigatorBaseSyncAction extends BaseSelectionListenerAction
 	protected IWorkbenchPart getActivePart()
 	{
 		return fActivePart;
+	}
+
+	protected boolean isSelectionFromSource()
+	{
+		return fSelectedFromSource;
 	}
 }
