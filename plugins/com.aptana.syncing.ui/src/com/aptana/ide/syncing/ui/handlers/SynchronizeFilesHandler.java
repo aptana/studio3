@@ -49,7 +49,7 @@ public class SynchronizeFilesHandler extends BaseSyncHandler
 	{
 		SynchronizeFilesAction action = new SynchronizeFilesAction();
 		action.setActivePart(null, HandlerUtil.getActivePart(event));
-		action.setSelection(new StructuredSelection(getSelectedResources()));
+		action.setSelection(new StructuredSelection(getSelectedResources()), isSelectionFromSource());
 		action.run(null);
 
 		return null;

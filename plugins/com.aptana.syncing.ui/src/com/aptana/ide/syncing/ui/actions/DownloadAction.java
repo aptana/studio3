@@ -54,6 +54,7 @@ import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
 import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants;
+import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ui.DialogUtils;
 
 /**
@@ -82,7 +83,7 @@ public class DownloadAction extends BaseSyncAction
 					IConnectionPoint source = site.getSource();
 					IConnectionPoint target = site.getDestination();
 					// retrieves the root filestore of each end
-					IFileStore sourceRoot = (fSourceRoot == null) ? source.getRoot() : fSourceRoot;
+					final IFileStore sourceRoot = (fSourceRoot == null) ? source.getRoot() : fSourceRoot;
 					if (!target.isConnected())
 					{
 						target.connect(monitor);
@@ -122,6 +123,10 @@ public class DownloadAction extends BaseSyncAction
 											{
 											}
 										}
+									}
+									if (!fSelectedFromSource)
+									{
+										IOUIPlugin.refreshNavigatorView(sourceRoot);
 									}
 
 									postAction(syncer);

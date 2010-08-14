@@ -603,7 +603,6 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 				{
 					return;
 				}
-				IOUIPlugin.refreshNavigatorView(fTarget.getCurrentInput());
 				UIUtils.getDisplay().asyncExec(new Runnable()
 				{
 
@@ -635,7 +634,6 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 				{
 					return;
 				}
-				IOUIPlugin.refreshNavigatorView(fSource.getCurrentInput());
 				UIUtils.getDisplay().asyncExec(new Runnable()
 				{
 
