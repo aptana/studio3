@@ -9,14 +9,10 @@
  * Contributors:
  *     xored software, Inc. - initial API and Implementation (Alex Panchenko)
  *******************************************************************************/
-package com.aptana.formatter.ui;
+package com.aptana.formatter;
 
-/**
- * @since 2.0
- */
-public interface IFormatterIndentGenerator
-{
-	void generateIndent(int indentLevel, StringBuilder target);
+public interface IFormatterTextNode extends IFormatterNode {
 
-	int getTabSize();
+	String getText();
+
 }

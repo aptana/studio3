@@ -2,7 +2,7 @@ package com.aptana.formatter.ui.internal;
 
 import java.util.Arrays;
 
-import com.aptana.formatter.ui.IFormatterIndentGenerator;
+import com.aptana.formatter.IFormatterIndentGenerator;
 
 /**
  * @since 2.0

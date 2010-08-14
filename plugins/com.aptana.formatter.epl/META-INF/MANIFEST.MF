@@ -16,6 +16,10 @@ Require-Bundle: org.eclipse.ui,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Eclipse-ExtensibleAPI: true
 Bundle-ActivationPolicy: lazy
-Export-Package: com.aptana.formatter.epl,
+Export-Package: com.aptana.formatter,
+ com.aptana.formatter.epl,
  com.aptana.formatter.ui,
- com.aptana.formatter.ui.internal
+ com.aptana.formatter.ui.internal,
+ com.aptana.formatter.ui.internal.preferences,
+ com.aptana.formatter.ui.profile,
+ com.aptana.formatter.util

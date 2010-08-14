@@ -9,7 +9,7 @@
  * Contributors:
  *     xored software, Inc. - initial API and Implementation (Alex Panchenko)
  *******************************************************************************/
-package com.aptana.formatter.ui;
+package com.aptana.formatter;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -24,6 +24,14 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import com.aptana.formatter.epl.FormatterPlugin;
+import com.aptana.formatter.ui.FormatterMessages;
+import com.aptana.formatter.ui.IFormatterModifyDialog;
+import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
+import com.aptana.formatter.ui.IProfile;
+import com.aptana.formatter.ui.IProfileManager;
+import com.aptana.formatter.ui.IProfileStore;
+import com.aptana.formatter.ui.IProfileVersioner;
+import com.aptana.formatter.ui.IScriptFormatterFactory;
 import com.aptana.formatter.ui.profile.BuiltInProfile;
 import com.aptana.formatter.ui.profile.GeneralProfileVersioner;
 import com.aptana.formatter.ui.profile.ProfileManager;
@@ -47,7 +55,7 @@ public abstract class AbstractScriptFormatterFactory extends ContributedExtensio
 		String lang = getLanguage();
 		if (lang != null && lang.length() > 0)
 		{
-			buffer.append("com.aptana."); //$NON-NLS-1$
+			buffer.append("org.eclipse.dltk."); //$NON-NLS-1$
 			buffer.append(lang.toLowerCase());
 		}
 		else
