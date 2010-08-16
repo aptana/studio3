@@ -28,6 +28,24 @@ public abstract class BaseHandler extends AbstractHandler
 	}
 
 	/**
+	 * addFileStore
+	 * 
+	 * @param fileStore
+	 */
+	protected void addFileStore(IFileStore fileStore)
+	{
+		this._fileStores.add(fileStore);
+	}
+	
+	/**
+	 * clearFileStores
+	 */
+	protected void clearFileStores()
+	{
+		this._fileStores.clear();
+	}
+	
+	/**
 	 * getFileStores
 	 * 
 	 * @return
@@ -62,7 +80,7 @@ public abstract class BaseHandler extends AbstractHandler
 	public void setEnabled(Object evaluationContext)
 	{
 		// clear cached selection
-		this._fileStores.clear();
+		this.clearFileStores();
 
 		if (evaluationContext instanceof EvaluationContext)
 		{
@@ -86,7 +104,7 @@ public abstract class BaseHandler extends AbstractHandler
 
 							if (this.isValid(fileStore))
 							{
-								this._fileStores.add(fileStore);
+								this.addFileStore(fileStore);
 							}
 						}
 					}
