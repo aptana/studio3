@@ -15,7 +15,7 @@ import com.aptana.parsing.IParseState;
 public class RHTMLOutlineLabelProvider extends HTMLOutlineLabelProvider
 {
 
-	private static final Image ERB_ICON = Activator.getImage("icons/element.gif"); //$NON-NLS-1$
+	private static final Image ERB_ICON = Activator.getImage("icons/element.png"); //$NON-NLS-1$
 
 	private static final int TRIM_TO_LENGTH = 20;
 
