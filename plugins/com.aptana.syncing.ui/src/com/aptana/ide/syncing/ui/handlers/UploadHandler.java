@@ -49,7 +49,7 @@ public class UploadHandler extends BaseSyncHandler
 	{
 		UploadAction action = new UploadAction();
 		action.setActivePart(null, HandlerUtil.getActivePart(event));
-		action.setSelection(new StructuredSelection(getSelectedResources()));
+		action.setSelection(new StructuredSelection(getSelectedResources()), isSelectionFromSource());
 		action.run(null);
 
 		return null;

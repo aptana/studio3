@@ -24,6 +24,9 @@ public abstract class BaseSyncHandler extends AbstractHandler
 {
 
 	private IAdaptable[] fSelectedResources;
+	// a flag indicating if the selected elements belongs to the source or destination within a sync connection
+	// by default, assume the selection is from source
+	private boolean fSelectedFromSource = true;
 
 	@Override
 	public boolean isEnabled()
@@ -36,6 +39,12 @@ public abstract class BaseSyncHandler extends AbstractHandler
 		{
 			if (SiteConnectionUtils.findSitesForSource(resource).length > 0)
 			{
+				fSelectedFromSource = true;
+				return true;
+			}
+			if (SiteConnectionUtils.findSitesWithDestination(resource).length > 0)
+			{
+				fSelectedFromSource = false;
 				return true;
 			}
 		}
@@ -113,5 +122,10 @@ public abstract class BaseSyncHandler extends AbstractHandler
 	protected IAdaptable[] getSelectedResources()
 	{
 		return fSelectedResources;
+	}
+
+	protected boolean isSelectionFromSource()
+	{
+		return fSelectedFromSource;
 	}
 }

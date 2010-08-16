@@ -17,7 +17,7 @@ public class NavigatorSynchronizeAction extends NavigatorBaseSyncAction
 	{
 		SynchronizeFilesAction action = new SynchronizeFilesAction();
 		action.setActivePart(null, getActivePart());
-		action.setSelection(getStructuredSelection());
+		action.setSelection(getStructuredSelection(), isSelectionFromSource());
 		action.run(null);
 	}
 }

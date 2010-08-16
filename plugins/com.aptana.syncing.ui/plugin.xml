@@ -281,15 +281,20 @@
         <visibleWhen
               checkEnabled="false">
            <iterate>
-              <and>
+              <or>
+                 <and>
+                    <instanceof
+                          value="org.eclipse.core.resources.IResource">
+                    </instanceof>
+                    <test
+                          property="com.aptana.ide.ui.io.navigator.resource.isAccessible"
+                          value="true">
+                    </test>
+                 </and>
                  <instanceof
-                       value="org.eclipse.core.resources.IResource">
+                       value="com.aptana.ide.ui.io.navigator.FileSystemObject">
                  </instanceof>
-                 <test
-                       property="com.aptana.ide.ui.io.navigator.resource.isAccessible"
-                       value="true">
-                 </test>
-              </and>
+              </or>
            </iterate>
         </visibleWhen>
      </menu>

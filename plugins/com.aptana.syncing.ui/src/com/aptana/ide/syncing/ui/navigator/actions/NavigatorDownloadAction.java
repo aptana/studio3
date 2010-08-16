@@ -17,7 +17,7 @@ public class NavigatorDownloadAction extends NavigatorBaseSyncAction
 	{
 		DownloadAction action = new DownloadAction();
 		action.setActivePart(null, getActivePart());
-		action.setSelection(getStructuredSelection());
+		action.setSelection(getStructuredSelection(), isSelectionFromSource());
 		action.run(null);
 	}
 }
