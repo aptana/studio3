@@ -17,13 +17,13 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
-            categoryId="com.aptana.git.ui.category"
+            categoryId="com.aptana.ui.category"
             defaultHandler="com.aptana.index.core.ui.handlers.ExcludeHandler"
             id="com.aptana.index.core.ui.commands.exclude"
             name="%command.name">
       </command>
       <command
-            categoryId="com.aptana.git.ui.category"
+            categoryId="com.aptana.ui.category"
             defaultHandler="com.aptana.index.core.ui.handlers.IncludeHandler"
             id="com.aptana.index.core.ui.commands.include"
             name="%command.name.0">
