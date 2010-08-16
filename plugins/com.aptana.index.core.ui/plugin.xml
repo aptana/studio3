@@ -18,13 +18,11 @@
          point="org.eclipse.ui.commands">
       <command
             categoryId="com.aptana.ui.category"
-            defaultHandler="com.aptana.index.core.ui.handlers.ExcludeHandler"
             id="com.aptana.index.core.ui.commands.exclude"
             name="%command.name">
       </command>
       <command
             categoryId="com.aptana.ui.category"
-            defaultHandler="com.aptana.index.core.ui.handlers.IncludeHandler"
             id="com.aptana.index.core.ui.commands.include"
             name="%command.name.0">
       </command>
@@ -77,5 +75,66 @@
                commandId="com.aptana.index.core.ui.commands.include">
          </command>
       </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="com.aptana.index.core.ui.handlers.ExcludeHandler"
+            commandId="com.aptana.index.core.ui.commands.exclude">
+         <enabledWhen>
+            <iterate
+                  ifEmpty="false">
+               <and>
+                  <or>
+                     <instanceof
+                           value="org.eclipse.core.resources.IProject">
+                     </instanceof>
+                     <instanceof
+                           value="org.eclipse.core.resources.IFolder">
+                     </instanceof>
+                  </or>
+                  <test
+                        forcePluginActivation="true"
+                        property="com.aptana.index.isFiltered"
+                        value="false">
+                  </test>
+               </and>
+            </iterate>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="com.aptana.index.core.ui.handlers.IncludeHandler"
+            commandId="com.aptana.index.core.ui.commands.include">
+         <enabledWhen>
+            <iterate
+                  ifEmpty="false">
+               <and>
+                  <or>
+                     <instanceof
+                           value="org.eclipse.core.resources.IProject">
+                     </instanceof>
+                     <instanceof
+                           value="org.eclipse.core.resources.IFolder">
+                     </instanceof>
+                  </or>
+                  <test
+                        forcePluginActivation="true"
+                        property="com.aptana.index.isFiltered"
+                        value="true">
+                  </test>
+               </and>
+            </iterate>
+         </enabledWhen>
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="com.aptana.index.core.ui.handlers.FilterTester"
+            id="com.aptana.index.core.ui.filterTests"
+            namespace="com.aptana.index"
+            properties="isFiltered"
+            type="org.eclipse.core.resources.IResource">
+      </propertyTester>
    </extension>
 </plugin>
