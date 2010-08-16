@@ -22,10 +22,14 @@
 #define MAXCOMLEN 255
 #endif
 
+#define MAXARGS 16
+
 #define ESC '\033'
 #define DLE	'\020'
 
 #define MAX_ESC_SEQUENCE_LENGTH	16
+
+static const char* DELIM = " ";
 
 static void send_process_list(char* ptyname);
 
@@ -44,10 +48,22 @@ main (int argc, char** argv)
 	int pty;
 	char ptyname[MAXCOMLEN+1];
 	struct winsize size = { 0, 0 };
+	char *args[MAXARGS];
+	int index = 0;
 
-	if( argc > 1 ) {
+	if( argc < 3 ) {
+		return EXIT_FAILURE;
+	}
+	memset(args, MAXARGS, sizeof(char*));
+	for( char* arg = strtok(argv[2], DELIM); arg != NULL; arg = strtok(NULL, DELIM), ++index ) {
+		if( index >= MAXARGS ) {
+			return EXIT_FAILURE;
+		}
+		args[index] = arg;
+	}
+	if( argc > 3 ) {
 		unsigned int width, height;
-		if( sscanf(argv[1], "%ux%u", &width, &height) == 2 ) {
+		if( sscanf(argv[3], "%ux%u", &width, &height) == 2 ) {
 			size.ws_col = width;
 			size.ws_row = height;
 		}
@@ -65,7 +81,7 @@ main (int argc, char** argv)
 			exit (EXIT_FAILURE); 
 			
 		case 0: /* This is the child process */ 
-			execl("/bin/bash", "-bash", "-li", NULL); 
+			execv(argv[1], args); 
 			
 			perror("exec()"); /* Since exec* never return */ 
 			exit (EXIT_FAILURE); 
