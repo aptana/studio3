@@ -3,6 +3,7 @@ package com.aptana.scope;
 public class NameSelector implements ISelectorNode
 {
 	private String _name;
+	private int matchLength = 0;
 	
 	/**
 	 * NameSelector
@@ -36,6 +37,7 @@ public class NameSelector implements ISelectorNode
 				if (scopeLength == nameLength || step.charAt(nameLength) == '.')
 				{
 					result = true;
+					matchLength = nameLength;
 					context.advance();
 				}
 			}
@@ -52,5 +54,11 @@ public class NameSelector implements ISelectorNode
 	public String toString()
 	{
 		return this._name;
+	}
+	
+	@Override
+	public int matchLength()
+	{
+		return matchLength;
 	}
 }

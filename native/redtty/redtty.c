@@ -29,7 +29,7 @@
 
 #define MAX_ESC_SEQUENCE_LENGTH	16
 
-static const char* DELIM = " ";
+static const char* DELIM = "\n";
 
 static void send_process_list(char* ptyname);
 
@@ -55,7 +55,7 @@ main (int argc, char** argv)
 	if( argc < 3 ) {
 		return EXIT_FAILURE;
 	}
-	memset(args, MAXARGS, sizeof(char*));
+	memset(args, 0, sizeof(args));
 	for( arg = strtok(argv[2], DELIM); arg != NULL; arg = strtok(NULL, DELIM), ++index ) {
 		if( index >= MAXARGS ) {
 			return EXIT_FAILURE;

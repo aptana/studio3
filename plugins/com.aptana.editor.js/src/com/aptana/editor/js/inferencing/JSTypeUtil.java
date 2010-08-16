@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.UserAgentManager;
@@ -181,6 +182,91 @@ public class JSTypeUtil
 	}
 
 	/**
+	 * applySignature
+	 * 
+	 * @param property
+	 * @param typeName
+	 */
+	public static void applySignature(PropertyElement property, String typeName)
+	{
+		if (property instanceof FunctionElement)
+		{
+			applySignature((FunctionElement) property, typeName);
+		}
+		else
+		{
+			property.addType(typeName);
+		}
+	}
+
+	/**
+	 * applySignature
+	 * 
+	 * @param function
+	 * @param typeName
+	 */
+	public static void applySignature(FunctionElement function, String typeName)
+	{
+		if (function != null && typeName != null)
+		{
+			int delimiter = typeName.indexOf(JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER);
+
+			if (delimiter != -1)
+			{
+				for (String returnType : typeName.substring(delimiter + 1).split(JSTypeConstants.RETURN_TYPE_DELIMITER))
+				{
+					function.addReturnType(returnType);
+				}
+
+				// chop off the signature to continue processing the type
+				typeName = typeName.substring(0, delimiter);
+			}
+
+			function.addType(typeName);
+		}
+	}
+
+	/**
+	 * createGenericArrayType
+	 * 
+	 * @param elementType
+	 * @return
+	 */
+	public static String createGenericArrayType(String elementType)
+	{
+		return JSTypeConstants.GENERIC_ARRAY_OPEN + elementType + JSTypeConstants.GENERIC_CLOSE;
+	}
+
+	/**
+	 * getArrayElementType
+	 * 
+	 * @param type
+	 * @return
+	 */
+	public static String getArrayElementType(String type)
+	{
+		String result = null;
+
+		if (type != null && type.length() > 0)
+		{
+			if (type.endsWith(JSTypeConstants.ARRAY_LITERAL))
+			{
+				result = type.substring(0, type.length() - 2);
+			}
+			else if (type.startsWith(JSTypeConstants.GENERIC_ARRAY_OPEN) && type.endsWith(JSTypeConstants.GENERIC_CLOSE))
+			{
+				result = type.substring(JSTypeConstants.GENERIC_ARRAY_OPEN.length(), type.length() - 1);
+			}
+			else if (type.equals(JSTypeConstants.ARRAY_TYPE))
+			{
+				result = JSTypeConstants.OBJECT_TYPE;
+			}
+		}
+
+		return result;
+	}
+
+	/**
 	 * getFunctionSignatureReturnTypeNames
 	 * 
 	 * @param typeName
@@ -189,16 +275,16 @@ public class JSTypeUtil
 	public static List<String> getFunctionSignatureReturnTypeNames(String typeName)
 	{
 		List<String> result;
-		
-		int index = typeName.indexOf(':');
-		
+
+		int index = typeName.indexOf(JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER);
+
 		if (index != -1)
 		{
 			String returnTypesString = typeName.substring(index + 1);
-			
+
 			result = new ArrayList<String>();
-			
-			for (String returnType : returnTypesString.split(","))
+
+			for (String returnType : returnTypesString.split(JSTypeConstants.RETURN_TYPE_DELIMITER))
 			{
 				result.add(returnType);
 			}
@@ -207,7 +293,31 @@ public class JSTypeUtil
 		{
 			result = Collections.emptyList();
 		}
-		
+
+		return result;
+	}
+
+	/**
+	 * getFunctionSignatureType
+	 * 
+	 * @param typeName
+	 * @return
+	 */
+	public static String getFunctionSignatureType(String typeName)
+	{
+		String result = typeName;
+
+		if (typeName != null)
+		{
+			int delimiter = typeName.indexOf(JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER);
+
+			if (delimiter != -1)
+			{
+				// chop off the signature to continue processing the type
+				result = typeName.substring(0, delimiter);
+			}
+		}
+
 		return result;
 	}
 
@@ -242,10 +352,6 @@ public class JSTypeUtil
 						{
 							parts.add(functionName.getText());
 						}
-						// else
-						// {
-						// parts.add("function-" + node.getStartingOffset());
-						// }
 						break;
 
 					case JSNodeTypes.NAME_VALUE_PAIR:
@@ -305,6 +411,26 @@ public class JSTypeUtil
 		UUID uuid = UUID.randomUUID();
 
 		return MessageFormat.format("{0}{1}", JSTypeConstants.DYNAMIC_CLASS_PREFIX, uuid); //$NON-NLS-1$
+	}
+
+	/**
+	 * isFunctionPrefix
+	 * 
+	 * @param type
+	 * @return
+	 */
+	public static boolean isFunctionPrefix(String type)
+	{
+		boolean result = false;
+
+		if (type != null)
+		{
+			Matcher m = JSTypeConstants.FUNCTION_PREFIX.matcher(type);
+
+			result = m.find();
+		}
+
+		return result;
 	}
 
 	/**

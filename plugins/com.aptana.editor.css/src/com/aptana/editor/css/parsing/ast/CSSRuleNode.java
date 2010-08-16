@@ -1,6 +1,5 @@
 package com.aptana.editor.css.parsing.ast;
 
-import java.util.Arrays;
 import java.util.List;
 
 import beaver.Symbol;
@@ -88,19 +87,18 @@ public class CSSRuleNode extends CSSNode
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (!(obj instanceof CSSRuleNode))
+		if (!super.equals(obj) || !(obj instanceof CSSRuleNode))
 		{
 			return false;
 		}
 		CSSRuleNode other = (CSSRuleNode) obj;
-		return Arrays.equals(getSelectors(), other.getSelectors())
-				&& Arrays.equals(getDeclarations(), other.getDeclarations());
+		return toString().equals(other.toString());
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return 31 * Arrays.hashCode(getSelectors()) + Arrays.hashCode(getDeclarations());
+		return super.hashCode() * 31 + toString().hashCode();
 	}
 
 	@Override

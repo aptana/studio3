@@ -18,7 +18,7 @@ import com.aptana.editor.js.parsing.IJSParserConstants;
 public class HTMLOutlineLabelProvider extends CompositeOutlineLabelProvider
 {
 
-	private static final Image ELEMENT_ICON = Activator.getImage("icons/element.gif"); //$NON-NLS-1$
+	private static final Image ELEMENT_ICON = Activator.getImage("icons/element.png"); //$NON-NLS-1$
 
 	public HTMLOutlineLabelProvider()
 	{

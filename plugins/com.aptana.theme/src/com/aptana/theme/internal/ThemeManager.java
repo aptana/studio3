@@ -3,7 +3,6 @@ package com.aptana.theme.internal;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Enumeration;
@@ -13,6 +12,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.WeakHashMap;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -55,13 +55,16 @@ public class ThemeManager implements IThemeManager
 	private Theme fCurrentTheme;
 	private HashMap<String, Theme> fThemeMap;
 	private HashSet<String> fBuiltins;
-	private Map<WeakReference<Token>, String> fTokens;
+	
+	// NOTE: We need to specifying WeakHashMap here since most (all other?) Map
+	// implementations will cause a memory leak
+	private WeakHashMap<Token, String> fTokens;
 
 	private static ThemeManager fgInstance;
 
 	private ThemeManager()
 	{
-		fTokens = new HashMap<WeakReference<Token>, String>();
+		fTokens = new WeakHashMap<Token, String>();
 	}
 
 	public static ThemeManager instance()
@@ -89,6 +92,10 @@ public class ThemeManager implements IThemeManager
 			if (activeThemeName != null)
 			{
 				fCurrentTheme = getTheme(activeThemeName);
+				if (fCurrentTheme != null)
+				{
+					return fCurrentTheme;
+				}
 			}
 			if (fCurrentTheme == null)
 			{
@@ -304,18 +311,18 @@ public class ThemeManager implements IThemeManager
 		}
 	}
 
-	public IToken getToken(String string)
+	public IToken getToken(String scope)
 	{
-		Token token = new Token(getTextAttribute(string));
-		fTokens.put(new WeakReference<Token>(token), string);
+		Token token = new Token(getTextAttribute(scope));
+//		fTokens.put(token, scope);
 		return token;
 	}
 
 	private void adaptTokens()
 	{
-		for (Map.Entry<WeakReference<Token>, String> entry : fTokens.entrySet())
+		for (Map.Entry<Token, String> entry : fTokens.entrySet())
 		{
-			Token token = entry.getKey().get();
+			Token token = entry.getKey();
 			if (token != null)
 				token.setData(getTextAttribute(entry.getValue()));
 		}

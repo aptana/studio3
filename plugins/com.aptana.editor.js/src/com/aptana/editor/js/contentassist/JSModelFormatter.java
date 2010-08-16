@@ -179,7 +179,7 @@ public class JSModelFormatter
 		buffer.append(function.getName());
 		buffer.append("(").append(StringUtil.join(", ", function.getParameterTypes())).append(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		addTypes(buffer, function.getTypeNames());
+		addTypes(buffer, function.getReturnTypeNames());
 		addDescription(buffer, function);
 		addExamples(buffer, function.getExamples());
 		addDefiningFiles(buffer, function, projectURI);
@@ -255,13 +255,17 @@ public class JSModelFormatter
 
 		if (type != null)
 		{
-			if (type.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN) && type.endsWith(JSTypeConstants.GENERIC_CLASS_CLOSE))
+			if (type.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN) && type.endsWith(JSTypeConstants.GENERIC_CLOSE))
 			{
 				result = type.substring(JSTypeConstants.GENERIC_CLASS_OPEN.length(), type.length() - 1);
 			}
 			else if (type.startsWith(JSTypeConstants.DYNAMIC_CLASS_PREFIX))
 			{
 				result = JSTypeConstants.USER_TYPE;
+			}
+			else if (type.startsWith(JSTypeConstants.GENERIC_FUNCTION_OPEN) && type.endsWith(JSTypeConstants.GENERIC_CLOSE))
+			{
+				result = type.substring(JSTypeConstants.GENERIC_FUNCTION_OPEN.length(), type.length() - 1);
 			}
 			else
 			{

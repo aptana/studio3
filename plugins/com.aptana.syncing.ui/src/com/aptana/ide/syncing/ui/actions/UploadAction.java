@@ -54,6 +54,7 @@ import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
 import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants;
+import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ui.DialogUtils;
 
 /**
@@ -82,13 +83,13 @@ public class UploadAction extends BaseSyncAction
 					IConnectionPoint source = site.getSource();
 					IConnectionPoint target = site.getDestination();
 					// retrieves the root filestore of each end
-					IFileStore sourceRoot = source.getRoot();
+					IFileStore sourceRoot = (fSourceRoot == null) ? source.getRoot() : fSourceRoot;
 					// makes sure the target end point is connected
 					if (!target.isConnected())
 					{
 						target.connect(monitor);
 					}
-					IFileStore targetRoot = target.getRoot();
+					final IFileStore targetRoot = (fDestinationRoot == null) ? target.getRoot() : fDestinationRoot;
 					syncer.setClientFileManager(source);
 					syncer.setServerFileManager(target);
 					syncer.setClientFileRoot(sourceRoot);
@@ -100,8 +101,16 @@ public class UploadAction extends BaseSyncAction
 					{
 						fileStores[i] = SyncUtils.getFileStore(files[i]);
 					}
-					IFileStore[] sourceFiles = EFSUtils.getAllFiles(fileStores, true, false, monitor);
-
+					IFileStore[] sourceFiles;
+					if (fSelectedFromSource)
+					{
+						sourceFiles = EFSUtils.getAllFiles(fileStores, true, false, monitor);
+					}
+					else
+					{
+						// the selection is from the destination, so do a reverse download
+						sourceFiles = SyncUtils.getDownloadFiles(target, source, fileStores, true, monitor);
+					}
 					final VirtualFileSyncPair[] items = syncer.createSyncItems(sourceFiles, new IFileStore[0], monitor);
 
 					syncer.setEventHandler(new SyncActionEventHandler(Messages.UploadAction_MessageTitle, items.length,
@@ -111,6 +120,7 @@ public class UploadAction extends BaseSyncAction
 								@Override
 								public void syncCompleted()
 								{
+									IOUIPlugin.refreshNavigatorView(targetRoot);
 									postAction(syncer);
 									syncer.setEventHandler(null);
 									syncer.disconnect();

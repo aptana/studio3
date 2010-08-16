@@ -1,8 +1,8 @@
 package com.aptana.editor.js.sdoc.parsing;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.ArrayDeque;
+import java.util.Queue;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -20,7 +20,7 @@ public class SDocScanner extends Scanner
 	private SDocTokenScanner fTokenScanner;
 	private SDocTypeTokenScanner fTypeTokenScanner;
 	private IDocument fDocument;
-	private List<Symbol> fQueue;
+	private Queue<Symbol> fQueue;
 	private int fOffset;
 
 	/**
@@ -30,7 +30,7 @@ public class SDocScanner extends Scanner
 	{
 		fTokenScanner = new SDocTokenScanner();
 		fTypeTokenScanner = new SDocTypeTokenScanner();
-		fQueue = new LinkedList<Symbol>();
+		fQueue = new ArrayDeque<Symbol>();
 	}
 
 	/*
@@ -44,7 +44,7 @@ public class SDocScanner extends Scanner
 
 		if (fQueue.size() > 0)
 		{
-			result = fQueue.remove(0);
+			result = fQueue.poll();
 		}
 		else
 		{
@@ -65,7 +65,7 @@ public class SDocScanner extends Scanner
 			{
 				this.queueTypeTokens(offset, length);
 
-				result = fQueue.remove(0);
+				result = fQueue.poll();
 			}
 			else
 			{
@@ -117,7 +117,7 @@ public class SDocScanner extends Scanner
 			{
 				Symbol symbol = new Symbol(type.getIndex(), offset + fOffset, offset + fOffset + length - 1, fDocument.get(offset, length));
 
-				fQueue.add(symbol);
+				fQueue.offer(symbol);
 
 				token = fTypeTokenScanner.nextToken();
 			}

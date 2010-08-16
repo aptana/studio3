@@ -33,6 +33,7 @@ import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.inferencing.JSNodeTypeInferrer;
 import com.aptana.editor.js.inferencing.JSPropertyCollection;
 import com.aptana.editor.js.inferencing.JSScope;
+import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.editor.js.parsing.JSTokenScanner;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
@@ -49,8 +50,8 @@ import com.aptana.parsing.lexer.Range;
 
 public class JSContentAssistProcessor extends CommonContentAssistProcessor
 {
-	private static final Image JS_FUNCTION = Activator.getImage("/icons/js_function.gif"); //$NON-NLS-1$
-	private static final Image JS_PROPERTY = Activator.getImage("/icons/js_property.gif"); //$NON-NLS-1$
+	private static final Image JS_FUNCTION = Activator.getImage("/icons/js_function.png"); //$NON-NLS-1$
+	private static final Image JS_PROPERTY = Activator.getImage("/icons/js_property.png"); //$NON-NLS-1$
 
 	private static final EnumSet<ContentSelector> CORE_GLOBAL_SELECTOR = EnumSet.of(ContentSelector.NAME, //
 		ContentSelector.DESCRIPTION, //
@@ -138,7 +139,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		List<PropertyElement> projectGlobals = this._indexHelper.getProjectGlobals(this.getIndex(), PROJECT_GLOBAL_SELECTOR);
 
-		if (projectGlobals != null)
+		if (projectGlobals != null && projectGlobals.isEmpty() == false)
 		{
 			Image[] userAgents = this.getAllUserAgentIcons();
 			URI projectURI = this.getProjectURI();
@@ -164,37 +165,15 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected void addProperties(Set<ICompletionProposal> proposals, int offset)
 	{
-		IParseNode propertyNode = null;
+		JSGetPropertyNode node = this.getGetPropertyNode();
 
-		if (this._targetNode != null && this._targetNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
+		if (node != null)
 		{
-			propertyNode = this._targetNode;
-		}
-		else if (this._statementNode != null)
-		{
-			if (this._statementNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
-			{
-				propertyNode = this._statementNode;
-			}
-			else
-			{
-				IParseNode child = this._statementNode.getFirstChild();
-
-				if (child != null && child.getNodeType() == JSNodeTypes.GET_PROPERTY)
-				{
-					propertyNode = child;
-				}
-			}
-		}
-
-		if (propertyNode != null)
-		{
-			JSGetPropertyNode node = (JSGetPropertyNode) propertyNode;
 			JSScope localScope = this.getScopeAtOffset(offset);
 
 			if (localScope != null)
 			{
-				List<String> typeList = null;
+				List<String> typeList = Collections.emptyList();
 
 				// lookup in current file
 				IParseNode lhs = node.getLeftHandSide();
@@ -208,37 +187,28 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					typeList = typeWalker.getTypes();
 				}
 
-				if (typeList != null)
+				// TEMP: Show types for debugging info
+				if (Platform.inDevelopmentMode())
 				{
-					// TEMP: Show types for debugging info
-					if (Platform.inDevelopmentMode())
-					{
-						System.out.println("types: " + StringUtil.join(", ", typeList)); //$NON-NLS-1$ //$NON-NLS-2$
-					}
-
-					// add all properties of each type to our proposal list
-					for (String type : typeList)
-					{
-						if (type.startsWith(JSTypeConstants.FUNCTION_SIGNATURE_PREFIX))
-						{
-							this.addTypeProperties(proposals, JSTypeConstants.FUNCTION_TYPE, offset);
-						}
-						else if (type.startsWith(JSTypeConstants.GENERIC_ARRAY_OPEN))
-						{
-							this.addTypeProperties(proposals, JSTypeConstants.ARRAY_TYPE, offset);
-						}
-						else
-						{
-							this.addTypeProperties(proposals, type, offset);
-						}
-					}
+					System.out.println("types: " + StringUtil.join(", ", typeList)); //$NON-NLS-1$ //$NON-NLS-2$
 				}
-				else
+
+				// add all properties of each type to our proposal list
+				for (String type : typeList)
 				{
-					// TEMP: Show types for debugging info
-					if (Platform.inDevelopmentMode())
+					if (JSTypeUtil.isFunctionPrefix(type))
 					{
-						System.out.println("types: "); //$NON-NLS-1$
+						String functionType = JSTypeUtil.getFunctionSignatureType(type);
+
+						this.addTypeProperties(proposals, functionType, offset);
+					}
+					else if (type.startsWith(JSTypeConstants.GENERIC_ARRAY_OPEN))
+					{
+						this.addTypeProperties(proposals, JSTypeConstants.ARRAY_TYPE, offset);
+					}
+					else
+					{
+						this.addTypeProperties(proposals, type, offset);
 					}
 				}
 			}
@@ -516,6 +486,52 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
+	 * getGetPropertyNode
+	 * 
+	 * @return
+	 */
+	private JSGetPropertyNode getGetPropertyNode()
+	{
+		JSGetPropertyNode propertyNode = null;
+
+		if (this._targetNode != null)
+		{
+			if (this._targetNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
+			{
+				propertyNode = (JSGetPropertyNode) this._targetNode;
+			}
+			else
+			{
+				IParseNode parentNode = this._targetNode.getParent();
+
+				if (parentNode != null && parentNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
+				{
+					propertyNode = (JSGetPropertyNode) parentNode;
+				}
+			}
+		}
+
+		if (propertyNode == null && this._statementNode != null)
+		{
+			if (this._statementNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
+			{
+				propertyNode = (JSGetPropertyNode) this._statementNode;
+			}
+			else
+			{
+				IParseNode child = this._statementNode.getFirstChild();
+
+				if (child != null && child.getNodeType() == JSNodeTypes.GET_PROPERTY)
+				{
+					propertyNode = (JSGetPropertyNode) child;
+				}
+			}
+		}
+
+		return propertyNode;
+	}
+
+	/**
 	 * getGlobalScope
 	 * 
 	 * @return
@@ -557,7 +573,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		LocationType result = LocationType.UNKNOWN;
 
 		// set up references to AST nodes around the current offset
-		this._targetNode = this.getActiveASTNode(offset);
+		this._targetNode = this.getActiveASTNode(offset - 1);
 		this._statementNode = null;
 		IParseNode ast = null;
 

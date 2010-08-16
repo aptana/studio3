@@ -34,12 +34,22 @@
  */
 package com.aptana.ide.syncing.ui;
 
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.IExecutionListener;
+import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -51,9 +61,13 @@ import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.SyncingPlugin;
 import com.aptana.ide.syncing.core.events.ISiteConnectionListener;
 import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
+import com.aptana.ide.syncing.ui.actions.Sync;
 import com.aptana.ide.syncing.ui.editors.EditorUtils;
 import com.aptana.ide.syncing.ui.navigator.ProjectSitesManager;
+import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants.SyncDirection;
+import com.aptana.ide.syncing.ui.preferences.SyncPreferenceUtil;
 import com.aptana.ide.ui.io.IOUIPlugin;
+import com.aptana.ui.UIUtils;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -121,6 +135,49 @@ public class SyncingUIPlugin extends AbstractUIPlugin {
 		}
 	}
 
+	private IExecutionListener fExecutionListener = new IExecutionListener()
+	{
+
+		@Override
+		public void notHandled(String commandId, NotHandledException exception)
+		{
+		}
+
+		@Override
+		public void postExecuteFailure(String commandId, ExecutionException exception)
+		{
+		}
+
+		@Override
+		public void postExecuteSuccess(String commandId, Object returnValue)
+		{
+			// if we see a save command
+			if ("org.eclipse.ui.file.save".equals(commandId)) //$NON-NLS-1$
+			{
+				IEditorPart editorPart = UIUtils.getActiveEditor();
+				if (editorPart != null)
+				{
+					IEditorInput input = editorPart.getEditorInput();
+					if (input instanceof IFileEditorInput)
+					{
+						// for upload, checks if the active editor belongs to a project auto-synced to a FTP connection
+						IProject project = ((IFileEditorInput) input).getFile().getProject();
+						if (SyncPreferenceUtil.isAutoSync(project)
+								&& SyncPreferenceUtil.getAutoSyncDirection(project) != SyncDirection.DOWNLOAD)
+						{
+							Sync.uploadCurrentEditor();
+						}
+					}
+				}
+			}
+		}
+
+		@Override
+		public void preExecute(String commandId, ExecutionEvent event)
+		{
+		}
+	};
+
     /**
      * The constructor
      */
@@ -135,6 +192,7 @@ public class SyncingUIPlugin extends AbstractUIPlugin {
         plugin = this;
         SyncingPlugin.getSiteConnectionManager().addListener(connectionListener);
         CoreIOPlugin.getConnectionPointManager().addConnectionPointListener(connectionPointListener);
+		addCommandSaveListener();
     }
 
     /**
@@ -143,6 +201,7 @@ public class SyncingUIPlugin extends AbstractUIPlugin {
     public void stop(BundleContext context) throws Exception {
         SyncingPlugin.getSiteConnectionManager().removeListener(connectionListener);
         CoreIOPlugin.getConnectionPointManager().removeConnectionPointListener(connectionPointListener);
+    	removeCommandSaveListener();
         plugin = null;
         super.stop(context);
     }
@@ -202,4 +261,22 @@ public class SyncingUIPlugin extends AbstractUIPlugin {
     private static void log(IStatus status) {
         getDefault().getLog().log(status);
     }
+
+	private void addCommandSaveListener()
+	{
+		ICommandService commandService = (ICommandService) PlatformUI.getWorkbench().getAdapter(ICommandService.class);
+		if (commandService != null)
+		{
+			commandService.addExecutionListener(fExecutionListener);
+		}
+	}
+
+	private void removeCommandSaveListener()
+	{
+		ICommandService commandService = (ICommandService) PlatformUI.getWorkbench().getAdapter(ICommandService.class);
+		if (commandService != null)
+		{
+			commandService.removeExecutionListener(fExecutionListener);
+		}
+	}
 }

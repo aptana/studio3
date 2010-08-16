@@ -63,6 +63,16 @@ public class JSIndexReader
 			}
 			column++;
 
+			// types
+			if (fields.contains(ContentSelector.TYPES))
+			{
+				for (ReturnTypeElement returnType : this.getReturnTypes(index, columns[column]))
+				{
+					f.addType(returnType);
+				}
+			}
+			column++;
+
 			// parameters
 			if (fields.contains(ContentSelector.PARAMETERS))
 			{

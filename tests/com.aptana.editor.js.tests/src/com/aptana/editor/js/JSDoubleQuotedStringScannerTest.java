@@ -10,20 +10,12 @@ import org.eclipse.jface.text.rules.Token;
 
 public class JSDoubleQuotedStringScannerTest extends TestCase
 {
-
-	private JSDoubleQuotedStringScanner fScanner;
+	private JSEscapeSequenceScanner fScanner;
 
 	@Override
 	protected void setUp() throws Exception
 	{
-		fScanner = new JSDoubleQuotedStringScanner()
-		{
-			@Override
-			protected IToken getToken(String tokenName)
-			{
-				return JSDoubleQuotedStringScannerTest.this.getToken(tokenName);
-			}
-		};
+		fScanner = new JSEscapeSequenceScanner("string.quoted.double.js");
 	}
 
 	@Override

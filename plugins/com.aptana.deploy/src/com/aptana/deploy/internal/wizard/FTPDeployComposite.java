@@ -1,6 +1,5 @@
 package com.aptana.deploy.internal.wizard;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
@@ -9,19 +8,13 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import com.aptana.deploy.Activator;
-import com.aptana.deploy.preferences.IPreferenceConstants;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
+import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants.SyncDirection;
 import com.aptana.ide.ui.secureftp.internal.CommonFTPConnectionPropertyComposite;
 
 @SuppressWarnings("restriction")
 public class FTPDeployComposite extends CommonFTPConnectionPropertyComposite implements SelectionListener
 {
-
-	public static enum Direction
-	{
-		UPLOAD, DOWNLOAD, BOTH
-	}
 
 	private Button autoSyncCheckbox;
 	private Button uploadButton;
@@ -33,6 +26,7 @@ public class FTPDeployComposite extends CommonFTPConnectionPropertyComposite imp
 		super(parent, style, connectionPoint, listener);
 
 		createAutoSyncOptions(this);
+		optionsExpandable.setExpanded(true);
 	}
 
 	public boolean isAutoSyncSelected()
@@ -40,17 +34,17 @@ public class FTPDeployComposite extends CommonFTPConnectionPropertyComposite imp
 		return autoSyncCheckbox.getSelection();
 	}
 
-	public Direction getSyncDirection()
+	public SyncDirection getSyncDirection()
 	{
 		if (uploadButton.getSelection())
 		{
-			return Direction.UPLOAD;
+			return SyncDirection.UPLOAD;
 		}
 		if (downloadButton.getSelection())
 		{
-			return Direction.DOWNLOAD;
+			return SyncDirection.DOWNLOAD;
 		}
-		return Direction.BOTH;
+		return SyncDirection.BOTH;
 	}
 
 	private void createAutoSyncOptions(Composite parent)
@@ -61,8 +55,7 @@ public class FTPDeployComposite extends CommonFTPConnectionPropertyComposite imp
 
 		autoSyncCheckbox = new Button(sync, SWT.CHECK);
 		autoSyncCheckbox.setText(Messages.FTPDeployComposite_AutoSync);
-		autoSyncCheckbox.setSelection(Platform.getPreferencesService().getBoolean(Activator.getPluginIdentifier(),
-				IPreferenceConstants.AUTO_SYNC, true, null));
+		autoSyncCheckbox.setSelection(true);
 		autoSyncCheckbox.addSelectionListener(this);
 
 		uploadButton = new Button(sync, SWT.RADIO);

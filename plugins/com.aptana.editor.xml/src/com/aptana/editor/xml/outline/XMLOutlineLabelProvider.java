@@ -10,7 +10,7 @@ import com.aptana.editor.xml.parsing.ast.XMLElementNode;
 public class XMLOutlineLabelProvider extends LabelProvider
 {
 
-	private static final Image ELEMENT_ICON = XMLPlugin.getImage("icons/element.gif"); //$NON-NLS-1$
+	private static final Image ELEMENT_ICON = XMLPlugin.getImage("icons/element.png"); //$NON-NLS-1$
 
 	public XMLOutlineLabelProvider()
 	{

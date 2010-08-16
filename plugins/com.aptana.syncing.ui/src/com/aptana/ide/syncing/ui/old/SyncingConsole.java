@@ -35,6 +35,8 @@
 package com.aptana.ide.syncing.ui.old;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.console.ConsolePlugin;
@@ -44,6 +46,8 @@ import org.eclipse.ui.console.MessageConsoleStream;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
+import com.aptana.theme.ConsoleThemer;
+import com.aptana.theme.extensions.ConsoleThemePageParticipant;
 
 /**
  * @author Paul Colton
@@ -100,6 +104,10 @@ public class SyncingConsole extends MessageConsole
 	private static void initConsole()
 	{
 		_console = new SyncingConsole(Messages.SyncingConsole_AptanaSyncingConsole, null);
+		Map<MessageConsoleStream, String> themeConsoleStreamToColor = new HashMap<MessageConsoleStream, String>();
+		themeConsoleStreamToColor.put(_console.newMessageStream(), ConsoleThemer.CONSOLE_OUTPUT);
+
+		_console.setAttribute(ConsoleThemePageParticipant.THEME_CONSOLE_STREAM_TO_COLOR_ATTRIBUTE, themeConsoleStreamToColor);
 		ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { _console });
 	}
 

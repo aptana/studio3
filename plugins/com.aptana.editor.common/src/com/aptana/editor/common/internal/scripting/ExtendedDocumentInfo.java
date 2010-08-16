@@ -58,6 +58,12 @@ import com.aptana.scripting.model.BundleManager;
 	private String filename;
 	private String defaultContentType;
 
+	// Cached copy of the top level scope
+	private String fTopLevelScope;
+	// Boolean flag to tell if we calculated top level scope already. It may have been null, so we can't just check for
+	// null on memoized field.
+	private boolean calculatedTopLevelScope = false;
+
 	/**
 	 * @param filename
 	 */
@@ -103,17 +109,27 @@ import com.aptana.scripting.model.BundleManager;
 	public QualifiedContentType modify(QualifiedContentType translation)
 	{
 		if (filename == null)
-			return translation;
-		String[] parts = translation.getParts();
-		String scope = BundleManager.getInstance().getTopLevelScope(filename);
-		if (scope == null)
 		{
 			return translation;
 		}
+
+		// memoize since it's expensive (we repeatedly ask for scopes with our new coloring!)
+		if (!calculatedTopLevelScope)
+		{
+			fTopLevelScope = BundleManager.getInstance().getTopLevelScope(filename);
+			calculatedTopLevelScope = true;
+		}
+
+		if (fTopLevelScope == null)
+		{
+			return translation;
+		}
+
 		// TODO If scope ends with generic DEFAULT PARTITION, cut that off
 
+		String[] parts = translation.getParts();
 		String[] newParts = new String[parts.length];
-		newParts[0] = scope;
+		newParts[0] = fTopLevelScope;
 		System.arraycopy(parts, 1, newParts, 1, parts.length - 1);
 		return new QualifiedContentType(newParts);
 	}

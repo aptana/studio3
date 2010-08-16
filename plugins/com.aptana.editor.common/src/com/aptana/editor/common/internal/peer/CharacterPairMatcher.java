@@ -28,7 +28,8 @@ import com.aptana.scope.ScopeSelector;
  */
 public class CharacterPairMatcher implements ICharacterPairMatcher
 {
-	private static final ScopeSelector fgCommentSelector = new ScopeSelector(Messages.getString("CharacterPairMatcher.0")); //$NON-NLS-1$
+	private static final ScopeSelector fgCommentSelector = new ScopeSelector(
+			Messages.getString("CharacterPairMatcher.0")); //$NON-NLS-1$
 	private int fAnchor = -1;
 	private final CharPairs fPairs;
 	private final String fPartitioning;
@@ -118,6 +119,10 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 			// Now try to right of caret
 			charOffset = caretOffset;
 			caretOffset += 1;
+			if (charOffset >= doc.getLength())
+			{
+				return null;
+			}
 			prevChar = doc.getChar(charOffset);
 			if (!fPairs.contains(prevChar))
 			{
@@ -153,8 +158,8 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 		final int adjustedOffset = isForward ? charOffset : caretOffset;
 
 		final DocumentPartitionAccessor partDoc = new DocumentPartitionAccessor(doc, fPartitioning, partition);
-		int endOffset = findMatchingPeer(partDoc, prevChar, fPairs.getMatching(prevChar), isForward, isForward ? doc
-				.getLength() : -1, searchStartPosition);
+		int endOffset = findMatchingPeer(partDoc, prevChar, fPairs.getMatching(prevChar), isForward,
+				isForward ? doc.getLength() : -1, searchStartPosition);
 		if (endOffset == -1)
 			return null;
 		final int adjustedEndOffset = isForward ? endOffset + 1 : endOffset;
@@ -230,8 +235,8 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 			}
 			else if (c == start && doc.inPartition(pos))
 			{
-				pos = findMatchingPeer(doc, start, end, searchForward, boundary, doc
-						.getNextPosition(pos, searchForward));
+				pos = findMatchingPeer(doc, start, end, searchForward, boundary,
+						doc.getNextPosition(pos, searchForward));
 				if (pos == -1)
 					return -1;
 			}

@@ -41,7 +41,7 @@ public class CommandProposal extends SnippetTemplateProposal
 			{
 				IDocument document = viewer.getDocument();
 				int start = getReplaceOffset();
-				int end = getReplaceEndOffset();
+				int end = offset;
 				String replacement = ""; //$NON-NLS-1$
 				if (end == document.getLength())
 				{

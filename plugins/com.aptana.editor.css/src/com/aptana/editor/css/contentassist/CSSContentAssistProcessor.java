@@ -80,8 +80,8 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		ERROR, OUTSIDE_RULE, INSIDE_RULE, INSIDE_ARG, INSIDE_PROPERTY, INSIDE_VALUE
 	};
 
-	private static final Image ELEMENT_ICON = Activator.getImage("/icons/element.gif"); //$NON-NLS-1$
-	private static final Image PROPERTY_ICON = Activator.getImage("/icons/property.gif"); //$NON-NLS-1$
+	private static final Image ELEMENT_ICON = Activator.getImage("/icons/element.png"); //$NON-NLS-1$
+	private static final Image PROPERTY_ICON = Activator.getImage("/icons/property.png"); //$NON-NLS-1$
 
 	private IContextInformationValidator _validator;
 	private CSSIndexQueryHelper _queryHelper;
@@ -153,7 +153,8 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 						break;
 						
 					case SEMICOLON:
-					case CURLY_BRACE:
+					case LCURLY:
+					case RCURLY:
 						this._replaceRange = this._currentLexeme = null;
 						break;
 						
@@ -274,7 +275,8 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 					this._replaceRange = this._currentLexeme = lexemeProvider.getLexeme(index + 1);
 					break;
 				
-				case CURLY_BRACE:
+				case LCURLY:
+				case RCURLY:
 					this._replaceRange = this._currentLexeme = null;
 					offset++;
 					break;
@@ -499,7 +501,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			@Override
 			protected CSSTokenType getTypeFromData(Object data)
 			{
-				return CSSTokenType.get((String) data);
+				return (CSSTokenType) data;
 			}
 		};
 	}
@@ -592,47 +594,43 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 
 			switch (lexeme.getType())
 			{
-				case CURLY_BRACE:
-					if ("{".equals(lexeme.getText())) //$NON-NLS-1$
+				case LCURLY:
+					location = LocationType.INSIDE_PROPERTY;
+					break;
+				case RCURLY:
+					if (index > 0)
 					{
-						location = LocationType.INSIDE_PROPERTY;
-					}
-					else
-					{
-						if (index > 0)
+						Lexeme<CSSTokenType> previousLexeme = lexemeProvider.getLexeme(index - 1);
+						
+						if (previousLexeme.getEndingOffset() == offset - 1)
 						{
-							Lexeme<CSSTokenType> previousLexeme = lexemeProvider.getLexeme(index - 1);
-							
-							if (previousLexeme.getEndingOffset() == offset - 1)
+							switch (previousLexeme.getType())
 							{
-								switch (previousLexeme.getType())
-								{
-									case CLASS:
-									case ID:
-										location = LocationType.ERROR;
-										break LOOP;
-										
-									case CURLY_BRACE:
-									case SEMICOLON:
-										location = LocationType.INSIDE_PROPERTY;
-										break;
-										
-									default:
-										break;
-								}
+								case CLASS:
+								case ID:
+									location = LocationType.ERROR;
+									break LOOP;
+									
+								case LCURLY:
+								case SEMICOLON:
+									location = LocationType.INSIDE_PROPERTY;
+									break;
+									
+								default:
+									break;
 							}
-							else
+						}
+						else
+						{
+							switch (previousLexeme.getType())
 							{
-								switch (previousLexeme.getType())
-								{
-									case COLON:
-										location = LocationType.INSIDE_VALUE;
-										break;
-										
-									default:
-										location = LocationType.INSIDE_PROPERTY;
-										break;
-								}
+								case COLON:
+									location = LocationType.INSIDE_VALUE;
+									break;
+									
+								default:
+									location = LocationType.INSIDE_PROPERTY;
+									break;
 							}
 						}
 					}
@@ -672,7 +670,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 					location = (lexeme.getEndingOffset() < offset) ? LocationType.INSIDE_VALUE : LocationType.INSIDE_PROPERTY;
 					break;
 					
-				case ARGS:
+//				case ARGS:
 				case FUNCTION:
 				case VALUE:
 					location = LocationType.INSIDE_VALUE;
@@ -805,24 +803,20 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 
 			switch (lexeme.getType())
 			{
-				case CURLY_BRACE:
-					if ("{".equals(lexeme.getText())) //$NON-NLS-1$
+				case LCURLY:
+					if (lexeme.getEndingOffset() < offset)
 					{
-						if (lexeme.getEndingOffset() < offset)
-						{
-							result = LocationType.INSIDE_RULE;
-							this._replaceRange = this._currentLexeme = null;
-						}
-						else
-						{
-							result = LocationType.OUTSIDE_RULE;
-							this._replaceRange = this._currentLexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
-						}
+						result = LocationType.INSIDE_RULE;
+						this._replaceRange = this._currentLexeme = null;
 					}
 					else
 					{
-						result = (lexeme.getEndingOffset() < offset) ? LocationType.OUTSIDE_RULE : LocationType.INSIDE_RULE;
+						result = LocationType.OUTSIDE_RULE;
+						this._replaceRange = this._currentLexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
 					}
+					break LOOP;
+				case RCURLY:
+					result = (lexeme.getEndingOffset() < offset) ? LocationType.OUTSIDE_RULE : LocationType.INSIDE_RULE;
 					break LOOP;
 
 				case COLON:
@@ -890,7 +884,8 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			case COLON:
 			case COMMA:
-			case CURLY_BRACE:
+			case LCURLY:
+			case RCURLY:
 			case SEMICOLON:
 				result = true;
 				break;
@@ -933,19 +928,16 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 						this._replaceRange = this._currentLexeme = null;
 						break;
 
-					case CURLY_BRACE:
-						if ("}".equals(this._currentLexeme.getText())) //$NON-NLS-1$
-						{
-							Lexeme<CSSTokenType> candidate = lexemeProvider.getLexemeFromOffset(offset - 1);
+					case LCURLY:
+						this._replaceRange = this._currentLexeme = null;
+						break;
+						
+					case RCURLY:
+						Lexeme<CSSTokenType> candidate = lexemeProvider.getLexemeFromOffset(offset - 1);
 
-							if (candidate != null && this.isValueDelimiter(candidate) == false)
-							{
-								this._replaceRange = this._currentLexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
-							}
-							else
-							{
-								this._replaceRange = this._currentLexeme = null;
-							}
+						if (candidate != null && this.isValueDelimiter(candidate) == false)
+						{
+							this._replaceRange = this._currentLexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
 						}
 						else
 						{
