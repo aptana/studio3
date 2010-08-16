@@ -70,7 +70,7 @@ public class NixBashConfiguration extends AbstractProcessConfiguration {
 		List<String> list = new ArrayList<String>();
 		list.add(getExecutable().getAbsolutePath());
 		list.add("/bin/bash"); //$NON-NLS-1$
-		list.add("bash --rcfile "+getRCFile().getAbsolutePath()+" -i"); //$NON-NLS-1$
+		list.add("bash --rcfile \""+getRCFile().getAbsolutePath()+"\" -i"); //$NON-NLS-1$
 		list.add("120x40"); //$NON-NLS-1$
 		return list;
 	}
