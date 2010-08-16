@@ -165,11 +165,9 @@ public class IndexFilterManager
 			// be filtered.
 			for (IFileStore fileStore : fileStores)
 			{
-				IContainer[] containers = workspaceRoot.findContainersForLocationURI(fileStore.toURI());
-				
-				if (containers.length > 0)
+				for (IContainer container : workspaceRoot.findContainersForLocationURI(fileStore.toURI()))
 				{
-					IFileStore workspaceFileStore = EFSUtils.getFileStore(containers[0]);
+					IFileStore workspaceFileStore = EFSUtils.getFileStore(container);
 					
 					if (this.isFilteredItem(workspaceFileStore))
 					{
