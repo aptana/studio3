@@ -49,13 +49,14 @@ main (int argc, char** argv)
 	char ptyname[MAXCOMLEN+1];
 	struct winsize size = { 0, 0 };
 	char *args[MAXARGS];
+	char* arg;
 	int index = 0;
 
 	if( argc < 3 ) {
 		return EXIT_FAILURE;
 	}
 	memset(args, MAXARGS, sizeof(char*));
-	for( char* arg = strtok(argv[2], DELIM); arg != NULL; arg = strtok(NULL, DELIM), ++index ) {
+	for( arg = strtok(argv[2], DELIM); arg != NULL; arg = strtok(NULL, DELIM), ++index ) {
 		if( index >= MAXARGS ) {
 			return EXIT_FAILURE;
 		}
