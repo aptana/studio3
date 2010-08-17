@@ -10,28 +10,28 @@ import com.aptana.index.core.ui.IndexFilterManager;
 public class FilterTester extends PropertyTester
 {
 	private static final String IS_FILTERED = "isFiltered";
-	
+
 	@Override
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue)
 	{
 		boolean result = false;
-		
+
 		if (receiver instanceof IResource)
 		{
 			IResource resource = (IResource) receiver;
-			
+
 			if (IS_FILTERED.equals(property))
 			{
 				IFileStore fileStore = EFSUtils.getFileStore(resource);
 				boolean expectedResult = toBoolean(expectedValue);
-				
+
 				result = (IndexFilterManager.getInstance().isFilteredItem(fileStore) == expectedResult);
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * toBoolean
 	 * 

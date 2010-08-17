@@ -36,7 +36,7 @@ public abstract class BaseHandler extends AbstractHandler
 	{
 		this._fileStores.add(fileStore);
 	}
-	
+
 	/**
 	 * clearFileStores
 	 */
@@ -44,7 +44,7 @@ public abstract class BaseHandler extends AbstractHandler
 	{
 		this._fileStores.clear();
 	}
-	
+
 	/**
 	 * getFileStores
 	 * 
