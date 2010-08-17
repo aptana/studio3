@@ -47,12 +47,7 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		Object data = token.getData();
 		if (data instanceof String)
 		{
-			// try
-			// {
 			String last = (String) data;
-			// int offset = fScanner.getTokenOffset();
-			// String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
-			// .getScopeAtOffset(fDocument, offset);
 			if (!scope.endsWith(last))
 			{
 				last = scope + " " + last; //$NON-NLS-1$
@@ -60,11 +55,6 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 			IToken converted = ThemePlugin.getDefault().getThemeManager().getToken(last);
 			lastAttribute = super.getTokenTextAttribute(converted);
 			return lastAttribute;
-			// }
-			// catch (BadLocationException e)
-			// {
-			// CommonEditorPlugin.logError(e);
-			// }
 		}
 		else if (token.isWhitespace())
 		{
