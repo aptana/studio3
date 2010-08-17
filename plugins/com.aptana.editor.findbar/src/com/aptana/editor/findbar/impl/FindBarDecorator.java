@@ -38,6 +38,8 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.commands.ICommandService;
@@ -53,6 +55,18 @@ import com.aptana.editor.findbar.api.IFindBarDecorator;
 
 public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 {
+
+	private static final String CLOSE = "icons/close.png"; //$NON-NLS-1$
+	private static final String PREVIOUS = "icons/previous.png"; //$NON-NLS-1$
+	private static final String NEXT = "icons/next.png"; //$NON-NLS-1$
+	private static final String SIGMA = "icons/sigma.png"; //$NON-NLS-1$
+	private static final String FINDREPLACE = "icons/findreplace.png"; //$NON-NLS-1$
+	private static final String CASE_SENSITIVE = "icons/casesensitive.png"; //$NON-NLS-1$
+	private static final String CASE_SENSITIVE_DISABLED = "icons/casesensitive_disabled.png"; //$NON-NLS-1$
+	private static final String REGEX = "icons/regex.png"; //$NON-NLS-1$
+	private static final String REGEX_DISABLED = "icons/regex_disabled.png"; //$NON-NLS-1$
+	private static final String WHOLE_WORD = "icons/whole_word.png"; //$NON-NLS-1$
+	private static final String WHOLE_WORD_DISABLED = "icons/whole_word_disabled.png"; //$NON-NLS-1$
 
 	private final ITextEditor textEditor;
 	private ISourceViewer sourceViewer;
@@ -95,7 +109,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		gridLayout.verticalSpacing = 0;
 		findBar.setLayout(gridLayout);
 
-		close = createButton(FindBarPlugin.CLOSE, true);
+		close = createButton(CLOSE, true);
 		close.setToolTipText(Messages.FindBarDecorator_TOOLTIP_HideFindBar);
 
 		findButton = createButton(null, true);
@@ -106,21 +120,32 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		comboReplace = createCombo(PREFERENCE_NAME_REPLACE);
 		combos = new Combo[] { combo, comboReplace };
 
-		previous = createButton(FindBarPlugin.PREVIOUS, false);
-		next = createButton(FindBarPlugin.NEXT, false);
+		previous = createButton(PREVIOUS, false);
+		next = createButton(NEXT, false);
 
-		caseSensitive = createCheck();
-		caseSensitive.setText(Messages.FindBarDecorator_LABEL_CaseSensitive);
+		ToolBar optionsToolBar = new ToolBar(findBar, SWT.NONE);
+		optionsToolBar.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 
-		wholeWord = createCheck();
-		wholeWord.setText(Messages.FindBarDecorator_LABEL_WholeWord);
+		caseSensitive = new ToolItem(optionsToolBar, SWT.CHECK);
+		caseSensitive.setImage(FindBarPlugin.getImage(CASE_SENSITIVE));
+		caseSensitive.setDisabledImage(FindBarPlugin.getImage(CASE_SENSITIVE_DISABLED));
+		caseSensitive.setToolTipText(Messages.FindBarDecorator_LABEL_CaseSensitive);
+		caseSensitive.addSelectionListener(this);
+
+		wholeWord = new ToolItem(optionsToolBar, SWT.CHECK);
+		wholeWord.setImage(FindBarPlugin.getImage(WHOLE_WORD));
+		wholeWord.setDisabledImage(FindBarPlugin.getImage(WHOLE_WORD_DISABLED));
+		wholeWord.setToolTipText(Messages.FindBarDecorator_LABEL_WholeWord);
+		wholeWord.addSelectionListener(this);
 		wholeWord.setEnabled(false);
 
 		IFindReplaceTarget findReplaceTarget = (IFindReplaceTarget) textEditor.getAdapter(IFindReplaceTarget.class);
 		if (findReplaceTarget instanceof IFindReplaceTargetExtension3)
 		{
-			regularExpression = createCheck();
-			regularExpression.setText(Messages.FindBarDecorator_LABEL_RegularExpression);
+			regularExpression = new ToolItem(optionsToolBar, SWT.CHECK);
+			regularExpression.setImage(FindBarPlugin.getImage(REGEX));
+			regularExpression.setDisabledImage(FindBarPlugin.getImage(REGEX_DISABLED));
+			regularExpression.setToolTipText(Messages.FindBarDecorator_LABEL_RegularExpression);
 			regularExpression.addSelectionListener(new SelectionListener()
 			{
 
@@ -145,7 +170,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		replaceAll.setText(Messages.FindBarDecorator_LABEL_ReplaceAll);
 
 		countTotal = createCheck();
-		countTotal.setImage(FindBarPlugin.getDefault().getImage(FindBarPlugin.SIGMA));
+		countTotal.setImage(FindBarPlugin.getImage(SIGMA));
 		countTotal.setToolTipText(Messages.FindBarDecorator_TOOLTIP_ShowMatchCount);
 
 		count = new Label(findBar, SWT.NONE);
@@ -156,11 +181,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		Label streach = new Label(findBar, SWT.NONE);
 		streach.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
-		showFindReplaceDialog = createButton(FindBarPlugin.FINDREPLACE, true);
+		showFindReplaceDialog = createButton(FINDREPLACE, true);
 		showFindReplaceDialog.setToolTipText(Messages.FindBarDecorator_TOOLTIP_ShowFindReplaceDialog);
 
-		disableWhenHidden = new Control[] { combo, comboReplace, caseSensitive, wholeWord, regularExpression, close,
-				next, previous, countTotal, findButton, replaceFind, replace, replaceAll, count, showFindReplaceDialog, };
+		disableWhenHidden = new Control[] { combo, comboReplace, optionsToolBar, close, next, previous, countTotal,
+				findButton, replaceFind, replace, replaceAll, count, showFindReplaceDialog, };
 	}
 
 	/**
@@ -185,7 +210,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		button.setEnabled(enabled);
 		if (image != null)
 		{
-			button.setImage(FindBarPlugin.getDefault().getImage(image));
+			button.setImage(FindBarPlugin.getImage(image));
 		}
 		button.addSelectionListener(this);
 		button.setLayoutData(layoutData);
@@ -430,9 +455,9 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	private Combo combo;
 	private Combo comboReplace;
 	private Combo[] combos;
-	private Button caseSensitive;
-	private Button wholeWord;
-	private Button regularExpression;
+	private ToolItem caseSensitive;
+	private ToolItem wholeWord;
+	private ToolItem regularExpression;
 	private int incrementalOffset = -1;
 	private Button close;
 	private Button next;
