@@ -4,6 +4,7 @@ import java.util.StringTokenizer;
 
 import org.eclipse.swt.graphics.Image;
 
+import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.erb.Activator;
 import com.aptana.editor.erb.html.parsing.ERBScript;
 import com.aptana.editor.html.outline.HTMLOutlineLabelProvider;
@@ -11,6 +12,7 @@ import com.aptana.editor.ruby.core.IRubyScript;
 import com.aptana.editor.ruby.outline.RubyOutlineLabelProvider;
 import com.aptana.editor.ruby.parsing.IRubyParserConstants;
 import com.aptana.parsing.IParseState;
+import com.aptana.parsing.ast.IParseNode;
 
 public class RHTMLOutlineLabelProvider extends HTMLOutlineLabelProvider
 {
@@ -28,23 +30,31 @@ public class RHTMLOutlineLabelProvider extends HTMLOutlineLabelProvider
 	}
 
 	@Override
-	protected Image getDefaultImage(Object element)
+	public Image getImage(Object element)
 	{
-		if (element instanceof ERBScript)
+		if (element instanceof CommonOutlineItem)
 		{
-			return ERB_ICON;
+			IParseNode node = ((CommonOutlineItem) element).getReferenceNode();
+			if (node instanceof ERBScript)
+			{
+				return ERB_ICON;
+			}
 		}
-		return super.getDefaultImage(element);
+		return super.getImage(element);
 	}
 
 	@Override
-	protected String getDefaultText(Object element)
+	public String getText(Object element)
 	{
-		if (element instanceof ERBScript)
+		if (element instanceof CommonOutlineItem)
 		{
-			return getDisplayText((ERBScript) element);
+			IParseNode node = ((CommonOutlineItem) element).getReferenceNode();
+			if (node instanceof ERBScript)
+			{
+				return getDisplayText((ERBScript) node);
+			}
 		}
-		return super.getDefaultText(element);
+		return super.getText(element);
 	}
 
 	private String getDisplayText(ERBScript script)
