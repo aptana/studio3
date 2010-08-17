@@ -1,5 +1,7 @@
 package com.aptana.editor.erb;
 
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -47,4 +49,16 @@ public class Activator extends AbstractUIPlugin {
 		return plugin;
 	}
 
+	public static Image getImage(String string)
+	{
+		if (getDefault().getImageRegistry().get(string) == null)
+		{
+			ImageDescriptor id = imageDescriptorFromPlugin(PLUGIN_ID, string);
+			if (id != null)
+			{
+				getDefault().getImageRegistry().put(string, id);
+			}
+		}
+		return getDefault().getImageRegistry().get(string);
+	}
 }
