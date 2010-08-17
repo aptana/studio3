@@ -1,9 +1,10 @@
 package com.aptana.editor.common.outline;
 
+import com.aptana.parsing.ast.ILanguageNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 
-public class CommonOutlineItem implements IRange, Comparable<IRange>
+public class CommonOutlineItem implements ILanguageNode, IRange, Comparable<IRange>
 {
 	private IRange fSourceRange;
 	private IParseNode fReferenceNode;
@@ -67,6 +68,12 @@ public class CommonOutlineItem implements IRange, Comparable<IRange>
 	public int getStartingOffset()
 	{
 		return fSourceRange.getStartingOffset();
+	}
+
+	@Override
+	public String getLanguage()
+	{
+		return getReferenceNode().getLanguage();
 	}
 
 	@Override

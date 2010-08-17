@@ -2,8 +2,10 @@ package com.aptana.index.core;
 
 import java.net.URI;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,13 +34,18 @@ abstract class IndexRequestJob extends Job
 	private static final String TAG_FILE_INDEXING_PARTICIPANT = "fileIndexingParticipant"; //$NON-NLS-1$
 	private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
 
+	private static final String INDEX_FILTER_PARTICIPANTS_ID = "indexFilterParticipants"; //$NON-NLS-1$
+	private static final String ELEMENT_FILTER = "filter"; //$NON-NLS-1$
+
 	private URI containerURI;
+	private List<IIndexFilterParticipant> filterParticipants;
 
-	public IndexRequestJob(URI containerURI)
-	{
-		this(MessageFormat.format("Indexing {0}", containerURI.toString()), containerURI);
-	}
-
+	/**
+	 * IndexRequestJob
+	 * 
+	 * @param name
+	 * @param containerURI
+	 */
 	public IndexRequestJob(String name, URI containerURI)
 	{
 		super(name);
@@ -48,6 +55,20 @@ abstract class IndexRequestJob extends Job
 		// setSystem(true);
 	}
 
+	/**
+	 * IndexRequestJob
+	 * 
+	 * @param containerURI
+	 */
+	public IndexRequestJob(URI containerURI)
+	{
+		this(MessageFormat.format("Indexing {0}", containerURI.toString()), containerURI);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.core.runtime.jobs.Job#belongsTo(java.lang.Object)
+	 */
 	@Override
 	public boolean belongsTo(Object family)
 	{
@@ -62,14 +83,181 @@ abstract class IndexRequestJob extends Job
 		return getContainerURI().equals(family);
 	}
 
+	/**
+	 * Instantiate a {@link IFileStoreIndexingParticipant} from the {@link IConfigurationElement} pointing to it via an
+	 * extension.
+	 * 
+	 * @param key
+	 * @return
+	 */
+	private IFileStoreIndexingParticipant createParticipant(IConfigurationElement key)
+	{
+		try
+		{
+			return (IFileStoreIndexingParticipant) key.createExecutableExtension(ATTR_CLASS);
+		}
+		catch (CoreException e)
+		{
+			IndexActivator.logError(e);
+		}
+		return null;
+	}
+
+	/**
+	 * filterFileStores
+	 * 
+	 * @return
+	 */
+	protected Set<IFileStore> filterFileStores(Set<IFileStore> fileStores)
+	{
+		if (fileStores != null && fileStores.isEmpty() == false)
+		{
+			for (IIndexFilterParticipant filterParticipant : this.getFilterParticipants())
+			{
+				fileStores = filterParticipant.applyFilter(fileStores);
+			}
+		}
+
+		return fileStores;
+	}
+
+	/**
+	 * getContainerURI
+	 * 
+	 * @return
+	 */
 	protected URI getContainerURI()
 	{
 		return containerURI;
 	}
 
+	/**
+	 * Return a map from classname of the participant to a set of strings for the content type ids it applies to.
+	 * 
+	 * @return
+	 */
+	private Map<IConfigurationElement, Set<IContentType>> getFileIndexingParticipants()
+	{
+		IExtensionRegistry registry = Platform.getExtensionRegistry();
+		Map<IConfigurationElement, Set<IContentType>> map = new HashMap<IConfigurationElement, Set<IContentType>>();
+		if (registry == null)
+		{
+			return map;
+		}
+
+		IExtensionPoint extensionPoint = registry.getExtensionPoint(IndexActivator.PLUGIN_ID, FILE_INDEXING_PARTICIPANTS_ID);
+		if (extensionPoint == null)
+		{
+			return map;
+		}
+
+		IContentTypeManager manager = Platform.getContentTypeManager();
+
+		IExtension[] extensions = extensionPoint.getExtensions();
+		for (IExtension extension : extensions)
+		{
+			IConfigurationElement[] elements = extension.getConfigurationElements();
+
+			for (IConfigurationElement element : elements)
+			{
+				if (element.getName().equals(TAG_FILE_INDEXING_PARTICIPANT))
+				{
+					Set<IContentType> types = new HashSet<IContentType>();
+
+					IConfigurationElement[] contentTypes = element.getChildren(CONTENT_TYPE_BINDING);
+					for (IConfigurationElement contentTypeBinding : contentTypes)
+					{
+						String contentTypeId = contentTypeBinding.getAttribute(CONTENT_TYPE_ID);
+						IContentType type = manager.getContentType(contentTypeId);
+						types.add(type);
+					}
+					map.put(element, types);
+				}
+			}
+		}
+		return map;
+	}
+
+	/**
+	 * getFilterParticipants
+	 * 
+	 * @return
+	 */
+	private List<IIndexFilterParticipant> getFilterParticipants()
+	{
+		if (this.filterParticipants == null)
+		{
+			this.filterParticipants = new ArrayList<IIndexFilterParticipant>();
+
+			IExtensionRegistry registry = Platform.getExtensionRegistry();
+
+			if (registry != null)
+			{
+				IExtensionPoint extensionPoint = registry.getExtensionPoint(IndexActivator.PLUGIN_ID, INDEX_FILTER_PARTICIPANTS_ID);
+
+				if (extensionPoint != null)
+				{
+					for (IExtension extension : extensionPoint.getExtensions())
+					{
+						for (IConfigurationElement element : extension.getConfigurationElements())
+						{
+							if (ELEMENT_FILTER.equals(element.getName()))
+							{
+								try
+								{
+									IIndexFilterParticipant participant = (IIndexFilterParticipant) element.createExecutableExtension(ATTR_CLASS);
+
+									this.filterParticipants.add(participant);
+								}
+								catch (CoreException e)
+								{
+									IndexActivator.logError(e);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return this.filterParticipants;
+	}
+
+	/**
+	 * getIndex
+	 * 
+	 * @return
+	 */
 	protected Index getIndex()
 	{
 		return IndexManager.getInstance().getIndex(getContainerURI());
+	}
+
+	/**
+	 * hasTypes
+	 * 
+	 * @param store
+	 * @param types
+	 * @return
+	 */
+	protected boolean hasType(IFileStore store, Set<IContentType> types)
+	{
+		if (types == null || types.isEmpty())
+		{
+			return false;
+		}
+		for (IContentType type : types)
+		{
+			if (type == null)
+			{
+				continue;
+			}
+			if (type.isAssociatedWith(store.getName()))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -81,9 +269,10 @@ abstract class IndexRequestJob extends Job
 	 * @param monitor
 	 * @throws CoreException
 	 */
-	protected void indexFileStores(Index index, Set<IFileStore> fileStores, IProgressMonitor monitor)
-			throws CoreException
+	protected void indexFileStores(Index index, Set<IFileStore> fileStores, IProgressMonitor monitor) throws CoreException
 	{
+		fileStores = this.filterFileStores(fileStores);
+
 		if (index == null || fileStores == null || fileStores.isEmpty())
 		{
 			return;
@@ -174,93 +363,5 @@ abstract class IndexRequestJob extends Job
 			}
 		}
 		return result;
-	}
-
-	/**
-	 * Instantiate a {@link IFileStoreIndexingParticipant} from the {@link IConfigurationElement} pointing to it via an
-	 * extension.
-	 * 
-	 * @param key
-	 * @return
-	 */
-	private IFileStoreIndexingParticipant createParticipant(IConfigurationElement key)
-	{
-		try
-		{
-			return (IFileStoreIndexingParticipant) key.createExecutableExtension(ATTR_CLASS);
-		}
-		catch (CoreException e)
-		{
-			IndexActivator.logError(e);
-		}
-		return null;
-	}
-
-	protected boolean hasType(IFileStore store, Set<IContentType> types)
-	{
-		if (types == null || types.isEmpty())
-		{
-			return false;
-		}
-		for (IContentType type : types)
-		{
-			if (type == null)
-			{
-				continue;
-			}
-			if (type.isAssociatedWith(store.getName()))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * Return a map from classname of the participant to a set of strings for the content type ids it applies to.
-	 * 
-	 * @return
-	 */
-	private Map<IConfigurationElement, Set<IContentType>> getFileIndexingParticipants()
-	{
-		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		Map<IConfigurationElement, Set<IContentType>> map = new HashMap<IConfigurationElement, Set<IContentType>>();
-		if (registry == null)
-		{
-			return map;
-		}
-
-		IExtensionPoint extensionPoint = registry.getExtensionPoint(IndexActivator.PLUGIN_ID,
-				FILE_INDEXING_PARTICIPANTS_ID);
-		if (extensionPoint == null)
-		{
-			return map;
-		}
-
-		IContentTypeManager manager = Platform.getContentTypeManager();
-
-		IExtension[] extensions = extensionPoint.getExtensions();
-		for (IExtension extension : extensions)
-		{
-			IConfigurationElement[] elements = extension.getConfigurationElements();
-
-			for (IConfigurationElement element : elements)
-			{
-				if (element.getName().equals(TAG_FILE_INDEXING_PARTICIPANT))
-				{
-					Set<IContentType> types = new HashSet<IContentType>();
-
-					IConfigurationElement[] contentTypes = element.getChildren(CONTENT_TYPE_BINDING);
-					for (IConfigurationElement contentTypeBinding : contentTypes)
-					{
-						String contentTypeId = contentTypeBinding.getAttribute(CONTENT_TYPE_ID);
-						IContentType type = manager.getContentType(contentTypeId);
-						types.add(type);
-					}
-					map.put(element, types);
-				}
-			}
-		}
-		return map;
 	}
 }

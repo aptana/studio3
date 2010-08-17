@@ -6,7 +6,8 @@ public interface JSIndexConstants
 	// 0.1 - Initial version
 	// 0.11 - Use UUIDs for foreign keys
 	// 0.12 - FunctionElements have types and returnTypes now
-	public static final double INDEX_VERSION = 0.12;
+	// 0.13 - Fix UserAgent foreign keys
+	public static final double INDEX_VERSION = 0.13;
 
 	// general constants
 	static final String PREFIX = "js."; //$NON-NLS-1$
