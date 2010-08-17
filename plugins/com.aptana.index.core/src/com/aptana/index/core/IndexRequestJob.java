@@ -114,7 +114,7 @@ abstract class IndexRequestJob extends Job
 		{
 			for (IIndexFilterParticipant filterParticipant : this.getFilterParticipants())
 			{
-				fileStores = filterParticipant.filterFileStores(fileStores);
+				fileStores = filterParticipant.applyFilter(fileStores);
 			}
 		}
 

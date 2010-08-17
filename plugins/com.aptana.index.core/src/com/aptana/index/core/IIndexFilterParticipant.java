@@ -12,5 +12,5 @@ public interface IIndexFilterParticipant
 	 * @param fileStores
 	 * @return
 	 */
-	public Set<IFileStore> filterFileStores(Set<IFileStore> fileStores);
+	public Set<IFileStore> applyFilter(Set<IFileStore> fileStores);
 }
