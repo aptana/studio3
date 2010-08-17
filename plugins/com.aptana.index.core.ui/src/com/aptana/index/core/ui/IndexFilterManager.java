@@ -96,13 +96,14 @@ public class IndexFilterManager
 	 */
 	public void commitFilteredItems()
 	{
+		// determine which file stores were added and deleted
 		Set<IFileStore> deletedItems = this.loadFilteredItems();
 		Set<IFileStore> addedItems = new HashSet<IFileStore>(this._filteredItems);
 
 		addedItems.removeAll(deletedItems);
 		deletedItems.removeAll(this._filteredItems);
 
-		// now save our new list
+		// build a preference value of all file stores we are filtering
 		String value;
 
 		if (this._filteredItems != null)
@@ -123,17 +124,18 @@ public class IndexFilterManager
 			value = IPreferenceConstants.NO_ITEMS;
 		}
 
+		// now save the file store list
 		IPreferenceStore prefs = IndexUiActivator.getDefault().getPreferenceStore();
 
 		prefs.putValue(IPreferenceConstants.FILTERED_INDEX_URIS, value);
 
 		// determine which projects have been affected by the last set of changes
 		Set<IProject> projects = new HashSet<IProject>();
-		
+
 		for (IFileStore f : addedItems)
 		{
 			IResource resource = (IResource) f.getAdapter(IResource.class);
-			
+
 			if (resource != null)
 			{
 				projects.add(resource.getProject());
@@ -142,39 +144,41 @@ public class IndexFilterManager
 		for (IFileStore f : deletedItems)
 		{
 			IResource resource = (IResource) f.getAdapter(IResource.class);
-			
+
 			if (resource != null)
 			{
 				projects.add(resource.getProject());
 			}
 		}
-		
-		// update project indexes that were affected by our settings
+
+		// update project indexes that were affected by our changes
 		IndexManager manager = IndexManager.getInstance();
-		
+
+		// TODO: Should we keep tabs on the indexing jobs we create here and
+		// cancel them if we're generating a new job for the same project?
 		for (IProject p : projects)
 		{
 			// remove project index
 			manager.removeIndex(p.getLocationURI());
-			
+
 			// and then re-build it
 			new IndexProjectJob(p).schedule();
 		}
 	}
-	
+
 	/**
-	 * filterFileStores
+	 * applyFilter
 	 * 
 	 * @param fileStores
 	 * @return
 	 */
-	public Set<IFileStore> filterFileStores(Set<IFileStore> fileStores)
+	public Set<IFileStore> applyFilter(Set<IFileStore> fileStores)
 	{
 		if (this._filteredItems != null && this._filteredItems.isEmpty() == false && fileStores != null)
 		{
 			IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 			Set<IFileStore> toRemove = new HashSet<IFileStore>();
-			
+
 			// NOTE: The indexing system creates LocalFiles but filters are based
 			// on WorkspaceFiles. The following tries to convert each LocalFile
 			// in the set to a WorkspaceFile before testing if the item needs to
@@ -184,7 +188,7 @@ public class IndexFilterManager
 				for (IContainer container : workspaceRoot.findContainersForLocationURI(fileStore.toURI()))
 				{
 					IFileStore workspaceFileStore = EFSUtils.getFileStore(container);
-					
+
 					if (this.isFilteredItem(workspaceFileStore))
 					{
 						toRemove.add(fileStore);
@@ -224,7 +228,7 @@ public class IndexFilterManager
 	public boolean isFilteredItem(IFileStore item)
 	{
 		boolean result = false;
-		
+
 		if (item != null)
 		{
 			for (IFileStore candidate : this._filteredItems)
@@ -236,10 +240,10 @@ public class IndexFilterManager
 				}
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * loadFilteredItems
 	 */
