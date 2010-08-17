@@ -10,8 +10,8 @@ public class JSOutlineLabelProvider extends LabelProvider
 {
 	private static final Image ARRAY_ICON = Activator.getImage("icons/array-literal.png"); //$NON-NLS-1$
 	private static final Image BOOLEAN_ICON = Activator.getImage("icons/boolean.png"); //$NON-NLS-1$
-	private static final Image FUNCTION_ICON = Activator.getImage("icons/js_function.gif"); //$NON-NLS-1$
-	private static final Image PROPERTY_ICON = Activator.getImage("icons/js_property.gif"); //$NON-NLS-1$
+	private static final Image FUNCTION_ICON = Activator.getImage("icons/js_function.png"); //$NON-NLS-1$
+	private static final Image PROPERTY_ICON = Activator.getImage("icons/js_property.png"); //$NON-NLS-1$
 	private static final Image NULL_ICON = Activator.getImage("icons/null.png"); //$NON-NLS-1$
 	private static final Image NUMBER_ICON = Activator.getImage("icons/number.png"); //$NON-NLS-1$
 	private static final Image OBJECT_LITERAL_ICON = Activator.getImage("icons/object-literal.png"); //$NON-NLS-1$
