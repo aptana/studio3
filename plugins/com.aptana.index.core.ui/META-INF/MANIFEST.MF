@@ -7,10 +7,10 @@ Bundle-Activator: com.aptana.index.core.ui.IndexUiActivator
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- com.aptana.core;bundle-version="3.0.0",
- com.aptana.index.core;bundle-version="2.0.0",
+ com.aptana.core,
+ com.aptana.index.core,
  org.eclipse.core.expressions,
  org.eclipse.core.resources,
- com.aptana.core.io;bundle-version="3.0.0"
+ com.aptana.core.io
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
