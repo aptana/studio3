@@ -259,7 +259,12 @@ public class IndexFilterManager
 					URI uri = new URI(uriString);
 					IFileStore item = EFS.getStore(uri);
 
-					filteredItems.add(item);
+					// TODO: Is it possible to have non-local files in projects
+					// and will this still work for those?
+					if (item.fetchInfo().exists())
+					{
+						filteredItems.add(item);
+					}
 				}
 				catch (URISyntaxException e)
 				{
