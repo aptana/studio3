@@ -344,7 +344,8 @@ public class JSIndexWriter
 		{
 			Index index = JSIndexQueryHelper.getIndex();
 			
-			key = UUID.randomUUID().toString();
+			// generate key from hash
+			key = Integer.toString(userAgent.hashCode());
 			
 			// set key for cache purposes
 			userAgent.setKey(key);
