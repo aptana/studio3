@@ -1168,6 +1168,10 @@ ObjectLiteral
 		{:
 			return new JSObjectNode(l, r, p);
 		:}
+	|	LCURLY.l PropertyNameAndValueList.p COMMA RCURLY.r
+		{:
+			return new JSObjectNode(l, r, p);
+		:}
 	;
 
 PropertyNameAndValueList

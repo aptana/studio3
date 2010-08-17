@@ -42,6 +42,7 @@ public class JSRegExpRule implements IPredicateRule
 		}
 
 		State state = State.ERROR;
+		boolean inCharacterClass = false; // use flag instead of new state to simplify state machine
 		int c = scanner.read();
 		int unreadCount = 0;
 
@@ -64,15 +65,27 @@ public class JSRegExpRule implements IPredicateRule
 								break;
 
 							case '/':
-								if (unreadCount > 1)
+								// We allow stray slashes inside of character classes
+								if (inCharacterClass == false)
 								{
-									state = State.OPTIONS;
+									if (unreadCount > 1)
+									{
+										state = State.OPTIONS;
+									}
+									else
+									{
+										state = State.ERROR;
+										break LOOP;
+									}
 								}
-								else
-								{
-									state = State.ERROR;
-									break LOOP;
-								}
+								break;
+
+							case '[':
+								inCharacterClass = true;
+								break;
+
+							case ']':
+								inCharacterClass = false;
 								break;
 
 							case '\r':
