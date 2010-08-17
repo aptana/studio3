@@ -67,9 +67,25 @@ public class IndexFilterManager
 			{
 				this._filteredItems = new HashSet<IFileStore>();
 			}
-			
+
+			// only add if this item isn't being filtered already
 			if (this.isFilteredItem(item) == false)
 			{
+				// remove any pre-existing file stores that are children of the
+				// item we're about to add
+				Set<IFileStore> toRemove = new HashSet<IFileStore>();
+
+				for (IFileStore candidate : this._filteredItems)
+				{
+					if (item.isParentOf(candidate))
+					{
+						toRemove.add(candidate);
+					}
+				}
+
+				this._filteredItems.removeAll(toRemove);
+
+				// add new item to our list
 				this._filteredItems.add(item);
 			}
 		}
