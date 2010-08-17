@@ -9,6 +9,7 @@ import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.custom.LineBackgroundEvent;
 import org.eclipse.swt.custom.LineBackgroundListener;
+import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Color;
 
@@ -95,26 +96,44 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener
 			String commonPrefix = getScope(document, line, endOfLineScope);
 
 			TextAttribute at = getCurrentTheme().getTextAttribute(commonPrefix);
+			// If the background is null or matches the theme BG, we should just return early!
+			if (at.getBackground() == null || at.getBackground().equals(getThemeBG()))
+			{
+				return;
+			}
+
 			event.lineBackground = at.getBackground();
 			// When we do this, we need to explicitly set the bg color for ranges with no bg color!
-//			StyleRange[] ranges = textWidget.getStyleRanges(offset, lineRegion.getLength(), true);
-//			if (ranges != null && ranges.length > 0)
-//			{
-//				Color themeBG = null;
-//				for (StyleRange range : ranges)
-//				{
-//					// FIXME This is rather hacky. We still don't play nice 100% of the time...
-//					if (range.background == null)
-//					{
-//						if (themeBG == null)
-//						{
-//							themeBG = getThemeBG();
-//						}
-//						range.background = themeBG;
-//						textWidget.setStyleRange(range);
-//					}
-//				}
-//			}
+			
+			// First, for perf reasons, bail out early if there are no style ranges, or there's too many
+			StyleRange[] ranges = textWidget.getStyleRanges(offset, lineRegion.getLength(), false);
+			if (ranges == null || ranges.length == 0 || ranges.length > 100)
+			{
+				return;
+			}
+			// for perf reasons, only do ranges up to 160th column!
+			int length = Math.min(160, lineRegion.getLength());
+			ranges = textWidget.getStyleRanges(offset, length, true);
+			if (ranges == null || ranges.length == 0)
+			{
+				return;
+			}
+
+			int x = 0;
+			int[] pairs = new int[ranges.length * 2];
+			for (StyleRange range : ranges)
+			{
+				// FIXME This is rather hacky. We still don't play nice 100% of the time... What about offsets with
+				// no style, or with a bg matching theme BG (because of alpha?)
+				if (range.background == null)
+				{
+					range.background = getThemeBG();
+				}
+				pairs[x] = range.start;
+				pairs[x + 1] = range.length;
+				x += 2;
+			}
+			textWidget.setStyleRanges(offset, length, pairs, ranges);
 		}
 		catch (BadLocationException e)
 		{

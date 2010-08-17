@@ -18,13 +18,13 @@ public class RubyOutlineLabelProvider extends LabelProvider
 	private static final Image METHOD_PUBLIC = Activator.getImage("icons/method_public_obj.png"); //$NON-NLS-1$
 	private static final Image METHOD_PROTECTED = Activator.getImage("icons/method_protected_obj.png"); //$NON-NLS-1$
 	private static final Image METHOD_PRIVATE = Activator.getImage("icons/method_private_obj.png"); //$NON-NLS-1$
-	private static final Image CLASS_VAR = Activator.getImage("icons/class_var_obj.gif"); //$NON-NLS-1$
-	private static final Image CONSTANT = Activator.getImage("icons/constant_obj.gif"); //$NON-NLS-1$
+	private static final Image CLASS_VAR = Activator.getImage("icons/class_var_obj.png"); //$NON-NLS-1$
+	private static final Image CONSTANT = Activator.getImage("icons/constant_obj.png"); //$NON-NLS-1$
 	private static final Image GLOBAL = Activator.getImage("icons/global_obj.png"); //$NON-NLS-1$
-	private static final Image INSTANCE_VAR = Activator.getImage("icons/instance_var_obj.gif"); //$NON-NLS-1$
-	private static final Image LOCAL_VAR = Activator.getImage("icons/local_var_obj.gif"); //$NON-NLS-1$
-	private static final Image IMPORT_DECLARATION = Activator.getImage("icons/import_obj.gif"); //$NON-NLS-1$
-	private static final Image IMPORT_CONTAINER = Activator.getImage("icons/import_container_obj.gif"); //$NON-NLS-1$
+	private static final Image INSTANCE_VAR = Activator.getImage("icons/instance_var_obj.png"); //$NON-NLS-1$
+	private static final Image LOCAL_VAR = Activator.getImage("icons/local_var_obj.png"); //$NON-NLS-1$
+	private static final Image IMPORT_DECLARATION = Activator.getImage("icons/import_obj.png"); //$NON-NLS-1$
+	private static final Image IMPORT_CONTAINER = Activator.getImage("icons/import_container_obj.png"); //$NON-NLS-1$
 
 	@Override
 	public Image getImage(Object element)

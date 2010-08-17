@@ -44,6 +44,6 @@ public class HTMLOutlineProviderTest extends TestCase
 		Object[] selectors = fContentProvider.getElements(result);
 		assertEquals(1, selectors.length);
 		assertEquals("html", fLabelProvider.getText(selectors[0]));
-		assertEquals(Activator.getImage("icons/element.gif"), fLabelProvider.getImage(selectors[0]));
+		assertEquals(Activator.getImage("icons/element.png"), fLabelProvider.getImage(selectors[0]));
 	}
 }
