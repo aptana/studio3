@@ -1,5 +1,6 @@
 package com.aptana.editor.js.contentassist.index;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,7 +9,9 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.JSTypeConstants;
+import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
@@ -25,10 +28,25 @@ public class JSIndexWriter
 	static Map<String, UserAgentElement> userAgentsByKey = new HashMap<String, UserAgentElement>();
 
 	/**
-	 * JSMetadataIndexer
+	 * JSIndexWriter
 	 */
 	public JSIndexWriter()
 	{
+		this.loadUserAgents();
+	}
+
+	/**
+	 * cacheUserAgent
+	 * 
+	 * @param userAgent
+	 * @param key
+	 */
+	private void cacheUserAgent(UserAgentElement userAgent)
+	{
+		String key = userAgent.getKey();
+		
+		keysByUserAgent.put(userAgent, key);
+		userAgentsByKey.put(key, userAgent);
 	}
 
 	/**
@@ -39,6 +57,26 @@ public class JSIndexWriter
 	protected URI getDocumentPath()
 	{
 		return URI.create(JSIndexConstants.METADATA);
+	}
+
+	/**
+	 * loadUserAgents
+	 */
+	protected void loadUserAgents()
+	{
+		JSIndexReader reader = new JSIndexReader();
+
+		try
+		{
+			for (UserAgentElement userAgent : reader.getUserAgents())
+			{
+				this.cacheUserAgent(userAgent);
+			}
+		}
+		catch (IOException e)
+		{
+			Activator.logError(e.getMessage(), e);
+		}
 	}
 
 	/**
@@ -295,25 +333,30 @@ public class JSIndexWriter
 	/**
 	 * writeUserAgent
 	 * 
-	 * @param index
 	 * @param userAgent
 	 * @return
 	 */
-	protected String writeUserAgent(Index index, UserAgentElement userAgent)
+	protected String writeUserAgent(UserAgentElement userAgent)
 	{
 		String key = keysByUserAgent.get(userAgent);
 
 		if (key == null)
 		{
+			Index index = JSIndexQueryHelper.getIndex();
+			
 			key = UUID.randomUUID().toString();
+			
+			// set key for cache purposes
+			userAgent.setKey(key);
 
+			// store user agent in index so we can recover it during the next session
 			String[] columns = new String[] { key, userAgent.getDescription(), userAgent.getOS(), userAgent.getPlatform(), userAgent.getVersion() };
 			String value = StringUtil.join(JSIndexConstants.DELIMITER, columns);
 
 			index.addEntry(JSIndexConstants.USER_AGENT, value, this.getDocumentPath());
 
-			keysByUserAgent.put(userAgent, key);
-			userAgentsByKey.put(key, userAgent);
+			// cache for faster retrieval during reading
+			cacheUserAgent(userAgent);
 		}
 
 		return key;
@@ -331,7 +374,7 @@ public class JSIndexWriter
 
 		for (UserAgentElement userAgent : userAgents)
 		{
-			keys.add(this.writeUserAgent(index, userAgent));
+			keys.add(this.writeUserAgent(userAgent));
 		}
 
 		return keys;
