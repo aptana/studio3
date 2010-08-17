@@ -23,7 +23,7 @@ import com.aptana.index.core.Index;
 
 public class JSIndexWriter
 {
-	private static final URI METADATA_LOCATION = URI.create(""); //$NON-NLS-1$
+	private static final URI METADATA_LOCATION = URI.create(JSIndexConstants.METADATA); //$NON-NLS-1$
 	private static Map<UserAgentElement, String> keysByUserAgent = new HashMap<UserAgentElement, String>();
 	static Map<String, UserAgentElement> userAgentsByKey = new HashMap<String, UserAgentElement>();
 
