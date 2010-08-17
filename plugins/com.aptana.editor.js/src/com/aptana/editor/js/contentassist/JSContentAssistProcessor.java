@@ -28,7 +28,6 @@ import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.model.ContentSelector;
-import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.inferencing.JSNodeTypeInferrer;
 import com.aptana.editor.js.inferencing.JSPropertyCollection;
@@ -121,7 +120,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				String name = property.getName();
 				String description = JSModelFormatter.getDescription(property, projectURI);
-				Image image = (property instanceof FunctionElement) ? JS_FUNCTION : JS_PROPERTY;
+				Image image = JSModelFormatter.getImage(property);
 				Image[] userAgents = this.getUserAgentImages(property.getUserAgentNames());
 
 				this.addProposal(proposals, name, image, description, userAgents, location, offset);
@@ -148,7 +147,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				String name = property.getName();
 				String description = JSModelFormatter.getDescription(property, projectURI);
-				Image image = (property instanceof FunctionElement) ? JS_FUNCTION : JS_PROPERTY;
+				Image image = JSModelFormatter.getImage(property);
 				List<String> documents = property.getDocuments();
 				String location = (documents != null && documents.size() > 0) ? JSModelFormatter.getDocumentDisplayName(documents.get(0)) : null;
 
