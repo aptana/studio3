@@ -18,6 +18,7 @@ public class JSTypeConstants
 
 	public static final String UNDEFINED_TYPE = "undefined"; //$NON-NLS-1$
 	public static final String VOID_TYPE = "void"; //$NON-NLS-1$
+	public static final String NULL_TYPE = "null"; //$NON-NLS-1$
 
 	public static final String WINDOW_PROPERTY = "window"; //$NON-NLS-1$
 
