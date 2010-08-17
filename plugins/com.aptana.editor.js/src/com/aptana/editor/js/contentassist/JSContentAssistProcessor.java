@@ -326,10 +326,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 		for (PropertyElement property : properties)
 		{
-			boolean isFunction = (property instanceof FunctionElement);
 			String name = property.getName();
 			String description = JSModelFormatter.getDescription(property, this.getProjectURI());
-			Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
+			Image image = JSModelFormatter.getImage(property);
 			List<String> userAgentNames = property.getUserAgentNames();
 			Image[] userAgents = getUserAgentImages(userAgentNames);
 			String owningType = JSModelFormatter.getTypeDisplayName(property.getOwningType());
