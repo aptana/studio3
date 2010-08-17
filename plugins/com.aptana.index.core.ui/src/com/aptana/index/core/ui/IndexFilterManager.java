@@ -26,7 +26,7 @@ import com.aptana.index.core.ui.preferences.IPreferenceConstants;
 
 public class IndexFilterManager
 {
-	private static final String ITEM_DELIMITER = ","; //$NON-NLS-1$
+	private static final String ITEM_DELIMITER = "\0"; //$NON-NLS-1$
 	private static IndexFilterManager INSTANCE;
 
 	/**
