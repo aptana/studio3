@@ -44,7 +44,11 @@ import com.aptana.editor.common.text.rules.SourceConfigurationPartitionScanner;
 public class JSSourcePartitionScanner extends SourceConfigurationPartitionScanner implements IJSTokenScanner
 {
 	private static final Pattern DIVISION_START = Pattern.compile("^.*[-+$_a-zA-Z0-9/'\"')\\]]\\s*$");
+	private static final int PREVIEW_LENGTH = 80;
 
+	/**
+	 * JSSourcePartitionScanner
+	 */
 	public JSSourcePartitionScanner()
 	{
 		super(JSSourceConfiguration.getDefault());
@@ -58,8 +62,8 @@ public class JSSourcePartitionScanner extends SourceConfigurationPartitionScanne
 	public boolean hasDivisionStart()
 	{
 		boolean result = false;
-		int offsetStart = Math.max(0, fOffset - 80);
-		int offsetEnd = Math.min(offsetStart + 80, Math.min(fOffset, fDocument.getLength()));
+		int offsetStart = Math.max(0, fOffset - PREVIEW_LENGTH);
+		int offsetEnd = Math.min(offsetStart + PREVIEW_LENGTH, Math.min(fOffset, fDocument.getLength()));
 
 		if (offsetStart < offsetEnd)
 		{
