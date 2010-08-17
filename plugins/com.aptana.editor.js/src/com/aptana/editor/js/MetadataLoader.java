@@ -173,6 +173,15 @@ public class MetadataLoader extends Job
 		{
 			indexer.writeType(index, type);
 		}
+		
+		try
+		{
+			index.save();
+		}
+		catch (IOException e)
+		{
+			Activator.logError(e.getMessage(), e);
+		}
 
 		return Status.OK_STATUS;
 	}
