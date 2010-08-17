@@ -13,8 +13,13 @@ package com.aptana.ruby.formatter;
 
 import com.aptana.formatter.ui.CodeFormatterConstants;
 
-public class RubyFormatterConstants {
-
+public class RubyFormatterConstants
+{
+	/**
+	 * Ruby formatter ID.
+	 */
+	public static final String FORMATTER_ID = "ruby.formatter"; //$NON-NLS-1$
+	
 	public static final String FORMATTER_TAB_CHAR = CodeFormatterConstants.FORMATTER_TAB_CHAR;
 	public static final String FORMATTER_TAB_SIZE = CodeFormatterConstants.FORMATTER_TAB_SIZE;
 	public static final String FORMATTER_INDENTATION_SIZE = CodeFormatterConstants.FORMATTER_INDENTATION_SIZE;
@@ -42,5 +47,4 @@ public class RubyFormatterConstants {
 
 	public static final String WRAP_COMMENTS = "wrap.comments"; //$NON-NLS-1$
 	public static final String WRAP_COMMENTS_LENGTH = "wrap.comments.length"; //$NON-NLS-1$
-
 }

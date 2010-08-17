@@ -27,7 +27,7 @@ import org.eclipse.core.runtime.Platform;
  */
 public abstract class ContributionExtensionManager
 {
-	private static final String NATURE_ID = "natureId"; //$NON-NLS-1$
+	private static final String CONTENT_TYPE = "contentType"; //$NON-NLS-1$
 
 	private static final String SELECTOR_TAG = "selector"; //$NON-NLS-1$
 	public static final String CLASS_TAG = "class"; //$NON-NLS-1$
@@ -194,7 +194,7 @@ public abstract class ContributionExtensionManager
 		return object;
 	}
 
-	protected final void addContribution(String natureId, IConfigurationElement element)
+	protected final void addContribution(String contentType, IConfigurationElement element)
 	{
 		try
 		{
@@ -207,11 +207,11 @@ public abstract class ContributionExtensionManager
 				 */
 				IContributedExtension contrib = (IContributedExtension) configureContribution(object, element);
 
-				List<IContributedExtension> list = contentTypeToContribMap.get(natureId);
+				List<IContributedExtension> list = contentTypeToContribMap.get(contentType);
 				if (list == null)
 				{
 					list = new ArrayList<IContributedExtension>();
-					contentTypeToContribMap.put(natureId, list);
+					contentTypeToContribMap.put(contentType, list);
 				}
 
 				list.add(contrib);
@@ -240,7 +240,7 @@ public abstract class ContributionExtensionManager
 		}
 	}
 
-	private void loadChildren(String natureId, IConfigurationElement[] innerElements)
+	private void loadChildren(String contentType, IConfigurationElement[] innerElements)
 	{
 		for (int j = 0; j < innerElements.length; j++)
 		{
@@ -249,11 +249,11 @@ public abstract class ContributionExtensionManager
 
 			if (name.equals(getContributionElementName()))
 			{
-				addContribution(natureId, innerElement);
+				addContribution(contentType, innerElement);
 			}
 			else if (name.equals(SELECTOR_TAG))
 			{
-				addSelector(natureId, innerElement);
+				addSelector(contentType, innerElement);
 			}
 		}
 	}
@@ -269,9 +269,9 @@ public abstract class ContributionExtensionManager
 			IConfigurationElement[] elements = extension.getConfigurationElements();
 			for (IConfigurationElement main : elements)
 			{
-				if (isNatureContribution(main))
+				if (isContentTypeContribution(main))
 				{
-					String natureId = main.getAttribute(NATURE_ID);
+					String natureId = main.getAttribute(CONTENT_TYPE);
 					IConfigurationElement[] innerElements = main.getChildren();
 					loadChildren(natureId, innerElements);
 				}
@@ -284,7 +284,7 @@ public abstract class ContributionExtensionManager
 	 * @return
 	 * @since 2.0
 	 */
-	protected boolean isNatureContribution(IConfigurationElement main)
+	protected boolean isContentTypeContribution(IConfigurationElement main)
 	{
 		return true;
 	}

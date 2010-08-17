@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="com.aptana.formatter.epl.formatterFactory">
+      <engineContribution
+            contentType="com.aptana.contenttype.ruby">
+         <formatterFactory
+               class="com.aptana.ruby.formatter.RubyFormatterFactory"
+               id="com.aptana.ruby.formatterFactory"
+               name="Ruby Code Formatter"
+               priority="10">
+         </formatterFactory>
+      </engineContribution>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.aptana.ruby.formatter.internal.RubyFormatterPreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.ui.AptanaPreferencePage"
+            class="com.aptana.ruby.formatter.preferences.RubyFormatterPreferencePage"
+            id="com.aptana.ruby.preferences.formatter"
+            name="Ruby Formatter">
+      </page>
+   </extension>
+
+</plugin>

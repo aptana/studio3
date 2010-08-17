@@ -9,11 +9,22 @@
  * Contributors:
  *     xored software, Inc. - initial API and Implementation (Alex Panchenko)
  *******************************************************************************/
-package com.aptana.ruby.formatter.internal;
+package com.aptana.ruby.formatter.preferences;
 
-public class DumpStackOnly extends Exception
-{
+import org.eclipse.osgi.util.NLS;
 
-	private static final long serialVersionUID = 5661320147862682807L;
+/**
+ * @author Alexey
+ *
+ */
+public class Messages extends NLS {
+	private static final String BUNDLE_NAME = "com.aptana.ruby.formatter.preferences.messages"; //$NON-NLS-1$
+	public static String RubyFormatterPreferencePage_description;
+	static {
+		// initialize resource bundle
+		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	}
 
+	private Messages() {
+	}
 }

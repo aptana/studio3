@@ -17,6 +17,7 @@ import java.util.List;
 import com.aptana.formatter.FormatterBlockNode;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.IFormatterNode;
 import com.aptana.formatter.IFormatterTextNode;
 import com.aptana.formatter.IFormatterWriter;
 
@@ -106,7 +107,7 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 	/*
 	 * @see org.eclipse.dltk.formatter.nodes.FormatterBlockNode#getChildren()
 	 */
-	public List getChildren()
+	public List<IFormatterNode> getChildren()
 	{
 		if (begin == null)
 		{
@@ -114,7 +115,7 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 		}
 		else
 		{
-			List result = new ArrayList();
+			List<IFormatterNode> result = new ArrayList<IFormatterNode>();
 			if (begin != null)
 			{
 				result.add(begin);
@@ -129,7 +130,7 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 	 */
 	public String toString()
 	{
-		return begin + "\n" + super.toString();
+		return begin + "\n" + super.toString(); //$NON-NLS-1$
 	}
 
 }

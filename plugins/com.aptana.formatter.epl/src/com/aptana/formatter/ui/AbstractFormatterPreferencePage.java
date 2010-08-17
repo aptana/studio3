@@ -32,7 +32,6 @@ import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.formatter.ui.internal.AbstractFormatterSelectionBlock;
 import com.aptana.formatter.ui.internal.preferences.ScriptSourcePreviewerUpdater;
 import com.aptana.theme.ColorManager;
@@ -189,7 +188,7 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 	 * @param b
 	 * @return
 	 */
-	protected abstract ISourceViewerConfiguration createSimpleSourceViewerConfiguration(ISharedTextColors colorManager,
+	protected abstract SourceViewerConfiguration createSimpleSourceViewerConfiguration(ISharedTextColors colorManager,
 			IPreferenceStore preferenceStore, ITextEditor editor, boolean configureFormatter);
 
 	protected abstract String getContentType();

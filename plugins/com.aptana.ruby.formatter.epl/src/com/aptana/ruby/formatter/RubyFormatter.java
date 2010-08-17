@@ -43,20 +43,28 @@ import com.aptana.ruby.formatter.internal.RubyFormatterNodeRewriter;
 public class RubyFormatter extends AbstractScriptFormatter
 {
 
-	protected static final String[] INDENTING = { RubyFormatterConstants.INDENT_CLASS,
-			RubyFormatterConstants.INDENT_MODULE, RubyFormatterConstants.INDENT_METHOD,
-			RubyFormatterConstants.INDENT_BLOCKS, RubyFormatterConstants.INDENT_IF, RubyFormatterConstants.INDENT_CASE,
-			RubyFormatterConstants.INDENT_WHEN };
+	protected static final String[] INDENTING = { 
+		RubyFormatterConstants.INDENT_CLASS,
+		RubyFormatterConstants.INDENT_MODULE, 
+		RubyFormatterConstants.INDENT_METHOD,
+		RubyFormatterConstants.INDENT_BLOCKS, 
+		RubyFormatterConstants.INDENT_IF, 
+		RubyFormatterConstants.INDENT_CASE,
+		RubyFormatterConstants.INDENT_WHEN };
 
-	protected static final String[] BLANK_LINES = { RubyFormatterConstants.LINES_FILE_AFTER_REQUIRE,
-			RubyFormatterConstants.LINES_FILE_BETWEEN_MODULE, RubyFormatterConstants.LINES_FILE_BETWEEN_CLASS,
-			RubyFormatterConstants.LINES_FILE_BETWEEN_METHOD, RubyFormatterConstants.LINES_BEFORE_FIRST,
-			RubyFormatterConstants.LINES_BEFORE_MODULE, RubyFormatterConstants.LINES_BEFORE_CLASS,
-			RubyFormatterConstants.LINES_BEFORE_METHOD };
+	protected static final String[] BLANK_LINES = { 
+		RubyFormatterConstants.LINES_FILE_AFTER_REQUIRE,
+		RubyFormatterConstants.LINES_FILE_BETWEEN_MODULE, 
+		RubyFormatterConstants.LINES_FILE_BETWEEN_CLASS,
+		RubyFormatterConstants.LINES_FILE_BETWEEN_METHOD, 
+		RubyFormatterConstants.LINES_BEFORE_FIRST,
+		RubyFormatterConstants.LINES_BEFORE_MODULE, 
+		RubyFormatterConstants.LINES_BEFORE_CLASS,
+		RubyFormatterConstants.LINES_BEFORE_METHOD };
 
 	private final String lineDelimiter;
 
-	public RubyFormatter(String lineDelimiter, Map preferences)
+	public RubyFormatter(String lineDelimiter, Map<String, ? extends Object> preferences)
 	{
 		super(preferences);
 		this.lineDelimiter = lineDelimiter;

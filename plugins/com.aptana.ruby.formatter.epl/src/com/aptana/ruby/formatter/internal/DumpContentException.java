@@ -17,26 +17,33 @@ import java.io.PrintWriter;
 /**
  * This exception class is used to dump large content to the stack trace field
  */
-public class DumpContentException extends Exception {
+public class DumpContentException extends Exception
+{
 
-	public DumpContentException(String message) {
+	private static final long serialVersionUID = 9087590677123278598L;
+
+	public DumpContentException(String message)
+	{
 		super(message);
 	}
 
-	public void printStackTrace(PrintStream s) {
-		synchronized (s) {
-			s.println("========");
+	public void printStackTrace(PrintStream s)
+	{
+		synchronized (s)
+		{
+			s.println("========"); //$NON-NLS-1$
 			s.println(getMessage());
-			s.println("========");
+			s.println("========"); //$NON-NLS-1$
 		}
 	}
 
-	public void printStackTrace(PrintWriter s) {
-		synchronized (s) {
-			s.println("========");
+	public void printStackTrace(PrintWriter s)
+	{
+		synchronized (s)
+		{
+			s.println("========"); //$NON-NLS-1$
 			s.println(getMessage());
-			s.println("========");
+			s.println("========"); //$NON-NLS-1$
 		}
 	}
-
 }

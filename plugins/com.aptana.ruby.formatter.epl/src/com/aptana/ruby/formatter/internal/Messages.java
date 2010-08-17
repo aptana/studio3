@@ -14,7 +14,7 @@ package com.aptana.ruby.formatter.internal;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.eclipse.dltk.ruby.formatter.internal.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.ruby.formatter.internal.messages"; //$NON-NLS-1$
 	public static String RubyFormatter_contentCorrupted;
 	static {
 		// initialize resource bundle

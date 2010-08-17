@@ -11,7 +11,6 @@
  *******************************************************************************/
 package com.aptana.ruby.formatter.internal.nodes;
 
-import java.util.Iterator;
 import java.util.List;
 
 import com.aptana.formatter.FormatterBlockNode;
@@ -23,35 +22,40 @@ import com.aptana.formatter.IFormatterNode;
 import com.aptana.formatter.IFormatterWriter;
 import com.aptana.ruby.formatter.RubyFormatterConstants;
 
-public class FormatterRootNode extends FormatterBlockNode {
+public class FormatterRootNode extends FormatterBlockNode
+{
 
 	/**
 	 * @param document
 	 */
-	public FormatterRootNode(IFormatterDocument document) {
+	public FormatterRootNode(IFormatterDocument document)
+	{
 		super(document);
 	}
 
-	protected void acceptNodes(final List nodes, IFormatterContext context,
-			IFormatterWriter visitor) throws Exception {
+	protected void acceptNodes(final List<IFormatterNode> nodes, IFormatterContext context, IFormatterWriter visitor)
+			throws Exception
+	{
 		boolean wasRequire = false;
-		for (Iterator i = nodes.iterator(); i.hasNext();) {
-			IFormatterNode node = (IFormatterNode) i.next();
+		for (IFormatterNode node : nodes)
+		{
 			context.enter(node);
-			if (node instanceof FormatterRequireNode) {
-				if (wasRequire) {
+			if (node instanceof FormatterRequireNode)
+			{
+				if (wasRequire)
+				{
 					context.setBlankLines(0);
 				}
-			} else if (wasRequire
-					&& (node instanceof IFormatterContainerNode || !FormatterUtils
-							.isEmptyText(node))) {
-				context
-						.setBlankLines(getInt(RubyFormatterConstants.LINES_FILE_AFTER_REQUIRE));
+			}
+			else if (wasRequire && (node instanceof IFormatterContainerNode || !FormatterUtils.isEmptyText(node)))
+			{
+				context.setBlankLines(getInt(RubyFormatterConstants.LINES_FILE_AFTER_REQUIRE));
 				wasRequire = false;
 			}
 			node.accept(context, visitor);
 			context.leave(node);
-			if (node instanceof FormatterRequireNode) {
+			if (node instanceof FormatterRequireNode)
+			{
 				wasRequire = true;
 			}
 		}

@@ -11,8 +11,8 @@
  *******************************************************************************/
 package com.aptana.ruby.formatter.internal;
 
+import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.jface.text.IRegion;
@@ -102,27 +102,32 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			public Object visitClassNode(ClassNode visited)
 			{
 				FormatterClassNode classNode = new FormatterClassNode(document);
-				classNode.setBegin(createTextNode(document, visited));
+				SourcePosition position = visited.getPosition();
+				classNode.setBegin(createTextNode(document, position.getStartOffset(), visited.getCPath().getPosition()
+						.getEndOffset()));
 				push(classNode);
 				visitChildren(visited);
 				// checkedPop(classNode, visited.getEnd().getPosition().getStartOffset());
-				SourcePosition position = visited.getPosition();
-				checkedPop(classNode, position.getEndOffset() - 1);
-				classNode.setEnd(createTextNode(document, position));
+				Node bodyNode = visited.getBodyNode();
+				int bodyEndOffset = bodyNode.getPosition().getEndOffset();
+				checkedPop(classNode, bodyEndOffset);
+				classNode.setEnd(createTextNode(document, bodyEndOffset, position.getEndOffset()));
 				return null;
 			}
 
 			public Object visitSClassNode(SClassNode visited)
 			{
 				FormatterClassNode classNode = new FormatterClassNode(document);
+				SourcePosition position = visited.getPosition();
 				classNode.setBegin(createTextNode(document, visited));
 				// .getClassKeyword()));
 				push(classNode);
 				visitChildren(visited);
 				// checkedPop(classNode, visited.getEnd().getPosition().getStartOffset());
-				SourcePosition position = visited.getPosition();
-				checkedPop(classNode, position.getEndOffset() - 1);
-				classNode.setEnd(createTextNode(document, position));
+				Node bodyNode = visited.getBodyNode();
+				int bodyEndOffset = bodyNode.getPosition().getEndOffset();
+				checkedPop(classNode, bodyEndOffset);
+				classNode.setEnd(createTextNode(document, bodyEndOffset, position.getEndOffset()));
 				return null;
 			}
 
@@ -135,8 +140,10 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				visitChildren(visited);
 				// checkedPop(moduleNode, visited.getEnd().getPosition().getStartOffset());
 				SourcePosition position = visited.getPosition();
-				checkedPop(moduleNode, position.getEndOffset() - 1);
-				moduleNode.setEnd(createTextNode(document, position));
+				Node bodyNode = visited.getBodyNode();
+				int bodyEndOffset = bodyNode.getPosition().getEndOffset();
+				checkedPop(moduleNode, bodyEndOffset);
+				moduleNode.setEnd(createTextNode(document, bodyEndOffset, position.getEndOffset()));
 				return null;
 			}
 
@@ -158,9 +165,11 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 						.getPosition().getEndOffset()));
 				push(methodNode);
 				visitChildren(visited);
+				Node bodyNode = visited.getBodyNode();
 				// checkedPop(methodNode, visited.getEnd().getPosition().getStartOffset());
-				checkedPop(methodNode, position.getEndOffset() - 1);
-				methodNode.setEnd(createTextNode(document, position));
+				int bodyEndOffset = bodyNode.getPosition().getEndOffset();
+				checkedPop(methodNode, bodyEndOffset);
+				methodNode.setEnd(createTextNode(document, bodyEndOffset, position.getEndOffset()));
 				return null;
 			}
 
@@ -177,8 +186,10 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				visitChildren(visited);
 				// checkedPop(whileNode, visited.getEnd().getPosition().getStartOffset());
 				SourcePosition position = visited.getPosition();
-				checkedPop(whileNode, position.getEndOffset() - 1);
-				whileNode.setEnd(createTextNode(document, position));
+				Node bodyNode = visited.getBodyNode();
+				int bodyEndOffset = bodyNode.getPosition().getEndOffset();
+				checkedPop(whileNode, bodyEndOffset);
+				whileNode.setEnd(createTextNode(document, bodyEndOffset, position.getEndOffset()));
 				return null;
 			}
 
@@ -190,8 +201,10 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				visitChildren(visited);
 				// checkedPop(forNode, visited.getEnd().getPosition().getStartOffset());
 				SourcePosition position = visited.getPosition();
-				checkedPop(forNode, position.getEndOffset() - 1);
-				forNode.setEnd(createTextNode(document, position));
+				Node bodyNode = visited.getBodyNode();
+				int bodyEndOffset = bodyNode.getPosition().getEndOffset();
+				checkedPop(forNode, bodyEndOffset);
+				forNode.setEnd(createTextNode(document, bodyEndOffset, position.getEndOffset()));
 				return null;
 			}
 
@@ -203,8 +216,10 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				visitChildren(visited);
 				// checkedPop(forNode, visited.getEnd().getPosition().getStartOffset());
 				SourcePosition position = visited.getPosition();
-				checkedPop(forNode, position.getEndOffset() - 1);
-				forNode.setEnd(createTextNode(document, position));
+				Node bodyNode = visited.getBodyNode();
+				int bodyEndOffset = bodyNode.getPosition().getEndOffset();
+				checkedPop(forNode, bodyEndOffset);
+				forNode.setEnd(createTextNode(document, bodyEndOffset, position.getEndOffset()));
 				return null;
 			}
 
@@ -226,56 +241,60 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				visitChildren(visited);
 				// checkedPop(untilNode, visited.getEnd().getPosition().getStartOffset());
 				SourcePosition position = visited.getPosition();
-				checkedPop(untilNode, position.getEndOffset() - 1);
-				untilNode.setEnd(createTextNode(document, position));
+				Node bodyNode = visited.getBodyNode();
+				int bodyEndOffset = bodyNode.getPosition().getEndOffset();
+				checkedPop(untilNode, bodyEndOffset);
+				untilNode.setEnd(createTextNode(document, bodyEndOffset, position.getEndOffset()));
 				return null;
 			}
 
 			public Object visitCaseNode(CaseNode visited)
 			{
 				FormatterCaseNode caseNode = new FormatterCaseNode(document);
-				final int caseEnd = visited.getCaseNode().getPosition().getEndOffset();
+				// final int caseEnd = visited.getCaseNode().getPosition().getEndOffset();
 				SourcePosition position = visited.getPosition();
-				caseNode.setBegin(createTextNode(document, position.getStartOffset(), caseEnd));
+				// caseNode.setBegin(createTextNode(document, position.getStartOffset(), caseEnd));
+				caseNode.setBegin(createTextNode(document, position.getStartOffset(), visited.getCaseNode()
+						.getPosition().getEndOffset()));
 				push(caseNode);
 				Node branch = visited.getFirstWhenNode();
-				visited.getElseNode();
-				while (branch != null)
+				List<Node> children;
+				if (branch instanceof ArrayNode)
 				{
-					if (branch instanceof WhenNode)
+					children = branch.childNodes();
+				}
+				else
+				{
+					children = new ArrayList<Node>();
+					children.add(branch);
+				}
+				for (Node child : children)
+				{
+					if (child instanceof WhenNode)
 					{
-						WhenNode whenBranch = (WhenNode) branch;
-						SourcePosition whenPosition = visited.getPosition();
+						WhenNode whenBranch = (WhenNode) child;
 						FormatterWhenNode whenNode = new FormatterWhenNode(document);
-						SourcePosition branchPosition = branch.getPosition();
+						SourcePosition branchPosition = child.getPosition();
 						whenNode.setBegin(createTextNode(document, branchPosition.getStartOffset(), whenBranch
 								.getExpressionNodes().getPosition().getEndOffset()));
 						push(whenNode);
-						visitChild(whenBranch.getBodyNode());
-						branch = ((WhenNode) branch).getNextCase();
-						checkedPop(whenNode, branch != null ? branchPosition.getStartOffset() : whenPosition
-								.getEndOffset() - 1);
+						Node whenBodyNode = whenBranch.getBodyNode();
+						visitChild(whenBodyNode);
+						checkedPop(whenNode, whenBodyNode.getPosition().getEndOffset());
 					}
 					else
 					{
 						FormatterWhenElseNode whenElseNode = new FormatterWhenElseNode(document);
-						SourcePosition elsePosition = visited.getPosition();
-						whenElseNode.setBegin(createTextNode(document, branch));
+						SourcePosition elsePosition = child.getPosition();
+						whenElseNode.setBegin(createTextNode(document, child));
 						push(whenElseNode);
-						visitChildren(branch.childNodes());
-						// checkedPop(whenElseNode, visited.getEnd().getPosition().getStartOffset());
-						checkedPop(whenElseNode, elsePosition.getEndOffset() - 1);
-						branch = null;
+						visitChildren(child.childNodes());
+						checkedPop(whenElseNode, elsePosition.getEndOffset());
 					}
-					// else
-					// {
-					// RubyFormatterPlugin.warn(NLS.bind("Unexpected {0} class in case/when expression", branch
-					// .getClass().getName()), new DumpStackOnly());
-					// break;
-					// }
 				}
-				checkedPop(caseNode, position.getEndOffset() - 1);
-				caseNode.setEnd(createTextNode(document, position));
+				int bodyEndOffset = visited.getCases().getPosition().getEndOffset();
+				checkedPop(caseNode, bodyEndOffset);
+				caseNode.setEnd(createTextNode(document, bodyEndOffset, position.getEndOffset()));
 				return null;
 			}
 
@@ -317,9 +336,10 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				ifNode.setBegin(createTextNode(document, position.getStartOffset(), visited.getCondition()
 						.getPosition().getEndOffset()));
 				push(ifNode);
-				visitChild(visited.getThenBody());
+				Node thenBody = visited.getThenBody();
+				visitChild(thenBody);
 				checkedPop(ifNode, visited.getElseBody() != null ? visited.getElseBody().getPosition().getStartOffset()
-						: position.getEndOffset() - 1);
+						: thenBody.getPosition().getEndOffset());
 				Node branch = visited.getElseBody();
 				// FIXME: Shalom - Handle the IF-THEN-ELSE!
 				// while (branch != null)
@@ -353,7 +373,10 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				// break;
 				// }
 				// }
-				addChild(new FormatterIfEndNode(document, position));
+
+				// TODO - Fix this!
+				// -3 for 'end'
+				addChild(new FormatterIfEndNode(document, position.getEndOffset() - 3, position.getEndOffset()));
 				return null;
 			}
 
@@ -368,8 +391,10 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				visitChild(visited.getBodyNode());
 				// checkedPop(beginNode, visited.getEndKeyword().getPosition().getStartOffset());
 				SourcePosition position = visited.getPosition();
-				checkedPop(beginNode, position.getEndOffset() - 1);
-				beginNode.setEnd(createTextNode(document, position));
+				Node bodyNode = visited.getBodyNode();
+				int bodyEndOffset = bodyNode.getPosition().getEndOffset();
+				checkedPop(beginNode, bodyEndOffset);
+				beginNode.setEnd(createTextNode(document, bodyEndOffset, position.getEndOffset()));
 				return null;
 			}
 
@@ -440,8 +465,10 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				visitChildren(visited);
 				// checkedPop(endNode, visited.getRightBrace().getPosition().getStartOffset());
 				SourcePosition position = visited.getPosition();
-				checkedPop(endNode, position.getEndOffset() - 1);
-				endNode.setEnd(createTextNode(document, position));
+				Node bodyNode = visited.getBodyNode();
+				int bodyEndOffset = bodyNode.getPosition().getEndOffset();
+				checkedPop(endNode, bodyEndOffset);
+				endNode.setEnd(createTextNode(document, bodyEndOffset, position.getEndOffset()));
 				return null;
 			}
 
@@ -455,8 +482,10 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				visitChildren(visited);
 				// checkedPop(endNode, visited.getRightBrace().getPosition().getStartOffset());
 				SourcePosition position = visited.getPosition();
-				checkedPop(endNode, position.getEndOffset() - 1);
-				endNode.setEnd(createTextNode(document, position));
+				Node bodyNode = visited.getBodyNode();
+				int bodyEndOffset = bodyNode.getPosition().getEndOffset();
+				checkedPop(endNode, bodyEndOffset);
+				endNode.setEnd(createTextNode(document, bodyEndOffset, position.getEndOffset()));
 				return null;
 			}
 
@@ -534,44 +563,51 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 			public Object visitArrayNode(ArrayNode visited)
 			{
-				// if (visited.getLeftBracketPosition() != null && visited.getRightBracketPosition() != null)
-				// {
-				final FormatterArrayNode arrayNode = new FormatterArrayNode(document);
-				arrayNode.setBegin(createTextNode(document, visited));
-				push(arrayNode);
 				SourcePosition position = visited.getPosition();
-				checkedPop(arrayNode, position.getEndOffset() - 1);
-				arrayNode.setEnd(createTextNode(document, position));
-				return null;
-				// }
-				// else
-				// {
-				// return super.visitArrayNode(visited);
-				// }
+				String right = document.get(position.getStartOffset(), position.getStartOffset() + 1);
+				String left = document.get(position.getEndOffset() - 1, position.getEndOffset());
+				// if (visited.getLeftBracketPosition() != null && visited.getRightBracketPosition() != null)
+				if ("[".equals(right) && "]".equals(left)) { //$NON-NLS-1$ //$NON-NLS-2$
+					final FormatterArrayNode arrayNode = new FormatterArrayNode(document);
+					arrayNode.setBegin(createTextNode(document, visited));
+					push(arrayNode);
+					SourcePosition lastNodePosition = visited.getLast().getPosition();
+					checkedPop(arrayNode, lastNodePosition.getEndOffset());
+					arrayNode.setEnd(createTextNode(document, position.getEndOffset() - 1, position.getEndOffset()));
+					return null;
+				}
+				else
+				{
+					return super.visitArrayNode(visited);
+				}
 			}
 
 			public Object visitHashNode(HashNode visited)
 			{
-				// if (visited.getLeftBrace() != null && visited.getRightBrace() != null)
-				// {
-				final FormatterHashNode hashNode = new FormatterHashNode(document);
-				hashNode.setBegin(createTextNode(document, visited));
-				push(hashNode);
-				// checkedPop(hashNode, right.getStartOffset());
+
 				SourcePosition position = visited.getPosition();
-				checkedPop(hashNode, position.getEndOffset() - 1);
-				hashNode.setEnd(createTextNode(document, position));
-				return null;
-				// }
-				// else
-				// {
-				// return super.visitHashNode(visited);
-				// }
+				String right = document.get(position.getStartOffset(), position.getStartOffset() + 1);
+				String left = document.get(position.getEndOffset() - 1, position.getEndOffset());
+				// if (visited.getLeftBrace() != null && visited.getRightBrace() != null)
+				if ("{".equals(right) && "}".equals(left)) { //$NON-NLS-1$ //$NON-NLS-2$
+					final FormatterHashNode hashNode = new FormatterHashNode(document);
+					hashNode.setBegin(createTextNode(document, visited));
+					push(hashNode);
+					// checkedPop(hashNode, right.getStartOffset());
+					SourcePosition listNodePosition = visited.getListNode().getPosition();
+					checkedPop(hashNode, listNodePosition.getEndOffset());
+					hashNode.setEnd(createTextNode(document, position.getEndOffset() - 1, position.getEndOffset()));
+					return null;
+				}
+				else
+				{
+					return super.visitHashNode(visited);
+				}
 			}
 
 			private boolean isRequireMethod(FCallNode call)
 			{
-				if ("require".equals(call.getName()))
+				if ("require".equals(call.getName())) //$NON-NLS-1$
 				{
 					if (call.getArgsNode() instanceof ArrayNode)
 					{
@@ -583,18 +619,17 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 			private void visitChildren(Node visited)
 			{
-				final List children = visited.childNodes();
+				final List<Node> children = visited.childNodes();
 				if (!children.isEmpty())
 				{
 					visitChildren(children);
 				}
 			}
 
-			private void visitChildren(List children)
+			private void visitChildren(List<Node> children)
 			{
-				for (Iterator i = children.iterator(); i.hasNext();)
+				for (Node child : children)
 				{
-					final Node child = (Node) i.next();
 					visitChild(child);
 				}
 			}
