@@ -305,7 +305,7 @@ public class JSIndexWriter
 
 		if (key == null)
 		{
-			key = Integer.toString(keysByUserAgent.size());
+			key = UUID.randomUUID().toString();
 
 			String[] columns = new String[] { key, userAgent.getDescription(), userAgent.getOS(), userAgent.getPlatform(), userAgent.getVersion() };
 			String value = StringUtil.join(JSIndexConstants.DELIMITER, columns);
