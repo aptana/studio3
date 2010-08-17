@@ -19,12 +19,12 @@
       <command
             categoryId="com.aptana.ui.category"
             id="com.aptana.index.core.ui.commands.exclude"
-            name="%command.name">
+            name="%command.exclude">
       </command>
       <command
             categoryId="com.aptana.ui.category"
             id="com.aptana.index.core.ui.commands.include"
-            name="%command.name.0">
+            name="%command.include">
       </command>
    </extension>
    <extension
@@ -33,14 +33,14 @@
             locationURI="popup:com.aptana.explorer.view?before=group.edit">
          <menu
                id="indexing.main"
-               label="%menu.label">
+               label="%menu.indexing">
          </menu>
       </menuContribution>
       <menuContribution
             locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?before=group.edit">
          <menu
                id="projectexplorer.indexing.main"
-               label="%menu.label.0">
+               label="%menu.indexing">
             <visibleWhen
                   checkEnabled="false">
                <iterate>
