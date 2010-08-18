@@ -23,7 +23,6 @@ import com.aptana.index.core.Index;
 
 public class JSIndexWriter
 {
-	private static final URI METADATA_LOCATION = URI.create(JSIndexConstants.METADATA); //$NON-NLS-1$
 	private static Map<UserAgentElement, String> keysByUserAgent = new HashMap<UserAgentElement, String>();
 	static Map<String, UserAgentElement> userAgentsByKey = new HashMap<String, UserAgentElement>();
 
@@ -56,7 +55,7 @@ public class JSIndexWriter
 	 */
 	protected URI getDocumentPath()
 	{
-		return URI.create(JSIndexConstants.METADATA);
+		return URI.create(JSIndexConstants.METADATA_FILE_LOCATION);
 	}
 
 	/**
@@ -285,7 +284,7 @@ public class JSIndexWriter
 	 */
 	public void writeType(Index index, TypeElement type)
 	{
-		this.writeType(index, type, METADATA_LOCATION);
+		this.writeType(index, type, this.getDocumentPath());
 	}
 
 	/**
