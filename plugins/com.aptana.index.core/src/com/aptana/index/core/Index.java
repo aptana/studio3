@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,11 +21,9 @@ import com.aptana.internal.index.core.ReadWriteMonitor;
 
 public class Index
 {
-	private static final int MATCH_RULE_INDEX_MASK = SearchPattern.EXACT_MATCH | SearchPattern.PREFIX_MATCH
-			| SearchPattern.PATTERN_MATCH | SearchPattern.CASE_SENSITIVE | SearchPattern.REGEX_MATCH;
-
+	private static final int MATCH_RULE_INDEX_MASK = SearchPattern.EXACT_MATCH | SearchPattern.PREFIX_MATCH | SearchPattern.PATTERN_MATCH
+		| SearchPattern.CASE_SENSITIVE | SearchPattern.REGEX_MATCH;
 	private static final Map<String, Pattern> PATTERNS = new HashMap<String, Pattern>();
-
 	// Separator to use after the container path
 	public static final char DEFAULT_SEPARATOR = '/';
 
@@ -58,6 +57,7 @@ public class Index
 						isEscaped = false;
 					}
 					break;
+
 				// characters that need to be escaped in the regex.
 				case '(':
 				case ')':
@@ -78,6 +78,7 @@ public class Index
 					buffer.append('\\');
 					buffer.append(c);
 					break;
+
 				case '?':
 					if (!isEscaped)
 					{
@@ -90,6 +91,7 @@ public class Index
 						isEscaped = false;
 					}
 					break;
+
 				case '*':
 					if (!isEscaped)
 					{
@@ -102,6 +104,7 @@ public class Index
 						isEscaped = false;
 					}
 					break;
+
 				default:
 					if (isEscaped)
 					{
@@ -123,6 +126,24 @@ public class Index
 	}
 
 	/**
+	 * computeIndexLocation
+	 * 
+	 * @param containerPath
+	 * @return
+	 */
+	private static IPath computeIndexLocation(URI containerPath)
+	{
+		CRC32 crc = new CRC32();
+
+		crc.reset();
+		crc.update(containerPath.toString().getBytes());
+
+		String fileName = Long.toString(crc.getValue()) + ".index"; //$NON-NLS-1$
+
+		return IndexActivator.getDefault().getStateLocation().append(fileName);
+	}
+
+	/**
 	 * isMatch
 	 * 
 	 * @param pattern
@@ -133,30 +154,45 @@ public class Index
 	public static boolean isMatch(String pattern, String word, int matchRule)
 	{
 		if (pattern == null)
+		{
 			return true;
+		}
+
 		int patternLength = pattern.length();
 		int wordLength = word.length();
+
 		if (patternLength == 0)
+		{
 			return matchRule != SearchPattern.EXACT_MATCH;
+		}
+
 		switch (matchRule)
 		{
 			case SearchPattern.EXACT_MATCH:
 				return patternLength == wordLength && pattern.equalsIgnoreCase(word);
+
 			case SearchPattern.PREFIX_MATCH:
 				return patternLength <= wordLength && word.toLowerCase().startsWith(pattern.toLowerCase());
+
 			case SearchPattern.PATTERN_MATCH:
 				return patternMatch(pattern.toLowerCase(), word.toLowerCase());
+
 			case SearchPattern.REGEX_MATCH:
 				return regexPatternMatch(pattern, word, false);
+
 			case SearchPattern.EXACT_MATCH | SearchPattern.CASE_SENSITIVE:
 				return patternLength == wordLength && pattern.equals(word);
+
 			case SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE:
 				return patternLength <= wordLength && word.startsWith(pattern);
+
 			case SearchPattern.PATTERN_MATCH | SearchPattern.CASE_SENSITIVE:
 				return patternMatch(pattern, word);
+
 			case SearchPattern.REGEX_MATCH | SearchPattern.CASE_SENSITIVE:
 				return regexPatternMatch(pattern, word, true);
 		}
+
 		return false;
 	}
 
@@ -181,7 +217,9 @@ public class Index
 	private static boolean patternMatch(String pattern, String word)
 	{
 		if (pattern.equals("*")) //$NON-NLS-1$
+		{
 			return true;
+		}
 
 		// see if we've cached a regex for this pattern already
 		Pattern p = PATTERNS.get(pattern);
@@ -244,11 +282,8 @@ public class Index
 	}
 
 	public char separator = DEFAULT_SEPARATOR;
-
 	private MemoryIndex memoryIndex;
-
 	private DiskIndex diskIndex;
-
 	// FIXME We're not using the read write locks at all really!
 	public ReadWriteMonitor monitor;
 	private URI containerURI;
@@ -269,35 +304,9 @@ public class Index
 
 		// Convert to a filename we can use for the actual index on disk
 		IPath diskIndexPath = computeIndexLocation(containerURI);
-		String diskIndexPathString = diskIndexPath.getDevice() == null ? diskIndexPath.toString() : diskIndexPath
-				.toOSString();
+		String diskIndexPathString = diskIndexPath.getDevice() == null ? diskIndexPath.toString() : diskIndexPath.toOSString();
 		this.diskIndex = new DiskIndex(diskIndexPathString);
 		this.diskIndex.initialize(reuseExistingFile);
-	}
-
-	/**
-	 * computeIndexLocation
-	 * 
-	 * @param containerPath
-	 * @return
-	 */
-	private static IPath computeIndexLocation(URI containerPath)
-	{
-		CRC32 crc = new CRC32();
-		crc.reset();
-		crc.update(containerPath.toString().getBytes());
-		String fileName = Long.toString(crc.getValue()) + ".index"; //$NON-NLS-1$
-		return IndexActivator.getDefault().getStateLocation().append(fileName);
-	}
-
-	/**
-	 * @deprecated
-	 * @return
-	 */
-	public URI getRoot()
-	{
-		// TODO Remove this! JDT doesn't need it!
-		return containerURI;
 	}
 
 	/**
@@ -313,6 +322,21 @@ public class Index
 	}
 
 	/**
+	 * getCategories
+	 * 
+	 * @return
+	 */
+	public List<String> getCategories()
+	{
+		Set<String> categories = new HashSet<String>();
+
+		categories.addAll(this.memoryIndex.getCategories());
+		categories.addAll(this.diskIndex.getCategories());
+
+		return new ArrayList<String>(categories);
+	}
+
+	/**
 	 * getIndexFile
 	 * 
 	 * @return
@@ -320,6 +344,16 @@ public class Index
 	public File getIndexFile()
 	{
 		return this.diskIndex == null ? null : this.diskIndex.indexFile;
+	}
+
+	/**
+	 * @deprecated
+	 * @return
+	 */
+	public URI getRoot()
+	{
+		// TODO Remove this! JDT doesn't need it!
+		return containerURI;
 	}
 
 	/**
@@ -375,6 +409,26 @@ public class Index
 	}
 
 	/**
+	 * Returns the document names that contain the given substring, if null then returns all of them.
+	 */
+	public Set<String> queryDocumentNames(String substring) throws IOException
+	{
+		Set<String> results;
+
+		if (this.memoryIndex.hasChanged())
+		{
+			results = this.diskIndex.addDocumentNames(substring, this.memoryIndex);
+			results.addAll(this.memoryIndex.addDocumentNames(substring));
+		}
+		else
+		{
+			results = this.diskIndex.addDocumentNames(substring, null);
+		}
+
+		return results;
+	}
+
+	/**
 	 * Remove all indices for a given document
 	 * 
 	 * @param containerRelativeURI
@@ -411,33 +465,24 @@ public class Index
 	{
 		// must own the write lock of the monitor
 		if (!hasChanged())
+		{
 			return;
+		}
 
 		int numberOfChanges = this.memoryIndex.numberOfChanges();
 		this.diskIndex = this.diskIndex.mergeWith(this.memoryIndex);
 		this.memoryIndex = new MemoryIndex();
+
 		if (numberOfChanges > 1000)
+		{
 			System.gc(); // reclaim space if the MemoryIndex was very BIG
+		}
 	}
 
-	/**
-	 * Returns the document names that contain the given substring, if null then returns all of them.
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
 	 */
-	public Set<String> queryDocumentNames(String substring) throws IOException
-	{
-		Set<String> results;
-		if (this.memoryIndex.hasChanged())
-		{
-			results = this.diskIndex.addDocumentNames(substring, this.memoryIndex);
-			results.addAll(this.memoryIndex.addDocumentNames(substring));
-		}
-		else
-		{
-			results = this.diskIndex.addDocumentNames(substring, null);
-		}
-		return results;
-	}
-
 	public String toString()
 	{
 		return "Index for " + this.containerURI; //$NON-NLS-1$
