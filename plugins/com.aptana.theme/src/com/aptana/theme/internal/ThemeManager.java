@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.WeakHashMap;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -54,11 +55,16 @@ public class ThemeManager implements IThemeManager
 	private Theme fCurrentTheme;
 	private HashMap<String, Theme> fThemeMap;
 	private HashSet<String> fBuiltins;
+	
+	// NOTE: We need to specifying WeakHashMap here since most (all other?) Map
+	// implementations will cause a memory leak
+	private WeakHashMap<Token, String> fTokens;
 
 	private static ThemeManager fgInstance;
 
 	private ThemeManager()
 	{
+		fTokens = new WeakHashMap<Token, String>();
 	}
 
 	public static ThemeManager instance()
@@ -110,6 +116,7 @@ public class ThemeManager implements IThemeManager
 	public void setCurrentTheme(Theme theme)
 	{
 		fCurrentTheme = theme;
+		adaptTokens();
 
 		// Set the find in file search color
 		IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.search"); //$NON-NLS-1$
@@ -306,7 +313,19 @@ public class ThemeManager implements IThemeManager
 
 	public IToken getToken(String scope)
 	{
-		return new Token(getTextAttribute(scope));
+		Token token = new Token(getTextAttribute(scope));
+//		fTokens.put(token, scope);
+		return token;
+	}
+
+	private void adaptTokens()
+	{
+		for (Map.Entry<Token, String> entry : fTokens.entrySet())
+		{
+			Token token = entry.getKey();
+			if (token != null)
+				token.setData(getTextAttribute(entry.getValue()));
+		}
 	}
 
 	public void addTheme(Theme newTheme)
