@@ -48,11 +48,7 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		if (data instanceof String)
 		{
 			String last = (String) data;
-			if (last.length() == 0)
-			{
-				last = scope;
-			}
-			else if (!scope.endsWith(last))
+			if (!scope.endsWith(last))
 			{
 				last = scope + " " + last; //$NON-NLS-1$
 			}
