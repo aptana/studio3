@@ -306,11 +306,7 @@ public class Theme
 
 	private RGBa merge(RGBa top, RGBa bottom, RGB defaultParent)
 	{
-		if (top == null && bottom == null)
-		{
-			return new RGBa(defaultParent);
-		}
-		if (top == null) // for some reason there is no top.
+		if (top == null) // for some reaosn there is no top.
 		{
 			return bottom;
 		}
@@ -327,9 +323,19 @@ public class Theme
 
 	private TextAttribute toTextAttribute(DelayedTextAttribute attr)
 	{
-		RGBa fg = merge(attr.getForeground(), null, defaultFG);
-		RGBa bg = merge(attr.getBackground(), null, defaultBG);
-		return new TextAttribute(colorManager.getColor(fg.toRGB()), colorManager.getColor(bg.toRGB()), attr.getStyle());
+		RGBa fg = attr.getForeground(); // TODO Do we ever need to handle FG alpha?!
+		Color bgColor = null;
+		RGBa bg = attr.getBackground();
+		if (bg != null)
+		{
+			RGB bgRGB = bg.toRGB();
+			if (!bg.isFullyOpaque())
+			{
+				bgRGB = alphaBlend(defaultBG, bgRGB, bg.getAlpha());
+			}
+			bgColor = colorManager.getColor(bgRGB);
+		}
+		return new TextAttribute(colorManager.getColor(fg.toRGB()), bgColor, attr.getStyle());
 	}
 
 	public RGB getBackground()
