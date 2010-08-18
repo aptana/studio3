@@ -1,9 +1,10 @@
 package com.aptana.editor.js.contentassist.model;
 
-import com.aptana.core.util.StringUtil;
 
 public class UserAgentElement
 {
+	private static final String EMPTY = "";
+	
 	private String _platform;
 	private String _version;
 	private String _os;
@@ -37,11 +38,11 @@ public class UserAgentElement
 			UserAgentElement that = (UserAgentElement) obj;
 			
 			result =
-				StringUtil.areEqual(this.getDescription(), that.getDescription())
-			&&	StringUtil.areEqual(this.getOS(), that.getOS())
-			&&	StringUtil.areEqual(this.getOSVersion(), that.getOSVersion())
-			&&	StringUtil.areEqual(this.getPlatform(), that.getPlatform())
-			&&	StringUtil.areEqual(this.getVersion(), that.getVersion());
+				this.getDescription().equals(that.getDescription())
+			&&	this.getOS().equals(that.getOS())
+			&&	this.getOSVersion().equals(that.getOSVersion())
+			&&	this.getPlatform().equals(that.getPlatform())
+			&&	this.getVersion().equals(that.getVersion());
 		}
 		
 		return result;
@@ -54,7 +55,7 @@ public class UserAgentElement
 	 */
 	public String getDescription()
 	{
-		return this._description;
+		return (this._description != null) ? this._description : EMPTY;
 	}
 
 	/**
@@ -64,7 +65,7 @@ public class UserAgentElement
 	 */
 	public String getKey()
 	{
-		return this._key;
+		return (this._key != null) ? this._key : EMPTY;
 	}
 
 	/**
@@ -74,7 +75,7 @@ public class UserAgentElement
 	 */
 	public String getOS()
 	{
-		return this._os;
+		return (this._os != null) ? this._os : EMPTY;
 	}
 
 	/**
@@ -84,7 +85,7 @@ public class UserAgentElement
 	 */
 	public String getOSVersion()
 	{
-		return this._osVersion;
+		return (this._osVersion != null) ? this._osVersion : EMPTY;
 	}
 
 	/**
@@ -94,7 +95,7 @@ public class UserAgentElement
 	 */
 	public String getPlatform()
 	{
-		return this._platform;
+		return (this._platform != null) ? this._platform : EMPTY;
 	}
 
 	/**
@@ -104,7 +105,7 @@ public class UserAgentElement
 	 */
 	public String getVersion()
 	{
-		return this._version;
+		return (this._version != null) ? this._version : EMPTY;
 	}
 
 	/*
@@ -119,11 +120,11 @@ public class UserAgentElement
 		if (h == 0)
 		{
 			String[] items = new String[] {
-				this._description,
-				this._os,
-				this._osVersion,
-				this._platform,
-				this._version
+				this.getDescription(),
+				this.getOS(),
+				this.getOSVersion(),
+				this.getPlatform(),
+				this.getVersion()
 			};
 			
 			for (String item : items)
