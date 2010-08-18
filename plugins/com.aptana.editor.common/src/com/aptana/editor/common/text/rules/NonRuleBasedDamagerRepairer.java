@@ -163,16 +163,9 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 				int offset = region.getOffset();
 				String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
 						.getScopeAtOffset(fDocument, offset);
-				if (last.length() == 0)
-				{
-					last = scope;
-				}
-				else if (!scope.endsWith(last))
-				{
-					scope += " " + last; //$NON-NLS-1$
-				}
-				fDefaultTextAttribute = ThemePlugin.getDefault().getThemeManager().getToken(scope);
-				data = fDefaultTextAttribute.getData();
+				scope += " " + last; //$NON-NLS-1$
+				IToken converted = ThemePlugin.getDefault().getThemeManager().getToken(scope);
+				data = converted.getData();
 			}
 			catch (BadLocationException e)
 			{
