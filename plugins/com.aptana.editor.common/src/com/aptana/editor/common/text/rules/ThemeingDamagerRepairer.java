@@ -1,9 +1,7 @@
 package com.aptana.editor.common.text.rules;
 
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.TextAttribute;
-import org.eclipse.jface.text.TextPresentation;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
@@ -15,30 +13,10 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 {
 
 	private TextAttribute lastAttribute;
-	private String scope;
 
 	public ThemeingDamagerRepairer(ITokenScanner scanner)
 	{
 		super(scanner);
-	}
-
-	@Override
-	public void createPresentation(TextPresentation presentation, ITypedRegion region)
-	{
-		try
-		{
-			int offset = region.getOffset();
-			scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(fDocument, offset);
-		}
-		catch (BadLocationException e)
-		{
-			// ignore
-		}
-		finally
-		{
-			super.createPresentation(presentation, region);
-			scope = null;
-		}
 	}
 
 	@Override
@@ -47,24 +25,21 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		Object data = token.getData();
 		if (data instanceof String)
 		{
-			// try
-			// {
-			String last = (String) data;
-			// int offset = fScanner.getTokenOffset();
-			// String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
-			// .getScopeAtOffset(fDocument, offset);
-			if (!scope.endsWith(last))
+			try
 			{
-				last = scope + " " + last; //$NON-NLS-1$
+				String last = (String) data;
+				int offset = fScanner.getTokenOffset();
+				String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
+						.getScopeAtOffset(fDocument, offset);
+				scope += " " + last; //$NON-NLS-1$
+				IToken converted = ThemePlugin.getDefault().getThemeManager().getToken(scope);
+				lastAttribute = super.getTokenTextAttribute(converted);
+				return lastAttribute;
 			}
-			IToken converted = ThemePlugin.getDefault().getThemeManager().getToken(last);
-			lastAttribute = super.getTokenTextAttribute(converted);
-			return lastAttribute;
-			// }
-			// catch (BadLocationException e)
-			// {
-			// CommonEditorPlugin.logError(e);
-			// }
+			catch (BadLocationException e)
+			{
+				CommonEditorPlugin.logError(e);
+			}
 		}
 		else if (token.isWhitespace())
 		{

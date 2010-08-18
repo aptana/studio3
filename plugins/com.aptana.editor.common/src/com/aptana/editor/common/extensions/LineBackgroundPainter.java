@@ -9,7 +9,6 @@ import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.custom.LineBackgroundEvent;
 import org.eclipse.swt.custom.LineBackgroundListener;
-import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Color;
 
@@ -98,11 +97,9 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener
 			TextAttribute at = getCurrentTheme().getTextAttribute(commonPrefix);
 			event.lineBackground = at.getBackground();
 			// When we do this, we need to explicitly set the bg color for ranges with no bg color!
-//			int length = Math.min(160, lineRegion.getLength());
-//			StyleRange[] ranges = textWidget.getStyleRanges(offset, length, false);
+//			StyleRange[] ranges = textWidget.getStyleRanges(offset, lineRegion.getLength(), true);
 //			if (ranges != null && ranges.length > 0)
 //			{
-//				int count = 0;
 //				Color themeBG = null;
 //				for (StyleRange range : ranges)
 //				{
@@ -114,15 +111,9 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener
 //							themeBG = getThemeBG();
 //						}
 //						range.background = themeBG;
-//						// textWidget.setStyleRange(range);
-//						count++;
-////						if (count > 50)
-////						{
-////							break;
-////						}
+//						textWidget.setStyleRange(range);
 //					}
 //				}
-//				textWidget.setStyleRanges(offset, length, null, ranges);
 //			}
 		}
 		catch (BadLocationException e)
