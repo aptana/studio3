@@ -1,11 +1,11 @@
-package com.aptana.ui.internal;
+package com.aptana.projects.internal;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS
 {
 
-	private static final String BUNDLE_NAME = "com.aptana.ui.internal.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.projects.internal.messages"; //$NON-NLS-1$
 
 	public static String ProjectPropertyTester_ERR_ProjectNature;
 

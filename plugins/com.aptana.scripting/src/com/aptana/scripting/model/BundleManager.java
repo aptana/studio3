@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptingEngine;
+import com.aptana.scripting.model.ProjectTemplate.Type;
 import com.aptana.scripting.model.filters.AndFilter;
 import com.aptana.scripting.model.filters.IModelFilter;
 import com.aptana.scripting.model.filters.IsExecutableCommandFilter;
@@ -44,6 +46,7 @@ public class BundleManager
 	static final CommandElement[] NO_COMMANDS = new CommandElement[0];
 	static final MenuElement[] NO_MENUS = new MenuElement[0];
 	static final SnippetElement[] NO_SNIPPETS = new SnippetElement[0];
+	static final ProjectTemplate[] NO_PROJECT_TEMPLATES = new ProjectTemplate[0];
 
 	private static final File[] NO_FILES = new File[0];
 	private static final String[] NO_STRINGS = new String[0];
@@ -1054,6 +1057,38 @@ public class BundleManager
 		return result.toArray(new MenuElement[result.size()]);
 	}
 
+	public ProjectTemplate[] getProjectTemplates()
+	{
+		List<ProjectTemplate> result = new ArrayList<ProjectTemplate>();
+		Iterator<List<BundleElement>> iter = _bundlesByPath.values().iterator();
+		List<BundleElement> bundles;
+		while (iter.hasNext())
+		{
+			bundles = iter.next();
+			for (BundleElement bundle : bundles)
+			{
+				result.addAll(Arrays.asList(bundle.getProjectTemplates()));
+			}
+		}
+		return result.toArray(new ProjectTemplate[result.size()]);
+	}
+
+	public ProjectTemplate[] getProjectTemplatesByType(Type type)
+	{
+		List<ProjectTemplate> result = new ArrayList<ProjectTemplate>();
+		Iterator<List<BundleElement>> iter = _bundlesByPath.values().iterator();
+		List<BundleElement> bundles;
+		while (iter.hasNext())
+		{
+			bundles = iter.next();
+			for (BundleElement bundle : bundles)
+			{
+				result.addAll(Arrays.asList(bundle.getProjectTemplatesByType(type)));
+			}
+		}
+		return result.toArray(new ProjectTemplate[result.size()]);
+	}
+
 	/**
 	 * getTopLevelScope
 	 * 
@@ -1095,8 +1130,8 @@ public class BundleManager
 						// one and move on
 						
 						// split on periods to see the specificity of scope name
-						int existingLength = StringUtil.characterInstanceCount(result, '.') + 1;  //$NON-NLS-1$
-						int newLength = StringUtil.characterInstanceCount(entry.getValue(), '.') + 1;  //$NON-NLS-1$
+						int existingLength = StringUtil.characterInstanceCount(result, '.') + 1;
+						int newLength = StringUtil.characterInstanceCount(entry.getValue(), '.') + 1;
 
 						if (newLength > existingLength)
 						{
