@@ -35,7 +35,7 @@ public class UserAgentElement
 			UserAgentElement that = (UserAgentElement) obj;
 			
 			result =
-				StringUtil.areEqual(this.getDescription(), ((UserAgentElement) obj).getDescription())
+				StringUtil.areEqual(this.getDescription(), that.getDescription())
 			&&	StringUtil.areEqual(this.getOS(), that.getOS())
 			&&	StringUtil.areEqual(this.getPlatform(), that.getPlatform())
 			&&	StringUtil.areEqual(this.getVersion(), that.getVersion());

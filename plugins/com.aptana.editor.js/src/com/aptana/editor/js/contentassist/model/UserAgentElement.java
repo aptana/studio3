@@ -1,5 +1,7 @@
 package com.aptana.editor.js.contentassist.model;
 
+import com.aptana.core.util.StringUtil;
+
 public class UserAgentElement
 {
 	private String _platform;
@@ -7,12 +9,42 @@ public class UserAgentElement
 	private String _os;
 	private String _osVersion;
 	private String _description;
+	private int _hash;
+	private String _key; // used by the indexing system only
 
 	/**
-	 * UserAgentElelment
+	 * UserAgentElement
 	 */
 	public UserAgentElement()
 	{
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj)
+	{
+		boolean result = false;
+		
+		if (this == obj)
+		{
+			result = true;
+		}
+		else
+		{
+			UserAgentElement that = (UserAgentElement) obj;
+			
+			result =
+				StringUtil.areEqual(this.getDescription(), that.getDescription())
+			&&	StringUtil.areEqual(this.getOS(), that.getOS())
+			&&	StringUtil.areEqual(this.getOSVersion(), that.getOSVersion())
+			&&	StringUtil.areEqual(this.getPlatform(), that.getPlatform())
+			&&	StringUtil.areEqual(this.getVersion(), that.getVersion());
+		}
+		
+		return result;
 	}
 
 	/**
@@ -24,7 +56,17 @@ public class UserAgentElement
 	{
 		return this._description;
 	}
-	
+
+	/**
+	 * getKey
+	 * 
+	 * @return
+	 */
+	public String getKey()
+	{
+		return this._key;
+	}
+
 	/**
 	 * getOS
 	 * 
@@ -65,6 +107,39 @@ public class UserAgentElement
 		return this._version;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode()
+	{
+		int h = this._hash;
+		
+		if (h == 0)
+		{
+			String[] items = new String[] {
+				this._description,
+				this._os,
+				this._osVersion,
+				this._platform,
+				this._version
+			};
+			
+			for (String item : items)
+			{
+				if (item != null)
+				{
+					h = 31*h + item.hashCode();
+				}
+			}
+			
+			this._hash = h;
+		}
+		
+		return h;
+	}
+
 	/**
 	 * setDescription
 	 * 
@@ -74,7 +149,17 @@ public class UserAgentElement
 	{
 		this._description = description;
 	}
-	
+
+	/**
+	 * setKey
+	 * 
+	 * @param key
+	 */
+	public void setKey(String key)
+	{
+		this._key = key;
+	}
+
 	/**
 	 * setOS
 	 * 

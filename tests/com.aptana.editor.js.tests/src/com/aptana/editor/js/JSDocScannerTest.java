@@ -38,7 +38,7 @@ public class JSDocScannerTest extends TestCase
 		IDocument document = new Document(src);
 		fScanner.setRange(document, 0, src.length());
 
-		assertToken(getToken("meta.documentation.tag.js"), 0, 6);
+		assertToken(getToken("meta.tag.documentation.js"), 0, 6);
 		assertToken(getToken("comment.block.documentation.js"), 6, 1);
 		assertToken(getToken("markup.underline.link"), 7, 5);
 		assertToken(getToken("comment.block.documentation.js"), 12, 1);
