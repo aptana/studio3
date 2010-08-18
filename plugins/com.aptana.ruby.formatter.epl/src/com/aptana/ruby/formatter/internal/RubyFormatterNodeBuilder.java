@@ -40,6 +40,7 @@ import org.jrubyparser.ast.ListNode;
 import org.jrubyparser.ast.MethodDefNode;
 import org.jrubyparser.ast.ModuleNode;
 import org.jrubyparser.ast.Node;
+import org.jrubyparser.ast.NodeType;
 import org.jrubyparser.ast.PostExeNode;
 import org.jrubyparser.ast.PreExeNode;
 import org.jrubyparser.ast.RegexpNode;
@@ -109,7 +110,15 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				visitChildren(visited);
 				// checkedPop(classNode, visited.getEnd().getPosition().getStartOffset());
 				Node bodyNode = visited.getBodyNode();
-				int bodyEndOffset = bodyNode.getPosition().getEndOffset();
+				int bodyEndOffset;
+				if (NodeType.NILNODE.equals(bodyNode.getNodeType()))
+				{
+					bodyEndOffset = classNode.getEndOffset();
+				}
+				else
+				{
+					bodyEndOffset = bodyNode.getPosition().getEndOffset();
+				}
 				checkedPop(classNode, bodyEndOffset);
 				classNode.setEnd(createTextNode(document, bodyEndOffset, position.getEndOffset()));
 				return null;
@@ -167,7 +176,12 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				visitChildren(visited);
 				Node bodyNode = visited.getBodyNode();
 				// checkedPop(methodNode, visited.getEnd().getPosition().getStartOffset());
-				int bodyEndOffset = bodyNode.getPosition().getEndOffset();
+				int bodyEndOffset;
+				if (bodyNode != null) {
+					bodyEndOffset = bodyNode.getPosition().getEndOffset();
+				} else {
+					bodyEndOffset = position.getEndOffset() - 3;
+				}
 				checkedPop(methodNode, bodyEndOffset);
 				methodNode.setEnd(createTextNode(document, bodyEndOffset, position.getEndOffset()));
 				return null;
@@ -211,12 +225,12 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			public Object visitForNode(ForNode visited)
 			{
 				FormatterForNode forNode = new FormatterForNode(document);
-				forNode.setBegin(createTextNode(document, visited));
+				Node bodyNode = visited.getBodyNode();
+				forNode.setBegin(createTextNode(document, visited.getPosition().getStartOffset(), bodyNode.getPosition().getStartOffset() - 1));
 				push(forNode);
 				visitChildren(visited);
 				// checkedPop(forNode, visited.getEnd().getPosition().getStartOffset());
 				SourcePosition position = visited.getPosition();
-				Node bodyNode = visited.getBodyNode();
 				int bodyEndOffset = bodyNode.getPosition().getEndOffset();
 				checkedPop(forNode, bodyEndOffset);
 				forNode.setEnd(createTextNode(document, bodyEndOffset, position.getEndOffset()));
@@ -268,6 +282,7 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 					children = new ArrayList<Node>();
 					children.add(branch);
 				}
+				int bodyEndOffset = position.getEndOffset();
 				for (Node child : children)
 				{
 					if (child instanceof WhenNode)
@@ -281,6 +296,7 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 						Node whenBodyNode = whenBranch.getBodyNode();
 						visitChild(whenBodyNode);
 						checkedPop(whenNode, whenBodyNode.getPosition().getEndOffset());
+						bodyEndOffset = whenNode.getEndOffset();
 					}
 					else
 					{
@@ -290,9 +306,9 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 						push(whenElseNode);
 						visitChildren(child.childNodes());
 						checkedPop(whenElseNode, elsePosition.getEndOffset());
+						bodyEndOffset = whenElseNode.getEndOffset();
 					}
 				}
-				int bodyEndOffset = visited.getCases().getPosition().getEndOffset();
 				checkedPop(caseNode, bodyEndOffset);
 				caseNode.setEnd(createTextNode(document, bodyEndOffset, position.getEndOffset()));
 				return null;

@@ -203,14 +203,36 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		return new CommonContentAssistProcessor(getAbstractThemeableEditor());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getContentFormatter(org.eclipse.jface.text.source.ISourceViewer)
+	/**
+	 * Collects the code formatters by the supported content-types and returns a new {@link MultiPassContentFormatter}
+	 * that holds them.<br>
+	 * Note that the first content-type that has a registered formatter is defined as the 'master' formatter, while all
+	 * the rest are defined as the 'slave' formatters. Therefore, there is an order importance to the content-types that
+	 * are returned from the {@link #getConfiguredContentTypes(ISourceViewer)}.
 	 */
-	@Override
 	public IContentFormatter getContentFormatter(ISourceViewer sourceViewer)
 	{
-		return new MultiPassContentFormatter(getConfiguredDocumentPartitioning(sourceViewer), IDocument.DEFAULT_CONTENT_TYPE);
+		final String[][] contentTypes = getTopContentTypes();
+		final MultiPassContentFormatter formatter = new MultiPassContentFormatter(
+				getConfiguredDocumentPartitioning(sourceViewer), IDocument.DEFAULT_CONTENT_TYPE);
+		boolean masterSet = false;
+		for (String contentTypeArr[] : contentTypes)
+		{
+			
+//			if (ScriptFormatterManager.hasFormatterFor(contentType))
+//			{
+//				if (!masterSet)
+//				{
+//					formatter.setMasterStrategy(new ScriptFormattingStrategy(contentType));
+//					masterSet = true;
+//				}
+//				else
+//				{
+//					formatter.setSlaveStrategy(new ScriptFormattingStrategy(contentType), contentType);
+//				}
+//			}
+		}
+		return formatter;
 	}
 
 	/*

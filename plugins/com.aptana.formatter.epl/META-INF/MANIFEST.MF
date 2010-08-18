@@ -11,8 +11,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jface.text,
  org.eclipse.ui.editors,
  com.aptana.ui.epl,
- com.aptana.theme,
- com.aptana.editor.common
+ com.aptana.theme
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Eclipse-ExtensibleAPI: true
 Bundle-ActivationPolicy: lazy

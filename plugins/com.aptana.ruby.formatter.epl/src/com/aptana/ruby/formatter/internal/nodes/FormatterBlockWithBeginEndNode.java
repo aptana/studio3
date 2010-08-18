@@ -47,22 +47,23 @@ public abstract class FormatterBlockWithBeginEndNode extends FormatterBlockNode
 			}
 		}
 		context.resetBlankLines();
-		// TODO - Shalom: Check what's the effect of that change
-		// final boolean indenting = isIndenting();
-		// if (indenting) {
-		context.incIndent();
-		// }
+		final boolean indenting = isIndenting();
+		if (indenting)
+		{
+			context.incIndent();
+		}
 		super.accept(context, visitor);
-		// if (indenting) {
-		context.decIndent();
-		// }
+		if (indenting)
+		{
+			context.decIndent();
+		}
 		if (end != null)
 		{
 			visitor.write(context, end.getStartOffset(), end.getEndOffset());
 		}
 		context.setBlankLines(getBlankLinesAfter(context));
 	}
-
+	
 	protected int getBlankLinesBefore(IFormatterContext context)
 	{
 		return -1;

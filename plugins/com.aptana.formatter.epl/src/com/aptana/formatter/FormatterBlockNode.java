@@ -15,49 +15,56 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class FormatterBlockNode extends AbstractFormatterNode implements
-		IFormatterContainerNode {
+public class FormatterBlockNode extends AbstractFormatterNode implements IFormatterContainerNode
+{
 
 	/**
 	 * @param document
 	 */
-	public FormatterBlockNode(IFormatterDocument document) {
+	public FormatterBlockNode(IFormatterDocument document)
+	{
 		super(document);
 	}
 
 	private final List<IFormatterNode> body = new ArrayList<IFormatterNode>();
 
-	protected void acceptNodes(final List<IFormatterNode> nodes,
-			IFormatterContext context, IFormatterWriter visitor)
-			throws Exception {
-		for (IFormatterNode node : nodes) {
+	protected void acceptNodes(final List<IFormatterNode> nodes, IFormatterContext context, IFormatterWriter visitor)
+			throws Exception
+	{
+		for (IFormatterNode node : nodes)
+		{
 			context.enter(node);
 			node.accept(context, visitor);
 			context.leave(node);
 		}
 	}
 
-	public void addChild(IFormatterNode child) {
+	public void addChild(IFormatterNode child)
+	{
 		body.add(child);
 	}
 
-	public void accept(IFormatterContext context, IFormatterWriter visitor)
-			throws Exception {
+	public void accept(IFormatterContext context, IFormatterWriter visitor) throws Exception
+	{
 		acceptBody(context, visitor);
 	}
 
-	protected void acceptBody(IFormatterContext context,
-			IFormatterWriter visitor) throws Exception {
+	protected void acceptBody(IFormatterContext context, IFormatterWriter visitor) throws Exception
+	{
 		acceptNodes(body, context, visitor);
 	}
 
 	/*
 	 * @see org.eclipse.dltk.ruby.formatter.node.IFormatterNode#getEndOffset()
 	 */
-	public int getEndOffset() {
-		if (!body.isEmpty()) {
+	public int getEndOffset()
+	{
+		if (!body.isEmpty())
+		{
 			return body.get(body.size() - 1).getEndOffset();
-		} else {
+		}
+		else
+		{
 			return DEFAULT_OFFSET;
 		}
 	}
@@ -65,38 +72,57 @@ public class FormatterBlockNode extends AbstractFormatterNode implements
 	/*
 	 * @see org.eclipse.dltk.ruby.formatter.node.IFormatterNode#getStartOffset()
 	 */
-	public int getStartOffset() {
-		if (!body.isEmpty()) {
+	public int getStartOffset()
+	{
+		if (!body.isEmpty())
+		{
 			return body.get(0).getStartOffset();
-		} else {
+		}
+		else
+		{
 			return DEFAULT_OFFSET;
 		}
 	}
 
 	/*
-	 * @see
-	 * org.eclipse.dltk.ruby.formatter.node.IFormatterContainerNode#isEmpty()
+	 * @see org.eclipse.dltk.ruby.formatter.node.IFormatterContainerNode#isEmpty()
 	 */
-	public boolean isEmpty() {
-		for (IFormatterNode node : body) {
-			if (!node.isEmpty()) {
+	public boolean isEmpty()
+	{
+		for (IFormatterNode node : body)
+		{
+			if (!node.isEmpty())
+			{
 				return false;
 			}
 		}
 		return true;
 	}
 
-	public List<IFormatterNode> getChildren() {
+	public List<IFormatterNode> getChildren()
+	{
 		return Collections.unmodifiableList(body);
 	}
 
 	@Override
-	public String toString() {
+	public String toString()
+	{
 		return body.toString();
 	}
 
-	public List<IFormatterNode> getBody() {
+	public List<IFormatterNode> getBody()
+	{
 		return body;
 	}
 
+	/**
+	 * Returns true if the node is indenting; False, otherwise.<br>
+	 * The default implementation is false. Subclasses may override.
+	 * 
+	 * @return Returns true if the node is indenting; False, otherwise
+	 */
+	protected boolean isIndenting()
+	{
+		return false;
+	}
 }
