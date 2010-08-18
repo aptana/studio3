@@ -96,66 +96,14 @@ public class MetadataLoader extends Job
 	}
 
 	/**
-	 * removeOutdatedIndexes
+	 * rebuildMetadataIndex
+	 * 
+	 * @param monitor
 	 */
-	private void removeOutdatedIndexes()
+	private void rebuildMetadataIndex(IProgressMonitor monitor)
 	{
-		double expectedVersion = Platform.getPreferencesService().getDouble(Activator.PLUGIN_ID, IPreferenceConstants.JS_INDEX_VERSION, 0.0, null);
-
-		if (expectedVersion != JSIndexConstants.INDEX_VERSION)
-		{
-			IndexManager manager = IndexManager.getInstance();
-			
-			// TODO: We are temporarily deleting the entire project index
-			// because it appears that Index#removeCategories doesn't clean up
-			// the index's list of documents. This prevents the files from
-			// being indexed during the timestamp comparison step in Index.
-			boolean deleteIndex = true;
-			
-			for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
-			{
-				if (deleteIndex)
-				{
-					manager.removeIndex(project.getLocationURI());
-				}
-				else
-				{
-					Index index = manager.getIndex(project.getLocationURI());
-	
-					if (index != null)
-					{
-						index.removeCategories(JSIndexConstants.ALL_CATEGORIES);
-					}
-				}
-				
-				// re-index
-				new IndexProjectJob(project).schedule();
-			}
-
-			IEclipsePreferences prefs = (new InstanceScope()).getNode(Activator.PLUGIN_ID);
-			
-			prefs.putDouble(IPreferenceConstants.JS_INDEX_VERSION, JSIndexConstants.INDEX_VERSION);
-			
-			try
-			{
-				prefs.flush();
-			}
-			catch (BackingStoreException e)
-			{
-			}
-			
-			IndexManager.getInstance().removeIndex(URI.create(JSIndexConstants.METADATA));
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	@Override
-	protected IStatus run(IProgressMonitor monitor)
-	{
-		this.removeOutdatedIndexes();
+		// delete any existing metadata index
+		IndexManager.getInstance().removeIndex(URI.create(JSIndexConstants.METADATA_INDEX_LOCATION));
 
 		JSMetadataReader reader = new JSMetadataReader();
 
@@ -173,7 +121,7 @@ public class MetadataLoader extends Job
 		{
 			indexer.writeType(index, type);
 		}
-		
+
 		try
 		{
 			index.save();
@@ -182,7 +130,79 @@ public class MetadataLoader extends Job
 		{
 			Activator.logError(e.getMessage(), e);
 		}
+	}
+
+	/**
+	 * rebuildProjectIndexes
+	 */
+	private void rebuildProjectIndexes()
+	{
+		IndexManager manager = IndexManager.getInstance();
+
+		// TODO: We are temporarily deleting the entire project index
+		// because it appears that Index#removeCategories doesn't clean up
+		// the index's list of documents. This prevents the files from
+		// being indexed during the timestamp comparison step in Index.
+		boolean deleteIndex = true;
+
+		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
+		{
+			if (deleteIndex)
+			{
+				manager.removeIndex(project.getLocationURI());
+			}
+			else
+			{
+				Index index = manager.getIndex(project.getLocationURI());
+
+				if (index != null)
+				{
+					index.removeCategories(JSIndexConstants.ALL_CATEGORIES);
+				}
+			}
+
+			// re-index
+			new IndexProjectJob(project).schedule();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+	protected IStatus run(IProgressMonitor monitor)
+	{
+		double expectedVersion = Platform.getPreferencesService().getDouble(Activator.PLUGIN_ID, IPreferenceConstants.JS_INDEX_VERSION, 0.0, null);
+
+		if (expectedVersion != JSIndexConstants.INDEX_VERSION)
+		{
+			// rebuild indexes
+			this.rebuildMetadataIndex(monitor);
+			this.rebuildProjectIndexes();
+
+			// update version preference to latest version
+			this.updateVersionPreference();
+		}
 
 		return Status.OK_STATUS;
+	}
+
+	/**
+	 * updateVersionPreference
+	 */
+	private void updateVersionPreference()
+	{
+		IEclipsePreferences prefs = (new InstanceScope()).getNode(Activator.PLUGIN_ID);
+
+		prefs.putDouble(IPreferenceConstants.JS_INDEX_VERSION, JSIndexConstants.INDEX_VERSION);
+
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+		}
 	}
 }
