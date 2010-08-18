@@ -183,6 +183,14 @@
                   class="com.aptana.ui.commands.OpenFileManagerContributionItem"
                   id="com.aptana.ui.open.file.manager">
             </dynamic>
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate>
+                  <instanceof
+                        value="org.eclipse.core.resources.IResource">
+                  </instanceof>
+               </iterate>
+            </visibleWhen>
          </menu>
       </menuContribution>
    </extension>
