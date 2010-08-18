@@ -37,6 +37,7 @@ package com.aptana.filesystem.ftp.tests;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.io.tests.CommonConnectionTest;
@@ -70,7 +71,7 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 	{
 		initBasePath();
 		FTPConnectionPoint ftpcp = setupConnection();
-		ftpcp.setPath(Path.ROOT.append(getClass().getSimpleName()));
+		ftpcp.setPath(constructBasePath());
 		cp = ftpcp;
 		super.setUp();
 	}
@@ -81,11 +82,14 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 		cleanupBasePath();
 	}
 
+	public static IPath constructBasePath() {
+		return new Path(getConfig().getProperty("ftp.path", "/home/ftpuser")).append(FTPConnectionWithBasePathTest.class.getSimpleName());
+	}
+	
 	public static void initBasePath() throws CoreException
 	{
 		FTPConnectionPoint ftpcp = setupConnection();
-		IFileStore fs = ftpcp.getRoot().getFileStore(
-				Path.ROOT.append(FTPConnectionWithBasePathTest.class.getSimpleName()));
+		IFileStore fs = ftpcp.getRoot().getFileStore(constructBasePath());
 		assertNotNull(fs);
 		if (!fs.fetchInfo().exists())
 		{
@@ -98,8 +102,7 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 	public static void cleanupBasePath() throws CoreException
 	{
 		FTPConnectionPoint ftpcp = setupConnection();
-		IFileStore fs = ftpcp.getRoot().getFileStore(
-				Path.ROOT.append(FTPConnectionWithBasePathTest.class.getSimpleName()));
+		IFileStore fs = ftpcp.getRoot().getFileStore(constructBasePath());
 		assertNotNull(fs);
 		if (fs.fetchInfo().exists())
 		{
