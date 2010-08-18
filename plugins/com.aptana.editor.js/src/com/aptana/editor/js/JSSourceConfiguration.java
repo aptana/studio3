@@ -77,8 +77,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, JS_MULTILINE_COMMENT, JS_SINGLELINE_COMMENT,
 			JS_DOC, STRING_DOUBLE, STRING_SINGLE, JS_REGEXP };
 
-	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IJSConstants.CONTENT_TYPE_JS },
-			{ IJSConstants.CONTENT_TYPE_JSON } };
+	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IJSConstants.CONTENT_TYPE_JS }, { IJSConstants.CONTENT_TYPE_JSON } };
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
 			new EndOfLineRule("//", new Token(JS_SINGLELINE_COMMENT)), //$NON-NLS-1$
@@ -102,15 +101,14 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	{
 		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 		c.addTranslation(new QualifiedContentType(IJSConstants.CONTENT_TYPE_JS), new QualifiedContentType("source.js")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(IJSConstants.CONTENT_TYPE_JSON), new QualifiedContentType(
-				"source.json")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(IJSConstants.CONTENT_TYPE_JSON), new QualifiedContentType("source.json")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType("string.quoted.double.js")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(STRING_SINGLE), new QualifiedContentType("string.quoted.single.js")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(JS_REGEXP), new QualifiedContentType("string.regexp.js")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(JS_SINGLELINE_COMMENT), new QualifiedContentType(
 				"comment.line.double-slash.js")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(JS_MULTILINE_COMMENT), new QualifiedContentType("comment.block.js")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(JS_DOC), new QualifiedContentType("comment.block.documentation.js")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(JS_DOC), new QualifiedContentType("comment.block.js")); //$NON-NLS-1$
 	}
 
 	public static JSSourceConfiguration getDefault()
@@ -215,7 +213,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 		if (multiLineCommentScanner == null)
 		{
 			multiLineCommentScanner = new RuleBasedScanner();
-			multiLineCommentScanner.setDefaultReturnToken(getToken("comment.block.js")); //$NON-NLS-1$
+			multiLineCommentScanner.setDefaultReturnToken(new Token("comment.block.js")); //$NON-NLS-1$
 		}
 		return multiLineCommentScanner;
 	}
@@ -225,7 +223,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 		if (singleLineCommentScanner == null)
 		{
 			singleLineCommentScanner = new RuleBasedScanner();
-			singleLineCommentScanner.setDefaultReturnToken(getToken("comment.line.double-slash.js")); //$NON-NLS-1$
+			singleLineCommentScanner.setDefaultReturnToken(new Token("comment.line.double-slash.js")); //$NON-NLS-1$
 		}
 		return singleLineCommentScanner;
 	}
@@ -234,7 +232,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	{
 		if (regexpScanner == null)
 		{
-			regexpScanner = new JSEscapeSequenceScanner("string.regexp.js"); //$NON-NLS-1$
+			regexpScanner = new JSEscapeSequenceScanner("string.regexp.js");
 		}
 		return regexpScanner;
 	}
@@ -243,7 +241,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	{
 		if (doubleQuoteScanner == null)
 		{
-			doubleQuoteScanner = new JSEscapeSequenceScanner("string.quoted.double.js"); //$NON-NLS-1$
+			doubleQuoteScanner = new JSEscapeSequenceScanner("string.quoted.double.js");
 		}
 		return doubleQuoteScanner;
 	}
@@ -252,7 +250,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	{
 		if (singleQuoteScanner == null)
 		{
-			singleQuoteScanner = new JSEscapeSequenceScanner("string.quoted.single.js"); //$NON-NLS-1$
+			singleQuoteScanner = new JSEscapeSequenceScanner("string.quoted.single.js");
 		}
 		return singleQuoteScanner;
 	}
