@@ -68,17 +68,34 @@ public abstract class StringUtil
 
 		int length = items.length;
 		String result = ""; //$NON-NLS-1$
+
 		if (length > 0)
 		{
 			StringBuilder sb = new StringBuilder();
+			String item;
+
 			for (int i = 0; i < length - 1; i++)
 			{
-				sb.append(items[i]).append(delimiter);
+				item = items[i];
+
+				if (item != null)
+				{
+					sb.append(item);
+				}
+
+				sb.append(delimiter);
 			}
-			sb.append(items[length - 1]);
+
+			item = items[length - 1];
+
+			if (item != null)
+			{
+				sb.append(item);
+			}
 
 			result = sb.toString();
 		}
+
 		return result;
 	}
 
