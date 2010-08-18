@@ -56,11 +56,7 @@ public class FTPConnectionTest extends CommonConnectionTest
 				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'})).toCharArray());
 		ftpcp.setPath(new Path(getConfig().getProperty("ftp.path", "/home/ftpuser"))); 
 		cp = ftpcp;
-		try {
-			super.setUp();
-		}
-		catch(Exception ex) {			
-		}
+		super.setUp();
 	}
 
 	/* (non-Javadoc)

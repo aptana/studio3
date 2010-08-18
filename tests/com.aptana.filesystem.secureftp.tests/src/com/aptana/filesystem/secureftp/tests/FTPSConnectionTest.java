@@ -57,11 +57,7 @@ public class FTPSConnectionTest extends CommonConnectionTest
 		ftpcp.setPath(new Path(getConfig().getProperty("ftps.path", "/home/ftpuser"))); 
 		ftpcp.setValidateCertificate(false);
 		cp = ftpcp;
-		try {
-			super.setUp();
-		}
-		catch(Exception ex) {			
-		}
+		super.setUp();
 	}
 
 	/* (non-Javadoc)

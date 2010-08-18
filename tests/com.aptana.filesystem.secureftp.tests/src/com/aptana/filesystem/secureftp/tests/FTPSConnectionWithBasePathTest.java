@@ -74,13 +74,7 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 		FTPSConnectionPoint ftpcp = setupConnection();
 		ftpcp.setPath(constructBasePath());
 		cp = ftpcp;
-		try {
-			super.setUp();
-		}
-		catch(Exception ex) {
-			cleanupBasePath();
-            throw ex;
-		}
+		super.setUp();
 	}
 
 	@Override
@@ -98,11 +92,14 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 		FTPSConnectionPoint ftpcp = setupConnection();
 		IFileStore fs = ftpcp.getRoot().getFileStore(constructBasePath());
 		assertNotNull(fs);
-		if (!fs.fetchInfo().exists())
-		{
-			fs.mkdir(EFS.NONE, null);
+		try {
+			if (!fs.fetchInfo().exists())
+			{
+				fs.mkdir(EFS.NONE, null);
+			}
+		} finally {
+			ftpcp.disconnect(null);
 		}
-		ftpcp.disconnect(null);
 		assertFalse(ftpcp.isConnected());
 	}
 
@@ -111,11 +108,14 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 		FTPSConnectionPoint ftpcp = setupConnection();
 		IFileStore fs = ftpcp.getRoot().getFileStore(constructBasePath());
 		assertNotNull(fs);
-		if (fs.fetchInfo().exists())
-		{
-			fs.delete(EFS.NONE, null);
+		try {
+			if (fs.fetchInfo().exists())
+			{
+				fs.delete(EFS.NONE, null);
+			}
+		} finally {
+			ftpcp.disconnect(null);
 		}
-		ftpcp.disconnect(null);
 		assertFalse(ftpcp.isConnected());
 	}
 
