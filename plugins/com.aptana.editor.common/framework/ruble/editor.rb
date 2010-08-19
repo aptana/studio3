@@ -168,7 +168,11 @@ module Ruble
     # * start_line
     # * end_line
     def selection
-      editor_part.selection_provider.selection
+      if editor_part.respond_to? :selection_provider
+        editor_part.selection_provider.selection
+      else
+        org.eclipse.jface.text.TextSelection.emptySelection
+      end
     end
     
     # Argument is a 2 integer array with first being offset, second being length; 
