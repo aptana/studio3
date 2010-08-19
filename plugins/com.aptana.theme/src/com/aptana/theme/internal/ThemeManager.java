@@ -138,7 +138,7 @@ public class ThemeManager implements IThemeManager
 		// Also set the standard eclipse editor props, like fg, bg, selection fg, bg
 		prefs = new InstanceScope().getNode("com.aptana.editor.common"); //$NON-NLS-1$
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND_SYSTEM_DEFAULT, false);
-		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND, toString(theme.getSelection()));
+		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND, toString(theme.getSelectionAgainstBG()));
 
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND_SYSTEM_DEFAULT, false);
 		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND, toString(theme.getBackground()));
@@ -147,7 +147,7 @@ public class ThemeManager implements IThemeManager
 		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND, toString(theme.getForeground()));
 
 		prefs.put(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR,
-				toString(theme.getLineHighlight()));
+				toString(theme.getLineHighlightAgainstBG()));
 		try
 		{
 			prefs.flush();

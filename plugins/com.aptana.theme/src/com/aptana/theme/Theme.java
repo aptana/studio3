@@ -54,9 +54,9 @@ public class Theme
 	private Map<ScopeSelector, DelayedTextAttribute> coloringRules;
 	private ColorManager colorManager;
 	private RGB defaultFG;
-	private RGB lineHighlight;
+	private RGBa lineHighlight;
 	private RGB defaultBG;
-	private RGB selection;
+	private RGBa selection;
 	private RGB caret;
 	private String name;
 
@@ -91,8 +91,8 @@ public class Theme
 		// The general editor colors
 		defaultFG = parseHexRGB((String) props.remove(FOREGROUND_PROP_KEY));
 		defaultBG = parseHexRGB((String) props.remove(BACKGROUND_PROP_KEY));
-		lineHighlight = parseHexRGB((String) props.remove(LINE_HIGHLIGHT_PROP_KEY), true);
-		selection = parseHexRGB((String) props.remove(SELECTION_PROP_KEY), true);
+		lineHighlight = parseHexRGBa((String) props.remove(LINE_HIGHLIGHT_PROP_KEY));
+		selection = parseHexRGBa((String) props.remove(SELECTION_PROP_KEY));
 		caret = parseHexRGB((String) props.remove(CARET_PROP_KEY), true);
 
 		for (Entry<Object, Object> entry : props.entrySet())
@@ -337,7 +337,7 @@ public class Theme
 		return defaultBG;
 	}
 
-	public RGB getSelection()
+	public RGBa getSelection()
 	{
 		return selection;
 	}
@@ -347,7 +347,7 @@ public class Theme
 		return defaultFG;
 	}
 
-	public RGB getLineHighlight()
+	public RGBa getLineHighlight()
 	{
 		return lineHighlight;
 	}
@@ -611,21 +611,21 @@ public class Theme
 
 	public void updateLineHighlight(RGB newColor)
 	{
-		if (newColor == null || (lineHighlight != null && lineHighlight.equals(newColor)))
+		if (newColor == null || (lineHighlight != null && lineHighlight.toRGB().equals(newColor)))
 		{
 			return;
 		}
-		lineHighlight = newColor;
+		lineHighlight = new RGBa(newColor);
 		save();
 	}
 
 	public void updateSelection(RGB newColor)
 	{
-		if (newColor == null || (selection != null && selection.equals(newColor)))
+		if (newColor == null || (selection != null && selection.toRGB().equals(newColor)))
 		{
 			return;
 		}
-		selection = newColor;
+		selection = new RGBa(newColor);
 		save();
 	}
 
@@ -726,7 +726,8 @@ public class Theme
 	{
 		if (searchResultBG == null)
 		{
-			searchResultBG = isDark(getSelection()) ? lighten(getSelection()) : darken(getSelection());
+			searchResultBG = isDark(getSelectionAgainstBG()) ? lighten(getSelectionAgainstBG())
+					: darken(getSelectionAgainstBG());
 		}
 		return searchResultBG;
 	}
@@ -758,6 +759,26 @@ public class Theme
 		// Convert to grayscale
 		double grey = 0.3 * color.red + 0.59 * color.green + 0.11 * color.blue;
 		return grey <= 128;
+	}
+
+	/**
+	 * Returns the selection color alpha blended with the theme bg to give a good estimate of correct RGB value
+	 * 
+	 * @return
+	 */
+	public RGB getSelectionAgainstBG()
+	{
+		return alphaBlend(defaultBG, selection.toRGB(), selection.getAlpha());
+	}
+
+	/**
+	 * Returns the line highlight color alpha blended with the theme bg to give a good estimate of correct RGB value
+	 * 
+	 * @return
+	 */
+	public RGB getLineHighlightAgainstBG()
+	{
+		return alphaBlend(defaultBG, lineHighlight.toRGB(), lineHighlight.getAlpha());
 	}
 
 }

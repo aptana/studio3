@@ -183,7 +183,7 @@ public class ThemeableEditorExtension {
 		// Force selection color
 		sourceViewer.getTextWidget().setSelectionBackground(
 				ThemePlugin.getDefault().getColorManager().getColor(
-						getThemeManager().getCurrentTheme().getSelection()));
+						getThemeManager().getCurrentTheme().getSelectionAgainstBG()));
 		if (!Platform.getOS().equals(Platform.OS_MACOSX))
 		{
 			// Linux and windows need selection fg set or we just see a block of color.
@@ -220,8 +220,7 @@ public class ThemeableEditorExtension {
 							return;
 					}
 					IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-					prefs.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE, textSelection
-							.getLength() == 0);
+					prefs.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE, false);
 					try
 					{
 						prefs.flush();

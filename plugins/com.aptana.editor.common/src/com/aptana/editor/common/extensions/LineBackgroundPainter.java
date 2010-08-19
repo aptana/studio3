@@ -5,15 +5,22 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IPaintPositionManager;
 import org.eclipse.jface.text.IPainter;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITextViewerExtension5;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.custom.LineBackgroundEvent;
 import org.eclipse.swt.custom.LineBackgroundListener;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
+import com.aptana.theme.RGBa;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
 
@@ -24,10 +31,20 @@ import com.aptana.theme.ThemePlugin;
  * 
  * @author cwilliams
  */
-public class LineBackgroundPainter implements IPainter, LineBackgroundListener
+public class LineBackgroundPainter implements IPainter, LineBackgroundListener, PaintListener
 {
 
 	private ISourceViewer fViewer;
+	/** The paint position manager for managing the line coordinates */
+	private IPaintPositionManager fPositionManager;
+
+	/** Keeps track of the line to be painted */
+	private Position fCurrentLine = new Position(0, 0);
+	/** Keeps track of the line to be cleared */
+	private Position fLastLine = new Position(0, 0);
+	/** Keeps track of the line number of the last painted line */
+	private int fLastLineNumber = -1;
+
 	private boolean fIsActive;
 
 	public LineBackgroundPainter(ISourceViewer viewer)
@@ -68,14 +85,170 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener
 		if (!fIsActive)
 		{
 			textWidget.addLineBackgroundListener(this);
+			textWidget.addPaintListener(this);
+			fPositionManager.managePosition(fCurrentLine);
 			fIsActive = true;
+		}
+
+		if (updateHighlightLine())
+		{
+			// clear last line
+			drawHighlightLine(fLastLine);
+			// draw new line
+			drawHighlightLine(fCurrentLine);
 		}
 	}
 
+	/**
+	 * Returns the location of the caret as offset in the source viewer's input document.
+	 * 
+	 * @return the caret location
+	 */
+	private int getModelCaret()
+	{
+		int widgetCaret = fViewer.getTextWidget().getCaretOffset();
+		if (fViewer instanceof ITextViewerExtension5)
+		{
+			ITextViewerExtension5 extension = (ITextViewerExtension5) fViewer;
+			return extension.widgetOffset2ModelOffset(widgetCaret);
+		}
+		IRegion visible = fViewer.getVisibleRegion();
+		return widgetCaret + visible.getOffset();
+	}
+
+	/**
+	 * Updates all the cached information about the lines to be painted and to be cleared. Returns <code>true</code> if
+	 * the line number of the cursor line has changed.
+	 * 
+	 * @return <code>true</code> if cursor line changed
+	 */
+	private boolean updateHighlightLine()
+	{
+		try
+		{
+
+			IDocument document = fViewer.getDocument();
+			int modelCaret = getModelCaret();
+			int lineNumber = document.getLineOfOffset(modelCaret);
+
+			// redraw if the current line number is different from the last line number we painted
+			// initially fLastLineNumber is -1
+			if (lineNumber != fLastLineNumber || !fCurrentLine.overlapsWith(modelCaret, 0))
+			{
+
+				fLastLine.offset = fCurrentLine.offset;
+				fLastLine.length = fCurrentLine.length;
+				fLastLine.isDeleted = fCurrentLine.isDeleted;
+
+				if (fCurrentLine.isDeleted)
+				{
+					fCurrentLine.isDeleted = false;
+					fPositionManager.managePosition(fCurrentLine);
+				}
+
+				fCurrentLine.offset = document.getLineOffset(lineNumber);
+				if (lineNumber == document.getNumberOfLines() - 1)
+					fCurrentLine.length = document.getLength() - fCurrentLine.offset;
+				else
+					fCurrentLine.length = document.getLineOffset(lineNumber + 1) - fCurrentLine.offset;
+
+				fLastLineNumber = lineNumber;
+				return true;
+
+			}
+
+		}
+		catch (BadLocationException e)
+		{
+		}
+
+		return false;
+	}
+
+	protected Position getCurrentLinePosition()
+	{
+		Point selection = fViewer.getTextWidget().getSelectionRange();
+		if (selection.y != 0)
+			return null;
+		try
+		{
+			int line = fViewer.getDocument().getLineOfOffset(selection.x);
+			return new Position(fViewer.getDocument().getLineOffset(line), 0);
+		}
+		catch (BadLocationException e)
+		{
+			return null;
+		}
+	}
+
+	/**
+	 * Assumes the given position to specify offset and length of a line to be painted.
+	 * 
+	 * @param position
+	 *            the specification of the line to be painted
+	 */
+	private void drawHighlightLine(Position position)
+	{
+		Rectangle rect = getLineRectangle(position);
+		if (rect == null)
+		{
+			return;
+		}
+		fViewer.getTextWidget().redraw(rect.x, rect.y, rect.width, rect.height, true);
+	}
+
+	private Rectangle getLineRectangle(Position position)
+	{
+		if (position == null)
+		{
+			return null;
+		}
+
+		// if the position that is about to be drawn was deleted then we can't
+		if (position.isDeleted())
+			return null;
+
+		int widgetOffset = 0;
+		if (fViewer instanceof ITextViewerExtension5)
+		{
+
+			ITextViewerExtension5 extension = (ITextViewerExtension5) fViewer;
+			widgetOffset = extension.modelOffset2WidgetOffset(position.getOffset());
+			if (widgetOffset == -1)
+				return null;
+
+		}
+		else
+		{
+
+			IRegion visible = fViewer.getVisibleRegion();
+			widgetOffset = position.getOffset() - visible.getOffset();
+			if (widgetOffset < 0 || visible.getLength() < widgetOffset)
+				return null;
+		}
+
+		StyledText textWidget = fViewer.getTextWidget();
+		// check for https://bugs.eclipse.org/bugs/show_bug.cgi?id=64898
+		// this is a guard against the symptoms but not the actual solution
+		if (0 <= widgetOffset && widgetOffset <= textWidget.getCharCount())
+		{
+			Point upperLeft = textWidget.getLocationAtOffset(widgetOffset);
+			int width = textWidget.getClientArea().width + textWidget.getHorizontalPixel();
+			int height = textWidget.getLineHeight(widgetOffset);
+
+			return new Rectangle(0, upperLeft.y, width, height);
+		}
+
+		return null;
+	}
+
+	/*
+	 * @see IPainter#setPositionManager(IPaintPositionManager)
+	 */
 	@Override
 	public void setPositionManager(IPaintPositionManager manager)
 	{
-		// do nothing
+		fPositionManager = manager;
 	}
 
 	@Override
@@ -94,14 +267,13 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener
 		// We're coloring whole line based on what the trailing end bg color should be.
 		try
 		{
+
 			int offset = event.lineOffset;
 			IDocument document = fViewer.getDocument();
 			int line = document.getLineOfOffset(offset);
 			IRegion lineRegion = document.getLineInformation(line);
 			String endOfLineScope = getScopeManager().getScopeAtOffset(document, lineRegion.getLength() + offset);
-
 			String commonPrefix = getScope(document, line, endOfLineScope);
-
 			TextAttribute at = getCurrentTheme().getTextAttribute(commonPrefix);
 			// If the background is null or matches the theme BG, we should just return early!
 			if (at.getBackground() == null || at.getBackground().equals(getThemeBG()))
@@ -172,5 +344,23 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener
 			}
 		}
 		return builder.toString();
+	}
+
+	@Override
+	public void paintControl(PaintEvent e)
+	{
+		// Draw the current line highlight over top using alpha!
+		Rectangle rect = new Rectangle(e.x, e.y, e.width, e.height);
+		// TODO Only paint the part of lineRect that is contained in rect!
+		Rectangle lineRect = getLineRectangle(getCurrentLinePosition());
+		if (lineRect == null)
+		{
+			return;
+		}
+
+		RGBa lineHighlight = getCurrentTheme().getLineHighlight();
+		e.gc.setAlpha(lineHighlight.getAlpha());
+		e.gc.setBackground(ThemePlugin.getDefault().getColorManager().getColor(lineHighlight.toRGB()));
+		e.gc.fillRectangle(lineRect);
 	}
 }

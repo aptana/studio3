@@ -368,7 +368,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				TableItem item = (TableItem) e.item;
 				lastSelectedColor = item.getBackground(0);
 				lastSelected = item;
-				item.setBackground(0, ThemePlugin.getDefault().getColorManager().getColor(getTheme().getSelection()));
+				item.setBackground(0, ThemePlugin.getDefault().getColorManager().getColor(getTheme().getSelectionAgainstBG()));
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e)
@@ -674,9 +674,9 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		Theme theme = getTheme();
 		fgSelector.setColorValue(theme.getForeground());
 		bgSelector.setColorValue(theme.getBackground());
-		lineHighlightSelector.setColorValue(theme.getLineHighlight());
+		lineHighlightSelector.setColorValue(theme.getLineHighlight().toRGB());
 		caretSelector.setColorValue(theme.getCaret());
-		selectionSelector.setColorValue(theme.getSelection());
+		selectionSelector.setColorValue(theme.getSelection().toRGB());
 		fThemeCombo.setText(themeName);
 		tableViewer.setInput(theme);
 		addCustomTableEditorControls();

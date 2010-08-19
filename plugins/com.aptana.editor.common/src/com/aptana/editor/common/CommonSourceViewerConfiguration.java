@@ -37,9 +37,9 @@ package com.aptana.editor.common;
 import java.util.Map;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.internal.text.html.HTMLTextPresenter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.DefaultInformationControl;
@@ -317,7 +317,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	
 	protected Color getThemeSelection()
 	{
-		RGB bg = ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getSelection();
+		RGB bg = ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getSelectionAgainstBG();
 		return ThemePlugin.getDefault().getColorManager().getColor(bg);
 	}
 

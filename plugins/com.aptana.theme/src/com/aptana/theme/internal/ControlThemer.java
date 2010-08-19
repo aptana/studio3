@@ -105,7 +105,7 @@ class ControlThemer implements IControlThemer
 
 	protected Color getSelection()
 	{
-		return getColorManager().getColor(getThemeManager().getCurrentTheme().getSelection());
+		return getColorManager().getColor(getThemeManager().getCurrentTheme().getSelectionAgainstBG());
 	}
 
 	protected ColorManager getColorManager()
