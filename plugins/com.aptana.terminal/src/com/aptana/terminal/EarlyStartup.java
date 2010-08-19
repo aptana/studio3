@@ -22,7 +22,7 @@ import com.aptana.terminal.preferences.IPreferenceConstants;
 
 public class EarlyStartup implements IStartup
 {
-	private static final String RAILS_PERSPECTIVE_ID = "org.radrails.rails.ui.PerspectiveRails"; //$NON-NLS-1$
+	private static final String WEB_PERSPECTIVE_ID = "com.aptana.ui.WebPerspective"; //$NON-NLS-1$
 
 	private IPerspectiveListener4 _perspectiveListener;
 	private IWindowListener _windowListener;
@@ -38,7 +38,7 @@ public class EarlyStartup implements IStartup
 		{
 			public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, String changeId)
 			{
-				if (RAILS_PERSPECTIVE_ID.equals(perspective.getId()) && "resetComplete".equals(changeId)) //$NON-NLS-1$
+				if (WEB_PERSPECTIVE_ID.equals(perspective.getId()) && "resetComplete".equals(changeId)) //$NON-NLS-1$
 				{
 					EarlyStartup.this.openTerminalEditor(page.getWorkbenchWindow());
 				}
@@ -46,7 +46,7 @@ public class EarlyStartup implements IStartup
 
 			public void perspectiveOpened(IWorkbenchPage page, IPerspectiveDescriptor perspective)
 			{
-				if (RAILS_PERSPECTIVE_ID.equals(perspective.getId())) //$NON-NLS-1$
+				if (WEB_PERSPECTIVE_ID.equals(perspective.getId()))
 				{
 					EarlyStartup.this.openTerminalEditor(page.getWorkbenchWindow());
 				}
@@ -134,7 +134,7 @@ public class EarlyStartup implements IStartup
 						String perspectiveId = workbenchPage.getPerspective().getId();
 						
 						// only open a terminal editor if the Rails perspective is the active perspective
-						if (RAILS_PERSPECTIVE_ID.equals(perspectiveId))
+						if (WEB_PERSPECTIVE_ID.equals(perspectiveId))
 						{
 							EarlyStartup.this.openTerminalEditor(workbenchWindow);
 						}
