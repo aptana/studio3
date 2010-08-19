@@ -5,12 +5,14 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import beaver.Symbol;
 import beaver.Scanner.Exception;
+import beaver.Symbol;
 
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
+import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParseState;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseNode;
 
@@ -18,15 +20,15 @@ public class CompositeParser implements IParser
 {
 
 	protected CompositeParserScanner fScanner;
-	protected IParser fParser;
+	private String fParserLanguage;
 
 	protected IParseNode fEmbeddedlanguageRoot;
 	protected Symbol fCurrentSymbol;
 
-	public CompositeParser(CompositeParserScanner defaultScanner, IParser primaryParser)
+	public CompositeParser(CompositeParserScanner defaultScanner, String primaryParserLanguage)
 	{
 		fScanner = defaultScanner;
-		fParser = primaryParser;
+		fParserLanguage = primaryParserLanguage;
 	}
 
 	@Override
@@ -39,7 +41,7 @@ public class CompositeParser implements IParser
 		// first processes the embedded language
 		fEmbeddedlanguageRoot = processEmbeddedlanguage(parseState);
 		// then processes the source as normal
-		IParseNode result = fParser.parse(parseState);
+		IParseNode result = primaryParse(parseState);
 
 		if (fEmbeddedlanguageRoot != null)
 		{
@@ -83,6 +85,28 @@ public class CompositeParser implements IParser
 		}
 
 		return result;
+	}
+
+	private IParseNode primaryParse(IParseState parseState) throws java.lang.Exception
+	{
+		IParserPool pool = ParserPoolFactory.getInstance().getParserPool(fParserLanguage);
+		if (pool != null)
+		{
+			IParser parser = null;
+			try
+			{
+				parser = pool.checkOut();
+				return parser.parse(parseState);
+			}
+			finally
+			{
+				if (parser != null)
+				{
+					pool.checkIn(parser);
+				}
+			}
+		}
+		return null;
 	}
 
 	/**

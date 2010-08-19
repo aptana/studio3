@@ -10,11 +10,13 @@
  *******************************************************************************/
 package com.aptana.internal.index.core;
 
+import com.aptana.index.core.IReadWriteMonitor;
+
 /**
  * Monitor ensuring no more than one writer working concurrently. Multiple readers are allowed to perform
  * simultaneously.
  */
-public class ReadWriteMonitor
+public class ReadWriteMonitor implements IReadWriteMonitor
 {
 
 	/**
@@ -23,8 +25,8 @@ public class ReadWriteMonitor
 	 */
 	private int status = 0;
 
-	/**
-	 * Concurrent reading is allowed Blocking only when already writing.
+	/* (non-Javadoc)
+	 * @see com.aptana.internal.index.core.IReadWriteMonitor#enterRead()
 	 */
 	public synchronized void enterRead()
 	{
@@ -42,8 +44,8 @@ public class ReadWriteMonitor
 		status++;
 	}
 
-	/**
-	 * Only one writer at a time is allowed to perform Blocking only when already writing or reading.
+	/* (non-Javadoc)
+	 * @see com.aptana.internal.index.core.IReadWriteMonitor#enterWrite()
 	 */
 	public synchronized void enterWrite()
 	{
@@ -61,8 +63,8 @@ public class ReadWriteMonitor
 		status--;
 	}
 
-	/**
-	 * Only notify waiting writer(s) if last reader
+	/* (non-Javadoc)
+	 * @see com.aptana.internal.index.core.IReadWriteMonitor#exitRead()
 	 */
 	public synchronized void exitRead()
 	{
@@ -71,8 +73,8 @@ public class ReadWriteMonitor
 			notifyAll();
 	}
 
-	/**
-	 * When writing is over, all readers and possible writers are granted permission to restart concurrently
+	/* (non-Javadoc)
+	 * @see com.aptana.internal.index.core.IReadWriteMonitor#exitWrite()
 	 */
 	public synchronized void exitWrite()
 	{
@@ -81,10 +83,8 @@ public class ReadWriteMonitor
 			notifyAll();
 	}
 
-	/**
-	 * Atomic exitRead/enterWrite: Allows to keep monitor in between exit read and next enter write. Use when writing
-	 * changes is optional, otherwise call the individual methods. Returns false if multiple readers are accessing the
-	 * index.
+	/* (non-Javadoc)
+	 * @see com.aptana.internal.index.core.IReadWriteMonitor#exitReadEnterWrite()
 	 */
 	public synchronized boolean exitReadEnterWrite()
 	{
@@ -95,17 +95,8 @@ public class ReadWriteMonitor
 		return true;
 	}
 
-	/**
-	 * Atomic exitWrite/enterRead: Allows to keep monitor in between exit write and next enter read. When writing is
-	 * over, all readers are granted permissing to restart concurrently. This is the same as:
-	 * 
-	 * <pre>
-	 * synchronized (monitor)
-	 * {
-	 * 	monitor.exitWrite();
-	 * 	monitor.enterRead();
-	 * }
-	 * </pre>
+	/* (non-Javadoc)
+	 * @see com.aptana.internal.index.core.IReadWriteMonitor#exitWriteEnterRead()
 	 */
 	public synchronized void exitWriteEnterRead()
 	{

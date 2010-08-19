@@ -68,7 +68,7 @@ public class HTMLParser implements IParser
 		fScanner.setSource(source);
 
 		int startingOffset = parseState.getStartingOffset();
-		IParseNode root = new ParseRootNode(HTMLNode.LANGUAGE, new HTMLNode[0], startingOffset, startingOffset
+		IParseNode root = new ParseRootNode(IHTMLParserConstants.LANGUAGE, new HTMLNode[0], startingOffset, startingOffset
 				+ source.length());
 		parseAll(root);
 		parseState.setParseResult(root);
