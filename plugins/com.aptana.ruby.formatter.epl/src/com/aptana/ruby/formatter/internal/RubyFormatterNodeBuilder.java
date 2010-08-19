@@ -8,6 +8,7 @@
  *
  * Contributors:
  *     xored software, Inc. - initial API and Implementation (Alex Panchenko)
+ *     Aptana Inc. - Modify it to work with org.jrubyparser.parser AST (Shalom Gibly)
  *******************************************************************************/
 package com.aptana.ruby.formatter.internal;
 
@@ -87,6 +88,11 @@ import com.aptana.ruby.formatter.internal.nodes.FormatterWhenElseNode;
 import com.aptana.ruby.formatter.internal.nodes.FormatterWhenNode;
 import com.aptana.ruby.formatter.internal.nodes.FormatterWhileNode;
 
+/**
+ * Ruby Formatter node builder.
+ * 
+ * @author Xored, Shalom Gibly [Aptana]
+ */
 public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 {
 
@@ -216,13 +222,48 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			public Object visitIterNode(IterNode visited)
 			{
 				FormatterDoNode forNode = new FormatterDoNode(document);
-				forNode.setBegin(createTextNode(document, visited));
+				// Note: The iteration may or may not have a 'varNode'. Also, it may or may not have a 'body'.
+
+				Node varNode = visited.getVarNode();
+				Node bodyNode = visited.getBodyNode();
+				SourcePosition position = visited.getPosition();
+				// Here we try to figure out what to place in the begin segment
+				int beginEndOffset = position.getEndOffset();
+				if (bodyNode != null)
+				{
+					beginEndOffset = bodyNode.getPosition().getStartOffset();
+				}
+				else
+				{
+					// we have an iteration without a body.
+					if (varNode != null)
+					{
+						// we look for the start offset of the 'end'
+						// keyword, right after the var-node
+						beginEndOffset = varNode.getPosition().getEndOffset();
+						// look for the 'end' keyword start
+						beginEndOffset = charLookup(document, beginEndOffset, 'e');
+					}
+					else
+					{
+						// we have no body-node, nor var-node.
+						// in this case we just look for the start of the 'end' keyword.
+						beginEndOffset = locateEndOffset(document, position.getEndOffset());
+					}
+				}
+				forNode.setBegin(createTextNode(document, position.getStartOffset(), beginEndOffset));
 				push(forNode);
 				visitChildren(visited);
 				// checkedPop(forNode, visited.getEnd().getPosition().getStartOffset());
-				SourcePosition position = visited.getPosition();
-				Node bodyNode = visited.getBodyNode();
-				int bodyEndOffset = bodyNode.getPosition().getEndOffset();
+				int bodyEndOffset;
+				if (bodyNode != null)
+				{
+					bodyEndOffset = bodyNode.getPosition().getEndOffset();
+				}
+				else
+				{
+					bodyEndOffset = forNode.getEndOffset();
+				}
 				checkedPop(forNode, bodyEndOffset);
 				forNode.setEnd(createTextNode(document, bodyEndOffset, position.getEndOffset()));
 				return null;
@@ -363,10 +404,22 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				Node elseBody = visited.getElseBody();
 				// Flip the 'else' and 'then' in case the 'then' appears 'after the 'else'
 				// This is the case with 'unless', so we flip it to make it easier to handle.
+				int ifNodeEnd = -1; // the end position for the entire if block.
+				if (elseBody != null)
+				{
+					ifNodeEnd = elseBody.getPosition().getEndOffset();
+				}
+				else if (thenBody != null)
+				{
+					ifNodeEnd = thenBody.getPosition().getEndOffset();
+				}
 				if (elseBody != null && thenBody != null)
 				{
 					if (thenBody.getPosition().getStartOffset() > elseBody.getPosition().getStartOffset())
 					{
+						// we also need to update the end position of the entire if block
+						ifNodeEnd = thenBody.getPosition().getEndOffset();
+						// flip the 'the' and 'else'
 						Node temp = thenBody;
 						thenBody = elseBody;
 						elseBody = temp;
@@ -379,7 +432,7 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 					visitChild(elseBody);
 				}
 				checkedPop(ifNode, ifNode.getEndOffset());
-				
+
 				while (elseBody != null && thenBody != null)
 				{
 					if (elseBody instanceof IfNode)
@@ -410,8 +463,12 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 					}
 				}
 
-				// -3 for 'end'
-				addChild(new FormatterIfEndNode(document, position.getEndOffset() - 3, position.getEndOffset()));
+				if (ifNodeEnd < 0)
+				{
+					// locate the 'end'
+					ifNodeEnd = locateEndOffset(document, position.getEndOffset());
+				}
+				addChild(new FormatterIfEndNode(document, ifNodeEnd, position.getEndOffset()));
 				return null;
 			}
 
@@ -705,6 +762,55 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	private IFormatterTextNode createTextNode(IFormatterDocument document, ISourcePositionHolder positionHolder)
 	{
 		return createTextNode(document, positionHolder.getPosition());
+	}
+
+	/**
+	 * Locate the word 'end' by searching for it from right to left in the given document. The assumption here is that
+	 * the 'end' word is actually there, and the only thing that separate us from reaching it are white-spaces.
+	 * 
+	 * @param document
+	 * @param rightOffset
+	 * @return The start offset of the 'end' word
+	 */
+	protected int locateEndOffset(IFormatterDocument document, int rightOffset)
+	{
+		String toLocate = "end"; //$NON-NLS-1$
+		int wordLength = toLocate.length();
+		do
+		{
+			int leftOffset = rightOffset - wordLength;
+			String endString = document.get(leftOffset, rightOffset);
+			if (toLocate.equals(endString))
+			{
+				// found it!
+				return leftOffset;
+			}
+			rightOffset--;
+		}
+		while (rightOffset - wordLength >= 0);
+		// if we got here, we didn't find the 'end'
+		return rightOffset;
+	}
+
+	/**
+	 * Look for the given char in the document and return it's position.
+	 * 
+	 * @param document
+	 * @param offset
+	 * @param c
+	 * @return The char offset; -1 if no matching char was found
+	 */
+	protected int charLookup(final IFormatterDocument document, int offset, char c)
+	{
+		while (offset + 1 < document.getLength())
+		{
+			if (document.charAt(offset) == c)
+			{
+				return offset;
+			}
+			offset++;
+		}
+		return -1;
 	}
 
 	/**
