@@ -10,7 +10,6 @@ import org.jrubyparser.parser.ParserConfiguration;
 import org.jrubyparser.parser.ParserResult;
 import org.jrubyparser.parser.ParserSupport;
 import org.jrubyparser.parser.Ruby18Parser;
-import org.jrubyparser.parser.RubyParser;
 
 /**
  * @author Chris Williams
@@ -20,13 +19,15 @@ public class RubySourceParser
 {
 
 	private IRubyWarnings warnings;
+	private Ruby18Parser parser;
+	private ParserConfiguration config;
 
-	public RubySourceParser()
+	RubySourceParser()
 	{
 		this(new NullWarnings());
 	}
 
-	public RubySourceParser(IRubyWarnings warnings)
+	RubySourceParser(IRubyWarnings warnings)
 	{
 		this.warnings = warnings;
 	}
@@ -83,8 +84,13 @@ public class RubySourceParser
 		{
 			fileName = ""; //$NON-NLS-1$
 		}
-		ParserConfiguration config = getParserConfig();
-		RubyParser parser = getDefaultRubyParser(config);
+		if (parser == null)
+		{
+			config = getParserConfig();
+			ParserSupport support = new ParserSupport();
+			support.setConfiguration(config);
+			parser = new Ruby18Parser(support);
+		}
 		parser.setWarnings(warnings);
 		LexerSource lexerSource = LexerSource.getSource(fileName, content, config);
 		ParserResult result = parser.parse(config, lexerSource);
@@ -100,13 +106,6 @@ public class RubySourceParser
 	protected void postProcessResult(ParserResult result)
 	{
 		// do nothing
-	}
-
-	protected RubyParser getDefaultRubyParser(ParserConfiguration config)
-	{
-		ParserSupport support = new ParserSupport();
-		support.setConfiguration(config);
-		return new Ruby18Parser(support);
 	}
 
 	protected ParserConfiguration getParserConfig()

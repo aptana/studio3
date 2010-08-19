@@ -43,7 +43,7 @@ import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.html.outline.HTMLOutlineContentProvider;
 import com.aptana.editor.html.outline.HTMLOutlineLabelProvider;
 import com.aptana.editor.html.parsing.HTMLParseState;
-import com.aptana.editor.html.parsing.ast.HTMLNode;
+import com.aptana.editor.html.parsing.IHTMLParserConstants;
 import com.aptana.editor.js.Activator;
 
 public class HTMLEditor extends AbstractThemeableEditor
@@ -64,7 +64,7 @@ public class HTMLEditor extends AbstractThemeableEditor
 	@Override
 	protected FileService createFileService()
 	{
-		return new FileService(HTMLNode.LANGUAGE, new HTMLParseState());
+		return new FileService(IHTMLParserConstants.LANGUAGE, new HTMLParseState());
 	}
 
 	/**
