@@ -25,6 +25,7 @@ import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 import org.jrubyparser.parser.ParserResult;
 
+import com.aptana.editor.ruby.parsing.NullParserResult;
 import com.aptana.editor.ruby.parsing.RubySourceParser;
 import com.aptana.formatter.AbstractScriptFormatter;
 import com.aptana.formatter.FormatterDocument;
@@ -43,24 +44,16 @@ import com.aptana.ruby.formatter.internal.RubyFormatterNodeRewriter;
 public class RubyFormatter extends AbstractScriptFormatter
 {
 
-	protected static final String[] INDENTING = { 
-		RubyFormatterConstants.INDENT_CLASS,
-		RubyFormatterConstants.INDENT_MODULE, 
-		RubyFormatterConstants.INDENT_METHOD,
-		RubyFormatterConstants.INDENT_BLOCKS, 
-		RubyFormatterConstants.INDENT_IF, 
-		RubyFormatterConstants.INDENT_CASE,
-		RubyFormatterConstants.INDENT_WHEN };
+	protected static final String[] INDENTING = { RubyFormatterConstants.INDENT_CLASS,
+			RubyFormatterConstants.INDENT_MODULE, RubyFormatterConstants.INDENT_METHOD,
+			RubyFormatterConstants.INDENT_BLOCKS, RubyFormatterConstants.INDENT_IF, RubyFormatterConstants.INDENT_CASE,
+			RubyFormatterConstants.INDENT_WHEN };
 
-	protected static final String[] BLANK_LINES = { 
-		RubyFormatterConstants.LINES_FILE_AFTER_REQUIRE,
-		RubyFormatterConstants.LINES_FILE_BETWEEN_MODULE, 
-		RubyFormatterConstants.LINES_FILE_BETWEEN_CLASS,
-		RubyFormatterConstants.LINES_FILE_BETWEEN_METHOD, 
-		RubyFormatterConstants.LINES_BEFORE_FIRST,
-		RubyFormatterConstants.LINES_BEFORE_MODULE, 
-		RubyFormatterConstants.LINES_BEFORE_CLASS,
-		RubyFormatterConstants.LINES_BEFORE_METHOD };
+	protected static final String[] BLANK_LINES = { RubyFormatterConstants.LINES_FILE_AFTER_REQUIRE,
+			RubyFormatterConstants.LINES_FILE_BETWEEN_MODULE, RubyFormatterConstants.LINES_FILE_BETWEEN_CLASS,
+			RubyFormatterConstants.LINES_FILE_BETWEEN_METHOD, RubyFormatterConstants.LINES_BEFORE_FIRST,
+			RubyFormatterConstants.LINES_BEFORE_MODULE, RubyFormatterConstants.LINES_BEFORE_CLASS,
+			RubyFormatterConstants.LINES_BEFORE_METHOD };
 
 	private final String lineDelimiter;
 
@@ -78,21 +71,23 @@ public class RubyFormatter extends AbstractScriptFormatter
 		{
 			RubySourceParser parser = new RubySourceParser();
 			result = parser.parse(source);
-
-			final RubyFormatterNodeBuilder builder = new RubyFormatterNodeBuilder();
-			final FormatterDocument fDocument = createDocument(source);
-			IFormatterContainerNode root = builder.build(result, fDocument);
-			new RubyFormatterNodeRewriter(result, fDocument).rewrite(root);
-			final IFormatterContext context = new RubyFormatterContext(0);
-			FormatterIndentDetector detector = new FormatterIndentDetector(offset);
-			try
+			if (!(result instanceof NullParserResult))
 			{
-				root.accept(context, detector);
-				return detector.getLevel();
-			}
-			catch (Exception e)
-			{
-				// ignore
+				final RubyFormatterNodeBuilder builder = new RubyFormatterNodeBuilder();
+				final FormatterDocument fDocument = createDocument(source);
+				IFormatterContainerNode root = builder.build(result, fDocument);
+				new RubyFormatterNodeRewriter(result, fDocument).rewrite(root);
+				final IFormatterContext context = new RubyFormatterContext(0);
+				FormatterIndentDetector detector = new FormatterIndentDetector(offset);
+				try
+				{
+					root.accept(context, detector);
+					return detector.getLevel();
+				}
+				catch (Exception e)
+				{
+					// ignore
+				}
 			}
 		}
 		catch (Throwable t)
@@ -108,24 +103,27 @@ public class RubyFormatter extends AbstractScriptFormatter
 		final String input = source.substring(offset, offset + length);
 		RubySourceParser parser = new RubySourceParser();
 		ParserResult result = parser.parse(input);
-		final String output = format(input, result, indent);
-		if (output != null)
+		if (!(result instanceof NullParserResult))
 		{
-			if (!input.equals(output))
+			final String output = format(input, result, indent);
+			if (output != null)
 			{
-				if (!isValidation() || equalsIgnoreBlanks(new StringReader(input), new StringReader(output)))
+				if (!input.equals(output))
 				{
-					return new ReplaceEdit(offset, length, output);
+					if (!isValidation() || equalsIgnoreBlanks(new StringReader(input), new StringReader(output)))
+					{
+						return new ReplaceEdit(offset, length, output);
+					}
+					else
+					{
+						FormatterPlugin.log(new Status(IStatus.ERROR, RubyFormatterPlugin.PLUGIN_ID, IStatus.OK,
+								Messages.RubyFormatter_contentCorrupted, new DumpContentException(input + "\n<!-------!>\n" + output))); //$NON-NLS-1$
+					}
 				}
 				else
 				{
-					FormatterPlugin.log(new Status(IStatus.ERROR, RubyFormatterPlugin.PLUGIN_ID, IStatus.OK,
-							Messages.RubyFormatter_contentCorrupted, new DumpContentException(input)));
+					return new MultiTextEdit(); // NOP
 				}
-			}
-			else
-			{
-				return new MultiTextEdit(); // NOP
 			}
 		}
 		return null;
