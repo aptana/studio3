@@ -73,7 +73,13 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 		FTPConnectionPoint ftpcp = setupConnection();
 		ftpcp.setPath(constructBasePath());
 		cp = ftpcp;
-		super.setUp();
+		try {
+			super.setUp();
+		}
+		catch(Exception ex) {
+			cleanupBasePath();
+            throw ex;
+        }
 	}
 
 	@Override
