@@ -56,6 +56,22 @@ public class HTMLIndexWriter
 	 */
 	protected void writeAttribute(Index index, AttributeElement attribute)
 	{
+		String[] columns = new String[] {
+			attribute.getName(),
+			attribute.getType(),
+			attribute.getElement(),
+			"", // specifications
+			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, attribute.getUserAgents())),
+			attribute.getDeprecated(),
+			attribute.getDescription(),
+			attribute.getHint(),
+			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, attribute.getReferences()),
+			attribute.getRemark(),
+			"" // values
+		};
+		String key = StringUtil.join(HTMLIndexConstants.DELIMITER, columns);
+		
+		index.addEntry(HTMLIndexConstants.ATTRIBUTE, key, this.getDocumentPath());
 	}
 
 	/**
@@ -93,6 +109,17 @@ public class HTMLIndexWriter
 	 */
 	protected void writeEvent(Index index, EventElement event)
 	{
+		String[] columns = new String[] {
+			event.getName(),
+			event.getType(),
+			"", // specifications
+			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, event.getUserAgents())),
+			event.getDescription(),
+			event.getRemark()
+		};
+		String key = StringUtil.join(HTMLIndexConstants.DELIMITER, columns);
+		
+		index.addEntry(HTMLIndexConstants.EVENT, key, this.getDocumentPath());
 	}
 
 	/**
