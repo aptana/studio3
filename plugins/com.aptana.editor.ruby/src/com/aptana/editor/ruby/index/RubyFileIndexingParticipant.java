@@ -13,11 +13,15 @@ import org.jrubyparser.parser.ParserResult;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.ruby.Activator;
+import com.aptana.editor.ruby.parsing.IRubyParserConstants;
 import com.aptana.editor.ruby.parsing.ISourceElementRequestor;
+import com.aptana.editor.ruby.parsing.RubyParser;
 import com.aptana.editor.ruby.parsing.RubySourceParser;
 import com.aptana.editor.ruby.parsing.SourceElementVisitor;
 import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
+import com.aptana.parsing.IParserPool;
+import com.aptana.parsing.ParserPoolFactory;
 
 public class RubyFileIndexingParticipant implements IFileStoreIndexingParticipant
 {
@@ -56,14 +60,25 @@ public class RubyFileIndexingParticipant implements IFileStoreIndexingParticipan
 			{
 				return;
 			}
-			
-			RubySourceParser sourceParser = new RubySourceParser();
-			ParserResult result = sourceParser.parse(store.getName(), source);
-			sub.worked(50);
-			Node root = result.getAST();
-			ISourceElementRequestor builder = new RubySourceIndexer(index, store.toURI());
-			SourceElementVisitor visitor = new SourceElementVisitor(builder);
-			visitor.acceptNode(root);
+
+			// create parser and associated parse state
+			IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IRubyParserConstants.LANGUAGE);
+
+			if (pool != null)
+			{
+				RubyParser parser = (RubyParser) pool.checkOut();
+
+				RubySourceParser sourceParser = parser.getSourceParser();
+				ParserResult result = sourceParser.parse(store.getName(), source);
+
+				pool.checkIn(parser);
+				sub.worked(50);
+
+				Node root = result.getAST();
+				ISourceElementRequestor builder = new RubySourceIndexer(index, store.toURI());
+				SourceElementVisitor visitor = new SourceElementVisitor(builder);
+				visitor.acceptNode(root);
+			}
 		}
 		catch (Throwable e)
 		{

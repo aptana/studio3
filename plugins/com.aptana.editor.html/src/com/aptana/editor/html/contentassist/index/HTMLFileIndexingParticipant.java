@@ -20,8 +20,8 @@ import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.html.Activator;
 import com.aptana.editor.html.parsing.HTMLParseState;
+import com.aptana.editor.html.parsing.IHTMLParserConstants;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
-import com.aptana.editor.html.parsing.ast.HTMLNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
@@ -65,7 +65,7 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 		{
 			sub.subTask(file.getName());
 
-			IParserPool pool = ParserPoolFactory.getInstance().getParserPool(HTMLNode.LANGUAGE);
+			IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IHTMLParserConstants.LANGUAGE);
 			if (pool != null)
 			{
 				String fileContents = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(20)));

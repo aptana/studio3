@@ -624,4 +624,9 @@ public class Index implements IReadWriteMonitor
 	{
 		return "Index for " + this.containerURI; //$NON-NLS-1$
 	}
+
+	public URI getRelativeDocumentPath(URI path)
+	{
+		return containerURI.relativize(path);
+	}
 }
