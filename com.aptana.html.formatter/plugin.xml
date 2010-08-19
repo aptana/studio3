@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="com.aptana.formatter.epl.formatterFactory">
+      <engineContribution
+            contentType="com.aptana.contenttype.html">
+         <formatterFactory
+               class="com.aptana.html.formatter.HTMLFormatterFactory"
+               id="com.aptana.html.formatterFactory"
+               name="HTML Code Formatter"
+               priority="10">
+         </formatterFactory>
+      </engineContribution>
+   </extension>
+</plugin>
