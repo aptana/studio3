@@ -1,14 +1,22 @@
 package com.aptana.editor.common;
 
 import java.text.MessageFormat;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.ITextViewerExtension5;
+import org.eclipse.jface.text.formatter.FormattingContextProperties;
+import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
@@ -50,12 +58,17 @@ import com.aptana.editor.common.internal.scripting.CommandElementsProvider;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
+import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.scripting.snippets.ExpandSnippetVerifyKeyListener;
+import com.aptana.formatter.ui.IScriptFormatterFactory;
+import com.aptana.formatter.ui.ScriptFormatterManager;
+import com.aptana.formatter.ui.ScriptFormattingContextProperties;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
 import com.aptana.theme.ThemePlugin;
+import com.aptana.ui.preferences.PreferencesLookupDelegate;
 
 /**
  * Provides a way to override the editor fg, bg caret, highlight and selection from what is set in global text editor
@@ -300,6 +313,39 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			protected Layout createLayout()
 			{
 				return new RulerLayout(RULER_EDITOR_GAP);
+			}
+			
+			@SuppressWarnings("unchecked")
+			@Override
+			public IFormattingContext createFormattingContext()
+			{
+				final IFormattingContext context = super.createFormattingContext();
+				try
+				{
+					QualifiedContentType contentType = CommonEditorPlugin.getDefault().getDocumentScopeManager()
+							.getContentType(getDocument(), 0);
+					if (contentType.getPartCount() > 0)
+					{
+						String mainContentType = contentType.getParts()[0];
+						final IScriptFormatterFactory factory = ScriptFormatterManager.getSelected(mainContentType);
+						if (factory != null)
+						{
+							AbstractThemeableEditor abstractThemeableEditor = AbstractThemeableEditor.this;
+							IResource file = (IResource) abstractThemeableEditor.getEditorInput().getAdapter(
+									IResource.class);
+							context
+									.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID, factory
+											.getId());
+							IProject project = (file != null) ? file.getProject() : null;
+							Map preferences = factory.retrievePreferences(new PreferencesLookupDelegate(project));
+							context.setProperty(FormattingContextProperties.CONTEXT_PREFERENCES, preferences);
+						}
+					}
+				}
+				catch (BadLocationException e)
+				{
+				}
+				return context;
 			}
 		};
 		
