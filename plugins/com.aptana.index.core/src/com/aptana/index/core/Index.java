@@ -474,14 +474,14 @@ public class Index implements IReadWriteMonitor
 	public List<QueryResult> query(String[] categories, String key, int matchRule) throws IOException
 	{
 		Map<String, QueryResult> results = null;
-		
+
 		try
 		{
 			// NOTE: I'd like to lock later in the method, but it would contort
 			// the IReadWriteMonitor interface, so we lock here and stick with
 			// the call to exitReadEnterWrite below
 			this.enterRead();
-			
+
 			if (this.memoryIndex.shouldMerge() && monitor.exitReadEnterWrite())
 			{
 				try
@@ -493,9 +493,9 @@ public class Index implements IReadWriteMonitor
 					monitor.exitWriteEnterRead();
 				}
 			}
-	
+
 			int rule = matchRule & MATCH_RULE_INDEX_MASK;
-	
+
 			if (this.memoryIndex.hasChanged())
 			{
 				results = this.diskIndex.addQueryResults(categories, key, rule, this.memoryIndex);
@@ -509,7 +509,7 @@ public class Index implements IReadWriteMonitor
 		finally
 		{
 			this.exitRead();
-			
+
 			// clear any cached regexes or patterns we might have used during the query
 			PATTERNS.clear();
 		}
@@ -574,7 +574,7 @@ public class Index implements IReadWriteMonitor
 	{
 		this.save(true);
 	}
-	
+
 	/**
 	 * save
 	 * 
@@ -591,17 +591,17 @@ public class Index implements IReadWriteMonitor
 			{
 				this.enterWrite();
 			}
-			
+
 			// must own the write lock of the monitor
 			if (!hasChanged())
 			{
 				return;
 			}
-	
+
 			int numberOfChanges = this.memoryIndex.numberOfChanges();
 			this.diskIndex = this.diskIndex.mergeWith(this.memoryIndex);
 			this.memoryIndex = new MemoryIndex();
-	
+
 			if (numberOfChanges > 1000)
 			{
 				System.gc(); // reclaim space if the MemoryIndex was very BIG

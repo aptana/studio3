@@ -36,7 +36,7 @@ public class IndexManager
 		{
 			INSTANCE = new IndexManager();
 		}
-		
+
 		return INSTANCE;
 	}
 
@@ -57,7 +57,7 @@ public class IndexManager
 	public synchronized Index getIndex(URI path)
 	{
 		Index index = this.indexes.get(path);
-		
+
 		if (index == null)
 		{
 			try
@@ -74,7 +74,7 @@ public class IndexManager
 					// Don't re-use the file (create an empty index file)
 					index = new Index(path, false);
 					this.indexes.put(path, index);
-					
+
 					// force a rebuild of the index.
 					new RebuildIndexJob(path).schedule();
 				}
@@ -84,7 +84,7 @@ public class IndexManager
 				}
 			}
 		}
-		
+
 		return index;
 	}
 
@@ -94,12 +94,12 @@ public class IndexManager
 	public synchronized void removeIndex(URI path)
 	{
 		Index index = getIndex(path);
-		
+
 		if (index != null)
 		{
 			index.deleteIndexFile();
 		}
-		
+
 		this.indexes.remove(path);
 	}
 }
