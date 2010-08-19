@@ -83,7 +83,7 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 	}
 
 	public static IPath constructBasePath() {
-		return new Path("/home/ftpuser/").append(FTPConnectionWithBasePathTest.class.getSimpleName());
+		return new Path(getConfig().getProperty("ftp.path", "/home/ftpuser")).append(FTPConnectionWithBasePathTest.class.getSimpleName());
 	}
 	
 	public static void initBasePath() throws CoreException
