@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
 import com.aptana.editor.html.contentassist.model.EventElement;
@@ -72,8 +71,8 @@ public class HTMLIndexWriter
 			element.getDisplayName(),
 			element.getRelatedClass(),
 			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, element.getAttributes()),
-			// specifications,
-			StringUtil.join(CSSIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, element.getUserAgents())),
+			"", // specifications,
+			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, element.getUserAgents())),
 			element.getDeprecated(),
 			element.getDescription(),
 			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, element.getEvents()),
