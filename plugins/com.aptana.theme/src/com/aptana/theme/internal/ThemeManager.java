@@ -3,7 +3,6 @@ package com.aptana.theme.internal;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Enumeration;
@@ -55,13 +54,11 @@ public class ThemeManager implements IThemeManager
 	private Theme fCurrentTheme;
 	private HashMap<String, Theme> fThemeMap;
 	private HashSet<String> fBuiltins;
-	private Map<WeakReference<Token>, String> fTokens;
 
 	private static ThemeManager fgInstance;
 
 	private ThemeManager()
 	{
-		fTokens = new HashMap<WeakReference<Token>, String>();
 	}
 
 	public static ThemeManager instance()
@@ -113,7 +110,6 @@ public class ThemeManager implements IThemeManager
 	public void setCurrentTheme(Theme theme)
 	{
 		fCurrentTheme = theme;
-		adaptTokens();
 
 		// Set the find in file search color
 		IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.search"); //$NON-NLS-1$
@@ -310,19 +306,7 @@ public class ThemeManager implements IThemeManager
 
 	public IToken getToken(String scope)
 	{
-		Token token = new Token(getTextAttribute(scope));
-		fTokens.put(new WeakReference<Token>(token), scope);
-		return token;
-	}
-
-	private void adaptTokens()
-	{
-		for (Map.Entry<WeakReference<Token>, String> entry : fTokens.entrySet())
-		{
-			Token token = entry.getKey().get();
-			if (token != null)
-				token.setData(getTextAttribute(entry.getValue()));
-		}
+		return new Token(getTextAttribute(scope));
 	}
 
 	public void addTheme(Theme newTheme)

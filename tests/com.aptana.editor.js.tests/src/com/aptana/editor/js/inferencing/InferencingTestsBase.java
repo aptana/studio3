@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,6 +22,10 @@ import com.aptana.core.util.ResourceUtil;
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
+import com.aptana.editor.js.contentassist.index.JSIndexReader;
+import com.aptana.editor.js.contentassist.model.ContentSelector;
+import com.aptana.editor.js.contentassist.model.PropertyElement;
+import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.parsing.JSParser;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
@@ -38,6 +43,9 @@ public abstract class InferencingTestsBase extends TestCase
 			this.processParseResults(index, root, location);
 		}
 	}
+
+	private static final EnumSet<ContentSelector> PARENT_TYPES_AND_PROPERTIES = EnumSet.of(ContentSelector.PARENT_TYPES, ContentSelector.PROPERTIES);
+	private JSIndexReader _reader;
 
 	/**
 	 * getContent
@@ -174,9 +182,9 @@ public abstract class InferencingTestsBase extends TestCase
 		assertNotNull(root);
 		assertTrue(root instanceof JSParseRootNode);
 
-		IParseNode invocation = root.getLastChild();
-		assertNotNull(invocation);
-		assertTrue(invocation instanceof JSNode);
+		IParseNode statement = root.getLastChild();
+		assertNotNull(statement);
+		assertTrue(statement instanceof JSNode);
 
 		JSScope globals = this.getGlobals((JSParseRootNode) root);
 		assertNotNull(globals);
@@ -184,7 +192,7 @@ public abstract class InferencingTestsBase extends TestCase
 		Indexer indexer = new Indexer();
 		indexer.indexTree(this.getIndex(), (JSParseRootNode) root, this.getLocation());
 
-		return this.getTypes(globals, (JSNode) invocation);
+		return this.getTypes(globals, (JSNode) statement);
 	}
 
 	/**
@@ -220,6 +228,17 @@ public abstract class InferencingTestsBase extends TestCase
 		}
 
 		return parseState.getParseResult();
+	}
+
+	/**
+	 * getType
+	 * 
+	 * @param typeName
+	 * @return
+	 */
+	protected TypeElement getType(String typeName)
+	{
+		return this._reader.getType(this.getIndex(), typeName, PARENT_TYPES_AND_PROPERTIES);
 	}
 
 	/**
@@ -269,20 +288,20 @@ public abstract class InferencingTestsBase extends TestCase
 	 */
 	public void lastStatementTypeTests(String source, String... types)
 	{
-		List<String> invocationTypes = this.getLastStatementTypes(source);
-		assertNotNull(invocationTypes);
+		List<String> statementTypes = this.getLastStatementTypes(source);
+		assertNotNull(statementTypes);
 
-		assertEquals(types.length, invocationTypes.size());
+		assertEquals(types.length, statementTypes.size());
 
 		for (String type : types)
 		{
-			String message = MessageFormat.format("Unable to locate {0} in {1}", type, invocationTypes);
+			String message = MessageFormat.format("Unable to locate {0} in {1}", type, statementTypes);
 
 			if (JSTypeConstants.DYNAMIC_CLASS_PREFIX.equals(type))
 			{
 				boolean match = false;
 
-				for (String returnedType : invocationTypes)
+				for (String returnedType : statementTypes)
 				{
 					if (returnedType.startsWith(JSTypeConstants.DYNAMIC_CLASS_PREFIX))
 					{
@@ -298,8 +317,59 @@ public abstract class InferencingTestsBase extends TestCase
 			}
 			else
 			{
-				assertTrue(message, invocationTypes.contains(type));
+				assertTrue(message, statementTypes.contains(type));
 			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see junit.framework.TestCase#setUp()
+	 */
+	@Override
+	protected void setUp() throws Exception
+	{
+		// TODO Auto-generated method stub
+		super.setUp();
+
+		this._reader = new JSIndexReader();
+	}
+
+	/**
+	 * structureTests
+	 * 
+	 * @param typeName
+	 * @param propertyNames
+	 */
+	protected void structureTests(String typeName, String... propertyNames)
+	{
+		assertNotNull(typeName);
+
+		this.structureTests(this.getType(typeName), propertyNames);
+	}
+
+	/**
+	 * structureTests
+	 * 
+	 * @param type
+	 * @param propertyNames
+	 */
+	protected void structureTests(TypeElement type, String... propertyNames)
+	{
+		List<String> parentTypes = type.getParentTypes();
+		assertEquals(1, parentTypes.size());
+		assertEquals(JSTypeConstants.OBJECT_TYPE, parentTypes.get(0));
+
+		for (String propertyName : propertyNames)
+		{
+			PropertyElement property = type.getProperty(propertyName);
+			assertNotNull(propertyName + " does not exist", property);
+
+			List<String> propertyTypeNames = property.getTypeNames();
+			assertNotNull(propertyName + " does not have a type", propertyTypeNames);
+
+			assertEquals(1, propertyTypeNames.size());
+			assertEquals(JSTypeConstants.BOOLEAN_TYPE, propertyTypeNames.get(0));
 		}
 	}
 
@@ -310,6 +380,8 @@ public abstract class InferencingTestsBase extends TestCase
 	@Override
 	protected void tearDown() throws Exception
 	{
+		this._reader = null;
+
 		URI indexURI = this.getIndexURI();
 
 		if (indexURI != null)

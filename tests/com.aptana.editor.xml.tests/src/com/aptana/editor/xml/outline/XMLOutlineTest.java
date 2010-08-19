@@ -48,6 +48,6 @@ public class XMLOutlineTest extends TestCase
 		Object[] elements = fContentProvider.getElements(parseState.getParseResult());
 		assertEquals(1, elements.length);
 		assertEquals("test", fLabelProvider.getText(elements[0]));
-		assertEquals(XMLPlugin.getImage("icons/element.gif"), fLabelProvider.getImage(elements[0]));
+		assertEquals(XMLPlugin.getImage("icons/element.png"), fLabelProvider.getImage(elements[0]));
 	}
 }

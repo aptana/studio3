@@ -10,8 +10,8 @@ import com.aptana.editor.css.parsing.ast.CSSSelectorNode;
 public class CSSOutlineLabelProvider extends LabelProvider
 {
 
-	private static final Image SELECTOR_ICON = Activator.getImage("icons/selector.gif"); //$NON-NLS-1$
-	private static final Image DECLARATION_ICON = Activator.getImage("icons/declaration.gif"); //$NON-NLS-1$
+	private static final Image SELECTOR_ICON = Activator.getImage("icons/selector.png"); //$NON-NLS-1$
+	private static final Image DECLARATION_ICON = Activator.getImage("icons/declaration.png"); //$NON-NLS-1$
 
 	@Override
 	public Image getImage(Object element)

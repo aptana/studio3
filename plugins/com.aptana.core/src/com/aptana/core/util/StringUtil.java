@@ -22,6 +22,35 @@ public abstract class StringUtil
 	public static final String EMPTY = ""; //$NON-NLS-1$
 
 	/**
+	 * characterInstanceCount
+	 * 
+	 * @param source
+	 * @param c
+	 * @return
+	 */
+	public static int characterInstanceCount(String source, char c)
+	{
+		int result = -1;
+
+		if (source != null)
+		{
+			int length = source.length();
+
+			result = 0;
+
+			for (int i = 0; i < length; i++)
+			{
+				if (source.charAt(i) == c)
+				{
+					result++;
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
 	 * Create a string by concatenating the elements of a string array using a delimited between each item
 	 * 
 	 * @param delimiter

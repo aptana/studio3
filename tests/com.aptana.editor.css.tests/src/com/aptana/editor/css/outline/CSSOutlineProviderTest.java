@@ -45,13 +45,13 @@ public class CSSOutlineProviderTest extends TestCase
 		assertEquals(2, selectors.length);
 		CSSRuleNode rule = (CSSRuleNode) result.getChild(0);
 		assertEquals(rule.getSelectors()[0], selectors[0]);
-		assertEquals(Activator.getImage("icons/selector.gif"), fLabelProvider.getImage(selectors[0]));
+		assertEquals(Activator.getImage("icons/selector.png"), fLabelProvider.getImage(selectors[0]));
 		assertEquals(rule.getSelectors()[1], selectors[1]);
 
 		Object[] declarations = fContentProvider.getChildren(selectors[0]);
 		assertEquals(1, declarations.length);
 		assertEquals(rule.getDeclarations()[0], declarations[0]);
-		assertEquals(Activator.getImage("icons/declaration.gif"), fLabelProvider.getImage(declarations[0]));
+		assertEquals(Activator.getImage("icons/declaration.png"), fLabelProvider.getImage(declarations[0]));
 
 		declarations = fContentProvider.getChildren(selectors[1]);
 		assertEquals(1, declarations.length);

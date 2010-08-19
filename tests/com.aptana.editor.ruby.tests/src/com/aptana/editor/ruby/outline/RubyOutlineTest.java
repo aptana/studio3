@@ -55,12 +55,12 @@ public class RubyOutlineTest extends TestCase
 		assertEquals("initialize(files)", fLabelProvider.getText(level1[0]));
 		assertEquals(Activator.getImage("icons/method_protected_obj.png"), fLabelProvider.getImage(level1[0]));
 		assertEquals("@files", fLabelProvider.getText(level1[1]));
-		assertEquals(Activator.getImage("icons/instance_var_obj.gif"), fLabelProvider.getImage(level1[1]));
+		assertEquals(Activator.getImage("icons/instance_var_obj.png"), fLabelProvider.getImage(level1[1]));
 
 		Object[] level2 = fContentProvider.getChildren(level1[0]); // files
 		assertEquals(1, level2.length);
 		assertEquals("files", fLabelProvider.getText(level2[0]));
-		assertEquals(Activator.getImage("icons/local_var_obj.gif"), fLabelProvider.getImage(level2[0]));
+		assertEquals(Activator.getImage("icons/local_var_obj.png"), fLabelProvider.getImage(level2[0]));
 
 		level2 = fContentProvider.getChildren(level1[1]);
 		assertEquals(0, level2.length);

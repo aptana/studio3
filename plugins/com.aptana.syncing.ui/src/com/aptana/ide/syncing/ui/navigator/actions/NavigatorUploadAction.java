@@ -17,7 +17,7 @@ public class NavigatorUploadAction extends NavigatorBaseSyncAction
 	{
 		UploadAction action = new UploadAction();
 		action.setActivePart(null, getActivePart());
-		action.setSelection(getStructuredSelection());
+		action.setSelection(getStructuredSelection(), isSelectionFromSource());
 		action.run(null);
 	}
 }

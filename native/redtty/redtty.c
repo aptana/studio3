@@ -29,7 +29,7 @@
 
 #define MAX_ESC_SEQUENCE_LENGTH	16
 
-static const char* DELIM = " ";
+static const char* DELIM = "\n";
 
 static void send_process_list(char* ptyname);
 

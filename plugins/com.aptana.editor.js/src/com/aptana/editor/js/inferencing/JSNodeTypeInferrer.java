@@ -4,7 +4,9 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
@@ -146,6 +148,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 			((JSNode) node).accept(this);
 		}
 	}
+
 	/**
 	 * addTypes
 	 * 
@@ -619,7 +622,26 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSObjectNode node)
 	{
-		this.addType(JSTypeConstants.OBJECT_TYPE);
+		if (node.hasChildren())
+		{
+			// collect all descendants into a property collection
+			JSPropertyCollection symbol = new JSPropertyCollection();
+			JSPropertyCollector collector = new JSPropertyCollector(symbol);
+
+			collector.visit(node);
+
+			// infer type
+			JSSymbolTypeInferrer inferrer = new JSSymbolTypeInferrer(this._scope, this._index, this._location);
+			Set<String> types = new LinkedHashSet<String>();
+
+			inferrer.processProperties(symbol, types);
+
+			this.addTypes(new ArrayList<String>(types));
+		}
+		else
+		{
+			this.addType(JSTypeConstants.OBJECT_TYPE);
+		}
 	}
 
 	/*

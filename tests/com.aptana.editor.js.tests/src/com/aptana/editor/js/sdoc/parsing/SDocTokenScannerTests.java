@@ -392,38 +392,4 @@ public class SDocTokenScannerTests extends SDocScannerTestBase
 			SDocTokenType.WHITESPACE
 		);
 	}
-	
-	public void testSampleBlock()
-	{
-//		String source =
-//			"/**\n" +
-//			" * This is a sample block of text\n" +
-//			" *\n" +
-//			" * @param {String} text\n" +
-//			" *   This is a description of 'text'\n" +
-//			" */";
-//		
-//		lexemeTypeTests(
-//			source,
-//			SDocTokenType.START_DOCUMENTATION,
-//			//SDocTokenType.WHITESPACE,
-//			//SDocTokenType.WHITESPACE,
-//			SDocTokenType.TEXT,
-//			SDocTokenType.WHITESPACE,
-//			SDocTokenType.WHITESPACE,
-//			SDocTokenType.WHITESPACE,
-//			SDocTokenType.PARAM,
-//			SDocTokenType.WHITESPACE,
-//			SDocTokenType.LCURLY,
-//			SDocTokenType.IDENTIFIER,
-//			SDocTokenType.RCURLY,
-//			SDocTokenType.WHITESPACE,
-//			SDocTokenType.TEXT,
-//			SDocTokenType.WHITESPACE,
-//			SDocTokenType.WHITESPACE,
-//			SDocTokenType.TEXT,
-//			SDocTokenType.WHITESPACE,
-//			SDocTokenType.END_DOCUMENTATION
-//		);
-	}
 }

@@ -34,8 +34,6 @@
  */
 package com.aptana.ide.syncing.ui;
 
-import java.text.MessageFormat;
-
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IExecutionListener;
@@ -43,7 +41,6 @@ import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
@@ -67,7 +64,8 @@ import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
 import com.aptana.ide.syncing.ui.actions.Sync;
 import com.aptana.ide.syncing.ui.editors.EditorUtils;
 import com.aptana.ide.syncing.ui.navigator.ProjectSitesManager;
-import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants;
+import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants.SyncDirection;
+import com.aptana.ide.syncing.ui.preferences.SyncPreferenceUtil;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ui.UIUtils;
 
@@ -156,16 +154,16 @@ public class SyncingUIPlugin extends AbstractUIPlugin {
 			// if we see a save command
 			if ("org.eclipse.ui.file.save".equals(commandId)) //$NON-NLS-1$
 			{
-				// checks if the active editor belongs to a project which is auto-synced to a FTP connection
 				IEditorPart editorPart = UIUtils.getActiveEditor();
 				if (editorPart != null)
 				{
 					IEditorInput input = editorPart.getEditorInput();
 					if (input instanceof IFileEditorInput)
 					{
+						// for upload, checks if the active editor belongs to a project auto-synced to a FTP connection
 						IProject project = ((IFileEditorInput) input).getFile().getProject();
-						if (Platform.getPreferencesService().getBoolean(PLUGIN_ID,
-								MessageFormat.format("{0}:{1}", IPreferenceConstants.AUTO_SYNC, project.getName()), false, null)) //$NON-NLS-1$
+						if (SyncPreferenceUtil.isAutoSync(project)
+								&& SyncPreferenceUtil.getAutoSyncDirection(project) != SyncDirection.DOWNLOAD)
 						{
 							Sync.uploadCurrentEditor();
 						}

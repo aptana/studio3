@@ -130,6 +130,17 @@ public class JSSourcePartitionScannerTest extends TestCase
 		assertContentType(JSSourceConfiguration.JS_REGEXP, source, 26);
 		assertContentType(JSSourceConfiguration.JS_SINGLELINE_COMMENT, source, 27);
 	}
+	
+	// NOTE: the following is broken in JS partitioning
+//	public void testDivisions()
+//	{
+//		String source = "if ( x / s >= 0) { x = x / 10; }";
+//		
+//		for (int i = 0; i < source.length(); i++)
+//		{
+//			assertContentType(JSSourceConfiguration.DEFAULT, source, i);
+//		}
+//	}
 
 	public void testEndDoubleSlashRegexp()
 	{

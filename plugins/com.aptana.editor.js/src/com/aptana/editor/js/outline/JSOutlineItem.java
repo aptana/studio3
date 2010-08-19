@@ -4,11 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.aptana.editor.common.outline.CommonOutlineItem;
-import com.aptana.parsing.ast.ILanguageNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 
-public class JSOutlineItem extends CommonOutlineItem implements ILanguageNode
+public class JSOutlineItem extends CommonOutlineItem
 {
 
 	public static enum Type
@@ -78,12 +77,6 @@ public class JSOutlineItem extends CommonOutlineItem implements ILanguageNode
 	private boolean hasVirtualChildren()
 	{
 		return fVirtualChildren != null && fVirtualChildren.size() > 0;
-	}
-
-	@Override
-	public String getLanguage()
-	{
-		return getReferenceNode().getLanguage();
 	}
 
 	@Override

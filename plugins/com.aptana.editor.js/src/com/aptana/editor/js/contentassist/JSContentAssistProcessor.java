@@ -28,7 +28,6 @@ import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.model.ContentSelector;
-import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.inferencing.JSNodeTypeInferrer;
 import com.aptana.editor.js.inferencing.JSPropertyCollection;
@@ -50,8 +49,8 @@ import com.aptana.parsing.lexer.Range;
 
 public class JSContentAssistProcessor extends CommonContentAssistProcessor
 {
-	private static final Image JS_FUNCTION = Activator.getImage("/icons/js_function.gif"); //$NON-NLS-1$
-	private static final Image JS_PROPERTY = Activator.getImage("/icons/js_property.gif"); //$NON-NLS-1$
+	private static final Image JS_FUNCTION = Activator.getImage("/icons/js_function.png"); //$NON-NLS-1$
+	private static final Image JS_PROPERTY = Activator.getImage("/icons/js_property.png"); //$NON-NLS-1$
 
 	private static final EnumSet<ContentSelector> CORE_GLOBAL_SELECTOR = EnumSet.of(ContentSelector.NAME, //
 		ContentSelector.DESCRIPTION, //
@@ -121,7 +120,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				String name = property.getName();
 				String description = JSModelFormatter.getDescription(property, projectURI);
-				Image image = (property instanceof FunctionElement) ? JS_FUNCTION : JS_PROPERTY;
+				Image image = JSModelFormatter.getImage(property);
 				Image[] userAgents = this.getUserAgentImages(property.getUserAgentNames());
 
 				this.addProposal(proposals, name, image, description, userAgents, location, offset);
@@ -148,7 +147,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				String name = property.getName();
 				String description = JSModelFormatter.getDescription(property, projectURI);
-				Image image = (property instanceof FunctionElement) ? JS_FUNCTION : JS_PROPERTY;
+				Image image = JSModelFormatter.getImage(property);
 				List<String> documents = property.getDocuments();
 				String location = (documents != null && documents.size() > 0) ? JSModelFormatter.getDocumentDisplayName(documents.get(0)) : null;
 
@@ -326,10 +325,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 		for (PropertyElement property : properties)
 		{
-			boolean isFunction = (property instanceof FunctionElement);
 			String name = property.getName();
 			String description = JSModelFormatter.getDescription(property, this.getProjectURI());
-			Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
+			Image image = JSModelFormatter.getImage(property);
 			List<String> userAgentNames = property.getUserAgentNames();
 			Image[] userAgents = getUserAgentImages(userAgentNames);
 			String owningType = JSModelFormatter.getTypeDisplayName(property.getOwningType());
@@ -494,11 +492,24 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		JSGetPropertyNode propertyNode = null;
 
-		if (this._targetNode != null && this._targetNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
+		if (this._targetNode != null)
 		{
-			propertyNode = (JSGetPropertyNode) this._targetNode;
+			if (this._targetNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
+			{
+				propertyNode = (JSGetPropertyNode) this._targetNode;
+			}
+			else
+			{
+				IParseNode parentNode = this._targetNode.getParent();
+
+				if (parentNode != null && parentNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
+				{
+					propertyNode = (JSGetPropertyNode) parentNode;
+				}
+			}
 		}
-		else if (this._statementNode != null)
+
+		if (propertyNode == null && this._statementNode != null)
 		{
 			if (this._statementNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
 			{
@@ -514,6 +525,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				}
 			}
 		}
+
 		return propertyNode;
 	}
 
@@ -559,7 +571,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		LocationType result = LocationType.UNKNOWN;
 
 		// set up references to AST nodes around the current offset
-		this._targetNode = this.getActiveASTNode(offset);
+		this._targetNode = this.getActiveASTNode(offset - 1);
 		this._statementNode = null;
 		IParseNode ast = null;
 

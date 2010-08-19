@@ -39,6 +39,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -71,6 +72,10 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
     private IWorkbenchPart fActivePart;
     private List<IAdaptable> fSelectedElements;
     private ISiteConnection fSite;
+
+    protected IFileStore fSourceRoot;
+    protected IFileStore fDestinationRoot;
+    protected boolean fSelectedFromSource;
 
     public BaseSyncAction() {
         fSelectedElements = new ArrayList<IAdaptable>();
@@ -169,12 +174,40 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
 		fSite = site;
 	}
 
+	/**
+	 * Specifies a particular file store as the root for the source side.
+	 * 
+	 * @param sourceRoot
+	 *            a file store
+	 */
+	public void setSourceRoot(IFileStore sourceRoot)
+	{
+		fSourceRoot = sourceRoot;
+	}
+
+	/**
+	 * Specifies a particular file store as the root for the destination side.
+	 * 
+	 * @param destinationRoot
+	 *            a file store
+	 */
+	public void setDestinationRoot(IFileStore destinationRoot)
+	{
+		fDestinationRoot = destinationRoot;
+	}
+
 	@Override
 	public void init(IViewPart view) {
 		fActivePart = view;
 	}
 
-    public void setSelection(ISelection selection) {
+	public void setSelection(ISelection selection)
+	{
+		setSelection(selection, true);
+	}
+
+    public void setSelection(ISelection selection, boolean fromSource) {
+    	fSelectedFromSource = fromSource;
         fSelectedElements.clear();
 
         if (!(selection instanceof IStructuredSelection) || selection.isEmpty()) {
@@ -182,9 +215,14 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
         }
 
         Object[] elements = ((IStructuredSelection) selection).toArray();
+        ISiteConnection[] sites;
         for (Object element : elements) {
             if (element instanceof IAdaptable) {
-            	ISiteConnection[] sites = SiteConnectionUtils.findSitesForSource((IAdaptable) element);
+            	if (fSelectedFromSource) {
+            		sites = SiteConnectionUtils.findSitesForSource((IAdaptable) element);
+            	} else {
+            		sites = SiteConnectionUtils.findSitesWithDestination((IAdaptable) element);
+            	}
                 if (sites.length > 0) {
                     fSelectedElements.add((IAdaptable) element);
                 }
@@ -213,7 +251,11 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
         Set<ISiteConnection> sitesSet;
         ISiteConnection[] sites;
         for (IAdaptable element : fSelectedElements) {
-            sites = SiteConnectionUtils.findSitesForSource(element);
+        	if (fSelectedFromSource) {
+        		sites = SiteConnectionUtils.findSitesForSource(element);
+        	} else {
+        		sites = SiteConnectionUtils.findSitesWithDestination(element);
+        	}
             sitesSet = new HashSet<ISiteConnection>();
             for (ISiteConnection site : sites) {
                 sitesSet.add(site);
@@ -236,7 +278,7 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
         }
     }
 
-    private static ISiteConnection getLastSyncConnection(IContainer container) {
+    private ISiteConnection getLastSyncConnection(IContainer container) {
         if (container == null) {
             return null;
         }
@@ -246,8 +288,12 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
             return null;
         }
 
-        ISiteConnection[] sites = SiteConnectionUtils.findSitesForSource(container, true);
-        String target;
+        ISiteConnection[] sites;
+        if (fSelectedFromSource) {
+        	sites = SiteConnectionUtils.findSitesForSource(container, true);
+        } else {
+        	sites = SiteConnectionUtils.findSitesWithDestination(container, true);
+        }        String target;
         for (ISiteConnection site : sites) {
             target = site.getDestination().getName();
             if (target.equals(lastConnection)) {

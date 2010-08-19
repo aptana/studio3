@@ -10,26 +10,21 @@ import org.eclipse.jface.text.rules.Token;
 
 public class JSCodeScannerTest extends TestCase
 {
-
 	private JSCodeScanner scanner;
 
 	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		scanner = new JSCodeScanner()
-		{
-			protected IToken createToken(String string)
-			{
-				return getToken(string);
-			};
-		};
+		
+		scanner = new JSCodeScanner();
 	}
 
 	@Override
 	protected void tearDown() throws Exception
 	{
 		scanner = null;
+		
 		super.tearDown();
 	}
 

@@ -103,12 +103,13 @@ public class ScopeSelector
 		int bestOffset = -1;
 		int bestLength = 0;
 		ScopeSelector bestMatch = null;
+
 		for (ScopeSelector selector : selectors)
 		{
 			if (selector.matches(scope))
 			{
-
 				int offset = selector.matchOffset;
+
 				if (offset > bestOffset)
 				{
 					bestOffset = offset;
@@ -118,6 +119,7 @@ public class ScopeSelector
 				else if (offset == bestOffset)
 				{
 					int length = selector.matchLength;
+
 					if (length > bestLength)
 					{
 						bestMatch = selector;
@@ -129,6 +131,7 @@ public class ScopeSelector
 				}
 			}
 		}
+
 		return bestMatch;
 	}
 

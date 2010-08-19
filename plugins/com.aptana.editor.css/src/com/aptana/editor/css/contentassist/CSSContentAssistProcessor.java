@@ -80,8 +80,8 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		ERROR, OUTSIDE_RULE, INSIDE_RULE, INSIDE_ARG, INSIDE_PROPERTY, INSIDE_VALUE
 	};
 
-	private static final Image ELEMENT_ICON = Activator.getImage("/icons/element.gif"); //$NON-NLS-1$
-	private static final Image PROPERTY_ICON = Activator.getImage("/icons/property.gif"); //$NON-NLS-1$
+	private static final Image ELEMENT_ICON = Activator.getImage("/icons/element.png"); //$NON-NLS-1$
+	private static final Image PROPERTY_ICON = Activator.getImage("/icons/property.png"); //$NON-NLS-1$
 
 	private IContextInformationValidator _validator;
 	private CSSIndexQueryHelper _queryHelper;

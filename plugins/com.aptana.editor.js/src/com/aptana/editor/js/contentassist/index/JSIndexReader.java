@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.regex.Pattern;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.ParameterElement;
@@ -121,7 +123,7 @@ public class JSIndexReader
 					for (String userAgentKey : columns[column].split(JSIndexConstants.SUB_DELIMITER))
 					{
 						// get user agent and add to element
-						f.addUserAgent(this.getUserAgent(index, userAgentKey));
+						f.addUserAgent(this.getUserAgent(userAgentKey));
 					}
 				}
 				column++;
@@ -215,7 +217,7 @@ public class JSIndexReader
 					for (String userAgentKey : columns[column].split(JSIndexConstants.SUB_DELIMITER))
 					{
 						// get user agent and add to element
-						p.addUserAgent(this.getUserAgent(index, userAgentKey));
+						p.addUserAgent(this.getUserAgent(userAgentKey));
 					}
 					column++;
 				}
@@ -232,6 +234,35 @@ public class JSIndexReader
 		}
 
 		return p;
+	}
+
+	/**
+	 * createUserAgent
+	 * 
+	 * @param key
+	 * @return
+	 */
+	protected UserAgentElement createUserAgent(QueryResult userAgent)
+	{
+		UserAgentElement result = new UserAgentElement();
+
+		String key = userAgent.getWord();
+		String[] columns = key.split(JSIndexConstants.DELIMITER);
+		int column = 0;
+
+		result.setKey(columns[column++]);
+		result.setDescription(columns[column++]);
+		result.setOS(columns[column++]);
+		result.setPlatform(columns[column++]);
+
+		// NOTE: split does not return a final empty element if the string being split
+		// ends with the delimiter.
+		if (column < columns.length)
+		{
+			result.setVersion(columns[column++]);
+		}
+
+		return result;
 	}
 
 	/**
@@ -754,37 +785,48 @@ public class JSIndexReader
 	/**
 	 * getUserAgent
 	 * 
-	 * @param index
 	 * @param userAgentKey
 	 * @return
 	 * @throws IOException
 	 */
-	protected UserAgentElement getUserAgent(Index index, String userAgentKey) throws IOException
+	protected UserAgentElement getUserAgent(String userAgentKey) throws IOException
 	{
 		UserAgentElement result = JSIndexWriter.userAgentsByKey.get(userAgentKey);
 
-		if (result == null && index != null)
+		if (result == null)
 		{
+			Index index = JSIndexQueryHelper.getIndex();
 			String searchKey = userAgentKey + JSIndexConstants.DELIMITER;
 			List<QueryResult> items = index.query(new String[] { JSIndexConstants.USER_AGENT }, searchKey, SearchPattern.PREFIX_MATCH);
 
 			if (items != null && items.size() > 0)
 			{
-				String key = items.get(0).getWord();
-				String[] columns = key.split(JSIndexConstants.DELIMITER);
-				int column = 1; // skip index
+				result = this.createUserAgent(items.get(0));
+			}
+		}
 
-				result = new UserAgentElement();
-				result.setDescription(columns[column++]);
-				result.setOS(columns[column++]);
-				result.setPlatform(columns[column++]);
+		return result;
+	}
 
-				// NOTE: split does not return a final empty element if the string being split
-				// ends with the delimiter.
-				if (column < columns.length)
-				{
-					result.setVersion(columns[column++]);
-				}
+	/**
+	 * getUserAgents
+	 * 
+	 * @return
+	 * @throws IOException
+	 */
+	public List<UserAgentElement> getUserAgents() throws IOException
+	{
+		List<UserAgentElement> result = Collections.emptyList();
+		Index index = JSIndexQueryHelper.getIndex();
+		List<QueryResult> items = index.query(new String[] { JSIndexConstants.USER_AGENT }, "*", SearchPattern.PATTERN_MATCH);
+
+		if (items != null && items.isEmpty() == false)
+		{
+			result = new ArrayList<UserAgentElement>();
+
+			for (QueryResult item : items)
+			{
+				result.add(this.createUserAgent(item));
 			}
 		}
 

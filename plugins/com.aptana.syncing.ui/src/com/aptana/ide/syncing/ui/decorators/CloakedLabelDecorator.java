@@ -66,11 +66,12 @@ public class CloakedLabelDecorator implements ILightweightLabelDecorator {
         }
 
         IAdaptable adaptable = (IAdaptable) element;
-        // only shows the cloak decorator when the resource has a sync
-        // connection
-        if (SiteConnectionUtils.findSitesForSource(adaptable).length == 0) {
-            return;
-        }
+		// only shows the cloak decorator when the element is associated with a sync connection as a source or
+		// destination
+		if (SiteConnectionUtils.findSitesForSource(adaptable).length == 0
+				&& SiteConnectionUtils.findSitesWithDestination(adaptable).length == 0) {
+			return;
+		}
 
         IFileStore fileStore = SyncUtils.getFileStore(adaptable);
         if (fileStore != null) {
