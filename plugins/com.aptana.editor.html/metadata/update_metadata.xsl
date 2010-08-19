@@ -35,7 +35,7 @@
 
 <xsl:template match="fields">
 	<attributes>
-		<xsl:apply-templates select="field|/content-assist/elements/element/fields/field[string-length(@type) > 0]">
+		<xsl:apply-templates select="field|/content-assist/elements/element/fields/field[count(*) > 0]">
 			<xsl:sort select="@name"/>
 		</xsl:apply-templates>
 	</attributes>
