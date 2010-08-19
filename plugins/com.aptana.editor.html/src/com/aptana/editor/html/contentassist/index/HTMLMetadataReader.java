@@ -91,6 +91,7 @@ public class HTMLMetadataReader extends MetadataReader
 		// grab and set property values
 		attribute.setName(attributes.getValue("name")); //$NON-NLS-1$
 		attribute.setType(attributes.getValue("type")); //$NON-NLS-1$
+		attribute.setElement(attributes.getValue("element")); //$NON-NLS-1$
 
 		// set current item
 		this._currentAttribute = attribute;
