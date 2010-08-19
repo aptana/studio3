@@ -62,7 +62,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 	private static final Image ELEMENT_ICON = Activator.getImage("/icons/element.png"); //$NON-NLS-1$
 	private static final Image ATTRIBUTE_ICON = Activator.getImage("/icons/attribute.png"); //$NON-NLS-1$
-	private static final Image EVENT_ICON = Activator.getImage("/icons/event.png"); //$NON-NLS-1$
+	private static final Image EVENT_ICON = Activator.getImage("/icons/event.gif"); //$NON-NLS-1$
 	private static final Map<String, LocationType> locationMap;
 
 	private HTMLIndexQueryHelper _queryHelper;
