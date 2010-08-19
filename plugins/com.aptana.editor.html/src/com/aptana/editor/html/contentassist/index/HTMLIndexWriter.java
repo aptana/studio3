@@ -36,7 +36,7 @@ public class HTMLIndexWriter
 	{
 		return URI.create(HTMLIndexConstants.METADATA);
 	}
-	
+
 	/**
 	 * loadXML
 	 * 
@@ -70,7 +70,7 @@ public class HTMLIndexWriter
 			"" // values
 		};
 		String key = StringUtil.join(HTMLIndexConstants.DELIMITER, columns);
-		
+
 		index.addEntry(HTMLIndexConstants.ATTRIBUTE, key, this.getDocumentPath());
 	}
 
@@ -97,7 +97,7 @@ public class HTMLIndexWriter
 			element.getRemark()
 		};
 		String key = StringUtil.join(HTMLIndexConstants.DELIMITER, columns);
-		
+
 		index.addEntry(HTMLIndexConstants.ELEMENT, key, this.getDocumentPath());
 	}
 
@@ -118,7 +118,7 @@ public class HTMLIndexWriter
 			event.getRemark()
 		};
 		String key = StringUtil.join(HTMLIndexConstants.DELIMITER, columns);
-		
+
 		index.addEntry(HTMLIndexConstants.EVENT, key, this.getDocumentPath());
 	}
 
@@ -144,7 +144,7 @@ public class HTMLIndexWriter
 			this.writeEvent(index, event);
 		}
 	}
-	
+
 	/**
 	 * writeUserAgent
 	 * 
@@ -155,26 +155,26 @@ public class HTMLIndexWriter
 	protected String writeUserAgent(Index index, UserAgentElement userAgent)
 	{
 		String key = this._userAgentKeyMap.get(userAgent);
-		
+
 		if (key == null)
 		{
 			key = Integer.toString(this._userAgentKeyMap.size());
-			
+
 			String[] columns = new String[] {
 				key,
 				userAgent.getPlatform(),
 				userAgent.getVersion()
 			};
 			String value = StringUtil.join(HTMLIndexConstants.DELIMITER, columns);
-			
+
 			index.addEntry(HTMLIndexConstants.USER_AGENT, value, this.getDocumentPath());
-			
+
 			this._userAgentKeyMap.put(userAgent, key);
 		}
-		
+
 		return key;
 	}
-	
+
 	/**
 	 * writeUserAgents
 	 * 
@@ -184,12 +184,12 @@ public class HTMLIndexWriter
 	protected List<String> writeUserAgents(Index index, List<UserAgentElement> userAgents)
 	{
 		List<String> keys = new LinkedList<String>();
-		
+
 		for (UserAgentElement userAgent : userAgents)
 		{
 			keys.add(this.writeUserAgent(index, userAgent));
 		}
-		
+
 		return keys;
 	}
 }

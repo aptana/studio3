@@ -97,7 +97,7 @@ public class AttributeElement
 	{
 		return this._element;
 	}
-	
+
 	/**
 	 * getHint
 	 * 
@@ -207,7 +207,7 @@ public class AttributeElement
 	{
 		this._element = element;
 	}
-	
+
 	/**
 	 * setHint
 	 * 

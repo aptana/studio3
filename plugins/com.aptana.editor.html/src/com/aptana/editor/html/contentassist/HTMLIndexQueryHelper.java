@@ -44,14 +44,14 @@ public class HTMLIndexQueryHelper
 		{
 			AttributeElement defaultAttribute = null;
 			AttributeElement candidateAttribute = null;
-			
+
 			// TODO: optimize with a name->attribute hash
 			for (AttributeElement attribute : this.getAttributes())
 			{
 				if (attributeName.equals(attribute.getName()))
 				{
 					String elementRef = attribute.getElement();
-					
+
 					if (elementRef != null && elementRef.length() > 0)
 					{
 						if (elementName.equals(elementRef))
@@ -65,7 +65,7 @@ public class HTMLIndexQueryHelper
 					}
 				}
 			}
-			
+
 			if (candidateAttribute != null)
 			{
 				result = candidateAttribute;
