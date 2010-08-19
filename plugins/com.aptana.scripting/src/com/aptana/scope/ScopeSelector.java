@@ -1,11 +1,14 @@
 package com.aptana.scope;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Stack;
 import java.util.regex.Pattern;
 
 public class ScopeSelector
 {
+	private static final String NEGATIVE_LOOKAHEAD = "-"; //$NON-NLS-1$
 	private static final Pattern or_split = Pattern.compile("\\s*,\\s*"); //$NON-NLS-1$
 	private static final Pattern and_split = Pattern.compile("\\s+"); //$NON-NLS-1$
 
@@ -181,6 +184,7 @@ public class ScopeSelector
 			{
 				// process ands
 				String[] ands = and_split.split(or);
+				ands = processNegativeLookaheads(ands);
 				int startingSize = stack.size();
 				int i = 0;
 
@@ -189,7 +193,7 @@ public class ScopeSelector
 					String and = ands[i];
 
 					// stop processing "and"s if we encounter a negative lookahead operator
-					if (and != null && and.equals("-")) //$NON-NLS-1$
+					if (and != null && and.equals(NEGATIVE_LOOKAHEAD))
 					{
 						break;
 					}
@@ -210,7 +214,7 @@ public class ScopeSelector
 				{
 					String operator = ands[i];
 
-					if (operator != null && operator.equals("-")) //$NON-NLS-1$
+					if (operator != null && operator.equals(NEGATIVE_LOOKAHEAD))
 					{
 						if (i + 1 < ands.length)
 						{
@@ -255,6 +259,30 @@ public class ScopeSelector
 		}
 
 		this._root = (stack != null && stack.size() > 0) ? stack.pop() : null;
+	}
+
+	/**
+	 * Handles when '-' negative lookahead is butted up against next NameSelector.
+	 * 
+	 * @param ands
+	 * @return
+	 */
+	private String[] processNegativeLookaheads(String[] ands)
+	{
+		List<String> processed = new ArrayList<String>();
+		for (String and : ands)
+		{
+			if (and.startsWith(NEGATIVE_LOOKAHEAD) && and.length() > 1)
+			{
+				processed.add(NEGATIVE_LOOKAHEAD);
+				processed.add(and.substring(1));
+			}
+			else
+			{
+				processed.add(and);
+			}
+		}
+		return processed.toArray(new String[processed.size()]);
 	}
 
 	/*

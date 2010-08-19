@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ui.internal;
+package com.aptana.projects.internal;
 
 import java.text.MessageFormat;
 
@@ -40,7 +40,7 @@ import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 
-import com.aptana.ui.UIPlugin;
+import com.aptana.projects.ProjectsPlugin;
 
 /**
  * A property tester that will test the existence of the nature ID in the given {@link IProject} receiver.
@@ -93,7 +93,7 @@ public class ProjectPropertyTester extends PropertyTester
 			}
 			catch (CoreException e)
 			{
-				UIPlugin.logError(
+				ProjectsPlugin.logError(
 						MessageFormat.format(Messages.ProjectPropertyTester_ERR_ProjectNature, project.getName()), e);
 			}
 		}
