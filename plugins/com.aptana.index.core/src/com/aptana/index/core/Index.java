@@ -19,7 +19,7 @@ import com.aptana.internal.index.core.DiskIndex;
 import com.aptana.internal.index.core.MemoryIndex;
 import com.aptana.internal.index.core.ReadWriteMonitor;
 
-public class Index
+public class Index implements IReadWriteMonitor
 {
 	private static final int MATCH_RULE_INDEX_MASK = SearchPattern.EXACT_MATCH | SearchPattern.PREFIX_MATCH | SearchPattern.PATTERN_MATCH
 		| SearchPattern.CASE_SENSITIVE | SearchPattern.REGEX_MATCH;
@@ -284,8 +284,7 @@ public class Index
 	public char separator = DEFAULT_SEPARATOR;
 	private MemoryIndex memoryIndex;
 	private DiskIndex diskIndex;
-	// FIXME We're not using the read write locks at all really!
-	public ReadWriteMonitor monitor;
+	private IReadWriteMonitor monitor;
 	private URI containerURI;
 
 	/**
@@ -318,7 +317,104 @@ public class Index
 	 */
 	public void addEntry(String category, String key, URI containerRelativeURI)
 	{
+		this.enterWrite();
 		this.memoryIndex.addEntry(category, key, containerRelativeURI.toString());
+		this.exitWrite();
+	}
+
+	/**
+	 * deleteIndexFile
+	 */
+	void deleteIndexFile()
+	{
+		File indexFile = this.getIndexFile();
+
+		if (indexFile != null && indexFile.exists())
+		{
+			indexFile.delete();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.index.core.IReadWriteMonitor#enterRead()
+	 */
+	@Override
+	public void enterRead()
+	{
+		if (this.monitor != null)
+		{
+			this.monitor.enterRead();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.index.core.IReadWriteMonitor#enterWrite()
+	 */
+	@Override
+	public void enterWrite()
+	{
+		if (this.monitor != null)
+		{
+			this.monitor.enterWrite();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.index.core.IReadWriteMonitor#exitRead()
+	 */
+	@Override
+	public void exitRead()
+	{
+		if (this.monitor != null)
+		{
+			this.monitor.exitRead();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.index.core.IReadWriteMonitor#exitReadEnterWrite()
+	 */
+	@Override
+	public boolean exitReadEnterWrite()
+	{
+		boolean result = false;
+
+		if (this.monitor != null)
+		{
+			result = this.monitor.exitReadEnterWrite();
+		}
+
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.index.core.IReadWriteMonitor#exitWrite()
+	 */
+	@Override
+	public void exitWrite()
+	{
+		if (this.monitor != null)
+		{
+			this.monitor.exitWrite();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.index.core.IReadWriteMonitor#exitWriteEnterRead()
+	 */
+	@Override
+	public void exitWriteEnterRead()
+	{
+		if (this.monitor != null)
+		{
+			this.monitor.exitWriteEnterRead();
+		}
 	}
 
 	/**
@@ -377,33 +473,46 @@ public class Index
 	 */
 	public List<QueryResult> query(String[] categories, String key, int matchRule) throws IOException
 	{
-		if (this.memoryIndex.shouldMerge() && monitor.exitReadEnterWrite())
+		Map<String, QueryResult> results = null;
+		
+		try
 		{
-			try
+			// NOTE: I'd like to lock later in the method, but it would contort
+			// the IReadWriteMonitor interface, so we lock here and stick with
+			// the call to exitReadEnterWrite below
+			this.enterRead();
+			
+			if (this.memoryIndex.shouldMerge() && monitor.exitReadEnterWrite())
 			{
-				save();
+				try
+				{
+					this.save(false);
+				}
+				finally
+				{
+					monitor.exitWriteEnterRead();
+				}
 			}
-			finally
+	
+			int rule = matchRule & MATCH_RULE_INDEX_MASK;
+	
+			if (this.memoryIndex.hasChanged())
 			{
-				monitor.exitWriteEnterRead();
+				results = this.diskIndex.addQueryResults(categories, key, rule, this.memoryIndex);
+				results = this.memoryIndex.addQueryResults(categories, key, rule, results);
+			}
+			else
+			{
+				results = this.diskIndex.addQueryResults(categories, key, rule, null);
 			}
 		}
-
-		Map<String, QueryResult> results;
-		int rule = matchRule & MATCH_RULE_INDEX_MASK;
-
-		if (this.memoryIndex.hasChanged())
+		finally
 		{
-			results = this.diskIndex.addQueryResults(categories, key, rule, this.memoryIndex);
-			results = this.memoryIndex.addQueryResults(categories, key, rule, results);
+			this.exitRead();
+			
+			// clear any cached regexes or patterns we might have used during the query
+			PATTERNS.clear();
 		}
-		else
-		{
-			results = this.diskIndex.addQueryResults(categories, key, rule, null);
-		}
-
-		// clear any cached regexes or patterns we might have used during the query
-		PATTERNS.clear();
 
 		return (results == null) ? null : new ArrayList<QueryResult>(results.values());
 	}
@@ -463,19 +572,47 @@ public class Index
 	 */
 	public void save() throws IOException
 	{
-		// must own the write lock of the monitor
-		if (!hasChanged())
+		this.save(true);
+	}
+	
+	/**
+	 * save
+	 * 
+	 * @param lock
+	 * @throws IOException
+	 */
+	private void save(boolean lock) throws IOException
+	{
+		// NOTE: Unfortunately we need the ugly "lock" flag hack in order to
+		// prevent hanging when save is called from query
+		try
 		{
-			return;
+			if (lock)
+			{
+				this.enterWrite();
+			}
+			
+			// must own the write lock of the monitor
+			if (!hasChanged())
+			{
+				return;
+			}
+	
+			int numberOfChanges = this.memoryIndex.numberOfChanges();
+			this.diskIndex = this.diskIndex.mergeWith(this.memoryIndex);
+			this.memoryIndex = new MemoryIndex();
+	
+			if (numberOfChanges > 1000)
+			{
+				System.gc(); // reclaim space if the MemoryIndex was very BIG
+			}
 		}
-
-		int numberOfChanges = this.memoryIndex.numberOfChanges();
-		this.diskIndex = this.diskIndex.mergeWith(this.memoryIndex);
-		this.memoryIndex = new MemoryIndex();
-
-		if (numberOfChanges > 1000)
+		finally
 		{
-			System.gc(); // reclaim space if the MemoryIndex was very BIG
+			if (lock)
+			{
+				this.exitWrite();
+			}
 		}
 	}
 
