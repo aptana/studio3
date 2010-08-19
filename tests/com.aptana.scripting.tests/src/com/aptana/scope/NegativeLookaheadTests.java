@@ -45,4 +45,11 @@ public class NegativeLookaheadTests extends TestCase
 		assertTrue(selector.matches("A B C"));
 		assertFalse(selector.matches("A B C D"));
 	}
+	
+	public void testAS3_894()
+	{
+		ScopeSelector selector = new ScopeSelector("source -meta.source.embedded");
+
+		assertTrue(selector.matches("text.html.basic source.css.embedded.html"));
+	}
 }
