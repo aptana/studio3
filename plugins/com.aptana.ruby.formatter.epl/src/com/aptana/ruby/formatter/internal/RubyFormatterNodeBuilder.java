@@ -49,6 +49,7 @@ import org.jrubyparser.ast.RescueNode;
 import org.jrubyparser.ast.SClassNode;
 import org.jrubyparser.ast.StrNode;
 import org.jrubyparser.ast.UntilNode;
+import org.jrubyparser.ast.VCallNode;
 import org.jrubyparser.ast.WhenNode;
 import org.jrubyparser.ast.WhileNode;
 import org.jrubyparser.ast.XStrNode;
@@ -66,9 +67,11 @@ import com.aptana.ruby.formatter.internal.nodes.FormatterBeginNode;
 import com.aptana.ruby.formatter.internal.nodes.FormatterCaseNode;
 import com.aptana.ruby.formatter.internal.nodes.FormatterClassNode;
 import com.aptana.ruby.formatter.internal.nodes.FormatterDoNode;
+import com.aptana.ruby.formatter.internal.nodes.FormatterElseIfNode;
 import com.aptana.ruby.formatter.internal.nodes.FormatterEnsureNode;
 import com.aptana.ruby.formatter.internal.nodes.FormatterForNode;
 import com.aptana.ruby.formatter.internal.nodes.FormatterHashNode;
+import com.aptana.ruby.formatter.internal.nodes.FormatterIfElseNode;
 import com.aptana.ruby.formatter.internal.nodes.FormatterIfEndNode;
 import com.aptana.ruby.formatter.internal.nodes.FormatterIfNode;
 import com.aptana.ruby.formatter.internal.nodes.FormatterMethodNode;
@@ -177,9 +180,12 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				Node bodyNode = visited.getBodyNode();
 				// checkedPop(methodNode, visited.getEnd().getPosition().getStartOffset());
 				int bodyEndOffset;
-				if (bodyNode != null) {
+				if (bodyNode != null)
+				{
 					bodyEndOffset = bodyNode.getPosition().getEndOffset();
-				} else {
+				}
+				else
+				{
 					bodyEndOffset = position.getEndOffset() - 3;
 				}
 				checkedPop(methodNode, bodyEndOffset);
@@ -226,7 +232,8 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			{
 				FormatterForNode forNode = new FormatterForNode(document);
 				Node bodyNode = visited.getBodyNode();
-				forNode.setBegin(createTextNode(document, visited.getPosition().getStartOffset(), bodyNode.getPosition().getStartOffset() - 1));
+				forNode.setBegin(createTextNode(document, visited.getPosition().getStartOffset(), bodyNode
+						.getPosition().getStartOffset() - 1));
 				push(forNode);
 				visitChildren(visited);
 				// checkedPop(forNode, visited.getEnd().getPosition().getStartOffset());
@@ -353,44 +360,56 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 						.getPosition().getEndOffset()));
 				push(ifNode);
 				Node thenBody = visited.getThenBody();
+				Node elseBody = visited.getElseBody();
+				// Flip the 'else' and 'then' in case the 'then' appears 'after the 'else'
+				// This is the case with 'unless', so we flip it to make it easier to handle.
+				if (elseBody != null && thenBody != null)
+				{
+					if (thenBody.getPosition().getStartOffset() > elseBody.getPosition().getStartOffset())
+					{
+						Node temp = thenBody;
+						thenBody = elseBody;
+						elseBody = temp;
+					}
+				}
 				visitChild(thenBody);
-				checkedPop(ifNode, visited.getElseBody() != null ? visited.getElseBody().getPosition().getStartOffset()
-						: thenBody.getPosition().getEndOffset());
-				Node branch = visited.getElseBody();
-				// FIXME: Shalom - Handle the IF-THEN-ELSE!
-				// while (branch != null)
-				// {
-				// if (branch instanceof IfNode.ElseIf)
-				// {
-				// final IfNode.ElseIf elseIfBranch = (IfNode.ElseIf) branch;
-				// FormatterElseIfNode elseIfNode = new FormatterElseIfNode(document);
-				// elseIfNode.setBegin(createTextNode(document, elseIfBranch.getStartOffset(), elseIfBranch
-				// .getCondition().getEndOffset()));
-				// push(elseIfNode);
-				// visitChild(elseIfBranch.getFirstBody());
-				// branch = ((IfNode.ElseIf) branch).getSecondBody();
-				// checkedPop(elseIfNode, branch != null ? branch.getStartOffset() : visited.getEndKeyword()
-				// .getPosition().getStartOffset());
-				// }
-				// else if (branch instanceof ElseNode)
-				// {
-				// final ElseNode elseBranch = (ElseNode) branch;
-				// FormatterIfElseNode elseNode = new FormatterIfElseNode(document);
-				// elseNode.setBegin(createTextNode(document, elseBranch.getElseKeyword()));
-				// push(elseNode);
-				// visitChild(elseBranch.getStatement());
-				// checkedPop(elseNode, visited.getEndKeyword().getPosition().getStartOffset());
-				// branch = null;
-				// }
-				// else
-				// {
-				// RubyFormatterPlugin.warn(NLS.bind("Unexpected {0} class in if expression", branch.getClass()
-				// .getName()), new DumpStackOnly());
-				// break;
-				// }
-				// }
+				if (thenBody == null && elseBody != null)
+				{
+					// We have an 'unless' case, so we just visit the else-boby
+					visitChild(elseBody);
+				}
+				checkedPop(ifNode, ifNode.getEndOffset());
+				
+				while (elseBody != null && thenBody != null)
+				{
+					if (elseBody instanceof IfNode)
+					{
+						// elsif
+						IfNode elseIfBranch = (IfNode) elseBody;
+						FormatterElseIfNode elseIfNode = new FormatterElseIfNode(document);
+						elseIfNode.setBegin(createTextNode(document, thenBody.getPosition().getEndOffset(),
+								elseIfBranch.getCondition().getPosition().getEndOffset()));
+						push(elseIfNode);
+						thenBody = elseIfBranch.getThenBody();
+						visitChild(thenBody);
+						elseBody = elseIfBranch.getElseBody();
+						// checkedPop(elseIfNode, branch != null ? branch.getStartOffset() : visited.getEndKeyword()
+						// .getPosition().getStartOffset());
+						checkedPop(elseIfNode, elseIfNode.getEndOffset());
+					}
+					else
+					{
+						// else
+						FormatterIfElseNode elseNode = new FormatterIfElseNode(document);
+						elseNode.setBegin(createTextNode(document, thenBody.getPosition().getEndOffset(), elseBody
+								.getPosition().getStartOffset()));
+						push(elseNode);
+						visitChild(elseBody);
+						checkedPop(elseNode, elseNode.getEndOffset());
+						elseBody = null;
+					}
+				}
 
-				// TODO - Fix this!
 				// -3 for 'end'
 				addChild(new FormatterIfEndNode(document, position.getEndOffset() - 3, position.getEndOffset()));
 				return null;
@@ -514,6 +533,15 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				return null;
 			}
 
+			public Object visitVCallNode(VCallNode visited)
+			{
+				SourcePosition position = visited.getPosition();
+				FormatterStringNode strNode = new FormatterStringNode(document, position.getStartOffset(), position
+						.getEndOffset());
+				addChild(strNode);
+				return null;
+			}
+
 			public Object visitDStrNode(DStrNode visited)
 			{
 				SourcePosition position = visited.getPosition();
@@ -569,12 +597,15 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 					FormatterRequireNode requireNode = new FormatterRequireNode(document, position.getStartOffset(),
 							position.getEndOffset());
 					addChild(requireNode);
-					return null;
 				}
 				else
 				{
-					return super.visitFCallNode(visited);
+					SourcePosition position = visited.getPosition();
+					FormatterStringNode strNode = new FormatterStringNode(document, position.getStartOffset(), position
+							.getEndOffset());
+					addChild(strNode);
 				}
+				return null;
 			}
 
 			public Object visitArrayNode(ArrayNode visited)
