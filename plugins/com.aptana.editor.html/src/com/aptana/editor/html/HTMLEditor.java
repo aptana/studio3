@@ -60,7 +60,7 @@ public class HTMLEditor extends AbstractThemeableEditor
 		setSourceViewerConfiguration(new HTMLSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new HTMLDocumentProvider());
 	}
-	
+
 	@Override
 	protected FileService createFileService()
 	{

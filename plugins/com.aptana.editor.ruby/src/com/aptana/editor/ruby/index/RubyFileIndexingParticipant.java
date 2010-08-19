@@ -60,7 +60,7 @@ public class RubyFileIndexingParticipant implements IFileStoreIndexingParticipan
 			{
 				return;
 			}
-			
+
 			// create parser and associated parse state
 			IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IRubyParserConstants.LANGUAGE);
 
@@ -70,10 +70,10 @@ public class RubyFileIndexingParticipant implements IFileStoreIndexingParticipan
 
 				RubySourceParser sourceParser = parser.getSourceParser();
 				ParserResult result = sourceParser.parse(store.getName(), source);
-				
+
 				pool.checkIn(parser);
 				sub.worked(50);
-				
+
 				Node root = result.getAST();
 				ISourceElementRequestor builder = new RubySourceIndexer(index, store.toURI());
 				SourceElementVisitor visitor = new SourceElementVisitor(builder);
