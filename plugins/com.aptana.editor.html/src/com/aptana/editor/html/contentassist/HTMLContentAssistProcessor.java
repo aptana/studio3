@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -166,33 +164,20 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @param attributeName
 	 */
-	private void addAttributeValueProposals(List<ICompletionProposal> proposals, int offset, String attributeName)
+	private void addAttributeValueProposals(List<ICompletionProposal> proposals, int offset, String elementName, String attributeName)
 	{
-		// NOTE: the logic for handling an attribute list and duplicate values
-		// will go away once the metadata format is fixed so that multiple
-		// attributes with the same name can disambiguate what elements they
-		// belong to.
-		List<AttributeElement> attributes = this._queryHelper.getAttribute(attributeName);
+		AttributeElement attribute = this._queryHelper.getAttribute(elementName, attributeName);
 
-		if (attributes != null)
+		if (attribute != null)
 		{
-			Set<String> addedNames = new HashSet<String>();
-
-			for (AttributeElement attribute : attributes)
+			for (ValueElement value : attribute.getValues())
 			{
-				for (ValueElement value : attribute.getValues())
-				{
-					String name = value.getName();
+				String name = value.getName();
+				Image icon = ATTRIBUTE_ICON;
+				String description = value.getDescription();
+				Image[] userAgentIcons = this.getAllUserAgentIcons();
 
-					if (addedNames.contains(name) == false)
-					{
-						Image[] userAgentIcons = this.getAllUserAgentIcons();
-
-						this.addProposal(proposals, value.getName(), ATTRIBUTE_ICON, value.getDescription(), userAgentIcons, offset);
-
-						addedNames.add(name);
-					}
-				}
+				this.addProposal(proposals, name, icon, description, userAgentIcons, offset);
 			}
 		}
 	}
@@ -242,7 +227,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			}
 			else
 			{
-				addAttributeValueProposals(proposals, offset, attributeName);
+				String elementName = this.getElementName(lexemeProvider, offset);
+				
+				this.addAttributeValueProposals(proposals, offset, elementName, attributeName);
 			}
 		}
 	}
