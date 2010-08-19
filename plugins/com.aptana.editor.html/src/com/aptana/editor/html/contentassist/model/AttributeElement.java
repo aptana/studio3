@@ -7,6 +7,7 @@ public class AttributeElement
 {
 	private String _name;
 	private String _type;
+	private String _element;
 	private List<SpecificationElement> _specifications = new LinkedList<SpecificationElement>();
 	private List<UserAgentElement> _userAgents = new LinkedList<UserAgentElement>();
 	private String _deprecated;
@@ -87,6 +88,16 @@ public class AttributeElement
 		return this._description;
 	}
 
+	/**
+	 * getElement
+	 * 
+	 * @return
+	 */
+	public String getElement()
+	{
+		return this._element;
+	}
+	
 	/**
 	 * getHint
 	 * 
@@ -187,6 +198,16 @@ public class AttributeElement
 		this._description = description;
 	}
 
+	/**
+	 * setElement
+	 * 
+	 * @param element
+	 */
+	public void setElement(String element)
+	{
+		this._element = element;
+	}
+	
 	/**
 	 * setHint
 	 * 
