@@ -34,7 +34,9 @@
  */
 package com.aptana.editor.common;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -68,10 +70,13 @@ import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import com.aptana.editor.common.contentassist.ContentAssistant;
 import com.aptana.editor.common.contentassist.InformationControl;
 import com.aptana.editor.common.hover.CommonAnnotationHover;
+import com.aptana.editor.common.internal.formatter.CommonMultiPassContentFormatter;
 import com.aptana.editor.common.text.CommonDoubleClickStrategy;
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
 import com.aptana.editor.common.text.reconciler.CommonCompositeReconcilingStrategy;
 import com.aptana.editor.common.text.reconciler.CommonReconciler;
+import com.aptana.formatter.ui.ScriptFormatterManager;
+import com.aptana.formatter.ui.ScriptFormattingStrategy;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
 
@@ -81,6 +86,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	private AbstractThemeableEditor fTextEditor;
 	private CommonDoubleClickStrategy fDoubleClickStrategy;
 	private IPreferenceChangeListener fThemeChangeListener;
+	private static final String CONTENTTYPE_HTML_PREFIX = "com.aptana.contenttype.html"; //$NON-NLS-1$
 
 	/**
 	 * CommonSourceViewerConfiguration
@@ -206,31 +212,51 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	/**
 	 * Collects the code formatters by the supported content-types and returns a new {@link MultiPassContentFormatter}
 	 * that holds them.<br>
-	 * Note that the first content-type that has a registered formatter is defined as the 'master' formatter, while all
-	 * the rest are defined as the 'slave' formatters. Therefore, there is an order importance to the content-types that
-	 * are returned from the {@link #getConfiguredContentTypes(ISourceViewer)}.
+	 * The returned content formatter is computed from the result of {@link #getTopContentTypes()}. The first element in
+	 * the returned array should define the 'master' formatter. While the rest of the elements should contain the
+	 * 'slave' formatter. <br>
+	 * Note that each slave formatter is located in the last element of each inner-array that was returned from the
+	 * getTopContentTypes call.
 	 */
 	public IContentFormatter getContentFormatter(ISourceViewer sourceViewer)
 	{
 		final String[][] contentTypes = getTopContentTypes();
-		final MultiPassContentFormatter formatter = new MultiPassContentFormatter(
+		final MultiPassContentFormatter formatter = new CommonMultiPassContentFormatter(
 				getConfiguredDocumentPartitioning(sourceViewer), IDocument.DEFAULT_CONTENT_TYPE);
 		boolean masterSet = false;
+		Set<String> addedFormatters = new HashSet<String>();
 		for (String contentTypeArr[] : contentTypes)
 		{
-			
-//			if (ScriptFormatterManager.hasFormatterFor(contentType))
-//			{
-//				if (!masterSet)
-//				{
-//					formatter.setMasterStrategy(new ScriptFormattingStrategy(contentType));
-//					masterSet = true;
-//				}
-//				else
-//				{
-//					formatter.setSlaveStrategy(new ScriptFormattingStrategy(contentType), contentType);
-//				}
-//			}
+			// The first item in the array should contain the master formatter strategy
+			// In case it starts with the HTML prefix (like in PHP, ERB etc.), we try to set
+			// the master to the HTML formatter.
+			if (!masterSet && contentTypeArr[0].startsWith(CONTENTTYPE_HTML_PREFIX))
+			{
+				if (ScriptFormatterManager.hasFormatterFor(CONTENTTYPE_HTML_PREFIX))
+				{
+					formatter.setMasterStrategy(new ScriptFormattingStrategy(CONTENTTYPE_HTML_PREFIX));
+					masterSet = true;
+					addedFormatters.add(CONTENTTYPE_HTML_PREFIX);
+				}
+				else
+				{
+					CommonEditorPlugin
+							.logWarning("Could not located an expected code formatter for '" + CONTENTTYPE_HTML_PREFIX + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			}
+			String contentType = contentTypeArr[contentTypeArr.length - 1];
+			if (!addedFormatters.contains(contentType) && ScriptFormatterManager.hasFormatterFor(contentType))
+			{
+				if (!masterSet)
+				{
+					formatter.setMasterStrategy(new ScriptFormattingStrategy(contentType));
+					masterSet = true;
+				}
+				else
+				{
+					formatter.setSlaveStrategy(new ScriptFormattingStrategy(contentType), contentType);
+				}
+			}
 		}
 		return formatter;
 	}

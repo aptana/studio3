@@ -33,4 +33,13 @@ public interface IDocumentScopeManager
 	 */
 	public void setDocumentScope(IDocument document, String defaultScope, String fileName);
 
+	/**
+	 * Returns a qualified, un-translated, content-type at a specific offset. <br>
+	 * 
+	 * @param document
+	 * @param offset
+	 * @return A QualifiedContentType of the content at a specific offset.
+	 * @throws BadLocationException 
+	 */
+	public QualifiedContentType getContentType(IDocument document, int offset) throws BadLocationException;
 }
