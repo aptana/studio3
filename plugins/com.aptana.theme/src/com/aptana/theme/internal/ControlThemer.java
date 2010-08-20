@@ -1,6 +1,9 @@
 package com.aptana.theme.internal;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -34,6 +37,7 @@ class ControlThemer implements IControlThemer
 	private Control control;
 
 	private Listener selectionOverride;
+	private IPreferenceChangeListener fThemeChangeListener;
 
 	public ControlThemer(Control control)
 	{
@@ -43,6 +47,7 @@ class ControlThemer implements IControlThemer
 	@Override
 	public void apply()
 	{
+		addThemeChangeListener();
 		applyTheme();
 	}
 
@@ -71,6 +76,8 @@ class ControlThemer implements IControlThemer
 
 			control.setRedraw(true);
 		}
+
+		removeThemeListener();
 	}
 
 	protected Font getFont()
@@ -141,8 +148,9 @@ class ControlThemer implements IControlThemer
 
 					event.detail &= ~SWT.SELECTED;
 					event.detail &= ~SWT.BACKGROUND;
-					
-					// force foreground color. Otherwise on dark themes we get black FG (all the time on Win, on non-focus for Mac)
+
+					// force foreground color. Otherwise on dark themes we get black FG (all the time on Win, on
+					// non-focus for Mac)
 					gc.setForeground(getForeground());
 				}
 			}
@@ -157,6 +165,32 @@ class ControlThemer implements IControlThemer
 			getControl().removeListener(SWT.EraseItem, selectionOverride);
 		}
 		selectionOverride = null;
+	}
+
+	private void addThemeChangeListener()
+	{
+		fThemeChangeListener = new IPreferenceChangeListener()
+		{
+
+			@Override
+			public void preferenceChange(PreferenceChangeEvent event)
+			{
+				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
+				{
+					applyTheme();
+				}
+			}
+		};
+		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+	}
+
+	private void removeThemeListener()
+	{
+		if (fThemeChangeListener != null)
+		{
+			new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
+			fThemeChangeListener = null;
+		}
 	}
 
 }
