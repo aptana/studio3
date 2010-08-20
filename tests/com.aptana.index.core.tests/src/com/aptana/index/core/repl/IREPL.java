@@ -52,6 +52,8 @@ import com.aptana.internal.index.core.DiskIndex;
 public class IREPL
 {
 	private static final Map<String, ICommand> COMMAND_MAP;
+	
+	private String indexDirectory = "/Users/klindsey/Documents/Workspaces/runtime-red.product/.metadata/.plugins/com.aptana.index.core";
 	private List<DiskIndex> indexes;
 	private DiskIndex currentIndex;
 	private String currentCategory;
@@ -71,7 +73,8 @@ public class IREPL
 			new SearchWordContent(), //
 			
 			new SetCategoryName(), //
-			new SetIndex() //
+			new SetIndex(), //
+			new SetIndexDirectory() //
 		};
 
 		COMMAND_MAP = new HashMap<String, ICommand>();
@@ -170,6 +173,16 @@ public class IREPL
 	}
 	
 	/**
+	 * getIndexDirectory
+	 * 
+	 * @return
+	 */
+	public String getIndexDirectory()
+	{
+		return this.indexDirectory;
+	}
+	
+	/**
 	 * getIndexes
 	 * 
 	 * @return
@@ -186,7 +199,7 @@ public class IREPL
 	{
 		indexes = new ArrayList<DiskIndex>();
 
-		File indexHome = new File("/Users/klindsey/Documents/Workspaces/runtime-red.product/.metadata/.plugins/com.aptana.index.core");
+		File indexHome = new File(this.getIndexDirectory());
 		FileFilter filter = new FileFilter()
 		{
 			@Override
@@ -302,5 +315,15 @@ public class IREPL
 	public void setCurrentIndex(DiskIndex index)
 	{
 		this.currentIndex = index;
+	}
+	
+	/**
+	 * setIndexDirectory
+	 * 
+	 * @param directory
+	 */
+	public void setIndexDirectory(String directory)
+	{
+		this.indexDirectory = directory;
 	}
 }
