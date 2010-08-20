@@ -11,12 +11,14 @@ import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.custom.LineBackgroundEvent;
 import org.eclipse.swt.custom.LineBackgroundListener;
+import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.ui.PlatformUI;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
@@ -156,7 +158,7 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 				return true;
 			}
 			// Force redraw if there's a non-empty selection!
-			Point selection = fViewer.getTextWidget().getSelection();
+			Point selection = fViewer.getTextWidget().getSelectionRange();
 			if (selection.y != 0)
 			{
 				return true;
@@ -271,26 +273,56 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 		// We're coloring whole line based on what the trailing end bg color should be.
 		try
 		{
-			int offset = event.lineOffset;
+			final int offset = event.lineOffset;
 			IDocument document = fViewer.getDocument();
 			int line = document.getLineOfOffset(offset);
-			
+			final IRegion lineRegion = document.getLineInformation(line);
+
 			// Check if we need to use a fully opaque current line highlight here.
-			int modelCaret = getModelCaret();
-			int lineNumber = document.getLineOfOffset(modelCaret);
-			if (line == lineNumber)
+			// must have no selection, be same as current line, be fully opaque
+			Point selection = fViewer.getTextWidget().getSelectionRange();
+			if (selection.y == 0)
 			{
-				// current line!
 				RGBa lineHighlight = getCurrentTheme().getLineHighlight();
-				if (lineHighlight.isFullyOpaque())
+				if (lineHighlight.isFullyOpaque()) // fully opaque
 				{
-					// FIXME In this case, we should be overriding the bg of the style ranges for the line too!
-					event.lineBackground = ThemePlugin.getDefault().getColorManager().getColor(lineHighlight.toRGB());
-					return;
+					int modelCaret = getModelCaret();
+					int lineNumber = document.getLineOfOffset(modelCaret);
+					if (line == lineNumber) // current line!
+					{
+						event.lineBackground = ThemePlugin.getDefault().getColorManager()
+								.getColor(lineHighlight.toRGB());
+						// In this case, we should be overriding the bg of the style ranges for the line too!
+						PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
+						{
+							@Override
+							public void run()
+							{
+								// FIXME Only change bg colors of visible ranges!
+								StyleRange[] ranges = fViewer.getTextWidget().getStyleRanges(offset,
+										Math.min(160, lineRegion.getLength()), true);
+								if (ranges == null || ranges.length == 0)
+								{
+									return;
+								}
+								int[] positions = new int[ranges.length * 2];
+								int x = 0;
+								for (StyleRange range : ranges)
+								{
+									range.background = null;
+									positions[x] = range.start;
+									positions[x + 1] = range.length;
+									x += 2;
+								}
+								fViewer.getTextWidget().setStyleRanges(offset, Math.min(160, lineRegion.getLength()),
+										positions, ranges);
+							}
+						});
+						return;
+					}
 				}
 			}
 
-			IRegion lineRegion = document.getLineInformation(line);
 			String endOfLineScope = getScopeManager().getScopeAtOffset(document, lineRegion.getLength() + offset);
 			String commonPrefix = getScope(document, line, endOfLineScope);
 			TextAttribute at = getCurrentTheme().getTextAttribute(commonPrefix);
