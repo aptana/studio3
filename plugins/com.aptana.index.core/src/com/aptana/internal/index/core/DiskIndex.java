@@ -592,6 +592,26 @@ public class DiskIndex
 	}
 	
 	/**
+	 * getDocuments
+	 * 
+	 * @return
+	 */
+	public List<String> getDocuments()
+	{
+		List<String> result = Collections.emptyList();
+		
+		try
+		{
+			result = this.readAllDocumentNames();
+		}
+		catch (IOException e)
+		{
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * initialize
 	 * 
 	 * @throws IOException
