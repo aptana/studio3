@@ -150,9 +150,13 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 
 				fCurrentLine.offset = document.getLineOffset(lineNumber);
 				if (lineNumber == document.getNumberOfLines() - 1)
+				{
 					fCurrentLine.length = document.getLength() - fCurrentLine.offset;
+				}
 				else
+				{
 					fCurrentLine.length = document.getLineOffset(lineNumber + 1) - fCurrentLine.offset;
+				}
 
 				fLastLineNumber = lineNumber;
 				return true;
@@ -175,7 +179,9 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 	{
 		Point selection = fViewer.getTextWidget().getSelectionRange();
 		if (selection.y != 0)
+		{
 			return null;
+		}
 		try
 		{
 			int line = fViewer.getDocument().getLineOfOffset(selection.x);
@@ -212,7 +218,9 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 
 		// if the position that is about to be drawn was deleted then we can't
 		if (position.isDeleted())
+		{
 			return null;
+		}
 
 		int widgetOffset = 0;
 		if (fViewer instanceof ITextViewerExtension5)
@@ -221,8 +229,9 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 			ITextViewerExtension5 extension = (ITextViewerExtension5) fViewer;
 			widgetOffset = extension.modelOffset2WidgetOffset(position.getOffset());
 			if (widgetOffset == -1)
+			{
 				return null;
-
+			}
 		}
 		else
 		{
@@ -230,7 +239,9 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 			IRegion visible = fViewer.getVisibleRegion();
 			widgetOffset = position.getOffset() - visible.getOffset();
 			if (widgetOffset < 0 || visible.getLength() < widgetOffset)
+			{
 				return null;
+			}
 		}
 
 		StyledText textWidget = fViewer.getTextWidget();
@@ -241,7 +252,6 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 			Point upperLeft = textWidget.getLocationAtOffset(widgetOffset);
 			int width = textWidget.getClientArea().width + textWidget.getHorizontalPixel();
 			int height = textWidget.getLineHeight(widgetOffset);
-
 			return new Rectangle(0, upperLeft.y, width, height);
 		}
 
@@ -403,6 +413,14 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 	@Override
 	public void paintControl(PaintEvent e)
 	{
+		// If there's no alpha value for the line highlight, then we need to force the bg color of the whole line
+		// to the rgb value!
+		RGBa lineHighlight = getCurrentTheme().getLineHighlight();
+		if (lineHighlight.isFullyOpaque())
+		{
+			return;
+		}
+
 		Rectangle rect = new Rectangle(e.x, e.y, e.width, e.height);
 		Rectangle lineRect = getLineRectangle(getCurrentLinePosition());
 		if (lineRect == null || !lineRect.intersects(rect))
@@ -412,16 +430,6 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 
 		// Only paint the part of lineRect that is contained in rect!
 		Rectangle intersection = lineRect.intersection(rect);
-		RGBa lineHighlight = getCurrentTheme().getLineHighlight();
-
-		// FIXME If there's no alpha value for the line highlight, then we need to force the bg color of the whole line
-		// to the rgb value!
-		if (lineHighlight.isFullyOpaque())
-		{
-			// For now, maybe we should just assume an alpha value of 128?
-			return;
-		}
-
 		e.gc.setAlpha(lineHighlight.getAlpha());
 		e.gc.setBackground(ThemePlugin.getDefault().getColorManager().getColor(lineHighlight.toRGB()));
 		e.gc.fillRectangle(intersection);
