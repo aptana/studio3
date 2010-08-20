@@ -47,6 +47,7 @@ import org.jrubyparser.ast.PreExeNode;
 import org.jrubyparser.ast.RegexpNode;
 import org.jrubyparser.ast.RescueBodyNode;
 import org.jrubyparser.ast.RescueNode;
+import org.jrubyparser.ast.ReturnNode;
 import org.jrubyparser.ast.SClassNode;
 import org.jrubyparser.ast.StrNode;
 import org.jrubyparser.ast.UntilNode;
@@ -96,7 +97,7 @@ import com.aptana.ruby.formatter.internal.nodes.FormatterWhileNode;
 public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 {
 
-	public IFormatterContainerNode build(ParserResult result, final IFormatterDocument document)
+	public IFormatterContainerNode build(final ParserResult result, final IFormatterDocument document)
 	{
 		final IFormatterContainerNode root = new FormatterRootNode(document);
 		start(root);
@@ -192,7 +193,7 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				}
 				else
 				{
-					bodyEndOffset = position.getEndOffset() - 3;
+					bodyEndOffset = locateEndOffset(document, position.getEndOffset());
 				}
 				checkedPop(methodNode, bodyEndOffset);
 				methodNode.setEnd(createTextNode(document, bodyEndOffset, position.getEndOffset()));
@@ -373,28 +374,6 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 			public Object visitIfNode(IfNode visited)
 			{
-				// if (visited.isInline())
-				// {
-				// List children = new ArrayList(3);
-				// if (visited.getThenBody() != null)
-				// {
-				// children.add(visited.getThenBody());
-				// }
-				// if (visited.getElseBody() != null)
-				// {
-				// children.add(visited.getElseBody());
-				// }
-				// if (visited.getCondition() != null)
-				// {
-				// children.add(visited.getCondition());
-				// }
-				// if (!children.isEmpty())
-				// {
-				// Collections.sort(children, POSITION_COMPARATOR);
-				// visitChildren(children);
-				// }
-				// return null;
-				// }
 				FormatterIfNode ifNode = new FormatterIfNode(document);
 				SourcePosition position = visited.getPosition();
 				ifNode.setBegin(createTextNode(document, position.getStartOffset(), visited.getCondition()
@@ -402,6 +381,13 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				push(ifNode);
 				Node thenBody = visited.getThenBody();
 				Node elseBody = visited.getElseBody();
+
+				if (thenBody instanceof ReturnNode || elseBody instanceof ReturnNode)
+				{
+					// we have a special case of 'return if x' or 'return unless x' expression
+					checkedPop(ifNode, ifNode.getEndOffset());
+					return null;
+				}
 				// Flip the 'else' and 'then' in case the 'then' appears 'after the 'else'
 				// This is the case with 'unless', so we flip it to make it easier to handle.
 				int ifNodeEnd = -1; // the end position for the entire if block.
@@ -673,15 +659,20 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				// if (visited.getLeftBracketPosition() != null && visited.getRightBracketPosition() != null)
 				if ("[".equals(right) && "]".equals(left)) { //$NON-NLS-1$ //$NON-NLS-2$
 					final FormatterArrayNode arrayNode = new FormatterArrayNode(document);
-					arrayNode.setBegin(createTextNode(document, visited));
+					arrayNode.setBegin(createTextNode(document, position.getStartOffset(),
+							position.getStartOffset() + 1));
 					push(arrayNode);
-					SourcePosition lastNodePosition = visited.getLast().getPosition();
-					checkedPop(arrayNode, lastNodePosition.getEndOffset());
+					visitChildren(visited);
+					checkedPop(arrayNode, position.getEndOffset() - 1);
 					arrayNode.setEnd(createTextNode(document, position.getEndOffset() - 1, position.getEndOffset()));
 					return null;
 				}
 				else
 				{
+					// we should probably better handle ArrayNodes that arrive without the brackets.
+					// For example:
+					// job = Delayed::Job.find :first,
+					// :order => "run_at ASC"
 					return super.visitArrayNode(visited);
 				}
 			}
@@ -695,11 +686,12 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				// if (visited.getLeftBrace() != null && visited.getRightBrace() != null)
 				if ("{".equals(right) && "}".equals(left)) { //$NON-NLS-1$ //$NON-NLS-2$
 					final FormatterHashNode hashNode = new FormatterHashNode(document);
-					hashNode.setBegin(createTextNode(document, visited));
+					hashNode
+							.setBegin(createTextNode(document, position.getStartOffset(), position.getStartOffset() + 1));
 					push(hashNode);
 					// checkedPop(hashNode, right.getStartOffset());
-					SourcePosition listNodePosition = visited.getListNode().getPosition();
-					checkedPop(hashNode, listNodePosition.getEndOffset());
+					visitChildren(visited);
+					checkedPop(hashNode, position.getEndOffset() - 1);
 					hashNode.setEnd(createTextNode(document, position.getEndOffset() - 1, position.getEndOffset()));
 					return null;
 				}

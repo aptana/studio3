@@ -12,6 +12,7 @@
 package com.aptana.ruby.formatter.internal.nodes;
 
 import com.aptana.formatter.IFormatterDocument;
+import com.aptana.ruby.formatter.RubyFormatterConstants;
 
 
 public class FormatterHashNode extends FormatterBlockWithBeginEndNode {
@@ -23,4 +24,7 @@ public class FormatterHashNode extends FormatterBlockWithBeginEndNode {
 		super(document);
 	}
 
+	protected boolean isIndenting() {
+		return getDocument().getBoolean(RubyFormatterConstants.INDENT_BLOCKS);
+	}
 }
