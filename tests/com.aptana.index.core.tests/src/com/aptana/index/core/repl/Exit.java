@@ -24,9 +24,9 @@ public class Exit extends GenericCommand
 		
 		result.add("bye");
 		result.add("quit");
+		result.add("e");
 		result.add("b");
 		result.add("q");
-		result.add("e");
 		
 		return result;
 	}
