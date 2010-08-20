@@ -56,7 +56,7 @@ public class SearchDocumentName extends GenericCommand
 	@Override
 	public String getDescription()
 	{
-		return "Return a list of documents that contain the speficied name";
+		return "Find documents containing the specified text. Use * to return all documents. Current index is honored when set; otherwise, queries all indexes";
 	}
 
 	/*

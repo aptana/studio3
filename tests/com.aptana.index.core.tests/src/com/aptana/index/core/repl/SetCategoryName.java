@@ -64,7 +64,7 @@ public class SetCategoryName extends GenericCommand
 	@Override
 	public String getDescription()
 	{
-		return "Set the current category. If no args are passed in, it shows the current category";
+		return "Set current category to first one that contains specified text. If no args are passed in, it clears current category";
 	}
 
 	@Override

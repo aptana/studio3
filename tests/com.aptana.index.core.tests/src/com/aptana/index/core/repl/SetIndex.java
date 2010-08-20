@@ -57,7 +57,7 @@ public class SetIndex extends GenericCommand
 	@Override
 	public String getDescription()
 	{
-		return "Set the current index. If no args are passed in, it shows the current index";
+		return "Set current index to first one that contains specified text. If no args are passed in, it clears current index";
 	}
 
 	@Override

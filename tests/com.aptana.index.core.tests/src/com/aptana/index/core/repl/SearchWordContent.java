@@ -63,7 +63,7 @@ public class SearchWordContent extends GenericCommand
 	@Override
 	public String getDescription()
 	{
-		return "Find all words with the specified content";
+		return "Find words containing the specified text. Use * to return all words. Current index and category are honored when set; otherwise, queries all indexes and/or categories";
 	}
 
 	/*

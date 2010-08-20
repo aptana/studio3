@@ -56,7 +56,7 @@ public class SearchCategoryName extends GenericCommand
 	@Override
 	public String getDescription()
 	{
-		return "Return a list of categories that contain the speficied name";
+		return "Find categories containing the specified text. Use * to return all categories. Current index is honored when set; otherwise, queries all indexes";
 	}
 
 	/*

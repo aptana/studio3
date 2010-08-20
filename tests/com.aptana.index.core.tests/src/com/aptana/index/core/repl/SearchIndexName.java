@@ -52,7 +52,7 @@ public class SearchIndexName extends GenericCommand
 	@Override
 	public String getDescription()
 	{
-		return "Return a list of indexes that match the specified pattern";
+		return "Find indexes containing the specified text. Use * to return all indexes.";
 	}
 
 	/*
