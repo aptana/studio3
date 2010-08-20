@@ -7,7 +7,7 @@ public interface HTMLIndexConstants
 	// general constants
 	static final String DELIMITER = "\0"; //$NON-NLS-1$
 	static final String SUB_DELIMITER = ","; //$NON-NLS-1$
-	static final String METADATA = PREFIX + "metadata"; //$NON-NLS-1$
+	static final String METADATA = "metadata:/html"; //$NON-NLS-1$
 	static final String CORE = "HTML Core"; //$NON-NLS-1$
 
 	// index categories

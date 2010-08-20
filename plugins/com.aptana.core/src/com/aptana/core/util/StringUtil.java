@@ -352,4 +352,8 @@ public abstract class StringUtil
 		return false;
 	}
 
+	public static boolean isEmpty(String text)
+	{
+		return text == null || text.length() == 0;
+	}
 }

@@ -35,7 +35,7 @@
 
 <xsl:template match="fields">
 	<attributes>
-		<xsl:apply-templates select="field|/content-assist/elements/element/fields/field[string-length(@type) > 0]">
+		<xsl:apply-templates select="field|/content-assist/elements/element/fields/field[count(*) > 0]">
 			<xsl:sort select="@name"/>
 		</xsl:apply-templates>
 	</attributes>
@@ -86,7 +86,7 @@
 		</xsl:if>
 		<xsl:apply-templates select="fields" mode="reference"/>
 		<xsl:copy-of select="availability"/>
-		<xsl:copy-of select="browsers"/>
+		<xsl:apply-templates select="browsers"/>
 		<xsl:copy-of select="deprecated"/>
 		<xsl:copy-of select="description"/>
 		<xsl:apply-templates select="events" mode="reference"/>
@@ -100,8 +100,13 @@
 	<attribute>
 		<xsl:copy-of select="@name"/>
 		<xsl:copy-of select="@type"/>
+		<xsl:if test="../../@name">
+			<xsl:attribute name="element">
+				<xsl:value-of select="../../@name"/>
+			</xsl:attribute>
+		</xsl:if>
 		<xsl:copy-of select="availability"/>
-		<xsl:copy-of select="browsers"/>
+		<xsl:apply-templates select="browsers"/>
 		<xsl:copy-of select="deprecated"/>
 		<xsl:copy-of select="description"/>
 		<xsl:copy-of select="hint"/>
@@ -116,7 +121,7 @@
 		<xsl:copy-of select="@name"/>
 		<xsl:copy-of select="@type"/>
 		<xsl:copy-of select="availability"/>
-		<xsl:copy-of select="browsers"/>
+		<xsl:apply-templates select="browsers"/>
 		<xsl:copy-of select="description"/>
 		<xsl:copy-of select="remarks"/>
 	</event>
@@ -130,6 +135,19 @@
 		<xsl:copy-of select="description"/>
 		<!-- skipping examples since they don't seem to provide any benefit -->
 	</entity>
+</xsl:template>
+
+<xsl:template match="browsers">
+	<browsers>
+		<xsl:apply-templates select="browser"/>
+	</browsers>
+</xsl:template>
+
+<xsl:template match="browser">
+	<xsl:if test="@platform = 'Safari'">
+		<browser platform="Chrome" version="5.0+"/>
+	</xsl:if>
+	<xsl:copy-of select="."/>
 </xsl:template>
 
 <xsl:template match="text()">

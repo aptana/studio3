@@ -118,6 +118,10 @@ module Ruble
       @jobj.license_url = license_url.join("\n")
     end
 
+    def project_template(type, name, location, description = nil)
+      @jobj.addProjectTemplate(type, name, location, description)
+    end
+
     # A proxy class to make syntax pretty...
     class FileTypesProxy
       def initialize(jobj)
