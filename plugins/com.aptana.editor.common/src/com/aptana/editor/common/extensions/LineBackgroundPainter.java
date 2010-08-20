@@ -154,9 +154,13 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 
 				fLastLineNumber = lineNumber;
 				return true;
-
 			}
-
+			// Force redraw if there's a non-empty selection!
+			Point selection = fViewer.getTextWidget().getSelection();
+			if (selection.y != 0)
+			{
+				return true;
+			}
 		}
 		catch (BadLocationException e)
 		{
@@ -267,10 +271,25 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 		// We're coloring whole line based on what the trailing end bg color should be.
 		try
 		{
-
 			int offset = event.lineOffset;
 			IDocument document = fViewer.getDocument();
 			int line = document.getLineOfOffset(offset);
+			
+			// Check if we need to use a fully opaque current line highlight here.
+			int modelCaret = getModelCaret();
+			int lineNumber = document.getLineOfOffset(modelCaret);
+			if (line == lineNumber)
+			{
+				// current line!
+				RGBa lineHighlight = getCurrentTheme().getLineHighlight();
+				if (lineHighlight.isFullyOpaque())
+				{
+					// FIXME In this case, we should be overriding the bg of the style ranges for the line too!
+					event.lineBackground = ThemePlugin.getDefault().getColorManager().getColor(lineHighlight.toRGB());
+					return;
+				}
+			}
+
 			IRegion lineRegion = document.getLineInformation(line);
 			String endOfLineScope = getScopeManager().getScopeAtOffset(document, lineRegion.getLength() + offset);
 			String commonPrefix = getScope(document, line, endOfLineScope);
@@ -346,21 +365,33 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 		return builder.toString();
 	}
 
+	/**
+	 * Draws the current line highlight (over top using theme colors and alpha).
+	 */
 	@Override
 	public void paintControl(PaintEvent e)
 	{
-		// Draw the current line highlight over top using alpha!
 		Rectangle rect = new Rectangle(e.x, e.y, e.width, e.height);
-		// TODO Only paint the part of lineRect that is contained in rect!
 		Rectangle lineRect = getLineRectangle(getCurrentLinePosition());
-		if (lineRect == null)
+		if (lineRect == null || !lineRect.intersects(rect))
 		{
 			return;
 		}
 
+		// Only paint the part of lineRect that is contained in rect!
+		Rectangle intersection = lineRect.intersection(rect);
 		RGBa lineHighlight = getCurrentTheme().getLineHighlight();
+
+		// FIXME If there's no alpha value for the line highlight, then we need to force the bg color of the whole line
+		// to the rgb value!
+		if (lineHighlight.isFullyOpaque())
+		{
+			// For now, maybe we should just assume an alpha value of 128?
+			return;
+		}
+
 		e.gc.setAlpha(lineHighlight.getAlpha());
 		e.gc.setBackground(ThemePlugin.getDefault().getColorManager().getColor(lineHighlight.toRGB()));
-		e.gc.fillRectangle(lineRect);
+		e.gc.fillRectangle(intersection);
 	}
 }
