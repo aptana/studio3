@@ -40,6 +40,7 @@ import org.jrubyparser.ast.IterNode;
 import org.jrubyparser.ast.ListNode;
 import org.jrubyparser.ast.MethodDefNode;
 import org.jrubyparser.ast.ModuleNode;
+import org.jrubyparser.ast.NilImplicitNode;
 import org.jrubyparser.ast.Node;
 import org.jrubyparser.ast.NodeType;
 import org.jrubyparser.ast.PostExeNode;
@@ -202,19 +203,24 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 			public Object visitWhileNode(WhileNode visited)
 			{
-				// if (!visited.isBlock())
-				// {
-				// visitChildren(visited);
-				// return null;
-				// }
 				FormatterWhileNode whileNode = new FormatterWhileNode(document);
-				whileNode.setBegin(createTextNode(document, visited));
-				push(whileNode);
-				visitChildren(visited);
-				// checkedPop(whileNode, visited.getEnd().getPosition().getStartOffset());
 				SourcePosition position = visited.getPosition();
+				Node conditionNode = visited.getConditionNode();
+				whileNode.setBegin(createTextNode(document, position.getStartOffset(), conditionNode.getPosition()
+						.getEndOffset()));
+				push(whileNode);
 				Node bodyNode = visited.getBodyNode();
-				int bodyEndOffset = bodyNode.getPosition().getEndOffset();
+				visitChildren(bodyNode);
+				int bodyEndOffset;
+				if (bodyNode instanceof NilImplicitNode)
+				{
+					// empty 'while' body
+					bodyEndOffset = whileNode.getEndOffset();
+				}
+				else
+				{
+					bodyEndOffset = bodyNode.getPosition().getEndOffset();
+				}
 				checkedPop(whileNode, bodyEndOffset);
 				whileNode.setEnd(createTextNode(document, bodyEndOffset, position.getEndOffset()));
 				return null;
@@ -463,16 +469,51 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			 */
 			public Object visitBeginNode(BeginNode visited)
 			{
+				/**
+				 * TODO -NEED TO SUPPORT THIS
+				 * <pre>
+				 * begin
+				 *   # main code here                                 				
+				 * rescue SomeException                               				
+				 *   # ...                                            				
+				 * rescue AnotherException                            				
+				 *   # ..                                             				
+				 * else                                               				
+				 *   # stuff you want to happen AFTER the main code,  				
+				 *   # but BEFORE the ensure block, but only if there 				
+				 *   # were no exceptions raised. Note, too, that     				
+				 *   # exceptions raised here won't be rescued by the 				
+				 *   # rescue clauses above.                          				
+				 * ensure                                             				
+				 *   # stuff that should happen dead last, and        				
+				 *   # regardless of whether any exceptions were      				
+				 *   # raised or not.                                 				
+				 * end                                                				
+				 * </pre>
+				 */
 				FormatterBeginNode beginNode = new FormatterBeginNode(document);
-				beginNode.setBegin(createTextNode(document, visited));
-				push(beginNode);
-				visitChild(visited.getBodyNode());
-				// checkedPop(beginNode, visited.getEndKeyword().getPosition().getStartOffset());
-				SourcePosition position = visited.getPosition();
 				Node bodyNode = visited.getBodyNode();
-				int bodyEndOffset = bodyNode.getPosition().getEndOffset();
-				checkedPop(beginNode, bodyEndOffset);
-				beginNode.setEnd(createTextNode(document, bodyEndOffset, position.getEndOffset()));
+				SourcePosition position = visited.getPosition();
+				int beginEndOffset;
+				if (bodyNode instanceof NilImplicitNode)
+				{
+					// we have an emply body here
+					beginEndOffset = locateEndOffset(document, position.getEndOffset());
+					beginNode.setBegin(createTextNode(document, position.getStartOffset(), beginEndOffset));
+					push(beginNode);
+					checkedPop(beginNode, beginEndOffset);
+					beginNode.setEnd(createTextNode(document, beginEndOffset, position.getEndOffset()));
+				}
+				else
+				{
+					beginEndOffset = bodyNode.getPosition().getStartOffset();
+					beginNode.setBegin(createTextNode(document, position.getStartOffset(), beginEndOffset));
+					push(beginNode);
+					visitChild(bodyNode);
+					int bodyEndOffset = bodyNode.getPosition().getEndOffset();
+					checkedPop(beginNode, bodyEndOffset);
+					beginNode.setEnd(createTextNode(document, bodyEndOffset, position.getEndOffset()));
+				}
 				return null;
 			}
 
@@ -653,6 +694,13 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 			public Object visitArrayNode(ArrayNode visited)
 			{
+				IFormatterContainerNode containerNode = peek();
+				if (containerNode.getStartOffset() == visited.getPosition().getStartOffset())
+				{
+					// just analyze the children. This is an ArrayNode inside an ArrayNode
+					visitChildren(visited);
+					return null;
+				}
 				SourcePosition position = visited.getPosition();
 				String right = document.get(position.getStartOffset(), position.getStartOffset() + 1);
 				String left = document.get(position.getEndOffset() - 1, position.getEndOffset());

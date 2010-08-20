@@ -12,7 +12,7 @@
 package com.aptana.ruby.formatter.internal.nodes;
 
 import com.aptana.formatter.IFormatterDocument;
-
+import com.aptana.ruby.formatter.RubyFormatterConstants;
 
 /**
  * <code>
@@ -25,13 +25,19 @@ import com.aptana.formatter.IFormatterDocument;
  * end
  * </code>
  */
-public class FormatterBeginNode extends FormatterBlockWithBeginEndNode {
+public class FormatterBeginNode extends FormatterBlockWithBeginEndNode
+{
 
 	/**
 	 * @param document
 	 */
-	public FormatterBeginNode(IFormatterDocument document) {
+	public FormatterBeginNode(IFormatterDocument document)
+	{
 		super(document);
 	}
 
+	protected boolean isIndenting()
+	{
+		return getDocument().getBoolean(RubyFormatterConstants.INDENT_BLOCKS);
+	}
 }
