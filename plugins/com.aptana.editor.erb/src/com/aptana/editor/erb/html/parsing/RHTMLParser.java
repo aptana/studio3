@@ -6,11 +6,13 @@ import beaver.Symbol;
 
 import com.aptana.editor.common.parsing.CompositeParser;
 import com.aptana.editor.erb.parsing.lexer.ERBTokens;
-import com.aptana.editor.html.parsing.HTMLParser;
+import com.aptana.editor.html.parsing.IHTMLParserConstants;
 import com.aptana.editor.ruby.core.IRubyScript;
 import com.aptana.editor.ruby.parsing.IRubyParserConstants;
-import com.aptana.editor.ruby.parsing.RubyParser;
 import com.aptana.parsing.IParseState;
+import com.aptana.parsing.IParser;
+import com.aptana.parsing.IParserPool;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
@@ -20,8 +22,7 @@ public class RHTMLParser extends CompositeParser
 
 	public RHTMLParser()
 	{
-		// FIXME keep a reference to language and check out parser on demand?
-		super(new RHTMLParserScanner(), new HTMLParser());
+		super(new RHTMLParserScanner(), IHTMLParserConstants.LANGUAGE);
 	}
 
 	@Override
@@ -65,13 +66,19 @@ public class RHTMLParser extends CompositeParser
 			id = getCurrentSymbol().getId();
 		}
 
-		IParseNode result = getParseResult(new RubyParser(), start, end);
-		if (result != null)
+		IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IRubyParserConstants.LANGUAGE);
+		if (pool != null)
 		{
-			Symbol endTag = getCurrentSymbol();
-			ERBScript erb = new ERBScript((IRubyScript) result, startTag.value.toString(), endTag.value.toString());
-			erb.setLocation(startTag.getStart(), endTag.getEnd());
-			root.addChild(erb);
+			IParser parser = pool.checkOut();
+			IParseNode result = getParseResult(parser, start, end);
+			pool.checkIn(parser);
+			if (result != null)
+			{
+				Symbol endTag = getCurrentSymbol();
+				ERBScript erb = new ERBScript((IRubyScript) result, startTag.value.toString(), endTag.value.toString());
+				erb.setLocation(startTag.getStart(), endTag.getEnd());
+				root.addChild(erb);
+			}
 		}
 	}
 }

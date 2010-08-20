@@ -1,27 +1,33 @@
-package com.aptana.ui.internal.wizards;
+package com.aptana.projects.internal.wizards;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
-import java.net.URL;
+import java.text.MessageFormat;
+import java.util.Enumeration;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResourceStatus;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IWorkbench;
@@ -37,10 +43,13 @@ import org.eclipse.ui.statushandlers.StatusAdapter;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
-import org.osgi.framework.Bundle;
 
-import com.aptana.ui.UIPlugin;
-import com.aptana.ui.projects.WebProjectNature;
+import com.aptana.git.ui.CloneJob;
+import com.aptana.projects.ProjectsPlugin;
+import com.aptana.projects.WebProjectNature;
+import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.ProjectTemplate;
+import com.aptana.scripting.model.ProjectTemplate.Type;
 
 public class NewProjectWizard extends BasicNewResourceWizard implements IExecutableExtension
 {
@@ -50,20 +59,16 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 	 */
 	public static final String ID = "com.aptana.ui.wizards.NewWebProject"; //$NON-NLS-1$
 
-	/**
-	 * The default index.html file
-	 */
-	private static final String INDEX_PATH = "/project/index.html"; //$NON-NLS-1$
+	private static final String IMAGE = "icons/web_project_wiz.png"; //$NON-NLS-1$
 
 	private WizardNewProjectCreationPage mainPage;
+	private ProjectTemplateSelectionPage templatesPage;
 	private IProject newProject;
 	private IConfigurationElement configElement;
 
-	private IFile indexFile;
-
 	public NewProjectWizard()
 	{
-		IDialogSettings workbenchSettings = UIPlugin.getDefault().getDialogSettings();
+		IDialogSettings workbenchSettings = ProjectsPlugin.getDefault().getDialogSettings();
 		IDialogSettings section = workbenchSettings.getSection("BasicNewProjectResourceWizard");//$NON-NLS-1$
 		if (section == null)
 		{
@@ -81,6 +86,12 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		mainPage.setTitle(Messages.NewProjectWizard_ProjectPage_Title);
 		mainPage.setDescription(Messages.NewProjectWizard_ProjectPage_Description);
 		addPage(mainPage);
+
+		ProjectTemplate[] templates = BundleManager.getInstance().getProjectTemplatesByType(Type.WEB);
+		if (templates.length > 0)
+		{
+			addPage(templatesPage = new ProjectTemplateSelectionPage("templateSelectionPage", templates)); //$NON-NLS-1$
+		}
 	}
 
 	@Override
@@ -92,7 +103,6 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 			return false;
 		}
 
-		createDefaultIndexFile();
 		updatePerspective();
 		selectAndReveal(newProject);
 		openIndexFile();
@@ -118,8 +128,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 	@Override
 	protected void initializeDefaultPageImageDescriptor()
 	{
-		ImageDescriptor desc = UIPlugin.imageDescriptorFromPlugin(UIPlugin.PLUGIN_ID, "icons/web_project_wiz.png"); //$NON-NLS-1$
-		setDefaultPageImageDescriptor(desc);
+		setDefaultPageImageDescriptor(ProjectsPlugin.getImageDescriptor(IMAGE));
 	}
 
 	protected void updatePerspective()
@@ -162,6 +171,43 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		description.setLocationURI(location);
 		description.setNatureIds(new String[] { WebProjectNature.ID });
 
+		boolean fromGit = false;
+		if (templatesPage != null)
+		{
+			ProjectTemplate template = templatesPage.getSelectedTemplate();
+			if (template != null && !template.getSourceLocation().endsWith(".zip")) //$NON-NLS-1$
+			{
+				// assumes to be creating the project from a git URL
+				fromGit = true;
+				doCloneFromGit(template, description);
+			}
+		}
+		if (!fromGit)
+		{
+			try
+			{
+				doBasicCreateProject(newProjectHandle, description);
+				if (templatesPage != null)
+				{
+					ProjectTemplate template = templatesPage.getSelectedTemplate();
+					if (template != null)
+					{
+						extractZip(template, newProjectHandle);
+					}
+				}
+			}
+			catch (CoreException e)
+			{
+				return null;
+			}
+		}
+
+		newProject = newProjectHandle;
+		return newProject;
+	}
+
+	private void doBasicCreateProject(IProject project, final IProjectDescription description) throws CoreException
+	{
 		// create the new project operation
 		IRunnableWithProgress op = new IRunnableWithProgress()
 		{
@@ -191,7 +237,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		}
 		catch (InterruptedException e)
 		{
-			return null;
+			throw new CoreException(new Status(IStatus.ERROR, ProjectsPlugin.PLUGIN_ID, e.getMessage(), e));
 		}
 		catch (InvocationTargetException e)
 		{
@@ -202,12 +248,12 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 				StatusAdapter status;
 				if (cause.getStatus().getCode() == IResourceStatus.CASE_VARIANT_EXISTS)
 				{
-					status = new StatusAdapter(new Status(IStatus.WARNING, UIPlugin.PLUGIN_ID, NLS.bind(
-							Messages.NewProjectWizard_Warning_DirectoryExists, newProjectHandle.getName()), cause));
+					status = new StatusAdapter(new Status(IStatus.WARNING, ProjectsPlugin.PLUGIN_ID, NLS.bind(
+							Messages.NewProjectWizard_Warning_DirectoryExists, project.getName()), cause));
 				}
 				else
 				{
-					status = new StatusAdapter(new Status(cause.getStatus().getSeverity(), UIPlugin.PLUGIN_ID,
+					status = new StatusAdapter(new Status(cause.getStatus().getSeverity(), ProjectsPlugin.PLUGIN_ID,
 							Messages.NewProjectWizard_CreationProblem, cause));
 				}
 				status.setProperty(IStatusAdapterConstants.TITLE_PROPERTY, Messages.NewProjectWizard_CreationProblem);
@@ -215,48 +261,79 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 			}
 			else
 			{
-				StatusAdapter status = new StatusAdapter(new Status(IStatus.WARNING, UIPlugin.PLUGIN_ID, 0, NLS.bind(
-						Messages.NewProjectWizard_InternalError, t.getMessage()), t));
+				StatusAdapter status = new StatusAdapter(new Status(IStatus.WARNING, ProjectsPlugin.PLUGIN_ID, 0,
+						NLS.bind(Messages.NewProjectWizard_InternalError, t.getMessage()), t));
 				status.setProperty(IStatusAdapterConstants.TITLE_PROPERTY, Messages.NewProjectWizard_CreationProblem);
 				StatusManager.getManager().handle(status, StatusManager.LOG | StatusManager.BLOCK);
 			}
-			return null;
 		}
-		newProject = newProjectHandle;
-
-		return newProject;
 	}
 
-	private IFile createDefaultIndexFile()
+	private void extractZip(ProjectTemplate template, IProject project)
 	{
-		// create a default index.html file
-		indexFile = newProject.getFile("index.html"); //$NON-NLS-1$
-		if (indexFile != null && !indexFile.exists())
+		File zip_path = new File(template.getDirectory(), template.getSourceLocation());
+		if (zip_path.exists())
 		{
-			Bundle bundle = Platform.getBundle(UIPlugin.PLUGIN_ID);
-			if (bundle != null)
+			ZipFile zipFile = null;
+			try
 			{
-				URL indexUrl = bundle.getEntry(INDEX_PATH);
-				if (indexUrl != null)
+				zipFile = new ZipFile(zip_path, ZipFile.OPEN_READ);
+				Enumeration<? extends ZipEntry> entries = zipFile.entries();
+				ZipEntry entry;
+				while (entries.hasMoreElements())
+				{
+					entry = entries.nextElement();
+
+					if (entry.isDirectory())
+					{
+						IFolder newFolder = project.getFolder(Path.fromOSString(entry.getName()));
+						newFolder.create(true, true, null);
+					}
+					else
+					{
+						IFile newFile = project.getFile(Path.fromOSString(entry.getName()));
+						newFile.create(zipFile.getInputStream(entry), true, null);
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				ProjectsPlugin.logError(MessageFormat.format(Messages.NewProjectWizard_ERR_UnzipFile, zip_path), e);
+			}
+			finally
+			{
+				if (zipFile != null)
 				{
 					try
 					{
-						indexUrl = FileLocator.toFileURL(indexUrl);
-						indexFile.create(indexUrl.openStream(), true, null);
+						zipFile.close();
 					}
-					catch (Exception e)
+					catch (IOException e)
 					{
-						UIPlugin.logError(Messages.NewProjectWizard_ERR_CreatingIndex, e);
+						// ignores
 					}
 				}
 			}
 		}
-		return indexFile;
+	}
+
+	private void doCloneFromGit(ProjectTemplate template, IProjectDescription projectDescription)
+	{
+		IPath path = mainPage.getLocationPath();
+		// when default is used, getLocationPath() only returns the workspace root, so needs to append the project name
+		// to the path
+		if (mainPage.useDefaults())
+		{
+			path = path.append(projectDescription.getName());
+		}
+		Job job = new CloneJob(template.getSourceLocation(), path.toOSString(), true);
+		job.schedule();
 	}
 
 	private void openIndexFile()
 	{
-		if (indexFile != null && indexFile.exists())
+		IFile indexFile = newProject.getFile("index.html"); //$NON-NLS-1$
+		if (indexFile.exists())
 		{
 			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 			if (page != null)
@@ -267,7 +344,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 				}
 				catch (PartInitException e)
 				{
-					UIPlugin.logError(Messages.NewProjectWizard_ERR_OpeningIndex, e);
+					ProjectsPlugin.logError(Messages.NewProjectWizard_ERR_OpeningIndex, e);
 				}
 			}
 		}

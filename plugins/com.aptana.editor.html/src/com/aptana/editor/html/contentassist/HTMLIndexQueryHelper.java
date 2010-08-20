@@ -3,7 +3,6 @@ package com.aptana.editor.html.contentassist;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,27 +33,46 @@ public class HTMLIndexQueryHelper
 	/**
 	 * getAttribute
 	 * 
-	 * @param name
+	 * @param attributeName
 	 * @return
 	 */
-	public List<AttributeElement> getAttribute(String name)
+	public AttributeElement getAttribute(String elementName, String attributeName)
 	{
-		// NOTE: Right now the metadata format uses name references in elements
-		// to list which properties it has. Unfortunately, if more than one
-		// element have the same attribute name we lose the connection to the
-		// right attribute when we do attribute lookups. So, for now, we're
-		// returning the list of attributes that match the given name
-		List<AttributeElement> result = new LinkedList<AttributeElement>();
+		AttributeElement result = null;
 
-		if (name != null && name.length() > 0)
+		if (elementName != null && elementName.length() > 0 && attributeName != null && attributeName.length() > 0)
 		{
+			AttributeElement defaultAttribute = null;
+			AttributeElement candidateAttribute = null;
+
 			// TODO: optimize with a name->attribute hash
 			for (AttributeElement attribute : this.getAttributes())
 			{
-				if (name.equals(attribute.getName()))
+				if (attributeName.equals(attribute.getName()))
 				{
-					result.add(attribute);
+					String elementRef = attribute.getElement();
+
+					if (elementRef != null && elementRef.length() > 0)
+					{
+						if (elementName.equals(elementRef))
+						{
+							candidateAttribute = attribute;
+						}
+					}
+					else
+					{
+						defaultAttribute = attribute;
+					}
 				}
+			}
+
+			if (candidateAttribute != null)
+			{
+				result = candidateAttribute;
+			}
+			else if (defaultAttribute != null)
+			{
+				result = defaultAttribute;
 			}
 		}
 

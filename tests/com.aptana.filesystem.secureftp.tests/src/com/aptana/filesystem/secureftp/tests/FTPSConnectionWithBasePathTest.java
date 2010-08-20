@@ -37,6 +37,7 @@ package com.aptana.filesystem.secureftp.tests;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.io.tests.CommonConnectionTest;
@@ -71,7 +72,7 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 	{
 		initBasePath();
 		FTPSConnectionPoint ftpcp = setupConnection();
-		ftpcp.setPath(Path.ROOT.append(getClass().getSimpleName()));
+		ftpcp.setPath(constructBasePath());
 		cp = ftpcp;
 		super.setUp();
 	}
@@ -82,31 +83,39 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 		cleanupBasePath();
 	}
 
+	public static IPath constructBasePath() {
+		return new Path(getConfig().getProperty("ftp.path", "/home/ftpuser")).append(FTPSConnectionWithBasePathTest.class.getSimpleName());
+	}
+	
 	public static void initBasePath() throws CoreException
 	{
 		FTPSConnectionPoint ftpcp = setupConnection();
-		IFileStore fs = ftpcp.getRoot().getFileStore(
-				Path.ROOT.append(FTPSConnectionWithBasePathTest.class.getSimpleName()));
+		IFileStore fs = ftpcp.getRoot().getFileStore(constructBasePath());
 		assertNotNull(fs);
-		if (!fs.fetchInfo().exists())
-		{
-			fs.mkdir(EFS.NONE, null);
+		try {
+			if (!fs.fetchInfo().exists())
+			{
+				fs.mkdir(EFS.NONE, null);
+			}
+		} finally {
+			ftpcp.disconnect(null);
 		}
-		ftpcp.disconnect(null);
 		assertFalse(ftpcp.isConnected());
 	}
 
 	public static void cleanupBasePath() throws CoreException
 	{
 		FTPSConnectionPoint ftpcp = setupConnection();
-		IFileStore fs = ftpcp.getRoot().getFileStore(
-				Path.ROOT.append(FTPSConnectionWithBasePathTest.class.getSimpleName()));
+		IFileStore fs = ftpcp.getRoot().getFileStore(constructBasePath());
 		assertNotNull(fs);
-		if (fs.fetchInfo().exists())
-		{
-			fs.delete(EFS.NONE, null);
+		try {
+			if (fs.fetchInfo().exists())
+			{
+				fs.delete(EFS.NONE, null);
+			}
+		} finally {
+			ftpcp.disconnect(null);
 		}
-		ftpcp.disconnect(null);
 		assertFalse(ftpcp.isConnected());
 	}
 

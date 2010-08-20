@@ -72,7 +72,7 @@ public class CommandConverter
 		String trigger = BundleConverter.sanitize(properties, "tabTrigger");
 		if (trigger != null)
 		{
-			buffer.append("  cmd.trigger = '").append(scope).append("'\n");
+			buffer.append("  cmd.trigger = '").append(trigger).append("'\n");
 		}
 		String outputType = convertOutputTypes(camelcaseToUnderscores(BundleConverter.sanitize(properties, "output")));
 		buffer.append("  cmd.output = :").append(outputType).append("\n");
