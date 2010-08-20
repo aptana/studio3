@@ -7,7 +7,7 @@ public class Exit extends GenericCommand
 {
 	
 	@Override
-	public boolean execute(IndexREPL repl, String[] args)
+	public boolean execute(IREPL repl, String[] args)
 	{
 		System.out.println("Exiting...");
 		

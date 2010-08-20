@@ -10,7 +10,7 @@ public class ReloadIndexes extends GenericCommand
 	 * @see com.aptana.index.core.repl.GenericCommand#execute(com.aptana.index.core.repl.IndexREPL, java.lang.String[])
 	 */
 	@Override
-	public boolean execute(IndexREPL repl, String[] args)
+	public boolean execute(IREPL repl, String[] args)
 	{
 		repl.loadDiskIndexes();
 		

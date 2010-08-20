@@ -49,7 +49,7 @@ import com.aptana.internal.index.core.DiskIndex;
 /**
  * @author klindsey
  */
-public class IndexREPL
+public class IREPL
 {
 	private static final Map<String, ICommand> COMMAND_MAP;
 	private List<DiskIndex> indexes;
@@ -97,7 +97,7 @@ public class IndexREPL
 	 */
 	public static void main(String[] args)
 	{
-		IndexREPL repl = new IndexREPL();
+		IREPL repl = new IREPL();
 
 		repl.run();
 	}

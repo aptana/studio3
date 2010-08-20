@@ -21,7 +21,7 @@ public class SetIndex extends GenericCommand
 	}
 
 	@Override
-	public boolean execute(IndexREPL repl, String[] args)
+	public boolean execute(IREPL repl, String[] args)
 	{
 		if (args != null && args.length > 1)
 		{

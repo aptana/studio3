@@ -20,7 +20,7 @@ public class Help extends GenericCommand
 	}
 	
 	@Override
-	public boolean execute(IndexREPL repl, String[] args)
+	public boolean execute(IREPL repl, String[] args)
 	{
 		for (String name : repl.getCommandNames())
 		{

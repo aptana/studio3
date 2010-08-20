@@ -11,7 +11,7 @@ public interface ICommand
 	 * @param args
 	 * @return
 	 */
-	boolean execute(IndexREPL repl, String[] args);
+	boolean execute(IREPL repl, String[] args);
 
 	/**
 	 * getAliases

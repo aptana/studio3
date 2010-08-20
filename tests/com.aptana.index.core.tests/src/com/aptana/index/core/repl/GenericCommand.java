@@ -6,7 +6,7 @@ import java.util.List;
 public abstract class GenericCommand implements ICommand
 {
 	@Override
-	public boolean execute(IndexREPL repl, String[] args)
+	public boolean execute(IREPL repl, String[] args)
 	{
 		return true;
 	}
