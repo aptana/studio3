@@ -3,7 +3,6 @@ package com.aptana.theme.internal;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -45,7 +44,6 @@ class TreeThemer extends ControlThemer
 
 	private TreeViewer fTreeViewer;
 	private IPropertyChangeListener fontListener;
-	private IPreferenceChangeListener fThemeChangeListener;
 	private Listener measureItemListener;
 	private Listener customDrawingListener;
 	private Listener selectionPaintListener;
