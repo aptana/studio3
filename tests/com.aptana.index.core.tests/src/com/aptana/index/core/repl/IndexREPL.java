@@ -55,6 +55,7 @@ public class IndexREPL
 	private List<DiskIndex> indexes;
 	private DiskIndex currentIndex;
 	private String currentCategory;
+	private boolean helpedOnce = false;
 
 	static
 	{
@@ -223,33 +224,61 @@ public class IndexREPL
 	 */
 	public void run()
 	{
+		System.out.println("IREPL v0.1 - A simple read-execute-print loop to poke around disk indexes");
+		System.out.println("Type help for more info");
+		System.out.println();
+		
+		// pre-load current set of indexes
 		this.loadDiskIndexes();
 
+		// wrap stdin with a scanner
 		Scanner scanner = new Scanner(System.in);
 
+		// start loop until we exit
 		while (true)
 		{
+			// show prompt
 			this.prompt();
+			
+			// grab (trimmed) user input
 			String input = scanner.nextLine().trim();
 			
+			// process input if we got something
 			if (input.length() > 0)
 			{
+				// simple arg splitting
 				String[] args = input.split("\\s+");
+				
+				// first arg is the command
 				String name = args[0];
 	
+				// process command or show help
 				if (COMMAND_MAP.containsKey(name))
 				{
 					ICommand command = COMMAND_MAP.get(name);
 	
-					if (command.execute(this, args) == false)
+					try
 					{
-						break;
+						if (command.execute(this, args) == false)
+						{
+							break;
+						}
+					}
+					catch (Throwable t)
+					{
+						t.printStackTrace();
 					}
 				}
 				else
 				{
-					// TODO: show help
-					System.out.println("Unrecognized command: " + input);
+					System.out.println("Unrecognized command: " + name);
+					
+					if (this.helpedOnce == false)
+					{
+						System.out.println();
+						COMMAND_MAP.get("help").execute(this, null);
+						this.helpedOnce = true;
+					}
 				}
 			}
 		}
