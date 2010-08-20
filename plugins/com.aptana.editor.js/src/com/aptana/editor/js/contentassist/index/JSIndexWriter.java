@@ -1,6 +1,5 @@
 package com.aptana.editor.js.contentassist.index;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,7 +8,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
@@ -24,15 +22,6 @@ import com.aptana.index.core.Index;
 public class JSIndexWriter
 {
 	private static Map<UserAgentElement, String> keysByUserAgent = new HashMap<UserAgentElement, String>();
-	static Map<String, UserAgentElement> userAgentsByKey = new HashMap<String, UserAgentElement>();
-
-	/**
-	 * JSIndexWriter
-	 */
-	public JSIndexWriter()
-	{
-		this.loadUserAgents();
-	}
 
 	/**
 	 * cacheUserAgent
@@ -45,7 +34,6 @@ public class JSIndexWriter
 		String key = userAgent.getKey();
 		
 		keysByUserAgent.put(userAgent, key);
-		userAgentsByKey.put(key, userAgent);
 	}
 
 	/**
@@ -56,26 +44,6 @@ public class JSIndexWriter
 	protected URI getDocumentPath()
 	{
 		return URI.create(JSIndexConstants.METADATA_FILE_LOCATION);
-	}
-
-	/**
-	 * loadUserAgents
-	 */
-	protected void loadUserAgents()
-	{
-		JSIndexReader reader = new JSIndexReader();
-
-		try
-		{
-			for (UserAgentElement userAgent : reader.getUserAgents())
-			{
-				this.cacheUserAgent(userAgent);
-			}
-		}
-		catch (IOException e)
-		{
-			Activator.logError(e.getMessage(), e);
-		}
 	}
 
 	/**
@@ -355,8 +323,8 @@ public class JSIndexWriter
 
 			index.addEntry(JSIndexConstants.USER_AGENT, value, this.getDocumentPath());
 
-			// cache for faster retrieval during reading
-			cacheUserAgent(userAgent);
+			// cache for to prevent unnecessary writes
+			this.cacheUserAgent(userAgent);
 		}
 
 		return key;
