@@ -86,10 +86,6 @@ public class ThemeManager implements IThemeManager
 			if (activeThemeName != null)
 			{
 				fCurrentTheme = getTheme(activeThemeName);
-				if (fCurrentTheme != null)
-				{
-					return fCurrentTheme;
-				}
 			}
 			if (fCurrentTheme == null)
 			{

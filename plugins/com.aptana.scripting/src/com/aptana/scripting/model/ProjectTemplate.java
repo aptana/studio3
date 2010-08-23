@@ -53,4 +53,37 @@ public final class ProjectTemplate
 	{
 		return fDirectory;
 	}
+
+	@Override
+	public int hashCode()
+	{
+		int hash = 31 + getType().hashCode();
+		hash = 31 * hash + getName().hashCode();
+		hash = 31 * hash + getSourceLocation().hashCode();
+		hash = 31 * hash + getDirectory().hashCode();
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof ProjectTemplate))
+		{
+			return false;
+		}
+		ProjectTemplate other = (ProjectTemplate) obj;
+		return getType() == other.getType() && getName().equals(other.getName())
+				&& getSourceLocation().equals(other.getSourceLocation()) && getDirectory().equals(other.getDirectory());
+	}
+
+	@Override
+	public String toString()
+	{
+		StringBuilder text = new StringBuilder();
+		text.append("type = ").append(getType()).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
+		text.append("name = ").append(getName()).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
+		text.append("source location = ").append(getSourceLocation()).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
+		text.append("bundle location = ").append(getDirectory()); //$NON-NLS-1$
+		return text.toString();
+	}
 }

@@ -326,7 +326,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		{
 			path = path.append(projectDescription.getName());
 		}
-		Job job = new CloneJob(template.getSourceLocation(), path.toOSString(), true);
+		Job job = new CloneJob(template.getSourceLocation(), path.toOSString(), true, true);
 		job.schedule();
 	}
 
