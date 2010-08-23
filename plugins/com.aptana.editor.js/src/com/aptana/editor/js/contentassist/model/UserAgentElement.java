@@ -1,10 +1,9 @@
 package com.aptana.editor.js.contentassist.model;
 
-
 public class UserAgentElement
 {
 	private static final String EMPTY = "";
-	
+
 	private String _platform;
 	private String _version;
 	private String _os;
@@ -26,7 +25,7 @@ public class UserAgentElement
 	public boolean equals(Object obj)
 	{
 		boolean result = false;
-		
+
 		if (this == obj)
 		{
 			result = true;
@@ -34,15 +33,15 @@ public class UserAgentElement
 		else
 		{
 			UserAgentElement that = (UserAgentElement) obj;
-			
-			result =
-				this.getDescription().equals(that.getDescription())
-			&&	this.getOS().equals(that.getOS())
-			&&	this.getOSVersion().equals(that.getOSVersion())
-			&&	this.getPlatform().equals(that.getPlatform())
-			&&	this.getVersion().equals(that.getVersion());
+
+			result = //
+				this.getDescription().equals(that.getDescription()) //
+					&& this.getOS().equals(that.getOS()) //
+					&& this.getOSVersion().equals(that.getOSVersion()) //
+					&& this.getPlatform().equals(that.getPlatform()) //
+					&& this.getVersion().equals(that.getVersion()); //
 		}
-		
+
 		return result;
 	}
 
@@ -114,23 +113,23 @@ public class UserAgentElement
 	public int hashCode()
 	{
 		int h = 0;
-		
-		String[] items = new String[] {
-			this.getDescription(),
-			this.getOS(),
-			this.getOSVersion(),
-			this.getPlatform(),
-			this.getVersion()
+
+		String[] items = new String[] { //
+			this.getDescription(), //
+			this.getOS(), //
+			this.getOSVersion(), //
+			this.getPlatform(), //
+			this.getVersion() //
 		};
-		
+
 		for (String item : items)
 		{
 			if (item != null)
 			{
-				h = 31*h + item.hashCode();
+				h = 31 * h + item.hashCode();
 			}
 		}
-		
+
 		return h;
 	}
 

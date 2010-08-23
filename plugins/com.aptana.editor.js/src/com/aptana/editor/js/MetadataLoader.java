@@ -119,14 +119,14 @@ public class MetadataLoader extends Job
 
 		JSIndexWriter indexer = new JSIndexWriter();
 		Index index = JSIndexQueryHelper.getIndex();
-		
+
 		// write user agents from user agent list in prefs
 		for (UserAgent userAgent : UserAgentManager.getInstance().getAllUserAgents())
 		{
 			UserAgentElement ua = new UserAgentElement();
 
 			ua.setPlatform(userAgent.ID);
-			
+
 			indexer.writeUserAgent(ua);
 		}
 

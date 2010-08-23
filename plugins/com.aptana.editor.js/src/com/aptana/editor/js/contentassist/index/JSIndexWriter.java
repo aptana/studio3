@@ -32,7 +32,7 @@ public class JSIndexWriter
 	private void cacheUserAgent(UserAgentElement userAgent)
 	{
 		String key = userAgent.getKey();
-		
+
 		keysByUserAgent.put(userAgent, key);
 	}
 
@@ -310,10 +310,10 @@ public class JSIndexWriter
 		if (key == null)
 		{
 			Index index = JSIndexQueryHelper.getIndex();
-			
+
 			// get
 			key = userAgent.getKey();
-			
+
 			// store user agent in index so we can recover it during the next session
 			String[] columns = new String[] { key, userAgent.getDescription(), userAgent.getOS(), userAgent.getPlatform(), userAgent.getVersion() };
 			String value = StringUtil.join(JSIndexConstants.DELIMITER, columns);

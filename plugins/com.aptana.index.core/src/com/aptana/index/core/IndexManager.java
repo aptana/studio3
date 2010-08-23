@@ -99,7 +99,7 @@ public class IndexManager
 	{
 		return new ArrayList<URI>(indexes.keySet());
 	}
-	
+
 	/**
 	 * Removes the index for a given path. This is a no-op if the index did not exist.
 	 */
