@@ -26,6 +26,7 @@ import org.eclipse.text.edits.TextEdit;
 import org.jrubyparser.parser.ParserResult;
 
 import com.aptana.editor.ruby.parsing.NullParserResult;
+import com.aptana.editor.ruby.parsing.RubyParser;
 import com.aptana.editor.ruby.parsing.RubySourceParser;
 import com.aptana.formatter.AbstractScriptFormatter;
 import com.aptana.formatter.FormatterDocument;
@@ -69,7 +70,7 @@ public class RubyFormatter extends AbstractScriptFormatter
 		final ParserResult result;
 		try
 		{
-			RubySourceParser parser = new RubySourceParser();
+			RubySourceParser parser = new RubyParser().getSourceParser();
 			result = parser.parse(source);
 			if (!(result instanceof NullParserResult))
 			{
@@ -101,7 +102,7 @@ public class RubyFormatter extends AbstractScriptFormatter
 	public TextEdit format(String source, int offset, int length, int indent) throws FormatterException
 	{
 		final String input = source.substring(offset, offset + length);
-		RubySourceParser parser = new RubySourceParser();
+		RubySourceParser parser = new RubyParser().getSourceParser();
 		ParserResult result = parser.parse(input);
 		if (!(result instanceof NullParserResult))
 		{

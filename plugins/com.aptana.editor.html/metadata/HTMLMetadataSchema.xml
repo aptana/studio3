@@ -6,8 +6,9 @@
 	</element>
 
 	<element name="attribute" onEnter="enterAttribute" onExit="exitAttribute">
-		<attribute name="name" />	
-		<attribute name="type" usage="optional" />	
+		<attribute name="name" />
+		<attribute name="type" usage="optional" />
+		<attribute name="element" usage="optional" />
 		<child-element name="availability" />
 		<child-element name="browsers" />
         <child-element name="deprecated" />

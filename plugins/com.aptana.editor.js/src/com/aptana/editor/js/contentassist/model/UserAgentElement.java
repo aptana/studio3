@@ -1,16 +1,14 @@
 package com.aptana.editor.js.contentassist.model;
 
-import com.aptana.core.util.StringUtil;
-
 public class UserAgentElement
 {
+	private static final String EMPTY = "";
+
 	private String _platform;
 	private String _version;
 	private String _os;
 	private String _osVersion;
 	private String _description;
-	private int _hash;
-	private String _key; // used by the indexing system only
 
 	/**
 	 * UserAgentElement
@@ -27,7 +25,7 @@ public class UserAgentElement
 	public boolean equals(Object obj)
 	{
 		boolean result = false;
-		
+
 		if (this == obj)
 		{
 			result = true;
@@ -35,15 +33,15 @@ public class UserAgentElement
 		else
 		{
 			UserAgentElement that = (UserAgentElement) obj;
-			
-			result =
-				StringUtil.areEqual(this.getDescription(), that.getDescription())
-			&&	StringUtil.areEqual(this.getOS(), that.getOS())
-			&&	StringUtil.areEqual(this.getOSVersion(), that.getOSVersion())
-			&&	StringUtil.areEqual(this.getPlatform(), that.getPlatform())
-			&&	StringUtil.areEqual(this.getVersion(), that.getVersion());
+
+			result = //
+				this.getDescription().equals(that.getDescription()) //
+					&& this.getOS().equals(that.getOS()) //
+					&& this.getOSVersion().equals(that.getOSVersion()) //
+					&& this.getPlatform().equals(that.getPlatform()) //
+					&& this.getVersion().equals(that.getVersion()); //
 		}
-		
+
 		return result;
 	}
 
@@ -54,7 +52,7 @@ public class UserAgentElement
 	 */
 	public String getDescription()
 	{
-		return this._description;
+		return (this._description != null) ? this._description : EMPTY;
 	}
 
 	/**
@@ -64,7 +62,7 @@ public class UserAgentElement
 	 */
 	public String getKey()
 	{
-		return this._key;
+		return Integer.toString(this.hashCode());
 	}
 
 	/**
@@ -74,7 +72,7 @@ public class UserAgentElement
 	 */
 	public String getOS()
 	{
-		return this._os;
+		return (this._os != null) ? this._os : EMPTY;
 	}
 
 	/**
@@ -84,7 +82,7 @@ public class UserAgentElement
 	 */
 	public String getOSVersion()
 	{
-		return this._osVersion;
+		return (this._osVersion != null) ? this._osVersion : EMPTY;
 	}
 
 	/**
@@ -94,7 +92,7 @@ public class UserAgentElement
 	 */
 	public String getPlatform()
 	{
-		return this._platform;
+		return (this._platform != null) ? this._platform : EMPTY;
 	}
 
 	/**
@@ -104,7 +102,7 @@ public class UserAgentElement
 	 */
 	public String getVersion()
 	{
-		return this._version;
+		return (this._version != null) ? this._version : EMPTY;
 	}
 
 	/*
@@ -114,29 +112,24 @@ public class UserAgentElement
 	@Override
 	public int hashCode()
 	{
-		int h = this._hash;
-		
-		if (h == 0)
+		int h = 0;
+
+		String[] items = new String[] { //
+			this.getDescription(), //
+			this.getOS(), //
+			this.getOSVersion(), //
+			this.getPlatform(), //
+			this.getVersion() //
+		};
+
+		for (String item : items)
 		{
-			String[] items = new String[] {
-				this._description,
-				this._os,
-				this._osVersion,
-				this._platform,
-				this._version
-			};
-			
-			for (String item : items)
+			if (item != null)
 			{
-				if (item != null)
-				{
-					h = 31*h + item.hashCode();
-				}
+				h = 31 * h + item.hashCode();
 			}
-			
-			this._hash = h;
 		}
-		
+
 		return h;
 	}
 
@@ -148,16 +141,6 @@ public class UserAgentElement
 	public void setDescription(String description)
 	{
 		this._description = description;
-	}
-
-	/**
-	 * setKey
-	 * 
-	 * @param key
-	 */
-	public void setKey(String key)
-	{
-		this._key = key;
 	}
 
 	/**

@@ -20,6 +20,5 @@ Export-Package: com.aptana.ui,
  com.aptana.ui.actions,
  com.aptana.ui.commands,
  com.aptana.ui.preferences,
- com.aptana.ui.projects,
  com.aptana.ui.widgets
 Eclipse-ExtensibleAPI: true

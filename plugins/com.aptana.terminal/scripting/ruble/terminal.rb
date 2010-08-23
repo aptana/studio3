@@ -9,8 +9,10 @@ module Ruble
       def open(command, working_dir = nil, secondary_id = nil, title = nil)
         # TODO Clean up the command string for display purposes here. Drop '"'? Drop ruby vm args?
         working_dir_path = org.eclipse.core.runtime.Path.new(working_dir) if working_dir
-        secondary_id ||= Ruble::Project.current.name
-        title ||= Ruble::Project.current.name
+        project_name = Ruble::Project.current.name if Ruble::Project.current
+        project_name ||= 'no_project'
+        secondary_id ||= project_name
+        title ||= project_name
         if title.nil? and !working_dir.nil?
           title = working_dir
         end

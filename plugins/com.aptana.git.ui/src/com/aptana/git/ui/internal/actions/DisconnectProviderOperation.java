@@ -72,7 +72,7 @@ public class DisconnectProviderOperation implements IWorkspaceRunnable
 
 				if (project != null)
 				{
-					GitUIPlugin.trace("disconnect " + project.getName()); //$NON-NLS-1$
+					GitUIPlugin.trace("disconnecting project: " + project.getName()); //$NON-NLS-1$
 					unmarkTeamPrivate(project);
 					RepositoryProvider.unmap(project);
 					getGitRepositoryManager().removeRepository(project);
@@ -111,7 +111,7 @@ public class DisconnectProviderOperation implements IWorkspaceRunnable
 				}
 				if (c[k].isTeamPrivateMember())
 				{
-					GitUIPlugin.trace("notTeamPrivate " + c[k]); //$NON-NLS-1$
+					GitUIPlugin.trace("Setting to no longer be Team Private: " + c[k]); //$NON-NLS-1$
 					c[k].setTeamPrivateMember(false);
 				}
 			}

@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptingEngine;
+import com.aptana.scripting.model.ProjectTemplate.Type;
 import com.aptana.scripting.model.filters.AndFilter;
 import com.aptana.scripting.model.filters.IModelFilter;
 import com.aptana.scripting.model.filters.IsExecutableCommandFilter;
@@ -36,7 +38,7 @@ public class BundleManager
 {
 	static final Pattern DOT_PATTERN = Pattern.compile("\\."); //$NON-NLS-1$
 	static final Pattern STAR_PATTERN = Pattern.compile("\\*"); //$NON-NLS-1$
-	
+
 	static final String SNIPPETS_DIRECTORY_NAME = "snippets"; //$NON-NLS-1$
 	static final String COMMANDS_DIRECTORY_NAME = "commands"; //$NON-NLS-1$
 	static final String TEMPLATES_DIRECTORY_NAME = "templates"; //$NON-NLS-1$
@@ -44,6 +46,7 @@ public class BundleManager
 	static final CommandElement[] NO_COMMANDS = new CommandElement[0];
 	static final MenuElement[] NO_MENUS = new MenuElement[0];
 	static final SnippetElement[] NO_SNIPPETS = new SnippetElement[0];
+	static final ProjectTemplate[] NO_PROJECT_TEMPLATES = new ProjectTemplate[0];
 
 	private static final File[] NO_FILES = new File[0];
 	private static final String[] NO_STRINGS = new String[0];
@@ -62,13 +65,15 @@ public class BundleManager
 
 	private Map<File, List<BundleElement>> _bundlesByPath;
 	private Map<String, BundleEntry> _entriesByName;
-
-	private Object bundlePathsLock = new Object();
-	private Object entryNamesLock = new Object();
-	
 	private List<BundleChangeListener> _bundleListeners;
 	private List<ElementChangeListener> _elementListeners;
 	private List<LoadCycleListener> _loadCycleListeners;
+
+	private Object bundlePathsLock = new Object();
+	private Object entryNamesLock = new Object();
+	private Object bundleListenersLock = new Object();
+	private Object elementListenersLock = new Object();
+	private Object loadCycleListenersLock = new Object();
 
 	/**
 	 * getInstance
@@ -210,12 +215,15 @@ public class BundleManager
 	{
 		if (listener != null)
 		{
-			if (this._bundleListeners == null)
+			synchronized (bundleListenersLock)
 			{
-				this._bundleListeners = new ArrayList<BundleChangeListener>();
-			}
+				if (this._bundleListeners == null)
+				{
+					this._bundleListeners = new ArrayList<BundleChangeListener>();
+				}
 
-			this._bundleListeners.add(listener);
+				this._bundleListeners.add(listener);
+			}
 		}
 	}
 
@@ -228,12 +236,15 @@ public class BundleManager
 	{
 		if (listener != null)
 		{
-			if (this._elementListeners == null)
+			synchronized (elementListenersLock)
 			{
-				this._elementListeners = new ArrayList<ElementChangeListener>();
-			}
+				if (this._elementListeners == null)
+				{
+					this._elementListeners = new ArrayList<ElementChangeListener>();
+				}
 
-			this._elementListeners.add(listener);
+				this._elementListeners.add(listener);
+			}
 		}
 	}
 
@@ -246,12 +257,15 @@ public class BundleManager
 	{
 		if (listener != null)
 		{
-			if (this._loadCycleListeners == null)
+			synchronized (loadCycleListenersLock)
 			{
-				this._loadCycleListeners = new ArrayList<LoadCycleListener>();
-			}
+				if (this._loadCycleListeners == null)
+				{
+					this._loadCycleListeners = new ArrayList<LoadCycleListener>();
+				}
 
-			this._loadCycleListeners.add(listener);
+				this._loadCycleListeners.add(listener);
+			}
 		}
 	}
 
@@ -287,11 +301,17 @@ public class BundleManager
 	 */
 	void fireBundleAddedEvent(BundleElement bundle)
 	{
-		if (this._bundleListeners != null && bundle != null)
+		if (bundle != null)
 		{
-			for (BundleChangeListener listener : this._bundleListeners)
+			synchronized (bundleListenersLock)
 			{
-				listener.added(bundle);
+				if (this._bundleListeners != null)
+				{
+					for (BundleChangeListener listener : this._bundleListeners)
+					{
+						listener.added(bundle);
+					}
+				}
 			}
 		}
 	}
@@ -303,11 +323,17 @@ public class BundleManager
 	 */
 	void fireBundleBecameHiddenEvent(BundleEntry entry)
 	{
-		if (this._bundleListeners != null && entry != null)
+		if (entry != null)
 		{
-			for (BundleChangeListener listener : this._bundleListeners)
+			synchronized (bundleListenersLock)
 			{
-				listener.becameHidden(entry);
+				if (this._bundleListeners != null)
+				{
+					for (BundleChangeListener listener : this._bundleListeners)
+					{
+						listener.becameHidden(entry);
+					}
+				}
 			}
 		}
 	}
@@ -319,11 +345,17 @@ public class BundleManager
 	 */
 	void fireBundleBecameVisibleEvent(BundleEntry entry)
 	{
-		if (this._bundleListeners != null && entry != null)
+		if (entry != null)
 		{
-			for (BundleChangeListener listener : this._bundleListeners)
+			synchronized (bundleListenersLock)
 			{
-				listener.becameVisible(entry);
+				if (this._bundleListeners != null)
+				{
+					for (BundleChangeListener listener : this._bundleListeners)
+					{
+						listener.becameVisible(entry);
+					}
+				}
 			}
 		}
 	}
@@ -335,11 +367,17 @@ public class BundleManager
 	 */
 	void fireBundleDeletedEvent(BundleElement bundle)
 	{
-		if (this._bundleListeners != null && bundle != null)
+		if (bundle != null)
 		{
-			for (BundleChangeListener listener : this._bundleListeners)
+			synchronized (bundleListenersLock)
 			{
-				listener.deleted(bundle);
+				if (this._bundleListeners != null)
+				{
+					for (BundleChangeListener listener : this._bundleListeners)
+					{
+						listener.deleted(bundle);
+					}
+				}
 			}
 		}
 	}
@@ -351,11 +389,17 @@ public class BundleManager
 	 */
 	void fireElementAddedEvent(AbstractElement element)
 	{
-		if (this._elementListeners != null && element != null)
+		if (element != null)
 		{
-			for (ElementChangeListener listener : this._elementListeners)
+			synchronized (elementListenersLock)
 			{
-				listener.elementAdded(element);
+				if (this._elementListeners != null)
+				{
+					for (ElementChangeListener listener : this._elementListeners)
+					{
+						listener.elementAdded(element);
+					}
+				}
 			}
 		}
 	}
@@ -367,11 +411,17 @@ public class BundleManager
 	 */
 	void fireElementDeletedEvent(AbstractElement element)
 	{
-		if (this._elementListeners != null && element != null)
+		if (element != null)
 		{
-			for (ElementChangeListener listener : this._elementListeners)
+			synchronized (elementListenersLock)
 			{
-				listener.elementDeleted(element);
+				if (this._elementListeners != null)
+				{
+					for (ElementChangeListener listener : this._elementListeners)
+					{
+						listener.elementDeleted(element);
+					}
+				}
 			}
 		}
 	}
@@ -383,7 +433,7 @@ public class BundleManager
 	 */
 	void fireElementModifiedEvent(AbstractElement element)
 	{
-		if (this._elementListeners != null && element != null)
+		if (element != null)
 		{
 			boolean sendEvent = true;
 
@@ -394,11 +444,17 @@ public class BundleManager
 
 			if (sendEvent)
 			{
-				for (ElementChangeListener listener : this._elementListeners)
+				synchronized (elementListenersLock)
 				{
-					listener.elementDeleted(element);
-					listener.elementAdded(element);
-					// listener.elementModified(element);
+					if (this._elementListeners != null)
+					{
+						for (ElementChangeListener listener : this._elementListeners)
+						{
+							listener.elementDeleted(element);
+							listener.elementAdded(element);
+							// listener.elementModified(element);
+						}
+					}
 				}
 			}
 		}
@@ -411,11 +467,17 @@ public class BundleManager
 	 */
 	void fireScriptLoadedEvent(File script)
 	{
-		if (this._loadCycleListeners != null && script != null)
+		if (script != null)
 		{
-			for (LoadCycleListener listener : this._loadCycleListeners)
+			synchronized (loadCycleListenersLock)
 			{
-				listener.scriptLoaded(script);
+				if (this._loadCycleListeners != null)
+				{
+					for (LoadCycleListener listener : this._loadCycleListeners)
+					{
+						listener.scriptLoaded(script);
+					}
+				}
 			}
 		}
 	}
@@ -427,11 +489,17 @@ public class BundleManager
 	 */
 	void fireScriptReloadedEvent(File script)
 	{
-		if (this._loadCycleListeners != null && script != null)
+		if (script != null)
 		{
-			for (LoadCycleListener listener : this._loadCycleListeners)
+			synchronized (loadCycleListenersLock)
 			{
-				listener.scriptReloaded(script);
+				if (this._loadCycleListeners != null)
+				{
+					for (LoadCycleListener listener : this._loadCycleListeners)
+					{
+						listener.scriptReloaded(script);
+					}
+				}
 			}
 		}
 	}
@@ -443,11 +511,17 @@ public class BundleManager
 	 */
 	void fireScriptUnloadedEvent(File script)
 	{
-		if (this._loadCycleListeners != null && script != null)
+		if (script != null)
 		{
-			for (LoadCycleListener listener : this._loadCycleListeners)
+			synchronized (loadCycleListenersLock)
 			{
-				listener.scriptReloaded(script);
+				if (this._loadCycleListeners != null)
+				{
+					for (LoadCycleListener listener : this._loadCycleListeners)
+					{
+						listener.scriptReloaded(script);
+					}
+				}
 			}
 		}
 	}
@@ -535,10 +609,10 @@ public class BundleManager
 	public File getBundleDirectory(File script)
 	{
 		String scriptPath = script.getAbsolutePath();
-		
+
 		return scriptPath.endsWith(BUNDLE_FILE) ? script.getParentFile() : script.getParentFile().getParentFile();
 	}
-	
+
 	/**
 	 * getBundles
 	 * 
@@ -642,35 +716,35 @@ public class BundleManager
 	protected List<String> getBundleLoadPaths(File bundleDirectory)
 	{
 		List<String> result = null;
-		
+
 		if (bundleDirectory != null)
 		{
 			File bundleFile = new File(bundleDirectory, BUNDLE_FILE);
 			String bundleName = BundleUtils.getBundleName(bundleFile);
-			
+
 			if (bundleName != null)
 			{
 				String defaultName = BundleUtils.getDefaultBundleName(bundleFile.getAbsolutePath());
-				
+
 				if (bundleName.equals(defaultName) == false)
 				{
 					result = this.getBundleLoadPaths(bundleName);
 				}
 			}
-			
+
 			if (result == null)
 			{
 				result = new LinkedList<String>();
-				
+
 				result.addAll(ScriptingEngine.getInstance().getContributedLoadPaths());
 			}
-			
+
 			result.add(0, BundleUtils.getBundleLibDirectory(bundleDirectory));
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getBundleLoadPaths
 	 * 
@@ -687,11 +761,11 @@ public class BundleManager
 			{
 				// grab all bundles of the given name
 				BundleEntry entry = this._entriesByName.get(name);
-				
+
 				result.addAll(entry.getLoadPaths());
 			}
 		}
-		
+
 		result.addAll(ScriptingEngine.getInstance().getContributedLoadPaths());
 
 		return result;
@@ -778,7 +852,7 @@ public class BundleManager
 
 		return result;
 	}
-	
+
 	/**
 	 * getBundleScripts
 	 * 
@@ -808,7 +882,7 @@ public class BundleManager
 			File snippetsDirectory = new File(bundleDirectory, SNIPPETS_DIRECTORY_NAME);
 
 			result.addAll(Arrays.asList(this.getScriptsFromDirectory(snippetsDirectory)));
-			
+
 			// look for templates inside "templates" directory
 			File templatesDirectory = new File(bundleDirectory, TEMPLATES_DIRECTORY_NAME);
 
@@ -869,7 +943,7 @@ public class BundleManager
 
 		return result.toArray(new CommandElement[result.size()]);
 	}
-	
+
 	/**
 	 * getContentAssists
 	 * 
@@ -895,7 +969,7 @@ public class BundleManager
 		{
 			filter = caFilter;
 		}
-		
+
 		List<ContentAssistElement> result = new ArrayList<ContentAssistElement>();
 		for (String name : this.getBundleNames())
 		{
@@ -1054,6 +1128,38 @@ public class BundleManager
 		return result.toArray(new MenuElement[result.size()]);
 	}
 
+	public ProjectTemplate[] getProjectTemplates()
+	{
+		List<ProjectTemplate> result = new ArrayList<ProjectTemplate>();
+		Iterator<List<BundleElement>> iter = _bundlesByPath.values().iterator();
+		List<BundleElement> bundles;
+		while (iter.hasNext())
+		{
+			bundles = iter.next();
+			for (BundleElement bundle : bundles)
+			{
+				result.addAll(Arrays.asList(bundle.getProjectTemplates()));
+			}
+		}
+		return result.toArray(new ProjectTemplate[result.size()]);
+	}
+
+	public ProjectTemplate[] getProjectTemplatesByType(Type type)
+	{
+		List<ProjectTemplate> result = new ArrayList<ProjectTemplate>();
+		Iterator<List<BundleElement>> iter = _bundlesByPath.values().iterator();
+		List<BundleElement> bundles;
+		while (iter.hasNext())
+		{
+			bundles = iter.next();
+			for (BundleElement bundle : bundles)
+			{
+				result.addAll(Arrays.asList(bundle.getProjectTemplatesByType(type)));
+			}
+		}
+		return result.toArray(new ProjectTemplate[result.size()]);
+	}
+
 	/**
 	 * getTopLevelScope
 	 * 
@@ -1093,10 +1199,10 @@ public class BundleManager
 						// return value
 						// TODO: Check for simple case where one is a subset scope of the other, use the more specific
 						// one and move on
-						
+
 						// split on periods to see the specificity of scope name
-						int existingLength = StringUtil.characterInstanceCount(result, '.') + 1;  //$NON-NLS-1$
-						int newLength = StringUtil.characterInstanceCount(entry.getValue(), '.') + 1;  //$NON-NLS-1$
+						int existingLength = StringUtil.characterInstanceCount(result, '.') + 1;
+						int newLength = StringUtil.characterInstanceCount(entry.getValue(), '.') + 1;
 
 						if (newLength > existingLength)
 						{
@@ -1180,7 +1286,7 @@ public class BundleManager
 				result = this._bundlesByPath.containsKey(bundleDirectory);
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -1211,29 +1317,25 @@ public class BundleManager
 					}
 					else
 					{
-						message = MessageFormat.format(Messages.BundleManager_No_Bundle_File, new Object[] {
-								bundleDirectory.getAbsolutePath(), BUNDLE_FILE });
+						message = MessageFormat.format(Messages.BundleManager_No_Bundle_File, new Object[] { bundleDirectory.getAbsolutePath(), BUNDLE_FILE });
 					}
 				}
 				else
 				{
-					message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY,
-							new Object[] { bundleDirectory.getAbsolutePath() });
+					message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY, new Object[] { bundleDirectory.getAbsolutePath() });
 				}
 			}
 			else
 			{
-				message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY,
-						new Object[] { bundleDirectory.getAbsolutePath() });
+				message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY, new Object[] { bundleDirectory.getAbsolutePath() });
 			}
 		}
 		else
 		{
-			message = MessageFormat.format(Messages.BundleManager_BUNDLE_DIRECTORY_DOES_NOT_EXIST,
-					new Object[] { bundleDirectory.getAbsolutePath() });
+			message = MessageFormat.format(Messages.BundleManager_BUNDLE_DIRECTORY_DOES_NOT_EXIST, new Object[] { bundleDirectory.getAbsolutePath() });
 		}
 
-		if (result == false  && message != null && message.length() > 0)
+		if (result == false && message != null && message.length() > 0)
 		{
 			ScriptLogger.logError(message);
 		}
@@ -1286,7 +1388,7 @@ public class BundleManager
 	{
 		// clear out any existing bundles since we're rebuilding from scratch
 		this.reset();
-		
+
 		this.loadApplicationBundles();
 		this.loadUserBundles();
 		this.loadProjectBundles();
@@ -1361,8 +1463,7 @@ public class BundleManager
 
 		if (execute && script.canRead() == false)
 		{
-			String message = MessageFormat.format(Messages.BundleManager_UNREADABLE_SCRIPT, new Object[] { script
-					.getAbsolutePath() });
+			String message = MessageFormat.format(Messages.BundleManager_UNREADABLE_SCRIPT, new Object[] { script.getAbsolutePath() });
 
 			ScriptLogger.logError(message);
 			execute = false;
@@ -1405,11 +1506,11 @@ public class BundleManager
 	public void reloadBundle(BundleElement bundle)
 	{
 		File bundleDirectory = bundle.getBundleDirectory();
-		
+
 		this.unloadBundle(bundleDirectory);
 		this.loadBundle(bundleDirectory);
 	}
-	
+
 	/**
 	 * reloadScript
 	 * 
@@ -1420,13 +1521,13 @@ public class BundleManager
 		if (script != null)
 		{
 			this.unloadScript(script, false);
-			
+
 			// determine bundle root directory
 			File bundleDirectory = this.getBundleDirectory(script);
 
 			// get bundle load paths
 			List<String> loadPaths = this.getBundleLoadPaths(bundleDirectory);
-			
+
 			// execute script
 			ScriptingEngine.getInstance().runScript(script.getAbsolutePath(), loadPaths, RunType.THREAD, true);
 
@@ -1494,12 +1595,15 @@ public class BundleManager
 	 */
 	public void removeBundleChangeListener(BundleChangeListener listener)
 	{
-		if (this._bundleListeners != null)
+		synchronized (bundleListenersLock)
 		{
-			this._bundleListeners.remove(listener);
+			if (this._bundleListeners != null)
+			{
+				this._bundleListeners.remove(listener);
+			}
 		}
 	}
-	
+
 	/**
 	 * removeElementChangeListener
 	 * 
@@ -1507,9 +1611,12 @@ public class BundleManager
 	 */
 	public void removeElementChangeListener(ElementChangeListener listener)
 	{
-		if (this._elementListeners != null)
+		synchronized (elementListenersLock)
 		{
-			this._elementListeners.remove(listener);
+			if (this._elementListeners != null)
+			{
+				this._elementListeners.remove(listener);
+			}
 		}
 	}
 
@@ -1520,9 +1627,12 @@ public class BundleManager
 	 */
 	public void removeLoadCycleListener(LoadCycleListener listener)
 	{
-		if (this._loadCycleListeners != null)
+		synchronized (loadCycleListenersLock)
 		{
-			this._loadCycleListeners.remove(listener);
+			if (this._loadCycleListeners != null)
+			{
+				this._loadCycleListeners.remove(listener);
+			}
 		}
 	}
 
@@ -1559,7 +1669,7 @@ public class BundleManager
 	{
 		AbstractElement[] elements = AbstractElement.getElementsByDirectory(bundleDirectory.getAbsolutePath());
 		Set<File> scripts = new HashSet<File>();
-		
+
 		if (elements != null)
 		{
 			for (AbstractElement element : elements)
@@ -1567,13 +1677,13 @@ public class BundleManager
 				scripts.add(new File(element.getPath()));
 			}
 		}
-		
+
 		for (File script : scripts)
 		{
 			this.unloadScript(script);
 		}
 	}
-	
+
 	/**
 	 * unloadScript
 	 * 

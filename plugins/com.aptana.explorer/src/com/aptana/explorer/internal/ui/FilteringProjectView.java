@@ -919,7 +919,7 @@ public class FilteringProjectView extends GitProjectView
 
 	protected Color getHoverBackgroundColor()
 	{
-		return ThemePlugin.getDefault().getColorManager().getColor(getActiveTheme().getLineHighlight());
+		return ThemePlugin.getDefault().getColorManager().getColor(getActiveTheme().getLineHighlightAgainstBG());
 	}
 
 	protected Theme getActiveTheme()

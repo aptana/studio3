@@ -13,6 +13,7 @@ import org.jruby.RubyRegexp;
 import com.aptana.core.util.StringUtil;
 import com.aptana.parsing.io.SourcePrinter;
 import com.aptana.scope.ScopeSelector;
+import com.aptana.scripting.model.ProjectTemplate.Type;
 
 public class BundleElement extends AbstractElement
 {
@@ -40,6 +41,8 @@ public class BundleElement extends AbstractElement
 	
 	private Map<ScopeSelector, RubyRegexp> _increaseIndentMarkers;
 	private Map<ScopeSelector, RubyRegexp> _decreaseIndentMarkers;
+
+	private List<ProjectTemplate> _projectTemplates;
 
 	/**
 	 * Bundle
@@ -146,7 +149,7 @@ public class BundleElement extends AbstractElement
 	 */
 	public void associateScope(String filePattern, String scope)
 	{
-		if (filePattern != null && filePattern.length() > 0 && scope != null && scope.length() > 0)
+		if (!StringUtil.isEmpty(filePattern) && !StringUtil.isEmpty(scope))
 		{
 			// Store the filetype -> scope mapping for later lookup when we need to set up the scope in the editor
 			if (this._fileTypeRegistry == null)
@@ -168,6 +171,11 @@ public class BundleElement extends AbstractElement
 		this._description = null;
 		this._license = null;
 		this._licenseUrl = null;
+		if (_projectTemplates != null)
+		{
+			_projectTemplates.clear();
+			_projectTemplates = null;
+		}
 	}
 
 	/**
@@ -211,7 +219,7 @@ public class BundleElement extends AbstractElement
 
 		synchronized (commandLock)
 		{
-			if (name != null && name.length() > 0 && this._commands != null && this._commands.size() > 0)
+			if (!StringUtil.isEmpty(name) && this._commands != null && this._commands.size() > 0)
 			{
 				for (CommandElement command : this._commands)
 				{
@@ -286,7 +294,7 @@ public class BundleElement extends AbstractElement
 	{
 		String result = super.getDisplayName();
 
-		if (result == null || result.length() == 0)
+		if (StringUtil.isEmpty(result))
 		{
 			result = this.getDefaultName();
 		}
@@ -507,8 +515,7 @@ public class BundleElement extends AbstractElement
 		// calculated display name we generate in this class
 		String displayName = super.getDisplayName();
 
-		return displayName != null && displayName.length() > 0
-				&& StringUtil.areNotEqual(displayName, this.getDefaultName());
+		return !StringUtil.isEmpty(displayName) && StringUtil.areNotEqual(displayName, this.getDefaultName());
 	}
 
 	/**
@@ -666,7 +673,7 @@ public class BundleElement extends AbstractElement
 	 */
 	public void setFoldingMarkers(String scope, RubyRegexp startRegexp, RubyRegexp endRegexp)
 	{
-		if (scope != null && scope.length() > 0 && startRegexp != null && startRegexp.isNil() == false && endRegexp != null && endRegexp.isNil() == false)
+		if (!StringUtil.isEmpty(scope) && startRegexp != null && startRegexp.isNil() == false && endRegexp != null && endRegexp.isNil() == false)
 		{
 			// store starting regular expression
 			if (this._foldingStartMarkers == null)
@@ -695,7 +702,7 @@ public class BundleElement extends AbstractElement
 	 */
 	public void setIndentMarkers(String scope, RubyRegexp startRegexp, RubyRegexp endRegexp)
 	{
-		if (scope != null && scope.length() > 0 && startRegexp != null && startRegexp.isNil() == false && endRegexp != null && endRegexp.isNil() == false)
+		if (!StringUtil.isEmpty(scope) && startRegexp != null && startRegexp.isNil() == false && endRegexp != null && endRegexp.isNil() == false)
 		{
 			// store increasing regular expression
 			if (this._increaseIndentMarkers == null)
@@ -763,5 +770,44 @@ public class BundleElement extends AbstractElement
 	List<String> getFileTypes()
 	{
 		return fileTypes;
+	}
+
+	public void addProjectTemplate(String type, String name, String location, String description)
+	{
+		if (!StringUtil.isEmpty(type) && !StringUtil.isEmpty(name) && !StringUtil.isEmpty(location))
+		{
+			if (_projectTemplates == null)
+			{
+				_projectTemplates = new ArrayList<ProjectTemplate>();
+			}
+			_projectTemplates.add(new ProjectTemplate(type, name, location, description, _bundleDirectory));
+		}
+	}
+
+	public ProjectTemplate[] getProjectTemplates()
+	{
+		if (_projectTemplates == null)
+		{
+			return BundleManager.NO_PROJECT_TEMPLATES;
+		}
+		return _projectTemplates.toArray(new ProjectTemplate[_projectTemplates.size()]);
+	}
+
+	public ProjectTemplate[] getProjectTemplatesByType(Type type)
+	{
+		if (_projectTemplates == null)
+		{
+			return BundleManager.NO_PROJECT_TEMPLATES;
+		}
+		List<ProjectTemplate> list = new ArrayList<ProjectTemplate>();
+		for (ProjectTemplate template : _projectTemplates)
+		{
+			// type "all" is always included
+			if (template.getType() == type || template.getType() == Type.ALL)
+			{
+				list.add(template);
+			}
+		}
+		return list.toArray(new ProjectTemplate[list.size()]);
 	}
 }

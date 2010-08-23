@@ -50,6 +50,7 @@ public class CloneJob extends Job
 	private String sourceURI;
 	private String dest;
 	private boolean forceRootAsProject;
+	private boolean shallowClone;
 
 	public CloneJob(String sourceURI, String dest)
 	{
@@ -58,11 +59,17 @@ public class CloneJob extends Job
 
 	public CloneJob(String sourceURI, String dest, boolean forceRootAsProject)
 	{
+		this(sourceURI, dest, forceRootAsProject, false);
+	}
+
+	public CloneJob(String sourceURI, String dest, boolean forceRootAsProject, boolean shallow)
+	{
 		super(Messages.CloneWizard_Job_title);
 		setUser(true);
 		this.sourceURI = sourceURI;
 		this.dest = dest;
 		this.forceRootAsProject = forceRootAsProject;
+		this.shallowClone = shallow;
 	}
 
 	@Override
@@ -112,14 +119,22 @@ public class CloneJob extends Job
 				@Override
 				public void launchAdded(ILaunch launch) {
 					// TODO Auto-generated method stub
-					
 				}
 			};
 			manager.addLaunchListener(listener);
 			
 			// FIXME This doesn't ever run in bg in 3.6!
-			ILaunch launch = Launcher.launch(GitExecutable.instance().path().toOSString(), null,
-					subMonitor.newChild(100), "clone", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$
+			ILaunch launch;
+			if (shallowClone)
+			{
+				launch = Launcher.launch(GitExecutable.instance().path().toOSString(), null, subMonitor.newChild(100),
+						"clone", "--depth", "1", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			}
+			else
+			{
+				launch = Launcher.launch(GitExecutable.instance().path().toOSString(), null, subMonitor.newChild(100),
+						"clone", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 			if (launch == null)
 			{
 				manager.removeLaunchListener(listener);
@@ -141,7 +156,8 @@ public class CloneJob extends Job
 				existingProjects = collectProjectFilesFromDirectory(new File(dest), null, subMonitor.newChild(25));
 			}
 			if (existingProjects.isEmpty())
-			{ // No projects found. Turn the root of the repo into a project!
+			{
+				// No projects found. Turn the root of the repo into a project!
 				createExistingProject(new File(dest), subMonitor.newChild(75));
 			}
 			else
