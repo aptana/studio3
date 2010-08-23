@@ -252,7 +252,7 @@ public class JSIndexReader
 		String[] columns = key.split(JSIndexConstants.DELIMITER);
 		int column = 0;
 
-		result.setKey(columns[column++]);
+		column++; // skip key
 		result.setDescription(columns[column++]);
 		result.setOS(columns[column++]);
 		result.setPlatform(columns[column++]);
