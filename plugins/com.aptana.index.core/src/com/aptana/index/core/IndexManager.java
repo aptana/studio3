@@ -2,7 +2,9 @@ package com.aptana.index.core;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
@@ -86,6 +88,16 @@ public class IndexManager
 		}
 
 		return index;
+	}
+
+	/**
+	 * getIndexPaths
+	 * 
+	 * @return
+	 */
+	public synchronized List<URI> getIndexPaths()
+	{
+		return new ArrayList<URI>(indexes.keySet());
 	}
 
 	/**

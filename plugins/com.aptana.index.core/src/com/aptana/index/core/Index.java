@@ -592,7 +592,7 @@ public class Index implements IReadWriteMonitor
 				this.enterWrite();
 			}
 
-			// must own the write lock of the monitor
+			// no need to do anything if the memory index hasn't changed
 			if (!hasChanged())
 			{
 				return;

@@ -32,7 +32,7 @@ public class JSIndexQueryHelper
 	 */
 	public static Index getIndex()
 	{
-		return IndexManager.getInstance().getIndex(URI.create(JSIndexConstants.METADATA));
+		return IndexManager.getInstance().getIndex(URI.create(JSIndexConstants.METADATA_INDEX_LOCATION));
 	}
 
 	private JSIndexReader _reader;

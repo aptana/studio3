@@ -578,7 +578,7 @@ public class DiskIndex
 	public List<String> getCategories()
 	{
 		List<String> result;
-		
+
 		if (categoryOffsets == null)
 		{
 			result = Collections.emptyList();
@@ -587,10 +587,30 @@ public class DiskIndex
 		{
 			result = new ArrayList<String>(categoryOffsets.keySet());
 		}
-		
+
 		return result;
 	}
-	
+
+	/**
+	 * getDocuments
+	 * 
+	 * @return
+	 */
+	public List<String> getDocuments()
+	{
+		List<String> result = Collections.emptyList();
+
+		try
+		{
+			result = this.readAllDocumentNames();
+		}
+		catch (IOException e)
+		{
+		}
+
+		return result;
+	}
+
 	/**
 	 * initialize
 	 * 
