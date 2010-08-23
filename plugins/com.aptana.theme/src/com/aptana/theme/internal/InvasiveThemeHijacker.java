@@ -582,11 +582,11 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		else
 		{
 			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND,
-					StringConverter.asString(theme.getSelection()));
+					StringConverter.asString(theme.getSelectionAgainstBG()));
 			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND, StringConverter.asString(theme.getBackground()));
 			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND, StringConverter.asString(theme.getForeground()));
 			prefs.put(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR,
-					StringConverter.asString(theme.getLineHighlight()));
+					StringConverter.asString(theme.getLineHighlightAgainstBG()));
 		}
 
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND_SYSTEM_DEFAULT, revertToDefaults);
@@ -612,8 +612,8 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		}
 		else
 		{
-			prefs.put("occurrenceIndicationColor", StringConverter.asString(theme.getSelection())); //$NON-NLS-1$
-			prefs.put("writeOccurrenceIndicationColor", StringConverter.asString(theme.getSelection())); //$NON-NLS-1$
+			prefs.put("occurrenceIndicationColor", StringConverter.asString(theme.getSelectionAgainstBG())); //$NON-NLS-1$
+			prefs.put("writeOccurrenceIndicationColor", StringConverter.asString(theme.getSelectionAgainstBG())); //$NON-NLS-1$
 		}
 
 		try
@@ -752,7 +752,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 
 		// Force selection color
 		sourceViewer.getTextWidget().setSelectionBackground(
-				ThemePlugin.getDefault().getColorManager().getColor(getCurrentTheme().getSelection()));
+				ThemePlugin.getDefault().getColorManager().getColor(getCurrentTheme().getSelectionAgainstBG()));
 		if (!Platform.getOS().equals(Platform.OS_MACOSX))
 		{
 			// Linux and windows need selection fg set or we just see a block of color.

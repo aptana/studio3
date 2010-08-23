@@ -6,9 +6,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -304,7 +304,7 @@ public class BundleView extends ViewPart
 					ColorManager colorManager = plugin.getColorManager();
 					IThemeManager themeManager = plugin.getThemeManager();
 
-					gc.setBackground(colorManager.getColor(themeManager.getCurrentTheme().getSelection()));
+					gc.setBackground(colorManager.getColor(themeManager.getCurrentTheme().getSelectionAgainstBG()));
 					gc.fillRectangle(0, event.y, clientWidth, event.height);
 					gc.setBackground(oldBackground);
 
