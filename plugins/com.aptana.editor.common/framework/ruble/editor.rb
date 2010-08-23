@@ -243,8 +243,6 @@ module Ruble
     end
     
     def to_env
-      input = editor_input
-      Ruble::Logger.log_error input
       result = {}
       
       if editor_part.kind_of?(com.aptana.editor.common.AbstractThemeableEditor)
@@ -255,6 +253,7 @@ module Ruble
         result['TM_TAB_SIZE'] = 4
       end
       
+      input = editor_input
       if input.respond_to? :file
         ifile = input.file
         file = ifile.location.to_file
