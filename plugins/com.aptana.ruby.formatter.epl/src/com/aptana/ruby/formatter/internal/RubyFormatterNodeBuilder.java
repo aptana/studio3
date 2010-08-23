@@ -13,6 +13,7 @@
 package com.aptana.ruby.formatter.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -23,7 +24,6 @@ import org.jrubyparser.SourcePosition;
 import org.jrubyparser.ast.ArgumentNode;
 import org.jrubyparser.ast.ArrayNode;
 import org.jrubyparser.ast.BeginNode;
-import org.jrubyparser.ast.BlockNode;
 import org.jrubyparser.ast.CaseNode;
 import org.jrubyparser.ast.ClassNode;
 import org.jrubyparser.ast.Colon3Node;
@@ -42,7 +42,6 @@ import org.jrubyparser.ast.ListNode;
 import org.jrubyparser.ast.MethodDefNode;
 import org.jrubyparser.ast.ModuleNode;
 import org.jrubyparser.ast.NilImplicitNode;
-import org.jrubyparser.ast.NilNode;
 import org.jrubyparser.ast.Node;
 import org.jrubyparser.ast.NodeType;
 import org.jrubyparser.ast.PostExeNode;
@@ -382,8 +381,26 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 			public Object visitIfNode(IfNode visited)
 			{
-				FormatterIfNode ifNode = new FormatterIfNode(document);
 				SourcePosition position = visited.getPosition();
+				if (position.getStartLine() == position.getEndLine()) {
+					// Inline if
+					List<Node> children = new ArrayList<Node>(3);
+					if (visited.getThenBody() != null) {
+						children.add(visited.getThenBody());
+					}
+					if (visited.getElseBody() != null) {
+						children.add(visited.getElseBody());
+					}
+					if (visited.getCondition() != null) {
+						children.add(visited.getCondition());
+					}
+					if (!children.isEmpty()) {
+						Collections.sort(children, POSITION_COMPARATOR);
+						visitChildren(children);
+					}
+					return null;
+				}
+				FormatterIfNode ifNode = new FormatterIfNode(document);
 				ifNode.setBegin(createTextNode(document, position.getStartOffset(), visited.getCondition()
 						.getPosition().getEndOffset()));
 				push(ifNode);
@@ -950,14 +967,12 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		return new Region(position.getStartOffset(), position.getEndOffset() - position.getStartOffset());
 	}
 
-	protected static final Comparator POSITION_COMPARATOR = new Comparator()
+	protected static final Comparator<Node> POSITION_COMPARATOR = new Comparator<Node>()
 	{
 
-		public int compare(Object o1, Object o2)
+		public int compare(Node n1, Node n2)
 		{
-			final Node node1 = (Node) o1;
-			final Node node2 = (Node) o2;
-			return node1.getPosition().getStartOffset() - node2.getPosition().getStartOffset();
+			return n1.getPosition().getStartOffset() - n2.getPosition().getStartOffset();
 		}
 	};
 }
