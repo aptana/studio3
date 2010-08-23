@@ -102,12 +102,20 @@ public class Theme
 			RGBa foreground = null;
 			RGBa background = null;
 			List<String> values = tokenize((String) entry.getValue());
+			// Handle empty fg with a bg color! If first token is just an empty value followed by a comma
+			int num = 0;
+			boolean skipFG = false;
 			for (String token : values)
 			{
-				if (token.startsWith("#")) //$NON-NLS-1$
+				if (token.length() == 0 && num == 0)
+				{
+					// empty fg!
+					skipFG = true;
+				}
+				else if (token.startsWith("#")) //$NON-NLS-1$
 				{
 					// it's a color!
-					if (foreground == null)
+					if (foreground == null && !skipFG)
 					{
 						foreground = parseHexRGBa(token);
 					}
@@ -131,10 +139,7 @@ public class Theme
 						style |= SWT.BOLD;
 					}
 				}
-			}
-			if (foreground == null)
-			{
-				foreground = new RGBa(defaultFG);
+				num++;
 			}
 			DelayedTextAttribute attribute = new DelayedTextAttribute(foreground, background, style);
 			coloringRules.put(new ScopeSelector(scopeSelector), attribute);
@@ -224,7 +229,7 @@ public class Theme
 			return cache.get(scope);
 		}
 		lastSelectorMatch = null;
-		TextAttribute ta = toTextAttribute(getDelayedTextAttribute(scope));
+		TextAttribute ta = toTextAttribute(getDelayedTextAttribute(scope), true);
 		cache.put(scope, ta);
 		return ta;
 	}
@@ -259,20 +264,37 @@ public class Theme
 		// Some tokens are special. They have fallbacks even if not in the theme! Looks like bundles can contribute
 		// them?
 		if (scope.startsWith("markup.changed")) //$NON-NLS-1$
+		{
 			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(248, 205, 14), SWT.NORMAL);
-
+		}
 		if (scope.startsWith("markup.deleted")) //$NON-NLS-1$
+		{
 			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(255, 86, 77), SWT.NORMAL);
-
+		}
 		if (scope.startsWith("markup.inserted")) //$NON-NLS-1$
+		{
 			return new DelayedTextAttribute(new RGBa(0, 0, 0), new RGBa(128, 250, 120), SWT.NORMAL);
-
+		}
+		if (scope.startsWith("markup.underline")) //$NON-NLS-1$
+		{
+			return new DelayedTextAttribute(null, null, TextAttribute.UNDERLINE);
+		}
+		if (scope.startsWith("markup.bold")) //$NON-NLS-1$
+		{
+			return new DelayedTextAttribute(null, null, SWT.BOLD);
+		}
+		if (scope.startsWith("markup.italic")) //$NON-NLS-1$
+		{
+			return new DelayedTextAttribute(null, null, SWT.ITALIC);
+		}
 		if (scope.startsWith("meta.diff.index") || scope.startsWith("meta.diff.range") || scope.startsWith("meta.separator.diff")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		{
 			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(65, 126, 218), SWT.ITALIC);
-
+		}
 		if (scope.startsWith("meta.diff.header")) //$NON-NLS-1$
+		{
 			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(103, 154, 233), SWT.NORMAL);
-
+		}
 		return new DelayedTextAttribute(new RGBa(defaultFG));
 	}
 
@@ -301,7 +323,8 @@ public class Theme
 	private DelayedTextAttribute merge(DelayedTextAttribute childAttr, DelayedTextAttribute parentAttr)
 	{
 		return new DelayedTextAttribute(merge(childAttr.getForeground(), parentAttr.getForeground(), defaultFG), merge(
-				childAttr.getBackground(), parentAttr.getBackground(), defaultBG), childAttr.getStyle());
+				childAttr.getBackground(), parentAttr.getBackground(), defaultBG), childAttr.getStyle()
+				| parentAttr.getStyle());
 	}
 
 	private RGBa merge(RGBa top, RGBa bottom, RGB defaultParent)
@@ -325,11 +348,19 @@ public class Theme
 		return new RGBa(alphaBlend(bottom.toRGB(), top.toRGB(), top.getAlpha()));
 	}
 
-	private TextAttribute toTextAttribute(DelayedTextAttribute attr)
+	private TextAttribute toTextAttribute(DelayedTextAttribute attr, boolean forceColor)
 	{
-		RGBa fg = merge(attr.getForeground(), null, defaultFG);
-		RGBa bg = merge(attr.getBackground(), null, defaultBG);
-		return new TextAttribute(colorManager.getColor(fg.toRGB()), colorManager.getColor(bg.toRGB()), attr.getStyle());
+		Color fg = null;
+		if (attr.getForeground() != null || forceColor)
+		{
+			fg = colorManager.getColor(merge(attr.getForeground(), null, defaultFG).toRGB());
+		}
+		Color bg = null;
+		if (attr.getBackground() != null || forceColor)
+		{
+			bg = colorManager.getColor(merge(attr.getBackground(), null, defaultBG).toRGB());
+		}
+		return new TextAttribute(fg, bg, attr.getStyle());
 	}
 
 	public RGB getBackground()
@@ -367,7 +398,7 @@ public class Theme
 		Map<String, TextAttribute> tokens = new HashMap<String, TextAttribute>();
 		for (Map.Entry<ScopeSelector, DelayedTextAttribute> entry : coloringRules.entrySet())
 		{
-			tokens.put(entry.getKey().toString(), toTextAttribute(entry.getValue()));
+			tokens.put(entry.getKey().toString(), toTextAttribute(entry.getValue(), false));
 		}
 		return tokens;
 	}
@@ -381,8 +412,17 @@ public class Theme
 	 */
 	public void update(String scopeSelector, TextAttribute at)
 	{
-		coloringRules.put(new ScopeSelector(scopeSelector), new DelayedTextAttribute(new RGBa(at.getForeground()
-				.getRGB()), new RGBa(at.getBackground().getRGB()), at.getStyle()));
+		RGBa fg = null;
+		if (at.getForeground() != null)
+		{
+			fg = new RGBa(at.getForeground().getRGB());
+		}
+		RGBa bg = null;
+		if (at.getBackground() != null)
+		{
+			bg = new RGBa(at.getBackground().getRGB());
+		}
+		coloringRules.put(new ScopeSelector(scopeSelector), new DelayedTextAttribute(fg, bg, at.getStyle()));
 		wipeCache();
 		save();
 	}
@@ -425,7 +465,10 @@ public class Theme
 			{
 				value.append(BOLD).append(DELIMETER);
 			}
-			value.deleteCharAt(value.length() - 1);
+			if (value.length() > 0)
+			{
+				value.deleteCharAt(value.length() - 1);
+			}
 			if (value.length() == 0)
 				continue;
 			props.put(entry.getKey().toString(), value.toString());
@@ -567,7 +610,7 @@ public class Theme
 	 */
 	public void addNewDefaultToken(String scopeSelector)
 	{
-		DelayedTextAttribute attr = new DelayedTextAttribute(new RGBa(defaultFG));
+		DelayedTextAttribute attr = new DelayedTextAttribute(null);
 		coloringRules.put(new ScopeSelector(scopeSelector), attr);
 		wipeCache();
 		save();
