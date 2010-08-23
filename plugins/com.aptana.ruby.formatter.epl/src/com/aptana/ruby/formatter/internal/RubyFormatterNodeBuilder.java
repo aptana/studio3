@@ -23,6 +23,7 @@ import org.jrubyparser.SourcePosition;
 import org.jrubyparser.ast.ArgumentNode;
 import org.jrubyparser.ast.ArrayNode;
 import org.jrubyparser.ast.BeginNode;
+import org.jrubyparser.ast.BlockNode;
 import org.jrubyparser.ast.CaseNode;
 import org.jrubyparser.ast.ClassNode;
 import org.jrubyparser.ast.Colon3Node;
@@ -41,6 +42,7 @@ import org.jrubyparser.ast.ListNode;
 import org.jrubyparser.ast.MethodDefNode;
 import org.jrubyparser.ast.ModuleNode;
 import org.jrubyparser.ast.NilImplicitNode;
+import org.jrubyparser.ast.NilNode;
 import org.jrubyparser.ast.Node;
 import org.jrubyparser.ast.NodeType;
 import org.jrubyparser.ast.PostExeNode;
@@ -471,6 +473,7 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			{
 				/**
 				 * TODO -NEED TO SUPPORT THIS
+				 * 
 				 * <pre>
 				 * begin
 				 *   # main code here                                 				
@@ -488,31 +491,73 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				 *   # stuff that should happen dead last, and        				
 				 *   # regardless of whether any exceptions were      				
 				 *   # raised or not.                                 				
-				 * end                                                				
+				 * end
 				 * </pre>
 				 */
 				FormatterBeginNode beginNode = new FormatterBeginNode(document);
+				SourcePosition beginPosition = visited.getPosition();
+				// We first need to find the body-node of the begin section.
+				// It can be right under the BeginNode, but in cases where we have
+				// A RescueNode or an EnsureNode, it will be under those nodes.
 				Node bodyNode = visited.getBodyNode();
-				SourcePosition position = visited.getPosition();
-				int beginEndOffset;
+				RescueBodyNode rescueBodyNode = null;
+				int beginEndOffset = -1;
+				if (bodyNode instanceof EnsureNode)
+				{
+					EnsureNode ensureNode = (EnsureNode) bodyNode;
+					bodyNode = ensureNode.getBodyNode();
+					Node innerEnsureNode = ensureNode.getEnsureNode();
+					if (!(innerEnsureNode instanceof NilImplicitNode))
+					{
+						beginEndOffset = innerEnsureNode.getPosition().getEndOffset();
+					}
+				}
+				if (bodyNode instanceof RescueNode)
+				{
+					RescueNode rescueNode = (RescueNode) bodyNode;
+					bodyNode = rescueNode.getBodyNode();
+					rescueBodyNode = rescueNode.getRescueNode();
+				}
 				if (bodyNode instanceof NilImplicitNode)
 				{
 					// we have an emply body here
-					beginEndOffset = locateEndOffset(document, position.getEndOffset());
-					beginNode.setBegin(createTextNode(document, position.getStartOffset(), beginEndOffset));
+					if (beginEndOffset < 0)
+					{
+						beginEndOffset = locateEndOffset(document, beginPosition.getEndOffset());
+					}
+					beginNode.setBegin(createTextNode(document, beginPosition.getStartOffset(), beginEndOffset));
 					push(beginNode);
 					checkedPop(beginNode, beginEndOffset);
-					beginNode.setEnd(createTextNode(document, beginEndOffset, position.getEndOffset()));
+					beginNode.setEnd(createTextNode(document, beginEndOffset, beginPosition.getEndOffset()));
 				}
 				else
 				{
-					beginEndOffset = bodyNode.getPosition().getStartOffset();
-					beginNode.setBegin(createTextNode(document, position.getStartOffset(), beginEndOffset));
+					SourcePosition bodyNodePosition = bodyNode.getPosition();
+					if (beginEndOffset < 0)
+					{
+						if (rescueBodyNode instanceof RescueBodyNode)
+						{
+							Node innerBodyNode = rescueBodyNode.getBodyNode();
+							if (!(innerBodyNode instanceof NilImplicitNode))
+							{
+								beginEndOffset = innerBodyNode.getPosition().getEndOffset();
+							}
+							else
+							{
+								beginEndOffset = rescueBodyNode.getPosition().getEndOffset();
+							}
+						}
+						else
+						{
+							beginEndOffset = bodyNode.getPosition().getEndOffset();
+						}
+					}
+					beginNode.setBegin(createTextNode(document, beginPosition.getStartOffset(), bodyNodePosition
+							.getStartOffset()));
 					push(beginNode);
-					visitChild(bodyNode);
-					int bodyEndOffset = bodyNode.getPosition().getEndOffset();
-					checkedPop(beginNode, bodyEndOffset);
-					beginNode.setEnd(createTextNode(document, bodyEndOffset, position.getEndOffset()));
+					visitChild(visited.getBodyNode());
+					checkedPop(beginNode, -1);
+					beginNode.setEnd(createTextNode(document, beginNode.getEndOffset(), beginPosition.getEndOffset()));
 				}
 				return null;
 			}
@@ -524,28 +569,59 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				// return null;
 				// }
 				visitChild(visited.getBodyNode());
-				RescueBodyNode node = visited.getRescueNode();
-				while (node != null)
+				RescueBodyNode rescueBody = visited.getRescueNode();
+				int lastBodyEndOffset = -1;
+				while (rescueBody != null)
 				{
 					FormatterRescueNode rescueNode = new FormatterRescueNode(document);
-					rescueNode.setBegin(createTextNode(document, node.getPosition().getStartOffset(), node
-							.getExceptionNodes() != null ? node.getExceptionNodes().getPosition().getEndOffset() : node
-							.getPosition().getEndOffset()));
-					push(rescueNode);
-					visitChild(node.getBodyNode());
-					node = node.getOptRescueNode();
-					final int rescueEnd;
-					if (node != null)
+					Node bodyInnerNode = rescueBody.getBodyNode();
+					int rescueBeginEndOffset = -1;
+					SourcePosition position = rescueBody.getPosition();
+					if (!(bodyInnerNode instanceof NilImplicitNode))
 					{
-						rescueEnd = node.getPosition().getStartOffset();
-					}
-					else if (visited.getElseNode() != null)
-					{
-						rescueEnd = visited.getElseNode().getPosition().getStartOffset();
+						SourcePosition innerBodyPosition = bodyInnerNode.getPosition();
+						rescueBeginEndOffset = innerBodyPosition.getStartOffset();
+						lastBodyEndOffset = innerBodyPosition.getEndOffset();
+						// if (bodyInnerNode.)
 					}
 					else
 					{
-						rescueEnd = -1;
+						// try to look into the exception nodes
+						Node exceptionNodes = rescueBody.getExceptionNodes();
+						if (exceptionNodes != null)
+						{
+							rescueBeginEndOffset = exceptionNodes.getPosition().getEndOffset();
+						}
+						else if (visited.getElseNode() != null)
+						{
+							rescueBeginEndOffset = visited.getElseNode().getPosition().getStartOffset();
+						}
+						else
+						{
+							// FIXME - This will probably fail if we have nested rescue blocks
+							rescueBeginEndOffset = document.get(position.getStartOffset(), position.getEndOffset())
+									.lastIndexOf("rescue") + position.getStartOffset() + 6; //$NON-NLS-1$
+						}
+						lastBodyEndOffset = rescueBeginEndOffset;
+					}
+					rescueNode.setBegin(createTextNode(document, position.getStartOffset(), rescueBeginEndOffset));
+					push(rescueNode);
+					visitChild(rescueBody.getBodyNode());
+					rescueBody = rescueBody.getOptRescueNode();
+					final int rescueEnd;
+					if (rescueBody != null)
+					{
+						// rescueEnd = -1;
+						rescueEnd = position.getStartOffset();
+					}
+					else if (visited.getElseNode() != null)
+					{
+						// rescueEnd = visited.getElseNode().getPosition().getStartOffset();
+						rescueEnd = lastBodyEndOffset;
+					}
+					else
+					{
+						rescueEnd = rescueNode.getEndOffset();
 					}
 					checkedPop(rescueNode, rescueEnd);
 				}
@@ -553,7 +629,8 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				{
 					final Node elseBranch = visited.getElseNode();
 					FormatterRescueElseNode elseNode = new FormatterRescueElseNode(document);
-					elseNode.setBegin(createTextNode(document, elseBranch));
+					elseNode.setBegin(createTextNode(document, lastBodyEndOffset, elseBranch.getPosition()
+							.getStartOffset()));
 					push(elseNode);
 					visitChildren(elseBranch.childNodes());
 					checkedPop(elseNode, -1);
@@ -563,10 +640,16 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 			public Object visitEnsureNode(EnsureNode visited)
 			{
-				visitChild(visited.getBodyNode());
+				Node bodyNode = visited.getBodyNode();
+				visitChild(bodyNode);
 				FormatterEnsureNode ensureNode = new FormatterEnsureNode(document);
 				Node node = visited.getEnsureNode();
-				ensureNode.setBegin(createTextNode(document, node));
+				SourcePosition position = visited.getPosition();
+				// FIXME - This will probably fail if we have nested rescue blocks
+				int ensureStartOffset = document.get(position.getStartOffset(), position.getEndOffset()).lastIndexOf(
+						"ensure") //$NON-NLS-1$
+						+ position.getStartOffset();
+				ensureNode.setBegin(createTextNode(document, ensureStartOffset, node.getPosition().getStartOffset()));
 				push(ensureNode);
 				visitChildren(node.childNodes());
 				checkedPop(ensureNode, -1);
