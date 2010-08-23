@@ -274,7 +274,7 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 		{
 			return;
 		}
-		StyledText textWidget = fViewer.getTextWidget();
+		final StyledText textWidget = fViewer.getTextWidget();
 		if (textWidget == null)
 		{
 			return;
@@ -308,9 +308,17 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 							@Override
 							public void run()
 							{
+								if (textWidget.isDisposed())
+								{
+									return;
+								}
 								// FIXME Only change bg colors of visible ranges!
-								StyleRange[] ranges = fViewer.getTextWidget().getStyleRanges(offset,
-										Math.min(160, lineRegion.getLength()), true);
+								int replaceLength = 160;
+								if (lineRegion != null)
+								{
+									replaceLength = Math.min(replaceLength, lineRegion.getLength());
+								}
+								StyleRange[] ranges = textWidget.getStyleRanges(offset, replaceLength, true);
 								if (ranges == null || ranges.length == 0)
 								{
 									return;
@@ -324,8 +332,7 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 									positions[x + 1] = range.length;
 									x += 2;
 								}
-								fViewer.getTextWidget().setStyleRanges(offset, Math.min(160, lineRegion.getLength()),
-										positions, ranges);
+								textWidget.setStyleRanges(offset, replaceLength, positions, ranges);
 							}
 						});
 						return;
