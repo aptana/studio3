@@ -28,6 +28,8 @@ import com.aptana.index.core.SearchPattern;
 
 public class JSIndexReader
 {
+	private static Map<String, UserAgentElement> userAgentsByKey = new HashMap<String, UserAgentElement>();
+
 	/**
 	 * createFunctionFromKey
 	 * 
@@ -250,7 +252,7 @@ public class JSIndexReader
 		String[] columns = key.split(JSIndexConstants.DELIMITER);
 		int column = 0;
 
-		result.setKey(columns[column++]);
+		column++; // skip key
 		result.setDescription(columns[column++]);
 		result.setOS(columns[column++]);
 		result.setPlatform(columns[column++]);
@@ -791,7 +793,7 @@ public class JSIndexReader
 	 */
 	protected UserAgentElement getUserAgent(String userAgentKey) throws IOException
 	{
-		UserAgentElement result = JSIndexWriter.userAgentsByKey.get(userAgentKey);
+		UserAgentElement result = userAgentsByKey.get(userAgentKey);
 
 		if (result == null)
 		{
@@ -802,6 +804,11 @@ public class JSIndexReader
 			if (items != null && items.size() > 0)
 			{
 				result = this.createUserAgent(items.get(0));
+
+				if (result != null)
+				{
+					userAgentsByKey.put(userAgentKey, result);
+				}
 			}
 		}
 

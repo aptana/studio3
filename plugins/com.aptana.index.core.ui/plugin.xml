@@ -26,6 +26,11 @@
             id="com.aptana.index.core.ui.commands.include"
             name="%command.include">
       </command>
+      <command
+            categoryId="com.aptana.ui.category"
+            id="com.aptana.index.core.ui.commands.rebuild"
+            name="Rebuild index">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -60,6 +65,9 @@
       <menuContribution
             locationURI="popup:indexing.main">
          <command
+               commandId="com.aptana.index.core.ui.commands.rebuild">
+         </command>
+         <command
                commandId="com.aptana.index.core.ui.commands.exclude">
          </command>
          <command
@@ -68,6 +76,9 @@
       </menuContribution>
       <menuContribution
             locationURI="popup:projectexplorer.indexing.main">
+         <command
+               commandId="com.aptana.index.core.ui.commands.rebuild">
+         </command>
          <command
                commandId="com.aptana.index.core.ui.commands.exclude">
          </command>
@@ -123,6 +134,18 @@
                         value="true">
                   </test>
                </and>
+            </iterate>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="com.aptana.index.core.ui.handlers.RebuildHandler"
+            commandId="com.aptana.index.core.ui.commands.rebuild">
+         <enabledWhen>
+            <iterate
+                  ifEmpty="false">
+               <instanceof
+                     value="org.eclipse.core.resources.IProject">
+               </instanceof>
             </iterate>
          </enabledWhen>
       </handler>
