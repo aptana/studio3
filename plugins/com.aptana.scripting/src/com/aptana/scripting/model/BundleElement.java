@@ -171,7 +171,11 @@ public class BundleElement extends AbstractElement
 		this._description = null;
 		this._license = null;
 		this._licenseUrl = null;
-		this._projectTemplates.clear();
+		if (_projectTemplates != null)
+		{
+			_projectTemplates.clear();
+			_projectTemplates = null;
+		}
 	}
 
 	/**
