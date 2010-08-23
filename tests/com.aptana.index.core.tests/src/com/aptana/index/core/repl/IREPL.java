@@ -53,7 +53,7 @@ public class IREPL
 {
 	private static final Map<String, ICommand> COMMAND_MAP;
 	
-	private String indexDirectory = "/Users/klindsey/Documents/Workspaces/runtime-red.product/.metadata/.plugins/com.aptana.index.core";
+	private String indexDirectory = new File(".").getAbsolutePath();
 	private List<DiskIndex> indexes;
 	private DiskIndex currentIndex;
 	private String currentCategory;
