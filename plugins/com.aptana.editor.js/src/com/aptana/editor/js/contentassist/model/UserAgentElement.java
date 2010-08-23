@@ -10,8 +10,6 @@ public class UserAgentElement
 	private String _os;
 	private String _osVersion;
 	private String _description;
-	private int _hash;
-	private String _key; // used by the indexing system only
 
 	/**
 	 * UserAgentElement
@@ -65,7 +63,7 @@ public class UserAgentElement
 	 */
 	public String getKey()
 	{
-		return (this._key != null) ? this._key : EMPTY;
+		return Integer.toString(this.hashCode());
 	}
 
 	/**
@@ -115,27 +113,22 @@ public class UserAgentElement
 	@Override
 	public int hashCode()
 	{
-		int h = this._hash;
+		int h = 0;
 		
-		if (h == 0)
+		String[] items = new String[] {
+			this.getDescription(),
+			this.getOS(),
+			this.getOSVersion(),
+			this.getPlatform(),
+			this.getVersion()
+		};
+		
+		for (String item : items)
 		{
-			String[] items = new String[] {
-				this.getDescription(),
-				this.getOS(),
-				this.getOSVersion(),
-				this.getPlatform(),
-				this.getVersion()
-			};
-			
-			for (String item : items)
+			if (item != null)
 			{
-				if (item != null)
-				{
-					h = 31*h + item.hashCode();
-				}
+				h = 31*h + item.hashCode();
 			}
-			
-			this._hash = h;
 		}
 		
 		return h;
@@ -149,16 +142,6 @@ public class UserAgentElement
 	public void setDescription(String description)
 	{
 		this._description = description;
-	}
-
-	/**
-	 * setKey
-	 * 
-	 * @param key
-	 */
-	public void setKey(String key)
-	{
-		this._key = key;
 	}
 
 	/**
