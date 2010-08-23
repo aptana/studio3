@@ -19,12 +19,15 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.editor.common.contentassist.UserAgentManager;
+import com.aptana.editor.common.contentassist.UserAgentManager.UserAgent;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
 import com.aptana.editor.js.contentassist.index.JSMetadataReader;
 import com.aptana.editor.js.contentassist.index.ScriptDocException;
 import com.aptana.editor.js.contentassist.model.TypeElement;
+import com.aptana.editor.js.contentassist.model.UserAgentElement;
 import com.aptana.editor.js.preferences.IPreferenceConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
@@ -116,7 +119,18 @@ public class MetadataLoader extends Job
 
 		JSIndexWriter indexer = new JSIndexWriter();
 		Index index = JSIndexQueryHelper.getIndex();
+		
+		// write user agents from user agent list in prefs
+		for (UserAgent userAgent : UserAgentManager.getInstance().getAllUserAgents())
+		{
+			UserAgentElement ua = new UserAgentElement();
 
+			ua.setPlatform(userAgent.ID);
+			
+			indexer.writeUserAgent(ua);
+		}
+
+		// write types
 		for (TypeElement type : reader.getTypes())
 		{
 			indexer.writeType(index, type);
