@@ -25,6 +25,7 @@ import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 import org.jrubyparser.parser.ParserResult;
 
+import com.aptana.editor.ruby.parsing.IRubyParserConstants;
 import com.aptana.editor.ruby.parsing.NullParserResult;
 import com.aptana.editor.ruby.parsing.RubyParser;
 import com.aptana.editor.ruby.parsing.RubySourceParser;
@@ -36,6 +37,9 @@ import com.aptana.formatter.IFormatterContainerNode;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.ui.FormatterException;
+import com.aptana.parsing.IParser;
+import com.aptana.parsing.IParserPool;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.ruby.formatter.internal.DumpContentException;
 import com.aptana.ruby.formatter.internal.Messages;
 import com.aptana.ruby.formatter.internal.RubyFormatterContext;
@@ -67,11 +71,15 @@ public class RubyFormatter extends AbstractScriptFormatter
 	public int detectIndentationLevel(IDocument document, int offset)
 	{
 		final String source = document.get();
+		if (isSlave())
+		{
+			// TODO - Extract the relevant parts from the source, or get it from the parse state.
+		}
 		final ParserResult result;
 		try
 		{
-			RubySourceParser parser = new RubyParser().getSourceParser();
-			result = parser.parse(source);
+			RubySourceParser sourceParser = getSourceParser();
+			result = sourceParser.parse(source);
 			if (!(result instanceof NullParserResult))
 			{
 				final RubyFormatterNodeBuilder builder = new RubyFormatterNodeBuilder();
@@ -102,8 +110,13 @@ public class RubyFormatter extends AbstractScriptFormatter
 	public TextEdit format(String source, int offset, int length, int indent) throws FormatterException
 	{
 		final String input = source.substring(offset, offset + length);
-		RubySourceParser parser = new RubyParser().getSourceParser();
-		ParserResult result = parser.parse(input);
+		if (isSlave())
+		{
+			// TODO - Extract the relevant parts from the source, or get it from the parse state.
+		}
+		// RHTMLParser parser = new RHTMLParser();
+		RubySourceParser sourceParser = getSourceParser();
+		ParserResult result = sourceParser.parse(input);
 		if (!(result instanceof NullParserResult))
 		{
 			final String output = format(input, result, indent);
@@ -118,7 +131,8 @@ public class RubyFormatter extends AbstractScriptFormatter
 					else
 					{
 						FormatterPlugin.log(new Status(IStatus.ERROR, RubyFormatterPlugin.PLUGIN_ID, IStatus.OK,
-								Messages.RubyFormatter_contentCorrupted, new DumpContentException(input + "\n<!-------!>\n" + output))); //$NON-NLS-1$
+								Messages.RubyFormatter_contentCorrupted, new DumpContentException(input
+										+ "\n<!-------!>\n" + output))); //$NON-NLS-1$
 					}
 				}
 				else
@@ -128,6 +142,29 @@ public class RubyFormatter extends AbstractScriptFormatter
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * @return RubySourceParser
+	 */
+	private RubySourceParser getSourceParser()
+	{
+		RubySourceParser sourceParser = null;
+		IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IRubyParserConstants.LANGUAGE);
+		if (pool != null)
+		{
+			IParser parser = pool.checkOut();
+			if (parser instanceof RubyParser)
+			{
+				sourceParser = ((RubyParser) parser).getSourceParser();
+			}
+			pool.checkIn(parser);
+		}
+		if (sourceParser == null)
+		{
+			sourceParser = new RubyParser().getSourceParser();
+		}
+		return sourceParser;
 	}
 
 	protected boolean isValidation()

@@ -47,18 +47,22 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 		final TypedPosition partition;
 		final IProject project;
 		final String formatterId;
+		final boolean isSlave;
 
 		/**
 		 * @param document
 		 * @param partition
 		 * @param project
+		 * @param isSlave
 		 */
-		public FormatJob(IDocument document, TypedPosition partition, IProject project, String formatterId)
+		public FormatJob(IDocument document, TypedPosition partition, IProject project, String formatterId,
+				Boolean isSlave)
 		{
 			this.document = document;
 			this.partition = partition;
 			this.project = project;
 			this.formatterId = formatterId;
+			this.isSlave = (isSlave != null) ? isSlave : false;
 		}
 
 	}
@@ -117,6 +121,7 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 					{
 						((IScriptFormatterExtension) formatter).initialize(job.project);
 					}
+					formatter.setIsSlave(job.isSlave);
 					final int indentationLevel = formatter.detectIndentationLevel(document, offset);
 					final TextEdit edit = formatter.format(document.get(), offset, partition.getLength(),
 							indentationLevel);
@@ -187,7 +192,9 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 				.getProperty(FormattingContextProperties.CONTEXT_PARTITION);
 		final IProject project = (IProject) context.getProperty(ScriptFormattingContextProperties.CONTEXT_PROJECT);
 		final String formatterId = (String) context.getProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID);
-		fJobs.addLast(new FormatJob(document, partition, project, formatterId));
+		final Boolean isSlave = (Boolean) context
+				.getProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_IS_SLAVE);
+		fJobs.addLast(new FormatJob(document, partition, project, formatterId, isSlave));
 	}
 
 	@Override

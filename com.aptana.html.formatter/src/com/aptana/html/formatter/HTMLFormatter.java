@@ -2,6 +2,7 @@ package com.aptana.html.formatter;
 
 import java.util.Map;
 
+import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
@@ -35,8 +36,7 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	public TextEdit format(String source, int offset, int length, int indentationLevel) throws FormatterException
 	{
 		// TODO - Format the HTML.
-		TextEdit edit = new ReplaceEdit(offset, length, source);
-		return edit;
+		return new MultiTextEdit(); // NOP
 	}
 
 }

@@ -17,7 +17,8 @@ import org.eclipse.text.edits.TextEdit;
 /**
  * Script source code formatter interface.
  */
-public interface IScriptFormatter {
+public interface IScriptFormatter
+{
 
 	/**
 	 * Detects the indentation level at the specified offset
@@ -29,9 +30,8 @@ public interface IScriptFormatter {
 	int detectIndentationLevel(IDocument document, int offset);
 
 	/**
-	 * Format <code>source</code>, and returns a text edit that correspond to
-	 * the difference between the given string and the formatted string.
-	 * 
+	 * Format <code>source</code>, and returns a text edit that correspond to the difference between the given string
+	 * and the formatted string.
 	 * <p>
 	 * It returns null if the given string cannot be formatted.
 	 * </p>
@@ -45,7 +45,22 @@ public interface IScriptFormatter {
 	 * @param indentationLevel
 	 *            the additional indent level
 	 */
-	TextEdit format(String source, int offset, int length, int indentationLevel)
-			throws FormatterException;
+	TextEdit format(String source, int offset, int length, int indentationLevel) throws FormatterException;
 
+	/**
+	 * Set a flag on this formatter to indicate that it will be running as a slave formatter by the multi-pass
+	 * formatter.
+	 * 
+	 * @param isSlave
+	 * @see #isSlave()
+	 */
+	void setIsSlave(boolean isSlave);
+
+	/**
+	 * Returns true if this formatter is running as a 'slave' formatter.
+	 * 
+	 * @return boolean
+	 * @see #setIsSlave(boolean)
+	 */
+	boolean isSlave();
 }

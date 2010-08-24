@@ -225,7 +225,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	public IContentFormatter getContentFormatter(ISourceViewer sourceViewer)
 	{
 		final String[][] contentTypes = getTopContentTypes();
-		final MultiPassContentFormatter formatter = new CommonMultiPassContentFormatter(
+		final CommonMultiPassContentFormatter formatter = new CommonMultiPassContentFormatter(
 				getConfiguredDocumentPartitioning(sourceViewer), IDocument.DEFAULT_CONTENT_TYPE);
 		boolean masterSet = false;
 		Set<String> addedFormatters = new HashSet<String>();
@@ -238,7 +238,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 			{
 				if (ScriptFormatterManager.hasFormatterFor(CONTENTTYPE_HTML_PREFIX))
 				{
-					formatter.setMasterStrategy(new ScriptFormattingStrategy(CONTENTTYPE_HTML_PREFIX));
+					formatter.setMasterStrategy(CONTENTTYPE_HTML_PREFIX);
 					masterSet = true;
 					addedFormatters.add(CONTENTTYPE_HTML_PREFIX);
 				}
@@ -253,12 +253,12 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 			{
 				if (!masterSet)
 				{
-					formatter.setMasterStrategy(new ScriptFormattingStrategy(contentType));
+					formatter.setMasterStrategy(contentType);
 					masterSet = true;
 				}
 				else
 				{
-					formatter.setSlaveStrategy(new ScriptFormattingStrategy(contentType), contentType);
+					formatter.setSlaveStrategy(contentType);
 				}
 			}
 		}

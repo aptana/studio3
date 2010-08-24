@@ -1,7 +1,9 @@
 package com.aptana.editor.common.internal.formatter;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -10,15 +12,21 @@ import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.jface.text.formatter.MultiPassContentFormatter;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.editor.common.scripting.QualifiedContentType;
+import com.aptana.formatter.ui.ScriptFormattingContextProperties;
+import com.aptana.formatter.ui.ScriptFormattingStrategy;
 
 /**
  * A common multi-pass content formatter.<br>
  * This content formatter behaves like the {@link MultiPassContentFormatter}. The only change is in the way the slave
  * formatters are located. The slaves are searched by translating the given partition type to the conent-type of the
- * language that generates them.
+ * language that generates them.<br>
+ * Note that when using this class, call the {@link #setMasterStrategy(String)} and the
+ * {@link #setSlaveStrategy(String)} of the {@link CommonMultiPassContentFormatter}, instead of its superclass
+ * {@link MultiPassContentFormatter}.
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
@@ -28,6 +36,9 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 	private IDocumentScopeManager documentScopeManager;
 	private final String fType;
 	private final String fPartitioning;
+	private String masterContentType;
+	private Set<String> slaveContentTypes;
+	private Set<String> formattedContentTypes;
 
 	/**
 	 * Constructs a new {@link CommonMultiPassContentFormatter}.
@@ -41,12 +52,37 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 		this.fPartitioning = partitioning;
 		this.fType = type;
 		documentScopeManager = CommonEditorPlugin.getDefault().getDocumentScopeManager();
+		slaveContentTypes = new HashSet<String>();
+		masterContentType = StringUtil.EMPTY;
+	}
+
+	/**
+	 * Set the master strategy.
+	 * 
+	 * @param contentType
+	 */
+	public void setMasterStrategy(String contentType)
+	{
+		this.masterContentType = contentType;
+		super.setMasterStrategy(new ScriptFormattingStrategy(contentType));
+	}
+
+	/**
+	 * Set a slave strategy.
+	 * 
+	 * @param contentType
+	 */
+	public void setSlaveStrategy(String contentType)
+	{
+		this.slaveContentTypes.add(contentType);
+		super.setSlaveStrategy(new ScriptFormattingStrategy(contentType), contentType);
 	}
 
 	/**
 	 * Format the slaves.<br>
-	 * This version of the formatSlaves tries to identify all the regions that belong to the same content-type and
-	 * format them as a single unit.
+	 * This version of the formatSlaves will look into the content-types and will call a slave formatter for that
+	 * content-type for the entire document (not only the partition area). This allows better formatting for nested
+	 * languages like PHP and ERB (Ruby).
 	 * 
 	 * @see org.eclipse.jface.text.formatter.MultiPassContentFormatter#formatSlaves(org.eclipse.jface.text.formatter.
 	 *      IFormattingContext, org.eclipse.jface.text.IDocument, int, int)
@@ -55,6 +91,15 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 	@Override
 	protected void formatSlaves(IFormattingContext context, IDocument document, int offset, int length)
 	{
+		// Reset the content types we already formatted. Set the master in there, as it was already done.
+		formattedContentTypes = new HashSet<String>();
+		formattedContentTypes.add(masterContentType);
+
+		// Add a property to the context to notify the formatter it is formatting as a slave.
+		// By doing so formatters for languages like ERB will do an extra step of collecting the code bits from the
+		// content before formatting it.
+		context.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_IS_SLAVE, Boolean.TRUE);
+		
 		Map partitioners = new HashMap(0);
 		try
 		{
@@ -76,13 +121,7 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 			String type = null;
 			ITypedRegion partition = null;
 
-			partitioners = TextUtilities.removeDocumentPartitioners(document);
-
-			// Instead of formatting each partition, we collect the start and end offset for a specific content type and
-			// when it switches, we call a slave formatter to do the actual formatting.
-			int start = -1;
-			int contentLength = 0;
-			QualifiedContentType lastQualifiedContentType = null;
+			// Note: This loop is traversing backwards
 			for (int index = partitions.length - 1; index >= 0; index--)
 			{
 				partition = partitions[index];
@@ -90,42 +129,39 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 				boolean isDefaultType = fType.equals(type);
 				QualifiedContentType qualifiedContentType = documentScopeManager.getContentType(document, partition
 						.getOffset());
-				if (!isDefaultType && qualifiedContentType != null)
+				String contentType = extractContentType(qualifiedContentType);
+				if (!isDefaultType && contentType != null && !formattedContentTypes.contains(contentType))
 				{
-					if (lastQualifiedContentType == null || qualifiedContentType.equals(lastQualifiedContentType))
-					{
-						// We just need to set/expand the offset and length (note that the loop is moving backwards)
-						start = partition.getOffset();
-						contentLength += partition.getLength();
-						lastQualifiedContentType = qualifiedContentType;
-						continue;
-					}
+					formattedContentTypes.add(contentType);
+					System.out.println("Formatting 'slave' content-type: " + contentType);
+					partitioners = TextUtilities.removeDocumentPartitioners(document);
+					formatSlave(context, document, offset, length, contentType);
+					TextUtilities.addDocumentPartitioners(document, partitioners);
 				}
-				// if we got to this point, that means we have to check for a content-type switch and make a call to a
-				// slave formatter.
-				if (lastQualifiedContentType != null)
-				{
-					// take the last qualified content type and format it
-					formatSlave(context, document, start, contentLength, lastQualifiedContentType.getLastPart());
-					start = -1;
-					contentLength = 0;
-					lastQualifiedContentType = null;
-				}
-			}
-			if (lastQualifiedContentType != null)
-			{
-				// take the last qualified content type and format it
-				if (lastQualifiedContentType.getPartCount() > 0)
-					formatSlave(context, document, start, contentLength, lastQualifiedContentType.getParts()[0]);
 			}
 		}
 		catch (BadLocationException exception)
 		{
-			// Should not happen
+			// Should never happen
+			CommonEditorPlugin.logError(exception);
 		}
 		finally
 		{
 			TextUtilities.addDocumentPartitioners(document, partitioners);
 		}
+	}
+
+	protected String extractContentType(QualifiedContentType qualifiedContentType)
+	{
+		if (qualifiedContentType == null)
+		{
+			return null;
+		}
+		int partCount = qualifiedContentType.getPartCount();
+		if (partCount > 2)
+		{
+			return qualifiedContentType.getParts()[partCount - 2];
+		}
+		return null;
 	}
 }

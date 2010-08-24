@@ -29,5 +29,13 @@ public class ScriptFormattingContextProperties {
 	 * Value: <code>"formatting.context.formatterId"</code>
 	 */
 	public static final String CONTEXT_FORMATTER_ID = "formatting.context.formatterId"; //$NON-NLS-1$
+	
+	/**
+	 * Property key that indicates that the formatter is running as a 'slave'. The property must be of the
+	 * type <code>java.lang.Boolean</code>.
+	 * <p>
+	 * Value: <code>"formatting.context.isSlave"</code>
+	 */
+	public static final String CONTEXT_FORMATTER_IS_SLAVE = "formatting.context.isSlave"; //$NON-NLS-1$
 
 }
