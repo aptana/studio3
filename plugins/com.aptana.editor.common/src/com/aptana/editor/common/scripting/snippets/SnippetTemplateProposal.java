@@ -108,7 +108,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 			int start;
 			TemplateBuffer templateBuffer;
 			{
-				int oldReplaceOffset = getReplaceOffset();
+				int oldReplaceOffset = getReplaceOffset(document, fTemplate);
 
 				if (fTemplate instanceof SnippetTemplate)
 				{
@@ -149,7 +149,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 					return;
 				}
 
-				start = getReplaceOffset();
+				start = getReplaceOffset(document, fTemplate);
 				int shift = start - oldReplaceOffset;
 				int end = Math.max(getReplaceEndOffset(), offset + shift);
 
@@ -278,6 +278,33 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 			fSelectedRegion = fRegion;
 		}
 
+	}
+
+	private int getReplaceOffset(IDocument document, Template template)
+	{
+		if (template instanceof CommandTemplate)
+		{
+			try
+			{
+				CommandTemplate ct = (CommandTemplate) template;
+				// FIXME Need to get correct offset based on prefix chopping!
+				int fullPrefixOffset = getReplaceOffset();
+				String prefix = document.get(fullPrefixOffset, getReplaceEndOffset() - fullPrefixOffset);
+				final String origPrefix = prefix;
+				while (!ct.matches(prefix))
+				{
+					prefix = SnippetsCompletionProcessor.narrowPrefix(prefix);
+				}
+				return fullPrefixOffset + (origPrefix.length() - prefix.length());
+			}
+			catch (BadLocationException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		return getReplaceOffset();
 	}
 
 	/**

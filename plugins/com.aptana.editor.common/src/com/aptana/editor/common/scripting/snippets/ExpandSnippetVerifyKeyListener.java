@@ -50,11 +50,7 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 
 	public void verifyKey(VerifyEvent event)
 	{
-		if (textViewer == null)
-		{
-			return;
-		}
-		if (document == null)
+		if (textViewer == null || document == null)
 		{
 			return;
 		}
@@ -65,65 +61,67 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 			return;
 		}
 
-		if (canModifyEditor)
+		if (canModifyEditor && event.doit && event.character == '\t')
 		{
-			if (event.doit)
+			ITextSelection selection = (ITextSelection) textEditor.getSelectionProvider().getSelection();
+			if (selection.getLength() == 0)
 			{
-				if (event.character == '\t')
+				int offset = selection.getOffset() - 1;
+				try
 				{
-					ITextSelection selection = (ITextSelection) textEditor.getSelectionProvider().getSelection();
-					if (selection.getLength() == 0)
+					String previousChar = document.get(offset, 1);
+					if (!Character.isWhitespace(previousChar.charAt(0)))
 					{
-						int offset = selection.getOffset() - 1;
-						try
+						int caretOffset = textViewer.getTextWidget().getCaretOffset();
+						String scope = getScope(document, caretOffset);
+						AndFilter filter = new AndFilter(new ScopeFilter(scope), new HasTriggerFilter());
+						CommandElement[] commandsFromScope = BundleManager.getInstance().getCommands(filter);
+						if (commandsFromScope.length > 0)
 						{
-							String previousChar = document.get(offset, 1);
-							if (!Character.isWhitespace(previousChar.charAt(0)))
+							// chop off portions of prefix from beginning until we have a match!
+							String prefix = SnippetsCompletionProcessor
+									.extractPrefixFromDocument(document, caretOffset);
+							while (prefix != null && prefix.length() > 0)
 							{
-								int caretOffset = textViewer.getTextWidget().getCaretOffset();
-								String scope = getScope(document, caretOffset);
-								boolean found = false;
-								AndFilter filter = new AndFilter(new ScopeFilter(scope), new HasTriggerFilter());
-								CommandElement[] commandsFromScope = BundleManager.getInstance().getCommands(filter);
-								if (commandsFromScope.length > 0)
-								{
-									String prefix = SnippetsCompletionProcessor.extractPrefixFromDocument(document,
-											caretOffset);
-									LOOP: for (CommandElement commandElement : commandsFromScope)
-									{
-										String[] triggers = commandElement.getTriggers();
-										if (triggers != null)
-										{
-											for (String trigger : triggers)
-											{
-												if (trigger != null && trigger.startsWith(prefix))
-												{
-													found = true;
-													// Break out of the main outer for loop
-													break LOOP;
-												}
-											}
-										}
-									}
-								}
-								if (found)
+								if (hasMatchingSnippet(prefix, commandsFromScope))
 								{
 									if (contentAssistant != null)
 									{
 										contentAssistant.showPossibleCompletions();
 										event.doit = false;
 									}
+									return;
 								}
+								prefix = SnippetsCompletionProcessor.narrowPrefix(prefix);
 							}
 						}
-						catch (BadLocationException e)
-						{
-							return;
-						}
+					}
+				}
+				catch (BadLocationException e)
+				{
+					return;
+				}
+			}
+		}
+	}
+
+	protected boolean hasMatchingSnippet(String prefix, CommandElement[] commandsFromScope)
+	{
+		for (CommandElement commandElement : commandsFromScope)
+		{
+			String[] triggers = commandElement.getTriggers();
+			if (triggers != null)
+			{
+				for (String trigger : triggers)
+				{
+					if (trigger != null && trigger.startsWith(prefix))
+					{
+						return true;
 					}
 				}
 			}
 		}
+		return false;
 	}
 
 	private static boolean canModifyEditor(ITextEditor editor)
