@@ -38,7 +38,6 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 	private final String fPartitioning;
 	private String masterContentType;
 	private Set<String> slaveContentTypes;
-	private Set<String> formattedContentTypes;
 
 	/**
 	 * Constructs a new {@link CommonMultiPassContentFormatter}.
@@ -91,15 +90,11 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 	@Override
 	protected void formatSlaves(IFormattingContext context, IDocument document, int offset, int length)
 	{
-		// Reset the content types we already formatted. Set the master in there, as it was already done.
-		formattedContentTypes = new HashSet<String>();
-		formattedContentTypes.add(masterContentType);
-
 		// Add a property to the context to notify the formatter it is formatting as a slave.
 		// By doing so formatters for languages like ERB will do an extra step of collecting the code bits from the
 		// content before formatting it.
 		context.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_IS_SLAVE, Boolean.TRUE);
-		
+
 		Map partitioners = new HashMap(0);
 		try
 		{
@@ -121,6 +116,11 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 			String type = null;
 			ITypedRegion partition = null;
 
+			// Instead of formatting each partition, we collect the start and end offset for a specific content type and
+			// when it switches, we call a slave formatter to do the actual formatting.
+			int start = -1;
+			int contentLength = 0;
+			String lastContentType = null;
 			// Note: This loop is traversing backwards
 			for (int index = partitions.length - 1; index >= 0; index--)
 			{
@@ -130,14 +130,37 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 				QualifiedContentType qualifiedContentType = documentScopeManager.getContentType(document, partition
 						.getOffset());
 				String contentType = extractContentType(qualifiedContentType);
-				if (!isDefaultType && contentType != null && !formattedContentTypes.contains(contentType))
+				if (!isDefaultType && contentType != null && !contentType.equals(masterContentType))
 				{
-					formattedContentTypes.add(contentType);
-					System.out.println("Formatting 'slave' content-type: " + contentType);
-					partitioners = TextUtilities.removeDocumentPartitioners(document);
-					formatSlave(context, document, offset, length, contentType);
-					TextUtilities.addDocumentPartitioners(document, partitioners);
+					if (lastContentType == null || lastContentType.equals(contentType))
+					{
+						// We just need to set/expand the offset and length (note that the loop is moving backwards)
+						start = partition.getOffset();
+						contentLength += partition.getLength();
+						lastContentType = contentType;
+						continue;
+					}
 				}
+				// if we got to this point, that means we have to check for a content-type switch and make a call to a
+				// slave formatter.
+				if (lastContentType != null)
+				{
+					// take the last qualified content type and format it
+					partitioners = TextUtilities.removeDocumentPartitioners(document);
+					System.out.println(lastContentType + "(" + document.get(start, contentLength) + ')');
+					formatSlave(context, document, start, contentLength, lastContentType);
+					start = -1;
+					contentLength = 0;
+					lastContentType = null;
+					TextUtilities.addDocumentPartitioners(document, partitioners);
+					partitioners = null;
+				}
+			}
+			if (lastContentType != null)
+			{
+				// take the last qualified content type and format it
+				partitioners = TextUtilities.removeDocumentPartitioners(document);
+				formatSlave(context, document, start, contentLength, lastContentType);
 			}
 		}
 		catch (BadLocationException exception)
@@ -147,7 +170,10 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 		}
 		finally
 		{
-			TextUtilities.addDocumentPartitioners(document, partitioners);
+			if (partitioners != null)
+			{
+				TextUtilities.addDocumentPartitioners(document, partitioners);
+			}
 		}
 	}
 
