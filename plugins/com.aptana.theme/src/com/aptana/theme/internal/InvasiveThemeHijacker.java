@@ -384,6 +384,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		}
 	}
 
+	@SuppressWarnings("nls")
 	protected void hijackSearchView(final IViewPart view, final boolean revertToDefaults)
 	{
 		PageBookView outline = (PageBookView) view;
@@ -412,7 +413,9 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 				{
 					// Have to explicitly hook to child label too, since it's bg is set to non-null value
 					Composite comp = (Composite) page.getControl();
-					hookTheme(comp.getChildren()[0], revertToDefaults);
+					Control label = comp.getChildren()[0];
+					hookTheme(label, revertToDefaults);
+					comp.layout();
 				}
 				hookTheme(page.getControl(), revertToDefaults);
 			}
