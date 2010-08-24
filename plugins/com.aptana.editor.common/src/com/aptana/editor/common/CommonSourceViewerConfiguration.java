@@ -39,9 +39,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.internal.text.html.HTMLTextPresenter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.DefaultInformationControl;
@@ -76,7 +76,6 @@ import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
 import com.aptana.editor.common.text.reconciler.CommonCompositeReconcilingStrategy;
 import com.aptana.editor.common.text.reconciler.CommonReconciler;
 import com.aptana.formatter.ui.ScriptFormatterManager;
-import com.aptana.formatter.ui.ScriptFormattingStrategy;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
 
@@ -288,7 +287,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	 * org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getHyperlinkDetectorTargets(org.eclipse.jface.text.
 	 * source.ISourceViewer)
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings( { "unchecked", "rawtypes" })
 	@Override
 	protected Map getHyperlinkDetectorTargets(ISourceViewer sourceViewer)
 	{

@@ -147,7 +147,7 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 				{
 					// take the last qualified content type and format it
 					partitioners = TextUtilities.removeDocumentPartitioners(document);
-					System.out.println(lastContentType + "(" + document.get(start, contentLength) + ')');
+					// System.out.println(lastContentType + "(" + document.get(start, contentLength) + ')');
 					formatSlave(context, document, start, contentLength, lastContentType);
 					start = -1;
 					contentLength = 0;
