@@ -243,7 +243,7 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 			while (i > 0)
 			{
 				char ch = document.getChar(i - 1);
-				if (Character.isWhitespace(ch))
+				if (Character.isWhitespace(ch) || ch == '>' || ch == '<')
 					break;
 				i--;
 			}
