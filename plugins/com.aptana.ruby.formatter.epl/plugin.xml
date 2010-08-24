@@ -14,6 +14,18 @@
       </engineContribution>
    </extension>
    <extension
+         point="com.aptana.formatter.epl.formatterFactory">
+      <engineContribution
+            contentType="com.aptana.contenttype.html.erb">
+         <formatterFactory
+               class="com.aptana.ruby.formatter.RubyFormatterFactory"
+               id="com.aptana.erb.formatterFactory"
+               name="Ruby Code Formatter for ERB"
+               priority="10">
+         </formatterFactory>
+      </engineContribution>
+   </extension>
+   <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
             class="com.aptana.ruby.formatter.internal.RubyFormatterPreferenceInitializer">
