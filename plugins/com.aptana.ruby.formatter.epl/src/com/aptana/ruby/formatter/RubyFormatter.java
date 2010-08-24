@@ -71,10 +71,6 @@ public class RubyFormatter extends AbstractScriptFormatter
 	public int detectIndentationLevel(IDocument document, int offset)
 	{
 		final String source = document.get();
-		if (isSlave())
-		{
-			// TODO - Extract the relevant parts from the source, or get it from the parse state.
-		}
 		final ParserResult result;
 		try
 		{
@@ -109,12 +105,45 @@ public class RubyFormatter extends AbstractScriptFormatter
 
 	public TextEdit format(String source, int offset, int length, int indent) throws FormatterException
 	{
-		final String input = source.substring(offset, offset + length);
+		String input = source.substring(offset, offset + length);
 		if (isSlave())
 		{
-			// TODO - Extract the relevant parts from the source, or get it from the parse state.
+			// We are formatting an ERB content
+			if (input.startsWith("<%=")) { //$NON-NLS-1$
+				input = input.substring(3);
+				offset += 3;
+				length -= 3;
+			}
+			else if (input.startsWith("<%")) { //$NON-NLS-1$
+				input = input.substring(2);
+				offset += 2;
+				length -= 2;
+			}
+			if (input.endsWith("%>")) { //$NON-NLS-1$
+				input = input.substring(0, input.length() - 2);
+				length -= 2;
+			}
+			// We also skip any new-line characters for the ERB case. Otherwise, the formatting will jump the code up.
+			int toTrim = 0;
+			for (int i = 0; i < input.length(); i++)
+			{
+				char c = input.charAt(i);
+				if (c == '\n' || c == '\r')
+				{
+					toTrim++;
+				}
+				else
+				{
+					break;
+				}
+			}
+			if (toTrim > 0)
+			{
+				input = input.substring(toTrim);
+				offset += toTrim;
+				length -= toTrim;
+			}
 		}
-		// RHTMLParser parser = new RHTMLParser();
 		RubySourceParser sourceParser = getSourceParser();
 		ParserResult result = sourceParser.parse(input);
 		if (!(result instanceof NullParserResult))
