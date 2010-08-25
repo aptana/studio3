@@ -69,6 +69,16 @@ class TreeThemer extends ControlThemer
 		overrideLabelProvider();
 	}
 
+	@Override
+	protected void applyTheme()
+	{
+		super.applyTheme();
+		if (fTreeViewer != null)
+		{
+			fTreeViewer.refresh(true);
+		}
+	}
+
 	private void overrideLabelProvider()
 	{
 		ViewerColumn viewer = (ViewerColumn) getTree().getData("org.eclipse.jface.columnViewer"); //$NON-NLS-1$
@@ -282,7 +292,7 @@ class TreeThemer extends ControlThemer
 					{
 						if (item != null)
 						{
-							Rectangle bounds = item.getBounds();
+							Rectangle bounds = item.getBounds(tree.getColumnCount() - 1);
 							int x = bounds.x + bounds.width;
 							if (x < clientWidth)
 							{
