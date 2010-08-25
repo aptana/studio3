@@ -22,6 +22,7 @@ import org.eclipse.ui.PlatformUI;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
+import com.aptana.theme.ColorManager;
 import com.aptana.theme.RGBa;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
@@ -29,7 +30,9 @@ import com.aptana.theme.ThemePlugin;
 /**
  * A class that colors the entire line in token bg if there's only one background color specified in styling. This
  * extends block comment bg colors to entire line in the most common use case, rather than having the bg color revert to
- * the editor bg on the preceding spaces and trailing newline and empty space.
+ * the editor bg on the preceding spaces and trailing newline and empty space. This class now also handles painting
+ * current line highlights in a modified manner from CursorLinePainter. This impl handles line highlights with alpha and
+ * handles when tokens on a line have a non-null bg color of their own with an opaque line highlight.
  * 
  * @author cwilliams
  */
@@ -57,7 +60,27 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 	@Override
 	public void deactivate(boolean redraw)
 	{
-		// do nothing
+		if (fIsActive)
+		{
+			fIsActive = false;
+
+			/*
+			 * on turning off the feature one has to paint the currently highlighted line with the standard background
+			 * color
+			 */
+			if (redraw)
+				drawHighlightLine(fCurrentLine);
+
+			fViewer.getTextWidget().removeLineBackgroundListener(this);
+			fViewer.getTextWidget().removePaintListener(this);
+
+			if (fPositionManager != null)
+				fPositionManager.unmanagePosition(fCurrentLine);
+
+			fLastLineNumber = -1;
+			fCurrentLine.offset = 0;
+			fCurrentLine.length = 0;
+		}
 	}
 
 	/*
@@ -92,6 +115,7 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 			fIsActive = true;
 		}
 
+		// This forces redraw of the line highlight
 		if (updateHighlightLine())
 		{
 			// clear last line
@@ -280,7 +304,6 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 			return;
 		}
 
-		// We're coloring whole line based on what the trailing end bg color should be.
 		try
 		{
 			final int offset = event.lineOffset;
@@ -288,58 +311,15 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 			int line = document.getLineOfOffset(offset);
 			final IRegion lineRegion = document.getLineInformation(line);
 
-			// Check if we need to use a fully opaque current line highlight here.
-			// must have no selection, be same as current line, be fully opaque
-			Point selection = fViewer.getTextWidget().getSelectionRange();
-			if (selection.y == 0)
+			// Handle fully opaque line highlight here. A modified approach from CursorLinePainter.
+			if (shouldDrawCurrentLine(line))
 			{
-				RGBa lineHighlight = getCurrentTheme().getLineHighlight();
-				if (lineHighlight.isFullyOpaque()) // fully opaque
-				{
-					int modelCaret = getModelCaret();
-					int lineNumber = document.getLineOfOffset(modelCaret);
-					if (line == lineNumber) // current line!
-					{
-						event.lineBackground = ThemePlugin.getDefault().getColorManager()
-								.getColor(lineHighlight.toRGB());
-						// In this case, we should be overriding the bg of the style ranges for the line too!
-						PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
-						{
-							@Override
-							public void run()
-							{
-								if (textWidget.isDisposed())
-								{
-									return;
-								}
-								// FIXME Only change bg colors of visible ranges!
-								int replaceLength = 160;
-								if (lineRegion != null)
-								{
-									replaceLength = Math.min(replaceLength, lineRegion.getLength());
-								}
-								StyleRange[] ranges = textWidget.getStyleRanges(offset, replaceLength, true);
-								if (ranges == null || ranges.length == 0)
-								{
-									return;
-								}
-								int[] positions = new int[ranges.length * 2];
-								int x = 0;
-								for (StyleRange range : ranges)
-								{
-									range.background = null;
-									positions[x] = range.start;
-									positions[x + 1] = range.length;
-									x += 2;
-								}
-								textWidget.setStyleRanges(offset, replaceLength, positions, ranges);
-							}
-						});
-						return;
-					}
-				}
+				drawCurrentLine(event, lineRegion);
+				return;
 			}
 
+			// Not drawing an opaque line highlight, so we need to do our normal line coloring here.
+			// This extends the bg color out for a given line based on it's end scope.
 			String endOfLineScope = getScopeManager().getScopeAtOffset(document, lineRegion.getLength() + offset);
 			String commonPrefix = getScope(document, line, endOfLineScope);
 			TextAttribute at = getCurrentTheme().getTextAttribute(commonPrefix);
@@ -348,7 +328,6 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 			{
 				return;
 			}
-
 			event.lineBackground = at.getBackground();
 		}
 		catch (BadLocationException e)
@@ -357,19 +336,92 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 		}
 	}
 
-	protected Color getThemeBG()
+	private void drawCurrentLine(LineBackgroundEvent event, final IRegion lineRegion)
 	{
-		return ThemePlugin.getDefault().getColorManager().getColor(getCurrentTheme().getBackground());
+		final StyledText textWidget = fViewer.getTextWidget();
+		final int offset = event.lineOffset;
+		final RGBa lineHighlight = getCurrentTheme().getLineHighlight();
+		event.lineBackground = getColorManager().getColor(lineHighlight.toRGB());
+		// In this case, we should be overriding the bg of the style ranges for the line too!
+		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				if (textWidget.isDisposed())
+				{
+					return;
+				}
+				// FIXME Only change bg colors of visible ranges!
+				int replaceLength = 160;
+				if (lineRegion != null)
+				{
+					replaceLength = Math.min(replaceLength, lineRegion.getLength());
+				}
+
+				// be safe about offsets
+				int charCount = textWidget.getCharCount();
+				if (offset + replaceLength > charCount)
+				{
+					replaceLength = charCount - offset;
+					if (replaceLength < 0)
+					{
+						// Just playing safe here
+						replaceLength = 0;
+					}
+				}
+				StyleRange[] ranges = textWidget.getStyleRanges(offset, replaceLength, true);
+				if (ranges == null || ranges.length == 0)
+				{
+					return;
+				}
+				int[] positions = new int[ranges.length * 2];
+				int x = 0;
+				for (StyleRange range : ranges)
+				{
+					range.background = null;
+					positions[x] = range.start;
+					positions[x + 1] = range.length;
+					x += 2;
+				}
+				textWidget.setStyleRanges(offset, replaceLength, positions, ranges);
+			}
+		});
 	}
 
-	protected Theme getCurrentTheme()
+	protected ColorManager getColorManager()
 	{
-		return ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
+		return ThemePlugin.getDefault().getColorManager();
 	}
 
-	protected IDocumentScopeManager getScopeManager()
+	/**
+	 * Must have no selection, caret must be on the line, be fully opaque
+	 * 
+	 * @param line
+	 * @return
+	 */
+	private boolean shouldDrawCurrentLine(int line)
 	{
-		return CommonEditorPlugin.getDefault().getDocumentScopeManager();
+		// If there's a selection we "turn off" line highlight.
+		Point selection = fViewer.getTextWidget().getSelectionRange();
+		if (selection.y != 0)
+			return false;
+
+		// If there's transparency, we handle/color that in a different way, in #paintControl.
+		RGBa lineHighlight = getCurrentTheme().getLineHighlight();
+		if (!lineHighlight.isFullyOpaque())
+			return false;
+
+		// Now we make sure that this really is the current line.
+		try
+		{
+			int lineNumber = fViewer.getDocument().getLineOfOffset(getModelCaret());
+			return line == lineNumber; // current line!
+		}
+		catch (BadLocationException e)
+		{
+			return false;
+		}
 	}
 
 	/**
@@ -415,7 +467,9 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 	}
 
 	/**
-	 * Draws the current line highlight (over top using theme colors and alpha).
+	 * Draws the current line highlight (over top using theme colors and alpha). If the line highlight is fully opaque,
+	 * then this method will not do anything and we'll fall back to using the mechanism eclipse does in
+	 * CursorLinePainter with a little modification.
 	 */
 	@Override
 	public void paintControl(PaintEvent e)
@@ -438,7 +492,22 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 		// Only paint the part of lineRect that is contained in rect!
 		Rectangle intersection = lineRect.intersection(rect);
 		e.gc.setAlpha(lineHighlight.getAlpha());
-		e.gc.setBackground(ThemePlugin.getDefault().getColorManager().getColor(lineHighlight.toRGB()));
+		e.gc.setBackground(getColorManager().getColor(lineHighlight.toRGB()));
 		e.gc.fillRectangle(intersection);
+	}
+
+	protected Color getThemeBG()
+	{
+		return getColorManager().getColor(getCurrentTheme().getBackground());
+	}
+
+	protected Theme getCurrentTheme()
+	{
+		return ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
+	}
+
+	protected IDocumentScopeManager getScopeManager()
+	{
+		return CommonEditorPlugin.getDefault().getDocumentScopeManager();
 	}
 }
