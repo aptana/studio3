@@ -10,6 +10,7 @@ public class SnippetsTests
 	{
 		TestSuite suite = new TestSuite(SnippetsTests.class.getName());
 		//$JUnit-BEGIN$
+		suite.addTestSuite(SnippetsCompletionProcessorTest.class);
 		suite.addTestSuite(SnippetTemplateTranslatorTest.class);
 		//$JUnit-END$
 		return suite;
