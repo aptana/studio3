@@ -6,5 +6,6 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: APTANA
 Fragment-Host: com.aptana.editor.common;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: org.junit
+Require-Bundle: org.junit,
+ com.aptana.testing.mocks;bundle-version="1.0.0"
 Export-Package: com.aptana.editor.common.tests

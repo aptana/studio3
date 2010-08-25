@@ -13,6 +13,7 @@ public class SnippetsTests
 		suite.addTestSuite(CommandTemplateTest.class);
 		suite.addTestSuite(SnippetsCompletionProcessorTest.class);
 		suite.addTestSuite(SnippetTemplateTranslatorTest.class);
+		suite.addTestSuite(SnippetsCompletionProcessorTest.class);
 		//$JUnit-END$
 		return suite;
 	}

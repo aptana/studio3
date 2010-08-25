@@ -38,6 +38,7 @@ import org.eclipse.swt.widgets.Shell;
 public class SnippetTemplateProposal extends TemplateProposal implements ICompletionProposalExtension6
 {
 
+	// TODO Figure out space tab width and use it rather than constant of 2!
 	private static final int SPACE_INDENT_SIZE = 2;
 
 	protected ICompletionProposal[] templateProposals;
@@ -287,7 +288,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 			try
 			{
 				CommandTemplate ct = (CommandTemplate) template;
-				// FIXME Need to get correct offset based on prefix chopping!
+				// Need to get correct offset based on prefix chopping!
 				int fullPrefixOffset = getReplaceOffset();
 				String prefix = document.get(fullPrefixOffset, getReplaceEndOffset() - fullPrefixOffset);
 				final String origPrefix = prefix;
@@ -299,8 +300,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 			}
 			catch (BadLocationException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				// ignore
 			}
 		}
 
@@ -309,7 +309,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 
 	/**
 	 * Given the prefix text in the editor, modify the snippet patterns' indents to use same type of indentation (tabs
-	 * vs spaces). TODO Figure out space tab width and use it rather than constant of 2!
+	 * vs spaces)
 	 * 
 	 * @param prefix
 	 * @param indentedPattern
