@@ -69,6 +69,16 @@ class TreeThemer extends ControlThemer
 		overrideLabelProvider();
 	}
 
+	@Override
+	protected void applyTheme()
+	{
+		super.applyTheme();
+		if (fTreeViewer != null)
+		{
+			fTreeViewer.refresh(true);
+		}
+	}
+
 	private void overrideLabelProvider()
 	{
 		ViewerColumn viewer = (ViewerColumn) getTree().getData("org.eclipse.jface.columnViewer"); //$NON-NLS-1$
