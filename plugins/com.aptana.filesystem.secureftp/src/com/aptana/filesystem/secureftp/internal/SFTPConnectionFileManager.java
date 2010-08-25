@@ -314,7 +314,13 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 
 	private static void throwFileNotFound(FTPException e, IPath path) throws FileNotFoundException, FTPException {
 		int reply = e.getReplyCode();
+		if (reply == -1 && e.getCause() instanceof FTPException) {
+			reply = ((FTPException) e.getCause()).getReplyCode();
+		}
 		if (reply == -1 || reply == SshFxpStatus.STATUS_FX_NO_SUCH_FILE || reply == SshFxpStatus.STATUS_FX_NO_SUCH_PATH) {
+			throw new FileNotFoundException(path.toPortableString());
+		}
+		if (reply == SshFxpStatus.STATUS_FX_PERMISSION_DENIED) {
 			throw new FileNotFoundException(path.toPortableString());
 		}
 		throw e;
