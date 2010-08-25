@@ -32,14 +32,14 @@ public interface IGitRepositoryListener
 	public void branchRemoved(BranchRemovedEvent e);
 
 	/**
-	 * Users has run a pull via our UI.
+	 * User has run a pull via our UI.
 	 * 
 	 * @param e
 	 */
 	public void pulled(PullEvent e);
 
 	/**
-	 * Users has run a push via our UI.
+	 * User has run a push via our UI.
 	 * 
 	 * @param e
 	 */
