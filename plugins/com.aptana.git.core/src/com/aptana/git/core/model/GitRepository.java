@@ -48,8 +48,22 @@ import com.aptana.git.core.model.GitRef.TYPE;
 public class GitRepository
 {
 
+	/**
+	 * The file used
+	 */
 	private static final String COMMIT_EDITMSG = "COMMIT_EDITMSG"; //$NON-NLS-1$
+	/**
+	 * The most important file in git. This holds the current file state. When this changes, the state of files in the
+	 * repo has changed.
+	 */
 	private static final String INDEX = "index"; //$NON-NLS-1$
+	/**
+	 * File created prior to merges (which happen as part of pull, which is just fetch + merge).
+	 */
+	private static final String ORIG_HEAD = "ORIG_HEAD"; //$NON-NLS-1$
+	/**
+	 * A file created when we hit merge conflicts that need to be manually resolved.
+	 */
 	static final String MERGE_HEAD_FILENAME = "MERGE_HEAD"; //$NON-NLS-1$
 	private static final String COMMIT_FILE_ENCODING = "UTF-8"; //$NON-NLS-1$
 	private static final String HEAD = "HEAD"; //$NON-NLS-1$
@@ -98,8 +112,14 @@ public class GitRepository
 						@Override
 						public void fileCreated(int wd, String rootPath, String name)
 						{
-							if (name != null && name.equals(INDEX))
+							if (name == null)
+								return;
+							if (name.equals(INDEX))
 								refreshIndex();
+							else if (name.equals(ORIG_HEAD)) // this is done before merges (or pulls, which are just
+																// fetch + merge)
+								firePullEvent(); // we're conflating the two events here because I don't have the ideas
+													// separated in the listeners yet.
 						}
 
 						@Override
