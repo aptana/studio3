@@ -282,7 +282,7 @@ class TreeThemer extends ControlThemer
 					{
 						if (item != null)
 						{
-							Rectangle bounds = item.getBounds();
+							Rectangle bounds = item.getBounds(tree.getColumnCount() - 1);
 							int x = bounds.x + bounds.width;
 							if (x < clientWidth)
 							{
