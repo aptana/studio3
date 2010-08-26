@@ -15,6 +15,8 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 	private IParseListener fListener;
 	protected IPathResolver resolver;
 
+	private IParseNode fRootNode;
+
 	public CommonOutlineItem getOutlineItem(IParseNode node)
 	{
 		if (node == null)
@@ -29,10 +31,10 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 	{
 		if (parentElement instanceof AbstractThemeableEditor)
 		{
-			IParseNode root = ((AbstractThemeableEditor) parentElement).getFileService().getParseResult();
-			if (root != null)
+			fRootNode = ((AbstractThemeableEditor) parentElement).getFileService().getParseResult();
+			if (fRootNode != null)
 			{
-				return filter(root.getChildren());
+				return filter(fRootNode.getChildren());
 			}
 		}
 		else if (parentElement instanceof IParseNode)
@@ -104,8 +106,12 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 							IParseNode node = editor.getFileService().getParseResult();
 							if (node != null)
 							{
+								boolean shouldAutoExpand = (fRootNode == null);
 								page.refresh();
-								page.expandToLevel(2);
+								if (shouldAutoExpand)
+								{
+									page.expandToLevel(2);
+								}
 							}
 						}
 					});

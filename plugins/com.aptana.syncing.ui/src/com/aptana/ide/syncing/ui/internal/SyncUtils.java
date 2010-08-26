@@ -155,6 +155,10 @@ public class SyncUtils
 		{
 			return ConnectionPointUtils.findOrCreateWorkspaceConnectionPoint((IContainer) resource);
 		}
+		else if (resource != null)
+		{
+			return ConnectionPointUtils.findOrCreateWorkspaceConnectionPoint(resource.getParent());
+		}
 		else
 		{
 			File file = (File) adaptable.getAdapter(File.class);

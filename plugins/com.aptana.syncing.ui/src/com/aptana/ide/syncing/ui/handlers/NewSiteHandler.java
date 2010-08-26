@@ -54,4 +54,10 @@ public class NewSiteHandler extends BaseSyncHandler
 
 		return null;
 	}
+
+	@Override
+	public boolean isEnabled()
+	{
+		return true;
+	}
 }
