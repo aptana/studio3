@@ -8,6 +8,7 @@
  * 
  * Contributors: 
  *     xored software, Inc. - initial API and Implementation (Yuri Strot) 
+ *     Aptana Inc. - Modified to support multiple languages in the same page (Shalom Gibly)
  *******************************************************************************/
 package com.aptana.formatter.ui.internal;
 
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -27,6 +29,7 @@ import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
@@ -66,6 +69,13 @@ import com.aptana.ui.util.SWTFactory;
 import com.aptana.ui.util.SWTUtil;
 import com.aptana.ui.util.Util;
 
+/**
+ * Abstract formatter option block that displays multiple languages and let the user select a profile and a language to
+ * format.
+ * 
+ * @author Yuri Strot, Shalom Gibly <sgibly@aptana.com>
+ * @since Aptana Studio 3.0
+ */
 public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlock
 {
 
@@ -77,11 +87,13 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	private Button fDeleteButton;
 	private Button fNewButton;
 	private Button fLoadButton;
+	private Button fSaveButton;
 
 	private int selectedFactory;
 	private IScriptFormatterFactory[] factories;
 	private Map<IScriptFormatterFactory, IProfileManager> profileByFactory = new HashMap<IScriptFormatterFactory, IProfileManager>();
 	protected SourceViewer fPreviewViewer;
+	private StackLayout previewStackLayout;
 
 	private static List<IScriptFormatterFactory> TEMP_LIST = new ArrayList<IScriptFormatterFactory>();
 
@@ -104,12 +116,12 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 
 	protected abstract void updatePreview();
 
-	protected abstract SourceViewer createPreview(Composite parent);
+	protected abstract SourceViewer createSourcePreview(Composite parent);
 
 	public AbstractFormatterSelectionBlock(IStatusChangeListener context, IProject project, PreferenceKey formatterKey,
-			String contentType, IWorkbenchPreferenceContainer container)
+			IWorkbenchPreferenceContainer container)
 	{
-		super(context, project, collectPreferenceKeys(TEMP_LIST, contentType, formatterKey), container);
+		super(context, project, collectPreferenceKeys(TEMP_LIST, formatterKey), container);
 		factories = (IScriptFormatterFactory[]) TEMP_LIST.toArray(new IScriptFormatterFactory[TEMP_LIST.size()]);
 		TEMP_LIST = new ArrayList<IScriptFormatterFactory>();
 	}
@@ -247,23 +259,29 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		updatePreview();
 	}
 
-	protected static PreferenceKey[] collectPreferenceKeys(List<IScriptFormatterFactory> factories, String contentType,
+	protected static PreferenceKey[] collectPreferenceKeys(List<IScriptFormatterFactory> factories,
 			PreferenceKey formatterKey)
 	{
 		List<PreferenceKey> result = new ArrayList<PreferenceKey>();
 		result.add(formatterKey);
-		IContributedExtension[] extensions = ScriptFormatterManager.getInstance().getContributions(contentType);
+		IContributedExtension[] extensions = ScriptFormatterManager.getInstance().getAllContributions();
+		Set<Class<? extends IScriptFormatterFactory>> factoriesClasses = new HashSet<Class<? extends IScriptFormatterFactory>>();
 		for (int i = 0; i < extensions.length; ++i)
 		{
 			IScriptFormatterFactory factory = (IScriptFormatterFactory) extensions[i];
-			factories.add(factory);
-			final PreferenceKey[] keys = factory.getPreferenceKeys();
-			if (keys != null)
+			// factory.g
+			if (!factoriesClasses.contains(factory.getClass()))
 			{
-				for (int j = 0; j < keys.length; ++j)
+				factoriesClasses.add(factory.getClass());
+				factories.add(factory);
+				final PreferenceKey[] keys = factory.getPreferenceKeys();
+				if (keys != null)
 				{
-					final PreferenceKey prefKey = keys[j];
-					result.add(prefKey);
+					for (int j = 0; j < keys.length; ++j)
+					{
+						final PreferenceKey prefKey = keys[j];
+						result.add(prefKey);
+					}
 				}
 			}
 		}
@@ -316,6 +334,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		PixelConverter fPixConv = new PixelConverter(parent);
 		fComposite = createComposite(parent, numColumns);
 
+		// TODO - Remove this call, and instead collect, sort and display the formatters in the preview area.
 		createFormatterSection(fComposite, numColumns, fPixConv);
 
 		final Group group = SWTFactory.createGroup(fComposite,
@@ -344,21 +363,42 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			}
 		});
 
-		fEditButton = createButton(group, FormatterMessages.AbstractFormatterSelectionBlock_editProfile,
+		// TODO - Move to the preview box for the language that is being edited at the moment
+		/*
+		 * fEditButton = createButton(group, FormatterMessages.AbstractFormatterSelectionBlock_editProfile,
+		 * GridData.HORIZONTAL_ALIGN_BEGINNING); fEditButton.addSelectionListener(new SelectionListener() { public void
+		 * widgetSelected(SelectionEvent e) { editButtonPressed(); } public void widgetDefaultSelected(SelectionEvent e)
+		 * { editButtonPressed(); } });
+		 */
+		fNewButton = createButton(group, FormatterMessages.AbstractFormatterSelectionBlock_newProfile,
 				GridData.HORIZONTAL_ALIGN_BEGINNING);
-		fEditButton.addSelectionListener(new SelectionListener()
+		fNewButton.addSelectionListener(new SelectionListener()
 		{
 
 			public void widgetSelected(SelectionEvent e)
 			{
-				editButtonPressed();
+				createNewProfile();
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e)
 			{
-				editButtonPressed();
+				createNewProfile();
+			}
+
+			protected void createNewProfile()
+			{
+				IScriptFormatterFactory formatterFactory = getSelectedExtension();
+				final CreateProfileDialog p = new CreateProfileDialog(group.getShell(), getProfileManager(),
+						formatterFactory.getProfileVersioner());
+				if (p.open() != Window.OK)
+				{
+					return;
+				}
+				applyPreferences();
+				updateComboFromProfiles();
 			}
 		});
+
 		fDeleteButton = createButton(group, FormatterMessages.AbstractFormatterSelectionBlock_removeProfile,
 				GridData.HORIZONTAL_ALIGN_BEGINNING);
 		fDeleteButton.addSelectionListener(new SelectionListener()
@@ -390,37 +430,8 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			}
 		});
 
-		fNewButton = createButton(group, FormatterMessages.AbstractFormatterSelectionBlock_newProfile,
-				GridData.HORIZONTAL_ALIGN_BEGINNING);
-		fNewButton.addSelectionListener(new SelectionListener()
-		{
-
-			public void widgetSelected(SelectionEvent e)
-			{
-				createNewProfile();
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e)
-			{
-				createNewProfile();
-			}
-
-			protected void createNewProfile()
-			{
-				IScriptFormatterFactory formatterFactory = getSelectedExtension();
-				final CreateProfileDialog p = new CreateProfileDialog(group.getShell(), getProfileManager(),
-						formatterFactory.getProfileVersioner());
-				if (p.open() != Window.OK)
-					return;
-
-				applyPreferences();
-
-				updateComboFromProfiles();
-				if (!p.openEditDialog())
-					return;
-				editButtonPressed();
-			}
-		});
+		// add a filler
+		createLabel(group, "", 3); //$NON-NLS-1$
 
 		fLoadButton = createButton(group, FormatterMessages.AbstractFormatterSelectionBlock_importProfile,
 				GridData.HORIZONTAL_ALIGN_END);
@@ -429,80 +440,132 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 
 			public void widgetSelected(SelectionEvent e)
 			{
-				doImport();
+				doImport(group);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e)
 			{
-				doImport();
+				doImport(group);
 			}
 
-			protected void doImport()
+		});
+
+		fSaveButton = createButton(group, FormatterMessages.FormatterModifyDialog_export, SWT.PUSH);
+		fSaveButton.addSelectionListener(new SelectionListener()
+		{
+
+			public void widgetSelected(SelectionEvent e)
 			{
-				final FileDialog dialog = new FileDialog(group.getShell(), SWT.OPEN);
-				dialog.setText(FormatterMessages.AbstractFormatterSelectionBlock_importProfileLabel);
-				dialog.setFilterExtensions(new String[] { "*.xml" }); //$NON-NLS-1$
-				final String path = dialog.open();
-				if (path == null)
-					return;
+				doExport();
+			}
 
-				final File file = new File(path);
-				IScriptFormatterFactory factory = getSelectedExtension();
-				Collection<IProfile> profiles = null;
-				IProfileStore store = factory.getProfileStore();
-				try
-				{
-					profiles = store.readProfilesFromFile(file);
-				}
-				catch (CoreException e)
-				{
-					FormatterPlugin.logError(FormatterMessages.AbstractFormatterSelectionBlock_notValidProfile, e);
-				}
-				if (profiles == null || profiles.isEmpty())
-					return;
-
-				final IProfile profile = profiles.iterator().next();
-
-				IProfileVersioner versioner = factory.getProfileVersioner();
-
-				if (!versioner.getFormatterId().equals(profile.getFormatterId()))
-				{
-					final String title = FormatterMessages.AbstractFormatterSelectionBlock_importProfileLabel;
-					final String message = NLS.bind(
-							FormatterMessages.AbstractFormatterSelectionBlock_notValidFormatter, versioner
-									.getFormatterId(), profile.getFormatterId());
-					MessageDialog.openError(group.getShell(), title, message);
-					return;
-				}
-
-				if (profile.getVersion() > versioner.getCurrentVersion())
-				{
-					final String title = FormatterMessages.AbstractFormatterSelectionBlock_importingProfile;
-					final String message = FormatterMessages.AbstractFormatterSelectionBlock_moreRecentVersion;
-					MessageDialog.openWarning(group.getShell(), title, message);
-				}
-
-				final IProfileManager profileManager = getProfileManager();
-				if (profileManager.containsName(profile.getName()))
-				{
-					final AlreadyExistsDialog aeDialog = new AlreadyExistsDialog(group.getShell(), profile,
-							profileManager);
-					if (aeDialog.open() != Window.OK)
-						return;
-				}
-				((IProfile.ICustomProfile) profile).setVersion(versioner.getCurrentVersion());
-				profileManager.addProfile(profile);
-				updateComboFromProfiles();
-				applyPreferences();
+			public void widgetDefaultSelected(SelectionEvent e)
+			{
+				doExport();
 			}
 		});
-		createLabel(group, "", 3); //$NON-NLS-1$
 
 		configurePreview(group, numColumns);
 		updateButtons();
 		applyPreferences();
 
 		return fComposite;
+	}
+
+	protected void doImport(Composite group)
+	{
+		// TODO - This import should probably handle multiple languages as well.
+		final FileDialog dialog = new FileDialog(group.getShell(), SWT.OPEN);
+		dialog.setText(FormatterMessages.AbstractFormatterSelectionBlock_importProfileLabel);
+		dialog.setFilterExtensions(new String[] { "*.xml" }); //$NON-NLS-1$
+		final String path = dialog.open();
+		if (path == null)
+			return;
+
+		final File file = new File(path);
+		IScriptFormatterFactory factory = getSelectedExtension();
+		Collection<IProfile> profiles = null;
+		IProfileStore store = factory.getProfileStore();
+		try
+		{
+			profiles = store.readProfilesFromFile(file);
+		}
+		catch (CoreException e)
+		{
+			FormatterPlugin.logError(FormatterMessages.AbstractFormatterSelectionBlock_notValidProfile, e);
+		}
+		if (profiles == null || profiles.isEmpty())
+			return;
+
+		final IProfile profile = profiles.iterator().next();
+
+		IProfileVersioner versioner = factory.getProfileVersioner();
+
+		if (!versioner.getFormatterId().equals(profile.getFormatterId()))
+		{
+			final String title = FormatterMessages.AbstractFormatterSelectionBlock_importProfileLabel;
+			final String message = NLS.bind(FormatterMessages.AbstractFormatterSelectionBlock_notValidFormatter,
+					versioner.getFormatterId(), profile.getFormatterId());
+			MessageDialog.openError(group.getShell(), title, message);
+			return;
+		}
+
+		if (profile.getVersion() > versioner.getCurrentVersion())
+		{
+			final String title = FormatterMessages.AbstractFormatterSelectionBlock_importingProfile;
+			final String message = FormatterMessages.AbstractFormatterSelectionBlock_moreRecentVersion;
+			MessageDialog.openWarning(group.getShell(), title, message);
+		}
+
+		final IProfileManager profileManager = getProfileManager();
+		if (profileManager.containsName(profile.getName()))
+		{
+			final AlreadyExistsDialog aeDialog = new AlreadyExistsDialog(group.getShell(), profile, profileManager);
+			if (aeDialog.open() != Window.OK)
+				return;
+		}
+		((IProfile.ICustomProfile) profile).setVersion(versioner.getCurrentVersion());
+		profileManager.addProfile(profile);
+		updateComboFromProfiles();
+		applyPreferences();
+	}
+
+	private void doExport()
+	{
+		// TODO - Run a combined export for all the languages
+		// IProfileStore store = formatterFactory.getProfileStore();
+		// IProfile selected = manager.create(ProfileKind.TEMPORARY,
+		// fProfileNameField.getText(), getPreferences(), profile
+		// .getFormatterId(), profile.getVersion());
+		//
+		// final FileDialog dialog = new FileDialog(getShell(), SWT.SAVE);
+		// dialog.setText(FormatterMessages.FormatterModifyDialog_exportProfile);
+		//		dialog.setFilterExtensions(new String[] { "*.xml" }); //$NON-NLS-1$
+		//
+		// final String path = dialog.open();
+		// if (path == null)
+		// return;
+		//
+		// final File file = new File(path);
+		// String message = NLS.bind(
+		// FormatterMessages.FormatterModifyDialog_replaceFileQuestion,
+		// file.getAbsolutePath());
+		// if (file.exists()
+		// && !MessageDialog.openQuestion(getShell(),
+		// FormatterMessages.FormatterModifyDialog_exportProfile,
+		// message)) {
+		// return;
+		// }
+		//
+		// final Collection<IProfile> profiles = new ArrayList<IProfile>();
+		// profiles.add(selected);
+		// try {
+		// store.writeProfilesToFile(profiles, file);
+		// } catch (CoreException e) {
+		// final String title = FormatterMessages.FormatterModifyDialog_exportProfile;
+		// message = FormatterMessages.FormatterModifyDialog_exportProblem;
+		// ExceptionHandler.handle(e, getShell(), title, message);
+		// }
 	}
 
 	protected void createFormatterSection(Composite composite, int numColumns, PixelConverter fPixConv)
@@ -583,7 +646,15 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	protected void configurePreview(Composite composite, int numColumns)
 	{
 		createLabel(composite, FormatterMessages.AbstractFormatterSelectionBlock_preview, numColumns);
-		fPreviewViewer = createPreview(composite);
+		previewStackLayout = new StackLayout();
+		final Composite parent = new Composite(composite, SWT.NONE);
+		parent.setLayoutData(new GridData(GridData.FILL_BOTH));
+		parent.setLayout(previewStackLayout);
+		for (IScriptFormatterFactory factory : factories)
+		{
+			
+		}
+		fPreviewViewer = createSourcePreview(composite);
 
 		final GridData gd = new GridData(GridData.FILL_VERTICAL | GridData.HORIZONTAL_ALIGN_FILL);
 		gd.horizontalSpan = numColumns;

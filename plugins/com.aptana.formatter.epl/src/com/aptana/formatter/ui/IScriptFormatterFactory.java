@@ -15,6 +15,11 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.source.ISharedTextColors;
+import org.eclipse.jface.text.source.SourceViewerConfiguration;
+import org.eclipse.ui.texteditor.ITextEditor;
+
 import com.aptana.ui.IContributedExtension;
 import com.aptana.ui.preferences.IPreferencesLookupDelegate;
 import com.aptana.ui.preferences.IPreferencesSaveDelegate;
@@ -99,4 +104,10 @@ public interface IScriptFormatterFactory extends IContributedExtension
 	 */
 	IProfileManager createProfileManager(List<IProfile> profiles);
 
+	SourceViewerConfiguration createSimpleSourceViewerConfiguration(ISharedTextColors colorManager,
+			IPreferenceStore preferenceStore, ITextEditor editor, boolean configureFormatter);
+
+	PreferenceKey getFormatterPreferenceKey();
+
+	IPreferenceStore getPreferenceStore();
 }

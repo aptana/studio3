@@ -13,7 +13,7 @@ package com.aptana.ruby.formatter;
 
 import com.aptana.formatter.ui.CodeFormatterConstants;
 
-public class RubyFormatterConstants
+public interface RubyFormatterConstants
 {
 	/**
 	 * Ruby formatter ID.

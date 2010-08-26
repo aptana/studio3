@@ -14,6 +14,7 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.parsing,
  com.aptana.ui;bundle-version="3.0.0",
  com.aptana.ui.epl,
- com.aptana.editor.common
+ com.aptana.editor.common,
+ com.aptana.editor.html
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy

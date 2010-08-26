@@ -1,6 +1,7 @@
 package com.aptana.ui;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -50,6 +51,17 @@ public abstract class ContributionExtensionManager
 		return (IContributedExtension[]) contributions.toArray(new IContributedExtension[contributions.size()]);
 	}
 
+	public IContributedExtension[] getAllContributions()
+	{
+		Collection<List<IContributedExtension>> values = contentTypeToContribMap.values();
+		List<IContributedExtension> contributions = new ArrayList<IContributedExtension>();
+		for (List<IContributedExtension> contribution : values)
+		{
+			contributions.addAll(contribution);
+		}
+		return (IContributedExtension[]) contributions.toArray(new IContributedExtension[contributions.size()]);
+	}
+	
 	public IContributedExtension getSelectedContribution(String contentType)
 	{
 		IContributedExtension[] contributions = getContributions(contentType);

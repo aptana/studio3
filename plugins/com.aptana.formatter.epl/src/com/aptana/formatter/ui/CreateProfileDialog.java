@@ -21,11 +21,8 @@ import org.eclipse.jface.dialogs.StatusDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -38,11 +35,11 @@ import com.aptana.ui.util.StatusInfo;
 /**
  * The dialog to create a new profile.
  */
-public class CreateProfileDialog extends StatusDialog {
+public class CreateProfileDialog extends StatusDialog
+{
 
 	private Text fNameText;
 	private Combo fProfileCombo;
-	private Button fEditCheckbox;
 
 	private final static StatusInfo fOk = new StatusInfo();
 	private final static StatusInfo fEmpty = new StatusInfo(IStatus.ERROR,
@@ -55,12 +52,11 @@ public class CreateProfileDialog extends StatusDialog {
 	private final String[] fSortedNames;
 
 	private IProfile fCreatedProfile;
-	protected boolean fOpenEditDialog;
 
 	private IProfileVersioner versioner;
 
-	public CreateProfileDialog(Shell parentShell,
-			IProfileManager profileManager, IProfileVersioner versioner) {
+	public CreateProfileDialog(Shell parentShell, IProfileManager profileManager, IProfileVersioner versioner)
+	{
 		super(parentShell);
 		fProfileManager = profileManager;
 		fSortedProfiles = fProfileManager.getSortedProfiles();
@@ -69,13 +65,15 @@ public class CreateProfileDialog extends StatusDialog {
 	}
 
 	@Override
-	public void create() {
+	public void create()
+	{
 		super.create();
 		setTitle(FormatterMessages.CreateProfileDialog_newProfile);
 	}
 
 	@Override
-	public Control createDialogArea(Composite parent) {
+	public Control createDialogArea(Composite parent)
+	{
 
 		final int numColumns = 2;
 
@@ -103,8 +101,10 @@ public class CreateProfileDialog extends StatusDialog {
 		gd.horizontalSpan = numColumns;
 		fNameText = new Text(composite, SWT.SINGLE | SWT.BORDER);
 		fNameText.setLayoutData(gd);
-		fNameText.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
+		fNameText.addModifyListener(new ModifyListener()
+		{
+			public void modifyText(ModifyEvent e)
+			{
 				doValidation();
 			}
 		});
@@ -113,8 +113,7 @@ public class CreateProfileDialog extends StatusDialog {
 		gd = new GridData();
 		gd.horizontalSpan = numColumns;
 		Label profileLabel = new Label(composite, SWT.WRAP);
-		profileLabel
-				.setText(FormatterMessages.CreateProfileDialog_initSettings);
+		profileLabel.setText(FormatterMessages.CreateProfileDialog_initSettings);
 		profileLabel.setLayoutData(gd);
 
 		gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -125,20 +124,6 @@ public class CreateProfileDialog extends StatusDialog {
 		// "Open the edit dialog now" checkbox
 		gd = new GridData();
 		gd.horizontalSpan = numColumns;
-		fEditCheckbox = new Button(composite, SWT.CHECK);
-		fEditCheckbox
-				.setText(FormatterMessages.CreateProfileDialog_openEditDialog);
-		fEditCheckbox.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) {
-				fOpenEditDialog = ((Button) e.widget).getSelection();
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-		});
-
-		fOpenEditDialog = true;
-		fEditCheckbox.setSelection(fOpenEditDialog);
 
 		fProfileCombo.setItems(fSortedNames);
 		fProfileCombo.setText(fProfileManager.getSelected().getName());
@@ -154,14 +139,17 @@ public class CreateProfileDialog extends StatusDialog {
 	/**
 	 * Validate the current settings
 	 */
-	protected void doValidation() {
+	protected void doValidation()
+	{
 		final String name = fNameText.getText().trim();
 
-		if (fProfileManager.containsName(name)) {
+		if (fProfileManager.containsName(name))
+		{
 			updateStatus(fDuplicate);
 			return;
 		}
-		if (name.length() == 0) {
+		if (name.length() == 0)
+		{
 			updateStatus(fEmpty);
 			return;
 		}
@@ -169,26 +157,22 @@ public class CreateProfileDialog extends StatusDialog {
 	}
 
 	@Override
-	protected void okPressed() {
+	protected void okPressed()
+	{
 		if (!getStatus().isOK())
 			return;
 
-		final Map<String, String> baseSettings = new HashMap<String, String>(
-				(fSortedProfiles.get(fProfileCombo.getSelectionIndex()))
-						.getSettings());
+		final Map<String, String> baseSettings = new HashMap<String, String>((fSortedProfiles.get(fProfileCombo
+				.getSelectionIndex())).getSettings());
 		final String profileName = fNameText.getText();
 
-		fCreatedProfile = fProfileManager.create(ProfileKind.CUSTOM,
-				profileName, baseSettings, versioner.getFormatterId(),
-				versioner.getCurrentVersion());
+		fCreatedProfile = fProfileManager.create(ProfileKind.CUSTOM, profileName, baseSettings, versioner
+				.getFormatterId(), versioner.getCurrentVersion());
 		super.okPressed();
 	}
 
-	public final IProfile getCreatedProfile() {
+	public final IProfile getCreatedProfile()
+	{
 		return fCreatedProfile;
-	}
-
-	public final boolean openEditDialog() {
-		return fOpenEditDialog;
 	}
 }

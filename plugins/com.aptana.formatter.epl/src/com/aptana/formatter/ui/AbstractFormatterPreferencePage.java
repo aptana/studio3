@@ -53,7 +53,7 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 		public FormatterSelectionBlock(IStatusChangeListener context, IProject project,
 				IWorkbenchPreferenceContainer container)
 		{
-			super(context, project, getFormatterPreferenceKey(), getContentType(), container);
+			super(context, project, getFormatterPreferenceKey(), container);
 			fColorManager = new ColorManager();
 		}
 
@@ -78,7 +78,7 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 
 			public ISourceViewer createPreview(Composite composite)
 			{
-				return FormatterSelectionBlock.this.createPreview(composite);
+				return FormatterSelectionBlock.this.createSourcePreview(composite);
 			}
 
 			public Shell getShell()
@@ -101,7 +101,7 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 		/**
 		 * @param composite
 		 */
-		public SourceViewer createPreview(Composite composite)
+		public SourceViewer createSourcePreview(Composite composite)
 		{
 			IPreferenceStore generalTextStore = EditorsUI.getPreferenceStore();
 			IPreferenceStore store = new ChainedPreferenceStore(new IPreferenceStore[] { getPreferenceStore(),
@@ -181,6 +181,18 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 		return new FormatterSelectionBlock(newStatusChangedListener, project, container);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.ui.preferences.PropertyAndPreferencePage#supportsProjectSpecificOptions()
+	 */
+	@Override
+	protected boolean supportsProjectSpecificOptions()
+	{
+		// For now, we disable any project-specific settings for the code formatter.
+		// TODO - Re-enable this by removing this method if we decide to enable project-specific settings.
+		return false;
+	}
+
 	/**
 	 * @param colorManager
 	 * @param store
@@ -190,8 +202,6 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 	 */
 	protected abstract SourceViewerConfiguration createSimpleSourceViewerConfiguration(ISharedTextColors colorManager,
 			IPreferenceStore preferenceStore, ITextEditor editor, boolean configureFormatter);
-
-	protected abstract String getContentType();
 
 	protected abstract PreferenceKey getFormatterPreferenceKey();
 

@@ -7,7 +7,6 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.ruby.IRubyConstants;
 import com.aptana.editor.ruby.RubySourceViewerConfiguration;
 import com.aptana.formatter.ui.AbstractFormatterPreferencePage;
 import com.aptana.ruby.formatter.RubyFormatterConstants;
@@ -22,11 +21,6 @@ public class RubyFormatterPreferencePage extends AbstractFormatterPreferencePage
 
 	private static final PreferenceKey FORMATTER = new PreferenceKey(RubyFormatterPlugin.PLUGIN_ID,
 			RubyFormatterConstants.FORMATTER_ID);
-
-	protected String getContentType()
-	{
-		return IRubyConstants.CONTENT_TYPE_RUBY;
-	}
 
 	protected PreferenceKey getFormatterPreferenceKey()
 	{

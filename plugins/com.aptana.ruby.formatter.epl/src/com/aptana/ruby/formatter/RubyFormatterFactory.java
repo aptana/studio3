@@ -14,6 +14,13 @@ package com.aptana.ruby.formatter;
 import java.net.URL;
 import java.util.Map;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.source.ISharedTextColors;
+import org.eclipse.jface.text.source.SourceViewerConfiguration;
+import org.eclipse.ui.texteditor.ITextEditor;
+
+import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.ruby.RubySourceViewerConfiguration;
 import com.aptana.formatter.AbstractScriptFormatterFactory;
 import com.aptana.formatter.ui.IFormatterModifyDialog;
 import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
@@ -23,6 +30,8 @@ import com.aptana.ui.preferences.PreferenceKey;
 
 public class RubyFormatterFactory extends AbstractScriptFormatterFactory
 {
+	private static final PreferenceKey FORMATTER_PREF_KEY = new PreferenceKey(RubyFormatterPlugin.PLUGIN_ID,
+			RubyFormatterConstants.FORMATTER_ID);
 
 	private static final String FORMATTER_PREVIEW_FILE = "formatterPreview.rb"; //$NON-NLS-1$
 
@@ -49,6 +58,11 @@ public class RubyFormatterFactory extends AbstractScriptFormatterFactory
 		return result;
 	}
 
+	public PreferenceKey getFormatterPreferenceKey()
+	{
+		return FORMATTER_PREF_KEY;
+	}
+
 	public IScriptFormatter createFormatter(String lineDelimiter, Map<String, String> preferences)
 	{
 		return new RubyFormatter(lineDelimiter, preferences);
@@ -71,4 +85,18 @@ public class RubyFormatterFactory extends AbstractScriptFormatterFactory
 		return null;
 	}
 
+	public SourceViewerConfiguration createSimpleSourceViewerConfiguration(ISharedTextColors colorManager,
+			IPreferenceStore preferenceStore, ITextEditor editor, boolean configureFormatter)
+	{
+		// TODO: Shalom - Wrap this in 'simple' implementation?
+		// return new SimpleRubySourceViewerConfiguration(colorManager,
+		// preferenceStore, editor, IRubyPartitions.RUBY_PARTITIONING,
+		// configureFormatter);
+		return new RubySourceViewerConfiguration(preferenceStore, (AbstractThemeableEditor) editor);
+	}
+
+	public IPreferenceStore getPreferenceStore()
+	{
+		return RubyFormatterPlugin.getDefault().getPreferenceStore();
+	}
 }

@@ -382,19 +382,24 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			public Object visitIfNode(IfNode visited)
 			{
 				SourcePosition position = visited.getPosition();
-				if (position.getStartLine() == position.getEndLine()) {
+				if (position.getStartLine() == position.getEndLine())
+				{
 					// Inline if
 					List<Node> children = new ArrayList<Node>(3);
-					if (visited.getThenBody() != null) {
+					if (visited.getThenBody() != null)
+					{
 						children.add(visited.getThenBody());
 					}
-					if (visited.getElseBody() != null) {
+					if (visited.getElseBody() != null)
+					{
 						children.add(visited.getElseBody());
 					}
-					if (visited.getCondition() != null) {
+					if (visited.getCondition() != null)
+					{
 						children.add(visited.getCondition());
 					}
-					if (!children.isEmpty()) {
+					if (!children.isEmpty())
+					{
 						Collections.sort(children, POSITION_COMPARATOR);
 						visitChildren(children);
 					}

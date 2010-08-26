@@ -3,6 +3,13 @@ package com.aptana.html.formatter;
 import java.net.URL;
 import java.util.Map;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.source.ISharedTextColors;
+import org.eclipse.jface.text.source.SourceViewerConfiguration;
+import org.eclipse.ui.texteditor.ITextEditor;
+
+import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.html.HTMLSourceViewerConfiguration;
 import com.aptana.formatter.AbstractScriptFormatterFactory;
 import com.aptana.formatter.ui.IFormatterModifyDialog;
 import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
@@ -16,6 +23,9 @@ import com.aptana.ui.preferences.PreferenceKey;
  */
 public class HTMLFormatterFactory extends AbstractScriptFormatterFactory
 {
+	private static final PreferenceKey FORMATTER_PREF_KEY = new PreferenceKey(HTMLFormatterPlugin.PLUGIN_ID,
+			HTMLFormatterConstants.FORMATTER_ID);
+	
 	private static final String FORMATTER_PREVIEW_FILE = "formatterPreview.html"; //$NON-NLS-1$
 
 	private static final String[] KEYS = {
@@ -65,5 +75,25 @@ public class HTMLFormatterFactory extends AbstractScriptFormatterFactory
 	{
 		// FIXME - Shalom: Implements this
 		return null;
+	}
+
+	@Override
+	public SourceViewerConfiguration createSimpleSourceViewerConfiguration(ISharedTextColors colorManager,
+			IPreferenceStore preferenceStore, ITextEditor editor, boolean configureFormatter)
+	{
+		return new HTMLSourceViewerConfiguration(preferenceStore, (AbstractThemeableEditor) editor);
+	}
+
+	@Override
+	public PreferenceKey getFormatterPreferenceKey()
+	{
+		return FORMATTER_PREF_KEY;
+	}
+
+	@Override
+	public IPreferenceStore getPreferenceStore()
+	{
+		// TODO Auto-generated method stub
+		return HTMLFormatterPlugin.getDefault().getPreferenceStore();
 	}
 }
