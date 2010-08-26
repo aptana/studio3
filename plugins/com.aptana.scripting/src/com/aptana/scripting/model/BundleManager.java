@@ -99,7 +99,7 @@ public class BundleManager
 		{
 			// create new instance
 			INSTANCE = new BundleManager();
-			
+
 			// setup default application bundles path
 			URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(BUILTIN_BUNDLES), null);
 
@@ -111,11 +111,11 @@ public class BundleManager
 			// get possible user override
 			boolean validUserBundlePath = false;
 			String userBundlePathOverride = System.getProperty(APTANA_RUBLE_USER_LOCATION);
-			
+
 			if (userBundlePathOverride != null)
 			{
 				File f = new File(userBundlePathOverride);
-				
+
 				if (f.exists())
 				{
 					if (f.isDirectory())
@@ -139,18 +139,18 @@ public class BundleManager
 					// try to create the path
 					validUserBundlePath = f.mkdirs();
 				}
-				
+
 				if (validUserBundlePath)
 				{
 					INSTANCE.userBundlesPath = f.getAbsolutePath();
 				}
 			}
-			
+
 			if (validUserBundlePath == false)
 			{
 				String OS = Platform.getOS();
 				String userHome = System.getProperty(USER_HOME_PROPERTY);
-	
+
 				// setup default user bundles path
 				if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
 				{

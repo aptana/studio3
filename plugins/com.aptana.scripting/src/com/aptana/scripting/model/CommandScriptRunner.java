@@ -83,7 +83,7 @@ public class CommandScriptRunner extends AbstractCommandRunner
 	{
 		return new String[] { "-l", this._tempFile.getAbsolutePath() }; //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * executeScript
 	 * 
@@ -92,25 +92,23 @@ public class CommandScriptRunner extends AbstractCommandRunner
 	public String executeScript()
 	{
 		IPath shell;
-		try {
+		try
+		{
 			shell = ShellExecutable.getPath();
-		} catch (CoreException e) {
+		}
+		catch (CoreException e)
+		{
 			Activator.logError(Messages.CommandScriptRunner_CANNOT_LOCATE_SHELL, e);
 			this._exitValue = 1;
 			this.setExecutedSuccessfully(false);
-			return MessageFormat.format(
-					Messages.CommandScriptRunner_UNABLE_TO_LOCATE_SHELL_FOR_COMMAND,
-					new Object[]
-					{
-						this.getCommand().getPath()
-					}
-				);
+			return MessageFormat.format(Messages.CommandScriptRunner_UNABLE_TO_LOCATE_SHELL_FOR_COMMAND, new Object[] { this.getCommand().getPath() });
 		}
 		String[] commandLine = this.getCommandLineArguments();
-		String resultText = null;		
+		String resultText = null;
 		String input = IOUtil.read(this.getContext().getInputStream(), "UTF-8"); //$NON-NLS-1$			
-		Map<Integer, String> result = ProcessUtil.runInBackground(shell.toOSString(), this.getCommand().getWorkingDirectory(), input, this.getContributedEnvironment(), commandLine);
-		
+		Map<Integer, String> result = ProcessUtil.runInBackground(shell.toOSString(), this.getCommand().getWorkingDirectory(), input, this
+			.getContributedEnvironment(), commandLine);
+
 		if (result == null)
 		{
 			this._exitValue = 1;
