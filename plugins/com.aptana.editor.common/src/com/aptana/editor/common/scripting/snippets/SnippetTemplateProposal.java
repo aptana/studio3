@@ -296,6 +296,10 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 				{
 					prefix = SnippetsCompletionProcessor.narrowPrefix(prefix);
 				}
+				if (prefix.length() == 0)
+				{
+					return fullPrefixOffset;
+				}
 				return fullPrefixOffset + (origPrefix.length() - prefix.length());
 			}
 			catch (BadLocationException e)
