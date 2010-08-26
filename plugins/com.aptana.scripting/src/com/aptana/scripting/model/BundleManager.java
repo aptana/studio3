@@ -51,6 +51,7 @@ public class BundleManager
 	private static final File[] NO_FILES = new File[0];
 	private static final String[] NO_STRINGS = new String[0];
 
+	private static final String APTANA_RUBLE_USER_LOCATION = "aptana.ruble.user.location"; //$NON-NLS-1$
 	private static final String BUILTIN_BUNDLES = "bundles"; //$NON-NLS-1$
 	private static final String BUNDLE_FILE = "bundle.rb"; //$NON-NLS-1$
 	private static final String RUBY_FILE_EXTENSION = ".rb"; //$NON-NLS-1$
@@ -98,7 +99,7 @@ public class BundleManager
 		{
 			// create new instance
 			INSTANCE = new BundleManager();
-
+			
 			// setup default application bundles path
 			URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(BUILTIN_BUNDLES), null);
 
@@ -107,17 +108,58 @@ public class BundleManager
 				INSTANCE.applicationBundlesPath = ResourceUtil.resourcePathToString(url);
 			}
 
-			String OS = Platform.getOS();
-			String userHome = System.getProperty(USER_HOME_PROPERTY);
-
-			// setup default user bundles path
-			if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
+			// get possible user override
+			boolean validUserBundlePath = false;
+			String userBundlePathOverride = System.getProperty(APTANA_RUBLE_USER_LOCATION);
+			
+			if (userBundlePathOverride != null)
 			{
-				INSTANCE.userBundlesPath = userHome + USER_BUNDLE_DIRECTORY_MACOSX;
+				File f = new File(userBundlePathOverride);
+				
+				if (f.exists())
+				{
+					if (f.isDirectory())
+					{
+						if (f.canRead() && f.canWrite())
+						{
+							validUserBundlePath = true;
+						}
+						else
+						{
+							Activator.logError(Messages.BundleManager_USER_PATH_NOT_READ_WRITE + f.getAbsolutePath(), null);
+						}
+					}
+					else
+					{
+						Activator.logError(Messages.BundleManager_USER_PATH_NOT_DIRECTORY + f.getAbsolutePath(), null);
+					}
+				}
+				else
+				{
+					// try to create the path
+					validUserBundlePath = f.mkdirs();
+				}
+				
+				if (validUserBundlePath)
+				{
+					INSTANCE.userBundlesPath = f.getAbsolutePath();
+				}
 			}
-			else
+			
+			if (validUserBundlePath == false)
 			{
-				INSTANCE.userBundlesPath = userHome + File.separator + USER_BUNDLE_DIRECTORY_GENERAL;
+				String OS = Platform.getOS();
+				String userHome = System.getProperty(USER_HOME_PROPERTY);
+	
+				// setup default user bundles path
+				if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
+				{
+					INSTANCE.userBundlesPath = userHome + USER_BUNDLE_DIRECTORY_MACOSX;
+				}
+				else
+				{
+					INSTANCE.userBundlesPath = userHome + File.separator + USER_BUNDLE_DIRECTORY_GENERAL;
+				}
 			}
 		}
 
