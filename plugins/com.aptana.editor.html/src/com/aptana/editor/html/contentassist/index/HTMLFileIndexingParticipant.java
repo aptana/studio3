@@ -85,6 +85,11 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 				}
 			}
 		}
+		catch (beaver.Parser.Exception e)
+		{
+			// just like in FileServer ... "not logging the parsing error here since
+			// the source could be in an intermediate state of being edited by the user"
+		}
 		catch (Throwable e)
 		{
 			Activator

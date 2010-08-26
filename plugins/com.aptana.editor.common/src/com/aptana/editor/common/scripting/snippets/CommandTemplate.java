@@ -29,12 +29,25 @@ public class CommandTemplate extends Template
 	@Override
 	public boolean matches(String prefix, String contextTypeId)
 	{
-		boolean matches = super.matches(prefix, contextTypeId);
-		if (!matches)
+		if (!super.matches(prefix, contextTypeId))
 		{
-			return matches;
+			return false;
 		}
-		return prefix != null && prefix.length() != 0 && getName().toLowerCase().startsWith(prefix.toLowerCase());
+
+		while (prefix != null && prefix.length() > 0)
+		{
+			if (matches(prefix))
+			{
+				return true;
+			}
+			prefix = SnippetsCompletionProcessor.narrowPrefix(prefix);
+		}
+		return false;
+	}
+
+	protected boolean matches(String prefix)
+	{
+		return getName().toLowerCase().startsWith(prefix.toLowerCase());
 	}
 
 	boolean exactMatches(String prefix)

@@ -155,12 +155,13 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 			buf.append(indent);
 
 			String line = d.get(info.getOffset(), info.getLength());
-			line = line.trim();
-			if (c1 == '*' && !line.endsWith("*/")) //$NON-NLS-1$
+			String trimmedLine = line.trim();
+			if (c1 == '*' && !trimmedLine.endsWith("*/")) //$NON-NLS-1$
 			{
 				buf.append("* "); //$NON-NLS-1$
 			}
-			else if (line.startsWith("/*") && !line.endsWith("*/")) //$NON-NLS-1$ //$NON-NLS-2$
+			// FIXME Don't do this is the newline comes before the /*!
+			else if (trimmedLine.startsWith("/*") && !trimmedLine.endsWith("*/") && line.indexOf("/*") < (c.offset - info.getOffset())) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			{
 				buf.append(" * "); //$NON-NLS-1$
 				try
@@ -176,7 +177,7 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 				{
 				}
 				String toEnd = " */"; //$NON-NLS-1$
-				if (line.startsWith("/**")) //$NON-NLS-1$
+				if (trimmedLine.startsWith("/**")) //$NON-NLS-1$
 				{
 					toEnd = " */"; //$NON-NLS-1$
 				}

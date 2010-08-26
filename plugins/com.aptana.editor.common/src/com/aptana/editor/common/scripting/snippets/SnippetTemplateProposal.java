@@ -38,6 +38,7 @@ import org.eclipse.swt.widgets.Shell;
 public class SnippetTemplateProposal extends TemplateProposal implements ICompletionProposalExtension6
 {
 
+	// TODO Figure out space tab width and use it rather than constant of 2!
 	private static final int SPACE_INDENT_SIZE = 2;
 
 	protected ICompletionProposal[] templateProposals;
@@ -108,7 +109,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 			int start;
 			TemplateBuffer templateBuffer;
 			{
-				int oldReplaceOffset = getReplaceOffset();
+				int oldReplaceOffset = getReplaceOffset(document, fTemplate);
 
 				if (fTemplate instanceof SnippetTemplate)
 				{
@@ -149,7 +150,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 					return;
 				}
 
-				start = getReplaceOffset();
+				start = getReplaceOffset(document, fTemplate);
 				int shift = start - oldReplaceOffset;
 				int end = Math.max(getReplaceEndOffset(), offset + shift);
 
@@ -280,9 +281,39 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 
 	}
 
+	private int getReplaceOffset(IDocument document, Template template)
+	{
+		if (template instanceof CommandTemplate)
+		{
+			try
+			{
+				CommandTemplate ct = (CommandTemplate) template;
+				// Need to get correct offset based on prefix chopping!
+				int fullPrefixOffset = getReplaceOffset();
+				String prefix = document.get(fullPrefixOffset, getReplaceEndOffset() - fullPrefixOffset);
+				final String origPrefix = prefix;
+				while (!ct.matches(prefix))
+				{
+					prefix = SnippetsCompletionProcessor.narrowPrefix(prefix);
+				}
+				if (prefix.length() == 0)
+				{
+					return fullPrefixOffset;
+				}
+				return fullPrefixOffset + (origPrefix.length() - prefix.length());
+			}
+			catch (BadLocationException e)
+			{
+				// ignore
+			}
+		}
+
+		return getReplaceOffset();
+	}
+
 	/**
 	 * Given the prefix text in the editor, modify the snippet patterns' indents to use same type of indentation (tabs
-	 * vs spaces). TODO Figure out space tab width and use it rather than constant of 2!
+	 * vs spaces)
 	 * 
 	 * @param prefix
 	 * @param indentedPattern

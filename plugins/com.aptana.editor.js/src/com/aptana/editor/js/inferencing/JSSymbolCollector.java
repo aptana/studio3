@@ -232,6 +232,14 @@ public class JSSymbolCollector extends JSTreeWalker
 				}
 				break;
 		}
+		
+		// process rhs
+		IParseNode rhs = node.getRightHandSide();
+		
+		if (rhs != null)
+		{
+			this.accept(rhs);
+		}
 	}
 
 	/*
