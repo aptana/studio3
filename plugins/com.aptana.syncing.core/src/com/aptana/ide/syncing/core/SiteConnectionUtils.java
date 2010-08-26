@@ -254,9 +254,11 @@ public final class SiteConnectionUtils {
 
 	public static ISiteConnection getSiteWithDestination(String destinationName, ISiteConnection[] sites)
 	{
+		IConnectionPoint destination;
 		for (ISiteConnection site : sites)
 		{
-			if (site.getDestination().getName().equals(destinationName))
+			destination = site.getDestination();
+			if (destination != null && destination.getName().equals(destinationName))
 			{
 				return site;
 			}
