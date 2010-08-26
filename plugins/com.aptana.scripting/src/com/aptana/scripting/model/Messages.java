@@ -20,7 +20,15 @@ public class Messages extends NLS
 
 	public static String BundleManager_UNREADABLE_SCRIPT;
 
+	public static String BundleManager_USER_PATH_NOT_DIRECTORY;
+
+	public static String BundleManager_USER_PATH_NOT_READ_WRITE;
+
 	public static String BundleMonitor_Error_Processing_Resource_Change;
+
+	public static String BundleMonitor_ERROR_REGISTERING_FILE_WATCHER;
+
+	public static String BundleMonitor_INVALID_WATCHER_PATH;
 
 	public static String CommandElement_Error_Building_Env_Variables;
 
@@ -35,6 +43,10 @@ public class Messages extends NLS
 	public static String CommandElement_Undefined_Key_Binding;
 
 	public static String CommandElement_Unrecognized_OS;
+
+	public static String CommandScriptRunner_CANNOT_LOCATE_SHELL;
+
+	public static String CommandScriptRunner_UNABLE_TO_LOCATE_SHELL_FOR_COMMAND;
 	
 	static
 	{

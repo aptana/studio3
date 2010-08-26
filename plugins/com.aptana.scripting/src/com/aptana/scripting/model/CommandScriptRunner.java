@@ -81,7 +81,7 @@ public class CommandScriptRunner extends AbstractCommandRunner
 	 */
 	protected String[] getCommandLineArguments()
 	{
-		return new String[] { "-l", this._tempFile.getAbsolutePath() };
+		return new String[] { "-l", this._tempFile.getAbsolutePath() }; //$NON-NLS-1$
 	}
 	
 	/**
@@ -95,11 +95,11 @@ public class CommandScriptRunner extends AbstractCommandRunner
 		try {
 			shell = ShellExecutable.getPath();
 		} catch (CoreException e) {
-			Activator.logError("Could not locate shell", e);
+			Activator.logError(Messages.CommandScriptRunner_CANNOT_LOCATE_SHELL, e);
 			this._exitValue = 1;
 			this.setExecutedSuccessfully(false);
 			return MessageFormat.format(
-					"Unable to locate a shell with which to execute this command: {0}",
+					Messages.CommandScriptRunner_UNABLE_TO_LOCATE_SHELL_FOR_COMMAND,
 					new Object[]
 					{
 						this.getCommand().getPath()

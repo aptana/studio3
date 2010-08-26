@@ -13,7 +13,7 @@ public class BundleUtils
 	public static final String LIB_DIRECTORY_NAME = "lib"; //$NON-NLS-1$
 	
 	private static final String BUNDLE_DIRECTORY_SUFFIX = ".ruble"; //$NON-NLS-1$
-	private static final Pattern BUNDLE_NAME = Pattern.compile("^\\s*bundle\\s*(\"(?:\\\"|[^\"\\r\\n])*\"|'(?:\\\\'|[^'\\r\\n]*'))?(?:\\s*do|(?m:\\s*)\\{)");
+	private static final Pattern BUNDLE_NAME = Pattern.compile("^\\s*bundle\\s*(\"(?:\\\"|[^\"\\r\\n])*\"|'(?:\\\\'|[^'\\r\\n]*'))?(?:\\s*do|(?m:\\s*)\\{)"); //$NON-NLS-1$
 	
 	public static BundleUtils INSTANCE;
 	
