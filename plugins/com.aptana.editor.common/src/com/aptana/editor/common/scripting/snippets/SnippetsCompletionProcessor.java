@@ -251,7 +251,9 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 			{
 				char ch = document.getChar(i - 1);
 				if (Character.isWhitespace(ch))
+				{
 					break;
+				}
 				i--;
 			}
 			return document.get(i, offset - i);
