@@ -81,7 +81,9 @@ module Ruble
     
     # Converts the project to a Dir object so you can query it's file listing
     def to_dir
-      Dir.new(project.location.toOSString)
+      loc = project.location
+      return nil unless loc
+      Dir.new(loc.toOSString)
     end
 
     # Forces a refresh of the project. Pass in true to force only a shallow refresh of the project and direct members
@@ -134,10 +136,12 @@ module Ruble
 	
 	# convert to a list of environment variables
 	def to_env
-	  {
-	    :TM_PROJECT_NAME => name,
-	    :TM_PROJECT_DIRECTORY => to_dir.path
+	  hash = {
+	    :TM_PROJECT_NAME => name
 	  }
+	  as_dir = to_dir
+	  hash[:TM_PROJECT_DIRECTORY] = as_dir.path if as_dir
+	  hash
 	end
     
   end
