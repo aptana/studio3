@@ -3,14 +3,14 @@ package com.aptana.scripting.model;
 public interface ElementChangeListener
 {
 	/**
-	 * ElementAdded
+	 * elementAdded
 	 * 
 	 * @param element
 	 */
 	void elementAdded(AbstractElement element);
-	
+
 	/**
-	 * ElementDeleted
+	 * elementDeleted
 	 * 
 	 * @param element
 	 */

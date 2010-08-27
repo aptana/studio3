@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -51,9 +51,11 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
+import com.aptana.editor.common.scripting.IContentTypeTranslator;
+import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
-import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 
 /**
  * @author Max Stepanov
@@ -62,36 +64,54 @@ import com.aptana.editor.common.theme.IThemeManager;
 public class RubySourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration
 {
 
+	// FIXME Move out the translations strings as constants in IRubyConstants
 	public final static String PREFIX = "__rb_"; //$NON-NLS-1$
 	public final static String DEFAULT = "__rb" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
 	public static final String SINGLE_LINE_COMMENT = PREFIX + "singleline_comment"; //$NON-NLS-1$
 	public static final String MULTI_LINE_COMMENT = PREFIX + "multiline_comment"; //$NON-NLS-1$
 	public static final String REGULAR_EXPRESSION = PREFIX + "regular_expression"; //$NON-NLS-1$
 	public static final String COMMAND = PREFIX + "command"; //$NON-NLS-1$
-	public final static String STRING = PREFIX + "string"; //$NON-NLS-1$
+	public final static String STRING_SINGLE = PREFIX + "string_single"; //$NON-NLS-1$
+	public final static String STRING_DOUBLE = PREFIX + "string_double"; //$NON-NLS-1$
 
 	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, SINGLE_LINE_COMMENT, MULTI_LINE_COMMENT,
-			REGULAR_EXPRESSION, COMMAND, STRING };
+			REGULAR_EXPRESSION, COMMAND, STRING_SINGLE, STRING_DOUBLE };
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IRubyConstants.CONTENT_TYPE_RUBY } };
-
-	private IToken stringToken = new Token(STRING);
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
 			new EndOfLineRule("#", new Token(SINGLE_LINE_COMMENT)), //$NON-NLS-1$
 			new MultiLineRule("=begin", "=end", new Token(MULTI_LINE_COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
 			new SingleLineRule("/", "/", new Token(REGULAR_EXPRESSION), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-			new SingleLineRule("\"", "\"", stringToken, '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-			new SingleLineRule("\'", "\'", stringToken, '\\') }; //$NON-NLS-1$ //$NON-NLS-2$
+			new SingleLineRule("\"", "\"", new Token(STRING_DOUBLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
+			new SingleLineRule("\'", "\'", new Token(STRING_SINGLE), '\\') }; //$NON-NLS-1$ //$NON-NLS-2$
 
 	private RubyCodeScanner codeScanner;
 	private RuleBasedScanner singleLineCommentScanner;
 	private RuleBasedScanner multiLineCommentScanner;
 	private RubyRegexpScanner regexpScanner;
 	private RuleBasedScanner commandScanner;
-	private RuleBasedScanner stringScanner;
+	private RuleBasedScanner singleQuotedStringScanner;
+	private RuleBasedScanner doubleQuotedStringScanner;
 
 	private static RubySourceConfiguration instance;
+
+	static
+	{
+		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
+		c.addTranslation(new QualifiedContentType(IRubyConstants.CONTENT_TYPE_RUBY), new QualifiedContentType(
+				"source.ruby.rails")); //$NON-NLS-1$ // FIXME Should just be source.ruby! Rails bundle should contribute the more specific scope
+		c.addTranslation(new QualifiedContentType(STRING_SINGLE), new QualifiedContentType("string.quoted.single.ruby")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType("string.quoted.double.ruby")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(SINGLE_LINE_COMMENT), new QualifiedContentType(
+				"comment.line.number-sign.ruby")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(MULTI_LINE_COMMENT), new QualifiedContentType(
+				"comment.block.documentation.ruby")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(REGULAR_EXPRESSION), new QualifiedContentType(
+				"string.regexp.classic.ruby")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(REGULAR_EXPRESSION), new QualifiedContentType(
+				"string.interpolated.ruby")); //$NON-NLS-1$
+	}
 
 	public static RubySourceConfiguration getDefault()
 	{
@@ -154,32 +174,36 @@ public class RubySourceConfiguration implements IPartitioningConfiguration, ISou
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
 	{
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getCodeScanner());
+		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getCodeScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
-		dr = new DefaultDamagerRepairer(getSingleLineCommentScanner());
+		dr = new ThemeingDamagerRepairer(getSingleLineCommentScanner());
 		reconciler.setDamager(dr, RubySourceConfiguration.SINGLE_LINE_COMMENT);
 		reconciler.setRepairer(dr, RubySourceConfiguration.SINGLE_LINE_COMMENT);
 
-		dr = new DefaultDamagerRepairer(getMultiLineCommentScanner());
+		dr = new ThemeingDamagerRepairer(getMultiLineCommentScanner());
 		reconciler.setDamager(dr, RubySourceConfiguration.MULTI_LINE_COMMENT);
 		reconciler.setRepairer(dr, RubySourceConfiguration.MULTI_LINE_COMMENT);
 
-		dr = new DefaultDamagerRepairer(getRegexpScanner());
+		dr = new ThemeingDamagerRepairer(getRegexpScanner());
 		reconciler.setDamager(dr, RubySourceConfiguration.REGULAR_EXPRESSION);
 		reconciler.setRepairer(dr, RubySourceConfiguration.REGULAR_EXPRESSION);
 
-		dr = new DefaultDamagerRepairer(getCommandScanner());
+		dr = new ThemeingDamagerRepairer(getCommandScanner());
 		reconciler.setDamager(dr, RubySourceConfiguration.COMMAND);
 		reconciler.setRepairer(dr, RubySourceConfiguration.COMMAND);
 
-		dr = new DefaultDamagerRepairer(getStringScanner());
-		reconciler.setDamager(dr, RubySourceConfiguration.STRING);
-		reconciler.setRepairer(dr, RubySourceConfiguration.STRING);
+		dr = new ThemeingDamagerRepairer(getSingleQuotedStringScanner());
+		reconciler.setDamager(dr, RubySourceConfiguration.STRING_SINGLE);
+		reconciler.setRepairer(dr, RubySourceConfiguration.STRING_SINGLE);
+
+		dr = new ThemeingDamagerRepairer(getDoubleQuotedStringScanner());
+		reconciler.setDamager(dr, RubySourceConfiguration.STRING_DOUBLE);
+		reconciler.setRepairer(dr, RubySourceConfiguration.STRING_DOUBLE);
 	}
 
 	private ITokenScanner getCodeScanner()
@@ -230,23 +254,28 @@ public class RubySourceConfiguration implements IPartitioningConfiguration, ISou
 		return commandScanner;
 	}
 
-	private ITokenScanner getStringScanner()
+	private ITokenScanner getSingleQuotedStringScanner()
 	{
-		if (stringScanner == null)
+		if (singleQuotedStringScanner == null)
 		{
-			stringScanner = new RuleBasedScanner();
-			stringScanner.setDefaultReturnToken(getToken("string.quoted.single.ruby")); //$NON-NLS-1$
+			singleQuotedStringScanner = new RuleBasedScanner();
+			singleQuotedStringScanner.setDefaultReturnToken(getToken("string.quoted.single.ruby")); //$NON-NLS-1$
 		}
-		return stringScanner;
+		return singleQuotedStringScanner;
+	}
+
+	private ITokenScanner getDoubleQuotedStringScanner()
+	{
+		if (doubleQuotedStringScanner == null)
+		{
+			doubleQuotedStringScanner = new RuleBasedScanner();
+			doubleQuotedStringScanner.setDefaultReturnToken(getToken("string.quoted.double.ruby")); //$NON-NLS-1$
+		}
+		return doubleQuotedStringScanner;
 	}
 
 	protected IToken getToken(String tokenName)
 	{
-		return getThemeManager().getToken(tokenName);
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
+		return new Token(tokenName);
 	}
 }

@@ -44,6 +44,48 @@ public class CSSCodeScannerTest extends TestCase
 			assertToken(Token.WHITESPACE, i + 2, 1);
 		}
 	}
+
+	public void testIdentifierWithKeyword()
+	{
+		String src = "table-row-group";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("source.css"), 0, 15);
+	}
+
+	public void testBrowserSpecificPropertyNames()
+	{
+		String src = "-moz-border-radius: 4px\n" +
+				"-webkit-border-radius: 4px";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("support.type.property-name.css"), 0, 18);
+		assertToken(getToken("punctuation.separator.key-value.css"), 18, 1);
+		assertToken(Token.WHITESPACE, 19, 1);
+		assertToken(getToken("constant.numeric.css"), 20, 1);
+		assertToken(getToken("keyword.other.unit.css"), 21, 2);
+		assertToken(Token.WHITESPACE, 23, 1);
+		assertToken(getToken("support.type.property-name.css"), 24, 21);
+		assertToken(getToken("punctuation.separator.key-value.css"), 45, 1);
+		assertToken(Token.WHITESPACE, 46, 1);
+		assertToken(getToken("constant.numeric.css"), 47, 1);
+		assertToken(getToken("keyword.other.unit.css"), 48, 2);
+	}
+	
+	public void testURLFunctionArgWithNoString()
+	{
+		String src = "background: url(/images/blah_header.jpg)";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("support.type.property-name.css"), 0, 10);
+		assertToken(getToken("punctuation.separator.key-value.css"), 10, 1);
+		assertToken(Token.WHITESPACE, 11, 1);
+		assertToken(getToken("support.function.misc.css"), 12, 3);		
+		assertToken(getToken("punctuation.section.function.css"), 15, 1);
+	}
 	
 	public void testSmallCaps()
 	{
@@ -62,6 +104,29 @@ public class CSSCodeScannerTest extends TestCase
 		assertToken(getToken("punctuation.terminator.rule.css"), 24, 1);
 		assertToken(Token.WHITESPACE, 25, 1);
 		assertToken(getToken("punctuation.section.property-list.css"), 26, 1);
+	}
+
+	public void testCSSEmTag()
+	{
+		// the preceding elements are to make sure "em" does not corrupt the rest of tokenizing
+		String src = "textarea.JScript, textarea.HTML {height:10em;}";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("entity.name.tag.css"), 0, 8);
+		assertToken(getToken("entity.other.attribute-name.class.css"), 8, 8);
+		assertToken(getToken("punctuation.separator.css"), 16, 1);
+		assertToken(Token.WHITESPACE, 17, 1);
+		assertToken(getToken("entity.name.tag.css"), 18, 8);
+		assertToken(getToken("entity.other.attribute-name.class.css"), 26, 5);
+		assertToken(Token.WHITESPACE, 31, 1);
+		assertToken(getToken("punctuation.section.property-list.css"), 32, 1);
+		assertToken(getToken("support.type.property-name.css"), 33, 6);
+		assertToken(getToken("punctuation.separator.key-value.css"), 39, 1);
+		assertToken(getToken("constant.numeric.css"), 40, 2);
+		assertToken(getToken("keyword.other.unit.css"), 42, 2); // "em"
+		assertToken(getToken("punctuation.terminator.rule.css"), 44, 1);
+		assertToken(getToken("punctuation.section.property-list.css"), 45, 1);
 	}
 
 	public void testBasicTokenizing()
@@ -142,16 +207,16 @@ public class CSSCodeScannerTest extends TestCase
 		assertToken(getToken("punctuation.separator.key-value.css"), 139, 1);
 		assertToken(Token.WHITESPACE, 140, 1);
 		assertToken(getToken("support.constant.font-name.css"), 141, 7);
-		assertToken(getToken(null), 148, 1);
+		assertToken(getToken("punctuation.separator.css"), 148, 1);
 		assertToken(Token.WHITESPACE, 149, 1);
 		assertToken(getToken("support.constant.font-name.css"), 150, 6);
-		assertToken(getToken(null), 156, 1);
+		assertToken(getToken("punctuation.separator.css"), 156, 1);
 		assertToken(Token.WHITESPACE, 157, 1);
 		assertToken(getToken("support.constant.font-name.css"), 158, 5);
-		assertToken(getToken(null), 163, 1);
+		assertToken(getToken("punctuation.separator.css"), 163, 1);
 		assertToken(Token.WHITESPACE, 164, 1);
 		assertToken(getToken("support.constant.font-name.css"), 165, 9);
-		assertToken(getToken(null), 174, 1);
+		assertToken(getToken("punctuation.separator.css"), 174, 1);
 		assertToken(Token.WHITESPACE, 175, 1);
 		assertToken(getToken("support.constant.font-name.css"), 176, 10);
 		assertToken(getToken("punctuation.terminator.rule.css"), 186, 1);

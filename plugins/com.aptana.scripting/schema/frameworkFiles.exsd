@@ -6,7 +6,7 @@
          <meta.schema plugin="com.aptana.scripting" id="frameworkFiles" name="Framework Files"/>
       </appinfo>
       <documentation>
-         This extension point allows plugins to contribute ruby library files to be loaded along with the RadRails ruby framework.
+         This extension point allows plugins to contribute ruby library files to be loaded along with the Ruble framework.
       </documentation>
    </annotation>
 

@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -51,10 +51,12 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
+import com.aptana.editor.common.scripting.IContentTypeTranslator;
+import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
-import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
-import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
+import com.aptana.editor.js.text.rules.JSRegExpRule;
 
 /**
  * @author Max Stepanov
@@ -75,7 +77,8 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, JS_MULTILINE_COMMENT, JS_SINGLELINE_COMMENT,
 			JS_DOC, STRING_DOUBLE, STRING_SINGLE, JS_REGEXP };
 
-	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IJSConstants.CONTENT_TYPE_JS } };
+	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IJSConstants.CONTENT_TYPE_JS },
+			{ IJSConstants.CONTENT_TYPE_JSON } };
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
 			new EndOfLineRule("//", new Token(JS_SINGLELINE_COMMENT)), //$NON-NLS-1$
@@ -83,17 +86,32 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 			new SingleLineRule("\'", "\'", new Token(STRING_SINGLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
 			new MultiLineRule("/**", "*/", new Token(JS_DOC), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
 			new MultiLineRule("/*", "*/", new Token(JS_MULTILINE_COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
-			new RegexpRule("/([^/]|\\\\/)*?([^/\\\\]+|\\\\\\\\)/[igm]*", new Token(JS_REGEXP), true) }; //$NON-NLS-1$
+			new JSRegExpRule(new Token(JS_REGEXP)) };
 
 	private JSCodeScanner codeScanner;
 	private JSDocScanner docScanner;
-	private JSSingleQuotedStringScanner singleQuoteScanner;
-	private JSDoubleQuotedStringScanner doubleQuoteScanner;
-	private JSRegexpScanner regexpScanner;
+	private JSEscapeSequenceScanner singleQuoteScanner;
+	private JSEscapeSequenceScanner doubleQuoteScanner;
+	private JSEscapeSequenceScanner regexpScanner;
 	private RuleBasedScanner multiLineCommentScanner;
 	private RuleBasedScanner singleLineCommentScanner;
 
 	private static JSSourceConfiguration instance;
+
+	static
+	{
+		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
+		c.addTranslation(new QualifiedContentType(IJSConstants.CONTENT_TYPE_JS), new QualifiedContentType("source.js")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(IJSConstants.CONTENT_TYPE_JSON), new QualifiedContentType(
+				"source.json")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType("string.quoted.double.js")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(STRING_SINGLE), new QualifiedContentType("string.quoted.single.js")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(JS_REGEXP), new QualifiedContentType("string.regexp.js")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(JS_SINGLELINE_COMMENT), new QualifiedContentType(
+				"comment.line.double-slash.js")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(JS_MULTILINE_COMMENT), new QualifiedContentType("comment.block.js")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(JS_DOC), new QualifiedContentType("comment.block.documentation.js")); //$NON-NLS-1$
+	}
 
 	public static JSSourceConfiguration getDefault()
 	{
@@ -160,34 +178,34 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
 	{
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getCodeScanner());
+		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getCodeScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
-		dr = new DefaultDamagerRepairer(getJSDocScanner());
+		dr = new ThemeingDamagerRepairer(getJSDocScanner());
 		reconciler.setDamager(dr, JS_DOC);
 		reconciler.setRepairer(dr, JS_DOC);
 
-		dr = new DefaultDamagerRepairer(getMultiLineCommentScanner());
+		dr = new ThemeingDamagerRepairer(getMultiLineCommentScanner());
 		reconciler.setDamager(dr, JS_MULTILINE_COMMENT);
 		reconciler.setRepairer(dr, JS_MULTILINE_COMMENT);
 
-		dr = new DefaultDamagerRepairer(getSingleQuotedStringScanner());
+		dr = new ThemeingDamagerRepairer(getSingleQuotedStringScanner());
 		reconciler.setDamager(dr, STRING_SINGLE);
 		reconciler.setRepairer(dr, STRING_SINGLE);
 
-		dr = new DefaultDamagerRepairer(getDoubleQuotedStringScanner());
+		dr = new ThemeingDamagerRepairer(getDoubleQuotedStringScanner());
 		reconciler.setDamager(dr, STRING_DOUBLE);
 		reconciler.setRepairer(dr, STRING_DOUBLE);
 
-		dr = new DefaultDamagerRepairer(getSingleLineCommentScanner());
+		dr = new ThemeingDamagerRepairer(getSingleLineCommentScanner());
 		reconciler.setDamager(dr, JS_SINGLELINE_COMMENT);
 		reconciler.setRepairer(dr, JS_SINGLELINE_COMMENT);
 
-		dr = new DefaultDamagerRepairer(getRegexpScanner());
+		dr = new ThemeingDamagerRepairer(getRegexpScanner());
 		reconciler.setDamager(dr, JS_REGEXP);
 		reconciler.setRepairer(dr, JS_REGEXP);
 	}
@@ -216,7 +234,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	{
 		if (regexpScanner == null)
 		{
-			regexpScanner = new JSRegexpScanner();
+			regexpScanner = new JSEscapeSequenceScanner("string.regexp.js"); //$NON-NLS-1$
 		}
 		return regexpScanner;
 	}
@@ -225,7 +243,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	{
 		if (doubleQuoteScanner == null)
 		{
-			doubleQuoteScanner = new JSDoubleQuotedStringScanner();
+			doubleQuoteScanner = new JSEscapeSequenceScanner("string.quoted.double.js"); //$NON-NLS-1$
 		}
 		return doubleQuoteScanner;
 	}
@@ -234,7 +252,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	{
 		if (singleQuoteScanner == null)
 		{
-			singleQuoteScanner = new JSSingleQuotedStringScanner();
+			singleQuoteScanner = new JSEscapeSequenceScanner("string.quoted.single.js"); //$NON-NLS-1$
 		}
 		return singleQuoteScanner;
 	}
@@ -259,11 +277,6 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 
 	protected IToken getToken(String tokenName)
 	{
-		return getThemeManager().getToken(tokenName);
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
+		return new Token(tokenName);
 	}
 }

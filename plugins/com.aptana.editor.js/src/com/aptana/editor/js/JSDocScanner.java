@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -42,10 +42,8 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
+import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WordRule;
-
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.IThemeManager;
 
 /**
  * A rule based JavaDoc scanner.
@@ -74,9 +72,10 @@ public class JSDocScanner extends RuleBasedScanner
 		}
 	}
 
-	private static String[] KEYWORDS = { "@author", "@deprecated", "@exception", "@param", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			"@return", "@see", "@serial", "@serialData", "@serialField", "@since", "@throws", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
-			"@version" }; //$NON-NLS-1$
+	@SuppressWarnings("nls")
+	private static String[] KEYWORDS = { "@author", "@class", "@constructor", "@deprecated", "@exception", "@extends",
+			"@final", "@member", "@param", "@private", "@requires", "@return", "@returns", "@see", "@serial",
+			"@serialData", "@serialField", "@since", "@throws", "@type", "@version" };
 
 	/**
 	 * Create a new javadoc scanner for the given color provider.
@@ -85,26 +84,21 @@ public class JSDocScanner extends RuleBasedScanner
 	{
 		super();
 
-		IToken keyword = getToken("meta.documentation.tag.js"); //$NON-NLS-1$
-		IToken tag = getToken("text.html.basic"); //$NON-NLS-1$
-		IToken link = getToken("markup.underline.link"); //$NON-NLS-1$
-
 		List<IRule> list = new ArrayList<IRule>();
 
 		// Add rule for tags.
-		list.add(new SingleLineRule("<", ">", tag)); //$NON-NLS-2$ //$NON-NLS-1$
+		list.add(new SingleLineRule("<", ">", getToken("text.html.basic"))); //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-1$
 
 		// Add rule for links.
-		list.add(new SingleLineRule("{", "}", link)); //$NON-NLS-2$ //$NON-NLS-1$
+		list.add(new SingleLineRule("{", "}", getToken("markup.underline.link"))); //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-1$
 
 		// Add word rule for keywords.
+		IToken keyword = getToken("meta.tag.documentation.js"); //$NON-NLS-1$
 		WordRule wordRule = new WordRule(new JSDocWordDetector());
-
 		for (String word : KEYWORDS)
 		{
 			wordRule.addWord(word, keyword);
 		}
-
 		list.add(wordRule);
 
 		setDefaultReturnToken(getToken("comment.block.documentation.js")); //$NON-NLS-1$
@@ -113,11 +107,7 @@ public class JSDocScanner extends RuleBasedScanner
 
 	protected IToken getToken(String tokenName)
 	{
-		return getThemeManager().getToken(tokenName);
+		return new Token(tokenName);
 	}
 
-	protected IThemeManager getThemeManager()
-	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
-	}
 }

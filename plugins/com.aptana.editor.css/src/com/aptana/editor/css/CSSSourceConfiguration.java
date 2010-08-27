@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -53,9 +53,11 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
+import com.aptana.editor.common.scripting.IContentTypeTranslator;
+import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
-import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 
 /**
  * @author Max Stepanov
@@ -139,6 +141,16 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	private static CSSSourceConfiguration instance;
 
+	static
+	{
+		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
+		c.addTranslation(new QualifiedContentType(ICSSConstants.CONTENT_TYPE_CSS), new QualifiedContentType(
+				ICSSConstants.CSS_SCOPE));
+		c.addTranslation(new QualifiedContentType(MULTILINE_COMMENT), new QualifiedContentType(
+				ICSSConstants.CSS_COMMENT_BLOCK_SCOPE));
+		c.addTranslation(new QualifiedContentType(STRING), new QualifiedContentType(ICSSConstants.CSS_STRING_SCOPE));
+	}
+
 	public static CSSSourceConfiguration getDefault()
 	{
 		if (instance == null)
@@ -212,18 +224,18 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
 	{
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(Activator.getDefault().getCodeScanner());
+		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(Activator.getDefault().getCodeScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
-		dr = new DefaultDamagerRepairer(getWordScanner());
+		dr = new ThemeingDamagerRepairer(getWordScanner());
 		reconciler.setDamager(dr, MULTILINE_COMMENT);
 		reconciler.setRepairer(dr, MULTILINE_COMMENT);
 
-		dr = new DefaultDamagerRepairer(getStringScanner());
+		dr = new ThemeingDamagerRepairer(getStringScanner());
 		reconciler.setDamager(dr, STRING);
 		reconciler.setRepairer(dr, STRING);
 	}
@@ -233,7 +245,7 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 		if (multilineCommentScanner == null)
 		{
 			multilineCommentScanner = new RuleBasedScanner();
-			multilineCommentScanner.setDefaultReturnToken(getToken("comment.block.css")); //$NON-NLS-1$
+			multilineCommentScanner.setDefaultReturnToken(getToken(ICSSConstants.CSS_COMMENT_BLOCK_SCOPE));
 		}
 		return multilineCommentScanner;
 	}
@@ -243,18 +255,13 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 		if (stringScanner == null)
 		{
 			stringScanner = new RuleBasedScanner();
-			stringScanner.setDefaultReturnToken(getToken("string.quoted.single.css")); //$NON-NLS-1$
+			stringScanner.setDefaultReturnToken(getToken(ICSSConstants.CSS_STRING_SCOPE));
 		}
 		return stringScanner;
 	}
 
 	protected IToken getToken(String name)
 	{
-		return getThemeManager().getToken(name);
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
+		return new Token(name);
 	}
 }

@@ -1,10 +1,7 @@
 package com.aptana.scope;
 
-public class OrSelector implements ISelectorNode
+public class OrSelector extends BinarySelector
 {
-	ISelectorNode _left;
-	ISelectorNode _right;
-	
 	/**
 	 * OrSelector
 	 * 
@@ -13,28 +10,7 @@ public class OrSelector implements ISelectorNode
 	 */
 	public OrSelector(ISelectorNode left, ISelectorNode right)
 	{
-		this._left = left;
-		this._right = right;
-	}
-	
-	/**
-	 * getLeftChild
-	 * 
-	 * @return
-	 */
-	public ISelectorNode getLeftChild()
-	{
-		return this._left;
-	}
-	
-	/**
-	 * getRightChild
-	 * 
-	 * @return
-	 */
-	public ISelectorNode getRightChild()
-	{
-		return this._right;
+		super(left, right);
 	}
 	
 	/*
@@ -67,14 +43,10 @@ public class OrSelector implements ISelectorNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
+	 * @see com.aptana.scope.BinarySelector#getOperator()
 	 */
-	@Override
-	public String toString()
+	protected String getOperator()
 	{
-		String left = (this._left == null) ? "null" : this._left.toString(); //$NON-NLS-1$
-		String right = (this._right == null) ? "null" : this._right.toString(); //$NON-NLS-1$
-		
-		return left + ", " + right; //$NON-NLS-1$
+		return ",";
 	}
 }

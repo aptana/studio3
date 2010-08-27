@@ -7,6 +7,7 @@
             class="com.aptana.editor.html.HTMLEditor"
             contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
             default="true"
+            extensions="html,htm,xhtml,shtml"
             icon="icons/html.png"
             id="com.aptana.editor.html"
             name="%editor.html.name">
@@ -19,11 +20,50 @@
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             base-type="org.eclipse.core.runtime.text"
-            file-extensions="html,htm"
+            file-extensions="html,htm,xhtml,shtml"
             id="com.aptana.contenttype.html"
             name="%content-type.html.name"
             priority="normal">
       </content-type>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.aptana.editor.html.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectorTargets">
+      <target
+            id="com.aptana.editor.html"
+            name="%editor.html.name">
+      </target>
+   </extension>
 
+   <extension
+         point="com.aptana.index.core.fileIndexingParticipants">
+      <fileIndexingParticipant
+            class="com.aptana.editor.html.contentassist.index.HTMLFileIndexingParticipant">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.html">
+         </contentTypeBinding>
+      </fileIndexingParticipant>
+   </extension>
+   <extension
+         point="com.aptana.parsing.parser">
+      <parser
+            class="com.aptana.editor.html.parsing.HTMLParser"
+            language="text/html">
+      </parser>
+   </extension>
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
+      <hyperlinkDetector
+            activate="true"
+            class="com.aptana.editor.html.text.hyperlink.CSSClassHyperlinkDetector"
+            id="com.aptana.editor.html.hyperlinkDetector"
+            name="CSS Class Hyperlinks"
+            targetId="com.aptana.editor.html">
+      </hyperlinkDetector>
+   </extension>
 </plugin>

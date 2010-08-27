@@ -14,6 +14,9 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
+import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.model.IGitRepositoryManager;
+
 /**
  * An action that actually generates a dynamic sub-menu.
  * 
@@ -139,5 +142,10 @@ public abstract class MenuAction implements IObjectActionDelegate, IMenuCreator
 	public void run(IAction action)
 	{
 		// generally do nothing. If can be activated by keybinding, subclasses should implement
+	}
+
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 }

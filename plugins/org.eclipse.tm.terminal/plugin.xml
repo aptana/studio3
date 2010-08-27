@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<!--
+# Copyright (c) 2006, 2008 Wind River Systems, Inc. and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors:
+# Michael Scharf (Wind River) - initial API and implementation 
+# Martin Oberhuber (Wind River) - fixed copyright headers and beautified
+# Michael Scharf (Wind River) - [237425] undefined tm.terminal command
+-->
+<plugin>
+   <extension-point id="terminalConnectors" name="Terminal Connectors" schema="schema/terminalConnectors.exsd"/>
+   <extension-point id="terminalHyperlinkDetectors" name="Terminal Hyperlink Detectors" schema="schema/terminalHyperlinkDetectors.exsd"/>
+   <extension point="org.eclipse.ui.contexts">           
+      <context
+            name="%terminal.context.name"
+            description="%terminal.context.description"
+            id="com.aptana.org.eclipse.tm.terminal.TerminalContext"
+            />
+   </extension>
+	<extension point="org.eclipse.help.contexts">
+  		<contexts file="HelpContexts.xml"/>
+	</extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <!-- Dummy commands for bindings, see below -->
+      <command
+            categoryId="com.aptana.org.eclipse.tm.terminal.category1"
+            id="com.aptana.org.eclipse.tm.terminal.command1"
+            name="%terminal.insertion.name"/>
+      <category
+            description="%terminal.view.insertion.description"
+            id="com.aptana.org.eclipse.tm.terminal.category1"
+            name="%terminal.insertion.category.name"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <!--
+      These keybindings are needed to disable the menu-activation keys (e.g.,
+      Alt-F for the File menu, etc.).  The code in method
+      TerminalControl.TerminalFocusListener.focusGained() disables the Eclipse key
+      binding service, but it doesn't disable the global menu-activation
+      keys.
+      -->
+      <key
+            commandId="com.aptana.org.eclipse.tm.terminal.command1"
+            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Alt+A"/> <!-- Search -->
+      <key
+            commandId="com.aptana.org.eclipse.tm.terminal.command1"
+            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Alt+E"/> <!-- Edit -->
+      <key
+            commandId="com.aptana.org.eclipse.tm.terminal.command1"
+            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Alt+F"/> <!-- File -->
+      <key
+            commandId="com.aptana.org.eclipse.tm.terminal.command1"
+            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Alt+G"/> 
+      <key
+            commandId="com.aptana.org.eclipse.tm.terminal.command1"
+            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Alt+H"/> <!-- Help -->
+      <key
+            commandId="com.aptana.org.eclipse.tm.terminal.command1"
+            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Alt+N"/> <!-- Navigate -->
+      <key
+            commandId="com.aptana.org.eclipse.tm.terminal.command1"
+            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Alt+P"/> <!-- Project -->
+      <key
+            commandId="com.aptana.org.eclipse.tm.terminal.command1"
+            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Alt+R"/> <!-- Run -->
+      <key
+            commandId="com.aptana.org.eclipse.tm.terminal.command1"
+            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Alt+S"/> <!-- Source -->
+      <key
+            commandId="com.aptana.org.eclipse.tm.terminal.command1"
+            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Alt+T"/> <!-- Refactor -->
+      <key
+            commandId="com.aptana.org.eclipse.tm.terminal.command1"
+            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Alt+V"/> <!-- CVS -->
+      <key
+            commandId="com.aptana.org.eclipse.tm.terminal.command1"
+            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Alt+W"/> <!-- Window -->
+   </extension>
+</plugin>

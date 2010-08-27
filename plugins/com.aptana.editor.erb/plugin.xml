@@ -7,7 +7,7 @@
             class="com.aptana.editor.erb.html.RHTMLEditor"
             contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
             default="true"
-            extensions="rhtml"
+            extensions="rhtml,erb"
             icon="icons/erb.png"
             id="com.aptana.editor.erb.html"
             name="%editor.rhtml.name">
@@ -18,7 +18,7 @@
       <editor
             class="com.aptana.editor.erb.xml.RXMLEditor"
             contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
-            extensions="rxml"
+            extensions="rxml,erb"
             icon="icons/erb.png"
             id="com.aptana.editor.erb.xml"
             name="%editor.rxml.name">
@@ -45,6 +45,13 @@
             name="%content-type.rxml.name"
             priority="normal">
       </content-type>
+   </extension>
+   <extension
+         point="com.aptana.parsing.parser">
+      <parser
+            class="com.aptana.editor.erb.html.parsing.RHTMLParser"
+            language="text/erb">
+      </parser>
    </extension>
 
 </plugin>

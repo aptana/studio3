@@ -1,12 +1,14 @@
 package com.aptana.editor.css.parsing.ast;
 
+import java.util.Arrays;
 import java.util.List;
+
+import com.aptana.parsing.ast.IParseNode;
 
 public class CSSPageNode extends CSSNode
 {
 
 	private String fPageSelector;
-	private CSSDeclarationNode[] fDeclarations;
 
 	public CSSPageNode(int start, int end)
 	{
@@ -26,28 +28,40 @@ public class CSSPageNode extends CSSNode
 	@SuppressWarnings("unchecked")
 	public CSSPageNode(String pageSelector, Object declarations, int start, int end)
 	{
+		super(start, end);
 		fPageSelector = pageSelector;
 		if (declarations instanceof CSSDeclarationNode)
 		{
-			fDeclarations = new CSSDeclarationNode[1];
-			fDeclarations[0] = (CSSDeclarationNode) declarations;
+			setChildren(new CSSDeclarationNode[] { (CSSDeclarationNode) declarations });
 		}
 		else if (declarations instanceof List<?>)
 		{
 			List<CSSDeclarationNode> list = (List<CSSDeclarationNode>) declarations;
-			int size = list.size();
-			fDeclarations = new CSSDeclarationNode[size];
-			for (int i = 0; i < size; ++i)
-			{
-				fDeclarations[i] = list.get(i);
-			}
+			setChildren(list.toArray(new CSSDeclarationNode[list.size()]));
 		}
-		else
+	}
+
+	public CSSDeclarationNode[] getDeclarations()
+	{
+		List<IParseNode> list = Arrays.asList(getChildren());
+		return list.toArray(new CSSDeclarationNode[list.size()]);
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!super.equals(obj) || !(obj instanceof CSSPageNode))
 		{
-			fDeclarations = new CSSDeclarationNode[0];
+			return false;
 		}
-		this.start = start;
-		this.end = end;
+		CSSPageNode other = (CSSPageNode) obj;
+		return toString().equals(other.toString());
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return super.hashCode() * 31 + toString().hashCode();
 	}
 
 	@Override
@@ -60,10 +74,12 @@ public class CSSPageNode extends CSSNode
 			text.append(":").append(fPageSelector).append(" "); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		text.append("{"); //$NON-NLS-1$
-		for (int i = 0; i < fDeclarations.length; ++i)
+		CSSDeclarationNode[] declarations = getDeclarations();
+		int size = declarations.length;
+		for (int i = 0; i < size; ++i)
 		{
-			text.append(fDeclarations[i]);
-			if (i < fDeclarations.length - 1)
+			text.append(declarations[i]);
+			if (i < size - 1)
 			{
 				text.append(" "); //$NON-NLS-1$
 			}

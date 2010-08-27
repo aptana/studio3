@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -49,11 +49,13 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
-import com.aptana.editor.common.NonRuleBasedDamagerRepairer;
+import com.aptana.editor.common.scripting.IContentTypeTranslator;
+import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
+import com.aptana.editor.common.text.rules.NonRuleBasedDamagerRepairer;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.TagRule;
-import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 
 /**
  * @author Max Stepanov
@@ -74,7 +76,7 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
 			new MultiLineRule("<?", "?>", new Token(PRE_PROCESSOR)), //$NON-NLS-1$ //$NON-NLS-2$
-			new MultiLineRule("<!--", "-->", new Token(XML_COMMENT)), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("<!--", "-->", new Token(XML_COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
 			new MultiLineRule("<![CDATA[", "]]>", new Token(CDATA)), //$NON-NLS-1$ //$NON-NLS-2$
 			new TagRule("/", new Token(XML_TAG)), //$NON-NLS-1$
 			new TagRule(new Token(XML_TAG)) };
@@ -90,6 +92,9 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 	{
 		if (instance == null)
 		{
+			IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
+			c.addTranslation(new QualifiedContentType(IXMLConstants.CONTENT_TYPE_XML), new QualifiedContentType(
+					"text.xml")); //$NON-NLS-1$
 			instance = new XMLSourceConfiguration();
 		}
 		return instance;
@@ -151,22 +156,22 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
 	{
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getXMLScanner());
+		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getXMLScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
-		dr = new DefaultDamagerRepairer(getPreProcessorScanner());
+		dr = new ThemeingDamagerRepairer(getPreProcessorScanner());
 		reconciler.setDamager(dr, PRE_PROCESSOR);
 		reconciler.setRepairer(dr, PRE_PROCESSOR);
 
-		dr = new DefaultDamagerRepairer(getCDATAScanner());
+		dr = new ThemeingDamagerRepairer(getCDATAScanner());
 		reconciler.setDamager(dr, CDATA);
 		reconciler.setRepairer(dr, CDATA);
 
-		dr = new DefaultDamagerRepairer(getXMLTagScanner());
+		dr = new ThemeingDamagerRepairer(getXMLTagScanner());
 		reconciler.setDamager(dr, XML_TAG);
 		reconciler.setRepairer(dr, XML_TAG);
 
@@ -215,11 +220,6 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	protected IToken getToken(String tokenName)
 	{
-		return getThemeManager().getToken(tokenName);
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
+		return new Token(tokenName);
 	}
 }

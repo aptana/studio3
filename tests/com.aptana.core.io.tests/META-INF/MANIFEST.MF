@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Aptana Core IO Tests
+Bundle-SymbolicName: com.aptana.core.io.tests
+Bundle-Version: 3.0.0.qualifier
+Bundle-Vendor: Aptana, Inc.
+Fragment-Host: com.aptana.core.io
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.junit
+Export-Package: com.aptana.core.io.tests

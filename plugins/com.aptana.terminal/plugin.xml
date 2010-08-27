@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="processConfigurations" name="Process Configurations" schema="schema/processConfigurations.exsd"/>
 
    <extension
          point="org.eclipse.ui.views">
       <category
             name="%category.name"
-            id="com.aptana.terminal">
+            id="com.aptana">
       </category>
       <view
             allowMultiple="true"
-            category="com.aptana.terminal"
+            category="com.aptana"
             class="com.aptana.terminal.views.TerminalView"
             icon="icons/terminal.png"
-            id="com.aptana.terminal.views.TerminalView"
+            id="com.aptana.terminal.views.terminal"
             name="%view.name">
       </view>
    </extension>
@@ -49,25 +50,123 @@
       </factory>
    </extension>
    <extension
-         point="org.eclipse.ui.perspectiveExtensions">
-      <perspectiveExtension
-            targetID="*">
-         <view
-               id="com.aptana.terminal.views.TerminalView"
-               minimized="false"
-               relationship="stack"
-               relative="org.eclipse.ui.console.ConsoleView"
-               visible="true">
-         </view>
-      </perspectiveExtension>
-   </extension>
-   <extension
          point="com.aptana.scripting.loadPaths">
       <loadPath
             id="terminal"
             name="terminal"
             path="scripting">
       </loadPath>
+   </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="com.aptana.terminal.EarlyStartup">
+      </startup>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.aptana.terminal.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="com.aptana.terminal.actionSet"
+            label="%showTerminalEditorActionSet.label"
+            visible="false">
+         <action
+               class="com.aptana.terminal.editor.ShowTerminalEditorAction"
+               icon="icons/terminal.png"
+               id="com.aptana.terminal.ShowTerminalEditorAction"
+               label="%showTerminalEditorAction.label"
+               menubarPath="window/showView/additions"
+               style="push">
+         </action>
+      </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.debug.ui.DebugPerspective">
+         <actionSet
+               id="com.aptana.terminal.actionSet">
+         </actionSet>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.ui.AptanaPreferencePage"
+            class="com.aptana.terminal.preferences.TerminalPreferencePage"
+            id="com.aptana.terminal.page"
+            name="%page.name">
+      </page>
+   </extension>
+   <extension
+         point="com.aptana.org.eclipse.tm.terminal.terminalConnectors">
+      <connector
+            class="com.aptana.terminal.connector.LocalTerminalConnector"
+            hidden="false"
+            id="com.aptana.terminal.connector.local"
+            name="Local Connection">
+      </connector>
+   </extension>
+   <extension
+         point="com.aptana.terminal.processConfigurations">
+      <configuration
+            class="com.aptana.terminal.internal.configurations.NixBashConfiguration"
+            id="com.aptana.terminal.configurations.macosx"
+            name="MacOSX Bash"
+            platform="macosx">
+      </configuration>
+      <configuration
+            class="com.aptana.terminal.internal.configurations.NixBashConfiguration"
+            id="com.aptana.terminal.configurations.linux"
+            name="Linux Bash"
+            platform="linux">
+      </configuration>
+      <configuration
+            class="com.aptana.terminal.internal.configurations.WindowsMingwConfiguration"
+            id="com.aptana.terminal.configurations.win32"
+            name="Windows MINGW"
+            platform="win32">
+      </configuration>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.ui.category.views"
+            defaultHandler="com.aptana.terminal.internal.handlers.ShowTerminalHandler"
+            description="Show Terminal view"
+            id="com.aptana.terminal.commands.showTerminal"
+            name="Show Terminal">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="com.aptana.ui.globalActionSet">
+            <command
+                  commandId="com.aptana.terminal.commands.showTerminal"
+                  icon="icons/terminal.png"
+                  style="push">
+               <visibleWhen>
+                  <reference
+                        definitionId="com.aptana.ui.contributions.inGlobalActionSet">
+                  </reference>
+               </visibleWhen>
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>
+   <extension
+         point="com.aptana.org.eclipse.tm.terminal.terminalHyperlinkDetectors">
+      <detector
+            class="com.aptana.terminal.internal.URLHyperlinkDetector">
+      </detector>
    </extension>
 
 </plugin>

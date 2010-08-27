@@ -2,12 +2,16 @@ package com.aptana.git.core;
 
 import java.net.URI;
 
+import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.team.IMoveDeleteHook;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.team.core.history.IFileHistoryProvider;
 
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.internal.core.storage.GitFileHistoryProvider;
 
 public class GitRepositoryProvider extends org.eclipse.team.core.RepositoryProvider
@@ -24,17 +28,30 @@ public class GitRepositoryProvider extends org.eclipse.team.core.RepositoryProvi
 	@Override
 	public void configureProject() throws CoreException
 	{
+		// Ensure resource for newly created .git folder is loaded
+		getProject().refreshLocal(IResource.DEPTH_ONE, new NullProgressMonitor());
 		// look for .git sub dir
 		final IResource dotGit = getProject().findMember(GitRepository.GIT_DIR);
 		if (dotGit != null && dotGit.exists())
 		{
 			// if it exists and it actually is the right .git meta dir, let's mark it as team private
-			URI gitDir = GitRepository.gitDirForURL(getProject().getLocationURI());
-			if (dotGit.getLocationURI().equals(gitDir))
+			URI gitDir = getGitRepositoryManager().gitDirForURL(getProject().getLocationURI());
+			if (gitDir != null)
 			{
-				dotGit.setTeamPrivateMember(true);
+				// Need to perform IPath based equals() check instead of URI based comparison
+				// to deal with differences in the trailing / in two URIs
+				IPath dotGitPath = dotGit.getLocation();
+				if (dotGitPath != null && dotGitPath.equals(URIUtil.toPath((gitDir))))
+				{
+					dotGit.setTeamPrivateMember(true);
+				}
 			}
 		}
+	}
+
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 
 	@Override

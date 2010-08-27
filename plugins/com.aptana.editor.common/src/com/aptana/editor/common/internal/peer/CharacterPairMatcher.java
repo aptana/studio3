@@ -14,6 +14,9 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.source.ICharacterPairMatcher;
 
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.scope.ScopeSelector;
+
 /**
  * This is a modified version of DefaultCharacterPairMatcher from Eclipse. This version adds some heuristics to try and
  * properly handle character pairs where the start and end chars are the same (like '', "", ``) by looking at the
@@ -25,6 +28,8 @@ import org.eclipse.jface.text.source.ICharacterPairMatcher;
  */
 public class CharacterPairMatcher implements ICharacterPairMatcher
 {
+	private static final ScopeSelector fgCommentSelector = new ScopeSelector(
+			Messages.getString("CharacterPairMatcher.0")); //$NON-NLS-1$
 	private int fAnchor = -1;
 	private final CharPairs fPairs;
 	private final String fPartitioning;
@@ -107,10 +112,29 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 	 */
 	private IRegion performMatch(IDocument doc, int caretOffset) throws BadLocationException
 	{
-		final int charOffset = caretOffset - 1;
-		final char prevChar = doc.getChar(Math.max(charOffset, 0));
+		int charOffset = Math.max(caretOffset - 1, 0);
+		char prevChar = doc.getChar(charOffset);
 		if (!fPairs.contains(prevChar))
+		{
+			// Now try to right of caret
+			charOffset = caretOffset;
+			caretOffset += 1;
+			if (charOffset >= doc.getLength())
+			{
+				return null;
+			}
+			prevChar = doc.getChar(charOffset);
+			if (!fPairs.contains(prevChar))
+			{
+				return null;
+			}
+		}
+
+		// Drop out if the char is inside a comment
+		if (fgCommentSelector.matches(getScopeAtOffset(doc, charOffset)))
+		{
 			return null;
+		}
 
 		boolean isForward = fPairs.isStartCharacter(prevChar);
 		final String partition = TextUtilities.getContentType(doc, fPartitioning, charOffset, false);
@@ -130,18 +154,23 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 			}
 		}
 		fAnchor = isForward ? ICharacterPairMatcher.LEFT : ICharacterPairMatcher.RIGHT;
-		final int searchStartPosition = isForward ? caretOffset : caretOffset - 2;
+		final int searchStartPosition = isForward ? charOffset + 1 : caretOffset - 2;
 		final int adjustedOffset = isForward ? charOffset : caretOffset;
 
 		final DocumentPartitionAccessor partDoc = new DocumentPartitionAccessor(doc, fPartitioning, partition);
-		int endOffset = findMatchingPeer(partDoc, prevChar, fPairs.getMatching(prevChar), isForward, isForward ? doc
-				.getLength() : -1, searchStartPosition);
+		int endOffset = findMatchingPeer(partDoc, prevChar, fPairs.getMatching(prevChar), isForward,
+				isForward ? doc.getLength() : -1, searchStartPosition);
 		if (endOffset == -1)
 			return null;
 		final int adjustedEndOffset = isForward ? endOffset + 1 : endOffset;
 		if (adjustedEndOffset == adjustedOffset)
 			return null;
 		return new Region(Math.min(adjustedOffset, adjustedEndOffset), Math.abs(adjustedEndOffset - adjustedOffset));
+	}
+
+	protected String getScopeAtOffset(IDocument doc, int charOffset) throws BadLocationException
+	{
+		return CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(doc, charOffset);
 	}
 
 	private boolean isUnclosedPair(char c, IDocument document, int offset) throws BadLocationException
@@ -200,14 +229,14 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 		while (pos != boundary)
 		{
 			final char c = doc.getChar(pos);
-			if (doc.isMatch(pos, end))
+			if (doc.isMatch(pos, end) && !fgCommentSelector.matches(getScopeAtOffset(doc.fDocument, pos)))
 			{
 				return pos;
 			}
 			else if (c == start && doc.inPartition(pos))
 			{
-				pos = findMatchingPeer(doc, start, end, searchForward, boundary, doc
-						.getNextPosition(pos, searchForward));
+				pos = findMatchingPeer(doc, start, end, searchForward, boundary,
+						doc.getNextPosition(pos, searchForward));
 				if (pos == -1)
 					return -1;
 			}

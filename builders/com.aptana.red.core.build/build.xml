@@ -57,13 +57,8 @@
         ================================= -->
 	<target name="categorize" description="categorize the update site">
 		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="yes">
-			<arg line="-application org.eclipse.equinox.p2.publisher.CategoryPublisher -nosplash -console -consolelog -metadataRepository file:${deploy.dir} -categoryDefinition file:${deploy.dir}/site.xml" />
+			<arg line="-application org.eclipse.equinox.p2.metadata.generator.EclipseGenerator -nosplash -consolelog -updateSite ${deploy.dir} -site file:${deploy.dir}/site.xml -metadataRepository file:${deploy.dir} -metadataRepositoryName &quot;Aptana Studio 3 Core Update Site&quot; -artifactRepository file:${deploy.dir} -artifactRepositoryName &quot;Aptana Studio 3 Core Artifacts&quot; -publishArtifacts -publishArtifactRepository -compress -reusePack200Files -noDefaultIUs -vmargs -Xmx256m" />
 		</java>
-		<!-- Re-JAR the content.xml file! -->
-		<jar destfile="${deploy.dir}/content.jar">
-			<fileset file="${deploy.dir}/content.xml" />
-		</jar>
-		<delete file="${deploy.dir}/content.xml" />
 	</target>
 
 	<!-- ================================= 
@@ -103,12 +98,24 @@
           target: generate.base                      
          - - - - - - - - - - - - - - - - - -->
 	<target name="generate.base" depends="copy.base.windows,copy.base">
-		<!-- Workaround for https://bugs.eclipse.org/241430 shouldn't be necessary when we move to 3.5 -->
-		<delete failonerror="false">
-			<fileset dir="${baseLocation}/configuration/.settings">
-				<include name="org.eclipse.equinox.p2.*.repository.prefs" />
-			</fileset>
-		</delete>
+		<antcall target="run.director">
+			<param name="p2.installIU" value="com.aptana.ide.feature.libraries.subscription.feature.group" />
+			<param name="p2.repo" value="${libraries-com.p2.repo}" />
+		</antcall>
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+			  target: run.director                      
+			 - - - - - - - - - - - - - - - - - -->
+	<target name="run.director" description="Runs the p2 director installs">
+		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="true" dir="${baseLocation}" timeout="900000">
+			<arg line="-application org.eclipse.equinox.p2.director" />
+			<arg line="-nosplash" />
+			<arg line="-consoleLog" />
+			<arg line="-metadataRepository ${p2.repo}" />
+			<arg line="-artifactRepository ${p2.repo}" />
+			<arg line="-installIU ${p2.installIU}" />
+		</java>
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
@@ -157,6 +164,7 @@
 				<dirset dir="${buildDirectory}" defaultexcludes="true">
 					<include name="plugins/*" />
 					<include name="features/*" />
+					<exclude name="plugins/com.aptana.usage" />
 					<exclude name="${topLevelElementType}s/${topLevelElementId}" />
 				</dirset>
 			</path>

@@ -6,23 +6,27 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.aptana.git.ui.GitUIPlugin
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.core.resources;bundle-version="3.4.0",
- org.eclipse.debug.core;bundle-version="3.4.0",
+ org.eclipse.debug.ui;bundle-version="3.4.0",
  org.eclipse.team.core;bundle-version="3.4.0",
- com.aptana.git.core;bundle-version="1.0.0",
- org.eclipse.ui,
+ org.eclipse.ui;bundle-version="3.4.0",
  org.eclipse.ui.ide;bundle-version="3.4.0",
  org.eclipse.team.ui;bundle-version="3.4.0",
- org.eclipse.debug.ui;bundle-version="3.4.0",
  org.eclipse.ui.externaltools,
  org.eclipse.jface.text;bundle-version="3.4.0",
  org.eclipse.compare;bundle-version="3.4.0",
- com.aptana.util;bundle-version="1.0.0",
- org.eclipse.ui.browser;bundle-version="3.0.0",
- com.aptana.editor.common;bundle-version="1.0.0"
+ org.eclipse.ui.browser;bundle-version="3.2.0",
+ org.eclipse.ui.editors;bundle-version="3.4.0",
+ org.eclipse.ui.workbench.texteditor;bundle-version="3.4.0",
+ com.aptana.core;bundle-version="3.0.0",
+ com.aptana.git.core;bundle-version="1.0.0",
+ com.aptana.theme,
+ com.aptana.console;bundle-version="1.0.0",
+ com.aptana.ui;bundle-version="3.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.git.ui,
  com.aptana.git.ui.actions,
- com.aptana.git.ui.dialogs
+ com.aptana.git.ui.dialogs,
+ com.aptana.git.ui.internal.history
+Eclipse-ExtensibleAPI: true

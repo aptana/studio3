@@ -47,6 +47,32 @@ public class SassCodeScannerTest extends TestCase
 			assertToken(Token.WHITESPACE, i + 2, 1);
 		}
 	}
+	
+	public void testCSS3PropertyNames()
+	{
+		String src = "border-radius: 1px\n" +
+				"border-image-width: 1px\n" +
+				"box-decoration-break: clone";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("support.type.property-name.css"), 0, 13);
+		assertToken(getToken("punctuation.separator.key-value.css"), 13, 1);
+		assertToken(Token.WHITESPACE, 14, 1);
+		assertToken(getToken("constant.numeric.css"), 15, 1);
+		assertToken(getToken("keyword.other.unit.css"), 16, 2);
+		assertToken(Token.WHITESPACE, 18, 1);
+		assertToken(getToken("support.type.property-name.css"), 19, 18);
+		assertToken(getToken("punctuation.separator.key-value.css"), 37, 1);
+		assertToken(Token.WHITESPACE, 38, 1);
+		assertToken(getToken("constant.numeric.css"), 39, 1);
+		assertToken(getToken("keyword.other.unit.css"), 40, 2);
+		assertToken(Token.WHITESPACE, 42, 1);
+		assertToken(getToken("support.type.property-name.css"), 43, 20);
+		assertToken(getToken("punctuation.separator.key-value.css"), 63, 1);
+		assertToken(Token.WHITESPACE, 64, 1);
+	}
+	
 	// FIXME Test actual Sass, not CSS!
 	
 	public void testSmallCaps()
@@ -201,16 +227,16 @@ public class SassCodeScannerTest extends TestCase
 		assertToken(getToken("punctuation.separator.key-value.css"), 139, 1);
 		assertToken(Token.WHITESPACE, 140, 1);
 		assertToken(getToken("support.constant.font-name.css"), 141, 7);
-		assertToken(getToken(null), 148, 1);
+		assertToken(getToken("punctuation.separator.css"), 148, 1);
 		assertToken(Token.WHITESPACE, 149, 1);
 		assertToken(getToken("support.constant.font-name.css"), 150, 6);
-		assertToken(getToken(null), 156, 1);
+		assertToken(getToken("punctuation.separator.css"), 156, 1);
 		assertToken(Token.WHITESPACE, 157, 1);
 		assertToken(getToken("support.constant.font-name.css"), 158, 5);
-		assertToken(getToken(null), 163, 1);
+		assertToken(getToken("punctuation.separator.css"), 163, 1);
 		assertToken(Token.WHITESPACE, 164, 1);
 		assertToken(getToken("support.constant.font-name.css"), 165, 9);
-		assertToken(getToken(null), 174, 1);
+		assertToken(getToken("punctuation.separator.css"), 174, 1);
 		assertToken(Token.WHITESPACE, 175, 1);
 		assertToken(getToken("support.constant.font-name.css"), 176, 10);
 		assertToken(getToken("punctuation.terminator.rule.css"), 186, 1);

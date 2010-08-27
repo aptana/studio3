@@ -1,5 +1,7 @@
 package com.aptana.editor.css.parsing.ast;
 
+import java.util.Arrays;
+
 public class CSSMediaNode extends CSSNode
 {
 
@@ -8,9 +10,25 @@ public class CSSMediaNode extends CSSNode
 
 	public CSSMediaNode(String[] medias, int start, int end)
 	{
+		super(start, end);
 		fMedias = medias;
-		this.start = start;
-		this.end = end;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!super.equals(obj) || !(obj instanceof CSSMediaNode))
+		{
+			return false;
+		}
+		CSSMediaNode other = (CSSMediaNode) obj;
+		return Arrays.equals(fMedias, other.fMedias);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return super.hashCode() * 31 + Arrays.hashCode(fMedias);
 	}
 
 	@Override

@@ -18,7 +18,7 @@ public class MatchContext
 	MatchContext(String scope)
 	{
 		this._steps = (scope != null) ? spaces.split(scope) : new String[0];
-		this._currentIndex = this._steps.length - 1;
+		this._currentIndex = 0;
 		this._savedPositions = new Stack<Integer>();
 	}
 	
@@ -27,7 +27,7 @@ public class MatchContext
 	 */
 	public void advance()
 	{
-		this._currentIndex--;
+		this._currentIndex++;
 	}
 	
 	/**
@@ -45,6 +45,24 @@ public class MatchContext
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * getLength
+	 * 
+	 * @return
+	 */
+	public int getLength()
+	{
+		return this._steps.length;
+	}
+	
+	/**
+	 * popCurrentStep
+	 */
+	public void popCurrentStep()
+	{
+		this.popCurrentStep(true);
 	}
 	
 	/**

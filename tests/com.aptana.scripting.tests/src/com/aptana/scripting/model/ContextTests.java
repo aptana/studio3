@@ -14,7 +14,7 @@ public class ContextTests extends BundleTestBase
 	{
 		// load bundle
 		String bundleName = "contexts";
-		BundleEntry entry = this.getBundleEntry(bundleName, BundleScope.PROJECT);
+		BundleEntry entry = this.getBundleEntry(bundleName, BundlePrecedence.PROJECT);
 		
 		// get commands
 		CommandElement[] commands = entry.getCommands();

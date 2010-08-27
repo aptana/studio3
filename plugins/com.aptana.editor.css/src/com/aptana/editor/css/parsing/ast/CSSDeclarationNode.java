@@ -6,19 +6,18 @@ public class CSSDeclarationNode extends CSSNode
 {
 
 	private String fIdentifier;
-	private CSSExpressionNode fValue;
 	private String fStatus;
 	private boolean fHasSemicolon;
 
-	public CSSDeclarationNode()
+	public CSSDeclarationNode(int start, int end)
 	{
+		super(start, end);
 	}
 
 	public CSSDeclarationNode(Symbol semicolon)
 	{
+		super(semicolon.getStart(), semicolon.getEnd());
 		fHasSemicolon = true;
-		this.start = semicolon.getStart();
-		this.end = semicolon.getEnd();
 	}
 
 	public CSSDeclarationNode(Symbol identifier, CSSExpressionNode value)
@@ -29,8 +28,8 @@ public class CSSDeclarationNode extends CSSNode
 	public CSSDeclarationNode(Symbol identifier, CSSExpressionNode value, Symbol status)
 	{
 		fIdentifier = identifier.value.toString();
-		fValue = value;
 		fStatus = (status == null) ? null : status.value.toString();
+		setChildren(new CSSNode[] { value });
 
 		this.start = identifier.getStart();
 		if (status == null)
@@ -41,6 +40,11 @@ public class CSSDeclarationNode extends CSSNode
 		{
 			this.end = status.getEnd();
 		}
+	}
+
+	public CSSExpressionNode getAssignedValue()
+	{
+		return (CSSExpressionNode) getChild(0);
 	}
 
 	public void setHasSemicolon(Symbol semicolon)
@@ -56,7 +60,7 @@ public class CSSDeclarationNode extends CSSNode
 		if (fIdentifier != null)
 		{
 			text.append(fIdentifier);
-			text.append(": ").append(fValue); //$NON-NLS-1$
+			text.append(": ").append(getAssignedValue()); //$NON-NLS-1$
 			if (fStatus != null)
 			{
 				text.append(" ").append(fStatus); //$NON-NLS-1$
@@ -67,5 +71,42 @@ public class CSSDeclarationNode extends CSSNode
 			text.append(";"); //$NON-NLS-1$
 		}
 		return text.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!super.equals(obj))
+		{
+			return false;
+		}
+		if (!(obj instanceof CSSDeclarationNode))
+		{
+			return false;
+		}
+		CSSDeclarationNode otherDecl = (CSSDeclarationNode) obj;
+		if (fIdentifier == null)
+		{
+			// if there is no identifier, it's an empty declaration, and other fields are not set either, so no need to
+			// check them
+			return otherDecl.fIdentifier == null;
+		}
+		return fIdentifier.equals(otherDecl.fIdentifier)
+				&& ((fStatus == null && otherDecl.fStatus == null) || (fStatus != null && fStatus
+						.equals(otherDecl.fStatus))) && fHasSemicolon == otherDecl.fHasSemicolon;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		if (fIdentifier == null)
+		{
+			return super.hashCode();
+		}
+		int hash = super.hashCode();
+		hash = hash * 31 + fIdentifier.hashCode();
+		hash = hash * 31 + (fStatus == null ? 0 : fStatus.hashCode());
+		hash = hash * 31 + Boolean.valueOf(fHasSemicolon).hashCode();
+		return hash;
 	}
 }

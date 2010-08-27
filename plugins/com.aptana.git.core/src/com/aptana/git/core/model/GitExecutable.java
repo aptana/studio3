@@ -1,38 +1,49 @@
 package com.aptana.git.core.model;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.ShellExecutable;
+import com.aptana.core.util.ExecutableUtil;
+import com.aptana.core.util.PlatformUtil;
+import com.aptana.core.util.ProcessUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IPreferenceConstants;
-import com.aptana.util.ProcessUtil;
 
 public class GitExecutable
 {
-
+	protected static final String GIT_EXECUTABLE = "git"; //$NON-NLS-1$
+	protected static final String GIT_EXECUTABLE_WIN32 = GIT_EXECUTABLE+".exe"; //$NON-NLS-1$
 	public static final String MIN_GIT_VERSION = "1.6.0"; //$NON-NLS-1$
-	private static ArrayList<String> fgLocations;
-	private String gitPath;
+	private static ArrayList<IPath> fgLocations;
+	private IPath gitPath;
 
 	static GitExecutable fgExecutable;
 	private static boolean fgAddedPrefListener;
 
-	private GitExecutable(String gitPath)
+	private GitExecutable(IPath gitPath)
 	{
 		this.gitPath = gitPath;
 	}
 
-	public static GitExecutable instance()
+	public synchronized static GitExecutable instance()
 	{
+		// FIXME Singletons are bad! hide behind an interface and grab the global instance of this from the plugin?
 		if (fgExecutable == null)
 		{
 			fgExecutable = GitExecutable.find();
@@ -47,6 +58,10 @@ public class GitExecutable
 								if (!event.getKey().equals(IPreferenceConstants.GIT_EXECUTABLE_PATH))
 									return;
 								fgExecutable = null;
+								// reset shell path preferences on Win32
+								if (Platform.OS_WIN32.equals(Platform.getOS())) {
+									ShellExecutable.setPreferenceShellPath(null);
+								}
 							}
 						});
 				fgAddedPrefListener = true;
@@ -54,39 +69,69 @@ public class GitExecutable
 		}
 		return fgExecutable;
 	}
+	
+	private static IPath getPreferenceGitPath() {
+		String pref = new InstanceScope().getNode(GitPlugin.PLUGIN_ID).get(IPreferenceConstants.GIT_EXECUTABLE_PATH, null);
+		if (pref != null && !pref.isEmpty()) {
+			IPath path = Path.fromOSString(pref);
+			if (path.toFile().isDirectory()) {
+				boolean isWin32 = Platform.OS_WIN32.equals(Platform.getOS());
+				path = path.append(isWin32 ? GIT_EXECUTABLE_WIN32 : GIT_EXECUTABLE);
+			}
+			if (acceptBinary(path)) {
+				return path;
+			}
+			GitPlugin.logError(MessageFormat.format(
+					"You entered a custom git path in the Preferences pane, but this path is not a valid git v{0} or higher binary. We're going to use the default search paths instead", //$NON-NLS-1$
+					MIN_GIT_VERSION), null);
+		}
+		return null;
+	}
+
+	public static void setPreferenceGitPath(IPath path) {
+		IEclipsePreferences prefs = new InstanceScope().getNode(GitPlugin.PLUGIN_ID);
+		if (path != null) {
+			prefs.put(IPreferenceConstants.GIT_EXECUTABLE_PATH, path.toOSString());			
+		} else {
+			prefs.remove(IPreferenceConstants.GIT_EXECUTABLE_PATH);
+		}
+		try {
+			prefs.flush();
+		} catch (BackingStoreException e) {
+			GitPlugin.logError("Saving preferences failed.", e); //$NON-NLS-1$
+		}
+		fgExecutable = null;
+		if (Platform.OS_WIN32.equals(Platform.getOS())) {
+			if (path != null && path.toFile().isFile()) {
+				path = path.removeLastSegments(1);
+			}
+			ShellExecutable.setPreferenceShellPath(path);
+		}
+	}
 
 	private static GitExecutable find()
 	{
-		String prefPath = Platform.getPreferencesService().getString(GitPlugin.getPluginId(), IPreferenceConstants.GIT_EXECUTABLE_PATH, null, null);
-		if (prefPath != null && prefPath.length() > 0)
-		{
-			if (acceptBinary(prefPath))
-			{
-				return new GitExecutable(prefPath);
-			}
-			GitPlugin
-					.logError(
-							MessageFormat
-									.format(
-											"You entered a custom git path in the Preferences pane, but this path is not a valid git v{0} or higher binary. We're going to use the default search paths instead", //$NON-NLS-1$
-											MIN_GIT_VERSION), null);
+		IPath prefPath = getPreferenceGitPath();
+		if (prefPath != null) {
+			PortableGit.checkInstallation(prefPath);
+			return new GitExecutable(prefPath);
 		}
-
-		// Try to find the path of the Git binary
-		String gitPath = System.getenv(GitEnv.GIT_PATH);
-		if (gitPath != null && acceptBinary(gitPath))
-			return new GitExecutable(gitPath);
-
-		// No explicit path. Try it with "which"
-		String whichPath = ProcessUtil.outputForCommand("/usr/bin/which", null, "git"); //$NON-NLS-1$ //$NON-NLS-2$
-		if (acceptBinary(whichPath))
-			return new GitExecutable(whichPath);
-
-		// Still no path. Let's try some default locations.
-		for (String location : searchLocations())
-		{
-			if (acceptBinary(location))
-				return new GitExecutable(location);
+		
+		boolean isWin32 = Platform.OS_WIN32.equals(Platform.getOS());
+		IPath path = ExecutableUtil.find(isWin32 ? GIT_EXECUTABLE_WIN32 : GIT_EXECUTABLE, false, searchLocations(), new FileFilter() {
+			@Override
+			public boolean accept(File pathname) {
+				return acceptBinary(Path.fromOSString(pathname.getAbsolutePath()));
+			}
+		});
+		if (path != null) {
+			return new GitExecutable(path);
+		}
+		
+		path = PortableGit.getLocation();
+		if (path != null) {
+			setPreferenceGitPath(path);
+			return new GitExecutable(path);
 		}
 
 		log(MessageFormat.format("Could not find a git binary higher than version {0}", MIN_GIT_VERSION)); //$NON-NLS-1$
@@ -98,46 +143,48 @@ public class GitExecutable
 		GitPlugin.logInfo(string);
 	}
 
-	private static List<String> searchLocations()
+	private static List<IPath> searchLocations()
 	{
 		if (fgLocations == null)
 		{
-			fgLocations = new ArrayList<String>();
-			fgLocations.add("/opt/local/bin/git"); //$NON-NLS-1$
-			fgLocations.add("/sw/bin/git"); //$NON-NLS-1$
-			fgLocations.add("/opt/git/bin/git"); //$NON-NLS-1$
-			fgLocations.add("/usr/local/bin/git"); //$NON-NLS-1$
-			fgLocations.add("/usr/local/git/bin/git"); //$NON-NLS-1$
-			fgLocations.add(stringByExpandingTildeInPath("~/bin/git")); //$NON-NLS-1$
+			fgLocations = new ArrayList<IPath>();
+			if (Platform.getOS().equals(Platform.OS_WIN32))
+			{
+				fgLocations.add(Path.fromOSString(PlatformUtil.expandEnvironmentStrings("%PROGRAMW6432%\\Git\\bin"))); //$NON-NLS-1$
+				fgLocations.add(Path.fromOSString(PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES%\\Git\\bin"))); //$NON-NLS-1$
+				fgLocations.add(Path.fromOSString(PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES(X86)%\\Git\\bin"))); //$NON-NLS-1$
+			}
+			else
+			{
+				fgLocations.add(Path.fromOSString("/opt/local/bin")); //$NON-NLS-1$
+				fgLocations.add(Path.fromOSString("/sw/bin")); //$NON-NLS-1$
+				fgLocations.add(Path.fromOSString("/opt/git/bin")); //$NON-NLS-1$
+				fgLocations.add(Path.fromOSString("/usr/local/bin")); //$NON-NLS-1$
+				fgLocations.add(Path.fromOSString("/usr/local/git/bin")); //$NON-NLS-1$
+				fgLocations.add(Path.fromOSString(PlatformUtil.expandEnvironmentStrings("~/bin"))); //$NON-NLS-1$
+			}
 		}
 		return fgLocations;
 	}
 
-	private static String stringByExpandingTildeInPath(String string)
-	{
-		String userHome = System.getProperty("user.home"); //$NON-NLS-1$
-		return string.replaceAll("~", userHome); //$NON-NLS-1$
-	}
-
-	private static String versionForPath(String path)
+	private static String versionForPath(IPath path)
 	{
 		if (path == null)
 			return null;
 
-		File file = new File(path);
-		if (!file.isFile())
+		if (!path.toFile().isFile())
 			return null;
 
-		String version = ProcessUtil.outputForCommand(path, null, "--version"); //$NON-NLS-1$
+		String version = ProcessUtil.outputForCommand(path.toOSString(), null, "--version"); //$NON-NLS-1$
 		if (version != null && version.startsWith("git version ")) //$NON-NLS-1$
 			return version.substring(12);
 
 		return null;
 	}
 
-	public static boolean acceptBinary(String path)
+	public static boolean acceptBinary(IPath path)
 	{
-		if (path == null || path.length() == 0)
+		if (path == null)
 			return false;
 
 		String version = versionForPath(path);
@@ -154,7 +201,7 @@ public class GitExecutable
 		return false;
 	}
 
-	public String path()
+	public IPath path()
 	{
 		return gitPath;
 	}
@@ -166,9 +213,15 @@ public class GitExecutable
 	 * @param args
 	 * @return
 	 */
-	public String outputForCommand(String workingDir, String... args)
+	public String outputForCommand(IPath workingDir, String... args)
 	{
-		return ProcessUtil.outputForCommand(gitPath, workingDir, args);
+		Map<String, String> env = new HashMap<String, String>();
+		env.putAll(ShellExecutable.getEnvironment());
+		IPath git_ssh = GitPlugin.getDefault().getGIT_SSH();
+		if (git_ssh != null) {
+			env.put("GIT_SSH", git_ssh.toOSString()); //$NON-NLS-1$
+		}
+		return ProcessUtil.outputForCommand(gitPath.toOSString(), workingDir, env, args);
 	}
 
 	/**
@@ -178,9 +231,9 @@ public class GitExecutable
 	 * @param args
 	 * @return
 	 */
-	public Map<Integer, String> runInBackground(String workingDir, String... args)
+	public Map<Integer, String> runInBackground(IPath workingDir, String... args)
 	{
-		return ProcessUtil.runInBackground(gitPath, workingDir, args);
+		return ProcessUtil.runInBackground(gitPath.toOSString(), workingDir, args);
 	}
 
 	/**
@@ -188,14 +241,12 @@ public class GitExecutable
 	 * 
 	 * @param workingDirectory
 	 * @param input
-	 * @param amendEnvironment
 	 * @param args
 	 * @return
 	 */
-	public Map<Integer, String> runInBackground(String workingDirectory, String input,
-			Map<String, String> amendEnvironment, String... args)
+	public Map<Integer, String> runInBackground(String input, IPath workingDirectory, String... args)
 	{
-		return ProcessUtil.runInBackground(gitPath, workingDirectory, input, amendEnvironment, args);
+		return ProcessUtil.runInBackground(gitPath.toOSString(), workingDirectory, input, null, args);
 	}
 
 	/**
@@ -205,9 +256,10 @@ public class GitExecutable
 	 * @param arguments
 	 * @return
 	 * @throws IOException
+	 * @throws CoreException 
 	 */
-	public Process run(String directory, String... arguments) throws IOException
+	public Process run(IPath directory, String... arguments) throws IOException, CoreException
 	{
-		return ProcessUtil.run(gitPath, directory, arguments);
+		return ProcessUtil.run(gitPath.toOSString(), directory, arguments);
 	}
 }

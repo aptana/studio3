@@ -6,11 +6,11 @@ import java.util.Map;
 
 public enum InvocationType
 {
-	UNKNOWN("unknown"),
-	KEY_BINDING("key_binding"),
-	MENU("menu"),
-	COMMAND("command"),
-	TRIGGER("trigger");
+	UNKNOWN("unknown"), //$NON-NLS-1$
+	KEY_BINDING("key_binding"), //$NON-NLS-1$
+	MENU("menu"), //$NON-NLS-1$
+	COMMAND("command"), //$NON-NLS-1$
+	TRIGGER("trigger"); //$NON-NLS-1$
 	
 	private static Map<String, InvocationType> NAME_MAP;
 	private String _name;

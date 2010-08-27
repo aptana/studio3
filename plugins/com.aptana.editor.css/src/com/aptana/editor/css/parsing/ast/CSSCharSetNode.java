@@ -8,9 +8,25 @@ public class CSSCharSetNode extends CSSNode
 
 	public CSSCharSetNode(String encoding, int start, int end)
 	{
+		super(start, end);
 		fEncoding = encoding;
-		this.start = start;
-		this.end = end;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!super.equals(obj) || !(obj instanceof CSSCharSetNode))
+		{
+			return false;
+		}
+		CSSCharSetNode other = (CSSCharSetNode) obj;
+		return fEncoding.equals(other.fEncoding);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return super.hashCode() * 31 + fEncoding.hashCode();
 	}
 
 	@Override

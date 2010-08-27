@@ -32,5 +32,31 @@
             class="com.aptana.editor.css.preferences.PreferenceInitializer">
       </initializer>
    </extension>
+   <extension
+         point="com.aptana.index.core.fileIndexingParticipants">
+      <fileIndexingParticipant
+            class="com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.css">
+         </contentTypeBinding>
+      </fileIndexingParticipant>
+   </extension>
+   <extension
+         point="com.aptana.parsing.parser">
+      <parser
+            class="com.aptana.editor.css.parsing.CSSParser"
+            language="text/css">
+      </parser>
+   </extension>
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
+      <hyperlinkDetector
+            activate="true"
+            class="com.aptana.editor.css.text.hyperlink.HTMLIDHyperlinkDetector"
+            id="com.aptana.editor.css.hyperlinkDetector"
+            name="CSS Class Hyperlinks"
+            targetId="com.aptana.editor.ui.hyperlinkTarget">
+      </hyperlinkDetector>
+   </extension>
 
 </plugin>

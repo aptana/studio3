@@ -1,17 +1,26 @@
 package com.aptana.scripting;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+
+import com.aptana.scripting.keybindings.internal.KeybindingsManager;
+import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.RunType;
 
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends AbstractUIPlugin
+public class Activator extends Plugin
 {
 	public static final String PLUGIN_ID = "com.aptana.scripting"; //$NON-NLS-1$
 	private static Activator plugin;
+
+	/**
+	 * Context id set by workbench part to indicate they are scripting aware.
+	 */
+	public static final String CONTEXT_ID = "com.aptana.scripting.context"; //$NON-NLS-1$
 
 	/**
 	 * Returns the shared instance
@@ -21,6 +30,16 @@ public class Activator extends AbstractUIPlugin
 	public static Activator getDefault()
 	{
 		return plugin;
+	}
+
+	/**
+	 * This returns the default run type to be used by ScriptingEngine and CommandElement.
+	 * 
+	 * @return
+	 */
+	public static RunType getDefaultRunType()
+	{
+		return RunType.CURRENT_THREAD;
 	}
 
 	/**
@@ -64,6 +83,8 @@ public class Activator extends AbstractUIPlugin
 		getDefault().getLog().log(new Status(IStatus.OK, PLUGIN_ID, string));
 	}
 
+	private FileTypeAssociationListener fileTypeListener;
+
 	/**
 	 * The constructor
 	 */
@@ -79,6 +100,8 @@ public class Activator extends AbstractUIPlugin
 	{
 		super.start(context);
 		plugin = this;
+		fileTypeListener = new FileTypeAssociationListener();
+		BundleManager.getInstance().addBundleChangeListener(fileTypeListener);
 	}
 
 	/*
@@ -87,7 +110,24 @@ public class Activator extends AbstractUIPlugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
-		plugin = null;
-		super.stop(context);
+		try
+		{
+			KeybindingsManager.uninstall();
+			if (fileTypeListener != null)
+			{
+				fileTypeListener.cleanup();
+				BundleManager.getInstance().removeBundleChangeListener(fileTypeListener);
+			}
+			fileTypeListener = null;
+		}
+		catch (Exception e)
+		{
+			// ignore
+		}
+		finally
+		{
+			plugin = null;
+			super.stop(context);
+		}
 	}
 }

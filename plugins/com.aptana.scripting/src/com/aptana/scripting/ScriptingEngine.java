@@ -15,21 +15,14 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.jruby.Ruby;
-import org.jruby.RubyArray;
-import org.jruby.RubyString;
-import org.jruby.embed.EmbedEvalUnit;
-import org.jruby.embed.EvalFailedException;
-import org.jruby.embed.LocalContextProvider;
 import org.jruby.embed.LocalContextScope;
 import org.jruby.embed.LocalVariableBehavior;
-import org.jruby.embed.ParseFailedException;
-import org.jruby.embed.PathType;
 import org.jruby.embed.ScriptingContainer;
-import org.jruby.runtime.builtin.IRubyObject;
 import org.osgi.framework.Bundle;
 
-import com.aptana.util.ResourceUtils;
+import com.aptana.core.util.ResourceUtil;
+import com.aptana.scripting.model.RunType;
+import com.aptana.scripting.model.ScriptLoadJob;
 
 public class ScriptingEngine
 {
@@ -48,28 +41,58 @@ public class ScriptingEngine
 	private ScriptingContainer _scriptingContainer;
 	private List<String> _loadPaths;
 	private List<String> _frameworkFiles;
-	private List<RubyString> fAdded = new ArrayList<RubyString>();
+	private RunType _runType;
 
 	/**
 	 * ScriptingEngine
 	 */
 	private ScriptingEngine()
 	{
+		this._runType = Activator.getDefaultRunType();
 	}
 
 	/**
-	 * getInstance
+	 * createScriptingContainer
 	 * 
+	 * @param scope
 	 * @return
 	 */
-	public static ScriptingEngine getInstance()
+	public ScriptingContainer createScriptingContainer(LocalContextScope scope)
 	{
-		if (instance == null)
+		// ScriptingContainer result = new ScriptingContainer(scope, LocalVariableBehavior.PERSISTENT);
+		ScriptingContainer result = new ScriptingContainer(scope, LocalVariableBehavior.TRANSIENT);
+
+		try
 		{
-			instance = new ScriptingEngine();
+			File jrubyHome = null;
+			Bundle jruby = Platform.getBundle("org.jruby"); //$NON-NLS-1$
+			// try just exploding the jruby lib dir
+			URL url = FileLocator.find(jruby, new Path("lib"), null); //$NON-NLS-1$
+
+			if (url != null)
+			{
+				File lib = ResourceUtil.resourcePathToFile(url);
+				// Ok, now use the parent of exploded lib dir as JRuby Home
+				jrubyHome = lib.getParentFile();
+			}
+			else
+			{
+				// Ok, just assume the plugin is unpacked and pass the root of the plugin as JRuby Home
+				jrubyHome = FileLocator.getBundleFile(jruby);
+			}
+
+			result.setHomeDirectory(jrubyHome.getAbsolutePath());
+		}
+		catch (IOException e)
+		{
+			String message = MessageFormat.format(Messages.ScriptingEngine_Error_Setting_JRuby_Home, new Object[] { e
+					.getMessage() });
+
+			Activator.logError(message, e);
+			ScriptLogger.logError(message);
 		}
 
-		return instance;
+		return result;
 	}
 
 	/**
@@ -106,7 +129,7 @@ public class ScriptingEngine
 								String declaringPluginID = declaring.getNamespaceIdentifier();
 								Bundle bundle = Platform.getBundle(declaringPluginID);
 								URL url = bundle.getEntry(path);
-								String urlAsPath = ResourceUtils.resourcePathToString(url);
+								String urlAsPath = ResourceUtil.resourcePathToString(url);
 
 								if (urlAsPath != null && urlAsPath.length() > 0)
 								{
@@ -115,10 +138,9 @@ public class ScriptingEngine
 								else
 								{
 									String message = MessageFormat.format(
-										Messages.ScriptingEngine_Unable_To_Convert_Load_Path,
-										new Object[] { declaringPluginID, url }
-									);
-									
+											Messages.ScriptingEngine_Unable_To_Convert_Load_Path, new Object[] {
+													declaringPluginID, url });
+
 									Activator.logError(message, null);
 								}
 							}
@@ -175,6 +197,21 @@ public class ScriptingEngine
 	}
 
 	/**
+	 * getInstance
+	 * 
+	 * @return
+	 */
+	public static ScriptingEngine getInstance()
+	{
+		if (instance == null)
+		{
+			instance = new ScriptingEngine();
+		}
+
+		return instance;
+	}
+
+	/**
 	 * getScriptingContainer
 	 * 
 	 * @return
@@ -183,35 +220,7 @@ public class ScriptingEngine
 	{
 		if (this._scriptingContainer == null)
 		{
-			this._scriptingContainer = new ScriptingContainer(LocalContextScope.SINGLETON, LocalVariableBehavior.PERSISTENT);
-
-			try
-			{
-				File jrubyHome = null;
-				// try just exploding the jruby lib dir
-				URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path("lib"), null); //$NON-NLS-1$
-				if (url != null)
-				{
-					File lib = ResourceUtils.resourcePathToFile(url);
-					// Ok, now use the parent of exploded lib dir as JRuby Home
-					jrubyHome = lib.getParentFile();
-				}
-				else
-				{
-					// Ok, just assume the plugin is unpacked and pass the root of the plugin as JRuby Home
-					jrubyHome = FileLocator.getBundleFile(Activator.getDefault().getBundle());
-				}
-				this._scriptingContainer.getProvider().getRubyInstanceConfig()
-						.setJRubyHome(jrubyHome.getAbsolutePath());
-			}
-			catch (IOException e)
-			{
-				String message = MessageFormat.format(Messages.ScriptingEngine_Error_Setting_JRuby_Home,
-						new Object[] { e.getMessage() });
-
-				Activator.logError(message, e);
-				ScriptLogger.logError(message);
-			}
+			this._scriptingContainer = this.createScriptingContainer(LocalContextScope.THREADSAFE);
 		}
 
 		return this._scriptingContainer;
@@ -224,61 +233,47 @@ public class ScriptingEngine
 	 */
 	public Object runScript(String fullPath, List<String> loadPaths)
 	{
-		ScriptingContainer container = this.getScriptingContainer();
-		Object result = null;
+		return this.runScript(fullPath, loadPaths, this._runType, false);
+	}
 
-		if (loadPaths != null && loadPaths.size() > 0)
-		{
-			LocalContextProvider provider = container.getProvider();
+	/**
+	 * runScript
+	 * 
+	 * @param fullPath
+	 * @param loadPaths
+	 * @param async
+	 * @return
+	 */
+	public Object runScript(String fullPath, List<String> loadPaths, boolean async)
+	{
+		return this.runScript(fullPath, loadPaths, this._runType, async);
+	}
+	
+	/**
+	 * runScript
+	 * 
+	 * @param fullPath
+	 * @param loadPaths
+	 * @param runType
+	 * @param async
+	 * @return
+	 */
+	public Object runScript(String fullPath, List<String> loadPaths, RunType runType, boolean async)
+	{
+		ScriptLoadJob job = new ScriptLoadJob(fullPath, loadPaths);
 
-			if (provider != null)
-			{
-				Ruby runtime = provider.getRuntime();	    
-				IRubyObject object = runtime.getLoadService().getLoadPath();
-				RubyArray loadpathArray = (RubyArray) object;
-				// wipe whatever we added before
-				for (RubyString added : fAdded)
-				{
-					loadpathArray.remove(added);
-				}
-				fAdded.clear();
-				// Now add our custom loadpath for this execution
-				for (String loadPath : loadPaths)
-				{
-					RubyString toAdd = runtime.newString(loadPath.replace('\\', '/'));
-					loadpathArray.append(toAdd);
-					fAdded.add(toAdd); 
-				}
-			}
-		}
-
-		// TODO: $0 should work, but until then, we'll use this hack so scripts
-		// can get its full path
-		container.put("$fullpath", fullPath); //$NON-NLS-1$
-
-		// compile
 		try
 		{
-			EmbedEvalUnit unit = container.parse(PathType.ABSOLUTE, fullPath);
-
-			// execute
-			result = unit.run();
+			job.run("Load '" + fullPath + "'", runType, async); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		catch (ParseFailedException e)
+		catch (InterruptedException e)
 		{
-			String message = MessageFormat.format(Messages.ScriptingEngine_Parse_Error, new Object[] { fullPath,
-					e.getMessage() });
+			String message = MessageFormat.format(Messages.ScriptingEngine_Error_Executing_Script,
+					new Object[] { fullPath });
 
-			ScriptLogger.logError(message);
-		}
-		catch (EvalFailedException e)
-		{
-			String message = MessageFormat.format(Messages.ScriptingEngine_Execution_Error, new Object[] { fullPath,
-					e.getMessage() });
-
-			ScriptLogger.logError(message);
+			ScriptUtils.logErrorWithStackTrace(message, e);
 		}
 
-		return result;
+		return (async && this._runType != RunType.CURRENT_THREAD) ? null : job.getReturnValue();
 	}
 }

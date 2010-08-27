@@ -3,8 +3,6 @@ package com.aptana.editor.css.parsing.ast;
 public class CSSTermListNode extends CSSExpressionNode
 {
 
-	private CSSExpressionNode fLeftExpr;
-	private CSSExpressionNode fRightExpr;
 	private String fSeparator;
 
 	public CSSTermListNode(CSSExpressionNode left, CSSExpressionNode right)
@@ -14,18 +12,43 @@ public class CSSTermListNode extends CSSExpressionNode
 
 	public CSSTermListNode(CSSExpressionNode left, CSSExpressionNode right, String separator)
 	{
-		fLeftExpr = left;
-		fRightExpr = right;
+		super(left.getStart(), right.getEnd());
+		setChildren(new CSSExpressionNode[] { left, right });
 		fSeparator = separator;
-		this.start = left.getStart();
-		this.end = right.getEnd();
+	}
+
+	public CSSExpressionNode getLeftExpression()
+	{
+		return (CSSExpressionNode) getChild(0);
+	}
+
+	public CSSExpressionNode getRightExpression()
+	{
+		return (CSSExpressionNode) getChild(1);
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!super.equals(obj) || !(obj instanceof CSSTermListNode))
+		{
+			return false;
+		}
+		CSSTermListNode other = (CSSTermListNode) obj;
+		return toString().equals(other.toString());
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return super.hashCode() * 31 + toString().hashCode();
 	}
 
 	@Override
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
-		text.append(fLeftExpr);
+		text.append(getLeftExpression());
 		if (fSeparator == null)
 		{
 			text.append(" "); //$NON-NLS-1$
@@ -34,7 +57,7 @@ public class CSSTermListNode extends CSSExpressionNode
 		{
 			text.append(fSeparator);
 		}
-		text.append(fRightExpr);
+		text.append(getRightExpression());
 		return text.toString();
 	}
 }

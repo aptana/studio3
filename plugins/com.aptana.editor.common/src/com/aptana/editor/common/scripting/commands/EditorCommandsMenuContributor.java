@@ -7,41 +7,43 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.expressions.IEvaluationContext;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.ContributionItem;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.bindings.keys.KeySequence;
-import org.eclipse.jface.bindings.keys.KeyStroke;
-import org.eclipse.jface.bindings.keys.SWTKeySupport;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.ISources;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.IEvaluationService;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.core.IScopeReference;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.DocumentContentTypeManager;
 import com.aptana.editor.common.ITopContentTypesProvider;
-import com.aptana.editor.common.QualifiedContentType;
-import com.aptana.editor.common.tmp.ContentTypeTranslation;
-import com.aptana.scope.ScopeSelector;
+import com.aptana.editor.common.scripting.IContentTypeTranslator;
+import com.aptana.editor.common.scripting.QualifiedContentType;
+import com.aptana.scripting.model.AbstractElement;
+import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.InvocationType;
 import com.aptana.scripting.model.MenuElement;
-import com.aptana.scripting.model.ScopeFilter;
 import com.aptana.scripting.model.SnippetElement;
-import com.aptana.util.CollectionsUtil;
+import com.aptana.scripting.model.filters.IModelFilter;
+import com.aptana.scripting.model.filters.NotFilter;
+import com.aptana.scripting.model.filters.ScopeFilter;
 
 /**
  * This contributes the menus for editor scope to the Commands menu.
@@ -51,10 +53,7 @@ import com.aptana.util.CollectionsUtil;
 public class EditorCommandsMenuContributor extends ContributionItem
 {
 
-	private static final String DISPOSE_ON_HIDE = "DOH"; //$NON-NLS-1$
-
-	// FIXME Char for tab. Figure out how to use an image instead.
-	private static final String TAB = "\u21E5"; //$NON-NLS-1$
+	private static final String TAB = "\u00bb"; //$NON-NLS-1$
 
 	public EditorCommandsMenuContributor()
 	{
@@ -77,70 +76,60 @@ public class EditorCommandsMenuContributor extends ContributionItem
 			Object activePart = currentState.getVariable(ISources.ACTIVE_PART_NAME);
 			if (activePart instanceof ITextEditor)
 			{
-				fill(menu, (ITextEditor) activePart);
+				fill(menu, (ITextEditor) activePart, this);
+			}
+			else
+			{
+				fill(menu, null, this);
 			}
 		}
 	}
 
-	public static void fill(final Menu menu, ITextEditor textEditor)
+	public static void fill(Menu menu, ITextEditor textEditor)
 	{
-		// Add the listener to clean up the menu on hide
-		// so that the accelerators do not interfere with
-		// key binding
-		menu.addMenuListener(new MenuListener()
-		{
-			@Override
-			public void menuShown(MenuEvent e)
-			{
-			}
+		fill(menu, textEditor, null);
+	}
 
-			@Override
-			public void menuHidden(MenuEvent e)
+	public static void fill(final Menu menu, ITextEditor textEditor, IContributionItem contributionItem)
+	{
+		String scope = null;
+		List<MenuElement> menusFromScopeList = new LinkedList<MenuElement>();
+		MenuElement[] menusFromScope;
+		MenuElement[] menusFromOtherScopes = null;
+		if (textEditor == null)
+		{
+			IWorkbenchPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart();
+			if (part != null)
 			{
-				menu.removeMenuListener(this);
-				// Have to use the delay to allow the dispatching
-				// of any menu item selection events
-				menu.getDisplay().timerExec(200, new Runnable()
+				IScopeReference scopeRef = (IScopeReference) part.getAdapter(IScopeReference.class);
+				if (scopeRef != null)
 				{
-					@Override
-					public void run()
-					{
-						if (menu.isDisposed())
-						{
-							return;
-						}
-						MenuItem[] menuItems = menu.getItems();
-						for (MenuItem menuItem : menuItems)
-						{
-							if (!menuItem.isDisposed())
-							{
-								// Is this a menu item that we had added
-								Object data = menuItem.getData(DISPOSE_ON_HIDE);
-								if (data != null)
-								{
-									menuItem.dispose();
-								}
-							}
-						}
-					}
-				});
+					scope = scopeRef.getScopeId();
+				}
 			}
-		});
+			menusFromScope = BundleManager.getInstance().getMenus(new IModelFilter()
+			{
 
-		// Is this an Aptana Editor
-		if (textEditor instanceof AbstractThemeableEditor)
+				@Override
+				public boolean include(AbstractElement element)
+				{
+					return true;
+				}
+			});
+			if (menusFromScope.length > 0)
+			{
+				menusFromScopeList.addAll(Arrays.asList(menusFromScope));
+			}
+		}
+		else
 		{
-			AbstractThemeableEditor abstractThemeableEditor = (AbstractThemeableEditor) textEditor;
-			String contentTypeAtOffset = null;
-			List<MenuElement> menusFromScopeList = new LinkedList<MenuElement>();
-			MenuElement[] menusFromScope;
 			try
 			{
-				IDocument document = abstractThemeableEditor.getDocumentProvider().getDocument(
-						abstractThemeableEditor.getEditorInput());
-				int caretOffset = TextEditorUtils.getCaretOffset(abstractThemeableEditor);
+				IDocument document = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput());
+				int caretOffset = TextEditorUtils.getCaretOffset(textEditor);
 				// Get the scope at caret offset
-				contentTypeAtOffset = getContentTypeAtOffset(document, caretOffset);
+				scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
+						.getScopeAtOffset(document, caretOffset);
 			}
 			catch (BadLocationException e)
 			{
@@ -148,72 +137,93 @@ public class EditorCommandsMenuContributor extends ContributionItem
 			}
 
 			// First pull all possible menus from the current caret position's scopes
-			if (contentTypeAtOffset != null)
+			if (scope != null)
 			{
-				String[] splitContentTypesAtOffset = ScopeSelector.splitScope(contentTypeAtOffset);
-				for (int i = 0; i < splitContentTypesAtOffset.length; i++)
+				ScopeFilter filter = new ScopeFilter(scope);
+				menusFromScope = BundleManager.getInstance().getMenus(filter);
+				if (menusFromScope.length > 0)
 				{
-					ScopeFilter filter = new ScopeFilter(splitContentTypesAtOffset[i]);
-					menusFromScope = BundleManager.getInstance().getMenus(filter);
-					if (menusFromScope.length > 0)
-					{
-						menusFromScopeList.addAll(Arrays.asList(menusFromScope));
-						break;
-					}
+					menusFromScopeList.addAll(Arrays.asList(menusFromScope));
 				}
 			}
 
 			// Next we get all possible scopes from the top level content type provider
-			SourceViewerConfiguration sourceViewerConfiguration = abstractThemeableEditor
-					.getSourceViewerConfigurationNonFinal();
+			SourceViewerConfiguration sourceViewerConfiguration = (SourceViewerConfiguration) textEditor
+					.getAdapter(SourceViewerConfiguration.class);
 			if (sourceViewerConfiguration instanceof ITopContentTypesProvider)
 			{
 				String[][] topContentTypes = ((ITopContentTypesProvider) sourceViewerConfiguration)
 						.getTopContentTypes();
+				List<String> topLevelContentTypesList = new LinkedList<String>();
 				for (String[] topContentType : topContentTypes)
 				{
 					QualifiedContentType qualifiedContentType = new QualifiedContentType(topContentType);
-					String contentType = ContentTypeTranslation.getDefault().translate(qualifiedContentType).toString();
+					String contentType = getContentTypeTranslator().translate(qualifiedContentType).toString();
+					topLevelContentTypesList.add(contentType);
+				}
+				if (topLevelContentTypesList.size() > 0)
+				{
+					String[] topLevelContentTypes = new String[topLevelContentTypesList.size()];
+					topLevelContentTypesList.toArray(topLevelContentTypes);
+
 					// Get menus
-					ScopeFilter filter = new ScopeFilter(contentType);
-					menusFromScope = BundleManager.getInstance().getMenus(filter);
+					ScopeFilter topLevelContentTypesFilter = new ScopeFilter(topLevelContentTypes);
+					menusFromScope = BundleManager.getInstance().getMenus(topLevelContentTypesFilter);
 					if (menusFromScope.length > 0)
 					{
 						// Collect
 						menusFromScopeList.addAll(Arrays.asList(menusFromScope));
 					}
+
+					// Next we use a negative filter to get menus that belong to scopes
+					// that do not match the top level scopes. We will use this
+					// later to build the "Other" menu.
+					NotFilter notFilter = new NotFilter(topLevelContentTypesFilter);
+					menusFromOtherScopes = BundleManager.getInstance().getMenus(notFilter);
 				}
 			}
+		}
 
-			// Do we have some menus?
-			if (menusFromScopeList.size() > 0)
+		// Do we have some menus?
+		if (menusFromScopeList.size() > 0)
+		{
+			// Remove duplicates and sort
+			CollectionsUtil.removeDuplicates(menusFromScopeList);
+			Collections.sort(menusFromScopeList, new Comparator<MenuElement>()
 			{
-				// Remove duplicates and sort
-				CollectionsUtil.removeDuplicates(menusFromScopeList);
-				Collections.sort(menusFromScopeList, new Comparator<MenuElement>()
+				@Override
+				public int compare(MenuElement menuElement1, MenuElement menuElement2)
 				{
-					@Override
-					public int compare(MenuElement menuElement1, MenuElement menuElement2)
-					{
-						return menuElement1.getDisplayName().compareTo(menuElement2.getDisplayName());
-					}
-				});
-				menusFromScope = new MenuElement[menusFromScopeList.size()];
-				menusFromScopeList.toArray(menusFromScope);
+					return menuElement1.getDisplayName().compareTo(menuElement2.getDisplayName());
+				}
+			});
+			menusFromScope = new MenuElement[menusFromScopeList.size()];
+			menusFromScopeList.toArray(menusFromScope);
 
-				// Now build the menu
-				buildMenu(menu, menusFromScope, abstractThemeableEditor, contentTypeAtOffset);
-			}
+			// Now build the menu
+			buildMenu(menu, menusFromScope, textEditor, scope, contributionItem);
+		}
 
-			new MenuItem(menu, SWT.SEPARATOR);
+		// Are there any menus that belong to scopes other than top level scopes
+		if (menusFromOtherScopes != null && menusFromOtherScopes.length > 0)
+		{
+			// Build the "Other" menu
+			MenuItem separatorMenuItem = new MenuItem(menu, SWT.SEPARATOR);
+			separatorMenuItem.setData(contributionItem);
 
 			MenuItem menuItemForOtherScopes = new MenuItem(menu, SWT.CASCADE);
+			menuItemForOtherScopes.setData(contributionItem);
 			menuItemForOtherScopes.setText(Messages.EditorCommandsMenuContributor_CommandsForOtherScopes);
 
 			Menu menuForOtherScopes = new Menu(menu);
 			menuItemForOtherScopes.setMenu(menuForOtherScopes);
-			// TODO Need API in Bundle Manager to implement this.
+			buildMenu(menuForOtherScopes, menusFromOtherScopes, textEditor, scope, contributionItem);
 		}
+	}
+
+	protected static IContentTypeTranslator getContentTypeTranslator()
+	{
+		return CommonEditorPlugin.getDefault().getContentTypeTranslator();
 	}
 
 	/**
@@ -222,59 +232,52 @@ public class EditorCommandsMenuContributor extends ContributionItem
 	 * @param menu
 	 * @param menusFromScope
 	 * @param textEditor
-	 * @param contentTypeAtOffset
+	 * @param scope
 	 */
-	private static void buildMenu(Menu menu, MenuElement[] menusFromScope, final ITextEditor textEditor,
-			String contentTypeAtOffset)
+	private static void buildMenu(Menu menu, MenuElement[] menusFromScope, final ITextEditor textEditor, String scope,
+			IContributionItem contributionItem)
 	{
 		for (MenuElement menuForScope : menusFromScope)
 		{
-			String displayName = menuForScope.getDisplayName();
 			if (menuForScope.isHierarchicalMenu())
 			{
-				MenuItem menuItemForMenuForScope = new MenuItem(menu, SWT.CASCADE);
-				menuItemForMenuForScope.setText(displayName);
-				// We mark the cascade menu items for disposal when the menu is hidden
-				// so that accelerators on descendant menu items do not hinder the handling of
-				// key bindings
-				menuItemForMenuForScope.setData(DISPOSE_ON_HIDE, Boolean.TRUE);
+				MenuItem menuItem = new MenuItem(menu, SWT.CASCADE);
+				menuItem.setData(contributionItem);
+				menuItem.setText(menuForScope.getDisplayName());
 
 				Menu menuForMenuForScope = new Menu(menu);
-				menuItemForMenuForScope.setMenu(menuForMenuForScope);
+				menuItem.setMenu(menuForMenuForScope);
 
 				// Recursive
-				buildMenu(menuForMenuForScope, menuForScope.getChildren(), textEditor, contentTypeAtOffset);
+				buildMenu(menuForMenuForScope, menuForScope.getChildren(), textEditor, scope, contributionItem);
 			}
 			else if (menuForScope.isSeparator())
 			{
-				new MenuItem(menu, SWT.SEPARATOR);
+				MenuItem separatorMenuItem = new MenuItem(menu, SWT.SEPARATOR);
+				separatorMenuItem.setData(contributionItem);
 			}
 			else
 			{
 				final CommandElement command = menuForScope.getCommand();
-				final MenuItem menuItem = new MenuItem(menu, SWT.PUSH);
 
+				// A command attached to the menu item may not be executable on
+				// the current platform in which case we skip the menu item
+				if (command != null && (!command.isExecutable()))
+				{
+					continue;
+				}
+				final MenuItem menuItem = new MenuItem(menu, SWT.PUSH);
+				menuItem.setData(contributionItem);
+
+				String displayName = menuForScope.getDisplayName();
+				String acceleratorText = ""; //$NON-NLS-1$
 				if (command != null)
 				{
 					KeySequence[] keySequences = command.getKeySequences();
 					if (keySequences != null && keySequences.length > 0)
 					{
 						KeySequence keySequence = keySequences[0];
-						KeyStroke[] keyStrokes = keySequence.getKeyStrokes();
-						// Eclipse can show only single key stroke key sequences
-						if (keyStrokes.length == 1)
-						{
-							int accelerator = SWTKeySupport.convertKeyStrokeToAccelerator(keyStrokes[0]);
-							menuItem.setAccelerator(accelerator);
-							// We mark the first level menu item with accelerators
-							// for disposal when the menu is hidden so that it does
-							// the accelerator does not interfere with the handling
-							// of key bindings
-							if (menu.getParentMenu() == null)
-							{
-								menuItem.setData(DISPOSE_ON_HIDE, Boolean.TRUE);
-							}
-						}
+						acceleratorText = "\t" + keySequence.format(); //$NON-NLS-1$
 					}
 					if (command instanceof SnippetElement || keySequences == null || keySequences.length == 0)
 					{
@@ -282,11 +285,11 @@ public class EditorCommandsMenuContributor extends ContributionItem
 						if (triggers != null && triggers.length > 0)
 						{
 							// Use first trigger
-							displayName += " (" + triggers[0] + TAB + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+							displayName += " " + triggers[0] + getTabChar(); //$NON-NLS-1$
 						}
 					}
 				}
-				menuItem.setText(displayName);
+				menuItem.setText(displayName + acceleratorText);
 				menuItem.addSelectionListener(new SelectionListener()
 				{
 					@Override
@@ -297,8 +300,8 @@ public class EditorCommandsMenuContributor extends ContributionItem
 							// There is no associated command. Show a message to the user.
 							MessageDialog.openError(menuItem.getParent().getShell(),
 									Messages.EditorCommandsMenuContributor_TITLE_CommandNotDefined, Messages.bind(
-											Messages.EditorCommandsMenuContributor_MSG_CommandNotDefined, menuItem
-													.getText()));
+											Messages.EditorCommandsMenuContributor_MSG_CommandNotDefined,
+											menuItem.getText()));
 						}
 						else
 						{
@@ -319,9 +322,52 @@ public class EditorCommandsMenuContributor extends ContributionItem
 				// 2. The command did not specify the scope
 				// 3. The command specified the scope and it matches the current scope
 				menuItem.setEnabled(command == null || command.getScope() == null
-						|| command.getScopeSelector().matches(contentTypeAtOffset));
+						|| command.getScopeSelector().matches(scope));
 			}
 		}
+		if (menusFromScope.length > 0)
+		{
+			MenuElement menuForScope = menusFromScope[0];
+			// if we're inside a bundle's main menu
+			if (menuForScope.getParent() != null && menuForScope.getParent().getParent() == null)
+			{
+				MenuItem separatorMenuItem = new MenuItem(menu, SWT.SEPARATOR);
+				separatorMenuItem.setData(contributionItem);
+
+				final MenuItem editBundleItem = new MenuItem(menu, SWT.PUSH);
+				editBundleItem.setData(contributionItem);
+				editBundleItem.setText(Messages.EditorCommandsMenuContributor_LBL_EditBundle);
+				final BundleElement bundleElement = menuForScope.getOwningBundle();
+				editBundleItem.addSelectionListener(new SelectionListener()
+				{
+					@Override
+					public void widgetSelected(SelectionEvent e)
+					{
+						editBundle(bundleElement);
+					}
+
+					@Override
+					public void widgetDefaultSelected(SelectionEvent e)
+					{
+					}
+				});
+			}
+		}
+	}
+
+	private static String getTabChar()
+	{
+		if (Platform.getOS().equals(Platform.OS_MACOSX))
+		{
+			return "\u21E5"; // char which looks like: ->| //$NON-NLS-1$ 
+		}
+		return TAB;
+	}
+
+	protected static void editBundle(final BundleElement owningBundle)
+	{
+		Job job = new EditBundleJob(owningBundle);
+		job.schedule();
 	}
 
 	/*
@@ -332,15 +378,5 @@ public class EditorCommandsMenuContributor extends ContributionItem
 	public boolean isDynamic()
 	{
 		return true;
-	}
-
-	private static String getContentTypeAtOffset(IDocument document, int offset) throws BadLocationException
-	{
-		QualifiedContentType contentType = DocumentContentTypeManager.getInstance().getContentType(document, offset);
-		if (contentType != null)
-		{
-			return ContentTypeTranslation.getDefault().translate(contentType).toString();
-		}
-		return document.getContentType(offset);
 	}
 }

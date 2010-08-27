@@ -13,6 +13,7 @@ public class AllTests
 		suite.addTestSuite(AndSelectorTests.class);
 		suite.addTestSuite(NameSelectorTests.class);
 		suite.addTestSuite(OrSelectorTests.class);
+		suite.addTestSuite(NegativeLookaheadTests.class);
 		// $JUnit-END$
 		return suite;
 	}

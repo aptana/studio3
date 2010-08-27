@@ -14,6 +14,7 @@ public class Messages extends NLS
 	public static String ExistingOrNewPage_ProjectColumn_Label;
 	public static String ExistingOrNewPage_RepositoryColumn_Label;
 	public static String ExistingOrNewPage_Title;
+	public static String ExistingOrNewPage_UnabletoFindGitExecutableError;
 	public static String SharingWizard_failed;
 	public static String SharingWizard_Title;
 	static

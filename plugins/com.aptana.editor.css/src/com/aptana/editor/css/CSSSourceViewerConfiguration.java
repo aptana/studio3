@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -35,8 +35,8 @@
 package com.aptana.editor.css;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
@@ -44,71 +44,63 @@ import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
-import com.aptana.editor.common.ILanguageService;
 import com.aptana.editor.common.TextUtils;
-import com.aptana.editor.css.internal.CSSCommentIndentStrategy;
-import com.aptana.editor.css.internal.CSSContentAssistProcessor;
+import com.aptana.editor.css.contentassist.CSSContentAssistProcessor;
+import com.aptana.editor.css.text.CSSTextHover;
 
-public class CSSSourceViewerConfiguration extends CommonSourceViewerConfiguration {
+public class CSSSourceViewerConfiguration extends CommonSourceViewerConfiguration
+{
 
-    private ILanguageService fLanguageService;
-
-    public CSSSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor) {
-        super(preferences, editor);
-    }
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source.ISourceViewer)
-	 */
-	@Override
-	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
-		return TextUtils.combine(new String[][] {
-				{ IDocument.DEFAULT_CONTENT_TYPE },
-				CSSSourceConfiguration.CONTENT_TYPES
-			});
+	public CSSSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor)
+	{
+		super(preferences, editor);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source
+	 * .ISourceViewer)
+	 */
+	@Override
+	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer)
+	{
+		return TextUtils.combine(new String[][] { { IDocument.DEFAULT_CONTENT_TYPE },
+				CSSSourceConfiguration.CONTENT_TYPES });
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
 	 */
-	public String[][] getTopContentTypes() {
+	public String[][] getTopContentTypes()
+	{
 		return CSSSourceConfiguration.getDefault().getTopContentTypes();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source.ISourceViewer)
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source
+	 * .ISourceViewer)
 	 */
 	@Override
-	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
+	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer)
+	{
 		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
 		CSSSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		return reconciler;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getAutoEditStrategies(org.eclipse.jface.text.source.ISourceViewer, java.lang.String)
-	 */
-    @Override
-    public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType) {
-        String partitioning = getConfiguredDocumentPartitioning(sourceViewer);
-        if (contentType.equals(CSSSourceConfiguration.MULTILINE_COMMENT)) {
-            return new IAutoEditStrategy[] { new CSSCommentIndentStrategy(partitioning,
-                    contentType, this, sourceViewer) };
-        }
-        return super.getAutoEditStrategies(sourceViewer, contentType);
-    }
+	@Override
+	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
+	{
+		return new CSSContentAssistProcessor(getAbstractThemeableEditor());
+	}
 
-    @Override
-    protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer,
-            String contentType) {
-        return new CSSContentAssistProcessor();
-    }
-
-    @Override
-    protected ILanguageService getLanguageService() {
-        if (fLanguageService == null) {
-            fLanguageService = new CSSLanguageService();
-        }
-        return fLanguageService;
-    }
+	@Override
+	public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType)
+	{
+		return new CSSTextHover();
+	}
 }

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="com.aptana.ui.propertyDialogs">
+      <dialog
+            class="com.aptana.ide.ui.ftp.internal.FTPPropertyDialogProvider"
+            id="com.aptana.ide.ui.secureftp.sftpDialog"
+            objectClass="com.aptana.filesystem.secureftp.SFTPConnectionPoint">
+      </dialog>
+      <dialog
+            class="com.aptana.ide.ui.ftp.internal.FTPPropertyDialogProvider"
+            id="com.aptana.ide.ui.secureftp.ftpsDialog"
+            objectClass="com.aptana.filesystem.secureftp.FTPSConnectionPoint">
+      </dialog>
+   </extension>
+   <extension
+         point="com.aptana.ui.imageAssociations">
+      <objectImage
+            icon="icons/full/obj16/sftp.png"
+            objectClass="com.aptana.filesystem.secureftp.SFTPConnectionPoint">
+      </objectImage>
+      <objectImage
+            icon="icons/full/obj16/ftps.png"
+            objectClass="com.aptana.filesystem.secureftp.FTPSConnectionPoint">
+      </objectImage>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="com.aptana.ide.ui.ftp.internal.FTPPropertyDialogProvider"
+            class="com.aptana.ide.ui.secureftp.internal.CommonFTPPropertyDialogProvider$Factory">
+         <adapter
+               type="com.aptana.ui.IPropertyDialogProvider">
+         </adapter>
+      </factory>
+   </extension>
+
+</plugin>

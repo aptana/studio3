@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -64,7 +64,7 @@ public class ERBPartitionerSwitchStrategy extends PartitionerSwitchStrategy {
 		super(ERB_PAIRS, ESCAPE_PAIRS);
 	}
 	
-	public static ERBPartitionerSwitchStrategy getDafault() {
+	public static ERBPartitionerSwitchStrategy getDefault() {
 		if (instance == null) {
 			instance = new ERBPartitionerSwitchStrategy();
 		}

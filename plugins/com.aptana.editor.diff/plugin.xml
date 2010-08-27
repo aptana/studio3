@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.aptana.editor.diff.DiffEditor"
+            contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
+            default="true"
+            extensions="diff,patch"
+            icon="icons/diff.png"
+            id="com.aptana.editor.diff"
+            name="%editor.diff.name">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.diff">
+         </contentTypeBinding>
+      </editor>
+   </extension>
+    <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            file-extensions="diff,patch"
+            id="com.aptana.contenttype.diff"
+            name="%content-type.diff.name"
+            priority="normal">
+      </content-type>
+   </extension>
+
+</plugin>

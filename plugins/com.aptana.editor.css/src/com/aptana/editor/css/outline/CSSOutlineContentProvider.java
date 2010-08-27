@@ -78,7 +78,7 @@ public class CSSOutlineContentProvider extends CommonOutlineContentProvider
 	}
 
 	@Override
-	protected IParseNode[] filter(IParseNode[] nodes)
+	protected Object[] filter(IParseNode[] nodes)
 	{
 		// displays only the rules
 		List<CSSSelectorNode> selectors = new ArrayList<CSSSelectorNode>();

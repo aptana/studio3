@@ -1,6 +1,5 @@
 package com.aptana.git.core.model;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -13,19 +12,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.osgi.util.NLS;
 
+import com.aptana.core.util.ProcessUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.GitPlugin;
-import com.aptana.util.ProcessUtil;
-import com.aptana.util.StringUtil;
 
 public class GitIndex
 {
@@ -39,14 +41,27 @@ public class GitIndex
 
 	private GitRepository repository;
 	private boolean amend;
-	private String workingDirectory;
+	private IPath workingDirectory;
+
+	/**
+	 * Temporary list of changed files that we build up on refreshes. TODO Don't make this a field here that is
+	 * redundant with the next list, instead make it a local var to refresh and pass it along to the jobs/methods that
+	 * need it.
+	 */
 	private List<ChangedFile> files;
+
+	/**
+	 * The list of changed files that is a copy of the above list. Only copied at the very end of the refresh, so it
+	 * always contains the full listing from last finished refresh call.
+	 */
+	private List<ChangedFile> changedFiles;
 
 	private int refreshStatus = 0;
 	private boolean notify;
-	private Map<String, String> amendEnvironment;
 
-	GitIndex(GitRepository repository, String workingDirectory)
+	private Job indexRefreshJob;
+
+	GitIndex(GitRepository repository, IPath workingDirectory)
 	{
 		super();
 
@@ -55,67 +70,131 @@ public class GitIndex
 
 		this.repository = repository;
 		this.workingDirectory = workingDirectory;
-		this.files = new Vector<ChangedFile>();
+		this.changedFiles = new ArrayList<ChangedFile>();
 	}
 
-	public void refresh()
+	/**
+	 * Used by callers who don't need to wait for it to finish so we can squash together repeated calls when they come
+	 * rapid-fire.
+	 */
+	public void refreshAsync()
 	{
-		refresh(true);
+		if (indexRefreshJob == null)
+		{
+			indexRefreshJob = new Job("Refreshing git index") //$NON-NLS-1$
+			{
+				@Override
+				protected IStatus run(IProgressMonitor monitor)
+				{
+					if (monitor != null && monitor.isCanceled())
+						return Status.CANCEL_STATUS;
+					refresh(monitor);
+					return Status.OK_STATUS;
+				}
+			};
+			indexRefreshJob.setSystem(true);
+		}
+		else
+		{
+			indexRefreshJob.cancel();
+		}
+		indexRefreshJob.schedule(250);
 	}
 
-	synchronized void refresh(boolean notify)
+	/**
+	 * Run a refresh synchronously.
+	 * 
+	 * @param monitor
+	 * @return
+	 */
+	public IStatus refresh(IProgressMonitor monitor)
 	{
+		SubMonitor sub = SubMonitor.convert(monitor, 100);
+		try
+		{
+			return refresh(true, sub.newChild(100));
+		}
+		finally
+		{
+			sub.done();
+		}
+	}
+
+	synchronized IStatus refresh(boolean notify, IProgressMonitor monitor)
+	{
+		if (monitor != null && monitor.isCanceled())
+			return Status.CANCEL_STATUS;
 		this.notify = notify;
 		refreshStatus = 0;
 
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, "update-index", "-q", //$NON-NLS-1$ //$NON-NLS-2$
 				"--unmerged", "--ignore-missing", "--refresh"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
+		if (result == null) // couldn't even execute!
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git update-index"); //$NON-NLS-1$
 		int exitValue = result.keySet().iterator().next();
 		if (exitValue != 0)
-			return;
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.values().iterator().next());
 
 		Set<Job> jobs = new HashSet<Job>();
 		jobs.add(new Job("other files") //$NON-NLS-1$
-				{
+		{
 
-					@Override
-					protected IStatus run(IProgressMonitor monitor)
-					{
-						String output = GitExecutable.instance().outputForCommand(workingDirectory,
-								"ls-files", "--others", //$NON-NLS-1$ //$NON-NLS-2$
-								"--exclude-standard", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
-						readOtherFiles(output);
-						return Status.OK_STATUS;
-					}
-				});
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
+						"ls-files", "--others", //$NON-NLS-1$ //$NON-NLS-2$
+						"--exclude-standard", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
+				if (result != null && result.keySet().iterator().next() == 0)
+				{
+					readOtherFiles(result.values().iterator().next());
+				}
+				return Status.OK_STATUS;
+			}
+		});
 		jobs.add(new Job("unstaged files") //$NON-NLS-1$
-				{
+		{
 
-					@Override
-					protected IStatus run(IProgressMonitor monitor)
-					{
-						String output = GitExecutable.instance().outputForCommand(workingDirectory, "diff-files", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
-						readUnstagedFiles(output);
-						return Status.OK_STATUS;
-					}
-				});
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
+						"diff-files", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
+				if (result != null && result.keySet().iterator().next() == 0)
+				{
+					readUnstagedFiles(result.values().iterator().next());
+				}
+				return Status.OK_STATUS;
+			}
+		});
 		jobs.add(new Job("staged files") //$NON-NLS-1$
+		{
+
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
+						"diff-index", "--cached", //$NON-NLS-1$ //$NON-NLS-2$
+						"-z", getParentTree()); //$NON-NLS-1$
+				if (result != null && result.keySet().iterator().next() == 0)
 				{
+					readStagedFiles(result.values().iterator().next());
+				}
+				return Status.OK_STATUS;
+			}
+		});
+		// Last chance to cancel...
+		if (monitor != null && monitor.isCanceled())
+			return Status.CANCEL_STATUS;
 
-					@Override
-					protected IStatus run(IProgressMonitor monitor)
-					{
-						String output = GitExecutable.instance().outputForCommand(workingDirectory,
-								"diff-index", "--cached", //$NON-NLS-1$ //$NON-NLS-2$
-								"-z", getParentTree()); //$NON-NLS-1$
-						readStagedFiles(output);
-						return Status.OK_STATUS;
-					}
-				});
-
-		this.files.clear(); // FIXME Is this right? Seems like after we commit we leave some files in memory that
-		// shouldn't be there anymore (especially unstaged ones)
+		// Copy the last full list of changed files we built up on refresh. Used to pass along the delta
+		Collection<ChangedFile> preRefreshFiles = new ArrayList<ChangedFile>(this.changedFiles.size());
+		for (ChangedFile file : this.changedFiles)
+		{
+			preRefreshFiles.add(new ChangedFile(file));
+		}
+		// Now create a new temporary list so we can built it up...
+		this.files = new Vector<ChangedFile>();
 
 		// Schedule all the jobs
 		for (Job toSchedule : jobs)
@@ -137,6 +216,39 @@ public class GitIndex
 				// ignore
 			}
 		}
+
+		// At this point, all index operations have finished.
+		// We need to find all files that don't have either
+		// staged or unstaged files, and delete them
+		Collection<ChangedFile> toRefresh = new ArrayList<ChangedFile>(this.files);
+		List<ChangedFile> deleteFiles = new ArrayList<ChangedFile>();
+		for (ChangedFile file : this.files)
+		{
+			if (!file.hasStagedChanges && !file.hasUnstagedChanges)
+				deleteFiles.add(file);
+		}
+
+		if (!deleteFiles.isEmpty())
+		{
+			for (ChangedFile file : deleteFiles)
+				files.remove(file);
+		}
+
+		// Now make the "final" list a copy of the temporary one we were just building up
+		synchronized (changedFiles)
+		{
+			changedFiles.clear();
+			for (ChangedFile file : this.files)
+			{
+				changedFiles.add(new ChangedFile(file));
+			}
+		}
+		// Don't hold onto temp list in memory!
+		this.files = null;
+
+		postIndexChange(preRefreshFiles, toRefresh);
+
+		return Status.OK_STATUS;
 	}
 
 	private String getParentTree()
@@ -148,32 +260,6 @@ public class GitIndex
 			return "4b825dc642cb6eb9a060e54bf8d69288fbee4904"; //$NON-NLS-1$
 
 		return parent;
-	}
-
-	void setAmend(boolean amend)
-	{
-		if (this.amend == amend)
-			return;
-		this.amend = amend;
-		this.amendEnvironment = null;
-
-		refresh();
-		if (!amend)
-			return;
-
-		// If we amend, we want to keep the author information for the previous commit
-		// We do this by reading in the previous commit, and storing the information
-		// in a dictionary. This dictionary will then later be read by commit()
-		String message = GitExecutable.instance().outputForCommand("cat-file commit HEAD"); //$NON-NLS-1$
-		Pattern p = Pattern.compile("\nauthor ([^\n]*) <([^\n>]*)> ([0-9]+[^\n]*)\n"); //$NON-NLS-1$
-		Matcher m = p.matcher(message);
-		if (m.find())
-		{
-			amendEnvironment = new HashMap<String, String>();
-			amendEnvironment.put(GitEnv.GIT_AUTHOR_NAME, m.group(1));
-			amendEnvironment.put(GitEnv.GIT_AUTHOR_EMAIL, m.group(2));
-			amendEnvironment.put(GitEnv.GIT_AUTHOR_DATE, m.group(3));
-		}
 	}
 
 	private void readOtherFiles(String string)
@@ -197,7 +283,6 @@ public class GitIndex
 		}
 
 		addFilesFromDictionary(dictionary, false, false);
-		indexStepComplete();
 	}
 
 	private void readStagedFiles(String string)
@@ -205,7 +290,6 @@ public class GitIndex
 		List<String> lines = linesFromNotification(string);
 		Map<String, List<String>> dic = dictionaryForLines(lines);
 		addFilesFromDictionary(dic, true, true);
-		indexStepComplete();
 	}
 
 	private void readUnstagedFiles(String string)
@@ -213,7 +297,6 @@ public class GitIndex
 		List<String> lines = linesFromNotification(string);
 		Map<String, List<String>> dic = dictionaryForLines(lines);
 		addFilesFromDictionary(dic, false, true);
-		indexStepComplete();
 	}
 
 	List<String> linesFromNotification(String string)
@@ -253,6 +336,10 @@ public class GitIndex
 
 	private void addFilesFromDictionary(Map<String, List<String>> dictionary, boolean staged, boolean tracked)
 	{
+		if (this.files == null)
+		{
+			return;
+		}
 		// Iterate over all existing files
 		synchronized (this.files)
 		{
@@ -351,105 +438,110 @@ public class GitIndex
 		}
 	}
 
-	/**
-	 * This method is called for each of the three processes from above. If all three are finished (self.busy == 0),
-	 * then we can delete all files previously marked as deletable
-	 */
-	private void indexStepComplete()
-	{
-		// if we're still busy, do nothing :)
-		if (--refreshStatus > 0)
-		{
-			return;
-		}
-
-		// At this point, all index operations have finished.
-		// We need to find all files that don't have either
-		// staged or unstaged files, and delete them
-
-		Collection<ChangedFile> toRefresh = new ArrayList<ChangedFile>(this.files);
-		List<ChangedFile> deleteFiles = new ArrayList<ChangedFile>();
-		for (ChangedFile file : this.files)
-		{
-			if (!file.hasStagedChanges && !file.hasUnstagedChanges)
-				deleteFiles.add(file);
-		}
-
-		if (!deleteFiles.isEmpty())
-		{
-			for (ChangedFile file : deleteFiles)
-				files.remove(file);
-		}
-		postIndexChange(toRefresh);
-	}
-
-	private void postIndexChange(Collection<ChangedFile> changedFiles)
+	private void postIndexChange(Collection<ChangedFile> preChangeFiles, Collection<ChangedFile> postChangeFiles)
 	{
 		if (this.notify)
-			this.repository.fireIndexChangeEvent(changedFiles);
+			this.repository.fireIndexChangeEvent(preChangeFiles, postChangeFiles);
 		else
 			this.notify = true;
 	}
 
+	/**
+	 * Makes a copy of the internal list of changed files so that iterating won't ever result in a
+	 * ConcurrentModificationException. try to avoid use if possible, since a deep copy is made which can be expensive.
+	 * 
+	 * @return
+	 */
 	public List<ChangedFile> changedFiles()
 	{
-		return new ArrayList<ChangedFile>(files);
+		synchronized (changedFiles)
+		{
+			List<ChangedFile> copy = new ArrayList<ChangedFile>(changedFiles.size());
+			for (ChangedFile file : this.changedFiles)
+			{
+				copy.add(new ChangedFile(file));
+			}
+			return copy;
+		}
 	}
 
 	public boolean stageFiles(Collection<ChangedFile> stageFiles)
 	{
+		if (stageFiles == null || stageFiles.isEmpty())
+			return false;
+
 		List<String> args = new ArrayList<String>();
 		args.add("update-index"); //$NON-NLS-1$
 		args.add("--add"); //$NON-NLS-1$
 		args.add("--remove"); //$NON-NLS-1$
+		args.add("--stdin"); //$NON-NLS-1$
+		StringBuffer input = new StringBuffer(stageFiles.size()*stageFiles.iterator().next().getPath().length());
 		for (ChangedFile file : stageFiles)
 		{
-			args.add(file.getPath());
+			input.append(file.getPath()).append('\n');
 		}
 
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(input.toString(), workingDirectory,
 				args.toArray(new String[args.size()]));
-		int ret = result.keySet().iterator().next();
+		if (result == null)
+			return false;
 
+		int ret = result.keySet().iterator().next();
 		if (ret != 0)
 		{
+			GitPlugin.logError("Failed to stage files: " + result.values().iterator().next(), null); //$NON-NLS-1$
 			return false;
 		}
-
+		Collection<ChangedFile> preFiles = new ArrayList<ChangedFile>(stageFiles.size());
+		for (ChangedFile file : stageFiles)
+		{
+			preFiles.add(new ChangedFile(file));
+		}
 		for (ChangedFile file : stageFiles)
 		{
 			file.hasUnstagedChanges = false;
 			file.hasStagedChanges = true;
 		}
 
-		postIndexChange(stageFiles);
+		postIndexChange(preFiles, stageFiles);
 		return true;
 	}
 
 	public boolean unstageFiles(Collection<ChangedFile> unstageFiles)
 	{
+		if (unstageFiles == null || unstageFiles.isEmpty())
+			return false;
+
 		StringBuilder input = new StringBuilder();
 		for (ChangedFile file : unstageFiles)
 		{
 			input.append(file.indexInfo());
 		}
 
-		int ret = 1;
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, input.toString(),
-				null, new String[] { "update-index", "-z", "--index-info" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		ret = result.keySet().iterator().next();
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(input.toString(),
+				workingDirectory, new String[] { "update-index", "-z", "--index-info" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (result == null)
+			return false;
+
+		int ret = result.keySet().iterator().next();
 		if (ret != 0)
 		{
+			GitPlugin.logError("Failed to stage files: " + result.values().iterator().next(), null); //$NON-NLS-1$
 			return false;
 		}
 
+		Collection<ChangedFile> preFiles = new ArrayList<ChangedFile>(unstageFiles.size());
+		for (ChangedFile file : unstageFiles)
+		{
+			preFiles.add(new ChangedFile(file));
+		}
 		for (ChangedFile file : unstageFiles)
 		{
 			file.hasUnstagedChanges = true;
 			file.hasStagedChanges = false;
 		}
 
-		postIndexChange(unstageFiles);
+		postIndexChange(preFiles, unstageFiles);
 		return true;
 	}
 
@@ -464,8 +556,8 @@ public class GitIndex
 		String[] arguments = new String[] { "checkout-index", "--index", "--quiet", "--force", "-z", "--stdin" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
 		int ret = 1;
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, input.toString(),
-				null, arguments);
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(input.toString(),
+				workingDirectory, arguments);
 		ret = result.keySet().iterator().next();
 
 		if (ret != 0)
@@ -473,196 +565,41 @@ public class GitIndex
 			// postOperationFailed("Discarding changes failed with return value " + ret);
 			return;
 		}
-
+		Collection<ChangedFile> preFiles = new ArrayList<ChangedFile>(discardFiles.size());
+		for (ChangedFile file : discardFiles)
+		{
+			preFiles.add(new ChangedFile(file));
+		}
 		for (ChangedFile file : discardFiles)
 			file.hasUnstagedChanges = false;
 
-		postIndexChange(discardFiles);
+		postIndexChange(preFiles, discardFiles);
 	}
 
-	public void commit(String commitMessage)
+	public boolean commit(String commitMessage)
 	{
 		boolean success = doCommit(commitMessage);
 		if (!success)
-			return;
+			return false;
 
-		// Need to explicitly fire off changes for the files that were staged and got committed
-		postIndexChange(getStagedFiles());
 		repository.hasChanged();
 
-		amendEnvironment = null;
 		if (amend)
 			this.amend = false;
 		else
-			refresh();
+			refresh(new NullProgressMonitor()); // TODO Run async if we can!
+		return true;
 	}
 
 	private boolean doCommit(String commitMessage)
 	{
-		// prepare to commit
-		prepareToCommit(commitMessage);
-
-		// build up list of parents
-		List<String> parents = new ArrayList<String>();
-		String head = amend ? "HEAD^" : "HEAD"; //$NON-NLS-1$ //$NON-NLS-2$
-		parents.add(head);
-		parents.addAll(repository.getMergeSHAs());
-
-		// TODO get commit message from file since it could have been changed?
-
-		// commit tree
-		String commit = commitTree(parents, commitMessage);
-		if (commit == null)
-			return false;
-
-		// update HEAD ref
-		if (!updateHeadRef(commit, commitMessage))
-			return false;
-
-		// TODO Extract these files as constants
-		unlink(repository.gitFile(GitRepository.MERGE_HEAD_FILENAME));
-		unlink(repository.gitFile("MERGE_MSG")); //$NON-NLS-1$
-		unlink(repository.gitFile("MERGE_MODE")); //$NON-NLS-1$
-		unlink(repository.gitFile("SQUASH_MSG")); //$NON-NLS-1$
-
-		// Run post-commit hook
-		postCommitUpdate("Running post-commit hook"); //$NON-NLS-1$
-		return repository.executeHook("post-commit"); //$NON-NLS-1$
-	}
-
-	private boolean prepareToCommit(String commitMessage)
-	{
-		// Run pre-commit hook
-		postCommitUpdate("Running pre-commit hook"); //$NON-NLS-1$
-		if (!repository.executeHook("pre-commit")) //$NON-NLS-1$
+		int exitCode = 1;
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, "commit", "-m", commitMessage);
+		if (result != null && !result.isEmpty())
 		{
-			postCommitFailure("Pre-commit hook failed"); //$NON-NLS-1$
-			return false;
+			exitCode = result.keySet().iterator().next();
 		}
-		// Write commit message to file
-		String commitSubject = "commit: "; //$NON-NLS-1$
-		int newLine = commitMessage.indexOf("\n"); //$NON-NLS-1$
-		if (newLine == -1)
-			commitSubject += commitMessage;
-		else
-			commitSubject += commitMessage.substring(0, newLine);
-
-		repository.writetoCommitFile(commitMessage);
-		// Re-read index (?)
-
-		// Run prepare-commit-msg hook
-		postCommitUpdate("Running prepare-commit hook"); //$NON-NLS-1$
-		if (!repository.executeHook("prepare-commit-msg", "message")) //$NON-NLS-1$ //$NON-NLS-2$
-		{
-			postCommitFailure("prepare-commit-msg hook failed"); //$NON-NLS-1$
-			return false;
-		}
-		// Run commit-msg hook
-		postCommitUpdate("Running commit-msg hook"); //$NON-NLS-1$
-		if (!repository.executeHook("commit-msg", repository.commitMessageFile())) //$NON-NLS-1$
-		{
-			postCommitFailure("Commit-msg hook failed"); //$NON-NLS-1$
-			return false;
-		}
-		return true;
-	}
-
-	protected String commitTree(List<String> parents, String commitMessage)
-	{
-		postCommitUpdate("Creating tree"); //$NON-NLS-1$
-		String tree = GitExecutable.instance().outputForCommand(workingDirectory, "write-tree"); //$NON-NLS-1$
-		if (tree.length() != 40)
-		{
-			postCommitFailure("Creating tree failed"); //$NON-NLS-1$
-			return null;
-		}
-
-		List<String> arguments = new ArrayList<String>();
-		arguments.add("commit-tree"); //$NON-NLS-1$
-		arguments.add(tree);
-		for (String parent : parents)
-		{
-			if (repository.parseReference(parent) != null)
-			{
-				arguments.add("-p"); //$NON-NLS-1$
-				arguments.add(parent);
-			}
-		}
-		postCommitUpdate("Creating commit"); //$NON-NLS-1$
-		int ret = 1;
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, commitMessage,
-				amendEnvironment, arguments.toArray(new String[arguments.size()]));
-		String commit = result.values().iterator().next();
-		ret = result.keySet().iterator().next();
-		if (ret != 0 || commit.length() != 40)
-		{
-			postCommitFailure("Could not create a commit object"); //$NON-NLS-1$
-			return null;
-		}
-		return commit;
-	}
-
-	/**
-	 * One of the steps during commit.
-	 * 
-	 * @param commit
-	 * @param commitMessage
-	 * @return
-	 */
-	protected boolean updateHeadRef(String commit, String commitMessage)
-	{
-		postCommitUpdate("Updating HEAD"); //$NON-NLS-1$
-		String commitSubject = "commit: "; //$NON-NLS-1$
-		int newLine = commitMessage.indexOf("\n"); //$NON-NLS-1$
-		if (newLine == -1)
-			commitSubject += commitMessage;
-		else
-			commitSubject += commitMessage.substring(0, newLine);
-
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
-				"update-ref", "-m", commitSubject, "HEAD", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				commit);
-		int ret = result.keySet().iterator().next();
-		if (ret != 0)
-		{
-			postCommitFailure("Could not update HEAD"); //$NON-NLS-1$
-			return false;
-		}
-		return true;
-	}
-
-	private boolean unlink(File gitFile)
-	{
-		if (gitFile == null)
-			return false;
-		if (!gitFile.exists())
-			return false;
-
-		return gitFile.delete();
-	}
-
-	private Collection<ChangedFile> getStagedFiles()
-	{
-		Collection<ChangedFile> staged = new ArrayList<ChangedFile>();
-		synchronized (this.files)
-		{
-			for (ChangedFile file : this.files)
-			{
-				if (file.hasStagedChanges())
-					staged.add(file);
-			}
-		}
-		return staged;
-	}
-
-	private void postCommitFailure(String string)
-	{
-		GitPlugin.logError(string, null);
-	}
-
-	private void postCommitUpdate(String string)
-	{
-		GitPlugin.logInfo(string);
+		return exitCode == 0;
 	}
 
 	/**
@@ -714,7 +651,7 @@ public class GitIndex
 		{
 			try
 			{
-				return ProcessUtil.read(new FileInputStream(new File(workingDirectory, file.path)));
+				return ProcessUtil.read(new FileInputStream(workingDirectory.append(file.path).toFile()));
 			}
 			catch (FileNotFoundException e)
 			{
@@ -747,35 +684,138 @@ public class GitIndex
 	}
 
 	/**
-	 * Used to stage/unstage/discard 'hunks' on files with changes. See http://tomayko.com/writings/the-thing-about-git
+	 * For use in telling if a given resource is a changed file, or is a folder containing changes underneath it.
 	 * 
-	 * @param hunk
-	 * @param stage
-	 * @param reverse
+	 * @param resource
+	 * @param changedFiles
 	 * @return
 	 */
-	public boolean applyPatch(String hunk, boolean stage, boolean reverse)
+	public boolean resourceOrChildHasChanges(IResource resource)
 	{
-		List<String> array = new ArrayList<String>();
-		array.add("apply"); //$NON-NLS-1$
-		if (stage)
-			array.add("--cached"); //$NON-NLS-1$
-		if (reverse)
-			array.add("--reverse"); //$NON-NLS-1$
-
-		int ret = 1;
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, hunk, null,
-				array.toArray(new String[array.size()]));
-
-		if (ret != 0)
+		synchronized (changedFiles)
 		{
-			GitPlugin.logError(NLS.bind("Applying patch failed with return value {0}. Error: {1}", ret, result.values() //$NON-NLS-1$
-					.iterator().next()), null);
+			if (changedFiles == null || changedFiles.isEmpty())
+				return false;
+
+			IPath workingDirectory = repository.workingDirectory();
+			IPath resourcePath = resource.getLocation();
+			for (ChangedFile changedFile : changedFiles)
+			{
+				IPath fullPath = workingDirectory.append(changedFile.getPath()).makeAbsolute();
+				if (resourcePath.isPrefixOf(fullPath))
+					return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean isDirty()
+	{
+		synchronized (changedFiles)
+		{
+			return !changedFiles.isEmpty();
+		}
+	}
+
+	public boolean hasUnresolvedMergeConflicts()
+	{
+		synchronized (changedFiles)
+		{
+			if (changedFiles.isEmpty())
+				return false;
+			for (ChangedFile changedFile : changedFiles)
+			{
+				if (changedFile.hasUnmergedChanges() && changedFile.hasUnstagedChanges())
+					return true;
+			}
 			return false;
 		}
+	}
 
-		// TODO: Try to be smarter about what to refresh
-		refresh();
-		return true;
+	public Set<IResource> getChangedResources()
+	{
+		IPath workingDir = repository.workingDirectory();
+		Set<IResource> resources = new HashSet<IResource>();
+		synchronized (changedFiles)
+		{
+			for (ChangedFile changedFile : changedFiles)
+			{
+				IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+						.getFileForLocation(workingDir.append(changedFile.getPath()));
+				if (resource != null)
+					resources.add(resource);
+			}
+		}
+		return resources;
+	}
+
+	public ChangedFile getChangedFileForResource(IResource resource)
+	{
+		if (resource == null || resource.getLocationURI() == null)
+			return null;
+		IPath resourcePath = resource.getLocation();
+		IPath workingDirectory = repository.workingDirectory();
+		synchronized (changedFiles)
+		{
+			for (ChangedFile changedFile : changedFiles)
+			{
+				IPath fullPath = workingDirectory.append(changedFile.getPath());
+				if (resourcePath.equals(fullPath))
+				{
+					return changedFile;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Gets the list of changed files that are underneath the given container.
+	 * 
+	 * @param container
+	 * @return
+	 */
+	public List<ChangedFile> getChangedFilesForContainer(IContainer container)
+	{
+		if (container == null || container.getLocationURI() == null)
+			return Collections.emptyList();
+
+		IPath resourcePath = container.getLocation();
+		List<ChangedFile> filtered = new ArrayList<ChangedFile>();
+		IPath workingDirectory = repository.workingDirectory();
+
+		synchronized (changedFiles)
+		{
+			if (changedFiles == null || changedFiles.isEmpty())
+				return Collections.emptyList();
+			for (ChangedFile changedFile : changedFiles)
+			{
+				IPath fullPath = workingDirectory.append(changedFile.getPath()).makeAbsolute();
+				if (resourcePath.isPrefixOf(fullPath))
+					filtered.add(changedFile);
+			}
+		}
+		return filtered;
+	}
+
+	/**
+	 * Find the changed file that corresponds to the repo relative path argument.
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public ChangedFile findChangedFile(String path)
+	{
+		synchronized (changedFiles)
+		{
+			for (ChangedFile changedFile : changedFiles)
+			{
+				if (changedFile.getPath().equals(path))
+				{
+					return changedFile;
+				}
+			}
+		}
+		return null;
 	}
 }

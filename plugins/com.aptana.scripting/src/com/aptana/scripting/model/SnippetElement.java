@@ -2,6 +2,8 @@ package com.aptana.scripting.model;
 
 public class SnippetElement extends CommandElement
 {
+	private String _expansion;
+	
 	/**
 	 * Snippet
 	 * 
@@ -28,7 +30,13 @@ public class SnippetElement extends CommandElement
 	 */
 	public CommandResult execute(CommandContext context)
 	{
-		CommandResult result = new CommandResult(this.getExpansion());
+		// set output type
+		context.setOutputType(getOutputType());
+
+		CommandResult result = new CommandResult(this, context);
+
+		// set result
+		result.setOutputString(this.getExpansion());
 
 		// indicate successful execution so that command result processing will work
 		result.setExecutedSuccessfully(true);
@@ -57,7 +65,7 @@ public class SnippetElement extends CommandElement
 	 */
 	public String getExpansion()
 	{
-		return this.getInvoke();
+		return this._expansion;
 	}
 
 	/**
@@ -67,6 +75,16 @@ public class SnippetElement extends CommandElement
 	 */
 	public void setExpansion(String expansion)
 	{
-		this.setInvoke(expansion);
+		this._expansion = expansion;
 	}
+
+	/**
+	 * Always executable.
+	 */
+	@Override
+	public boolean isExecutable()
+	{
+		return true;
+	}
+
 }

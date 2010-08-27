@@ -9,9 +9,25 @@ public class CSSTermNode extends CSSExpressionNode
 
 	public CSSTermNode(Symbol term)
 	{
+		super(term.getStart(), term.getEnd());
 		fTerm = term.value.toString();
-		this.start = term.getStart();
-		this.end = term.getEnd();
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!super.equals(obj) || !(obj instanceof CSSTermNode))
+		{
+			return false;
+		}
+		CSSTermNode other = (CSSTermNode) obj;
+		return fTerm.equals(other.fTerm);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return super.hashCode() * 31 + fTerm.hashCode();
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -50,11 +50,11 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
-import com.aptana.editor.common.QualifiedContentType;
+import com.aptana.editor.common.scripting.IContentTypeTranslator;
+import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
-import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.common.tmp.ContentTypeTranslation;
+import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 
 /**
  * @author Max Stepanov
@@ -68,8 +68,7 @@ public class SassSourceConfiguration implements IPartitioningConfiguration, ISou
 	public final static String STRING_DOUBLE = PREFIX + "string_double"; //$NON-NLS-1$
 	public final static String COMMENT = PREFIX + "comment"; //$NON-NLS-1$
 
-	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, COMMENT, STRING_SINGLE,
-			STRING_DOUBLE };
+	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, COMMENT, STRING_SINGLE, STRING_DOUBLE };
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { ISassConstants.CONTENT_TYPE_SASS } };
 
@@ -88,7 +87,9 @@ public class SassSourceConfiguration implements IPartitioningConfiguration, ISou
 		{
 			instance = new SassSourceConfiguration();
 			// TODO Probably need to do some other massaging!
-			ContentTypeTranslation.getDefault().addTranslation(new QualifiedContentType("com.aptana.contenttype.sass"), new QualifiedContentType("source.sass")); //$NON-NLS-1$ //$NON-NLS-2$
+			IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
+			c.addTranslation(new QualifiedContentType(ISassConstants.CONTENT_TYPE_SASS), new QualifiedContentType(
+					"source.sass")); //$NON-NLS-1$
 		}
 		return instance;
 	}
@@ -97,8 +98,7 @@ public class SassSourceConfiguration implements IPartitioningConfiguration, ISou
 	{
 		IToken comment = new Token(COMMENT);
 
-		partitioningRules = new IPredicateRule[] { 
-				new SingleLineRule("\"", "\"", new Token(STRING_DOUBLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
+		partitioningRules = new IPredicateRule[] { new SingleLineRule("\"", "\"", new Token(STRING_DOUBLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
 				new SingleLineRule("\'", "\'", new Token(STRING_SINGLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
 				new EndOfLineRule("/*", comment), //$NON-NLS-1$ // FIXME What about nested comments!
 				new EndOfLineRule("//", comment) //$NON-NLS-1$ // FIXME What about nested comments!
@@ -158,22 +158,22 @@ public class SassSourceConfiguration implements IPartitioningConfiguration, ISou
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
 	{
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getCodeScanner());
+		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getCodeScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
-		dr = new DefaultDamagerRepairer(getCommentScanner());
+		dr = new ThemeingDamagerRepairer(getCommentScanner());
 		reconciler.setDamager(dr, COMMENT);
 		reconciler.setRepairer(dr, COMMENT);
 
-		dr = new DefaultDamagerRepairer(getSingleQuotedStringScanner());
+		dr = new ThemeingDamagerRepairer(getSingleQuotedStringScanner());
 		reconciler.setDamager(dr, STRING_SINGLE);
 		reconciler.setRepairer(dr, STRING_SINGLE);
 
-		dr = new DefaultDamagerRepairer(getDoubleQuotedStringScanner());
+		dr = new ThemeingDamagerRepairer(getDoubleQuotedStringScanner());
 		reconciler.setDamager(dr, STRING_DOUBLE);
 		reconciler.setRepairer(dr, STRING_DOUBLE);
 	}
@@ -217,11 +217,6 @@ public class SassSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	protected IToken getToken(String name)
 	{
-		return getThemeManager().getToken(name);
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
+		return new Token(name);
 	}
 }

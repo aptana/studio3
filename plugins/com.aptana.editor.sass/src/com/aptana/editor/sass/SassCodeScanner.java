@@ -1,6 +1,8 @@
 package com.aptana.editor.sass;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,20 +22,10 @@ import com.aptana.editor.css.CSSCodeScanner;
 public class SassCodeScanner extends CSSCodeScanner
 {
 
-	/**
-	 * CodeScanner
-	 */
-	public SassCodeScanner()
+	@Override
+	protected List<IRule> createRules()
 	{
-		super();
-
-		// Now manipulate the CSS rules to add a couple extra
-		List<IRule> rules = new ArrayList<IRule>();
-		for (IRule rule : fRules)
-		{
-			rules.add(rule);
-		}
-
+		List<IRule> rules = super.createRules();
 		// Stick in a rule that recognizes mixins and variables
 		// FIXME This rule doesn't properly set the first char (!, =, or +) to it's own different punctuation token type
 		ExtendedWordRule variableRule = new ExtendedWordRule(new VariableWordDetector(),
@@ -47,9 +39,16 @@ public class SassCodeScanner extends CSSCodeScanner
 			}
 		};
 		rules.add(1, variableRule);
+		return rules;
+	}
+
+	@Override
+	protected List<IRule> createPunctuationRules()
+	{
+		List<IRule> rules = super.createPunctuationRules();
+		rules.remove(rules.size() - 1);
 		rules.add(new SingleCharacterRule('=', createToken("punctuation.definition.entity.sass"))); //$NON-NLS-1$
-		
-		setRules(rules.toArray(new IRule[rules.size()]));
+		return rules;
 	}
 
 	/**
@@ -69,7 +68,16 @@ public class SassCodeScanner extends CSSCodeScanner
 				namespaced.add(tokenizer.nextToken());
 			namespaced.add(name);
 		}
-		return namespaced.toArray(new String[namespaced.size()]);
+		List<String> list = new ArrayList<String>(namespaced);
+		Collections.sort(list, new Comparator<String>()
+		{
+			@Override
+			public int compare(String o1, String o2)
+			{
+				return o2.length() - o1.length();
+			}
+		});
+		return list.toArray(new String[list.size()]);
 	}
 
 	private static class VariableWordDetector implements IWordDetector

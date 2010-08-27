@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -34,24 +34,40 @@
  */
 package com.aptana.editor.common.text.reconciler;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
+import org.eclipse.swt.widgets.Display;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonEditorPlugin;
 
 public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension
 {
 
 	private AbstractThemeableEditor fEditor;
 
+	/**
+	 * Code Folding.
+	 */
+	private List<Position> fPositions = new ArrayList<Position>();
+
+	private IProgressMonitor fMonitor;
+
+	private RubyRegexpFolder folder;
+
 	public CommonReconcilingStrategy(AbstractThemeableEditor editor)
 	{
 		fEditor = editor;
+
 	}
 
 	public AbstractThemeableEditor getEditor()
@@ -62,18 +78,21 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	@Override
 	public void reconcile(IRegion partition)
 	{
+		// TODO Only recalculate the folding diff in the dirty region?
 		reconcile(false);
 	}
 
 	@Override
 	public void reconcile(DirtyRegion dirtyRegion, IRegion subRegion)
 	{
+		// TODO Only recalculate the folding diff in the dirty region? Requires us to set this as an "incremental reconciler" to get just dirty region
 		reconcile(false);
 	}
 
 	@Override
 	public void setDocument(IDocument document)
 	{
+		folder = new RubyRegexpFolder(document);
 		fEditor.getFileService().setDocument(document);
 	}
 
@@ -86,6 +105,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	@Override
 	public void setProgressMonitor(IProgressMonitor monitor)
 	{
+		fMonitor = monitor;
 	}
 
 	public void aboutToBeReconciled()
@@ -102,12 +122,39 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 
 	protected void calculatePositions(IProgressMonitor monitor)
 	{
+		if (monitor != null && monitor.isCanceled())
+			return;
 		// doing a full parse at the moment
 		fEditor.getFileService().parse();
+		if (monitor != null && monitor.isCanceled())
+			return;
+		// Folding...
+		fPositions.clear();
+		try
+		{
+			fPositions = folder.emitFoldingRegions(fPositions, monitor);
+		}
+		catch (BadLocationException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+		// If we had all positions we shouldn't probably listen to cancel, but we may have exited emitFoldingRegions
+		// early because of cancel...
+		if (monitor != null && monitor.isCanceled())
+			return;
+
+		Display.getDefault().asyncExec(new Runnable()
+		{
+			public void run()
+			{
+				fEditor.updateFoldingStructure(fPositions);
+			}
+		});
+
 	}
 
 	private void reconcile(boolean initialReconcile)
 	{
-		calculatePositions(new NullProgressMonitor());
+		calculatePositions(fMonitor);
 	}
 }

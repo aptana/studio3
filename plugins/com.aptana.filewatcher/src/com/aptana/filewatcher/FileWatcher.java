@@ -1,5 +1,7 @@
 package com.aptana.filewatcher;
 
+import org.eclipse.core.runtime.Platform;
+
 import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
@@ -15,39 +17,38 @@ public class FileWatcher
 	{
 		if (_instance == null)
 		{
-			String osName = System.getProperty("os.name").toLowerCase(); //$NON-NLS-1$
-			if (osName.equals("linux")) //$NON-NLS-1$
+			if (Platform.OS_LINUX.equals(Platform.getOS()))
 			{
 				try
 				{
 					_instance = (IJNotify) Class.forName("net.contentobjects.jnotify.linux.JNotifyAdapterLinux") //$NON-NLS-1$
 							.newInstance();
 				}
-				catch (Exception e)
+				catch (Throwable e)
 				{
 					FileWatcherPlugin.log(e);
 				}
 			}
-			else if (osName.startsWith("windows")) //$NON-NLS-1$
+			else if (Platform.OS_WIN32.equals(Platform.getOS()))
 			{
 				try
 				{
 					_instance = (IJNotify) Class.forName("net.contentobjects.jnotify.win32.JNotifyAdapterWin32") //$NON-NLS-1$
 							.newInstance();
 				}
-				catch (Exception e)
+				catch (Throwable e)
 				{
 					FileWatcherPlugin.log(e);
 				}
 			}
-			else if (osName.startsWith("mac os x")) //$NON-NLS-1$
+			else if (Platform.OS_MACOSX.equals(Platform.getOS()))
 			{
 				try
 				{
 					_instance = (IJNotify) Class
 							.forName("net.contentobjects.jnotify.macosx.JNotifyAdapterMacOSX").newInstance(); //$NON-NLS-1$
 				}
-				catch (Exception e)
+				catch (Throwable e)
 				{
 					FileWatcherPlugin.log(e);
 				}

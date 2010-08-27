@@ -71,27 +71,62 @@ public class CSSRuleNode extends CSSNode
 	}
 
 	@Override
+	public void addOffset(int offset)
+	{
+		super.addOffset(offset);
+		for (CSSSelectorNode node : fSelectors)
+		{
+			node.addOffset(offset);
+		}
+		for (CSSDeclarationNode node : fDeclarations)
+		{
+			node.addOffset(offset);
+		}
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!super.equals(obj) || !(obj instanceof CSSRuleNode))
+		{
+			return false;
+		}
+		CSSRuleNode other = (CSSRuleNode) obj;
+		return toString().equals(other.toString());
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return super.hashCode() * 31 + toString().hashCode();
+	}
+
+	@Override
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
-		for (int i = 0; i < fSelectors.length; ++i)
+		CSSSelectorNode[] selectors = getSelectors();
+		for (int i = 0; i < selectors.length; ++i)
 		{
-			text.append(fSelectors[i]);
-			if (i < fSelectors.length - 1)
+			text.append(selectors[i]);
+			if (i < selectors.length - 1)
 			{
 				text.append(", "); //$NON-NLS-1$
 			}
 		}
+
+		CSSDeclarationNode[] declarations = getDeclarations();
 		text.append(" {"); //$NON-NLS-1$
-		for (int i = 0; i < fDeclarations.length; ++i)
+		for (int i = 0; i < declarations.length; ++i)
 		{
-			text.append(fDeclarations[i]);
-			if (i < fDeclarations.length - 1)
+			text.append(declarations[i]);
+			if (i < declarations.length - 1)
 			{
 				text.append(" "); //$NON-NLS-1$
 			}
 		}
 		text.append("}"); //$NON-NLS-1$
+
 		return text.toString();
 	}
 }

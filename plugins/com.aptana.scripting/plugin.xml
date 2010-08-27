@@ -19,22 +19,31 @@
    <extension
          point="com.aptana.scripting.frameworkFiles">
       <file
-            name="radrails/bundle.rb">
+            name="ruble/bundle.rb">
       </file>
       <file
-            name="radrails/command.rb">
+            name="ruble/command.rb">
       </file>
       <file
-            name="radrails/logger.rb">
+            name="ruble/logger.rb">
       </file>
       <file
-            name="radrails/menu.rb">
+            name="ruble/menu.rb">
       </file>
       <file
-            name="radrails/snippet.rb">
+            name="ruble/snippet.rb">
       </file>
       <file
-            name="radrails/context.rb">
+            name="ruble/context.rb">
+      </file>
+      <file
+            name="ruble/platform.rb">
+      </file>
+      <file
+            name="ruble/template.rb">
+      </file>
+      <file
+            name="ruble/content_assist.rb">
       </file>
    </extension>
    <extension
@@ -44,6 +53,19 @@
             id="com.aptana.scripting.model.BundleSupportContextContributor"
             name="Bundle Support Context Contributor">
       </contributor>
+      <contributor
+            class="com.aptana.scripting.FullnameEnvContextContributor"
+            id="com.aptana.scripting.EnvContextContributor"
+            name="Environment Contributor">
+      </contributor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            id="com.aptana.scripting.context"
+            name="Aptana Scriptable Context"
+            parentId="org.eclipse.ui.contexts.window">
+      </context>
    </extension>
 
 </plugin>

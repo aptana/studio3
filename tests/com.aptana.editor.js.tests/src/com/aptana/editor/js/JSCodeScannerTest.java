@@ -10,26 +10,21 @@ import org.eclipse.jface.text.rules.Token;
 
 public class JSCodeScannerTest extends TestCase
 {
-
 	private JSCodeScanner scanner;
 
 	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		scanner = new JSCodeScanner()
-		{
-			protected IToken createToken(String string)
-			{
-				return getToken(string);
-			};
-		};
+		
+		scanner = new JSCodeScanner();
 	}
 
 	@Override
 	protected void tearDown() throws Exception
 	{
 		scanner = null;
+		
 		super.tearDown();
 	}
 
@@ -51,24 +46,24 @@ public class JSCodeScannerTest extends TestCase
 
 	public void testOperatorTokens()
 	{
-		String src = ">>>= <<= >>= === !== != <> <= >= == -- ++ && || ?: *= /= %= += -= &= ^= ! $ % & * - + ~ = < > ! / ";
+		String src = ">>>= >>> <<= >>= === !== >> << != <= >= == -- ++ && || *= /= %= += -= &= |= ^= ? ! % & * - + ~ = < > ^ | / ";
 		IDocument document = new Document(src);
 		scanner.setRange(document, 0, src.length());
 
 		assertToken(getToken("keyword.operator.js"), 0, 4);
 		assertToken(Token.WHITESPACE, 4, 1);
 
-		for (int i = 5; i < 21; i += 4)
+		for (int i = 5; i < 25; i += 4)
 		{
 			assertToken(src.substring(i, i + 4), getToken("keyword.operator.js"), i, 3);
 			assertToken(Token.WHITESPACE, i + 3, 1);
 		}
-		for (int i = 21; i < 72; i += 3)
+		for (int i = 25; i < 79; i += 3)
 		{
 			assertToken(src.substring(i, i + 3), getToken("keyword.operator.js"), i, 2);
 			assertToken(Token.WHITESPACE, i + 2, 1);
 		}
-		for (int i = 72; i < src.length(); i += 2)
+		for (int i = 79; i < src.length(); i += 2)
 		{
 			assertToken(src.substring(i, i + 2), getToken("keyword.operator.js"), i, 1);
 			assertToken(Token.WHITESPACE, i + 1, 1);
@@ -79,7 +74,7 @@ public class JSCodeScannerTest extends TestCase
 
 	public void testNumbers()
 	{
-		String src = "0xff 0X123 1 9.234";
+		String src = "0xff 0X123 1 9.234 1E8";
 		IDocument document = new Document(src);
 		scanner.setRange(document, 0, src.length());
 
@@ -90,6 +85,8 @@ public class JSCodeScannerTest extends TestCase
 		assertToken(getToken("constant.numeric.js"), 11, 1);
 		assertToken(Token.WHITESPACE, 12, 1);
 		assertToken(getToken("constant.numeric.js"), 13, 5);
+		assertToken(Token.WHITESPACE, 18, 1);
+		assertToken(getToken("constant.numeric.js"), 19, 3);
 	}
 
 	public void testConstantWords()
@@ -188,8 +185,7 @@ public class JSCodeScannerTest extends TestCase
 		assertToken(Token.WHITESPACE, 70, 1);
 		assertToken(getToken("keyword.operator.js"), 71, 1); // =
 		assertToken(Token.WHITESPACE, 72, 1);
-		assertToken(getToken("keyword.operator.js"), 73, 1); // $
-		assertToken(getToken("source.js"), 74, 1); // A
+		assertToken(getToken("source.js"), 73, 2); // $A
 		assertToken(getToken("meta.brace.round.js"), 75, 1); // (
 		assertToken(getToken("source.js"), 76, 9); // arguments
 		assertToken(getToken("meta.brace.round.js"), 85, 1); // )
@@ -214,6 +210,15 @@ public class JSCodeScannerTest extends TestCase
 		assertToken(Token.WHITESPACE, 129, 7);
 
 		// TODO Test all the rest of the lines! (Or at least the "interesting" parts with new token types
+	}
+
+	public void testUnderscoreInIdentifierWithKeyword()
+	{
+		String src = "add_child";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("source.js"), 0, 9);
 	}
 
 	private IToken getToken(String string)

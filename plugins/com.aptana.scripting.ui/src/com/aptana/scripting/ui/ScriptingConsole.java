@@ -1,89 +1,86 @@
 package com.aptana.scripting.ui;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.text.TextAttribute;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.SWTError;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.PlatformUI;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
-import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.ColorManager;
-import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.common.theme.Theme;
+import com.aptana.scripting.ScriptLogListener;
+import com.aptana.scripting.ScriptLogger;
+import com.aptana.theme.ConsoleThemer;
+import com.aptana.theme.extensions.ConsoleThemePageParticipant;
 
+/**
+ * Singleton for the scripting console.
+ */
 public class ScriptingConsole
 {
-	private static final String TEXTFONT_PROPERTY = "org.eclipse.jface.textfont";
-	private static final String CONSOLE_TRACE = "console.trace";
-	private static final String CONSOLE_WARNING = "console.warning";
-	private static final String CONSOLE_INFO = "console.info";
-	private static final String CONSOLE_ERROR = "console.error";
-	private static final String CONSOLE_OUTPUT = "console.output";
-	
 	private static final String CONSOLE_ICON_PATH = "icons/console.png"; //$NON-NLS-1$
 
 	private static ScriptingConsole INSTANCE;
-	
-	private static MessageConsole console;
-	private static MessageConsoleStream outputConsoleStream;
-	private static MessageConsoleStream errorConsoleStream;
-	private static MessageConsoleStream infoConsoleStream;
-	private static MessageConsoleStream warningConsoleStream;
-	private static MessageConsoleStream traceConsoleStream;
-	
-	private IPropertyChangeListener _fontChangeListener;
-	private IPreferenceChangeListener _themeChangeListener;
+	private MessageConsole console;
+	private MessageConsoleStream outputConsoleStream;
+	private MessageConsoleStream errorConsoleStream;
+	private MessageConsoleStream infoConsoleStream;
+	private MessageConsoleStream warningConsoleStream;
+	private MessageConsoleStream traceConsoleStream;
 
-	static
-	{
-		IWorkbench workbench = PlatformUI.getWorkbench();
-		final Display display = workbench.getDisplay();
-		
-		if (display != null)
-		{
-		}
-	}
-	
 	/**
-	 * ScriptingConsole
+	 * Singleton: private constructor
 	 */
 	private ScriptingConsole()
 	{
-		// create console
-		console = new MessageConsole(Messages.EarlyStartup_SCRIPTING_CONSOLE_NAME, ScriptingUIPlugin.getImageDescriptor(CONSOLE_ICON_PATH));
+		if (console == null)
+		{
+			console = new MessageConsole(Messages.EarlyStartup_SCRIPTING_CONSOLE_NAME, ScriptingUIPlugin
+					.getImageDescriptor(CONSOLE_ICON_PATH));
 
-		// register our console with Eclipse
-		ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { console });
-		
-		// create message streams
-		outputConsoleStream = console.newMessageStream();
-		errorConsoleStream = console.newMessageStream();
-		infoConsoleStream = console.newMessageStream();
-		warningConsoleStream = console.newMessageStream();
-		traceConsoleStream = console.newMessageStream();
-		
-		// setup theme listener
-		this.addListeners();
-		
-		// and apply colors
-		this.applyTheme();
+			// create message streams
+			outputConsoleStream = console.newMessageStream();
+			errorConsoleStream = console.newMessageStream();
+			infoConsoleStream = console.newMessageStream();
+			warningConsoleStream = console.newMessageStream();
+			traceConsoleStream = console.newMessageStream();
+
+			// bring console into view when errors occur
+			errorConsoleStream.setActivateOnWrite(true);
+
+			HashMap<MessageConsoleStream, String> themeConsoleStreamToColor = new HashMap<MessageConsoleStream, String>();
+			themeConsoleStreamToColor.put(outputConsoleStream, ConsoleThemer.CONSOLE_OUTPUT);
+			themeConsoleStreamToColor.put(errorConsoleStream, ConsoleThemer.CONSOLE_ERROR);
+			themeConsoleStreamToColor.put(infoConsoleStream, ConsoleThemer.CONSOLE_INFO);
+			themeConsoleStreamToColor.put(warningConsoleStream, ConsoleThemer.CONSOLE_WARNING);
+			themeConsoleStreamToColor.put(traceConsoleStream, ConsoleThemer.CONSOLE_TRACE);
+
+			// Will be used later on by the ConsoleThemePageParticipant to properly set the colors
+			// following the theme.
+			console.setAttribute(ConsoleThemePageParticipant.THEME_CONSOLE_STREAM_TO_COLOR_ATTRIBUTE,
+					themeConsoleStreamToColor);
+
+			// register our console with Eclipse
+			ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { console });
+		}
+	}
+
+	/**
+	 * Return the singleton instance of ScriptConsole. Should be called on UI thread.
+	 * 
+	 * @return
+	 */
+	public static synchronized ScriptingConsole getInstance()
+	{
+		if (INSTANCE == null)
+		{
+			INSTANCE = new ScriptingConsole();
+
+			INSTANCE.addListeners();
+		}
+
+		return INSTANCE;
 	}
 
 	/**
@@ -91,96 +88,9 @@ public class ScriptingConsole
 	 */
 	private void addListeners()
 	{
-		this.listenForFontChanges();
-		this.listenForThemeChanges();
+		this.listenForLoggingEvents();
 	}
-	
-	/**
-	 * applyTheme
-	 */
-	private void applyTheme()
-	{
-		IWorkbench workbench = PlatformUI.getWorkbench();
-		final Display display = workbench.getDisplay();
-		
-		if (display == null)
-		{
-			throw new IllegalStateException(new SWTError(SWT.ERROR_THREAD_INVALID_ACCESS));
-		}
-		
-		display.syncExec(new Runnable()
-		{
-			public void run()
-			{
-				// set colors
-				CommonEditorPlugin plugin = CommonEditorPlugin.getDefault();
-				ColorManager colorManager = plugin.getColorManager();
-				Theme theme = plugin.getThemeManager().getCurrentTheme();
-				
-				// set background color
-				console.setBackground(colorManager.getColor(theme.getBackground()));
-				console.setFont(JFaceResources.getTextFont());
-				
-				// set stream colors
-				applyTheme(CONSOLE_OUTPUT, outputConsoleStream, display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
-				applyTheme(CONSOLE_ERROR, errorConsoleStream, display.getSystemColor(SWT.COLOR_DARK_RED));
-				applyTheme(CONSOLE_INFO, infoConsoleStream, display.getSystemColor(SWT.COLOR_DARK_BLUE));
-				applyTheme(CONSOLE_WARNING, warningConsoleStream, display.getSystemColor(SWT.COLOR_DARK_YELLOW));
-				applyTheme(CONSOLE_TRACE, traceConsoleStream, display.getSystemColor(SWT.COLOR_DARK_GREEN));
-			}
-		});
-	}
-	
-	/**
-	 * applyTheme
-	 * 
-	 * @param name
-	 * @param stream
-	 * @param defaultColor
-	 * 
-	 * @return
-	 */
-	private void applyTheme(String name, MessageConsoleStream stream, Color defaultColor)
-	{
-		IConsoleManager consoleManager = ConsolePlugin.getDefault().getConsoleManager();
-		Theme theme = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme();
-		Color color = defaultColor;
-		int style = SWT.NONE;
-		
-		// grab theme values, if they exist
-		if (theme.hasEntry(name))
-		{
-			TextAttribute attr = theme.getTextAttribute(name);
-			
-			color = theme.getForeground(name);
-			style = attr.getStyle();
-		}
-		
-		// apply new values
-		stream.setColor(color);
-		stream.setFontStyle(style);
-		
-		// refresh the display
-		consoleManager.refresh(stream.getConsole());
-	}
-	
-	/**
-	 * Return the singleton instance of ScriptConsole. Should be called on UI thread.
-	 * <p>
-	 * Throws IllegalStateException if unable to get the Display which most likely happens when called on non-UI thread.
-	 * 
-	 * @return
-	 */
-	public static ScriptingConsole getDefault()
-	{
-		if (INSTANCE == null)
-		{
-			INSTANCE = new ScriptingConsole();
-		}
-		
-		return INSTANCE;
-	}
-	
+
 	/**
 	 * getErrorConsoleStream
 	 * 
@@ -232,98 +142,55 @@ public class ScriptingConsole
 	}
 
 	/**
-	 * listenForFontChanges
+	 * listenForLoggingEvents
 	 */
-	private void listenForFontChanges()
+	private void listenForLoggingEvents()
 	{
-		this._fontChangeListener = new IPropertyChangeListener()
+		// create our scripting log listener and register it
+		ScriptLogger.getInstance().addLogListener(new ScriptLogListener()
 		{
-			@Override
-			public void propertyChange(PropertyChangeEvent event)
-			{
-				if (event.getProperty().equals(TEXTFONT_PROPERTY))
-				{
-					applyTheme();
-				}
-			}
-		};
-		JFaceResources.getFontRegistry().addListener(this._fontChangeListener);
-	}
-	
-	/**
-	 * listenForThemeChanges
-	 */
-	private void listenForThemeChanges()
-	{
-		this._themeChangeListener = new IPreferenceChangeListener()
-		{
-			@Override
-			public void preferenceChange(PreferenceChangeEvent event)
-			{
-				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
-				{
-					applyTheme();
-				}
-			}
-		};
-		
-		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(this._themeChangeListener);
-	}
-	
-	/**
-	 * print
-	 * 
-	 * @param stream
-	 * @param output
-	 */
-	private static void print(final MessageConsoleStream stream, final String output)
-	{
-		Job job = new Job("Writing to console") //$NON-NLS-1$
-		{
-			@Override
-			protected IStatus run(IProgressMonitor monitor)
-			{
-				stream.print(output);
-				return Status.OK_STATUS;
-			}
-		};
-		
-		job.setSystem(true);
-		job.setPriority(Job.SHORT);
-		job.schedule();
-	}
-	
-	/**
-	 * print
-	 * 
-	 * @param output
-	 */
-	public void print(String output)
-	{
-		print(getOutputConsoleStream(), output);
-		showConsole();
-	}
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$
 
-	/**
-	 * printErr
-	 * 
-	 * @param output
-	 */
-	public void printErr(String output)
-	{
-		print(getErrorConsoleStream(), output);
-		showConsole();
-	}
+			private String formatMessage(String message)
+			{
+				return "[" + this.getDateTimeStamp() + "] " + message; //$NON-NLS-1$ //$NON-NLS-2$
+			}
 
-	/**
-	 * showConsole
-	 */
-	private void showConsole()
-	{
-		if (console != null)
-		{
-			console.activate();
-		}
+			private String getDateTimeStamp()
+			{
+				return format.format(new Date());
+			}
+
+			public void logError(String error)
+			{
+				getErrorConsoleStream().println(this.formatMessage(error));
+			}
+
+			public void logInfo(String info)
+			{
+				getInfoConsoleStream().println(this.formatMessage(info));
+			}
+
+			public void logWarning(String warning)
+			{
+				getWarningConsoleStream().println(this.formatMessage(warning));
+			}
+
+			public void print(String message)
+			{
+				getOutputConsoleStream().println(message);
+			}
+
+			public void printError(String message)
+			{
+				getErrorConsoleStream().println(message);
+			}
+
+			public void trace(String message)
+			{
+				getTraceConsoleStream().println(this.formatMessage(message));
+			}
+		});
 	}
 
 }

@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -42,4 +42,8 @@ package com.aptana.editor.css;
 public interface ICSSConstants {
 
 	public String CONTENT_TYPE_CSS = "com.aptana.contenttype.css"; //$NON-NLS-1$
+	
+	public String CSS_SCOPE = "source.css"; //$NON-NLS-1$
+	public String CSS_COMMENT_BLOCK_SCOPE = "comment.block.css"; //$NON-NLS-1$
+	public String CSS_STRING_SCOPE = "string.quoted.single.css"; //$NON-NLS-1$
 }

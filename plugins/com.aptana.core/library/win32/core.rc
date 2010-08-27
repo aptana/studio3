@@ -1,0 +1,35 @@
+ 
+#include "windows.h"
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION CORE_COMMA_VERSION
+ PRODUCTVERSION PRODUCT_COMMA_VERSION
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40000L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "CompanyName", "Aptana Inc.\0"
+            VALUE "FileDescription", "Core platform support library\0"
+            VALUE "FileVersion", CORE_FILE_VERSION
+            VALUE "InternalName", "core\0"
+            VALUE "LegalCopyright", "Copyright (c) 2005-2010 Aptana, Inc.  All Rights Reserved.\0"
+            VALUE "OriginalFilename", CORE_ORG_FILENAME
+            VALUE "ProductName", "Aptana Studio\0"
+            VALUE "ProductVersion", PRODUCT_VERSION
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END

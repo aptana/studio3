@@ -17,12 +17,12 @@ public class CommandResult
 
 	/**
 	 * CommandResult
-	 * 
-	 * @param output
 	 */
-	public CommandResult(String output)
+	public CommandResult(CommandElement command, CommandContext context)
 	{
-		this._outputString = output;
+		this._command = command;
+		this._context = context;
+		this._outputType = (context != null) ? context.getOutputType() : OutputType.UNDEFINED;
 	}
 
 	/**
@@ -74,7 +74,7 @@ public class CommandResult
 	{
 		return this._errorString;
 	}
-
+	
 	/**
 	 * getInputType
 	 * 
@@ -102,7 +102,14 @@ public class CommandResult
 	 */
 	public String getOutputString()
 	{
-		return this._outputString;
+		String result = this._outputString;
+		
+		if (result == null && this._outputStream != null)
+		{
+			result = this._outputStream.toString();
+		}
+		
+		return result;
 	}
 
 	/**
@@ -123,27 +130,6 @@ public class CommandResult
 	public int getReturnValue()
 	{
 		return this._returnValue;
-	}
-	
-	/**
-	 * setCommand
-	 * 
-	 * @param command
-	 */
-	void setCommand(CommandElement command)
-	{
-		this._command = command;
-	}
-
-	/**
-	 * setContext
-	 * 
-	 * @param context
-	 */
-	void setContext(CommandContext context)
-	{
-		this._context = context;
-		this._outputType = (context != null) ? context.getOutputType() : OutputType.UNDEFINED;
 	}
 
 	/**
@@ -166,6 +152,36 @@ public class CommandResult
 		this._inputType = inputType;
 	}
 
+	/**
+	 * setOutputStream
+	 * 
+	 * @param output
+	 */
+	void setOutputStream(OutputStream output)
+	{
+		this._outputStream = output;
+	}
+	
+	/**
+	 * setOutputString
+	 * 
+	 * @param output
+	 */
+	void setOutputString(String output)
+	{
+		this._outputString = output;
+	}
+
+	/**
+	 * Set the error string
+	 * 
+	 * @param err
+	 */
+	void setErrorString(String err)
+	{
+		this._errorString = err;
+	}
+	
 	/**
 	 * setReturnValue
 	 * 

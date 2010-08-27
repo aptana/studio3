@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
@@ -50,7 +51,9 @@ import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.text.rules.CompositePartitionScanner;
 import com.aptana.editor.common.text.rules.SingleTagRule;
-import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.ThemePlugin;
 
 /**
  * @author Max Stepanov
@@ -104,10 +107,9 @@ public abstract class CompositeSourceViewerConfiguration extends CommonSourceVie
 	@Override
 	public final String[] getConfiguredContentTypes(ISourceViewer sourceViewer)
 	{
-		return TextUtils
-				.combine(new String[][] { CompositePartitionScanner.SWITCHING_CONTENT_TYPES,
-						primarySourceViewerConfiguration.getContentTypes(),
-						defaultSourceViewerConfiguration.getContentTypes() });
+		return TextUtils.combine(new String[][] { { IDocument.DEFAULT_CONTENT_TYPE },
+				CompositePartitionScanner.SWITCHING_CONTENT_TYPES, primarySourceViewerConfiguration.getContentTypes(),
+				defaultSourceViewerConfiguration.getContentTypes() });
 	}
 
 	/*
@@ -133,7 +135,7 @@ public abstract class CompositeSourceViewerConfiguration extends CommonSourceVie
 	{
 		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
 
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getStartEndTokenScanner());
+		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getStartEndTokenScanner());
 		reconciler.setDamager(dr, CompositePartitionScanner.START_SWITCH_TAG);
 		reconciler.setRepairer(dr, CompositePartitionScanner.START_SWITCH_TAG);
 		reconciler.setDamager(dr, CompositePartitionScanner.END_SWITCH_TAG);
@@ -170,6 +172,6 @@ public abstract class CompositeSourceViewerConfiguration extends CommonSourceVie
 
 	protected IThemeManager getThemeManager()
 	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
+		return ThemePlugin.getDefault().getThemeManager();
 	}
 }

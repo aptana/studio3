@@ -11,7 +11,7 @@ public class CommandTests extends BundleTestBase
 	 */
 	protected String executeCommand(String bundleName, String commandName)
 	{
-		BundleElement bundle = this.loadBundle(bundleName, BundleScope.PROJECT);
+		BundleElement bundle = this.loadBundle(bundleName, BundlePrecedence.PROJECT);
 
 		// get command
 		CommandElement command = bundle.getCommandByName(commandName);
@@ -32,7 +32,10 @@ public class CommandTests extends BundleTestBase
 	{
 		String resultText = this.executeCommand("invokeString", "Test");
 		
-		assertEquals("hello\n", resultText);
+		// NOTE: we have to use endsWith here because msysgit prints out /etc/motd
+		// when using 'bash -l'. Most likely users will turn this off, but we need
+		// to perform the test this way to pass in a default install
+		assertTrue(resultText.endsWith("hello string"));
 	}
 
 	/**
@@ -43,5 +46,15 @@ public class CommandTests extends BundleTestBase
 		String resultText = this.executeCommand("invokeBlock", "Test");
 		
 		assertEquals("hello", resultText);
+	}
+	
+	/**
+	 * testRequireInBlock
+	 */
+	public void testRequireInBlock()
+	{
+		String resultText = this.executeCommand("requireInCommand", "MyCommand");
+		
+		assertEquals("My Thing Name", resultText);
 	}
 }

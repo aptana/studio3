@@ -5,12 +5,11 @@ Bundle-SymbolicName: com.aptana.editor.common;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.aptana.editor.common.CommonEditorPlugin
 Bundle-Vendor: %providerName
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
- org.eclipse.core.resources,
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources;bundle-version="3.4.0",
+ org.eclipse.ui,
  org.eclipse.jface.text,
  org.eclipse.core.expressions,
- org.eclipse.core.filesystem,
  org.eclipse.ui.editors,
  org.eclipse.ui.console,
  org.eclipse.ui.ide,
@@ -18,16 +17,34 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.editor.findbar;bundle-version="1.0.0",
  com.aptana.scripting,
  org.eclipse.ui.workbench.texteditor,
- plistreader;bundle-version="1.0.0",
- com.aptana.parsing
+ com.aptana.core;bundle-version="3.0.0",
+ com.aptana.ui.epl;bundle-version="1.0.0",
+ com.aptana.parsing,
+ org.jruby;bundle-version="1.4.0",
+ com.aptana.git.core;bundle-version="1.0.0",
+ com.aptana.usage,
+ com.aptana.core,
+ com.aptana.index.core;bundle-version="2.0.0",
+ com.aptana.ui;bundle-version="3.0.0",
+ beaver;bundle-version="1.0.0",
+ com.aptana.theme,
+ com.aptana.terminal;bundle-version="1.0.0",
+ com.aptana.org.eclipse.tm.terminal;bundle-version="3.0.100"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.common,
+ com.aptana.editor.common.contentassist,
+ com.aptana.editor.common.extensions,
  com.aptana.editor.common.outline,
+ com.aptana.editor.common.parsing,
  com.aptana.editor.common.preferences,
+ com.aptana.editor.common.resolver,
+ com.aptana.editor.common.scripting,
+ com.aptana.editor.common.scripting.commands,
+ com.aptana.editor.common.scripting.snippets,
  com.aptana.editor.common.text,
- com.aptana.editor.common.text.rules,
- com.aptana.editor.common.theme,
- com.aptana.editor.common.tmp
-Import-Package: com.aptana.util
+ com.aptana.editor.common.text.hyperlink,
+ com.aptana.editor.common.text.rules
+Eclipse-ExtensibleAPI: true
+Bundle-ClassPath: .

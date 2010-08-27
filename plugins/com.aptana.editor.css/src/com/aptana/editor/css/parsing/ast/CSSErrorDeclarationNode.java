@@ -5,7 +5,6 @@ public class CSSErrorDeclarationNode extends CSSDeclarationNode
 
 	public CSSErrorDeclarationNode(int start, int end)
 	{
-		this.start = start;
-		this.end = end;
+		super(start, end);
 	}
 }

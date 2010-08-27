@@ -9,11 +9,8 @@ import junit.framework.TestCase;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.FastPartitioner;
+import org.eclipse.jface.text.rules.IPartitionTokenScanner;
 import org.eclipse.jface.text.rules.IToken;
-
-import com.aptana.editor.ruby.MergingPartitionScanner;
-import com.aptana.editor.ruby.RubySourceConfiguration;
-import com.aptana.editor.ruby.RubySourcePartitionScanner;
 
 /**
  * @author Chris
@@ -62,6 +59,12 @@ public class RubySourcePartitionScannerTest extends TestCase
 				+ "  private\n"
 				+ "############################################################################################ \n"
 				+ "end", 0);
+		assert (true);
+	}
+
+	public void testDivideAndRegexInHeredocInterpolation()
+	{
+		getContentType("test.execute <<END\n" + "#{/[0-9]+/ / 5}\n" + "END", 0);
 		assert (true);
 	}
 
@@ -178,18 +181,14 @@ public class RubySourcePartitionScannerTest extends TestCase
 
 	public void testCommentAtEndOfLineWithStringAtBeginning()
 	{
-		String code = "hash = {\n" + 
-		"  \"string\" => { # comment\n" + 
-		"    123\n" + 
-		"  }\n" + 
-		"}";
+		String code = "hash = {\n" + "  \"string\" => { # comment\n" + "    123\n" + "  }\n" + "}";
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 0);
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 4);
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 6);
 
-		assertContentType(RubySourceConfiguration.STRING, code, 11);
-		assertContentType(RubySourceConfiguration.STRING, code, 12);
-		assertContentType(RubySourceConfiguration.STRING, code, 18);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 11);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 12);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 18);
 
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 19);
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 22);
@@ -199,11 +198,7 @@ public class RubySourcePartitionScannerTest extends TestCase
 
 	public void testLinesWithJustSpaceBeforeComment()
 	{
-		String code = "  \n" + 
-		"  # comment\n" + 
-		"  def method\n" + 
-		"    \n" + 
-		"  end";
+		String code = "  \n" + "  # comment\n" + "  def method\n" + "    \n" + "  end";
 		assertContentType(RubySourceConfiguration.SINGLE_LINE_COMMENT, code, 5);
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 17);
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 20);
@@ -211,9 +206,7 @@ public class RubySourcePartitionScannerTest extends TestCase
 
 	public void testCommentsWithAlotOfPrecedingSpaces()
 	{
-		String code = "                # We \n" + 
-		"                # caller-requested until.\n" + 
-		"return self\n";
+		String code = "                # We \n" + "                # caller-requested until.\n" + "return self\n";
 		assertContentType(RubySourceConfiguration.SINGLE_LINE_COMMENT, code, 16);
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 64);
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 70);
@@ -223,57 +216,57 @@ public class RubySourcePartitionScannerTest extends TestCase
 	{
 		String code = "string = \"here's some code: #{1} there\"";
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 2); // st'r'...
-		assertContentType(RubySourceConfiguration.STRING, code, 10); // "'h'er...
-		assertContentType(RubySourceConfiguration.STRING, code, 28); // '#'{1...
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 10); // "'h'er...
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 28); // '#'{1...
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 30); // '1'} t...
-		assertContentType(RubySourceConfiguration.STRING, code, 31); // '}' th...
-		assertContentType(RubySourceConfiguration.STRING, code, 35); // th'e're..
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 31); // '}' th...
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 35); // th'e're..
 	}
 
 	public void testCodeWithinSingleQuoteString()
 	{
 		String code = "string = 'here s some code: #{1} there'";
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 2); // st'r'...
-		assertContentType(RubySourceConfiguration.STRING, code, 10); // "'h'er...
-		assertContentType(RubySourceConfiguration.STRING, code, 28); // '#'{1...
-		assertContentType(RubySourceConfiguration.STRING, code, 30); // '1'} t...
-		assertContentType(RubySourceConfiguration.STRING, code, 31); // '}' th...
-		assertContentType(RubySourceConfiguration.STRING, code, 35); // th'e're..
+		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 10); // "'h'er...
+		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 28); // '#'{1...
+		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 30); // '1'} t...
+		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 31); // '}' th...
+		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 35); // th'e're..
 	}
 
 	public void testVariableSubstitutionWithinString()
 	{
 		String code = "string = \"here's some code: #$global there\"";
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 2); // st'r'...
-		assertContentType(RubySourceConfiguration.STRING, code, 10); // "'h'er...
-		assertContentType(RubySourceConfiguration.STRING, code, 28); // '#'$glo...
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 10); // "'h'er...
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 28); // '#'$glo...
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 29); // '$'global
-		assertContentType(RubySourceConfiguration.STRING, code, 36);// ' 'there...
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 36);// ' 'there...
 	}
 
 	public void testStringWithinCodeWithinString()
 	{
 		String code = "string = \"here's some code: #{var = 'string'} there\"";
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 2); // st'r'...
-		assertContentType(RubySourceConfiguration.STRING, code, 10); // "'h'er...
-		assertContentType(RubySourceConfiguration.STRING, code, 28); // '#'{var
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 10); // "'h'er...
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 28); // '#'{var
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 30); // 'v'ar =
-		assertContentType(RubySourceConfiguration.STRING, code, 36); // '''string
-		assertContentType(RubySourceConfiguration.STRING, code, 46); // 't'here
+		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 36); // '''string
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 46); // 't'here
 	}
 
 	public void testStringWithEndBraceWithinCodeWithinString()
 	{
 		String code = "string = \"here's some code: #{var = '}'; 1} there\"";
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 2); // st'r'...
-		assertContentType(RubySourceConfiguration.STRING, code, 10); // "'h'er...
-		assertContentType(RubySourceConfiguration.STRING, code, 28); // '#'{var
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 10); // "'h'er...
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 28); // '#'{var
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 30); // 'v'ar =
-		assertContentType(RubySourceConfiguration.STRING, code, 37); // '}';
+		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 37); // '}';
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 39); // ';' 1}
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 41); // ; '1'}
-		assertContentType(RubySourceConfiguration.STRING, code, 42); // 1'}' t
-		assertContentType(RubySourceConfiguration.STRING, code, 44); // 't'here
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 42); // 1'}' t
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 44); // 't'here
 	}
 
 	public void testRegex()
@@ -296,13 +289,13 @@ public class RubySourcePartitionScannerTest extends TestCase
 	{
 		String code = "quoted_value = \"'#{quoted_value[1..-2].gsub(/\\'/, \"\\\\\\\\'\")}'\" if quoted_value.include?(\"\\\\\\'\") # (for ruby mode) \"\n"
 				+ "quoted_value";
-		assertContentType(RubySourceConfiguration.STRING, code, 16); // 
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 16); //
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 19); // #{'q'uoted
 		assertContentType(RubySourceConfiguration.REGULAR_EXPRESSION, code, 44); // /
-		assertContentType(RubySourceConfiguration.STRING, code, 51); // "\
-		assertContentType(RubySourceConfiguration.STRING, code, 59); // '" if
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 51); // "\
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 59); // '" if
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 62); // 'i'f quoted_
-		assertContentType(RubySourceConfiguration.STRING, code, 87); // include?('"'
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 87); // include?('"'
 		assertContentType(RubySourceConfiguration.SINGLE_LINE_COMMENT, code, 95); // '#' (for ruby mode)
 		assertContentType(RubySourceConfiguration.DEFAULT, code, code.length() - 3);
 	}
@@ -311,11 +304,11 @@ public class RubySourcePartitionScannerTest extends TestCase
 	{
 		String code = "require 'commands/server'";
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 1);
-		assertContentType(RubySourceConfiguration.STRING, code, 8);
-		assertContentType(RubySourceConfiguration.STRING, code, 9);
-		assertContentType(RubySourceConfiguration.STRING, code, 17);
-		assertContentType(RubySourceConfiguration.STRING, code, 18);
-		assertContentType(RubySourceConfiguration.STRING, code, 24);
+		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 8);
+		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 9);
+		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 17);
+		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 18);
+		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 24);
 	}
 
 	public void testCommands()
@@ -327,7 +320,7 @@ public class RubySourcePartitionScannerTest extends TestCase
 		assertContentType(RubySourceConfiguration.COMMAND, code, 23);
 		assertContentType(RubySourceConfiguration.COMMAND, code, 38);
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 50);
-		assertContentType(RubySourceConfiguration.STRING, code, 55);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 55);
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 58);
 		assertContentType(RubySourceConfiguration.COMMAND, code, 59);
 		assertContentType(RubySourceConfiguration.COMMAND, code, 63);
@@ -352,35 +345,35 @@ public class RubySourcePartitionScannerTest extends TestCase
 				+ "  DELETE FROM #{self.class.table_name}\n"
 				+ "  WHERE #{connection.quote_column_name(self.class.primary_key)} = #{quoted_id}\n" + "end_sql\n";
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 1); // c'o'nnection
-		assertContentType(RubySourceConfiguration.STRING, code, 18); // '<'<-end_sql
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 18); // '<'<-end_sql
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 33); // 's'elf.class
-		assertContentType(RubySourceConfiguration.STRING, code, 48); // '}' Destroy
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 48); // '}' Destroy
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 75); // 's'elf.class
-		assertContentType(RubySourceConfiguration.STRING, code, 96); // name'}'\n
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 96); // name'}'\n
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 108); // {'c'onnection
-		assertContentType(RubySourceConfiguration.STRING, code, 160); // '}' =
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 160); // '}' =
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 166); // {'q'uoted
-		assertContentType(RubySourceConfiguration.STRING, code, 175); // _id'}'\n
-		assertContentType(RubySourceConfiguration.STRING, code, 177); // 'e'nd_sql
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 175); // _id'}'\n
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 177); // 'e'nd_sql
 	}
 
 	public void testScaryString()
 	{
 		String code = "puts \"match|#{$`}<<#{$&}>>#{$'}|\"\n" + "pp $~";
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 1); // p'u'ts
-		assertContentType(RubySourceConfiguration.STRING, code, 5); // '"'match
-		assertContentType(RubySourceConfiguration.STRING, code, 13); // #'{'$`
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 5); // '"'match
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 13); // #'{'$`
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 14); // $
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 15); // `
-		assertContentType(RubySourceConfiguration.STRING, code, 16); // }
-		assertContentType(RubySourceConfiguration.STRING, code, 20); // {
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 16); // }
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 20); // {
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 21); // $
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 22); // &
-		assertContentType(RubySourceConfiguration.STRING, code, 23); // }
-		assertContentType(RubySourceConfiguration.STRING, code, 27); // {
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 23); // }
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 27); // {
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 28); // $
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 29); // '
-		assertContentType(RubySourceConfiguration.STRING, code, 30); // }
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 30); // }
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 34); // 'p'p $~
 	}
 
@@ -389,37 +382,34 @@ public class RubySourcePartitionScannerTest extends TestCase
 
 	public void testBraceFinderHandlesWeirdGlobal()
 	{
-		RubySourcePartitionScanner.EndBraceFinder finder = new RubySourcePartitionScanner.EndBraceFinder("$'}|\"\npp $~");
+		RubySourcePartitionScanner.EndBraceFinder finder = new RubySourcePartitionScanner.EndBraceFinder(
+				"$'}|\"\npp $~");
 		assertEquals(2, finder.find());
 	}
 
 	public void testNestedHeredocs()
 	{
 		String code = "methods += <<-BEGIN + nn_element_def(element) + <<-END\n"
-				+ "  def #{element.downcase}(attributes = {})\n" + 
-				"BEGIN\n" + 
-				"  end\n" + 
-				"END\n" + 
-				"\n" +
-				"puts :symbol\n";
+				+ "  def #{element.downcase}(attributes = {})\n" + "BEGIN\n" + "  end\n" + "END\n" + "\n"
+				+ "puts :symbol\n";
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 1);
 		// _<_<-BEGIN
-		assertContentType(RubySourceConfiguration.STRING, code, 11);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 11);
 		// <<-BEGI_N_
-		assertContentType(RubySourceConfiguration.STRING, code, 18);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 18);
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 20);
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 46);
-		assertContentType(RubySourceConfiguration.STRING, code, 48);
-		assertContentType(RubySourceConfiguration.STRING, code, 62); // #'{'
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 48);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 62); // #'{'
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 63); // #{'e'lem
-		assertContentType(RubySourceConfiguration.STRING, code, 79); // case'}'
-		
-		assertContentType(RubySourceConfiguration.STRING, code, 80); // }'('att
-		assertContentType(RubySourceConfiguration.STRING, code, 96); // )
-		assertContentType(RubySourceConfiguration.STRING, code, 102); // BEGI'N'
-		assertContentType(RubySourceConfiguration.STRING, code, 108); // en'd'
-		
-		assertContentType(RubySourceConfiguration.STRING, code, 112); // EN'D'
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 79); // case'}'
+
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 80); // }'('att
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 96); // )
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 102); // BEGI'N'
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 108); // en'd'
+
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 112); // EN'D'
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 115); // 'p'uts
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 120); // ':'sym
 	}
@@ -430,12 +420,12 @@ public class RubySourcePartitionScannerTest extends TestCase
 				+ "    \"#{controller_class_name}Helper\"";
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 1);
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 40);
-		assertContentType(RubySourceConfiguration.STRING, code, 48);
-		assertContentType(RubySourceConfiguration.STRING, code, 50);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 48);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 50);
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 51);
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 71);
-		assertContentType(RubySourceConfiguration.STRING, code, 72);
-		assertContentType(RubySourceConfiguration.STRING, code, 83);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 72);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 83);
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 84);
 		assertContentType(RubySourceConfiguration.SINGLE_LINE_COMMENT, code, 86);
 	}
@@ -446,42 +436,120 @@ public class RubySourcePartitionScannerTest extends TestCase
 		assertContentType(RubySourceConfiguration.MULTI_LINE_COMMENT, code, 0);
 		assertContentType(RubySourceConfiguration.MULTI_LINE_COMMENT, code, 32); // =en'd'
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 36); // 'r'equire
-		assertContentType(RubySourceConfiguration.STRING, code, 44);
+		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 44);
 	}
 
 	public void testROR255()
 	{
 		String code = "\"all_of(#{@matchers.map { |matcher| matcher.mocha_inspect }.join(\", \") })\"";
-		assertContentType(RubySourceConfiguration.STRING, code, 1); // "'a'll_of
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 1); // "'a'll_of
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 10); // #{'@'match
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 60); // }.'j'oin
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 70);
-		assertContentType(RubySourceConfiguration.STRING, code, 71); // ) '}')"
-		assertContentType(RubySourceConfiguration.STRING, code, 72); // ) }')'"
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 71); // ) '}')"
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 72); // ) }')'"
 	}
 
 	public void testROR950()
 	{
 		String code = "config.load_paths += [\"#{RAILS_ROOT}/vendor/plugins/sql_session_store/lib\"]";
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 0); // 'c'onfig
-		assertContentType(RubySourceConfiguration.STRING, code, 22); // ['"'#{
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 22); // ['"'#{
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 25); // #{'R'
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 34);
-		assertContentType(RubySourceConfiguration.STRING, code, 36); // '/'vendor
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 36); // '/'vendor
 
 		code = "config.load_paths += %W(#{RAILS_ROOT}/vendor/plugins/sql_session_store/lib)";
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 0); // 'c'onfig
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 26); // #{'R'
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 35); // OO'T'}
-		assertContentType(RubySourceConfiguration.STRING, code, 37); // '/'vendor
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 37); // '/'vendor
 	}
+
+	public void testSmallQString()
+	{
+		String code = "%q(string)";
+		for (int i = 0; i < code.length(); i++)
+		{
+			assertContentType(RubySourceConfiguration.STRING_SINGLE, code, i);
+		}
+	}
+
+	public void testLargeQString()
+	{
+		String code = "%Q(string)";
+		for (int i = 0; i < code.length(); i++)
+		{
+			assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, i);
+		}
+	}
+
+	public void testPercentXCommand2()
+	{
+		String code = "%x(command)";
+		for (int i = 0; i < code.length(); i++)
+		{
+			assertContentType(RubySourceConfiguration.COMMAND, code, i);
+		}
+	}
+
+	public void testPercentSyntax()
+	{
+		String code = "%(unknown)";
+		for (int i = 0; i < code.length(); i++)
+		{
+			assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, i);
+		}
+	}
+
+	public void testPercentSSymbol()
+	{
+		String code = "%s(symbol)";
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 0);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 1);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 2);
+		for (int i = 3; i < code.length(); i++)
+		{
+			assertContentType(RubySourceConfiguration.STRING_SINGLE, code, i);
+		}
+	}
+
+	public void testSmallWString()
+	{
+		String code = "%w(string two)";
+		for (int i = 0; i < code.length(); i++)
+		{
+			assertContentType(RubySourceConfiguration.STRING_SINGLE, code, i);
+		}
+	}
+
+	public void testLargeWString()
+	{
+		String code = "%W(string two)";
+		for (int i = 0; i < code.length(); i++)
+		{
+			assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, i);
+		}
+	}
+
+	public void testSingleQuotedHeredoc()
+	{
+		String code = "heredoc =<<'END'\n  hello world!\nEND\n";
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 0);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 8);
+		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 9);
+		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 32);
+	}
+
+	// TODO Write tests for nested heredocs and heredocs in middle of line with the heredoc being single-quoted (or
+	// mixture)
 
 	public void testROR975()
 	{
 		String code = "exist_sym = :\"#{row['PROVVPI']}.#{row['vpi']}.#{row['vci']}.#{row['seq_num']}\"";
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 0); // 'e'xist
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 12); // ':'
-		assertContentType(RubySourceConfiguration.STRING, code, 13); // '"'#
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 13); // '"'#
 	}
 
 	public void testROR1278()
@@ -503,7 +571,7 @@ public class RubySourcePartitionScannerTest extends TestCase
 		// warn
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 0);
 		// "Warning
-		assertContentType(RubySourceConfiguration.STRING, code, 5);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 5);
 		// caller
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 16);
 		// /'/
@@ -512,12 +580,12 @@ public class RubySourcePartitionScannerTest extends TestCase
 		// ,
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 33);
 		// ''
-		assertContentType(RubySourceConfiguration.STRING, code, 35);
-		assertContentType(RubySourceConfiguration.STRING, code, 36);
+		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 35);
+		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 36);
 		// )
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 37);
 		// }: cgi-lib
-		assertContentType(RubySourceConfiguration.STRING, code, 38);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 38);
 	}
 
 	public void testROR1307StringSymbols()
@@ -536,30 +604,30 @@ public class RubySourcePartitionScannerTest extends TestCase
 		// send(':'
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 67);
 		// "to_#{
-		assertContentType(RubySourceConfiguration.STRING, code, 68);
-		assertContentType(RubySourceConfiguration.STRING, code, 73);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 68);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 73);
 		// type
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 74);
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 77);
 		// }"
-		assertContentType(RubySourceConfiguration.STRING, code, 78);
-		assertContentType(RubySourceConfiguration.STRING, code, 79);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 78);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 79);
 		// , number)
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 80);
 		// "#{
-		assertContentType(RubySourceConfiguration.STRING, code, 91);
-		assertContentType(RubySourceConfiguration.STRING, code, 93);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 91);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 93);
 		// type
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 94);
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 97);
 		// } failed on Ruby number -> array"
-		assertContentType(RubySourceConfiguration.STRING, code, 98);
-		assertContentType(RubySourceConfiguration.STRING, code, 130);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 98);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 130);
 		// assert_equal
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 137);
 		// 'Failed on signed_to_udword'
-		assertContentType(RubySourceConfiguration.STRING, code, 183);
-		assertContentType(RubySourceConfiguration.STRING, code, 210);
+		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 183);
+		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 210);
 	}
 
 	public void testROR1248()
@@ -573,13 +641,13 @@ public class RubySourcePartitionScannerTest extends TestCase
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 11); // f
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 17); // (
 		// '"'
-		assertContentType(RubySourceConfiguration.STRING, code, 18); // '
-		assertContentType(RubySourceConfiguration.STRING, code, 20); // '
+		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 18); // '
+		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 20); // '
 		// ,
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 21); // ,
 		// '\"'
-		assertContentType(RubySourceConfiguration.STRING, code, 22); // '
-		assertContentType(RubySourceConfiguration.STRING, code, 25); // '
+		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 22); // '
+		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 25); // '
 		// )
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 26);
 		// }"`
@@ -589,62 +657,147 @@ public class RubySourcePartitionScannerTest extends TestCase
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 33);
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 36);
 		// "syntax hilighting broken here"
-		assertContentType(RubySourceConfiguration.STRING, code, 38);
-		assertContentType(RubySourceConfiguration.STRING, code, 68);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 38);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 68);
 	}
 
 	public void testCGI()
 	{
-		String src = "module TagMaker # :nodoc:\n" + 
-		"		\n" + 
-		"    # Generate code for an element with required start and end tags.\n" + 
-		"    #\n" +
-		"    #   - -\n" + 
-		"    def nn_element_def(element)\n" + 
-		"      nOE_element_def(element, <<-END)\n" +
-		"          if block_given?\n" + 
-		"            yield.to_s\n" + 
-		"          else\n" +
-		"            \"\"\n" + 
-		"          end +\n" + 
-		"          \"</#{element.upcase}>\"\n" + 
-		"      END\n" +
-		"    end\n" + 
-		"    \n" + 
-		"    # Generate code for an empty element.\n" + 
-		"    #\n" +
-		"    #   - O EMPTY\n" + 
-		"    def nOE_element_def(element, append = nil)\n" + 
-		"   end\n" + 
-		"end";
+		String src = "module TagMaker # :nodoc:\n" + "		\n"
+				+ "    # Generate code for an element with required start and end tags.\n" + "    #\n"
+				+ "    #   - -\n" + "    def nn_element_def(element)\n" + "      nOE_element_def(element, <<-END)\n"
+				+ "          if block_given?\n" + "            yield.to_s\n" + "          else\n"
+				+ "            \"\"\n" + "          end +\n" + "          \"</#{element.upcase}>\"\n" + "      END\n"
+				+ "    end\n" + "    \n" + "    # Generate code for an empty element.\n" + "    #\n"
+				+ "    #   - O EMPTY\n" + "    def nOE_element_def(element, append = nil)\n" + "   end\n" + "end";
 		// module TagMaker # :nodoc:
 		assertContentType(RubySourceConfiguration.DEFAULT, src, 0); // m
 		assertContentType(RubySourceConfiguration.SINGLE_LINE_COMMENT, src, 16); // #
 
 		// nOE_element_def(element, <<-END)
 		assertContentType(RubySourceConfiguration.DEFAULT, src, 177); // ,
-		assertContentType(RubySourceConfiguration.STRING, src, 179); // <
-		assertContentType(RubySourceConfiguration.STRING, src, 184); // D
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, src, 179); // <
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, src, 184); // D
 		assertContentType(RubySourceConfiguration.DEFAULT, src, 185); // )
 
 		// </#{element.upcase}>
-		assertContentType(RubySourceConfiguration.STRING, src, 296); // {
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, src, 296); // {
 		assertContentType(RubySourceConfiguration.DEFAULT, src, 297); // e
 		assertContentType(RubySourceConfiguration.DEFAULT, src, 310); // e
-		assertContentType(RubySourceConfiguration.STRING, src, 311); // }
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, src, 311); // }
 
 		// END
-		assertContentType(RubySourceConfiguration.STRING, src, 321); // E
-		assertContentType(RubySourceConfiguration.STRING, src, 323); // D
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, src, 321); // E
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, src, 323); // D
 
 		// end
 		assertContentType(RubySourceConfiguration.DEFAULT, src, 329); // e
 	}
-	
+
 	public void testBlockComment()
 	{
 		String code = "=begin\n=end";
 		assertContentType(RubySourceConfiguration.MULTI_LINE_COMMENT, code, 0);
 		assertContentType(RubySourceConfiguration.MULTI_LINE_COMMENT, code, code.length() - 1);
+	}
+
+	public void testSymbolBeginningWithS()
+	{
+		String code = "hash[:symbol]";
+		for (int i = 0; i < code.length(); i++)
+			assertContentType(RubySourceConfiguration.DEFAULT, code, i);
+	}
+
+	public void testSymbolWithString()
+	{
+		String code = "hash[:\"symbol\"]";
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 0);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 5);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 6);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 13);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 14);
+	}
+
+	public void testSymbolHitsEndOfFile()
+	{
+		String code = "hash[:";
+		for (int i = 0; i < code.length(); i++)
+			assertContentType(RubySourceConfiguration.DEFAULT, code, i);
+	}
+
+	public void testPercentSSymbolHitsEndOfFile()
+	{
+		String code = "hash[%s";
+		for (int i = 0; i < code.length(); i++)
+			assertContentType(RubySourceConfiguration.DEFAULT, code, i);
+	}
+
+	public void testSymbolStringHitsEndOfFile()
+	{
+		String code = "hash[:\"";
+		for (int i = 0; i < code.length() - 1; i++)
+			assertContentType(RubySourceConfiguration.DEFAULT, code, i);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, code.length() - 1);
+	}
+
+	public void testHeredoc()
+	{
+		String code = "def index\n    heredoc =<<-END\n" + "  This is a heredoc, I think\n" + "END\nend\n";
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 0);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 22);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 23);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 35);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 61);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 63);
+	}
+
+	public void testReturnsRubyDefaultContentTypeNotDocumentDefaultContentType()
+	{
+		String src = "  config.parameters << :password";
+		IDocument document = new Document(src);
+		RubySourcePartitionScanner scanner = new RubySourcePartitionScanner();
+		scanner.setPartialRange(document, 0, src.length(), IDocument.DEFAULT_CONTENT_TYPE, 0);
+
+		assertToken(scanner, RubySourceConfiguration.DEFAULT, 0, 2);
+		assertToken(scanner, RubySourceConfiguration.DEFAULT, 2, 6);
+		assertToken(scanner, RubySourceConfiguration.DEFAULT, 8, 1);
+		assertToken(scanner, RubySourceConfiguration.DEFAULT, 9, 10);
+		assertToken(scanner, RubySourceConfiguration.DEFAULT, 19, 1);
+		assertToken(scanner, RubySourceConfiguration.DEFAULT, 20, 2);
+		assertToken(scanner, RubySourceConfiguration.DEFAULT, 22, 1);
+		assertToken(scanner, RubySourceConfiguration.DEFAULT, 23, 1);
+		assertToken(scanner, RubySourceConfiguration.DEFAULT, 24, 8);
+	}
+	
+	/*
+	 * https://aptana.lighthouseapp.com/projects/45260/tickets/372-color-syntax-when-dividing-inline-ruby
+	 */
+	public void testBug372()
+	{
+		String code = "\"#{@mem / 100.0}\", @test_object\n\"#{@mem / 100.0}\", @test_object";
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 0);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 2);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 3);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 14);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 15);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 16);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 17);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 31);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 32);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 34);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 35);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 46);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 47);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 48);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 49);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 62);
+	}
+
+	private void assertToken(IPartitionTokenScanner scanner, String contentType, int offset, int length)
+	{
+		IToken token = scanner.nextToken();
+		assertEquals(contentType, token.getData());
+		assertEquals(offset, scanner.getTokenOffset());
+		assertEquals(length, scanner.getTokenLength());
 	}
 }

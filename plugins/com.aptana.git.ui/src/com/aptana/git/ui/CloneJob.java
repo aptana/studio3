@@ -2,7 +2,7 @@ package com.aptana.git.ui;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,8 +24,13 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
-import org.eclipse.ui.internal.ide.StatusUtil;
+import org.eclipse.debug.core.ILaunchListener;
+import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.debug.core.IStreamListener;
+import org.eclipse.debug.core.model.IProcess;
+import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.ui.statushandlers.StatusManager;
 
 import com.aptana.git.core.model.GitExecutable;
@@ -34,7 +39,6 @@ import com.aptana.git.ui.internal.sharing.ConnectProviderOperation;
 import com.aptana.git.ui.internal.wizards.Messages;
 
 //FIXME Move to some different package?
-@SuppressWarnings("restriction")
 public class CloneJob extends Job
 {
 
@@ -46,6 +50,7 @@ public class CloneJob extends Job
 	private String sourceURI;
 	private String dest;
 	private boolean forceRootAsProject;
+	private boolean shallowClone;
 
 	public CloneJob(String sourceURI, String dest)
 	{
@@ -54,27 +59,96 @@ public class CloneJob extends Job
 
 	public CloneJob(String sourceURI, String dest, boolean forceRootAsProject)
 	{
+		this(sourceURI, dest, forceRootAsProject, false);
+	}
+
+	public CloneJob(String sourceURI, String dest, boolean forceRootAsProject, boolean shallow)
+	{
 		super(Messages.CloneWizard_Job_title);
 		setUser(true);
 		this.sourceURI = sourceURI;
 		this.dest = dest;
 		this.forceRootAsProject = forceRootAsProject;
+		this.shallowClone = shallow;
 	}
 
 	@Override
 	protected IStatus run(IProgressMonitor monitor)
 	{
-		SubMonitor subMonitor = SubMonitor.convert(monitor, 200);
+		SubMonitor subMonitor = SubMonitor.convert(monitor, 500);
 		try
 		{
-			ILaunch launch = Launcher.launch(GitExecutable.instance().path(), null, "clone", sourceURI, dest); //$NON-NLS-1$
+			if (GitExecutable.instance() == null)
+			{
+				throw new CoreException(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
+						Messages.CloneJob_UnableToFindGitExecutableError));
+			}
+			ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
+			ILaunchListener listener = new ILaunchListener() {
+				
+				@Override
+				public void launchRemoved(ILaunch launch) {
+				}
+				
+				@Override
+				public void launchChanged(ILaunch launch) {
+					// TODO Make sure this is our launch!
+					IProcess[] processes = launch.getProcesses();
+					if (processes != null)
+					{
+						IProcess process = processes[0];
+						// TODO Sniff the process output for percentages?
+						process.getStreamsProxy().getOutputStreamMonitor().addListener(new IStreamListener() {
+							
+							@Override
+							public void streamAppended(String text, IStreamMonitor monitor) {
+								System.out.println(text);
+							}
+						});
+						process.getStreamsProxy().getErrorStreamMonitor().addListener(new IStreamListener() {
+							
+							@Override
+							public void streamAppended(String text, IStreamMonitor monitor) {
+								System.err.println(text);
+								// TODO Look for "Checking out files: \d+% (\d+/\d+) and report progress accordingly
+							}
+						});
+					}
+				}
+				
+				@Override
+				public void launchAdded(ILaunch launch) {
+					// TODO Auto-generated method stub
+				}
+			};
+			manager.addLaunchListener(listener);
+			
+			// FIXME This doesn't ever run in bg in 3.6!
+			ILaunch launch;
+			if (shallowClone)
+			{
+				launch = Launcher.launch(GitExecutable.instance().path().toOSString(), null, subMonitor.newChild(100),
+						"clone", "--depth", "1", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			}
+			else
+			{
+				launch = Launcher.launch(GitExecutable.instance().path().toOSString(), null, subMonitor.newChild(100),
+						"clone", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			if (launch == null)
+			{
+				manager.removeLaunchListener(listener);
+				throw new CoreException(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), MessageFormat.format(
+						Messages.CloneJob_UnableToLaunchGitError, sourceURI, dest)));
+			}
 			while (!launch.isTerminated())
 			{
 				if (subMonitor.isCanceled())
 					return Status.CANCEL_STATUS;
 				Thread.yield();
 			}
-			subMonitor.worked(100);
+			manager.removeLaunchListener(listener);
+			subMonitor.setWorkRemaining(100);
 			Collection<File> existingProjects = new ArrayList<File>();
 			if (!forceRootAsProject)
 			{
@@ -82,7 +156,8 @@ public class CloneJob extends Job
 				existingProjects = collectProjectFilesFromDirectory(new File(dest), null, subMonitor.newChild(25));
 			}
 			if (existingProjects.isEmpty())
-			{ // No projects found. Turn the root of the repo into a project!
+			{
+				// No projects found. Turn the root of the repo into a project!
 				createExistingProject(new File(dest), subMonitor.newChild(75));
 			}
 			else
@@ -91,16 +166,20 @@ public class CloneJob extends Job
 				int step = 75 / existingProjects.size();
 				for (File file : existingProjects)
 				{
+					if (file == null)
+						continue;
 					createExistingProject(file, subMonitor.newChild(step));
 				}
 			}
 		}
-		catch (InvocationTargetException e)
+		catch (CoreException e)
 		{
-			return new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage(), e);
+			GitUIPlugin.logError(e);
+			return e.getStatus();
 		}
-		catch (InterruptedException e)
+		catch (Throwable e)
 		{
+			GitUIPlugin.logError(e.getMessage(), e);
 			return new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage(), e);
 		}
 		finally
@@ -147,17 +226,19 @@ public class CloneJob extends Job
 			}
 			catch (IOException exception)
 			{
+				GitUIPlugin.logError(exception.getMessage(), exception);
 				StatusManager.getManager().handle(
-						StatusUtil.newStatus(IStatus.ERROR, exception.getLocalizedMessage(), exception));
+						new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), exception.getLocalizedMessage(), exception));
 			}
 		}
 
 		// first look for project description files
-		final String dotProject = IProjectDescription.DESCRIPTION_FILE_NAME;
 		for (int i = 0; i < contents.length; i++)
 		{
 			File file = contents[i];
-			if (file.isFile() && file.getName().equals(dotProject))
+			if (file == null)
+				continue;
+			if (file.isFile() && file.getName().equals(IProjectDescription.DESCRIPTION_FILE_NAME))
 			{
 				files.add(file);
 				// don't search sub-directories since we can't have nested
@@ -168,6 +249,8 @@ public class CloneJob extends Job
 		// no project description found, so recurse into sub-directories
 		for (int i = 0; i < contents.length; i++)
 		{
+			if (contents[i] == null)
+				continue;
 			if (contents[i].isDirectory())
 			{
 				if (!contents[i].getName().equals(METADATA_FOLDER))
@@ -183,8 +266,9 @@ public class CloneJob extends Job
 					}
 					catch (IOException exception)
 					{
+						GitUIPlugin.logError(exception.getMessage(), exception);
 						StatusManager.getManager().handle(
-								StatusUtil.newStatus(IStatus.ERROR, exception.getLocalizedMessage(), exception));
+								new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), exception.getLocalizedMessage(), exception));
 
 					}
 					files.addAll(collectProjectFilesFromDirectory(contents[i], directoriesVisited, monitor));
@@ -200,11 +284,9 @@ public class CloneJob extends Job
 	 * @param record
 	 * @param monitor
 	 * @return boolean <code>true</code> if successful
-	 * @throws InvocationTargetException
-	 * @throws InterruptedException
+	 * @throws CoreException
 	 */
-	private boolean createExistingProject(final File dest, IProgressMonitor monitor) throws InvocationTargetException,
-			InterruptedException
+	private boolean createExistingProject(final File dest, IProgressMonitor monitor) throws CoreException
 	{
 		try
 		{
@@ -238,15 +320,11 @@ public class CloneJob extends Job
 			ConnectProviderOperation connectProviderOperation = new ConnectProviderOperation(project);
 			connectProviderOperation.run(new SubProgressMonitor(monitor, 20));
 		}
-		catch (CoreException e)
-		{
-			throw new InvocationTargetException(e);
-		}
 		finally
 		{
-			monitor.done();
+			if (monitor != null)
+				monitor.done();
 		}
-
 		return true;
 	}
 
@@ -292,47 +370,22 @@ public class CloneJob extends Job
 		 */
 		private void setProjectName()
 		{
-			try
+			// If we don't have the project name try again
+			if (projectName == null)
 			{
-				// If we don't have the project name try again
-				if (projectName == null)
-				{
-					IPath path = new Path(projectSystemFile.getPath());
-					// if the file is in the default location, use the directory
-					// name as the project name
-					if (isDefaultLocation(path))
-					{
-						projectName = path.segment(path.segmentCount() - 2);
-						description = ResourcesPlugin.getWorkspace().newProjectDescription(projectName);
-					}
-					else
-					{
-						description = ResourcesPlugin.getWorkspace().loadProjectDescription(path);
-						projectName = description.getName();
-					}
+				IPath path = new Path(projectSystemFile.getPath());
 
+				try
+				{
+					description = ResourcesPlugin.getWorkspace().loadProjectDescription(path);
+					projectName = description.getName();
+				}
+				catch (CoreException e)
+				{
+					// no existing project description
+					projectName = path.lastSegment();
 				}
 			}
-			catch (CoreException e)
-			{
-				// no good couldn't get the name
-			}
-		}
-
-		/**
-		 * Returns whether the given project description file path is in the default location for a project
-		 * 
-		 * @param path
-		 *            The path to examine
-		 * @return Whether the given path is the default location for a project
-		 */
-		private boolean isDefaultLocation(IPath path)
-		{
-			// The project description file must at least be within the project,
-			// which is within the workspace location
-			if (path.segmentCount() < 2)
-				return false;
-			return path.removeLastSegments(2).toFile().equals(Platform.getLocation().toFile());
 		}
 
 		/**

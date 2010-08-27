@@ -1,14 +1,14 @@
 package com.aptana.scripting.model;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.scope.ScopeSelector;
-import com.aptana.util.StringUtil;
 
 public abstract class AbstractBundleElement extends AbstractElement
 {
 	private static final String ALL_SCOPES = "all"; //$NON-NLS-1$
+	
 	private String _scope;
 	private ScopeSelector _scopeSelector;
-	
 	protected BundleElement owningBundle;
 
 	/**

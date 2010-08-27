@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -38,17 +38,18 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlinePage;
+import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
 import com.aptana.editor.css.outline.CSSOutlineLabelProvider;
-import com.aptana.editor.css.parsing.CSSParserFactory;
+import com.aptana.editor.css.parsing.ICSSParserConstants;
 
 public class CSSSourceEditor extends AbstractThemeableEditor
 {
 
 	@Override
-	protected CommonOutlinePage getOutlinePage()
+	protected CommonOutlinePage createOutlinePage()
 	{
-		CommonOutlinePage outline = super.getOutlinePage();
+		CommonOutlinePage outline = super.createOutlinePage();
 		outline.setContentProvider(new CSSOutlineContentProvider());
 		outline.setLabelProvider(new CSSOutlineLabelProvider());
 
@@ -62,8 +63,12 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 
 		setSourceViewerConfiguration(new CSSSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new CSSDocumentProvider());
-
-		getFileService().setParser(CSSParserFactory.getInstance().getParser());
+	}
+	
+	@Override
+	protected FileService createFileService()
+	{
+		return new FileService(ICSSParserConstants.LANGUAGE);
 	}
 
 	@Override

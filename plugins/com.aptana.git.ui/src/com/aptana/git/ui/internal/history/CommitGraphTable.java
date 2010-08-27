@@ -71,7 +71,7 @@ class CommitGraphTable extends TableViewer
 		date.setWidth(250);
 		layout.addColumnData(new ColumnWeightData(5, true));
 
-		setContentProvider(ArrayContentProvider.getInstance());
+		setContentProvider(new ArrayContentProvider());
 		setLabelProvider(new CommitLabelProvider());
 
 		createPaintListener(table);
@@ -347,7 +347,7 @@ class CommitGraphTable extends TableViewer
 		protected void drawCommitDot(final int x, final int y, final int w, final int h)
 		{
 			g.fillOval(cellX + x, cellY + y, w, h);
-			g.setForeground(sys_black);
+			g.setForeground(cellFG);
 			g.setLineWidth(2);
 			g.drawOval(cellX + x, cellY + y, w, h);
 		}

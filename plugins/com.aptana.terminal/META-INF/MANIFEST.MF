@@ -7,12 +7,15 @@ Bundle-Activator: com.aptana.terminal.Activator
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.core.resources,
- com.aptana.editor.common;bundle-version="1.0.0",
- com.aptana.util;bundle-version="1.0.0",
- com.aptana.scripting;bundle-version="1.0.0"
+ org.eclipse.debug.core,
+ com.aptana.core;bundle-version="3.0.0",
+ com.aptana.org.eclipse.tm.terminal;bundle-version="3.0.100",
+ com.aptana.theme,
+ org.eclipse.jface.text;bundle-version="3.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.terminal,
- com.aptana.terminal.server,
- com.aptana.terminal.views
+ com.aptana.terminal.views,
+ com.aptana.terminal.widget,
+ com.aptana.terminal.editor
+Eclipse-ExtensibleAPI: true

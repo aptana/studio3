@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -38,32 +38,31 @@ package com.aptana.editor.common;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
-import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 
 import com.aptana.editor.common.text.rules.CompositePartitionScanner;
 
 /**
  * @author Max Stepanov
- *
  */
-public class CompositeDocumentProvider extends TextFileDocumentProvider {
+public class CompositeDocumentProvider extends CommonDocumentProvider
+{
 
 	private String documentContentType;
 	private IPartitioningConfiguration defaultPartitioningConfiguration;
 	private IPartitioningConfiguration primaryPartitioningConfiguration;
 	private IPartitionerSwitchStrategy partitionerSwitchStrategy;
-	
+
 	/**
 	 * @param documentContentType
 	 * @param defaultPartitioningConfiguration
 	 * @param primaryPartitioningConfiguration
 	 * @param partitionerSwitchStrategy
 	 */
-	protected CompositeDocumentProvider(
-			String documentContentType,
+	protected CompositeDocumentProvider(String documentContentType,
 			IPartitioningConfiguration defaultPartitioningConfiguration,
 			IPartitioningConfiguration primaryPartitioningConfiguration,
-			IPartitionerSwitchStrategy partitionerSwitchStrategy) {
+			IPartitionerSwitchStrategy partitionerSwitchStrategy)
+	{
 		super();
 		this.documentContentType = documentContentType;
 		this.defaultPartitioningConfiguration = defaultPartitioningConfiguration;
@@ -72,27 +71,32 @@ public class CompositeDocumentProvider extends TextFileDocumentProvider {
 	}
 
 	@Override
-	public void connect(Object element) throws CoreException {
-	    super.connect(element);
+	public void connect(Object element) throws CoreException
+	{
+		super.connect(element);
 
 		IDocument document = getDocument(element);
-		if (document != null) {			
-			CompositePartitionScanner partitionScanner = new CompositePartitionScanner(
-					defaultPartitioningConfiguration.createSubPartitionScanner(),
-					primaryPartitioningConfiguration.createSubPartitionScanner(),
+		if (document != null)
+		{
+			CompositePartitionScanner partitionScanner = new CompositePartitionScanner(defaultPartitioningConfiguration
+					.createSubPartitionScanner(), primaryPartitioningConfiguration.createSubPartitionScanner(),
 					partitionerSwitchStrategy);
-			IDocumentPartitioner partitioner = new ExtendedFastPartitioner(partitionScanner,
-					TextUtils.combine(new String[][] {
-							CompositePartitionScanner.SWITCHING_CONTENT_TYPES,
+			IDocumentPartitioner partitioner = new ExtendedFastPartitioner(partitionScanner, TextUtils
+					.combine(new String[][] { CompositePartitionScanner.SWITCHING_CONTENT_TYPES,
 							defaultPartitioningConfiguration.getContentTypes(),
-							primaryPartitioningConfiguration.getContentTypes()
-					}));
+							primaryPartitioningConfiguration.getContentTypes() }));
 			partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().setDocumentContentType(document, documentContentType);
-			DocumentContentTypeManager.getInstance().registerConfigurations(document,
-					new IPartitioningConfiguration[] { defaultPartitioningConfiguration, primaryPartitioningConfiguration });
+			CommonEditorPlugin.getDefault().getDocumentScopeManager().registerConfigurations(
+					document,
+					new IPartitioningConfiguration[] { defaultPartitioningConfiguration,
+							primaryPartitioningConfiguration });
 		}
+	}
+
+	protected String getDefaultContentType(String filename)
+	{
+		return documentContentType;
 	}
 }

@@ -11,11 +11,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.xml.sax.InputSource;
 
 import plistreader.AbstractReader;
 import plistreader.PlistFactory;
 import plistreader.PlistProperties;
+
+import com.aptana.core.util.ProcessUtil;
 
 /**
  * This is a rather ugly but mostly working converter for textmate bundles. Run with no args it will search the user's
@@ -29,6 +34,37 @@ import plistreader.PlistProperties;
 @SuppressWarnings("nls")
 public class BundleConverter
 {
+
+	/**
+	 * Characters that naturally occur only with hitting shift, so if keybinding contains shift plus these characters,
+	 * replace with their base character.
+	 */
+	private static Map<Character, Character> shiftChars = new HashMap<Character, Character>();
+	static
+	{
+		shiftChars.put('_', '-');
+		shiftChars.put('!', '1');
+		shiftChars.put('@', '2');
+		shiftChars.put('#', '3');
+		shiftChars.put('$', '4');
+		shiftChars.put('%', '5');
+		shiftChars.put('^', '6');
+		shiftChars.put('&', '7');
+		shiftChars.put('*', '8');
+		shiftChars.put('(', '9');
+		shiftChars.put(')', '0');
+		shiftChars.put('+', '=');
+		shiftChars.put('{', '[');
+		shiftChars.put('}', ']');
+		shiftChars.put('|', '\\');
+		shiftChars.put(':', ';');
+		shiftChars.put('"', '\'');
+		shiftChars.put('<', ',');
+		shiftChars.put('>', '.');
+		shiftChars.put('?', '/');
+		shiftChars.put('~', '`');
+	}
+
 	/**
 	 * @param args
 	 * @throws Exception
@@ -44,14 +80,14 @@ public class BundleConverter
 			// args = new String[] { "/Applications/TextMate.app/Contents/SharedSupport/Bundles" };
 		}
 
-		String outputDir = userHome + "/Documents/RadRails Bundles";
+		String outputDir = userHome + "/Documents/Aptana Rubles";
 		if (args.length > 1)
 		{
 			outputDir = args[1];
 		}
 
 		// Only convert the following bundles
-		// String[] bundleFilter = new String[] { "TODO" };
+		String[] bundleFilter = new String[] { "json" };
 		File[] bundles = gatherBundles(new File(args[0]));
 		if (bundles == null)
 		{
@@ -62,14 +98,14 @@ public class BundleConverter
 		{
 			String nameWithoutExtension = textmateBundleDir.getName().substring(0,
 					textmateBundleDir.getName().length() - 9);
-			// for (String bundleToConvert : bundleFilter)
-			// {
-			// if (bundleToConvert.equalsIgnoreCase(nameWithoutExtension))
-			// {
-			convertBundle(textmateBundleDir, outputDir + File.separator + nameWithoutExtension);
-			// continue;
-			// }
-			// }
+			for (String bundleToConvert : bundleFilter)
+			{
+				if (bundleToConvert.equalsIgnoreCase(nameWithoutExtension))
+				{
+					convertBundle(textmateBundleDir, outputDir + File.separator + nameWithoutExtension + ".ruble");
+					continue;
+				}
+			}
 		}
 	}
 
@@ -90,7 +126,7 @@ public class BundleConverter
 		});
 	}
 
-	private static void convertBundle(File bundleDir, String outputBundlePath) throws IOException
+	public static void convertBundle(File bundleDir, String outputBundlePath) throws IOException
 	{
 		Map<String, String> uuidToName = new HashMap<String, String>();
 		// Run SnippetConverter on snippets sub dir
@@ -117,18 +153,22 @@ public class BundleConverter
 		copyDir(bundleDir + "/Templates/", outputBundlePath + "/unsupported/templates");
 	}
 
-	private static void copyDir(String srcPath, String destPath)
+	private static boolean copyDir(String srcPath, String destPath)
 	{
-		if (!new File(srcPath).exists())
-			return;
+		return copyDir(Path.fromOSString(srcPath), Path.fromOSString(destPath));
+	}
+
+	private static boolean copyDir(IPath srcPath, IPath destPath)
+	{
+		if (!srcPath.toFile().exists())
+			return true;
 		try
 		{
-			File dest = new File(destPath);
-			dest.mkdirs();
+			destPath.toFile().mkdirs();
 
-			ProcessBuilder builder = new ProcessBuilder("cp", "-R", srcPath, destPath);
-			Process p = builder.start();
+			Process p = ProcessUtil.run("cp", null, "-R", srcPath.toOSString(), destPath.toOSString());
 			p.waitFor();
+			return true;
 		}
 		catch (IOException e)
 		{
@@ -140,6 +180,12 @@ public class BundleConverter
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		catch (CoreException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -148,29 +194,177 @@ public class BundleConverter
 		PlistProperties properties = parse(plistFile);
 
 		StringBuilder buffer = new StringBuilder();
-		buffer.append("require 'java'\n");
-		buffer.append("require 'radrails'\n\n");
+		buffer.append("require 'ruble'\n\n");
 		String name = sanitize(properties, "name");
 		buffer.append("bundle '").append(name).append("' do |bundle|\n");
 		// Author
 		buffer.append("  bundle.author = '").append(sanitize(properties, "contactName")).append("'\n");
 		// Contact Email
-		buffer.append("  bundle.contact_email_rot_13 = '").append(sanitize(properties, "contactEmailRot13")).append(
-				"'\n");
+		buffer.append("  bundle.contact_email_rot_13 = '").append(sanitize(properties, "contactEmailRot13"))
+				.append("'\n");
 		// Description
-		buffer.append("  bundle.description =  <<END\n").append((String) properties.getProperty("description")).append(
-				"\nEND\n");
+		buffer.append("  bundle.description =  <<END\n").append((String) properties.getProperty("description"))
+				.append("\nEND\n");
+
+		buffer.append(addIndents(new File(plistFile.getParentFile(), "Preferences")));
+
+		File syntaxesDir = new File(plistFile.getParentFile(), "Syntaxes");
+		buffer.append(addFolding(syntaxesDir));
+		buffer.append(addFileTypes(syntaxesDir));
 
 		// Menu
 		PlistProperties mainMenu = (PlistProperties) properties.getProperty("mainMenu");
-		PlistProperties submenus = (PlistProperties) mainMenu.getProperty("submenus");
-		buffer.append("\n  bundle.menu '").append(name).append("' do |main_menu|\n");
-		buffer.append(handleMenu("    main_menu", submenus, (List<String>) mainMenu.getProperty("items"), uuidToName));
-		buffer.append("  end\n");
+		if (mainMenu != null)
+		{
+			PlistProperties submenus = (PlistProperties) mainMenu.getProperty("submenus");
+			buffer.append("\n  bundle.menu '").append(name).append("' do |main_menu|\n");
+			buffer.append(handleMenu("    main_menu", submenus, (List<String>) mainMenu.getProperty("items"),
+					uuidToName));
+			buffer.append("  end\n");
+		}
+		else
+		{
+			List<String> items = (List<String>) properties.getProperty("ordering");
+			buffer.append("\n  bundle.menu '").append(name).append("' do |main_menu|\n");
+			buffer.append(handleMenu("    main_menu", new PlistProperties(), items, uuidToName));
+			buffer.append("  end\n");
+		}
 		// end menu
 
 		buffer.append("end\n");
 		return buffer.toString();
+	}
+
+	private static String addIndents(File prefsDir)
+	{
+		StringBuilder builder = new StringBuilder();
+		if (prefsDir == null || !prefsDir.isDirectory())
+			return builder.toString();
+		File[] files = prefsDir.listFiles(new FilenameFilter()
+		{
+
+			@Override
+			public boolean accept(File dir, String name)
+			{
+				return name.endsWith(".plist");
+			}
+		});
+		if (files == null || files.length < 1)
+			return builder.toString();
+
+		for (File prefsFile : files)
+		{
+			PlistProperties properties = parse(prefsFile);
+			if (properties == null || !properties.hasKey("settings"))
+				continue;
+			PlistProperties settings = (PlistProperties) properties.getProperty("settings");
+			if (!settings.hasKey("increaseIndentPattern"))
+				continue;
+
+			String scope = (String) properties.getProperty("scope");
+			String increase = (String) settings.getProperty("increaseIndentPattern");
+			increase = sanitizeRegexp(increase);
+			builder.append("  increase_indent = /").append(increase).append("/\n");
+			if (settings.hasKey("decreaseIndentPattern"))
+			{
+				String decrease = (String) settings.getProperty("decreaseIndentPattern");
+				decrease = sanitizeRegexp(decrease);
+				builder.append("  decrease_indent = /").append(decrease).append("/\n");
+				builder.append("  bundle.indent['").append(scope).append("'] = increase_indent, decrease_indent\n");
+			}
+		}
+		return builder.toString();
+	}
+
+	protected static String sanitizeRegexp(String regexp)
+	{
+		return regexp.replace("''", "'").replace("/", "\\/");
+	}
+
+	@SuppressWarnings("unchecked")
+	private static String addFileTypes(File syntaxesDir)
+	{
+		StringBuilder builder = new StringBuilder();
+		if (syntaxesDir == null || !syntaxesDir.isDirectory())
+			return builder.toString();
+		File[] files = syntaxesDir.listFiles(new FilenameFilter()
+		{
+
+			@Override
+			public boolean accept(File dir, String name)
+			{
+				return name.endsWith(".tmLanguage") || name.endsWith(".plist");
+			}
+		});
+		if (files == null || files.length < 1)
+			return builder.toString();
+
+		for (File syntaxFile : files)
+		{
+			PlistProperties properties = parse(syntaxFile);
+			String scope = (String) properties.getProperty("scopeName");
+			List<String> fileTypes = (List<String>) properties.getProperty("fileTypes");
+			if (fileTypes != null && !fileTypes.isEmpty())
+			{
+				builder.append("  bundle.file_types['").append(scope).append("'] = ");
+				for (String fileType : fileTypes)
+				{
+					String pattern = "*." + fileType;
+					// If fileType has a period or begins with a capital letter we should assume exact filename match
+					if (fileType.contains(".") || Character.isUpperCase(fileType.charAt(0)))
+					{
+						pattern = fileType;
+					}
+					builder.append("'").append(pattern).append("', ");
+				}
+				builder.delete(builder.length() - 2, builder.length());
+				builder.append("\n");
+			}
+		}
+		return builder.toString();
+	}
+
+	private static String addFolding(File syntaxesDir)
+	{
+		StringBuilder builder = new StringBuilder();
+		if (syntaxesDir == null || !syntaxesDir.isDirectory())
+			return builder.toString();
+		File[] files = syntaxesDir.listFiles(new FilenameFilter()
+		{
+
+			@Override
+			public boolean accept(File dir, String name)
+			{
+				return name.endsWith(".tmLanguage") || name.endsWith(".plist");
+			}
+		});
+		if (files == null || files.length < 1)
+			return builder.toString();
+
+		for (File syntaxFile : files)
+		{
+			PlistProperties properties = parse(syntaxFile);
+			String scope = (String) properties.getProperty("scopeName");
+			boolean hasStart = properties.hasKey("foldingStartMarker");
+			if (hasStart)
+			{
+				String folding = (String) properties.getProperty("foldingStartMarker");
+				folding = sanitizeRegexp(folding);
+				builder.append("  start_folding = /").append(folding).append("/\n");
+			}
+			boolean hasStop = properties.hasKey("foldingStopMarker");
+			if (hasStop)
+			{
+				String folding = (String) properties.getProperty("foldingStopMarker");
+				folding = sanitizeRegexp(folding);
+				builder.append("  end_folding = /").append(folding).append("/\n");
+			}
+			if (hasStart && hasStop)
+			{
+				builder.append("  bundle.folding['").append(scope).append("'] = start_folding, end_folding\n");
+			}
+		}
+		return builder.toString();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -208,8 +402,13 @@ public class BundleConverter
 				// Not a sub-menu, must be an item
 				String commandName = uuidToName.get(uuid);
 				if (commandName == null)
-					commandName = uuid;
-				buffer.append(menuPrefix).append(".command '").append(commandName).append("'\n");
+				{
+					buffer.append("#").append(menuPrefix).append(".command '").append(uuid).append("'\n");
+				}
+				else
+				{
+					buffer.append(menuPrefix).append(".command '").append(commandName).append("'\n");
+				}
 			}
 		}
 		return buffer.toString();
@@ -217,11 +416,15 @@ public class BundleConverter
 
 	static PlistProperties parse(File plistFile)
 	{
+		return parse(Path.fromOSString(plistFile.getAbsolutePath()));
+	}
+
+	static PlistProperties parse(IPath plistPath)
+	{
 		try
 		{
-			ProcessBuilder builder = new ProcessBuilder("/usr/bin/plutil", "-convert", "xml1", "\""
-					+ plistFile.getAbsolutePath() + "\"");
-			Process p = builder.start();
+			Process p = ProcessUtil.run("/usr/bin/plutil", plistPath.removeLastSegments(1), "-convert", "xml1",
+					plistPath.lastSegment());
 			int exitCode = p.waitFor();
 			if (exitCode != 0)
 			{
@@ -231,14 +434,15 @@ public class BundleConverter
 			AbstractReader reader = PlistFactory.createReader();
 			// FIXME Often these files will have special characters that aren't proper in XML (like say Ctrl+C as a
 			// keybinding, 0x03 so we need it to become "&#x03;"), we need to massage the XML now!
-			InputSource source = new InputSource(new InputStreamReader(new FileInputStream(plistFile), "UTF-8"));
+			InputSource source = new InputSource(
+					new InputStreamReader(new FileInputStream(plistPath.toFile()), "UTF-8"));
 			source.setEncoding("UTF-8");
 			reader.setSource(source);
 			return reader.parse();
 		}
 		catch (Exception e)
 		{
-			System.err.println("An error occurred processing: " + plistFile.getAbsolutePath());
+			System.err.println("An error occurred processing: " + plistPath.toOSString());
 		}
 		return null;
 	}
@@ -248,7 +452,7 @@ public class BundleConverter
 		String content = (String) properties.getProperty(key);
 		if (content == null)
 			return null;
-		return content.replace("'", "\\'").replace("�", "...").replace("�", "-"); //$NON-NLS-1$ //$NON-NLS-2$
+		return content.replace("'", "\\'").replace("…", "...").replace("—", "-"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	static void writeToFile(String output, String outFilePath) throws IOException
@@ -284,38 +488,75 @@ public class BundleConverter
 			char c = keyBinding.charAt(i);
 			switch (c)
 			{
-				case '@':
-					builder.append("M1+M2+"); //$NON-NLS-1$
+				case '': // 63236
+					builder.append("F1+"); //$NON-NLS-1$
 					break;
-				case '^':
-					if ((keyBinding.length() > (i + 1)) && (keyBinding.charAt(i + 1) == '@'))
-					{
-						builder.append("CONTROL+SHIFT+COMMAND+"); //$NON-NLS-1$
-						i++;
-					}
-					else
-					{
-						builder.append("CONTROL+M2+"); //$NON-NLS-1$
-					}
+				case 63237:
+					builder.append("F2+"); //$NON-NLS-1$
 					break;
-				case '~':
-					if ((keyBinding.length() > (i + 1)) && (keyBinding.charAt(i + 1) == '@'))
-					{
-						builder.append("OPTION+COMMAND+"); //$NON-NLS-1$
-						i++;
-					}
-					else
-					{
-						builder.append(c).append('+');
-					}
+				case '': // 63238
+					builder.append("F3+"); //$NON-NLS-1$
+					break;
+				case 63239:
+					builder.append("F4+"); //$NON-NLS-1$
+					break;
+				case '': // 63240
+					builder.append("F5+"); //$NON-NLS-1$
+					break;
+				case 63241:
+					builder.append("F6+"); //$NON-NLS-1$
+					break;
+				case 63242:
+					builder.append("F7+"); //$NON-NLS-1$
+					break;
+				case 63243:
+					builder.append("F8+"); //$NON-NLS-1$
+					break;
+				case 63244:
+					builder.append("F9+"); //$NON-NLS-1$
+					break;
+				case 63245:
+					builder.append("F10+"); //$NON-NLS-1$
+					break;
+				case 63246:
+					builder.append("F11+"); //$NON-NLS-1$
+					break;
+				case 63247:
+					builder.append("F12+"); //$NON-NLS-1$
+					break;
+				case '@': // COMMAND, which is M1 on Mac
+					builder.append("M1+"); //$NON-NLS-1$				
+					break;
+				case '^': // CTRL, which is M4 on Mac
+					builder.append("M4+"); //$NON-NLS-1$					
+					break;
+				case '~': // M3, ALT/OPTION
+					builder.append("M3+"); //$NON-NLS-1$
+					break;
+				case '$':
+					builder.append("M2+"); //$NON-NLS-1$
+					break;
+				case '\n':
+					builder.append("ENTER+"); //$NON-NLS-1$
+					break;
+				case '': // invisible escape character
+					builder.append("ESCAPE+"); //$NON-NLS-1$
+					break;
+				case '': // invisible backspace character
+					builder.append("DEL+"); //$NON-NLS-1$
 					break;
 				default:
-					builder.append(c).append('+');
+					if (Character.isLetter(c) && Character.isUpperCase(c))
+					{
+						builder.append("M2+"); //$NON-NLS-1$
+					}
+					builder.append(Character.toUpperCase(c)).append('+');
 					break;
 			}
 		}
 		if (keyBinding.length() > 0)
 			builder.deleteCharAt(builder.length() - 1);
+
 		return builder.toString();
 	}
 }

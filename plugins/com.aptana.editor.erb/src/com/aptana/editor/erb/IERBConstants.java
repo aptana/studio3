@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -37,11 +37,22 @@ package com.aptana.editor.erb;
 
 /**
  * @author Max Stepanov
- *
+ * @author cwilliams
  */
-public interface IERBConstants {
+public interface IERBConstants
+{
 
 	public String CONTENT_TYPE_HTML_ERB = "com.aptana.contenttype.html.erb"; //$NON-NLS-1$
 	public String CONTENT_TYPE_XML_ERB = "com.aptana.contenttype.xml.erb"; //$NON-NLS-1$
 	
+	public String LANGUAGE_ERB = "text/erb"; //$NON-NLS-1$
+
+	/**
+	 * Scope names for RHTML scopes.
+	 */
+	public static final String EMBEDDED_CSS_SCOPE = "source.css.embedded.html"; //$NON-NLS-1$
+	public static final String EMBEDDED_JS_SCOPE = "source.js.embedded.html"; //$NON-NLS-1$
+	public static final String EMBEDDED_RUBY_SCOPE = "source.ruby.rails.embedded.html"; //$NON-NLS-1$
+	public static final String TOPLEVEL_RHTML_SCOPE = "text.html.ruby"; //$NON-NLS-1$
+	public static final String EMBEDDED_RUBY_TAG_SCOPE = "source.erb.embedded.html"; //$NON-NLS-1$
 }

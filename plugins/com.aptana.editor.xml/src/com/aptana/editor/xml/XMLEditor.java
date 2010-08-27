@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -34,7 +34,14 @@
  */
 package com.aptana.editor.xml;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.outline.CommonOutlinePage;
+import com.aptana.editor.common.parsing.FileService;
+import com.aptana.editor.xml.outline.XMLOutlineContentProvider;
+import com.aptana.editor.xml.outline.XMLOutlineLabelProvider;
+import com.aptana.editor.xml.parsing.IXMLParserConstants;
 
 public class XMLEditor extends AbstractThemeableEditor {
 
@@ -45,4 +52,26 @@ public class XMLEditor extends AbstractThemeableEditor {
         setSourceViewerConfiguration(new XMLSourceViewerConfiguration(getPreferenceStore(), this));
         setDocumentProvider(new XMLDocumentProvider());
     }
+    
+    @Override
+    protected FileService createFileService()
+    {
+    	return new FileService(IXMLParserConstants.LANGUAGE);
+    }
+
+	@Override
+	protected CommonOutlinePage createOutlinePage()
+	{
+		CommonOutlinePage outline = super.createOutlinePage();
+		outline.setContentProvider(new XMLOutlineContentProvider());
+		outline.setLabelProvider(new XMLOutlineLabelProvider());
+
+		return outline;
+	}
+
+	@Override
+	protected IPreferenceStore getOutlinePreferenceStore()
+	{
+		return XMLPlugin.getDefault().getPreferenceStore();
+	}
 }

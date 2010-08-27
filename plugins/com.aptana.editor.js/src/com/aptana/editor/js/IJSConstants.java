@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -42,4 +42,5 @@ package com.aptana.editor.js;
 public interface IJSConstants {
 
 	public String CONTENT_TYPE_JS = "com.aptana.contenttype.js"; //$NON-NLS-1$
+	public String CONTENT_TYPE_JSON = "com.aptana.contenttype.json"; //$NON-NLS-1$
 }

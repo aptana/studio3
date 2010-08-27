@@ -34,21 +34,21 @@ public class CreateBranchDialog extends InputDialog
 
 	public CreateBranchDialog(final Shell parentShell, final GitRepository repo)
 	{
-		super(parentShell, Messages.GitProjectView_CreateBranchDialog_Title,
-				Messages.GitProjectView_CreateBranchDialog_Message, "", //$NON-NLS-1$
+		super(parentShell, Messages.CreateBranchDialog_CreateBranchDialog_Title,
+				Messages.CreateBranchDialog_CreateBranchDialog_Message, "", //$NON-NLS-1$
 				new IInputValidator()
 				{
 
 					public String isValid(String newText)
 					{
 						if (newText == null || newText.trim().length() == 0)
-							return Messages.GitProjectView_NonEmptyBranchNameMessage;
+							return Messages.CreateBranchDialog_NonEmptyBranchNameMessage;
 						if (newText.trim().contains(" ") || newText.trim().contains("\t")) //$NON-NLS-1$ //$NON-NLS-2$
-							return Messages.GitProjectView_NoWhitespaceBranchNameMessage;
+							return Messages.CreateBranchDialog_NoWhitespaceBranchNameMessage;
 						if (repo.localBranches().contains(newText.trim()))
-							return Messages.GitProjectView_BranchAlreadyExistsMessage;
+							return Messages.CreateBranchDialog_BranchAlreadyExistsMessage;
 						if (!repo.validBranchName(newText.trim()))
-							return Messages.GitProjectView_InvalidBranchNameMessage;
+							return Messages.CreateBranchDialog_InvalidBranchNameMessage;
 						return null;
 					}
 				});

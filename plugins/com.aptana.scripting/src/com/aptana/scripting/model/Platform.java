@@ -74,7 +74,7 @@ public enum Platform
 	 * @param eclipsePlatform
 	 * @return
 	 */
-	static Platform[] getPlatformsForEclipsePlatform(String eclipsePlatform)
+	public static Platform[] getPlatformsForEclipsePlatform(String eclipsePlatform)
 	{
 		Platform[] result = NO_PLATFORMS;
 

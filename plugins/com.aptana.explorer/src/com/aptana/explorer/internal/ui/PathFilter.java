@@ -1,5 +1,6 @@
 package com.aptana.explorer.internal.ui;
 
+import java.io.IOException;
 import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,17 +16,22 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.ui.internal.misc.StringMatcher;
 
+import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
+import com.aptana.editor.ruby.index.IRubyIndexConstants;
 import com.aptana.explorer.ExplorerPlugin;
+import com.aptana.index.core.Index;
+import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.QueryResult;
 
 @SuppressWarnings("restriction")
 class PathFilter extends ViewerFilter
 {
 
 	private static Object[] EMPTY = new Object[0];
-	
+
 	private StringMatcher singularMatcher;
 	private StringMatcher pluralMatcher;
-	
+
 	/*
 	 * Cache of filtered elements in the tree
 	 */
@@ -35,6 +41,8 @@ class PathFilter extends ViewerFilter
 	 * Maps parent elements to TRUE or FALSE
 	 */
 	private Map<Object, Boolean> foundAnyCache = new HashMap<Object, Boolean>();
+
+	private List<QueryResult> queryResults;
 
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element)
@@ -62,8 +70,24 @@ class PathFilter extends ViewerFilter
 		IPath path = resource.getProjectRelativePath();
 		String rawPath = path.toPortableString();
 
+		// HACK Ignore tmp and vendor for Rails projects
+		try
+		{
+			if (resource.getProject().hasNature("org.radrails.rails.core.railsnature") //$NON-NLS-1$
+					&& (rawPath.startsWith("tmp/") || rawPath.startsWith("vendor/"))) //$NON-NLS-1$ //$NON-NLS-2$
+			{
+				return false;
+			}
+		}
+		catch (CoreException e)
+		{
+			ExplorerPlugin.logError(e);
+		}
+
 		if (match(rawPath))
+		{
 			return true;
+		}
 
 		// Otherwise check if any of the words of the text matches
 		String[] words = getWords(rawPath);
@@ -91,6 +115,38 @@ class PathFilter extends ViewerFilter
 			}
 		}
 
+		// check if the resource is included by the filtered file or vise versa
+		if (queryResults == null)
+		{
+			// FIXME We should have a search API layer over the top of this and shouldn't be hitting indices directly.
+			// Pass a scope object to the search API and it calculates what indices to search within!
+			queryResults = new ArrayList<QueryResult>();
+			Index index = IndexManager.getInstance().getIndex(resource.getProject().getLocationURI());
+			try
+			{
+				queryResults = index.query(new String[] { HTMLIndexConstants.RESOURCE_CSS,
+						HTMLIndexConstants.RESOURCE_JS, IRubyIndexConstants.REQUIRE }, null, 0);
+			}
+			catch (IOException e)
+			{
+				return false;
+			}
+		}
+		if (queryResults != null)
+		{
+			for (QueryResult result : queryResults)
+			{
+				String[] documents = result.getDocuments();
+				for (String document : documents)
+				{
+					if ((match(document) && resource.getLocationURI().toString().equals(result.getWord()))
+							|| (match(result.getWord()) && resource.getLocation().toPortableString().equals(document)))
+					{
+						return true;
+					}
+				}
+			}
+		}
 		return false;
 	}
 
@@ -132,6 +188,11 @@ class PathFilter extends ViewerFilter
 			// i.e. people/person vs user/users
 			// For now let's assume user always inputs singular and we always generate singular.
 			pluralMatcher = new StringMatcher("*" + Inflector.pluralize(patternString) + "*", true, false); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		if (queryResults != null)
+		{
+			queryResults.clear();
+			queryResults = null;
 		}
 	}
 

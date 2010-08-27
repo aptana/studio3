@@ -4,42 +4,61 @@ import org.eclipse.jface.text.templates.Template;
 
 import com.aptana.scripting.model.CommandElement;
 
-public class CommandTemplate extends Template {
-	// TODO: We need to figure out a way to have a common base class for this and SnippetTemplate
+public class CommandTemplate extends Template
+{
+	private final CommandElement commandElement;
 
-    private final CommandElement command;
+	protected CommandTemplate(CommandElement command, String name, String description, String contextTypeId,
+			String pattern, boolean isAutoInsertable)
+	{
+		super(name, description, contextTypeId, pattern, isAutoInsertable);
+		this.commandElement = command;
+	}
 
-    public CommandTemplate(CommandElement command, String trigger, String contextTypeId) {
-        super(trigger,
-                command.getDisplayName(), 
-                contextTypeId,
-                command.getDisplayName(),
-                true);
-        this.command = command;
-    }
-    
-    public CommandElement getCommand() {
-        return command;
-    }
-    
-    @Override
-    public boolean matches(String prefix, String contextTypeId) {
-        boolean matches = super.matches(prefix, contextTypeId);
-        if (!matches) {
-            return matches;
-        }
-        return prefix != null && prefix.length() != 0 && getName().toLowerCase().startsWith(prefix.toLowerCase());
-    }
+	public CommandTemplate(CommandElement commandElement, String trigger, String contextTypeId)
+	{
+		this(commandElement, trigger, commandElement.getDisplayName(), contextTypeId, commandElement.getDisplayName(),
+				true);
+	}
 
-    boolean exactMatches(String prefix)
-    {
-        return prefix != null && prefix.length() != 0 && getName().equalsIgnoreCase(prefix);
-    }
+	public CommandElement getCommandElement()
+	{
+		return commandElement;
+	}
 
-    @Override
-    public String toString()
-    {
-    	return getName() + " - " + getPattern(); //$NON-NLS-1$
-    }
+	@Override
+	public boolean matches(String prefix, String contextTypeId)
+	{
+		if (!super.matches(prefix, contextTypeId))
+		{
+			return false;
+		}
+
+		while (prefix != null && prefix.length() > 0)
+		{
+			if (matches(prefix))
+			{
+				return true;
+			}
+			prefix = SnippetsCompletionProcessor.narrowPrefix(prefix);
+		}
+		return false;
+	}
+
+	protected boolean matches(String prefix)
+	{
+		return getName().toLowerCase().startsWith(prefix.toLowerCase());
+	}
+
+	boolean exactMatches(String prefix)
+	{
+		return prefix != null && prefix.length() != 0 && getName().equalsIgnoreCase(prefix);
+	}
+
+	@Override
+	public String toString()
+	{
+		return getName() + " - " + getPattern(); //$NON-NLS-1$
+	}
 
 }

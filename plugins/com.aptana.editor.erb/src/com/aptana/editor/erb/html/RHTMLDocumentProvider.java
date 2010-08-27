@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -51,7 +51,7 @@ public class RHTMLDocumentProvider extends CompositeDocumentProvider {
 		super(IERBConstants.CONTENT_TYPE_HTML_ERB,
 				HTMLSourceConfiguration.getDefault(),
 				RubySourceConfiguration.getDefault(),
-				ERBPartitionerSwitchStrategy.getDafault());
+				ERBPartitionerSwitchStrategy.getDefault());
 	}
 
 }

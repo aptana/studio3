@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -35,28 +35,44 @@
 package com.aptana.editor.js;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.core.runtime.content.IContentTypeManager;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
-import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 
-import com.aptana.editor.common.DocumentContentTypeManager;
+import com.aptana.editor.common.CommonDocumentProvider;
+import com.aptana.editor.common.CommonEditorPlugin;
 
-public class JSDocumentProvider extends TextFileDocumentProvider {
+public class JSDocumentProvider extends CommonDocumentProvider
+{
 
-    @Override
-	public void connect(Object element) throws CoreException {
+	@Override
+	public void connect(Object element) throws CoreException
+	{
 		super.connect(element);
 
 		IDocument document = getDocument(element);
-		if (document != null) {
-			IDocumentPartitioner partitioner = new FastPartitioner(
-					new JSSourcePartitionScanner(),
+		if (document != null)
+		{
+			IDocumentPartitioner partitioner = new FastPartitioner(new JSSourcePartitionScanner(),
 					JSSourceConfiguration.CONTENT_TYPES);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().setDocumentContentType(document, IJSConstants.CONTENT_TYPE_JS);
-			DocumentContentTypeManager.getInstance().registerConfiguration(document, JSSourceConfiguration.getDefault());
+			CommonEditorPlugin.getDefault().getDocumentScopeManager().registerConfiguration(document,
+					JSSourceConfiguration.getDefault());
 		}
+	}
+
+	protected String getDefaultContentType(String filename)
+	{
+		IContentTypeManager manager = Platform.getContentTypeManager();
+		IContentType type = manager.getContentType(IJSConstants.CONTENT_TYPE_JSON);
+		if (type.isAssociatedWith(filename))
+		{
+			return IJSConstants.CONTENT_TYPE_JSON;
+		}		
+		return IJSConstants.CONTENT_TYPE_JS;
 	}
 }

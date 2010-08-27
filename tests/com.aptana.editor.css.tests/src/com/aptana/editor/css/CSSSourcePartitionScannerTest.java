@@ -10,7 +10,6 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 
-import com.aptana.editor.common.DocumentContentTypeManager;
 import com.aptana.editor.common.ExtendedFastPartitioner;
 import com.aptana.editor.common.IExtendedPartitioner;
 import com.aptana.editor.common.NullPartitionerSwitchStrategy;
@@ -31,7 +30,7 @@ public class CSSSourcePartitionScannerTest extends TestCase
 		assertEquals("Content type doesn't match expectations for: " + code.charAt(offset), contentType,
 				getContentType(code, offset));
 	}
-	
+
 	@Override
 	protected void tearDown() throws Exception
 	{
@@ -52,9 +51,6 @@ public class CSSSourcePartitionScannerTest extends TestCase
 			partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().setDocumentContentType(document, ICSSConstants.CONTENT_TYPE_CSS);
-			DocumentContentTypeManager.getInstance().registerConfiguration(document,
-					CSSSourceConfiguration.getDefault());
 		}
 		return partitioner.getContentType(offset);
 	}

@@ -8,6 +8,7 @@ import java.util.Map;
 
 import plistreader.PlistProperties;
 
+import com.aptana.scripting.model.InputType;
 import com.aptana.scripting.model.OutputType;
 
 @SuppressWarnings("nls")
@@ -23,13 +24,13 @@ public class CommandConverter
 		String userHome = System.getProperty("user.home");
 		if (args == null || args.length == 0)
 		{
-			args = new String[] { userHome + "/Documents/RadRails Bundles/sass/commands" };
+			args = new String[] { userHome + "/Documents/Aptana Rubles/sass/commands" };
 		}
 
 		String outputFilePath;
 		if (args.length < 2)
 		{
-			outputFilePath = userHome + "/Documents/RadRails Bundles/sass/commands";
+			outputFilePath = userHome + "/Documents/Aptana Rubles/sass/commands";
 		}
 		else
 		{
@@ -55,7 +56,7 @@ public class CommandConverter
 		if (properties == null)
 			return null;
 		StringBuilder buffer = new StringBuilder();
-		buffer.append("require 'radrails'\n\n");
+		buffer.append("require 'ruble'\n\n");
 		buffer.append("command '").append(BundleConverter.sanitize(properties, "name")).append("' do |cmd|\n");
 		String keyBinding = BundleConverter.sanitize(properties, "keyEquivalent");
 		if (keyBinding != null)
@@ -71,14 +72,15 @@ public class CommandConverter
 		String trigger = BundleConverter.sanitize(properties, "tabTrigger");
 		if (trigger != null)
 		{
-			buffer.append("  cmd.trigger = '").append(scope).append("'\n");
+			buffer.append("  cmd.trigger = '").append(trigger).append("'\n");
 		}
-		String outputType = BundleConverter.sanitize(properties, "output");
-		outputType = camelcaseToUnderscores(outputType);
-		outputType = convertOutputTypes(outputType);
+		String outputType = convertOutputTypes(camelcaseToUnderscores(BundleConverter.sanitize(properties, "output")));
 		buffer.append("  cmd.output = :").append(outputType).append("\n");
-		buffer.append("  cmd.input = :").append(BundleConverter.sanitize(properties, "input"));
-		String fallbackInput = BundleConverter.sanitize(properties, "fallbackInput");
+		String inputType = convertInputTypes(BundleConverter.sanitize(properties, "input"));
+		buffer.append("  cmd.input = :").append(inputType);
+		// TODO If fallbackInput is null, it actually can often mean :document! (and I think it gets shoved into
+		// TM_SELECTED_TEXT!)
+		String fallbackInput = convertInputTypes(BundleConverter.sanitize(properties, "fallbackInput"));
 		if (fallbackInput != null)
 			buffer.append(", :").append(fallbackInput);
 		buffer.append("\n");
@@ -110,7 +112,22 @@ public class CommandConverter
 		{
 			return OutputType.INSERT_AS_TEXT.getName().toLowerCase();
 		}
+		if (outputType.equals("open_as_new_document"))
+		{
+			return OutputType.CREATE_NEW_DOCUMENT.getName().toLowerCase();
+		}
 		return outputType;
+	}
+
+	private static String convertInputTypes(String inputType)
+	{
+		if (inputType == null)
+			return null;
+		if (inputType.equals("character"))
+		{
+			return InputType.RIGHT_CHAR.getName().toLowerCase();
+		}
+		return inputType;
 	}
 
 	private static String camelcaseToUnderscores(String outputType)

@@ -1,18 +1,27 @@
 package com.aptana.git.core;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.team.core.history.IFileRevision;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.core.util.IOUtil;
 import com.aptana.git.core.model.GitCommit;
-import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.GitRepositoryManager;
+import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.internal.core.storage.CommitFileRevision;
 
 /**
@@ -22,12 +31,16 @@ public class GitPlugin extends Plugin
 {
 
 	// The plug-in ID
-	private static final String PLUGIN_ID = "com.aptana.git.core"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "com.aptana.git.core"; //$NON-NLS-1$
 
 	// The shared instance
 	private static GitPlugin plugin;
 
-	private com.aptana.git.core.GitProjectRefresher fRepoListener;
+	private GitProjectRefresher fRepoListener;
+	private IResourceChangeListener fGitResourceListener;
+
+	private GitRepositoryManager fGitRepoManager;
+	private boolean updateSSHW = true;
 
 	/**
 	 * The constructor
@@ -50,10 +63,12 @@ public class GitPlugin extends Plugin
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				ResourcesPlugin.getWorkspace().addResourceChangeListener(new GitResourceListener(),
+				fGitResourceListener = new GitResourceListener();
+				ResourcesPlugin.getWorkspace().addResourceChangeListener(fGitResourceListener,
 						IResourceChangeEvent.POST_CHANGE);
 				fRepoListener = new GitProjectRefresher();
-				GitRepository.addListener(fRepoListener);
+				getGitRepositoryManager().addListener(fRepoListener);
+				getGitRepositoryManager().addListenerToEachRepository(fRepoListener);
 				return Status.OK_STATUS;
 			}
 		};
@@ -67,9 +82,21 @@ public class GitPlugin extends Plugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
-		GitRepository.removeListener(fRepoListener);
-		plugin = null;
-		super.stop(context);
+		try
+		{
+			ResourcesPlugin.getWorkspace().removeResourceChangeListener(fGitResourceListener);
+			getGitRepositoryManager().removeListener(fRepoListener);
+			getGitRepositoryManager().removeListenerFromEachRepository(fRepoListener);
+			// Remove all the GitRepositories from memory!
+			if (fGitRepoManager != null)
+				fGitRepoManager.cleanup();
+		}
+		finally
+		{
+			fGitRepoManager = null;
+			plugin = null;
+			super.stop(context);
+		}
 	}
 
 	/**
@@ -97,6 +124,18 @@ public class GitPlugin extends Plugin
 		getDefault().getLog().log(e.getStatus());
 	}
 
+	public static void logWarning(String warning)
+	{
+		if (getDefault() != null)
+			getDefault().getLog().log(new Status(IStatus.WARNING, getPluginId(), warning));
+	}
+
+	public static void logError(Exception e)
+	{
+		if (getDefault() != null)
+			getDefault().getLog().log(new Status(IStatus.WARNING, getPluginId(), "", e)); //$NON-NLS-1$
+	}
+
 	public static void logInfo(String string)
 	{
 		if (getDefault() != null && getDefault().isDebugging())
@@ -119,5 +158,44 @@ public class GitPlugin extends Plugin
 	public static IFileRevision revisionForCommit(GitCommit commit, String fileName)
 	{
 		return new CommitFileRevision(commit, fileName);
+	}
+
+	public IPath getGIT_SSH()
+	{
+		if (Platform.OS_WIN32.equals(Platform.getOS()))
+		{
+			IPath path = getStateLocation().append("bin").append("sshw.exe"); //$NON-NLS-1$ //$NON-NLS-2$
+			File file = path.toFile();
+			if (!file.exists() || updateSSHW)
+			{
+				try
+				{
+					file.getParentFile().mkdirs();
+					if (file.createNewFile())
+					{
+						IOUtil.extractFile(PLUGIN_ID, new Path("$os$/sshw.exe"), file); //$NON-NLS-1$
+					}
+				}
+				catch (IOException e)
+				{
+					logError("Extract file failed.", e); //$NON-NLS-1$
+				}
+				updateSSHW = false;
+			}
+			if (file.exists())
+			{
+				return path;
+			}
+		}
+		return null;
+	}
+
+	public IGitRepositoryManager getGitRepositoryManager()
+	{
+		if (fGitRepoManager == null)
+		{
+			fGitRepoManager = new GitRepositoryManager();
+		}
+		return fGitRepoManager;
 	}
 }

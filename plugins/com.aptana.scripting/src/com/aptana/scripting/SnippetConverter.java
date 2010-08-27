@@ -25,12 +25,12 @@ public class SnippetConverter
 		String userHome = System.getProperty("user.home");
 		if (args == null || args.length == 0)
 		{
-			args = new String[] { userHome + "/Documents/RadRails Bundles/rails-rrbundle/Snippets" };
+			args = new String[] { userHome + "/Documents/Aptana Rubles/rails.ruble/Snippets" };
 		}
 		String outputFilePath;
 		if (args.length < 2)
 		{
-			outputFilePath = userHome + "/Documents/RadRails Bundles/rails-rrbundle/Snippets/snippets.rb";
+			outputFilePath = userHome + "/Documents/Aptana Rubles/rails.ruble/Snippets/snippets.rb";
 		}
 		else
 		{

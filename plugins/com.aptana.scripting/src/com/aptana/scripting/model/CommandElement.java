@@ -1,84 +1,124 @@
 package com.aptana.scripting.model;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.ByteArrayOutputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.eclipse.jface.bindings.keys.IKeyLookup;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.bindings.keys.KeySequence;
-import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.jruby.Ruby;
 import org.jruby.RubyHash;
 import org.jruby.RubyProc;
-import org.jruby.RubySystemExit;
-import org.jruby.embed.ScriptingContainer;
 import org.jruby.exceptions.RaiseException;
-import org.jruby.javasupport.JavaEmbedUtils;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
+import com.aptana.core.ShellExecutable;
+import com.aptana.parsing.io.SourcePrinter;
+import com.aptana.scripting.Activator;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptUtils;
 import com.aptana.scripting.ScriptingEngine;
 
 public class CommandElement extends AbstractBundleElement
 {
-	private static final InputType[] NO_TYPES = new InputType[0];
-	private static final String[] NO_KEY_BINDINGS = new String[0];
-	
-	private static final String CONTEXT_RUBY_CLASS = "Context"; //$NON-NLS-1$
-	private static final String ENV_PROPERTY = "ENV"; //$NON-NLS-1$
-	private static final String OUTPUT_PROPERTY = "output"; //$NON-NLS-1$
-	private static final String TO_ENV_METHOD_NAME = "to_env"; //$NON-NLS-1$
-
-	private static final Pattern CONTROL_PLUS = Pattern.compile("control" + Pattern.quote(KeyStroke.KEY_DELIMITER), Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
-	private static final String CTRL_PLUS = Matcher.quoteReplacement(IKeyLookup.CTRL_NAME + KeyStroke.KEY_DELIMITER);
-	private static final Pattern OPTION_PLUS = Pattern.compile("option" + Pattern.quote(KeyStroke.KEY_DELIMITER), Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
-	private static final String ALT_PLUS = Matcher.quoteReplacement(IKeyLookup.ALT_NAME + KeyStroke.KEY_DELIMITER);
-
-	/**
-	 * Normalize the keyBinding string.
-	 * <p>
-	 * Convert control+ to CTRL+ Convert option+ to ALT+
-	 * 
-	 * @param keyBinding
-	 * @return
-	 */
-	static String normalizeKeyBinding(String keyBinding)
+	private static interface InvokeUnion
 	{
-		String result = null;
+		String getInvoke();
 
-		if (keyBinding != null)
+		RubyProc getInvokeBlock();
+	}
+
+	private static final class Invoke implements InvokeUnion
+	{
+		private final String _invoke;
+
+		private Invoke(String invoke)
 		{
-			result = CONTROL_PLUS.matcher(keyBinding).replaceAll(CTRL_PLUS); // Convert control+ to CTRL+
-			result = OPTION_PLUS.matcher(result).replaceAll(ALT_PLUS); // Convert option+ to ALT+
+			this._invoke = invoke;
 		}
 
-		return result;
+		public String getInvoke()
+		{
+			return this._invoke;
+		}
+
+		public RubyProc getInvokeBlock()
+		{
+			return null;
+		}
+
+		public String toString()
+		{
+			return "invoke= " + _invoke; //$NON-NLS-1$
+		}
 	}
+
+	private static final class InvokeBlock implements InvokeUnion
+	{
+		private final RubyProc _invokeBlock;
+
+		private InvokeBlock(RubyProc invokeBlock)
+		{
+			this._invokeBlock = invokeBlock;
+		}
+
+		public String getInvoke()
+		{
+			return null;
+		}
+
+		public RubyProc getInvokeBlock()
+		{
+			return this._invokeBlock;
+		}
+
+		public String toString()
+		{
+			return "invoke <block>"; //$NON-NLS-1$
+		}
+	}
+
+	private static final InvokeUnion NO_INVOKE = new InvokeUnion()
+	{
+		public String getInvoke()
+		{
+			return null;
+		}
+
+		public RubyProc getInvokeBlock()
+		{
+			return null;
+		}
+
+		public String toString()
+		{
+			return ""; //$NON-NLS-1$
+		}
+	};
+
+	private static final InputType[] NO_TYPES = new InputType[0];
+	private static final String[] NO_KEY_BINDINGS = new String[0];
+	private static final String TO_ENV_METHOD_NAME = "to_env"; //$NON-NLS-1$
+
 	private String[] _triggers;
-	private String _invoke;
-	private RubyProc _invokeBlock;
+	private Map<Platform, InvokeUnion> _invokeUnionMap;
 	private Map<Platform, String[]> _keyBindings;
 	private InputType[] _inputTypes;
 	private String _inputPath;
 	private OutputType _outputType;
 	private String _outputPath;
+	private boolean _async;
+	private RunType _runType;
+	private Ruby _runtime;
 
-	private String _workingDirectoryPath;
-
+	private IPath _workingDirectoryPath;
 	private WorkingDirectoryType _workingDirectoryType;
 
 	/**
@@ -93,6 +133,7 @@ public class CommandElement extends AbstractBundleElement
 		this._inputTypes = NO_TYPES;
 		this._outputType = OutputType.UNDEFINED;
 		this._workingDirectoryType = WorkingDirectoryType.UNDEFINED;
+		this._runType = Activator.getDefaultRunType();
 	}
 
 	/**
@@ -127,16 +168,47 @@ public class CommandElement extends AbstractBundleElement
 
 		if (this.isExecutable())
 		{
+			AbstractCommandRunner job = null;
+
+			// determine if we are running asynchronously taking the output type into account
+			boolean async = (this._async && this._outputType.allowAsync());
+
 			// set default output type, this may be changed by context.exit_with_message
 			context.setOutputType(this._outputType);
 
+			// create job based on invocation type
 			if (this.isShellCommand())
 			{
-				result = this.invokeStringCommand(context);
+				job = new CommandScriptRunner(this, context);
 			}
 			else if (this.isBlockCommand())
 			{
-				result = this.invokeBlockCommand(context);
+				// create output stream and attach to context
+				context.setOutputStream(new ByteArrayOutputStream());
+
+				BundleElement bundle = this.getOwningBundle();
+				String bundleName = bundle.getDisplayName();
+				job = new CommandBlockRunner(this, context, BundleManager.getInstance().getBundleLoadPaths(bundleName));
+			}
+
+			// run the job, if we have one
+			if (job != null)
+			{
+				try
+				{
+					job.run("Execute '" + this.getDisplayName() + "'", this._runType, async); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+				catch (InterruptedException e)
+				{
+					String message = MessageFormat.format(Messages.CommandElement_Error_Executing_Command,
+							new Object[] { this.getDisplayName(), this.getPath() });
+
+					ScriptUtils.logErrorWithStackTrace(message, e);
+				}
+
+				// get result, using a default shell if we're running async
+				result = (async && this._runType != RunType.CURRENT_THREAD) ? new CommandResult(this, context) : job
+						.getCommandResult();
 			}
 		}
 
@@ -151,7 +223,7 @@ public class CommandElement extends AbstractBundleElement
 
 		return result;
 	}
-	
+
 	/**
 	 * getElementName
 	 */
@@ -181,13 +253,80 @@ public class CommandElement extends AbstractBundleElement
 	}
 
 	/**
+	 * getInvokeUnion
+	 * 
+	 * @return
+	 */
+	private InvokeUnion getInvokeUnion()
+	{
+		Platform[] platforms = Platform.getCurrentPlatforms();
+		InvokeUnion result = null;
+
+		if (this._invokeUnionMap == null)
+		{
+			return NO_INVOKE;
+		}
+
+		for (Platform platform : platforms)
+		{
+			if (platform != Platform.UNDEFINED)
+			{
+				result = this._invokeUnionMap.get(platform);
+
+				if (result != null)
+				{
+					break;
+				}
+			}
+		}
+
+		if (result == null)
+		{
+			result = this._invokeUnionMap.get(Platform.ALL);
+		}
+		if (result == null)
+		{
+			result = NO_INVOKE;
+		}
+		return result;
+	}
+
+	/**
+	 * setInvokeUnion
+	 * 
+	 * @param OS
+	 * @param invokeUnion
+	 */
+	private void setInvokeUnion(String OS, InvokeUnion invokeUnion)
+	{
+		Platform bindingOS = Platform.get(OS);
+
+		if (bindingOS != Platform.UNDEFINED)
+		{
+			if (this._invokeUnionMap == null)
+			{
+				this._invokeUnionMap = new HashMap<Platform, InvokeUnion>();
+			}
+
+			this._invokeUnionMap.put(bindingOS, invokeUnion);
+		}
+		else
+		{
+			String message = MessageFormat.format(Messages.CommandElement_Unrecognized_OS, new Object[] {
+					this.getPath(), OS });
+
+			ScriptLogger.logWarning(message);
+		}
+	}
+
+	/**
 	 * getInvoke
 	 * 
 	 * @return
 	 */
 	public String getInvoke()
 	{
-		return this._invoke;
+		return this.getInvokeUnion().getInvoke();
 	}
 
 	/**
@@ -197,7 +336,7 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	public RubyProc getInvokeBlock()
 	{
-		return this._invokeBlock;
+		return this.getInvokeUnion().getInvokeBlock();
 	}
 
 	/**
@@ -220,7 +359,7 @@ public class CommandElement extends AbstractBundleElement
 			if (platform != Platform.UNDEFINED)
 			{
 				result = this._keyBindings.get(platform);
-				
+
 				if (result != null && result.length > 0)
 				{
 					break;
@@ -253,7 +392,7 @@ public class CommandElement extends AbstractBundleElement
 				try
 				{
 					// Need to convert the format
-					String normalizedKeyBinding = normalizeKeyBinding(binding);
+					String normalizedKeyBinding = ScriptUtils.normalizeKeyBinding(binding);
 					KeySequence sequence = KeySequence.getInstance(normalizedKeyBinding);
 
 					result.add(sequence);
@@ -291,6 +430,26 @@ public class CommandElement extends AbstractBundleElement
 	}
 
 	/**
+	 * getRuntime
+	 * 
+	 * @return
+	 */
+	public Ruby getRuntime()
+	{
+		return this._runtime;
+	}
+
+	/**
+	 * getRunType
+	 * 
+	 * @return
+	 */
+	public String getRunType()
+	{
+		return this._runType.getName();
+	}
+
+	/**
 	 * getTrigger
 	 * 
 	 * @return
@@ -305,246 +464,37 @@ public class CommandElement extends AbstractBundleElement
 	 * 
 	 * @return
 	 */
-	public String getWorkingDirectory()
+	public IPath getWorkingDirectory()
 	{
 		switch (this._workingDirectoryType)
 		{
-			case CURRENT_BUNDLE:
-				return new File(this.getPath()).getParentFile().toString();
-
 			case PATH:
-				return this._workingDirectoryPath;
-
-				// FIXME: implement for story https://www.pivotaltracker.com/story/show/2031417
-				// can't implement these yet because they require us to hook into higher level functionality in the
-				// editor.common and explorer plugins. AAAARGH.
-			case UNDEFINED:
 			case CURRENT_PROJECT:
+				// This case is handled specially because of bundle dependencies. The App Explorer plugin will look for
+				// this type and will turn it into a PATH type and set the path to the current project
+				return this._workingDirectoryPath;
+			case CURRENT_BUNDLE:
+				return Path.fromOSString(getOwningBundle().getBundleDirectory().getAbsolutePath());
+			case UNDEFINED:
 			case CURRENT_FILE:
 			default:
-				return new File(this.getPath()).getParentFile().toString();
+				return Path.fromOSString(this.getPath()).removeLastSegments(1);
 		}
 	}
 
-	/**
-	 * invokeBlockCommand
-	 * 
-	 * @param resultText
-	 * @return
-	 */
-	private CommandResult invokeBlockCommand(CommandContext context)
+	public WorkingDirectoryType getWorkingDirectoryType()
 	{
-		ScriptingContainer container = ScriptingEngine.getInstance().getScriptingContainer(); 
-		Ruby runtime = container.getRuntime();
-		Map<String, String> environment = new HashMap<String, String>();
-		boolean executedSuccessfully = true;
-		String resultText = ""; //$NON-NLS-1$
-
-		try
-		{
-			ThreadContext threadContext = runtime.getCurrentContext();
-			IRubyObject[] args = new IRubyObject[] { JavaEmbedUtils.javaToRuby(runtime, context) };
-			IRubyObject rubyContext = ScriptUtils.instantiateClass(ScriptUtils.RADRAILS_MODULE, CONTEXT_RUBY_CLASS, args);
-
-			// TODO: Keep track of any env vars we may have clobbered here and restore back their original values!
-			IRubyObject env = runtime.getObject().getConstant(ENV_PROPERTY);
-			
-			if (env != null && env instanceof RubyHash)
-			{
-				RubyHash hash = (RubyHash) env;
-				populateEnvironment(context.getMap(), environment);
-				hash.putAll(environment);
-			}
-
-			// set STDOUT
-			StringWriter writer = new StringWriter();
-			container.setWriter(writer);
-			context.put(OUTPUT_PROPERTY, container.getOut());
-			
-			// do "turn off warnings" hack and set STDIN
-			boolean isVerbose = runtime.isVerbose();
-			runtime.setVerbose(runtime.getNil());
-			container.setReader(new BufferedReader(new InputStreamReader(context.getInputStream())));
-			runtime.setVerbose((isVerbose) ? runtime.getTrue() : runtime.getFalse());
-
-			// invoke the block
-			IRubyObject result = this._invokeBlock.call(threadContext, new IRubyObject[] { rubyContext });
-			String output = writer.toString();
-
-			// process return result, if any
-			if (result != null && result.isNil() == false)
-			{
-				resultText = result.asString().asJavaString();
-			}
-			else if (output != null && output.length() > 0)
-			{
-				resultText = output;
-			}
-		}
-		catch (RaiseException e)
-		{
-			if ((e.getException() instanceof RubySystemExit) && context.isForcedExit())
-			{
-				// should be from the exit call in exit_with_message
-				resultText = context.get(OUTPUT_PROPERTY).toString();
-			}
-			else
-			{
-				String message = MessageFormat.format(
-					Messages.CommandElement_Error_Processing_Command_Block,
-					new Object[] { this.getDisplayName(), this.getPath(), e.getMessage() }
-				);
-				
-				ScriptUtils.logErrorWithStackTrace(message, e);
-				executedSuccessfully = false;
-			}
-		}
-		catch (Exception e)
-		{
-			String message = MessageFormat.format(
-				Messages.CommandElement_Error_Processing_Command_Block,
-				new Object[] { this.getDisplayName(), this.getPath(), e.getMessage() }
-			);
-			
-			ScriptUtils.logErrorWithStackTrace(message, e);
-			executedSuccessfully = false;
-		}
-		
-		// Now clear the environment
-		IRubyObject env = runtime.getObject().getConstant(ENV_PROPERTY);
-		
-		if (env != null && env instanceof RubyHash)
-		{
-			RubyHash hash = (RubyHash) env;
-			
-			for (String key : environment.keySet())
-			{
-				hash.remove(key);
-			}
-		}
-
-		CommandResult result = new CommandResult(resultText);
-		result.setExecutedSuccessfully(executedSuccessfully);
-		result.setCommand(this);
-		result.setContext(context);
-
-		return result;
+		return this._workingDirectoryType;
 	}
 
 	/**
-	 * invokeStringCommand
+	 * isAsync
 	 * 
 	 * @return
 	 */
-	private CommandResult invokeStringCommand(CommandContext context)
+	public boolean isAsync()
 	{
-		// TODO: hardly a robust implementation, but enough to start testing
-		// functionality
-
-		String OS = org.eclipse.core.runtime.Platform.getOS();
-		File tempFile = null;
-		String resultText = ""; //$NON-NLS-1$
-		boolean executedSuccessfully = true;
-		int exitValue = 0;
-
-		try
-		{
-			// create temporary file for execution
-			tempFile = File.createTempFile("command_temp_", //$NON-NLS-1$
-					(OS.equals(org.eclipse.core.runtime.Platform.OS_WIN32) ? ".bat" : ".sh") //$NON-NLS-1$ //$NON-NLS-2$
-					);
-
-			// dump "invoke" content into temp file
-			PrintWriter pw = new PrintWriter(tempFile);
-			pw.print(this._invoke);
-			pw.close();
-
-			// create process builder
-			ProcessBuilder builder = new ProcessBuilder();
-
-			// augment environment with the context map
-			if (context != null)
-			{
-				this.populateEnvironment(context.getMap(), builder.environment());
-			}
-
-			// create the command to execute
-			List<String> commands = new ArrayList<String>();
-
-			if (OS.equals(org.eclipse.core.runtime.Platform.OS_MACOSX)
-					|| OS.equals(org.eclipse.core.runtime.Platform.OS_LINUX))
-			{
-				// FIXME: should we be using the user's preferred shell instead of hardcoding?
-				commands.add("/bin/bash"); //$NON-NLS-1$
-			}
-			else
-			{
-				// FIXME: we should allow use of other shells on Windows: PowerShell, cygwin, etc.
-				commands.add("cmd"); //$NON-NLS-1$
-			}
-
-			commands.add(tempFile.getAbsolutePath());
-
-			// setup command-line
-			builder.command(commands);
-
-			// setup working directory
-			String path = this.getWorkingDirectory();
-			if (path != null && path.length() > 0)
-			{
-				builder.directory(new File(path));
-			}
-
-			// run process and get output
-			StringBuffer buffer = new StringBuffer();
-			Process process = builder.start();
-
-			InputStream is = process.getInputStream();
-			byte[] line = new byte[1024];
-			int count;
-
-			try
-			{
-				while ((count = is.read(line)) != -1)
-				{
-					buffer.append(new String(line, 0, count));
-				}
-			}
-			catch (IOException e)
-			{
-				ScriptLogger.logError(e.getMessage());
-				executedSuccessfully = false;
-			}
-
-			exitValue = process.waitFor();
-			resultText = buffer.toString();
-			executedSuccessfully = (exitValue == 0);
-		}
-		catch (IOException e)
-		{
-			ScriptLogger.logError(e.getMessage());
-			executedSuccessfully = false;
-		}
-		catch (InterruptedException e)
-		{
-			ScriptLogger.logError(e.getMessage());
-			executedSuccessfully = false;
-		}
-		finally
-		{
-			if (tempFile != null && tempFile.exists())
-			{
-				tempFile.delete();
-			}
-		}
-
-		CommandResult result = new CommandResult(resultText);
-		result.setReturnValue(exitValue);
-		result.setExecutedSuccessfully(executedSuccessfully);
-		result.setCommand(this);
-		result.setContext(context);
-
-		return result;
+		return this._async;
 	}
 
 	/**
@@ -554,7 +504,7 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	public boolean isBlockCommand()
 	{
-		return (this._invokeBlock != null);
+		return (this.getInvokeUnion().getInvokeBlock() != null);
 	}
 
 	/**
@@ -564,7 +514,7 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	public boolean isExecutable()
 	{
-		return ((this._invoke != null && this._invoke.length() > 0) || this._invokeBlock != null);
+		return ((this.getInvoke() != null && this.getInvoke().length() > 0) || this.getInvokeBlock() != null);
 	}
 
 	/**
@@ -574,7 +524,7 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	public boolean isShellCommand()
 	{
-		return (this._invokeBlock == null && this._invoke != null && this._invoke.length() > 0);
+		return (this.getInvokeBlock() == null && this.getInvoke() != null && this.getInvoke().length() > 0);
 	}
 
 	/**
@@ -583,8 +533,10 @@ public class CommandElement extends AbstractBundleElement
 	 * @param contextMap
 	 * @param environment
 	 */
+	@SuppressWarnings("deprecation")
 	void populateEnvironment(Map<String, Object> contextMap, Map<String, String> environment)
 	{
+		environment.putAll(ShellExecutable.getEnvironment());
 		for (Map.Entry<String, Object> entry : contextMap.entrySet())
 		{
 			Object valueObject = entry.getValue();
@@ -598,15 +550,15 @@ public class CommandElement extends AbstractBundleElement
 				{
 					Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
 					ThreadContext threadContext = runtime.getCurrentContext();
-					
+
 					try
 					{
 						IRubyObject methodResult = rubyObject.callMethod(threadContext, TO_ENV_METHOD_NAME);
-	
+
 						if (methodResult instanceof RubyHash)
 						{
 							RubyHash environmentHash = (RubyHash) methodResult;
-	
+
 							for (Object hashKey : environmentHash.keySet())
 							{
 								environment.put(hashKey.toString(), environmentHash.get(hashKey).toString());
@@ -615,11 +567,9 @@ public class CommandElement extends AbstractBundleElement
 					}
 					catch (RaiseException e)
 					{
-						String message = MessageFormat.format(
-							"An error occurred while building environment variables for the ''{0}'' context property in the ''{1}'' command ({2}): {3}",
-							new Object[] { entry.getKey(), this.getDisplayName(), this.getPath(), e.getMessage() }
-						);
-						
+						String message = MessageFormat.format(Messages.CommandElement_Error_Building_Env_Variables,
+								new Object[] { entry.getKey(), this.getDisplayName(), this.getPath(), e.getMessage() });
+
 						ScriptLogger.logError(message);
 						e.printStackTrace();
 					}
@@ -652,15 +602,15 @@ public class CommandElement extends AbstractBundleElement
 		printer.printWithIndent("scope: ").println(this.getScope()); //$NON-NLS-1$
 
 		// output invoke/expansion, if it is defined
-		if (this._invoke != null)
+		if (this.getInvoke() != null)
 		{
-			printer.printWithIndent("invoke: ").println(this._invoke); //$NON-NLS-1$
+			printer.printWithIndent("invoke: ").println(this.getInvoke()); //$NON-NLS-1$
 		}
 
 		// output invoke block, if it is defined
-		if (this._invokeBlock != null)
+		if (this.getInvokeBlock() != null)
 		{
-			printer.printWithIndent("block: ").println(this._invokeBlock.to_s().asJavaString()); //$NON-NLS-1$
+			printer.printWithIndent("block: ").println(this.getInvokeBlock().to_s().asJavaString()); //$NON-NLS-1$
 		}
 
 		// output key bindings, if it is defined
@@ -745,6 +695,16 @@ public class CommandElement extends AbstractBundleElement
 	}
 
 	/**
+	 * setAsync
+	 * 
+	 * @param value
+	 */
+	public void setAsync(boolean value)
+	{
+		this._async = value;
+	}
+
+	/**
 	 * setInputPath
 	 * 
 	 * @param path
@@ -813,7 +773,7 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	public void setInvoke(String invoke)
 	{
-		this._invoke = invoke;
+		this.setInvoke(Platform.ALL.getName(), invoke);
 	}
 
 	/**
@@ -823,7 +783,30 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	public void setInvokeBlock(RubyProc block)
 	{
-		this._invokeBlock = block;
+		this.setInvokeBlock(Platform.ALL.getName(), block);
+	}
+
+	/**
+	 * setInvoke
+	 * 
+	 * @param invoke
+	 */
+	public void setInvoke(String OS, String invoke)
+	{
+		InvokeUnion invokeUnion = new Invoke(invoke);
+		setInvokeUnion(OS, invokeUnion);
+	}
+
+	/**
+	 * setInvokeBlock
+	 * 
+	 * @param block
+	 */
+	public void setInvokeBlock(String OS, RubyProc block)
+	{
+		InvokeUnion invokeUnion = new InvokeBlock(block);
+		setInvokeUnion(OS, invokeUnion);
+		this.setRuntime((block != null) ? block.getRuntime() : null);
 	}
 
 	/**
@@ -862,8 +845,15 @@ public class CommandElement extends AbstractBundleElement
 			{
 				this._keyBindings = new HashMap<Platform, String[]>();
 			}
-
-			this._keyBindings.put(bindingOS, keyBindings);
+			
+			// Force each string to be uppercase, http://aptana.lighthouseapp.com/projects/45260/tickets/393
+			int i = 0;
+			String[] uppercase = new String[keyBindings.length];
+			for(String binding : keyBindings)
+			{
+				uppercase[i++] = binding.toUpperCase();
+			}
+			this._keyBindings.put(bindingOS, uppercase);
 		}
 		else
 		{
@@ -905,6 +895,46 @@ public class CommandElement extends AbstractBundleElement
 	}
 
 	/**
+	 * setRunType
+	 * 
+	 * @param type
+	 */
+	public void setRunType(String type)
+	{
+		this._runType = RunType.get(type);
+	}
+
+	/**
+	 * setRuntime
+	 * 
+	 * @param object
+	 */
+	public void setRuntime(IRubyObject object)
+	{
+		this.setRuntime((object != null) ? object.getRuntime() : null);
+	}
+
+	/**
+	 * setRuntime
+	 * 
+	 * @param object
+	 */
+	public void setRuntime(Ruby runtime)
+	{
+		this._runtime = runtime;
+	}
+
+	/**
+	 * setRunType
+	 * 
+	 * @param type
+	 */
+	public void setRunType(RunType type)
+	{
+		this._runType = type;
+	}
+
+	/**
 	 * setTrigger
 	 * 
 	 * @param trigger
@@ -929,7 +959,7 @@ public class CommandElement extends AbstractBundleElement
 	 * 
 	 * @param path
 	 */
-	public void setWorkingDirectoryPath(String path)
+	public void setWorkingDirectoryPath(IPath path)
 	{
 		this._workingDirectoryPath = path;
 	}
@@ -952,5 +982,21 @@ public class CommandElement extends AbstractBundleElement
 	public void setWorkingDirectoryType(WorkingDirectoryType type)
 	{
 		this._workingDirectoryType = type;
+	}
+
+	/**
+	 * Return the environment based on the current context.
+	 * 
+	 * @return environment map
+	 */
+	public Map<String, String> getEnvironment()
+	{
+		CommandContext commandContext = createCommandContext();
+
+		// Get the process's environment
+		Map<String, String> environment = new LinkedHashMap<String, String>(new ProcessBuilder().environment());
+		populateEnvironment(commandContext.getMap(), environment);
+
+		return environment;
 	}
 }

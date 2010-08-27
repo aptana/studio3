@@ -4,13 +4,11 @@ public class CSSAttributeSelectorNode extends CSSNode
 {
 
 	private String fAttributeText;
-	private CSSExpressionNode fFuncExpr;
 
 	public CSSAttributeSelectorNode(String text, int start, int end)
 	{
+		super(start, end);
 		fAttributeText = text;
-		this.start = start;
-		this.end = end;
 	}
 
 	/**
@@ -21,9 +19,30 @@ public class CSSAttributeSelectorNode extends CSSNode
 	 */
 	public CSSAttributeSelectorNode(CSSExpressionNode function, int start)
 	{
-		fFuncExpr = function;
-		this.start = start;
-		this.end = function.getEnd();
+		super(start, function.getEnd());
+		setChildren(new CSSNode[] { function });
+	}
+
+	public CSSExpressionNode getFunction()
+	{
+		return (CSSExpressionNode) getChild(0);
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!super.equals(obj) || !(obj instanceof CSSAttributeSelectorNode))
+		{
+			return false;
+		}
+		CSSAttributeSelectorNode other = (CSSAttributeSelectorNode) obj;
+		return toString().equals(other.toString());
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return super.hashCode() * 31 + toString().hashCode();
 	}
 
 	@Override
@@ -31,7 +50,7 @@ public class CSSAttributeSelectorNode extends CSSNode
 	{
 		if (fAttributeText == null)
 		{
-			return ":" + fFuncExpr.toString(); //$NON-NLS-1$
+			return ":" + getFunction(); //$NON-NLS-1$
 		}
 		return fAttributeText;
 	}

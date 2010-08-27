@@ -4,10 +4,10 @@
    <extension
          point="org.eclipse.ui.views">
       <view
-            allowMultiple="false"
+            allowMultiple="true"
             category="org.eclipse.ui"
             class="com.aptana.explorer.internal.ui.FilteringProjectView"
-            icon="icons/full/cview16/filenav_nav.gif"
+            icon="icons/full/cview16/filenav_nav.png"
             id="com.aptana.explorer.view"
             name="%view.name"
             restorable="true">
@@ -28,29 +28,25 @@
                   pattern="org.eclipse.ui.navigator.resources.filters.*">
             </contentExtension>
             <contentExtension pattern="org.eclipse.jdt.java.ui.javaContent" />
-			<contentExtension pattern="org.eclipse.jdt.java.ui.filters.*" />	
-			<contentExtension pattern="org.eclipse.jdt.java.ui.javaLinkHelper" />	
+			<contentExtension pattern="org.eclipse.jdt.java.ui.filters.*" />
+			<contentExtension pattern="org.eclipse.ui.navigator.resources.linkHelper">
+   </contentExtension>	
          </includes>
+         <excludes>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resources.workingSets">
+            </contentExtension>
+         </excludes>
       </viewerContentBinding>
       <viewerActionBinding
             viewerId="com.aptana.explorer.view">
          <includes>
             <actionExtension
-                  pattern="org.eclipse.ui.navigator.resources.*">
+                  pattern="org\.eclipse\.ui\.navigator\.resources\.(?!WorkingSetActions).*">
             </actionExtension>
          </includes>
       </viewerActionBinding>
 	</extension>
-   <extension
-         point="org.eclipse.ui.themes">
-      <fontDefinition
-            categoryId="org.eclipse.ui.workbenchMisc"
-            defaultsTo="org.eclipse.jface.textfont"
-            id="com.aptana.explorer.font"
-            isEditable="true"
-            label="%appExplorerFont.label">
-      </fontDefinition>
-   </extension>
    <extension
          point="com.aptana.scripting.contextContributors">
       <contributor
@@ -61,14 +57,193 @@
    <extension
          point="com.aptana.scripting.loadPaths">
       <loadPath
-            name="RadRails Framework Files"
+            name="Aptana Studio Framework Files"
             path="framework/">
       </loadPath>
    </extension>
    <extension
          point="com.aptana.scripting.frameworkFiles">
       <file
-            name="radrails/project.rb">
+            name="ruble/project.rb">
       </file>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+         class="com.aptana.explorer.internal.ui.SearchTextHandler:org.eclipse.ui.edit.cut"
+         commandId="org.eclipse.ui.edit.cut">
+        <activeWhen>
+           <with variable="activeFocusControlId">
+             <equals value="com.aptana.explorer.view.searchText"/>
+           </with>
+        </activeWhen>
+      </handler>
+      <handler
+         class="com.aptana.explorer.internal.ui.SearchTextHandler:org.eclipse.ui.edit.copy"
+         commandId="org.eclipse.ui.edit.copy">
+        <activeWhen>
+           <with variable="com.aptana.explorer.view.searchText">
+             <equals value="com.aptana.explorer.view.SearchInProject"/>
+           </with>
+        </activeWhen>
+      </handler>
+      <handler
+         class="com.aptana.explorer.internal.ui.SearchTextHandler:org.eclipse.ui.edit.paste"
+         commandId="org.eclipse.ui.edit.paste">
+        <activeWhen>
+           <with variable="activeFocusControlId">
+             <equals value="com.aptana.explorer.view.searchText"/>
+           </with>
+        </activeWhen>
+      </handler>
+      <handler
+         class="com.aptana.explorer.internal.ui.SearchTextHandler:org.eclipse.ui.edit.selectAll"
+         commandId="org.eclipse.ui.edit.selectAll">
+        <activeWhen>
+           <with variable="activeFocusControlId">
+             <equals value="com.aptana.explorer.view.searchText"/>
+           </with>
+        </activeWhen>
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.navigatorContent">
+      <commonWizard
+            associatedExtensionId="org.eclipse.ui.navigator.resourceContent"
+            type="new"
+            wizardId="com.aptana.ui.wizards.new.file">
+         <enablement>
+			<or>
+				<adapt type="org.eclipse.core.resources.IFile" />
+				<adapt type="org.eclipse.core.resources.IFolder" />
+	         	<adapt type="org.eclipse.core.resources.IProject" />
+	            <adapt type="org.eclipse.core.resources.IWorkspaceRoot" />
+			</or>
+	     </enablement>
+      </commonWizard>
+      <commonWizard
+            associatedExtensionId="org.eclipse.ui.navigator.resourceContent"
+            type="new"
+            wizardId="com.aptana.ui.wizards.NewWebProject">
+         <enablement></enablement>
+      </commonWizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.ui.category.views"
+            defaultHandler="com.aptana.explorer.internal.handlers.ToggleAppExplorerHandler"
+            description="%command.toggleappexplorer.description"
+            id="com.aptana.explorer.commands.toggleAppExplorer"
+            name="%command.toggleappexplorer.name">
+         <state
+               class="org.eclipse.ui.handlers.RegistryToggleState:true"
+               id="org.eclipse.ui.commands.toggleState">
+         </state>
+      </command>
+      <command
+            defaultHandler="com.aptana.explorer.internal.handlers.DeployHandler"
+            id="com.aptana.explorer.deploy"
+            name="%Deploy.label">
+      </command>
+      <command
+            defaultHandler="com.aptana.explorer.internal.handlers.OpenTerminalHandler"
+            id="com.aptana.explorer.commands.openTerminal"
+            name="%command.openTerminal.name">
+      </command>
+      <command
+            defaultHandler="com.aptana.explorer.internal.handlers.RunDeployWizardHandler"
+            id="com.aptana.explorer.deploywizard"
+            name="%DeployWizard.label">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="com.aptana.ui.globalActionSet">
+            <command
+                  commandId="com.aptana.explorer.commands.toggleAppExplorer"
+                  icon="icons/full/cview16/filenav_nav.png"
+                  style="toggle">
+               <visibleWhen>
+                  <reference
+                        definitionId="com.aptana.ui.contributions.inGlobalActionSet">
+                  </reference>
+               </visibleWhen>
+            </command>
+         </toolbar>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:com.aptana.explorer.deploy?before=group.deploy">
+         <command
+               commandId="com.aptana.explorer.deploy"
+               label="%Deploy.label"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:com.aptana.explorer.deploy?before=group.cap">
+         <command
+               commandId="com.aptana.explorer.deploy"
+               label="%Deploy.label"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:com.aptana.explorer.deploy?before=group.ftp">
+         <command
+               commandId="com.aptana.explorer.deploy"
+               label="%FTPDeploy.label"
+               icon="icons/full/elcl16/network_arrow.png"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:com.aptana.explorer.deploy?after=group.wizard">
+         <command
+               commandId="com.aptana.explorer.deploywizard"
+               label="%DeployWizard.label"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:com.aptana.explorer.gear?after=group.run">
+         <command
+               commandId="com.aptana.explorer.commands.openTerminal"
+               label="%command.openTerminal.name"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="true"
+            locationURI="popup:com.aptana.explorer.view?before=group.edit">
+         <menu
+               id="appExplorerShowIn"
+               label="%ShowIn.label">
+            <dynamic
+                  class="com.aptana.ui.commands.OpenFileManagerContributionItem"
+                  id="com.aptana.explorer.open.file.manager">
+            </dynamic>
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate>
+                  <instanceof
+                        value="org.eclipse.core.resources.IResource">
+                  </instanceof>
+               </iterate>
+            </visibleWhen>
+         </menu>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="com.aptana.explorer.deploy"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="CTRL+M3+D">
+      </key>
    </extension>
 </plugin>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.debug.core.processFactories">
+      <processFactory
+            class="com.aptana.console.process.ConsoleProcessFactory"
+            id="com.aptana.console.processFactory">
+      </processFactory>
+   </extension>
+
+</plugin>

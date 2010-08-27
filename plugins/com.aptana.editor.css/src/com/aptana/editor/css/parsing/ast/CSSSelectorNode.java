@@ -3,14 +3,11 @@ package com.aptana.editor.css.parsing.ast;
 public class CSSSelectorNode extends CSSNode
 {
 
-	private CSSSimpleSelectorNode[] fSimpleSelectors;
-
 	public CSSSelectorNode(CSSRuleNode parent, CSSSimpleSelectorNode[] simpleSelectors, int start, int end)
 	{
+		super(start, end);
 		setParent(parent);
-		fSimpleSelectors = simpleSelectors;
-		this.start = start;
-		this.end = end;
+		setChildren(simpleSelectors);
 	}
 
 	public CSSRuleNode getRule()
@@ -18,23 +15,20 @@ public class CSSSelectorNode extends CSSNode
 		return (CSSRuleNode) getParent();
 	}
 
-	public CSSSimpleSelectorNode[] getSimpleSelectors()
+	@Override
+	public boolean equals(Object obj)
 	{
-		return fSimpleSelectors;
+		if (!super.equals(obj) || !(obj instanceof CSSSelectorNode))
+		{
+			return false;
+		}
+		CSSSelectorNode other = (CSSSelectorNode) obj;
+		return toString().equals(other.toString());
 	}
 
 	@Override
-	public String toString()
+	public int hashCode()
 	{
-		StringBuilder text = new StringBuilder();
-		for (int i = 0; i < fSimpleSelectors.length; ++i)
-		{
-			text.append(fSimpleSelectors[i]);
-			if (i < fSimpleSelectors.length - 1)
-			{
-				text.append(" "); //$NON-NLS-1$
-			}
-		}
-		return text.toString();
+		return super.hashCode() * 31 + toString().hashCode();
 	}
 }

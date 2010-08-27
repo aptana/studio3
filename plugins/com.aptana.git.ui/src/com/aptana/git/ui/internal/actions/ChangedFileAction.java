@@ -7,13 +7,13 @@ import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.actions.GitAction;
 
-abstract class ChangedFileAction extends GitAction
+public abstract class ChangedFileAction extends GitAction
 {
 	protected ChangedFile getChangedFile(IResource resource)
 	{
 		if (!(resource instanceof IFile))
 			return null;
-		GitRepository repo = GitRepository.getAttached(resource.getProject());
+		GitRepository repo = getGitRepositoryManager().getAttached(resource.getProject());
 		if (repo == null)
 			return null;
 		return getChangedFile(repo, resource);

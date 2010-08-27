@@ -11,9 +11,17 @@ public class AllTests
 		// $JUnit-BEGIN$
 		suite.addTestSuite(BundleTests.class);
 		suite.addTestSuite(CommandTests.class);
+		suite.addTestSuite(PlatformSpecificCommandTests.class);
 		suite.addTestSuite(ContextTests.class);
 		suite.addTestSuite(FilterTests.class);
 		suite.addTestSuite(KeyBindingTests.class);
+		suite.addTestSuite(BundleVisibilityTests.class);
+		suite.addTestSuite(WithDefaultsTests.class);
+		suite.addTestSuite(ProjectBundleMonitorTests.class);
+		
+		// TODO: uncomment once timing issues are resolved. We're still getting
+		// Intermittent failures
+		//suite.addTestSuite(UserBundleMonitorTests.class);
 		// $JUnit-END$
 		return suite;
 	}

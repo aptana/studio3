@@ -17,4 +17,10 @@
             typeClass="com.aptana.git.core.GitRepositoryProviderType">
       </repository>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.aptana.git.internal.core.PreferenceInitializer">
+      </initializer>
+   </extension>
 </plugin>

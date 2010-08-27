@@ -21,14 +21,13 @@ import org.eclipse.jface.text.link.LinkedModeModel;
 import org.eclipse.jface.text.link.LinkedModeUI;
 import org.eclipse.jface.text.link.LinkedPosition;
 import org.eclipse.jface.text.link.LinkedPositionGroup;
-import org.eclipse.jface.text.link.LinkedModeUI.ExitFlags;
-import org.eclipse.jface.text.link.LinkedModeUI.IExitPolicy;
 import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.texteditor.link.EditorLinkedModeUI;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.scope.ScopeSelector;
 
 /**
  * A class that can be installed on a ITextViewer and will auto-insert the closing peer character for typical paired
@@ -47,6 +46,8 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	private IPositionUpdater fUpdater = new ExclusivePositionUpdater(CATEGORY);
 	private Stack<BracketLevel> fBracketLevelStack = new Stack<BracketLevel>();
 	private char[] pairs;
+
+	private static final ScopeSelector fgCommentSelector = new ScopeSelector("comment"); //$NON-NLS-1$
 
 	PeerCharacterCloser(ITextViewer textViewer, char[] pairs)
 	{
@@ -79,6 +80,13 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 
 		try
 		{
+
+			String scope = getScopeAtOffset(document, offset);
+			if (fgCommentSelector.matches(scope))
+			{
+				return;
+			}
+
 			if (length > 0)
 			{
 				wrapSelection(event, document, offset, length);
@@ -152,7 +160,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 
 			level.fUI = new EditorLinkedModeUI(model, textViewer);
 			level.fUI.setSimpleMode(true);
-			level.fUI.setExitPolicy(new ExitPolicy(closingCharacter, getEscapeCharacter(closingCharacter),
+			level.fUI.setExitPolicy(new ExitPolicy(textViewer, closingCharacter, getEscapeCharacter(closingCharacter),
 					fBracketLevelStack));
 			level.fUI.setExitPosition(textViewer, offset + 2, 0, Integer.MAX_VALUE);
 			level.fUI.setCyclingMode(LinkedModeUI.CYCLE_NEVER);
@@ -173,57 +181,83 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		}
 	}
 
+	protected String getScopeAtOffset(IDocument document, final int offset) throws BadLocationException
+	{
+		return CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(document, offset);
+	}
+
 	boolean unpairedClose(char openingChar, char closingCharacter, IDocument document, int offset)
 	{
 		try
 		{
 			// Now we need to do smarter checks, see if rest of doc contains unbalanced set!
-			String before = document.get(0, offset).trim();
+			String before = document.get(0, offset); // don't cheat and trim because we need offsets to match for
+														// comment scope matching
 			int stackLevel = 0;
 			for (int i = 0; i < before.length(); i++)
 			{
+
 				char c = before.charAt(i);
 				if (c == openingChar && openingChar == closingCharacter)
 				{
-					stackLevel++;
-					stackLevel = stackLevel % 2;
+					if (!fgCommentSelector.matches(getScopeAtOffset(document, i)))
+					{
+						stackLevel++;
+						stackLevel = stackLevel % 2;
+					}
 				}
 				else if (c == openingChar)
 				{
-					stackLevel++;
+					if (!fgCommentSelector.matches(getScopeAtOffset(document, i)))
+					{
+						stackLevel++;
+					}
 				}
 				else if (c == closingCharacter)
 				{
-					stackLevel--;
+					if (!fgCommentSelector.matches(getScopeAtOffset(document, i)))
+					{
+						stackLevel--;
+					}
 				}
 			}
 
-			String after = document.get(offset, document.getLength() - offset).trim();
+			String after = document.get(offset, document.getLength() - offset); // don't cheat and trim because we need
+																				// offsets to match for comment scope
+																				// matching
 			for (int i = 0; i < after.length(); i++)
 			{
 				char c = after.charAt(i);
 				if (c == openingChar && openingChar == closingCharacter)
 				{
-					stackLevel++;
-					stackLevel = stackLevel % 2;
+					if (!fgCommentSelector.matches(getScopeAtOffset(document, offset + i)))
+					{
+						stackLevel++;
+						stackLevel = stackLevel % 2;
+					}
 				}
 				else if (c == openingChar)
 				{
-					stackLevel++;
+					if (!fgCommentSelector.matches(getScopeAtOffset(document, offset + i)))
+					{
+						stackLevel++;
+					}
 				}
 				else if (c == closingCharacter)
 				{
-					stackLevel--;
-					if (stackLevel < 0)
-						return true;
+					if (!fgCommentSelector.matches(getScopeAtOffset(document, offset + i)))
+					{
+						stackLevel--;
+						if (stackLevel < 0)
+							return true;
+					}
 				}
 			}
 			return stackLevel != 0;
 		}
 		catch (BadLocationException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// ignore
 		}
 		return false;
 	}
@@ -257,6 +291,8 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		int index = -1;
 		while ((index = previous.indexOf(c, index + 1)) != -1)
 		{
+			if (fgCommentSelector.matches(getScopeAtOffset(document, beginning + index)))
+				continue;
 			open = !open;
 			if (open)
 			{
@@ -351,81 +387,13 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		return true;
 	}
 
-	/**
-	 * Determines when to exit linked mode in the editor.
-	 * 
-	 * @author cwilliams
-	 */
-	private class ExitPolicy implements IExitPolicy
-	{
-
-		final char fExitCharacter;
-		final char fEscapeCharacter;
-		final Stack<BracketLevel> fStack;
-		final int fSize;
-
-		public ExitPolicy(char exitCharacter, char escapeCharacter, Stack<BracketLevel> stack)
-		{
-			fExitCharacter = exitCharacter;
-			fEscapeCharacter = escapeCharacter;
-			fStack = stack;
-			fSize = fStack.size();
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * @see org.eclipse.jface.text.link.LinkedModeUI.IExitPolicy#doExit(org.eclipse.jface.text.link.LinkedModeModel,
-		 * org.eclipse.swt.events.VerifyEvent, int, int)
-		 */
-		public ExitFlags doExit(LinkedModeModel model, VerifyEvent event, int offset, int length)
-		{
-			if (event.character == 10 || event.character == 13) // \n // \r
-			{
-				return new ExitFlags(ILinkedModeListener.EXIT_ALL, true);
-			}
-
-			if (event.character != fExitCharacter)
-				return null;
-
-			if (fSize == fStack.size() && !isEscaped(offset))
-			{
-				BracketLevel level = fStack.peek();
-				if (level.fFirstPosition.offset > offset || level.fSecondPosition.offset < offset)
-					return null;
-				if (level.fSecondPosition.offset == offset && length == 0)
-					// don't enter the character if if its the closing peer
-					return new ExitFlags(ILinkedModeListener.UPDATE_CARET, false);
-			}
-
-			return null;
-		}
-
-		/**
-		 * Is the character escaped by a preceding escape char?
-		 * 
-		 * @param offset
-		 * @return
-		 */
-		private boolean isEscaped(int offset)
-		{
-			IDocument document = textViewer.getDocument();
-			try
-			{
-				return fEscapeCharacter == document.getChar(offset - 1);
-			}
-			catch (BadLocationException e)
-			{
-			}
-			return false;
-		}
-	}
 
 	/**
 	 * Simple class to hold linked mode and two positions.
 	 * 
 	 * @author cwilliams
 	 */
-	private static class BracketLevel
+	static class BracketLevel
 	{
 		LinkedModeUI fUI;
 		Position fFirstPosition;

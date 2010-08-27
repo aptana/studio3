@@ -12,6 +12,30 @@
                value="org.eclipse.team.core.repository=com.aptana.git.core.GitRepositoryProvider">
          </filter>
          <action
+               class="com.aptana.git.ui.actions.RevertAction"
+               definitionId="com.aptana.git.ui.command.revert"
+               id="com.aptana.git.ui.actions.RevertAction"
+               label="%RevertAction_label"
+               menubarPath="team.main/targetGroup"
+               tooltip="%RevertAction_tooltip">
+         </action>
+         <action
+               class="com.aptana.git.ui.actions.UnstageAction"
+               definitionId="com.aptana.git.ui.command.unstage"
+               id="com.aptana.git.ui.actions.UnstageAction"
+               label="%UnstageAction_label"
+               menubarPath="team.main/targetGroup"
+               tooltip="%UnstageAction_tooltip">
+         </action>
+         <action
+               class="com.aptana.git.ui.actions.StageAction"
+               definitionId="com.aptana.git.ui.command.stage"
+               id="com.aptana.git.ui.actions.StageAction"
+               label="%StageAction_label"
+               menubarPath="team.main/targetGroup"
+               tooltip="%StageAction_tooltip">
+         </action>
+         <action
                class="com.aptana.git.ui.actions.GithubNetworkAction"
                definitionId="com.aptana.git.ui.command.github.network"
                icon="icons/obj16/github.gif"
@@ -23,9 +47,17 @@
          <action
                label="%DisconnectAction_label"
                tooltip="%DisconnectAction_tooltip"
-                class="com.aptana.git.ui.internal.actions.DisconnectAction"
+               class="com.aptana.git.ui.actions.DisconnectAction"
                id="com.aptana.git.ui.actions.DisconnectAction"
                menubarPath="team.main/projectGroup">
+         </action>
+         <action
+               class="com.aptana.git.ui.actions.AddRemoteAction"
+               definitionId="com.aptana.git.ui.command.add_remote"
+               id="com.aptana.git.ui.actions.AddRemoteAction"
+               label="%AddRemoteAction_label"
+               menubarPath="team.main/projectGroup"
+               tooltip="%AddRemoteAction_tooltip">
          </action>
          <action
                class="com.aptana.git.ui.actions.PushAction"
@@ -44,7 +76,7 @@
                tooltip="%PullAction_tooltip">
          </action>
          <action
-               class="com.aptana.git.ui.internal.actions.StatusAction"
+               class="com.aptana.git.ui.actions.StatusAction"
                definitionId="com.aptana.git.ui.command.status"
                id="com.aptana.git.ui.actions.StatusAction"
                label="%StatusAction_label"
@@ -52,7 +84,7 @@
                tooltip="%StatusAction_tooltip">
          </action>
          <action
-               class="com.aptana.git.ui.internal.actions.ShowResourceInHistoryAction"
+               class="com.aptana.git.ui.actions.ShowResourceInHistoryAction"
                id="com.aptana.git.ui.actions.ShowResourceInHistoryAction"
                label="%ShowResourceInHistoryAction_label"
                menubarPath="team.main/group1"
@@ -67,7 +99,7 @@
                tooltip="%CommitAction_tooltip">
          </action>
          <action
-               class="com.aptana.git.ui.internal.actions.DeleteBranchAction"
+               class="com.aptana.git.ui.actions.DeleteBranchAction"
                id="com.aptana.git.ui.actions.DeleteBranchAction"
                definitionId="com.aptana.git.ui.command.delete_branch"
                label="%DeleteBranchAction_label"
@@ -75,7 +107,7 @@
                tooltip="%DeleteBranchAction_tooltip">
          </action>
          <action
-               class="com.aptana.git.ui.internal.actions.MergeBranchAction"
+               class="com.aptana.git.ui.actions.MergeBranchAction"
                id="com.aptana.git.ui.actions.MergeBranchAction"
                definitionId="com.aptana.git.ui.command.merge_branch"
                label="%MergeBranchAction_label"
@@ -109,31 +141,7 @@
                name="projectPersistentProperty"
                value="org.eclipse.team.core.repository=com.aptana.git.core.GitRepositoryProvider">
          </filter>
-         <action
-               class="com.aptana.git.ui.internal.actions.RevertAction"
-               definitionId="com.aptana.git.ui.command.revert"
-               id="com.aptana.git.ui.actions.RevertAction"
-               label="%RevertAction_label"
-               menubarPath="team.main/targetGroup"
-               tooltip="%RevertAction_tooltip">
-         </action>
-         <action
-               class="com.aptana.git.ui.internal.actions.UnstageAction"
-               definitionId="com.aptana.git.ui.command.unstage"
-               id="com.aptana.git.ui.actions.UnstageAction"
-               label="%UnstageAction_label"
-               menubarPath="team.main/targetGroup"
-               tooltip="%UnstageAction_tooltip">
-         </action>
-         <action
-               class="com.aptana.git.ui.internal.actions.StageAction"
-               definitionId="com.aptana.git.ui.command.stage"
-               id="com.aptana.git.ui.actions.StageAction"
-               label="%StageAction_label"
-               menubarPath="team.main/targetGroup"
-               tooltip="%StageAction_tooltip">
-         </action>
-         <action
+          <action
                class="com.aptana.git.ui.internal.actions.MergeConflictsAction"
                definitionId="com.aptana.git.ui.command.merge_conflicts"
                enablesFor="+"
@@ -141,6 +149,24 @@
                label="%MergeConflictsAction_label"
                menubarPath="team.main/targetGroup"
                tooltip="%MergeConflictsAction_tooltip">
+         </action>
+         <action
+               class="com.aptana.git.ui.internal.actions.CompareWithHEADAction"
+               definitionId="com.aptana.git.ui.command.compare_with_HEAD"
+               enablesFor="+"
+               id="com.aptana.git.ui.actions.CompareWithHEADAction"
+               label="%CompareWithHEADAction_label"
+               menubarPath="compareWithMenu/compareWithGroup"
+               tooltip="%CompareWithHEADAction_tooltip">
+         </action>
+         <action
+               class="com.aptana.git.ui.internal.actions.CompareWithRevisionAction"
+               definitionId="com.aptana.git.ui.command.compare_with_revision"
+               enablesFor="+"
+               id="com.aptana.git.ui.actions.CompareWithRevisionAction"
+               label="%CompareWithRevisionAction_label"
+               menubarPath="compareWithMenu/compareWithGroup"
+               tooltip="%CompareWithRevisionAction_tooltip">
          </action>
       </objectContribution>
    </extension>
@@ -216,6 +242,11 @@
       </category>
       <command
             categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.add_remote"
+            name="%AddRemoteAction_tooltip">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
             id="com.aptana.git.ui.command.push"
             name="%PushAction_tooltip">
       </command>
@@ -279,11 +310,27 @@
             id="com.aptana.git.ui.command.merge_conflicts"
             name="%MergeConflictsAction_tooltip">
       </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.compare_with_HEAD"
+            name="%CompareWithHEADAction_tooltip">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.compare_with_revision"
+            name="%CompareWithRevisionAction_tooltip">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
       <key
             commandId="com.aptana.git.ui.command.push"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="CTRL+M2+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.add_remote"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="CTRL+M2+G">
@@ -360,6 +407,18 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="CTRL+M2+G">
       </key>
+      <key
+            commandId="com.aptana.git.ui.command.compare_with_HEAD"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="CTRL+M2+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.compare_with_revision"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="CTRL+M2+G">
+      </key>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
@@ -369,5 +428,13 @@
             id="com.aptana.git.ui.GitExecutableLocationPage"
             name="Git">
       </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.quickDiffReferenceProvider">
+      <referenceprovider
+            class="com.aptana.git.ui.internal.QuickDiffReferenceProvider"
+            id="com.aptana.git.ui.quickdiff"
+            label="Git Quick Diff">
+      </referenceprovider>
    </extension>
 </plugin>

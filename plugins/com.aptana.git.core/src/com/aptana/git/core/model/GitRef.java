@@ -1,5 +1,7 @@
 package com.aptana.git.core.model;
 
+import java.util.regex.Pattern;
+
 /**
  * Represents a reference in the git repo. Typically branches or tags.
  * 
@@ -104,5 +106,21 @@ public class GitRef
 	public int hashCode()
 	{
 		return toString().hashCode();
+	}
+
+	public String getRemoteName()
+	{
+		if (type() != TYPE.REMOTE)
+			return null;
+		String shortName = shortName();
+		return shortName.split(Pattern.quote("/"))[0]; //$NON-NLS-1$
+	}
+
+	public String getRemoteBranchName()
+	{
+		if (type() != TYPE.REMOTE)
+			return null;
+		String shortName = shortName();
+		return shortName.split(Pattern.quote("/"))[1]; //$NON-NLS-1$
 	}
 }

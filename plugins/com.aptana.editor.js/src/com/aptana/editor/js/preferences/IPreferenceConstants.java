@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -46,4 +46,9 @@ public interface IPreferenceConstants {
      * The value is a boolean to indicate if we auto-indent on carriage return
      */
     public static final String AUTO_INDENT_ON_CARRIAGE_RETURN = "AUTO_INDENT_ON_CARRIAGE_RETURN"; //$NON-NLS-1$
+    
+    /**
+     * The value is a double used to indicate the current format being used by the JS index categories.
+     */
+    public static final String JS_INDEX_VERSION = "JS_INDEX_VERSION"; //$NON-NLS-1$
 }

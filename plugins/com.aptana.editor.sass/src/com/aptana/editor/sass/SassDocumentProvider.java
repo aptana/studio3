@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -38,25 +38,32 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
-import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 
-import com.aptana.editor.common.DocumentContentTypeManager;
+import com.aptana.editor.common.CommonDocumentProvider;
+import com.aptana.editor.common.CommonEditorPlugin;
 
-public class SassDocumentProvider extends TextFileDocumentProvider {
+public class SassDocumentProvider extends CommonDocumentProvider
+{
 
-    @Override
-	public void connect(Object element) throws CoreException {
+	@Override
+	public void connect(Object element) throws CoreException
+	{
 		super.connect(element);
 
 		IDocument document = getDocument(element);
-		if (document != null) {
-			IDocumentPartitioner partitioner = new FastPartitioner(
-					new SassSourcePartitionScanner(),
+		if (document != null)
+		{
+			IDocumentPartitioner partitioner = new FastPartitioner(new SassSourcePartitionScanner(),
 					SassSourceConfiguration.CONTENT_TYPES);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().setDocumentContentType(document, ISassConstants.CONTENT_TYPE_SASS);
-			DocumentContentTypeManager.getInstance().registerConfiguration(document, SassSourceConfiguration.getDefault());
+			CommonEditorPlugin.getDefault().getDocumentScopeManager().registerConfiguration(document,
+					SassSourceConfiguration.getDefault());
 		}
+	}
+
+	protected String getDefaultContentType(String filename)
+	{
+		return ISassConstants.CONTENT_TYPE_SASS;
 	}
 }

@@ -3,6 +3,7 @@ package com.aptana.scripting.keybindings;
 import java.util.List;
 
 import org.eclipse.jface.bindings.keys.KeySequence;
+import org.eclipse.swt.graphics.Point;
 
 import com.aptana.scripting.model.CommandElement;
 
@@ -28,4 +29,12 @@ public interface ICommandElementsProvider
 	 * @param commandElement
 	 */
 	void execute(CommandElement commandElement);
+
+	/**
+	 * Return the display relative location to show the pop-up menu of Commands.
+	 *
+	 *
+	 * @return a suitable display relative location of pop-up. If <code>null</code> is returned the cursor location will be used.
+	 */
+	Point getCommandElementsPopupLocation();
 }

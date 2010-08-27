@@ -1,40 +1,46 @@
 package com.aptana.editor.common.scripting.snippets;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import junit.framework.TestCase;
+
+import org.eclipse.jface.text.Document;
 
 public class SnippetsCompletionProcessorTest extends TestCase
 {
 
-	public void testProcessExpansion()
+	public void testExtractPrefixFromDocument()
 	{
-		Map<String, String> expectations = new HashMap<String, String>();
-		expectations.put("$0", "${cursor}");
-		expectations.put("${0}", "${cursor}");
-		expectations.put("${1:name}", "${value1:1('name')}");
-		expectations.put("background-image: url($1);$0", "background-image: url(${value1:1('')});${cursor}");
-		expectations.put("font-size: ${1:100%};$0", "font-size: ${value1:1('100%')};${cursor}");
-		expectations.put("${1:sans-}serif", "${value1:1('sans-')}serif");
-		expectations.put("${2:!important}", "${value2:2('!important')}");
-		expectations.put("${3:fixed/scroll}", "${choices3:3('fixed','scroll')}");
-		expectations.put("margin: ${1:20px} ${2:0px} ${3:40px} ${4:0px};$0",
-				"margin: ${value1:1('20px')} ${value2:2('0px')} ${value3:3('40px')} ${value4:4('0px')};${cursor}");
-		expectations.put("background-attachment: ${1:scroll/fixed};$0",
-				"background-attachment: ${choices1:1('scroll','fixed')};${cursor}");
-		expectations.put("background-repeat: ${1:repeat/repeat-x/repeat-y/no-repeat};$0",
-				"background-repeat: ${choices1:1('repeat','repeat-x','repeat-y','no-repeat')};${cursor}");
-		expectations.put("font-family: ${1:Arial, \"MS Trebuchet\"}, ${2:sans-}serif;$0",
-				"font-family: ${value1:1('Arial, \"MS Trebuchet\"')}, ${value2:2('sans-')}serif;${cursor}");
-		expectations
-				.put(
-						"font: ${1:normal/italic/oblique} ${2:normal/small-caps};$0",
-						"font: ${choices1:1('normal','italic','oblique')} ${choices2:2('normal','small-caps')};${cursor}");
-		for (Map.Entry<String, String> pair : expectations.entrySet())
-		{
-			assertEquals(pair.getValue(), SnippetsCompletionProcessor.processExpansion(pair.getKey()));
-		}
+		assertEquals("echo", extractPrefixFromDocument("  echo"));
+		assertEquals(">echo", extractPrefixFromDocument(">echo"));
+		assertEquals("]echo", extractPrefixFromDocument("]echo"));
+		assertEquals("123-echo", extractPrefixFromDocument("123-echo"));
+		assertEquals("something_echo", extractPrefixFromDocument("something_echo"));
+		assertEquals("123echo", extractPrefixFromDocument("123echo"));
+		assertEquals("&echo", extractPrefixFromDocument("&echo"));
+		assertEquals("*echo", extractPrefixFromDocument("*echo"));
+		assertEquals("(echo", extractPrefixFromDocument("(echo"));
+		assertEquals(":echo", extractPrefixFromDocument(":echo"));
+		assertEquals("'echo", extractPrefixFromDocument("'echo"));
+	}
+	
+	public void testNarrowPrefix()
+	{
+		assertEquals("", SnippetsCompletionProcessor.narrowPrefix("echo"));
+		assertEquals("echo", SnippetsCompletionProcessor.narrowPrefix(">echo"));
+		assertEquals("echo", SnippetsCompletionProcessor.narrowPrefix("]echo"));
+		assertEquals("echo", SnippetsCompletionProcessor.narrowPrefix("123-echo"));
+		assertEquals("echo", SnippetsCompletionProcessor.narrowPrefix("something_echo"));
+		assertEquals("", SnippetsCompletionProcessor.narrowPrefix("123echo"));
+		assertEquals("echo", SnippetsCompletionProcessor.narrowPrefix("&echo"));
+		assertEquals("echo", SnippetsCompletionProcessor.narrowPrefix("*echo"));
+		assertEquals("echo", SnippetsCompletionProcessor.narrowPrefix("(echo"));
+		assertEquals("echo", SnippetsCompletionProcessor.narrowPrefix(":echo"));
+		assertEquals("echo", SnippetsCompletionProcessor.narrowPrefix("'echo"));
+		assertEquals("echo", SnippetsCompletionProcessor.narrowPrefix("other.echo"));
+	}
+
+	private String extractPrefixFromDocument(String string)
+	{
+		return SnippetsCompletionProcessor.extractPrefixFromDocument(new Document(string), string.length());
 	}
 
 }

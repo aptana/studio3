@@ -6,14 +6,29 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.aptana.editor.ruby.Activator
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources,
  org.eclipse.jface.text,
  org.eclipse.ui,
  org.eclipse.ui.editors,
- com.aptana.editor.common
+ org.eclipse.ui.views,
+ com.aptana.editor.common,
+ com.aptana.parsing,
+ org.jruby,
+ com.aptana.index.core,
+ com.aptana.core,
+ org.jrubyparser;bundle-version="1.0.0",
+ com.aptana.theme,
+ beaver,
+ com.aptana.org.eclipse.tm.terminal;bundle-version="3.0.100",
+ org.eclipse.ui.ide;bundle-version="3.4.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.ruby,
- org.jrubyparser.parser;x-friends:="com.aptana.editor.ruby.tests"
-Bundle-ClassPath: lib/JRubyParser.jar,
- .
+ com.aptana.editor.ruby.core,
+ com.aptana.editor.ruby.index,
+ com.aptana.editor.ruby.outline,
+ com.aptana.editor.ruby.parsing,
+ com.aptana.editor.ruby.parsing.ast
+Bundle-ClassPath: .
+Eclipse-ExtensibleAPI: true

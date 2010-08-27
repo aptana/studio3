@@ -11,13 +11,6 @@ public interface IGitRepositoryListener
 	public void indexChanged(IndexChangedEvent e);
 
 	/**
-	 * A project has been mapped to a new repository (new to us, may have already existed on disk).
-	 * 
-	 * @param e
-	 */
-	public void repositoryAdded(RepositoryAddedEvent e);
-
-	/**
 	 * The working branch has been changed for a repository
 	 * 
 	 * @param e
@@ -25,9 +18,30 @@ public interface IGitRepositoryListener
 	public void branchChanged(BranchChangedEvent e);
 
 	/**
-	 * Called when a repository is unmapped from a project
+	 * A new local branch has been added for a repository
 	 * 
 	 * @param e
 	 */
-	public void repositoryRemoved(RepositoryRemovedEvent e);
+	public void branchAdded(BranchAddedEvent e);
+
+	/**
+	 * A local branch has been deleted for a repository
+	 * 
+	 * @param e
+	 */
+	public void branchRemoved(BranchRemovedEvent e);
+
+	/**
+	 * User has run a pull via our UI.
+	 * 
+	 * @param e
+	 */
+	public void pulled(PullEvent e);
+
+	/**
+	 * User has run a push via our UI.
+	 * 
+	 * @param e
+	 */
+	public void pushed(PushEvent e);
 }

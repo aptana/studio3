@@ -1,45 +1,41 @@
 package com.aptana.git.ui.internal.preferences;
 
-import org.eclipse.core.runtime.preferences.DefaultScope;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
-import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.osgi.service.prefs.BackingStoreException;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IPreferenceConstants;
 import com.aptana.git.core.model.GitExecutable;
-import com.aptana.git.ui.GitUIPlugin;
 
-public class GitExecutableLocationPage extends PreferencePage implements IWorkbenchPreferencePage
+public class GitExecutableLocationPage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
 {
 
 	private FileFieldEditor fileEditor;
+	private BooleanFieldEditor pullIndicatorEditor;
 
 	public GitExecutableLocationPage()
 	{
 		super();
 	}
 
-	@Override
-	protected Control createContents(Composite parent)
+	public void init(IWorkbench workbench)
 	{
-		Composite composite = new Composite(parent, SWT.NULL);
-		GridLayout layout = new GridLayout();
-		layout.marginHeight = 0;
-		layout.marginWidth = 0;
-		composite.setLayout(layout);
-		composite.setFont(parent.getFont());
+	}
 
-		fileEditor = new FileFieldEditor("", "Git Executable", true, FileFieldEditor.VALIDATE_ON_KEY_STROKE, composite)
+	@Override
+	protected void createFieldEditors()
+	{
+		// Git Executable location
+		fileEditor = new FileFieldEditor(IPreferenceConstants.GIT_EXECUTABLE_PATH, Messages.GitExecutableLocationPage_LocationLabel, true,
+				FileFieldEditor.VALIDATE_ON_KEY_STROKE, getFieldEditorParent())
 		{
 			@Override
 			protected boolean checkState()
@@ -52,9 +48,9 @@ public class GitExecutableLocationPage extends PreferencePage implements IWorkbe
 				String text = getTextControl().getText();
 				if (text != null && text.trim().length() > 0)
 				{
-					if (!GitExecutable.acceptBinary(text))
+					if (!GitExecutable.acceptBinary(Path.fromOSString(text)))
 					{
-						showErrorMessage(NLS.bind("This path is not a valid git v{0} or higher binary.",
+						showErrorMessage(NLS.bind(Messages.GitExecutableLocationPage_InvalidLocationErrorMessage,
 								GitExecutable.MIN_GIT_VERSION));
 						return false;
 					}
@@ -64,55 +60,16 @@ public class GitExecutableLocationPage extends PreferencePage implements IWorkbe
 				return true;
 			}
 		};
-		IEclipsePreferences prefs = new InstanceScope().getNode(GitPlugin.getPluginId());
-		String path = prefs.get(IPreferenceConstants.GIT_EXECUTABLE_PATH, null);
-		if (path == null)
-			path = "";
-		fileEditor.setStringValue(path);
-		fileEditor.setPage(this);
-
-		applyDialogFont(composite);
-
-		return composite;
-	}
-
-	public void init(IWorkbench workbench)
-	{
+		// Git pull indicator
+		pullIndicatorEditor = new BooleanFieldEditor(IPreferenceConstants.GIT_CALCULATE_PULL_INDICATOR,
+				Messages.GitExecutableLocationPage_CalculatePullIndicatorLabel, getFieldEditorParent());
+		addField(fileEditor);
+		addField(pullIndicatorEditor);
 	}
 
 	@Override
-	protected void performDefaults()
+	protected IPreferenceStore doGetPreferenceStore()
 	{
-		IEclipsePreferences prefs = new DefaultScope().getNode(GitPlugin.getPluginId());
-		String path = prefs.get(IPreferenceConstants.GIT_EXECUTABLE_PATH, null);
-		if (path == null)
-			path = "";
-		fileEditor.setStringValue(path);
-
-		super.performDefaults();
+		return new ScopedPreferenceStore(new InstanceScope(), GitPlugin.getPluginId());
 	}
-
-	@Override
-	public boolean performOk()
-	{
-		IEclipsePreferences prefs = new InstanceScope().getNode(GitPlugin.getPluginId());
-		String value = fileEditor.getStringValue();
-		if (value != null && value.trim().length() == 0)
-		{
-			if (prefs.get(IPreferenceConstants.GIT_EXECUTABLE_PATH, null) != null)
-				prefs.remove(IPreferenceConstants.GIT_EXECUTABLE_PATH);
-		}
-		else
-			prefs.put(IPreferenceConstants.GIT_EXECUTABLE_PATH, value);
-		try
-		{
-			prefs.flush();
-		}
-		catch (BackingStoreException e)
-		{
-			GitUIPlugin.logError(e.getMessage(), e);
-		}
-		return super.performOk();
-	}
-
 }

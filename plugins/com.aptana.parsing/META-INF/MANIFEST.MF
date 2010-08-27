@@ -1,23 +1,23 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
-Bundle-SymbolicName: com.aptana.parsing
+Bundle-SymbolicName: com.aptana.parsing;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.aptana.parsing.ParsingPlugin
 Bundle-Vendor: %providerName
-Require-Bundle: org.eclipse.core.runtime
+Require-Bundle: org.eclipse.core.runtime,
+ beaver;bundle-version="1.0.0",
+ com.aptana.core;bundle-version="3.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Export-Package: beaver,
- beaver.comp,
- beaver.comp.io,
- beaver.comp.run,
- beaver.comp.util,
- beaver.spec,
- beaver.spec.ast,
- beaver.spec.parser,
- com.aptana.parsing,
+Export-Package: com.aptana.parsing,
  com.aptana.parsing.ast,
- com.aptana.parsing.lexer
-Bundle-ClassPath: libs/beaver.jar,
+ com.aptana.parsing.io,
+ com.aptana.parsing.lexer,
+ com.aptana.parsing.xpath,
+ com.aptana.sax,
+ org.jaxen
+Bundle-ClassPath: libs/jaxen-1.1.2.jar,
  .
+Eclipse-ExtensibleAPI: true
+Eclipse-BuddyPolicy: dependent

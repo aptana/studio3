@@ -1,4 +1,4 @@
-require "radrails"
+require "ruble"
 
 bundle "invokeBlock" do
   command "Test" do |cmd|

@@ -1,9 +1,11 @@
 package com.aptana.editor.css;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
+import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.IWordDetector;
@@ -11,12 +13,16 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.text.rules.RegexpRule;
+import com.aptana.editor.common.text.rules.ExtendedWordRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
-import com.aptana.editor.common.text.rules.WordDetector;
-import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.editor.css.internal.text.rules.AtWordDetector;
+import com.aptana.editor.css.internal.text.rules.IdentifierWithPrefixDetector;
+import com.aptana.editor.css.internal.text.rules.KeywordIdentifierDetector;
+import com.aptana.editor.css.internal.text.rules.SpecialCharacterWordDetector;
+import com.aptana.editor.css.parsing.lexer.CSSTokenType;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.ThemePlugin;
 
 /**
  * @author Chris Williams
@@ -24,9 +30,12 @@ import com.aptana.editor.common.theme.IThemeManager;
 public class CSSCodeScanner extends BufferedRuleBasedScanner
 {
 
-	@SuppressWarnings("nls")
-	private static final String[] MEASUREMENTS = new String[] { "em", "ex", "px", "cm", "mm", "in", "pt", "pc", "deg",
-			"rad", "grad", "ms", "s", "hz", "khz" };
+	private static final String KEYWORD_IMPORT = "@import"; //$NON-NLS-1$
+	private static final String KEYWORD_PAGE = "@page"; //$NON-NLS-1$
+	private static final String KEYWORD_MEDIA = "@media"; //$NON-NLS-1$
+	private static final String KEYWORD_CHARSET = "@charset"; //$NON-NLS-1$
+	private static final String WORD_INCLUDES = "~="; //$NON-NLS-1$
+	private static final String WORD_DASHMATCH = "|="; //$NON-NLS-1$
 
 	@SuppressWarnings("nls")
 	private static final String[] DEPRECATED_COLORS = new String[] { "aliceblue", "antiquewhite", "aquamarine",
@@ -58,37 +67,46 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 
 	@SuppressWarnings("nls")
 	private static final String[] HTML_TAGS = { "a", "abbr", "acronym", "address", "area", "b", "base", "big",
-			"blockquote", "body", "br", "button", "caption", "cite", "code", "col", "colgroup", "dd", "del", "dfn",
-			"div", "dl", "dt", "em", "fieldset", "form", "frame", "frameset", "head", "hr", "html", "h1", "h2", "h3",
-			"h4", "h5", "h6", "i", "iframe", "img", "input", "ins", "kbd", "label", "legend", "li", "link", "map",
-			"meta", "noframes", "noscript", "object", "ol", "optgroup", "option", "p", "param", "pre", "q", "samp",
-			"script", "select", "small", "span", "strike", "strong", "style", "sub", "sup", "table", "tbody", "td",
-			"textarea", "tfoot", "th", "thead", "title", "tr", "tt", "ul", "var" };
+			"blockquote", "body", "br", "button", "caption", "cite", "code", "col",
+			"colgroup",
+			"dd",
+			"del",
+			"dfn",
+			// FIXME Turn "em" back on when we can add hack to determine if we're inside or outside a rule
+			"div", "dl", "dt", /* "em", */"embed", "fieldset", "form", "frame", "frameset", "head", "hr", "html",
+			"h1", "h2", "h3", "h4", "h5", "h6", "i", "iframe", "img", "input", "ins", "kbd", "label", "legend", "li",
+			"link", "map", "meta", "noframes", "noscript", "object", "ol", "optgroup", "option", "p", "param", "pre",
+			"q", "samp", "script", "select", "small", "span", "strike", "strong", "style", "sub", "sup", "table",
+			"tbody", "td", "textarea", "tfoot", "th", "thead", "title", "tr", "tt", "ul", "var", "header", "nav",
+			"section", "article", "footer", "aside", "audio", "video", "canvas", "hgroup" };
 
 	@SuppressWarnings("nls")
 	private static final String[] FUNCTIONS = { "rgb", "url", "attr", "counters", "counter" };
 
 	@SuppressWarnings("nls")
-	private static final String[] PROPERTY_NAMES = { "azimuth", "background-attachment", "background-color",
-			"background-image", "background-position-x", "background-position-y", "background-position",
-			"background-repeat", "background", "border-bottom-color", "border-bottom-style", "border-bottom-width",
-			"border-bottom", "border-collapse", "border-color", "border-left-color", "border-left-style",
-			"border-left-width", "border-left", "border-right-color", "border-right-style", "border-right-width",
+	private static final String[] PROPERTY_NAMES = { "azimuth", "background-attachment", "background-clip",
+			"background-color", "background-image", "background-origin", "background-position-x",
+			"background-position-y", "background-position", "background-repeat", "background-size", "background",
+			"border-bottom-color", "border-bottom-style", "border-bottom-width", "border-bottom", "border-collapse",
+			"border-color", "border-image-source", "border-image-slice", "border-image-width", "border-image-outset",
+			"border-image-repeat", "border-image", "border-left-color", "border-left-style", "border-left-width",
+			"border-left", "border-radius", "border-right-color", "border-right-style", "border-right-width",
 			"border-right", "border-spacing", "border-style", "border-top-color", "border-top-style",
-			"border-top-width", "border-top", "border-width", "border", "bottom", "caption-side", "clear", "clip",
-			"color", "content", "counter-increment", "counter-reset", "cue-after", "cue-before", "cue", "cursor",
-			"direction", "display", "elevation", "empty-cells", "float", "font-family", "font-size-adjust",
-			"font-size", "font-stretch", "font-style", "font-variant", "font-weight", "font", "height", "left",
-			"letter-spacing", "line-height", "list-style-image", "list-style-position", "list-style-type",
-			"list-style", "margin-bottom", "margin-left", "margin-right", "margin-top", "marker-offset", "margin",
-			"marks", "max-height", "max-width", "min-height", "min-width", "-moz-border-radius", "opacity", "orphans",
-			"outline-color", "outline-style", "outline-width", "outline", "overflow-x", "overflow-y", "overflow",
-			"padding-bottom", "padding-left", "padding-right", "padding-top", "padding", "page-break-after",
-			"page-break-before", "page-break-inside", "page", "pause-after", "pause-before", "pause", "pitch-range",
-			"pitch", "play-during", "position", "quotes", "richness", "right", "size", "speak-header", "speak-numeral",
-			"speak-punctuation", "speech-rate", "speak", "stress", "table-layout", "text-align", "text-decoration",
-			"text-indent", "text-shadow", "text-transform", "top", "unicode-bidi", "vertical-align", "visibility",
-			"voice-family", "volume", "white-space", "widows", "width", "word-spacing", "z-index" };
+			"border-top-width", "border-top", "border-width", "border", "bottom", "box-decoration-break", "box-shadow",
+			"caption-side", "clear", "clip", "color", "content", "counter-increment", "counter-reset", "cue-after",
+			"cue-before", "cue", "cursor", "direction", "display", "elevation", "empty-cells", "float", "font-family",
+			"font-size-adjust", "font-size", "font-stretch", "font-style", "font-variant", "font-weight", "font",
+			"height", "left", "letter-spacing", "line-height", "list-style-image", "list-style-position",
+			"list-style-type", "list-style", "margin-bottom", "margin-left", "margin-right", "margin-top",
+			"marker-offset", "margin", "marks", "max-height", "max-width", "min-height", "min-width",
+			"-moz-border-radius", "opacity", "orphans", "outline-color", "outline-style", "outline-width", "outline",
+			"overflow-x", "overflow-y", "overflow", "padding-bottom", "padding-left", "padding-right", "padding-top",
+			"padding", "page-break-after", "page-break-before", "page-break-inside", "page", "pause-after",
+			"pause-before", "pause", "pitch-range", "pitch", "play-during", "position", "quotes", "richness", "right",
+			"size", "speak-header", "speak-numeral", "speak-punctuation", "speech-rate", "speak", "stress",
+			"table-layout", "text-align", "text-decoration", "text-indent", "text-shadow", "text-transform", "top",
+			"unicode-bidi", "vertical-align", "visibility", "voice-family", "volume", "white-space", "widows", "width",
+			"word-spacing", "z-index" };
 
 	@SuppressWarnings("nls")
 	private static final String[] PROPERTY_VALUES = { "absolute", "all-scroll", "always", "armenian", "auto",
@@ -117,124 +135,287 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			"utopia", "verdana", "webdings", "sans-serif", "serif", "monospace" };
 
 	/**
-	 * A flag to turn on or off the optimization of eligible regexp rules. Seems to make a measurable difference on
-	 * large files.
-	 */
-	private static final boolean OPTIMIZE_REGEXP_RULES = true;
-
-	/**
 	 * CodeScanner
 	 */
 	public CSSCodeScanner()
+	{
+		List<IRule> rules = createRules();
+		setRules(rules.toArray(new IRule[rules.size()]));
+	}
+
+	protected List<IRule> createRules()
 	{
 		List<IRule> rules = new ArrayList<IRule>();
 
 		// Add generic whitespace rule.
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 
-		IWordDetector lettersAndHyphens = new LettersAndHyphensWordDetector();
-		WordRule wordRule2 = new WordRule(lettersAndHyphens, Token.UNDEFINED);
-		addWordsToRule(wordRule2, getPropertyNames(), "support.type.property-name.css"); //$NON-NLS-1$
-		addWordsToRule(wordRule2, PROPERTY_VALUES, "support.constant.property-value.css"); //$NON-NLS-1$
-		rules.add(wordRule2);
-		
-		// normal words
-		WordRule wordRule = new WordRule(new WordDetector(), Token.UNDEFINED);
-		addWordsToRule(wordRule, MEASUREMENTS, "keyword.other.unit.css"); //$NON-NLS-1$
-		addWordsToRule(wordRule, HTML_TAGS, "entity.name.tag.css"); //$NON-NLS-1$
-		addWordsToRule(wordRule, MEDIA, "support.constant.media.css"); //$NON-NLS-1$
-		addWordsToRule(wordRule, FUNCTIONS, "support.function.misc.css"); //$NON-NLS-1$
-		addWordsToRule(wordRule, STANDARD_COLORS, "support.constant.color.w3c-standard-color-name.css"); //$NON-NLS-1$
-		addWordsToRule(wordRule, DEPRECATED_COLORS, "invalid.deprecated.color.w3c-non-standard-color-name.css"); //$NON-NLS-1$
+		IWordDetector identifierDetector = new KeywordIdentifierDetector();
+		// CSS Properties, values and measurements, HTML tags, media values, functions, color names
+		WordRule wordRule = new WordRule(identifierDetector, Token.UNDEFINED);
+		addWordsToRule(wordRule, getPropertyNames(), CSSTokenType.PROPERTY);
+		addWordsToRule(wordRule, PROPERTY_VALUES, CSSTokenType.VALUE);
+		addWordsToRule(wordRule, HTML_TAGS, CSSTokenType.ELEMENT);
+		addWordsToRule(wordRule, MEDIA, CSSTokenType.MEDIA);
+		addWordsToRule(wordRule, STANDARD_COLORS, CSSTokenType.COLOR);
+		addWordsToRule(wordRule, DEPRECATED_COLORS, CSSTokenType.DEPRECATED_COLOR);
 		rules.add(wordRule);
 
-		
-
-		// letters and hyphens, ignore case
-		WordRule wordRule3 = new WordRule(lettersAndHyphens, Token.UNDEFINED, true);
-		addWordsToRule(wordRule3, FONT_NAMES, "support.constant.font-name.css"); //$NON-NLS-1$
-		rules.add(wordRule3);
-
-		// curly braces
-		rules.add(new SingleCharacterRule('{', createToken("punctuation.section.property-list.css"))); //$NON-NLS-1$
-		rules.add(new SingleCharacterRule('}', createToken("punctuation.section.property-list.css"))); //$NON-NLS-1$
-		// colon
-		rules.add(new SingleCharacterRule(':', createToken("punctuation.separator.key-value.css"))); //$NON-NLS-1$
-		// semicolon
-		rules.add(new SingleCharacterRule(';', createToken("punctuation.terminator.rule.css"))); //$NON-NLS-1$
-		// parens
-		rules.add(new SingleCharacterRule('(', createToken("punctuation.section.function.css"))); //$NON-NLS-1$
-		rules.add(new SingleCharacterRule(')', createToken("punctuation.section.function.css"))); //$NON-NLS-1$
-
-		// Now onto to more expensive regexp rules
-		// rgb values
-		rules.add(new RegexpRule("#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\\b", //$NON-NLS-1$
-				createToken("constant.other.color.rgb-value.css"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
-		// ids
-		rules.add(new RegexpRule(
-				"#[_a-zA-Z0-9-]+", createToken("entity.other.attribute-name.id.css"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
 		// classes
-		rules.add(new RegexpRule(
-				"\\.[_a-zA-Z0-9-]+", createToken("entity.other.attribute-name.class.css"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new WordRule(new IdentifierWithPrefixDetector('.'), createToken(CSSTokenType.CLASS)));
 
-		// numbers
-		rules.add(new RegexpRule("(\\-|\\+)?\\s*[0-9]+(\\.[0-9]+)?", //$NON-NLS-1$
-				createToken("constant.numeric.css"))); //$NON-NLS-1$
+		// keywords that start with @
+		wordRule = new WordRule(new AtWordDetector(), createToken(CSSTokenType.AT_RULE));
+		wordRule.addWord(KEYWORD_CHARSET, createToken(CSSTokenType.CHARSET));
+		wordRule.addWord(KEYWORD_IMPORT, createToken(CSSTokenType.IMPORT));
+		wordRule.addWord(KEYWORD_MEDIA, createToken(CSSTokenType.MEDIA_KEYWORD));
+		wordRule.addWord(KEYWORD_PAGE, createToken(CSSTokenType.PAGE));
+		rules.add(wordRule);
 
-		// %
-		rules.add(new SingleCharacterRule('%', createToken("keyword.other.unit.css"))); //$NON-NLS-1$
 		// !important
-		rules.add(new RegexpRule(
-				"!important", createToken("support.constant.property-value.css"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
-		// FIXME name of keyword should be in token!
-		// @ rules
-		rules.add(new RegexpRule(
-				"@[_a-zA-Z0-9-]+", createToken("keyword.control.at-rule.media.css"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
+		WordRule importantRule = new WordRule(new IdentifierWithPrefixDetector('!'), Token.UNDEFINED);
+		importantRule.addWord("!important", createToken(CSSTokenType.IMPORTANT)); //$NON-NLS-1$
+		rules.add(importantRule);
 
-		setRules(rules.toArray(new IRule[rules.size()]));
+		// ignore case for font names
+		wordRule = new WordRule(identifierDetector, Token.UNDEFINED, true);
+		addWordsToRule(wordRule, FONT_NAMES, CSSTokenType.FONT);
+		rules.add(wordRule);
+
+		// Browser-specific property names
+		rules.add(createVendorPropertyRules());
+
+		// special character keywords
+		wordRule = new WordRule(new SpecialCharacterWordDetector(), Token.UNDEFINED);
+		wordRule.addWord(WORD_INCLUDES, createToken(CSSTokenType.INCLUDES));
+		wordRule.addWord(WORD_DASHMATCH, createToken(CSSTokenType.DASHMATCH));
+		rules.add(wordRule);
+
+		rules.addAll(createPunctuationRules());
+
+		// rgb values
+		rules.add(createRGBRule());
+
+		// ids
+		rules.add(new WordRule(new IdentifierWithPrefixDetector('#'), createToken(CSSTokenType.ID)));
+
+		rules.addAll(createScannerSpecificRules());
+
+		rules.add(createNumberRule());
+
+		// identifiers
+		rules.add(new ExtendedWordRule(new KeywordIdentifierDetector(), createToken(CSSTokenType.IDENTIFIER), false)
+		{
+
+			@Override
+			protected boolean wordOK(String word, ICharacterScanner scanner)
+			{
+				if (word.charAt(0) == '-')
+				{
+					return word.length() > 1;
+				}
+				return true;
+			}
+		});
+
+		rules.add(new SingleCharacterRule('-', createToken(CSSTokenType.MINUS)));
+
+		return rules;
 	}
 
-	protected String[] getPropertyNames()
+	private ExtendedWordRule createVendorPropertyRules()
 	{
-		return PROPERTY_NAMES;
+		return new ExtendedWordRule(new IdentifierWithPrefixDetector('-'), createToken(CSSTokenType.PROPERTY), true)
+		{
+			@Override
+			protected boolean wordOK(String word, ICharacterScanner scanner)
+			{
+				// Table 1. Vendor Extension Prefixes
+				// Prefix Organisation
+				// -ms- Microsoft
+				// mso- Microsoft Office
+				// -moz- Mozilla Foundation (Gecko-based browsers)
+				// -o- Opera Software
+				// -atsc- Advanced Television Standards Committee
+				// -wap- The WAP Forum
+				// -webkit- Safari (and other WebKit-based browsers)
+				// -khtml-
+
+				return word.startsWith("-moz-") || word.startsWith("-webkit-") || word.startsWith("-ms-") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						|| word.startsWith("-o-") || word.startsWith("-atsc-") || word.startsWith("-khtml-") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						|| word.startsWith("-wap-"); //$NON-NLS-1$
+			}
+		};
 	}
 
-	private void addWordsToRule(WordRule wordRule, String[] words, String tokenType)
+	private ExtendedWordRule createRGBRule()
+	{
+		return new ExtendedWordRule(new IdentifierWithPrefixDetector('#'), createToken(CSSTokenType.RGB), false)
+		{
+
+			@Override
+			protected boolean wordOK(String word, ICharacterScanner scanner)
+			{
+				if (word.length() != 4 && word.length() != 7)
+				{
+					return false;
+				}
+				word = word.toLowerCase();
+				for (int i = 1; i < word.length(); i++)
+				{
+					char c = word.charAt(i);
+					if (Character.isDigit(c))
+					{
+						continue;
+					}
+					if ('a' <= c && c <= 'f') // a-f
+					{
+						continue;
+					}
+					return false;
+				}
+				return true;
+			}
+		};
+	}
+
+	@SuppressWarnings("nls")
+	protected Collection<? extends IRule> createScannerSpecificRules()
+	{
+		List<IRule> rules = new ArrayList<IRule>();
+		WordRule wordRule = new WordRule(new KeywordIdentifierDetector(), Token.UNDEFINED);
+		wordRule.addWord("em", createToken(CSSTokenType.EMS));
+		wordRule.addWord("ex", createToken(CSSTokenType.EXS));
+		wordRule.addWord("px", createToken(CSSTokenType.LENGTH));
+		wordRule.addWord("cm", createToken(CSSTokenType.LENGTH));
+		wordRule.addWord("mm", createToken(CSSTokenType.LENGTH));
+		wordRule.addWord("in", createToken(CSSTokenType.LENGTH));
+		wordRule.addWord("pt", createToken(CSSTokenType.LENGTH));
+		wordRule.addWord("pc", createToken(CSSTokenType.LENGTH));
+		wordRule.addWord("deg", createToken(CSSTokenType.ANGLE));
+		wordRule.addWord("rad", createToken(CSSTokenType.ANGLE));
+		wordRule.addWord("grad", createToken(CSSTokenType.ANGLE));
+		wordRule.addWord("ms", createToken(CSSTokenType.TIME));
+		wordRule.addWord("s", createToken(CSSTokenType.TIME));
+		wordRule.addWord("hz", createToken(CSSTokenType.FREQUENCY));
+		wordRule.addWord("khz", createToken(CSSTokenType.FREQUENCY));
+		wordRule.addWord("Hz", createToken(CSSTokenType.FREQUENCY));
+		wordRule.addWord("kHz", createToken(CSSTokenType.FREQUENCY));
+		addWordsToRule(wordRule, FUNCTIONS, CSSTokenType.FUNCTION);
+		rules.add(wordRule);
+		return rules;
+	}
+
+	protected IRule createNumberRule()
+	{
+		return new ExtendedWordRule(new IWordDetector()
+		{
+
+			@Override
+			public boolean isWordStart(char c)
+			{
+				return c == '-' || c == '+' || c == '.' || Character.isDigit(c);
+			}
+
+			@Override
+			public boolean isWordPart(char c)
+			{
+				return c == '.' || Character.isDigit(c);
+			}
+		}, createToken(CSSTokenType.NUMBER), false)
+		{
+
+			@Override
+			protected boolean wordOK(String word, ICharacterScanner scanner)
+			{
+				return word.matches("(-|\\+)?\\s*[0-9]+(\\.[0-9]+)?"); //$NON-NLS-1$
+			}
+		};
+	}
+
+	protected List<IRule> createPunctuationRules()
+	{
+		List<IRule> rules = new ArrayList<IRule>();
+		// curly braces
+		rules.add(new SingleCharacterRule('{', createToken(CSSTokenType.LCURLY)));
+		rules.add(new SingleCharacterRule('}', createToken(CSSTokenType.RCURLY)));
+		// colon
+		rules.add(new SingleCharacterRule(':', createToken(CSSTokenType.COLON)));
+		// semicolon
+		rules.add(new SingleCharacterRule(';', createToken(CSSTokenType.SEMICOLON)));
+		// %
+		rules.add(new SingleCharacterRule('%', createToken(CSSTokenType.PERCENTAGE)));
+		// comma
+		rules.add(new SingleCharacterRule(',', createToken(CSSTokenType.COMMA)));
+		// parens
+		rules.add(new SingleCharacterRule('(', createToken(CSSTokenType.LPAREN)));
+		rules.add(new SingleCharacterRule(')', createToken(CSSTokenType.RPAREN)));
+		// brackets
+		rules.add(new SingleCharacterRule('[', createToken(CSSTokenType.LBRACKET)));
+		rules.add(new SingleCharacterRule(']', createToken(CSSTokenType.RBRACKET)));
+		// plus
+		rules.add(new SingleCharacterRule('+', createToken(CSSTokenType.PLUS)));
+		// star
+		rules.add(new SingleCharacterRule('*', createToken(CSSTokenType.STAR)));
+		// greater
+		rules.add(new SingleCharacterRule('>', createToken(CSSTokenType.GREATER)));
+		// forward slash
+		rules.add(new SingleCharacterRule('/', createToken(CSSTokenType.SLASH)));
+		// equal
+		rules.add(new SingleCharacterRule('=', createToken(CSSTokenType.EQUAL)));
+		return rules;
+	}
+
+	/**
+	 * addWordsToRule
+	 * 
+	 * @param wordRule
+	 * @param words
+	 * @param tokenType
+	 */
+	private void addWordsToRule(WordRule wordRule, String[] words, CSSTokenType tokenType)
 	{
 		IToken token = createToken(tokenType);
+
 		for (String word : words)
 		{
 			wordRule.addWord(word, token);
 		}
 	}
 
-	protected IToken createToken(String string)
+	/**
+	 * createToken
+	 * 
+	 * @param type
+	 * @return
+	 */
+	protected IToken createToken(CSSTokenType type)
 	{
-		return getThemeManager().getToken(string);
+		return createToken(type.getScope());
 	}
 
-	protected IThemeManager getThemeManager()
+	protected IToken createToken(String scope)
 	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
+		return new Token(scope);
 	}
 
 	/**
-	 * Detects words consisting only of letters and '-'. Must start with letter
+	 * getPropertyNames
 	 * 
-	 * @author cwilliams
+	 * @return
 	 */
-	protected static class LettersAndHyphensWordDetector implements IWordDetector
+	protected String[] getPropertyNames()
 	{
-		@Override
-		public boolean isWordPart(char c)
-		{
-			return Character.isLetter(c) || c == '-';
-		}
+		return PROPERTY_NAMES;
+	}
 
-		@Override
-		public boolean isWordStart(char c)
-		{
-			return Character.isLetter(c);
-		}
+	/**
+	 * getThemeManager
+	 * 
+	 * @return
+	 */
+	protected IThemeManager getThemeManager()
+	{
+		return ThemePlugin.getDefault().getThemeManager();
 	}
 }

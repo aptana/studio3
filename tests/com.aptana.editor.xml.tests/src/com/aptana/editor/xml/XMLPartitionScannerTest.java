@@ -13,8 +13,6 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
 
-import com.aptana.editor.common.DocumentContentTypeManager;
-
 /**
  * @author Chris
  * @author Sandip
@@ -45,9 +43,6 @@ public class XMLPartitionScannerTest extends TestCase
 			partitioner = new FastPartitioner(new XMLPartitionScanner(), XMLSourceConfiguration.CONTENT_TYPES);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().setDocumentContentType(document, IXMLConstants.CONTENT_TYPE_XML);
-			DocumentContentTypeManager.getInstance().registerConfiguration(document,
-					XMLSourceConfiguration.getDefault());
 		}
 		return partitioner.getContentType(offset);
 	}

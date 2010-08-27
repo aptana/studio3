@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -37,34 +37,41 @@ package com.aptana.editor.html;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
-import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 
-import com.aptana.editor.common.DocumentContentTypeManager;
+import com.aptana.editor.common.CommonDocumentProvider;
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ExtendedFastPartitioner;
 import com.aptana.editor.common.IExtendedPartitioner;
 import com.aptana.editor.common.NullPartitionerSwitchStrategy;
 import com.aptana.editor.common.text.rules.CompositePartitionScanner;
 import com.aptana.editor.common.text.rules.NullSubPartitionScanner;
 
-public class HTMLDocumentProvider extends TextFileDocumentProvider {
+public class HTMLDocumentProvider extends CommonDocumentProvider
+{
 
-    @Override
-	public void connect(Object element) throws CoreException {
-	    super.connect(element);
+	@Override
+	public void connect(Object element) throws CoreException
+	{
+		super.connect(element);
 
 		IDocument document = getDocument(element);
-		if (document != null) {
-			CompositePartitionScanner partitionScanner = new CompositePartitionScanner(
-					HTMLSourceConfiguration.getDefault().createSubPartitionScanner(),
-					new NullSubPartitionScanner(),
+		if (document != null)
+		{
+			CompositePartitionScanner partitionScanner = new CompositePartitionScanner(HTMLSourceConfiguration
+					.getDefault().createSubPartitionScanner(), new NullSubPartitionScanner(),
 					new NullPartitionerSwitchStrategy());
-			IDocumentPartitioner partitioner = new ExtendedFastPartitioner(partitionScanner,
-						HTMLSourceConfiguration.getDefault().getContentTypes());
+			IDocumentPartitioner partitioner = new ExtendedFastPartitioner(partitionScanner, HTMLSourceConfiguration
+					.getDefault().getContentTypes());
 			partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().setDocumentContentType(document, IHTMLConstants.CONTENT_TYPE_HTML);
-			DocumentContentTypeManager.getInstance().registerConfiguration(document, HTMLSourceConfiguration.getDefault());
+			CommonEditorPlugin.getDefault().getDocumentScopeManager().registerConfiguration(document,
+					HTMLSourceConfiguration.getDefault());
 		}
+	}
+
+	protected String getDefaultContentType(String filename)
+	{
+		return IHTMLConstants.CONTENT_TYPE_HTML;
 	}
 }
