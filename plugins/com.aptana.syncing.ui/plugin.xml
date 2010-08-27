@@ -145,20 +145,20 @@
             id="com.aptana.ide.syncing.ui.projectSitesContribution"
             objectClass="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnections">
          <action
-               class="com.aptana.ide.syncing.ui.actions.ConnectionManagerAction"
-               enablesFor="1"
-               id="com.aptana.ide.syncing.ui.actions.ConnectionManagerAction"
-               label="%Action.ConnectionManager.name"
-               menubarPath="group.new2"
-               tooltip="%Action.ConnectionManager.tooltip">
-         </action>
-         <action
                class="com.aptana.ide.syncing.ui.actions.NewSiteAction"
                enablesFor="1"
                id="com.aptana.ide.syncing.ui.actions.NewSiteAction"
                label="%Action.NewConnection.name"
-               menubarPath="group.new"
+               menubarPath="group.connections.new"
                tooltip="%Action.NewConnection.tooltip">
+         </action>
+         <action
+               class="com.aptana.ide.syncing.ui.actions.ConnectionManagerAction"
+               enablesFor="1"
+               id="com.aptana.ide.syncing.ui.actions.ConnectionManagerAction"
+               label="%Action.ConnectionManager.name"
+               menubarPath="group.connections.edit"
+               tooltip="%Action.ConnectionManager.tooltip">
          </action>
       </objectContribution>
       <objectContribution
@@ -284,8 +284,8 @@
           icon="icons/full/obj16/ftp.png"
           id="connections.main"
           label="%Menu.Connections.name">
-		    <separator name="group1" visible="true"/>
-		    <separator name="group2" visible="true"/>
+		    <separator name="group.connections.new" visible="true"/>
+		    <separator name="group.connections.edit" visible="true"/>
 		  </menu>
 		</menuContribution>
 	  <menuContribution
@@ -327,8 +327,8 @@
           icon="icons/full/obj16/ftp.png"
           id="projectexplorer.connections.main"
           label="%Menu.Connections.name">
-		    <separator name="group1" visible="true"/>
-		    <separator name="group2" visible="true"/>
+		    <separator name="group.connections.new" visible="true"/>
+		    <separator name="group.connections.edit" visible="true"/>
 		  </menu>
 		</menuContribution>
       <menuContribution
@@ -388,25 +388,25 @@
          </command>
       </menuContribution>
       <menuContribution
-            locationURI="popup:connections.main?after=group1">
+            locationURI="popup:connections.main?after=group.connections.new">
          <command
                commandId="com.aptana.ide.syncing.ui.commands.newconnection">
          </command>
       </menuContribution>        
       <menuContribution
-            locationURI="popup:connections.main?after=group2">
+            locationURI="popup:connections.main?after=group.connections.edit">
          <command
                commandId="com.aptana.ide.syncing.ui.commands.connectionmanager">
          </command>
       </menuContribution>        
       <menuContribution
-            locationURI="popup:projectexplorer.connections.main?after=group1">
+            locationURI="popup:projectexplorer.connections.main?after=group.connections.new">
          <command
                commandId="com.aptana.ide.syncing.ui.commands.newconnection">
          </command>
       </menuContribution>        
       <menuContribution
-            locationURI="popup:projectexplorer.connections.main?after=group2">
+            locationURI="popup:projectexplorer.connections.main?after=group.connections.edit">
          <command
                commandId="com.aptana.ide.syncing.ui.commands.connectionmanager">
          </command>
