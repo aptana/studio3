@@ -259,6 +259,7 @@ public class RubyTokenScanner implements ITokenScanner
 	{
 		lexer.reset();
 		lexer.setState(LexState.EXPR_BEG);
+		lexer.setPreserveSpaces(true);
 		parserSupport.initTopLocalVariables();
 		isInSymbol = false;
 		ParserConfiguration config = new ParserConfiguration(0, CompatVersion.RUBY1_8);
