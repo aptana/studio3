@@ -39,8 +39,34 @@ class RubyAutoIndentStrategy extends RubyRegexpAutoIndentStrategy
 	protected boolean autoIndent(IDocument d, DocumentCommand c)
 	{
 		if (!super.autoIndent(d, c))
-			return false;
+		{
+			try
+			{
+				int p = (c.offset == d.getLength() ? c.offset - 1 : c.offset);
+				int line = d.getLineOfOffset(p);
+				IRegion currentLineRegion = d.getLineInformation(line);
+				int startOfCurrentLine = currentLineRegion.getOffset();
+				String lineString = d.get(startOfCurrentLine, c.offset - startOfCurrentLine);
 
+				if (lineString.startsWith("=begin")) //$NON-NLS-1$
+				{
+					// TODO If doesn't start at beginning of line, move to first column?
+					String indent = getIndentString();
+					c.text += indent;
+					c.caretOffset = c.offset + indent.length();
+					c.shiftsCaret = false;
+					c.text += TextUtilities.getDefaultLineDelimiter(d) + "=end"; //$NON-NLS-1$
+					return true;
+				}
+			}
+			catch (BadLocationException e)
+			{
+				// ignore
+			}
+			return false;
+		}
+
+		// Ruble says we're at an indentation point, this is where we should look for closing with "end"
 		try
 		{
 			int p = (c.offset == d.getLength() ? c.offset - 1 : c.offset);
@@ -59,7 +85,7 @@ class RubyAutoIndentStrategy extends RubyRegexpAutoIndentStrategy
 				c.text += TextUtilities.getDefaultLineDelimiter(d) + "=end"; //$NON-NLS-1$
 			}
 			// insert closing "end" on new line after an unclosed block
-			else if (closeBlock() && unclosedBlock(d, trimmed, c.offset))
+			if (closeBlock() && unclosedBlock(d, trimmed, c.offset))
 			{
 				String previousLineIndent = getAutoIndentAfterNewLine(d, c);
 				c.text += TextUtilities.getDefaultLineDelimiter(d) + previousLineIndent + BLOCK_CLOSER;
