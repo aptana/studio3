@@ -6,11 +6,17 @@ import org.eclipse.jface.text.source.ISharedTextColors;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.ui.AbstractFormatterPreferencePage;
-import com.aptana.ui.preferences.PreferenceKey;
 
 public class CommonFomatterPreferencePage extends AbstractFormatterPreferencePage
 {
+	public CommonFomatterPreferencePage()
+	{
+		// Hide the global Apply and Defaults buttons. They will appear locally for each formatter on the preview pane.
+		noDefaultAndApplyButton();
+	}
+
 	@Override
 	protected SourceViewerConfiguration createSimpleSourceViewerConfiguration(ISharedTextColors colorManager,
 			IPreferenceStore preferenceStore, ITextEditor editor, boolean configureFormatter)
@@ -22,15 +28,7 @@ public class CommonFomatterPreferencePage extends AbstractFormatterPreferencePag
 	@Override
 	protected IDialogSettings getDialogSettings()
 	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	protected PreferenceKey getFormatterPreferenceKey()
-	{
-		// TODO Auto-generated method stub
-		return null;
+		return FormatterPlugin.getDefault().getDialogSettings();
 	}
 
 	@Override

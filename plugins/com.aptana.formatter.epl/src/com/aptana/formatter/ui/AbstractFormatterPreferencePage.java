@@ -38,7 +38,6 @@ import com.aptana.theme.ColorManager;
 import com.aptana.ui.ContributionExtensionManager;
 import com.aptana.ui.preferences.AbstractConfigurationBlockPropertyAndPreferencePage;
 import com.aptana.ui.preferences.AbstractOptionsBlock;
-import com.aptana.ui.preferences.PreferenceKey;
 import com.aptana.ui.util.IStatusChangeListener;
 
 public abstract class AbstractFormatterPreferencePage extends AbstractConfigurationBlockPropertyAndPreferencePage
@@ -53,7 +52,7 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 		public FormatterSelectionBlock(IStatusChangeListener context, IProject project,
 				IWorkbenchPreferenceContainer container)
 		{
-			super(context, project, getFormatterPreferenceKey(), container);
+			super(context, project, container);
 			fColorManager = new ColorManager();
 		}
 
@@ -90,12 +89,6 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 			{
 				return AbstractFormatterPreferencePage.this.getDialogSettings();
 			}
-
-			public IProfileManager getProfileManager()
-			{
-				return FormatterSelectionBlock.this.getProfileManager();
-			}
-
 		}
 
 		/**
@@ -151,17 +144,12 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 			return FormatterMessages.FormatterPreferencePage_settingsLink;
 		}
 
-		protected PreferenceKey getSavedContributionKey()
-		{
-			return AbstractFormatterPreferencePage.this.getFormatterPreferenceKey();
-		}
-
 		protected void updatePreview()
 		{
 			if (fPreviewViewer != null)
 			{
 				IScriptFormatterFactory factory = getSelectedExtension();
-				IProfileManager manager = getProfileManager(factory);
+				IProfileManager manager = getProfileManager();
 				FormatterPreviewUtils.updatePreview(fPreviewViewer, factory.getPreviewContent(), factory, manager
 						.getSelected().getSettings());
 			}
@@ -202,8 +190,6 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 	 */
 	protected abstract SourceViewerConfiguration createSimpleSourceViewerConfiguration(ISharedTextColors colorManager,
 			IPreferenceStore preferenceStore, ITextEditor editor, boolean configureFormatter);
-
-	protected abstract PreferenceKey getFormatterPreferenceKey();
 
 	protected abstract IDialogSettings getDialogSettings();
 

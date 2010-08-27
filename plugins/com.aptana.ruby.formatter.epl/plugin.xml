@@ -7,8 +7,9 @@
             contentType="com.aptana.contenttype.ruby">
          <formatterFactory
                class="com.aptana.ruby.formatter.RubyFormatterFactory"
+               description="Ruby Code Formatter"
                id="com.aptana.ruby.formatterFactory"
-               name="Ruby Code Formatter"
+               name="Ruby/ERB"
                priority="10">
          </formatterFactory>
       </engineContribution>
@@ -19,8 +20,9 @@
             contentType="com.aptana.contenttype.html.erb">
          <formatterFactory
                class="com.aptana.ruby.formatter.RubyFormatterFactory"
+               description="Ruby Code Formatter for ERB"
                id="com.aptana.erb.formatterFactory"
-               name="Ruby Code Formatter for ERB"
+               name="Ruby/ERB"
                priority="10">
          </formatterFactory>
       </engineContribution>
@@ -30,15 +32,6 @@
       <initializer
             class="com.aptana.ruby.formatter.internal.RubyFormatterPreferenceInitializer">
       </initializer>
-   </extension>
-   <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            category="com.aptana.ui.AptanaPreferencePage"
-            class="com.aptana.ruby.formatter.preferences.RubyFormatterPreferencePage"
-            id="com.aptana.ruby.preferences.formatter"
-            name="Ruby Formatter">
-      </page>
    </extension>
 
 </plugin>

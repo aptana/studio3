@@ -26,12 +26,20 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.text.source.SourceViewer;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.ListViewer;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -41,6 +49,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PreferenceLinkArea;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
@@ -57,6 +66,7 @@ import com.aptana.formatter.ui.IProfileVersioner;
 import com.aptana.formatter.ui.IScriptFormatterFactory;
 import com.aptana.formatter.ui.ProfileKind;
 import com.aptana.formatter.ui.ScriptFormatterManager;
+import com.aptana.formatter.ui.profile.ProfileManager;
 import com.aptana.ui.ContributionExtensionManager;
 import com.aptana.ui.IContributedExtension;
 import com.aptana.ui.dialogs.PropertyLinkArea;
@@ -91,9 +101,9 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 
 	private int selectedFactory;
 	private IScriptFormatterFactory[] factories;
-	private Map<IScriptFormatterFactory, IProfileManager> profileByFactory = new HashMap<IScriptFormatterFactory, IProfileManager>();
 	protected SourceViewer fPreviewViewer;
 	private StackLayout previewStackLayout;
+	private IProfileManager profileManager;
 
 	private static List<IScriptFormatterFactory> TEMP_LIST = new ArrayList<IScriptFormatterFactory>();
 
@@ -109,55 +119,43 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	 */
 	protected abstract String getPreferenceLinkMessage();
 
-	/**
-	 * Returns the preference key that will be used to store the contribution preference.
-	 */
-	protected abstract PreferenceKey getSavedContributionKey();
-
 	protected abstract void updatePreview();
 
 	protected abstract SourceViewer createSourcePreview(Composite parent);
 
-	public AbstractFormatterSelectionBlock(IStatusChangeListener context, IProject project, PreferenceKey formatterKey,
+	public AbstractFormatterSelectionBlock(IStatusChangeListener context, IProject project,
 			IWorkbenchPreferenceContainer container)
 	{
-		super(context, project, collectPreferenceKeys(TEMP_LIST, formatterKey), container);
+		super(context, project, collectPreferenceKeys(TEMP_LIST), container);
 		factories = (IScriptFormatterFactory[]) TEMP_LIST.toArray(new IScriptFormatterFactory[TEMP_LIST.size()]);
 		TEMP_LIST = new ArrayList<IScriptFormatterFactory>();
 	}
 
 	protected IProfileManager getProfileManager()
 	{
-		return getProfileManager(getSelectedExtension());
-	}
-
-	protected IProfileManager getProfileManager(IScriptFormatterFactory factory)
-	{
-		IProfileManager manager = profileByFactory.get(factory);
-		if (manager == null)
+		if (profileManager == null && factories.length > 0)
 		{
 			List<IProfile> allProfiles = new ArrayList<IProfile>();
-			List<IProfile> buitinProfiles = factory.getBuiltInProfiles();
-			if (buitinProfiles != null && buitinProfiles.size() > 0)
+			List<IProfile> builtInProfiles = factories[0].getBuiltInProfiles();
+			if (builtInProfiles != null && builtInProfiles.size() > 0)
 			{
-				allProfiles.addAll(buitinProfiles);
+				allProfiles.addAll(builtInProfiles);
 			}
 			else
 			{
 				FormatterPlugin.logError(NLS.bind(FormatterMessages.AbstractFormatterSelectionBlock_noBuiltInProfiles,
-						factory.getId()));
+						factories[0].getId()));
 			}
-			allProfiles.addAll(factory.getCustomProfiles());
-			manager = factory.createProfileManager(allProfiles);
-			selectCurrentProfile(factory, manager);
-			profileByFactory.put(factory, manager);
+			allProfiles.addAll(factories[0].getCustomProfiles());
+			profileManager = new ProfileManager(allProfiles);
+			selectCurrentProfile(profileManager);
 		}
-		return manager;
+		return profileManager;
 	}
 
-	private void selectCurrentProfile(IScriptFormatterFactory factory, IProfileManager manager)
+	private void selectCurrentProfile(IProfileManager manager)
 	{
-		PreferenceKey activeProfileKey = factory.getActiveProfileKey();
+		PreferenceKey activeProfileKey = factories[0].getActiveProfileKey();
 		if (activeProfileKey != null)
 		{
 			String profileId = getValue(activeProfileKey);
@@ -171,7 +169,15 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 				}
 			}
 		}
-		Map<String, String> preferences = factory.retrievePreferences(new LoadDelegate());
+		// We need to collect *all* the settings from all the factories.
+		// Map<String, String> preferences = factories[0].retrievePreferences(new LoadDelegate());
+		Map<String, String> preferences = new HashMap<String, String>();
+		LoadDelegate delegate = new LoadDelegate();
+		for (IScriptFormatterFactory factory : factories)
+		{
+			preferences.putAll(factory.retrievePreferences(delegate));
+		}
+		
 		if (!preferences.isEmpty())
 		{
 			for (IProfile profile : manager.getSortedProfiles())
@@ -185,6 +191,8 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		}
 		String name = getProfileName(manager.getSortedProfiles(),
 				FormatterMessages.AbstractFormatterSelectionBlock_activeProfileName);
+		// Once one factory is set to create a new profile, we create a new profile for all the other factories as well.
+		
 		IProfile profile = manager.create(ProfileKind.CUSTOM, name, preferences, factory.getId(), factory
 				.getProfileVersioner().getCurrentVersion());
 		manager.setSelected(profile);
@@ -259,11 +267,9 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		updatePreview();
 	}
 
-	protected static PreferenceKey[] collectPreferenceKeys(List<IScriptFormatterFactory> factories,
-			PreferenceKey formatterKey)
+	protected static PreferenceKey[] collectPreferenceKeys(List<IScriptFormatterFactory> factories)
 	{
 		List<PreferenceKey> result = new ArrayList<PreferenceKey>();
-		result.add(formatterKey);
 		IContributedExtension[] extensions = ScriptFormatterManager.getInstance().getAllContributions();
 		Set<Class<? extends IScriptFormatterFactory>> factoriesClasses = new HashSet<Class<? extends IScriptFormatterFactory>>();
 		for (int i = 0; i < extensions.length; ++i)
@@ -274,6 +280,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			{
 				factoriesClasses.add(factory.getClass());
 				factories.add(factory);
+				result.add(factory.getFormatterPreferenceKey());
 				final PreferenceKey[] keys = factory.getPreferenceKeys();
 				if (keys != null)
 				{
@@ -570,64 +577,64 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 
 	protected void createFormatterSection(Composite composite, int numColumns, PixelConverter fPixConv)
 	{
-		String id = getValue(getSavedContributionKey());
-		int index = -1;
-		for (int i = 0; i < factories.length; i++)
-		{
-			IScriptFormatterFactory factory = factories[i];
-			if (factory.getId().equals(id))
-			{
-				index = i;
-				break;
-			}
-		}
-		if (index == -1 && factories.length != 0)
-		{
-			index = 0;
-			for (int i = 1; i < factories.length; i++)
-			{
-				if (factories[i].getPriority() > factories[index].getPriority())
-				{
-					index = i;
-				}
-			}
-			// doSetFactory(index);
-		}
-
-		if (factories.length > 1)
-		{
-			createLabel(composite, FormatterMessages.AbstractFormatterSelectionBlock_formatterLabel, numColumns);
-			fFactoryCombo = createProfileCombo(composite, numColumns, fPixConv.convertWidthInCharsToPixels(20));
-
-			for (int i = 0; i < factories.length; i++)
-			{
-				fFactoryCombo.add(factories[i].getName());
-			}
-
-			fFactoryCombo.addSelectionListener(new SelectionListener()
-			{
-
-				public void widgetSelected(SelectionEvent e)
-				{
-					doSetFactory(fFactoryCombo.getSelectionIndex());
-				}
-
-				public void widgetDefaultSelected(SelectionEvent e)
-				{
-					doSetFactory(fFactoryCombo.getSelectionIndex());
-				}
-			});
-			fFactoryCombo.select(index);
-		}
-
-		fFactoryDescription = createLabel(composite, Util.EMPTY_STRING, numColumns, true);
-		doSetFactory(index);
+		// String id = getValue(getSavedContributionKey());
+		// int index = -1;
+		// for (int i = 0; i < factories.length; i++)
+		// {
+		// IScriptFormatterFactory factory = factories[i];
+		// if (factory.getId().equals(id))
+		// {
+		// index = i;
+		// break;
+		// }
+		// }
+		// if (index == -1 && factories.length != 0)
+		// {
+		// index = 0;
+		// for (int i = 1; i < factories.length; i++)
+		// {
+		// if (factories[i].getPriority() > factories[index].getPriority())
+		// {
+		// index = i;
+		// }
+		// }
+		// // doSetFactory(index);
+		// }
+		//
+		// if (factories.length > 1)
+		// {
+		// createLabel(composite, FormatterMessages.AbstractFormatterSelectionBlock_formatterLabel, numColumns);
+		// fFactoryCombo = createProfileCombo(composite, numColumns, fPixConv.convertWidthInCharsToPixels(20));
+		//
+		// for (int i = 0; i < factories.length; i++)
+		// {
+		// fFactoryCombo.add(factories[i].getName());
+		// }
+		//
+		// fFactoryCombo.addSelectionListener(new SelectionListener()
+		// {
+		//
+		// public void widgetSelected(SelectionEvent e)
+		// {
+		// doSetFactory(fFactoryCombo.getSelectionIndex());
+		// }
+		//
+		// public void widgetDefaultSelected(SelectionEvent e)
+		// {
+		// doSetFactory(fFactoryCombo.getSelectionIndex());
+		// }
+		// });
+		// fFactoryCombo.select(index);
+		// }
+		//
+		// fFactoryDescription = createLabel(composite, Util.EMPTY_STRING, numColumns, true);
+		// doSetFactory(index);
 	}
 
 	protected void doSetFactory(int index)
 	{
 		selectedFactory = index;
-		setValue(getSavedContributionKey(), factories[index].getId());
+		setValue(factories[index].getFormatterPreferenceKey(), factories[index].getId());
 		String desc = getSelectedExtension().getDescription();
 		if (desc != null && desc.length() != 0)
 		{
@@ -646,21 +653,101 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	protected void configurePreview(Composite composite, int numColumns)
 	{
 		createLabel(composite, FormatterMessages.AbstractFormatterSelectionBlock_preview, numColumns);
-		previewStackLayout = new StackLayout();
-		final Composite parent = new Composite(composite, SWT.NONE);
-		parent.setLayoutData(new GridData(GridData.FILL_BOTH));
-		parent.setLayout(previewStackLayout);
-		for (IScriptFormatterFactory factory : factories)
-		{
-			
-		}
-		fPreviewViewer = createSourcePreview(composite);
-
-		final GridData gd = new GridData(GridData.FILL_VERTICAL | GridData.HORIZONTAL_ALIGN_FILL);
+		Composite previewGroup = new Composite(composite, SWT.NONE);
+		previewGroup.setLayout(new GridLayout(1, true));
+		GridData gd = new GridData(GridData.FILL_VERTICAL | GridData.HORIZONTAL_ALIGN_FILL);
 		gd.horizontalSpan = numColumns;
-		gd.verticalSpan = 7;
-		gd.heightHint = 100;
-		fPreviewViewer.getControl().setLayoutData(gd);
+		previewGroup.setLayoutData(gd);
+
+		// Add a SashForm to create left and right areas. The left will hold the list of formatters, while the right
+		// will hold a preview pane
+		SashForm sashForm = new SashForm(previewGroup, SWT.HORIZONTAL);
+		sashForm.setLayoutData(new GridData(GridData.FILL_BOTH));
+		ListViewer listViewer = new ListViewer(sashForm, SWT.SINGLE | SWT.BORDER);
+		listViewer.getControl().setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		listViewer.setContentProvider(new ArrayContentProvider());
+		listViewer.setLabelProvider(new LabelProvider()
+		{
+			@Override
+			public String getText(Object element)
+			{
+				IScriptFormatterFactory factory = (IScriptFormatterFactory) element;
+				return factory.getName();
+			}
+		});
+		listViewer.setInput(this.factories);
+		listViewer.setSelection(new StructuredSelection(this.factories[0]));
+		
+		// Add the right panel (code preview and buttons)
+		Composite rightPanel = new Composite(sashForm, SWT.NONE);
+		GridLayout layout = new GridLayout(1, false);
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+		rightPanel.setLayout(layout);
+		rightPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		// TODO - TEMP
+		Text text = new Text(rightPanel, SWT.BORDER);
+		text.setLayoutData(new GridData(GridData.FILL_BOTH));
+		// Buttons panel
+		Composite buttons = new Composite(rightPanel, SWT.NONE);
+		layout = new GridLayout(2, true);
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+		buttons.setLayout(layout);
+		final Button editBt = new Button(buttons, SWT.PUSH);
+		editBt.setText("Edit");
+		GridData editLayoutData = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1);
+		editBt.setLayoutData(editLayoutData);
+		final Button defaultsBt = new Button(buttons, SWT.PUSH);
+		defaultsBt.setText("Defaults");
+		GridData defaultLauoutData = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1);
+		defaultsBt.setLayoutData(defaultLauoutData);
+
+		Point defaultSize = defaultsBt.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		Point editSize = editBt.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		if (defaultSize.x > editSize.x)
+		{
+			editLayoutData.widthHint = defaultSize.x;
+		}
+		else
+		{
+			defaultLauoutData.widthHint = editSize.x;
+		}
+		IProfileManager profileManager = getProfileManager();
+		defaultsBt.setEnabled(!profileManager.getSelected().isBuiltInProfile());
+		sashForm.setWeights(new int[] { 1, 3 });
+
+		// Attach the listeners
+		profileManager.addPropertyChangeListener(new IPropertyChangeListener()
+		{
+			@Override
+			public void propertyChange(PropertyChangeEvent event)
+			{
+				if (IProfileManager.PROFILE_SELECTED.equals(event.getProperty()))
+				{
+					IProfile profile = (IProfile) event.getNewValue();
+					updatePreview();
+					defaultsBt.setEnabled(!profile.isBuiltInProfile());
+				}
+			}
+		});
+		// previewStackLayout = new StackLayout();
+		// final Composite previewAreaStack = new Composite(composite, SWT.NONE);
+		// previewAreaStack.setLayoutData(new GridData(GridData.FILL_BOTH));
+		// previewAreaStack.setLayout(previewStackLayout);
+		// for (IScriptFormatterFactory factory : factories)
+		// {
+		//
+		// }
+		// fPreviewViewer = createSourcePreview(composite);
+		//
+		// gd = new GridData(GridData.FILL_VERTICAL | GridData.HORIZONTAL_ALIGN_FILL);
+		// gd.horizontalSpan = numColumns;
+		// gd.verticalSpan = 7;
+		// gd.heightHint = 100;
+		// fPreviewViewer.getControl().setLayoutData(gd);
 	}
 
 	protected IScriptFormatterFactory getSelectedExtension()

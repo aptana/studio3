@@ -74,7 +74,6 @@ public class ProfileStore implements IProfileStore
 
 		private String fName;
 		private Map<String, String> fSettings;
-		private String fFormatter;
 
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException
@@ -92,7 +91,6 @@ public class ProfileStore implements IProfileStore
 			{
 
 				fName = attributes.getValue(XML_ATTRIBUTE_NAME);
-				fFormatter = attributes.getValue(XML_ATTRIBUTE_PROFILE_FORMATTER);
 				try
 				{
 					fVersion = Integer.parseInt(attributes.getValue(XML_ATTRIBUTE_VERSION));
@@ -123,10 +121,9 @@ public class ProfileStore implements IProfileStore
 						fSettings.put(entry.getKey(), entry.getValue());
 					}
 				}
-				fProfiles.add(new CustomProfile(fName, fSettings, fFormatter, fVersion));
+				fProfiles.add(new CustomProfile(fName, fSettings, fVersion));
 				fName = null;
 				fSettings = null;
-				fFormatter = null;
 				fVersion = 1;
 			}
 		}
@@ -148,7 +145,6 @@ public class ProfileStore implements IProfileStore
 	private final static String XML_ATTRIBUTE_VERSION = "version"; //$NON-NLS-1$
 	private final static String XML_ATTRIBUTE_ID = "id"; //$NON-NLS-1$
 	private final static String XML_ATTRIBUTE_NAME = "name"; //$NON-NLS-1$
-	private final static String XML_ATTRIBUTE_PROFILE_FORMATTER = "formatter"; //$NON-NLS-1$
 	private final static String XML_ATTRIBUTE_VALUE = "value"; //$NON-NLS-1$
 
 	private final Map<String, String> defaults;
@@ -398,7 +394,6 @@ public class ProfileStore implements IProfileStore
 	{
 		final Element element = document.createElement(XML_NODE_PROFILE);
 		element.setAttribute(XML_ATTRIBUTE_NAME, profile.getName());
-		element.setAttribute(XML_ATTRIBUTE_PROFILE_FORMATTER, profile.getFormatterId());
 		element.setAttribute(XML_ATTRIBUTE_VERSION, Integer.toString(profile.getVersion()));
 
 		for (Map.Entry<String, String> entry : profile.getSettings().entrySet())

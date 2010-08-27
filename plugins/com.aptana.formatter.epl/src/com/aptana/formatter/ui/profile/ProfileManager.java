@@ -17,6 +17,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+
 import com.aptana.formatter.ui.IProfile;
 import com.aptana.formatter.ui.IProfileManager;
 import com.aptana.formatter.ui.ProfileKind;
@@ -24,7 +28,8 @@ import com.aptana.formatter.ui.ProfileKind;
 /**
  * The model for the set of profiles which are available in the workbench.
  */
-public class ProfileManager implements IProfileManager {
+public class ProfileManager implements IProfileManager
+{
 
 	/**
 	 * A map containing the available profiles, using the IDs as keys.
@@ -35,6 +40,8 @@ public class ProfileManager implements IProfileManager {
 	 * The available profiles, sorted by name.
 	 */
 	private final List<IProfile> fProfilesByName;
+
+	private ListenerList listeners;
 
 	/**
 	 * The currently selected profile.
@@ -47,50 +54,53 @@ public class ProfileManager implements IProfileManager {
 	 * Create and initialize a new profile manager.
 	 * 
 	 * @param profiles
-	 *            Initial custom profiles (List of type
-	 *            <code>CustomProfile</code>)
+	 *            Initial custom profiles (List of type <code>CustomProfile</code>)
 	 * @param profileVersioner
 	 */
-	public ProfileManager(List<IProfile> profiles) {
+	public ProfileManager(List<IProfile> profiles)
+	{
 		fProfiles = new HashMap<String, IProfile>();
 		fProfilesByName = new ArrayList<IProfile>();
-		for (final IProfile profile : profiles) {
+		for (final IProfile profile : profiles)
+		{
 			fProfiles.put(profile.getID(), profile);
 			fProfilesByName.add(profile);
 		}
 		Collections.sort(fProfilesByName);
-		if (!fProfilesByName.isEmpty()) {
+		if (!fProfilesByName.isEmpty())
+		{
 			fSelected = fProfilesByName.get(0);
 		}
+		listeners = new ListenerList();
 	}
 
 	/**
-	 * Get an immutable list as view on all profiles, sorted alphabetically.
-	 * Unless the set of profiles has been modified between the two calls, the
-	 * sequence is guaranteed to correspond to the one returned by
+	 * Get an immutable list as view on all profiles, sorted alphabetically. Unless the set of profiles has been
+	 * modified between the two calls, the sequence is guaranteed to correspond to the one returned by
 	 * <code>getSortedNames</code>.
 	 * 
 	 * @return a list of elements of type <code>Profile</code>
-	 * 
 	 * @see #getSortedDisplayNames()
 	 */
-	public List<IProfile> getSortedProfiles() {
+	public List<IProfile> getSortedProfiles()
+	{
 		return Collections.unmodifiableList(fProfilesByName);
 	}
 
 	/**
-	 * Get the names of all profiles stored in this profile manager, sorted
-	 * alphabetically. Unless the set of profiles has been modified between the
-	 * two calls, the sequence is guaranteed to correspond to the one returned
-	 * by <code>getSortedProfiles</code>.
+	 * Get the names of all profiles stored in this profile manager, sorted alphabetically. Unless the set of profiles
+	 * has been modified between the two calls, the sequence is guaranteed to correspond to the one returned by
+	 * <code>getSortedProfiles</code>.
 	 * 
 	 * @return All names, sorted alphabetically
 	 * @see #getSortedProfiles()
 	 */
-	public String[] getSortedDisplayNames() {
+	public String[] getSortedDisplayNames()
+	{
 		final String[] sortedNames = new String[fProfilesByName.size()];
 		int i = 0;
-		for (IProfile curr : fProfilesByName) {
+		for (IProfile curr : fProfilesByName)
+		{
 			sortedNames[i++] = curr.getName();
 		}
 		return sortedNames;
@@ -103,24 +113,43 @@ public class ProfileManager implements IProfileManager {
 	 *            The profile ID
 	 * @return The profile with the given ID or <code>null</code>
 	 */
-	public IProfile getProfile(String ID) {
+	public IProfile getProfile(String ID)
+	{
 		return fProfiles.get(ID);
 	}
 
-	public IProfile getSelected() {
+	public IProfile getSelected()
+	{
 		return fSelected;
 	}
 
-	public void setSelected(IProfile profile) {
-		final IProfile newSelected = fProfiles.get(profile.getID());
-		if (newSelected != null && !newSelected.equals(fSelected)) {
-			fSelected = newSelected;
-		}
+	public void addPropertyChangeListener(IPropertyChangeListener listener)
+	{
+		listeners.add(listener);
 	}
 
-	public boolean containsName(String name) {
-		for (IProfile curr : fProfilesByName) {
-			if (name.equals(curr.getName())) {
+	public void setSelected(IProfile profile)
+	{
+		final IProfile newSelected = fProfiles.get(profile.getID());
+		if (newSelected != null && !newSelected.equals(fSelected))
+		{
+			PropertyChangeEvent event = new PropertyChangeEvent(this, PROFILE_SELECTED, fSelected, newSelected);
+			fSelected = newSelected;
+			Object[] allListeners = listeners.getListeners();
+			for (Object listener : allListeners)
+			{
+				((IPropertyChangeListener) listener).propertyChange(event);
+			}
+		}
+
+	}
+
+	public boolean containsName(String name)
+	{
+		for (IProfile curr : fProfilesByName)
+		{
+			if (name.equals(curr.getName()))
+			{
 				return true;
 			}
 		}
@@ -130,17 +159,20 @@ public class ProfileManager implements IProfileManager {
 	/*
 	 * @see IProfileManager#findProfile(java.lang.String)
 	 */
-	public IProfile findProfile(String profileId) {
+	public IProfile findProfile(String profileId)
+	{
 		return fProfiles.get(profileId);
 	}
 
-	public void addProfile(IProfile profile) {
-		if (profile instanceof CustomProfile) {
+	public void addProfile(IProfile profile)
+	{
+		if (profile instanceof CustomProfile)
+		{
 			CustomProfile newProfile = (CustomProfile) profile;
 			// newProfile.setManager(this);
-			final CustomProfile oldProfile = (CustomProfile) fProfiles
-					.get(profile.getID());
-			if (oldProfile != null) {
+			final CustomProfile oldProfile = (CustomProfile) fProfiles.get(profile.getID());
+			if (oldProfile != null)
+			{
 				fProfiles.remove(oldProfile.getID());
 				fProfilesByName.remove(oldProfile);
 				// oldProfile.setManager(null);
@@ -153,8 +185,10 @@ public class ProfileManager implements IProfileManager {
 		}
 	}
 
-	public boolean deleteProfile(IProfile profile) {
-		if (profile instanceof CustomProfile) {
+	public boolean deleteProfile(IProfile profile)
+	{
+		if (profile instanceof CustomProfile)
+		{
 			CustomProfile oldProfile = (CustomProfile) profile;
 			int index = fProfilesByName.indexOf(profile);
 
@@ -174,18 +208,20 @@ public class ProfileManager implements IProfileManager {
 		return false;
 	}
 
-	public IProfile rename(IProfile profile, String newName) {
+	public IProfile rename(IProfile profile, String newName)
+	{
 		final String trimmed = newName.trim();
 		if (trimmed.equals(profile.getName()))
 			return profile;
-		if (profile.isBuiltInProfile()) {
-			CustomProfile newProfile = new CustomProfile(trimmed, profile
-					.getSettings(), profile.getFormatterId(), profile
-					.getVersion());
+		if (profile.isBuiltInProfile())
+		{
+			CustomProfile newProfile = new CustomProfile(trimmed, profile.getSettings(), profile.getVersion());
 			addProfile(newProfile);
 			fDirty = true;
 			return newProfile;
-		} else {
+		}
+		else
+		{
 			CustomProfile cProfile = (CustomProfile) profile;
 
 			String oldID = profile.getID();
@@ -200,8 +236,8 @@ public class ProfileManager implements IProfileManager {
 		}
 	}
 
-	public void profileReplaced(CustomProfile oldProfile,
-			CustomProfile newProfile) {
+	public void profileReplaced(CustomProfile oldProfile, CustomProfile newProfile)
+	{
 		fProfiles.remove(oldProfile.getID());
 		fProfiles.put(newProfile.getID(), newProfile);
 		fProfilesByName.remove(oldProfile);
@@ -211,11 +247,11 @@ public class ProfileManager implements IProfileManager {
 		setSelected(newProfile);
 	}
 
-	public IProfile create(ProfileKind kind, String profileName,
-			Map<String, String> settings, String formatterId, int version) {
-		CustomProfile profile = new CustomProfile(profileName, settings,
-				formatterId, version);
-		if (kind != ProfileKind.TEMPORARY) {
+	public IProfile create(ProfileKind kind, String profileName, Map<String, String> settings, int version)
+	{
+		CustomProfile profile = new CustomProfile(profileName, settings, version);
+		if (kind != ProfileKind.TEMPORARY)
+		{
 			addProfile(profile);
 		}
 		return profile;
@@ -224,21 +260,24 @@ public class ProfileManager implements IProfileManager {
 	/*
 	 * @see org.eclipse.dltk.ui.formatter.IProfileManager#isDirty()
 	 */
-	public boolean isDirty() {
+	public boolean isDirty()
+	{
 		return fDirty;
 	}
 
 	/*
 	 * @see org.eclipse.dltk.ui.formatter.IProfileManager#markDirty()
 	 */
-	public void markDirty() {
+	public void markDirty()
+	{
 		fDirty = true;
 	}
 
 	/*
 	 * @see org.eclipse.dltk.ui.formatter.IProfileManager#clearDirty()
 	 */
-	public void clearDirty() {
+	public void clearDirty()
+	{
 		fDirty = false;
 	}
 }

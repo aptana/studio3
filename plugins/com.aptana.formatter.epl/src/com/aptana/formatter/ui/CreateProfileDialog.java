@@ -167,7 +167,7 @@ public class CreateProfileDialog extends StatusDialog
 		final String profileName = fNameText.getText();
 
 		fCreatedProfile = fProfileManager.create(ProfileKind.CUSTOM, profileName, baseSettings, versioner
-				.getFormatterId(), versioner.getCurrentVersion());
+				.getCurrentVersion());
 		super.okPressed();
 	}
 

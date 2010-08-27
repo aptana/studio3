@@ -48,13 +48,13 @@ import com.aptana.ui.util.ExceptionHandler;
 import com.aptana.ui.util.IStatusChangeListener;
 import com.aptana.ui.util.StatusInfo;
 
-public abstract class FormatterModifyDialog extends StatusDialog implements
-		IFormatterModifyDialog, IStatusChangeListener {
+public abstract class FormatterModifyDialog extends StatusDialog implements IFormatterModifyDialog,
+		IStatusChangeListener
+{
 
 	private final FormatterDialogPreferences preferences = new FormatterDialogPreferences();
 
-	private final FormatterControlManager controlManager = new FormatterControlManager(
-			preferences, this);
+	private final FormatterControlManager controlManager = new FormatterControlManager(preferences, this);
 
 	private static final int SAVE_BUTTON_ID = IDialogConstants.CLIENT_ID + 1;
 
@@ -72,28 +72,28 @@ public abstract class FormatterModifyDialog extends StatusDialog implements
 	/**
 	 * @param parent
 	 */
-	public FormatterModifyDialog(IFormatterModifyDialogOwner dialogOwner,
-			IScriptFormatterFactory formatterFactory) {
+	public FormatterModifyDialog(IFormatterModifyDialogOwner dialogOwner, IScriptFormatterFactory formatterFactory)
+	{
 		super(dialogOwner.getShell());
 		this.dialogOwner = dialogOwner;
 		this.formatterFactory = formatterFactory;
-		this.fDialogSettings = getDialogSettingsSection(dialogOwner
-				.getDialogSettings(), formatterFactory.getId());
+		this.fDialogSettings = getDialogSettingsSection(dialogOwner.getDialogSettings(), formatterFactory.getId());
 		setStatusLineAboveButtons(false);
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 	}
 
-	public void setProfileManager(IProfileManager manager) {
+	public void setProfileManager(IProfileManager manager)
+	{
 		this.manager = manager;
 		this.profile = manager.getSelected();
-		setTitle(NLS.bind(FormatterMessages.FormatterModifyDialog_dialogTitle,
-				profile.getName()));
+		setTitle(NLS.bind(FormatterMessages.FormatterModifyDialog_dialogTitle, profile.getName()));
 	}
 
-	private static IDialogSettings getDialogSettingsSection(
-			IDialogSettings settings, String sectionId) {
+	private static IDialogSettings getDialogSettingsSection(IDialogSettings settings, String sectionId)
+	{
 		IDialogSettings section = settings.getSection(sectionId);
-		if (section == null) {
+		if (section == null)
+		{
 			section = settings.addNewSection(sectionId);
 		}
 		return section;
@@ -105,9 +105,11 @@ public abstract class FormatterModifyDialog extends StatusDialog implements
 	private static final String KEY_HEIGHT = "height"; //$NON-NLS-1$
 
 	@Override
-	protected Point getInitialSize() {
+	protected Point getInitialSize()
+	{
 		Point initialSize = super.getInitialSize();
-		try {
+		try
+		{
 			int lastWidth = fDialogSettings.getInt(KEY_WIDTH);
 			// if (initialSize.x > lastWidth)
 			// lastWidth = initialSize.x;
@@ -115,23 +117,29 @@ public abstract class FormatterModifyDialog extends StatusDialog implements
 			// if (initialSize.y > lastHeight)
 			// lastHeight = initialSize.y;
 			return new Point(lastWidth, lastHeight);
-		} catch (NumberFormatException ex) {
+		}
+		catch (NumberFormatException ex)
+		{
 		}
 		return initialSize;
 	}
 
 	@Override
-	protected Point getInitialLocation(Point initialSize) {
-		try {
-			return new Point(fDialogSettings.getInt(KEY_X), fDialogSettings
-					.getInt(KEY_Y));
-		} catch (NumberFormatException ex) {
+	protected Point getInitialLocation(Point initialSize)
+	{
+		try
+		{
+			return new Point(fDialogSettings.getInt(KEY_X), fDialogSettings.getInt(KEY_Y));
+		}
+		catch (NumberFormatException ex)
+		{
 			return super.getInitialLocation(initialSize);
 		}
 	}
 
 	@Override
-	public boolean close() {
+	public boolean close()
+	{
 		final Rectangle shell = getShell().getBounds();
 		fDialogSettings.put(KEY_WIDTH, shell.width);
 		fDialogSettings.put(KEY_HEIGHT, shell.height);
@@ -144,32 +152,32 @@ public abstract class FormatterModifyDialog extends StatusDialog implements
 	private final List<IFormatterModifiyTabPage> fTabPages = new ArrayList<IFormatterModifiyTabPage>();
 
 	@Override
-	protected Control createDialogArea(Composite parent) {
+	protected Control createDialogArea(Composite parent)
+	{
 		final Composite composite = (Composite) super.createDialogArea(parent);
 
 		Composite nameComposite = new Composite(composite, SWT.NONE);
-		nameComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
-				false));
+		nameComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		nameComposite.setLayout(new GridLayout(3, false));
 
 		fProfileNameField = new StringDialogField();
-		fProfileNameField
-				.setLabelText(FormatterMessages.FormatterModifyDialog_profileName);
-		if (profile != null) {
+		fProfileNameField.setLabelText(FormatterMessages.FormatterModifyDialog_profileName);
+		if (profile != null)
+		{
 			fProfileNameField.setText(profile.getName());
 		}
-		fProfileNameField.getLabelControl(nameComposite).setLayoutData(
-				new GridData(SWT.LEFT, SWT.CENTER, false, false));
-		fProfileNameField.getTextControl(nameComposite).setLayoutData(
-				new GridData(SWT.FILL, SWT.CENTER, true, false));
-		fProfileNameField.setDialogFieldListener(new IDialogFieldListener() {
-			public void dialogFieldChanged(DialogField field) {
+		fProfileNameField.getLabelControl(nameComposite)
+				.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
+		fProfileNameField.getTextControl(nameComposite).setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		fProfileNameField.setDialogFieldListener(new IDialogFieldListener()
+		{
+			public void dialogFieldChanged(DialogField field)
+			{
 				validate();
 			}
 		});
 
-		fSaveButton = createButton(nameComposite, SAVE_BUTTON_ID,
-				FormatterMessages.FormatterModifyDialog_export, false);
+		fSaveButton = createButton(nameComposite, SAVE_BUTTON_ID, FormatterMessages.FormatterModifyDialog_export, false);
 
 		fTabFolder = new TabFolder(composite, SWT.NONE);
 		fTabFolder.setFont(composite.getFont());
@@ -180,17 +188,22 @@ public abstract class FormatterModifyDialog extends StatusDialog implements
 	}
 
 	@Override
-	protected void buttonPressed(int buttonId) {
-		if (buttonId == SAVE_BUTTON_ID) {
+	protected void buttonPressed(int buttonId)
+	{
+		if (buttonId == SAVE_BUTTON_ID)
+		{
 			saveButtonPressed();
-		} else {
+		}
+		else
+		{
 			super.buttonPressed(buttonId);
 		}
 	}
 
 	protected abstract void addPages();
 
-	protected void addTabPage(String title, IFormatterModifiyTabPage tabPage) {
+	protected void addTabPage(String title, IFormatterModifiyTabPage tabPage)
+	{
 		final TabItem tabItem = new TabItem(fTabFolder, SWT.NONE);
 		applyDialogFont(tabItem.getControl());
 		tabItem.setText(title);
@@ -199,64 +212,77 @@ public abstract class FormatterModifyDialog extends StatusDialog implements
 		fTabPages.add(tabPage);
 	}
 
-	public final void statusChanged(IStatus status) {
+	public final void statusChanged(IStatus status)
+	{
 		tabStatus = status;
 		validate();
-		for (IFormatterModifiyTabPage tabPage : fTabPages) {
+		for (IFormatterModifiyTabPage tabPage : fTabPages)
+		{
 			tabPage.updatePreview();
 		}
 	}
 
-	public IFormatterModifyDialogOwner getOwner() {
+	public IFormatterModifyDialogOwner getOwner()
+	{
 		return dialogOwner;
 	}
 
-	public IScriptFormatterFactory getFormatterFactory() {
+	public IScriptFormatterFactory getFormatterFactory()
+	{
 		return formatterFactory;
 	}
 
 	@Override
-	protected void updateButtonsEnableState(IStatus status) {
+	protected void updateButtonsEnableState(IStatus status)
+	{
 		super.updateButtonsEnableState(status);
-		if (fSaveButton != null && !fSaveButton.isDisposed()) {
-			fSaveButton.setEnabled(!validateProfileName()
-					.matches(IStatus.ERROR));
+		if (fSaveButton != null && !fSaveButton.isDisposed())
+		{
+			fSaveButton.setEnabled(!validateProfileName().matches(IStatus.ERROR));
 		}
 	}
 
-	protected void validate() {
+	protected void validate()
+	{
 		updateStatus(getValidationStatus());
 	}
 
-	protected IStatus getValidationStatus() {
+	protected IStatus getValidationStatus()
+	{
 		IStatus status = doValidate();
 		if (tabStatus.getSeverity() < status.getSeverity())
 			return status;
 		return tabStatus;
 	}
 
-	protected IStatus doValidate() {
-		if (profile == null || manager == null) {
+	protected IStatus doValidate()
+	{
+		if (profile == null || manager == null)
+		{
 			return Status.OK_STATUS;
 		}
 
 		Map<String, String> values = getPreferences();
 		String name = getProfileName();
-		if (name.equals(profile.getName()) && profile.equalsTo(values)) {
+		if (name.equals(profile.getName()) && profile.equalsTo(values))
+		{
 			return StatusInfo.OK_STATUS;
 		}
 
 		IStatus status = validateProfileName();
-		if (status.matches(IStatus.ERROR)) {
+		if (status.matches(IStatus.ERROR))
+		{
 			return status;
 		}
 
-		if (!name.equals(profile.getName()) && manager.containsName(name)) {
+		if (!name.equals(profile.getName()) && manager.containsName(name))
+		{
 			return new Status(IStatus.ERROR, FormatterPlugin.PLUGIN_ID,
 					FormatterMessages.FormatterModifyDialog_nameExists);
 		}
 
-		if (profile.isBuiltInProfile()) {
+		if (profile.isBuiltInProfile())
+		{
 			return new Status(IStatus.INFO, FormatterPlugin.PLUGIN_ID,
 					FormatterMessages.FormatterModifyDialog_createNewProfile);
 		}
@@ -264,23 +290,26 @@ public abstract class FormatterModifyDialog extends StatusDialog implements
 		return StatusInfo.OK_STATUS;
 	}
 
-	public String getProfileName() {
+	public String getProfileName()
+	{
 		return fProfileNameField.getText().trim();
 	}
 
-	private IStatus validateProfileName() {
+	private IStatus validateProfileName()
+	{
 		final String name = getProfileName();
 
-		if (profile.isBuiltInProfile()) {
-			if (profile.getName().equals(name)) {
-				return new Status(
-						IStatus.ERROR,
-						FormatterPlugin.PLUGIN_ID,
+		if (profile.isBuiltInProfile())
+		{
+			if (profile.getName().equals(name))
+			{
+				return new Status(IStatus.ERROR, FormatterPlugin.PLUGIN_ID,
 						FormatterMessages.FormatterModifyDialog_changeBuiltInProfileName);
 			}
 		}
 
-		if (name.length() == 0) {
+		if (name.length() == 0)
+		{
 			return new Status(IStatus.ERROR, FormatterPlugin.PLUGIN_ID,
 					FormatterMessages.FormatterModifyDialog_nameEmpty);
 		}
@@ -292,19 +321,21 @@ public abstract class FormatterModifyDialog extends StatusDialog implements
 	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
 	 */
 	@Override
-	protected void okPressed() {
+	protected void okPressed()
+	{
 		super.okPressed();
-		if (!profile.getName().equals(fProfileNameField.getText())) {
+		if (!profile.getName().equals(fProfileNameField.getText()))
+		{
 			profile = manager.rename(profile, fProfileNameField.getText());
 			manager.setSelected(profile);
 		}
 	}
 
-	private void saveButtonPressed() {
+	private void saveButtonPressed()
+	{
 		IProfileStore store = formatterFactory.getProfileStore();
-		IProfile selected = manager.create(ProfileKind.TEMPORARY,
-				fProfileNameField.getText(), getPreferences(), profile
-						.getFormatterId(), profile.getVersion());
+		IProfile selected = manager.create(ProfileKind.TEMPORARY, fProfileNameField.getText(), getPreferences(),
+				profile.getVersion());
 
 		final FileDialog dialog = new FileDialog(getShell(), SWT.SAVE);
 		dialog.setText(FormatterMessages.FormatterModifyDialog_exportProfile);
@@ -315,36 +346,40 @@ public abstract class FormatterModifyDialog extends StatusDialog implements
 			return;
 
 		final File file = new File(path);
-		String message = NLS.bind(
-				FormatterMessages.FormatterModifyDialog_replaceFileQuestion,
-				file.getAbsolutePath());
+		String message = NLS.bind(FormatterMessages.FormatterModifyDialog_replaceFileQuestion, file.getAbsolutePath());
 		if (file.exists()
-				&& !MessageDialog.openQuestion(getShell(),
-						FormatterMessages.FormatterModifyDialog_exportProfile,
-						message)) {
+				&& !MessageDialog.openQuestion(getShell(), FormatterMessages.FormatterModifyDialog_exportProfile,
+						message))
+		{
 			return;
 		}
 
 		final Collection<IProfile> profiles = new ArrayList<IProfile>();
 		profiles.add(selected);
-		try {
+		try
+		{
 			store.writeProfilesToFile(profiles, file);
-		} catch (CoreException e) {
+		}
+		catch (CoreException e)
+		{
 			final String title = FormatterMessages.FormatterModifyDialog_exportProfile;
 			message = FormatterMessages.FormatterModifyDialog_exportProblem;
 			ExceptionHandler.handle(e, getShell(), title, message);
 		}
 	}
 
-	public void setPreferences(Map<String, String> prefs) {
+	public void setPreferences(Map<String, String> prefs)
+	{
 		preferences.set(prefs);
 		final Shell shell = getShell();
-		if (shell != null && !shell.isDisposed()) {
+		if (shell != null && !shell.isDisposed())
+		{
 			controlManager.initialize();
 		}
 	}
 
-	public Map<String, String> getPreferences() {
+	public Map<String, String> getPreferences()
+	{
 		return preferences.get();
 	}
 

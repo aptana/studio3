@@ -17,34 +17,41 @@ import java.util.Map;
 import com.aptana.formatter.ui.IProfile;
 
 /**
- * Represents a user-defined profile. A custom profile can be modified after
- * instantiation.
+ * Represents a user-defined profile. A custom profile can be modified after instantiation.
  */
-public class CustomProfile extends Profile implements IProfile.ICustomProfile {
+public class CustomProfile extends Profile implements IProfile.ICustomProfile
+{
+	String fName;
+	private Map<String, String> fSettings;
+	// protected ProfileManager fManager;
+	private int fVersion;
 
-	public CustomProfile(String name, Map<String, String> settings,
-			String formatter, int version) {
+	public CustomProfile(String name, Map<String, String> settings, int version)
+	{
 		fName = name;
 		fSettings = settings;
-		fFormatter = formatter;
 		fVersion = version;
 	}
 
-	public String getName() {
+	public String getName()
+	{
 		return fName;
 	}
 
-	public Map<String, String> getSettings() {
+	public Map<String, String> getSettings()
+	{
 		return new HashMap<String, String>(fSettings);
 	}
 
-	public void setSettings(Map<String, String> settings) {
+	public void setSettings(Map<String, String> settings)
+	{
 		if (settings == null)
 			throw new IllegalArgumentException();
 		fSettings = settings;
 	}
 
-	public String getID() {
+	public String getID()
+	{
 		return fName;
 	}
 
@@ -56,33 +63,27 @@ public class CustomProfile extends Profile implements IProfile.ICustomProfile {
 	// return fManager;
 	// }
 
-	public int getVersion() {
+	public int getVersion()
+	{
 		return fVersion;
 	}
 
-	public void setVersion(int version) {
+	public void setVersion(int version)
+	{
 		fVersion = version;
 	}
 
-	public int compareTo(IProfile o) {
-		if (o instanceof CustomProfile) {
+	public int compareTo(IProfile o)
+	{
+		if (o instanceof CustomProfile)
+		{
 			return getName().compareToIgnoreCase(o.getName());
 		}
 		return 1;
 	}
 
-	public boolean isProfileToSave() {
+	public boolean isProfileToSave()
+	{
 		return true;
 	}
-
-	public String getFormatterId() {
-		return fFormatter;
-	}
-
-	private String fFormatter;
-	String fName;
-	private Map<String, String> fSettings;
-	// protected ProfileManager fManager;
-	private int fVersion;
-
 }

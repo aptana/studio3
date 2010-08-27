@@ -14,30 +14,38 @@ package com.aptana.formatter.ui;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jface.util.IPropertyChangeListener;
+
 /**
  * The model for the set of profiles which are available in the workbench.
  */
-public interface IProfileManager {
+public interface IProfileManager
+{
 
+	/**
+	 * A property name for a change in the profile's selection.
+	 */
+	public static final String PROFILE_SELECTED = "profile.selected"; //$NON-NLS-1$
+
+	/**
+	 * Returns true iff the profile is dirty.
+	 */
 	public boolean isDirty();
 
 	/**
-	 * Get an immutable list as view on all profiles, sorted alphabetically.
-	 * Unless the set of profiles has been modified between the two calls, the
-	 * sequence is guaranteed to correspond to the one returned by
+	 * Get an immutable list as view on all profiles, sorted alphabetically. Unless the set of profiles has been
+	 * modified between the two calls, the sequence is guaranteed to correspond to the one returned by
 	 * <code>getSortedNames</code>.
 	 * 
 	 * @return a list of elements of type <code>IProfile</code>
-	 * 
 	 * @see #getSortedDisplayNames()
 	 */
 	public List<IProfile> getSortedProfiles();
 
 	/**
-	 * Get the names of all profiles stored in this profile manager, sorted
-	 * alphabetically. Unless the set of profiles has been modified between the
-	 * two calls, the sequence is guaranteed to correspond to the one returned
-	 * by <code>getSortedProfiles</code>.
+	 * Get the names of all profiles stored in this profile manager, sorted alphabetically. Unless the set of profiles
+	 * has been modified between the two calls, the sequence is guaranteed to correspond to the one returned by
+	 * <code>getSortedProfiles</code>.
 	 * 
 	 * @return All names, sorted alphabetically
 	 * @see #getSortedProfiles()
@@ -45,8 +53,7 @@ public interface IProfileManager {
 	public String[] getSortedDisplayNames();
 
 	/**
-	 * Check whether a user-defined profile in this profile manager already has
-	 * this name.
+	 * Check whether a user-defined profile in this profile manager already has this name.
 	 * 
 	 * @param name
 	 *            The name to test for
@@ -56,6 +63,8 @@ public interface IProfileManager {
 
 	public IProfile findProfile(String profileId);
 
+	public void addPropertyChangeListener(IPropertyChangeListener listener);
+
 	/**
 	 * Get the currently selected profile.
 	 * 
@@ -64,8 +73,7 @@ public interface IProfileManager {
 	public IProfile getSelected();
 
 	/**
-	 * Set the selected profile. The profile must already be contained in this
-	 * profile manager.
+	 * Set the selected profile. The profile must already be contained in this profile manager.
 	 * 
 	 * @param profile
 	 *            The profile to select
@@ -81,11 +89,9 @@ public interface IProfileManager {
 	public void addProfile(IProfile profile);
 
 	/**
-	 * Delete passed profile from this profile manager. The next profile in the
-	 * list is selected.
+	 * Delete passed profile from this profile manager. The next profile in the list is selected.
 	 * 
-	 * @return true if the profile has been successfully removed, false
-	 *         otherwise.
+	 * @return true if the profile has been successfully removed, false otherwise.
 	 */
 	public boolean deleteProfile(IProfile profile);
 
@@ -96,7 +102,6 @@ public interface IProfileManager {
 	 *            profile to rename
 	 * @param newName
 	 *            new profile name
-	 * 
 	 * @return profile with specified name
 	 */
 	public IProfile rename(IProfile profile, String newName);
@@ -104,12 +109,10 @@ public interface IProfileManager {
 	/**
 	 * @param profileName
 	 * @param settings
-	 * @param formatterId
 	 * @param version
 	 * @return
 	 */
-	public IProfile create(ProfileKind kind, String profileName,
-			Map<String, String> settings, String formatterId, int version);
+	public IProfile create(ProfileKind kind, String profileName, Map<String, String> settings, int version);
 
 	public void markDirty();
 

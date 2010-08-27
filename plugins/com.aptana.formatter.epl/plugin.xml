@@ -2,5 +2,24 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="formatterFactory" name="Script Formatter Factory" schema="schema/formatterFactory.exsd"/>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.ui.AptanaPreferencePage"
+            class="com.aptana.formatter.CommonFomatterPreferencePage"
+            id="com.aptana.formatter.common"
+            name="Code Formatter">
+         <keywordReference
+               id="com.aptana.formatter.keyword.beautifier">
+         </keywordReference>
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.keywords">
+      <keyword
+            id="com.aptana.formatter.keyword.beautifier"
+            label="beautifier">
+      </keyword>
+   </extension>
 
 </plugin>

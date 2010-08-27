@@ -7,8 +7,9 @@
             contentType="com.aptana.contenttype.html">
          <formatterFactory
                class="com.aptana.html.formatter.HTMLFormatterFactory"
+               description="HTML Code Formatter"
                id="com.aptana.html.formatterFactory"
-               name="HTML Code Formatter"
+               name="HTML"
                priority="10">
          </formatterFactory>
       </engineContribution>

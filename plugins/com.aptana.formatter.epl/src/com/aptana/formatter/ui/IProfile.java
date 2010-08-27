@@ -29,8 +29,6 @@ public interface IProfile extends Comparable<IProfile> {
 
 	public void setSettings(Map<String, String> settings);
 
-	public String getFormatterId();
-
 	public int getVersion();
 
 	public boolean equalsTo(Map<String, String> otherMap);
