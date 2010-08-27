@@ -34,12 +34,14 @@
  */
 package com.aptana.editor.markdown;
 
-import com.aptana.editor.common.SourceConfigurationPartitionScanner;
+import com.aptana.editor.common.text.rules.SourceConfigurationPartitionScanner;
 
-public class MarkdownPartitionScanner extends SourceConfigurationPartitionScanner {
-	
-	public MarkdownPartitionScanner() {
+public class MarkdownPartitionScanner extends SourceConfigurationPartitionScanner
+{
+
+	public MarkdownPartitionScanner()
+	{
 		super(MarkdownSourceConfiguration.getDefault());
 	}
-	
+
 }

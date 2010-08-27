@@ -38,12 +38,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.text.rules.IRule;
+import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
+import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 
-import com.aptana.editor.common.RegexpRule;
-import com.aptana.editor.common.WhitespaceDetector;
-import com.aptana.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.text.rules.RegexpRule;
+import com.aptana.editor.common.text.rules.WhitespaceDetector;
 
 public class MarkdownScanner extends RuleBasedScanner
 {
@@ -52,11 +53,16 @@ public class MarkdownScanner extends RuleBasedScanner
 	{
 		List<IRule> rules = new ArrayList<IRule>();
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
-		rules.add(new RegexpRule("\\*\\*[\\w\\*]+\\*\\*", ThemeUtil.getToken("markup.bold.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$
-		rules.add(new RegexpRule("__[\\w_]+__", ThemeUtil.getToken("markup.bold.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$
-		rules.add(new RegexpRule("_\\w+[\\w_]*_", ThemeUtil.getToken("markup.italic.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$
-		rules.add(new RegexpRule("\\*[\\w\\*]+\\*", ThemeUtil.getToken("markup.italic.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new RegexpRule("\\*\\*[\\w\\*]+\\*\\*", getToken("markup.bold.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new RegexpRule("__[\\w_]+__", getToken("markup.bold.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new RegexpRule("_\\w+[\\w_]*_", getToken("markup.italic.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new RegexpRule("\\*[\\w\\*]+\\*", getToken("markup.italic.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$
 		setRules(rules.toArray(new IRule[rules.size()]));
-		setDefaultReturnToken(ThemeUtil.getToken("markup")); //$NON-NLS-1$
+		setDefaultReturnToken(getToken("markup")); //$NON-NLS-1$
+	}
+
+	protected IToken getToken(String tokenName)
+	{
+		return new Token(tokenName);
 	}
 }

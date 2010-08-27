@@ -38,7 +38,6 @@ package com.aptana.editor.markdown;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
-import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
@@ -51,12 +50,12 @@ import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
-import com.aptana.editor.common.ISubPartitionScanner;
-import com.aptana.editor.common.SubPartitionScanner;
-import com.aptana.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.text.rules.ISubPartitionScanner;
+import com.aptana.editor.common.text.rules.SubPartitionScanner;
+import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 
 /**
- * @author Max Stepanov
+ * @author Chris Williams
  */
 public class MarkdownSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration
 {
@@ -66,6 +65,8 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 	public final static String HEADING = PREFIX + "heading"; //$NON-NLS-1$
 
 	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, HEADING };
+
+	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IMarkdownConstants.CONTENT_TYPE_MARKDOWN } };
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] { new SingleLineRule("#", "", new Token(HEADING)), //$NON-NLS-1$ //$NON-NLS-2$
 	};
@@ -91,6 +92,11 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 	public String[] getContentTypes()
 	{
 		return CONTENT_TYPES;
+	}
+
+	public String[][] getTopContentTypes()
+	{
+		return TOP_CONTENT_TYPES;
 	}
 
 	/*
@@ -131,14 +137,14 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
 	{
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getXMLScanner());
+		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getXMLScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
-		dr = new DefaultDamagerRepairer(getPreProcessorScanner());
+		dr = new ThemeingDamagerRepairer(getPreProcessorScanner());
 		reconciler.setDamager(dr, HEADING);
 		reconciler.setRepairer(dr, HEADING);
 	}
@@ -149,9 +155,9 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		{
 			preProcessorScanner = new RuleBasedScanner();
 			IRule[] rules = new IRule[1];
-			rules[0] = new PatternRule("#", " ", ThemeUtil.getToken("punctuation.definition.heading.markdown"), (char) 0, true);
-			preProcessorScanner.setRules(rules);			
-			preProcessorScanner.setDefaultReturnToken(ThemeUtil.getToken("entity.name.section.markdown")); //$NON-NLS-1$
+			rules[0] = new PatternRule("#", " ", getToken("punctuation.definition.heading.markdown"), (char) 0, true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			preProcessorScanner.setRules(rules);
+			preProcessorScanner.setDefaultReturnToken(getToken("entity.name.section.markdown")); //$NON-NLS-1$
 		}
 		return preProcessorScanner;
 	}
@@ -165,4 +171,8 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		return xmlScanner;
 	}
 
+	protected IToken getToken(String tokenName)
+	{
+		return new Token(tokenName);
+	}
 }

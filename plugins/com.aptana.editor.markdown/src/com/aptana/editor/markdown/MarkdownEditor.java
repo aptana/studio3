@@ -36,13 +36,15 @@ package com.aptana.editor.markdown;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 
-public class MarkdownEditor extends AbstractThemeableEditor {
+public class MarkdownEditor extends AbstractThemeableEditor
+{
 
-    @Override
-    protected void initializeEditor() {
-        super.initializeEditor();
+	@Override
+	protected void initializeEditor()
+	{
+		super.initializeEditor();
 
-        setSourceViewerConfiguration(new MarkdownSourceViewerConfiguration(getPreferenceStore()));
-        setDocumentProvider(new MarkdownDocumentProvider());
-    }
+		setSourceViewerConfiguration(new MarkdownSourceViewerConfiguration(getPreferenceStore(), this));
+		setDocumentProvider(new MarkdownDocumentProvider());
+	}
 }

@@ -40,15 +40,16 @@ import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 
+import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
 
 public class MarkdownSourceViewerConfiguration extends CommonSourceViewerConfiguration
 {
 
-	public MarkdownSourceViewerConfiguration(IPreferenceStore preferences)
+	public MarkdownSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor)
 	{
-		super(preferences);
+		super(preferences, editor);
 	}
 
 	/*
@@ -66,6 +67,15 @@ public class MarkdownSourceViewerConfiguration extends CommonSourceViewerConfigu
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
+	 */
+	public String[][] getTopContentTypes()
+	{
+		return MarkdownSourceConfiguration.getDefault().getTopContentTypes();
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see
 	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source
 	 * .ISourceViewer)
@@ -73,7 +83,7 @@ public class MarkdownSourceViewerConfiguration extends CommonSourceViewerConfigu
 	@Override
 	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer)
 	{
-		PresentationReconciler reconciler = new PresentationReconciler();
+		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
 		MarkdownSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		return reconciler;
 	}

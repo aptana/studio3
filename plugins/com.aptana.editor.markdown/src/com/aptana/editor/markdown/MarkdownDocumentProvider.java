@@ -38,25 +38,32 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
-import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 
-import com.aptana.editor.common.DocumentContentTypeManager;
+import com.aptana.editor.common.CommonDocumentProvider;
+import com.aptana.editor.common.CommonEditorPlugin;
 
-public class MarkdownDocumentProvider extends TextFileDocumentProvider {
+public class MarkdownDocumentProvider extends CommonDocumentProvider
+{
 
-    @Override
-	public void connect(Object element) throws CoreException {
-	    super.connect(element);
+	@Override
+	public void connect(Object element) throws CoreException
+	{
+		super.connect(element);
 
 		IDocument document = getDocument(element);
-		if (document != null) {
-			IDocumentPartitioner partitioner = new FastPartitioner(
-					new MarkdownPartitionScanner(),
+		if (document != null)
+		{
+			IDocumentPartitioner partitioner = new FastPartitioner(new MarkdownPartitionScanner(),
 					MarkdownSourceConfiguration.CONTENT_TYPES);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().setDocumentContentType(document, IMarkdownConstants.CONTENT_TYPE_MARKDOWN);
-			DocumentContentTypeManager.getInstance().registerConfiguration(document, MarkdownSourceConfiguration.getDefault());
+			CommonEditorPlugin.getDefault().getDocumentScopeManager()
+					.registerConfiguration(document, MarkdownSourceConfiguration.getDefault());
 		}
+	}
+
+	protected String getDefaultContentType(String filename)
+	{
+		return IMarkdownConstants.CONTENT_TYPE_MARKDOWN;
 	}
 }
