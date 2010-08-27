@@ -5,6 +5,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IPaintPositionManager;
 import org.eclipse.jface.text.IPainter;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.ITextViewerExtension5;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TextAttribute;
@@ -18,7 +19,6 @@ import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.ui.PlatformUI;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
@@ -225,6 +225,16 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 	 */
 	private void drawHighlightLine(Position position)
 	{
+		RGBa lineHighlight = getCurrentTheme().getLineHighlight();
+		if (lineHighlight.isFullyOpaque())
+		{
+			if (fViewer instanceof ITextViewerExtension2)
+			{
+				ITextViewerExtension2 ext = (ITextViewerExtension2) fViewer;
+				ext.invalidateTextPresentation(position.getOffset(), position.getLength());
+			}
+			return;
+		}
 		Rectangle rect = getLineRectangle(position);
 		if (rect == null)
 		{
@@ -342,51 +352,54 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 		final int offset = event.lineOffset;
 		final RGBa lineHighlight = getCurrentTheme().getLineHighlight();
 		event.lineBackground = getColorManager().getColor(lineHighlight.toRGB());
-		// In this case, we should be overriding the bg of the style ranges for the line too!
-		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				if (textWidget.isDisposed())
-				{
-					return;
-				}
-				// FIXME Only change bg colors of visible ranges!
-				int replaceLength = 160;
-				if (lineRegion != null)
-				{
-					replaceLength = Math.min(replaceLength, lineRegion.getLength());
-				}
 
-				// be safe about offsets
-				int charCount = textWidget.getCharCount();
-				if (offset + replaceLength > charCount)
-				{
-					replaceLength = charCount - offset;
-					if (replaceLength < 0)
-					{
-						// Just playing safe here
-						replaceLength = 0;
-					}
-				}
-				StyleRange[] ranges = textWidget.getStyleRanges(offset, replaceLength, true);
-				if (ranges == null || ranges.length == 0)
-				{
-					return;
-				}
-				int[] positions = new int[ranges.length * 2];
-				int x = 0;
-				for (StyleRange range : ranges)
-				{
-					range.background = null;
-					positions[x] = range.start;
-					positions[x + 1] = range.length;
-					x += 2;
-				}
-				textWidget.setStyleRanges(offset, replaceLength, positions, ranges);
+		// In this case, we should be overriding the bg of the style ranges for the line too!
+		if (textWidget.isDisposed())
+		{
+			return;
+		}
+		// FIXME Only change bg colors of visible ranges!
+		int replaceLength = 160;
+		if (lineRegion != null)
+		{
+			replaceLength = Math.min(replaceLength, lineRegion.getLength());
+		}
+
+		// be safe about offsets
+		int charCount = textWidget.getCharCount();
+		if (offset + replaceLength > charCount)
+		{
+			replaceLength = charCount - offset;
+			if (replaceLength < 0)
+			{
+				// Just playing safe here
+				replaceLength = 0;
 			}
-		});
+		}
+		final StyleRange[] ranges = textWidget.getStyleRanges(offset, replaceLength, true);
+		if (ranges == null || ranges.length == 0)
+		{
+			return;
+		}
+		final int[] positions = new int[ranges.length * 2];
+		int x = 0;
+		boolean apply = false;
+		for (StyleRange range : ranges)
+		{
+			if (range.background != null)
+			{
+				apply = true;
+			}
+			range.background = null;
+			positions[x] = range.start;
+			positions[x + 1] = range.length;
+			x += 2;
+		}
+
+		if (apply)
+		{
+			textWidget.setStyleRanges(offset, replaceLength, positions, ranges);
+		}
 	}
 
 	protected ColorManager getColorManager()
