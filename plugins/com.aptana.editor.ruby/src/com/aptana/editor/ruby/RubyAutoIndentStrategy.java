@@ -30,8 +30,7 @@ class RubyAutoIndentStrategy extends RubyRegexpAutoIndentStrategy
 	private final Pattern openBlockPattern = Pattern.compile(".*[\\S].*do[\\w|\\s]*"); //$NON-NLS-1$
 	private static final String BLOCK_CLOSER = "end"; //$NON-NLS-1$
 
-	RubyAutoIndentStrategy(String contentType, SourceViewerConfiguration svc,
-			ISourceViewer sourceViewer)
+	RubyAutoIndentStrategy(String contentType, SourceViewerConfiguration svc, ISourceViewer sourceViewer)
 	{
 		super(contentType, svc, sourceViewer);
 	}
@@ -62,16 +61,7 @@ class RubyAutoIndentStrategy extends RubyRegexpAutoIndentStrategy
 			// insert closing "end" on new line after an unclosed block
 			else if (closeBlock() && unclosedBlock(d, trimmed, c.offset))
 			{
-				// FIXME copy old content of line behind insertion point to new line
-
-				// if (lineEnd - contentStart > 0)
-				// {
-				// c.length = lineEnd - c.offset;
-				// buf.append(d.get(contentStart, lineEnd - contentStart).toCharArray());
-				// }
-
 				String previousLineIndent = getAutoIndentAfterNewLine(d, c);
-
 				c.text += TextUtilities.getDefaultLineDelimiter(d) + previousLineIndent + BLOCK_CLOSER;
 			}
 		}
