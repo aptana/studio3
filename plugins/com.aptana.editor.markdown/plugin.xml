@@ -21,7 +21,7 @@
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             base-type="org.eclipse.core.runtime.text"
-            file-extensions="md, mdown, markdown"
+            file-extensions="md, mdown, markdown, markdn"
             id="com.aptana.contenttype.markdown"
             name="%content-type.markdown.name"
             priority="normal">

@@ -48,8 +48,11 @@ import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
+import com.aptana.editor.common.scripting.IContentTypeTranslator;
+import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
@@ -81,6 +84,9 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		if (instance == null)
 		{
 			instance = new MarkdownSourceConfiguration();
+			IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
+			c.addTranslation(new QualifiedContentType(IMarkdownConstants.CONTENT_TYPE_MARKDOWN),
+					new QualifiedContentType("text.html.markdown")); //$NON-NLS-1$
 		}
 		return instance;
 	}
@@ -155,7 +161,9 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		{
 			preProcessorScanner = new RuleBasedScanner();
 			IRule[] rules = new IRule[1];
-			rules[0] = new PatternRule("#", " ", getToken("punctuation.definition.heading.markdown"), (char) 0, true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			PatternRule heading = new PatternRule("#", " ", getToken("punctuation.definition.heading.markdown"), (char) 0, true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			heading.setColumnConstraint(0);
+			rules[0] = heading;			
 			preProcessorScanner.setRules(rules);
 			preProcessorScanner.setDefaultReturnToken(getToken("entity.name.section.markdown")); //$NON-NLS-1$
 		}
