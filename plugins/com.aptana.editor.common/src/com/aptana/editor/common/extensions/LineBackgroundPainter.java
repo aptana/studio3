@@ -5,6 +5,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IPaintPositionManager;
 import org.eclipse.jface.text.IPainter;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.ITextViewerExtension5;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TextAttribute;
@@ -224,6 +225,16 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 	 */
 	private void drawHighlightLine(Position position)
 	{
+		RGBa lineHighlight = getCurrentTheme().getLineHighlight();
+		if (lineHighlight.isFullyOpaque())
+		{
+			if (fViewer instanceof ITextViewerExtension2)
+			{
+				ITextViewerExtension2 ext = (ITextViewerExtension2) fViewer;
+				ext.invalidateTextPresentation(position.getOffset(), position.getLength());
+			}
+			return;
+		}
 		Rectangle rect = getLineRectangle(position);
 		if (rect == null)
 		{
