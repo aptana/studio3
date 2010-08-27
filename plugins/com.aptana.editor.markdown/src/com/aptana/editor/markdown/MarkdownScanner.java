@@ -39,9 +39,12 @@ import java.util.List;
 
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
+import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
+import org.eclipse.jface.text.rules.WordRule;
 
 import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
@@ -53,12 +56,67 @@ public class MarkdownScanner extends RuleBasedScanner
 	{
 		List<IRule> rules = new ArrayList<IRule>();
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
-		rules.add(new RegexpRule("\\*\\*[\\w\\*]+\\*\\*", getToken("markup.bold.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$
-		rules.add(new RegexpRule("__[\\w_]+__", getToken("markup.bold.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$
-		rules.add(new RegexpRule("_\\w+[\\w_]*_", getToken("markup.italic.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$
-		rules.add(new RegexpRule("\\*[\\w\\*]+\\*", getToken("markup.italic.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new SingleLineRule("`", "`", getToken("markup.raw.inline.markdown"), '\\')); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+		rules.add(new RegexpRule(
+				"\\[([^\\]]+?)\\](?=\\s*\\[([^\\]]+?)\\])", getToken("string.other.link.title.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new RegexpRule(
+				"\\[([^\\]]+?)\\](?=\\s*\\(([^\\)]+?)\\))", getToken("string.other.link.title.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new RegexpRule("\\[([^\\]]+?)\\]", getToken("constant.other.reference.link.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// Bold
+		rules.add(new SingleLineRule("**", "**", getToken("markup.bold.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		rules.add(new SingleLineRule("__", "__", getToken("markup.bold.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+		// Italic
+		rules.add(new SingleLineRule("*", "*", getToken("markup.italic.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		rules.add(new SingleLineRule("_", "_", getToken("markup.italic.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+		// Character escapes
+		WordRule rule = new WordRule(new IWordDetector()
+		{
+
+			boolean toggle = false;
+
+			public boolean isWordStart(char c)
+			{
+				if (c == '\\')
+				{
+					toggle = true;
+					return true;
+				}
+				return false;
+			}
+
+			public boolean isWordPart(char c)
+			{
+				if (toggle)
+				{
+					toggle = false;
+					return true;
+				}
+				return false;
+			}
+		}, getToken("constant.character.escape.markdown")); //$NON-NLS-1$C
+		rules.add(rule);
+
+		// Underline link
+		rule = new WordRule(new IWordDetector()
+		{
+
+			public boolean isWordStart(char c)
+			{
+				return c == '#';
+			}
+
+			public boolean isWordPart(char c)
+			{
+				return Character.isJavaIdentifierPart(c);
+			}
+		}, getToken("markup.underline.link.markdown")); //$NON-NLS-1$C
+		rules.add(rule);
+
 		setRules(rules.toArray(new IRule[rules.size()]));
-		setDefaultReturnToken(getToken("markup")); //$NON-NLS-1$
+		setDefaultReturnToken(getToken("")); //$NON-NLS-1$
 	}
 
 	protected IToken getToken(String tokenName)

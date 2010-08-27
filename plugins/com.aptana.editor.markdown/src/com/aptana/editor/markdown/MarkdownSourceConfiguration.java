@@ -35,6 +35,9 @@
 
 package com.aptana.editor.markdown;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
@@ -42,7 +45,6 @@ import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
-import org.eclipse.jface.text.rules.PatternRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
@@ -54,6 +56,8 @@ import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
+import com.aptana.editor.common.text.rules.NonRuleBasedDamagerRepairer;
+import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 
@@ -66,13 +70,16 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 	public final static String PREFIX = "__md_"; //$NON-NLS-1$
 	public final static String DEFAULT = "__md" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
 	public final static String HEADING = PREFIX + "heading"; //$NON-NLS-1$
+	public final static String HEADING_1 = HEADING + ".1"; //$NON-NLS-1$
+	public final static String HEADING_2 = HEADING + ".2"; //$NON-NLS-1$
+	public final static String UNNUMBERED_LIST = PREFIX + "unnumbered.list"; //$NON-NLS-1$
+	public final static String SEPARATOR = PREFIX + "separator"; //$NON-NLS-1$
+	public final static String BLOCK = PREFIX + "block"; //$NON-NLS-1$
 
-	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, HEADING };
+	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, HEADING, HEADING_1, HEADING_2,
+			UNNUMBERED_LIST, SEPARATOR, BLOCK };
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IMarkdownConstants.CONTENT_TYPE_MARKDOWN } };
-
-	private IPredicateRule[] partitioningRules = new IPredicateRule[] { new SingleLineRule("#", "", new Token(HEADING)), //$NON-NLS-1$ //$NON-NLS-2$
-	};
 
 	private MarkdownScanner xmlScanner;
 	private RuleBasedScanner preProcessorScanner;
@@ -87,6 +94,14 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 			IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 			c.addTranslation(new QualifiedContentType(IMarkdownConstants.CONTENT_TYPE_MARKDOWN),
 					new QualifiedContentType("text.html.markdown")); //$NON-NLS-1$
+			c.addTranslation(new QualifiedContentType(DEFAULT), new QualifiedContentType("meta.paragraph.markdown")); //$NON-NLS-1$
+			c.addTranslation(new QualifiedContentType(HEADING), new QualifiedContentType("markup.heading.markdown")); //$NON-NLS-1$
+			c.addTranslation(new QualifiedContentType(HEADING_1), new QualifiedContentType("markup.heading.1.markdown")); //$NON-NLS-1$
+			c.addTranslation(new QualifiedContentType(HEADING_2), new QualifiedContentType("markup.heading.2.markdown")); //$NON-NLS-1$
+			c.addTranslation(new QualifiedContentType(UNNUMBERED_LIST), new QualifiedContentType(
+					"markup.list.unnumbered.markdown")); //$NON-NLS-1$
+			c.addTranslation(new QualifiedContentType(SEPARATOR), new QualifiedContentType("meta.separator.markdown")); //$NON-NLS-1$
+			c.addTranslation(new QualifiedContentType(BLOCK), new QualifiedContentType("markup.raw.block.markdown")); //$NON-NLS-1$
 		}
 		return instance;
 	}
@@ -111,7 +126,108 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 	 */
 	public IPredicateRule[] getPartitioningRules()
 	{
-		return partitioningRules;
+		List<IPredicateRule> rules = new ArrayList<IPredicateRule>();
+
+		// Separators
+		final char[] separatorChars = { '*', '-', '_' };
+		for (int sepCharIdx = 0; sepCharIdx < separatorChars.length; sepCharIdx++)
+		{
+			for (int initialSpaces = 0; initialSpaces <= 3; initialSpaces++)
+			{
+				for (int laterSpaces = 0; laterSpaces <= 2; laterSpaces++)
+				{
+					rules.add(createSeparatorRule(separatorChars[sepCharIdx], initialSpaces, laterSpaces));
+				}
+			}
+		}
+
+		// Lists
+		for (int i = 0; i <= 3; i++)
+		{
+			rules.add(createListRule(i, '*'));
+			rules.add(createListRule(i, '+'));
+			rules.add(createListRule(i, '-'));
+		}
+		// Headings
+		rules.add(createSetexHeadingRule('-', 2));
+		rules.add(createSetexHeadingRule('=', 1));
+		for (int i = 6; i > 0; i--)
+		{
+			rules.add(createATXHeadingRule(i));
+		}
+
+		// Blocks
+		SingleLineRule rule = new SingleLineRule("    ", "", new Token(BLOCK));
+		rule.setColumnConstraint(0);
+		rules.add(rule);
+		rule = new SingleLineRule("\t", "", new Token(BLOCK));
+		rule.setColumnConstraint(0);
+		rules.add(rule);
+
+		return rules.toArray(new IPredicateRule[rules.size()]);
+	}
+
+	protected IPredicateRule createSeparatorRule(char c, int leadingSpaces, int spaces2)
+	{
+		String string = "";
+		for (int x = 0; x < leadingSpaces; x++)
+		{
+			string += " ";
+		}
+		string += c;
+		for (int x = 0; x < spaces2; x++)
+		{
+			string += " ";
+		}
+		string += c;
+		for (int x = 0; x < spaces2; x++)
+		{
+			string += " ";
+		}
+		string += c;
+		SingleLineRule rule = new SingleLineRule(string, "", new Token(SEPARATOR));
+		rule.setColumnConstraint(0);
+		return rule;
+
+	}
+
+	protected IPredicateRule createListRule(int leadingSpaces, char c)
+	{
+		// [ ]{0,3}([*+-])(?=\s)
+		String str = "";
+		for (int i = 0; i < leadingSpaces; i++)
+		{
+			str += " ";
+		}
+		str += c;
+		str += " ";
+		SingleLineRule rule = new SingleLineRule(str, null, new Token(UNNUMBERED_LIST));
+		rule.setColumnConstraint(0);
+		return rule;
+	}
+
+	protected SingleLineRule createSetexHeadingRule(char c, int level)
+	{
+		String token = HEADING_1;
+		if (level == 2)
+		{
+			token = HEADING_2;
+		}
+		SingleLineRule rule = new SingleLineRule("" + c, null, new Token(token)); //$NON-NLS-1$
+		rule.setColumnConstraint(0);
+		return rule;
+	}
+
+	protected SingleLineRule createATXHeadingRule(int hashes)
+	{
+		String header = ""; //$NON-NLS-1$
+		for (int i = 0; i < hashes; i++)
+		{
+			header += "#"; //$NON-NLS-1$
+		}
+		SingleLineRule rule = new SingleLineRule(header, header, new Token(HEADING));
+		rule.setColumnConstraint(0);
+		return rule;
 	}
 
 	/*
@@ -120,7 +236,7 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 	 */
 	public ISubPartitionScanner createSubPartitionScanner()
 	{
-		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
+		return new SubPartitionScanner(getPartitioningRules(), CONTENT_TYPES, new Token(DEFAULT));
 	}
 
 	/*
@@ -150,9 +266,20 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
+		reconciler.setDamager(dr, UNNUMBERED_LIST);
+		reconciler.setRepairer(dr, UNNUMBERED_LIST);
+
 		dr = new ThemeingDamagerRepairer(getPreProcessorScanner());
 		reconciler.setDamager(dr, HEADING);
 		reconciler.setRepairer(dr, HEADING);
+
+		NonRuleBasedDamagerRepairer ndr = new NonRuleBasedDamagerRepairer(getToken("meta.separator.markdown")); //$NON-NLS-1$
+		reconciler.setDamager(ndr, SEPARATOR);
+		reconciler.setRepairer(ndr, SEPARATOR);
+
+		ndr = new NonRuleBasedDamagerRepairer(getToken("markup.raw.block.markdown")); //$NON-NLS-1$
+		reconciler.setDamager(ndr, BLOCK);
+		reconciler.setRepairer(ndr, BLOCK);
 	}
 
 	private ITokenScanner getPreProcessorScanner()
@@ -160,10 +287,11 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		if (preProcessorScanner == null)
 		{
 			preProcessorScanner = new RuleBasedScanner();
-			IRule[] rules = new IRule[1];
-			PatternRule heading = new PatternRule("#", " ", getToken("punctuation.definition.heading.markdown"), (char) 0, true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			heading.setColumnConstraint(0);
-			rules[0] = heading;			
+			IRule[] rules = new IRule[] {
+					new SingleCharacterRule('#', getToken("punctuation.definition.heading.markdown")), //$NON-NLS-1$
+					new SingleCharacterRule('=', getToken("punctuation.definition.heading.markdown")), //$NON-NLS-1$
+					new SingleCharacterRule('-', getToken("punctuation.definition.heading.markdown")) //$NON-NLS-1$
+			};
 			preProcessorScanner.setRules(rules);
 			preProcessorScanner.setDefaultReturnToken(getToken("entity.name.section.markdown")); //$NON-NLS-1$
 		}
