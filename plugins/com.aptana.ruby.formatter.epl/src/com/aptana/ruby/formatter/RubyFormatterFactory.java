@@ -78,13 +78,6 @@ public class RubyFormatterFactory extends AbstractScriptFormatterFactory
 		return new RubyFormatterModifyDialog(dialogOwner, this);
 	}
 
-	@Override
-	public PreferenceKey getActiveProfileKey()
-	{
-		// FIXME - Shalom: Implements this
-		return null;
-	}
-
 	public SourceViewerConfiguration createSimpleSourceViewerConfiguration(ISharedTextColors colorManager,
 			IPreferenceStore preferenceStore, ITextEditor editor, boolean configureFormatter)
 	{

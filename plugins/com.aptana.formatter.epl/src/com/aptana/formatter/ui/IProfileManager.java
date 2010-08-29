@@ -16,6 +16,8 @@ import java.util.Map;
 
 import org.eclipse.jface.util.IPropertyChangeListener;
 
+import com.aptana.ui.preferences.PreferenceKey;
+
 /**
  * The model for the set of profiles which are available in the workbench.
  */
@@ -121,4 +123,22 @@ public interface IProfileManager
 	 */
 	public void clearDirty();
 
+	/**
+	 * Returns the active profile key.
+	 * 
+	 * @return
+	 */
+	public PreferenceKey getActiveProfileKey();
+
+	public IProfileVersioner getProfileVersioner();
+
+	public IProfileStore getProfileStore();
+
+	public List<IProfile> getBuiltInProfiles();
+
+	public List<IProfile> getCustomProfiles();
+
+	public String getDefaultProfileID();
+
+	public String getDefaultProfileName();
 }

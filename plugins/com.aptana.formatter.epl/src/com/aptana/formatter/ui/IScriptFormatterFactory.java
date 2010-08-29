@@ -50,8 +50,6 @@ public interface IScriptFormatterFactory extends IContributedExtension
 
 	PreferenceKey[] getPreferenceKeys();
 
-	PreferenceKey getActiveProfileKey();
-
 	void savePreferences(Map<String, String> preferences, IPreferencesSaveDelegate delegate);
 
 	/**
@@ -64,15 +62,7 @@ public interface IScriptFormatterFactory extends IContributedExtension
 	 */
 	IScriptFormatter createFormatter(String lineDelimiter, Map<String, String> preferences);
 
-	List<IProfile> getBuiltInProfiles();
-
-	List<IProfile> getCustomProfiles();
-
 	void saveCustomProfiles(List<IProfile> profiles);
-
-	IProfileVersioner getProfileVersioner();
-
-	IProfileStore getProfileStore();
 
 	/**
 	 * Returns the contribution id
@@ -97,12 +87,6 @@ public interface IScriptFormatterFactory extends IContributedExtension
 	 * @return
 	 */
 	IFormatterModifyDialog createDialog(IFormatterModifyDialogOwner dialogOwner);
-
-	/**
-	 * @param allProfiles
-	 * @return
-	 */
-	IProfileManager createProfileManager(List<IProfile> profiles);
 
 	SourceViewerConfiguration createSimpleSourceViewerConfiguration(ISharedTextColors colorManager,
 			IPreferenceStore preferenceStore, ITextEditor editor, boolean configureFormatter);

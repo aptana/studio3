@@ -12,28 +12,20 @@
 package com.aptana.formatter;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.preferences.DefaultScope;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import com.aptana.formatter.epl.FormatterPlugin;
-import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.formatter.ui.IFormatterModifyDialog;
 import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
 import com.aptana.formatter.ui.IProfile;
 import com.aptana.formatter.ui.IProfileManager;
 import com.aptana.formatter.ui.IProfileStore;
-import com.aptana.formatter.ui.IProfileVersioner;
 import com.aptana.formatter.ui.IScriptFormatterFactory;
-import com.aptana.formatter.ui.profile.BuiltInProfile;
-import com.aptana.formatter.ui.profile.GeneralProfileVersioner;
 import com.aptana.formatter.ui.profile.ProfileManager;
 import com.aptana.formatter.ui.profile.ProfileStore;
 import com.aptana.ui.ContributedExtension;
@@ -47,68 +39,9 @@ import com.aptana.ui.preferences.PreferenceKey;
 public abstract class AbstractScriptFormatterFactory extends ContributedExtension implements IScriptFormatterFactory
 {
 
-	protected IProfileVersioner versioner;
-
-	protected String getDefaultProfileID()
-	{
-		StringBuffer buffer = new StringBuffer();
-		String lang = getLanguage();
-		if (lang != null && lang.length() > 0)
-		{
-			buffer.append("org.eclipse.dltk."); //$NON-NLS-1$
-			buffer.append(lang.toLowerCase());
-		}
-		else
-		{
-			buffer.append(getClass().getName());
-		}
-
-		buffer.append(".formatter.profiles.default"); //$NON-NLS-1$
-		return buffer.toString();
-	}
-
-	protected String getDefaultProfileName()
-	{
-		return FormatterMessages.AbstractScriptFormatterFactory_defaultProfileName;
-	}
-
-	public List<IProfile> getBuiltInProfiles()
-	{
-		List<IProfile> profiles = new ArrayList<IProfile>();
-
-		IProfileVersioner versioner = getProfileVersioner();
-		BuiltInProfile profile = new BuiltInProfile(getDefaultProfileID(), getDefaultProfileName(),
-				loadDefaultSettings(), 1, getId(), versioner.getCurrentVersion());
-
-		profiles.add(profile);
-		return profiles;
-	}
-
 	protected PreferenceKey getProfilesKey()
 	{
 		return null;
-	}
-
-	public List<IProfile> getCustomProfiles()
-	{
-		final PreferenceKey profilesKey = getProfilesKey();
-		if (profilesKey != null)
-		{
-			final String profilesSource = profilesKey.getStoredValue(new InstanceScope());
-			if (profilesSource != null && profilesSource.length() > 0)
-			{
-				final IProfileStore store = getProfileStore();
-				try
-				{
-					return ((ProfileStore) store).readProfilesFromString(profilesSource);
-				}
-				catch (CoreException e)
-				{
-					FormatterPlugin.logError(e);
-				}
-			}
-		}
-		return Collections.emptyList();
 	}
 
 	public void saveCustomProfiles(List<IProfile> profiles)
@@ -116,7 +49,7 @@ public abstract class AbstractScriptFormatterFactory extends ContributedExtensio
 		final PreferenceKey profilesKey = getProfilesKey();
 		if (profilesKey != null)
 		{
-			final IProfileStore store = getProfileStore();
+			final IProfileStore store = ProfileManager.getInstance().getProfileStore();
 			try
 			{
 				String value = ((ProfileStore) store).writeProfiles(profiles);
@@ -129,42 +62,23 @@ public abstract class AbstractScriptFormatterFactory extends ContributedExtensio
 		}
 	}
 
-	public Map<String, String> loadDefaultSettings()
-	{
-		Map<String, String> settings = new HashMap<String, String>();
-		PreferenceKey[] keys = getPreferenceKeys();
-		if (keys != null)
-		{
-			DefaultScope scope = new DefaultScope();
-			for (int i = 0; i < keys.length; i++)
-			{
-				PreferenceKey key = keys[i];
-				String name = key.getName();
-				IEclipsePreferences preferences = scope.getNode(key.getQualifier());
-				String value = preferences.get(name, null);
-				if (value != null)
-					settings.put(name, value);
-			}
-		}
-		return settings;
-	}
-
 	public Map<String, String> retrievePreferences(IPreferencesLookupDelegate delegate)
 	{
-		final PreferenceKey activeProfileKey = getActiveProfileKey();
+		ProfileManager profileManager = ProfileManager.getInstance();
+		final PreferenceKey activeProfileKey = profileManager.getActiveProfileKey();
 		if (activeProfileKey != null)
 		{
 			final String profileId = delegate.getString(activeProfileKey.getQualifier(), activeProfileKey.getName());
 			if (profileId != null && profileId.length() != 0)
 			{
-				for (IProfile profile : getBuiltInProfiles())
+				for (IProfile profile : profileManager.getBuiltInProfiles())
 				{
 					if (profileId.equals(profile.getID()))
 					{
 						return profile.getSettings();
 					}
 				}
-				for (IProfile profile : getCustomProfiles())
+				for (IProfile profile : profileManager.getCustomProfiles())
 				{
 					if (profileId.equals(profile.getID()))
 					{
@@ -212,37 +126,12 @@ public abstract class AbstractScriptFormatterFactory extends ContributedExtensio
 			}
 		}
 
-		final PreferenceKey activeProfileKey = getActiveProfileKey();
+		final PreferenceKey activeProfileKey = ProfileManager.getInstance().getActiveProfileKey();
 		if (activeProfileKey != null && preferences.containsKey(activeProfileKey.getName()))
 		{
 			final String value = preferences.get(activeProfileKey.getName());
 			delegate.setString(activeProfileKey.getQualifier(), activeProfileKey.getName(), value);
 		}
-	}
-
-	public IProfileVersioner getProfileVersioner()
-	{
-		if (versioner == null)
-			versioner = createProfileVersioner();
-		return versioner;
-	}
-
-	public IProfileStore getProfileStore()
-	{
-		return new ProfileStore(getProfileVersioner(), loadDefaultSettings());
-	}
-
-	protected IProfileVersioner createProfileVersioner()
-	{
-		return new GeneralProfileVersioner(getId());
-	}
-
-	/*
-	 * @see IScriptFormatterFactory#createProfileManager(java.util.List)
-	 */
-	public IProfileManager createProfileManager(List<IProfile> profiles)
-	{
-		return new ProfileManager(profiles);
 	}
 
 	public boolean isValid()
@@ -258,10 +147,5 @@ public abstract class AbstractScriptFormatterFactory extends ContributedExtensio
 	public IFormatterModifyDialog createDialog(IFormatterModifyDialogOwner dialogOwner, IProfileManager manager)
 	{
 		return null;
-	}
-
-	private String getLanguage()
-	{
-		return getContentType();
 	}
 }

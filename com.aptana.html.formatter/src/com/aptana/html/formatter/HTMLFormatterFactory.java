@@ -71,13 +71,6 @@ public class HTMLFormatterFactory extends AbstractScriptFormatterFactory
 	}
 
 	@Override
-	public PreferenceKey getActiveProfileKey()
-	{
-		// FIXME - Shalom: Implements this
-		return null;
-	}
-
-	@Override
 	public SourceViewerConfiguration createSimpleSourceViewerConfiguration(ISharedTextColors colorManager,
 			IPreferenceStore preferenceStore, ITextEditor editor, boolean configureFormatter)
 	{

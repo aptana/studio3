@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -65,7 +64,6 @@ import com.aptana.formatter.ui.IProfileStore;
 import com.aptana.formatter.ui.IProfileVersioner;
 import com.aptana.formatter.ui.IScriptFormatterFactory;
 import com.aptana.formatter.ui.ProfileKind;
-import com.aptana.formatter.ui.ScriptFormatterManager;
 import com.aptana.formatter.ui.profile.ProfileManager;
 import com.aptana.ui.ContributionExtensionManager;
 import com.aptana.ui.IContributedExtension;
@@ -126,36 +124,23 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	public AbstractFormatterSelectionBlock(IStatusChangeListener context, IProject project,
 			IWorkbenchPreferenceContainer container)
 	{
-		super(context, project, collectPreferenceKeys(TEMP_LIST), container);
-		factories = (IScriptFormatterFactory[]) TEMP_LIST.toArray(new IScriptFormatterFactory[TEMP_LIST.size()]);
+		super(context, project, ProfileManager.collectPreferenceKeys(TEMP_LIST), container);
+		factories = TEMP_LIST.toArray(new IScriptFormatterFactory[TEMP_LIST.size()]);
 		TEMP_LIST = new ArrayList<IScriptFormatterFactory>();
 	}
 
 	protected IProfileManager getProfileManager()
 	{
-		if (profileManager == null && factories.length > 0)
+		if (profileManager == null)
 		{
-			List<IProfile> allProfiles = new ArrayList<IProfile>();
-			List<IProfile> builtInProfiles = factories[0].getBuiltInProfiles();
-			if (builtInProfiles != null && builtInProfiles.size() > 0)
-			{
-				allProfiles.addAll(builtInProfiles);
-			}
-			else
-			{
-				FormatterPlugin.logError(NLS.bind(FormatterMessages.AbstractFormatterSelectionBlock_noBuiltInProfiles,
-						factories[0].getId()));
-			}
-			allProfiles.addAll(factories[0].getCustomProfiles());
-			profileManager = new ProfileManager(allProfiles);
-			selectCurrentProfile(profileManager);
+			profileManager = ProfileManager.getInstance();
 		}
 		return profileManager;
 	}
 
 	private void selectCurrentProfile(IProfileManager manager)
 	{
-		PreferenceKey activeProfileKey = factories[0].getActiveProfileKey();
+		PreferenceKey activeProfileKey = manager.getActiveProfileKey();
 		if (activeProfileKey != null)
 		{
 			String profileId = getValue(activeProfileKey);
@@ -177,7 +162,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		{
 			preferences.putAll(factory.retrievePreferences(delegate));
 		}
-		
+
 		if (!preferences.isEmpty())
 		{
 			for (IProfile profile : manager.getSortedProfiles())
@@ -192,9 +177,9 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		String name = getProfileName(manager.getSortedProfiles(),
 				FormatterMessages.AbstractFormatterSelectionBlock_activeProfileName);
 		// Once one factory is set to create a new profile, we create a new profile for all the other factories as well.
-		
-		IProfile profile = manager.create(ProfileKind.CUSTOM, name, preferences, factory.getId(), factory
-				.getProfileVersioner().getCurrentVersion());
+
+		IProfile profile = manager.create(ProfileKind.CUSTOM, name, preferences, manager.getProfileVersioner()
+				.getCurrentVersion());
 		manager.setSelected(profile);
 	}
 
@@ -228,29 +213,30 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	@Override
 	protected boolean saveValues()
 	{
-		for (Map.Entry<IScriptFormatterFactory, IProfileManager> entry : profileByFactory.entrySet())
-		{
-			final IProfileManager manager = entry.getValue();
-			if (manager.isDirty())
-			{
-				entry.getKey().saveCustomProfiles(manager.getSortedProfiles());
-				manager.clearDirty();
-			}
-		}
+		// TODO - SAVE VALUES (for all profiles)
+		// for (Map.Entry<IScriptFormatterFactory, IProfileManager> entry : profileByFactory.entrySet())
+		// {
+		// final IProfileManager manager = entry.getValue();
+		// if (manager.isDirty())
+		// {
+		// entry.getKey().saveCustomProfiles(manager.getSortedProfiles());
+		// manager.clearDirty();
+		// }
+		// }
 		return super.saveValues();
 	}
 
 	protected void applyPreferences()
 	{
 		IScriptFormatterFactory factory = getSelectedExtension();
-		IProfileManager manager = getProfileManager(factory);
+		IProfileManager manager = getProfileManager();
 		IProfile profile = manager.getSelected();
 		Map<String, String> settings = new HashMap<String, String>();
 		if (profile != null)
 		{
 			settings.putAll(profile.getSettings());
 		}
-		PreferenceKey activeProfileKey = factory.getActiveProfileKey();
+		PreferenceKey activeProfileKey = profileManager.getActiveProfileKey();
 		if (activeProfileKey != null)
 		{
 			if (profile != null)
@@ -265,34 +251,6 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		IPreferencesSaveDelegate delegate = new SaveDelegate();
 		factory.savePreferences(settings, delegate);
 		updatePreview();
-	}
-
-	protected static PreferenceKey[] collectPreferenceKeys(List<IScriptFormatterFactory> factories)
-	{
-		List<PreferenceKey> result = new ArrayList<PreferenceKey>();
-		IContributedExtension[] extensions = ScriptFormatterManager.getInstance().getAllContributions();
-		Set<Class<? extends IScriptFormatterFactory>> factoriesClasses = new HashSet<Class<? extends IScriptFormatterFactory>>();
-		for (int i = 0; i < extensions.length; ++i)
-		{
-			IScriptFormatterFactory factory = (IScriptFormatterFactory) extensions[i];
-			// factory.g
-			if (!factoriesClasses.contains(factory.getClass()))
-			{
-				factoriesClasses.add(factory.getClass());
-				factories.add(factory);
-				result.add(factory.getFormatterPreferenceKey());
-				final PreferenceKey[] keys = factory.getPreferenceKeys();
-				if (keys != null)
-				{
-					for (int j = 0; j < keys.length; ++j)
-					{
-						final PreferenceKey prefKey = keys[j];
-						result.add(prefKey);
-					}
-				}
-			}
-		}
-		return result.toArray(new PreferenceKey[result.size()]);
 	}
 
 	// ~ Methods
@@ -396,7 +354,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			{
 				IScriptFormatterFactory formatterFactory = getSelectedExtension();
 				final CreateProfileDialog p = new CreateProfileDialog(group.getShell(), getProfileManager(),
-						formatterFactory.getProfileVersioner());
+						profileManager.getProfileVersioner());
 				if (p.open() != Window.OK)
 				{
 					return;
@@ -490,9 +448,9 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			return;
 
 		final File file = new File(path);
-		IScriptFormatterFactory factory = getSelectedExtension();
+		// IScriptFormatterFactory factory = getSelectedExtension();
 		Collection<IProfile> profiles = null;
-		IProfileStore store = factory.getProfileStore();
+		IProfileStore store = profileManager.getProfileStore();
 		try
 		{
 			profiles = store.readProfilesFromFile(file);
@@ -506,16 +464,16 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 
 		final IProfile profile = profiles.iterator().next();
 
-		IProfileVersioner versioner = factory.getProfileVersioner();
+		IProfileVersioner versioner = profileManager.getProfileVersioner();
 
-		if (!versioner.getFormatterId().equals(profile.getFormatterId()))
-		{
-			final String title = FormatterMessages.AbstractFormatterSelectionBlock_importProfileLabel;
-			final String message = NLS.bind(FormatterMessages.AbstractFormatterSelectionBlock_notValidFormatter,
-					versioner.getFormatterId(), profile.getFormatterId());
-			MessageDialog.openError(group.getShell(), title, message);
-			return;
-		}
+		// if (!versioner.getFormatterId().equals(profile.getFormatterId()))
+		// {
+		// final String title = FormatterMessages.AbstractFormatterSelectionBlock_importProfileLabel;
+		// final String message = NLS.bind(FormatterMessages.AbstractFormatterSelectionBlock_notValidFormatter,
+		// versioner.getFormatterId(), profile.getFormatterId());
+		// MessageDialog.openError(group.getShell(), title, message);
+		// return;
+		// }
 
 		if (profile.getVersion() > versioner.getCurrentVersion())
 		{
@@ -678,7 +636,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		});
 		listViewer.setInput(this.factories);
 		listViewer.setSelection(new StructuredSelection(this.factories[0]));
-		
+
 		// Add the right panel (code preview and buttons)
 		Composite rightPanel = new Composite(sashForm, SWT.NONE);
 		GridLayout layout = new GridLayout(1, false);

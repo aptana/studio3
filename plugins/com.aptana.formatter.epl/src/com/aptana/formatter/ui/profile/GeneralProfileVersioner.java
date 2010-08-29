@@ -17,30 +17,35 @@ import com.aptana.formatter.ui.IProfileVersioner;
 /**
  * Default implementation of the <code>IProfileVersioner</code>
  */
-public class GeneralProfileVersioner implements IProfileVersioner {
-
-	public GeneralProfileVersioner(String formatter) {
-		this.formatter = formatter;
-	}
-
-	public int getCurrentVersion() {
-		return DEFAULT_VERSION;
-	}
-
-	public int getFirstVersion() {
-		return DEFAULT_VERSION;
-	}
-
-	public String getFormatterId() {
-		return formatter;
-	}
-
-	public void update(IProfile profile) {
-		if (profile instanceof CustomProfile)
-			((CustomProfile) profile).setVersion(DEFAULT_VERSION);
-	}
+public class GeneralProfileVersioner implements IProfileVersioner
+{
 
 	private static final int DEFAULT_VERSION = 1;
 	private String formatter;
 
+	public GeneralProfileVersioner(String formatter)
+	{
+		this.formatter = formatter;
+	}
+
+	public int getCurrentVersion()
+	{
+		return DEFAULT_VERSION;
+	}
+
+	public int getFirstVersion()
+	{
+		return DEFAULT_VERSION;
+	}
+
+	public String getFormatterId()
+	{
+		return formatter;
+	}
+
+	public void update(IProfile profile)
+	{
+		if (profile instanceof CustomProfile)
+			((CustomProfile) profile).setVersion(DEFAULT_VERSION);
+	}
 }

@@ -14,41 +14,94 @@ package com.aptana.formatter.ui.profile;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.osgi.util.NLS;
 
+import com.aptana.formatter.epl.FormatterPlugin;
+import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.formatter.ui.IProfile;
 import com.aptana.formatter.ui.IProfileManager;
+import com.aptana.formatter.ui.IProfileStore;
+import com.aptana.formatter.ui.IProfileVersioner;
+import com.aptana.formatter.ui.IScriptFormatterFactory;
 import com.aptana.formatter.ui.ProfileKind;
+import com.aptana.formatter.ui.ScriptFormatterManager;
+import com.aptana.ui.IContributedExtension;
+import com.aptana.ui.preferences.PreferenceKey;
 
 /**
- * The model for the set of profiles which are available in the workbench.
+ * The model for the set of profiles which are available in the workbench.<br>
  */
 public class ProfileManager implements IProfileManager
 {
+
+	private static final String APTANA_CODE_FORMATTER_ID = "aptana.code.formatter"; //$NON-NLS-1$
+	private static final String DEFAULT_PROFILE_ID = "com.aptana.formatter.profiles.default"; //$NON-NLS-1$
+
+	private static ProfileManager instance;
 
 	/**
 	 * A map containing the available profiles, using the IDs as keys.
 	 */
 	private final Map<String, IProfile> fProfiles;
-
 	/**
 	 * The available profiles, sorted by name.
 	 */
 	private final List<IProfile> fProfilesByName;
-
 	private ListenerList listeners;
-
 	/**
 	 * The currently selected profile.
 	 */
 	private IProfile fSelected;
-
 	private boolean fDirty = false;
+	private PreferenceKey activeProfileKey;
+	private IProfileVersioner versioner;
+	private PreferenceKey[] preferenceKeys;
+
+	/**
+	 * Returns a single instance of the {@link ProfileManager}.<br>
+	 * As long as the {@link #dispose()} method was not called, consequent calls to this method will return the same
+	 * instance. In case the {@link #dispose()} was called, the next call for this method will return a new instance of
+	 * the ProfileManager.
+	 * 
+	 * @return A single instance of a profile manager.
+	 * @see #dispose()
+	 */
+	public static ProfileManager getInstance()
+	{
+		synchronized (ProfileManager.class)
+		{
+			if (instance == null)
+			{
+				instance = new ProfileManager();
+			}
+		}
+		return instance;
+	}
+
+	/**
+	 * Dispose the current instance of the ProfileManager.
+	 * 
+	 * @see #getInstance()
+	 */
+	public static void dispose()
+	{
+		synchronized (ProfileManager.class)
+		{
+			instance = null;
+		}
+	}
 
 	/**
 	 * Create and initialize a new profile manager.
@@ -57,8 +110,21 @@ public class ProfileManager implements IProfileManager
 	 *            Initial custom profiles (List of type <code>CustomProfile</code>)
 	 * @param profileVersioner
 	 */
-	public ProfileManager(List<IProfile> profiles)
+	private ProfileManager()
 	{
+		List<IProfile> profiles = new ArrayList<IProfile>();
+		List<IProfile> builtInProfiles = getBuiltInProfiles();
+		if (builtInProfiles != null && builtInProfiles.size() > 0)
+		{
+			profiles.addAll(builtInProfiles);
+		}
+		else
+		{
+			FormatterPlugin.logError(NLS.bind(FormatterMessages.AbstractFormatterSelectionBlock_noBuiltInProfiles,
+					APTANA_CODE_FORMATTER_ID));
+		}
+		profiles.addAll(getCustomProfiles());
+
 		fProfiles = new HashMap<String, IProfile>();
 		fProfilesByName = new ArrayList<IProfile>();
 		for (final IProfile profile : profiles)
@@ -72,6 +138,116 @@ public class ProfileManager implements IProfileManager
 			fSelected = fProfilesByName.get(0);
 		}
 		listeners = new ListenerList();
+	}
+
+	public Map<String, String> loadDefaultSettings()
+	{
+		Map<String, String> settings = new HashMap<String, String>();
+		PreferenceKey[] keys = getPreferenceKeys();
+		if (keys != null)
+		{
+			DefaultScope scope = new DefaultScope();
+			for (int i = 0; i < keys.length; i++)
+			{
+				PreferenceKey key = keys[i];
+				String name = key.getName();
+				IEclipsePreferences preferences = scope.getNode(key.getQualifier());
+				String value = preferences.get(name, null);
+				if (value != null)
+					settings.put(name, value);
+			}
+		}
+		return settings;
+	}
+
+	public List<IProfile> getBuiltInProfiles()
+	{
+		List<IProfile> profiles = new ArrayList<IProfile>();
+		IProfileVersioner versioner = getProfileVersioner();
+		BuiltInProfile profile = new BuiltInProfile(getDefaultProfileID(), getDefaultProfileName(),
+				loadDefaultSettings(), 1, APTANA_CODE_FORMATTER_ID, versioner.getCurrentVersion());
+
+		profiles.add(profile);
+		return profiles;
+	}
+
+	public List<IProfile> getCustomProfiles()
+	{
+		final PreferenceKey profilesKey = getProfilesKey();
+		if (profilesKey != null)
+		{
+			final String profilesSource = profilesKey.getStoredValue(new InstanceScope());
+			if (profilesSource != null && profilesSource.length() > 0)
+			{
+				final IProfileStore store = getProfileStore();
+				try
+				{
+					return ((ProfileStore) store).readProfilesFromString(profilesSource);
+				}
+				catch (CoreException e)
+				{
+					FormatterPlugin.logError(e);
+				}
+			}
+		}
+		return Collections.emptyList();
+	}
+
+	protected PreferenceKey getProfilesKey()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	protected PreferenceKey[] getPreferenceKeys()
+	{
+		if (preferenceKeys == null)
+		{
+			preferenceKeys = collectPreferenceKeys(new ArrayList<IScriptFormatterFactory>());
+		}
+		return preferenceKeys;
+	}
+
+	public IProfileStore getProfileStore()
+	{
+		return new ProfileStore(getProfileVersioner(), loadDefaultSettings());
+	}
+
+	public static PreferenceKey[] collectPreferenceKeys(List<IScriptFormatterFactory> factories)
+	{
+		List<PreferenceKey> result = new ArrayList<PreferenceKey>();
+		IContributedExtension[] extensions = ScriptFormatterManager.getInstance().getAllContributions();
+		Set<Class<? extends IScriptFormatterFactory>> factoriesClasses = new HashSet<Class<? extends IScriptFormatterFactory>>();
+		for (int i = 0; i < extensions.length; ++i)
+		{
+			IScriptFormatterFactory factory = (IScriptFormatterFactory) extensions[i];
+			if (!factoriesClasses.contains(factory.getClass()))
+			{
+				factoriesClasses.add(factory.getClass());
+				factories.add(factory);
+				result.add(factory.getFormatterPreferenceKey());
+				final PreferenceKey[] keys = factory.getPreferenceKeys();
+				if (keys != null)
+				{
+					for (int j = 0; j < keys.length; ++j)
+					{
+						final PreferenceKey prefKey = keys[j];
+						result.add(prefKey);
+					}
+				}
+			}
+		}
+		return result.toArray(new PreferenceKey[result.size()]);
+	}
+
+	public PreferenceKey getActiveProfileKey()
+	{
+		return activeProfileKey;
+	}
+
+	public void setActiveProfileKey(PreferenceKey activeProfile)
+	{
+		this.activeProfileKey = activeProfile;
 	}
 
 	/**
@@ -279,5 +455,36 @@ public class ProfileManager implements IProfileManager
 	public void clearDirty()
 	{
 		fDirty = false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.ui.IProfileManager#getProfileVersioner()
+	 */
+	public IProfileVersioner getProfileVersioner()
+	{
+		if (versioner == null)
+			versioner = createProfileVersioner();
+		return versioner;
+	}
+
+	/**
+	 * Create a new profile versioner.
+	 * 
+	 * @return A new profile versioner
+	 */
+	protected IProfileVersioner createProfileVersioner()
+	{
+		return new GeneralProfileVersioner(APTANA_CODE_FORMATTER_ID);
+	}
+
+	public String getDefaultProfileID()
+	{
+		return DEFAULT_PROFILE_ID;
+	}
+
+	public String getDefaultProfileName()
+	{
+		return FormatterMessages.AbstractScriptFormatterFactory_defaultProfileName;
 	}
 }

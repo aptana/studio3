@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.TabItem;
 import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.ui.internal.FormatterControlManager;
 import com.aptana.formatter.ui.internal.FormatterDialogPreferences;
+import com.aptana.formatter.ui.profile.ProfileManager;
 import com.aptana.ui.preferences.dialogfields.DialogField;
 import com.aptana.ui.preferences.dialogfields.IDialogFieldListener;
 import com.aptana.ui.preferences.dialogfields.StringDialogField;
@@ -333,7 +334,8 @@ public abstract class FormatterModifyDialog extends StatusDialog implements IFor
 
 	private void saveButtonPressed()
 	{
-		IProfileStore store = formatterFactory.getProfileStore();
+		// IProfileStore store = formatterFactory.getProfileStore();
+		IProfileStore store = ProfileManager.getInstance().getProfileStore();
 		IProfile selected = manager.create(ProfileKind.TEMPORARY, fProfileNameField.getText(), getPreferences(),
 				profile.getVersion());
 
@@ -358,6 +360,7 @@ public abstract class FormatterModifyDialog extends StatusDialog implements IFor
 		profiles.add(selected);
 		try
 		{
+			// TODO - WRITE ALL PROFILES
 			store.writeProfilesToFile(profiles, file);
 		}
 		catch (CoreException e)
