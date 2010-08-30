@@ -6,13 +6,13 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.InvalidPropertiesFormatException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -107,7 +107,7 @@ public class Theme
 			boolean skipFG = false;
 			for (String token : values)
 			{
-				if (token.length() == 0 && num == 0)
+				if (token.trim().length() == 0 && num == 0)
 				{
 					// empty fg!
 					skipFG = true;
@@ -154,12 +154,7 @@ public class Theme
 			tokens.add(value);
 			return tokens;
 		}
-		StringTokenizer tokenizer = new StringTokenizer(value, ", "); //$NON-NLS-1$
-		while (tokenizer.hasMoreTokens())
-		{
-			tokens.add(tokenizer.nextToken());
-		}
-		return tokens;
+		return Arrays.asList(value.split(","));
 	}
 
 	private RGB parseHexRGB(String hex)
