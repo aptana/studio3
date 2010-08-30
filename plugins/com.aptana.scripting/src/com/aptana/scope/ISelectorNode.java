@@ -5,4 +5,6 @@ public interface ISelectorNode
 	boolean matches(MatchContext context);
 	
 	int matchLength();
+
+	int matchFragments();
 }
