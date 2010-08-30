@@ -107,14 +107,14 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener
 			
 			// First, for perf reasons, bail out early if there are no style ranges, or there's too many
 			StyleRange[] ranges = textWidget.getStyleRanges(offset, lineRegion.getLength(), false);
-			if (ranges == null || ranges.length <= 0 || ranges.length > 100)
+			if (ranges == null || ranges.length == 0 || ranges.length > 100)
 			{
 				return;
 			}
 			// for perf reasons, only do ranges up to 160th column!
 			int length = Math.min(160, lineRegion.getLength());
 			ranges = textWidget.getStyleRanges(offset, length, true);
-			if (ranges == null || ranges.length <= 0)
+			if (ranges == null || ranges.length == 0)
 			{
 				return;
 			}
