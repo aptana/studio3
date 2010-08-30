@@ -2,6 +2,9 @@ package com.aptana.scope;
 
 public class NegativeLookaheadSelector extends BinarySelector
 {
+	private int matchLength;
+	private int matchFragments;
+
 	/**
 	 * NegativeLookaheadSelector
 	 * 
@@ -19,6 +22,8 @@ public class NegativeLookaheadSelector extends BinarySelector
 	 */
 	public boolean matches(MatchContext context)
 	{
+		matchLength = 0;
+		matchFragments = 0;
 		boolean result = true;
 
 		if (context != null && this._left != null && this._right != null)
@@ -35,11 +40,29 @@ public class NegativeLookaheadSelector extends BinarySelector
 
 				context.popCurrentStep();
 			}
+			
+			if (result)
+			{
+				matchLength = this._left.matchLength();
+				matchFragments = this._left.matchFragments();
+			}
 
 			context.popCurrentStep(!result);
 		}
 
 		return result;
+	}
+	
+	@Override
+	public int matchFragments()
+	{
+		return matchFragments;
+	}
+	
+	@Override
+	public int matchLength()
+	{
+		return matchLength;
 	}
 
 	/*
