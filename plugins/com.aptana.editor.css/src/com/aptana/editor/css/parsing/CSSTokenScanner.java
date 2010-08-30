@@ -44,7 +44,7 @@ public class CSSTokenScanner extends CSSCodeScanner
 		
 		// FIXME These are all really just numbers followed by measurements. Can't we modify scanner/parser to grab number and then a measurement
 		// em
-		rules.add(createMeasurementRule("(\\-|\\+)?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)em", CSSTokenType.EMS));
+		rules.add(createMeasurementRule("(\\-|\\+)?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)em", CSSTokenType.EMS)); //$NON-NLS-1$
 		// length
 		rules.add(createMeasurementRule("(\\-|\\+)?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)(px|cm|mm|in|pt|pc)", CSSTokenType.LENGTH)); //$NON-NLS-1$
 		// percentage
@@ -57,6 +57,7 @@ public class CSSTokenScanner extends CSSCodeScanner
 		rules.add(createMeasurementRule("(\\-|\\+)?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)([Hh]z|k[Hh]z)", CSSTokenType.FREQUENCY)); //$NON-NLS-1$
 		// time
 		rules.add(createMeasurementRule("(\\-|\\+)?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)(ms|s)", CSSTokenType.TIME)); //$NON-NLS-1$
+
 		return rules;
 	}
 
