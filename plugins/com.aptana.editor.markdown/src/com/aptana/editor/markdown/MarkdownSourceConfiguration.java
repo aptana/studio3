@@ -146,7 +146,7 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 			}
 		}
 
-		// Inline HTML
+		// Inline HTML, // FIXME This needs to be merged with BlockLevelRule!
 		TagRule tagRule = new TagRule("/", new Token(HTML_TAG)); //$NON-NLS-1$
 		tagRule.setColumnConstraint(0);
 		rules.add(tagRule);
@@ -170,10 +170,10 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		}
 
 		// Blocks
-		SingleLineRule rule = new SingleLineRule("    ", "", new Token(BLOCK));
+		SingleLineRule rule = new SingleLineRule("    ", "", new Token(BLOCK)); //$NON-NLS-1$ //$NON-NLS-2$
 		rule.setColumnConstraint(0);
 		rules.add(rule);
-		rule = new SingleLineRule("\t", "", new Token(BLOCK));
+		rule = new SingleLineRule("\t", "", new Token(BLOCK)); //$NON-NLS-1$ //$NON-NLS-2$
 		rule.setColumnConstraint(0);
 		rules.add(rule);
 
@@ -216,7 +216,7 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		}
 		str += c;
 		str += " ";
-		SingleLineRule rule = new SingleLineRule(str, null, new Token(UNNUMBERED_LIST));
+		SingleLineRule rule = new BlockLevelRule(str, null, new Token(UNNUMBERED_LIST));
 		rule.setColumnConstraint(0);
 		return rule;
 	}
