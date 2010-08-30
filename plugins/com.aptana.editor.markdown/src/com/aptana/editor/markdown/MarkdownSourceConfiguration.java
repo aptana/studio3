@@ -147,8 +147,12 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		}
 
 		// Inline HTML
-		rules.add(new TagRule("/", new Token(HTML_TAG))); //$NON-NLS-1$
-		rules.add(new TagRule(new Token(HTML_TAG)));
+		TagRule tagRule = new TagRule("/", new Token(HTML_TAG)); //$NON-NLS-1$
+		tagRule.setColumnConstraint(0);
+		rules.add(tagRule);
+		tagRule = new TagRule(new Token(HTML_TAG));
+		tagRule.setColumnConstraint(0);
+		rules.add(tagRule);
 
 		// Lists
 		for (int i = 0; i <= 3; i++)
@@ -291,7 +295,7 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		ndr = new NonRuleBasedDamagerRepairer(getToken("markup.raw.block.markdown")); //$NON-NLS-1$
 		reconciler.setDamager(ndr, BLOCK);
 		reconciler.setRepairer(ndr, BLOCK);
-		
+
 		dr = new ThemeingDamagerRepairer(new HTMLTagScanner());
 		reconciler.setDamager(dr, HTML_TAG);
 		reconciler.setRepairer(dr, HTML_TAG);
