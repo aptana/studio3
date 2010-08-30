@@ -49,6 +49,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.TreePath;
 
+import com.aptana.ide.core.io.vfs.IExtendedFileInfo;
 import com.aptana.ide.ui.io.internal.FetchFileInfoJob;
 import com.aptana.ide.ui.io.internal.FetchFileInfoStatus;
 
@@ -94,6 +95,15 @@ public final class FileSystemUtils {
 		IFileInfo fileInfo = getFileInfo(object);
 		if (fileInfo != null) {
 			return fileInfo.getAttribute(EFS.ATTRIBUTE_SYMLINK);
+		}
+		return false;
+	}
+
+	public static boolean isPrivate(Object object)
+	{
+		IFileInfo fileInfo = getFileInfo(object);
+		if (fileInfo != null && fileInfo instanceof IExtendedFileInfo) {
+			return ((IExtendedFileInfo)fileInfo).getPermissions() == 0;
 		}
 		return false;
 	}

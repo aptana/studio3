@@ -63,8 +63,11 @@ import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPointCategory;
 import com.aptana.ide.core.io.LocalConnectionPoint;
 import com.aptana.ide.core.io.LocalRoot;
+import com.aptana.ide.core.io.PermissionDeniedException;
 import com.aptana.ide.core.io.WorkspaceConnectionPoint;
+import com.aptana.ide.core.io.vfs.IExtendedFileInfo;
 import com.aptana.ide.ui.io.CoreIOImages;
+import com.aptana.ide.ui.io.FileSystemUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.ImageUtils;
 import com.aptana.ui.ImageAssociations;
@@ -247,6 +250,14 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
                 } catch (CoreException e1) {
                 }
             }
+			else if (object instanceof FileSystemObject && e.getCause() instanceof PermissionDeniedException)
+			{
+				IFileInfo fileInfo = FileSystemUtils.getFileInfo(object);
+				if (fileInfo != null && fileInfo instanceof IExtendedFileInfo) {
+					((IExtendedFileInfo) fileInfo).setPermissions(0);
+				}
+				return;
+			}
 			IOUIPlugin.logError(Messages.FileSystemWorkbenchAdapter_FailedToFetchDeferredChildren, e);
 			UIUtils.showErrorMessage(Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
 		} finally {

@@ -32,45 +32,43 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.css.parsing;
+package com.aptana.ide.core.io;
 
-import com.aptana.editor.css.parsing.lexer.CSSTokenType;
+import java.io.IOException;
 
-public class CSSKeywordTest extends CSSTokensTest
+public class PermissionDeniedException extends IOException
 {
+	/*
+	 * Fields
+	 */
+	private static final long serialVersionUID = -443040597160397837L;
 
-	public void testImportKeyword()
+	/*
+	 * Constructors
+	 */
+
+	/**
+	 * Create a new instance of PermissionDeniedException
+	 * 
+	 * @param message
+	 *            The message associated with this exception
+	 * @param e
+	 *            The inner exception that caused this exception
+	 */
+	public PermissionDeniedException(String message, Exception e)
 	{
-		assertToken("@import", CSSTokenType.IMPORT, 0, 7); //$NON-NLS-1$
-		assertToken("@imports", CSSTokenType.AT_RULE, 0, 8); //$NON-NLS-1$
+		super(message, e);
 	}
 
-	public void testPageKeyword()
+	/**
+	 * Create a new instance of PermissionDeniedException
+	 * 
+	 * @param message
+	 *            The message associated with this exception
+	 */
+	public PermissionDeniedException(String message)
 	{
-		assertToken("@page", CSSTokenType.PAGE, 0, 5); //$NON-NLS-1$
-		assertToken("@pages", CSSTokenType.AT_RULE, 0, 6); //$NON-NLS-1$
+		super(message);
 	}
 
-	public void testMediaKeyword()
-	{
-		assertToken("@media", CSSTokenType.MEDIA_KEYWORD, 0, 6); //$NON-NLS-1$
-		assertToken("@medias", CSSTokenType.AT_RULE, 0, 7); //$NON-NLS-1$
-	}
-
-	public void testCharSetKeyword()
-	{
-		assertToken("@charset", CSSTokenType.CHARSET, 0, 8); //$NON-NLS-1$
-		assertToken("@charsets", CSSTokenType.AT_RULE, 0, 9); //$NON-NLS-1$
-	}
-
-	public void testUrlKeyword()
-	{
-		assertToken("url(test.css)", CSSTokenType.URL, 0, 13); //$NON-NLS-1$
-	}
-
-	public void testImportantKeyword()
-	{
-		assertToken("!important", CSSTokenType.IMPORTANT, 0, 10); //$NON-NLS-1$
-		assertToken("! important", CSSTokenType.IMPORTANT, 0, 11); //$NON-NLS-1$
-	}
 }
