@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptingEngine;
+import com.aptana.scripting.model.ProjectTemplate.Type;
 import com.aptana.scripting.model.filters.AndFilter;
 import com.aptana.scripting.model.filters.IModelFilter;
 import com.aptana.scripting.model.filters.IsExecutableCommandFilter;
@@ -44,10 +46,12 @@ public class BundleManager
 	static final CommandElement[] NO_COMMANDS = new CommandElement[0];
 	static final MenuElement[] NO_MENUS = new MenuElement[0];
 	static final SnippetElement[] NO_SNIPPETS = new SnippetElement[0];
+	static final ProjectTemplate[] NO_PROJECT_TEMPLATES = new ProjectTemplate[0];
 
 	private static final File[] NO_FILES = new File[0];
 	private static final String[] NO_STRINGS = new String[0];
 
+	private static final String APTANA_RUBLE_USER_LOCATION = "aptana.ruble.user.location"; //$NON-NLS-1$
 	private static final String BUILTIN_BUNDLES = "bundles"; //$NON-NLS-1$
 	private static final String BUNDLE_FILE = "bundle.rb"; //$NON-NLS-1$
 	private static final String RUBY_FILE_EXTENSION = ".rb"; //$NON-NLS-1$
@@ -104,17 +108,58 @@ public class BundleManager
 				INSTANCE.applicationBundlesPath = ResourceUtil.resourcePathToString(url);
 			}
 
-			String OS = Platform.getOS();
-			String userHome = System.getProperty(USER_HOME_PROPERTY);
+			// get possible user override
+			boolean validUserBundlePath = false;
+			String userBundlePathOverride = System.getProperty(APTANA_RUBLE_USER_LOCATION);
 
-			// setup default user bundles path
-			if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
+			if (userBundlePathOverride != null)
 			{
-				INSTANCE.userBundlesPath = userHome + USER_BUNDLE_DIRECTORY_MACOSX;
+				File f = new File(userBundlePathOverride);
+
+				if (f.exists())
+				{
+					if (f.isDirectory())
+					{
+						if (f.canRead() && f.canWrite())
+						{
+							validUserBundlePath = true;
+						}
+						else
+						{
+							Activator.logError(Messages.BundleManager_USER_PATH_NOT_READ_WRITE + f.getAbsolutePath(), null);
+						}
+					}
+					else
+					{
+						Activator.logError(Messages.BundleManager_USER_PATH_NOT_DIRECTORY + f.getAbsolutePath(), null);
+					}
+				}
+				else
+				{
+					// try to create the path
+					validUserBundlePath = f.mkdirs();
+				}
+
+				if (validUserBundlePath)
+				{
+					INSTANCE.userBundlesPath = f.getAbsolutePath();
+				}
 			}
-			else
+
+			if (validUserBundlePath == false)
 			{
-				INSTANCE.userBundlesPath = userHome + File.separator + USER_BUNDLE_DIRECTORY_GENERAL;
+				String OS = Platform.getOS();
+				String userHome = System.getProperty(USER_HOME_PROPERTY);
+
+				// setup default user bundles path
+				if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
+				{
+					INSTANCE.userBundlesPath = userHome + USER_BUNDLE_DIRECTORY_MACOSX;
+				}
+				else
+				{
+					INSTANCE.userBundlesPath = userHome + File.separator + USER_BUNDLE_DIRECTORY_GENERAL;
+				}
 			}
 		}
 
@@ -1125,6 +1170,38 @@ public class BundleManager
 		return result.toArray(new MenuElement[result.size()]);
 	}
 
+	public ProjectTemplate[] getProjectTemplates()
+	{
+		List<ProjectTemplate> result = new ArrayList<ProjectTemplate>();
+		Iterator<List<BundleElement>> iter = _bundlesByPath.values().iterator();
+		List<BundleElement> bundles;
+		while (iter.hasNext())
+		{
+			bundles = iter.next();
+			for (BundleElement bundle : bundles)
+			{
+				result.addAll(Arrays.asList(bundle.getProjectTemplates()));
+			}
+		}
+		return result.toArray(new ProjectTemplate[result.size()]);
+	}
+
+	public ProjectTemplate[] getProjectTemplatesByType(Type type)
+	{
+		List<ProjectTemplate> result = new ArrayList<ProjectTemplate>();
+		Iterator<List<BundleElement>> iter = _bundlesByPath.values().iterator();
+		List<BundleElement> bundles;
+		while (iter.hasNext())
+		{
+			bundles = iter.next();
+			for (BundleElement bundle : bundles)
+			{
+				result.addAll(Arrays.asList(bundle.getProjectTemplatesByType(type)));
+			}
+		}
+		return result.toArray(new ProjectTemplate[result.size()]);
+	}
+
 	/**
 	 * getTopLevelScope
 	 * 
@@ -1166,8 +1243,8 @@ public class BundleManager
 						// one and move on
 
 						// split on periods to see the specificity of scope name
-						int existingLength = StringUtil.characterInstanceCount(result, '.') + 1; //$NON-NLS-1$
-						int newLength = StringUtil.characterInstanceCount(entry.getValue(), '.') + 1; //$NON-NLS-1$
+						int existingLength = StringUtil.characterInstanceCount(result, '.') + 1;
+						int newLength = StringUtil.characterInstanceCount(entry.getValue(), '.') + 1;
 
 						if (newLength > existingLength)
 						{

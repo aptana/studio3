@@ -48,7 +48,12 @@ import com.aptana.editor.js.contentassist.JSContentAssistProcessor;
 
 public class JSSourceViewerConfiguration extends CommonSourceViewerConfiguration
 {
-
+	/**
+	 * JSSourceViewerConfiguration
+	 * 
+	 * @param preferences
+	 * @param editor
+	 */
 	public JSSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor)
 	{
 		super(preferences, editor);
@@ -63,8 +68,7 @@ public class JSSourceViewerConfiguration extends CommonSourceViewerConfiguration
 	@Override
 	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer)
 	{
-		return TextUtils.combine(new String[][] { { IDocument.DEFAULT_CONTENT_TYPE },
-				JSSourceConfiguration.CONTENT_TYPES });
+		return TextUtils.combine(new String[][] { { IDocument.DEFAULT_CONTENT_TYPE }, JSSourceConfiguration.CONTENT_TYPES });
 	}
 
 	/*
@@ -86,15 +90,28 @@ public class JSSourceViewerConfiguration extends CommonSourceViewerConfiguration
 	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer)
 	{
 		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
+		
 		JSSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
+		
 		return reconciler;
 	}
-	
 
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.editor.common.CommonSourceViewerConfiguration#getContentAssistProcessor(org.eclipse.jface.text.source
+	 * .ISourceViewer, java.lang.String)
+	 */
 	@Override
 	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
 	{
-		return new JSContentAssistProcessor(getAbstractThemeableEditor());
-	}
+		IContentAssistProcessor result = null;
 
+		if (IDocument.DEFAULT_CONTENT_TYPE.equals(contentType) || JSSourceConfiguration.DEFAULT.equals(contentType))
+		{
+			result = new JSContentAssistProcessor(getAbstractThemeableEditor());
+		}
+
+		return result;
+	}
 }

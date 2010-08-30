@@ -26,7 +26,7 @@ public class JSIndexTests extends TestCase
 	@Override
 	protected void tearDown() throws Exception
 	{
-		IndexManager.getInstance().removeIndex(URI.create(JSIndexConstants.METADATA));
+		IndexManager.getInstance().removeIndex(URI.create(JSIndexConstants.METADATA_INDEX_LOCATION));
 		
 		super.tearDown();
 	}

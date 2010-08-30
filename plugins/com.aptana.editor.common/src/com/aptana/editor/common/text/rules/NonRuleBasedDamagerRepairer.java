@@ -58,6 +58,7 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 	protected IDocument fDocument;
 	/** The default text attribute if non is returned as data by the current token */
 	protected IToken fDefaultTextAttribute;
+	private String fFullScope;
 
 	/**
 	 * Constructor for NonRuleBasedDamagerRepairer.
@@ -157,27 +158,33 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 		Object data = fDefaultTextAttribute.getData();
 		if (data instanceof String)
 		{
-			try
+			// Cache the full scope so we can just re-use it. It shouldn't ever change... Previous caching of text
+			// attribute ended up breaking when theme changed
+			if (fFullScope == null)
 			{
-				String last = (String) data;
-				int offset = region.getOffset();
-				String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
-						.getScopeAtOffset(fDocument, offset);
-				if (last.length() == 0)
+				try
 				{
-					last = scope;
+					String last = (String) data;
+					int offset = region.getOffset();
+					String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
+							.getScopeAtOffset(fDocument, offset);
+					if (last.length() == 0)
+					{
+						last = scope;
+					}
+					else if (!scope.endsWith(last))
+					{
+						scope += " " + last; //$NON-NLS-1$
+					}
+					fFullScope = scope;
 				}
-				else if (!scope.endsWith(last))
+				catch (BadLocationException e)
 				{
-					scope += " " + last; //$NON-NLS-1$
+					CommonEditorPlugin.logError(e);
 				}
-				fDefaultTextAttribute = ThemePlugin.getDefault().getThemeManager().getToken(scope);
-				data = fDefaultTextAttribute.getData();
 			}
-			catch (BadLocationException e)
-			{
-				CommonEditorPlugin.logError(e);
-			}
+			IToken token = ThemePlugin.getDefault().getThemeManager().getToken(fFullScope);
+			data = token.getData();
 		}
 		if (data instanceof TextAttribute)
 		{

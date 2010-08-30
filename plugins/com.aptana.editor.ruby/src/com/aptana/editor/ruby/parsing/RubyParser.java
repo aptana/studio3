@@ -23,9 +23,14 @@ public class RubyParser implements IParser
 				+ source.length());
 		RubyStructureBuilder builder = new RubyStructureBuilder(root);
 		SourceElementVisitor visitor = new SourceElementVisitor(builder);
-		visitor.acceptNode(fParser.parse(source).getAST());
+		visitor.acceptNode(getSourceParser().parse(source).getAST());
 		parseState.setParseResult(root);
 
 		return root;
+	}
+
+	public RubySourceParser getSourceParser()
+	{
+		return fParser;
 	}
 }

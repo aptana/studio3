@@ -51,10 +51,8 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 			// limit the height of the font
 			if (textFontData[0].getHeight() > SnippetsContentAssistant.MAX_HEIGHT)
 			{
-				maxHeightTextFont = new Font(textFont.getDevice(),
-						textFontData[0].getName(),
-						SnippetsContentAssistant.MAX_HEIGHT,
-						textFontData[0].getStyle());
+				maxHeightTextFont = new Font(textFont.getDevice(), textFontData[0].getName(),
+						SnippetsContentAssistant.MAX_HEIGHT, textFontData[0].getStyle());
 			}
 		}
 
@@ -101,7 +99,8 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 		IDocument document = viewer.getDocument();
 		try
 		{
-			contentTypeString = getDocumentScopeManager().getScopeAtOffset(document, region.getOffset() + region.getLength());
+			contentTypeString = getDocumentScopeManager().getScopeAtOffset(document,
+					region.getOffset() + region.getLength());
 		}
 		catch (BadLocationException e)
 		{
@@ -118,9 +117,9 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 	@Override
 	protected Image getImage(Template template)
 	{
-		if (template instanceof SnippetTemplate ||
-				(template instanceof CommandTemplate &&
-						OutputType.INSERT_AS_SNIPPET.getName().equals(((CommandTemplate) template).getCommandElement().getOutputType())))
+		if (template instanceof SnippetTemplate
+				|| (template instanceof CommandTemplate && OutputType.INSERT_AS_SNIPPET.getName().equals(
+						((CommandTemplate) template).getCommandElement().getOutputType())))
 		{
 			return CommonEditorPlugin.getDefault().getImageFromImageRegistry(CommonEditorPlugin.SNIPPET);
 		}
@@ -133,14 +132,20 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 		List<Template> templatesList = new LinkedList<Template>();
 		AndFilter filter = new AndFilter(new ScopeFilter(contextTypeId), new HasTriggerFilter());
 		CommandElement[] commandsFromScope = BundleManager.getInstance().getCommands(filter);
-		for (CommandElement commandElement : commandsFromScope) {
+		for (CommandElement commandElement : commandsFromScope)
+		{
 			String[] triggers = commandElement.getTriggers();
-			if (triggers != null) {
-				for (String trigger : triggers) {
-					if (commandElement instanceof SnippetElement) {
-						templatesList.add(new SnippetTemplate((SnippetElement)commandElement, trigger, contextTypeId));
-					} else {
-						templatesList.add (new CommandTemplate(commandElement, trigger, contextTypeId));
+			if (triggers != null)
+			{
+				for (String trigger : triggers)
+				{
+					if (commandElement instanceof SnippetElement)
+					{
+						templatesList.add(new SnippetTemplate((SnippetElement) commandElement, trigger, contextTypeId));
+					}
+					else
+					{
+						templatesList.add(new CommandTemplate(commandElement, trigger, contextTypeId));
 					}
 				}
 			}
@@ -161,6 +166,8 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 	{
 		ICompletionProposal[] completionProposals = super.computeCompletionProposals(viewer, offset);
 
+		// FIXME We need to be smarter about prefix. If full prefix doesn't match, chop off at non-letter/digit portions
+		// from beginning until we have a match!
 		// We now check if there is only one proposal that
 		// matches exactly with the prefix the user has typed
 		String extractPrefix = extractPrefix(viewer, offset);
@@ -185,7 +192,7 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 		// So we just return it
 		if (exactPrefixMatches == 1)
 		{
-			return new ICompletionProposal[] {completionProposals[exactPrefixMatchIndex]};
+			return new ICompletionProposal[] { completionProposals[exactPrefixMatchIndex] };
 		}
 
 		for (int i = 0; i < completionProposals.length; i++)
@@ -244,7 +251,9 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 			{
 				char ch = document.getChar(i - 1);
 				if (Character.isWhitespace(ch))
+				{
 					break;
+				}
 				i--;
 			}
 			return document.get(i, offset - i);
@@ -255,7 +264,8 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 		}
 	}
 
-	public static void insertAsTemplate(ITextViewer textViewer, final IRegion region, String templateText, CommandElement commandElement)
+	public static void insertAsTemplate(ITextViewer textViewer, final IRegion region, String templateText,
+			CommandElement commandElement)
 	{
 		SnippetsCompletionProcessor snippetsCompletionProcessor = new SnippetsCompletionProcessor();
 		Template template = new SnippetTemplate(commandElement, templateText);
@@ -264,9 +274,10 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 				.createProposal(template, context, region, 0);
 		completionProposal.setTemplateProposals(new ICompletionProposal[] { completionProposal });
 		completionProposal.apply(textViewer, '0', SWT.NONE, region.getOffset());
-		
-		Point selection= completionProposal.getSelection(textViewer.getDocument());
-		if (selection != null) {
+
+		Point selection = completionProposal.getSelection(textViewer.getDocument());
+		if (selection != null)
+		{
 			textViewer.setSelectedRange(selection.x, selection.y);
 			textViewer.revealRange(selection.x, selection.y);
 		}
@@ -281,12 +292,26 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 		return textFontStyler;
 	}
 
-	void possibleCompletionsClosed() {
+	void possibleCompletionsClosed()
+	{
 		if (textFontStyler != null)
 		{
 			textFontStyler.dispose();
 			textFontStyler = null;
 		}
+	}
+
+	static String narrowPrefix(String prefix)
+	{
+		for (int i = 0; i < prefix.length(); i++)
+		{
+			char ch = prefix.charAt(i);
+			if (!Character.isLetterOrDigit(ch))
+			{
+				return prefix.substring(i + 1);
+			}
+		}
+		return ""; //$NON-NLS-1$
 	}
 
 }

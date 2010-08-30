@@ -2,10 +2,15 @@ package com.aptana.editor.js.contentassist;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.eclipse.swt.graphics.Image;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.URIUtil;
+import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
@@ -13,8 +18,29 @@ import com.aptana.editor.js.contentassist.model.SinceElement;
 
 public class JSModelFormatter
 {
+	private static final Map<String, Image> TYPE_IMAGE_MAP;
+
+	// used for mixed types
+	private static final Image PROPERTY = Activator.getImage("/icons/js_property.png"); //$NON-NLS-1$
+
 	private static final String NEW_LINE = "<br>"; //$NON-NLS-1$
 	private static final String DOUBLE_NEW_LINE = NEW_LINE + NEW_LINE;
+
+	/**
+	 * static initializer
+	 */
+	static
+	{
+		TYPE_IMAGE_MAP = new HashMap<String, Image>();
+		TYPE_IMAGE_MAP.put(JSTypeConstants.ARRAY_TYPE, Activator.getImage("/icons/array-literal.png")); //$NON-NLS-1$
+		TYPE_IMAGE_MAP.put(JSTypeConstants.BOOLEAN_TYPE, Activator.getImage("/icons/boolean.png")); //$NON-NLS-1$
+		TYPE_IMAGE_MAP.put(JSTypeConstants.FUNCTION_TYPE, Activator.getImage("/icons/js_function.png")); //$NON-NLS-1$
+		TYPE_IMAGE_MAP.put(JSTypeConstants.NULL_TYPE, Activator.getImage("/icons/null.png")); //$NON-NLS-1$
+		TYPE_IMAGE_MAP.put(JSTypeConstants.NUMBER_TYPE, Activator.getImage("/icons/number.png")); //$NON-NLS-1$
+		TYPE_IMAGE_MAP.put(JSTypeConstants.OBJECT_TYPE, Activator.getImage("/icons/object-literal.png")); //$NON-NLS-1$
+		TYPE_IMAGE_MAP.put(JSTypeConstants.REG_EXP_TYPE, Activator.getImage("/icons/regex.png")); //$NON-NLS-1$
+		TYPE_IMAGE_MAP.put(JSTypeConstants.STRING_TYPE, Activator.getImage("/icons/string.png")); //$NON-NLS-1$
+	}
 
 	/**
 	 * addDefiningFiles
@@ -243,6 +269,42 @@ public class JSModelFormatter
 		return result;
 	}
 
+	/**
+	 * getImage
+	 * 
+	 * @param property
+	 * @return
+	 */
+	public static Image getImage(PropertyElement property)
+	{
+		Image result = (property instanceof FunctionElement) ? TYPE_IMAGE_MAP.get(JSTypeConstants.FUNCTION_TYPE) : PROPERTY;
+		
+		if (property != null)
+		{
+			List<String> types = property.getTypeNames();
+			
+			if (types != null && types.size() == 1)
+			{
+				String type = types.get(0);
+				
+				if (TYPE_IMAGE_MAP.containsKey(type))
+				{
+					result = TYPE_IMAGE_MAP.get(type);
+				}
+				else if (type.startsWith(JSTypeConstants.DYNAMIC_CLASS_PREFIX))
+				{
+					result = TYPE_IMAGE_MAP.get(JSTypeConstants.OBJECT_TYPE);
+				}
+				else if (type.startsWith(JSTypeConstants.FUNCTION_TYPE))
+				{
+					result = TYPE_IMAGE_MAP.get(JSTypeConstants.FUNCTION_TYPE);
+				}
+			}
+		}
+		
+		return result;
+	}
+	
 	/**
 	 * getDisplayTypeName
 	 * 

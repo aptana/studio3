@@ -331,7 +331,12 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 						int y = event.getBounds().y + event.getBounds().height - 6;
 						int x2 = event.getBounds().width;
 						Color oldFG = event.gc.getForeground();
-						event.gc.setForeground(token.getValue().getForeground());
+						Color fg = token.getValue().getForeground();
+						if (fg == null)
+						{
+							fg = ThemePlugin.getDefault().getColorManager().getColor(getTheme().getForeground());
+						}
+						event.gc.setForeground(fg);
 						event.gc.drawLine(0, y, x2, y);
 						event.gc.setForeground(oldFG);
 						event.detail &= ~SWT.FOREGROUND;
@@ -368,7 +373,8 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				TableItem item = (TableItem) e.item;
 				lastSelectedColor = item.getBackground(0);
 				lastSelected = item;
-				item.setBackground(0, ThemePlugin.getDefault().getColorManager().getColor(getTheme().getSelection()));
+				item.setBackground(0,
+						ThemePlugin.getDefault().getColorManager().getColor(getTheme().getSelectionAgainstBG()));
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e)
@@ -674,9 +680,9 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		Theme theme = getTheme();
 		fgSelector.setColorValue(theme.getForeground());
 		bgSelector.setColorValue(theme.getBackground());
-		lineHighlightSelector.setColorValue(theme.getLineHighlight());
+		lineHighlightSelector.setColorValue(theme.getLineHighlight().toRGB());
 		caretSelector.setColorValue(theme.getCaret());
-		selectionSelector.setColorValue(theme.getSelection());
+		selectionSelector.setColorValue(theme.getSelection().toRGB());
 		fThemeCombo.setText(themeName);
 		tableViewer.setInput(theme);
 		addCustomTableEditorControls();
@@ -701,11 +707,15 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		TableItem[] items = table.getItems();
 		for (int i = 0; i < items.length; i++)
 		{
-
 			Map.Entry<String, TextAttribute> commit = (Map.Entry<String, TextAttribute>) items[i].getData();
-			createButton(table, items[i], 1, commit.getValue().getForeground());
+			if (commit.getValue().getForeground() != null)
+			{
+				createButton(table, items[i], 1, commit.getValue().getForeground());
+			}
 			if (commit.getValue().getBackground() != null)
+			{
 				createButton(table, items[i], 2, commit.getValue().getBackground());
+			}
 			createFontStyle(table, items[i], commit.getValue());
 		}
 	}
@@ -788,7 +798,10 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		Button button = new Button(table, SWT.PUSH | SWT.FLAT);
 		Image image = new Image(table.getDisplay(), 16, 16);
 		GC gc = new GC(image);
-		gc.setBackground(color);
+		if (color != null)
+		{
+			gc.setBackground(color);
+		}
 		gc.fillRectangle(0, 0, 16, 16);
 		gc.dispose();
 		button.setImage(image);
@@ -934,9 +947,9 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		}
 		else if (source == deleteThemeButton)
 		{
-			boolean ok = MessageDialog.openConfirm(getShell(), MessageFormat.format(
-					Messages.ThemePreferencePage_DeleteThemeTitle, fSelectedTheme), MessageFormat.format(
-					Messages.ThemePreferencePage_DeleteThemeMsg, fSelectedTheme));
+			boolean ok = MessageDialog.openConfirm(getShell(),
+					MessageFormat.format(Messages.ThemePreferencePage_DeleteThemeTitle, fSelectedTheme),
+					MessageFormat.format(Messages.ThemePreferencePage_DeleteThemeMsg, fSelectedTheme));
 			if (ok)
 			{
 				getTheme().delete();

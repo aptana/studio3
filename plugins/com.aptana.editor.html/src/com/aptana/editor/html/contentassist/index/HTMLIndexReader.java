@@ -1,6 +1,8 @@
 package com.aptana.editor.html.contentassist.index;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,7 +22,7 @@ public class HTMLIndexReader
 	 * 
 	 * @param key
 	 * @return
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	private ElementElement createElementFromKey(Index index, String key) throws IOException
 	{
@@ -73,7 +75,8 @@ public class HTMLIndexReader
 	public ElementElement getElement(Index index, String name) throws IOException
 	{
 		String searchKey = name + CSSIndexConstants.DELIMITER;
-		List<QueryResult> items = index.query(new String[] { HTMLIndexConstants.ELEMENT }, searchKey, SearchPattern.PREFIX_MATCH);
+		List<QueryResult> items = index.query(new String[] { HTMLIndexConstants.ELEMENT }, searchKey,
+				SearchPattern.PREFIX_MATCH);
 		ElementElement result = null;
 
 		if (items != null)
@@ -99,7 +102,8 @@ public class HTMLIndexReader
 	 */
 	public List<ElementElement> getElements(Index index) throws IOException
 	{
-		List<QueryResult> items = index.query(new String[] { HTMLIndexConstants.ELEMENT }, "*", SearchPattern.PATTERN_MATCH); //$NON-NLS-1$
+		List<QueryResult> items = index.query(new String[] { HTMLIndexConstants.ELEMENT },
+				"*", SearchPattern.PATTERN_MATCH); //$NON-NLS-1$
 		List<ElementElement> result = new LinkedList<ElementElement>();
 
 		if (items != null)
@@ -126,7 +130,8 @@ public class HTMLIndexReader
 	protected UserAgentElement getUserAgent(Index index, String userAgentKey) throws IOException
 	{
 		String searchKey = userAgentKey + HTMLIndexConstants.DELIMITER;
-		List<QueryResult> items = index.query(new String[] { HTMLIndexConstants.USER_AGENT }, searchKey, SearchPattern.PREFIX_MATCH);
+		List<QueryResult> items = index.query(new String[] { HTMLIndexConstants.USER_AGENT }, searchKey,
+				SearchPattern.PREFIX_MATCH);
 		UserAgentElement result = null;
 
 		if (items != null && items.size() > 0)
@@ -148,7 +153,7 @@ public class HTMLIndexReader
 
 		return result;
 	}
-	
+
 	/**
 	 * getValues
 	 * 
@@ -174,8 +179,15 @@ public class HTMLIndexReader
 					{
 						String[] paths = item.getDocuments();
 						String path = (paths != null && paths.length > 0) ? paths[0] : ""; //$NON-NLS-1$
-
-						result.put(item.getWord(), path);
+						try
+						{
+							URI uri = index.getRelativeDocumentPath(new URI(path));
+							result.put(item.getWord(), uri.toString());
+						}
+						catch (URISyntaxException e)
+						{
+							result.put(item.getWord(), path);
+						}
 					}
 				}
 			}

@@ -23,17 +23,7 @@ import com.aptana.index.core.Index;
 
 public class JSIndexWriter
 {
-	private static final URI METADATA_LOCATION = URI.create(""); //$NON-NLS-1$
 	private static Map<UserAgentElement, String> keysByUserAgent = new HashMap<UserAgentElement, String>();
-	static Map<String, UserAgentElement> userAgentsByKey = new HashMap<String, UserAgentElement>();
-
-	/**
-	 * JSIndexWriter
-	 */
-	public JSIndexWriter()
-	{
-		this.loadUserAgents();
-	}
 
 	/**
 	 * cacheUserAgent
@@ -44,9 +34,8 @@ public class JSIndexWriter
 	private void cacheUserAgent(UserAgentElement userAgent)
 	{
 		String key = userAgent.getKey();
-		
+
 		keysByUserAgent.put(userAgent, key);
-		userAgentsByKey.put(key, userAgent);
 	}
 
 	/**
@@ -56,27 +45,7 @@ public class JSIndexWriter
 	 */
 	protected URI getDocumentPath()
 	{
-		return URI.create(JSIndexConstants.METADATA);
-	}
-
-	/**
-	 * loadUserAgents
-	 */
-	protected void loadUserAgents()
-	{
-		JSIndexReader reader = new JSIndexReader();
-
-		try
-		{
-			for (UserAgentElement userAgent : reader.getUserAgents())
-			{
-				this.cacheUserAgent(userAgent);
-			}
-		}
-		catch (IOException e)
-		{
-			Activator.logError(e.getMessage(), e);
-		}
+		return URI.create(JSIndexConstants.METADATA_FILE_LOCATION);
 	}
 
 	/**
@@ -285,7 +254,7 @@ public class JSIndexWriter
 	 */
 	public void writeType(Index index, TypeElement type)
 	{
-		this.writeType(index, type, METADATA_LOCATION);
+		this.writeType(index, type, this.getDocumentPath());
 	}
 
 	/**
@@ -336,27 +305,43 @@ public class JSIndexWriter
 	 * @param userAgent
 	 * @return
 	 */
-	protected String writeUserAgent(UserAgentElement userAgent)
+	public String writeUserAgent(UserAgentElement userAgent)
 	{
 		String key = keysByUserAgent.get(userAgent);
 
 		if (key == null)
 		{
-			Index index = JSIndexQueryHelper.getIndex();
+			// get key
+			key = userAgent.getKey();
 			
-			key = UUID.randomUUID().toString();
+			// see if it has been written already
+			JSIndexReader reader = new JSIndexReader();
 			
-			// set key for cache purposes
-			userAgent.setKey(key);
+			UserAgentElement diskUserAgent = null;
+			
+			try
+			{
+				diskUserAgent = reader.getUserAgent(key);
+			}
+			catch (IOException e)
+			{
+				Activator.logError(e.getMessage(), e);
+			}
+			
+			// write to index, if we didn't have it there already
+			if (diskUserAgent == null)
+			{
+				Index index = JSIndexQueryHelper.getIndex();
+	
+				// store user agent in index so we can recover it during the next session
+				String[] columns = new String[] { key, userAgent.getDescription(), userAgent.getOS(), userAgent.getPlatform(), userAgent.getVersion() };
+				String value = StringUtil.join(JSIndexConstants.DELIMITER, columns);
+	
+				index.addEntry(JSIndexConstants.USER_AGENT, value, this.getDocumentPath());
+			}
 
-			// store user agent in index so we can recover it during the next session
-			String[] columns = new String[] { key, userAgent.getDescription(), userAgent.getOS(), userAgent.getPlatform(), userAgent.getVersion() };
-			String value = StringUtil.join(JSIndexConstants.DELIMITER, columns);
-
-			index.addEntry(JSIndexConstants.USER_AGENT, value, this.getDocumentPath());
-
-			// cache for faster retrieval during reading
-			cacheUserAgent(userAgent);
+			// cache to prevent unnecessary reads and writes
+			this.cacheUserAgent(userAgent);
 		}
 
 		return key;

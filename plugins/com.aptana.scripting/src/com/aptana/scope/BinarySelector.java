@@ -55,10 +55,4 @@ public abstract class BinarySelector implements ISelectorNode
 		return left + this.getOperator() + " " + right; //$NON-NLS-1$
 	}
 
-	@Override
-	public int matchLength()
-	{
-		// TODO is this even right?
-		return Math.max(getLeftChild().matchLength(), getRightChild().matchLength());
-	}
 }

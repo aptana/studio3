@@ -81,6 +81,66 @@ public class DiskIndex
 	}
 
 	/**
+	 * addDocumentNames
+	 * 
+	 * @param substring
+	 * @param memoryIndex
+	 * @return
+	 * @throws IOException
+	 */
+	public Set<String> addDocumentNames(String substring, MemoryIndex memoryIndex) throws IOException
+	{
+		// must skip over documents which have been added/changed/deleted in the memory index
+		List<String> docNames = readAllDocumentNames();
+		Set<String> results = new HashSet<String>(docNames.size());
+
+		if (substring == null)
+		{
+			if (memoryIndex == null)
+			{
+				return new HashSet<String>(docNames);
+			}
+
+			Map<String, Map<String, Set<String>>> docsToRefs = memoryIndex.getDocumentsToReferences();
+
+			for (String docName : docNames)
+			{
+				if (!docsToRefs.containsKey(docName))
+				{
+					results.add(docName);
+				}
+			}
+		}
+		else
+		{
+			if (memoryIndex == null)
+			{
+				for (String docName : docNames)
+				{
+					if (docName.startsWith(substring, 0))
+					{
+						results.add(docName);
+					}
+				}
+			}
+			else
+			{
+				Map<String, Map<String, Set<String>>> docsToRefs = memoryIndex.getDocumentsToReferences();
+
+				for (String docName : docNames)
+				{
+					if (docName.startsWith(substring, 0) && !docsToRefs.containsKey(docName))
+					{
+						results.add(docName);
+					}
+				}
+			}
+		}
+
+		return results;
+	}
+
+	/**
 	 * addQueryResult
 	 * 
 	 * @param results
@@ -90,13 +150,17 @@ public class DiskIndex
 	 * @return
 	 * @throws IOException
 	 */
-	private Map<String, QueryResult> addQueryResult(Map<String, QueryResult> results, String word,
-			Map<String, Object> wordsToDocNumbers, MemoryIndex memoryIndex) throws IOException
+	private Map<String, QueryResult> addQueryResult(Map<String, QueryResult> results, String word, Map<String, Object> wordsToDocNumbers,
+		MemoryIndex memoryIndex) throws IOException
 	{
 		// must skip over documents which have been added/changed/deleted in the memory index
 		if (results == null)
+		{
 			results = new HashMap<String, QueryResult>(13);
+		}
+
 		QueryResult result = results.get(word);
+
 		if (memoryIndex == null)
 		{
 			if (result == null)
@@ -104,9 +168,11 @@ public class DiskIndex
 				result = new QueryResult(word, null);
 				results.put(word, result);
 			}
+
 			result.addDocumentTable(wordsToDocNumbers);
 
 			List<Integer> docNumbers = readDocumentNumbers(wordsToDocNumbers.get(word));
+
 			for (Integer docNumber : docNumbers)
 			{
 				result.addDocumentName(readDocumentName(docNumber));
@@ -115,18 +181,30 @@ public class DiskIndex
 		else
 		{
 			Map<String, Map<String, Set<String>>> docsToRefs = memoryIndex.getDocumentsToReferences();
+
 			if (result == null)
+			{
 				result = new QueryResult(word, null);
+			}
+
 			List<Integer> docNumbers = readDocumentNumbers(wordsToDocNumbers.get(word));
+
 			for (Integer docNumber : docNumbers)
 			{
 				String docName = readDocumentName(docNumber);
+
 				if (!docsToRefs.containsKey(docName))
+				{
 					result.addDocumentName(docName);
+				}
 			}
+
 			if (!result.isEmpty())
+			{
 				results.put(word, result);
+			}
 		}
+
 		return results;
 	}
 
@@ -140,14 +218,16 @@ public class DiskIndex
 	 * @return
 	 * @throws IOException
 	 */
-	public Map<String, QueryResult> addQueryResults(String[] categories, String key, int matchRule,
-			MemoryIndex memoryIndex) throws IOException
+	public Map<String, QueryResult> addQueryResults(String[] categories, String key, int matchRule, MemoryIndex memoryIndex) throws IOException
 	{
 		// assumes sender has called startQuery() & will call stopQuery() when finished
 		if (this.categoryOffsets == null)
+		{
 			return null; // file is empty
+		}
 
 		Map<String, QueryResult> results = null; // initialized if needed
+
 		if (key == null)
 		{
 			for (int i = 0, l = categories.length; i < l; i++)
@@ -159,14 +239,24 @@ public class DiskIndex
 				if (wordsToDocNumbers != null)
 				{
 					if (results == null)
+					{
 						results = new HashMap<String, QueryResult>(wordsToDocNumbers.size());
+					}
+
 					for (String word : wordsToDocNumbers.keySet())
+					{
 						if (word != null)
+						{
 							results = addQueryResult(results, word, wordsToDocNumbers, memoryIndex);
+						}
+					}
 				}
 			}
+
 			if (results != null && this.cachedChunks == null)
+			{
 				cacheDocumentNames();
+			}
 		}
 		else
 		{
@@ -176,34 +266,45 @@ public class DiskIndex
 					for (int i = 0, l = categories.length; i < l; i++)
 					{
 						Map<String, Object> wordsToDocNumbers = readCategoryTable(categories[i], false);
+
 						if (wordsToDocNumbers != null && wordsToDocNumbers.containsKey(key))
+						{
 							results = addQueryResult(results, key, wordsToDocNumbers, memoryIndex);
+						}
 					}
 					break;
+
 				case SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE:
 					for (int i = 0, l = categories.length; i < l; i++)
 					{
 						Map<String, Object> wordsToDocNumbers = readCategoryTable(categories[i], false);
+
 						if (wordsToDocNumbers != null)
 						{
 							for (String word : wordsToDocNumbers.keySet())
 							{
 								if (word != null && word.startsWith(key))
+								{
 									results = addQueryResult(results, word, wordsToDocNumbers, memoryIndex);
+								}
 							}
 						}
 					}
 					break;
+
 				default:
 					for (int i = 0, l = categories.length; i < l; i++)
 					{
 						Map<String, Object> wordsToDocNumbers = readCategoryTable(categories[i], false);
+
 						if (wordsToDocNumbers != null)
 						{
 							for (String word : wordsToDocNumbers.keySet())
 							{
 								if (word != null && Index.isMatch(key, word, matchRule))
+								{
 									results = addQueryResult(results, word, wordsToDocNumbers, memoryIndex);
+								}
 							}
 						}
 					}
@@ -222,16 +323,21 @@ public class DiskIndex
 	{
 		// will need all document names so get them now
 		this.cachedChunks = new String[this.numberOfChunks][];
+
 		InputStream stream = new BufferedInputStream(new FileInputStream(this.indexFile));
+
 		try
 		{
 			// if (this.numberOfChunks > 5)
 			// BUFFER_READ_SIZE <<= 1;
 			int offset = this.chunkOffsets[0];
+
 			skip(stream, offset);
+
 			for (int i = 0; i < this.numberOfChunks; i++)
 			{
 				int size = i == this.numberOfChunks - 1 ? this.sizeOfLastChunk : CHUNK_SIZE;
+
 				readChunk(this.cachedChunks[i] = new String[size], stream, 0, size);
 			}
 		}
@@ -255,44 +361,64 @@ public class DiskIndex
 	 * @param memoryIndex
 	 * @return
 	 */
-	private List<String> computeDocumentNames(List<String> onDiskNames, int[] positions,
-			Map<String, Integer> indexedDocuments, MemoryIndex memoryIndex)
+	private List<String> computeDocumentNames(List<String> onDiskNames, int[] positions, Map<String, Integer> indexedDocuments, MemoryIndex memoryIndex)
 	{
 		int onDiskLength = onDiskNames.size();
 		Map<String, Map<String, Set<String>>> memIndexDocs = memoryIndex.getDocumentsToReferences();
+
 		if (onDiskLength == 0)
 		{
 			// disk index was empty, so add every indexed document
 			for (Map.Entry<String, Map<String, Set<String>>> entry : memIndexDocs.entrySet())
 			{
 				Map<String, Set<String>> refTable = entry.getValue();
+
 				if (refTable != null)
+				{
 					indexedDocuments.put(entry.getKey(), null); // remember each new document
+				}
 			}
 
 			List<String> newDocNames = new ArrayList<String>(indexedDocuments.size());
 			Set<String> added = indexedDocuments.keySet();
+
 			for (String adddedString : added)
+			{
 				if (adddedString != null)
+				{
 					newDocNames.add(adddedString);
+				}
+			}
+
 			Collections.sort(newDocNames);
+
 			for (int i = 0, l = newDocNames.size(); i < l; i++)
+			{
 				indexedDocuments.put(newDocNames.get(i), new Integer(i));
+			}
+
 			return newDocNames;
 		}
 
 		// initialize positions as if each document will remain in the same position
 		for (int i = 0; i < onDiskLength; i++)
+		{
 			positions[i] = i;
+		}
 
 		// find out if the memory index has any new or deleted documents, if not then the names & positions are the same
 		int numDeletedDocNames = 0;
 		int numReindexedDocNames = 0;
+
 		nextPath: for (Map.Entry<String, Map<String, Set<String>>> entry : memIndexDocs.entrySet())
 		{
 			String docName = entry.getKey();
+
 			if (docName == null)
+			{
 				continue;
+			}
+
 			for (int j = 0; j < onDiskLength; j++)
 			{
 				if (docName.equals(onDiskNames.get(j)))
@@ -307,30 +433,52 @@ public class DiskIndex
 						positions[j] = RE_INDEXED;
 						numReindexedDocNames++;
 					}
+
 					continue nextPath;
 				}
 			}
+
 			if (entry.getValue() != null)
+			{
 				indexedDocuments.put(docName, null); // remember each new document, skip deleted documents which were
+			}
 			// never saved
 		}
 
 		List<String> newDocNames = onDiskNames;
+
 		if (numDeletedDocNames > 0 || indexedDocuments.size() > 0)
 		{
 			// some new documents have been added or some old ones deleted
 			newDocNames = new ArrayList<String>(onDiskLength + indexedDocuments.size() - numDeletedDocNames);
+
 			for (int i = 0; i < onDiskLength; i++)
+			{
 				if (positions[i] >= RE_INDEXED)
+				{
 					newDocNames.add(onDiskNames.get(i)); // keep each unchanged document
+				}
+			}
+
 			Set<String> added = indexedDocuments.keySet();
+
 			for (String addedString : added)
+			{
 				if (addedString != null)
+				{
 					newDocNames.add(addedString); // add each new document
+				}
+			}
+
 			Collections.sort(newDocNames);
+
 			for (int i = 0, l = newDocNames.size(); i < l; i++)
+			{
 				if (indexedDocuments.containsKey(newDocNames.get(i)))
+				{
 					indexedDocuments.put(newDocNames.get(i), new Integer(i)); // remember the position for each new
+				}
+			}
 			// document
 		}
 
@@ -338,6 +486,7 @@ public class DiskIndex
 		// if its old position == DELETED then its forgotton
 		// if its old position == ReINDEXED then its also forgotten but its new position is needed to map references
 		int count = -1;
+
 		for (int i = 0; i < onDiskLength;)
 		{
 			switch (positions[i])
@@ -345,6 +494,7 @@ public class DiskIndex
 				case DELETED:
 					i++; // skip over deleted... references are forgotten
 					break;
+
 				case RE_INDEXED:
 					String newName = newDocNames.get(++count);
 					if (newName.equals(onDiskNames.get(i)))
@@ -354,11 +504,15 @@ public class DiskIndex
 						i++;
 					}
 					break;
+
 				default:
 					if (newDocNames.get(++count).equals(onDiskNames.get(i)))
+					{
 						positions[i++] = count; // the unchanged docName that was at position i is now at position count
+					}
 			}
 		}
+
 		return newDocNames;
 	}
 
@@ -374,21 +528,33 @@ public class DiskIndex
 		for (Map.Entry<String, Set<String>> entry : categoryToWords.entrySet())
 		{
 			String categoryName = entry.getKey();
+
 			if (categoryName == null)
+			{
 				continue;
+			}
+
 			Map<String, Object> wordsToDocs = this.categoryTables.get(categoryName);
+
 			if (wordsToDocs == null)
+			{
 				this.categoryTables.put(categoryName, wordsToDocs = new HashMap<String, Object>());
+			}
 
 			for (String word : entry.getValue())
 			{
 				if (word == null)
+				{
 					continue;
+				}
+
 				Object positions = wordsToDocs.get(word);
+
 				if (positions == null)
 				{
 					wordsToDocs.put(word, positions = new ArrayList<Integer>());
 				}
+
 				((List<Integer>) positions).add(newPosition);
 			}
 		}
@@ -405,6 +571,47 @@ public class DiskIndex
 	}
 
 	/**
+	 * getCategories
+	 * 
+	 * @return
+	 */
+	public List<String> getCategories()
+	{
+		List<String> result;
+
+		if (categoryOffsets == null)
+		{
+			result = Collections.emptyList();
+		}
+		else
+		{
+			result = new ArrayList<String>(categoryOffsets.keySet());
+		}
+
+		return result;
+	}
+
+	/**
+	 * getDocuments
+	 * 
+	 * @return
+	 */
+	public List<String> getDocuments()
+	{
+		List<String> result = Collections.emptyList();
+
+		try
+		{
+			result = this.readAllDocumentNames();
+		}
+		catch (IOException e)
+		{
+		}
+
+		return result;
+	}
+
+	/**
 	 * initialize
 	 * 
 	 * @throws IOException
@@ -417,19 +624,24 @@ public class DiskIndex
 			{
 				// read it in!
 				InputStream stream = new BufferedInputStream(new FileInputStream(this.indexFile));
+
 				try
 				{
 					streamRead = 0;
+
 					String signature = readString(stream);
+
 					if (!signature.equals(SIGNATURE))
 					{
 						throw new IOException(Messages.DiskIndex_Wrong_Format);
 					}
+
 					this.headerInfoOffset = readStreamInt(stream);
+
 					if (this.headerInfoOffset > 0)
 					{ // file is empty if its not set
 						skip(stream, this.headerInfoOffset - this.streamRead); // assume that the header info offset is
-																				// over
+						// over
 						// current buffer end
 						readHeaderInfo(stream);
 					}
@@ -440,10 +652,14 @@ public class DiskIndex
 				}
 				return;
 			}
+
 			if (!this.indexFile.delete())
 			{
 				if (DEBUG)
+				{
 					System.out.println("initialize - Failed to delete index " + this.indexFile); //$NON-NLS-1$
+				}
+
 				throw new IOException("Failed to delete index " + this.indexFile); //$NON-NLS-1$
 			}
 		}
@@ -452,6 +668,7 @@ public class DiskIndex
 		if (indexFile.createNewFile())
 		{
 			FileOutputStream stream = new FileOutputStream(this.indexFile, false);
+
 			try
 			{
 				writeString(stream, SIGNATURE);
@@ -465,7 +682,10 @@ public class DiskIndex
 		else
 		{
 			if (DEBUG)
+			{
 				System.out.println("initialize - Failed to create new index " + this.indexFile); //$NON-NLS-1$
+			}
+
 			throw new IOException(Messages.DiskIndex_Unable_To_Create_Index_File + indexFile);
 		}
 	}
@@ -482,12 +702,17 @@ public class DiskIndex
 		if (newIndexFile.exists() && !newIndexFile.delete())
 		{ // delete the temporary index file
 			if (DEBUG)
+			{
 				System.out.println("initializeFrom - Failed to delete temp index " + this.indexFile); //$NON-NLS-1$
+			}
 		}
 		else if (!newIndexFile.createNewFile())
 		{
 			if (DEBUG)
+			{
 				System.out.println("initializeFrom - Failed to create temp index " + this.indexFile); //$NON-NLS-1$
+			}
+
 			throw new IOException("Failed to create temp index " + this.indexFile); //$NON-NLS-1$
 		}
 
@@ -511,16 +736,25 @@ public class DiskIndex
 	{
 		// at this point, this.categoryTables contains the names -> wordsToDocs added in copyQueryResults()
 		Set<String> oldNames = onDisk.categoryOffsets.keySet();
+
 		for (String oldName : oldNames)
 		{
 			if (oldName != null && !this.categoryTables.containsKey(oldName))
+			{
 				this.categoryTables.put(oldName, null);
+			}
 		}
 
 		Set<String> categoryNames = this.categoryTables.keySet();
+
 		for (String categoryName : categoryNames)
+		{
 			if (categoryName != null)
+			{
 				mergeCategory(categoryName, onDisk, positions, stream);
+			}
+		}
+
 		this.categoryTables = null;
 	}
 
@@ -534,33 +768,48 @@ public class DiskIndex
 	 * @throws IOException
 	 */
 	@SuppressWarnings("unchecked")
-	private void mergeCategory(String categoryName, DiskIndex onDisk, int[] positions, OutputStream stream)
-			throws IOException
+	private void mergeCategory(String categoryName, DiskIndex onDisk, int[] positions, OutputStream stream) throws IOException
 	{
 		Map<String, Object> wordsToDocs = this.categoryTables.get(categoryName);
+
 		if (wordsToDocs == null)
+		{
 			wordsToDocs = new HashMap<String, Object>(3);
+		}
 
 		Map<String, Object> oldWordsToDocs = onDisk.readCategoryTable(categoryName, true);
+
 		if (oldWordsToDocs != null)
 		{
 			nextWord: for (Map.Entry<String, Object> entry : oldWordsToDocs.entrySet())
 			{
 				String oldWord = entry.getKey();
+
 				if (oldWord == null)
+				{
 					continue;
+				}
+
 				List<Integer> oldDocNumbers = (List<Integer>) entry.getValue();
 				List<Integer> mappedNumbers = new ArrayList<Integer>(oldDocNumbers.size());
+
 				for (Integer oldDocNumber : oldDocNumbers)
 				{
 					int pos = positions[oldDocNumber];
+
 					if (pos > RE_INDEXED) // forget any reference to a document which was deleted or re_indexed
+					{
 						mappedNumbers.add(pos);
+					}
 				}
+
 				if (mappedNumbers.isEmpty())
+				{
 					continue nextWord; // skip words which no longer have any references
+				}
 
 				Object o = wordsToDocs.get(oldWord);
+
 				if (o == null)
 				{
 					wordsToDocs.put(oldWord, mappedNumbers);
@@ -568,6 +817,7 @@ public class DiskIndex
 				else
 				{
 					List<Integer> list = null;
+
 					if (o instanceof List<?>)
 					{
 						list = (List<Integer>) o;
@@ -577,11 +827,14 @@ public class DiskIndex
 						list = new ArrayList<Integer>();
 						wordsToDocs.put(oldWord, list);
 					}
+
 					list.addAll(mappedNumbers);
 				}
 			}
+
 			onDisk.categoryTables.put(categoryName, null); // flush cached table
 		}
+
 		writeCategoryTable(categoryName, wordsToDocs, stream);
 	}
 
@@ -602,26 +855,33 @@ public class DiskIndex
 		// docNames
 		Map<String, Integer> indexedDocuments = new HashMap<String, Integer>(3); // for each new/changed document in the
 		// memoryIndex
+
 		names = computeDocumentNames(names, positions, indexedDocuments, memoryIndex);
+
 		if (names.isEmpty())
 		{
 			if (previousLength == 0)
+			{
 				return this; // nothing to do... memory index contained deleted documents that had never been saved
+			}
 
 			// index is now empty since all the saved documents were removed
 			DiskIndex newDiskIndex = new DiskIndex(this.indexFile.getPath());
 			newDiskIndex.initialize(false);
+
 			return newDiskIndex;
 		}
 
 		this.streamEnd = 0;
 
 		DiskIndex newDiskIndex = new DiskIndex(this.indexFile.getPath() + ".tmp"); //$NON-NLS-1$
+
 		try
 		{
 			newDiskIndex.initializeFrom(this, newDiskIndex.indexFile);
 			OutputStream stream = new BufferedOutputStream(new FileOutputStream(newDiskIndex.indexFile, false));
 			int offsetToHeader = -1;
+
 			try
 			{
 				newDiskIndex.writeDocumentNames(stream, names);
@@ -631,9 +891,12 @@ public class DiskIndex
 				if (!indexedDocuments.isEmpty())
 				{
 					for (Map.Entry<String, Integer> entry : indexedDocuments.entrySet())
+					{
 						if (entry.getKey() != null)
-							newDiskIndex.copyQueryResults(memoryIndex.getCategoriesForDocument(entry.getKey()),
-									entry.getValue());
+						{
+							newDiskIndex.copyQueryResults(memoryIndex.getCategoriesForDocument(entry.getKey()), entry.getValue());
+						}
+					}
 				}
 
 				indexedDocuments = null; // free up the space
@@ -642,9 +905,13 @@ public class DiskIndex
 
 				// merge each category table with the new ones & write them out
 				if (previousLength == 0)
+				{
 					newDiskIndex.writeCategories(stream);
+				}
 				else
+				{
 					newDiskIndex.mergeCategories(this, positions, stream);
+				}
 				// write header
 				offsetToHeader = newDiskIndex.streamEnd;
 				newDiskIndex.writeHeaderInfo(stream);
@@ -654,6 +921,7 @@ public class DiskIndex
 			{
 				stream.close();
 			}
+
 			newDiskIndex.writeOffsetToHeader(offsetToHeader);
 
 			// rename file by deleting previous index file & renaming temp one
@@ -661,6 +929,7 @@ public class DiskIndex
 			{
 				throw new IOException("Failed to delete index file " + this.indexFile); //$NON-NLS-1$
 			}
+
 			if (!newDiskIndex.indexFile.renameTo(this.indexFile))
 			{
 				throw new IOException("Failed to rename index file " + this.indexFile); //$NON-NLS-1$
@@ -669,11 +938,18 @@ public class DiskIndex
 		catch (IOException e)
 		{
 			if (newDiskIndex.indexFile.exists() && !newDiskIndex.indexFile.delete())
+			{
 				if (DEBUG)
+				{
 					System.out.println("mergeWith - Failed to delete temp index " + newDiskIndex.indexFile); //$NON-NLS-1$
+				}
+			}
+
 			throw e;
 		}
+
 		newDiskIndex.indexFile = this.indexFile;
+
 		return newDiskIndex;
 	}
 
@@ -687,7 +963,9 @@ public class DiskIndex
 	private int read(InputStream stream) throws IOException
 	{
 		int val = stream.read();
+
 		streamRead++;
+
 		return val;
 	}
 
@@ -700,17 +978,27 @@ public class DiskIndex
 	private synchronized List<String> readAllDocumentNames() throws IOException
 	{
 		if (this.numberOfChunks <= 0)
+		{
 			return Collections.emptyList();
+		}
 
 		InputStream stream = new BufferedInputStream(new FileInputStream(this.indexFile));
+
 		try
 		{
 			int offset = this.chunkOffsets[0];
+
 			skip(stream, offset);
+
 			int lastIndex = this.numberOfChunks - 1;
+
 			String[] docNames = new String[lastIndex * CHUNK_SIZE + sizeOfLastChunk];
+
 			for (int i = 0; i < this.numberOfChunks; i++)
+			{
 				readChunk(docNames, stream, i * CHUNK_SIZE, i < lastIndex ? CHUNK_SIZE : sizeOfLastChunk);
+			}
+
 			return Arrays.asList(docNames);
 		}
 		finally
@@ -727,11 +1015,11 @@ public class DiskIndex
 	 * @return
 	 * @throws IOException
 	 */
-	private synchronized Map<String, Object> readCategoryTable(String categoryName, boolean readDocNumbers)
-			throws IOException
+	private synchronized Map<String, Object> readCategoryTable(String categoryName, boolean readDocNumbers) throws IOException
 	{
 		// result will be null if categoryName is unknown
 		Integer offset = this.categoryOffsets.get(categoryName);
+
 		if (offset == null)
 		{
 			return null;
@@ -744,19 +1032,26 @@ public class DiskIndex
 		else
 		{
 			Map<String, Object> cachedTable = this.categoryTables.get(categoryName);
+
 			if (cachedTable != null)
 			{
 				if (readDocNumbers)
 				{ // must cache remaining document number arrays
 					Map<String, Object> copy = new HashMap<String, Object>(cachedTable);
+
 					for (Map.Entry<String, Object> entry : cachedTable.entrySet())
 					{
 						Object arrayOffset = entry.getValue();
+
 						if (arrayOffset instanceof Integer)
+						{
 							copy.put(entry.getKey(), readDocumentNumbers(arrayOffset));
+						}
 					}
+
 					cachedTable = copy;
 				}
+
 				return cachedTable;
 			}
 		}
@@ -766,10 +1061,13 @@ public class DiskIndex
 		String[] matchingWords = null;
 		int count = 0;
 		int firstOffset = -1;
+
 		try
 		{
 			skip(stream, offset);
+
 			int size = readStreamInt(stream);
+
 			try
 			{
 				if (size < 0)
@@ -780,6 +1078,7 @@ public class DiskIndex
 					System.err.println("size = " + size); //$NON-NLS-1$
 					System.err.println("--------------------   END   --------------------"); //$NON-NLS-1$
 				}
+
 				categoryTable = new HashMap<String, Object>(size);
 			}
 			catch (OutOfMemoryError oom)
@@ -793,11 +1092,14 @@ public class DiskIndex
 				System.err.println("--------------------   END   --------------------"); //$NON-NLS-1$
 				throw oom;
 			}
+
 			int largeArraySize = 256;
+
 			for (int i = 0; i < size; i++)
 			{
 				String word = readString(stream);
 				int arrayOffset = readStreamInt(stream);
+
 				// if arrayOffset is:
 				// <= 0 then the array size == 1 with the value -> -arrayOffset
 				// > 1 & < 256 then the size of the array is > 1 & < 256, the document array follows immediately
@@ -806,6 +1108,7 @@ public class DiskIndex
 				if (arrayOffset <= 0)
 				{
 					List<Integer> positions = new ArrayList<Integer>();
+
 					positions.add(-arrayOffset);
 					categoryTable.put(word, positions); // store 1 element array by negating
 					// documentNumber
@@ -818,17 +1121,26 @@ public class DiskIndex
 				else
 				{
 					arrayOffset = readStreamInt(stream); // read actual offset
+
 					if (readDocNumbers)
 					{
 						if (matchingWords == null)
+						{
 							matchingWords = new String[size];
+						}
+
 						if (count == 0)
+						{
 							firstOffset = arrayOffset;
+						}
+
 						matchingWords[count++] = word;
 					}
+
 					categoryTable.put(word, new Integer(arrayOffset)); // offset to array in the file
 				}
 			}
+
 			this.categoryTables.put(categoryName, categoryTable);
 			// cache the table as long as its not too big
 			// in practice, some tables can be greater than 500K when they contain more than 10K elements
@@ -846,9 +1158,11 @@ public class DiskIndex
 		if (matchingWords != null && count > 0)
 		{
 			stream = new BufferedInputStream(new FileInputStream(this.indexFile));
+
 			try
 			{
 				skip(stream, firstOffset);
+
 				for (int i = 0; i < count; i++)
 				{ // each array follows the previous one
 					categoryTable.put(matchingWords[i], readStreamDocumentArray(stream, readStreamInt(stream)));
@@ -863,6 +1177,7 @@ public class DiskIndex
 				stream.close();
 			}
 		}
+
 		return categoryTable;
 	}
 
@@ -878,17 +1193,21 @@ public class DiskIndex
 	private void readChunk(String[] docNames, InputStream stream, int index, int size) throws IOException
 	{
 		String current = readString(stream);
+
 		docNames[index++] = current;
+
 		for (int i = 1; i < size; i++)
 		{
 			int start = read(stream) & 0xFF;
 			int end = read(stream) & 0xFF;
 			String next = readString(stream);
+
 			if (start > 0)
 			{
 				if (end > 0)
 				{
 					int length = current.length();
+
 					next = current.substring(0, start) + next + current.substring(length - end, length);
 				}
 				else
@@ -899,8 +1218,10 @@ public class DiskIndex
 			else if (end > 0)
 			{
 				int length = current.length();
+
 				next = next + current.substring(length - end, length);
 			}
+
 			docNames[index++] = next;
 			current = next;
 		}
@@ -916,22 +1237,32 @@ public class DiskIndex
 	synchronized String readDocumentName(int docNumber) throws IOException
 	{
 		if (this.cachedChunks == null)
+		{
 			this.cachedChunks = new String[this.numberOfChunks][];
+		}
 
 		int chunkNumber = docNumber / CHUNK_SIZE;
 		String[] chunk = this.cachedChunks[chunkNumber];
+
 		if (chunk == null)
 		{
 			boolean isLastChunk = chunkNumber == this.numberOfChunks - 1;
 			int start = this.chunkOffsets[chunkNumber];
 			int numberOfBytes = (isLastChunk ? this.startOfCategoryTables : this.chunkOffsets[chunkNumber + 1]) - start;
+
 			if (numberOfBytes < 0)
+			{
 				throw new IllegalArgumentException();
+			}
+
 			InputStream file = new BufferedInputStream(new FileInputStream(this.indexFile));
+
 			try
 			{
 				skip(file, start);
+
 				int numberOfNames = isLastChunk ? this.sizeOfLastChunk : CHUNK_SIZE;
+
 				chunk = new String[numberOfNames];
 				readChunk(chunk, file, 0, numberOfNames);
 			}
@@ -943,8 +1274,10 @@ public class DiskIndex
 			{
 				file.close();
 			}
+
 			this.cachedChunks[chunkNumber] = chunk;
 		}
+
 		return chunk[docNumber - (chunkNumber * CHUNK_SIZE)];
 	}
 
@@ -960,13 +1293,18 @@ public class DiskIndex
 	{
 		// arrayOffset is either a cached array of docNumbers or an Integer offset in the file
 		if (arrayOffset instanceof List<?>)
+		{
 			return (List<Integer>) arrayOffset;
+		}
 
 		InputStream stream = new BufferedInputStream(new FileInputStream(this.indexFile));
+
 		try
 		{
 			int offset = ((Integer) arrayOffset).intValue();
+
 			skip(stream, offset);
+
 			return readStreamDocumentArray(stream, readStreamInt(stream));
 		}
 		finally
@@ -991,7 +1329,9 @@ public class DiskIndex
 
 		this.chunkOffsets = new int[this.numberOfChunks];
 		for (int i = 0; i < this.numberOfChunks; i++)
+		{
 			this.chunkOffsets[i] = readStreamInt(stream);
+		}
 
 		this.startOfCategoryTables = readStreamInt(stream);
 
@@ -1000,21 +1340,27 @@ public class DiskIndex
 		this.categoryEnds = new HashMap<String, Integer>(size);
 		String previousCategory = null;
 		int offset = -1;
+
 		for (int i = 0; i < size; i++)
 		{
 			String categoryName = readString(stream);
+
 			offset = readStreamInt(stream);
 			this.categoryOffsets.put(categoryName, offset); // cache offset to category table
+
 			if (previousCategory != null)
 			{
 				this.categoryEnds.put(previousCategory, offset); // cache end of the category table
 			}
+
 			previousCategory = categoryName;
 		}
+
 		if (previousCategory != null)
 		{
 			this.categoryEnds.put(previousCategory, this.headerInfoOffset); // cache end of the category table
 		}
+
 		this.categoryTables = new HashMap<String, Map<String, Object>>(3);
 	}
 
@@ -1029,27 +1375,35 @@ public class DiskIndex
 	private List<Integer> readStreamDocumentArray(InputStream stream, int arraySize) throws IOException
 	{
 		if (arraySize == 0)
+		{
 			return Collections.emptyList();
+		}
 
 		List<Integer> indexes = new ArrayList<Integer>();
+
 		for (int i = 0; i < arraySize; i++)
 		{
 			int value = 0;
+
 			switch (this.documentReferenceSize)
 			{
 				case 1:
 					value = read(stream) & 0xFF;
 					break;
+
 				case 2:
 					value = (read(stream) & 0xFF) << 8;
 					value = value + (read(stream) & 0xFF);
 					break;
+
 				default:
 					value = readStreamInt(stream);
 					break;
 			}
+
 			indexes.add(value);
 		}
+
 		return indexes;
 	}
 
@@ -1063,8 +1417,10 @@ public class DiskIndex
 	private int readStreamInt(InputStream stream) throws IOException
 	{
 		int val = (read(stream) & 0xFF) << 24;
+
 		val += (read(stream) & 0xFF) << 16;
 		val += (read(stream) & 0xFF) << 8;
+
 		return val + (read(stream) & 0xFF);
 	}
 
@@ -1083,9 +1439,11 @@ public class DiskIndex
 		// fill the chars from bytes buffer
 		char[] word = new char[length];
 		int i = 0;
+
 		while (i < length)
 		{
 			byte b = (byte) read(stream);
+
 			switch (b & 0xF0)
 			{
 				case 0x00:
@@ -1098,33 +1456,42 @@ public class DiskIndex
 				case 0x70:
 					word[i++] = (char) b;
 					break;
+
 				case 0xC0:
 				case 0xD0:
 					char next = (char) read(stream);
+
 					if ((next & 0xC0) != 0x80)
 					{
 						throw new UTFDataFormatException();
 					}
+
 					char ch = (char) ((b & 0x1F) << 6);
+
 					ch |= next & 0x3F;
 					word[i++] = ch;
 					break;
+
 				case 0xE0:
 					char first = (char) read(stream);
 					char second = (char) read(stream);
+
 					if ((first & second & 0xC0) != 0x80)
 					{
 						throw new UTFDataFormatException();
 					}
+
 					ch = (char) ((b & 0x0F) << 12);
 					ch |= ((first & 0x3F) << 6);
 					ch |= second & 0x3F;
 					word[i++] = ch;
 					break;
+
 				default:
 					throw new UTFDataFormatException();
 			}
 		}
+
 		return new String(word);
 	}
 
@@ -1149,8 +1516,11 @@ public class DiskIndex
 		// file.seek(offset);
 
 		this.categoriesToDiscard = categoryNames;
+
 		DiskIndex newIndex = mergeWith(memoryIndex);
+
 		newIndex.categoriesToDiscard = null;
+
 		return newIndex;
 	}
 
@@ -1166,19 +1536,30 @@ public class DiskIndex
 	{
 		final long wantToSkip = n;
 		long actuallySkipped = 0;
+
 		while (n > 0)
 		{
 			long skipped = stream.skip(n);
+
 			actuallySkipped += skipped;
 			n = n - skipped;
+
 			if (actuallySkipped == wantToSkip)
+			{
 				return actuallySkipped;
+			}
+
 			int read = stream.read();
+
 			if (read == -1)
+			{
 				return actuallySkipped;
+			}
+
 			n--;
 			actuallySkipped++;
 		}
+
 		return actuallySkipped;
 	}
 
@@ -1193,9 +1574,13 @@ public class DiskIndex
 		for (Map.Entry<String, Map<String, Object>> entry : categoryTables.entrySet())
 		{
 			String categoryName = entry.getKey();
+
 			if (categoryName != null)
+			{
 				writeCategoryTable(categoryName, entry.getValue(), stream);
+			}
 		}
+
 		this.categoryTables = null;
 	}
 
@@ -1208,15 +1593,19 @@ public class DiskIndex
 	 * @throws IOException
 	 */
 	@SuppressWarnings("unchecked")
-	private void writeCategoryTable(String categoryName, Map<String, Object> wordsToDocs, OutputStream stream)
-			throws IOException
+	private void writeCategoryTable(String categoryName, Map<String, Object> wordsToDocs, OutputStream stream) throws IOException
 	{
 		if (this.categoriesToDiscard != null)
 		{
 			for (String categoryToDiscard : categoriesToDiscard)
+			{
 				if (categoryName.equals(categoryToDiscard))
+				{
 					return;
+				}
+			}
 		}
+
 		// the format of a category table is as follows:
 		// any document number arrays with >= 256 elements are written before the table (the offset to each array is
 		// remembered)
@@ -1229,9 +1618,11 @@ public class DiskIndex
 
 		Map<String, Integer> longArrays = new HashMap<String, Integer>();
 		int largeArraySize = 256;
+
 		for (Map.Entry<String, Object> entry : wordsToDocs.entrySet())
 		{
 			List<Integer> docNumbers = (List<Integer>) entry.getValue();
+
 			if (docNumbers.size() >= largeArraySize)
 			{
 				longArrays.put(entry.getKey(), new Integer(this.streamEnd));
@@ -1246,6 +1637,7 @@ public class DiskIndex
 		for (Map.Entry<String, Object> entry : wordsToDocs.entrySet())
 		{
 			writeString(stream, entry.getKey());
+
 			if (longArrays.containsKey(entry.getKey()))
 			{
 				writeStreamInt(stream, largeArraySize); // mark to identify that an offset follows
@@ -1255,10 +1647,15 @@ public class DiskIndex
 			else
 			{
 				List<Integer> documentNumbers = (List<Integer>) entry.getValue();
+
 				if (documentNumbers.size() == 1)
+				{
 					writeStreamInt(stream, -documentNumbers.get(0));
+				}
 				else
+				{
 					writeDocumentNumbers(documentNumbers, stream);
+				}
 			}
 		}
 	}
@@ -1279,24 +1676,29 @@ public class DiskIndex
 		int size = sortedDocNames.size();
 		this.numberOfChunks = (size / CHUNK_SIZE) + 1;
 		this.sizeOfLastChunk = size % CHUNK_SIZE;
+
 		if (this.sizeOfLastChunk == 0)
 		{
 			this.numberOfChunks--;
 			this.sizeOfLastChunk = CHUNK_SIZE;
 		}
+
 		this.documentReferenceSize = size <= 0x7F ? 1 : (size <= 0x7FFF ? 2 : 4); // number of bytes used to encode a
 		// reference
 
 		this.chunkOffsets = new int[this.numberOfChunks];
 		int lastIndex = this.numberOfChunks - 1;
+
 		for (int i = 0; i < this.numberOfChunks; i++)
 		{
 			this.chunkOffsets[i] = this.streamEnd;
 
 			int chunkSize = i == lastIndex ? this.sizeOfLastChunk : CHUNK_SIZE;
 			int chunkIndex = i * CHUNK_SIZE;
+
 			String current = sortedDocNames.get(chunkIndex);
 			writeString(stream, current);
+
 			for (int j = 1; j < chunkSize; j++)
 			{
 				String next = sortedDocNames.get(chunkIndex + j);
@@ -1305,35 +1707,55 @@ public class DiskIndex
 				int max = len1 < len2 ? len1 : len2;
 				int start = 0; // number of identical characters at the beginning (also the index of first character
 				// that is different)
+
 				while (current.charAt(start) == next.charAt(start))
 				{
 					start++;
+
 					if (max == start)
+					{
 						break; // current is 'abba', next is 'abbab'
+					}
 				}
+
 				if (start > 255)
+				{
 					start = 255;
+				}
 
 				int end = 0; // number of identical characters at the end
+
 				while (current.charAt(--len1) == next.charAt(--len2))
 				{
 					end++;
+
 					if (len2 == start)
+					{
 						break; // current is 'abbba', next is 'abba'
+					}
+
 					if (len1 == 0)
+					{
 						break; // current is 'xabc', next is 'xyabc'
+					}
 				}
+
 				if (end > 255)
+				{
 					end = 255;
+				}
+
 				stream.write((byte) start);
 				stream.write((byte) end);
 				this.streamEnd += 2;
 
 				int last = next.length() - end;
+
 				writeString(stream, (start < last ? next.substring(start, last) : "")); //$NON-NLS-1$
 				current = next;
 			}
 		}
+
 		this.startOfCategoryTables = this.streamEnd + 1;
 	}
 
@@ -1348,27 +1770,33 @@ public class DiskIndex
 	{
 		// must store length as a positive int to detect in-lined array of 1 element
 		int length = documentNumbers.size();
+
 		writeStreamInt(stream, length);
 		Collections.sort(documentNumbers);
+
 		for (Integer docNumber : documentNumbers)
 		{
 			int value = docNumber.intValue();
+
 			switch (this.documentReferenceSize)
 			{
 				case 1:
 					stream.write((byte) value);
 					this.streamEnd++;
 					break;
+
 				case 2:
 					stream.write((byte) (value >> 8));
 					stream.write((byte) value);
 					this.streamEnd += 2;
 					break;
+
 				default:
 					writeStreamInt(stream, value);
 					break;
 			}
 		}
+
 		stream.flush();
 	}
 
@@ -1398,11 +1826,13 @@ public class DiskIndex
 		// append the file with the category offsets... # of name -> offset pairs, followed by each name & an offset to
 		// its word->doc# table
 		writeStreamInt(stream, this.categoryOffsets.size());
+
 		for (Map.Entry<String, Integer> entry : categoryOffsets.entrySet())
 		{
 			writeString(stream, entry.getKey());
 			writeStreamInt(stream, entry.getValue());
 		}
+
 		stream.flush();
 	}
 
@@ -1417,6 +1847,7 @@ public class DiskIndex
 		if (offsetToHeader > 0)
 		{
 			RandomAccessFile file = new RandomAccessFile(this.indexFile, "rw"); //$NON-NLS-1$
+
 			try
 			{
 				file.seek(this.headerInfoOffset); // offset to position in header
@@ -1506,51 +1937,7 @@ public class DiskIndex
 				streamEnd++;
 			}
 		}
-		stream.flush();
-	}
 
-	public Set<String> addDocumentNames(String substring, MemoryIndex memoryIndex) throws IOException
-	{
-		// must skip over documents which have been added/changed/deleted in the memory index
-		List<String> docNames = readAllDocumentNames();
-		Set<String> results = new HashSet<String>(docNames.size());
-		if (substring == null)
-		{
-			if (memoryIndex == null)
-			{
-				return new HashSet<String>(docNames);
-			}
-			Map<String, Map<String, Set<String>>> docsToRefs = memoryIndex.getDocumentsToReferences();
-			for (String docName : docNames)
-			{
-				if (!docsToRefs.containsKey(docName))
-				{
-					results.add(docName);
-				}
-			}
-		}
-		else
-		{
-			if (memoryIndex == null)
-			{
-				for (String docName : docNames)
-				{
-					if (docName.startsWith(substring, 0))
-					{
-						results.add(docName);
-					}
-				}
-			}
-			else
-			{
-				Map<String, Map<String, Set<String>>> docsToRefs = memoryIndex.getDocumentsToReferences();
-				for (String docName : docNames)
-				{
-					if (docName.startsWith(substring, 0) && !docsToRefs.containsKey(docName))
-						results.add(docName);
-				}
-			}
-		}
-		return results;
+		stream.flush();
 	}
 }

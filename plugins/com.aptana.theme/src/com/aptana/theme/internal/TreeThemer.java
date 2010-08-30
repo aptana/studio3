@@ -3,9 +3,6 @@ package com.aptana.theme.internal;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -47,7 +44,6 @@ class TreeThemer extends ControlThemer
 
 	private TreeViewer fTreeViewer;
 	private IPropertyChangeListener fontListener;
-	private IPreferenceChangeListener fThemeChangeListener;
 	private Listener measureItemListener;
 	private Listener customDrawingListener;
 	private Listener selectionPaintListener;
@@ -70,8 +66,17 @@ class TreeThemer extends ControlThemer
 		addCustomTreeControlDrawing();
 		addMeasureItemListener();
 		addFontListener();
-		addThemeChangeListener();
 		overrideLabelProvider();
+	}
+
+	@Override
+	protected void applyTheme()
+	{
+		super.applyTheme();
+		if (fTreeViewer != null)
+		{
+			fTreeViewer.refresh(true);
+		}
 	}
 
 	private void overrideLabelProvider()
@@ -287,7 +292,7 @@ class TreeThemer extends ControlThemer
 					{
 						if (item != null)
 						{
-							Rectangle bounds = item.getBounds();
+							Rectangle bounds = item.getBounds(tree.getColumnCount() - 1);
 							int x = bounds.x + bounds.width;
 							if (x < clientWidth)
 							{
@@ -296,8 +301,9 @@ class TreeThemer extends ControlThemer
 						}
 					}
 					gc.setBackground(oldBackground);
-					
-					// force foreground color. Otherwise on dark themes we get black FG (all the time on Win, on non-focus for Mac)
+
+					// force foreground color. Otherwise on dark themes we get black FG (all the time on Win, on
+					// non-focus for Mac)
 					gc.setForeground(getForeground());
 				}
 				catch (Exception e)
@@ -486,23 +492,6 @@ class TreeThemer extends ControlThemer
 		JFaceResources.getFontRegistry().addListener(fontListener);
 	}
 
-	private void addThemeChangeListener()
-	{
-		fThemeChangeListener = new IPreferenceChangeListener()
-		{
-
-			@Override
-			public void preferenceChange(PreferenceChangeEvent event)
-			{
-				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
-				{
-					applyTheme();
-				}
-			}
-		};
-		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
-	}
-
 	public void dispose()
 	{
 		super.dispose();
@@ -511,7 +500,6 @@ class TreeThemer extends ControlThemer
 		removeCustomTreeControlDrawing();
 		removeMeasureItemListener();
 		removeFontListener();
-		removeThemeListener();
 	}
 
 	private void removeCustomTreeControlDrawing()
@@ -555,14 +543,5 @@ class TreeThemer extends ControlThemer
 			JFaceResources.getFontRegistry().removeListener(fontListener);
 		}
 		fontListener = null;
-	}
-
-	private void removeThemeListener()
-	{
-		if (fThemeChangeListener != null)
-		{
-			new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
-			fThemeChangeListener = null;
-		}
 	}
 }

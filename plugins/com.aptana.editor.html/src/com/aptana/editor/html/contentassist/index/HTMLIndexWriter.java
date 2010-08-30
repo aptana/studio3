@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
 import com.aptana.editor.html.contentassist.model.EventElement;
@@ -37,7 +36,7 @@ public class HTMLIndexWriter
 	{
 		return URI.create(HTMLIndexConstants.METADATA);
 	}
-	
+
 	/**
 	 * loadXML
 	 * 
@@ -57,6 +56,22 @@ public class HTMLIndexWriter
 	 */
 	protected void writeAttribute(Index index, AttributeElement attribute)
 	{
+		String[] columns = new String[] {
+			attribute.getName(),
+			attribute.getType(),
+			attribute.getElement(),
+			"", // specifications
+			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, attribute.getUserAgents())),
+			attribute.getDeprecated(),
+			attribute.getDescription(),
+			attribute.getHint(),
+			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, attribute.getReferences()),
+			attribute.getRemark(),
+			"" // values
+		};
+		String key = StringUtil.join(HTMLIndexConstants.DELIMITER, columns);
+
+		index.addEntry(HTMLIndexConstants.ATTRIBUTE, key, this.getDocumentPath());
 	}
 
 	/**
@@ -72,8 +87,8 @@ public class HTMLIndexWriter
 			element.getDisplayName(),
 			element.getRelatedClass(),
 			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, element.getAttributes()),
-			// specifications,
-			StringUtil.join(CSSIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, element.getUserAgents())),
+			"", // specifications,
+			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, element.getUserAgents())),
 			element.getDeprecated(),
 			element.getDescription(),
 			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, element.getEvents()),
@@ -82,7 +97,7 @@ public class HTMLIndexWriter
 			element.getRemark()
 		};
 		String key = StringUtil.join(HTMLIndexConstants.DELIMITER, columns);
-		
+
 		index.addEntry(HTMLIndexConstants.ELEMENT, key, this.getDocumentPath());
 	}
 
@@ -94,6 +109,17 @@ public class HTMLIndexWriter
 	 */
 	protected void writeEvent(Index index, EventElement event)
 	{
+		String[] columns = new String[] {
+			event.getName(),
+			event.getType(),
+			"", // specifications
+			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, event.getUserAgents())),
+			event.getDescription(),
+			event.getRemark()
+		};
+		String key = StringUtil.join(HTMLIndexConstants.DELIMITER, columns);
+
+		index.addEntry(HTMLIndexConstants.EVENT, key, this.getDocumentPath());
 	}
 
 	/**
@@ -118,7 +144,7 @@ public class HTMLIndexWriter
 			this.writeEvent(index, event);
 		}
 	}
-	
+
 	/**
 	 * writeUserAgent
 	 * 
@@ -129,26 +155,26 @@ public class HTMLIndexWriter
 	protected String writeUserAgent(Index index, UserAgentElement userAgent)
 	{
 		String key = this._userAgentKeyMap.get(userAgent);
-		
+
 		if (key == null)
 		{
 			key = Integer.toString(this._userAgentKeyMap.size());
-			
+
 			String[] columns = new String[] {
 				key,
 				userAgent.getPlatform(),
 				userAgent.getVersion()
 			};
 			String value = StringUtil.join(HTMLIndexConstants.DELIMITER, columns);
-			
+
 			index.addEntry(HTMLIndexConstants.USER_AGENT, value, this.getDocumentPath());
-			
+
 			this._userAgentKeyMap.put(userAgent, key);
 		}
-		
+
 		return key;
 	}
-	
+
 	/**
 	 * writeUserAgents
 	 * 
@@ -158,12 +184,12 @@ public class HTMLIndexWriter
 	protected List<String> writeUserAgents(Index index, List<UserAgentElement> userAgents)
 	{
 		List<String> keys = new LinkedList<String>();
-		
+
 		for (UserAgentElement userAgent : userAgents)
 		{
 			keys.add(this.writeUserAgent(index, userAgent));
 		}
-		
+
 		return keys;
 	}
 }

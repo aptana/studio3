@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -62,7 +60,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 	private static final Image ELEMENT_ICON = Activator.getImage("/icons/element.png"); //$NON-NLS-1$
 	private static final Image ATTRIBUTE_ICON = Activator.getImage("/icons/attribute.png"); //$NON-NLS-1$
-	private static final Image EVENT_ICON = Activator.getImage("/icons/event.png"); //$NON-NLS-1$
+	private static final Image EVENT_ICON = Activator.getImage("/icons/event.gif"); //$NON-NLS-1$
 	private static final Map<String, LocationType> locationMap;
 
 	private HTMLIndexQueryHelper _queryHelper;
@@ -149,12 +147,15 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 			for (String attribute : element.getAttributes())
 			{
-				proposals.add(createProposal(attribute, attribute + postfix, ATTRIBUTE_ICON, null, userAgentIcons, HTMLIndexConstants.CORE, offset, attribute.length() + length));
+				proposals.add(createProposal(attribute, attribute + postfix, ATTRIBUTE_ICON, null, userAgentIcons, HTMLIndexConstants.CORE, offset, attribute
+					.length()
+					+ length));
 			}
 
 			for (String event : element.getEvents())
 			{
-				proposals.add(createProposal(event, event + postfix, EVENT_ICON, null, userAgentIcons, HTMLIndexConstants.CORE, offset, event.length() + length));
+				proposals
+					.add(createProposal(event, event + postfix, EVENT_ICON, null, userAgentIcons, HTMLIndexConstants.CORE, offset, event.length() + length));
 			}
 		}
 	}
@@ -166,33 +167,20 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @param attributeName
 	 */
-	private void addAttributeValueProposals(List<ICompletionProposal> proposals, int offset, String attributeName)
+	private void addAttributeValueProposals(List<ICompletionProposal> proposals, int offset, String elementName, String attributeName)
 	{
-		// NOTE: the logic for handling an attribute list and duplicate values
-		// will go away once the metadata format is fixed so that multiple
-		// attributes with the same name can disambiguate what elements they
-		// belong to.
-		List<AttributeElement> attributes = this._queryHelper.getAttribute(attributeName);
+		AttributeElement attribute = this._queryHelper.getAttribute(elementName, attributeName);
 
-		if (attributes != null)
+		if (attribute != null)
 		{
-			Set<String> addedNames = new HashSet<String>();
-
-			for (AttributeElement attribute : attributes)
+			for (ValueElement value : attribute.getValues())
 			{
-				for (ValueElement value : attribute.getValues())
-				{
-					String name = value.getName();
+				String name = value.getName();
+				Image icon = ATTRIBUTE_ICON;
+				String description = value.getDescription();
+				Image[] userAgentIcons = this.getAllUserAgentIcons();
 
-					if (addedNames.contains(name) == false)
-					{
-						Image[] userAgentIcons = this.getAllUserAgentIcons();
-
-						this.addProposal(proposals, value.getName(), ATTRIBUTE_ICON, value.getDescription(), userAgentIcons, offset);
-
-						addedNames.add(name);
-					}
-				}
+				this.addProposal(proposals, name, icon, description, userAgentIcons, offset);
 			}
 		}
 	}
@@ -242,7 +230,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			}
 			else
 			{
-				addAttributeValueProposals(proposals, offset, attributeName);
+				String elementName = this.getElementName(lexemeProvider, offset);
+
+				this.addAttributeValueProposals(proposals, offset, elementName, attributeName);
 			}
 		}
 	}
@@ -412,15 +402,14 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		// add it to the list
 		proposals.add(proposal);
 	}
-	
-	private CommonCompletionProposal createProposal(String name, Image image, String description, Image[] userAgents,
-			String fileLocation, int offset)
+
+	private CommonCompletionProposal createProposal(String name, Image image, String description, Image[] userAgents, String fileLocation, int offset)
 	{
 		return createProposal(name, name, image, description, userAgents, fileLocation, offset, name.length());
 	}
-	
+
 	protected CommonCompletionProposal createProposal(String displayName, String name, Image image, String description, Image[] userAgents,
-			String fileLocation, int offset, int length)
+		String fileLocation, int offset, int length)
 	{
 		IContextInformation contextInfo = null;
 
@@ -442,7 +431,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CommonContentAssistProcessor#doComputeCompletionProposals(org.eclipse.jface.text.ITextViewer, int, char, boolean)
+	 * @see
+	 * com.aptana.editor.common.CommonContentAssistProcessor#doComputeCompletionProposals(org.eclipse.jface.text.ITextViewer
+	 * , int, char, boolean)
 	 */
 	@Override
 	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
@@ -651,7 +642,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					{
 						case IN_OPEN_TAG:
 							lastLexeme = lexemeProvider.getLastLexeme();
-							
+
 							if (lastLexeme != null && lastLexeme.getEndingOffset() == offset - 1)
 							{
 								result = LocationType.IN_TEXT;
@@ -777,12 +768,12 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				case TAG_START:
 					result = LocationType.IN_ELEMENT_NAME;
 					break;
-					
+
 				case TAG_END:
 					if (index >= 1)
 					{
 						Lexeme<HTMLTokenType> previous = lexemeProvider.getLexeme(index - 1);
-						
+
 						if (previous.getEndingOffset() < offset - 1)
 						{
 							result = LocationType.IN_ATTRIBUTE_NAME;
