@@ -15,6 +15,12 @@ public class NameSelector implements ISelectorNode
 		this._name = name;
 	}
 	
+	@Override
+	public int matchFragments()
+	{
+		return 1;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.scope.ISelectorNode#matches(com.aptana.scope.MatchContext)

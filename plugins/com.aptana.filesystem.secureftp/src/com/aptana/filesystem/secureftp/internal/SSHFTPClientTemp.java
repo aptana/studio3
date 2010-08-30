@@ -1,10 +1,6 @@
 package com.aptana.filesystem.secureftp.internal;
 
 import java.lang.reflect.Field;
-import java.text.MessageFormat;
-
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 
 import com.enterprisedt.net.ftp.ssh.SSHFTPClient;
 import com.enterprisedt.net.j2ssh.SftpClient;
@@ -29,8 +25,6 @@ public class SSHFTPClientTemp extends SSHFTPClient
 		}
 		catch (Exception e)
 		{
-			SecureFTPPlugin.log(new Status(IStatus.ERROR, SecureFTPPlugin.PLUGIN_ID, MessageFormat.format(
-					"Unable to access interior SFTP property. Error: {0}", e.getLocalizedMessage())));
 			return super.connected();
 		}
 	}
