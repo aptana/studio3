@@ -1,5 +1,6 @@
 package com.aptana.editor.js.contentassist.index;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
@@ -309,18 +311,36 @@ public class JSIndexWriter
 
 		if (key == null)
 		{
-			Index index = JSIndexQueryHelper.getIndex();
-
-			// get
+			// get key
 			key = userAgent.getKey();
+			
+			// see if it has been written already
+			JSIndexReader reader = new JSIndexReader();
+			
+			UserAgentElement diskUserAgent = null;
+			
+			try
+			{
+				diskUserAgent = reader.getUserAgent(key);
+			}
+			catch (IOException e)
+			{
+				Activator.logError(e.getMessage(), e);
+			}
+			
+			// write to index, if we didn't have it there already
+			if (diskUserAgent == null)
+			{
+				Index index = JSIndexQueryHelper.getIndex();
+	
+				// store user agent in index so we can recover it during the next session
+				String[] columns = new String[] { key, userAgent.getDescription(), userAgent.getOS(), userAgent.getPlatform(), userAgent.getVersion() };
+				String value = StringUtil.join(JSIndexConstants.DELIMITER, columns);
+	
+				index.addEntry(JSIndexConstants.USER_AGENT, value, this.getDocumentPath());
+			}
 
-			// store user agent in index so we can recover it during the next session
-			String[] columns = new String[] { key, userAgent.getDescription(), userAgent.getOS(), userAgent.getPlatform(), userAgent.getVersion() };
-			String value = StringUtil.join(JSIndexConstants.DELIMITER, columns);
-
-			index.addEntry(JSIndexConstants.USER_AGENT, value, this.getDocumentPath());
-
-			// cache for to prevent unnecessary writes
+			// cache to prevent unnecessary reads and writes
 			this.cacheUserAgent(userAgent);
 		}
 
