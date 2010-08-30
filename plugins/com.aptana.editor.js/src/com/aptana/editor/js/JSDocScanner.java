@@ -84,26 +84,21 @@ public class JSDocScanner extends RuleBasedScanner
 	{
 		super();
 
-		IToken keyword = getToken("meta.documentation.tag.js"); //$NON-NLS-1$
-		IToken tag = getToken("text.html.basic"); //$NON-NLS-1$
-		IToken link = getToken("markup.underline.link"); //$NON-NLS-1$
-
 		List<IRule> list = new ArrayList<IRule>();
 
 		// Add rule for tags.
-		list.add(new SingleLineRule("<", ">", tag)); //$NON-NLS-2$ //$NON-NLS-1$
+		list.add(new SingleLineRule("<", ">", getToken("text.html.basic"))); //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-1$
 
 		// Add rule for links.
-		list.add(new SingleLineRule("{", "}", link)); //$NON-NLS-2$ //$NON-NLS-1$
+		list.add(new SingleLineRule("{", "}", getToken("markup.underline.link"))); //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-1$
 
 		// Add word rule for keywords.
+		IToken keyword = getToken("meta.tag.documentation.js"); //$NON-NLS-1$
 		WordRule wordRule = new WordRule(new JSDocWordDetector());
-
 		for (String word : KEYWORDS)
 		{
 			wordRule.addWord(word, keyword);
 		}
-
 		list.add(wordRule);
 
 		setDefaultReturnToken(getToken("comment.block.documentation.js")); //$NON-NLS-1$
