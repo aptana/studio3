@@ -145,20 +145,20 @@
             id="com.aptana.ide.syncing.ui.projectSitesContribution"
             objectClass="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnections">
          <action
-               class="com.aptana.ide.syncing.ui.actions.ConnectionManagerAction"
-               enablesFor="1"
-               id="com.aptana.ide.syncing.ui.actions.ConnectionManagerAction"
-               label="%Action.ConnectionManager.name"
-               menubarPath="group.new2"
-               tooltip="%Action.ConnectionManager.tooltip">
-         </action>
-         <action
                class="com.aptana.ide.syncing.ui.actions.NewSiteAction"
                enablesFor="1"
                id="com.aptana.ide.syncing.ui.actions.NewSiteAction"
                label="%Action.NewConnection.name"
-               menubarPath="group.new"
+               menubarPath="group.connections.new"
                tooltip="%Action.NewConnection.tooltip">
+         </action>
+         <action
+               class="com.aptana.ide.syncing.ui.actions.ConnectionManagerAction"
+               enablesFor="1"
+               id="com.aptana.ide.syncing.ui.actions.ConnectionManagerAction"
+               label="%Action.ConnectionManager.name"
+               menubarPath="group.connections.edit"
+               tooltip="%Action.ConnectionManager.tooltip">
          </action>
       </objectContribution>
       <objectContribution
@@ -231,10 +231,10 @@
                label="%Menu.Connections.name"
                path="aptanasynchronize/syncingGroup">
             <separator
-                  name="group1">
+                  name="group.connections.new">
             </separator>
             <separator
-                  name="group2">
+                  name="group.connections.edit">
             </separator>
          </menu>
          <action
@@ -275,7 +275,7 @@
                enablesFor="1"
                id="com.aptana.ide.syncing.ui.actions.ResourceNewSiteAction"
                label="%Action.NewConnection.name"
-               menubarPath="aptanasynchronize/aptana.connections.main/group1"
+               menubarPath="aptanasynchronize/aptana.connections.main/group.connections.new"
                tooltip="%Action.NewConnection.tooltip">
          </action>
          <action
@@ -283,7 +283,7 @@
                enablesFor="1"
                id="com.aptana.ide.syncing.ui.actions.ResourceConnectionManagerAction"
                label="%Action.ConnectionManager.name"
-               menubarPath="aptanasynchronize/aptana.connections.main/group2"
+               menubarPath="aptanasynchronize/aptana.connections.main/group.connections.edit"
                tooltip="%Action.ConnectionManager.tooltip">
          </action>
          <action
@@ -348,10 +348,10 @@
                label="%Menu.Connections.name"
                path="aptanasynchronize/syncingGroup">
             <separator
-                  name="group1">
+                  name="group.connections.new">
             </separator>
             <separator
-                  name="group2">
+                  name="group.connections.edit">
             </separator>
          </menu>
          <action
@@ -392,7 +392,7 @@
                enablesFor="1"
                id="com.aptana.ide.syncing.ui.actions.FileSystemNewSiteAction"
                label="%Action.NewConnection.name"
-               menubarPath="aptanasynchronize/aptana.connections.main/group1"
+               menubarPath="aptanasynchronize/aptana.connections.main/group.connections.new"
                tooltip="%Action.NewConnection.tooltip">
          </action>
          <action
@@ -400,7 +400,7 @@
                enablesFor="1"
                id="com.aptana.ide.syncing.ui.actions.FileSystemConnectionManagerAction"
                label="%Action.ConnectionManager.name"
-               menubarPath="aptanasynchronize/aptana.connections.main/group2"
+               menubarPath="aptanasynchronize/aptana.connections.main/group.connections.edit"
                tooltip="%Action.ConnectionManager.tooltip">
          </action>
          <action

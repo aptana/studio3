@@ -46,38 +46,44 @@ import com.aptana.ide.syncing.ui.dialogs.SiteConnectionsEditorDialog;
 /**
  * @author Ingo Muschenetz
  */
-public class ConnectionManagerAction implements IObjectActionDelegate, IViewActionDelegate {
+public class ConnectionManagerAction implements IObjectActionDelegate, IViewActionDelegate
+{
 
-    private IWorkbenchPart fActivePart;
-    @SuppressWarnings("unused")
+	private IWorkbenchPart fActivePart;
+	@SuppressWarnings("unused")
 	private ISelection fSelection;
 
-    public ConnectionManagerAction() {
-    }
-
-    @Override
-    public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-        fActivePart = targetPart;
-    }
-
-    @Override
-    public void run(IAction action) {
-        SiteConnectionsEditorDialog dlg = new SiteConnectionsEditorDialog(fActivePart.getSite().getShell());
-        dlg.open();
-    }
-
-    @Override
-    public void selectionChanged(IAction action, ISelection selection) {
-        setSelection(selection);
-    }
+	public ConnectionManagerAction()
+	{
+	}
 
 	@Override
-	public void init(IViewPart view) {
+	public void setActivePart(IAction action, IWorkbenchPart targetPart)
+	{
+		fActivePart = targetPart;
+	}
+
+	@Override
+	public void run(IAction action)
+	{
+		SiteConnectionsEditorDialog dlg = new SiteConnectionsEditorDialog(fActivePart.getSite().getShell());
+		dlg.open();
+	}
+
+	@Override
+	public void selectionChanged(IAction action, ISelection selection)
+	{
+		setSelection(selection);
+	}
+
+	@Override
+	public void init(IViewPart view)
+	{
 		fActivePart = view;
 	}
 
-    public void setSelection(ISelection selection)
-    {
-    	fSelection = selection;
-    }
+	public void setSelection(ISelection selection)
+	{
+		fSelection = selection;
+	}
 }
