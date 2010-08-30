@@ -281,6 +281,7 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
+		// FIXME For lists, we basically need to "eat" the first list char, i.e. '*'
 		reconciler.setDamager(dr, UNNUMBERED_LIST);
 		reconciler.setRepairer(dr, UNNUMBERED_LIST);
 
