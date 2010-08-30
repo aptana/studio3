@@ -59,7 +59,9 @@ import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.NonRuleBasedDamagerRepairer;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
+import com.aptana.editor.common.text.rules.TagRule;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
+import com.aptana.editor.html.HTMLTagScanner;
 
 /**
  * @author Chris Williams
@@ -75,9 +77,10 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 	public final static String UNNUMBERED_LIST = PREFIX + "unnumbered.list"; //$NON-NLS-1$
 	public final static String SEPARATOR = PREFIX + "separator"; //$NON-NLS-1$
 	public final static String BLOCK = PREFIX + "block"; //$NON-NLS-1$
+	public final static String HTML_TAG = PREFIX + "html"; //$NON-NLS-1$
 
 	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, HEADING, HEADING_1, HEADING_2,
-			UNNUMBERED_LIST, SEPARATOR, BLOCK };
+			UNNUMBERED_LIST, SEPARATOR, BLOCK, HTML_TAG };
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IMarkdownConstants.CONTENT_TYPE_MARKDOWN } };
 
@@ -102,6 +105,8 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 					"markup.list.unnumbered.markdown")); //$NON-NLS-1$
 			c.addTranslation(new QualifiedContentType(SEPARATOR), new QualifiedContentType("meta.separator.markdown")); //$NON-NLS-1$
 			c.addTranslation(new QualifiedContentType(BLOCK), new QualifiedContentType("markup.raw.block.markdown")); //$NON-NLS-1$
+			c.addTranslation(new QualifiedContentType(HTML_TAG), new QualifiedContentType(
+					"meta.disable-markdown", "meta.tag.block.any.html")); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return instance;
 	}
@@ -141,6 +146,10 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 			}
 		}
 
+		// Inline HTML
+		rules.add(new TagRule("/", new Token(HTML_TAG))); //$NON-NLS-1$
+		rules.add(new TagRule(new Token(HTML_TAG)));
+
 		// Lists
 		for (int i = 0; i <= 3; i++)
 		{
@@ -167,6 +176,7 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		return rules.toArray(new IPredicateRule[rules.size()]);
 	}
 
+	@SuppressWarnings("nls")
 	protected IPredicateRule createSeparatorRule(char c, int leadingSpaces, int spaces2)
 	{
 		String string = "";
@@ -191,6 +201,7 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 
 	}
 
+	@SuppressWarnings("nls")
 	protected IPredicateRule createListRule(int leadingSpaces, char c)
 	{
 		// [ ]{0,3}([*+-])(?=\s)
@@ -280,6 +291,10 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		ndr = new NonRuleBasedDamagerRepairer(getToken("markup.raw.block.markdown")); //$NON-NLS-1$
 		reconciler.setDamager(ndr, BLOCK);
 		reconciler.setRepairer(ndr, BLOCK);
+		
+		dr = new ThemeingDamagerRepairer(new HTMLTagScanner());
+		reconciler.setDamager(dr, HTML_TAG);
+		reconciler.setRepairer(dr, HTML_TAG);
 	}
 
 	private ITokenScanner getPreProcessorScanner()
