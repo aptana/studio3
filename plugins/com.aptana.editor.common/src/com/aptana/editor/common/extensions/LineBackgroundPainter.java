@@ -381,6 +381,7 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 		{
 			return;
 		}
+		Color background = textWidget.getBackground();
 		final int[] positions = new int[ranges.length * 2];
 		int x = 0;
 		boolean apply = false;
@@ -388,6 +389,13 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 		{
 			if (range.background != null)
 			{
+				if (!range.background.equals(background))
+				{
+					positions[x] = range.start;
+					positions[x + 1] = range.length;
+					x += 2;
+					continue;
+				}
 				apply = true;
 			}
 			range.background = null;
