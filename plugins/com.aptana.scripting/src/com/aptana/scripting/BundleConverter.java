@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +20,7 @@ import plistreader.AbstractReader;
 import plistreader.PlistFactory;
 import plistreader.PlistProperties;
 
+import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ProcessUtil;
 
 /**
@@ -371,6 +372,10 @@ public class BundleConverter
 	protected static String handleMenu(String menuPrefix, PlistProperties submenus, List<String> items,
 			Map<String, String> uuidToName)
 	{
+		if (items == null)
+		{
+			return "";
+		}
 		// Calculate indent from our current one
 		int spaces = menuPrefix.length() - menuPrefix.trim().length();
 		String indent = "";
@@ -432,10 +437,12 @@ public class BundleConverter
 				// System.err.println("Bad exit code for conversion: " + exitCode);
 			}
 			AbstractReader reader = PlistFactory.createReader();
+
+			String src = IOUtil.read(new FileInputStream(plistPath.toFile()), "UTF-8");
+			src = stripNonValidXMLCharacters(src);
 			// FIXME Often these files will have special characters that aren't proper in XML (like say Ctrl+C as a
 			// keybinding, 0x03 so we need it to become "&#x03;"), we need to massage the XML now!
-			InputSource source = new InputSource(
-					new InputStreamReader(new FileInputStream(plistPath.toFile()), "UTF-8"));
+			InputSource source = new InputSource(new StringReader(src));
 			source.setEncoding("UTF-8");
 			reader.setSource(source);
 			return reader.parse();
@@ -445,6 +452,29 @@ public class BundleConverter
 			System.err.println("An error occurred processing: " + plistPath.toOSString());
 		}
 		return null;
+	}
+
+	private static String stripNonValidXMLCharacters(String in)
+	{
+		StringBuffer out = new StringBuffer(); // Used to hold the output.
+		char current; // Used to reference the current character.
+
+		if (in == null || ("".equals(in)))
+			return ""; // vacancy test.
+		for (int i = 0; i < in.length(); i++)
+		{
+			current = in.charAt(i); // NOTE: No IndexOutOfBoundsException caught here; it should not happen.
+			if ((current == 0x9) || (current == 0xA) || (current == 0xD) || ((current >= 0x20) && (current <= 0xD7FF))
+					|| ((current >= 0xE000) && (current <= 0xFFFD)) || ((current >= 0x10000) && (current <= 0x10FFFF)))
+			{
+				out.append(current);
+			}
+			else
+			{
+//				out.append("&#").append((int) current).append(";");
+			}
+		}
+		return out.toString();
 	}
 
 	protected static String sanitize(PlistProperties properties, String key)
