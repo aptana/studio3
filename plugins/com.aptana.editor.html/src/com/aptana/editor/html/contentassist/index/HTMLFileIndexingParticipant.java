@@ -2,6 +2,8 @@ package com.aptana.editor.html.contentassist.index;
 
 import java.net.URI;
 import java.text.MessageFormat;
+import java.util.ArrayDeque;
+import java.util.Queue;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -32,11 +34,131 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipant
 {
-
 	private static final String ELEMENT_LINK = "link"; //$NON-NLS-1$
 	private static final String ELEMENT_SCRIPT = "script"; //$NON-NLS-1$
 	private static final String ATTRIBUTE_HREF = "href"; //$NON-NLS-1$
 	private static final String ATTRIBUTE_SRC = "src"; //$NON-NLS-1$
+
+	/**
+	 * addIndex
+	 * 
+	 * @param index
+	 * @param file
+	 * @param category
+	 * @param word
+	 */
+	private static void addIndex(Index index, IFileStore file, String category, String word)
+	{
+		index.addEntry(category, word, file.toURI());
+	}
+
+	/**
+	 * processNode
+	 * 
+	 * @param index
+	 * @param file
+	 * @param current
+	 */
+	private static void processNode(Index index, IFileStore file, IParseNode current)
+	{
+		if (current instanceof HTMLSpecialNode)
+		{
+			HTMLSpecialNode htmlSpecialNode = (HTMLSpecialNode) current;
+			IParseNode child = htmlSpecialNode.getChild(0);
+
+			if (child != null)
+			{
+				String language = child.getLanguage();
+
+				if (ICSSParserConstants.LANGUAGE.equals(language))
+				{
+					CSSFileIndexingParticipant.walkNode(index, file, child);
+				}
+			}
+			if (htmlSpecialNode.getName().equalsIgnoreCase(ELEMENT_SCRIPT))
+			{
+				String jsSource = htmlSpecialNode.getAttributeValue(ATTRIBUTE_SRC);
+
+				if (jsSource != null)
+				{
+					IPathResolver resolver = new URIResolver(file.toURI());
+					URI resolved = resolver.resolveURI(jsSource);
+
+					if (resolved != null)
+					{
+						addIndex(index, file, HTMLIndexConstants.RESOURCE_JS, resolved.toString());
+					}
+				}
+			}
+		}
+		else if (current instanceof HTMLElementNode)
+		{
+			HTMLElementNode element = (HTMLElementNode) current;
+			String cssClass = element.getCSSClass();
+
+			if (cssClass != null && cssClass.trim().length() > 0)
+			{
+				StringTokenizer tokenizer = new StringTokenizer(cssClass);
+
+				while (tokenizer.hasMoreTokens())
+				{
+					addIndex(index, file, CSSIndexConstants.CLASS, tokenizer.nextToken());
+				}
+			}
+
+			String id = element.getID();
+
+			if (id != null && id.trim().length() > 0)
+			{
+				addIndex(index, file, CSSIndexConstants.IDENTIFIER, id);
+			}
+
+			if (element.getName().equalsIgnoreCase(ELEMENT_LINK))
+			{
+				String cssLink = element.getAttributeValue(ATTRIBUTE_HREF);
+
+				if (cssLink != null)
+				{
+					IPathResolver resolver = new URIResolver(file.toURI());
+					URI resolved = resolver.resolveURI(cssLink);
+					if (resolved != null)
+					{
+						addIndex(index, file, HTMLIndexConstants.RESOURCE_CSS, resolved.toString());
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * walkNode
+	 * 
+	 * @param index
+	 * @param file
+	 * @param parent
+	 */
+	public static void walkNode(Index index, IFileStore file, IParseNode parent)
+	{
+		if (parent != null)
+		{
+			Queue<IParseNode> queue = new ArrayDeque<IParseNode>();
+
+			// prime queue
+			queue.offer(parent);
+
+			while (queue.isEmpty() == false)
+			{
+				IParseNode current = queue.poll();
+
+				processNode(index, file, current);
+
+				for (IParseNode child : current)
+				{
+					queue.offer(child);
+				}
+			}
+		}
+	}
 
 	@Override
 	public void index(Set<IFileStore> files, Index index, IProgressMonitor monitor) throws CoreException
@@ -54,6 +176,13 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 		sub.done();
 	}
 
+	/**
+	 * indexFileStore
+	 * 
+	 * @param index
+	 * @param file
+	 * @param monitor
+	 */
 	private void indexFileStore(Index index, IFileStore file, IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
@@ -92,88 +221,12 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 		}
 		catch (Throwable e)
 		{
-			Activator
-					.logError(
-							MessageFormat.format(Messages.HTMLFileIndexingParticipant_Error_During_Indexing,
-									file.getName()), e);
+			Activator.logError(MessageFormat.format(Messages.HTMLFileIndexingParticipant_Error_During_Indexing, file
+					.getName()), e);
 		}
 		finally
 		{
 			sub.done();
 		}
 	}
-
-	public static void walkNode(Index index, IFileStore file, IParseNode parent)
-	{
-		if (parent == null)
-			return;
-
-		if (parent instanceof HTMLSpecialNode)
-		{
-			HTMLSpecialNode htmlSpecialNode = (HTMLSpecialNode) parent;
-			IParseNode child = htmlSpecialNode.getChild(0);
-			if (child != null)
-			{
-				String language = child.getLanguage();
-				if (ICSSParserConstants.LANGUAGE.equals(language))
-				{
-					CSSFileIndexingParticipant.walkNode(index, file, child);
-				}
-			}
-			if (htmlSpecialNode.getName().equalsIgnoreCase(ELEMENT_SCRIPT))
-			{
-				String jsSource = htmlSpecialNode.getAttributeValue(ATTRIBUTE_SRC);
-				if (jsSource != null)
-				{
-					IPathResolver resolver = new URIResolver(file.toURI());
-					URI resolved = resolver.resolveURI(jsSource);
-
-					if (resolved != null)
-					{
-						addIndex(index, file, HTMLIndexConstants.RESOURCE_JS, resolved.toString());
-					}
-				}
-			}
-		}
-		else if (parent instanceof HTMLElementNode)
-		{
-			HTMLElementNode element = (HTMLElementNode) parent;
-			String cssClass = element.getCSSClass();
-			if (cssClass != null && cssClass.trim().length() > 0)
-			{
-				StringTokenizer tokenizer = new StringTokenizer(cssClass);
-				while (tokenizer.hasMoreTokens())
-					addIndex(index, file, CSSIndexConstants.CLASS, tokenizer.nextToken());
-			}
-			String id = element.getID();
-			if (id != null && id.trim().length() > 0)
-			{
-				addIndex(index, file, CSSIndexConstants.IDENTIFIER, id);
-			}
-			if (element.getName().equalsIgnoreCase(ELEMENT_LINK))
-			{
-				String cssLink = element.getAttributeValue(ATTRIBUTE_HREF);
-				if (cssLink != null)
-				{
-					IPathResolver resolver = new URIResolver(file.toURI());
-					URI resolved = resolver.resolveURI(cssLink);
-					if (resolved != null)
-					{
-						addIndex(index, file, HTMLIndexConstants.RESOURCE_CSS, resolved.toString());
-					}
-				}
-			}
-		}
-
-		for (IParseNode child : parent.getChildren())
-		{
-			walkNode(index, file, child);
-		}
-	}
-
-	private static void addIndex(Index index, IFileStore file, String category, String word)
-	{
-		index.addEntry(category, word, file.toURI());
-	}
-
 }
