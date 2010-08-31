@@ -155,13 +155,13 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 	}
 
 	/**
-	 * walkNode
+	 * walkAST
 	 * 
 	 * @param index
 	 * @param file
 	 * @param parent
 	 */
-	public static void walkNode(Index index, IFileStore file, IParseNode parent)
+	public static void walkAST(Index index, IFileStore file, IParseNode parent)
 	{
 		if (parent != null)
 		{
@@ -184,6 +184,11 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.index.core.IFileStoreIndexingParticipant#index(java.util.Set, com.aptana.index.core.Index,
+	 * org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	public void index(Set<IFileStore> files, Index index, IProgressMonitor monitor) throws CoreException
 	{
@@ -233,7 +238,7 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 						IParseNode parseNode = htmlParser.parse(parseState);
 						pool.checkIn(htmlParser);
 						sub.worked(50);
-						walkNode(index, file, parseNode);
+						walkAST(index, file, parseNode);
 					}
 				}
 			}
