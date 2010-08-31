@@ -53,6 +53,89 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 	}
 
 	/**
+	 * processHTMLElementNode
+	 * 
+	 * @param index
+	 * @param file
+	 * @param element
+	 */
+	private static void processHTMLElementNode(Index index, IFileStore file, HTMLElementNode element)
+	{
+		String cssClass = element.getCSSClass();
+
+		if (cssClass != null && cssClass.trim().length() > 0)
+		{
+			StringTokenizer tokenizer = new StringTokenizer(cssClass);
+
+			while (tokenizer.hasMoreTokens())
+			{
+				addIndex(index, file, CSSIndexConstants.CLASS, tokenizer.nextToken());
+			}
+		}
+
+		String id = element.getID();
+
+		if (id != null && id.trim().length() > 0)
+		{
+			addIndex(index, file, CSSIndexConstants.IDENTIFIER, id);
+		}
+
+		if (element.getName().equalsIgnoreCase(ELEMENT_LINK))
+		{
+			String cssLink = element.getAttributeValue(ATTRIBUTE_HREF);
+
+			if (cssLink != null)
+			{
+				IPathResolver resolver = new URIResolver(file.toURI());
+				URI resolved = resolver.resolveURI(cssLink);
+
+				if (resolved != null)
+				{
+					addIndex(index, file, HTMLIndexConstants.RESOURCE_CSS, resolved.toString());
+				}
+			}
+		}
+	}
+
+	/**
+	 * processHTMLSpecialNode
+	 * 
+	 * @param index
+	 * @param file
+	 * @param htmlSpecialNode
+	 */
+	private static void processHTMLSpecialNode(Index index, IFileStore file, HTMLSpecialNode htmlSpecialNode)
+	{
+		IParseNode child = htmlSpecialNode.getChild(0);
+
+		if (child != null)
+		{
+			String language = child.getLanguage();
+
+			if (ICSSParserConstants.LANGUAGE.equals(language))
+			{
+				CSSFileIndexingParticipant.walkNode(index, file, child);
+			}
+		}
+
+		if (htmlSpecialNode.getName().equalsIgnoreCase(ELEMENT_SCRIPT))
+		{
+			String jsSource = htmlSpecialNode.getAttributeValue(ATTRIBUTE_SRC);
+
+			if (jsSource != null)
+			{
+				IPathResolver resolver = new URIResolver(file.toURI());
+				URI resolved = resolver.resolveURI(jsSource);
+
+				if (resolved != null)
+				{
+					addIndex(index, file, HTMLIndexConstants.RESOURCE_JS, resolved.toString());
+				}
+			}
+		}
+	}
+
+	/**
 	 * processNode
 	 * 
 	 * @param index
@@ -63,70 +146,11 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 	{
 		if (current instanceof HTMLSpecialNode)
 		{
-			HTMLSpecialNode htmlSpecialNode = (HTMLSpecialNode) current;
-			IParseNode child = htmlSpecialNode.getChild(0);
-
-			if (child != null)
-			{
-				String language = child.getLanguage();
-
-				if (ICSSParserConstants.LANGUAGE.equals(language))
-				{
-					CSSFileIndexingParticipant.walkNode(index, file, child);
-				}
-			}
-			if (htmlSpecialNode.getName().equalsIgnoreCase(ELEMENT_SCRIPT))
-			{
-				String jsSource = htmlSpecialNode.getAttributeValue(ATTRIBUTE_SRC);
-
-				if (jsSource != null)
-				{
-					IPathResolver resolver = new URIResolver(file.toURI());
-					URI resolved = resolver.resolveURI(jsSource);
-
-					if (resolved != null)
-					{
-						addIndex(index, file, HTMLIndexConstants.RESOURCE_JS, resolved.toString());
-					}
-				}
-			}
+			processHTMLSpecialNode(index, file, (HTMLSpecialNode) current);
 		}
 		else if (current instanceof HTMLElementNode)
 		{
-			HTMLElementNode element = (HTMLElementNode) current;
-			String cssClass = element.getCSSClass();
-
-			if (cssClass != null && cssClass.trim().length() > 0)
-			{
-				StringTokenizer tokenizer = new StringTokenizer(cssClass);
-
-				while (tokenizer.hasMoreTokens())
-				{
-					addIndex(index, file, CSSIndexConstants.CLASS, tokenizer.nextToken());
-				}
-			}
-
-			String id = element.getID();
-
-			if (id != null && id.trim().length() > 0)
-			{
-				addIndex(index, file, CSSIndexConstants.IDENTIFIER, id);
-			}
-
-			if (element.getName().equalsIgnoreCase(ELEMENT_LINK))
-			{
-				String cssLink = element.getAttributeValue(ATTRIBUTE_HREF);
-
-				if (cssLink != null)
-				{
-					IPathResolver resolver = new URIResolver(file.toURI());
-					URI resolved = resolver.resolveURI(cssLink);
-					if (resolved != null)
-					{
-						addIndex(index, file, HTMLIndexConstants.RESOURCE_CSS, resolved.toString());
-					}
-				}
-			}
+			processHTMLElementNode(index, file, (HTMLElementNode) current);
 		}
 	}
 
@@ -221,8 +245,7 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 		}
 		catch (Throwable e)
 		{
-			Activator.logError(MessageFormat.format(Messages.HTMLFileIndexingParticipant_Error_During_Indexing, file
-					.getName()), e);
+			Activator.logError(MessageFormat.format(Messages.HTMLFileIndexingParticipant_Error_During_Indexing, file.getName()), e);
 		}
 		finally
 		{
