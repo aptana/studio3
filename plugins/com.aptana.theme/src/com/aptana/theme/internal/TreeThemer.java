@@ -288,11 +288,20 @@ class TreeThemer extends ControlThemer
 					Color oldBackground = gc.getBackground();
 
 					gc.setBackground(getSelection());
+					int columns = tree.getColumnCount();
 					for (TreeItem item : items)
 					{
 						if (item != null)
-						{
-							Rectangle bounds = item.getBounds(tree.getColumnCount() - 1);
+						{						
+							Rectangle bounds;
+							if (columns == 0)
+							{
+								bounds = item.getBounds();
+							}
+							else
+							{
+								bounds = item.getBounds(columns - 1);
+							}
 							int x = bounds.x + bounds.width;
 							if (x < clientWidth)
 							{
