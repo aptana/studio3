@@ -14,4 +14,10 @@
          </formatterFactory>
       </engineContribution>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.aptana.html.formatter.HTMLFormatterPreferenceInitializer">
+      </initializer>
+   </extension>
 </plugin>

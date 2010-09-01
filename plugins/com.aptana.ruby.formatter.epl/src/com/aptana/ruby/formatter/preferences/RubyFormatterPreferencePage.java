@@ -9,9 +9,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.ruby.RubySourceViewerConfiguration;
 import com.aptana.formatter.ui.AbstractFormatterPreferencePage;
-import com.aptana.ruby.formatter.RubyFormatterConstants;
 import com.aptana.ruby.formatter.RubyFormatterPlugin;
-import com.aptana.ui.preferences.PreferenceKey;
 
 /**
  * Preference page for Ruby debugging engines
@@ -19,13 +17,13 @@ import com.aptana.ui.preferences.PreferenceKey;
 public class RubyFormatterPreferencePage extends AbstractFormatterPreferencePage
 {
 
-	private static final PreferenceKey FORMATTER = new PreferenceKey(RubyFormatterPlugin.PLUGIN_ID,
-			RubyFormatterConstants.FORMATTER_ID);
-
-	protected PreferenceKey getFormatterPreferenceKey()
-	{
-		return FORMATTER;
-	}
+	// private static final PreferenceKey FORMATTER = new PreferenceKey(RubyFormatterPlugin.PLUGIN_ID,
+	// RubyFormatterConstants.FORMATTER_ID);
+	//
+	// protected PreferenceKey getFormatterPreferenceKey()
+	// {
+	// return FORMATTER;
+	// }
 
 	protected IDialogSettings getDialogSettings()
 	{
@@ -45,7 +43,7 @@ public class RubyFormatterPreferencePage extends AbstractFormatterPreferencePage
 	protected SourceViewerConfiguration createSimpleSourceViewerConfiguration(ISharedTextColors colorManager,
 			IPreferenceStore preferenceStore, ITextEditor editor, boolean configureFormatter)
 	{
-		// TODO: Shalom  - Wrap this in 'simple' implementation?
+		// TODO: Shalom - Wrap this in 'simple' implementation?
 		// return new SimpleRubySourceViewerConfiguration(colorManager,
 		// preferenceStore, editor, IRubyPartitions.RUBY_PARTITIONING,
 		// configureFormatter);
