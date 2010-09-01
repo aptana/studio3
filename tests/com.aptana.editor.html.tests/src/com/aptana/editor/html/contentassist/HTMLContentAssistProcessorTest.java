@@ -44,6 +44,62 @@ public class HTMLContentAssistProcessorTest extends TestCase
 		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
 		assertEquals("<a></a>", fDocument.get());
 	}
+	
+	public void testABBRProposal()
+	{
+		int offset = 2;
+		IDocument fDocument = new Document("<a>");
+		char trigger = '\t';
+		ITextViewer viewer = new TextViewer(fDocument);
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
+		assertEquals(130, proposals.length);
+		ICompletionProposal linkProposal = findProposal("abbr", proposals);
+
+		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
+		assertEquals("<abbr></abbr>", fDocument.get());
+	}
+	
+	public void testElementWhichIsClosedProposal()
+	{
+		int offset = 1;
+		IDocument fDocument = new Document("<></a>");
+		char trigger = '\t';
+		ITextViewer viewer = new TextViewer(fDocument);
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
+		assertEquals(130, proposals.length);
+		ICompletionProposal linkProposal = findProposal("a", proposals);
+
+		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
+		assertEquals("<a></a>", fDocument.get());
+	}
+	
+	public void testElementWhichIsClosedProposal2()
+	{
+		int offset = 1;
+		IDocument fDocument = new Document("<></a>");
+		char trigger = '\t';
+		ITextViewer viewer = new TextViewer(fDocument);
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
+		assertEquals(130, proposals.length);
+		ICompletionProposal linkProposal = findProposal("abbr", proposals);
+
+		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
+		assertEquals("<abbr></abbr></a>", fDocument.get());
+	}
+
+	public void testElementWhichIsClosedProposal3()
+	{
+		int offset = 1;
+		IDocument fDocument = new Document("<</a>");
+		char trigger = '\t';
+		ITextViewer viewer = new TextViewer(fDocument);
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
+		assertEquals(130, proposals.length);
+		ICompletionProposal linkProposal = findProposal("abbr", proposals);
+
+		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
+		assertEquals("<abbr></abbr></a>", fDocument.get());
+	}
 
 	public void testIMGProposal()
 	{

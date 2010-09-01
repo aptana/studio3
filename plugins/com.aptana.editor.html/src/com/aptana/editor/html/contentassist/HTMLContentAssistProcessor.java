@@ -288,15 +288,11 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			boolean close = true;
 			int replaceLength = 0;
-			if (this._currentLexeme.getType() == HTMLTokenType.TAG_END) // '>
+			if (this._currentLexeme.getType() == HTMLTokenType.TAG_END) // '|>
 			{
 				replaceLength = 1; // replace the '>'
-				if (this._currentLexeme.getType() == HTMLTokenType.TAG_START) // '<', nothing in between <>
-				{
-					this._replaceRange = this._currentLexeme = null;
-				}
 			}
-			else
+			else if (this._currentLexeme.getType() != HTMLTokenType.TAG_START) // as long as it's not: "<|<"
 			{
 				// We're on element name, replace it
 				int index = lexemeProvider.getLexemeCeilingIndex(_currentLexeme.getEndingOffset() + 1);
