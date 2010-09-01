@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="true"
+            category="com.aptana"
+            class="com.aptana.browser.WebBrowserView"
+            icon="icons/obj16/browser.png"
+            id="com.aptana.browser.views.webbrowser"
+            name="Web Browser"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.aptana.browser.WebBrowserEditor"
+            default="false"
+            icon="icons/obj16/browser.png"
+            id="com.aptana.browser.editors.webbrowser"
+            name="Web Browser">
+      </editor>
+   </extension>
+
+</plugin>
