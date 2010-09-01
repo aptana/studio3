@@ -14,6 +14,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IURIEditorInput;
@@ -50,10 +51,22 @@ public class OpenInFinderHandler extends AbstractHandler
 			else
 			{
 				@SuppressWarnings("unchecked")
-				List<IResource> selectedFiles = (List<IResource>) evContext.getDefaultVariable();
-				for (IResource selected : selectedFiles)
+				List<Object> selectedFiles = (List<Object>) evContext.getDefaultVariable();
+				for (Object selected : selectedFiles)
 				{
-					open(selected.getLocationURI());
+				    IResource resource=null;
+				    if(selected instanceof IResource)
+				    {
+                        resource = (IResource) selected;
+				    }
+				    else if(selected instanceof IAdaptable)
+				    {
+				        resource = (IResource) ((IAdaptable)selected).getAdapter(IResource.class);
+				    }
+				    if(resource != null)
+				    {
+				        open(resource.getLocationURI());
+				    }
 				}
 			}
 		}
