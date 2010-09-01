@@ -1,12 +1,16 @@
 package com.aptana.editor.js.vsdoc.parsing;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.xml.sax.Attributes;
 
 import com.aptana.editor.common.contentassist.MetadataReader;
+import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.editor.js.sdoc.model.ExampleTag;
@@ -271,7 +275,15 @@ public class VSDocReader extends MetadataReader
 	@Override
 	protected InputStream getSchemaStream()
 	{
-		return this.getClass().getResourceAsStream(METADATA_SCHEMA_XML);
+		try
+		{
+			return FileLocator.openStream(Activator.getDefault().getBundle(),
+					Path.fromPortableString(METADATA_SCHEMA_XML), false);
+		}
+		catch (IOException e)
+		{
+			return this.getClass().getResourceAsStream(METADATA_SCHEMA_XML);
+		}
 	}
 
 	/*

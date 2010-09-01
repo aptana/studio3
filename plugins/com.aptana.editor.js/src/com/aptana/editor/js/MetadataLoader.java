@@ -69,13 +69,9 @@ public class MetadataLoader extends Job
 
 					reader.loadXML(stream);
 				}
-				catch (ScriptDocException e)
-				{
-					Activator.logError(Messages.Activator_Error_Loading_Metadata, e);
-				}
 				catch (Throwable t)
 				{
-					Activator.logError(Messages.Activator_Error_Loading_Metadata, t);
+					Activator.logError(Messages.Activator_Error_Loading_Metadata + ":" + resource, t);
 				}
 				finally
 				{

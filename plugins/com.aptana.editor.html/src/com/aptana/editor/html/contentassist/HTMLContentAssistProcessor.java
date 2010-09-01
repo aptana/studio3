@@ -106,12 +106,13 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	/**
 	 * addAttributeAndEventProposals
 	 * 
+	 * @param lexemeProvider
 	 * @param offset
-	 * @param result
 	 */
-	protected void addAttributeAndEventProposals(List<ICompletionProposal> proposals,
-			LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
+	protected List<ICompletionProposal> addAttributeAndEventProposals(LexemeProvider<HTMLTokenType> lexemeProvider,
+			int offset)
 	{
+		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		String elementName = this.getElementName(lexemeProvider, offset);
 		ElementElement element = this._queryHelper.getElement(elementName);
 
@@ -162,18 +163,19 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						HTMLIndexConstants.CORE, offset, event.length() + length));
 			}
 		}
+		return proposals;
 	}
 
 	/**
 	 * addAttributeValueProposals
 	 * 
-	 * @param proposals
 	 * @param offset
+	 * @param elementName
 	 * @param attributeName
 	 */
-	private void addAttributeValueProposals(List<ICompletionProposal> proposals, int offset, String elementName,
-			String attributeName)
+	private List<ICompletionProposal> addAttributeValueProposals(int offset, String elementName, String attributeName)
 	{
+		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		AttributeElement attribute = this._queryHelper.getAttribute(elementName, attributeName);
 
 		if (attribute != null)
@@ -188,6 +190,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				this.addProposal(proposals, name, icon, description, userAgentIcons, offset);
 			}
 		}
+		return proposals;
 	}
 
 	/**
@@ -197,9 +200,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param lexemeProvider
 	 * @param offset
 	 */
-	private void addAttributeValueProposals(List<ICompletionProposal> proposals,
-			LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
+	private List<ICompletionProposal> addAttributeValueProposals(LexemeProvider<HTMLTokenType> lexemeProvider,
+			int offset)
 	{
+		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		String attributeName = this.getAttributeName(lexemeProvider, offset);
 
 		if (attributeName != null && attributeName.length() > 0)
@@ -228,29 +232,30 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 			if (attributeName.equals("id")) //$NON-NLS-1$
 			{
-				this.addIDProposals(proposals, offset);
+				proposals.addAll(this.addIDProposals(offset));
 			}
 			else if (attributeName.equals("class")) //$NON-NLS-1$
 			{
-				this.addClassProposals(proposals, offset);
+				proposals.addAll(this.addClassProposals(offset));
 			}
 			else
 			{
 				String elementName = this.getElementName(lexemeProvider, offset);
 
-				this.addAttributeValueProposals(proposals, offset, elementName, attributeName);
+				proposals.addAll(this.addAttributeValueProposals(offset, elementName, attributeName));
 			}
 		}
+		return proposals;
 	}
 
 	/**
-	 * addClasses
+	 * addClassProposals
 	 * 
-	 * @param proposals
 	 * @param offset
 	 */
-	protected void addClassProposals(List<ICompletionProposal> proposals, int offset)
+	protected List<ICompletionProposal> addClassProposals(int offset)
 	{
+		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		Map<String, String> classes = this._queryHelper.getClasses(this.getIndex());
 
 		if (classes != null)
@@ -265,17 +270,18 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						offset);
 			}
 		}
+		return proposals;
 	}
 
 	/**
-	 * addOpenTagProposals
+	 * addElementProposals
 	 * 
-	 * @param proposals
+	 * @param lexemeProvider
 	 * @param offset
 	 */
-	protected void addElementProposals(List<ICompletionProposal> proposals,
-			LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
+	protected List<ICompletionProposal> addElementProposals(LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
 	{
+		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		List<ElementElement> elements = this._queryHelper.getElements();
 
 		if (elements != null)
@@ -354,7 +360,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				proposals.add(proposal);
 			}
 		}
-
+		return proposals;
 	}
 
 	/**
@@ -383,13 +389,13 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
-	 * addIDs
+	 * addIDProposals
 	 * 
-	 * @param result
 	 * @param offset
 	 */
-	protected void addIDProposals(List<ICompletionProposal> proposals, int offset)
+	protected List<ICompletionProposal> addIDProposals(int offset)
 	{
+		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		Map<String, String> ids = this._queryHelper.getIDs(this.getIndex());
 
 		if (ids != null)
@@ -404,6 +410,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						offset);
 			}
 		}
+		return proposals;
 	}
 
 	/**
@@ -421,15 +428,15 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		switch (location)
 		{
 			case IN_ELEMENT_NAME:
-				this.addElementProposals(proposals, lexemeProvider, offset);
+				proposals.addAll(this.addElementProposals(lexemeProvider, offset));
 				break;
 
 			case IN_ATTRIBUTE_NAME:
-				this.addAttributeAndEventProposals(proposals, lexemeProvider, offset);
+				proposals.addAll(this.addAttributeAndEventProposals(lexemeProvider, offset));
 				break;
 
 			case IN_ATTRIBUTE_VALUE:
-				this.addAttributeValueProposals(proposals, lexemeProvider, offset);
+				proposals.addAll(this.addAttributeValueProposals(lexemeProvider, offset));
 				break;
 
 			default:
