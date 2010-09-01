@@ -448,7 +448,7 @@ public class SourceElementVisitor extends InOrderVisitor
 				String argName = arguments.get(i);
 				if (argName.startsWith(":")) //$NON-NLS-1$
 				{
-					argName.substring(1);
+					argName = argName.substring(1);
 				}
 				field.name = "@" + argName; //$NON-NLS-1$
 				field.nameSourceStart = node.getPosition().getStartOffset() + 1;

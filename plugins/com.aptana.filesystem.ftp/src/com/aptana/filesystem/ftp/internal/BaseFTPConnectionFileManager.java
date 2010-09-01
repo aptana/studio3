@@ -452,7 +452,7 @@ public abstract class BaseFTPConnectionFileManager implements IConnectionFileMan
 	protected abstract URI getRootCanonicalURI();
 
 	// all methods here accept absolute path
-	protected abstract void changeCurrentDir(IPath path) throws FTPException, IOException;
+	protected abstract void changeCurrentDir(IPath path) throws FTPException, IOException, CoreException;
 	protected abstract ExtendedFileInfo fetchFile(IPath path, int options, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
 	protected abstract ExtendedFileInfo[] fetchFiles(IPath path, int options, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
 	protected abstract String[] listDirectory(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException;

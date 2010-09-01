@@ -10,7 +10,8 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.core.io,
  com.aptana.core.epl,
  com.aptana.filesystem.ftp;visibility:=reexport,
- com.aptana.ide.libraries.subscription
+ com.aptana.ide.libraries.subscription,
+ com.aptana.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

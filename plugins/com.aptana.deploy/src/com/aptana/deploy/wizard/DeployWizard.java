@@ -41,6 +41,7 @@ import org.eclipse.ui.internal.browser.WebBrowserEditor;
 import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.CorePlugin;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.deploy.Activator;
@@ -80,7 +81,7 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 {
 
 	private static final String BUNDLE_HEROKU = "Heroku"; //$NON-NLS-1$
-	private static final String BUNDLE_ENGINEYARD = "Engine Yard";
+	private static final String BUNDLE_ENGINEYARD = "Engine Yard"; //$NON-NLS-1$
 
 	private IProject project;
 
@@ -477,8 +478,8 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 					builder.append("&email="); //$NON-NLS-1$
 					builder.append(URLEncoder.encode(userID, "UTF-8")); //$NON-NLS-1$
 					builder.append("&type=signuphook"); //$NON-NLS-1$
-					builder.append("&version=");
-					builder.append(EclipseUtil.getPluginVersion("com.aptana.core"));
+					builder.append("&version="); //$NON-NLS-1$
+					builder.append(EclipseUtil.getPluginVersion(CorePlugin.PLUGIN_ID));
 
 					URL url = new URL(builder.toString());
 					connection = (HttpURLConnection) url.openConnection();
@@ -570,7 +571,7 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 					public void run()
 					{
 						CommandElement command;
-						command = getCommand(BUNDLE_ENGINEYARD, "Deploy App");
+						command = getCommand(BUNDLE_ENGINEYARD, "Deploy App"); //$NON-NLS-1$
 						command.execute();
 					}
 				});
@@ -580,7 +581,6 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		return runnable;
 	}
 
-	
 	@Override
 	public void addPages()
 	{

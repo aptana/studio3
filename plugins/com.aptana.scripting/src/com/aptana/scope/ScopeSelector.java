@@ -15,6 +15,7 @@ public class ScopeSelector
 	private ISelectorNode _root;
 	private int matchOffset;
 	private int matchLength;
+	private int matchFragments;
 
 	/**
 	 * ScopeSelector
@@ -72,6 +73,7 @@ public class ScopeSelector
 					// plus how much of that step matched (looking for longest)
 					matchOffset = i;
 					matchLength = this._root.matchLength();
+					matchFragments = this._root.matchFragments();
 
 					// we matched, so report success and stop looking for a match
 					result = true;
@@ -111,8 +113,10 @@ public class ScopeSelector
 		{
 			if (selector.matches(scope))
 			{
-				int offset = selector.matchOffset;
-
+				int offset = selector.matchOffset; // This offset is the fragment of scope (counting spaces, basically)
+				int fragments = selector.matchFragments;
+				offset += fragments - 1;
+				
 				if (offset > bestOffset)
 				{
 					bestOffset = offset;

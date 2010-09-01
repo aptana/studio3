@@ -8,7 +8,7 @@
             class="com.aptana.ide.ui.io.internal.FileSystemObjectPropertyTester"
             id="com.aptana.ide.ui.io.navigator.filePropertyTester"
             namespace="com.aptana.ide.ui.io.navigator.file"
-            properties="isDirectory, isLocal, isSymlink"
+            properties="isDirectory, isLocal, isSymlink, isPrivate"
             type="com.aptana.ide.ui.io.navigator.FileSystemObject">
       </propertyTester>
       <propertyTester
@@ -158,6 +158,10 @@
                <test
                      property="com.aptana.ide.ui.io.navigator.file.isDirectory"
                      value="true">
+               </test>
+               <test
+                    property="com.aptana.ide.ui.io.navigator.file.isPrivate"
+                    value="false">
                </test>
             </and>
          </enablement>
@@ -310,6 +314,26 @@
                </objectClass>
                <objectState
                      name="isSymlink"
+                     value="true">
+               </objectState>
+            </and>
+         </enablement>
+      </decorator>
+      <decorator
+            adaptable="true"
+            icon="icons/full/ovr16/private.png"
+            id="com.aptana.ide.ui.io.decorators.filePrivateDecorator"
+            label="Private Decorator"
+            lightweight="true"
+            location="BOTTOM_RIGHT"
+            state="true">
+         <enablement>
+            <and>
+               <objectClass
+                     name="com.aptana.ide.ui.io.navigator.FileSystemObject">
+               </objectClass>
+               <objectState
+                     name="isPrivate"
                      value="true">
                </objectState>
             </and>

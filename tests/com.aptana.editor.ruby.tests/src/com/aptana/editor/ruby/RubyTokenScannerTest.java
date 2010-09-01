@@ -44,8 +44,9 @@ public class RubyTokenScannerTest extends TestCase
 		String code = "class Chris\nend\n";
 		setUpScanner(code);
 		assertToken(Tokens.kCLASS, 0, 5);
-		assertToken(Tokens.tCONSTANT, 5, 6);
-		assertToken(RubyTokenScanner.NEWLINE, 11, 1);
+		assertToken(Tokens.tWHITESPACE, 5, 1);
+		assertToken(Tokens.tCONSTANT, 6, 5);
+		assertToken(Tokens.tWHITESPACE, 11, 1);
 		assertToken(Tokens.kEND, 12, 3);
 	}
 
@@ -53,12 +54,16 @@ public class RubyTokenScannerTest extends TestCase
 	{
 		String code = "  helper_method :logged_in?\n" + "  def method\n" + "    \n" + "  end";
 		setUpScanner(code);
-		assertToken(Tokens.tIDENTIFIER, 0, 15); // ' helper_method'
-		assertToken(Tokens.tSYMBEG, 15, 2); // ' :'
+		assertToken(Tokens.tWHITESPACE, 0, 2);
+		assertToken(Tokens.tIDENTIFIER, 2, 13); // 'helper_method'
+		assertToken(Tokens.tWHITESPACE, 15, 1);
+		assertToken(Tokens.tSYMBEG, 16, 1); // ':'
 		assertToken(Tokens.tSYMBEG, 17, 10); // 'logged_in?'
-		assertToken(RubyTokenScanner.NEWLINE, 27, 1); // '\n'
-		assertToken(Tokens.kDEF, 28, 5); // ' def'
-		assertToken(Tokens.tIDENTIFIER, 33, 7); // ' method'
+		assertToken(Tokens.tWHITESPACE, 27, 1); // '\n'
+		assertToken(Tokens.tWHITESPACE, 28, 2);
+		assertToken(Tokens.kDEF, 30, 3); // 'def'
+		assertToken(Tokens.tWHITESPACE, 33, 1);
+		assertToken(Tokens.tIDENTIFIER, 34, 6); // 'method'
 	}
 
 	public void testSymbolInsideBrackets()
@@ -90,9 +95,11 @@ public class RubyTokenScannerTest extends TestCase
 		String code = "alias :tsort_each_child :each_key";
 		setUpScanner(code);
 		assertToken(Tokens.kALIAS, 0, 5); // 'alias'
-		assertToken(Tokens.tSYMBEG, 5, 2); // ' :'
+		assertToken(Tokens.tWHITESPACE, 5, 1); // ' '
+		assertToken(Tokens.tSYMBEG, 6, 1); // ':'
 		assertToken(Tokens.tSYMBEG, 7, 16); // 'tsort_each_child'
-		assertToken(Tokens.tSYMBEG, 23, 2); // ' :'
+		assertToken(Tokens.tWHITESPACE, 23, 1); // ' '
+		assertToken(Tokens.tSYMBEG, 24, 1); // ':'
 		assertToken(Tokens.tSYMBEG, 25, 8); // 'each_key'
 	}
 
@@ -114,14 +121,20 @@ public class RubyTokenScannerTest extends TestCase
 		String code = "multiparameter_name = true ? value.method : value";
 		setUpScanner(code);
 		assertToken(Tokens.tIDENTIFIER, 0, 19); // 'multiparameter_name'
-		assertToken(RubyTokenScanner.ASSIGNMENT, 19, 2); // ' ='
-		assertToken(Tokens.kTRUE, 21, 5); // ' true'
-		assertToken(RubyTokenScanner.QUESTION, 26, 2); // ' ?'
-		assertToken(Tokens.tIDENTIFIER, 28, 6); // ' value'
+		assertToken(Tokens.tWHITESPACE, 19, 1); // ' '
+		assertToken(RubyTokenScanner.ASSIGNMENT, 20, 1); // '='
+		assertToken(Tokens.tWHITESPACE, 21, 1); // ' '
+		assertToken(Tokens.kTRUE, 22, 4); // 'true'
+		assertToken(Tokens.tWHITESPACE, 26, 1); // ' '
+		assertToken(RubyTokenScanner.QUESTION, 27, 1); // '?'
+		assertToken(Tokens.tWHITESPACE, 28, 1); // ' '
+		assertToken(Tokens.tIDENTIFIER, 29, 5); // 'value'
 		assertToken(Tokens.tDOT, 34, 1); // '.'
 		assertToken(Tokens.tIDENTIFIER, 35, 6); // 'method'
-		assertToken(RubyTokenScanner.COLON, 41, 2); // ' :'
-		assertToken(Tokens.tIDENTIFIER, 43, 6); // ' value'
+		assertToken(Tokens.tWHITESPACE, 41, 1); // ' '
+		assertToken(RubyTokenScanner.COLON, 42, 1); // ':'
+		assertToken(Tokens.tWHITESPACE, 43, 1); // ' '
+		assertToken(Tokens.tIDENTIFIER, 44, 5); // 'value'
 	}
 
 	public void testWhen()
@@ -129,12 +142,15 @@ public class RubyTokenScannerTest extends TestCase
 		String code = "case value\n" + "when FalseClass: 0\n" + "else value\n" + "end";
 		setUpScanner(code);
 		assertToken(Tokens.kCASE, 0, 4); // 'case'
-		assertToken(Tokens.tIDENTIFIER, 4, 6); // ' value'
-		assertToken(RubyTokenScanner.NEWLINE, 10, 1); // '\n'
+		assertToken(Tokens.tWHITESPACE, 4, 1); // ' '
+		assertToken(Tokens.tIDENTIFIER, 5, 5); // 'value'
+		assertToken(Tokens.tWHITESPACE, 10, 1); // '\n'
 		assertToken(Tokens.kWHEN, 11, 4); // 'when'
-		assertToken(Tokens.tCONSTANT, 15, 11); // ' FalseClass'
+		assertToken(Tokens.tWHITESPACE, 15, 1); // ' '
+		assertToken(Tokens.tCONSTANT, 16, 10); // 'FalseClass'
 		assertToken(RubyTokenScanner.COLON, 26, 1); // ':'
-		assertToken(Tokens.tINTEGER, 27, 2); // ' 0'
+		assertToken(Tokens.tWHITESPACE, 27, 1); // ' '
+		assertToken(Tokens.tINTEGER, 28, 1); // '0'
 	}
 
 	public void testAppendSymbol()
@@ -177,7 +193,9 @@ public class RubyTokenScannerTest extends TestCase
 		String code = "@@var = 1";
 		setUpScanner(code);
 		assertToken(Tokens.tCVAR, 0, 5); // '@@var'
-		assertToken(RubyTokenScanner.ASSIGNMENT, 5, 2); // ' ='
-		assertToken(Tokens.tINTEGER, 7, 2); // ' 1'
+		assertToken(Tokens.tWHITESPACE, 5, 1); // ' '
+		assertToken(RubyTokenScanner.ASSIGNMENT, 6, 1); // '='
+		assertToken(Tokens.tWHITESPACE, 7, 1); // ' '
+		assertToken(Tokens.tINTEGER, 8, 1); // '1'
 	}
 }

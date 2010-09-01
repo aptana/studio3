@@ -91,13 +91,13 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 				}
 				catch (JNotifyException e)
 				{
-					Activator.logError("An error occurred while registering a file watcher", e);
+					Activator.logError(Messages.BundleMonitor_ERROR_REGISTERING_FILE_WATCHER, e);
 				}
 			}
 			else
 			{
 				String message = MessageFormat.format(
-						"Unable to register file watcher for {0}. The path is not a directory or does not exist",
+						Messages.BundleMonitor_INVALID_WATCHER_PATH,
 						userBundlesPath);
 
 				Activator.logError(message, null);

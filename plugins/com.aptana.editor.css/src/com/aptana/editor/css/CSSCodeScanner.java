@@ -173,9 +173,29 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		rules.add(wordRule);
 
 		// !important
-		WordRule importantRule = new WordRule(new IdentifierWithPrefixDetector('!'), Token.UNDEFINED);
-		importantRule.addWord("!important", createToken(CSSTokenType.IMPORTANT)); //$NON-NLS-1$
-		rules.add(importantRule);
+		rules.add(new ExtendedWordRule(new IWordDetector()
+		{
+
+			@Override
+			public boolean isWordStart(char c)
+			{
+				return c == '!';
+			}
+
+			@Override
+			public boolean isWordPart(char c)
+			{
+				return isWordStart(c) || Character.isLetterOrDigit(c) || Character.isWhitespace(c);
+			}
+		}, createToken(CSSTokenType.IMPORTANT), false)
+		{
+
+			@Override
+			protected boolean wordOK(String word, ICharacterScanner scanner)
+			{
+				return word.matches("!\\s*important"); //$NON-NLS-1$
+			}
+		});
 
 		// ignore case for font names
 		wordRule = new WordRule(identifierDetector, Token.UNDEFINED, true);

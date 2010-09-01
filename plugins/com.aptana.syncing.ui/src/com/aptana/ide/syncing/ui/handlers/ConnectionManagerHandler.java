@@ -32,45 +32,32 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.css.parsing;
+package com.aptana.ide.syncing.ui.handlers;
 
-import com.aptana.editor.css.parsing.lexer.CSSTokenType;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.ui.handlers.HandlerUtil;
 
-public class CSSKeywordTest extends CSSTokensTest
+import com.aptana.ide.syncing.ui.actions.ConnectionManagerAction;
+
+public class ConnectionManagerHandler extends BaseSyncHandler
 {
 
-	public void testImportKeyword()
+	@Override
+	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
-		assertToken("@import", CSSTokenType.IMPORT, 0, 7); //$NON-NLS-1$
-		assertToken("@imports", CSSTokenType.AT_RULE, 0, 8); //$NON-NLS-1$
+		ConnectionManagerAction action = new ConnectionManagerAction();
+		action.setActivePart(null, HandlerUtil.getActivePart(event));
+		action.setSelection(new StructuredSelection(getSelectedResources()));
+		action.run(null);
+
+		return null;
 	}
 
-	public void testPageKeyword()
+	@Override
+	public boolean isEnabled()
 	{
-		assertToken("@page", CSSTokenType.PAGE, 0, 5); //$NON-NLS-1$
-		assertToken("@pages", CSSTokenType.AT_RULE, 0, 6); //$NON-NLS-1$
-	}
-
-	public void testMediaKeyword()
-	{
-		assertToken("@media", CSSTokenType.MEDIA_KEYWORD, 0, 6); //$NON-NLS-1$
-		assertToken("@medias", CSSTokenType.AT_RULE, 0, 7); //$NON-NLS-1$
-	}
-
-	public void testCharSetKeyword()
-	{
-		assertToken("@charset", CSSTokenType.CHARSET, 0, 8); //$NON-NLS-1$
-		assertToken("@charsets", CSSTokenType.AT_RULE, 0, 9); //$NON-NLS-1$
-	}
-
-	public void testUrlKeyword()
-	{
-		assertToken("url(test.css)", CSSTokenType.URL, 0, 13); //$NON-NLS-1$
-	}
-
-	public void testImportantKeyword()
-	{
-		assertToken("!important", CSSTokenType.IMPORTANT, 0, 10); //$NON-NLS-1$
-		assertToken("! important", CSSTokenType.IMPORTANT, 0, 11); //$NON-NLS-1$
+		return true;
 	}
 }

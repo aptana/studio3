@@ -62,6 +62,12 @@ public class XMLElementNode extends XMLNode
 		return fNameNode;
 	}
 
+	@Override
+	public String getText()
+	{
+		return fNameNode.getName();
+	}
+
 	public boolean isSelfClosing()
 	{
 		return fIsSelfClosing;

@@ -32,45 +32,58 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.css.parsing;
+package com.aptana.ide.syncing.ui.actions;
 
-import com.aptana.editor.css.parsing.lexer.CSSTokenType;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ui.IObjectActionDelegate;
+import org.eclipse.ui.IViewActionDelegate;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPart;
 
-public class CSSKeywordTest extends CSSTokensTest
+import com.aptana.ide.syncing.ui.dialogs.SiteConnectionsEditorDialog;
+
+/**
+ * @author Ingo Muschenetz
+ */
+public class ConnectionManagerAction implements IObjectActionDelegate, IViewActionDelegate
 {
 
-	public void testImportKeyword()
+	private IWorkbenchPart fActivePart;
+	@SuppressWarnings("unused")
+	private ISelection fSelection;
+
+	public ConnectionManagerAction()
 	{
-		assertToken("@import", CSSTokenType.IMPORT, 0, 7); //$NON-NLS-1$
-		assertToken("@imports", CSSTokenType.AT_RULE, 0, 8); //$NON-NLS-1$
 	}
 
-	public void testPageKeyword()
+	@Override
+	public void setActivePart(IAction action, IWorkbenchPart targetPart)
 	{
-		assertToken("@page", CSSTokenType.PAGE, 0, 5); //$NON-NLS-1$
-		assertToken("@pages", CSSTokenType.AT_RULE, 0, 6); //$NON-NLS-1$
+		fActivePart = targetPart;
 	}
 
-	public void testMediaKeyword()
+	@Override
+	public void run(IAction action)
 	{
-		assertToken("@media", CSSTokenType.MEDIA_KEYWORD, 0, 6); //$NON-NLS-1$
-		assertToken("@medias", CSSTokenType.AT_RULE, 0, 7); //$NON-NLS-1$
+		SiteConnectionsEditorDialog dlg = new SiteConnectionsEditorDialog(fActivePart.getSite().getShell());
+		dlg.open();
 	}
 
-	public void testCharSetKeyword()
+	@Override
+	public void selectionChanged(IAction action, ISelection selection)
 	{
-		assertToken("@charset", CSSTokenType.CHARSET, 0, 8); //$NON-NLS-1$
-		assertToken("@charsets", CSSTokenType.AT_RULE, 0, 9); //$NON-NLS-1$
+		setSelection(selection);
 	}
 
-	public void testUrlKeyword()
+	@Override
+	public void init(IViewPart view)
 	{
-		assertToken("url(test.css)", CSSTokenType.URL, 0, 13); //$NON-NLS-1$
+		fActivePart = view;
 	}
 
-	public void testImportantKeyword()
+	public void setSelection(ISelection selection)
 	{
-		assertToken("!important", CSSTokenType.IMPORTANT, 0, 10); //$NON-NLS-1$
-		assertToken("! important", CSSTokenType.IMPORTANT, 0, 11); //$NON-NLS-1$
+		fSelection = selection;
 	}
 }
