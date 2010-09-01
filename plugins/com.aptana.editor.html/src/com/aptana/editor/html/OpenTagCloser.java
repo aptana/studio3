@@ -1,8 +1,5 @@
 package com.aptana.editor.html;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.BadLocationException;
@@ -13,24 +10,11 @@ import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.graphics.Point;
 
+import com.aptana.editor.html.parsing.HTMLParseState;
+
 @SuppressWarnings("nls")
 public class OpenTagCloser implements VerifyKeyListener
 {
-
-	// FIXME See HTMLParseState for info on self closing tags/empty tags!
-	private static Set<String> SELF_CLOSING_TAGS = new HashSet<String>();
-	static
-	{
-		SELF_CLOSING_TAGS.add("br");
-		SELF_CLOSING_TAGS.add("hr");
-		SELF_CLOSING_TAGS.add("area");
-		SELF_CLOSING_TAGS.add("base");
-		SELF_CLOSING_TAGS.add("basefont");
-		SELF_CLOSING_TAGS.add("input");
-		SELF_CLOSING_TAGS.add("img");
-		SELF_CLOSING_TAGS.add("link");
-		SELF_CLOSING_TAGS.add("meta");
-	}
 
 	private ITextViewer textViewer;
 
@@ -174,7 +158,15 @@ public class OpenTagCloser implements VerifyKeyListener
 			if (x == -1)
 				break;
 			x += toAdd;
-			stack++;
+			char c = '>';
+			if (x < src.length())
+			{
+				c = src.charAt(x);
+			}
+			if (c == '>' || Character.isWhitespace(c))
+			{
+				stack++;
+			}
 		}
 
 		// Subtract number of close tags
@@ -186,7 +178,15 @@ public class OpenTagCloser implements VerifyKeyListener
 			if (x == -1)
 				break;
 			x += toAdd;
-			stack--;
+			char c = '>';
+			if (x < src.length())
+			{
+				c = src.charAt(x);
+			}
+			if (c == '>' || Character.isWhitespace(c))
+			{
+				stack--;
+			}
 		}
 		// if we had more equal number of closed (or more than open), then the tag is closed.
 		return stack <= 0;
@@ -269,7 +269,7 @@ public class OpenTagCloser implements VerifyKeyListener
 		{
 			toCheck = toCheck.substring(0, toCheck.length() - 1);
 		}
-		if (toCheck.startsWith("/") || SELF_CLOSING_TAGS.contains(toCheck))
+		if (toCheck.startsWith("/") || new HTMLParseState().isEmptyTagType(toCheck))
 		{
 			return null;
 		}
