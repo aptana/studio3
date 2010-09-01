@@ -36,6 +36,12 @@ public class NamedMember extends RubyElement implements IRubyMember
 	}
 
 	@Override
+	public String getText()
+	{
+		return fNameNode.getName();
+	}
+
+	@Override
 	public String toString()
 	{
 		return getName();
