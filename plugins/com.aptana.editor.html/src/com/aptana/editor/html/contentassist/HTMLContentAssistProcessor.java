@@ -33,6 +33,7 @@ import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
 import com.aptana.editor.html.contentassist.model.EntityElement;
 import com.aptana.editor.html.contentassist.model.ValueElement;
+import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
 import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.parsing.lexer.IRange;
@@ -283,32 +284,18 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			int replaceLength = 0;
 			if (this._currentLexeme.getType() == HTMLTokenType.TAG_END) // '>
 			{
-				int index = lexemeProvider.getLexemeCeilingIndex(offset);
 				replaceLength = 1; // replace the '>'
-				IRange replaceRange = this._currentLexeme = lexemeProvider.getLexeme(index - 1);
 				if (this._currentLexeme.getType() == HTMLTokenType.TAG_START) // '<', nothing in between <>
 				{
 					this._replaceRange = this._currentLexeme = null;
-				}
-				else
-				{
-					// replace previous lexeme/token
-					offset = replaceRange.getStartingOffset();
-					replaceLength = replaceRange.getLength();
 				}
 			}
 			else
 			{
 				// We're on element name, replace it
-				int index = lexemeProvider.getLexemeCeilingIndex(offset);
-				Lexeme<HTMLTokenType> nextLexeme = lexemeProvider.getLexeme(index + 1);
-				if (nextLexeme == null)
-				{
-					offset = _currentLexeme.getStartingOffset();
-					replaceLength = _currentLexeme.getLength();
-					close = false;
-				}
-				else if (!nextLexeme.equals(_currentLexeme))
+				int index = lexemeProvider.getLexemeCeilingIndex(_currentLexeme.getEndingOffset() + 1);
+				Lexeme<HTMLTokenType> nextLexeme = lexemeProvider.getLexeme(index);
+				if (nextLexeme != null && !nextLexeme.equals(_currentLexeme))
 				{
 					offset = _currentLexeme.getStartingOffset();
 					replaceLength = _currentLexeme.getLength();
@@ -330,25 +317,34 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				String[] userAgents = element.getUserAgentNames();
 				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 
-				// FIXME What about tags that are self-closing?
 				String replaceString = element.getName();
 				if (close)
 				{
-					replaceString += ">"; //$NON-NLS-1$
-					// If the tag doesn't exist in the doc, we get back that it's closed. We need to copy the
-					// document and insert the tag into it
-					IDocument doc = new Document(fDocument.get());
-					try
+					if (element.getName().startsWith("!") || new HTMLParseState().isEmptyTagType(element.getName())) //$NON-NLS-1$
 					{
-						doc.replace(offset, 0, element.getName());
+						replaceString += "/>"; //$NON-NLS-1$
 					}
-					catch (BadLocationException e)
+					else
 					{
-						// ignore
-					}
-					if (!OpenTagCloser.tagClosed(doc, offset, element.getName()))
-					{
-						replaceString += "</" + element.getName() + ">"; //$NON-NLS-1$ //$NON-NLS-2$
+						// If the tag doesn't exist in the doc, we get back that it's closed. We need to copy the
+						// document and insert the tag into it
+						IDocument doc = new Document(fDocument.get());
+						try
+						{
+							doc.replace(offset, replaceLength, element.getName() + ">"); //$NON-NLS-1$
+						}
+						catch (BadLocationException e)
+						{
+							// ignore
+						}
+						if (!OpenTagCloser.tagClosed(doc, offset, element.getName()))
+						{
+							replaceString += "></" + element.getName() + ">"; //$NON-NLS-1$ //$NON-NLS-2$
+						}
+						else
+						{
+							replaceString += ">"; //$NON-NLS-1$
+						}
 					}
 				}
 				CommonCompletionProposal proposal = new CommonCompletionProposal(replaceString, offset, replaceLength,
