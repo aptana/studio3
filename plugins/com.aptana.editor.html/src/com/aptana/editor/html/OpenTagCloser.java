@@ -17,6 +17,7 @@ import org.eclipse.swt.graphics.Point;
 public class OpenTagCloser implements VerifyKeyListener
 {
 
+	// FIXME See HTMLParseState for info on self closing tags/empty tags!
 	private static Set<String> SELF_CLOSING_TAGS = new HashSet<String>();
 	static
 	{
@@ -157,7 +158,7 @@ public class OpenTagCloser implements VerifyKeyListener
 		return openTag == null || openTag.startsWith("<%") || openTag.startsWith("<!");
 	}
 
-	private boolean tagClosed(IDocument document, int offset, String openTag)
+	public static boolean tagClosed(IDocument document, int offset, String openTag)
 	{
 		// Actually make a "stack" of open and close tags for this tag name and see if it's unbalanced
 		String tagName = getTagName(openTag);
@@ -197,15 +198,24 @@ public class OpenTagCloser implements VerifyKeyListener
 	 * @param openTag
 	 * @return
 	 */
-	protected String getTagName(String openTag)
+	protected static String getTagName(String openTag)
 	{
-		String tagName = openTag.substring(1, openTag.indexOf(">")).trim();
-		int spaceIndex = tagName.indexOf(' ');
+		if (openTag.startsWith("<"))
+		{
+			openTag = openTag.substring(1);
+		}
+		int index = openTag.indexOf(">");
+		if (index != -1)
+		{
+			openTag = openTag.substring(0, index);
+		}
+		openTag = openTag.trim();
+		int spaceIndex = openTag.indexOf(' ');
 		if (spaceIndex != -1)
 		{
-			tagName = tagName.substring(0, spaceIndex);
+			openTag = openTag.substring(0, spaceIndex);
 		}
-		return tagName;
+		return openTag;
 	}
 
 	private String getMatchingCloseTag(String openTag)

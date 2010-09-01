@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.ITypedRegion;
@@ -26,6 +27,7 @@ import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.html.Activator;
 import com.aptana.editor.html.HTMLScopeScanner;
 import com.aptana.editor.html.HTMLSourceConfiguration;
+import com.aptana.editor.html.OpenTagCloser;
 import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
@@ -67,6 +69,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	private IContextInformationValidator _validator;
 	private Lexeme<HTMLTokenType> _currentLexeme;
 	private IRange _replaceRange;
+	private IDocument fDocument;
 
 	/**
 	 * static initializer
@@ -105,7 +108,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @param result
 	 */
-	protected void addAttributeAndEventProposals(List<ICompletionProposal> proposals, LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
+	protected void addAttributeAndEventProposals(List<ICompletionProposal> proposals,
+			LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
 	{
 		String elementName = this.getElementName(lexemeProvider, offset);
 		ElementElement element = this._queryHelper.getElement(elementName);
@@ -147,15 +151,14 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 			for (String attribute : element.getAttributes())
 			{
-				proposals.add(createProposal(attribute, attribute + postfix, ATTRIBUTE_ICON, null, userAgentIcons, HTMLIndexConstants.CORE, offset, attribute
-					.length()
-					+ length));
+				proposals.add(createProposal(attribute, attribute + postfix, ATTRIBUTE_ICON, null, userAgentIcons,
+						HTMLIndexConstants.CORE, offset, attribute.length() + length));
 			}
 
 			for (String event : element.getEvents())
 			{
-				proposals
-					.add(createProposal(event, event + postfix, EVENT_ICON, null, userAgentIcons, HTMLIndexConstants.CORE, offset, event.length() + length));
+				proposals.add(createProposal(event, event + postfix, EVENT_ICON, null, userAgentIcons,
+						HTMLIndexConstants.CORE, offset, event.length() + length));
 			}
 		}
 	}
@@ -167,7 +170,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @param attributeName
 	 */
-	private void addAttributeValueProposals(List<ICompletionProposal> proposals, int offset, String elementName, String attributeName)
+	private void addAttributeValueProposals(List<ICompletionProposal> proposals, int offset, String elementName,
+			String attributeName)
 	{
 		AttributeElement attribute = this._queryHelper.getAttribute(elementName, attributeName);
 
@@ -192,7 +196,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param lexemeProvider
 	 * @param offset
 	 */
-	private void addAttributeValueProposals(List<ICompletionProposal> proposals, LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
+	private void addAttributeValueProposals(List<ICompletionProposal> proposals,
+			LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
 	{
 		String attributeName = this.getAttributeName(lexemeProvider, offset);
 
@@ -255,7 +260,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 			for (Entry<String, String> entry : classes.entrySet())
 			{
-				this.addProposal(proposals, entry.getKey(), ATTRIBUTE_ICON, null, userAgentIcons, entry.getValue(), offset);
+				this.addProposal(proposals, entry.getKey(), ATTRIBUTE_ICON, null, userAgentIcons, entry.getValue(),
+						offset);
 			}
 		}
 	}
@@ -266,21 +272,56 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param proposals
 	 * @param offset
 	 */
-	protected void addElementProposals(List<ICompletionProposal> proposals, LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
+	protected void addElementProposals(List<ICompletionProposal> proposals,
+			LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
 	{
 		List<ElementElement> elements = this._queryHelper.getElements();
 
 		if (elements != null)
 		{
-			if (this._currentLexeme.getType() == HTMLTokenType.TAG_END)
+			boolean close = true;
+			int replaceLength = 0;
+			if (this._currentLexeme.getType() == HTMLTokenType.TAG_END) // '>
 			{
 				int index = lexemeProvider.getLexemeCeilingIndex(offset);
-
-				this._replaceRange = this._currentLexeme = lexemeProvider.getLexeme(index - 1);
-
-				if (this._currentLexeme.getType() == HTMLTokenType.TAG_START)
+				replaceLength = 1; // replace the '>'
+				IRange replaceRange = this._currentLexeme = lexemeProvider.getLexeme(index - 1);
+				if (this._currentLexeme.getType() == HTMLTokenType.TAG_START) // '<', nothing in between <>
 				{
 					this._replaceRange = this._currentLexeme = null;
+				}
+				else
+				{
+					// replace previous lexeme/token
+					offset = replaceRange.getStartingOffset();
+					replaceLength = replaceRange.getLength();
+				}
+			}
+			else
+			{
+				// We're on element name, replace it
+				int index = lexemeProvider.getLexemeCeilingIndex(offset);
+				Lexeme<HTMLTokenType> nextLexeme = lexemeProvider.getLexeme(index + 1);
+				if (nextLexeme == null)
+				{
+					offset = _currentLexeme.getStartingOffset();
+					replaceLength = _currentLexeme.getLength();
+					close = false;
+				}
+				else if (!nextLexeme.equals(_currentLexeme))
+				{
+					offset = _currentLexeme.getStartingOffset();
+					replaceLength = _currentLexeme.getLength();
+					if (nextLexeme.getType() == HTMLTokenType.TAG_END)
+					{
+						// Followed by '>', so replace spaces plus end
+						replaceLength += nextLexeme.getEndingOffset() - _currentLexeme.getEndingOffset();
+					}
+					else if (nextLexeme.getType() != HTMLTokenType.TAG_START)
+					{
+						// If there's an attribute we don't want to add ">" or close tag!
+						close = false;
+					}
 				}
 			}
 
@@ -289,7 +330,32 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				String[] userAgents = element.getUserAgentNames();
 				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 
-				this.addProposal(proposals, element.getName(), ELEMENT_ICON, element.getDescription(), userAgentIcons, offset);
+				// FIXME What about tags that are self-closing?
+				String replaceString = element.getName();
+				if (close)
+				{
+					replaceString += ">"; //$NON-NLS-1$
+					// If the tag doesn't exist in the doc, we get back that it's closed. We need to copy the
+					// document and insert the tag into it
+					IDocument doc = new Document(fDocument.get());
+					try
+					{
+						doc.replace(offset, 0, element.getName());
+					}
+					catch (BadLocationException e)
+					{
+						// ignore
+					}
+					if (!OpenTagCloser.tagClosed(doc, offset, element.getName()))
+					{
+						replaceString += "</" + element.getName() + ">"; //$NON-NLS-1$ //$NON-NLS-2$
+					}
+				}
+				CommonCompletionProposal proposal = new CommonCompletionProposal(replaceString, offset, replaceLength,
+						replaceString.length(), ELEMENT_ICON, element.getName(), null, element.getDescription());
+				proposal.setFileLocation(HTMLIndexConstants.CORE);
+				proposal.setUserAgentImages(userAgentIcons);
+				proposals.add(proposal);
 			}
 		}
 
@@ -301,7 +367,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param result
 	 * @param offset
 	 */
-	private void addEntityProposals(List<ICompletionProposal> proposals, LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
+	private void addEntityProposals(List<ICompletionProposal> proposals, LexemeProvider<HTMLTokenType> lexemeProvider,
+			int offset)
 	{
 		List<EntityElement> entities = this._queryHelper.getEntities();
 
@@ -313,7 +380,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				Image[] userAgentIcons = this.getAllUserAgentIcons();
 
-				this.addProposal(proposals, entity.getName(), ELEMENT_ICON, entity.getDescription(), userAgentIcons, offset);
+				this.addProposal(proposals, entity.getName(), ELEMENT_ICON, entity.getDescription(), userAgentIcons,
+						offset);
 			}
 		}
 	}
@@ -336,7 +404,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 			for (Entry<String, String> entry : ids.entrySet())
 			{
-				this.addProposal(proposals, entry.getKey(), ATTRIBUTE_ICON, null, userAgentIcons, entry.getValue(), offset);
+				this.addProposal(proposals, entry.getKey(), ATTRIBUTE_ICON, null, userAgentIcons, entry.getValue(),
+						offset);
 			}
 		}
 	}
@@ -348,7 +417,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @param result
 	 */
-	private void addOpenTagPropsals(List<ICompletionProposal> proposals, LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
+	private void addOpenTagPropsals(List<ICompletionProposal> proposals, LexemeProvider<HTMLTokenType> lexemeProvider,
+			int offset)
 	{
 		LocationType location = this.getOpenTagLocationType(lexemeProvider, offset);
 
@@ -381,7 +451,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param userAgents
 	 * @param offset
 	 */
-	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, int offset)
+	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description,
+			Image[] userAgents, int offset)
 	{
 		this.addProposal(proposals, name, image, description, userAgents, HTMLIndexConstants.CORE, offset);
 	}
@@ -395,21 +466,22 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param userAgents
 	 * @param offset
 	 */
-	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, String fileLocation,
-		int offset)
+	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description,
+			Image[] userAgents, String fileLocation, int offset)
 	{
 		CommonCompletionProposal proposal = createProposal(name, image, description, userAgents, fileLocation, offset);
 		// add it to the list
 		proposals.add(proposal);
 	}
 
-	private CommonCompletionProposal createProposal(String name, Image image, String description, Image[] userAgents, String fileLocation, int offset)
+	private CommonCompletionProposal createProposal(String name, Image image, String description, Image[] userAgents,
+			String fileLocation, int offset)
 	{
 		return createProposal(name, name, image, description, userAgents, fileLocation, offset, name.length());
 	}
 
-	protected CommonCompletionProposal createProposal(String displayName, String name, Image image, String description, Image[] userAgents,
-		String fileLocation, int offset, int length)
+	protected CommonCompletionProposal createProposal(String displayName, String name, Image image, String description,
+			Image[] userAgents, String fileLocation, int offset, int length)
 	{
 		IContextInformation contextInfo = null;
 
@@ -423,7 +495,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		}
 
 		// build proposal
-		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image, displayName, contextInfo, description);
+		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image,
+				displayName, contextInfo, description);
 		proposal.setFileLocation(fileLocation);
 		proposal.setUserAgentImages(userAgents);
 		return proposal;
@@ -436,18 +509,19 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * , int, char, boolean)
 	 */
 	@Override
-	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
+	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
+			boolean autoActivated)
 	{
 		// tokenize the current document
-		IDocument document = viewer.getDocument();
+		fDocument = viewer.getDocument();
 
-		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
+		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(fDocument, offset);
 
 		// store a reference to the lexeme at the current position
 		this._replaceRange = this._currentLexeme = lexemeProvider.getFloorLexeme(offset);
 
 		// first step is to determine if we're inside an open tag, close tag, text, etc.
-		LocationType location = this.getCoarseLocationType(document, lexemeProvider, offset);
+		LocationType location = this.getCoarseLocationType(fDocument, lexemeProvider, offset);
 
 		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
 
@@ -483,7 +557,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			try
 			{
-				String text = document.get(this._replaceRange.getStartingOffset(), this._replaceRange.getLength());
+				String text = fDocument.get(this._replaceRange.getStartingOffset(), this._replaceRange.getLength());
 
 				this.setSelectedProposal(text, result);
 			}
@@ -762,7 +836,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					break;
 
 				case EQUAL:
-					result = (offset <= lexeme.getStartingOffset()) ? LocationType.IN_ATTRIBUTE_NAME : LocationType.IN_ATTRIBUTE_VALUE;
+					result = (offset <= lexeme.getStartingOffset()) ? LocationType.IN_ATTRIBUTE_NAME
+							: LocationType.IN_ATTRIBUTE_VALUE;
 					break;
 
 				case TAG_START:
