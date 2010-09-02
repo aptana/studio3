@@ -1,5 +1,7 @@
 package com.aptana.editor.html.parsing;
 
+import java.util.EnumSet;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,10 +55,15 @@ public class HTMLParseState extends ParseState
 	 */
 	public int getCloseTagType(String tagName)
 	{
-		String key = tagName.toLowerCase();
-		if (fEndTagInfo.containsKey(key))
+		// in XHTML, the tag always needs to be properly closed 
+		if (fDocumentType != Type.XHTML_1_0_FRAMESET && fDocumentType != Type.XHTML_1_0_STRICT
+				&& fDocumentType != Type.XHTML_1_0_TRANSITIONAL && fDocumentType != Type.XHTML_1_1_STRICT)
 		{
-			return fEndTagInfo.get(key) & HTMLTagInfo.END_MASK;
+			String key = tagName.toLowerCase();
+			if (fEndTagInfo.containsKey(key))
+			{
+				return fEndTagInfo.get(key) & HTMLTagInfo.END_MASK;
+			}
 		}
 		return HTMLTagInfo.END_REQUIRED;
 	}
