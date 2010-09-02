@@ -347,10 +347,8 @@ public class JSIndexReader
 
 		if (index != null)
 		{
-			String quotedOwningType = Pattern.quote(owningType);
-			String quotedPropertyName = Pattern.quote(propertyName);
-			List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(quotedOwningType, quotedPropertyName),
-				SearchPattern.REGEX_MATCH);
+			List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(owningType, propertyName),
+				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
 
 			if (functions != null && functions.size() > 0)
 			{
@@ -447,7 +445,7 @@ public class JSIndexReader
 	 */
 	private String getMemberPattern(String typeName, String memberName)
 	{
-		return MessageFormat.format("^{2}{0}{1}(?:{0}|$)", new Object[] { JSIndexConstants.DELIMITER, typeName, memberName }); //$NON-NLS-1$
+		return MessageFormat.format("{2}{0}{1}", new Object[] { JSIndexConstants.DELIMITER, typeName, memberName }); //$NON-NLS-1$
 	}
 
 	/**
@@ -577,10 +575,8 @@ public class JSIndexReader
 
 		if (index != null)
 		{
-			String quotedOwningType = Pattern.quote(owningType);
-			String quotedPropertyName = Pattern.quote(propertyName);
-			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(quotedOwningType, quotedPropertyName),
-				SearchPattern.REGEX_MATCH);
+			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningType, propertyName),
+				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
 
 			if (properties != null && properties.size() > 0)
 			{
