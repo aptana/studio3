@@ -269,7 +269,13 @@ public class OpenTagCloser implements VerifyKeyListener
 		{
 			toCheck = toCheck.substring(0, toCheck.length() - 1);
 		}
-		if (toCheck.startsWith("/") || new HTMLParseState().isEmptyTagType(toCheck))
+		if (toCheck.startsWith("/"))
+		{
+			return null;
+		}
+		HTMLParseState state = new HTMLParseState();
+		state.setEditState(document.get(), null, 0, 0);
+		if (state.isEmptyTagType(toCheck))
 		{
 			return null;
 		}

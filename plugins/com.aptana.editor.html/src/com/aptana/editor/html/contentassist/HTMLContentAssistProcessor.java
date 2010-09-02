@@ -70,7 +70,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	private IContextInformationValidator _validator;
 	private Lexeme<HTMLTokenType> _currentLexeme;
 	private IRange _replaceRange;
-	private IDocument fDocument;
+	private IDocument _document;
 
 	/**
 	 * static initializer
@@ -314,6 +314,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				}
 			}
 
+			HTMLParseState state = null;
 			for (ElementElement element : elements)
 			{
 				String[] userAgents = element.getUserAgentNames();
@@ -322,7 +323,12 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				String replaceString = element.getName();
 				if (close)
 				{
-					if (element.getName().startsWith("!") || new HTMLParseState().isEmptyTagType(element.getName())) //$NON-NLS-1$
+					if (state == null)
+					{
+						state = new HTMLParseState();
+						state.setEditState(_document.get(), null, 0, 0);
+					}
+					if (element.getName().startsWith("!") || state.isEmptyTagType(element.getName())) //$NON-NLS-1$
 					{
 						replaceString += "/>"; //$NON-NLS-1$
 					}
@@ -330,7 +336,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					{
 						// If the tag doesn't exist in the doc, we get back that it's closed. We need to copy the
 						// document and insert the tag into it
-						IDocument doc = new Document(fDocument.get());
+						IDocument doc = new Document(_document.get());
 						try
 						{
 							doc.replace(offset, replaceLength, element.getName() + ">"); //$NON-NLS-1$
@@ -512,15 +518,15 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			boolean autoActivated)
 	{
 		// tokenize the current document
-		fDocument = viewer.getDocument();
+		_document = viewer.getDocument();
 
-		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(fDocument, offset);
+		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(_document, offset);
 
 		// store a reference to the lexeme at the current position
 		this._replaceRange = this._currentLexeme = lexemeProvider.getFloorLexeme(offset);
 
 		// first step is to determine if we're inside an open tag, close tag, text, etc.
-		LocationType location = this.getCoarseLocationType(fDocument, lexemeProvider, offset);
+		LocationType location = this.getCoarseLocationType(_document, lexemeProvider, offset);
 
 		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
 
@@ -556,7 +562,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			try
 			{
-				String text = fDocument.get(this._replaceRange.getStartingOffset(), this._replaceRange.getLength());
+				String text = _document.get(this._replaceRange.getStartingOffset(), this._replaceRange.getLength());
 
 				this.setSelectedProposal(text, result);
 			}
