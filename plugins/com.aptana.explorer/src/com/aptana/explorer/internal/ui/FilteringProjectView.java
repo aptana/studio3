@@ -231,7 +231,7 @@ public class FilteringProjectView extends GitProjectView
 		}
 		projectExpansions.put(project, expanded);
 		projectSelections.put(project, selected);
-	
+
 		String filter = getFilterString();
 		if (filter != null)
 		{
@@ -367,7 +367,7 @@ public class FilteringProjectView extends GitProjectView
 					int endOfItemX = hoveredItem.getBounds().width + hoveredItem.getBounds().x;
 					lastDrawnX = Math.max(endOfClientAreaX, endOfItemX) - (IMAGE_MARGIN + eyeball.getBounds().width);
 					int itemHeight = tree.getItemHeight();
-					int imageHeight = eyeball.getBounds().height;					
+					int imageHeight = eyeball.getBounds().height;
 					int y = hoveredItem.getBounds().y + (itemHeight - imageHeight) / 2;
 					event.gc.drawImage(eyeball, lastDrawnX, y);
 				}
@@ -441,7 +441,8 @@ public class FilteringProjectView extends GitProjectView
 		for (IProject project : projects)
 		{
 			if (project.isAccessible()
-					&& !(projectExpansions.get(project).isEmpty() && projectSelections.get(project).isEmpty() && projectFilters.get(project) == null))
+					&& !(projectExpansions.get(project).isEmpty() && projectSelections.get(project).isEmpty() && projectFilters
+							.get(project) == null))
 			{
 				IMemento projectMemento = memento.createChild(TAG_PROJECT);
 				projectMemento.putString(KEY_NAME, project.getName());
@@ -569,7 +570,7 @@ public class FilteringProjectView extends GitProjectView
 		updateProjectMementoCache(oldProject);
 		super.projectChanged(oldProject, newProject);
 		// Restore the displayed project state.
-		restoreStateJob(newProject);		
+		restoreStateJob(newProject);
 	}
 
 	@Override
@@ -605,7 +606,11 @@ public class FilteringProjectView extends GitProjectView
 							@Override
 							public void run()
 							{
-								getCommonViewer().refresh();
+								if (getCommonViewer() != null && getCommonViewer().getTree() != null
+										&& getCommonViewer().getTree().isDisposed())
+								{
+									getCommonViewer().refresh();
+								}
 							}
 						});
 						return;
@@ -638,8 +643,8 @@ public class FilteringProjectView extends GitProjectView
 	protected void setFilterText(String string)
 	{
 		currentFilterText = string;
-		showFilterLabel(eyeball, NLS.bind(Messages.FilteringProjectView_LBL_FilteringFor,
-				new Object[] { currentFilterText }));
+		showFilterLabel(eyeball,
+				NLS.bind(Messages.FilteringProjectView_LBL_FilteringFor, new Object[] { currentFilterText }));
 		textChanged();
 	}
 
@@ -723,9 +728,12 @@ public class FilteringProjectView extends GitProjectView
 							getCommonViewer().setExpandedState(item.getData(), false);
 						}
 					}
-					try {
+					try
+					{
 						getCommonViewer().refresh(true);
-					} catch (Exception e) {
+					}
+					catch (Exception e)
+					{
 						// ignore. This seems to just happen on windows and appears to be benign
 					}
 
