@@ -51,6 +51,7 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 	private int fLastLineNumber = -1;
 
 	private boolean fIsActive;
+	private Point fLastSelection = new Point(0, 0);
 
 	public LineBackgroundPainter(ISourceViewer viewer)
 	{
@@ -156,12 +157,24 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 			IDocument document = fViewer.getDocument();
 			int modelCaret = getModelCaret();
 			int lineNumber = document.getLineOfOffset(modelCaret);
+			Point selection = fViewer.getTextWidget().getSelectionRange();
 
 			// redraw if the current line number is different from the last line number we painted
 			// initially fLastLineNumber is -1
-			if (lineNumber != fLastLineNumber || !fCurrentLine.overlapsWith(modelCaret, 0))
+			if (lineNumber != fLastLineNumber || !fCurrentLine.overlapsWith(modelCaret, 0) || (selection.y != 0))
 			{
-
+				// Handle non-empty selections (turn off highlight line)
+				if (selection.y != 0 && fLastLine.equals(fCurrentLine))
+				{
+					if (fLastSelection.equals(selection)) // selection didn't change
+					{
+						return false; // don't redraw the highlight line
+					}
+					fLastSelection = selection;
+					return true; // selection changed
+				}
+				fLastSelection = selection;
+				// Update the current and last lines
 				fLastLine.offset = fCurrentLine.offset;
 				fLastLine.length = fCurrentLine.length;
 				fLastLine.isDeleted = fCurrentLine.isDeleted;
@@ -183,12 +196,6 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 				}
 
 				fLastLineNumber = lineNumber;
-				return true;
-			}
-			// Force redraw if there's a non-empty selection!
-			Point selection = fViewer.getTextWidget().getSelectionRange();
-			if (selection.y != 0)
-			{
 				return true;
 			}
 		}
