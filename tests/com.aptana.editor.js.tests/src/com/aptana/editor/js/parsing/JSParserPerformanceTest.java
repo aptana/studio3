@@ -302,10 +302,7 @@ public class JSParserPerformanceTest extends TestCase
 		// get time difference
 		long diff = System.currentTimeMillis() - start;
 
-		if (diff > numRuns*100)
-		{
-			// show results
-			System.out.println(String.format("parse: %5dms: %s", (diff / numRuns), resourceName));
-		}
+		// show results
+		System.out.println(String.format("parse: %5dms: %s", (diff / numRuns), resourceName));
 	}
 }
