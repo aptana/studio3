@@ -1,4 +1,4 @@
-package com.aptana.editor.js.parsing;
+package com.aptana.editor.js.contentassist;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -6,24 +6,39 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
+import junit.framework.TestCase;
+
 import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
+import com.aptana.editor.js.parsing.JSParser;
+import com.aptana.editor.js.parsing.ast.JSParseRootNode;
+import com.aptana.index.core.Index;
+import com.aptana.index.core.IndexManager;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
+import com.aptana.parsing.ast.IParseNode;
 
-public class JSParserPerformanceTest extends TestCase
+public class JSIndexingPerformanceTest extends TestCase
 {
+	public class Indexer extends JSFileIndexingParticipant
+	{
+		public void indexTree(Index index, JSParseRootNode root, URI location)
+		{
+			this.processParseResults(index, root, location);
+		}
+	}
+
 	/**
 	 * main
 	 * 
@@ -39,7 +54,7 @@ public class JSParserPerformanceTest extends TestCase
 			if (file.canRead())
 			{
 				List<File> files = new ArrayList<File>();
-				JSParserPerformanceTest tester = new JSParserPerformanceTest();
+				JSIndexingPerformanceTest tester = new JSIndexingPerformanceTest();
 
 				if (file.isDirectory())
 				{
@@ -84,10 +99,12 @@ public class JSParserPerformanceTest extends TestCase
 
 				for (File f : files)
 				{
+					System.out.println("Processing " + f.getName());
+					
 					try
 					{
 						tester.setUp();
-						tester.timeParse(f);
+						tester.timeIndex(f);
 					}
 					catch (Throwable e)
 					{
@@ -169,6 +186,44 @@ public class JSParserPerformanceTest extends TestCase
 		return getSource(stream);
 	}
 
+	/**
+	 * getURI
+	 * 
+	 * @return
+	 */
+	protected URI getLocation()
+	{
+		return URI.create("inference_file.js");
+	}
+
+	/**
+	 * getIndex
+	 * 
+	 * @return
+	 */
+	protected Index getIndex()
+	{
+		URI indexURI = this.getIndexURI();
+		Index result = null;
+
+		if (indexURI != null)
+		{
+			result = IndexManager.getInstance().getIndex(indexURI);
+		}
+
+		return result;
+	}
+
+	/**
+	 * getIndexURI
+	 * 
+	 * @return
+	 */
+	protected URI getIndexURI()
+	{
+		return URI.create("inference.testing");
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
@@ -176,6 +231,8 @@ public class JSParserPerformanceTest extends TestCase
 	@Override
 	protected void setUp() throws Exception
 	{
+		super.setUp();
+		
 		fParser = new JSParser();
 	}
 
@@ -187,6 +244,15 @@ public class JSParserPerformanceTest extends TestCase
 	protected void tearDown() throws Exception
 	{
 		fParser = null;
+		
+		URI indexURI = this.getIndexURI();
+
+		if (indexURI != null)
+		{
+			IndexManager.getInstance().removeIndex(indexURI);
+		}
+
+		super.tearDown();
 	}
 
 	/**
@@ -196,7 +262,7 @@ public class JSParserPerformanceTest extends TestCase
 	 */
 	public void testDojo() throws Exception
 	{
-		timeParse("performance/dojo.js.uncompressed.js");
+		timeIndex("performance/dojo.js.uncompressed.js");
 	}
 
 	/**
@@ -206,7 +272,7 @@ public class JSParserPerformanceTest extends TestCase
 	 */
 	public void testExt() throws Exception
 	{
-		timeParse("performance/ext-core.js");
+		timeIndex("performance/ext-core.js");
 	}
 
 	/**
@@ -216,7 +282,7 @@ public class JSParserPerformanceTest extends TestCase
 	 */
 	public void testTiMobile() throws Exception
 	{
-		timeParse("performance/timobile.js");
+		timeIndex("performance/timobile.js");
 	}
 
 	/**
@@ -226,7 +292,7 @@ public class JSParserPerformanceTest extends TestCase
 	 */
 	public void testTinyMce() throws Exception
 	{
-		timeParse("performance/tiny_mce.js");
+		timeIndex("performance/tiny_mce.js");
 	}
 
 	/**
@@ -236,18 +302,18 @@ public class JSParserPerformanceTest extends TestCase
 	 */
 	public void testRegress() throws Exception
 	{
-		timeParse("performance/regress-155081-2.js");
+		timeIndex("performance/regress-155081-2.js");
 	}
-	
+
 	/**
 	 * timeParse
 	 * 
 	 * @param file
 	 * @throws Exception
 	 */
-	protected void timeParse(File file) throws Exception
+	protected void timeIndex(File file) throws Exception
 	{
-		this.timeParse(file.getAbsolutePath(), getSource(file));
+		this.timeIndex(file.getAbsolutePath(), getSource(file));
 	}
 
 	/**
@@ -256,20 +322,9 @@ public class JSParserPerformanceTest extends TestCase
 	 * @param resourceName
 	 * @throws Exception
 	 */
-	protected void timeParse(String resourceName) throws Exception
+	protected void timeIndex(String resourceName) throws Exception
 	{
-		this.timeParse(resourceName, getSource(resourceName));
-	}
-
-	/**
-	 * time
-	 * 
-	 * @param name
-	 * @param source
-	 */
-	protected void timeParse(String name, String source) throws Exception
-	{
-		this.timeParse(name, source, 5);
+		this.timeIndex(resourceName, getSource(resourceName));
 	}
 
 	/**
@@ -278,34 +333,41 @@ public class JSParserPerformanceTest extends TestCase
 	 * @param resourceName
 	 * @throws Exception
 	 */
-	protected void timeParse(String resourceName, String src, int numRuns) throws Exception
+	protected void timeIndex(String resourceName, String src) throws Exception
 	{
 		// apply to parse state
 		IParseState parseState = new ParseState();
 		parseState.setEditState(src, src, 0, 0);
 
-		// start timing
-		long start = System.currentTimeMillis();
-
-		for (int i = 0; i < numRuns; i++)
+		try
 		{
-			try
+			fParser.parse(parseState);
+
+			IParseNode root = parseState.getParseResult();
+
+			if (root instanceof JSParseRootNode)
 			{
-				fParser.parse(parseState);
+				Indexer indexer = new Indexer();
+
+				// start timing
+				long start = System.currentTimeMillis();
+
+				indexer.indexTree(this.getIndex(), (JSParseRootNode) root, this.getLocation());
+
+				// get time difference
+				long diff = System.currentTimeMillis() - start;
+
+				// show results
+				System.out.println(String.format("index: %5dms: %s", diff, resourceName));
 			}
-			catch (Exception e)
+			else
 			{
-				fail(e.getMessage());
+				fail("No parse root node for " + resourceName);
 			}
 		}
-
-		// get time difference
-		long diff = System.currentTimeMillis() - start;
-
-		if (diff > numRuns*100)
+		catch (Exception e)
 		{
-			// show results
-			System.out.println(String.format("parse: %5dms: %s", (diff / numRuns), resourceName));
+			fail(e.getMessage());
 		}
 	}
 }
