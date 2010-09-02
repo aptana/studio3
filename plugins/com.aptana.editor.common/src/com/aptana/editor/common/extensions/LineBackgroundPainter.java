@@ -52,6 +52,7 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 
 	private boolean fIsActive;
 	private Point fLastSelection = new Point(0, 0);
+	private boolean fEnabled;
 
 	public LineBackgroundPainter(ISourceViewer viewer)
 	{
@@ -232,6 +233,12 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 	 */
 	private void drawHighlightLine(Position position)
 	{
+		// Don't draw if highlight current line is turned off
+		if (!fEnabled)
+		{
+			return;
+		}
+
 		RGBa lineHighlight = getCurrentTheme().getLineHighlight();
 		if (lineHighlight.isFullyOpaque())
 		{
@@ -430,6 +437,12 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 	 */
 	private boolean shouldDrawCurrentLine(int line)
 	{
+		// Don't draw if highlight current line is turned off
+		if (!fEnabled)
+		{
+			return false;
+		}
+
 		// If there's a selection we "turn off" line highlight.
 		Point selection = fViewer.getTextWidget().getSelectionRange();
 		if (selection.y != 0)
@@ -537,5 +550,10 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 	protected IDocumentScopeManager getScopeManager()
 	{
 		return CommonEditorPlugin.getDefault().getDocumentScopeManager();
+	}
+
+	public void setHighlightLineEnabled(boolean on)
+	{
+		fEnabled = on;
 	}
 }

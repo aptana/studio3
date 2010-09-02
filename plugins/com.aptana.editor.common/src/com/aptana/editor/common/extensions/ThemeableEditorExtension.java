@@ -21,6 +21,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Caret;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -80,25 +81,10 @@ public class ThemeableEditorExtension
 
 	public void overrideThemeColors()
 	{
-		disableLineHighlight();
 		overrideSelectionColor();
 		overrideCursor();
 		overrideCaretColor();
 		overrideRulerColors();
-	}
-
-	private void disableLineHighlight()
-	{
-		try
-		{
-			IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-			prefs.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE, false);
-			prefs.flush();
-		}
-		catch (BackingStoreException e)
-		{
-			CommonEditorPlugin.logError(e);
-		}
 	}
 
 	public void initializeLineNumberRulerColumn(LineNumberRulerColumn rulerColumn)
@@ -119,6 +105,15 @@ public class ThemeableEditorExtension
 			overrideThemeColors();
 			editor.getISourceViewer().invalidateTextPresentation();
 		}
+		else if (event.getProperty().equals(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE))
+		{
+			Object newValue = event.getNewValue();
+			if (newValue instanceof Boolean)
+			{
+				boolean on = (Boolean) newValue;
+				fFullLineBackgroundPainter.setHighlightLineEnabled(on);
+			}
+		}
 	}
 
 	public void createBackgroundPainter(ISourceViewer viewer)
@@ -127,7 +122,10 @@ public class ThemeableEditorExtension
 		{
 			if (viewer instanceof ITextViewerExtension2)
 			{
+				boolean lineHighlight = Platform.getPreferencesService().getBoolean(EditorsUI.PLUGIN_ID,
+						AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE, true, null);
 				fFullLineBackgroundPainter = new LineBackgroundPainter(viewer);
+				fFullLineBackgroundPainter.setHighlightLineEnabled(lineHighlight);
 				ITextViewerExtension2 extension = (ITextViewerExtension2) viewer;
 				extension.addPainter(fFullLineBackgroundPainter);
 			}
