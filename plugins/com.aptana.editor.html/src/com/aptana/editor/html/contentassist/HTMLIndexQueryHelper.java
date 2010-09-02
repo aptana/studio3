@@ -182,13 +182,9 @@ public class HTMLIndexQueryHelper
 
 						this._metadata.loadXML(stream);
 					}
-					catch (IOException e)
-					{
-						Activator.logError(Messages.HTMLIndexQueryHelper_Error_Loading_Metadata, e);
-					}
 					catch (Throwable t)
 					{
-						Activator.logError(Messages.HTMLIndexQueryHelper_Error_Loading_Metadata, t);
+						Activator.logError(Messages.HTMLIndexQueryHelper_Error_Loading_Metadata + ": " + resource, t);
 					}
 					finally
 					{

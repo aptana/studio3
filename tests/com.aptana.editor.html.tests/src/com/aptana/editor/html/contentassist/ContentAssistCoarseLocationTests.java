@@ -2,7 +2,7 @@ package com.aptana.editor.html.contentassist;
 
 import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.LocationType;
 
-public class ContentAssistCoarseLocationTests extends LocationTests
+public class ContentAssistCoarseLocationTests extends LocationTestCase
 {
 	/**
 	 * openTagTests
