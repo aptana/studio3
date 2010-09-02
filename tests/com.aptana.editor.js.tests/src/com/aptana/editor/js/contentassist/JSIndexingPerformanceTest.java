@@ -45,90 +45,81 @@ public class JSIndexingPerformanceTest extends TestCase
 	 * @param args
 	 * @return
 	 */
-	public static void main(String[] args)
+	public void testFiles()
 	{
-		if (args != null && args.length > 0)
+		File file = new File("/Users/klindsey/Documents/Projects/Jaxer");
+
+		if (file.canRead())
 		{
-			File file = new File(args[0]);
+			List<File> files = new ArrayList<File>();
+			JSIndexingPerformanceTest tester = new JSIndexingPerformanceTest();
 
-			if (file.canRead())
+			if (file.isDirectory())
 			{
-				List<File> files = new ArrayList<File>();
-				JSIndexingPerformanceTest tester = new JSIndexingPerformanceTest();
+				final Queue<File> directories = new ArrayDeque<File>();
 
-				if (file.isDirectory())
+				directories.offer(file);
+
+				while (directories.isEmpty() == false)
 				{
-					final Queue<File> directories = new ArrayDeque<File>();
-
-					directories.offer(file);
-
-					while (directories.isEmpty() == false)
+					File directory = directories.poll();
+					File[] jsFiles = directory.listFiles(new FileFilter()
 					{
-						File directory = directories.poll();
-						File[] jsFiles = directory.listFiles(new FileFilter()
+
+						@Override
+						public boolean accept(File pathname)
 						{
+							boolean result = false;
 
-							@Override
-							public boolean accept(File pathname)
+							if (pathname.isDirectory())
 							{
-								boolean result = false;
-
-								if (pathname.isDirectory())
-								{
-									directories.offer(pathname);
-								}
-								else
-								{
-									result = (pathname.getName().toLowerCase().endsWith(".js"));
-								}
-
-								return result;
+								directories.offer(pathname);
+							}
+							else
+							{
+								result = (pathname.getName().toLowerCase().endsWith(".js"));
 							}
 
-						});
+							return result;
+						}
 
-						files.addAll(Arrays.asList(jsFiles));
-					}
+					});
+
+					files.addAll(Arrays.asList(jsFiles));
 				}
-				else if (file.isFile())
+			}
+			else if (file.isFile())
+			{
+				files.add(file);
+			}
+
+			long start = System.currentTimeMillis();
+
+			for (File f : files)
+			{
+				try
 				{
-					files.add(file);
+					tester.setUp();
+					tester.timeIndex(f);
 				}
-
-				long start = System.currentTimeMillis();
-
-				for (File f : files)
+				catch (Throwable e)
 				{
-					System.out.println("Processing " + f.getName());
-					
+				}
+				finally
+				{
 					try
 					{
-						tester.setUp();
-						tester.timeIndex(f);
+						tester.tearDown();
 					}
-					catch (Throwable e)
+					catch (Exception e)
 					{
-					}
-					finally
-					{
-						try
-						{
-							tester.tearDown();
-						}
-						catch (Exception e)
-						{
-						}
 					}
 				}
-
-				long diff = System.currentTimeMillis() - start;
-
-				System.out.println("processed " + files.size() + " files in " + diff + " milliseconds");
 			}
-		}
-		else
-		{
-			System.out.println("Expected a list of JS files and/or directories to search");
+
+			long diff = System.currentTimeMillis() - start;
+
+			System.out.println("processed " + files.size() + " files in " + diff + " milliseconds");
 		}
 	}
 
@@ -232,7 +223,7 @@ public class JSIndexingPerformanceTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		
+
 		fParser = new JSParser();
 	}
 
@@ -244,7 +235,7 @@ public class JSIndexingPerformanceTest extends TestCase
 	protected void tearDown() throws Exception
 	{
 		fParser = null;
-		
+
 		URI indexURI = this.getIndexURI();
 
 		if (indexURI != null)
