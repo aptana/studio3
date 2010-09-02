@@ -1,7 +1,5 @@
 package com.aptana.editor.html.parsing;
 
-import java.util.EnumSet;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
