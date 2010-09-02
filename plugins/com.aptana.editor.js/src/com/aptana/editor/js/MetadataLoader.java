@@ -25,7 +25,6 @@ import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
 import com.aptana.editor.js.contentassist.index.JSMetadataReader;
-import com.aptana.editor.js.contentassist.index.ScriptDocException;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.contentassist.model.UserAgentElement;
 import com.aptana.editor.js.preferences.IPreferenceConstants;
