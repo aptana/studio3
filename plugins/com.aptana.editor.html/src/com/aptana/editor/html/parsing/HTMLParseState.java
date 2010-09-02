@@ -53,15 +53,10 @@ public class HTMLParseState extends ParseState
 	 */
 	public int getCloseTagType(String tagName)
 	{
-		// in XHTML, the tag always needs to be properly closed 
-		if (fDocumentType != Type.XHTML_1_0_FRAMESET && fDocumentType != Type.XHTML_1_0_STRICT
-				&& fDocumentType != Type.XHTML_1_0_TRANSITIONAL && fDocumentType != Type.XHTML_1_1_STRICT)
+		String key = tagName.toLowerCase();
+		if (fEndTagInfo.containsKey(key))
 		{
-			String key = tagName.toLowerCase();
-			if (fEndTagInfo.containsKey(key))
-			{
-				return fEndTagInfo.get(key) & HTMLTagInfo.END_MASK;
-			}
+			return fEndTagInfo.get(key) & HTMLTagInfo.END_MASK;
 		}
 		return HTMLTagInfo.END_REQUIRED;
 	}
