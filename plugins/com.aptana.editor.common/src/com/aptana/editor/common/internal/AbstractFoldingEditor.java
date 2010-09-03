@@ -1,10 +1,12 @@
 package com.aptana.editor.common.internal;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
@@ -13,7 +15,11 @@ import org.eclipse.jface.text.source.projection.ProjectionAnnotationModel;
 import org.eclipse.jface.text.source.projection.ProjectionSupport;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
+import org.eclipse.ui.texteditor.AbstractTextEditor;
+import org.eclipse.ui.texteditor.IDocumentProvider;
+import org.eclipse.ui.texteditor.IDocumentProviderExtension;
 
 import com.aptana.editor.common.IFoldingEditor;
 
@@ -116,5 +122,56 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * This code auto-refreshes files that are out of synch when we first open them. This is a bit of a hack that looks
+	 * to see if it seems we're out of sync and the file isn't open yet. If it is already open, we call super so it pops
+	 * a dialog asking if you want to update the file contents.
+	 */
+	@Override
+	protected void handleEditorInputChanged()
+	{
+		final IDocumentProvider provider = getDocumentProvider();
+		if (provider == null)
+		{
+			// fix for http://dev.eclipse.org/bugs/show_bug.cgi?id=15066
+			close(false);
+			return;
+		}
+
+		final IEditorInput input = getEditorInput();
+		boolean wasActivated = true;
+		try
+		{
+			Field f = AbstractTextEditor.class.getDeclaredField("fHasBeenActivated"); //$NON-NLS-1$
+			f.setAccessible(true);
+			wasActivated = (Boolean) f.get(this);
+		}
+		catch (Exception e1)
+		{
+			// ignore
+		}
+		if (!wasActivated && !provider.isDeleted(input))
+		{
+			try
+			{
+				if (provider instanceof IDocumentProviderExtension)
+				{
+					IDocumentProviderExtension extension = (IDocumentProviderExtension) provider;
+					extension.synchronize(input);
+				}
+				else
+				{
+					doSetInput(input);
+				}
+				return;
+			}
+			catch (CoreException e)
+			{
+				// ignore
+			}
+		}
+		super.handleEditorInputChanged();
 	}
 }
