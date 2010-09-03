@@ -104,7 +104,7 @@ public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHover
 		}
 		catch (BadLocationException e)
 		{
-			Activator.logError(e.getMessage(), e);
+			// ignores the exception; just assumes no hover info is available
 		}
 		return null;
 	}
