@@ -169,24 +169,40 @@ public class ParseNode extends Node implements IParseNode
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.IParseNode#getChildIndex(com.aptana.parsing.ast.IParseNode)
+	 */
+	public int getChildIndex(IParseNode child)
+	{
+		int result = -1;
+		
+		for (int i = 0; i < fChildrenCount; i++)
+		{
+			if (fChildren[i] == child)
+			{
+				result = i;
+				break;
+			}
+		}
+		
+		return result;
+	}
+	
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.IParseNode#getIndex()
 	 */
 	@Override
 	public int getIndex()
 	{
-		IParseNode parent = getParent();
 		int result = -1;
 
+		// grab parent
+		IParseNode parent = getParent();
+		
+		// get child index of this node, if parent exists
 		if (parent != null)
 		{
-			for (int i = 0; i < parent.getChildCount(); i++)
-			{
-				if (parent.getChild(i) == this)
-				{
-					result = i;
-					break;
-				}
-			}
+			result = parent.getChildIndex(this);
 		}
 
 		return result;
