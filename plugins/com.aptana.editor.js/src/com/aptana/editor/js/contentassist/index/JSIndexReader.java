@@ -48,16 +48,16 @@ public class JSIndexReader
 			String key = function.getWord();
 			String[] columns = key.split(JSIndexConstants.DELIMITER);
 			int column = 0;
+			
+			// owning type
+			f.setOwningType(columns[column]);
+			column++;
 
 			// name
 			if (fields.contains(ContentSelector.NAME))
 			{
 				f.setName(columns[column]);
 			}
-			column++;
-
-			// owning type
-			f.setOwningType(columns[column]);
 			column++;
 
 			// description
@@ -162,16 +162,16 @@ public class JSIndexReader
 			String key = property.getWord();
 			String[] columns = key.split(JSIndexConstants.DELIMITER);
 			int column = 0;
+			
+			// owning type
+			p.setOwningType(columns[column]);
+			column++;
 
 			// name
 			if (fields.contains(ContentSelector.NAME))
 			{
 				p.setName(columns[column]);
 			}
-			column++;
-
-			// owning type
-			p.setOwningType(columns[column]);
 			column++;
 
 			// description
@@ -374,12 +374,9 @@ public class JSIndexReader
 
 		if (index != null && owningTypes != null && owningTypes.isEmpty() == false)
 		{
-			// build regex pattern to match all owning types at once
-			String typePattern = getUserTypesPattern(owningTypes);
-
 			// read functions
 			List<QueryResult> functions = index
-				.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(typePattern), SearchPattern.REGEX_MATCH);
+				.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(owningTypes), SearchPattern.REGEX_MATCH);
 
 			if (functions != null)
 			{
@@ -409,9 +406,8 @@ public class JSIndexReader
 		if (index != null && owningType != null && owningType.length() > 0)
 		{
 			// read functions
-			String quotedOwningType = Pattern.quote(owningType);
-			List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(quotedOwningType),
-				SearchPattern.REGEX_MATCH);
+			List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(owningType),
+				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
 
 			if (functions != null)
 			{
@@ -428,12 +424,25 @@ public class JSIndexReader
 	/**
 	 * getMemberPattern
 	 * 
+	 * @param typeNames
+	 * @return
+	 */
+	private String getMemberPattern(List<String> typeNames)
+	{
+		String typePattern = getUserTypesPattern(typeNames);
+
+		return MessageFormat.format("^{1}{0}", new Object[] { JSIndexConstants.DELIMITER, typePattern }); //$NON-NLS-1$
+	}
+
+	/**
+	 * getMemberPattern
+	 * 
 	 * @param typeName
 	 * @return
 	 */
 	private String getMemberPattern(String typeName)
 	{
-		return MessageFormat.format("^[^{0}]+{0}{1}(?:{0}|$)", new Object[] { JSIndexConstants.DELIMITER, typeName }); //$NON-NLS-1$
+		return MessageFormat.format("{1}{0}", new Object[] { JSIndexConstants.DELIMITER, typeName }); //$NON-NLS-1$
 	}
 
 	/**
@@ -445,7 +454,7 @@ public class JSIndexReader
 	 */
 	private String getMemberPattern(String typeName, String memberName)
 	{
-		return MessageFormat.format("{2}{0}{1}", new Object[] { JSIndexConstants.DELIMITER, typeName, memberName }); //$NON-NLS-1$
+		return MessageFormat.format("{1}{0}{2}", new Object[] { JSIndexConstants.DELIMITER, typeName, memberName }); //$NON-NLS-1$
 	}
 
 	/**
@@ -508,11 +517,8 @@ public class JSIndexReader
 
 		if (index != null && owningTypes != null && owningTypes.isEmpty() == false)
 		{
-			// build regex pattern to match all owning types at once
-			String typePattern = getUserTypesPattern(owningTypes);
-
 			// read properties
-			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(typePattern),
+			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningTypes),
 				SearchPattern.REGEX_MATCH);
 
 			if (properties != null)
@@ -543,9 +549,8 @@ public class JSIndexReader
 		if (index != null && owningType != null && owningType.length() > 0)
 		{
 			// read properties
-			String quotedOwningType = Pattern.quote(owningType);
-			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(quotedOwningType),
-				SearchPattern.REGEX_MATCH);
+			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningType),
+				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
 
 			if (properties != null)
 			{

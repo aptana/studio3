@@ -9,7 +9,8 @@ public interface JSIndexConstants
 	// 0.13 - Fix UserAgent foreign keys
 	// 0.14 - Fix to StringUtil.join to not include null values in final string
 	// 0.15 - Write user agent list from UserAgentManager to index as well
-	public static final double INDEX_VERSION = 0.15;
+	// 0.16 - Change field order when writing properties and functions (search optimization)
+	public static final double INDEX_VERSION = 0.16;
 
 	// general constants
 	static final String PREFIX = "js."; //$NON-NLS-1$
