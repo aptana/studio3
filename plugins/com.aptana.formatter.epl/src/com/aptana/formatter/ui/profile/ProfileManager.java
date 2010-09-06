@@ -225,7 +225,7 @@ public class ProfileManager implements IProfileManager
 			{
 				factoriesClasses.add(factory.getClass());
 				factories.add(factory);
-				result.add(factory.getFormatterPreferenceKey());
+				// result.add(factory.getFormatterPreferenceKey());
 				final PreferenceKey[] keys = factory.getPreferenceKeys();
 				if (keys != null)
 				{
