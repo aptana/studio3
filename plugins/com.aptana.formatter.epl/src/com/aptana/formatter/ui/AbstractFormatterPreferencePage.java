@@ -104,7 +104,9 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 		public SourceViewer createSourcePreview(Composite composite, IScriptFormatterFactory factory)
 		{
 			IPreferenceStore generalTextStore = EditorsUI.getPreferenceStore();
-			IPreferenceStore store = new ChainedPreferenceStore(new IPreferenceStore[] { getPreferenceStore(),
+			// TODO - Note that we pass the factory's preferences store and not calling to this.getPrefereceStore.
+			// In case we decide to unify the preferences into the this plugin, we might need to change this.
+			IPreferenceStore store = new ChainedPreferenceStore(new IPreferenceStore[] { factory.getPreferenceStore(),
 					generalTextStore });
 			SourceViewer fPreviewViewer = createPreviewViewer(composite, null, null, false, SWT.V_SCROLL | SWT.H_SCROLL
 					| SWT.BORDER, store);
@@ -122,8 +124,6 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 			new ScriptSourcePreviewerUpdater(fPreviewViewer, configuration, store);
 			fPreviewViewer.setEditable(false);
 			IDocument document = new Document();
-			// IDLTKUILanguageToolkit toolkit = DLTKUILanguageManager.getLanguageToolkit(getContentType());
-			// toolkit.getTextTools().setupDocumentPartitioner(document, toolkit.getPartitioningId());
 			fPreviewViewer.setDocument(document);
 			return fPreviewViewer;
 		}
@@ -142,7 +142,7 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 		{
 			ProjectionViewer viewer = new ProjectionViewer(parent, verticalRuler, overviewRuler,
 					showAnnotationsOverview, styles);
-			// TODO - Shalom - Attach the Theme colors (see AbstractThemableEditor)
+			// TODO - Shalom - Attach the Theme colors (see AbstractThemeableEditor)
 			return viewer;
 		}
 
