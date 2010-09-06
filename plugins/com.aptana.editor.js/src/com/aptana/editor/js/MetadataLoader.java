@@ -25,7 +25,6 @@ import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
 import com.aptana.editor.js.contentassist.index.JSMetadataReader;
-import com.aptana.editor.js.contentassist.index.ScriptDocException;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.contentassist.model.UserAgentElement;
 import com.aptana.editor.js.preferences.IPreferenceConstants;
@@ -69,13 +68,9 @@ public class MetadataLoader extends Job
 
 					reader.loadXML(stream);
 				}
-				catch (ScriptDocException e)
-				{
-					Activator.logError(Messages.Activator_Error_Loading_Metadata, e);
-				}
 				catch (Throwable t)
 				{
-					Activator.logError(Messages.Activator_Error_Loading_Metadata, t);
+					Activator.logError(Messages.Activator_Error_Loading_Metadata + ":" + resource, t);
 				}
 				finally
 				{

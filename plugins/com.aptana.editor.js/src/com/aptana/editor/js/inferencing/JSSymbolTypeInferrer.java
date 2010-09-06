@@ -25,7 +25,6 @@ import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSIdentifierNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
-import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSObjectNode;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.index.core.Index;
@@ -137,7 +136,7 @@ public class JSSymbolTypeInferrer
 		if (property != null && object != null)
 		{
 			Queue<JSNode> queue = new ArrayDeque<JSNode>();
-			Set<String> visitedSymbols = new HashSet<String>();
+			Set<IParseNode> visitedSymbols = new HashSet<IParseNode>();
 
 			// prime the queue
 			queue.addAll(object.getValues());
@@ -145,40 +144,41 @@ public class JSSymbolTypeInferrer
 			while (queue.isEmpty() == false)
 			{
 				JSNode node = queue.poll();
-				DocumentationBlock docs = node.getDocumentation();
-
-				if (docs != null)
+				
+				if (visitedSymbols.contains(node) == false)
 				{
-					JSTypeUtil.applyDocumentation(property, docs);
-					break;
-				}
-				else if (node instanceof JSIdentifierNode)
-				{
-					// grab name
-					String symbol = node.getText();
-
-					visitedSymbols.add(symbol);
-
-					JSPropertyCollection p = this.getSymbolProperty(this._activeScope.getObject(), symbol);
-
-					if (p != null)
+					visitedSymbols.add(node);
+					
+					DocumentationBlock docs = node.getDocumentation();
+	
+					if (docs != null)
 					{
-						for (JSNode value : p.getValues())
+						JSTypeUtil.applyDocumentation(property, docs);
+						break;
+					}
+					else if (node instanceof JSIdentifierNode)
+					{
+						// grab name
+						String symbol = node.getText();
+	
+						JSPropertyCollection p = this.getSymbolProperty(this._activeScope.getObject(), symbol);
+	
+						if (p != null)
 						{
-							if (value.getNodeType() != JSNodeTypes.IDENTIFIER || visitedSymbols.contains(value.getText()) == false)
+							for (JSNode value : p.getValues())
 							{
 								queue.offer(value);
 							}
 						}
 					}
-				}
-				else if (node instanceof JSAssignmentNode)
-				{
-					IParseNode rhs = node.getLastChild();
-
-					if (rhs instanceof JSNode)
+					else if (node instanceof JSAssignmentNode)
 					{
-						queue.offer((JSNode) rhs);
+						IParseNode rhs = node.getLastChild();
+	
+						if (rhs instanceof JSNode)
+						{
+							queue.offer((JSNode) rhs);
+						}
 					}
 				}
 			}
