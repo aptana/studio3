@@ -30,7 +30,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
-import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.formatter.ui.internal.AbstractFormatterSelectionBlock;
 import com.aptana.formatter.ui.internal.preferences.ScriptSourcePreviewerUpdater;
@@ -67,17 +66,25 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 			return ScriptFormatterManager.getInstance();
 		}
 
-		protected IFormatterModifyDialogOwner createDialogOwner()
+		protected IFormatterModifyDialogOwner createDialogOwner(IScriptFormatterFactory formatter)
 		{
-			return new FormatterModifyDialogOwner();
+			return new FormatterModifyDialogOwner(formatter);
 		}
 
 		private class FormatterModifyDialogOwner implements IFormatterModifyDialogOwner
 		{
 
+			private final IScriptFormatterFactory formatter;
+
+			public FormatterModifyDialogOwner(IScriptFormatterFactory formatter)
+			{
+				this.formatter = formatter;
+
+			}
+
 			public ISourceViewer createPreview(Composite composite)
 			{
-				return FormatterSelectionBlock.this.createSourcePreview(composite);
+				return FormatterSelectionBlock.this.createSourcePreview(composite, formatter);
 			}
 
 			public Shell getShell()
@@ -94,7 +101,7 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 		/**
 		 * @param composite
 		 */
-		public SourceViewer createSourcePreview(Composite composite)
+		public SourceViewer createSourcePreview(Composite composite, IScriptFormatterFactory factory)
 		{
 			IPreferenceStore generalTextStore = EditorsUI.getPreferenceStore();
 			IPreferenceStore store = new ChainedPreferenceStore(new IPreferenceStore[] { getPreferenceStore(),
@@ -105,7 +112,7 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 			{
 				return null;
 			}
-			SourceViewerConfiguration configuration = (SourceViewerConfiguration) createSimpleSourceViewerConfiguration(
+			SourceViewerConfiguration configuration = (SourceViewerConfiguration) factory.createSimpleSourceViewerConfiguration(
 					fColorManager, store, null, false);
 			fPreviewViewer.configure(configuration);
 			if (fPreviewViewer.getTextWidget().getTabs() == 0)
@@ -146,11 +153,11 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 
 		protected void updatePreview()
 		{
-			if (fPreviewViewer != null)
+			if (fSelectedPreviewViewer != null)
 			{
-				IScriptFormatterFactory factory = getSelectedExtension();
+				IScriptFormatterFactory factory = getSelectedFormatter();
 				IProfileManager manager = getProfileManager();
-				FormatterPreviewUtils.updatePreview(fPreviewViewer, factory.getPreviewContent(), factory, manager
+				FormatterPreviewUtils.updatePreview(fSelectedPreviewViewer, factory.getPreviewContent(), factory, manager
 						.getSelected().getSettings());
 			}
 		}
@@ -180,16 +187,6 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 		// TODO - Re-enable this by removing this method if we decide to enable project-specific settings.
 		return false;
 	}
-
-	/**
-	 * @param colorManager
-	 * @param store
-	 * @param object
-	 * @param b
-	 * @return
-	 */
-	protected abstract SourceViewerConfiguration createSimpleSourceViewerConfiguration(ISharedTextColors colorManager,
-			IPreferenceStore preferenceStore, ITextEditor editor, boolean configureFormatter);
 
 	protected abstract IDialogSettings getDialogSettings();
 

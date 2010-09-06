@@ -27,9 +27,12 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.AbstractListViewer;
 import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
@@ -48,7 +51,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PreferenceLinkArea;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
@@ -97,15 +99,16 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	private Button fLoadButton;
 	private Button fSaveButton;
 
-	private int selectedFactory;
+	private int selectedProfile;
 	private IScriptFormatterFactory[] factories;
-	protected SourceViewer fPreviewViewer;
+	protected SourceViewer fSelectedPreviewViewer;
+	private ArrayList<SourceViewer> sourcePreviewViewers;
 	private StackLayout previewStackLayout;
 	private IProfileManager profileManager;
 
 	private static List<IScriptFormatterFactory> TEMP_LIST = new ArrayList<IScriptFormatterFactory>();
 
-	protected abstract IFormatterModifyDialogOwner createDialogOwner();
+	protected abstract IFormatterModifyDialogOwner createDialogOwner(IScriptFormatterFactory formatter);
 
 	/**
 	 * Returns the extension manager for the contributed extension.
@@ -119,7 +122,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 
 	protected abstract void updatePreview();
 
-	protected abstract SourceViewer createSourcePreview(Composite parent);
+	protected abstract SourceViewer createSourcePreview(Composite parent, IScriptFormatterFactory factory);
 
 	public AbstractFormatterSelectionBlock(IStatusChangeListener context, IProject project,
 			IWorkbenchPreferenceContainer container)
@@ -127,6 +130,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		super(context, project, ProfileManager.collectPreferenceKeys(TEMP_LIST), container);
 		factories = TEMP_LIST.toArray(new IScriptFormatterFactory[TEMP_LIST.size()]);
 		TEMP_LIST = new ArrayList<IScriptFormatterFactory>();
+		sourcePreviewViewers = new ArrayList<SourceViewer>();
 	}
 
 	protected IProfileManager getProfileManager()
@@ -228,7 +232,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 
 	protected void applyPreferences()
 	{
-		IScriptFormatterFactory factory = getSelectedExtension();
+		IScriptFormatterFactory factory = getSelectedFormatter();
 		IProfileManager manager = getProfileManager();
 		IProfile profile = manager.getSelected();
 		Map<String, String> settings = new HashMap<String, String>();
@@ -250,6 +254,8 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		}
 		IPreferencesSaveDelegate delegate = new SaveDelegate();
 		factory.savePreferences(settings, delegate);
+		fSelectedPreviewViewer = sourcePreviewViewers.get(selectedProfile);
+		previewStackLayout.topControl = fSelectedPreviewViewer.getControl();
 		updatePreview();
 	}
 
@@ -352,7 +358,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 
 			protected void createNewProfile()
 			{
-				IScriptFormatterFactory formatterFactory = getSelectedExtension();
+				IScriptFormatterFactory formatterFactory = getSelectedFormatter();
 				final CreateProfileDialog p = new CreateProfileDialog(group.getShell(), getProfileManager(),
 						profileManager.getProfileVersioner());
 				if (p.open() != Window.OK)
@@ -589,11 +595,18 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		// doSetFactory(index);
 	}
 
-	protected void doSetFactory(int index)
+	/**
+	 * Sets the formatter's profile.
+	 * 
+	 * @param index
+	 */
+	protected void doSetProfile(int index)
 	{
-		selectedFactory = index;
+		// FIXME - This code is wrong. We need to fix it so that the selected profile effects
+		// the previews of the factories.
+		selectedProfile = index;
 		setValue(factories[index].getFormatterPreferenceKey(), factories[index].getId());
-		String desc = getSelectedExtension().getDescription();
+		String desc = getSelectedFormatter().getDescription();
 		if (desc != null && desc.length() != 0)
 		{
 			fFactoryDescription.setText(desc);
@@ -621,7 +634,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		// will hold a preview pane
 		SashForm sashForm = new SashForm(previewGroup, SWT.HORIZONTAL);
 		sashForm.setLayoutData(new GridData(GridData.FILL_BOTH));
-		ListViewer listViewer = new ListViewer(sashForm, SWT.SINGLE | SWT.BORDER);
+		final ListViewer listViewer = new ListViewer(sashForm, SWT.SINGLE | SWT.BORDER);
 		listViewer.getControl().setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		listViewer.setContentProvider(new ArrayContentProvider());
@@ -636,7 +649,16 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		});
 		listViewer.setInput(this.factories);
 		listViewer.setSelection(new StructuredSelection(this.factories[0]));
-
+		listViewer.addSelectionChangedListener(new ISelectionChangedListener()
+		{
+			@Override
+			public void selectionChanged(SelectionChangedEvent event)
+			{
+				// Update the preview
+				selectedProfile = listViewer.getList().getSelectionIndex();
+				updatePreview();
+			}
+		});
 		// Add the right panel (code preview and buttons)
 		Composite rightPanel = new Composite(sashForm, SWT.NONE);
 		GridLayout layout = new GridLayout(1, false);
@@ -645,9 +667,21 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		rightPanel.setLayout(layout);
 		rightPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		// TODO - TEMP
-		Text text = new Text(rightPanel, SWT.BORDER);
-		text.setLayoutData(new GridData(GridData.FILL_BOTH));
+		// TODO
+		Composite previewPane = new Composite(rightPanel, SWT.BORDER);
+		previewPane.setLayoutData(new GridData(GridData.FILL_BOTH));
+		previewStackLayout = new StackLayout();
+		previewPane.setLayout(previewStackLayout);
+		for (IScriptFormatterFactory factory : this.factories)
+		{
+			SourceViewer sourcePreview = createSourcePreview(previewPane, factory);
+			sourcePreviewViewers.add(sourcePreview);
+		}
+		if (selectedProfile != -1 && sourcePreviewViewers.size() > selectedProfile)
+		{
+			fSelectedPreviewViewer = sourcePreviewViewers.get(selectedProfile);
+			previewStackLayout.topControl = fSelectedPreviewViewer.getControl();
+		}
 		// Buttons panel
 		Composite buttons = new Composite(rightPanel, SWT.NONE);
 		layout = new GridLayout(2, true);
@@ -699,18 +733,18 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		// {
 		//
 		// }
-		// fPreviewViewer = createSourcePreview(composite);
+		// fSelectedPreviewViewer = createSourcePreview(composite);
 		//
 		// gd = new GridData(GridData.FILL_VERTICAL | GridData.HORIZONTAL_ALIGN_FILL);
 		// gd.horizontalSpan = numColumns;
 		// gd.verticalSpan = 7;
 		// gd.heightHint = 100;
-		// fPreviewViewer.getControl().setLayoutData(gd);
+		// fSelectedPreviewViewer.getControl().setLayoutData(gd);
 	}
 
-	protected IScriptFormatterFactory getSelectedExtension()
+	protected IScriptFormatterFactory getSelectedFormatter()
 	{
-		return factories[selectedFactory];
+		return factories[selectedProfile];
 	}
 
 	protected final void updateSelection()
@@ -724,11 +758,11 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 
 	protected void editButtonPressed()
 	{
-		IScriptFormatterFactory factory = getSelectedExtension();
+		IScriptFormatterFactory factory = getSelectedFormatter();
 		if (factory != null)
 		{
 			final IProfileManager manager = getProfileManager();
-			final IFormatterModifyDialog dialog = factory.createDialog(createDialogOwner());
+			final IFormatterModifyDialog dialog = factory.createDialog(createDialogOwner(factory));
 			if (dialog != null)
 			{
 				dialog.setProfileManager(manager);
