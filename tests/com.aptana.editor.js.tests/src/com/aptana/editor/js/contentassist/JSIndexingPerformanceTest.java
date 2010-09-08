@@ -269,23 +269,72 @@ public class JSIndexingPerformanceTest extends TestCase
 	*/
 
 	/**
-	 * testRegress155081_2
+	 * testJaxerFiles
 	 * 
 	 * @throws Exception
 	 */
-	public void testRegress155081_2() throws Exception
+	public void testJaxerFiles() throws Exception
 	{
-		timeIndex("performance/regress-155081-2.js");
-	}
-
-	/**
-	 * testRegress98901
-	 * 
-	 * @throws Exception
-	 */
-	public void testRegress98901() throws Exception
-	{
-		timeIndex("performance/regress-98901.js");
+		timeIndex("performance/jaxer/11.2.2-1-n.js");
+		timeIndex("performance/jaxer/15.10.6.2-2.js");
+		timeIndex("performance/jaxer/15.5.4.7-2.js");
+		timeIndex("performance/jaxer/15.9.5.21-3.js");
+		timeIndex("performance/jaxer/ComposerCommands.js");
+		timeIndex("performance/jaxer/DBAPI.js");
+		timeIndex("performance/jaxer/DOMTestCase.js");
+		timeIndex("performance/jaxer/Microformats.js");
+		timeIndex("performance/jaxer/MochiKit_packed.js");
+		timeIndex("performance/jaxer/SimpleTest.js");
+		timeIndex("performance/jaxer/TestCachePerformance.js");
+		timeIndex("performance/jaxer/UDDITypes.js");
+		timeIndex("performance/jaxer/browser_bug_411172.js");
+		timeIndex("performance/jaxer/clientBothProperty.js");
+		timeIndex("performance/jaxer/commands.js");
+		timeIndex("performance/jaxer/crlManager.js");
+		timeIndex("performance/jaxer/dojo.js");
+		timeIndex("performance/jaxer/dom.js");
+		timeIndex("performance/jaxer/editor.js");
+		timeIndex("performance/jaxer/effects.js");
+		timeIndex("performance/jaxer/file-utils.js");
+		timeIndex("performance/jaxer/head_urlformatter.js");
+		timeIndex("performance/jaxer/httpd.js");
+		timeIndex("performance/jaxer/ifaceinfotest.js");
+		timeIndex("performance/jaxer/irc.js");
+		timeIndex("performance/jaxer/jquery-1.2.1.js");
+		timeIndex("performance/jaxer/jquery-1.2.6.min.js");
+		timeIndex("performance/jaxer/jquery-stable.js");
+		timeIndex("performance/jaxer/jquery.js");
+		timeIndex("performance/jaxer/lexical-008.js");
+		timeIndex("performance/jaxer/messages.js");
+		timeIndex("performance/jaxer/narcissus-exec.js");
+		timeIndex("performance/jaxer/nsDragAndDrop.js");
+		timeIndex("performance/jaxer/packed.js");
+		timeIndex("performance/jaxer/perlstress-001.js");
+		timeIndex("performance/jaxer/perlstress-002.js");
+		timeIndex("performance/jaxer/property_database.js");
+		timeIndex("performance/jaxer/prototype.js");
+		timeIndex("performance/jaxer/publishprefs.js");
+		timeIndex("performance/jaxer/regress-100199.js");
+		timeIndex("performance/jaxer/regress-111557.js");
+		timeIndex("performance/jaxer/regress-155081-2.js");
+		timeIndex("performance/jaxer/regress-192226.js");
+		timeIndex("performance/jaxer/regress-244470.js");
+		timeIndex("performance/jaxer/regress-309925-02.js");
+		timeIndex("performance/jaxer/regress-76054.js");
+		timeIndex("performance/jaxer/regress-98901.js");
+		timeIndex("performance/jaxer/scriptaculous.js");
+		timeIndex("performance/jaxer/split-002.js");
+		timeIndex("performance/jaxer/test_413784.js");
+		timeIndex("performance/jaxer/test_423515_forceCopyShortcuts.js");
+		timeIndex("performance/jaxer/test_bug364285-1.js");
+		timeIndex("performance/jaxer/test_bug374754.js");
+		timeIndex("performance/jaxer/test_multi_statements.js");
+		timeIndex("performance/jaxer/test_prepare_insert_update.js");
+		timeIndex("performance/jaxer/tip_followscroll.js");
+		timeIndex("performance/jaxer/tree-utils.js");
+		timeIndex("performance/jaxer/utils.js");
+		timeIndex("performance/jaxer/xpath.js");
+		timeIndex("performance/jaxer/xslt_script.js");
 	}
 
 	/**
