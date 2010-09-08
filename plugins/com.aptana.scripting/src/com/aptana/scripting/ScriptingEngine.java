@@ -160,7 +160,7 @@ public class ScriptingEngine
 	 * 
 	 * @return
 	 */
-	public List<String> getFrameworkFiles()
+	public synchronized List<String> getFrameworkFiles()
 	{
 		if (this._frameworkFiles == null)
 		{

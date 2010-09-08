@@ -7,8 +7,10 @@ import java.util.Map;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.State;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
@@ -82,7 +84,18 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			if (part instanceof IEditorPart)
 			{
 				IEditorPart editorPart = (IEditorPart) part;
-				EventLogger.getInstance().logEvent("editor.closed", editorPart.getEditorSite().getId()); //$NON-NLS-1$
+				final String id = editorPart.getEditorSite().getId();
+				Job job = new Job("Recording editor close") //$NON-NLS-1$
+				{
+					@Override
+					protected IStatus run(IProgressMonitor monitor)
+					{
+						EventLogger.getInstance().logEvent("editor.closed", id); //$NON-NLS-1$
+						return Status.OK_STATUS;
+					}
+				};
+				job.setSystem(true);
+				job.setPriority(Job.SHORT);
 			}
 		}
 
@@ -97,7 +110,18 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			if (part instanceof IEditorPart)
 			{
 				IEditorPart editorPart = (IEditorPart) part;
-				EventLogger.getInstance().logEvent("editor.opened", editorPart.getEditorSite().getId()); //$NON-NLS-1$
+				final String id = editorPart.getEditorSite().getId();
+				Job job = new Job("Recording editor open") //$NON-NLS-1$
+				{
+					@Override
+					protected IStatus run(IProgressMonitor monitor)
+					{
+						EventLogger.getInstance().logEvent("editor.opened", id); //$NON-NLS-1$
+						return Status.OK_STATUS;
+					}
+				};
+				job.setSystem(true);
+				job.setPriority(Job.SHORT);
 			}
 		}
 	};
