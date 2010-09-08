@@ -19,8 +19,14 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
+import org.eclipse.core.runtime.jobs.Job;
 import org.jruby.RubyRegexp;
 
 import com.aptana.core.util.ResourceUtil;
@@ -58,6 +64,11 @@ public class BundleManager
 	private static final String USER_HOME_PROPERTY = "user.home"; //$NON-NLS-1$
 	private static final String USER_BUNDLE_DIRECTORY_GENERAL = "Aptana Rubles"; //$NON-NLS-1$
 	private static final String USER_BUNDLE_DIRECTORY_MACOSX = "/Documents/Aptana Rubles"; //$NON-NLS-1$
+
+	// These fields are solely for managing parallel loading of bundles so we can enforce a Maximum number of
+	// simultaneous loads
+	private int counter = 0; // counter to cycle through for use in enforcing max parallel bundle loads
+	private static final int MAX_PARALLEL_LOADS = 5;
 
 	private static BundleManager INSTANCE;
 
@@ -126,7 +137,8 @@ public class BundleManager
 						}
 						else
 						{
-							Activator.logError(Messages.BundleManager_USER_PATH_NOT_READ_WRITE + f.getAbsolutePath(), null);
+							Activator.logError(Messages.BundleManager_USER_PATH_NOT_READ_WRITE + f.getAbsolutePath(),
+									null);
 						}
 					}
 					else
@@ -1359,22 +1371,26 @@ public class BundleManager
 					}
 					else
 					{
-						message = MessageFormat.format(Messages.BundleManager_No_Bundle_File, new Object[] { bundleDirectory.getAbsolutePath(), BUNDLE_FILE });
+						message = MessageFormat.format(Messages.BundleManager_No_Bundle_File, new Object[] {
+								bundleDirectory.getAbsolutePath(), BUNDLE_FILE });
 					}
 				}
 				else
 				{
-					message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY, new Object[] { bundleDirectory.getAbsolutePath() });
+					message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY,
+							new Object[] { bundleDirectory.getAbsolutePath() });
 				}
 			}
 			else
 			{
-				message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY, new Object[] { bundleDirectory.getAbsolutePath() });
+				message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY,
+						new Object[] { bundleDirectory.getAbsolutePath() });
 			}
 		}
 		else
 		{
-			message = MessageFormat.format(Messages.BundleManager_BUNDLE_DIRECTORY_DOES_NOT_EXIST, new Object[] { bundleDirectory.getAbsolutePath() });
+			message = MessageFormat.format(Messages.BundleManager_BUNDLE_DIRECTORY_DOES_NOT_EXIST,
+					new Object[] { bundleDirectory.getAbsolutePath() });
 		}
 
 		if (result == false && message != null && message.length() > 0)
@@ -1408,19 +1424,38 @@ public class BundleManager
 	 * 
 	 * @param bundleDirectory
 	 */
-	public void loadBundle(File bundleDirectory)
+	public void loadBundle(final File bundleDirectory)
 	{
-		File[] bundleScripts = this.getBundleScripts(bundleDirectory);
-
-		if (bundleScripts.length > 0)
+		Job job = new Job("Loading bundle: " + bundleDirectory.getAbsolutePath()) //$NON-NLS-1$
 		{
-			List<String> bundleLoadPaths = this.getBundleLoadPaths(bundleDirectory);
-
-			for (File script : bundleScripts)
+			protected IStatus run(IProgressMonitor monitor)
 			{
-				this.loadScript(script, true, bundleLoadPaths);
+				File[] bundleScripts = getBundleScripts(bundleDirectory);
+				SubMonitor sub = SubMonitor.convert(monitor, bundleScripts.length);
+
+				if (bundleScripts.length > 0)
+				{
+					List<String> bundleLoadPaths = getBundleLoadPaths(bundleDirectory);
+
+					for (File script : bundleScripts)
+					{
+						sub.subTask(script.getAbsolutePath());
+						loadScript(script, true, bundleLoadPaths);
+						sub.worked(1);
+						Thread.yield();
+					}
+				}
+				sub.done();
+				return Status.OK_STATUS;
 			}
+		};
+		job.setRule(new SerialPerObjectRule(counter++));
+		if (counter >= MAX_PARALLEL_LOADS)
+		{
+			counter = 0;
 		}
+		job.setPriority(Job.SHORT);
+		job.schedule();
 	}
 
 	/**
@@ -1505,7 +1540,8 @@ public class BundleManager
 
 		if (execute && script.canRead() == false)
 		{
-			String message = MessageFormat.format(Messages.BundleManager_UNREADABLE_SCRIPT, new Object[] { script.getAbsolutePath() });
+			String message = MessageFormat.format(Messages.BundleManager_UNREADABLE_SCRIPT,
+					new Object[] { script.getAbsolutePath() });
 
 			ScriptLogger.logError(message);
 			execute = false;
@@ -1794,6 +1830,47 @@ public class BundleManager
 			String message = MessageFormat.format(Messages.BundleManager_Unloaded_Null_Script, new Object[] {});
 
 			ScriptLogger.logError(message);
+		}
+	}
+
+	/**
+	 * This is a rule which reports a conflict when two rules wrap the same object. It is used to enforce a max job
+	 * count for parallel bundle loads.
+	 * 
+	 * @author cwilliams
+	 */
+	private class SerialPerObjectRule implements ISchedulingRule
+	{
+
+		private Object fObject = null;
+
+		public SerialPerObjectRule(Object lock)
+		{
+			fObject = lock;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.core.runtime.jobs.ISchedulingRule#contains(org.eclipse.core.runtime.jobs.ISchedulingRule)
+		 */
+		public boolean contains(ISchedulingRule rule)
+		{
+			return rule == this;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see
+		 * org.eclipse.core.runtime.jobs.ISchedulingRule#isConflicting(org.eclipse.core.runtime.jobs.ISchedulingRule)
+		 */
+		public boolean isConflicting(ISchedulingRule rule)
+		{
+			if (rule instanceof SerialPerObjectRule)
+			{
+				SerialPerObjectRule vup = (SerialPerObjectRule) rule;
+				return fObject == vup.fObject;
+			}
+			return false;
 		}
 	}
 }
