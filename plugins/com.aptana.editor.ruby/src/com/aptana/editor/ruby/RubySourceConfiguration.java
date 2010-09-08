@@ -109,7 +109,7 @@ public class RubySourceConfiguration implements IPartitioningConfiguration, ISou
 				"comment.block.documentation.ruby")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(REGULAR_EXPRESSION), new QualifiedContentType(
 				"string.regexp.classic.ruby")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(REGULAR_EXPRESSION), new QualifiedContentType(
+		c.addTranslation(new QualifiedContentType(COMMAND), new QualifiedContentType(
 				"string.interpolated.ruby")); //$NON-NLS-1$
 	}
 
