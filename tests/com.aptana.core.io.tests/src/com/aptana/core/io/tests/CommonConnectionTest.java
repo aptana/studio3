@@ -98,7 +98,7 @@ public abstract class CommonConnectionTest extends TestCase
 	protected static final Properties getConfig() {
 		if (cachedProperties == null) {
 			cachedProperties = new Properties();
-			String propertiesFile = System.getenv("junit.properties");
+			String propertiesFile = System.getenv("junit.properties"); //$NON-NLS-1$
 			if (propertiesFile != null && new File(propertiesFile).length() > 0) {
 				try {
 					cachedProperties.load(new FileInputStream(propertiesFile));

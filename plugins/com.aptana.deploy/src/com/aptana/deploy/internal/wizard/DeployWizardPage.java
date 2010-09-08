@@ -34,7 +34,7 @@ public class DeployWizardPage extends WizardPage
 	public static final String NAME = "Deployment"; //$NON-NLS-1$
 	private static final String HEROKU_IMG_PATH = "icons/heroku.png"; //$NON-NLS-1$
 	private static final String FTP_IMG_PATH = "icons/ftp.png"; //$NON-NLS-1$
-	private static final String EY_IMG_PATH = "icons/ey_small.png";
+	private static final String EY_IMG_PATH = "icons/ey_small.png"; //$NON-NLS-1$
 
 	private Button deployWithFTP;
 	private Button deployWithCapistrano;

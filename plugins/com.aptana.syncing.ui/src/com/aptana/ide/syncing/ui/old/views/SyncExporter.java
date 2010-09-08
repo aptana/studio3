@@ -88,27 +88,27 @@ public class SyncExporter
 		switch (state)
 		{
 			case SyncState.Ignore:
-				return "Ignore";
+				return "Ignore"; //$NON-NLS-1$
 			case SyncState.ItemsMatch:
-				return "Items Match";
+				return "Items Match"; //$NON-NLS-1$
 			case SyncState.CRCMismatch:
-				return "CRC Mismatch";
+				return "CRC Mismatch"; //$NON-NLS-1$
 			case SyncState.ClientItemIsNewer:
-				return "Uploaded";
+				return "Uploaded"; //$NON-NLS-1$
 			case SyncState.ServerItemIsNewer:
-				return "Downloaded";
+				return "Downloaded"; //$NON-NLS-1$
 			case SyncState.ClientItemOnly:
-				return "Uploaded";
+				return "Uploaded"; //$NON-NLS-1$
 			case SyncState.ServerItemOnly:
-				return "Downloaded";
+				return "Downloaded"; //$NON-NLS-1$
 			case SyncState.IncompatibleFileTypes:
-				return "Incompatible File Types";
+				return "Incompatible File Types"; //$NON-NLS-1$
 			case SyncState.ClientItemDeleted:
-				return "Deleted on Client";
+				return "Deleted on Client"; //$NON-NLS-1$
 			case SyncState.ServerItemDeleted:
-				return "Deleted on Server";
+				return "Deleted on Server"; //$NON-NLS-1$
 			default:
-				return "Unknown";
+				return "Unknown"; //$NON-NLS-1$
 		}
 	}
 }

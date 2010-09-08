@@ -1257,7 +1257,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 
 	protected void refreshViewer()
 	{
-		if (getCommonViewer() == null)
+		if (getCommonViewer() == null || getCommonViewer().getTree() == null || getCommonViewer().getTree().isDisposed())
 		{
 			return;
 		}

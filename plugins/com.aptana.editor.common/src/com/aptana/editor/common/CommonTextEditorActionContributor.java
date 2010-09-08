@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.texteditor.BasicTextEditorActionContributor;
+import org.eclipse.ui.editors.text.TextEditorActionContributor;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.ITextEditorExtension;
@@ -32,7 +32,7 @@ import com.aptana.editor.common.scripting.commands.EditorCommandsMenuContributor
  * @author schitale
  *
  */
-public class CommonTextEditorActionContributor extends BasicTextEditorActionContributor {
+public class CommonTextEditorActionContributor extends TextEditorActionContributor {
 
 	private CommandsMenuContributionItem commandsMenuContributionItem;
 

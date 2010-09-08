@@ -5,6 +5,7 @@ import java.net.URLDecoder;
 
 public class URIUtil
 {
+
 	/**
 	 * URIUtil
 	 */
@@ -26,7 +27,7 @@ public class URIUtil
 		{
 			try
 			{
-				result = URLDecoder.decode(uri.toString(), "utf-8");
+				result = URLDecoder.decode(uri.toString(), "utf-8"); //$NON-NLS-1$
 			}
 			catch (UnsupportedEncodingException e)
 			{
@@ -36,6 +37,4 @@ public class URIUtil
 	
 		return result;
 	}
-	
-	
 }

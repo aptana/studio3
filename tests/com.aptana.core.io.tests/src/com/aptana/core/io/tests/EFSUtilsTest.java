@@ -27,26 +27,26 @@ public class EFSUtilsTest extends TestCase
 
 	public void testGetAbsolutePath() throws IOException, CoreException
 	{
-		File f = File.createTempFile("test", "txt");
+		File f = File.createTempFile("test", "txt"); //$NON-NLS-1$ //$NON-NLS-2$
 		LocalConnectionPoint lcp = new LocalConnectionPoint(Path.fromOSString(f.getAbsolutePath()));
 		assertEquals(f.getAbsolutePath(), EFSUtils.getAbsolutePath(lcp.getRoot()));
 	}
 
 	public void testGetPath() throws IOException, CoreException
 	{
-		File f = File.createTempFile("test", "txt");
+		File f = File.createTempFile("test", "txt"); //$NON-NLS-1$ //$NON-NLS-2$
 		LocalConnectionPoint lcp = new LocalConnectionPoint(Path.fromOSString(f.getAbsolutePath()));
 		assertEquals(f.getAbsolutePath(), EFSUtils.getAbsolutePath(lcp.getRoot()));
 	}
 
 	public void testGetRelativePath() throws IOException, CoreException
 	{
-		File f = File.createTempFile("test", "txt");
-		File f2 = File.createTempFile("test", "txt");
-		assertEquals("/" + f.getName(), EFSUtils.getRelativePath(EFS.getLocalFileSystem().fromLocalFile(
+		File f = File.createTempFile("test", "txt"); //$NON-NLS-1$ //$NON-NLS-2$
+		File f2 = File.createTempFile("test", "txt"); //$NON-NLS-1$ //$NON-NLS-2$
+		assertEquals("/" + f.getName(), EFSUtils.getRelativePath(EFS.getLocalFileSystem().fromLocalFile( //$NON-NLS-1$
 				f.getParentFile()), EFS.getLocalFileSystem().fromLocalFile(f)));
 
-		assertEquals("", EFSUtils.getRelativePath(EFS.getLocalFileSystem().fromLocalFile(f.getParentFile()), EFS
+		assertEquals("", EFSUtils.getRelativePath(EFS.getLocalFileSystem().fromLocalFile(f.getParentFile()), EFS //$NON-NLS-1$
 				.getLocalFileSystem().fromLocalFile(f.getParentFile())));
 
 		assertNull(EFSUtils.getRelativePath(EFS.getLocalFileSystem().fromLocalFile(f), EFS.getLocalFileSystem()

@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.Platform;
-
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSCatchNode;
@@ -212,12 +210,7 @@ public class JSSymbolCollector extends JSTreeWalker
 							break LOOP;
 
 						case JSNodeTypes.THIS:
-							// TODO: implement this once we're properly handling
-							// [[proto]]
-							if (Platform.inDevelopmentMode())
-							{
-								System.out.println("unprocessed assignment: " + node); //$NON-NLS-1$
-							}
+							// TODO: implement this once we're properly handling [[proto]]
 							break LOOP;
 
 						default:
@@ -226,16 +219,13 @@ public class JSSymbolCollector extends JSTreeWalker
 					}
 				}
 
-				if (Platform.inDevelopmentMode() && lhs == null)
-				{
-					System.out.println("unprocessed assignment: " + node); //$NON-NLS-1$
-				}
+				// TODO: unhandled assignment
 				break;
 		}
-		
+
 		// process rhs
 		IParseNode rhs = node.getRightHandSide();
-		
+
 		if (rhs != null)
 		{
 			this.accept(rhs);
