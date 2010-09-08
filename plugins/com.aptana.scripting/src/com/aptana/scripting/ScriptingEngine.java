@@ -100,7 +100,7 @@ public class ScriptingEngine
 	 * 
 	 * @return
 	 */
-	public List<String> getContributedLoadPaths()
+	public synchronized List<String> getContributedLoadPaths()
 	{
 		if (this._loadPaths == null)
 		{

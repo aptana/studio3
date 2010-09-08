@@ -10,7 +10,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -776,7 +775,7 @@ public class BundleManager
 
 			if (result == null)
 			{
-				result = new LinkedList<String>();
+				result = new ArrayList<String>();
 
 				result.addAll(ScriptingEngine.getInstance().getContributedLoadPaths());
 			}
