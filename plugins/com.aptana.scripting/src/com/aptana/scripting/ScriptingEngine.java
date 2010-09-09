@@ -100,7 +100,7 @@ public class ScriptingEngine
 	 * 
 	 * @return
 	 */
-	public synchronized List<String> getContributedLoadPaths()
+	public List<String> getContributedLoadPaths()
 	{
 		if (this._loadPaths == null)
 		{
@@ -160,7 +160,7 @@ public class ScriptingEngine
 	 * 
 	 * @return
 	 */
-	public synchronized List<String> getFrameworkFiles()
+	public List<String> getFrameworkFiles()
 	{
 		if (this._frameworkFiles == null)
 		{
