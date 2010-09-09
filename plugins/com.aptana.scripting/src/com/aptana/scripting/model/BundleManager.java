@@ -64,10 +64,11 @@ public class BundleManager
 	private static final String USER_BUNDLE_DIRECTORY_GENERAL = "Aptana Rubles"; //$NON-NLS-1$
 	private static final String USER_BUNDLE_DIRECTORY_MACOSX = "/Documents/Aptana Rubles"; //$NON-NLS-1$
 
-	// These fields are solely for managing parallel loading of bundles so we can enforce a Maximum number of
-	// simultaneous loads
-	private int counter = 0; // counter to cycle through for use in enforcing max parallel bundle loads
-	private static final int MAX_PARALLEL_LOADS = 5;
+	/**
+	 * counter to cycle through for use in enforcing max parallel bundle loads. We compare versus the number of
+	 * available processors reported by Java's Runtime.
+	 */
+	private int counter = 0;
 
 	private static BundleManager INSTANCE;
 
@@ -1449,7 +1450,7 @@ public class BundleManager
 			}
 		};
 		job.setRule(new SerialPerObjectRule(counter++));
-		if (counter >= MAX_PARALLEL_LOADS)
+		if (counter >= Runtime.getRuntime().availableProcessors())
 		{
 			counter = 0;
 		}
