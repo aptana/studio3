@@ -20,6 +20,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -1426,37 +1427,66 @@ public class BundleManager
 	 */
 	public void loadBundle(final File bundleDirectory)
 	{
-		Job job = new Job("Loading bundle: " + bundleDirectory.getAbsolutePath()) //$NON-NLS-1$
-		{
-			protected IStatus run(IProgressMonitor monitor)
-			{
-				File[] bundleScripts = getBundleScripts(bundleDirectory);
-				SubMonitor sub = SubMonitor.convert(monitor, bundleScripts.length);
-
-				if (bundleScripts.length > 0)
-				{
-					List<String> bundleLoadPaths = getBundleLoadPaths(bundleDirectory);
-
-					for (File script : bundleScripts)
-					{
-						sub.subTask(script.getAbsolutePath());
-						loadScript(script, true, bundleLoadPaths);
-						sub.worked(1);
-						Thread.yield();
-					}
-				}
-				sub.done();
-				return Status.OK_STATUS;
-			}
-		};
-		job.setRule(new SerialPerObjectRule(counter++));
-		if (counter >= Runtime.getRuntime().availableProcessors())
-		{
-			counter = 0;
-		}
-		job.setPriority(Job.SHORT);
-		job.schedule();
+		loadBundle(bundleDirectory, true);
 	}
+
+	/**
+	 * loadBundle FIXME This is a hack specifically for testing so we can still load bundles sync there as the tests
+	 * assume that they will! We should be able to return back the job or a listener or pass in a monitor so we can
+	 * monitor the status of the job and wait until it's finished!
+	 * 
+	 * @param bundleDirectory
+	 */
+	public void loadBundle(final File bundleDirectory, boolean async)
+	{
+		BundleLoadJob job = new BundleLoadJob(bundleDirectory);
+		if (async)
+		{
+			job.setRule(new SerialPerObjectRule(counter++));
+			if (counter >= Runtime.getRuntime().availableProcessors())
+			{
+				counter = 0;
+			}
+			job.schedule();
+		}
+		else
+		{
+			job.run(new NullProgressMonitor());
+		}
+	}
+
+	private class BundleLoadJob extends Job
+	{
+		private File bundleDirectory;
+
+		BundleLoadJob(File bundleDirectory)
+		{
+			super("Loading bundle: " + bundleDirectory.getAbsolutePath()); //$NON-NLS-1$
+			this.bundleDirectory = bundleDirectory;
+			setPriority(Job.SHORT);
+		}
+
+		public IStatus run(IProgressMonitor monitor)
+		{
+			File[] bundleScripts = getBundleScripts(bundleDirectory);
+			SubMonitor sub = SubMonitor.convert(monitor, bundleScripts.length);
+
+			if (bundleScripts.length > 0)
+			{
+				List<String> bundleLoadPaths = getBundleLoadPaths(bundleDirectory);
+
+				for (File script : bundleScripts)
+				{
+					sub.subTask(script.getAbsolutePath());
+					loadScript(script, true, bundleLoadPaths);
+					sub.worked(1);
+					Thread.yield();
+				}
+			}
+			sub.done();
+			return Status.OK_STATUS;
+		}
+	};
 
 	/**
 	 * loadBundles
