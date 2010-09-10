@@ -64,7 +64,6 @@ import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.LoadCycleListener;
-import com.aptana.scripting.model.SnippetElement;
 import com.aptana.scripting.model.filters.IModelFilter;
 
 @SuppressWarnings("restriction")
@@ -360,7 +359,6 @@ public class KeybindingsManager implements LoadCycleListener
 
 	private void loadbindings()
 	{
-		Activator.trace("Loading ruble command keybindings");
 		resetState();
 
 		// Collect unique key sequences
@@ -370,7 +368,7 @@ public class KeybindingsManager implements LoadCycleListener
 		// Filter to commands with bindings
 		IModelFilter filter = new IModelFilter()
 		{
-			
+
 			@Override
 			public boolean include(AbstractElement element)
 			{
@@ -379,14 +377,14 @@ public class KeybindingsManager implements LoadCycleListener
 				if (element instanceof CommandElement)
 				{
 					CommandElement node = (CommandElement) element;
-					String[] bindings = node.getKeyBindings();					
+					String[] bindings = node.getKeyBindings();
 					result = (bindings != null && bindings.length > 0);
 				}
-				
+
 				return result;
 			}
 		};
-		
+
 		// Get all commands with bindings
 		CommandElement[] commands = bundleManager.getCommands(filter);
 		for (CommandElement commandElement : commands)
