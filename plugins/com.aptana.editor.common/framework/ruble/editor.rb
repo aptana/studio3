@@ -297,7 +297,7 @@ module Ruble
       
       # I'm sure there's a better way to extract the word at the current caret position
       if current_line !~ /^\s*$/
-        starting_offset = caret_column
+        starting_offset = 0
         ending_offset = current_line.length
         
         (caret_column - 1).downto(0) do |n|
