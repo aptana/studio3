@@ -18,7 +18,7 @@ import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
 
 import junit.framework.TestCase;
 
-public class LocationTests extends TestCase
+public abstract class LocationTestCase extends TestCase
 {
 	/**
 	 * createDocument

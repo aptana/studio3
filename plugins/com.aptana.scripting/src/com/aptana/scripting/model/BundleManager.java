@@ -10,7 +10,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,8 +18,15 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
+import org.eclipse.core.runtime.jobs.Job;
 import org.jruby.RubyRegexp;
 
 import com.aptana.core.util.ResourceUtil;
@@ -58,6 +64,12 @@ public class BundleManager
 	private static final String USER_HOME_PROPERTY = "user.home"; //$NON-NLS-1$
 	private static final String USER_BUNDLE_DIRECTORY_GENERAL = "Aptana Rubles"; //$NON-NLS-1$
 	private static final String USER_BUNDLE_DIRECTORY_MACOSX = "/Documents/Aptana Rubles"; //$NON-NLS-1$
+
+	/**
+	 * counter to cycle through for use in enforcing max parallel bundle loads. We compare versus the number of
+	 * available processors reported by Java's Runtime.
+	 */
+	private int counter = 0;
 
 	private static BundleManager INSTANCE;
 
@@ -126,7 +138,8 @@ public class BundleManager
 						}
 						else
 						{
-							Activator.logError(Messages.BundleManager_USER_PATH_NOT_READ_WRITE + f.getAbsolutePath(), null);
+							Activator.logError(Messages.BundleManager_USER_PATH_NOT_READ_WRITE + f.getAbsolutePath(),
+									null);
 						}
 					}
 					else
@@ -643,6 +656,30 @@ public class BundleManager
 	}
 
 	/**
+	 * getBundleEnvs
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public EnvironmentElement[] getBundleEnvs(String name)
+	{
+		EnvironmentElement[] result = new EnvironmentElement[0];
+
+		synchronized (entryNamesLock)
+		{
+			if (this._entriesByName != null && this._entriesByName.containsKey(name))
+			{
+				// grab all bundles of the given name
+				BundleEntry entry = this._entriesByName.get(name);
+
+				result = entry.getEnvs();
+			}
+		}
+
+		return result;
+	}
+
+	/**
 	 * getBundleDirectory
 	 * 
 	 * @param script
@@ -776,7 +813,7 @@ public class BundleManager
 
 			if (result == null)
 			{
-				result = new LinkedList<String>();
+				result = new ArrayList<String>();
 
 				result.addAll(ScriptingEngine.getInstance().getContributedLoadPaths());
 			}
@@ -1359,22 +1396,26 @@ public class BundleManager
 					}
 					else
 					{
-						message = MessageFormat.format(Messages.BundleManager_No_Bundle_File, new Object[] { bundleDirectory.getAbsolutePath(), BUNDLE_FILE });
+						message = MessageFormat.format(Messages.BundleManager_No_Bundle_File, new Object[] {
+								bundleDirectory.getAbsolutePath(), BUNDLE_FILE });
 					}
 				}
 				else
 				{
-					message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY, new Object[] { bundleDirectory.getAbsolutePath() });
+					message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY,
+							new Object[] { bundleDirectory.getAbsolutePath() });
 				}
 			}
 			else
 			{
-				message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY, new Object[] { bundleDirectory.getAbsolutePath() });
+				message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY,
+						new Object[] { bundleDirectory.getAbsolutePath() });
 			}
 		}
 		else
 		{
-			message = MessageFormat.format(Messages.BundleManager_BUNDLE_DIRECTORY_DOES_NOT_EXIST, new Object[] { bundleDirectory.getAbsolutePath() });
+			message = MessageFormat.format(Messages.BundleManager_BUNDLE_DIRECTORY_DOES_NOT_EXIST,
+					new Object[] { bundleDirectory.getAbsolutePath() });
 		}
 
 		if (result == false && message != null && message.length() > 0)
@@ -1408,20 +1449,68 @@ public class BundleManager
 	 * 
 	 * @param bundleDirectory
 	 */
-	public void loadBundle(File bundleDirectory)
+	public void loadBundle(final File bundleDirectory)
 	{
-		File[] bundleScripts = this.getBundleScripts(bundleDirectory);
+		loadBundle(bundleDirectory, true);
+	}
 
-		if (bundleScripts.length > 0)
+	/**
+	 * loadBundle FIXME This is a hack specifically for testing so we can still load bundles sync there as the tests
+	 * assume that they will! We should be able to return back the job or a listener or pass in a monitor so we can
+	 * monitor the status of the job and wait until it's finished!
+	 * 
+	 * @param bundleDirectory
+	 */
+	public void loadBundle(final File bundleDirectory, boolean async)
+	{
+		BundleLoadJob job = new BundleLoadJob(bundleDirectory);
+		if (async)
 		{
-			List<String> bundleLoadPaths = this.getBundleLoadPaths(bundleDirectory);
-
-			for (File script : bundleScripts)
+			job.setRule(new SerialPerObjectRule(counter++));
+			if (counter >= Runtime.getRuntime().availableProcessors())
 			{
-				this.loadScript(script, true, bundleLoadPaths);
+				counter = 0;
 			}
+			job.schedule();
+		}
+		else
+		{
+			job.run(new NullProgressMonitor());
 		}
 	}
+
+	private class BundleLoadJob extends Job
+	{
+		private File bundleDirectory;
+
+		BundleLoadJob(File bundleDirectory)
+		{
+			super("Loading bundle: " + bundleDirectory.getAbsolutePath()); //$NON-NLS-1$
+			this.bundleDirectory = bundleDirectory;
+			setPriority(Job.SHORT);
+		}
+
+		public IStatus run(IProgressMonitor monitor)
+		{
+			File[] bundleScripts = getBundleScripts(bundleDirectory);
+			SubMonitor sub = SubMonitor.convert(monitor, bundleScripts.length);
+
+			if (bundleScripts.length > 0)
+			{
+				List<String> bundleLoadPaths = getBundleLoadPaths(bundleDirectory);
+
+				for (File script : bundleScripts)
+				{
+					sub.subTask(script.getAbsolutePath());
+					loadScript(script, true, bundleLoadPaths);
+					sub.worked(1);
+					Thread.yield();
+				}
+			}
+			sub.done();
+			return Status.OK_STATUS;
+		}
+	};
 
 	/**
 	 * loadBundles
@@ -1505,7 +1594,8 @@ public class BundleManager
 
 		if (execute && script.canRead() == false)
 		{
-			String message = MessageFormat.format(Messages.BundleManager_UNREADABLE_SCRIPT, new Object[] { script.getAbsolutePath() });
+			String message = MessageFormat.format(Messages.BundleManager_UNREADABLE_SCRIPT,
+					new Object[] { script.getAbsolutePath() });
 
 			ScriptLogger.logError(message);
 			execute = false;
@@ -1795,5 +1885,82 @@ public class BundleManager
 
 			ScriptLogger.logError(message);
 		}
+	}
+
+	/**
+	 * This is a rule which reports a conflict when two rules wrap the same object. It is used to enforce a max job
+	 * count for parallel bundle loads.
+	 * 
+	 * @author cwilliams
+	 */
+	private class SerialPerObjectRule implements ISchedulingRule
+	{
+
+		private Object fObject = null;
+
+		public SerialPerObjectRule(Object lock)
+		{
+			fObject = lock;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.core.runtime.jobs.ISchedulingRule#contains(org.eclipse.core.runtime.jobs.ISchedulingRule)
+		 */
+		public boolean contains(ISchedulingRule rule)
+		{
+			return rule == this;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see
+		 * org.eclipse.core.runtime.jobs.ISchedulingRule#isConflicting(org.eclipse.core.runtime.jobs.ISchedulingRule)
+		 */
+		public boolean isConflicting(ISchedulingRule rule)
+		{
+			if (rule instanceof SerialPerObjectRule)
+			{
+				SerialPerObjectRule vup = (SerialPerObjectRule) rule;
+				return fObject == vup.fObject;
+			}
+			return false;
+		}
+	}
+
+	public List<EnvironmentElement> getEnvs(IModelFilter filter)
+	{
+
+		IModelFilter caFilter = new IModelFilter()
+		{
+
+			@Override
+			public boolean include(AbstractElement element)
+			{
+				return element instanceof EnvironmentElement;
+			}
+		};
+		if (filter != null)
+		{
+			filter = new AndFilter(filter, caFilter);
+		}
+		else
+		{
+			filter = caFilter;
+		}
+
+		List<EnvironmentElement> result = new ArrayList<EnvironmentElement>();
+		for (String name : this.getBundleNames())
+		{
+			for (EnvironmentElement command : this.getBundleEnvs(name))
+			{
+				if (filter.include(command))
+				{
+					result.add(command);
+				}
+			}
+		}
+
+		return result;
 	}
 }

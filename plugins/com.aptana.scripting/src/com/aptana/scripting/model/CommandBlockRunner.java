@@ -17,6 +17,7 @@ import org.jruby.RubyGlobal.InputGlobalVariable;
 import org.jruby.RubyGlobal.OutputGlobalVariable;
 import org.jruby.RubyHash;
 import org.jruby.RubyIO;
+import org.jruby.RubyProc;
 import org.jruby.RubySystemExit;
 import org.jruby.exceptions.RaiseException;
 import org.jruby.javasupport.JavaEmbedUtils;
@@ -24,6 +25,8 @@ import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.scripting.ScriptUtils;
+import com.aptana.scripting.model.filters.IModelFilter;
+import com.aptana.scripting.model.filters.ScopeFilter;
 
 public class CommandBlockRunner extends AbstractCommandRunner
 {
@@ -66,9 +69,9 @@ public class CommandBlockRunner extends AbstractCommandRunner
 	{
 		Ruby runtime = this.getRuntime();
 
-		// register any bundle libraries that were loaded by this script 
+		// register any bundle libraries that were loaded by this script
 		this.registerLibraries(runtime, this.getCommand().getPath());
-		
+
 		// unapply load paths
 		this.unapplyLoadPaths(runtime);
 
@@ -97,6 +100,15 @@ public class CommandBlockRunner extends AbstractCommandRunner
 			this._originalEnvironment = (RubyHash) hash.dup();
 
 			hash.putAll(this.getContributedEnvironment());
+
+			// Grab all the matching env objects contributed via bundles that have scope matching!
+			IModelFilter filter = new ScopeFilter((String) hash.get("TM_CURRENT_SCOPE")); //$NON-NLS-1$
+			List<EnvironmentElement> envs = BundleManager.getInstance().getEnvs(filter);
+			for (EnvironmentElement e : envs)
+			{
+				RubyProc invoke = e.getInvokeBlock();
+				invoke.call(runtime.getCurrentContext(), new IRubyObject[] { hash });
+			}
 		}
 	}
 
@@ -194,8 +206,8 @@ public class CommandBlockRunner extends AbstractCommandRunner
 		// create context
 		Ruby runtime = this.getRuntime();
 		ThreadContext threadContext = runtime.getCurrentContext();
-		IRubyObject rubyContext = ScriptUtils.instantiateClass(runtime, ScriptUtils.RUBLE_MODULE,
-				CONTEXT_RUBY_CLASS, JavaEmbedUtils.javaToRuby(runtime, context));
+		IRubyObject rubyContext = ScriptUtils.instantiateClass(runtime, ScriptUtils.RUBLE_MODULE, CONTEXT_RUBY_CLASS,
+				JavaEmbedUtils.javaToRuby(runtime, context));
 		String resultText = null;
 
 		// assume that we've executed successfully
@@ -204,8 +216,8 @@ public class CommandBlockRunner extends AbstractCommandRunner
 		try
 		{
 			// invoke the block
-			IRubyObject result = this.getCommand().getInvokeBlock().call(threadContext,
-					new IRubyObject[] { rubyContext });
+			IRubyObject result = this.getCommand().getInvokeBlock()
+					.call(threadContext, new IRubyObject[] { rubyContext });
 
 			// TODO: not sure if we need to perform the closing here or not. This will be
 			// resolved once we rework CommandExecutionUtils to support async calls. That's
@@ -245,7 +257,7 @@ public class CommandBlockRunner extends AbstractCommandRunner
 				else
 				{
 					executionFailed(command, e);
-				}				
+				}
 			}
 			else
 			{
@@ -355,7 +367,7 @@ public class CommandBlockRunner extends AbstractCommandRunner
 		if (ostream != null)
 		{
 			RubyIO io = new RubyIO(runtime, ostream);
-			
+
 			io.getOpenFile().getMainStream().setSync(true);
 			setConsole(io);
 		}

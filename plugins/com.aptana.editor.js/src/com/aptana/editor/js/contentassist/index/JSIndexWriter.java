@@ -116,9 +116,18 @@ public class JSIndexWriter
 		String examplesKey = this.writeExamples(index, function.getExamples(), location);
 		String sinceListKey = this.writeSinceList(index, function.getSinceList(), location);
 
-		String value = StringUtil.join(JSIndexConstants.DELIMITER, function.getName(), function.getOwningType(), descriptionKey, functionTypesKey,
-			parametersKey, returnTypesKey, examplesKey, sinceListKey, StringUtil.join(JSIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, function
-				.getUserAgents())));
+		String value = StringUtil.join( //
+			JSIndexConstants.DELIMITER, //
+			function.getOwningType(), //
+			function.getName(), //
+			descriptionKey, //
+			functionTypesKey, //
+			parametersKey, //
+			returnTypesKey, //
+			examplesKey, //
+			sinceListKey, //
+			StringUtil.join(JSIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, function.getUserAgents())) //
+		);
 
 		index.addEntry(JSIndexConstants.FUNCTION, value, location);
 	}
@@ -167,8 +176,16 @@ public class JSIndexWriter
 		String examplesKey = this.writeExamples(index, property.getExamples(), location);
 		String sinceListKey = this.writeSinceList(index, property.getSinceList(), location);
 
-		String value = StringUtil.join(JSIndexConstants.DELIMITER, property.getName(), property.getOwningType(), descriptionKey, propertyTypesKey, examplesKey,
-			sinceListKey, StringUtil.join(JSIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, property.getUserAgents())));
+		String value = StringUtil.join( //
+			JSIndexConstants.DELIMITER, //
+			property.getOwningType(), //
+			property.getName(), //
+			descriptionKey, //
+			propertyTypesKey, //
+			examplesKey, //
+			sinceListKey, //
+			StringUtil.join(JSIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, property.getUserAgents())) //
+		);
 
 		index.addEntry(JSIndexConstants.PROPERTY, value, location);
 	}
@@ -313,12 +330,12 @@ public class JSIndexWriter
 		{
 			// get key
 			key = userAgent.getKey();
-			
+
 			// see if it has been written already
 			JSIndexReader reader = new JSIndexReader();
-			
+
 			UserAgentElement diskUserAgent = null;
-			
+
 			try
 			{
 				diskUserAgent = reader.getUserAgent(key);
@@ -327,16 +344,16 @@ public class JSIndexWriter
 			{
 				Activator.logError(e.getMessage(), e);
 			}
-			
+
 			// write to index, if we didn't have it there already
 			if (diskUserAgent == null)
 			{
 				Index index = JSIndexQueryHelper.getIndex();
-	
+
 				// store user agent in index so we can recover it during the next session
 				String[] columns = new String[] { key, userAgent.getDescription(), userAgent.getOS(), userAgent.getPlatform(), userAgent.getVersion() };
 				String value = StringUtil.join(JSIndexConstants.DELIMITER, columns);
-	
+
 				index.addEntry(JSIndexConstants.USER_AGENT, value, this.getDocumentPath());
 			}
 

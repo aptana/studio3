@@ -51,15 +51,15 @@ public final class ExecutableUtil
 		if (Platform.OS_WIN32.equals(Platform.getOS()))
 		{
 			String[] paths;
-			if (env != null && env.containsKey("PATH")) {
-				paths = env.get("PATH").split(ShellExecutable.PATH_SEPARATOR);
+			if (env != null && env.containsKey("PATH")) { //$NON-NLS-1$
+				paths = env.get("PATH").split(ShellExecutable.PATH_SEPARATOR); //$NON-NLS-1$
 				for( int i = 0; i < paths.length; ++i) {
-					if (paths[i].matches("^/(.)/.*")) {
-						paths[i] = paths[i].replaceFirst("^/(.)/", "$1:/");
+					if (paths[i].matches("^/(.)/.*")) { //$NON-NLS-1$
+						paths[i] = paths[i].replaceFirst("^/(.)/", "$1:/"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				}
 			} else {
-				String pathENV = System.getenv("PATH");
+				String pathENV = System.getenv("PATH"); //$NON-NLS-1$
 				paths = pathENV.split(File.pathSeparator);
 			}
 			// Grab PATH and search it!

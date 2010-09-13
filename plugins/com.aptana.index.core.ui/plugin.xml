@@ -103,6 +103,9 @@
                      <instanceof
                            value="org.eclipse.core.resources.IFolder">
                      </instanceof>
+                     <instanceof
+                           value="org.eclipse.core.resources.IFile">
+                     </instanceof>
                   </or>
                   <test
                         forcePluginActivation="true"
@@ -126,6 +129,9 @@
                      </instanceof>
                      <instanceof
                            value="org.eclipse.core.resources.IFolder">
+                     </instanceof>
+                     <instanceof
+                           value="org.eclipse.core.resources.IFile">
                      </instanceof>
                   </or>
                   <test

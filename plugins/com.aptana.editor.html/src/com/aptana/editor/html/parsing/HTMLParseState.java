@@ -13,6 +13,7 @@ import com.aptana.parsing.ParseState;
 public class HTMLParseState extends ParseState
 {
 
+	// FIXME This is incorrect. These tags need to be determined at runtime based on the document type!
 	@SuppressWarnings("nls")
 	private static final String[] END_OPTIONAL_TAGS = { "body", "colgroup", "dd", "dt", "area", "html", "li", "option",
 			"p", "tbody", "td", "tfoot", "th", "thead", "tr" };

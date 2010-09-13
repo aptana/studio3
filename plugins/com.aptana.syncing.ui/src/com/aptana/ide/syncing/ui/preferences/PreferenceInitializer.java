@@ -56,8 +56,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		store.setDefault(IPreferenceConstants.SHOW_SYNC_EXPLORER_TABLE, true);
 		store.setDefault(IPreferenceConstants.SHOW_DATE, true);
 		store.setDefault(IPreferenceConstants.SHOW_SIZE, true);
-		store.setDefault(IPreferenceConstants.FILE_PERMISSION, "-rw-rw-rw-");
-		store.setDefault(IPreferenceConstants.DIRECTORY_PERMISSION, "drwxrwxrwx");
+		store.setDefault(IPreferenceConstants.FILE_PERMISSION, "-rw-rw-rw-"); //$NON-NLS-1$
+		store.setDefault(IPreferenceConstants.DIRECTORY_PERMISSION, "drwxrwxrwx"); //$NON-NLS-1$
 	}
-
 }

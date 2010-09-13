@@ -68,7 +68,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.ui.ISharedImages;
@@ -546,7 +545,7 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 			{
 				IFileStore sourceStore = SyncUtils.getFileStore(fSource.getCurrentInput());
 				IFileStore targetStore = SyncUtils.getFileStore(fTarget.getCurrentInput());
-				dialog = new SmartSyncDialog(Display.getDefault().getActiveShell(), source, dest, sourceStore, targetStore,
+				dialog = new SmartSyncDialog(UIUtils.getActiveShell(), source, dest, sourceStore, targetStore,
 						source.getName(), dest.getName());
 			}
 			else
@@ -562,7 +561,7 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 				{
 					IOUIPlugin.refreshNavigatorView(fSource.getCurrentInput());
 					IOUIPlugin.refreshNavigatorView(fTarget.getCurrentInput());
-					Display.getDefault().asyncExec(new Runnable()
+					UIUtils.getDisplay().asyncExec(new Runnable()
 					{
 
 						public void run()
@@ -576,12 +575,8 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 		}
 		catch (CoreException e)
 		{
-			ErrorDialog
-					.openError(
-							Display.getDefault().getActiveShell(),
-							"Error opening Synchronize dialog",
-							"Unable to open synchronize dialog. It appears either the source or destination endpoint is invalid",
-							e.getStatus());
+			ErrorDialog.openError(UIUtils.getActiveShell(), Messages.FTPManagerComposite_SyncErrorDialog_Title,
+					Messages.FTPManagerComposite_SyncErrorDialog_Message, e.getStatus());
 		}
 	}
 

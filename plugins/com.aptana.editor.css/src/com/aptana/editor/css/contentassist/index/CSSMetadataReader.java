@@ -34,13 +34,17 @@
  */
 package com.aptana.editor.css.contentassist.index;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.xml.sax.Attributes;
 
 import com.aptana.editor.common.contentassist.MetadataReader;
+import com.aptana.editor.css.Activator;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
 import com.aptana.editor.css.contentassist.model.SpecificationElement;
@@ -375,6 +379,14 @@ public class CSSMetadataReader extends MetadataReader
 	@Override
 	protected InputStream getSchemaStream()
 	{
-		return this.getClass().getResourceAsStream(METADATA_SCHEMA_XML);
+		try
+		{
+			return FileLocator.openStream(Activator.getDefault().getBundle(),
+					Path.fromPortableString(METADATA_SCHEMA_XML), false);
+		}
+		catch (IOException e)
+		{
+			return this.getClass().getResourceAsStream(METADATA_SCHEMA_XML);
+		}
 	}
 }

@@ -2,7 +2,7 @@ package com.aptana.editor.html.contentassist;
 
 import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.LocationType;
 
-public class ContentAssistFineLocationTests extends LocationTests
+public class ContentAssistFineLocationTests extends LocationTestCase
 {
 	/**
 	 * testOpenBracket
