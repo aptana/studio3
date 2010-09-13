@@ -654,7 +654,7 @@ public class BundleManager
 
 		return result;
 	}
-	
+
 	/**
 	 * getBundleEnvs
 	 * 

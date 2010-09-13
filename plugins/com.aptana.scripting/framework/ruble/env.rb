@@ -1,11 +1,8 @@
 module Ruble
   class Env < BaseElement
     def initialize(scope, &block)
-      super("snippet#{java.lang.System.currentTimeMillis}")
+      super("snippet-#{java.util.UUID.randomUUID().toString()}")
 
-      bundle = BundleManager.bundle_from_path(path)
-      bundle.apply_defaults(self) unless bundle.nil?
-     
       @jobj.set_invoke_block(&block)
       @jobj.setScope(scope)
     end
@@ -15,16 +12,16 @@ module Ruble
     def create_java_object
       com.aptana.scripting.model.EnvironmentElement.new($fullpath)
     end
-    
+
     class << self
       def define_variables(scope, &block)
         log_info("loading env variable contributor #{scope}")
-        
+
         e = Env.new(scope, &block)
-        
+
         # add env modifier to bundle
         bundle = BundleManager.bundle_from_path(e.path)
-        
+
         if !bundle.nil?
           bundle.add_env(e)
         else

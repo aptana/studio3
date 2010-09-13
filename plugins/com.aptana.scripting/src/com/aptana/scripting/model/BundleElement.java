@@ -40,7 +40,7 @@ public class BundleElement extends AbstractElement
 
 	private Map<ScopeSelector, RubyRegexp> _foldingStartMarkers;
 	private Map<ScopeSelector, RubyRegexp> _foldingStopMarkers;
-	
+
 	private Map<ScopeSelector, RubyRegexp> _increaseIndentMarkers;
 	private Map<ScopeSelector, RubyRegexp> _decreaseIndentMarkers;
 
@@ -101,7 +101,7 @@ public class BundleElement extends AbstractElement
 			BundleManager.getInstance().fireElementAddedEvent(command);
 		}
 	}
-	
+
 	/**
 	 * addEnv
 	 * 
@@ -185,7 +185,7 @@ public class BundleElement extends AbstractElement
 			{
 				this._fileTypeRegistry = new HashMap<String, String>();
 			}
-			
+
 			this._fileTypeRegistry.put(filePattern, scope);
 		}
 	}
@@ -283,7 +283,7 @@ public class BundleElement extends AbstractElement
 
 		return result;
 	}
-	
+
 	/**
 	 * getEnvs
 	 * 
@@ -380,7 +380,7 @@ public class BundleElement extends AbstractElement
 		{
 			return Collections.emptyMap();
 		}
-		
+
 		return Collections.unmodifiableMap(this._foldingStartMarkers);
 	}
 
@@ -395,10 +395,10 @@ public class BundleElement extends AbstractElement
 		{
 			return Collections.emptyMap();
 		}
-		
+
 		return Collections.unmodifiableMap(this._foldingStopMarkers);
 	}
-	
+
 	/**
 	 * getFoldingStartMarkers
 	 * 
@@ -410,7 +410,7 @@ public class BundleElement extends AbstractElement
 		{
 			return Collections.emptyMap();
 		}
-		
+
 		return Collections.unmodifiableMap(this._increaseIndentMarkers);
 	}
 
@@ -425,7 +425,7 @@ public class BundleElement extends AbstractElement
 		{
 			return Collections.emptyMap();
 		}
-		
+
 		return Collections.unmodifiableMap(this._decreaseIndentMarkers);
 	}
 
@@ -457,7 +457,7 @@ public class BundleElement extends AbstractElement
 	public List<String> getLoadPaths()
 	{
 		List<String> result = new LinkedList<String>();
-		
+
 		result.add(BundleUtils.getBundleLibDirectory(this.getBundleDirectory()));
 
 		return result;
@@ -512,7 +512,7 @@ public class BundleElement extends AbstractElement
 
 		return result;
 	}
-	
+
 	/**
 	 * hasMenus
 	 * 
@@ -722,16 +722,17 @@ public class BundleElement extends AbstractElement
 	 */
 	public void setFoldingMarkers(String scope, RubyRegexp startRegexp, RubyRegexp endRegexp)
 	{
-		if (!StringUtil.isEmpty(scope) && startRegexp != null && startRegexp.isNil() == false && endRegexp != null && endRegexp.isNil() == false)
+		if (!StringUtil.isEmpty(scope) && startRegexp != null && startRegexp.isNil() == false && endRegexp != null
+				&& endRegexp.isNil() == false)
 		{
 			// store starting regular expression
 			if (this._foldingStartMarkers == null)
 			{
 				this._foldingStartMarkers = new HashMap<ScopeSelector, RubyRegexp>();
 			}
-			
+
 			this._foldingStartMarkers.put(new ScopeSelector(scope), startRegexp);
-			
+
 			// store ending regular expression
 			if (this._foldingStopMarkers == null)
 			{
@@ -741,7 +742,7 @@ public class BundleElement extends AbstractElement
 			this._foldingStopMarkers.put(new ScopeSelector(scope), endRegexp);
 		}
 	}
-	
+
 	/**
 	 * setIndentMarkers
 	 * 
@@ -751,16 +752,17 @@ public class BundleElement extends AbstractElement
 	 */
 	public void setIndentMarkers(String scope, RubyRegexp startRegexp, RubyRegexp endRegexp)
 	{
-		if (!StringUtil.isEmpty(scope) && startRegexp != null && startRegexp.isNil() == false && endRegexp != null && endRegexp.isNil() == false)
+		if (!StringUtil.isEmpty(scope) && startRegexp != null && startRegexp.isNil() == false && endRegexp != null
+				&& endRegexp.isNil() == false)
 		{
 			// store increasing regular expression
 			if (this._increaseIndentMarkers == null)
 			{
 				this._increaseIndentMarkers = new HashMap<ScopeSelector, RubyRegexp>();
 			}
-			
+
 			this._increaseIndentMarkers.put(new ScopeSelector(scope), startRegexp);
-			
+
 			// store decreasing regular expression
 			if (this._decreaseIndentMarkers == null)
 			{
@@ -811,9 +813,9 @@ public class BundleElement extends AbstractElement
 		this._visible = flag;
 	}
 
-
 	/**
 	 * getFileTypes
+	 * 
 	 * @return
 	 */
 	List<String> getFileTypes()
