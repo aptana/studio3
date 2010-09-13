@@ -19,6 +19,10 @@ module Ruble
     def add_command(command)
       @jobj.add_command command.java_object
     end
+    
+    def add_env(env)
+      @jobj.add_env env.java_object
+    end
 
     def add_menu(menu)
       @jobj.add_menu menu.java_object

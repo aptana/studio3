@@ -654,6 +654,30 @@ public class BundleManager
 
 		return result;
 	}
+	
+	/**
+	 * getBundleEnvs
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public EnvironmentElement[] getBundleEnvs(String name)
+	{
+		EnvironmentElement[] result = new EnvironmentElement[0];
+
+		synchronized (entryNamesLock)
+		{
+			if (this._entriesByName != null && this._entriesByName.containsKey(name))
+			{
+				// grab all bundles of the given name
+				BundleEntry entry = this._entriesByName.get(name);
+
+				result = entry.getEnvs();
+			}
+		}
+
+		return result;
+	}
 
 	/**
 	 * getBundleDirectory
@@ -1902,5 +1926,41 @@ public class BundleManager
 			}
 			return false;
 		}
+	}
+
+	public List<EnvironmentElement> getEnvs(IModelFilter filter)
+	{
+
+		IModelFilter caFilter = new IModelFilter()
+		{
+
+			@Override
+			public boolean include(AbstractElement element)
+			{
+				return element instanceof EnvironmentElement;
+			}
+		};
+		if (filter != null)
+		{
+			filter = new AndFilter(filter, caFilter);
+		}
+		else
+		{
+			filter = caFilter;
+		}
+
+		List<EnvironmentElement> result = new ArrayList<EnvironmentElement>();
+		for (String name : this.getBundleNames())
+		{
+			for (EnvironmentElement command : this.getBundleEnvs(name))
+			{
+				if (filter.include(command))
+				{
+					result.add(command);
+				}
+			}
+		}
+
+		return result;
 	}
 }

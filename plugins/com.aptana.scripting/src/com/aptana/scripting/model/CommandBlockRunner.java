@@ -17,6 +17,7 @@ import org.jruby.RubyGlobal.InputGlobalVariable;
 import org.jruby.RubyGlobal.OutputGlobalVariable;
 import org.jruby.RubyHash;
 import org.jruby.RubyIO;
+import org.jruby.RubyProc;
 import org.jruby.RubySystemExit;
 import org.jruby.exceptions.RaiseException;
 import org.jruby.javasupport.JavaEmbedUtils;
@@ -24,6 +25,8 @@ import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.scripting.ScriptUtils;
+import com.aptana.scripting.model.filters.IModelFilter;
+import com.aptana.scripting.model.filters.ScopeFilter;
 
 public class CommandBlockRunner extends AbstractCommandRunner
 {
@@ -96,7 +99,16 @@ public class CommandBlockRunner extends AbstractCommandRunner
 			// save copy for later
 			this._originalEnvironment = (RubyHash) hash.dup();
 
-			hash.putAll(this.getContributedEnvironment());
+			hash.putAll(this.getContributedEnvironment());			
+			
+			// Grab all the matching env objects contributed via bundles that have scope matching!
+			IModelFilter filter = new ScopeFilter((String) hash.get("TM_CURRENT_SCOPE")); //$NON-NLS-1$
+			List<EnvironmentElement> envs = BundleManager.getInstance().getEnvs(filter);
+			for (EnvironmentElement e : envs)
+			{
+				RubyProc invoke = e.getInvokeBlock();				
+				invoke.call(runtime.getCurrentContext(), new IRubyObject[] { hash });
+			}
 		}
 	}
 

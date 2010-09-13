@@ -28,10 +28,12 @@ public class BundleElement extends AbstractElement
 	private BundlePrecedence _bundlePrecedence;
 	private List<MenuElement> _menus;
 	private List<CommandElement> _commands;
+	private List<EnvironmentElement> _envs;
 	private boolean _visible;
 
 	private Object menuLock = new Object();
 	private Object commandLock = new Object();
+	private Object envLock = new Object();
 
 	private Map<String, String> _fileTypeRegistry;
 	private List<String> fileTypes;
@@ -97,6 +99,33 @@ public class BundleElement extends AbstractElement
 
 			// fire add event
 			BundleManager.getInstance().fireElementAddedEvent(command);
+		}
+	}
+	
+	/**
+	 * addEnv
+	 * 
+	 * @param env
+	 */
+	public void addEnv(EnvironmentElement env)
+	{
+		if (env != null)
+		{
+			synchronized (envLock)
+			{
+				if (this._envs == null)
+				{
+					this._envs = new ArrayList<EnvironmentElement>();
+				}
+
+				// NOTE: Should we prevent the same element from being added twice?
+				this._envs.add(env);
+			}
+
+			env.setOwningBundle(this);
+
+			// fire add event
+			BundleManager.getInstance().fireElementAddedEvent(env);
 		}
 	}
 
@@ -249,6 +278,26 @@ public class BundleElement extends AbstractElement
 			if (this._commands != null && this._commands.size() > 0)
 			{
 				result = this._commands.toArray(new CommandElement[this._commands.size()]);
+			}
+		}
+
+		return result;
+	}
+	
+	/**
+	 * getEnvs
+	 * 
+	 * @return
+	 */
+	public EnvironmentElement[] getEnvs()
+	{
+		EnvironmentElement[] result = new EnvironmentElement[0];
+
+		synchronized (envLock)
+		{
+			if (this._envs != null && this._envs.size() > 0)
+			{
+				result = this._envs.toArray(new EnvironmentElement[this._envs.size()]);
 			}
 		}
 

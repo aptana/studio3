@@ -204,6 +204,38 @@ public class BundleEntry
 
 		return result.toArray(new CommandElement[result.size()]);
 	}
+	
+	/**
+	 * getEnvs
+	 * 
+	 * @return
+	 */
+	public EnvironmentElement[] getEnvs()
+	{
+		final Set<String> names = new HashSet<String>();
+		final List<EnvironmentElement> result = new ArrayList<EnvironmentElement>();
+
+		this.processBundles(new BundleProcessor()
+		{
+			public boolean processBundle(BundleEntry entry, BundleElement bundle)
+			{
+				for (EnvironmentElement command : bundle.getEnvs())
+				{
+					String name = command.getDisplayName();
+
+					if (names.contains(name) == false)
+					{
+						names.add(name);
+						result.add(command);
+					}
+				}
+
+				return true;
+			}
+		});
+
+		return result.toArray(new EnvironmentElement[result.size()]);
+	}
 
 	/**
 	 * getContributingBundles
