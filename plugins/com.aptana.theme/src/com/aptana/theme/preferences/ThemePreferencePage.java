@@ -57,6 +57,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -424,25 +425,58 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			public void mouseDown(MouseEvent e)
 			{
 				Table table = tableViewer.getTable();
-				// If user is clicking in the BG column when it's empty, pop open a color dialog
-				int myX = table.getColumn(0).getWidth();
-				myX += table.getColumn(1).getWidth();
-				int width = table.getColumn(2).getWidth() + 2;
-				if (!(e.x > myX && e.x < (myX + width)))
-					return;
-				TableItem tableItem = table.getItem(new Point(e.x, e.y));
-				ColorDialog colorDialog = new ColorDialog(table.getShell());
-				colorDialog.setRGB(getTheme().getBackground());
-				RGB newRGB = colorDialog.open();
-				if (newRGB == null)
-					return;
-				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) tableItem.getData();
-				Color fg = token.getValue().getForeground();
-				Color bg = ThemePlugin.getDefault().getColorManager().getColor(newRGB);
+				// If user is clicking in the FG/BG column when it's empty, pop open a color dialog
+				int fgColX = table.getColumn(0).getWidth(); // scope col width
+				int fgColWidth = table.getColumn(1).getWidth(); // fg col width
+				int bgColX = fgColX + fgColWidth;
+				int bgColWidth = table.getColumn(2).getWidth() + 2;
 
+				Map.Entry<String, TextAttribute> token = null;
+				Color fg = null;
+				Color bg = null;
+				if (e.x > fgColX && e.x < (fgColX + fgColWidth))
+				{
+					// user clicked in FG column
+					ColorDialog colorDialog = new ColorDialog(table.getShell());
+					colorDialog.setRGB(getTheme().getForeground());
+					RGB newRGB = colorDialog.open();
+					if (newRGB == null)
+					{
+						return; // no color selected, don't change a thing!
+					}
+					TableItem tableItem = table.getItem(new Point(e.x, e.y));
+					token = (Map.Entry<String, TextAttribute>) tableItem.getData();
+					fg = ThemePlugin.getDefault().getColorManager().getColor(newRGB);
+					bg = token.getValue().getBackground();
+				}
+				else if (e.x > bgColX && e.x < (bgColX + bgColWidth)) // is user clicking in the BG column?
+				{
+					ColorDialog colorDialog = new ColorDialog(table.getShell());
+					colorDialog.setRGB(getTheme().getBackground());
+					RGB newRGB = colorDialog.open();
+					if (newRGB == null)
+					{
+						return; // no color selected, don't change a thing!
+					}
+					TableItem tableItem = table.getItem(new Point(e.x, e.y));
+					token = (Map.Entry<String, TextAttribute>) tableItem.getData();
+					fg = token.getValue().getForeground();
+					bg = ThemePlugin.getDefault().getColorManager().getColor(newRGB);
+				}
+				else
+				{
+					return;
+				}
+
+				// Update the token's colors in our theme
 				TextAttribute at = new TextAttribute(fg, bg, token.getValue().getStyle(), token.getValue().getFont());
 				getTheme().update(token.getKey(), at);
 				setTheme(fSelectedTheme);
+
+				// Need to update the drawing of this row in the table!
+				TableItem tableItem = table.getItem(new Point(e.x, e.y));
+				Rectangle bounds = tableItem.getBounds(1);
+				table.redraw(bounds.x, bounds.y, bounds.width, bounds.height, true);
 			}
 		});
 
