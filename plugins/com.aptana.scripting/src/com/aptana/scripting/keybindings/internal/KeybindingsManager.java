@@ -60,10 +60,11 @@ import org.eclipse.ui.services.IEvaluationService;
 
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
+import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.LoadCycleListener;
-import com.aptana.scripting.model.SnippetElement;
+import com.aptana.scripting.model.filters.IModelFilter;
 
 @SuppressWarnings("restriction")
 public class KeybindingsManager implements LoadCycleListener
@@ -203,9 +204,10 @@ public class KeybindingsManager implements LoadCycleListener
 	private final Set<KeySequence> uniqueKeySequences;
 	private final Set<KeySequence> uniqueKeySequencesPrefixes;
 
+	private Job workbenchJob;
+
 	/**
 	 * Install the KeybindingsManager.
-	 *
 	 */
 	public static void install()
 	{
@@ -221,7 +223,6 @@ public class KeybindingsManager implements LoadCycleListener
 
 	/**
 	 * Uninstall the KeybindingsManager.
-	 *
 	 */
 	public static void uninstall()
 	{
@@ -318,26 +319,42 @@ public class KeybindingsManager implements LoadCycleListener
 
 	private void reloadbindings()
 	{
-		WorkbenchJob workbenchJob = new WorkbenchJob("Reloading KeybindingsManager") //$NON-NLS-1$
+		if (workbenchJob == null)
 		{
-			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor)
+			workbenchJob = new Job("Reloading KeybindingsManager") //$NON-NLS-1$
 			{
-				try
+				@Override
+				public IStatus run(IProgressMonitor monitor)
 				{
-					loadbindings();
+					if (monitor != null && monitor.isCanceled())
+					{
+						return Status.CANCEL_STATUS;
+					}
+					try
+					{
+						loadbindings();
+					}
+					finally
+					{
+					}
+					return Status.OK_STATUS;
 				}
-				finally
-				{
-				}
-				return Status.OK_STATUS;
-			}
 
-		};
-		workbenchJob.setRule(MUTEX_RULE);
-		workbenchJob.setSystem(true);
-		workbenchJob.setPriority(Job.LONG);
-		workbenchJob.schedule();
+				public boolean shouldRun()
+				{
+					return PlatformUI.isWorkbenchRunning();
+				};
+
+			};
+			workbenchJob.setRule(MUTEX_RULE);
+			workbenchJob.setSystem(true);
+			workbenchJob.setPriority(Job.LONG);
+		}
+		else
+		{
+			workbenchJob.cancel();
+		}
+		workbenchJob.schedule(100);
 	}
 
 	private void loadbindings()
@@ -348,16 +365,30 @@ public class KeybindingsManager implements LoadCycleListener
 		uniqueKeySequences.clear();
 		uniqueKeySequencesPrefixes.clear();
 
-		// Get all commands
-		CommandElement[] commands = bundleManager.getCommands();
+		// Filter to commands with bindings
+		IModelFilter filter = new IModelFilter()
+		{
+
+			@Override
+			public boolean include(AbstractElement element)
+			{
+				boolean result = false;
+
+				if (element instanceof CommandElement)
+				{
+					CommandElement node = (CommandElement) element;
+					String[] bindings = node.getKeyBindings();
+					result = (bindings != null && bindings.length > 0);
+				}
+
+				return result;
+			}
+		};
+
+		// Get all commands with bindings
+		CommandElement[] commands = bundleManager.getCommands(filter);
 		for (CommandElement commandElement : commands)
 		{
-			// Skip snippets
-			if (commandElement instanceof SnippetElement)
-			{
-				continue;
-			}
-
 			// Get key sequences
 			KeySequence[] keySequences = commandElement.getKeySequences();
 			if (keySequences != null && keySequences.length > 0)
@@ -386,7 +417,7 @@ public class KeybindingsManager implements LoadCycleListener
 
 	/**
 	 * Set the enabled state of KeybindingsManager.
-	 *
+	 * 
 	 * @param enabled
 	 */
 	private void setEnabled(boolean enabled)
@@ -471,7 +502,7 @@ public class KeybindingsManager implements LoadCycleListener
 						resetState();
 					}
 
-					//  Do not consume the event. Let Eclipse handle it.
+					// Do not consume the event. Let Eclipse handle it.
 					return false;
 				}
 				else
@@ -532,7 +563,7 @@ public class KeybindingsManager implements LoadCycleListener
 
 	/**
 	 * Reset the state if the active window associated with the state changes.
-	 *
+	 * 
 	 * @param window
 	 */
 	private void checkActiveWindow(IWorkbenchWindow window)
@@ -546,7 +577,7 @@ public class KeybindingsManager implements LoadCycleListener
 
 	/**
 	 * Changes the key binding state to the given key sequence.
-	 *
+	 * 
 	 * @param sequence
 	 *            The new key sequence for the state; should not be <code>null</code>.
 	 */
@@ -582,11 +613,11 @@ public class KeybindingsManager implements LoadCycleListener
 				Point cursorLocation = display.getCursorLocation();
 				if (initialLocation != null)
 				{
-//					Warp the cursor ?
-//					if (!cursorLocation.equals(initialLocation))
-//					{
-//						display.setCursorLocation(initialLocation);
-//					}
+					// Warp the cursor ?
+					// if (!cursorLocation.equals(initialLocation))
+					// {
+					// display.setCursorLocation(initialLocation);
+					// }
 					return initialLocation;
 				}
 				return cursorLocation;
@@ -635,11 +666,8 @@ public class KeybindingsManager implements LoadCycleListener
 						{
 							String name = originalParameterizedCommand.getName();
 							final TableItem item = new TableItem(commandElementTable, SWT.NULL);
-							item
-									.setText(new String[] {
-											name,
-											(mnemonic < MNEMONICS.length() ? String.valueOf(MNEMONICS
-													.charAt(mnemonic++)) : "") }); //$NON-NLS-1$
+							item.setText(new String[] { name,
+									(mnemonic < MNEMONICS.length() ? String.valueOf(MNEMONICS.charAt(mnemonic++)) : "") }); //$NON-NLS-1$
 							item.setData(ParameterizedCommand.class.getName(), originalParameterizedCommand);
 						}
 						catch (NotDefinedException nde)
@@ -804,7 +832,7 @@ public class KeybindingsManager implements LoadCycleListener
 	/**
 	 * Performs the actual execution of the command by looking up the current handler from the command manager. If there
 	 * is a handler and it is enabled, then it tries the actual execution. Execution failures are logged.
-	 *
+	 * 
 	 * @param binding
 	 *            The binding that should be executed; should not be <code>null</code>.
 	 * @param trigger

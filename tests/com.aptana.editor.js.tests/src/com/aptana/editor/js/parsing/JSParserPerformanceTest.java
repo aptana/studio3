@@ -230,13 +230,72 @@ public class JSParserPerformanceTest extends TestCase
 	}
 
 	/**
-	 * testRegress
+	 * testJaxerFiles
 	 * 
 	 * @throws Exception
 	 */
-	public void testRegress() throws Exception
+	public void testJaxerFiles() throws Exception
 	{
-		timeParse("performance/regress-155081-2.js");
+		timeParse("performance/jaxer/11.2.2-1-n.js");
+		timeParse("performance/jaxer/15.10.6.2-2.js");
+		timeParse("performance/jaxer/15.5.4.7-2.js");
+		timeParse("performance/jaxer/15.9.5.21-3.js");
+		timeParse("performance/jaxer/ComposerCommands.js");
+		timeParse("performance/jaxer/DBAPI.js");
+		timeParse("performance/jaxer/DOMTestCase.js");
+		timeParse("performance/jaxer/Microformats.js");
+		timeParse("performance/jaxer/MochiKit_packed.js");
+		timeParse("performance/jaxer/SimpleTest.js");
+		timeParse("performance/jaxer/TestCachePerformance.js");
+		timeParse("performance/jaxer/UDDITypes.js");
+		timeParse("performance/jaxer/browser_bug_411172.js");
+		timeParse("performance/jaxer/clientBothProperty.js");
+		timeParse("performance/jaxer/commands.js");
+		timeParse("performance/jaxer/crlManager.js");
+		timeParse("performance/jaxer/dojo.js");
+		timeParse("performance/jaxer/dom.js");
+		timeParse("performance/jaxer/editor.js");
+		timeParse("performance/jaxer/effects.js");
+		timeParse("performance/jaxer/file-utils.js");
+		timeParse("performance/jaxer/head_urlformatter.js");
+		timeParse("performance/jaxer/httpd.js");
+		timeParse("performance/jaxer/ifaceinfotest.js");
+		timeParse("performance/jaxer/irc.js");
+		timeParse("performance/jaxer/jquery-1.2.1.js");
+		timeParse("performance/jaxer/jquery-1.2.6.min.js");
+		timeParse("performance/jaxer/jquery-stable.js");
+		timeParse("performance/jaxer/jquery.js");
+		timeParse("performance/jaxer/lexical-008.js");
+		timeParse("performance/jaxer/messages.js");
+		timeParse("performance/jaxer/narcissus-exec.js");
+		timeParse("performance/jaxer/nsDragAndDrop.js");
+		timeParse("performance/jaxer/packed.js");
+		timeParse("performance/jaxer/perlstress-001.js");
+		timeParse("performance/jaxer/perlstress-002.js");
+		timeParse("performance/jaxer/property_database.js");
+		timeParse("performance/jaxer/prototype.js");
+		timeParse("performance/jaxer/publishprefs.js");
+		timeParse("performance/jaxer/regress-100199.js");
+		timeParse("performance/jaxer/regress-111557.js");
+		timeParse("performance/jaxer/regress-155081-2.js");
+		timeParse("performance/jaxer/regress-192226.js");
+		timeParse("performance/jaxer/regress-244470.js");
+		timeParse("performance/jaxer/regress-309925-02.js");
+		timeParse("performance/jaxer/regress-76054.js");
+		timeParse("performance/jaxer/regress-98901.js");
+		timeParse("performance/jaxer/scriptaculous.js");
+		timeParse("performance/jaxer/split-002.js");
+		timeParse("performance/jaxer/test_413784.js");
+		timeParse("performance/jaxer/test_423515_forceCopyShortcuts.js");
+		timeParse("performance/jaxer/test_bug364285-1.js");
+		timeParse("performance/jaxer/test_bug374754.js");
+		timeParse("performance/jaxer/test_multi_statements.js");
+		timeParse("performance/jaxer/test_prepare_insert_update.js");
+		timeParse("performance/jaxer/tip_followscroll.js");
+		timeParse("performance/jaxer/tree-utils.js");
+		timeParse("performance/jaxer/utils.js");
+		timeParse("performance/jaxer/xpath.js");
+		timeParse("performance/jaxer/xslt_script.js");
 	}
 	
 	/**
