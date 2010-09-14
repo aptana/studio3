@@ -9,12 +9,12 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveListener;
+import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWindowListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
-import org.eclipse.ui.internal.WorkbenchPage;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -40,7 +40,7 @@ public class ExplorerPlugin extends AbstractUIPlugin
 		@Override
 		public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective)
 		{
-			setCommandState(((WorkbenchPage) page).getActivePerspective().findView(IExplorerUIConstants.VIEW_ID) != null);
+			setCommandState(findView(page, IExplorerUIConstants.VIEW_ID) != null);
 		}
 
 		@Override
@@ -48,14 +48,14 @@ public class ExplorerPlugin extends AbstractUIPlugin
 		{
 			if (changeId.equals(IWorkbenchPage.CHANGE_VIEW_HIDE))
 			{
-				if (((WorkbenchPage) page).getActivePerspective().findView(IExplorerUIConstants.VIEW_ID) == null)
+				if (findView(page, IExplorerUIConstants.VIEW_ID) == null)
 				{
 					setCommandState(false);
 				}
 			}
 			else if (changeId.equals(IWorkbenchPage.CHANGE_VIEW_SHOW))
 			{
-				if (((WorkbenchPage) page).getActivePerspective().findView(IExplorerUIConstants.VIEW_ID) != null)
+				if (findView(page, IExplorerUIConstants.VIEW_ID) != null)
 				{
 					setCommandState(true);
 				}
@@ -102,6 +102,20 @@ public class ExplorerPlugin extends AbstractUIPlugin
 	 */
 	public ExplorerPlugin()
 	{
+	}
+
+	protected IViewReference findView(IWorkbenchPage page, String viewId)
+	{
+		IViewReference refs[] = page.getViewReferences();
+		for (int i = 0; i < refs.length; i++)
+		{
+			IViewReference ref = refs[i];
+			if (viewId.equals(ref.getId()))
+			{
+				return ref;
+			}
+		}
+		return null;
 	}
 
 	/*
