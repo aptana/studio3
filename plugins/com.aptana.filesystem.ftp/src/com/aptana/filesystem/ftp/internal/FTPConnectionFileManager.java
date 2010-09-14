@@ -88,6 +88,7 @@ import com.enterprisedt.net.ftp.FTPMessageListener;
 import com.enterprisedt.net.ftp.FTPOutputStream;
 import com.enterprisedt.net.ftp.FTPReply;
 import com.enterprisedt.net.ftp.FTPTransferType;
+import com.enterprisedt.net.ftp.MalformedReplyException;
 import com.enterprisedt.net.ftp.pro.ProFTPClient;
 
 /**
@@ -1064,6 +1065,8 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 		if (statSupported != Boolean.FALSE) {
 			try {
 				ftpFiles = ftpSTAT(dirPath.addTrailingSeparator().toPortableString());
+			} catch (MalformedReplyException e) {
+				statSupported = Boolean.FALSE;
 			} catch (FTPException e) {
 				if (e.getReplyCode() == 501 || e.getReplyCode() == 502) {
 					statSupported = null;
