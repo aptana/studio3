@@ -107,10 +107,10 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 			return;
 		}
 
-		StyledText textWidget = fViewer.getTextWidget();
 		// initialization
 		if (!fIsActive)
 		{
+			StyledText textWidget = fViewer.getTextWidget();
 			textWidget.addLineBackgroundListener(this);
 			textWidget.addPaintListener(this);
 			fPositionManager.managePosition(fCurrentLine);
@@ -162,7 +162,7 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 
 			// redraw if the current line number is different from the last line number we painted
 			// initially fLastLineNumber is -1
-			if (lineNumber != fLastLineNumber || !fCurrentLine.overlapsWith(modelCaret, 0) || (selection.y != 0))
+			if (lineNumber != fLastLineNumber || !overlaps(fCurrentLine, modelCaret) || (selection.y != 0))
 			{
 				// Handle non-empty selections (turn off highlight line)
 				if (selection.y != 0 && fLastLine.equals(fCurrentLine))
@@ -204,6 +204,17 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 		{
 		}
 
+		return false;
+	}
+
+	private boolean overlaps(Position currentLine, int modelCaret)
+	{
+		if (currentLine.overlapsWith(modelCaret, 0))
+			return true;
+		if (modelCaret == (currentLine.getOffset() + currentLine.getLength()))
+		{
+			return true;
+		}
 		return false;
 	}
 
