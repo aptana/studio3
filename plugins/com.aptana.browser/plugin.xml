@@ -23,5 +23,14 @@
             name="Web Browser">
       </editor>
    </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="com.aptana.ui.WebPerspective">
+         <viewShortcut
+               id="com.aptana.browser.views.webbrowser">
+         </viewShortcut>
+      </perspectiveExtension>
+   </extension>
 
 </plugin>

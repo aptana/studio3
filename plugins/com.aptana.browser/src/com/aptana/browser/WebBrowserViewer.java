@@ -35,11 +35,20 @@
 
 package com.aptana.browser;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.LocationAdapter;
+import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.browser.ProgressEvent;
+import org.eclipse.swt.browser.ProgressListener;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.ToolBar;
 
 import com.aptana.swt.webkitbrowser.WebKitBrowser;
 
@@ -52,6 +61,16 @@ public class WebBrowserViewer extends Composite {
 	public static final int NAVIGATION_BAR = 1 << 0;
 	
 	private WebKitBrowser browser;
+	private IAction backAction;
+	private IAction forwardAction;
+	private IAction stopAction;
+	private IAction refreshAction;
+	private IAction goAction;
+	
+	private ToolBarManager toolBarManager;
+	private Combo urlCombo;
+	private boolean loadInProgress = false;
+	
 	
 	/**
 	 * @param parent
@@ -64,9 +83,125 @@ public class WebBrowserViewer extends Composite {
 			Composite container = new Composite(this, SWT.NONE);
 			container.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 			container.setLayout(GridLayoutFactory.swtDefaults().numColumns(3).create());
+			createNavigationBar(container);
 		}
 		browser = new WebKitBrowser(this, SWT.NONE);
 		browser.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
+		if ((style & NAVIGATION_BAR) != 0) {
+			browser.addProgressListener(new ProgressListener() {
+				@Override
+				public void changed(ProgressEvent event) {
+					if (!loadInProgress) {
+						loadInProgress = true;
+						updateNavigationButtons();
+					}
+				}
+	
+				@Override
+				public void completed(ProgressEvent event) {
+					loadInProgress = false;
+					updateNavigationButtons();
+				}
+			});
+			browser.addLocationListener(new LocationAdapter() {
+				@Override
+				public void changed(LocationEvent event) {
+					urlCombo.setText(browser.getUrl());
+					// TODO: history
+				}
+			});
+			updateNavigationButtons();
+		}
+	}
+	
+	private void createNavigationBar(Composite parent) {
+		createActions();
+		
+		toolBarManager = new ToolBarManager(SWT.FLAT);
+		toolBarManager.add(backAction);
+		toolBarManager.add(forwardAction);
+		toolBarManager.add(stopAction);
+		toolBarManager.add(refreshAction);
+		ToolBar toolbar = toolBarManager.createControl(parent);
+		toolbar.setLayoutData(GridDataFactory.fillDefaults().create());
+				
+		urlCombo = new Combo(parent, SWT.DROP_DOWN);
+		urlCombo.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+
+		ToolBarManager toolBarManager2 = new ToolBarManager(SWT.FLAT);
+		toolBarManager2.add(goAction);
+		toolbar = toolBarManager2.createControl(parent);
+		toolbar.setLayoutData(GridDataFactory.fillDefaults().create());
+	}
+	
+	private void createActions() {
+		backAction = new Action("Back") {
+			{
+				setToolTipText("Go back");
+				setImageDescriptor(ImageResource.getImageDescriptor(ImageResource.IMG_ELCL_NAV_BACKWARD));
+				setDisabledImageDescriptor(ImageResource.getImageDescriptor(ImageResource.IMG_DLCL_NAV_BACKWARD));
+			}
+
+			@Override
+			public void run() {
+				setEnabled(browser.back() && browser.isBackEnabled());
+			}
+		};
+		forwardAction = new Action("Forward") {
+			{
+				setToolTipText("Go forward");
+				setImageDescriptor(ImageResource.getImageDescriptor(ImageResource.IMG_ELCL_NAV_FORWARD));
+				setDisabledImageDescriptor(ImageResource.getImageDescriptor(ImageResource.IMG_DLCL_NAV_FORWARD));
+			}
+
+			@Override
+			public void run() {
+				setEnabled(browser.forward() && browser.isForwardEnabled());
+			}
+		};
+		stopAction = new Action("Stop") {
+			{
+				setToolTipText("Stop");
+				setImageDescriptor(ImageResource.getImageDescriptor(ImageResource.IMG_ELCL_NAV_STOP));
+				setDisabledImageDescriptor(ImageResource.getImageDescriptor(ImageResource.IMG_DLCL_NAV_STOP));
+			}
+
+			@Override
+			public void run() {
+				browser.stop();
+			}
+		};
+		refreshAction = new Action("Refresh") {
+			{
+				setToolTipText("Refresh");
+				setImageDescriptor(ImageResource.getImageDescriptor(ImageResource.IMG_ELCL_NAV_REFRESH));
+				setDisabledImageDescriptor(ImageResource.getImageDescriptor(ImageResource.IMG_DLCL_NAV_REFRESH));
+			}
+
+			@Override
+			public void run() {
+				browser.refresh();
+			}
+		};
+		goAction = new Action("Go") {
+			{
+				setToolTipText("Open the URL");
+				setImageDescriptor(ImageResource.getImageDescriptor(ImageResource.IMG_ELCL_NAV_GO));
+				setDisabledImageDescriptor(ImageResource.getImageDescriptor(ImageResource.IMG_DLCL_NAV_GO));
+			}
+
+			@Override
+			public void run() {
+				browser.setUrl(urlCombo.getText());
+			}
+		};
+	}
+	
+	private void updateNavigationButtons() {
+		backAction.setEnabled(browser.isBackEnabled());
+		forwardAction.setEnabled(browser.isForwardEnabled());
+		stopAction.setEnabled(loadInProgress);
+		refreshAction.setEnabled(!loadInProgress);
 	}
 
 	/* (non-Javadoc)
