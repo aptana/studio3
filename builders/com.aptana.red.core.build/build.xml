@@ -102,10 +102,10 @@
 			<param name="p2.installIU" value="com.aptana.ide.feature.libraries.subscription.feature.group" />
 			<param name="p2.repo" value="${libraries-com.p2.repo}" />
 		</antcall>
-		<antcall target="run.director">
-			<param name="p2.installIU" value="com.aptana.webkitbrowser.feature.group" />
-			<param name="p2.repo" value="${webkit.p2.repo}" />
-		</antcall>
+		<fileset dir="${webkit.p2.repo}" defaultexcludes="true">
+			<include name="features/*" />
+			<include name="plugins/*" />
+		</fileset>
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
