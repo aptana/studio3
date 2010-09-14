@@ -20,6 +20,7 @@ import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveListener;
+import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWindowListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
@@ -27,7 +28,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
-import org.eclipse.ui.internal.WorkbenchPage;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -41,7 +41,6 @@ import com.aptana.usage.EventLogger;
 /**
  * The activator class controls the plug-in life cycle
  */
-@SuppressWarnings("restriction")
 public class CommonEditorPlugin extends AbstractUIPlugin
 {
 
@@ -132,7 +131,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		@Override
 		public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective)
 		{
-			setCommandState(((WorkbenchPage) page).getActivePerspective().findView(OUTLINE_VIEW_ID) != null);
+			setCommandState(findView(page, OUTLINE_VIEW_ID) != null);
 		}
 
 		@Override
@@ -140,14 +139,14 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		{
 			if (changeId.equals(IWorkbenchPage.CHANGE_VIEW_HIDE))
 			{
-				if (((WorkbenchPage) page).getActivePerspective().findView(OUTLINE_VIEW_ID) == null)
+				if (findView(page, OUTLINE_VIEW_ID) == null)
 				{
 					setCommandState(false);
 				}
 			}
 			else if (changeId.equals(IWorkbenchPage.CHANGE_VIEW_SHOW))
 			{
-				if (((WorkbenchPage) page).getActivePerspective().findView(OUTLINE_VIEW_ID) != null)
+				if (findView(page, OUTLINE_VIEW_ID) != null)
 				{
 					setCommandState(true);
 				}
@@ -164,6 +163,20 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 				commandState.setValue(state);
 				service.refreshElements(COMMAND_ID, null);
 			}
+		}
+
+		protected IViewReference findView(IWorkbenchPage page, String viewId)
+		{
+			IViewReference refs[] = page.getViewReferences();
+			for (int i = 0; i < refs.length; i++)
+			{
+				IViewReference ref = refs[i];
+				if (viewId.equals(ref.getId()))
+				{
+					return ref;
+				}
+			}
+			return null;
 		}
 	};
 
@@ -217,7 +230,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 
 		// Activate indexing
 		IndexActivator.getDefault();
-		
+
 		differentiator = new FilenameDifferentiator();
 		differentiator.schedule();
 
@@ -282,7 +295,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	{
 		getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message, null));
 	}
-	
+
 	public static void logInfo(String message)
 	{
 		getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message, null));
