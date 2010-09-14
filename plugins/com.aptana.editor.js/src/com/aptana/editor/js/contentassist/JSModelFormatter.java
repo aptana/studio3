@@ -68,7 +68,7 @@ public class JSModelFormatter
 			}
 
 			buffer.append(DOUBLE_NEW_LINE); //$NON-NLS-1$
-			buffer.append(Messages.JSModelFormatter_Defined_Section_Header);
+			buffer.append("<b>").append(Messages.JSModelFormatter_Defined_Section_Header).append("</b>");
 			buffer.append(NEW_LINE); //$NON-NLS-1$
 
 			boolean first = true;
@@ -91,7 +91,7 @@ public class JSModelFormatter
 					buffer.append(NEW_LINE);
 				}
 
-				buffer.append(document);
+				buffer.append("- ").append(document);
 			}
 		}
 	}
