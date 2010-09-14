@@ -41,7 +41,6 @@ import com.aptana.usage.EventLogger;
 /**
  * The activator class controls the plug-in life cycle
  */
-@SuppressWarnings("restriction")
 public class CommonEditorPlugin extends AbstractUIPlugin
 {
 
@@ -165,7 +164,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 				service.refreshElements(COMMAND_ID, null);
 			}
 		}
-		
+
 		protected IViewReference findView(IWorkbenchPage page, String viewId)
 		{
 			IViewReference refs[] = page.getViewReferences();
@@ -231,7 +230,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 
 		// Activate indexing
 		IndexActivator.getDefault();
-		
+
 		differentiator = new FilenameDifferentiator();
 		differentiator.schedule();
 
@@ -296,7 +295,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	{
 		getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message, null));
 	}
-	
+
 	public static void logInfo(String message)
 	{
 		getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message, null));
