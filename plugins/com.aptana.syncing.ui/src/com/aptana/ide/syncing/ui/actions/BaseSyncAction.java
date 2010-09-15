@@ -166,6 +166,7 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
     public void selectionChanged(IAction action, ISelection selection) {
         action.setEnabled(false);
         setSelection(selection);
+        setSelectedSite(null);
         action.setEnabled(fSelectedElements.size() > 0);
     }
 
