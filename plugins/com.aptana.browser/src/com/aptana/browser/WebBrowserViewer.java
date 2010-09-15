@@ -144,7 +144,7 @@ public class WebBrowserViewer extends Composite {
 
 			@Override
 			public void run() {
-				setEnabled(browser.back() && browser.isBackEnabled());
+				browser.back();
 			}
 		};
 		forwardAction = new Action("Forward") {
@@ -156,7 +156,7 @@ public class WebBrowserViewer extends Composite {
 
 			@Override
 			public void run() {
-				setEnabled(browser.forward() && browser.isForwardEnabled());
+				browser.forward();
 			}
 		};
 		stopAction = new Action("Stop") {
@@ -198,8 +198,8 @@ public class WebBrowserViewer extends Composite {
 	}
 	
 	private void updateNavigationButtons() {
-		backAction.setEnabled(browser.isBackEnabled());
-		forwardAction.setEnabled(browser.isForwardEnabled());
+		backAction.setEnabled(!loadInProgress && browser.isBackEnabled());
+		forwardAction.setEnabled(!loadInProgress && browser.isForwardEnabled());
 		stopAction.setEnabled(loadInProgress);
 		refreshAction.setEnabled(!loadInProgress);
 	}
