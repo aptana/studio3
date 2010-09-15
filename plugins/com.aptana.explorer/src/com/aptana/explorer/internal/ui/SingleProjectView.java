@@ -5,9 +5,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import net.contentobjects.jnotify.IJNotify;
-import net.contentobjects.jnotify.JNotifyException;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -75,7 +72,6 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.IScopeReference;
 import com.aptana.core.ShellExecutable;
-import com.aptana.core.resources.FileDeltaRefreshAdapter;
 import com.aptana.core.resources.IProjectContext;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.ProcessUtil;
@@ -84,7 +80,6 @@ import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IExplorerUIConstants;
 import com.aptana.explorer.IPreferenceConstants;
-import com.aptana.filewatcher.FileWatcher;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.ide.core.io.IConnectionPoint;
@@ -159,11 +154,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	private Composite filterComp;
 	private CLabel filterLabel;
 	private GridData filterLayoutData;
-
-	/**
-	 * Used as a handle for the filesystem watcher on the selected project.
-	 */
-	private Integer watcher;
 
 	// listen for external changes to active project
 	private IPreferenceChangeListener fActiveProjectPrefChangeListener;
@@ -1205,21 +1195,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	 */
 	protected void projectChanged(IProject oldProject, IProject newProject)
 	{
-		// FIXME Now that we have a general layer for filewatchers on projects, this is unnecessary! Remove filewatcher code here
-		// Set/unset file watcher
-		removeFileWatcher();
-		try
-		{
-			if (newProject != null && newProject.exists() && newProject.getLocation() != null)
-			{
-				watcher = FileWatcher.addWatch(newProject.getLocation().toOSString(), IJNotify.FILE_ANY, true,
-						new FileDeltaRefreshAdapter());
-			}
-		}
-		catch (JNotifyException e)
-		{
-			ExplorerPlugin.logError(e.getMessage(), e);
-		}
 		// Set project pulldown
 		String newProjectName = ""; //$NON-NLS-1$
 		if (newProject != null && newProject.exists())
@@ -1238,21 +1213,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 			// Clear the selection when there is no active project so the menus
 			// get updated correctly
 			getCommonViewer().setSelection(StructuredSelection.EMPTY);
-		}
-	}
-
-	private void removeFileWatcher()
-	{
-		try
-		{
-			if (watcher != null)
-			{
-				FileWatcher.removeWatch(watcher);
-			}
-		}
-		catch (JNotifyException e)
-		{
-			ExplorerPlugin.logError(e.getMessage(), e);
 		}
 	}
 
@@ -1288,7 +1248,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	@Override
 	public void dispose()
 	{
-		removeFileWatcher();
 		getControlThemerFactory().dispose(getCommonViewer());
 		removeProjectResourceListener();
 		removeActiveProjectPrefListener();
