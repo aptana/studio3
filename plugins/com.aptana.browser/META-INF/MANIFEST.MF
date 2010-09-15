@@ -10,4 +10,3 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.swt.webkitbrowser
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Eclipse-PlatformFilter: (| (& (| (osgi.os=win32) (osgi.ws=cocoa) (osgi.ws=gtk2)) (osgi.arch=x86)) (& (osgi.ws=gtk2) (osgi.arch=x86_64)) )

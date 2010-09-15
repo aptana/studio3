@@ -710,7 +710,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 
 		menuManager.appendToGroup(GROUP_HEROKU_COMMANDS, new ContributionItem()
 		{
-
 			@Override
 			public void fill(Menu menu, int index)
 			{
