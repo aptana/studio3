@@ -15,7 +15,7 @@ import com.aptana.ui.UIPlugin;
 public class ReportBugCommandHandler extends AbstractHandler
 {
 
-	private static final String REPORT_BUG_URL_STRING = "https://aptana.lighthouseapp.com/projects/45260-rr3/tickets/new"; //$NON-NLS-1$
+	private static final String REPORT_BUG_URL_STRING = "https://aptana.lighthouseapp.com/projects/35272-studio/tickets/new"; //$NON-NLS-1$
 	private static URL REPORT_BUG_URL;
 
 	static
