@@ -1,4 +1,4 @@
-package com.aptana.explorer.internal.ui;
+package com.aptana.core.resources;
 
 import java.io.File;
 import java.util.HashMap;
@@ -17,9 +17,9 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
-import com.aptana.explorer.ExplorerPlugin;
+import com.aptana.core.CorePlugin;
 
-class FileDeltaRefreshAdapter extends JNotifyAdapter
+public class FileDeltaRefreshAdapter extends JNotifyAdapter
 {
 	private WorkspaceJob job;
 	private Map<IResource, Integer> toRefresh = new HashMap<IResource, Integer>();
@@ -30,7 +30,7 @@ class FileDeltaRefreshAdapter extends JNotifyAdapter
 			job.cancel();
 		if (toRefresh.isEmpty())
 			return;
-		job = new WorkspaceJob(Messages.SingleProjectView_RefreshJob_title)
+		job = new WorkspaceJob("Refresh...")
 		{
 
 			@Override
@@ -115,7 +115,7 @@ class FileDeltaRefreshAdapter extends JNotifyAdapter
 		}
 		catch (Throwable e)
 		{
-			ExplorerPlugin.logError(e.getMessage(), e);
+			CorePlugin.logError(e.getMessage(), e);
 		}
 		finally
 		{

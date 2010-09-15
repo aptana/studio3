@@ -75,6 +75,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.IScopeReference;
 import com.aptana.core.ShellExecutable;
+import com.aptana.core.resources.FileDeltaRefreshAdapter;
 import com.aptana.core.resources.IProjectContext;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.ProcessUtil;
@@ -206,7 +207,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		toolbarGridLayout.marginHeight = 0;
 		toolbarGridLayout.horizontalSpacing = 0;
 		toolbarComposite.setLayout(toolbarGridLayout);
-		
+
 		// For project and branch....
 		Composite pulldowns = new Composite(toolbarComposite, SWT.NONE);
 		pulldowns.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
@@ -234,7 +235,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		toolbarButtonsLayout.marginHeight = 0;
 		toolbarButtonsLayout.marginWidth = 0;
 		toolbarButtons.setLayout(toolbarButtonsLayout);
-		
+
 		// Create Deploy menu
 		createDeployMenu(toolbarButtons);
 
@@ -498,7 +499,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 			{
 				addHerokuMenuCommands(menuManager);
 			}
-			//Still need to call isFTPProject to populate siteConnections variable
+			// Still need to call isFTPProject to populate siteConnections variable
 			else if ((type == DeployType.FTP) && isFTPProject())
 			{
 				addFTPMenuCommands(menuManager);
@@ -685,8 +686,8 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 											rememberMyDecision);
 								}
 								// remembers the last sync connection
-								ResourceSynchronizationUtils.setLastSyncConnection(selectedProject, destination
-										.getName());
+								ResourceSynchronizationUtils.setLastSyncConnection(selectedProject,
+										destination.getName());
 							}
 							settingsDialog.setPropertySource(destination);
 						}
@@ -821,70 +822,70 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	private void addEngineYardMenuCommands(MenuManager menuManager)
 	{
 		menuManager.add(new Separator(GROUP_DEPLOY));
-		menuManager.add(new Separator(GROUP_EY_COMMANDS)); //$NON-NLS-1$
+		menuManager.add(new Separator(GROUP_EY_COMMANDS));
 
-		menuManager.appendToGroup(GROUP_EY_COMMANDS, new ContributionItem() //$NON-NLS-1$
+		menuManager.appendToGroup(GROUP_EY_COMMANDS, new ContributionItem()
+		{
+
+			@Override
+			public void fill(Menu menu, int index)
+			{
+
+				// open ssh session
+
+				MenuItem item = new MenuItem(menu, SWT.PUSH);
+				item.setText(Messages.SingleProjectView_OpenSSHSubmenuLabel);
+				item.addSelectionListener(new SelectionAdapter()
 				{
-
-					@Override
-					public void fill(Menu menu, int index)
+					public void widgetSelected(SelectionEvent e)
 					{
-
-						// open ssh session
-
-						MenuItem item = new MenuItem(menu, SWT.PUSH);
-						item.setText(Messages.SingleProjectView_OpenSSHSubmenuLabel);
-						item.addSelectionListener(new SelectionAdapter()
-						{
-							public void widgetSelected(SelectionEvent e)
-							{
-								final CommandElement command;
-								command = getBundleCommand(BUNDLE_ENGINE_YARD, "Open SSH Session"); //$NON-NLS-1$
-								command.execute();
-							}
-						});
-
-						// Deployment Submenu
-						final MenuItem deploymentMenuItem = new MenuItem(menu, SWT.CASCADE);
-						deploymentMenuItem.setText(Messages.SingleProjectView_DeploymentSubmenuLabel);
-						Menu deploymentSubMenu = new Menu(menu);
-
-						createDeploySubMenuItem(deploymentSubMenu, "List Environments", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-						createDeploySubMenuItem(deploymentSubMenu, "Retrieve Logs", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-						createDeploySubMenuItem(deploymentSubMenu, "Rebuild Environment", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-						createDeploySubMenuItem(deploymentSubMenu, "Rollback App", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-
-						deploymentMenuItem.setMenu(deploymentSubMenu);
-
-						// Recipes Submenu
-						final MenuItem recipesMenuItem = new MenuItem(menu, SWT.CASCADE);
-						recipesMenuItem.setText(Messages.SingleProjectView_RecipesSubmenuLabel);
-						Menu recipesSubMenu = new Menu(menu);
-
-						createDeploySubMenuItem(recipesSubMenu, "Apply Recipes", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-						createDeploySubMenuItem(recipesSubMenu, "Upload Recipes", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-						createDeploySubMenuItem(recipesSubMenu, "Download Recipes", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-
-						recipesMenuItem.setMenu(recipesSubMenu);
-
-						// Maintenance Submenu
-						final MenuItem maintenanceMenuItem = new MenuItem(menu, SWT.CASCADE);
-						maintenanceMenuItem.setText(Messages.SingleProjectView_MaintenanceSubmenuLabel);
-						Menu maintenanceSubMenu = new Menu(menu);
-
-						createDeploySubMenuItem(maintenanceSubMenu, "Turn Maintenance On", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-						createDeploySubMenuItem(maintenanceSubMenu, "Turn Maintenance Off", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-
-						maintenanceMenuItem.setMenu(maintenanceSubMenu);
-
-					}
-
-					@Override
-					public boolean isDynamic()
-					{
-						return true;
+						final CommandElement command;
+						command = getBundleCommand(BUNDLE_ENGINE_YARD, "Open SSH Session"); //$NON-NLS-1$
+						command.execute();
 					}
 				});
+
+				// Deployment Submenu
+				final MenuItem deploymentMenuItem = new MenuItem(menu, SWT.CASCADE);
+				deploymentMenuItem.setText(Messages.SingleProjectView_DeploymentSubmenuLabel);
+				Menu deploymentSubMenu = new Menu(menu);
+
+				createDeploySubMenuItem(deploymentSubMenu, "List Environments", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+				createDeploySubMenuItem(deploymentSubMenu, "Retrieve Logs", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+				createDeploySubMenuItem(deploymentSubMenu, "Rebuild Environment", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+				createDeploySubMenuItem(deploymentSubMenu, "Rollback App", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+
+				deploymentMenuItem.setMenu(deploymentSubMenu);
+
+				// Recipes Submenu
+				final MenuItem recipesMenuItem = new MenuItem(menu, SWT.CASCADE);
+				recipesMenuItem.setText(Messages.SingleProjectView_RecipesSubmenuLabel);
+				Menu recipesSubMenu = new Menu(menu);
+
+				createDeploySubMenuItem(recipesSubMenu, "Apply Recipes", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+				createDeploySubMenuItem(recipesSubMenu, "Upload Recipes", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+				createDeploySubMenuItem(recipesSubMenu, "Download Recipes", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+
+				recipesMenuItem.setMenu(recipesSubMenu);
+
+				// Maintenance Submenu
+				final MenuItem maintenanceMenuItem = new MenuItem(menu, SWT.CASCADE);
+				maintenanceMenuItem.setText(Messages.SingleProjectView_MaintenanceSubmenuLabel);
+				Menu maintenanceSubMenu = new Menu(menu);
+
+				createDeploySubMenuItem(maintenanceSubMenu, "Turn Maintenance On", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+				createDeploySubMenuItem(maintenanceSubMenu, "Turn Maintenance Off", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+
+				maintenanceMenuItem.setMenu(maintenanceSubMenu);
+
+			}
+
+			@Override
+			public boolean isDynamic()
+			{
+				return true;
+			}
+		});
 
 	}
 
@@ -1164,7 +1165,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		}
 		projectChanged(oldActiveProject, newSelectedProject);
 	}
-	
+
 	public void setActiveProject(IProject project)
 	{
 		setActiveProject(project.getName());
@@ -1204,6 +1205,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	 */
 	protected void projectChanged(IProject oldProject, IProject newProject)
 	{
+		// FIXME Now that we have a general layer for filewatchers on projects, this is unnecessary! Remove filewatcher code here
 		// Set/unset file watcher
 		removeFileWatcher();
 		try
@@ -1256,7 +1258,8 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 
 	protected void refreshViewer()
 	{
-		if (getCommonViewer() == null || getCommonViewer().getTree() == null || getCommonViewer().getTree().isDisposed())
+		if (getCommonViewer() == null || getCommonViewer().getTree() == null
+				|| getCommonViewer().getTree().isDisposed())
 		{
 			return;
 		}
