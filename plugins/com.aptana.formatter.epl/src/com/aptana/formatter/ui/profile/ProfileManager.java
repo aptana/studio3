@@ -147,15 +147,13 @@ public class ProfileManager implements IProfileManager
 		PreferenceKey[] keys = getPreferenceKeys();
 		if (keys != null)
 		{
-			IPreferenceStore store = FormatterPlugin.getDefault().getPreferenceStore();
-			
 			DefaultScope scope = new DefaultScope();
 			for (int i = 0; i < keys.length; i++)
 			{
 				PreferenceKey key = keys[i];
 				String name = key.getName();
-//				IEclipsePreferences preferences = scope.getNode(key.getQualifier());
-				String value = store.getString(name);
+				IEclipsePreferences preferences = scope.getNode(key.getQualifier());
+				String value = preferences.get(name, null);
 				if (value != null)
 					settings.put(name, value);
 			}

@@ -3,7 +3,6 @@ package com.aptana.html.formatter;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 
-import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 
 /**
@@ -21,7 +20,7 @@ public class HTMLFormatterPreferenceInitializer extends AbstractPreferenceInitia
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IPreferenceStore store = FormatterPlugin.getDefault().getPreferenceStore();
+		IPreferenceStore store = HTMLFormatterPlugin.getDefault().getPreferenceStore();
 		store.setDefault(HTMLFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.SPACE);
 		store.setDefault(HTMLFormatterConstants.FORMATTER_TAB_SIZE, "2"); //$NON-NLS-1$
 		store.setDefault(HTMLFormatterConstants.FORMATTER_INDENTATION_SIZE, "2"); //$NON-NLS-1$
