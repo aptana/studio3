@@ -45,9 +45,13 @@ import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.browser.ProgressListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ToolBar;
 
 import com.aptana.swt.webkitbrowser.WebKitBrowser;
@@ -127,6 +131,12 @@ public class WebBrowserViewer extends Composite {
 				
 		urlCombo = new Combo(parent, SWT.DROP_DOWN);
 		urlCombo.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+
+		urlCombo.addListener(SWT.DefaultSelection, new Listener() {
+            public void handleEvent(Event e) {
+                setUrl(urlCombo.getText());
+            }
+        });
 
 		ToolBarManager toolBarManager2 = new ToolBarManager(SWT.FLAT);
 		toolBarManager2.add(goAction);
