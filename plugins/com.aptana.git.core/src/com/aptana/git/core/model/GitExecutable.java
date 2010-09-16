@@ -143,7 +143,7 @@ public class GitExecutable
 		GitPlugin.logInfo(string);
 	}
 
-	private static List<IPath> searchLocations()
+	private synchronized static List<IPath> searchLocations()
 	{
 		if (fgLocations == null)
 		{

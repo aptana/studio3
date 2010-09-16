@@ -166,6 +166,7 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
     public void selectionChanged(IAction action, ISelection selection) {
         action.setEnabled(false);
         setSelection(selection);
+        setSelectedSite(null);
         action.setEnabled(fSelectedElements.size() > 0);
     }
 
@@ -272,7 +273,7 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
     @SuppressWarnings("unchecked")
 	protected ISiteConnection[] getSiteConnections() {
         List<Set<ISiteConnection>> sitesList = new ArrayList<Set<ISiteConnection>>();
-        Set<ISiteConnection> sitesSet;
+        Set<ISiteConnection> sitesSet = new HashSet<ISiteConnection>();
         ISiteConnection[] sites;
         for (IAdaptable element : fSelectedElements) {
         	if (fSelectedFromSource) {
@@ -280,7 +281,7 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
         	} else {
         		sites = SiteConnectionUtils.findSitesWithDestination(element);
         	}
-            sitesSet = new HashSet<ISiteConnection>();
+            sitesSet.clear();
             for (ISiteConnection site : sites) {
                 sitesSet.add(site);
             }
@@ -317,9 +318,15 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
         	sites = SiteConnectionUtils.findSitesForSource(container, true);
         } else {
         	sites = SiteConnectionUtils.findSitesWithDestination(container, true);
-        }        String target;
+        }
+        IConnectionPoint destination;
+        String target;
         for (ISiteConnection site : sites) {
-            target = site.getDestination().getName();
+        	destination = site.getDestination();
+        	if (destination == null) {
+        		continue;
+        	}
+            target = destination.getName();
             if (target.equals(lastConnection)) {
                 return site;
             }

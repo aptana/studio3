@@ -1,4 +1,4 @@
-package com.aptana.explorer.internal.ui;
+package com.aptana.core.resources;
 
 import java.io.File;
 import java.util.HashMap;
@@ -17,9 +17,9 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
-import com.aptana.explorer.ExplorerPlugin;
+import com.aptana.core.CorePlugin;
 
-class FileDeltaRefreshAdapter extends JNotifyAdapter
+public class FileDeltaRefreshAdapter extends JNotifyAdapter
 {
 	private WorkspaceJob job;
 	private Map<IResource, Integer> toRefresh = new HashMap<IResource, Integer>();
@@ -27,10 +27,14 @@ class FileDeltaRefreshAdapter extends JNotifyAdapter
 	private void refresh()
 	{
 		if (job != null)
+		{
 			job.cancel();
+		}
 		if (toRefresh.isEmpty())
+		{
 			return;
-		job = new WorkspaceJob(Messages.SingleProjectView_RefreshJob_title)
+		}
+		job = new WorkspaceJob("Refresh...") //$NON-NLS-1$
 		{
 
 			@Override
@@ -41,7 +45,9 @@ class FileDeltaRefreshAdapter extends JNotifyAdapter
 				for (Map.Entry<IResource, Integer> entry : copy.entrySet())
 				{
 					if (sub.isCanceled())
+					{
 						return Status.CANCEL_STATUS;
+					}
 					entry.getKey().refreshLocal(entry.getValue(), sub.newChild(1));
 					synchronized (toRefresh)
 					{
@@ -66,8 +72,8 @@ class FileDeltaRefreshAdapter extends JNotifyAdapter
 		}
 		else if (file.isDirectory())
 		{
-			resource = ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(
-					new Path(file.getAbsolutePath()));
+			resource = ResourcesPlugin.getWorkspace().getRoot()
+					.getContainerForLocation(new Path(file.getAbsolutePath()));
 			depth = IResource.DEPTH_INFINITE;
 		}
 		addToRefreshList(resource, depth);
@@ -76,7 +82,9 @@ class FileDeltaRefreshAdapter extends JNotifyAdapter
 	private void addToRefreshList(IResource resource, Integer depth)
 	{
 		if (resource == null)
+		{
 			return;
+		}
 		// Don't refresh stuff we don't want/can't access/can't see (i.e. .git and it's sub-tree)
 		if (resource.isPhantom() || resource.isHidden() || resource.isTeamPrivateMember(IResource.CHECK_ANCESTORS))
 		{
@@ -90,7 +98,9 @@ class FileDeltaRefreshAdapter extends JNotifyAdapter
 				{
 					Integer oldDepth = toRefresh.get(resource);
 					if (oldDepth < depth)
+					{
 						toRefresh.put(resource, depth);
+					}
 				}
 				else
 				{
@@ -105,7 +115,9 @@ class FileDeltaRefreshAdapter extends JNotifyAdapter
 								// We already have an ancestor in the map. If it's refreshing infinitely don't add this
 								// resource
 								if (toRefresh.get(container) == IResource.DEPTH_INFINITE)
+								{
 									return;
+								}
 							}
 						}
 					}
@@ -115,7 +127,7 @@ class FileDeltaRefreshAdapter extends JNotifyAdapter
 		}
 		catch (Throwable e)
 		{
-			ExplorerPlugin.logError(e.getMessage(), e);
+			CorePlugin.logError(e.getMessage(), e);
 		}
 		finally
 		{
@@ -127,8 +139,8 @@ class FileDeltaRefreshAdapter extends JNotifyAdapter
 	public void fileDeleted(int wd, String rootPath, String name)
 	{
 		String pathString = rootPath + (name.length() > 0 ? Path.SEPARATOR + name : ""); //$NON-NLS-1$
-		IResource resource = ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(
-				new Path(pathString).removeLastSegments(1));
+		IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+				.getContainerForLocation(new Path(pathString).removeLastSegments(1));
 		addToRefreshList(resource, IResource.DEPTH_ONE);
 	}
 
@@ -144,8 +156,8 @@ class FileDeltaRefreshAdapter extends JNotifyAdapter
 		}
 		else if (file.isDirectory())
 		{
-			resource = ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(
-					new Path(file.getAbsolutePath()));
+			resource = ResourcesPlugin.getWorkspace().getRoot()
+					.getContainerForLocation(new Path(file.getAbsolutePath()));
 			depth = IResource.DEPTH_INFINITE;
 		}
 		addToRefreshList(resource, depth);

@@ -288,6 +288,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			boolean close = true;
 			int replaceLength = 0;
+
 			if (this._currentLexeme.getType() == HTMLTokenType.TAG_END) // '|>
 			{
 				replaceLength = 1; // replace the '>'
@@ -296,31 +297,43 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				// We're on element name, replace it
 				int index = lexemeProvider.getLexemeCeilingIndex(_currentLexeme.getEndingOffset() + 1);
+
+				if (index == -1 || index >= lexemeProvider.size())
+				{
+					index = lexemeProvider.size() - 1;
+				}
+
 				Lexeme<HTMLTokenType> nextLexeme = lexemeProvider.getLexeme(index);
-				if (nextLexeme != null && !nextLexeme.equals(_currentLexeme))
+
+				if (nextLexeme != null) // && !nextLexeme.equals(_currentLexeme))
 				{
 					offset = _currentLexeme.getStartingOffset();
 					replaceLength = _currentLexeme.getLength();
-					if (nextLexeme.getType() == HTMLTokenType.TAG_END)
+
+					if (nextLexeme.equals(this._currentLexeme) == false)
 					{
-						// Followed by '>', so replace spaces plus end
-						replaceLength += nextLexeme.getEndingOffset() - _currentLexeme.getEndingOffset();
-					}
-					else if (nextLexeme.getType() != HTMLTokenType.TAG_START)
-					{
-						// If there's an attribute we don't want to add ">" or close tag!
-						close = false;
+						if (nextLexeme.getType() == HTMLTokenType.TAG_END)
+						{
+							// Followed by '>', so replace spaces plus end
+							replaceLength += nextLexeme.getEndingOffset() - _currentLexeme.getEndingOffset();
+						}
+						else if (nextLexeme.getType() != HTMLTokenType.TAG_START)
+						{
+							// If there's an attribute we don't want to add ">" or close tag!
+							close = false;
+						}
 					}
 				}
 			}
 
 			HTMLParseState state = null;
+
 			for (ElementElement element : elements)
 			{
 				String[] userAgents = element.getUserAgentNames();
 				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
-
 				String replaceString = element.getName();
+
 				if (close)
 				{
 					if (state == null)
@@ -328,6 +341,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						state = new HTMLParseState();
 						state.setEditState(_document.get(), null, 0, 0);
 					}
+
 					if (element.getName().startsWith("!") || state.isEmptyTagType(element.getName())) //$NON-NLS-1$
 					{
 						replaceString += "/>"; //$NON-NLS-1$
@@ -355,8 +369,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						}
 					}
 				}
-				CommonCompletionProposal proposal = new CommonCompletionProposal(replaceString, offset, replaceLength,
-						replaceString.length(), ELEMENT_ICON, element.getName(), null, element.getDescription());
+
+				CommonCompletionProposal proposal = new CommonCompletionProposal(replaceString, offset, replaceLength, replaceString.length(), ELEMENT_ICON,
+					element.getName(), null, element.getDescription());
+
 				proposal.setFileLocation(HTMLIndexConstants.CORE);
 				proposal.setUserAgentImages(userAgentIcons);
 				proposals.add(proposal);
@@ -384,8 +400,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				Image[] userAgentIcons = this.getAllUserAgentIcons();
 
-				this.addProposal(proposals, entity.getName(), ELEMENT_ICON, entity.getDescription(), userAgentIcons,
-						offset);
+				this.addProposal(proposals, entity.getName(), ELEMENT_ICON, entity.getDescription(), userAgentIcons, offset);
 			}
 		}
 	}
@@ -408,8 +423,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 			for (Entry<String, String> entry : ids.entrySet())
 			{
-				this.addProposal(proposals, entry.getKey(), ATTRIBUTE_ICON, null, userAgentIcons, entry.getValue(),
-						offset);
+				this.addProposal(proposals, entry.getKey(), ATTRIBUTE_ICON, null, userAgentIcons, entry.getValue(), offset);
 			}
 		}
 		return proposals;
@@ -422,8 +436,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @param result
 	 */
-	private void addOpenTagPropsals(List<ICompletionProposal> proposals, LexemeProvider<HTMLTokenType> lexemeProvider,
-			int offset)
+	private void addOpenTagPropsals(List<ICompletionProposal> proposals, LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
 	{
 		LocationType location = this.getOpenTagLocationType(lexemeProvider, offset);
 
@@ -456,8 +469,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param userAgents
 	 * @param offset
 	 */
-	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description,
-			Image[] userAgents, int offset)
+	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, int offset)
 	{
 		this.addProposal(proposals, name, image, description, userAgents, HTMLIndexConstants.CORE, offset);
 	}
@@ -471,22 +483,21 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param userAgents
 	 * @param offset
 	 */
-	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description,
-			Image[] userAgents, String fileLocation, int offset)
+	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, String fileLocation,
+		int offset)
 	{
 		CommonCompletionProposal proposal = createProposal(name, image, description, userAgents, fileLocation, offset);
 		// add it to the list
 		proposals.add(proposal);
 	}
 
-	private CommonCompletionProposal createProposal(String name, Image image, String description, Image[] userAgents,
-			String fileLocation, int offset)
+	private CommonCompletionProposal createProposal(String name, Image image, String description, Image[] userAgents, String fileLocation, int offset)
 	{
 		return createProposal(name, name, image, description, userAgents, fileLocation, offset, name.length());
 	}
 
-	protected CommonCompletionProposal createProposal(String displayName, String name, Image image, String description,
-			Image[] userAgents, String fileLocation, int offset, int length)
+	protected CommonCompletionProposal createProposal(String displayName, String name, Image image, String description, Image[] userAgents,
+		String fileLocation, int offset, int length)
 	{
 		IContextInformation contextInfo = null;
 
@@ -500,8 +511,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		}
 
 		// build proposal
-		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image,
-				displayName, contextInfo, description);
+		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image, displayName, contextInfo, description);
 		proposal.setFileLocation(fileLocation);
 		proposal.setUserAgentImages(userAgents);
 		return proposal;
@@ -514,8 +524,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * , int, char, boolean)
 	 */
 	@Override
-	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
-			boolean autoActivated)
+	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
 	{
 		// tokenize the current document
 		_document = viewer.getDocument();
@@ -841,8 +850,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					break;
 
 				case EQUAL:
-					result = (offset <= lexeme.getStartingOffset()) ? LocationType.IN_ATTRIBUTE_NAME
-							: LocationType.IN_ATTRIBUTE_VALUE;
+					result = (offset <= lexeme.getStartingOffset()) ? LocationType.IN_ATTRIBUTE_NAME : LocationType.IN_ATTRIBUTE_VALUE;
 					break;
 
 				case TAG_START:
