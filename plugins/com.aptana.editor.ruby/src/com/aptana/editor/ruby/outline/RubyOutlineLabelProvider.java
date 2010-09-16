@@ -7,8 +7,8 @@ import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.ruby.Activator;
 import com.aptana.editor.ruby.core.IRubyElement;
 import com.aptana.editor.ruby.core.IRubyMethod;
-import com.aptana.editor.ruby.core.IRubyType;
 import com.aptana.editor.ruby.core.IRubyMethod.Visibility;
+import com.aptana.editor.ruby.core.IRubyType;
 
 public class RubyOutlineLabelProvider extends LabelProvider
 {
@@ -18,6 +18,7 @@ public class RubyOutlineLabelProvider extends LabelProvider
 	private static final Image METHOD_PUBLIC = Activator.getImage("icons/method_public_obj.png"); //$NON-NLS-1$
 	private static final Image METHOD_PROTECTED = Activator.getImage("icons/method_protected_obj.png"); //$NON-NLS-1$
 	private static final Image METHOD_PRIVATE = Activator.getImage("icons/method_private_obj.png"); //$NON-NLS-1$
+	private static final Image METHOD_SINGLETON = Activator.getImage("icons/class_method.png"); //$NON-NLS-1$
 	private static final Image CLASS_VAR = Activator.getImage("icons/class_var_obj.png"); //$NON-NLS-1$
 	private static final Image CONSTANT = Activator.getImage("icons/constant_obj.png"); //$NON-NLS-1$
 	private static final Image GLOBAL = Activator.getImage("icons/global_obj.png"); //$NON-NLS-1$
@@ -39,7 +40,12 @@ public class RubyOutlineLabelProvider extends LabelProvider
 		}
 		else if (element instanceof IRubyMethod)
 		{
-			Visibility visibility = ((IRubyMethod) element).getVisibility();
+			IRubyMethod method = (IRubyMethod) element;
+			if (method.isSingleton())
+			{
+				return METHOD_SINGLETON;
+			}
+			Visibility visibility = method.getVisibility();
 			switch (visibility)
 			{
 				case PUBLIC:
