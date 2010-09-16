@@ -46,47 +46,54 @@ public class ExplorerContextContributor implements ContextContributor
 	{
 		// First try and get the active project for the instance of the App Explorer open in the active window
 		final IProject[] projects = new IProject[1];
-		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
+		try
 		{
-
-			@Override
-			public void run()
+			PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
 			{
-				IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-				if (window == null)
+
+				@Override
+				public void run()
 				{
-					return;
-				}
-				IWorkbenchPage page = window.getActivePage();
-				if (page == null)
-				{
-					return;
-				}
-				IViewReference[] refs = page.getViewReferences();
-				if (refs == null)
-				{
-					return;
-				}
-				for (IViewReference ref : refs)
-				{
-					if (ref == null || !ref.getId().equals(IExplorerUIConstants.VIEW_ID))
+					IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+					if (window == null)
 					{
-						continue;
-					}
-					SingleProjectView view = (SingleProjectView) ref.getPart(false);
-					if (view == null)
-					{
-						continue;
-					}
-					IProject activeProject = view.getActiveProject();
-					if (activeProject != null)
-					{
-						projects[0] = activeProject;
 						return;
 					}
+					IWorkbenchPage page = window.getActivePage();
+					if (page == null)
+					{
+						return;
+					}
+					IViewReference[] refs = page.getViewReferences();
+					if (refs == null)
+					{
+						return;
+					}
+					for (IViewReference ref : refs)
+					{
+						if (ref == null || !ref.getId().equals(IExplorerUIConstants.VIEW_ID))
+						{
+							continue;
+						}
+						SingleProjectView view = (SingleProjectView) ref.getPart(false);
+						if (view == null)
+						{
+							continue;
+						}
+						IProject activeProject = view.getActiveProject();
+						if (activeProject != null)
+						{
+							projects[0] = activeProject;
+							return;
+						}
+					}
 				}
-			}
-		});
+			});
+		}
+		catch (IllegalStateException e)
+		{
+			// workbench hasn't been created yet. Non-UI unit test launch?
+		}
 		if (projects[0] != null)
 		{
 			return projects[0];
