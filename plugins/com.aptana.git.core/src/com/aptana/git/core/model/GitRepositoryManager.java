@@ -50,14 +50,17 @@ public class GitRepositoryManager implements IGitRepositoryManager
 	@Override
 	public void cleanup()
 	{
-		for (SoftReference<GitRepository> reference : cachedRepos.values())
+		synchronized (cachedRepos)
 		{
-			if (reference == null || reference.get() == null)
-				continue;
-			GitRepository cachedRepo = reference.get();
-			cachedRepo.dispose();
+			for (SoftReference<GitRepository> reference : cachedRepos.values())
+			{
+				if (reference == null || reference.get() == null)
+					continue;
+				GitRepository cachedRepo = reference.get();
+				cachedRepo.dispose();
+			}
+			cachedRepos.clear();
 		}
-		cachedRepos.clear();
 	}
 
 	@Override
@@ -89,19 +92,22 @@ public class GitRepositoryManager implements IGitRepositoryManager
 		if (repo == null)
 			return;
 
-		cachedRepos.remove(p.getLocationURI().getPath());
 		boolean dispose = true;
-
-		// Only dispose if there's no other projects attached to same repo!
-		for (SoftReference<GitRepository> ref : cachedRepos.values())
+		synchronized (cachedRepos)
 		{
-			if (ref == null || ref.get() == null)
-				continue;
-			GitRepository other = ref.get();
-			if (other.equals(repo))
+			cachedRepos.remove(p.getLocationURI().getPath());
+
+			// Only dispose if there's no other projects attached to same repo!
+			for (SoftReference<GitRepository> ref : cachedRepos.values())
 			{
-				dispose = false;
-				break;
+				if (ref == null || ref.get() == null)
+					continue;
+				GitRepository other = ref.get();
+				if (other.equals(repo))
+				{
+					dispose = false;
+					break;
+				}
 			}
 		}
 
@@ -131,33 +137,43 @@ public class GitRepositoryManager implements IGitRepositoryManager
 	}
 
 	@Override
-	public synchronized GitRepository getUnattachedExisting(URI path)
+	public GitRepository getUnattachedExisting(URI path)
 	{
 		if (GitExecutable.instance() == null || GitExecutable.instance().path() == null || path == null)
 			return null;
 
-		SoftReference<GitRepository> ref = cachedRepos.get(path.getPath());
+		SoftReference<GitRepository> ref;
+		synchronized (cachedRepos)
+		{
+			ref = cachedRepos.get(path.getPath());
+		}
 		if (ref == null || ref.get() == null)
 		{
 			URI gitDirURL = gitDirForURL(path);
 			if (gitDirURL == null)
 				return null;
 			// Check to see if any cached repo has the same git dir
-			for (SoftReference<GitRepository> reference : cachedRepos.values())
+			synchronized (cachedRepos)
 			{
-				if (reference == null || reference.get() == null)
-					continue;
-				GitRepository cachedRepo = reference.get();
-				if (cachedRepo.getFileURL().getPath().equals(gitDirURL.getPath()))
+				for (SoftReference<GitRepository> reference : cachedRepos.values())
 				{
-					// Same git dir, so cache under our new path as well
-					cachedRepos.put(path.getPath(), reference);
-					return cachedRepo;
+					if (reference == null || reference.get() == null)
+						continue;
+					GitRepository cachedRepo = reference.get();
+					if (cachedRepo.getFileURL().getPath().equals(gitDirURL.getPath()))
+					{
+						// Same git dir, so cache under our new path as well
+						cachedRepos.put(path.getPath(), reference);
+						return cachedRepo;
+					}
 				}
 			}
 			// no cache for this repo or any repo sharing same git dir
 			ref = new SoftReference<GitRepository>(new GitRepository(gitDirURL));
-			cachedRepos.put(path.getPath(), ref);
+			synchronized (cachedRepos)
+			{
+				cachedRepos.put(path.getPath(), ref);
+			}
 		}
 		// TODO What if the underlying .git dir was wiped while we still had the object cached?
 		return ref.get();
