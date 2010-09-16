@@ -22,6 +22,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.ruby.RubySourceViewerConfiguration;
 import com.aptana.formatter.AbstractScriptFormatterFactory;
+import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.ui.IFormatterModifyDialog;
 import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
 import com.aptana.formatter.ui.IScriptFormatter;
@@ -30,7 +31,7 @@ import com.aptana.ui.preferences.PreferenceKey;
 
 public class RubyFormatterFactory extends AbstractScriptFormatterFactory
 {
-	private static final PreferenceKey FORMATTER_PREF_KEY = new PreferenceKey(RubyFormatterPlugin.PLUGIN_ID,
+	private static final PreferenceKey FORMATTER_PREF_KEY = new PreferenceKey(FormatterPlugin.PLUGIN_ID,
 			RubyFormatterConstants.FORMATTER_ID);
 
 	private static final String FORMATTER_PREVIEW_FILE = "formatterPreview.rb"; //$NON-NLS-1$
@@ -53,7 +54,9 @@ public class RubyFormatterFactory extends AbstractScriptFormatterFactory
 		for (int i = 0; i < KEYS.length; ++i)
 		{
 			final String key = KEYS[i];
-			result[i] = new PreferenceKey(RubyFormatterPlugin.PLUGIN_ID, key);
+			// We set all keys with the FormatterPlugin.PLUGIN_ID qualifier, since this is where we are saving
+			// all the settings for all the formatters
+			result[i] = new PreferenceKey(FormatterPlugin.PLUGIN_ID, key);
 		}
 		return result;
 	}

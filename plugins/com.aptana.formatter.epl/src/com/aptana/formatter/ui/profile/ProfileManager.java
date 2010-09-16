@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
@@ -146,13 +147,15 @@ public class ProfileManager implements IProfileManager
 		PreferenceKey[] keys = getPreferenceKeys();
 		if (keys != null)
 		{
+			IPreferenceStore store = FormatterPlugin.getDefault().getPreferenceStore();
+			
 			DefaultScope scope = new DefaultScope();
 			for (int i = 0; i < keys.length; i++)
 			{
 				PreferenceKey key = keys[i];
 				String name = key.getName();
-				IEclipsePreferences preferences = scope.getNode(key.getQualifier());
-				String value = preferences.get(name, null);
+//				IEclipsePreferences preferences = scope.getNode(key.getQualifier());
+				String value = store.getString(name);
 				if (value != null)
 					settings.put(name, value);
 			}

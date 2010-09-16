@@ -17,8 +17,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.Region;
 import org.jrubyparser.ISourcePositionHolder;
 import org.jrubyparser.SourcePosition;
 import org.jrubyparser.ast.ArgumentNode;
@@ -27,7 +25,6 @@ import org.jrubyparser.ast.BeginNode;
 import org.jrubyparser.ast.CaseNode;
 import org.jrubyparser.ast.ClassNode;
 import org.jrubyparser.ast.Colon3Node;
-import org.jrubyparser.ast.CommentNode;
 import org.jrubyparser.ast.DRegexpNode;
 import org.jrubyparser.ast.DStrNode;
 import org.jrubyparser.ast.DefnNode;
@@ -80,7 +77,6 @@ import com.aptana.ruby.formatter.internal.nodes.FormatterIfEndNode;
 import com.aptana.ruby.formatter.internal.nodes.FormatterIfNode;
 import com.aptana.ruby.formatter.internal.nodes.FormatterMethodNode;
 import com.aptana.ruby.formatter.internal.nodes.FormatterModuleNode;
-import com.aptana.ruby.formatter.internal.nodes.FormatterRDocNode;
 import com.aptana.ruby.formatter.internal.nodes.FormatterRequireNode;
 import com.aptana.ruby.formatter.internal.nodes.FormatterRescueElseNode;
 import com.aptana.ruby.formatter.internal.nodes.FormatterRescueNode;
@@ -370,14 +366,14 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				return null;
 			}
 
-			public Object visitCommentNode(CommentNode visited)
-			{
-				SourcePosition position = visited.getPosition();
-				FormatterRDocNode commentNode = new FormatterRDocNode(document, position.getStartOffset(), position
-						.getEndOffset());
-				addChild(commentNode);
-				return null;
-			}
+			// public Object visitCommentNode(CommentNode visited)
+			// {
+			// SourcePosition position = visited.getPosition();
+			// FormatterRDocNode commentNode = new FormatterRDocNode(document, position.getStartOffset(), position
+			// .getEndOffset());
+			// addChild(commentNode);
+			// return null;
+			// }
 
 			public Object visitIfNode(IfNode visited)
 			{
@@ -967,10 +963,10 @@ public class RubyFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		return createTextNode(document, position.getStartOffset(), position.getEndOffset());
 	}
 
-	private static IRegion createRegion(SourcePosition position)
-	{
-		return new Region(position.getStartOffset(), position.getEndOffset() - position.getStartOffset());
-	}
+	// private static IRegion createRegion(SourcePosition position)
+	// {
+	// return new Region(position.getStartOffset(), position.getEndOffset() - position.getStartOffset());
+	// }
 
 	protected static final Comparator<Node> POSITION_COMPARATOR = new Comparator<Node>()
 	{

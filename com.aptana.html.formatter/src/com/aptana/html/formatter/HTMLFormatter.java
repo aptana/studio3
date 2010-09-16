@@ -3,7 +3,6 @@ package com.aptana.html.formatter;
 import java.util.Map;
 
 import org.eclipse.text.edits.MultiTextEdit;
-import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
 import com.aptana.formatter.AbstractScriptFormatter;
@@ -37,6 +36,36 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	{
 		// TODO - Format the HTML.
 		return new MultiTextEdit(); // NOP
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.ui.IScriptFormatter#getIndentSize()
+	 */
+	@Override
+	public int getIndentSize()
+	{
+		return getInt(HTMLFormatterConstants.FORMATTER_INDENTATION_SIZE);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.ui.IScriptFormatter#getIndentType()
+	 */
+	@Override
+	public String getIndentType()
+	{
+		return getString(HTMLFormatterConstants.FORMATTER_TAB_CHAR);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.ui.IScriptFormatter#getTabSize()
+	 */
+	@Override
+	public int getTabSize()
+	{
+		return getInt(HTMLFormatterConstants.FORMATTER_TAB_SIZE);
 	}
 
 }

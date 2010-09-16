@@ -46,14 +46,13 @@ public class FormatterPreviewUtils {
 				disablePreview(viewer);
 				return;
 			}
-			final int tabSize = toInt(preferences
-					.get(CodeFormatterConstants.FORMATTER_TAB_SIZE));
+			IScriptFormatter formatter = factory.createFormatter(
+					LINE_SEPARATOR, preferences);
+			final int tabSize = formatter.getTabSize();
 			if (tabSize != viewer.getTextWidget().getTabs()) {
 				viewer.getTextWidget().setTabs(tabSize);
 			}
 			viewer.getTextWidget().setEnabled(true);
-			IScriptFormatter formatter = factory.createFormatter(
-					LINE_SEPARATOR, preferences);
 			try {
 				TextEdit textEdit = formatter.format(content, 0, content
 						.length(), 0);

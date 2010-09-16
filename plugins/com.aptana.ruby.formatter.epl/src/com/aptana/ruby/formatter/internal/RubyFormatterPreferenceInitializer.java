@@ -12,16 +12,16 @@ package com.aptana.ruby.formatter.internal;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 
+import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 import com.aptana.ruby.formatter.RubyFormatterConstants;
-import com.aptana.ruby.formatter.RubyFormatterPlugin;
 
 public class RubyFormatterPreferenceInitializer extends AbstractPreferenceInitializer
 {
 
 	public void initializeDefaultPreferences()
 	{
-		IPreferenceStore store = RubyFormatterPlugin.getDefault().getPreferenceStore();
+		IPreferenceStore store = FormatterPlugin.getDefault().getPreferenceStore();
 		//
 		store.setDefault(RubyFormatterConstants.INDENT_CLASS, true);
 		store.setDefault(RubyFormatterConstants.INDENT_MODULE, true);
@@ -47,9 +47,8 @@ public class RubyFormatterPreferenceInitializer extends AbstractPreferenceInitia
 		store.setDefault(RubyFormatterConstants.WRAP_COMMENTS, false);
 		store.setDefault(RubyFormatterConstants.WRAP_COMMENTS_LENGTH, 80);
 
-		// Set the generic formatting values for Ruby
-		store.setDefault(CodeFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.SPACE);
-		store.setDefault(CodeFormatterConstants.FORMATTER_TAB_SIZE, "2"); //$NON-NLS-1$
-		store.setDefault(CodeFormatterConstants.FORMATTER_INDENTATION_SIZE, "2"); //$NON-NLS-1$
+		store.setDefault(RubyFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.SPACE);
+		store.setDefault(RubyFormatterConstants.FORMATTER_TAB_SIZE, "2"); //$NON-NLS-1$
+		store.setDefault(RubyFormatterConstants.FORMATTER_INDENTATION_SIZE, "2"); //$NON-NLS-1$
 	}
 }

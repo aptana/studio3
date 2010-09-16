@@ -103,6 +103,38 @@ public class RubyFormatter extends AbstractScriptFormatter
 		return 0;
 	}
 
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.ui.IScriptFormatter#getIndentSize()
+	 */
+	@Override
+	public int getIndentSize()
+	{
+		return getInt(RubyFormatterConstants.FORMATTER_INDENTATION_SIZE);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.ui.IScriptFormatter#getIndentType()
+	 */
+	@Override
+	public String getIndentType()
+	{
+		return getString(RubyFormatterConstants.FORMATTER_TAB_CHAR);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.ui.IScriptFormatter#getTabSize()
+	 */
+	@Override
+	public int getTabSize()
+	{
+		return getInt(RubyFormatterConstants.FORMATTER_TAB_SIZE);
+	}
+
+	
 	public TextEdit format(String source, int offset, int length, int indent) throws FormatterException
 	{
 		String input = source.substring(offset, offset + length);
@@ -298,5 +330,4 @@ public class RubyFormatter extends AbstractScriptFormatter
 		while (line.length() == 0);
 		return line;
 	}
-
 }

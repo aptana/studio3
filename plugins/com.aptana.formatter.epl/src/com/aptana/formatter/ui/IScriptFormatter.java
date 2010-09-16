@@ -63,4 +63,26 @@ public interface IScriptFormatter
 	 * @see #setIsSlave(boolean)
 	 */
 	boolean isSlave();
+
+	/**
+	 * Returns the indentation size, as defined in the formatter preferences.
+	 * 
+	 * @return The indentation size.
+	 */
+	int getIndentSize();
+
+	/**
+	 * Returns the tab size, as defined in the formatter preferences.
+	 * 
+	 * @return The tab size.
+	 */
+	int getTabSize();
+
+	/**
+	 * Returns the indentation type, as defined in the formatter preferences.
+	 * 
+	 * @return The indentation type - One of {@link CodeFormatterConstants#TAB}, {@link CodeFormatterConstants#SPACE}
+	 *         or {@link CodeFormatterConstants#MIXED}
+	 */
+	String getIndentType();
 }
