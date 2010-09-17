@@ -29,17 +29,10 @@ public class HTMLFormatterFactory extends AbstractScriptFormatterFactory
 	private static final String FORMATTER_PREVIEW_FILE = "formatterPreview.html"; //$NON-NLS-1$
 
 	private static final String[] KEYS = {
-	// RubyFormatterConstants.FORMATTER_TAB_CHAR,
-	// RubyFormatterConstants.FORMATTER_INDENTATION_SIZE, RubyFormatterConstants.FORMATTER_TAB_SIZE,
-	// RubyFormatterConstants.INDENT_CLASS, RubyFormatterConstants.INDENT_MODULE,
-	// RubyFormatterConstants.INDENT_METHOD, RubyFormatterConstants.INDENT_BLOCKS,
-	// RubyFormatterConstants.INDENT_IF, RubyFormatterConstants.INDENT_CASE, RubyFormatterConstants.INDENT_WHEN,
-	// RubyFormatterConstants.LINES_FILE_AFTER_REQUIRE, RubyFormatterConstants.LINES_FILE_BETWEEN_MODULE,
-	// RubyFormatterConstants.LINES_FILE_BETWEEN_CLASS, RubyFormatterConstants.LINES_FILE_BETWEEN_METHOD,
-	// RubyFormatterConstants.LINES_BEFORE_FIRST, RubyFormatterConstants.LINES_BEFORE_MODULE,
-	// RubyFormatterConstants.LINES_BEFORE_CLASS, RubyFormatterConstants.LINES_BEFORE_METHOD,
-	// RubyFormatterConstants.LINES_PRESERVE, RubyFormatterConstants.WRAP_COMMENTS,
-	// RubyFormatterConstants.WRAP_COMMENTS_LENGTH
+		// TODO - Add more...
+		HTMLFormatterConstants.FORMATTER_INDENTATION_SIZE,
+		HTMLFormatterConstants.FORMATTER_TAB_CHAR,
+		HTMLFormatterConstants.FORMATTER_TAB_SIZE
 	};
 
 	public PreferenceKey[] getPreferenceKeys()

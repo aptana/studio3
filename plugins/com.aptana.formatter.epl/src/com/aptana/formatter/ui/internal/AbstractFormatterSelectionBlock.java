@@ -38,6 +38,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StackLayout;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
@@ -50,6 +51,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.PreferenceLinkArea;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
@@ -90,15 +92,13 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 
 	private Composite fComposite;
 	private Combo fProfileCombo;
-	private Combo fFactoryCombo;
 	private Label fFactoryDescription;
-	private Button fEditButton;
 	private Button fDeleteButton;
 	private Button fNewButton;
 	private Button fLoadButton;
 	private Button fSaveButton;
 
-	private int selectedProfile;
+	private int selectedFormatter;
 	private IScriptFormatterFactory[] factories;
 	protected SourceViewer fSelectedPreviewViewer;
 	private ArrayList<SourceViewer> sourcePreviewViewers;
@@ -229,8 +229,12 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		return super.saveValues();
 	}
 
+	/**
+	 * Apply the preferences on all the registered formatter factories.
+	 */
 	protected void applyPreferences()
 	{
+		// FIXME - This one only deals with the selected formatter. It should deal with all the registered formatters.
 		IScriptFormatterFactory factory = getSelectedFormatter();
 		IProfileManager manager = getProfileManager();
 		IProfile profile = manager.getSelected();
@@ -253,12 +257,10 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		}
 		IPreferencesSaveDelegate delegate = new SaveDelegate();
 		factory.savePreferences(settings, delegate);
-		fSelectedPreviewViewer = sourcePreviewViewers.get(selectedProfile);
+		fSelectedPreviewViewer = sourcePreviewViewers.get(selectedFormatter);
 		previewStackLayout.topControl = fSelectedPreviewViewer.getControl();
 		updatePreview();
 	}
-
-	// ~ Methods
 
 	@Override
 	public final Control createOptionsBlock(Composite parent)
@@ -304,9 +306,6 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		PixelConverter fPixConv = new PixelConverter(parent);
 		fComposite = createComposite(parent, numColumns);
 
-		// TODO - Remove this call, and instead collect, sort and display the formatters in the preview area.
-		createFormatterSection(fComposite, numColumns, fPixConv);
-
 		final Group group = SWTFactory.createGroup(fComposite,
 				FormatterMessages.AbstractFormatterSelectionBlock_profilesGroup, numColumns, numColumns,
 				GridData.FILL_BOTH);
@@ -319,53 +318,22 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 
 		fProfileCombo = createProfileCombo(group, 3, fPixConv.convertWidthInCharsToPixels(20));
 		updateComboFromProfiles();
-		fProfileCombo.addSelectionListener(new SelectionListener()
+		fProfileCombo.addSelectionListener(new SelectionAdapter()
 		{
 
 			public void widgetSelected(SelectionEvent e)
-			{
-				updateSelection();
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e)
 			{
 				updateSelection();
 			}
 		});
 
-		// TODO - Move to the preview box for the language that is being edited at the moment
-		/*
-		 * fEditButton = createButton(group, FormatterMessages.AbstractFormatterSelectionBlock_editProfile,
-		 * GridData.HORIZONTAL_ALIGN_BEGINNING); fEditButton.addSelectionListener(new SelectionListener() { public void
-		 * widgetSelected(SelectionEvent e) { editButtonPressed(); } public void widgetDefaultSelected(SelectionEvent e)
-		 * { editButtonPressed(); } });
-		 */
 		fNewButton = createButton(group, FormatterMessages.AbstractFormatterSelectionBlock_newProfile,
 				GridData.HORIZONTAL_ALIGN_BEGINNING);
-		fNewButton.addSelectionListener(new SelectionListener()
+		fNewButton.addSelectionListener(new SelectionAdapter()
 		{
-
 			public void widgetSelected(SelectionEvent e)
 			{
-				createNewProfile();
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e)
-			{
-				createNewProfile();
-			}
-
-			protected void createNewProfile()
-			{
-				IScriptFormatterFactory formatterFactory = getSelectedFormatter();
-				final CreateProfileDialog p = new CreateProfileDialog(group.getShell(), getProfileManager(),
-						profileManager.getProfileVersioner());
-				if (p.open() != Window.OK)
-				{
-					return;
-				}
-				applyPreferences();
-				updateComboFromProfiles();
+				createNewProfile(group.getShell());
 			}
 		});
 
@@ -440,6 +408,23 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		applyPreferences();
 
 		return fComposite;
+	}
+
+	/**
+	 * Create a new formatter profile. This profile will hold all the formatters that are registered in the system.
+	 * 
+	 * @param shell
+	 */
+	protected void createNewProfile(Shell shell)
+	{
+		final CreateProfileDialog p = new CreateProfileDialog(shell, getProfileManager(), profileManager
+				.getProfileVersioner());
+		if (p.open() != Window.OK)
+		{
+			return;
+		}
+		applyPreferences();
+		updateComboFromProfiles();
 	}
 
 	protected void doImport(Composite group)
@@ -538,62 +523,6 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		// }
 	}
 
-	protected void createFormatterSection(Composite composite, int numColumns, PixelConverter fPixConv)
-	{
-		// String id = getValue(getSavedContributionKey());
-		// int index = -1;
-		// for (int i = 0; i < factories.length; i++)
-		// {
-		// IScriptFormatterFactory factory = factories[i];
-		// if (factory.getId().equals(id))
-		// {
-		// index = i;
-		// break;
-		// }
-		// }
-		// if (index == -1 && factories.length != 0)
-		// {
-		// index = 0;
-		// for (int i = 1; i < factories.length; i++)
-		// {
-		// if (factories[i].getPriority() > factories[index].getPriority())
-		// {
-		// index = i;
-		// }
-		// }
-		// // doSetFactory(index);
-		// }
-		//
-		// if (factories.length > 1)
-		// {
-		// createLabel(composite, FormatterMessages.AbstractFormatterSelectionBlock_formatterLabel, numColumns);
-		// fFactoryCombo = createProfileCombo(composite, numColumns, fPixConv.convertWidthInCharsToPixels(20));
-		//
-		// for (int i = 0; i < factories.length; i++)
-		// {
-		// fFactoryCombo.add(factories[i].getName());
-		// }
-		//
-		// fFactoryCombo.addSelectionListener(new SelectionListener()
-		// {
-		//
-		// public void widgetSelected(SelectionEvent e)
-		// {
-		// doSetFactory(fFactoryCombo.getSelectionIndex());
-		// }
-		//
-		// public void widgetDefaultSelected(SelectionEvent e)
-		// {
-		// doSetFactory(fFactoryCombo.getSelectionIndex());
-		// }
-		// });
-		// fFactoryCombo.select(index);
-		// }
-		//
-		// fFactoryDescription = createLabel(composite, Util.EMPTY_STRING, numColumns, true);
-		// doSetFactory(index);
-	}
-
 	/**
 	 * Sets the formatter's profile.
 	 * 
@@ -603,7 +532,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	{
 		// FIXME - This code is wrong. We need to fix it so that the selected profile effects
 		// the previews of the factories.
-		selectedProfile = index;
+		selectedFormatter = index;
 		setValue(factories[index].getFormatterPreferenceKey(), factories[index].getId());
 		String desc = getSelectedFormatter().getDescription();
 		if (desc != null && desc.length() != 0)
@@ -629,7 +558,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		gd.horizontalSpan = numColumns;
 		previewGroup.setLayoutData(gd);
 
-		// Add a SashForm to create left and right areas. The left will hold the list of formatters, while the right
+		// Adds a SashForm to create left and right areas. The left will hold the list of formatters, while the right
 		// will hold a preview pane
 		SashForm sashForm = new SashForm(previewGroup, SWT.HORIZONTAL);
 		sashForm.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -654,7 +583,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			public void selectionChanged(SelectionChangedEvent event)
 			{
 				// Update the preview
-				selectedProfile = listViewer.getList().getSelectionIndex();
+				selectedFormatter = listViewer.getList().getSelectionIndex();
 				updatePreview();
 			}
 		});
@@ -666,7 +595,6 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		rightPanel.setLayout(layout);
 		rightPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		// TODO
 		Composite previewPane = new Composite(rightPanel, SWT.BORDER);
 		previewPane.setLayoutData(new GridData(GridData.FILL_BOTH));
 		previewStackLayout = new StackLayout();
@@ -676,9 +604,9 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			SourceViewer sourcePreview = createSourcePreview(previewPane, factory);
 			sourcePreviewViewers.add(sourcePreview);
 		}
-		if (selectedProfile != -1 && sourcePreviewViewers.size() > selectedProfile)
+		if (selectedFormatter != -1 && sourcePreviewViewers.size() > selectedFormatter)
 		{
-			fSelectedPreviewViewer = sourcePreviewViewers.get(selectedProfile);
+			fSelectedPreviewViewer = sourcePreviewViewers.get(selectedFormatter);
 			previewStackLayout.topControl = fSelectedPreviewViewer.getControl();
 		}
 		// Buttons panel
@@ -724,26 +652,24 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 				}
 			}
 		});
-		// previewStackLayout = new StackLayout();
-		// final Composite previewAreaStack = new Composite(composite, SWT.NONE);
-		// previewAreaStack.setLayoutData(new GridData(GridData.FILL_BOTH));
-		// previewAreaStack.setLayout(previewStackLayout);
-		// for (IScriptFormatterFactory factory : factories)
-		// {
-		//
-		// }
-		// fSelectedPreviewViewer = createSourcePreview(composite);
-		//
-		// gd = new GridData(GridData.FILL_VERTICAL | GridData.HORIZONTAL_ALIGN_FILL);
-		// gd.horizontalSpan = numColumns;
-		// gd.verticalSpan = 7;
-		// gd.heightHint = 100;
-		// fSelectedPreviewViewer.getControl().setLayoutData(gd);
+		editBt.addSelectionListener(new SelectionAdapter()
+		{
+			public void widgetSelected(SelectionEvent e)
+			{
+				editButtonPressed();
+			}
+		});
 	}
 
+	/**
+	 * Returns the {@link IScriptFormatterFactory} for the formatter that is selected in the list of the
+	 * formatters-preview.
+	 * 
+	 * @return The selected {@link IScriptFormatterFactory} (e.g. that one that is currently previewed)
+	 */
 	protected IScriptFormatterFactory getSelectedFormatter()
 	{
-		return factories[selectedProfile];
+		return factories[selectedFormatter];
 	}
 
 	protected final void updateSelection()
@@ -755,6 +681,9 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		updatePreview();
 	}
 
+	/**
+	 * Open the formatter settings dialog for the selected language in the code-formatter main page.
+	 */
 	protected void editButtonPressed()
 	{
 		IScriptFormatterFactory factory = getSelectedFormatter();
