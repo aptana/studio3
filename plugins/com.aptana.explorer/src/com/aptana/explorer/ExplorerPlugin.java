@@ -3,6 +3,7 @@ package com.aptana.explorer;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.State;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -16,6 +17,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.progress.UIJob;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -125,7 +127,19 @@ public class ExplorerPlugin extends AbstractUIPlugin
 	{
 		super.start(context);
 		plugin = this;
-		addPartListener();
+		// Run this in a job so we don't slow down the plugin startup!
+		// FIXME Pull the toggle/part listener code out to it's own class?
+		UIJob uiJob = new UIJob("adding app explorer toggle listener") //$NON-NLS-1$
+		{
+
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor)
+			{
+				addPartListener();
+				return Status.OK_STATUS;
+			}
+		};
+		uiJob.schedule();
 	}
 
 	/*
@@ -134,9 +148,15 @@ public class ExplorerPlugin extends AbstractUIPlugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
-		removePartListener();
-		plugin = null;
-		super.stop(context);
+		try
+		{
+			removePartListener();
+		}
+		finally
+		{
+			plugin = null;
+			super.stop(context);
+		}
 	}
 
 	/**

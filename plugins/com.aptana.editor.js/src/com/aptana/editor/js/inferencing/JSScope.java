@@ -231,7 +231,7 @@ public class JSScope
 
 		while (current != null)
 		{
-			result.addAll(this.getLocalSymbolNames());
+			result.addAll(current.getLocalSymbolNames());
 
 			current = current.getParentScope();
 		}

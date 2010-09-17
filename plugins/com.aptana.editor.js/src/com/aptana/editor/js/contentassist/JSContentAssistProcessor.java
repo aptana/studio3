@@ -260,7 +260,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		if (this._targetNode != null)
 		{
-			String fileLocation = this.getFilename();
 			JSScope globalScope = this.getGlobalScope();
 
 			if (globalScope != null)
@@ -269,6 +268,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 				if (localScope != null)
 				{
+					String fileLocation = this.getFilename();
 					Image[] userAgents = this.getAllUserAgentIcons();
 					List<String> symbols = localScope.getSymbolNames();
 

@@ -295,8 +295,13 @@ public class ChooseSiteConnectionDialog extends TrayDialog implements SelectionL
     private void initializeDefaultValues() {
         int currentIndex = 0;
         int selectIndex = 0;
+        IConnectionPoint destination;
         for (ISiteConnection site : fSites) {
-            fSiteCombo.add(site.getName() + ": " + site.getDestination().getName()); //$NON-NLS-1$
+        	destination = site.getDestination();
+        	if (destination == null) {
+        		continue;
+        	}
+            fSiteCombo.add(site.getName() + ": " + destination.getName()); //$NON-NLS-1$
             if (site == fSelectedSite) {
                 selectIndex = currentIndex;
             }
