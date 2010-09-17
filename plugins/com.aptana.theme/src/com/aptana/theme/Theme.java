@@ -44,7 +44,8 @@ public class Theme
 	private static final String BOLD = "bold"; //$NON-NLS-1$
 	private static final String ITALIC = "italic"; //$NON-NLS-1$
 
-	static final String THEME_NAME_PROP_KEY = "name"; //$NON-NLS-1$
+	public static final String THEME_NAME_PROP_KEY = "name"; //$NON-NLS-1$
+	public static final String THEME_EXTENDS_PROP_KEY = "extends_theme"; //$NON-NLS-1$
 	static final String FOREGROUND_PROP_KEY = "foreground"; //$NON-NLS-1$
 	private static final String BACKGROUND_PROP_KEY = "background"; //$NON-NLS-1$
 	private static final String SELECTION_PROP_KEY = "selection"; //$NON-NLS-1$
@@ -107,7 +108,8 @@ public class Theme
 			boolean skipFG = false;
 			for (String token : values)
 			{
-				if (token.trim().length() == 0 && num == 0)
+			    token = token.trim();
+				if (token.length() == 0 && num == 0)
 				{
 					// empty fg!
 					skipFG = true;
