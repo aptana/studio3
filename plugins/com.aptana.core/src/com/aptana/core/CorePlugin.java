@@ -198,11 +198,14 @@ public class CorePlugin extends Plugin
 
 		public synchronized void dispose()
 		{
-			for (IProject project : new HashSet<IProject>(fWatchers.keySet()))
+			if (fWatchers != null)
 			{
-				unhookFilewatcher(project);
+				for (IProject project : new HashSet<IProject>(fWatchers.keySet()))
+				{
+					unhookFilewatcher(project);
+				}
+				fWatchers = null;
 			}
-			fWatchers = null;
 		}
 
 		protected synchronized void hookFilewatcher(IProject newProject)
