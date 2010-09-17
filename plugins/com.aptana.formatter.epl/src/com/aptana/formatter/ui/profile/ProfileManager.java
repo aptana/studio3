@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
@@ -49,6 +48,7 @@ public class ProfileManager implements IProfileManager
 
 	private static final String APTANA_CODE_FORMATTER_ID = "aptana.code.formatter"; //$NON-NLS-1$
 	private static final String DEFAULT_PROFILE_ID = "com.aptana.formatter.profiles.default"; //$NON-NLS-1$
+	private static final String ACTIVE_PROFILE_ID = "com.aptana.formatter.profiles.active"; //$NON-NLS-1$
 
 	private static ProfileManager instance;
 
@@ -66,7 +66,6 @@ public class ProfileManager implements IProfileManager
 	 */
 	private IProfile fSelected;
 	private boolean fDirty = false;
-	private PreferenceKey activeProfileKey;
 	private IProfileVersioner versioner;
 	private PreferenceKey[] preferenceKeys;
 
@@ -136,7 +135,12 @@ public class ProfileManager implements IProfileManager
 		Collections.sort(fProfilesByName);
 		if (!fProfilesByName.isEmpty())
 		{
-			fSelected = fProfilesByName.get(0);
+			String storedActiveProfile = getActiveProfileKey().getStoredValue(new InstanceScope());
+			fSelected = fProfiles.get(storedActiveProfile);
+			if (fSelected == null)
+			{
+				fSelected = fProfilesByName.get(0);
+			}
 		}
 		listeners = new ListenerList();
 	}
@@ -194,10 +198,14 @@ public class ProfileManager implements IProfileManager
 		return Collections.emptyList();
 	}
 
-	protected PreferenceKey getProfilesKey()
+	/**
+	 * Returns the preferences key that will eventually hold the custom formatters settings.
+	 * 
+	 * @return The preferences key that will hold the custom formatter settings.
+	 */
+	public PreferenceKey getProfilesKey()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return new PreferenceKey(FormatterPlugin.PLUGIN_ID, APTANA_CODE_FORMATTER_ID);
 	}
 
 	protected PreferenceKey[] getPreferenceKeys()
@@ -241,14 +249,12 @@ public class ProfileManager implements IProfileManager
 		return result.toArray(new PreferenceKey[result.size()]);
 	}
 
+	/**
+	 * Returns the active profile preference key.
+	 */
 	public PreferenceKey getActiveProfileKey()
 	{
-		return activeProfileKey;
-	}
-
-	public void setActiveProfileKey(PreferenceKey activeProfile)
-	{
-		this.activeProfileKey = activeProfile;
+		return new PreferenceKey(FormatterPlugin.PLUGIN_ID, ACTIVE_PROFILE_ID);
 	}
 
 	/**
@@ -303,6 +309,11 @@ public class ProfileManager implements IProfileManager
 	public void addPropertyChangeListener(IPropertyChangeListener listener)
 	{
 		listeners.add(listener);
+	}
+
+	public void removePropertyChangeListener(IPropertyChangeListener listener)
+	{
+		listeners.remove(listener);
 	}
 
 	public void setSelected(IProfile profile)

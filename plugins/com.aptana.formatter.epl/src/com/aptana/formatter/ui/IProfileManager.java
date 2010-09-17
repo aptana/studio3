@@ -66,6 +66,8 @@ public interface IProfileManager
 	public IProfile findProfile(String profileId);
 
 	public void addPropertyChangeListener(IPropertyChangeListener listener);
+	
+	public void removePropertyChangeListener(IPropertyChangeListener listener);
 
 	/**
 	 * Get the currently selected profile.
@@ -141,4 +143,11 @@ public interface IProfileManager
 	public String getDefaultProfileID();
 
 	public String getDefaultProfileName();
+
+	/**
+	 * Returns the preferences key that will eventually hold the custom formatters settings.
+	 * 
+	 * @return The preferences key that will hold the custom formatter settings.
+	 */
+	public PreferenceKey getProfilesKey();
 }

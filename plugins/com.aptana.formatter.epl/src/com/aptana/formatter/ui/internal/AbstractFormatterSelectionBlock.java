@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.text.source.SourceViewer;
@@ -68,6 +69,7 @@ import com.aptana.formatter.ui.IProfileVersioner;
 import com.aptana.formatter.ui.IScriptFormatterFactory;
 import com.aptana.formatter.ui.ProfileKind;
 import com.aptana.formatter.ui.profile.ProfileManager;
+import com.aptana.formatter.ui.profile.ProfileStore;
 import com.aptana.ui.ContributionExtensionManager;
 import com.aptana.ui.IContributedExtension;
 import com.aptana.ui.dialogs.PropertyLinkArea;
@@ -104,6 +106,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	private ArrayList<SourceViewer> sourcePreviewViewers;
 	private StackLayout previewStackLayout;
 	private IProfileManager profileManager;
+	private IPropertyChangeListener profileChangeListener;
 
 	private static List<IScriptFormatterFactory> TEMP_LIST = new ArrayList<IScriptFormatterFactory>();
 
@@ -213,19 +216,28 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		return null;
 	}
 
+	/**
+	 * Saves the values for all the profiles.
+	 */
 	@Override
 	protected boolean saveValues()
 	{
-		// TODO - SAVE VALUES (for all profiles)
-		// for (Map.Entry<IScriptFormatterFactory, IProfileManager> entry : profileByFactory.entrySet())
-		// {
-		// final IProfileManager manager = entry.getValue();
-		// if (manager.isDirty())
-		// {
-		// entry.getKey().saveCustomProfiles(manager.getSortedProfiles());
-		// manager.clearDirty();
-		// }
-		// }
+		IProfileManager manager = getProfileManager();
+		PreferenceKey profilesKey = manager.getProfilesKey();
+		if (manager.isDirty())
+		{
+			final IProfileStore store = manager.getProfileStore();
+			try
+			{
+				String value = ((ProfileStore) store).writeProfiles(manager.getSortedProfiles());
+				profilesKey.setStoredValue(new InstanceScope(), value);
+				manager.clearDirty();
+			}
+			catch (CoreException e)
+			{
+				FormatterPlugin.logError(e);
+			}
+		}
 		return super.saveValues();
 	}
 
@@ -234,8 +246,6 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	 */
 	protected void applyPreferences()
 	{
-		// FIXME - This one only deals with the selected formatter. It should deal with all the registered formatters.
-		IScriptFormatterFactory factory = getSelectedFormatter();
 		IProfileManager manager = getProfileManager();
 		IProfile profile = manager.getSelected();
 		Map<String, String> settings = new HashMap<String, String>();
@@ -256,7 +266,10 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			}
 		}
 		IPreferencesSaveDelegate delegate = new SaveDelegate();
-		factory.savePreferences(settings, delegate);
+		for (IScriptFormatterFactory factory : factories)
+		{
+			factory.savePreferences(settings, delegate);
+		}
 		fSelectedPreviewViewer = sourcePreviewViewers.get(selectedFormatter);
 		previewStackLayout.topControl = fSelectedPreviewViewer.getControl();
 		updatePreview();
@@ -565,6 +578,19 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		final ListViewer listViewer = new ListViewer(sashForm, SWT.SINGLE | SWT.BORDER);
 		listViewer.getControl().setLayoutData(new GridData(GridData.FILL_BOTH));
 
+		// Add the right panel (code preview and buttons)
+		Composite rightPanel = new Composite(sashForm, SWT.NONE);
+		GridLayout layout = new GridLayout(1, false);
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+		rightPanel.setLayout(layout);
+		rightPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
+		final Composite previewPane = new Composite(rightPanel, SWT.BORDER);
+		previewPane.setLayoutData(new GridData(GridData.FILL_BOTH));
+		previewStackLayout = new StackLayout();
+		previewPane.setLayout(previewStackLayout);
+
+		// Set the data into the list
 		listViewer.setContentProvider(new ArrayContentProvider());
 		listViewer.setLabelProvider(new LabelProvider()
 		{
@@ -584,21 +610,13 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			{
 				// Update the preview
 				selectedFormatter = listViewer.getList().getSelectionIndex();
+				fSelectedPreviewViewer = sourcePreviewViewers.get(selectedFormatter);
+				previewStackLayout.topControl = fSelectedPreviewViewer.getControl();
+				previewPane.layout();
 				updatePreview();
 			}
 		});
-		// Add the right panel (code preview and buttons)
-		Composite rightPanel = new Composite(sashForm, SWT.NONE);
-		GridLayout layout = new GridLayout(1, false);
-		layout.marginHeight = 0;
-		layout.marginWidth = 0;
-		rightPanel.setLayout(layout);
-		rightPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		Composite previewPane = new Composite(rightPanel, SWT.BORDER);
-		previewPane.setLayoutData(new GridData(GridData.FILL_BOTH));
-		previewStackLayout = new StackLayout();
-		previewPane.setLayout(previewStackLayout);
 		for (IScriptFormatterFactory factory : this.factories)
 		{
 			SourceViewer sourcePreview = createSourcePreview(previewPane, factory);
@@ -608,7 +626,9 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		{
 			fSelectedPreviewViewer = sourcePreviewViewers.get(selectedFormatter);
 			previewStackLayout.topControl = fSelectedPreviewViewer.getControl();
+			previewPane.layout();
 		}
+
 		// Buttons panel
 		Composite buttons = new Composite(rightPanel, SWT.NONE);
 		layout = new GridLayout(2, true);
@@ -639,7 +659,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		sashForm.setWeights(new int[] { 1, 3 });
 
 		// Attach the listeners
-		profileManager.addPropertyChangeListener(new IPropertyChangeListener()
+		profileChangeListener = new IPropertyChangeListener()
 		{
 			@Override
 			public void propertyChange(PropertyChangeEvent event)
@@ -647,11 +667,17 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 				if (IProfileManager.PROFILE_SELECTED.equals(event.getProperty()))
 				{
 					IProfile profile = (IProfile) event.getNewValue();
+					fSelectedPreviewViewer = sourcePreviewViewers.get(selectedFormatter);
+					previewStackLayout.topControl = fSelectedPreviewViewer.getControl();
+					previewPane.layout();
 					updatePreview();
 					defaultsBt.setEnabled(!profile.isBuiltInProfile());
 				}
 			}
-		});
+		};
+		profileManager.addPropertyChangeListener(profileChangeListener);
+
+		// Edit
 		editBt.addSelectionListener(new SelectionAdapter()
 		{
 			public void widgetSelected(SelectionEvent e)
@@ -659,6 +685,60 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 				editButtonPressed();
 			}
 		});
+
+		// Restore Defaults
+		defaultsBt.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				PreferenceKey[] preferenceKeys = getSelectedFormatter().getPreferenceKeys();
+				IProfileManager manager = getProfileManager();
+				List<IProfile> builtInProfiles = manager.getBuiltInProfiles();
+				String defaultProfileId = manager.getDefaultProfileID();
+				IProfile defaultProfile = null;
+				for (IProfile profile : builtInProfiles)
+				{
+					if (profile.getID().equals(defaultProfileId))
+					{
+						defaultProfile = profile;
+						break;
+					}
+				}
+				if (defaultProfile != null)
+				{
+					Map<String, String> defaultSettings = defaultProfile.getSettings();
+					Map<String, String> activeSettings = manager.getSelected().getSettings();
+					for (PreferenceKey key : preferenceKeys)
+					{
+						String name = key.getName();
+						if (defaultSettings.containsKey(name))
+						{
+							activeSettings.put(name, defaultSettings.get(name));
+						}
+						else
+						{
+							activeSettings.remove(name);
+						}
+					}
+					manager.getSelected().setSettings(activeSettings);
+					// FIXME - Check why this saving does not apply to the next session
+					applyPreferences();
+					updatePreview();
+				}
+			}
+		});
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.ui.preferences.AbstractOptionsBlock#dispose()
+	 */
+	public void dispose()
+	{
+		IProfileManager profileManager = getProfileManager();
+		profileManager.removePropertyChangeListener(profileChangeListener);
+		super.dispose();
 	}
 
 	/**

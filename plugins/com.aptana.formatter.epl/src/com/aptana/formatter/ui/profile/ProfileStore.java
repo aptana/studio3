@@ -163,6 +163,13 @@ public class ProfileStore implements IProfileStore
 		return versioner;
 	}
 
+	/**
+	 * Returns an XML from the given profiles.
+	 * 
+	 * @param profiles
+	 * @return An XML string
+	 * @throws CoreException
+	 */
 	public String writeProfiles(Collection<IProfile> profiles) throws CoreException
 	{
 		ByteArrayOutputStream stream = new ByteArrayOutputStream(2000);
