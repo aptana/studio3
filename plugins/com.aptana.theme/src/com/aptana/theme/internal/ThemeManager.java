@@ -317,26 +317,25 @@ public class ThemeManager implements IThemeManager
 		{
 		    try 
 		    {
-                String themeExtends = (String) props.getProperty(Theme.THEME_EXTENDS_PROP_KEY);
-                if(themeExtends != null)
+                String multipleThemeExtends = (String) props.getProperty(Theme.THEME_EXTENDS_PROP_KEY);
+                if(multipleThemeExtends != null)
                 {
-                    String name = props.getProperty(Theme.THEME_NAME_PROP_KEY);
-                    props.remove(Theme.THEME_EXTENDS_PROP_KEY);
-                    
-                    Properties extended = nameToThemeProperties.get(themeExtends);
-                    if(extended == null)
-                    {
-                        throw new IllegalStateException("Could not find a theme for extension named: "+themeExtends+" in theme: "+name);
-                    }
-                    String baseExtends = extended.getProperty(Theme.THEME_EXTENDS_PROP_KEY);
-                    if(baseExtends != null)
-                    {
-                        //We could make it work, but let's wait for the use-case to appear.
-                        throw new IllegalStateException("Cannot currently extend a theme that's already extended.");
-                    }
                     Properties newProperties = new Properties();
-                    newProperties.putAll(extended);
+                    StringTokenizer tokenizer = new StringTokenizer(multipleThemeExtends, ",");
+                    String name = props.getProperty(Theme.THEME_NAME_PROP_KEY);
+                    while(tokenizer.hasMoreTokens())
+                    {
+                        String themeExtends = tokenizer.nextToken();
+                        Properties extended = nameToThemeProperties.get(themeExtends);
+                        if(extended == null)
+                        {
+                            throw new IllegalStateException("Could not find a theme for extension named: "+themeExtends+" in theme: "+name);
+                        }
+                        newProperties.putAll(extended);
+                    }
                     newProperties.putAll(props);
+                    //We don't want the final extends props in the properties.
+                    newProperties.remove(Theme.THEME_EXTENDS_PROP_KEY);
                     Assert.isTrue(newProperties.get(Theme.THEME_NAME_PROP_KEY).equals(name));
                     nameToThemeProperties.put(name, newProperties);
                 }
@@ -349,6 +348,11 @@ public class ThemeManager implements IThemeManager
 		
 		for(Properties props:nameToThemeProperties.values())
 		{
+		    String name = props.getProperty(Theme.THEME_NAME_PROP_KEY);
+		    if(name.startsWith("abstract_theme"))
+		    {
+		        continue;
+		    }
 		    try {
                 loadTheme(props);
             } catch (Exception e) {
