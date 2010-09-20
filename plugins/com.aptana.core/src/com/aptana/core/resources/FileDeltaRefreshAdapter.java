@@ -40,7 +40,11 @@ public class FileDeltaRefreshAdapter extends JNotifyAdapter
 			@Override
 			public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException
 			{
-				Map<IResource, Integer> copy = new HashMap<IResource, Integer>(toRefresh);
+				Map<IResource, Integer> copy;
+				synchronized (toRefresh)
+				{
+					copy = new HashMap<IResource, Integer>(toRefresh);
+				}
 				SubMonitor sub = SubMonitor.convert(monitor, copy.size());
 				for (Map.Entry<IResource, Integer> entry : copy.entrySet())
 				{
