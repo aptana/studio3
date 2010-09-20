@@ -7,9 +7,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import com.aptana.formatter.ui.IProfileManager;
-import com.aptana.formatter.ui.profile.ProfileManager;
-
 /**
  * The activator class controls the plug-in life cycle
  */
@@ -26,7 +23,7 @@ public class FormatterPlugin extends AbstractUIPlugin
 
 	// The shared instance
 	private static FormatterPlugin plugin;
-	
+
 	/**
 	 * The constructor
 	 */

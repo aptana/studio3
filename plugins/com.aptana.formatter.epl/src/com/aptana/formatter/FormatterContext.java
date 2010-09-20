@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.aptana.formatter.epl.FormatterPlugin;
+import com.aptana.formatter.nodes.IFormatterNode;
 
 public class FormatterContext implements IFormatterContext, Cloneable
 {

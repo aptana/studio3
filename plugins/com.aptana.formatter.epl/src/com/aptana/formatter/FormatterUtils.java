@@ -13,6 +13,9 @@ package com.aptana.formatter;
 
 import java.util.List;
 
+import com.aptana.formatter.nodes.IFormatterNode;
+import com.aptana.formatter.nodes.IFormatterTextNode;
+
 public class FormatterUtils {
 
 	public static boolean isSpace(char c) {

@@ -14,12 +14,12 @@ package com.aptana.ruby.formatter.internal.nodes;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.aptana.formatter.FormatterBlockNode;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.IFormatterNode;
-import com.aptana.formatter.IFormatterTextNode;
 import com.aptana.formatter.IFormatterWriter;
+import com.aptana.formatter.nodes.FormatterBlockNode;
+import com.aptana.formatter.nodes.IFormatterNode;
+import com.aptana.formatter.nodes.IFormatterTextNode;
 
 public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 {

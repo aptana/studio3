@@ -11,8 +11,8 @@
  *******************************************************************************/
 package com.aptana.ruby.formatter.internal.nodes;
 
-import com.aptana.formatter.FormatterTextNode;
 import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.nodes.FormatterTextNode;
 
 
 public class FormatterRequireNode extends FormatterTextNode {

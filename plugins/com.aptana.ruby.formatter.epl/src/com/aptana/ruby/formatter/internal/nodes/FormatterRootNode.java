@@ -13,13 +13,13 @@ package com.aptana.ruby.formatter.internal.nodes;
 
 import java.util.List;
 
-import com.aptana.formatter.FormatterBlockNode;
 import com.aptana.formatter.FormatterUtils;
-import com.aptana.formatter.IFormatterContainerNode;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.IFormatterNode;
 import com.aptana.formatter.IFormatterWriter;
+import com.aptana.formatter.nodes.FormatterBlockNode;
+import com.aptana.formatter.nodes.IFormatterContainerNode;
+import com.aptana.formatter.nodes.IFormatterNode;
 import com.aptana.ruby.formatter.RubyFormatterConstants;
 
 public class FormatterRootNode extends FormatterBlockNode

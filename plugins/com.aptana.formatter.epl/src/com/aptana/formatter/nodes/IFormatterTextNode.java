@@ -9,7 +9,7 @@
  * Contributors:
  *     xored software, Inc. - initial API and Implementation (Alex Panchenko)
  *******************************************************************************/
-package com.aptana.formatter;
+package com.aptana.formatter.nodes;
 
 public interface IFormatterTextNode extends IFormatterNode {
 

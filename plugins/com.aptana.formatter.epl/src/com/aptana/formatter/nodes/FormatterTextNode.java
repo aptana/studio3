@@ -9,9 +9,13 @@
  * Contributors:
  *     xored software, Inc. - initial API and Implementation (Alex Panchenko)
  *******************************************************************************/
-package com.aptana.formatter;
+package com.aptana.formatter.nodes;
 
 import java.io.StringWriter;
+
+import com.aptana.formatter.IFormatterContext;
+import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.IFormatterWriter;
 
 public class FormatterTextNode extends AbstractFormatterNode implements
 		IFormatterTextNode {

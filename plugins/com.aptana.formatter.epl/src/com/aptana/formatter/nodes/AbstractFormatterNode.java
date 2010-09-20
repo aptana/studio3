@@ -9,7 +9,9 @@
  * Contributors:
  *     xored software, Inc. - initial API and Implementation (Alex Panchenko)
  *******************************************************************************/
-package com.aptana.formatter;
+package com.aptana.formatter.nodes;
+
+import com.aptana.formatter.IFormatterDocument;
 
 public abstract class AbstractFormatterNode implements IFormatterNode {
 

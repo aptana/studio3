@@ -9,10 +9,12 @@
  * Contributors:
  *     xored software, Inc. - initial API and Implementation (Alex Panchenko)
  *******************************************************************************/
-package com.aptana.formatter;
+package com.aptana.formatter.nodes;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.aptana.formatter.IFormatterDocument;
 
 public abstract class FormatterNodeRewriter {
 

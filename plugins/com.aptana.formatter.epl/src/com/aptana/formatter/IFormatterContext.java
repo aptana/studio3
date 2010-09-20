@@ -11,6 +11,8 @@
  *******************************************************************************/
 package com.aptana.formatter;
 
+import com.aptana.formatter.nodes.IFormatterNode;
+
 public interface IFormatterContext {
 
 	int getIndent();

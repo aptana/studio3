@@ -9,18 +9,25 @@
  * Contributors:
  *     xored software, Inc. - initial API and Implementation (Alex Panchenko)
  *******************************************************************************/
-package com.aptana.formatter;
+package com.aptana.formatter.nodes;
 
-import java.util.List;
+import com.aptana.formatter.IFormatterContext;
+import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.IFormatterWriter;
 
-public interface IFormatterContainerNode extends IFormatterNode {
+public interface IFormatterNode {
 
-	void addChild(IFormatterNode child);
+	int DEFAULT_OFFSET = 0;
+
+	void accept(IFormatterContext context, IFormatterWriter visitor)
+			throws Exception;
 
 	boolean isEmpty();
 
-	List<IFormatterNode> getBody();
+	int getStartOffset();
 
-	List<IFormatterNode> getChildren();
+	int getEndOffset();
+
+	IFormatterDocument getDocument();
 
 }

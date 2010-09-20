@@ -57,10 +57,10 @@ import org.jrubyparser.ast.XStrNode;
 import org.jrubyparser.parser.ParserResult;
 
 import com.aptana.editor.ruby.parsing.ast.AbstractVisitor;
-import com.aptana.formatter.AbstractFormatterNodeBuilder;
-import com.aptana.formatter.IFormatterContainerNode;
 import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.IFormatterTextNode;
+import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
+import com.aptana.formatter.nodes.IFormatterContainerNode;
+import com.aptana.formatter.nodes.IFormatterTextNode;
 import com.aptana.ruby.formatter.internal.nodes.FormatterArrayNode;
 import com.aptana.ruby.formatter.internal.nodes.FormatterAtBeginNode;
 import com.aptana.ruby.formatter.internal.nodes.FormatterAtEndNode;

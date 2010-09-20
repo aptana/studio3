@@ -11,10 +11,10 @@
  *******************************************************************************/
 package com.aptana.ruby.formatter.internal.nodes;
 
-import com.aptana.formatter.FormatterBlockNode;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.IFormatterWriter;
+import com.aptana.formatter.nodes.FormatterBlockNode;
 import com.aptana.ruby.formatter.RubyFormatterConstants;
 
 public class FormatterModifierNode extends FormatterBlockNode {

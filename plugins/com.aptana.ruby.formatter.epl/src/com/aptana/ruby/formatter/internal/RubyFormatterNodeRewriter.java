@@ -8,13 +8,13 @@ import org.jrubyparser.SourcePosition;
 import org.jrubyparser.ast.CommentNode;
 import org.jrubyparser.parser.ParserResult;
 
-import com.aptana.formatter.FormatterTextNode;
 import com.aptana.formatter.FormatterUtils;
-import com.aptana.formatter.IFormatterCommentableNode;
-import com.aptana.formatter.IFormatterContainerNode;
 import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.IFormatterNode;
-import com.aptana.formatter.IFormatterTextNode;
+import com.aptana.formatter.nodes.FormatterTextNode;
+import com.aptana.formatter.nodes.IFormatterCommentableNode;
+import com.aptana.formatter.nodes.IFormatterContainerNode;
+import com.aptana.formatter.nodes.IFormatterNode;
+import com.aptana.formatter.nodes.IFormatterTextNode;
 import com.aptana.ruby.formatter.internal.nodes.FormatterCommentNode;
 
 public class RubyFormatterNodeRewriter

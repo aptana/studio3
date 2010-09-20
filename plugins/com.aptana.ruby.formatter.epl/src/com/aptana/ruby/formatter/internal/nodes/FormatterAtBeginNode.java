@@ -11,8 +11,8 @@
  *******************************************************************************/
 package com.aptana.ruby.formatter.internal.nodes;
 
-import com.aptana.formatter.IFormatterCommentableNode;
 import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.nodes.IFormatterCommentableNode;
 
 
 public class FormatterAtBeginNode extends FormatterBlockWithBeginEndNode

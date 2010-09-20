@@ -13,13 +13,13 @@ package com.aptana.ruby.formatter.internal.nodes;
 
 import org.eclipse.jface.text.IRegion;
 
-import com.aptana.formatter.FormatterTextNode;
 import com.aptana.formatter.FormatterUtils;
 import com.aptana.formatter.IFormatterCallback;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.IFormatterRawWriter;
 import com.aptana.formatter.IFormatterWriter;
+import com.aptana.formatter.nodes.FormatterTextNode;
 
 public class FormatterHereDocNode extends FormatterTextNode implements IFormatterCallback
 {

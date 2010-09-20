@@ -17,6 +17,7 @@ Eclipse-ExtensibleAPI: true
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.formatter,
  com.aptana.formatter.epl,
+ com.aptana.formatter.nodes,
  com.aptana.formatter.ui,
  com.aptana.formatter.ui.internal,
  com.aptana.formatter.ui.internal.preferences,

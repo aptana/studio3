@@ -12,8 +12,8 @@
 package com.aptana.ruby.formatter.internal;
 
 import com.aptana.formatter.FormatterContext;
-import com.aptana.formatter.IFormatterContainerNode;
-import com.aptana.formatter.IFormatterNode;
+import com.aptana.formatter.nodes.IFormatterContainerNode;
+import com.aptana.formatter.nodes.IFormatterNode;
 import com.aptana.ruby.formatter.internal.nodes.FormatterRequireNode;
 
 public class RubyFormatterContext extends FormatterContext {

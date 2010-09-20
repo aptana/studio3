@@ -19,6 +19,25 @@ import org.eclipse.osgi.util.NLS;
  */
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "com.aptana.ruby.formatter.preferences.messages"; //$NON-NLS-1$
+	public static String RubyFormatterBlankLinesPage_afterRequire;
+	public static String RubyFormatterBlankLinesPage_beforeFirstDeclare;
+	public static String RubyFormatterBlankLinesPage_beforeMethodsDeclare;
+	public static String RubyFormatterBlankLinesPage_beforeNestedClass;
+	public static String RubyFormatterBlankLinesPage_beforeNestedModule;
+	public static String RubyFormatterBlankLinesPage_betweenClasses;
+	public static String RubyFormatterBlankLinesPage_betweenMethods;
+	public static String RubyFormatterBlankLinesPage_betweenModules;
+	public static String RubyFormatterBlankLinesPage_blankLines;
+	public static String RubyFormatterBlankLinesPage_blanksWithinClassesAndModules;
+	public static String RubyFormatterBlankLinesPage_emptyLinesToPreserve;
+	public static String RubyFormatterBlankLinesPage_existingBlankLines;
+	public static String RubyFormatterCommentsPage_commentFormatting;
+	public static String RubyFormatterCommentsPage_enableCommentWrapping;
+	public static String RubyFormatterCommentsPage_maxCommentWidth;
+	public static String RubyFormatterModifyDialog_blanksTabTitle;
+	public static String RubyFormatterModifyDialog_commentsTabTitle;
+	public static String RubyFormatterModifyDialog_indentationTabTitle;
+	public static String RubyFormatterModifyDialog_rubyFormatterTitle;
 	public static String RubyFormatterPreferencePage_description;
 	static {
 		// initialize resource bundle

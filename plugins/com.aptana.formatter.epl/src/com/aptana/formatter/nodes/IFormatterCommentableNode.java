@@ -1,4 +1,4 @@
-package com.aptana.formatter;
+package com.aptana.formatter.nodes;
 
 import java.util.List;
 

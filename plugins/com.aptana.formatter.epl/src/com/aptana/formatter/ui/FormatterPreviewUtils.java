@@ -94,26 +94,6 @@ public class FormatterPreviewUtils
 		}
 	}
 
-	private static int toInt(Object value)
-	{
-		if (value != null)
-		{
-			if (value instanceof Number)
-			{
-				return ((Number) value).intValue();
-			}
-			try
-			{
-				return Integer.parseInt(value.toString());
-			}
-			catch (NumberFormatException e)
-			{
-				// ignore
-			}
-		}
-		return 0;
-	}
-
 	private static void disablePreview(ISourceViewer viewer)
 	{
 		viewer.getTextWidget().setEnabled(false);

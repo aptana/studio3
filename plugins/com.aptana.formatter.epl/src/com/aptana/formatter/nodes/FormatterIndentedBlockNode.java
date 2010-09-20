@@ -1,4 +1,8 @@
-package com.aptana.formatter;
+package com.aptana.formatter.nodes;
+
+import com.aptana.formatter.IFormatterContext;
+import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.IFormatterWriter;
 
 public class FormatterIndentedBlockNode extends FormatterBlockNode {
 

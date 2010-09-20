@@ -1,9 +1,9 @@
 package com.aptana.ruby.formatter.internal.nodes;
 
-import com.aptana.formatter.FormatterTextNode;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.IFormatterWriter;
+import com.aptana.formatter.nodes.FormatterTextNode;
 import com.aptana.ruby.formatter.RubyFormatterConstants;
 
 public class FormatterCommentNode extends FormatterTextNode {

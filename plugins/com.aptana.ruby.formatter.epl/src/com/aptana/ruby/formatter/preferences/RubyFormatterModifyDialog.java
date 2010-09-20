@@ -15,21 +15,23 @@ import com.aptana.formatter.ui.FormatterModifyDialog;
 import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
 import com.aptana.formatter.ui.IScriptFormatterFactory;
 
-public class RubyFormatterModifyDialog extends FormatterModifyDialog {
+public class RubyFormatterModifyDialog extends FormatterModifyDialog
+{
 
 	/**
 	 * @param parent
 	 */
-	public RubyFormatterModifyDialog(IFormatterModifyDialogOwner dialogOwner,
-			IScriptFormatterFactory formatterFactory) {
+	public RubyFormatterModifyDialog(IFormatterModifyDialogOwner dialogOwner, IScriptFormatterFactory formatterFactory)
+	{
 		super(dialogOwner, formatterFactory);
-		setTitle("Ruby Formatter");
+		setTitle(Messages.RubyFormatterModifyDialog_rubyFormatterTitle);
 	}
 
-	protected void addPages() {
-		addTabPage("Indentation", new RubyFormatterIndentationTabPage(this));
-		addTabPage("Blank Lines", new RubyFormatterBlankLinesPage(this));
-		addTabPage("Comments", new RubyFormatterCommentsPage(this));
+	protected void addPages()
+	{
+		addTabPage(Messages.RubyFormatterModifyDialog_indentationTabTitle, new RubyFormatterIndentationTabPage(this));
+		addTabPage(Messages.RubyFormatterModifyDialog_blanksTabTitle, new RubyFormatterBlankLinesPage(this));
+		addTabPage(Messages.RubyFormatterModifyDialog_commentsTabTitle, new RubyFormatterCommentsPage(this));
 	}
 
 }
