@@ -48,6 +48,8 @@ import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ToolBar;
 
 import com.aptana.swt.webkitbrowser.WebKitBrowser;
@@ -128,6 +130,12 @@ public class WebBrowserViewer extends Composite {
 		urlCombo = new Combo(parent, SWT.DROP_DOWN);
 		urlCombo.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 
+		urlCombo.addListener(SWT.DefaultSelection, new Listener() {
+            public void handleEvent(Event e) {
+                setUrl(urlCombo.getText());
+            }
+        });
+
 		ToolBarManager toolBarManager2 = new ToolBarManager(SWT.FLAT);
 		toolBarManager2.add(goAction);
 		toolbar = toolBarManager2.createControl(parent);
@@ -144,7 +152,7 @@ public class WebBrowserViewer extends Composite {
 
 			@Override
 			public void run() {
-				setEnabled(browser.back() && browser.isBackEnabled());
+				browser.back();
 			}
 		};
 		forwardAction = new Action("Forward") {
@@ -156,7 +164,7 @@ public class WebBrowserViewer extends Composite {
 
 			@Override
 			public void run() {
-				setEnabled(browser.forward() && browser.isForwardEnabled());
+				browser.forward();
 			}
 		};
 		stopAction = new Action("Stop") {
@@ -198,8 +206,8 @@ public class WebBrowserViewer extends Composite {
 	}
 	
 	private void updateNavigationButtons() {
-		backAction.setEnabled(browser.isBackEnabled());
-		forwardAction.setEnabled(browser.isForwardEnabled());
+		backAction.setEnabled(!loadInProgress && browser.isBackEnabled());
+		forwardAction.setEnabled(!loadInProgress && browser.isForwardEnabled());
 		stopAction.setEnabled(loadInProgress);
 		refreshAction.setEnabled(!loadInProgress);
 	}

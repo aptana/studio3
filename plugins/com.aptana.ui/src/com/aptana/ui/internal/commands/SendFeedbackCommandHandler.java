@@ -15,7 +15,7 @@ import com.aptana.ui.UIPlugin;
 public class SendFeedbackCommandHandler extends AbstractHandler
 {
 
-	private static final String SEND_FEEDBACK_URL_STRING = "https://radrails.tenderapp.com/discussions/radrails-3-prerelease#new_topic_form"; //$NON-NLS-1$
+	private static final String SEND_FEEDBACK_URL_STRING = "https://aptanastudio.tenderapp.com/discussion/new"; //$NON-NLS-1$
 	private static URL SEND_FEEDBACK_URL;
 
 	static
