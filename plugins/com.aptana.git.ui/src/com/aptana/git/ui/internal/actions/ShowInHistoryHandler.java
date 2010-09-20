@@ -10,7 +10,10 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.team.ui.TeamUI;
 import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.IURIEditorInput;
+
+import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.IGitRepositoryManager;
 
 public class ShowInHistoryHandler extends AbstractHandler
 {
@@ -28,12 +31,23 @@ public class ShowInHistoryHandler extends AbstractHandler
 	{
 		if (evaluationContext instanceof EvaluationContext)
 		{
-			enabled = (getResource((EvaluationContext) evaluationContext) != null);
+			IResource resource = getResource((EvaluationContext) evaluationContext);
+			if (resource != null)
+			{
+				GitRepository repo = getGitRepositoryManager().getAttached(resource.getProject());
+				if (repo != null)
+				{
+					enabled = true;
+					return;
+				}
+			}
 		}
-		else
-		{
-			enabled = false;
-		}
+		enabled = false;
+	}
+
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 
 	@Override
@@ -55,36 +69,28 @@ public class ShowInHistoryHandler extends AbstractHandler
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	private IResource getResource(EvaluationContext evContext)
 	{
-		// TODO Ensure that the resource is under a git repo!
 		Object input = evContext.getVariable("showInInput"); //$NON-NLS-1$
 		if (input instanceof IFileEditorInput)
 		{
 			IFileEditorInput fei = (IFileEditorInput) input;
 			return fei.getFile();
 		}
-		else if (input instanceof IURIEditorInput)
-		{
-			// IURIEditorInput uriInput = (IURIEditorInput) input;
-			// open(uriInput.getURI());
-		}
-		else
-		{
-			@SuppressWarnings("unchecked")
-			List<Object> selectedFiles = (List<Object>) evContext.getDefaultVariable();
-			for (Object selected : selectedFiles)
-			{
-				if (selected instanceof IResource)
-				{
-					return (IResource) selected;
-				}
-				else if (selected instanceof IAdaptable)
-				{
-					return (IResource) ((IAdaptable) selected).getAdapter(IResource.class);
-				}
 
+		List<Object> selectedFiles = (List<Object>) evContext.getDefaultVariable();
+		for (Object selected : selectedFiles)
+		{
+			if (selected instanceof IResource)
+			{
+				return (IResource) selected;
 			}
+			else if (selected instanceof IAdaptable)
+			{
+				return (IResource) ((IAdaptable) selected).getAdapter(IResource.class);
+			}
+
 		}
 		return null;
 	}
