@@ -45,6 +45,10 @@ public abstract class FormatterModifyTabPage implements IFormatterModifiyTabPage
 
 	private final IFormatterModifyDialog dialog;
 	private ISourceViewer previewViewer;
+	/**
+	 * A pixel converter for layout calculations
+	 */
+	protected PixelConverter fPixelConverter;
 
 	/**
 	 * @param dialog
@@ -336,10 +340,4 @@ public abstract class FormatterModifyTabPage implements IFormatterModifiyTabPage
 		gd.widthHint = widthHint;
 		return gd;
 	}
-
-	/**
-	 * A pixel converter for layout calculations
-	 */
-	protected PixelConverter fPixelConverter;
-
 }

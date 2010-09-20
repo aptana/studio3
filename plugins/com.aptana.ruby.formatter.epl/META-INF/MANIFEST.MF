@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Aptana Ruby Formatter [EPL]
-Bundle-SymbolicName: com.aptana.ruby.formatter.epl;singleton:=true
+Bundle-SymbolicName: com.aptana.editor.ruby.formatter.epl;singleton:=true
 Bundle-Version: 3.0.0.qualifier
-Bundle-Activator: com.aptana.ruby.formatter.RubyFormatterPlugin
+Bundle-Activator: com.aptana.editor.ruby.formatter.RubyFormatterPlugin
 Bundle-Vendor: Aptana Inc.
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,

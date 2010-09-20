@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Aptana HTML Formatter
-Bundle-SymbolicName: com.aptana.html.formatter;singleton:=true
+Bundle-SymbolicName: com.aptana.editor.html.formatter;singleton:=true
 Bundle-Version: 3.0.0.qualifier
-Bundle-Activator: com.aptana.html.formatter.HTMLFormatterPlugin
+Bundle-Activator: com.aptana.editor.html.formatter.HTMLFormatterPlugin
 Bundle-Vendor: Aptana Inc.
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,

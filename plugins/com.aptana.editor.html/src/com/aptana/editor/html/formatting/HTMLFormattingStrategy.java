@@ -26,6 +26,7 @@ import com.aptana.editor.html.Activator;
 
 /**
  * Code formatting strategy for HTML.
+ * TODO - Remove this once the HTML formatter is in place.
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
