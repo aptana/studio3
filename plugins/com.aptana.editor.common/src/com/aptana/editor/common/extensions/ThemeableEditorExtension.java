@@ -242,7 +242,6 @@ public class ThemeableEditorExtension
 		if (this.fCaretImage != null && fCaretColor.equals(caretColor))
 			return;
 
-		PaletteData data = new PaletteData(new RGB[] { caretColor });
 		int x = caret.getSize().x;
 		int y = caret.getSize().y;
 		// Apparently the current caret may have invalid sizings
@@ -254,6 +253,8 @@ public class ThemeableEditorExtension
 		{
 			try
 			{
+				RGB inverted = new RGB(255 - caretColor.red, 255 - caretColor.green, 255 - caretColor.blue);
+				PaletteData data = new PaletteData(new RGB[] { inverted });
 				ImageData iData = new ImageData(x, y, 1, data);
 				caret.setImage(null);
 				if (this.fCaretImage != null)
