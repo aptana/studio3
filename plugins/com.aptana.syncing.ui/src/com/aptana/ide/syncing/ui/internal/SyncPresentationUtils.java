@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -32,7 +32,6 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-
 package com.aptana.ide.syncing.ui.internal;
 
 import java.text.SimpleDateFormat;
