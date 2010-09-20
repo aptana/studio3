@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.PixelConverter;
@@ -74,9 +75,9 @@ import com.aptana.ui.ContributionExtensionManager;
 import com.aptana.ui.IContributedExtension;
 import com.aptana.ui.dialogs.PropertyLinkArea;
 import com.aptana.ui.preferences.AbstractOptionsBlock;
-import com.aptana.ui.preferences.IPreferencesLookupDelegate;
 import com.aptana.ui.preferences.IPreferencesSaveDelegate;
 import com.aptana.ui.preferences.PreferenceKey;
+import com.aptana.ui.util.ExceptionHandler;
 import com.aptana.ui.util.IStatusChangeListener;
 import com.aptana.ui.util.SWTFactory;
 import com.aptana.ui.util.SWTUtil;
@@ -142,51 +143,6 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			profileManager = ProfileManager.getInstance();
 		}
 		return profileManager;
-	}
-
-	private void selectCurrentProfile(IProfileManager manager)
-	{
-		PreferenceKey activeProfileKey = manager.getActiveProfileKey();
-		if (activeProfileKey != null)
-		{
-			String profileId = getValue(activeProfileKey);
-			if (profileId != null && profileId.length() != 0)
-			{
-				IProfile profile = manager.findProfile(profileId);
-				if (profile != null)
-				{
-					manager.setSelected(profile);
-					return;
-				}
-			}
-		}
-		// We need to collect *all* the settings from all the factories.
-		// Map<String, String> preferences = factories[0].retrievePreferences(new LoadDelegate());
-		Map<String, String> preferences = new HashMap<String, String>();
-		LoadDelegate delegate = new LoadDelegate();
-		for (IScriptFormatterFactory factory : factories)
-		{
-			preferences.putAll(factory.retrievePreferences(delegate));
-		}
-
-		if (!preferences.isEmpty())
-		{
-			for (IProfile profile : manager.getSortedProfiles())
-			{
-				if (profile.equalsTo(preferences))
-				{
-					manager.setSelected(profile);
-					return;
-				}
-			}
-		}
-		String name = getProfileName(manager.getSortedProfiles(),
-				FormatterMessages.AbstractFormatterSelectionBlock_activeProfileName);
-		// Once one factory is set to create a new profile, we create a new profile for all the other factories as well.
-
-		IProfile profile = manager.create(ProfileKind.CUSTOM, name, preferences, manager.getProfileVersioner()
-				.getCurrentVersion());
-		manager.setSelected(profile);
 	}
 
 	protected String getProfileName(List<IProfile> profiles, String prefix)
@@ -402,15 +358,9 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		});
 
 		fSaveButton = createButton(group, FormatterMessages.FormatterModifyDialog_export, SWT.PUSH);
-		fSaveButton.addSelectionListener(new SelectionListener()
+		fSaveButton.addSelectionListener(new SelectionAdapter()
 		{
-
 			public void widgetSelected(SelectionEvent e)
-			{
-				doExport();
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e)
 			{
 				doExport();
 			}
@@ -442,7 +392,6 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 
 	protected void doImport(Composite group)
 	{
-		// TODO - This import should probably handle multiple languages as well.
 		final FileDialog dialog = new FileDialog(group.getShell(), SWT.OPEN);
 		dialog.setText(FormatterMessages.AbstractFormatterSelectionBlock_importProfileLabel);
 		dialog.setFilterExtensions(new String[] { "*.xml" }); //$NON-NLS-1$
@@ -498,42 +447,46 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		applyPreferences();
 	}
 
+	/**
+	 * Export the formatter as an XML.
+	 */
 	private void doExport()
 	{
-		// TODO - Run a combined export for all the languages
-		// IProfileStore store = formatterFactory.getProfileStore();
-		// IProfile selected = manager.create(ProfileKind.TEMPORARY,
-		// fProfileNameField.getText(), getPreferences(), profile
-		// .getFormatterId(), profile.getVersion());
-		//
-		// final FileDialog dialog = new FileDialog(getShell(), SWT.SAVE);
-		// dialog.setText(FormatterMessages.FormatterModifyDialog_exportProfile);
-		//		dialog.setFilterExtensions(new String[] { "*.xml" }); //$NON-NLS-1$
-		//
-		// final String path = dialog.open();
-		// if (path == null)
-		// return;
-		//
-		// final File file = new File(path);
-		// String message = NLS.bind(
-		// FormatterMessages.FormatterModifyDialog_replaceFileQuestion,
-		// file.getAbsolutePath());
-		// if (file.exists()
-		// && !MessageDialog.openQuestion(getShell(),
-		// FormatterMessages.FormatterModifyDialog_exportProfile,
-		// message)) {
-		// return;
-		// }
-		//
-		// final Collection<IProfile> profiles = new ArrayList<IProfile>();
-		// profiles.add(selected);
-		// try {
-		// store.writeProfilesToFile(profiles, file);
-		// } catch (CoreException e) {
-		// final String title = FormatterMessages.FormatterModifyDialog_exportProfile;
-		// message = FormatterMessages.FormatterModifyDialog_exportProblem;
-		// ExceptionHandler.handle(e, getShell(), title, message);
-		// }
+		IProfileManager manager = getProfileManager();
+		IProfileStore store = manager.getProfileStore();
+		IProfile activeProfile = manager.getSelected();
+		IProfile selected = manager.create(ProfileKind.TEMPORARY, activeProfile.getName(), activeProfile.getSettings(),
+				activeProfile.getVersion());
+
+		final FileDialog dialog = new FileDialog(getShell(), SWT.SAVE);
+		dialog.setText(FormatterMessages.FormatterModifyDialog_exportProfile);
+		dialog.setFilterExtensions(new String[] { "*.xml" }); //$NON-NLS-1$
+
+		final String path = dialog.open();
+		if (path == null)
+			return;
+
+		final File file = new File(path);
+		String message = NLS.bind(FormatterMessages.FormatterModifyDialog_replaceFileQuestion, file.getAbsolutePath());
+		if (file.exists()
+				&& !MessageDialog.openQuestion(getShell(), FormatterMessages.FormatterModifyDialog_exportProfile,
+						message))
+		{
+			return;
+		}
+
+		final Collection<IProfile> profiles = new ArrayList<IProfile>();
+		profiles.add(selected);
+		try
+		{
+			store.writeProfilesToFile(profiles, file);
+		}
+		catch (CoreException e)
+		{
+			final String title = FormatterMessages.FormatterModifyDialog_exportProfile;
+			message = FormatterMessages.FormatterModifyDialog_exportProblem;
+			ExceptionHandler.handle(e, getShell(), title, message);
+		}
 	}
 
 	/**
@@ -543,8 +496,6 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	 */
 	protected void doSetProfile(int index)
 	{
-		// FIXME - This code is wrong. We need to fix it so that the selected profile effects
-		// the previews of the factories.
 		selectedFormatter = index;
 		setValue(factories[index].getFormatterPreferenceKey(), factories[index].getId());
 		String desc = getSelectedFormatter().getDescription();
@@ -636,11 +587,11 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		layout.marginWidth = 0;
 		buttons.setLayout(layout);
 		final Button editBt = new Button(buttons, SWT.PUSH);
-		editBt.setText("Edit");
+		editBt.setText(FormatterMessages.AbstractFormatterSelectionBlock_edit);
 		GridData editLayoutData = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1);
 		editBt.setLayoutData(editLayoutData);
 		final Button defaultsBt = new Button(buttons, SWT.PUSH);
-		defaultsBt.setText("Defaults");
+		defaultsBt.setText(FormatterMessages.AbstractFormatterSelectionBlock_defaults);
 		GridData defaultLauoutData = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1);
 		defaultsBt.setLayoutData(defaultLauoutData);
 
@@ -692,8 +643,16 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				PreferenceKey[] preferenceKeys = getSelectedFormatter().getPreferenceKeys();
+				IScriptFormatterFactory formatter = getSelectedFormatter();
+				PreferenceKey[] preferenceKeys = formatter.getPreferenceKeys();
 				IProfileManager manager = getProfileManager();
+				if (!MessageDialog.openQuestion(defaultsBt.getShell(),
+						FormatterMessages.AbstractFormatterSelectionBlock_confirmDefaultsTitle, NLS.bind(
+								FormatterMessages.AbstractFormatterSelectionBlock_confirmDefaultsMessage, formatter
+										.getName())))
+				{
+					return;
+				}
 				List<IProfile> builtInProfiles = manager.getBuiltInProfiles();
 				String defaultProfileId = manager.getDefaultProfileID();
 				IProfile defaultProfile = null;
@@ -709,12 +668,15 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 				{
 					Map<String, String> defaultSettings = defaultProfile.getSettings();
 					Map<String, String> activeSettings = manager.getSelected().getSettings();
+					IScopeContext context = new InstanceScope();
 					for (PreferenceKey key : preferenceKeys)
 					{
 						String name = key.getName();
 						if (defaultSettings.containsKey(name))
 						{
-							activeSettings.put(name, defaultSettings.get(name));
+							String value = defaultSettings.get(name);
+							activeSettings.put(name, value);
+							key.setStoredValue(context, value);
 						}
 						else
 						{
@@ -722,9 +684,9 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 						}
 					}
 					manager.getSelected().setSettings(activeSettings);
-					// FIXME - Check why this saving does not apply to the next session
+					manager.markDirty();
+					// Apply the preferences. This will update the preview as well.
 					applyPreferences();
-					updatePreview();
 				}
 			}
 		});
@@ -820,26 +782,6 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			IProfile selected = getProfileManager().getSelected();
 			fDeleteButton.setEnabled(!selected.isBuiltInProfile());
 		}
-	}
-
-	private class LoadDelegate implements IPreferencesLookupDelegate
-	{
-
-		public boolean getBoolean(String qualifier, String key)
-		{
-			return getBooleanValue(new PreferenceKey(qualifier, key));
-		}
-
-		public int getInt(String qualifier, String key)
-		{
-			return getIntValue(new PreferenceKey(qualifier, key));
-		}
-
-		public String getString(String qualifier, String key)
-		{
-			return getValue(new PreferenceKey(qualifier, key));
-		}
-
 	}
 
 	private class SaveDelegate implements IPreferencesSaveDelegate

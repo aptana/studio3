@@ -18,8 +18,12 @@ public class FormatterMessages extends NLS {
 	public static String AbstractFormatterSelectionBlock_activeProfileName;
 	public static String AbstractScriptFormatterFactory_defaultProfileName;
 	public static String AbstractFormatterSelectionBlock_activeProfile;
+	public static String AbstractFormatterSelectionBlock_confirmDefaultsMessage;
+	public static String AbstractFormatterSelectionBlock_confirmDefaultsTitle;
 	public static String AbstractFormatterSelectionBlock_confirmRemoveLabel;
 	public static String AbstractFormatterSelectionBlock_confirmRemoveMessage;
+	public static String AbstractFormatterSelectionBlock_defaults;
+	public static String AbstractFormatterSelectionBlock_edit;
 	public static String AbstractFormatterSelectionBlock_editProfile;
 	public static String AbstractFormatterSelectionBlock_importingProfile;
 	public static String AbstractFormatterSelectionBlock_importProfile;
