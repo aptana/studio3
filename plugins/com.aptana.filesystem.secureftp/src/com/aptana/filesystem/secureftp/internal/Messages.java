@@ -52,6 +52,8 @@ import org.eclipse.osgi.util.NLS;
 	public static String FTPSConnectionFileManager_HostNameNotFound;
 	public static String FTPSConnectionFileManager_PasswordNotAccepted;
 	public static String FTPSConnectionFileManager_RemoteFolderNotFound;
+	public static String FTPSConnectionFileManager_ServerSertificateError;
+
 	public static String FTPSConnectionFileManager_SpecifyPassword;
 	public static String SecureUtils_InvalidPrivateKey;
 	public static String SecureUtils_UnableToReadPrivateKey;
