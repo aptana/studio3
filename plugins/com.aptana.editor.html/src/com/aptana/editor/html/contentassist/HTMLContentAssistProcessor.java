@@ -368,6 +368,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 				String replaceString = element.getName();
 
+				int cursorPosition = replaceString.length();
 				if (close)
 				{
 					if (state == null)
@@ -379,6 +380,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					if (element.getName().startsWith("!") || state.isEmptyTagType(element.getName())) //$NON-NLS-1$
 					{
 						replaceString += "/>"; //$NON-NLS-1$
+						// TODO Depending on tag, we should stick cursor inside the tag or after the end of tag
+						cursorPosition += 2;
 					}
 					else
 					{
@@ -396,16 +399,19 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						if (!OpenTagCloser.tagClosed(doc, offset, element.getName()))
 						{
 							replaceString += "></" + element.getName() + ">"; //$NON-NLS-1$ //$NON-NLS-2$
+							// TODO Depending on the tag, we should add a "tabstop" inside the open part of the tag
+							cursorPosition += 1;
 						}
 						else
 						{
 							replaceString += ">"; //$NON-NLS-1$
+							cursorPosition += 1;
 						}
 					}
 				}
 
-				CommonCompletionProposal proposal = new CommonCompletionProposal(replaceString, offset, replaceLength, replaceString.length(), ELEMENT_ICON,
-					element.getName(), null, element.getDescription());
+				CommonCompletionProposal proposal = new CommonCompletionProposal(replaceString, offset, replaceLength,
+						cursorPosition, ELEMENT_ICON, element.getName(), null, element.getDescription());
 
 				proposal.setFileLocation(HTMLIndexConstants.CORE);
 				proposal.setUserAgentImages(userAgentIcons);
@@ -434,7 +440,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				Image[] userAgentIcons = this.getAllUserAgentIcons();
 
-				this.addProposal(proposals, entity.getName(), ELEMENT_ICON, entity.getDescription(), userAgentIcons, offset);
+				this.addProposal(proposals, entity.getName(), ELEMENT_ICON, entity.getDescription(), userAgentIcons,
+						offset);
 			}
 		}
 	}
@@ -457,7 +464,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 			for (Entry<String, String> entry : ids.entrySet())
 			{
-				this.addProposal(proposals, entry.getKey(), ATTRIBUTE_ICON, null, userAgentIcons, entry.getValue(), offset);
+				this.addProposal(proposals, entry.getKey(), ATTRIBUTE_ICON, null, userAgentIcons, entry.getValue(),
+						offset);
 			}
 		}
 		return proposals;
@@ -470,7 +478,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @param result
 	 */
-	private void addOpenTagPropsals(List<ICompletionProposal> proposals, LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
+	private void addOpenTagPropsals(List<ICompletionProposal> proposals, LexemeProvider<HTMLTokenType> lexemeProvider,
+			int offset)
 	{
 		LocationType location = this.getOpenTagLocationType(lexemeProvider, offset);
 
@@ -503,7 +512,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param userAgents
 	 * @param offset
 	 */
-	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, int offset)
+	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description,
+			Image[] userAgents, int offset)
 	{
 		this.addProposal(proposals, name, image, description, userAgents, HTMLIndexConstants.CORE, offset);
 	}
@@ -517,21 +527,22 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param userAgents
 	 * @param offset
 	 */
-	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, String fileLocation,
-		int offset)
+	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description,
+			Image[] userAgents, String fileLocation, int offset)
 	{
 		CommonCompletionProposal proposal = createProposal(name, image, description, userAgents, fileLocation, offset);
 		// add it to the list
 		proposals.add(proposal);
 	}
 
-	private CommonCompletionProposal createProposal(String name, Image image, String description, Image[] userAgents, String fileLocation, int offset)
+	private CommonCompletionProposal createProposal(String name, Image image, String description, Image[] userAgents,
+			String fileLocation, int offset)
 	{
 		return createProposal(name, name, image, description, userAgents, fileLocation, offset, name.length());
 	}
 
-	protected CommonCompletionProposal createProposal(String displayName, String name, Image image, String description, Image[] userAgents,
-		String fileLocation, int offset, int length)
+	protected CommonCompletionProposal createProposal(String displayName, String name, Image image, String description,
+			Image[] userAgents, String fileLocation, int offset, int length)
 	{
 		IContextInformation contextInfo = null;
 
@@ -545,7 +556,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		}
 
 		// build proposal
-		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image, displayName, contextInfo, description);
+		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image,
+				displayName, contextInfo, description);
 		proposal.setFileLocation(fileLocation);
 		proposal.setUserAgentImages(userAgents);
 		return proposal;
@@ -558,7 +570,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * , int, char, boolean)
 	 */
 	@Override
-	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
+	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
+			boolean autoActivated)
 	{
 		// tokenize the current document
 		_document = viewer.getDocument();
@@ -884,7 +897,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					break;
 
 				case EQUAL:
-					result = (offset <= lexeme.getStartingOffset()) ? LocationType.IN_ATTRIBUTE_NAME : LocationType.IN_ATTRIBUTE_VALUE;
+					result = (offset <= lexeme.getStartingOffset()) ? LocationType.IN_ATTRIBUTE_NAME
+							: LocationType.IN_ATTRIBUTE_VALUE;
 					break;
 
 				case TAG_START:
