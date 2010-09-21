@@ -55,7 +55,7 @@ public class RubySourceEditor extends AbstractThemeableEditor
 {
 
 	private static final char[] PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'', '\'',
-			'"', '"', '|', '|', 'Ò', 'Ó' };
+			'"', '"', '|', '|', 8220, 8221, 8216, 8217 }; // curly double quotes, curly single quotes
 
 	@Override
 	protected void initializeEditor()

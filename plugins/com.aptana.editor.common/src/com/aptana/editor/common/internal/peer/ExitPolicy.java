@@ -47,7 +47,6 @@ import org.eclipse.swt.events.VerifyEvent;
 
 import com.aptana.editor.common.internal.peer.PeerCharacterCloser.BracketLevel;
 
-
 /**
  * Determines when to exit linked mode in the editor.
  * 
@@ -56,6 +55,12 @@ import com.aptana.editor.common.internal.peer.PeerCharacterCloser.BracketLevel;
 class ExitPolicy implements IExitPolicy
 {
 
+	/**
+	 * Integer constants for the special "curly" quotes. See http://www.dwheeler.com/essays/quotes-in-html.html
+	 */
+	private static final int CURLY_RIGHT_SINGLE_QUOTE = 8217;
+	private static final int CURLY_RIGHT_DOUBLE_QUOTE = 8221;
+	
 	private ITextViewer fTextViewer;
 	private final char fExitCharacter;
 	private final char fEscapeCharacter;
@@ -111,16 +116,18 @@ class ExitPolicy implements IExitPolicy
 
 	/**
 	 * Don't insert newline when we're in auto-paired string chars, pipes ||, or less-than/greater-than <> pair.
+	 * 
 	 * @return
 	 */
 	private boolean shouldInsertNewline()
 	{
 		return !isStringPair() && fExitCharacter != '|' && fExitCharacter != '>';
 	}
-	
+
 	private boolean isStringPair()
 	{
-		return fExitCharacter == '"' || fExitCharacter == '\'' || fExitCharacter == '`' || fExitCharacter == 'Ó';
+		return fExitCharacter == '"' || fExitCharacter == '\'' || fExitCharacter == '`'
+				|| fExitCharacter == CURLY_RIGHT_DOUBLE_QUOTE || fExitCharacter == CURLY_RIGHT_SINGLE_QUOTE;
 	}
 
 	/**
