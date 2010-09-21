@@ -173,6 +173,7 @@ public class ExplorerPlugin extends AbstractUIPlugin
 				return Status.OK_STATUS;
 			}
 		};
+		uiJob.setSystem(true);
 		uiJob.schedule();
 	}
 
