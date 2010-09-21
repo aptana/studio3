@@ -58,8 +58,8 @@ class ExitPolicy implements IExitPolicy
 	/**
 	 * Integer constants for the special "curly" quotes. See http://www.dwheeler.com/essays/quotes-in-html.html
 	 */
-	private static final int CURLY_RIGHT_SINGLE_QUOTE = 8217;
-	private static final int CURLY_RIGHT_DOUBLE_QUOTE = 8221;
+	private static final char CURLY_RIGHT_SINGLE_QUOTE = '\u2019';
+	private static final char CURLY_RIGHT_DOUBLE_QUOTE = '\u201D';
 	
 	private ITextViewer fTextViewer;
 	private final char fExitCharacter;
