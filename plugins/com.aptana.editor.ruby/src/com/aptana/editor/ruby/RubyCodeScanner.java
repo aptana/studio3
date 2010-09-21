@@ -45,7 +45,7 @@ import org.jrubyparser.parser.Tokens;
 public class RubyCodeScanner implements ITokenScanner
 {
 
-	private ITokenScanner fScanner;
+	private RubyTokenScanner fScanner;
 	private boolean nextIsMethodName;
 	private boolean nextIsModuleName;
 	private boolean nextIsClassName;
@@ -84,8 +84,7 @@ public class RubyCodeScanner implements ITokenScanner
 				lookForBlock = false;
 		}
 
-		if (nextAreArgs
-				&& (data.intValue() == RubyTokenScanner.NEWLINE || data.intValue() == RubyTokenScanner.SEMICOLON))
+		if (nextAreArgs && (isNewline(data) || data.intValue() == RubyTokenScanner.SEMICOLON))
 		{
 			nextAreArgs = false;
 		}
@@ -236,6 +235,20 @@ public class RubyCodeScanner implements ITokenScanner
 			default:
 				return getToken("default.ruby"); //$NON-NLS-1$
 		}
+	}
+
+	@SuppressWarnings("nls")
+	protected boolean isNewline(Integer data)
+	{
+		if (data.intValue() == RubyTokenScanner.NEWLINE)
+			return true;
+		if (data.intValue() != Tokens.tWHITESPACE)
+			return false;
+		// make sure it's actually a newline
+		String tokenSrc = fScanner.getSource(fOffset, fLength);
+		if (tokenSrc == null)
+			return false;
+		return tokenSrc.equals("\r\n") || tokenSrc.equals("\n") || tokenSrc.equals("\r");
 	}
 
 	protected IToken getToken(String tokenName)
