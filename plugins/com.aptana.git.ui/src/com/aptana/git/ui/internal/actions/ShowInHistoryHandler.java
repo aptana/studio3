@@ -9,6 +9,7 @@ import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.team.ui.TeamUI;
+import org.eclipse.team.ui.history.IHistoryView;
 import org.eclipse.ui.IFileEditorInput;
 
 import com.aptana.git.core.GitPlugin;
@@ -63,7 +64,11 @@ public class ShowInHistoryHandler extends AbstractHandler
 			IResource resource = getResource((EvaluationContext) context);
 			if (resource != null)
 			{
-				TeamUI.getHistoryView().showHistoryFor(resource);
+				IHistoryView view = TeamUI.getHistoryView();
+				if (view != null)
+				{
+					view.showHistoryFor(resource);
+				}
 			}
 		}
 		return null;
