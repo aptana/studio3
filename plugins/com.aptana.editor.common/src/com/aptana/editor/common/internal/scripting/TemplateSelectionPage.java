@@ -34,6 +34,7 @@
  */
 package com.aptana.editor.common.internal.scripting;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -57,6 +58,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.scripting.model.TemplateElement;
@@ -216,7 +218,9 @@ public class TemplateSelectionPage extends WizardPage implements ISelectionChang
 	 */
 	protected void setPreviewContent(TemplateElement template)
 	{
-		String templateContent = NewFileWizard.getTemplateContent(template);
+		WizardNewFileCreationPage fileCreationPage = (WizardNewFileCreationPage) getPreviousPage();
+		IPath path = fileCreationPage.getContainerFullPath().append(fileCreationPage.getFileName());
+		String templateContent = NewFileWizard.getTemplateContent(template, path);
 		if (templateContent == null)
 		{
 			templatePreview.setText(""); //$NON-NLS-1$
