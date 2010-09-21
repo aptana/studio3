@@ -52,7 +52,6 @@ import org.eclipse.debug.internal.ui.views.memory.IMemoryViewPane;
 import org.eclipse.debug.internal.ui.views.memory.MemoryView;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.jface.preference.JFacePreferences;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.hyperlink.DefaultHyperlinkPresenter;
@@ -126,6 +125,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 	public InvasiveThemeHijacker()
 	{
 		super("Installing invasive theme hijacker!"); //$NON-NLS-1$
+		setSystem(true);
 	}
 
 	protected boolean invasiveThemesEnabled()
@@ -576,9 +576,9 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 	protected void applyThemeToJDTEditor(Theme theme, boolean revertToDefaults, IProgressMonitor monitor)
 	{
 		// Set prefs for all editors
-	    setHyperlinkValues(theme, new InstanceScope().getNode("org.eclipse.ui.workbench"), revertToDefaults);
-	    setHyperlinkValues(theme, new InstanceScope().getNode(ThemePlugin.PLUGIN_ID), revertToDefaults);
-	    
+		setHyperlinkValues(theme, new InstanceScope().getNode("org.eclipse.ui.workbench"), revertToDefaults);
+		setHyperlinkValues(theme, new InstanceScope().getNode(ThemePlugin.PLUGIN_ID), revertToDefaults);
+
 		setGeneralEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.texteditor"), revertToDefaults);
 		setEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.editors"), revertToDefaults);
 
@@ -719,36 +719,38 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		}
 	}
 
-	protected void setHyperlinkValues(Theme theme, IEclipsePreferences prefs, boolean revertToDefaults){
-	    if (prefs == null)
-	        return;
-	    if (revertToDefaults)
-	    {
-	        //Console preferences
-	        prefs.remove(JFacePreferences.HYPERLINK_COLOR);
-	        prefs.remove(JFacePreferences.ACTIVE_HYPERLINK_COLOR);
-	        
-	        //Editor preferences
-	        prefs.remove(DefaultHyperlinkPresenter.HYPERLINK_COLOR_SYSTEM_DEFAULT);
-	        prefs.remove(DefaultHyperlinkPresenter.HYPERLINK_COLOR);
-	        
-	    }
-	    else
-	    {
-	        TextAttribute consoleHyperlink = theme.getTextAttribute("console.hyperlink");
-	        TextAttribute editorHyperlink = theme.getTextAttribute("hyperlink");
-	        
-	        prefs.put(JFacePreferences.HYPERLINK_COLOR,
-	                StringConverter.asString(consoleHyperlink.getForeground().getRGB()));
-	        prefs.put(JFacePreferences.ACTIVE_HYPERLINK_COLOR,
-	                StringConverter.asString(consoleHyperlink.getForeground().getRGB()));
-	        prefs.putBoolean(DefaultHyperlinkPresenter.HYPERLINK_COLOR_SYSTEM_DEFAULT, false);
-	        prefs.put(DefaultHyperlinkPresenter.HYPERLINK_COLOR, StringConverter.asString(editorHyperlink.getForeground().getRGB()));
-	        
-	    }
-	    
+	protected void setHyperlinkValues(Theme theme, IEclipsePreferences prefs, boolean revertToDefaults)
+	{
+		if (prefs == null)
+			return;
+		if (revertToDefaults)
+		{
+			// Console preferences
+			prefs.remove(JFacePreferences.HYPERLINK_COLOR);
+			prefs.remove(JFacePreferences.ACTIVE_HYPERLINK_COLOR);
+
+			// Editor preferences
+			prefs.remove(DefaultHyperlinkPresenter.HYPERLINK_COLOR_SYSTEM_DEFAULT);
+			prefs.remove(DefaultHyperlinkPresenter.HYPERLINK_COLOR);
+
+		}
+		else
+		{
+			TextAttribute consoleHyperlink = theme.getTextAttribute("console.hyperlink");
+			TextAttribute editorHyperlink = theme.getTextAttribute("hyperlink");
+
+			prefs.put(JFacePreferences.HYPERLINK_COLOR,
+					StringConverter.asString(consoleHyperlink.getForeground().getRGB()));
+			prefs.put(JFacePreferences.ACTIVE_HYPERLINK_COLOR,
+					StringConverter.asString(consoleHyperlink.getForeground().getRGB()));
+			prefs.putBoolean(DefaultHyperlinkPresenter.HYPERLINK_COLOR_SYSTEM_DEFAULT, false);
+			prefs.put(DefaultHyperlinkPresenter.HYPERLINK_COLOR,
+					StringConverter.asString(editorHyperlink.getForeground().getRGB()));
+
+		}
+
 	}
-	
+
 	protected void setGeneralEditorValues(Theme theme, IEclipsePreferences prefs, boolean revertToDefaults)
 	{
 		if (prefs == null)
