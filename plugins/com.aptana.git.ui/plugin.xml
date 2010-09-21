@@ -449,9 +449,9 @@
             locationURI="popup:org.eclipse.ui.menus.showInMenu">
          <command
                commandId="com.aptana.git.ui.command.showInResourceHistory"
-               label="Resource History"
+               label="%ResourceHistory_label"
                style="push"
-               tooltip="Show In Resource History">
+               tooltip="%ShowResourceInHistoryAction_label">
          </command>
       </menuContribution>
    </extension>
