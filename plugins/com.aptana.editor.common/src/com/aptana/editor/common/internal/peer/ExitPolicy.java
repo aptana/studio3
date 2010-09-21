@@ -120,7 +120,7 @@ class ExitPolicy implements IExitPolicy
 	
 	private boolean isStringPair()
 	{
-		return fExitCharacter == '"' || fExitCharacter == '\'' || fExitCharacter == '`' || fExitCharacter == 'ï¿½';
+		return fExitCharacter == '"' || fExitCharacter == '\'' || fExitCharacter == '`' || fExitCharacter == 'Ó';
 	}
 
 	/**
