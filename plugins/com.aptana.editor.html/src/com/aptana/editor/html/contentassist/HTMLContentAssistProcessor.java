@@ -379,9 +379,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 					if (element.getName().startsWith("!") || state.isEmptyTagType(element.getName())) //$NON-NLS-1$
 					{
-						replaceString += "/>"; //$NON-NLS-1$
+						replaceString += " />"; //$NON-NLS-1$
 						// TODO Depending on tag, we should stick cursor inside the tag or after the end of tag
-						cursorPosition += 2;
+						cursorPosition += 3;
 					}
 					else
 					{
