@@ -47,6 +47,19 @@ public class RubyCodeScannerTest extends TestCase
 		assertEquals("Lengths don't match", length, fScanner.getTokenLength());
 		assertEquals("Token scope doesn't match", scope, token.getData());
 	}
+	
+	public void testNoParensNextIdentifierIsntParameter()
+	{
+		String code = "def denominator\nmethod_call\nend";
+		setUpScanner(code);
+		assertToken("keyword.control.def.ruby", 0, 3); // 'def'
+		assertToken("default.ruby", 3, 1); // ' '
+		assertToken("entity.name.function.ruby", 4, 11); // 'denominator'
+		assertToken("default.ruby", 15, 1); // '\n'
+		assertToken("default.ruby", 16, 11); // 'method_call'
+		assertToken("default.ruby", 27, 1); // '\n'
+		assertToken("keyword.control.ruby", 28, 3); // 'end'
+	}
 
 	public void testMethodDefinition()
 	{
