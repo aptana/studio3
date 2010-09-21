@@ -239,6 +239,7 @@ public class RubyTokenScanner implements ITokenScanner
 			case COMMA:
 			case Tokens.tASSOC:
 			case Tokens.tRPAREN:
+			case Tokens.tWHITESPACE:
 				return true;
 			default:
 				return false;
@@ -274,6 +275,7 @@ public class RubyTokenScanner implements ITokenScanner
 			case Tokens.tASSOC:
 			case Tokens.tLSHFT:
 			case Tokens.tRPAREN:
+			case Tokens.tWHITESPACE:
 			case COMMA:
 			case NEWLINE:
 				return true;
