@@ -112,7 +112,7 @@ public class HTMLContentAssistProcessorTest extends TestCase
 		ICompletionProposal linkProposal = findProposal("img", proposals);
 
 		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
-		assertEquals("<img/>", fDocument.get());
+		assertEquals("<img />", fDocument.get());
 	}
 
 	private ICompletionProposal findProposal(String string, ICompletionProposal[] proposals)
