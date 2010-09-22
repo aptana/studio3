@@ -14,6 +14,7 @@ import com.aptana.editor.js.tests.TextViewer;
 public class HTMLContentAssistProcessorTest extends TestCase
 {
 
+	private static final int ELEMENT_PROPOSALS_COUNT = 132;
 	private HTMLContentAssistProcessor fProcessor;
 
 	@Override
@@ -38,7 +39,7 @@ public class HTMLContentAssistProcessorTest extends TestCase
 		char trigger = '\t';
 		ITextViewer viewer = new TextViewer(fDocument);
 		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
-		assertEquals(130, proposals.length);
+		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
 		ICompletionProposal linkProposal = findProposal("a", proposals);
 
 		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
@@ -52,7 +53,7 @@ public class HTMLContentAssistProcessorTest extends TestCase
 		char trigger = '\t';
 		ITextViewer viewer = new TextViewer(fDocument);
 		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
-		assertEquals(130, proposals.length);
+		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
 		ICompletionProposal linkProposal = findProposal("abbr", proposals);
 
 		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
@@ -66,7 +67,7 @@ public class HTMLContentAssistProcessorTest extends TestCase
 		char trigger = '\t';
 		ITextViewer viewer = new TextViewer(fDocument);
 		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
-		assertEquals(130, proposals.length);
+		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
 		ICompletionProposal linkProposal = findProposal("a", proposals);
 
 		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
@@ -80,7 +81,7 @@ public class HTMLContentAssistProcessorTest extends TestCase
 		char trigger = '\t';
 		ITextViewer viewer = new TextViewer(fDocument);
 		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
-		assertEquals(130, proposals.length);
+		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
 		ICompletionProposal linkProposal = findProposal("abbr", proposals);
 
 		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
@@ -94,7 +95,7 @@ public class HTMLContentAssistProcessorTest extends TestCase
 		char trigger = '\t';
 		ITextViewer viewer = new TextViewer(fDocument);
 		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
-		assertEquals(130, proposals.length);
+		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
 		ICompletionProposal linkProposal = findProposal("abbr", proposals);
 
 		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
@@ -108,7 +109,7 @@ public class HTMLContentAssistProcessorTest extends TestCase
 		char trigger = '\t';
 		ITextViewer viewer = new TextViewer(fDocument);
 		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
-		assertEquals(130, proposals.length);
+		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
 		ICompletionProposal linkProposal = findProposal("img", proposals);
 
 		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
