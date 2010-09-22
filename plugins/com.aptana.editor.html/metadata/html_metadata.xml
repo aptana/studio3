@@ -6227,6 +6227,90 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </references>
       <remarks>Limited support for &amp;lt;marquee&amp;gt;&amp;lt;/marquee&amp;gt; in non-Netscape browsers. Avoid using if possible.</remarks>
     </element>
+    <element name="math">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <browser platform="IE" version="9.0+"/>
+        <browser platform="Mozilla" version="3.0+"/>
+        <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
+        <browser platform="Safari" version="1.0+"/>
+      </browsers>
+      <description>Embedded Math markup language content.</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onloadstart"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+    </element>
     <element name="menu" related-class="HTMLMenuElement" display-name="Menu">
       <attribute-refs>
         <attribute-ref name="accesskey"/>
@@ -6849,6 +6933,8 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <attribute-ref name="id"/>
         <attribute-ref name="lang"/>
         <attribute-ref name="language"/>
+        <attribute-ref name="reversed"/>
+        <attribute-ref name="start"/>
         <attribute-ref name="style"/>
         <attribute-ref name="tabindex"/>
         <attribute-ref name="title"/>
@@ -8999,6 +9085,90 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <reference name="HTMLElement"/>
       </references>
       <remarks>Use the &amp;lt;sup&amp;gt;&amp;lt;/sup&amp;gt; tag for things like showing exponents.</remarks>
+    </element>
+    <element name="svg">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <browser platform="IE" version="9.0+"/>
+        <browser platform="Mozilla" version="3.0+"/>
+        <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
+        <browser platform="Safari" version="1.0+"/>
+      </browsers>
+      <description>Embedded Scalabale Vector Graphics content.</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onloadstart"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
     </element>
     <element name="table" related-class="HTMLTableElement" display-name="Table">
       <attribute-refs>
@@ -12250,7 +12420,10 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <description>Specifies the URL for the meta-information dictionary.</description>
       <hint>[url]</hint>
     </attribute>
-    <attribute name="pubdate" type="String">
+    <attribute name="pubdate" type="Boolean">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
       <browsers>
         <!-- Not currently supported by any browser -->
       </browsers>
@@ -12341,6 +12514,15 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="stylesheet" description="This document is a stylesheet."/>
         <value name="subsection" description="This document is a subsection."/>
       </values>
+    </attribute>
+    <attribute name="reversed" type="Boolean">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <!-- TODO I have no idea which browsers support this! -->
+      </browsers>
+      <description>If present, it indicates that the list is a descending list (..., 3, 2, 1). If the attribute is omitted, the list is an ascending list (1, 2, 3, ...).</description>
     </attribute>
     <attribute name="rightmargin" type="Boolean" element="body">
       <browsers>
@@ -12610,6 +12792,15 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <description>Text content to dislay while the object associated with the element loads.</description>
       <hint>[text]</hint>
     </attribute>
+    <attribute name="start" type="Number">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <!-- TODO I have no idea which browsers support this! -->
+      </browsers>
+      <description>The ordinal value of the first list item. The default value, used if the attribute is missing or if the value cannot be converted to a number according to the referenced algorithm, is 1 if the element has no reversed attribute, and is the number of child li elements otherwise.</description>
+    </attribute>
     <attribute name="style" type="String">
       <availability>
         <specification name="W3C" version="HTML 4.01"/>
@@ -12793,14 +12984,27 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <values>
         <value name="button" description="Generic button."/>
         <value name="checkbox" description="Checkbox control. Allows user to select multiple choices."/>
+        <value name="color" description="Field for colors."/>
+        <value name="date" description="Text field for dates."/>
+        <value name="datetime" description="Text field for dates and times with UTC timezone."/>
+        <value name="datetime-local" description="Text field for dates and times with no time zone."/>
+        <value name="email" description="Text field for email addresses."/>
         <value name="file" description="Allows user to browse to and upload a file."/>
         <value name="hidden" description="Form control that is not visible to the user. Used to store state information."/>
         <value name="image" description="Image form control. May be used like a button."/>
+        <value name="month" description="Text field for months."/>
+        <value name="number" description="Text field for numbers."/>
         <value name="password" description="Password input field. Hides keystrokes with *'s."/>
         <value name="radio" description="Radio control button. Allows user to select a single option."/>
+        <value name="range" description="Range value. Typically a slider control."/>
         <value name="reset" description="Reset button."/>
+        <value name="search" description="Search field."/>
         <value name="submit" description="Submit button."/>
+        <value name="tel" description="Text field for telephone numbers."/>
         <value name="text" description="Single line text field."/>
+        <value name="time" description="Text field for times."/>
+        <value name="url" description="Text field for URLs."/>
+        <value name="week" description="Text field for weeks."/>
       </values>
     </attribute>
     <attribute name="type" element="li">
@@ -13027,6 +13231,15 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </browsers>
       <description>Text containing the value of the element.</description>
       <hint>[value-text]</hint>
+    </attribute>
+    <attribute name="value" type="Number" element="li">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <!-- TODO I have no idea which browsers support this! -->
+      </browsers>
+      <description>The ordinal value of the list item.</description>
     </attribute>
     <attribute name="valuetype" type="String">
       <availability>

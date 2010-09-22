@@ -4,7 +4,7 @@ License
     * Aptana Public License (http://www.aptana.com/legal/apl/)
     * GNU Public License/Aptana Exception (http://www.aptana.com/legal/gpl/)
 
-This program Copyright (c) 2005-2008 Aptana, Inc. This program is distributed under the Aptana Publc License and the GNU General Public license. For the GPL license, this program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License, Version 3, as published by the Free Software Foundation. For the Aptana Public License (APL), this program and the accompanying materials are made available under the terms of the APL v1.0 which accompanies this distribution. Redistribution, except as permitted by the above license, is prohibited. Please review the license below for specific terms and conditions.
+This program Copyright (c) 2005-2010 Aptana, Inc. This program is distributed under the Aptana Public License and the GNU General Public license. For the GPL license, this program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License, Version 3, as published by the Free Software Foundation. For the Aptana Public License (APL), this program and the accompanying materials are made available under the terms of the APL v1.0 which accompanies this distribution. Redistribution, except as permitted by the above license, is prohibited. Please review the license below for specific terms and conditions.
 
 Any modifications must keep this entire license intact.
 

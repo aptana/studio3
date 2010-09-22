@@ -320,6 +320,11 @@
             id="com.aptana.git.ui.command.compare_with_revision"
             name="%CompareWithRevisionAction_tooltip">
       </command>
+      <command
+            defaultHandler="com.aptana.git.ui.internal.actions.ShowInHistoryHandler"
+            id="com.aptana.git.ui.command.showInResourceHistory"
+            name="Show in Resource History">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -436,5 +441,18 @@
             id="com.aptana.git.ui.quickdiff"
             label="Git Quick Diff">
       </referenceprovider>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.ui.menus.showInMenu">
+         <command
+               commandId="com.aptana.git.ui.command.showInResourceHistory"
+               label="%ResourceHistory_label"
+               style="push"
+               tooltip="%ShowResourceInHistoryAction_label">
+         </command>
+      </menuContribution>
    </extension>
 </plugin>

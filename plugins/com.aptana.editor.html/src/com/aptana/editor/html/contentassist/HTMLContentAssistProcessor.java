@@ -1,5 +1,40 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.html.contentassist;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -65,6 +100,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	private static final Image ATTRIBUTE_ICON = Activator.getImage("/icons/attribute.png"); //$NON-NLS-1$
 	private static final Image EVENT_ICON = Activator.getImage("/icons/event.gif"); //$NON-NLS-1$
 	private static final Map<String, LocationType> locationMap;
+	private static final Map<String, String> DOCTYPES;
 
 	private HTMLIndexQueryHelper _queryHelper;
 	private IContextInformationValidator _validator;
@@ -89,6 +125,26 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		locationMap.put(JSSourceConfiguration.DEFAULT, LocationType.IN_TEXT);
 		locationMap.put(CSSSourceConfiguration.DEFAULT, LocationType.IN_TEXT);
 		locationMap.put(IDocument.DEFAULT_CONTENT_TYPE, LocationType.IN_TEXT);
+
+		DOCTYPES = new HashMap<String, String>();
+		DOCTYPES.put("HTML 5", "HTML"); //$NON-NLS-1$ //$NON-NLS-2$
+		DOCTYPES.put("HTML 4.01 Strict", //$NON-NLS-1$
+				"HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"\n\"http://www.w3.org/TR/html4/strict.dtd\""); //$NON-NLS-1$
+		DOCTYPES.put("HTML 4.01 Transitional", //$NON-NLS-1$
+				"HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n\"http://www.w3.org/TR/html4/loose.dtd\""); //$NON-NLS-1$
+		DOCTYPES.put("HTML 4.01 Transitional (Quirks)", "HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\""); //$NON-NLS-1$ //$NON-NLS-2$
+		DOCTYPES.put("HTML 4.01 Frameset", //$NON-NLS-1$
+				"HTML PUBLIC \"-//W3C//DTD HTML 4.01 Frameset//EN\"\n\"http://www.w3.org/TR/html4/frameset.dtd\""); //$NON-NLS-1$
+		DOCTYPES.put("XHTML 1.1", //$NON-NLS-1$
+				"html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\""); //$NON-NLS-1$
+		DOCTYPES.put("XHTML 1.0 Strict", //$NON-NLS-1$
+				"html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\""); //$NON-NLS-1$
+		DOCTYPES.put("XHTML 1.0 Transitional", //$NON-NLS-1$
+				"html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\n\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\""); //$NON-NLS-1$
+		DOCTYPES.put("XHTML 1.0 Frameset", //$NON-NLS-1$
+				"html PUBLIC \"-//W3C//DTD XHTML 1.0 Frameset//EN\"\n\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd\""); //$NON-NLS-1$
+		DOCTYPES.put("HTML 3.2", "HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\""); //$NON-NLS-1$ //$NON-NLS-2$
+		DOCTYPES.put("HTML 2.0", "HTML PUBLIC \"-//IETF//DTD HTML//EN\""); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -334,6 +390,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 				String replaceString = element.getName();
 
+				int cursorPosition = replaceString.length();
 				if (close)
 				{
 					if (state == null)
@@ -342,9 +399,16 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						state.setEditState(_document.get(), null, 0, 0);
 					}
 
-					if (element.getName().startsWith("!") || state.isEmptyTagType(element.getName())) //$NON-NLS-1$
+					if (element.getName().charAt(0) == '!') // don't close DOCTYPE with a slash
 					{
-						replaceString += "/>"; //$NON-NLS-1$
+						replaceString += " >"; //$NON-NLS-1$
+						cursorPosition += 1;
+					}
+					else if (state.isEmptyTagType(element.getName()))
+					{
+						replaceString += " />"; //$NON-NLS-1$
+						// TODO Depending on tag, we should stick cursor inside the tag or after the end of tag
+						cursorPosition += 3;
 					}
 					else
 					{
@@ -362,16 +426,19 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						if (!OpenTagCloser.tagClosed(doc, offset, element.getName()))
 						{
 							replaceString += "></" + element.getName() + ">"; //$NON-NLS-1$ //$NON-NLS-2$
+							// TODO Depending on the tag, we should add a "tabstop" inside the open part of the tag
+							cursorPosition += 1;
 						}
 						else
 						{
 							replaceString += ">"; //$NON-NLS-1$
+							cursorPosition += 1;
 						}
 					}
 				}
 
-				CommonCompletionProposal proposal = new CommonCompletionProposal(replaceString, offset, replaceLength, replaceString.length(), ELEMENT_ICON,
-					element.getName(), null, element.getDescription());
+				CommonCompletionProposal proposal = new CommonCompletionProposal(replaceString, offset, replaceLength,
+						cursorPosition, ELEMENT_ICON, element.getName(), null, element.getDescription());
 
 				proposal.setFileLocation(HTMLIndexConstants.CORE);
 				proposal.setUserAgentImages(userAgentIcons);
@@ -395,13 +462,40 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		if (entities != null)
 		{
 			this.setEntityRange(lexemeProvider, offset);
+			Image[] userAgentIcons = this.getAllUserAgentIcons();
 
 			for (EntityElement entity : entities)
 			{
-				Image[] userAgentIcons = this.getAllUserAgentIcons();
-
-				this.addProposal(proposals, entity.getName(), ELEMENT_ICON, entity.getDescription(), userAgentIcons, offset);
+				this.addProposal(proposals, entity.getName(), ELEMENT_ICON, entity.getDescription(), userAgentIcons,
+						offset);
 			}
+		}
+	}
+
+	/**
+	 * addDoctypeProposals
+	 * 
+	 * @param result
+	 * @param offset
+	 */
+	private void addDoctypeProposals(List<ICompletionProposal> proposals, LexemeProvider<HTMLTokenType> lexemeProvider,
+			int offset)
+	{
+		this._replaceRange = null;
+		Image[] userAgentIcons = this.getAllUserAgentIcons();
+		for (Map.Entry<String, String> entry : DOCTYPES.entrySet())
+		{
+			String src = entry.getValue();
+			String name = entry.getKey();
+			CommonCompletionProposal proposal = createProposal(name, src, ELEMENT_ICON,
+					MessageFormat.format("&lt;!DOCTYPE {0}&gt;", src), userAgentIcons, //$NON-NLS-1$
+					HTMLIndexConstants.CORE, offset, src.length());
+			if (src.equalsIgnoreCase("HTML")) // Make HTML 5 the default //$NON-NLS-1$
+			{
+				proposal.setIsSuggestedSelection(true);
+				proposal.setIsDefaultSelection(true);
+			}
+			proposals.add(proposal);
 		}
 	}
 
@@ -423,7 +517,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 			for (Entry<String, String> entry : ids.entrySet())
 			{
-				this.addProposal(proposals, entry.getKey(), ATTRIBUTE_ICON, null, userAgentIcons, entry.getValue(), offset);
+				this.addProposal(proposals, entry.getKey(), ATTRIBUTE_ICON, null, userAgentIcons, entry.getValue(),
+						offset);
 			}
 		}
 		return proposals;
@@ -436,7 +531,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @param result
 	 */
-	private void addOpenTagPropsals(List<ICompletionProposal> proposals, LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
+	private void addOpenTagPropsals(List<ICompletionProposal> proposals, LexemeProvider<HTMLTokenType> lexemeProvider,
+			int offset)
 	{
 		LocationType location = this.getOpenTagLocationType(lexemeProvider, offset);
 
@@ -469,7 +565,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param userAgents
 	 * @param offset
 	 */
-	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, int offset)
+	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description,
+			Image[] userAgents, int offset)
 	{
 		this.addProposal(proposals, name, image, description, userAgents, HTMLIndexConstants.CORE, offset);
 	}
@@ -483,21 +580,22 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param userAgents
 	 * @param offset
 	 */
-	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, String fileLocation,
-		int offset)
+	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description,
+			Image[] userAgents, String fileLocation, int offset)
 	{
 		CommonCompletionProposal proposal = createProposal(name, image, description, userAgents, fileLocation, offset);
 		// add it to the list
 		proposals.add(proposal);
 	}
 
-	private CommonCompletionProposal createProposal(String name, Image image, String description, Image[] userAgents, String fileLocation, int offset)
+	private CommonCompletionProposal createProposal(String name, Image image, String description, Image[] userAgents,
+			String fileLocation, int offset)
 	{
 		return createProposal(name, name, image, description, userAgents, fileLocation, offset, name.length());
 	}
 
-	protected CommonCompletionProposal createProposal(String displayName, String name, Image image, String description, Image[] userAgents,
-		String fileLocation, int offset, int length)
+	protected CommonCompletionProposal createProposal(String displayName, String name, Image image, String description,
+			Image[] userAgents, String fileLocation, int offset, int length)
 	{
 		IContextInformation contextInfo = null;
 
@@ -511,7 +609,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		}
 
 		// build proposal
-		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image, displayName, contextInfo, description);
+		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image,
+				displayName, contextInfo, description);
 		proposal.setFileLocation(fileLocation);
 		proposal.setUserAgentImages(userAgents);
 		return proposal;
@@ -524,7 +623,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * , int, char, boolean)
 	 */
 	@Override
-	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
+	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
+			boolean autoActivated)
 	{
 		// tokenize the current document
 		_document = viewer.getDocument();
@@ -550,6 +650,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 			case IN_TEXT:
 				this.addEntityProposals(result, lexemeProvider, offset);
+				break;
+
+			case IN_DOCTYPE:
+				this.addDoctypeProposals(result, lexemeProvider, offset);
 				break;
 
 			default:
@@ -739,7 +843,20 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 							{
 								if (firstLexeme.getStartingOffset() == offset)
 								{
-									result = LocationType.IN_TEXT;
+									// What if the preceding non-whitespace char isn't '>' and it isn't in the lexemes? We should report in open tag still!
+									if (offset == 0)
+									{
+										result = LocationType.IN_TEXT;
+									}
+									else
+									{
+										ITypedRegion previousPartition = document.getPartition(offset - 1);
+										String src = document.get(previousPartition.getOffset(), previousPartition.getLength()).trim();
+										if (src.charAt(src.length() - 1) == '>')
+										{
+											result = LocationType.IN_TEXT;
+										}
+									}
 								}
 								else if ("</".equals(firstLexeme.getText())) //$NON-NLS-1$
 								{
@@ -764,7 +881,16 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 												result = LocationType.IN_OPEN_TAG;
 											}
 											break;
-
+										case META:
+											if (lastLexeme.getText().equalsIgnoreCase("DOCTYPE")) //$NON-NLS-1$
+											{
+												result = LocationType.IN_DOCTYPE;
+											}
+											else
+											{
+												result = LocationType.IN_OPEN_TAG;
+											}
+											break;
 										default:
 											result = LocationType.IN_OPEN_TAG;
 											break;
@@ -850,7 +976,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					break;
 
 				case EQUAL:
-					result = (offset <= lexeme.getStartingOffset()) ? LocationType.IN_ATTRIBUTE_NAME : LocationType.IN_ATTRIBUTE_VALUE;
+					result = (offset <= lexeme.getStartingOffset()) ? LocationType.IN_ATTRIBUTE_NAME
+							: LocationType.IN_ATTRIBUTE_VALUE;
 					break;
 
 				case TAG_START:
