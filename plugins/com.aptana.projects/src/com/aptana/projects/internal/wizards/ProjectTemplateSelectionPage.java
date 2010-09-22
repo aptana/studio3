@@ -76,7 +76,11 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 
 	public ProjectTemplate getSelectedTemplate()
 	{
-		return fSelectedTemplate;
+		if (fUseTemplateButton.getSelection())
+		{
+			return fSelectedTemplate;
+		}
+		return null;
 	}
 
 	@Override
