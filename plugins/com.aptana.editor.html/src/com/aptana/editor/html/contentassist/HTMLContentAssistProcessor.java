@@ -843,7 +843,20 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 							{
 								if (firstLexeme.getStartingOffset() == offset)
 								{
-									result = LocationType.IN_TEXT;
+									// What if the preceding non-whitespace char isn't '>' and it isn't in the lexemes? We should report in open tag still!
+									if (offset == 0)
+									{
+										result = LocationType.IN_TEXT;
+									}
+									else
+									{
+										ITypedRegion previousPartition = document.getPartition(offset - 1);
+										String src = document.get(previousPartition.getOffset(), previousPartition.getLength()).trim();
+										if (src.charAt(src.length() - 1) == '>')
+										{
+											result = LocationType.IN_TEXT;
+										}
+									}
 								}
 								else if ("</".equals(firstLexeme.getText())) //$NON-NLS-1$
 								{
@@ -868,7 +881,16 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 												result = LocationType.IN_OPEN_TAG;
 											}
 											break;
-
+										case META:
+											if (lastLexeme.getText().equalsIgnoreCase("DOCTYPE")) //$NON-NLS-1$
+											{
+												result = LocationType.IN_DOCTYPE;
+											}
+											else
+											{
+												result = LocationType.IN_OPEN_TAG;
+											}
+											break;
 										default:
 											result = LocationType.IN_OPEN_TAG;
 											break;
