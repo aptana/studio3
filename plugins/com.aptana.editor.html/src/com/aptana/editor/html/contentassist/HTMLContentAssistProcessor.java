@@ -377,7 +377,12 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						state.setEditState(_document.get(), null, 0, 0);
 					}
 
-					if (element.getName().startsWith("!") || state.isEmptyTagType(element.getName())) //$NON-NLS-1$
+					if (element.getName().charAt(0) == '!') // don't close DOCTYPE with a slash
+					{
+						replaceString += " >"; //$NON-NLS-1$
+						cursorPosition += 1;
+					}
+					else if (state.isEmptyTagType(element.getName()))
 					{
 						replaceString += " />"; //$NON-NLS-1$
 						// TODO Depending on tag, we should stick cursor inside the tag or after the end of tag
