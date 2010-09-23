@@ -30,6 +30,7 @@ import com.aptana.core.util.IOUtil;
 import com.aptana.plist.IPListParser;
 import com.aptana.plist.PListPlugin;
 
+@SuppressWarnings("restriction")
 public class XMLPListParser implements IPListParser
 {
 
@@ -160,6 +161,7 @@ public class XMLPListParser implements IPListParser
 			try
 			{
 				String raw = node.getTextContent();
+				// FIXME Implement our own Base64 decoder!
 				return Base64.decode(raw.getBytes(UTF_8));
 			}
 			catch (UnsupportedEncodingException e)
