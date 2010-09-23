@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,7 +33,12 @@ import com.aptana.plist.PListPlugin;
 public class XMLPListParser implements IPListParser
 {
 
-	private static final String ISO_8601_DATETIME = "yyyy-MM-dd'T'HH:mm:ss'Z'"; //$NON-NLS-1$
+	private static DateFormat ISO_8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); //$NON-NLS-1$
+	static
+	{
+		TimeZone tz = TimeZone.getTimeZone("UTC"); //$NON-NLS-1$
+		ISO_8601.setTimeZone(tz);
+	}
 	private static final String UTF_8 = "UTF-8"; //$NON-NLS-1$
 
 	@SuppressWarnings("unchecked")
@@ -78,8 +84,11 @@ public class XMLPListParser implements IPListParser
 			if (d != null)
 			{
 				Element doc = d.getDocumentElement();
-				Node root = doc.getFirstChild().getNextSibling();
-				return (Map<String, Object>) parseNode((Element) root);
+				if (doc != null && doc.getFirstChild() != null && doc.getFirstChild().getNextSibling() != null)
+				{
+					Node root = doc.getFirstChild().getNextSibling();
+					return (Map<String, Object>) parseNode((Element) root);
+				}
 			}
 		}
 		return Collections.emptyMap();
@@ -138,10 +147,7 @@ public class XMLPListParser implements IPListParser
 			{
 				// ISO 8601 format text
 				String raw = node.getTextContent();
-				SimpleDateFormat df = new SimpleDateFormat(ISO_8601_DATETIME);
-				TimeZone tz = TimeZone.getTimeZone("UTC");
-				df.setTimeZone(tz);
-				return df.parse(raw);
+				return ISO_8601.parse(raw);
 			}
 			catch (Exception e)
 			{
