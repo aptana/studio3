@@ -33,7 +33,23 @@ public class HTMLFormatterFactory extends AbstractScriptFormatterFactory
 		// TODO - Add more...
 		HTMLFormatterConstants.FORMATTER_INDENTATION_SIZE,
 		HTMLFormatterConstants.FORMATTER_TAB_CHAR,
-		HTMLFormatterConstants.FORMATTER_TAB_SIZE
+		HTMLFormatterConstants.FORMATTER_TAB_SIZE,
+		HTMLFormatterConstants.WRAP_COMMENTS,
+		HTMLFormatterConstants.WRAP_COMMENTS_LENGTH,
+		HTMLFormatterConstants.INDENT_BODY,
+		HTMLFormatterConstants.INDENT_HTML,
+		HTMLFormatterConstants.INDENT_HEAD,
+		HTMLFormatterConstants.INDENT_META,
+		HTMLFormatterConstants.INDENT_TABLE,
+		HTMLFormatterConstants.INDENT_TABLE_TD,
+		HTMLFormatterConstants.INDENT_TABLE_TR,
+		HTMLFormatterConstants.INDENT_TABLE_TH,
+		HTMLFormatterConstants.INDENT_UL,
+		HTMLFormatterConstants.INDENT_LI,
+		HTMLFormatterConstants.LINES_AFTER_ELEMENTS,
+		HTMLFormatterConstants.LINES_AFTER_NON_HTML_ELEMENTS,
+		HTMLFormatterConstants.LINES_BEFORE_NON_HTML_ELEMENTS,
+		HTMLFormatterConstants.PRESERVED_LINES
 	};
 
 	public PreferenceKey[] getPreferenceKeys()
@@ -47,9 +63,9 @@ public class HTMLFormatterFactory extends AbstractScriptFormatterFactory
 		return result;
 	}
 
-	public IScriptFormatter createFormatter(String lineDelimiter, Map<String, String> preferences)
+	public IScriptFormatter createFormatter(String lineSeparator, Map<String, String> preferences)
 	{
-		return new HTMLFormatter(preferences);
+		return new HTMLFormatter(lineSeparator, preferences);
 	}
 
 	public URL getPreviewContent()

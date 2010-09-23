@@ -11,9 +11,6 @@
  *******************************************************************************/
 package com.aptana.editor.ruby.formatter;
 
-import java.io.IOException;
-import java.io.LineNumberReader;
-import java.io.Reader;
 import java.io.StringReader;
 import java.util.Map;
 
@@ -25,8 +22,6 @@ import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 import org.jrubyparser.parser.ParserResult;
 
-import com.aptana.editor.ruby.formatter.internal.DumpContentException;
-import com.aptana.editor.ruby.formatter.internal.Messages;
 import com.aptana.editor.ruby.formatter.internal.RubyFormatterContext;
 import com.aptana.editor.ruby.formatter.internal.RubyFormatterNodeBuilder;
 import com.aptana.editor.ruby.formatter.internal.RubyFormatterNodeRewriter;
@@ -42,6 +37,8 @@ import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.ui.FormatterException;
+import com.aptana.formatter.ui.FormatterMessages;
+import com.aptana.formatter.util.DumpContentException;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParserPoolFactory;
@@ -103,7 +100,6 @@ public class RubyFormatter extends AbstractScriptFormatter
 		return 0;
 	}
 
-
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.formatter.ui.IScriptFormatter#getIndentSize()
@@ -134,7 +130,6 @@ public class RubyFormatter extends AbstractScriptFormatter
 		return getInt(RubyFormatterConstants.FORMATTER_TAB_SIZE);
 	}
 
-	
 	public TextEdit format(String source, int offset, int length, int indent) throws FormatterException
 	{
 		String input = source.substring(offset, offset + length);
@@ -192,7 +187,7 @@ public class RubyFormatter extends AbstractScriptFormatter
 					else
 					{
 						FormatterPlugin.log(new Status(IStatus.ERROR, RubyFormatterPlugin.PLUGIN_ID, IStatus.OK,
-								Messages.RubyFormatter_contentCorrupted, new DumpContentException(input
+								FormatterMessages.RubyFormatter_formatterError, new DumpContentException(input
 										+ "\n<!-------!>\n" + output))); //$NON-NLS-1$
 					}
 				}
@@ -275,59 +270,5 @@ public class RubyFormatter extends AbstractScriptFormatter
 		document.setInt(RubyFormatterConstants.FORMATTER_TAB_SIZE, getInt(RubyFormatterConstants.FORMATTER_TAB_SIZE));
 		document.setBoolean(RubyFormatterConstants.WRAP_COMMENTS, getBoolean(RubyFormatterConstants.WRAP_COMMENTS));
 		return document;
-	}
-
-	private boolean equalsIgnoreBlanks(Reader inputReader, Reader outputReader)
-	{
-		LineNumberReader input = new LineNumberReader(inputReader);
-		LineNumberReader output = new LineNumberReader(outputReader);
-		for (;;)
-		{
-			final String inputLine = readLine(input);
-			final String outputLine = readLine(output);
-			if (inputLine == null)
-			{
-				if (outputLine == null)
-				{
-					return true;
-				}
-				else
-				{
-					return false;
-				}
-			}
-			else if (outputLine == null)
-			{
-				return false;
-			}
-			else if (!inputLine.equals(outputLine))
-			{
-				return false;
-			}
-		}
-	}
-
-	private String readLine(LineNumberReader reader)
-	{
-		String line;
-		do
-		{
-			try
-			{
-				line = reader.readLine();
-			}
-			catch (IOException e)
-			{
-				// should not happen
-				return null;
-			}
-			if (line == null)
-			{
-				return line;
-			}
-			line = line.trim();
-		}
-		while (line.length() == 0);
-		return line;
 	}
 }

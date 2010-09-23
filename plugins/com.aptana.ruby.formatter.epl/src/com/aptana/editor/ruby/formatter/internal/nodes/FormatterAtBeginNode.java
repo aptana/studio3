@@ -12,6 +12,7 @@
 package com.aptana.editor.ruby.formatter.internal.nodes;
 
 import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 import com.aptana.formatter.nodes.IFormatterCommentableNode;
 
 

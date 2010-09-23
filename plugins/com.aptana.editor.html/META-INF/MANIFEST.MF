@@ -29,5 +29,6 @@ Export-Package: com.aptana.editor.html,
  com.aptana.editor.html.contentassist.index,
  com.aptana.editor.html.outline,
  com.aptana.editor.html.parsing,
+ com.aptana.editor.html.parsing.ast,
  com.aptana.editor.html.parsing.lexer
 Eclipse-ExtensibleAPI: true

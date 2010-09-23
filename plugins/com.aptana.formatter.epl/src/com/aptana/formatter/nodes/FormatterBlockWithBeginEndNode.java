@@ -9,37 +9,41 @@
  * Contributors:
  *     xored software, Inc. - initial API and Implementation (Alex Panchenko)
  *******************************************************************************/
-package com.aptana.editor.ruby.formatter.internal.nodes;
+package com.aptana.formatter.nodes;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.aptana.formatter.FormatterUtils;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.IFormatterWriter;
-import com.aptana.formatter.nodes.FormatterBlockNode;
-import com.aptana.formatter.nodes.IFormatterNode;
-import com.aptana.formatter.nodes.IFormatterTextNode;
 
-public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
+public abstract class FormatterBlockWithBeginEndNode extends FormatterBlockNode
 {
 
 	/**
 	 * @param document
 	 */
-	public FormatterBlockWithBeginNode(IFormatterDocument document)
+	public FormatterBlockWithBeginEndNode(IFormatterDocument document)
 	{
 		super(document);
 	}
 
-	private IFormatterTextNode begin;
+	protected List<IFormatterNode> begin = null;
+	protected IFormatterTextNode end;
 
 	public void accept(IFormatterContext context, IFormatterWriter visitor) throws Exception
 	{
+		context.setBlankLines(getBlankLinesBefore(context));
 		if (begin != null)
 		{
-			visitor.write(context, begin.getStartOffset(), begin.getEndOffset());
+			for (IFormatterNode element : begin)
+			{
+				element.accept(context, visitor);
+			}
 		}
+		context.resetBlankLines();
 		final boolean indenting = isIndenting();
 		if (indenting)
 		{
@@ -50,14 +54,29 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 		{
 			context.decIndent();
 		}
+		if (end != null)
+		{
+			visitor.write(context, end.getStartOffset(), end.getEndOffset());
+		}
+		context.setBlankLines(getBlankLinesAfter(context));
+	}
+
+	protected int getBlankLinesBefore(IFormatterContext context)
+	{
+		return -1;
+	}
+
+	protected int getBlankLinesAfter(IFormatterContext context)
+	{
+		return -1;
 	}
 
 	/**
 	 * @return the begin
 	 */
-	public IFormatterTextNode getBegin()
+	public IFormatterNode[] getBegin()
 	{
-		return begin;
+		return FormatterUtils.toTextNodeArray(begin);
 	}
 
 	/**
@@ -66,7 +85,36 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 	 */
 	public void setBegin(IFormatterTextNode begin)
 	{
-		this.begin = begin;
+		if (this.begin == null)
+		{
+			this.begin = new ArrayList<IFormatterNode>();
+		}
+		this.begin.add(begin);
+	}
+
+	public void insertBefore(List<IFormatterNode> nodes)
+	{
+		if (this.begin == null)
+		{
+			this.begin = new ArrayList<IFormatterNode>();
+		}
+		this.begin.addAll(0, nodes);
+	}
+
+	/**
+	 * @return the end
+	 */
+	public IFormatterTextNode getEnd()
+	{
+		return end;
+	}
+
+	/**
+	 * @param node
+	 */
+	public void setEnd(IFormatterTextNode node)
+	{
+		this.end = node;
 	}
 
 	/*
@@ -76,7 +124,7 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 	{
 		if (begin != null)
 		{
-			return begin.getStartOffset();
+			return ((IFormatterTextNode) begin.get(0)).getStartOffset();
 		}
 		return super.getStartOffset();
 	}
@@ -86,13 +134,17 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 	 */
 	public int getEndOffset()
 	{
+		if (end != null)
+		{
+			return end.getEndOffset();
+		}
 		if (!super.isEmpty())
 		{
 			return super.getEndOffset();
 		}
 		if (begin != null)
 		{
-			return begin.getEndOffset();
+			return ((IFormatterTextNode) begin.get(begin.size() - 1)).getEndOffset();
 		}
 		return DEFAULT_OFFSET;
 	}
@@ -102,7 +154,7 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 	 */
 	public boolean isEmpty()
 	{
-		return begin == null && super.isEmpty();
+		return begin == null && end == null && super.isEmpty();
 	}
 
 	/*
@@ -110,7 +162,7 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 	 */
 	public List<IFormatterNode> getChildren()
 	{
-		if (begin == null)
+		if (begin == null && end == null)
 		{
 			return super.getChildren();
 		}
@@ -119,9 +171,13 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 			List<IFormatterNode> result = new ArrayList<IFormatterNode>();
 			if (begin != null)
 			{
-				result.add(begin);
+				result.addAll(begin);
 			}
 			result.addAll(super.getChildren());
+			if (end != null)
+			{
+				result.add(end);
+			}
 			return result;
 		}
 	}
@@ -131,7 +187,7 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 	 */
 	public String toString()
 	{
-		return begin + "\n" + super.toString(); //$NON-NLS-1$
+		return begin + "\n" + super.toString() + "\n" + end; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 }

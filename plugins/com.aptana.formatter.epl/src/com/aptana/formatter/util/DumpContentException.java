@@ -9,7 +9,7 @@
  * Contributors:
  *     xored software, Inc. - initial API and Implementation (Alex Panchenko)
  *******************************************************************************/
-package com.aptana.editor.ruby.formatter.internal;
+package com.aptana.formatter.util;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;

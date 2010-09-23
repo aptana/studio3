@@ -15,6 +15,7 @@ import com.aptana.editor.ruby.formatter.RubyFormatterConstants;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.IFormatterWriter;
+import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 
 public class FormatterRescueElseNode extends FormatterBlockWithBeginNode {
 

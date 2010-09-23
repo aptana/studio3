@@ -11,6 +11,9 @@
  *******************************************************************************/
 package com.aptana.formatter;
 
+import java.io.IOException;
+import java.io.LineNumberReader;
+import java.io.Reader;
 import java.util.Map;
 
 import org.eclipse.jface.text.IDocument;
@@ -110,6 +113,60 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 		{
 			return new FormatterIndentGenerator('\t', 1, tabSize);
 		}
+	}
+
+	protected boolean equalsIgnoreBlanks(Reader inputReader, Reader outputReader)
+	{
+		LineNumberReader input = new LineNumberReader(inputReader);
+		LineNumberReader output = new LineNumberReader(outputReader);
+		for (;;)
+		{
+			final String inputLine = readLine(input);
+			final String outputLine = readLine(output);
+			if (inputLine == null)
+			{
+				if (outputLine == null)
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else if (outputLine == null)
+			{
+				return false;
+			}
+			else if (!inputLine.equals(outputLine))
+			{
+				return false;
+			}
+		}
+	}
+
+	private String readLine(LineNumberReader reader)
+	{
+		String line;
+		do
+		{
+			try
+			{
+				line = reader.readLine();
+			}
+			catch (IOException e)
+			{
+				// should not happen
+				return null;
+			}
+			if (line == null)
+			{
+				return line;
+			}
+			line = line.trim();
+		}
+		while (line.length() == 0);
+		return line;
 	}
 
 	public int detectIndentationLevel(IDocument document, int offset)
