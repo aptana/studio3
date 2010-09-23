@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Plist
+Bundle-SymbolicName: com.aptana.plist
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: com.aptana.plist.PListPlugin
+Bundle-Vendor: APTANA
+Require-Bundle: org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Export-Package: ch.randelshofer.quaqua.util
