@@ -38,7 +38,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
 import com.aptana.editor.common.outline.CommonOutlineItem;
-import com.aptana.editor.ruby.Activator;
+import com.aptana.editor.ruby.RubyEditorPlugin;
 import com.aptana.editor.ruby.core.IRubyElement;
 import com.aptana.editor.ruby.core.IRubyMethod;
 import com.aptana.editor.ruby.core.IRubyMethod.Visibility;
@@ -47,19 +47,19 @@ import com.aptana.editor.ruby.core.IRubyType;
 public class RubyOutlineLabelProvider extends LabelProvider
 {
 
-	private static final Image CLASS = Activator.getImage("icons/class_obj.png"); //$NON-NLS-1$
-	private static final Image MODULE = Activator.getImage("icons/module_obj.png"); //$NON-NLS-1$
-	private static final Image METHOD_PUBLIC = Activator.getImage("icons/method_public_obj.png"); //$NON-NLS-1$
-	private static final Image METHOD_PROTECTED = Activator.getImage("icons/method_protected_obj.png"); //$NON-NLS-1$
-	private static final Image METHOD_PRIVATE = Activator.getImage("icons/method_private_obj.png"); //$NON-NLS-1$
-	private static final Image METHOD_SINGLETON = Activator.getImage("icons/class_method.png"); //$NON-NLS-1$
-	private static final Image CLASS_VAR = Activator.getImage("icons/class_var_obj.png"); //$NON-NLS-1$
-	private static final Image CONSTANT = Activator.getImage("icons/constant_obj.png"); //$NON-NLS-1$
-	private static final Image GLOBAL = Activator.getImage("icons/global_obj.png"); //$NON-NLS-1$
-	private static final Image INSTANCE_VAR = Activator.getImage("icons/instance_var_obj.png"); //$NON-NLS-1$
-	private static final Image LOCAL_VAR = Activator.getImage("icons/local_var_obj.png"); //$NON-NLS-1$
-	private static final Image IMPORT_DECLARATION = Activator.getImage("icons/import_obj.png"); //$NON-NLS-1$
-	private static final Image IMPORT_CONTAINER = Activator.getImage("icons/import_container_obj.png"); //$NON-NLS-1$
+	private static final Image CLASS = RubyEditorPlugin.getImage("icons/class_obj.png"); //$NON-NLS-1$
+	private static final Image MODULE = RubyEditorPlugin.getImage("icons/module_obj.png"); //$NON-NLS-1$
+	private static final Image METHOD_PUBLIC = RubyEditorPlugin.getImage("icons/method_public_obj.png"); //$NON-NLS-1$
+	private static final Image METHOD_PROTECTED = RubyEditorPlugin.getImage("icons/method_protected_obj.png"); //$NON-NLS-1$
+	private static final Image METHOD_PRIVATE = RubyEditorPlugin.getImage("icons/method_private_obj.png"); //$NON-NLS-1$
+	private static final Image METHOD_SINGLETON = RubyEditorPlugin.getImage("icons/class_method.png"); //$NON-NLS-1$
+	private static final Image CLASS_VAR = RubyEditorPlugin.getImage("icons/class_var_obj.png"); //$NON-NLS-1$
+	private static final Image CONSTANT = RubyEditorPlugin.getImage("icons/constant_obj.png"); //$NON-NLS-1$
+	private static final Image GLOBAL = RubyEditorPlugin.getImage("icons/global_obj.png"); //$NON-NLS-1$
+	private static final Image INSTANCE_VAR = RubyEditorPlugin.getImage("icons/instance_var_obj.png"); //$NON-NLS-1$
+	private static final Image LOCAL_VAR = RubyEditorPlugin.getImage("icons/local_var_obj.png"); //$NON-NLS-1$
+	private static final Image IMPORT_DECLARATION = RubyEditorPlugin.getImage("icons/import_obj.png"); //$NON-NLS-1$
+	private static final Image IMPORT_CONTAINER = RubyEditorPlugin.getImage("icons/import_container_obj.png"); //$NON-NLS-1$
 
 	@Override
 	public Image getImage(Object element)

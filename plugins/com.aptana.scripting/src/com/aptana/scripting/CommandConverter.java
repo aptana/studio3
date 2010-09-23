@@ -40,8 +40,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import plistreader.PlistProperties;
-
 import com.aptana.scripting.model.InputType;
 import com.aptana.scripting.model.OutputType;
 
@@ -86,7 +84,7 @@ public class CommandConverter
 
 	private static String convert(File commandFile)
 	{
-		PlistProperties properties = BundleConverter.parse(commandFile);
+		Map<String, Object> properties = BundleConverter.parse(commandFile);
 		if (properties == null)
 			return null;
 		StringBuilder buffer = new StringBuilder();
@@ -118,7 +116,7 @@ public class CommandConverter
 		if (fallbackInput != null)
 			buffer.append(", :").append(fallbackInput);
 		buffer.append("\n");
-		buffer.append("  cmd.invoke =<<-EOF\n").append(properties.getProperty("command")).append("\nEOF\n");
+		buffer.append("  cmd.invoke =<<-EOF\n").append(properties.get("command")).append("\nEOF\n");
 		buffer.append("end\n");
 		return buffer.toString();
 	}
@@ -228,11 +226,11 @@ public class CommandConverter
 			return uuidNameMap;
 		for (File commandFile : commandFiles)
 		{
-			PlistProperties properties = BundleConverter.parse(commandFile);
+			Map<String, Object> properties = BundleConverter.parse(commandFile);
 			if (properties == null)
 				continue;
 			String name = BundleConverter.sanitize(properties, "name");
-			String uuid = (String) properties.getProperty("uuid");
+			String uuid = (String) properties.get("uuid");
 			uuidNameMap.put(uuid, name);
 		}
 		return uuidNameMap;

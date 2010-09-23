@@ -147,7 +147,7 @@ public class RubyTokenScanner implements ITokenScanner
 		}
 		catch (IOException e)
 		{
-			Activator.log(e);
+			RubyEditorPlugin.log(e);
 		}
 
 		return returnValue;
