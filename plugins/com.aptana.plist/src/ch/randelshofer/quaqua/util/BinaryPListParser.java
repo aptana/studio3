@@ -142,14 +142,6 @@ public class BinaryPListParser implements IPListParser {
 	 */
 	private int refCount;
 	/**
-	 * Total count of offsets.
-	 */
-	private int offsetCount;
-	/**
-	 * Total count of objects.
-	 */
-	private int objectCount;
-	/**
 	 * Offset in file of top level offset in offset table.
 	 */
 	private int topLevelOffset;
@@ -362,11 +354,13 @@ public class BinaryPListParser implements IPListParser {
 			// element # in offset table which is top level object
 			raf.seek(raf.length() - 32);
 			// count of offset ints in offset table
-			offsetCount = (int) raf.readLong();
+//			offsetCount = (int) raf.readLong();
+			raf.readLong();
 			// count of object refs in arrays and dicts
 			refCount = (int) raf.readLong();
 			// count of offsets in offset table (also is number of objects)
-			objectCount = (int) raf.readLong();
+//			objectCount = (int) raf.readLong();
+			raf.readLong();
 			// element # in offset table which is top level object
 			topLevelOffset = (int) raf.readLong();
 			buf = new byte[topLevelOffset - 8];

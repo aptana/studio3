@@ -285,6 +285,7 @@ public class BundleConverter
 			Map<String, Object> properties = parse(prefsFile);
 			if (properties == null || !properties.containsKey("settings"))
 				continue;
+			@SuppressWarnings("unchecked")
 			Map<String, Object> settings = (Map<String, Object>) properties.get("settings");
 			if (!settings.containsKey("increaseIndentPattern"))
 				continue;
