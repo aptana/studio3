@@ -325,7 +325,7 @@ public class CoreStubber extends Job
 			IContentType[] types = project.getContentTypeMatcher().findContentTypesFor(filename);
 			for (IContentType type : types)
 			{
-				if (type.getId().equals(IRubyConstants.CONTENT_TYPE_RUBY))
+				if (IRubyConstants.CONTENT_TYPE_RUBY.equals(type.getId()))
 				{
 					return true;
 				}
