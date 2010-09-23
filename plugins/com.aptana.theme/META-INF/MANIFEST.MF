@@ -25,3 +25,4 @@ Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.theme,
  com.aptana.theme.extensions,
  com.aptana.theme.preferences
+Eclipse-ExtensibleAPI: true

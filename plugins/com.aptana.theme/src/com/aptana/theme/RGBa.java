@@ -88,4 +88,25 @@ public class RGBa
 		return alpha == 255;
 	}
 
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == this)
+		{
+			return true;
+		}
+		if (obj instanceof RGBa)
+		{
+			RGBa other = (RGBa) obj;
+			return other.alpha == alpha && other.red == red && other.green == green && other.blue == blue;
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return (alpha << 32) | (blue << 16) | (green << 8) | red;
+	}
+
 }
