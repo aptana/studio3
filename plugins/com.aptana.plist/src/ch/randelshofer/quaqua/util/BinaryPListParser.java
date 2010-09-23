@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import com.aptana.plist.IPListParser;
+
 /**
  * Reads a binary PList file and returns it as a List of Objects.
  * <p>
@@ -46,7 +48,7 @@ import java.util.TimeZone;
  * @author  Werner Randelshofer
  * @version $Id$
  */
-public class BinaryPListParser {
+public class BinaryPListParser implements IPListParser {
 
     private final static boolean DEBUG = false;
 
