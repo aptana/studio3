@@ -174,7 +174,7 @@ public class CoreStubber extends Job
 					}
 					catch (CoreException e)
 					{
-						Activator.log(e.getStatus());
+						RubyEditorPlugin.log(e.getStatus());
 					}
 				}
 			};
@@ -242,7 +242,7 @@ public class CoreStubber extends Job
 		}
 		catch (Exception e)
 		{
-			return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e);
+			return new Status(IStatus.ERROR, RubyEditorPlugin.PLUGIN_ID, e.getMessage(), e);
 		}
 		finally
 		{
@@ -357,7 +357,7 @@ public class CoreStubber extends Job
 			return null;
 		}
 		// Store core stubs based on ruby version string...
-		IPath outputPath = Activator.getDefault().getStateLocation().append(Integer.toString(rubyVersion.hashCode()))
+		IPath outputPath = RubyEditorPlugin.getDefault().getStateLocation().append(Integer.toString(rubyVersion.hashCode()))
 				.append(RUBY_EXE);
 		return outputPath.toFile();
 	}
@@ -444,7 +444,7 @@ public class CoreStubber extends Job
 
 	protected void generateCoreStubs(File outputDir, File finishMarker) throws IOException
 	{
-		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(CORE_STUBBER_PATH), null);
+		URL url = FileLocator.find(RubyEditorPlugin.getDefault().getBundle(), new Path(CORE_STUBBER_PATH), null);
 		File stubberScript = ResourceUtil.resourcePathToFile(url);
 
 		Map<Integer, String> stubberResult = ProcessUtil.runInBackground(RUBY_EXE, null,
@@ -453,7 +453,7 @@ public class CoreStubber extends Job
 		if (exitCode != 0)
 		{
 			String stubberOutput = stubberResult.values().iterator().next();
-			Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, stubberOutput, null));
+			RubyEditorPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, RubyEditorPlugin.PLUGIN_ID, stubberOutput, null));
 		}
 		else
 		{

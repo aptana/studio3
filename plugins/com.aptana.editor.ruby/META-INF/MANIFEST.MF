@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.editor.ruby;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: com.aptana.editor.ruby.Activator
+Bundle-Activator: com.aptana.editor.ruby.RubyEditorPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
