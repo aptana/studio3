@@ -1,6 +1,8 @@
 package com.aptana.plist.xml;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
@@ -12,14 +14,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.internal.preferences.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXParseException;
 
+import com.aptana.core.util.IOUtil;
 import com.aptana.plist.IPListParser;
 import com.aptana.plist.PListPlugin;
 
@@ -27,49 +33,106 @@ public class XMLPListParser implements IPListParser
 {
 
 	private static final String ISO_8601_DATETIME = "yyyy-MM-dd'T'HH:mm:ss'Z'"; //$NON-NLS-1$
+	private static final String UTF_8 = "UTF-8"; //$NON-NLS-1$
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, Object> parse(File file) throws IOException
 	{
+		DocumentBuilder builder = null;
 		try
 		{
-			Document d = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file);
-			Element doc = d.getDocumentElement();
-			Node root = doc.getFirstChild().getNextSibling();
-			return (Map<String, Object>) parseNode((Element) root);
+			builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		}
-		catch (Exception e)
+		catch (ParserConfigurationException e)
 		{
 			PListPlugin.logError(e);
+		}
+		if (builder != null)
+		{
+			Document d = null;
+			try
+			{
+
+				d = builder.parse(file);
+			}
+			catch (SAXParseException e)
+			{
+				// May have failed due to invalid characters in XML, which happens often with TM themes,
+				// So let's sanitize the XML
+				String raw = IOUtil.read(new FileInputStream(file), UTF_8);
+				raw = stripNonValidXMLCharacters(raw);
+				try
+				{
+					d = builder.parse(new ByteArrayInputStream(raw.getBytes(UTF_8)));
+				}
+				catch (Exception e1)
+				{
+					PListPlugin.logError(e1);
+				}
+			}
+			catch (Exception e)
+			{
+				PListPlugin.logError(e);
+			}
+			if (d != null)
+			{
+				Element doc = d.getDocumentElement();
+				Node root = doc.getFirstChild().getNextSibling();
+				return (Map<String, Object>) parseNode((Element) root);
+			}
 		}
 		return Collections.emptyMap();
 	}
 
+	private static String stripNonValidXMLCharacters(String in)
+	{
+		if (in == null || ("".equals(in))) //$NON-NLS-1$
+		{
+			return ""; //$NON-NLS-1$
+		}
+		StringBuffer out = new StringBuffer();
+		for (int i = 0; i < in.length(); i++)
+		{
+			char current = in.charAt(i);
+			if ((current == 0x9) || (current == 0xA) || (current == 0xD) || ((current >= 0x20) && (current <= 0xD7FF))
+					|| ((current >= 0xE000) && (current <= 0xFFFD)) || ((current >= 0x10000) && (current <= 0x10FFFF)))
+			{
+				out.append(current);
+			}
+			else
+			{
+				// out.append("&#").append((int) current).append(";"); // Broken, can we insert them in some way that
+				// does work?
+			}
+		}
+		return out.toString();
+	}
+
 	private Object parseNode(Element node)
 	{
-		String childName = node.getTagName();
-		if (childName.equals("string"))
+		String tagName = node.getTagName();
+		if (tagName.equals("string"))
 		{
 			return node.getTextContent();
 		}
-		else if (childName.equals("real"))
+		else if (tagName.equals("real"))
 		{
 			return Float.parseFloat(node.getTextContent());
 		}
-		else if (childName.equals("integer"))
+		else if (tagName.equals("integer"))
 		{
 			return Long.parseLong(node.getTextContent());
 		}
-		else if (childName.equals("true"))
+		else if (tagName.equals("true"))
 		{
 			return Boolean.TRUE;
 		}
-		else if (childName.equals("false"))
+		else if (tagName.equals("false"))
 		{
 			return Boolean.FALSE;
 		}
-		else if (childName.equals("date"))
+		else if (tagName.equals("date"))
 		{
 			try
 			{
@@ -86,12 +149,12 @@ public class XMLPListParser implements IPListParser
 			}
 			return new Date();
 		}
-		else if (childName.equals("data"))
+		else if (tagName.equals("data"))
 		{
 			try
 			{
 				String raw = node.getTextContent();
-				return Base64.decode(raw.getBytes("UTF-8"));
+				return Base64.decode(raw.getBytes(UTF_8));
 			}
 			catch (UnsupportedEncodingException e)
 			{
@@ -99,7 +162,7 @@ public class XMLPListParser implements IPListParser
 			}
 			return new byte[0];
 		}
-		else if (childName.equals("array"))
+		else if (tagName.equals("array"))
 		{
 			List<Object> array = new ArrayList<Object>();
 			NodeList children = node.getChildNodes();
@@ -113,7 +176,7 @@ public class XMLPListParser implements IPListParser
 			}
 			return array;
 		}
-		else if (childName.equals("dict"))
+		else if (tagName.equals("dict"))
 		{
 			Map<String, Object> map = new HashMap<String, Object>();
 			NodeList children = node.getChildNodes();
