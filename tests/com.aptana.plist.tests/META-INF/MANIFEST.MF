@@ -7,3 +7,4 @@ Bundle-Vendor: APTANA
 Fragment-Host: com.aptana.plist;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.junit
+Export-Package: com.aptana.plist.tests
