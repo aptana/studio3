@@ -95,9 +95,14 @@ public class Activator extends AbstractUIPlugin
 		return plugin;
 	}
 
+	public static void log(IStatus s)
+	{
+		getDefault().getLog().log(s);
+	}
+
 	public static void log(Throwable e)
 	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, e.getMessage(), e));
+		log(new Status(IStatus.ERROR, PLUGIN_ID, e.getMessage(), e));
 	}
 
 	public static Image getImage(String path)
