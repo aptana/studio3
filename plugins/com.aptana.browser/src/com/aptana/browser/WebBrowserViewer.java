@@ -37,6 +37,7 @@ package com.aptana.browser;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -114,6 +115,12 @@ public class WebBrowserViewer extends Composite {
 			});
 			updateNavigationButtons();
 		}
+		
+		MenuManager menuManager = new MenuManager("#Popup");
+		menuManager.add(backAction);
+		menuManager.add(forwardAction);
+		menuManager.add(refreshAction);
+		browser.setMenu(menuManager.createContextMenu(browser));
 	}
 	
 	private void createNavigationBar(Composite parent) {
