@@ -36,15 +36,22 @@ import com.aptana.parsing.ast.IParseNode;
 public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFormatter
 {
 
+	/**
+	 * Indentation constants
+	 */
 	protected static final String[] INDENTATIONS = { HTMLFormatterConstants.INDENT_HTML,
-			HTMLFormatterConstants.INDENT_HEAD, HTMLFormatterConstants.INDENT_BODY,
-			HTMLFormatterConstants.INDENT_META, HTMLFormatterConstants.INDENT_TABLE_TD,
-			HTMLFormatterConstants.INDENT_TABLE, HTMLFormatterConstants.INDENT_TABLE_TR,
-			HTMLFormatterConstants.INDENT_TABLE_TH, HTMLFormatterConstants.INDENT_UL, HTMLFormatterConstants.INDENT_LI };
+			HTMLFormatterConstants.INDENT_HEAD, HTMLFormatterConstants.INDENT_BODY, HTMLFormatterConstants.INDENT_META,
+			HTMLFormatterConstants.INDENT_TABLE_TD, HTMLFormatterConstants.INDENT_TABLE,
+			HTMLFormatterConstants.INDENT_TABLE_TR, HTMLFormatterConstants.INDENT_TABLE_TH,
+			HTMLFormatterConstants.INDENT_UL, HTMLFormatterConstants.INDENT_LI };
 
+	/**
+	 * Blank lines constants
+	 */
 	protected static final String[] BLANK_LINES = { HTMLFormatterConstants.LINES_AFTER_ELEMENTS,
 			HTMLFormatterConstants.LINES_BEFORE_NON_HTML_ELEMENTS, HTMLFormatterConstants.LINES_AFTER_NON_HTML_ELEMENTS };
 
+	
 	private String lineSeparator;
 
 	/**

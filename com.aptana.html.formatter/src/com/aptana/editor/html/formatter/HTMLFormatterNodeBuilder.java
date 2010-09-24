@@ -34,7 +34,9 @@
  */
 package com.aptana.editor.html.formatter;
 
+import java.lang.reflect.Constructor;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import com.aptana.editor.html.formatter.nodes.FormatterBodyNode;
@@ -52,6 +54,9 @@ import com.aptana.editor.html.formatter.nodes.NonIndentingFormatterNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.formatter.FormatterDocument;
+import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.epl.FormatterPlugin;
+import com.aptana.formatter.nodes.AbstractFormatterNode;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.FormatterBlockNode;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
@@ -78,6 +83,31 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	protected static final HashSet<String> VOID_ELEMENTS = new HashSet<String>(Arrays.asList("area", "base", "br",
 			"col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track",
 			"wbr"));
+	/**
+	 * This map holds a mapping between the element type (name) to a constructor of a formatter node that is dedicated
+	 * to format it according to the preferences.
+	 */
+	private static final HashMap<String, Constructor<? extends AbstractFormatterNode>> FORMATTERS = new HashMap<String, Constructor<? extends AbstractFormatterNode>>();
+	static
+	{
+		try
+		{
+			FORMATTERS.put("html", FormatterHtmlNode.class.getConstructor(IFormatterDocument.class)); //$NON-NLS-1$
+			FORMATTERS.put("head", FormatterHeadNode.class.getConstructor(IFormatterDocument.class)); //$NON-NLS-1$
+			FORMATTERS.put("meta", FormatterMetaNode.class.getConstructor(IFormatterDocument.class)); //$NON-NLS-1$
+			FORMATTERS.put("body", FormatterBodyNode.class.getConstructor(IFormatterDocument.class)); //$NON-NLS-1$
+			FORMATTERS.put("table", FormatterTableNode.class.getConstructor(IFormatterDocument.class)); //$NON-NLS-1$
+			FORMATTERS.put("tr", FormatterTableTRNode.class.getConstructor(IFormatterDocument.class)); //$NON-NLS-1$
+			FORMATTERS.put("th", FormatterTableTHNode.class.getConstructor(IFormatterDocument.class)); //$NON-NLS-1$
+			FORMATTERS.put("td", FormatterTableTDNode.class.getConstructor(IFormatterDocument.class)); //$NON-NLS-1$
+			FORMATTERS.put("ul", FormatterULNode.class.getConstructor(IFormatterDocument.class)); //$NON-NLS-1$
+			FORMATTERS.put("li", FormatterLINode.class.getConstructor(IFormatterDocument.class)); //$NON-NLS-1$
+		}
+		catch (Throwable t)
+		{
+			FormatterPlugin.logError(t);
+		}
+	}
 	private static final String INLINE_TAG_CLOSING = "/>"; //$NON-NLS-1$
 
 	private FormatterDocument document;
@@ -96,7 +126,7 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		final IFormatterContainerNode rootNode = new FormatterBlockNode(document);
 		start(rootNode);
 		IParseNode[] children = parseResult.getChildren();
-		addNodes(children, rootNode);
+		addNodes(children);
 		checkedPop(rootNode, document.getLength());
 		return rootNode;
 	}
@@ -105,7 +135,7 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	 * @param children
 	 * @param rootNode
 	 */
-	private void addNodes(IParseNode[] children, IFormatterContainerNode rootNode)
+	private void addNodes(IParseNode[] children)
 	{
 		if (children == null || children.length == 0)
 		{
@@ -113,7 +143,7 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		}
 		for (IParseNode child : children)
 		{
-			addNode(child, rootNode);
+			addNode(child);
 		}
 	}
 
@@ -121,39 +151,29 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	 * @param node
 	 * @param rootNode
 	 */
-	private void addNode(IParseNode node, IFormatterContainerNode rootNode)
+	private void addNode(IParseNode node)
 	{
 		if (node instanceof HTMLElementNode)
 		{
+			// DEBUG
+			// System.out.println(elementNode.getName() + "[" + elementNode.getStartingOffset() + ", "
+			// + elementNode.getEndingOffset() + "]");
+			
 			HTMLElementNode elementNode = (HTMLElementNode) node;
-			System.out.println(elementNode.getName() + "[" + elementNode.getStartingOffset() + ", "
-					+ elementNode.getEndingOffset() + "]");
 			// Check if we need to create a formatter node with a begin and end node, or just begin node.
 			String name = elementNode.getName();
-			if (VOID_ELEMENTS.contains(name.toLowerCase()) || !hasInlineClosingTag(elementNode))
+			if (VOID_ELEMENTS.contains(name.toLowerCase()) || !hasInlineClosingTag(elementNode) || (node instanceof HTMLSpecialNode))
 			{
 				FormatterBlockWithBeginNode formatterNode = new NonIndentingFormatterNode(document);
 				formatterNode.setBegin(createTextNode(document, elementNode.getStartingOffset(), elementNode
-						.getEndingOffset()));
+						.getEndingOffset() + 1));
 				push(formatterNode);
 				checkedPop(formatterNode, -1);
 			}
 			else
 			{
-				FormatterBlockWithBeginEndNode formatterNode = getFormatterNode(elementNode);
-				push(formatterNode);
-				// Recursively call this method till we are done with all the children under this node.
-				addNodes(node.getChildren(), rootNode);
-				checkedPop(formatterNode, -1);
+				pushFormatterNode(elementNode);
 			}
-		}
-		else if (node instanceof HTMLSpecialNode)
-		{
-			// it's an embedded JS or CSS
-			HTMLSpecialNode specialNode = (HTMLSpecialNode) node;
-			System.out.println(specialNode.getName() + "[" + specialNode.getStartingOffset() + ", "
-					+ specialNode.getEndingOffset() + "]");
-			// specialNode.get
 		}
 	}
 
@@ -182,58 +202,97 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	 * @param node
 	 * @return FormatterBlockWithBeginEndNode sub-classing instance
 	 */
-	private FormatterBlockWithBeginEndNode getFormatterNode(HTMLElementNode node)
+	private FormatterBlockWithBeginEndNode pushFormatterNode(HTMLElementNode node)
 	{
-		FormatterBlockWithBeginEndNode formatterNode;
+		FormatterBlockWithBeginEndNode formatterNode = null;
 		String type = node.getName().toLowerCase();
-		if ("html".equals(type)) //$NON-NLS-1$
+		// First, check if we have a class that handles this type of element.
+		Constructor<? extends AbstractFormatterNode> constructor = FORMATTERS.get(type);
+		if (constructor != null)
 		{
-			formatterNode = new FormatterHtmlNode(document);
+			try
+			{
+				formatterNode = (FormatterBlockWithBeginEndNode) constructor.newInstance(document);
+			}
+			catch (Throwable t)
+			{
+				FormatterPlugin.logError(t);
+			}
 		}
-		else if ("head".equals(type)) //$NON-NLS-1$
-		{
-			formatterNode = new FormatterHeadNode(document);
-		}
-		else if ("meta".equals(type)) //$NON-NLS-1$
-		{
-			formatterNode = new FormatterMetaNode(document);
-		}
-		else if ("body".equals(type)) //$NON-NLS-1$
-		{
-			formatterNode = new FormatterBodyNode(document);
-		}
-		else if ("table".equals(type)) //$NON-NLS-1$
-		{
-			formatterNode = new FormatterTableNode(document);
-		}
-		else if ("tr".equals(type)) //$NON-NLS-1$
-		{
-			formatterNode = new FormatterTableTRNode(document);
-		}
-		else if ("th".equals(type)) //$NON-NLS-1$
-		{
-			formatterNode = new FormatterTableTHNode(document);
-		}
-		else if ("td".equals(type)) //$NON-NLS-1$
-		{
-			formatterNode = new FormatterTableTDNode(document);
-		}
-		else if ("ul".equals(type)) //$NON-NLS-1$
-		{
-			formatterNode = new FormatterULNode(document);
-		}
-		else if ("li".equals(type)) //$NON-NLS-1$
-		{
-			formatterNode = new FormatterLINode(document);
-		}
-		else
+		// If we did not have any handle class (or we had an error), set the node to the default one.
+		if (formatterNode == null)
 		{
 			formatterNode = new FormatterDefaultElementNode(document);
 		}
 		int startingOffset = node.getStartingOffset();
 		int endingOffset = node.getEndingOffset();
-		formatterNode.setBegin(createTextNode(document, startingOffset, startingOffset + type.length()));
-		formatterNode.setEnd(createTextNode(document, endingOffset - type.length(), endingOffset));
+		int tagCloser = findRightChar('>', startingOffset + type.length() + 1);
+		formatterNode.setBegin(createTextNode(document, startingOffset, tagCloser + 1));
+		push(formatterNode);
+
+		// Recursively call this method till we are done with all the children under this node.
+		addNodes(node.getChildren());
+
+		int end = endingOffset - type.length();
+		if (node.hasChildren())
+		{
+			IParseNode firstChild = node.getFirstChild();
+			IParseNode lastChild = node.getLastChild();
+			end = lastChild.getEndingOffset() + 1;
+			checkedPop(formatterNode, firstChild.getStartingOffset());
+		}
+		else
+		{
+			end = findLeftChar('<', end);
+			checkedPop(formatterNode, end);
+		}
+		formatterNode.setEnd(createTextNode(document, end, endingOffset + 1));
 		return formatterNode;
+	}
+
+	/**
+	 * @param c
+	 *            The char to find left to the start position.
+	 * @param position
+	 *            Start position
+	 * @return The char position. If not found or out of bounds, we return the initial position.
+	 */
+	private int findLeftChar(char c, int position)
+	{
+		if (position > -1 && position <= document.getLength())
+		{
+			for (int i = position; i > 0; i--)
+			{
+				if (document.charAt(i) == c)
+				{
+					position = i;
+					break;
+				}
+			}
+		}
+		return position;
+	}
+
+	/**
+	 * @param c
+	 *            The char to find right to the start position.
+	 * @param position
+	 *            Start position
+	 * @return The char position. If not found or out of bounds, we return the initial position.
+	 */
+	private int findRightChar(char c, int position)
+	{
+		if (position > -1 && position <= document.getLength())
+		{
+			for (int i = position; i < document.getLength(); i++)
+			{
+				if (document.charAt(i) == c)
+				{
+					position = i;
+					break;
+				}
+			}
+		}
+		return position;
 	}
 }

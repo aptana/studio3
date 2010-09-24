@@ -35,15 +35,20 @@
 package com.aptana.editor.html.formatter;
 
 import com.aptana.formatter.FormatterDocument;
+import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.nodes.FormatterNodeRewriter;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
+import com.aptana.formatter.nodes.IFormatterNode;
 import com.aptana.parsing.ast.IParseNode;
 
 /**
  * @author Shalom
- *
  */
-public class HTMLFormatterNodeRewriter
+public class HTMLFormatterNodeRewriter extends FormatterNodeRewriter
 {
+
+	private final FormatterDocument document;
+	private final IParseNode parseResult;
 
 	/**
 	 * @param parseResult
@@ -51,7 +56,8 @@ public class HTMLFormatterNodeRewriter
 	 */
 	public HTMLFormatterNodeRewriter(IParseNode parseResult, FormatterDocument document)
 	{
-		// TODO Auto-generated constructor stub
+		this.parseResult = parseResult;
+		this.document = document;
 	}
 
 	/**
@@ -59,8 +65,21 @@ public class HTMLFormatterNodeRewriter
 	 */
 	public void rewrite(IFormatterContainerNode root)
 	{
+		mergeTextNodes(root);
+		insertComments(root);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterNodeRewriter#createCommentNode(com.aptana.formatter.IFormatterDocument,
+	 * int, int, java.lang.Object)
+	 */
+	@Override
+	protected IFormatterNode createCommentNode(IFormatterDocument document, int startOffset, int endOffset,
+			Object object)
+	{
 		// TODO Auto-generated method stub
-		
+		return null;
 	}
 
 }

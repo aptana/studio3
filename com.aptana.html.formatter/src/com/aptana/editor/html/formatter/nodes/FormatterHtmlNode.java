@@ -35,6 +35,7 @@
 package com.aptana.editor.html.formatter.nodes;
 
 import com.aptana.editor.html.formatter.HTMLFormatterConstants;
+import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 
@@ -56,6 +57,15 @@ public class FormatterHtmlNode extends FormatterBlockWithBeginEndNode
 	protected boolean isIndenting()
 	{
 		return getDocument().getBoolean(HTMLFormatterConstants.INDENT_HTML);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode#getBlankLinesAfter(com.aptana.formatter.IFormatterContext)
+	 */
+	@Override
+	protected int getBlankLinesAfter(IFormatterContext context)
+	{
+		return 1;
 	}
 
 }
