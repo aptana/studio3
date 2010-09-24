@@ -53,7 +53,6 @@
       <import plugin="org.eclipse.equinox.preferences"/>
       <import plugin="org.eclipse.core.filesystem" version="1.2.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.equinox.security" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="plistreader" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.jruby" version="1.4.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.index.core" version="2.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.ui" version="3.0.0" match="greaterOrEqual"/>
@@ -84,6 +83,7 @@
       <import plugin="com.aptana.syncing.ui"/>
       <import plugin="com.aptana.theme"/>
       <import plugin="com.aptana.browser"/>
+      <import plugin="com.aptana.plist"/>
    </requires>
 
    <plugin
@@ -257,6 +257,14 @@
 
    <plugin
          id="com.aptana.theme.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.plist.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"

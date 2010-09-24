@@ -46,7 +46,7 @@ import org.jrubyparser.ast.Node;
 import org.jrubyparser.parser.ParserResult;
 
 import com.aptana.core.util.IOUtil;
-import com.aptana.editor.ruby.Activator;
+import com.aptana.editor.ruby.RubyEditorPlugin;
 import com.aptana.editor.ruby.parsing.IRubyParserConstants;
 import com.aptana.editor.ruby.parsing.ISourceElementRequestor;
 import com.aptana.editor.ruby.parsing.RubyParser;
@@ -116,7 +116,7 @@ public class RubyFileIndexingParticipant implements IFileStoreIndexingParticipan
 		}
 		catch (Throwable e)
 		{
-			Activator.log(e);
+			RubyEditorPlugin.log(e);
 		}
 		finally
 		{

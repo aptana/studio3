@@ -44,8 +44,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import plistreader.PlistProperties;
-
 @SuppressWarnings("nls")
 public class SnippetConverter
 {
@@ -83,7 +81,7 @@ public class SnippetConverter
 		{
 			try
 			{
-				PlistProperties properties = BundleConverter.parse(plistFile);
+				Map<String, Object> properties = BundleConverter.parse(plistFile);
 				if (properties == null)
 					continue;
 				String name = BundleConverter.sanitize(properties, "name");
@@ -167,11 +165,11 @@ public class SnippetConverter
 		{
 			try
 			{
-				PlistProperties properties = BundleConverter.parse(plistFile);
+				Map<String, Object> properties = BundleConverter.parse(plistFile);
 				if (properties == null)
 					continue;
 				String name = BundleConverter.sanitize(properties, "name");
-				String uuid = (String) properties.getProperty("uuid");
+				String uuid = (String) properties.get("uuid");
 				snippets.put(uuid, name);
 			}
 			catch (Exception e)

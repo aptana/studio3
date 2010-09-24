@@ -47,6 +47,16 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IResourceDeltaVisitor;
+import org.eclipse.core.resources.IResourceProxy;
+import org.eclipse.core.resources.IResourceProxyVisitor;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -89,6 +99,89 @@ public class CoreStubber extends Job
 	protected IStatus run(IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
+
+		// Bail out early if there are no ruby files in the user's workspace
+		if (!isRubyFileInWorkspace())
+		{
+			IResourceChangeListener fResourceListener = new IResourceChangeListener()
+			{
+
+				@Override
+				public void resourceChanged(IResourceChangeEvent event)
+				{
+					// listen for addition of ruby files/opening of projects (traverse them and look for ruby
+					// files)
+					IResourceDelta delta = event.getDelta();
+					if (delta == null)
+					{
+						return;
+					}
+					try
+					{
+						final boolean[] found = new boolean[1];
+						delta.accept(new IResourceDeltaVisitor()
+						{
+
+							@Override
+							public boolean visit(IResourceDelta delta) throws CoreException
+							{
+								if (found[0])
+									return false;
+								IResource resource = delta.getResource();
+								if (resource.getType() == IResource.FILE)
+								{
+									if (isRubyFile(resource.getProject(), resource.getName()))
+									{
+										found[0] = true;
+									}
+									return false;
+								}
+								if (resource.getType() == IResource.ROOT || resource.getType() == IResource.FOLDER)
+								{
+									return true;
+								}
+								if (resource.getType() == IResource.PROJECT)
+								{
+									// a project was added or opened
+									if (delta.getKind() == IResourceDelta.ADDED
+											|| (delta.getKind() == IResourceDelta.CHANGED
+													&& (delta.getFlags() & IResourceDelta.OPEN) != 0 && resource
+													.isAccessible()))
+									{
+										// Check if project contains ruby files!
+										IProject project = resource.getProject();
+										RubyFileDetectingVisitor visitor = new RubyFileDetectingVisitor(project);
+										project.accept(visitor, IResource.NONE);
+										if (visitor.found())
+										{
+											found[0] = true;
+											return false;
+										}
+									}
+									else
+									{
+										return true;
+									}
+								}
+								return false;
+							}
+						});
+						if (found[0])
+						{
+							ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
+							schedule();
+						}
+					}
+					catch (CoreException e)
+					{
+						RubyEditorPlugin.log(e.getStatus());
+					}
+				}
+			};
+			ResourcesPlugin.getWorkspace().addResourceChangeListener(fResourceListener,
+					IResourceChangeEvent.POST_CHANGE);
+			return Status.CANCEL_STATUS;
+		}
 
 		try
 		{
@@ -149,13 +242,100 @@ public class CoreStubber extends Job
 		}
 		catch (Exception e)
 		{
-			return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e);
+			return new Status(IStatus.ERROR, RubyEditorPlugin.PLUGIN_ID, e.getMessage(), e);
 		}
 		finally
 		{
 			sub.done();
 		}
 		return Status.OK_STATUS;
+	}
+
+	/**
+	 * Traverses the workspace until we find a file that matches the ruby content type. If one is found, returns true
+	 * early. Otherwise we search everything and ultimately return false.
+	 * 
+	 * @return
+	 */
+	private boolean isRubyFileInWorkspace()
+	{
+		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+		for (final IProject project : projects)
+		{
+			try
+			{
+				if (!project.isAccessible())
+				{
+					continue;
+				}
+				RubyFileDetectingVisitor visitor = new RubyFileDetectingVisitor(project);
+				project.accept(visitor, IResource.NONE);
+				if (visitor.found())
+				{
+					return true;
+				}
+			}
+			catch (CoreException e)
+			{
+				// ignore
+			}
+		}
+		return false;
+	}
+
+	class RubyFileDetectingVisitor implements IResourceProxyVisitor
+	{
+
+		private IProject fProject;
+		private boolean fFound;
+
+		RubyFileDetectingVisitor(IProject project)
+		{
+			this.fProject = project;
+			this.fFound = false;
+		}
+
+		@Override
+		public boolean visit(IResourceProxy proxy) throws CoreException
+		{
+			if (fFound)
+			{
+				return false;
+			}
+
+			if (proxy.getType() == IResource.FILE && isRubyFile(fProject, proxy.getName()))
+			{
+				fFound = true;
+				return false;
+			}
+
+			return true;
+		}
+
+		public boolean found()
+		{
+			return fFound;
+		}
+	}
+
+	private boolean isRubyFile(IProject project, String filename)
+	{
+		try
+		{
+			IContentType[] types = project.getContentTypeMatcher().findContentTypesFor(filename);
+			for (IContentType type : types)
+			{
+				if (IRubyConstants.CONTENT_TYPE_RUBY.equals(type.getId()))
+				{
+					return true;
+				}
+			}
+		}
+		catch (CoreException e)
+		{
+			// ignore
+		}
+		return false;
 	}
 
 	public static Index getRubyCoreIndex()
@@ -177,7 +357,7 @@ public class CoreStubber extends Job
 			return null;
 		}
 		// Store core stubs based on ruby version string...
-		IPath outputPath = Activator.getDefault().getStateLocation().append(Integer.toString(rubyVersion.hashCode()))
+		IPath outputPath = RubyEditorPlugin.getDefault().getStateLocation().append(Integer.toString(rubyVersion.hashCode()))
 				.append(RUBY_EXE);
 		return outputPath.toFile();
 	}
@@ -264,7 +444,7 @@ public class CoreStubber extends Job
 
 	protected void generateCoreStubs(File outputDir, File finishMarker) throws IOException
 	{
-		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(CORE_STUBBER_PATH), null);
+		URL url = FileLocator.find(RubyEditorPlugin.getDefault().getBundle(), new Path(CORE_STUBBER_PATH), null);
 		File stubberScript = ResourceUtil.resourcePathToFile(url);
 
 		Map<Integer, String> stubberResult = ProcessUtil.runInBackground(RUBY_EXE, null,
@@ -273,7 +453,7 @@ public class CoreStubber extends Job
 		if (exitCode != 0)
 		{
 			String stubberOutput = stubberResult.values().iterator().next();
-			Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, stubberOutput, null));
+			RubyEditorPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, RubyEditorPlugin.PLUGIN_ID, stubberOutput, null));
 		}
 		else
 		{
