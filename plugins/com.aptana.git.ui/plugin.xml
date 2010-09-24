@@ -173,9 +173,9 @@
                definitionId="com.aptana.git.ui.command.blame"
                enablesFor="+"
                id="com.aptana.git.ui.actions.BlameAction"
-               label="Blame"
+               label="%BlameAction_label"
                menubarPath="team.main/targetGroup"
-               tooltip="Blame">
+               tooltip="%BlameAction_tooltip">
          </action>
       </objectContribution>
    </extension>
@@ -332,7 +332,7 @@
       <command
             categoryId="com.aptana.git.ui.category"
             id="com.aptana.git.ui.command.blame"
-            name="Blame">
+            name="%BlameAction_label">
       </command>
       <command
             defaultHandler="com.aptana.git.ui.internal.actions.ShowInHistoryHandler"
