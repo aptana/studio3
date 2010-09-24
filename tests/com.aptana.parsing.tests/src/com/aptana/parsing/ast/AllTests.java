@@ -3,6 +3,7 @@ package com.aptana.parsing.ast;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+@SuppressWarnings("nls")
 public class AllTests
 {
 
