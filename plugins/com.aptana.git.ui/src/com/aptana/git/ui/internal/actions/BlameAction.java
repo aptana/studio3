@@ -11,9 +11,13 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.internal.text.revisions.Colors;
+import org.eclipse.jface.text.revisions.Revision;
 import org.eclipse.jface.text.revisions.RevisionInformation;
 import org.eclipse.jface.text.source.LineRange;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.team.ui.TeamUI;
+import org.eclipse.team.ui.history.IHistoryPage;
+import org.eclipse.team.ui.history.IHistoryView;
 import org.eclipse.team.ui.history.RevisionAnnotationController;
 import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
@@ -25,10 +29,12 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 
 import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.actions.GitAction;
+import com.aptana.git.ui.internal.history.GitHistoryPage;
 
 @SuppressWarnings("restriction")
 public class BlameAction extends GitAction implements IEditorActionDelegate
@@ -54,8 +60,8 @@ public class BlameAction extends GitAction implements IEditorActionDelegate
 			{
 				continue;
 			}
-			IFile file = (IFile) resource;
-			GitRepository repo = GitPlugin.getDefault().getGitRepositoryManager().getAttached(file.getProject());
+			final IFile file = (IFile) resource;
+			final GitRepository repo = GitPlugin.getDefault().getGitRepositoryManager().getAttached(file.getProject());
 			RevisionInformation info = createRevisionInformation(repo, repo.relativePath(file));
 
 			if (fEditor == null && getTargetPart() instanceof AbstractDecoratedTextEditor)
@@ -66,6 +72,11 @@ public class BlameAction extends GitAction implements IEditorActionDelegate
 			if (fEditor != null)
 			{
 				((AbstractDecoratedTextEditor) fEditor).showRevisionInformation(info, GIT_QUICK_DIFF_ID);
+				IWorkbenchPage page = getActivePage();
+				if (page != null)
+				{
+					attachHistorySyncher(file, repo, page);
+				}
 			}
 			else
 			{
@@ -75,6 +86,7 @@ public class BlameAction extends GitAction implements IEditorActionDelegate
 					try
 					{
 						RevisionAnnotationController.openEditor(page, file);
+						attachHistorySyncher(file, repo, page);
 					}
 					catch (PartInitException e)
 					{
@@ -83,6 +95,29 @@ public class BlameAction extends GitAction implements IEditorActionDelegate
 				}
 			}
 		}
+	}
+
+	protected IHistoryView attachHistorySyncher(final IFile file, final GitRepository repo, IWorkbenchPage page)
+	{
+		IHistoryView historyView = TeamUI.getHistoryView();
+		if (historyView != null)
+		{
+			IHistoryPage historyPage = historyView.getHistoryPage();
+			if (historyPage instanceof GitHistoryPage)
+			{
+				new RevisionAnnotationController(page, file, ((GitHistoryPage) historyPage).getSelectionProvider())
+				{
+
+					@Override
+					protected Object getHistoryEntry(Revision selected)
+					{
+						String sha = selected.getId();
+						return new GitCommit(repo, sha);
+					}
+				};
+			}
+		}
+		return historyView;
 	}
 
 	private IWorkbenchPage getActivePage()
@@ -185,7 +220,8 @@ public class BlameAction extends GitAction implements IEditorActionDelegate
 			}
 			uniqueAuthors.add(rev.getAuthor());
 		}
-		// Assign unique colors! FIXME Shouldn't be accessing this class, so we'll need to create our own version eventually
+		// Assign unique colors! FIXME Shouldn't be accessing this class, so we'll need to create our own version
+		// eventually
 		RGB[] colors = Colors.rainbow(uniqueAuthors.size());
 		RevisionInformation info = new RevisionInformation();
 		for (GitRevision rev : revisions.values())
