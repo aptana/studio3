@@ -9,6 +9,7 @@ import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 
+@SuppressWarnings("nls")
 public class ThemeTest extends TestCase
 {
 

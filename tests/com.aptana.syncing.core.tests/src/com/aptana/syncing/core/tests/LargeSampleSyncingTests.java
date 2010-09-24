@@ -63,6 +63,7 @@ import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
 /**
  * @author Ingo Muschenetz
  */
+@SuppressWarnings("nls")
 public abstract class LargeSampleSyncingTests extends TestCase
 {
 	protected IFileStore clientDirectory;

@@ -6,6 +6,7 @@ import org.eclipse.core.runtime.Path;
 
 import com.aptana.ide.core.io.LocalConnectionPoint;
 
+@SuppressWarnings("nls")
 public class LocalSyncingTestsWithSpaces extends SyncingTests
 {
 
