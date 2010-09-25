@@ -11,9 +11,12 @@
  *******************************************************************************/
 package com.aptana.formatter;
 
+import java.util.Set;
+
 import org.eclipse.jface.text.IRegion;
 
-public interface IFormatterDocument {
+public interface IFormatterDocument
+{
 
 	String getText();
 
@@ -41,6 +44,8 @@ public interface IFormatterDocument {
 	String getString(String key);
 
 	int getInt(String key);
+
+	Set<String> getSet(String key);
 
 	char charAt(int start);
 

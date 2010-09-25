@@ -26,7 +26,7 @@ public class HTMLFormatterFactory extends AbstractScriptFormatterFactory
 {
 	private static final PreferenceKey FORMATTER_PREF_KEY = new PreferenceKey(HTMLFormatterPlugin.PLUGIN_ID,
 			HTMLFormatterConstants.FORMATTER_ID);
-	
+
 	private static final String FORMATTER_PREVIEW_FILE = "formatterPreview.html"; //$NON-NLS-1$
 
 	private static final String[] KEYS = {
@@ -36,16 +36,8 @@ public class HTMLFormatterFactory extends AbstractScriptFormatterFactory
 		HTMLFormatterConstants.FORMATTER_TAB_SIZE,
 		HTMLFormatterConstants.WRAP_COMMENTS,
 		HTMLFormatterConstants.WRAP_COMMENTS_LENGTH,
-		HTMLFormatterConstants.INDENT_BODY,
-		HTMLFormatterConstants.INDENT_HTML,
-		HTMLFormatterConstants.INDENT_HEAD,
-		HTMLFormatterConstants.INDENT_META,
-		HTMLFormatterConstants.INDENT_TABLE,
-		HTMLFormatterConstants.INDENT_TABLE_TD,
-		HTMLFormatterConstants.INDENT_TABLE_TR,
-		HTMLFormatterConstants.INDENT_TABLE_TH,
-		HTMLFormatterConstants.INDENT_UL,
-		HTMLFormatterConstants.INDENT_LI,
+		HTMLFormatterConstants.INDENT_EXCLUDED_TAGS,
+		HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS,
 		HTMLFormatterConstants.LINES_AFTER_ELEMENTS,
 		HTMLFormatterConstants.LINES_AFTER_NON_HTML_ELEMENTS,
 		HTMLFormatterConstants.LINES_BEFORE_NON_HTML_ELEMENTS,

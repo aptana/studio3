@@ -23,22 +23,19 @@ public interface HTMLFormatterConstants
 	public static final String WRAP_COMMENTS_LENGTH = FORMATTER_ID + ".wrap.comments.length"; //$NON-NLS-1$
 
 	// Indentation
+	public static final String INDENT_EXCLUDED_TAGS = FORMATTER_ID + ".indent.excluded"; //$NON-NLS-1$
+	
 	public static final String FORMATTER_INDENTATION_SIZE = FORMATTER_ID + '.'
 			+ CodeFormatterConstants.FORMATTER_INDENTATION_SIZE;
-	public static final String INDENT_HTML = FORMATTER_ID + ".indent.html"; //$NON-NLS-1$
-	public static final String INDENT_HEAD = FORMATTER_ID + ".indent.head"; //$NON-NLS-1$
-	public static final String INDENT_BODY = FORMATTER_ID + ".indent.body"; //$NON-NLS-1$
-	public static final String INDENT_META = FORMATTER_ID + ".indent.meta"; //$NON-NLS-1$
-	public static final String INDENT_TABLE = FORMATTER_ID + ".indent.table"; //$NON-NLS-1$
-	public static final String INDENT_TABLE_TD = FORMATTER_ID + ".indent.table.td"; //$NON-NLS-1$
-	public static final String INDENT_TABLE_TR = FORMATTER_ID + ".indent.table.tr"; //$NON-NLS-1$
-	public static final String INDENT_TABLE_TH = FORMATTER_ID + ".indent.table.th"; //$NON-NLS-1$
-	public static final String INDENT_UL = FORMATTER_ID + ".indent.ul"; //$NON-NLS-1$
-	public static final String INDENT_LI = FORMATTER_ID + ".indent.li"; //$NON-NLS-1$
 
-	// Blank lines
+	// New lines
+	public static final String NEW_LINES_EXCLUDED_TAGS = FORMATTER_ID + ".newline.excluded"; //$NON-NLS-1$
+	
+	// Empty lines
 	public static final String LINES_AFTER_ELEMENTS = FORMATTER_ID + ".line.after.element"; //$NON-NLS-1$
 	public static final String LINES_BEFORE_NON_HTML_ELEMENTS = FORMATTER_ID + ".line.before.non.html"; //$NON-NLS-1$
 	public static final String LINES_AFTER_NON_HTML_ELEMENTS = FORMATTER_ID + ".line.after.non.html"; //$NON-NLS-1$
 	public static final String PRESERVED_LINES = FORMATTER_ID + ".line.preserve"; //$NON-NLS-1$
+
+	
 }

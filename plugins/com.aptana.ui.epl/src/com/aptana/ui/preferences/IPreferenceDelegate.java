@@ -19,6 +19,11 @@ import org.eclipse.jface.preference.IPreferenceStore;
 public interface IPreferenceDelegate {
 
 	/**
+	 * A delimiter that can be used to store/read lists of items.
+	 */
+	static final String PREFERECE_DELIMITER = "!"; //$NON-NLS-1$
+	
+	/**
 	 * Returns the string value for the given preference key
 	 */
 	String getString(Object key);

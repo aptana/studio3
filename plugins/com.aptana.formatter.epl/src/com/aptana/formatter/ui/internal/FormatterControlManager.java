@@ -21,10 +21,12 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.formatter.ui.IFormatterControlManager;
+import com.aptana.formatter.ui.internal.preferences.AddRemoveList;
 import com.aptana.ui.preferences.ControlBindingManager;
 import com.aptana.ui.preferences.IPreferenceDelegate;
 import com.aptana.ui.util.IStatusChangeListener;
@@ -84,6 +86,17 @@ public class FormatterControlManager implements IFormatterControlManager, IStatu
 		return text;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.aptana.formatter.ui.IFormatterControlManager#createManagedList(org.eclipse.swt.widgets.Group, java.lang.String)
+	 */
+	@Override
+	public Control createManagedList(Group group, Object key)
+	{
+		AddRemoveList list = new AddRemoveList(group);
+		bindingManager.bindControl(list.getList(), key);
+		return list.getControl();
+	}
+	
 	private final Map<Control, Label> labelAssociations = new HashMap<Control, Label>();
 
 	/**
@@ -165,5 +178,4 @@ public class FormatterControlManager implements IFormatterControlManager, IStatu
 	{
 		delegate.setString(key, value);
 	}
-
 }

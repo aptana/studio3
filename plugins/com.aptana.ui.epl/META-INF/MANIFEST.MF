@@ -21,7 +21,9 @@ Export-Package: com.aptana.editor.common.contentassist,
  com.aptana.ui.epl,
  com.aptana.ui.preferences,
  com.aptana.ui.preferences.dialogfields,
- com.aptana.ui.util
+ com.aptana.ui.properties,
+ com.aptana.ui.util,
+ com.aptana.ui.widgets
 Eclipse-ExtensibleAPI: true
 Bundle-Activator: com.aptana.ui.epl.UIEplPlugin
 

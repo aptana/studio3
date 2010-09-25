@@ -34,36 +34,63 @@
  */
 package com.aptana.editor.html.formatter.preferences;
 
-import org.eclipse.swt.widgets.Composite;
+import java.net.URL;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+
+import com.aptana.editor.html.formatter.HTMLFormatterConstants;
+import com.aptana.formatter.ui.FormatterModifyDialog;
+import com.aptana.formatter.ui.FormatterModifyTabPage;
 import com.aptana.formatter.ui.IFormatterControlManager;
-import com.aptana.formatter.ui.IFormatterModifiyTabPage;
+import com.aptana.ui.util.SWTFactory;
 
 /**
+ * A HTML formatter tab for new-lines insertions.
+ * 
  * @author Shalom
- *
  */
-public class HTMLFormatterBlankLinesPage implements IFormatterModifiyTabPage
+public class HTMLFormatterNewLinesPage extends FormatterModifyTabPage
 {
 
-	/* (non-Javadoc)
-	 * @see com.aptana.formatter.ui.IFormatterModifiyTabPage#createContents(com.aptana.formatter.ui.IFormatterControlManager, org.eclipse.swt.widgets.Composite)
+	private static final String NEW_LINES_PREVIEW_FILE = "indentation-preview.html"; //$NON-NLS-1$
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param dialog
+	 *            A {@link FormatterModifyDialog}
 	 */
-	@Override
-	public Composite createContents(IFormatterControlManager manager, Composite parent)
+	public HTMLFormatterNewLinesPage(FormatterModifyDialog dialog)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		super(dialog);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.formatter.ui.IFormatterModifiyTabPage#updatePreview()
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.formatter.ui.FormatterModifyTabPage#createOptions(com.aptana.formatter.ui.IFormatterControlManager,
+	 * org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
-	public void updatePreview()
+	protected void createOptions(IFormatterControlManager manager, Composite parent)
 	{
-		// TODO Auto-generated method stub
-
+		Group group = SWTFactory.createGroup(parent, Messages.HTMLFormatterTabPage_exclusionsGroupLabel, 1, 1,
+				GridData.FILL_BOTH);
+		Label exclutionLabel = new Label(group, SWT.WRAP);
+		exclutionLabel.setText(Messages.HTMLFormatterNewLinesPage_exclusionsMessage);
+		manager.createManagedList(group, HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.ui.FormatterModifyTabPage#getPreviewContent()
+	 */
+	protected URL getPreviewContent()
+	{
+		return getClass().getResource(NEW_LINES_PREVIEW_FILE);
+	}
 }

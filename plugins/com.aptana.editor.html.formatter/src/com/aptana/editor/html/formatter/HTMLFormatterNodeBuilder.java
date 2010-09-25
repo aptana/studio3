@@ -34,29 +34,14 @@
  */
 package com.aptana.editor.html.formatter;
 
-import java.lang.reflect.Constructor;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 
-import com.aptana.editor.html.formatter.nodes.FormatterBodyNode;
 import com.aptana.editor.html.formatter.nodes.FormatterDefaultElementNode;
-import com.aptana.editor.html.formatter.nodes.FormatterHeadNode;
-import com.aptana.editor.html.formatter.nodes.FormatterHtmlNode;
-import com.aptana.editor.html.formatter.nodes.FormatterLINode;
-import com.aptana.editor.html.formatter.nodes.FormatterMetaNode;
-import com.aptana.editor.html.formatter.nodes.FormatterTableNode;
-import com.aptana.editor.html.formatter.nodes.FormatterTableTDNode;
-import com.aptana.editor.html.formatter.nodes.FormatterTableTHNode;
-import com.aptana.editor.html.formatter.nodes.FormatterTableTRNode;
-import com.aptana.editor.html.formatter.nodes.FormatterULNode;
-import com.aptana.editor.html.formatter.nodes.NonIndentingFormatterNode;
+import com.aptana.editor.html.formatter.nodes.FormatterVoidElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.formatter.FormatterDocument;
-import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.epl.FormatterPlugin;
-import com.aptana.formatter.nodes.AbstractFormatterNode;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.FormatterBlockNode;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
@@ -83,31 +68,6 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	protected static final HashSet<String> VOID_ELEMENTS = new HashSet<String>(Arrays.asList("area", "base", "br",
 			"col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track",
 			"wbr"));
-	/**
-	 * This map holds a mapping between the element type (name) to a constructor of a formatter node that is dedicated
-	 * to format it according to the preferences.
-	 */
-	private static final HashMap<String, Constructor<? extends AbstractFormatterNode>> FORMATTERS = new HashMap<String, Constructor<? extends AbstractFormatterNode>>();
-	static
-	{
-		try
-		{
-			FORMATTERS.put("html", FormatterHtmlNode.class.getConstructor(IFormatterDocument.class)); //$NON-NLS-1$
-			FORMATTERS.put("head", FormatterHeadNode.class.getConstructor(IFormatterDocument.class)); //$NON-NLS-1$
-			FORMATTERS.put("meta", FormatterMetaNode.class.getConstructor(IFormatterDocument.class)); //$NON-NLS-1$
-			FORMATTERS.put("body", FormatterBodyNode.class.getConstructor(IFormatterDocument.class)); //$NON-NLS-1$
-			FORMATTERS.put("table", FormatterTableNode.class.getConstructor(IFormatterDocument.class)); //$NON-NLS-1$
-			FORMATTERS.put("tr", FormatterTableTRNode.class.getConstructor(IFormatterDocument.class)); //$NON-NLS-1$
-			FORMATTERS.put("th", FormatterTableTHNode.class.getConstructor(IFormatterDocument.class)); //$NON-NLS-1$
-			FORMATTERS.put("td", FormatterTableTDNode.class.getConstructor(IFormatterDocument.class)); //$NON-NLS-1$
-			FORMATTERS.put("ul", FormatterULNode.class.getConstructor(IFormatterDocument.class)); //$NON-NLS-1$
-			FORMATTERS.put("li", FormatterLINode.class.getConstructor(IFormatterDocument.class)); //$NON-NLS-1$
-		}
-		catch (Throwable t)
-		{
-			FormatterPlugin.logError(t);
-		}
-	}
 	private static final String INLINE_TAG_CLOSING = "/>"; //$NON-NLS-1$
 
 	private FormatterDocument document;
@@ -158,13 +118,13 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			// DEBUG
 			// System.out.println(elementNode.getName() + "[" + elementNode.getStartingOffset() + ", "
 			// + elementNode.getEndingOffset() + "]");
-			
+
 			HTMLElementNode elementNode = (HTMLElementNode) node;
 			// Check if we need to create a formatter node with a begin and end node, or just begin node.
-			String name = elementNode.getName();
-			if (VOID_ELEMENTS.contains(name.toLowerCase()) || !hasInlineClosingTag(elementNode) || (node instanceof HTMLSpecialNode))
+			String name = elementNode.getName().toLowerCase();
+			if (VOID_ELEMENTS.contains(name) || !hasInlineClosingTag(elementNode) || (node instanceof HTMLSpecialNode))
 			{
-				FormatterBlockWithBeginNode formatterNode = new NonIndentingFormatterNode(document);
+				FormatterBlockWithBeginNode formatterNode = new FormatterVoidElementNode(document, name);
 				formatterNode.setBegin(createTextNode(document, elementNode.getStartingOffset(), elementNode
 						.getEndingOffset() + 1));
 				push(formatterNode);
@@ -204,26 +164,8 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	 */
 	private FormatterBlockWithBeginEndNode pushFormatterNode(HTMLElementNode node)
 	{
-		FormatterBlockWithBeginEndNode formatterNode = null;
 		String type = node.getName().toLowerCase();
-		// First, check if we have a class that handles this type of element.
-		Constructor<? extends AbstractFormatterNode> constructor = FORMATTERS.get(type);
-		if (constructor != null)
-		{
-			try
-			{
-				formatterNode = (FormatterBlockWithBeginEndNode) constructor.newInstance(document);
-			}
-			catch (Throwable t)
-			{
-				FormatterPlugin.logError(t);
-			}
-		}
-		// If we did not have any handle class (or we had an error), set the node to the default one.
-		if (formatterNode == null)
-		{
-			formatterNode = new FormatterDefaultElementNode(document);
-		}
+		FormatterBlockWithBeginEndNode formatterNode = new FormatterDefaultElementNode(document, type);
 		int startingOffset = node.getStartingOffset();
 		int endingOffset = node.getEndingOffset();
 		int tagCloser = findRightChar('>', startingOffset + type.length() + 1);

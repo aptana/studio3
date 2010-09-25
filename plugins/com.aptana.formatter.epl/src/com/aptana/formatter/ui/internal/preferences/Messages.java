@@ -32,30 +32,29 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.html.formatter.nodes;
+package com.aptana.formatter.ui.internal.preferences;
 
-import com.aptana.editor.html.formatter.HTMLFormatterConstants;
-import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
+import org.eclipse.osgi.util.NLS;
 
 /**
- * A BODY tag node formatter.
- * 
- * @author Shalom Gibly <sgibly@aptana.com>
+ * @author Shalom
+ *
  */
-public class FormatterBodyNode extends FormatterBlockWithBeginEndNode
+public class Messages extends NLS
 {
-	/**
-	 * @param document
-	 */
-	public FormatterBodyNode(IFormatterDocument document)
+	private static final String BUNDLE_NAME = "com.aptana.formatter.ui.internal.preferences.messages"; //$NON-NLS-1$
+	public static String AddRemoveList_add;
+	public static String AddRemoveList_inputMessageErrorInfo;
+	public static String AddRemoveList_inputMessageText;
+	public static String AddRemoveList_inputMessageTitle;
+	public static String AddRemoveList_remove;
+	static
 	{
-		super(document);
+		// initialize resource bundle
+		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
-	protected boolean isIndenting()
+	private Messages()
 	{
-		return getDocument().getBoolean(HTMLFormatterConstants.INDENT_BODY);
 	}
-
 }

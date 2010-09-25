@@ -21,6 +21,8 @@ import com.aptana.ui.epl.UIEplPlugin;
 import com.aptana.ui.util.IStatusChangeListener;
 import com.aptana.ui.util.StatusInfo;
 import com.aptana.ui.util.StatusUtil;
+import com.aptana.ui.widgets.CListViewer;
+import com.aptana.ui.widgets.IListDataChangeListener;
 
 /**
  */
@@ -36,6 +38,7 @@ public class ControlBindingManager
 
 	private IPreferenceDelegate preferenceDelegate;
 	private Map<Button, String> radioControls;
+	private Map<CListViewer, Object> listControls;
 
 	private Map<Text, Object> textControls;
 	private ValidatorManager validatorManager;
@@ -59,6 +62,7 @@ public class ControlBindingManager
 		this.comboControls = new HashMap<Combo, Object>();
 		this.textControls = new HashMap<Text, Object>();
 		this.radioControls = new HashMap<Button, String>();
+		this.listControls = new HashMap<CListViewer, Object>();
 
 		this.validatorManager = new ValidatorManager();
 		this.dependencyManager = new DependencyManager();
@@ -233,6 +237,38 @@ public class ControlBindingManager
 		});
 	}
 
+	public void bindControl(final CListViewer list, final Object key)
+	{
+		if (key != null)
+		{
+			listControls.put(list, key);
+		}
+		list.addListDataChangeListener(new IListDataChangeListener()
+		{
+			@Override
+			public void inputChanged(Object input, Object oldInput)
+			{
+				Object[] in = (Object[]) input;
+				StringBuilder builder = new StringBuilder();
+				for (int i = 0; i < in.length; i++)
+				{
+					builder.append(in[i]);
+					if (i + 1 < in.length)
+					{
+						builder.append(IPreferenceDelegate.PREFERECE_DELIMITER);
+					}
+				}
+				String oldValue = preferenceDelegate.getString(key);
+				String newValue = builder.toString();
+				if (!newValue.equals(oldValue))
+				{
+					preferenceDelegate.setString(key, newValue);
+					changeListener.statusChanged(StatusInfo.OK_STATUS);
+				}
+			}
+		});
+	}
+
 	public void createDependency(final Button button, Control[] dependencies)
 	{
 		createDependency(button, dependencies, null);
@@ -265,6 +301,7 @@ public class ControlBindingManager
 		initCheckBoxes();
 		initRadioControls();
 		initCombos();
+		initListControls();
 
 		dependencyManager.initialize();
 	}
@@ -339,6 +376,19 @@ public class ControlBindingManager
 			{
 				button.setSelection(false);
 			}
+		}
+	}
+
+	private void initListControls()
+	{
+		Iterator<CListViewer> it = listControls.keySet().iterator();
+		while (it.hasNext())
+		{
+			final CListViewer list = it.next();
+			final Object key = listControls.get(list);
+			String value = preferenceDelegate.getString(key);
+			String[] elements = (value != null) ? value.split(IPreferenceDelegate.PREFERECE_DELIMITER) : new String[0];
+			list.setInput(elements);
 		}
 	}
 

@@ -32,30 +32,27 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.html.formatter.nodes;
+package com.aptana.editor.html.formatter.preferences;
 
-import com.aptana.editor.html.formatter.HTMLFormatterConstants;
-import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
+import org.eclipse.osgi.util.NLS;
 
 /**
- * A META tag node formatter.
- * 
- * @author Shalom Gibly <sgibly@aptana.com>
+ * @author Shalom
  */
-public class FormatterMetaNode extends FormatterBlockWithBeginEndNode
+public class Messages extends NLS
 {
-	/**
-	 * @param document
-	 */
-	public FormatterMetaNode(IFormatterDocument document)
+	private static final String BUNDLE_NAME = "com.aptana.editor.html.formatter.preferences.Messages"; //$NON-NLS-1$
+	public static String HTMLFormatterIndentationTabPage_exclusionsMessage;
+	public static String HTMLFormatterTabPage_exclusionsGroupLabel;
+	public static String HTMLFormatterIndentationTabPage_indentationGeneralGroupLabel;
+	public static String HTMLFormatterNewLinesPage_exclusionsMessage;
+	static
 	{
-		super(document);
+		// initialize resource bundle
+		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
-	protected boolean isIndenting()
+	private Messages()
 	{
-		return getDocument().getBoolean(HTMLFormatterConstants.INDENT_META);
 	}
-
 }

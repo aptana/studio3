@@ -13,6 +13,7 @@ package com.aptana.formatter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jface.text.IRegion;
 
@@ -23,6 +24,7 @@ public class FormatterDocument implements IFormatterDocument
 	private final Map<String, Boolean> booleans = new HashMap<String, Boolean>();
 	private final Map<String, String> strings = new HashMap<String, String>();
 	private final Map<String, Integer> ints = new HashMap<String, Integer>();
+	private final Map<String, Set<String>> sets = new HashMap<String, Set<String>>();
 
 	/**
 	 * @param text
@@ -76,7 +78,7 @@ public class FormatterDocument implements IFormatterDocument
 
 	public String getString(String key)
 	{
-		return (String) strings.get(key);
+		return strings.get(key);
 	}
 
 	public void setInt(String key, int value)
@@ -88,6 +90,16 @@ public class FormatterDocument implements IFormatterDocument
 	{
 		final Integer value = (Integer) ints.get(key);
 		return value != null ? value.intValue() : 0;
+	}
+
+	public void setSet(String key, Set<String> set)
+	{
+		sets.put(key, set);
+	}
+
+	public Set<String> getSet(String key)
+	{
+		return sets.get(key);
 	}
 
 	public char charAt(int index)

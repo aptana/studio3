@@ -36,6 +36,7 @@ package com.aptana.editor.html.formatter.preferences;
 
 import java.net.URL;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -44,6 +45,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.editor.html.formatter.HTMLFormatterConstants;
@@ -88,8 +90,8 @@ public class HTMLFormatterIndentationTabPage extends FormatterModifyTabPage
 	@Override
 	protected void createOptions(IFormatterControlManager manager, Composite parent)
 	{
-		Group group = SWTFactory.createGroup(parent, "General Settings", 2, 1, //$NON-NLS-1$
-				GridData.FILL_HORIZONTAL);
+		Group group = SWTFactory.createGroup(parent,
+				Messages.HTMLFormatterIndentationTabPage_indentationGeneralGroupLabel, 2, 1, GridData.FILL_HORIZONTAL);
 		final Combo tabOptions = manager.createCombo(group, HTMLFormatterConstants.FORMATTER_TAB_CHAR,
 				FormatterMessages.IndentationTabPage_general_group_option_tab_policy, tabOptionItems, tabOptionNames);
 		final Text indentationSize = manager.createNumber(group, HTMLFormatterConstants.FORMATTER_INDENTATION_SIZE,
@@ -112,6 +114,12 @@ public class HTMLFormatterIndentationTabPage extends FormatterModifyTabPage
 			}
 		});
 		new TabOptionHandler(manager, tabOptions, indentationSize);
+
+		group = SWTFactory.createGroup(parent,
+				Messages.HTMLFormatterTabPage_exclusionsGroupLabel, 1, 1, GridData.FILL_BOTH);
+		Label exclutionLabel = new Label(group, SWT.WRAP);
+		exclutionLabel.setText(Messages.HTMLFormatterIndentationTabPage_exclusionsMessage);
+		manager.createManagedList(group, HTMLFormatterConstants.INDENT_EXCLUDED_TAGS);
 	}
 
 	/**

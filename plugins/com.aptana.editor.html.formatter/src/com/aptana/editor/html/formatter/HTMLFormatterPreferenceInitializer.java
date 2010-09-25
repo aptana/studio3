@@ -4,6 +4,7 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.aptana.formatter.ui.CodeFormatterConstants;
+import com.aptana.ui.preferences.IPreferenceDelegate;
 
 /**
  * HTML formatter preference initializer.
@@ -26,16 +27,13 @@ public class HTMLFormatterPreferenceInitializer extends AbstractPreferenceInitia
 		store.setDefault(HTMLFormatterConstants.FORMATTER_INDENTATION_SIZE, "2"); //$NON-NLS-1$
 		store.setDefault(HTMLFormatterConstants.WRAP_COMMENTS, false);
 		store.setDefault(HTMLFormatterConstants.WRAP_COMMENTS_LENGTH, 80);
-		store.setDefault(HTMLFormatterConstants.INDENT_HTML, true);
-		store.setDefault(HTMLFormatterConstants.INDENT_HEAD, true);
-		store.setDefault(HTMLFormatterConstants.INDENT_BODY, true);
-		store.setDefault(HTMLFormatterConstants.INDENT_META, true);
-		store.setDefault(HTMLFormatterConstants.INDENT_TABLE, true);
-		store.setDefault(HTMLFormatterConstants.INDENT_TABLE_TD, true);
-		store.setDefault(HTMLFormatterConstants.INDENT_TABLE_TR, true);
-		store.setDefault(HTMLFormatterConstants.INDENT_TABLE_TH, true);
-		store.setDefault(HTMLFormatterConstants.INDENT_UL, true);
-		store.setDefault(HTMLFormatterConstants.INDENT_LI, true);
+		// We add all the 'Void' html tags here as well. They should not trigger an indent increase.
+		store.setDefault(HTMLFormatterConstants.INDENT_EXCLUDED_TAGS,
+				"br,a,i,b,em,strong,h1,h2,h3,h4,h5,h6,area,base,col,command,embed,hr,img,input,keygen,link,meta,param,source,track,wbr" //$NON-NLS-1$
+				.replaceAll(",", IPreferenceDelegate.PREFERECE_DELIMITER)); //$NON-NLS-1$
+		store.setDefault(HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS,
+				"a,span,i,b,em,strong,h1,h2,h3,h4,h5,h6,title,option,meta".replaceAll(",", //$NON-NLS-1$//$NON-NLS-2$
+						IPreferenceDelegate.PREFERECE_DELIMITER));
 		store.setDefault(HTMLFormatterConstants.LINES_AFTER_ELEMENTS, 1);
 		store.setDefault(HTMLFormatterConstants.LINES_AFTER_NON_HTML_ELEMENTS, 1);
 		store.setDefault(HTMLFormatterConstants.LINES_BEFORE_NON_HTML_ELEMENTS, 1);

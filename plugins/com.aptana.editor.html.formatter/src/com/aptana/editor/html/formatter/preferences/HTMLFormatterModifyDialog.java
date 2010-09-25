@@ -60,7 +60,9 @@ public class HTMLFormatterModifyDialog extends FormatterModifyDialog
 	protected void addPages()
 	{
 		addTabPage("Indentation", new HTMLFormatterIndentationTabPage(this));
-//		addTabPage("Blank Lines", new HTMLFormatterBlankLinesPage(this));
+		addTabPage("New Lines", new HTMLFormatterNewLinesPage(this));
+		// TODO - Add a Blank Lines tab
+		
 //		addTabPage("Comments", new HTMLFormatterCommentsPage(this));
 	}
 }

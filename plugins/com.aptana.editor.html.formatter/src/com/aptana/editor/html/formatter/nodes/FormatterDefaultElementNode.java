@@ -34,6 +34,9 @@
  */
 package com.aptana.editor.html.formatter.nodes;
 
+import java.util.Set;
+
+import com.aptana.editor.html.formatter.HTMLFormatterConstants;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 
@@ -45,17 +48,21 @@ import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
  */
 public class FormatterDefaultElementNode extends FormatterBlockWithBeginEndNode
 {
+	private String element;
+
 	/**
 	 * @param document
 	 */
-	public FormatterDefaultElementNode(IFormatterDocument document)
+	public FormatterDefaultElementNode(IFormatterDocument document, String element)
 	{
 		super(document);
+		this.element = element;
 	}
 
 	protected boolean isIndenting()
 	{
-		return false;
+		Set<String> set = getDocument().getSet(HTMLFormatterConstants.INDENT_EXCLUDED_TAGS);
+		return !set.contains(element);
 	}
 
 }

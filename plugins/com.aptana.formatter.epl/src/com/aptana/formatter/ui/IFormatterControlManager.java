@@ -15,13 +15,16 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.ui.preferences.IPreferenceDelegate;
 
-public interface IFormatterControlManager extends IPreferenceDelegate {
+public interface IFormatterControlManager extends IPreferenceDelegate
+{
 
-	public interface IInitializeListener {
+	public interface IInitializeListener
+	{
 		void initialize();
 	}
 
@@ -43,11 +46,20 @@ public interface IFormatterControlManager extends IPreferenceDelegate {
 	 */
 	Combo createCombo(Composite parent, Object key, String label, String[] items);
 
-	Combo createCombo(Composite parent, Object key, String label,
-			String[] itemValues, String[] itemLabels);
+	Combo createCombo(Composite parent, Object key, String label, String[] itemValues, String[] itemLabels);
 
 	Text createNumber(Composite parent, Object key, String label);
 
 	void enableControl(Control control, boolean enabled);
+
+	/**
+	 * Creates a list of items that are manageable through 'Add' and 'Remove' buttons on its side bar.<br>
+	 * [Aptana Addition]
+	 * 
+	 * @param group
+	 * @param key
+	 *            The preferences key that the values will be saved as a comma-separated strings.
+	 */
+	Control createManagedList(Group group, Object key);
 
 }

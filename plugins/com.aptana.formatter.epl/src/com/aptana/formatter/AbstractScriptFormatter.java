@@ -14,7 +14,10 @@ package com.aptana.formatter;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.Reader;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jface.text.IDocument;
 
@@ -56,6 +59,31 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 			return Boolean.valueOf(value.toString()).booleanValue();
 		}
 		return false;
+	}
+
+	/**
+	 * Returns a Set of elements from a specific preference value. The elements will be delimited using the given
+	 * delimiter.
+	 * 
+	 * @param key
+	 * @param delimiter
+	 *            - The delimiter to use in order the turn the preference value into a set.
+	 * @return
+	 */
+	protected Set<String> getSet(String key, String delimiter)
+	{
+		Object value = preferences.get(key);
+		if (value != null)
+		{
+			String[] elements = value.toString().split(delimiter);
+			Set<String> set = new HashSet<String>();
+			for (String str : elements)
+			{
+				set.add(str);
+			}
+			return set;
+		}
+		return Collections.emptySet();
 	}
 
 	protected int getInt(String key)

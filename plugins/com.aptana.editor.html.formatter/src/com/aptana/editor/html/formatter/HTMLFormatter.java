@@ -27,6 +27,7 @@ import com.aptana.parsing.IParser;
 import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.ui.preferences.IPreferenceDelegate;
 
 /**
  * HTML code formatter.
@@ -37,21 +38,11 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 {
 
 	/**
-	 * Indentation constants
-	 */
-	protected static final String[] INDENTATIONS = { HTMLFormatterConstants.INDENT_HTML,
-			HTMLFormatterConstants.INDENT_HEAD, HTMLFormatterConstants.INDENT_BODY, HTMLFormatterConstants.INDENT_META,
-			HTMLFormatterConstants.INDENT_TABLE_TD, HTMLFormatterConstants.INDENT_TABLE,
-			HTMLFormatterConstants.INDENT_TABLE_TR, HTMLFormatterConstants.INDENT_TABLE_TH,
-			HTMLFormatterConstants.INDENT_UL, HTMLFormatterConstants.INDENT_LI };
-
-	/**
 	 * Blank lines constants
 	 */
 	protected static final String[] BLANK_LINES = { HTMLFormatterConstants.LINES_AFTER_ELEMENTS,
 			HTMLFormatterConstants.LINES_BEFORE_NON_HTML_ELEMENTS, HTMLFormatterConstants.LINES_AFTER_NON_HTML_ELEMENTS };
 
-	
 	private String lineSeparator;
 
 	/**
@@ -203,10 +194,10 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		FormatterDocument document = new FormatterDocument(input);
 		document.setInt(HTMLFormatterConstants.FORMATTER_TAB_SIZE, getInt(HTMLFormatterConstants.FORMATTER_TAB_SIZE));
 		document.setBoolean(HTMLFormatterConstants.WRAP_COMMENTS, getBoolean(HTMLFormatterConstants.WRAP_COMMENTS));
-		for (int i = 0; i < INDENTATIONS.length; i++)
-		{
-			document.setBoolean(INDENTATIONS[i], getBoolean(INDENTATIONS[i]));
-		}
+		document.setSet(HTMLFormatterConstants.INDENT_EXCLUDED_TAGS, getSet(
+				HTMLFormatterConstants.INDENT_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
+		document.setSet(HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, getSet(
+				HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
 		for (int i = 0; i < BLANK_LINES.length; i++)
 		{
 			document.setInt(BLANK_LINES[i], getInt(BLANK_LINES[i]));
