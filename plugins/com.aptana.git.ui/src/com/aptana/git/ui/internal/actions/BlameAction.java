@@ -1,7 +1,7 @@
 package com.aptana.git.ui.internal.actions;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -154,7 +154,7 @@ public class BlameAction extends GitAction implements IEditorActionDelegate
 		String committer = null;
 		int finalLine = 1;
 		int numberOfLines = 1;
-		Date timestamp = null;
+		Calendar timestamp = null;
 		String summary = null;
 		for (String line : lines)
 		{
@@ -179,10 +179,10 @@ public class BlameAction extends GitAction implements IEditorActionDelegate
 			}
 			else if (line.startsWith("committer-time ")) //$NON-NLS-1$
 			{
-				// TODO Verify that this is the correct date/time. Probably need to account for timezone!
 				String time = line.substring(15);
-				long timeValue = Long.parseLong(time);
-				timestamp = new Date(timeValue);
+				long timeValue = Long.parseLong(time) * 1000;
+				timestamp = Calendar.getInstance();
+				timestamp.setTimeInMillis(timeValue);
 			}
 			else if (line.startsWith("committer ")) //$NON-NLS-1$
 			{
@@ -194,10 +194,10 @@ public class BlameAction extends GitAction implements IEditorActionDelegate
 				revision = revisions.get(sha);
 				if (revision == null)
 				{
-					revision = new GitRevision(sha, author, committer, summary, timestamp);
+					revision = new GitRevision(sha, author, committer, summary, timestamp.getTime());
 				}
-				// FIXME Seems like the line numbers are one off!
-				revision.addRange(new LineRange(finalLine, numberOfLines));
+				// Need to shift line numbers down one to match properly
+				revision.addRange(new LineRange(finalLine - 1, numberOfLines));
 				revisions.put(sha, revision);
 				sha = null;
 				revision = null;
