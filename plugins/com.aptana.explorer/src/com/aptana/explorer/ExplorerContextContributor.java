@@ -85,7 +85,6 @@ public class ExplorerContextContributor implements ContextContributor
 			PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
 			{
 
-				@Override
 				public void run()
 				{
 					IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -152,7 +151,6 @@ public class ExplorerContextContributor implements ContextContributor
 	 * @see com.aptana.scripting.model.ContextContributor#modifyContext(com.aptana.scripting.model.CommandElement,
 	 * com.aptana.scripting.model.CommandContext)
 	 */
-	@Override
 	public void modifyContext(CommandElement command, CommandContext context)
 	{
 		IProject project = this.getActiveProject();
