@@ -17,7 +17,7 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.core,
  com.aptana.core.io,
  com.aptana.ui.io.epl
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.ide.ui.io,
  com.aptana.ide.ui.io.actions,

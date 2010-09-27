@@ -5,7 +5,7 @@ Bundle-SymbolicName: com.aptana.scripting.tests;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Aptana
 Fragment-Host: com.aptana.scripting;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.junit

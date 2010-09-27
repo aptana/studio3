@@ -142,6 +142,6 @@ Export-Package: .,
  org.jruby.util.io,
  org.jruby.util.string,
  org.jruby.util.unsafe
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-BuddyPolicy: global
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.4.0"
