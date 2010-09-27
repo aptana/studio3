@@ -11262,6 +11262,31 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <values>
         <value name="*" description="Specify a character set not on this list."/>
         <value name="ISO-8859-1" description="Default value for charset."/>
+        <value name="UTF-8" description="Preferred value for charset."/>
+        <value name="Shift_JIS" description="Japanese language charset."/>
+        <value name="HZ-GB-2312" description="Simplified Chinese charset."/>
+        <value name="ISO-8859-2" description="Latin alphabet part 2 Eastern Europe."/>
+        <value name="ISO-8859-3" description="Latin alphabet part 3 SE Europe, Esperanto, miscellaneous others."/>
+        <value name="ISO-8859-4" description="Latin alphabet part 4 Scandinavia/Baltics (and others not in ISO-8859-1)."/>
+        <value name="ISO-8859-5" description="Latin/Cyrillic part 5 The languages that are using a Cyrillic alphabet such as Bulgarian, Belarusian, Russian and Macedonian."/>
+        <value name="ISO-8859-6" description="Latin/Arabic part 6 The languages that are using the Arabic alphabet."/>
+        <value name="ISO-8859-7" description="Latin/Greek part 7  The modern Greek language as well as mathematical symbols derived from the Greek."/>
+        <value name="ISO-8859-8" description="Latin/Hebrew part 8 The languages that are using the Hebrew alphabet."/>
+        <value name="ISO-8859-9" description="Latin 5 part 9  The Turkish language. Same as ISO-8859-1 except Turkish characters replace Icelandic ones."/>
+        <value name="ISO-8859-10" description="Latin 6 Lappish, Nordic, Eskimo The Nordic languages."/>
+        <value name="ISO-8859-15" description="Latin 9 (aka Latin 0) Similar to ISO 8859-1 but replaces some less common symbols with the euro sign and some other missing characters."/>
+        <value name="ISO-2022-JP" description="Latin/Japanese part 1 The Japanese language."/>
+        <value name="ISO-2022-JP-2" description="Latin/Japanese part 2 The Japanese language."/>
+        <value name="ISO-2022-KR" description="Latin/Korean part 1 The Korean language."/>
+        <value name="cp1250" description="Central European languages that use Latin script, (Polish, Czech, Slovak, Hungarian, Slovene, Serbian, Croatian, Romanian and Albanian)."/>
+        <value name="cp1251" description="Cyrillic alphabets."/>
+        <value name="cp1252" description="Western languages."/>
+        <value name="cp1253" description="Greek."/>
+        <value name="cp1254" description="Turkish."/>
+        <value name="cp1255" description="Hebrew."/>
+        <value name="cp1256" description="Arabic."/>
+        <value name="cp1257" description="Baltic languages."/>
+        <value name="cp1258" description="Vietnamese."/>
       </values>
     </attribute>
     <attribute name="checked" type="String">
@@ -11447,6 +11472,30 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="text/html" description="HTML document."/>
         <value name="text/html; charset=iso-8859-1" description="HTML document with ISO-8859-1 character set."/>
         <value name="text/html; charset=UTF-8" description="HTML document with UTF-8 character set."/>
+        <value name="text/html; charset=Shift_JIS" description="Japanese language charset."/>
+        <value name="text/html; charset=HZ-GB-2312" description="Simplified Chinese charset."/>
+        <value name="text/html; charset=ISO-8859-2" description="Latin alphabet part 2 Eastern Europe."/>
+        <value name="text/html; charset=ISO-8859-3" description="Latin alphabet part 3 SE Europe, Esperanto, miscellaneous others."/>
+        <value name="text/html; charset=ISO-8859-4" description="Latin alphabet part 4 Scandinavia/Baltics (and others not in ISO-8859-1)."/>
+        <value name="text/html; charset=ISO-8859-5" description="Latin/Cyrillic part 5 The languages that are using a Cyrillic alphabet such as Bulgarian, Belarusian, Russian and Macedonian."/>
+        <value name="text/html; charset=ISO-8859-6" description="Latin/Arabic part 6 The languages that are using the Arabic alphabet."/>
+        <value name="text/html; charset=ISO-8859-7" description="Latin/Greek part 7  The modern Greek language as well as mathematical symbols derived from the Greek."/>
+        <value name="text/html; charset=ISO-8859-8" description="Latin/Hebrew part 8 The languages that are using the Hebrew alphabet."/>
+        <value name="text/html; charset=ISO-8859-9" description="Latin 5 part 9  The Turkish language. Same as ISO-8859-1 except Turkish characters replace Icelandic ones."/>
+        <value name="text/html; charset=ISO-8859-10" description="Latin 6 Lappish, Nordic, Eskimo The Nordic languages."/>
+        <value name="text/html; charset=ISO-8859-15" description="Latin 9 (aka Latin 0) Similar to ISO 8859-1 but replaces some less common symbols with the euro sign and some other missing characters."/>
+        <value name="text/html; charset=ISO-2022-JP" description="Latin/Japanese part 1 The Japanese language."/>
+        <value name="text/html; charset=ISO-2022-JP-2" description="Latin/Japanese part 2 The Japanese language."/>
+        <value name="text/html; charset=ISO-2022-KR" description="Latin/Korean part 1 The Korean language."/>
+        <value name="text/html; charset=cp1250" description="Central European languages that use Latin script, (Polish, Czech, Slovak, Hungarian, Slovene, Serbian, Croatian, Romanian and Albanian)."/>
+        <value name="text/html; charset=cp1251" description="Cyrillic alphabets."/>
+        <value name="text/html; charset=cp1252" description="Western languages."/>
+        <value name="text/html; charset=cp1253" description="Greek."/>
+        <value name="text/html; charset=cp1254" description="Turkish."/>
+        <value name="text/html; charset=cp1255" description="Hebrew."/>
+        <value name="text/html; charset=cp1256" description="Arabic."/>
+        <value name="text/html; charset=cp1257" description="Baltic languages."/>
+        <value name="text/html; charset=cp1258" description="Vietnamese."/>
       </values>
     </attribute>
     <attribute name="contenteditable" type="String">
