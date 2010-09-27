@@ -257,7 +257,7 @@ public class JSMetadataReader extends MetadataReader
 	{
 		String mname = attributes.getValue("name"); //$NON-NLS-1$
 
-		if (mname == null)
+		if (mname == null && this._currentType != null)
 		{
 			mname = this._currentType.getName();
 		}
