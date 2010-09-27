@@ -26,7 +26,6 @@ public class SDocMLFileIndexingParticipant implements IFileStoreIndexingParticip
 	 * (non-Javadoc)
 	 * @see com.aptana.index.core.IFileStoreIndexingParticipant#index(java.util.Set, com.aptana.index.core.Index, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public void index(Set<IFileStore> files, Index index, IProgressMonitor monitor) throws CoreException
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, files.size() * 100);

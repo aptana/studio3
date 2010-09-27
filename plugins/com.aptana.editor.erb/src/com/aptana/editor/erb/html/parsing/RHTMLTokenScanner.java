@@ -89,7 +89,6 @@ public class RHTMLTokenScanner extends HTMLTokenScanner
 	private static final class RubyStartDetector implements IWordDetector
 	{
 
-		@Override
 		public boolean isWordPart(char c)
 		{
 			switch (c)
@@ -102,7 +101,6 @@ public class RHTMLTokenScanner extends HTMLTokenScanner
 			return false;
 		}
 
-		@Override
 		public boolean isWordStart(char c)
 		{
 			return c == '<';
@@ -112,7 +110,6 @@ public class RHTMLTokenScanner extends HTMLTokenScanner
 	private static final class RubyEndDetector implements IWordDetector
 	{
 
-		@Override
 		public boolean isWordPart(char c)
 		{
 			switch (c)
@@ -125,7 +122,6 @@ public class RHTMLTokenScanner extends HTMLTokenScanner
 			return false;
 		}
 
-		@Override
 		public boolean isWordStart(char c)
 		{
 			return c == '-' || c == '%';

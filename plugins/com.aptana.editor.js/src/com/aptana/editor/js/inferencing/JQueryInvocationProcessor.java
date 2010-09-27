@@ -59,7 +59,6 @@ public class JQueryInvocationProcessor implements InvocationProcessor
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.inferencing.InvocationProcessor#getInvocationPatterns()
 	 */
-	@Override
 	public List<String> getInvocationPatterns()
 	{
 		return PATTERNS;
@@ -69,7 +68,6 @@ public class JQueryInvocationProcessor implements InvocationProcessor
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.inferencing.InvocationProcessor#processInvocation(com.aptana.editor.js.inferencing.JSScope, com.aptana.editor.js.parsing.ast.JSInvokeNode)
 	 */
-	@Override
 	public boolean processInvocation(JSScope scope, JSInvokeNode node)
 	{
 		boolean processed = false;

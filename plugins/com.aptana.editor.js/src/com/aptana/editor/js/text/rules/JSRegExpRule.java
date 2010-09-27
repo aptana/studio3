@@ -64,7 +64,6 @@ public class JSRegExpRule implements IPredicateRule
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.rules.IRule#evaluate(org.eclipse.jface.text.rules.ICharacterScanner)
 	 */
-	@Override
 	public IToken evaluate(ICharacterScanner scanner)
 	{
 		if (scanner instanceof IJSTokenScanner)
@@ -178,13 +177,11 @@ public class JSRegExpRule implements IPredicateRule
 		}
 	}
 
-	@Override
 	public IToken evaluate(ICharacterScanner scanner, boolean resume)
 	{
 		return evaluate(scanner);
 	}
 
-	@Override
 	public IToken getSuccessToken()
 	{
 		return token;
