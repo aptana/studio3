@@ -54,6 +54,12 @@
                contentTypeId="com.aptana.contenttype.js">
          </contentTypeBinding>
       </fileIndexingParticipant>
+      <fileIndexingParticipant
+            class="com.aptana.editor.js.contentassist.index.SDocMLFileIndexingParticipant">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.sdocml">
+         </contentTypeBinding>
+      </fileIndexingParticipant>
    </extension>
    <extension
          point="com.aptana.parsing.parser">
