@@ -28194,6 +28194,7 @@ li {
       <values>
         <value name="*" description="Specify a value for vertical-align that is not on this list."/>
         <value name="inherit" description="Inherit the value from the parent element."/>
+        <value name="bottom" description="Align the bottom of the aligned subtree with the bottom of the line box."/>
         <value name="baseline" description="Align with the baseline of the containing element."/>
         <value name="sub" description="Align as subscript."/>
         <value name="super" description="Align as superscript."/>
