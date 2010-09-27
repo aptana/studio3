@@ -55,7 +55,6 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 		super(target, wndParent, connectors);
 		getRootControl().setBackground(ThemedTextLineRenderer.getStyleMap().getBackgroundColor());
 		preferenceChangeListener = new IPreferenceChangeListener() {
-			@Override
 			public void preferenceChange(PreferenceChangeEvent event) {
 				if (IThemeManager.THEME_CHANGED.equals(event.getKey())) {
 					Control control = getRootControl();

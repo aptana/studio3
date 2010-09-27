@@ -85,7 +85,6 @@ public class TerminalComposite extends Composite {
 		fCtlTerminal.getRootControl().setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 		fCtlTerminal.setConnector(fCtlTerminal.getConnectors()[0]);
 		addDisposeListener(new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				disposeTerminal();
 			}
@@ -149,14 +148,12 @@ public class TerminalComposite extends Composite {
 	
 	private ITerminalListener getTerminalListener() {
 		return new ITerminalListener() {
-			@Override
 			public void setTerminalTitle(String title) {
 				if (terminalListener != null) {
 					terminalListener.setTerminalTitle(title);
 				}
 			}
 			
-			@Override
 			public void setState(TerminalState state) {
 				if (terminalListener != null) {
 					terminalListener.setState(state);
