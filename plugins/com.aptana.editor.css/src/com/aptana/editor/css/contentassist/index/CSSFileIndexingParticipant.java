@@ -60,7 +60,7 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class CSSFileIndexingParticipant implements IFileStoreIndexingParticipant
 {
-	@Override
+
 	public void index(Set<IFileStore> files, Index index, IProgressMonitor monitor) throws CoreException
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, files.size() * 100);

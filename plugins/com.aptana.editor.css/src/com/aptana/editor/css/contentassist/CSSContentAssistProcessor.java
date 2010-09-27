@@ -470,7 +470,6 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		// sort by display name
 		Collections.sort(result, new Comparator<ICompletionProposal>()
 		{
-			@Override
 			public int compare(ICompletionProposal o1, ICompletionProposal o2)
 			{
 				return o1.getDisplayString().compareToIgnoreCase(o2.getDisplayString());
