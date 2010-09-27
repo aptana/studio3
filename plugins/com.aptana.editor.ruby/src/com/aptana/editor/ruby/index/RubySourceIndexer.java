@@ -61,34 +61,28 @@ public class RubySourceIndexer implements ISourceElementRequestor
 		index.addEntry(category, word, documentPath);
 	}
 
-	@Override
 	public void exitType(int endOffset)
 	{
 		typeStack.pop();
 	}
 
-	@Override
 	public void exitScript(int endOffset)
 	{
 		typeStack.clear();
 	}
 
-	@Override
 	public void exitMethod(int endOffset)
 	{
 	}
 
-	@Override
 	public void exitField(int endOffset)
 	{
 	}
 
-	@Override
 	public void exitConstructor(int endOffset)
 	{
 	}
 
-	@Override
 	public void enterType(TypeInfo type)
 	{
 		String simpleName = getSimpleName(type.name);
@@ -180,7 +174,6 @@ public class RubySourceIndexer implements ISourceElementRequestor
 		return names;
 	}
 
-	@Override
 	public void enterScript()
 	{
 	}
@@ -222,12 +215,10 @@ public class RubySourceIndexer implements ISourceElementRequestor
 		addIndex(IRubyIndexConstants.METHOD_DECL, createMethodKey(method.name, method.parameterNames.length));
 	}
 
-	@Override
 	public void acceptYield(String name)
 	{
 	}
 
-	@Override
 	public void acceptTypeReference(String name, int startOffset, int endOffset)
 	{
 		addTypeReference(name);
@@ -252,12 +243,10 @@ public class RubySourceIndexer implements ISourceElementRequestor
 		return name;
 	}
 
-	@Override
 	public void acceptModuleFunction(String function)
 	{
 	}
 
-	@Override
 	public void acceptMixin(String moduleName)
 	{
 		addIndex(IRubyIndexConstants.REF, getSimpleName(moduleName));
@@ -350,12 +339,10 @@ public class RubySourceIndexer implements ISourceElementRequestor
 		return lastSegment(name, NAMESPACE_DELIMETER);
 	}
 
-	@Override
 	public void acceptMethodVisibilityChange(String methodName, Visibility visibility)
 	{
 	}
 
-	@Override
 	public void acceptMethodReference(String name, int argCount, int offset)
 	{
 		addIndex(IRubyIndexConstants.METHOD_REF, createMethodKey(name, argCount));
@@ -366,7 +353,6 @@ public class RubySourceIndexer implements ISourceElementRequestor
 		return name + IRubyIndexConstants.SEPARATOR + String.valueOf(argCount);
 	}
 
-	@Override
 	public void acceptImport(String value, int startOffset, int endOffset)
 	{
 		// FIXME This is really, really bad. requires are relative to loadpaths, which are dynamic.
@@ -378,13 +364,11 @@ public class RubySourceIndexer implements ISourceElementRequestor
 		addIndex(IRubyIndexConstants.REQUIRE, value);
 	}
 
-	@Override
 	public void acceptFieldReference(String name, int offset)
 	{
 		addIndex(IRubyIndexConstants.REF, name);
 	}
 
-	@Override
 	public void acceptConstructorReference(String name, int argCount, int offset)
 	{
 		String simpleTypeName = getSimpleName(name);
@@ -392,7 +376,6 @@ public class RubySourceIndexer implements ISourceElementRequestor
 		addIndex(IRubyIndexConstants.CONSTRUCTOR_REF, createMethodKey(simpleTypeName, argCount));
 	}
 
-	@Override
 	public void acceptBlock(int startOffset, int endOffset)
 	{
 	}

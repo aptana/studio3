@@ -79,24 +79,20 @@ public class RubyStructureBuilder implements ISourceElementRequestor
 		modelStack.push(script);
 	}
 
-	@Override
 	public void acceptBlock(int startOffset, int endOffset)
 	{
 		RubyElement parent = modelStack.peek();
 		parent.addChild(new RubyBlock(startOffset, endOffset));
 	}
 
-	@Override
 	public void acceptConstructorReference(String name, int argCount, int offset)
 	{
 	}
 
-	@Override
 	public void acceptFieldReference(String name, int offset)
 	{
 	}
 
-	@Override
 	public void acceptImport(String value, int startOffset, int endOffset)
 	{
 		IImportContainer importContainer = script.getImportContainer();
@@ -106,12 +102,10 @@ public class RubyStructureBuilder implements ISourceElementRequestor
 		}
 	}
 
-	@Override
 	public void acceptMethodReference(String name, int argCount, int offset)
 	{
 	}
 
-	@Override
 	public void acceptMethodVisibilityChange(String methodName, Visibility visibility)
 	{
 		RubyElement element = getCurrentType();
@@ -135,7 +129,6 @@ public class RubyStructureBuilder implements ISourceElementRequestor
 		}
 	}
 
-	@Override
 	public void acceptMixin(String string)
 	{
 		// pushes mixins into parent type, if available
@@ -153,7 +146,6 @@ public class RubyStructureBuilder implements ISourceElementRequestor
 		parentType.setIncludedModuleNames(moduleNames.toArray(new String[moduleNames.size()]));
 	}
 
-	@Override
 	public void acceptModuleFunction(String function)
 	{
 		RubyElement element = getCurrentType();
@@ -177,12 +169,10 @@ public class RubyStructureBuilder implements ISourceElementRequestor
 		}
 	}
 
-	@Override
 	public void acceptTypeReference(String name, int startOffset, int endOffset)
 	{
 	}
 
-	@Override
 	public void acceptYield(String name)
 	{
 		if (!modelStack.isEmpty())
@@ -195,13 +185,11 @@ public class RubyStructureBuilder implements ISourceElementRequestor
 		}
 	}
 
-	@Override
 	public void enterConstructor(MethodInfo constructor)
 	{
 		enterMethod(constructor);
 	}
 
-	@Override
 	public void enterField(FieldInfo fieldInfo)
 	{
 		RubyField handle;
@@ -243,7 +231,6 @@ public class RubyStructureBuilder implements ISourceElementRequestor
 		modelStack.push(handle);
 	}
 
-	@Override
 	public void enterMethod(MethodInfo methodInfo)
 	{
 		RubyMethod method = new RubyMethod(methodInfo.name, methodInfo.parameterNames, methodInfo.nameSourceStart,
@@ -254,12 +241,10 @@ public class RubyStructureBuilder implements ISourceElementRequestor
 		modelStack.push(method);
 	}
 
-	@Override
 	public void enterScript()
 	{
 	}
 
-	@Override
 	public void enterType(TypeInfo typeInfo)
 	{
 		RubyType handle;
@@ -284,34 +269,29 @@ public class RubyStructureBuilder implements ISourceElementRequestor
 		modelStack.push(handle);
 	}
 
-	@Override
 	public void exitConstructor(int endOffset)
 	{
 		exitMethod(endOffset);
 	}
 
-	@Override
 	public void exitField(int endOffset)
 	{
 		RubyElement element = modelStack.pop();
 		element.setLocation(element.getStartingOffset(), endOffset + 1);
 	}
 
-	@Override
 	public void exitMethod(int endOffset)
 	{
 		RubyElement element = modelStack.pop();
 		element.setLocation(element.getStartingOffset(), endOffset + 1);
 	}
 
-	@Override
 	public void exitScript(int endOffset)
 	{
 		RubyElement element = modelStack.pop();
 		element.setLocation(element.getStartingOffset(), endOffset + 1);
 	}
 
-	@Override
 	public void exitType(int endOffset)
 	{
 		RubyElement element = modelStack.pop();
