@@ -34,13 +34,12 @@ import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.actions.GitAction;
+import com.aptana.git.ui.internal.QuickDiffReferenceProvider;
 import com.aptana.git.ui.internal.history.GitHistoryPage;
 
 @SuppressWarnings("restriction")
 public class BlameAction extends GitAction implements IEditorActionDelegate
 {
-
-	private static final String GIT_QUICK_DIFF_ID = "com.aptana.git.ui.quickdiff"; //$NON-NLS-1$
 
 	private IEditorPart fEditor;
 
@@ -71,7 +70,7 @@ public class BlameAction extends GitAction implements IEditorActionDelegate
 
 			if (fEditor != null)
 			{
-				((AbstractDecoratedTextEditor) fEditor).showRevisionInformation(info, GIT_QUICK_DIFF_ID);
+				((AbstractDecoratedTextEditor) fEditor).showRevisionInformation(info, QuickDiffReferenceProvider.ID);
 				IWorkbenchPage page = getActivePage();
 				if (page != null)
 				{

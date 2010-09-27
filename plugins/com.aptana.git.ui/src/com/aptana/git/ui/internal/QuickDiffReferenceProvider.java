@@ -42,6 +42,8 @@ import com.aptana.git.core.model.IGitRepositoryManager;
 
 public class QuickDiffReferenceProvider implements IQuickDiffReferenceProvider, IElementStateListener
 {
+	
+	public static final String ID = "com.aptana.git.ui.quickdiff"; //$NON-NLS-1$
 
 	/** <code>true</code> if the document has been read. */
 	private boolean fDocumentRead = false;
