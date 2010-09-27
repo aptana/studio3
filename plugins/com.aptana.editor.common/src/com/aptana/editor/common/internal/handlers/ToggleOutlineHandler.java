@@ -50,7 +50,6 @@ public class ToggleOutlineHandler extends AbstractHandler
 
 	private static final String OUTLINE_VIEW_ID = "org.eclipse.ui.views.ContentOutline"; //$NON-NLS-1$
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		boolean toShow = !HandlerUtil.toggleCommandState(event.getCommand());

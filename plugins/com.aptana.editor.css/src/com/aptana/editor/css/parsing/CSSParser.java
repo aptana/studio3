@@ -543,7 +543,6 @@ public class CSSParser extends Parser implements IParser {
 		return actions[rule_num].reduce(_symbols, offset);
 	}
 
-	@Override
 	public synchronized IParseNode parse(IParseState parseState) throws java.lang.Exception
 	{
 		fScanner.setSource(new String(parseState.getSource()));

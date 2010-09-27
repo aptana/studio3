@@ -65,14 +65,12 @@ public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHover
 
 	private static final Pattern RGB_PATTERN = Pattern.compile("#([a-fA-F0-9]{3}|[a-fA-F0-9]{6})"); //$NON-NLS-1$
 
-	@Override
 	public String getHoverInfo(ITextViewer textViewer, IRegion hoverRegion)
 	{
 		// Not called
 		return null;
 	}
 
-	@Override
 	public IRegion getHoverRegion(ITextViewer textViewer, int offset)
 	{
 		// look for the current "word"
@@ -115,7 +113,6 @@ public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHover
 		return Character.isLetterOrDigit(c) || c == '-' || c == '_' || c == '.' || c == '#';
 	}
 
-	@Override
 	public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion)
 	{
 		try
@@ -223,7 +220,6 @@ public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHover
 			return ThemePlugin.getDefault().getColorManager();
 		}
 
-		@Override
 		public void setInput(Object input)
 		{
 			if (input instanceof RGB)

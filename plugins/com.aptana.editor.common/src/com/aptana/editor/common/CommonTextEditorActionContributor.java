@@ -134,7 +134,7 @@ public class CommonTextEditorActionContributor extends TextEditorActionContribut
 			menuToolItem = new ToolItem(toolBar, SWT.DROP_DOWN);
 			menuToolItem.setImage(CommonEditorPlugin.getDefault().getImageFromImageRegistry(CommonEditorPlugin.COMMAND));
 			menuToolItem.addSelectionListener(new SelectionListener() {
-				@Override
+
 				public void widgetSelected(SelectionEvent e) {
 					if (menu.isDisposed()) {
 						return;
@@ -150,13 +150,12 @@ public class CommonTextEditorActionContributor extends TextEditorActionContribut
 					EditorCommandsMenuContributor.fill(menu, textEditor);
 					menu.setVisible(true);
 				}
-				
-				@Override
+
 				public void widgetDefaultSelected(SelectionEvent e) {}
 			});
 			
 			menuToolItem.addDisposeListener(new DisposeListener() {
-				@Override
+
 				public void widgetDisposed(DisposeEvent e) {
 					menuToolItem = null;					
 				}

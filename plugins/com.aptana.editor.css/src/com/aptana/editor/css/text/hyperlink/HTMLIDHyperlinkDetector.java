@@ -72,7 +72,6 @@ public class HTMLIDHyperlinkDetector extends IndexQueryingHyperlinkDetector
 		super();
 	}
 
-	@Override
 	public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region, boolean canShowMultipleHyperlinks)
 	{
 		List<IHyperlink> hyperlinks = new ArrayList<IHyperlink>();

@@ -43,7 +43,6 @@ public class CommandElementsProviderAdapterFactory implements IAdapterFactory
 {
 	private static final Class[] ADAPTERS = new Class[] {ICommandElementsProvider.class};
 
-	@Override
 	public Object getAdapter(Object adaptableObject, Class adapterType)
 	{
 		if (adapterType == ICommandElementsProvider.class)
@@ -56,7 +55,6 @@ public class CommandElementsProviderAdapterFactory implements IAdapterFactory
 		return null;
 	}
 
-	@Override
 	public Class[] getAdapterList()
 	{
 		return ADAPTERS;

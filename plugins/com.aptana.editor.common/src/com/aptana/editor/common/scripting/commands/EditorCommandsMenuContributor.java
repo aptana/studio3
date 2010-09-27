@@ -144,7 +144,6 @@ public class EditorCommandsMenuContributor extends ContributionItem
 			menusFromScope = BundleManager.getInstance().getMenus(new IModelFilter()
 			{
 
-				@Override
 				public boolean include(AbstractElement element)
 				{
 					return true;
@@ -225,7 +224,6 @@ public class EditorCommandsMenuContributor extends ContributionItem
 			CollectionsUtil.removeDuplicates(menusFromScopeList);
 			Collections.sort(menusFromScopeList, new Comparator<MenuElement>()
 			{
-				@Override
 				public int compare(MenuElement menuElement1, MenuElement menuElement2)
 				{
 					return menuElement1.getDisplayName().compareTo(menuElement2.getDisplayName());
@@ -326,7 +324,6 @@ public class EditorCommandsMenuContributor extends ContributionItem
 				menuItem.setText(displayName + acceleratorText);
 				menuItem.addSelectionListener(new SelectionListener()
 				{
-					@Override
 					public void widgetSelected(SelectionEvent e)
 					{
 						if (command == null)
@@ -345,7 +342,6 @@ public class EditorCommandsMenuContributor extends ContributionItem
 						}
 					}
 
-					@Override
 					public void widgetDefaultSelected(SelectionEvent e)
 					{
 					}
@@ -374,13 +370,11 @@ public class EditorCommandsMenuContributor extends ContributionItem
 				final BundleElement bundleElement = menuForScope.getOwningBundle();
 				editBundleItem.addSelectionListener(new SelectionListener()
 				{
-					@Override
 					public void widgetSelected(SelectionEvent e)
 					{
 						editBundle(bundleElement);
 					}
 
-					@Override
 					public void widgetDefaultSelected(SelectionEvent e)
 					{
 					}
