@@ -59,6 +59,8 @@ import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.IHTMLParserConstants;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
+import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
+import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.IParser;
@@ -165,6 +167,13 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 				{
 					addIndex(index, file, HTMLIndexConstants.RESOURCE_JS, resolved.toString());
 				}
+			}
+			else if (child != null && IJSParserConstants.LANGUAGE.equals(child.getLanguage()))
+			{
+				// process inline code
+				JSFileIndexingParticipant jsIndex = new JSFileIndexingParticipant();
+				
+				jsIndex.processParseResults(index, child, file.toURI());
 			}
 		}
 	}

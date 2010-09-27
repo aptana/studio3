@@ -258,7 +258,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 	 * @param file
 	 * @param parseState
 	 */
-	protected void processParseResults(Index index, IParseNode ast, URI location)
+	public void processParseResults(Index index, IParseNode ast, URI location)
 	{
 		JSScope globals = this.getGlobals(ast);
 
