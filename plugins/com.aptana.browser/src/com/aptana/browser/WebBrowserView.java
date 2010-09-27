@@ -63,7 +63,6 @@ public class WebBrowserView extends ViewPart {
 		browserViewer = new WebBrowserViewer(parent, WebBrowserViewer.NAVIGATION_BAR);
 		WebKitBrowser browser = (WebKitBrowser) browserViewer.getBrowserControl();
 		browser.addProgressListener(new ProgressListener() {
-			@Override
 			public void changed(ProgressEvent event) {
 				if (event.total == 0) {
 					return;
@@ -80,13 +79,11 @@ public class WebBrowserView extends ViewPart {
 				}
 			}
 			
-			@Override
 			public void completed(ProgressEvent event) {
 				getStatusBarProgressMonitor().done();
 			}
 		});
 		browser.addTitleListener(new TitleListener() {
-			@Override
 			public void changed(TitleEvent event) {
 				setTitleToolTip(event.title);
 			}

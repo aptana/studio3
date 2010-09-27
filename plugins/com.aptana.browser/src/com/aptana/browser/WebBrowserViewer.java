@@ -92,7 +92,6 @@ public class WebBrowserViewer extends Composite {
 		browser.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 		if ((style & NAVIGATION_BAR) != 0) {
 			browser.addProgressListener(new ProgressListener() {
-				@Override
 				public void changed(ProgressEvent event) {
 					if (!loadInProgress) {
 						loadInProgress = true;
@@ -100,7 +99,6 @@ public class WebBrowserViewer extends Composite {
 					}
 				}
 	
-				@Override
 				public void completed(ProgressEvent event) {
 					loadInProgress = false;
 					updateNavigationButtons();
