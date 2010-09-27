@@ -80,25 +80,21 @@ public class EditorLineHyperlink implements IHyperlink
 		this.lineNumber = lineNumber;
 	}
 
-	@Override
 	public IRegion getHyperlinkRegion()
 	{
 		return region;
 	}
 
-	@Override
 	public String getTypeLabel()
 	{
 		return null;
 	}
 
-	@Override
 	public String getHyperlinkText()
 	{
 		return this.filepath + ":" + lineNumber; //$NON-NLS-1$
 	}
 
-	@Override
 	public void open()
 	{
 		try

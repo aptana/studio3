@@ -66,7 +66,6 @@ public class PartitionerSwitchingIgnoreRule implements IPredicateRule
 	 * @see org.eclipse.jface.text.rules.IPredicateRule#evaluate(org.eclipse.jface.text.rules.ICharacterScanner,
 	 * boolean)
 	 */
-	@Override
 	public IToken evaluate(ICharacterScanner scanner, boolean resume)
 	{
 		if (scanner instanceof SequenceCharacterScanner)
@@ -90,7 +89,6 @@ public class PartitionerSwitchingIgnoreRule implements IPredicateRule
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.rules.IPredicateRule#getSuccessToken()
 	 */
-	@Override
 	public IToken getSuccessToken()
 	{
 		return rule.getSuccessToken();
@@ -100,7 +98,6 @@ public class PartitionerSwitchingIgnoreRule implements IPredicateRule
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.rules.IRule#evaluate(org.eclipse.jface.text.rules.ICharacterScanner)
 	 */
-	@Override
 	public IToken evaluate(ICharacterScanner scanner)
 	{
 		if (scanner instanceof SequenceCharacterScanner)

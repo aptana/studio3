@@ -162,7 +162,6 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		fSearchBox.addModifyListener(new ModifyListener()
 		{
 
-			@Override
 			public void modifyText(ModifyEvent e)
 			{
 				String text = fSearchBox.getText();
@@ -182,7 +181,6 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		fSearchBox.addFocusListener(new FocusListener()
 		{
 
-			@Override
 			public void focusLost(FocusEvent e)
 			{
 				if (fSearchBox.getText().length() == 0)
@@ -192,7 +190,6 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 				fSearchBox.setForeground(fSearchBox.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 			}
 
-			@Override
 			public void focusGained(FocusEvent e)
 			{
 				if (fSearchBox.getText().equals(INITIAL_FILTER_TEXT))
@@ -244,7 +241,6 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		viewer.addDoubleClickListener(new IDoubleClickListener()
 		{
 
-			@Override
 			public void doubleClick(DoubleClickEvent event)
 			{
 				IStructuredSelection selection = (IStructuredSelection) event.getSelection();
@@ -260,12 +256,10 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		viewer.getTree().addKeyListener(new KeyListener()
 		{
 
-			@Override
 			public void keyPressed(KeyEvent e)
 			{
 			}
 
-			@Override
 			public void keyReleased(KeyEvent e)
 			{
 				if (e.keyCode == '\r' && isLinkedWithEditor())
@@ -387,7 +381,6 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		}
 	}
 
-	@Override
 	public void propertyChange(PropertyChangeEvent event)
 	{
 		String property = event.getProperty();

@@ -69,26 +69,21 @@ public class EditorSearchHyperlink implements IHyperlink
 		this.document = document;
 	}
 
-	@Override
 	public IRegion getHyperlinkRegion()
 	{
 		return region;
 	}
 
-	@Override
 	public String getTypeLabel()
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public String getHyperlinkText()
 	{
 		return MessageFormat.format("Open in {0}", document.toString());
 	}
 
-	@Override
 	public void open()
 	{
 		try

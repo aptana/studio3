@@ -60,7 +60,6 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 		return new CommonOutlineItem(node.getNameNode().getNameRange(), node);
 	}
 
-	@Override
 	public Object[] getChildren(Object parentElement)
 	{
 		if (parentElement instanceof AbstractThemeableEditor)
@@ -83,7 +82,6 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 		return EMPTY;
 	}
 
-	@Override
 	public Object getParent(Object element)
 	{
 		if (element instanceof IParseNode)
@@ -98,24 +96,20 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 		return null;
 	}
 
-	@Override
 	public boolean hasChildren(Object element)
 	{
 		return getChildren(element).length > 0;
 	}
 
-	@Override
 	public Object[] getElements(Object inputElement)
 	{
 		return getChildren(inputElement);
 	}
 
-	@Override
 	public void dispose()
 	{
 	}
 
-	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput)
 	{
 		boolean isCU = (newInput instanceof AbstractThemeableEditor);
@@ -125,13 +119,11 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 			final AbstractThemeableEditor editor = (AbstractThemeableEditor) newInput;
 			fListener = new IParseListener()
 			{
-				@Override
 				public void parseFinished()
 				{
 					Display.getDefault().asyncExec(new Runnable()
 					{
 
-						@Override
 						public void run()
 						{
 							CommonOutlinePage page = editor.getOutlinePage();

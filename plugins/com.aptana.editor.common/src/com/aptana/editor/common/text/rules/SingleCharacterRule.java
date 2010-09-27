@@ -56,7 +56,6 @@ public class SingleCharacterRule implements IPredicateRule
 		this.successToken = successToken;
 	}
 
-	@Override
 	public IToken evaluate(ICharacterScanner scanner, boolean resume)
 	{
 		if (c == (char) scanner.read())
@@ -67,13 +66,11 @@ public class SingleCharacterRule implements IPredicateRule
 		return Token.UNDEFINED;
 	}
 
-	@Override
 	public IToken getSuccessToken()
 	{
 		return successToken;
 	}
 
-	@Override
 	public IToken evaluate(ICharacterScanner scanner)
 	{
 		return evaluate(scanner, false);

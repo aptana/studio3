@@ -236,7 +236,6 @@ class EditBundleJob extends Job
 		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 		{
 
-			@Override
 			public void run()
 			{
 				IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();

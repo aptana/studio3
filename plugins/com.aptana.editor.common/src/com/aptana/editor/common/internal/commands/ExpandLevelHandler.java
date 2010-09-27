@@ -49,7 +49,6 @@ public class ExpandLevelHandler extends AbstractHandler
 
 	private static final String LEVEL = "level"; //$NON-NLS-1$
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		// assumes to expand to level 1 if not specified
