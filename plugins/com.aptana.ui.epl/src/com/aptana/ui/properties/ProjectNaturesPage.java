@@ -157,7 +157,6 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 		fTableViewer.addCheckStateListener(this);
 		fTableViewer.addSelectionChangedListener(new ISelectionChangedListener()
 		{
-			@Override
 			public void selectionChanged(SelectionChangedEvent event)
 			{
 				updateButtons();
@@ -196,7 +195,6 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 		// set nature ids on the project
 		IRunnableWithProgress runnable = new IRunnableWithProgress()
 		{
-			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException
 			{
 				try
@@ -232,7 +230,6 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 		return true;
 	}
 
-	@Override
 	public void checkStateChanged(CheckStateChangedEvent event)
 	{
 		// Check if the current checked items are the same as the initial ones.
@@ -265,7 +262,6 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 		updateButtons();
 	}
 
-	@Override
 	public void widgetSelected(SelectionEvent e)
 	{
 		Object source = e.getSource();
@@ -285,7 +281,6 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 		}
 	}
 
-	@Override
 	public void widgetDefaultSelected(SelectionEvent e)
 	{
 	}
@@ -323,7 +318,6 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 			IRunnableWithProgress close = new IRunnableWithProgress()
 			{
 
-				@Override
 				public void run(final IProgressMonitor monitor) throws InvocationTargetException
 				{
 					// use the CloseResourceAction to provide a file saving dialog in case the project has some unsaved
@@ -335,7 +329,6 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 						{
 							CloseResourceAction closeAction = new CloseResourceAction(new IShellProvider()
 							{
-								@Override
 								public Shell getShell()
 								{
 									return Display.getDefault().getActiveShell();
@@ -375,7 +368,6 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 			// re-open the project
 			IRunnableWithProgress open = new IRunnableWithProgress()
 			{
-				@Override
 				public void run(IProgressMonitor monitor) throws InvocationTargetException
 				{
 					try
@@ -463,7 +455,6 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 		return new ViewerComparator(new Comparator<String>()
 		{
 
-			@Override
 			public int compare(String o1, String o2)
 			{
 				// set Aptana natures ahead of others
@@ -524,7 +515,6 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 			return isAptanaNature(element.toString()) ? APTANA_NATURE_IMAGE : null;
 		}
 
-		@Override
 		public Font getFont(Object element)
 		{
 			// make the primary nature bold

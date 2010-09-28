@@ -69,7 +69,6 @@ public class ViewLogCommandHandler extends AbstractHandler
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
 	 */
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		String logFile = System.getProperty("osgi.logfile"); //$NON-NLS-1$
