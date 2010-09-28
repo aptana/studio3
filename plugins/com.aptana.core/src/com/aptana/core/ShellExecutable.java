@@ -126,7 +126,7 @@ public class ShellExecutable {
 				boolean isWin32 = Platform.OS_WIN32.equals(Platform.getOS());
 				path = path.append(isWin32 ? SH_EXE : BASH);
 			}
-			if (path.toFile().canExecute()) {
+			if (ExecutableUtil.isExecutable(path)) {
 				return path;
 			}
 			CorePlugin.logWarning("Shell executable path preference point to an invalid location"); //$NON-NLS-1$
