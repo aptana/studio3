@@ -36,13 +36,14 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.quickdiff.IQuickDiffReferenceProvider;
 
 import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
 
 public class QuickDiffReferenceProvider implements IQuickDiffReferenceProvider, IElementStateListener
 {
-	
+
 	public static final String ID = "com.aptana.git.ui.quickdiff"; //$NON-NLS-1$
 
 	/** <code>true</code> if the document has been read. */
@@ -201,11 +202,16 @@ public class QuickDiffReferenceProvider implements IQuickDiffReferenceProvider, 
 			IStorageDocumentProvider provider = (IStorageDocumentProvider) prov;
 
 			if (doc == null)
+			{
 				if (force || fDocumentRead)
+				{
 					doc = new Document();
+				}
 				else
+				{
 					return;
-
+				}
+			}
 			IJobManager jobMgr = Job.getJobManager();
 
 			try
@@ -214,14 +220,27 @@ public class QuickDiffReferenceProvider implements IQuickDiffReferenceProvider, 
 				IFile file = input.getFile();
 				GitRepository repo = getGitRepositoryManager().getAttached(file.getProject());
 				if (repo == null)
+				{
 					return;
-				String name = repo.getChangedFileForResource(file).getPath();
+				}
+				ChangedFile changedFile = repo.getChangedFileForResource(file);
+				if (changedFile == null)
+				{
+					return;
+				}
+				String name = changedFile.getPath();
 				final IFileRevision nextFile = GitPlugin.revisionForCommit(new GitCommit(repo, "HEAD"), name); //$NON-NLS-1$
+				if (nextFile == null)
+				{
+					return;
+				}
 				IStorage storage = nextFile.getStorage(new NullProgressMonitor());
 
 				// check for null for backward compatibility (we used to check before...)
 				if (storage == null)
+				{
 					return;
+				}
 				fProgressMonitor = monitor;
 				ISchedulingRule rule = getSchedulingRule(storage);
 
@@ -240,10 +259,13 @@ public class QuickDiffReferenceProvider implements IQuickDiffReferenceProvider, 
 
 					String encoding;
 					if (storage instanceof IEncodedStorage)
+					{
 						encoding = ((IEncodedStorage) storage).getCharset();
+					}
 					else
+					{
 						encoding = null;
-
+					}
 					boolean skipUTF8BOM = isUTF8BOM(encoding, storage);
 
 					setDocumentContent(doc, storage, encoding, monitor, skipUTF8BOM);
@@ -261,7 +283,9 @@ public class QuickDiffReferenceProvider implements IQuickDiffReferenceProvider, 
 			}
 
 			if (monitor != null && monitor.isCanceled())
+			{
 				return;
+			}
 
 			// update state
 			synchronized (fLock)
@@ -286,9 +310,13 @@ public class QuickDiffReferenceProvider implements IQuickDiffReferenceProvider, 
 	private ISchedulingRule getSchedulingRule(IStorage storage)
 	{
 		if (storage instanceof ISchedulingRule)
+		{
 			return (ISchedulingRule) storage;
+		}
 		else if (storage != null)
+		{
 			return (ISchedulingRule) storage.getAdapter(ISchedulingRule.class);
+		}
 		return null;
 	}
 
@@ -326,11 +354,13 @@ public class QuickDiffReferenceProvider implements IQuickDiffReferenceProvider, 
 			jobMgr.endRule(rule);
 		}
 		else
+		{
 			synchronized (fDocumentAccessorLock)
 			{
 				fDocumentLocked = false;
 				fDocumentAccessorLock.notifyAll();
 			}
+		}
 	}
 
 	/**
@@ -371,15 +401,21 @@ public class QuickDiffReferenceProvider implements IQuickDiffReferenceProvider, 
 				{
 					Shell shell = window.getShell();
 					if (shell != null)
+					{
 						display = shell.getDisplay();
+					}
 				}
 			}
 		}
 
 		if (display != null && !display.isDisposed())
+		{
 			display.asyncExec(runnable);
+		}
 		else
+		{
 			runnable.run();
+		}
 	}
 
 	/**
@@ -409,25 +445,33 @@ public class QuickDiffReferenceProvider implements IQuickDiffReferenceProvider, 
 			if (skipUTF8BOM)
 			{
 				for (int i = 0; i < 3; i++)
+				{
 					if (contentStream.read() == -1)
 					{
 						throw new IOException(Messages.QuickDiffReferenceProvider_Error_NotEnoughBytesForBOM);
 					}
+				}
 			}
 
 			final int DEFAULT_FILE_SIZE = 15 * 1024;
 
 			if (encoding == null)
+			{
 				in = new BufferedReader(new InputStreamReader(contentStream), DEFAULT_FILE_SIZE);
+			}
 			else
+			{
 				in = new BufferedReader(new InputStreamReader(contentStream, encoding), DEFAULT_FILE_SIZE);
+			}
 			StringBuffer buffer = new StringBuffer(DEFAULT_FILE_SIZE);
 			char[] readBuffer = new char[2048];
 			int n = in.read(readBuffer);
 			while (n > 0)
 			{
 				if (monitor != null && monitor.isCanceled())
+				{
 					return;
+				}
 
 				buffer.append(readBuffer, 0, n);
 				n = in.read(readBuffer);
@@ -446,9 +490,13 @@ public class QuickDiffReferenceProvider implements IQuickDiffReferenceProvider, 
 			try
 			{
 				if (in != null)
+				{
 					in.close();
+				}
 				else
+				{
 					contentStream.close();
+				}
 			}
 			catch (IOException x)
 			{
@@ -484,8 +532,10 @@ public class QuickDiffReferenceProvider implements IQuickDiffReferenceProvider, 
 				if (bom != null)
 				{
 					if (bom != IContentDescription.BOM_UTF_8)
+					{
 						throw new CoreException(new Status(IStatus.ERROR, EditorsUI.PLUGIN_ID, IStatus.OK,
 								Messages.QuickDiffReferenceProvider_Error_WrongByteOrderMark, null));
+					}
 					return true;
 				}
 			}
