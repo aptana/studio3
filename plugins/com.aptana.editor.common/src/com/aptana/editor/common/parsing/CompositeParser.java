@@ -65,7 +65,6 @@ public class CompositeParser implements IParser
 		fParserLanguage = primaryParserLanguage;
 	}
 
-	@Override
 	public IParseNode parse(IParseState parseState) throws java.lang.Exception
 	{
 		String source = new String(parseState.getSource());

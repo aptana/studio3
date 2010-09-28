@@ -12,7 +12,6 @@ public class IndexFilterParticipant implements IIndexFilterParticipant
 	 * (non-Javadoc)
 	 * @see com.aptana.index.core.IIndexFilterParticipant#filterFileStores(java.util.Set)
 	 */
-	@Override
 	public Set<IFileStore> applyFilter(Set<IFileStore> fileStores)
 	{
 		return IndexFilterManager.getInstance().applyFilter(fileStores);

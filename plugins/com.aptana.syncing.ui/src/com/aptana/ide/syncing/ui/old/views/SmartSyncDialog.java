@@ -613,13 +613,11 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		toolItem.addSelectionListener(new SelectionListener()
 		{
 
-			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
 				removeFilter();
 			}
 
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e)
 			{
 			}
@@ -2043,7 +2041,6 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 
 	}
 
-	@Override
 	public void search(String text, boolean isCaseSensitive, boolean isRegularExpression)
 	{
 		searchText = text;

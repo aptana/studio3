@@ -61,7 +61,6 @@ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.IStreamListener#streamAppended(java.lang.String, org.eclipse.debug.core.model.IStreamMonitor)
 	 */
-	@Override
 	public void streamAppended(String text, IStreamMonitor monitor) {
 		if (outputFilter != null) {
 			printStream.print(outputFilter.filterOutput(text.toCharArray()));

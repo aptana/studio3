@@ -68,7 +68,6 @@ public class CommonReconciler extends MonoReconciler
 
 			private Job job;
 
-			@Override
 			public void scriptUnloaded(File script)
 			{
 				bundleFileChanged(script);
@@ -101,13 +100,11 @@ public class CommonReconciler extends MonoReconciler
 				job.schedule(750);
 			}
 
-			@Override
 			public void scriptReloaded(File script)
 			{
 				bundleFileChanged(script);
 			}
 
-			@Override
 			public void scriptLoaded(File script)
 			{
 				bundleFileChanged(script);

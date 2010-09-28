@@ -319,7 +319,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 			return new IScopeReference()
 			{
 
-				@Override
 				public String getScopeId()
 				{
 					if (selectedProject != null)
@@ -1040,14 +1039,12 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		getCommonViewer().getTree().getMenu().addMenuListener(new MenuListener()
 		{
 
-			@Override
 			public void menuShown(MenuEvent e)
 			{
 				Menu menu = (Menu) e.getSource();
 				mangleContextMenu(menu);
 			}
 
-			@Override
 			public void menuHidden(MenuEvent e)
 			{
 				// do nothing
@@ -1079,13 +1076,11 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		toolItem.addSelectionListener(new SelectionListener()
 		{
 
-			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
 				removeFilter();
 			}
 
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e)
 			{
 			}
@@ -1330,7 +1325,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				delta.accept(new IResourceDeltaVisitor()
 				{
 
-					@Override
 					public boolean visit(IResourceDelta delta) throws CoreException
 					{
 						IResource resource = delta.getResource();
@@ -1355,7 +1349,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 								Display.getDefault().asyncExec(new Runnable()
 								{
 
-									@Override
 									public void run()
 									{
 										// Construct the menu item to for this
@@ -1412,7 +1405,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 								Display.getDefault().asyncExec(new Runnable()
 								{
 
-									@Override
 									public void run()
 									{
 										MenuItem[] menuItems = projectsMenu.getItems();
@@ -1452,7 +1444,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		}
 	}
 
-	@Override
 	public void search(String text, boolean isCaseSensitive, boolean isRegularExpression)
 	{
 		if (selectedProject == null)

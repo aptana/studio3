@@ -63,7 +63,6 @@ public class CSSClassHyperlinkDetector extends IndexQueryingHyperlinkDetector
 
 	private static final Pattern CSS_CLASS_PATTERN = Pattern.compile("class=[\"'�]([_a-zA-Z0-9-]+)[\"'�]"); //$NON-NLS-1$
 
-	@Override
 	public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region, boolean canShowMultipleHyperlinks)
 	{
 		List<IHyperlink> hyperlinks = new ArrayList<IHyperlink>();

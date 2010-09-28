@@ -125,7 +125,6 @@ public class ChangedFile implements Comparable<ChangedFile>
 		return getStatus().equals(Status.UNMERGED);
 	}
 
-	@Override
 	public int compareTo(ChangedFile o)
 	{
 		return getPath().compareTo(o.getPath());

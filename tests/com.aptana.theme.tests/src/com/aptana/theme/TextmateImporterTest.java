@@ -10,6 +10,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 
+@SuppressWarnings("nls")
 public class TextmateImporterTest extends TestCase
 {
 

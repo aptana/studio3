@@ -36,7 +36,6 @@ public class EngineYardLoginWizardPage extends WizardPage implements ILoginValid
 		super(NAME, Messages.EngineYardLoginWizardPage_Title, Activator.getImageDescriptor(ENGINE_YARD_ICON));
 	}
 
-	@Override
 	public void createControl(Composite parent)
 	{
 		Composite composite = new Composite(parent, SWT.NULL);
@@ -62,7 +61,6 @@ public class EngineYardLoginWizardPage extends WizardPage implements ILoginValid
 		userId.addModifyListener(new ModifyListener()
 		{
 
-			@Override
 			public void modifyText(ModifyEvent e)
 			{
 				getContainer().updateButtons();
@@ -77,7 +75,6 @@ public class EngineYardLoginWizardPage extends WizardPage implements ILoginValid
 		password.addModifyListener(new ModifyListener()
 		{
 
-			@Override
 			public void modifyText(ModifyEvent e)
 			{
 				getContainer().updateButtons();

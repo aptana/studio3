@@ -45,7 +45,6 @@ import com.aptana.scripting.model.ContextContributor;
 public class BrowserContextContributor implements ContextContributor
 {
 
-	@Override
 	public void modifyContext(CommandElement command, CommandContext context)
 	{
 		if (command != null)

@@ -115,7 +115,6 @@ public abstract class CompositeSourceViewerConfiguration extends CommonSourceVie
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
 	 */
-	@Override
 	public String[][] getTopContentTypes()
 	{
 		return topContentTypesArray;

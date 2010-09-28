@@ -271,7 +271,6 @@ public class MenuDialog extends PopupDialog
 		completionsTable.addListener(SWT.EraseItem, new Listener()
 		{
 
-			@Override
 			public void handleEvent(Event event)
 			{
 				if ((event.detail & SWT.SELECTED) != 0)
@@ -289,7 +288,6 @@ public class MenuDialog extends PopupDialog
 		completionsTable.addTraverseListener(new TraverseListener()
 		{
 
-			@Override
 			public void keyTraversed(TraverseEvent e)
 			{
 				int selectionIndex = completionsTable.getSelectionIndex();

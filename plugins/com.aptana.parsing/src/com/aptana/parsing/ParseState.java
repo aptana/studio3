@@ -55,7 +55,6 @@ public class ParseState implements IParseState
 		fInsertedText = NO_CHARS;
 	}
 
-	@Override
 	public void clearEditState()
 	{
 		fInsertedText = NO_CHARS;
@@ -67,31 +66,26 @@ public class ParseState implements IParseState
 		return fParseResult;
 	}
 
-	@Override
 	public char[] getInsertedText()
 	{
 		return fInsertedText;
 	}
 
-	@Override
 	public int getRemovedLength()
 	{
 		return fRemovedLength;
 	}
 
-	@Override
 	public char[] getSource()
 	{
 		return fSource;
 	}
 
-	@Override
 	public int getStartingOffset()
 	{
 		return fStartingOffset;
 	}
 
-	@Override
 	public void setEditState(String source, String insertedText, int startingOffset, int removedLength)
 	{
 		fSource = (source != null) ? source.toCharArray() : NO_CHARS;
@@ -100,13 +94,11 @@ public class ParseState implements IParseState
 		fRemovedLength = removedLength;
 	}
 
-	@Override
 	public void setParseResult(IParseNode result)
 	{
 		fParseResult = result;
 	}
 
-	@Override
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();

@@ -62,7 +62,6 @@ public class DeployHandler extends AbstractHandler
 
 	private IProject selectedProject;
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		

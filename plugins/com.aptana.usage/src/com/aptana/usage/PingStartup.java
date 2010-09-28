@@ -76,7 +76,6 @@ public class PingStartup implements IStartup
 	private static final int READ_TIMEOUT = 15 * 60 * 1000; // 15 minutes in milliseconds
 	private static final long TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
-	@Override
 	public void earlyStartup()
 	{
 		if (Platform.inDevelopmentMode())

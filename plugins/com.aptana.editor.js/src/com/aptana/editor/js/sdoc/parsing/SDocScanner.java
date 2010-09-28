@@ -35,7 +35,7 @@
 package com.aptana.editor.js.sdoc.parsing;
 
 import java.io.IOException;
-import java.util.ArrayDeque;
+import java.util.LinkedList;
 import java.util.Queue;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -64,7 +64,7 @@ public class SDocScanner extends Scanner
 	{
 		fTokenScanner = new SDocTokenScanner();
 		fTypeTokenScanner = new SDocTypeTokenScanner();
-		fQueue = new ArrayDeque<Symbol>();
+		fQueue = new LinkedList<Symbol>();
 	}
 
 	/*

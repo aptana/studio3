@@ -27,6 +27,7 @@ public abstract class AbstractPlistParserTestCase extends TestCase
 		return new File(url.toURI());
 	}
 
+	@SuppressWarnings("unchecked")
 	public void testParseExample() throws Exception
 	{
 		Map<String, Object> result = PListParserFactory.parse(getFileInTestFragment(getExampleFilePath()));

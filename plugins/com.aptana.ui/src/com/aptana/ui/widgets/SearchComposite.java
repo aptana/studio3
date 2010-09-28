@@ -105,7 +105,6 @@ public class SearchComposite extends Composite
 
 		searchText.addFocusListener(new FocusListener()
 		{
-			@Override
 			public void focusLost(FocusEvent e)
 			{
 				if (searchText.getText().length() == 0)
@@ -115,7 +114,6 @@ public class SearchComposite extends Composite
 				searchText.setForeground(searchText.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 			}
 
-			@Override
 			public void focusGained(FocusEvent e)
 			{
 				if (searchText.getText().equals(initialText))
@@ -128,12 +126,10 @@ public class SearchComposite extends Composite
 
 		searchText.addKeyListener(new KeyListener()
 		{
-			@Override
 			public void keyReleased(KeyEvent e)
 			{
 			}
 
-			@Override
 			public void keyPressed(KeyEvent e)
 			{
 				if (!e.doit)
@@ -148,7 +144,6 @@ public class SearchComposite extends Composite
 			}
 		});
 		searchText.addModifyListener(new ModifyListener() {
-			@Override
 			public void modifyText(ModifyEvent e) {
 				if (!searchOnEnter) {
 					searchText();

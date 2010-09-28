@@ -435,7 +435,6 @@ public class ThemeManager implements IThemeManager
 		return fBuiltins.contains(themeName);
 	}
 
-	@Override
 	public IStatus validateThemeName(String name)
 	{
 		if (name == null || name.trim().length() == 0)

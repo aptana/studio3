@@ -48,6 +48,7 @@ import com.aptana.ide.core.io.CoreIOPlugin;
 /**
  * @author Max Stepanov
  */
+@SuppressWarnings("nls")
 public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 {
 

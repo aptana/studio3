@@ -181,7 +181,6 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		fThemeChangeListener = new IPreferenceChangeListener()
 		{
 
-			@Override
 			public void preferenceChange(PreferenceChangeEvent event)
 			{
 				if (event.getKey().equals(IThemeManager.THEME_CHANGED))

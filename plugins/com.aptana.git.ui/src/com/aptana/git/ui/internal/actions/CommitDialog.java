@@ -136,7 +136,6 @@ public class CommitDialog extends StatusDialog
 		validate();
 		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 		{
-			@Override
 			public void run()
 			{
 				packTable(stagedTable);
@@ -462,7 +461,6 @@ public class CommitDialog extends StatusDialog
 		table.addListener(SWT.EraseItem, new Listener()
 		{
 
-			@Override
 			public void handleEvent(Event event)
 			{
 				// Only draw the text custom
@@ -475,7 +473,6 @@ public class CommitDialog extends StatusDialog
 		table.addListener(SWT.PaintItem, new Listener()
 		{
 
-			@Override
 			public void handleEvent(Event event)
 			{
 				// Only draw the text custom
@@ -561,7 +558,6 @@ public class CommitDialog extends StatusDialog
 							PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 							{
 
-								@Override
 								public void run()
 								{
 									// If this file was shown in diff area, we need to blank the diff area!
@@ -953,12 +949,10 @@ public class CommitDialog extends StatusDialog
 			comp.setLayoutData(data);
 		}
 
-		@Override
 		public void widgetDefaultSelected(SelectionEvent e)
 		{
 		}
 
-		@Override
 		public void widgetSelected(SelectionEvent e)
 		{
 			Object source = e.getSource();

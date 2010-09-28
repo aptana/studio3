@@ -124,7 +124,6 @@ public enum HTMLTokenType implements ITypePredicate
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.css.parsing.lexer.ITypePredicate#isDefined()
 	 */
-	@Override
 	public boolean isDefined()
 	{
 		return (this != UNDEFINED);

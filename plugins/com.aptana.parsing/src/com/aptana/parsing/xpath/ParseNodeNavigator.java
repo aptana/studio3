@@ -282,13 +282,11 @@ public class ParseNodeNavigator extends DefaultNavigator
 					}
 				}
 
-				@Override
 				public boolean hasNext()
 				{
 					return next != null;
 				}
 
-				@Override
 				public Object next()
 				{
 					Object result = next;
@@ -298,7 +296,6 @@ public class ParseNodeNavigator extends DefaultNavigator
 					return result;
 				}
 
-				@Override
 				public void remove()
 				{
 					// do nothing

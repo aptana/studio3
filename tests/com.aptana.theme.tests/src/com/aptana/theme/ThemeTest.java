@@ -9,6 +9,7 @@ import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 
+@SuppressWarnings("nls")
 public class ThemeTest extends TestCase
 {
 
@@ -61,8 +62,8 @@ public class ThemeTest extends TestCase
 		assertEquals(new RGB(255, 255, 255), theme.getBackground());
 		assertEquals(new RGB(255, 0, 0), theme.getForeground());
 		assertEquals(new RGB(0, 255, 0), theme.getCaret());
-		assertEquals(new RGB(0, 0, 255), theme.getSelection());
-		assertEquals(new RGB(255, 0, 255), theme.getLineHighlight());
+		assertEquals(new RGBa(0, 0, 255, 255), theme.getSelection());
+		assertEquals(new RGBa(255, 0, 255, 255), theme.getLineHighlight());
 		// Now check tokens
 		assertTrue(theme.hasEntry("constant.language.js"));
 		assertFalse(theme.hasEntry("constant.language"));
@@ -109,9 +110,9 @@ public class ThemeTest extends TestCase
 		assertEquals(new RGB(128, 128, 128), theme.getBackground());
 	}
 
-	public void testGetBackAsRGBReturnsNullIfNoBackGroundSpecified()
+	public void testGetBackAsRGBReturnsThemeBackgroundIfNoBackGroundSpecified()
 	{
-		assertNull(theme.getBackgroundAsRGB("something.that.inherits"));
+		assertEquals(theme.getBackground(), theme.getBackgroundAsRGB("something.that.inherits"));
 	}
 
 	public void testUpdateGlobalFGColor()
@@ -134,17 +135,17 @@ public class ThemeTest extends TestCase
 	public void testUpdateGlobalLineHighlightColor()
 	{
 		theme.updateLineHighlight(new RGB(128, 128, 128));
-		assertEquals(new RGB(128, 128, 128), theme.getLineHighlight());
+		assertEquals(new RGBa(128, 128, 128, 255), theme.getLineHighlight());
 		theme.updateLineHighlight(null);
-		assertEquals(new RGB(128, 128, 128), theme.getLineHighlight());
+		assertEquals(new RGBa(128, 128, 128, 255), theme.getLineHighlight());
 	}
 
 	public void testUpdateGlobalSelectionColor()
 	{
 		theme.updateSelection(new RGB(128, 128, 128));
-		assertEquals(new RGB(128, 128, 128), theme.getSelection());
+		assertEquals(new RGBa(128, 128, 128, 255), theme.getSelection());
 		theme.updateSelection(null);
-		assertEquals(new RGB(128, 128, 128), theme.getSelection());
+		assertEquals(new RGBa(128, 128, 128, 255), theme.getSelection());
 	}
 
 	public void testGetTokens()

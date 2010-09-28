@@ -101,17 +101,14 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	private final IPartListener fPartListener = new IPartListener()
 	{
 
-		@Override
 		public void partActivated(IWorkbenchPart part)
 		{
 		}
 
-		@Override
 		public void partBroughtToTop(IWorkbenchPart part)
 		{
 		}
 
-		@Override
 		public void partClosed(IWorkbenchPart part)
 		{
 			if (part instanceof IEditorPart)
@@ -132,12 +129,10 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			}
 		}
 
-		@Override
 		public void partDeactivated(IWorkbenchPart part)
 		{
 		}
 
-		@Override
 		public void partOpened(IWorkbenchPart part)
 		{
 			if (part instanceof IEditorPart)
@@ -162,13 +157,11 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	private final IPerspectiveListener fPerspectiveListener = new IPerspectiveListener()
 	{
 
-		@Override
 		public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective)
 		{
 			setCommandState(findView(page, OUTLINE_VIEW_ID) != null);
 		}
 
-		@Override
 		public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, String changeId)
 		{
 			if (changeId.equals(IWorkbenchPage.CHANGE_VIEW_HIDE))

@@ -1068,7 +1068,6 @@ public class BundleManager
 		IModelFilter caFilter = new IModelFilter()
 		{
 
-			@Override
 			public boolean include(AbstractElement element)
 			{
 				return element instanceof ContentAssistElement;
@@ -1968,7 +1967,6 @@ public class BundleManager
 		IModelFilter caFilter = new IModelFilter()
 		{
 
-			@Override
 			public boolean include(AbstractElement element)
 			{
 				return element instanceof EnvironmentElement;

@@ -70,14 +70,12 @@ public class CommandElementsProvider implements ICommandElementsProvider
 		this.textViewer = textViewer;
 	}
 
-	@Override
 	public void execute(CommandElement commandElement)
 	{
 		CommandResult commandResult = CommandExecutionUtils.executeCommand(commandElement, InvocationType.KEY_BINDING, textViewer, textEditor);
 		CommandExecutionUtils.processCommandResult(commandElement, commandResult, textEditor);
 	}
 
-	@Override
 	public List<CommandElement> getCommandElements(KeySequence keySequence)
 	{
 		List<CommandElement> commandElements = new LinkedList<CommandElement>();
@@ -116,7 +114,6 @@ public class CommandElementsProvider implements ICommandElementsProvider
 	/* (non-Javadoc)
 	 * @see com.aptana.scripting.keybindings.ICommandElementsProvider#getCommandElementsPopupLocation()
 	 */
-	@Override
 	public Point getCommandElementsPopupLocation()
 	{
 		Object control = textEditor.getAdapter(Control.class);

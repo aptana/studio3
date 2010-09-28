@@ -204,4 +204,21 @@ public class GitCommit
 	{
 		this.authorEmail = authorEmail;
 	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj instanceof GitCommit)
+		{
+			GitCommit other = (GitCommit) obj;
+			return other.sha.equals(sha) && other.repository.equals(repository);
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return 31 * sha.hashCode() + repository.hashCode();
+	}
 }

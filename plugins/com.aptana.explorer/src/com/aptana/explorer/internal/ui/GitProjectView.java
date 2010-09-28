@@ -1190,7 +1190,6 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		}
 	}
 
-	@Override
 	public void pushed(PushEvent e)
 	{
 		// Need to recalc the push indicators on branch pulldown
@@ -1268,13 +1267,11 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		handleBranchEvent(e.getRepository());
 	}
 
-	@Override
 	public void branchAdded(BranchAddedEvent e)
 	{
 		handleBranchEvent(e.getRepository());
 	}
 
-	@Override
 	public void branchRemoved(BranchRemovedEvent e)
 	{
 		handleBranchEvent(e.getRepository());

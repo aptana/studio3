@@ -245,7 +245,6 @@ public class ControlBindingManager
 		}
 		list.addListDataChangeListener(new IListDataChangeListener()
 		{
-			@Override
 			public void inputChanged(Object input, Object oldInput)
 			{
 				Object[] in = (Object[]) input;

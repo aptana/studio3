@@ -32,5 +32,21 @@
          </viewShortcut>
       </perspectiveExtension>
    </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="com.aptana.browser.actionSet"
+            label="Show WebBrowser ActionSet"
+            visible="true">
+         <action
+               class="com.aptana.browser.actions.ShowBrowserEditorAction"
+               icon="icons/obj16/browser.png"
+               id="com.aptana.browser.ShowBrowserEditorAction"
+               label="WebBrowser Editor"
+               menubarPath="window/showView/additions"
+               style="push">
+         </action>
+      </actionSet>
+   </extension>
 
 </plugin>

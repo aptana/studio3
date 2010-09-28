@@ -19,6 +19,8 @@
 	<element name="css" type="root">
 		<child-element name="elements" />
 		<child-element name="properties" />
+		<child-element name="pseudo-classes" />
+		<child-element name="pseudo-elements" />
 	</element>
 	
 	<element name="description" onEnter="startTextBuffer" onExit="exitDescription" hasText="yes"/>
@@ -31,10 +33,10 @@
 		<attribute name="name" />
 		<attribute name="display-name" usage="optional" />
 		<child-element name="browsers" />
-        <child-element name="description" />
-        <child-element name="example" />
+    <child-element name="description" />
+    <child-element name="example" />
 		<child-element name="property-refs" />
-        <child-element name="remarks" />
+    <child-element name="remarks" />
 	</element>
 	
 	<element name="example" onEnter="startTextBuffer" onExit="exitExample" hasText="yes" />
@@ -48,8 +50,8 @@
 		<child-element name="availability" />
 		<child-element name="browsers" />
 		<child-element name="description" />
-        <child-element name="example" />
-        <child-element name="hint" />
+    <child-element name="example" />
+    <child-element name="hint" />
 		<child-element name="remarks" />
 		<child-element name="values" />
 	</element>
@@ -65,6 +67,32 @@
 	<element name="property-ref" onEnter="enterPropertyReference">
 		<attribute name="name" />
 	</element>
+
+  <element name="pseudo-class" onEnter="enterPseudoClass" onExit="exitPseudoClass">
+    <attribute name="name" />
+    <child-element name="availability" />
+    <child-element name="browsers" />
+    <child-element name="description" />
+    <child-element name="example" />
+    <child-element name="values" />
+  </element>
+    
+  <element name="pseudo-classes">
+    <child-element name="pseudo-class" />
+  </element>
+  
+  <element name="pseudo-element" onEnter="enterPseudoElement" onExit="exitPseudoElement">
+    <attribute name="name" />
+    <attribute name="allow-pseudo-class-syntax" usage="optional" />
+    <child-element name="availability" />
+    <child-element name="browsers" />
+    <child-element name="description" />
+    <child-element name="example" />
+  </element>
+    
+  <element name="pseudo-elements">
+    <child-element name="pseudo-element" />
+  </element>
 
 	<element name="remarks" onEnter="startTextBuffer" onExit="exitRemarks" hasText="yes"/>
 	

@@ -95,6 +95,11 @@ public class RGBa
 		{
 			return true;
 		}
+		if (obj instanceof RGB)
+		{
+			RGB other = (RGB) obj;
+			return isFullyOpaque() && other.red == red && other.green == green && other.blue == blue;
+		}
 		if (obj instanceof RGBa)
 		{
 			RGBa other = (RGBa) obj;

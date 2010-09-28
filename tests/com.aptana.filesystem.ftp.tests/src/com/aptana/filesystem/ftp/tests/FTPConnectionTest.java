@@ -43,6 +43,7 @@ import com.aptana.filesystem.ftp.FTPConnectionPoint;
 /**
  * @author Max Stepanov
  */
+@SuppressWarnings("nls")
 public class FTPConnectionTest extends CommonConnectionTest
 {
 

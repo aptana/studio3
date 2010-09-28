@@ -183,7 +183,6 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 		}
 		Collections.sort(templatesList, new Comparator<Template>()
 		{
-			@Override
 			public int compare(Template template1, Template template2)
 			{
 				return template1.getDescription().compareTo(template2.getDescription());

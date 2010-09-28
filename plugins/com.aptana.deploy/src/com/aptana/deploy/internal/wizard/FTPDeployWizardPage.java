@@ -78,7 +78,6 @@ public class FTPDeployWizardPage extends WizardPage implements FTPConnectionProp
 		return complete;
 	}
 
-	@Override
 	public void createControl(Composite parent)
 	{
 		ftpConnectionComposite = new FTPDeployComposite(parent, SWT.NONE, connectionPoint, this);
@@ -98,13 +97,11 @@ public class FTPDeployWizardPage extends WizardPage implements FTPConnectionProp
 		return null;
 	}
 
-	@Override
 	public boolean close()
 	{
 		return false;
 	}
 
-	@Override
 	public void error(String message)
 	{
 		if (message == null)
@@ -119,17 +116,14 @@ public class FTPDeployWizardPage extends WizardPage implements FTPConnectionProp
 		setPageComplete(message == null);
 	}
 
-	@Override
 	public void layoutShell()
 	{
 	}
 
-	@Override
 	public void lockUI(boolean lock)
 	{
 	}
 
-	@Override
 	public void setValid(boolean valid)
 	{
 	}

@@ -121,7 +121,6 @@ public class CloakAction implements IObjectActionDelegate, IViewActionDelegate
 	{
 	}
 
-	@Override
 	public void init(IViewPart view)
 	{
 	}

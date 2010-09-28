@@ -129,8 +129,6 @@ public final class EventLogger
 
 		AptanaDB.getInstance().execute(GET_EVENTS, new IResultSetHandler()
 		{
-
-			@Override
 			public void processResultSet(ResultSet resultSet) throws SQLException
 			{
 				long dateTime = resultSet.getLong(1);
@@ -152,8 +150,6 @@ public final class EventLogger
 
 		AptanaDB.getInstance().execute(query, new IResultSetHandler()
 		{
-
-			@Override
 			public void processResultSet(ResultSet resultSet) throws SQLException
 			{
 				long dateTime = resultSet.getLong(1);

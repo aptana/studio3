@@ -86,14 +86,12 @@ public class NegativeLookaheadSelector extends BinarySelector
 
 		return result;
 	}
-	
-	@Override
+
 	public int matchFragments()
 	{
 		return matchFragments;
 	}
-	
-	@Override
+
 	public int matchLength()
 	{
 		return matchLength;
@@ -105,6 +103,6 @@ public class NegativeLookaheadSelector extends BinarySelector
 	 */
 	protected String getOperator()
 	{
-		return " -";
+		return " -"; //$NON-NLS-1$
 	}
 }

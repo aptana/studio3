@@ -4,7 +4,7 @@ Bundle-Name: Mocks
 Bundle-SymbolicName: com.aptana.testing.mocks
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: APTANA
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ClassPath: lib/cglib-nodep-2.1_3.jar,
  lib/hamcrest-core-1.1.jar,
  lib/hamcrest-library-1.1.jar,

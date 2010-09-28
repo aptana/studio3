@@ -295,7 +295,6 @@ public class CorePlugin extends Plugin
 				delta.accept(new IResourceDeltaVisitor()
 				{
 
-					@Override
 					public boolean visit(IResourceDelta delta) throws CoreException
 					{
 						IResource resource = delta.getResource();

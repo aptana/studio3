@@ -46,13 +46,11 @@ public class ScannerSwitchStrategy implements IScannerSwitchStrategy
 		fExitTokens = exitTokens;
 	}
 
-	@Override
 	public String[] getEnterTokens()
 	{
 		return fEnterTokens;
 	}
 
-	@Override
 	public String[] getExitTokens()
 	{
 		return fExitTokens;

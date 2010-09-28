@@ -353,12 +353,10 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		handlerService.activateHandler("org.eclipse.ui.edit.findbar.focusReplace", new FocusReplaceFindBarHandler()); //$NON-NLS-1$
 	}
 
-	@Override
 	public void widgetDefaultSelected(SelectionEvent e)
 	{
 	}
 
-	@Override
 	public void widgetSelected(SelectionEvent e)
 	{
 		Object source = e.getSource();

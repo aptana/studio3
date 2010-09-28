@@ -61,7 +61,6 @@ public class XMLSourceViewerConfiguration extends CommonSourceViewerConfiguratio
 			});
 	}
 
-	@Override
 	public String[][] getTopContentTypes() {
 		return XMLSourceConfiguration.getDefault().getTopContentTypes();
 	}

@@ -168,6 +168,15 @@
                menubarPath="compareWithMenu/compareWithGroup"
                tooltip="%CompareWithRevisionAction_tooltip">
          </action>
+         <action
+               class="com.aptana.git.ui.internal.actions.BlameAction"
+               definitionId="com.aptana.git.ui.command.blame"
+               enablesFor="+"
+               id="com.aptana.git.ui.actions.BlameAction"
+               label="%BlameAction_label"
+               menubarPath="team.main/targetGroup"
+               tooltip="%BlameAction_tooltip">
+         </action>
       </objectContribution>
    </extension>
    
@@ -319,6 +328,11 @@
             categoryId="com.aptana.git.ui.category"
             id="com.aptana.git.ui.command.compare_with_revision"
             name="%CompareWithRevisionAction_tooltip">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.blame"
+            name="%BlameAction_label">
       </command>
       <command
             defaultHandler="com.aptana.git.ui.internal.actions.ShowInHistoryHandler"

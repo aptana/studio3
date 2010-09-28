@@ -47,7 +47,6 @@ public class StacktraceHyperlinkDetector implements IHyperlinkDetector
 {
 	private static Pattern OPEN_TRACE_LINE_PATTERN = Pattern.compile("\\s*(\\S.+?):(\\d+):\\s+"); //$NON-NLS-1$
 
-	@Override
 	public IHyperlink[] detectHyperlinks(String contents)
 	{
 		Matcher m = OPEN_TRACE_LINE_PATTERN.matcher(contents);

@@ -81,7 +81,6 @@ public class GitRepositoryManager implements IGitRepositoryManager
 		}
 	}
 
-	@Override
 	public void cleanup()
 	{
 		synchronized (cachedRepos)
@@ -97,7 +96,6 @@ public class GitRepositoryManager implements IGitRepositoryManager
 		}
 	}
 
-	@Override
 	public void create(IPath path)
 	{
 		if (path == null)
@@ -119,7 +117,6 @@ public class GitRepositoryManager implements IGitRepositoryManager
 		GitExecutable.instance().runInBackground(path, "init"); //$NON-NLS-1$
 	}
 
-	@Override
 	public void removeRepository(IProject p)
 	{
 		GitRepository repo = getUnattachedExisting(p.getLocationURI());
@@ -157,7 +154,6 @@ public class GitRepositoryManager implements IGitRepositoryManager
 		}
 	}
 
-	@Override
 	public GitRepository getAttached(IProject project)
 	{
 		if (project == null)
@@ -170,7 +166,6 @@ public class GitRepositoryManager implements IGitRepositoryManager
 		return getUnattachedExisting(project.getLocationURI());
 	}
 
-	@Override
 	public GitRepository getUnattachedExisting(URI path)
 	{
 		if (GitExecutable.instance() == null || GitExecutable.instance().path() == null || path == null)
@@ -213,7 +208,6 @@ public class GitRepositoryManager implements IGitRepositoryManager
 		return ref.get();
 	}
 
-	@Override
 	public GitRepository attachExisting(IProject project, IProgressMonitor m) throws CoreException
 	{
 		if (m == null)
@@ -244,7 +238,6 @@ public class GitRepositoryManager implements IGitRepositoryManager
 			listener.repositoryAdded(e);
 	}
 
-	@Override
 	public URI gitDirForURL(URI repositoryURL)
 	{
 		if (GitExecutable.instance() == null)
@@ -286,7 +279,6 @@ public class GitRepositoryManager implements IGitRepositoryManager
 		return "true".equals(output); //$NON-NLS-1$
 	}
 
-	@Override
 	public void addListenerToEachRepository(IGitRepositoryListener listener)
 	{
 		if (listener == null)
@@ -301,7 +293,6 @@ public class GitRepositoryManager implements IGitRepositoryManager
 		}
 	}
 
-	@Override
 	public void removeListenerFromEachRepository(IGitRepositoryListener listener)
 	{
 		if (listener == null)
@@ -316,7 +307,6 @@ public class GitRepositoryManager implements IGitRepositoryManager
 		}
 	}
 
-	@Override
 	public GitRepository createOrAttach(IProject project, IProgressMonitor monitor) throws CoreException
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);

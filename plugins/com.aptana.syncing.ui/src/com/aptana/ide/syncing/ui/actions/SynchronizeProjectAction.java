@@ -59,7 +59,6 @@ public class SynchronizeProjectAction extends BaseSyncAction
 		UIUtils.getDisplay().asyncExec(new Runnable()
 		{
 
-			@Override
 			public void run()
 			{
 				try

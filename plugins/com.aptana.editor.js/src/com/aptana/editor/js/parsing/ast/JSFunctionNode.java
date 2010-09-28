@@ -34,7 +34,6 @@
  */
 package com.aptana.editor.js.parsing.ast;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -134,7 +133,7 @@ public class JSFunctionNode extends JSNode
 		List<JSReturnNode> result = new ArrayList<JSReturnNode>();
 
 		// Using a linked list since it provides a queue interface
-		Queue<IParseNode> queue = new ArrayDeque<IParseNode>();
+		Queue<IParseNode> queue = new LinkedList<IParseNode>();
 
 		// prime the queue
 		queue.add(this.getBody());

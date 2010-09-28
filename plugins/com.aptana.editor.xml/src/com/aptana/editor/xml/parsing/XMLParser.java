@@ -67,7 +67,6 @@ public class XMLParser implements IParser
 		fElementStack = new Stack<IParseNode>();
 	}
 
-	@Override
 	public IParseNode parse(IParseState parseState) throws java.lang.Exception
 	{
 		String source = new String(parseState.getSource());

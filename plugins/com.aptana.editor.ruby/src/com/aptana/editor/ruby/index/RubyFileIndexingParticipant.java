@@ -60,7 +60,6 @@ import com.aptana.parsing.ParserPoolFactory;
 public class RubyFileIndexingParticipant implements IFileStoreIndexingParticipant
 {
 
-	@Override
 	public void index(Set<IFileStore> files, final Index index, IProgressMonitor monitor) throws CoreException
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, files.size() * 100);

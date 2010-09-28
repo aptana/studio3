@@ -48,7 +48,6 @@ public class RubyScript extends RubyElement implements IRubyScript
 		super(start, end);
 	}
 
-	@Override
 	public IImportContainer getImportContainer()
 	{
 		if (fImportContainer == null)

@@ -121,7 +121,6 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 	 * @see com.aptana.index.core.IFileIndexingParticipant#index(java.util.Set, com.aptana.index.core.Index,
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public void index(Set<IFileStore> files, Index index, IProgressMonitor monitor) throws CoreException
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, files.size() * 100);
@@ -258,7 +257,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 	 * @param file
 	 * @param parseState
 	 */
-	protected void processParseResults(Index index, IParseNode ast, URI location)
+	public void processParseResults(Index index, IParseNode ast, URI location)
 	{
 		JSScope globals = this.getGlobals(ast);
 

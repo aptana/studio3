@@ -45,6 +45,7 @@ import beaver.Symbol;
 
 import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.html.parsing.HTMLTagScanner.TokenType;
+import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
@@ -94,7 +95,6 @@ public class HTMLParser implements IParser
 		fTagScanner = new HTMLTagScanner();
 	}
 
-	@Override
 	public synchronized IParseNode parse(IParseState parseState) throws java.lang.Exception
 	{
 		fParseState = (HTMLParseState) parseState;
@@ -114,6 +114,9 @@ public class HTMLParser implements IParser
 	{
 		switch (symbol.getId())
 		{
+			case HTMLTokens.COMMENT:
+				processComment();
+				break;
 			case HTMLTokens.START_TAG:
 				processStartTag();
 				break;
@@ -204,6 +207,16 @@ public class HTMLParser implements IParser
 		{
 		}
 		return new IParseNode[0];
+	}
+
+	private void processComment()
+	{
+		HTMLCommentNode comment = new HTMLCommentNode(fCurrentSymbol.value.toString(), fCurrentSymbol.getStart(),
+				fCurrentSymbol.getEnd());
+		if (fCurrentElement != null)
+		{
+			fCurrentElement.addChild(comment);
+		}
 	}
 
 	private void processStartTag()

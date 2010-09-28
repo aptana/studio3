@@ -38,7 +38,6 @@ public class EngineYardSignupPage extends WizardPage
 		this.startingUserId = startingUserId;
 	}
 
-	@Override
 	public void createControl(Composite parent)
 	{
 		Composite composite = new Composite(parent, SWT.NULL);
