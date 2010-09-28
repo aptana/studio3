@@ -104,7 +104,6 @@ public class TerminalEditorInput implements IEditorInput, IPersistableElement {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IPersistableElement#getFactoryId()
 	 */
-	@Override
 	public String getFactoryId() {
 		return TerminalElementFactory.ID;
 	}
@@ -112,7 +111,6 @@ public class TerminalEditorInput implements IEditorInput, IPersistableElement {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IPersistable#saveState(org.eclipse.ui.IMemento)
 	 */
-	@Override
 	public void saveState(IMemento memento) {
 		IMemento child = memento.createChild(PROP_TITLE);
 		child.putTextData(title != null ? title : ""); //$NON-NLS-1$

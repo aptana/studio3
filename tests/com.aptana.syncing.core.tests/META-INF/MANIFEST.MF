@@ -5,7 +5,7 @@ Bundle-SymbolicName: com.aptana.syncing.core.tests
 Bundle-Version: 3.0.0.qualifier
 Bundle-Vendor: Aptana, Inc.
 Fragment-Host: com.aptana.syncing.core
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.junit,
  com.aptana.filesystem.ftp;bundle-version="3.0.0",
  com.aptana.filesystem.secureftp;bundle-version="3.0.0",

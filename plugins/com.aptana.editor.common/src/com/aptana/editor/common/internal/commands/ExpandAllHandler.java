@@ -51,7 +51,6 @@ public class ExpandAllHandler extends AbstractHandler
 	{
 	}
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		IWorkbenchPart part = HandlerUtil.getActivePart(event);

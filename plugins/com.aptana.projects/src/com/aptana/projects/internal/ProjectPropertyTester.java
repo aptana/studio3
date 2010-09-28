@@ -55,7 +55,6 @@ public class ProjectPropertyTester extends PropertyTester
 	private static final String NATURE = "nature"; //$NON-NLS-1$
 	private static final String APTANA_NATURE = "aptana"; //$NON-NLS-1$
 
-	@Override
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue)
 	{
 		if (NATURE.equals(property) && receiver instanceof IProject)

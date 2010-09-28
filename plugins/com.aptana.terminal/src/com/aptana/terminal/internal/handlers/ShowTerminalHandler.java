@@ -53,7 +53,6 @@ public class ShowTerminalHandler extends AbstractHandler
 	private static final String EXPLORER_PLUGIN_ID = "com.aptana.explorer"; //$NON-NLS-1$
 	private static final String EXPLORER_ACTIVE_PROJECT = "activeProject"; //$NON-NLS-1$
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		IProject project = null;

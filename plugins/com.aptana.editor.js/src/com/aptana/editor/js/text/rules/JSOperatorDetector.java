@@ -49,7 +49,6 @@ public class JSOperatorDetector implements IWordDetector
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.rules.IWordDetector#isWordPart(char)
 	 */
-	@Override
 	public boolean isWordPart(char c)
 	{
 		fPosition++;
@@ -83,7 +82,6 @@ public class JSOperatorDetector implements IWordDetector
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.rules.IWordDetector#isWordStart(char)
 	 */
-	@Override
 	public boolean isWordStart(char c)
 	{
 		fPosition = 0;

@@ -60,7 +60,6 @@ public class RubyElement extends ParseNode implements IRubyElement
 		this.end = end;
 	}
 
-	@Override
 	public String getName()
 	{
 		return EMPTY;

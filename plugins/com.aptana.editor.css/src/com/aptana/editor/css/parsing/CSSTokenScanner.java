@@ -99,14 +99,12 @@ public class CSSTokenScanner extends CSSCodeScanner
 	{
 		return new ExtendedWordRule(new IWordDetector()
 		{
-			
-			@Override
+
 			public boolean isWordStart(char c)
 			{
 				return c == '-' || c == '+' || c == '.' || Character.isDigit(c);
 			}
-			
-			@Override
+
 			public boolean isWordPart(char c)
 			{
 				return c == '.' || c == '%' ||Character.isLetterOrDigit(c);

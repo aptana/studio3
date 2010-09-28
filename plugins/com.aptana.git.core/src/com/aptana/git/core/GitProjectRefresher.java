@@ -131,13 +131,11 @@ class GitProjectRefresher extends AbstractGitRepositoryListener implements IGitR
 		job.schedule();
 	}
 
-	@Override
 	public void repositoryAdded(RepositoryAddedEvent e)
 	{
 		e.getRepository().addListener(this);
 	}
 
-	@Override
 	public void repositoryRemoved(RepositoryRemovedEvent e)
 	{
 		e.getRepository().removeListener(this);

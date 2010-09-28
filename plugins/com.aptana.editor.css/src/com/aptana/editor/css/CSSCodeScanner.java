@@ -210,13 +210,11 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		rules.add(new ExtendedWordRule(new IWordDetector()
 		{
 
-			@Override
 			public boolean isWordStart(char c)
 			{
 				return c == '!';
 			}
 
-			@Override
 			public boolean isWordPart(char c)
 			{
 				return isWordStart(c) || Character.isLetterOrDigit(c) || Character.isWhitespace(c);
@@ -365,13 +363,11 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		return new ExtendedWordRule(new IWordDetector()
 		{
 
-			@Override
 			public boolean isWordStart(char c)
 			{
 				return c == '-' || c == '+' || c == '.' || Character.isDigit(c);
 			}
 
-			@Override
 			public boolean isWordPart(char c)
 			{
 				return c == '.' || Character.isDigit(c);

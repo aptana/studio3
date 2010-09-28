@@ -55,7 +55,6 @@ public class BundleContextContributor implements ContextContributor
 	 * @see com.aptana.scripting.model.ContextContributor#modifyContext(com.aptana.scripting.model.CommandElement,
 	 * com.aptana.scripting.model.CommandContext)
 	 */
-	@Override
 	public void modifyContext(CommandElement command, CommandContext context)
 	{
 		if (command != null)

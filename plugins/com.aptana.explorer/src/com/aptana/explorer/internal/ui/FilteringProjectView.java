@@ -620,7 +620,6 @@ public class FilteringProjectView extends GitProjectView
 		fResourceListener = new IResourceChangeListener()
 		{
 
-			@Override
 			public void resourceChanged(IResourceChangeEvent event)
 			{
 				if (selectedProject == null || !selectedProject.exists())
@@ -637,7 +636,6 @@ public class FilteringProjectView extends GitProjectView
 						PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 						{
 
-							@Override
 							public void run()
 							{
 								if (getCommonViewer() != null && getCommonViewer().getTree() != null

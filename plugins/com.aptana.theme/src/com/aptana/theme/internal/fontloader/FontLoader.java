@@ -108,7 +108,6 @@ public class FontLoader implements IColorFactory
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.themes.IColorFactory#createColor()
 	 */
-	@Override
 	public RGB createColor()
 	{
 		return FONT_LOADER;

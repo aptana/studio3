@@ -74,12 +74,10 @@ public class FTPDeployComposite extends CommonFTPConnectionPropertyComposite imp
 		updateEnableState();
 	}
 
-	@Override
 	public void widgetDefaultSelected(SelectionEvent e)
 	{
 	}
 
-	@Override
 	public void widgetSelected(SelectionEvent e)
 	{
 		Object source = e.getSource();

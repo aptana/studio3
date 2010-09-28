@@ -956,13 +956,11 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		super.dispose();
 	}
 
-	@Override
 	public void widgetDefaultSelected(SelectionEvent e)
 	{
 	}
 
 	@SuppressWarnings("unchecked")
-	@Override
 	public void widgetSelected(SelectionEvent e)
 	{
 		Object source = e.getSource();
@@ -1131,7 +1129,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		}
 	}
 
-	@Override
 	public String isValid(String newText)
 	{
 		IStatus status = getThemeManager().validateThemeName(newText);
@@ -1142,7 +1139,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		return status.getMessage();
 	}
 
-	@Override
 	public void propertyChange(PropertyChangeEvent event)
 	{
 		Object value = event.getNewValue();

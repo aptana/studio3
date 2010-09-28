@@ -106,7 +106,6 @@ public class CoreStubber extends Job
 			IResourceChangeListener fResourceListener = new IResourceChangeListener()
 			{
 
-				@Override
 				public void resourceChanged(IResourceChangeEvent event)
 				{
 					// listen for addition of ruby files/opening of projects (traverse them and look for ruby
@@ -122,7 +121,6 @@ public class CoreStubber extends Job
 						delta.accept(new IResourceDeltaVisitor()
 						{
 
-							@Override
 							public boolean visit(IResourceDelta delta) throws CoreException
 							{
 								if (found[0])
@@ -217,7 +215,6 @@ public class CoreStubber extends Job
 			Thread t = new Thread(new Runnable()
 			{
 
-				@Override
 				public void run()
 				{
 					for (Job job : jobs)
@@ -295,7 +292,6 @@ public class CoreStubber extends Job
 			this.fFound = false;
 		}
 
-		@Override
 		public boolean visit(IResourceProxy proxy) throws CoreException
 		{
 			if (fFound)

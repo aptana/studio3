@@ -75,13 +75,11 @@ class HTMLTagScanner extends RuleBasedScanner
 		WordRule wordRule = new ExtendedWordRule(new IWordDetector()
 		{
 
-			@Override
 			public boolean isWordPart(char c)
 			{
 				return Character.isLetter(c) || c == '-' || c == ':';
 			}
 
-			@Override
 			public boolean isWordStart(char c)
 			{
 				return Character.isLetter(c);
@@ -119,13 +117,11 @@ class HTMLTagScanner extends RuleBasedScanner
 	private static class WordDetector implements IWordDetector
 	{
 
-		@Override
 		public boolean isWordPart(char c)
 		{
 			return Character.isLetterOrDigit(c);
 		}
 
-		@Override
 		public boolean isWordStart(char c)
 		{
 			return Character.isLetter(c);

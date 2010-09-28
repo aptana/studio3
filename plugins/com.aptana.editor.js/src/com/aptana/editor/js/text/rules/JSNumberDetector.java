@@ -38,13 +38,11 @@ import org.eclipse.jface.text.rules.IWordDetector;
 
 class JSNumberDetector implements IWordDetector
 {
-	@Override
 	public boolean isWordStart(char c)
 	{
 		return Character.isDigit(c);
 	}
 
-	@Override
 	public boolean isWordPart(char c)
 	{
 		if (isWordStart(c) || c == '.')

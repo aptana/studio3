@@ -68,7 +68,6 @@ public class URIResolver implements IPathResolver
 	/**
 	 * Returns null if unable to resolve the path to a URI and grab the contents.
 	 */
-	@Override
 	public String resolveSource(String path, IProgressMonitor monitor) throws Exception
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);

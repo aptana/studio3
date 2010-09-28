@@ -64,7 +64,6 @@ public class RubyType extends NamedMember implements IRubyType
 		includedModuleNames = EMPTY_ARRAY;
 	}
 
-	@Override
 	public IRubyField[] getFields()
 	{
 		List<IRubyElement> elements = new ArrayList<IRubyElement>();
@@ -74,7 +73,6 @@ public class RubyType extends NamedMember implements IRubyType
 		return elements.toArray(new IRubyField[elements.size()]);
 	}
 
-	@Override
 	public IRubyMethod[] getMethods()
 	{
 		IRubyElement[] elements = getChildrenOfType(IRubyElement.METHOD);
@@ -86,7 +84,6 @@ public class RubyType extends NamedMember implements IRubyType
 		return methods;
 	}
 
-	@Override
 	public String[] getIncludedModuleNames()
 	{
 		if (isAnonymous())
@@ -96,7 +93,6 @@ public class RubyType extends NamedMember implements IRubyType
 		return includedModuleNames;
 	}
 
-	@Override
 	public String getSuperclassName()
 	{
 		if (isAnonymous())
@@ -115,13 +111,11 @@ public class RubyType extends NamedMember implements IRubyType
 		return IRubyElement.TYPE;
 	}
 
-	@Override
 	public boolean isClass()
 	{
 		return true;
 	}
 
-	@Override
 	public boolean isModule()
 	{
 		return false;

@@ -114,7 +114,6 @@ public class QuickDiffReferenceProvider implements IQuickDiffReferenceProvider, 
 		return fReference;
 	}
 
-	@Override
 	public void dispose()
 	{
 		IProgressMonitor monitor = fProgressMonitor;
@@ -138,13 +137,11 @@ public class QuickDiffReferenceProvider implements IQuickDiffReferenceProvider, 
 		}
 	}
 
-	@Override
 	public String getId()
 	{
 		return fId;
 	}
 
-	@Override
 	public void setActiveEditor(ITextEditor targetEditor)
 	{
 		IDocumentProvider provider = null;
@@ -169,13 +166,11 @@ public class QuickDiffReferenceProvider implements IQuickDiffReferenceProvider, 
 		}
 	}
 
-	@Override
 	public boolean isEnabled()
 	{
 		return fEditorInput != null && fDocumentProvider != null;
 	}
 
-	@Override
 	public void setId(String id)
 	{
 		this.fId = id;

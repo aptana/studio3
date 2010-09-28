@@ -39,7 +39,6 @@ public class HerokuDeployWizardPage extends WizardPage
 		super(NAME, Messages.HerokuDeployWizardPage_Title, Activator.getImageDescriptor(HEROKU_ICON));
 	}
 
-	@Override
 	public void createControl(Composite parent)
 	{
 		Composite composite = new Composite(parent, SWT.NULL);
@@ -63,7 +62,6 @@ public class HerokuDeployWizardPage extends WizardPage
 		appName.addModifyListener(new ModifyListener()
 		{
 
-			@Override
 			public void modifyText(ModifyEvent e)
 			{
 				getContainer().updateButtons();

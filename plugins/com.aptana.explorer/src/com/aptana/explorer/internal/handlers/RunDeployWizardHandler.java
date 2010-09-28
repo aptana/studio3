@@ -47,7 +47,6 @@ import com.aptana.deploy.wizard.DeployWizard;
 public class RunDeployWizardHandler extends AbstractHandler
 {
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		IWorkbenchPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart();

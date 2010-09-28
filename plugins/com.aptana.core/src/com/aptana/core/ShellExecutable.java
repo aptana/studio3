@@ -55,6 +55,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessUtil;
+import com.aptana.core.util.StringUtil;
 
 /**
  * @author Max Stepanov
@@ -119,7 +120,7 @@ public class ShellExecutable {
 	
 	private static IPath getPreferenceShellPath() {
 		String pref = new InstanceScope().getNode(CorePlugin.PLUGIN_ID).get(ICorePreferenceConstants.SHELL_EXECUTABLE_PATH, null);
-		if (pref != null && !pref.isEmpty()) {
+		if (pref != null && !StringUtil.isEmpty(pref)) {
 			IPath path = Path.fromOSString(pref);
 			if (path.toFile().isDirectory()) {
 				boolean isWin32 = Platform.OS_WIN32.equals(Platform.getOS());

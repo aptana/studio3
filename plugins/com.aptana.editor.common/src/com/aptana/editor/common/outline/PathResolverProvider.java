@@ -64,8 +64,7 @@ public final class PathResolverProvider
 		{
 			return null;
 		}
-		
-		@Override
+
 		public URI resolveURI(String path)
 		{
 			try

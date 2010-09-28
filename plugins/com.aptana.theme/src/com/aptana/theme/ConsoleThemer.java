@@ -235,7 +235,6 @@ public class ConsoleThemer
 	{
 		this.fThemeChangeListener = new IPreferenceChangeListener()
 		{
-			@Override
 			public void preferenceChange(PreferenceChangeEvent event)
 			{
 				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
@@ -255,7 +254,6 @@ public class ConsoleThemer
 	{
 		this.fFontChangeListener = new IPropertyChangeListener()
 		{
-			@Override
 			public void propertyChange(PropertyChangeEvent event)
 			{
 				if (event.getProperty().equals(TEXTFONT_PROPERTY))

@@ -12,7 +12,7 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.scripting;bundle-version="1.0.0",
  com.aptana.theme,
  org.eclipse.jface.text
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.scripting.ui

@@ -46,7 +46,6 @@ public class WebPerspectiveFactory implements IPerspectiveFactory
 	private static final String APP_EXPLORER_ID = "com.aptana.explorer.view"; //$NON-NLS-1$
 	private static final String TERMINAL_VIEW = "com.aptana.terminal.views.terminal"; //$NON-NLS-1$
 
-	@Override
 	public void createInitialLayout(IPageLayout layout)
 	{
 		// Get the editor area

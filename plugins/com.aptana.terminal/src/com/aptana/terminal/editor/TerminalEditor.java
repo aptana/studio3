@@ -204,7 +204,6 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, ITermi
 	protected void close() {
 		if (terminalComposite != null && !terminalComposite.isDisposed()) {
 			terminalComposite.getTerminalControl().getDisplay().asyncExec(new Runnable() {
-				@Override
 				public void run() {
 					getSite().getPage().closeEditor((IEditorPart) getSite().getPart(), false);
 				}
@@ -215,7 +214,6 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, ITermi
 	/* (non-Javadoc)
 	 * @see com.aptana.terminal.internal.IProcessListener#processCompleted()
 	 */
-	@Override
 	public void processCompleted() {
 		IPreferenceStore prefs = Activator.getDefault().getPreferenceStore();
 		boolean closeViewOnExit = prefs.getBoolean(IPreferenceConstants.CLOSE_VIEW_ON_EXIT);
@@ -258,7 +256,6 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, ITermi
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart2#promptToSaveOnClose()
 	 */
-	@Override
 	public int promptToSaveOnClose() {
 		return terminalComposite.canCloseTerminal() ? ISaveablePart2.YES : ISaveablePart2.CANCEL;
 	}
@@ -275,17 +272,14 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, ITermi
 	/* (non-Javadoc)
 	 * @see org.eclipse.tm.internal.terminal.control.ITerminalListener#setState(org.eclipse.tm.internal.terminal.provisional.api.TerminalState)
 	 */
-	@Override
 	public void setState(TerminalState state) {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tm.internal.terminal.control.ITerminalListener#setTerminalTitle(java.lang.String)
 	 */
-	@Override
 	public void setTerminalTitle(final String title) {
 		Utils.runInDisplayThread(new Runnable() {
-			@Override
 			public void run() {
 				setPartName(title);
 			}

@@ -17,7 +17,7 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.parsing,
  beaver;bundle-version="1.0.0",
  com.aptana.theme
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.js,

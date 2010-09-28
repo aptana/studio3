@@ -40,7 +40,6 @@ public class HerokuLoginWizardPage extends WizardPage implements ILoginValidator
 		super(NAME, Messages.HerokuLoginWizardPage_Title, Activator.getImageDescriptor(HEROKU_ICON));
 	}
 
-	@Override
 	public void createControl(Composite parent)
 	{
 		Composite composite = new Composite(parent, SWT.NULL);
@@ -66,7 +65,6 @@ public class HerokuLoginWizardPage extends WizardPage implements ILoginValidator
 		userId.addModifyListener(new ModifyListener()
 		{
 
-			@Override
 			public void modifyText(ModifyEvent e)
 			{
 				getContainer().updateButtons();
@@ -81,7 +79,6 @@ public class HerokuLoginWizardPage extends WizardPage implements ILoginValidator
 		password.addModifyListener(new ModifyListener()
 		{
 
-			@Override
 			public void modifyText(ModifyEvent e)
 			{
 				getContainer().updateButtons();
@@ -125,7 +122,6 @@ public class HerokuLoginWizardPage extends WizardPage implements ILoginValidator
 		((IPageChangeProvider) container).addPageChangedListener(new IPageChangedListener()
 		{
 
-			@Override
 			public void pageChanged(PageChangedEvent event)
 			{
 				Object selected = event.getSelectedPage();

@@ -47,7 +47,6 @@ public class JSFunctionCallDetector implements IWordDetector
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.rules.IWordDetector#isWordPart(char)
 	 */
-	@Override
 	public boolean isWordPart(char c)
 	{
 		return Character.isLetter(c) || c == '_' || c == '$' || Character.isDigit(c);
@@ -57,7 +56,6 @@ public class JSFunctionCallDetector implements IWordDetector
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.rules.IWordDetector#isWordStart(char)
 	 */
-	@Override
 	public boolean isWordStart(char c)
 	{
 		return c == '.';

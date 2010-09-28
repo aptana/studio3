@@ -150,7 +150,6 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 * org.eclipse.jface.text.contentassist.IContentAssistProcessor#computeCompletionProposals(org.eclipse.jface.text
 	 * .ITextViewer, int)
 	 */
-	@Override
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset)
 	{
 		List<ICompletionProposal> completionProposals = new ArrayList<ICompletionProposal>();
@@ -170,7 +169,6 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 * com.aptana.editor.common.ICommonContentAssistProcessor#computeCompletionProposals(org.eclipse.jface.text.ITextViewer
 	 * , int, char, boolean)
 	 */
-	@Override
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
 			boolean autoActivated)
 	{
@@ -392,10 +390,8 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 * org.eclipse.jface.text.contentassist.IContentAssistProcessor#computeContextInformation(org.eclipse.jface.text
 	 * .ITextViewer, int)
 	 */
-	@Override
 	public IContextInformation[] computeContextInformation(ITextViewer viewer, int offset)
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -413,17 +409,17 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getCompletionProposalAutoActivationCharacters()
 	 */
-	@Override
 	public char[] getCompletionProposalAutoActivationCharacters()
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getContextInformationAutoActivationCharacters()
+	 */
 	public char[] getContextInformationAutoActivationCharacters()
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -431,7 +427,6 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getContextInformationValidator()
 	 */
-	@Override
 	public IContextInformationValidator getContextInformationValidator()
 	{
 		// TODO Auto-generated method stub
@@ -442,10 +437,8 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getErrorMessage()
 	 */
-	@Override
 	public String getErrorMessage()
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 

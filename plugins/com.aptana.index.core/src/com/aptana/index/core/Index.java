@@ -339,7 +339,6 @@ public class Index implements IReadWriteMonitor
 	 * (non-Javadoc)
 	 * @see com.aptana.index.core.IReadWriteMonitor#enterRead()
 	 */
-	@Override
 	public void enterRead()
 	{
 		if (this.monitor != null)
@@ -352,7 +351,6 @@ public class Index implements IReadWriteMonitor
 	 * (non-Javadoc)
 	 * @see com.aptana.index.core.IReadWriteMonitor#enterWrite()
 	 */
-	@Override
 	public void enterWrite()
 	{
 		if (this.monitor != null)
@@ -365,7 +363,6 @@ public class Index implements IReadWriteMonitor
 	 * (non-Javadoc)
 	 * @see com.aptana.index.core.IReadWriteMonitor#exitRead()
 	 */
-	@Override
 	public void exitRead()
 	{
 		if (this.monitor != null)
@@ -378,7 +375,6 @@ public class Index implements IReadWriteMonitor
 	 * (non-Javadoc)
 	 * @see com.aptana.index.core.IReadWriteMonitor#exitReadEnterWrite()
 	 */
-	@Override
 	public boolean exitReadEnterWrite()
 	{
 		boolean result = false;
@@ -395,7 +391,6 @@ public class Index implements IReadWriteMonitor
 	 * (non-Javadoc)
 	 * @see com.aptana.index.core.IReadWriteMonitor#exitWrite()
 	 */
-	@Override
 	public void exitWrite()
 	{
 		if (this.monitor != null)
@@ -408,7 +403,6 @@ public class Index implements IReadWriteMonitor
 	 * (non-Javadoc)
 	 * @see com.aptana.index.core.IReadWriteMonitor#exitWriteEnterRead()
 	 */
-	@Override
 	public void exitWriteEnterRead()
 	{
 		if (this.monitor != null)

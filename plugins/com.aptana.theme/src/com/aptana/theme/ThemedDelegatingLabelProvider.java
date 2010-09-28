@@ -65,19 +65,16 @@ public class ThemedDelegatingLabelProvider implements ILabelProvider, IColorProv
 		disabled = true;
 	}
 
-	@Override
 	public Image getImage(Object element)
 	{
 		return wrapped.getImage(element);
 	}
 
-	@Override
 	public String getText(Object element)
 	{
 		return wrapped.getText(element);
 	}
 
-	@Override
 	public Color getForeground(Object element)
 	{
 		if (disabled)
@@ -96,13 +93,11 @@ public class ThemedDelegatingLabelProvider implements ILabelProvider, IColorProv
 		return ThemePlugin.getDefault().getThemeManager();
 	}
 
-	@Override
 	public Color getBackground(Object element)
 	{
 		return null;
 	}
 
-	@Override
 	public Font getFont(Object element)
 	{
 		if (disabled)
@@ -121,25 +116,21 @@ public class ThemedDelegatingLabelProvider implements ILabelProvider, IColorProv
 		return font;
 	}
 
-	@Override
 	public void addListener(ILabelProviderListener listener)
 	{
 		wrapped.addListener(listener);
 	}
 
-	@Override
 	public void dispose()
 	{
 		wrapped.dispose();
 	}
 
-	@Override
 	public boolean isLabelProperty(Object element, String property)
 	{
 		return wrapped.isLabelProperty(element, property);
 	}
 
-	@Override
 	public void removeListener(ILabelProviderListener listener)
 	{
 		wrapped.removeListener(listener);

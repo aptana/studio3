@@ -64,7 +64,6 @@ public class OpenTagCloser implements VerifyKeyListener
 		return pairMatcher;
 	}
 
-	@Override
 	public void verifyKey(VerifyEvent event)
 	{
 		// early pruning to slow down normal typing as little as possible

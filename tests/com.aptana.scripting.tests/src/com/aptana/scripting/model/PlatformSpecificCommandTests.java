@@ -46,7 +46,6 @@ public class PlatformSpecificCommandTests extends BundleTestBase
 	{
 		CommandElement[] commands = BundleTestBase.getBundleManagerInstance().getCommands(new IModelFilter()
 		{
-			@Override
 			public boolean include(AbstractElement element)
 			{
 				boolean result = false;

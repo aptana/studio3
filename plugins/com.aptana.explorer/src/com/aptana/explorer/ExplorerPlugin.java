@@ -72,13 +72,11 @@ public class ExplorerPlugin extends AbstractUIPlugin
 	private final IPerspectiveListener fPerspectiveListener = new IPerspectiveListener()
 	{
 
-		@Override
 		public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective)
 		{
 			setCommandState(findView(page, IExplorerUIConstants.VIEW_ID) != null);
 		}
 
-		@Override
 		public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, String changeId)
 		{
 			if (changeId.equals(IWorkbenchPage.CHANGE_VIEW_HIDE))

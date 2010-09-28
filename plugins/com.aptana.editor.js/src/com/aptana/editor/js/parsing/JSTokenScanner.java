@@ -108,7 +108,6 @@ public class JSTokenScanner extends RuleBasedScanner implements IJSTokenScanner
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.IJSTokenScanner#hasDivisionStart()
 	 */
-	@Override
 	public boolean hasDivisionStart()
 	{
 		if (fToken == null || fToken.getData() == null)

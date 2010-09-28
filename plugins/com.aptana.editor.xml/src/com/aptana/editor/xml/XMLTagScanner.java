@@ -72,13 +72,11 @@ public class XMLTagScanner extends RuleBasedScanner
 		WordRule wordRule = new ExtendedWordRule(new IWordDetector()
 		{
 
-			@Override
 			public boolean isWordPart(char c)
 			{
 				return Character.isLetter(c) || c == '-' || c == ':';
 			}
 
-			@Override
 			public boolean isWordStart(char c)
 			{
 				return Character.isLetter(c);

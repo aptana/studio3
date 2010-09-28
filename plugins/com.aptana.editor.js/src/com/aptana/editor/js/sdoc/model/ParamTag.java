@@ -36,6 +36,7 @@ package com.aptana.editor.js.sdoc.model;
 
 import java.util.List;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.parsing.io.SourcePrinter;
 
 public class ParamTag extends TagWithTypes
@@ -119,7 +120,7 @@ public class ParamTag extends TagWithTypes
 
 		String text = this.getText();
 
-		if (text != null && text.isEmpty() == false)
+		if (text != null && StringUtil.isEmpty(text) == false)
 		{
 			writer.println();
 			writer.printIndent().print("    ").print(text); //$NON-NLS-1$

@@ -77,7 +77,6 @@ public class URLHyperlinkDetector implements IHyperlinkDetector
 			+ "      [.!,?]+ [^.!,?;\"\\'<>()\\[\\]\\{\\}\\s\\x7F-\\xFF]+\n" + "    )*\n" + "  )?",
 			Pattern.CASE_INSENSITIVE | Pattern.COMMENTS);
 
-	@Override
 	public IHyperlink[] detectHyperlinks(String contents)
 	{
 		List<IHyperlink> list = new ArrayList<IHyperlink>();
