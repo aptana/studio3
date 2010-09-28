@@ -56,12 +56,10 @@ public class NewSiteAction implements IObjectActionDelegate, IViewActionDelegate
     public NewSiteAction() {
     }
 
-    @Override
     public void setActivePart(IAction action, IWorkbenchPart targetPart) {
         fActivePart = targetPart;
     }
 
-    @Override
     public void run(IAction action) {
         if (fSelection.isEmpty() || !(fSelection instanceof IStructuredSelection)) {
             return;
@@ -77,12 +75,10 @@ public class NewSiteAction implements IObjectActionDelegate, IViewActionDelegate
         dlg.open();
     }
 
-    @Override
     public void selectionChanged(IAction action, ISelection selection) {
         setSelection(selection);
     }
 
-	@Override
 	public void init(IViewPart view) {
 		fActivePart = view;
 	}

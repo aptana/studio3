@@ -179,18 +179,15 @@ public abstract class SyncingErrorTests extends TestCase
 		
 		Synchronizer syncManager = new Synchronizer(true, timeTolerance, includeCloakedFiles);
 		syncManager.setLogger(new ILogger() {
-			
-			@Override
+
 			public void logWarning(String message, Throwable th) {
 				System.out.println(message);
 			}
-			
-			@Override
+
 			public void logInfo(String message, Throwable th) {
 				System.out.println(message);
 			}
-			
-			@Override
+
 			public void logError(String message, Throwable th) {
 				System.out.println(message);
 			}

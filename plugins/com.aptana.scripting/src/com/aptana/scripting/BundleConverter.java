@@ -271,7 +271,6 @@ public class BundleConverter
 		File[] files = prefsDir.listFiles(new FilenameFilter()
 		{
 
-			@Override
 			public boolean accept(File dir, String name)
 			{
 				return name.endsWith(".plist");
@@ -319,7 +318,6 @@ public class BundleConverter
 		File[] files = syntaxesDir.listFiles(new FilenameFilter()
 		{
 
-			@Override
 			public boolean accept(File dir, String name)
 			{
 				return name.endsWith(".tmLanguage") || name.endsWith(".plist");
@@ -361,7 +359,6 @@ public class BundleConverter
 		File[] files = syntaxesDir.listFiles(new FilenameFilter()
 		{
 
-			@Override
 			public boolean accept(File dir, String name)
 			{
 				return name.endsWith(".tmLanguage") || name.endsWith(".plist");
