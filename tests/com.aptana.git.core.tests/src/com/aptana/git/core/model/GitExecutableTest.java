@@ -6,9 +6,15 @@ import java.net.URL;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.internal.filesystem.local.LocalFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 
@@ -46,8 +52,22 @@ public class GitExecutableTest extends TestCase
 	{
 		URL url = FileLocator.find(GitPlugin.getDefault().getBundle(), path, null);
 		url = FileLocator.toFileURL(url);
-		File file = new File(url.getPath());
-		file.setExecutable(true, false);
+		if (!Platform.getOS().equals(Platform.OS_WIN32))
+		{
+			try
+			{
+				IFileStore fileStore = EFS.getStore(url.toURI());
+				IFileInfo fileInfo = fileStore.fetchInfo();
+				if (!fileInfo.getAttribute(EFS.ATTRIBUTE_EXECUTABLE))
+				{
+					fileInfo.setAttribute(EFS.ATTRIBUTE_EXECUTABLE, true);
+					fileStore.putInfo(fileInfo, EFS.SET_ATTRIBUTES, null);
+				}
+			}
+			catch (Exception e)
+			{
+			}
+		}
 		return url;
 	}
 
