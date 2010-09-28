@@ -85,12 +85,9 @@ public class CloneJob extends Job
 			}
 			ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
 			ILaunchListener listener = new ILaunchListener() {
-				
-				@Override
 				public void launchRemoved(ILaunch launch) {
 				}
 				
-				@Override
 				public void launchChanged(ILaunch launch) {
 					// TODO Make sure this is our launch!
 					IProcess[] processes = launch.getProcesses();
@@ -100,14 +97,12 @@ public class CloneJob extends Job
 						// TODO Sniff the process output for percentages?
 						process.getStreamsProxy().getOutputStreamMonitor().addListener(new IStreamListener() {
 							
-							@Override
 							public void streamAppended(String text, IStreamMonitor monitor) {
 								System.out.println(text);
 							}
 						});
 						process.getStreamsProxy().getErrorStreamMonitor().addListener(new IStreamListener() {
 							
-							@Override
 							public void streamAppended(String text, IStreamMonitor monitor) {
 								System.err.println(text);
 								// TODO Look for "Checking out files: \d+% (\d+/\d+) and report progress accordingly
@@ -116,7 +111,6 @@ public class CloneJob extends Job
 					}
 				}
 				
-				@Override
 				public void launchAdded(ILaunch launch) {
 					// TODO Auto-generated method stub
 				}

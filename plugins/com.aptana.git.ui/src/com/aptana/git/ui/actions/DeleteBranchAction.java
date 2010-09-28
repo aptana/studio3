@@ -98,8 +98,6 @@ public class DeleteBranchAction extends MenuAction
 					// Failed, show reason why to user and ask if they want to force with -D
 					Display.getDefault().syncExec(new Runnable()
 					{
-
-						@Override
 						public void run()
 						{
 							result[0] = MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),

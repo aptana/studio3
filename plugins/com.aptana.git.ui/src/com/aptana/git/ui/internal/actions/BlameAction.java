@@ -43,7 +43,6 @@ public class BlameAction extends GitAction implements IEditorActionDelegate
 
 	private IEditorPart fEditor;
 
-	@Override
 	public void setActiveEditor(IAction action, IEditorPart targetEditor)
 	{
 		this.fEditor = targetEditor;
