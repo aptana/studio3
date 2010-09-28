@@ -74,6 +74,7 @@
     <child-element name="browsers" />
     <child-element name="description" />
     <child-element name="example" />
+    <child-element name="values" />
   </element>
     
   <element name="pseudo-classes">
@@ -82,6 +83,7 @@
   
   <element name="pseudo-element" onEnter="enterPseudoElement" onExit="exitPseudoElement">
     <attribute name="name" />
+    <attribute name="allow-pseudo-class-syntax" usage="optional" />
     <child-element name="availability" />
     <child-element name="browsers" />
     <child-element name="description" />

@@ -40,6 +40,7 @@ import java.util.List;
 public class PseudoClassElement extends AbstractCSSMetadataElement
 {
 	private List<SpecificationElement> _specifications = new LinkedList<SpecificationElement>();
+	private List<ValueElement> _values = new LinkedList<ValueElement>();
 
 	/**
 	 * PseudoClassElement
@@ -67,5 +68,25 @@ public class PseudoClassElement extends AbstractCSSMetadataElement
 	public List<SpecificationElement> getSpecifications()
 	{
 		return this._specifications;
+	}
+
+	/**
+	 * addValue
+	 * 
+	 * @param value
+	 */
+	public void addValue(ValueElement value)
+	{
+		this._values.add(value);
+	}
+
+	/**
+	 * getValues
+	 * 
+	 * @return
+	 */
+	public List<ValueElement> getValues()
+	{
+		return this._values;
 	}
 }

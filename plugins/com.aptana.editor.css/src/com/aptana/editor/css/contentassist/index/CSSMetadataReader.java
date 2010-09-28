@@ -189,6 +189,7 @@ public class CSSMetadataReader extends MetadataReader
 
 		// grab and set property values
 		pseudoElement.setName(attributes.getValue("name")); //$NON-NLS-1$
+		pseudoElement.setAllowPseudoClassSyntax(Boolean.valueOf(attributes.getValue("allow-pseudo-class-syntax"))); //$NON-NLS-1$
 
 		// set current item
 		this._currentPseudoElement = pseudoElement;
@@ -458,10 +459,16 @@ public class CSSMetadataReader extends MetadataReader
 	 */
 	public void exitValue(String ns, String name, String qname)
 	{
-		// add class to class list
-		this._currentProperty.addValue(this._currentValue);
+		if (this._currentProperty != null)
+		{
+			this._currentProperty.addValue(this._currentValue);
+		}
+		else if (this._currentPseudoClass != null)
+		{
+			this._currentPseudoClass.addValue(this._currentValue);
+		}
 
-		// clear current class
+		// clear current value
 		this._currentValue = null;
 	}
 

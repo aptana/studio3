@@ -27496,7 +27496,7 @@ foo:empty is not a valid representation for the following fragments:
 
 &lt;foo&gt;bar&lt;/foo&gt;
 &lt;foo&gt;&lt;bar&gt;bla&lt;/bar&gt;&lt;/foo&gt;
-&lt;foo&gt;this is not &lt;bar&gt;:empty&lt;/bar&gt;&lt;/foo&gt;&lt;/example&gt;
+&lt;foo&gt;this is not &lt;bar&gt;:empty&lt;/bar&gt;&lt;/foo&gt;</example>
     </pseudo-class>
     <pseudo-class name="enabled">
       <browsers>
@@ -27570,11 +27570,19 @@ A future version of this specification may introduce an :indeterminate pseudo-cl
       <description>The pseudo-class ':lang(C)' matches if the element is in language C. Whether there is a match is based solely on the identifier C being either equal to, or a hyphen-separated substring of, the element's language value, in the same way as if performed by the '|=' operator. The matching of C against the element's language value is performed case-insensitively. The identifier C does not have to be a valid language name.</description>
       <example>html:lang(fr-ca) { quotes: '\u201C' '\u201D' }</example>
       <values>
-        <value>*</value>
-        <value>en</value>
-        <value>fr</value>
-        <value>fr-ca</value>
-      </value>
+        <value name="*" description="See &lt;a href=&quot;http://www.iana.org/assignments/language-subtag-registry&quot;&gt;http://www.iana.org/assignments/language-subtag-registry&lt;/a&gt;" />
+        <value name="cmn" description="Mandarin Chinese" />
+        <value name="de" description="German" />
+        <value name="en" description="English" />
+        <value name="es" description="Spanish" />
+        <value name="fr" description="French" />
+        <value name="fr-be" description="Belgian French" />
+        <value name="fr-ca" description="Canadian French" />
+        <value name="it" description="Italian" />
+        <value name="ja" description="Japanese" />
+        <value name="zh-Hans" description="Simplified Chinese" />
+        <value name="zh-Hant" description="Tranditional Chinese" />
+      </values>
     </pseudo-class>
     <pseudo-class name="last-child">
       <browsers>
@@ -27626,7 +27634,7 @@ The following group of selectors represents all HTML elements except links.
 
 html|*:not(:link):not(:visited)</example>
       <values>
-        <value>*</value>
+        <value name="*" description="A simple selector" />
       </values>
     </pseudo-class>
     <pseudo-class name="nth-child">
@@ -27657,9 +27665,9 @@ p:nth-child(4n+2) { color: green; }
 p:nth-child(4n+3) { color: maroon; }
 p:nth-child(4n+4) { color: purple; }</example>
       <values>
-        <value>*</value>
-        <value>odd</value>
-        <value>even</value>
+        <value name="*" description="[ ['-'|'+']? INTEGER? {N} [ S* ['-'|'+'] S* INTEGER ]? | ['-'|'+']? INTEGER | {O}{D}{D} | {E}{V}{E}{N} ]" />
+        <value name="odd" description="Has the same signification as 2n+1." />
+        <value name="even" description="Has the same signification as 2n." />
       </values>
     </pseudo-class>
     <pseudo-class name="nth-last-child">
@@ -27675,9 +27683,9 @@ p:nth-child(4n+4) { color: purple; }</example>
 foo:nth-last-child(odd)    /* represents all odd foo elements in their parent element,
                               counting from the last one */</example>
       <values>
-        <value>*</value>
-        <value>odd</value>
-        <value>even</value>
+        <value name="*" description="[ ['-'|'+']? INTEGER? {N} [ S* ['-'|'+'] S* INTEGER ]? | ['-'|'+']? INTEGER | {O}{D}{D} | {E}{V}{E}{N} ]" />
+        <value name="odd" description="Has the same signification as 2n+1." />
+        <value name="even" description="Has the same signification as 2n." />
       </values>
     </pseudo-class>
     <pseudo-class name="nth-last-of-type">
@@ -27690,9 +27698,9 @@ foo:nth-last-child(odd)    /* represents all odd foo elements in their parent el
       <description>The :nth-last-of-type(an+b) pseudo-class notation represents an element that has an+b-1 siblings with the same expanded element name &lt;b&gt;after&lt;/b&gt; it in the document tree, for any zero or positive integer value of n, and has a parent element. See :nth-child() pseudo-class for the syntax of its argument. It also accepts the ‘even’ and ‘odd’ values.</description>
       <example>body > h2:nth-of-type(n+2):nth-last-of-type(n+2)</example>
       <values>
-        <value>*</value>
-        <value>odd</value>
-        <value>even</value>
+        <value name="*" description="[ ['-'|'+']? INTEGER? {N} [ S* ['-'|'+'] S* INTEGER ]? | ['-'|'+']? INTEGER | {O}{D}{D} | {E}{V}{E}{N} ]" />
+        <value name="odd" description="Has the same signification as 2n+1." />
+        <value name="even" description="Has the same signification as 2n." />
       </values>
     </pseudo-class>
     <pseudo-class name="nth-of-type">
@@ -27706,9 +27714,9 @@ foo:nth-last-child(odd)    /* represents all odd foo elements in their parent el
       <example>img:nth-of-type(2n+1) { float: right; }
 img:nth-of-type(2n) { float: left; }</example>
       <values>
-        <value>*</value>
-        <value>odd</value>
-        <value>even</value>
+        <value name="*" description="[ ['-'|'+']? INTEGER? {N} [ S* ['-'|'+'] S* INTEGER ]? | ['-'|'+']? INTEGER | {O}{D}{D} | {E}{V}{E}{N} ]" />
+        <value name="odd" description="Has the same signification as 2n+1." />
+        <value name="even" description="Has the same signification as 2n." />
       </values>
     </pseudo-class>
     <pseudo-class name="only-child">
@@ -27763,7 +27771,7 @@ img:nth-of-type(2n) { float: left; }</example>
     </pseudo-class>
   </pseudo-classes>
   <pseudo-elements>
-    <pseudo-element name="after">
+    <pseudo-element name="after" allow-pseudo-class-syntax="true">
       <browsers>
         <!-- TODO Unknown -->
       </browsers>
@@ -27773,7 +27781,7 @@ img:nth-of-type(2n) { float: left; }</example>
       <description>The ':before' and ':after' pseudo-elements can be used to insert generated content before or after an element's content.</description>
       <example>p.special:after {content: "Special! "}</example>
     </pseudo-element>
-    <pseudo-element name="before">
+    <pseudo-element name="before" allow-pseudo-class-syntax="true">
       <browsers>
         <!-- TODO Unknown -->
       </browsers>
@@ -27783,7 +27791,7 @@ img:nth-of-type(2n) { float: left; }</example>
       <description>The ':before' and ':after' pseudo-elements can be used to insert generated content before or after an element's content.</description>
       <example>h1:before {content: counter(chapno, upper-roman) ". "}</example>
     </pseudo-element>
-    <pseudo-element name="first-letter">
+    <pseudo-element name="first-letter" allow-pseudo-class-syntax="true">
       <browsers>
         <!-- TODO Unknown -->
       </browsers>
@@ -27793,7 +27801,7 @@ img:nth-of-type(2n) { float: left; }</example>
       <description>The :first-letter pseudo-element must select the first letter of the first line of a block, if it is not preceded by any other content (such as images or inline tables) on its line. The :first-letter pseudo-element may be used for "initial caps" and "drop caps", which are common typographical effects. This type of initial letter is similar to an inline-level element if its 'float' property is 'none', otherwise it is similar to a floated element.</description>
       <example>p:first-letter { font-size: 3em; font-weight: normal }</example>
     </pseudo-element>
-    <pseudo-element name="first-line">
+    <pseudo-element name="first-line" allow-pseudo-class-syntax="true">
       <browsers>
         <!-- TODO Unknown -->
       </browsers>
