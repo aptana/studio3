@@ -1,6 +1,6 @@
 package com.aptana.git.ui.internal.actions;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -83,7 +83,7 @@ public class ShowInHistoryHandler extends AbstractHandler
 			return fei.getFile();
 		}
 
-		List<Object> selectedFiles = (List<Object>) evContext.getDefaultVariable();
+		Collection<Object> selectedFiles = (Collection<Object>) evContext.getDefaultVariable();
 		for (Object selected : selectedFiles)
 		{
 			if (selected instanceof IResource)
