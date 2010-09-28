@@ -36,7 +36,7 @@ package com.aptana.editor.html.contentassist.index;
 
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.ArrayDeque;
+import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -208,7 +208,7 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 	{
 		if (parent != null)
 		{
-			Queue<IParseNode> queue = new ArrayDeque<IParseNode>();
+			Queue<IParseNode> queue = new LinkedList<IParseNode>();
 
 			// prime queue
 			queue.offer(parent);

@@ -6,9 +6,9 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
@@ -43,7 +43,7 @@ public class JSParserPerformanceTest extends TestCase
 
 				if (file.isDirectory())
 				{
-					final Queue<File> directories = new ArrayDeque<File>();
+					final Queue<File> directories = new LinkedList<File>();
 
 					directories.offer(file);
 
