@@ -68,6 +68,8 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	protected static final HashSet<String> VOID_ELEMENTS = new HashSet<String>(Arrays.asList("area", "base", "br",
 			"col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track",
 			"wbr"));
+	@SuppressWarnings("nls")
+	protected static final HashSet<String> OPTIONAL_ENDING_TAGS = new HashSet<String>(Arrays.asList(""));
 	private static final String INLINE_TAG_CLOSING = "/>"; //$NON-NLS-1$
 
 	private FormatterDocument document;
@@ -82,12 +84,14 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	 */
 	public IFormatterContainerNode build(IParseNode parseResult, FormatterDocument document)
 	{
+		long start = System.currentTimeMillis();
 		this.document = document;
 		final IFormatterContainerNode rootNode = new FormatterBlockNode(document);
 		start(rootNode);
 		IParseNode[] children = parseResult.getChildren();
 		addNodes(children);
 		checkedPop(rootNode, document.getLength());
+		System.out.println((System.currentTimeMillis() - start));
 		return rootNode;
 	}
 
@@ -168,14 +172,14 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		FormatterBlockWithBeginEndNode formatterNode = new FormatterDefaultElementNode(document, type);
 		int startingOffset = node.getStartingOffset();
 		int endingOffset = node.getEndingOffset();
-		int tagCloser = findRightChar('>', startingOffset + type.length() + 1);
+		int tagCloser = findRightChar('>', startingOffset + type.length() + 1, true);
 		formatterNode.setBegin(createTextNode(document, startingOffset, tagCloser + 1));
 		push(formatterNode);
 
 		// Recursively call this method till we are done with all the children under this node.
 		addNodes(node.getChildren());
 
-		int end = endingOffset - type.length();
+		int end;
 		if (node.hasChildren())
 		{
 			IParseNode firstChild = node.getFirstChild();
@@ -185,10 +189,11 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		}
 		else
 		{
-			end = findLeftChar('<', end);
+			end = findLeftChar('<', endingOffset - type.length(), true);
 			checkedPop(formatterNode, end);
 		}
-		formatterNode.setEnd(createTextNode(document, end, endingOffset + 1));
+		int tagEnd = findRightChar('>', end, true);
+		formatterNode.setEnd(createTextNode(document, end, tagEnd + 1));
 		return formatterNode;
 	}
 
@@ -199,14 +204,25 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	 *            Start position
 	 * @return The char position. If not found or out of bounds, we return the initial position.
 	 */
-	private int findLeftChar(char c, int position)
+	private int findLeftChar(char c, int position, boolean skipComments)
 	{
 		if (position > -1 && position <= document.getLength())
 		{
+			CommentScanner scanner = skipComments ? new CommentScanner(false) : null;
 			for (int i = position; i > 0; i--)
 			{
-				if (document.charAt(i) == c)
+				char nextChar = document.charAt(i);
+				if (skipComments)
 				{
+					scanner.feed(nextChar);
+				}
+				if (nextChar == c)
+				{
+					// Skip any comments openers
+					if (skipComments && scanner.isInComment())
+					{
+						continue;
+					}
 					position = i;
 					break;
 				}
@@ -222,19 +238,111 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	 *            Start position
 	 * @return The char position. If not found or out of bounds, we return the initial position.
 	 */
-	private int findRightChar(char c, int position)
+	private int findRightChar(char c, int position, boolean skipComments)
 	{
 		if (position > -1 && position <= document.getLength())
 		{
+			CommentScanner scanner = skipComments ? new CommentScanner(true) : null;
 			for (int i = position; i < document.getLength(); i++)
 			{
-				if (document.charAt(i) == c)
+				char nextChar = document.charAt(i);
+				if (skipComments)
 				{
+					scanner.feed(nextChar);
+				}
+				if (nextChar == c)
+				{
+					// Skip any comments openers
+					if (skipComments && scanner.isInComment())
+					{
+						continue;
+					}
 					position = i;
 					break;
 				}
 			}
 		}
 		return position;
+	}
+
+	/**
+	 * A simple scanner that is fed with chars and keeps track whether we are in an HTML comment or not. A comment can
+	 * appear in two different forms: <br>
+	 * 
+	 * <pre>
+	 * 1. <! > 
+	 * 2. <!-- -->
+	 * </pre>
+	 */
+	private class CommentScanner
+	{
+		private String startComment;
+		private String endComment;
+		private StringBuilder buffer;
+		private final boolean leftToRight;
+
+		/**
+		 * Constructs a new comments scanner with the direction of the scanning.
+		 * 
+		 * @param leftToRight
+		 */
+		public CommentScanner(boolean leftToRight)
+		{
+			this.leftToRight = leftToRight;
+			buffer = new StringBuilder();
+			if (leftToRight)
+			{
+				startComment = "<!"; //$NON-NLS-1$
+				endComment = ">"; //$NON-NLS-1$
+			}
+			else
+			{
+				// The buffer will hold those characters in a reverse order, so we have to make sure the string are
+				// revered as well
+				startComment = ">"; //$NON-NLS-1$
+				endComment = "!<"; //$NON-NLS-1$
+			}
+		}
+
+		/**
+		 * @param nextChar
+		 */
+		public void feed(char nextChar)
+		{
+			buffer.append(nextChar);
+		}
+
+		/**
+		 * @return if we are currently in a comment
+		 */
+		public boolean isInComment()
+		{
+			String string = buffer.toString();
+			String hyphens = "--"; //$NON-NLS-1$
+			boolean hasHyphens = true;
+			String startWithHyphens = (leftToRight) ? startComment + hyphens : hyphens + startComment;
+			int startIndex = string.lastIndexOf(startWithHyphens);
+			if (startIndex < 0)
+			{
+				startIndex = string.lastIndexOf(startComment);
+				hasHyphens = false;
+			}
+			if (startIndex < 0)
+			{
+				return false;
+			}
+			// else, we check where is the matching end tag.
+			String ending = endComment;
+			if (hasHyphens)
+			{
+				ending = (leftToRight) ? hyphens + endComment : endComment + hyphens;
+			}
+			int endIndex = string.lastIndexOf(ending);
+			if (endIndex > 0 && startIndex > endIndex)
+			{
+				return true;
+			}
+			return endIndex < 0 || endIndex == string.length() - ending.length();
+		}
 	}
 }
