@@ -291,7 +291,6 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 				{
 
-					@Override
 					public void run()
 					{
 						treeViewer.add(getOutlineItem((IParseNode) parent), finalElements);
@@ -315,7 +314,6 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 				{
 
-					@Override
 					public void run()
 					{
 						treeViewer.remove(placeholder);
