@@ -37,10 +37,6 @@ package com.aptana.scripting;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-
 import org.eclipse.core.runtime.Platform;
 
 import com.aptana.core.util.IOUtil;
@@ -79,20 +75,12 @@ public class FullnameEnvContextContributor implements ContextContributor, Enviro
 		// If we're on Mac, grab the full user name via applescript and stuff it in the TM_FULLNAME env var
 		if (Platform.getOS().equals(Platform.OS_MACOSX))
 		{
-			try
+			String appleScript = "do shell script \"echo \" & the long user name of (system info)"; //$NON-NLS-1$
+			String output = ProcessUtil.outputForCommand("osascript", null, "-e", appleScript); //$NON-NLS-1$ //$NON-NLS-2$
+			if (output != null)
 			{
-				String appleScript = "set myName to the long user name of (system info)\nreturn myName"; //$NON-NLS-1$
-				ScriptEngineManager mgr = new ScriptEngineManager();
-				ScriptEngine engine = mgr.getEngineByName("AppleScript"); //$NON-NLS-1$
-				Object ret = engine.eval(appleScript);
-				if (ret != null)
-				{
-					map.put(TM_FULLNAME, ret.toString());
-				}
-			}
-			catch (ScriptException e)
-			{
-				Activator.logError(e.getMessage(), e);
+				String[] lines = output.split("\r|\n|\r\n"); //$NON-NLS-1$
+				map.put(TM_FULLNAME, lines[lines.length - 1]);
 			}
 		}
 		// Seems like %USERNAME% typically holds the full name of the user now on Windows
@@ -110,15 +98,15 @@ public class FullnameEnvContextContributor implements ContextContributor, Enviro
 		{
 			if (username.trim().length() > 0)
 			{
-				try 
+				try
 				{
-					Process p = ProcessUtil.run("/usr/bin/getent", null, "passwd", username);
-					String read = IOUtil.read(p.getInputStream(), "UTF-8");
-					String raw = read.split(":")[4];
-					String fullname = raw.split(",")[0];
+					Process p = ProcessUtil.run("/usr/bin/getent", null, "passwd", username); //$NON-NLS-1$ //$NON-NLS-2$
+					String read = IOUtil.read(p.getInputStream(), "UTF-8"); //$NON-NLS-1$
+					String raw = read.split(":")[4]; //$NON-NLS-1$
+					String fullname = raw.split(",")[0]; //$NON-NLS-1$
 					map.put(TM_FULLNAME, fullname);
-				} 
-				catch (Throwable e) 
+				}
+				catch (Throwable e)
 				{
 					// ignore
 				}

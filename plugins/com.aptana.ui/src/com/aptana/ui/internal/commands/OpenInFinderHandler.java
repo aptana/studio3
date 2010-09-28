@@ -39,10 +39,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -55,7 +51,6 @@ import org.eclipse.ui.IURIEditorInput;
 
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessUtil;
-import com.aptana.ui.UIPlugin;
 
 public class OpenInFinderHandler extends AbstractHandler
 {
@@ -87,19 +82,19 @@ public class OpenInFinderHandler extends AbstractHandler
 				List<Object> selectedFiles = (List<Object>) evContext.getDefaultVariable();
 				for (Object selected : selectedFiles)
 				{
-				    IResource resource=null;
-				    if(selected instanceof IResource)
-				    {
-                        resource = (IResource) selected;
-				    }
-				    else if(selected instanceof IAdaptable)
-				    {
-				        resource = (IResource) ((IAdaptable)selected).getAdapter(IResource.class);
-				    }
-				    if(resource != null)
-				    {
-				        open(resource.getLocationURI());
-				    }
+					IResource resource = null;
+					if (selected instanceof IResource)
+					{
+						resource = (IResource) selected;
+					}
+					else if (selected instanceof IAdaptable)
+					{
+						resource = (IResource) ((IAdaptable) selected).getAdapter(IResource.class);
+					}
+					if (resource != null)
+					{
+						open(resource.getLocationURI());
+					}
 				}
 			}
 		}
@@ -160,18 +155,14 @@ public class OpenInFinderHandler extends AbstractHandler
 		{
 			subcommand = "reveal"; //$NON-NLS-1$
 		}
-		try
+		// FIXME This doesn't necessarily push the window on top!
+		String appleScript = "tell application \"Finder\" to " + subcommand + " (POSIX file \"" + path + "\")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		Map<Integer, String> result = ProcessUtil.runInBackground("osascript", null, "-e", appleScript); //$NON-NLS-1$ //$NON-NLS-2$
+		if (result != null && result.keySet().iterator().next() == 0)
 		{
-			String appleScript = "tell application \"Finder\" to " + subcommand + " (POSIX file \"" + path + "\")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			ScriptEngineManager mgr = new ScriptEngineManager();
-			ScriptEngine engine = mgr.getEngineByName("AppleScript"); //$NON-NLS-1$
-			engine.eval(appleScript);
 			return true;
 		}
-		catch (ScriptException e)
-		{
-			UIPlugin.logError(e.getMessage(), e);
-		}
+		// TODO Log output if failed?
 		return false;
 	}
 
