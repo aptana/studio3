@@ -463,32 +463,25 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		{
 			listener = new IQueryListener()
 			{
-
-				@Override
 				public void queryStarting(ISearchQuery query)
 				{
 
 				}
 
-				@Override
 				public void queryRemoved(ISearchQuery query)
 				{
 					hijackView(view, revertToDefaults);
 				}
 
-				@Override
 				public void queryFinished(ISearchQuery query)
 				{
 
 				}
 
-				@Override
 				public void queryAdded(ISearchQuery query)
 				{
 					PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 					{
-
-						@Override
 						public void run()
 						{
 							hijackView(view, revertToDefaults);
@@ -897,7 +890,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 	}
 
 	// IPreferenceChangeListener
-	@Override
 	public void preferenceChange(PreferenceChangeEvent event)
 	{
 		// If invaisive themes are on and we changed the theme, schedule. Also schedule if we toggled invasive theming.
@@ -955,7 +947,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 	}
 
 	// IPartListener
-	@Override
 	public void partOpened(IWorkbenchPart part)
 	{
 		if (part instanceof IEditorPart)
@@ -969,7 +960,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 					pageListener = new ISelectionChangedListener()
 					{
 
-						@Override
 						public void selectionChanged(SelectionChangedEvent event)
 						{
 							hijackOutline();
@@ -988,7 +978,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		hijackView(view, false);
 	}
 
-	@Override
 	public void partDeactivated(IWorkbenchPart part)
 	{
 		if (!(part instanceof IEditorPart))
@@ -997,7 +986,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		hijackOutline();
 	}
 
-	@Override
 	public void partClosed(IWorkbenchPart part)
 	{
 		if (part instanceof MultiPageEditorPart)
@@ -1019,13 +1007,11 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		}
 	}
 
-	@Override
 	public void partBroughtToTop(IWorkbenchPart part)
 	{
 		partActivated(part);
 	}
 
-	@Override
 	public void partActivated(final IWorkbenchPart part)
 	{
 		if (part instanceof IViewPart)
@@ -1036,8 +1022,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			{
 				Display.getCurrent().asyncExec(new Runnable()
 				{
-
-					@Override
 					public void run()
 					{
 						hijackView((IViewPart) part, false);
@@ -1061,8 +1045,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			{
 				Display.getCurrent().asyncExec(new Runnable()
 				{
-
-					@Override
 					public void run()
 					{
 						((IAptanaHistory) page).setTheme(false);
@@ -1105,7 +1087,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 	/**
 	 * Schedules itself to override Java/PDE views and editors' coloring only if invasive themes are enabled.
 	 */
-	@Override
 	public synchronized void earlyStartup()
 	{
 		if (ranEarlyStartup)
