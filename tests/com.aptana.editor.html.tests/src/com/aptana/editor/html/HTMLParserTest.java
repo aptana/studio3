@@ -99,6 +99,12 @@ public class HTMLParserTest extends TestCase
 		parseTest(source);
 	}
 
+	public void testComment() throws Exception
+	{
+		String source = "<html><head><!-- this is a comment --></head></html>\n";
+		parseTest(source);
+	}
+
 	protected void parseTest(String source) throws Exception
 	{
 		parseTest(source, source);
