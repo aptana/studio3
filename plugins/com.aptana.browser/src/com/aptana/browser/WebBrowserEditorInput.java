@@ -69,7 +69,7 @@ public class WebBrowserEditorInput implements IEditorInput {
 	 * @see org.eclipse.ui.IEditorInput#getName()
 	 */
 	public String getName() {
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
@@ -83,13 +83,13 @@ public class WebBrowserEditorInput implements IEditorInput {
 	 * @see org.eclipse.ui.IEditorInput#getToolTipText()
 	 */
 	public String getToolTipText() {
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		return null;
 	}
