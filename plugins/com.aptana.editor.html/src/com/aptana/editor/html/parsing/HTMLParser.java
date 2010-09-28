@@ -94,7 +94,6 @@ public class HTMLParser implements IParser
 		fTagScanner = new HTMLTagScanner();
 	}
 
-	@Override
 	public synchronized IParseNode parse(IParseState parseState) throws java.lang.Exception
 	{
 		fParseState = (HTMLParseState) parseState;
