@@ -80,7 +80,6 @@ public abstract class SearchToolbarControl extends ControlContribution implement
 	/* (non-Javadoc)
 	 * @see com.aptana.ui.widgets.SearchComposite.Client#search(java.lang.String, boolean, boolean)
 	 */
-	@Override
 	public abstract void search(String text, boolean isCaseSensitive, boolean isRegularExpression);
 
 }
