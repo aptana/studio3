@@ -126,6 +126,46 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
+	 * addPseudoClassArguments
+	 * 
+	 * @param pseudoClassName
+	 * @param proposals
+	 * @param offset
+	 */
+	protected void addPseudoClassArguments(String pseudoClassName, List<ICompletionProposal> proposals, int offset)
+	{
+		if (pseudoClassName == null)
+		{
+			return;
+		}
+		List<PseudoClassElement> classes = this._queryHelper.getPseudoClasses();
+		if (classes != null)
+		{
+			for (PseudoClassElement pseudoClass : classes)
+			{
+				if (!pseudoClass.getName().equals(pseudoClassName))
+				{
+					continue;
+				}
+				List<ValueElement> values = pseudoClass.getValues();
+				if (values != null)
+				{
+					for (ValueElement value : values)
+					{
+						// String description = CSSModelFormatter.getDescription(value);
+						String[] userAgents = pseudoClass.getUserAgentNames();
+						Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
+
+						proposals.add(createProposal(value.getName(), ELEMENT_ICON, value.getDescription(),
+								userAgentIcons, offset));
+					}
+				}
+				break;
+			}
+		}
+	}
+
+	/**
 	 * addPseudoClassProposals
 	 * 
 	 * @param proposals
@@ -362,6 +402,11 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 						this._replaceRange = this._currentLexeme = null;
 					}
 					break;
+				case RPAREN:
+					this._replaceRange = null;
+					this._currentLexeme = lexemeProvider
+							.getLexemeFromOffset(this._currentLexeme.getStartingOffset() - 1);
+					break;
 
 				default:
 					break;
@@ -391,6 +436,17 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 					{
 						this.addPseudoClassProposals(proposals, offset);
 					}
+					break;
+				case LPAREN:
+					// Back up one, grab identifier as the pseudo-class name
+					String pseudoClassName = null;
+					Lexeme<CSSTokenType> lex = lexemeProvider.getLexemeFromOffset(this._currentLexeme
+							.getStartingOffset() - 1);
+					if (lex.getType() == CSSTokenType.IDENTIFIER)
+					{
+						pseudoClassName = lex.getText();
+					}
+					this.addPseudoClassArguments(pseudoClassName, proposals, offset);
 					break;
 				default:
 					this.addAllElementProposals(proposals, offset);
