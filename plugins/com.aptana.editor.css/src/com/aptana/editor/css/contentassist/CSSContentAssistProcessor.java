@@ -64,6 +64,8 @@ import com.aptana.editor.css.CSSScopeScanner;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
+import com.aptana.editor.css.contentassist.model.PseudoClassElement;
+import com.aptana.editor.css.contentassist.model.PseudoElementElement;
 import com.aptana.editor.css.contentassist.model.ValueElement;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 import com.aptana.parsing.lexer.IRange;
@@ -121,6 +123,41 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				proposals.add(createProposal(element.getName(), ELEMENT_ICON, description, userAgentIcons, offset));
 			}
 		}
+	}
+	
+	/**
+	 * addPseudoClassProposals
+	 * 
+	 * @param proposals
+	 * @param offset
+	 */
+	protected void addPseudoClassProposals(List<ICompletionProposal> proposals, int offset)
+	{
+		List<PseudoClassElement> classes = this._queryHelper.getPseudoClasses();
+		if (classes != null)
+		{
+			for (PseudoClassElement pseudoClass : classes)
+			{
+				String description = CSSModelFormatter.getDescription(pseudoClass);
+				String[] userAgents = pseudoClass.getUserAgentNames();
+				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
+
+				proposals.add(createProposal(pseudoClass.getName(), ELEMENT_ICON, description, userAgentIcons, offset));
+			}
+		}
+		
+		List<PseudoElementElement> elements = this._queryHelper.getPseudoElements();
+		if (elements != null)
+		{
+			for (PseudoClassElement pseudoElement : elements)
+			{
+				String description = CSSModelFormatter.getDescription(pseudoElement);
+				String[] userAgents = pseudoElement.getUserAgentNames();
+				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
+
+				proposals.add(createProposal(pseudoElement.getName(), ELEMENT_ICON, description, userAgentIcons, offset));
+			}
+		}	
 	}
 
 	/**
@@ -274,7 +311,11 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 					int index = lexemeProvider.getLexemeCeilingIndex(offset);
 					this._replaceRange = this._currentLexeme = lexemeProvider.getLexeme(index + 1);
 					break;
-				
+					
+				case COLON:
+					this._replaceRange = null;
+					break;
+					
 				case LCURLY:
 				case RCURLY:
 					this._replaceRange = this._currentLexeme = null;
@@ -305,7 +346,9 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				case ID:
 					this.addIDs(proposals, offset);
 					break;
-	
+				case COLON:
+					this.addPseudoClassProposals(proposals, offset);
+					break;
 				default:
 					this.addAllElementProposals(proposals, offset);
 					break;
@@ -820,6 +863,21 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 					break LOOP;
 
 				case COLON:
+					result = LocationType.INSIDE_RULE;
+					// Pseudo-classes/elements
+					if (index >= 1)
+					{
+						Lexeme<CSSTokenType> previous = lexemeProvider.getLexeme(index - 1);
+						if (previous != null && (previous.getType() == CSSTokenType.RCURLY || previous.getType() == CSSTokenType.ELEMENT || previous.getType() == CSSTokenType.CLASS || previous.getType() == CSSTokenType.ID))
+						{
+							result = LocationType.OUTSIDE_RULE;
+						}
+					}
+					else
+					{
+						result = LocationType.OUTSIDE_RULE;
+					}
+					break LOOP;
 				case PROPERTY:
 				case VALUE:
 					result = LocationType.INSIDE_RULE;
