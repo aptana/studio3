@@ -61,13 +61,11 @@ public class FullnameEnvContextContributor implements ContextContributor, Enviro
 	 */
 	private Map<String, Map<String, String>> fgCache = new HashMap<String, Map<String, String>>(3);
 
-	@Override
 	public void modifyContext(CommandElement command, CommandContext context)
 	{
 		context.put(System.currentTimeMillis() + "_env", this); //$NON-NLS-1$
 	}
 
-	@Override
 	public Map<String, String> toEnvironment()
 	{
 		String username = System.getProperty("user.name"); //$NON-NLS-1$

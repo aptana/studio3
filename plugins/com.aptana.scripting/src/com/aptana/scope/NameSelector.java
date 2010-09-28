@@ -48,8 +48,7 @@ public class NameSelector implements ISelectorNode
 	{
 		this._name = name;
 	}
-	
-	@Override
+
 	public int matchFragments()
 	{
 		return 1;
@@ -95,8 +94,7 @@ public class NameSelector implements ISelectorNode
 	{
 		return this._name;
 	}
-	
-	@Override
+
 	public int matchLength()
 	{
 		return matchLength;

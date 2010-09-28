@@ -9,9 +9,8 @@ import com.aptana.index.core.ui.IndexFilterManager;
 
 public class FilterTester extends PropertyTester
 {
-	private static final String IS_FILTERED = "isFiltered";
+	private static final String IS_FILTERED = "isFiltered"; //$NON-NLS-1$
 
-	@Override
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue)
 	{
 		boolean result = false;

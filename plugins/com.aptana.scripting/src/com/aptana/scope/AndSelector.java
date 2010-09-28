@@ -77,7 +77,6 @@ public class AndSelector extends BinarySelector
 		return result;
 	}
 
-	@Override
 	public int matchLength()
 	{
 		return matchLength;
@@ -89,10 +88,9 @@ public class AndSelector extends BinarySelector
 	 */
 	protected String getOperator()
 	{
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 
-	@Override
 	public int matchFragments()
 	{
 		return matchFragments;

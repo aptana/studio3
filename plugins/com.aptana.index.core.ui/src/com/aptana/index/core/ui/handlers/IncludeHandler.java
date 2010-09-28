@@ -12,7 +12,6 @@ public class IncludeHandler extends BaseHandler
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
 	 */
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		IndexFilterManager manager = IndexFilterManager.getInstance();
