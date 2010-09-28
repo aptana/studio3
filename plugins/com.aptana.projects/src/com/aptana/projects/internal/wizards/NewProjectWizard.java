@@ -144,7 +144,6 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		return true;
 	}
 
-	@Override
 	public void setInitializationData(IConfigurationElement config, String propertyName, Object data)
 			throws CoreException
 	{

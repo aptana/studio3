@@ -99,7 +99,6 @@ public class DeleteBranchAction extends MenuAction
 					Display.getDefault().syncExec(new Runnable()
 					{
 
-						@Override
 						public void run()
 						{
 							result[0] = MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),

@@ -51,7 +51,6 @@ public class ShowInHistoryHandler extends AbstractHandler
 		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		if (event == null)
