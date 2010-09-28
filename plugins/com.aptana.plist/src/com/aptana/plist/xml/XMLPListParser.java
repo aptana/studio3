@@ -43,7 +43,6 @@ public class XMLPListParser implements IPListParser
 	private static final String UTF_8 = "UTF-8"; //$NON-NLS-1$
 
 	@SuppressWarnings("unchecked")
-	@Override
 	public Map<String, Object> parse(File file) throws IOException
 	{
 		DocumentBuilder builder = null;
