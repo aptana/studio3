@@ -69,10 +69,10 @@ public class ThemeExporter
 			builder.append("require 'ruble/theme'\n\n");
 			builder.append("Ruble::Theme.add({\n");
 
-			for (String key : props.stringPropertyNames())
+			for (Object key : props.keySet())
 			{
 				builder.append("  '").append(key).append("' => '");
-				builder.append(props.getProperty(key));
+				builder.append(props.get(key));
 				builder.append("',\n");
 			}
 			if (props.size() > 0)
