@@ -36,11 +36,18 @@
 package com.aptana.browser;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.action.IStatusLineManager;
+import org.eclipse.swt.browser.ProgressEvent;
+import org.eclipse.swt.browser.ProgressListener;
+import org.eclipse.swt.browser.TitleEvent;
+import org.eclipse.swt.browser.TitleListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
+
+import com.aptana.swt.webkitbrowser.WebKitBrowser;
 
 /**
  * @author Max Stepanov
@@ -48,20 +55,16 @@ import org.eclipse.ui.part.EditorPart;
  */
 public class WebBrowserEditor extends EditorPart {
 
-	/**
-	 * 
-	 */
-	public WebBrowserEditor() {
-		// TODO Auto-generated constructor stub
-	}
+	public static final String EDITOR_ID = "com.aptana.browser.editors.webbrowser"; //$NON-NLS-1$
+	
+	private WebBrowserViewer browserViewer;
+	private int progressWorked;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-		// TODO Auto-generated method stub
-
 	}
 
 	/* (non-Javadoc)
@@ -69,8 +72,6 @@ public class WebBrowserEditor extends EditorPart {
 	 */
 	@Override
 	public void doSaveAs() {
-		// TODO Auto-generated method stub
-
 	}
 
 	/* (non-Javadoc)
@@ -78,8 +79,8 @@ public class WebBrowserEditor extends EditorPart {
 	 */
 	@Override
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-		// TODO Auto-generated method stub
-
+		setSite(site);
+		setInput(input);
 	}
 
 	/* (non-Javadoc)
@@ -87,7 +88,6 @@ public class WebBrowserEditor extends EditorPart {
 	 */
 	@Override
 	public boolean isDirty() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -96,7 +96,6 @@ public class WebBrowserEditor extends EditorPart {
 	 */
 	@Override
 	public boolean isSaveAsAllowed() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -105,8 +104,34 @@ public class WebBrowserEditor extends EditorPart {
 	 */
 	@Override
 	public void createPartControl(Composite parent) {
-		// TODO Auto-generated method stub
-
+		browserViewer = new WebBrowserViewer(parent, WebBrowserViewer.NAVIGATION_BAR);
+		WebKitBrowser browser = (WebKitBrowser) browserViewer.getBrowserControl();
+		browser.addProgressListener(new ProgressListener() {
+			public void changed(ProgressEvent event) {
+				if (event.total == 0) {
+					return;
+				}
+				if (event.current == 0) {
+					IProgressMonitor progressMonitor = getStatusBarProgressMonitor();
+					progressMonitor.done();
+					progressMonitor.beginTask("", event.total); //$NON-NLS-1$
+					progressWorked = 0;
+				}
+				if (progressWorked < event.current) {
+					getStatusBarProgressMonitor().worked(event.current-progressWorked);
+					progressWorked = event.current;
+				}
+			}
+			
+			public void completed(ProgressEvent event) {
+				getStatusBarProgressMonitor().done();
+			}
+		});
+		browser.addTitleListener(new TitleListener() {
+			public void changed(TitleEvent event) {
+				setTitleToolTip(event.title);
+			}
+		});
 	}
 
 	/* (non-Javadoc)
@@ -114,8 +139,12 @@ public class WebBrowserEditor extends EditorPart {
 	 */
 	@Override
 	public void setFocus() {
-		// TODO Auto-generated method stub
+		browserViewer.setFocus();
+	}
 
+	private IProgressMonitor getStatusBarProgressMonitor() {
+		IStatusLineManager statusLineManager = getEditorSite().getActionBars().getStatusLineManager();
+		return statusLineManager.getProgressMonitor();
 	}
 
 }

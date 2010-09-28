@@ -32,56 +32,66 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ui.internal.commands;
 
-import java.io.File;
-import java.io.FileOutputStream;
+package com.aptana.browser;
 
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.Display;
-
-import com.aptana.ui.UIPlugin;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IPersistableElement;
 
 /**
- * @author ashebanow
+ * @author Max Stepanov
+ *
  */
-public class ClearLogCommandHandler extends AbstractHandler
-{
+public class WebBrowserEditorInput implements IEditorInput {
 
 	/**
 	 * 
 	 */
-	public ClearLogCommandHandler()
-	{
+	public WebBrowserEditorInput() {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IEditorInput#exists()
 	 */
-	public Object execute(ExecutionEvent event) throws ExecutionException
-	{
-		String logFile = System.getProperty("osgi.logfile"); //$NON-NLS-1$
+	public boolean exists() {
+		return false;
+	}
 
-		if (!MessageDialog.openConfirm(Display.getCurrent().getActiveShell(), Messages.ClearLogConfirmTitle,
-				Messages.ClearLogConfirmDescription))
-		{
-			return null;
-		}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IEditorInput#getImageDescriptor()
+	 */
+	public ImageDescriptor getImageDescriptor() {
+		return ImageResource.getImageDescriptor(ImageResource.IMG_OBJ_BROWSER);
+	}
 
-		try
-		{
-			File file = new File(logFile);
-			FileOutputStream fileOutputStream = new FileOutputStream(file);
-			fileOutputStream.close();
-		}
-		catch (Exception e)
-		{
-			UIPlugin.logError(e.getLocalizedMessage(), e);
-		}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IEditorInput#getName()
+	 */
+	public String getName() {
+		return "";
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IEditorInput#getPersistable()
+	 */
+	public IPersistableElement getPersistable() {
 		return null;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IEditorInput#getToolTipText()
+	 */
+	public String getToolTipText() {
+		return "";
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+	 */
+	@SuppressWarnings("unchecked")
+	public Object getAdapter(Class adapter) {
+		return null;
+	}
+
 }

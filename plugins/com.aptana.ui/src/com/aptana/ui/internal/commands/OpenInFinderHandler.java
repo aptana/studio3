@@ -60,7 +60,6 @@ import com.aptana.ui.UIPlugin;
 public class OpenInFinderHandler extends AbstractHandler
 {
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		if (event == null)

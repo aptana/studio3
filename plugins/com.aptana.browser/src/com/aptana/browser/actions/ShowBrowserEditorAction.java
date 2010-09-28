@@ -32,56 +32,60 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ui.internal.commands;
 
-import java.io.File;
-import java.io.FileOutputStream;
+package com.aptana.browser.actions;
 
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.eclipse.ui.PartInitException;
 
-import com.aptana.ui.UIPlugin;
+import com.aptana.browser.BrowserPlugin;
+import com.aptana.browser.WebBrowserEditor;
+import com.aptana.browser.WebBrowserEditorInput;
 
 /**
- * @author ashebanow
+ * @author Max Stepanov
+ *
  */
-public class ClearLogCommandHandler extends AbstractHandler
-{
+public class ShowBrowserEditorAction implements IWorkbenchWindowActionDelegate {
 
-	/**
-	 * 
+	private IWorkbenchWindow workbenchWindow;
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#dispose()
 	 */
-	public ClearLogCommandHandler()
-	{
+	public void dispose() {
+		workbenchWindow = null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.IWorkbenchWindow)
 	 */
-	public Object execute(ExecutionEvent event) throws ExecutionException
-	{
-		String logFile = System.getProperty("osgi.logfile"); //$NON-NLS-1$
-
-		if (!MessageDialog.openConfirm(Display.getCurrent().getActiveShell(), Messages.ClearLogConfirmTitle,
-				Messages.ClearLogConfirmDescription))
-		{
-			return null;
-		}
-
-		try
-		{
-			File file = new File(logFile);
-			FileOutputStream fileOutputStream = new FileOutputStream(file);
-			fileOutputStream.close();
-		}
-		catch (Exception e)
-		{
-			UIPlugin.logError(e.getLocalizedMessage(), e);
-		}
-		return null;
+	public void init(IWorkbenchWindow window) {
+		this.workbenchWindow = window;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
+	 */
+	public void run(IAction action) {
+		IWorkbenchPage workbenchPage = workbenchWindow.getActivePage();
+		if (workbenchPage != null) {
+			try {
+				workbenchPage.openEditor(new WebBrowserEditorInput(), WebBrowserEditor.EDITOR_ID);
+			} catch (PartInitException e) {
+				BrowserPlugin.log(e);
+			}
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
+	 */
+	public void selectionChanged(IAction action, ISelection selection) {
+	}
+
 }
