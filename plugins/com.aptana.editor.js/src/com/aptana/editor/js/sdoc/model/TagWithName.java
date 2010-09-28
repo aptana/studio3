@@ -34,6 +34,7 @@
  */
 package com.aptana.editor.js.sdoc.model;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.parsing.io.SourcePrinter;
 
 public abstract class TagWithName extends Tag
@@ -80,7 +81,7 @@ public abstract class TagWithName extends Tag
 
 		String text = this.getText();
 
-		if (text != null && text.isEmpty() == false)
+		if (text != null && StringUtil.isEmpty(text) == false)
 		{
 			writer.print(" ").print(text); //$NON-NLS-1$
 		}
