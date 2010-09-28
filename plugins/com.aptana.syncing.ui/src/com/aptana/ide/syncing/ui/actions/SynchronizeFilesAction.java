@@ -63,7 +63,6 @@ public class SynchronizeFilesAction extends BaseSyncAction
 		UIUtils.getDisplay().asyncExec(new Runnable()
 		{
 
-			@Override
 			public void run()
 			{
 				try

@@ -106,7 +106,6 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		fThemeChangeListener = new IPreferenceChangeListener()
 		{
 
-			@Override
 			public void preferenceChange(PreferenceChangeEvent event)
 			{
 				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
@@ -412,27 +411,23 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		postLabelEvent(new LabelProviderChangedEvent(this, resources.toArray()));
 	}
 
-	@Override
 	public void pulled(PullEvent e)
 	{
 		cache.clear();
 		refresh();
 	}
 
-	@Override
 	public void pushed(PushEvent e)
 	{
 		cache.clear();
 		refresh();
 	}
 
-	@Override
 	public void branchAdded(BranchAddedEvent e)
 	{
 		// do nothing
 	}
 
-	@Override
 	public void branchRemoved(BranchRemovedEvent e)
 	{
 		// do nothing

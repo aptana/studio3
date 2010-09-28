@@ -197,7 +197,6 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
 		fDestinationRoot = destinationRoot;
 	}
 
-	@Override
 	public void init(IViewPart view) {
 		fActivePart = view;
 	}

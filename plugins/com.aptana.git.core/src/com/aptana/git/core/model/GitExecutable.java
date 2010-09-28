@@ -56,6 +56,7 @@ import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IPreferenceConstants;
 
@@ -106,7 +107,7 @@ public class GitExecutable
 	
 	private static IPath getPreferenceGitPath() {
 		String pref = new InstanceScope().getNode(GitPlugin.PLUGIN_ID).get(IPreferenceConstants.GIT_EXECUTABLE_PATH, null);
-		if (pref != null && !pref.isEmpty()) {
+		if (!StringUtil.isEmpty(pref)) {
 			IPath path = Path.fromOSString(pref);
 			if (path.toFile().isDirectory()) {
 				boolean isWin32 = Platform.OS_WIN32.equals(Platform.getOS());
@@ -153,7 +154,7 @@ public class GitExecutable
 		
 		boolean isWin32 = Platform.OS_WIN32.equals(Platform.getOS());
 		IPath path = ExecutableUtil.find(isWin32 ? GIT_EXECUTABLE_WIN32 : GIT_EXECUTABLE, false, searchLocations(), new FileFilter() {
-			@Override
+
 			public boolean accept(File pathname) {
 				return acceptBinary(Path.fromOSString(pathname.getAbsolutePath()));
 			}

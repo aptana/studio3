@@ -479,7 +479,6 @@ public class ConnectionPointComposite implements SelectionListener, ISelectionCh
 		treeViewer.getTree().addDisposeListener(new DisposeListener()
 		{
 
-			@Override
 			public void widgetDisposed(DisposeEvent e)
 			{
 				getControlThemerFactory().dispose(fTreeViewer);

@@ -53,7 +53,6 @@ public class JSParserPerformanceTest extends TestCase
 						File[] jsFiles = directory.listFiles(new FileFilter()
 						{
 
-							@Override
 							public boolean accept(File pathname)
 							{
 								boolean result = false;

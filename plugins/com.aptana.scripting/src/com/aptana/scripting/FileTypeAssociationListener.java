@@ -55,13 +55,11 @@ class FileTypeAssociationListener implements BundleChangeListener
 
 	private static final String GENERIC_CONTENT_TYPE_ID = "com.aptana.editor.text.content-type.generic"; //$NON-NLS-1$
 
-	@Override
 	public void deleted(BundleElement bundle)
 	{
 		// nothing
 	}
 
-	@Override
 	public void becameVisible(BundleEntry entry)
 	{
 		// Activate the file type associations
@@ -105,7 +103,6 @@ class FileTypeAssociationListener implements BundleChangeListener
 		}
 	}
 
-	@Override
 	public void becameHidden(BundleEntry entry)
 	{
 		// remove the file type associations
@@ -139,7 +136,6 @@ class FileTypeAssociationListener implements BundleChangeListener
 		return entry.getFileTypes();
 	}
 
-	@Override
 	public void added(BundleElement bundle)
 	{
 		// nothing

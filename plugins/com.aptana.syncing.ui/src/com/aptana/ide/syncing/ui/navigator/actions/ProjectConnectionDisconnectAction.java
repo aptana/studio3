@@ -65,7 +65,6 @@ public class ProjectConnectionDisconnectAction implements IObjectActionDelegate
 	{
 	}
 
-	@Override
 	public void run(IAction action)
 	{
 		final IConnectionPoint connectionPoint = (IConnectionPoint) projectConnection
@@ -111,13 +110,11 @@ public class ProjectConnectionDisconnectAction implements IObjectActionDelegate
 		job.schedule();
 	}
 
-	@Override
 	public void setActivePart(IAction action, IWorkbenchPart targetPart)
 	{
 		this.targetPart = targetPart;
 	}
 
-	@Override
 	public void selectionChanged(IAction action, ISelection selection)
 	{
 		projectConnection = null;
