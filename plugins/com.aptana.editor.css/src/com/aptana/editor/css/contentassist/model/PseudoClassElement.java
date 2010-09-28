@@ -32,64 +32,61 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.css.contentassist;
+package com.aptana.editor.css.contentassist.model;
 
+import java.util.LinkedList;
 import java.util.List;
 
-import com.aptana.editor.css.contentassist.model.ICSSMetadataElement;
-import com.aptana.editor.css.contentassist.model.UserAgentElement;
-
-public class CSSModelFormatter
+public class PseudoClassElement extends AbstractCSSMetadataElement
 {
+	private List<SpecificationElement> _specifications = new LinkedList<SpecificationElement>();
+	private List<ValueElement> _values = new LinkedList<ValueElement>();
+
 	/**
-	 * CSSModelFormatter
+	 * PseudoClassElement
 	 */
-	private CSSModelFormatter()
+	public PseudoClassElement()
 	{
+		super();
 	}
-	
+
 	/**
-	 * getDescription
+	 * addSpecification
 	 * 
-	 * @param element
+	 * @param specification
+	 */
+	public void addSpecification(SpecificationElement specification)
+	{
+		this._specifications.add(specification);
+	}
+
+	/**
+	 * getSpecifications
+	 * 
 	 * @return
 	 */
-	public static String getDescription(ICSSMetadataElement element)
+	public List<SpecificationElement> getSpecifications()
 	{
-		StringBuilder buffer = new StringBuilder();
-		
-		// emit name
-		buffer.append("<b>").append(element.getName()).append("</b><br>"); //$NON-NLS-1$ //$NON-NLS-2$
-		
-		// emit description
-		String description = element.getDescription();
-		
-		if (description != null && description.length() > 0)
-		{
-			buffer.append(description).append("<br>"); //$NON-NLS-1$
-		}
-		
-		// emit support browsers
-		List<UserAgentElement> userAgents = element.getUserAgents();
-		
-		if (userAgents != null && userAgents.size() > 0)
-		{
-			buffer.append("<br>"); //$NON-NLS-1$
-			buffer.append("<b>").append(Messages.CSSModelFormatter_Supported_User_Agents).append("</b><br>"); //$NON-NLS-1$ //$NON-NLS-2$
-			
-			for (int i = 0; i < userAgents.size(); i++)
-			{
-				UserAgentElement userAgent = userAgents.get(i);
-				
-				if (i > 0)
-				{
-					buffer.append(", "); //$NON-NLS-1$
-				}
-				
-				buffer.append(userAgent.getPlatform()).append(" ").append(userAgent.getVersion()); //$NON-NLS-1$
-			}
-		}
-		
-		return buffer.toString();
+		return this._specifications;
+	}
+
+	/**
+	 * addValue
+	 * 
+	 * @param value
+	 */
+	public void addValue(ValueElement value)
+	{
+		this._values.add(value);
+	}
+
+	/**
+	 * getValues
+	 * 
+	 * @return
+	 */
+	public List<ValueElement> getValues()
+	{
+		return this._values;
 	}
 }
