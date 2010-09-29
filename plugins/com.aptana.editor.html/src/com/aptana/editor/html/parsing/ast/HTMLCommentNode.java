@@ -1,6 +1,5 @@
 package com.aptana.editor.html.parsing.ast;
 
-import com.aptana.editor.html.parsing.lexer.HTMLTokens;
 
 public class HTMLCommentNode extends HTMLNode
 {
@@ -9,7 +8,7 @@ public class HTMLCommentNode extends HTMLNode
 
 	public HTMLCommentNode(String text, int start, int end)
 	{
-		super(HTMLTokens.COMMENT, start, end);
+		super(HTMLNodeTypes.COMMENT, start, end);
 		fText = text;
 	}
 

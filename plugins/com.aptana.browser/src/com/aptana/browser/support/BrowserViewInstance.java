@@ -32,22 +32,65 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.html.parsing.ast;
 
-public interface HTMLNodeTypes
-{
-	public static final short ERROR = -1;
+package com.aptana.browser.support;
 
-	public static final short UNKNOWN = 0;
+import java.net.URL;
 
-	public static final short DECLARATION = 1;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.internal.browser.InternalBrowserInstance;
+import org.eclipse.ui.internal.browser.WebBrowserUIPlugin;
 
-	public static final short ELEMENT = 2;
+import com.aptana.browser.parts.WebBrowserView;
+
+/**
+ * @author Max Stepanov
+ *
+ */
+@SuppressWarnings("restriction")
+public class BrowserViewInstance extends InternalBrowserInstance {
 
 	/**
-	 * Used to indicate a transition to another language
+	 * @param id
+	 * @param style
+	 * @param name
+	 * @param tooltip
 	 */
-	public static final short SPECIAL = 3;
+	public BrowserViewInstance(String id, int style, String name, String tooltip) {
+		super(id, style, name, tooltip);
+	}
 
-	public static final short COMMENT = 4;
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.browser.IWebBrowser#openURL(java.net.URL)
+	 */
+	public void openURL(URL url) throws PartInitException {
+		WebBrowserView view = (WebBrowserView) part;
+		IWorkbenchWindow workbenchWindow = WebBrowserUIPlugin.getInstance().getWorkbench().getActiveWorkbenchWindow();
+		IWorkbenchPage workbenchPage = null;
+		if (workbenchWindow != null) {
+			workbenchPage = workbenchWindow.getActivePage();
+		}
+		if (workbenchPage == null) {
+			throw new PartInitException("Cannot get Workbench page");
+		}
+		if (view == null) {
+			view = (WebBrowserView) workbenchPage.showView(WebBrowserView.VIEW_ID, getId(), IWorkbenchPage.VIEW_CREATE);
+			hookPart(workbenchPage, view);
+		}
+		if (view != null) {
+			workbenchPage.bringToTop(view);
+			view.setURL(url != null ? url.toExternalForm() : null);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.browser.AbstractWebBrowser#close()
+	 */
+	@Override
+	public boolean close() {
+		return ((WebBrowserView) part).close();
+	}
+
 }
