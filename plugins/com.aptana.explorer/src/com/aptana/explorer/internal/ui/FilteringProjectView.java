@@ -51,9 +51,9 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -112,7 +112,7 @@ public class FilteringProjectView extends GitProjectView
 	 */
 	private static final long SOFT_MAX_EXPAND_TIME = 200;
 
-	private String currentFilterText = ""; //$NON-NLS-1$
+	private IResource currentFilter = null;
 
 	private PathFilter patternFilter;
 	private WorkbenchJob refreshJob;
@@ -266,10 +266,10 @@ public class FilteringProjectView extends GitProjectView
 		projectExpansions.put(project, expanded);
 		projectSelections.put(project, selected);
 
-		String filter = getFilterString();
+		IResource filter = getFilterResource();
 		if (filter != null)
 		{
-			projectFilters.put(project, filter);
+			projectFilters.put(project, filter.getLocation().toPortableString());
 		}
 	}
 
@@ -316,12 +316,12 @@ public class FilteringProjectView extends GitProjectView
 				if (e.x >= lastDrawnX && e.x <= lastDrawnX + eyeball.getBounds().width)
 				{
 					// Ok, now we need to turn on the filter!
-					String text = getResourceNameToFilterBy();
+					IResource text = getResourceToFilterBy();
 					if (text != null)
 					{
 						fExpandedElements = getCommonViewer().getExpandedElements();
 						hoveredItem = null;
-						setFilterText(text);
+						setFilter(text);
 					}
 				}
 			}
@@ -439,7 +439,7 @@ public class FilteringProjectView extends GitProjectView
 	@Override
 	protected void removeFilter()
 	{
-		clearText();
+		clearFilter();
 		super.removeFilter();
 	}
 
@@ -556,17 +556,20 @@ public class FilteringProjectView extends GitProjectView
 		List<String> expansions = projectExpansions.get(project);
 		List<String> selections = projectSelections.get(project);
 		viewer.getControl().setRedraw(false);
+		// FIXME Reconstruct filter into IResource
 		String filter = projectFilters.get(project);
 		if (filter == null || filter.length() == 0)
 		{
-			if (currentFilterText != null && currentFilterText.length() > 0)
+			if (currentFilter != null)
 			{
-				clearText();
+				clearFilter();
 			}
 		}
-		else if (!filter.equals(currentFilterText))
+		else
 		{
-			setFilterText(filter);
+			IResource filterResource = project.getWorkspace().getRoot()
+					.getFileForLocation(Path.fromPortableString(filter));
+			setFilter(filterResource);
 		}
 		if (selections != null)
 		{
@@ -659,25 +662,25 @@ public class FilteringProjectView extends GitProjectView
 	}
 
 	/**
-	 * Clears the text in the filter text widget.
+	 * Clears the filter.
 	 */
-	protected void clearText()
+	protected void clearFilter()
 	{
-		currentFilterText = ""; //$NON-NLS-1$
-		textChanged();
+		currentFilter = null;
+		filterChanged();
 	}
 
 	/**
-	 * Set the text in the filter control.
+	 * Set the filter.
 	 * 
-	 * @param string
+	 * @param resource
 	 */
-	protected void setFilterText(String string)
+	protected void setFilter(IResource resource)
 	{
-		currentFilterText = string;
+		currentFilter = resource;
 		showFilterLabel(eyeball,
-				NLS.bind(Messages.FilteringProjectView_LBL_FilteringFor, new Object[] { currentFilterText }));
-		textChanged();
+				NLS.bind(Messages.FilteringProjectView_LBL_FilteringFor, new Object[] { currentFilter.getName() }));
+		filterChanged();
 	}
 
 	/**
@@ -690,9 +693,9 @@ public class FilteringProjectView extends GitProjectView
 	}
 
 	/**
-	 * Update the receiver after the text has changed.
+	 * Update the receiver after the filter has changed.
 	 */
-	protected void textChanged()
+	protected void filterChanged()
 	{
 		// cancel currently running job first, to prevent unnecessary redraw
 		if (refreshJob != null)
@@ -723,22 +726,16 @@ public class FilteringProjectView extends GitProjectView
 					return Status.CANCEL_STATUS;
 				}
 
-				String text = getFilterString();
+				IResource text = getFilterResource();
 				if (text == null)
 				{
-					return Status.OK_STATUS;
-				}
-
-				boolean initial = currentFilterText == null || currentFilterText.equals(""); //$NON-NLS-1$
-				if (initial)
-				{
-					patternFilter.setPattern(null);
+					patternFilter.setResourceToFilterOn(null);
 					getCommonViewer().removeFilter(patternFilter);
 				}
 				else
 				{
 					getCommonViewer().removeFilter(patternFilter);
-					patternFilter.setPattern(text);
+					patternFilter.setResourceToFilterOn(text);
 					getCommonViewer().addFilter(patternFilter);
 				}
 
@@ -769,7 +766,7 @@ public class FilteringProjectView extends GitProjectView
 						// ignore. This seems to just happen on windows and appears to be benign
 					}
 
-					if (text.length() > 0 && !initial)
+					if (text != null)
 					{
 						/*
 						 * Expand elements one at a time. After each is expanded, check to see if the filter text has
@@ -861,78 +858,14 @@ public class FilteringProjectView extends GitProjectView
 		};
 	}
 
-	protected String getFilterString()
+	protected IResource getFilterResource()
 	{
-		return currentFilterText;
+		return currentFilter;
 	}
 
-	private String getResourceNameToFilterBy()
+	private IResource getResourceToFilterBy()
 	{
-		String text = hoveredItem.getText();
-		IResource resource = getResource(hoveredItem);
-		if (resource != null)
-		{
-			text = resource.getName(); // if we can, use the raw filename so we don't pick up decorators added
-		}
-		// Try and strip filename down to the resource name!
-		if (text.endsWith("_controller.rb")) //$NON-NLS-1$
-		{
-			text = text.substring(0, text.indexOf("_controller")); //$NON-NLS-1$
-			text = Inflector.singularize(text);
-		}
-		else if (text.endsWith("_controller_test.rb")) //$NON-NLS-1$
-		{
-			text = text.substring(0, text.indexOf("_controller_test.rb")); //$NON-NLS-1$
-			text = Inflector.singularize(text);
-		}
-		else if (text.endsWith("_helper.rb")) //$NON-NLS-1$
-		{
-			text = text.substring(0, text.indexOf("_helper")); //$NON-NLS-1$
-			text = Inflector.singularize(text);
-		}
-		else if (text.endsWith("_helper_test.rb")) //$NON-NLS-1$
-		{
-			text = text.substring(0, text.indexOf("_helper_test.rb")); //$NON-NLS-1$
-			text = Inflector.singularize(text);
-		}
-		else if (text.endsWith("_test.rb")) //$NON-NLS-1$
-		{
-			text = text.substring(0, text.indexOf("_test.rb")); //$NON-NLS-1$
-		}
-		else if (text.endsWith("_spec.rb")) //$NON-NLS-1$
-		{
-			text = text.substring(0, text.indexOf("_spec.rb")); //$NON-NLS-1$
-		}
-		else if (text.endsWith(".yml")) //$NON-NLS-1$
-		{
-			if (resource != null)
-			{
-				IPath path = resource.getProjectRelativePath();
-				if (path.segmentCount() >= 3 && path.segment(1).equals("fixtures")) //$NON-NLS-1$
-				{
-					text = text.substring(0, text.indexOf(".yml")); //$NON-NLS-1$
-					text = Inflector.singularize(text);
-				}
-			}
-		}
-		else if (text.endsWith(".rb")) //$NON-NLS-1$
-		{
-			text = text.substring(0, text.indexOf(".rb")); //$NON-NLS-1$
-		}
-		else
-		{
-			// We need to grab the full path, so we can determine the resource name!
-			if (resource != null)
-			{
-				IPath path = resource.getProjectRelativePath();
-				if (path.segmentCount() >= 3 && path.segment(1).equals("views")) //$NON-NLS-1$
-				{
-					text = path.segment(2);
-					text = Inflector.singularize(text);
-				}
-			}
-		}
-		return text;
+		return getResource(hoveredItem);
 	}
 
 	private void removeHoveredItem()
@@ -969,8 +902,7 @@ public class FilteringProjectView extends GitProjectView
 
 	private boolean filterOn()
 	{
-		return getFilterString() != null && getFilterString().trim().length() > 0
-				&& !getFilterString().equals(Messages.SingleProjectView_InitialFileFilterText);
+		return getFilterResource() != null;
 	}
 
 	protected IResource getResource(final TreeItem t)
