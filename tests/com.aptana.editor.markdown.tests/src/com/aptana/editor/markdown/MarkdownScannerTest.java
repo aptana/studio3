@@ -56,6 +56,21 @@ public class MarkdownScannerTest extends TestCase
 		assertToken(getToken(""), 19, 4);
 	}
 
+	public void testItalicWithSpaceInside()
+	{
+		String src = "There is *ita lics* here";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken(""), 0, 5);
+		assertToken(Token.WHITESPACE, 5, 1);
+		assertToken(getToken(""), 6, 2);
+		assertToken(Token.WHITESPACE, 8, 1);
+		assertToken(getToken("markup.italic.markdown"), 9, 10);
+		assertToken(Token.WHITESPACE, 19, 1);
+		assertToken(getToken(""), 20, 4);
+	}
+
 	public void testItalicsUsingUnderscores()
 	{
 		String src = "There is _italics_ here";
@@ -71,9 +86,64 @@ public class MarkdownScannerTest extends TestCase
 		assertToken(getToken(""), 19, 4);
 	}
 
-	// TODO Add tests for italics/bold with spaces inside
-	// TODO Add tests for */_ with spaces on each side being treated as literals (not italics/bold)
+	public void testItalicsUsingUnderscoresWithSpaceInside()
+	{
+		String src = "There is _ita lics_ here";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken(""), 0, 5);
+		assertToken(Token.WHITESPACE, 5, 1);
+		assertToken(getToken(""), 6, 2);
+		assertToken(Token.WHITESPACE, 8, 1);
+		assertToken(getToken("markup.italic.markdown"), 9, 10);
+		assertToken(Token.WHITESPACE, 19, 1);
+		assertToken(getToken(""), 20, 4);
+	}
+
 	// TODO Add tests for escaped asterisks and underscores!
+
+	public void testUnderscoreSurroundedBySpaceIsLiteral()
+	{
+		String src = "There is _ no italics _ here";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken(""), 0, 5);
+		assertToken(Token.WHITESPACE, 5, 1);
+		assertToken(getToken(""), 6, 2);
+		assertToken(Token.WHITESPACE, 8, 1);
+		assertToken(getToken(""), 9, 1);
+		assertToken(Token.WHITESPACE, 10, 1);
+		assertToken(getToken(""), 11, 2);
+		assertToken(Token.WHITESPACE, 13, 1);
+		assertToken(getToken(""), 14, 7);
+		assertToken(Token.WHITESPACE, 21, 1);
+		assertToken(getToken(""), 22, 1);
+		assertToken(Token.WHITESPACE, 23, 1);
+		assertToken(getToken(""), 24, 4);
+	}
+
+	public void testAsteriskSurroundedBySpaceIsLiteral()
+	{
+		String src = "There is * no italics * here";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken(""), 0, 5);
+		assertToken(Token.WHITESPACE, 5, 1);
+		assertToken(getToken(""), 6, 2);
+		assertToken(Token.WHITESPACE, 8, 1);
+		assertToken(getToken(""), 9, 1);
+		assertToken(Token.WHITESPACE, 10, 1);
+		assertToken(getToken(""), 11, 2);
+		assertToken(Token.WHITESPACE, 13, 1);
+		assertToken(getToken(""), 14, 7);
+		assertToken(Token.WHITESPACE, 21, 1);
+		assertToken(getToken(""), 22, 1);
+		assertToken(Token.WHITESPACE, 23, 1);
+		assertToken(getToken(""), 24, 4);
+	}
 
 	public void testBold()
 	{
@@ -90,6 +160,21 @@ public class MarkdownScannerTest extends TestCase
 		assertToken(getToken(""), 18, 4);
 	}
 
+	public void testBoldWithSpaceInside()
+	{
+		String src = "There is **bo ld** here";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken(""), 0, 5);
+		assertToken(Token.WHITESPACE, 5, 1);
+		assertToken(getToken(""), 6, 2);
+		assertToken(Token.WHITESPACE, 8, 1);
+		assertToken(getToken("markup.bold.markdown"), 9, 9);
+		assertToken(Token.WHITESPACE, 18, 1);
+		assertToken(getToken(""), 19, 4);
+	}
+
 	public void testBoldUsingUnderscores()
 	{
 		String src = "There is __bold__ here";
@@ -103,6 +188,21 @@ public class MarkdownScannerTest extends TestCase
 		assertToken(getToken("markup.bold.markdown"), 9, 8);
 		assertToken(Token.WHITESPACE, 17, 1);
 		assertToken(getToken(""), 18, 4);
+	}
+
+	public void testBoldUsingUnderscoresWithSpaceInside()
+	{
+		String src = "There is __bo ld__ here";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken(""), 0, 5);
+		assertToken(Token.WHITESPACE, 5, 1);
+		assertToken(getToken(""), 6, 2);
+		assertToken(Token.WHITESPACE, 8, 1);
+		assertToken(getToken("markup.bold.markdown"), 9, 9);
+		assertToken(Token.WHITESPACE, 18, 1);
+		assertToken(getToken(""), 19, 4);
 	}
 
 	// http://daringfireball.net/projects/markdown/syntax#link

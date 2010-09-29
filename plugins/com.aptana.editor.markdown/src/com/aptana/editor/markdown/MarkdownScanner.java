@@ -65,12 +65,13 @@ public class MarkdownScanner extends RuleBasedScanner
 		rules.add(new RegexpRule("\\[([^\\]]+?)\\]", getToken("constant.other.reference.link.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Bold
+		
 		rules.add(new SingleLineRule("**", "**", getToken("markup.bold.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		rules.add(new SingleLineRule("__", "__", getToken("markup.bold.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		// Italic
-		rules.add(new SingleLineRule("*", "*", getToken("markup.italic.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		rules.add(new SingleLineRule("_", "_", getToken("markup.italic.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		rules.add(new RegexpRule("\\*[\\S]+[^\\*]*\\*", getToken("markup.italic.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new RegexpRule("\\_[\\S]+[^\\_]*\\_", getToken("markup.italic.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Character escapes
 		WordRule rule = new WordRule(new IWordDetector()
