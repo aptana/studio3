@@ -60,7 +60,6 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	 * (non-Javadoc)
 	 * @see com.aptana.formatter.ui.IScriptFormatter#format(java.lang.String, int, int, int)
 	 */
-	@Override
 	public TextEdit format(String source, int offset, int length, int indentationLevel) throws FormatterException
 	{
 		String input = source.substring(offset, offset + length);
@@ -106,7 +105,6 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	 * (non-Javadoc)
 	 * @see com.aptana.formatter.ui.IScriptFormatter#getIndentSize()
 	 */
-	@Override
 	public int getIndentSize()
 	{
 		return getInt(HTMLFormatterConstants.FORMATTER_INDENTATION_SIZE);
@@ -116,7 +114,6 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	 * (non-Javadoc)
 	 * @see com.aptana.formatter.ui.IScriptFormatter#getIndentType()
 	 */
-	@Override
 	public String getIndentType()
 	{
 		return getString(HTMLFormatterConstants.FORMATTER_TAB_CHAR);
@@ -126,7 +123,6 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	 * (non-Javadoc)
 	 * @see com.aptana.formatter.ui.IScriptFormatter#getTabSize()
 	 */
-	@Override
 	public int getTabSize()
 	{
 		return getInt(HTMLFormatterConstants.FORMATTER_TAB_SIZE);

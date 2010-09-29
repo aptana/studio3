@@ -49,7 +49,6 @@ public class HTMLFormatterCommentsPage implements IFormatterModifiyTabPage
 	/* (non-Javadoc)
 	 * @see com.aptana.formatter.ui.IFormatterModifiyTabPage#createContents(com.aptana.formatter.ui.IFormatterControlManager, org.eclipse.swt.widgets.Composite)
 	 */
-	@Override
 	public Composite createContents(IFormatterControlManager manager, Composite parent)
 	{
 		// TODO Auto-generated method stub
@@ -59,7 +58,6 @@ public class HTMLFormatterCommentsPage implements IFormatterModifiyTabPage
 	/* (non-Javadoc)
 	 * @see com.aptana.formatter.ui.IFormatterModifiyTabPage#updatePreview()
 	 */
-	@Override
 	public void updatePreview()
 	{
 		// TODO Auto-generated method stub

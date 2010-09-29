@@ -70,20 +70,17 @@ public class HTMLFormatterFactory extends AbstractScriptFormatterFactory
 		return new HTMLFormatterModifyDialog(dialogOwner, this);
 	}
 
-	@Override
 	public SourceViewerConfiguration createSimpleSourceViewerConfiguration(ISharedTextColors colorManager,
 			IPreferenceStore preferenceStore, ITextEditor editor, boolean configureFormatter)
 	{
 		return new HTMLSourceViewerConfiguration(preferenceStore, (AbstractThemeableEditor) editor);
 	}
 
-	@Override
 	public PreferenceKey getFormatterPreferenceKey()
 	{
 		return FORMATTER_PREF_KEY;
 	}
 
-	@Override
 	public IPreferenceStore getPreferenceStore()
 	{
 		return HTMLFormatterPlugin.getDefault().getPreferenceStore();

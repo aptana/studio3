@@ -89,7 +89,6 @@ public class FormatterControlManager implements IFormatterControlManager, IStatu
 	/* (non-Javadoc)
 	 * @see com.aptana.formatter.ui.IFormatterControlManager#createManagedList(org.eclipse.swt.widgets.Group, java.lang.String)
 	 */
-	@Override
 	public Control createManagedList(Group group, Object key)
 	{
 		AddRemoveList list = new AddRemoveList(group);

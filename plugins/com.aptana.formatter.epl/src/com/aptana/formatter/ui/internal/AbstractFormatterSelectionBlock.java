@@ -556,7 +556,6 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		listViewer.setSelection(new StructuredSelection(this.factories[0]));
 		listViewer.addSelectionChangedListener(new ISelectionChangedListener()
 		{
-			@Override
 			public void selectionChanged(SelectionChangedEvent event)
 			{
 				// Update the preview
@@ -612,7 +611,6 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		// Attach the listeners
 		profileChangeListener = new IPropertyChangeListener()
 		{
-			@Override
 			public void propertyChange(PropertyChangeEvent event)
 			{
 				if (IProfileManager.PROFILE_SELECTED.equals(event.getProperty()))

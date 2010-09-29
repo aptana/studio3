@@ -117,6 +117,7 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	 */
 	private void addNode(IParseNode node)
 	{
+		// Handle HTMLCommentNode
 		if (node instanceof HTMLElementNode)
 		{
 			// DEBUG

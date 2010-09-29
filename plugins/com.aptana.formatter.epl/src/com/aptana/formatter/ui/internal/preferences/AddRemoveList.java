@@ -102,7 +102,6 @@ public class AddRemoveList implements Listener
 		listViewer = new CListViewer(control, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
 		listViewer.addSelectionChangedListener(new ISelectionChangedListener()
 		{
-			@Override
 			public void selectionChanged(SelectionChangedEvent event)
 			{
 				updateButtonsState();
@@ -151,7 +150,6 @@ public class AddRemoveList implements Listener
 	 * (non-Javadoc)
 	 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
 	 */
-	@Override
 	public void handleEvent(Event event)
 	{
 		if (event.widget == addButton)
@@ -181,7 +179,6 @@ public class AddRemoveList implements Listener
 	{
 		IInputValidator inputValidator = new IInputValidator()
 		{
-			@Override
 			public String isValid(String newText)
 			{
 				// Only letters, digits, spaces and commas are valid here.
@@ -218,7 +215,7 @@ public class AddRemoveList implements Listener
 			}
 			for (String v : values)
 			{
-				if (!v.trim().isEmpty())
+				if (v.trim().length() != 0)
 				{
 					elementsSet.add(v.toLowerCase());
 				}
@@ -280,7 +277,6 @@ public class AddRemoveList implements Listener
 		 * (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 		 */
-		@Override
 		public Object[] getElements(Object inputElement)
 		{
 			return elements;
@@ -290,7 +286,6 @@ public class AddRemoveList implements Listener
 		 * (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 		 */
-		@Override
 		public void dispose()
 		{
 			elements = null;
@@ -301,7 +296,6 @@ public class AddRemoveList implements Listener
 		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 		 * java.lang.Object, java.lang.Object)
 		 */
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput)
 		{
 			if (newInput instanceof Object[])
