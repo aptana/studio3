@@ -10,6 +10,7 @@ public class RulesTests
 	{
 		TestSuite suite = new TestSuite(RulesTests.class.getName());
 		//$JUnit-BEGIN$
+		suite.addTestSuite(CaseInsensitiveMultiLineRuleTest.class);
 		suite.addTestSuite(TagRuleTest.class);
 		suite.addTestSuite(RegexpRuleTest.class);
 		suite.addTestSuite(WhitespaceDetectorTest.class);

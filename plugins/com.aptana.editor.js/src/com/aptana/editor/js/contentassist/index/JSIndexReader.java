@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.contentassist.index;
 
 import java.io.IOException;
@@ -48,16 +82,16 @@ public class JSIndexReader
 			String key = function.getWord();
 			String[] columns = key.split(JSIndexConstants.DELIMITER);
 			int column = 0;
+			
+			// owning type
+			f.setOwningType(columns[column]);
+			column++;
 
 			// name
 			if (fields.contains(ContentSelector.NAME))
 			{
 				f.setName(columns[column]);
 			}
-			column++;
-
-			// owning type
-			f.setOwningType(columns[column]);
 			column++;
 
 			// description
@@ -162,16 +196,16 @@ public class JSIndexReader
 			String key = property.getWord();
 			String[] columns = key.split(JSIndexConstants.DELIMITER);
 			int column = 0;
+			
+			// owning type
+			p.setOwningType(columns[column]);
+			column++;
 
 			// name
 			if (fields.contains(ContentSelector.NAME))
 			{
 				p.setName(columns[column]);
 			}
-			column++;
-
-			// owning type
-			p.setOwningType(columns[column]);
 			column++;
 
 			// description
@@ -347,10 +381,8 @@ public class JSIndexReader
 
 		if (index != null)
 		{
-			String quotedOwningType = Pattern.quote(owningType);
-			String quotedPropertyName = Pattern.quote(propertyName);
-			List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(quotedOwningType, quotedPropertyName),
-				SearchPattern.REGEX_MATCH);
+			List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(owningType, propertyName),
+				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
 
 			if (functions != null && functions.size() > 0)
 			{
@@ -376,12 +408,9 @@ public class JSIndexReader
 
 		if (index != null && owningTypes != null && owningTypes.isEmpty() == false)
 		{
-			// build regex pattern to match all owning types at once
-			String typePattern = getUserTypesPattern(owningTypes);
-
 			// read functions
 			List<QueryResult> functions = index
-				.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(typePattern), SearchPattern.REGEX_MATCH);
+				.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(owningTypes), SearchPattern.REGEX_MATCH);
 
 			if (functions != null)
 			{
@@ -411,9 +440,8 @@ public class JSIndexReader
 		if (index != null && owningType != null && owningType.length() > 0)
 		{
 			// read functions
-			String quotedOwningType = Pattern.quote(owningType);
-			List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(quotedOwningType),
-				SearchPattern.REGEX_MATCH);
+			List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(owningType),
+				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
 
 			if (functions != null)
 			{
@@ -430,12 +458,25 @@ public class JSIndexReader
 	/**
 	 * getMemberPattern
 	 * 
+	 * @param typeNames
+	 * @return
+	 */
+	private String getMemberPattern(List<String> typeNames)
+	{
+		String typePattern = getUserTypesPattern(typeNames);
+
+		return MessageFormat.format("^{1}{0}", new Object[] { JSIndexConstants.DELIMITER, typePattern }); //$NON-NLS-1$
+	}
+
+	/**
+	 * getMemberPattern
+	 * 
 	 * @param typeName
 	 * @return
 	 */
 	private String getMemberPattern(String typeName)
 	{
-		return MessageFormat.format("^[^{0}]+{0}{1}(?:{0}|$)", new Object[] { JSIndexConstants.DELIMITER, typeName }); //$NON-NLS-1$
+		return MessageFormat.format("{1}{0}", new Object[] { JSIndexConstants.DELIMITER, typeName }); //$NON-NLS-1$
 	}
 
 	/**
@@ -447,7 +488,7 @@ public class JSIndexReader
 	 */
 	private String getMemberPattern(String typeName, String memberName)
 	{
-		return MessageFormat.format("^{2}{0}{1}(?:{0}|$)", new Object[] { JSIndexConstants.DELIMITER, typeName, memberName }); //$NON-NLS-1$
+		return MessageFormat.format("{1}{0}{2}", new Object[] { JSIndexConstants.DELIMITER, typeName, memberName }); //$NON-NLS-1$
 	}
 
 	/**
@@ -510,11 +551,8 @@ public class JSIndexReader
 
 		if (index != null && owningTypes != null && owningTypes.isEmpty() == false)
 		{
-			// build regex pattern to match all owning types at once
-			String typePattern = getUserTypesPattern(owningTypes);
-
 			// read properties
-			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(typePattern),
+			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningTypes),
 				SearchPattern.REGEX_MATCH);
 
 			if (properties != null)
@@ -545,9 +583,8 @@ public class JSIndexReader
 		if (index != null && owningType != null && owningType.length() > 0)
 		{
 			// read properties
-			String quotedOwningType = Pattern.quote(owningType);
-			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(quotedOwningType),
-				SearchPattern.REGEX_MATCH);
+			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningType),
+				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
 
 			if (properties != null)
 			{
@@ -577,10 +614,8 @@ public class JSIndexReader
 
 		if (index != null)
 		{
-			String quotedOwningType = Pattern.quote(owningType);
-			String quotedPropertyName = Pattern.quote(propertyName);
-			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(quotedOwningType, quotedPropertyName),
-				SearchPattern.REGEX_MATCH);
+			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningType, propertyName),
+				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
 
 			if (properties != null && properties.size() > 0)
 			{

@@ -6,6 +6,7 @@ import java.util.List;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -97,7 +98,7 @@ public abstract class BaseHandler extends AbstractHandler
 
 					for (Object object : structuredSelection.toArray())
 					{
-						if (object instanceof IFolder || object instanceof IProject)
+						if (object instanceof IProject || object instanceof IFolder || object instanceof IFile)
 						{
 							IResource resource = (IResource) object;
 							IFileStore fileStore = EFSUtils.getFileStore(resource);

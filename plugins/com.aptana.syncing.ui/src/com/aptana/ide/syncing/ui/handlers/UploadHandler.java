@@ -44,7 +44,6 @@ import com.aptana.ide.syncing.ui.actions.UploadAction;
 public class UploadHandler extends BaseSyncHandler
 {
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		UploadAction action = new UploadAction();

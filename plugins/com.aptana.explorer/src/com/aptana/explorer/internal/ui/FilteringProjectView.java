@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.explorer.internal.ui;
 
 import java.util.ArrayList;
@@ -231,7 +265,7 @@ public class FilteringProjectView extends GitProjectView
 		}
 		projectExpansions.put(project, expanded);
 		projectSelections.put(project, selected);
-	
+
 		String filter = getFilterString();
 		if (filter != null)
 		{
@@ -367,7 +401,7 @@ public class FilteringProjectView extends GitProjectView
 					int endOfItemX = hoveredItem.getBounds().width + hoveredItem.getBounds().x;
 					lastDrawnX = Math.max(endOfClientAreaX, endOfItemX) - (IMAGE_MARGIN + eyeball.getBounds().width);
 					int itemHeight = tree.getItemHeight();
-					int imageHeight = eyeball.getBounds().height;					
+					int imageHeight = eyeball.getBounds().height;
 					int y = hoveredItem.getBounds().y + (itemHeight - imageHeight) / 2;
 					event.gc.drawImage(eyeball, lastDrawnX, y);
 				}
@@ -441,7 +475,8 @@ public class FilteringProjectView extends GitProjectView
 		for (IProject project : projects)
 		{
 			if (project.isAccessible()
-					&& !(projectExpansions.get(project).isEmpty() && projectSelections.get(project).isEmpty() && projectFilters.get(project) == null))
+					&& !(projectExpansions.get(project).isEmpty() && projectSelections.get(project).isEmpty() && projectFilters
+							.get(project) == null))
 			{
 				IMemento projectMemento = memento.createChild(TAG_PROJECT);
 				projectMemento.putString(KEY_NAME, project.getName());
@@ -569,7 +604,7 @@ public class FilteringProjectView extends GitProjectView
 		updateProjectMementoCache(oldProject);
 		super.projectChanged(oldProject, newProject);
 		// Restore the displayed project state.
-		restoreStateJob(newProject);		
+		restoreStateJob(newProject);
 	}
 
 	@Override
@@ -585,7 +620,6 @@ public class FilteringProjectView extends GitProjectView
 		fResourceListener = new IResourceChangeListener()
 		{
 
-			@Override
 			public void resourceChanged(IResourceChangeEvent event)
 			{
 				if (selectedProject == null || !selectedProject.exists())
@@ -602,10 +636,13 @@ public class FilteringProjectView extends GitProjectView
 						PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 						{
 
-							@Override
 							public void run()
 							{
-								getCommonViewer().refresh();
+								if (getCommonViewer() != null && getCommonViewer().getTree() != null
+										&& getCommonViewer().getTree().isDisposed())
+								{
+									getCommonViewer().refresh();
+								}
 							}
 						});
 						return;
@@ -638,8 +675,8 @@ public class FilteringProjectView extends GitProjectView
 	protected void setFilterText(String string)
 	{
 		currentFilterText = string;
-		showFilterLabel(eyeball, NLS.bind(Messages.FilteringProjectView_LBL_FilteringFor,
-				new Object[] { currentFilterText }));
+		showFilterLabel(eyeball,
+				NLS.bind(Messages.FilteringProjectView_LBL_FilteringFor, new Object[] { currentFilterText }));
 		textChanged();
 	}
 
@@ -723,9 +760,12 @@ public class FilteringProjectView extends GitProjectView
 							getCommonViewer().setExpandedState(item.getData(), false);
 						}
 					}
-					try {
+					try
+					{
 						getCommonViewer().refresh(true);
-					} catch (Exception e) {
+					}
+					catch (Exception e)
+					{
 						// ignore. This seems to just happen on windows and appears to be benign
 					}
 

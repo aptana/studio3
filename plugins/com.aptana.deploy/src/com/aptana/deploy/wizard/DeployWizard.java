@@ -41,6 +41,7 @@ import org.eclipse.ui.internal.browser.WebBrowserEditor;
 import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.CorePlugin;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.deploy.Activator;
@@ -80,7 +81,7 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 {
 
 	private static final String BUNDLE_HEROKU = "Heroku"; //$NON-NLS-1$
-	private static final String BUNDLE_ENGINEYARD = "Engine Yard";
+	private static final String BUNDLE_ENGINEYARD = "Engine Yard"; //$NON-NLS-1$
 
 	private IProject project;
 
@@ -169,7 +170,6 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		IRunnableWithProgress runnable = new IRunnableWithProgress()
 		{
 
-			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
 			{
 				SubMonitor sub = SubMonitor.convert(monitor, 100);
@@ -238,7 +238,6 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		runnable = new IRunnableWithProgress()
 		{
 
-			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
 			{
 				SubMonitor sub = SubMonitor.convert(monitor, 100);
@@ -248,7 +247,6 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 					PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
 					{
 
-						@Override
 						public void run()
 						{
 							try
@@ -298,7 +296,6 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		runnable = new IRunnableWithProgress()
 		{
 
-			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
 			{
 				SubMonitor sub = SubMonitor.convert(monitor, 100);
@@ -318,7 +315,6 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 					PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
 					{
 
-						@Override
 						public void run()
 						{
 							CommandElement command;
@@ -407,7 +403,6 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 				return ""; //$NON-NLS-1$
 			}
 
-			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
 			{
 				SubMonitor sub = SubMonitor.convert(monitor, 100);
@@ -442,7 +437,6 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 				{
 
-					@Override
 					public void run()
 					{
 						openSignupURLinEclipseBrowser(url, style, BROWSER_ID, javascript);
@@ -477,8 +471,8 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 					builder.append("&email="); //$NON-NLS-1$
 					builder.append(URLEncoder.encode(userID, "UTF-8")); //$NON-NLS-1$
 					builder.append("&type=signuphook"); //$NON-NLS-1$
-					builder.append("&version=");
-					builder.append(EclipseUtil.getPluginVersion("com.aptana.core"));
+					builder.append("&version="); //$NON-NLS-1$
+					builder.append(EclipseUtil.getPluginVersion(CorePlugin.PLUGIN_ID));
 
 					URL url = new URL(builder.toString());
 					connection = (HttpURLConnection) url.openConnection();
@@ -507,7 +501,6 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 				return ""; //$NON-NLS-1$
 			}
 
-			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
 			{
 				SubMonitor sub = SubMonitor.convert(monitor, 100);
@@ -542,7 +535,6 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 				{
 
-					@Override
 					public void run()
 					{
 						openSignupURLinEclipseBrowser(url, style, BROWSER_ID, javascript);
@@ -560,17 +552,15 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		runnable = new IRunnableWithProgress()
 		{
 
-			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
 			{
 				PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
 				{
 
-					@Override
 					public void run()
 					{
 						CommandElement command;
-						command = getCommand(BUNDLE_ENGINEYARD, "Deploy App");
+						command = getCommand(BUNDLE_ENGINEYARD, "Deploy App"); //$NON-NLS-1$
 						command.execute();
 					}
 				});
@@ -580,7 +570,6 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		return runnable;
 	}
 
-	
 	@Override
 	public void addPages()
 	{
@@ -604,7 +593,6 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		return page.getPreviousPage();
 	}
 
-	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection)
 	{
 		Object element = selection.getFirstElement();
@@ -703,14 +691,12 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 			browser.addProgressListener(new ProgressListener()
 			{
 
-				@Override
 				public void completed(ProgressEvent event)
 				{
 					browser.removeProgressListener(this);
 					browser.execute(javascript);
 				}
 
-				@Override
 				public void changed(ProgressEvent event)
 				{
 					// ignore

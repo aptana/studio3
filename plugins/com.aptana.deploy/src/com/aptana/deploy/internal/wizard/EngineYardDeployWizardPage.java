@@ -46,7 +46,6 @@ public class EngineYardDeployWizardPage extends WizardPage
 		super(NAME, Messages.EngineYardDeployWizardPage_Title, Activator.getImageDescriptor(EY_ICON));
 	}
 
-	@Override
 	public void createControl(Composite parent)
 	{
 		Composite composite = new Composite(parent, SWT.NULL);
@@ -86,7 +85,6 @@ public class EngineYardDeployWizardPage extends WizardPage
 				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 				{
 
-					@Override
 					public void run()
 					{
 						try
@@ -116,13 +114,11 @@ public class EngineYardDeployWizardPage extends WizardPage
 							browser.addProgressListener(new ProgressListener()
 							{
 
-								@Override
 								public void completed(ProgressEvent event)
 								{
 									browser.removeProgressListener(this);
 								}
 
-								@Override
 								public void changed(ProgressEvent event)
 								{
 									// ignore

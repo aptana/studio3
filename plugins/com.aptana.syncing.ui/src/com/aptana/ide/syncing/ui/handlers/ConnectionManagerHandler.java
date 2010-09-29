@@ -44,7 +44,6 @@ import com.aptana.ide.syncing.ui.actions.ConnectionManagerAction;
 public class ConnectionManagerHandler extends BaseSyncHandler
 {
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		ConnectionManagerAction action = new ConnectionManagerAction();

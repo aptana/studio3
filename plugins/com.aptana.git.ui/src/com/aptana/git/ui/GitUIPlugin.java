@@ -76,7 +76,6 @@ public class GitUIPlugin extends AbstractUIPlugin
 		{
 
 			@SuppressWarnings("restriction")
-			@Override
 			public void preferenceChange(PreferenceChangeEvent event)
 			{
 				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
@@ -196,7 +195,6 @@ public class GitUIPlugin extends AbstractUIPlugin
 		{
 			dlg.run(true, false, new IRunnableWithProgress()
 			{
-				@Override
 				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
 				{
 					try

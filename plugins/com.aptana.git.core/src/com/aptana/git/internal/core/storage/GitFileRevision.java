@@ -59,4 +59,21 @@ public abstract class GitFileRevision extends FileRevision
 			return null;
 		}
 	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj instanceof GitFileRevision)
+		{
+			GitFileRevision other = (GitFileRevision) obj;
+			return other.path.equals(path);
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return path.hashCode();
+	}
 }

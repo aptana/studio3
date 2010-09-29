@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2008 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -613,13 +613,11 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		toolItem.addSelectionListener(new SelectionListener()
 		{
 
-			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
 				removeFilter();
 			}
 
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e)
 			{
 			}
@@ -2043,7 +2041,6 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 
 	}
 
-	@Override
 	public void search(String text, boolean isCaseSensitive, boolean isRegularExpression)
 	{
 		searchText = text;

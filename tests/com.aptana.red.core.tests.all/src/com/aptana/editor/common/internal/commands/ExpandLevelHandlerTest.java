@@ -150,8 +150,7 @@ public class ExpandLevelHandlerTest extends TestCase
 		{
 			PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
 			{
-				
-				@Override
+
 				public void run()
 				{
 					try
@@ -174,8 +173,7 @@ public class ExpandLevelHandlerTest extends TestCase
 		final IWorkbenchPage[] result = new IWorkbenchPage[1];
 		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
 		{
-			
-			@Override
+
 			public void run()
 			{
 				result[0] = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();

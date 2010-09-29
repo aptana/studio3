@@ -46,7 +46,7 @@ public class RubyParserTest extends TestCase
 		assertEquals(true, rubyClass.isClass());
 		assertEquals("Object", rubyClass.getSuperclassName());
 		// checks fields
-		assertFields(rubyClass, new String[] { "@:name", "@:age", "@name", "@age" });
+		assertFields(rubyClass, new String[] { "@name", "@age" });
 		// checks methods
 		assertMethods(rubyClass, new String[] { "name()", "age()", "initialize(name, age)" });
 	}

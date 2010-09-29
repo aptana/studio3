@@ -166,6 +166,7 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
     public void selectionChanged(IAction action, ISelection selection) {
         action.setEnabled(false);
         setSelection(selection);
+        setSelectedSite(null);
         action.setEnabled(fSelectedElements.size() > 0);
     }
 
@@ -196,14 +197,37 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
 		fDestinationRoot = destinationRoot;
 	}
 
-	@Override
 	public void init(IViewPart view) {
 		fActivePart = view;
 	}
 
 	public void setSelection(ISelection selection)
 	{
-		setSelection(selection, true);
+		fSelectedElements.clear();
+
+		Object[] elements = ((IStructuredSelection) selection).toArray();
+		IAdaptable adaptable;
+		boolean fromSource = true;
+		for (Object element : elements)
+		{
+			if (element instanceof IAdaptable)
+			{
+				adaptable = (IAdaptable) element;
+				if (SiteConnectionUtils.findSitesForSource(adaptable).length > 0)
+				{
+					fSelectedElements.add(adaptable);
+				}
+				else if (SiteConnectionUtils.findSitesWithDestination(adaptable).length > 0)
+				{
+					if (fromSource)
+					{
+						fromSource = false;
+					}
+					fSelectedElements.add(adaptable);
+				}
+			}
+		}
+		fSelectedFromSource = fromSource;
 	}
 
     public void setSelection(ISelection selection, boolean fromSource) {
@@ -248,7 +272,7 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
     @SuppressWarnings("unchecked")
 	protected ISiteConnection[] getSiteConnections() {
         List<Set<ISiteConnection>> sitesList = new ArrayList<Set<ISiteConnection>>();
-        Set<ISiteConnection> sitesSet;
+        Set<ISiteConnection> sitesSet = new HashSet<ISiteConnection>();
         ISiteConnection[] sites;
         for (IAdaptable element : fSelectedElements) {
         	if (fSelectedFromSource) {
@@ -256,7 +280,7 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
         	} else {
         		sites = SiteConnectionUtils.findSitesWithDestination(element);
         	}
-            sitesSet = new HashSet<ISiteConnection>();
+            sitesSet.clear();
             for (ISiteConnection site : sites) {
                 sitesSet.add(site);
             }
@@ -293,9 +317,15 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
         	sites = SiteConnectionUtils.findSitesForSource(container, true);
         } else {
         	sites = SiteConnectionUtils.findSitesWithDestination(container, true);
-        }        String target;
+        }
+        IConnectionPoint destination;
+        String target;
         for (ISiteConnection site : sites) {
-            target = site.getDestination().getName();
+        	destination = site.getDestination();
+        	if (destination == null) {
+        		continue;
+        	}
+            target = destination.getName();
             if (target.equals(lastConnection)) {
                 return site;
             }

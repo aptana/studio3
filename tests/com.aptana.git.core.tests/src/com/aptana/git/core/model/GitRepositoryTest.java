@@ -213,37 +213,31 @@ public class GitRepositoryTest extends TestCase
 		final List<RepositoryEvent> eventsReceived = new ArrayList<RepositoryEvent>();
 		IGitRepositoryListener listener = new IGitRepositoryListener()
 		{
-			@Override
 			public void indexChanged(IndexChangedEvent e)
 			{
 				eventsReceived.add(e);
 			}
 
-			@Override
 			public void branchChanged(BranchChangedEvent e)
 			{
 				eventsReceived.add(e);
 			}
 
-			@Override
 			public void pulled(PullEvent e)
 			{
 				eventsReceived.add(e);
 			}
 
-			@Override
 			public void branchAdded(BranchAddedEvent e)
 			{
 				eventsReceived.add(e);
 			}
 
-			@Override
 			public void branchRemoved(BranchRemovedEvent e)
 			{
 				eventsReceived.add(e);
 			}
 
-			@Override
 			public void pushed(PushEvent e)
 			{
 				eventsReceived.add(e);

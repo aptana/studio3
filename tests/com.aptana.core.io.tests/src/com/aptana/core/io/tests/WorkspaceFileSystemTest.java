@@ -67,7 +67,7 @@ public class WorkspaceFileSystemTest extends TestCase {
 
 		// Workspace file has workspace:/ protocol and trailing '/'
 		URI uri = fs.toURI();
-		String replaced = uri.toString().replaceAll("workspace:", "file:") + "/";
+		String replaced = uri.toString().replaceAll("workspace:", "file:") + "/"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		assertEquals(location.toFile().toURI().toString(), replaced);
 	}
 
@@ -76,7 +76,7 @@ public class WorkspaceFileSystemTest extends TestCase {
 
 		// Workspace file has workspace:/ protocol
 		URI uri = fs.toURI();
-		String replaced = uri.toString().replaceAll("workspace:", "file:");
+		String replaced = uri.toString().replaceAll("workspace:", "file:"); //$NON-NLS-1$ //$NON-NLS-2$
 		assertEquals(location.toFile().toURI().toString(), replaced);
 	}
 

@@ -44,7 +44,6 @@ import com.aptana.ide.syncing.ui.actions.DownloadAction;
 public class DownloadHandler extends BaseSyncHandler
 {
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		DownloadAction action = new DownloadAction();

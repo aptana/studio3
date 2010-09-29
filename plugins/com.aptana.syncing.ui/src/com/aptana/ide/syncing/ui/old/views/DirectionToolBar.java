@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2008 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -207,7 +207,7 @@ public class DirectionToolBar
 		directionBar.setLayout(layout);
 
 		fDirectionDown = new ToolItem(directionBar, SWT.DROP_DOWN);
-		fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/sync_both.gif"));
+		fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/sync_both.gif")); //$NON-NLS-1$
 
 		final Menu directionMenu = new Menu(directionBar);
 		fDirectionDown.addSelectionListener(new SelectionAdapter()
@@ -267,19 +267,19 @@ public class DirectionToolBar
 		fBoth.addSelectionListener(directionAdapter);
 
 		fUpload = new MenuItem(directionMenu, SWT.RADIO);
-		fUpload.setText(Messages.SmartSyncDialog_Upload); //$NON-NLS-1$
+		fUpload.setText(Messages.SmartSyncDialog_Upload);
 		fUpload.addSelectionListener(directionAdapter);
 
 		fForceUpload = new MenuItem(directionMenu, SWT.RADIO);
-		fForceUpload.setText(Messages.SmartSyncDialog_UploadAll); //$NON-NLS-1$
+		fForceUpload.setText(Messages.SmartSyncDialog_UploadAll);
 		fForceUpload.addSelectionListener(directionAdapter);
 
 		fDownload = new MenuItem(directionMenu, SWT.RADIO);
-		fDownload.setText(Messages.SmartSyncDialog_Download); //$NON-NLS-1$
+		fDownload.setText(Messages.SmartSyncDialog_Download);
 		fDownload.addSelectionListener(directionAdapter);
 
 		fForceDownload = new MenuItem(directionMenu, SWT.RADIO);
-		fForceDownload.setText(Messages.SmartSyncDialog_DownloadAll); //$NON-NLS-1$
+		fForceDownload.setText(Messages.SmartSyncDialog_DownloadAll);
 		fForceDownload.addSelectionListener(directionAdapter);
 
 		// fDirectionDown.setText(fBoth.getText());
@@ -293,27 +293,27 @@ public class DirectionToolBar
 	{
 		if (fBoth.getSelection())
 		{
-			fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/direction_both.gif"));
+			fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/direction_both.gif")); //$NON-NLS-1$
 			// fDirectionDown.setText(fBoth.getText());
 		}
 		else if (fUpload.getSelection())
 		{
-			fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/direction_upload.gif"));
+			fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/direction_upload.gif")); //$NON-NLS-1$
 			// fDirectionDown.setText(fUpload.getText());
 		}
 		else if (fForceUpload.getSelection())
 		{
-			fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/direction_upload_force.gif"));
+			fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/direction_upload_force.gif")); //$NON-NLS-1$
 			// fDirectionDown.setText(fForceUpload.getText());
 		}
 		else if (fDownload.getSelection())
 		{
-			fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/direction_download.gif"));
+			fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/direction_download.gif")); //$NON-NLS-1$
 			// fDirectionDown.setText(fDownload.getText());
 		}
 		else if (fForceDownload.getSelection())
 		{
-			fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/direction_download_force.gif"));
+			fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/direction_download_force.gif")); //$NON-NLS-1$
 			// fDirectionDown.setText(fForceDownload.getText());
 		}
 	}

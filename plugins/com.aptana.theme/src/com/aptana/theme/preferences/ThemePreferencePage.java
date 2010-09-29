@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.theme.preferences;
 
 import java.io.File;
@@ -57,6 +91,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -424,25 +459,58 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			public void mouseDown(MouseEvent e)
 			{
 				Table table = tableViewer.getTable();
-				// If user is clicking in the BG column when it's empty, pop open a color dialog
-				int myX = table.getColumn(0).getWidth();
-				myX += table.getColumn(1).getWidth();
-				int width = table.getColumn(2).getWidth() + 2;
-				if (!(e.x > myX && e.x < (myX + width)))
-					return;
-				TableItem tableItem = table.getItem(new Point(e.x, e.y));
-				ColorDialog colorDialog = new ColorDialog(table.getShell());
-				colorDialog.setRGB(getTheme().getBackground());
-				RGB newRGB = colorDialog.open();
-				if (newRGB == null)
-					return;
-				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) tableItem.getData();
-				Color fg = token.getValue().getForeground();
-				Color bg = ThemePlugin.getDefault().getColorManager().getColor(newRGB);
+				// If user is clicking in the FG/BG column when it's empty, pop open a color dialog
+				int fgColX = table.getColumn(0).getWidth(); // scope col width
+				int fgColWidth = table.getColumn(1).getWidth(); // fg col width
+				int bgColX = fgColX + fgColWidth;
+				int bgColWidth = table.getColumn(2).getWidth() + 2;
 
+				Map.Entry<String, TextAttribute> token = null;
+				Color fg = null;
+				Color bg = null;
+				if (e.x > fgColX && e.x < (fgColX + fgColWidth))
+				{
+					// user clicked in FG column
+					ColorDialog colorDialog = new ColorDialog(table.getShell());
+					colorDialog.setRGB(getTheme().getForeground());
+					RGB newRGB = colorDialog.open();
+					if (newRGB == null)
+					{
+						return; // no color selected, don't change a thing!
+					}
+					TableItem tableItem = table.getItem(new Point(e.x, e.y));
+					token = (Map.Entry<String, TextAttribute>) tableItem.getData();
+					fg = ThemePlugin.getDefault().getColorManager().getColor(newRGB);
+					bg = token.getValue().getBackground();
+				}
+				else if (e.x > bgColX && e.x < (bgColX + bgColWidth)) // is user clicking in the BG column?
+				{
+					ColorDialog colorDialog = new ColorDialog(table.getShell());
+					colorDialog.setRGB(getTheme().getBackground());
+					RGB newRGB = colorDialog.open();
+					if (newRGB == null)
+					{
+						return; // no color selected, don't change a thing!
+					}
+					TableItem tableItem = table.getItem(new Point(e.x, e.y));
+					token = (Map.Entry<String, TextAttribute>) tableItem.getData();
+					fg = token.getValue().getForeground();
+					bg = ThemePlugin.getDefault().getColorManager().getColor(newRGB);
+				}
+				else
+				{
+					return;
+				}
+
+				// Update the token's colors in our theme
 				TextAttribute at = new TextAttribute(fg, bg, token.getValue().getStyle(), token.getValue().getFont());
 				getTheme().update(token.getKey(), at);
 				setTheme(fSelectedTheme);
+
+				// Need to update the drawing of this row in the table!
+				TableItem tableItem = table.getItem(new Point(e.x, e.y));
+				Rectangle bounds = tableItem.getBounds(1);
+				table.redraw(bounds.x, bounds.y, bounds.width, bounds.height, true);
 			}
 		});
 
@@ -888,13 +956,11 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		super.dispose();
 	}
 
-	@Override
 	public void widgetDefaultSelected(SelectionEvent e)
 	{
 	}
 
 	@SuppressWarnings("unchecked")
-	@Override
 	public void widgetSelected(SelectionEvent e)
 	{
 		Object source = e.getSource();
@@ -1063,7 +1129,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		}
 	}
 
-	@Override
 	public String isValid(String newText)
 	{
 		IStatus status = getThemeManager().validateThemeName(newText);
@@ -1074,7 +1139,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		return status.getMessage();
 	}
 
-	@Override
 	public void propertyChange(PropertyChangeEvent event)
 	{
 		Object value = event.getNewValue();

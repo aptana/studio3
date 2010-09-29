@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common.extensions;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -51,13 +85,14 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 	private int fLastLineNumber = -1;
 
 	private boolean fIsActive;
+	private Point fLastSelection = new Point(0, 0);
+	private boolean fEnabled;
 
 	public LineBackgroundPainter(ISourceViewer viewer)
 	{
 		this.fViewer = viewer;
 	}
 
-	@Override
 	public void deactivate(boolean redraw)
 	{
 		if (fIsActive)
@@ -105,10 +140,10 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 			return;
 		}
 
-		StyledText textWidget = fViewer.getTextWidget();
 		// initialization
 		if (!fIsActive)
 		{
+			StyledText textWidget = fViewer.getTextWidget();
 			textWidget.addLineBackgroundListener(this);
 			textWidget.addPaintListener(this);
 			fPositionManager.managePosition(fCurrentLine);
@@ -156,12 +191,24 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 			IDocument document = fViewer.getDocument();
 			int modelCaret = getModelCaret();
 			int lineNumber = document.getLineOfOffset(modelCaret);
+			Point selection = fViewer.getTextWidget().getSelectionRange();
 
 			// redraw if the current line number is different from the last line number we painted
 			// initially fLastLineNumber is -1
-			if (lineNumber != fLastLineNumber || !fCurrentLine.overlapsWith(modelCaret, 0))
+			if (lineNumber != fLastLineNumber || !overlaps(fCurrentLine, modelCaret) || (selection.y != 0))
 			{
-
+				// Handle non-empty selections (turn off highlight line)
+				if (selection.y != 0 && fLastLine.equals(fCurrentLine))
+				{
+					if (fLastSelection.equals(selection)) // selection didn't change
+					{
+						return false; // don't redraw the highlight line
+					}
+					fLastSelection = selection;
+					return true; // selection changed
+				}
+				fLastSelection = selection;
+				// Update the current and last lines
 				fLastLine.offset = fCurrentLine.offset;
 				fLastLine.length = fCurrentLine.length;
 				fLastLine.isDeleted = fCurrentLine.isDeleted;
@@ -185,17 +232,22 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 				fLastLineNumber = lineNumber;
 				return true;
 			}
-			// Force redraw if there's a non-empty selection!
-			Point selection = fViewer.getTextWidget().getSelectionRange();
-			if (selection.y != 0)
-			{
-				return true;
-			}
 		}
 		catch (BadLocationException e)
 		{
 		}
 
+		return false;
+	}
+
+	private boolean overlaps(Position currentLine, int modelCaret)
+	{
+		if (currentLine.overlapsWith(modelCaret, 0))
+			return true;
+		if (modelCaret == (currentLine.getOffset() + currentLine.getLength()))
+		{
+			return true;
+		}
 		return false;
 	}
 
@@ -225,6 +277,12 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 	 */
 	private void drawHighlightLine(Position position)
 	{
+		// Don't draw if highlight current line is turned off
+		if (!fEnabled)
+		{
+			return;
+		}
+
 		RGBa lineHighlight = getCurrentTheme().getLineHighlight();
 		if (lineHighlight.isFullyOpaque())
 		{
@@ -295,13 +353,11 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 	/*
 	 * @see IPainter#setPositionManager(IPaintPositionManager)
 	 */
-	@Override
 	public void setPositionManager(IPaintPositionManager manager)
 	{
 		fPositionManager = manager;
 	}
 
-	@Override
 	public void lineGetBackground(LineBackgroundEvent event)
 	{
 		if (fViewer == null)
@@ -381,6 +437,7 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 		{
 			return;
 		}
+		Color background = textWidget.getBackground();
 		final int[] positions = new int[ranges.length * 2];
 		int x = 0;
 		boolean apply = false;
@@ -388,6 +445,13 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 		{
 			if (range.background != null)
 			{
+				if (!range.background.equals(background))
+				{
+					positions[x] = range.start;
+					positions[x + 1] = range.length;
+					x += 2;
+					continue;
+				}
 				apply = true;
 			}
 			range.background = null;
@@ -415,6 +479,12 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 	 */
 	private boolean shouldDrawCurrentLine(int line)
 	{
+		// Don't draw if highlight current line is turned off
+		if (!fEnabled)
+		{
+			return false;
+		}
+
 		// If there's a selection we "turn off" line highlight.
 		Point selection = fViewer.getTextWidget().getSelectionRange();
 		if (selection.y != 0)
@@ -484,7 +554,6 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 	 * then this method will not do anything and we'll fall back to using the mechanism eclipse does in
 	 * CursorLinePainter with a little modification.
 	 */
-	@Override
 	public void paintControl(PaintEvent e)
 	{
 		// If there's no alpha value for the line highlight, then we need to force the bg color of the whole line
@@ -522,5 +591,10 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 	protected IDocumentScopeManager getScopeManager()
 	{
 		return CommonEditorPlugin.getDefault().getDocumentScopeManager();
+	}
+
+	public void setHighlightLineEnabled(boolean on)
+	{
+		fEnabled = on;
 	}
 }

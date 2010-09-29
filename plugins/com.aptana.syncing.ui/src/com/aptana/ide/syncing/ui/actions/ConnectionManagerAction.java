@@ -57,26 +57,22 @@ public class ConnectionManagerAction implements IObjectActionDelegate, IViewActi
 	{
 	}
 
-	@Override
 	public void setActivePart(IAction action, IWorkbenchPart targetPart)
 	{
 		fActivePart = targetPart;
 	}
 
-	@Override
 	public void run(IAction action)
 	{
 		SiteConnectionsEditorDialog dlg = new SiteConnectionsEditorDialog(fActivePart.getSite().getShell());
 		dlg.open();
 	}
 
-	@Override
 	public void selectionChanged(IAction action, ISelection selection)
 	{
 		setSelection(selection);
 	}
 
-	@Override
 	public void init(IViewPart view)
 	{
 		fActivePart = view;

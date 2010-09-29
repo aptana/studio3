@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.ruby.index;
 
 import java.net.URI;
@@ -27,34 +61,28 @@ public class RubySourceIndexer implements ISourceElementRequestor
 		index.addEntry(category, word, documentPath);
 	}
 
-	@Override
 	public void exitType(int endOffset)
 	{
 		typeStack.pop();
 	}
 
-	@Override
 	public void exitScript(int endOffset)
 	{
 		typeStack.clear();
 	}
 
-	@Override
 	public void exitMethod(int endOffset)
 	{
 	}
 
-	@Override
 	public void exitField(int endOffset)
 	{
 	}
 
-	@Override
 	public void exitConstructor(int endOffset)
 	{
 	}
 
-	@Override
 	public void enterType(TypeInfo type)
 	{
 		String simpleName = getSimpleName(type.name);
@@ -146,7 +174,6 @@ public class RubySourceIndexer implements ISourceElementRequestor
 		return names;
 	}
 
-	@Override
 	public void enterScript()
 	{
 	}
@@ -188,12 +215,10 @@ public class RubySourceIndexer implements ISourceElementRequestor
 		addIndex(IRubyIndexConstants.METHOD_DECL, createMethodKey(method.name, method.parameterNames.length));
 	}
 
-	@Override
 	public void acceptYield(String name)
 	{
 	}
 
-	@Override
 	public void acceptTypeReference(String name, int startOffset, int endOffset)
 	{
 		addTypeReference(name);
@@ -218,12 +243,10 @@ public class RubySourceIndexer implements ISourceElementRequestor
 		return name;
 	}
 
-	@Override
 	public void acceptModuleFunction(String function)
 	{
 	}
 
-	@Override
 	public void acceptMixin(String moduleName)
 	{
 		addIndex(IRubyIndexConstants.REF, getSimpleName(moduleName));
@@ -316,12 +339,10 @@ public class RubySourceIndexer implements ISourceElementRequestor
 		return lastSegment(name, NAMESPACE_DELIMETER);
 	}
 
-	@Override
 	public void acceptMethodVisibilityChange(String methodName, Visibility visibility)
 	{
 	}
 
-	@Override
 	public void acceptMethodReference(String name, int argCount, int offset)
 	{
 		addIndex(IRubyIndexConstants.METHOD_REF, createMethodKey(name, argCount));
@@ -332,7 +353,6 @@ public class RubySourceIndexer implements ISourceElementRequestor
 		return name + IRubyIndexConstants.SEPARATOR + String.valueOf(argCount);
 	}
 
-	@Override
 	public void acceptImport(String value, int startOffset, int endOffset)
 	{
 		// FIXME This is really, really bad. requires are relative to loadpaths, which are dynamic.
@@ -344,13 +364,11 @@ public class RubySourceIndexer implements ISourceElementRequestor
 		addIndex(IRubyIndexConstants.REQUIRE, value);
 	}
 
-	@Override
 	public void acceptFieldReference(String name, int offset)
 	{
 		addIndex(IRubyIndexConstants.REF, name);
 	}
 
-	@Override
 	public void acceptConstructorReference(String name, int argCount, int offset)
 	{
 		String simpleTypeName = getSimpleName(name);
@@ -358,7 +376,6 @@ public class RubySourceIndexer implements ISourceElementRequestor
 		addIndex(IRubyIndexConstants.CONSTRUCTOR_REF, createMethodKey(simpleTypeName, argCount));
 	}
 
-	@Override
 	public void acceptBlock(int startOffset, int endOffset)
 	{
 	}

@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.theme;
 
 import java.io.ByteArrayInputStream;
@@ -44,7 +78,8 @@ public class Theme
 	private static final String BOLD = "bold"; //$NON-NLS-1$
 	private static final String ITALIC = "italic"; //$NON-NLS-1$
 
-	static final String THEME_NAME_PROP_KEY = "name"; //$NON-NLS-1$
+	public static final String THEME_NAME_PROP_KEY = "name"; //$NON-NLS-1$
+	public static final String THEME_EXTENDS_PROP_KEY = "extends_theme"; //$NON-NLS-1$
 	static final String FOREGROUND_PROP_KEY = "foreground"; //$NON-NLS-1$
 	private static final String BACKGROUND_PROP_KEY = "background"; //$NON-NLS-1$
 	private static final String SELECTION_PROP_KEY = "selection"; //$NON-NLS-1$
@@ -107,7 +142,8 @@ public class Theme
 			boolean skipFG = false;
 			for (String token : values)
 			{
-				if (token.trim().length() == 0 && num == 0)
+				token = token.trim();
+				if (token.length() == 0 && num == 0)
 				{
 					// empty fg!
 					skipFG = true;
@@ -154,7 +190,7 @@ public class Theme
 			tokens.add(value);
 			return tokens;
 		}
-		return Arrays.asList(value.split(","));
+		return Arrays.asList(value.split(DELIMETER));
 	}
 
 	private RGB parseHexRGB(String hex)
@@ -709,7 +745,19 @@ public class Theme
 	 */
 	public boolean hasEntry(String scopeSelector)
 	{
-		return coloringRules.containsKey(scopeSelector);
+		if (cache.containsKey(scopeSelector))
+		{
+			return true;
+		}
+		ScopeSelector selector = new ScopeSelector(scopeSelector);
+		for (ScopeSelector s : coloringRules.keySet())
+		{
+			if (selector.equals(s))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public Color getForeground(String scope)

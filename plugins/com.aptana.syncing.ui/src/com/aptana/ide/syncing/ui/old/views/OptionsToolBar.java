@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2008 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -176,7 +176,7 @@ public class OptionsToolBar
 		fDropdown = new ToolItem(optionsBar, SWT.DROP_DOWN);
 		// fDropdown.setText(Messages.SmartSyncDialog_ViewOptions);
 		fDropdown.setToolTipText(Messages.SmartSyncDialog_OptionsToolTip);
-		fDropdown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/configure.gif"));
+		fDropdown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/configure.gif")); //$NON-NLS-1$
 
 		final Menu menu = new Menu(optionsBar);
 		fDropdown.addSelectionListener(new SelectionAdapter()

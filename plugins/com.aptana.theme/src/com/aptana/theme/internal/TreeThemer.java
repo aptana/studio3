@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.theme.internal;
 
 import java.lang.reflect.Field;
@@ -207,7 +241,6 @@ class TreeThemer extends ControlThemer
 			isDisabled = false;
 		}
 
-		@Override
 		public Image getImage(Object element)
 		{
 			if (cellProvider instanceof ILabelProvider)
@@ -217,7 +250,6 @@ class TreeThemer extends ControlThemer
 			return null;
 		}
 
-		@Override
 		public String getText(Object element)
 		{
 			if (cellProvider instanceof ILabelProvider)
@@ -270,8 +302,6 @@ class TreeThemer extends ControlThemer
 		// This draws from right end of item to full width of tree, needed on windows so selection is full width of view
 		selectionPaintListener = new Listener()
 		{
-
-			@Override
 			public void handleEvent(Event event)
 			{
 				try
@@ -288,11 +318,20 @@ class TreeThemer extends ControlThemer
 					Color oldBackground = gc.getBackground();
 
 					gc.setBackground(getSelection());
+					int columns = tree.getColumnCount();
 					for (TreeItem item : items)
 					{
 						if (item != null)
-						{
-							Rectangle bounds = item.getBounds(tree.getColumnCount() - 1);
+						{						
+							Rectangle bounds;
+							if (columns == 0)
+							{
+								bounds = item.getBounds();
+							}
+							else
+							{
+								bounds = item.getBounds(columns - 1);
+							}
 							int x = bounds.x + bounds.width;
 							if (x < clientWidth)
 							{
@@ -325,8 +364,6 @@ class TreeThemer extends ControlThemer
 		final Tree tree = getTree();
 		customDrawingListener = new Listener()
 		{
-
-			@Override
 			public void handleEvent(Event event)
 			{
 				GC gc = event.gc;
@@ -409,8 +446,6 @@ class TreeThemer extends ControlThemer
 		final Tree tree = getTree();
 		fontListener = new IPropertyChangeListener()
 		{
-
-			@Override
 			public void propertyChange(PropertyChangeEvent event)
 			{
 				if (!event.getProperty().equals(IThemeManager.VIEW_FONT_NAME))
@@ -419,8 +454,6 @@ class TreeThemer extends ControlThemer
 				}
 				Display.getCurrent().asyncExec(new Runnable()
 				{
-
-					@Override
 					public void run()
 					{
 						Font font = getFont();

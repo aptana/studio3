@@ -65,7 +65,6 @@ public class NixBashConfiguration extends AbstractProcessConfiguration {
 	/* (non-Javadoc)
 	 * @see com.aptana.terminal.IProcessConfiguration#getCommandLine()
 	 */
-	@Override
 	public List<String> getCommandLine() {
 		List<String> list = new ArrayList<String>();
 		list.add(getExecutable().getAbsolutePath());

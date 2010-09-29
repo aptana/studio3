@@ -1,7 +1,38 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.html;
-
-import java.util.HashSet;
-import java.util.Set;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -13,23 +44,11 @@ import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.graphics.Point;
 
+import com.aptana.editor.html.parsing.HTMLParseState;
+
 @SuppressWarnings("nls")
 public class OpenTagCloser implements VerifyKeyListener
 {
-
-	private static Set<String> SELF_CLOSING_TAGS = new HashSet<String>();
-	static
-	{
-		SELF_CLOSING_TAGS.add("br");
-		SELF_CLOSING_TAGS.add("hr");
-		SELF_CLOSING_TAGS.add("area");
-		SELF_CLOSING_TAGS.add("base");
-		SELF_CLOSING_TAGS.add("basefont");
-		SELF_CLOSING_TAGS.add("input");
-		SELF_CLOSING_TAGS.add("img");
-		SELF_CLOSING_TAGS.add("link");
-		SELF_CLOSING_TAGS.add("meta");
-	}
 
 	private ITextViewer textViewer;
 
@@ -45,7 +64,6 @@ public class OpenTagCloser implements VerifyKeyListener
 		return pairMatcher;
 	}
 
-	@Override
 	public void verifyKey(VerifyEvent event)
 	{
 		// early pruning to slow down normal typing as little as possible
@@ -157,7 +175,7 @@ public class OpenTagCloser implements VerifyKeyListener
 		return openTag == null || openTag.startsWith("<%") || openTag.startsWith("<!");
 	}
 
-	private boolean tagClosed(IDocument document, int offset, String openTag)
+	public static boolean tagClosed(IDocument document, int offset, String openTag)
 	{
 		// Actually make a "stack" of open and close tags for this tag name and see if it's unbalanced
 		String tagName = getTagName(openTag);
@@ -173,7 +191,15 @@ public class OpenTagCloser implements VerifyKeyListener
 			if (x == -1)
 				break;
 			x += toAdd;
-			stack++;
+			char c = '>';
+			if (x < src.length())
+			{
+				c = src.charAt(x);
+			}
+			if (c == '>' || Character.isWhitespace(c))
+			{
+				stack++;
+			}
 		}
 
 		// Subtract number of close tags
@@ -185,7 +211,15 @@ public class OpenTagCloser implements VerifyKeyListener
 			if (x == -1)
 				break;
 			x += toAdd;
-			stack--;
+			char c = '>';
+			if (x < src.length())
+			{
+				c = src.charAt(x);
+			}
+			if (c == '>' || Character.isWhitespace(c))
+			{
+				stack--;
+			}
 		}
 		// if we had more equal number of closed (or more than open), then the tag is closed.
 		return stack <= 0;
@@ -197,15 +231,24 @@ public class OpenTagCloser implements VerifyKeyListener
 	 * @param openTag
 	 * @return
 	 */
-	protected String getTagName(String openTag)
+	protected static String getTagName(String openTag)
 	{
-		String tagName = openTag.substring(1, openTag.indexOf(">")).trim();
-		int spaceIndex = tagName.indexOf(' ');
+		if (openTag.startsWith("<"))
+		{
+			openTag = openTag.substring(1);
+		}
+		int index = openTag.indexOf(">");
+		if (index != -1)
+		{
+			openTag = openTag.substring(0, index);
+		}
+		openTag = openTag.trim();
+		int spaceIndex = openTag.indexOf(' ');
 		if (spaceIndex != -1)
 		{
-			tagName = tagName.substring(0, spaceIndex);
+			openTag = openTag.substring(0, spaceIndex);
 		}
-		return tagName;
+		return openTag;
 	}
 
 	private String getMatchingCloseTag(String openTag)
@@ -259,7 +302,13 @@ public class OpenTagCloser implements VerifyKeyListener
 		{
 			toCheck = toCheck.substring(0, toCheck.length() - 1);
 		}
-		if (toCheck.startsWith("/") || SELF_CLOSING_TAGS.contains(toCheck))
+		if (toCheck.startsWith("/"))
+		{
+			return null;
+		}
+		HTMLParseState state = new HTMLParseState();
+		state.setEditState(document.get(), null, 0, 0);
+		if (state.isEmptyTagType(toCheck))
 		{
 			return null;
 		}

@@ -109,7 +109,6 @@ public class DownloadAction extends BaseSyncAction
 							items.length, monitor, new SyncActionEventHandler.Client()
 							{
 
-								@Override
 								public void syncCompleted()
 								{
 									for (IAdaptable file : files)
@@ -172,7 +171,6 @@ public class DownloadAction extends BaseSyncAction
 		getShell().getDisplay().asyncExec(new Runnable()
 		{
 
-			@Override
 			public void run()
 			{
 				DialogUtils.openIgnoreMessageDialogInformation(getShell(), MESSAGE_TITLE, MessageFormat.format(
