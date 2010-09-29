@@ -82,6 +82,7 @@ public class WebBrowserViewer extends Composite {
 	public WebBrowserViewer(Composite parent, int style) {
 		super(parent, SWT.NONE);
 		setLayout(GridLayoutFactory.fillDefaults().create());
+		createActions();
 		if ((style & NAVIGATION_BAR) != 0) {
 			Composite container = new Composite(this, SWT.NONE);
 			container.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
@@ -122,8 +123,6 @@ public class WebBrowserViewer extends Composite {
 	}
 	
 	private void createNavigationBar(Composite parent) {
-		createActions();
-		
 		toolBarManager = new ToolBarManager(SWT.FLAT);
 		toolBarManager.add(backAction);
 		toolBarManager.add(forwardAction);

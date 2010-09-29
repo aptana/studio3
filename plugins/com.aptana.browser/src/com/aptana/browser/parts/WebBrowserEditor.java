@@ -33,32 +33,40 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.browser;
+package com.aptana.browser.parts;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IStatusLineManager;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.swt.browser.TitleEvent;
 import org.eclipse.swt.browser.TitleListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 import org.eclipse.ui.part.EditorPart;
 
+import com.aptana.browser.WebBrowserViewer;
 import com.aptana.swt.webkitbrowser.WebKitBrowser;
 
 /**
  * @author Max Stepanov
  *
  */
+@SuppressWarnings("restriction")
 public class WebBrowserEditor extends EditorPart {
 
 	public static final String EDITOR_ID = "com.aptana.browser.editors.webbrowser"; //$NON-NLS-1$
 	
 	private WebBrowserViewer browserViewer;
 	private int progressWorked;
+	private String initialURL;
+	private Image image;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
@@ -81,6 +89,38 @@ public class WebBrowserEditor extends EditorPart {
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
 		setSite(site);
 		setInput(input);
+		if (input instanceof WebBrowserEditorInput) {
+			WebBrowserEditorInput wbei = (WebBrowserEditorInput) input;
+			initialURL = null;
+			if (wbei.getURL() != null)
+				initialURL = wbei.getURL().toExternalForm();
+			if (browserViewer != null) {
+				browserViewer.setUrl(initialURL);
+				site.getWorkbenchWindow().getActivePage().activate(this);
+			}
+	
+			setPartName(wbei.getName());
+			setTitleToolTip(wbei.getToolTipText());
+			Image oldImage = image;
+			ImageDescriptor id = wbei.getImageDescriptor();
+			image = id.createImage();
+
+			setTitleImage(image);
+			if (oldImage != null && !oldImage.isDisposed())
+				oldImage.dispose();
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+	 */
+	@Override
+	public void dispose() {
+		if (image != null && !image.isDisposed()) {
+			image.dispose();
+			image = null;
+		}
+		super.dispose();
 	}
 
 	/* (non-Javadoc)
@@ -104,7 +144,15 @@ public class WebBrowserEditor extends EditorPart {
 	 */
 	@Override
 	public void createPartControl(Composite parent) {
-		browserViewer = new WebBrowserViewer(parent, WebBrowserViewer.NAVIGATION_BAR);
+		WebBrowserEditorInput input = getWebBrowserEditorInput();
+		int style = 0;
+		if (input == null || input.isLocationBarLocal()) {
+			style |= WebBrowserViewer.NAVIGATION_BAR;
+		}
+		if (input == null || input.isToolbarLocal()) {
+			style |= WebBrowserViewer.NAVIGATION_BAR;
+		}
+		browserViewer = new WebBrowserViewer(parent, style);
 		WebKitBrowser browser = (WebKitBrowser) browserViewer.getBrowserControl();
 		browser.addProgressListener(new ProgressListener() {
 			public void changed(ProgressEvent event) {
@@ -132,6 +180,7 @@ public class WebBrowserEditor extends EditorPart {
 				setTitleToolTip(event.title);
 			}
 		});
+		browserViewer.setUrl(initialURL);
 	}
 
 	/* (non-Javadoc)
@@ -139,12 +188,31 @@ public class WebBrowserEditor extends EditorPart {
 	 */
 	@Override
 	public void setFocus() {
-		browserViewer.setFocus();
+		if (browserViewer != null) {
+			browserViewer.setFocus();
+		}
 	}
 
 	private IProgressMonitor getStatusBarProgressMonitor() {
 		IStatusLineManager statusLineManager = getEditorSite().getActionBars().getStatusLineManager();
 		return statusLineManager.getProgressMonitor();
+	}
+
+	public boolean close() {
+        final boolean [] result = new boolean[1];
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				result[0] = getEditorSite().getPage().closeEditor(WebBrowserEditor.this, false);
+			}
+		});
+        return result[0];
+	}
+
+	protected WebBrowserEditorInput getWebBrowserEditorInput() {
+		IEditorInput input = getEditorInput();
+		if (input instanceof WebBrowserEditorInput)
+			return (WebBrowserEditorInput) input;
+		return null;
 	}
 
 }

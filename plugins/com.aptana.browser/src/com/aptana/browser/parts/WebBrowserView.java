@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.browser;
+package com.aptana.browser.parts;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IStatusLineManager;
@@ -44,6 +44,7 @@ import org.eclipse.swt.browser.TitleListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
+import com.aptana.browser.WebBrowserViewer;
 import com.aptana.swt.webkitbrowser.WebKitBrowser;
 
 /**
@@ -51,6 +52,8 @@ import com.aptana.swt.webkitbrowser.WebKitBrowser;
  *
  */
 public class WebBrowserView extends ViewPart {
+
+	public static final String VIEW_ID = "com.aptana.browser.views.webbrowser"; //$NON-NLS-1$
 
 	private WebBrowserViewer browserViewer;
 	private int progressWorked;
@@ -102,4 +105,18 @@ public class WebBrowserView extends ViewPart {
 		IStatusLineManager statusLineManager = getViewSite().getActionBars().getStatusLineManager();
 		return statusLineManager.getProgressMonitor();
 	}
+	
+	public boolean close() {
+		try {
+			getSite().getPage().hideView(this);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
+	public void setURL(String url) {
+		browserViewer.setUrl(url);
+	}
+
 }

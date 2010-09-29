@@ -33,65 +33,40 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.browser;
+package com.aptana.browser.support;
 
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IPersistableElement;
+import java.net.URL;
 
 /**
  * @author Max Stepanov
  *
  */
-public class WebBrowserEditorInput implements IEditorInput {
+@SuppressWarnings("restriction")
+public class WebBrowserEditorInput extends org.eclipse.ui.internal.browser.WebBrowserEditorInput {
+
 
 	/**
-	 * 
+	 * @param url
 	 */
-	public WebBrowserEditorInput() {
+	public WebBrowserEditorInput(URL url) {
+		super(url);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IEditorInput#exists()
+	/**
+	 * @param url
+	 * @param style
 	 */
-	public boolean exists() {
-		return false;
+	public WebBrowserEditorInput(URL url, int style) {
+		super(url, style);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IEditorInput#getImageDescriptor()
+	/**
+	 * @param url
+	 * @param style
+	 * @param browserId
 	 */
-	public ImageDescriptor getImageDescriptor() {
-		return ImageResource.getImageDescriptor(ImageResource.IMG_OBJ_BROWSER);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IEditorInput#getName()
-	 */
-	public String getName() {
-		return ""; //$NON-NLS-1$
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IEditorInput#getPersistable()
-	 */
-	public IPersistableElement getPersistable() {
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IEditorInput#getToolTipText()
-	 */
-	public String getToolTipText() {
-		return ""; //$NON-NLS-1$
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
-	 */
-	@SuppressWarnings("rawtypes")
-	public Object getAdapter(Class adapter) {
-		return null;
+	public WebBrowserEditorInput(URL url, int style, String browserId) {
+		super(url, style, browserId);
 	}
 
 }
