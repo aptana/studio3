@@ -48,6 +48,7 @@ import org.eclipse.jface.text.rules.WordRule;
 
 import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
+import com.aptana.editor.common.text.rules.WordDetector;
 
 public class MarkdownScanner extends RuleBasedScanner
 {
@@ -114,7 +115,11 @@ public class MarkdownScanner extends RuleBasedScanner
 			}
 		}, getToken("markup.underline.link.markdown")); //$NON-NLS-1$C
 		rules.add(rule);
-
+		
+		// Normal words
+		rule = new WordRule(new WordDetector(), getToken("")); //$NON-NLS-1$C
+		rules.add(rule);
+		
 		setRules(rules.toArray(new IRule[rules.size()]));
 		setDefaultReturnToken(getToken("")); //$NON-NLS-1$
 	}

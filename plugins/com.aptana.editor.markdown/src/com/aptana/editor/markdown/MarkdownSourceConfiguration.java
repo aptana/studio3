@@ -85,7 +85,7 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IMarkdownConstants.CONTENT_TYPE_MARKDOWN } };
 
 	private MarkdownScanner xmlScanner;
-	private RuleBasedScanner preProcessorScanner;
+	private RuleBasedScanner headingScanner;
 
 	private static MarkdownSourceConfiguration instance;
 
@@ -304,18 +304,11 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 
 	private ITokenScanner getPreProcessorScanner()
 	{
-		if (preProcessorScanner == null)
+		if (headingScanner == null)
 		{
-			preProcessorScanner = new RuleBasedScanner();
-			IRule[] rules = new IRule[] {
-					new SingleCharacterRule('#', getToken("punctuation.definition.heading.markdown")), //$NON-NLS-1$
-					new SingleCharacterRule('=', getToken("punctuation.definition.heading.markdown")), //$NON-NLS-1$
-					new SingleCharacterRule('-', getToken("punctuation.definition.heading.markdown")) //$NON-NLS-1$
-			};
-			preProcessorScanner.setRules(rules);
-			preProcessorScanner.setDefaultReturnToken(getToken("entity.name.section.markdown")); //$NON-NLS-1$
+			headingScanner = new MarkdownHeadingScanner();
 		}
-		return preProcessorScanner;
+		return headingScanner;
 	}
 
 	protected ITokenScanner getMarkdownScanner()

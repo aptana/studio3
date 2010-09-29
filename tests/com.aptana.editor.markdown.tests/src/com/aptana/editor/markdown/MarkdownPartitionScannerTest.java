@@ -13,6 +13,7 @@ import com.aptana.editor.common.text.rules.NullSubPartitionScanner;
 public class MarkdownPartitionScannerTest extends TestCase
 {
 
+	// TODO Refactor out common code with other language's partition scanner testcases!
 	private ExtendedFastPartitioner partitioner;
 
 	private void assertContentType(String contentType, String code, int offset)
