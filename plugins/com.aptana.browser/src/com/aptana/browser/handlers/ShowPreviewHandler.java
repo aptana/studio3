@@ -33,59 +33,38 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.browser.actions;
+package com.aptana.browser.handlers;
 
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.browser.IWebBrowser;
-import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
 import com.aptana.browser.BrowserPlugin;
+import com.aptana.browser.parts.WebBrowserEditor;
+import com.aptana.browser.support.WebBrowserEditorInput;
 
 /**
  * @author Max Stepanov
  *
  */
-public class ShowBrowserEditorAction implements IWorkbenchWindowActionDelegate {
-
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#dispose()
-	 */
-	public void dispose() {
-	}
+public class ShowPreviewHandler extends AbstractHandler {
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.IWorkbenchWindow)
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
 	 */
-	public void init(IWorkbenchWindow window) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
-	 */
-	public void run(IAction action) {
-		try {
-			IWorkbenchBrowserSupport workbenchBrowserSupport = PlatformUI.getWorkbench().getBrowserSupport();
-			if (workbenchBrowserSupport.isInternalWebBrowserAvailable()) {
-				IWebBrowser webBrowser = workbenchBrowserSupport.createBrowser(IWorkbenchBrowserSupport.AS_EDITOR | IWorkbenchBrowserSupport.LOCATION_BAR | IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.STATUS, null, null, null);
-				if (webBrowser != null) {
-					webBrowser.openURL(null);
-				}
+	public Object execute(ExecutionEvent event) throws ExecutionException {
+		IWorkbenchPage workbenchPage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		if (workbenchPage != null) {
+			try {
+				workbenchPage.openEditor(new WebBrowserEditorInput(null), WebBrowserEditor.EDITOR_ID);
+			} catch (PartInitException e) {
+				BrowserPlugin.log(e);
 			}
-		} catch (PartInitException e) {
-			BrowserPlugin.log(e);
 		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
-	 */
-	public void selectionChanged(IAction action, ISelection selection) {
+		return null;
 	}
 
 }
