@@ -35,6 +35,8 @@
 package com.aptana.editor.html.parsing;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 import org.eclipse.jface.text.Document;
@@ -185,6 +187,26 @@ public class HTMLParser implements IParser
 			processSymbol(fCurrentSymbol);
 			advance();
 		}
+
+		// if there are unclosed tags remaining, close them all
+		List<HTMLElementNode> elementsToClose = new ArrayList<HTMLElementNode>();
+		if (fCurrentElement instanceof HTMLElementNode)
+		{
+			elementsToClose.add((HTMLElementNode) fCurrentElement);
+		}
+		IParseNode node;
+		for (int i = fElementStack.size() - 1; i >= 0; --i)
+		{
+			node = fElementStack.get(i);
+			if (node instanceof HTMLElementNode)
+			{
+				elementsToClose.add((HTMLElementNode) node);
+			}
+		}
+		for (HTMLElementNode element : elementsToClose)
+		{
+			element.setLocation(element.getStartingOffset(), fCurrentSymbol.getStart() - 1);
+		}
 	}
 
 	private void advance() throws IOException, Exception
@@ -228,18 +250,63 @@ public class HTMLParser implements IParser
 
 	private void processEndTag()
 	{
-		// only closes current element if current lexeme and element have the same tag name
-		if (fCurrentElement != null)
+		String tagName = HTMLUtils.stripTagEndings(fCurrentSymbol.value.toString());
+		List<HTMLElementNode> elementsToClose = new ArrayList<HTMLElementNode>();
+		if (fCurrentElement instanceof HTMLElementNode
+				&& ((HTMLElementNode) fCurrentElement).getName().equalsIgnoreCase(tagName))
 		{
-			String tagName = HTMLUtils.stripTagEndings(fCurrentSymbol.value.toString());
-			if ((fCurrentElement instanceof HTMLElementNode)
-					&& ((HTMLElementNode) fCurrentElement).getName().equalsIgnoreCase(tagName))
+			elementsToClose.add((HTMLElementNode) fCurrentElement);
+		}
+		else
+		{
+			// finds the closest opened tag of the same name
+			IParseNode node;
+			int i;
+			for (i = fElementStack.size() - 1; i >= 0; --i)
 			{
-				// adjusts the ending offset of current element to include the entire block
-				((HTMLElementNode) fCurrentElement).setLocation(fCurrentElement.getStartingOffset(), fCurrentSymbol
-						.getEnd());
-				closeElement();
+				node = fElementStack.get(i);
+				if (node instanceof HTMLElementNode && ((HTMLElementNode) node).getName().equalsIgnoreCase(tagName))
+				{
+					break;
+				}
 			}
+
+			if (i >= 0)
+			{
+				// found the match, so closes it as well as all the open elements above
+				if (fCurrentElement instanceof HTMLElementNode)
+				{
+					elementsToClose.add((HTMLElementNode) fCurrentElement);
+				}
+
+				for (int j = fElementStack.size() - 1; j >= i; --j)
+				{
+					node = fElementStack.get(j);
+					if (node instanceof HTMLElementNode)
+					{
+						elementsToClose.add((HTMLElementNode) node);
+					}
+				}
+			}
+		}
+
+		HTMLElementNode element;
+		int size = elementsToClose.size();
+		for (int i = 0; i < size; ++i)
+		{
+			element = elementsToClose.get(i);
+			// adjusts the ending offset of the element to include the entire block
+			if (i < size - 1)
+			{
+				element.setLocation(element.getStartingOffset(), fCurrentSymbol.getStart() - 1);
+			}
+			else
+			{
+				// only the last element has the end tag
+				element.setLocation(element.getStartingOffset(), fCurrentSymbol.getEnd());
+				element.setEndNode(fCurrentSymbol.getStart(), fCurrentSymbol.getEnd());
+			}
+			closeElement();
 		}
 	}
 
@@ -308,13 +375,26 @@ public class HTMLParser implements IParser
 	 */
 	private void openElement(HTMLElementNode element)
 	{
+		String tagName = element.getName();
+		int closeTagType = fParseState.getCloseTagType(tagName);
+		// tag with optional end could not be nested, so if we see another instance of the same start tag, close the
+		// previous one
+		if (closeTagType == HTMLTagInfo.END_OPTIONAL && fCurrentElement != null
+				&& tagName.equals(fCurrentElement.getNameNode().getName()))
+		{
+			// adjusts the ending offset of current element to include the entire block up to the start of the new tag
+			((HTMLNode) fCurrentElement)
+					.setLocation(fCurrentElement.getStartingOffset(), fCurrentSymbol.getStart() - 1);
+			closeElement();
+		}
+
 		// adds the new parent as a child of the current parent
 		if (fCurrentElement != null)
 		{
 			fCurrentElement.addChild(element);
 		}
 
-		if (fParseState.getCloseTagType(element.getName()) != HTMLTagInfo.END_FORBIDDEN)
+		if (closeTagType != HTMLTagInfo.END_FORBIDDEN)
 		{
 			fElementStack.push(fCurrentElement);
 			fCurrentElement = element;
