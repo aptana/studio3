@@ -8,6 +8,7 @@ import org.jrubyparser.SourcePosition;
 import org.jrubyparser.ast.CommentNode;
 import org.jrubyparser.parser.ParserResult;
 
+import com.aptana.editor.ruby.formatter.internal.nodes.FormatterRubyCommentNode;
 import com.aptana.formatter.FormatterUtils;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterCommentNode;
@@ -206,7 +207,7 @@ public class RubyFormatterNodeRewriter
 					result.add(new FormatterTextNode(document, start, validEnd));
 					start = position.getStartOffset();
 				}
-				result.add(new FormatterCommentNode(document, start, Math.min(position.getEndOffset(), end)));
+				result.add(new FormatterRubyCommentNode(document, start, Math.min(position.getEndOffset(), end)));
 				start = position.getEndOffset();
 				if (start > end)
 				{
