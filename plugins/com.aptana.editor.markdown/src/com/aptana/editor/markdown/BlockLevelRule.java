@@ -34,7 +34,7 @@ public class BlockLevelRule extends SingleLineRule
 
 	public BlockLevelRule(String startSequence, String endSequence, IToken token)
 	{
-		super(startSequence, endSequence, token);
+		super(startSequence, endSequence, token, (char) 0, true);
 		setColumnConstraint(0);
 	}
 

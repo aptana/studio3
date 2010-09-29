@@ -240,7 +240,7 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		{
 			header += "#"; //$NON-NLS-1$
 		}
-		SingleLineRule rule = new SingleLineRule(header, header, new Token(HEADING));
+		SingleLineRule rule = new SingleLineRule(header, header, new Token(HEADING), (char) 0, true);
 		rule.setColumnConstraint(0);
 		return rule;
 	}
@@ -274,7 +274,7 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
 	{
-		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getXMLScanner());
+		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getMarkdownScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
@@ -318,7 +318,7 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		return preProcessorScanner;
 	}
 
-	protected ITokenScanner getXMLScanner()
+	protected ITokenScanner getMarkdownScanner()
 	{
 		if (xmlScanner == null)
 		{
