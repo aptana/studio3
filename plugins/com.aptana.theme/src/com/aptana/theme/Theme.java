@@ -142,7 +142,7 @@ public class Theme
 			boolean skipFG = false;
 			for (String token : values)
 			{
-			    token = token.trim();
+				token = token.trim();
 				if (token.length() == 0 && num == 0)
 				{
 					// empty fg!
@@ -741,16 +741,17 @@ public class Theme
 	 */
 	public boolean hasEntry(String scopeSelector)
 	{
-		if(cache.containsKey(scopeSelector))
+		if (cache.containsKey(scopeSelector))
 		{
-		    return true;
+			return true;
 		}
-		for(ScopeSelector s:coloringRules.keySet())
+		ScopeSelector selector = new ScopeSelector(scopeSelector);
+		for (ScopeSelector s : coloringRules.keySet())
 		{
-		    if(s.matches(scopeSelector))
-		    {
-		        return true;
-		    }
+			if (selector.equals(s))
+			{
+				return true;
+			}
 		}
 		return false;
 	}
