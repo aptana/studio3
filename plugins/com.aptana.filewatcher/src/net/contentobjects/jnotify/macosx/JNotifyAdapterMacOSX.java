@@ -247,7 +247,7 @@ public class JNotifyAdapterMacOSX implements IJNotify
 		private void scan(File root, boolean recursive, JNEvents events)
 		{
 			File[] files = root.listFiles();
-			Set<Map.Entry<String, JNFile>> existingfiles = jnfiles.tailMap(root.getAbsolutePath(), false).entrySet();
+			Set<Map.Entry<String, JNFile>> existingfiles = jnfiles.tailMap(root.getAbsolutePath() + "\0").entrySet();
 			TreeSet<String> stillAlive = null;
 			String rootPath = root.getAbsolutePath();
 
@@ -274,7 +274,17 @@ public class JNotifyAdapterMacOSX implements IJNotify
 					{
 						JNFile jnf = new JNFile(files[i]);
 						// check if this inode is already known
-						Map.Entry<JNFile, TreeSet<String>> oldEntry = paths.floorEntry(jnf);
+						Iterator<Map.Entry<JNFile, TreeSet<String>>> iter = paths.entrySet().iterator();
+						Map.Entry<JNFile, TreeSet<String>> oldEntry = null, currentEntry;
+						while (iter.hasNext())
+						{
+							currentEntry = iter.next();
+							if (currentEntry.getKey().compareTo(jnf) > 0)
+							{
+								break;
+							}
+							oldEntry = currentEntry;
+						}
 						TreeSet<String> plist;
 						if (oldEntry == null || !jnf.equals(oldEntry.getKey()))
 						{
@@ -540,17 +550,21 @@ public class JNotifyAdapterMacOSX implements IJNotify
 
 					// a deleted file and a created file have the same inode
 					// merge into a rename event
-					String newpath = created.getValue().pollFirst();
-					String oldpath = deleted.getValue().pollFirst();
+					TreeSet<String> createdValue = created.getValue();
+					String newpath = createdValue.first();
+					createdValue.remove(newpath);
+					TreeSet<String> deletedValue = deleted.getValue();
+					String oldpath = deletedValue.first();
+					deletedValue.remove(oldpath);
 					e.renamed.put(oldpath, newpath);
 
 					// this inode is no longer associated with anything
-					if (created.getValue().size() == 0)
+					if (createdValue.size() == 0)
 					{
 						createdIt.remove();
 						created = null;
 					}
-					if (deleted.getValue().size() == 0)
+					if (deletedValue.size() == 0)
 					{
 						deletedIt.remove();
 						deleted = null;
