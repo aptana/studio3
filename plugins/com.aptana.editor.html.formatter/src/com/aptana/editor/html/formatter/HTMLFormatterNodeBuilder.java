@@ -40,12 +40,16 @@ import java.util.HashSet;
 import com.aptana.editor.html.formatter.nodes.FormatterDefaultElementNode;
 import com.aptana.editor.html.formatter.nodes.FormatterVoidElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
+import com.aptana.editor.html.parsing.ast.HTMLNode;
+import com.aptana.editor.html.parsing.ast.HTMLNodeTypes;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
+import com.aptana.editor.html.parsing.lexer.HTMLTokens;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.FormatterBlockNode;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
+import com.aptana.formatter.nodes.FormatterCommentNode;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.parsing.ast.IParseNode;
 
@@ -117,27 +121,38 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	 */
 	private void addNode(IParseNode node)
 	{
-		// Handle HTMLCommentNode
-		if (node instanceof HTMLElementNode)
+		if (node instanceof HTMLNode)
 		{
 			// DEBUG
 			// System.out.println(elementNode.getName() + "[" + elementNode.getStartingOffset() + ", "
 			// + elementNode.getEndingOffset() + "]");
 
 			HTMLElementNode elementNode = (HTMLElementNode) node;
-			// Check if we need to create a formatter node with a begin and end node, or just begin node.
-			String name = elementNode.getName().toLowerCase();
-			if (VOID_ELEMENTS.contains(name) || !hasInlineClosingTag(elementNode) || (node instanceof HTMLSpecialNode))
+			if (elementNode.getNodeType() == HTMLTokens.COMMENT)
 			{
-				FormatterBlockWithBeginNode formatterNode = new FormatterVoidElementNode(document, name);
-				formatterNode.setBegin(createTextNode(document, elementNode.getStartingOffset(), elementNode
-						.getEndingOffset() + 1));
-				push(formatterNode);
-				checkedPop(formatterNode, -1);
+				// We got a HTMLCommentNode
+				FormatterCommentNode commentNode = new FormatterCommentNode(document, elementNode.getStartingOffset(),
+						elementNode.getEndingOffset());
+				// We just need to add a child here. We cannot 'push', since the comment node is not a container node.
+				addChild(commentNode);
 			}
-			else
+			else if (elementNode.getNodeType() == HTMLNodeTypes.ELEMENT)
 			{
-				pushFormatterNode(elementNode);
+				// Check if we need to create a formatter node with a begin and end node, or just begin node.
+				String name = elementNode.getName().toLowerCase();
+				if (VOID_ELEMENTS.contains(name) || !hasInlineClosingTag(elementNode)
+						|| (node instanceof HTMLSpecialNode))
+				{
+					FormatterBlockWithBeginNode formatterNode = new FormatterVoidElementNode(document, name);
+					formatterNode.setBegin(createTextNode(document, elementNode.getStartingOffset(), elementNode
+							.getEndingOffset() + 1));
+					push(formatterNode);
+					checkedPop(formatterNode, -1);
+				}
+				else
+				{
+					pushFormatterNode(elementNode);
+				}
 			}
 		}
 	}

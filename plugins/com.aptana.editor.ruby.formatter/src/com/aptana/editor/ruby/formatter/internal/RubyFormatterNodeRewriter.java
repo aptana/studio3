@@ -8,9 +8,9 @@ import org.jrubyparser.SourcePosition;
 import org.jrubyparser.ast.CommentNode;
 import org.jrubyparser.parser.ParserResult;
 
-import com.aptana.editor.ruby.formatter.internal.nodes.FormatterCommentNode;
 import com.aptana.formatter.FormatterUtils;
 import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.nodes.FormatterCommentNode;
 import com.aptana.formatter.nodes.FormatterTextNode;
 import com.aptana.formatter.nodes.IFormatterCommentableNode;
 import com.aptana.formatter.nodes.IFormatterContainerNode;

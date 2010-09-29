@@ -1,4 +1,4 @@
-package com.aptana.editor.ruby.formatter.internal.nodes;
+package com.aptana.formatter.nodes;
 
 import com.aptana.editor.ruby.formatter.RubyFormatterConstants;
 import com.aptana.formatter.IFormatterContext;
