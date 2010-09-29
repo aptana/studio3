@@ -40,15 +40,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.viewers.AbstractTreeViewer;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.ui.internal.misc.StringMatcher;
 
 import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
 import com.aptana.editor.ruby.index.IRubyIndexConstants;
@@ -63,9 +63,6 @@ class PathFilter extends ViewerFilter
 
 	private static Object[] EMPTY = new Object[0];
 
-	private StringMatcher singularMatcher;
-	private StringMatcher pluralMatcher;
-
 	/*
 	 * Cache of filtered elements in the tree
 	 */
@@ -76,39 +73,150 @@ class PathFilter extends ViewerFilter
 	 */
 	private Map<Object, Boolean> foundAnyCache = new HashMap<Object, Boolean>();
 
-	private List<QueryResult> queryResults;
+	private Map<Object, Boolean> leafCache = new HashMap<Object, Boolean>();
 
-	@Override
-	public boolean select(Viewer viewer, Object parentElement, Object element)
+	private List<QueryResult> queryResults;
+	private IResource filterResource;
+	private Pattern regexp;
+
+	private String fFilterLocationMinusExtension;
+
+	private String fFilterResourceURI;
+
+	/**
+	 * Answers whether the given element in the given viewer matches the filter pattern. This is a default
+	 * implementation that will show a leaf element in the tree based on whether the provided filter text matches the
+	 * text of the given element's text, or that of it's children (if the element has any). Subclasses may override this
+	 * method.
+	 * 
+	 * @param viewer
+	 *            the tree viewer in which the element resides
+	 * @param element
+	 *            the element in the tree to check for a match
+	 * @return true if the element matches the filter pattern
+	 */
+	public boolean isElementVisible(Viewer viewer, Object element)
 	{
-		IResource resource = null;
-		if (element instanceof IResource)
-		{
-			resource = (IResource) element;
-		}
-		else if (element instanceof IAdaptable)
-		{
-			IAdaptable adaptable = (IAdaptable) element;
-			resource = (IResource) adaptable.getAdapter(IResource.class);
-		}
-		if (resource != null)
-		{
-			return isEnclosed(viewer, resource);
-		}
-		// TODO Try matching on the label like PatternFilter does
-		return true;
+		return isParentMatch(viewer, element) || isLeafMatch(viewer, element);
 	}
 
-	private boolean isEnclosed(Viewer viewer, IResource resource)
+	/**
+	 * Returns true if any of the elements makes it through the filter. This method uses caching if enabled; the
+	 * computation is done in computeAnyVisible.
+	 * 
+	 * @param viewer
+	 * @param parent
+	 * @param elements
+	 *            the elements (must not be an empty array)
+	 * @return true if any of the elements makes it through the filter.
+	 */
+	private boolean isAnyVisible(Viewer viewer, Object parent, Object[] elements)
 	{
+		Object[] filtered = cache.get(parent);
+		if (filtered != null)
+		{
+			return filtered.length > 0;
+		}
+		Boolean foundAny = foundAnyCache.get(parent);
+		if (foundAny == null)
+		{
+			foundAny = computeAnyVisible(viewer, elements) ? Boolean.TRUE : Boolean.FALSE;
+			foundAnyCache.put(parent, foundAny);
+		}
+		return foundAny.booleanValue();
+	}
+
+	/**
+	 * Check if the parent (category) is a match to the filter text. The default behavior returns true if the element
+	 * has at least one child element that is a match with the filter text. Subclasses may override this method.
+	 * 
+	 * @param viewer
+	 *            the viewer that contains the element
+	 * @param element
+	 *            the tree element to check
+	 * @return true if the given element has children that matches the filter text
+	 */
+	protected boolean isParentMatch(Viewer viewer, Object element)
+	{
+		// TODO Also check if name matches the text matchers!
+
+		Object[] children = ((ITreeContentProvider) ((AbstractTreeViewer) viewer).getContentProvider())
+				.getChildren(element);
+
+		if ((children != null) && (children.length > 0))
+		{
+			return isAnyVisible(viewer, element, children);
+		}
+		return false;
+	}
+
+	/**
+	 * Returns true if any of the elements makes it through the filter.
+	 * 
+	 * @param viewer
+	 *            the viewer
+	 * @param elements
+	 *            the elements to test
+	 * @return <code>true</code> if any of the elements makes it through the filter
+	 */
+	private boolean computeAnyVisible(Viewer viewer, Object[] elements)
+	{
+		boolean elementFound = false;
+		for (int i = 0; i < elements.length && !elementFound; i++)
+		{
+			Object element = elements[i];
+			elementFound = isElementVisible(viewer, element);
+		}
+		return elementFound;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers.Viewer, java.lang.Object,
+	 * java.lang.Object)
+	 */
+	public final boolean select(Viewer viewer, Object parentElement, Object element)
+	{
+		return isElementVisible(viewer, element);
+	}
+
+	/**
+	 * Check if the current (leaf) element is a match with the filter text. The default behavior checks that the label
+	 * of the element is a match. Subclasses should override this method.
+	 * 
+	 * @param viewer
+	 *            the viewer that contains the element
+	 * @param element
+	 *            the tree element to check
+	 * @return true if the given element's label matches the filter text
+	 */
+	protected boolean isLeafMatch(Viewer viewer, Object element)
+	{
+		Boolean result = leafCache.get(element);
+		if (result == null)
+		{
+			result = doIsLeafMatch(viewer, element);
+			leafCache.put(element, result);
+		}
+		return result;
+	}
+
+	protected boolean doIsLeafMatch(Viewer viewer, Object element)
+	{
+		IResource resource = (IResource) element;
+		if (resource.equals(filterResource))
+		{
+			return true;
+		}
+
 		IPath path = resource.getProjectRelativePath();
 		String rawPath = path.toPortableString();
 
 		// HACK Ignore tmp and vendor for Rails projects
 		try
 		{
-			if (resource.getProject().hasNature("org.radrails.rails.core.railsnature") //$NON-NLS-1$
-					&& (rawPath.startsWith("tmp/") || rawPath.startsWith("vendor/"))) //$NON-NLS-1$ //$NON-NLS-2$
+			if ((rawPath.startsWith("tmp/") || rawPath.startsWith("vendor/")) //$NON-NLS-1$ //$NON-NLS-2$
+					&& resource.getProject().hasNature("org.radrails.rails.core.railsnature")) //$NON-NLS-1$
 			{
 				return false;
 			}
@@ -118,35 +226,10 @@ class PathFilter extends ViewerFilter
 			ExplorerPlugin.logError(e);
 		}
 
-		if (match(rawPath))
+		// Check if the path matches the singular/plural matchers we generated
+		if (wordMatches(resource.getName()))
 		{
 			return true;
-		}
-
-		// Otherwise check if any of the words of the text matches
-		String[] words = getWords(rawPath);
-		for (int i = 0; i < words.length; i++)
-		{
-			String word = words[i];
-			if (match(word))
-			{
-				return true;
-			}
-		}
-
-		if (resource instanceof IContainer)
-		{
-			IContainer container = (IContainer) resource;
-			try
-			{
-				Object[] visible = filter(viewer, container, container.members());
-				if (visible != null && visible.length > 0)
-					return true;
-			}
-			catch (CoreException e)
-			{
-				ExplorerPlugin.logError(e);
-			}
 		}
 
 		// check if the resource is included by the filtered file or vise versa
@@ -168,19 +251,105 @@ class PathFilter extends ViewerFilter
 		}
 		if (queryResults != null)
 		{
+			// Memoize the location/location URI because it's expensive to grab
+			String resourceURI = null;
+			String resourceLocationMinusExtension = null;
 			for (QueryResult result : queryResults)
 			{
-				String[] documents = result.getDocuments();
-				for (String document : documents)
+				String includedFile = result.getWord();
+				// check if the 'resource' includes 'filteredResource'
+				if (getFilterResourceLocationMinusExtension().endsWith(includedFile))
 				{
-					if ((match(document) && resource.getLocationURI().toString().equals(result.getWord()))
-							|| (match(result.getWord()) && resource.getLocation().toPortableString().equals(document)))
+					// OK, we've established that filteredResource is included by the result.documents
+
+					// check if the documents contains 'resource'
+					for (String document : result.getDocuments())
 					{
-						return true;
+						if (resourceURI == null)
+						{
+							resourceURI = resource.getLocationURI().toString();
+						}
+						if (document.equals(resourceURI))
+						{
+							return true;
+						}
+					}
+				}
+				else
+				{
+					// Check if the current 'resource' is included by 'filteredResource'
+					if (resourceLocationMinusExtension == null)
+					{
+						resourceLocationMinusExtension = resource.getLocation().removeFileExtension()
+								.toPortableString();
+					}
+					// Something includes our current 'resource'
+					if (resourceLocationMinusExtension.endsWith(includedFile))
+					{
+						// See if one of the documents is the one we're filtering on, if so include this resource
+						for (String document : result.getDocuments())
+						{
+							if (document.equals(getFilterResourceURI()))
+							{
+								return true;
+							}
+						}
 					}
 				}
 			}
 		}
+		return false;
+	}
+
+	protected String getFilterResourceURI()
+	{
+		if (fFilterResourceURI == null)
+		{
+			fFilterResourceURI = filterResource.getLocationURI().toString();
+		}
+		return fFilterResourceURI;
+	}
+
+	private String getFilterResourceLocationMinusExtension()
+	{
+		if (fFilterLocationMinusExtension == null)
+		{
+			fFilterLocationMinusExtension = filterResource.getLocation().removeFileExtension().toPortableString();
+		}
+		return fFilterLocationMinusExtension;
+	}
+
+	/**
+	 * Return whether or not if any of the words in text satisfy the match critera.
+	 * 
+	 * @param text
+	 *            the text to match
+	 * @return boolean <code>true</code> if one of the words in text satisifes the match criteria.
+	 */
+	protected boolean wordMatches(String text)
+	{
+		if (text == null)
+		{
+			return false;
+		}
+
+		// If the whole text matches we are all set
+		if (match(text))
+		{
+			return true;
+		}
+
+		// Otherwise check if any of the words of the text matches
+		String[] words = getWords(text);
+		for (int i = 0; i < words.length; i++)
+		{
+			String word = words[i];
+			if (match(word))
+			{
+				return true;
+			}
+		}
+
 		return false;
 	}
 
@@ -193,11 +362,11 @@ class PathFilter extends ViewerFilter
 	 */
 	private boolean match(String string)
 	{
-		if (singularMatcher == null)
+		if (regexp == null)
 		{
 			return true;
 		}
-		return singularMatcher.match(string) || (pluralMatcher != null && pluralMatcher.match(string));
+		return regexp.matcher(string).matches();
 	}
 
 	/**
@@ -205,34 +374,111 @@ class PathFilter extends ViewerFilter
 	 * 
 	 * @param patternString
 	 */
-	public void setPattern(String patternString)
+	private void setPattern(String patternString)
 	{
-		clearCaches();
-		if (patternString == null || patternString.equals("")) { //$NON-NLS-1$
-			singularMatcher = null;
-			pluralMatcher = null;
+		if (patternString == null || patternString.equals("")) //$NON-NLS-1$
+		{
+			regexp = null;
 		}
 		else
 		{
-			singularMatcher = new StringMatcher("*" + patternString + "*", true, false); //$NON-NLS-1$ //$NON-NLS-2$
-			if (patternString.contains("?") || patternString.contains("*")) //$NON-NLS-1$ //$NON-NLS-2$
-				return;
-			// TODO Generate a matcher for the singular and plural forms of the pattern unless singular is prefix of
-			// plural!
-			// i.e. people/person vs user/users
-			// For now let's assume user always inputs singular and we always generate singular.
-			pluralMatcher = new StringMatcher("*" + Inflector.pluralize(patternString) + "*", true, false); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		if (queryResults != null)
-		{
-			queryResults.clear();
-			queryResults = null;
+			regexp = Pattern.compile("^(.*)?(" + patternString + "|" + Inflector.pluralize(patternString) + ")(.*)?$");
 		}
 	}
 
-	@Override
-	public Object[] filter(Viewer viewer, Object parent, Object[] elements)
+	public void setResourceToFilterOn(IResource resource)
 	{
+		clearCaches();
+		if (queryResults != null)
+		{
+			queryResults = null;
+		}
+		fFilterLocationMinusExtension = null;
+		fFilterResourceURI = null;
+		if (resource == null)
+		{
+			filterResource = null;
+			setPattern(null);
+			return;
+		}
+		this.filterResource = resource;
+		setPattern(createPatternFromResource(resource));
+	}
+
+	protected String createPatternFromResource(IResource resource)
+	{
+		String text = resource.getName();
+		// Try and strip filename down to the resource name!
+		if (text.endsWith("_controller.rb")) //$NON-NLS-1$
+		{
+			text = text.substring(0, text.indexOf("_controller")); //$NON-NLS-1$
+			text = Inflector.singularize(text);
+		}
+		else if (text.endsWith("_controller_test.rb")) //$NON-NLS-1$
+		{
+			text = text.substring(0, text.indexOf("_controller_test.rb")); //$NON-NLS-1$
+			text = Inflector.singularize(text);
+		}
+		else if (text.endsWith("_helper.rb")) //$NON-NLS-1$
+		{
+			text = text.substring(0, text.indexOf("_helper")); //$NON-NLS-1$
+			text = Inflector.singularize(text);
+		}
+		else if (text.endsWith("_helper_test.rb")) //$NON-NLS-1$
+		{
+			text = text.substring(0, text.indexOf("_helper_test.rb")); //$NON-NLS-1$
+			text = Inflector.singularize(text);
+		}
+		else if (text.endsWith("_test.rb")) //$NON-NLS-1$
+		{
+			text = text.substring(0, text.indexOf("_test.rb")); //$NON-NLS-1$
+		}
+		else if (text.endsWith("_spec.rb")) //$NON-NLS-1$
+		{
+			text = text.substring(0, text.indexOf("_spec.rb")); //$NON-NLS-1$
+		}
+		else if (text.endsWith(".yml")) //$NON-NLS-1$
+		{
+			IPath path = resource.getProjectRelativePath();
+			if (path.segmentCount() >= 3 && path.segment(1).equals("fixtures")) //$NON-NLS-1$
+			{
+				text = text.substring(0, text.indexOf(".yml")); //$NON-NLS-1$
+				text = Inflector.singularize(text);
+			}
+		}
+		else if (text.endsWith(".rb")) //$NON-NLS-1$
+		{
+			text = text.substring(0, text.indexOf(".rb")); //$NON-NLS-1$
+		}
+		else
+		{
+			// We need to grab the full path, so we can determine the resource name!
+
+			IPath path = resource.getProjectRelativePath();
+			if (path.segmentCount() >= 3 && path.segment(1).equals("views")) //$NON-NLS-1$
+			{
+				text = path.segment(2);
+				text = Inflector.singularize(text);
+			}
+		}
+		return text;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ViewerFilter#filter(org.eclipse.jface.viewers.Viewer, java.lang.Object,
+	 * java.lang.Object[])
+	 */
+	public final Object[] filter(Viewer viewer, Object parent, Object[] elements)
+	{
+		// we don't want to optimize if we've extended the filter ... this
+		// needs to be addressed in 3.4
+		// https://bugs.eclipse.org/bugs/show_bug.cgi?id=186404
+		if (regexp == null)
+		{
+			return elements;
+		}
+
 		Object[] filtered = cache.get(parent);
 		if (filtered == null)
 		{
@@ -257,6 +503,7 @@ class PathFilter extends ViewerFilter
 	{
 		cache.clear();
 		foundAnyCache.clear();
+		leafCache.clear();
 	}
 
 	/**
