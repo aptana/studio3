@@ -37,14 +37,14 @@ package com.aptana.browser.actions;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.browser.IWebBrowser;
+import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
 import com.aptana.browser.BrowserPlugin;
-import com.aptana.browser.WebBrowserEditor;
-import com.aptana.browser.WebBrowserEditorInput;
 
 /**
  * @author Max Stepanov
@@ -52,33 +52,33 @@ import com.aptana.browser.WebBrowserEditorInput;
  */
 public class ShowBrowserEditorAction implements IWorkbenchWindowActionDelegate {
 
-	private IWorkbenchWindow workbenchWindow;
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#dispose()
 	 */
 	public void dispose() {
-		workbenchWindow = null;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.IWorkbenchWindow)
 	 */
 	public void init(IWorkbenchWindow window) {
-		this.workbenchWindow = window;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
 	public void run(IAction action) {
-		IWorkbenchPage workbenchPage = workbenchWindow.getActivePage();
-		if (workbenchPage != null) {
-			try {
-				workbenchPage.openEditor(new WebBrowserEditorInput(), WebBrowserEditor.EDITOR_ID);
-			} catch (PartInitException e) {
-				BrowserPlugin.log(e);
+		try {
+			IWorkbenchBrowserSupport workbenchBrowserSupport = PlatformUI.getWorkbench().getBrowserSupport();
+			if (workbenchBrowserSupport.isInternalWebBrowserAvailable()) {
+				IWebBrowser webBrowser = workbenchBrowserSupport.createBrowser(IWorkbenchBrowserSupport.AS_EDITOR | IWorkbenchBrowserSupport.LOCATION_BAR | IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.STATUS, null, null, null);
+				if (webBrowser != null) {
+					webBrowser.openURL(null);
+				}
 			}
+		} catch (PartInitException e) {
+			BrowserPlugin.log(e);
 		}
 	}
 
