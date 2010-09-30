@@ -13,7 +13,8 @@ package com.aptana.formatter;
 
 import org.eclipse.jface.text.IRegion;
 
-public class FormatterIndentDetector implements IFormatterWriter {
+public class FormatterIndentDetector implements IFormatterWriter
+{
 
 	private final int offset;
 	private boolean indentDetected = false;
@@ -22,25 +23,31 @@ public class FormatterIndentDetector implements IFormatterWriter {
 	/**
 	 * @param offset
 	 */
-	public FormatterIndentDetector(int offset) {
+	public FormatterIndentDetector(int offset)
+	{
 		this.offset = offset;
 	}
 
-	public void addNewLineCallback(IFormatterCallback callback) {
+	public void addNewLineCallback(IFormatterCallback callback)
+	{
 		// empty
 	}
 
-	public void excludeRegion(IRegion region) {
+	public void excludeRegion(IRegion region)
+	{
 		// empty
 
 	}
 
-	public void ensureLineStarted(IFormatterContext context) {
+	public void ensureLineStarted(IFormatterContext context)
+	{
 		// empty
 	}
 
-	public void write(IFormatterContext context, int startOffset, int endOffset) {
-		if (!indentDetected && startOffset >= offset) {
+	public void write(IFormatterContext context, int startOffset, int endOffset)
+	{
+		if (!indentDetected && startOffset >= offset)
+		{
 			level = context.getIndent();
 			indentDetected = true;
 		}
@@ -49,34 +56,48 @@ public class FormatterIndentDetector implements IFormatterWriter {
 	/*
 	 * @see IFormatterWriter#writeText(IFormatterContext, String)
 	 */
-	public void writeText(IFormatterContext context, String text) {
+	public void writeText(IFormatterContext context, String text)
+	{
 		// empty
 	}
 
 	/*
 	 * @see IFormatterWriter#writeLineBreak(IFormatterContext)
 	 */
-	public void writeLineBreak(IFormatterContext context) {
+	public void writeLineBreak(IFormatterContext context)
+	{
 		// empty
 	}
 
-	public void skipNextLineBreaks(IFormatterContext context) {
+	public void skipNextLineBreaks(IFormatterContext context)
+	{
 		// empty
 	}
 
-	public void appendToPreviousLine(IFormatterContext context, String text) {
+	public void appendToPreviousLine(IFormatterContext context, String text)
+	{
 		// empty
 	}
 
-	public void disableAppendToPreviousLine() {
+	public void disableAppendToPreviousLine()
+	{
 		// empty
 	}
 
 	/**
 	 * @return the level
 	 */
-	public int getLevel() {
+	public int getLevel()
+	{
 		return level;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterWriter#endsWithNewLine()
+	 */
+	public boolean endsWithNewLine()
+	{
+		return false;
+	}
 }
