@@ -724,24 +724,6 @@ public class FilteringProjectView extends GitProjectView
 					return Status.CANCEL_STATUS;
 				}
 
-				IResource filterResource = getFilterResource();
-				if (filterResource == null)
-				{
-					patternFilter.setResourceToFilterOn(null);
-
-					getCommonViewer().removeFilter(patternFilter);
-				}
-				else
-				{
-					getCommonViewer().removeFilter(patternFilter);
-					patternFilter.setResourceToFilterOn(filterResource);
-					showFilterLabel(
-							eyeball,
-							NLS.bind(Messages.FilteringProjectView_LBL_FilteringFor,
-									new Object[] { patternFilter.getPattern() }));
-					getCommonViewer().addFilter(patternFilter);
-				}
-
 				Control redrawFalseControl = getCommonViewer().getControl();
 				try
 				{
@@ -751,24 +733,34 @@ public class FilteringProjectView extends GitProjectView
 					// dancing scrollbar
 					redrawFalseControl.setRedraw(false);
 					// collapse all
-					TreeItem[] is = getCommonViewer().getTree().getItems();
-					for (int i = 0; i < is.length; i++)
-					{
-						TreeItem item = is[i];
-						if (item.getExpanded())
-						{
-							getCommonViewer().setExpandedState(item.getData(), false);
-						}
-					}
+					getCommonViewer().collapseAll();
+					// Now apply/remove teh filter. This will trigger a refresh!
+					IResource filterResource = getFilterResource();
 					try
 					{
-						getCommonViewer().refresh(true);
+						if (filterResource == null)
+						{
+							patternFilter.setResourceToFilterOn(null);
+
+							getCommonViewer().removeFilter(patternFilter);
+						}
+						else
+						{
+							getCommonViewer().removeFilter(patternFilter);
+							patternFilter.setResourceToFilterOn(filterResource);
+							showFilterLabel(
+									eyeball,
+									NLS.bind(Messages.FilteringProjectView_LBL_FilteringFor,
+											new Object[] { patternFilter.getPattern() }));
+							getCommonViewer().addFilter(patternFilter);
+						}
 					}
 					catch (Exception e)
 					{
 						// ignore. This seems to just happen on windows and appears to be benign
 					}
-
+					
+					// Now set up expansion of elements
 					if (filterResource != null)
 					{
 						/*
