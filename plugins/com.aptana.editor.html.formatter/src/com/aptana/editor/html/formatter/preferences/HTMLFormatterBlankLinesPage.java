@@ -32,62 +32,56 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.html.formatter.nodes;
+package com.aptana.editor.html.formatter.preferences;
 
-import java.util.Set;
+import java.net.URL;
+
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 
 import com.aptana.editor.html.formatter.HTMLFormatterConstants;
-import com.aptana.formatter.IFormatterContext;
-import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
+import com.aptana.formatter.ui.FormatterModifyTabPage;
+import com.aptana.formatter.ui.IFormatterControlManager;
+import com.aptana.formatter.ui.IFormatterModifyDialog;
+import com.aptana.ui.util.SWTFactory;
 
 /**
- * A default tag node formatter is responsible of the formatting of a tag that has a begin and end, however, should not
- * be indented.
+ * Blank-lines configuration tab for the HTML code formatter.
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
-public class FormatterDefaultElementNode extends FormatterBlockWithBeginEndNode
+public class HTMLFormatterBlankLinesPage extends FormatterModifyTabPage
 {
-	private String element;
 
 	/**
-	 * @param document
+	 * @param dialog
 	 */
-	public FormatterDefaultElementNode(IFormatterDocument document, String element)
+	public HTMLFormatterBlankLinesPage(IFormatterModifyDialog dialog)
 	{
-		super(document);
-		this.element = element;
+		super(dialog);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isIndenting()
-	 */
-	protected boolean isIndenting()
+	protected void createOptions(IFormatterControlManager manager, Composite parent)
 	{
-		Set<String> set = getDocument().getSet(HTMLFormatterConstants.INDENT_EXCLUDED_TAGS);
-		return !set.contains(element);
+		Group blankLinesGroup = SWTFactory.createGroup(parent,
+				Messages.HTMLFormatterBlankLinesPage_blankLinesGroupLabel, 2, 1, GridData.FILL_HORIZONTAL);
+		manager.createNumber(blankLinesGroup, HTMLFormatterConstants.LINES_AFTER_ELEMENTS,
+				Messages.HTMLFormatterBlankLinesPage_afterElements);
+		manager.createNumber(blankLinesGroup, HTMLFormatterConstants.LINES_AFTER_NON_HTML_ELEMENTS,
+				Messages.HTMLFormatterBlankLinesPage_afterSpecialElements);
+		manager.createNumber(blankLinesGroup, HTMLFormatterConstants.LINES_BEFORE_NON_HTML_ELEMENTS,
+				Messages.HTMLFormatterBlankLinesPage_beforeSpecialElements);
+
+		Group preserveLinesGroup = SWTFactory.createGroup(parent,
+				Messages.HTMLFormatterBlankLinesPage_existingBlankLinesGroupLabel, 2, 1, GridData.FILL_HORIZONTAL);
+		manager.createNumber(preserveLinesGroup, HTMLFormatterConstants.PRESERVED_LINES,
+				Messages.HTMLFormatterBlankLinesPage_existingBlankLinesToPreserve);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingNewLine()
-	 */
-	protected boolean isAddingNewLine()
+	protected URL getPreviewContent()
 	{
-		Set<String> set = getDocument().getSet(HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS);
-		return !set.contains(element);
+		return getClass().getResource("blank-lines-preview.html"); //$NON-NLS-1$
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode#getBlankLinesAfter(com.aptana.formatter.IFormatterContext
-	 * )
-	 */
-	protected int getBlankLinesAfter(IFormatterContext context)
-	{
-		return getInt(HTMLFormatterConstants.LINES_AFTER_ELEMENTS);
-	}
 }

@@ -34,50 +34,25 @@
  */
 package com.aptana.editor.html.formatter.nodes;
 
-import java.util.Set;
-
 import com.aptana.editor.html.formatter.HTMLFormatterConstants;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 
 /**
- * A default tag node formatter is responsible of the formatting of a tag that has a begin and end, however, should not
- * be indented.
+ * An HTML formatter node for special HTML element which represents a non-HTML content, such as CSS, JS etc.
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
-public class FormatterDefaultElementNode extends FormatterBlockWithBeginEndNode
+public class FormatterSpecialElementNode extends FormatterDefaultElementNode
 {
-	private String element;
 
 	/**
 	 * @param document
+	 * @param element
 	 */
-	public FormatterDefaultElementNode(IFormatterDocument document, String element)
+	public FormatterSpecialElementNode(IFormatterDocument document, String element)
 	{
-		super(document);
-		this.element = element;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isIndenting()
-	 */
-	protected boolean isIndenting()
-	{
-		Set<String> set = getDocument().getSet(HTMLFormatterConstants.INDENT_EXCLUDED_TAGS);
-		return !set.contains(element);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingNewLine()
-	 */
-	protected boolean isAddingNewLine()
-	{
-		Set<String> set = getDocument().getSet(HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS);
-		return !set.contains(element);
+		super(document, element);
 	}
 
 	/*
@@ -88,6 +63,17 @@ public class FormatterDefaultElementNode extends FormatterBlockWithBeginEndNode
 	 */
 	protected int getBlankLinesAfter(IFormatterContext context)
 	{
-		return getInt(HTMLFormatterConstants.LINES_AFTER_ELEMENTS);
+		return getInt(HTMLFormatterConstants.LINES_AFTER_NON_HTML_ELEMENTS);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode#getBlankLinesBefore(com.aptana.formatter.IFormatterContext
+	 * )
+	 */
+	protected int getBlankLinesBefore(IFormatterContext context)
+	{
+		return getInt(HTMLFormatterConstants.LINES_BEFORE_NON_HTML_ELEMENTS);
 	}
 }

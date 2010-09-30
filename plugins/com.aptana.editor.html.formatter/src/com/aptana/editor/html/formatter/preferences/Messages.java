@@ -42,12 +42,19 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.editor.html.formatter.preferences.messages"; //$NON-NLS-1$
+	public static String HTMLFormatterBlankLinesPage_afterElements;
+	public static String HTMLFormatterBlankLinesPage_afterSpecialElements;
+	public static String HTMLFormatterBlankLinesPage_beforeSpecialElements;
+	public static String HTMLFormatterBlankLinesPage_blankLinesGroupLabel;
+	public static String HTMLFormatterBlankLinesPage_existingBlankLinesGroupLabel;
+	public static String HTMLFormatterBlankLinesPage_existingBlankLinesToPreserve;
 	public static String HTMLFormatterCommentsPage_enableWrapping;
 	public static String HTMLFormatterCommentsPage_formattingGroupLabel;
 	public static String HTMLFormatterCommentsPage_maxLineWidth;
 	public static String HTMLFormatterIndentationTabPage_exclusionsMessage;
 	public static String HTMLFormatterTabPage_exclusionsGroupLabel;
 	public static String HTMLFormatterIndentationTabPage_indentationGeneralGroupLabel;
+	public static String HTMLFormatterModifyDialog_blankLinesTabName;
 	public static String HTMLFormatterModifyDialog_commentsTabName;
 	public static String HTMLFormatterModifyDialog_htmlFormatterTitle;
 	public static String HTMLFormatterModifyDialog_intentationTabName;

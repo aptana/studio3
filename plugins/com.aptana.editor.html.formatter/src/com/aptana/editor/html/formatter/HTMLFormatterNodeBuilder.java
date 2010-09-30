@@ -39,6 +39,7 @@ import java.util.HashSet;
 
 import com.aptana.editor.html.formatter.nodes.FormatterDefaultElementNode;
 import com.aptana.editor.html.formatter.nodes.FormatterHTMLCommentNode;
+import com.aptana.editor.html.formatter.nodes.FormatterSpecialElementNode;
 import com.aptana.editor.html.formatter.nodes.FormatterVoidElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
@@ -136,7 +137,7 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				// We just need to add a child here. We cannot 'push', since the comment node is not a container node.
 				addChild(commentNode);
 			}
-			else if (htmlNode.getNodeType() == HTMLNodeTypes.ELEMENT)
+			else if (htmlNode.getNodeType() == HTMLNodeTypes.ELEMENT || htmlNode.getNodeType() == HTMLNodeTypes.SPECIAL)
 			{
 				// Check if we need to create a formatter node with a begin and end node, or just begin node.
 				HTMLElementNode elementNode = (HTMLElementNode) node;
@@ -186,7 +187,15 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	private FormatterBlockWithBeginEndNode pushFormatterNode(HTMLElementNode node)
 	{
 		String type = node.getName().toLowerCase();
-		FormatterBlockWithBeginEndNode formatterNode = new FormatterDefaultElementNode(document, type);
+		FormatterBlockWithBeginEndNode formatterNode;
+		if (node.getNodeType() == HTMLNodeTypes.ELEMENT)
+		{
+			formatterNode = new FormatterDefaultElementNode(document, type);
+		}
+		else
+		{
+			formatterNode = new FormatterSpecialElementNode(document, type);
+		}
 		IRange beginNodeRange = node.getNameNode().getNameRange();
 		formatterNode.setBegin(createTextNode(document, beginNodeRange.getStartingOffset(), beginNodeRange
 				.getEndingOffset() + 1));

@@ -34,7 +34,7 @@ public class HTMLFormatterPreferenceInitializer extends AbstractPreferenceInitia
 		store.setDefault(HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS,
 				"a,span,i,b,em,strong,h1,h2,h3,h4,h5,h6,title,option,meta".replaceAll(",", //$NON-NLS-1$//$NON-NLS-2$
 						IPreferenceDelegate.PREFERECE_DELIMITER));
-		store.setDefault(HTMLFormatterConstants.LINES_AFTER_ELEMENTS, 1);
+		store.setDefault(HTMLFormatterConstants.LINES_AFTER_ELEMENTS, 0);
 		store.setDefault(HTMLFormatterConstants.LINES_AFTER_NON_HTML_ELEMENTS, 1);
 		store.setDefault(HTMLFormatterConstants.LINES_BEFORE_NON_HTML_ELEMENTS, 1);
 		store.setDefault(HTMLFormatterConstants.PRESERVED_LINES, 1);

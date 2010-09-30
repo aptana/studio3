@@ -61,7 +61,7 @@ public class HTMLFormatterModifyDialog extends FormatterModifyDialog
 	{
 		addTabPage(Messages.HTMLFormatterModifyDialog_intentationTabName, new HTMLFormatterIndentationTabPage(this));
 		addTabPage(Messages.HTMLFormatterModifyDialog_newLinesTabName, new HTMLFormatterNewLinesPage(this));
+		addTabPage(Messages.HTMLFormatterModifyDialog_blankLinesTabName, new HTMLFormatterBlankLinesPage(this));
 		addTabPage(Messages.HTMLFormatterModifyDialog_commentsTabName, new HTMLFormatterCommentsPage(this));
-		// TODO - Add a Blank Lines tab
 	}
 }
