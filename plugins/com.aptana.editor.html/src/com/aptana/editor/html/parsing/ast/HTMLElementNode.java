@@ -52,6 +52,7 @@ public class HTMLElementNode extends HTMLNode
 	private static final String CLASS = "class"; //$NON-NLS-1$
 
 	private INameNode fNameNode;
+	private INameNode fEndNode;
 	private Map<String, String> fAttributes;
 
 	public HTMLElementNode(Symbol tagSymbol, int start, int end)
@@ -139,6 +140,16 @@ public class HTMLElementNode extends HTMLNode
 	public void setAttribute(String name, String value)
 	{
 		fAttributes.put(name, value);
+	}
+
+	public INameNode getEndNode()
+	{
+		return fEndNode;
+	}
+
+	public void setEndNode(int start, int end)
+	{
+		fEndNode = new NameNode(fNameNode.getName(), start, end);
 	}
 
 	@Override

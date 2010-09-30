@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+* This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -37,6 +37,7 @@ package com.aptana.editor.css.text.hyperlink;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -112,8 +113,8 @@ public class HTMLIDHyperlinkDetector extends IndexQueryingHyperlinkDetector
 			IRegion linkRegion = new Region(start, length);
 			for (QueryResult result : results)
 			{
-				String[] documents = result.getDocuments();
-				if (documents == null || documents.length <= 0)
+				Set<String> documents = result.getDocuments();
+				if (documents == null || documents.isEmpty())
 				{
 					continue;
 				}

@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParser;
+import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.Range;
@@ -103,6 +104,54 @@ public class HTMLParserTest extends TestCase
 	{
 		String source = "<html><head><!-- this is a comment --></head></html>\n";
 		parseTest(source);
+	}
+
+	public void testNestedUnclosedTag() throws Exception
+	{
+		String source = "<p><b></b><p>";
+		parseTest(source, "<p><b></b></p>\n<p></p>\n");
+	}
+
+	public void testUnclosedTags() throws Exception
+	{
+		String source = "<body><p><li></body>";
+		parseTest(source, "<body><p><li></li></p></body>\n");
+	}
+
+	public void testCloseTagPosition() throws Exception
+	{
+		String source = "<body><p>text</body>";
+		fParseState.setEditState(source, source, 0, 0);
+		IParseNode result = fParser.parse(fParseState);
+		IParseNode[] children = result.getChildren();
+		assertEquals(1, children.length);
+		assertEquals(19, children[0].getEndingOffset());
+		INameNode endTag = ((HTMLElementNode) children[0]).getEndNode();
+		assertEquals(new Range(13, 19), endTag.getNameRange());
+
+		children = children[0].getChildren();
+		assertEquals(1, children.length);
+		assertEquals(12, children[0].getEndingOffset());
+		endTag = ((HTMLElementNode) children[0]).getEndNode();
+		assertNull(endTag);
+	}
+
+	public void testUnclosedRootTag() throws Exception
+	{
+		String source = "<body><p>text";
+		fParseState.setEditState(source, source, 0, 0);
+		IParseNode result = fParser.parse(fParseState);
+		IParseNode[] children = result.getChildren();
+		assertEquals(1, children.length);
+		assertEquals(12, children[0].getEndingOffset());
+		INameNode endTag = ((HTMLElementNode) children[0]).getEndNode();
+		assertNull(endTag);
+
+		children = children[0].getChildren();
+		assertEquals(1, children.length);
+		assertEquals(12, children[0].getEndingOffset());
+		endTag = ((HTMLElementNode) children[0]).getEndNode();
+		assertNull(endTag);
 	}
 
 	protected void parseTest(String source) throws Exception

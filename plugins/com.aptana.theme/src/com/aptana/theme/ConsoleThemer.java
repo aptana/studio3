@@ -54,8 +54,6 @@ import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IOConsoleOutputStream;
 import org.eclipse.ui.console.TextConsole;
 
-import com.aptana.theme.extensions.ConsoleThemePageParticipant;
-
 /**
  * This extension will make sure that the colors for the console are always following the theme preferences.
  */

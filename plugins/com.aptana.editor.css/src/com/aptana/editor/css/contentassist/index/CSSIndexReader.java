@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
@@ -310,8 +311,8 @@ public class CSSIndexReader
 
 					for (QueryResult item : items)
 					{
-						String[] paths = item.getDocuments();
-						String path = (paths != null && paths.length > 0) ? paths[0] : ""; //$NON-NLS-1$
+						Set<String> paths = item.getDocuments();
+						String path = (paths != null && !paths.isEmpty()) ? paths.iterator().next() : ""; //$NON-NLS-1$
 
 						result.put(item.getWord(), path);
 					}

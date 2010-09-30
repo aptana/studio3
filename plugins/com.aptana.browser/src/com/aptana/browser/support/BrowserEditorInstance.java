@@ -33,59 +33,70 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.browser.actions;
+package com.aptana.browser.support;
 
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.viewers.ISelection;
+import java.net.URL;
+
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.browser.IWebBrowser;
-import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
+import org.eclipse.ui.internal.browser.InternalBrowserInstance;
+import org.eclipse.ui.internal.browser.WebBrowserUIPlugin;
 
-import com.aptana.browser.BrowserPlugin;
+import com.aptana.browser.parts.WebBrowserEditor;
 
 /**
  * @author Max Stepanov
  *
  */
-public class ShowBrowserEditorAction implements IWorkbenchWindowActionDelegate {
+@SuppressWarnings("restriction")
+public class BrowserEditorInstance extends InternalBrowserInstance {
 
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#dispose()
+	/**
+	 * @param id
+	 * @param style
+	 * @param name
+	 * @param tooltip
 	 */
-	public void dispose() {
+	public BrowserEditorInstance(String id, int style, String name, String tooltip) {
+		super(id, style, name, tooltip);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.IWorkbenchWindow)
+	 * @see org.eclipse.ui.browser.IWebBrowser#openURL(java.net.URL)
 	 */
-	public void init(IWorkbenchWindow window) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
-	 */
-	public void run(IAction action) {
-		try {
-			IWorkbenchBrowserSupport workbenchBrowserSupport = PlatformUI.getWorkbench().getBrowserSupport();
-			if (workbenchBrowserSupport.isInternalWebBrowserAvailable()) {
-				IWebBrowser webBrowser = workbenchBrowserSupport.createBrowser(IWorkbenchBrowserSupport.AS_EDITOR | IWorkbenchBrowserSupport.LOCATION_BAR | IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.STATUS, null, null, null);
-				if (webBrowser != null) {
-					webBrowser.openURL(null);
-				}
-			}
-		} catch (PartInitException e) {
-			BrowserPlugin.log(e);
+	public void openURL(URL url) throws PartInitException {
+		WebBrowserEditorInput editorInput = new WebBrowserEditorInput(url, style);
+		editorInput.setName(name);
+		editorInput.setToolTipText(tooltip);
+		WebBrowserEditor editor = (WebBrowserEditor) part;
+		IWorkbenchWindow workbenchWindow = WebBrowserUIPlugin.getInstance().getWorkbench().getActiveWorkbenchWindow();
+		IWorkbenchPage workbenchPage = null;
+		if (workbenchWindow != null) {
+			workbenchPage = workbenchWindow.getActivePage();
+		}
+		if (workbenchPage == null) {
+			throw new PartInitException("Cannot get Workbench page");
+		}
+		if (editor != null) {
+			editor.init(editor.getEditorSite(), editorInput);
+			workbenchPage.activate(editor);
+		} else {
+			editor = (WebBrowserEditor) workbenchPage.openEditor(editorInput, WebBrowserEditor.EDITOR_ID);
+			hookPart(workbenchPage, editor);
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
+	 * @see org.eclipse.ui.browser.AbstractWebBrowser#close()
 	 */
-	public void selectionChanged(IAction action, ISelection selection) {
+	@Override
+	public boolean close() {
+		try {
+			return ((WebBrowserEditor) part).close();
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
 }

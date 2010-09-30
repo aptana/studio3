@@ -43,7 +43,7 @@ import com.aptana.editor.common.text.rules.ExtendedWordRule;
 
 public class JSNumberRule extends ExtendedWordRule
 {
-	private static final String REGEXP = "(0(x|X)[0-9a-fA-F]+)|([0-9]+(\\.[0-9]+)?(?:[eE]\\d+)?)"; //$NON-NLS-1$
+	private static final String REGEXP = "(0(x|X)[0-9a-fA-F]+)|(([0-9]+(\\.[0-9]+)?|\\.[0-9]+)(?:[eE]\\d+)?)"; //$NON-NLS-1$
 	private static Pattern pattern;
 
 	public JSNumberRule(IToken token)

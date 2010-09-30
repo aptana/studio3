@@ -335,6 +335,7 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 		}
 		else if (ftpConnectionPoint != originalFtpConnectionPoint)
 		{
+			ftpConnectionPoint.setId(originalFtpConnectionPoint.getId());
 			CoreIOPlugin.getConnectionPointManager().removeConnectionPoint(originalFtpConnectionPoint);
 			CoreIOPlugin.getConnectionPointManager().addConnectionPoint(ftpConnectionPoint);
 		}
