@@ -40,12 +40,12 @@ class JSNumberDetector implements IWordDetector
 {
 	public boolean isWordStart(char c)
 	{
-		return Character.isDigit(c);
+		return Character.isDigit(c) || c == '.';
 	}
 
 	public boolean isWordPart(char c)
 	{
-		if (isWordStart(c) || c == '.')
+		if (isWordStart(c))
 			return true;
 		char lower = Character.toLowerCase(c);
 		return lower == 'a' || lower == 'b' || lower == 'c' || lower == 'd' || lower == 'e' || lower == 'f' || lower == 'x';
