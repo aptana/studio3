@@ -56,6 +56,44 @@ public class MarkdownScannerTest extends TestCase
 		assertToken(getToken(""), 19, 4);
 	}
 
+	public void testEscapedAsteriskIsntItalic()
+	{
+		String src = "Ain't no \\*italics\\* here";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken(""), 0, 3);
+		assertToken(getToken(""), 3, 1);
+		assertToken(getToken(""), 4, 1);
+		assertToken(Token.WHITESPACE, 5, 1);
+		assertToken(getToken(""), 6, 2);
+		assertToken(Token.WHITESPACE, 8, 1);
+		assertToken(getToken("constant.character.escape.markdown"), 9, 2);
+		assertToken(getToken(""), 11, 7);
+		assertToken(getToken("constant.character.escape.markdown"), 18, 2);
+		assertToken(Token.WHITESPACE, 20, 1);
+		assertToken(getToken(""), 21, 4);
+	}
+
+	public void testEscapedUnderscoreIsntItalic()
+	{
+		String src = "Ain't no \\_italics\\_ here";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken(""), 0, 3);
+		assertToken(getToken(""), 3, 1);
+		assertToken(getToken(""), 4, 1);
+		assertToken(Token.WHITESPACE, 5, 1);
+		assertToken(getToken(""), 6, 2);
+		assertToken(Token.WHITESPACE, 8, 1);
+		assertToken(getToken("constant.character.escape.markdown"), 9, 2);
+		assertToken(getToken(""), 11, 7);
+		assertToken(getToken("constant.character.escape.markdown"), 18, 2);
+		assertToken(Token.WHITESPACE, 20, 1);
+		assertToken(getToken(""), 21, 4);
+	}
+
 	public void testItalicWithSpaceInside()
 	{
 		String src = "There is *ita lics* here";
@@ -100,8 +138,6 @@ public class MarkdownScannerTest extends TestCase
 		assertToken(Token.WHITESPACE, 19, 1);
 		assertToken(getToken(""), 20, 4);
 	}
-
-	// TODO Add tests for escaped asterisks and underscores!
 
 	public void testUnderscoreSurroundedBySpaceIsLiteral()
 	{
@@ -206,7 +242,7 @@ public class MarkdownScannerTest extends TestCase
 	}
 
 	// http://daringfireball.net/projects/markdown/syntax#link
-	// TODO Test reference (i.e. [text][ref-id], and later teh def of a ref: [ref-id] )
+	// TODO Test reference (i.e. [text][ref-id], and later the def of a ref: [ref-id] )
 	// TODO Test link with title (i.e. [text](htttp://example.org "title")
 
 	public void testLink()

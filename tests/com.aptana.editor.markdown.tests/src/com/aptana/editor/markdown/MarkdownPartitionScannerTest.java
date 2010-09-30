@@ -94,17 +94,110 @@ public class MarkdownPartitionScannerTest extends TestCase
 		assertContentType(MarkdownSourceConfiguration.HEADING, source, 0);
 		assertContentType(MarkdownSourceConfiguration.HEADING, source, 78);
 		// newline
-		 assertContentType(MarkdownSourceConfiguration.DEFAULT, source, 80);
+		assertContentType(MarkdownSourceConfiguration.DEFAULT, source, 80);
 		// License heading
 		assertContentType(MarkdownSourceConfiguration.HEADING, source, 82);
 		assertContentType(MarkdownSourceConfiguration.HEADING, source, 92);
 		// newline
-		 assertContentType(MarkdownSourceConfiguration.DEFAULT, source, 94);
+		assertContentType(MarkdownSourceConfiguration.DEFAULT, source, 94);
 		// Major components
 		assertContentType(MarkdownSourceConfiguration.DEFAULT, source, 95);
 		assertContentType(MarkdownSourceConfiguration.DEFAULT, source, 111);
 		// Modernizr list item
 		assertContentType(MarkdownSourceConfiguration.UNNUMBERED_LIST, source, 114);
 		assertContentType(MarkdownSourceConfiguration.UNNUMBERED_LIST, source, 141);
+	}
+
+	public void testSeparator1()
+	{
+		String source = "* * *";
+
+		assertContentType(MarkdownSourceConfiguration.SEPARATOR, source, 0);
+		assertContentType(MarkdownSourceConfiguration.SEPARATOR, source, source.length() - 1);
+	}
+
+	public void testSeparator2()
+	{
+		String source = "***";
+
+		assertContentType(MarkdownSourceConfiguration.SEPARATOR, source, 0);
+		assertContentType(MarkdownSourceConfiguration.SEPARATOR, source, source.length() - 1);
+	}
+
+	public void testSeparator3()
+	{
+		String source = "*****";
+
+		assertContentType(MarkdownSourceConfiguration.SEPARATOR, source, 0);
+		assertContentType(MarkdownSourceConfiguration.SEPARATOR, source, source.length() - 1);
+	}
+
+	public void testSeparator4()
+	{
+		String source = "- - -";
+
+		assertContentType(MarkdownSourceConfiguration.SEPARATOR, source, 0);
+		assertContentType(MarkdownSourceConfiguration.SEPARATOR, source, source.length() - 1);
+	}
+
+	public void testSeparator5()
+	{
+		String source = "---------------------------------------";
+
+		assertContentType(MarkdownSourceConfiguration.SEPARATOR, source, 0);
+		assertContentType(MarkdownSourceConfiguration.SEPARATOR, source, source.length() - 1);
+	}
+
+	public void testQuote()
+	{
+		String source = "> This is the first level of quoting.";
+
+		assertContentType(MarkdownSourceConfiguration.QUOTE, source, 0);
+		assertContentType(MarkdownSourceConfiguration.QUOTE, source, source.length() - 1);
+	}
+
+	public void testQuoteFollowedByNoSpace()
+	{
+		String source = ">This is the first level of quoting.";
+
+		assertContentType(MarkdownSourceConfiguration.QUOTE, source, 0);
+		assertContentType(MarkdownSourceConfiguration.QUOTE, source, source.length() - 1);
+	}
+
+	public void testQuotePrecededByOneSpace()
+	{
+		String source = " > This is the first level of quoting.";
+
+		assertContentType(MarkdownSourceConfiguration.QUOTE, source, 1);
+		assertContentType(MarkdownSourceConfiguration.QUOTE, source, source.length() - 1);
+	}
+
+	public void testQuotePrecededByTwoSpaces()
+	{
+		String source = "  > This is the first level of quoting.";
+
+		assertContentType(MarkdownSourceConfiguration.QUOTE, source, 2);
+		assertContentType(MarkdownSourceConfiguration.QUOTE, source, source.length() - 1);
+	}
+
+	public void testQuotePrecededByThreeSpaces()
+	{
+		String source = "   > This is the first level of quoting.";
+
+		assertContentType(MarkdownSourceConfiguration.QUOTE, source, 3);
+		assertContentType(MarkdownSourceConfiguration.QUOTE, source, source.length() - 1);
+	}
+
+	public void testQuoteHardWrapped()
+	{
+		String source = "> This is a blockquote with two paragraphs. Lorem ipsum dolor sit amet,\n"
+				+ "consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus.\n"
+				+ "Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.";
+
+		assertContentType(MarkdownSourceConfiguration.QUOTE, source, 1);
+		assertContentType(MarkdownSourceConfiguration.QUOTE, source, 74);
+		assertContentType(MarkdownSourceConfiguration.QUOTE, source, 138);
+		assertContentType(MarkdownSourceConfiguration.QUOTE, source, 160);
+		assertContentType(MarkdownSourceConfiguration.QUOTE, source, source.length() - 1);
 	}
 }

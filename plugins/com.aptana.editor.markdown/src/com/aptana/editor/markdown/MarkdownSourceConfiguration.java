@@ -42,7 +42,6 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.IPredicateRule;
-import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
@@ -57,7 +56,6 @@ import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.NonRuleBasedDamagerRepairer;
-import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.TagRule;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
@@ -76,11 +74,12 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 	public final static String HEADING_2 = HEADING + ".2"; //$NON-NLS-1$
 	public final static String UNNUMBERED_LIST = PREFIX + "unnumbered.list"; //$NON-NLS-1$
 	public final static String SEPARATOR = PREFIX + "separator"; //$NON-NLS-1$
+	public final static String QUOTE = PREFIX + "quote"; //$NON-NLS-1$
 	public final static String BLOCK = PREFIX + "block"; //$NON-NLS-1$
 	public final static String HTML_TAG = PREFIX + "html"; //$NON-NLS-1$
 
 	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, HEADING, HEADING_1, HEADING_2,
-			UNNUMBERED_LIST, SEPARATOR, BLOCK, HTML_TAG };
+			UNNUMBERED_LIST, SEPARATOR, QUOTE, BLOCK, HTML_TAG };
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IMarkdownConstants.CONTENT_TYPE_MARKDOWN } };
 
@@ -104,6 +103,7 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 			c.addTranslation(new QualifiedContentType(UNNUMBERED_LIST), new QualifiedContentType(
 					"markup.list.unnumbered.markdown")); //$NON-NLS-1$
 			c.addTranslation(new QualifiedContentType(SEPARATOR), new QualifiedContentType("meta.separator.markdown")); //$NON-NLS-1$
+			c.addTranslation(new QualifiedContentType(QUOTE), new QualifiedContentType("meta.block-level.markdown", "markup.quote.markdown")); //$NON-NLS-1$ //$NON-NLS-2$
 			c.addTranslation(new QualifiedContentType(BLOCK), new QualifiedContentType("markup.raw.block.markdown")); //$NON-NLS-1$
 			c.addTranslation(new QualifiedContentType(HTML_TAG), new QualifiedContentType(
 					"meta.disable-markdown", "meta.tag.block.any.html")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -133,6 +133,12 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 	{
 		List<IPredicateRule> rules = new ArrayList<IPredicateRule>();
 
+		// BlockQuotes
+		rules.add(new HardWrapLineRule(">", null, new Token(QUOTE))); //$NON-NLS-1$
+		rules.add(new HardWrapLineRule(" >", null, new Token(QUOTE))); //$NON-NLS-1$
+		rules.add(new HardWrapLineRule("  >", null, new Token(QUOTE))); //$NON-NLS-1$
+		rules.add(new HardWrapLineRule("   >", null, new Token(QUOTE))); //$NON-NLS-1$
+		
 		// Separators
 		final char[] separatorChars = { '*', '-', '_' };
 		for (int sepCharIdx = 0; sepCharIdx < separatorChars.length; sepCharIdx++)
@@ -199,7 +205,7 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 			string += " ";
 		}
 		string += c;
-		SingleLineRule rule = new SingleLineRule(string, "", new Token(SEPARATOR));
+		SingleLineRule rule = new SingleLineRule(string, "", new Token(SEPARATOR), (char) 0, true);
 		rule.setColumnConstraint(0);
 		return rule;
 
