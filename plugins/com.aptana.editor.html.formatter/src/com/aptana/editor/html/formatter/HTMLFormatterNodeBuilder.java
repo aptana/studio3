@@ -142,8 +142,7 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				// Check if we need to create a formatter node with a begin and end node, or just begin node.
 				HTMLElementNode elementNode = (HTMLElementNode) node;
 				String name = elementNode.getName().toLowerCase();
-				if (VOID_ELEMENTS.contains(name) || !hasInlineClosingTag(elementNode)
-						|| (node instanceof HTMLSpecialNode))
+				if (VOID_ELEMENTS.contains(name) || !hasInlineClosingTag(elementNode))
 				{
 					FormatterBlockWithBeginNode formatterNode = new FormatterVoidElementNode(document, name);
 					formatterNode.setBegin(createTextNode(document, elementNode.getStartingOffset(), elementNode
