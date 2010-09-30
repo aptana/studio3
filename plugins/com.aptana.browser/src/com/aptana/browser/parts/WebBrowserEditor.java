@@ -63,10 +63,11 @@ public class WebBrowserEditor extends EditorPart {
 
 	public static final String EDITOR_ID = "com.aptana.browser.editors.webbrowser"; //$NON-NLS-1$
 	
-	private WebBrowserViewer browserViewer;
+	protected WebBrowserViewer browserViewer;
 	private int progressWorked;
 	private String initialURL;
 	private Image image;
+	private boolean disposed;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
@@ -95,7 +96,7 @@ public class WebBrowserEditor extends EditorPart {
 			if (wbei.getURL() != null)
 				initialURL = wbei.getURL().toExternalForm();
 			if (browserViewer != null) {
-				browserViewer.setUrl(initialURL);
+				browserViewer.setURL(initialURL);
 				site.getWorkbenchWindow().getActivePage().activate(this);
 			}
 	
@@ -121,8 +122,13 @@ public class WebBrowserEditor extends EditorPart {
 			image = null;
 		}
 		super.dispose();
+		disposed = true;
 	}
 
+	public boolean isDisposed() {
+		return disposed;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.EditorPart#isDirty()
 	 */
@@ -180,7 +186,7 @@ public class WebBrowserEditor extends EditorPart {
 				setTitleToolTip(event.title);
 			}
 		});
-		browserViewer.setUrl(initialURL);
+		browserViewer.setURL(initialURL);
 	}
 
 	/* (non-Javadoc)
