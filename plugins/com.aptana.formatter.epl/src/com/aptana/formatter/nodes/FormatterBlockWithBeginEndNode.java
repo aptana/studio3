@@ -36,6 +36,13 @@ public abstract class FormatterBlockWithBeginEndNode extends FormatterBlockNode
 	public void accept(IFormatterContext context, IFormatterWriter visitor) throws Exception
 	{
 		context.setBlankLines(getBlankLinesBefore(context));
+		boolean addingNewLine = isAddingNewLine();
+		if (addingNewLine && !visitor.endsWithNewLine())
+		{
+			// Add a new line in case the end should be pre-pended with a new line and the previous node did not add
+			// a new-line.
+			visitor.writeLineBreak(context);
+		}
 		if (begin != null)
 		{
 			for (IFormatterNode element : begin)
@@ -49,14 +56,29 @@ public abstract class FormatterBlockWithBeginEndNode extends FormatterBlockNode
 		{
 			context.incIndent();
 		}
+		if (addingNewLine)
+		{
+			visitor.writeLineBreak(context);
+		}
 		super.accept(context, visitor);
 		if (indenting)
 		{
 			context.decIndent();
 		}
+
 		if (end != null)
 		{
+			if (addingNewLine && !visitor.endsWithNewLine())
+			{
+				// Add a new line in case the end should be pre-pended with a new line and the previous node did not add
+				// a new-line.
+				visitor.writeLineBreak(context);
+			}
 			visitor.write(context, end.getStartOffset(), end.getEndOffset());
+			if (addingNewLine)
+			{
+				visitor.writeLineBreak(context);
+			}
 		}
 		context.setBlankLines(getBlankLinesAfter(context));
 	}

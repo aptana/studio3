@@ -13,15 +13,15 @@ package com.aptana.formatter;
 
 import org.eclipse.jface.text.IRegion;
 
-public interface IFormatterWriter {
+public interface IFormatterWriter
+{
 
 	void ensureLineStarted(IFormatterContext context);
 
 	void write(IFormatterContext context, int startOffset, int endOffset);
 
 	/**
-	 * Writes specified text at the current position. Ideally text should not
-	 * contain line breaks characters.
+	 * Writes specified text at the current position. Ideally text should not contain line breaks characters.
 	 * 
 	 * @param text
 	 */
@@ -44,5 +44,12 @@ public interface IFormatterWriter {
 	void excludeRegion(IRegion region);
 
 	void addNewLineCallback(IFormatterCallback callback);
+
+	/**
+	 * Returns true if the current buffer in the writer is ending with a new-line terminator.
+	 * 
+	 * @return True, if the buffer ends with a line-terminator; False, otherwise.
+	 */
+	boolean endsWithNewLine();
 
 }

@@ -65,4 +65,9 @@ public class FormatterDefaultElementNode extends FormatterBlockWithBeginEndNode
 		return !set.contains(element);
 	}
 
+	protected boolean isAddingNewLine()
+	{
+		Set<String> set = getDocument().getSet(HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS);
+		return !set.contains(element);
+	}
 }

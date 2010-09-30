@@ -177,14 +177,14 @@ public class RubyFormatter extends AbstractScriptFormatter
 			{
 				if (!input.equals(output))
 				{
-					if (!isValidation() || equalsIgnoreBlanks(new StringReader(input), new StringReader(output)))
+					if (!isValidation() || equalLinesIgnoreBlanks(new StringReader(input), new StringReader(output)))
 					{
 						return new ReplaceEdit(offset, length, output);
 					}
 					else
 					{
 						FormatterPlugin.log(new Status(IStatus.ERROR, RubyFormatterPlugin.PLUGIN_ID, IStatus.OK,
-								FormatterMessages.RubyFormatter_formatterError, new DumpContentException(input
+								FormatterMessages.Formatter_formatterError, new DumpContentException(input
 										+ "\n<!-------!>\n" + output))); //$NON-NLS-1$
 					}
 				}

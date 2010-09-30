@@ -81,7 +81,7 @@ public class FormatterMessages extends NLS {
 
 	public static String IndentationTabPage_general_group_option_indent_size;
 
-	public static String RubyFormatter_formatterError;
+	public static String Formatter_formatterError;
 	public static String RubyFormatterIndentationTabPage_declarationWithinClassBody;
 	public static String RubyFormatterIndentationTabPage_declarationWithinMethodBody;
 	public static String RubyFormatterIndentationTabPage_declarationWithinModuleBody;

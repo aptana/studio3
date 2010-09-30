@@ -143,7 +143,18 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 		}
 	}
 
-	protected boolean equalsIgnoreBlanks(Reader inputReader, Reader outputReader)
+	/**
+	 * Check if the content that is read from the two given readers is equal in a way that it ignores the white-spaces
+	 * at the beginning and the end of each line. Note that it does not ignore any changes in the spacing inside the
+	 * lines. These changes will return false for this equality check. Same goes with new-lines that are added during
+	 * the formatting process (if at all). In these cases, a custom check is needed, or even an AST comparison.
+	 * 
+	 * @param inputReader
+	 * @param outputReader
+	 * @return True if equal; False, otherwise.
+	 * @see #equalsIgnoreWhitespaces(Reader, Reader)
+	 */
+	protected boolean equalLinesIgnoreBlanks(Reader inputReader, Reader outputReader)
 	{
 		LineNumberReader input = new LineNumberReader(inputReader);
 		LineNumberReader output = new LineNumberReader(outputReader);
@@ -171,6 +182,29 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 				return false;
 			}
 		}
+	}
+
+	/**
+	 * Check if the content that is read from the two given strings is equal in a way that it ignores <b>every</b> white
+	 * space that exists in the content.
+	 * 
+	 * @param in
+	 * @param out
+	 * @return True if equal; False, otherwise.
+	 */
+	protected boolean equalsIgnoreWhitespaces(String in, String out)
+	{
+		if (in == null)
+		{
+			return out == null;
+		}
+		if (out == null)
+		{
+			return false;
+		}
+		in = in.replaceAll("\\s", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		out = out.replaceAll("\\s", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		return in.equals(out);
 	}
 
 	private String readLine(LineNumberReader reader)

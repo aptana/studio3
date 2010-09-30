@@ -78,4 +78,14 @@ public class FormatterVoidElementNode extends FormatterBlockWithBeginNode
 		Set<String> set = getDocument().getSet(HTMLFormatterConstants.INDENT_EXCLUDED_TAGS);
 		return !set.contains(element);
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingNewLine()
+	 */
+	protected boolean isAddingNewLine()
+	{
+		Set<String> set = getDocument().getSet(HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS);
+		return !set.contains(element);
+	}
 }

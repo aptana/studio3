@@ -1,8 +1,6 @@
 package com.aptana.editor.common.internal.formatter;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -95,7 +93,9 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 		// content before formatting it.
 		context.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_IS_SLAVE, Boolean.TRUE);
 
-		Map partitioners = new HashMap(0);
+		// For now, the partitioners addition and removal is commented out. This one causes a major slow down when
+		// dealing with large files.
+		// Map partitioners = new HashMap(0);
 		try
 		{
 
@@ -146,20 +146,20 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 				if (lastContentType != null)
 				{
 					// take the last qualified content type and format it
-					partitioners = TextUtilities.removeDocumentPartitioners(document);
+					// partitioners = TextUtilities.removeDocumentPartitioners(document);
 					// System.out.println(lastContentType + "(" + document.get(start, contentLength) + ')');
 					formatSlave(context, document, start, contentLength, lastContentType);
 					start = -1;
 					contentLength = 0;
 					lastContentType = null;
-					TextUtilities.addDocumentPartitioners(document, partitioners);
-					partitioners = null;
+					// TextUtilities.addDocumentPartitioners(document, partitioners);
+					// partitioners = null;
 				}
 			}
 			if (lastContentType != null)
 			{
 				// take the last qualified content type and format it
-				partitioners = TextUtilities.removeDocumentPartitioners(document);
+				// partitioners = TextUtilities.removeDocumentPartitioners(document);
 				formatSlave(context, document, start, contentLength, lastContentType);
 			}
 		}
@@ -168,13 +168,13 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 			// Should never happen
 			CommonEditorPlugin.logError(exception);
 		}
-		finally
-		{
-			if (partitioners != null)
-			{
-				TextUtilities.addDocumentPartitioners(document, partitioners);
-			}
-		}
+		// finally
+		// {
+		// if (partitioners != null)
+		// {
+		// TextUtilities.addDocumentPartitioners(document, partitioners);
+		// }
+		// }
 	}
 
 	protected String extractContentType(QualifiedContentType qualifiedContentType)

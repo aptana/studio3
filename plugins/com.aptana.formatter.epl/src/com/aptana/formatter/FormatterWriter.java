@@ -582,4 +582,27 @@ public class FormatterWriter implements IFormatterWriter
 		return keepLines;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterWriter#endsWithNewLine()
+	 */
+	public boolean endsWithNewLine()
+	{
+		int writerLength = writer.length();
+		if (writerLength < lineDelimiter.length())
+		{
+			return false;
+		}
+		if (lineDelimiter.length() == 1)
+		{
+			return writer.charAt(writerLength - 1) == lineDelimiter.charAt(0);
+		}
+		else if (lineDelimiter.length() == 2)
+		{
+			return writer.charAt(writerLength - 2) == lineDelimiter.charAt(0)
+					&& writer.charAt(writerLength - 1) == lineDelimiter.charAt(1);
+		}
+		return false;
+	}
+
 }

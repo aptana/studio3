@@ -129,4 +129,15 @@ public class FormatterBlockNode extends AbstractFormatterNode implements IFormat
 	{
 		return false;
 	}
+
+	/**
+	 * Returns true if the node suppose to end with a new line; False, otherwise.<br>
+	 * The default implementation is false. Subclasses may override.
+	 * 
+	 * @return Returns true if the node should end with a new line; False, otherwise
+	 */
+	protected boolean isAddingNewLine()
+	{
+		return false;
+	}
 }

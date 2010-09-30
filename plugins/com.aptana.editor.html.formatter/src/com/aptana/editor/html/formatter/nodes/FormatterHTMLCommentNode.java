@@ -66,4 +66,9 @@ public class FormatterHTMLCommentNode extends FormatterCommentNode
 	{
 		return HTMLFormatterConstants.WRAP_COMMENTS;
 	}
+	
+	protected boolean isAddingNewLine()
+	{
+		return true;
+	}
 }

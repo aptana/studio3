@@ -1,6 +1,5 @@
 package com.aptana.editor.html.formatter;
 
-import java.io.StringReader;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
@@ -76,14 +75,14 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 				{
 					if (!input.equals(output))
 					{
-						if (equalsIgnoreBlanks(new StringReader(input), new StringReader(output)))
+						if (equalsIgnoreWhitespaces(input, output))
 						{
 							return new ReplaceEdit(offset, length, output);
 						}
 						else
 						{
 							FormatterPlugin.log(new Status(IStatus.ERROR, HTMLFormatterPlugin.PLUGIN_ID, IStatus.OK,
-									FormatterMessages.RubyFormatter_formatterError, new DumpContentException(input
+									FormatterMessages.Formatter_formatterError, new DumpContentException(input
 											+ "\n=========================\n" + output))); //$NON-NLS-1$
 						}
 					}
@@ -157,7 +156,7 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			FormatterPlugin.logError(e);
 			return null;
 		}
 	}

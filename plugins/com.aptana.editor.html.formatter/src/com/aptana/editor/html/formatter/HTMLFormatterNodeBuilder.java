@@ -90,14 +90,12 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	 */
 	public IFormatterContainerNode build(IParseNode parseResult, FormatterDocument document)
 	{
-		long start = System.currentTimeMillis();
 		this.document = document;
 		final IFormatterContainerNode rootNode = new FormatterBlockNode(document);
 		start(rootNode);
 		IParseNode[] children = parseResult.getChildren();
 		addNodes(children);
 		checkedPop(rootNode, document.getLength());
-		System.out.println((System.currentTimeMillis() - start));
 		return rootNode;
 	}
 

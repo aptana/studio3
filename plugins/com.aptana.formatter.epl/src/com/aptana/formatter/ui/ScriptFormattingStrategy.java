@@ -128,7 +128,9 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 					if (edit != null)
 					{
 						if (edit.getChildrenSize() > 20)
+						{
 							partitioners = TextUtilities.removeDocumentPartitioners(document);
+						}
 						edit.apply(document);
 					}
 				}
