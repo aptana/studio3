@@ -9,13 +9,13 @@ import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.ui.progress.UIJob;
 import org.mortbay.util.ajax.JSON;
 
 import com.aptana.portal.ui.dispatch.browserNotifications.AbstractBrowserNotification;
+import com.aptana.portal.ui.internal.BrowserWrapper;
 
 /**
  * This class is used to generate JavaScript notifications that are to be executed in a Browser instance. The Portal
@@ -32,12 +32,12 @@ public class BrowserNotifier
 	private static final String NOTIFICATION_PATTERN = "eventsDispatcher.notify(''{0}'');"; //$NON-NLS-1$
 	private static final String DATA_PATTERN_PREFIX = '\"' + IBrowserNotificationConstants.EVENT_DATA + "\":"; //$NON-NLS-1$
 	private static BrowserNotifier instance = null;
-	private HashMap<String, Browser> browsers;
+	private HashMap<String, BrowserWrapper> browsers;
 
 	// Private constructor
 	private BrowserNotifier()
 	{
-		browsers = new HashMap<String, Browser>();
+		browsers = new HashMap<String, BrowserWrapper>();
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class BrowserNotifier
 	 * @param browser
 	 *            A non-disposed browser.
 	 */
-	public void registerBrowser(final String id, Browser browser)
+	public void registerBrowser(final String id, BrowserWrapper browser)
 	{
 		if (!browser.isDisposed())
 		{
@@ -202,7 +202,7 @@ public class BrowserNotifier
 	 *            The event data as JSON string (can be null)
 	 * @return true if the operation was successful and false otherwise
 	 */
-	public boolean notifyBrowser(Browser browser, String eventName, String eventType, String eventData)
+	public boolean notifyBrowser(BrowserWrapper browser, String eventName, String eventType, String eventData)
 	{
 		String notification = createBrowserNotification(eventName, eventType, eventData);
 		return browser.execute(notification);
@@ -233,7 +233,7 @@ public class BrowserNotifier
 		{
 			if (notifyAll || notificationTargets.contains(id))
 			{
-				Browser b = browsers.get(id);
+				BrowserWrapper b = browsers.get(id);
 				if (!b.isDisposed())
 				{
 					result &= b.execute(notification);
