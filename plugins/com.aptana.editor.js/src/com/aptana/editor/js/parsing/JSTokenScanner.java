@@ -36,35 +36,36 @@ package com.aptana.editor.js.parsing;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.EndOfLineRule;
-import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.MultiLineRule;
+import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
-import com.aptana.editor.common.text.rules.ExtendedWordRule;
-import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.common.text.rules.WordDetector;
 import com.aptana.editor.js.IJSTokenScanner;
-import com.aptana.editor.js.JSCodeScanner;
+import com.aptana.editor.js.JSLanguageConstants;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
+import com.aptana.editor.js.text.rules.CharacterMapRule;
+import com.aptana.editor.js.text.rules.JSIdentifierDetector;
+import com.aptana.editor.js.text.rules.JSNumberRule;
+import com.aptana.editor.js.text.rules.JSRegExpRule;
+import com.aptana.editor.js.text.rules.JSOperatorDetector;
 
 /**
  * @author Michael Xia
+ * @author Kevin Lindsey
+ * @author cwilliams
  */
-public class JSTokenScanner extends JSCodeScanner implements IJSTokenScanner
+public class JSTokenScanner extends RuleBasedScanner implements IJSTokenScanner
 {
-	@SuppressWarnings("nls")
-	private static String[] GRAMMAR_KEYWORDS = { "function", "var", "void", "true", "false", "null", "this" };
 	private static String VAR_CONST = "const"; //$NON-NLS-1$
 
 	private IToken fToken;
@@ -74,109 +75,39 @@ public class JSTokenScanner extends JSCodeScanner implements IJSTokenScanner
 	 */
 	public JSTokenScanner()
 	{
+		initRules();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.JSCodeScanner#initRules()
+	/**
+	 * addWordRules
+	 * 
+	 * @param wordRule
+	 * @param keywordOperators
+	 * @param words
 	 */
-	@Override
-	protected void initRules()
+	protected void addWordRules(WordRule wordRule, IToken keywordOperators, String... words)
 	{
-		List<IRule> rules = new ArrayList<IRule>();
-
-		// generic whitespace rule
-		rules.add(new WhitespaceRule(new WhitespaceDetector()));
-
-		// comments and documentation
-		rules.add(new EndOfLineRule("///", createToken(JSTokenType.VSDOC))); //$NON-NLS-1$
-		rules.add(new EndOfLineRule("//", createToken(JSTokenType.SINGLELINE_COMMENT))); //$NON-NLS-1$
-		rules.add(new MultiLineRule("/**", "*/", createToken(JSTokenType.SDOC), (char) 0, true)); //$NON-NLS-1$ //$NON-NLS-2$
-		rules.add(new MultiLineRule("/*", "*/", createToken(JSTokenType.MULTILINE_COMMENT))); //$NON-NLS-1$ //$NON-NLS-2$
-
-		// quoted strings
-		IToken token = createToken(JSTokenType.STRING);
-		rules.add(new SingleLineRule("\"", "\"", token, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
-		rules.add(new SingleLineRule("\'", "\'", token, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
-
-		// regex
-		rules.add(new JSRegExpRule(createToken(JSTokenType.REGEX)));
-
-		WordRule wordRule = new WordRule(new LettersAndDigitsWordDetector(), Token.UNDEFINED);
-		for (String keyword : KEYWORD_OPERATORS)
+		for (String word : words)
 		{
-			JSTokenType type = JSTokenType.get(keyword);
-
-			wordRule.addWord(keyword, createToken(type));
+			wordRule.addWord(word, keywordOperators);
 		}
-		addWordRules(wordRule, createToken(JSTokenType.IDENTIFIER), SUPPORT_FUNCTIONS);
-		addWordRules(wordRule, createToken(JSTokenType.IDENTIFIER), EVENT_HANDLER_FUNCTIONS);
-		addWordRules(wordRule, createToken(JSTokenType.IDENTIFIER), DOM_FUNCTIONS);
-		rules.add(wordRule);
+	}
 
-		// operators
-		wordRule = new WordRule(new OperatorDetector(), Token.UNDEFINED);
-		for (String operator : OPERATORS)
-		{
-			JSTokenType type = JSTokenType.get(operator);
-
-			wordRule.addWord(operator, createToken(type));
-		}
-		rules.add(wordRule);
-
-		for (char operator : SINGLE_CHARACTER_OPERATORS)
-		{
-			JSTokenType type = JSTokenType.get(Character.toString(operator));
-
-			rules.add(new SingleCharacterRule(operator, createToken(type)));
-		}
-
-		// other keywords, types, and constants
-		wordRule = new WordRule(new WordDetector(), Token.UNDEFINED);
-		for (String keyword : KEYWORD_CONTROL)
-		{
-			JSTokenType type = JSTokenType.get(keyword);
-
-			wordRule.addWord(keyword, createToken(type));
-		}
-		for (String keyword : GRAMMAR_KEYWORDS)
-		{
-			JSTokenType type = JSTokenType.get(keyword);
-
-			wordRule.addWord(keyword, createToken(type));
-		}
-		wordRule.addWord(VAR_CONST, createToken(JSTokenType.VAR));
-		addWordRules(wordRule, createToken(JSTokenType.IDENTIFIER), SUPPORT_CLASSES);
-		addWordRules(wordRule, createToken(JSTokenType.IDENTIFIER), SUPPORT_DOM_CONSTANTS);
-		rules.add(wordRule);
-
-		// punctuation
-		rules.add(new SingleCharacterRule(';', createToken(JSTokenType.SEMICOLON)));
-		rules.add(new SingleCharacterRule('(', createToken(JSTokenType.LPAREN)));
-		rules.add(new SingleCharacterRule(')', createToken(JSTokenType.RPAREN)));
-		rules.add(new SingleCharacterRule('[', createToken(JSTokenType.LBRACKET)));
-		rules.add(new SingleCharacterRule(']', createToken(JSTokenType.RBRACKET)));
-		rules.add(new SingleCharacterRule('{', createToken(JSTokenType.LCURLY)));
-		rules.add(new SingleCharacterRule('}', createToken(JSTokenType.RCURLY)));
-		rules.add(new SingleCharacterRule(',', createToken(JSTokenType.COMMA)));
-		rules.add(new SingleCharacterRule(':', createToken(JSTokenType.COLON)));
-		rules.add(new SingleCharacterRule('.', createToken(JSTokenType.DOT)));
-		rules.add(new SingleCharacterRule('?', createToken(JSTokenType.QUESTION)));
-
-		// numbers
-		rules.add(new JSNumberRule(createToken(JSTokenType.NUMBER)));
-
-		// identifiers
-		rules.add(new WordRule(new JSIdentifierDetector(), createToken(JSTokenType.IDENTIFIER)));
-
-		setRules(rules.toArray(new IRule[rules.size()]));
+	/**
+	 * createToken
+	 * 
+	 * @param type
+	 * @return
+	 */
+	protected IToken createToken(JSTokenType type)
+	{
+		return new Token(type);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.IJSTokenScanner#hasDivisionStart()
 	 */
-	@Override
 	public boolean hasDivisionStart()
 	{
 		if (fToken == null || fToken.getData() == null)
@@ -205,15 +136,100 @@ public class JSTokenScanner extends JSCodeScanner implements IJSTokenScanner
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.rules.RuleBasedScanner#setRange(org.eclipse.jface.text.IDocument, int, int)
+	/**
+	 * initRules
 	 */
-	@Override
-	public void setRange(final IDocument document, int offset, int length)
+	protected void initRules()
 	{
-		fToken = null;
-		super.setRange(document, offset, length);
+		List<IRule> rules = new ArrayList<IRule>();
+
+		// generic whitespace rule
+		rules.add(new WhitespaceRule(new WhitespaceDetector()));
+
+		// comments and documentation
+		rules.add(new EndOfLineRule("///", createToken(JSTokenType.VSDOC))); //$NON-NLS-1$
+		rules.add(new EndOfLineRule("//", createToken(JSTokenType.SINGLELINE_COMMENT))); //$NON-NLS-1$
+		rules.add(new MultiLineRule("/**", "*/", createToken(JSTokenType.SDOC), (char) 0, true)); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new MultiLineRule("/*", "*/", createToken(JSTokenType.MULTILINE_COMMENT))); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// quoted strings
+		IToken token = createToken(JSTokenType.STRING);
+		rules.add(new SingleLineRule("\"", "\"", token, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new SingleLineRule("\'", "\'", token, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// regex
+		rules.add(new JSRegExpRule(createToken(JSTokenType.REGEX)));
+
+		WordRule wordRule = new WordRule(new JSIdentifierDetector(), Token.UNDEFINED);
+		for (String keyword : JSLanguageConstants.KEYWORD_OPERATORS)
+		{
+			JSTokenType type = JSTokenType.get(keyword);
+
+			wordRule.addWord(keyword, createToken(type));
+		}
+		addWordRules(wordRule, createToken(JSTokenType.IDENTIFIER), JSLanguageConstants.SUPPORT_FUNCTIONS);
+		addWordRules(wordRule, createToken(JSTokenType.IDENTIFIER), JSLanguageConstants.EVENT_HANDLER_FUNCTIONS);
+		addWordRules(wordRule, createToken(JSTokenType.IDENTIFIER), JSLanguageConstants.DOM_FUNCTIONS);
+		rules.add(wordRule);
+
+		// operators
+		wordRule = new WordRule(new JSOperatorDetector(), Token.UNDEFINED);
+		for (String operator : JSLanguageConstants.OPERATORS)
+		{
+			JSTokenType type = JSTokenType.get(operator);
+
+			wordRule.addWord(operator, createToken(type));
+		}
+		rules.add(wordRule);
+		
+		// NOTE: Numbers can start with a period, so we need to check for numbers
+		// before the operator list below, which includes the dot operator
+		rules.add(new JSNumberRule(createToken(JSTokenType.NUMBER)));
+
+		// single-character operators and punctuation
+		CharacterMapRule cmRule = new CharacterMapRule();
+		for (char operator : JSLanguageConstants.SINGLE_CHARACTER_OPERATORS)
+		{
+			JSTokenType type = JSTokenType.get(Character.toString(operator));
+
+			cmRule.add(operator, createToken(type));
+		}
+		cmRule.add(';', createToken(JSTokenType.SEMICOLON));
+		cmRule.add('(', createToken(JSTokenType.LPAREN));
+		cmRule.add(')', createToken(JSTokenType.RPAREN));
+		cmRule.add('[', createToken(JSTokenType.LBRACKET));
+		cmRule.add(']', createToken(JSTokenType.RBRACKET));
+		cmRule.add('{', createToken(JSTokenType.LCURLY));
+		cmRule.add('}', createToken(JSTokenType.RCURLY));
+		cmRule.add(',', createToken(JSTokenType.COMMA));
+		cmRule.add(':', createToken(JSTokenType.COLON));
+		cmRule.add('.', createToken(JSTokenType.DOT));
+		cmRule.add('?', createToken(JSTokenType.QUESTION));
+		rules.add(cmRule);
+
+		// other keywords, types, and constants
+		wordRule = new WordRule(new WordDetector(), Token.UNDEFINED);
+		for (String keyword : JSLanguageConstants.KEYWORD_CONTROL)
+		{
+			JSTokenType type = JSTokenType.get(keyword);
+
+			wordRule.addWord(keyword, createToken(type));
+		}
+		for (String keyword : JSLanguageConstants.GRAMMAR_KEYWORDS)
+		{
+			JSTokenType type = JSTokenType.get(keyword);
+
+			wordRule.addWord(keyword, createToken(type));
+		}
+		wordRule.addWord(VAR_CONST, createToken(JSTokenType.VAR));
+		addWordRules(wordRule, createToken(JSTokenType.IDENTIFIER), JSLanguageConstants.SUPPORT_CLASSES);
+		addWordRules(wordRule, createToken(JSTokenType.IDENTIFIER), JSLanguageConstants.SUPPORT_DOM_CONSTANTS);
+		rules.add(wordRule);
+
+		// identifiers
+		rules.add(new WordRule(new JSIdentifierDetector(), createToken(JSTokenType.IDENTIFIER)));
+
+		setRules(rules.toArray(new IRule[rules.size()]));
 	}
 
 	/*
@@ -223,84 +239,18 @@ public class JSTokenScanner extends JSCodeScanner implements IJSTokenScanner
 	@Override
 	public IToken nextToken()
 	{
-		fToken = super.nextToken();
-		return fToken;
+		return fToken = super.nextToken();
 	}
 
-	/**
-	 * createToken
-	 * 
-	 * @param type
-	 * @return
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.RuleBasedScanner#setRange(org.eclipse.jface.text.IDocument, int, int)
 	 */
-	protected IToken createToken(JSTokenType type)
+	@Override
+	public void setRange(final IDocument document, int offset, int length)
 	{
-		return new Token(type);
-	}
+		fToken = null;
 
-	protected IToken createToken(String name)
-	{
-		System.out.println(name);
-		return super.createToken(name);
-	}
-
-	private static class JSNumberRule extends ExtendedWordRule
-	{
-		private static final String REGEXP = "(0(x|X)[0-9a-fA-F]+)|([0-9]+(\\.[0-9]+)?(?:[eE]\\d+)?)"; //$NON-NLS-1$
-		private static Pattern pattern;
-
-		JSNumberRule(IToken token)
-		{
-			super(new JSNumberDetector(), token, false);
-		}
-
-		@Override
-		protected boolean wordOK(String word, ICharacterScanner scanner)
-		{
-			return getPattern().matcher(word).matches();
-		}
-
-		private synchronized static Pattern getPattern()
-		{
-			if (pattern == null)
-			{
-				pattern = Pattern.compile(REGEXP);
-			}
-			return pattern;
-		}
-	}
-
-	private static class JSNumberDetector implements IWordDetector
-	{
-		@Override
-		public boolean isWordStart(char c)
-		{
-			return Character.isDigit(c);
-		}
-
-		@Override
-		public boolean isWordPart(char c)
-		{
-			if (isWordStart(c) || c == '.')
-				return true;
-			char lower = Character.toLowerCase(c);
-			return lower == 'a' || lower == 'b' || lower == 'c' || lower == 'd' || lower == 'e' || lower == 'f' || lower == 'x';
-		}
-	}
-
-	private static class JSIdentifierDetector implements IWordDetector
-	{
-
-		@Override
-		public boolean isWordStart(char c)
-		{
-			return c == '_' || c == '$' || Character.isLetter(c);
-		}
-
-		@Override
-		public boolean isWordPart(char c)
-		{
-			return isWordStart(c) || Character.isDigit(c);
-		}
+		super.setRange(document, offset, length);
 	}
 }

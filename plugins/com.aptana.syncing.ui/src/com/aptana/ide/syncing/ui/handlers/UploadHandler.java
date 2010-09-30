@@ -44,12 +44,11 @@ import com.aptana.ide.syncing.ui.actions.UploadAction;
 public class UploadHandler extends BaseSyncHandler
 {
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		UploadAction action = new UploadAction();
 		action.setActivePart(null, HandlerUtil.getActivePart(event));
-		action.setSelection(new StructuredSelection(getSelectedResources()));
+		action.setSelection(new StructuredSelection(getSelectedResources()), isSelectionFromSource());
 		action.run(null);
 
 		return null;

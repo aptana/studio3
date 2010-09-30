@@ -22,7 +22,7 @@
             base-type="org.eclipse.core.runtime.text"
             file-extensions="diff,patch"
             id="com.aptana.contenttype.diff"
-            name="%content-type.diff.name"
+            name="%contenttype.diff.name"
             priority="normal">
       </content-type>
    </extension>

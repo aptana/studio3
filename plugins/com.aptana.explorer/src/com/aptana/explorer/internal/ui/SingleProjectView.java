@@ -1,12 +1,43 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.explorer.internal.ui;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import net.contentobjects.jnotify.IJNotify;
-import net.contentobjects.jnotify.JNotifyException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -83,7 +114,6 @@ import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IExplorerUIConstants;
 import com.aptana.explorer.IPreferenceConstants;
-import com.aptana.filewatcher.FileWatcher;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.ide.core.io.IConnectionPoint;
@@ -159,11 +189,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	private CLabel filterLabel;
 	private GridData filterLayoutData;
 
-	/**
-	 * Used as a handle for the filesystem watcher on the selected project.
-	 */
-	private Integer watcher;
-
 	// listen for external changes to active project
 	private IPreferenceChangeListener fActiveProjectPrefChangeListener;
 
@@ -206,7 +231,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		toolbarGridLayout.marginHeight = 0;
 		toolbarGridLayout.horizontalSpacing = 0;
 		toolbarComposite.setLayout(toolbarGridLayout);
-		
+
 		// For project and branch....
 		Composite pulldowns = new Composite(toolbarComposite, SWT.NONE);
 		pulldowns.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
@@ -234,7 +259,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		toolbarButtonsLayout.marginHeight = 0;
 		toolbarButtonsLayout.marginWidth = 0;
 		toolbarButtons.setLayout(toolbarButtonsLayout);
-		
+
 		// Create Deploy menu
 		createDeployMenu(toolbarButtons);
 
@@ -294,7 +319,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 			return new IScopeReference()
 			{
 
-				@Override
 				public String getScopeId()
 				{
 					if (selectedProject != null)
@@ -498,7 +522,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 			{
 				addHerokuMenuCommands(menuManager);
 			}
-			//Still need to call isFTPProject to populate siteConnections variable
+			// Still need to call isFTPProject to populate siteConnections variable
 			else if ((type == DeployType.FTP) && isFTPProject())
 			{
 				addFTPMenuCommands(menuManager);
@@ -685,8 +709,8 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 											rememberMyDecision);
 								}
 								// remembers the last sync connection
-								ResourceSynchronizationUtils.setLastSyncConnection(selectedProject, destination
-										.getName());
+								ResourceSynchronizationUtils.setLastSyncConnection(selectedProject,
+										destination.getName());
 							}
 							settingsDialog.setPropertySource(destination);
 						}
@@ -710,7 +734,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 
 		menuManager.appendToGroup(GROUP_HEROKU_COMMANDS, new ContributionItem()
 		{
-
 			@Override
 			public void fill(Menu menu, int index)
 			{
@@ -822,70 +845,70 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	private void addEngineYardMenuCommands(MenuManager menuManager)
 	{
 		menuManager.add(new Separator(GROUP_DEPLOY));
-		menuManager.add(new Separator(GROUP_EY_COMMANDS)); //$NON-NLS-1$
+		menuManager.add(new Separator(GROUP_EY_COMMANDS));
 
-		menuManager.appendToGroup(GROUP_EY_COMMANDS, new ContributionItem() //$NON-NLS-1$
+		menuManager.appendToGroup(GROUP_EY_COMMANDS, new ContributionItem()
+		{
+
+			@Override
+			public void fill(Menu menu, int index)
+			{
+
+				// open ssh session
+
+				MenuItem item = new MenuItem(menu, SWT.PUSH);
+				item.setText(Messages.SingleProjectView_OpenSSHSubmenuLabel);
+				item.addSelectionListener(new SelectionAdapter()
 				{
-
-					@Override
-					public void fill(Menu menu, int index)
+					public void widgetSelected(SelectionEvent e)
 					{
-
-						// open ssh session
-
-						MenuItem item = new MenuItem(menu, SWT.PUSH);
-						item.setText(Messages.SingleProjectView_OpenSSHSubmenuLabel);
-						item.addSelectionListener(new SelectionAdapter()
-						{
-							public void widgetSelected(SelectionEvent e)
-							{
-								final CommandElement command;
-								command = getBundleCommand(BUNDLE_ENGINE_YARD, "Open SSH Session"); //$NON-NLS-1$
-								command.execute();
-							}
-						});
-
-						// Deployment Submenu
-						final MenuItem deploymentMenuItem = new MenuItem(menu, SWT.CASCADE);
-						deploymentMenuItem.setText(Messages.SingleProjectView_DeploymentSubmenuLabel);
-						Menu deploymentSubMenu = new Menu(menu);
-
-						createDeploySubMenuItem(deploymentSubMenu, "List Environments", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-						createDeploySubMenuItem(deploymentSubMenu, "Retrieve Logs", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-						createDeploySubMenuItem(deploymentSubMenu, "Rebuild Environment", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-						createDeploySubMenuItem(deploymentSubMenu, "Rollback App", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-
-						deploymentMenuItem.setMenu(deploymentSubMenu);
-
-						// Recipes Submenu
-						final MenuItem recipesMenuItem = new MenuItem(menu, SWT.CASCADE);
-						recipesMenuItem.setText(Messages.SingleProjectView_RecipesSubmenuLabel);
-						Menu recipesSubMenu = new Menu(menu);
-
-						createDeploySubMenuItem(recipesSubMenu, "Apply Recipes", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-						createDeploySubMenuItem(recipesSubMenu, "Upload Recipes", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-						createDeploySubMenuItem(recipesSubMenu, "Download Recipes", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-
-						recipesMenuItem.setMenu(recipesSubMenu);
-
-						// Maintenance Submenu
-						final MenuItem maintenanceMenuItem = new MenuItem(menu, SWT.CASCADE);
-						maintenanceMenuItem.setText(Messages.SingleProjectView_MaintenanceSubmenuLabel);
-						Menu maintenanceSubMenu = new Menu(menu);
-
-						createDeploySubMenuItem(maintenanceSubMenu, "Turn Maintenance On", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-						createDeploySubMenuItem(maintenanceSubMenu, "Turn Maintenance Off", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-
-						maintenanceMenuItem.setMenu(maintenanceSubMenu);
-
-					}
-
-					@Override
-					public boolean isDynamic()
-					{
-						return true;
+						final CommandElement command;
+						command = getBundleCommand(BUNDLE_ENGINE_YARD, "Open SSH Session"); //$NON-NLS-1$
+						command.execute();
 					}
 				});
+
+				// Deployment Submenu
+				final MenuItem deploymentMenuItem = new MenuItem(menu, SWT.CASCADE);
+				deploymentMenuItem.setText(Messages.SingleProjectView_DeploymentSubmenuLabel);
+				Menu deploymentSubMenu = new Menu(menu);
+
+				createDeploySubMenuItem(deploymentSubMenu, "List Environments", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+				createDeploySubMenuItem(deploymentSubMenu, "Retrieve Logs", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+				createDeploySubMenuItem(deploymentSubMenu, "Rebuild Environment", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+				createDeploySubMenuItem(deploymentSubMenu, "Rollback App", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+
+				deploymentMenuItem.setMenu(deploymentSubMenu);
+
+				// Recipes Submenu
+				final MenuItem recipesMenuItem = new MenuItem(menu, SWT.CASCADE);
+				recipesMenuItem.setText(Messages.SingleProjectView_RecipesSubmenuLabel);
+				Menu recipesSubMenu = new Menu(menu);
+
+				createDeploySubMenuItem(recipesSubMenu, "Apply Recipes", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+				createDeploySubMenuItem(recipesSubMenu, "Upload Recipes", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+				createDeploySubMenuItem(recipesSubMenu, "Download Recipes", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+
+				recipesMenuItem.setMenu(recipesSubMenu);
+
+				// Maintenance Submenu
+				final MenuItem maintenanceMenuItem = new MenuItem(menu, SWT.CASCADE);
+				maintenanceMenuItem.setText(Messages.SingleProjectView_MaintenanceSubmenuLabel);
+				Menu maintenanceSubMenu = new Menu(menu);
+
+				createDeploySubMenuItem(maintenanceSubMenu, "Turn Maintenance On", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+				createDeploySubMenuItem(maintenanceSubMenu, "Turn Maintenance Off", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
+
+				maintenanceMenuItem.setMenu(maintenanceSubMenu);
+
+			}
+
+			@Override
+			public boolean isDynamic()
+			{
+				return true;
+			}
+		});
 
 	}
 
@@ -1016,14 +1039,12 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		getCommonViewer().getTree().getMenu().addMenuListener(new MenuListener()
 		{
 
-			@Override
 			public void menuShown(MenuEvent e)
 			{
 				Menu menu = (Menu) e.getSource();
 				mangleContextMenu(menu);
 			}
 
-			@Override
 			public void menuHidden(MenuEvent e)
 			{
 				// do nothing
@@ -1055,13 +1076,11 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		toolItem.addSelectionListener(new SelectionListener()
 		{
 
-			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
 				removeFilter();
 			}
 
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e)
 			{
 			}
@@ -1070,7 +1089,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		return filter;
 	}
 
-	protected void hideFilterLable()
+	protected void hideFilterLabel()
 	{
 		filterLayoutData.exclude = true;
 		filterComp.setVisible(false);
@@ -1088,7 +1107,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 
 	protected void removeFilter()
 	{
-		hideFilterLable();
+		hideFilterLabel();
 	}
 
 	private void addProjectResourceListener()
@@ -1165,7 +1184,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		}
 		projectChanged(oldActiveProject, newSelectedProject);
 	}
-	
+
 	public void setActiveProject(IProject project)
 	{
 		setActiveProject(project.getName());
@@ -1205,20 +1224,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	 */
 	protected void projectChanged(IProject oldProject, IProject newProject)
 	{
-		// Set/unset file watcher
-		removeFileWatcher();
-		try
-		{
-			if (newProject != null && newProject.exists() && newProject.getLocation() != null)
-			{
-				watcher = FileWatcher.addWatch(newProject.getLocation().toOSString(), IJNotify.FILE_ANY, true,
-						new FileDeltaRefreshAdapter());
-			}
-		}
-		catch (JNotifyException e)
-		{
-			ExplorerPlugin.logError(e.getMessage(), e);
-		}
 		// Set project pulldown
 		String newProjectName = ""; //$NON-NLS-1$
 		if (newProject != null && newProject.exists())
@@ -1240,24 +1245,10 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		}
 	}
 
-	private void removeFileWatcher()
-	{
-		try
-		{
-			if (watcher != null)
-			{
-				FileWatcher.removeWatch(watcher);
-			}
-		}
-		catch (JNotifyException e)
-		{
-			ExplorerPlugin.logError(e.getMessage(), e);
-		}
-	}
-
 	protected void refreshViewer()
 	{
-		if (getCommonViewer() == null)
+		if (getCommonViewer() == null || getCommonViewer().getTree() == null
+				|| getCommonViewer().getTree().isDisposed())
 		{
 			return;
 		}
@@ -1286,7 +1277,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	@Override
 	public void dispose()
 	{
-		removeFileWatcher();
 		getControlThemerFactory().dispose(getCommonViewer());
 		removeProjectResourceListener();
 		removeActiveProjectPrefListener();
@@ -1335,7 +1325,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				delta.accept(new IResourceDeltaVisitor()
 				{
 
-					@Override
 					public boolean visit(IResourceDelta delta) throws CoreException
 					{
 						IResource resource = delta.getResource();
@@ -1360,7 +1349,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 								Display.getDefault().asyncExec(new Runnable()
 								{
 
-									@Override
 									public void run()
 									{
 										// Construct the menu item to for this
@@ -1417,7 +1405,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 								Display.getDefault().asyncExec(new Runnable()
 								{
 
-									@Override
 									public void run()
 									{
 										MenuItem[] menuItems = projectsMenu.getItems();
@@ -1457,7 +1444,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		}
 	}
 
-	@Override
 	public void search(String text, boolean isCaseSensitive, boolean isRegularExpression)
 	{
 		if (selectedProject == null)

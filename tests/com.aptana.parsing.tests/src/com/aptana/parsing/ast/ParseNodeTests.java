@@ -2,6 +2,7 @@ package com.aptana.parsing.ast;
 
 import junit.framework.TestCase;
 
+@SuppressWarnings("nls")
 public class ParseNodeTests extends TestCase
 {
 	static class TextNode extends ParseNode

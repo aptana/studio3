@@ -168,7 +168,11 @@ module Ruble
     # * start_line
     # * end_line
     def selection
-      editor_part.selection_provider.selection
+      if editor_part.respond_to? :selection_provider
+        editor_part.selection_provider.selection
+      else
+        org.eclipse.jface.text.TextSelection.emptySelection
+      end
     end
     
     # Argument is a 2 integer array with first being offset, second being length; 
@@ -239,7 +243,6 @@ module Ruble
     end
     
     def to_env
-      input = editor_input
       result = {}
       
       if editor_part.kind_of?(com.aptana.editor.common.AbstractThemeableEditor)
@@ -250,6 +253,7 @@ module Ruble
         result['TM_TAB_SIZE'] = 4
       end
       
+      input = editor_input
       if input.respond_to? :file
         ifile = input.file
         file = ifile.location.to_file
@@ -258,57 +262,67 @@ module Ruble
         result["TM_FILEPATH"] = file.absolute_path
         result["TM_FILENAME"] = file.name
         result["TM_DIRECTORY"] = file.parent_file.absolute_path
-        result["TM_PROJECT_DIRECTORY"] = ifile.project.location.to_file.absolute_path # duplicate name in project.rb
-        
-        if !selection.empty? and selection.text.length > 0
-          result["TM_SELECTED_TEXT"] = selection.text
-          result["TM_LINE_NUMBER"] = selection.start_line + 1
-          result["TM_SELECTION_OFFSET"] = selection.offset
-          result["TM_SELECTION_LENGTH"] = selection.length
-          result["TM_SELECTION_START_LINE_NUMBER"] = result["TM_LINE_NUMBER"]
-          result["TM_SELECTION_END_LINE_NUMBER"] = selection.end_line + 1
-          result["TM_INPUT_START_LINE_INDEX"] = caret_column
-          result["TM_INPUT_START_COLUMN"] = result['TM_INPUT_START_LINE_INDEX'] + 1
-          result["TM_INPUT_START_LINE"] = result["TM_SELECTION_START_LINE_NUMBER"]
-        else
-          result["TM_LINE_NUMBER"] = caret_line + 1
-          result["TM_COLUMN_NUMBER"] = caret_column + 1
-        end
-        result["TM_LINE_INDEX"] = caret_column
-        result["TM_CARET_LINE_NUMBER"] = caret_line + 1
-        result["TM_CARET_LINE_TEXT"] = current_line
-        result["TM_CARET_OFFSET"] = caret_offset
-        result["TM_CURRENT_LINE"] = current_line
-        
-        # I'm sure there's a better way to extract the word at the current caret position
-        if current_line !~ /^\s*$/
-          starting_offset = caret_column
-          ending_offset = current_line.length
+      elsif input.respond_to? :getURI
+        uri = input.getURI
+        if uri.scheme == "file"
+          file = java.io.File.new(uri)
           
-          (caret_column - 1).downto(0) do |n|
-            if current_line[n,1] =~ /\W/
-              starting_offset = n + 1
-              break
-            end
+          result["TM_SELECTED_FILE"] = file.absolute_path
+          result["TM_FILEPATH"] = file.absolute_path
+          result["TM_FILENAME"] = file.name
+          result["TM_DIRECTORY"] = file.parent_file.absolute_path
+        end
+      end
+      # FIXME What if we have a URIEditorInput, we could still fill in some of these values!
+      
+      if !selection.empty? and selection.text.length > 0
+        result["TM_SELECTED_TEXT"] = selection.text
+        result["TM_LINE_NUMBER"] = selection.start_line + 1
+        result["TM_SELECTION_OFFSET"] = selection.offset
+        result["TM_SELECTION_LENGTH"] = selection.length
+        result["TM_SELECTION_START_LINE_NUMBER"] = result["TM_LINE_NUMBER"]
+        result["TM_SELECTION_END_LINE_NUMBER"] = selection.end_line + 1
+        result["TM_INPUT_START_LINE_INDEX"] = caret_column
+        result["TM_INPUT_START_COLUMN"] = result['TM_INPUT_START_LINE_INDEX'] + 1
+        result["TM_INPUT_START_LINE"] = result["TM_SELECTION_START_LINE_NUMBER"]
+      else
+        result["TM_LINE_NUMBER"] = caret_line + 1
+        result["TM_COLUMN_NUMBER"] = caret_column + 1
+      end
+      result["TM_LINE_INDEX"] = caret_column
+      result["TM_CARET_LINE_NUMBER"] = caret_line + 1
+      result["TM_CARET_LINE_TEXT"] = current_line
+      result["TM_CARET_OFFSET"] = caret_offset
+      result["TM_CURRENT_LINE"] = current_line
+      
+      # I'm sure there's a better way to extract the word at the current caret position
+      if current_line !~ /^\s*$/
+        starting_offset = 0
+        ending_offset = current_line.length
+        
+        (caret_column - 1).downto(0) do |n|
+          if current_line[n,1] =~ /\W/
+            starting_offset = n + 1
+            break
           end
-          (caret_column...current_line.length).each do |n|
-            if current_line[n,1] =~ /\W/
-              ending_offset = n
-              break
-            end
+        end
+        (caret_column...current_line.length).each do |n|
+          if current_line[n,1] =~ /\W/
+            ending_offset = n
+            break
           end
-          
-          result["TM_CURRENT_WORD"] = current_line[starting_offset, ending_offset - starting_offset]
-        else
-          result["TM_CURRENT_WORD"] = ""
         end
         
-        result["TM_CURRENT_SCOPE"] = current_scope
-        result["TM_SCOPE"] = result["TM_CURRENT_SCOPE"]
-        # Allow each bundle to modify env vars based on scope, in order.
-        scopes = current_scope.split(' ')
-        scopes.each { |scope| result = modify_env(scope, result) } 
-      end           
+        result["TM_CURRENT_WORD"] = current_line[starting_offset, ending_offset - starting_offset]
+      else
+        result["TM_CURRENT_WORD"] = ""
+      end
+      
+      result["TM_CURRENT_SCOPE"] = current_scope
+      result["TM_SCOPE"] = result["TM_CURRENT_SCOPE"]
+      # Allow each bundle to modify env vars based on scope, in order.
+      scopes = current_scope.split(' ')
+      scopes.each { |scope| result = modify_env(scope, result) }
       
       result
     end

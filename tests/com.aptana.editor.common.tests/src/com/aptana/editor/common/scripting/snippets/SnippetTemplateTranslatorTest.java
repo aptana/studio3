@@ -25,6 +25,11 @@ public class SnippetTemplateTranslatorTest extends TestCase
 		assertTranslatesTo("\\${1:name}${0}", "$${1:name}${cursor}");
 	}
 	
+	public void testEscapedDollarAsValue()
+	{
+		assertTranslatesTo("${1:name \\$}${0}", "${1:tabstop('name $')}${cursor}");
+	}
+	
 	public void testTabstopWithSingleQuotedContent()
 	{
 		assertTranslatesTo("validates_presence_of :message => \"${4:can't be blank}\"", "validates_presence_of :message => \"${4:tabstop('can''t be blank')}\"");

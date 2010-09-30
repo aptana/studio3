@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2008 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -282,13 +282,11 @@ public class ParseNodeNavigator extends DefaultNavigator
 					}
 				}
 
-				@Override
 				public boolean hasNext()
 				{
 					return next != null;
 				}
 
-				@Override
 				public Object next()
 				{
 					Object result = next;
@@ -298,7 +296,6 @@ public class ParseNodeNavigator extends DefaultNavigator
 					return result;
 				}
 
-				@Override
 				public void remove()
 				{
 					// do nothing

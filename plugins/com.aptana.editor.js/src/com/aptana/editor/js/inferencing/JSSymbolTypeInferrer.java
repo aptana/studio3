@@ -1,12 +1,46 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.inferencing;
 
 import java.net.URI;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -25,7 +59,6 @@ import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSIdentifierNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
-import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSObjectNode;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.index.core.Index;
@@ -136,8 +169,8 @@ public class JSSymbolTypeInferrer
 	{
 		if (property != null && object != null)
 		{
-			Queue<JSNode> queue = new ArrayDeque<JSNode>();
-			Set<String> visitedSymbols = new HashSet<String>();
+			Queue<JSNode> queue = new LinkedList<JSNode>();
+			Set<IParseNode> visitedSymbols = new HashSet<IParseNode>();
 
 			// prime the queue
 			queue.addAll(object.getValues());
@@ -145,40 +178,41 @@ public class JSSymbolTypeInferrer
 			while (queue.isEmpty() == false)
 			{
 				JSNode node = queue.poll();
-				DocumentationBlock docs = node.getDocumentation();
-
-				if (docs != null)
+				
+				if (visitedSymbols.contains(node) == false)
 				{
-					JSTypeUtil.applyDocumentation(property, docs);
-					break;
-				}
-				else if (node instanceof JSIdentifierNode)
-				{
-					// grab name
-					String symbol = node.getText();
-
-					visitedSymbols.add(symbol);
-
-					JSPropertyCollection p = this.getSymbolProperty(this._activeScope.getObject(), symbol);
-
-					if (p != null)
+					visitedSymbols.add(node);
+					
+					DocumentationBlock docs = node.getDocumentation();
+	
+					if (docs != null)
 					{
-						for (JSNode value : p.getValues())
+						JSTypeUtil.applyDocumentation(property, docs);
+						break;
+					}
+					else if (node instanceof JSIdentifierNode)
+					{
+						// grab name
+						String symbol = node.getText();
+	
+						JSPropertyCollection p = this.getSymbolProperty(this._activeScope.getObject(), symbol);
+	
+						if (p != null)
 						{
-							if (value.getNodeType() != JSNodeTypes.IDENTIFIER || visitedSymbols.contains(value.getText()) == false)
+							for (JSNode value : p.getValues())
 							{
 								queue.offer(value);
 							}
 						}
 					}
-				}
-				else if (node instanceof JSAssignmentNode)
-				{
-					IParseNode rhs = node.getLastChild();
-
-					if (rhs instanceof JSNode)
+					else if (node instanceof JSAssignmentNode)
 					{
-						queue.offer((JSNode) rhs);
+						IParseNode rhs = node.getLastChild();
+	
+						if (rhs instanceof JSNode)
+						{
+							queue.offer((JSNode) rhs);
+						}
 					}
 				}
 			}
@@ -238,7 +272,7 @@ public class JSSymbolTypeInferrer
 		for (String name : activeObject.getPropertyNames())
 		{
 			// TODO: Treat as new property if names match but not their types?
-			if (propertyMap.containsKey(name) == false)
+			if (propertyMap.containsKey(name) == false || "prototype".equals(name))
 			{
 				additionalProperties.add(name);
 			}

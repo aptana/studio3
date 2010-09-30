@@ -1,17 +1,55 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.scope;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Stack;
 import java.util.regex.Pattern;
 
 public class ScopeSelector
 {
+	private static final String NEGATIVE_LOOKAHEAD = "-"; //$NON-NLS-1$
 	private static final Pattern or_split = Pattern.compile("\\s*,\\s*"); //$NON-NLS-1$
 	private static final Pattern and_split = Pattern.compile("\\s+"); //$NON-NLS-1$
 
 	private ISelectorNode _root;
 	private int matchOffset;
 	private int matchLength;
+	private int matchFragments;
 
 	/**
 	 * ScopeSelector
@@ -69,6 +107,7 @@ public class ScopeSelector
 					// plus how much of that step matched (looking for longest)
 					matchOffset = i;
 					matchLength = this._root.matchLength();
+					matchFragments = this._root.matchFragments();
 
 					// we matched, so report success and stop looking for a match
 					result = true;
@@ -108,8 +147,10 @@ public class ScopeSelector
 		{
 			if (selector.matches(scope))
 			{
-				int offset = selector.matchOffset;
-
+				int offset = selector.matchOffset; // This offset is the fragment of scope (counting spaces, basically)
+				int fragments = selector.matchFragments;
+				offset += fragments - 1;
+				
 				if (offset > bestOffset)
 				{
 					bestOffset = offset;
@@ -181,6 +222,7 @@ public class ScopeSelector
 			{
 				// process ands
 				String[] ands = and_split.split(or);
+				ands = processNegativeLookaheads(ands);
 				int startingSize = stack.size();
 				int i = 0;
 
@@ -189,7 +231,7 @@ public class ScopeSelector
 					String and = ands[i];
 
 					// stop processing "and"s if we encounter a negative lookahead operator
-					if (and != null && and.equals("-")) //$NON-NLS-1$
+					if (and != null && and.equals(NEGATIVE_LOOKAHEAD))
 					{
 						break;
 					}
@@ -210,7 +252,7 @@ public class ScopeSelector
 				{
 					String operator = ands[i];
 
-					if (operator != null && operator.equals("-")) //$NON-NLS-1$
+					if (operator != null && operator.equals(NEGATIVE_LOOKAHEAD))
 					{
 						if (i + 1 < ands.length)
 						{
@@ -255,6 +297,30 @@ public class ScopeSelector
 		}
 
 		this._root = (stack != null && stack.size() > 0) ? stack.pop() : null;
+	}
+
+	/**
+	 * Handles when '-' negative lookahead is butted up against next NameSelector.
+	 * 
+	 * @param ands
+	 * @return
+	 */
+	private String[] processNegativeLookaheads(String[] ands)
+	{
+		List<String> processed = new ArrayList<String>();
+		for (String and : ands)
+		{
+			if (and.startsWith(NEGATIVE_LOOKAHEAD) && and.length() > 1)
+			{
+				processed.add(NEGATIVE_LOOKAHEAD);
+				processed.add(and.substring(1));
+			}
+			else
+			{
+				processed.add(and);
+			}
+		}
+		return processed.toArray(new String[processed.size()]);
 	}
 
 	/*

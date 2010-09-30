@@ -61,7 +61,6 @@ public class WindowsMingwConfiguration extends AbstractProcessConfiguration {
 	 * (non-Javadoc)
 	 * @see com.aptana.terminal.IProcessConfiguration#getCommandLine()
 	 */
-	@Override
 	public List<String> getCommandLine() throws CoreException {
 		List<String> list = new ArrayList<String>();
 		list.add(getExecutable().getAbsolutePath());

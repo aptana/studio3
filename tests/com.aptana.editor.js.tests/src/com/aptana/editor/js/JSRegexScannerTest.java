@@ -10,20 +10,12 @@ import org.eclipse.jface.text.rules.Token;
 
 public class JSRegexScannerTest extends TestCase
 {
-
-	private JSRegexpScanner fScanner;
+	private JSEscapeSequenceScanner fScanner;
 
 	@Override
 	protected void setUp() throws Exception
 	{
-		fScanner = new JSRegexpScanner()
-		{
-			@Override
-			protected IToken getToken(String tokenName)
-			{
-				return JSRegexScannerTest.this.getToken(tokenName);
-			}
-		};
+		fScanner = new JSEscapeSequenceScanner("string.regexp.js");
 	}
 
 	@Override

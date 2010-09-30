@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: JRuby
 Bundle-SymbolicName: org.jruby
-Bundle-Version: 1.5.1.qualifier
+Bundle-Version: 1.5.3.qualifier
 Bundle-ClassPath: lib/jruby.jar
 Bundle-Vendor: jruby.org
 Export-Package: .,
@@ -142,6 +142,6 @@ Export-Package: .,
  org.jruby.util.io,
  org.jruby.util.string,
  org.jruby.util.unsafe
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-BuddyPolicy: global
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.4.0"

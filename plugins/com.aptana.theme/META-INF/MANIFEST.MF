@@ -11,16 +11,18 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.console,
  org.eclipse.ui.editors,
  org.eclipse.ui.workbench.texteditor,
- plistreader,
  com.aptana.scripting,
  org.eclipse.debug.ui,
  org.eclipse.ui.ide,
  org.eclipse.ui.views,
  org.eclipse.team.ui,
  com.aptana.ui;bundle-version="3.0.0",
- com.aptana.core;bundle-version="3.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+ com.aptana.core;bundle-version="3.0.0",
+ org.eclipse.search;bundle-version="3.5.0";resolution:=optional,
+ com.aptana.plist;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.theme,
  com.aptana.theme.extensions,
  com.aptana.theme.preferences
+Eclipse-ExtensibleAPI: true

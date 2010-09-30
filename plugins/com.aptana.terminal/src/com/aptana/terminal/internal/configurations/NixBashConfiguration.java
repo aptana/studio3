@@ -65,12 +65,12 @@ public class NixBashConfiguration extends AbstractProcessConfiguration {
 	/* (non-Javadoc)
 	 * @see com.aptana.terminal.IProcessConfiguration#getCommandLine()
 	 */
-	@Override
 	public List<String> getCommandLine() {
 		List<String> list = new ArrayList<String>();
 		list.add(getExecutable().getAbsolutePath());
 		list.add("/bin/bash"); //$NON-NLS-1$
-		list.add("bash --rcfile "+getRCFile().getAbsolutePath()+" -i"); //$NON-NLS-1$
+		// newline is a delimiter in redtty
+		list.add("bash\n--rcfile\n"+getRCFile().getAbsolutePath()+"\n-i"); //$NON-NLS-1$
 		list.add("120x40"); //$NON-NLS-1$
 		return list;
 	}

@@ -44,12 +44,11 @@ import com.aptana.ide.syncing.ui.actions.DownloadAction;
 public class DownloadHandler extends BaseSyncHandler
 {
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		DownloadAction action = new DownloadAction();
 		action.setActivePart(null, HandlerUtil.getActivePart(event));
-		action.setSelection(new StructuredSelection(getSelectedResources()));
+		action.setSelection(new StructuredSelection(getSelectedResources()), isSelectionFromSource());
 		action.run(null);
 
 		return null;

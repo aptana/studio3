@@ -168,6 +168,15 @@
                menubarPath="compareWithMenu/compareWithGroup"
                tooltip="%CompareWithRevisionAction_tooltip">
          </action>
+         <action
+               class="com.aptana.git.ui.internal.actions.BlameAction"
+               definitionId="com.aptana.git.ui.command.blame"
+               enablesFor="+"
+               id="com.aptana.git.ui.actions.BlameAction"
+               label="%BlameAction_label"
+               menubarPath="team.main/targetGroup"
+               tooltip="%BlameAction_tooltip">
+         </action>
       </objectContribution>
    </extension>
    
@@ -320,6 +329,16 @@
             id="com.aptana.git.ui.command.compare_with_revision"
             name="%CompareWithRevisionAction_tooltip">
       </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.blame"
+            name="%BlameAction_label">
+      </command>
+      <command
+            defaultHandler="com.aptana.git.ui.internal.actions.ShowInHistoryHandler"
+            id="com.aptana.git.ui.command.showInResourceHistory"
+            name="Show in Resource History">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -436,5 +455,18 @@
             id="com.aptana.git.ui.quickdiff"
             label="Git Quick Diff">
       </referenceprovider>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.ui.menus.showInMenu">
+         <command
+               commandId="com.aptana.git.ui.command.showInResourceHistory"
+               label="%ResourceHistory_label"
+               style="push"
+               tooltip="%ShowResourceInHistoryAction_label">
+         </command>
+      </menuContribution>
    </extension>
 </plugin>

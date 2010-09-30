@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.git.core.model;
 
 import java.io.BufferedReader;
@@ -48,8 +82,22 @@ import com.aptana.git.core.model.GitRef.TYPE;
 public class GitRepository
 {
 
+	/**
+	 * The file used
+	 */
 	private static final String COMMIT_EDITMSG = "COMMIT_EDITMSG"; //$NON-NLS-1$
+	/**
+	 * The most important file in git. This holds the current file state. When this changes, the state of files in the
+	 * repo has changed.
+	 */
 	private static final String INDEX = "index"; //$NON-NLS-1$
+	/**
+	 * File created prior to merges (which happen as part of pull, which is just fetch + merge).
+	 */
+	private static final String ORIG_HEAD = "ORIG_HEAD"; //$NON-NLS-1$
+	/**
+	 * A file created when we hit merge conflicts that need to be manually resolved.
+	 */
 	static final String MERGE_HEAD_FILENAME = "MERGE_HEAD"; //$NON-NLS-1$
 	private static final String COMMIT_FILE_ENCODING = "UTF-8"; //$NON-NLS-1$
 	private static final String HEAD = "HEAD"; //$NON-NLS-1$
@@ -98,8 +146,14 @@ public class GitRepository
 						@Override
 						public void fileCreated(int wd, String rootPath, String name)
 						{
-							if (name != null && name.equals(INDEX))
+							if (name == null)
+								return;
+							if (name.equals(INDEX))
 								refreshIndex();
+							else if (name.equals(ORIG_HEAD)) // this is done before merges (or pulls, which are just
+																// fetch + merge)
+								firePullEvent(); // we're conflating the two events here because I don't have the ideas
+													// separated in the listeners yet.
 						}
 
 						@Override
@@ -288,7 +342,6 @@ public class GitRepository
 				true, new JNotifyListener()
 				{
 
-					@Override
 					public void fileRenamed(int wd, String rootPath, String oldName, String newName)
 					{
 						if (newName == null)
@@ -319,7 +372,6 @@ public class GitRepository
 						return newName != null && newName.indexOf(File.separator) != -1 && !newName.endsWith(".lock"); //$NON-NLS-1$
 					}
 
-					@Override
 					public void fileModified(int wd, String rootPath, String name)
 					{
 						if (name == null)
@@ -344,7 +396,6 @@ public class GitRepository
 						}
 					}
 
-					@Override
 					public void fileDeleted(int wd, String rootPath, final String name)
 					{
 						// if path is longer than one segment, then remote branch was deleted. Means we probably
@@ -367,7 +418,6 @@ public class GitRepository
 						}
 					}
 
-					@Override
 					public void fileCreated(int wd, String rootPath, final String name)
 					{
 						if (isProbablyBranch(name))
@@ -456,7 +506,7 @@ public class GitRepository
 		// Return local branches first!
 		SortedSet<String> localFirst = new TreeSet<String>(new Comparator<String>()
 		{
-			@Override
+
 			public int compare(String o1, String o2)
 			{
 				if (o1.contains("/") && !o2.contains("/")) //$NON-NLS-1$ //$NON-NLS-2$

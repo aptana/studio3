@@ -41,6 +41,8 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 
+import com.aptana.ide.ui.io.FileSystemUtils;
+
 /**
  * @author Michael Xia (mxia@aptana.com)
  */
@@ -49,6 +51,7 @@ public class FileSystemObjectPropertyTester extends PropertyTester {
     private static final String PROPERTY_IS_DIRECTORY = "isDirectory"; //$NON-NLS-1$
     private static final String PROPERTY_IS_LOCAL = "isLocal"; //$NON-NLS-1$
     private static final String PROPERTY_IS_SYMLINK = "isSymlink"; //$NON-NLS-1$
+    private static final String PROPERTY_IS_PRIVATE = "isPrivate"; //$NON-NLS-1$
 
     public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
         if (receiver instanceof IAdaptable) {
@@ -61,6 +64,8 @@ public class FileSystemObjectPropertyTester extends PropertyTester {
                 return fileInfo.isDirectory() == value;
             } else if (PROPERTY_IS_SYMLINK.equals(property)) {
             	return fileInfo.getAttribute(EFS.ATTRIBUTE_SYMLINK) == value;
+            } else if (PROPERTY_IS_PRIVATE.equals(property)) {
+            	return FileSystemUtils.isPrivate(fileInfo) == value;
             } else if (PROPERTY_IS_LOCAL.equals(property)) {
                 try {
                     return (fileStore.toLocalFile(EFS.NONE, null) != null) == value;

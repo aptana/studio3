@@ -63,7 +63,6 @@ public class SynchronizeFilesAction extends BaseSyncAction
 		UIUtils.getDisplay().asyncExec(new Runnable()
 		{
 
-			@Override
 			public void run()
 			{
 				try
@@ -93,7 +92,7 @@ public class SynchronizeFilesAction extends BaseSyncAction
 				catch (CoreException e)
 				{
 					MessageBox error = new MessageBox(UIUtils.getActiveShell(), SWT.ICON_ERROR | SWT.OK);
-					error.setMessage("Unable to open synchronization dialog.");
+					error.setMessage(Messages.SynchronizeFilesAction_ERR_OpeningSyncDialog);
 					error.open();
 				}
 			}

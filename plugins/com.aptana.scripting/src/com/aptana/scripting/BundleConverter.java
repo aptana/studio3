@@ -1,12 +1,45 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.scripting;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Writer;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,13 +47,9 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.xml.sax.InputSource;
-
-import plistreader.AbstractReader;
-import plistreader.PlistFactory;
-import plistreader.PlistProperties;
 
 import com.aptana.core.util.ProcessUtil;
+import com.aptana.plist.PListParserFactory;
 
 /**
  * This is a rather ugly but mostly working converter for textmate bundles. Run with no args it will search the user's
@@ -191,7 +220,7 @@ public class BundleConverter
 	@SuppressWarnings("unchecked")
 	private static String convertInfoPlist(File plistFile, Map<String, String> uuidToName)
 	{
-		PlistProperties properties = parse(plistFile);
+		Map<String, Object> properties = parse(plistFile);
 
 		StringBuilder buffer = new StringBuilder();
 		buffer.append("require 'ruble'\n\n");
@@ -203,7 +232,7 @@ public class BundleConverter
 		buffer.append("  bundle.contact_email_rot_13 = '").append(sanitize(properties, "contactEmailRot13"))
 				.append("'\n");
 		// Description
-		buffer.append("  bundle.description =  <<END\n").append((String) properties.getProperty("description"))
+		buffer.append("  bundle.description =  <<END\n").append((String) properties.get("description"))
 				.append("\nEND\n");
 
 		buffer.append(addIndents(new File(plistFile.getParentFile(), "Preferences")));
@@ -213,20 +242,19 @@ public class BundleConverter
 		buffer.append(addFileTypes(syntaxesDir));
 
 		// Menu
-		PlistProperties mainMenu = (PlistProperties) properties.getProperty("mainMenu");
+		Map<String, Object> mainMenu = (Map<String, Object>) properties.get("mainMenu");
 		if (mainMenu != null)
 		{
-			PlistProperties submenus = (PlistProperties) mainMenu.getProperty("submenus");
+			Map<String, Object> submenus = (Map<String, Object>) mainMenu.get("submenus");
 			buffer.append("\n  bundle.menu '").append(name).append("' do |main_menu|\n");
-			buffer.append(handleMenu("    main_menu", submenus, (List<String>) mainMenu.getProperty("items"),
-					uuidToName));
+			buffer.append(handleMenu("    main_menu", submenus, (List<String>) mainMenu.get("items"), uuidToName));
 			buffer.append("  end\n");
 		}
 		else
 		{
-			List<String> items = (List<String>) properties.getProperty("ordering");
+			List<String> items = (List<String>) properties.get("ordering");
 			buffer.append("\n  bundle.menu '").append(name).append("' do |main_menu|\n");
-			buffer.append(handleMenu("    main_menu", new PlistProperties(), items, uuidToName));
+			buffer.append(handleMenu("    main_menu", new HashMap<String, Object>(), items, uuidToName));
 			buffer.append("  end\n");
 		}
 		// end menu
@@ -243,7 +271,6 @@ public class BundleConverter
 		File[] files = prefsDir.listFiles(new FilenameFilter()
 		{
 
-			@Override
 			public boolean accept(File dir, String name)
 			{
 				return name.endsWith(".plist");
@@ -254,20 +281,21 @@ public class BundleConverter
 
 		for (File prefsFile : files)
 		{
-			PlistProperties properties = parse(prefsFile);
-			if (properties == null || !properties.hasKey("settings"))
+			Map<String, Object> properties = parse(prefsFile);
+			if (properties == null || !properties.containsKey("settings"))
 				continue;
-			PlistProperties settings = (PlistProperties) properties.getProperty("settings");
-			if (!settings.hasKey("increaseIndentPattern"))
+			@SuppressWarnings("unchecked")
+			Map<String, Object> settings = (Map<String, Object>) properties.get("settings");
+			if (!settings.containsKey("increaseIndentPattern"))
 				continue;
 
-			String scope = (String) properties.getProperty("scope");
-			String increase = (String) settings.getProperty("increaseIndentPattern");
+			String scope = (String) properties.get("scope");
+			String increase = (String) settings.get("increaseIndentPattern");
 			increase = sanitizeRegexp(increase);
 			builder.append("  increase_indent = /").append(increase).append("/\n");
-			if (settings.hasKey("decreaseIndentPattern"))
+			if (settings.containsKey("decreaseIndentPattern"))
 			{
-				String decrease = (String) settings.getProperty("decreaseIndentPattern");
+				String decrease = (String) settings.get("decreaseIndentPattern");
 				decrease = sanitizeRegexp(decrease);
 				builder.append("  decrease_indent = /").append(decrease).append("/\n");
 				builder.append("  bundle.indent['").append(scope).append("'] = increase_indent, decrease_indent\n");
@@ -290,7 +318,6 @@ public class BundleConverter
 		File[] files = syntaxesDir.listFiles(new FilenameFilter()
 		{
 
-			@Override
 			public boolean accept(File dir, String name)
 			{
 				return name.endsWith(".tmLanguage") || name.endsWith(".plist");
@@ -301,9 +328,9 @@ public class BundleConverter
 
 		for (File syntaxFile : files)
 		{
-			PlistProperties properties = parse(syntaxFile);
-			String scope = (String) properties.getProperty("scopeName");
-			List<String> fileTypes = (List<String>) properties.getProperty("fileTypes");
+			Map<String, Object> properties = parse(syntaxFile);
+			String scope = (String) properties.get("scopeName");
+			List<String> fileTypes = (List<String>) properties.get("fileTypes");
 			if (fileTypes != null && !fileTypes.isEmpty())
 			{
 				builder.append("  bundle.file_types['").append(scope).append("'] = ");
@@ -332,7 +359,6 @@ public class BundleConverter
 		File[] files = syntaxesDir.listFiles(new FilenameFilter()
 		{
 
-			@Override
 			public boolean accept(File dir, String name)
 			{
 				return name.endsWith(".tmLanguage") || name.endsWith(".plist");
@@ -343,19 +369,19 @@ public class BundleConverter
 
 		for (File syntaxFile : files)
 		{
-			PlistProperties properties = parse(syntaxFile);
-			String scope = (String) properties.getProperty("scopeName");
-			boolean hasStart = properties.hasKey("foldingStartMarker");
+			Map<String, Object> properties = parse(syntaxFile);
+			String scope = (String) properties.get("scopeName");
+			boolean hasStart = properties.containsKey("foldingStartMarker");
 			if (hasStart)
 			{
-				String folding = (String) properties.getProperty("foldingStartMarker");
+				String folding = (String) properties.get("foldingStartMarker");
 				folding = sanitizeRegexp(folding);
 				builder.append("  start_folding = /").append(folding).append("/\n");
 			}
-			boolean hasStop = properties.hasKey("foldingStopMarker");
+			boolean hasStop = properties.containsKey("foldingStopMarker");
 			if (hasStop)
 			{
-				String folding = (String) properties.getProperty("foldingStopMarker");
+				String folding = (String) properties.get("foldingStopMarker");
 				folding = sanitizeRegexp(folding);
 				builder.append("  end_folding = /").append(folding).append("/\n");
 			}
@@ -368,9 +394,13 @@ public class BundleConverter
 	}
 
 	@SuppressWarnings("unchecked")
-	protected static String handleMenu(String menuPrefix, PlistProperties submenus, List<String> items,
+	protected static String handleMenu(String menuPrefix, Map<String, Object> submenus, List<String> items,
 			Map<String, String> uuidToName)
 	{
+		if (items == null)
+		{
+			return "";
+		}
 		// Calculate indent from our current one
 		int spaces = menuPrefix.length() - menuPrefix.trim().length();
 		String indent = "";
@@ -388,13 +418,13 @@ public class BundleConverter
 			}
 			else
 			{
-				PlistProperties props = (PlistProperties) submenus.getProperty(uuid);
+				Map<String, Object> props = (Map<String, Object>) submenus.get(uuid);
 				if (props != null)
 				{
 					// it's a submenu
-					String subMenuName = (String) props.getProperty("name");
+					String subMenuName = (String) props.get("name");
 					buffer.append(menuPrefix).append(".menu '").append(subMenuName).append("' do |submenu|\n");
-					buffer.append(handleMenu(indent + "  submenu", submenus, (List<String>) props.getProperty("items"),
+					buffer.append(handleMenu(indent + "  submenu", submenus, (List<String>) props.get("items"),
 							uuidToName));
 					buffer.append(indent).append("end\n");
 					continue;
@@ -414,42 +444,27 @@ public class BundleConverter
 		return buffer.toString();
 	}
 
-	static PlistProperties parse(File plistFile)
+	static Map<String, Object> parse(File plistFile)
 	{
 		return parse(Path.fromOSString(plistFile.getAbsolutePath()));
 	}
 
-	static PlistProperties parse(IPath plistPath)
+	static Map<String, Object> parse(IPath plistPath)
 	{
 		try
 		{
-			Process p = ProcessUtil.run("/usr/bin/plutil", plistPath.removeLastSegments(1), "-convert", "xml1",
-					plistPath.lastSegment());
-			int exitCode = p.waitFor();
-			if (exitCode != 0)
-			{
-				// Not necessarily an error, it may already be XML
-				// System.err.println("Bad exit code for conversion: " + exitCode);
-			}
-			AbstractReader reader = PlistFactory.createReader();
-			// FIXME Often these files will have special characters that aren't proper in XML (like say Ctrl+C as a
-			// keybinding, 0x03 so we need it to become "&#x03;"), we need to massage the XML now!
-			InputSource source = new InputSource(
-					new InputStreamReader(new FileInputStream(plistPath.toFile()), "UTF-8"));
-			source.setEncoding("UTF-8");
-			reader.setSource(source);
-			return reader.parse();
+			return PListParserFactory.parse(plistPath.toFile());
 		}
-		catch (Exception e)
+		catch (IOException e)
 		{
-			System.err.println("An error occurred processing: " + plistPath.toOSString());
+			Activator.logError(e.getMessage(), e);
 		}
-		return null;
+		return Collections.emptyMap();
 	}
 
-	protected static String sanitize(PlistProperties properties, String key)
+	protected static String sanitize(Map<String, Object> properties, String key)
 	{
-		String content = (String) properties.getProperty(key);
+		String content = (String) properties.get(key);
 		if (content == null)
 			return null;
 		return content.replace("'", "\\'").replace("…", "...").replace("—", "-"); //$NON-NLS-1$ //$NON-NLS-2$

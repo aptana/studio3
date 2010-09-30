@@ -1,5 +1,40 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.contentassist.index;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,7 +43,9 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.JSTypeConstants;
+import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
@@ -20,15 +57,19 @@ import com.aptana.index.core.Index;
 
 public class JSIndexWriter
 {
-	private static final URI METADATA_LOCATION = URI.create(""); //$NON-NLS-1$
 	private static Map<UserAgentElement, String> keysByUserAgent = new HashMap<UserAgentElement, String>();
-	static Map<String, UserAgentElement> userAgentsByKey = new HashMap<String, UserAgentElement>();
 
 	/**
-	 * JSMetadataIndexer
+	 * cacheUserAgent
+	 * 
+	 * @param userAgent
+	 * @param key
 	 */
-	public JSIndexWriter()
+	private void cacheUserAgent(UserAgentElement userAgent)
 	{
+		String key = userAgent.getKey();
+
+		keysByUserAgent.put(userAgent, key);
 	}
 
 	/**
@@ -38,7 +79,7 @@ public class JSIndexWriter
 	 */
 	protected URI getDocumentPath()
 	{
-		return URI.create(JSIndexConstants.METADATA);
+		return URI.create(JSIndexConstants.METADATA_FILE_LOCATION);
 	}
 
 	/**
@@ -109,9 +150,18 @@ public class JSIndexWriter
 		String examplesKey = this.writeExamples(index, function.getExamples(), location);
 		String sinceListKey = this.writeSinceList(index, function.getSinceList(), location);
 
-		String value = StringUtil.join(JSIndexConstants.DELIMITER, function.getName(), function.getOwningType(), descriptionKey, functionTypesKey,
-			parametersKey, returnTypesKey, examplesKey, sinceListKey, StringUtil.join(JSIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, function
-				.getUserAgents())));
+		String value = StringUtil.join( //
+			JSIndexConstants.DELIMITER, //
+			function.getOwningType(), //
+			function.getName(), //
+			descriptionKey, //
+			functionTypesKey, //
+			parametersKey, //
+			returnTypesKey, //
+			examplesKey, //
+			sinceListKey, //
+			StringUtil.join(JSIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, function.getUserAgents())) //
+		);
 
 		index.addEntry(JSIndexConstants.FUNCTION, value, location);
 	}
@@ -160,8 +210,16 @@ public class JSIndexWriter
 		String examplesKey = this.writeExamples(index, property.getExamples(), location);
 		String sinceListKey = this.writeSinceList(index, property.getSinceList(), location);
 
-		String value = StringUtil.join(JSIndexConstants.DELIMITER, property.getName(), property.getOwningType(), descriptionKey, propertyTypesKey, examplesKey,
-			sinceListKey, StringUtil.join(JSIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, property.getUserAgents())));
+		String value = StringUtil.join( //
+			JSIndexConstants.DELIMITER, //
+			property.getOwningType(), //
+			property.getName(), //
+			descriptionKey, //
+			propertyTypesKey, //
+			examplesKey, //
+			sinceListKey, //
+			StringUtil.join(JSIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, property.getUserAgents())) //
+		);
 
 		index.addEntry(JSIndexConstants.PROPERTY, value, location);
 	}
@@ -247,7 +305,7 @@ public class JSIndexWriter
 	 */
 	public void writeType(Index index, TypeElement type)
 	{
-		this.writeType(index, type, METADATA_LOCATION);
+		this.writeType(index, type, this.getDocumentPath());
 	}
 
 	/**
@@ -295,25 +353,46 @@ public class JSIndexWriter
 	/**
 	 * writeUserAgent
 	 * 
-	 * @param index
 	 * @param userAgent
 	 * @return
 	 */
-	protected String writeUserAgent(Index index, UserAgentElement userAgent)
+	public String writeUserAgent(UserAgentElement userAgent)
 	{
 		String key = keysByUserAgent.get(userAgent);
 
 		if (key == null)
 		{
-			key = Integer.toString(keysByUserAgent.size());
+			// get key
+			key = userAgent.getKey();
 
-			String[] columns = new String[] { key, userAgent.getDescription(), userAgent.getOS(), userAgent.getPlatform(), userAgent.getVersion() };
-			String value = StringUtil.join(JSIndexConstants.DELIMITER, columns);
+			// see if it has been written already
+			JSIndexReader reader = new JSIndexReader();
 
-			index.addEntry(JSIndexConstants.USER_AGENT, value, this.getDocumentPath());
+			UserAgentElement diskUserAgent = null;
 
-			keysByUserAgent.put(userAgent, key);
-			userAgentsByKey.put(key, userAgent);
+			try
+			{
+				diskUserAgent = reader.getUserAgent(key);
+			}
+			catch (IOException e)
+			{
+				Activator.logError(e.getMessage(), e);
+			}
+
+			// write to index, if we didn't have it there already
+			if (diskUserAgent == null)
+			{
+				Index index = JSIndexQueryHelper.getIndex();
+
+				// store user agent in index so we can recover it during the next session
+				String[] columns = new String[] { key, userAgent.getDescription(), userAgent.getOS(), userAgent.getPlatform(), userAgent.getVersion() };
+				String value = StringUtil.join(JSIndexConstants.DELIMITER, columns);
+
+				index.addEntry(JSIndexConstants.USER_AGENT, value, this.getDocumentPath());
+			}
+
+			// cache to prevent unnecessary reads and writes
+			this.cacheUserAgent(userAgent);
 		}
 
 		return key;
@@ -331,7 +410,7 @@ public class JSIndexWriter
 
 		for (UserAgentElement userAgent : userAgents)
 		{
-			keys.add(this.writeUserAgent(index, userAgent));
+			keys.add(this.writeUserAgent(userAgent));
 		}
 
 		return keys;

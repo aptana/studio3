@@ -419,7 +419,6 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
                         .getDecoratingWorkbenchLabelProvider());
                 Arrays.sort(projects, new Comparator<IProject>() {
 
-					@Override
 					public int compare(IProject o1, IProject o2) {
 						return o1.getName().compareTo(o2.getName());
 					}
@@ -487,7 +486,6 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
                         .getDecoratingWorkbenchLabelProvider());
                 Arrays.sort(sites, new Comparator<IConnectionPoint>() {
 
-					@Override
 					public int compare(IConnectionPoint o1, IConnectionPoint o2) {
 						return o1.getName().compareTo(o2.getName());
 					}

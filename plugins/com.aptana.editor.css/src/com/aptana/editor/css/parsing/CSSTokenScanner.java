@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.css.parsing;
 
 import java.util.ArrayList;
@@ -44,7 +78,7 @@ public class CSSTokenScanner extends CSSCodeScanner
 		
 		// FIXME These are all really just numbers followed by measurements. Can't we modify scanner/parser to grab number and then a measurement
 		// em
-		rules.add(createMeasurementRule("(\\-|\\+)?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)em", CSSTokenType.EMS));
+		rules.add(createMeasurementRule("(\\-|\\+)?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)em", CSSTokenType.EMS)); //$NON-NLS-1$
 		// length
 		rules.add(createMeasurementRule("(\\-|\\+)?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)(px|cm|mm|in|pt|pc)", CSSTokenType.LENGTH)); //$NON-NLS-1$
 		// percentage
@@ -57,6 +91,7 @@ public class CSSTokenScanner extends CSSCodeScanner
 		rules.add(createMeasurementRule("(\\-|\\+)?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)([Hh]z|k[Hh]z)", CSSTokenType.FREQUENCY)); //$NON-NLS-1$
 		// time
 		rules.add(createMeasurementRule("(\\-|\\+)?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)(ms|s)", CSSTokenType.TIME)); //$NON-NLS-1$
+
 		return rules;
 	}
 
@@ -64,14 +99,12 @@ public class CSSTokenScanner extends CSSCodeScanner
 	{
 		return new ExtendedWordRule(new IWordDetector()
 		{
-			
-			@Override
+
 			public boolean isWordStart(char c)
 			{
 				return c == '-' || c == '+' || c == '.' || Character.isDigit(c);
 			}
-			
-			@Override
+
 			public boolean isWordPart(char c)
 			{
 				return c == '.' || c == '%' ||Character.isLetterOrDigit(c);

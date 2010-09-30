@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.findbar.impl;
 
 import java.util.List;
@@ -38,6 +72,8 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.commands.ICommandService;
@@ -53,6 +89,18 @@ import com.aptana.editor.findbar.api.IFindBarDecorator;
 
 public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 {
+
+	private static final String CLOSE = "icons/close.png"; //$NON-NLS-1$
+	private static final String PREVIOUS = "icons/previous.png"; //$NON-NLS-1$
+	private static final String NEXT = "icons/next.png"; //$NON-NLS-1$
+	private static final String SIGMA = "icons/sigma.png"; //$NON-NLS-1$
+	private static final String FINDREPLACE = "icons/findreplace.png"; //$NON-NLS-1$
+	private static final String CASE_SENSITIVE = "icons/casesensitive.png"; //$NON-NLS-1$
+	private static final String CASE_SENSITIVE_DISABLED = "icons/casesensitive_disabled.png"; //$NON-NLS-1$
+	private static final String REGEX = "icons/regex.png"; //$NON-NLS-1$
+	private static final String REGEX_DISABLED = "icons/regex_disabled.png"; //$NON-NLS-1$
+	private static final String WHOLE_WORD = "icons/whole_word.png"; //$NON-NLS-1$
+	private static final String WHOLE_WORD_DISABLED = "icons/whole_word_disabled.png"; //$NON-NLS-1$
 
 	private final ITextEditor textEditor;
 	private ISourceViewer sourceViewer;
@@ -95,7 +143,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		gridLayout.verticalSpacing = 0;
 		findBar.setLayout(gridLayout);
 
-		close = createButton(FindBarPlugin.CLOSE, true);
+		close = createButton(CLOSE, true);
 		close.setToolTipText(Messages.FindBarDecorator_TOOLTIP_HideFindBar);
 
 		findButton = createButton(null, true);
@@ -106,21 +154,32 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		comboReplace = createCombo(PREFERENCE_NAME_REPLACE);
 		combos = new Combo[] { combo, comboReplace };
 
-		previous = createButton(FindBarPlugin.PREVIOUS, false);
-		next = createButton(FindBarPlugin.NEXT, false);
+		previous = createButton(PREVIOUS, false);
+		next = createButton(NEXT, false);
 
-		caseSensitive = createCheck();
-		caseSensitive.setText(Messages.FindBarDecorator_LABEL_CaseSensitive);
+		ToolBar optionsToolBar = new ToolBar(findBar, SWT.NONE);
+		optionsToolBar.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 
-		wholeWord = createCheck();
-		wholeWord.setText(Messages.FindBarDecorator_LABEL_WholeWord);
+		caseSensitive = new ToolItem(optionsToolBar, SWT.CHECK);
+		caseSensitive.setImage(FindBarPlugin.getImage(CASE_SENSITIVE));
+		caseSensitive.setDisabledImage(FindBarPlugin.getImage(CASE_SENSITIVE_DISABLED));
+		caseSensitive.setToolTipText(Messages.FindBarDecorator_LABEL_CaseSensitive);
+		caseSensitive.addSelectionListener(this);
+
+		wholeWord = new ToolItem(optionsToolBar, SWT.CHECK);
+		wholeWord.setImage(FindBarPlugin.getImage(WHOLE_WORD));
+		wholeWord.setDisabledImage(FindBarPlugin.getImage(WHOLE_WORD_DISABLED));
+		wholeWord.setToolTipText(Messages.FindBarDecorator_LABEL_WholeWord);
+		wholeWord.addSelectionListener(this);
 		wholeWord.setEnabled(false);
 
 		IFindReplaceTarget findReplaceTarget = (IFindReplaceTarget) textEditor.getAdapter(IFindReplaceTarget.class);
 		if (findReplaceTarget instanceof IFindReplaceTargetExtension3)
 		{
-			regularExpression = createCheck();
-			regularExpression.setText(Messages.FindBarDecorator_LABEL_RegularExpression);
+			regularExpression = new ToolItem(optionsToolBar, SWT.CHECK);
+			regularExpression.setImage(FindBarPlugin.getImage(REGEX));
+			regularExpression.setDisabledImage(FindBarPlugin.getImage(REGEX_DISABLED));
+			regularExpression.setToolTipText(Messages.FindBarDecorator_LABEL_RegularExpression);
 			regularExpression.addSelectionListener(new SelectionListener()
 			{
 
@@ -145,7 +204,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		replaceAll.setText(Messages.FindBarDecorator_LABEL_ReplaceAll);
 
 		countTotal = createCheck();
-		countTotal.setImage(FindBarPlugin.getDefault().getImage(FindBarPlugin.SIGMA));
+		countTotal.setImage(FindBarPlugin.getImage(SIGMA));
 		countTotal.setToolTipText(Messages.FindBarDecorator_TOOLTIP_ShowMatchCount);
 
 		count = new Label(findBar, SWT.NONE);
@@ -156,11 +215,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		Label streach = new Label(findBar, SWT.NONE);
 		streach.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
-		showFindReplaceDialog = createButton(FindBarPlugin.FINDREPLACE, true);
+		showFindReplaceDialog = createButton(FINDREPLACE, true);
 		showFindReplaceDialog.setToolTipText(Messages.FindBarDecorator_TOOLTIP_ShowFindReplaceDialog);
 
-		disableWhenHidden = new Control[] { combo, comboReplace, caseSensitive, wholeWord, regularExpression, close,
-				next, previous, countTotal, findButton, replaceFind, replace, replaceAll, count, showFindReplaceDialog, };
+		disableWhenHidden = new Control[] { combo, comboReplace, optionsToolBar, close, next, previous, countTotal,
+				findButton, replaceFind, replace, replaceAll, count, showFindReplaceDialog, };
 	}
 
 	/**
@@ -185,7 +244,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		button.setEnabled(enabled);
 		if (image != null)
 		{
-			button.setImage(FindBarPlugin.getDefault().getImage(image));
+			button.setImage(FindBarPlugin.getImage(image));
 		}
 		button.addSelectionListener(this);
 		button.setLayoutData(layoutData);
@@ -294,12 +353,10 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		handlerService.activateHandler("org.eclipse.ui.edit.findbar.focusReplace", new FocusReplaceFindBarHandler()); //$NON-NLS-1$
 	}
 
-	@Override
 	public void widgetDefaultSelected(SelectionEvent e)
 	{
 	}
 
-	@Override
 	public void widgetSelected(SelectionEvent e)
 	{
 		Object source = e.getSource();
@@ -430,9 +487,9 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	private Combo combo;
 	private Combo comboReplace;
 	private Combo[] combos;
-	private Button caseSensitive;
-	private Button wholeWord;
-	private Button regularExpression;
+	private ToolItem caseSensitive;
+	private ToolItem wholeWord;
+	private ToolItem regularExpression;
 	private int incrementalOffset = -1;
 	private Button close;
 	private Button next;
@@ -933,13 +990,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		{
 			if (removeAddListener)
 			{
-				combo.getDisplay().asyncExec(new Runnable()
-				{
-					public void run()
-					{
-						combo.addModifyListener(modifyListener);
-					}
-				});
+				combo.addModifyListener(modifyListener);
 			}
 		}
 	}

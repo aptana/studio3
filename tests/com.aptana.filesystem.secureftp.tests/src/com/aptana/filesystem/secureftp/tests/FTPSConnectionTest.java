@@ -35,12 +35,15 @@
 
 package com.aptana.filesystem.secureftp.tests;
 
+import org.eclipse.core.runtime.Path;
+
 import com.aptana.core.io.tests.CommonConnectionTest;
 import com.aptana.filesystem.secureftp.FTPSConnectionPoint;
 
 /**
  * @author Max Stepanov
  */
+@SuppressWarnings("nls")
 public class FTPSConnectionTest extends CommonConnectionTest
 {
 
@@ -52,6 +55,7 @@ public class FTPSConnectionTest extends CommonConnectionTest
 		ftpcp.setLogin(getConfig().getProperty("ftps.username", "ftpuser")); //$NON-NLS-1$ //$NON-NLS-2$
 		ftpcp.setPassword(getConfig().getProperty("ftps.password",	//$NON-NLS-1$
 				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'})).toCharArray());
+		ftpcp.setPath(new Path(getConfig().getProperty("ftps.path", "/home/ftpuser"))); 
 		ftpcp.setValidateCertificate(false);
 		cp = ftpcp;
 		super.setUp();

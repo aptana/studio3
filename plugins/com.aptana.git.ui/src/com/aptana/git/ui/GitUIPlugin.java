@@ -11,9 +11,9 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -76,7 +76,6 @@ public class GitUIPlugin extends AbstractUIPlugin
 		{
 
 			@SuppressWarnings("restriction")
-			@Override
 			public void preferenceChange(PreferenceChangeEvent event)
 			{
 				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
@@ -196,7 +195,6 @@ public class GitUIPlugin extends AbstractUIPlugin
 		{
 			dlg.run(true, false, new IRunnableWithProgress()
 			{
-				@Override
 				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
 				{
 					try
@@ -256,8 +254,8 @@ public class GitUIPlugin extends AbstractUIPlugin
 				}
 				else
 				{
-					MessageDialog.openWarning(shell, Messages.GitUIPlugin_9, NLS.bind(Messages.GitUIPlugin_10,
-							GitExecutable.MIN_GIT_VERSION));
+					MessageDialog.openWarning(shell, Messages.GitUIPlugin_9,
+							NLS.bind(Messages.GitUIPlugin_10, GitExecutable.MIN_GIT_VERSION));
 				}
 			}
 			else
@@ -284,6 +282,8 @@ public class GitUIPlugin extends AbstractUIPlugin
 
 	public static void trace(String string)
 	{
+		if (!getDefault().isDebugging())
+			return;
 		getDefault().getLog().log(new Status(IStatus.OK, getPluginId(), string));
 	}
 

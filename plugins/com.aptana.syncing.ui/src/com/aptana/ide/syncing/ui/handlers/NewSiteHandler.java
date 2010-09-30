@@ -44,7 +44,6 @@ import com.aptana.ide.syncing.ui.actions.NewSiteAction;
 public class NewSiteHandler extends BaseSyncHandler
 {
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		NewSiteAction action = new NewSiteAction();
@@ -53,5 +52,11 @@ public class NewSiteHandler extends BaseSyncHandler
 		action.run(null);
 
 		return null;
+	}
+
+	@Override
+	public boolean isEnabled()
+	{
+		return true;
 	}
 }

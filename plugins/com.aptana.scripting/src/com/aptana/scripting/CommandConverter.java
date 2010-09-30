@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.scripting;
 
 import java.io.File;
@@ -5,8 +39,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import plistreader.PlistProperties;
 
 import com.aptana.scripting.model.InputType;
 import com.aptana.scripting.model.OutputType;
@@ -52,7 +84,7 @@ public class CommandConverter
 
 	private static String convert(File commandFile)
 	{
-		PlistProperties properties = BundleConverter.parse(commandFile);
+		Map<String, Object> properties = BundleConverter.parse(commandFile);
 		if (properties == null)
 			return null;
 		StringBuilder buffer = new StringBuilder();
@@ -72,7 +104,7 @@ public class CommandConverter
 		String trigger = BundleConverter.sanitize(properties, "tabTrigger");
 		if (trigger != null)
 		{
-			buffer.append("  cmd.trigger = '").append(scope).append("'\n");
+			buffer.append("  cmd.trigger = '").append(trigger).append("'\n");
 		}
 		String outputType = convertOutputTypes(camelcaseToUnderscores(BundleConverter.sanitize(properties, "output")));
 		buffer.append("  cmd.output = :").append(outputType).append("\n");
@@ -84,7 +116,7 @@ public class CommandConverter
 		if (fallbackInput != null)
 			buffer.append(", :").append(fallbackInput);
 		buffer.append("\n");
-		buffer.append("  cmd.invoke =<<-EOF\n").append(properties.getProperty("command")).append("\nEOF\n");
+		buffer.append("  cmd.invoke =<<-EOF\n").append(properties.get("command")).append("\nEOF\n");
 		buffer.append("end\n");
 		return buffer.toString();
 	}
@@ -194,11 +226,11 @@ public class CommandConverter
 			return uuidNameMap;
 		for (File commandFile : commandFiles)
 		{
-			PlistProperties properties = BundleConverter.parse(commandFile);
+			Map<String, Object> properties = BundleConverter.parse(commandFile);
 			if (properties == null)
 				continue;
 			String name = BundleConverter.sanitize(properties, "name");
-			String uuid = (String) properties.getProperty("uuid");
+			String uuid = (String) properties.get("uuid");
 			uuidNameMap.put(uuid, name);
 		}
 		return uuidNameMap;

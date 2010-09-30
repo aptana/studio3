@@ -42,6 +42,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
@@ -54,6 +55,7 @@ import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
 import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants;
+import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ui.DialogUtils;
 
 /**
@@ -82,12 +84,12 @@ public class DownloadAction extends BaseSyncAction
 					IConnectionPoint source = site.getSource();
 					IConnectionPoint target = site.getDestination();
 					// retrieves the root filestore of each end
-					IFileStore sourceRoot = source.getRoot();
+					final IFileStore sourceRoot = (fSourceRoot == null) ? source.getRoot() : fSourceRoot;
 					if (!target.isConnected())
 					{
 						target.connect(monitor);
 					}
-					IFileStore targetRoot = target.getRoot();
+					IFileStore targetRoot = (fDestinationRoot == null) ? target.getRoot() : fDestinationRoot;
 					syncer.setClientFileManager(source);
 					syncer.setServerFileManager(target);
 					syncer.setClientFileRoot(sourceRoot);
@@ -99,7 +101,7 @@ public class DownloadAction extends BaseSyncAction
 					{
 						fileStores[i] = SyncUtils.getFileStore(files[i]);
 					}
-					IFileStore[] targetFiles = SyncUtils.getDownloadFiles(source, target, fileStores, true, monitor);
+					IFileStore[] targetFiles = SyncUtils.getDownloadFiles(source, target, fileStores, fSelectedFromSource, true, monitor);
 
 					VirtualFileSyncPair[] items = syncer.createSyncItems(new IFileStore[0], targetFiles, monitor);
 
@@ -107,7 +109,6 @@ public class DownloadAction extends BaseSyncAction
 							items.length, monitor, new SyncActionEventHandler.Client()
 							{
 
-								@Override
 								public void syncCompleted()
 								{
 									for (IAdaptable file : files)
@@ -123,6 +124,10 @@ public class DownloadAction extends BaseSyncAction
 											}
 										}
 									}
+									if (!fSelectedFromSource)
+									{
+										IOUIPlugin.refreshNavigatorView(sourceRoot);
+									}
 
 									postAction(syncer);
 									syncer.setEventHandler(null);
@@ -130,6 +135,10 @@ public class DownloadAction extends BaseSyncAction
 								}
 							}));
 					syncer.download(items, monitor);
+				}
+				catch (OperationCanceledException e)
+				{
+					return Status.CANCEL_STATUS;
 				}
 				catch (Exception e)
 				{
@@ -162,7 +171,6 @@ public class DownloadAction extends BaseSyncAction
 		getShell().getDisplay().asyncExec(new Runnable()
 		{
 
-			@Override
 			public void run()
 			{
 				DialogUtils.openIgnoreMessageDialogInformation(getShell(), MESSAGE_TITLE, MessageFormat.format(

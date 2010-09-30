@@ -10,26 +10,21 @@ import org.eclipse.jface.text.rules.Token;
 
 public class JSCodeScannerTest extends TestCase
 {
-
 	private JSCodeScanner scanner;
 
 	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		scanner = new JSCodeScanner()
-		{
-			protected IToken createToken(String string)
-			{
-				return getToken(string);
-			};
-		};
+		
+		scanner = new JSCodeScanner();
 	}
 
 	@Override
 	protected void tearDown() throws Exception
 	{
 		scanner = null;
+		
 		super.tearDown();
 	}
 
@@ -79,7 +74,7 @@ public class JSCodeScannerTest extends TestCase
 
 	public void testNumbers()
 	{
-		String src = "0xff 0X123 1 9.234 1E8";
+		String src = "0xff 0X123 1 9.234 1E8 .1";
 		IDocument document = new Document(src);
 		scanner.setRange(document, 0, src.length());
 
@@ -92,6 +87,8 @@ public class JSCodeScannerTest extends TestCase
 		assertToken(getToken("constant.numeric.js"), 13, 5);
 		assertToken(Token.WHITESPACE, 18, 1);
 		assertToken(getToken("constant.numeric.js"), 19, 3);
+		assertToken(Token.WHITESPACE, 22, 1);
+		assertToken(getToken("constant.numeric.js"), 23, 2);
 	}
 
 	public void testConstantWords()

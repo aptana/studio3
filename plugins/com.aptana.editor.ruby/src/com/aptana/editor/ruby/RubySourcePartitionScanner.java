@@ -207,7 +207,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 		}
 		catch (IOException e)
 		{
-			Activator.log(e);
+			RubyEditorPlugin.log(e);
 		}
 		if (!isEOF)
 		{
@@ -746,7 +746,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 
 	private boolean insideHeredoc()
 	{
-		return fOpeningString.endsWith("\n"); //$NON-NLS-1$
+		return fOpeningString != null && fOpeningString.endsWith("\n"); //$NON-NLS-1$
 	}
 
 	private boolean reachedEndOfHeredoc()

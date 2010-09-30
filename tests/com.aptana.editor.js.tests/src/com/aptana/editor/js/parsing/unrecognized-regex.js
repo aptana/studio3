@@ -1,0 +1,1 @@
+var xyz = "/^" + str.replace(/[\\/$\n\r\t]/g, subst) + "$/";

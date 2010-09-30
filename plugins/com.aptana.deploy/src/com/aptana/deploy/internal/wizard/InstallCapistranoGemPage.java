@@ -40,7 +40,6 @@ public class InstallCapistranoGemPage extends WizardPage
 		super(NAME, Messages.InstallCapistranoGemPage_Title, null);
 	}
 
-	@Override
 	public void createControl(Composite parent)
 	{
 		Composite composite = new Composite(parent, SWT.NULL);
@@ -109,7 +108,6 @@ public class InstallCapistranoGemPage extends WizardPage
 								PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 								{
 
-									@Override
 									public void run()
 									{
 										getContainer().updateButtons(); // ok update the wizard

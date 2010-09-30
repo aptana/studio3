@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.theme;
 
 import java.io.ByteArrayInputStream;
@@ -6,13 +40,13 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.InvalidPropertiesFormatException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -44,7 +78,8 @@ public class Theme
 	private static final String BOLD = "bold"; //$NON-NLS-1$
 	private static final String ITALIC = "italic"; //$NON-NLS-1$
 
-	static final String THEME_NAME_PROP_KEY = "name"; //$NON-NLS-1$
+	public static final String THEME_NAME_PROP_KEY = "name"; //$NON-NLS-1$
+	public static final String THEME_EXTENDS_PROP_KEY = "extends_theme"; //$NON-NLS-1$
 	static final String FOREGROUND_PROP_KEY = "foreground"; //$NON-NLS-1$
 	private static final String BACKGROUND_PROP_KEY = "background"; //$NON-NLS-1$
 	private static final String SELECTION_PROP_KEY = "selection"; //$NON-NLS-1$
@@ -54,9 +89,9 @@ public class Theme
 	private Map<ScopeSelector, DelayedTextAttribute> coloringRules;
 	private ColorManager colorManager;
 	private RGB defaultFG;
-	private RGB lineHighlight;
+	private RGBa lineHighlight;
 	private RGB defaultBG;
-	private RGB selection;
+	private RGBa selection;
 	private RGB caret;
 	private String name;
 
@@ -91,8 +126,8 @@ public class Theme
 		// The general editor colors
 		defaultFG = parseHexRGB((String) props.remove(FOREGROUND_PROP_KEY));
 		defaultBG = parseHexRGB((String) props.remove(BACKGROUND_PROP_KEY));
-		lineHighlight = parseHexRGB((String) props.remove(LINE_HIGHLIGHT_PROP_KEY), true);
-		selection = parseHexRGB((String) props.remove(SELECTION_PROP_KEY), true);
+		lineHighlight = parseHexRGBa((String) props.remove(LINE_HIGHLIGHT_PROP_KEY));
+		selection = parseHexRGBa((String) props.remove(SELECTION_PROP_KEY));
 		caret = parseHexRGB((String) props.remove(CARET_PROP_KEY), true);
 
 		for (Entry<Object, Object> entry : props.entrySet())
@@ -102,12 +137,21 @@ public class Theme
 			RGBa foreground = null;
 			RGBa background = null;
 			List<String> values = tokenize((String) entry.getValue());
+			// Handle empty fg with a bg color! If first token is just an empty value followed by a comma
+			int num = 0;
+			boolean skipFG = false;
 			for (String token : values)
 			{
-				if (token.startsWith("#")) //$NON-NLS-1$
+				token = token.trim();
+				if (token.length() == 0 && num == 0)
+				{
+					// empty fg!
+					skipFG = true;
+				}
+				else if (token.startsWith("#")) //$NON-NLS-1$
 				{
 					// it's a color!
-					if (foreground == null)
+					if (foreground == null && !skipFG)
 					{
 						foreground = parseHexRGBa(token);
 					}
@@ -131,10 +175,7 @@ public class Theme
 						style |= SWT.BOLD;
 					}
 				}
-			}
-			if (foreground == null)
-			{
-				foreground = new RGBa(defaultFG);
+				num++;
 			}
 			DelayedTextAttribute attribute = new DelayedTextAttribute(foreground, background, style);
 			coloringRules.put(new ScopeSelector(scopeSelector), attribute);
@@ -149,12 +190,7 @@ public class Theme
 			tokens.add(value);
 			return tokens;
 		}
-		StringTokenizer tokenizer = new StringTokenizer(value, ", "); //$NON-NLS-1$
-		while (tokenizer.hasMoreTokens())
-		{
-			tokens.add(tokenizer.nextToken());
-		}
-		return tokens;
+		return Arrays.asList(value.split(DELIMETER));
 	}
 
 	private RGB parseHexRGB(String hex)
@@ -224,7 +260,7 @@ public class Theme
 			return cache.get(scope);
 		}
 		lastSelectorMatch = null;
-		TextAttribute ta = toTextAttribute(getDelayedTextAttribute(scope));
+		TextAttribute ta = toTextAttribute(getDelayedTextAttribute(scope), true);
 		cache.put(scope, ta);
 		return ta;
 	}
@@ -259,20 +295,37 @@ public class Theme
 		// Some tokens are special. They have fallbacks even if not in the theme! Looks like bundles can contribute
 		// them?
 		if (scope.startsWith("markup.changed")) //$NON-NLS-1$
+		{
 			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(248, 205, 14), SWT.NORMAL);
-
+		}
 		if (scope.startsWith("markup.deleted")) //$NON-NLS-1$
+		{
 			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(255, 86, 77), SWT.NORMAL);
-
+		}
 		if (scope.startsWith("markup.inserted")) //$NON-NLS-1$
+		{
 			return new DelayedTextAttribute(new RGBa(0, 0, 0), new RGBa(128, 250, 120), SWT.NORMAL);
-
+		}
+		if (scope.startsWith("markup.underline")) //$NON-NLS-1$
+		{
+			return new DelayedTextAttribute(null, null, TextAttribute.UNDERLINE);
+		}
+		if (scope.startsWith("markup.bold")) //$NON-NLS-1$
+		{
+			return new DelayedTextAttribute(null, null, SWT.BOLD);
+		}
+		if (scope.startsWith("markup.italic")) //$NON-NLS-1$
+		{
+			return new DelayedTextAttribute(null, null, SWT.ITALIC);
+		}
 		if (scope.startsWith("meta.diff.index") || scope.startsWith("meta.diff.range") || scope.startsWith("meta.separator.diff")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		{
 			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(65, 126, 218), SWT.ITALIC);
-
+		}
 		if (scope.startsWith("meta.diff.header")) //$NON-NLS-1$
+		{
 			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(103, 154, 233), SWT.NORMAL);
-
+		}
 		return new DelayedTextAttribute(new RGBa(defaultFG));
 	}
 
@@ -301,12 +354,17 @@ public class Theme
 	private DelayedTextAttribute merge(DelayedTextAttribute childAttr, DelayedTextAttribute parentAttr)
 	{
 		return new DelayedTextAttribute(merge(childAttr.getForeground(), parentAttr.getForeground(), defaultFG), merge(
-				childAttr.getBackground(), parentAttr.getBackground(), defaultBG), childAttr.getStyle());
+				childAttr.getBackground(), parentAttr.getBackground(), defaultBG), childAttr.getStyle()
+				| parentAttr.getStyle());
 	}
 
 	private RGBa merge(RGBa top, RGBa bottom, RGB defaultParent)
 	{
-		if (top == null) // for some reaosn there is no top.
+		if (top == null && bottom == null)
+		{
+			return new RGBa(defaultParent);
+		}
+		if (top == null) // for some reason there is no top.
 		{
 			return bottom;
 		}
@@ -321,21 +379,19 @@ public class Theme
 		return new RGBa(alphaBlend(bottom.toRGB(), top.toRGB(), top.getAlpha()));
 	}
 
-	private TextAttribute toTextAttribute(DelayedTextAttribute attr)
+	private TextAttribute toTextAttribute(DelayedTextAttribute attr, boolean forceColor)
 	{
-		RGBa fg = attr.getForeground(); // TODO Do we ever need to handle FG alpha?!
-		Color bgColor = null;
-		RGBa bg = attr.getBackground();
-		if (bg != null)
+		Color fg = null;
+		if (attr.getForeground() != null || forceColor)
 		{
-			RGB bgRGB = bg.toRGB();
-			if (!bg.isFullyOpaque())
-			{
-				bgRGB = alphaBlend(defaultBG, bgRGB, bg.getAlpha());
-			}
-			bgColor = colorManager.getColor(bgRGB);
+			fg = colorManager.getColor(merge(attr.getForeground(), null, defaultFG).toRGB());
 		}
-		return new TextAttribute(colorManager.getColor(fg.toRGB()), bgColor, attr.getStyle());
+		Color bg = null;
+		if (attr.getBackground() != null || forceColor)
+		{
+			bg = colorManager.getColor(merge(attr.getBackground(), null, defaultBG).toRGB());
+		}
+		return new TextAttribute(fg, bg, attr.getStyle());
 	}
 
 	public RGB getBackground()
@@ -343,7 +399,7 @@ public class Theme
 		return defaultBG;
 	}
 
-	public RGB getSelection()
+	public RGBa getSelection()
 	{
 		return selection;
 	}
@@ -353,7 +409,7 @@ public class Theme
 		return defaultFG;
 	}
 
-	public RGB getLineHighlight()
+	public RGBa getLineHighlight()
 	{
 		return lineHighlight;
 	}
@@ -373,7 +429,7 @@ public class Theme
 		Map<String, TextAttribute> tokens = new HashMap<String, TextAttribute>();
 		for (Map.Entry<ScopeSelector, DelayedTextAttribute> entry : coloringRules.entrySet())
 		{
-			tokens.put(entry.getKey().toString(), toTextAttribute(entry.getValue()));
+			tokens.put(entry.getKey().toString(), toTextAttribute(entry.getValue(), false));
 		}
 		return tokens;
 	}
@@ -387,8 +443,17 @@ public class Theme
 	 */
 	public void update(String scopeSelector, TextAttribute at)
 	{
-		coloringRules.put(new ScopeSelector(scopeSelector), new DelayedTextAttribute(new RGBa(at.getForeground()
-				.getRGB()), new RGBa(at.getBackground().getRGB()), at.getStyle()));
+		RGBa fg = null;
+		if (at.getForeground() != null)
+		{
+			fg = new RGBa(at.getForeground().getRGB());
+		}
+		RGBa bg = null;
+		if (at.getBackground() != null)
+		{
+			bg = new RGBa(at.getBackground().getRGB());
+		}
+		coloringRules.put(new ScopeSelector(scopeSelector), new DelayedTextAttribute(fg, bg, at.getStyle()));
 		wipeCache();
 		save();
 	}
@@ -431,7 +496,10 @@ public class Theme
 			{
 				value.append(BOLD).append(DELIMETER);
 			}
-			value.deleteCharAt(value.length() - 1);
+			if (value.length() > 0)
+			{
+				value.deleteCharAt(value.length() - 1);
+			}
 			if (value.length() == 0)
 				continue;
 			props.put(entry.getKey().toString(), value.toString());
@@ -573,7 +641,7 @@ public class Theme
 	 */
 	public void addNewDefaultToken(String scopeSelector)
 	{
-		DelayedTextAttribute attr = new DelayedTextAttribute(new RGBa(defaultFG));
+		DelayedTextAttribute attr = new DelayedTextAttribute(null);
 		coloringRules.put(new ScopeSelector(scopeSelector), attr);
 		wipeCache();
 		save();
@@ -617,21 +685,21 @@ public class Theme
 
 	public void updateLineHighlight(RGB newColor)
 	{
-		if (newColor == null || (lineHighlight != null && lineHighlight.equals(newColor)))
+		if (newColor == null || (lineHighlight != null && lineHighlight.toRGB().equals(newColor)))
 		{
 			return;
 		}
-		lineHighlight = newColor;
+		lineHighlight = new RGBa(newColor);
 		save();
 	}
 
 	public void updateSelection(RGB newColor)
 	{
-		if (newColor == null || (selection != null && selection.equals(newColor)))
+		if (newColor == null || (selection != null && selection.toRGB().equals(newColor)))
 		{
 			return;
 		}
-		selection = newColor;
+		selection = new RGBa(newColor);
 		save();
 	}
 
@@ -673,7 +741,19 @@ public class Theme
 	 */
 	public boolean hasEntry(String scopeSelector)
 	{
-		return coloringRules.containsKey(scopeSelector);
+		if (cache.containsKey(scopeSelector))
+		{
+			return true;
+		}
+		ScopeSelector selector = new ScopeSelector(scopeSelector);
+		for (ScopeSelector s : coloringRules.keySet())
+		{
+			if (selector.equals(s))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public Color getForeground(String scope)
@@ -732,7 +812,8 @@ public class Theme
 	{
 		if (searchResultBG == null)
 		{
-			searchResultBG = isDark(getSelection()) ? lighten(getSelection()) : darken(getSelection());
+			searchResultBG = isDark(getSelectionAgainstBG()) ? lighten(getSelectionAgainstBG())
+					: darken(getSelectionAgainstBG());
 		}
 		return searchResultBG;
 	}
@@ -764,6 +845,26 @@ public class Theme
 		// Convert to grayscale
 		double grey = 0.3 * color.red + 0.59 * color.green + 0.11 * color.blue;
 		return grey <= 128;
+	}
+
+	/**
+	 * Returns the selection color alpha blended with the theme bg to give a good estimate of correct RGB value
+	 * 
+	 * @return
+	 */
+	public RGB getSelectionAgainstBG()
+	{
+		return alphaBlend(defaultBG, selection.toRGB(), selection.getAlpha());
+	}
+
+	/**
+	 * Returns the line highlight color alpha blended with the theme bg to give a good estimate of correct RGB value
+	 * 
+	 * @return
+	 */
+	public RGB getLineHighlightAgainstBG()
+	{
+		return alphaBlend(defaultBG, lineHighlight.toRGB(), lineHighlight.getAlpha());
 	}
 
 }

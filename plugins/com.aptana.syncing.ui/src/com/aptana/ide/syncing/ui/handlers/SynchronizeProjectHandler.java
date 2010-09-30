@@ -44,12 +44,11 @@ import com.aptana.ide.syncing.ui.actions.SynchronizeProjectAction;
 public class SynchronizeProjectHandler extends BaseSyncHandler
 {
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		SynchronizeProjectAction action = new SynchronizeProjectAction();
 		action.setActivePart(null, HandlerUtil.getActivePart(event));
-		action.setSelection(new StructuredSelection(getSelectedResources()));
+		action.setSelection(new StructuredSelection(getSelectedResources()), isSelectionFromSource());
 		action.run(null);
 
 		return null;

@@ -20,6 +20,10 @@ module Ruble
       @jobj.add_command command.java_object
     end
 
+    def add_env(env)
+      @jobj.add_env env.java_object
+    end
+
     def add_menu(menu)
       @jobj.add_menu menu.java_object
     end
@@ -116,6 +120,10 @@ module Ruble
 
     def license_url=(license_url)
       @jobj.license_url = license_url.join("\n")
+    end
+
+    def project_template(type, name, location, description = nil)
+      @jobj.addProjectTemplate(type, name, location, description)
     end
 
     # A proxy class to make syntax pretty...

@@ -96,7 +96,7 @@ public class SiteConnectionSynchronizeAction implements IObjectActionDelegate
 		catch (CoreException e)
 		{
 			MessageBox error = new MessageBox(UIUtils.getActiveShell(), SWT.ICON_ERROR | SWT.OK);
-			error.setMessage("Unable to open synchronization dialog.");
+			error.setMessage(Messages.SiteConnectionSynchronizeAction_UnableToOpenSyncDialog);
 			error.open();
 		}
     }

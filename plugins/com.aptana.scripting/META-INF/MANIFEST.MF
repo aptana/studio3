@@ -12,9 +12,9 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.filewatcher;bundle-version="1.0.0",
  com.aptana.core;bundle-version="3.0.0",
  com.aptana.parsing;bundle-version="1.0.0",
- plistreader;bundle-version="1.0.0",
- org.jruby;bundle-version="1.4.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+ org.jruby;bundle-version="1.4.0",
+ com.aptana.plist;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Export-Package: com.aptana.scope,

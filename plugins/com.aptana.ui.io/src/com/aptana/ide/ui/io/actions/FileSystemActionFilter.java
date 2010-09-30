@@ -67,6 +67,9 @@ public class FileSystemActionFilter implements IActionFilter {
 			if ( "isSymlink".equals(name)) { //$NON-NLS-1$
 				return  FileSystemUtils.isSymlink(target) == toBoolean(value);
 			}			
+			if ( "isPrivate".equals(name)) { //$NON-NLS-1$
+				return FileSystemUtils.isPrivate(target) == toBoolean(value);
+			}
 		}
 		return false;
 	}

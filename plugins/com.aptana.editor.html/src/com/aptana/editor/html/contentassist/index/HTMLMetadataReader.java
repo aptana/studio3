@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2008 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -34,13 +34,17 @@
  */
 package com.aptana.editor.html.contentassist.index;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.xml.sax.Attributes;
 
 import com.aptana.editor.common.contentassist.MetadataReader;
+import com.aptana.editor.html.Activator;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
 import com.aptana.editor.html.contentassist.model.EntityElement;
@@ -67,7 +71,6 @@ public class HTMLMetadataReader extends MetadataReader
 	private List<EntityElement> _entities = new LinkedList<EntityElement>();
 	private EntityElement _currentEntity;
 
-
 	/**
 	 * Create a new instance of CoreLoader
 	 */
@@ -91,6 +94,7 @@ public class HTMLMetadataReader extends MetadataReader
 		// grab and set property values
 		attribute.setName(attributes.getValue("name")); //$NON-NLS-1$
 		attribute.setType(attributes.getValue("type")); //$NON-NLS-1$
+		attribute.setElement(attributes.getValue("element")); //$NON-NLS-1$
 
 		// set current item
 		this._currentAttribute = attribute;
@@ -149,7 +153,7 @@ public class HTMLMetadataReader extends MetadataReader
 		// set current item
 		this._currentElement = element;
 	}
-	
+
 	/**
 	 * start processing an entity element
 	 * 
@@ -162,12 +166,12 @@ public class HTMLMetadataReader extends MetadataReader
 	{
 		// create a new item documentation object
 		EntityElement entity = new EntityElement();
-		
+
 		// grab and set property values
 		entity.setName(attributes.getValue("name")); //$NON-NLS-1$
 		entity.setDecimalValue(attributes.getValue("decimal")); //$NON-NLS-1$
 		entity.setHexValue(attributes.getValue("hex")); //$NON-NLS-1$
-		
+
 		// set current item
 		this._currentEntity = entity;
 	}
@@ -389,7 +393,7 @@ public class HTMLMetadataReader extends MetadataReader
 		this._elements.add(this._currentElement);
 		this._currentElement = null;
 	}
-	
+
 	/**
 	 * Exit an entity element
 	 * 
@@ -514,7 +518,7 @@ public class HTMLMetadataReader extends MetadataReader
 	{
 		return this._entities;
 	}
-	
+
 	/**
 	 * getEvents
 	 * 
@@ -532,6 +536,14 @@ public class HTMLMetadataReader extends MetadataReader
 	@Override
 	protected InputStream getSchemaStream()
 	{
-		return this.getClass().getResourceAsStream(HTML_METADATA_SCHEMA);
+		try
+		{
+			return FileLocator.openStream(Activator.getDefault().getBundle(),
+					Path.fromPortableString(HTML_METADATA_SCHEMA), false);
+		}
+		catch (IOException e)
+		{
+			return this.getClass().getResourceAsStream(HTML_METADATA_SCHEMA);
+		}
 	}
 }

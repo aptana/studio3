@@ -63,8 +63,8 @@ public class TextLineRenderer implements ILinelRenderer {
 				drawCursor(model, gc, line, x, y, colFirst);
 			}
 			if(fModel.hasLineSelection(line)) {
-				gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_SELECTION_TEXT));
-				gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_SELECTION));
+				gc.setForeground(getSelectionForeground());
+				gc.setBackground(getSelectionBackground());
 				Point start=model.getSelectionStart();
 				Point end=model.getSelectionEnd();
 				char[] chars=model.getTerminalText().getChars(line);
@@ -86,6 +86,14 @@ public class TextLineRenderer implements ILinelRenderer {
 				}
 			}
 		}
+	}
+	protected Color getSelectionBackground()
+	{
+		return Display.getCurrent().getSystemColor(SWT.COLOR_LIST_SELECTION);
+	}
+	protected Color getSelectionForeground()
+	{
+		return Display.getCurrent().getSystemColor(SWT.COLOR_LIST_SELECTION_TEXT);
 	}
 
 	private void fillBackground(GC gc, int x, int y, int width, int height) {

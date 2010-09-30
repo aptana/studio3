@@ -138,17 +138,14 @@ public class SyncingUIPlugin extends AbstractUIPlugin {
 	private IExecutionListener fExecutionListener = new IExecutionListener()
 	{
 
-		@Override
 		public void notHandled(String commandId, NotHandledException exception)
 		{
 		}
 
-		@Override
 		public void postExecuteFailure(String commandId, ExecutionException exception)
 		{
 		}
 
-		@Override
 		public void postExecuteSuccess(String commandId, Object returnValue)
 		{
 			// if we see a save command
@@ -172,7 +169,6 @@ public class SyncingUIPlugin extends AbstractUIPlugin {
 			}
 		}
 
-		@Override
 		public void preExecute(String commandId, ExecutionEvent event)
 		{
 		}

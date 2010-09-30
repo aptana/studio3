@@ -1,36 +1,64 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.explorer.internal.ui;
 
 import java.io.IOException;
-import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.viewers.AbstractTreeViewer;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.ui.internal.misc.StringMatcher;
 
 import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
 import com.aptana.editor.ruby.index.IRubyIndexConstants;
-import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.QueryResult;
 
-@SuppressWarnings("restriction")
 class PathFilter extends ViewerFilter
 {
 
 	private static Object[] EMPTY = new Object[0];
-
-	private StringMatcher singularMatcher;
-	private StringMatcher pluralMatcher;
 
 	/*
 	 * Cache of filtered elements in the tree
@@ -42,77 +70,183 @@ class PathFilter extends ViewerFilter
 	 */
 	private Map<Object, Boolean> foundAnyCache = new HashMap<Object, Boolean>();
 
+	private Map<Object, Boolean> leafCache = new HashMap<Object, Boolean>();
+
 	private List<QueryResult> queryResults;
+	private IResource filterResource;
+	private Pattern regexp;
 
-	@Override
-	public boolean select(Viewer viewer, Object parentElement, Object element)
+	private String fFilterLocationMinusExtension;
+	private String fFilterResourceURI;
+	private Boolean fHasRailsNature;
+
+	private String patternString;
+
+	/**
+	 * Answers whether the given element in the given viewer matches the filter pattern. This is a default
+	 * implementation that will show a leaf element in the tree based on whether the provided filter text matches the
+	 * text of the given element's text, or that of it's children (if the element has any). Subclasses may override this
+	 * method.
+	 * 
+	 * @param viewer
+	 *            the tree viewer in which the element resides
+	 * @param element
+	 *            the element in the tree to check for a match
+	 * @return true if the element matches the filter pattern
+	 */
+	public boolean isElementVisible(Viewer viewer, Object element)
 	{
-		IResource resource = null;
-		if (element instanceof IResource)
-		{
-			resource = (IResource) element;
-		}
-		else if (element instanceof IAdaptable)
-		{
-			IAdaptable adaptable = (IAdaptable) element;
-			resource = (IResource) adaptable.getAdapter(IResource.class);
-		}
-		if (resource != null)
-		{
-			return isEnclosed(viewer, resource);
-		}
-		// TODO Try matching on the label like PatternFilter does
-		return true;
-	}
-
-	private boolean isEnclosed(Viewer viewer, IResource resource)
-	{
-		IPath path = resource.getProjectRelativePath();
-		String rawPath = path.toPortableString();
-
 		// HACK Ignore tmp and vendor for Rails projects
-		try
+		IResource resource = (IResource) element;
+		String firstSegment = resource.getProjectRelativePath().segment(0);
+		if (firstSegment.equals("tmp") || firstSegment.equals("vendor")) //$NON-NLS-1$ //$NON-NLS-2$
 		{
-			if (resource.getProject().hasNature("org.radrails.rails.core.railsnature") //$NON-NLS-1$
-					&& (rawPath.startsWith("tmp/") || rawPath.startsWith("vendor/"))) //$NON-NLS-1$ //$NON-NLS-2$
+			try
 			{
-				return false;
+				if (hasRailsNature())
+				{
+					return false;
+				}
+			}
+			catch (CoreException e)
+			{
+				// ignore
 			}
 		}
-		catch (CoreException e)
-		{
-			ExplorerPlugin.logError(e);
-		}
+		return isParentMatch(viewer, element) || isLeafMatch(viewer, element);
+	}
 
-		if (match(rawPath))
+	protected boolean hasRailsNature() throws CoreException
+	{
+		if (fHasRailsNature == null)
+		{
+			fHasRailsNature = filterResource.getProject().hasNature("org.radrails.rails.core.railsnature"); //$NON-NLS-1$
+		}
+		return fHasRailsNature;
+	}
+
+	/**
+	 * Returns true if any of the elements makes it through the filter. This method uses caching if enabled; the
+	 * computation is done in computeAnyVisible.
+	 * 
+	 * @param viewer
+	 * @param parent
+	 * @param elements
+	 *            the elements (must not be an empty array)
+	 * @return true if any of the elements makes it through the filter.
+	 */
+	private boolean isAnyVisible(Viewer viewer, Object parent, Object[] elements)
+	{
+		Object[] filtered = cache.get(parent);
+		if (filtered != null)
+		{
+			return filtered.length > 0;
+		}
+		Boolean foundAny = foundAnyCache.get(parent);
+		if (foundAny == null)
+		{
+			foundAny = computeAnyVisible(viewer, elements) ? Boolean.TRUE : Boolean.FALSE;
+			foundAnyCache.put(parent, foundAny);
+		}
+		return foundAny.booleanValue();
+	}
+
+	/**
+	 * Check if the parent (category) is a match to the filter text. The default behavior returns true if the element
+	 * has at least one child element that is a match with the filter text. Subclasses may override this method.
+	 * 
+	 * @param viewer
+	 *            the viewer that contains the element
+	 * @param element
+	 *            the tree element to check
+	 * @return true if the given element has children that matches the filter text
+	 */
+	protected boolean isParentMatch(Viewer viewer, Object element)
+	{
+		// TODO Also check if name matches the text matchers!
+
+		IResource resource = (IResource) element;
+		if (wordMatches(resource.getName()))
 		{
 			return true;
 		}
 
-		// Otherwise check if any of the words of the text matches
-		String[] words = getWords(rawPath);
-		for (int i = 0; i < words.length; i++)
+		Object[] children = ((ITreeContentProvider) ((AbstractTreeViewer) viewer).getContentProvider())
+				.getChildren(element);
+
+		if ((children != null) && (children.length > 0))
 		{
-			String word = words[i];
-			if (match(word))
-			{
-				return true;
-			}
+			return isAnyVisible(viewer, element, children);
+		}
+		return false;
+	}
+
+	/**
+	 * Returns true if any of the elements makes it through the filter.
+	 * 
+	 * @param viewer
+	 *            the viewer
+	 * @param elements
+	 *            the elements to test
+	 * @return <code>true</code> if any of the elements makes it through the filter
+	 */
+	private boolean computeAnyVisible(Viewer viewer, Object[] elements)
+	{
+		boolean elementFound = false;
+		for (int i = 0; i < elements.length && !elementFound; i++)
+		{
+			Object element = elements[i];
+			elementFound = isElementVisible(viewer, element);
+		}
+		return elementFound;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers.Viewer, java.lang.Object,
+	 * java.lang.Object)
+	 */
+	public final boolean select(Viewer viewer, Object parentElement, Object element)
+	{
+		return isElementVisible(viewer, element);
+	}
+
+	/**
+	 * Check if the current (leaf) element is a match with the filter text. The default behavior checks that the label
+	 * of the element is a match. Subclasses should override this method.
+	 * 
+	 * @param viewer
+	 *            the viewer that contains the element
+	 * @param element
+	 *            the tree element to check
+	 * @return true if the given element's label matches the filter text
+	 */
+	protected boolean isLeafMatch(Viewer viewer, Object element)
+	{
+		Boolean result = leafCache.get(element);
+		if (result == null)
+		{
+			result = doIsLeafMatch(viewer, element);
+			leafCache.put(element, result);
+		}
+		return result;
+	}
+
+	protected boolean doIsLeafMatch(Viewer viewer, Object element)
+	{
+		IResource resource = (IResource) element;
+		if (resource.equals(filterResource))
+		{
+			return true;
 		}
 
-		if (resource instanceof IContainer)
+		IPath path = resource.getProjectRelativePath();
+		String rawPath = path.toPortableString();
+
+		// Check if any part of path matches regexp
+		if (wordMatches(rawPath))
 		{
-			IContainer container = (IContainer) resource;
-			try
-			{
-				Object[] visible = filter(viewer, container, container.members());
-				if (visible != null && visible.length > 0)
-					return true;
-			}
-			catch (CoreException e)
-			{
-				ExplorerPlugin.logError(e);
-			}
+			return true;
 		}
 
 		// check if the resource is included by the filtered file or vise versa
@@ -134,20 +268,89 @@ class PathFilter extends ViewerFilter
 		}
 		if (queryResults != null)
 		{
+			// Memoize the location/location URI because it's expensive to grab
+			String resourceURI = null;
+			String resourceLocationMinusExtension = null;
 			for (QueryResult result : queryResults)
 			{
-				String[] documents = result.getDocuments();
-				for (String document : documents)
+				String includedFile = result.getWord();
+				// check if the 'resource' includes 'filteredResource'
+				if (getFilterResourceLocationMinusExtension().endsWith(includedFile))
 				{
-					if ((match(document) && resource.getLocationURI().toString().equals(result.getWord()))
-							|| (match(result.getWord()) && resource.getLocation().toPortableString().equals(document)))
+					// OK, we've established that filteredResource is included by the result.documents
+
+					// check if the documents contains 'resource'
+					for (String document : result.getDocuments())
 					{
-						return true;
+						if (resourceURI == null)
+						{
+							resourceURI = resource.getLocationURI().toString();
+						}
+						if (document.equals(resourceURI))
+						{
+							return true;
+						}
+					}
+				}
+				else
+				{
+					// Check if the current 'resource' is included by 'filteredResource'
+					if (resourceLocationMinusExtension == null)
+					{
+						resourceLocationMinusExtension = resource.getLocation().removeFileExtension()
+								.toPortableString();
+					}
+					// Something includes our current 'resource'
+					if (resourceLocationMinusExtension.endsWith(includedFile))
+					{
+						// See if one of the documents is the one we're filtering on, if so include this resource
+						for (String document : result.getDocuments())
+						{
+							if (document.equals(getFilterResourceURI()))
+							{
+								return true;
+							}
+						}
 					}
 				}
 			}
 		}
 		return false;
+	}
+
+	protected String getFilterResourceURI()
+	{
+		if (fFilterResourceURI == null)
+		{
+			fFilterResourceURI = filterResource.getLocationURI().toString();
+		}
+		return fFilterResourceURI;
+	}
+
+	private String getFilterResourceLocationMinusExtension()
+	{
+		if (fFilterLocationMinusExtension == null)
+		{
+			fFilterLocationMinusExtension = filterResource.getLocation().removeFileExtension().toPortableString();
+		}
+		return fFilterLocationMinusExtension;
+	}
+
+	/**
+	 * Return whether or not if any of the words in text satisfy the match critera.
+	 * 
+	 * @param text
+	 *            the text to match
+	 * @return boolean <code>true</code> if one of the words in text satisfies the match criteria.
+	 */
+	protected boolean wordMatches(String text)
+	{
+		if (text == null)
+		{
+			return false;
+		}
+
+		return match(text);
 	}
 
 	/**
@@ -159,11 +362,11 @@ class PathFilter extends ViewerFilter
 	 */
 	private boolean match(String string)
 	{
-		if (singularMatcher == null)
+		if (regexp == null)
 		{
 			return true;
 		}
-		return singularMatcher.match(string) || (pluralMatcher != null && pluralMatcher.match(string));
+		return regexp.matcher(string).find();
 	}
 
 	/**
@@ -171,34 +374,113 @@ class PathFilter extends ViewerFilter
 	 * 
 	 * @param patternString
 	 */
-	public void setPattern(String patternString)
+	private void setPattern(String patternString)
 	{
-		clearCaches();
-		if (patternString == null || patternString.equals("")) { //$NON-NLS-1$
-			singularMatcher = null;
-			pluralMatcher = null;
+		this.patternString = patternString;
+		if (patternString == null || patternString.equals("")) //$NON-NLS-1$
+		{
+			regexp = null;
 		}
 		else
 		{
-			singularMatcher = new StringMatcher("*" + patternString + "*", true, false); //$NON-NLS-1$ //$NON-NLS-2$
-			if (patternString.contains("?") || patternString.contains("*")) //$NON-NLS-1$ //$NON-NLS-2$
-				return;
-			// TODO Generate a matcher for the singular and plural forms of the pattern unless singular is prefix of
-			// plural!
-			// i.e. people/person vs user/users
-			// For now let's assume user always inputs singular and we always generate singular.
-			pluralMatcher = new StringMatcher("*" + Inflector.pluralize(patternString) + "*", true, false); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		if (queryResults != null)
-		{
-			queryResults.clear();
-			queryResults = null;
+			regexp = Pattern.compile("\\b(" + patternString + "|" + Inflector.pluralize(patternString) + ")\\b");
 		}
 	}
 
-	@Override
-	public Object[] filter(Viewer viewer, Object parent, Object[] elements)
+	public void setResourceToFilterOn(IResource resource)
 	{
+		clearCaches();
+		if (queryResults != null)
+		{
+			queryResults = null;
+		}
+		fFilterLocationMinusExtension = null;
+		fFilterResourceURI = null;
+		fHasRailsNature = null;
+		if (resource == null)
+		{
+			filterResource = null;
+			setPattern(null);
+			return;
+		}
+		this.filterResource = resource;
+		setPattern(createPatternFromResource(resource));
+	}
+
+	protected String createPatternFromResource(IResource resource)
+	{
+		String text = resource.getName();
+		// Try and strip filename down to the resource name!
+		if (text.endsWith("_controller.rb")) //$NON-NLS-1$
+		{
+			text = text.substring(0, text.indexOf("_controller")); //$NON-NLS-1$
+			text = Inflector.singularize(text);
+		}
+		else if (text.endsWith("_controller_test.rb")) //$NON-NLS-1$
+		{
+			text = text.substring(0, text.indexOf("_controller_test.rb")); //$NON-NLS-1$
+			text = Inflector.singularize(text);
+		}
+		else if (text.endsWith("_helper.rb")) //$NON-NLS-1$
+		{
+			text = text.substring(0, text.indexOf("_helper")); //$NON-NLS-1$
+			text = Inflector.singularize(text);
+		}
+		else if (text.endsWith("_helper_test.rb")) //$NON-NLS-1$
+		{
+			text = text.substring(0, text.indexOf("_helper_test.rb")); //$NON-NLS-1$
+			text = Inflector.singularize(text);
+		}
+		else if (text.endsWith("_test.rb")) //$NON-NLS-1$
+		{
+			text = text.substring(0, text.indexOf("_test.rb")); //$NON-NLS-1$
+		}
+		else if (text.endsWith("_spec.rb")) //$NON-NLS-1$
+		{
+			text = text.substring(0, text.indexOf("_spec.rb")); //$NON-NLS-1$
+		}
+		else if (text.endsWith(".yml")) //$NON-NLS-1$
+		{
+			IPath path = resource.getProjectRelativePath();
+			if (path.segmentCount() >= 3 && path.segment(1).equals("fixtures")) //$NON-NLS-1$
+			{
+				text = text.substring(0, text.indexOf(".yml")); //$NON-NLS-1$
+				text = Inflector.singularize(text);
+			}
+		}
+		else if (text.endsWith(".rb")) //$NON-NLS-1$
+		{
+			text = text.substring(0, text.indexOf(".rb")); //$NON-NLS-1$
+		}
+		else
+		{
+			// We need to grab the full path, so we can determine the resource name!
+
+			IPath path = resource.getProjectRelativePath();
+			if (path.segmentCount() >= 3 && path.segment(1).equals("views")) //$NON-NLS-1$
+			{
+				text = path.segment(2);
+				text = Inflector.singularize(text);
+			}
+		}
+		return text;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ViewerFilter#filter(org.eclipse.jface.viewers.Viewer, java.lang.Object,
+	 * java.lang.Object[])
+	 */
+	public final Object[] filter(Viewer viewer, Object parent, Object[] elements)
+	{
+		// we don't want to optimize if we've extended the filter ... this
+		// needs to be addressed in 3.4
+		// https://bugs.eclipse.org/bugs/show_bug.cgi?id=186404
+		if (regexp == null)
+		{
+			return elements;
+		}
+
 		Object[] filtered = cache.get(parent);
 		if (filtered == null)
 		{
@@ -223,43 +505,11 @@ class PathFilter extends ViewerFilter
 	{
 		cache.clear();
 		foundAnyCache.clear();
+		leafCache.clear();
 	}
 
-	/**
-	 * Take the given filter text and break it down into words using a BreakIterator.
-	 * 
-	 * @param text
-	 * @return an array of words
-	 */
-	private String[] getWords(String text)
+	public String getPattern()
 	{
-		List<String> words = new ArrayList<String>();
-		// Break the text up into words, separating based on whitespace and
-		// common punctuation.
-		// Previously used String.split(..., "\\W"), where "\W" is a regular
-		// expression (see the Javadoc for class Pattern).
-		// Need to avoid both String.split and regular expressions, in order to
-		// compile against JCL Foundation (bug 80053).
-		// Also need to do this in an NL-sensitive way. The use of BreakIterator
-		// was suggested in bug 90579.
-		BreakIterator iter = BreakIterator.getWordInstance();
-		iter.setText(text);
-		int i = iter.first();
-		while (i != java.text.BreakIterator.DONE && i < text.length())
-		{
-			int j = iter.following(i);
-			if (j == java.text.BreakIterator.DONE)
-			{
-				j = text.length();
-			}
-			// match the word
-			if (Character.isLetterOrDigit(text.charAt(i)))
-			{
-				String word = text.substring(i, j);
-				words.add(word);
-			}
-			i = j;
-		}
-		return words.toArray(new String[words.size()]);
+		return this.patternString;
 	}
 }

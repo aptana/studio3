@@ -139,4 +139,25 @@ public class CommitFileRevision extends GitFileRevision
 		CommitFileRevision other = (CommitFileRevision) revision;
 		return commit.parents().contains(other.commit.sha());
 	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj instanceof CommitFileRevision)
+		{
+			if (!super.equals(obj)) // check path
+			{
+				return false;
+			}
+			CommitFileRevision other = (CommitFileRevision) obj;
+			return other.commit.equals(commit); // check commit
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return 31 * super.hashCode() + commit.hashCode();
+	}
 }

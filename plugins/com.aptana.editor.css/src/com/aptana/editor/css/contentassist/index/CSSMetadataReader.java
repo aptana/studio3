@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2008 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -34,15 +34,21 @@
  */
 package com.aptana.editor.css.contentassist.index;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.xml.sax.Attributes;
 
 import com.aptana.editor.common.contentassist.MetadataReader;
+import com.aptana.editor.css.Activator;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
+import com.aptana.editor.css.contentassist.model.PseudoClassElement;
+import com.aptana.editor.css.contentassist.model.PseudoElementElement;
 import com.aptana.editor.css.contentassist.model.SpecificationElement;
 import com.aptana.editor.css.contentassist.model.UserAgentElement;
 import com.aptana.editor.css.contentassist.model.ValueElement;
@@ -53,13 +59,17 @@ import com.aptana.editor.css.contentassist.model.ValueElement;
 public class CSSMetadataReader extends MetadataReader
 {
 	private static final String METADATA_SCHEMA_XML = "/metadata/CSSMetadataSchema.xml"; //$NON-NLS-1$
-	
+
 	private List<ElementElement> _elements = new LinkedList<ElementElement>();
 	private ElementElement _currentElement;
 	private PropertyElement _currentProperty;
+	private PseudoClassElement _currentPseudoClass;
+	private PseudoElementElement _currentPseudoElement;
 	private ValueElement _currentValue;
 	private UserAgentElement _currentUserAgent;
 	private List<PropertyElement> _properties = new LinkedList<PropertyElement>();
+	private List<PseudoClassElement> _pseudoClasses = new LinkedList<PseudoClassElement>();
+	private List<PseudoElementElement> _pseudoElements = new LinkedList<PseudoElementElement>();
 
 	/**
 	 * CSSMetadataReader
@@ -100,7 +110,7 @@ public class CSSMetadataReader extends MetadataReader
 	{
 		// create a new item documentation object
 		ElementElement element = new ElementElement();
-		
+
 		// grab and set property values
 		element.setName(attributes.getValue("name")); //$NON-NLS-1$
 		element.setDisplayName(attributes.getValue("display-name")); //$NON-NLS-1$
@@ -108,7 +118,7 @@ public class CSSMetadataReader extends MetadataReader
 		// set current item
 		this._currentElement = element;
 	}
-	
+
 	/**
 	 * start processing a property element
 	 * 
@@ -130,7 +140,7 @@ public class CSSMetadataReader extends MetadataReader
 		// set current item
 		this._currentProperty = property;
 	}
-	
+
 	/**
 	 * start processing a property reference element
 	 * 
@@ -145,6 +155,47 @@ public class CSSMetadataReader extends MetadataReader
 	}
 
 	/**
+	 * start processing a pseudo-class element
+	 * 
+	 * @param ns
+	 * @param name
+	 * @param qname
+	 * @param attributes
+	 */
+	public void enterPseudoClass(String ns, String name, String qname, Attributes attributes)
+	{
+		// create a new item documentation object
+		PseudoClassElement pseudoClass = new PseudoClassElement();
+
+		// grab and set property values
+		pseudoClass.setName(attributes.getValue("name")); //$NON-NLS-1$
+
+		// set current item
+		this._currentPseudoClass = pseudoClass;
+	}
+
+	/**
+	 * start processing a pseudo-element element
+	 * 
+	 * @param ns
+	 * @param name
+	 * @param qname
+	 * @param attributes
+	 */
+	public void enterPseudoElement(String ns, String name, String qname, Attributes attributes)
+	{
+		// create a new item documentation object
+		PseudoElementElement pseudoElement = new PseudoElementElement();
+
+		// grab and set property values
+		pseudoElement.setName(attributes.getValue("name")); //$NON-NLS-1$
+		pseudoElement.setAllowPseudoClassSyntax(Boolean.valueOf(attributes.getValue("allow-pseudo-class-syntax"))); //$NON-NLS-1$
+
+		// set current item
+		this._currentPseudoElement = pseudoElement;
+	}
+
+	/**
 	 * start processing a specification element
 	 * 
 	 * @param ns
@@ -155,11 +206,22 @@ public class CSSMetadataReader extends MetadataReader
 	public void enterSpecification(String ns, String name, String qname, Attributes attributes)
 	{
 		SpecificationElement specification = new SpecificationElement();
-		
+
 		specification.setName(attributes.getValue("name")); //$NON-NLS-1$
 		specification.setVersion(attributes.getValue("version")); //$NON-NLS-1$
-		
-		this._currentProperty.addSpecification(specification);
+
+		if (this._currentProperty != null)
+		{
+			this._currentProperty.addSpecification(specification);
+		}
+		else if (this._currentPseudoClass != null)
+		{
+			this._currentPseudoClass.addSpecification(specification);
+		}
+		else if (this._currentPseudoElement != null)
+		{
+			this._currentPseudoElement.addSpecification(specification);
+		}
 	}
 
 	/**
@@ -206,6 +268,16 @@ public class CSSMetadataReader extends MetadataReader
 			// add example to the current element
 			this._currentElement.addUserAgent(this._currentUserAgent);
 		}
+		else if (this._currentPseudoClass != null)
+		{
+			// add example to the current pseudo-class
+			this._currentPseudoClass.addUserAgent(this._currentUserAgent);
+		}
+		else if (this._currentPseudoElement != null)
+		{
+			// add example to the current pseudo-element
+			this._currentPseudoElement.addUserAgent(this._currentUserAgent);
+		}
 
 		// clear current class
 		this._currentUserAgent = null;
@@ -221,7 +293,7 @@ public class CSSMetadataReader extends MetadataReader
 	public void exitDescription(String ns, String name, String qname)
 	{
 		String text = this.getText();
-		
+
 		if (this._currentProperty != null)
 		{
 			// add example to the current parameter
@@ -237,6 +309,16 @@ public class CSSMetadataReader extends MetadataReader
 			// add example to the current parameter
 			this._currentUserAgent.setDescription(this.decodeHtml(text));
 		}
+		else if (this._currentPseudoClass != null)
+		{
+			// add example to the current pseudo-class
+			this._currentPseudoClass.setDescription(this.decodeHtml(text));
+		}
+		else if (this._currentPseudoElement != null)
+		{
+			// add example to the current pseudo-element
+			this._currentPseudoElement.setDescription(this.decodeHtml(text));
+		}
 	}
 
 	/**
@@ -249,7 +331,7 @@ public class CSSMetadataReader extends MetadataReader
 	public void exitElement(String ns, String name, String qname)
 	{
 		this._elements.add(this._currentElement);
-		
+
 		this._currentElement = null;
 	}
 
@@ -263,7 +345,7 @@ public class CSSMetadataReader extends MetadataReader
 	public void exitExample(String ns, String name, String qname)
 	{
 		String text = this.getText();
-		
+
 		if (this._currentProperty != null)
 		{
 			this._currentProperty.setExample(this.decodeHtml(text));
@@ -272,8 +354,16 @@ public class CSSMetadataReader extends MetadataReader
 		{
 			this._currentElement.setExample(this.decodeHtml(text));
 		}
+		else if (this._currentPseudoClass != null)
+		{
+			this._currentPseudoClass.setExample(this.decodeHtml(text));
+		}
+		else if (this._currentPseudoElement != null)
+		{
+			this._currentPseudoElement.setExample(this.decodeHtml(text));
+		}
 	}
-	
+
 	/**
 	 * Exit a hint element
 	 * 
@@ -284,7 +374,7 @@ public class CSSMetadataReader extends MetadataReader
 	public void exitHint(String ns, String name, String qname)
 	{
 		String text = this.getText();
-		
+
 		if (this._currentProperty != null)
 		{
 			// add hint to the current property
@@ -307,10 +397,38 @@ public class CSSMetadataReader extends MetadataReader
 	public void exitProperty(String ns, String name, String qname)
 	{
 		this._properties.add(this._currentProperty);
-		
+
 		this._currentProperty = null;
 	}
-	
+
+	/**
+	 * Exit a pseudo-class element
+	 * 
+	 * @param ns
+	 * @param name
+	 * @param qname
+	 */
+	public void exitPseudoClass(String ns, String name, String qname)
+	{
+		this._pseudoClasses.add(this._currentPseudoClass);
+
+		this._currentPseudoClass = null;
+	}
+
+	/**
+	 * Exit a pseudo-element element
+	 * 
+	 * @param ns
+	 * @param name
+	 * @param qname
+	 */
+	public void exitPseudoElement(String ns, String name, String qname)
+	{
+		this._pseudoElements.add(this._currentPseudoElement);
+
+		this._currentPseudoElement = null;
+	}
+
 	/**
 	 * exit a remarks element
 	 * 
@@ -321,7 +439,7 @@ public class CSSMetadataReader extends MetadataReader
 	public void exitRemarks(String ns, String name, String qname)
 	{
 		String text = this.getText();
-		
+
 		if (this._currentProperty != null)
 		{
 			this._currentProperty.setRemark(text);
@@ -341,10 +459,16 @@ public class CSSMetadataReader extends MetadataReader
 	 */
 	public void exitValue(String ns, String name, String qname)
 	{
-		// add class to class list
-		this._currentProperty.addValue(this._currentValue);
+		if (this._currentProperty != null)
+		{
+			this._currentProperty.addValue(this._currentValue);
+		}
+		else if (this._currentPseudoClass != null)
+		{
+			this._currentPseudoClass.addValue(this._currentValue);
+		}
 
-		// clear current class
+		// clear current value
 		this._currentValue = null;
 	}
 
@@ -357,7 +481,7 @@ public class CSSMetadataReader extends MetadataReader
 	{
 		return this._elements;
 	}
-	
+
 	/**
 	 * getProperties
 	 * 
@@ -367,7 +491,27 @@ public class CSSMetadataReader extends MetadataReader
 	{
 		return this._properties;
 	}
-	
+
+	/**
+	 * getPseudoClasses
+	 * 
+	 * @return
+	 */
+	public List<PseudoClassElement> getPseudoClasses()
+	{
+		return this._pseudoClasses;
+	}
+
+	/**
+	 * getPseudoElements
+	 * 
+	 * @return
+	 */
+	public List<PseudoElementElement> getPseudoElements()
+	{
+		return this._pseudoElements;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.contentassist.MetadataReader#getSchemaStream()
@@ -375,6 +519,14 @@ public class CSSMetadataReader extends MetadataReader
 	@Override
 	protected InputStream getSchemaStream()
 	{
-		return this.getClass().getResourceAsStream(METADATA_SCHEMA_XML);
+		try
+		{
+			return FileLocator.openStream(Activator.getDefault().getBundle(),
+					Path.fromPortableString(METADATA_SCHEMA_XML), false);
+		}
+		catch (IOException e)
+		{
+			return this.getClass().getResourceAsStream(METADATA_SCHEMA_XML);
+		}
 	}
 }

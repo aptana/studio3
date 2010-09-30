@@ -75,7 +75,6 @@ public class FeatureInfo implements Comparable<FeatureInfo>
 		this.enabled = enabled;
 	}
 
-	@Override
 	public int compareTo(FeatureInfo o)
 	{
 		int result = name.compareTo(o.name);

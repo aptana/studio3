@@ -1,6 +1,7 @@
 package com.aptana.theme;
 
-import java.io.InputStream;
+import java.io.File;
+import java.net.URL;
 
 import junit.framework.TestCase;
 
@@ -9,21 +10,23 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 
+@SuppressWarnings("nls")
 public class TextmateImporterTest extends TestCase
 {
 
 	public void testImportOfMidnightTheme() throws Exception
 	{
 		TextmateImporter importer = new TextmateImporter();
-		InputStream stream = FileLocator.openStream(ThemePlugin.getDefault().getBundle(), new Path(
-				"Midnight.tmTheme"), false);
-		Theme theme = importer.convert(stream);
+		URL url = FileLocator.find(ThemePlugin.getDefault().getBundle(), Path.fromPortableString("Midnight.tmTheme"),
+				null);
+		url = FileLocator.toFileURL(url);
+		Theme theme = importer.convert(new File(url.toURI()));
 		assertEquals("Midnight", theme.getName());
 		assertEquals(new RGB(248, 248, 248), theme.getForeground());
 		assertEquals(new RGB(10, 0, 31), theme.getBackground());
-		assertEquals(new RGB(24, 0, 147), theme.getSelection());
-		assertEquals(new RGB(169, 166, 176), theme.getCaret());
-		assertEquals(new RGB(25, 9, 98), theme.getLineHighlight());
+		assertEquals(new RGBa(37, 0, 255, 133), theme.getSelection());
+		assertEquals(new RGB(169, 166, 177), theme.getCaret());
+		assertEquals(new RGBa(60, 30, 255, 77), theme.getLineHighlight());
 
 		assertEquals(new RGB(105, 0, 161), theme.getForegroundAsRGB("comment"));
 		assertEquals(new RGB(171, 42, 29), theme.getForegroundAsRGB("invalid.deprecated"));

@@ -1,11 +1,50 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.contentassist;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.eclipse.swt.graphics.Image;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.URIUtil;
+import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
@@ -13,8 +52,29 @@ import com.aptana.editor.js.contentassist.model.SinceElement;
 
 public class JSModelFormatter
 {
+	private static final Map<String, Image> TYPE_IMAGE_MAP;
+
+	// used for mixed types
+	private static final Image PROPERTY = Activator.getImage("/icons/js_property.png"); //$NON-NLS-1$
+
 	private static final String NEW_LINE = "<br>"; //$NON-NLS-1$
 	private static final String DOUBLE_NEW_LINE = NEW_LINE + NEW_LINE;
+
+	/**
+	 * static initializer
+	 */
+	static
+	{
+		TYPE_IMAGE_MAP = new HashMap<String, Image>();
+		TYPE_IMAGE_MAP.put(JSTypeConstants.ARRAY_TYPE, Activator.getImage("/icons/array-literal.png")); //$NON-NLS-1$
+		TYPE_IMAGE_MAP.put(JSTypeConstants.BOOLEAN_TYPE, Activator.getImage("/icons/boolean.png")); //$NON-NLS-1$
+		TYPE_IMAGE_MAP.put(JSTypeConstants.FUNCTION_TYPE, Activator.getImage("/icons/js_function.png")); //$NON-NLS-1$
+		TYPE_IMAGE_MAP.put(JSTypeConstants.NULL_TYPE, Activator.getImage("/icons/null.png")); //$NON-NLS-1$
+		TYPE_IMAGE_MAP.put(JSTypeConstants.NUMBER_TYPE, Activator.getImage("/icons/number.png")); //$NON-NLS-1$
+		TYPE_IMAGE_MAP.put(JSTypeConstants.OBJECT_TYPE, Activator.getImage("/icons/object-literal.png")); //$NON-NLS-1$
+		TYPE_IMAGE_MAP.put(JSTypeConstants.REG_EXP_TYPE, Activator.getImage("/icons/regex.png")); //$NON-NLS-1$
+		TYPE_IMAGE_MAP.put(JSTypeConstants.STRING_TYPE, Activator.getImage("/icons/string.png")); //$NON-NLS-1$
+	}
 
 	/**
 	 * addDefiningFiles
@@ -42,7 +102,7 @@ public class JSModelFormatter
 			}
 
 			buffer.append(DOUBLE_NEW_LINE); //$NON-NLS-1$
-			buffer.append(Messages.JSModelFormatter_Defined_Section_Header);
+			buffer.append("<b>").append(Messages.JSModelFormatter_Defined_Section_Header).append("</b>");
 			buffer.append(NEW_LINE); //$NON-NLS-1$
 
 			boolean first = true;
@@ -65,7 +125,7 @@ public class JSModelFormatter
 					buffer.append(NEW_LINE);
 				}
 
-				buffer.append(document);
+				buffer.append("- ").append(document);
 			}
 		}
 	}
@@ -243,6 +303,42 @@ public class JSModelFormatter
 		return result;
 	}
 
+	/**
+	 * getImage
+	 * 
+	 * @param property
+	 * @return
+	 */
+	public static Image getImage(PropertyElement property)
+	{
+		Image result = (property instanceof FunctionElement) ? TYPE_IMAGE_MAP.get(JSTypeConstants.FUNCTION_TYPE) : PROPERTY;
+		
+		if (property != null)
+		{
+			List<String> types = property.getTypeNames();
+			
+			if (types != null && types.size() == 1)
+			{
+				String type = types.get(0);
+				
+				if (TYPE_IMAGE_MAP.containsKey(type))
+				{
+					result = TYPE_IMAGE_MAP.get(type);
+				}
+				else if (type.startsWith(JSTypeConstants.DYNAMIC_CLASS_PREFIX))
+				{
+					result = TYPE_IMAGE_MAP.get(JSTypeConstants.OBJECT_TYPE);
+				}
+				else if (type.startsWith(JSTypeConstants.FUNCTION_TYPE))
+				{
+					result = TYPE_IMAGE_MAP.get(JSTypeConstants.FUNCTION_TYPE);
+				}
+			}
+		}
+		
+		return result;
+	}
+	
 	/**
 	 * getDisplayTypeName
 	 * 

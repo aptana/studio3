@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.contentassist;
 
 import java.net.URI;
@@ -28,7 +62,6 @@ import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.model.ContentSelector;
-import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.inferencing.JSNodeTypeInferrer;
 import com.aptana.editor.js.inferencing.JSPropertyCollection;
@@ -50,8 +83,8 @@ import com.aptana.parsing.lexer.Range;
 
 public class JSContentAssistProcessor extends CommonContentAssistProcessor
 {
-	private static final Image JS_FUNCTION = Activator.getImage("/icons/js_function.gif"); //$NON-NLS-1$
-	private static final Image JS_PROPERTY = Activator.getImage("/icons/js_property.gif"); //$NON-NLS-1$
+	private static final Image JS_FUNCTION = Activator.getImage("/icons/js_function.png"); //$NON-NLS-1$
+	private static final Image JS_PROPERTY = Activator.getImage("/icons/js_property.png"); //$NON-NLS-1$
 
 	private static final EnumSet<ContentSelector> CORE_GLOBAL_SELECTOR = EnumSet.of(ContentSelector.NAME, //
 		ContentSelector.DESCRIPTION, //
@@ -121,7 +154,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				String name = property.getName();
 				String description = JSModelFormatter.getDescription(property, projectURI);
-				Image image = (property instanceof FunctionElement) ? JS_FUNCTION : JS_PROPERTY;
+				Image image = JSModelFormatter.getImage(property);
 				Image[] userAgents = this.getUserAgentImages(property.getUserAgentNames());
 
 				this.addProposal(proposals, name, image, description, userAgents, location, offset);
@@ -148,7 +181,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				String name = property.getName();
 				String description = JSModelFormatter.getDescription(property, projectURI);
-				Image image = (property instanceof FunctionElement) ? JS_FUNCTION : JS_PROPERTY;
+				Image image = JSModelFormatter.getImage(property);
 				List<String> documents = property.getDocuments();
 				String location = (documents != null && documents.size() > 0) ? JSModelFormatter.getDocumentDisplayName(documents.get(0)) : null;
 
@@ -261,7 +294,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		if (this._targetNode != null)
 		{
-			String fileLocation = this.getFilename();
 			JSScope globalScope = this.getGlobalScope();
 
 			if (globalScope != null)
@@ -270,6 +302,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 				if (localScope != null)
 				{
+					String fileLocation = this.getFilename();
 					Image[] userAgents = this.getAllUserAgentIcons();
 					List<String> symbols = localScope.getSymbolNames();
 
@@ -326,10 +359,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 		for (PropertyElement property : properties)
 		{
-			boolean isFunction = (property instanceof FunctionElement);
 			String name = property.getName();
 			String description = JSModelFormatter.getDescription(property, this.getProjectURI());
-			Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
+			Image image = JSModelFormatter.getImage(property);
 			List<String> userAgentNames = property.getUserAgentNames();
 			Image[] userAgents = getUserAgentImages(userAgentNames);
 			String owningType = JSModelFormatter.getTypeDisplayName(property.getOwningType());
@@ -399,7 +431,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		// sort by display name
 		Collections.sort(proposals, new Comparator<ICompletionProposal>()
 		{
-			@Override
 			public int compare(ICompletionProposal o1, ICompletionProposal o2)
 			{
 				return o1.getDisplayString().compareToIgnoreCase(o2.getDisplayString());

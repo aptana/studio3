@@ -12,7 +12,7 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.org.eclipse.tm.terminal;bundle-version="3.0.100",
  com.aptana.theme,
  org.eclipse.jface.text;bundle-version="3.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.terminal,
  com.aptana.terminal.views,

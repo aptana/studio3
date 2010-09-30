@@ -1,6 +1,42 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.html.parsing;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 import org.eclipse.jface.text.Document;
@@ -11,6 +47,7 @@ import beaver.Symbol;
 
 import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.html.parsing.HTMLTagScanner.TokenType;
+import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
@@ -60,7 +97,6 @@ public class HTMLParser implements IParser
 		fTagScanner = new HTMLTagScanner();
 	}
 
-	@Override
 	public synchronized IParseNode parse(IParseState parseState) throws java.lang.Exception
 	{
 		fParseState = (HTMLParseState) parseState;
@@ -68,7 +104,7 @@ public class HTMLParser implements IParser
 		fScanner.setSource(source);
 
 		int startingOffset = parseState.getStartingOffset();
-		IParseNode root = new ParseRootNode(HTMLNode.LANGUAGE, new HTMLNode[0], startingOffset, startingOffset
+		IParseNode root = new ParseRootNode(IHTMLParserConstants.LANGUAGE, new HTMLNode[0], startingOffset, startingOffset
 				+ source.length());
 		parseAll(root);
 		parseState.setParseResult(root);
@@ -80,6 +116,9 @@ public class HTMLParser implements IParser
 	{
 		switch (symbol.getId())
 		{
+			case HTMLTokens.COMMENT:
+				processComment();
+				break;
 			case HTMLTokens.START_TAG:
 				processStartTag();
 				break;
@@ -148,6 +187,26 @@ public class HTMLParser implements IParser
 			processSymbol(fCurrentSymbol);
 			advance();
 		}
+
+		// if there are unclosed tags remaining, close them all
+		List<HTMLElementNode> elementsToClose = new ArrayList<HTMLElementNode>();
+		if (fCurrentElement instanceof HTMLElementNode)
+		{
+			elementsToClose.add((HTMLElementNode) fCurrentElement);
+		}
+		IParseNode node;
+		for (int i = fElementStack.size() - 1; i >= 0; --i)
+		{
+			node = fElementStack.get(i);
+			if (node instanceof HTMLElementNode)
+			{
+				elementsToClose.add((HTMLElementNode) node);
+			}
+		}
+		for (HTMLElementNode element : elementsToClose)
+		{
+			element.setLocation(element.getStartingOffset(), fCurrentSymbol.getStart() - 1);
+		}
 	}
 
 	private void advance() throws IOException, Exception
@@ -172,6 +231,16 @@ public class HTMLParser implements IParser
 		return new IParseNode[0];
 	}
 
+	private void processComment()
+	{
+		HTMLCommentNode comment = new HTMLCommentNode(fCurrentSymbol.value.toString(), fCurrentSymbol.getStart(),
+				fCurrentSymbol.getEnd());
+		if (fCurrentElement != null)
+		{
+			fCurrentElement.addChild(comment);
+		}
+	}
+
 	private void processStartTag()
 	{
 		HTMLElementNode element = processCurrentTag();
@@ -181,18 +250,63 @@ public class HTMLParser implements IParser
 
 	private void processEndTag()
 	{
-		// only closes current element if current lexeme and element have the same tag name
-		if (fCurrentElement != null)
+		String tagName = HTMLUtils.stripTagEndings(fCurrentSymbol.value.toString());
+		List<HTMLElementNode> elementsToClose = new ArrayList<HTMLElementNode>();
+		if (fCurrentElement instanceof HTMLElementNode
+				&& ((HTMLElementNode) fCurrentElement).getName().equalsIgnoreCase(tagName))
 		{
-			String tagName = HTMLUtils.stripTagEndings(fCurrentSymbol.value.toString());
-			if ((fCurrentElement instanceof HTMLElementNode)
-					&& ((HTMLElementNode) fCurrentElement).getName().equalsIgnoreCase(tagName))
+			elementsToClose.add((HTMLElementNode) fCurrentElement);
+		}
+		else
+		{
+			// finds the closest opened tag of the same name
+			IParseNode node;
+			int i;
+			for (i = fElementStack.size() - 1; i >= 0; --i)
 			{
-				// adjusts the ending offset of current element to include the entire block
-				((HTMLElementNode) fCurrentElement).setLocation(fCurrentElement.getStartingOffset(), fCurrentSymbol
-						.getEnd());
-				closeElement();
+				node = fElementStack.get(i);
+				if (node instanceof HTMLElementNode && ((HTMLElementNode) node).getName().equalsIgnoreCase(tagName))
+				{
+					break;
+				}
 			}
+
+			if (i >= 0)
+			{
+				// found the match, so closes it as well as all the open elements above
+				if (fCurrentElement instanceof HTMLElementNode)
+				{
+					elementsToClose.add((HTMLElementNode) fCurrentElement);
+				}
+
+				for (int j = fElementStack.size() - 1; j >= i; --j)
+				{
+					node = fElementStack.get(j);
+					if (node instanceof HTMLElementNode)
+					{
+						elementsToClose.add((HTMLElementNode) node);
+					}
+				}
+			}
+		}
+
+		HTMLElementNode element;
+		int size = elementsToClose.size();
+		for (int i = 0; i < size; ++i)
+		{
+			element = elementsToClose.get(i);
+			// adjusts the ending offset of the element to include the entire block
+			if (i < size - 1)
+			{
+				element.setLocation(element.getStartingOffset(), fCurrentSymbol.getStart() - 1);
+			}
+			else
+			{
+				// only the last element has the end tag
+				element.setLocation(element.getStartingOffset(), fCurrentSymbol.getEnd());
+				element.setEndNode(fCurrentSymbol.getStart(), fCurrentSymbol.getEnd());
+			}
+			closeElement();
 		}
 	}
 
@@ -261,13 +375,26 @@ public class HTMLParser implements IParser
 	 */
 	private void openElement(HTMLElementNode element)
 	{
+		String tagName = element.getName();
+		int closeTagType = fParseState.getCloseTagType(tagName);
+		// tag with optional end could not be nested, so if we see another instance of the same start tag, close the
+		// previous one
+		if (closeTagType == HTMLTagInfo.END_OPTIONAL && fCurrentElement != null
+				&& tagName.equals(fCurrentElement.getNameNode().getName()))
+		{
+			// adjusts the ending offset of current element to include the entire block up to the start of the new tag
+			((HTMLNode) fCurrentElement)
+					.setLocation(fCurrentElement.getStartingOffset(), fCurrentSymbol.getStart() - 1);
+			closeElement();
+		}
+
 		// adds the new parent as a child of the current parent
 		if (fCurrentElement != null)
 		{
 			fCurrentElement.addChild(element);
 		}
 
-		if (fParseState.getCloseTagType(element.getName()) != HTMLTagInfo.END_FORBIDDEN)
+		if (closeTagType != HTMLTagInfo.END_FORBIDDEN)
 		{
 			fElementStack.push(fCurrentElement);
 			fCurrentElement = element;
