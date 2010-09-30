@@ -37,6 +37,7 @@ package com.aptana.editor.html.text.hyperlink;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -97,8 +98,8 @@ public class CSSClassHyperlinkDetector extends IndexQueryingHyperlinkDetector
 			IRegion linkRegion = new Region(start, length);
 			for (QueryResult result : results)
 			{
-				String[] documents = result.getDocuments();
-				if (documents == null || documents.length <= 0)
+				Set<String> documents = result.getDocuments();
+				if (documents == null || documents.isEmpty())
 				{
 					continue;
 				}

@@ -678,8 +678,6 @@ public class FilteringProjectView extends GitProjectView
 	protected void setFilter(IResource resource)
 	{
 		currentFilter = resource;
-		showFilterLabel(eyeball,
-				NLS.bind(Messages.FilteringProjectView_LBL_FilteringFor, new Object[] { currentFilter.getName() }));
 		filterChanged();
 	}
 
@@ -713,7 +711,7 @@ public class FilteringProjectView extends GitProjectView
 	 */
 	protected long getRefreshJobDelay()
 	{
-		return 200;
+		return 100;
 	}
 
 	protected WorkbenchJob doCreateRefreshJob()
@@ -726,16 +724,21 @@ public class FilteringProjectView extends GitProjectView
 					return Status.CANCEL_STATUS;
 				}
 
-				IResource text = getFilterResource();
-				if (text == null)
+				IResource filterResource = getFilterResource();
+				if (filterResource == null)
 				{
 					patternFilter.setResourceToFilterOn(null);
+
 					getCommonViewer().removeFilter(patternFilter);
 				}
 				else
 				{
 					getCommonViewer().removeFilter(patternFilter);
-					patternFilter.setResourceToFilterOn(text);
+					patternFilter.setResourceToFilterOn(filterResource);
+					showFilterLabel(
+							eyeball,
+							NLS.bind(Messages.FilteringProjectView_LBL_FilteringFor,
+									new Object[] { patternFilter.getPattern() }));
 					getCommonViewer().addFilter(patternFilter);
 				}
 
@@ -766,7 +769,7 @@ public class FilteringProjectView extends GitProjectView
 						// ignore. This seems to just happen on windows and appears to be benign
 					}
 
-					if (text != null)
+					if (filterResource != null)
 					{
 						/*
 						 * Expand elements one at a time. After each is expanded, check to see if the filter text has

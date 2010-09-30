@@ -1,9 +1,11 @@
 package com.aptana.index.core;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class QueryResult
 {
@@ -36,9 +38,9 @@ public class QueryResult
 		return word;
 	}
 
-	public String[] getDocuments()
+	public Set<String> getDocuments()
 	{
-		return documentNames.toArray(new String[documentNames.size()]);
+		return Collections.unmodifiableSet(documentNames);
 	}
 
 	public boolean isEmpty()

@@ -35,7 +35,6 @@
 package com.aptana.explorer.internal.ui;
 
 import java.io.IOException;
-import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,12 +51,10 @@ import org.eclipse.jface.viewers.ViewerFilter;
 
 import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
 import com.aptana.editor.ruby.index.IRubyIndexConstants;
-import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.QueryResult;
 
-@SuppressWarnings("restriction")
 class PathFilter extends ViewerFilter
 {
 
@@ -80,8 +77,10 @@ class PathFilter extends ViewerFilter
 	private Pattern regexp;
 
 	private String fFilterLocationMinusExtension;
-
 	private String fFilterResourceURI;
+	private Boolean fHasRailsNature;
+
+	private String patternString;
 
 	/**
 	 * Answers whether the given element in the given viewer matches the filter pattern. This is a default
@@ -97,7 +96,33 @@ class PathFilter extends ViewerFilter
 	 */
 	public boolean isElementVisible(Viewer viewer, Object element)
 	{
+		// HACK Ignore tmp and vendor for Rails projects
+		IResource resource = (IResource) element;
+		String firstSegment = resource.getProjectRelativePath().segment(0);
+		if (firstSegment.equals("tmp") || firstSegment.equals("vendor")) //$NON-NLS-1$ //$NON-NLS-2$
+		{
+			try
+			{
+				if (hasRailsNature())
+				{
+					return false;
+				}
+			}
+			catch (CoreException e)
+			{
+				// ignore
+			}
+		}
 		return isParentMatch(viewer, element) || isLeafMatch(viewer, element);
+	}
+
+	protected boolean hasRailsNature() throws CoreException
+	{
+		if (fHasRailsNature == null)
+		{
+			fHasRailsNature = filterResource.getProject().hasNature("org.radrails.rails.core.railsnature"); //$NON-NLS-1$
+		}
+		return fHasRailsNature;
 	}
 
 	/**
@@ -139,6 +164,12 @@ class PathFilter extends ViewerFilter
 	protected boolean isParentMatch(Viewer viewer, Object element)
 	{
 		// TODO Also check if name matches the text matchers!
+
+		IResource resource = (IResource) element;
+		if (wordMatches(resource.getName()))
+		{
+			return true;
+		}
 
 		Object[] children = ((ITreeContentProvider) ((AbstractTreeViewer) viewer).getContentProvider())
 				.getChildren(element);
@@ -212,22 +243,8 @@ class PathFilter extends ViewerFilter
 		IPath path = resource.getProjectRelativePath();
 		String rawPath = path.toPortableString();
 
-		// HACK Ignore tmp and vendor for Rails projects
-		try
-		{
-			if ((rawPath.startsWith("tmp/") || rawPath.startsWith("vendor/")) //$NON-NLS-1$ //$NON-NLS-2$
-					&& resource.getProject().hasNature("org.radrails.rails.core.railsnature")) //$NON-NLS-1$
-			{
-				return false;
-			}
-		}
-		catch (CoreException e)
-		{
-			ExplorerPlugin.logError(e);
-		}
-
-		// Check if the path matches the singular/plural matchers we generated
-		if (wordMatches(resource.getName()))
+		// Check if any part of path matches regexp
+		if (wordMatches(rawPath))
 		{
 			return true;
 		}
@@ -324,7 +341,7 @@ class PathFilter extends ViewerFilter
 	 * 
 	 * @param text
 	 *            the text to match
-	 * @return boolean <code>true</code> if one of the words in text satisifes the match criteria.
+	 * @return boolean <code>true</code> if one of the words in text satisfies the match criteria.
 	 */
 	protected boolean wordMatches(String text)
 	{
@@ -333,24 +350,7 @@ class PathFilter extends ViewerFilter
 			return false;
 		}
 
-		// If the whole text matches we are all set
-		if (match(text))
-		{
-			return true;
-		}
-
-		// Otherwise check if any of the words of the text matches
-		String[] words = getWords(text);
-		for (int i = 0; i < words.length; i++)
-		{
-			String word = words[i];
-			if (match(word))
-			{
-				return true;
-			}
-		}
-
-		return false;
+		return match(text);
 	}
 
 	/**
@@ -366,7 +366,7 @@ class PathFilter extends ViewerFilter
 		{
 			return true;
 		}
-		return regexp.matcher(string).matches();
+		return regexp.matcher(string).find();
 	}
 
 	/**
@@ -376,13 +376,14 @@ class PathFilter extends ViewerFilter
 	 */
 	private void setPattern(String patternString)
 	{
+		this.patternString = patternString;
 		if (patternString == null || patternString.equals("")) //$NON-NLS-1$
 		{
 			regexp = null;
 		}
 		else
 		{
-			regexp = Pattern.compile("^(.*)?(" + patternString + "|" + Inflector.pluralize(patternString) + ")(.*)?$");
+			regexp = Pattern.compile("\\b(" + patternString + "|" + Inflector.pluralize(patternString) + ")\\b");
 		}
 	}
 
@@ -395,6 +396,7 @@ class PathFilter extends ViewerFilter
 		}
 		fFilterLocationMinusExtension = null;
 		fFilterResourceURI = null;
+		fHasRailsNature = null;
 		if (resource == null)
 		{
 			filterResource = null;
@@ -506,41 +508,8 @@ class PathFilter extends ViewerFilter
 		leafCache.clear();
 	}
 
-	/**
-	 * Take the given filter text and break it down into words using a BreakIterator.
-	 * 
-	 * @param text
-	 * @return an array of words
-	 */
-	private String[] getWords(String text)
+	public String getPattern()
 	{
-		List<String> words = new ArrayList<String>();
-		// Break the text up into words, separating based on whitespace and
-		// common punctuation.
-		// Previously used String.split(..., "\\W"), where "\W" is a regular
-		// expression (see the Javadoc for class Pattern).
-		// Need to avoid both String.split and regular expressions, in order to
-		// compile against JCL Foundation (bug 80053).
-		// Also need to do this in an NL-sensitive way. The use of BreakIterator
-		// was suggested in bug 90579.
-		BreakIterator iter = BreakIterator.getWordInstance();
-		iter.setText(text);
-		int i = iter.first();
-		while (i != java.text.BreakIterator.DONE && i < text.length())
-		{
-			int j = iter.following(i);
-			if (j == java.text.BreakIterator.DONE)
-			{
-				j = text.length();
-			}
-			// match the word
-			if (Character.isLetterOrDigit(text.charAt(i)))
-			{
-				String word = text.substring(i, j);
-				words.add(word);
-			}
-			i = j;
-		}
-		return words.toArray(new String[words.size()]);
+		return this.patternString;
 	}
 }
