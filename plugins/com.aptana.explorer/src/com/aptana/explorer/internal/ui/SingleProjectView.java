@@ -1089,7 +1089,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		return filter;
 	}
 
-	protected void hideFilterLable()
+	protected void hideFilterLabel()
 	{
 		filterLayoutData.exclude = true;
 		filterComp.setVisible(false);
@@ -1107,7 +1107,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 
 	protected void removeFilter()
 	{
-		hideFilterLable();
+		hideFilterLabel();
 	}
 
 	private void addProjectResourceListener()

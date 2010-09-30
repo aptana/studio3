@@ -37,7 +37,7 @@ package com.aptana.editor.js.contentassist.index;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -900,9 +900,9 @@ public class JSIndexReader
 	 * 
 	 * @return
 	 */
-	public Map<String, List<String>> getValues(Index index, String category)
+	public Map<String, Collection<String>> getValues(Index index, String category)
 	{
-		Map<String, List<String>> result = null;
+		Map<String, Collection<String>> result = null;
 
 		if (index != null)
 		{
@@ -914,11 +914,11 @@ public class JSIndexReader
 
 				if (items != null && items.size() > 0)
 				{
-					result = new HashMap<String, List<String>>();
+					result = new HashMap<String, Collection<String>>();
 
 					for (QueryResult item : items)
 					{
-						result.put(item.getWord(), Arrays.asList(item.getDocuments()));
+						result.put(item.getWord(), item.getDocuments());
 					}
 				}
 			}
