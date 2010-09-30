@@ -116,7 +116,7 @@ public class WebBrowserView extends ViewPart {
 	}
 	
 	public void setURL(String url) {
-		browserViewer.setUrl(url);
+		browserViewer.setURL(url);
 	}
 
 }
