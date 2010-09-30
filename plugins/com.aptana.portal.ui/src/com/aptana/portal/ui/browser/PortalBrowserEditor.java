@@ -14,14 +14,14 @@ import org.eclipse.swt.browser.TitleEvent;
 import org.eclipse.swt.browser.TitleListener;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.internal.browser.IBrowserViewerContainer;
-import org.eclipse.ui.internal.browser.WebBrowserEditor;
 
+import com.aptana.browser.parts.WebBrowserEditor;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.BrowserNotifier;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
 import com.aptana.portal.ui.dispatch.browserFunctions.DispatcherBrowserFunction;
 import com.aptana.portal.ui.internal.Portal;
+import com.aptana.swt.webkitbrowser.WebKitBrowser;
 
 /**
  * A portal browser editor. We extends the Eclipse internal WebBrowserEditor. Although not a great act, it solves the
@@ -30,7 +30,7 @@ import com.aptana.portal.ui.internal.Portal;
  * @author Shalom Gibly <sgibly@aptana.com>
  */
 @SuppressWarnings("restriction")
-public class PortalBrowserEditor extends WebBrowserEditor implements IBrowserViewerContainer
+public class PortalBrowserEditor extends WebBrowserEditor
 {
 	public static final String WEB_BROWSER_EDITOR_ID = "com.aptana.portal.ui.browser.portal"; //$NON-NLS-1$
 	private List<BrowserFunction> browserFunctions;
@@ -44,7 +44,7 @@ public class PortalBrowserEditor extends WebBrowserEditor implements IBrowserVie
 	{
 		if (url != null)
 		{
-			this.webBrowser.setURL(url.toString());
+			this.browserViewer.setURL(url.toString());
 		}
 		else
 		{
@@ -59,14 +59,14 @@ public class PortalBrowserEditor extends WebBrowserEditor implements IBrowserVie
 	 */
 	public void addDisposeListener(DisposeListener listener)
 	{
-		this.webBrowser.addDisposeListener(listener);
+		this.browserViewer.addDisposeListener(listener);
 	}
 
 	@Override
 	public void createPartControl(Composite parent)
 	{
 		super.createPartControl(parent);
-		final Browser browser = this.webBrowser.getBrowser();
+		final WebKitBrowser browser = (WebKitBrowser) this.browserViewer.getBrowserControl();
 		browser.setJavascriptEnabled(true);
 
 		// Usually, we would just listen to a location change. However, since IE does not
@@ -171,7 +171,6 @@ public class PortalBrowserEditor extends WebBrowserEditor implements IBrowserVie
 			this.browser = browser;
 		}
 
-		@Override
 		public void changed(TitleEvent event)
 		{
 			// Dispose all BrowserFunctions when the location of the browser is no longer under

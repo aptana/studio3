@@ -121,13 +121,11 @@ public abstract class InstallerOptionsDialog extends TitleAreaDialog
 		path.setText(attributes.get(INSTALL_DIR_ATTR).toString());
 		path.addKeyListener(new KeyListener()
 		{
-			@Override
 			public void keyReleased(org.eclipse.swt.events.KeyEvent e)
 			{
 				attributes.put(INSTALL_DIR_ATTR, path.getText());
 			}
 
-			@Override
 			public void keyPressed(org.eclipse.swt.events.KeyEvent e)
 			{
 				attributes.put(INSTALL_DIR_ATTR, path.getText());

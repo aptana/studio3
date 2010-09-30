@@ -101,7 +101,6 @@ public class PreferenceActionController extends AbstractActionController
 		return null;
 	}
 
-	@Override
 	public void configurationStateChanged(ConfigurationStatus status, Set<String> attributesChanged)
 	{
 		// Do nothing

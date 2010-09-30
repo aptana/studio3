@@ -94,7 +94,6 @@ public class PortalUIPlugin extends AbstractUIPlugin
 		final IProject[] projects = new IProject[1];
 		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
 		{
-			@Override
 			public void run()
 			{
 				IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();

@@ -143,7 +143,6 @@ public class RecentFilesActionController extends AbstractActionController
 		}
 	}
 
-	@Override
 	public void configurationStateChanged(ConfigurationStatus status, Set<String> attributesChanged)
 	{
 		// do nothing

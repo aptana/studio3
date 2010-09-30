@@ -118,7 +118,6 @@ public class BrowserActionController extends AbstractActionController
 		return null;
 	}
 
-	@Override
 	public void configurationStateChanged(ConfigurationStatus status, Set<String> attributesChanged)
 	{
 		// Do nothing

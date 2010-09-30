@@ -33,7 +33,6 @@ public abstract class AbstractProcessorDelegate implements IConfigurationProcess
 	 * (non-Javadoc)
 	 * @see com.aptana.configurations.processor.IConfigurationProcessorDelegate#getSupportedCommands()
 	 */
-	@Override
 	public Set<String> getSupportedCommands()
 	{
 		return Collections.unmodifiableSet(supportedCommands.keySet());
@@ -50,7 +49,6 @@ public abstract class AbstractProcessorDelegate implements IConfigurationProcess
 	 * @throws IllegalArgumentException
 	 *             In case the command type is not supported or a shell was not found
 	 */
-	@Override
 	public Object runCommand(String commandType, IPath workingDir)
 	{
 		String command = supportedCommands.get(commandType);

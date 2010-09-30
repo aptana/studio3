@@ -9,7 +9,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.mortbay.jetty.util,
  com.aptana.core;bundle-version="3.0.0",
  com.aptana.scripting
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.configurations,
  com.aptana.configurations.processor

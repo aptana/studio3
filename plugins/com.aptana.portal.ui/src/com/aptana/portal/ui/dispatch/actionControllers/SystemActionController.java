@@ -89,7 +89,6 @@ public class SystemActionController extends AbstractActionController
 	 * configurations.processor.ConfigurationStatus, java.util.Set)
 	 */
 	@SuppressWarnings("unchecked")
-	@Override
 	public void configurationStateChanged(ConfigurationStatus status, Set<String> attributesChanged)
 	{
 		// we only care status changes

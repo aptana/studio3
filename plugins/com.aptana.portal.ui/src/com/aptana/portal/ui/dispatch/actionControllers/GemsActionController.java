@@ -93,7 +93,6 @@ public class GemsActionController extends AbstractActionController
 	 * Listen to configuration status changes and notify the browser when needed.
 	 */
 	@SuppressWarnings("unchecked")
-	@Override
 	public void configurationStateChanged(ConfigurationStatus status, Set<String> attributesChanged)
 	{
 		// On the Gems controller, we only care status changes

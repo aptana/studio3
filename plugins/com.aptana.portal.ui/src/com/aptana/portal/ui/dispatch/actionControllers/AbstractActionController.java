@@ -36,7 +36,6 @@ public abstract class AbstractActionController implements IActionController, ICo
 	 * (non-Javadoc)
 	 * @see com.aptana.portal.dispatch.IActionController#getActions()
 	 */
-	@Override
 	public String[] getActions()
 	{
 		Set<String> actionNames = getActionsMap().keySet();
@@ -47,7 +46,6 @@ public abstract class AbstractActionController implements IActionController, ICo
 	 * (non-Javadoc)
 	 * @see com.aptana.portal.dispatch.IActionController#hasAction(java.lang.String)
 	 */
-	@Override
 	public boolean hasAction(String action)
 	{
 		return getActionsMap().containsKey(action);
@@ -57,7 +55,6 @@ public abstract class AbstractActionController implements IActionController, ICo
 	 * (non-Javadoc)
 	 * @see com.aptana.portal.dispatch.IActionController#invokeAction(java.lang.String, java.lang.Object[])
 	 */
-	@Override
 	public Object invokeAction(String action, Object args)
 	{
 		Method method = getActionsMap().get(action);
@@ -115,7 +112,6 @@ public abstract class AbstractActionController implements IActionController, ICo
 	 * (non-Javadoc)
 	 * @see com.aptana.portal.ui.dispatch.IActionController#getConfigurationProcessorId()
 	 */
-	@Override
 	public String getConfigurationProcessorId()
 	{
 		return configurationProcessorID;
@@ -125,7 +121,6 @@ public abstract class AbstractActionController implements IActionController, ICo
 	 * (non-Javadoc)
 	 * @see com.aptana.portal.ui.dispatch.IActionController#setConfigurationProcessorId(java.lang.String)
 	 */
-	@Override
 	public void setConfigurationProcessorId(String id)
 	{
 		configurationProcessorID = id;

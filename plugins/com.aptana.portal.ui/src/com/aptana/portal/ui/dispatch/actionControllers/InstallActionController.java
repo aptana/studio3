@@ -66,7 +66,6 @@ public class InstallActionController extends AbstractActionController
 	 * @see com.aptana.configurations.processor.IConfigurationProcessorListener#configurationStateChanged(com.aptana.
 	 * configurations.processor.ConfigurationStatus, java.util.Set)
 	 */
-	@Override
 	public void configurationStateChanged(ConfigurationStatus status, Set<String> attributesChanged)
 	{
 		// TODO - Shalom: Notify that the installation is complete?

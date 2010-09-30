@@ -37,7 +37,6 @@ public class ConsoleController extends AbstractActionController
 	{
 	}
 
-	@Override
 	public void configurationStateChanged(ConfigurationStatus status, Set<String> attributesChanged)
 	{
 	}

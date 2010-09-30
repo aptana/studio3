@@ -338,7 +338,6 @@ public class Portal
 	 */
 	private class PortalDisposeListener implements DisposeListener
 	{
-		@Override
 		public void widgetDisposed(DisposeEvent e)
 		{
 			portalBrowser = null;

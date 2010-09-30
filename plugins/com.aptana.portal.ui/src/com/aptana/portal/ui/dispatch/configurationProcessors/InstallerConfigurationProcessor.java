@@ -243,7 +243,6 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 	{
 		Display.getDefault().syncExec(new Runnable()
 		{
-			@Override
 			public void run()
 			{
 				MessageDialog.open(kind, null, title, message, SWT.NONE);

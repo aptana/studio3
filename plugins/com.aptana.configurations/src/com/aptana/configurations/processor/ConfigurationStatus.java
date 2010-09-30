@@ -247,13 +247,11 @@ public class ConfigurationStatus implements Convertible
 
 	// ################# JSON Convertible Implementation ################
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Override
 	public void fromJSON(Map map)
 	{
 		attributes.putAll(map);
 	}
 
-	@Override
 	public void toJSON(Output out)
 	{
 		for (String key : attributes.keySet())

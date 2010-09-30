@@ -18,8 +18,9 @@ Require-Bundle: org.eclipse.ui,
  org.mortbay.jetty.util,
  com.aptana.theme,
  com.aptana.explorer,
- com.aptana.core.io
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+ com.aptana.core.io,
+ com.aptana.browser
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.portal.ui,
  com.aptana.portal.ui.browser,

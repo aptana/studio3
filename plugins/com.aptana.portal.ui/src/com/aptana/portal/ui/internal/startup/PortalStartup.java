@@ -16,7 +16,6 @@ import com.aptana.portal.ui.internal.Portal;
  */
 public class PortalStartup implements IStartup
 {
-	@Override
 	public void earlyStartup()
 	{
 		Job job = new UIJob("Launching Aptana Developer Toolbox...") { //$NON-NLS-1$
