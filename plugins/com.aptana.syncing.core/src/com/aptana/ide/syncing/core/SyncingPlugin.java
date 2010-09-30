@@ -49,6 +49,12 @@ import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.core.CorePlugin;
+import com.aptana.ide.core.io.ConnectionPointType;
+import com.aptana.ide.core.io.CoreIOPlugin;
+import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.ide.core.io.IConnectionPointManager;
+import com.aptana.ide.core.io.events.ConnectionPointEvent;
+import com.aptana.ide.core.io.events.IConnectionPointListener;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -62,6 +68,38 @@ public class SyncingPlugin extends Plugin
 
 	// The shared instance
 	private static SyncingPlugin plugin;
+
+	private IConnectionPointListener connectionListener = new IConnectionPointListener()
+	{
+
+		public void connectionPointChanged(ConnectionPointEvent event)
+		{
+			IConnectionPoint connection = event.getConnectionPoint();
+			IConnectionPointManager manager = CoreIOPlugin.getConnectionPointManager();
+			ConnectionPointType type = manager.getType(connection);
+			if (type == null)
+			{
+				return;
+			}
+
+			switch (event.getKind())
+			{
+				case ConnectionPointEvent.POST_ADD:
+					ISiteConnection[] sites = getSiteConnectionManager().getSiteConnections();
+					IConnectionPoint destination;
+					String id = connection.getId();
+					for (ISiteConnection site : sites)
+					{
+						destination = site.getDestination();
+						if (destination != null && destination.getId().equals(id))
+						{
+							// the destination is changed to a new type
+							site.setDestination(connection);
+						}
+					}
+			}
+		}
+	};
 
 	/**
 	 * The constructor
@@ -128,6 +166,8 @@ public class SyncingPlugin extends Plugin
 				}
 			}
 		}
+		
+		CoreIOPlugin.getConnectionPointManager().addConnectionPointListener(connectionListener);
 	}
 
 	/*
@@ -138,6 +178,7 @@ public class SyncingPlugin extends Plugin
 	{
 		ResourcesPlugin.getWorkspace().removeSaveParticipant(this);
 		ResourcesPlugin.getWorkspace().removeSaveParticipant(CorePlugin.getDefault());
+		CoreIOPlugin.getConnectionPointManager().removeConnectionPointListener(connectionListener);
 		plugin = null;
 		super.stop(context);
 	}

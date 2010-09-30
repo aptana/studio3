@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.html.contentassist.model.ElementElement;
@@ -211,8 +212,8 @@ public class HTMLIndexReader
 
 					for (QueryResult item : items)
 					{
-						String[] paths = item.getDocuments();
-						String path = (paths != null && paths.length > 0) ? paths[0] : ""; //$NON-NLS-1$
+						Set<String> paths = item.getDocuments();
+						String path = (paths != null && !paths.isEmpty()) ? paths.iterator().next() : ""; //$NON-NLS-1$
 						try
 						{
 							URI uri = index.getRelativeDocumentPath(new URI(path));
