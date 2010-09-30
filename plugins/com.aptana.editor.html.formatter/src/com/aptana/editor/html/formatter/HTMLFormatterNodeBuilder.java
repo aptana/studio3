@@ -44,7 +44,6 @@ import com.aptana.editor.html.formatter.nodes.FormatterVoidElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
 import com.aptana.editor.html.parsing.ast.HTMLNodeTypes;
-import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.FormatterBlockNode;
@@ -80,9 +79,6 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	private static final String INLINE_TAG_CLOSING = "/>"; //$NON-NLS-1$
 
 	private FormatterDocument document;
-
-	// TODO - Take a look at http://dev.w3.org/html5/spec/Overview.html#syntax-tag-omission
-	// We might need to identify those elements and treat them a little differently in case they omit the ending tags.
 
 	/**
 	 * @param parseResult

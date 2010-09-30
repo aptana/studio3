@@ -112,7 +112,7 @@ public class AddRemoveList implements Listener
 		listViewer.setSorter(new ViewerSorter());
 
 		data = new GridData(GridData.FILL_BOTH);
-		data.grabExcessVerticalSpace = true;
+		data.heightHint = 300;
 		listViewer.getControl().setLayoutData(data);
 
 		Composite groupComponent = new Composite(control, SWT.NULL);
