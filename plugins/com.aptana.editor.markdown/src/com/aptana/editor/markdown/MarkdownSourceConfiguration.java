@@ -176,10 +176,10 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		}
 
 		// Blocks
-		SingleLineRule rule = new SingleLineRule("    ", "", new Token(BLOCK)); //$NON-NLS-1$ //$NON-NLS-2$
+		SingleLineRule rule = new SingleLineRule("    ", "", new Token(BLOCK), (char) 0, true); //$NON-NLS-1$ //$NON-NLS-2$
 		rule.setColumnConstraint(0);
 		rules.add(rule);
-		rule = new SingleLineRule("\t", "", new Token(BLOCK)); //$NON-NLS-1$ //$NON-NLS-2$
+		rule = new SingleLineRule("\t", "", new Token(BLOCK), (char) 0, true); //$NON-NLS-1$ //$NON-NLS-2$
 		rule.setColumnConstraint(0);
 		rules.add(rule);
 

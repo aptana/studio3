@@ -200,4 +200,23 @@ public class MarkdownPartitionScannerTest extends TestCase
 		assertContentType(MarkdownSourceConfiguration.QUOTE, source, 160);
 		assertContentType(MarkdownSourceConfiguration.QUOTE, source, source.length() - 1);
 	}
+
+	public void testCodeBlockWithTab()
+	{
+		String source = "\tBlock of code";
+
+		assertContentType(MarkdownSourceConfiguration.BLOCK, source, 0);
+		assertContentType(MarkdownSourceConfiguration.BLOCK, source, 1);
+		assertContentType(MarkdownSourceConfiguration.BLOCK, source, source.length() - 1);
+	}
+
+	public void testCodeBlockWith4Spaces()
+	{
+		String source = "    Block of code";
+
+		assertContentType(MarkdownSourceConfiguration.BLOCK, source, 0);
+		assertContentType(MarkdownSourceConfiguration.BLOCK, source, 1);
+		assertContentType(MarkdownSourceConfiguration.BLOCK, source, 3);
+		assertContentType(MarkdownSourceConfiguration.BLOCK, source, source.length() - 1);
+	}
 }
