@@ -67,10 +67,8 @@ public class ProjectSiteConnections extends PlatformObject implements IWorkbench
     public Object[] getChildren(Object o) {
         ISiteConnection[] sites = SiteConnectionUtils.findSitesForSource(fProject, true, true);
         List<ProjectSiteConnection> targets = new ArrayList<ProjectSiteConnection>();
-        for (int i = 0; i < sites.length; ++i) {
-        	if (sites[i].getDestination() != null) {
-        		targets.add(new ProjectSiteConnection(fProject, sites[i]));
-        	}
+        for (ISiteConnection site : sites) {
+        	targets.add(new ProjectSiteConnection(fProject, site));
         }
         return targets.toArray(new ProjectSiteConnection[targets.size()]);
     }

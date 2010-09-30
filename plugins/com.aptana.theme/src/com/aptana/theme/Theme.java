@@ -741,19 +741,7 @@ public class Theme
 	 */
 	public boolean hasEntry(String scopeSelector)
 	{
-		if (cache.containsKey(scopeSelector))
-		{
-			return true;
-		}
-		ScopeSelector selector = new ScopeSelector(scopeSelector);
-		for (ScopeSelector s : coloringRules.keySet())
-		{
-			if (selector.equals(s))
-			{
-				return true;
-			}
-		}
-		return false;
+		return coloringRules.containsKey(new ScopeSelector(scopeSelector));
 	}
 
 	public Color getForeground(String scope)
