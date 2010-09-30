@@ -4,8 +4,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.ProgressAdapter;
@@ -15,13 +13,14 @@ import org.eclipse.swt.browser.TitleListener;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 
-import com.aptana.browser.parts.WebBrowserEditor;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.BrowserNotifier;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
 import com.aptana.portal.ui.dispatch.browserFunctions.DispatcherBrowserFunction;
+import com.aptana.portal.ui.internal.BrowserFunctionWrapper;
+import com.aptana.portal.ui.internal.BrowserWrapper;
 import com.aptana.portal.ui.internal.Portal;
-import com.aptana.swt.webkitbrowser.WebKitBrowser;
+import com.aptana.portal.ui.internal.WebBrowserEditorStub;
 
 /**
  * A portal browser editor. We extends the Eclipse internal WebBrowserEditor. Although not a great act, it solves the
@@ -30,10 +29,10 @@ import com.aptana.swt.webkitbrowser.WebKitBrowser;
  * @author Shalom Gibly <sgibly@aptana.com>
  */
 @SuppressWarnings("restriction")
-public class PortalBrowserEditor extends WebBrowserEditor
+public class PortalBrowserEditor extends WebBrowserEditorStub
 {
 	public static final String WEB_BROWSER_EDITOR_ID = "com.aptana.portal.ui.browser.portal"; //$NON-NLS-1$
-	private List<BrowserFunction> browserFunctions;
+	private List<BrowserFunctionWrapper> browserFunctions;
 
 	/**
 	 * Set the URL to display in the browser.
@@ -44,7 +43,7 @@ public class PortalBrowserEditor extends WebBrowserEditor
 	{
 		if (url != null)
 		{
-			this.browserViewer.setURL(url.toString());
+			this.webBrowser.setURL(url.toString());
 		}
 		else
 		{
@@ -59,14 +58,14 @@ public class PortalBrowserEditor extends WebBrowserEditor
 	 */
 	public void addDisposeListener(DisposeListener listener)
 	{
-		this.browserViewer.addDisposeListener(listener);
+		this.webBrowser.addDisposeListener(listener);
 	}
 
 	@Override
 	public void createPartControl(Composite parent)
 	{
 		super.createPartControl(parent);
-		final WebKitBrowser browser = (WebKitBrowser) this.browserViewer.getBrowserControl();
+		final BrowserWrapper browser = new BrowserWrapper(webBrowser.getBrowser());
 		browser.setJavascriptEnabled(true);
 
 		// Usually, we would just listen to a location change. However, since IE does not
@@ -102,13 +101,12 @@ public class PortalBrowserEditor extends WebBrowserEditor
 	 * 
 	 * @param browser
 	 */
-	protected synchronized void registerBrowserFunctions(final Browser browser)
+	protected synchronized void registerBrowserFunctions(final BrowserWrapper browser)
 	{
-		browserFunctions = new ArrayList<BrowserFunction>();
+		browserFunctions = new ArrayList<BrowserFunctionWrapper>();
 		// For now, we register a single browser function that dispatch all the
 		// JavaScript requests through the browser-action-controller extensions.
-		BrowserFunction dispatcherFunction = new DispatcherBrowserFunction(browser,
-				IBrowserNotificationConstants.DISPATCH_FUNCTION_NAME);
+		BrowserFunctionWrapper dispatcherFunction = browser.createBrowserFunction(IBrowserNotificationConstants.DISPATCH_FUNCTION_NAME, new DispatcherBrowserFunction());
 		browserFunctions.add(dispatcherFunction);
 
 		boolean executionResult = browser
@@ -137,7 +135,7 @@ public class PortalBrowserEditor extends WebBrowserEditor
 	 * 
 	 * @param browser
 	 */
-	protected synchronized void refreshBrowserRegistration(Browser browser)
+	protected synchronized void refreshBrowserRegistration(BrowserWrapper browser)
 	{
 		unregisterBrowserFunctions();
 		String url = browser.getUrl();
@@ -154,7 +152,7 @@ public class PortalBrowserEditor extends WebBrowserEditor
 	{
 		if (browserFunctions != null)
 		{
-			for (BrowserFunction bf : browserFunctions)
+			for (BrowserFunctionWrapper bf : browserFunctions)
 			{
 				bf.dispose();
 			}
@@ -164,9 +162,9 @@ public class PortalBrowserEditor extends WebBrowserEditor
 
 	private class PortalTitleListener implements TitleListener
 	{
-		private final Browser browser;
+		private final BrowserWrapper browser;
 
-		public PortalTitleListener(Browser browser)
+		public PortalTitleListener(BrowserWrapper browser)
 		{
 			this.browser = browser;
 		}

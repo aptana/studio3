@@ -2,8 +2,6 @@ package com.aptana.portal.ui.dispatch.browserFunctions;
 
 import java.util.Map;
 
-import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.BrowserFunction;
 import org.mortbay.util.ajax.JSON;
 
 import com.aptana.portal.ui.PortalUIPlugin;
@@ -11,24 +9,15 @@ import com.aptana.portal.ui.dispatch.BrowserInteractionRegistry;
 import com.aptana.portal.ui.dispatch.BrowserNotifier;
 import com.aptana.portal.ui.dispatch.IActionController;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
+import com.aptana.portal.ui.internal.IBrowserFunctionHandler;
 
 /**
  * This class is the main functions dispatcher for all the registered IActionControllers.
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
-public class DispatcherBrowserFunction extends BrowserFunction
+public class DispatcherBrowserFunction implements IBrowserFunctionHandler
 {
-	/**
-	 * Constructor.
-	 * 
-	 * @param browser
-	 * @param name
-	 */
-	public DispatcherBrowserFunction(Browser browser, String name)
-	{
-		super(browser, name);
-	}
 
 	/**
 	 * This function should always get a single argument of a JSON request, which can be transformed into a {@link Map}

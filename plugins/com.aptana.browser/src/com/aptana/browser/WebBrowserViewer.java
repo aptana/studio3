@@ -224,7 +224,7 @@ public class WebBrowserViewer extends Composite {
 		return browser.setFocus();
 	}
 	
-	public Control getBrowserControl() {
+	public Control getBrowser() {
 		return browser;
 	}
 
