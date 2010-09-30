@@ -1,3 +1,5 @@
+package com.aptana.core.util;
+
 /**
  * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
