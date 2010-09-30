@@ -34,34 +34,53 @@
  */
 package com.aptana.editor.html.formatter.preferences;
 
-import org.eclipse.swt.widgets.Composite;
+import java.net.URL;
 
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
+
+import com.aptana.editor.html.formatter.HTMLFormatterConstants;
+import com.aptana.formatter.ui.FormatterModifyTabPage;
 import com.aptana.formatter.ui.IFormatterControlManager;
-import com.aptana.formatter.ui.IFormatterModifiyTabPage;
+import com.aptana.formatter.ui.IFormatterModifyDialog;
+import com.aptana.ui.util.SWTFactory;
 
 /**
- * @author Shalom
- *
+ * A formatter comments page for HTML.
+ * 
+ * @author Shalom Gibly <sgibly@aptana.com>
  */
-public class HTMLFormatterCommentsPage implements IFormatterModifiyTabPage
+public class HTMLFormatterCommentsPage extends FormatterModifyTabPage
 {
 
-	/* (non-Javadoc)
-	 * @see com.aptana.formatter.ui.IFormatterModifiyTabPage#createContents(com.aptana.formatter.ui.IFormatterControlManager, org.eclipse.swt.widgets.Composite)
+	/**
+	 * @param dialog
 	 */
-	public Composite createContents(IFormatterControlManager manager, Composite parent)
+	public HTMLFormatterCommentsPage(IFormatterModifyDialog dialog)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		super(dialog);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.formatter.ui.IFormatterModifiyTabPage#updatePreview()
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.formatter.ui.FormatterModifyTabPage#createOptions(com.aptana.formatter.ui.IFormatterControlManager,
+	 * org.eclipse.swt.widgets.Composite)
 	 */
-	public void updatePreview()
+	protected void createOptions(IFormatterControlManager manager, Composite parent)
 	{
-		// TODO Auto-generated method stub
+		Group commentWrappingGroup = SWTFactory.createGroup(parent,
+				Messages.HTMLFormatterCommentsPage_formattingGroupLabel, 2, 1, GridData.FILL_HORIZONTAL);
+		manager.createCheckbox(commentWrappingGroup, HTMLFormatterConstants.WRAP_COMMENTS,
+				Messages.HTMLFormatterCommentsPage_enableWrapping, 2);
+		manager.createNumber(commentWrappingGroup, HTMLFormatterConstants.WRAP_COMMENTS_LENGTH,
+				Messages.HTMLFormatterCommentsPage_maxLineWidth);
 
 	}
 
+	protected URL getPreviewContent()
+	{
+		return getClass().getResource("wrapping-preview.html"); //$NON-NLS-1$
+	}
 }

@@ -13,18 +13,44 @@ package com.aptana.editor.ruby.formatter.internal;
 
 import com.aptana.editor.ruby.formatter.internal.nodes.FormatterRequireNode;
 import com.aptana.formatter.FormatterContext;
+import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.nodes.IFormatterNode;
 
-public class RubyFormatterContext extends FormatterContext {
+public class RubyFormatterContext extends FormatterContext
+{
 
-	public RubyFormatterContext(int indent) {
+	public RubyFormatterContext(int indent)
+	{
 		super(indent);
 	}
 
-	protected boolean isCountable(IFormatterNode node) {
-		return node instanceof IFormatterContainerNode
-				|| node instanceof FormatterRequireNode;
+	protected boolean isCountable(IFormatterNode node)
+	{
+		return node instanceof IFormatterContainerNode || node instanceof FormatterRequireNode;
+	}
+
+	/**
+	 * Check if the char sequence starts with a '#' sign. If so, return 1. Otherwise, return 0.
+	 * 
+	 * @see IFormatterContext#getCommentStartLength(CharSequence, int)
+	 */
+	public int getCommentStartLength(CharSequence chars, int offset)
+	{
+		if (chars.length() > offset && chars.charAt(offset) == '#')
+		{
+			return 1;
+		}
+		return 0;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterContext#getWrappingCommentPrefix()
+	 */
+	public String getWrappingCommentPrefix()
+	{
+		return "# "; //$NON-NLS-1$
 	}
 
 }

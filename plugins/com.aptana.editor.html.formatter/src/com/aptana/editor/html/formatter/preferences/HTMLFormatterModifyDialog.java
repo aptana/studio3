@@ -54,15 +54,14 @@ public class HTMLFormatterModifyDialog extends FormatterModifyDialog
 	public HTMLFormatterModifyDialog(IFormatterModifyDialogOwner dialogOwner, IScriptFormatterFactory formatterFactory)
 	{
 		super(dialogOwner, formatterFactory);
-		setTitle("HTML Formatter");
+		setTitle(Messages.HTMLFormatterModifyDialog_htmlFormatterTitle);
 	}
 
 	protected void addPages()
 	{
-		addTabPage("Indentation", new HTMLFormatterIndentationTabPage(this));
-		addTabPage("New Lines", new HTMLFormatterNewLinesPage(this));
+		addTabPage(Messages.HTMLFormatterModifyDialog_intentationTabName, new HTMLFormatterIndentationTabPage(this));
+		addTabPage(Messages.HTMLFormatterModifyDialog_newLinesTabName, new HTMLFormatterNewLinesPage(this));
+		addTabPage(Messages.HTMLFormatterModifyDialog_commentsTabName, new HTMLFormatterCommentsPage(this));
 		// TODO - Add a Blank Lines tab
-		
-//		addTabPage("Comments", new HTMLFormatterCommentsPage(this));
 	}
 }

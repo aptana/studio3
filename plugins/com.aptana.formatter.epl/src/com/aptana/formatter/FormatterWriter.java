@@ -204,9 +204,9 @@ public class FormatterWriter implements IFormatterWriter
 						{
 							++begin;
 						}
-						if (begin < writer.length() && writer.charAt(begin) == '#')
+						if (begin < writer.length())
 						{
-							++begin;
+							begin += context.getCommentStartLength(writer, begin);
 						}
 						while (begin < writer.length() && FormatterUtils.isSpace(writer.charAt(begin)))
 						{
@@ -224,7 +224,10 @@ public class FormatterWriter implements IFormatterWriter
 						}
 						if (prevWordEnd > begin)
 						{
-							writer.replace(prevWordEnd, wordBegin, lineDelimiter + "# "); //$NON-NLS-1$
+							StringBuilder tempIndentBuffer = new StringBuilder();
+							indentGenerator.generateIndent(context.getIndent(), tempIndentBuffer);
+							writer.replace(prevWordEnd, wordBegin, lineDelimiter + tempIndentBuffer
+									+ context.getWrappingCommentPrefix());
 							start = prevWordEnd + lineDelimiter.length();
 							offset = calculateOffset(start);
 						}

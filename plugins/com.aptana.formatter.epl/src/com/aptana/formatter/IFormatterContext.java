@@ -13,7 +13,8 @@ package com.aptana.formatter;
 
 import com.aptana.formatter.nodes.IFormatterNode;
 
-public interface IFormatterContext {
+public interface IFormatterContext
+{
 
 	int getIndent();
 
@@ -57,4 +58,22 @@ public interface IFormatterContext {
 
 	void setWrapping(boolean value);
 
+	/**
+	 * Returns the length of the comment start in the offset position. In case there is no comment starting at the given
+	 * offset, return 0. Example: For Ruby, the comment is starting with '#', so it there is a '#' in the offset, this
+	 * method returns 1. For HTML, the comment start can be '&lt!' or '&lt!--', and in that case the return value can be
+	 * 2 or 4.
+	 * 
+	 * @param chars
+	 * @param offset
+	 * @return The comment start length. Returns zero in case a comment does not start at the given position.
+	 */
+	int getCommentStartLength(CharSequence chars, int offset);
+
+	/**
+	 * Returns a string that will be appended as a comment prefix when the formatter wrapps long comments.
+	 * 
+	 * @return A comment prefix to append when wrapping a long comment (may be empty).
+	 */
+	String getWrappingCommentPrefix();
 }
