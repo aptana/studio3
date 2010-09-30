@@ -49,6 +49,7 @@ import org.eclipse.jface.text.rules.WordRule;
 
 import com.aptana.editor.common.text.rules.ExtendedWordRule;
 import com.aptana.editor.common.text.rules.RegexpRule;
+import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.common.text.rules.WordDetector;
 
@@ -119,16 +120,31 @@ public class MarkdownScanner extends RuleBasedScanner
 		}
 	}
 
+	private IToken fLastToken;
+
 	public MarkdownScanner()
 	{
 		List<IRule> rules = new ArrayList<IRule>();
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 		rules.add(new SingleLineRule("`", "`", getToken("markup.raw.inline.markdown"), '\\')); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+
+		// Links
 		rules.add(new RegexpRule(
 				"\\[([^\\]]+?)\\](?=\\s*\\[([^\\]]+?)\\])", getToken("string.other.link.title.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$
 		rules.add(new RegexpRule(
 				"\\[([^\\]]+?)\\](?=\\s*\\(([^\\)]+?)\\))", getToken("string.other.link.title.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$
 		rules.add(new RegexpRule("\\[([^\\]]+?)\\]", getToken("constant.other.reference.link.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// Link URLs
+		rules.add(new RegexpRule("(http:/)?/[^\\)\\(\\s]+", getToken("markup.underline.link.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// Link titles
+		rules.add(new SingleLineRule("\"", "\"", getToken("string.other.link.description.title.markdown"), '\\')); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+		// Parens. Report what they are in links, add special hack in nextToken to set it to "" when it's not in the
+		// right place
+		rules.add(new SingleCharacterRule('(', getToken("punctuation.definition.metadata.markdown"))); //$NON-NLS-1$
+		rules.add(new SingleCharacterRule(')', getToken("punctuation.definition.metadata.markdown"))); //$NON-NLS-1$
 
 		// Bold
 		rules.add(new SingleLineRule("**", "**", getToken("markup.bold.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -169,5 +185,54 @@ public class MarkdownScanner extends RuleBasedScanner
 	protected IToken getToken(String tokenName)
 	{
 		return new Token(tokenName);
+	}
+
+	@Override
+	public IToken nextToken()
+	{
+		IToken token = super.nextToken();
+		// Parens are special, but only as part of links
+		if (tokenIs(token, "punctuation.definition.metadata.markdown")
+				&& !lastTokenIs("string.other.link.description.title.markdown", "string.other.link.title.markdown",
+						"markup.underline.link.markdown"))
+		{
+			token = getToken("");
+		}
+		// URLS are special, but only inside links
+		else if (tokenIs(token, "markup.underline.link.markdown"))
+		{
+			if (!lastTokenIs("punctuation.definition.metadata.markdown"))
+			{
+				token = getToken("");
+			}
+		}
+		fLastToken = token;
+		return token;
+	}
+
+	private boolean lastTokenIs(String... precedingTokens)
+	{
+		return tokenIs(fLastToken, precedingTokens);
+	}
+
+	private boolean tokenIs(IToken token, String... tokenScope)
+	{
+		if (token == null)
+		{
+			return false;
+		}
+		Object data = token.getData();
+		if (data == null)
+		{
+			return false;
+		}
+		for (String precedingToken : tokenScope)
+		{
+			if (precedingToken.equals(data))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 }

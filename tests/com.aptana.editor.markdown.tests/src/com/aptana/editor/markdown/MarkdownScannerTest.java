@@ -241,20 +241,157 @@ public class MarkdownScannerTest extends TestCase
 		assertToken(getToken(""), 19, 4);
 	}
 
-	// http://daringfireball.net/projects/markdown/syntax#link
-	// TODO Test reference (i.e. [text][ref-id], and later the def of a ref: [ref-id] )
-	// TODO Test link with title (i.e. [text](htttp://example.org "title")
-
-	public void testLink()
+	public void testLinkWithTitle()
 	{
-		String src = "[View full diff and commit history](http://github.com/paulirish/html5-boilerplate/compare/v0.9...v0.9.1)";
+		String src = "This is [an example](http://example.com/ \"Title\") inline link.";
 		IDocument document = new Document(src);
 		scanner.setRange(document, 0, src.length());
 
-		assertToken(getToken("string.other.link.title.markdown"), 0, 35); //$NON-NLS-1$
-		assertToken(getToken("punctuation.definition.link.markdown"), 35, 1); //$NON-NLS-1$
-		assertToken(getToken("markup.underline.link.markdown"), 36, 67); //$NON-NLS-1$
-		assertToken(getToken("punctuation.definition.link.markdown"), 103, 1); //$NON-NLS-1$
+		assertToken(getToken(""), 0, 4); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 4, 1);
+		assertToken(getToken(""), 5, 2); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 7, 1);
+		assertToken(getToken("string.other.link.title.markdown"), 8, 12); //$NON-NLS-1$
+		assertToken(getToken("punctuation.definition.metadata.markdown"), 20, 1); //$NON-NLS-1$
+		assertToken(getToken("markup.underline.link.markdown"), 21, 19); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 40, 1);
+		assertToken(getToken("string.other.link.description.title.markdown"), 41, 7); //$NON-NLS-1$
+		assertToken(getToken("punctuation.definition.metadata.markdown"), 48, 1); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 49, 1);
+		assertToken(getToken(""), 50, 6); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 56, 1);
+		assertToken(getToken(""), 57, 4); //$NON-NLS-1$
+		assertToken(getToken(""), 61, 1); //$NON-NLS-1$
+	}
+
+	public void testLinkWithNoTitle()
+	{
+		String src = "[This link](http://example.net/) has no title attribute.";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("string.other.link.title.markdown"), 0, 11); //$NON-NLS-1$
+		assertToken(getToken("punctuation.definition.metadata.markdown"), 11, 1); //$NON-NLS-1$
+		assertToken(getToken("markup.underline.link.markdown"), 12, 19); //$NON-NLS-1$
+		assertToken(getToken("punctuation.definition.metadata.markdown"), 31, 1); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 32, 1);
+		assertToken(getToken(""), 33, 3); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 36, 1);
+		assertToken(getToken(""), 37, 2); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 39, 1);
+		assertToken(getToken(""), 40, 5); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 45, 1);
+		assertToken(getToken(""), 46, 9); //$NON-NLS-1$
+		assertToken(getToken(""), 55, 1); //$NON-NLS-1$
+	}
+
+	public void testLinkWithNoTitleRelativeURL()
+	{
+		String src = "See my [About](/about/) page for details.";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken(""), 0, 3); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 3, 1);
+		assertToken(getToken(""), 4, 2); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 6, 1);
+		assertToken(getToken("string.other.link.title.markdown"), 7, 7); //$NON-NLS-1$
+		assertToken(getToken("punctuation.definition.metadata.markdown"), 14, 1); //$NON-NLS-1$
+		assertToken(getToken("markup.underline.link.markdown"), 15, 7); //$NON-NLS-1$
+		assertToken(getToken("punctuation.definition.metadata.markdown"), 22, 1); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 23, 1);
+		assertToken(getToken(""), 24, 4); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 28, 1);
+		assertToken(getToken(""), 29, 3); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 32, 1);
+		assertToken(getToken(""), 33, 7); //$NON-NLS-1$
+		assertToken(getToken(""), 40, 1); //$NON-NLS-1$
+	}
+
+	public void testReferenceLink()
+	{
+		String src = "This is [an example][id] reference-style link.";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken(""), 0, 4); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 4, 1);
+		assertToken(getToken(""), 5, 2); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 7, 1);
+		assertToken(getToken("string.other.link.title.markdown"), 8, 12); //$NON-NLS-1$
+		assertToken(getToken("constant.other.reference.link.markdown"), 20, 4); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 24, 1);
+		assertToken(getToken(""), 25, 9); //$NON-NLS-1$
+		assertToken(getToken(""), 34, 1); //$NON-NLS-1$
+		assertToken(getToken(""), 35, 5); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 40, 1);
+		assertToken(getToken(""), 41, 4); //$NON-NLS-1$
+	}
+
+	public void testReferenceLinkWithSpaceBetweenBrackets()
+	{
+		String src = "This is [an example] [id] reference-style link.";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken(""), 0, 4); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 4, 1);
+		assertToken(getToken(""), 5, 2); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 7, 1);
+		assertToken(getToken("string.other.link.title.markdown"), 8, 12); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 20, 1);
+		assertToken(getToken("constant.other.reference.link.markdown"), 21, 4); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 25, 1);
+		assertToken(getToken(""), 26, 9); //$NON-NLS-1$
+		assertToken(getToken(""), 35, 1); //$NON-NLS-1$
+		assertToken(getToken(""), 36, 5); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 41, 1);
+		assertToken(getToken(""), 42, 4); //$NON-NLS-1$
+	}
+
+	public void testReferenceDefinitionWithDoubleQuotes()
+	{
+		String src = "[foo]: http://example.com/  \"Optional Title Here\"";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("constant.other.reference.link.markdown"), 0, 5); //$NON-NLS-1$
+		assertToken(getToken(""), 5, 1); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 6, 1);
+		// FIXME
+		assertToken(getToken("markup.underline.link.markdown"), 7, 19); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 26, 2);
+		assertToken(getToken("string.other.link.description.title.markdown"), 28, 21); //$NON-NLS-1$
+	}
+
+	public void testReferenceDefinitionWithSingleQuotes()
+	{
+		String src = "[foo]: http://example.com/  'Optional Title Here'";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("constant.other.reference.link.markdown"), 0, 5); //$NON-NLS-1$
+		assertToken(getToken(""), 5, 1); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 6, 1);
+		// FIXME
+		assertToken(getToken("markup.underline.link.markdown"), 7, 19); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 26, 2);
+		assertToken(getToken("string.other.link.description.title.markdown"), 28, 21); //$NON-NLS-1$
+	}
+
+	public void testReferenceDefinitionWithParentheses()
+	{
+		String src = "[foo]: http://example.com/  (Optional Title Here)";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("constant.other.reference.link.markdown"), 0, 5); //$NON-NLS-1$
+		assertToken(getToken(""), 5, 1); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 6, 1);
+		// FIXME
+		assertToken(getToken("markup.underline.link.markdown"), 7, 19); //$NON-NLS-1$
+		assertToken(Token.WHITESPACE, 26, 2);
+		assertToken(getToken("string.other.link.description.title.markdown"), 28, 21); //$NON-NLS-1$
 	}
 
 	private IToken getToken(String string)
