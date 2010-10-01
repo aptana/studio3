@@ -1,11 +1,10 @@
-package com.aptana.editor.markdown;
+package com.aptana.editor.markdown.text.rules;
 
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 
-class UnnumberedListScanner extends MarkdownScanner
+public class UnnumberedListScanner extends MarkdownScanner
 {
 	private boolean fFirstToken;
 
@@ -42,9 +41,9 @@ class UnnumberedListScanner extends MarkdownScanner
 	}
 
 	@Override
-	public void setRange(IDocument document, int offset, int length)
+	protected void reset()
 	{
 		fFirstToken = true;
-		super.setRange(document, offset, length);
+		super.reset();
 	}
 }

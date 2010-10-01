@@ -63,6 +63,9 @@ import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 import com.aptana.editor.html.HTMLTagScanner;
 import com.aptana.editor.markdown.text.rules.BlockLevelRule;
 import com.aptana.editor.markdown.text.rules.HardWrapLineRule;
+import com.aptana.editor.markdown.text.rules.MarkdownHeadingScanner;
+import com.aptana.editor.markdown.text.rules.MarkdownScanner;
+import com.aptana.editor.markdown.text.rules.UnnumberedListScanner;
 
 /**
  * @author Chris Williams

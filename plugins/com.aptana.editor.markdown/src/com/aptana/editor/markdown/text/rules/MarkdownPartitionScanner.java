@@ -32,9 +32,10 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.markdown;
+package com.aptana.editor.markdown.text.rules;
 
 import com.aptana.editor.common.text.rules.SourceConfigurationPartitionScanner;
+import com.aptana.editor.markdown.MarkdownSourceConfiguration;
 
 public class MarkdownPartitionScanner extends SourceConfigurationPartitionScanner
 {

@@ -1,4 +1,4 @@
-package com.aptana.editor.markdown;
+package com.aptana.editor.markdown.text.rules;
 
 import junit.framework.TestCase;
 
@@ -9,6 +9,7 @@ import com.aptana.editor.common.ExtendedFastPartitioner;
 import com.aptana.editor.common.NullPartitionerSwitchStrategy;
 import com.aptana.editor.common.text.rules.CompositePartitionScanner;
 import com.aptana.editor.common.text.rules.NullSubPartitionScanner;
+import com.aptana.editor.markdown.MarkdownSourceConfiguration;
 
 public class MarkdownPartitionScannerTest extends TestCase
 {

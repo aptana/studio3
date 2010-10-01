@@ -3,7 +3,7 @@ package com.aptana.editor.markdown.tests;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import com.aptana.editor.markdown.MarkdownPartitionScannerTest;
+import com.aptana.editor.markdown.text.rules.MarkdownPartitionScannerTest;
 
 public class AllTests
 {

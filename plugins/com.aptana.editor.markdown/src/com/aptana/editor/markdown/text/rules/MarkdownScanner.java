@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.markdown;
+package com.aptana.editor.markdown.text.rules;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +52,6 @@ import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.common.text.rules.WordDetector;
-import com.aptana.editor.markdown.text.rules.EscapeCharacterRule;
 
 public class MarkdownScanner extends RuleBasedScanner
 {

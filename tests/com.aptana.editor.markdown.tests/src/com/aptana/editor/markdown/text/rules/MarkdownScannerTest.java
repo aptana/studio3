@@ -1,4 +1,4 @@
-package com.aptana.editor.markdown;
+package com.aptana.editor.markdown.text.rules;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
@@ -7,6 +7,8 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
+
+import com.aptana.editor.markdown.text.rules.MarkdownScanner;
 
 public class MarkdownScannerTest extends TestCase
 {

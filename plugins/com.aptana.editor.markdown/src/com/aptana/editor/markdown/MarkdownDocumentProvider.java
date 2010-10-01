@@ -41,6 +41,7 @@ import org.eclipse.jface.text.rules.FastPartitioner;
 
 import com.aptana.editor.common.CommonDocumentProvider;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.markdown.text.rules.MarkdownPartitionScanner;
 
 public class MarkdownDocumentProvider extends CommonDocumentProvider
 {
