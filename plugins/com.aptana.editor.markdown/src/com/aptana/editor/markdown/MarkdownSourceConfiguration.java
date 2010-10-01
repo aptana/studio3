@@ -41,6 +41,7 @@ import java.util.List;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
+import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
@@ -72,14 +73,15 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 	public final static String HEADING = PREFIX + "heading"; //$NON-NLS-1$
 	public final static String HEADING_1 = HEADING + ".1"; //$NON-NLS-1$
 	public final static String HEADING_2 = HEADING + ".2"; //$NON-NLS-1$
-	public final static String UNNUMBERED_LIST = PREFIX + "unnumbered.list"; //$NON-NLS-1$
+	public final static String UNNUMBERED_LIST = PREFIX + "unnumbered_list"; //$NON-NLS-1$
+	public final static String NUMBERED_LIST = PREFIX + "numbered_list"; //$NON-NLS-1$
 	public final static String SEPARATOR = PREFIX + "separator"; //$NON-NLS-1$
 	public final static String QUOTE = PREFIX + "quote"; //$NON-NLS-1$
 	public final static String BLOCK = PREFIX + "block"; //$NON-NLS-1$
 	public final static String HTML_TAG = PREFIX + "html"; //$NON-NLS-1$
 
 	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, HEADING, HEADING_1, HEADING_2,
-			UNNUMBERED_LIST, SEPARATOR, QUOTE, BLOCK, HTML_TAG };
+			UNNUMBERED_LIST, NUMBERED_LIST, SEPARATOR, QUOTE, BLOCK, HTML_TAG };
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IMarkdownConstants.CONTENT_TYPE_MARKDOWN } };
 
@@ -102,8 +104,11 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 			c.addTranslation(new QualifiedContentType(HEADING_2), new QualifiedContentType("markup.heading.2.markdown")); //$NON-NLS-1$
 			c.addTranslation(new QualifiedContentType(UNNUMBERED_LIST), new QualifiedContentType(
 					"markup.list.unnumbered.markdown")); //$NON-NLS-1$
+			c.addTranslation(new QualifiedContentType(NUMBERED_LIST), new QualifiedContentType(
+					"markup.list.numbered.markdown")); //$NON-NLS-1$
 			c.addTranslation(new QualifiedContentType(SEPARATOR), new QualifiedContentType("meta.separator.markdown")); //$NON-NLS-1$
-			c.addTranslation(new QualifiedContentType(QUOTE), new QualifiedContentType("meta.block-level.markdown", "markup.quote.markdown")); //$NON-NLS-1$ //$NON-NLS-2$
+			c.addTranslation(new QualifiedContentType(QUOTE), new QualifiedContentType(
+					"meta.block-level.markdown", "markup.quote.markdown")); //$NON-NLS-1$ //$NON-NLS-2$
 			c.addTranslation(new QualifiedContentType(BLOCK), new QualifiedContentType("markup.raw.block.markdown")); //$NON-NLS-1$
 			c.addTranslation(new QualifiedContentType(HTML_TAG), new QualifiedContentType(
 					"meta.disable-markdown", "meta.tag.block.any.html")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -138,7 +143,7 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		rules.add(new HardWrapLineRule(" >", null, new Token(QUOTE))); //$NON-NLS-1$
 		rules.add(new HardWrapLineRule("  >", null, new Token(QUOTE))); //$NON-NLS-1$
 		rules.add(new HardWrapLineRule("   >", null, new Token(QUOTE))); //$NON-NLS-1$
-		
+
 		// Separators
 		final char[] separatorChars = { '*', '-', '_' };
 		for (int sepCharIdx = 0; sepCharIdx < separatorChars.length; sepCharIdx++)
@@ -160,13 +165,20 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		tagRule.setColumnConstraint(0);
 		rules.add(tagRule);
 
-		// Lists
+		// Unnumbered Lists
 		for (int i = 0; i <= 3; i++)
 		{
 			rules.add(createListRule(i, '*'));
 			rules.add(createListRule(i, '+'));
 			rules.add(createListRule(i, '-'));
 		}
+
+		// Numbered Lists
+		for (int i = 1; i <= 100; i++)
+		{
+			rules.add(new BlockLevelRule(i + ".", null, new Token(NUMBERED_LIST))); //$NON-NLS-1$
+		}
+
 		// Headings
 		rules.add(createSetexHeadingRule('-', 2));
 		rules.add(createSetexHeadingRule('=', 1));
@@ -176,10 +188,10 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		}
 
 		// Blocks
-		SingleLineRule rule = new SingleLineRule("    ", "", new Token(BLOCK), (char) 0, true); //$NON-NLS-1$ //$NON-NLS-2$
+		SingleLineRule rule = new EndOfLineRule("    ", new Token(BLOCK)); //$NON-NLS-1$
 		rule.setColumnConstraint(0);
 		rules.add(rule);
-		rule = new SingleLineRule("\t", "", new Token(BLOCK), (char) 0, true); //$NON-NLS-1$ //$NON-NLS-2$
+		rule = new EndOfLineRule("\t", new Token(BLOCK)); //$NON-NLS-1$
 		rule.setColumnConstraint(0);
 		rules.add(rule);
 
@@ -220,11 +232,8 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		{
 			str += " ";
 		}
-		str += c;
-		str += " ";
-		SingleLineRule rule = new BlockLevelRule(str, null, new Token(UNNUMBERED_LIST));
-		rule.setColumnConstraint(0);
-		return rule;
+		str += c + " ";
+		return new BlockLevelRule(str, null, new Token(UNNUMBERED_LIST));
 	}
 
 	protected SingleLineRule createSetexHeadingRule(char c, int level)
@@ -287,9 +296,11 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
-		// FIXME For lists, we basically need to "eat" the first list char, i.e. '*'
 		reconciler.setDamager(dr, UNNUMBERED_LIST);
 		reconciler.setRepairer(dr, UNNUMBERED_LIST);
+		
+		reconciler.setDamager(dr, NUMBERED_LIST);
+		reconciler.setRepairer(dr, NUMBERED_LIST);
 
 		dr = new ThemeingDamagerRepairer(getPreProcessorScanner());
 		reconciler.setDamager(dr, HEADING);

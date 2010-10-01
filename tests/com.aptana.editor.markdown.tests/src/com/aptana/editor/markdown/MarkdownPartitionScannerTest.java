@@ -219,4 +219,14 @@ public class MarkdownPartitionScannerTest extends TestCase
 		assertContentType(MarkdownSourceConfiguration.BLOCK, source, 3);
 		assertContentType(MarkdownSourceConfiguration.BLOCK, source, source.length() - 1);
 	}
+	
+	public void testNumberedList()
+	{
+		String source = "1. First item";
+
+		assertContentType(MarkdownSourceConfiguration.NUMBERED_LIST, source, 0);
+		assertContentType(MarkdownSourceConfiguration.NUMBERED_LIST, source, 1);
+		assertContentType(MarkdownSourceConfiguration.NUMBERED_LIST, source, 3);
+		assertContentType(MarkdownSourceConfiguration.NUMBERED_LIST, source, source.length() - 1);
+	}
 }
