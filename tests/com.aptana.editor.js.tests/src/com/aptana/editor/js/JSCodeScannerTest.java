@@ -1,33 +1,20 @@
 package com.aptana.editor.js;
 
-import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
-
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
 
-public class JSCodeScannerTest extends TestCase
+import com.aptana.editor.common.tests.AbstractTokenScannerTestCase;
+
+public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 {
-	private JSCodeScanner scanner;
-
 	@Override
-	protected void setUp() throws Exception
+	protected ITokenScanner createTokenScanner()
 	{
-		super.setUp();
-		
-		scanner = new JSCodeScanner();
+		return new JSCodeScanner();
 	}
-
-	@Override
-	protected void tearDown() throws Exception
-	{
-		scanner = null;
-		
-		super.tearDown();
-	}
-
+	
 	public void testBasicTokenizing()
 	{
 		String src = "var one = 1;";
@@ -221,31 +208,5 @@ public class JSCodeScannerTest extends TestCase
 		scanner.setRange(document, 0, src.length());
 
 		assertToken(getToken("source.js"), 0, 9);
-	}
-
-	private IToken getToken(String string)
-	{
-		return new Token(string);
-	}
-
-	private void assertToken(IToken token, int offset, int length)
-	{
-		assertToken(null, token, offset, length);
-	}
-
-	private void assertToken(String msg, IToken token, int offset, int length)
-	{
-		try
-		{
-			assertEquals(token.getData(), scanner.nextToken().getData());
-			assertEquals(offset, scanner.getTokenOffset());
-			assertEquals(length, scanner.getTokenLength());
-		}
-		catch (AssertionFailedError e)
-		{
-			System.out.println(msg);
-			throw e;
-		}
-
 	}
 }

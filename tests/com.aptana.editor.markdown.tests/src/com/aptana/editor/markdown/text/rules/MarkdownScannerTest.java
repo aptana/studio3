@@ -1,34 +1,19 @@
 package com.aptana.editor.markdown.text.rules;
 
-import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
-
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
 
-import com.aptana.editor.markdown.text.rules.MarkdownScanner;
+import com.aptana.editor.common.tests.AbstractTokenScannerTestCase;
 
-public class MarkdownScannerTest extends TestCase
+public class MarkdownScannerTest extends AbstractTokenScannerTestCase
 {
-	// TODO Refactor out common code with other language's token scanner testcases!
-	private MarkdownScanner scanner;
 
 	@Override
-	protected void setUp() throws Exception
+	protected ITokenScanner createTokenScanner()
 	{
-		super.setUp();
-
-		scanner = new MarkdownScanner();
-	}
-
-	@Override
-	protected void tearDown() throws Exception
-	{
-		scanner = null;
-
-		super.tearDown();
+		return new MarkdownScanner();
 	}
 
 	public void testBasicTokenizing()
@@ -60,40 +45,36 @@ public class MarkdownScannerTest extends TestCase
 
 	public void testEscapedAsteriskIsntItalic()
 	{
-		String src = "Ain't no \\*italics\\* here";
+		String src = "Aint no \\*italics\\* here";
 		IDocument document = new Document(src);
 		scanner.setRange(document, 0, src.length());
 
-		assertToken(getToken(""), 0, 3);
-		assertToken(getToken(""), 3, 1);
-		assertToken(getToken(""), 4, 1);
-		assertToken(Token.WHITESPACE, 5, 1);
-		assertToken(getToken(""), 6, 2);
-		assertToken(Token.WHITESPACE, 8, 1);
-		assertToken(getToken("constant.character.escape.markdown"), 9, 2);
-		assertToken(getToken(""), 11, 7);
-		assertToken(getToken("constant.character.escape.markdown"), 18, 2);
-		assertToken(Token.WHITESPACE, 20, 1);
-		assertToken(getToken(""), 21, 4);
+		assertToken(getToken(""), 0, 4);
+		assertToken(Token.WHITESPACE, 4, 1);
+		assertToken(getToken(""), 5, 2);
+		assertToken(Token.WHITESPACE, 7, 1);
+		assertToken(getToken("constant.character.escape.markdown"), 8, 2);
+		assertToken(getToken(""), 10, 7);
+		assertToken(getToken("constant.character.escape.markdown"), 17, 2);
+		assertToken(Token.WHITESPACE, 19, 1);
+		assertToken(getToken(""), 20, 4);
 	}
 
 	public void testEscapedUnderscoreIsntItalic()
 	{
-		String src = "Ain't no \\_italics\\_ here";
+		String src = "Aint no \\_italics\\_ here";
 		IDocument document = new Document(src);
 		scanner.setRange(document, 0, src.length());
 
-		assertToken(getToken(""), 0, 3);
-		assertToken(getToken(""), 3, 1);
-		assertToken(getToken(""), 4, 1);
-		assertToken(Token.WHITESPACE, 5, 1);
-		assertToken(getToken(""), 6, 2);
-		assertToken(Token.WHITESPACE, 8, 1);
-		assertToken(getToken("constant.character.escape.markdown"), 9, 2);
-		assertToken(getToken(""), 11, 7);
-		assertToken(getToken("constant.character.escape.markdown"), 18, 2);
-		assertToken(Token.WHITESPACE, 20, 1);
-		assertToken(getToken(""), 21, 4);
+		assertToken(getToken(""), 0, 4);
+		assertToken(Token.WHITESPACE, 4, 1);
+		assertToken(getToken(""), 5, 2);
+		assertToken(Token.WHITESPACE, 7, 1);
+		assertToken(getToken("constant.character.escape.markdown"), 8, 2);
+		assertToken(getToken(""), 10, 7);
+		assertToken(getToken("constant.character.escape.markdown"), 17, 2);
+		assertToken(Token.WHITESPACE, 19, 1);
+		assertToken(getToken(""), 20, 4);
 	}
 
 	public void testItalicWithSpaceInside()
@@ -360,7 +341,6 @@ public class MarkdownScannerTest extends TestCase
 		assertToken(getToken("constant.other.reference.link.markdown"), 0, 5); //$NON-NLS-1$
 		assertToken(getToken(""), 5, 1); //$NON-NLS-1$
 		assertToken(Token.WHITESPACE, 6, 1);
-		// FIXME
 		assertToken(getToken("markup.underline.link.markdown"), 7, 19); //$NON-NLS-1$
 		assertToken(Token.WHITESPACE, 26, 2);
 		assertToken(getToken("string.other.link.description.title.markdown"), 28, 21); //$NON-NLS-1$
@@ -375,7 +355,6 @@ public class MarkdownScannerTest extends TestCase
 		assertToken(getToken("constant.other.reference.link.markdown"), 0, 5); //$NON-NLS-1$
 		assertToken(getToken(""), 5, 1); //$NON-NLS-1$
 		assertToken(Token.WHITESPACE, 6, 1);
-		// FIXME
 		assertToken(getToken("markup.underline.link.markdown"), 7, 19); //$NON-NLS-1$
 		assertToken(Token.WHITESPACE, 26, 2);
 		assertToken(getToken("string.other.link.description.title.markdown"), 28, 21); //$NON-NLS-1$
@@ -390,34 +369,8 @@ public class MarkdownScannerTest extends TestCase
 		assertToken(getToken("constant.other.reference.link.markdown"), 0, 5); //$NON-NLS-1$
 		assertToken(getToken(""), 5, 1); //$NON-NLS-1$
 		assertToken(Token.WHITESPACE, 6, 1);
-		// FIXME
 		assertToken(getToken("markup.underline.link.markdown"), 7, 19); //$NON-NLS-1$
 		assertToken(Token.WHITESPACE, 26, 2);
 		assertToken(getToken("string.other.link.description.title.markdown"), 28, 21); //$NON-NLS-1$
-	}
-
-	private IToken getToken(String string)
-	{
-		return new Token(string);
-	}
-
-	private void assertToken(IToken token, int offset, int length)
-	{
-		assertToken(null, token, offset, length);
-	}
-
-	private void assertToken(String msg, IToken token, int offset, int length)
-	{
-		try
-		{
-			assertEquals(token.getData(), scanner.nextToken().getData());
-			assertEquals(offset, scanner.getTokenOffset());
-			assertEquals(length, scanner.getTokenLength());
-		}
-		catch (AssertionFailedError e)
-		{
-			System.out.println(msg);
-			throw e;
-		}
 	}
 }
