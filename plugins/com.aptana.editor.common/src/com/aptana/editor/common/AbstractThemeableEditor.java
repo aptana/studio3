@@ -35,8 +35,6 @@
 package com.aptana.editor.common;
 
 import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -179,11 +177,11 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	private boolean fCursorChangeListened;
 	private SelectionChangedListener fSelectionChangedListener;
 
-  	/**
+	/**
 	 * Manages what's needed to make the find bar work.
 	 */
 	private FindBarEditorExtension fThemeableEditorFindBarExtension;
-	
+
 	/**
 	 * Manages what's needed to make the colors obey the current theme.
 	 */
@@ -205,21 +203,20 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.extensions.IThemeableEditor#getISourceViewer()
 	 */
-	public final ISourceViewer getISourceViewer() 
+	public final ISourceViewer getISourceViewer()
 	{
 		return super.getSourceViewer();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.extensions.IThemeableEditor#getIVerticalRuler()
 	 */
-	public final IVerticalRuler getIVerticalRuler() 
+	public final IVerticalRuler getIVerticalRuler()
 	{
 		return super.getVerticalRuler();
 	}
-	
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.texteditor.AbstractDecoratedTextEditor#createPartControl(org.eclipse.swt.widgets.Composite)
@@ -229,14 +226,14 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	{
 		this.fThemeableEditorColorsExtension.setParent(parent);
 		Composite findBarComposite = this.fThemeableEditorFindBarExtension.createFindBarComposite(parent);
-		Assert.isNotNull(findBarComposite); //the find bar must be the new parent.
+		Assert.isNotNull(findBarComposite); // the find bar must be the new parent.
 		super.createPartControl(findBarComposite);
 		this.fThemeableEditorFindBarExtension.createFindBar(getSourceViewer());
 		this.fThemeableEditorColorsExtension.overrideThemeColors();
 		PeerCharacterCloser.install(getSourceViewer(), getAutoClosePairCharacters());
 		fCursorChangeListened = true;
 
-		fSelectionChangedListener= new SelectionChangedListener();
+		fSelectionChangedListener = new SelectionChangedListener();
 		fSelectionChangedListener.install(getSelectionProvider());
 		fThemeListener = new PropertyChangeListener();
 		ThemePlugin.getDefault().getPreferenceStore().addPropertyChangeListener(fThemeListener);
@@ -245,10 +242,10 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		contextService.activateContext(Activator.CONTEXT_ID);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#setFocus()
-	 *
-	 * This is to workaround the Eclipse SWT bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=303677f
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#setFocus() This is to workaround the Eclipse SWT bug
+	 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=303677f
 	 */
 	@Override
 	public void setFocus()
@@ -303,9 +300,10 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		{
 			return getOutlinePage();
 		}
-		
+
 		Object adaptable = this.fThemeableEditorFindBarExtension.getFindBarDecoratorAdapter(adapter);
-		if(adaptable != null){
+		if (adaptable != null)
+		{
 			return adaptable;
 		}
 		return super.getAdapter(adapter);
@@ -325,7 +323,6 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		return new CommonOutlinePage(this, getOutlinePreferenceStore());
 	}
 
-
 	@Override
 	protected void initializeLineNumberRulerColumn(LineNumberRulerColumn rulerColumn)
 	{
@@ -338,7 +335,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	{
 		fAnnotationAccess = getAnnotationAccess();
 		fOverviewRuler = createOverviewRuler(getSharedColors());
-		
+
 		// Need to make it a projection viewer now that we have folding...
 		ISourceViewer viewer = new ProjectionViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(), styles)
 		{
@@ -346,7 +343,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			{
 				return new RulerLayout(RULER_EDITOR_GAP);
 			}
-			
+
 			@SuppressWarnings("unchecked")
 			@Override
 			public IFormattingContext createFormattingContext()
@@ -359,8 +356,11 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 					if (contentType.getPartCount() > 0)
 					{
 						String mainContentType = contentType.getParts()[0];
-						if (mainContentType.startsWith("com.aptana.contenttype.html")) {
-							mainContentType = "com.aptana.contenttype.html";
+						// We need to make sure that in case the given content type is actually a nested language in
+						// HTML, we look for the HTML formatter factory because it should be the 'Master' formatter.
+						if (mainContentType.startsWith(CommonSourceViewerConfiguration.CONTENTTYPE_HTML_PREFIX))
+						{
+							mainContentType = CommonSourceViewerConfiguration.CONTENTTYPE_HTML_PREFIX;
 						}
 						final IScriptFormatterFactory factory = ScriptFormatterManager.getSelected(mainContentType);
 						if (factory != null)
@@ -383,7 +383,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 				return context;
 			}
 		};
-		
+
 		if (viewer instanceof ITextViewerExtension)
 		{
 			// create key listener
@@ -394,11 +394,11 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 					onKeyPressed(event);
 				}
 			};
-			
+
 			// add listener to our viewer
 			((ITextViewerExtension) viewer).prependVerifyKeyListener(this.keyListener);
 		}
-		
+
 		// ensure decoration support has been created and configured.
 		getSourceViewerDecorationSupport(viewer);
 
@@ -406,7 +406,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 		return viewer;
 	}
-	
+
 	/**
 	 * onKeyPressed
 	 * 
@@ -414,18 +414,18 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	 */
 	private void onKeyPressed(VerifyEvent event)
 	{
-//		if (event.character == ' ')
-//		{
-//			// TODO: possibly popup CA for the current partition
-//			ISourceViewer viewer = this.getSourceViewer();
-//
-//			if (viewer instanceof ITextOperationTarget)
-//			{
-//				int operation = SourceViewer.CONTENTASSIST_PROPOSALS;
-//
-//				((ITextOperationTarget) viewer).doOperation(operation);
-//			}
-//		}
+		// if (event.character == ' ')
+		// {
+		// // TODO: possibly popup CA for the current partition
+		// ISourceViewer viewer = this.getSourceViewer();
+		//
+		// if (viewer instanceof ITextOperationTarget)
+		// {
+		// int operation = SourceViewer.CONTENTASSIST_PROPOSALS;
+		//
+		// ((ITextOperationTarget) viewer).doOperation(operation);
+		// }
+		// }
 	}
 
 	@Override
@@ -460,25 +460,24 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		return getPairMatchingCharacters();
 	}
 
-
-
 	@Override
 	public void dispose()
 	{
 		if (keyListener != null)
 		{
 			ISourceViewer viewer = this.getSourceViewer();
-			
+
 			if (viewer instanceof ITextViewerExtension)
 			{
 				((ITextViewerExtension) viewer).removeVerifyKeyListener(this.keyListener);
 			}
-			
+
 			keyListener = null;
 		}
-		if (fSelectionChangedListener != null)  {
+		if (fSelectionChangedListener != null)
+		{
 			fSelectionChangedListener.uninstall(getSelectionProvider());
-			fSelectionChangedListener= null;
+			fSelectionChangedListener = null;
 		}
 		if (fThemeListener != null)
 		{
@@ -490,11 +489,10 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		super.dispose();
 	}
 
-
 	@Override
 	protected void initializeEditor()
 	{
-		setPreferenceStore(new ChainedPreferenceStore(new IPreferenceStore[] { 
+		setPreferenceStore(new ChainedPreferenceStore(new IPreferenceStore[] {
 				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() }));
 		fFileService = createFileService();
 	}
@@ -641,7 +639,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	protected Object getOutlineElementAt(int caret)
 	{
 		IParseNode astNode = getASTNodeAt(caret);
-		if (astNode == null) {
+		if (astNode == null)
+		{
 			return null;
 		}
 		return fOutlinePage.getOutlineItem(astNode);

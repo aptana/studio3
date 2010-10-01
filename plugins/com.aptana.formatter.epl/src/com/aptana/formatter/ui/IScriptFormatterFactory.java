@@ -59,6 +59,8 @@ public interface IScriptFormatterFactory extends IContributedExtension
 	 *            the line delimiter to use
 	 * @param preferences
 	 *            the formatting options
+	 * @param language
+	 *            The language this formatter is going to work on
 	 */
 	IScriptFormatter createFormatter(String lineDelimiter, Map<String, String> preferences);
 
@@ -94,4 +96,19 @@ public interface IScriptFormatterFactory extends IContributedExtension
 	PreferenceKey getFormatterPreferenceKey();
 
 	IPreferenceStore getPreferenceStore();
+
+	/**
+	 * Returns the language that this formatter is formatting.<br>
+	 * For example, 'text/html'.
+	 * 
+	 * @return The language string.
+	 */
+	String getLanguage();
+
+	/**
+	 * Set the language identifier string for this formatter (e.g. text/html)
+	 * 
+	 * @param language
+	 */
+	void setLanguage(String language);
 }

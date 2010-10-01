@@ -30,6 +30,7 @@ import com.aptana.ui.preferences.PreferenceKey;
 
 public class RubyFormatterFactory extends AbstractScriptFormatterFactory
 {
+
 	private static final PreferenceKey FORMATTER_PREF_KEY = new PreferenceKey(RubyFormatterPlugin.PLUGIN_ID,
 			RubyFormatterConstants.FORMATTER_ID);
 
@@ -65,7 +66,7 @@ public class RubyFormatterFactory extends AbstractScriptFormatterFactory
 
 	public IScriptFormatter createFormatter(String lineDelimiter, Map<String, String> preferences)
 	{
-		return new RubyFormatter(lineDelimiter, preferences);
+		return new RubyFormatter(lineDelimiter, preferences, getLanguage());
 	}
 
 	public URL getPreviewContent()

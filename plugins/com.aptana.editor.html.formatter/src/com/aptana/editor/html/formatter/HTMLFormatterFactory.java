@@ -24,25 +24,20 @@ import com.aptana.ui.preferences.PreferenceKey;
  */
 public class HTMLFormatterFactory extends AbstractScriptFormatterFactory
 {
+
 	private static final PreferenceKey FORMATTER_PREF_KEY = new PreferenceKey(HTMLFormatterPlugin.PLUGIN_ID,
 			HTMLFormatterConstants.FORMATTER_ID);
 
 	private static final String FORMATTER_PREVIEW_FILE = "formatterPreview.html"; //$NON-NLS-1$
 
 	private static final String[] KEYS = {
-		// TODO - Add more...
-		HTMLFormatterConstants.FORMATTER_INDENTATION_SIZE,
-		HTMLFormatterConstants.FORMATTER_TAB_CHAR,
-		HTMLFormatterConstants.FORMATTER_TAB_SIZE,
-		HTMLFormatterConstants.WRAP_COMMENTS,
-		HTMLFormatterConstants.WRAP_COMMENTS_LENGTH,
-		HTMLFormatterConstants.INDENT_EXCLUDED_TAGS,
-		HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS,
-		HTMLFormatterConstants.LINES_AFTER_ELEMENTS,
-		HTMLFormatterConstants.LINES_AFTER_NON_HTML_ELEMENTS,
-		HTMLFormatterConstants.LINES_BEFORE_NON_HTML_ELEMENTS,
-		HTMLFormatterConstants.PRESERVED_LINES
-	};
+			// TODO - Add more...
+			HTMLFormatterConstants.FORMATTER_INDENTATION_SIZE, HTMLFormatterConstants.FORMATTER_TAB_CHAR,
+			HTMLFormatterConstants.FORMATTER_TAB_SIZE, HTMLFormatterConstants.WRAP_COMMENTS,
+			HTMLFormatterConstants.WRAP_COMMENTS_LENGTH, HTMLFormatterConstants.INDENT_EXCLUDED_TAGS,
+			HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, HTMLFormatterConstants.LINES_AFTER_ELEMENTS,
+			HTMLFormatterConstants.LINES_AFTER_NON_HTML_ELEMENTS,
+			HTMLFormatterConstants.LINES_BEFORE_NON_HTML_ELEMENTS, HTMLFormatterConstants.PRESERVED_LINES };
 
 	public PreferenceKey[] getPreferenceKeys()
 	{
@@ -57,7 +52,7 @@ public class HTMLFormatterFactory extends AbstractScriptFormatterFactory
 
 	public IScriptFormatter createFormatter(String lineSeparator, Map<String, String> preferences)
 	{
-		return new HTMLFormatter(lineSeparator, preferences);
+		return new HTMLFormatter(lineSeparator, preferences, getLanguage());
 	}
 
 	public URL getPreviewContent()

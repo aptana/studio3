@@ -25,7 +25,6 @@ import org.jrubyparser.parser.ParserResult;
 import com.aptana.editor.ruby.formatter.internal.RubyFormatterContext;
 import com.aptana.editor.ruby.formatter.internal.RubyFormatterNodeBuilder;
 import com.aptana.editor.ruby.formatter.internal.RubyFormatterNodeRewriter;
-import com.aptana.editor.ruby.parsing.IRubyParserConstants;
 import com.aptana.editor.ruby.parsing.NullParserResult;
 import com.aptana.editor.ruby.parsing.RubyParser;
 import com.aptana.editor.ruby.parsing.RubySourceParser;
@@ -57,9 +56,9 @@ public class RubyFormatter extends AbstractScriptFormatter
 
 	private final String lineDelimiter;
 
-	public RubyFormatter(String lineDelimiter, Map<String, ? extends Object> preferences)
+	public RubyFormatter(String lineDelimiter, Map<String, ? extends Object> preferences, String language)
 	{
-		super(preferences);
+		super(preferences, language);
 		this.lineDelimiter = lineDelimiter;
 	}
 
@@ -201,7 +200,7 @@ public class RubyFormatter extends AbstractScriptFormatter
 	protected RubySourceParser getSourceParser()
 	{
 		RubySourceParser sourceParser = null;
-		IParser parser = super.getParser(IRubyParserConstants.LANGUAGE);
+		IParser parser = super.getParser();
 		if (parser instanceof RubyParser)
 		{
 			sourceParser = ((RubyParser) parser).getSourceParser();

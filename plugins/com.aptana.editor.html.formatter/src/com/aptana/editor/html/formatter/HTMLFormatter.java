@@ -12,7 +12,6 @@ import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
 import com.aptana.editor.html.parsing.HTMLParseState;
-import com.aptana.editor.html.parsing.IHTMLParserConstants;
 import com.aptana.formatter.AbstractScriptFormatter;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.FormatterIndentDetector;
@@ -51,9 +50,9 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	 * 
 	 * @param preferences
 	 */
-	protected HTMLFormatter(String lineSeparator, Map<String, ? extends Object> preferences)
+	protected HTMLFormatter(String lineSeparator, Map<String, ? extends Object> preferences, String language)
 	{
-		super(preferences);
+		super(preferences, language);
 		this.lineSeparator = lineSeparator;
 	}
 
@@ -62,7 +61,7 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	 */
 	public int detectIndentationLevel(IDocument document, int offset)
 	{
-		IParser parser = getParser(IHTMLParserConstants.LANGUAGE);
+		IParser parser = getParser();
 		IParseState parseState = new HTMLParseState();
 		String source = document.get();
 		parseState.setEditState(source, null, 0, 0);
@@ -172,7 +171,7 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	public TextEdit format(String source, int offset, int length, int indentationLevel) throws FormatterException
 	{
 		String input = source.substring(offset, offset + length);
-		IParser parser = getParser(IHTMLParserConstants.LANGUAGE);
+		IParser parser = getParser();
 		IParseState parseState = new HTMLParseState();
 		parseState.setEditState(input, null, 0, 0);
 		try

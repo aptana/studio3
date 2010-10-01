@@ -37,32 +37,43 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 
 	private final Map<String, ? extends Object> preferences;
 	private boolean isSlave;
+	private String language;
 
 	/**
 	 * @param preferences
 	 */
-	protected AbstractScriptFormatter(Map<String, ? extends Object> preferences)
+	protected AbstractScriptFormatter(Map<String, ? extends Object> preferences, String language)
 	{
 		this.preferences = preferences;
+		this.language = language;
 	}
 
 	/**
-	 * Returns an {@link IParser} that is assigned to the given language.
+	 * Returns an {@link IParser} which was assigned to the language that was set on this formatter.
 	 * 
-	 * @param language
-	 *            The language identifier. For example, text/html.
 	 * @return IParser (can be null in case there is no assigned parser for the given language)
 	 */
-	protected IParser getParser(String language)
+	protected IParser getParser()
 	{
 		IParser parser = null;
-		IParserPool pool = ParserPoolFactory.getInstance().getParserPool(language);
+		IParserPool pool = ParserPoolFactory.getInstance().getParserPool(getLanguage());
 		if (pool != null)
 		{
 			parser = pool.checkOut();
 			pool.checkIn(parser);
 		}
 		return parser;
+	}
+
+	/**
+	 * Returns the language that this formatter is formatting now. The value of this language is also used when
+	 * retrieving the parser for this language.
+	 * 
+	 * @return The language this formatter is dealing with.
+	 */
+	public String getLanguage()
+	{
+		return language;
 	}
 
 	protected boolean getBoolean(String key)
