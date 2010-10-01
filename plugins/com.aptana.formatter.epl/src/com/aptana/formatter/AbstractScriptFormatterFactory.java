@@ -39,24 +39,24 @@ import com.aptana.ui.preferences.PreferenceKey;
 public abstract class AbstractScriptFormatterFactory extends ContributedExtension implements IScriptFormatterFactory
 {
 
-	private String language;
+	private String mainContentType;
 
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.formatter.ui.IScriptFormatterFactory#getLanguage()
 	 */
-	public String getLanguage()
+	public String getMainContentType()
 	{
-		return language;
+		return mainContentType;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.formatter.ui.IScriptFormatterFactory#setLanguage(java.lang.String)
 	 */
-	public void setLanguage(String language)
+	public void setMainContentType(String mainContentType)
 	{
-		this.language = language;
+		this.mainContentType = mainContentType;
 	}
 
 	protected PreferenceKey getProfilesKey()

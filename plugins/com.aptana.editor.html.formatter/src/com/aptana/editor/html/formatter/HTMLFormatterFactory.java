@@ -52,7 +52,7 @@ public class HTMLFormatterFactory extends AbstractScriptFormatterFactory
 
 	public IScriptFormatter createFormatter(String lineSeparator, Map<String, String> preferences)
 	{
-		return new HTMLFormatter(lineSeparator, preferences, getLanguage());
+		return new HTMLFormatter(lineSeparator, preferences, getMainContentType());
 	}
 
 	public URL getPreviewContent()

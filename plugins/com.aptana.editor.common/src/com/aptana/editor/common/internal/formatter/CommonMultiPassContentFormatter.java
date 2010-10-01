@@ -14,6 +14,8 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.editor.common.scripting.QualifiedContentType;
+import com.aptana.formatter.ui.IScriptFormatterFactory;
+import com.aptana.formatter.ui.ScriptFormatterManager;
 import com.aptana.formatter.ui.ScriptFormattingContextProperties;
 import com.aptana.formatter.ui.ScriptFormattingStrategy;
 
@@ -148,6 +150,7 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 					// take the last qualified content type and format it
 					// partitioners = TextUtilities.removeDocumentPartitioners(document);
 					// System.out.println(lastContentType + "(" + document.get(start, contentLength) + ')');
+					updateContex(context, lastContentType);
 					formatSlave(context, document, start, contentLength, lastContentType);
 					start = -1;
 					contentLength = 0;
@@ -160,6 +163,7 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 			{
 				// take the last qualified content type and format it
 				// partitioners = TextUtilities.removeDocumentPartitioners(document);
+				updateContex(context, lastContentType);
 				formatSlave(context, document, start, contentLength, lastContentType);
 			}
 		}
@@ -175,6 +179,21 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 		// TextUtilities.addDocumentPartitioners(document, partitioners);
 		// }
 		// }
+	}
+
+	/**
+	 * Update the fomatting context to reflect to the script formatter that should be used with the given content-type.
+	 * 
+	 * @param context
+	 * @param lastContentType
+	 */
+	private void updateContex(IFormattingContext context, String contentType)
+	{
+		IScriptFormatterFactory factory = ScriptFormatterManager.getSelected(contentType);
+		if (factory != null && context != null)
+		{
+			context.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID, factory.getId());
+		}
 	}
 
 	protected String extractContentType(QualifiedContentType qualifiedContentType)

@@ -365,6 +365,11 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 						final IScriptFormatterFactory factory = ScriptFormatterManager.getSelected(mainContentType);
 						if (factory != null)
 						{
+							// The code above might change the content type that is used to
+							// get the formatter, but we still need to save the original content-type so that the
+							// IScriptFormatter instance will handle the any required parsing by calling the right IParser.
+							factory.setMainContentType(contentType.getParts()[0]);
+							
 							AbstractThemeableEditor abstractThemeableEditor = AbstractThemeableEditor.this;
 							IResource file = (IResource) abstractThemeableEditor.getEditorInput().getAdapter(
 									IResource.class);

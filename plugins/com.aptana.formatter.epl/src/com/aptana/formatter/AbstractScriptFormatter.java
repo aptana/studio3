@@ -37,26 +37,26 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 
 	private final Map<String, ? extends Object> preferences;
 	private boolean isSlave;
-	private String language;
+	private String mainContentType;
 
 	/**
 	 * @param preferences
 	 */
-	protected AbstractScriptFormatter(Map<String, ? extends Object> preferences, String language)
+	protected AbstractScriptFormatter(Map<String, ? extends Object> preferences, String mainContentType)
 	{
 		this.preferences = preferences;
-		this.language = language;
+		this.mainContentType = mainContentType;
 	}
 
 	/**
-	 * Returns an {@link IParser} which was assigned to the language that was set on this formatter.
+	 * Returns an {@link IParser} which was assigned to the mainContentType that was set on this formatter.
 	 * 
-	 * @return IParser (can be null in case there is no assigned parser for the given language)
+	 * @return IParser (can be null in case there is no assigned parser for the given mainContentType)
 	 */
 	protected IParser getParser()
 	{
 		IParser parser = null;
-		IParserPool pool = ParserPoolFactory.getInstance().getParserPool(getLanguage());
+		IParserPool pool = ParserPoolFactory.getInstance().getParserPool(getMainContentType());
 		if (pool != null)
 		{
 			parser = pool.checkOut();
@@ -66,14 +66,14 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 	}
 
 	/**
-	 * Returns the language that this formatter is formatting now. The value of this language is also used when
-	 * retrieving the parser for this language.
+	 * Returns the main Content-Type that this formatter is formatting now. The value of this main Content-Type is
+	 * mainly used when retrieving the parser .
 	 * 
-	 * @return The language this formatter is dealing with.
+	 * @return The mainContentType this formatter is dealing with.
 	 */
-	public String getLanguage()
+	public String getMainContentType()
 	{
-		return language;
+		return mainContentType;
 	}
 
 	protected boolean getBoolean(String key)

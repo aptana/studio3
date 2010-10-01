@@ -37,6 +37,7 @@ package com.aptana.editor.html.formatter;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.html.formatter.nodes.FormatterDefaultElementNode;
 import com.aptana.editor.html.formatter.nodes.FormatterHTMLCommentNode;
 import com.aptana.editor.html.formatter.nodes.FormatterSpecialElementNode;
@@ -151,6 +152,17 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 					pushFormatterNode(elementNode);
 				}
 			}
+		}
+		else
+		{
+			// it's a node that was generated from a different language parser, such as the RHTMLParser
+			FormatterSpecialElementNode specialNode = new FormatterSpecialElementNode(document, StringUtil.EMPTY);
+			int startingOffset = node.getStartingOffset();
+			int endingOffset = node.getEndingOffset() + 1;
+			specialNode.setBegin(createTextNode(document, startingOffset, endingOffset));
+			specialNode.setEnd(createTextNode(document, endingOffset, endingOffset)); // empty end
+			push(specialNode);
+			checkedPop(specialNode, -1);
 		}
 	}
 

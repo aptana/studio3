@@ -17,6 +17,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
@@ -35,6 +36,7 @@ import com.aptana.formatter.FormatterWriter;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
+import com.aptana.formatter.ui.CodeFormatterConstants;
 import com.aptana.formatter.ui.FormatterException;
 import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.formatter.util.DumpContentException;
@@ -56,18 +58,19 @@ public class RubyFormatter extends AbstractScriptFormatter
 
 	private final String lineDelimiter;
 
-	public RubyFormatter(String lineDelimiter, Map<String, ? extends Object> preferences, String language)
+	public RubyFormatter(String lineDelimiter, Map<String, ? extends Object> preferences, String mainContentType)
 	{
-		super(preferences, language);
+		super(preferences, mainContentType);
 		this.lineDelimiter = lineDelimiter;
 	}
 
 	public int detectIndentationLevel(IDocument document, int offset)
 	{
-		final String source = document.get();
-		final ParserResult result;
 		try
 		{
+			final String source = document.get();
+			final ParserResult result;
+
 			RubySourceParser sourceParser = getSourceParser();
 			result = sourceParser.parse(source);
 			if (!(result instanceof NullParserResult))
@@ -93,7 +96,6 @@ public class RubyFormatter extends AbstractScriptFormatter
 		{
 			FormatterPlugin.logError(t);
 		}
-		// TODO keep current indent
 		return 0;
 	}
 

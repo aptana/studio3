@@ -8,6 +8,7 @@
  *
  * Contributors:
  *     xored software, Inc. - initial API and Implementation (Alex Panchenko)
+ *     Aptana Inc. - Improved support (Shalom Gibly)
  *******************************************************************************/
 package com.aptana.editor.ruby.formatter;
 
@@ -66,7 +67,7 @@ public class RubyFormatterFactory extends AbstractScriptFormatterFactory
 
 	public IScriptFormatter createFormatter(String lineDelimiter, Map<String, String> preferences)
 	{
-		return new RubyFormatter(lineDelimiter, preferences, getLanguage());
+		return new RubyFormatter(lineDelimiter, preferences, getMainContentType());
 	}
 
 	public URL getPreviewContent()

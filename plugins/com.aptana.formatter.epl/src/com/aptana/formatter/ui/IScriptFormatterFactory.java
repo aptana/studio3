@@ -98,17 +98,24 @@ public interface IScriptFormatterFactory extends IContributedExtension
 	IPreferenceStore getPreferenceStore();
 
 	/**
-	 * Returns the language that this formatter is formatting.<br>
-	 * For example, 'text/html'.
+	 * Returns the main content-type identifier string for this formatter.<br>
+	 * The main content type may be different then the content type that initiated this formatter factory. This allows
+	 * having a Master formatter, such as HTML, working with a parser that is not an HTML parser, but some other parser
+	 * that support a nested language such as ERB.
 	 * 
-	 * @return The language string.
+	 * @return The main content-type.
+	 * @see #setMainContentType(String)
 	 */
-	String getLanguage();
+	String getMainContentType();
 
 	/**
-	 * Set the language identifier string for this formatter (e.g. text/html)
+	 * Set the main content-type identifier string for this formatter.<br>
+	 * The main content type may be different then the content type that initiated this formatter factory. This allows
+	 * having a Master formatter, such as HTML, working with a parser that is not an HTML parser, but some other parser
+	 * that support a nested language such as ERB.
 	 * 
-	 * @param language
+	 * @param mainContentType
+	 * @see #getMainContentType()
 	 */
-	void setLanguage(String language);
+	void setMainContentType(String mainContentType);
 }

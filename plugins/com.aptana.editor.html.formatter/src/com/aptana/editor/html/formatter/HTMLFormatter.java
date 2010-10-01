@@ -50,9 +50,9 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	 * 
 	 * @param preferences
 	 */
-	protected HTMLFormatter(String lineSeparator, Map<String, ? extends Object> preferences, String language)
+	protected HTMLFormatter(String lineSeparator, Map<String, ? extends Object> preferences, String mainContentType)
 	{
-		super(preferences, language);
+		super(preferences, mainContentType);
 		this.lineSeparator = lineSeparator;
 	}
 
