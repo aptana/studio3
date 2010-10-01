@@ -4,6 +4,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import com.aptana.editor.markdown.text.rules.MarkdownPartitionScannerTest;
+import com.aptana.editor.markdown.text.rules.MarkdownScannerTest;
 
 public class AllTests
 {
@@ -13,6 +14,7 @@ public class AllTests
 		TestSuite suite = new TestSuite(AllTests.class.getName());
 		// $JUnit-BEGIN$
 		suite.addTestSuite(MarkdownPartitionScannerTest.class);
+		suite.addTestSuite(MarkdownScannerTest.class);
 		// $JUnit-END$
 		return suite;
 	}
