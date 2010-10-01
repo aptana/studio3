@@ -63,7 +63,7 @@ public class WebBrowserEditor extends EditorPart {
 
 	public static final String EDITOR_ID = "com.aptana.browser.editors.webbrowser"; //$NON-NLS-1$
 	
-	protected WebBrowserViewer browserViewer;
+	protected WebBrowserViewer webBrowser;
 	private int progressWorked;
 	private String initialURL;
 	private Image image;
@@ -95,8 +95,8 @@ public class WebBrowserEditor extends EditorPart {
 			initialURL = null;
 			if (wbei.getURL() != null)
 				initialURL = wbei.getURL().toExternalForm();
-			if (browserViewer != null) {
-				browserViewer.setURL(initialURL);
+			if (webBrowser != null) {
+				webBrowser.setURL(initialURL);
 				site.getWorkbenchWindow().getActivePage().activate(this);
 			}
 	
@@ -158,8 +158,8 @@ public class WebBrowserEditor extends EditorPart {
 		if (input == null || input.isToolbarLocal()) {
 			style |= WebBrowserViewer.NAVIGATION_BAR;
 		}
-		browserViewer = new WebBrowserViewer(parent, style);
-		WebKitBrowser browser = (WebKitBrowser) browserViewer.getBrowserControl();
+		webBrowser = new WebBrowserViewer(parent, style);
+		WebKitBrowser browser = (WebKitBrowser) webBrowser.getBrowser();
 		browser.addProgressListener(new ProgressListener() {
 			public void changed(ProgressEvent event) {
 				if (event.total == 0) {
@@ -186,7 +186,7 @@ public class WebBrowserEditor extends EditorPart {
 				setTitleToolTip(event.title);
 			}
 		});
-		browserViewer.setURL(initialURL);
+		webBrowser.setURL(initialURL);
 	}
 
 	/* (non-Javadoc)
@@ -194,8 +194,8 @@ public class WebBrowserEditor extends EditorPart {
 	 */
 	@Override
 	public void setFocus() {
-		if (browserViewer != null) {
-			browserViewer.setFocus();
+		if (webBrowser != null) {
+			webBrowser.setFocus();
 		}
 	}
 

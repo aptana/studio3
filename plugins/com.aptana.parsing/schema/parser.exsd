@@ -66,6 +66,13 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="content-type" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 
