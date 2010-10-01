@@ -313,7 +313,7 @@ public class FormatterWriter implements IFormatterWriter
 		}
 		else if (!lineStarted)
 		{
-			if (Character.isWhitespace(ch))
+			if (!context.isInForeignNode() && Character.isWhitespace(ch))
 			{
 				indent.append(ch);
 			}

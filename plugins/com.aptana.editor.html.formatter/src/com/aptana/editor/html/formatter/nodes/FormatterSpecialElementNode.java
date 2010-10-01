@@ -37,6 +37,7 @@ package com.aptana.editor.html.formatter.nodes;
 import com.aptana.editor.html.formatter.HTMLFormatterConstants;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.IFormatterWriter;
 
 /**
  * An HTML formatter node for special HTML element which represents a non-HTML content, such as CSS, JS etc.
@@ -53,6 +54,20 @@ public class FormatterSpecialElementNode extends FormatterDefaultElementNode
 	public FormatterSpecialElementNode(IFormatterDocument document, String element)
 	{
 		super(document, element);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode#accept(com.aptana.formatter.IFormatterContext,
+	 * com.aptana.formatter.IFormatterWriter)
+	 */
+	@Override
+	public void accept(IFormatterContext context, IFormatterWriter visitor) throws Exception
+	{
+		boolean prevValue = context.isInForeignNode();
+		context.setInForeignNode(true);
+		super.accept(context, visitor);
+		context.setInForeignNode(prevValue);
 	}
 
 	/*

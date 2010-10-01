@@ -8,6 +8,7 @@
  *
  * Contributors:
  *     xored software, Inc. - initial API and Implementation (Alex Panchenko)
+ *     Aptana, Inc. - Improved implementation (Shalom Gibly) 
  *******************************************************************************/
 package com.aptana.editor.ruby.formatter;
 
@@ -17,7 +18,6 @@ import java.util.Map;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
@@ -36,7 +36,6 @@ import com.aptana.formatter.FormatterWriter;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
-import com.aptana.formatter.ui.CodeFormatterConstants;
 import com.aptana.formatter.ui.FormatterException;
 import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.formatter.util.DumpContentException;

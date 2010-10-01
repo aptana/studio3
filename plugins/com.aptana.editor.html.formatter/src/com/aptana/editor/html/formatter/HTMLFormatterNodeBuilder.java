@@ -195,28 +195,32 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	{
 		String type = node.getName().toLowerCase();
 		FormatterBlockWithBeginEndNode formatterNode;
-		if (node.getNodeType() == HTMLNodeTypes.ELEMENT)
-		{
-			formatterNode = new FormatterDefaultElementNode(document, type);
-		}
-		else
-		{
-			formatterNode = new FormatterSpecialElementNode(document, type);
-		}
 		IRange beginNodeRange = node.getNameNode().getNameRange();
-		formatterNode.setBegin(createTextNode(document, beginNodeRange.getStartingOffset(), beginNodeRange
-				.getEndingOffset() + 1));
-		push(formatterNode);
-
-		// Recursively call this method till we are done with all the children under this node.
-		addNodes(node.getChildren());
-
-		int endOffset = node.getEndingOffset() + 1;
 		INameNode endNode = node.getEndNode();
+		int endOffset = node.getEndingOffset() + 1;
 		if (endNode != null)
 		{
 			IRange endNodeRange = endNode.getNameRange();
 			endOffset = endNodeRange.getStartingOffset();
+		}
+
+		if (node.getNodeType() == HTMLNodeTypes.ELEMENT)
+		{
+			formatterNode = new FormatterDefaultElementNode(document, type);
+			formatterNode.setBegin(createTextNode(document, beginNodeRange.getStartingOffset(), beginNodeRange
+					.getEndingOffset() + 1));
+		}
+		else
+		{
+			// It's a special (foreign) node. We set the 'begin' for this node to include its body as well.
+			formatterNode = new FormatterSpecialElementNode(document, type);
+			formatterNode.setBegin(createTextNode(document, beginNodeRange.getStartingOffset(), endOffset));
+		}
+		push(formatterNode);
+		if (node.getNodeType() == HTMLNodeTypes.ELEMENT)
+		{
+			// Recursively call this method till we are done with all the children under this node.
+			addNodes(node.getChildren());
 		}
 		checkedPop(formatterNode, endOffset);
 		formatterNode.setEnd(createTextNode(document, endOffset, node.getEndingOffset() + 1));
