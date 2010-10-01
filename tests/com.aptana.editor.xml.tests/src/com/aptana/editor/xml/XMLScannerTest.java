@@ -1,43 +1,26 @@
 package com.aptana.editor.xml;
 
-import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
-
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
 
-import com.aptana.editor.xml.XMLScanner;
+import com.aptana.editor.common.tests.AbstractTokenScannerTestCase;
 
-public class XMLScannerTest extends TestCase
+public class XMLScannerTest extends AbstractTokenScannerTestCase
 {
 
-	private XMLScanner scanner;
-
 	@Override
-	protected void setUp() throws Exception
+	protected ITokenScanner createTokenScanner()
 	{
-		super.setUp();
-		scanner = new XMLScanner()
+		return new XMLScanner()
 		{
 			protected IToken createToken(String string)
 			{
-				return getToken(string);
+				return XMLScannerTest.this.getToken(string);
 			};
 		};
-	}
-
-	protected IToken getToken(String string)
-	{
-		return new Token(string);
-	}
-
-	@Override
-	protected void tearDown() throws Exception
-	{
-		scanner = null;
-		super.tearDown();
 	}
 
 	public void testEntities()
@@ -76,25 +59,5 @@ public class XMLScannerTest extends TestCase
 		assertToken(getToken("text"), 0, 4);
 		assertToken(getToken("constant.character.entity.xml"), 4, 6);
 		assertToken(getToken("text"), 10, 4);
-	}
-
-	private void assertToken(IToken token, int offset, int length)
-	{
-		assertToken(null, token, offset, length);
-	}
-
-	private void assertToken(String msg, IToken token, int offset, int length)
-	{
-		try
-		{
-			assertEquals(token.getData(), scanner.nextToken().getData());
-			assertEquals(offset, scanner.getTokenOffset());
-			assertEquals(length, scanner.getTokenLength());
-		}
-		catch (AssertionFailedError e)
-		{
-			System.out.println(msg);
-			throw e;
-		}
 	}
 }
