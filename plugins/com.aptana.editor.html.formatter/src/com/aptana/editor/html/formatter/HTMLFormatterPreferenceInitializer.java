@@ -29,10 +29,10 @@ public class HTMLFormatterPreferenceInitializer extends AbstractPreferenceInitia
 		store.setDefault(HTMLFormatterConstants.WRAP_COMMENTS_LENGTH, 80);
 		// We add all the 'Void' html tags here as well. They should not trigger an indent increase.
 		store.setDefault(HTMLFormatterConstants.INDENT_EXCLUDED_TAGS,
-				"br,a,i,b,em,strong,h1,h2,h3,h4,h5,h6,area,base,col,command,embed,hr,img,input,keygen,link,meta,param,source,track,wbr" //$NON-NLS-1$
+				"br,a,i,b,em,strong,h1,h2,h3,h4,h5,h6,area,base,col,command,embed,hr,img,input,keygen,link,meta,param,source,track,wbr,td,th" //$NON-NLS-1$
 				.replaceAll(",", IPreferenceDelegate.PREFERECE_DELIMITER)); //$NON-NLS-1$
 		store.setDefault(HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS,
-				"a,span,i,b,em,strong,h1,h2,h3,h4,h5,h6,title,option,meta".replaceAll(",", //$NON-NLS-1$//$NON-NLS-2$
+				"a,span,i,b,em,strong,h1,h2,h3,h4,h5,h6,title,option,meta,td,th".replaceAll(",", //$NON-NLS-1$//$NON-NLS-2$
 						IPreferenceDelegate.PREFERECE_DELIMITER));
 		store.setDefault(HTMLFormatterConstants.LINES_AFTER_ELEMENTS, 0);
 		store.setDefault(HTMLFormatterConstants.LINES_AFTER_NON_HTML_ELEMENTS, 1);
