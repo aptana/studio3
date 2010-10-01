@@ -104,15 +104,29 @@ public class SyncingUIPlugin extends AbstractUIPlugin {
         public void connectionPointChanged(ConnectionPointEvent event) {
             IConnectionPoint connectionPoint = event.getConnectionPoint();
             switch (event.getKind()) {
+			case ConnectionPointEvent.POST_ADD:
+				ISiteConnection[] sites = SyncingPlugin.getSiteConnectionManager().getSiteConnections();
+				IConnectionPoint source, destination;
+				String id = connectionPoint.getId();
+				for (ISiteConnection site : sites) {
+					source = site.getSource();
+					if (source != null && source.getId().equals(id)) {
+						// the source is changed to a new type
+						site.setSource(connectionPoint);
+					}
+					destination = site.getDestination();
+					if (destination != null && destination.getId().equals(id)) {
+						// the destination is changed to a new type
+						site.setDestination(connectionPoint);
+						refreshProjectSiteConnection(site);
+					}
+				}
+				break;
             case ConnectionPointEvent.POST_DELETE:
-                // check if any site connection has the deleted connection point as either source or destination
+                // check if any site connection has the deleted connection point as the destination
                 ISiteConnection[] siteConnections = SyncingPlugin.getSiteConnectionManager().getSiteConnections();
                 for (ISiteConnection siteConnection : siteConnections) {
-                    if (siteConnection.getSource() == connectionPoint) {
-                        siteConnection.setSource(null);
-                    }
                     if (siteConnection.getDestination() == connectionPoint) {
-                        siteConnection.setDestination(null);
                         refreshProjectSiteConnection(siteConnection);
                     }
                 }

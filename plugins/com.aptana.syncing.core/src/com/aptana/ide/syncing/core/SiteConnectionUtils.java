@@ -44,6 +44,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 
+import com.aptana.ide.core.io.ConnectionPointUtils;
 import com.aptana.ide.core.io.IConnectionPoint;
 
 /**
@@ -138,7 +139,11 @@ public final class SiteConnectionUtils {
 					if (connectionRoot != null) {
 						if (connectionRoot.equals(resource) || (!strict && contains(connectionRoot, resource))
 								|| (includeChildren && contains(resource, connectionRoot))) {
-							list.add(i);
+							IConnectionPoint destination = i.getDestination();
+							if (destination != null
+									&& ConnectionPointUtils.findConnectionPoint(destination.getRootURI()) != null) {
+								list.add(i);
+							}
 						}
 					}
 				}
@@ -154,7 +159,11 @@ public final class SiteConnectionUtils {
 							if (root != null) {
 								if (root.equals(fileStore) || (!strict && root.isParentOf(fileStore))
 										|| (includeChildren && fileStore.isParentOf(root))) {
-									list.add(i);
+									IConnectionPoint destination = i.getDestination();
+									if (destination != null
+											&& ConnectionPointUtils.findConnectionPoint(destination.getRootURI()) != null) {
+										list.add(i);
+									}
 								}
 							}
 						} catch (CoreException ignore) {

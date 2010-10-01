@@ -163,6 +163,7 @@ public class HTMLParser implements IParser
 		if (fCurrentElement != null)
 		{
 			HTMLSpecialNode node = new HTMLSpecialNode(startTag, nested, startTag.getStart(), fCurrentSymbol.getEnd());
+			node.setEndNode(fCurrentSymbol.getStart(), fCurrentSymbol.getEnd());
 			parseAttribute(node, startTag.value.toString());
 			fCurrentElement.addChild(node);
 		}

@@ -63,10 +63,11 @@ public class WebBrowserEditor extends EditorPart {
 
 	public static final String EDITOR_ID = "com.aptana.browser.editors.webbrowser"; //$NON-NLS-1$
 	
-	private WebBrowserViewer browserViewer;
+	protected WebBrowserViewer webBrowser;
 	private int progressWorked;
 	private String initialURL;
 	private Image image;
+	private boolean disposed;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
@@ -94,8 +95,8 @@ public class WebBrowserEditor extends EditorPart {
 			initialURL = null;
 			if (wbei.getURL() != null)
 				initialURL = wbei.getURL().toExternalForm();
-			if (browserViewer != null) {
-				browserViewer.setUrl(initialURL);
+			if (webBrowser != null) {
+				webBrowser.setURL(initialURL);
 				site.getWorkbenchWindow().getActivePage().activate(this);
 			}
 	
@@ -121,8 +122,13 @@ public class WebBrowserEditor extends EditorPart {
 			image = null;
 		}
 		super.dispose();
+		disposed = true;
 	}
 
+	public boolean isDisposed() {
+		return disposed;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.EditorPart#isDirty()
 	 */
@@ -152,8 +158,8 @@ public class WebBrowserEditor extends EditorPart {
 		if (input == null || input.isToolbarLocal()) {
 			style |= WebBrowserViewer.NAVIGATION_BAR;
 		}
-		browserViewer = new WebBrowserViewer(parent, style);
-		WebKitBrowser browser = (WebKitBrowser) browserViewer.getBrowserControl();
+		webBrowser = new WebBrowserViewer(parent, style);
+		WebKitBrowser browser = (WebKitBrowser) webBrowser.getBrowser();
 		browser.addProgressListener(new ProgressListener() {
 			public void changed(ProgressEvent event) {
 				if (event.total == 0) {
@@ -180,7 +186,7 @@ public class WebBrowserEditor extends EditorPart {
 				setTitleToolTip(event.title);
 			}
 		});
-		browserViewer.setUrl(initialURL);
+		webBrowser.setURL(initialURL);
 	}
 
 	/* (non-Javadoc)
@@ -188,8 +194,8 @@ public class WebBrowserEditor extends EditorPart {
 	 */
 	@Override
 	public void setFocus() {
-		if (browserViewer != null) {
-			browserViewer.setFocus();
+		if (webBrowser != null) {
+			webBrowser.setFocus();
 		}
 	}
 

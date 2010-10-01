@@ -64,7 +64,7 @@ public class WebBrowserView extends ViewPart {
 	@Override
 	public void createPartControl(Composite parent) {
 		browserViewer = new WebBrowserViewer(parent, WebBrowserViewer.NAVIGATION_BAR);
-		WebKitBrowser browser = (WebKitBrowser) browserViewer.getBrowserControl();
+		WebKitBrowser browser = (WebKitBrowser) browserViewer.getBrowser();
 		browser.addProgressListener(new ProgressListener() {
 			public void changed(ProgressEvent event) {
 				if (event.total == 0) {
@@ -116,7 +116,7 @@ public class WebBrowserView extends ViewPart {
 	}
 	
 	public void setURL(String url) {
-		browserViewer.setUrl(url);
+		browserViewer.setURL(url);
 	}
 
 }

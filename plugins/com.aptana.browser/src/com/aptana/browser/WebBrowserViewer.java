@@ -136,7 +136,7 @@ public class WebBrowserViewer extends Composite {
 
 		urlCombo.addListener(SWT.DefaultSelection, new Listener() {
             public void handleEvent(Event e) {
-                setUrl(urlCombo.getText());
+                setURL(urlCombo.getText());
             }
         });
 
@@ -224,7 +224,7 @@ public class WebBrowserViewer extends Composite {
 		return browser.setFocus();
 	}
 	
-	public Control getBrowserControl() {
+	public Control getBrowser() {
 		return browser;
 	}
 
@@ -244,7 +244,7 @@ public class WebBrowserViewer extends Composite {
 	 * @return
 	 * @see com.aptana.swt.webkitbrowser.WebKitBrowser#setUrl(java.lang.String, java.lang.String, java.lang.String[])
 	 */
-	public boolean setUrl(String url, String postData, String[] headers) {
+	public boolean setURL(String url, String postData, String[] headers) {
 		return browser.setUrl(url, postData, headers);
 	}
 
@@ -253,7 +253,7 @@ public class WebBrowserViewer extends Composite {
 	 * @return
 	 * @see com.aptana.swt.webkitbrowser.WebKitBrowser#setUrl(java.lang.String)
 	 */
-	public boolean setUrl(String url) {
+	public boolean setURL(String url) {
 		return browser.setUrl(url);
 	}
 
