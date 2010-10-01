@@ -43,7 +43,7 @@ import com.aptana.editor.common.CommonDocumentProvider;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.markdown.text.rules.MarkdownPartitionScanner;
 
-public class MarkdownDocumentProvider extends CommonDocumentProvider
+class MarkdownDocumentProvider extends CommonDocumentProvider
 {
 
 	@Override

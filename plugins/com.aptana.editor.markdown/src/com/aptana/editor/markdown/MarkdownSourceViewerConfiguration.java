@@ -44,7 +44,7 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
 
-public class MarkdownSourceViewerConfiguration extends CommonSourceViewerConfiguration
+class MarkdownSourceViewerConfiguration extends CommonSourceViewerConfiguration
 {
 
 	public MarkdownSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor)
