@@ -359,6 +359,9 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 					if (contentType.getPartCount() > 0)
 					{
 						String mainContentType = contentType.getParts()[0];
+						if (mainContentType.startsWith("com.aptana.contenttype.html")) {
+							mainContentType = "com.aptana.contenttype.html";
+						}
 						final IScriptFormatterFactory factory = ScriptFormatterManager.getSelected(mainContentType);
 						if (factory != null)
 						{

@@ -12,7 +12,6 @@ import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
 import com.aptana.editor.html.parsing.HTMLParseState;
-import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.editor.html.parsing.IHTMLParserConstants;
 import com.aptana.formatter.AbstractScriptFormatter;
 import com.aptana.formatter.FormatterDocument;
@@ -28,8 +27,6 @@ import com.aptana.formatter.ui.IScriptFormatter;
 import com.aptana.formatter.util.DumpContentException;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
-import com.aptana.parsing.IParserPool;
-import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.ui.preferences.IPreferenceDelegate;
 
@@ -65,7 +62,7 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	 */
 	public int detectIndentationLevel(IDocument document, int offset)
 	{
-		HTMLParser parser = getParser();
+		IParser parser = getParser(IHTMLParserConstants.LANGUAGE);
 		IParseState parseState = new HTMLParseState();
 		String source = document.get();
 		parseState.setEditState(source, null, 0, 0);
@@ -175,7 +172,7 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	public TextEdit format(String source, int offset, int length, int indentationLevel) throws FormatterException
 	{
 		String input = source.substring(offset, offset + length);
-		HTMLParser parser = getParser();
+		IParser parser = getParser(IHTMLParserConstants.LANGUAGE);
 		IParseState parseState = new HTMLParseState();
 		parseState.setEditState(input, null, 0, 0);
 		try
@@ -272,29 +269,6 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 			FormatterPlugin.logError(e);
 			return null;
 		}
-	}
-
-	/**
-	 * @return HTMLParser
-	 */
-	private HTMLParser getParser()
-	{
-		HTMLParser htmlParser = null;
-		IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IHTMLParserConstants.LANGUAGE);
-		if (pool != null)
-		{
-			IParser parser = pool.checkOut();
-			if (parser instanceof HTMLParser)
-			{
-				htmlParser = (HTMLParser) parser;
-			}
-			pool.checkIn(parser);
-		}
-		if (htmlParser == null)
-		{
-			htmlParser = new HTMLParser();
-		}
-		return htmlParser;
 	}
 
 	private FormatterDocument createFormatterDocument(String input)

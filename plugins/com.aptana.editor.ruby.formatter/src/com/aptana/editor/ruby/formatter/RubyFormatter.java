@@ -40,8 +40,6 @@ import com.aptana.formatter.ui.FormatterException;
 import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.formatter.util.DumpContentException;
 import com.aptana.parsing.IParser;
-import com.aptana.parsing.IParserPool;
-import com.aptana.parsing.ParserPoolFactory;
 
 public class RubyFormatter extends AbstractScriptFormatter
 {
@@ -200,18 +198,13 @@ public class RubyFormatter extends AbstractScriptFormatter
 	/**
 	 * @return RubySourceParser
 	 */
-	private RubySourceParser getSourceParser()
+	protected RubySourceParser getSourceParser()
 	{
 		RubySourceParser sourceParser = null;
-		IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IRubyParserConstants.LANGUAGE);
-		if (pool != null)
+		IParser parser = super.getParser(IRubyParserConstants.LANGUAGE);
+		if (parser instanceof RubyParser)
 		{
-			IParser parser = pool.checkOut();
-			if (parser instanceof RubyParser)
-			{
-				sourceParser = ((RubyParser) parser).getSourceParser();
-			}
-			pool.checkIn(parser);
+			sourceParser = ((RubyParser) parser).getSourceParser();
 		}
 		if (sourceParser == null)
 		{

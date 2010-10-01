@@ -25,6 +25,9 @@ import com.aptana.formatter.ui.CodeFormatterConstants;
 import com.aptana.formatter.ui.IScriptFormatter;
 import com.aptana.formatter.ui.internal.FormatterIndentGenerator;
 import com.aptana.formatter.ui.internal.FormatterMixedIndentGenerator;
+import com.aptana.parsing.IParser;
+import com.aptana.parsing.IParserPool;
+import com.aptana.parsing.ParserPoolFactory;
 
 /**
  * Abstract base class for the {@link IScriptFormatter} implementations.
@@ -41,6 +44,25 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 	protected AbstractScriptFormatter(Map<String, ? extends Object> preferences)
 	{
 		this.preferences = preferences;
+	}
+
+	/**
+	 * Returns an {@link IParser} that is assigned to the given language.
+	 * 
+	 * @param language
+	 *            The language identifier. For example, text/html.
+	 * @return IParser (can be null in case there is no assigned parser for the given language)
+	 */
+	protected IParser getParser(String language)
+	{
+		IParser parser = null;
+		IParserPool pool = ParserPoolFactory.getInstance().getParserPool(language);
+		if (pool != null)
+		{
+			parser = pool.checkOut();
+			pool.checkIn(parser);
+		}
+		return parser;
 	}
 
 	protected boolean getBoolean(String key)
