@@ -61,6 +61,8 @@ import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.TagRule;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 import com.aptana.editor.html.HTMLTagScanner;
+import com.aptana.editor.markdown.text.rules.BlockLevelRule;
+import com.aptana.editor.markdown.text.rules.HardWrapLineRule;
 
 /**
  * @author Chris Williams
@@ -296,11 +298,12 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
-		reconciler.setDamager(dr, UNNUMBERED_LIST);
-		reconciler.setRepairer(dr, UNNUMBERED_LIST);
-		
 		reconciler.setDamager(dr, NUMBERED_LIST);
 		reconciler.setRepairer(dr, NUMBERED_LIST);
+
+		dr = new ThemeingDamagerRepairer(new UnnumberedListScanner());
+		reconciler.setDamager(dr, UNNUMBERED_LIST);
+		reconciler.setRepairer(dr, UNNUMBERED_LIST);
 
 		dr = new ThemeingDamagerRepairer(getPreProcessorScanner());
 		reconciler.setDamager(dr, HEADING);

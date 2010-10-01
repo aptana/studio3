@@ -1,4 +1,4 @@
-package com.aptana.editor.markdown;
+package com.aptana.editor.markdown.text.rules;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -7,7 +7,7 @@ import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.SingleLineRule;
 
-public class BlockLevelRule extends SingleLineRule
+public class HardWrapLineRule extends SingleLineRule
 {
 	/**
 	 * Comparator that orders <code>char[]</code> in decreasing array lengths.
@@ -32,7 +32,7 @@ public class BlockLevelRule extends SingleLineRule
 	private char[][] fSortedLineDelimiters;
 	private char[][] fLineDelimiters;
 
-	public BlockLevelRule(String startSequence, String endSequence, IToken token)
+	public HardWrapLineRule(String startSequence, String endSequence, IToken token)
 	{
 		super(startSequence, endSequence, token, (char) 0, true);
 		setColumnConstraint(0);
@@ -102,9 +102,9 @@ public class BlockLevelRule extends SingleLineRule
 						}
 						// Check if next char is space/tab
 						c = scanner.read();
-						if (c == ' ' || c == '\t')
+						if (!Character.isWhitespace(c))
 						{
-							// Next line is indented, say we haven't hit the end yet!
+							// Next line is not indented, say we haven't hit the end yet!
 							break;
 						}
 

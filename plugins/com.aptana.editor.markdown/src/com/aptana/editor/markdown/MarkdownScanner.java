@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.IWordDetector;
@@ -49,78 +48,14 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
-import com.aptana.editor.common.text.rules.ExtendedWordRule;
 import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.common.text.rules.WordDetector;
+import com.aptana.editor.markdown.text.rules.EscapeCharacterRule;
 
 public class MarkdownScanner extends RuleBasedScanner
 {
-
-	private final class EscapeCharacterRule extends ExtendedWordRule
-	{
-		private EscapeCharacterRule(IToken defaultToken)
-		{
-			super(new EscapeCharacterDetector(), defaultToken, false);
-		}
-
-		@Override
-		protected boolean wordOK(String word, ICharacterScanner scanner)
-		{
-			if (word.length() != 2)
-			{
-				return false;
-			}
-			char c = word.charAt(1);
-			switch (c)
-			{
-				case '\\':
-				case '`':
-				case '*':
-				case '_':
-				case '{':
-				case '}':
-				case '[':
-				case ']':
-				case '(':
-				case ')':
-				case '#':
-				case '+':
-				case '-':
-				case '.':
-				case '!':
-					return true;
-				default:
-					return false;
-			}
-		}
-	}
-
-	private final class EscapeCharacterDetector implements IWordDetector
-	{
-		boolean toggle = false;
-
-		public boolean isWordStart(char c)
-		{
-			if (c == '\\')
-			{
-				toggle = true;
-				return true;
-			}
-			return false;
-		}
-
-		public boolean isWordPart(char c)
-		{
-			if (toggle)
-			{
-				toggle = false;
-				return true;
-			}
-			return false;
-		}
-	}
 
 	private IToken fLastToken;
 	private boolean nextMayBeLink;
@@ -145,7 +80,8 @@ public class MarkdownScanner extends RuleBasedScanner
 
 		// Link titles
 		rules.add(new PatternRule("\"", "\"", getToken("string.other.link.description.title.markdown"), '\\', false)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		rules.add(new PatternRule("'", "'", getToken("string.other.link.description.title.markdown"), '\\', false, false)); //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$
+		rules.add(new PatternRule(
+				"'", "'", getToken("string.other.link.description.title.markdown"), '\\', false, false)); //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$
 
 		// Parens. Report what they are in links, add special hack in nextToken to set it to "" when it's not in the
 		// right place
