@@ -12,17 +12,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.editor.js.Activator;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
 
-public class JSParserPerformanceTest extends TestCase
+public class JSParserPerformanceTest extends PerformanceTestCase
 {
 	/**
 	 * main
@@ -163,7 +162,8 @@ public class JSParserPerformanceTest extends TestCase
 	 */
 	private String getSource(String resourceName) throws IOException
 	{
-		InputStream stream = FileLocator.openStream(Platform.getBundle(Activator.PLUGIN_ID), new Path(resourceName), false);
+		InputStream stream = FileLocator.openStream(Platform.getBundle(Activator.PLUGIN_ID), new Path(resourceName),
+				false);
 
 		return getSource(stream);
 	}
@@ -175,6 +175,7 @@ public class JSParserPerformanceTest extends TestCase
 	@Override
 	protected void setUp() throws Exception
 	{
+		super.setUp();
 		fParser = new JSParser();
 	}
 
@@ -186,6 +187,7 @@ public class JSParserPerformanceTest extends TestCase
 	protected void tearDown() throws Exception
 	{
 		fParser = null;
+		super.tearDown();
 	}
 
 	/**
@@ -195,7 +197,7 @@ public class JSParserPerformanceTest extends TestCase
 	 */
 	public void testDojo() throws Exception
 	{
-		timeParse("performance/dojo.js.uncompressed.js");
+		timeParse("performance/dojo.js.uncompressed.js", 3500);
 	}
 
 	/**
@@ -215,7 +217,7 @@ public class JSParserPerformanceTest extends TestCase
 	 */
 	public void testTiMobile() throws Exception
 	{
-		timeParse("performance/timobile.js");
+		timeParse("performance/timobile.js", 125);
 	}
 
 	/**
@@ -225,7 +227,7 @@ public class JSParserPerformanceTest extends TestCase
 	 */
 	public void testTinyMce() throws Exception
 	{
-		timeParse("performance/tiny_mce.js");
+		timeParse("performance/tiny_mce.js", 2850);
 	}
 
 	/**
@@ -235,6 +237,7 @@ public class JSParserPerformanceTest extends TestCase
 	 */
 	public void testJaxerFiles() throws Exception
 	{
+		// FIXME This doesn't work right, because it commits per file and we need to really batch them all together, or break each into it's own test
 		timeParse("performance/jaxer/11.2.2-1-n.js");
 		timeParse("performance/jaxer/15.10.6.2-2.js");
 		timeParse("performance/jaxer/15.5.4.7-2.js");
@@ -296,7 +299,7 @@ public class JSParserPerformanceTest extends TestCase
 		timeParse("performance/jaxer/xpath.js");
 		timeParse("performance/jaxer/xslt_script.js");
 	}
-	
+
 	/**
 	 * timeParse
 	 * 
@@ -318,6 +321,18 @@ public class JSParserPerformanceTest extends TestCase
 	{
 		this.timeParse(resourceName, getSource(resourceName));
 	}
+	
+	/**
+	 * time
+	 * 
+	 * @param resourceName
+	 * @param numRuns
+	 * @throws Exception
+	 */
+	protected void timeParse(String resourceName, int numRuns) throws Exception
+	{
+		this.timeParse(resourceName, getSource(resourceName), numRuns);
+	}
 
 	/**
 	 * time
@@ -327,7 +342,7 @@ public class JSParserPerformanceTest extends TestCase
 	 */
 	protected void timeParse(String name, String source) throws Exception
 	{
-		this.timeParse(name, source, 5);
+		this.timeParse(name, source, 6400);
 	}
 
 	/**
@@ -342,11 +357,9 @@ public class JSParserPerformanceTest extends TestCase
 		IParseState parseState = new ParseState();
 		parseState.setEditState(src, src, 0, 0);
 
-		// start timing
-		long start = System.currentTimeMillis();
-
 		for (int i = 0; i < numRuns; i++)
 		{
+			startMeasuring();
 			try
 			{
 				fParser.parse(parseState);
@@ -355,12 +368,10 @@ public class JSParserPerformanceTest extends TestCase
 			{
 				fail(e.getMessage());
 			}
+			stopMeasuring();
 		}
 
-		// get time difference
-		long diff = System.currentTimeMillis() - start;
-
-		// show results
-		System.out.println(String.format("parse: %5dms: %s", (diff / numRuns), resourceName));
+		commitMeasurements();
+		assertPerformance();
 	}
 }

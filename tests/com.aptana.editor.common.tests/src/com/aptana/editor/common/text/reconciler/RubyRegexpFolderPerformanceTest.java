@@ -6,20 +6,19 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
+import org.eclipse.test.performance.PerformanceTestCase;
 import org.jruby.Ruby;
 import org.jruby.RubyRegexp;
 
-public class RubyRegexpFolderPerformanceTest extends TestCase
+public class RubyRegexpFolderPerformanceTest extends PerformanceTestCase
 {
 
-	public void testTime() throws Exception
+	public void testYUICSSFolding() throws Exception
 	{
 		Ruby runtime = Ruby.newInstance();
 		final RubyRegexp endFolding = RubyRegexp.newRegexp(runtime, "(?<!\\*)\\*\\*\\/|^\\s*\\}", 0);
@@ -50,16 +49,16 @@ public class RubyRegexpFolderPerformanceTest extends TestCase
 			}
 		};
 
-		long start = System.currentTimeMillis();
-		final int runs = 1000;
+		// Now do the work!
+		final int runs = 6400;
 		for (int i = 0; i < runs; i++)
 		{
+			startMeasuring();
 			folder.emitFoldingRegions(positions, new NullProgressMonitor());
+			stopMeasuring();
 		}
-		long end = System.currentTimeMillis();
-		long diff = end - start;
-		double avg = (double) diff / (double) runs;
-		System.out.println("Took " + diff + "ms for " + runs + " runs. Avg: " + avg);
+		commitMeasurements();
+		assertPerformance();
 	}
 
 	protected static String readFile(String fileName) throws IOException

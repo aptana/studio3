@@ -5,11 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
@@ -21,7 +20,7 @@ import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
 
-public class JSIndexingPerformanceTest extends TestCase
+public class JSIndexingPerformanceTest extends PerformanceTestCase
 {
 	public class Indexer extends JSFileIndexingParticipant
 	{
@@ -392,11 +391,9 @@ public class JSIndexingPerformanceTest extends TestCase
 			{
 				Indexer indexer = new Indexer();
 
-				// start timing
-				long start = System.nanoTime();
-
 				for (int i = 0; i < numRuns; i++)
 				{
+					startMeasuring();
 					URI indexURI = this.getIndexURI();
 					
 					if (indexURI != null)
@@ -405,14 +402,10 @@ public class JSIndexingPerformanceTest extends TestCase
 					}
 					
 					indexer.indexTree(this.getIndex(), (JSParseRootNode) root, this.getLocation());
+					stopMeasuring();
 				}
-
-				// get time difference
-				long diff = System.nanoTime() - start;
-				double seconds = ((double) diff / numRuns) / 1e9;
-
-				// show results
-				System.out.println(String.format("index: %12.9fs: %s", seconds, resourceName));
+				commitMeasurements();
+				assertPerformance();
 			}
 			else
 			{
