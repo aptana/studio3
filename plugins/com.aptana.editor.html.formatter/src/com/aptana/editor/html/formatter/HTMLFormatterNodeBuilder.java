@@ -186,7 +186,12 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	}
 
 	/**
-	 * Determine the type of the node and return a formatter node that should represent it while rewriting the doc.
+	 * Determine the type of the node and return a formatter node that should represent it while rewriting the doc.<br>
+	 * Ant HTMLElementNode is acceptable here, even the special nodes. These special node just represents the wrapping
+	 * nodes around the 'foreign' nodes that exist as their children (nodes produced from the RHTML parser and JS
+	 * parser, for example).<br>
+	 * This behavior allows the inner child of these HTMLSpecialNodes to be processed in the
+	 * {@link #addNode(IParseNode)} method and produce a FormatterSpecialElementNode.<br>
 	 * 
 	 * @param node
 	 * @return FormatterBlockWithBeginEndNode sub-classing instance
@@ -204,20 +209,25 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			endOffset = endNodeRange.getStartingOffset();
 		}
 
-		if (node.getNodeType() == HTMLNodeTypes.ELEMENT)
+		formatterNode = new FormatterDefaultElementNode(document, type);
+		formatterNode.setBegin(createTextNode(document, beginNodeRange.getStartingOffset(), beginNodeRange
+				.getEndingOffset() + 1));
+		push(formatterNode);
+		if (node.getNodeType() == HTMLNodeTypes.SPECIAL)
 		{
-			formatterNode = new FormatterDefaultElementNode(document, type);
-			formatterNode.setBegin(createTextNode(document, beginNodeRange.getStartingOffset(), beginNodeRange
-					.getEndingOffset() + 1));
+			// Everything under this HTMLSpecialNode should be wrapped with a
+			// FormatterSpecialElementNode, and no need to visit its children.
+			// The assumption here is that the wrapping HTMLElementNode of this special node
+			// always have start and end tags.
+			FormatterSpecialElementNode specialNode = new FormatterSpecialElementNode(document, StringUtil.EMPTY);
+			int endSpecial = getEndWithoutWhiteSpaces(endNode.getNameRange().getStartingOffset() - 1, document) + 1;
+			int beginSpecial = getBeginWithoutWhiteSpaces(beginNodeRange.getEndingOffset() + 1, document);
+			specialNode.setBegin(createTextNode(document, beginSpecial, endSpecial));
+			specialNode.setEnd(createTextNode(document, endSpecial, endSpecial)); // empty end 
+			push(specialNode);
+			checkedPop(specialNode, -1);
 		}
 		else
-		{
-			// It's a special (foreign) node. We set the 'begin' for this node to include its body as well.
-			formatterNode = new FormatterSpecialElementNode(document, type);
-			formatterNode.setBegin(createTextNode(document, beginNodeRange.getStartingOffset(), endOffset));
-		}
-		push(formatterNode);
-		if (node.getNodeType() == HTMLNodeTypes.ELEMENT)
 		{
 			// Recursively call this method till we are done with all the children under this node.
 			addNodes(node.getChildren());
@@ -225,5 +235,42 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		checkedPop(formatterNode, endOffset);
 		formatterNode.setEnd(createTextNode(document, endOffset, node.getEndingOffset() + 1));
 		return formatterNode;
+	}
+
+	/**
+	 * @param i
+	 * @param document2
+	 * @return
+	 */
+	private int getBeginWithoutWhiteSpaces(int offset, FormatterDocument document)
+	{
+		int length = document.getLength();
+		while (offset < length)
+		{
+			if (!Character.isWhitespace(document.charAt(offset)))
+			{
+				break;
+			}
+			offset++;
+		}
+		return offset;
+	}
+
+	/**
+	 * @param startingOffset
+	 * @param document2
+	 * @return
+	 */
+	private int getEndWithoutWhiteSpaces(int offset, FormatterDocument document)
+	{
+		while (offset > 0)
+		{
+			if (!Character.isWhitespace(document.charAt(offset)))
+			{
+				break;
+			}
+			offset--;
+		}
+		return offset;
 	}
 }
