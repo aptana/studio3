@@ -486,9 +486,10 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 		}
 
 		// If there's a selection we "turn off" line highlight.
-		Point selection = fViewer.getTextWidget().getSelectionRange();
-		if (selection.y != 0)
-			return false;
+		// Note: disabled this as the line was still being highlighted and opaque backgrounds had a strange behaviour.  
+        //Point selection = fViewer.getTextWidget().getSelectionRange();
+        //if (selection.y != 0)
+        //    return false;
 
 		// If there's transparency, we handle/color that in a different way, in #paintControl.
 		RGBa lineHighlight = getCurrentTheme().getLineHighlight();
