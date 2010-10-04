@@ -106,9 +106,9 @@
 			</fileset>
 		</copy>
 		<antcall target="run.director">
-      		<param name="p2.installIU" value="com.aptana.ide.feature.libraries.subscription.feature.group" />
-      		<param name="p2.repo" value="${libraries-com.p2.repo}" />
-    	</antcall>
+			<param name="p2.installIU" value="com.aptana.ide.feature.libraries.subscription.feature.group" />
+			<param name="p2.repo" value="${libraries-com.p2.repo}" />
+		</antcall>
 		<antcall target="run.director">
 			<param name="p2.installIU" value="com.aptana.webkitbrowser.feature.group" />
 			<param name="p2.repo" value="${webkit.p2.repo}" />
@@ -172,7 +172,7 @@
 		</java>
 	</target>
 
-	<target name="test" depends="build">
+	<target name="-pre-test" depends="build">
 		<!-- Install the test feature we just built -->
 		<antcall target="run.director">
 			<param name="p2.installIU" value="${topLevelElementId}.feature.group" />
@@ -198,16 +198,9 @@
 		</emma>
 
 		<property name="library-file" value="${baseLocation}/test-framework/eclipse/plugins/org.eclipse.test_3.3.0/library.xml" />
-		<!-- Run the tests. -->
-		<antcall target="run-core-test">
-			<param name="test.plugin" value="com.aptana.red.core.tests.all" />
-			<param name="test.classname" value="com.aptana.red.core.tests.all.CoreTests" />
-		</antcall>
-		<antcall target="run-ui-test">
-      <param name="test.plugin" value="com.aptana.red.core.tests.all" />
-      <param name="test.classname" value="com.aptana.red.core.tests.all.UITests" />
-    </antcall>
+	</target>
 
+	<target name="-post-test">
 		<!-- Collect all test results into single file and move to results directory. -->
 		<ant target="collect" antfile="${library-file}" dir="${baseLocation}">
 			<property name="includes" value="com*.xml" />
@@ -229,6 +222,34 @@
 		</emma>
 
 		<antcall target="clean.after" />
+	</target>
+
+	<target name="test" depends="build">
+		<antcall target="-pre-test" />
+		
+		<!-- Run the tests. -->
+		<antcall target="run-core-test">
+			<param name="test.plugin" value="com.aptana.red.core.tests.all" />
+			<param name="test.classname" value="com.aptana.red.core.tests.all.CoreTests" />
+		</antcall>
+		<antcall target="run-ui-test">
+			<param name="test.plugin" value="com.aptana.red.core.tests.all" />
+			<param name="test.classname" value="com.aptana.red.core.tests.all.UITests" />
+		</antcall>
+
+		<antcall target="-post-test" />
+	</target>
+	
+	<target name="performance" depends="build">
+		<antcall target="-pre-test" />
+
+		<!-- Run the tests. -->
+		<antcall target="run-ui-test">
+			<param name="test.plugin" value="com.aptana.red.core.tests.all" />
+			<param name="test.classname" value="com.aptana.red.core.tests.all.PerformanceTests" />
+		</antcall>
+
+		<antcall target="-post-test" />
 	</target>
 
 	<target name="run-ui-test">
