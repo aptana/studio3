@@ -84,6 +84,7 @@
       <import plugin="com.aptana.theme"/>
       <import plugin="com.aptana.browser"/>
       <import plugin="com.aptana.plist"/>
+      <import plugin="com.aptana.editor.markdown"/>
    </requires>
 
    <plugin
@@ -270,5 +271,26 @@
          version="0.0.0"
          fragment="true"
          unpack="false"/>
+
+   <plugin
+         id="com.aptana.editor.markdown.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.test.performance"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.derby"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
 
 </feature>

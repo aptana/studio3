@@ -294,37 +294,41 @@ public class Theme
 
 		// Some tokens are special. They have fallbacks even if not in the theme! Looks like bundles can contribute
 		// them?
-		if (scope.startsWith("markup.changed")) //$NON-NLS-1$
+		if (new ScopeSelector("markup.changed").matches(scope)) //$NON-NLS-1$
 		{
 			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(248, 205, 14), SWT.NORMAL);
 		}
-		if (scope.startsWith("markup.deleted")) //$NON-NLS-1$
+		if (new ScopeSelector("markup.deleted").matches(scope)) //$NON-NLS-1$
 		{
 			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(255, 86, 77), SWT.NORMAL);
 		}
-		if (scope.startsWith("markup.inserted")) //$NON-NLS-1$
+		if (new ScopeSelector("markup.inserted").matches(scope)) //$NON-NLS-1$
 		{
 			return new DelayedTextAttribute(new RGBa(0, 0, 0), new RGBa(128, 250, 120), SWT.NORMAL);
 		}
-		if (scope.startsWith("markup.underline")) //$NON-NLS-1$
+		if (new ScopeSelector("markup.underline").matches(scope)) //$NON-NLS-1$
 		{
 			return new DelayedTextAttribute(null, null, TextAttribute.UNDERLINE);
 		}
-		if (scope.startsWith("markup.bold")) //$NON-NLS-1$
+		if (new ScopeSelector("markup.bold").matches(scope)) //$NON-NLS-1$
 		{
 			return new DelayedTextAttribute(null, null, SWT.BOLD);
 		}
-		if (scope.startsWith("markup.italic")) //$NON-NLS-1$
+		if (new ScopeSelector("markup.italic").matches(scope)) //$NON-NLS-1$
 		{
 			return new DelayedTextAttribute(null, null, SWT.ITALIC);
 		}
-		if (scope.startsWith("meta.diff.index") || scope.startsWith("meta.diff.range") || scope.startsWith("meta.separator.diff")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (new ScopeSelector("meta.diff.index").matches(scope) || new ScopeSelector("meta.diff.range").matches(scope) || new ScopeSelector("meta.separator.diff").matches(scope)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		{
 			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(65, 126, 218), SWT.ITALIC);
 		}
-		if (scope.startsWith("meta.diff.header")) //$NON-NLS-1$
+		if (new ScopeSelector("meta.diff.header").matches(scope)) //$NON-NLS-1$
 		{
 			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(103, 154, 233), SWT.NORMAL);
+		}
+		if (new ScopeSelector("meta.separator").matches(scope)) //$NON-NLS-1$
+		{
+			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(52, 103, 209), SWT.NORMAL);
 		}
 		return new DelayedTextAttribute(new RGBa(defaultFG));
 	}
