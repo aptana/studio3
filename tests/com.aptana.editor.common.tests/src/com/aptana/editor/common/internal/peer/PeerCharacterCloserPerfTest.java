@@ -11,25 +11,17 @@ public class PeerCharacterCloserPerfTest extends PerformanceTestCase
 	{
 		char[] pairs = new char[] { '(', ')', '"', '"' };
 		PeerCharacterCloser closer = new PeerCharacterCloser(null, pairs);
-		StringBuilder builder = new StringBuilder();
-		int times = 50000;
-		for (int i = 0; i < times; i++)
-		{
-			builder.append("((((((((((((((");
-		}
-		for (int i = 0; i < times; i++)
-		{
-			builder.append("))))))))))))))");
-		}
-		IDocument document = new Document(builder.toString());
-		builder = null;
-		int offset = times * 10;
-		int iterations = 1285;
+		int numPairs = 25000;
 
-		for (int i = 0; i < iterations; i++)
+		IDocument document = createDocumentWithPairs(numPairs);
+		for (int i = 0; i < 1500; i++)
 		{
 			startMeasuring();
-			if (closer.unpairedClose('(', ')', document, offset))
+			if (closer.unpairedClose('(', ')', document, 0))
+			{
+				fail("bad!");
+			}
+			if (closer.unpairedClose('(', ')', document, numPairs * 2))
 			{
 				fail("bad!");
 			}
@@ -37,6 +29,20 @@ public class PeerCharacterCloserPerfTest extends PerformanceTestCase
 		}
 		commitMeasurements();
 		assertPerformance();
+	}
+
+	private IDocument createDocumentWithPairs(int numPairs)
+	{
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < numPairs; i++)
+		{
+			builder.append('(');
+		}
+		for (int i = 0; i < numPairs; i++)
+		{
+			builder.append(')');
+		}
+		return new Document(builder.toString());
 	}
 
 }

@@ -1,133 +1,22 @@
 package com.aptana.editor.js.parsing;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.test.performance.PerformanceTestCase;
 
+import com.aptana.core.util.IOUtil;
 import com.aptana.editor.js.Activator;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
 
 public class JSParserPerformanceTest extends PerformanceTestCase
 {
-	/**
-	 * main
-	 * 
-	 * @param args
-	 * @return
-	 */
-	public static void main(String[] args)
-	{
-		if (args != null && args.length > 0)
-		{
-			File file = new File(args[0]);
-
-			if (file.canRead())
-			{
-				List<File> files = new ArrayList<File>();
-				JSParserPerformanceTest tester = new JSParserPerformanceTest();
-
-				if (file.isDirectory())
-				{
-					final Queue<File> directories = new LinkedList<File>();
-
-					directories.offer(file);
-
-					while (directories.isEmpty() == false)
-					{
-						File directory = directories.poll();
-						File[] jsFiles = directory.listFiles(new FileFilter()
-						{
-
-							public boolean accept(File pathname)
-							{
-								boolean result = false;
-
-								if (pathname.isDirectory())
-								{
-									directories.offer(pathname);
-								}
-								else
-								{
-									result = (pathname.getName().toLowerCase().endsWith(".js"));
-								}
-
-								return result;
-							}
-
-						});
-
-						files.addAll(Arrays.asList(jsFiles));
-					}
-				}
-				else if (file.isFile())
-				{
-					files.add(file);
-				}
-
-				long start = System.currentTimeMillis();
-
-				for (File f : files)
-				{
-					try
-					{
-						tester.setUp();
-						tester.timeParse(f);
-					}
-					catch (Throwable e)
-					{
-					}
-					finally
-					{
-						try
-						{
-							tester.tearDown();
-						}
-						catch (Exception e)
-						{
-						}
-					}
-				}
-
-				long diff = System.currentTimeMillis() - start;
-
-				System.out.println("processed " + files.size() + " files in " + diff + " milliseconds");
-			}
-		}
-		else
-		{
-			System.out.println("Expected a list of JS files and/or directories to search");
-		}
-	}
 
 	private JSParser fParser;
-
-	/**
-	 * getSource
-	 * 
-	 * @param file
-	 * @return
-	 * @throws IOException
-	 */
-	private String getSource(File file) throws IOException
-	{
-		InputStream stream = new FileInputStream(file);
-
-		return getSource(stream);
-	}
 
 	/**
 	 * getSource
@@ -138,19 +27,7 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 */
 	private String getSource(InputStream stream) throws IOException
 	{
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-		int read = -1;
-
-		while ((read = stream.read()) != -1)
-		{
-			out.write(read);
-		}
-
-		stream.close();
-
-		String src = new String(out.toByteArray());
-		return src;
+		return IOUtil.read(stream);
 	}
 
 	/**
@@ -164,7 +41,6 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	{
 		InputStream stream = FileLocator.openStream(Platform.getBundle(Activator.PLUGIN_ID), new Path(resourceName),
 				false);
-
 		return getSource(stream);
 	}
 
@@ -197,7 +73,7 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 */
 	public void testDojo() throws Exception
 	{
-		timeParse("performance/dojo.js.uncompressed.js", 3500);
+		assertParse(1350, "performance/dojo.js.uncompressed.js");
 	}
 
 	/**
@@ -207,7 +83,7 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 */
 	public void testExt() throws Exception
 	{
-		timeParse("performance/ext-core.js");
+		assertParse(1050, "performance/ext-core.js");
 	}
 
 	/**
@@ -217,7 +93,7 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 */
 	public void testTiMobile() throws Exception
 	{
-		timeParse("performance/timobile.js", 125);
+		assertParse(145, "performance/timobile.js");
 	}
 
 	/**
@@ -227,7 +103,7 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 */
 	public void testTinyMce() throws Exception
 	{
-		timeParse("performance/tiny_mce.js", 2850);
+		assertParse(1000, "performance/tiny_mce.js");
 	}
 
 	/**
@@ -237,91 +113,52 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 */
 	public void testJaxerFiles() throws Exception
 	{
-		// FIXME This doesn't work right, because it commits per file and we need to really batch them all together, or break each into it's own test
-		timeParse("performance/jaxer/11.2.2-1-n.js");
-		timeParse("performance/jaxer/15.10.6.2-2.js");
-		timeParse("performance/jaxer/15.5.4.7-2.js");
-		timeParse("performance/jaxer/15.9.5.21-3.js");
-		timeParse("performance/jaxer/ComposerCommands.js");
-		timeParse("performance/jaxer/DBAPI.js");
-		timeParse("performance/jaxer/DOMTestCase.js");
-		timeParse("performance/jaxer/Microformats.js");
-		timeParse("performance/jaxer/MochiKit_packed.js");
-		timeParse("performance/jaxer/SimpleTest.js");
-		timeParse("performance/jaxer/TestCachePerformance.js");
-		timeParse("performance/jaxer/UDDITypes.js");
-		timeParse("performance/jaxer/browser_bug_411172.js");
-		timeParse("performance/jaxer/clientBothProperty.js");
-		timeParse("performance/jaxer/commands.js");
-		timeParse("performance/jaxer/crlManager.js");
-		timeParse("performance/jaxer/dojo.js");
-		timeParse("performance/jaxer/dom.js");
-		timeParse("performance/jaxer/editor.js");
-		timeParse("performance/jaxer/effects.js");
-		timeParse("performance/jaxer/file-utils.js");
-		timeParse("performance/jaxer/head_urlformatter.js");
-		timeParse("performance/jaxer/httpd.js");
-		timeParse("performance/jaxer/ifaceinfotest.js");
-		timeParse("performance/jaxer/irc.js");
-		timeParse("performance/jaxer/jquery-1.2.1.js");
-		timeParse("performance/jaxer/jquery-1.2.6.min.js");
-		timeParse("performance/jaxer/jquery-stable.js");
-		timeParse("performance/jaxer/jquery.js");
-		timeParse("performance/jaxer/lexical-008.js");
-		timeParse("performance/jaxer/messages.js");
-		timeParse("performance/jaxer/narcissus-exec.js");
-		timeParse("performance/jaxer/nsDragAndDrop.js");
-		timeParse("performance/jaxer/packed.js");
-		timeParse("performance/jaxer/perlstress-001.js");
-		timeParse("performance/jaxer/perlstress-002.js");
-		timeParse("performance/jaxer/property_database.js");
-		timeParse("performance/jaxer/prototype.js");
-		timeParse("performance/jaxer/publishprefs.js");
-		timeParse("performance/jaxer/regress-100199.js");
-		timeParse("performance/jaxer/regress-111557.js");
-		timeParse("performance/jaxer/regress-155081-2.js");
-		timeParse("performance/jaxer/regress-192226.js");
-		timeParse("performance/jaxer/regress-244470.js");
-		timeParse("performance/jaxer/regress-309925-02.js");
-		timeParse("performance/jaxer/regress-76054.js");
-		timeParse("performance/jaxer/regress-98901.js");
-		timeParse("performance/jaxer/scriptaculous.js");
-		timeParse("performance/jaxer/split-002.js");
-		timeParse("performance/jaxer/test_413784.js");
-		timeParse("performance/jaxer/test_423515_forceCopyShortcuts.js");
-		timeParse("performance/jaxer/test_bug364285-1.js");
-		timeParse("performance/jaxer/test_bug374754.js");
-		timeParse("performance/jaxer/test_multi_statements.js");
-		timeParse("performance/jaxer/test_prepare_insert_update.js");
-		timeParse("performance/jaxer/tip_followscroll.js");
-		timeParse("performance/jaxer/tree-utils.js");
-		timeParse("performance/jaxer/utils.js");
-		timeParse("performance/jaxer/xpath.js");
-		timeParse("performance/jaxer/xslt_script.js");
+		assertParse(200, "performance/jaxer/11.2.2-1-n.js", "performance/jaxer/15.10.6.2-2.js",
+				"performance/jaxer/15.5.4.7-2.js", "performance/jaxer/15.9.5.21-3.js",
+				"performance/jaxer/ComposerCommands.js", "performance/jaxer/DBAPI.js",
+				"performance/jaxer/DOMTestCase.js", "performance/jaxer/Microformats.js",
+				"performance/jaxer/MochiKit_packed.js", "performance/jaxer/SimpleTest.js",
+				"performance/jaxer/TestCachePerformance.js", "performance/jaxer/UDDITypes.js",
+				"performance/jaxer/browser_bug_411172.js", "performance/jaxer/clientBothProperty.js",
+				"performance/jaxer/commands.js", "performance/jaxer/crlManager.js", "performance/jaxer/dojo.js",
+				"performance/jaxer/dom.js", "performance/jaxer/editor.js", "performance/jaxer/effects.js",
+				"performance/jaxer/file-utils.js", "performance/jaxer/head_urlformatter.js",
+				"performance/jaxer/httpd.js", "performance/jaxer/ifaceinfotest.js", "performance/jaxer/irc.js",
+				"performance/jaxer/jquery-1.2.1.js", "performance/jaxer/jquery-1.2.6.min.js",
+				"performance/jaxer/jquery-stable.js", "performance/jaxer/jquery.js",
+				"performance/jaxer/lexical-008.js", "performance/jaxer/messages.js",
+				"performance/jaxer/narcissus-exec.js", "performance/jaxer/nsDragAndDrop.js",
+				"performance/jaxer/packed.js", "performance/jaxer/perlstress-001.js",
+				"performance/jaxer/perlstress-002.js", "performance/jaxer/property_database.js",
+				"performance/jaxer/prototype.js", "performance/jaxer/publishprefs.js",
+				"performance/jaxer/regress-100199.js", "performance/jaxer/regress-111557.js",
+				"performance/jaxer/regress-155081-2.js", "performance/jaxer/regress-192226.js",
+				"performance/jaxer/regress-244470.js", "performance/jaxer/regress-309925-02.js",
+				"performance/jaxer/regress-76054.js", "performance/jaxer/regress-98901.js",
+				"performance/jaxer/scriptaculous.js", "performance/jaxer/split-002.js",
+				"performance/jaxer/test_413784.js", "performance/jaxer/test_423515_forceCopyShortcuts.js",
+				"performance/jaxer/test_bug364285-1.js", "performance/jaxer/test_bug374754.js",
+				"performance/jaxer/test_multi_statements.js", "performance/jaxer/test_prepare_insert_update.js",
+				"performance/jaxer/tip_followscroll.js", "performance/jaxer/tree-utils.js",
+				"performance/jaxer/utils.js", "performance/jaxer/xpath.js", "performance/jaxer/xslt_script.js");
 	}
 
 	/**
-	 * timeParse
-	 * 
-	 * @param file
-	 * @throws Exception
-	 */
-	protected void timeParse(File file) throws Exception
-	{
-		this.timeParse(file.getAbsolutePath(), getSource(file));
-	}
-
-	/**
-	 * time
+	 * assertParse
 	 * 
 	 * @param resourceName
 	 * @throws Exception
 	 */
-	protected void timeParse(String resourceName) throws Exception
+	private void assertParse(int numRuns, String... resources) throws Exception
 	{
-		this.timeParse(resourceName, getSource(resourceName));
+		for (String resourceName : resources)
+		{
+			timeParse(resourceName, numRuns);
+		}
+		commitMeasurements();
+		assertPerformance();
 	}
-	
+
 	/**
 	 * time
 	 * 
@@ -329,20 +166,9 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 * @param numRuns
 	 * @throws Exception
 	 */
-	protected void timeParse(String resourceName, int numRuns) throws Exception
+	private void timeParse(String resourceName, int numRuns) throws Exception
 	{
 		this.timeParse(resourceName, getSource(resourceName), numRuns);
-	}
-
-	/**
-	 * time
-	 * 
-	 * @param name
-	 * @param source
-	 */
-	protected void timeParse(String name, String source) throws Exception
-	{
-		this.timeParse(name, source, 6400);
 	}
 
 	/**
@@ -351,7 +177,7 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 * @param resourceName
 	 * @throws Exception
 	 */
-	protected void timeParse(String resourceName, String src, int numRuns) throws Exception
+	private void timeParse(String resourceName, String src, int numRuns) throws Exception
 	{
 		// apply to parse state
 		IParseState parseState = new ParseState();
@@ -370,8 +196,5 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 			}
 			stopMeasuring();
 		}
-
-		commitMeasurements();
-		assertPerformance();
 	}
 }
