@@ -1243,32 +1243,38 @@ public class BundleManager
 	public ProjectTemplate[] getProjectTemplates()
 	{
 		List<ProjectTemplate> result = new ArrayList<ProjectTemplate>();
-		Iterator<List<BundleElement>> iter = _bundlesByPath.values().iterator();
-		List<BundleElement> bundles;
-		while (iter.hasNext())
+
+		BundleEntry bundleEntry;
+		ProjectTemplate[] templates;
+		for (String bundleName : this.getBundleNames())
 		{
-			bundles = iter.next();
-			for (BundleElement bundle : bundles)
+			bundleEntry = this.getBundleEntry(bundleName);
+			templates = bundleEntry.getProjectTemplates();
+			for (ProjectTemplate template : templates)
 			{
-				result.addAll(Arrays.asList(bundle.getProjectTemplates()));
+				result.add(template);
 			}
 		}
+
 		return result.toArray(new ProjectTemplate[result.size()]);
 	}
 
 	public ProjectTemplate[] getProjectTemplatesByType(Type type)
 	{
 		List<ProjectTemplate> result = new ArrayList<ProjectTemplate>();
-		Iterator<List<BundleElement>> iter = _bundlesByPath.values().iterator();
-		List<BundleElement> bundles;
-		while (iter.hasNext())
+
+		BundleEntry bundleEntry;
+		ProjectTemplate[] templates;
+		for (String bundleName : this.getBundleNames())
 		{
-			bundles = iter.next();
-			for (BundleElement bundle : bundles)
+			bundleEntry = this.getBundleEntry(bundleName);
+			templates = bundleEntry.getProjectTemplatesByType(type);
+			for (ProjectTemplate template : templates)
 			{
-				result.addAll(Arrays.asList(bundle.getProjectTemplatesByType(type)));
+				result.add(template);
 			}
 		}
+
 		return result.toArray(new ProjectTemplate[result.size()]);
 	}
 
