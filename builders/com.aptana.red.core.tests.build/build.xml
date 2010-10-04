@@ -106,9 +106,9 @@
 			</fileset>
 		</copy>
 		<antcall target="run.director">
-      		<param name="p2.installIU" value="com.aptana.ide.feature.libraries.subscription.feature.group" />
-      		<param name="p2.repo" value="${libraries-com.p2.repo}" />
-    	</antcall>
+			<param name="p2.installIU" value="com.aptana.ide.feature.libraries.subscription.feature.group" />
+			<param name="p2.repo" value="${libraries-com.p2.repo}" />
+		</antcall>
 		<antcall target="run.director">
 			<param name="p2.installIU" value="com.aptana.webkitbrowser.feature.group" />
 			<param name="p2.repo" value="${webkit.p2.repo}" />
@@ -172,7 +172,7 @@
 		</java>
 	</target>
 
-	<target name="test" depends="build">
+	<target name="-pre-test" depends="build" description="Install test features and do pre-test setup.">
 		<!-- Install the test feature we just built -->
 		<antcall target="run.director">
 			<param name="p2.installIU" value="${topLevelElementId}.feature.group" />
@@ -189,33 +189,25 @@
 		<concat append="true" destfile="${baseLocation}/plugins/org.eclipse.sdk_3.6.0.v201006080911/plugin_customization.ini">
 			<filelist dir="${basedir}/prefs" files="plugin_customization.ini" />
 		</concat>
+	</target>
 
-		<!-- Instrument the code using EMMA -->
-		<emma enabled="true">
-			<instr instrpathref="instrument.classpath" mode="overwrite" metadatafile="${coverageDirectory}/metadata.emma">
-				<filter file="emma-filters.txt" />
-			</instr>
-		</emma>
-
-		<property name="library-file" value="${baseLocation}/test-framework/eclipse/plugins/org.eclipse.test_3.3.0/library.xml" />
-		<!-- Run the tests. -->
-		<antcall target="run-core-test">
-			<param name="test.plugin" value="com.aptana.red.core.tests.all" />
-			<param name="test.classname" value="com.aptana.red.core.tests.all.CoreTests" />
-		</antcall>
-		<antcall target="run-ui-test">
-      <param name="test.plugin" value="com.aptana.red.core.tests.all" />
-      <param name="test.classname" value="com.aptana.red.core.tests.all.UITests" />
-    </antcall>
-
-		<!-- Collect all test results into single file and move to results directory. -->
+	<target name="-post-test" description="Collect all test results into single file and move to results directory.">
 		<ant target="collect" antfile="${library-file}" dir="${baseLocation}">
 			<property name="includes" value="com*.xml" />
 			<property name="output-file" value="test-results.xml" />
 		</ant>
 		<move file="${baseLocation}/test-results.xml" todir="${testResultsDirectory}" />
+	</target>
 
-		<!-- Produce coverage analysis docs using EMMA -->
+	<target name="-instrument" description="Instrument the code using EMMA. Call before running tests. Call '-coverage' to produce reports after.">
+		<emma enabled="true">
+			<instr instrpathref="instrument.classpath" mode="overwrite" metadatafile="${coverageDirectory}/metadata.emma">
+				<filter file="emma-filters.txt" />
+			</instr>
+		</emma>
+	</target>
+
+	<target name="-coverage" description="Produce coverage analysis docs using EMMA. Assumes '-instrument' was called before running the tests.">
 		<emma enabled="true">
 			<report>
 				<fileset dir="${coverageDirectory}">
@@ -227,7 +219,37 @@
 				<xml outfile="${coverageDirectory}/coverage.xml" depth="method" />
 			</report>
 		</emma>
+	</target>
 
+	<target name="test" depends="build">
+		<antcall target="-pre-test" />
+		<antcall target="-instrument" />
+
+		<!-- Run the tests. -->
+		<antcall target="run-core-test">
+			<param name="test.plugin" value="com.aptana.red.core.tests.all" />
+			<param name="test.classname" value="com.aptana.red.core.tests.all.CoreTests" />
+		</antcall>
+		<antcall target="run-ui-test">
+			<param name="test.plugin" value="com.aptana.red.core.tests.all" />
+			<param name="test.classname" value="com.aptana.red.core.tests.all.UITests" />
+		</antcall>
+
+		<antcall target="-post-test" />
+		<antcall target="-coverage" />
+		<antcall target="clean.after" />
+	</target>
+
+	<target name="performance" depends="build">
+		<antcall target="-pre-test" />
+
+		<!-- Run the tests. -->
+		<antcall target="run-ui-test">
+			<param name="test.plugin" value="com.aptana.red.core.tests.all" />
+			<param name="test.classname" value="com.aptana.red.core.tests.all.PerformanceTests" />
+		</antcall>
+
+		<antcall target="-post-test" />
 		<antcall target="clean.after" />
 	</target>
 
@@ -243,7 +265,7 @@
 			<property name="data-dir" value="${baseLocation}/junit-workspace -clean" />
 			<property name="plugin-name" value="${test.plugin}" />
 			<property name="classname" value="${test.classname}" />
-			<property name="extraVMargs" value="-Demma.coverage.out.file=${coverageDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar" />
+			<property name="extraVMargs" value="-Demma.coverage.out.file=${coverageDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar -Declipse.perf.dbloc= -Declipse.perf.config=build=R3.0.0beta;host=ubunut32-jaxer-1;jvm=sun -Declipse.perf.assertAgainst=build=R3.0.0beta" />
 		</ant>
 	</target>
 

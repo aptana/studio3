@@ -1,16 +1,15 @@
 package com.aptana.editor.js.contentassist;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.test.performance.PerformanceTestCase;
 
+import com.aptana.core.util.IOUtil;
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
 import com.aptana.editor.js.parsing.JSParser;
@@ -21,7 +20,7 @@ import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
 
-public class JSIndexingPerformanceTest extends TestCase
+public class JSIndexingPerformanceTest extends PerformanceTestCase
 {
 	public class Indexer extends JSFileIndexingParticipant
 	{
@@ -38,7 +37,7 @@ public class JSIndexingPerformanceTest extends TestCase
 	 * 
 	 * @return
 	 */
-	protected Index getIndex()
+	private Index getIndex()
 	{
 		URI indexURI = this.getIndexURI();
 		Index result = null;
@@ -56,7 +55,7 @@ public class JSIndexingPerformanceTest extends TestCase
 	 * 
 	 * @return
 	 */
-	protected URI getIndexURI()
+	private URI getIndexURI()
 	{
 		return URI.create("inference.testing");
 	}
@@ -66,25 +65,10 @@ public class JSIndexingPerformanceTest extends TestCase
 	 * 
 	 * @return
 	 */
-	protected URI getLocation()
+	private URI getLocation()
 	{
 		return URI.create("inference_file.js");
 	}
-
-	/**
-	 * getSource
-	 * 
-	 * @param file
-	 * @return
-	 * @throws IOException
-	 *
-	private String getSource(File file) throws IOException
-	{
-		InputStream stream = new FileInputStream(file);
-
-		return getSource(stream);
-	}
-	*/
 
 	/**
 	 * getSource
@@ -95,19 +79,7 @@ public class JSIndexingPerformanceTest extends TestCase
 	 */
 	private String getSource(InputStream stream) throws IOException
 	{
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-		int read = -1;
-
-		while ((read = stream.read()) != -1)
-		{
-			out.write(read);
-		}
-
-		stream.close();
-
-		String src = new String(out.toByteArray());
-		return src;
+		return IOUtil.read(stream);
 	}
 
 	/**
@@ -119,8 +91,8 @@ public class JSIndexingPerformanceTest extends TestCase
 	 */
 	private String getSource(String resourceName) throws IOException
 	{
-		InputStream stream = FileLocator.openStream(Platform.getBundle(Activator.PLUGIN_ID), new Path(resourceName), false);
-
+		InputStream stream = FileLocator.openStream(Platform.getBundle(Activator.PLUGIN_ID), new Path(resourceName),
+				false);
 		return getSource(stream);
 	}
 
@@ -144,9 +116,9 @@ public class JSIndexingPerformanceTest extends TestCase
 	protected void tearDown() throws Exception
 	{
 		fParser = null;
-		
+
 		URI indexURI = this.getIndexURI();
-		
+
 		if (indexURI != null)
 		{
 			IndexManager.getInstance().removeIndex(indexURI);
@@ -160,9 +132,9 @@ public class JSIndexingPerformanceTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
-	public void testDojo() throws Exception
+	public void testDojoUncompressed() throws Exception
 	{
-		timeIndex("performance/dojo.js.uncompressed.js");
+		timeIndex(10, "performance/dojo.js.uncompressed.js");
 	}
 
 	/**
@@ -172,101 +144,8 @@ public class JSIndexingPerformanceTest extends TestCase
 	 */
 	public void testExt() throws Exception
 	{
-		timeIndex("performance/ext-core.js");
+		timeIndex(20, "performance/ext-core.js");
 	}
-
-	/**
-	 * main
-	 * 
-	 * @param args
-	 * @return
-	 *
-	public void testFiles()
-	{
-		File file = new File("/Users/klindsey/Documents/Projects/Jaxer");
-
-		if (file.canRead())
-		{
-			List<File> files = new ArrayList<File>();
-			JSIndexingPerformanceTest tester = new JSIndexingPerformanceTest();
-
-			if (file.isDirectory())
-			{
-				final Queue<File> directories = new ArrayDeque<File>();
-
-				directories.offer(file);
-
-				while (directories.isEmpty() == false)
-				{
-					File directory = directories.poll();
-					File[] jsFiles = directory.listFiles(new FileFilter()
-					{
-
-						@Override
-						public boolean accept(File pathname)
-						{
-							boolean result = false;
-
-							if (pathname.isDirectory())
-							{
-								directories.offer(pathname);
-							}
-							else
-							{
-								result = (pathname.getName().toLowerCase().endsWith(".js"));
-							}
-
-							return result;
-						}
-
-					});
-
-					files.addAll(Arrays.asList(jsFiles));
-				}
-			}
-			else if (file.isFile())
-			{
-				files.add(file);
-			}
-
-			long start = System.nanoTime();
-			long characterCount = 0;
-
-			for (File f : files)
-			{
-				try
-				{
-					tester.setUp();
-					
-					String source = this.getSource(f);
-					
-					characterCount += source.length();
-					
-					tester.timeIndex(f.getAbsolutePath(), source);
-				}
-				catch (Throwable e)
-				{
-				}
-				finally
-				{
-					try
-					{
-						tester.tearDown();
-					}
-					catch (Exception e)
-					{
-					}
-				}
-			}
-
-			long diff = System.nanoTime() - start;
-			double seconds = diff / 1e9;
-
-			String message = String.format("processed %d files (%d characters) in %f s", files.size(), characterCount, seconds);
-			System.out.println(message);
-		}
-	}
-	*/
 
 	/**
 	 * testJaxerFiles
@@ -275,66 +154,34 @@ public class JSIndexingPerformanceTest extends TestCase
 	 */
 	public void testJaxerFiles() throws Exception
 	{
-		timeIndex("performance/jaxer/11.2.2-1-n.js");
-		timeIndex("performance/jaxer/15.10.6.2-2.js");
-		timeIndex("performance/jaxer/15.5.4.7-2.js");
-		timeIndex("performance/jaxer/15.9.5.21-3.js");
-		timeIndex("performance/jaxer/ComposerCommands.js");
-		timeIndex("performance/jaxer/DBAPI.js");
-		timeIndex("performance/jaxer/DOMTestCase.js");
-		timeIndex("performance/jaxer/Microformats.js");
-		timeIndex("performance/jaxer/MochiKit_packed.js");
-		timeIndex("performance/jaxer/SimpleTest.js");
-		timeIndex("performance/jaxer/TestCachePerformance.js");
-		timeIndex("performance/jaxer/UDDITypes.js");
-		timeIndex("performance/jaxer/browser_bug_411172.js");
-		timeIndex("performance/jaxer/clientBothProperty.js");
-		timeIndex("performance/jaxer/commands.js");
-		timeIndex("performance/jaxer/crlManager.js");
-		timeIndex("performance/jaxer/dojo.js");
-		timeIndex("performance/jaxer/dom.js");
-		timeIndex("performance/jaxer/editor.js");
-		timeIndex("performance/jaxer/effects.js");
-		timeIndex("performance/jaxer/file-utils.js");
-		timeIndex("performance/jaxer/head_urlformatter.js");
-		timeIndex("performance/jaxer/httpd.js");
-		timeIndex("performance/jaxer/ifaceinfotest.js");
-		timeIndex("performance/jaxer/irc.js");
-		timeIndex("performance/jaxer/jquery-1.2.1.js");
-		timeIndex("performance/jaxer/jquery-1.2.6.min.js");
-		timeIndex("performance/jaxer/jquery-stable.js");
-		timeIndex("performance/jaxer/jquery.js");
-		timeIndex("performance/jaxer/lexical-008.js");
-		timeIndex("performance/jaxer/messages.js");
-		timeIndex("performance/jaxer/narcissus-exec.js");
-		timeIndex("performance/jaxer/nsDragAndDrop.js");
-		timeIndex("performance/jaxer/packed.js");
-		timeIndex("performance/jaxer/perlstress-001.js");
-		timeIndex("performance/jaxer/perlstress-002.js");
-		timeIndex("performance/jaxer/property_database.js");
-		timeIndex("performance/jaxer/prototype.js");
-		timeIndex("performance/jaxer/publishprefs.js");
-		timeIndex("performance/jaxer/regress-100199.js");
-		timeIndex("performance/jaxer/regress-111557.js");
-		timeIndex("performance/jaxer/regress-155081-2.js");
-		timeIndex("performance/jaxer/regress-192226.js");
-		timeIndex("performance/jaxer/regress-244470.js");
-		timeIndex("performance/jaxer/regress-309925-02.js");
-		timeIndex("performance/jaxer/regress-76054.js");
-		timeIndex("performance/jaxer/regress-98901.js");
-		timeIndex("performance/jaxer/scriptaculous.js");
-		timeIndex("performance/jaxer/split-002.js");
-		timeIndex("performance/jaxer/test_413784.js");
-		timeIndex("performance/jaxer/test_423515_forceCopyShortcuts.js");
-		timeIndex("performance/jaxer/test_bug364285-1.js");
-		timeIndex("performance/jaxer/test_bug374754.js");
-		timeIndex("performance/jaxer/test_multi_statements.js");
-		timeIndex("performance/jaxer/test_prepare_insert_update.js");
-		timeIndex("performance/jaxer/tip_followscroll.js");
-		timeIndex("performance/jaxer/tree-utils.js");
-		timeIndex("performance/jaxer/utils.js");
-		timeIndex("performance/jaxer/xpath.js");
-		timeIndex("performance/jaxer/xslt_script.js");
+		timeIndex(5, "performance/jaxer/11.2.2-1-n.js", "performance/jaxer/15.10.6.2-2.js",
+				"performance/jaxer/15.5.4.7-2.js", "performance/jaxer/15.9.5.21-3.js",
+				"performance/jaxer/ComposerCommands.js", "performance/jaxer/DBAPI.js",
+				"performance/jaxer/DOMTestCase.js", "performance/jaxer/Microformats.js",
+				"performance/jaxer/MochiKit_packed.js", "performance/jaxer/SimpleTest.js",
+				"performance/jaxer/TestCachePerformance.js", "performance/jaxer/UDDITypes.js",
+				"performance/jaxer/browser_bug_411172.js", "performance/jaxer/clientBothProperty.js",
+				"performance/jaxer/commands.js", "performance/jaxer/crlManager.js", "performance/jaxer/dojo.js",
+				"performance/jaxer/dom.js", "performance/jaxer/editor.js", "performance/jaxer/effects.js",
+				"performance/jaxer/file-utils.js", "performance/jaxer/head_urlformatter.js",
+				"performance/jaxer/httpd.js", "performance/jaxer/ifaceinfotest.js", "performance/jaxer/irc.js",
+				"performance/jaxer/jquery-1.2.1.js", "performance/jaxer/jquery-1.2.6.min.js",
+				"performance/jaxer/jquery-stable.js", "performance/jaxer/jquery.js",
+				"performance/jaxer/lexical-008.js", "performance/jaxer/messages.js",
+				"performance/jaxer/narcissus-exec.js", "performance/jaxer/nsDragAndDrop.js",
+				"performance/jaxer/packed.js", "performance/jaxer/perlstress-001.js",
+				"performance/jaxer/perlstress-002.js", "performance/jaxer/property_database.js",
+				"performance/jaxer/prototype.js", "performance/jaxer/publishprefs.js",
+				"performance/jaxer/regress-100199.js", "performance/jaxer/regress-111557.js",
+				"performance/jaxer/regress-155081-2.js", "performance/jaxer/regress-192226.js",
+				"performance/jaxer/regress-244470.js", "performance/jaxer/regress-309925-02.js",
+				"performance/jaxer/regress-76054.js", "performance/jaxer/regress-98901.js",
+				"performance/jaxer/scriptaculous.js", "performance/jaxer/split-002.js",
+				"performance/jaxer/test_413784.js", "performance/jaxer/test_423515_forceCopyShortcuts.js",
+				"performance/jaxer/test_bug364285-1.js", "performance/jaxer/test_bug374754.js",
+				"performance/jaxer/test_multi_statements.js", "performance/jaxer/test_prepare_insert_update.js",
+				"performance/jaxer/tip_followscroll.js", "performance/jaxer/tree-utils.js",
+				"performance/jaxer/utils.js", "performance/jaxer/xpath.js", "performance/jaxer/xslt_script.js");
 	}
 
 	/**
@@ -344,9 +191,9 @@ public class JSIndexingPerformanceTest extends TestCase
 	 */
 	public void testTiMobile() throws Exception
 	{
-		timeIndex("performance/timobile.js");
+		timeIndex(10, "performance/timobile.js");
 	}
-	
+
 	/**
 	 * testTinyMce
 	 * 
@@ -354,7 +201,7 @@ public class JSIndexingPerformanceTest extends TestCase
 	 */
 	public void testTinyMce() throws Exception
 	{
-		timeIndex("performance/tiny_mce.js");
+		timeIndex(50, "performance/tiny_mce.js");
 	}
 
 	/**
@@ -363,9 +210,14 @@ public class JSIndexingPerformanceTest extends TestCase
 	 * @param resourceName
 	 * @throws Exception
 	 */
-	protected void timeIndex(String resourceName) throws Exception
+	private void timeIndex(int numRuns, String... resources) throws Exception
 	{
-		this.timeIndex(resourceName, getSource(resourceName));
+		for (String resourceName : resources)
+		{
+			this.timeIndex(numRuns, resourceName, getSource(resourceName));
+		}
+		commitMeasurements();
+		assertPerformance();
 	}
 
 	/**
@@ -374,10 +226,8 @@ public class JSIndexingPerformanceTest extends TestCase
 	 * @param resourceName
 	 * @throws Exception
 	 */
-	protected void timeIndex(String resourceName, String src) throws Exception
+	private void timeIndex(int numRuns, String resourceName, String src) throws Exception
 	{
-		int numRuns = 5;
-		
 		// apply to parse state
 		IParseState parseState = new ParseState();
 		parseState.setEditState(src, src, 0, 0);
@@ -392,27 +242,20 @@ public class JSIndexingPerformanceTest extends TestCase
 			{
 				Indexer indexer = new Indexer();
 
-				// start timing
-				long start = System.nanoTime();
-
 				for (int i = 0; i < numRuns; i++)
 				{
 					URI indexURI = this.getIndexURI();
-					
 					if (indexURI != null)
 					{
 						IndexManager.getInstance().removeIndex(indexURI);
 					}
-					
-					indexer.indexTree(this.getIndex(), (JSParseRootNode) root, this.getLocation());
+					URI location = this.getLocation();
+					Index index = this.getIndex();
+
+					startMeasuring();
+					indexer.indexTree(index, (JSParseRootNode) root, location);
+					stopMeasuring();
 				}
-
-				// get time difference
-				long diff = System.nanoTime() - start;
-				double seconds = ((double) diff / numRuns) / 1e9;
-
-				// show results
-				System.out.println(String.format("index: %12.9fs: %s", seconds, resourceName));
 			}
 			else
 			{
