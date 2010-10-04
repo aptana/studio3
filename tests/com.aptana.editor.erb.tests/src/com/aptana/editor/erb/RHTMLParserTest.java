@@ -40,9 +40,9 @@ public class RHTMLParserTest extends TestCase
 		assertEquals(6, children.length);
 		assertEquals(IRubyParserConstants.LANGUAGE, children[0].getLanguage());
 		assertEquals(IRubyParserConstants.LANGUAGE, children[1].getLanguage());
-		assertEquals(2, children[2].getNodeType()); // HTMLElementNode
+		assertEquals(3, children[2].getNodeType()); // HTMLSpecialNode
 		assertEquals(IRubyParserConstants.LANGUAGE, children[3].getLanguage());
-		assertEquals(2, children[4].getNodeType()); // HTMLElementNode
+		assertEquals(3, children[4].getNodeType()); // HTMLSpecialNode
 		assertEquals(IRubyParserConstants.LANGUAGE, children[5].getLanguage());
 	}
 

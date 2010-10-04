@@ -154,6 +154,18 @@ public class HTMLParserTest extends TestCase
 		assertNull(endTag);
 	}
 
+	public void testSpecialNodeEnd() throws Exception
+	{
+		String source = "<script>var one = 1;</script>";
+		fParseState.setEditState(source, source, 0, 0);
+		IParseNode result = fParser.parse(fParseState);
+		IParseNode[] children = result.getChildren();
+		assertEquals(1, children.length);
+		INameNode endTag = ((HTMLElementNode) children[0]).getEndNode();
+		assertNotNull(endTag);
+		assertEquals(new Range(20, 28), endTag.getNameRange());
+	}
+
 	protected void parseTest(String source) throws Exception
 	{
 		parseTest(source, source);

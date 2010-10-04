@@ -65,6 +65,7 @@
          point="com.aptana.parsing.parser">
       <parser
             class="com.aptana.editor.js.parsing.JSParser"
+            content-type="com.aptana.contenttype.js"
             language="text/javascript">
       </parser>
    </extension>

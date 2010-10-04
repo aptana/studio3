@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.aptana.editor.markdown.MarkdownEditor"
+            contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
+            default="true"
+            extensions="md, mdown"
+            icon="icons/markdown.png"
+            id="com.aptana.editor.markdown"
+            name="%editor.markdown.name">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.markdown">
+         </contentTypeBinding>
+      </editor>
+   </extension>
+    <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            file-extensions="md, mdown, markdown, markdn"
+            id="com.aptana.contenttype.markdown"
+            name="%content-type.markdown.name"
+            priority="normal">
+      </content-type>
+   </extension>
+
+</plugin>

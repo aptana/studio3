@@ -1,6 +1,5 @@
 package com.aptana.deploy.internal.wizard;
 
-import java.lang.reflect.Field;
 import java.net.URL;
 
 import org.eclipse.core.resources.IProject;
@@ -10,9 +9,6 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.ProgressEvent;
-import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
@@ -22,18 +18,13 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
-import org.eclipse.ui.internal.browser.BrowserViewer;
-import org.eclipse.ui.internal.browser.WebBrowserEditor;
-import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 
 import com.aptana.deploy.Activator;
 import com.aptana.deploy.wizard.DeployWizard;
 
-@SuppressWarnings("restriction")
 public class EngineYardDeployWizardPage extends WizardPage
 {
 
@@ -94,36 +85,15 @@ public class EngineYardDeployWizardPage extends WizardPage
 
 							final int style = IWorkbenchBrowserSupport.NAVIGATION_BAR
 									| IWorkbenchBrowserSupport.LOCATION_BAR | IWorkbenchBrowserSupport.STATUS;
-
-							WebBrowserEditorInput input = new WebBrowserEditorInput(url, style, BROWSER_ID);
-							IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-							if (page == null || input == null)
-							{
-								return;
+							
+							IWorkbenchBrowserSupport workbenchBrowserSupport = PlatformUI.getWorkbench().getBrowserSupport();
+							
+							if(workbenchBrowserSupport.isInternalWebBrowserAvailable()) {
+								IWebBrowser webBrowser = workbenchBrowserSupport.createBrowser(style, BROWSER_ID, null, null);
+								if (webBrowser != null)
+									webBrowser.openURL(url);
 							}
-							IEditorPart editorPart = page.openEditor(input, WebBrowserEditor.WEB_BROWSER_EDITOR_ID);
-							if (editorPart == null)
-							{
-								return;
-							}
-							WebBrowserEditor webBrowserEditor = (WebBrowserEditor) editorPart;
-							Field f = WebBrowserEditor.class.getDeclaredField("webBrowser"); //$NON-NLS-1$
-							f.setAccessible(true);
-							BrowserViewer viewer = (BrowserViewer) f.get(webBrowserEditor);
-							final Browser browser = viewer.getBrowser();
-							browser.addProgressListener(new ProgressListener()
-							{
-
-								public void completed(ProgressEvent event)
-								{
-									browser.removeProgressListener(this);
-								}
-
-								public void changed(ProgressEvent event)
-								{
-									// ignore
-								}
-							});
+							
 						}
 						catch (Exception e)
 						{

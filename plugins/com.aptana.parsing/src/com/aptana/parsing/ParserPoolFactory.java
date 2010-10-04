@@ -53,30 +53,30 @@ public class ParserPoolFactory
 	private HashMap<String, IParserPool> pools;
 
 	/**
-	 * The main use of this class. Pass in a language (usually "text/language") and get back an IParserPool to use to
-	 * "borrow" a parser instance.
+	 * The main use of this class. Pass in a language (usually "text/language") or content type and get back an
+	 * IParserPool to use to "borrow" a parser instance.
 	 * 
-	 * @param language
+	 * @param languageOrContentType
 	 * @return
 	 */
-	public synchronized IParserPool getParserPool(String language)
+	public synchronized IParserPool getParserPool(String languageOrContentType)
 	{
 		if (pools == null)
 		{
 			pools = new HashMap<String, IParserPool>();
 		}
-		IParserPool pool = pools.get(language);
+		IParserPool pool = pools.get(languageOrContentType);
 		if (pool == null)
 		{
 			if (parsers == null)
 			{
 				parsers = getParsers();
 			}
-			IConfigurationElement parserExtension = parsers.get(language);
+			IConfigurationElement parserExtension = parsers.get(languageOrContentType);
 			if (parserExtension == null)
 				return null;
 			pool = new ParserPool(parserExtension);
-			pools.put(language, pool);
+			pools.put(languageOrContentType, pool);
 		}
 		return pool;
 	}
@@ -128,6 +128,8 @@ public class ParserPoolFactory
 					{
 						String language = element.getAttribute("language"); //$NON-NLS-1$
 						parsers.put(language, element);
+						String contentType = element.getAttribute("content-type"); //$NON-NLS-1$
+						parsers.put(contentType, element);
 					}
 				}
 			}
