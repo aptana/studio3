@@ -172,7 +172,7 @@
 		</java>
 	</target>
 
-	<target name="-pre-test" depends="build">
+	<target name="-pre-test" depends="build" description="Install test features and do pre-test setup.">
 		<!-- Install the test feature we just built -->
 		<antcall target="run.director">
 			<param name="p2.installIU" value="${topLevelElementId}.feature.group" />
@@ -189,8 +189,17 @@
 		<concat append="true" destfile="${baseLocation}/plugins/org.eclipse.sdk_3.6.0.v201006080911/plugin_customization.ini">
 			<filelist dir="${basedir}/prefs" files="plugin_customization.ini" />
 		</concat>
+	</target>
 
-		<!-- Instrument the code using EMMA -->
+	<target name="-post-test" description="Collect all test results into single file and move to results directory.">
+		<ant target="collect" antfile="${library-file}" dir="${baseLocation}">
+			<property name="includes" value="com*.xml" />
+			<property name="output-file" value="test-results.xml" />
+		</ant>
+		<move file="${baseLocation}/test-results.xml" todir="${testResultsDirectory}" />
+	</target>
+
+	<target name="-instrument" description="Instrument the code using EMMA. Call before running tests. Call '-coverage' to produce reports after.">
 		<emma enabled="true">
 			<instr instrpathref="instrument.classpath" mode="overwrite" metadatafile="${coverageDirectory}/metadata.emma">
 				<filter file="emma-filters.txt" />
@@ -198,15 +207,7 @@
 		</emma>
 	</target>
 
-	<target name="-post-test">
-		<!-- Collect all test results into single file and move to results directory. -->
-		<ant target="collect" antfile="${library-file}" dir="${baseLocation}">
-			<property name="includes" value="com*.xml" />
-			<property name="output-file" value="test-results.xml" />
-		</ant>
-		<move file="${baseLocation}/test-results.xml" todir="${testResultsDirectory}" />
-
-		<!-- Produce coverage analysis docs using EMMA -->
+	<target name="-coverage" description="Produce coverage analysis docs using EMMA. Assumes '-instrument' was called before running the tests.">
 		<emma enabled="true">
 			<report>
 				<fileset dir="${coverageDirectory}">
@@ -218,13 +219,12 @@
 				<xml outfile="${coverageDirectory}/coverage.xml" depth="method" />
 			</report>
 		</emma>
-
-		<antcall target="clean.after" />
 	</target>
 
 	<target name="test" depends="build">
 		<antcall target="-pre-test" />
-		
+		<antcall target="-instrument" />
+
 		<!-- Run the tests. -->
 		<antcall target="run-core-test">
 			<param name="test.plugin" value="com.aptana.red.core.tests.all" />
@@ -236,8 +236,10 @@
 		</antcall>
 
 		<antcall target="-post-test" />
+		<antcall target="-coverage" />
+		<antcall target="clean.after" />
 	</target>
-	
+
 	<target name="performance" depends="build">
 		<antcall target="-pre-test" />
 
@@ -248,6 +250,7 @@
 		</antcall>
 
 		<antcall target="-post-test" />
+		<antcall target="clean.after" />
 	</target>
 
 	<target name="run-ui-test">
