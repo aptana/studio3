@@ -196,8 +196,6 @@
 				<filter file="emma-filters.txt" />
 			</instr>
 		</emma>
-
-		<property name="library-file" value="${baseLocation}/test-framework/eclipse/plugins/org.eclipse.test_3.3.0/library.xml" />
 	</target>
 
 	<target name="-post-test">
