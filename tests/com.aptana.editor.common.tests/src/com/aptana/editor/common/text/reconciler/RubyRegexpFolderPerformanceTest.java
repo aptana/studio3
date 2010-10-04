@@ -1,11 +1,11 @@
 package com.aptana.editor.common.text.reconciler;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -14,6 +14,8 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.test.performance.PerformanceTestCase;
 import org.jruby.Ruby;
 import org.jruby.RubyRegexp;
+
+import com.aptana.core.util.IOUtil;
 
 public class RubyRegexpFolderPerformanceTest extends PerformanceTestCase
 {
@@ -50,11 +52,11 @@ public class RubyRegexpFolderPerformanceTest extends PerformanceTestCase
 		};
 
 		// Now do the work!
-		final int runs = 6400;
-		for (int i = 0; i < runs; i++)
+		for (int i = 0; i < 400; i++)
 		{
+			IProgressMonitor monitor = new NullProgressMonitor();
 			startMeasuring();
-			folder.emitFoldingRegions(positions, new NullProgressMonitor());
+			folder.emitFoldingRegions(positions, monitor);
 			stopMeasuring();
 		}
 		commitMeasurements();
@@ -64,13 +66,6 @@ public class RubyRegexpFolderPerformanceTest extends PerformanceTestCase
 	protected static String readFile(String fileName) throws IOException
 	{
 		InputStream stream = RubyRegexpFolderPerformanceTest.class.getResourceAsStream(fileName);
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		int read = -1;
-		while ((read = stream.read()) != -1)
-		{
-			out.write(read);
-		}
-		stream.close();
-		return new String(out.toByteArray());
+		return IOUtil.read(stream);
 	}
 }

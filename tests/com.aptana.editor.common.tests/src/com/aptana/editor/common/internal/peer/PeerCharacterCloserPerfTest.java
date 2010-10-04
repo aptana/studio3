@@ -14,7 +14,7 @@ public class PeerCharacterCloserPerfTest extends PerformanceTestCase
 		int numPairs = 25000;
 
 		IDocument document = createDocumentWithPairs(numPairs);
-		for (int i = 0; i < 1500; i++)
+		for (int i = 0; i < 10; i++)
 		{
 			startMeasuring();
 			if (closer.unpairedClose('(', ')', document, 0))

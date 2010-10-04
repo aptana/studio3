@@ -1,6 +1,5 @@
 package com.aptana.editor.css;
 
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -12,6 +11,7 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.test.performance.PerformanceTestCase;
 
+import com.aptana.core.util.IOUtil;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
 public class CSSCodeScannerPerformanceTest extends PerformanceTestCase
@@ -44,18 +44,10 @@ public class CSSCodeScannerPerformanceTest extends PerformanceTestCase
 	{
 		InputStream stream = FileLocator.openStream(Platform.getBundle("com.aptana.editor.css.tests"),
 				Path.fromPortableString("performance/wp-admin.css"), false);
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		int read = -1;
-		while ((read = stream.read()) != -1)
-		{
-			out.write(read);
-		}
-		stream.close();
-		String src = new String(out.toByteArray());
+		String src = IOUtil.read(stream);
 		IDocument document = new Document(src);
 
-		int numRuns = 4500;
-		for (int i = 0; i < numRuns; i++)
+		for (int i = 0; i < 80; i++)
 		{
 			startMeasuring();
 			fScanner.setRange(document, 0, src.length());

@@ -73,7 +73,7 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 */
 	public void testDojo() throws Exception
 	{
-		assertParse(1350, "performance/dojo.js.uncompressed.js");
+		assertParse(10, "performance/dojo.js.uncompressed.js");
 	}
 
 	/**
@@ -83,7 +83,7 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 */
 	public void testExt() throws Exception
 	{
-		assertParse(1050, "performance/ext-core.js");
+		assertParse(15, "performance/ext-core.js");
 	}
 
 	/**
@@ -93,7 +93,7 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 */
 	public void testTiMobile() throws Exception
 	{
-		assertParse(145, "performance/timobile.js");
+		assertParse(10, "performance/timobile.js");
 	}
 
 	/**
@@ -103,7 +103,7 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 */
 	public void testTinyMce() throws Exception
 	{
-		assertParse(1000, "performance/tiny_mce.js");
+		assertParse(10, "performance/tiny_mce.js");
 	}
 
 	/**
@@ -113,7 +113,7 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 */
 	public void testJaxerFiles() throws Exception
 	{
-		assertParse(200, "performance/jaxer/11.2.2-1-n.js", "performance/jaxer/15.10.6.2-2.js",
+		assertParse(5, "performance/jaxer/11.2.2-1-n.js", "performance/jaxer/15.10.6.2-2.js",
 				"performance/jaxer/15.5.4.7-2.js", "performance/jaxer/15.9.5.21-3.js",
 				"performance/jaxer/ComposerCommands.js", "performance/jaxer/DBAPI.js",
 				"performance/jaxer/DOMTestCase.js", "performance/jaxer/Microformats.js",
