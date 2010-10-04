@@ -35,12 +35,12 @@
 package com.aptana.editor.js.inferencing;
 
 import java.net.URI;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -169,7 +169,7 @@ public class JSSymbolTypeInferrer
 	{
 		if (property != null && object != null)
 		{
-			Queue<JSNode> queue = new ArrayDeque<JSNode>();
+			Queue<JSNode> queue = new LinkedList<JSNode>();
 			Set<IParseNode> visitedSymbols = new HashSet<IParseNode>();
 
 			// prime the queue
@@ -272,7 +272,7 @@ public class JSSymbolTypeInferrer
 		for (String name : activeObject.getPropertyNames())
 		{
 			// TODO: Treat as new property if names match but not their types?
-			if (propertyMap.containsKey(name) == false)
+			if (propertyMap.containsKey(name) == false || "prototype".equals(name))
 			{
 				additionalProperties.add(name);
 			}

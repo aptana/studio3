@@ -1,41 +1,26 @@
 package com.aptana.editor.html;
 
-import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
-
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
 
-public class HTMLTagScannerTest extends TestCase
+import com.aptana.editor.common.tests.AbstractTokenScannerTestCase;
+
+public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 {
 
-	private HTMLTagScanner scanner;
-
 	@Override
-	protected void setUp() throws Exception
+	protected ITokenScanner createTokenScanner()
 	{
-		super.setUp();
-		scanner = new HTMLTagScanner()
+		return new HTMLTagScanner()
 		{
 			protected IToken createToken(String string)
 			{
-				return getToken(string);
+				return HTMLTagScannerTest.this.getToken(string);
 			};
 		};
-	}
-
-	protected IToken getToken(String string)
-	{
-		return new Token(string);
-	}
-
-	@Override
-	protected void tearDown() throws Exception
-	{
-		scanner = null;
-		super.tearDown();
 	}
 
 	public void testBasicTokenizing()
@@ -60,7 +45,7 @@ public class HTMLTagScannerTest extends TestCase
 		assertToken(getToken("string.quoted.double.html"), 37, 5);
 		assertToken(getToken("punctuation.definition.tag.end.html"), 42, 1);
 	}
-	
+
 	public void testMultiLineSingleQuoteString()
 	{
 		String src = "<html attribute='\nchris'>";
@@ -75,7 +60,7 @@ public class HTMLTagScannerTest extends TestCase
 		assertToken(getToken("string.quoted.single.html"), 16, 8);
 		assertToken(getToken("punctuation.definition.tag.end.html"), 24, 1);
 	}
-	
+
 	public void testMultiLineDoubleQuoteString()
 	{
 		String src = "<html attribute=\"\nchris\">";
@@ -89,26 +74,5 @@ public class HTMLTagScannerTest extends TestCase
 		assertToken(getToken("punctuation.separator.key-value.html"), 15, 1);
 		assertToken(getToken("string.quoted.double.html"), 16, 8);
 		assertToken(getToken("punctuation.definition.tag.end.html"), 24, 1);
-	}
-
-	private void assertToken(IToken token, int offset, int length)
-	{
-		assertToken(null, token, offset, length);
-	}
-
-	private void assertToken(String msg, IToken token, int offset, int length)
-	{
-		try
-		{
-			assertEquals(token.getData(), scanner.nextToken().getData());
-			assertEquals(offset, scanner.getTokenOffset());
-			assertEquals(length, scanner.getTokenLength());
-		}
-		catch (AssertionFailedError e)
-		{
-			System.out.println(msg);
-			throw e;
-		}
-
 	}
 }

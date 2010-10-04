@@ -51,8 +51,10 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.internal.ui.views.memory.IMemoryViewPane;
 import org.eclipse.debug.internal.ui.views.memory.MemoryView;
 import org.eclipse.debug.ui.IDebugView;
+import org.eclipse.jface.preference.JFacePreferences;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.text.TextAttribute;
+import org.eclipse.jface.text.hyperlink.DefaultHyperlinkPresenter;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -123,6 +125,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 	public InvasiveThemeHijacker()
 	{
 		super("Installing invasive theme hijacker!"); //$NON-NLS-1$
+		setSystem(true);
 	}
 
 	protected boolean invasiveThemesEnabled()
@@ -460,32 +463,25 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		{
 			listener = new IQueryListener()
 			{
-
-				@Override
 				public void queryStarting(ISearchQuery query)
 				{
 
 				}
 
-				@Override
 				public void queryRemoved(ISearchQuery query)
 				{
 					hijackView(view, revertToDefaults);
 				}
 
-				@Override
 				public void queryFinished(ISearchQuery query)
 				{
 
 				}
 
-				@Override
 				public void queryAdded(ISearchQuery query)
 				{
 					PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 					{
-
-						@Override
 						public void run()
 						{
 							hijackView(view, revertToDefaults);
@@ -573,6 +569,9 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 	protected void applyThemeToJDTEditor(Theme theme, boolean revertToDefaults, IProgressMonitor monitor)
 	{
 		// Set prefs for all editors
+		setHyperlinkValues(theme, new InstanceScope().getNode("org.eclipse.ui.workbench"), revertToDefaults);
+		setHyperlinkValues(theme, new InstanceScope().getNode(ThemePlugin.PLUGIN_ID), revertToDefaults);
+
 		setGeneralEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.texteditor"), revertToDefaults);
 		setEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.editors"), revertToDefaults);
 
@@ -713,6 +712,38 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		}
 	}
 
+	protected void setHyperlinkValues(Theme theme, IEclipsePreferences prefs, boolean revertToDefaults)
+	{
+		if (prefs == null)
+			return;
+		if (revertToDefaults)
+		{
+			// Console preferences
+			prefs.remove(JFacePreferences.HYPERLINK_COLOR);
+			prefs.remove(JFacePreferences.ACTIVE_HYPERLINK_COLOR);
+
+			// Editor preferences
+			prefs.remove(DefaultHyperlinkPresenter.HYPERLINK_COLOR_SYSTEM_DEFAULT);
+			prefs.remove(DefaultHyperlinkPresenter.HYPERLINK_COLOR);
+
+		}
+		else
+		{
+			TextAttribute consoleHyperlink = theme.getTextAttribute("console.hyperlink");
+			TextAttribute editorHyperlink = theme.getTextAttribute("hyperlink");
+
+			prefs.put(JFacePreferences.HYPERLINK_COLOR,
+					StringConverter.asString(consoleHyperlink.getForeground().getRGB()));
+			prefs.put(JFacePreferences.ACTIVE_HYPERLINK_COLOR,
+					StringConverter.asString(consoleHyperlink.getForeground().getRGB()));
+			prefs.putBoolean(DefaultHyperlinkPresenter.HYPERLINK_COLOR_SYSTEM_DEFAULT, false);
+			prefs.put(DefaultHyperlinkPresenter.HYPERLINK_COLOR,
+					StringConverter.asString(editorHyperlink.getForeground().getRGB()));
+
+		}
+
+	}
+
 	protected void setGeneralEditorValues(Theme theme, IEclipsePreferences prefs, boolean revertToDefaults)
 	{
 		if (prefs == null)
@@ -754,11 +785,13 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		{
 			prefs.remove("occurrenceIndicationColor"); //$NON-NLS-1$
 			prefs.remove("writeOccurrenceIndicationColor"); //$NON-NLS-1$
+			prefs.remove("pydevOccurrenceIndicationColor"); //$NON-NLS-1$
 		}
 		else
 		{
 			prefs.put("occurrenceIndicationColor", StringConverter.asString(theme.getSelectionAgainstBG())); //$NON-NLS-1$
 			prefs.put("writeOccurrenceIndicationColor", StringConverter.asString(theme.getSelectionAgainstBG())); //$NON-NLS-1$
+			prefs.put("pydevOccurrenceIndicationColor", StringConverter.asString(theme.getSelectionAgainstBG())); //$NON-NLS-1$
 		}
 
 		try
@@ -857,7 +890,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 	}
 
 	// IPreferenceChangeListener
-	@Override
 	public void preferenceChange(PreferenceChangeEvent event)
 	{
 		// If invaisive themes are on and we changed the theme, schedule. Also schedule if we toggled invasive theming.
@@ -915,7 +947,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 	}
 
 	// IPartListener
-	@Override
 	public void partOpened(IWorkbenchPart part)
 	{
 		if (part instanceof IEditorPart)
@@ -929,7 +960,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 					pageListener = new ISelectionChangedListener()
 					{
 
-						@Override
 						public void selectionChanged(SelectionChangedEvent event)
 						{
 							hijackOutline();
@@ -948,7 +978,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		hijackView(view, false);
 	}
 
-	@Override
 	public void partDeactivated(IWorkbenchPart part)
 	{
 		if (!(part instanceof IEditorPart))
@@ -957,7 +986,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		hijackOutline();
 	}
 
-	@Override
 	public void partClosed(IWorkbenchPart part)
 	{
 		if (part instanceof MultiPageEditorPart)
@@ -979,13 +1007,11 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		}
 	}
 
-	@Override
 	public void partBroughtToTop(IWorkbenchPart part)
 	{
 		partActivated(part);
 	}
 
-	@Override
 	public void partActivated(final IWorkbenchPart part)
 	{
 		if (part instanceof IViewPart)
@@ -996,8 +1022,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			{
 				Display.getCurrent().asyncExec(new Runnable()
 				{
-
-					@Override
 					public void run()
 					{
 						hijackView((IViewPart) part, false);
@@ -1021,8 +1045,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			{
 				Display.getCurrent().asyncExec(new Runnable()
 				{
-
-					@Override
 					public void run()
 					{
 						((IAptanaHistory) page).setTheme(false);
@@ -1065,7 +1087,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 	/**
 	 * Schedules itself to override Java/PDE views and editors' coloring only if invasive themes are enabled.
 	 */
-	@Override
 	public synchronized void earlyStartup()
 	{
 		if (ranEarlyStartup)

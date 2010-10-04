@@ -167,7 +167,6 @@ public class CommandlineArgumentsHandler
 		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
 		{
 
-			@Override
 			public void run()
 			{
 				IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();

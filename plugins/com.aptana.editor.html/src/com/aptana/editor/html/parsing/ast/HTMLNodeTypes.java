@@ -48,4 +48,6 @@ public interface HTMLNodeTypes
 	 * Used to indicate a transition to another language
 	 */
 	public static final short SPECIAL = 3;
+
+	public static final short COMMENT = 4;
 }

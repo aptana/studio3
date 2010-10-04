@@ -5,7 +5,7 @@
          point="org.eclipse.ui.views">
       <view
             allowMultiple="true"
-            category="org.eclipse.ui"
+            category="com.aptana"
             class="com.aptana.explorer.internal.ui.FilteringProjectView"
             icon="icons/full/cview16/filenav_nav.png"
             id="com.aptana.explorer.view"

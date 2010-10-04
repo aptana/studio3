@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,6 +48,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -293,46 +295,116 @@ public class ThemeManager implements IThemeManager
 		fBuiltins = new HashSet<String>();
 		Enumeration<URL> urls = ThemePlugin.getDefault().getBundle().findEntries("themes", "*.properties", false); //$NON-NLS-1$ //$NON-NLS-2$
 		if (urls == null)
+		{
 			return;
+		}
+		Map<String, Properties> nameToThemeProperties = new HashMap<String, Properties>();
+		
 		while (urls.hasMoreElements())
 		{
 			URL url = urls.nextElement();
 			try
 			{
-				Theme theme = loadTheme(url.openStream());
-				if (theme != null)
-				{
-					fThemeMap.put(theme.getName(), theme);
-					fBuiltins.add(theme.getName());
-				}
+			    InputStream stream = url.openStream();
+		        try
+		        {
+		            Properties props = new Properties();
+                    props.load(stream);
+                    String themeName = props.getProperty(Theme.THEME_NAME_PROP_KEY);
+                    if(themeName != null)
+                    {
+                        if(!nameToThemeProperties.containsKey(themeName))
+                        {
+                            nameToThemeProperties.put(themeName, props);
+                        }
+                        else
+                        {
+                            throw new IllegalStateException("Theme with duplicated name: "+themeName);
+                        }
+                    }
+                    else
+                    {
+                        throw new IllegalStateException("No name in theme.");
+                    }
+		        }
+		        finally
+		        {
+		            try
+		            {
+		                stream.close();
+		            }
+		            catch (IOException e)
+		            {
+		                // ignore
+		            }
+		        }
+				
 			}
 			catch (Exception e)
 			{
 				ThemePlugin.logError(url.toString(), e);
 			}
 		}
+		
+		//Handle a theme extending another theme
+		for(Properties props:new ArrayList<Properties>(nameToThemeProperties.values())) //iterate in a copy!
+		{
+		    try 
+		    {
+                String multipleThemeExtends = (String) props.getProperty(Theme.THEME_EXTENDS_PROP_KEY);
+                if(multipleThemeExtends != null)
+                {
+                    Properties newProperties = new Properties();
+                    StringTokenizer tokenizer = new StringTokenizer(multipleThemeExtends, ",");
+                    String name = props.getProperty(Theme.THEME_NAME_PROP_KEY);
+                    while(tokenizer.hasMoreTokens())
+                    {
+                        String themeExtends = tokenizer.nextToken();
+                        Properties extended = nameToThemeProperties.get(themeExtends);
+                        if(extended == null)
+                        {
+                            throw new IllegalStateException("Could not find a theme for extension named: "+themeExtends+" in theme: "+name);
+                        }
+                        newProperties.putAll(extended);
+                    }
+                    newProperties.putAll(props);
+                    //We don't want the final extends props in the properties.
+                    newProperties.remove(Theme.THEME_EXTENDS_PROP_KEY);
+                    Assert.isTrue(newProperties.get(Theme.THEME_NAME_PROP_KEY).equals(name));
+                    nameToThemeProperties.put(name, newProperties);
+                }
+            } 
+		    catch (Exception e) 
+            {
+                ThemePlugin.logError(e);
+            }
+		}
+		
+		for(Properties props:nameToThemeProperties.values())
+		{
+		    String name = props.getProperty(Theme.THEME_NAME_PROP_KEY);
+		    if(name.startsWith("abstract_theme"))
+		    {
+		        continue;
+		    }
+		    try {
+                loadTheme(props);
+            } catch (Exception e) {
+                ThemePlugin.logError(e);
+            }
+		}
+
 	}
 
-	private static Theme loadTheme(InputStream stream) throws IOException
-	{
-		try
-		{
-			Properties props = new Properties();
-			props.load(stream);
-			return new Theme(ThemePlugin.getDefault().getColorManager(), props);
-		}
-		finally
-		{
-			try
-			{
-				stream.close();
-			}
-			catch (IOException e)
-			{
-				// ignore
-			}
-		}
-	}
+    private void loadTheme(Properties props) {
+        Theme theme = new Theme(ThemePlugin.getDefault().getColorManager(), props);
+        if (theme != null)
+        {
+            fThemeMap.put(theme.getName(), theme);
+            fBuiltins.add(theme.getName());
+        }
+    }
+
 
 	public IToken getToken(String scope)
 	{
@@ -363,7 +435,6 @@ public class ThemeManager implements IThemeManager
 		return fBuiltins.contains(themeName);
 	}
 
-	@Override
 	public IStatus validateThemeName(String name)
 	{
 		if (name == null || name.trim().length() == 0)

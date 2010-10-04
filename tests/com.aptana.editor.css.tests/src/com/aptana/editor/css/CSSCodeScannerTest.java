@@ -1,35 +1,25 @@
 package com.aptana.editor.css;
 
-import junit.framework.TestCase;
-
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
 
-public class CSSCodeScannerTest extends TestCase
+import com.aptana.editor.common.tests.AbstractTokenScannerTestCase;
+
+public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 {
-
-	private CSSCodeScanner scanner;
-
 	@Override
-	protected void setUp() throws Exception
+	protected ITokenScanner createTokenScanner()
 	{
-		super.setUp();
-		scanner = new CSSCodeScanner()
+		return new CSSCodeScanner()
 		{
 			protected IToken createToken(String string)
 			{
-				return getToken(string);
+				return CSSCodeScannerTest.this.getToken(string);
 			};
 		};
-	}
-
-	@Override
-	protected void tearDown() throws Exception
-	{
-		scanner = null;
-		super.tearDown();
 	}
 
 	public void testH1Through6()
@@ -56,8 +46,7 @@ public class CSSCodeScannerTest extends TestCase
 
 	public void testBrowserSpecificPropertyNames()
 	{
-		String src = "-moz-border-radius: 4px\n" +
-				"-webkit-border-radius: 4px";
+		String src = "-moz-border-radius: 4px\n" + "-webkit-border-radius: 4px";
 		IDocument document = new Document(src);
 		scanner.setRange(document, 0, src.length());
 
@@ -73,7 +62,7 @@ public class CSSCodeScannerTest extends TestCase
 		assertToken(getToken("constant.numeric.css"), 47, 1);
 		assertToken(getToken("keyword.other.unit.css"), 48, 2);
 	}
-	
+
 	public void testURLFunctionArgWithNoString()
 	{
 		String src = "background: url(/images/blah_header.jpg)";
@@ -83,10 +72,10 @@ public class CSSCodeScannerTest extends TestCase
 		assertToken(getToken("support.type.property-name.css"), 0, 10);
 		assertToken(getToken("punctuation.separator.key-value.css"), 10, 1);
 		assertToken(Token.WHITESPACE, 11, 1);
-		assertToken(getToken("support.function.misc.css"), 12, 3);		
+		assertToken(getToken("support.function.misc.css"), 12, 3);
 		assertToken(getToken("punctuation.section.function.css"), 15, 1);
 	}
-	
+
 	public void testSmallCaps()
 	{
 		String src = "small { font: small-caps; }";
@@ -287,17 +276,5 @@ public class CSSCodeScannerTest extends TestCase
 		assertToken(getToken("punctuation.section.property-list.css"), 336, 1);
 		assertToken(Token.WHITESPACE, 337, 3);
 		// line 20
-	}
-
-	private IToken getToken(String string)
-	{
-		return new Token(string);
-	}
-
-	private void assertToken(IToken token, int offset, int length)
-	{
-		assertEquals(token.getData(), scanner.nextToken().getData());
-		assertEquals(offset, scanner.getTokenOffset());
-		assertEquals(length, scanner.getTokenLength());
 	}
 }

@@ -98,7 +98,7 @@ public class WizardNewFilePage extends WizardNewFileCreationPage
 		IWizard wizard = getWizard();
 		TemplateSelectionPage templateSelectionPage = (TemplateSelectionPage) wizard
 				.getPage(NewFileWizard.TEMPLATE_PAGE_NAME);
-		String templateContent = NewFileWizard.getTemplateContent(templateSelectionPage.getSelectedTemplate());
+		String templateContent = NewFileWizard.getTemplateContent(templateSelectionPage.getSelectedTemplate(), getContainerFullPath().append(getFileName()));
 		if (templateContent != null)
 		{
 			return new ReaderInputStream(new StringReader(templateContent), "UTF-8"); //$NON-NLS-1$

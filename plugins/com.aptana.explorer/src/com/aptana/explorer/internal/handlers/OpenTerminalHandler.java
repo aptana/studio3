@@ -49,7 +49,6 @@ public class OpenTerminalHandler extends AbstractHandler
 
 	private IProject fProject;
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		if (fProject != null)

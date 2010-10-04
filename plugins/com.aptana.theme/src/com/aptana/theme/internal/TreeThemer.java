@@ -241,7 +241,6 @@ class TreeThemer extends ControlThemer
 			isDisabled = false;
 		}
 
-		@Override
 		public Image getImage(Object element)
 		{
 			if (cellProvider instanceof ILabelProvider)
@@ -251,7 +250,6 @@ class TreeThemer extends ControlThemer
 			return null;
 		}
 
-		@Override
 		public String getText(Object element)
 		{
 			if (cellProvider instanceof ILabelProvider)
@@ -304,8 +302,6 @@ class TreeThemer extends ControlThemer
 		// This draws from right end of item to full width of tree, needed on windows so selection is full width of view
 		selectionPaintListener = new Listener()
 		{
-
-			@Override
 			public void handleEvent(Event event)
 			{
 				try
@@ -368,8 +364,6 @@ class TreeThemer extends ControlThemer
 		final Tree tree = getTree();
 		customDrawingListener = new Listener()
 		{
-
-			@Override
 			public void handleEvent(Event event)
 			{
 				GC gc = event.gc;
@@ -452,8 +446,6 @@ class TreeThemer extends ControlThemer
 		final Tree tree = getTree();
 		fontListener = new IPropertyChangeListener()
 		{
-
-			@Override
 			public void propertyChange(PropertyChangeEvent event)
 			{
 				if (!event.getProperty().equals(IThemeManager.VIEW_FONT_NAME))
@@ -462,8 +454,6 @@ class TreeThemer extends ControlThemer
 				}
 				Display.getCurrent().asyncExec(new Runnable()
 				{
-
-					@Override
 					public void run()
 					{
 						Font font = getFont();

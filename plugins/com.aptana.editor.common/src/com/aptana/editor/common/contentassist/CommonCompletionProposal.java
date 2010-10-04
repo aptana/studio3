@@ -95,7 +95,6 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.ICompletionProposal#apply(org.eclipse.jface.text.IDocument)
 	 */
-	@Override
 	public void apply(IDocument document)
 	{
 		// not called anymore
@@ -150,7 +149,6 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.ICompletionProposal#getAdditionalProposalInfo()
 	 */
-	@Override
 	public String getAdditionalProposalInfo()
 	{
 		return this._additionalProposalInformation;
@@ -160,7 +158,6 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.ICompletionProposal#getContextInformation()
 	 */
-	@Override
 	public IContextInformation getContextInformation()
 	{
 		return this._contextInformation;
@@ -170,7 +167,6 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.ICompletionProposal#getDisplayString()
 	 */
-	@Override
 	public String getDisplayString()
 	{
 		return this._displayString;
@@ -180,7 +176,6 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.contentassist.ICommonCompletionProposal#getFileLocation()
 	 */
-	@Override
 	public String getFileLocation()
 	{
 		return (this._fileLocation != null) ? this._fileLocation : ""; //$NON-NLS-1$
@@ -190,7 +185,6 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.ICompletionProposal#getImage()
 	 */
-	@Override
 	public Image getImage()
 	{
 		return this._image;
@@ -210,7 +204,6 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.ICompletionProposal#getSelection(org.eclipse.jface.text.IDocument)
 	 */
-	@Override
 	public Point getSelection(IDocument document)
 	{
 		return new Point(this._replacementOffset + this._cursorPosition, 0);
@@ -220,7 +213,6 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.contentassist.ICommonCompletionProposal#getUserAgentImages()
 	 */
-	@Override
 	public Image[] getUserAgentImages()
 	{
 		return this._userAgentImages;
@@ -230,7 +222,6 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.contentassist.ICommonCompletionProposal#isDefaultSelection()
 	 */
-	@Override
 	public boolean isDefaultSelection()
 	{
 		return this._isDefaultSelection;
@@ -240,7 +231,6 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.contentassist.ICommonCompletionProposal#isSuggestedSelection()
 	 */
-	@Override
 	public boolean isSuggestedSelection()
 	{
 		return this._isSuggestedSelection;
@@ -286,25 +276,21 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 		this._userAgentImages = images;
 	}
 
-	@Override
 	public IInformationControlCreator getInformationControlCreator()
 	{
 		return null;
 	}
 
-	@Override
 	public CharSequence getPrefixCompletionText(IDocument document, int completionOffset)
 	{
 		return _replacementString;
 	}
 
-	@Override
 	public int getPrefixCompletionStart(IDocument document, int completionOffset)
 	{
 		return _replacementOffset;
 	}
 
-	@Override
 	public void apply(ITextViewer viewer, char trigger, int stateMask, int offset)
 	{
 		IDocument document = viewer.getDocument();

@@ -108,7 +108,6 @@ public class JSTokenScanner extends RuleBasedScanner implements IJSTokenScanner
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.IJSTokenScanner#hasDivisionStart()
 	 */
-	@Override
 	public boolean hasDivisionStart()
 	{
 		if (fToken == null || fToken.getData() == null)
@@ -182,6 +181,10 @@ public class JSTokenScanner extends RuleBasedScanner implements IJSTokenScanner
 			wordRule.addWord(operator, createToken(type));
 		}
 		rules.add(wordRule);
+		
+		// NOTE: Numbers can start with a period, so we need to check for numbers
+		// before the operator list below, which includes the dot operator
+		rules.add(new JSNumberRule(createToken(JSTokenType.NUMBER)));
 
 		// single-character operators and punctuation
 		CharacterMapRule cmRule = new CharacterMapRule();
@@ -222,9 +225,6 @@ public class JSTokenScanner extends RuleBasedScanner implements IJSTokenScanner
 		addWordRules(wordRule, createToken(JSTokenType.IDENTIFIER), JSLanguageConstants.SUPPORT_CLASSES);
 		addWordRules(wordRule, createToken(JSTokenType.IDENTIFIER), JSLanguageConstants.SUPPORT_DOM_CONSTANTS);
 		rules.add(wordRule);
-
-		// numbers
-		rules.add(new JSNumberRule(createToken(JSTokenType.NUMBER)));
 
 		// identifiers
 		rules.add(new WordRule(new JSIdentifierDetector(), createToken(JSTokenType.IDENTIFIER)));

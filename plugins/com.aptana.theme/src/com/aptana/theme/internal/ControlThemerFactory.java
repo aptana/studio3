@@ -120,7 +120,6 @@ public class ControlThemerFactory implements IControlThemerFactory
 		}
 	}
 
-	@Override
 	public void apply(Viewer viewer)
 	{
 		if (viewer instanceof TreeViewer)
@@ -146,7 +145,6 @@ public class ControlThemerFactory implements IControlThemerFactory
 		}
 	}
 
-	@Override
 	public void dispose(Viewer viewer)
 	{
 		dispose(viewer.getControl());

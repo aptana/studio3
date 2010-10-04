@@ -76,10 +76,13 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 
 	public ProjectTemplate getSelectedTemplate()
 	{
-		return fSelectedTemplate;
+		if (fUseTemplateButton.getSelection())
+		{
+			return fSelectedTemplate;
+		}
+		return null;
 	}
 
-	@Override
 	public void createControl(Composite parent)
 	{
 		Composite main = new Composite(parent, SWT.NONE);
@@ -107,7 +110,6 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 		setControl(main);
 	}
 
-	@Override
 	public void widgetSelected(SelectionEvent e)
 	{
 		Object source = e.getSource();
@@ -117,12 +119,10 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 		}
 	}
 
-	@Override
 	public void widgetDefaultSelected(SelectionEvent e)
 	{
 	}
 
-	@Override
 	public void selectionChanged(SelectionChangedEvent event)
 	{
 		// change the preview text according to the template selection
@@ -177,18 +177,15 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 	private class ListContentProvider implements IStructuredContentProvider
 	{
 
-		@Override
 		public Object[] getElements(Object inputElement)
 		{
 			return fTemplates;
 		}
 
-		@Override
 		public void dispose()
 		{
 		}
 
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput)
 		{
 		}

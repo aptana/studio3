@@ -53,7 +53,6 @@ public class ToggleAppExplorerHandler extends AbstractHandler
 	{
 	}
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		boolean toShow = !HandlerUtil.toggleCommandState(event.getCommand());

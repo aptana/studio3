@@ -64,19 +64,16 @@ public class CompositeTokenScanner implements ITokenScanner
 		return fSwitchStrategies[fCurrentIndex];
 	}
 
-	@Override
 	public int getTokenLength()
 	{
 		return fPrimaryTokenScanner.getTokenLength();
 	}
 
-	@Override
 	public int getTokenOffset()
 	{
 		return fPrimaryTokenScanner.getTokenOffset();
 	}
 
-	@Override
 	public IToken nextToken()
 	{
 		IToken token = fPrimaryTokenScanner.nextToken();
@@ -100,7 +97,6 @@ public class CompositeTokenScanner implements ITokenScanner
 		return token;
 	}
 
-	@Override
 	public void setRange(IDocument document, int offset, int length)
 	{
 		fPrimaryTokenScanner.setRange(document, offset, length);

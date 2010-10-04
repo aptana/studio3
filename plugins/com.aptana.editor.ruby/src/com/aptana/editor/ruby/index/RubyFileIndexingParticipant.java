@@ -46,7 +46,7 @@ import org.jrubyparser.ast.Node;
 import org.jrubyparser.parser.ParserResult;
 
 import com.aptana.core.util.IOUtil;
-import com.aptana.editor.ruby.Activator;
+import com.aptana.editor.ruby.RubyEditorPlugin;
 import com.aptana.editor.ruby.parsing.IRubyParserConstants;
 import com.aptana.editor.ruby.parsing.ISourceElementRequestor;
 import com.aptana.editor.ruby.parsing.RubyParser;
@@ -60,7 +60,6 @@ import com.aptana.parsing.ParserPoolFactory;
 public class RubyFileIndexingParticipant implements IFileStoreIndexingParticipant
 {
 
-	@Override
 	public void index(Set<IFileStore> files, final Index index, IProgressMonitor monitor) throws CoreException
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, files.size() * 100);
@@ -116,7 +115,7 @@ public class RubyFileIndexingParticipant implements IFileStoreIndexingParticipan
 		}
 		catch (Throwable e)
 		{
-			Activator.log(e);
+			RubyEditorPlugin.log(e);
 		}
 		finally
 		{

@@ -36,7 +36,7 @@ package com.aptana.editor.html.contentassist.index;
 
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.ArrayDeque;
+import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -59,6 +59,8 @@ import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.IHTMLParserConstants;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
+import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
+import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.IParser;
@@ -166,6 +168,13 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 					addIndex(index, file, HTMLIndexConstants.RESOURCE_JS, resolved.toString());
 				}
 			}
+			else if (child != null && IJSParserConstants.LANGUAGE.equals(child.getLanguage()))
+			{
+				// process inline code
+				JSFileIndexingParticipant jsIndex = new JSFileIndexingParticipant();
+				
+				jsIndex.processParseResults(index, child, file.toURI());
+			}
 		}
 	}
 
@@ -199,7 +208,7 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 	{
 		if (parent != null)
 		{
-			Queue<IParseNode> queue = new ArrayDeque<IParseNode>();
+			Queue<IParseNode> queue = new LinkedList<IParseNode>();
 
 			// prime queue
 			queue.offer(parent);
@@ -223,7 +232,6 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 	 * @see com.aptana.index.core.IFileStoreIndexingParticipant#index(java.util.Set, com.aptana.index.core.Index,
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public void index(Set<IFileStore> files, Index index, IProgressMonitor monitor) throws CoreException
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, files.size() * 100);

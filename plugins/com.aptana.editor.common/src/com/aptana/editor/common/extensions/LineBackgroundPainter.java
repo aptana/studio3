@@ -93,7 +93,6 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 		this.fViewer = viewer;
 	}
 
-	@Override
 	public void deactivate(boolean redraw)
 	{
 		if (fIsActive)
@@ -354,13 +353,11 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 	/*
 	 * @see IPainter#setPositionManager(IPaintPositionManager)
 	 */
-	@Override
 	public void setPositionManager(IPaintPositionManager manager)
 	{
 		fPositionManager = manager;
 	}
 
-	@Override
 	public void lineGetBackground(LineBackgroundEvent event)
 	{
 		if (fViewer == null)
@@ -557,7 +554,6 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 	 * then this method will not do anything and we'll fall back to using the mechanism eclipse does in
 	 * CursorLinePainter with a little modification.
 	 */
-	@Override
 	public void paintControl(PaintEvent e)
 	{
 		// If there's no alpha value for the line highlight, then we need to force the bg color of the whole line

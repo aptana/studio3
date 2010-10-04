@@ -45,7 +45,7 @@ import org.jrubyparser.parser.Tokens;
 public class RubyCodeScanner implements ITokenScanner
 {
 
-	private ITokenScanner fScanner;
+	private RubyTokenScanner fScanner;
 	private boolean nextIsMethodName;
 	private boolean nextIsModuleName;
 	private boolean nextIsClassName;
@@ -84,8 +84,7 @@ public class RubyCodeScanner implements ITokenScanner
 				lookForBlock = false;
 		}
 
-		if (nextAreArgs
-				&& (data.intValue() == RubyTokenScanner.NEWLINE || data.intValue() == RubyTokenScanner.SEMICOLON))
+		if (nextAreArgs && (isNewline(data) || data.intValue() == RubyTokenScanner.SEMICOLON))
 		{
 			nextAreArgs = false;
 		}
@@ -126,6 +125,12 @@ public class RubyCodeScanner implements ITokenScanner
 					nextIsMethodName = true;
 					return getToken("keyword.control.def.ruby"); //$NON-NLS-1$
 				default:
+					if (nextIsMethodName)
+					{
+						nextIsMethodName = false;
+						nextAreArgs = true;
+						return getToken("entity.name.function.ruby"); //$NON-NLS-1$
+					}
 					return getToken("keyword.control.ruby"); //$NON-NLS-1$
 			}
 		}
@@ -143,21 +148,55 @@ public class RubyCodeScanner implements ITokenScanner
 			case Tokens.tLEQ:
 			case Tokens.tLT:
 			case Tokens.tGT:
-				return getToken("keyword.operator.comparison.ruby"); //$NON-NLS-1$				
+				if (nextIsMethodName)
+				{
+					nextIsMethodName = false;
+					nextAreArgs = true;
+					return getToken("entity.name.function.ruby"); //$NON-NLS-1$
+				}
+				return getToken("keyword.operator.comparison.ruby"); //$NON-NLS-1$
+			case Tokens.tSTAR:
+				if (nextAreArgs) // could be un-named rest arg
+				{
+					return getToken("variable.parameter.ruby"); //$NON-NLS-1$
+				}
+				// intentionally fall-through
 			case Tokens.tAMPER:
 			case Tokens.tPERCENT:
 			case Tokens.tPOW:
-			case Tokens.tSTAR:
+			case Tokens.tSTAR2:
 			case Tokens.tPLUS:
 			case Tokens.tMINUS:
 			case Tokens.tDIVIDE:
+				if (nextIsMethodName)
+				{
+					nextIsMethodName = false;
+					nextAreArgs = true;
+					return getToken("entity.name.function.ruby"); //$NON-NLS-1$
+				}
 				return getToken("keyword.operator.arithmetic.ruby"); //$NON-NLS-1$			
 			case Tokens.tANDOP:
+			case Tokens.tAMPER2: // &
+			case Tokens.tTILDE:
 			case Tokens.tBANG:
 			case Tokens.tOROP:
 			case Tokens.tCARET:
 			case RubyTokenScanner.QUESTION:
+				if (nextIsMethodName)
+				{
+					nextIsMethodName = false;
+					nextAreArgs = true;
+					return getToken("entity.name.function.ruby"); //$NON-NLS-1$
+				}
 				return getToken("keyword.operator.logical.ruby"); //$NON-NLS-1$
+			case Tokens.tAREF:
+			case Tokens.tASET:
+			case Tokens.tUPLUS:
+			case Tokens.tUMINUS:
+			case Tokens.tUMINUS_NUM:
+				nextIsMethodName = false;
+				nextAreArgs = true;
+				return getToken("entity.name.function.ruby"); //$NON-NLS-1$			
 			case Tokens.tPIPE:
 				if (lookForBlock)
 				{
@@ -165,6 +204,12 @@ public class RubyCodeScanner implements ITokenScanner
 					if (!inPipe)
 						lookForBlock = false;
 					return getToken("default.ruby"); //$NON-NLS-1$
+				}
+				if (nextIsMethodName)
+				{
+					nextIsMethodName = false;
+					nextAreArgs = true;
+					return getToken("entity.name.function.ruby"); //$NON-NLS-1$
 				}
 				return getToken("keyword.operator.logical.ruby"); //$NON-NLS-1$
 			case Tokens.tLBRACE:
@@ -177,6 +222,12 @@ public class RubyCodeScanner implements ITokenScanner
 				if (nextIsClassName)
 				{
 					return getToken("entity.name.type.class.ruby"); //$NON-NLS-1$
+				}
+				if (nextIsMethodName)
+				{
+					nextIsMethodName = false;
+					nextAreArgs = true;
+					return getToken("entity.name.function.ruby"); //$NON-NLS-1$
 				}
 				return getToken("keyword.operator.assignment.augmented.ruby"); //$NON-NLS-1$
 			case Tokens.tOP_ASGN:
@@ -236,6 +287,20 @@ public class RubyCodeScanner implements ITokenScanner
 			default:
 				return getToken("default.ruby"); //$NON-NLS-1$
 		}
+	}
+
+	@SuppressWarnings("nls")
+	protected boolean isNewline(Integer data)
+	{
+		if (data.intValue() == RubyTokenScanner.NEWLINE)
+			return true;
+		if (data.intValue() != Tokens.tWHITESPACE)
+			return false;
+		// make sure it's actually a newline
+		String tokenSrc = fScanner.getSource(fOffset, fLength);
+		if (tokenSrc == null)
+			return false;
+		return tokenSrc.equals("\r\n") || tokenSrc.equals("\n") || tokenSrc.equals("\r");
 	}
 
 	protected IToken getToken(String tokenName)

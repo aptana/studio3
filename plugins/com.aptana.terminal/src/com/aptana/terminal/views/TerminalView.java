@@ -226,7 +226,6 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	protected void close() {
 		if (terminalComposite != null && !terminalComposite.isDisposed()) {
 			terminalComposite.getTerminalControl().getDisplay().asyncExec(new Runnable() {
-				@Override
 				public void run() {
 					getSite().getPage().hideView((IViewPart) getSite().getPart());
 				}
@@ -237,7 +236,6 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	/* (non-Javadoc)
 	 * @see com.aptana.terminal.internal.IProcessListener#processCompleted()
 	 */
-	@Override
 	public void processCompleted() {
 		IPreferenceStore prefs = Activator.getDefault().getPreferenceStore();
 		boolean closeViewOnExit = prefs.getBoolean(IPreferenceConstants.CLOSE_VIEW_ON_EXIT);
@@ -249,7 +247,6 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart2#promptToSaveOnClose()
 	 */
-	@Override
 	public int promptToSaveOnClose() {
 		return terminalComposite.canCloseTerminal() ? ISaveablePart2.YES : ISaveablePart2.CANCEL;
 	}
@@ -257,21 +254,18 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public void doSave(IProgressMonitor monitor) {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#doSaveAs()
 	 */
-	@Override
 	public void doSaveAs() {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#isDirty()
 	 */
-	@Override
 	public boolean isDirty() {
 		try {
 			return checkCanClose;
@@ -283,7 +277,6 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
 	 */
-	@Override
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
@@ -291,7 +284,6 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#isSaveOnCloseNeeded()
 	 */
-	@Override
 	public boolean isSaveOnCloseNeeded() {
 		checkCanClose = true;
 		return true;
@@ -333,14 +325,11 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 		terminalComposite.setFocus();
 	}
 	
-	@Override
 	public void setState(TerminalState state) {
 	}
 
-	@Override
 	public void setTerminalTitle(final String title) {
 		Utils.runInDisplayThread(new Runnable() {
-			@Override
 			public void run() {
 				setPartName(title);
 			}

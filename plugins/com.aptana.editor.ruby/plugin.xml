@@ -51,6 +51,7 @@
          point="com.aptana.parsing.parser">
       <parser
             class="com.aptana.editor.ruby.parsing.RubyParser"
+            content-type="com.aptana.contenttype.ruby"
             language="text/ruby">
       </parser>
    </extension>

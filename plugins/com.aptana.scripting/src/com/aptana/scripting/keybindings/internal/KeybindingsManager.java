@@ -211,7 +211,6 @@ public class KeybindingsManager implements LoadCycleListener
 
 	private final IContextManagerListener contextManagerListener = new IContextManagerListener()
 	{
-		@Override
 		public void contextManagerChanged(ContextManagerEvent contextManagerEvent)
 		{
 			setEnabled(contextManagerEvent.getContextManager().getActiveContextIds().contains(Activator.CONTEXT_ID));
@@ -403,7 +402,6 @@ public class KeybindingsManager implements LoadCycleListener
 		IModelFilter filter = new IModelFilter()
 		{
 
-			@Override
 			public boolean include(AbstractElement element)
 			{
 				boolean result = false;
@@ -907,7 +905,6 @@ public class KeybindingsManager implements LoadCycleListener
 	 * (non-Javadoc)
 	 * @see com.aptana.scripting.model.LoadCycleListener#scriptLoaded(java.io.File)
 	 */
-	@Override
 	public void scriptLoaded(File script)
 	{
 		reloadbindings();
@@ -917,7 +914,6 @@ public class KeybindingsManager implements LoadCycleListener
 	 * (non-Javadoc)
 	 * @see com.aptana.scripting.model.LoadCycleListener#scriptReloaded(java.io.File)
 	 */
-	@Override
 	public void scriptReloaded(File script)
 	{
 		reloadbindings();
@@ -927,7 +923,6 @@ public class KeybindingsManager implements LoadCycleListener
 	 * (non-Javadoc)
 	 * @see com.aptana.scripting.model.LoadCycleListener#scriptUnloaded(java.io.File)
 	 */
-	@Override
 	public void scriptUnloaded(File script)
 	{
 		reloadbindings();

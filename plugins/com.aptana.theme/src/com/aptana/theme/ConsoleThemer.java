@@ -54,8 +54,6 @@ import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IOConsoleOutputStream;
 import org.eclipse.ui.console.TextConsole;
 
-import com.aptana.theme.extensions.ConsoleThemePageParticipant;
-
 /**
  * This extension will make sure that the colors for the console are always following the theme preferences.
  */
@@ -235,7 +233,6 @@ public class ConsoleThemer
 	{
 		this.fThemeChangeListener = new IPreferenceChangeListener()
 		{
-			@Override
 			public void preferenceChange(PreferenceChangeEvent event)
 			{
 				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
@@ -255,7 +252,6 @@ public class ConsoleThemer
 	{
 		this.fFontChangeListener = new IPropertyChangeListener()
 		{
-			@Override
 			public void propertyChange(PropertyChangeEvent event)
 			{
 				if (event.getProperty().equals(TEXTFONT_PROPERTY))

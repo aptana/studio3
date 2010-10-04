@@ -9,6 +9,7 @@ import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.LocalConnectionPoint;
 
+@SuppressWarnings("nls")
 public class SFTPSyncingTestsWithSpaces extends SyncingTests
 {
 

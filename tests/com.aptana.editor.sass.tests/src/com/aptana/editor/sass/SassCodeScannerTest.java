@@ -1,38 +1,26 @@
 package com.aptana.editor.sass;
 
-import junit.framework.TestCase;
-
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
 
-import com.aptana.editor.sass.SassCodeScanner;
+import com.aptana.editor.common.tests.AbstractTokenScannerTestCase;
 
 @SuppressWarnings("nls")
-public class SassCodeScannerTest extends TestCase
+public class SassCodeScannerTest extends AbstractTokenScannerTestCase
 {
-
-	private SassCodeScanner scanner;
-
 	@Override
-	protected void setUp() throws Exception
+	protected ITokenScanner createTokenScanner()
 	{
-		super.setUp();
-		scanner = new SassCodeScanner()
+		return new SassCodeScanner()
 		{
 			protected IToken createToken(String string)
 			{
-				return getToken(string);
+				return SassCodeScannerTest.this.getToken(string);
 			};
 		};
-	}
-
-	@Override
-	protected void tearDown() throws Exception
-	{
-		scanner = null;
-		super.tearDown();
 	}
 
 	public void testH1Through6()
@@ -47,12 +35,10 @@ public class SassCodeScannerTest extends TestCase
 			assertToken(Token.WHITESPACE, i + 2, 1);
 		}
 	}
-	
+
 	public void testCSS3PropertyNames()
 	{
-		String src = "border-radius: 1px\n" +
-				"border-image-width: 1px\n" +
-				"box-decoration-break: clone";
+		String src = "border-radius: 1px\n" + "border-image-width: 1px\n" + "box-decoration-break: clone";
 		IDocument document = new Document(src);
 		scanner.setRange(document, 0, src.length());
 
@@ -72,9 +58,9 @@ public class SassCodeScannerTest extends TestCase
 		assertToken(getToken("punctuation.separator.key-value.css"), 63, 1);
 		assertToken(Token.WHITESPACE, 64, 1);
 	}
-	
+
 	// FIXME Test actual Sass, not CSS!
-	
+
 	public void testSmallCaps()
 	{
 		String src = "small { font: small-caps; }";
@@ -93,7 +79,7 @@ public class SassCodeScannerTest extends TestCase
 		assertToken(Token.WHITESPACE, 25, 1);
 		assertToken(getToken("punctuation.section.property-list.css"), 26, 1);
 	}
-	
+
 	public void testVariableDefinition()
 	{
 		String src = "!blue = #3bbfce";
@@ -106,7 +92,7 @@ public class SassCodeScannerTest extends TestCase
 		assertToken(Token.WHITESPACE, 7, 1);
 		assertToken(getToken("constant.other.color.rgb-value.css"), 8, 7);
 	}
-	
+
 	public void testVariableUsage()
 	{
 		String src = ".content_navigation\n  border-color = !blue";
@@ -121,7 +107,7 @@ public class SassCodeScannerTest extends TestCase
 		assertToken(Token.WHITESPACE, 36, 1);
 		assertToken(getToken("variable.other.sass"), 37, 5);
 	}
-	
+
 	public void testMixinDefinition()
 	{
 		String src = "=table-scaffolding\n  th\n    text-align: center";
@@ -137,7 +123,7 @@ public class SassCodeScannerTest extends TestCase
 		assertToken(Token.WHITESPACE, 39, 1);
 		assertToken(getToken("support.constant.property-value.css"), 40, 6);
 	}
-	
+
 	public void testMixinUsage()
 	{
 		String src = "#data\n  +table-scaffolding";
@@ -147,7 +133,7 @@ public class SassCodeScannerTest extends TestCase
 		assertToken(getToken("entity.other.attribute-name.id.css"), 0, 5);
 		assertToken(Token.WHITESPACE, 5, 3);
 		assertToken(getToken("variable.other.sass"), 8, 18);
-	}	
+	}
 
 	public void testBasicTokenizing()
 	{
@@ -307,17 +293,5 @@ public class SassCodeScannerTest extends TestCase
 		assertToken(getToken("punctuation.section.property-list.css"), 336, 1);
 		assertToken(Token.WHITESPACE, 337, 3);
 		// line 20
-	}
-
-	private IToken getToken(String string)
-	{
-		return new Token(string);
-	}
-
-	private void assertToken(IToken token, int offset, int length)
-	{
-		assertEquals(token.getData(), scanner.nextToken().getData());
-		assertEquals(offset, scanner.getTokenOffset());
-		assertEquals(length, scanner.getTokenLength());
 	}
 }

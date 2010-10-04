@@ -53,7 +53,6 @@ import com.aptana.terminal.IProcessConfiguration;
 	 * (non-Javadoc)
 	 * @see com.aptana.terminal.IProcessConfiguration#getExecutable()
 	 */
-	@Override
 	public File getExecutable() {
 		URL url = FileLocator.find(Activator.getDefault().getBundle(), getExecutablePath(), null);
 		return ResourceUtil.resourcePathToFile(url);
@@ -65,7 +64,6 @@ import com.aptana.terminal.IProcessConfiguration;
 	 * (non-Javadoc)
 	 * @see com.aptana.terminal.IProcessConfiguration#getEnvironment()
 	 */
-	@Override
 	public Map<String, String> getEnvironment() {
 		Map<String, String> env = new HashMap<String, String>();
 		env.put("APTANA_VERSION", getVersion()); //$NON-NLS-1$

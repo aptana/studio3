@@ -55,6 +55,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessUtil;
+import com.aptana.core.util.StringUtil;
 
 /**
  * @author Max Stepanov
@@ -119,13 +120,13 @@ public class ShellExecutable {
 	
 	private static IPath getPreferenceShellPath() {
 		String pref = new InstanceScope().getNode(CorePlugin.PLUGIN_ID).get(ICorePreferenceConstants.SHELL_EXECUTABLE_PATH, null);
-		if (pref != null && !pref.isEmpty()) {
+		if (pref != null && !StringUtil.isEmpty(pref)) {
 			IPath path = Path.fromOSString(pref);
 			if (path.toFile().isDirectory()) {
 				boolean isWin32 = Platform.OS_WIN32.equals(Platform.getOS());
 				path = path.append(isWin32 ? SH_EXE : BASH);
 			}
-			if (path.toFile().canExecute()) {
+			if (ExecutableUtil.isExecutable(path)) {
 				return path;
 			}
 			CorePlugin.logWarning("Shell executable path preference point to an invalid location"); //$NON-NLS-1$

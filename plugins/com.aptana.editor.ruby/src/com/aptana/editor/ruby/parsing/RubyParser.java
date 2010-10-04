@@ -49,7 +49,6 @@ public class RubyParser implements IParser
 		fParser = new RubySourceParser();
 	}
 
-	@Override
 	public IParseNode parse(IParseState parseState) throws Exception
 	{
 		String source = new String(parseState.getSource());

@@ -78,7 +78,8 @@ public class Theme
 	private static final String BOLD = "bold"; //$NON-NLS-1$
 	private static final String ITALIC = "italic"; //$NON-NLS-1$
 
-	static final String THEME_NAME_PROP_KEY = "name"; //$NON-NLS-1$
+	public static final String THEME_NAME_PROP_KEY = "name"; //$NON-NLS-1$
+	public static final String THEME_EXTENDS_PROP_KEY = "extends_theme"; //$NON-NLS-1$
 	static final String FOREGROUND_PROP_KEY = "foreground"; //$NON-NLS-1$
 	private static final String BACKGROUND_PROP_KEY = "background"; //$NON-NLS-1$
 	private static final String SELECTION_PROP_KEY = "selection"; //$NON-NLS-1$
@@ -141,7 +142,8 @@ public class Theme
 			boolean skipFG = false;
 			for (String token : values)
 			{
-				if (token.trim().length() == 0 && num == 0)
+				token = token.trim();
+				if (token.length() == 0 && num == 0)
 				{
 					// empty fg!
 					skipFG = true;
@@ -292,37 +294,41 @@ public class Theme
 
 		// Some tokens are special. They have fallbacks even if not in the theme! Looks like bundles can contribute
 		// them?
-		if (scope.startsWith("markup.changed")) //$NON-NLS-1$
+		if (new ScopeSelector("markup.changed").matches(scope)) //$NON-NLS-1$
 		{
 			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(248, 205, 14), SWT.NORMAL);
 		}
-		if (scope.startsWith("markup.deleted")) //$NON-NLS-1$
+		if (new ScopeSelector("markup.deleted").matches(scope)) //$NON-NLS-1$
 		{
 			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(255, 86, 77), SWT.NORMAL);
 		}
-		if (scope.startsWith("markup.inserted")) //$NON-NLS-1$
+		if (new ScopeSelector("markup.inserted").matches(scope)) //$NON-NLS-1$
 		{
 			return new DelayedTextAttribute(new RGBa(0, 0, 0), new RGBa(128, 250, 120), SWT.NORMAL);
 		}
-		if (scope.startsWith("markup.underline")) //$NON-NLS-1$
+		if (new ScopeSelector("markup.underline").matches(scope)) //$NON-NLS-1$
 		{
 			return new DelayedTextAttribute(null, null, TextAttribute.UNDERLINE);
 		}
-		if (scope.startsWith("markup.bold")) //$NON-NLS-1$
+		if (new ScopeSelector("markup.bold").matches(scope)) //$NON-NLS-1$
 		{
 			return new DelayedTextAttribute(null, null, SWT.BOLD);
 		}
-		if (scope.startsWith("markup.italic")) //$NON-NLS-1$
+		if (new ScopeSelector("markup.italic").matches(scope)) //$NON-NLS-1$
 		{
 			return new DelayedTextAttribute(null, null, SWT.ITALIC);
 		}
-		if (scope.startsWith("meta.diff.index") || scope.startsWith("meta.diff.range") || scope.startsWith("meta.separator.diff")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (new ScopeSelector("meta.diff.index").matches(scope) || new ScopeSelector("meta.diff.range").matches(scope) || new ScopeSelector("meta.separator.diff").matches(scope)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		{
 			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(65, 126, 218), SWT.ITALIC);
 		}
-		if (scope.startsWith("meta.diff.header")) //$NON-NLS-1$
+		if (new ScopeSelector("meta.diff.header").matches(scope)) //$NON-NLS-1$
 		{
 			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(103, 154, 233), SWT.NORMAL);
+		}
+		if (new ScopeSelector("meta.separator").matches(scope)) //$NON-NLS-1$
+		{
+			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(52, 103, 209), SWT.NORMAL);
 		}
 		return new DelayedTextAttribute(new RGBa(defaultFG));
 	}
@@ -739,7 +745,7 @@ public class Theme
 	 */
 	public boolean hasEntry(String scopeSelector)
 	{
-		return coloringRules.containsKey(scopeSelector);
+		return coloringRules.containsKey(new ScopeSelector(scopeSelector));
 	}
 
 	public Color getForeground(String scope)

@@ -60,19 +60,16 @@ public class RubyMethod extends NamedMember implements IRubyMethod
 		blockVars.add(name);
 	}
 
-	@Override
 	public String[] getBlockVars()
 	{
 		return blockVars.toArray(new String[blockVars.size()]);
 	}
 
-	@Override
 	public String[] getParameters()
 	{
 		return fParameters;
 	}
 
-	@Override
 	public Visibility getVisibility()
 	{
 		return fVisibility;
@@ -84,7 +81,6 @@ public class RubyMethod extends NamedMember implements IRubyMethod
 		return IRubyElement.METHOD;
 	}
 
-	@Override
 	public boolean isSingleton()
 	{
 		return isSingleton;

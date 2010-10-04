@@ -45,9 +45,9 @@ import org.eclipse.jface.text.rules.Token;
 import org.jrubyparser.CompatVersion;
 import org.jrubyparser.Parser.NullWarnings;
 import org.jrubyparser.lexer.Lexer;
+import org.jrubyparser.lexer.Lexer.LexState;
 import org.jrubyparser.lexer.LexerSource;
 import org.jrubyparser.lexer.SyntaxException;
-import org.jrubyparser.lexer.Lexer.LexState;
 import org.jrubyparser.parser.ParserConfiguration;
 import org.jrubyparser.parser.ParserResult;
 import org.jrubyparser.parser.ParserSupport;
@@ -147,7 +147,7 @@ public class RubyTokenScanner implements ITokenScanner
 		}
 		catch (IOException e)
 		{
-			System.out.println(e);
+			RubyEditorPlugin.log(e);
 		}
 
 		return returnValue;
@@ -239,6 +239,7 @@ public class RubyTokenScanner implements ITokenScanner
 			case COMMA:
 			case Tokens.tASSOC:
 			case Tokens.tRPAREN:
+			case Tokens.tWHITESPACE:
 				return true;
 			default:
 				return false;
@@ -274,6 +275,7 @@ public class RubyTokenScanner implements ITokenScanner
 			case Tokens.tASSOC:
 			case Tokens.tLSHFT:
 			case Tokens.tRPAREN:
+			case Tokens.tWHITESPACE:
 			case COMMA:
 			case NEWLINE:
 				return true;
@@ -311,5 +313,12 @@ public class RubyTokenScanner implements ITokenScanner
 		}
 		origOffset = offset;
 		origLength = length;
+	}
+
+	String getSource(int offset, int length)
+	{
+		if (fContents == null || offset < 0 || (offset + length) > fContents.length())
+			return null;
+		return new String(fContents.substring(offset, offset + length));
 	}
 }

@@ -170,7 +170,6 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		IRunnableWithProgress runnable = new IRunnableWithProgress()
 		{
 
-			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
 			{
 				SubMonitor sub = SubMonitor.convert(monitor, 100);
@@ -239,7 +238,6 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		runnable = new IRunnableWithProgress()
 		{
 
-			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
 			{
 				SubMonitor sub = SubMonitor.convert(monitor, 100);
@@ -249,7 +247,6 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 					PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
 					{
 
-						@Override
 						public void run()
 						{
 							try
@@ -299,7 +296,6 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		runnable = new IRunnableWithProgress()
 		{
 
-			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
 			{
 				SubMonitor sub = SubMonitor.convert(monitor, 100);
@@ -319,7 +315,6 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 					PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
 					{
 
-						@Override
 						public void run()
 						{
 							CommandElement command;
@@ -408,7 +403,6 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 				return ""; //$NON-NLS-1$
 			}
 
-			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
 			{
 				SubMonitor sub = SubMonitor.convert(monitor, 100);
@@ -443,7 +437,6 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 				{
 
-					@Override
 					public void run()
 					{
 						openSignupURLinEclipseBrowser(url, style, BROWSER_ID, javascript);
@@ -508,7 +501,6 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 				return ""; //$NON-NLS-1$
 			}
 
-			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
 			{
 				SubMonitor sub = SubMonitor.convert(monitor, 100);
@@ -543,7 +535,6 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 				{
 
-					@Override
 					public void run()
 					{
 						openSignupURLinEclipseBrowser(url, style, BROWSER_ID, javascript);
@@ -561,13 +552,11 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		runnable = new IRunnableWithProgress()
 		{
 
-			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
 			{
 				PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
 				{
 
-					@Override
 					public void run()
 					{
 						CommandElement command;
@@ -604,7 +593,6 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		return page.getPreviousPage();
 	}
 
-	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection)
 	{
 		Object element = selection.getFirstElement();
@@ -703,14 +691,12 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 			browser.addProgressListener(new ProgressListener()
 			{
 
-				@Override
 				public void completed(ProgressEvent event)
 				{
 					browser.removeProgressListener(this);
 					browser.execute(javascript);
 				}
 
-				@Override
 				public void changed(ProgressEvent event)
 				{
 					// ignore

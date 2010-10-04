@@ -269,7 +269,6 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 		}
 	}
 
-	@Override
 	public void transfer(ConnectionPointComposite source)
 	{
 		if (source == fSource)

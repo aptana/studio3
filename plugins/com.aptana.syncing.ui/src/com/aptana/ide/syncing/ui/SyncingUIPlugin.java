@@ -104,15 +104,29 @@ public class SyncingUIPlugin extends AbstractUIPlugin {
         public void connectionPointChanged(ConnectionPointEvent event) {
             IConnectionPoint connectionPoint = event.getConnectionPoint();
             switch (event.getKind()) {
+			case ConnectionPointEvent.POST_ADD:
+				ISiteConnection[] sites = SyncingPlugin.getSiteConnectionManager().getSiteConnections();
+				IConnectionPoint source, destination;
+				String id = connectionPoint.getId();
+				for (ISiteConnection site : sites) {
+					source = site.getSource();
+					if (source != null && source.getId().equals(id)) {
+						// the source is changed to a new type
+						site.setSource(connectionPoint);
+					}
+					destination = site.getDestination();
+					if (destination != null && destination.getId().equals(id)) {
+						// the destination is changed to a new type
+						site.setDestination(connectionPoint);
+						refreshProjectSiteConnection(site);
+					}
+				}
+				break;
             case ConnectionPointEvent.POST_DELETE:
-                // check if any site connection has the deleted connection point as either source or destination
+                // check if any site connection has the deleted connection point as the destination
                 ISiteConnection[] siteConnections = SyncingPlugin.getSiteConnectionManager().getSiteConnections();
                 for (ISiteConnection siteConnection : siteConnections) {
-                    if (siteConnection.getSource() == connectionPoint) {
-                        siteConnection.setSource(null);
-                    }
                     if (siteConnection.getDestination() == connectionPoint) {
-                        siteConnection.setDestination(null);
                         refreshProjectSiteConnection(siteConnection);
                     }
                 }
@@ -138,17 +152,14 @@ public class SyncingUIPlugin extends AbstractUIPlugin {
 	private IExecutionListener fExecutionListener = new IExecutionListener()
 	{
 
-		@Override
 		public void notHandled(String commandId, NotHandledException exception)
 		{
 		}
 
-		@Override
 		public void postExecuteFailure(String commandId, ExecutionException exception)
 		{
 		}
 
-		@Override
 		public void postExecuteSuccess(String commandId, Object returnValue)
 		{
 			// if we see a save command
@@ -172,7 +183,6 @@ public class SyncingUIPlugin extends AbstractUIPlugin {
 			}
 		}
 
-		@Override
 		public void preExecute(String commandId, ExecutionEvent event)
 		{
 		}

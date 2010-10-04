@@ -89,19 +89,16 @@ class FilenameDifferentiator extends UIJob implements IPartListener
 		return Status.OK_STATUS;
 	}
 
-	@Override
 	public void partActivated(IWorkbenchPart part)
 	{
 		disambiguate(part);
 	}
 
-	@Override
 	public void partBroughtToTop(IWorkbenchPart part)
 	{
 		// do nothing
 	}
 
-	@Override
 	public void partClosed(IWorkbenchPart part)
 	{
 		if (!(part instanceof IEditorPart))
@@ -127,13 +124,11 @@ class FilenameDifferentiator extends UIJob implements IPartListener
 		}
 	}
 
-	@Override
 	public void partDeactivated(IWorkbenchPart part)
 	{
 		// do nothing
 	}
 
-	@Override
 	public void partOpened(IWorkbenchPart part)
 	{
 		disambiguate(part);

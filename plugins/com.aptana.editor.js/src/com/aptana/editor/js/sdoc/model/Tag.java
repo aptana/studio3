@@ -36,6 +36,7 @@ package com.aptana.editor.js.sdoc.model;
 
 import beaver.Symbol;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.parsing.io.SourcePrinter;
 
 public abstract class Tag extends Symbol
@@ -116,7 +117,7 @@ public abstract class Tag extends Symbol
 			writer.print(TagType.UNKNOWN.toString());
 		}
 
-		if (this._text != null && this._text.isEmpty() == false)
+		if (this._text != null && StringUtil.isEmpty(this._text) == false)
 		{
 			writer.print(" ").print(this._text); //$NON-NLS-1$
 		}

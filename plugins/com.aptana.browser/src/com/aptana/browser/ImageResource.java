@@ -52,8 +52,11 @@ public final class ImageResource {
 	private static ImageRegistry imageRegistry;
 
 	private static final String URL_PREFIX = "$nl$/icons/"; //$NON-NLS-1$
+	private static final String URL_OBJ = URL_PREFIX + "obj16/"; //$NON-NLS-1$
 	private static final String URL_ELCL = URL_PREFIX + "elcl16/"; //$NON-NLS-1$
 	private static final String URL_DLCL = URL_PREFIX + "dlcl16/"; //$NON-NLS-1$
+
+	public static final String IMG_OBJ_BROWSER = "IMG_OBJ_BROWSER"; //$NON-NLS-1$
 
 	// toolbar images
 	public static final String IMG_ELCL_NAV_BACKWARD = "IMG_ELCL_NAV_BACKWARD"; //$NON-NLS-1$
@@ -101,6 +104,8 @@ public final class ImageResource {
 		imageRegistry = new ImageRegistry();
 	
 		// load Web browser images
+		registerImage(IMG_OBJ_BROWSER, URL_OBJ + "browser.png"); //$NON-NLS-1$
+
 		registerImage(IMG_ELCL_NAV_BACKWARD, URL_ELCL + "nav_backward.gif"); //$NON-NLS-1$
 		registerImage(IMG_ELCL_NAV_FORWARD, URL_ELCL + "nav_forward.gif"); //$NON-NLS-1$
 		registerImage(IMG_ELCL_NAV_STOP, URL_ELCL + "nav_stop.gif"); //$NON-NLS-1$

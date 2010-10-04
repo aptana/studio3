@@ -78,8 +78,7 @@ public class HTMLParserScanner extends CompositeParserScanner
 		{
 			return false;
 		}
-		// ignores comments and doctype declaration
-		return data.equals(HTMLTokens.getTokenName(HTMLTokens.COMMENT))
-				|| data.equals(HTMLTokens.getTokenName(HTMLTokens.DOCTYPE));
+		// ignores doctype declaration
+		return data.equals(HTMLTokens.getTokenName(HTMLTokens.DOCTYPE));
 	}
 }

@@ -218,8 +218,7 @@ public class ChooseSiteConnectionDialog extends TrayDialog implements SelectionL
         fSiteCombo.addSelectionListener(this);
         fSiteCombo.addModifyListener(new ModifyListener()
 		{
-			
-			@Override
+
 			public void modifyText(ModifyEvent e)
 			{
 				validate();

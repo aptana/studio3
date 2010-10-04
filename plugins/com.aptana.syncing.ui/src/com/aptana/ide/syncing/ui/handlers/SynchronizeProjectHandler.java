@@ -44,7 +44,6 @@ import com.aptana.ide.syncing.ui.actions.SynchronizeProjectAction;
 public class SynchronizeProjectHandler extends BaseSyncHandler
 {
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		SynchronizeProjectAction action = new SynchronizeProjectAction();

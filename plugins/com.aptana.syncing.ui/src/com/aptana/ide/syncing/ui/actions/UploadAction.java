@@ -118,7 +118,6 @@ public class UploadAction extends BaseSyncAction
 							monitor, new SyncActionEventHandler.Client()
 							{
 
-								@Override
 								public void syncCompleted()
 								{
 									IOUIPlugin.refreshNavigatorView(targetRoot);
@@ -165,7 +164,6 @@ public class UploadAction extends BaseSyncAction
 		getShell().getDisplay().asyncExec(new Runnable()
 		{
 
-			@Override
 			public void run()
 			{
 				DialogUtils.openIgnoreMessageDialogInformation(getShell(), MESSAGE_TITLE, MessageFormat.format(

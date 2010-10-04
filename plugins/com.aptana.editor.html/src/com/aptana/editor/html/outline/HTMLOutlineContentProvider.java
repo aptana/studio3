@@ -57,6 +57,7 @@ import com.aptana.editor.common.outline.CompositeOutlineContentProvider;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.html.Activator;
+import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
@@ -291,7 +292,6 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 				{
 
-					@Override
 					public void run()
 					{
 						treeViewer.add(getOutlineItem((IParseNode) parent), finalElements);
@@ -315,7 +315,6 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 				{
 
-					@Override
 					public void run()
 					{
 						treeViewer.remove(placeholder);
@@ -351,6 +350,11 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 		HTMLElementNode element;
 		for (IParseNode node : nodes)
 		{
+			if (node instanceof HTMLCommentNode)
+			{
+				// ignores comment nodes in outline
+				continue;
+			}
 			if (node instanceof HTMLElementNode)
 			{
 				// for HTML node, only takes the element node

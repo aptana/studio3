@@ -78,7 +78,6 @@ class ControlThemer implements IControlThemer
 		this.control = control;
 	}
 
-	@Override
 	public void apply()
 	{
 		addThemeChangeListener();
@@ -97,7 +96,6 @@ class ControlThemer implements IControlThemer
 		}
 	}
 
-	@Override
 	public void dispose()
 	{
 		if (control != null && !control.isDisposed())
@@ -205,8 +203,6 @@ class ControlThemer implements IControlThemer
 	{
 		fThemeChangeListener = new IPreferenceChangeListener()
 		{
-
-			@Override
 			public void preferenceChange(PreferenceChangeEvent event)
 			{
 				if (event.getKey().equals(IThemeManager.THEME_CHANGED))

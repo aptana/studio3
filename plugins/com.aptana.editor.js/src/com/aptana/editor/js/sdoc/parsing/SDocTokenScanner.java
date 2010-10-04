@@ -202,13 +202,11 @@ public class SDocTokenScanner extends RuleBasedScanner
 	{
 		return new ExtendedWordRule(new IWordDetector()
 		{
-			@Override
 			public boolean isWordStart(char c)
 			{
 				return this.isWordPart(c);
 			}
 
-			@Override
 			public boolean isWordPart(char c)
 			{
 				return c == ' ' || c == '\t' || c == '*';

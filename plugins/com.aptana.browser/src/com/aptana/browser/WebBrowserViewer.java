@@ -37,6 +37,7 @@ package com.aptana.browser;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -81,6 +82,7 @@ public class WebBrowserViewer extends Composite {
 	public WebBrowserViewer(Composite parent, int style) {
 		super(parent, SWT.NONE);
 		setLayout(GridLayoutFactory.fillDefaults().create());
+		createActions();
 		if ((style & NAVIGATION_BAR) != 0) {
 			Composite container = new Composite(this, SWT.NONE);
 			container.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
@@ -91,7 +93,6 @@ public class WebBrowserViewer extends Composite {
 		browser.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 		if ((style & NAVIGATION_BAR) != 0) {
 			browser.addProgressListener(new ProgressListener() {
-				@Override
 				public void changed(ProgressEvent event) {
 					if (!loadInProgress) {
 						loadInProgress = true;
@@ -99,7 +100,6 @@ public class WebBrowserViewer extends Composite {
 					}
 				}
 	
-				@Override
 				public void completed(ProgressEvent event) {
 					loadInProgress = false;
 					updateNavigationButtons();
@@ -114,11 +114,15 @@ public class WebBrowserViewer extends Composite {
 			});
 			updateNavigationButtons();
 		}
+		
+		MenuManager menuManager = new MenuManager("#Popup");
+		menuManager.add(backAction);
+		menuManager.add(forwardAction);
+		menuManager.add(refreshAction);
+		browser.setMenu(menuManager.createContextMenu(browser));
 	}
 	
 	private void createNavigationBar(Composite parent) {
-		createActions();
-		
 		toolBarManager = new ToolBarManager(SWT.FLAT);
 		toolBarManager.add(backAction);
 		toolBarManager.add(forwardAction);
@@ -132,7 +136,7 @@ public class WebBrowserViewer extends Composite {
 
 		urlCombo.addListener(SWT.DefaultSelection, new Listener() {
             public void handleEvent(Event e) {
-                setUrl(urlCombo.getText());
+                setURL(urlCombo.getText());
             }
         });
 
@@ -220,7 +224,7 @@ public class WebBrowserViewer extends Composite {
 		return browser.setFocus();
 	}
 	
-	public Control getBrowserControl() {
+	public Control getBrowser() {
 		return browser;
 	}
 
@@ -240,7 +244,7 @@ public class WebBrowserViewer extends Composite {
 	 * @return
 	 * @see com.aptana.swt.webkitbrowser.WebKitBrowser#setUrl(java.lang.String, java.lang.String, java.lang.String[])
 	 */
-	public boolean setUrl(String url, String postData, String[] headers) {
+	public boolean setURL(String url, String postData, String[] headers) {
 		return browser.setUrl(url, postData, headers);
 	}
 
@@ -249,7 +253,7 @@ public class WebBrowserViewer extends Composite {
 	 * @return
 	 * @see com.aptana.swt.webkitbrowser.WebKitBrowser#setUrl(java.lang.String)
 	 */
-	public boolean setUrl(String url) {
+	public boolean setURL(String url) {
 		return browser.setUrl(url);
 	}
 

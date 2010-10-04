@@ -32,6 +32,13 @@
             name="%content-type.json.name"
             priority="normal">
       </content-type>
+      <content-type
+            base-type="org.eclipse.core.runtime.xml"
+            file-extensions="sdocml"
+            id="com.aptana.contenttype.sdocml"
+            name="SDocML Source"
+            priority="normal">
+      </content-type>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
@@ -47,11 +54,18 @@
                contentTypeId="com.aptana.contenttype.js">
          </contentTypeBinding>
       </fileIndexingParticipant>
+      <fileIndexingParticipant
+            class="com.aptana.editor.js.contentassist.index.SDocMLFileIndexingParticipant">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.sdocml">
+         </contentTypeBinding>
+      </fileIndexingParticipant>
    </extension>
    <extension
          point="com.aptana.parsing.parser">
       <parser
             class="com.aptana.editor.js.parsing.JSParser"
+            content-type="com.aptana.contenttype.js"
             language="text/javascript">
       </parser>
    </extension>

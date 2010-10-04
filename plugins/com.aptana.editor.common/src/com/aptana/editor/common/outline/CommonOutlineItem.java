@@ -54,19 +54,16 @@ public class CommonOutlineItem implements ILanguageNode, IRange, Comparable<IRan
 		return fReferenceNode == null ? "" : fReferenceNode.getText(); //$NON-NLS-1$
 	}
 
-	@Override
 	public int compareTo(IRange o)
 	{
 		return getStartingOffset() - o.getStartingOffset();
 	}
 
-	@Override
 	public boolean contains(int offset)
 	{
 		return fSourceRange.contains(offset);
 	}
 
-	@Override
 	public boolean equals(Object obj)
 	{
 		if (!(obj instanceof CommonOutlineItem))
@@ -76,13 +73,11 @@ public class CommonOutlineItem implements ILanguageNode, IRange, Comparable<IRan
 		return fReferenceNode.equals(((CommonOutlineItem) obj).fReferenceNode);
 	}
 
-	@Override
 	public int getEndingOffset()
 	{
 		return fSourceRange.getEndingOffset();
 	}
 
-	@Override
 	public int getLength()
 	{
 		return fSourceRange.getLength();
@@ -98,25 +93,21 @@ public class CommonOutlineItem implements ILanguageNode, IRange, Comparable<IRan
 		return fSourceRange;
 	}
 
-	@Override
 	public int getStartingOffset()
 	{
 		return fSourceRange.getStartingOffset();
 	}
 
-	@Override
 	public String getLanguage()
 	{
 		return getReferenceNode().getLanguage();
 	}
 
-	@Override
 	public int hashCode()
 	{
 		return fReferenceNode.hashCode();
 	}
 
-	@Override
 	public boolean isEmpty()
 	{
 		return fSourceRange.isEmpty();

@@ -200,7 +200,6 @@ public class FTPConnectionPointPropertyDialog extends TitleAreaDialog implements
 		}
 	}
 	
-	@Override
 	public void setValid(boolean valid) {
 		Button button = getButton(OK);
 		if (button != null) {
@@ -208,7 +207,6 @@ public class FTPConnectionPointPropertyDialog extends TitleAreaDialog implements
 		}
 	}
 	
-	@Override
 	public void error(String message) {
 		if (message == null) {
 			setErrorMessage(null);
@@ -218,13 +216,11 @@ public class FTPConnectionPointPropertyDialog extends TitleAreaDialog implements
 		}
 	}
 
-	@Override
 	public void lockUI(boolean lock) {
 		lockedUI = lock;
 		getButton(OK).setEnabled(!lock);
 	}
 
-	@Override
 	public void layoutShell() {
 		Point size = getInitialSize();
 		Rectangle bounds = getConstrainedShellBounds(new Rectangle(0, 0, size.x, size.y));

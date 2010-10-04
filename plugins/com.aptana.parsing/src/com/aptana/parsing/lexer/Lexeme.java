@@ -60,7 +60,6 @@ public class Lexeme<T> implements ILexeme
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.lexer.IRange#contains(int)
 	 */
-	@Override
 	public boolean contains(int offset)
 	{
 		return getStartingOffset() <= offset && offset <= getEndingOffset();
@@ -70,7 +69,6 @@ public class Lexeme<T> implements ILexeme
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.lexer.IRange#getEndingOffset()
 	 */
-	@Override
 	public int getEndingOffset()
 	{
 		return this._endingOffset;
@@ -80,7 +78,6 @@ public class Lexeme<T> implements ILexeme
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.lexer.IRange#getLength()
 	 */
-	@Override
 	public int getLength()
 	{
 		if (this._text != null)
@@ -95,7 +92,6 @@ public class Lexeme<T> implements ILexeme
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.lexer.IRange#getStartingOffset()
 	 */
-	@Override
 	public int getStartingOffset()
 	{
 		return this._startingOffset;
@@ -105,7 +101,6 @@ public class Lexeme<T> implements ILexeme
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.lexer.ILexeme#getText()
 	 */
-	@Override
 	public String getText()
 	{
 		return this._text;
@@ -144,7 +139,6 @@ public class Lexeme<T> implements ILexeme
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.lexer.IRange#isEmpty()
 	 */
-	@Override
 	public boolean isEmpty()
 	{
 		return this._endingOffset < this._startingOffset;

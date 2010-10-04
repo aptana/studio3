@@ -52,6 +52,7 @@ import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
+import com.aptana.editor.common.text.rules.CaseInsensitiveMultiLineRule;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.NonRuleBasedDamagerRepairer;
 import com.aptana.editor.common.text.rules.PartitionerSwitchingIgnoreRule;
@@ -85,7 +86,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 			{ IHTMLConstants.CONTENT_TYPE_HTML, ICSSConstants.CONTENT_TYPE_CSS }, };
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
-			new MultiLineRule("<!DOCTYPE ", ">", new Token(HTML_DOCTYPE)), //$NON-NLS-1$ //$NON-NLS-2$
+			new CaseInsensitiveMultiLineRule("<!DOCTYPE ", ">", new Token(HTML_DOCTYPE)), //$NON-NLS-1$ //$NON-NLS-2$
 			new DocTypeRule(new Token(CDATA)), new PartitionerSwitchingIgnoreRule(new MultiLineRule("<!--", "-->", new Token(HTML_COMMENT), (char) 0, true)), //$NON-NLS-1$ //$NON-NLS-2$
 			new TagRule("script", new Token(HTML_SCRIPT), true), //$NON-NLS-1$
 			new TagRule("style", new Token(HTML_STYLE), true), //$NON-NLS-1$

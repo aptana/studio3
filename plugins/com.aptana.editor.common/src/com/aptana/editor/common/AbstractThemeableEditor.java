@@ -135,7 +135,6 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			}
 		}
 
-		@Override
 		public void selectionChanged(SelectionChangedEvent event)
 		{
 			AbstractThemeableEditor.this.selectionChanged();
@@ -145,7 +144,6 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	private class PropertyChangeListener implements IPropertyChangeListener
 	{
 
-		@Override
 		public void propertyChange(PropertyChangeEvent event)
 		{
 			handlePreferenceStoreChanged(event);
@@ -340,7 +338,6 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			// create key listener
 			this.keyListener = new VerifyKeyListener()
 			{
-				@Override
 				public void verifyKey(VerifyEvent event)
 				{
 					onKeyPressed(event);

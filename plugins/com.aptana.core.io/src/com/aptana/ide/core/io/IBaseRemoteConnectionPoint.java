@@ -51,6 +51,11 @@ public interface IBaseRemoteConnectionPoint extends IConnectionPoint {
 	public void setName(String name);
 
 	/**
+	 * @param id the id to set
+	 */
+	public void setId(String id);
+
+	/**
 	 * @return the host
 	 */
 	public String getHost();

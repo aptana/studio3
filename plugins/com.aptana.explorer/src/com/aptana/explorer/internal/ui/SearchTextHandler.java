@@ -56,7 +56,6 @@ public class SearchTextHandler extends AbstractHandler implements IExecutableExt
 {
 	private String commandId;
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		if (commandId != null)
@@ -88,7 +87,6 @@ public class SearchTextHandler extends AbstractHandler implements IExecutableExt
 		return null;
 	}
 
-	@Override
 	public void setInitializationData(IConfigurationElement config, String propertyName, Object data)
 			throws CoreException
 	{

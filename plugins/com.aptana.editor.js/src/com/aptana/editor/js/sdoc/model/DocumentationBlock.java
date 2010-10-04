@@ -41,6 +41,7 @@ import java.util.List;
 
 import beaver.Symbol;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.parsing.io.SourcePrinter;
 
 public class DocumentationBlock extends Symbol
@@ -193,7 +194,7 @@ public class DocumentationBlock extends Symbol
 	{
 		writer.println("/**").increaseIndent(); //$NON-NLS-1$
 
-		if (this._text != null && this._text.isEmpty() == false)
+		if (this._text != null && StringUtil.isEmpty(this._text) == false)
 		{
 			writer.printlnWithIndent(this._text);
 

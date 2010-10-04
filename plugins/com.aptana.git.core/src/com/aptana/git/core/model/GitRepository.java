@@ -342,7 +342,6 @@ public class GitRepository
 				true, new JNotifyListener()
 				{
 
-					@Override
 					public void fileRenamed(int wd, String rootPath, String oldName, String newName)
 					{
 						if (newName == null)
@@ -373,7 +372,6 @@ public class GitRepository
 						return newName != null && newName.indexOf(File.separator) != -1 && !newName.endsWith(".lock"); //$NON-NLS-1$
 					}
 
-					@Override
 					public void fileModified(int wd, String rootPath, String name)
 					{
 						if (name == null)
@@ -398,7 +396,6 @@ public class GitRepository
 						}
 					}
 
-					@Override
 					public void fileDeleted(int wd, String rootPath, final String name)
 					{
 						// if path is longer than one segment, then remote branch was deleted. Means we probably
@@ -421,7 +418,6 @@ public class GitRepository
 						}
 					}
 
-					@Override
 					public void fileCreated(int wd, String rootPath, final String name)
 					{
 						if (isProbablyBranch(name))
@@ -510,7 +506,7 @@ public class GitRepository
 		// Return local branches first!
 		SortedSet<String> localFirst = new TreeSet<String>(new Comparator<String>()
 		{
-			@Override
+
 			public int compare(String o1, String o2)
 			{
 				if (o1.contains("/") && !o2.contains("/")) //$NON-NLS-1$ //$NON-NLS-2$

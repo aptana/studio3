@@ -45,6 +45,7 @@
          point="com.aptana.parsing.parser">
       <parser
             class="com.aptana.editor.css.parsing.CSSParser"
+            content-type="com.aptana.contenttype.css"
             language="text/css">
       </parser>
    </extension>

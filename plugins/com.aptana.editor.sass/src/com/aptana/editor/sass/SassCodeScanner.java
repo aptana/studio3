@@ -105,7 +105,6 @@ public class SassCodeScanner extends CSSCodeScanner
 		List<String> list = new ArrayList<String>(namespaced);
 		Collections.sort(list, new Comparator<String>()
 		{
-			@Override
 			public int compare(String o1, String o2)
 			{
 				return o2.length() - o1.length();
@@ -117,13 +116,11 @@ public class SassCodeScanner extends CSSCodeScanner
 	private static class VariableWordDetector implements IWordDetector
 	{
 
-		@Override
 		public boolean isWordPart(char c)
 		{
 			return Character.isLetterOrDigit(c) || c == '-' || c == '_';
 		}
 
-		@Override
 		public boolean isWordStart(char c)
 		{
 			return c == '!' || c == '=' || c == '+';

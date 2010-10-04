@@ -51,6 +51,8 @@ import com.aptana.editor.css.contentassist.index.CSSIndexReader;
 import com.aptana.editor.css.contentassist.index.CSSMetadataReader;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
+import com.aptana.editor.css.contentassist.model.PseudoClassElement;
+import com.aptana.editor.css.contentassist.model.PseudoElementElement;
 import com.aptana.index.core.Index;
 
 public class CSSIndexQueryHelper
@@ -83,6 +85,26 @@ public class CSSIndexQueryHelper
 	public List<ElementElement> getElements()
 	{
 		return this.getMetadata().getElements();
+	}
+	
+	/**
+	 * getPseudoElements
+	 * 
+	 * @return
+	 */
+	public List<PseudoElementElement> getPseudoElements()
+	{
+		return this.getMetadata().getPseudoElements();
+	}
+	
+	/**
+	 * getPseudoClasses
+	 * 
+	 * @return
+	 */
+	public List<PseudoClassElement> getPseudoClasses()
+	{
+		return this.getMetadata().getPseudoClasses();
 	}
 
 	/**

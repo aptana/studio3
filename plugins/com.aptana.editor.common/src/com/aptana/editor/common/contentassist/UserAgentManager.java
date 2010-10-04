@@ -72,7 +72,6 @@ public class UserAgentManager
 			this.disabledIcon = disabledIcon;
 		}
 
-		@Override
 		public int compareTo(UserAgent o)
 		{
 			return this.name.compareToIgnoreCase(o.name);

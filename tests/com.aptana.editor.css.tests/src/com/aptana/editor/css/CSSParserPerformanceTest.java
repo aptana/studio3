@@ -1,15 +1,18 @@
 package com.aptana.editor.css;
 
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
-import junit.framework.TestCase;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.test.performance.PerformanceTestCase;
 
+import com.aptana.core.util.IOUtil;
 import com.aptana.editor.css.parsing.CSSParser;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
 
-public class CSSParserPerformanceTest extends TestCase
+public class CSSParserPerformanceTest extends PerformanceTestCase
 {
 
 	private CSSParser fParser;
@@ -17,6 +20,7 @@ public class CSSParserPerformanceTest extends TestCase
 	@Override
 	protected void setUp() throws Exception
 	{
+		super.setUp();
 		fParser = new CSSParser();
 	}
 
@@ -24,35 +28,24 @@ public class CSSParserPerformanceTest extends TestCase
 	protected void tearDown() throws Exception
 	{
 		fParser = null;
+		super.tearDown();
 	}
 
-	public void testTime() throws Exception
+	public void testWordpressAdminCSS() throws Exception
 	{
-		InputStream stream = getClass().getResourceAsStream("wp-admin.css");
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		int read = -1;
-		while ((read = stream.read()) != -1)
-		{
-			out.write(read);
-		}
-		stream.close();
-		String src = new String(out.toByteArray());
+		InputStream stream = FileLocator.openStream(Platform.getBundle("com.aptana.editor.css.tests"),
+				Path.fromPortableString("performance/wp-admin.css"), false);
+		String src = IOUtil.read(stream);
 
-		IParseState parseState = new ParseState();
-		int numRuns = 5;
-		long start = System.currentTimeMillis();
-		for (int i = 0; i < numRuns; i++)
+		for (int i = 0; i < 25; i++)
 		{
+			IParseState parseState = new ParseState();
+			startMeasuring();
 			parseState.setEditState(src, src, 0, 0);
-			try
-			{
-				fParser.parse(parseState);
-			}
-			catch (Exception e)
-			{
-			}
+			fParser.parse(parseState);
+			stopMeasuring();
 		}
-		long diff = System.currentTimeMillis() - start;
-		System.out.println("Average time: " + (diff / numRuns) + "ms");
+		commitMeasurements();
+		assertPerformance();
 	}
 }

@@ -35,6 +35,7 @@
 package com.aptana.editor.common.internal.scripting;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
@@ -43,6 +44,7 @@ import org.eclipse.ui.internal.ide.DialogUtil;
 import org.eclipse.ui.internal.wizards.newresource.ResourceMessages;
 import org.eclipse.ui.wizards.newresource.BasicNewFileResourceWizard;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.TemplateElement;
@@ -115,17 +117,18 @@ public class NewFileWizard extends BasicNewFileResourceWizard
 	 * 
 	 * @param template
 	 *            A {@link TemplateElement}
+	 * @param absoluteFilePath 
 	 * @return The output string that this template yield when executed. Null, in case the given template was null or
 	 *         did not contain a file pattern.
 	 */
-	public static String getTemplateContent(TemplateElement template)
+	public static String getTemplateContent(TemplateElement template, IPath absoluteFilePath)
 	{
 		if (template == null)
 		{
 			return null;
 		}
 		String pattern = template.getFiletype();
-		if (pattern.isEmpty())
+		if (StringUtil.isEmpty(pattern))
 		{
 			return null;
 		}
@@ -134,6 +137,9 @@ public class NewFileWizard extends BasicNewFileResourceWizard
 		// Replace * wildcard pattern with .+? regexp
 		pattern = pattern.replaceAll("\\*", "\\.\\+\\?"); //$NON-NLS-1$ //$NON-NLS-2$
 		CommandContext context = template.createCommandContext();
+		context.put("TM_NEW_FILE_BASENAME", absoluteFilePath.removeFileExtension().lastSegment()); //$NON-NLS-1$
+		context.put("TM_NEW_FILE", absoluteFilePath.toOSString()); //$NON-NLS-1$
+		context.put("TM_NEW_FILE_DIRECTORY", absoluteFilePath.removeLastSegments(1).toOSString()); //$NON-NLS-1$
 		CommandResult result = template.execute(context);
 		return result.getOutputString();
 	}

@@ -36,9 +36,12 @@ package com.aptana.core.util;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
@@ -157,10 +160,38 @@ public final class ExecutableUtil
 		return null;
 	}
 
-	private static boolean isExecutable(IPath path)
+	public static boolean isExecutable(IPath path)
 	{
+		if (path == null)
+		{
+			return false;
+		}
 		File file = path.toFile();
-		return file.exists() && file.canExecute();
-	}
+		if (file == null || !file.exists())
+		{
+			return false;
+		}
+		
+		// OK, file exists
+		try
+		{
+			Method m = File.class.getMethod("canExecute"); //$NON-NLS-1$
+			if (m != null)
+			{
+				return (Boolean) m.invoke(file);
+			}
+		}
+		catch (Exception e)
+		{
+			// ignore, only available on Java 6+
+		}
 
+		// File.canExecute() doesn't exist; do our best to determine if file is executable...
+		if (Platform.OS_WIN32.equals(Platform.getOS()))
+		{
+			return true;
+		}
+		IFileStore fileStore = EFS.getLocalFileSystem().getStore(path);
+	    return fileStore.fetchInfo().getAttribute(EFS.ATTRIBUTE_EXECUTABLE);
+	}
 }

@@ -493,7 +493,6 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 		return getStyledDisplayString().getString().trim();
 	}
 
-	@Override
 	public StyledString getStyledDisplayString()
 	{
 		if (styledDisplayString == null)
