@@ -87,20 +87,15 @@ public class HTMLParser implements IParser
 
 	public HTMLParser()
 	{
-		this(new HTMLParserScanner());
-	}
-
-	protected HTMLParser(HTMLParserScanner scanner)
-	{
-		fScanner = scanner;
 		fElementStack = new Stack<IParseNode>();
-		fTagScanner = new HTMLTagScanner();
 	}
 
 	public synchronized IParseNode parse(IParseState parseState) throws java.lang.Exception
 	{
 		fParseState = (HTMLParseState) parseState;
 		String source = new String(parseState.getSource());
+		fScanner = new HTMLParserScanner();
+		fTagScanner = new HTMLTagScanner();
 		fScanner.setSource(source);
 
 		int startingOffset = parseState.getStartingOffset();
@@ -108,7 +103,8 @@ public class HTMLParser implements IParser
 				+ source.length());
 		parseAll(root);
 		parseState.setParseResult(root);
-
+		fScanner = null;
+		fTagScanner = null;
 		return root;
 	}
 
