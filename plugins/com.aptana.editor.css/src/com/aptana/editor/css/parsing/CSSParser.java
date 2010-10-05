@@ -138,12 +138,9 @@ public class CSSParser extends Parser implements IParser {
 
 	private final Action[] actions;
 
-	private CSSScanner fScanner;
-
 	public CSSParser() {
 		super(PARSING_TABLES);
 		report = new CSSEvents();
-		fScanner = new CSSScanner();
 
 		actions = new Action[] {
 			new Action() {	// [0] Program = Statements.p
@@ -545,8 +542,9 @@ public class CSSParser extends Parser implements IParser {
 
 	public synchronized IParseNode parse(IParseState parseState) throws java.lang.Exception
 	{
-		fScanner.setSource(new String(parseState.getSource()));
-		IParseNode result = (IParseNode) parse(fScanner);
+		CSSScanner scanner = new CSSScanner();
+		scanner.setSource(new String(parseState.getSource()));
+		IParseNode result = (IParseNode) parse(scanner);
 		parseState.setParseResult(result);
 		return result;
 	}
