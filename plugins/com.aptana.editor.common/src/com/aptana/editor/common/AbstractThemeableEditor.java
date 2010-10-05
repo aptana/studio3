@@ -537,7 +537,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	{
 		if (fCursorChangeListened)
 		{
-			if (isLinkedWithEditor())
+			if (hasOutlinePageCreated() && isLinkedWithEditor())
 			{
 				getOutlinePage().select(computeHighlightedOutlineNode());
 			}
@@ -666,5 +666,10 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	public boolean isSaveAsAllowed()
 	{
 		return true;
+	}
+
+	public boolean hasOutlinePageCreated()
+	{
+		return fOutlinePage != null;
 	}
 }
