@@ -129,4 +129,26 @@ public class ChangedFile implements Comparable<ChangedFile>
 	{
 		return getPath().compareTo(o.getPath());
 	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj instanceof ChangedFile)
+		{
+			ChangedFile other = (ChangedFile) obj;
+			return (hasStagedChanges == other.hasStagedChanges) && (hasUnstagedChanges == other.hasUnstagedChanges)
+					&& status.equals(other.status) && getPath().equals(getPath());
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		int hash = 31 + Boolean.valueOf(hasStagedChanges).hashCode();
+		hash = hash * 31 + Boolean.valueOf(hasUnstagedChanges).hashCode();
+		hash = hash * 31 + getStatus().hashCode();
+		hash = hash * 31 + getPath().hashCode();
+		return hash;
+	}
 }
