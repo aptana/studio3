@@ -1,6 +1,5 @@
 package com.aptana.editor.common.text.reconciler;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -38,7 +37,6 @@ public class RubyRegexpFolderTest extends TestCase
 		String src = "body {\n" + "	color: red;\n" + "}\n" + "\n" + "div p {\n" + "	background-color: green;\n" + "}\n"
 				+ "\n" + ".one-liner { color: orange; }\n" + "\n" + "#id { \n" + "	font-family: monospace;\n" + "}";
 		IDocument document = new Document(src);
-		List<Position> positions = new ArrayList<Position>();
 		RubyRegexpFolder folder = new RubyRegexpFolder(document)
 		{
 			@Override
@@ -59,7 +57,7 @@ public class RubyRegexpFolderTest extends TestCase
 				return "source.css";
 			}
 		};
-		positions = folder.emitFoldingRegions(positions, new NullProgressMonitor());
+		List<Position> positions = folder.emitFoldingRegions(new NullProgressMonitor());
 		assertEquals(3, positions.size());
 		assertEquals(new Position(0, 22), positions.get(0)); // eats whole line at end
 		assertEquals(new Position(23, 36), positions.get(1)); // eats whole line at end
