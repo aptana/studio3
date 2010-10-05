@@ -352,6 +352,7 @@ public class JSParser extends Parser implements IParser {
 		String source = (characters != null) ? new String(characters) : "";
 
 		// send source to the scanner
+		fScanner = new JSScanner();
 		fScanner.setSource(source);
 
 		// parse
@@ -373,6 +374,8 @@ public class JSParser extends Parser implements IParser {
 			attachPreDocumentationBlocks(root, source);
 			attachPostDocumentationBlocks(root, source);
 		}
+		// let scanner get garbage collected so we don't hold onto document even after it's no longer open
+		fScanner = null;
 
 		return result;
 	}
@@ -497,8 +500,6 @@ public class JSParser extends Parser implements IParser {
 	public JSParser() {
 		super(PARSING_TABLES);
 
-
-		fScanner = new JSScanner();
 		report = new JSEvents();
 
 		recoveryStrategies = new IRecoveryStrategy[] {
