@@ -58,6 +58,7 @@
             name="Show Preview">
       </command>
    </extension>
+   <!-- not adding the icon for now since the functionality hasn't been implemented
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
@@ -77,6 +78,7 @@
          </toolbar>
       </menuContribution>
    </extension>
+   -->
    <extension
          point="org.eclipse.ui.browserSupport">
       <support
