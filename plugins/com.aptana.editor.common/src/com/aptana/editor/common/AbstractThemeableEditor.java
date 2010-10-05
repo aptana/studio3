@@ -246,8 +246,21 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		if (Platform.OS_MACOSX.equals(Platform.getOS()) && Platform.getWS().equals("cocoa")) //$NON-NLS-1$
 		{
 			final Shell shell = getSite().getShell();
+			if (shell == null)
+			{
+				return;
+			}
 			Display display = shell.getDisplay();
-			if (display.getFocusControl() != getSourceViewer().getTextWidget())
+			if (display == null)
+			{
+				return;
+			}
+			ISourceViewer sv = getSourceViewer();
+			if (sv == null)
+			{
+				return;
+			}
+			if (display.getFocusControl() != sv.getTextWidget())
 			{
 				// Focus did not stick due to the bug above. This is most likely
 				// because of the containing shell is not the active shell.
