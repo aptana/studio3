@@ -65,6 +65,7 @@ import org.eclipse.search.ui.ISearchQuery;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.search.ui.text.AbstractTextSearchViewPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -928,8 +929,13 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			return;
 
 		// Force selection color
-		sourceViewer.getTextWidget().setSelectionBackground(
-				ThemePlugin.getDefault().getColorManager().getColor(getCurrentTheme().getSelectionAgainstBG()));
+		Color existingSelectionBG = sourceViewer.getTextWidget().getSelectionBackground();
+		RGB selectionRGB = getCurrentTheme().getSelectionAgainstBG();
+		if (!existingSelectionBG.getRGB().equals(selectionRGB))
+		{
+			sourceViewer.getTextWidget().setSelectionBackground(
+					ThemePlugin.getDefault().getColorManager().getColor(selectionRGB));
+		}
 		if (!Platform.getOS().equals(Platform.OS_MACOSX))
 		{
 			// Linux and windows need selection fg set or we just see a block of color.
