@@ -33,37 +33,38 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.browser.handlers;
+package com.aptana.preview.internal;
 
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-
-import com.aptana.browser.BrowserPlugin;
-import com.aptana.browser.parts.WebBrowserEditor;
-import com.aptana.browser.support.WebBrowserEditorInput;
+import com.aptana.preview.IPreviewHandler;
+import com.aptana.preview.PreviewConfig;
+import com.aptana.preview.SourceConfig;
 
 /**
  * @author Max Stepanov
  *
  */
-public class ShowPreviewHandler extends AbstractHandler {
+public final class DefaultPreviewHandler implements IPreviewHandler {
+
+	private static DefaultPreviewHandler instance;
+	
+	/**
+	 * 
+	 */
+	private DefaultPreviewHandler() {
+	}
+	
+	public static DefaultPreviewHandler getInstance() {
+		if (instance == null) {
+			instance = new DefaultPreviewHandler();
+		}
+		return instance;
+	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 * @see com.aptana.preview.IPreviewHandler#handle(com.aptana.preview.SourceConfig)
 	 */
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		IWorkbenchPage workbenchPage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-		if (workbenchPage != null) {
-			try {
-				workbenchPage.openEditor(new WebBrowserEditorInput(null), WebBrowserEditor.EDITOR_ID);
-			} catch (PartInitException e) {
-				BrowserPlugin.log(e);
-			}
-		}
+	@Override
+	public PreviewConfig handle(SourceConfig config) {
 		return null;
 	}
 

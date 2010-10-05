@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="previewHandlers" name="Preview Handlers" schema="schema/previewHandlers.exsd"/>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.ui.category.views"
+            defaultHandler="com.aptana.preview.ui.handlers.ShowPreviewHandler"
+            description="Show Preview Editor"
+            id="com.aptana.preview.commands.showPreview"
+            name="Show Preview">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="com.aptana.ui.globalActionSet">
+            <command
+                  commandId="com.aptana.preview.commands.showPreview"
+                  icon="icons/etool16/preview.png"
+                  style="push">
+               <visibleWhen>
+                  <reference
+                        definitionId="com.aptana.ui.contributions.inGlobalActionSet">
+                  </reference>
+               </visibleWhen>
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.aptana.preview.internal.PreviewEditorPart"
+            default="false"
+            icon="icons/etool16/preview.png"
+            id="com.aptana.preview.editor"
+            name="Preview Editor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            default="false"
+            id="com.aptana.preview.editor1"
+            name="name">
+      </editor>
+   </extension>
+
+</plugin>

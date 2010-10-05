@@ -49,35 +49,6 @@
       </actionSet>
    </extension>
    <extension
-         point="org.eclipse.ui.commands">
-      <command
-            categoryId="org.eclipse.ui.category.views"
-            defaultHandler="com.aptana.browser.handlers.ShowPreviewHandler"
-            description="Show Preview Editor"
-            id="com.aptana.browser.commands.showPreview"
-            name="Show Preview">
-      </command>
-   </extension>
-   <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
-         <toolbar
-               id="com.aptana.ui.globalActionSet">
-            <command
-                  commandId="com.aptana.browser.commands.showPreview"
-                  icon="icons/obj16/browser.png"
-                  style="push">
-               <visibleWhen>
-                  <reference
-                        definitionId="com.aptana.ui.contributions.inGlobalActionSet">
-                  </reference>
-               </visibleWhen>
-            </command>
-         </toolbar>
-      </menuContribution>
-   </extension>
-   <extension
          point="org.eclipse.ui.browserSupport">
       <support
             class="com.aptana.browser.support.WorkbenchBrowserSupport"
