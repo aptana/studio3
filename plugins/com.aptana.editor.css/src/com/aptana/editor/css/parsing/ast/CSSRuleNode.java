@@ -121,18 +121,49 @@ public class CSSRuleNode extends CSSNode
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (!super.equals(obj) || !(obj instanceof CSSRuleNode))
+		if (!(obj instanceof CSSRuleNode) || !super.equals(obj))
 		{
 			return false;
 		}
 		CSSRuleNode other = (CSSRuleNode) obj;
-		return toString().equals(other.toString());
+		if (fDeclarations.length != other.fDeclarations.length)
+		{
+			return false;
+		}
+		if (fSelectors.length != other.fSelectors.length)
+		{
+			return false;
+		}
+		for (int i = 0; i < fSelectors.length; i++)
+		{
+			// Can't call equals() on this, because it compares parents, which is this, which results in infinite loop!
+			CSSSelectorNode otherSelector = other.fSelectors[i];
+			if (fSelectors[i].getNodeType() != otherSelector.getNodeType())
+				return false;
+		}
+		for (int i = 0; i < fDeclarations.length; i++)
+		{
+			// Can't call equals() on this, because it compares parents, which is this, which results in infinite loop!
+			CSSDeclarationNode otherDecl = other.fDeclarations[i];
+			if (fDeclarations[i].getNodeType() != otherDecl.getNodeType())
+				return false;
+		}
+		return true;
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return super.hashCode() * 31 + toString().hashCode();
+		int hash = super.hashCode();
+		for (CSSSelectorNode node : fSelectors)
+		{
+			hash = hash * 31 + node.hashCode();
+		}
+		for (CSSDeclarationNode node : fDeclarations)
+		{
+			hash = hash * 31 + node.hashCode();
+		}
+		return hash;
 	}
 
 	@Override
