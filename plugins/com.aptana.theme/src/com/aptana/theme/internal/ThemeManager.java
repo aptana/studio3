@@ -319,12 +319,13 @@ public class ThemeManager implements IThemeManager
                         }
                         else
                         {
-                            throw new IllegalStateException("Theme with duplicated name: "+themeName);
+							throw new IllegalStateException(MessageFormat.format(Messages.ThemeManager_ERR_DuplicateTheme,
+									themeName));
                         }
                     }
                     else
                     {
-                        throw new IllegalStateException("No name in theme.");
+                        throw new IllegalStateException(Messages.ThemeManager_ERR_ThemeNoName);
                     }
 		        }
 		        finally
@@ -345,55 +346,60 @@ public class ThemeManager implements IThemeManager
 				ThemePlugin.logError(url.toString(), e);
 			}
 		}
-		
-		//Handle a theme extending another theme
-		for(Properties props:new ArrayList<Properties>(nameToThemeProperties.values())) //iterate in a copy!
+
+		// Handle a theme extending another theme
+		for (Properties props : new ArrayList<Properties>(nameToThemeProperties.values())) // iterate in a copy!
 		{
-		    try 
-		    {
-                String multipleThemeExtends = (String) props.getProperty(Theme.THEME_EXTENDS_PROP_KEY);
-                if(multipleThemeExtends != null)
-                {
-                    Properties newProperties = new Properties();
-                    StringTokenizer tokenizer = new StringTokenizer(multipleThemeExtends, ",");
-                    String name = props.getProperty(Theme.THEME_NAME_PROP_KEY);
-                    while(tokenizer.hasMoreTokens())
-                    {
-                        String themeExtends = tokenizer.nextToken();
-                        Properties extended = nameToThemeProperties.get(themeExtends);
-                        if(extended == null)
-                        {
-                            throw new IllegalStateException("Could not find a theme for extension named: "+themeExtends+" in theme: "+name);
-                        }
-                        newProperties.putAll(extended);
-                    }
-                    newProperties.putAll(props);
-                    //We don't want the final extends props in the properties.
-                    newProperties.remove(Theme.THEME_EXTENDS_PROP_KEY);
-                    Assert.isTrue(newProperties.get(Theme.THEME_NAME_PROP_KEY).equals(name));
-                    nameToThemeProperties.put(name, newProperties);
-                }
-            } 
-		    catch (Exception e) 
-            {
-                ThemePlugin.logError(e);
-            }
-		}
-		
-		for(Properties props:nameToThemeProperties.values())
-		{
-		    String name = props.getProperty(Theme.THEME_NAME_PROP_KEY);
-		    if(name.startsWith("abstract_theme"))
-		    {
-		        continue;
-		    }
-		    try {
-                loadTheme(props);
-            } catch (Exception e) {
-                ThemePlugin.logError(e);
-            }
+			try
+			{
+				String multipleThemeExtends = (String) props.getProperty(Theme.THEME_EXTENDS_PROP_KEY);
+				if (multipleThemeExtends != null)
+				{
+					Properties newProperties = new Properties();
+					StringTokenizer tokenizer = new StringTokenizer(multipleThemeExtends, ","); //$NON-NLS-1$
+					String name = props.getProperty(Theme.THEME_NAME_PROP_KEY);
+					while (tokenizer.hasMoreTokens())
+					{
+						String themeExtends = tokenizer.nextToken();
+						Properties extended = nameToThemeProperties.get(themeExtends);
+						if (extended == null)
+						{
+							throw new IllegalStateException(
+									MessageFormat.format(
+											Messages.ThemeManager_ERR_NoThemeFound,
+											themeExtends, name));
+						}
+						newProperties.putAll(extended);
+					}
+					newProperties.putAll(props);
+					// We don't want the final extends props in the properties.
+					newProperties.remove(Theme.THEME_EXTENDS_PROP_KEY);
+					Assert.isTrue(newProperties.get(Theme.THEME_NAME_PROP_KEY).equals(name));
+					nameToThemeProperties.put(name, newProperties);
+				}
+			}
+			catch (Exception e)
+			{
+				ThemePlugin.logError(e);
+			}
 		}
 
+		for (Properties props : nameToThemeProperties.values())
+		{
+			String name = props.getProperty(Theme.THEME_NAME_PROP_KEY);
+			if (name.startsWith("abstract_theme")) //$NON-NLS-1$
+			{
+				continue;
+			}
+			try
+			{
+				loadTheme(props);
+			}
+			catch (Exception e)
+			{
+				ThemePlugin.logError(e);
+			}
+		}
 	}
 
     private void loadTheme(Properties props) {

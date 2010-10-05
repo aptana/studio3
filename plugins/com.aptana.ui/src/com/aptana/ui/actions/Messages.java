@@ -32,18 +32,15 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.scripting.ui.views;
+package com.aptana.ui.actions;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS
 {
-	private static final String BUNDLE_NAME = "com.aptana.scripting.ui.views.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.ui.actions.messages"; //$NON-NLS-1$
 
-	public static String BundleEntryNode_TXT_Reload;
-	public static String CommandsNode_Commands_Node;
-	public static String MenusNode_Menus_Node;
-	public static String SnippetsNode_Snippets_Node;
+	public static String SearchToolbarControl_InitialText;
 
 	static
 	{

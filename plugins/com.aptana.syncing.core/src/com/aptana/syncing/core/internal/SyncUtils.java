@@ -73,7 +73,7 @@ public final class SyncUtils
 		{
 			monitor = (monitor == null) ? new NullProgressMonitor() : monitor;
 			checkCanceled(monitor);
-			monitor.beginTask("", sourceInfo == null ? 3 : 2);
+			monitor.beginTask("", sourceInfo == null ? 3 : 2); //$NON-NLS-1$
 			if (sourceInfo == null)
 			{
 				sourceInfo = source.fetchInfo(IExtendedFileStore.DETAILED, subMonitorFor(monitor, 1));
@@ -95,7 +95,7 @@ public final class SyncUtils
 					in = source.openInputStream(EFS.NONE, subMonitorFor(monitor, 0));
 					out = destination.openOutputStream(EFS.NONE, subMonitorFor(monitor, 0));
 					IProgressMonitor subMonitor = subMonitorFor(monitor, 2);
-					subMonitor.beginTask(MessageFormat.format("Copying {0}", source.toString()), totalWork);
+					subMonitor.beginTask(MessageFormat.format(Messages.SyncUtils_Copying, source.toString()), totalWork);
 					while (true)
 					{
 						int bytesRead = -1;
@@ -105,7 +105,7 @@ public final class SyncUtils
 						}
 						catch (IOException e)
 						{
-							error(MessageFormat.format("Failed reading {0}", source.toString()), e);
+							error(MessageFormat.format(Messages.SyncUtils_ERR_Reading, source.toString()), e);
 						}
 						if (bytesRead == -1)
 							break;
@@ -115,7 +115,7 @@ public final class SyncUtils
 						}
 						catch (IOException e)
 						{
-							error(MessageFormat.format("Failed writing to {0}", destination.toString()), e);
+							error(MessageFormat.format(Messages.SyncUtils_ERR_Writing, destination.toString()), e);
 						}
 						subMonitor.worked(1);
 					}

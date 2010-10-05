@@ -121,27 +121,27 @@ public class XMLPListParser implements IPListParser
 	private Object parseNode(Element node)
 	{
 		String tagName = node.getTagName();
-		if (tagName.equals("string"))
+		if (tagName.equals("string")) //$NON-NLS-1$
 		{
 			return node.getTextContent();
 		}
-		else if (tagName.equals("real"))
+		else if (tagName.equals("real")) //$NON-NLS-1$
 		{
 			return Float.parseFloat(node.getTextContent());
 		}
-		else if (tagName.equals("integer"))
+		else if (tagName.equals("integer")) //$NON-NLS-1$
 		{
 			return Long.parseLong(node.getTextContent());
 		}
-		else if (tagName.equals("true"))
+		else if (tagName.equals("true")) //$NON-NLS-1$
 		{
 			return Boolean.TRUE;
 		}
-		else if (tagName.equals("false"))
+		else if (tagName.equals("false")) //$NON-NLS-1$
 		{
 			return Boolean.FALSE;
 		}
-		else if (tagName.equals("date"))
+		else if (tagName.equals("date")) //$NON-NLS-1$
 		{
 			try
 			{
@@ -155,7 +155,7 @@ public class XMLPListParser implements IPListParser
 			}
 			return new Date();
 		}
-		else if (tagName.equals("data"))
+		else if (tagName.equals("data")) //$NON-NLS-1$
 		{
 			try
 			{
@@ -169,7 +169,7 @@ public class XMLPListParser implements IPListParser
 			}
 			return new byte[0];
 		}
-		else if (tagName.equals("array"))
+		else if (tagName.equals("array")) //$NON-NLS-1$
 		{
 			List<Object> array = new ArrayList<Object>();
 			NodeList children = node.getChildNodes();
@@ -183,7 +183,7 @@ public class XMLPListParser implements IPListParser
 			}
 			return array;
 		}
-		else if (tagName.equals("dict"))
+		else if (tagName.equals("dict")) //$NON-NLS-1$
 		{
 			Map<String, Object> map = new HashMap<String, Object>();
 			NodeList children = node.getChildNodes();

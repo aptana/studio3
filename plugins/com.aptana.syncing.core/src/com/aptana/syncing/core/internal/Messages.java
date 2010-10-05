@@ -32,18 +32,17 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.scripting.ui.views;
+package com.aptana.syncing.core.internal;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS
 {
-	private static final String BUNDLE_NAME = "com.aptana.scripting.ui.views.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.syncing.core.internal.messages"; //$NON-NLS-1$
 
-	public static String BundleEntryNode_TXT_Reload;
-	public static String CommandsNode_Commands_Node;
-	public static String MenusNode_Menus_Node;
-	public static String SnippetsNode_Snippets_Node;
+	public static String SyncUtils_Copying;
+	public static String SyncUtils_ERR_Reading;
+	public static String SyncUtils_ERR_Writing;
 
 	static
 	{

@@ -70,7 +70,7 @@ public class NixBashConfiguration extends AbstractProcessConfiguration {
 		list.add(getExecutable().getAbsolutePath());
 		list.add("/bin/bash"); //$NON-NLS-1$
 		// newline is a delimiter in redtty
-		list.add("bash\n--rcfile\n"+getRCFile().getAbsolutePath()+"\n-i"); //$NON-NLS-1$
+		list.add("bash\n--rcfile\n"+getRCFile().getAbsolutePath()+"\n-i"); //$NON-NLS-1$ //$NON-NLS-2$
 		list.add("120x40"); //$NON-NLS-1$
 		return list;
 	}
