@@ -137,7 +137,7 @@ public class ChangedFile implements Comparable<ChangedFile>
 		{
 			ChangedFile other = (ChangedFile) obj;
 			return (hasStagedChanges == other.hasStagedChanges) && (hasUnstagedChanges == other.hasUnstagedChanges)
-					&& status.equals(other.status) && getPath().equals(getPath());
+					&& status.equals(other.status) && getPath().equals(other.getPath());
 		}
 		return false;
 	}
