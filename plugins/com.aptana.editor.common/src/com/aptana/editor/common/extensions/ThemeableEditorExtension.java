@@ -180,6 +180,21 @@ public class ThemeableEditorExtension
 			fCursor.dispose();
 			fCursor = null;
 		}
+
+		fLineColumn = null;
+		fCaretColor = null;
+		if (fEditor != null)
+		{
+			fEditor.clear();
+			fEditor = null;
+		}
+		fParent = null;
+		if (fFullLineBackgroundPainter != null)
+		{
+			fFullLineBackgroundPainter.deactivate(true);
+			fFullLineBackgroundPainter.dispose();
+			fFullLineBackgroundPainter = null;
+		}
 	}
 
 	protected IThemeManager getThemeManager()
