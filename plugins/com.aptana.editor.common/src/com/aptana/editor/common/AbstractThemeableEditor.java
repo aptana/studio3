@@ -301,10 +301,13 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			return getOutlinePage();
 		}
 
-		Object adaptable = this.fThemeableEditorFindBarExtension.getFindBarDecoratorAdapter(adapter);
-		if (adaptable != null)
+		if (this.fThemeableEditorFindBarExtension != null)
 		{
-			return adaptable;
+			Object adaptable = this.fThemeableEditorFindBarExtension.getFindBarDecoratorAdapter(adapter);
+			if (adaptable != null)
+			{
+				return adaptable;
+			}
 		}
 		return super.getAdapter(adapter);
 	}
