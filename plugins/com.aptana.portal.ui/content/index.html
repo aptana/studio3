@@ -3,8 +3,8 @@
 <head> 
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /> 
   <title>Developer Toolbox : Offline</title> 
-    <link href="stylesheets/reset.css" media="screen" rel="stylesheet" type="text/css" /> 
-    <link href="stylesheets/common.css" media="screen" rel="stylesheet" type="text/css" /> 
+  <link href="stylesheets/reset.css" media="screen" rel="stylesheet" type="text/css" /> 
+  <link href="stylesheets/common.css" media="screen" rel="stylesheet" type="text/css" />
 </head> 
 <body> 
     <div id="header"> 
@@ -14,7 +14,9 @@
     
     <div id="body"> 
         <div><h2 align="center">Content Unavailable in Offline Mode</h2></div>
-        <span id="refresh"><a href="javascript:location.reload(true)">reload</a></span>
+        <span id="reload"><a href="javascript:reloadPortal()">reload</a></span>
     </div> 
+    <script src="javascripts/framework/prototype.js" type="text/javascript"></script> 
+    <script src="javascripts/portal/offline_portal.js" type="text/javascript"></script> 
 </body> 
 </html> 
