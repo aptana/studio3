@@ -218,6 +218,10 @@ public class QuickDiffReferenceProvider implements IQuickDiffReferenceProvider, 
 			{
 				// Git specific part here....
 				IFile file = input.getFile();
+				if (file == null)
+				{
+					return;
+				}
 				GitRepository repo = getGitRepositoryManager().getAttached(file.getProject());
 				if (repo == null)
 				{

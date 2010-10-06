@@ -34,10 +34,15 @@
  */
 package com.aptana.core.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
-public class CollectionsUtil {
+public class CollectionsUtil
+{
 	/**
 	 * Given a list of elements of type <T>, remove the duplicates from the list in place
 	 * 
@@ -46,10 +51,31 @@ public class CollectionsUtil {
 	 */
 	public static <T> void removeDuplicates(final List<T> list)
 	{
-	    final LinkedHashSet<T> set;
+		final LinkedHashSet<T> set;
 
-	    set = new LinkedHashSet<T>(list); 
-	    list.clear(); 
-	    list.addAll(set);
+		set = new LinkedHashSet<T>(list);
+		list.clear();
+		list.addAll(set);
+	}
+
+	public static <T> Collection<T> getNonOverlapping(Collection<T> coll1, Collection<T> coll2)
+	{
+		Collection<T> result = union(coll1, coll2);
+		result.removeAll(intersect(coll1, coll2));
+		return result;
+	}
+
+	public static <T> Collection<T> intersect(Collection<T> coll1, Collection<T> coll2)
+	{
+		Set<T> intersection = new HashSet<T>(coll1);
+		intersection.retainAll(new HashSet<T>(coll2));
+		return intersection;
+	}
+
+	public static <T> Collection<T> union(Collection<T> coll1, Collection<T> coll2)
+	{
+		Set<T> union = new HashSet<T>(coll1);
+		union.addAll(new HashSet<T>(coll2));
+		return new ArrayList<T>(union);
 	}
 }

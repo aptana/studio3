@@ -2,7 +2,6 @@ package com.aptana.editor.common.text.reconciler;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -29,7 +28,6 @@ public class RubyRegexpFolderPerformanceTest extends PerformanceTestCase
 
 		String src = readFile("yui.css");
 		IDocument document = new Document(src);
-		List<Position> positions = new ArrayList<Position>();
 		RubyRegexpFolder folder = new RubyRegexpFolder(document)
 		{
 			@Override
@@ -56,8 +54,9 @@ public class RubyRegexpFolderPerformanceTest extends PerformanceTestCase
 		{
 			IProgressMonitor monitor = new NullProgressMonitor();
 			startMeasuring();
-			folder.emitFoldingRegions(positions, monitor);
+			List<Position> positions = folder.emitFoldingRegions(monitor);
 			stopMeasuring();
+			// TODO Verify the positions?
 		}
 		commitMeasurements();
 		assertPerformance();

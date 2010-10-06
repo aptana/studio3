@@ -64,16 +64,14 @@ import com.aptana.parsing.ast.ParseRootNode;
 
 public class HTMLParser implements IParser
 {
-
 	private static final String ATTR_TYPE = "type"; //$NON-NLS-1$
 	private static final String ATTR_LANG = "language"; //$NON-NLS-1$
 
 	@SuppressWarnings("nls")
 	private static final String[] CSS_VALID_TYPE_ATTR = new String[] { "text/css" };
 	@SuppressWarnings("nls")
-	private static final String[] JS_VALID_TYPE_ATTR = new String[] { "application/javascript",
-			"application/ecmascript", "application/x-javascript", "application/x-ecmascript", "text/javascript",
-			"text/ecmascript", "text/jscript" };
+	private static final String[] JS_VALID_TYPE_ATTR = new String[] { "application/javascript", "application/ecmascript", "application/x-javascript",
+		"application/x-ecmascript", "text/javascript", "text/ecmascript", "text/jscript" };
 	@SuppressWarnings("nls")
 	private static final String[] JS_VALID_LANG_ATTR = new String[] { "JavaScript" };
 
@@ -85,29 +83,53 @@ public class HTMLParser implements IParser
 	private IParseNode fCurrentElement;
 	private Symbol fCurrentSymbol;
 
+	/**
+	 * HTMLParser
+	 */
 	public HTMLParser()
 	{
-		this(new HTMLParserScanner());
 	}
 
-	protected HTMLParser(HTMLParserScanner scanner)
-	{
-		fScanner = scanner;
-		fElementStack = new Stack<IParseNode>();
-		fTagScanner = new HTMLTagScanner();
-	}
-
+	/**
+	 * parse
+	 */
 	public synchronized IParseNode parse(IParseState parseState) throws java.lang.Exception
 	{
+		fScanner = new HTMLParserScanner();
+		fTagScanner = new HTMLTagScanner();
+		fElementStack = new Stack<IParseNode>();
+
 		fParseState = (HTMLParseState) parseState;
 		String source = new String(parseState.getSource());
 		fScanner.setSource(source);
 
 		int startingOffset = parseState.getStartingOffset();
-		IParseNode root = new ParseRootNode(IHTMLParserConstants.LANGUAGE, new HTMLNode[0], startingOffset, startingOffset
-				+ source.length());
-		parseAll(root);
-		parseState.setParseResult(root);
+
+		IParseNode root = new ParseRootNode( //
+			IHTMLParserConstants.LANGUAGE, //
+			new HTMLNode[0], //
+			startingOffset, //
+			startingOffset + source.length() //
+		);
+
+		try
+		{
+			fCurrentElement = root;
+			
+			this.parseAll();
+			
+			parseState.setParseResult(root);
+		}
+		finally
+		{
+			// clear for garbage collection
+			fScanner = null;
+			fTagScanner = null;
+			fElementStack = null;
+			fCurrentElement = null;
+			fCurrentSymbol = null;
+			fParseState = null;
+		}
 
 		return root;
 	}
@@ -153,7 +175,7 @@ public class HTMLParser implements IParser
 		IParserPool pool = ParserPoolFactory.getInstance().getParserPool(language);
 		if (pool != null)
 		{
-			IParser parser = pool.checkOut();	
+			IParser parser = pool.checkOut();
 			if (parser != null)
 			{
 				nested = getParseResult(parser, start, end);
@@ -171,17 +193,13 @@ public class HTMLParser implements IParser
 
 	protected HTMLElementNode processCurrentTag()
 	{
-		HTMLElementNode element = new HTMLElementNode(fCurrentSymbol, fCurrentSymbol.getStart(), fCurrentSymbol
-				.getEnd());
+		HTMLElementNode element = new HTMLElementNode(fCurrentSymbol, fCurrentSymbol.getStart(), fCurrentSymbol.getEnd());
 		parseAttribute(element, fCurrentSymbol.value.toString());
 		return element;
 	}
 
-	private void parseAll(IParseNode root) throws IOException, Exception
+	private void parseAll() throws IOException, Exception
 	{
-		fElementStack.clear();
-		fCurrentElement = root;
-
 		advance();
 		while (fCurrentSymbol.getId() != HTMLTokens.EOF)
 		{
@@ -234,8 +252,7 @@ public class HTMLParser implements IParser
 
 	private void processComment()
 	{
-		HTMLCommentNode comment = new HTMLCommentNode(fCurrentSymbol.value.toString(), fCurrentSymbol.getStart(),
-				fCurrentSymbol.getEnd());
+		HTMLCommentNode comment = new HTMLCommentNode(fCurrentSymbol.value.toString(), fCurrentSymbol.getStart(), fCurrentSymbol.getEnd());
 		if (fCurrentElement != null)
 		{
 			fCurrentElement.addChild(comment);
@@ -253,8 +270,7 @@ public class HTMLParser implements IParser
 	{
 		String tagName = HTMLUtils.stripTagEndings(fCurrentSymbol.value.toString());
 		List<HTMLElementNode> elementsToClose = new ArrayList<HTMLElementNode>();
-		if (fCurrentElement instanceof HTMLElementNode
-				&& ((HTMLElementNode) fCurrentElement).getName().equalsIgnoreCase(tagName))
+		if (fCurrentElement instanceof HTMLElementNode && ((HTMLElementNode) fCurrentElement).getName().equalsIgnoreCase(tagName))
 		{
 			elementsToClose.add((HTMLElementNode) fCurrentElement);
 		}
@@ -355,14 +371,12 @@ public class HTMLParser implements IParser
 
 			if (data == TokenType.ATTR_NAME)
 			{
-				name = tag.substring(fTagScanner.getTokenOffset(), fTagScanner.getTokenOffset()
-						+ fTagScanner.getTokenLength());
+				name = tag.substring(fTagScanner.getTokenOffset(), fTagScanner.getTokenOffset() + fTagScanner.getTokenLength());
 			}
 			else if (data == TokenType.ATTR_VALUE)
 			{
 				// found a pair
-				value = tag.substring(fTagScanner.getTokenOffset(), fTagScanner.getTokenOffset()
-						+ fTagScanner.getTokenLength());
+				value = tag.substring(fTagScanner.getTokenOffset(), fTagScanner.getTokenOffset() + fTagScanner.getTokenLength());
 				// strips the quotation marks and any surrounding whitespaces
 				element.setAttribute(name, value.substring(1, value.length() - 1).trim());
 			}
@@ -380,12 +394,10 @@ public class HTMLParser implements IParser
 		int closeTagType = fParseState.getCloseTagType(tagName);
 		// tag with optional end could not be nested, so if we see another instance of the same start tag, close the
 		// previous one
-		if (closeTagType == HTMLTagInfo.END_OPTIONAL && fCurrentElement != null
-				&& tagName.equals(fCurrentElement.getNameNode().getName()))
+		if (closeTagType == HTMLTagInfo.END_OPTIONAL && fCurrentElement != null && tagName.equals(fCurrentElement.getNameNode().getName()))
 		{
 			// adjusts the ending offset of current element to include the entire block up to the start of the new tag
-			((HTMLNode) fCurrentElement)
-					.setLocation(fCurrentElement.getStartingOffset(), fCurrentSymbol.getStart() - 1);
+			((HTMLNode) fCurrentElement).setLocation(fCurrentElement.getStartingOffset(), fCurrentSymbol.getStart() - 1);
 			closeElement();
 		}
 

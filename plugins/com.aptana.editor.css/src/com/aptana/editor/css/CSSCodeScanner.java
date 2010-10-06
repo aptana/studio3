@@ -37,6 +37,7 @@ package com.aptana.editor.css;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
 import org.eclipse.jface.text.rules.ICharacterScanner;
@@ -222,10 +223,16 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		}, createToken(CSSTokenType.IMPORTANT), false)
 		{
 
+			private Pattern pattern;
+
 			@Override
 			protected boolean wordOK(String word, ICharacterScanner scanner)
 			{
-				return word.matches("!\\s*important"); //$NON-NLS-1$
+				if (pattern == null)
+				{
+					pattern = Pattern.compile("!\\s*important"); //$NON-NLS-1$
+				}
+				return pattern.matcher(word).matches();
 			}
 		});
 
@@ -375,10 +382,16 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		}, createToken(CSSTokenType.NUMBER), false)
 		{
 
+			private Pattern pattern;
+
 			@Override
 			protected boolean wordOK(String word, ICharacterScanner scanner)
 			{
-				return word.matches("(-|\\+)?\\s*[0-9]+(\\.[0-9]+)?"); //$NON-NLS-1$
+				if (pattern == null)
+				{
+					pattern = Pattern.compile("(-|\\+)?\\s*[0-9]+(\\.[0-9]+)?"); //$NON-NLS-1$
+				}
+				return pattern.matcher(word).matches();
 			}
 		};
 	}

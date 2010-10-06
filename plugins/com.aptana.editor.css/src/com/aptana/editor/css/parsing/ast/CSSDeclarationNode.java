@@ -110,11 +110,12 @@ public class CSSDeclarationNode extends CSSNode
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (!super.equals(obj))
+		if (!(obj instanceof CSSDeclarationNode))
 		{
 			return false;
 		}
-		if (!(obj instanceof CSSDeclarationNode))
+
+		if (!super.equals(obj))
 		{
 			return false;
 		}
