@@ -62,7 +62,7 @@ public class SourcePrinter
 	public SourcePrinter(String indent)
 	{
 		this._buffer = new StringBuffer();
-		this._indentText = indent; //$NON-NLS-1$
+		this._indentText = indent;
 		this._currentIndent = ""; //$NON-NLS-1$
 		this._newLine = DEFAULT_NEWLINE;
 	}

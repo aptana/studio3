@@ -196,7 +196,6 @@
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.IParser#parse(com.aptana.parsing.IParseState)
 	 */
-	@Override
 	public synchronized IParseNode parse(IParseState parseState) throws java.lang.Exception
 	{
 		// grab source
@@ -205,30 +204,39 @@
 		// make sure we have some source
 		String source = (characters != null) ? new String(characters) : "";
 
-		// send source to the scanner
+		// create scanner and send source to it
+		fScanner = new JSScanner();
 		fScanner.setSource(source);
-
-		// parse
-		IParseNode result = (IParseNode) parse(fScanner);
-
-		// store results in the parse state
-		parseState.setParseResult(result);
-
-		// TODO: We probably don't need documentation nodes in all cases. For
-		// example, the outline view probably doesn't rely on them. We should
-		// include a flag (maybe in the parseState) that makes this step
-		// optional.
-
-		// attach documentation
-		if (result instanceof JSParseRootNode)
+	
+		try
 		{
-			JSParseRootNode root = (JSParseRootNode) result;
-
-			attachPreDocumentationBlocks(root, source);
-			attachPostDocumentationBlocks(root, source);
+			// parse
+			IParseNode result = (IParseNode) parse(fScanner);
+	
+			// store results in the parse state
+			parseState.setParseResult(result);
+	
+			// TODO: We probably don't need documentation nodes in all cases. For
+			// example, the outline view probably doesn't rely on them. We should
+			// include a flag (maybe in the parseState) that makes this step
+			// optional.
+	
+			// attach documentation
+			if (result instanceof JSParseRootNode)
+			{
+				JSParseRootNode root = (JSParseRootNode) result;
+	
+				attachPreDocumentationBlocks(root, source);
+				attachPostDocumentationBlocks(root, source);
+			}
+			
+			return result;
 		}
-
-		return result;
+		finally
+		{
+			// clear scanner for garbage collection
+			fScanner = null;
+		}
 	}
 
 	/**
@@ -350,7 +358,6 @@
 :};
 
 %init {:
-		fScanner = new JSScanner();
 		report = new JSEvents();
 
 		recoveryStrategies = new IRecoveryStrategy[] {

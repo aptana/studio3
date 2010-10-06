@@ -83,7 +83,8 @@ public class BlameAction extends GitAction implements IEditorActionDelegate
 				{
 					try
 					{
-						RevisionAnnotationController.openEditor(page, file);
+						AbstractDecoratedTextEditor editor = RevisionAnnotationController.openEditor(page, file);
+						editor.showRevisionInformation(info, QuickDiffReferenceProvider.ID);
 						attachHistorySyncher(file, repo, page);
 					}
 					catch (PartInitException e)
@@ -140,7 +141,7 @@ public class BlameAction extends GitAction implements IEditorActionDelegate
 				relativePath.toOSString());
 		if (result == null || result.keySet().iterator().next() != 0)
 		{
-			return null;
+			return new RevisionInformation();
 		}
 
 		String output = result.values().iterator().next();
@@ -209,23 +210,34 @@ public class BlameAction extends GitAction implements IEditorActionDelegate
 			}
 		}
 
-		List<String> uniqueAuthors = new ArrayList<String>();
-		for (GitRevision rev : revisions.values())
-		{
-			if (uniqueAuthors.contains(rev.getAuthor()))
-			{
-				continue;
-			}
-			uniqueAuthors.add(rev.getAuthor());
-		}
-		// Assign unique colors! FIXME Shouldn't be accessing this class, so we'll need to create our own version
-		// eventually
-		RGB[] colors = Colors.rainbow(uniqueAuthors.size());
 		RevisionInformation info = new RevisionInformation();
-		for (GitRevision rev : revisions.values())
+		if (!revisions.isEmpty())
 		{
-			rev.setColor(colors[uniqueAuthors.indexOf(rev.getAuthor())]);
-			info.addRevision(rev);
+			List<String> uniqueAuthors = new ArrayList<String>();
+			for (GitRevision rev : revisions.values())
+			{
+				if (uniqueAuthors.contains(rev.getAuthor()))
+				{
+					continue;
+				}
+				uniqueAuthors.add(rev.getAuthor());
+			}
+			// Assign unique colors!
+			RGB[] colors;
+			if (uniqueAuthors.size() < 2)
+			{
+				colors = new RGB[] { new RGB(255, 0, 0) };
+			}
+			else
+			{
+				// FIXME Shouldn't be accessing this class, so we'll need to create our own version eventually
+				colors = Colors.rainbow(uniqueAuthors.size());
+			}
+			for (GitRevision rev : revisions.values())
+			{
+				rev.setColor(colors[uniqueAuthors.indexOf(rev.getAuthor())]);
+				info.addRevision(rev);
+			}
 		}
 		return info;
 	}

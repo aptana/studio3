@@ -47,6 +47,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRulerColumn;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -179,6 +180,21 @@ public class ThemeableEditorExtension
 			fCursor.dispose();
 			fCursor = null;
 		}
+
+		fLineColumn = null;
+		fCaretColor = null;
+		if (fEditor != null)
+		{
+			fEditor.clear();
+			fEditor = null;
+		}
+		fParent = null;
+		if (fFullLineBackgroundPainter != null)
+		{
+			fFullLineBackgroundPainter.deactivate(true);
+			fFullLineBackgroundPainter.dispose();
+			fFullLineBackgroundPainter = null;
+		}
 	}
 
 	protected IThemeManager getThemeManager()
@@ -200,9 +216,14 @@ public class ThemeableEditorExtension
 		}
 
 		// Force selection color
-		sourceViewer.getTextWidget().setSelectionBackground(
-				ThemePlugin.getDefault().getColorManager()
-						.getColor(getThemeManager().getCurrentTheme().getSelectionAgainstBG()));
+		Color existingSelectionBG = sourceViewer.getTextWidget().getSelectionBackground();
+		RGB selectionRGB = getThemeManager().getCurrentTheme().getSelectionAgainstBG();
+		if (!existingSelectionBG.getRGB().equals(selectionRGB))
+		{
+			sourceViewer.getTextWidget().setSelectionBackground(
+					ThemePlugin.getDefault().getColorManager().getColor(selectionRGB));
+		}
+
 		if (!Platform.getOS().equals(Platform.OS_MACOSX))
 		{
 			// Linux and windows need selection fg set or we just see a block of color.

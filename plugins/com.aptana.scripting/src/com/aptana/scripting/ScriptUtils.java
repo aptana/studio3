@@ -104,7 +104,7 @@ public class ScriptUtils
 		IRubyObject result = null;
 		
 		// try to load the module
-		RubyModule rubyModule = runtime.getModule(module); //$NON-NLS-1$
+		RubyModule rubyModule = runtime.getModule(module);
 		
 		if (rubyModule != null)
 		{

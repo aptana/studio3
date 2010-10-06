@@ -126,13 +126,18 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 
 						public void run()
 						{
-							CommonOutlinePage page = editor.getOutlinePage();
+							if (!editor.hasOutlinePageCreated())
+							{
+								return;
+							}
+
 							// FIXME What if the parse failed! We don't really want to wipe the existing results! This
 							// is just a hack!
 							IParseNode node = editor.getFileService().getParseResult();
 							if (node != null)
 							{
 								boolean shouldAutoExpand = (fRootNode == null);
+								CommonOutlinePage page = editor.getOutlinePage();
 								page.refresh();
 								if (shouldAutoExpand)
 								{
