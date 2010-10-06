@@ -51,6 +51,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.Bundle;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.ui.SWTUtils;
 import com.aptana.ui.epl.UIEplPlugin;
@@ -122,7 +123,10 @@ public class UserAgentManager
 	{
 		IPreferenceStore prefs = UIEplPlugin.getDefault().getPreferenceStore();
 		String agentsValue = prefs.getString(IPreferenceConstants.USER_AGENT_PREFERENCE);
-		
+		if (StringUtil.isEmpty(agentsValue))
+		{
+			return new String[0];
+		}
 		return agentsValue.split(","); //$NON-NLS-1$
 	}
 	
