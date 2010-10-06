@@ -83,7 +83,8 @@ public class BlameAction extends GitAction implements IEditorActionDelegate
 				{
 					try
 					{
-						RevisionAnnotationController.openEditor(page, file);
+						AbstractDecoratedTextEditor editor = RevisionAnnotationController.openEditor(page, file);
+						editor.showRevisionInformation(info, QuickDiffReferenceProvider.ID);
 						attachHistorySyncher(file, repo, page);
 					}
 					catch (PartInitException e)
