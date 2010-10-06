@@ -196,7 +196,6 @@
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.IParser#parse(com.aptana.parsing.IParseState)
 	 */
-	@Override
 	public synchronized IParseNode parse(IParseState parseState) throws java.lang.Exception
 	{
 		// grab source
@@ -205,7 +204,8 @@
 		// make sure we have some source
 		String source = (characters != null) ? new String(characters) : "";
 
-		// send source to the scanner
+		// create scanner and send source to it
+		fScanner = new JSScanner();
 		fScanner.setSource(source);
 
 		// parse
@@ -227,6 +227,9 @@
 			attachPreDocumentationBlocks(root, source);
 			attachPostDocumentationBlocks(root, source);
 		}
+		
+		// clear scanner for garbage collection
+		fScanner = null;
 
 		return result;
 	}
@@ -350,7 +353,6 @@
 :};
 
 %init {:
-		fScanner = new JSScanner();
 		report = new JSEvents();
 
 		recoveryStrategies = new IRecoveryStrategy[] {
