@@ -155,20 +155,20 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	private static final char[] DEFAULT_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`',
 			'\'', '\'', '"', '"' };
 
-	private ICommandElementsProvider commandElementsProvider;
+	private ICommandElementsProvider fCommandElementsProvider;
 
 	private CommonOutlinePage fOutlinePage;
 	private FileService fFileService;
-	private VerifyKeyListener keyListener;
+	private VerifyKeyListener fKeyListener;
 
 	private boolean fCursorChangeListened;
 	private SelectionChangedListener fSelectionChangedListener;
 
-  	/**
+	/**
 	 * Manages what's needed to make the find bar work.
 	 */
 	private FindBarEditorExtension fThemeableEditorFindBarExtension;
-	
+
 	/**
 	 * Manages what's needed to make the colors obey the current theme.
 	 */
@@ -190,21 +190,20 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.extensions.IThemeableEditor#getISourceViewer()
 	 */
-	public final ISourceViewer getISourceViewer() 
+	public final ISourceViewer getISourceViewer()
 	{
 		return super.getSourceViewer();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.extensions.IThemeableEditor#getIVerticalRuler()
 	 */
-	public final IVerticalRuler getIVerticalRuler() 
+	public final IVerticalRuler getIVerticalRuler()
 	{
 		return super.getVerticalRuler();
 	}
-	
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.texteditor.AbstractDecoratedTextEditor#createPartControl(org.eclipse.swt.widgets.Composite)
@@ -214,14 +213,14 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	{
 		this.fThemeableEditorColorsExtension.setParent(parent);
 		Composite findBarComposite = this.fThemeableEditorFindBarExtension.createFindBarComposite(parent);
-		Assert.isNotNull(findBarComposite); //the find bar must be the new parent.
+		Assert.isNotNull(findBarComposite); // the find bar must be the new parent.
 		super.createPartControl(findBarComposite);
 		this.fThemeableEditorFindBarExtension.createFindBar(getSourceViewer());
 		this.fThemeableEditorColorsExtension.overrideThemeColors();
 		PeerCharacterCloser.install(getSourceViewer(), getAutoClosePairCharacters());
 		fCursorChangeListened = true;
 
-		fSelectionChangedListener= new SelectionChangedListener();
+		fSelectionChangedListener = new SelectionChangedListener();
 		fSelectionChangedListener.install(getSelectionProvider());
 		fThemeListener = new PropertyChangeListener();
 		ThemePlugin.getDefault().getPreferenceStore().addPropertyChangeListener(fThemeListener);
@@ -230,10 +229,10 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		contextService.activateContext(Activator.CONTEXT_ID);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#setFocus()
-	 *
-	 * This is to workaround the Eclipse SWT bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=303677f
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#setFocus() This is to workaround the Eclipse SWT bug
+	 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=303677f
 	 */
 	@Override
 	public void setFocus()
@@ -301,9 +300,10 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		{
 			return getOutlinePage();
 		}
-		
+
 		Object adaptable = this.fThemeableEditorFindBarExtension.getFindBarDecoratorAdapter(adapter);
-		if(adaptable != null){
+		if (adaptable != null)
+		{
 			return adaptable;
 		}
 		return super.getAdapter(adapter);
@@ -323,7 +323,6 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		return new CommonOutlinePage(this, getOutlinePreferenceStore());
 	}
 
-
 	@Override
 	protected void initializeLineNumberRulerColumn(LineNumberRulerColumn rulerColumn)
 	{
@@ -336,7 +335,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	{
 		fAnnotationAccess = getAnnotationAccess();
 		fOverviewRuler = createOverviewRuler(getSharedColors());
-		
+
 		// Need to make it a projection viewer now that we have folding...
 		ISourceViewer viewer = new ProjectionViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(), styles)
 		{
@@ -345,22 +344,22 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 				return new RulerLayout(RULER_EDITOR_GAP);
 			}
 		};
-		
+
 		if (viewer instanceof ITextViewerExtension)
 		{
 			// create key listener
-			this.keyListener = new VerifyKeyListener()
+			this.fKeyListener = new VerifyKeyListener()
 			{
 				public void verifyKey(VerifyEvent event)
 				{
 					onKeyPressed(event);
 				}
 			};
-			
+
 			// add listener to our viewer
-			((ITextViewerExtension) viewer).prependVerifyKeyListener(this.keyListener);
+			((ITextViewerExtension) viewer).prependVerifyKeyListener(this.fKeyListener);
 		}
-		
+
 		// ensure decoration support has been created and configured.
 		getSourceViewerDecorationSupport(viewer);
 
@@ -368,7 +367,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 		return viewer;
 	}
-	
+
 	/**
 	 * onKeyPressed
 	 * 
@@ -376,18 +375,18 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	 */
 	private void onKeyPressed(VerifyEvent event)
 	{
-//		if (event.character == ' ')
-//		{
-//			// TODO: possibly popup CA for the current partition
-//			ISourceViewer viewer = this.getSourceViewer();
-//
-//			if (viewer instanceof ITextOperationTarget)
-//			{
-//				int operation = SourceViewer.CONTENTASSIST_PROPOSALS;
-//
-//				((ITextOperationTarget) viewer).doOperation(operation);
-//			}
-//		}
+		// if (event.character == ' ')
+		// {
+		// // TODO: possibly popup CA for the current partition
+		// ISourceViewer viewer = this.getSourceViewer();
+		//
+		// if (viewer instanceof ITextOperationTarget)
+		// {
+		// int operation = SourceViewer.CONTENTASSIST_PROPOSALS;
+		//
+		// ((ITextOperationTarget) viewer).doOperation(operation);
+		// }
+		// }
 	}
 
 	@Override
@@ -422,41 +421,61 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		return getPairMatchingCharacters();
 	}
 
-
-
 	@Override
 	public void dispose()
 	{
-		if (keyListener != null)
+		try
 		{
-			ISourceViewer viewer = this.getSourceViewer();
-			
-			if (viewer instanceof ITextViewerExtension)
+			if (fKeyListener != null)
 			{
-				((ITextViewerExtension) viewer).removeVerifyKeyListener(this.keyListener);
+				ISourceViewer viewer = this.getSourceViewer();
+
+				if (viewer instanceof ITextViewerExtension)
+				{
+					((ITextViewerExtension) viewer).removeVerifyKeyListener(this.fKeyListener);
+				}
+
+				fKeyListener = null;
 			}
-			
-			keyListener = null;
+			if (fSelectionChangedListener != null)
+			{
+				fSelectionChangedListener.uninstall(getSelectionProvider());
+				fSelectionChangedListener = null;
+			}
+			if (fThemeListener != null)
+			{
+				ThemePlugin.getDefault().getPreferenceStore().removePropertyChangeListener(fThemeListener);
+				fThemeListener = null;
+			}
+
+			if (fThemeableEditorColorsExtension != null)
+			{
+				fThemeableEditorColorsExtension.dispose();
+				fThemeableEditorColorsExtension = null;
+			}
+			if (fThemeableEditorFindBarExtension != null)
+			{
+				fThemeableEditorFindBarExtension.dispose();
+				fThemeableEditorFindBarExtension = null;
+			}
+			if (fOutlinePage != null)
+			{
+				fOutlinePage.dispose();
+				fOutlinePage = null;
+			}
+			fCommandElementsProvider = null;
+			fFileService = null;
 		}
-		if (fSelectionChangedListener != null)  {
-			fSelectionChangedListener.uninstall(getSelectionProvider());
-			fSelectionChangedListener= null;
-		}
-		if (fThemeListener != null)
+		finally
 		{
-			ThemePlugin.getDefault().getPreferenceStore().removePropertyChangeListener(fThemeListener);
-			fThemeListener = null;
+			super.dispose();
 		}
-
-		this.fThemeableEditorColorsExtension.dispose();
-		super.dispose();
 	}
-
 
 	@Override
 	protected void initializeEditor()
 	{
-		setPreferenceStore(new ChainedPreferenceStore(new IPreferenceStore[] { 
+		setPreferenceStore(new ChainedPreferenceStore(new IPreferenceStore[] {
 				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() }));
 	}
 
@@ -565,14 +584,13 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		this.fThemeableEditorFindBarExtension.createFindBarActions();
 	}
 
-
 	ICommandElementsProvider getCommandElementsProvider()
 	{
-		if (commandElementsProvider == null)
+		if (fCommandElementsProvider == null)
 		{
-			commandElementsProvider = new CommandElementsProvider(this, getSourceViewer());
+			fCommandElementsProvider = new CommandElementsProvider(this, getSourceViewer());
 		}
-		return commandElementsProvider;
+		return fCommandElementsProvider;
 	}
 
 	/**
@@ -599,7 +617,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	protected Object getOutlineElementAt(int caret)
 	{
 		IParseNode astNode = getASTNodeAt(caret);
-		if (astNode == null) {
+		if (astNode == null)
+		{
 			return null;
 		}
 		return fOutlinePage.getOutlineItem(astNode);
