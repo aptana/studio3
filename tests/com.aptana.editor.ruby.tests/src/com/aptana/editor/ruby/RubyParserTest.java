@@ -204,15 +204,15 @@ public class RubyParserTest extends TestCase
 		assertEquals("foo", children[0].toString());
 	}
 
-	public void testIfElse() throws Exception
-	{
-		String source = "if (foo > 0)\n\tputs foo\nelse\n\tputs -foo\nend";
-		fParseState.setEditState(source, source, 0, 0);
-
-		IParseNode result = fParser.parse(fParseState);
-		assertEquals(0, result.getStartingOffset());
-		assertEquals(43, result.getEndingOffset());
-	}
+//	public void testIfElse() throws Exception
+//	{
+//		String source = "if (foo > 0)\n\tputs foo\nelse\n\tputs -foo\nend";
+//		fParseState.setEditState(source, source, 0, 0);
+//
+//		IParseNode result = fParser.parse(fParseState);
+//		assertEquals(0, result.getStartingOffset());
+//		assertEquals(43, result.getEndingOffset());
+//	}
 
 	private void assertFields(IRubyType rubyClass, String[] fieldNames)
 	{
