@@ -34,6 +34,7 @@
  */
 package com.aptana.editor.common;
 
+import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.StringTokenizer;
 
@@ -42,6 +43,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.ITextViewerExtension5;
+import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
@@ -54,10 +56,8 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
-import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Layout;
@@ -159,7 +159,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 	private CommonOutlinePage fOutlinePage;
 	private FileService fFileService;
-	private VerifyKeyListener fKeyListener;
+	private ExpandSnippetVerifyKeyListener fKeyListener;
 
 	private boolean fCursorChangeListened;
 	private SelectionChangedListener fSelectionChangedListener;
@@ -301,10 +301,13 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			return getOutlinePage();
 		}
 
-		Object adaptable = this.fThemeableEditorFindBarExtension.getFindBarDecoratorAdapter(adapter);
-		if (adaptable != null)
+		if (this.fThemeableEditorFindBarExtension != null)
 		{
-			return adaptable;
+			Object adaptable = this.fThemeableEditorFindBarExtension.getFindBarDecoratorAdapter(adapter);
+			if (adaptable != null)
+			{
+				return adaptable;
+			}
 		}
 		return super.getAdapter(adapter);
 	}
@@ -343,19 +346,34 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			{
 				return new RulerLayout(RULER_EDITOR_GAP);
 			}
+
+			@Override
+			protected void handleDispose()
+			{
+				// HACK We force the widget command to be nulled out so it can be garbage collected. Might want to report a bug with eclipse to clean this up.
+				try
+				{
+					Field f = TextViewer.class.getDeclaredField("fWidgetCommand"); //$NON-NLS-1$
+					if (f != null)
+					{
+						f.setAccessible(true);
+						f.set(this, null);
+					}
+				}
+				catch (Throwable t)
+				{
+					// ignore
+				}
+				finally
+				{
+					super.handleDispose();
+				}
+			}
 		};
 
 		if (viewer instanceof ITextViewerExtension)
 		{
-			// create key listener
-			this.fKeyListener = new VerifyKeyListener()
-			{
-				public void verifyKey(VerifyEvent event)
-				{
-					onKeyPressed(event);
-				}
-			};
-
+			this.fKeyListener = new ExpandSnippetVerifyKeyListener(this);
 			// add listener to our viewer
 			((ITextViewerExtension) viewer).prependVerifyKeyListener(this.fKeyListener);
 		}
@@ -366,27 +384,6 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		fThemeableEditorColorsExtension.createBackgroundPainter(viewer);
 
 		return viewer;
-	}
-
-	/**
-	 * onKeyPressed
-	 * 
-	 * @param event
-	 */
-	private void onKeyPressed(VerifyEvent event)
-	{
-		// if (event.character == ' ')
-		// {
-		// // TODO: possibly popup CA for the current partition
-		// ISourceViewer viewer = this.getSourceViewer();
-		//
-		// if (viewer instanceof ITextOperationTarget)
-		// {
-		// int operation = SourceViewer.CONTENTASSIST_PROPOSALS;
-		//
-		// ((ITextOperationTarget) viewer).doOperation(operation);
-		// }
-		// }
 	}
 
 	@Override
@@ -576,11 +573,6 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	{
 		super.createActions();
 		setAction(FilterThroughCommandAction.COMMAND_ID, FilterThroughCommandAction.create(this));
-		ISourceViewer sourceViewer = getSourceViewer();
-		if (sourceViewer instanceof ITextViewerExtension)
-		{
-			((ITextViewerExtension) sourceViewer).prependVerifyKeyListener(new ExpandSnippetVerifyKeyListener(this));
-		}
 		this.fThemeableEditorFindBarExtension.createFindBarActions();
 	}
 
