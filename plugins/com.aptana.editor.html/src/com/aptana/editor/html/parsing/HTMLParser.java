@@ -120,10 +120,6 @@ public class HTMLParser implements IParser
 			
 			parseState.setParseResult(root);
 		}
-		catch (java.lang.Exception e)
-		{
-			throw e;
-		}
 		finally
 		{
 			// clear for garbage collection

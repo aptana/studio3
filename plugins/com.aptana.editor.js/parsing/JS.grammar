@@ -207,31 +207,36 @@
 		// create scanner and send source to it
 		fScanner = new JSScanner();
 		fScanner.setSource(source);
-
-		// parse
-		IParseNode result = (IParseNode) parse(fScanner);
-
-		// store results in the parse state
-		parseState.setParseResult(result);
-
-		// TODO: We probably don't need documentation nodes in all cases. For
-		// example, the outline view probably doesn't rely on them. We should
-		// include a flag (maybe in the parseState) that makes this step
-		// optional.
-
-		// attach documentation
-		if (result instanceof JSParseRootNode)
+	
+		try
 		{
-			JSParseRootNode root = (JSParseRootNode) result;
-
-			attachPreDocumentationBlocks(root, source);
-			attachPostDocumentationBlocks(root, source);
+			// parse
+			IParseNode result = (IParseNode) parse(fScanner);
+	
+			// store results in the parse state
+			parseState.setParseResult(result);
+	
+			// TODO: We probably don't need documentation nodes in all cases. For
+			// example, the outline view probably doesn't rely on them. We should
+			// include a flag (maybe in the parseState) that makes this step
+			// optional.
+	
+			// attach documentation
+			if (result instanceof JSParseRootNode)
+			{
+				JSParseRootNode root = (JSParseRootNode) result;
+	
+				attachPreDocumentationBlocks(root, source);
+				attachPostDocumentationBlocks(root, source);
+			}
+			
+			return result;
 		}
-		
-		// clear scanner for garbage collection
-		fScanner = null;
-
-		return result;
+		finally
+		{
+			// clear scanner for garbage collection
+			fScanner = null;
+		}
 	}
 
 	/**
