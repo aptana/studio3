@@ -35,43 +35,45 @@
 package com.aptana.editor.js.formatter.nodes;
 
 import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 
 /**
- * A JS function body formatter node.<br>
- * This node represents the body part of the function (everything between the curly-brackets).
+ * A JS function declaration formatter node.<br>
+ * This node represents the part of the function declaration up to the body part of the function.
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
-public class FormatterJSFunctionBodyNode extends FormatterJSBlockNode
+public class FormatterJSIfConditionNode extends FormatterBlockWithBeginNode
 {
+
+	private boolean hasBlockedChild;
 
 	/**
 	 * @param document
 	 */
-	public FormatterJSFunctionBodyNode(IFormatterDocument document)
+	public FormatterJSIfConditionNode(IFormatterDocument document, boolean hasBlockedChild)
 	{
 		super(document);
+		this.hasBlockedChild = hasBlockedChild;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingNewLine()
 	 */
 	@Override
 	protected boolean isAddingNewLine()
 	{
 		// TODO attach the preference key
-		return true;
+		return !hasBlockedChild;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isIndenting()
 	 */
 	@Override
 	protected boolean isIndenting()
 	{
 		// TODO attach the preference key
-		return true;
+		return !hasBlockedChild;
 	}
 }

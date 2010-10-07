@@ -34,10 +34,14 @@
  */
 package com.aptana.editor.js.formatter;
 
+import com.aptana.editor.js.formatter.nodes.FormatterJSIfBodyNode;
+import com.aptana.editor.js.formatter.nodes.FormatterJSIfConditionNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSFunctionBodyNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSFunctionDeclarationNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSIfNode;
+import com.aptana.editor.js.parsing.ast.JSNode;
+import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.editor.js.parsing.ast.JSTreeWalker;
 import com.aptana.editor.js.parsing.ast.JSWhileNode;
@@ -108,7 +112,57 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSIfNode node)
 		{
-			super.visit(node);
+			JSNode trueBlock = (JSNode) node.getTrueBlock();
+			JSNode falseBlock = (JSNode) node.getFalseBlock();
+
+			boolean isEmptyFalseBlock = (trueBlock.getNodeType() == JSNodeTypes.EMPTY);
+			boolean isCurlyTrueBlock = (trueBlock.getNodeType() == JSNodeTypes.STATEMENTS);
+			boolean isCurlyFalseBlock = (!isEmptyFalseBlock && falseBlock.getNodeType() == JSNodeTypes.STATEMENTS);
+
+			// First, construct the if condition node
+			FormatterJSIfConditionNode conditionNode = new FormatterJSIfConditionNode(document, isCurlyTrueBlock);
+			conditionNode.setBegin(createTextNode(document, node.getStartingOffset(), trueBlock.getStartingOffset()));
+			push(conditionNode);
+
+			// Construct the 'true' part of the 'if' and visit its children
+			if (isCurlyTrueBlock)
+			{
+				pushIfBodyNode(trueBlock);
+			}
+			else
+			{
+				// Just visit the children
+				visitChildren(trueBlock);
+			}
+			checkedPop(conditionNode, trueBlock.getEndingOffset());
+
+			// Construct the 'false' part if exist
+			if (!isEmptyFalseBlock)
+			{
+				if (isCurlyFalseBlock)
+				{
+					pushIfBodyNode(falseBlock);
+				}
+				else
+				{
+					// Just visit the children
+					visitChildren(falseBlock);
+				}
+			}
+		}
+
+		/**
+		 * @param block
+		 */
+		private void pushIfBodyNode(JSNode block)
+		{
+			FormatterJSIfBodyNode bodyNode = new FormatterJSIfBodyNode(document);
+			bodyNode.setBegin(createTextNode(document, block.getStartingOffset(), block.getStartingOffset() + 1));
+			push(bodyNode);
+			// visit the children
+			visitChildren(block);
+			checkedPop(bodyNode, block.getEndingOffset());
+			bodyNode.setEnd(createTextNode(document, block.getEndingOffset(), block.getEndingOffset() + 1));
 		}
 
 		/*

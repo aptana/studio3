@@ -35,20 +35,21 @@
 package com.aptana.editor.js.formatter.nodes;
 
 import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 
 /**
- * A JS function body formatter node.<br>
- * This node represents the body part of the function (everything between the curly-brackets).
+ * A generic JS block formatter node.<br>
+ * This node represents a body part between open and close curly-brackets.
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
-public class FormatterJSFunctionBodyNode extends FormatterJSBlockNode
+public class FormatterJSBlockNode extends FormatterBlockWithBeginEndNode
 {
 
 	/**
 	 * @param document
 	 */
-	public FormatterJSFunctionBodyNode(IFormatterDocument document)
+	public FormatterJSBlockNode(IFormatterDocument document)
 	{
 		super(document);
 	}

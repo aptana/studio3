@@ -37,18 +37,19 @@ package com.aptana.editor.js.formatter.nodes;
 import com.aptana.formatter.IFormatterDocument;
 
 /**
- * A JS function body formatter node.<br>
- * This node represents the body part of the function (everything between the curly-brackets).
+ * A JS if-else body formatter node.<br>
+ * This node represents the body part of an 'if' expression 'true' and 'false' parts (everything between the
+ * curly-brackets of the 'if' and the 'else').
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
-public class FormatterJSFunctionBodyNode extends FormatterJSBlockNode
+public class FormatterJSIfBodyNode extends FormatterJSBlockNode
 {
 
 	/**
 	 * @param document
 	 */
-	public FormatterJSFunctionBodyNode(IFormatterDocument document)
+	public FormatterJSIfBodyNode(IFormatterDocument document)
 	{
 		super(document);
 	}
@@ -61,7 +62,7 @@ public class FormatterJSFunctionBodyNode extends FormatterJSBlockNode
 	protected boolean isAddingNewLine()
 	{
 		// TODO attach the preference key
-		return true;
+		return false;
 	}
 
 	/*
