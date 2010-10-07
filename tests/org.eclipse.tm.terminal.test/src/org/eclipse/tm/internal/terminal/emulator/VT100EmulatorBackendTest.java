@@ -1020,7 +1020,7 @@ public class VT100EmulatorBackendTest extends TestCase {
 				"0123\n" +
 				"    \n" +
 				"    ", toMultiLineText(term));
-		assertEquals(1,vt100.getCursorLine());
+		assertEquals(0,vt100.getCursorLine()); // because of our modified wrapping newline behavior
 		assertEquals(0,vt100.getCursorColumn());
 
 		vt100.appendString("567890");
@@ -1044,8 +1044,7 @@ public class VT100EmulatorBackendTest extends TestCase {
 		assertEqualsTerm(
 				"0123\n" +
 				"5678\n" +
-				"90ab\n" +
-				"    ", toMultiLineText(term));
+				"90ab", toMultiLineText(term));
 		assertEquals(2,vt100.getCursorLine());
 		assertEquals(0,vt100.getCursorColumn());
 
@@ -1088,7 +1087,7 @@ public class VT100EmulatorBackendTest extends TestCase {
 				"opqr\n" +
 				"s123\n" +
 				"wx  ", toMultiLineText(term));
-		assertEquals(2,vt100.getCursorLine());
+		assertEquals(1,vt100.getCursorLine()); // because of our modified wrapping newline behavior
 		assertEquals(0,vt100.getCursorColumn());
 
 		vt100.setCursor(1, 1);
