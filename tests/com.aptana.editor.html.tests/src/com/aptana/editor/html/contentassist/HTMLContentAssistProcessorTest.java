@@ -176,6 +176,20 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertEquals("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"\n\"http://www.w3.org/TR/html4/strict.dtd\"",
 				fDocument.get());
 	}
+	
+	public void testCloseTagProposal()
+	{
+		int offset = 7;
+		IDocument fDocument = createDocument("<ul>\n</>");
+		char trigger = '\t';
+		ITextViewer viewer = new TextViewer(fDocument);
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
+		assertEquals(1, proposals.length);
+		ICompletionProposal closeProposal = findProposal("ul", proposals);
+
+		((ICompletionProposalExtension2) closeProposal).apply(viewer, trigger, SWT.NONE, offset);
+		assertEquals("<ul>\n</ul>", fDocument.get());
+	}
 
 	private ICompletionProposal findProposal(String string, ICompletionProposal[] proposals)
 	{
