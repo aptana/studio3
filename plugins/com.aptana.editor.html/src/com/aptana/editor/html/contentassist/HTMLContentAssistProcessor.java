@@ -642,9 +642,17 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				if (partition.getType().equals(HTMLSourceConfiguration.HTML_TAG))
 				{
 					String src = _document.get(partition.getOffset(), partition.getLength());
-					int blah = src.indexOf('<');
-					src = src.substring(blah + 1).trim();
+					int lessThanIndex = src.indexOf('<');
+					if (lessThanIndex == -1 || lessThanIndex >= src.length() - 1)
+					{
+						continue;
+					}
+					src = src.substring(lessThanIndex + 1).trim();
 					String[] parts = src.split("\\W"); //$NON-NLS-1$
+					if (parts == null || parts.length == 0)
+					{
+						continue;
+					}
 					String elementName = parts[0].toLowerCase();
 					if (!unclosedElements.contains(elementName) && !OpenTagCloser.tagClosed(_document, elementName))
 					{

@@ -47,6 +47,8 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 
 	private static final int ELEMENT_PROPOSALS_COUNT = 132;
 	private static final int DOCTYPE_PROPOSALS_COUNT = 11;
+	private static final int CLOSE_TAG_PROPOSALS_COUNT = 119;
+	
 	private HTMLContentAssistProcessor fProcessor;
 
 	@Override
@@ -189,6 +191,20 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 
 		((ICompletionProposalExtension2) closeProposal).apply(viewer, trigger, SWT.NONE, offset);
 		assertEquals("<ul>\n</ul>", fDocument.get());
+	}
+	
+	public void testCloseTagWithNoUnclosedTagsProposal()
+	{
+		int offset = 2;
+		IDocument fDocument = createDocument("</>");
+		char trigger = '\t';
+		ITextViewer viewer = new TextViewer(fDocument);
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
+		assertEquals(CLOSE_TAG_PROPOSALS_COUNT, proposals.length);
+		ICompletionProposal closeProposal = findProposal("ul", proposals);
+
+		((ICompletionProposalExtension2) closeProposal).apply(viewer, trigger, SWT.NONE, offset);
+		assertEquals("</ul>", fDocument.get());
 	}
 
 	private ICompletionProposal findProposal(String string, ICompletionProposal[] proposals)
