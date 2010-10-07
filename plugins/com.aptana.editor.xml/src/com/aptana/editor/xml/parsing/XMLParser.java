@@ -37,8 +37,8 @@ package com.aptana.editor.xml.parsing;
 import java.io.IOException;
 import java.util.Stack;
 
-import beaver.Symbol;
 import beaver.Scanner.Exception;
+import beaver.Symbol;
 
 import com.aptana.editor.xml.parsing.ast.XMLElementNode;
 import com.aptana.editor.xml.parsing.ast.XMLNode;
@@ -46,6 +46,7 @@ import com.aptana.editor.xml.parsing.lexer.XMLToken;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseRootNode;
 
 public class XMLParser implements IParser
@@ -67,14 +68,14 @@ public class XMLParser implements IParser
 		fElementStack = new Stack<IParseNode>();
 	}
 
-	public IParseNode parse(IParseState parseState) throws java.lang.Exception
+	public IParseRootNode parse(IParseState parseState) throws java.lang.Exception
 	{
 		String source = new String(parseState.getSource());
 		fScanner.setSource(source);
 
 		int startingOffset = parseState.getStartingOffset();
 		// creates the root node
-		IParseNode root = new ParseRootNode(IXMLParserConstants.LANGUAGE, new XMLNode[0], startingOffset,
+		IParseRootNode root = new ParseRootNode(IXMLParserConstants.LANGUAGE, new XMLNode[0], startingOffset,
 				startingOffset + source.length());
 		parseAll(root);
 		// stores the result

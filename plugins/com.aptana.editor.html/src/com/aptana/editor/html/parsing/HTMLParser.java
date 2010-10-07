@@ -59,6 +59,7 @@ import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 
@@ -93,7 +94,7 @@ public class HTMLParser implements IParser
 	/**
 	 * parse
 	 */
-	public synchronized IParseNode parse(IParseState parseState) throws java.lang.Exception
+	public synchronized IParseRootNode parse(IParseState parseState) throws java.lang.Exception
 	{
 		fScanner = new HTMLParserScanner();
 		fTagScanner = new HTMLTagScanner();
@@ -105,7 +106,7 @@ public class HTMLParser implements IParser
 
 		int startingOffset = parseState.getStartingOffset();
 
-		IParseNode root = new ParseRootNode( //
+		IParseRootNode root = new ParseRootNode( //
 			IHTMLParserConstants.LANGUAGE, //
 			new HTMLNode[0], //
 			startingOffset, //

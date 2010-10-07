@@ -34,58 +34,21 @@
  */
 package com.aptana.editor.css.parsing.ast;
 
-public class CSSAttributeSelectorNode extends CSSNode
+public class CSSNodeTypes
 {
-
-	private String fAttributeText;
-
-	public CSSAttributeSelectorNode(String text, int start, int end)
-	{
-		super(CSSNodeTypes.ATTRIBUTE_SELECTOR, start, end);
-		fAttributeText = text;
-	}
-
-	/**
-	 * ":" + function expression
-	 * 
-	 * @param function
-	 *            the function expression
-	 */
-	public CSSAttributeSelectorNode(CSSExpressionNode function, int start)
-	{
-		super(CSSNodeTypes.ATTRIBUTE_SELECTOR, start, function.getEnd());
-		setChildren(new CSSNode[] { function });
-	}
-
-	public CSSExpressionNode getFunction()
-	{
-		return (CSSExpressionNode) getChild(0);
-	}
-
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (!super.equals(obj) || !(obj instanceof CSSAttributeSelectorNode))
-		{
-			return false;
-		}
-		CSSAttributeSelectorNode other = (CSSAttributeSelectorNode) obj;
-		return toString().equals(other.toString());
-	}
-
-	@Override
-	public int hashCode()
-	{
-		return super.hashCode() * 31 + toString().hashCode();
-	}
-
-	@Override
-	public String toString()
-	{
-		if (fAttributeText == null)
-		{
-			return ":" + getFunction(); //$NON-NLS-1$
-		}
-		return fAttributeText;
-	}
+	public static final short UNKNOWN = 0;
+	public static final short ATTRIBUTE_SELECTOR = 1;
+	public static final short FUNCTION = 2;
+	public static final short CHAR_SET = 3;
+	public static final short DECLARATION = 4;
+	public static final short IMPORT = 5;
+	public static final short RULE = 6;
+	public static final short MEDIA = 7;
+	public static final short PAGE = 8;
+	public static final short SELECTOR = 9;
+	public static final short SIMPLE_SELECTOR = 10;
+	public static final short EXPRESSION = 11;
+	public static final short TERM = 12;
+	public static final short TERM_LIST = 13;
+	public static final short COMMENT = 14;
 }
