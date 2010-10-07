@@ -29,6 +29,7 @@ public class UITests
 		// suite.addTest(com.aptana.scripting.ui.tests.AllTests.suite()); // TODO Add Tests for scripting.ui
 		// suite.addTest(com.aptana.syncing.ui.tests.AllTests.suite()); // No syncing UI tests yet
 		suite.addTest(com.aptana.theme.tests.AllTests.suite());
+		suite.addTest(org.eclipse.tm.terminal.test.AllTests.suite());
 		// $JUnit-END$
 		
 		// Now add special test cases which require to be run after all plugins are loaded (dependency inversion in
