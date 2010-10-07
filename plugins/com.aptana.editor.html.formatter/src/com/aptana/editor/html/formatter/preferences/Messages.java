@@ -41,7 +41,7 @@ import org.eclipse.osgi.util.NLS;
  */
 public class Messages extends NLS
 {
-	private static final String BUNDLE_NAME = "com.aptana.editor.html.formatter.preferences.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.editor.html.formatter.preferences.Messages"; //$NON-NLS-1$
 	public static String HTMLFormatterBlankLinesPage_afterElements;
 	public static String HTMLFormatterBlankLinesPage_afterSpecialElements;
 	public static String HTMLFormatterBlankLinesPage_beforeSpecialElements;
