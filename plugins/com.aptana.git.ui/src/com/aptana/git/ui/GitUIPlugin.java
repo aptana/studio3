@@ -17,13 +17,11 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
@@ -37,7 +35,6 @@ import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.PortableGit;
 import com.aptana.git.ui.internal.GitColors;
 import com.aptana.theme.IThemeManager;
-import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.IDialogConstants;
 import com.aptana.ui.PopupSchedulingRule;
@@ -75,45 +72,33 @@ public class GitUIPlugin extends AbstractUIPlugin
 		themeChangeListener = new IPreferenceChangeListener()
 		{
 
-			@SuppressWarnings("restriction")
 			public void preferenceChange(PreferenceChangeEvent event)
 			{
 				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
 				{
-					IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
-					// Quick Diff colors
-					prefs.put("changeIndicationColor", toString(GitColors.greenBG().getRGB())); //$NON-NLS-1$
-					prefs.put("additionIndicationColor", toString(GitColors.greenBG().getRGB())); //$NON-NLS-1$
-					prefs.put("deletionIndicationColor", toString(GitColors.redBG().getRGB())); //$NON-NLS-1$
-
-					try
+					PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 					{
-						prefs.flush();
-					}
-					catch (BackingStoreException e)
-					{
-						GitUIPlugin.logError(e.getMessage(), e);
-					}
 
-					Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
-					IPreferenceStore prefStore = org.eclipse.debug.internal.ui.DebugUIPlugin.getDefault()
-							.getPreferenceStore();
-					PreferenceConverter
-							.setDefault(
-									prefStore,
-									org.eclipse.debug.internal.ui.preferences.IDebugPreferenceConstants.CONSOLE_BAKGROUND_COLOR,
-									theme.getBackground());
-					PreferenceConverter.setDefault(prefStore,
-							org.eclipse.debug.internal.ui.preferences.IDebugPreferenceConstants.CONSOLE_SYS_OUT_COLOR,
-							theme.getForeground());
+						public void run()
+						{
+							IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
+							// Quick Diff colors
+							prefs.put("changeIndicationColor", StringConverter.asString(GitColors.greenBG().getRGB())); //$NON-NLS-1$
+							prefs.put("additionIndicationColor", StringConverter.asString(GitColors.greenBG().getRGB())); //$NON-NLS-1$
+							prefs.put("deletionIndicationColor", StringConverter.asString(GitColors.redBG().getRGB())); //$NON-NLS-1$
+
+							try
+							{
+								prefs.flush();
+							}
+							catch (BackingStoreException e)
+							{
+								GitUIPlugin.logError(e.getMessage(), e);
+							}
+						}
+					});
+
 				}
-			}
-
-			private String toString(RGB selection)
-			{
-				StringBuilder builder = new StringBuilder();
-				builder.append(selection.red).append(',').append(selection.green).append(',').append(selection.blue);
-				return builder.toString();
 			}
 		};
 		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(themeChangeListener);
