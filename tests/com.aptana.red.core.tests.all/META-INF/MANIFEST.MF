@@ -40,6 +40,9 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.theme,
  com.aptana.plist;bundle-version="1.0.0",
  com.aptana.editor.markdown;bundle-version="1.0.0",
- com.aptana.org.eclipse.tm.terminal;bundle-version="3.0.100"
+ com.aptana.org.eclipse.tm.terminal;bundle-version="3.0.100",
+ org.eclipse.test.performance;bundle-version="3.4.0",
+ org.eclipse.core.tests.harness;bundle-version="3.4.0",
+ com.aptana.editor.epl.tests;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
