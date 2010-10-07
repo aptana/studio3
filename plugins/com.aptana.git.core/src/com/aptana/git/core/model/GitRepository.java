@@ -62,6 +62,7 @@ import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -1344,4 +1345,8 @@ public class GitRepository
 		return Status.OK_STATUS;
 	}
 
+	public IFile getFileForChangedFile(ChangedFile file)
+	{
+		return index().getResourceForChangedFile(file);
+	}
 }
