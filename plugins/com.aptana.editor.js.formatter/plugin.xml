@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="com.aptana.formatter.epl.formatterFactory">
+      <engineContribution
+            contentType="com.aptana.contenttype.js">
+         <formatterFactory
+               class="com.aptana.editor.js.formatter.JSFormatterFactory"
+               description="JavaScript Code Formatter"
+               id="com.aptana.editor.js.formatterFactory"
+               name="JavaScript"
+               priority="10">
+         </formatterFactory>
+      </engineContribution>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.aptana.editor.js.formatter.JSFormatterPreferenceInitializer">
+      </initializer>
+   </extension>
+</plugin>
