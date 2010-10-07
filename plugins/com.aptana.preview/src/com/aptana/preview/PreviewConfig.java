@@ -35,16 +35,28 @@
 
 package com.aptana.preview;
 
+import java.net.URL;
+
 /**
  * @author Max Stepanov
  *
  */
 public final class PreviewConfig {
 
+	private URL url;
+	
 	/**
 	 * 
 	 */
-	public PreviewConfig() {
+	public PreviewConfig(URL url) {
+		this.url = url;
+	}
+
+	/**
+	 * @return the url
+	 */
+	public URL getURL() {
+		return url;
 	}
 
 }

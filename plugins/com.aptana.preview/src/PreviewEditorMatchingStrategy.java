@@ -1,3 +1,10 @@
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorMatchingStrategy;
+import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.PartInitException;
+
+import com.aptana.preview.internal.PreviewEditorInput;
+
 /**
  * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
@@ -33,59 +40,29 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.preview;
-
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.ui.IEditorInput;
-
 /**
  * @author Max Stepanov
  *
  */
-public final class SourceConfig {
+public class PreviewEditorMatchingStrategy implements IEditorMatchingStrategy {
 
-	private IEditorInput editorInput;
-	private IProject project;
-	private IPath location;
-	private String content;
-	
-	/**
-	 * 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IEditorMatchingStrategy#matches(org.eclipse.ui.IEditorReference, org.eclipse.ui.IEditorInput)
 	 */
-	public SourceConfig(IEditorInput editorInput, IProject project, IPath location, String content) {
-		this.editorInput = editorInput;
-		this.project = project;
-		this.location = location;
-		this.content = content;
-	}
-
-	/**
-	 * @return the editorInput
-	 */
-	public IEditorInput getEditorInput() {
-		return editorInput;
-	}
-
-	/**
-	 * @return the project
-	 */
-	public IProject getProject() {
-		return project;
-	}
-
-	/**
-	 * @return the location
-	 */
-	public IPath getLocation() {
-		return location;
-	}
-
-	/**
-	 * @return the content
-	 */
-	public String getContent() {
-		return content;
+	@Override
+	public boolean matches(IEditorReference editorRef, IEditorInput input) {
+		if (input instanceof PreviewEditorInput) {
+			PreviewEditorInput pei = (PreviewEditorInput) input;
+			try {
+				PreviewEditorInput editorInput = (PreviewEditorInput) editorRef.getEditorInput();
+				if (editorInput.isFixed() || pei.isFixed()) {
+					return editorInput.equals(pei);
+				}
+			} catch (PartInitException e) {
+			}
+			return true;
+		}
+		return false;
 	}
 
 }

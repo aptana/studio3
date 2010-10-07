@@ -35,6 +35,17 @@
 
 package com.aptana.preview.internal;
 
+import java.net.MalformedURLException;
+
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.content.IContentType;
+
+import com.aptana.preview.Activator;
 import com.aptana.preview.IPreviewHandler;
 import com.aptana.preview.PreviewConfig;
 import com.aptana.preview.SourceConfig;
@@ -44,13 +55,15 @@ import com.aptana.preview.SourceConfig;
  *
  */
 public final class DefaultPreviewHandler implements IPreviewHandler {
-
+	
 	private static DefaultPreviewHandler instance;
+	private IContentType contentTypeHTML;
 	
 	/**
 	 * 
 	 */
 	private DefaultPreviewHandler() {
+		contentTypeHTML = Platform.getContentTypeManager().findContentTypeFor("index.html");
 	}
 	
 	public static DefaultPreviewHandler getInstance() {
@@ -64,7 +77,18 @@ public final class DefaultPreviewHandler implements IPreviewHandler {
 	 * @see com.aptana.preview.IPreviewHandler#handle(com.aptana.preview.SourceConfig)
 	 */
 	@Override
-	public PreviewConfig handle(SourceConfig config) {
+	public PreviewConfig handle(SourceConfig config) throws CoreException {
+		if (contentTypeHTML != null && contentTypeHTML.isAssociatedWith(config.getLocation().lastSegment())) {
+			try {
+				IPath location = config.getLocation();
+				if (config.getProject() != null) {
+					location = ResourcesPlugin.getWorkspace().getRoot().getFile(location).getLocation();
+				}
+				return new PreviewConfig(location.toFile().toURI().toURL());
+			} catch (MalformedURLException e) {
+				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "", e));
+			}			
+		}
 		return null;
 	}
 

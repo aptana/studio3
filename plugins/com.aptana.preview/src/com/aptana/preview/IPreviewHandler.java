@@ -35,11 +35,13 @@
 
 package com.aptana.preview;
 
+import org.eclipse.core.runtime.CoreException;
+
 /**
  * @author Max Stepanov
  *
  */
 public interface IPreviewHandler {
 
-	public PreviewConfig handle(SourceConfig config);
+	public PreviewConfig handle(SourceConfig config) throws CoreException;
 }

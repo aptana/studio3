@@ -38,15 +38,8 @@
             default="false"
             icon="icons/etool16/preview.png"
             id="com.aptana.preview.editor"
+            matchingStrategy="PreviewEditorMatchingStrategy"
             name="Preview Editor">
-      </editor>
-   </extension>
-   <extension
-         point="org.eclipse.ui.editors">
-      <editor
-            default="false"
-            id="com.aptana.preview.editor1"
-            name="name">
       </editor>
    </extension>
 

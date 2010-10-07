@@ -35,9 +35,13 @@
 
 package com.aptana.preview.internal;
 
+import java.net.URL;
+
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
+
+import com.aptana.preview.Activator;
 
 /**
  * @author Max Stepanov
@@ -45,10 +49,18 @@ import org.eclipse.ui.IPersistableElement;
  */
 public final class PreviewEditorInput implements IEditorInput {
 
+	private URL url;
+	private String name;
+	private String tooltip;
+	private boolean fixed;
+	
 	/**
 	 * 
 	 */
-	public PreviewEditorInput() {
+	public PreviewEditorInput(URL url, String name, String tooltip) {
+		this.url = url;
+		this.name = name;
+		this.tooltip = tooltip;
 	}
 
 	/* (non-Javadoc)
@@ -56,7 +68,6 @@ public final class PreviewEditorInput implements IEditorInput {
 	 */
 	@Override
 	public boolean exists() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -65,8 +76,7 @@ public final class PreviewEditorInput implements IEditorInput {
 	 */
 	@Override
 	public ImageDescriptor getImageDescriptor() {
-		// TODO Auto-generated method stub
-		return null;
+		return Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "icons/obj16/preview.png");
 	}
 
 	/* (non-Javadoc)
@@ -74,7 +84,11 @@ public final class PreviewEditorInput implements IEditorInput {
 	 */
 	@Override
 	public String getName() {
-		return null;
+		return name;
+	}
+	
+	public URL getURL() {
+		return url;
 	}
 
 	/* (non-Javadoc)
@@ -90,15 +104,30 @@ public final class PreviewEditorInput implements IEditorInput {
 	 */
 	@Override
 	public String getToolTipText() {
-		return null;
+		return tooltip != null ? tooltip : url.toExternalForm();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
 		return null;
+	}
+
+	/**
+	 * @return the fixed
+	 */
+	public boolean isFixed() {
+		return fixed;
+	}
+
+	/**
+	 * @param fixed the fixed to set
+	 */
+	public void setFixed(boolean fixed) {
+		this.fixed = fixed;
 	}
 
 }
