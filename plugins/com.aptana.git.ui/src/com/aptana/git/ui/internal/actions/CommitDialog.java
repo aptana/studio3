@@ -1002,7 +1002,7 @@ public class CommitDialog extends StatusDialog
 					table.select(table.getItemCount() - 1);
 				}
 				String filePath = table.getSelection()[0].getText(1);
-				updateDiff(!staged, filePath);
+				updateDiff(staged, filePath);
 			}
 			else
 			{

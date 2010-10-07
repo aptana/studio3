@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2005-2010 Aptana, Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * If redistributing this code, this entire header must remain intact.
+ */
 package com.aptana.filewatcher;
 
 import org.eclipse.core.runtime.Platform;

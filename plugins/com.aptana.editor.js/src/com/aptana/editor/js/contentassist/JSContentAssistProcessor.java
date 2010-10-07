@@ -229,6 +229,13 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				// add all properties of each type to our proposal list
 				for (String type : typeList)
 				{
+					// TODO: Temporary hack for jQuery CA until we resolve
+					// handling of function properties and derived types
+					if ("jQuery".equals(type))
+					{
+						type = "Function<jQuery>:jQuery";
+					}
+					
 					if (JSTypeUtil.isFunctionPrefix(type))
 					{
 						String functionType = JSTypeUtil.getFunctionSignatureType(type);

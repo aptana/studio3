@@ -37,8 +37,10 @@ package com.aptana.ide.syncing.ui.internal;
 
 import java.io.File;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IContainer;
@@ -79,11 +81,11 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
+import com.aptana.filesystem.ftp.FTPConnectionPoint;
 import com.aptana.ide.core.io.ConnectionPointUtils;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.efs.EFSUtils;
-import com.aptana.filesystem.ftp.FTPConnectionPoint;
 import com.aptana.ide.syncing.core.DefaultSiteConnection;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.SyncingPlugin;
@@ -195,15 +197,22 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
             CoreIOPlugin.getConnectionPointManager().addConnectionPoint(connectionPoint);
         }
         siteConnection.setSource(connectionPoint);
+        sourceEditor.clearNewConnections(false);
 
         connectionPoint = destinationEditor.getTarget();
         if (connectionPoint != null) {
             CoreIOPlugin.getConnectionPointManager().addConnectionPoint(connectionPoint);
         }
         siteConnection.setDestination(connectionPoint);
+        destinationEditor.clearNewConnections(false);
 
         changed = false;
         return true;
+    }
+
+    public void cancelChanges() {
+    	sourceEditor.clearNewConnections(true);
+    	destinationEditor.clearNewConnections(true);
     }
 
     public void modifyText(ModifyEvent e) {
@@ -309,8 +318,24 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
         private Label defaultDescriptionLabel;
         private boolean isDefault = false;
 
+        private List<IConnectionPoint> newRemoteConnections;
+
         public TargetEditor(String name) {
             this.name = name;
+            newRemoteConnections = new ArrayList<IConnectionPoint>();
+        }
+
+		/**
+		 * @param remove
+		 *            true if the newly created connections should be discarded, false if we are only resetting the list
+		 */
+        public void clearNewConnections(boolean remove) {
+        	if (remove){
+        		for (IConnectionPoint connection : newRemoteConnections) {
+        			CoreIOPlugin.getConnectionPointManager().removeConnectionPoint(connection);
+        		}
+        	}
+        	newRemoteConnections.clear();
         }
 
         public void widgetDefaultSelected(SelectionEvent e) {
@@ -321,6 +346,7 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
             if (source == remoteNewButton) {
                 IConnectionPoint result = createNewRemoteConnection();
                 if (result != null) {
+                	newRemoteConnections.add(result);
                     updateRemotesViewer();
                     setType(REMOTE);
                     remotesViewer.setSelection(new StructuredSelection(result));
@@ -383,9 +409,9 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
             remoteRadio.addSelectionListener(this);
 
             remotesViewer = new ComboViewer(mainComp, SWT.DROP_DOWN | SWT.READ_ONLY);
-            remotesViewer.getControl().setLayoutData(
-                    GridDataFactory.swtDefaults().exclude(!showRemote).align(SWT.FILL, SWT.CENTER)
-                            .span(2, 1).grab(true, false).create());
+			remotesViewer.getControl().setLayoutData(
+					GridDataFactory.swtDefaults().exclude(!showRemote).align(SWT.FILL, SWT.CENTER).span(2, 1)
+							.grab(true, false).create());
             remotesViewer.setContentProvider(new ArrayContentProvider());
             remotesViewer.addSelectionChangedListener(this);
             updateRemotesViewer();
@@ -431,12 +457,17 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
             /* row 3 - project folder */
             new Label(mainComp, SWT.NONE).setLayoutData(GridDataFactory.swtDefaults().create());
 
-            Label label = new Label(mainComp, SWT.NONE);
+			Composite folder = new Composite(mainComp, SWT.NONE);
+			folder.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).create());
+			folder.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).span(2, 1).grab(true, false)
+					.create());
+
+            Label label = new Label(folder, SWT.NONE);
             label.setText(StringUtil
                     .makeFormLabel(Messages.SiteConnectionPropertiesWidget_LBL_Folder));
             label.setLayoutData(GridDataFactory.swtDefaults().create());
 
-            projectFolderText = new Text(mainComp, SWT.BORDER);
+            projectFolderText = new Text(folder, SWT.BORDER);
             projectFolderText.setText(Path.ROOT.toPortableString());
             projectFolderText.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL,
                     SWT.CENTER).grab(true, false).create());
@@ -454,8 +485,8 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
             filesystemRadio.addSelectionListener(this);
 
             filesystemFolderText = new Text(mainComp, SWT.BORDER);
-            filesystemFolderText.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL,
-                    SWT.CENTER).span(2, 1).create());
+			filesystemFolderText.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).span(2, 1)
+					.grab(true, false).create());
             filesystemFolderText.addModifyListener(SiteConnectionPropertiesWidget.this);
 
             filesystemBrowseButton = new Button(mainComp, SWT.PUSH);

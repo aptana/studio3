@@ -83,7 +83,7 @@ public class FileService
 	 */
 	public IParseNode getParseResult()
 	{
-		return fParseState.getParseResult();
+		return getParseState().getParseResult();
 	}
 
 	/**
@@ -130,7 +130,7 @@ public class FileService
 						// TODO: at some point, we'll want to use this call to indicate the
 						// actual edit with the theory that we'll be able to perform
 						// incremental lexing and parsing based on that info.
-						fParseState.setEditState(source, source, 0, 0);
+						fParseState.setEditState(source, null, 0, 0);
 		
 						try
 						{

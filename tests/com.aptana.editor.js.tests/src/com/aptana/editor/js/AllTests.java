@@ -10,7 +10,6 @@ public class AllTests
 	{
 		TestSuite suite = new TestSuite("Tests for com.aptana.editor.js");
 		// $JUnit-BEGIN$
-		// suite.addTestSuite(JSCodeScannerPerformanceTest.class);
 		suite.addTestSuite(JSCodeScannerTest.class);
 		suite.addTestSuite(JSSourcePartitionScannerTest.class);
 		suite.addTestSuite(JSSingleQuotedStringScannerTest.class);

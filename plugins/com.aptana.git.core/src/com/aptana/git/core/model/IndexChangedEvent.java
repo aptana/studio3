@@ -34,7 +34,6 @@
  */
 package com.aptana.git.core.model;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -44,12 +43,14 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 
+import com.aptana.core.util.CollectionsUtil;
+
 public class IndexChangedEvent extends RepositoryEvent
 {
 
 	private Collection<ChangedFile> postChangeFiles;
 	private Collection<ChangedFile> preChangeFiles;
-	private ArrayList<ChangedFile> diff;
+	private Collection<ChangedFile> diff;
 
 	IndexChangedEvent(GitRepository repository, Collection<ChangedFile> preChangeFiles,
 			Collection<ChangedFile> postChangeFiles)
@@ -58,7 +59,7 @@ public class IndexChangedEvent extends RepositoryEvent
 		this.preChangeFiles = preChangeFiles;
 		this.postChangeFiles = postChangeFiles;
 	}
-	
+
 	public boolean hasDiff()
 	{
 		return !getDiff().isEmpty();
@@ -86,35 +87,9 @@ public class IndexChangedEvent extends RepositoryEvent
 	{
 		if (diff == null)
 		{
-			// Go through each of the lists and collect any that are in one but not the other, and any that are in both
-			// but have different statuses
-			diff = new ArrayList<ChangedFile>();
-			for (ChangedFile file : preChangeFiles)
-			{
-				if (!contains(postChangeFiles, file))
-					diff.add(file);
-			}
-			for (ChangedFile file : postChangeFiles)
-			{
-				if (!contains(preChangeFiles, file))
-					diff.add(file);
-			}
+			diff = CollectionsUtil.getNonOverlapping(preChangeFiles, postChangeFiles);
 		}
 		return diff;
-	}
-
-	private boolean contains(Collection<ChangedFile> files, ChangedFile file)
-	{
-		for (ChangedFile aFile : files)
-		{
-			if ((file.hasStagedChanges == aFile.hasStagedChanges)
-					&& (file.hasUnstagedChanges == aFile.hasUnstagedChanges)
-					&& (aFile.toString().equals(file.toString())))
-			{
-				return true;
-			}
-		}
-		return false;
 	}
 
 }
