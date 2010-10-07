@@ -17,6 +17,8 @@
 %import "com.aptana.parsing.IParser";
 %import "com.aptana.parsing.IRecoveryStrategy";
 %import "com.aptana.parsing.ast.IParseNode";
+%import "com.aptana.parsing.ast.IParseRootNode";
+%import "com.aptana.parsing.ast.ParseRootNode";
 
 %implements "IParser";
 
@@ -196,7 +198,7 @@
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.IParser#parse(com.aptana.parsing.IParseState)
 	 */
-	public synchronized IParseNode parse(IParseState parseState) throws java.lang.Exception
+	public synchronized IParseRootNode parse(IParseState parseState) throws java.lang.Exception
 	{
 		// grab source
 		char[] characters = parseState.getSource();
@@ -211,8 +213,11 @@
 		try
 		{
 			// parse
-			IParseNode result = (IParseNode) parse(fScanner);
-	
+			ParseRootNode result = (ParseRootNode) parse(fScanner);
+			int start = parseState.getStartingOffset();
+			int end = start + source.length();
+			result.setLocation(start, end);
+
 			// store results in the parse state
 			parseState.setParseResult(result);
 	

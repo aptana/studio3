@@ -265,7 +265,7 @@
 			<property name="data-dir" value="${baseLocation}/junit-workspace -clean" />
 			<property name="plugin-name" value="${test.plugin}" />
 			<property name="classname" value="${test.classname}" />
-			<property name="extraVMargs" value="-Demma.coverage.out.file=${coverageDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar -Declipse.perf.dbloc= -Declipse.perf.config=build=R3.0.0beta;host=ubunut32-jaxer-1;jvm=sun -Declipse.perf.assertAgainst=build=R3.0.0beta" />
+			<property name="extraVMargs" value="-ea -Demma.coverage.out.file=${coverageDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar -Declipse.perf.dbloc= -Declipse.perf.config=build=R3.0.0beta;host=ubunut32-jaxer-1;jvm=sun -Declipse.perf.assertAgainst=build=R3.0.0beta" />
 		</ant>
 	</target>
 

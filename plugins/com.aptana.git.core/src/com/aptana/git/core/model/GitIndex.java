@@ -48,6 +48,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
@@ -768,14 +769,12 @@ public class GitIndex
 
 	public Set<IResource> getChangedResources()
 	{
-		IPath workingDir = repository.workingDirectory();
 		Set<IResource> resources = new HashSet<IResource>();
 		synchronized (changedFiles)
 		{
 			for (ChangedFile changedFile : changedFiles)
 			{
-				IResource resource = ResourcesPlugin.getWorkspace().getRoot()
-						.getFileForLocation(workingDir.append(changedFile.getPath()));
+				IResource resource = getResourceForChangedFile(changedFile);
 				if (resource != null)
 					resources.add(resource);
 			}
@@ -783,12 +782,17 @@ public class GitIndex
 		return resources;
 	}
 
+	IFile getResourceForChangedFile(ChangedFile changedFile)
+	{
+		return ResourcesPlugin.getWorkspace().getRoot()
+		.getFileForLocation(workingDirectory.append(changedFile.getPath()));
+	}
+
 	public ChangedFile getChangedFileForResource(IResource resource)
 	{
 		if (resource == null || resource.getLocationURI() == null)
 			return null;
 		IPath resourcePath = resource.getLocation();
-		IPath workingDirectory = repository.workingDirectory();
 		synchronized (changedFiles)
 		{
 			for (ChangedFile changedFile : changedFiles)
