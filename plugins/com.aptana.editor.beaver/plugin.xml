@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.aptana.editor.beaver.BeaverEditor"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            default="true"
+            extensions="grammar,beaver,bvr"
+            id="com.aptana.editor.beaver"
+            name="%editor.name">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.beaver">
+         </contentTypeBinding>
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            file-extensions="grammar,beaver,bvr"
+            id="com.aptana.contenttype.beaver"
+            name="%content-type.name"
+            priority="normal">
+      </content-type>
+   </extension>
+
+</plugin>

@@ -39,7 +39,7 @@ public class CSSFunctionNode extends CSSExpressionNode
 
 	public CSSFunctionNode(CSSExpressionNode expression, int start, int end)
 	{
-		super(start, end);
+		super(CSSNodeTypes.FUNCTION, start, end);
 		setChildren(new CSSNode[] { expression });
 	}
 

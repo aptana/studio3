@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: DTD Editor Tests
+Bundle-SymbolicName: com.aptana.editor.dtd.tests
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Aptana, Inc.
+Fragment-Host: com.aptana.editor.dtd
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Require-Bundle: org.junit

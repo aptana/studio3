@@ -52,6 +52,7 @@ public class CSSRuleNode extends CSSNode
 	@SuppressWarnings("unchecked")
 	public CSSRuleNode(Symbol[] selectors, Object declarations, int end)
 	{
+		super(CSSNodeTypes.RULE);
 		fSelectors = new CSSSelectorNode[selectors.length];
 		List<CSSSimpleSelectorNode> simpleSelectors;
 		for (int i = 0; i < selectors.length; ++i)

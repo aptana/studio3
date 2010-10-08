@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.aptana.editor.dtd.DTDEditor"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            default="true"
+            extensions="dtd"
+            id="com.aptana.editor.dtd"
+            name="%editor.name">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.dtd">
+         </contentTypeBinding>
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            file-extensions="dtd"
+            id="com.aptana.contenttype.dtd"
+            name="%content-type.name"
+            priority="normal">
+      </content-type>
+   </extension>
+   <extension
+         point="com.aptana.parsing.parser">
+      <parser
+            class="com.aptana.editor.dtd.parsing.DTDParser"
+            content-type="com.aptana.contenttype.dtd"
+            language="text/dtd">
+      </parser>
+   </extension>
+
+</plugin>
