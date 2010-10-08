@@ -5,7 +5,7 @@ require "ruble/scope_selector"
 module Ruble
   
   class Snippet < Command
-    def initialize(name, path)
+    def initialize(name, path = nil)
       if name.kind_of? String
         super(name, path)
       else

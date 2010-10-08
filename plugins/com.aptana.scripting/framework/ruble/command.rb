@@ -8,7 +8,7 @@ require "ruble/bundle_manager"
 module Ruble
 
   class Command < BaseElement
-    def initialize(name, path)
+    def initialize(name, path = nil)
       if name.kind_of? String
         super(name, path)
 
