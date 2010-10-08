@@ -103,11 +103,7 @@ public class ScriptLoadJob extends AbstractScriptRunner
 		
 		// apply load paths
 		this.applyLoadPaths(runtime);
-		
-		// TODO: $0 should work, but until then, we'll use this hack so scripts
-		// can get their full path
-		container.put("$fullpath", this._filename); //$NON-NLS-1$
-		
+				
 		// compile
 		try
 		{
