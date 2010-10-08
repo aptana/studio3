@@ -34,13 +34,18 @@
  */
 package com.aptana.scripting;
 
+import net.contentobjects.jnotify.JNotifyException;
+
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.scripting.keybindings.internal.KeybindingsManager;
 import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.BundleMonitor;
 import com.aptana.scripting.model.RunType;
 
 /**
@@ -134,8 +139,34 @@ public class Activator extends Plugin
 	{
 		super.start(context);
 		plugin = this;
-		fileTypeListener = new FileTypeAssociationListener();
-		BundleManager.getInstance().addBundleChangeListener(fileTypeListener);
+		Job startupJob = new Job("Start bundle manager") //$NON-NLS-1$
+		{
+
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				fileTypeListener = new FileTypeAssociationListener();
+				BundleManager.getInstance().addBundleChangeListener(fileTypeListener);
+
+				// go ahead and process the workspace now to process bundles that exist already
+				BundleManager.getInstance().loadBundles();
+
+				// install Keybinding Manager
+				KeybindingsManager.install();
+
+				// turn on project and file monitoring
+				try
+				{
+					BundleMonitor.getInstance().beginMonitoring();
+				}
+				catch (JNotifyException e)
+				{
+					Activator.logError(Messages.EarlyStartup_Error_Initializing_File_Monitoring, e);
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		startupJob.schedule();
 	}
 
 	/*
@@ -146,6 +177,7 @@ public class Activator extends Plugin
 	{
 		try
 		{
+			BundleMonitor.getInstance().endMonitoring();
 			KeybindingsManager.uninstall();
 			if (fileTypeListener != null)
 			{
@@ -153,6 +185,7 @@ public class Activator extends Plugin
 				BundleManager.getInstance().removeBundleChangeListener(fileTypeListener);
 			}
 			fileTypeListener = null;
+			// FIXME Clean up the bundle manager singleton!
 		}
 		catch (Exception e)
 		{
