@@ -117,6 +117,7 @@ public class ScriptingEngine
 
 			result.setHomeDirectory(jrubyHome.getAbsolutePath());
 
+			// TODO Generate two containers? A global one for loading bundles, a threadsafe one for executing commands/snippets/etc?
 			// Pre-load 'ruble' framework files!
 			List<String> loadPaths = result.getLoadPaths();
 			loadPaths.addAll(0, getContributedLoadPaths());
