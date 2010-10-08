@@ -70,7 +70,9 @@ import com.enterprisedt.net.ftp.FTPClientInterface;
 import com.enterprisedt.net.ftp.FTPConnectMode;
 import com.enterprisedt.net.ftp.FTPException;
 import com.enterprisedt.net.ftp.FTPTransferType;
+import com.enterprisedt.net.ftp.ssl.SSLFTPCertificateException;
 import com.enterprisedt.net.ftp.ssl.SSLFTPClient;
+import com.enterprisedt.net.ftp.ssl.SSLFTPClient.ConfigFlags;
 
 /**
  * @author Max Stepanov
@@ -119,6 +121,7 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 		ftpsClient.setCustomValidator(new SSLHostValidator());
 		ftpsClient.setValidateServer(validateCertificate);
 		ftpsClient.setImplicitFTPS(!explicit);
+		ftpsClient.setConfigFlags(ConfigFlags.START_WITH_CLEAR_DATA_CHANNELS);
 	}
 
 	/* (non-Javadoc)
@@ -162,34 +165,57 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 				monitor.subTask(Messages.FTPSConnectionFileManager_Connecting);
 				connectFTPClient(ftpsClient);
 				if (!ftpsClient.isImplicitFTPS()) {
-					if (securityMechanism == null) {
-						String[] supportedMechanisms = new String[] {
-								SSLFTPClient.AUTH_TLS,
-								SSLFTPClient.AUTH_TLS_C,
-								SSLFTPClient.AUTH_SSL								
-						};
-						try {
-							String[] features = ftpClient.features();
-							if (features != null && features.length > 0) {
-								for (int i = 0; i < features.length; ++i) {
-									features[i] = features[i].trim();
-								}
-								List<String> featuresList = Arrays.asList(features);
-								for (int i = 0; i < supportedMechanisms.length; ++i) {
-									if (featuresList.contains("AUTH " + supportedMechanisms[i])) { //$NON-NLS-1$
-										securityMechanism = supportedMechanisms[i];
-										break;
-									}
+					final String[] supportedMechanisms = new String[] {
+							SSLFTPClient.AUTH_TLS,
+							SSLFTPClient.AUTH_TLS_C,
+							SSLFTPClient.AUTH_SSL								
+					};
+					boolean supportsPBSZ = false;
+					boolean supportsPROT = false;
+					try {
+						String[] features = ftpClient.features();
+						if (features != null && features.length > 0) {
+							for (int i = 0; i < features.length; ++i) {
+								features[i] = features[i].trim();
+							}
+							List<String> featuresList = Arrays.asList(features);
+							for (int i = 0; i < supportedMechanisms.length; ++i) {
+								if (securityMechanism == null && featuresList.contains("AUTH " + supportedMechanisms[i])) { //$NON-NLS-1$
+									securityMechanism = supportedMechanisms[i];
+									break;
 								}
 							}
-
-						} catch (Exception e) {
+							supportsPBSZ = featuresList.contains("PBSZ"); //$NON-NLS-1$
+							supportsPROT = featuresList.contains("PROT"); //$NON-NLS-1$
 						}
-						if (securityMechanism == null) {
-							securityMechanism = supportedMechanisms[0];
+
+					} catch (Exception e) {
+					}
+					if (securityMechanism != null) {
+						ftpsClient.auth(securityMechanism);
+					} else {
+						// server didn't indicate its supported auth mechanism, try them one-by-one
+						for (String i : supportedMechanisms) {
+							try {
+								ftpsClient.auth(securityMechanism);
+								securityMechanism = i;
+								break;
+							} catch (FTPException ignore) {
+							}
 						}
 					}
-					ftpsClient.auth(securityMechanism);
+					try {
+						if (supportsPBSZ) {
+							ftpsClient.pbsz(0);
+						}
+						if (supportsPROT) {
+							ftpsClient.prot(SSLFTPClient.PROT_PRIVATE);
+						}
+					} catch (FTPException e) {
+						if (supportsPROT) {
+							ftpsClient.prot(SSLFTPClient.PROT_CLEAR);
+						}
+					}
 				}
 				if (password.length == 0 && !IFTPConstants.LOGIN_ANONYMOUS.equals(login) && (context == null || !context.getBoolean(ConnectionContext.NO_PASSWORD_PROMPT))) {
                     getOrPromptPassword(MessageFormat.format(Messages.FTPSConnectionFileManager_FTPSAuthentication, host),
@@ -239,6 +265,9 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 		} catch (UnknownHostException e) {
 			safeQuit();
 			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.FTPSConnectionFileManager_HostNameNotFound+e.getLocalizedMessage(), e));
+		} catch (SSLFTPCertificateException e) {
+			safeQuit();
+			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.FTPSConnectionFileManager_ServerSertificateError+e.getLocalizedMessage(), e));
 		} catch (FileNotFoundException e) {
 			safeQuit();
 			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.FTPSConnectionFileManager_RemoteFolderNotFound+e.getLocalizedMessage(), e));			
@@ -265,7 +294,7 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 	}
 
 	private static void connectFTPClient(FTPClient ftpClient) throws IOException, FTPException {
-		PerformanceStats stats = PerformanceStats.getStats("com.aptana.filesystem.ftp/perf/connect", FTPSConnectionFileManager.class.getName());
+		PerformanceStats stats = PerformanceStats.getStats("com.aptana.filesystem.ftp/perf/connect", FTPSConnectionFileManager.class.getName()); //$NON-NLS-1$
 		stats.startRun(ftpClient.getRemoteHost());
 		try {
 			ftpClient.connect();

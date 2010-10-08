@@ -284,6 +284,11 @@ public class SiteConnectionsEditorDialog extends TitleAreaDialog implements Site
 			case 1:
 				if (sitePropertiesWidget.applyChanges()) {
 					break;
+				} else {
+					// unresolved error exists in the current selection
+					MessageDialog.openWarning(getShell(),
+							Messages.SiteConnectionsEditorDialog_UnresolvedWarning_Title,
+							Messages.SiteConnectionsEditorDialog_UnresolvedWarning_Message);
 				}
 			case 2:
 				return false;
@@ -309,6 +314,7 @@ public class SiteConnectionsEditorDialog extends TitleAreaDialog implements Site
 		}
 	}
 
+	@Override
 	protected void buttonPressed(int buttonId) {
 		if (buttonId == IDialogConstants.APPLY_ID) {
 			applyPressed();
@@ -316,6 +322,13 @@ public class SiteConnectionsEditorDialog extends TitleAreaDialog implements Site
 		super.buttonPressed(buttonId);
 	}
 
+	@Override
+    protected void cancelPressed() {
+		sitePropertiesWidget.cancelChanges();
+    	super.cancelPressed();
+    }
+
+	@Override
 	protected void okPressed() {
 		if (applyPressed()) {
 			super.okPressed();

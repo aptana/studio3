@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="true"
+            category="com.aptana"
+            class="com.aptana.browser.parts.WebBrowserView"
+            icon="icons/obj16/browser.png"
+            id="com.aptana.browser.views.webbrowser"
+            name="Web Browser"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.aptana.browser.parts.WebBrowserEditor"
+            default="false"
+            icon="icons/obj16/browser.png"
+            id="com.aptana.browser.editors.webbrowser"
+            name="Web Browser">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="com.aptana.ui.WebPerspective">
+         <viewShortcut
+               id="com.aptana.browser.views.webbrowser">
+         </viewShortcut>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="com.aptana.browser.actionSet"
+            label="Show WebBrowser ActionSet"
+            visible="true">
+         <action
+               class="com.aptana.browser.actions.ShowBrowserEditorAction"
+               icon="icons/obj16/browser.png"
+               id="com.aptana.browser.ShowBrowserEditorAction"
+               label="WebBrowser Editor"
+               menubarPath="window/showView/additions"
+               style="push">
+         </action>
+      </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.ui.category.views"
+            defaultHandler="com.aptana.browser.handlers.ShowPreviewHandler"
+            description="Show Preview Editor"
+            id="com.aptana.browser.commands.showPreview"
+            name="Show Preview">
+      </command>
+   </extension>
+   <!-- not adding the icon for now since the functionality hasn't been implemented
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="com.aptana.ui.globalActionSet">
+            <command
+                  commandId="com.aptana.browser.commands.showPreview"
+                  icon="icons/obj16/browser.png"
+                  style="push">
+               <visibleWhen>
+                  <reference
+                        definitionId="com.aptana.ui.contributions.inGlobalActionSet">
+                  </reference>
+               </visibleWhen>
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>
+   -->
+   <extension
+         point="org.eclipse.ui.browserSupport">
+      <support
+            class="com.aptana.browser.support.WorkbenchBrowserSupport"
+            default="false">
+      </support>
+   </extension>
+
+</plugin>

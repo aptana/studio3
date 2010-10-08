@@ -37,9 +37,9 @@ package com.aptana.editor.common;
 import java.util.Map;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.internal.text.html.HTMLTextPresenter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.DefaultInformationControl;
@@ -76,7 +76,8 @@ import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
 
 @SuppressWarnings("restriction")
-public abstract class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration implements ITopContentTypesProvider
+public abstract class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration implements
+		ITopContentTypesProvider
 {
 	private AbstractThemeableEditor fTextEditor;
 	private CommonDoubleClickStrategy fDoubleClickStrategy;
@@ -91,7 +92,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	public CommonSourceViewerConfiguration(IPreferenceStore preferenceStore, AbstractThemeableEditor editor)
 	{
 		super(preferenceStore);
-		
+
 		fTextEditor = editor;
 	}
 
@@ -107,7 +108,8 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getAnnotationHover(org.eclipse.jface.text.source.ISourceViewer)
+	 * @see org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getAnnotationHover(org.eclipse.jface.text.source.
+	 * ISourceViewer)
 	 */
 	@Override
 	public IAnnotationHover getAnnotationHover(ISourceViewer sourceViewer)
@@ -123,7 +125,8 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getAutoEditStrategies(org.eclipse.jface.text.source.ISourceViewer, java.lang.String)
+	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getAutoEditStrategies(org.eclipse.jface.text.source.
+	 * ISourceViewer, java.lang.String)
 	 */
 	@Override
 	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
@@ -133,7 +136,8 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getContentAssistant(org.eclipse.jface.text.source.ISourceViewer)
+	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getContentAssistant(org.eclipse.jface.text.source.
+	 * ISourceViewer)
 	 */
 	@Override
 	public IContentAssistant getContentAssistant(ISourceViewer sourceViewer)
@@ -146,11 +150,11 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		assistant.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
 
 		String[] contentTypes = getConfiguredContentTypes(sourceViewer);
-		
+
 		for (String type : contentTypes)
 		{
 			IContentAssistProcessor processor = getContentAssistProcessor(sourceViewer, type);
-			
+
 			if (processor != null)
 			{
 				assistant.setContentAssistProcessor(processor, type);
@@ -158,21 +162,20 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		}
 
 		assistant.setInformationControlCreator(getInformationControlCreator(sourceViewer));
-		
+
 		if (fPreferenceStore != null)
 		{
-//			assistant.enableAutoActivation(fPreferenceStore.getBoolean(IPreferenceConstants.CONTENT_ASSIST_AUTO_ACTIVATION));
-//			assistant.setAutoActivationDelay(fPreferenceStore.getInt(IPreferenceConstants.CONTENT_ASSIST_DELAY));
+			// assistant.enableAutoActivation(fPreferenceStore.getBoolean(IPreferenceConstants.CONTENT_ASSIST_AUTO_ACTIVATION));
+			// assistant.setAutoActivationDelay(fPreferenceStore.getInt(IPreferenceConstants.CONTENT_ASSIST_DELAY));
 			assistant.enableAutoActivation(true);
 			assistant.setAutoActivationDelay(200);
 		}
-		
+
 		assistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
 
 		fThemeChangeListener = new IPreferenceChangeListener()
 		{
 
-			@Override
 			public void preferenceChange(PreferenceChangeEvent event)
 			{
 				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
@@ -184,7 +187,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 			}
 		};
 		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
-		
+
 		return assistant;
 	}
 
@@ -205,12 +208,14 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getContentFormatter(org.eclipse.jface.text.source.ISourceViewer)
+	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getContentFormatter(org.eclipse.jface.text.source.
+	 * ISourceViewer)
 	 */
 	@Override
 	public IContentFormatter getContentFormatter(ISourceViewer sourceViewer)
 	{
-		return new MultiPassContentFormatter(getConfiguredDocumentPartitioning(sourceViewer), IDocument.DEFAULT_CONTENT_TYPE);
+		return new MultiPassContentFormatter(getConfiguredDocumentPartitioning(sourceViewer),
+				IDocument.DEFAULT_CONTENT_TYPE);
 	}
 
 	/*
@@ -232,16 +237,18 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getHyperlinkDetectorTargets(org.eclipse.jface.text.source.ISourceViewer)
+	 * @see
+	 * org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getHyperlinkDetectorTargets(org.eclipse.jface.text.
+	 * source.ISourceViewer)
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	protected Map getHyperlinkDetectorTargets(ISourceViewer sourceViewer)
 	{
 		Map targets = super.getHyperlinkDetectorTargets(sourceViewer);
-		
+
 		targets.put("com.aptana.editor.ui.hyperlinkTarget", fTextEditor); //$NON-NLS-1$
-		
+
 		return targets;
 	}
 
@@ -250,27 +257,30 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	 */
 	public String getIndent()
 	{
-		boolean useSpaces = fPreferenceStore.getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
-		
+		boolean useSpaces = fPreferenceStore
+				.getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
+
 		if (useSpaces)
 		{
 			int tabWidth = fPreferenceStore.getInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
 			StringBuilder buf = new StringBuilder();
-			
+
 			for (int i = 0; i < tabWidth; ++i)
 			{
 				buf.append(" "); //$NON-NLS-1$
 			}
-			
+
 			return buf.toString();
 		}
-		
+
 		return "\t"; //$NON-NLS-1$
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getInformationControlCreator(org.eclipse.jface.text.source.ISourceViewer)
+	 * @see
+	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getInformationControlCreator(org.eclipse.jface.text.source
+	 * .ISourceViewer)
 	 */
 	@Override
 	public IInformationControlCreator getInformationControlCreator(ISourceViewer sourceViewer)
@@ -286,13 +296,13 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 					{
 						return getThemeBackground();
 					}
-					
+
 					@Override
 					protected Color getForeground()
 					{
 						return getThemeForeground();
 					}
-					
+
 					@Override
 					protected Color getBorderColor()
 					{
@@ -302,28 +312,30 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 			}
 		};
 	}
-	
+
 	protected Color getThemeBackground()
 	{
 		RGB bg = ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getBackground();
 		return ThemePlugin.getDefault().getColorManager().getColor(bg);
 	}
-	
+
 	protected Color getThemeForeground()
 	{
 		RGB bg = ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getForeground();
 		return ThemePlugin.getDefault().getColorManager().getColor(bg);
 	}
-	
+
 	protected Color getThemeSelection()
 	{
-		RGB bg = ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getSelection();
+		RGB bg = ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getSelectionAgainstBG();
 		return ThemePlugin.getDefault().getColorManager().getColor(bg);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getInformationPresenter(org.eclipse.jface.text.source.ISourceViewer)
+	 * @see
+	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getInformationPresenter(org.eclipse.jface.text.source
+	 * .ISourceViewer)
 	 */
 	@Override
 	public IInformationPresenter getInformationPresenter(ISourceViewer sourceViewer)
@@ -355,7 +367,9 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getOverviewRulerAnnotationHover(org.eclipse.jface.text.source.ISourceViewer)
+	 * @see
+	 * org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getOverviewRulerAnnotationHover(org.eclipse.jface.text
+	 * .source.ISourceViewer)
 	 */
 	@Override
 	public IAnnotationHover getOverviewRulerAnnotationHover(ISourceViewer sourceViewer)
@@ -371,16 +385,19 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getReconciler(org.eclipse.jface.text.source.ISourceViewer)
+	 * @see
+	 * org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getReconciler(org.eclipse.jface.text.source.ISourceViewer
+	 * )
 	 */
 	@Override
 	public IReconciler getReconciler(ISourceViewer sourceViewer)
 	{
 		if (fTextEditor != null && fTextEditor.isEditable())
 		{
-			CommonCompositeReconcilingStrategy strategy = new CommonCompositeReconcilingStrategy(fTextEditor, getConfiguredDocumentPartitioning(sourceViewer));
+			CommonCompositeReconcilingStrategy strategy = new CommonCompositeReconcilingStrategy(fTextEditor,
+					getConfiguredDocumentPartitioning(sourceViewer));
 			CommonReconciler reconciler = new CommonReconciler(fTextEditor, strategy, false);
-			
+
 			reconciler.setIsIncrementalReconciler(false);
 			reconciler.setIsAllowedToModifyDocument(false);
 			reconciler.setProgressMonitor(new NullProgressMonitor());
@@ -388,10 +405,10 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 
 			return reconciler;
 		}
-		
+
 		return null;
 	}
-	
+
 	protected AbstractThemeableEditor getEditor()
 	{
 		return fTextEditor;

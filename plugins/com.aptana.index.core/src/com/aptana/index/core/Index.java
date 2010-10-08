@@ -2,13 +2,16 @@ package com.aptana.index.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.zip.CRC32;
 
 import org.eclipse.core.runtime.IPath;
 
@@ -16,13 +19,11 @@ import com.aptana.internal.index.core.DiskIndex;
 import com.aptana.internal.index.core.MemoryIndex;
 import com.aptana.internal.index.core.ReadWriteMonitor;
 
-public class Index
+public class Index implements IReadWriteMonitor
 {
-	private static final int MATCH_RULE_INDEX_MASK = SearchPattern.EXACT_MATCH | SearchPattern.PREFIX_MATCH
-			| SearchPattern.PATTERN_MATCH | SearchPattern.CASE_SENSITIVE | SearchPattern.REGEX_MATCH;
-
+	private static final int MATCH_RULE_INDEX_MASK = SearchPattern.EXACT_MATCH | SearchPattern.PREFIX_MATCH | SearchPattern.PATTERN_MATCH
+		| SearchPattern.CASE_SENSITIVE | SearchPattern.REGEX_MATCH;
 	private static final Map<String, Pattern> PATTERNS = new HashMap<String, Pattern>();
-
 	// Separator to use after the container path
 	public static final char DEFAULT_SEPARATOR = '/';
 
@@ -56,6 +57,7 @@ public class Index
 						isEscaped = false;
 					}
 					break;
+
 				// characters that need to be escaped in the regex.
 				case '(':
 				case ')':
@@ -76,6 +78,7 @@ public class Index
 					buffer.append('\\');
 					buffer.append(c);
 					break;
+
 				case '?':
 					if (!isEscaped)
 					{
@@ -88,6 +91,7 @@ public class Index
 						isEscaped = false;
 					}
 					break;
+
 				case '*':
 					if (!isEscaped)
 					{
@@ -100,6 +104,7 @@ public class Index
 						isEscaped = false;
 					}
 					break;
+
 				default:
 					if (isEscaped)
 					{
@@ -121,6 +126,24 @@ public class Index
 	}
 
 	/**
+	 * computeIndexLocation
+	 * 
+	 * @param containerPath
+	 * @return
+	 */
+	private static IPath computeIndexLocation(URI containerPath)
+	{
+		CRC32 crc = new CRC32();
+
+		crc.reset();
+		crc.update(containerPath.toString().getBytes());
+
+		String fileName = Long.toString(crc.getValue()) + ".index"; //$NON-NLS-1$
+
+		return IndexActivator.getDefault().getStateLocation().append(fileName);
+	}
+
+	/**
 	 * isMatch
 	 * 
 	 * @param pattern
@@ -131,30 +154,45 @@ public class Index
 	public static boolean isMatch(String pattern, String word, int matchRule)
 	{
 		if (pattern == null)
+		{
 			return true;
+		}
+
 		int patternLength = pattern.length();
 		int wordLength = word.length();
+
 		if (patternLength == 0)
+		{
 			return matchRule != SearchPattern.EXACT_MATCH;
+		}
+
 		switch (matchRule)
 		{
 			case SearchPattern.EXACT_MATCH:
 				return patternLength == wordLength && pattern.equalsIgnoreCase(word);
+
 			case SearchPattern.PREFIX_MATCH:
 				return patternLength <= wordLength && word.toLowerCase().startsWith(pattern.toLowerCase());
+
 			case SearchPattern.PATTERN_MATCH:
 				return patternMatch(pattern.toLowerCase(), word.toLowerCase());
+
 			case SearchPattern.REGEX_MATCH:
 				return regexPatternMatch(pattern, word, false);
+
 			case SearchPattern.EXACT_MATCH | SearchPattern.CASE_SENSITIVE:
 				return patternLength == wordLength && pattern.equals(word);
+
 			case SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE:
 				return patternLength <= wordLength && word.startsWith(pattern);
+
 			case SearchPattern.PATTERN_MATCH | SearchPattern.CASE_SENSITIVE:
 				return patternMatch(pattern, word);
+
 			case SearchPattern.REGEX_MATCH | SearchPattern.CASE_SENSITIVE:
 				return regexPatternMatch(pattern, word, true);
 		}
+
 		return false;
 	}
 
@@ -179,7 +217,9 @@ public class Index
 	private static boolean patternMatch(String pattern, String word)
 	{
 		if (pattern.equals("*")) //$NON-NLS-1$
+		{
 			return true;
+		}
 
 		// see if we've cached a regex for this pattern already
 		Pattern p = PATTERNS.get(pattern);
@@ -242,40 +282,30 @@ public class Index
 	}
 
 	public char separator = DEFAULT_SEPARATOR;
-
 	private MemoryIndex memoryIndex;
-
 	private DiskIndex diskIndex;
-
-	public ReadWriteMonitor monitor;
-
-	private String path;
+	private IReadWriteMonitor monitor;
+	private URI containerURI;
 
 	/**
 	 * Index
 	 * 
-	 * @param path
+	 * @param containerURI
+	 * @param reuseExistingFile
 	 * @throws IOException
 	 */
-	public Index(String path) throws IOException
+	public Index(URI containerURI, boolean reuseExistingFile) throws IOException
 	{
-		// Raw path of root we're indexing
-		this.path = path;
+		this.containerURI = containerURI;
 
 		this.memoryIndex = new MemoryIndex();
 		this.monitor = new ReadWriteMonitor();
 
 		// Convert to a filename we can use for the actual index on disk
-		IPath containerPath = IndexManager.getInstance().computeIndexLocation(path);
-		String containerPathString = containerPath.getDevice() == null ? containerPath.toString() : containerPath
-				.toOSString();
-		this.diskIndex = new DiskIndex(containerPathString);
-		this.diskIndex.initialize();
-	}
-
-	public String getRoot()
-	{
-		return path;
+		IPath diskIndexPath = computeIndexLocation(containerURI);
+		String diskIndexPathString = diskIndexPath.getDevice() == null ? diskIndexPath.toString() : diskIndexPath.toOSString();
+		this.diskIndex = new DiskIndex(diskIndexPathString);
+		this.diskIndex.initialize(reuseExistingFile);
 	}
 
 	/**
@@ -283,13 +313,117 @@ public class Index
 	 * 
 	 * @param category
 	 * @param key
-	 * @param documentPath
+	 * @param containerRelativeURI
 	 */
-	public void addEntry(String category, String key, String documentPath)
+	public void addEntry(String category, String key, URI containerRelativeURI)
 	{
-		// TODO Convert documentPath arg to URI, resolve it's relative path to base path of container passed into index
-		// constructor!
-		this.memoryIndex.addEntry(category, key, documentPath);
+		this.enterWrite();
+		this.memoryIndex.addEntry(category, key, containerRelativeURI.toString());
+		this.exitWrite();
+	}
+
+	/**
+	 * deleteIndexFile
+	 */
+	void deleteIndexFile()
+	{
+		File indexFile = this.getIndexFile();
+
+		if (indexFile != null && indexFile.exists())
+		{
+			indexFile.delete();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.index.core.IReadWriteMonitor#enterRead()
+	 */
+	public void enterRead()
+	{
+		if (this.monitor != null)
+		{
+			this.monitor.enterRead();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.index.core.IReadWriteMonitor#enterWrite()
+	 */
+	public void enterWrite()
+	{
+		if (this.monitor != null)
+		{
+			this.monitor.enterWrite();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.index.core.IReadWriteMonitor#exitRead()
+	 */
+	public void exitRead()
+	{
+		if (this.monitor != null)
+		{
+			this.monitor.exitRead();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.index.core.IReadWriteMonitor#exitReadEnterWrite()
+	 */
+	public boolean exitReadEnterWrite()
+	{
+		boolean result = false;
+
+		if (this.monitor != null)
+		{
+			result = this.monitor.exitReadEnterWrite();
+		}
+
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.index.core.IReadWriteMonitor#exitWrite()
+	 */
+	public void exitWrite()
+	{
+		if (this.monitor != null)
+		{
+			this.monitor.exitWrite();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.index.core.IReadWriteMonitor#exitWriteEnterRead()
+	 */
+	public void exitWriteEnterRead()
+	{
+		if (this.monitor != null)
+		{
+			this.monitor.exitWriteEnterRead();
+		}
+	}
+
+	/**
+	 * getCategories
+	 * 
+	 * @return
+	 */
+	public List<String> getCategories()
+	{
+		Set<String> categories = new HashSet<String>();
+
+		categories.addAll(this.memoryIndex.getCategories());
+		categories.addAll(this.diskIndex.getCategories());
+
+		return new ArrayList<String>(categories);
 	}
 
 	/**
@@ -300,6 +434,16 @@ public class Index
 	public File getIndexFile()
 	{
 		return this.diskIndex == null ? null : this.diskIndex.indexFile;
+	}
+
+	/**
+	 * @deprecated
+	 * @return
+	 */
+	public URI getRoot()
+	{
+		// TODO Remove this! JDT doesn't need it!
+		return containerURI;
 	}
 
 	/**
@@ -323,47 +467,78 @@ public class Index
 	 */
 	public List<QueryResult> query(String[] categories, String key, int matchRule) throws IOException
 	{
-		if (this.memoryIndex.shouldMerge() && monitor.exitReadEnterWrite())
+		Map<String, QueryResult> results = null;
+
+		try
 		{
-			try
+			// NOTE: I'd like to lock later in the method, but it would contort
+			// the IReadWriteMonitor interface, so we lock here and stick with
+			// the call to exitReadEnterWrite below
+			this.enterRead();
+
+			if (this.memoryIndex.shouldMerge() && monitor.exitReadEnterWrite())
 			{
-				save();
+				try
+				{
+					this.save(false);
+				}
+				finally
+				{
+					monitor.exitWriteEnterRead();
+				}
 			}
-			finally
+
+			int rule = matchRule & MATCH_RULE_INDEX_MASK;
+
+			if (this.memoryIndex.hasChanged())
 			{
-				monitor.exitWriteEnterRead();
+				results = this.diskIndex.addQueryResults(categories, key, rule, this.memoryIndex);
+				results = this.memoryIndex.addQueryResults(categories, key, rule, results);
+			}
+			else
+			{
+				results = this.diskIndex.addQueryResults(categories, key, rule, null);
 			}
 		}
-
-		Map<String, QueryResult> results;
-		int rule = matchRule & MATCH_RULE_INDEX_MASK;
-
-		if (this.memoryIndex.hasChanged())
+		finally
 		{
-			results = this.diskIndex.addQueryResults(categories, key, rule, this.memoryIndex);
-			results = this.memoryIndex.addQueryResults(categories, key, rule, results);
-		}
-		else
-		{
-			results = this.diskIndex.addQueryResults(categories, key, rule, null);
-		}
+			this.exitRead();
 
-		// clear any cached regexes or patterns we might have used during the query
-		PATTERNS.clear();
+			// clear any cached regexes or patterns we might have used during the query
+			PATTERNS.clear();
+		}
 
 		return (results == null) ? null : new ArrayList<QueryResult>(results.values());
 	}
 
 	/**
+	 * Returns the document names that contain the given substring, if null then returns all of them.
+	 */
+	public Set<String> queryDocumentNames(String substring) throws IOException
+	{
+		Set<String> results;
+
+		if (this.memoryIndex.hasChanged())
+		{
+			results = this.diskIndex.addDocumentNames(substring, this.memoryIndex);
+			results.addAll(this.memoryIndex.addDocumentNames(substring));
+		}
+		else
+		{
+			results = this.diskIndex.addDocumentNames(substring, null);
+		}
+
+		return results;
+	}
+
+	/**
 	 * Remove all indices for a given document
 	 * 
-	 * @param containerRelativePath
+	 * @param containerRelativeURI
 	 */
-	public void remove(String containerRelativePath)
+	public void remove(URI containerRelativeURI)
 	{
-		// TODO Convert containerRelativePath arg to URI, resolve it's relative path to base path of container passed
-		// into index constructor!
-		this.memoryIndex.remove(containerRelativePath);
+		this.memoryIndex.remove(containerRelativeURI.toString());
 	}
 
 	/**
@@ -391,32 +566,61 @@ public class Index
 	 */
 	public void save() throws IOException
 	{
-		// must own the write lock of the monitor
-		if (!hasChanged())
-			return;
-
-		int numberOfChanges = this.memoryIndex.numberOfChanges();
-		this.diskIndex = this.diskIndex.mergeWith(this.memoryIndex);
-		this.memoryIndex = new MemoryIndex();
-		if (numberOfChanges > 1000)
-			System.gc(); // reclaim space if the MemoryIndex was very BIG
+		this.save(true);
 	}
 
 	/**
-	 * Returns the document names that contain the given substring, if null then returns all of them.
+	 * save
+	 * 
+	 * @param lock
+	 * @throws IOException
 	 */
-	public Set<String> queryDocumentNames(String substring) throws IOException
+	private void save(boolean lock) throws IOException
 	{
-		Set<String> results;
-		if (this.memoryIndex.hasChanged())
+		// NOTE: Unfortunately we need the ugly "lock" flag hack in order to
+		// prevent hanging when save is called from query
+		try
 		{
-			results = this.diskIndex.addDocumentNames(substring, this.memoryIndex);
-			results.addAll(this.memoryIndex.addDocumentNames(substring));
+			if (lock)
+			{
+				this.enterWrite();
+			}
+
+			// no need to do anything if the memory index hasn't changed
+			if (!hasChanged())
+			{
+				return;
+			}
+
+			int numberOfChanges = this.memoryIndex.numberOfChanges();
+			this.diskIndex = this.diskIndex.mergeWith(this.memoryIndex);
+			this.memoryIndex = new MemoryIndex();
+
+			if (numberOfChanges > 1000)
+			{
+				System.gc(); // reclaim space if the MemoryIndex was very BIG
+			}
 		}
-		else
+		finally
 		{
-			results = this.diskIndex.addDocumentNames(substring, null);
+			if (lock)
+			{
+				this.exitWrite();
+			}
 		}
-		return results;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString()
+	{
+		return "Index for " + this.containerURI; //$NON-NLS-1$
+	}
+
+	public URI getRelativeDocumentPath(URI path)
+	{
+		return containerURI.relativize(path);
 	}
 }

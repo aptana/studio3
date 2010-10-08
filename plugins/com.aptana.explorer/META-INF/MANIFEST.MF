@@ -14,7 +14,6 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.git.core;bundle-version="1.0.0",
  com.aptana.git.ui;bundle-version="1.0.0",
  com.aptana.core;bundle-version="3.0.0",
- com.aptana.filewatcher;bundle-version="1.0.0",
  com.aptana.scripting;bundle-version="1.0.0",
  com.aptana.terminal;bundle-version="1.0.0",
  org.jruby;bundle-version="1.4.0",
@@ -33,7 +32,7 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.ui;bundle-version="3.0.0",
  com.aptana.deploy;bundle-version="1.0.0",
  com.aptana.theme
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.explorer

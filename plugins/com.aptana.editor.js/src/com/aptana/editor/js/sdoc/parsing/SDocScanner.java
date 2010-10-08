@@ -1,8 +1,42 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.sdoc.parsing;
 
 import java.io.IOException;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Queue;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -20,7 +54,7 @@ public class SDocScanner extends Scanner
 	private SDocTokenScanner fTokenScanner;
 	private SDocTypeTokenScanner fTypeTokenScanner;
 	private IDocument fDocument;
-	private List<Symbol> fQueue;
+	private Queue<Symbol> fQueue;
 	private int fOffset;
 
 	/**
@@ -41,38 +75,38 @@ public class SDocScanner extends Scanner
 	public Symbol nextToken() throws IOException, Exception
 	{
 		Symbol result;
-		
+
 		if (fQueue.size() > 0)
 		{
-			result = fQueue.remove(0);
+			result = fQueue.poll();
 		}
 		else
 		{
 			IToken token = fTokenScanner.nextToken();
 			Object data = token.getData();
-	
+
 			while (data == SDocTokenType.WHITESPACE)
 			{
 				token = fTokenScanner.nextToken();
 				data = token.getData();
 			}
-	
+
 			int offset = fTokenScanner.getTokenOffset();
 			int length = fTokenScanner.getTokenLength();
 			SDocTokenType type = (data == null) ? SDocTokenType.EOF : (SDocTokenType) data;
-	
+
 			if (type == SDocTokenType.TYPES)
 			{
 				this.queueTypeTokens(offset, length);
-	
-				result = fQueue.remove(0);
+
+				result = fQueue.poll();
 			}
 			else
 			{
 				try
 				{
 					int totalLength = fDocument.getLength();
-	
+
 					if (offset > totalLength)
 					{
 						offset = totalLength;
@@ -81,7 +115,7 @@ public class SDocScanner extends Scanner
 					{
 						length = 0;
 					}
-	
+
 					result = new Symbol(type.getIndex(), offset + fOffset, offset + fOffset + length - 1, fDocument.get(offset, length));
 				}
 				catch (BadLocationException e)
@@ -90,7 +124,7 @@ public class SDocScanner extends Scanner
 				}
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -112,13 +146,13 @@ public class SDocScanner extends Scanner
 			int length = fTypeTokenScanner.getTokenLength();
 			Object data = token.getData();
 			SDocTokenType type = (data == null) ? SDocTokenType.EOF : (SDocTokenType) data;
-			
+
 			try
 			{
 				Symbol symbol = new Symbol(type.getIndex(), offset + fOffset, offset + fOffset + length - 1, fDocument.get(offset, length));
 
-				fQueue.add(symbol);
-				
+				fQueue.offer(symbol);
+
 				token = fTypeTokenScanner.nextToken();
 			}
 			catch (BadLocationException e)
@@ -137,7 +171,7 @@ public class SDocScanner extends Scanner
 	{
 		fOffset = offset;
 	}
-	
+
 	/**
 	 * setSource
 	 * 

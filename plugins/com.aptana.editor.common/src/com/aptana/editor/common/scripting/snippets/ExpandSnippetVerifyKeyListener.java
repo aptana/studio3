@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common.scripting.snippets;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -50,11 +84,7 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 
 	public void verifyKey(VerifyEvent event)
 	{
-		if (textViewer == null)
-		{
-			return;
-		}
-		if (document == null)
+		if (textViewer == null || document == null)
 		{
 			return;
 		}
@@ -65,65 +95,67 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 			return;
 		}
 
-		if (canModifyEditor)
+		if (canModifyEditor && event.doit && event.character == '\t')
 		{
-			if (event.doit)
+			ITextSelection selection = (ITextSelection) textEditor.getSelectionProvider().getSelection();
+			if (selection.getLength() == 0)
 			{
-				if (event.character == '\t')
+				int offset = selection.getOffset() - 1;
+				try
 				{
-					ITextSelection selection = (ITextSelection) textEditor.getSelectionProvider().getSelection();
-					if (selection.getLength() == 0)
+					String previousChar = document.get(offset, 1);
+					if (!Character.isWhitespace(previousChar.charAt(0)))
 					{
-						int offset = selection.getOffset() - 1;
-						try
+						int caretOffset = textViewer.getTextWidget().getCaretOffset();
+						String scope = getScope(document, caretOffset);
+						AndFilter filter = new AndFilter(new ScopeFilter(scope), new HasTriggerFilter());
+						CommandElement[] commandsFromScope = BundleManager.getInstance().getCommands(filter);
+						if (commandsFromScope.length > 0)
 						{
-							String previousChar = document.get(offset, 1);
-							if (!Character.isWhitespace(previousChar.charAt(0)))
+							// chop off portions of prefix from beginning until we have a match!
+							String prefix = SnippetsCompletionProcessor
+									.extractPrefixFromDocument(document, caretOffset);
+							while (prefix != null && prefix.length() > 0)
 							{
-								int caretOffset = textViewer.getTextWidget().getCaretOffset();
-								String scope = getScope(document, caretOffset);
-								boolean found = false;
-								AndFilter filter = new AndFilter(new ScopeFilter(scope), new HasTriggerFilter());
-								CommandElement[] commandsFromScope = BundleManager.getInstance().getCommands(filter);
-								if (commandsFromScope.length > 0)
-								{
-									String prefix = SnippetsCompletionProcessor.extractPrefixFromDocument(document,
-											caretOffset);
-									LOOP: for (CommandElement commandElement : commandsFromScope)
-									{
-										String[] triggers = commandElement.getTriggers();
-										if (triggers != null)
-										{
-											for (String trigger : triggers)
-											{
-												if (trigger != null && trigger.startsWith(prefix))
-												{
-													found = true;
-													// Break out of the main outer for loop
-													break LOOP;
-												}
-											}
-										}
-									}
-								}
-								if (found)
+								if (hasMatchingSnippet(prefix, commandsFromScope))
 								{
 									if (contentAssistant != null)
 									{
 										contentAssistant.showPossibleCompletions();
 										event.doit = false;
 									}
+									return;
 								}
+								prefix = SnippetsCompletionProcessor.narrowPrefix(prefix);
 							}
 						}
-						catch (BadLocationException e)
-						{
-							return;
-						}
+					}
+				}
+				catch (BadLocationException e)
+				{
+					return;
+				}
+			}
+		}
+	}
+
+	protected boolean hasMatchingSnippet(String prefix, CommandElement[] commandsFromScope)
+	{
+		for (CommandElement commandElement : commandsFromScope)
+		{
+			String[] triggers = commandElement.getTriggers();
+			if (triggers != null)
+			{
+				for (String trigger : triggers)
+				{
+					if (trigger != null && trigger.startsWith(prefix))
+					{
+						return true;
 					}
 				}
 			}
 		}
+		return false;
 	}
 
 	private static boolean canModifyEditor(ITextEditor editor)

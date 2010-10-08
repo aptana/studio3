@@ -54,15 +54,19 @@ class RepositorySelectionPage extends WizardPage
 			{
 				String sourceURI = source.getText();
 				if (sourceURI != null)
-				{ 
-					// Try to stick to a default of a project under workspace matching the last path of the remote git repo
+				{
+					// Try to stick to a default of a project under workspace matching the last path of the remote git
+					// repo
 					String workspacePath = ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString();
 					int index = sourceURI.lastIndexOf(GitRepository.GIT_DIR);
-					if (index != -1)
+					if (index == -1)
 					{
-						int slash = sourceURI.lastIndexOf("/", index); //$NON-NLS-1$
-						if (slash != -1)
-							workspacePath += sourceURI.substring(slash, index);
+						index = sourceURI.length();
+					}
+					int slash = sourceURI.lastIndexOf("/", index); //$NON-NLS-1$
+					if (slash != -1)
+					{
+						workspacePath += File.separator + sourceURI.substring(slash + 1, index);
 					}
 					directoryText.setText(workspacePath);
 				}
@@ -135,14 +139,16 @@ class RepositorySelectionPage extends WizardPage
 		final File absoluteFile = new File(dstpath).getAbsoluteFile();
 		if (!isEmptyDir(absoluteFile))
 		{
-			setErrorMessage(NLS.bind(Messages.RepositorySelectionPage_DirectoryExists_ErrorMessage, absoluteFile.getPath()));
+			setErrorMessage(NLS.bind(Messages.RepositorySelectionPage_DirectoryExists_ErrorMessage,
+					absoluteFile.getPath()));
 			setPageComplete(false);
 			return;
 		}
 
 		if (!canCreateSubdir(absoluteFile.getParentFile()))
 		{
-			setErrorMessage(NLS.bind(Messages.RepositorySelectionPage_CannotCreateDirectory_ErrorMessage, absoluteFile.getPath()));
+			setErrorMessage(NLS.bind(Messages.RepositorySelectionPage_CannotCreateDirectory_ErrorMessage,
+					absoluteFile.getPath()));
 			setPageComplete(false);
 			return;
 		}

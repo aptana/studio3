@@ -1,23 +1,59 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.sdoc.model;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import com.aptana.parsing.io.SourceWriter;
+import com.aptana.editor.js.JSTypeConstants;
+import com.aptana.parsing.io.SourcePrinter;
 
 public class FunctionType extends Type
 {
-	private List<Type> _parameterTypes = new LinkedList<Type>();
-	private List<Type> _returnTypes = new LinkedList<Type>();
-	
+	private List<Type> _parameterTypes;
+	private List<Type> _returnTypes;
+
 	/**
 	 * FunctionType
 	 */
 	public FunctionType()
 	{
-		super("Function");
+		super(JSTypeConstants.FUNCTION_TYPE); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * addParameterType
 	 * 
@@ -27,10 +63,15 @@ public class FunctionType extends Type
 	{
 		if (parameterType != null)
 		{
+			if (this._parameterTypes == null)
+			{
+				this._parameterTypes = new ArrayList<Type>();
+			}
+			
 			this._parameterTypes.add(parameterType);
 		}
 	}
-	
+
 	/**
 	 * addReturnType
 	 * 
@@ -40,10 +81,15 @@ public class FunctionType extends Type
 	{
 		if (returnType != null)
 		{
+			if (this._returnTypes == null)
+			{
+				this._returnTypes = new ArrayList<Type>();
+			}
+			
 			this._returnTypes.add(returnType);
 		}
 	}
-	
+
 	/**
 	 * getReturnTypes
 	 * 
@@ -51,71 +97,78 @@ public class FunctionType extends Type
 	 */
 	public List<Type> getReturnTypes()
 	{
-		return this._returnTypes;
+		List<Type> result = this._returnTypes;
+		
+		if (result == null)
+		{
+			result = Collections.emptyList();
+		}
+		
+		return result;
 	}
-	
+
 	/**
 	 * toSource
 	 * 
 	 * @param writer
 	 */
-	public void toSource(SourceWriter writer)
+	public void toSource(SourcePrinter writer)
 	{
-		writer.print("Function");
-		
+		writer.print(JSTypeConstants.FUNCTION_TYPE); //$NON-NLS-1$
+
 		boolean first;
-		
-		if (this._parameterTypes.isEmpty() == false)
+
+		if (this._parameterTypes != null && this._parameterTypes.isEmpty() == false)
 		{
 			first = true;
-			
-			writer.print("(");
-			
+
+			writer.print("("); //$NON-NLS-1$
+
 			for (Type type : this._parameterTypes)
 			{
 				if (first == false)
 				{
-					writer.print(",");
+					writer.print(","); //$NON-NLS-1$
 				}
 				else
 				{
 					first = false;
 				}
-				
+
 				type.toSource(writer);
 			}
-			
-			writer.print(")");
+
+			writer.print(")"); //$NON-NLS-1$
 		}
-		
-		if (this._returnTypes.isEmpty() == false)
+
+		if (this._returnTypes != null && this._returnTypes.isEmpty() == false)
 		{
 			first = true;
-			
-			writer.print("->");
-			
+
+			writer.print("->"); //$NON-NLS-1$
+
 			if (this._returnTypes.size() > 1)
 			{
-				writer.print("(");
+				writer.print("("); //$NON-NLS-1$
 			}
-			
+
 			for (Type type : this._returnTypes)
 			{
 				if (first == false)
 				{
-					writer.print(",");
+					writer.print(","); //$NON-NLS-1$
 				}
 				else
 				{
 					first = false;
 				}
-				
+
 				type.toSource(writer);
 			}
-			
+
 			if (this._returnTypes.size() > 1)
 			{
-				writer.print(")");
+				writer.print(")"); //$NON-NLS-1$
 			}
 		}
 	}

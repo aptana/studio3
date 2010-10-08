@@ -1,4 +1,41 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common.scripting.snippets;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -35,6 +72,9 @@ import org.eclipse.swt.widgets.Shell;
 public class SnippetTemplateProposal extends TemplateProposal implements ICompletionProposalExtension6
 {
 
+	// TODO Figure out space tab width and use it rather than constant of 2!
+	private static final int SPACE_INDENT_SIZE = 2;
+
 	protected ICompletionProposal[] templateProposals;
 	protected char triggerChar;
 	protected char[] triggerChars;
@@ -62,13 +102,15 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 		fRegion = region;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.templates.TemplateProposal#getAdditionalProposalInfo()
 	 */
-	public String getAdditionalProposalInfo() {
+	public String getAdditionalProposalInfo()
+	{
 		return getTemplate().getPattern();
 	}
-	
+
 	@Override
 	public void apply(final ITextViewer viewer, char trigger, int stateMask, final int offset)
 	{
@@ -101,26 +143,32 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 			int start;
 			TemplateBuffer templateBuffer;
 			{
-				int oldReplaceOffset = getReplaceOffset();
+				int oldReplaceOffset = getReplaceOffset(document, fTemplate);
 
 				if (fTemplate instanceof SnippetTemplate)
 				{
 					// Reset indented pattern
-					((SnippetTemplate)fTemplate).setIndentedPattern(null);
+					((SnippetTemplate) fTemplate).setIndentedPattern(null);
 
 					IRegion lineInformationOfStart = document.getLineInformationOfOffset(oldReplaceOffset);
 					int lineInformationOfStartOffset = lineInformationOfStart.getOffset();
 					if (oldReplaceOffset > lineInformationOfStartOffset)
 					{
 						// Get the text from beginning of line to the replacement start offset
-						String prefix = document.get(lineInformationOfStartOffset, oldReplaceOffset - lineInformationOfStartOffset);
+						String prefix = document.get(lineInformationOfStartOffset, oldReplaceOffset
+								- lineInformationOfStartOffset);
 
 						// Is there any leading white space?
 						if (prefix.matches("\\s+.*")) //$NON-NLS-1$
 						{
 							// Yes. Prefix each line in the template's pattern with the same white space
-							((SnippetTemplate)fTemplate).setIndentedPattern(fTemplate.getPattern().replaceAll("(\r\n|\r|\n)", //$NON-NLS-1$
-									"$1" + prefix.replaceFirst("(\\s+).*", "$1")));   //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							String indentedPattern = fTemplate.getPattern().replaceAll("(\r\n|\r|\n)", //$NON-NLS-1$
+									"$1" + prefix.replaceFirst("(\\s+).*", "$1")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+							// We need to convert so that the pattern uses the same type of indent (spaces vs tabs)
+							indentedPattern = conformIndents(prefix, indentedPattern);
+
+							((SnippetTemplate) fTemplate).setIndentedPattern(indentedPattern);
 						}
 					}
 				}
@@ -136,7 +184,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 					return;
 				}
 
-				start = getReplaceOffset();
+				start = getReplaceOffset(document, fTemplate);
 				int shift = start - oldReplaceOffset;
 				int end = Math.max(getReplaceEndOffset(), offset + shift);
 
@@ -202,19 +250,20 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 
 				LinkedPosition first;
 				{
-					String[] values= variable.getValues();
-					ICompletionProposal[] proposals= new ICompletionProposal[values.length];
-					for (int j= 0; j < values.length; j++) {
+					String[] values = variable.getValues();
+					ICompletionProposal[] proposals = new ICompletionProposal[values.length];
+					for (int j = 0; j < values.length; j++)
+					{
 						ensurePositionCategoryInstalled(document, model);
-						Position pos= new Position(offsets[0] + start, length);
+						Position pos = new Position(offsets[0] + start, length);
 						document.addPosition(getCategory(), pos);
-						proposals[j]= new PositionBasedCompletionProposal(values[j], pos, length);
+						proposals[j] = new PositionBasedCompletionProposal(values[j], pos, length);
 					}
 
 					if (proposals.length > 1)
-						first= new ProposalPosition(document, offsets[0] + start, length, sequenceNumber, proposals);
+						first = new ProposalPosition(document, offsets[0] + start, length, sequenceNumber, proposals);
 					else
-						first= new LinkedPosition(document, offsets[0] + start, length, sequenceNumber);
+						first = new LinkedPosition(document, offsets[0] + start, length, sequenceNumber);
 				}
 
 				for (int j = 0; j != offsets.length; j++)
@@ -264,6 +313,88 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 			fSelectedRegion = fRegion;
 		}
 
+	}
+
+	private int getReplaceOffset(IDocument document, Template template)
+	{
+		if (template instanceof CommandTemplate)
+		{
+			try
+			{
+				CommandTemplate ct = (CommandTemplate) template;
+				// Need to get correct offset based on prefix chopping!
+				int fullPrefixOffset = getReplaceOffset();
+				String prefix = document.get(fullPrefixOffset, getReplaceEndOffset() - fullPrefixOffset);
+				final String origPrefix = prefix;
+				while (!ct.matches(prefix))
+				{
+					prefix = SnippetsCompletionProcessor.narrowPrefix(prefix);
+				}
+				if (prefix.length() == 0)
+				{
+					return fullPrefixOffset;
+				}
+				return fullPrefixOffset + (origPrefix.length() - prefix.length());
+			}
+			catch (BadLocationException e)
+			{
+				// ignore
+			}
+		}
+
+		return getReplaceOffset();
+	}
+
+	/**
+	 * Given the prefix text in the editor, modify the snippet patterns' indents to use same type of indentation (tabs
+	 * vs spaces)
+	 * 
+	 * @param prefix
+	 * @param indentedPattern
+	 * @return
+	 */
+	protected String conformIndents(String prefix, String indentedPattern)
+	{
+		boolean useTabs = prefix.contains("\t"); //$NON-NLS-1$
+
+		Pattern p = Pattern.compile("(\r\n|\r|\n)(\\s*)"); //$NON-NLS-1$
+		Matcher m = p.matcher(indentedPattern);
+		int startIndex = 0;
+		StringBuilder builder = new StringBuilder();
+		while (m.find(startIndex))
+		{
+			builder.append(indentedPattern.substring(startIndex, m.start(1)));
+			startIndex = m.end(2);
+			String indent = convertIndent(m.group(2), useTabs);
+			builder.append(m.group(1));
+			builder.append(indent);
+		}
+		builder.append(indentedPattern.substring(startIndex));
+		indentedPattern = builder.toString();
+		return indentedPattern;
+	}
+
+	private String convertIndent(String indent, boolean useTabs)
+	{
+		if (useTabs && indent.contains(" ")) //$NON-NLS-1$
+		{
+			String newIndent = ""; //$NON-NLS-1$
+			for (int i = 0; i < indent.length() / SPACE_INDENT_SIZE; i++)
+			{
+				newIndent += '\t';
+			}
+			return newIndent;
+		}
+		if (!useTabs && indent.contains("\t")) //$NON-NLS-1$
+		{
+			String newIndent = ""; //$NON-NLS-1$
+			for (int i = 0; i < indent.length() * SPACE_INDENT_SIZE; i++)
+			{
+				newIndent += " "; //$NON-NLS-1$
+			}
+			return newIndent;
+		}
+		return indent;
 	}
 
 	private void ensurePositionCategoryInstalled(final IDocument document, LinkedModeModel model)
@@ -332,8 +463,10 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 		return buffer.getString().length();
 	}
 
-	private void openErrorDialog(Shell shell, Exception e) {
-		MessageDialog.openError(shell, Messages.SnippetTemplateProposal_TITLE_SnippetTemplateProposalError, e.getMessage());
+	private void openErrorDialog(Shell shell, Exception e)
+	{
+		MessageDialog.openError(shell, Messages.SnippetTemplateProposal_TITLE_SnippetTemplateProposalError,
+				e.getMessage());
 	}
 
 	/*
@@ -360,20 +493,17 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 		return getStyledDisplayString().getString().trim();
 	}
 
-	@Override
 	public StyledString getStyledDisplayString()
 	{
 		if (styledDisplayString == null)
 		{
 			Template template = getTemplate();
-			styledDisplayString = new StyledString(
-					String.format("%1$-20.20s%2$10.10s ",  //$NON-NLS-1$
-							template.getDescription(),
-							template.getName() + "\u00bb") //$NON-NLS-1$
-							+ (triggerChar == '\000' ? " " : String.valueOf(triggerChar)) //$NON-NLS-1$
-							// Need padding on windows to work around the width computation
-							+ (Platform.OS_WIN32.equals(Platform.getOS()) ? "                                " : ""), //$NON-NLS-1$ //$NON-NLS-2$ 
-							styler);
+			styledDisplayString = new StyledString(String.format("%1$-20.20s%2$10.10s ", //$NON-NLS-1$
+					template.getDescription(), template.getName() + "\u00bb") //$NON-NLS-1$
+					+ (triggerChar == '\000' ? " " : String.valueOf(triggerChar)) //$NON-NLS-1$
+					// Need padding on windows to work around the width computation
+					+ (Platform.OS_WIN32.equals(Platform.getOS()) ? "                                " : ""), //$NON-NLS-1$ //$NON-NLS-2$ 
+					styler);
 		}
 		return styledDisplayString;
 	}

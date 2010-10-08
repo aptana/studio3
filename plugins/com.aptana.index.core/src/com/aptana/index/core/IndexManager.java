@@ -1,18 +1,18 @@
 package com.aptana.index.core;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.zip.CRC32;
 
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
 public class IndexManager
 {
-	private static IndexManager instance;
-	private Map<String, Index> indexes;
+	private static IndexManager INSTANCE;
+	private Map<URI, Index> indexes;
 
 	static final ISchedulingRule MUTEX_RULE = new ISchedulingRule()
 	{
@@ -34,9 +34,12 @@ public class IndexManager
 	 */
 	public synchronized static IndexManager getInstance()
 	{
-		if (instance == null)
-			instance = new IndexManager();
-		return instance;
+		if (INSTANCE == null)
+		{
+			INSTANCE = new IndexManager();
+		}
+
+		return INSTANCE;
 	}
 
 	/**
@@ -44,22 +47,7 @@ public class IndexManager
 	 */
 	private IndexManager()
 	{
-		indexes = new HashMap<String, Index>();
-	}
-
-	/**
-	 * computeIndexLocation
-	 * 
-	 * @param path
-	 * @return
-	 */
-	public IPath computeIndexLocation(String path)
-	{
-		CRC32 crc = new CRC32();
-		crc.reset();
-		crc.update(path.getBytes());
-		String fileName = Long.toString(crc.getValue()) + ".index"; //$NON-NLS-1$
-		return IndexActivator.getDefault().getStateLocation().append(fileName);
+		this.indexes = new HashMap<URI, Index>();
 	}
 
 	/**
@@ -68,40 +56,62 @@ public class IndexManager
 	 * @param path
 	 * @return
 	 */
-	public Index getIndex(String path)
+	public synchronized Index getIndex(URI path)
 	{
-		Index index = indexes.get(path);
+		Index index = this.indexes.get(path);
+
 		if (index == null)
 		{
 			try
 			{
-				index = new Index(path);
+				// First try to re-use an existing file if possible
+				index = new Index(path, true);
 				indexes.put(path, index);
 			}
 			catch (IOException e)
 			{
-				IndexActivator.logError("An error occurred while trying to access an index", e);
+				try
+				{
+					// We failed. Most likely disk index signature changed or got corrupted.
+					// Don't re-use the file (create an empty index file)
+					index = new Index(path, false);
+					this.indexes.put(path, index);
+
+					// force a rebuild of the index.
+					new RebuildIndexJob(path).schedule();
+				}
+				catch (IOException e1)
+				{
+					IndexActivator.logError("An error occurred while trying to access an index", e1); //$NON-NLS-1$
+				}
 			}
 		}
+
 		return index;
+	}
+
+	/**
+	 * getIndexPaths
+	 * 
+	 * @return
+	 */
+	public synchronized List<URI> getIndexPaths()
+	{
+		return new ArrayList<URI>(indexes.keySet());
 	}
 
 	/**
 	 * Removes the index for a given path. This is a no-op if the index did not exist.
 	 */
-	public synchronized void removeIndex(String path)
+	public synchronized void removeIndex(URI path)
 	{
 		Index index = getIndex(path);
-		File indexFile = null;
+
 		if (index != null)
 		{
-			index.monitor = null;
-			indexFile = index.getIndexFile();
+			index.deleteIndexFile();
 		}
-		if (indexFile.exists())
-		{
-			indexFile.delete();
-		}
+
 		this.indexes.remove(path);
 	}
 }

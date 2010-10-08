@@ -59,7 +59,7 @@ public final class ConnectionPointUtils {
 	
 	public static IConnectionPoint findConnectionPoint(URI uri) {
 		for (IConnectionPoint i : CoreIOPlugin.getConnectionPointManager().getConnectionPoints()) {
-			if (i.getRootURI().equals(uri)) {
+			if (uri.equals(i.getRootURI())) {
 				return i;
 			}
 		}

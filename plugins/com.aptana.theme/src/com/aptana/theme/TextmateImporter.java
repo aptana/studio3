@@ -1,22 +1,49 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.theme;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
-import org.xml.sax.InputSource;
-
-import plistreader.AbstractReader;
-import plistreader.PlistFactory;
-import plistreader.PlistProperties;
-import plistreader.PlistReaderException;
+import com.aptana.plist.PListParserFactory;
 
 /**
  * An importer to bring in Textmate themes to our theme system. This is not guaranteed to work 100% because we don't
@@ -51,14 +78,9 @@ public class TextmateImporter
 	 */
 	public Theme convert(File file) throws FileNotFoundException
 	{
-		return convert(new FileInputStream(file));
-	}
-
-	public Theme convert(InputStream stream)
-	{
 		try
 		{
-			return new Theme(ThemePlugin.getDefault().getColorManager(), convertToProperties(stream));
+			return new Theme(ThemePlugin.getDefault().getColorManager(), convertToProperties(file));
 		}
 		catch (Exception e)
 		{
@@ -68,47 +90,47 @@ public class TextmateImporter
 	}
 
 	@SuppressWarnings("unchecked")
-	private static Properties convertToProperties(InputStream stream) throws PlistReaderException
+	private static Properties convertToProperties(File file) throws IOException
 	{
-		Reader characterStream = new InputStreamReader(stream);
-		InputSource source = new InputSource(characterStream);
-		AbstractReader plistReader = PlistFactory.createReader();
-		plistReader.setSource(source);
-		PlistProperties plistProperties = plistReader.parse();
-		List<PlistProperties> tokenList = (List<PlistProperties>) plistProperties.getProperty(SETTINGS);
-		PlistProperties globals = (PlistProperties) tokenList.get(0).getProperty(SETTINGS);
-		Properties radRailsProps = globals.convertToProperties();
-		radRailsProps.put(Theme.THEME_NAME_PROP_KEY, plistProperties.getProperty(NAME));
+		Map<String, Object> plistProperties = parse(file);
+		List<Map<String, Object>> tokenList = (List<Map<String, Object>>) plistProperties.get(SETTINGS);
+		Map<String, Object> globals = (Map<String, Object>) tokenList.get(0).get(SETTINGS);
+		Properties radRailsProps = new Properties();
+		for (Map.Entry<String, Object> entry : globals.entrySet())
+		{
+			radRailsProps.put(entry.getKey(), entry.getValue());
+		}
+		radRailsProps.put(Theme.THEME_NAME_PROP_KEY, plistProperties.get(NAME));
 
 		tokenList.remove(0);
-		for (PlistProperties token : tokenList)
+		for (Map<String, Object> token : tokenList)
 		{
-			if (!token.hasKey(SCOPE))
+			if (!token.containsKey(SCOPE))
 				continue;
-			String scope = (String) token.getProperty(SCOPE);
-			PlistProperties colors = (PlistProperties) token.getProperty(SETTINGS);
+			String scope = (String) token.get(SCOPE);
+			Map<String, Object> colors = (Map<String, Object>) token.get(SETTINGS);
 
 			StringBuilder value = new StringBuilder();
-			if (colors.hasKey(FOREGROUND))
+			if (colors.containsKey(FOREGROUND))
 			{
-				String fg = (String) colors.getProperty(FOREGROUND);
+				String fg = (String) colors.get(FOREGROUND);
 				value.append(fg);
 			}
 			else
 			{
-				if (colors.hasKey(BACKGROUND) || colors.hasKey(FONT_STYLE))
+				if (colors.containsKey(BACKGROUND) || colors.containsKey(FONT_STYLE))
 					value.append(radRailsProps.getProperty(Theme.FOREGROUND_PROP_KEY));
 				else
 				{
-					String tokenName = (String) token.getProperty(NAME);
+					String tokenName = (String) token.get(NAME);
 					ThemePlugin.logWarning(MessageFormat.format("Token failed to import: {0}", tokenName)); //$NON-NLS-1$
 					continue;
 				}
 			}
 
-			if (colors.hasKey(BACKGROUND))
+			if (colors.containsKey(BACKGROUND))
 			{
-				String bg = (String) colors.getProperty(BACKGROUND);
+				String bg = (String) colors.get(BACKGROUND);
 				if (bg != null && bg.length() > 0)
 				{
 					value.append(Theme.DELIMETER);
@@ -116,9 +138,9 @@ public class TextmateImporter
 				}
 			}
 
-			if (colors.hasKey(FONT_STYLE))
+			if (colors.containsKey(FONT_STYLE))
 			{
-				String fontStyle = (String) colors.getProperty(FONT_STYLE);
+				String fontStyle = (String) colors.get(FONT_STYLE);
 				if (fontStyle != null && fontStyle.length() > 0)
 				{
 					StringTokenizer tokenizer = new StringTokenizer(fontStyle);
@@ -137,5 +159,10 @@ public class TextmateImporter
 		}
 
 		return radRailsProps;
+	}
+
+	private static Map<String, Object> parse(File file) throws IOException
+	{
+		return PListParserFactory.parse(file);
 	}
 }

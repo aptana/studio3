@@ -1,10 +1,16 @@
+// java -jar beaver.jar -T -w CSS.grammar
 %package "com.aptana.editor.css.parsing";
-%class "CSSParser";
-%import "com.aptana.editor.css.parsing.ast.*";
-%import "com.aptana.parsing.ast.*";
 
-%terminals AT_KEYWORD, CHARSET, IMPORT, MEDIA, PAGE, FUNCTION;
-%terminals SEMICOLON, COLON, COMMA, LCURLY, RCURLY, LBRACKET, RBRACKET, RPAREN, FORWARD_SLASH;
+%class "CSSParser";
+
+%import "com.aptana.editor.css.parsing.ast.*";
+%import "com.aptana.parsing.IParseState";
+%import "com.aptana.parsing.IParser";
+%import "com.aptana.parsing.ast.IParseRootNode";
+%import "com.aptana.parsing.ast.ParseRootNode";
+
+%terminals AT_RULE, CHARSET, IMPORT, MEDIA, PAGE, LPAREN;
+%terminals SEMICOLON, COLON, COMMA, LCURLY, RCURLY, LBRACKET, RBRACKET, RPAREN, SLASH;
 %terminals MINUS, PLUS, EQUAL, STAR, GREATER;
 %terminals IDENTIFIER, STRING, URL, NUMBER, CLASS, LENGTH, EMS, EXS, ANGLE, TIME, FREQUENCY, COLOR, PERCENTAGE;
 %terminals IMPORTANT, PROPERTY, SELECTOR, HASH, INCLUDES, DASHMATCH;
@@ -15,11 +21,72 @@
 %typeof ImportWord, Identifier, IdentiferOrString, Separator, Primitive, TypeOrUniversalSelector, AttributeValueOperator = "String";
 %typeof AttributeSelector = "CSSAttributeSelectorNode";
 
+%implements "IParser";
+
+%embed {:
+		// suppress the error printouts
+		private static class CSSEvents extends Events
+		{
+	
+			public void scannerError(Scanner.Exception e)
+			{
+			}
+	
+			public void syntaxError(Symbol token)
+			{
+			}
+	
+			public void unexpectedTokenRemoved(Symbol token)
+			{
+			}
+	
+			public void missingTokenInserted(Symbol token)
+			{
+			}
+	
+			public void misspelledTokenReplaced(Symbol token)
+			{
+			}
+	
+			public void errorPhraseRemoved(Symbol error)
+			{
+			}
+		}
+		
+	public synchronized IParseRootNode parse(IParseState parseState) throws java.lang.Exception
+	{
+		CSSScanner scanner = new CSSScanner();
+		scanner.setSource(new String(parseState.getSource()));
+		ParseRootNode result = (ParseRootNode) parse(scanner);
+		int start = parseState.getStartingOffset();
+		int end = start + parseState.getSource().length;
+		result.setLocation(start, end);
+		List<CSSCommentNode> commentNodes = new ArrayList<CSSCommentNode>();
+		IRange[] comments = scanner.getComments();
+		for (IRange comment : comments)
+		{
+			commentNodes.add(new CSSCommentNode(comment.getStartingOffset(), comment.getEndingOffset()));
+		}
+		result.setCommentNodes(commentNodes.toArray(new CSSCommentNode[commentNodes.size()]));
+		parseState.setParseResult(result);
+		return result;
+	}
+:};
+
+%init {:
+		report = new CSSEvents();
+:};
+
 %goal Program;
 
 Program
-	=	Statements.p {:return new ParseRootNode(ICSSParserConstants.LANGUAGE, p, _symbol_p.getStart(), _symbol_p.getEnd());:}
-	|	{:return new ParseRootNode(ICSSParserConstants.LANGUAGE, new Symbol[0], 0, 0);:}
+	=	Statements.p
+		{:
+			return new ParseRootNode(ICSSParserConstants.LANGUAGE, p, _symbol_p.getStart(), _symbol_p.getEnd());
+		:}
+	|	{:
+			return new ParseRootNode(ICSSParserConstants.LANGUAGE, new Symbol[0], 0, 0);
+		:}
 	;
 
 Statements
@@ -37,39 +104,75 @@ Statement
 	;
 
 CharSet
-	=	CHARSET.c STRING.s SEMICOLON.e {:return new CSSCharSetNode(s, c.getStart(), e.getEnd());:}
+	=	CHARSET.c STRING.s SEMICOLON.e
+		{:
+			return new CSSCharSetNode(s, c.getStart(), e.getEnd());
+		:}
 	;
 
 Import
-	=	IMPORT.i ImportWord.s SEMICOLON.e {:return new CSSImportNode(s, i.getStart(), e.getEnd());:}
-	|	IMPORT.i ImportWord.s List.m SEMICOLON.e {:return new CSSImportNode(s, m, i.getStart(), e.getEnd());:}
+	=	IMPORT.i ImportWord.s SEMICOLON.e
+		{:
+			return new CSSImportNode(s, i.getStart(), e.getEnd());
+		:}
+	|	IMPORT.i ImportWord.s List.m SEMICOLON.e
+		{:
+			return new CSSImportNode(s, m, i.getStart(), e.getEnd());
+		:}
 	;
 
 Media
-	=	MEDIA.m List.l LCURLY RCURLY.r {:return new CSSMediaNode(l, m.getStart(), r.getEnd());:}
-	|	MEDIA.m List.l LCURLY Statements RCURLY.r {:return new CSSMediaNode(l, m.getStart(), r.getEnd());:}
+	=	MEDIA.m List.l LCURLY RCURLY.r
+		{:
+			return new CSSMediaNode(l, m.getStart(), r.getEnd());
+		:}
+	|	MEDIA.m List.l LCURLY Statements RCURLY.r
+		{:
+			return new CSSMediaNode(l, m.getStart(), r.getEnd());
+		:}
 	;
 
 Page
-	=	PAGE.p LCURLY RCURLY.r {:return new CSSPageNode(p.getStart(), r.getEnd());:}
-	|	PAGE.p LCURLY Declarations.d RCURLY.r {:return new CSSPageNode(d.value, p.getStart(), r.getEnd());:}
-	|	PAGE.p COLON IDENTIFIER.s LCURLY RCURLY.r {:return new CSSPageNode(s, p.getStart(), r.getEnd());:}
-	|	PAGE.p COLON IDENTIFIER.s LCURLY Declarations.d RCURLY.r {:return new CSSPageNode(s, d.value, p.getStart(), r.getEnd());:}
+	=	PAGE.p LCURLY RCURLY.r
+		{:
+			return new CSSPageNode(p.getStart(), r.getEnd());
+		:}
+	|	PAGE.p LCURLY Declarations.d RCURLY.r
+		{:
+			return new CSSPageNode(d.value, p.getStart(), r.getEnd());
+		:}
+	|	PAGE.p COLON IDENTIFIER.s LCURLY RCURLY.r
+		{:
+			return new CSSPageNode(s, p.getStart(), r.getEnd());
+		:}
+	|	PAGE.p COLON IDENTIFIER.s LCURLY Declarations.d RCURLY.r
+		{:
+			return new CSSPageNode(s, d.value, p.getStart(), r.getEnd());
+		:}
 	;
 
 AtRule
-	=	AT_KEYWORD STRING SEMICOLON
-	|	AT_KEYWORD STRING LCURLY RCURLY
+	=	AT_RULE STRING SEMICOLON
+	|	AT_RULE STRING LCURLY RCURLY
 	;
 
 Rule
-	=	Selectors.s LCURLY RCURLY.r {:return new CSSRuleNode(s, r.getEnd());:}
-	|	Selectors.s LCURLY Declarations.d RCURLY.r {:return new CSSRuleNode(s, d.value, r.getEnd());:}
+	=	Selectors.s LCURLY RCURLY.r
+		{:
+			return new CSSRuleNode(s, r.getEnd());
+		:}
+	|	Selectors.s LCURLY Declarations.d RCURLY.r
+		{:
+			return new CSSRuleNode(s, d.value, r.getEnd());
+		:}
 	|	error
 	;
 
 Function
-	=	FUNCTION.l Expression.e RPAREN.r {:return new CSSFunctionNode(e, l.getStart(), r.getEnd());:}
+	=	LPAREN.l Expression.e RPAREN.r
+		{:
+			return new CSSFunctionNode(e, l.getStart(), r.getEnd());
+		:}
 	;
 
 List
@@ -79,7 +182,10 @@ List
 
 Declarations
 	=	Subdeclarations
-	|	Subdeclarations.l Declaration2.d {:_list_l.add(d); return _symbol_l;:}
+	|	Subdeclarations.l Declaration2.d
+		{:
+			_list_l.add(d); return _symbol_l;
+		:}
 	|	Declaration2
 	;
 
@@ -89,25 +195,52 @@ Subdeclarations
 	;
 
 Declaration
-	=	Declaration2.d SEMICOLON.s {:((CSSDeclarationNode) d).setHasSemicolon(s); return d;:}
-	|	SEMICOLON.s {:return new CSSDeclarationNode(s);:}
+	=	Declaration2.d SEMICOLON.s
+		{:
+			((CSSDeclarationNode) d).setHasSemicolon(s); return d;
+		:}
+	|	SEMICOLON.s
+		{:
+			return new CSSDeclarationNode(s);
+		:}
 	;
 
 Declaration2
-	=	Identifier.i COLON Expression.e {:return new CSSDeclarationNode(_symbol_i, e);:}
-	|	Identifier.i COLON Expression.e IMPORTANT.s {:return new CSSDeclarationNode(_symbol_i, e, _symbol_s);:}
-	|	error.e {:return new CSSErrorDeclarationNode(e.getStart(), e.getEnd());:}
+	=	Identifier.i COLON Expression.e
+		{:
+			return new CSSDeclarationNode(_symbol_i, e);
+		:}
+	|	Identifier.i COLON Expression.e IMPORTANT.s
+		{:
+			return new CSSDeclarationNode(_symbol_i, e, _symbol_s);
+		:}
+	|	error.e
+		{:
+			return new CSSErrorDeclarationNode(e.getStart(), e.getEnd());
+		:}
 	;
 
 Expression
-	=	Expression.e Separator.s Term.t {:return new CSSTermListNode(e, t, s);:}
-	|	Expression.e Term.t {:return new CSSTermListNode(e, t);:}
+	=	Expression.e Separator.s Term.t
+		{:
+			return new CSSTermListNode(e, t, s);
+		:}
+	|	Expression.e Term.t
+		{:
+			return new CSSTermListNode(e, t);
+		:}
 	|	Term
-	|	error.e {:return new CSSErrorExpressionNode(e.getStart(), e.getEnd());:}
+	|	error.e
+		{:
+			return new CSSErrorExpressionNode(e.getStart(), e.getEnd());
+		:}
 	;
 
 Term
-	=	Primitive.p {:return new CSSTermNode(_symbol_p);:}
+	=	Primitive.p
+		{:
+			return new CSSTermNode(_symbol_p);
+		:}
 	|	Function
 	;
 
@@ -122,9 +255,18 @@ Selector
 	;
 
 SimpleSelector
-	=	TypeOrUniversalSelector.t AttributeSelectors.a {:return new CSSSimpleSelectorNode(_symbol_t, a);:}
-	|	TypeOrUniversalSelector.t {:return new CSSSimpleSelectorNode(_symbol_t);:}
-	|	AttributeSelectors.a {:return new CSSSimpleSelectorNode(a);:}
+	=	TypeOrUniversalSelector.t AttributeSelectors.a
+		{:
+			return new CSSSimpleSelectorNode(_symbol_t, a);
+		:}
+	|	TypeOrUniversalSelector.t
+		{:
+			return new CSSSimpleSelectorNode(_symbol_t);
+		:}
+	|	AttributeSelectors.a
+		{:
+			return new CSSSimpleSelectorNode(a);
+		:}
 	;
 
 AttributeSelectors
@@ -133,13 +275,32 @@ AttributeSelectors
 	;
 
 AttributeSelector
-	=	CLASS.c {:return new CSSAttributeSelectorNode(c, _symbol_c.getStart(), _symbol_c.getEnd());:}
-	|	COLON.c IDENTIFIER.i {:return new CSSAttributeSelectorNode(":" + i, c.getStart(), _symbol_i.getEnd());:}
-	|	COLON.c Function.f {:return new CSSAttributeSelectorNode(f, c.getStart());:}
-	|	COLOR.c {:return new CSSAttributeSelectorNode(c, _symbol_c.getStart(), _symbol_c.getEnd());:}
-	|	HASH.h {:return new CSSAttributeSelectorNode(h, _symbol_h.getStart(), _symbol_h.getEnd());:}
-	|	LBRACKET.l IDENTIFIER.i RBRACKET.r {:return new CSSAttributeSelectorNode("[" + i + "]", l.getStart(), r.getEnd());:}
-	|	LBRACKET.l IDENTIFIER.i AttributeValueOperator.o IdentiferOrString.s RBRACKET.r {:
+	=	CLASS.c
+		{:
+			return new CSSAttributeSelectorNode(c, _symbol_c.getStart(), _symbol_c.getEnd());
+		:}
+	|	COLON.c IDENTIFIER.i
+		{:
+			return new CSSAttributeSelectorNode(":" + i, c.getStart(), _symbol_i.getEnd());
+		:}
+	|	COLON.c Function.f
+		{:
+			return new CSSAttributeSelectorNode(f, c.getStart());
+		:}
+	|	COLOR.c
+		{:
+			return new CSSAttributeSelectorNode(c, _symbol_c.getStart(), _symbol_c.getEnd());
+		:}
+	|	HASH.h
+		{:
+			return new CSSAttributeSelectorNode(h, _symbol_h.getStart(), _symbol_h.getEnd());
+		:}
+	|	LBRACKET.l IDENTIFIER.i RBRACKET.r
+		{:
+			return new CSSAttributeSelectorNode("[" + i + "]", l.getStart(), r.getEnd());
+		:}
+	|	LBRACKET.l IDENTIFIER.i AttributeValueOperator.o IdentiferOrString.s RBRACKET.r
+		{:
 			return new CSSAttributeSelectorNode("[" + i + " " + o + " " + s + "]", l.getStart(), r.getEnd());
 		:}
 	;
@@ -160,7 +321,7 @@ IdentiferOrString
 	;
 
 Separator
-	=	FORWARD_SLASH
+	=	SLASH
 	|	COMMA
 	|	PLUS
 	|	MINUS

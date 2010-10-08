@@ -35,9 +35,9 @@
 package com.aptana.editor.ruby;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextDoubleClickStrategy;
-import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
@@ -47,7 +47,6 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.common.contentassist.ContentAssistant;
-import com.aptana.editor.ruby.contentassist.RubyContentAssistProcessor;
 import com.aptana.editor.ruby.core.RubyDoubleClickStrategy;
 
 public class RubySourceViewerConfiguration extends CommonSourceViewerConfiguration
@@ -95,12 +94,6 @@ public class RubySourceViewerConfiguration extends CommonSourceViewerConfigurati
 		return assistant;
 	}
 
-	@Override
-	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
-	{
-		return new RubyContentAssistProcessor(getAbstractThemeableEditor());
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -123,5 +116,11 @@ public class RubySourceViewerConfiguration extends CommonSourceViewerConfigurati
 			fDoubleClickStrategy = new RubyDoubleClickStrategy();
 		}
 		return fDoubleClickStrategy;
+	}
+	
+	@Override
+	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
+	{
+		return new IAutoEditStrategy[] { new RubyAutoIndentStrategy(contentType, this, sourceViewer) };
 	}
 }

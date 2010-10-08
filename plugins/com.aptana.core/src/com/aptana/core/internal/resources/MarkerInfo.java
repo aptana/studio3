@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2008 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -49,9 +49,9 @@ public class MarkerInfo extends org.eclipse.core.internal.resources.MarkerInfo {
 	protected static final long UNDEFINED_ID = org.eclipse.core.internal.resources.MarkerInfo.UNDEFINED_ID;
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.core.internal.resources.MarkerInfo#setAttributes(java.util.Map, boolean)
+	 * @see org.eclipse.core.internal.resources.MarkerInfo#setAttributes(java.util.Map, Boolean)
 	 */
-	public void setAttributes(Map map, boolean validate) {
+	public void setAttributes(Map map, Boolean validate) {
 		Class superClass = getClass().getSuperclass();
 		try {
 			try {
@@ -59,16 +59,16 @@ public class MarkerInfo extends org.eclipse.core.internal.resources.MarkerInfo {
 				return;
 			} catch (NoSuchMethodException e) {
 			}
-			superClass.getMethod("setAttributes", Map.class, Boolean.class).invoke(this, map, validate); //$NON-NLS-1$
+			superClass.getMethod("setAttributes", Map.class, boolean.class).invoke(this, map, validate); //$NON-NLS-1$
 		} catch (Exception e) {
 			CorePlugin.log(e);
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.core.internal.resources.MarkerInfo#setAttribute(java.lang.String, java.lang.Object, boolean)
+	 * @see org.eclipse.core.internal.resources.MarkerInfo#setAttribute(java.lang.String, java.lang.Object, Boolean)
 	 */
-	public void setAttribute(String attributeName, Object value, boolean validate) {
+	public void setAttribute(String attributeName, Object value, Boolean validate) {
 		Class superClass = getClass().getSuperclass();
 		try {
 			try {
@@ -76,16 +76,16 @@ public class MarkerInfo extends org.eclipse.core.internal.resources.MarkerInfo {
 				return;
 			} catch (NoSuchMethodException e) {
 			}
-			superClass.getMethod("setAttribute", String.class, Object.class, Boolean.class).invoke(this, attributeName, value, validate); //$NON-NLS-1$
+			superClass.getMethod("setAttribute", String.class, Object.class, boolean.class).invoke(this, attributeName, value, validate); //$NON-NLS-1$
 		} catch (Exception e) {
 			CorePlugin.log(e);
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.core.internal.resources.MarkerInfo#setAttributes(java.lang.String[], java.lang.Object[], boolean)
+	 * @see org.eclipse.core.internal.resources.MarkerInfo#setAttributes(java.lang.String[], java.lang.Object[], Boolean)
 	 */
-	public void setAttributes(String[] attributeNames, Object[] values, boolean validate) {
+	public void setAttributes(String[] attributeNames, Object[] values, Boolean validate) {
 		Class superClass = getClass().getSuperclass();
 		try {
 			try {
@@ -93,7 +93,7 @@ public class MarkerInfo extends org.eclipse.core.internal.resources.MarkerInfo {
 				return;
 			} catch (NoSuchMethodException e) {
 			}
-			superClass.getMethod("setAttributes", String[].class, Object[].class, Boolean.class).invoke(this, attributeNames, values, validate); //$NON-NLS-1$
+			superClass.getMethod("setAttributes", String[].class, Object[].class, boolean.class).invoke(this, attributeNames, values, validate); //$NON-NLS-1$
 		} catch (Exception e) {
 			CorePlugin.log(e);
 		}

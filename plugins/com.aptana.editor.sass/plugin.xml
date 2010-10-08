@@ -7,7 +7,7 @@
             class="com.aptana.editor.sass.SassSourceEditor"
             contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
             default="true"
-            extensions="sass"
+            extensions="sass, scss"
             icon="icons/sass.png"
             id="com.aptana.editor.sass"
             name="%editor.sass.name">
@@ -20,7 +20,7 @@
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             base-type="org.eclipse.core.runtime.text"
-            file-extensions="sass"
+            file-extensions="sass, scss"
             id="com.aptana.contenttype.sass"
             name="%content-type.sass.name"
             priority="normal">

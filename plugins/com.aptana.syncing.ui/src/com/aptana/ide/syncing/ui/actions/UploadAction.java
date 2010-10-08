@@ -41,17 +41,21 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.ide.syncing.core.ISiteConnection;
+import com.aptana.ide.syncing.core.old.Synchronizer;
+import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
 import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants;
-import com.aptana.ide.ui.io.actions.CopyFilesOperation;
+import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ui.DialogUtils;
 
 /**
@@ -60,57 +64,86 @@ import com.aptana.ui.DialogUtils;
 public class UploadAction extends BaseSyncAction
 {
 
-	private IJobChangeListener jobListener = null;
-	private Job job;
+	private IJobChangeListener jobListener;
 
 	private static String MESSAGE_TITLE = StringUtil.ellipsify(Messages.UploadAction_MessageTitle);
 
 	protected void performAction(final IAdaptable[] files, final ISiteConnection site) throws CoreException
 	{
-		job = new Job(MESSAGE_TITLE)
+		final Synchronizer syncer = new Synchronizer();
+		Job job = new Job(MESSAGE_TITLE)
 		{
 
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				IConnectionPoint source = site.getSource();
-				IConnectionPoint target = site.getDestination();
-				// retrieves the root filestore of each end
-				IFileStore sourceRoot;
-				IFileStore targetRoot;
+				monitor.subTask(StringUtil.ellipsify(Messages.BaseSyncAction_RetrievingItems));
+
 				try
 				{
-					sourceRoot = source.getRoot();
+					IConnectionPoint source = site.getSource();
+					IConnectionPoint target = site.getDestination();
+					// retrieves the root filestore of each end
+					IFileStore sourceRoot = (fSourceRoot == null) ? source.getRoot() : fSourceRoot;
+					// makes sure the target end point is connected
 					if (!target.isConnected())
 					{
 						target.connect(monitor);
 					}
-					targetRoot = target.getRoot();
+					final IFileStore targetRoot = (fDestinationRoot == null) ? target.getRoot() : fDestinationRoot;
+					syncer.setClientFileManager(source);
+					syncer.setServerFileManager(target);
+					syncer.setClientFileRoot(sourceRoot);
+					syncer.setServerFileRoot(targetRoot);
+
+					// gets the filestores of the files to be copied
+					IFileStore[] fileStores = new IFileStore[files.length];
+					for (int i = 0; i < fileStores.length; ++i)
+					{
+						fileStores[i] = SyncUtils.getFileStore(files[i]);
+					}
+					IFileStore[] sourceFiles;
+					if (fSelectedFromSource)
+					{
+						sourceFiles = EFSUtils.getAllFiles(fileStores, true, false, monitor);
+					}
+					else
+					{
+						// the selection is from the destination, so do a reverse download
+						sourceFiles = SyncUtils.getDownloadFiles(target, source, fileStores, true, monitor);
+					}
+					final VirtualFileSyncPair[] items = syncer.createSyncItems(sourceFiles, new IFileStore[0], monitor);
+
+					syncer.setEventHandler(new SyncActionEventHandler(Messages.UploadAction_MessageTitle, items.length,
+							monitor, new SyncActionEventHandler.Client()
+							{
+
+								public void syncCompleted()
+								{
+									IOUIPlugin.refreshNavigatorView(targetRoot);
+									postAction(syncer);
+									syncer.setEventHandler(null);
+									syncer.disconnect();
+								}
+							}));
+					syncer.upload(items, monitor);
 				}
-				catch (CoreException e)
+				catch (OperationCanceledException e)
+				{
+					return Status.CANCEL_STATUS;
+				}
+				catch (Exception e)
 				{
 					return new Status(Status.ERROR, SyncingUIPlugin.PLUGIN_ID, e.getLocalizedMessage(), e);
 				}
 
-				// gets the filestores of the files to be copied
-				IFileStore[] fileStores = new IFileStore[files.length];
-				for (int i = 0; i < fileStores.length; ++i)
-				{
-					fileStores[i] = SyncUtils.getFileStore(files[i]);
-				}
-
-				CopyFilesOperation operation = new CopyFilesOperation(getShell());
-				IStatus status = operation.copyFiles(fileStores, sourceRoot, targetRoot, monitor);
-
-				if (status != Status.CANCEL_STATUS)
-				{
-					postAction(status);
-				}
-				return status;
+				return Status.OK_STATUS;
 			}
 		};
 		if (jobListener != null)
+		{
 			job.addJobChangeListener(jobListener);
+		}
 		job.setUser(true);
 		job.schedule();
 	}
@@ -126,7 +159,7 @@ public class UploadAction extends BaseSyncAction
 		return MESSAGE_TITLE;
 	}
 
-	private void postAction(final IStatus status)
+	private void postAction(final Synchronizer syncer)
 	{
 		getShell().getDisplay().asyncExec(new Runnable()
 		{
@@ -134,8 +167,9 @@ public class UploadAction extends BaseSyncAction
 			public void run()
 			{
 				DialogUtils.openIgnoreMessageDialogInformation(getShell(), MESSAGE_TITLE, MessageFormat.format(
-						Messages.UploadAction_PostMessage, status.getCode()), SyncingUIPlugin.getDefault()
-						.getPreferenceStore(), IPreferenceConstants.IGNORE_DIALOG_FILE_UPLOAD);
+						Messages.UploadAction_PostMessage, syncer.getClientFileTransferedCount(),
+						syncer.getServerDirectoryCreatedCount()), SyncingUIPlugin.getDefault().getPreferenceStore(),
+						IPreferenceConstants.IGNORE_DIALOG_FILE_UPLOAD);
 			}
 		});
 	}

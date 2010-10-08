@@ -55,8 +55,7 @@ import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
-import com.aptana.theme.IThemeManager;
-import com.aptana.theme.ThemePlugin;
+import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 
 /**
  * @author Max Stepanov
@@ -102,19 +101,15 @@ public class RubySourceConfiguration implements IPartitioningConfiguration, ISou
 		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 		c.addTranslation(new QualifiedContentType(IRubyConstants.CONTENT_TYPE_RUBY), new QualifiedContentType(
 				"source.ruby.rails")); //$NON-NLS-1$ // FIXME Should just be source.ruby! Rails bundle should contribute the more specific scope
-		c
-				.addTranslation(new QualifiedContentType(STRING_SINGLE), new QualifiedContentType(
-						"string.quoted.single.ruby")); //$NON-NLS-1$
-		c
-				.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType(
-						"string.quoted.double.ruby")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(STRING_SINGLE), new QualifiedContentType("string.quoted.single.ruby")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType("string.quoted.double.ruby")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(SINGLE_LINE_COMMENT), new QualifiedContentType(
 				"comment.line.number-sign.ruby")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(MULTI_LINE_COMMENT), new QualifiedContentType(
 				"comment.block.documentation.ruby")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(REGULAR_EXPRESSION), new QualifiedContentType(
 				"string.regexp.classic.ruby")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(REGULAR_EXPRESSION), new QualifiedContentType(
+		c.addTranslation(new QualifiedContentType(COMMAND), new QualifiedContentType(
 				"string.interpolated.ruby")); //$NON-NLS-1$
 	}
 
@@ -179,34 +174,34 @@ public class RubySourceConfiguration implements IPartitioningConfiguration, ISou
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
 	{
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getCodeScanner());
+		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getCodeScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
-		dr = new DefaultDamagerRepairer(getSingleLineCommentScanner());
+		dr = new ThemeingDamagerRepairer(getSingleLineCommentScanner());
 		reconciler.setDamager(dr, RubySourceConfiguration.SINGLE_LINE_COMMENT);
 		reconciler.setRepairer(dr, RubySourceConfiguration.SINGLE_LINE_COMMENT);
 
-		dr = new DefaultDamagerRepairer(getMultiLineCommentScanner());
+		dr = new ThemeingDamagerRepairer(getMultiLineCommentScanner());
 		reconciler.setDamager(dr, RubySourceConfiguration.MULTI_LINE_COMMENT);
 		reconciler.setRepairer(dr, RubySourceConfiguration.MULTI_LINE_COMMENT);
 
-		dr = new DefaultDamagerRepairer(getRegexpScanner());
+		dr = new ThemeingDamagerRepairer(getRegexpScanner());
 		reconciler.setDamager(dr, RubySourceConfiguration.REGULAR_EXPRESSION);
 		reconciler.setRepairer(dr, RubySourceConfiguration.REGULAR_EXPRESSION);
 
-		dr = new DefaultDamagerRepairer(getCommandScanner());
+		dr = new ThemeingDamagerRepairer(getCommandScanner());
 		reconciler.setDamager(dr, RubySourceConfiguration.COMMAND);
 		reconciler.setRepairer(dr, RubySourceConfiguration.COMMAND);
 
-		dr = new DefaultDamagerRepairer(getSingleQuotedStringScanner());
+		dr = new ThemeingDamagerRepairer(getSingleQuotedStringScanner());
 		reconciler.setDamager(dr, RubySourceConfiguration.STRING_SINGLE);
 		reconciler.setRepairer(dr, RubySourceConfiguration.STRING_SINGLE);
 
-		dr = new DefaultDamagerRepairer(getDoubleQuotedStringScanner());
+		dr = new ThemeingDamagerRepairer(getDoubleQuotedStringScanner());
 		reconciler.setDamager(dr, RubySourceConfiguration.STRING_DOUBLE);
 		reconciler.setRepairer(dr, RubySourceConfiguration.STRING_DOUBLE);
 	}
@@ -281,11 +276,6 @@ public class RubySourceConfiguration implements IPartitioningConfiguration, ISou
 
 	protected IToken getToken(String tokenName)
 	{
-		return getThemeManager().getToken(tokenName);
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return ThemePlugin.getDefault().getThemeManager();
+		return new Token(tokenName);
 	}
 }

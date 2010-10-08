@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.explorer.internal.ui;
 
 import java.util.ArrayList;
@@ -8,7 +42,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -41,6 +74,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -97,7 +131,7 @@ import com.aptana.git.ui.dialogs.CreateBranchDialog;
  */
 class GitProjectView extends SingleProjectView implements IGitRepositoryListener, IGitRepositoriesListener
 {
-	private static final String DIRTY_SUFFIX = "*";
+	private static final String DIRTY_SUFFIX = "*"; //$NON-NLS-1$
 	private static final String GIT_CHANGED_FILES_FILTER = "GitChangedFilesFilterEnabled"; //$NON-NLS-1$
 	private static final String PROJECT_DELIMITER = "######"; //$NON-NLS-1$
 	private static final String COMMIT_ICON_PATH = "icons/full/elcl16/disk.png"; //$NON-NLS-1$
@@ -211,17 +245,22 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 
 	protected void doCreateToolbar(Composite toolbarComposite)
 	{
-		createGitBranchCombo(toolbarComposite);
+		Composite branchComp = new Composite(toolbarComposite, SWT.NONE);
+		
+		GridLayout toolbarGridLayout = new GridLayout(3, false);
+		toolbarGridLayout.marginWidth = 2;
+		toolbarGridLayout.marginHeight = 0;
+		toolbarGridLayout.horizontalSpacing = 0;
+		
+		branchComp.setLayout(toolbarGridLayout);
+		createGitBranchCombo(branchComp);
 	}
 
 	private void createGitBranchCombo(Composite parent)
 	{
-		// Increment number of columns of the layout
-		((GridLayout) parent.getLayout()).numColumns += 3;
-
 		leftLabel = new Label(parent, SWT.NONE);
 		leftLabel.setText("["); //$NON-NLS-1$
-		leftLabelGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
+		leftLabelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
 		leftLabel.setLayoutData(leftLabelGridData);
 
 		branchesToolbar = new ToolBar(parent, SWT.FLAT);
@@ -1151,7 +1190,6 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		}
 	}
 
-	@Override
 	public void pushed(PushEvent e)
 	{
 		// Need to recalc the push indicators on branch pulldown
@@ -1179,21 +1217,17 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 						return Status.CANCEL_STATUS;
 					if (repository == null)
 					{
-						leftLabelGridData.exclude = true;
-						leftLabel.setVisible(false);
-						branchesToolbarGridData.exclude = true;
-						branchesToolbar.setVisible(false);
-						rightLabelGridData.exclude = true;
-						rightLabel.setVisible(false);
+						RowData rd = new RowData();
+						rd.exclude = true;
+						branchesToolbar.getParent().setLayoutData(rd);
+						branchesToolbar.getParent().setVisible(false);
 					}
 					else
 					{
-						leftLabelGridData.exclude = false;
-						leftLabel.setVisible(true);
-						branchesToolbarGridData.exclude = false;
-						branchesToolbar.setVisible(true);
-						rightLabelGridData.exclude = false;
-						rightLabel.setVisible(true);
+						RowData rd = new RowData();
+						rd.exclude = false;
+						branchesToolbar.getParent().setLayoutData(rd);
+						branchesToolbar.getParent().setVisible(true);
 					}
 					if (monitor != null && monitor.isCanceled())
 						return Status.CANCEL_STATUS;
@@ -1233,13 +1267,11 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		handleBranchEvent(e.getRepository());
 	}
 
-	@Override
 	public void branchAdded(BranchAddedEvent e)
 	{
 		handleBranchEvent(e.getRepository());
 	}
 
-	@Override
 	public void branchRemoved(BranchRemovedEvent e)
 	{
 		handleBranchEvent(e.getRepository());
@@ -1360,7 +1392,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			final MenuItem branchNameMenuItem = new MenuItem(switchBranchesSubMenu, SWT.RADIO);
 			if (branchName.equals(currentBranchName) && repository.isDirty())
 			{
-				branchNameMenuItem.setText(branchName + DIRTY_SUFFIX); //$NON-NLS-1$
+				branchNameMenuItem.setText(branchName + DIRTY_SUFFIX);
 			}
 			else
 			{
@@ -1460,20 +1492,6 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		if (index > 0)
 			index++;
 		createDiffMenuItem(menu, index++);
-
-		// Don't add the following unless a file is selected!
-		Set<IResource> selected = getSelectedFiles();
-		boolean add = false;
-		for (IResource resource : selected)
-		{
-			if (resource instanceof IFile)
-			{
-				add = true;
-				break;
-			}
-		}
-		if (!add)
-			return;
 		createStageMenuItem(menu, index++);
 		createUnstageMenuItem(menu, index++);
 		createRevertMenuItem(menu, index);

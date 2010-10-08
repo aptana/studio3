@@ -22,6 +22,10 @@
          id="com.aptana.ide.feature.libraries.subscription"
          version="0.0.0"/>
 
+   <includes
+         id="com.aptana.webkitbrowser"
+         version="0.0.0"/>
+
    <requires>
       <import plugin="org.eclipse.ui" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.runtime"/>
@@ -58,7 +62,7 @@
          unpack="false"/>
 
    <plugin
-         id="plistreader"
+         id="com.aptana.browser"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -389,4 +393,33 @@
          version="0.0.0"
          unpack="false"/>
 
+   <plugin
+         id="com.aptana.index.core.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+
+   <plugin
+         id="com.aptana.projects"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.plist"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.editor.markdown"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+>>>>>>> development
 </feature>

@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.scripting.model;
 
 import java.util.ArrayList;
@@ -13,6 +47,7 @@ import java.util.Set;
 import org.jruby.RubyRegexp;
 
 import com.aptana.scope.ScopeSelector;
+import com.aptana.scripting.model.ProjectTemplate.Type;
 
 public class BundleEntry
 {
@@ -66,10 +101,10 @@ public class BundleEntry
 	{
 		this._name = name;
 		this._bundles = bundles;
-		
+
 		Collections.sort(this._bundles, this._comparator);
 	}
-	
+
 	/**
 	 * add
 	 * 
@@ -92,7 +127,7 @@ public class BundleEntry
 
 				// fire visibility change events
 				this.fireVisibilityEvents(preVisibleBundles);
-				
+
 				// fire add event
 				BundleManager.getInstance().fireBundleAddedEvent(bundle);
 			}
@@ -107,13 +142,13 @@ public class BundleEntry
 	private void fireVisibilityEvents(Set<BundleElement> preVisibleBundles)
 	{
 		BundleManager manager = BundleManager.getInstance();
-		
+
 		// get current list of visible bundles
 		Set<BundleElement> becameVisible = new HashSet<BundleElement>(this.getContributingBundles());
-		
+
 		// determine which bundles lost visibility and which gained visibility
 		Set<BundleElement> becameHidden = new HashSet<BundleElement>(preVisibleBundles);
-		
+
 		becameHidden.removeAll(becameVisible);
 		becameVisible.removeAll(preVisibleBundles);
 
@@ -121,36 +156,36 @@ public class BundleEntry
 		if (becameHidden.size() > 0)
 		{
 			List<BundleElement> hiddenList = new ArrayList<BundleElement>(becameHidden);
-			
+
 			// set visibility flag
 			for (BundleElement bundle : hiddenList)
 			{
 				bundle.setVisible(false);
 			}
-			
+
 			// create new entry with these bundle elements. This is needed so the precedence
 			// rules can be applied to this collection
 			BundleEntry hiddenEntry = new BundleEntry(this.getName(), hiddenList);
-			
+
 			// fire hidden event
 			manager.fireBundleBecameHiddenEvent(hiddenEntry);
 		}
-		
+
 		// fire visible events
 		if (becameVisible.size() > 0)
 		{
 			List<BundleElement> visibleList = new ArrayList<BundleElement>(becameVisible);
-			
+
 			// set visibility flag
 			for (BundleElement bundle : visibleList)
 			{
 				bundle.setVisible(true);
 			}
-			
+
 			// create new entry with these bundle elements. This is needed so the precedence
 			// rules can be applied to this collection
 			BundleEntry visibleEntry = new BundleEntry(this.getName(), visibleList);
-			
+
 			// fire visible event
 			manager.fireBundleBecameVisibleEvent(visibleEntry);
 		}
@@ -206,6 +241,38 @@ public class BundleEntry
 	}
 
 	/**
+	 * getEnvs
+	 * 
+	 * @return
+	 */
+	public EnvironmentElement[] getEnvs()
+	{
+		final Set<String> names = new HashSet<String>();
+		final List<EnvironmentElement> result = new ArrayList<EnvironmentElement>();
+
+		this.processBundles(new BundleProcessor()
+		{
+			public boolean processBundle(BundleEntry entry, BundleElement bundle)
+			{
+				for (EnvironmentElement command : bundle.getEnvs())
+				{
+					String name = command.getDisplayName();
+
+					if (names.contains(name) == false)
+					{
+						names.add(name);
+						result.add(command);
+					}
+				}
+
+				return true;
+			}
+		});
+
+		return result.toArray(new EnvironmentElement[result.size()]);
+	}
+
+	/**
 	 * getContributingBundles
 	 * 
 	 * @return
@@ -213,7 +280,7 @@ public class BundleEntry
 	public List<BundleElement> getContributingBundles()
 	{
 		final List<BundleElement> result = new ArrayList<BundleElement>();
-		
+
 		this.processBundles(new BundleProcessor()
 		{
 			public boolean processBundle(BundleEntry entry, BundleElement bundle)
@@ -222,10 +289,10 @@ public class BundleEntry
 				return true;
 			}
 		});
-		
+
 		return Collections.unmodifiableList(result);
 	}
-	
+
 	/**
 	 * getFileTypeRegistry
 	 * 
@@ -240,20 +307,20 @@ public class BundleEntry
 			public boolean processBundle(BundleEntry entry, BundleElement bundle)
 			{
 				Map<String, String> registry = bundle.getFileTypeRegistry();
-				
+
 				if (registry != null)
 				{
 					result.putAll(registry);
 					return false;
 				}
-				
+
 				return true;
 			}
 		});
 
 		return result;
 	}
-	
+
 	/**
 	 * getFileTypes
 	 * 
@@ -268,12 +335,12 @@ public class BundleEntry
 			public boolean processBundle(BundleEntry entry, BundleElement bundle)
 			{
 				List<String> registry = bundle.getFileTypes();
-				
+
 				if (registry != null)
 				{
 					result.addAll(registry);
 				}
-				
+
 				return true;
 			}
 		});
@@ -295,12 +362,12 @@ public class BundleEntry
 			public boolean processBundle(BundleEntry entry, BundleElement bundle)
 			{
 				Map<ScopeSelector, RubyRegexp> registry = bundle.getFoldingStartMarkers();
-				
+
 				if (registry != null)
 				{
 					result.putAll(registry);
 				}
-				
+
 				return true;
 			}
 		});
@@ -322,19 +389,19 @@ public class BundleEntry
 			public boolean processBundle(BundleEntry entry, BundleElement bundle)
 			{
 				Map<ScopeSelector, RubyRegexp> registry = bundle.getFoldingStopMarkers();
-				
+
 				if (registry != null)
 				{
 					result.putAll(registry);
 				}
-				
+
 				return true;
 			}
 		});
 
 		return result;
 	}
-	
+
 	/**
 	 * getDecreaseIndentMarkers
 	 * 
@@ -349,12 +416,12 @@ public class BundleEntry
 			public boolean processBundle(BundleEntry entry, BundleElement bundle)
 			{
 				Map<ScopeSelector, RubyRegexp> registry = bundle.getDecreaseIndentMarkers();
-				
+
 				if (registry != null)
 				{
 					result.putAll(registry);
 				}
-				
+
 				return true;
 			}
 		});
@@ -376,12 +443,12 @@ public class BundleEntry
 			public boolean processBundle(BundleEntry entry, BundleElement bundle)
 			{
 				Map<ScopeSelector, RubyRegexp> registry = bundle.getIncreaseIndentMarkers();
-				
+
 				if (registry != null)
 				{
 					result.putAll(registry);
 				}
-				
+
 				return true;
 			}
 		});
@@ -397,20 +464,20 @@ public class BundleEntry
 	public List<String> getLoadPaths()
 	{
 		final List<String> result = new LinkedList<String>();
-		
+
 		this.processBundles(new BundleProcessor()
 		{
 			public boolean processBundle(BundleEntry entry, BundleElement bundle)
 			{
 				result.addAll(bundle.getLoadPaths());
-				
+
 				return true;
 			}
 		});
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * geMenus
 	 * 
@@ -441,6 +508,60 @@ public class BundleEntry
 		});
 
 		return result.toArray(new MenuElement[result.size()]);
+	}
+
+	public ProjectTemplate[] getProjectTemplates()
+	{
+		final Set<String> names = new HashSet<String>();
+		final List<ProjectTemplate> result = new ArrayList<ProjectTemplate>();
+
+		this.processBundles(new BundleProcessor()
+		{
+			public boolean processBundle(BundleEntry entry, BundleElement bundle)
+			{
+				for (ProjectTemplate template : bundle.getProjectTemplates())
+				{
+					String name = template.getName();
+
+					if (names.contains(name) == false)
+					{
+						names.add(name);
+						result.add(template);
+					}
+				}
+
+				return true;
+			}
+		});
+
+		return result.toArray(new ProjectTemplate[result.size()]);
+	}
+
+	public ProjectTemplate[] getProjectTemplatesByType(final Type type)
+	{
+		final Set<String> names = new HashSet<String>();
+		final List<ProjectTemplate> result = new ArrayList<ProjectTemplate>();
+
+		this.processBundles(new BundleProcessor()
+		{
+			public boolean processBundle(BundleEntry entry, BundleElement bundle)
+			{
+				for (ProjectTemplate template : bundle.getProjectTemplatesByType(type))
+				{
+					String name = template.getName();
+
+					if (names.contains(name) == false)
+					{
+						names.add(name);
+						result.add(template);
+					}
+				}
+
+				return true;
+			}
+		});
+
+		return result.toArray(new ProjectTemplate[result.size()]);
 	}
 
 	/**
@@ -490,7 +611,7 @@ public class BundleEntry
 	public void reload()
 	{
 		BundleManager manager = BundleManager.getInstance();
-		
+
 		synchronized (this._bundles)
 		{
 			for (BundleElement bundle : this._bundles)
@@ -499,7 +620,7 @@ public class BundleEntry
 			}
 		}
 	}
-	
+
 	/**
 	 * removeBundle
 	 * 
@@ -514,14 +635,14 @@ public class BundleEntry
 		{
 			// get list of visible bundles before adding this new one
 			Set<BundleElement> preVisibleBundles = new HashSet<BundleElement>(this.getContributingBundles());
-			
+
 			result = this._bundles.remove(bundle);
-			
+
 			if (result)
 			{
 				// fire bundle deleted event
 				BundleManager.getInstance().fireBundleDeletedEvent(bundle);
-				
+
 				// fire visibility change events
 				this.fireVisibilityEvents(preVisibleBundles);
 			}

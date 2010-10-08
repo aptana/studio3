@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) 2005-2010 Aptana, Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of Modified BSD License
+ * which accompanies this distribution. If redistributing this code,
+ * this entire header must remain intact.
+ */
 package com.aptana.portablegit.win32;
 
 import java.io.IOException;
@@ -15,7 +23,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends Plugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "com.aptana.portablegit.win32";
+	public static final String PLUGIN_ID = "com.aptana.portablegit.win32"; //$NON-NLS-1$
 
 	// The shared instance
 	private static Activator plugin;
@@ -50,7 +58,7 @@ public class Activator extends Plugin {
 	private void checkOrInstallGit() {
 		try {
 			IPath path = getStateLocation();
-			IPath installed = path.append(".installed_"+getBundle().getVersion().toString());
+			IPath installed = path.append(".installed_"+getBundle().getVersion().toString()); //$NON-NLS-1$
 			if (!installed.toFile().exists()) {
 				path.toFile().mkdirs();
 				if (Extractor.extract(path)) {

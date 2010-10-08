@@ -6,5 +6,6 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.aptana.portablegit.win32.Activator
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.core.runtime
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
+Eclipse-PlatformFilter: (osgi.os=win32)

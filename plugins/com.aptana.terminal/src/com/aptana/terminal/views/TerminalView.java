@@ -105,6 +105,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	private IMemento savedState = null;
 	
 	private Action fOpenEditorAction;
+	private Action fOpenViewAction;
 	private TerminalActionCopy fActionEditCopy;
 	private TerminalActionCut fActionEditCut;
 	private TerminalActionPaste fActionEditPaste;
@@ -225,7 +226,6 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	protected void close() {
 		if (terminalComposite != null && !terminalComposite.isDisposed()) {
 			terminalComposite.getTerminalControl().getDisplay().asyncExec(new Runnable() {
-				@Override
 				public void run() {
 					getSite().getPage().hideView((IViewPart) getSite().getPart());
 				}
@@ -236,7 +236,6 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	/* (non-Javadoc)
 	 * @see com.aptana.terminal.internal.IProcessListener#processCompleted()
 	 */
-	@Override
 	public void processCompleted() {
 		IPreferenceStore prefs = Activator.getDefault().getPreferenceStore();
 		boolean closeViewOnExit = prefs.getBoolean(IPreferenceConstants.CLOSE_VIEW_ON_EXIT);
@@ -248,7 +247,6 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart2#promptToSaveOnClose()
 	 */
-	@Override
 	public int promptToSaveOnClose() {
 		return terminalComposite.canCloseTerminal() ? ISaveablePart2.YES : ISaveablePart2.CANCEL;
 	}
@@ -256,21 +254,18 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public void doSave(IProgressMonitor monitor) {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#doSaveAs()
 	 */
-	@Override
 	public void doSaveAs() {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#isDirty()
 	 */
-	@Override
 	public boolean isDirty() {
 		try {
 			return checkCanClose;
@@ -282,7 +277,6 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
 	 */
-	@Override
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
@@ -290,7 +284,6 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#isSaveOnCloseNeeded()
 	 */
-	@Override
 	public boolean isSaveOnCloseNeeded() {
 		checkCanClose = true;
 		return true;
@@ -332,14 +325,11 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 		terminalComposite.setFocus();
 	}
 	
-	@Override
 	public void setState(TerminalState state) {
 	}
 
-	@Override
 	public void setTerminalTitle(final String title) {
 		Utils.runInDisplayThread(new Runnable() {
-			@Override
 			public void run() {
 				setPartName(title);
 			}
@@ -387,6 +377,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 		menuMgr.add(fActionEditClearAll);
 		menuMgr.add(fActionEditSelectAll);
 		menuMgr.add(new Separator());
+		menuMgr.add(fOpenViewAction);
 		menuMgr.add(fOpenEditorAction);
 
 		menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -407,10 +398,12 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	}
 
 	private void fillLocalPullDown(IMenuManager manager) {
+		manager.add(fOpenViewAction);
 		manager.add(fOpenEditorAction);
 	}
 
 	private void fillLocalToolBar(IToolBarManager manager) {
+		manager.add(fOpenViewAction);
 		manager.add(fOpenEditorAction);
 		manager.add(new Separator());
 		manager.add(fActionEditClearAll);
@@ -434,6 +427,15 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 		fActionEditClearAll = new TerminalActionClearAll(terminalComposite.getTerminalViewControl());
 		fActionEditSelectAll = new TerminalActionSelectAll(terminalComposite.getTerminalViewControl());
 
+		// open view action
+		fOpenViewAction = new Action(Messages.TerminalView_Open_Terminal_View, Activator.getImageDescriptor("/icons/terminal.png")) { //$NON-NLS-1$
+			@Override
+			public void run() {
+				openView(null, getPartName(), getWorkingDirectory());
+			}
+		};
+		fOpenViewAction.setToolTipText(Messages.TerminalView_Create_Terminal_View_Tooltip);
+
 		// open editor action
 		fOpenEditorAction = new Action(Messages.TerminalView_Open_Terminal_Editor, Activator.getImageDescriptor("/icons/terminal.png")) { //$NON-NLS-1$
 			@Override
@@ -442,6 +444,11 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 			}
 		};
 		fOpenEditorAction.setToolTipText(Messages.TerminalView_Create_Terminal_Editor_Tooltip);
+	}
+	
+	public IPath getWorkingDirectory()
+	{
+		return terminalComposite.getWorkingDirectory();
 	}
 
 }

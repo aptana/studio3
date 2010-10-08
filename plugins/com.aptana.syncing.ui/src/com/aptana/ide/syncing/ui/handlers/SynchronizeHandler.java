@@ -36,20 +36,21 @@ package com.aptana.ide.syncing.ui.handlers;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.aptana.ide.syncing.ui.actions.SynchronizeAction;
 
 public class SynchronizeHandler extends BaseSyncHandler
 {
+
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		SynchronizeAction action = new SynchronizeAction();
 		action.setActivePart(null, HandlerUtil.getActivePart(event));
-		action.setSelection(HandlerUtil.getCurrentSelection(event));
+		action.setSelection(new StructuredSelection(getSelectedResources()), isSelectionFromSource());
 		action.run(null);
 
 		return null;
 	}
-
 }

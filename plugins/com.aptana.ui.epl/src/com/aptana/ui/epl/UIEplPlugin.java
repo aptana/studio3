@@ -1,5 +1,18 @@
+/**
+ * Copyright (c) 2005-2010 Aptana, Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html. If redistributing this code,
+ * this entire header must remain intact.
+ */
 package com.aptana.ui.epl;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -45,5 +58,23 @@ public class UIEplPlugin extends AbstractUIPlugin
 	public static UIEplPlugin getDefault()
 	{
 		return plugin;
+	}
+
+	public static Image getImage(String string)
+	{
+		if (getDefault().getImageRegistry().get(string) == null)
+		{
+			ImageDescriptor id = imageDescriptorFromPlugin(PLUGIN_ID, string);
+			if (id != null)
+			{
+				getDefault().getImageRegistry().put(string, id);
+			}
+		}
+		return getDefault().getImageRegistry().get(string);
+	}
+
+	public static void logError(String msg, Throwable e)
+	{
+		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
 	}
 }

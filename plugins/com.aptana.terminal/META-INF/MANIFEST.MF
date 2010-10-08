@@ -10,10 +10,13 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.debug.core,
  com.aptana.core;bundle-version="3.0.0",
  com.aptana.org.eclipse.tm.terminal;bundle-version="3.0.100",
- com.aptana.theme
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+ com.aptana.theme,
+ org.eclipse.jface.text;bundle-version="3.0.0",
+ com.aptana.scripting
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.terminal,
  com.aptana.terminal.views,
- com.aptana.terminal.widget
+ com.aptana.terminal.widget,
+ com.aptana.terminal.editor
 Eclipse-ExtensibleAPI: true

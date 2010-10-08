@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.scripting.model;
 
 import java.io.File;
@@ -9,29 +43,41 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
+import org.eclipse.core.runtime.jobs.Job;
 import org.jruby.RubyRegexp;
 
 import com.aptana.core.util.ResourceUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptingEngine;
+import com.aptana.scripting.model.ProjectTemplate.Type;
 import com.aptana.scripting.model.filters.AndFilter;
 import com.aptana.scripting.model.filters.IModelFilter;
 import com.aptana.scripting.model.filters.IsExecutableCommandFilter;
 
 public class BundleManager
 {
+	static final Pattern DOT_PATTERN = Pattern.compile("\\."); //$NON-NLS-1$
+	static final Pattern STAR_PATTERN = Pattern.compile("\\*"); //$NON-NLS-1$
+
 	static final String SNIPPETS_DIRECTORY_NAME = "snippets"; //$NON-NLS-1$
 	static final String COMMANDS_DIRECTORY_NAME = "commands"; //$NON-NLS-1$
 	static final String TEMPLATES_DIRECTORY_NAME = "templates"; //$NON-NLS-1$
@@ -39,16 +85,24 @@ public class BundleManager
 	static final CommandElement[] NO_COMMANDS = new CommandElement[0];
 	static final MenuElement[] NO_MENUS = new MenuElement[0];
 	static final SnippetElement[] NO_SNIPPETS = new SnippetElement[0];
+	static final ProjectTemplate[] NO_PROJECT_TEMPLATES = new ProjectTemplate[0];
 
 	private static final File[] NO_FILES = new File[0];
 	private static final String[] NO_STRINGS = new String[0];
 
+	private static final String APTANA_RUBLE_USER_LOCATION = "aptana.ruble.user.location"; //$NON-NLS-1$
 	private static final String BUILTIN_BUNDLES = "bundles"; //$NON-NLS-1$
 	private static final String BUNDLE_FILE = "bundle.rb"; //$NON-NLS-1$
 	private static final String RUBY_FILE_EXTENSION = ".rb"; //$NON-NLS-1$
 	private static final String USER_HOME_PROPERTY = "user.home"; //$NON-NLS-1$
 	private static final String USER_BUNDLE_DIRECTORY_GENERAL = "Aptana Rubles"; //$NON-NLS-1$
 	private static final String USER_BUNDLE_DIRECTORY_MACOSX = "/Documents/Aptana Rubles"; //$NON-NLS-1$
+
+	/**
+	 * counter to cycle through for use in enforcing max parallel bundle loads. We compare versus the number of
+	 * available processors reported by Java's Runtime.
+	 */
+	private int counter = 0;
 
 	private static BundleManager INSTANCE;
 
@@ -57,13 +111,15 @@ public class BundleManager
 
 	private Map<File, List<BundleElement>> _bundlesByPath;
 	private Map<String, BundleEntry> _entriesByName;
-
-	private Object bundlePathsLock = new Object();
-	private Object entryNamesLock = new Object();
-	
 	private List<BundleChangeListener> _bundleListeners;
 	private List<ElementChangeListener> _elementListeners;
 	private List<LoadCycleListener> _loadCycleListeners;
+
+	private Object bundlePathsLock = new Object();
+	private Object entryNamesLock = new Object();
+	private Object bundleListenersLock = new Object();
+	private Object elementListenersLock = new Object();
+	private Object loadCycleListenersLock = new Object();
 
 	/**
 	 * getInstance
@@ -97,17 +153,59 @@ public class BundleManager
 				INSTANCE.applicationBundlesPath = ResourceUtil.resourcePathToString(url);
 			}
 
-			String OS = Platform.getOS();
-			String userHome = System.getProperty(USER_HOME_PROPERTY);
+			// get possible user override
+			boolean validUserBundlePath = false;
+			String userBundlePathOverride = System.getProperty(APTANA_RUBLE_USER_LOCATION);
 
-			// setup default user bundles path
-			if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
+			if (userBundlePathOverride != null)
 			{
-				INSTANCE.userBundlesPath = userHome + USER_BUNDLE_DIRECTORY_MACOSX;
+				File f = new File(userBundlePathOverride);
+
+				if (f.exists())
+				{
+					if (f.isDirectory())
+					{
+						if (f.canRead() && f.canWrite())
+						{
+							validUserBundlePath = true;
+						}
+						else
+						{
+							Activator.logError(Messages.BundleManager_USER_PATH_NOT_READ_WRITE + f.getAbsolutePath(),
+									null);
+						}
+					}
+					else
+					{
+						Activator.logError(Messages.BundleManager_USER_PATH_NOT_DIRECTORY + f.getAbsolutePath(), null);
+					}
+				}
+				else
+				{
+					// try to create the path
+					validUserBundlePath = f.mkdirs();
+				}
+
+				if (validUserBundlePath)
+				{
+					INSTANCE.userBundlesPath = f.getAbsolutePath();
+				}
 			}
-			else
+
+			if (validUserBundlePath == false)
 			{
-				INSTANCE.userBundlesPath = userHome + File.separator + USER_BUNDLE_DIRECTORY_GENERAL;
+				String OS = Platform.getOS();
+				String userHome = System.getProperty(USER_HOME_PROPERTY);
+
+				// setup default user bundles path
+				if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
+				{
+					INSTANCE.userBundlesPath = userHome + USER_BUNDLE_DIRECTORY_MACOSX;
+				}
+				else
+				{
+					INSTANCE.userBundlesPath = userHome + File.separator + USER_BUNDLE_DIRECTORY_GENERAL;
+				}
 			}
 		}
 
@@ -205,12 +303,15 @@ public class BundleManager
 	{
 		if (listener != null)
 		{
-			if (this._bundleListeners == null)
+			synchronized (bundleListenersLock)
 			{
-				this._bundleListeners = new ArrayList<BundleChangeListener>();
-			}
+				if (this._bundleListeners == null)
+				{
+					this._bundleListeners = new ArrayList<BundleChangeListener>();
+				}
 
-			this._bundleListeners.add(listener);
+				this._bundleListeners.add(listener);
+			}
 		}
 	}
 
@@ -223,12 +324,15 @@ public class BundleManager
 	{
 		if (listener != null)
 		{
-			if (this._elementListeners == null)
+			synchronized (elementListenersLock)
 			{
-				this._elementListeners = new ArrayList<ElementChangeListener>();
-			}
+				if (this._elementListeners == null)
+				{
+					this._elementListeners = new ArrayList<ElementChangeListener>();
+				}
 
-			this._elementListeners.add(listener);
+				this._elementListeners.add(listener);
+			}
 		}
 	}
 
@@ -241,12 +345,15 @@ public class BundleManager
 	{
 		if (listener != null)
 		{
-			if (this._loadCycleListeners == null)
+			synchronized (loadCycleListenersLock)
 			{
-				this._loadCycleListeners = new ArrayList<LoadCycleListener>();
-			}
+				if (this._loadCycleListeners == null)
+				{
+					this._loadCycleListeners = new ArrayList<LoadCycleListener>();
+				}
 
-			this._loadCycleListeners.add(listener);
+				this._loadCycleListeners.add(listener);
+			}
 		}
 	}
 
@@ -282,11 +389,17 @@ public class BundleManager
 	 */
 	void fireBundleAddedEvent(BundleElement bundle)
 	{
-		if (this._bundleListeners != null && bundle != null)
+		if (bundle != null)
 		{
-			for (BundleChangeListener listener : this._bundleListeners)
+			synchronized (bundleListenersLock)
 			{
-				listener.added(bundle);
+				if (this._bundleListeners != null)
+				{
+					for (BundleChangeListener listener : this._bundleListeners)
+					{
+						listener.added(bundle);
+					}
+				}
 			}
 		}
 	}
@@ -298,11 +411,17 @@ public class BundleManager
 	 */
 	void fireBundleBecameHiddenEvent(BundleEntry entry)
 	{
-		if (this._bundleListeners != null && entry != null)
+		if (entry != null)
 		{
-			for (BundleChangeListener listener : this._bundleListeners)
+			synchronized (bundleListenersLock)
 			{
-				listener.becameHidden(entry);
+				if (this._bundleListeners != null)
+				{
+					for (BundleChangeListener listener : this._bundleListeners)
+					{
+						listener.becameHidden(entry);
+					}
+				}
 			}
 		}
 	}
@@ -314,11 +433,17 @@ public class BundleManager
 	 */
 	void fireBundleBecameVisibleEvent(BundleEntry entry)
 	{
-		if (this._bundleListeners != null && entry != null)
+		if (entry != null)
 		{
-			for (BundleChangeListener listener : this._bundleListeners)
+			synchronized (bundleListenersLock)
 			{
-				listener.becameVisible(entry);
+				if (this._bundleListeners != null)
+				{
+					for (BundleChangeListener listener : this._bundleListeners)
+					{
+						listener.becameVisible(entry);
+					}
+				}
 			}
 		}
 	}
@@ -330,11 +455,17 @@ public class BundleManager
 	 */
 	void fireBundleDeletedEvent(BundleElement bundle)
 	{
-		if (this._bundleListeners != null && bundle != null)
+		if (bundle != null)
 		{
-			for (BundleChangeListener listener : this._bundleListeners)
+			synchronized (bundleListenersLock)
 			{
-				listener.deleted(bundle);
+				if (this._bundleListeners != null)
+				{
+					for (BundleChangeListener listener : this._bundleListeners)
+					{
+						listener.deleted(bundle);
+					}
+				}
 			}
 		}
 	}
@@ -346,11 +477,17 @@ public class BundleManager
 	 */
 	void fireElementAddedEvent(AbstractElement element)
 	{
-		if (this._elementListeners != null && element != null)
+		if (element != null)
 		{
-			for (ElementChangeListener listener : this._elementListeners)
+			synchronized (elementListenersLock)
 			{
-				listener.elementAdded(element);
+				if (this._elementListeners != null)
+				{
+					for (ElementChangeListener listener : this._elementListeners)
+					{
+						listener.elementAdded(element);
+					}
+				}
 			}
 		}
 	}
@@ -362,11 +499,17 @@ public class BundleManager
 	 */
 	void fireElementDeletedEvent(AbstractElement element)
 	{
-		if (this._elementListeners != null && element != null)
+		if (element != null)
 		{
-			for (ElementChangeListener listener : this._elementListeners)
+			synchronized (elementListenersLock)
 			{
-				listener.elementDeleted(element);
+				if (this._elementListeners != null)
+				{
+					for (ElementChangeListener listener : this._elementListeners)
+					{
+						listener.elementDeleted(element);
+					}
+				}
 			}
 		}
 	}
@@ -378,7 +521,7 @@ public class BundleManager
 	 */
 	void fireElementModifiedEvent(AbstractElement element)
 	{
-		if (this._elementListeners != null && element != null)
+		if (element != null)
 		{
 			boolean sendEvent = true;
 
@@ -389,11 +532,17 @@ public class BundleManager
 
 			if (sendEvent)
 			{
-				for (ElementChangeListener listener : this._elementListeners)
+				synchronized (elementListenersLock)
 				{
-					listener.elementDeleted(element);
-					listener.elementAdded(element);
-					// listener.elementModified(element);
+					if (this._elementListeners != null)
+					{
+						for (ElementChangeListener listener : this._elementListeners)
+						{
+							listener.elementDeleted(element);
+							listener.elementAdded(element);
+							// listener.elementModified(element);
+						}
+					}
 				}
 			}
 		}
@@ -406,11 +555,17 @@ public class BundleManager
 	 */
 	void fireScriptLoadedEvent(File script)
 	{
-		if (this._loadCycleListeners != null && script != null)
+		if (script != null)
 		{
-			for (LoadCycleListener listener : this._loadCycleListeners)
+			synchronized (loadCycleListenersLock)
 			{
-				listener.scriptLoaded(script);
+				if (this._loadCycleListeners != null)
+				{
+					for (LoadCycleListener listener : this._loadCycleListeners)
+					{
+						listener.scriptLoaded(script);
+					}
+				}
 			}
 		}
 	}
@@ -422,11 +577,17 @@ public class BundleManager
 	 */
 	void fireScriptReloadedEvent(File script)
 	{
-		if (this._loadCycleListeners != null && script != null)
+		if (script != null)
 		{
-			for (LoadCycleListener listener : this._loadCycleListeners)
+			synchronized (loadCycleListenersLock)
 			{
-				listener.scriptReloaded(script);
+				if (this._loadCycleListeners != null)
+				{
+					for (LoadCycleListener listener : this._loadCycleListeners)
+					{
+						listener.scriptReloaded(script);
+					}
+				}
 			}
 		}
 	}
@@ -438,11 +599,17 @@ public class BundleManager
 	 */
 	void fireScriptUnloadedEvent(File script)
 	{
-		if (this._loadCycleListeners != null && script != null)
+		if (script != null)
 		{
-			for (LoadCycleListener listener : this._loadCycleListeners)
+			synchronized (loadCycleListenersLock)
 			{
-				listener.scriptReloaded(script);
+				if (this._loadCycleListeners != null)
+				{
+					for (LoadCycleListener listener : this._loadCycleListeners)
+					{
+						listener.scriptReloaded(script);
+					}
+				}
 			}
 		}
 	}
@@ -522,6 +689,30 @@ public class BundleManager
 	}
 
 	/**
+	 * getBundleEnvs
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public EnvironmentElement[] getBundleEnvs(String name)
+	{
+		EnvironmentElement[] result = new EnvironmentElement[0];
+
+		synchronized (entryNamesLock)
+		{
+			if (this._entriesByName != null && this._entriesByName.containsKey(name))
+			{
+				// grab all bundles of the given name
+				BundleEntry entry = this._entriesByName.get(name);
+
+				result = entry.getEnvs();
+			}
+		}
+
+		return result;
+	}
+
+	/**
 	 * getBundleDirectory
 	 * 
 	 * @param script
@@ -530,10 +721,10 @@ public class BundleManager
 	public File getBundleDirectory(File script)
 	{
 		String scriptPath = script.getAbsolutePath();
-		
+
 		return scriptPath.endsWith(BUNDLE_FILE) ? script.getParentFile() : script.getParentFile().getParentFile();
 	}
-	
+
 	/**
 	 * getBundles
 	 * 
@@ -637,35 +828,35 @@ public class BundleManager
 	protected List<String> getBundleLoadPaths(File bundleDirectory)
 	{
 		List<String> result = null;
-		
+
 		if (bundleDirectory != null)
 		{
 			File bundleFile = new File(bundleDirectory, BUNDLE_FILE);
 			String bundleName = BundleUtils.getBundleName(bundleFile);
-			
+
 			if (bundleName != null)
 			{
 				String defaultName = BundleUtils.getDefaultBundleName(bundleFile.getAbsolutePath());
-				
+
 				if (bundleName.equals(defaultName) == false)
 				{
 					result = this.getBundleLoadPaths(bundleName);
 				}
 			}
-			
+
 			if (result == null)
 			{
-				result = new LinkedList<String>();
-				
+				result = new ArrayList<String>();
+
 				result.addAll(ScriptingEngine.getInstance().getContributedLoadPaths());
 			}
-			
+
 			result.add(0, BundleUtils.getBundleLibDirectory(bundleDirectory));
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getBundleLoadPaths
 	 * 
@@ -682,11 +873,11 @@ public class BundleManager
 			{
 				// grab all bundles of the given name
 				BundleEntry entry = this._entriesByName.get(name);
-				
+
 				result.addAll(entry.getLoadPaths());
 			}
 		}
-		
+
 		result.addAll(ScriptingEngine.getInstance().getContributedLoadPaths());
 
 		return result;
@@ -773,7 +964,7 @@ public class BundleManager
 
 		return result;
 	}
-	
+
 	/**
 	 * getBundleScripts
 	 * 
@@ -803,7 +994,7 @@ public class BundleManager
 			File snippetsDirectory = new File(bundleDirectory, SNIPPETS_DIRECTORY_NAME);
 
 			result.addAll(Arrays.asList(this.getScriptsFromDirectory(snippetsDirectory)));
-			
+
 			// look for templates inside "templates" directory
 			File templatesDirectory = new File(bundleDirectory, TEMPLATES_DIRECTORY_NAME);
 
@@ -864,7 +1055,7 @@ public class BundleManager
 
 		return result.toArray(new CommandElement[result.size()]);
 	}
-	
+
 	/**
 	 * getContentAssists
 	 * 
@@ -876,7 +1067,6 @@ public class BundleManager
 		IModelFilter caFilter = new IModelFilter()
 		{
 
-			@Override
 			public boolean include(AbstractElement element)
 			{
 				return element instanceof ContentAssistElement;
@@ -890,7 +1080,7 @@ public class BundleManager
 		{
 			filter = caFilter;
 		}
-		
+
 		List<ContentAssistElement> result = new ArrayList<ContentAssistElement>();
 		for (String name : this.getBundleNames())
 		{
@@ -1049,6 +1239,44 @@ public class BundleManager
 		return result.toArray(new MenuElement[result.size()]);
 	}
 
+	public ProjectTemplate[] getProjectTemplates()
+	{
+		List<ProjectTemplate> result = new ArrayList<ProjectTemplate>();
+
+		BundleEntry bundleEntry;
+		ProjectTemplate[] templates;
+		for (String bundleName : this.getBundleNames())
+		{
+			bundleEntry = this.getBundleEntry(bundleName);
+			templates = bundleEntry.getProjectTemplates();
+			for (ProjectTemplate template : templates)
+			{
+				result.add(template);
+			}
+		}
+
+		return result.toArray(new ProjectTemplate[result.size()]);
+	}
+
+	public ProjectTemplate[] getProjectTemplatesByType(Type type)
+	{
+		List<ProjectTemplate> result = new ArrayList<ProjectTemplate>();
+
+		BundleEntry bundleEntry;
+		ProjectTemplate[] templates;
+		for (String bundleName : this.getBundleNames())
+		{
+			bundleEntry = this.getBundleEntry(bundleName);
+			templates = bundleEntry.getProjectTemplatesByType(type);
+			for (ProjectTemplate template : templates)
+			{
+				result.add(template);
+			}
+		}
+
+		return result.toArray(new ProjectTemplate[result.size()]);
+	}
+
 	/**
 	 * getTopLevelScope
 	 * 
@@ -1070,10 +1298,10 @@ public class BundleManager
 				String pattern = entry.getKey();
 
 				// Escape periods in pattern (for regexp)
-				pattern = pattern.replaceAll("\\.", "\\\\."); //$NON-NLS-1$ //$NON-NLS-2$
+				pattern = DOT_PATTERN.matcher(pattern).replaceAll("\\\\."); //$NON-NLS-1$
 
 				// Replace * wildcard pattern with .+? regexp
-				pattern = pattern.replaceAll("\\*", "\\.\\+\\?"); //$NON-NLS-1$ //$NON-NLS-2$
+				pattern = STAR_PATTERN.matcher(pattern).replaceAll(".+?"); //$NON-NLS-1$
 
 				if (fileName.matches(pattern))
 				{
@@ -1088,8 +1316,10 @@ public class BundleManager
 						// return value
 						// TODO: Check for simple case where one is a subset scope of the other, use the more specific
 						// one and move on
-						int existingLength = result.split("\\.").length; // split on periods to see the specificity of scope name //$NON-NLS-1$
-						int newLength = entry.getValue().split("\\.").length; //$NON-NLS-1$
+
+						// split on periods to see the specificity of scope name
+						int existingLength = StringUtil.characterInstanceCount(result, '.') + 1;
+						int newLength = StringUtil.characterInstanceCount(entry.getValue(), '.') + 1;
 
 						if (newLength > existingLength)
 						{
@@ -1173,7 +1403,7 @@ public class BundleManager
 				result = this._bundlesByPath.containsKey(bundleDirectory);
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -1226,7 +1456,7 @@ public class BundleManager
 					new Object[] { bundleDirectory.getAbsolutePath() });
 		}
 
-		if (result == false  && message != null && message.length() > 0)
+		if (result == false && message != null && message.length() > 0)
 		{
 			ScriptLogger.logError(message);
 		}
@@ -1257,20 +1487,71 @@ public class BundleManager
 	 * 
 	 * @param bundleDirectory
 	 */
-	public void loadBundle(File bundleDirectory)
+	public void loadBundle(final File bundleDirectory)
 	{
-		File[] bundleScripts = this.getBundleScripts(bundleDirectory);
+		loadBundle(bundleDirectory, true);
+	}
 
-		if (bundleScripts.length > 0)
+	/**
+	 * loadBundle FIXME This is a hack specifically for testing so we can still load bundles sync there as the tests
+	 * assume that they will! We should be able to return back the job or a listener or pass in a monitor so we can
+	 * monitor the status of the job and wait until it's finished!
+	 * 
+	 * @param bundleDirectory
+	 */
+	public void loadBundle(final File bundleDirectory, boolean async)
+	{
+		BundleLoadJob job = new BundleLoadJob(bundleDirectory);
+		if (async)
 		{
-			List<String> bundleLoadPaths = this.getBundleLoadPaths(bundleDirectory);
-
-			for (File script : bundleScripts)
+			job.setRule(new SerialPerObjectRule(counter++));
+			if (counter >= Runtime.getRuntime().availableProcessors())
 			{
-				this.loadScript(script, true, bundleLoadPaths);
+				counter = 0;
 			}
+			job.schedule();
+		}
+		else
+		{
+			job.run(new NullProgressMonitor());
 		}
 	}
+
+	private class BundleLoadJob extends Job
+	{
+		private File bundleDirectory;
+
+		BundleLoadJob(File bundleDirectory)
+		{
+			super("Loading bundle: " + bundleDirectory.getAbsolutePath()); //$NON-NLS-1$
+			this.bundleDirectory = bundleDirectory;
+			setPriority(Job.SHORT);
+		}
+
+		public IStatus run(IProgressMonitor monitor)
+		{
+			File[] bundleScripts = getBundleScripts(bundleDirectory);
+			SubMonitor sub = SubMonitor.convert(monitor, bundleScripts.length);
+
+			if (bundleScripts.length > 0)
+			{
+				List<String> bundleLoadPaths = getBundleLoadPaths(bundleDirectory);
+
+				for (File script : bundleScripts)
+				{
+					sub.subTask(script.getAbsolutePath());
+					loadScript(script, true, bundleLoadPaths);
+					sub.worked(1);
+					if (script.getName().equals(BUNDLE_FILE))
+					{
+						yieldRule(monitor);
+					}
+				}
+			}
+			sub.done();
+			return Status.OK_STATUS;
+		}
+	};
 
 	/**
 	 * loadBundles
@@ -1279,7 +1560,7 @@ public class BundleManager
 	{
 		// clear out any existing bundles since we're rebuilding from scratch
 		this.reset();
-		
+
 		this.loadApplicationBundles();
 		this.loadUserBundles();
 		this.loadProjectBundles();
@@ -1354,8 +1635,8 @@ public class BundleManager
 
 		if (execute && script.canRead() == false)
 		{
-			String message = MessageFormat.format(Messages.BundleManager_UNREADABLE_SCRIPT, new Object[] { script
-					.getAbsolutePath() });
+			String message = MessageFormat.format(Messages.BundleManager_UNREADABLE_SCRIPT,
+					new Object[] { script.getAbsolutePath() });
 
 			ScriptLogger.logError(message);
 			execute = false;
@@ -1398,11 +1679,11 @@ public class BundleManager
 	public void reloadBundle(BundleElement bundle)
 	{
 		File bundleDirectory = bundle.getBundleDirectory();
-		
+
 		this.unloadBundle(bundleDirectory);
 		this.loadBundle(bundleDirectory);
 	}
-	
+
 	/**
 	 * reloadScript
 	 * 
@@ -1413,13 +1694,13 @@ public class BundleManager
 		if (script != null)
 		{
 			this.unloadScript(script, false);
-			
+
 			// determine bundle root directory
 			File bundleDirectory = this.getBundleDirectory(script);
 
 			// get bundle load paths
 			List<String> loadPaths = this.getBundleLoadPaths(bundleDirectory);
-			
+
 			// execute script
 			ScriptingEngine.getInstance().runScript(script.getAbsolutePath(), loadPaths, RunType.THREAD, true);
 
@@ -1487,12 +1768,15 @@ public class BundleManager
 	 */
 	public void removeBundleChangeListener(BundleChangeListener listener)
 	{
-		if (this._bundleListeners != null)
+		synchronized (bundleListenersLock)
 		{
-			this._bundleListeners.remove(listener);
+			if (this._bundleListeners != null)
+			{
+				this._bundleListeners.remove(listener);
+			}
 		}
 	}
-	
+
 	/**
 	 * removeElementChangeListener
 	 * 
@@ -1500,9 +1784,12 @@ public class BundleManager
 	 */
 	public void removeElementChangeListener(ElementChangeListener listener)
 	{
-		if (this._elementListeners != null)
+		synchronized (elementListenersLock)
 		{
-			this._elementListeners.remove(listener);
+			if (this._elementListeners != null)
+			{
+				this._elementListeners.remove(listener);
+			}
 		}
 	}
 
@@ -1513,9 +1800,12 @@ public class BundleManager
 	 */
 	public void removeLoadCycleListener(LoadCycleListener listener)
 	{
-		if (this._loadCycleListeners != null)
+		synchronized (loadCycleListenersLock)
 		{
-			this._loadCycleListeners.remove(listener);
+			if (this._loadCycleListeners != null)
+			{
+				this._loadCycleListeners.remove(listener);
+			}
 		}
 	}
 
@@ -1552,7 +1842,7 @@ public class BundleManager
 	{
 		AbstractElement[] elements = AbstractElement.getElementsByDirectory(bundleDirectory.getAbsolutePath());
 		Set<File> scripts = new HashSet<File>();
-		
+
 		if (elements != null)
 		{
 			for (AbstractElement element : elements)
@@ -1560,13 +1850,13 @@ public class BundleManager
 				scripts.add(new File(element.getPath()));
 			}
 		}
-		
+
 		for (File script : scripts)
 		{
 			this.unloadScript(script);
 		}
 	}
-	
+
 	/**
 	 * unloadScript
 	 * 
@@ -1636,5 +1926,81 @@ public class BundleManager
 
 			ScriptLogger.logError(message);
 		}
+	}
+
+	/**
+	 * This is a rule which reports a conflict when two rules wrap the same object. It is used to enforce a max job
+	 * count for parallel bundle loads.
+	 * 
+	 * @author cwilliams
+	 */
+	private class SerialPerObjectRule implements ISchedulingRule
+	{
+
+		private Object fObject = null;
+
+		public SerialPerObjectRule(Object lock)
+		{
+			fObject = lock;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.core.runtime.jobs.ISchedulingRule#contains(org.eclipse.core.runtime.jobs.ISchedulingRule)
+		 */
+		public boolean contains(ISchedulingRule rule)
+		{
+			return rule == this;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see
+		 * org.eclipse.core.runtime.jobs.ISchedulingRule#isConflicting(org.eclipse.core.runtime.jobs.ISchedulingRule)
+		 */
+		public boolean isConflicting(ISchedulingRule rule)
+		{
+			if (rule instanceof SerialPerObjectRule)
+			{
+				SerialPerObjectRule vup = (SerialPerObjectRule) rule;
+				return fObject == vup.fObject;
+			}
+			return false;
+		}
+	}
+
+	public List<EnvironmentElement> getEnvs(IModelFilter filter)
+	{
+
+		IModelFilter caFilter = new IModelFilter()
+		{
+
+			public boolean include(AbstractElement element)
+			{
+				return element instanceof EnvironmentElement;
+			}
+		};
+		if (filter != null)
+		{
+			filter = new AndFilter(filter, caFilter);
+		}
+		else
+		{
+			filter = caFilter;
+		}
+
+		List<EnvironmentElement> result = new ArrayList<EnvironmentElement>();
+		for (String name : this.getBundleNames())
+		{
+			for (EnvironmentElement command : this.getBundleEnvs(name))
+			{
+				if (filter.include(command))
+				{
+					result.add(command);
+				}
+			}
+		}
+
+		return result;
 	}
 }

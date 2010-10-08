@@ -62,7 +62,7 @@ public class DiffDocumentProvider extends CommonDocumentProvider
 		}
 	}
 
-	protected String getDefaultContentType()
+	protected String getDefaultContentType(String filename)
 	{
 		return IDiffConstants.CONTENT_TYPE_DIFF;
 	}

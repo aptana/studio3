@@ -153,4 +153,18 @@ public class HTMLSourcePartitionScannerTest extends TestCase
 		assertContentType(JSSourceConfiguration.DEFAULT, source, 71); // <script>'v'
 		assertContentType(JSSourceConfiguration.DEFAULT, source, 82); // ';'</script>
 	}
+
+	public void testLowercaseDoctype()
+	{
+		String source = "<!doctype html>";
+		// DOCTYPE
+		assertContentType(HTMLSourceConfiguration.HTML_DOCTYPE, source, 0);
+	}
+
+	public void testMixedcaseDoctype()
+	{
+		String source = "<!DoCtYpE html>";
+		// DOCTYPE
+		assertContentType(HTMLSourceConfiguration.HTML_DOCTYPE, source, 0);
+	}
 }

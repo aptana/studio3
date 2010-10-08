@@ -9,6 +9,7 @@
  *******************************************************************************/
 package com.aptana.git.internal.core.storage;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -31,6 +32,7 @@ import com.aptana.git.core.model.GitExecutable;
 public class CommitFileRevision extends GitFileRevision
 {
 
+	private static final String NO_COMMIT = "<no commit>"; //$NON-NLS-1$
 	private GitCommit commit;
 
 	public CommitFileRevision(GitCommit gitCommit, String filename)
@@ -68,6 +70,10 @@ public class CommitFileRevision extends GitFileRevision
 
 			public InputStream getContents() throws CoreException
 			{
+				if (commit == null)
+				{
+					return new ByteArrayInputStream(new byte[0]);
+				}
 				try
 				{
 					Process p = GitExecutable.instance().run(commit.repository().workingDirectory(), "show", //$NON-NLS-1$
@@ -86,24 +92,40 @@ public class CommitFileRevision extends GitFileRevision
 	@Override
 	public String getAuthor()
 	{
+		if (commit == null)
+		{
+			return NO_COMMIT;
+		}
 		return commit.getAuthor();
 	}
 
 	@Override
 	public String getComment()
 	{
+		if (commit == null)
+		{
+			return NO_COMMIT;
+		}
 		return commit.getComment();
 	}
 
 	@Override
 	public long getTimestamp()
 	{
+		if (commit == null)
+		{
+			return -1L;
+		}
 		return commit.getTimestamp();
 	}
 
 	@Override
 	public String getContentIdentifier()
 	{
+		if (commit == null)
+		{
+			return NO_COMMIT;
+		}
 		return commit.sha();
 	}
 
@@ -111,9 +133,34 @@ public class CommitFileRevision extends GitFileRevision
 	{
 		if (!(revision instanceof CommitFileRevision))
 			return false;
+		if (commit == null)
+			return false;
 		if (!commit.hasParent())
 			return false;
 		CommitFileRevision other = (CommitFileRevision) revision;
 		return commit.parents().contains(other.commit.sha());
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj instanceof CommitFileRevision)
+		{
+			if (!super.equals(obj)) // check path
+			{
+				return false;
+			}
+			CommitFileRevision other = (CommitFileRevision) obj;
+			return other.commit.equals(commit); // check commit
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		int hash = 31 * super.hashCode();
+		hash = hash + ((commit == null) ? 0 : commit.hashCode());
+		return hash;
 	}
 }

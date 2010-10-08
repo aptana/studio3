@@ -6,6 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.aptana.editor.css.Activator
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources;bundle-version="3.0.0",
  org.eclipse.jface.text,
  org.eclipse.ui,
  org.eclipse.ui.editors,
@@ -15,13 +16,17 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.parsing,
  com.aptana.core;bundle-version="3.0.0",
  beaver;bundle-version="1.0.0",
- com.aptana.theme
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+ com.aptana.theme,
+ org.eclipse.ui.workbench.texteditor,
+ org.eclipse.ui.ide;bundle-version="3.4.0",
+ com.aptana.scripting;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.css,
  com.aptana.editor.css.contentassist;x-friends:="com.aptana.editor.html,com.aptana.editor.erb",
  com.aptana.editor.css.contentassist.index,
  com.aptana.editor.css.outline,
- com.aptana.editor.css.parsing
+ com.aptana.editor.css.parsing,
+ com.aptana.editor.css.text
 Eclipse-ExtensibleAPI: true

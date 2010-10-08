@@ -7,9 +7,11 @@ import org.eclipse.core.resources.ISavedState;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -53,8 +55,6 @@ public class IndexActivator extends Plugin
 		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
 	}
 
-	private ResourceIndexer resourceChangeListener;
-
 	ISaveParticipant saveParticipant = new ISaveParticipant()
 	{
 
@@ -97,25 +97,44 @@ public class IndexActivator extends Plugin
 	{
 		super.start(context);
 		plugin = this;
-		IndexManager.getInstance();
-		resourceChangeListener = new ResourceIndexer();
-		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		workspace.addResourceChangeListener(resourceChangeListener, IResourceChangeEvent.PRE_DELETE | IResourceChangeEvent.POST_CHANGE);
 
-		// Register save participant to process any deltas that occured since last save
-		ISavedState savedState = ResourcesPlugin.getWorkspace().addSaveParticipant(this, saveParticipant);
-		if (savedState != null)
+		Job job = new Job("Start Resource Indexer") //$NON-NLS-1$
 		{
-			try
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
 			{
-				resourceChangeListener.processIResourceChangeEventPOST_BUILD.set(savedState);
-				savedState.processResourceChangeEvents(resourceChangeListener);
+				ResourceIndexer resourceChangeListener = new ResourceIndexer();
+				final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+				workspace.addResourceChangeListener(resourceChangeListener, IResourceChangeEvent.PRE_DELETE
+						| IResourceChangeEvent.POST_CHANGE);
+
+				try
+				{
+					// Register save participant to process any deltas that occurred since last save
+					ISavedState savedState = workspace.addSaveParticipant(plugin, saveParticipant);
+					if (savedState != null)
+					{
+						try
+						{
+							resourceChangeListener.processIResourceChangeEventPOST_BUILD.set(savedState);
+							savedState.processResourceChangeEvents(resourceChangeListener);
+						}
+						finally
+						{
+							resourceChangeListener.processIResourceChangeEventPOST_BUILD.set(null);
+						}
+					}
+				}
+				catch (CoreException e)
+				{
+					return e.getStatus();
+				}
+				return Status.OK_STATUS;
 			}
-			finally
-			{
-				resourceChangeListener.processIResourceChangeEventPOST_BUILD.set(null);
-			}
-		}
+		};
+		job.setSystem(true);
+		job.setPriority(Job.LONG);
+		job.schedule();
 	}
 
 	/*
@@ -124,10 +143,15 @@ public class IndexActivator extends Plugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
-		// Clean up
-		ResourcesPlugin.getWorkspace().removeSaveParticipant(this);
-
-		plugin = null;
-		super.stop(context);
+		try
+		{
+			// Clean up
+			ResourcesPlugin.getWorkspace().removeSaveParticipant(this);
+		}
+		finally
+		{
+			plugin = null;
+			super.stop(context);
+		}
 	}
 }

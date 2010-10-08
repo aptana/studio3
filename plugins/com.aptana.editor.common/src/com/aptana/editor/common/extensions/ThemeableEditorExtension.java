@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common.extensions;
 
 import java.lang.ref.WeakReference;
@@ -7,17 +41,13 @@ import java.util.Iterator;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.source.CompositeRuler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRulerColumn;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -38,23 +68,24 @@ import com.aptana.theme.ThemePlugin;
 /**
  * Used to override the colors of the editor (ruler, background, caret, etc.)
  */
-public class ThemeableEditorExtension {
+public class ThemeableEditorExtension
+{
 
 	/**
 	 * The original parent of the editor.
 	 */
 	private Composite fParent;
-	
+
 	/**
 	 * Caret image (updated as needed with the color)
 	 */
 	private Image fCaretImage;
-	
+
 	/**
 	 * Color of the cursor
 	 */
 	private RGB fCaretColor;
-	
+
 	/**
 	 * Cursor which should have the color changed
 	 */
@@ -66,30 +97,23 @@ public class ThemeableEditorExtension {
 	private LineNumberRulerColumn fLineColumn;
 
 	/**
-	 * Listener for selection changes in the editor (to update the selection color)
-	 */
-	private ISelectionChangedListener fSelectionListener;
-	
-	/**
 	 * This paints the entire line in the background color when there's only one bg color used on that line. To make
 	 * things like block comments with a different bg color look more like Textmate.
 	 */
 	private LineBackgroundPainter fFullLineBackgroundPainter;
 
 	/**
-	 * A weak reference to the editor (so that it doesn't have to be passed on all
-	 * methods of this class).
+	 * A weak reference to the editor (so that it doesn't have to be passed on all methods of this class).
 	 */
 	private WeakReference<IThemeableEditor> fEditor;
 
-
-	public ThemeableEditorExtension(IThemeableEditor editor) {
+	public ThemeableEditorExtension(IThemeableEditor editor)
+	{
 		this.fEditor = new WeakReference<IThemeableEditor>(editor);
 	}
 
-	
-	//Public interface (clients are responsible for calling these methods as needed).
-	
+	// Public interface (clients are responsible for calling these methods as needed).
+
 	public void overrideThemeColors()
 	{
 		overrideSelectionColor();
@@ -97,19 +121,18 @@ public class ThemeableEditorExtension {
 		overrideCaretColor();
 		overrideRulerColors();
 	}
-	
-	
-	public void initializeLineNumberRulerColumn(LineNumberRulerColumn rulerColumn) 
+
+	public void initializeLineNumberRulerColumn(LineNumberRulerColumn rulerColumn)
 	{
 		this.fLineColumn = rulerColumn;
 	}
 
-	public void setParent(Composite parent) 
+	public void setParent(Composite parent)
 	{
 		this.fParent = parent;
 	}
 
-	public void handlePreferenceStoreChanged(PropertyChangeEvent event) 
+	public void handlePreferenceStoreChanged(PropertyChangeEvent event)
 	{
 		if (event.getProperty().equals(IThemeManager.THEME_CHANGED))
 		{
@@ -117,31 +140,34 @@ public class ThemeableEditorExtension {
 			overrideThemeColors();
 			editor.getISourceViewer().invalidateTextPresentation();
 		}
-		if (event.getProperty().equals(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE))
+		else if (event.getProperty().equals(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE))
 		{
-			if (fSelectionListener == null)
+			Object newValue = event.getNewValue();
+			if (newValue instanceof Boolean)
 			{
-				overrideSelectionColor();
+				boolean on = (Boolean) newValue;
+				fFullLineBackgroundPainter.setHighlightLineEnabled(on);
 			}
 		}
 	}
 
-	
-	public void createBackgroundPainter(ISourceViewer viewer) 
+	public void createBackgroundPainter(ISourceViewer viewer)
 	{
 		if (fFullLineBackgroundPainter == null)
 		{
 			if (viewer instanceof ITextViewerExtension2)
 			{
+				boolean lineHighlight = Platform.getPreferencesService().getBoolean(EditorsUI.PLUGIN_ID,
+						AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE, true, null);
 				fFullLineBackgroundPainter = new LineBackgroundPainter(viewer);
+				fFullLineBackgroundPainter.setHighlightLineEnabled(lineHighlight);
 				ITextViewerExtension2 extension = (ITextViewerExtension2) viewer;
 				extension.addPainter(fFullLineBackgroundPainter);
 			}
 		}
 	}
 
-
-	public void dispose() 
+	public void dispose()
 	{
 		if (fCaretImage != null)
 		{
@@ -155,22 +181,31 @@ public class ThemeableEditorExtension {
 			fCursor = null;
 		}
 
-		removeLineHighlightListener();
+		fLineColumn = null;
+		fCaretColor = null;
+		if (fEditor != null)
+		{
+			fEditor.clear();
+			fEditor = null;
+		}
+		fParent = null;
+		if (fFullLineBackgroundPainter != null)
+		{
+			fFullLineBackgroundPainter.deactivate(true);
+			fFullLineBackgroundPainter.dispose();
+			fFullLineBackgroundPainter = null;
+		}
 	}
 
-	
-	//Private interface
-	
-	
 	protected IThemeManager getThemeManager()
 	{
 		return ThemePlugin.getDefault().getThemeManager();
 	}
-	
+
 	private void overrideSelectionColor()
 	{
 		IThemeableEditor editor = this.fEditor.get();
-		if(editor == null)
+		if (editor == null)
 		{
 			return;
 		}
@@ -181,67 +216,27 @@ public class ThemeableEditorExtension {
 		}
 
 		// Force selection color
-		sourceViewer.getTextWidget().setSelectionBackground(
-				ThemePlugin.getDefault().getColorManager().getColor(
-						getThemeManager().getCurrentTheme().getSelection()));
+		Color existingSelectionBG = sourceViewer.getTextWidget().getSelectionBackground();
+		RGB selectionRGB = getThemeManager().getCurrentTheme().getSelectionAgainstBG();
+		if (!existingSelectionBG.getRGB().equals(selectionRGB))
+		{
+			sourceViewer.getTextWidget().setSelectionBackground(
+					ThemePlugin.getDefault().getColorManager().getColor(selectionRGB));
+		}
+
 		if (!Platform.getOS().equals(Platform.OS_MACOSX))
 		{
 			// Linux and windows need selection fg set or we just see a block of color.
 			sourceViewer.getTextWidget().setSelectionForeground(
-					ThemePlugin.getDefault().getColorManager().getColor(
-							getThemeManager().getCurrentTheme().getForeground()));
+					ThemePlugin.getDefault().getColorManager()
+							.getColor(getThemeManager().getCurrentTheme().getForeground()));
 		}
-
-		if (fSelectionListener != null)
-			return;
-		final boolean defaultHighlightCurrentLine = Platform.getPreferencesService().getBoolean(EditorsUI.PLUGIN_ID,
-				AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE, false, null);
-		// Don't auto toggle the current line highlight if it's off (so it should remain off)
-		if (!defaultHighlightCurrentLine)
-			return;
-
-		fSelectionListener = new ISelectionChangedListener()
-		{
-
-			@Override
-			public void selectionChanged(SelectionChangedEvent event)
-			{
-				ISelection selection = event.getSelection();
-				if (selection instanceof ITextSelection)
-				{
-					// Auto turn off line highlight when there's a selection > 0
-					ITextSelection textSelection = (ITextSelection) selection;
-					if (textSelection.getLength() > 0)
-					{
-						final boolean defaultHighlightCurrentLine = Platform.getPreferencesService().getBoolean(
-								EditorsUI.PLUGIN_ID,
-								AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE, false, null);
-						if (!defaultHighlightCurrentLine)
-							return;
-					}
-					IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-					prefs.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE, textSelection
-							.getLength() == 0);
-					try
-					{
-						prefs.flush();
-					}
-					catch (BackingStoreException e)
-					{
-						// ignore
-					}
-				}
-			}
-		};
-		ISelectionProvider selectionProvider = editor.getSelectionProvider();
-		selectionProvider.addSelectionChangedListener(fSelectionListener);
 	}
-	
 
 	private void overrideCursor()
 	{
 		IThemeableEditor editor = this.fEditor.get();
-		if(editor == null)
+		if (editor == null)
 		{
 			return;
 		}
@@ -274,7 +269,7 @@ public class ThemeableEditorExtension {
 	private void overrideCaretColor()
 	{
 		IThemeableEditor editor = this.fEditor.get();
-		if(editor == null)
+		if (editor == null)
 		{
 			return;
 		}
@@ -302,7 +297,6 @@ public class ThemeableEditorExtension {
 		if (this.fCaretImage != null && fCaretColor.equals(caretColor))
 			return;
 
-		PaletteData data = new PaletteData(new RGB[] { caretColor });
 		int x = caret.getSize().x;
 		int y = caret.getSize().y;
 		// Apparently the current caret may have invalid sizings
@@ -314,6 +308,16 @@ public class ThemeableEditorExtension {
 		{
 			try
 			{
+				PaletteData data;
+				if (getThemeManager().getCurrentTheme().hasDarkBG())
+				{
+					data = new PaletteData(new RGB[] { caretColor });
+				}
+				else
+				{
+					RGB inverted = new RGB(255 - caretColor.red, 255 - caretColor.green, 255 - caretColor.blue);
+					data = new PaletteData(new RGB[] { inverted });
+				}
 				ImageData iData = new ImageData(x, y, 1, data);
 				caret.setImage(null);
 				if (this.fCaretImage != null)
@@ -333,7 +337,7 @@ public class ThemeableEditorExtension {
 			}
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private void overrideRulerColors()
 	{
@@ -352,25 +356,11 @@ public class ThemeableEditorExtension {
 		}
 	}
 
-	
-	private void removeLineHighlightListener()
-	{
-		IThemeableEditor editor = this.fEditor.get();
-		ISelectionProvider selectionProvider = editor.getSelectionProvider();
-
-		if (selectionProvider != null)
-		{
-			selectionProvider.removeSelectionChangedListener(fSelectionListener);
-		}
-		fSelectionListener = null;
-	}
-
-	
 	private void setCharacterPairColor(RGB rgb)
 	{
 		IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-		prefs.put(IPreferenceConstants.CHARACTER_PAIR_COLOR, MessageFormat.format(
-				"{0},{1},{2}", rgb.red, rgb.green, rgb.blue)); //$NON-NLS-1$
+		prefs.put(IPreferenceConstants.CHARACTER_PAIR_COLOR,
+				MessageFormat.format("{0},{1},{2}", rgb.red, rgb.green, rgb.blue)); //$NON-NLS-1$
 		try
 		{
 			prefs.flush();
@@ -380,6 +370,5 @@ public class ThemeableEditorExtension {
 			CommonEditorPlugin.logError(e);
 		}
 	}
-
 
 }

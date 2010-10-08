@@ -1,58 +1,106 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.parsing.ast;
 
-import com.aptana.editor.js.parsing.lexer.JSTokenType;
+import beaver.Symbol;
 
-public class JSPostUnaryOperatorNode extends JSUnaryOperatorNode
+import com.aptana.editor.js.parsing.lexer.JSTokenType;
+import com.aptana.parsing.ast.IParseNode;
+
+public class JSPostUnaryOperatorNode extends JSNode
 {
+	private Symbol _operator;
+	
 	/**
 	 * JSPostUnaryOperatorNode
 	 * 
 	 * @param operator
-	 * @param start
-	 * @param end
 	 * @param expression
 	 */
-	public JSPostUnaryOperatorNode(String operator, int start, int end, JSNode expression)
+	public JSPostUnaryOperatorNode(Symbol operator, JSNode expression)
 	{
-		super(start, end, expression);
+		this._operator = operator;
+		this.setChildren(new JSNode[] { expression });
 
 		short type = DEFAULT_TYPE;
-		JSTokenType token = JSTokenType.get(operator);
+		JSTokenType token = JSTokenType.get((String) operator.value);
+
 		switch (token)
 		{
 			case MINUS_MINUS:
 				type = JSNodeTypes.POST_DECREMENT;
 				break;
+
 			case PLUS_PLUS:
 				type = JSNodeTypes.POST_INCREMENT;
 				break;
+
+			default:
+				throw new IllegalArgumentException(Messages.JSPostUnaryOperatorNode_0 + token);
 		}
-		setType(type);
+
+		this.setNodeType(type);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSUnaryOperatorNode#toString()
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
 	@Override
-	public String toString()
+	public void accept(JSTreeWalker walker)
 	{
-		StringBuilder text = new StringBuilder();
-		text.append(getChildren()[0]);
-		String operator = ""; //$NON-NLS-1$
-		switch (getNodeType())
-		{
-			case JSNodeTypes.POST_DECREMENT:
-				operator = "--"; //$NON-NLS-1$
-				break;
-			case JSNodeTypes.POST_INCREMENT:
-				operator = "++"; //$NON-NLS-1$
-				break;
-		}
-		text.append(operator);
+		walker.visit(this);
+	}
 
-		this.appendSemicolon(text);
-
-		return text.toString();
+	/**
+	 * getExpression
+	 * 
+	 * @return
+	 */
+	public IParseNode getExpression()
+	{
+		return this.getChild(0);
+	}
+	
+	/**
+	 * getOperator
+	 * 
+	 * @return
+	 */
+	public Symbol getOperator()
+	{
+		return this._operator;
 	}
 }

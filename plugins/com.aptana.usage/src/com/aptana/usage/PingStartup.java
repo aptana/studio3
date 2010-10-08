@@ -37,6 +37,9 @@ package com.aptana.usage;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
@@ -50,6 +53,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Properties;
+import java.util.Scanner;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.zip.GZIPOutputStream;
@@ -76,7 +81,9 @@ public class PingStartup implements IStartup
 	private static final int READ_TIMEOUT = 15 * 60 * 1000; // 15 minutes in milliseconds
 	private static final long TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
-	@Override
+	private static String osName;
+	private static String osVersion;
+
 	public void earlyStartup()
 	{
 		if (Platform.inDevelopmentMode())
@@ -112,15 +119,16 @@ public class PingStartup implements IStartup
 		if (!Platform.getPreferencesService().getBoolean(UsagePlugin.PLUGIN_ID, IPreferenceConstants.P_IDE_HAS_RUN,
 				false, new IScopeContext[] { new ConfigurationScope() }))
 		{
-			add(keyValues, "first_run", Long.toString(System.currentTimeMillis())); //$NON-NLS-1$
+			EventLogger.getInstance().logEvent("first_run"); //$NON-NLS-1$
 		}
 		add(keyValues, "id", getApplicationId()); //$NON-NLS-1$
 		add(keyValues, "version", UsagePlugin.getPluginVersion()); //$NON-NLS-1$
 		add(keyValues, "product", System.getProperty("eclipse.product")); //$NON-NLS-1$ //$NON-NLS-2$
 		add(keyValues, "eclipse_version", System.getProperty("osgi.framework.version")); //$NON-NLS-1$ //$NON-NLS-2$
 		add(keyValues, "os_architecture", System.getProperty("os.arch")); //$NON-NLS-1$ //$NON-NLS-2$
-		add(keyValues, "os_name", System.getProperty("os.name")); //$NON-NLS-1$ //$NON-NLS-2$
-		add(keyValues, "os_version", System.getProperty("os.version")); //$NON-NLS-1$ //$NON-NLS-2$
+		parseOSNameAndVersion();
+		add(keyValues, "os_name", osName); //$NON-NLS-1$
+		add(keyValues, "os_version", osVersion); //$NON-NLS-1$
 		add(keyValues, LogEventTypes.STUDIO_KEY, MACAddress.getMACAddress());
 
 		// adds date/time stamp
@@ -161,7 +169,6 @@ public class PingStartup implements IStartup
 	{
 		String id = Platform.getPreferencesService().getString(UsagePlugin.PLUGIN_ID, IPreferenceConstants.P_IDE_ID,
 				null, null);
-
 		if (id == null)
 		{
 			id = UUID.randomUUID().toString();
@@ -179,6 +186,105 @@ public class PingStartup implements IStartup
 			}
 		}
 		return id;
+	}
+
+	private static void parseOSNameAndVersion()
+	{
+		osName = System.getProperty("os.name"); //$NON-NLS-1$
+		osVersion = System.getProperty("os.version"); //$NON-NLS-1$
+		if (osName.equals("Linux")) //$NON-NLS-1$
+		{
+			// tries to get more precise information for Linux OSes
+			try
+			{
+				File f;
+				if ((f = new File("/etc/lsb-release")).canRead()) //$NON-NLS-1$
+				{
+					// Debian-based distribution; the file has same syntax as Java properties
+					Properties props = new Properties();
+					props.load(new FileInputStream(f));
+					osName = props.getProperty("DISTRIB_ID"); //$NON-NLS-1$
+					osVersion = props.getProperty("DISTRIB_RELEASE"); //$NON-NLS-1$
+				}
+				else if ((f = new File("/etc/redhat-release")).canRead()) //$NON-NLS-1$
+				{
+					// RedHat-based distribution
+					BufferedReader in = null;
+					try
+					{
+						in = new BufferedReader(new FileReader(f));
+						String line = in.readLine();
+						int index = line.indexOf(" release"); //$NON-NLS-1$
+						if (index >= 0)
+						{
+							osName = line.substring(0, index);
+						}
+					}
+					catch (Exception e)
+					{
+					}
+					finally
+					{
+						if (in != null)
+						{
+							try
+							{
+								in.close();
+							}
+							catch (IOException e)
+							{
+								// ignores
+							}
+						}
+					}
+					osVersion = getVersion(f);
+				}
+				else if ((f = new File("/etc/SuSE-release")).canRead()) //$NON-NLS-1$
+				{
+					// SuSE-based distribution
+					BufferedReader in = null;
+					try
+					{
+						in = new BufferedReader(new FileReader(f));
+						osName = in.readLine();
+					}
+					catch (Exception e)
+					{
+					}
+					finally
+					{
+						if (in != null)
+						{
+							try
+							{
+								in.close();
+							}
+							catch (IOException e)
+							{
+								// ignores
+							}
+						}
+					}
+					osVersion = getVersion(f);
+				}
+			}
+			catch (IOException e)
+			{
+			}
+		}
+	}
+
+	private static String getVersion(File f)
+	{
+		try
+		{
+			Scanner sc = new Scanner(f);
+			return sc.findInLine("(\\d)+((\\.)(\\d)+)*"); //$NON-NLS-1$
+		}
+		catch (Exception e)
+		{
+		}
+		return null;
 	}
 
 	private static void add(List<String> list, String key, String value)

@@ -47,12 +47,12 @@ import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
+import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.text.rules.CompositePartitionScanner;
 import com.aptana.editor.common.text.rules.SingleTagRule;
-import com.aptana.theme.IThemeManager;
-import com.aptana.theme.ThemePlugin;
+import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 
 /**
  * @author Max Stepanov
@@ -115,7 +115,6 @@ public abstract class CompositeSourceViewerConfiguration extends CommonSourceVie
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
 	 */
-	@Override
 	public String[][] getTopContentTypes()
 	{
 		return topContentTypesArray;
@@ -134,7 +133,7 @@ public abstract class CompositeSourceViewerConfiguration extends CommonSourceVie
 	{
 		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
 
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getStartEndTokenScanner());
+		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getStartEndTokenScanner());
 		reconciler.setDamager(dr, CompositePartitionScanner.START_SWITCH_TAG);
 		reconciler.setRepairer(dr, CompositePartitionScanner.START_SWITCH_TAG);
 		reconciler.setDamager(dr, CompositePartitionScanner.END_SWITCH_TAG);
@@ -155,7 +154,7 @@ public abstract class CompositeSourceViewerConfiguration extends CommonSourceVie
 		if (startEndTokenScanner == null)
 		{
 			RuleBasedScanner ts = new RuleBasedScanner();
-			IToken seqToken = getThemeManager().getToken(getStartEndTokenType());
+			IToken seqToken = new Token(getStartEndTokenType());
 			List<IRule> rules = new ArrayList<IRule>();
 			for (String[] pair : getPartitionerSwitchStrategy().getSwitchTagPairs())
 			{
@@ -163,14 +162,9 @@ public abstract class CompositeSourceViewerConfiguration extends CommonSourceVie
 				rules.add(new SingleTagRule(pair[1], seqToken));
 			}
 			ts.setRules(rules.toArray(new IRule[rules.size()]));
-			ts.setDefaultReturnToken(getThemeManager().getToken("text")); //$NON-NLS-1$
+			ts.setDefaultReturnToken(new Token("text")); //$NON-NLS-1$
 			startEndTokenScanner = ts;
 		}
 		return startEndTokenScanner;
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return ThemePlugin.getDefault().getThemeManager();
 	}
 }

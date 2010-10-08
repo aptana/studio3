@@ -40,10 +40,8 @@ import java.util.List;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IInputValidator;
@@ -70,7 +68,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.ui.ISharedImages;
@@ -88,12 +85,13 @@ import com.aptana.ide.syncing.core.old.ConnectionPointSyncPair;
 import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
 import com.aptana.ide.syncing.core.old.handlers.SyncEventHandlerAdapter;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
+import com.aptana.ide.syncing.ui.actions.DownloadAction;
+import com.aptana.ide.syncing.ui.actions.UploadAction;
 import com.aptana.ide.syncing.ui.dialogs.SiteConnectionsEditorDialog;
 import com.aptana.ide.syncing.ui.editors.EditorUtils;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
 import com.aptana.ide.syncing.ui.old.views.SmartSyncDialog;
 import com.aptana.ide.ui.io.IOUIPlugin;
-import com.aptana.ide.ui.io.actions.CopyFilesOperation;
 import com.aptana.ui.UIUtils;
 
 /**
@@ -271,11 +269,6 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @seecom.aptana.ide.syncing.ui.views.ConnectionPointComposite.Client#transfer(com.aptana.ide.syncing.ui.views.
-	 * ConnectionPointComposite)
-	 */
 	public void transfer(ConnectionPointComposite source)
 	{
 		if (source == fSource)
@@ -540,13 +533,8 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 
 	private void syncSourceToDestination()
 	{
-
-		ISiteConnection selection = (ISiteConnection) ((IStructuredSelection) fSitesViewer.getSelection())
-				.getFirstElement();
-
-		IConnectionPoint source = selection.getSource();
-		IConnectionPoint dest = selection.getDestination();
-
+		IConnectionPoint source = fSelectedSite.getSource();
+		IConnectionPoint dest = fSelectedSite.getDestination();
 		ConnectionPointSyncPair cpsp = new ConnectionPointSyncPair(source, dest);
 
 		SmartSyncDialog dialog;
@@ -556,13 +544,13 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 			{
 				IFileStore sourceStore = SyncUtils.getFileStore(fSource.getCurrentInput());
 				IFileStore targetStore = SyncUtils.getFileStore(fTarget.getCurrentInput());
-				dialog = new SmartSyncDialog(Display.getDefault().getActiveShell(), source, dest, sourceStore, targetStore,
+				dialog = new SmartSyncDialog(UIUtils.getActiveShell(), source, dest, sourceStore, targetStore,
 						source.getName(), dest.getName());
 			}
 			else
 			{
 				IFileStore[] sourceStores = SyncUtils.getFileStores(focusedConnection.getSelectedElements());
-				dialog = new SmartSyncDialog(Display.getDefault().getActiveShell(), cpsp, sourceStores);
+				dialog = new SmartSyncDialog(UIUtils.getActiveShell(), cpsp, sourceStores);
 			}
 
 			dialog.open();
@@ -572,7 +560,7 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 				{
 					IOUIPlugin.refreshNavigatorView(fSource.getCurrentInput());
 					IOUIPlugin.refreshNavigatorView(fTarget.getCurrentInput());
-					Display.getDefault().asyncExec(new Runnable()
+					UIUtils.getDisplay().asyncExec(new Runnable()
 					{
 
 						public void run()
@@ -586,84 +574,71 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 		}
 		catch (CoreException e)
 		{
-			ErrorDialog
-					.openError(
-							Display.getDefault().getActiveShell(),
-							"Error opening Synchronize dialog",
-							"Unable to open synchronize dialog. It appears either the source or destination endpoint is invalid",
-							e.getStatus());
+			ErrorDialog.openError(UIUtils.getActiveShell(), Messages.FTPManagerComposite_SyncErrorDialog_Title,
+					Messages.FTPManagerComposite_SyncErrorDialog_Message, e.getStatus());
 		}
 	}
 
 	private void transferSourceToDestination()
 	{
-		transferItems(fSource.getSelectedElements(), fSource.getCurrentInput(), fTarget.getCurrentInput(),
-				new JobChangeAdapter()
+		UploadAction action = new UploadAction();
+		action.setActivePart(null, UIUtils.getActivePart());
+		action.setSelectedSite(fSelectedSite);
+		action.setSelection(new StructuredSelection(fSource.getSelectedElements()));
+		action.setSourceRoot(SyncUtils.getFileStore(fSource.getCurrentInput()));
+		action.setDestinationRoot(SyncUtils.getFileStore(fTarget.getCurrentInput()));
+		action.addJobListener(new JobChangeAdapter()
+		{
+
+			@Override
+			public void done(IJobChangeEvent event)
+			{
+				if (event.getResult() == Status.CANCEL_STATUS)
+				{
+					return;
+				}
+				UIUtils.getDisplay().asyncExec(new Runnable()
 				{
 
-					@Override
-					public void done(IJobChangeEvent event)
+					public void run()
 					{
-						if (event.getResult() == Status.CANCEL_STATUS)
-						{
-							return;
-						}
-						IOUIPlugin.refreshNavigatorView(fTarget.getCurrentInput());
-						UIUtils.getDisplay().asyncExec(new Runnable()
-						{
-
-							public void run()
-							{
-								fTarget.refresh();
-							}
-						});
+						fTarget.refresh();
 					}
 				});
+			}
+		});
+		action.run(null);
 	}
 
 	private void transferDestinationToSource()
 	{
-		transferItems(fTarget.getSelectedElements(), fTarget.getCurrentInput(), fSource.getCurrentInput(),
-				new JobChangeAdapter()
+		DownloadAction action = new DownloadAction();
+		action.setActivePart(null, UIUtils.getActivePart());
+		action.setSelectedSite(fSelectedSite);
+		action.setSelection(new StructuredSelection(fTarget.getSelectedElements()), false);
+		action.setSourceRoot(SyncUtils.getFileStore(fSource.getCurrentInput()));
+		action.setDestinationRoot(SyncUtils.getFileStore(fTarget.getCurrentInput()));
+		action.addJobListener(new JobChangeAdapter()
+		{
+
+			@Override
+			public void done(IJobChangeEvent event)
+			{
+				if (event.getResult() == Status.CANCEL_STATUS)
+				{
+					return;
+				}
+				UIUtils.getDisplay().asyncExec(new Runnable()
 				{
 
-					@Override
-					public void done(IJobChangeEvent event)
+					public void run()
 					{
-						if (event.getResult() == Status.CANCEL_STATUS)
-						{
-							return;
-						}
-						IOUIPlugin.refreshNavigatorView(fSource.getCurrentInput());
-						UIUtils.getDisplay().asyncExec(new Runnable()
-						{
-
-							public void run()
-							{
-								fSource.refresh();
-							}
-						});
+						fSource.refresh();
 					}
 				});
-	}
-
-	private void transferItems(IAdaptable[] sourceItems, IAdaptable sourceRoot, IAdaptable targetRoot,
-			IJobChangeListener listener)
-	{
-		IFileStore targetRootStore = SyncUtils.getFileStore(targetRoot);
-		if (targetRootStore != null)
-		{
-			CopyFilesOperation operation = new CopyFilesOperation(getControl().getShell());
-			IFileStore sourceRootStore = SyncUtils.getFileStore(sourceRoot);
-			if (sourceRootStore == null)
-			{
-				operation.copyFiles(sourceItems, targetRootStore, listener);
 			}
-			else
-			{
-				operation.copyFiles(sourceItems, sourceRootStore, targetRootStore, listener);
-			}
-		}
+		});
+		action.run(null);
 	}
 
 	private void fireSiteConnectionChanged(ISiteConnection site)

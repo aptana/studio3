@@ -1,3 +1,33 @@
+/*******************************************************************************
+ * JNotify - Allow java applications to register to File system events.
+ * 
+ * Copyright (C) 2005 - Content Objects
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * 
+ ******************************************************************************
+ *
+ * Content Objects, Inc., hereby disclaims all copyright interest in the
+ * library `JNotify' (a Java library for file system events). 
+ * 
+ * Yahali Sherman, 21 November 2005
+ *    Content Objects, VP R&D.
+ *    
+ ******************************************************************************
+ * Author : Omry Yadan
+ ******************************************************************************/
 package net.contentobjects.jnotify.macosx;
 
 import java.io.File;
@@ -247,7 +277,7 @@ public class JNotifyAdapterMacOSX implements IJNotify
 		private void scan(File root, boolean recursive, JNEvents events)
 		{
 			File[] files = root.listFiles();
-			Set<Map.Entry<String, JNFile>> existingfiles = jnfiles.tailMap(root.getAbsolutePath(), false).entrySet();
+			Set<Map.Entry<String, JNFile>> existingfiles = jnfiles.tailMap(root.getAbsolutePath() + "\0").entrySet();
 			TreeSet<String> stillAlive = null;
 			String rootPath = root.getAbsolutePath();
 
@@ -274,7 +304,17 @@ public class JNotifyAdapterMacOSX implements IJNotify
 					{
 						JNFile jnf = new JNFile(files[i]);
 						// check if this inode is already known
-						Map.Entry<JNFile, TreeSet<String>> oldEntry = paths.floorEntry(jnf);
+						Iterator<Map.Entry<JNFile, TreeSet<String>>> iter = paths.entrySet().iterator();
+						Map.Entry<JNFile, TreeSet<String>> oldEntry = null, currentEntry;
+						while (iter.hasNext())
+						{
+							currentEntry = iter.next();
+							if (currentEntry.getKey().compareTo(jnf) > 0)
+							{
+								break;
+							}
+							oldEntry = currentEntry;
+						}
 						TreeSet<String> plist;
 						if (oldEntry == null || !jnf.equals(oldEntry.getKey()))
 						{
@@ -540,17 +580,21 @@ public class JNotifyAdapterMacOSX implements IJNotify
 
 					// a deleted file and a created file have the same inode
 					// merge into a rename event
-					String newpath = created.getValue().pollFirst();
-					String oldpath = deleted.getValue().pollFirst();
+					TreeSet<String> createdValue = created.getValue();
+					String newpath = createdValue.first();
+					createdValue.remove(newpath);
+					TreeSet<String> deletedValue = deleted.getValue();
+					String oldpath = deletedValue.first();
+					deletedValue.remove(oldpath);
 					e.renamed.put(oldpath, newpath);
 
 					// this inode is no longer associated with anything
-					if (created.getValue().size() == 0)
+					if (createdValue.size() == 0)
 					{
 						createdIt.remove();
 						created = null;
 					}
-					if (deleted.getValue().size() == 0)
+					if (deletedValue.size() == 0)
 					{
 						deletedIt.remove();
 						deleted = null;

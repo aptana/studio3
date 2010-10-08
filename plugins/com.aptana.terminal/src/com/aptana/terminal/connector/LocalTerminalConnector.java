@@ -170,7 +170,6 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 	/* (non-Javadoc)
 	 * @see com.aptana.terminal.internal.IProcessListener#processCompleted()
 	 */
-	@Override
 	public void processCompleted() {
 		fControl.setState(TerminalState.CLOSED);
 		if (streamsProxy != null) {
@@ -262,7 +261,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(activeProjeectName);
 			if (project != null) {
 				IPath location = project.getLocation();
-				if (location != null) {
+				if (location != null && location.toFile().isDirectory()) {
 					return location;
 				}
 			}
@@ -280,7 +279,6 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 	/* (non-Javadoc)
 	 * @see com.aptana.terminal.connector.IOutputFilter#filterOutput(char[])
 	 */
-	@Override
 	public char[] filterOutput(char[] output) {
 		StringBuffer result = new StringBuffer(output.length);
 		boolean filtering = filteredSequence.length() != 0;

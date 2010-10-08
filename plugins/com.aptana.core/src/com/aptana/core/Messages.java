@@ -59,6 +59,7 @@ public final class Messages extends NLS
 	public static String CoreStrings_Browse;
 	public static String CoreStrings_Delete;
 	public static String CoreStrings_Edit;
+	public static String CoreStrings_Error;
 	public static String CoreStrings_New;
 	public static String CoreStrings_Open;
 	public static String CoreStrings_Properties;

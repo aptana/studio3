@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?mso-infoPathSolution PIVersion="1.0.0.0" language="en-us" href="http://www.aptana.com/forms/outline.xsn" name="urn:schemas-microsoft-com:office:infopath:outline:" productVersion="11.0.6357" solutionVersion="1.0.0.105" ?>
-<?mso-application progid="InfoPath.Document"?>
-<javascript xmlns:xsd = "http://www.w3.org/2001/XMLSchema" xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance">
+<javascript>
     
 	<class type = "AbstractView" superclass = "Object" visibility = "basic">
         <description>Base interface that all views derive from.</description>
@@ -65,7 +63,7 @@
                 <browsers>
                     <browser platform = "Mozilla" version = "1.0+"/>
                     <browser platform = "Netscape" version = "6.0+"/>
-					<browser platform = "Opera" version = "8.0+" />
+					          <browser platform = "Opera" version = "8.0+" />
                 </browsers>
 				<example>
 					&lt;p&gt;For examples, see the quirksmode test page:&lt;/p&gt;
@@ -1888,7 +1886,7 @@
                 <description>Specifies the color of active links.</description>
             </property>
             
-			<property name = "anchors" type = "Array" scope = "instance" access = "read" visibility = "basic">
+			<property name = "anchors" type = "Anchor[]" scope = "instance" access = "read" visibility = "basic">
                 <availability>
                     <specification name = "HTML DOM Level 1"/>
                 </availability>
@@ -20266,4 +20264,456 @@
 			
         </properties>
     </class>
+    <class type="HTMLBRElement" superclass="HTMLElement">
+    <description>Force a line break.</description>
+    <browsers>
+      <browser platform="IE" version="2.0+"/>
+      <browser platform="Netscape" version="1.0+"/>
+      <browser platform="Mozilla" version="1.0+"/>
+      <browser platform="Opera" version="4.0+"/>
+      <browser platform="Chrome" version="5.0+"/>
+      <browser platform="Safari" version="1.0+"/>
+    </browsers>
+      <constructors>
+        <constructor scope="instance" visibility="internal">
+          <description>Creates an instance of the HTMLBRElement.</description>
+          <parameters/>
+          <exceptions/>
+          <return-types>
+            <return-type type="HTMLBRElement"/>
+          </return-types>
+        </constructor>
+      </constructors>    
+    <properties>
+      <property name="clear" type="String" scope="instance" access="read-write" visibility="basic">
+        <description>Control flow of text around floats.</description>
+        <browsers>
+          <browser platform="IE" version="2.0+"/>
+          <browser platform="Netscape" version="1.0+"/>
+          <browser platform="Mozilla" version="1.0+"/>
+          <browser platform="Opera" version="4.0+"/>
+          <browser platform="Chrome" version="5.0+"/>
+          <browser platform="Safari" version="1.0+"/>
+        </browsers>
+        <availability>
+          <specification name="W3C" version="HTML DOM Level 2"/>
+        </availability>
+      </property>
+    </properties>
+    <references>
+      <reference name="HTMLBRElement"/>
+    </references>
+    <availability>
+      <specification name = "HTML DOM Level 2"/>
+      <specification name = "W3C" version="HTML DOM Level 2"/>
+    </availability>
+  </class>
+  <class type="HTMLDivElement" superclass="HTMLElement">
+    <description>Generic block container.</description>
+    <browsers>
+      <browser platform="IE" version="2.0+"/>
+      <browser platform="Netscape" version="2.0+"/>
+      <browser platform="Mozilla" version="1.0+"/>
+      <browser platform="Opera" version="4.0+"/>
+      <browser platform="Chrome" version="5.0+"/>
+      <browser platform="Safari" version="1.0+"/>
+    </browsers>
+      <constructors>
+        <constructor scope="instance" visibility="internal">
+          <description>Creates an instance of the HTMLDivElement.</description>
+          <parameters/>
+          <exceptions/>
+          <return-types>
+            <return-type type="HTMLDivElement"/>
+          </return-types>
+        </constructor>
+      </constructors>    
+    <properties>
+      <property name="align" type="String" scope="instance" access="read-write" visibility="basic">
+        <description>Horizontal text alignment.</description>
+        <browsers>
+          <browser platform="IE" version="2.0+"/>
+          <browser platform="Netscape" version="2.0+"/>
+          <browser platform="Mozilla" version="1.0+"/>
+          <browser platform="Opera" version="4.0+"/>
+          <browser platform="Chrome" version="5.0+"/>
+          <browser platform="Safari" version="1.0+"/>
+        </browsers>
+        <availability>
+          <specification name="W3C" version="HTML DOM Level 2"/>
+        </availability>
+      </property>
+    </properties>
+    <references>
+      <reference name="HTMLDivElement"/>
+    </references>
+    <availability>
+      <specification name = "HTML DOM Level 2"/>
+      <specification name = "W3C" version="HTML DOM Level 2"/>
+    </availability>
+  </class>
+  <class type="HTMLDListElement" superclass="HTMLElement">
+    <description>Definition List.</description>
+    <browsers>
+      <browser platform="IE" version="2.0+"/>
+      <browser platform="Netscape" version="1.0+"/>
+      <browser platform="Mozilla" version="1.0+"/>
+      <browser platform="Opera" version="4.0+"/>
+      <browser platform="Chrome" version="5.0+"/>
+      <browser platform="Safari" version="1.0+"/>
+    </browsers>
+      <constructors>
+        <constructor scope="instance" visibility="internal">
+          <description>Creates an instance of the HTMLDListElement.</description>
+          <parameters/>
+          <exceptions/>
+          <return-types>
+            <return-type type="HTMLDListElement"/>
+          </return-types>
+        </constructor>
+      </constructors>    
+    <properties>
+      <property name="compact" type="String" scope="instance" access="read-write" visibility="basic">
+        <description>Reduce spacing between list items.</description>
+        <browsers>
+          <browser platform="IE" version="2.0+"/>
+          <browser platform="Netscape" version="1.0+"/>
+          <browser platform="Mozilla" version="1.0+"/>
+          <browser platform="Opera" version="4.0+"/>
+          <browser platform="Chrome" version="5.0+"/>
+          <browser platform="Safari" version="1.0+"/>
+        </browsers>
+        <availability>
+          <specification name="W3C" version="HTML DOM Level 2"/>
+        </availability>
+      </property>
+    </properties>
+    <references>
+      <reference name="HTMLDListElement"/>
+    </references>
+    <availability>
+      <specification name = "HTML DOM Level 2"/>
+      <specification name = "W3C" version="HTML DOM Level 2"/>
+    </availability>
+  </class>
+  <class type="HTMLHeadingElement" superclass="HTMLElement">
+    <description>For the H1 to H6 elements.</description>
+    <browsers>
+      <browser platform="IE" version="2.0+"/>
+      <browser platform="Netscape" version="1.0+"/>
+      <browser platform="Mozilla" version="1.0+"/>
+      <browser platform="Opera" version="4.0+"/>
+      <browser platform="Chrome" version="5.0+"/>
+      <browser platform="Safari" version="1.0+"/>
+    </browsers>
+      <constructors>
+        <constructor scope="instance" visibility="internal">
+          <description>Creates an instance of the HTMLHeadingElement.</description>
+          <parameters/>
+          <exceptions/>
+          <return-types>
+            <return-type type="HTMLHeadingElement"/>
+          </return-types>
+        </constructor>
+      </constructors>    
+    <properties>
+      <property name="align" type="String" scope="instance" access="read-write" visibility="basic">
+        <description>Horizontal text alignment.</description>
+        <browsers>
+          <browser platform="IE" version="2.0+"/>
+          <browser platform="Netscape" version="1.0+"/>
+          <browser platform="Mozilla" version="1.0+"/>
+          <browser platform="Opera" version="4.0+"/>
+          <browser platform="Chrome" version="5.0+"/>
+          <browser platform="Safari" version="1.0+"/>
+        </browsers>
+        <availability>
+          <specification name="W3C" version="HTML DOM Level 2"/>
+        </availability>
+      </property>
+    </properties>
+    <references>
+      <reference name="HTMLHeadingElement"/>
+    </references>
+    <availability>
+      <specification name = "HTML DOM Level 2"/>
+      <specification name = "W3C" version="HTML DOM Level 2"/>
+    </availability>
+  </class>
+  <class type="HTMLHRElement" superclass="HTMLElement">
+    <description>Create a horizontal rule.</description>
+    <browsers>
+      <browser platform="IE" version="2.0+"/>
+      <browser platform="Netscape" version="1.0+"/>
+      <browser platform="Mozilla" version="1.0+"/>
+      <browser platform="Opera" version="4.0+"/>
+      <browser platform="Chrome" version="5.0+"/>
+      <browser platform="Safari" version="1.0+"/>
+    </browsers>
+      <constructors>
+        <constructor scope="instance" visibility="internal">
+          <description>Creates an instance of the HTMLHRElement.</description>
+          <parameters/>
+          <exceptions/>
+          <return-types>
+            <return-type type="HTMLHRElement"/>
+          </return-types>
+        </constructor>
+      </constructors>    
+    <properties>
+      <property name="align" type="String" scope="instance" access="read-write" visibility="basic">
+        <description>Align the rule on the page.</description>
+        <browsers>
+          <browser platform="IE" version="2.0+"/>
+          <browser platform="Netscape" version="1.0+"/>
+          <browser platform="Mozilla" version="1.0+"/>
+          <browser platform="Opera" version="4.0+"/>
+          <browser platform="Chrome" version="5.0+"/>
+          <browser platform="Safari" version="1.0+"/>
+        </browsers>
+        <availability>
+          <specification name="W3C" version="HTML DOM Level 2"/>
+        </availability>
+      </property>
+      <property name="noShade" type="Boolean" scope="instance" access="read-write" visibility="basic">
+        <description>Indicates to the user agent that there should be no shading in the rendering of this element.</description>
+        <browsers>
+          <browser platform="IE" version="2.0+"/>
+          <browser platform="Netscape" version="1.0+"/>
+          <browser platform="Mozilla" version="1.0+"/>
+          <browser platform="Opera" version="4.0+"/>
+          <browser platform="Chrome" version="5.0+"/>
+          <browser platform="Safari" version="1.0+"/>
+        </browsers>
+        <availability>
+          <specification name="W3C" version="HTML DOM Level 2"/>
+        </availability>
+      </property>
+      <property name="size" type="String" scope="instance" access="read-write" visibility="basic">
+        <description>The height of the rule.</description>
+        <browsers>
+          <browser platform="IE" version="2.0+"/>
+          <browser platform="Netscape" version="1.0+"/>
+          <browser platform="Mozilla" version="1.0+"/>
+          <browser platform="Opera" version="4.0+"/>
+          <browser platform="Chrome" version="5.0+"/>
+          <browser platform="Safari" version="1.0+"/>
+        </browsers>
+        <availability>
+          <specification name="W3C" version="HTML DOM Level 2"/>
+        </availability>
+      </property>
+      <property name="width" type="String" scope="instance" access="read-write" visibility="basic">
+        <description>The width of the rule.</description>
+        <browsers>
+          <browser platform="IE" version="2.0+"/>
+          <browser platform="Netscape" version="1.0+"/>
+          <browser platform="Mozilla" version="1.0+"/>
+          <browser platform="Opera" version="4.0+"/>
+          <browser platform="Chrome" version="5.0+"/>
+          <browser platform="Safari" version="1.0+"/>
+        </browsers>
+        <availability>
+          <specification name="W3C" version="HTML DOM Level 2"/>
+        </availability>
+      </property>
+    </properties>
+    <references>
+      <reference name="HTMLHRElement"/>
+    </references>
+    <availability>
+      <specification name = "HTML DOM Level 2"/>
+      <specification name = "W3C" version="HTML DOM Level 2"/>
+    </availability>
+  </class>
+  <class type="HTMLhtmlElement" superclass="HTMLElement">
+    <description>Root of an HTML document.</description>
+    <browsers>
+      <browser platform="IE" version="2.0+"/>
+      <browser platform="Netscape" version="1.0+"/>
+      <browser platform="Mozilla" version="1.0+"/>
+      <browser platform="Opera" version="4.0+"/>
+      <browser platform="Chrome" version="5.0+"/>
+      <browser platform="Safari" version="1.0+"/>
+    </browsers>
+      <constructors>
+        <constructor scope="instance" visibility="internal">
+          <description>Creates an instance of the HTMLhtmlElement.</description>
+          <parameters/>
+          <exceptions/>
+          <return-types>
+            <return-type type="HTMLhtmlElement"/>
+          </return-types>
+        </constructor>
+      </constructors>    
+    <properties>
+      <property name="version" type="String" scope="instance" access="read-write" visibility="basic">
+        <description><![CDATA[ Version information about the document's DTD.]]></description>
+        <browsers>
+          <browser platform="IE" version="2.0+"/>
+          <browser platform="Netscape" version="1.0+"/>
+          <browser platform="Mozilla" version="1.0+"/>
+          <browser platform="Opera" version="4.0+"/>
+          <browser platform="Chrome" version="5.0+"/>
+          <browser platform="Safari" version="1.0+"/>
+        </browsers>
+        <availability>
+          <specification name="W3C" version="HTML DOM Level 2"/>
+        </availability>
+      </property>
+    </properties>
+    <references>
+      <reference name="HTMLhtmlElement"/>
+    </references>
+    <availability>
+      <specification name = "HTML DOM Level 2"/>
+      <specification name = "W3C" version="HTML DOM Level 2"/>
+    </availability>
+  </class>
+  <class type="HTMLParagraphElement" superclass="HTMLElement">
+    <description>Specifies an element for paragraphs.</description>
+    <browsers>
+      <browser platform="IE" version="2.0+"/>
+      <browser platform="Netscape" version="1.0+"/>
+      <browser platform="Mozilla" version="1.0+"/>
+      <browser platform="Opera" version="4.0+"/>
+      <browser platform="Chrome" version="5.0+"/>
+      <browser platform="Safari" version="1.0+"/>
+    </browsers>
+      <constructors>
+        <constructor scope="instance" visibility="internal">
+          <description>Creates an instance of the HTMLParagraphElement.</description>
+          <parameters/>
+          <exceptions/>
+          <return-types>
+            <return-type type="HTMLParagraphElement"/>
+          </return-types>
+        </constructor>
+      </constructors>    
+    <properties>
+      <property name="align" type="String" scope="instance" access="read-write" visibility="basic">
+        <description>Horizontal line alignment.</description>
+        <browsers>
+          <browser platform="IE" version="2.0+"/>
+          <browser platform="Netscape" version="1.0+"/>
+          <browser platform="Mozilla" version="1.0+"/>
+          <browser platform="Opera" version="4.0+"/>
+          <browser platform="Chrome" version="5.0+"/>
+          <browser platform="Safari" version="1.0+"/>
+        </browsers>
+        <availability>
+          <specification name="W3C" version="HTML DOM Level 2"/>
+        </availability>
+      </property>
+    </properties>
+    <references>
+      <reference name="HTMLParagraphElement"/>
+    </references>
+    <availability>
+      <specification name = "HTML DOM Level 2"/>
+      <specification name = "W3C" version="HTML DOM Level 2"/>
+    </availability>
+  </class>
+  <class type="HTMLPreElement" superclass="HTMLElement">
+    <description>Preformatted text.</description>
+    <browsers>
+      <browser platform="IE" version="2.0+"/>
+      <browser platform="Netscape" version="1.0+"/>
+      <browser platform="Mozilla" version="1.0+"/>
+      <browser platform="Opera" version="4.0+"/>
+      <browser platform="Chrome" version="5.0+"/>
+      <browser platform="Safari" version="1.0+"/>
+    </browsers>
+      <constructors>
+        <constructor scope="instance" visibility="internal">
+          <description>Creates an instance of the HTMLPreElement.</description>
+          <parameters/>
+          <exceptions/>
+          <return-types>
+            <return-type type="HTMLPreElement"/>
+          </return-types>
+        </constructor>
+      </constructors>    
+    <properties>
+      <property name="width" type="Number" scope="instance" access="read-write" visibility="basic">
+        <description>Fixed width for content.</description>
+        <browsers>
+          <browser platform="IE" version="2.0+"/>
+          <browser platform="Netscape" version="1.0+"/>
+          <browser platform="Mozilla" version="1.0+"/>
+          <browser platform="Opera" version="4.0+"/>
+          <browser platform="Chrome" version="5.0+"/>
+          <browser platform="Safari" version="1.0+"/>
+        </browsers>
+        <availability>
+          <specification name="W3C" version="HTML DOM Level 2"/>
+        </availability>
+      </property>
+    </properties>
+    <references>
+      <reference name="HTMLPreElement"/>
+    </references>
+    <availability>
+      <specification name = "HTML DOM Level 2"/>
+      <specification name = "W3C" version="HTML DOM Level 2"/>
+    </availability>
+  </class>
+  <class type="HTMLUListElement" superclass="HTMLElement">
+    <description>Represents a list of items, where the order of the items is not important.</description>
+    <browsers>
+      <browser platform="IE" version="2.0+"/>
+      <browser platform="Netscape" version="1.0+"/>
+      <browser platform="Mozilla" version="1.0+"/>
+      <browser platform="Opera" version="4.0+"/>
+      <browser platform="Chrome" version="5.0+"/>
+      <browser platform="Safari" version="1.0+"/>
+    </browsers>
+      <constructors>
+        <constructor scope="instance" visibility="internal">
+          <description>Creates an instance of the HTMLUListElement.</description>
+          <parameters/>
+          <exceptions/>
+          <return-types>
+            <return-type type="HTMLUListElement"/>
+          </return-types>
+        </constructor>
+      </constructors>    
+    <properties>
+      <property name="compact" type="Boolean" scope="instance" access="read-write" visibility="basic">
+        <description>Reduce spacing between list items.</description>
+        <browsers>
+          <browser platform="IE" version="2.0+"/>
+          <browser platform="Netscape" version="1.0+"/>
+          <browser platform="Mozilla" version="1.0+"/>
+          <browser platform="Opera" version="4.0+"/>
+          <browser platform="Chrome" version="5.0+"/>
+          <browser platform="Safari" version="1.0+"/>
+        </browsers>
+        <availability>
+          <specification name="W3C" version="HTML DOM Level 2"/>
+        </availability>
+      </property>
+      <property name="type" type="String" scope="instance" access="read-write" visibility="basic">
+        <description>The style of the list.</description>
+        <browsers>
+          <browser platform="IE" version="2.0+"/>
+          <browser platform="Netscape" version="1.0+"/>
+          <browser platform="Mozilla" version="1.0+"/>
+          <browser platform="Opera" version="4.0+"/>
+          <browser platform="Chrome" version="5.0+"/>
+          <browser platform="Safari" version="1.0+"/>
+        </browsers>
+        <availability>
+          <specification name="W3C" version="HTML DOM Level 2"/>
+        </availability>
+      </property>
+    </properties>
+    <references>
+      <reference name="HTMLUListElement"/>
+    </references>
+    <availability>
+      <specification name = "HTML DOM Level 2"/>
+      <specification name = "W3C" version="HTML DOM Level 2"/>
+    </availability>
+  </class>
 </javascript>

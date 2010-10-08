@@ -6227,6 +6227,90 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </references>
       <remarks>Limited support for &amp;lt;marquee&amp;gt;&amp;lt;/marquee&amp;gt; in non-Netscape browsers. Avoid using if possible.</remarks>
     </element>
+    <element name="math">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <browser platform="IE" version="9.0+"/>
+        <browser platform="Mozilla" version="3.0+"/>
+        <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
+        <browser platform="Safari" version="1.0+"/>
+      </browsers>
+      <description>Embedded Math markup language content.</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onloadstart"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+    </element>
     <element name="menu" related-class="HTMLMenuElement" display-name="Menu">
       <attribute-refs>
         <attribute-ref name="accesskey"/>
@@ -6849,6 +6933,8 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <attribute-ref name="id"/>
         <attribute-ref name="lang"/>
         <attribute-ref name="language"/>
+        <attribute-ref name="reversed"/>
+        <attribute-ref name="start"/>
         <attribute-ref name="style"/>
         <attribute-ref name="tabindex"/>
         <attribute-ref name="title"/>
@@ -9000,6 +9086,90 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </references>
       <remarks>Use the &amp;lt;sup&amp;gt;&amp;lt;/sup&amp;gt; tag for things like showing exponents.</remarks>
     </element>
+    <element name="svg">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <browser platform="IE" version="9.0+"/>
+        <browser platform="Mozilla" version="3.0+"/>
+        <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
+        <browser platform="Safari" version="1.0+"/>
+      </browsers>
+      <description>Embedded Scalabale Vector Graphics content.</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onloadstart"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+    </element>
     <element name="table" related-class="HTMLTableElement" display-name="Table">
       <attribute-refs>
         <attribute-ref name="accesskey"/>
@@ -10793,7 +10963,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="top" description="Aligns the element at the top of the container element."/>
       </values>
     </attribute>
-    <attribute name="alink" type="String">
+    <attribute name="alink" type="String" element="body">
       <browsers>
         <browser platform="IE" version="4.0+"/>
         <browser platform="Netscape"/>
@@ -10914,7 +11084,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <description>Specifies the URL for the background image for the document or element.</description>
       <hint>[url]. Example values: "../images/blue-background.gif", etc.</hint>
     </attribute>
-    <attribute name="balance" type="Number">
+    <attribute name="balance" type="Number" element="bgsound">
       <browsers>
         <browser platform="None"/>
       </browsers>
@@ -10954,7 +11124,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <description>Specifies the background color for the document or element. Specify either a color name or RGB color.</description>
       <hint>[color | "transparent"]. Example values: Red, #FF0000 (#RRGGBB color code for "red"), etc.</hint>
     </attribute>
-    <attribute name="bgproperties" type="String">
+    <attribute name="bgproperties" type="String" element="body">
       <browsers>
         <browser platform="IE" version="4.0+"/>
         <browser platform="Chrome" version="5.0+"/>
@@ -11001,7 +11171,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <description>Specifies the lighter color of the border of the element, if the element has a 3D effect. Specify either a color name or RGB color code.</description>
       <hint>[color | "transparent"]. Example values: Red, #FF0000 (#RRGGBB color code for "red"), etc.</hint>
     </attribute>
-    <attribute name="bottommargin" type="String">
+    <attribute name="bottommargin" type="String" element="body">
       <browsers>
         <browser platform="IE" version="4.0+"/>
       </browsers>
@@ -11092,6 +11262,31 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <values>
         <value name="*" description="Specify a character set not on this list."/>
         <value name="ISO-8859-1" description="Default value for charset."/>
+        <value name="UTF-8" description="Preferred value for charset."/>
+        <value name="Shift_JIS" description="Japanese language charset."/>
+        <value name="HZ-GB-2312" description="Simplified Chinese charset."/>
+        <value name="ISO-8859-2" description="Latin alphabet part 2 Eastern Europe."/>
+        <value name="ISO-8859-3" description="Latin alphabet part 3 SE Europe, Esperanto, miscellaneous others."/>
+        <value name="ISO-8859-4" description="Latin alphabet part 4 Scandinavia/Baltics (and others not in ISO-8859-1)."/>
+        <value name="ISO-8859-5" description="Latin/Cyrillic part 5 The languages that are using a Cyrillic alphabet such as Bulgarian, Belarusian, Russian and Macedonian."/>
+        <value name="ISO-8859-6" description="Latin/Arabic part 6 The languages that are using the Arabic alphabet."/>
+        <value name="ISO-8859-7" description="Latin/Greek part 7  The modern Greek language as well as mathematical symbols derived from the Greek."/>
+        <value name="ISO-8859-8" description="Latin/Hebrew part 8 The languages that are using the Hebrew alphabet."/>
+        <value name="ISO-8859-9" description="Latin 5 part 9  The Turkish language. Same as ISO-8859-1 except Turkish characters replace Icelandic ones."/>
+        <value name="ISO-8859-10" description="Latin 6 Lappish, Nordic, Eskimo The Nordic languages."/>
+        <value name="ISO-8859-15" description="Latin 9 (aka Latin 0) Similar to ISO 8859-1 but replaces some less common symbols with the euro sign and some other missing characters."/>
+        <value name="ISO-2022-JP" description="Latin/Japanese part 1 The Japanese language."/>
+        <value name="ISO-2022-JP-2" description="Latin/Japanese part 2 The Japanese language."/>
+        <value name="ISO-2022-KR" description="Latin/Korean part 1 The Korean language."/>
+        <value name="cp1250" description="Central European languages that use Latin script, (Polish, Czech, Slovak, Hungarian, Slovene, Serbian, Croatian, Romanian and Albanian)."/>
+        <value name="cp1251" description="Cyrillic alphabets."/>
+        <value name="cp1252" description="Western languages."/>
+        <value name="cp1253" description="Greek."/>
+        <value name="cp1254" description="Turkish."/>
+        <value name="cp1255" description="Hebrew."/>
+        <value name="cp1256" description="Arabic."/>
+        <value name="cp1257" description="Baltic languages."/>
+        <value name="cp1258" description="Vietnamese."/>
       </values>
     </attribute>
     <attribute name="checked" type="String">
@@ -11141,7 +11336,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <description>CSS class assigned to the element.</description>
       <hint>[class-name]. Example values: header-class, list-element, etc.</hint>
     </attribute>
-    <attribute name="clear" type="String">
+    <attribute name="clear" type="String" element="br">
       <availability>
         <specification name="W3C" version="HTML 4.01"/>
       </availability>
@@ -11277,6 +11472,30 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="text/html" description="HTML document."/>
         <value name="text/html; charset=iso-8859-1" description="HTML document with ISO-8859-1 character set."/>
         <value name="text/html; charset=UTF-8" description="HTML document with UTF-8 character set."/>
+        <value name="text/html; charset=Shift_JIS" description="Japanese language charset."/>
+        <value name="text/html; charset=HZ-GB-2312" description="Simplified Chinese charset."/>
+        <value name="text/html; charset=ISO-8859-2" description="Latin alphabet part 2 Eastern Europe."/>
+        <value name="text/html; charset=ISO-8859-3" description="Latin alphabet part 3 SE Europe, Esperanto, miscellaneous others."/>
+        <value name="text/html; charset=ISO-8859-4" description="Latin alphabet part 4 Scandinavia/Baltics (and others not in ISO-8859-1)."/>
+        <value name="text/html; charset=ISO-8859-5" description="Latin/Cyrillic part 5 The languages that are using a Cyrillic alphabet such as Bulgarian, Belarusian, Russian and Macedonian."/>
+        <value name="text/html; charset=ISO-8859-6" description="Latin/Arabic part 6 The languages that are using the Arabic alphabet."/>
+        <value name="text/html; charset=ISO-8859-7" description="Latin/Greek part 7  The modern Greek language as well as mathematical symbols derived from the Greek."/>
+        <value name="text/html; charset=ISO-8859-8" description="Latin/Hebrew part 8 The languages that are using the Hebrew alphabet."/>
+        <value name="text/html; charset=ISO-8859-9" description="Latin 5 part 9  The Turkish language. Same as ISO-8859-1 except Turkish characters replace Icelandic ones."/>
+        <value name="text/html; charset=ISO-8859-10" description="Latin 6 Lappish, Nordic, Eskimo The Nordic languages."/>
+        <value name="text/html; charset=ISO-8859-15" description="Latin 9 (aka Latin 0) Similar to ISO 8859-1 but replaces some less common symbols with the euro sign and some other missing characters."/>
+        <value name="text/html; charset=ISO-2022-JP" description="Latin/Japanese part 1 The Japanese language."/>
+        <value name="text/html; charset=ISO-2022-JP-2" description="Latin/Japanese part 2 The Japanese language."/>
+        <value name="text/html; charset=ISO-2022-KR" description="Latin/Korean part 1 The Korean language."/>
+        <value name="text/html; charset=cp1250" description="Central European languages that use Latin script, (Polish, Czech, Slovak, Hungarian, Slovene, Serbian, Croatian, Romanian and Albanian)."/>
+        <value name="text/html; charset=cp1251" description="Cyrillic alphabets."/>
+        <value name="text/html; charset=cp1252" description="Western languages."/>
+        <value name="text/html; charset=cp1253" description="Greek."/>
+        <value name="text/html; charset=cp1254" description="Turkish."/>
+        <value name="text/html; charset=cp1255" description="Hebrew."/>
+        <value name="text/html; charset=cp1256" description="Arabic."/>
+        <value name="text/html; charset=cp1257" description="Baltic languages."/>
+        <value name="text/html; charset=cp1258" description="Vietnamese."/>
       </values>
     </attribute>
     <attribute name="contenteditable" type="String">
@@ -11327,7 +11546,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <description>Comma-delimited x, y coordinates for the element.</description>
       <hint>[left-top-x-coord, left-top-y-coord, right-bottom-x-coord, right-bottom-y-coord]. Example values: 10, 10, 100, 100</hint>
     </attribute>
-    <attribute name="data" type="String">
+    <attribute name="data" type="String" element="comment">
       <browsers>
         <browser platform="IE" version="4.0+"/>
       </browsers>
@@ -11808,6 +12027,27 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <description>Language code for the content of the element.</description>
       <hint>[language-code]. Example values: "en" (English), "fr" (French), "es" (Spanish), etc.</hint>
     </attribute>
+    <attribute name="language" element="script">
+      <browsers>
+        <browser platform="IE" version="3.0+"/>
+        <browser platform="Netscape" version="2.0+"/>
+        <browser platform="Mozilla" version="1.0+"/>
+        <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
+        <browser platform="Safari" version="1.0+"/>
+      </browsers>
+      <deprecated>Use "type" attribute instead.</deprecated>
+      <description>Specifies the scripting language.</description>
+      <values>
+        <value name="*" description="Specify a value for language that is not on this list."/>
+        <value name="JavaScript" description="JavaScript"/>
+        <value name="JavaScript1.1" description="JavaScript v1.1 or greater."/>
+        <value name="JavaScript1.2" description="JavaScript v1.2 or greater."/>
+        <value name="JScript" description="Microsoft implementation of JavaScript."/>
+        <value name="php" description="PHP."/>
+        <value name="VBScript" description="VBScript."/>
+      </values>
+    </attribute>
     <attribute name="language" type="String">
       <availability>
         <specification name="W3C" version="HTML 4.01"/>
@@ -11834,7 +12074,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <description>Number of pixels that the element is offset from the left.</description>
       <hint>[number-of-pixels]</hint>
     </attribute>
-    <attribute name="leftmargin" type="String">
+    <attribute name="leftmargin" type="String" element="body">
       <browsers>
         <browser platform="IE" version="4.0+"/>
         <browser platform="Chrome" version="5.0+"/>
@@ -11843,7 +12083,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <description>Left margin for the body of the document.</description>
       <hint>[margin-width]. Example values: 10px, 5%, etc.</hint>
     </attribute>
-    <attribute name="link" type="String">
+    <attribute name="link" type="String" element="body">
       <browsers>
         <browser platform="IE" version="4.0+"/>
         <browser platform="Netscape"/>
@@ -11946,7 +12186,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <description>Maximum number of characters that a user may type into the element.</description>
       <hint>[number-of-characters]</hint>
     </attribute>
-    <attribute name="mayscript" type="Boolean">
+    <attribute name="mayscript" type="Boolean" element="applet">
       <browsers>
         <browser platform="Netscape"/>
         <browser platform="Chrome" version="5.0+"/>
@@ -11997,7 +12237,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="post" description="Transfers data using an http post transaction."/>
       </values>
     </attribute>
-    <attribute name="methods" type="String">
+    <attribute name="methods" type="String" element="a">
       <browsers>
         <browser platform="IE" version="4.0+"/>
       </browsers>
@@ -12109,7 +12349,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="nowrap" description="Element text should not wrap."/>
       </values>
     </attribute>
-    <attribute name="object" type="String">
+    <attribute name="object" type="String" element="applet">
       <browsers>
         <browser platform="IE" version="4.0+"/>
         <browser platform="Netscape"/>
@@ -12229,7 +12469,10 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <description>Specifies the URL for the meta-information dictionary.</description>
       <hint>[url]</hint>
     </attribute>
-    <attribute name="pubdate" type="String">
+    <attribute name="pubdate" type="Boolean">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
       <browsers>
         <!-- Not currently supported by any browser -->
       </browsers>
@@ -12321,7 +12564,16 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="subsection" description="This document is a subsection."/>
       </values>
     </attribute>
-    <attribute name="rightmargin" type="Boolean">
+    <attribute name="reversed" type="Boolean">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <!-- TODO I have no idea which browsers support this! -->
+      </browsers>
+      <description>If present, it indicates that the list is a descending list (..., 3, 2, 1). If the attribute is omitted, the list is an ascending list (1, 2, 3, ...).</description>
+    </attribute>
+    <attribute name="rightmargin" type="Boolean" element="body">
       <browsers>
         <browser platform="IE" version="4.0+"/>
       </browsers>
@@ -12414,7 +12666,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="rowgroup" description="Cell is a header for its row group."/>
       </values>
     </attribute>
-    <attribute name="scroll" type="String">
+    <attribute name="scroll" type="String" element="body">
       <browsers>
         <browser platform="IE" version="4.0+"/>
       </browsers>
@@ -12589,6 +12841,15 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <description>Text content to dislay while the object associated with the element loads.</description>
       <hint>[text]</hint>
     </attribute>
+    <attribute name="start" type="Number">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <!-- TODO I have no idea which browsers support this! -->
+      </browsers>
+      <description>The ordinal value of the first list item. The default value, used if the attribute is missing or if the value cannot be converted to a number according to the referenced algorithm, is 1 if the element has no reversed attribute, and is the number of child li elements otherwise.</description>
+    </attribute>
     <attribute name="style" type="String">
       <availability>
         <specification name="W3C" version="HTML 4.01"/>
@@ -12660,7 +12921,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="_blank" description="New window."/>
       </values>
     </attribute>
-    <attribute name="text" type="String">
+    <attribute name="text" type="String" element="body">
       <browsers>
         <browser platform="IE" version="4.0+"/>
         <browser platform="Netscape"/>
@@ -12708,7 +12969,26 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="truespeed" description="Do not round up the scrolldelay value."/>
       </values>
     </attribute>
-    <attribute name="type" type="String">
+    <attribute name="type" element="a">
+      <availability>
+        <specification name="W3C" version="HTML 4.01"/>
+      </availability>
+      <browsers>
+        <browser platform="IE" version="4.0+"/>
+        <browser platform="Netscape"/>
+        <browser platform="Mozilla" version="1.0+ "/>
+        <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
+        <browser platform="Safari" version="1.0+"/>
+      </browsers>
+      <description>Specifies the type of linked file.</description>
+      <values>
+        <value name="*" description="Specify a file type that is not on this list."/>
+        <value name="text/css" description="CSS file."/>
+        <value name="text/javascript" description="JavaScript file."/>
+      </values>
+    </attribute>
+    <attribute name="type" type="String" element="button">
       <availability>
         <specification name="W3C" version="HTML 4.01"/>
       </availability>
@@ -12727,7 +13007,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="submit" description="Submit button."/>
       </values>
     </attribute>
-    <attribute name="type" type="String">
+    <attribute name="type" type="String" element="embed">
       <browsers>
         <browser platform="IE" version="4.0+"/>
         <browser platform="Netscape"/>
@@ -12737,7 +13017,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <description>MIME type for the embedded object.</description>
       <hint>[MIME-type]</hint>
     </attribute>
-    <attribute name="type" type="String">
+    <attribute name="type" type="String" element="input">
       <availability>
         <specification name="W3C" version="HTML 4.01"/>
       </availability>
@@ -12753,17 +13033,71 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <values>
         <value name="button" description="Generic button."/>
         <value name="checkbox" description="Checkbox control. Allows user to select multiple choices."/>
+        <value name="color" description="Field for colors."/>
+        <value name="date" description="Text field for dates."/>
+        <value name="datetime" description="Text field for dates and times with UTC timezone."/>
+        <value name="datetime-local" description="Text field for dates and times with no time zone."/>
+        <value name="email" description="Text field for email addresses."/>
         <value name="file" description="Allows user to browse to and upload a file."/>
         <value name="hidden" description="Form control that is not visible to the user. Used to store state information."/>
         <value name="image" description="Image form control. May be used like a button."/>
+        <value name="month" description="Text field for months."/>
+        <value name="number" description="Text field for numbers."/>
         <value name="password" description="Password input field. Hides keystrokes with *'s."/>
         <value name="radio" description="Radio control button. Allows user to select a single option."/>
+        <value name="range" description="Range value. Typically a slider control."/>
         <value name="reset" description="Reset button."/>
+        <value name="search" description="Search field."/>
         <value name="submit" description="Submit button."/>
+        <value name="tel" description="Text field for telephone numbers."/>
         <value name="text" description="Single line text field."/>
+        <value name="time" description="Text field for times."/>
+        <value name="url" description="Text field for URLs."/>
+        <value name="week" description="Text field for weeks."/>
       </values>
     </attribute>
-    <attribute name="type" type="String">
+    <attribute name="type" element="li">
+      <browsers>
+        <browser platform="IE" version="4.0+"/>
+        <browser platform="Netscape"/>
+        <browser platform="Mozilla" version="1.0+"/>
+        <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
+        <browser platform="Safari" version="1.0+"/>
+      </browsers>
+      <deprecated>Use CSS to style list items instead.</deprecated>
+      <description>Specifies the type of bullet, number, or letter to use in a list.</description>
+      <values>
+        <value name="circle" description="Open circle bullet."/>
+        <value name="disc" description="Filled-in circle bullet."/>
+        <value name="square" description="Square bullet."/>
+        <value name="a" description="Lower-case alphabet list (e.g. a., b., c., etc.)"/>
+        <value name="A" description="Upper-case alphabet list (e.g. A., B., C., etc.)"/>
+        <value name="i" description="Lower-case Roman numeral list (e.g. i., ii., iii., etc.)"/>
+        <value name="I" description="Upper-case Roman numeral list (e.g. I., II., III., etc.)"/>
+        <value name="1" description="Numbered list."/>
+      </values>
+    </attribute>
+    <attribute name="type" element="link">
+      <availability>
+        <specification name="W3C" version="HTML 4.01"/>
+      </availability>
+      <browsers>
+        <browser platform="IE" version="4.0+"/>
+        <browser platform="Netscape"/>
+        <browser platform="Mozilla" version="1.0+"/>
+        <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
+        <browser platform="Safari" version="1.0+"/>
+      </browsers>
+      <description>Specifies the type of linked file.</description>
+      <values>
+        <value name="*" description="Specify a file type that is not on this list."/>
+        <value name="text/css" description="CSS file."/>
+        <value name="text/javascript" description="JavaScript file."/>
+      </values>
+    </attribute>
+    <attribute name="type" type="String" element="object">
       <availability>
         <specification name="W3C" version="HTML 4.01"/>
       </availability>
@@ -12777,6 +13111,100 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </browsers>
       <description>Specifies the MIME type for the element.</description>
       <hint>[MIME-type]</hint>
+    </attribute>
+    <attribute name="type" element="ol">
+      <browsers>
+        <browser platform="IE" version="4.0+"/>
+        <browser platform="Netscape"/>
+        <browser platform="Mozilla" version="1.0+"/>
+        <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
+        <browser platform="Safari" version="1.0+"/>
+      </browsers>
+      <deprecated>Use CSS to style ordered list types instead.</deprecated>
+      <description>Specifies the type of numbering system to use in a list.</description>
+      <values>
+        <value name="a" description="Lower-case alphabet list (e.g. a., b., c., etc.)"/>
+        <value name="A" description="Upper-case alphabet list (e.g. A., B., C., etc.)"/>
+        <value name="i" description="Lower-case Roman numeral list (e.g. i., ii., iii., etc.)"/>
+        <value name="I" description="Upper-case Roman numeral list (e.g. I., II., III., etc.)"/>
+        <value name="1" description="Numbered list."/>
+      </values>
+    </attribute>
+    <attribute name="type" element="param">
+      <availability>
+        <specification name="W3C" version="HTML 4.01"/>
+      </availability>
+      <browsers>
+        <browser platform="IE" version="4.0+"/>
+        <browser platform="Netscape"/>
+        <browser platform="Mozilla" version="1.0+"/>
+        <browser platform="Opera" version="7.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
+        <browser platform="Safari" version="1.0+"/>
+      </browsers>
+      <description>Specifies the MIME type for the element.</description>
+      <hint>[MIME-type]</hint>
+    </attribute>
+    <attribute name="type" element="script">
+      <availability>
+        <specification name="W3C" version="HTML 4.01"/>
+      </availability>
+      <browsers>
+        <browser platform="IE" version="3.0+"/>
+        <browser platform="Netscape" version="2.0+"/>
+        <browser platform="Mozilla" version="1.0+"/>
+        <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
+        <browser platform="Safari" version="1.0+"/>
+      </browsers>
+      <description>Specifies the type of script.</description>
+      <values>
+        <value name="*" description="Specify a value for type that is not on this list."/>
+        <value name="text/javascript" description="JavaScript."/>
+        <value name="text/jscript" description="JScript."/>
+        <value name="text/php" description="PHP."/>
+        <value name="text/tcl" description="Tool Command Language."/>
+        <value name="text/vbscript" description="VBScript."/>
+        <value name="application/javascript" description="JavaScript. Ignored by IE7 and can cause serious errors."/>
+        <value name="application/x-shockwave-flash" description="Flash."/>
+      </values>
+    </attribute>
+    <attribute name="type" element="style">
+      <availability>
+        <specification name="W3C" version="HTML 4.01"/>
+      </availability>
+      <browsers>
+        <browser platform="IE" version="2.0+"/>
+        <browser platform="Netscape" version="1.0+"/>
+        <browser platform="Mozilla" version="1.0+"/>
+        <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
+        <browser platform="Safari" version="1.0+"/>
+      </browsers>
+      <description>Specifies the MIME type for the stylesheet language.</description>
+      <values>
+        <value name="*" description="Specify a value for type that is not on this list."/>
+        <value name="text/css" description="CSS."/>
+        <value name="text/javascript" description="JavaScript. This is only valid for Netscape Communicator."/>
+      </values>
+    </attribute>
+    <attribute name="type" element="ul">
+      <browsers>
+        <browser platform="IE" version="2.0+"/>
+        <browser platform="Netscape" version="1.0+"/>
+        <browser platform="Mozilla" version="1.0+"/>
+        <browser platform="Opera" version="4.0+"/>
+        <browser platform="Chrome" version="5.0+"/>
+        <browser platform="Safari" version="1.0+"/>
+      </browsers>
+      <deprecated>Use CSS to style unordered lists instead.</deprecated>
+      <description>Specifies the type of bullet to use in an unordered list.</description>
+      <values>
+        <value name="circle" description="Open circle bullet."/>
+        <value name="disc" description="Filled-in circle bullet."/>
+        <value name="square" description="Square bullet."/>
+      </values>
     </attribute>
     <attribute name="units" type="String">
       <browsers>
@@ -12798,7 +13226,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="on" description="Element cannot be selected."/>
       </values>
     </attribute>
-    <attribute name="urn" type="String">
+    <attribute name="urn" type="String" element="a">
       <browsers>
         <browser platform="IE" version="4.0+"/>
       </browsers>
@@ -12853,6 +13281,15 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <description>Text containing the value of the element.</description>
       <hint>[value-text]</hint>
     </attribute>
+    <attribute name="value" type="Number" element="li">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <!-- TODO I have no idea which browsers support this! -->
+      </browsers>
+      <description>The ordinal value of the list item.</description>
+    </attribute>
     <attribute name="valuetype" type="String">
       <availability>
         <specification name="W3C" version="HTML 4.01"/>
@@ -12883,7 +13320,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="shown" description="Display the element."/>
       </values>
     </attribute>
-    <attribute name="vlink" type="String">
+    <attribute name="vlink" type="String" element="body">
       <browsers>
         <browser platform="IE" version="4.0+"/>
         <browser platform="Netscape"/>
@@ -12896,7 +13333,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <description>Specifies the color for visited links in the document. Specify either a color name or RGB color.</description>
       <hint>[color | "transparent"]. Example values: Red, #FF0000 (#RRGGBB color code for "red"), etc.</hint>
     </attribute>
-    <attribute name="volume" type="String">
+    <attribute name="volume" type="String" element="bgsound">
       <browsers>
         <browser platform="None"/>
       </browsers>

@@ -46,10 +46,13 @@ import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.filesystem.provider.FileInfo;
 import org.eclipse.core.internal.filesystem.Policy;
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.preferences.CloakingUtils;
@@ -218,12 +221,9 @@ public final class EFSUtils
 		}
 
 		monitor = Policy.monitorFor(monitor);
-
-		boolean success = true;
-		monitor.subTask(MessageFormat.format("Copying {0} to {1}", sourceStore.getName(), destinationStore.getName()));
-
+		monitor.subTask(MessageFormat.format(Messages.EFSUtils_Copying, sourceStore.getName(), destinationStore.getName()));
 		sourceStore.copy(destinationStore, EFS.OVERWRITE, monitor);
-		return success;
+		return true;
 	}
 
 	/**
@@ -256,11 +256,17 @@ public final class EFSUtils
 	public static IFileStore[] getFiles(IFileStore file, boolean recurse, boolean includeCloakedFiles,
 			IProgressMonitor monitor) throws CoreException
 	{
-		IFileStore[] result = null;
-		ArrayList<IFileStore> list = new ArrayList<IFileStore>();
-		getFiles(file, recurse, list, includeCloakedFiles, monitor);
-		result = list.toArray(new IFileStore[0]);
-		return result;
+		SubMonitor progress = SubMonitor.convert(monitor, 100);
+
+		Object resource = file.getAdapter(IResource.class);
+		if (resource != null && resource instanceof IContainer)
+		{
+			((IResource) resource).refreshLocal(IResource.DEPTH_INFINITE, progress.newChild(10));
+		}
+
+		List<IFileStore> list = new ArrayList<IFileStore>();
+		getFiles(file, recurse, list, includeCloakedFiles, progress.newChild(90));
+		return list.toArray(new IFileStore[list.size()]);
 	}
 
 	/**
@@ -273,14 +279,14 @@ public final class EFSUtils
 	public static IFileStore[] getFiles(IFileStore[] files, boolean recurse, boolean includeCloakedFiles,
 			IProgressMonitor monitor) throws CoreException
 	{
-		ArrayList<IFileStore> fileList = new ArrayList<IFileStore>();
-		for (int i = 0; i < files.length; i++)
+		List<IFileStore> fileList = new ArrayList<IFileStore>();
+		for (IFileStore file : files)
 		{
-			fileList.addAll(Arrays.asList(getFiles(files[i], recurse, includeCloakedFiles, monitor)));
+			fileList.addAll(Arrays.asList(getFiles(file, recurse, includeCloakedFiles, monitor)));
 		}
-		return fileList.toArray(new IFileStore[0]);
+		return fileList.toArray(new IFileStore[fileList.size()]);
 	}
-	
+
 	/**
 	 * Returns the files of the filestore array plus all of their children
 	 * 
@@ -291,19 +297,24 @@ public final class EFSUtils
 	public static IFileStore[] getAllFiles(IFileStore[] files, boolean recurse, boolean includeCloakedFiles,
 			IProgressMonitor monitor) throws CoreException
 	{
-		ArrayList<IFileStore> fileList = new ArrayList<IFileStore>();
+		List<IFileStore> fileList = new ArrayList<IFileStore>();
 		fileList.addAll(Arrays.asList(files));
-		IFileStore[] childFiles = getFiles(files, true, false, monitor);
-		fileList.addAll(Arrays.asList(childFiles));
-		return fileList.toArray(new IFileStore[0]);
-	}	
-	
+		fileList.addAll(Arrays.asList(getFiles(files, true, false, monitor)));
+
+		return fileList.toArray(new IFileStore[fileList.size()]);
+	}
+
 	/**
 	 * getFiles
 	 * 
 	 * @param file
 	 * @param recurse
 	 * @param list
+	 * @param includeCloakedFiles
+	 * @param monitor
+	 *            the progress monitor to use for reporting progress to the user. It is the caller's responsibility to
+	 *            call done() on the given monitor. Accepts null, indicating that no progress should be reported and
+	 *            that the operation cannot be cancelled.
 	 * @throws CoreException
 	 */
 	private static void getFiles(IFileStore file, boolean recurse, List<IFileStore> list, boolean includeCloakedFiles,
@@ -314,32 +325,59 @@ public final class EFSUtils
 			return;
 		}
 
-		monitor = Policy.monitorFor(monitor);
-		Policy.checkCanceled(monitor);
-
-		IFileStore[] children = file.childStores(EFS.NONE, monitor);
-
-		if (children != null)
+		if (monitor != null)
 		{
-			boolean addingFile;
-			for (int i = 0; i < children.length; i++)
-			{
-				Policy.checkCanceled(monitor);
-				IFileStore child = children[i];
-				addingFile = false;
-				if (includeCloakedFiles || !CloakingUtils.isFileCloaked(child))
-				{
-					list.add(child);
-					addingFile = true;
-					monitor.worked(1);
-				}
+			Policy.checkCanceled(monitor);
+		}
 
-				if (recurse && child.fetchInfo(EFS.NONE, monitor).isDirectory() && addingFile)
+		if (isFolder(file, monitor))
+		{
+			IFileStore[] children = file.childStores(EFS.NONE, monitor);
+			if (children != null)
+			{
+				SubMonitor progress = SubMonitor.convert(monitor, children.length);
+				boolean addingFile;
+				for (IFileStore child : children)
 				{
-					monitor.subTask(MessageFormat.format("Fetching children of {0}", child.getName()));
-					getFiles(child, recurse, list, includeCloakedFiles, monitor);
+					Policy.checkCanceled(progress);
+					addingFile = false;
+					if (includeCloakedFiles || !CloakingUtils.isFileCloaked(child))
+					{
+						list.add(child);
+						addingFile = true;
+					}
+
+					if (recurse && addingFile && isFolder(child, progress))
+					{
+						getFiles(child, recurse, list, includeCloakedFiles, progress.newChild(1));
+					}
 				}
 			}
 		}
+	}
+
+	/**
+	 * Determines if the listed item is a file or a folder.
+	 * 
+	 * @param file
+	 * @param monitor
+	 * @return
+	 * @throws CoreException
+	 */
+	private static boolean isFolder(IFileStore file, IProgressMonitor monitor) throws CoreException
+	{
+		// if we are an IContainer, folder == true;
+		// if we are an IFile, folder == false
+		// if neither, then check info for isDirectory()
+		IResource resource = (IResource) file.getAdapter(IResource.class);
+		if (resource instanceof IContainer)
+		{
+			return true;
+		}
+		if (!(resource instanceof IFile) && file.fetchInfo(EFS.NONE, monitor).isDirectory())
+		{
+			return true;
+		}
+		return false;
 	}
 }

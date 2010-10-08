@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.ruby;
 
 import java.util.Vector;
@@ -8,13 +42,10 @@ import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
 import org.jrubyparser.parser.Tokens;
 
-import com.aptana.theme.IThemeManager;
-import com.aptana.theme.ThemePlugin;
-
 public class RubyCodeScanner implements ITokenScanner
 {
 
-	private ITokenScanner fScanner;
+	private RubyTokenScanner fScanner;
 	private boolean nextIsMethodName;
 	private boolean nextIsModuleName;
 	private boolean nextIsClassName;
@@ -53,8 +84,7 @@ public class RubyCodeScanner implements ITokenScanner
 				lookForBlock = false;
 		}
 
-		if (nextAreArgs
-				&& (data.intValue() == RubyTokenScanner.NEWLINE || data.intValue() == RubyTokenScanner.SEMICOLON))
+		if (nextAreArgs && (isNewline(data) || data.intValue() == RubyTokenScanner.SEMICOLON))
 		{
 			nextAreArgs = false;
 		}
@@ -95,6 +125,12 @@ public class RubyCodeScanner implements ITokenScanner
 					nextIsMethodName = true;
 					return getToken("keyword.control.def.ruby"); //$NON-NLS-1$
 				default:
+					if (nextIsMethodName)
+					{
+						nextIsMethodName = false;
+						nextAreArgs = true;
+						return getToken("entity.name.function.ruby"); //$NON-NLS-1$
+					}
 					return getToken("keyword.control.ruby"); //$NON-NLS-1$
 			}
 		}
@@ -112,21 +148,55 @@ public class RubyCodeScanner implements ITokenScanner
 			case Tokens.tLEQ:
 			case Tokens.tLT:
 			case Tokens.tGT:
-				return getToken("keyword.operator.comparison.ruby"); //$NON-NLS-1$				
+				if (nextIsMethodName)
+				{
+					nextIsMethodName = false;
+					nextAreArgs = true;
+					return getToken("entity.name.function.ruby"); //$NON-NLS-1$
+				}
+				return getToken("keyword.operator.comparison.ruby"); //$NON-NLS-1$
+			case Tokens.tSTAR:
+				if (nextAreArgs) // could be un-named rest arg
+				{
+					return getToken("variable.parameter.ruby"); //$NON-NLS-1$
+				}
+				// intentionally fall-through
 			case Tokens.tAMPER:
 			case Tokens.tPERCENT:
 			case Tokens.tPOW:
-			case Tokens.tSTAR:
+			case Tokens.tSTAR2:
 			case Tokens.tPLUS:
 			case Tokens.tMINUS:
 			case Tokens.tDIVIDE:
+				if (nextIsMethodName)
+				{
+					nextIsMethodName = false;
+					nextAreArgs = true;
+					return getToken("entity.name.function.ruby"); //$NON-NLS-1$
+				}
 				return getToken("keyword.operator.arithmetic.ruby"); //$NON-NLS-1$			
 			case Tokens.tANDOP:
+			case Tokens.tAMPER2: // &
+			case Tokens.tTILDE:
 			case Tokens.tBANG:
 			case Tokens.tOROP:
 			case Tokens.tCARET:
 			case RubyTokenScanner.QUESTION:
+				if (nextIsMethodName)
+				{
+					nextIsMethodName = false;
+					nextAreArgs = true;
+					return getToken("entity.name.function.ruby"); //$NON-NLS-1$
+				}
 				return getToken("keyword.operator.logical.ruby"); //$NON-NLS-1$
+			case Tokens.tAREF:
+			case Tokens.tASET:
+			case Tokens.tUPLUS:
+			case Tokens.tUMINUS:
+			case Tokens.tUMINUS_NUM:
+				nextIsMethodName = false;
+				nextAreArgs = true;
+				return getToken("entity.name.function.ruby"); //$NON-NLS-1$			
 			case Tokens.tPIPE:
 				if (lookForBlock)
 				{
@@ -134,6 +204,12 @@ public class RubyCodeScanner implements ITokenScanner
 					if (!inPipe)
 						lookForBlock = false;
 					return getToken("default.ruby"); //$NON-NLS-1$
+				}
+				if (nextIsMethodName)
+				{
+					nextIsMethodName = false;
+					nextAreArgs = true;
+					return getToken("entity.name.function.ruby"); //$NON-NLS-1$
 				}
 				return getToken("keyword.operator.logical.ruby"); //$NON-NLS-1$
 			case Tokens.tLBRACE:
@@ -146,6 +222,12 @@ public class RubyCodeScanner implements ITokenScanner
 				if (nextIsClassName)
 				{
 					return getToken("entity.name.type.class.ruby"); //$NON-NLS-1$
+				}
+				if (nextIsMethodName)
+				{
+					nextIsMethodName = false;
+					nextAreArgs = true;
+					return getToken("entity.name.function.ruby"); //$NON-NLS-1$
 				}
 				return getToken("keyword.operator.assignment.augmented.ruby"); //$NON-NLS-1$
 			case Tokens.tOP_ASGN:
@@ -207,14 +289,23 @@ public class RubyCodeScanner implements ITokenScanner
 		}
 	}
 
-	protected IToken getToken(String tokenName)
+	@SuppressWarnings("nls")
+	protected boolean isNewline(Integer data)
 	{
-		return getThemeManager().getToken(tokenName);
+		if (data.intValue() == RubyTokenScanner.NEWLINE)
+			return true;
+		if (data.intValue() != Tokens.tWHITESPACE)
+			return false;
+		// make sure it's actually a newline
+		String tokenSrc = fScanner.getSource(fOffset, fLength);
+		if (tokenSrc == null)
+			return false;
+		return tokenSrc.equals("\r\n") || tokenSrc.equals("\n") || tokenSrc.equals("\r");
 	}
 
-	protected IThemeManager getThemeManager()
+	protected IToken getToken(String tokenName)
 	{
-		return ThemePlugin.getDefault().getThemeManager();
+		return new Token(tokenName);
 	}
 
 	private IToken pop()

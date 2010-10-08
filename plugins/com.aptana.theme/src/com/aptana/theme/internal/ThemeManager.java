@@ -1,11 +1,45 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.theme.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,6 +48,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -30,6 +65,8 @@ import org.osgi.service.prefs.BackingStoreException;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
+import com.aptana.theme.internal.preferences.ThemerPreferenceInitializer;
+import com.aptana.theme.preferences.IPreferenceConstants;
 
 public class ThemeManager implements IThemeManager
 {
@@ -44,11 +81,6 @@ public class ThemeManager implements IThemeManager
 	private static final String THEME_LIST_PREF_KEY = "themeList"; //$NON-NLS-1$
 
 	/**
-	 * Preference key used to save the active theme.
-	 */
-	private static final String ACTIVE_THEME = "ACTIVE_THEME"; //$NON-NLS-1$
-
-	/**
 	 * Node in preferences used to store themes under. Each theme is a key value pair under this node. The key is the
 	 * theme name, value is XML format java Properties object.
 	 */
@@ -58,13 +90,11 @@ public class ThemeManager implements IThemeManager
 	private Theme fCurrentTheme;
 	private HashMap<String, Theme> fThemeMap;
 	private HashSet<String> fBuiltins;
-	private Map<WeakReference<Token>, String> fTokens;
 
 	private static ThemeManager fgInstance;
 
 	private ThemeManager()
 	{
-		fTokens = new HashMap<WeakReference<Token>, String>();
 	}
 
 	public static ThemeManager instance()
@@ -87,12 +117,24 @@ public class ThemeManager implements IThemeManager
 	{
 		if (fCurrentTheme == null)
 		{
-			String activeThemeName = Platform.getPreferencesService().getString(ThemePlugin.PLUGIN_ID, ACTIVE_THEME,
-					null, null);
+			String activeThemeName = Platform.getPreferencesService().getString(ThemePlugin.PLUGIN_ID,
+					IPreferenceConstants.ACTIVE_THEME, ThemerPreferenceInitializer.DEFAULT_THEME, null);
 			if (activeThemeName != null)
+			{
 				fCurrentTheme = getTheme(activeThemeName);
+			}
 			if (fCurrentTheme == null)
-				setCurrentTheme(getThemeMap().values().iterator().next());
+			{
+				// if we can't find the default theme, just use the first one in the list
+				if (!getThemeMap().values().isEmpty())
+				{
+					fCurrentTheme = getThemeMap().values().iterator().next();
+				}
+			}
+			if (fCurrentTheme != null)
+			{
+				setCurrentTheme(fCurrentTheme);
+			}
 		}
 		return fCurrentTheme;
 	}
@@ -100,7 +142,6 @@ public class ThemeManager implements IThemeManager
 	public void setCurrentTheme(Theme theme)
 	{
 		fCurrentTheme = theme;
-		adaptTokens();
 
 		// Set the find in file search color
 		IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.search"); //$NON-NLS-1$
@@ -129,7 +170,7 @@ public class ThemeManager implements IThemeManager
 		// Also set the standard eclipse editor props, like fg, bg, selection fg, bg
 		prefs = new InstanceScope().getNode("com.aptana.editor.common"); //$NON-NLS-1$
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND_SYSTEM_DEFAULT, false);
-		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND, toString(theme.getSelection()));
+		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND, toString(theme.getSelectionAgainstBG()));
 
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND_SYSTEM_DEFAULT, false);
 		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND, toString(theme.getBackground()));
@@ -137,8 +178,8 @@ public class ThemeManager implements IThemeManager
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND_SYSTEM_DEFAULT, false);
 		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND, toString(theme.getForeground()));
 
-		prefs.put(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR, toString(theme
-				.getLineHighlight()));
+		prefs.put(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR,
+				toString(theme.getLineHighlightAgainstBG()));
 		try
 		{
 			prefs.flush();
@@ -149,7 +190,7 @@ public class ThemeManager implements IThemeManager
 		}
 
 		prefs = new InstanceScope().getNode(ThemePlugin.PLUGIN_ID);
-		prefs.put(ACTIVE_THEME, theme.getName());
+		prefs.put(IPreferenceConstants.ACTIVE_THEME, theme.getName());
 		prefs.putLong(THEME_CHANGED, System.currentTimeMillis());
 		try
 		{
@@ -164,8 +205,8 @@ public class ThemeManager implements IThemeManager
 	private static String toString(RGB selection)
 	{
 		StringBuilder builder = new StringBuilder();
-		builder.append(selection.red).append(THEME_NAMES_DELIMETER).append(selection.green).append(
-				THEME_NAMES_DELIMETER).append(selection.blue);
+		builder.append(selection.red).append(THEME_NAMES_DELIMETER).append(selection.green)
+				.append(THEME_NAMES_DELIMETER).append(selection.blue);
 		return builder.toString();
 	}
 
@@ -254,62 +295,126 @@ public class ThemeManager implements IThemeManager
 		fBuiltins = new HashSet<String>();
 		Enumeration<URL> urls = ThemePlugin.getDefault().getBundle().findEntries("themes", "*.properties", false); //$NON-NLS-1$ //$NON-NLS-2$
 		if (urls == null)
+		{
 			return;
+		}
+		Map<String, Properties> nameToThemeProperties = new HashMap<String, Properties>();
+		
 		while (urls.hasMoreElements())
 		{
 			URL url = urls.nextElement();
 			try
 			{
-				Theme theme = loadTheme(url.openStream());
-				if (theme != null)
-				{
-					fThemeMap.put(theme.getName(), theme);
-					fBuiltins.add(theme.getName());
-				}
+			    InputStream stream = url.openStream();
+		        try
+		        {
+		            Properties props = new Properties();
+                    props.load(stream);
+                    String themeName = props.getProperty(Theme.THEME_NAME_PROP_KEY);
+                    if(themeName != null)
+                    {
+                        if(!nameToThemeProperties.containsKey(themeName))
+                        {
+                            nameToThemeProperties.put(themeName, props);
+                        }
+                        else
+                        {
+							throw new IllegalStateException(MessageFormat.format(Messages.ThemeManager_ERR_DuplicateTheme,
+									themeName));
+                        }
+                    }
+                    else
+                    {
+                        throw new IllegalStateException(Messages.ThemeManager_ERR_ThemeNoName);
+                    }
+		        }
+		        finally
+		        {
+		            try
+		            {
+		                stream.close();
+		            }
+		            catch (IOException e)
+		            {
+		                // ignore
+		            }
+		        }
+				
 			}
 			catch (Exception e)
 			{
 				ThemePlugin.logError(url.toString(), e);
 			}
 		}
-	}
 
-	private static Theme loadTheme(InputStream stream) throws IOException
-	{
-		try
-		{
-			Properties props = new Properties();
-			props.load(stream);
-			return new Theme(ThemePlugin.getDefault().getColorManager(), props);
-		}
-		finally
+		// Handle a theme extending another theme
+		for (Properties props : new ArrayList<Properties>(nameToThemeProperties.values())) // iterate in a copy!
 		{
 			try
 			{
-				stream.close();
+				String multipleThemeExtends = (String) props.getProperty(Theme.THEME_EXTENDS_PROP_KEY);
+				if (multipleThemeExtends != null)
+				{
+					Properties newProperties = new Properties();
+					StringTokenizer tokenizer = new StringTokenizer(multipleThemeExtends, ","); //$NON-NLS-1$
+					String name = props.getProperty(Theme.THEME_NAME_PROP_KEY);
+					while (tokenizer.hasMoreTokens())
+					{
+						String themeExtends = tokenizer.nextToken();
+						Properties extended = nameToThemeProperties.get(themeExtends);
+						if (extended == null)
+						{
+							throw new IllegalStateException(
+									MessageFormat.format(
+											Messages.ThemeManager_ERR_NoThemeFound,
+											themeExtends, name));
+						}
+						newProperties.putAll(extended);
+					}
+					newProperties.putAll(props);
+					// We don't want the final extends props in the properties.
+					newProperties.remove(Theme.THEME_EXTENDS_PROP_KEY);
+					Assert.isTrue(newProperties.get(Theme.THEME_NAME_PROP_KEY).equals(name));
+					nameToThemeProperties.put(name, newProperties);
+				}
 			}
-			catch (IOException e)
+			catch (Exception e)
 			{
-				// ignore
+				ThemePlugin.logError(e);
+			}
+		}
+
+		for (Properties props : nameToThemeProperties.values())
+		{
+			String name = props.getProperty(Theme.THEME_NAME_PROP_KEY);
+			if (name.startsWith("abstract_theme")) //$NON-NLS-1$
+			{
+				continue;
+			}
+			try
+			{
+				loadTheme(props);
+			}
+			catch (Exception e)
+			{
+				ThemePlugin.logError(e);
 			}
 		}
 	}
 
-	public IToken getToken(String string)
-	{
-		Token token = new Token(getTextAttribute(string));
-		fTokens.put(new WeakReference<Token>(token), string);
-		return token;
-	}
+    private void loadTheme(Properties props) {
+        Theme theme = new Theme(ThemePlugin.getDefault().getColorManager(), props);
+        if (theme != null)
+        {
+            fThemeMap.put(theme.getName(), theme);
+            fBuiltins.add(theme.getName());
+        }
+    }
 
-	private void adaptTokens()
+
+	public IToken getToken(String scope)
 	{
-		for (Map.Entry<WeakReference<Token>, String> entry : fTokens.entrySet())
-		{
-			Token token = entry.getKey().get();
-			if (token != null)
-				token.setData(getTextAttribute(entry.getValue()));
-		}
+		return new Token(getTextAttribute(scope));
 	}
 
 	public void addTheme(Theme newTheme)
@@ -336,7 +441,6 @@ public class ThemeManager implements IThemeManager
 		return fBuiltins.contains(themeName);
 	}
 
-	@Override
 	public IStatus validateThemeName(String name)
 	{
 		if (name == null || name.trim().length() == 0)

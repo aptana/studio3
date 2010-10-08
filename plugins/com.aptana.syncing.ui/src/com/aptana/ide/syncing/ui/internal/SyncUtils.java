@@ -42,7 +42,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IContainer;
@@ -156,6 +155,10 @@ public class SyncUtils
 		{
 			return ConnectionPointUtils.findOrCreateWorkspaceConnectionPoint((IContainer) resource);
 		}
+		else if (resource != null)
+		{
+			return ConnectionPointUtils.findOrCreateWorkspaceConnectionPoint(resource.getParent());
+		}
 		else
 		{
 			File file = (File) adaptable.getAdapter(File.class);
@@ -220,30 +223,49 @@ public class SyncUtils
 	public static IFileStore[] getDownloadFiles(IConnectionPoint sourceManager, IConnectionPoint destManager,
 			IFileStore[] files, boolean ignoreError, IProgressMonitor monitor)
 	{
-		Set<IFileStore> newFiles = new HashSet<IFileStore>();
-		IFileStore file;
-		IFileStore newFile;
-		for (int i = 0; i < files.length; i++)
-		{
-			file = files[i];
+		return getDownloadFiles(sourceManager, destManager, files, true, ignoreError, monitor);
+	}
 
+	public static IFileStore[] getDownloadFiles(IConnectionPoint sourceManager, IConnectionPoint destManager,
+			IFileStore[] files, boolean fromSource, boolean ignoreError, IProgressMonitor monitor)
+	{
+		Set<IFileStore> newFiles = new HashSet<IFileStore>();
+		IFileStore newFile;
+		for (IFileStore file : files)
+		{
 			newFile = null;
 			try
 			{
 				if (file.fetchInfo().isDirectory())
 				{
-					newFile = EFSUtils.createFile(sourceManager.getRoot(), file, destManager.getRoot());
-					newFile.mkdir(EFS.NONE, null);
-					IFileStore[] f = EFSUtils.getFiles(newFile, true, false, null);
-					if (!newFiles.contains(newFile))
+					if (fromSource)
 					{
-						newFiles.add(newFile);
+						newFile = EFSUtils.createFile(sourceManager.getRoot(), file, destManager.getRoot());
 					}
-					newFiles.addAll(Arrays.asList(f));
+					else
+					{
+						newFile = file;
+					}
+					if (newFile.fetchInfo().exists())
+					{
+						IFileStore[] f = EFSUtils.getFiles(newFile, true, false, null);
+						if (!newFiles.contains(newFile))
+						{
+							newFiles.add(newFile);
+						}
+						newFiles.addAll(Arrays.asList(f));
+					}
 				}
 				else
 				{
-					newFile = EFSUtils.createFile(sourceManager.getRoot(), file, destManager.getRoot());
+					if (fromSource)
+					{
+						newFile = EFSUtils.createFile(sourceManager.getRoot(), file, destManager.getRoot());
+					}
+					else
+					{
+						newFile = file;
+					}
 					if (newFile.fetchInfo().exists())
 					{
 						if (!newFiles.contains(newFile))

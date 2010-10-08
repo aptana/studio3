@@ -81,9 +81,6 @@
          <actionSet
                id="org.eclipse.ui.edit.text.actionSet.presentation">
          </actionSet>
-         <newWizardShortcut
-               id="com.aptana.ui.wizards.NewWebProject">
-         </newWizardShortcut>
          <actionSet
                id="com.aptana.ui.globalActionSet">
          </actionSet>
@@ -91,47 +88,6 @@
                id="com.aptana.terminal.actionSet">
          </actionSet>
       </perspectiveExtension>
-   </extension>
-   <extension
-         point="org.eclipse.ui.newWizards">
-      <wizard
-            category="com.aptana.ui.wizards.category"
-            class="com.aptana.ui.internal.wizards.NewProjectWizard"
-            finalPerspective="com.aptana.ui.WebPerspective"
-            icon="icons/new_web_project.png"
-            id="com.aptana.ui.wizards.NewWebProject"
-            name="%wizard.webproject.name"
-            preferredPerspectives="com.aptana.ui.WebPerspective"
-            project="true">
-         <description>
-            %wizard.webproject.description
-         </description>
-      </wizard>
-      <category
-            id="com.aptana.ui.wizards.category"
-            name="%category.web.name">
-      </category>
-      <primaryWizard
-            id="com.aptana.ui.wizards.NewWebProject">
-      </primaryWizard>
-   </extension>
-   <extension
-         id="webnature"
-         name="%extension.webnature.name"
-         point="org.eclipse.core.resources.natures">
-      <runtime>
-         <run
-               class="com.aptana.ui.projects.WebProjectNature">
-         </run>
-      </runtime>
-   </extension>
-   <extension
-         point="org.eclipse.ui.ide.projectNatureImages">
-      <image
-            icon="icons/webnature.gif"
-            id="com.aptana.ui.webnature.image"
-            natureId="com.aptana.ui.webnature">
-      </image>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -174,6 +130,11 @@
             id="com.aptana.ui.command.clearlog"
             name="%ClearLogCommand.Label">
       </command>
+      <command
+            defaultHandler="com.aptana.ui.internal.commands.OpenInFinderHandler"
+            id="com.aptana.ui.command.ShowInFileManager"
+            name="%ShowInFileManager.label">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -210,6 +171,26 @@
                   commandId="com.aptana.ui.command.viewreleasenotes"
                   style="push">
             </command>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?before=group.edit">
+         <menu
+               id="projectExplorerShowIn"
+               label="%ShowIn.label">
+            <dynamic
+                  class="com.aptana.ui.commands.OpenFileManagerContributionItem"
+                  id="com.aptana.ui.open.file.manager">
+            </dynamic>
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate>
+                  <instanceof
+                        value="org.eclipse.core.resources.IResource">
+                  </instanceof>
+               </iterate>
+            </visibleWhen>
          </menu>
       </menuContribution>
    </extension>

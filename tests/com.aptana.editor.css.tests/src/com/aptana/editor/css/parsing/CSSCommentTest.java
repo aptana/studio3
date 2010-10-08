@@ -34,13 +34,13 @@
  */
 package com.aptana.editor.css.parsing;
 
-import com.aptana.editor.css.parsing.lexer.CSSTokens;
+import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
 public class CSSCommentTest extends CSSTokensTest
 {
 
 	public void testMultiLineComment()
 	{
-		assertToken("/*\n * this is a multiline comment\n */", CSSTokens.getTokenName(CSSTokens.COMMENT), 0, 37);
+		assertToken("/*\n * this is a multiline comment\n */", CSSTokenType.COMMENT, 0, 37);
 	}
 }

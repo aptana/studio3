@@ -37,6 +37,7 @@ package com.aptana.editor.html;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
+import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
@@ -44,8 +45,6 @@ import com.aptana.editor.common.text.rules.EntityRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.common.text.rules.WordDetector;
-import com.aptana.theme.IThemeManager;
-import com.aptana.theme.ThemePlugin;
 
 public class HTMLScanner extends RuleBasedScanner
 {
@@ -64,11 +63,6 @@ public class HTMLScanner extends RuleBasedScanner
 
 	protected IToken createToken(String string)
 	{
-		return getThemeManager().getToken(string);
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return ThemePlugin.getDefault().getThemeManager();
+		return new Token(string);
 	}
 }

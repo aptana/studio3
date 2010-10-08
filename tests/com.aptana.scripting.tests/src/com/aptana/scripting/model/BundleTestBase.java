@@ -83,7 +83,7 @@ public abstract class BundleTestBase extends TestCase
 		assertTrue(bundleFile.exists());
 
 		// load bundle
-		manager.loadBundle(bundleFile);
+		manager.loadBundle(bundleFile, false);
 	}
 
 	/**

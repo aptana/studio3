@@ -12,12 +12,13 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.console,
  org.eclipse.search,
  com.aptana.core,
- com.aptana.ui.epl
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+ com.aptana.ui.epl,
+ org.eclipse.core.expressions
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.ui,
  com.aptana.ui.actions,
+ com.aptana.ui.commands,
  com.aptana.ui.preferences,
- com.aptana.ui.projects,
  com.aptana.ui.widgets
 Eclipse-ExtensibleAPI: true

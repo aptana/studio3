@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2008 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -52,6 +52,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -359,7 +360,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 
 		};
 		disconnectJob.setPriority(Job.INTERACTIVE);
-		disconnectJob.setSystem(true);
+		disconnectJob.setSystem(false);
 		disconnectJob.schedule();
 		close();
 	}
@@ -612,13 +613,11 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		toolItem.addSelectionListener(new SelectionListener()
 		{
 
-			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
 				removeFilter();
 			}
 
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e)
 			{
 			}
@@ -1257,6 +1256,10 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 						}
 					}
 				}
+				catch (OperationCanceledException e)
+				{
+					return Status.CANCEL_STATUS;
+				}
 				catch (Exception e1)
 				{
 					SyncingUIPlugin.logError(Messages.SmartSyncDialog_ErrorSmartSync, e1);
@@ -1380,7 +1383,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 
 		};
 		buildSmartSync.setPriority(Job.LONG);
-		buildSmartSync.setSystem(!compareInBackground);
+		buildSmartSync.setSystem(false);
 		buildSmartSync.schedule();
 	}
 
@@ -2038,7 +2041,6 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 
 	}
 
-	@Override
 	public void search(String text, boolean isCaseSensitive, boolean isRegularExpression)
 	{
 		searchText = text;

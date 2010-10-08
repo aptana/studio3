@@ -57,13 +57,8 @@
         ================================= -->
 	<target name="categorize" description="categorize the update site">
 		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="yes">
-			<arg line="-application org.eclipse.equinox.p2.publisher.CategoryPublisher -nosplash -console -consolelog -metadataRepository file:${deploy.dir} -categoryDefinition file:${deploy.dir}/site.xml" />
+			<arg line="-application org.eclipse.equinox.p2.metadata.generator.EclipseGenerator -nosplash -consolelog -updateSite ${deploy.dir} -site file:${deploy.dir}/site.xml -metadataRepository file:${deploy.dir} -metadataRepositoryName &quot;Aptana Studio 3 Core Update Site&quot; -artifactRepository file:${deploy.dir} -artifactRepositoryName &quot;Aptana Studio 3 Core Artifacts&quot; -publishArtifacts -publishArtifactRepository -compress -reusePack200Files -noDefaultIUs -vmargs -Xmx256m" />
 		</java>
-		<!-- Re-JAR the content.xml file! -->
-		<jar destfile="${deploy.dir}/content.jar">
-			<fileset file="${deploy.dir}/content.xml" />
-		</jar>
-		<delete file="${deploy.dir}/content.xml" />
 	</target>
 
 	<!-- ================================= 
@@ -103,16 +98,49 @@
           target: generate.base                      
          - - - - - - - - - - - - - - - - - -->
 	<target name="generate.base" depends="copy.base.windows,copy.base">
-		<!-- Workaround for https://bugs.eclipse.org/241430 shouldn't be necessary when we move to 3.5 -->
-		<delete failonerror="false">
-			<fileset dir="${baseLocation}/configuration/.settings">
-				<include name="org.eclipse.equinox.p2.*.repository.prefs" />
-			</fileset>
-		</delete>
 		<antcall target="run.director">
 			<param name="p2.installIU" value="com.aptana.ide.feature.libraries.subscription.feature.group" />
 			<param name="p2.repo" value="${libraries-com.p2.repo}" />
 		</antcall>
+		<!-- Copy the features and plugins over into a dropins folder. Installing makes it so that non-linux plugins/features won't be there! -->
+		<mkdir dir="${baseLocation}/dropins/eclipse" />
+		<copy todir="${baseLocation}/dropins/eclipse">
+			<fileset dir="${webkit.p2.repo}" defaultexcludes="true">
+				<include name="features/*" />
+				<include name="plugins/*" />
+			</fileset>
+		</copy>
+		
+		<!-- Unjar the features -->
+		<for param="file">
+			<path>
+				<fileset dir="${baseLocation}/dropins/eclipse/features" defaultexcludes="true">
+					<include name="*.jar" />
+				</fileset>
+			</path>
+			<sequential>
+				<echo message="Unzipping JAR @{file}" />
+				<basename file="@{file}" property="@{file}.name" suffix="jar" />
+				<mkdir dir="${baseLocation}/dropins/eclipse/features/${@{file}.name}" />
+				<unjar dest="${baseLocation}/dropins/eclipse/features/${@{file}.name}" src="@{file}" />
+				<delete file="@{file}" />
+			</sequential>
+		</for>
+		<!-- UnJAR the handful of plugins that we need to... -->
+		<for param="file">
+			<path>
+				<fileset dir="${baseLocation}/dropins/eclipse/plugins" defaultexcludes="true">
+					<include name="com.aptana.swt.webkitbrowser.macosx.x86_*.jar" />
+				</fileset>
+			</path>
+			<sequential>
+				<echo message="Unzipping JAR @{file}" />
+				<basename file="@{file}" property="@{file}.name" suffix="jar" />
+				<mkdir dir="${baseLocation}/dropins/eclipse/plugins/${@{file}.name}" />
+				<unjar dest="${baseLocation}/dropins/eclipse/plugins/${@{file}.name}" src="@{file}" />
+				<delete file="@{file}" />
+			</sequential>
+		</for>
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
@@ -175,6 +203,7 @@
 				<dirset dir="${buildDirectory}" defaultexcludes="true">
 					<include name="plugins/*" />
 					<include name="features/*" />
+					<exclude name="plugins/com.aptana.usage" />
 					<exclude name="${topLevelElementType}s/${topLevelElementId}" />
 				</dirset>
 			</path>

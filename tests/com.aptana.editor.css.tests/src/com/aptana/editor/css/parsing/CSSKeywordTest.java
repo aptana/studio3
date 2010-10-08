@@ -34,42 +34,43 @@
  */
 package com.aptana.editor.css.parsing;
 
-import com.aptana.editor.css.parsing.lexer.CSSTokens;
+import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
 public class CSSKeywordTest extends CSSTokensTest
 {
 
 	public void testImportKeyword()
 	{
-		assertToken("@import", CSSTokens.getTokenName(CSSTokens.IMPORT), 0, 7); //$NON-NLS-1$
-		assertToken("@imports", CSSTokens.getTokenName(CSSTokens.AT_KEYWORD), 0, 8); //$NON-NLS-1$
+		assertToken("@import", CSSTokenType.IMPORT, 0, 7); //$NON-NLS-1$
+		assertToken("@imports", CSSTokenType.AT_RULE, 0, 8); //$NON-NLS-1$
 	}
 
 	public void testPageKeyword()
 	{
-		assertToken("@page", CSSTokens.getTokenName(CSSTokens.PAGE), 0, 5); //$NON-NLS-1$
-		assertToken("@pages", CSSTokens.getTokenName(CSSTokens.AT_KEYWORD), 0, 6); //$NON-NLS-1$
+		assertToken("@page", CSSTokenType.PAGE, 0, 5); //$NON-NLS-1$
+		assertToken("@pages", CSSTokenType.AT_RULE, 0, 6); //$NON-NLS-1$
 	}
 
 	public void testMediaKeyword()
 	{
-		assertToken("@media", CSSTokens.getTokenName(CSSTokens.MEDIA), 0, 6); //$NON-NLS-1$
-		assertToken("@medias", CSSTokens.getTokenName(CSSTokens.AT_KEYWORD), 0, 7); //$NON-NLS-1$
+		assertToken("@media", CSSTokenType.MEDIA_KEYWORD, 0, 6); //$NON-NLS-1$
+		assertToken("@medias", CSSTokenType.AT_RULE, 0, 7); //$NON-NLS-1$
 	}
 
 	public void testCharSetKeyword()
 	{
-		assertToken("@charset", CSSTokens.getTokenName(CSSTokens.CHARSET), 0, 8); //$NON-NLS-1$
-		assertToken("@charsets", CSSTokens.getTokenName(CSSTokens.AT_KEYWORD), 0, 9); //$NON-NLS-1$
+		assertToken("@charset", CSSTokenType.CHARSET, 0, 8); //$NON-NLS-1$
+		assertToken("@charsets", CSSTokenType.AT_RULE, 0, 9); //$NON-NLS-1$
 	}
 
 	public void testUrlKeyword()
 	{
-		assertToken("url(test.css)", CSSTokens.getTokenName(CSSTokens.URL), 0, 13); //$NON-NLS-1$
+		assertToken("url(test.css)", CSSTokenType.URL, 0, 13); //$NON-NLS-1$
 	}
 
 	public void testImportantKeyword()
 	{
-		assertToken("! important", CSSTokens.getTokenName(CSSTokens.IMPORTANT), 0, 11); //$NON-NLS-1$
+		assertToken("!important", CSSTokenType.IMPORTANT, 0, 10); //$NON-NLS-1$
+		assertToken("! important", CSSTokenType.IMPORTANT, 0, 11); //$NON-NLS-1$
 	}
 }

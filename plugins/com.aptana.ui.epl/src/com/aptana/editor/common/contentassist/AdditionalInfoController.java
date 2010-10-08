@@ -323,19 +323,16 @@ class AdditionalInfoController extends AbstractInformationControlManager
 		 */
 		public final synchronized void reset(ICompletionProposal p)
 		{
-			if (fCurrentProposal != p)
-			{
-				fCurrentProposal = p;
-				fCurrentInfo = null;
-				fAllowShowing = false;
+			fCurrentProposal = p;
+			fCurrentInfo = null;
+			fAllowShowing = false;
 
-				long oldWakeup = fNextWakeup;
-				Task task = taskOnReset(p);
-				schedule(task, System.currentTimeMillis());
-				if (fNextWakeup < oldWakeup)
-				{
-					notifyAll();
-				}
+			long oldWakeup = fNextWakeup;
+			Task task = taskOnReset(p);
+			schedule(task, System.currentTimeMillis());
+			if (fNextWakeup < oldWakeup)
+			{
+				notifyAll();
 			}
 		}
 
@@ -507,20 +504,6 @@ class AdditionalInfoController extends AbstractInformationControlManager
 	 * @since 3.2
 	 */
 	private Timer fTimer;
-	/**
-	 * The proposal most recently set by {@link #showInformation(ICompletionProposal, Object)}, possibly
-	 * <code>null</code>.
-	 * 
-	 * @since 3.2
-	 */
-	private ICompletionProposal fProposal;
-	/**
-	 * The information most recently set by {@link #showInformation(ICompletionProposal, Object)}, possibly
-	 * <code>null</code>.
-	 * 
-	 * @since 3.2
-	 */
-	private Object fInformation;
 
 	/**
 	 * Creates a new additional information controller.
@@ -591,9 +574,6 @@ class AdditionalInfoController extends AbstractInformationControlManager
 			fTimer = null;
 		}
 
-		fProposal = null;
-		fInformation = null;
-
 		if (fProposalTable != null && !fProposalTable.isDisposed())
 		{
 			fProposalTable.removeSelectionListener(fSelectionListener);
@@ -632,14 +612,6 @@ class AdditionalInfoController extends AbstractInformationControlManager
 		{
 			return;
 		}
-		if (fProposal == proposal
-				&& ((info == null && fInformation == null) || (info != null && info.equals(fInformation))))
-		{
-			return;
-		}
-
-		fInformation = info;
-		fProposal = proposal;
 		showInformation();
 	}
 

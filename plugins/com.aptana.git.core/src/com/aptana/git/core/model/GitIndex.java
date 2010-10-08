@@ -1,6 +1,39 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.git.core.model;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -15,6 +48,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
@@ -482,7 +516,7 @@ public class GitIndex
 			input.append(file.getPath()).append('\n');
 		}
 
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, input.toString(), null,
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(input.toString(), workingDirectory,
 				args.toArray(new String[args.size()]));
 		if (result == null)
 			return false;
@@ -519,8 +553,8 @@ public class GitIndex
 			input.append(file.indexInfo());
 		}
 
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, input.toString(),
-				null, new String[] { "update-index", "-z", "--index-info" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(input.toString(),
+				workingDirectory, new String[] { "update-index", "-z", "--index-info" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (result == null)
 			return false;
 
@@ -557,8 +591,8 @@ public class GitIndex
 		String[] arguments = new String[] { "checkout-index", "--index", "--quiet", "--force", "-z", "--stdin" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
 		int ret = 1;
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, input.toString(),
-				null, arguments);
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(input.toString(),
+				workingDirectory, arguments);
 		ret = result.keySet().iterator().next();
 
 		if (ret != 0)
@@ -594,160 +628,13 @@ public class GitIndex
 
 	private boolean doCommit(String commitMessage)
 	{
-		// prepare to commit
-		prepareToCommit(commitMessage);
-
-		// build up list of parents
-		List<String> parents = new ArrayList<String>();
-		String head = amend ? "HEAD^" : "HEAD"; //$NON-NLS-1$ //$NON-NLS-2$
-		parents.add(head);
-		parents.addAll(repository.getMergeSHAs());
-
-		// TODO get commit message from file since it could have been changed?
-
-		// commit tree
-		String commit = commitTree(parents, commitMessage);
-		if (commit == null)
-			return false;
-
-		// update HEAD ref
-		if (!updateHeadRef(commit, commitMessage))
-			return false;
-
-		// TODO Extract these files as constants
-		unlink(repository.gitFile(GitRepository.MERGE_HEAD_FILENAME));
-		unlink(repository.gitFile("MERGE_MSG")); //$NON-NLS-1$
-		unlink(repository.gitFile("MERGE_MODE")); //$NON-NLS-1$
-		unlink(repository.gitFile("SQUASH_MSG")); //$NON-NLS-1$
-
-		// Run post-commit hook
-		postCommitUpdate("Running post-commit hook"); //$NON-NLS-1$
-		return repository.executeHook("post-commit"); //$NON-NLS-1$
-	}
-
-	private boolean prepareToCommit(String commitMessage)
-	{
-		// Run pre-commit hook
-		postCommitUpdate("Running pre-commit hook"); //$NON-NLS-1$
-		if (!repository.executeHook("pre-commit")) //$NON-NLS-1$
-		{
-			postCommitFailure("Pre-commit hook failed"); //$NON-NLS-1$
-			return false;
-		}
-		// Write commit message to file
-		String commitSubject = "commit: "; //$NON-NLS-1$
-		int newLine = commitMessage.indexOf("\n"); //$NON-NLS-1$
-		if (newLine == -1)
-			commitSubject += commitMessage;
-		else
-			commitSubject += commitMessage.substring(0, newLine);
-
-		repository.writetoCommitFile(commitMessage);
-		// Re-read index (?)
-
-		// Run prepare-commit-msg hook
-		postCommitUpdate("Running prepare-commit hook"); //$NON-NLS-1$
-		if (!repository.executeHook("prepare-commit-msg", "message")) //$NON-NLS-1$ //$NON-NLS-2$
-		{
-			postCommitFailure("prepare-commit-msg hook failed"); //$NON-NLS-1$
-			return false;
-		}
-		// Run commit-msg hook
-		postCommitUpdate("Running commit-msg hook"); //$NON-NLS-1$
-		if (!repository.executeHook("commit-msg", repository.commitMessageFile())) //$NON-NLS-1$
-		{
-			postCommitFailure("Commit-msg hook failed"); //$NON-NLS-1$
-			return false;
-		}
-		return true;
-	}
-
-	protected String commitTree(List<String> parents, String commitMessage)
-	{
-		postCommitUpdate("Creating tree"); //$NON-NLS-1$
-		String tree = GitExecutable.instance().outputForCommand(workingDirectory, "write-tree"); //$NON-NLS-1$
-		if (tree.length() != 40)
-		{
-			postCommitFailure("Creating tree failed"); //$NON-NLS-1$
-			return null;
-		}
-
-		List<String> arguments = new ArrayList<String>();
-		arguments.add("commit-tree"); //$NON-NLS-1$
-		arguments.add(tree);
-		for (String parent : parents)
-		{
-			if (repository.parseReference(parent) != null)
-			{
-				arguments.add("-p"); //$NON-NLS-1$
-				arguments.add(parent);
-			}
-		}
-		postCommitUpdate("Creating commit"); //$NON-NLS-1$
-		int ret = 1;
-		String commit = ""; //$NON-NLS-1$
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, commitMessage,
-				null, arguments.toArray(new String[arguments.size()]));
+		int exitCode = 1;
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, "commit", "-m", commitMessage);
 		if (result != null && !result.isEmpty())
 		{
-			commit = result.values().iterator().next();
-			ret = result.keySet().iterator().next();
+			exitCode = result.keySet().iterator().next();
 		}
-		if (ret != 0 || commit == null || commit.length() != 40)
-		{
-			postCommitFailure("Could not create a commit object"); //$NON-NLS-1$
-			return null;
-		}
-		return commit;
-	}
-
-	/**
-	 * One of the steps during commit.
-	 * 
-	 * @param commit
-	 * @param commitMessage
-	 * @return
-	 */
-	protected boolean updateHeadRef(String commit, String commitMessage)
-	{
-		postCommitUpdate("Updating HEAD"); //$NON-NLS-1$
-		String commitSubject = "commit: "; //$NON-NLS-1$
-		int newLine = commitMessage.indexOf("\n"); //$NON-NLS-1$
-		if (newLine == -1)
-			commitSubject += commitMessage;
-		else
-			commitSubject += commitMessage.substring(0, newLine);
-
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
-				"update-ref", "-m", commitSubject, "HEAD", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				commit);
-		int ret = result.keySet().iterator().next();
-		if (ret != 0)
-		{
-			postCommitFailure("Could not update HEAD"); //$NON-NLS-1$
-			return false;
-		}
-		return true;
-	}
-
-	private boolean unlink(File gitFile)
-	{
-		if (gitFile == null)
-			return false;
-		if (!gitFile.exists())
-			return false;
-
-		return gitFile.delete();
-	}
-
-	private void postCommitFailure(String string)
-	{
-		GitPlugin.logError(string, null);
-	}
-
-	private void postCommitUpdate(String string)
-	{
-		GitPlugin.logInfo(string);
+		return exitCode == 0;
 	}
 
 	/**
@@ -882,14 +769,12 @@ public class GitIndex
 
 	public Set<IResource> getChangedResources()
 	{
-		IPath workingDir = repository.workingDirectory();
 		Set<IResource> resources = new HashSet<IResource>();
 		synchronized (changedFiles)
 		{
 			for (ChangedFile changedFile : changedFiles)
 			{
-				IResource resource = ResourcesPlugin.getWorkspace().getRoot()
-						.getFileForLocation(workingDir.append(changedFile.getPath()));
+				IResource resource = getResourceForChangedFile(changedFile);
 				if (resource != null)
 					resources.add(resource);
 			}
@@ -897,12 +782,17 @@ public class GitIndex
 		return resources;
 	}
 
+	IFile getResourceForChangedFile(ChangedFile changedFile)
+	{
+		return ResourcesPlugin.getWorkspace().getRoot()
+		.getFileForLocation(workingDirectory.append(changedFile.getPath()));
+	}
+
 	public ChangedFile getChangedFileForResource(IResource resource)
 	{
 		if (resource == null || resource.getLocationURI() == null)
 			return null;
 		IPath resourcePath = resource.getLocation();
-		IPath workingDirectory = repository.workingDirectory();
 		synchronized (changedFiles)
 		{
 			for (ChangedFile changedFile : changedFiles)

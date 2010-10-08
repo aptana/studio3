@@ -215,7 +215,7 @@ public class VT100EmulatorBackend implements IVT100EmulatorBackend {
 				return;
 			assert n>0;
 			int line=toAbsoluteLine(fCursorLine);
-			int nLines=toAbsoluteLine(fScrollingRegionBottomLine)-line;
+			int nLines=toAbsoluteLine(fScrollingRegionBottomLine)+1-line;
 			fTerminal.scroll(line, nLines, n);
 		}
 	}
@@ -245,7 +245,7 @@ public class VT100EmulatorBackend implements IVT100EmulatorBackend {
 				return;
 			assert n>0;
 			int line=toAbsoluteLine(fCursorLine);
-			int nLines=toAbsoluteLine(fScrollingRegionBottomLine)-line;
+			int nLines=toAbsoluteLine(fScrollingRegionBottomLine)+1-line;
 			fTerminal.scroll(line, nLines, -n);
 		}
 	}

@@ -4,10 +4,13 @@ Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.ui.epl;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: %providerName
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.core.expressions,
  org.eclipse.ui,
- org.eclipse.jface.text
+ org.eclipse.jface.text,
+ org.eclipse.ui.ide
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.common.contentassist,

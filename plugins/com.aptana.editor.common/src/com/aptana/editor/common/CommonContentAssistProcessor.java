@@ -1,10 +1,49 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -31,6 +70,7 @@ import org.jruby.runtime.builtin.IRubyObject;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.ICommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.UserAgentManager;
+import com.aptana.editor.common.scripting.snippets.SnippetsCompletionProcessor;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.QueryResult;
@@ -38,6 +78,7 @@ import com.aptana.index.core.SearchPattern;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.filters.ScopeFilter;
@@ -56,6 +97,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	private static final String DISPLAY = "display"; //$NON-NLS-1$
 	private static final String IMAGE = "image"; //$NON-NLS-1$
 	private static final String TOOL_TIP = "tool_tip"; //$NON-NLS-1$
+	private static final String LOCATION = "location"; //$NON-NLS-1$
 
 	protected final AbstractThemeableEditor editor;
 
@@ -108,7 +150,6 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 * org.eclipse.jface.text.contentassist.IContentAssistProcessor#computeCompletionProposals(org.eclipse.jface.text
 	 * .ITextViewer, int)
 	 */
-	@Override
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset)
 	{
 		List<ICompletionProposal> completionProposals = new ArrayList<ICompletionProposal>();
@@ -128,33 +169,55 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 * com.aptana.editor.common.ICommonContentAssistProcessor#computeCompletionProposals(org.eclipse.jface.text.ITextViewer
 	 * , int, char, boolean)
 	 */
-	@Override
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
 			boolean autoActivated)
 	{
 		List<ICompletionProposal> proposals = addRubleProposals(viewer, offset);
+		proposals.addAll(addSnippetProposals(viewer, offset));
 		ICompletionProposal[] others = this.doComputeCompletionProposals(viewer, offset, activationChar, autoActivated);
-		if (proposals == null || proposals.isEmpty())
+		if (proposals.isEmpty())
 		{
 			return others;
 		}
 
 		if (others == null || others.length == 0)
 		{
-			// Pre-select the first ruble-contributed proposal
+			// Pre-select the first ruble-contributed proposal/snippet
 			ICompletionProposal proposal = proposals.get(0);
 			if (proposal instanceof CommonCompletionProposal)
 			{
 				((CommonCompletionProposal) proposal).setIsDefaultSelection(true);
-			}		
+			}
 			return proposals.toArray(new ICompletionProposal[proposals.size()]);
 		}
-		
+
 		// Combine the two, leave selection as is
 		ICompletionProposal[] combined = new ICompletionProposal[proposals.size() + others.length];
 		proposals.toArray(combined);
 		System.arraycopy(others, 0, combined, proposals.size(), others.length);
 		return combined;
+	}
+
+	/**
+	 * Calls the SnippetsCompletionProcessor to contribute any relevant snippets for the offset.
+	 * 
+	 * @param viewer
+	 * @param offset
+	 * @return
+	 */
+	private Collection<? extends ICompletionProposal> addSnippetProposals(ITextViewer viewer, int offset)
+	{
+		if (viewer != null && viewer.getSelectionProvider() != null)
+		{
+			ICompletionProposal[] snippets = new SnippetsCompletionProcessor().computeCompletionProposals(viewer,
+					offset);
+			if (snippets == null)
+			{
+				return Collections.emptyList();
+			}
+			return Arrays.asList(snippets);
+		}
+		return Collections.emptyList();
 	}
 
 	/**
@@ -179,7 +242,9 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 
 				for (CommandElement ce : commands)
 				{
-					CommandResult result = ce.execute();
+					CommandContext context = ce.createCommandContext();
+					context.setInputStream(new ByteArrayInputStream(viewer.getDocument().get().getBytes()));
+					CommandResult result = ce.execute(context);
 
 					if (!result.executedSuccessfully())
 					{
@@ -193,51 +258,71 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 					// This assumes that the command is returning an array that is output as a
 					// string I can eval (via inspect)!
 					RubyArray object = (RubyArray) ruby.evalScriptlet(output);
+					RubySymbol insertSymbol = RubySymbol.newSymbol(ruby, INSERT);
+					RubySymbol displaySymbol = RubySymbol.newSymbol(ruby, DISPLAY);
+					RubySymbol imageSymbol = RubySymbol.newSymbol(ruby, IMAGE);
+					RubySymbol tooltipSymbol = RubySymbol.newSymbol(ruby, TOOL_TIP);
+					RubySymbol locationSymbol = RubySymbol.newSymbol(ruby, LOCATION);
 					for (IRubyObject element : object.toJavaArray())
 					{
 						String name;
 						String displayName;
 						String description = null;
 						int length;
+						String location = null;
 						IContextInformation contextInfo = null;
 						int replaceLength = 0;
 						Image image = CommonEditorPlugin.getImage(DEFAULT_IMAGE);
 						if (element instanceof RubyHash)
 						{
 							RubyHash hash = (RubyHash) element;
-							// TODO Move symbol creation to top and re-use them?
-							if (hash.containsKey(RubySymbol.newSymbol(ruby, INSERT)))
+							if (!hash.containsKey(insertSymbol))
 							{
 								continue;
 							}
-							name = hash.get(RubySymbol.newSymbol(ruby, INSERT)).toString();
+							name = hash.get(insertSymbol).toString();
 							length = name.length();
-							if (hash.containsKey(RubySymbol.newSymbol(ruby, DISPLAY)))
+							if (hash.containsKey(displaySymbol))
 							{
-								displayName = hash.get(RubySymbol.newSymbol(ruby, DISPLAY)).toString();
+								displayName = hash.get(displaySymbol).toString();
 							}
 							else
 							{
 								displayName = name;
 							}
-							if (hash.containsKey(RubySymbol.newSymbol(ruby, IMAGE)))
+							if (hash.containsKey(locationSymbol))
 							{
-								String imagePath = hash.get(RubySymbol.newSymbol(ruby, IMAGE)).toString();
+								location = hash.get(locationSymbol).toString();
+							}
+							if (hash.containsKey(imageSymbol))
+							{
+								String imagePath = hash.get(imageSymbol).toString();
 								// Turn into image!
 								ImageRegistry reg = CommonEditorPlugin.getDefault().getImageRegistry();
 								Image fromReg = reg.get(imagePath);
 								if (fromReg == null)
 								{
+									URL imageURL = null;
 									try
 									{
-										ImageDescriptor desc = ImageDescriptor.createFromURL(new File(imagePath)
-												.toURI().toURL());
-										reg.put(imagePath, desc);
-										image = reg.get(imagePath);
+										imageURL = new URL(imagePath);
 									}
 									catch (MalformedURLException e)
 									{
-										CommonEditorPlugin.logError(e);
+										try
+										{
+											imageURL = new File(imagePath).toURI().toURL();
+										}
+										catch (MalformedURLException e1)
+										{
+											CommonEditorPlugin.logError(e1);
+										}
+									}
+									if (imageURL != null)
+									{
+										ImageDescriptor desc = ImageDescriptor.createFromURL(imageURL);
+										reg.put(imagePath, desc);
+										image = reg.get(imagePath);
 									}
 								}
 								else
@@ -245,9 +330,9 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 									image = fromReg;
 								}
 							}
-							if (hash.containsKey(RubySymbol.newSymbol(ruby, TOOL_TIP)))
+							if (hash.containsKey(tooltipSymbol))
 							{
-								description = hash.get(RubySymbol.newSymbol(ruby, TOOL_TIP)).toString();
+								description = hash.get(tooltipSymbol).toString();
 							}
 							// TODO Allow hash to set offset to insert and replace length?
 						}
@@ -261,7 +346,10 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 						// build proposal
 						CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength,
 								length, image, displayName, contextInfo, description);
-
+						if (location != null)
+						{
+							proposal.setFileLocation(location);
+						}
 						// add it to the list
 						proposals.add(proposal);
 					}
@@ -302,10 +390,8 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 * org.eclipse.jface.text.contentassist.IContentAssistProcessor#computeContextInformation(org.eclipse.jface.text
 	 * .ITextViewer, int)
 	 */
-	@Override
 	public IContextInformation[] computeContextInformation(ITextViewer viewer, int offset)
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -323,17 +409,17 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getCompletionProposalAutoActivationCharacters()
 	 */
-	@Override
 	public char[] getCompletionProposalAutoActivationCharacters()
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getContextInformationAutoActivationCharacters()
+	 */
 	public char[] getContextInformationAutoActivationCharacters()
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -341,7 +427,6 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getContextInformationValidator()
 	 */
-	@Override
 	public IContextInformationValidator getContextInformationValidator()
 	{
 		// TODO Auto-generated method stub
@@ -352,10 +437,8 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getErrorMessage()
 	 */
-	@Override
 	public String getErrorMessage()
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -382,29 +465,55 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		}
 		IEditorInput editorInput = editor.getEditorInput();
 		Index result = null;
-
-		// FIXME: For non-workspace files, the editor input would be FileStoreEditorInput.
-		// Both it and FileEditorInput implements IURIEditorInput, so we could use that once
-		// we're adapting to handle indexing non-workspace files.
-
 		if (editorInput instanceof IFileEditorInput)
 		{
 			IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
 			IFile file = fileEditorInput.getFile();
 			IProject project = file.getProject();
-
-			result = IndexManager.getInstance().getIndex(project.getFullPath().toPortableString());
+			result = IndexManager.getInstance().getIndex(project.getLocationURI());
 		}
 		else if (editorInput instanceof IURIEditorInput)
 		{
-			IURIEditorInput fileEditorInput = (IURIEditorInput) editorInput;
-			URI uri = fileEditorInput.getURI();
-			result = IndexManager.getInstance().getIndex(uri.toString());
+			IURIEditorInput uriEditorInput = (IURIEditorInput) editorInput;
+			URI uri = uriEditorInput.getURI();
+			// FIXME This file may be a child, we need to check to see if there's an index with a parent URI.
+			result = IndexManager.getInstance().getIndex(uri);
 		}
 
 		return result;
 	}
-	
+
+	/**
+	 * getProjectURI
+	 * 
+	 * @return
+	 */
+	protected URI getProjectURI()
+	{
+		URI result = null;
+
+		if (editor != null)
+		{
+			IEditorInput editorInput = editor.getEditorInput();
+
+			if (editorInput instanceof IFileEditorInput)
+			{
+				IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
+				IFile file = fileEditorInput.getFile();
+				IProject project = file.getProject();
+
+				result = project.getLocationURI();
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getURI
+	 * 
+	 * @return
+	 */
 	protected URI getURI()
 	{
 		IEditorInput editorInput = editor.getEditorInput();
@@ -425,7 +534,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	{
 		return editor.getFileService().getParseState();
 	}
-	
+
 	/**
 	 * getAllUserAgentIcons
 	 * 

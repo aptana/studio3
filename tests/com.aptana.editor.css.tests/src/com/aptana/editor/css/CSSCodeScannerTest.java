@@ -1,35 +1,59 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.css;
-
-import junit.framework.TestCase;
 
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
 
-public class CSSCodeScannerTest extends TestCase
+import com.aptana.editor.common.tests.AbstractTokenScannerTestCase;
+
+public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 {
-
-	private CSSCodeScanner scanner;
-
 	@Override
-	protected void setUp() throws Exception
+	protected ITokenScanner createTokenScanner()
 	{
-		super.setUp();
-		scanner = new CSSCodeScanner()
+		return new CSSCodeScanner()
 		{
 			protected IToken createToken(String string)
 			{
-				return getToken(string);
+				return CSSCodeScannerTest.this.getToken(string);
 			};
 		};
-	}
-
-	@Override
-	protected void tearDown() throws Exception
-	{
-		scanner = null;
-		super.tearDown();
 	}
 
 	public void testH1Through6()
@@ -56,8 +80,7 @@ public class CSSCodeScannerTest extends TestCase
 
 	public void testBrowserSpecificPropertyNames()
 	{
-		String src = "-moz-border-radius: 4px\n" +
-				"-webkit-border-radius: 4px";
+		String src = "-moz-border-radius: 4px\n" + "-webkit-border-radius: 4px";
 		IDocument document = new Document(src);
 		scanner.setRange(document, 0, src.length());
 
@@ -73,7 +96,7 @@ public class CSSCodeScannerTest extends TestCase
 		assertToken(getToken("constant.numeric.css"), 47, 1);
 		assertToken(getToken("keyword.other.unit.css"), 48, 2);
 	}
-	
+
 	public void testURLFunctionArgWithNoString()
 	{
 		String src = "background: url(/images/blah_header.jpg)";
@@ -83,10 +106,10 @@ public class CSSCodeScannerTest extends TestCase
 		assertToken(getToken("support.type.property-name.css"), 0, 10);
 		assertToken(getToken("punctuation.separator.key-value.css"), 10, 1);
 		assertToken(Token.WHITESPACE, 11, 1);
-		assertToken(getToken("support.function.misc.css"), 12, 3);		
-		assertToken(getToken("punctuation.section.function.css"), 15, 25);
+		assertToken(getToken("support.function.misc.css"), 12, 3);
+		assertToken(getToken("punctuation.section.function.css"), 15, 1);
 	}
-	
+
 	public void testSmallCaps()
 	{
 		String src = "small { font: small-caps; }";
@@ -115,7 +138,7 @@ public class CSSCodeScannerTest extends TestCase
 
 		assertToken(getToken("entity.name.tag.css"), 0, 8);
 		assertToken(getToken("entity.other.attribute-name.class.css"), 8, 8);
-		assertToken(Token.WHITESPACE, 16, 1);
+		assertToken(getToken("punctuation.separator.css"), 16, 1);
 		assertToken(Token.WHITESPACE, 17, 1);
 		assertToken(getToken("entity.name.tag.css"), 18, 8);
 		assertToken(getToken("entity.other.attribute-name.class.css"), 26, 5);
@@ -177,8 +200,8 @@ public class CSSCodeScannerTest extends TestCase
 		assertToken(getToken("punctuation.separator.key-value.css"), 25, 1);
 		assertToken(Token.WHITESPACE, 26, 1);
 		assertToken(getToken("support.function.misc.css"), 27, 3);
-		assertToken(getToken("punctuation.section.function.css"), 30, 2);
-//		assertToken(getToken("punctuation.section.function.css"), 31, 1);
+		assertToken(getToken("punctuation.section.function.css"), 30, 1);
+		assertToken(getToken("punctuation.section.function.css"), 31, 1);
 		assertToken(getToken("punctuation.terminator.rule.css"), 32, 1);
 		assertToken(Token.WHITESPACE, 33, 3);
 		// line 3
@@ -207,16 +230,16 @@ public class CSSCodeScannerTest extends TestCase
 		assertToken(getToken("punctuation.separator.key-value.css"), 139, 1);
 		assertToken(Token.WHITESPACE, 140, 1);
 		assertToken(getToken("support.constant.font-name.css"), 141, 7);
-		assertToken(getToken(null), 148, 1);
+		assertToken(getToken("punctuation.separator.css"), 148, 1);
 		assertToken(Token.WHITESPACE, 149, 1);
 		assertToken(getToken("support.constant.font-name.css"), 150, 6);
-		assertToken(getToken(null), 156, 1);
+		assertToken(getToken("punctuation.separator.css"), 156, 1);
 		assertToken(Token.WHITESPACE, 157, 1);
 		assertToken(getToken("support.constant.font-name.css"), 158, 5);
-		assertToken(getToken(null), 163, 1);
+		assertToken(getToken("punctuation.separator.css"), 163, 1);
 		assertToken(Token.WHITESPACE, 164, 1);
 		assertToken(getToken("support.constant.font-name.css"), 165, 9);
-		assertToken(getToken(null), 174, 1);
+		assertToken(getToken("punctuation.separator.css"), 174, 1);
 		assertToken(Token.WHITESPACE, 175, 1);
 		assertToken(getToken("support.constant.font-name.css"), 176, 10);
 		assertToken(getToken("punctuation.terminator.rule.css"), 186, 1);
@@ -287,17 +310,5 @@ public class CSSCodeScannerTest extends TestCase
 		assertToken(getToken("punctuation.section.property-list.css"), 336, 1);
 		assertToken(Token.WHITESPACE, 337, 3);
 		// line 20
-	}
-
-	private IToken getToken(String string)
-	{
-		return new Token(string);
-	}
-
-	private void assertToken(IToken token, int offset, int length)
-	{
-		assertEquals(token.getData(), scanner.nextToken().getData());
-		assertEquals(offset, scanner.getTokenOffset());
-		assertEquals(length, scanner.getTokenLength());
 	}
 }

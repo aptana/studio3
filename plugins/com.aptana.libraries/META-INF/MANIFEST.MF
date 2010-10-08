@@ -103,4 +103,4 @@ Export-Package: com.eaio.uuid,
  org.apache.derby.shared.common.sanity,
  org.apache.derby.tools,
  org.apache.derby.vti
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

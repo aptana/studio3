@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common.scripting.commands;
 
 import java.io.IOException;
@@ -16,10 +50,12 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.osgi.service.prefs.BackingStoreException;
+import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 
+import com.aptana.core.resources.IProjectContext;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -133,35 +169,89 @@ class EditBundleJob extends Job
 	protected void createProjectIfNecessary(IPath projectLocation, IProgressMonitor monitor) throws CoreException
 	{
 		SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		if (findMatchingProject(workspace, projectLocation) != null)
-			return; // A project already exists with this location. Return it.
 
-		// No project exists yet. Let's create on at this location and then open it.
-		IProject theProject = workspace.getRoot().getProject(bundle.getDisplayName());
-		if (!theProject.exists()) // it shouldn't...
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IProject theProject = findMatchingProject(workspace, projectLocation);
+		subMonitor.worked(10);
+		boolean makeActive = true;
+		if (theProject == null)
 		{
-			IProjectDescription description = workspace.newProjectDescription(theProject.getName());
-			description.setLocation(projectLocation);
-			theProject.create(description, subMonitor.newChild(50));
-			theProject.open(subMonitor.newChild(50));
+			// Enforce unique name...
+			int counter = 0;
+			while (true)
+			{
+				String projectName = bundle.getDisplayName();
+				if (counter > 0)
+				{
+					projectName += counter;
+				}
+				counter++;
+				// No project exists yet. Let's create on at this location and then open it.
+				theProject = workspace.getRoot().getProject(projectName);
+				if (!projectExists(theProject)) // it shouldn't...
+				{
+					IProjectDescription description = workspace.newProjectDescription(theProject.getName());
+					description.setLocation(projectLocation);
+					theProject.create(description, subMonitor.newChild(45));
+					theProject.open(subMonitor.newChild(45));
+					makeActive = false;
+					break;
+				}
+			}
 		}
-		else
+
+		if (makeActive)
 		{
-			// FIXME These refer to IDs/prefs in a plugin that depends on this one!
-			try
-			{
-				IEclipsePreferences prefs = new InstanceScope().getNode("com.aptana.explorer"); // ExplorerPlugin.PLUGIN_ID //$NON-NLS-1$
-				prefs.put("activeProject", theProject.getName()); // com.aptana.explorer.IPreferenceConstants.ACTIVE_PROJECT //$NON-NLS-1$
-				prefs.flush();
-			}
-			catch (BackingStoreException e)
-			{
-				CommonEditorPlugin.logError(e);
-			}
+			makeProjectActiveInAppExplorer(theProject);
 		}
 
 		subMonitor.done();
+	}
+
+	private boolean projectExists(IProject theProject)
+	{
+		if (theProject.exists())
+		{
+			return true;
+		}
+		// Could be a case difference on Mac!
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IProject[] projects = workspace.getRoot().getProjects();
+		for (IProject project : projects)
+		{
+			if (project == null)
+			{
+				continue;
+			}
+			if (theProject.getName().equalsIgnoreCase(project.getName()))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	protected void makeProjectActiveInAppExplorer(final IProject theProject)
+	{
+		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
+		{
+
+			public void run()
+			{
+				IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+				IViewReference[] refs = window.getActivePage().getViewReferences();
+				for (IViewReference ref : refs)
+				{
+					IWorkbenchPart part = ref.getPart(false);
+					if (part instanceof IProjectContext)
+					{
+						IProjectContext projectContext = (IProjectContext) part;
+						projectContext.setActiveProject(theProject);
+						return;
+					}
+				}
+			}
+		});
 	}
 
 	/**

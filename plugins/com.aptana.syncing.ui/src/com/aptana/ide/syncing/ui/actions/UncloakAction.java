@@ -121,7 +121,6 @@ public class UncloakAction implements IObjectActionDelegate, IViewActionDelegate
 	{
 	}
 
-	@Override
 	public void init(IViewPart view)
 	{
 	}

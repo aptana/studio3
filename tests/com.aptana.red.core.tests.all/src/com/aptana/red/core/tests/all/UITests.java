@@ -19,6 +19,7 @@ public class UITests
 		suite.addTest(com.aptana.editor.erb.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.js.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.html.tests.AllTests.suite());
+		suite.addTest(com.aptana.editor.markdown.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.ruby.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.sass.tests.AllTests.suite());
 		// suite.addTest(com.aptana.editor.text.tests.AllTests.suite()); // TODO Add Tests for editor.text
@@ -27,6 +28,8 @@ public class UITests
 		suite.addTest(com.aptana.git.ui.AllTests.suite());
 		// suite.addTest(com.aptana.scripting.ui.tests.AllTests.suite()); // TODO Add Tests for scripting.ui
 		// suite.addTest(com.aptana.syncing.ui.tests.AllTests.suite()); // No syncing UI tests yet
+		suite.addTest(com.aptana.theme.tests.AllTests.suite());
+		suite.addTest(org.eclipse.tm.terminal.test.AllTests.suite());
 		// $JUnit-END$
 		
 		// Now add special test cases which require to be run after all plugins are loaded (dependency inversion in

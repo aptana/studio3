@@ -11,19 +11,17 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
@@ -37,7 +35,6 @@ import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.PortableGit;
 import com.aptana.git.ui.internal.GitColors;
 import com.aptana.theme.IThemeManager;
-import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.IDialogConstants;
 import com.aptana.ui.PopupSchedulingRule;
@@ -75,46 +72,33 @@ public class GitUIPlugin extends AbstractUIPlugin
 		themeChangeListener = new IPreferenceChangeListener()
 		{
 
-			@SuppressWarnings("restriction")
-			@Override
 			public void preferenceChange(PreferenceChangeEvent event)
 			{
 				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
 				{
-					IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
-					// Quick Diff colors
-					prefs.put("changeIndicationColor", toString(GitColors.greenBG().getRGB())); //$NON-NLS-1$
-					prefs.put("additionIndicationColor", toString(GitColors.greenBG().getRGB())); //$NON-NLS-1$
-					prefs.put("deletionIndicationColor", toString(GitColors.redBG().getRGB())); //$NON-NLS-1$
-
-					try
+					PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 					{
-						prefs.flush();
-					}
-					catch (BackingStoreException e)
-					{
-						GitUIPlugin.logError(e.getMessage(), e);
-					}
 
-					Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
-					IPreferenceStore prefStore = org.eclipse.debug.internal.ui.DebugUIPlugin.getDefault()
-							.getPreferenceStore();
-					PreferenceConverter
-							.setDefault(
-									prefStore,
-									org.eclipse.debug.internal.ui.preferences.IDebugPreferenceConstants.CONSOLE_BAKGROUND_COLOR,
-									theme.getBackground());
-					PreferenceConverter.setDefault(prefStore,
-							org.eclipse.debug.internal.ui.preferences.IDebugPreferenceConstants.CONSOLE_SYS_OUT_COLOR,
-							theme.getForeground());
+						public void run()
+						{
+							IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
+							// Quick Diff colors
+							prefs.put("changeIndicationColor", StringConverter.asString(GitColors.greenBG().getRGB())); //$NON-NLS-1$
+							prefs.put("additionIndicationColor", StringConverter.asString(GitColors.greenBG().getRGB())); //$NON-NLS-1$
+							prefs.put("deletionIndicationColor", StringConverter.asString(GitColors.redBG().getRGB())); //$NON-NLS-1$
+
+							try
+							{
+								prefs.flush();
+							}
+							catch (BackingStoreException e)
+							{
+								GitUIPlugin.logError(e.getMessage(), e);
+							}
+						}
+					});
+
 				}
-			}
-
-			private String toString(RGB selection)
-			{
-				StringBuilder builder = new StringBuilder();
-				builder.append(selection.red).append(',').append(selection.green).append(',').append(selection.blue);
-				return builder.toString();
 			}
 		};
 		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(themeChangeListener);
@@ -196,7 +180,6 @@ public class GitUIPlugin extends AbstractUIPlugin
 		{
 			dlg.run(true, false, new IRunnableWithProgress()
 			{
-				@Override
 				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
 				{
 					try
@@ -256,8 +239,8 @@ public class GitUIPlugin extends AbstractUIPlugin
 				}
 				else
 				{
-					MessageDialog.openWarning(shell, Messages.GitUIPlugin_9, NLS.bind(Messages.GitUIPlugin_10,
-							GitExecutable.MIN_GIT_VERSION));
+					MessageDialog.openWarning(shell, Messages.GitUIPlugin_9,
+							NLS.bind(Messages.GitUIPlugin_10, GitExecutable.MIN_GIT_VERSION));
 				}
 			}
 			else
@@ -284,6 +267,8 @@ public class GitUIPlugin extends AbstractUIPlugin
 
 	public static void trace(String string)
 	{
+		if (!getDefault().isDebugging())
+			return;
 		getDefault().getLog().log(new Status(IStatus.OK, getPluginId(), string));
 	}
 

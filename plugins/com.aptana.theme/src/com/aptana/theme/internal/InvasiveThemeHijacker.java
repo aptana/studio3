@@ -1,5 +1,40 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.theme.internal;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,6 +43,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
@@ -15,19 +51,26 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.internal.ui.views.memory.IMemoryViewPane;
 import org.eclipse.debug.internal.ui.views.memory.MemoryView;
 import org.eclipse.debug.ui.IDebugView;
-import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.preference.JFacePreferences;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.text.TextAttribute;
+import org.eclipse.jface.text.hyperlink.DefaultHyperlinkPresenter;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.search.ui.IQueryListener;
+import org.eclipse.search.ui.ISearchQuery;
+import org.eclipse.search.ui.NewSearchUI;
+import org.eclipse.search.ui.text.AbstractTextSearchViewPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.team.ui.history.HistoryPage;
 import org.eclipse.team.ui.history.IHistoryView;
 import org.eclipse.ui.IEditorPart;
@@ -47,6 +90,7 @@ import org.eclipse.ui.part.IPage;
 import org.eclipse.ui.part.MessagePage;
 import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.part.PageBook;
+import org.eclipse.ui.part.PageBookView;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
@@ -58,10 +102,10 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.theme.ConsoleThemer;
+import com.aptana.theme.IControlThemerFactory;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
-import com.aptana.theme.TreeThemer;
 import com.aptana.theme.preferences.IPreferenceConstants;
 import com.aptana.ui.IAptanaHistory;
 
@@ -75,15 +119,14 @@ import com.aptana.ui.IAptanaHistory;
 public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceChangeListener, IStartup
 {
 
-	private Map<Tree, TreeThemer> themers = new HashMap<Tree, TreeThemer>();
 	private ISelectionChangedListener pageListener;
+	private Map<IViewPart, IQueryListener> queryListeners = new HashMap<IViewPart, IQueryListener>(3);
+	private static boolean ranEarlyStartup = false;
 
 	public InvasiveThemeHijacker()
 	{
 		super("Installing invasive theme hijacker!"); //$NON-NLS-1$
-
-		IEclipsePreferences prefs = new InstanceScope().getNode(ThemePlugin.PLUGIN_ID);
-		prefs.addPreferenceChangeListener(this);
+		setSystem(true);
 	}
 
 	protected boolean invasiveThemesEnabled()
@@ -93,15 +136,37 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 	}
 
 	@Override
-	public IStatus runInUIThread(IProgressMonitor monitor)
+	public synchronized IStatus runInUIThread(IProgressMonitor monitor)
 	{
+		SubMonitor sub = SubMonitor.convert(monitor, 4);
+		if (sub.isCanceled())
+		{
+			return Status.CANCEL_STATUS;
+		}
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		if (invasiveThemesEnabled())
 		{
-			applyThemeToJDTEditor(getCurrentTheme(), false);
-			applyThemeToConsole(getCurrentTheme(), false);
-			window.getActivePage().addPartListener(this);
-			hijackCurrentViews(window, false);
+			if (window != null && window.getActivePage() != null)
+			{
+				window.getActivePage().addPartListener(this);
+			}
+			if (sub.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
+			sub.setWorkRemaining(3);
+
+			applyThemeToJDTEditor(getCurrentTheme(), false, sub.newChild(1));
+			if (sub.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
+			applyThemeToConsole(getCurrentTheme(), false, sub.newChild(1));
+			if (sub.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
+			hijackCurrentViews(window, false, sub.newChild(1));
 		}
 		else
 		{
@@ -109,17 +174,31 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			{
 				window.getActivePage().removePartListener(this);
 			}
-			applyThemeToJDTEditor(getCurrentTheme(), true);
-			applyThemeToConsole(getCurrentTheme(), true);
-			hijackCurrentViews(window, true);
+			if (sub.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
+			sub.setWorkRemaining(3);
+
+			applyThemeToJDTEditor(getCurrentTheme(), true, sub.newChild(1));
+			if (sub.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
+			applyThemeToConsole(getCurrentTheme(), true, sub.newChild(1));
+			if (sub.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
+			hijackCurrentViews(window, true, sub.newChild(1));
 		}
+		sub.done();
 		return Status.OK_STATUS;
 	}
 
 	@SuppressWarnings("nls")
-	private void applyThemeToConsole(Theme currentTheme, boolean revertToDefaults)
+	private void applyThemeToConsole(Theme currentTheme, boolean revertToDefaults, IProgressMonitor monitor)
 	{
-
 		IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.debug.ui");
 		if (revertToDefaults)
 		{
@@ -127,6 +206,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			prefs.remove("org.eclipse.debug.ui.outColor");
 			prefs.remove("org.eclipse.debug.ui.inColor");
 			prefs.remove("org.eclipse.debug.ui.consoleBackground");
+			prefs.remove("org.eclipse.debug.ui.PREF_CHANGED_VALUE_BACKGROUND");
 		}
 		else
 		{
@@ -137,6 +217,11 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			setColor(prefs, "org.eclipse.debug.ui.inColor", currentTheme, ConsoleThemer.CONSOLE_INPUT,
 					currentTheme.getForeground());
 			prefs.put("org.eclipse.debug.ui.consoleBackground", StringConverter.asString(currentTheme.getBackground()));
+			prefs.put("org.eclipse.debug.ui.PREF_CHANGED_VALUE_BACKGROUND", StringConverter.asString(currentTheme.getBackgroundAsRGB("markup.changed.variable")));
+		}
+		if (monitor.isCanceled())
+		{
+			return;
 		}
 		try
 		{
@@ -159,24 +244,32 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		prefs.put(prefKey, StringConverter.asString(rgb));
 	}
 
-	protected void hijackCurrentViews(IWorkbenchWindow window, boolean revertToDefaults)
+	protected void hijackCurrentViews(IWorkbenchWindow window, boolean revertToDefaults, IProgressMonitor monitor)
 	{
 		if (window == null || window.getActivePage() == null)
 			return;
 		IViewReference[] refs = window.getActivePage().getViewReferences();
 		for (IViewReference ref : refs)
 		{
+			if (monitor.isCanceled())
+			{
+				return;
+			}
 			hijackView(ref.getView(false), revertToDefaults);
 		}
 		IEditorReference[] editorRefs = window.getActivePage().getEditorReferences();
 		for (IEditorReference ref : editorRefs)
 		{
+			if (monitor.isCanceled())
+			{
+				return;
+			}
 			hijackEditor(ref.getEditor(false), revertToDefaults);
 		}
 	}
 
 	@SuppressWarnings({ "nls" })
-	protected void hijackView(IViewPart view, boolean revertToDefaults)
+	protected void hijackView(final IViewPart view, final boolean revertToDefaults)
 	{
 		if (view == null)
 			return;
@@ -184,7 +277,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		if (view instanceof IResourceNavigator)
 		{
 			IResourceNavigator navigator = (IResourceNavigator) view;
-			hookTheme(navigator.getViewer().getTree(), revertToDefaults);
+			hookTheme(navigator.getViewer(), revertToDefaults);
 			return;
 		}
 		else if (view instanceof ExtendedMarkersView) // Problems, Tasks, Bookmarks
@@ -197,7 +290,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 					Method m = ExtendedMarkersView.class.getDeclaredMethod("getViewer");
 					m.setAccessible(true);
 					TreeViewer treeViewer = (TreeViewer) m.invoke(view);
-					hookTheme(treeViewer.getTree(), revertToDefaults);
+					hookTheme(treeViewer, revertToDefaults);
 				}
 				catch (Exception e)
 				{
@@ -210,10 +303,11 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		{
 			try
 			{
+				// FIXME This isn't coloring anything right now
 				Method m = ProgressView.class.getDeclaredMethod("getViewer");
 				m.setAccessible(true);
 				Viewer treeViewer = (Viewer) m.invoke(view);
-				hookTheme(treeViewer.getControl(), revertToDefaults);
+				hookTheme(treeViewer, revertToDefaults);
 			}
 			catch (Exception e)
 			{
@@ -225,7 +319,8 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		{
 			ContentOutline outline = (ContentOutline) view;
 			IPage page = outline.getCurrentPage();
-			if (page.getClass().getName().endsWith("CommonOutlinePage"))
+			String name = page.getClass().getName();
+			if (name.endsWith("CommonOutlinePage") || name.endsWith("PyOutlinePage"))
 				return; // we already handle our own outlines
 			Control control = page.getControl();
 			if (control instanceof PageBook)
@@ -264,42 +359,42 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 				HistoryPage page = (HistoryPage) historyView.getHistoryPage();
 				hookTheme(page.getControl(), revertToDefaults);
 			}
-
+			return;
 		}
 		else if (view instanceof IDebugView)
 		{
 			IDebugView debug = (IDebugView) view;
 			Viewer viewer = debug.getViewer();
-			hookTheme(viewer.getControl(), revertToDefaults);
+			hookTheme(viewer, revertToDefaults);
+			return;
 		}
 		else if (view instanceof MemoryView)
 		{
 			MemoryView memory = (MemoryView) view;
 			IMemoryViewPane[] memPaneArray = memory.getViewPanes();
-
 			for (IMemoryViewPane memPane : memPaneArray)
 			{
 				hookTheme(memPane.getControl(), revertToDefaults);
 			}
+			return;
 		}
 		else if (view instanceof ConsoleView)
 		{
 			hijackConsole(view);
+			return;
 		}
-		// else if (view.getClass().getName().equals("org.eclipse.search2.internal.ui.SearchView"))
-		// {
-		// PageBookView outline = (PageBookView) view;
-		// IPage page = outline.getCurrentPage();
-		// hookTheme(page.getControl(), revertToDefaults);
-		// return;
-		// }
+		else if (view.getClass().getName().equals("org.eclipse.search2.internal.ui.SearchView"))
+		{
+			hijackSearchView(view, revertToDefaults);
+			return;
+		}
 		else if (view.getClass().getName().equals("org.eclipse.ui.navigator.resources.ProjectExplorer"))
 		{
 			try
 			{
 				Method m = view.getClass().getMethod("getCommonViewer");
 				TreeViewer treeViewer = (TreeViewer) m.invoke(view);
-				hookTheme(treeViewer.getTree(), revertToDefaults);
+				hookTheme(treeViewer, revertToDefaults);
 			}
 			catch (Exception e)
 			{
@@ -313,40 +408,158 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			{
 				Method m = view.getClass().getMethod("getTreeViewer");
 				TreeViewer treeViewer = (TreeViewer) m.invoke(view);
-				hookTheme(treeViewer.getTree(), revertToDefaults);
+				hookTheme(treeViewer, revertToDefaults);
 			}
 			catch (Exception e)
 			{
 				// ignore
 			}
+			return;
+		}
+		else if (view.getClass().getName().endsWith("CallHierarchyViewPart"))
+		{
+			hijackCallHierarchy(view, revertToDefaults);
+			return;
+		}
+	}
+
+	@SuppressWarnings("nls")
+	protected void hijackSearchView(final IViewPart view, final boolean revertToDefaults)
+	{
+		PageBookView outline = (PageBookView) view;
+		IPage page = outline.getCurrentPage();
+		if (page != null)
+		{
+			if (page instanceof AbstractTextSearchViewPage)
+			{
+				// Need to hook to the table/tree, not the return value of getControl() (which is the pagebook)
+				try
+				{
+					AbstractTextSearchViewPage blah = (AbstractTextSearchViewPage) page;
+					Method m = blah.getClass().getDeclaredMethod("getViewer");
+					m.setAccessible(true);
+					Viewer v = (Viewer) m.invoke(blah);
+					hookTheme(v, revertToDefaults);
+				}
+				catch (Exception e)
+				{
+					// ignore
+				}
+			}
+			else
+			{
+				if (page.getClass().getName().endsWith("EmptySearchView"))
+				{
+					// Have to explicitly hook to child label too, since it's bg is set to non-null value
+					Composite comp = (Composite) page.getControl();
+					Control label = comp.getChildren()[0];
+					hookTheme(label, revertToDefaults);
+					comp.layout();
+				}
+				hookTheme(page.getControl(), revertToDefaults);
+			}
+		}
+		// Hook a query listener up to this view, so we can hijack the search result pages
+		IQueryListener listener = queryListeners.get(view);
+		if (listener == null)
+		{
+			listener = new IQueryListener()
+			{
+				public void queryStarting(ISearchQuery query)
+				{
+
+				}
+
+				public void queryRemoved(ISearchQuery query)
+				{
+					hijackView(view, revertToDefaults);
+				}
+
+				public void queryFinished(ISearchQuery query)
+				{
+
+				}
+
+				public void queryAdded(ISearchQuery query)
+				{
+					PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
+					{
+						public void run()
+						{
+							hijackView(view, revertToDefaults);
+						}
+					});
+
+				}
+			};
+			NewSearchUI.addQueryListener(listener);
+			queryListeners.put(view, listener);
+		}
+	}
+
+	@SuppressWarnings("nls")
+	protected void hijackCallHierarchy(final IViewPart view, final boolean revertToDefaults)
+	{
+		try
+		{
+			Field f = view.getClass().getDeclaredField("fPagebook");
+			f.setAccessible(true);
+			PageBook pageBook = (PageBook) f.get(view);
+
+			f = pageBook.getClass().getDeclaredField("currentPage");
+			f.setAccessible(true);
+			Control control = (Control) f.get(pageBook);
+			if (control instanceof Label)
+			{
+				hookTheme(control, revertToDefaults);
+				return;
+			}
+
+			Method m = view.getClass().getMethod("getViewer");
+			TreeViewer treeViewer = (TreeViewer) m.invoke(view);
+			hookTheme(treeViewer, revertToDefaults);
+
+			m = view.getClass().getDeclaredMethod("getLocationViewer");
+			if (m != null)
+			{
+				m.setAccessible(true);
+				Viewer viewer = (Viewer) m.invoke(view);
+				hookTheme(viewer, revertToDefaults);
+			}
+		}
+		catch (Exception e)
+		{
+			// ignore
 		}
 	}
 
 	protected void hookTheme(Control control, boolean revert)
 	{
-		if (control instanceof Tree)
+		if (revert)
 		{
-			overrideTreeDrawing((Tree) control, revert);
+			getControlThemerFactory().dispose(control);
 		}
 		else
 		{
-			control.setRedraw(false);
-			if (revert)
-			{
-				control.setBackground(null);
-				control.setForeground(null);
-				control.setFont(null);
-			}
-			else
-			{
-				control.setBackground(ThemePlugin.getDefault().getColorManager()
-						.getColor(getCurrentTheme().getBackground()));
-				control.setForeground(ThemePlugin.getDefault().getColorManager()
-						.getColor(getCurrentTheme().getForeground()));
-				control.setFont(JFaceResources.getTextFont());
-			}
-			control.setRedraw(true);
+			getControlThemerFactory().apply(control);
 		}
+	}
+
+	protected void hookTheme(Viewer viewer, boolean revert)
+	{
+		if (revert)
+		{
+			getControlThemerFactory().dispose(viewer);
+		}
+		else
+		{
+			getControlThemerFactory().apply(viewer);
+		}
+	}
+
+	protected IControlThemerFactory getControlThemerFactory()
+	{
+		return ThemePlugin.getDefault().getControlThemerFactory();
 	}
 
 	protected Theme getCurrentTheme()
@@ -354,38 +567,40 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		return ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
 	}
 
-	private void overrideTreeDrawing(final Tree tree, boolean revertToDefaults)
-	{
-		if (revertToDefaults)
-		{
-			TreeThemer themer = themers.remove(tree);
-			if (themer != null)
-				themer.dispose();
-		}
-		else
-		{
-			TreeThemer themer = new TreeThemer(tree);
-			themers.put(tree, themer);
-			themer.apply();
-		}
-	}
-
 	@SuppressWarnings("nls")
-	protected void applyThemeToJDTEditor(Theme theme, boolean revertToDefaults)
+	protected void applyThemeToJDTEditor(Theme theme, boolean revertToDefaults, IProgressMonitor monitor)
 	{
 		// Set prefs for all editors
+		setHyperlinkValues(theme, new InstanceScope().getNode("org.eclipse.ui.workbench"), revertToDefaults);
+		setHyperlinkValues(theme, new InstanceScope().getNode(ThemePlugin.PLUGIN_ID), revertToDefaults);
+
 		setGeneralEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.texteditor"), revertToDefaults);
 		setEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.editors"), revertToDefaults);
+
+		if (monitor.isCanceled())
+		{
+			return;
+		}
 
 		// PDE
 		IEclipsePreferences pdePrefs = new InstanceScope().getNode("org.eclipse.pde.ui");
 		setGeneralEditorValues(theme, pdePrefs, revertToDefaults);
 		setPDEEditorValues(theme, pdePrefs, revertToDefaults);
 
+		if (monitor.isCanceled())
+		{
+			return;
+		}
+
 		// Ant
 		IEclipsePreferences antPrefs = new InstanceScope().getNode("org.eclipse.ant.ui");
 		setGeneralEditorValues(theme, antPrefs, revertToDefaults);
 		setAntEditorValues(theme, antPrefs, revertToDefaults);
+
+		if (monitor.isCanceled())
+		{
+			return;
+		}
 
 		// Now set for JDT...
 		IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.jdt.ui");
@@ -499,6 +714,38 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		}
 	}
 
+	protected void setHyperlinkValues(Theme theme, IEclipsePreferences prefs, boolean revertToDefaults)
+	{
+		if (prefs == null)
+			return;
+		if (revertToDefaults)
+		{
+			// Console preferences
+			prefs.remove(JFacePreferences.HYPERLINK_COLOR);
+			prefs.remove(JFacePreferences.ACTIVE_HYPERLINK_COLOR);
+
+			// Editor preferences
+			prefs.remove(DefaultHyperlinkPresenter.HYPERLINK_COLOR_SYSTEM_DEFAULT);
+			prefs.remove(DefaultHyperlinkPresenter.HYPERLINK_COLOR);
+
+		}
+		else
+		{
+			TextAttribute consoleHyperlink = theme.getTextAttribute("console.hyperlink"); //$NON-NLS-1$
+			TextAttribute editorHyperlink = theme.getTextAttribute("hyperlink"); //$NON-NLS-1$
+
+			prefs.put(JFacePreferences.HYPERLINK_COLOR,
+					StringConverter.asString(consoleHyperlink.getForeground().getRGB()));
+			prefs.put(JFacePreferences.ACTIVE_HYPERLINK_COLOR,
+					StringConverter.asString(consoleHyperlink.getForeground().getRGB()));
+			prefs.putBoolean(DefaultHyperlinkPresenter.HYPERLINK_COLOR_SYSTEM_DEFAULT, false);
+			prefs.put(DefaultHyperlinkPresenter.HYPERLINK_COLOR,
+					StringConverter.asString(editorHyperlink.getForeground().getRGB()));
+
+		}
+
+	}
+
 	protected void setGeneralEditorValues(Theme theme, IEclipsePreferences prefs, boolean revertToDefaults)
 	{
 		if (prefs == null)
@@ -513,11 +760,11 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		else
 		{
 			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND,
-					StringConverter.asString(theme.getSelection()));
+					StringConverter.asString(theme.getSelectionAgainstBG()));
 			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND, StringConverter.asString(theme.getBackground()));
 			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND, StringConverter.asString(theme.getForeground()));
 			prefs.put(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR,
-					StringConverter.asString(theme.getLineHighlight()));
+					StringConverter.asString(theme.getLineHighlightAgainstBG()));
 		}
 
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND_SYSTEM_DEFAULT, revertToDefaults);
@@ -540,11 +787,18 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		{
 			prefs.remove("occurrenceIndicationColor"); //$NON-NLS-1$
 			prefs.remove("writeOccurrenceIndicationColor"); //$NON-NLS-1$
+			prefs.remove("pydevOccurrenceIndicationColor"); //$NON-NLS-1$
+			prefs.remove("currentIPColor"); //$NON-NLS-1$
+			prefs.remove("secondaryIPColor"); //$NON-NLS-1$
 		}
 		else
 		{
-			prefs.put("occurrenceIndicationColor", StringConverter.asString(theme.getSelection())); //$NON-NLS-1$
-			prefs.put("writeOccurrenceIndicationColor", StringConverter.asString(theme.getSelection())); //$NON-NLS-1$
+			prefs.put("occurrenceIndicationColor", StringConverter.asString(theme.getSelectionAgainstBG())); //$NON-NLS-1$
+			prefs.put("writeOccurrenceIndicationColor", StringConverter.asString(theme.getSelectionAgainstBG())); //$NON-NLS-1$
+			prefs.put("pydevOccurrenceIndicationColor", StringConverter.asString(theme.getSelectionAgainstBG())); //$NON-NLS-1$
+			// Override the debug line highlight colors
+			prefs.put("currentIPColor", StringConverter.asString(theme.getBackgroundAsRGB("meta.diff.header"))); //$NON-NLS-1$ //$NON-NLS-2$
+			prefs.put("secondaryIPColor", StringConverter.asString(theme.getBackgroundAsRGB("meta.diff.header"))); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		try
@@ -643,13 +897,12 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 	}
 
 	// IPreferenceChangeListener
-	@Override
 	public void preferenceChange(PreferenceChangeEvent event)
 	{
-		if (event.getKey().equals(IThemeManager.THEME_CHANGED)
-				|| event.getKey().equals(IPreferenceConstants.INVASIVE_THEMES))
+		// If invaisive themes are on and we changed the theme, schedule. Also schedule if we toggled invasive theming.
+		if (event.getKey().equals(IPreferenceConstants.INVASIVE_THEMES)
+				|| (event.getKey().equals(IThemeManager.THEME_CHANGED) && invasiveThemesEnabled()))
 		{
-			// enablement changed, schedule job to run (it'll stop if it's turned to false in "shouldRun()")
 			cancel();
 			schedule();
 		}
@@ -682,8 +935,13 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			return;
 
 		// Force selection color
-		sourceViewer.getTextWidget().setSelectionBackground(
-				ThemePlugin.getDefault().getColorManager().getColor(getCurrentTheme().getSelection()));
+		Color existingSelectionBG = sourceViewer.getTextWidget().getSelectionBackground();
+		RGB selectionRGB = getCurrentTheme().getSelectionAgainstBG();
+		if (!existingSelectionBG.getRGB().equals(selectionRGB))
+		{
+			sourceViewer.getTextWidget().setSelectionBackground(
+					ThemePlugin.getDefault().getColorManager().getColor(selectionRGB));
+		}
 		if (!Platform.getOS().equals(Platform.OS_MACOSX))
 		{
 			// Linux and windows need selection fg set or we just see a block of color.
@@ -701,7 +959,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 	}
 
 	// IPartListener
-	@Override
 	public void partOpened(IWorkbenchPart part)
 	{
 		if (part instanceof IEditorPart)
@@ -715,7 +972,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 					pageListener = new ISelectionChangedListener()
 					{
 
-						@Override
 						public void selectionChanged(SelectionChangedEvent event)
 						{
 							hijackOutline();
@@ -734,7 +990,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		hijackView(view, false);
 	}
 
-	@Override
 	public void partDeactivated(IWorkbenchPart part)
 	{
 		if (!(part instanceof IEditorPart))
@@ -743,7 +998,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		hijackOutline();
 	}
 
-	@Override
 	public void partClosed(IWorkbenchPart part)
 	{
 		if (part instanceof MultiPageEditorPart)
@@ -754,21 +1008,38 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 				multi.getSite().getSelectionProvider().removeSelectionChangedListener(pageListener);
 			}
 		}
+		// If it's a search view, remove any query listeners for it!
+		else if (part instanceof IViewPart)
+		{
+			IViewPart view = (IViewPart) part;
+			if (queryListeners.containsKey(view))
+			{
+				NewSearchUI.removeQueryListener(queryListeners.remove(view));
+			}
+		}
 	}
 
-	@Override
 	public void partBroughtToTop(IWorkbenchPart part)
 	{
 		partActivated(part);
 	}
 
-	@Override
-	public void partActivated(IWorkbenchPart part)
+	public void partActivated(final IWorkbenchPart part)
 	{
 		if (part instanceof IViewPart)
 		{
 			hijackHistory((IViewPart) part);
 			hijackConsole((IViewPart) part);
+			if (part.getClass().getName().endsWith("CallHierarchyViewPart")) //$NON-NLS-1$
+			{
+				Display.getCurrent().asyncExec(new Runnable()
+				{
+					public void run()
+					{
+						hijackView((IViewPart) part, false);
+					}
+				});
+			}
 		}
 		if (!(part instanceof IEditorPart))
 			return;
@@ -781,10 +1052,16 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		if (view instanceof IHistoryView)
 		{
 			IHistoryView historyView = (IHistoryView) view;
-			HistoryPage page = (HistoryPage) historyView.getHistoryPage();
+			final HistoryPage page = (HistoryPage) historyView.getHistoryPage();
 			if (page instanceof IAptanaHistory)
 			{
-				((IAptanaHistory) page).setTheme(false);
+				Display.getCurrent().asyncExec(new Runnable()
+				{
+					public void run()
+					{
+						((IAptanaHistory) page).setTheme(false);
+					}
+				});
 				return true;
 			}
 
@@ -804,6 +1081,10 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 	protected void hijackOutline()
 	{
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		if (window == null || window.getActivePage() == null)
+		{
+			return;
+		}
 		IViewReference[] refs = window.getActivePage().getViewReferences();
 		for (IViewReference ref : refs)
 		{
@@ -815,9 +1096,32 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		}
 	}
 
-	@Override
-	public void earlyStartup()
+	/**
+	 * Schedules itself to override Java/PDE views and editors' coloring only if invasive themes are enabled.
+	 */
+	public synchronized void earlyStartup()
 	{
-		schedule();
+		if (ranEarlyStartup)
+			return;
+		ranEarlyStartup = true;
+		if (invasiveThemesEnabled())
+		{
+			schedule();
+		}
+	}
+
+	public void apply()
+	{
+		earlyStartup();
+		IEclipsePreferences prefs = new InstanceScope().getNode(ThemePlugin.PLUGIN_ID);
+		prefs.addPreferenceChangeListener(this);
+	}
+
+	public void dispose()
+	{
+		IEclipsePreferences prefs = new InstanceScope().getNode(ThemePlugin.PLUGIN_ID);
+		prefs.removePreferenceChangeListener(this);
+
+		pageListener = null;
 	}
 }

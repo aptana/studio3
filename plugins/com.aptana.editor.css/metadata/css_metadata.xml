@@ -228,1131 +228,6 @@ a:hover {
       </property-refs>
       <remarks>Combine different anchor styles to create visual cues for your links.</remarks>
     </element>
-    <element name="a:active" display-name="Active Link">
-      <browsers>
-        <browser platform="IE" version="2.0+"/>
-        <browser platform="Netscape" version="1.0+"/>
-        <browser platform="Mozilla" version="1.0+"/>
-        <browser platform="Opera" version="4.0+"/>
-        <browser platform="Chrome" version="5.0+"/>
-        <browser platform="Safari" version="1.0+"/>
-      </browsers>
-      <description>Defines the properties for an active link.</description>
-      <example>
-			&lt;p&gt;This example shows a set styles of anchor elements that will visually change color and text-decoration depending on state and mouse behavior:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;
-a {
-	color: blue;
-	text-decoration: underline;
-}
-
-a:active {
-	color: yellow;
-	text-decoration: none;
-}
-
-a:link {
-	color: blue;
-	text-decoration: underline;
-}
-
-a:visited {
-	color: purple;
-	text-decoration: none;
-}
-
-a:focus {
-	color: red;
-	text-decoration: none;
-}
-
-a:hover {
-	color: red;
-	text-decoration: none;
-}
-&lt;/code&gt;&lt;/pre&gt;
-			</example>
-      <property-refs>
-        <property-ref name="-moz-binding"/>
-        <property-ref name="-moz-border-bottom-colors"/>
-        <property-ref name="-moz-border-left-colors"/>
-        <property-ref name="-moz-border-radius"/>
-        <property-ref name="-moz-border-radius-bottomleft"/>
-        <property-ref name="-moz-border-radius-bottomright"/>
-        <property-ref name="-moz-border-radius-topleft"/>
-        <property-ref name="-moz-border-radius-topright"/>
-        <property-ref name="-moz-border-right-colors"/>
-        <property-ref name="-moz-border-top-colors"/>
-        <property-ref name="-moz-opacity"/>
-        <property-ref name="-moz-outline"/>
-        <property-ref name="-moz-outline-color"/>
-        <property-ref name="-moz-outline-style"/>
-        <property-ref name="-moz-outline-width"/>
-        <property-ref name="-moz-user-focus"/>
-        <property-ref name="-moz-user-input"/>
-        <property-ref name="-moz-user-modify"/>
-        <property-ref name="-moz-user-select"/>
-        <property-ref name="-o-link"/>
-        <property-ref name="-o-link-source"/>
-        <property-ref name="accelerator"/>
-        <property-ref name="azimuth"/>
-        <property-ref name="background"/>
-        <property-ref name="background-attachment"/>
-        <property-ref name="background-color"/>
-        <property-ref name="background-image"/>
-        <property-ref name="background-position"/>
-        <property-ref name="background-position-x"/>
-        <property-ref name="background-position-y"/>
-        <property-ref name="background-repeat"/>
-        <property-ref name="border"/>
-        <property-ref name="border-bottom"/>
-        <property-ref name="border-bottom-color"/>
-        <property-ref name="border-bottom-style"/>
-        <property-ref name="border-bottom-width"/>
-        <property-ref name="border-collapse"/>
-        <property-ref name="border-color"/>
-        <property-ref name="border-left"/>
-        <property-ref name="border-left-color"/>
-        <property-ref name="border-left-style"/>
-        <property-ref name="border-left-width"/>
-        <property-ref name="border-right"/>
-        <property-ref name="border-right-color"/>
-        <property-ref name="border-right-style"/>
-        <property-ref name="border-right-width"/>
-        <property-ref name="border-spacing"/>
-        <property-ref name="border-style"/>
-        <property-ref name="border-top"/>
-        <property-ref name="border-top-color"/>
-        <property-ref name="border-top-style"/>
-        <property-ref name="border-top-width"/>
-        <property-ref name="border-width"/>
-        <property-ref name="bottom"/>
-        <property-ref name="caption-side"/>
-        <property-ref name="clear"/>
-        <property-ref name="clip"/>
-        <property-ref name="color"/>
-        <property-ref name="content"/>
-        <property-ref name="counter-increment"/>
-        <property-ref name="counter-reset"/>
-        <property-ref name="cue"/>
-        <property-ref name="cue-after"/>
-        <property-ref name="cue-before"/>
-        <property-ref name="cursor"/>
-        <property-ref name="direction"/>
-        <property-ref name="display"/>
-        <property-ref name="elevation"/>
-        <property-ref name="empty-cells"/>
-        <property-ref name="filter"/>
-        <property-ref name="float"/>
-        <property-ref name="font"/>
-        <property-ref name="font-family"/>
-        <property-ref name="font-size"/>
-        <property-ref name="font-size-adjust"/>
-        <property-ref name="font-stretch"/>
-        <property-ref name="font-style"/>
-        <property-ref name="font-variant"/>
-        <property-ref name="font-weight"/>
-        <property-ref name="height"/>
-        <property-ref name="ime-mode"/>
-        <property-ref name="layout-flow"/>
-        <property-ref name="layout-grid"/>
-        <property-ref name="layout-grid-char"/>
-        <property-ref name="layout-grid-line"/>
-        <property-ref name="layout-grid-mode"/>
-        <property-ref name="layout-grid-type"/>
-        <property-ref name="left"/>
-        <property-ref name="letter-spacing"/>
-        <property-ref name="line-break"/>
-        <property-ref name="line-height"/>
-        <property-ref name="list-style"/>
-        <property-ref name="list-style-image"/>
-        <property-ref name="list-style-position"/>
-        <property-ref name="list-style-type"/>
-        <property-ref name="margin"/>
-        <property-ref name="margin-bottom"/>
-        <property-ref name="margin-left"/>
-        <property-ref name="margin-right"/>
-        <property-ref name="margin-top"/>
-        <property-ref name="marker-offset"/>
-        <property-ref name="marks"/>
-        <property-ref name="max-height"/>
-        <property-ref name="max-width"/>
-        <property-ref name="min-height"/>
-        <property-ref name="min-width"/>
-        <property-ref name="opacity"/>
-        <property-ref name="orphans"/>
-        <property-ref name="outline"/>
-        <property-ref name="outline-color"/>
-        <property-ref name="outline-style"/>
-        <property-ref name="outline-width"/>
-        <property-ref name="overflow"/>
-        <property-ref name="overflow-x"/>
-        <property-ref name="overflow-y"/>
-        <property-ref name="padding"/>
-        <property-ref name="padding-bottom"/>
-        <property-ref name="padding-left"/>
-        <property-ref name="padding-right"/>
-        <property-ref name="padding-top"/>
-        <property-ref name="page"/>
-        <property-ref name="page-break-after"/>
-        <property-ref name="page-break-before"/>
-        <property-ref name="page-break-inside"/>
-        <property-ref name="pause"/>
-        <property-ref name="pause-after"/>
-        <property-ref name="pause-before"/>
-        <property-ref name="pitch"/>
-        <property-ref name="pitch-range"/>
-        <property-ref name="play-during"/>
-        <property-ref name="position"/>
-        <property-ref name="quotes"/>
-        <property-ref name="richness"/>
-        <property-ref name="right"/>
-        <property-ref name="ruby-align"/>
-        <property-ref name="ruby-overhang"/>
-        <property-ref name="ruby-position"/>
-        <property-ref name="scrollbar-3dlight-color"/>
-        <property-ref name="scrollbar-arrow-color"/>
-        <property-ref name="scrollbar-base-color"/>
-        <property-ref name="scrollbar-darkshadow-color"/>
-        <property-ref name="scrollbar-face-color"/>
-        <property-ref name="scrollbar-highlight-color"/>
-        <property-ref name="scrollbar-shadow-color"/>
-        <property-ref name="scrollbar-track-color"/>
-        <property-ref name="size"/>
-        <property-ref name="speak"/>
-        <property-ref name="speak-header"/>
-        <property-ref name="speak-numeral"/>
-        <property-ref name="speak-punctuation"/>
-        <property-ref name="speech-rate"/>
-        <property-ref name="stress"/>
-        <property-ref name="table-layout"/>
-        <property-ref name="text-align"/>
-        <property-ref name="text-align-last"/>
-        <property-ref name="text-decoration"/>
-        <property-ref name="text-indent"/>
-        <property-ref name="text-justify"/>
-        <property-ref name="text-overflow"/>
-        <property-ref name="text-shadow"/>
-        <property-ref name="text-transform"/>
-        <property-ref name="text-underline-position"/>
-        <property-ref name="top"/>
-        <property-ref name="unicode-bidi"/>
-        <property-ref name="vertical-align"/>
-        <property-ref name="visibility"/>
-        <property-ref name="voice-family"/>
-        <property-ref name="volume"/>
-        <property-ref name="white-space"/>
-        <property-ref name="widows"/>
-        <property-ref name="width"/>
-        <property-ref name="word-break"/>
-        <property-ref name="word-spacing"/>
-        <property-ref name="word-wrap"/>
-        <property-ref name="writing-mode"/>
-        <property-ref name="z-index"/>
-        <property-ref name="zoom"/>
-      </property-refs>
-      <remarks>A link becomes "active" for the moment when a user is clicking the link. Takes the same properties as a regular anchor element. You can style an a:active element to show a visual cue as to when the link is active.</remarks>
-    </element>
-    <element name="a:focus" display-name="Focused Link">
-      <browsers>
-        <browser platform="IE" version="2.0+"/>
-        <browser platform="Netscape" version="1.0+"/>
-        <browser platform="Mozilla" version="1.0+"/>
-        <browser platform="Opera" version="4.0+"/>
-        <browser platform="Chrome" version="5.0+"/>
-        <browser platform="Safari" version="1.0+"/>
-      </browsers>
-      <description>Defines the properties for a link that currently has focus.</description>
-      <example>
-			&lt;p&gt;This example shows a set styles of anchor elements that will visually change color and text-decoration depending on state and mouse behavior:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;
-a {
-	color: blue;
-	text-decoration: underline;
-}
-
-a:active {
-	color: yellow;
-	text-decoration: none;
-}
-
-a:link {
-	color: blue;
-	text-decoration: underline;
-}
-
-a:visited {
-	color: purple;
-	text-decoration: none;
-}
-
-a:focus {
-	color: red;
-	text-decoration: none;
-}
-
-a:hover {
-	color: red;
-	text-decoration: none;
-}
-&lt;/code&gt;&lt;/pre&gt;
-			</example>
-      <property-refs>
-        <property-ref name="-moz-binding"/>
-        <property-ref name="-moz-border-bottom-colors"/>
-        <property-ref name="-moz-border-left-colors"/>
-        <property-ref name="-moz-border-radius"/>
-        <property-ref name="-moz-border-radius-bottomleft"/>
-        <property-ref name="-moz-border-radius-bottomright"/>
-        <property-ref name="-moz-border-radius-topleft"/>
-        <property-ref name="-moz-border-radius-topright"/>
-        <property-ref name="-moz-border-right-colors"/>
-        <property-ref name="-moz-border-top-colors"/>
-        <property-ref name="-moz-opacity"/>
-        <property-ref name="-moz-outline"/>
-        <property-ref name="-moz-outline-color"/>
-        <property-ref name="-moz-outline-style"/>
-        <property-ref name="-moz-outline-width"/>
-        <property-ref name="-moz-user-focus"/>
-        <property-ref name="-moz-user-input"/>
-        <property-ref name="-moz-user-modify"/>
-        <property-ref name="-moz-user-select"/>
-        <property-ref name="-o-link"/>
-        <property-ref name="-o-link-source"/>
-        <property-ref name="accelerator"/>
-        <property-ref name="azimuth"/>
-        <property-ref name="background"/>
-        <property-ref name="background-attachment"/>
-        <property-ref name="background-color"/>
-        <property-ref name="background-image"/>
-        <property-ref name="background-position"/>
-        <property-ref name="background-position-x"/>
-        <property-ref name="background-position-y"/>
-        <property-ref name="background-repeat"/>
-        <property-ref name="border"/>
-        <property-ref name="border-bottom"/>
-        <property-ref name="border-bottom-color"/>
-        <property-ref name="border-bottom-style"/>
-        <property-ref name="border-bottom-width"/>
-        <property-ref name="border-collapse"/>
-        <property-ref name="border-color"/>
-        <property-ref name="border-left"/>
-        <property-ref name="border-left-color"/>
-        <property-ref name="border-left-style"/>
-        <property-ref name="border-left-width"/>
-        <property-ref name="border-right"/>
-        <property-ref name="border-right-color"/>
-        <property-ref name="border-right-style"/>
-        <property-ref name="border-right-width"/>
-        <property-ref name="border-spacing"/>
-        <property-ref name="border-style"/>
-        <property-ref name="border-top"/>
-        <property-ref name="border-top-color"/>
-        <property-ref name="border-top-style"/>
-        <property-ref name="border-top-width"/>
-        <property-ref name="border-width"/>
-        <property-ref name="bottom"/>
-        <property-ref name="caption-side"/>
-        <property-ref name="clear"/>
-        <property-ref name="clip"/>
-        <property-ref name="color"/>
-        <property-ref name="content"/>
-        <property-ref name="counter-increment"/>
-        <property-ref name="counter-reset"/>
-        <property-ref name="cue"/>
-        <property-ref name="cue-after"/>
-        <property-ref name="cue-before"/>
-        <property-ref name="cursor"/>
-        <property-ref name="direction"/>
-        <property-ref name="display"/>
-        <property-ref name="elevation"/>
-        <property-ref name="empty-cells"/>
-        <property-ref name="filter"/>
-        <property-ref name="float"/>
-        <property-ref name="font"/>
-        <property-ref name="font-family"/>
-        <property-ref name="font-size"/>
-        <property-ref name="font-size-adjust"/>
-        <property-ref name="font-stretch"/>
-        <property-ref name="font-style"/>
-        <property-ref name="font-variant"/>
-        <property-ref name="font-weight"/>
-        <property-ref name="height"/>
-        <property-ref name="ime-mode"/>
-        <property-ref name="layout-flow"/>
-        <property-ref name="layout-grid"/>
-        <property-ref name="layout-grid-char"/>
-        <property-ref name="layout-grid-line"/>
-        <property-ref name="layout-grid-mode"/>
-        <property-ref name="layout-grid-type"/>
-        <property-ref name="left"/>
-        <property-ref name="letter-spacing"/>
-        <property-ref name="line-break"/>
-        <property-ref name="line-height"/>
-        <property-ref name="list-style"/>
-        <property-ref name="list-style-image"/>
-        <property-ref name="list-style-position"/>
-        <property-ref name="list-style-type"/>
-        <property-ref name="margin"/>
-        <property-ref name="margin-bottom"/>
-        <property-ref name="margin-left"/>
-        <property-ref name="margin-right"/>
-        <property-ref name="margin-top"/>
-        <property-ref name="marker-offset"/>
-        <property-ref name="marks"/>
-        <property-ref name="max-height"/>
-        <property-ref name="max-width"/>
-        <property-ref name="min-height"/>
-        <property-ref name="min-width"/>
-        <property-ref name="opacity"/>
-        <property-ref name="orphans"/>
-        <property-ref name="outline"/>
-        <property-ref name="outline-color"/>
-        <property-ref name="outline-style"/>
-        <property-ref name="outline-width"/>
-        <property-ref name="overflow"/>
-        <property-ref name="overflow-x"/>
-        <property-ref name="overflow-y"/>
-        <property-ref name="padding"/>
-        <property-ref name="padding-bottom"/>
-        <property-ref name="padding-left"/>
-        <property-ref name="padding-right"/>
-        <property-ref name="padding-top"/>
-        <property-ref name="page"/>
-        <property-ref name="page-break-after"/>
-        <property-ref name="page-break-before"/>
-        <property-ref name="page-break-inside"/>
-        <property-ref name="pause"/>
-        <property-ref name="pause-after"/>
-        <property-ref name="pause-before"/>
-        <property-ref name="pitch"/>
-        <property-ref name="pitch-range"/>
-        <property-ref name="play-during"/>
-        <property-ref name="position"/>
-        <property-ref name="quotes"/>
-        <property-ref name="richness"/>
-        <property-ref name="right"/>
-        <property-ref name="ruby-align"/>
-        <property-ref name="ruby-overhang"/>
-        <property-ref name="ruby-position"/>
-        <property-ref name="scrollbar-3dlight-color"/>
-        <property-ref name="scrollbar-arrow-color"/>
-        <property-ref name="scrollbar-base-color"/>
-        <property-ref name="scrollbar-darkshadow-color"/>
-        <property-ref name="scrollbar-face-color"/>
-        <property-ref name="scrollbar-highlight-color"/>
-        <property-ref name="scrollbar-shadow-color"/>
-        <property-ref name="scrollbar-track-color"/>
-        <property-ref name="size"/>
-        <property-ref name="speak"/>
-        <property-ref name="speak-header"/>
-        <property-ref name="speak-numeral"/>
-        <property-ref name="speak-punctuation"/>
-        <property-ref name="speech-rate"/>
-        <property-ref name="stress"/>
-        <property-ref name="table-layout"/>
-        <property-ref name="text-align"/>
-        <property-ref name="text-align-last"/>
-        <property-ref name="text-decoration"/>
-        <property-ref name="text-indent"/>
-        <property-ref name="text-justify"/>
-        <property-ref name="text-overflow"/>
-        <property-ref name="text-shadow"/>
-        <property-ref name="text-transform"/>
-        <property-ref name="text-underline-position"/>
-        <property-ref name="top"/>
-        <property-ref name="unicode-bidi"/>
-        <property-ref name="vertical-align"/>
-        <property-ref name="visibility"/>
-        <property-ref name="voice-family"/>
-        <property-ref name="volume"/>
-        <property-ref name="white-space"/>
-        <property-ref name="widows"/>
-        <property-ref name="width"/>
-        <property-ref name="word-break"/>
-        <property-ref name="word-spacing"/>
-        <property-ref name="word-wrap"/>
-        <property-ref name="writing-mode"/>
-        <property-ref name="z-index"/>
-        <property-ref name="zoom"/>
-      </property-refs>
-      <remarks>Takes the same properties as a regular anchor element. You can style an a:focus element to show a visual cue as to when the link has focus.</remarks>
-    </element>
-    <element name="a:hover" display-name="Hover Link">
-      <browsers>
-        <browser platform="IE" version="2.0+"/>
-        <browser platform="Netscape" version="1.0+"/>
-        <browser platform="Mozilla" version="1.0+"/>
-        <browser platform="Opera" version="4.0+"/>
-        <browser platform="Chrome" version="5.0+"/>
-        <browser platform="Safari" version="1.0+"/>
-      </browsers>
-      <description>Defines the properties for a link that a user is currently hovering over with the mouse.</description>
-      <example>
-			&lt;p&gt;This example shows a set styles of anchor elements that will visually change color and text-decoration depending on state and mouse behavior:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;
-a {
-	color: blue;
-	text-decoration: underline;
-}
-
-a:active {
-	color: yellow;
-	text-decoration: none;
-}
-
-a:link {
-	color: blue;
-	text-decoration: underline;
-}
-
-a:visited {
-	color: purple;
-	text-decoration: none;
-}
-
-a:focus {
-	color: red;
-	text-decoration: none;
-}
-
-a:hover {
-	color: red;
-	text-decoration: none;
-}
-&lt;/code&gt;&lt;/pre&gt;
-			</example>
-      <property-refs>
-        <property-ref name="-moz-binding"/>
-        <property-ref name="-moz-border-bottom-colors"/>
-        <property-ref name="-moz-border-left-colors"/>
-        <property-ref name="-moz-border-radius"/>
-        <property-ref name="-moz-border-radius-bottomleft"/>
-        <property-ref name="-moz-border-radius-bottomright"/>
-        <property-ref name="-moz-border-radius-topleft"/>
-        <property-ref name="-moz-border-radius-topright"/>
-        <property-ref name="-moz-border-right-colors"/>
-        <property-ref name="-moz-border-top-colors"/>
-        <property-ref name="-moz-opacity"/>
-        <property-ref name="-moz-outline"/>
-        <property-ref name="-moz-outline-color"/>
-        <property-ref name="-moz-outline-style"/>
-        <property-ref name="-moz-outline-width"/>
-        <property-ref name="-moz-user-focus"/>
-        <property-ref name="-moz-user-input"/>
-        <property-ref name="-moz-user-modify"/>
-        <property-ref name="-moz-user-select"/>
-        <property-ref name="-o-link"/>
-        <property-ref name="-o-link-source"/>
-        <property-ref name="accelerator"/>
-        <property-ref name="azimuth"/>
-        <property-ref name="background"/>
-        <property-ref name="background-attachment"/>
-        <property-ref name="background-color"/>
-        <property-ref name="background-image"/>
-        <property-ref name="background-position"/>
-        <property-ref name="background-position-x"/>
-        <property-ref name="background-position-y"/>
-        <property-ref name="background-repeat"/>
-        <property-ref name="border"/>
-        <property-ref name="border-bottom"/>
-        <property-ref name="border-bottom-color"/>
-        <property-ref name="border-bottom-style"/>
-        <property-ref name="border-bottom-width"/>
-        <property-ref name="border-collapse"/>
-        <property-ref name="border-color"/>
-        <property-ref name="border-left"/>
-        <property-ref name="border-left-color"/>
-        <property-ref name="border-left-style"/>
-        <property-ref name="border-left-width"/>
-        <property-ref name="border-right"/>
-        <property-ref name="border-right-color"/>
-        <property-ref name="border-right-style"/>
-        <property-ref name="border-right-width"/>
-        <property-ref name="border-spacing"/>
-        <property-ref name="border-style"/>
-        <property-ref name="border-top"/>
-        <property-ref name="border-top-color"/>
-        <property-ref name="border-top-style"/>
-        <property-ref name="border-top-width"/>
-        <property-ref name="border-width"/>
-        <property-ref name="bottom"/>
-        <property-ref name="caption-side"/>
-        <property-ref name="clear"/>
-        <property-ref name="clip"/>
-        <property-ref name="color"/>
-        <property-ref name="content"/>
-        <property-ref name="counter-increment"/>
-        <property-ref name="counter-reset"/>
-        <property-ref name="cue"/>
-        <property-ref name="cue-after"/>
-        <property-ref name="cue-before"/>
-        <property-ref name="cursor"/>
-        <property-ref name="direction"/>
-        <property-ref name="display"/>
-        <property-ref name="elevation"/>
-        <property-ref name="empty-cells"/>
-        <property-ref name="filter"/>
-        <property-ref name="float"/>
-        <property-ref name="font"/>
-        <property-ref name="font-family"/>
-        <property-ref name="font-size"/>
-        <property-ref name="font-size-adjust"/>
-        <property-ref name="font-stretch"/>
-        <property-ref name="font-style"/>
-        <property-ref name="font-variant"/>
-        <property-ref name="font-weight"/>
-        <property-ref name="height"/>
-        <property-ref name="ime-mode"/>
-        <property-ref name="layout-flow"/>
-        <property-ref name="layout-grid"/>
-        <property-ref name="layout-grid-char"/>
-        <property-ref name="layout-grid-line"/>
-        <property-ref name="layout-grid-mode"/>
-        <property-ref name="layout-grid-type"/>
-        <property-ref name="left"/>
-        <property-ref name="letter-spacing"/>
-        <property-ref name="line-break"/>
-        <property-ref name="line-height"/>
-        <property-ref name="list-style"/>
-        <property-ref name="list-style-image"/>
-        <property-ref name="list-style-position"/>
-        <property-ref name="list-style-type"/>
-        <property-ref name="margin"/>
-        <property-ref name="margin-bottom"/>
-        <property-ref name="margin-left"/>
-        <property-ref name="margin-right"/>
-        <property-ref name="margin-top"/>
-        <property-ref name="marker-offset"/>
-        <property-ref name="marks"/>
-        <property-ref name="max-height"/>
-        <property-ref name="max-width"/>
-        <property-ref name="min-height"/>
-        <property-ref name="min-width"/>
-        <property-ref name="opacity"/>
-        <property-ref name="orphans"/>
-        <property-ref name="outline"/>
-        <property-ref name="outline-color"/>
-        <property-ref name="outline-style"/>
-        <property-ref name="outline-width"/>
-        <property-ref name="overflow"/>
-        <property-ref name="overflow-x"/>
-        <property-ref name="overflow-y"/>
-        <property-ref name="padding"/>
-        <property-ref name="padding-bottom"/>
-        <property-ref name="padding-left"/>
-        <property-ref name="padding-right"/>
-        <property-ref name="padding-top"/>
-        <property-ref name="page"/>
-        <property-ref name="page-break-after"/>
-        <property-ref name="page-break-before"/>
-        <property-ref name="page-break-inside"/>
-        <property-ref name="pause"/>
-        <property-ref name="pause-after"/>
-        <property-ref name="pause-before"/>
-        <property-ref name="pitch"/>
-        <property-ref name="pitch-range"/>
-        <property-ref name="play-during"/>
-        <property-ref name="position"/>
-        <property-ref name="quotes"/>
-        <property-ref name="richness"/>
-        <property-ref name="right"/>
-        <property-ref name="ruby-align"/>
-        <property-ref name="ruby-overhang"/>
-        <property-ref name="ruby-position"/>
-        <property-ref name="scrollbar-3dlight-color"/>
-        <property-ref name="scrollbar-arrow-color"/>
-        <property-ref name="scrollbar-base-color"/>
-        <property-ref name="scrollbar-darkshadow-color"/>
-        <property-ref name="scrollbar-face-color"/>
-        <property-ref name="scrollbar-highlight-color"/>
-        <property-ref name="scrollbar-shadow-color"/>
-        <property-ref name="scrollbar-track-color"/>
-        <property-ref name="size"/>
-        <property-ref name="speak"/>
-        <property-ref name="speak-header"/>
-        <property-ref name="speak-numeral"/>
-        <property-ref name="speak-punctuation"/>
-        <property-ref name="speech-rate"/>
-        <property-ref name="stress"/>
-        <property-ref name="table-layout"/>
-        <property-ref name="text-align"/>
-        <property-ref name="text-align-last"/>
-        <property-ref name="text-decoration"/>
-        <property-ref name="text-indent"/>
-        <property-ref name="text-justify"/>
-        <property-ref name="text-overflow"/>
-        <property-ref name="text-shadow"/>
-        <property-ref name="text-transform"/>
-        <property-ref name="text-underline-position"/>
-        <property-ref name="top"/>
-        <property-ref name="unicode-bidi"/>
-        <property-ref name="vertical-align"/>
-        <property-ref name="visibility"/>
-        <property-ref name="voice-family"/>
-        <property-ref name="volume"/>
-        <property-ref name="white-space"/>
-        <property-ref name="widows"/>
-        <property-ref name="width"/>
-        <property-ref name="word-break"/>
-        <property-ref name="word-spacing"/>
-        <property-ref name="word-wrap"/>
-        <property-ref name="writing-mode"/>
-        <property-ref name="z-index"/>
-        <property-ref name="zoom"/>
-      </property-refs>
-      <remarks>Takes the same properties as a regular anchor element. You can style an a:hover element to show a visual cue as to when a user is hovering over the link. Use a:hover to easily mimic rollover behavior for your links.</remarks>
-    </element>
-    <element name="a:link" display-name="Link">
-      <browsers>
-        <browser platform="IE" version="2.0+"/>
-        <browser platform="Netscape" version="1.0+"/>
-        <browser platform="Mozilla" version="1.0+"/>
-        <browser platform="Opera" version="4.0+"/>
-        <browser platform="Chrome" version="5.0+"/>
-        <browser platform="Safari" version="1.0+"/>
-      </browsers>
-      <description>Defines the properties for an unvisited link.</description>
-      <example>
-			&lt;p&gt;This example shows a set styles of anchor elements that will visually change color and text-decoration depending on state and mouse behavior:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;
-a {
-	color: blue;
-	text-decoration: underline;
-}
-
-a:active {
-	color: yellow;
-	text-decoration: none;
-}
-
-a:link {
-	color: blue;
-	text-decoration: underline;
-}
-
-a:visited {
-	color: purple;
-	text-decoration: none;
-}
-
-a:focus {
-	color: red;
-	text-decoration: none;
-}
-
-a:hover {
-	color: red;
-	text-decoration: none;
-}
-&lt;/code&gt;&lt;/pre&gt;
-			</example>
-      <property-refs>
-        <property-ref name="-moz-binding"/>
-        <property-ref name="-moz-border-bottom-colors"/>
-        <property-ref name="-moz-border-left-colors"/>
-        <property-ref name="-moz-border-radius"/>
-        <property-ref name="-moz-border-radius-bottomleft"/>
-        <property-ref name="-moz-border-radius-bottomright"/>
-        <property-ref name="-moz-border-radius-topleft"/>
-        <property-ref name="-moz-border-radius-topright"/>
-        <property-ref name="-moz-border-right-colors"/>
-        <property-ref name="-moz-border-top-colors"/>
-        <property-ref name="-moz-opacity"/>
-        <property-ref name="-moz-outline"/>
-        <property-ref name="-moz-outline-color"/>
-        <property-ref name="-moz-outline-style"/>
-        <property-ref name="-moz-outline-width"/>
-        <property-ref name="-moz-user-focus"/>
-        <property-ref name="-moz-user-input"/>
-        <property-ref name="-moz-user-modify"/>
-        <property-ref name="-moz-user-select"/>
-        <property-ref name="-o-link"/>
-        <property-ref name="-o-link-source"/>
-        <property-ref name="accelerator"/>
-        <property-ref name="azimuth"/>
-        <property-ref name="background"/>
-        <property-ref name="background-attachment"/>
-        <property-ref name="background-color"/>
-        <property-ref name="background-image"/>
-        <property-ref name="background-position"/>
-        <property-ref name="background-position-x"/>
-        <property-ref name="background-position-y"/>
-        <property-ref name="background-repeat"/>
-        <property-ref name="border"/>
-        <property-ref name="border-bottom"/>
-        <property-ref name="border-bottom-color"/>
-        <property-ref name="border-bottom-style"/>
-        <property-ref name="border-bottom-width"/>
-        <property-ref name="border-collapse"/>
-        <property-ref name="border-color"/>
-        <property-ref name="border-left"/>
-        <property-ref name="border-left-color"/>
-        <property-ref name="border-left-style"/>
-        <property-ref name="border-left-width"/>
-        <property-ref name="border-right"/>
-        <property-ref name="border-right-color"/>
-        <property-ref name="border-right-style"/>
-        <property-ref name="border-right-width"/>
-        <property-ref name="border-spacing"/>
-        <property-ref name="border-style"/>
-        <property-ref name="border-top"/>
-        <property-ref name="border-top-color"/>
-        <property-ref name="border-top-style"/>
-        <property-ref name="border-top-width"/>
-        <property-ref name="border-width"/>
-        <property-ref name="bottom"/>
-        <property-ref name="caption-side"/>
-        <property-ref name="clear"/>
-        <property-ref name="clip"/>
-        <property-ref name="color"/>
-        <property-ref name="content"/>
-        <property-ref name="counter-increment"/>
-        <property-ref name="counter-reset"/>
-        <property-ref name="cue"/>
-        <property-ref name="cue-after"/>
-        <property-ref name="cue-before"/>
-        <property-ref name="cursor"/>
-        <property-ref name="direction"/>
-        <property-ref name="display"/>
-        <property-ref name="elevation"/>
-        <property-ref name="empty-cells"/>
-        <property-ref name="filter"/>
-        <property-ref name="float"/>
-        <property-ref name="font"/>
-        <property-ref name="font-family"/>
-        <property-ref name="font-size"/>
-        <property-ref name="font-size-adjust"/>
-        <property-ref name="font-stretch"/>
-        <property-ref name="font-style"/>
-        <property-ref name="font-variant"/>
-        <property-ref name="font-weight"/>
-        <property-ref name="height"/>
-        <property-ref name="ime-mode"/>
-        <property-ref name="layout-flow"/>
-        <property-ref name="layout-grid"/>
-        <property-ref name="layout-grid-char"/>
-        <property-ref name="layout-grid-line"/>
-        <property-ref name="layout-grid-mode"/>
-        <property-ref name="layout-grid-type"/>
-        <property-ref name="left"/>
-        <property-ref name="letter-spacing"/>
-        <property-ref name="line-break"/>
-        <property-ref name="line-height"/>
-        <property-ref name="list-style"/>
-        <property-ref name="list-style-image"/>
-        <property-ref name="list-style-position"/>
-        <property-ref name="list-style-type"/>
-        <property-ref name="margin"/>
-        <property-ref name="margin-bottom"/>
-        <property-ref name="margin-left"/>
-        <property-ref name="margin-right"/>
-        <property-ref name="margin-top"/>
-        <property-ref name="marker-offset"/>
-        <property-ref name="marks"/>
-        <property-ref name="max-height"/>
-        <property-ref name="max-width"/>
-        <property-ref name="min-height"/>
-        <property-ref name="min-width"/>
-        <property-ref name="opacity"/>
-        <property-ref name="orphans"/>
-        <property-ref name="outline"/>
-        <property-ref name="outline-color"/>
-        <property-ref name="outline-style"/>
-        <property-ref name="outline-width"/>
-        <property-ref name="overflow"/>
-        <property-ref name="overflow-x"/>
-        <property-ref name="overflow-y"/>
-        <property-ref name="padding"/>
-        <property-ref name="padding-bottom"/>
-        <property-ref name="padding-left"/>
-        <property-ref name="padding-right"/>
-        <property-ref name="padding-top"/>
-        <property-ref name="page"/>
-        <property-ref name="page-break-after"/>
-        <property-ref name="page-break-before"/>
-        <property-ref name="page-break-inside"/>
-        <property-ref name="pause"/>
-        <property-ref name="pause-after"/>
-        <property-ref name="pause-before"/>
-        <property-ref name="pitch"/>
-        <property-ref name="pitch-range"/>
-        <property-ref name="play-during"/>
-        <property-ref name="position"/>
-        <property-ref name="quotes"/>
-        <property-ref name="richness"/>
-        <property-ref name="right"/>
-        <property-ref name="ruby-align"/>
-        <property-ref name="ruby-overhang"/>
-        <property-ref name="ruby-position"/>
-        <property-ref name="scrollbar-3dlight-color"/>
-        <property-ref name="scrollbar-arrow-color"/>
-        <property-ref name="scrollbar-base-color"/>
-        <property-ref name="scrollbar-darkshadow-color"/>
-        <property-ref name="scrollbar-face-color"/>
-        <property-ref name="scrollbar-highlight-color"/>
-        <property-ref name="scrollbar-shadow-color"/>
-        <property-ref name="scrollbar-track-color"/>
-        <property-ref name="size"/>
-        <property-ref name="speak"/>
-        <property-ref name="speak-header"/>
-        <property-ref name="speak-numeral"/>
-        <property-ref name="speak-punctuation"/>
-        <property-ref name="speech-rate"/>
-        <property-ref name="stress"/>
-        <property-ref name="table-layout"/>
-        <property-ref name="text-align"/>
-        <property-ref name="text-align-last"/>
-        <property-ref name="text-decoration"/>
-        <property-ref name="text-indent"/>
-        <property-ref name="text-justify"/>
-        <property-ref name="text-justify"/>
-        <property-ref name="text-shadow"/>
-        <property-ref name="text-transform"/>
-        <property-ref name="text-underline-position"/>
-        <property-ref name="top"/>
-        <property-ref name="unicode-bidi"/>
-        <property-ref name="vertical-align"/>
-        <property-ref name="visibility"/>
-        <property-ref name="voice-family"/>
-        <property-ref name="volume"/>
-        <property-ref name="white-space"/>
-        <property-ref name="widows"/>
-        <property-ref name="width"/>
-        <property-ref name="word-break"/>
-        <property-ref name="word-spacing"/>
-        <property-ref name="word-wrap"/>
-        <property-ref name="writing-mode"/>
-        <property-ref name="z-index"/>
-        <property-ref name="zoom"/>
-      </property-refs>
-      <remarks>Takes the same properties as a regular anchor element. You can style an a:link element to show that the link has not yet been clicked. </remarks>
-    </element>
-    <element name="a:visited" display-name="Visited Link">
-      <browsers>
-        <browser platform="IE" version="2.0+"/>
-        <browser platform="Netscape" version="1.0+"/>
-        <browser platform="Mozilla" version="1.0+"/>
-        <browser platform="Opera" version="4.0+"/>
-        <browser platform="Chrome" version="5.0+"/>
-        <browser platform="Safari" version="1.0+"/>
-      </browsers>
-      <description>Defines the properties for a visited link.</description>
-      <example>
-			&lt;p&gt;This example shows a set styles of anchor elements that will visually change color and text-decoration depending on state and mouse behavior:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;
-a {
-	color: blue;
-	text-decoration: underline;
-}
-
-a:active {
-	color: yellow;
-	text-decoration: none;
-}
-
-a:link {
-	color: blue;
-	text-decoration: underline;
-}
-
-a:visited {
-	color: purple;
-	text-decoration: none;
-}
-
-a:focus {
-	color: red;
-	text-decoration: none;
-}
-
-a:hover {
-	color: red;
-	text-decoration: none;
-}
-&lt;/code&gt;&lt;/pre&gt;
-			</example>
-      <property-refs>
-        <property-ref name="-moz-binding"/>
-        <property-ref name="-moz-border-bottom-colors"/>
-        <property-ref name="-moz-border-left-colors"/>
-        <property-ref name="-moz-border-radius"/>
-        <property-ref name="-moz-border-radius-bottomleft"/>
-        <property-ref name="-moz-border-radius-bottomright"/>
-        <property-ref name="-moz-border-radius-topleft"/>
-        <property-ref name="-moz-border-radius-topright"/>
-        <property-ref name="-moz-border-right-colors"/>
-        <property-ref name="-moz-border-top-colors"/>
-        <property-ref name="-moz-opacity"/>
-        <property-ref name="-moz-outline"/>
-        <property-ref name="-moz-outline-color"/>
-        <property-ref name="-moz-outline-style"/>
-        <property-ref name="-moz-outline-width"/>
-        <property-ref name="-moz-user-focus"/>
-        <property-ref name="-moz-user-input"/>
-        <property-ref name="-moz-user-modify"/>
-        <property-ref name="-moz-user-select"/>
-        <property-ref name="-o-link"/>
-        <property-ref name="-o-link-source"/>
-        <property-ref name="accelerator"/>
-        <property-ref name="azimuth"/>
-        <property-ref name="background"/>
-        <property-ref name="background-attachment"/>
-        <property-ref name="background-color"/>
-        <property-ref name="background-image"/>
-        <property-ref name="background-position"/>
-        <property-ref name="background-position-x"/>
-        <property-ref name="background-position-y"/>
-        <property-ref name="background-repeat"/>
-        <property-ref name="border"/>
-        <property-ref name="border-bottom"/>
-        <property-ref name="border-bottom-color"/>
-        <property-ref name="border-bottom-style"/>
-        <property-ref name="border-bottom-width"/>
-        <property-ref name="border-collapse"/>
-        <property-ref name="border-color"/>
-        <property-ref name="border-left"/>
-        <property-ref name="border-left-color"/>
-        <property-ref name="border-left-style"/>
-        <property-ref name="border-left-width"/>
-        <property-ref name="border-right"/>
-        <property-ref name="border-right-color"/>
-        <property-ref name="border-right-style"/>
-        <property-ref name="border-right-width"/>
-        <property-ref name="border-spacing"/>
-        <property-ref name="border-style"/>
-        <property-ref name="border-top"/>
-        <property-ref name="border-top-color"/>
-        <property-ref name="border-top-style"/>
-        <property-ref name="border-top-width"/>
-        <property-ref name="border-width"/>
-        <property-ref name="bottom"/>
-        <property-ref name="caption-side"/>
-        <property-ref name="clear"/>
-        <property-ref name="clip"/>
-        <property-ref name="color"/>
-        <property-ref name="content"/>
-        <property-ref name="counter-increment"/>
-        <property-ref name="counter-reset"/>
-        <property-ref name="cue"/>
-        <property-ref name="cue-after"/>
-        <property-ref name="cue-before"/>
-        <property-ref name="cursor"/>
-        <property-ref name="direction"/>
-        <property-ref name="display"/>
-        <property-ref name="elevation"/>
-        <property-ref name="empty-cells"/>
-        <property-ref name="filter"/>
-        <property-ref name="float"/>
-        <property-ref name="font"/>
-        <property-ref name="font-family"/>
-        <property-ref name="font-size"/>
-        <property-ref name="font-size-adjust"/>
-        <property-ref name="font-stretch"/>
-        <property-ref name="font-style"/>
-        <property-ref name="font-variant"/>
-        <property-ref name="font-weight"/>
-        <property-ref name="height"/>
-        <property-ref name="ime-mode"/>
-        <property-ref name="layout-flow"/>
-        <property-ref name="layout-grid"/>
-        <property-ref name="layout-grid-char"/>
-        <property-ref name="layout-grid-line"/>
-        <property-ref name="layout-grid-mode"/>
-        <property-ref name="layout-grid-type"/>
-        <property-ref name="left"/>
-        <property-ref name="letter-spacing"/>
-        <property-ref name="line-break"/>
-        <property-ref name="line-height"/>
-        <property-ref name="list-style"/>
-        <property-ref name="list-style-image"/>
-        <property-ref name="list-style-position"/>
-        <property-ref name="list-style-type"/>
-        <property-ref name="margin"/>
-        <property-ref name="margin-bottom"/>
-        <property-ref name="margin-left"/>
-        <property-ref name="margin-right"/>
-        <property-ref name="margin-top"/>
-        <property-ref name="marker-offset"/>
-        <property-ref name="marks"/>
-        <property-ref name="max-height"/>
-        <property-ref name="max-width"/>
-        <property-ref name="min-height"/>
-        <property-ref name="min-width"/>
-        <property-ref name="opacity"/>
-        <property-ref name="orphans"/>
-        <property-ref name="outline"/>
-        <property-ref name="outline-color"/>
-        <property-ref name="outline-style"/>
-        <property-ref name="outline-width"/>
-        <property-ref name="overflow"/>
-        <property-ref name="overflow-x"/>
-        <property-ref name="overflow-y"/>
-        <property-ref name="padding"/>
-        <property-ref name="padding-bottom"/>
-        <property-ref name="padding-left"/>
-        <property-ref name="padding-right"/>
-        <property-ref name="padding-top"/>
-        <property-ref name="page"/>
-        <property-ref name="page-break-after"/>
-        <property-ref name="page-break-before"/>
-        <property-ref name="page-break-inside"/>
-        <property-ref name="pause"/>
-        <property-ref name="pause-after"/>
-        <property-ref name="pause-before"/>
-        <property-ref name="pitch"/>
-        <property-ref name="pitch-range"/>
-        <property-ref name="play-during"/>
-        <property-ref name="position"/>
-        <property-ref name="quotes"/>
-        <property-ref name="richness"/>
-        <property-ref name="right"/>
-        <property-ref name="ruby-align"/>
-        <property-ref name="ruby-overhang"/>
-        <property-ref name="ruby-position"/>
-        <property-ref name="scrollbar-3dlight-color"/>
-        <property-ref name="scrollbar-arrow-color"/>
-        <property-ref name="scrollbar-base-color"/>
-        <property-ref name="scrollbar-darkshadow-color"/>
-        <property-ref name="scrollbar-face-color"/>
-        <property-ref name="scrollbar-highlight-color"/>
-        <property-ref name="scrollbar-shadow-color"/>
-        <property-ref name="scrollbar-track-color"/>
-        <property-ref name="size"/>
-        <property-ref name="speak"/>
-        <property-ref name="speak-header"/>
-        <property-ref name="speak-numeral"/>
-        <property-ref name="speak-punctuation"/>
-        <property-ref name="speech-rate"/>
-        <property-ref name="stress"/>
-        <property-ref name="table-layout"/>
-        <property-ref name="text-align"/>
-        <property-ref name="text-align-last"/>
-        <property-ref name="text-decoration"/>
-        <property-ref name="text-indent"/>
-        <property-ref name="text-justify"/>
-        <property-ref name="text-overflow"/>
-        <property-ref name="text-shadow"/>
-        <property-ref name="text-transform"/>
-        <property-ref name="text-underline-position"/>
-        <property-ref name="top"/>
-        <property-ref name="unicode-bidi"/>
-        <property-ref name="vertical-align"/>
-        <property-ref name="visibility"/>
-        <property-ref name="voice-family"/>
-        <property-ref name="volume"/>
-        <property-ref name="white-space"/>
-        <property-ref name="widows"/>
-        <property-ref name="width"/>
-        <property-ref name="word-break"/>
-        <property-ref name="word-spacing"/>
-        <property-ref name="word-wrap"/>
-        <property-ref name="writing-mode"/>
-        <property-ref name="z-index"/>
-        <property-ref name="zoom"/>
-      </property-refs>
-      <remarks>Takes the same properties as a regular anchor element. You can style an a:visited element differently to show a visual cue as to when the link has already been visited.</remarks>
-    </element>
     <element name="abbr" display-name="Abbreviation">
       <browsers>
         <browser platform="Netscape" version="6.0+"/>
@@ -28194,6 +27069,7 @@ li {
       <values>
         <value name="*" description="Specify a value for vertical-align that is not on this list."/>
         <value name="inherit" description="Inherit the value from the parent element."/>
+        <value name="bottom" description="Align the bottom of the aligned subtree with the bottom of the line box."/>
         <value name="baseline" description="Align with the baseline of the containing element."/>
         <value name="sub" description="Align as subscript."/>
         <value name="super" description="Align as superscript."/>
@@ -28575,4 +27451,365 @@ li {
       </values>
     </property>
   </properties>
+  <pseudo-classes>
+    <pseudo-class name="active">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS2"/>
+      </availability>
+      <description>The :active pseudo-class applies while an element is being activated by the user. For example, between the times the user presses the mouse button and releases it.</description>
+      <example>a:active  { color: lime }   /* active links    */</example>
+    </pseudo-class>
+    <pseudo-class name="checked">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <description>Radio and checkbox elements can be toggled by the user. Some menu items are "checked" when the user selects them. When such elements are toggled "on" the :checked pseudo-class applies. While the :checked pseudo-class is dynamic in nature, and can altered by user action, since it can also be based on the presence of semantic attributes in the document, it applies to all media.</description>
+      <example></example>
+    </pseudo-class>
+    <pseudo-class name="disabled">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <description>The :disabled pseudo-class represents user interface elements that are in a disabled state; such elements have a corresponding enabled state.</description>
+      <example></example>
+    </pseudo-class>
+    <pseudo-class name="empty">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <description>The :empty pseudo-class represents an element that has no children at all. In terms of the document tree, only element nodes and content nodes (such as DOM [DOM-LEVEL-3-CORE] text nodes, CDATA nodes, and entity references) whose data has a non-zero length must be considered as affecting emptiness; comments, processing instructions, and other nodes must not affect whether an element is considered empty or not.</description>
+      <example>p:empty is a valid representation of the following fragment:
+&lt;p&gt;&lt;/p&gt;
+foo:empty is not a valid representation for the following fragments:
+
+&lt;foo&gt;bar&lt;/foo&gt;
+&lt;foo&gt;&lt;bar&gt;bla&lt;/bar&gt;&lt;/foo&gt;
+&lt;foo&gt;this is not &lt;bar&gt;:empty&lt;/bar&gt;&lt;/foo&gt;</example>
+    </pseudo-class>
+    <pseudo-class name="enabled">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <description>The :enabled pseudo-class represents user interface elements that are in an enabled state; such elements have a corresponding disabled state.</description>
+      <example></example>
+    </pseudo-class>
+    <pseudo-class name="first-child">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS2"/>
+      </availability>
+      <description>The :first-child pseudo-class matches an element that is the first child element of some other element.</description>
+      <example>div > p:first-child { text-indent: 0 }</example>
+    </pseudo-class>
+    <pseudo-class name="first-of-type">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <description>Same as :nth-of-type(1). The :first-of-type pseudo-class represents an element that is the first sibling of its type in the list of children of its parent element.</description>
+      <example>dl dt:first-of-type</example>
+    </pseudo-class>
+    <pseudo-class name="focus">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS2"/>
+      </availability>
+      <description>The :focus pseudo-class applies while an element has the focus (accepts keyboard events or other forms of text input).</description>
+      <example>a:focus { background: yellow }</example>
+    </pseudo-class>
+    <pseudo-class name="hover">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS2"/>
+      </availability>
+      <description>The :hover pseudo-class applies while the user designates an element (with some pointing device), but does not activate it. For example, a visual user agent could apply this pseudo-class when the cursor (mouse pointer) hovers over a box generated by the element. User agents not supporting interactive media do not have to support this pseudo-class. Some conforming user agents supporting interactive media may not be able to support this pseudo-class (e.g., a pen device).</description>
+      <example>a:hover   { color: yellow } /* user hovers     */</example>
+    </pseudo-class>
+    <pseudo-class name="indeterminate">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <description>Radio and checkbox elements can be toggled by the user, but are sometimes in an indeterminate state, neither checked nor unchecked. This can be due to an element attribute, or DOM manipulation.
+
+A future version of this specification may introduce an :indeterminate pseudo-class that applies to such elements.</description>
+      <example></example>
+    </pseudo-class>
+    <pseudo-class name="lang">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS2"/>
+      </availability>
+      <description>The pseudo-class ':lang(C)' matches if the element is in language C. Whether there is a match is based solely on the identifier C being either equal to, or a hyphen-separated substring of, the element's language value, in the same way as if performed by the '|=' operator. The matching of C against the element's language value is performed case-insensitively. The identifier C does not have to be a valid language name.</description>
+      <example>html:lang(fr-ca) { quotes: '\u201C' '\u201D' }</example>
+      <values>
+        <value name="*" description="See &lt;a href=&quot;http://www.iana.org/assignments/language-subtag-registry&quot;&gt;http://www.iana.org/assignments/language-subtag-registry&lt;/a&gt;" />
+        <value name="cmn" description="Mandarin Chinese" />
+        <value name="de" description="German" />
+        <value name="en" description="English" />
+        <value name="es" description="Spanish" />
+        <value name="fr" description="French" />
+        <value name="fr-be" description="Belgian French" />
+        <value name="fr-ca" description="Canadian French" />
+        <value name="it" description="Italian" />
+        <value name="ja" description="Japanese" />
+        <value name="zh-Hans" description="Simplified Chinese" />
+        <value name="zh-Hant" description="Tranditional Chinese" />
+      </values>
+    </pseudo-class>
+    <pseudo-class name="last-child">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <description>Same as :nth-last-child(1). The :last-child pseudo-class represents an element that is the last child of some other element.</description>
+      <example>ol > li:last-child</example>
+    </pseudo-class>
+    <pseudo-class name="last-of-type">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <description>Same as :nth-last-of-type(1). The :last-of-type pseudo-class represents an element that is the last sibling of its type in the list of children of its parent element.</description>
+      <example>tr > td:last-of-type</example>
+    </pseudo-class>
+    <pseudo-class name="link">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS2"/>
+      </availability>
+      <description>The :link pseudo-class applies for links that have not yet been visited.</description>
+      <example>a:link { color: red }</example>
+    </pseudo-class>
+    <pseudo-class name="not">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <description>The negation pseudo-class, :not(X), is a functional notation taking a simple selector (excluding the negation pseudo-class itself) as an argument. It represents an element that is not represented by its argument.
+
+Negations may not be nested; :not(:not(...)) is invalid. Note also that since pseudo-elements are not simple selectors, they are not a valid argument to :not().</description>
+      <example>The following selector matches all button elements in an HTML document that are not disabled.
+
+button:not([DISABLED])
+The following selector represents all but FOO elements.
+
+*:not(FOO)
+The following group of selectors represents all HTML elements except links.
+
+html|*:not(:link):not(:visited)</example>
+      <values>
+        <value name="*" description="A simple selector" />
+      </values>
+    </pseudo-class>
+    <pseudo-class name="nth-child">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <description>The :nth-child(an+b) pseudo-class notation represents an element that has an+b-1 siblings before it in the document tree, for any positive integer or zero value of n, and has a parent element. For values of a and b greater than zero, this effectively divides the element's children into groups of a elements (the last group taking the remainder), and selecting the bth element of each group. For example, this allows the selectors to address every other row in a table, and could be used to alternate the color of paragraph text in a cycle of four. The a and b values must be integers (positive, negative, or zero). The index of the first child of an element is 1.
+
+In addition to this, :nth-child() can take ‘odd’ and ‘even’ as arguments instead. ‘odd’ has the same signification as 2n+1, and ‘even’ has the same signification as 2n.
+
+The argument to :nth-child() must match the grammar below, where INTEGER matches the token [0-9]+ and the rest of the tokenization is given by the Lexical scanner in section 10.2:
+
+nth
+  : S* [ ['-'|'+']? INTEGER? {N} [ S* ['-'|'+'] S* INTEGER ]? |
+         ['-'|'+']? INTEGER | {O}{D}{D} | {E}{V}{E}{N} ] S*
+  ;</description>
+      <example>tr:nth-child(2n+1) /* represents every odd row of an HTML table */
+tr:nth-child(odd)  /* same */
+tr:nth-child(2n+0) /* represents every even row of an HTML table */
+tr:nth-child(even) /* same */
+
+/* Alternate paragraph colours in CSS */
+p:nth-child(4n+1) { color: navy; }
+p:nth-child(4n+2) { color: green; }
+p:nth-child(4n+3) { color: maroon; }
+p:nth-child(4n+4) { color: purple; }</example>
+      <values>
+        <value name="*" description="[ ['-'|'+']? INTEGER? {N} [ S* ['-'|'+'] S* INTEGER ]? | ['-'|'+']? INTEGER | {O}{D}{D} | {E}{V}{E}{N} ]" />
+        <value name="odd" description="Has the same signification as 2n+1." />
+        <value name="even" description="Has the same signification as 2n." />
+      </values>
+    </pseudo-class>
+    <pseudo-class name="nth-last-child">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <description>The :nth-last-child(an+b) pseudo-class notation represents an element that has an+b-1 siblings &lt;b&gt;after&lt;/b&gt; it in the document tree, for any positive integer or zero value of n, and has a parent element. See :nth-child() pseudo-class for the syntax of its argument. It also accepts the ‘even’ and ‘odd’ values as arguments.</description>
+      <example>tr:nth-last-child(-n+2)    /* represents the two last rows of an HTML table */
+
+foo:nth-last-child(odd)    /* represents all odd foo elements in their parent element,
+                              counting from the last one */</example>
+      <values>
+        <value name="*" description="[ ['-'|'+']? INTEGER? {N} [ S* ['-'|'+'] S* INTEGER ]? | ['-'|'+']? INTEGER | {O}{D}{D} | {E}{V}{E}{N} ]" />
+        <value name="odd" description="Has the same signification as 2n+1." />
+        <value name="even" description="Has the same signification as 2n." />
+      </values>
+    </pseudo-class>
+    <pseudo-class name="nth-last-of-type">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <description>The :nth-last-of-type(an+b) pseudo-class notation represents an element that has an+b-1 siblings with the same expanded element name &lt;b&gt;after&lt;/b&gt; it in the document tree, for any zero or positive integer value of n, and has a parent element. See :nth-child() pseudo-class for the syntax of its argument. It also accepts the ‘even’ and ‘odd’ values.</description>
+      <example>body > h2:nth-of-type(n+2):nth-last-of-type(n+2)</example>
+      <values>
+        <value name="*" description="[ ['-'|'+']? INTEGER? {N} [ S* ['-'|'+'] S* INTEGER ]? | ['-'|'+']? INTEGER | {O}{D}{D} | {E}{V}{E}{N} ]" />
+        <value name="odd" description="Has the same signification as 2n+1." />
+        <value name="even" description="Has the same signification as 2n." />
+      </values>
+    </pseudo-class>
+    <pseudo-class name="nth-of-type">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <description>The :nth-of-type(an+b) pseudo-class notation represents an element that has an+b-1 siblings with the same expanded element name &lt;b&gt;before&lt;/b&gt; it in the document tree, for any zero or positive integer value of n, and has a parent element. See :nth-child() pseudo-class for the syntax of its argument. It also accepts the ‘even’ and ‘odd’ values.</description>
+      <example>img:nth-of-type(2n+1) { float: right; }
+img:nth-of-type(2n) { float: left; }</example>
+      <values>
+        <value name="*" description="[ ['-'|'+']? INTEGER? {N} [ S* ['-'|'+'] S* INTEGER ]? | ['-'|'+']? INTEGER | {O}{D}{D} | {E}{V}{E}{N} ]" />
+        <value name="odd" description="Has the same signification as 2n+1." />
+        <value name="even" description="Has the same signification as 2n." />
+      </values>
+    </pseudo-class>
+    <pseudo-class name="only-child">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <description>Represents an element that has a parent element and whose parent element has no other element children. Same as :first-child:last-child or :nth-child(1):nth-last-child(1), but with a lower specificity.</description>
+      <example></example>
+    </pseudo-class>
+    <pseudo-class name="only-of-type">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <description>Represents an element that has a parent element and whose parent element has no other element children with the same expanded element name. Same as :first-of-type:last-of-type or :nth-of-type(1):nth-last-of-type(1), but with a lower specificity.</description>
+      <example></example>
+    </pseudo-class>
+    <pseudo-class name="root">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <description>The :root pseudo-class represents an element that is the root of the document. In HTML 4, this is always the HTML element.</description>
+      <example>:root { color: red }</example>
+    </pseudo-class>
+    <pseudo-class name="target">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <description>A target element can be represented by the :target pseudo-class. If the document's URI has no fragment identifier, then the document has no target element.</description>
+      <example>.note:target /* This selector represents a p element of class note that is the target element of the referring URI. */</example>
+    </pseudo-class>
+    <pseudo-class name="visited">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS2"/>
+      </availability>
+      <description>The :visited pseudo-class applies once the link has been visited by the user.</description>
+      <example>a.external:visited { color: blue }</example>
+    </pseudo-class>
+  </pseudo-classes>
+  <pseudo-elements>
+    <pseudo-element name="after" allow-pseudo-class-syntax="true">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS2"/>
+      </availability>
+      <description>The ':before' and ':after' pseudo-elements can be used to insert generated content before or after an element's content.</description>
+      <example>p.special:after {content: "Special! "}</example>
+    </pseudo-element>
+    <pseudo-element name="before" allow-pseudo-class-syntax="true">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS2"/>
+      </availability>
+      <description>The ':before' and ':after' pseudo-elements can be used to insert generated content before or after an element's content.</description>
+      <example>h1:before {content: counter(chapno, upper-roman) ". "}</example>
+    </pseudo-element>
+    <pseudo-element name="first-letter" allow-pseudo-class-syntax="true">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS2"/>
+      </availability>
+      <description>The :first-letter pseudo-element must select the first letter of the first line of a block, if it is not preceded by any other content (such as images or inline tables) on its line. The :first-letter pseudo-element may be used for "initial caps" and "drop caps", which are common typographical effects. This type of initial letter is similar to an inline-level element if its 'float' property is 'none', otherwise it is similar to a floated element.</description>
+      <example>p:first-letter { font-size: 3em; font-weight: normal }</example>
+    </pseudo-element>
+    <pseudo-element name="first-line" allow-pseudo-class-syntax="true">
+      <browsers>
+        <!-- TODO Unknown -->
+      </browsers>
+      <availability>
+        <specification name="W3C" version="CSS2"/>
+      </availability>
+      <description>The :first-line pseudo-element applies special styles to the contents of the first formatted line of a paragraph.</description>
+      <example>p:first-line { text-transform: uppercase }</example>
+    </pseudo-element>
+  </pseudo-elements>
 </css>

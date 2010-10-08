@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.scripting.keybindings.internal;
 
 import java.io.File;
@@ -60,10 +94,11 @@ import org.eclipse.ui.services.IEvaluationService;
 
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
+import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.LoadCycleListener;
-import com.aptana.scripting.model.SnippetElement;
+import com.aptana.scripting.model.filters.IModelFilter;
 
 @SuppressWarnings("restriction")
 public class KeybindingsManager implements LoadCycleListener
@@ -176,7 +211,6 @@ public class KeybindingsManager implements LoadCycleListener
 
 	private final IContextManagerListener contextManagerListener = new IContextManagerListener()
 	{
-		@Override
 		public void contextManagerChanged(ContextManagerEvent contextManagerEvent)
 		{
 			setEnabled(contextManagerEvent.getContextManager().getActiveContextIds().contains(Activator.CONTEXT_ID));
@@ -203,9 +237,10 @@ public class KeybindingsManager implements LoadCycleListener
 	private final Set<KeySequence> uniqueKeySequences;
 	private final Set<KeySequence> uniqueKeySequencesPrefixes;
 
+	private Job workbenchJob;
+
 	/**
 	 * Install the KeybindingsManager.
-	 *
 	 */
 	public static void install()
 	{
@@ -221,7 +256,6 @@ public class KeybindingsManager implements LoadCycleListener
 
 	/**
 	 * Uninstall the KeybindingsManager.
-	 *
 	 */
 	public static void uninstall()
 	{
@@ -318,26 +352,42 @@ public class KeybindingsManager implements LoadCycleListener
 
 	private void reloadbindings()
 	{
-		WorkbenchJob workbenchJob = new WorkbenchJob("Reloading KeybindingsManager") //$NON-NLS-1$
+		if (workbenchJob == null)
 		{
-			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor)
+			workbenchJob = new Job("Reloading KeybindingsManager") //$NON-NLS-1$
 			{
-				try
+				@Override
+				public IStatus run(IProgressMonitor monitor)
 				{
-					loadbindings();
+					if (monitor != null && monitor.isCanceled())
+					{
+						return Status.CANCEL_STATUS;
+					}
+					try
+					{
+						loadbindings();
+					}
+					finally
+					{
+					}
+					return Status.OK_STATUS;
 				}
-				finally
-				{
-				}
-				return Status.OK_STATUS;
-			}
 
-		};
-		workbenchJob.setRule(MUTEX_RULE);
-		workbenchJob.setSystem(true);
-		workbenchJob.setPriority(Job.LONG);
-		workbenchJob.schedule();
+				public boolean shouldRun()
+				{
+					return PlatformUI.isWorkbenchRunning();
+				};
+
+			};
+			workbenchJob.setRule(MUTEX_RULE);
+			workbenchJob.setSystem(true);
+			workbenchJob.setPriority(Job.LONG);
+		}
+		else
+		{
+			workbenchJob.cancel();
+		}
+		workbenchJob.schedule(100);
 	}
 
 	private void loadbindings()
@@ -348,16 +398,29 @@ public class KeybindingsManager implements LoadCycleListener
 		uniqueKeySequences.clear();
 		uniqueKeySequencesPrefixes.clear();
 
-		// Get all commands
-		CommandElement[] commands = bundleManager.getCommands();
+		// Filter to commands with bindings
+		IModelFilter filter = new IModelFilter()
+		{
+
+			public boolean include(AbstractElement element)
+			{
+				boolean result = false;
+
+				if (element instanceof CommandElement)
+				{
+					CommandElement node = (CommandElement) element;
+					String[] bindings = node.getKeyBindings();
+					result = (bindings != null && bindings.length > 0);
+				}
+
+				return result;
+			}
+		};
+
+		// Get all commands with bindings
+		CommandElement[] commands = bundleManager.getCommands(filter);
 		for (CommandElement commandElement : commands)
 		{
-			// Skip snippets
-			if (commandElement instanceof SnippetElement)
-			{
-				continue;
-			}
-
 			// Get key sequences
 			KeySequence[] keySequences = commandElement.getKeySequences();
 			if (keySequences != null && keySequences.length > 0)
@@ -386,7 +449,7 @@ public class KeybindingsManager implements LoadCycleListener
 
 	/**
 	 * Set the enabled state of KeybindingsManager.
-	 *
+	 * 
 	 * @param enabled
 	 */
 	private void setEnabled(boolean enabled)
@@ -471,7 +534,7 @@ public class KeybindingsManager implements LoadCycleListener
 						resetState();
 					}
 
-					//  Do not consume the event. Let Eclipse handle it.
+					// Do not consume the event. Let Eclipse handle it.
 					return false;
 				}
 				else
@@ -532,7 +595,7 @@ public class KeybindingsManager implements LoadCycleListener
 
 	/**
 	 * Reset the state if the active window associated with the state changes.
-	 *
+	 * 
 	 * @param window
 	 */
 	private void checkActiveWindow(IWorkbenchWindow window)
@@ -546,7 +609,7 @@ public class KeybindingsManager implements LoadCycleListener
 
 	/**
 	 * Changes the key binding state to the given key sequence.
-	 *
+	 * 
 	 * @param sequence
 	 *            The new key sequence for the state; should not be <code>null</code>.
 	 */
@@ -582,11 +645,11 @@ public class KeybindingsManager implements LoadCycleListener
 				Point cursorLocation = display.getCursorLocation();
 				if (initialLocation != null)
 				{
-//					Warp the cursor ?
-//					if (!cursorLocation.equals(initialLocation))
-//					{
-//						display.setCursorLocation(initialLocation);
-//					}
+					// Warp the cursor ?
+					// if (!cursorLocation.equals(initialLocation))
+					// {
+					// display.setCursorLocation(initialLocation);
+					// }
 					return initialLocation;
 				}
 				return cursorLocation;
@@ -635,11 +698,8 @@ public class KeybindingsManager implements LoadCycleListener
 						{
 							String name = originalParameterizedCommand.getName();
 							final TableItem item = new TableItem(commandElementTable, SWT.NULL);
-							item
-									.setText(new String[] {
-											name,
-											(mnemonic < MNEMONICS.length() ? String.valueOf(MNEMONICS
-													.charAt(mnemonic++)) : "") }); //$NON-NLS-1$
+							item.setText(new String[] { name,
+									(mnemonic < MNEMONICS.length() ? String.valueOf(MNEMONICS.charAt(mnemonic++)) : "") }); //$NON-NLS-1$
 							item.setData(ParameterizedCommand.class.getName(), originalParameterizedCommand);
 						}
 						catch (NotDefinedException nde)
@@ -804,7 +864,7 @@ public class KeybindingsManager implements LoadCycleListener
 	/**
 	 * Performs the actual execution of the command by looking up the current handler from the command manager. If there
 	 * is a handler and it is enabled, then it tries the actual execution. Execution failures are logged.
-	 *
+	 * 
 	 * @param binding
 	 *            The binding that should be executed; should not be <code>null</code>.
 	 * @param trigger
@@ -845,7 +905,6 @@ public class KeybindingsManager implements LoadCycleListener
 	 * (non-Javadoc)
 	 * @see com.aptana.scripting.model.LoadCycleListener#scriptLoaded(java.io.File)
 	 */
-	@Override
 	public void scriptLoaded(File script)
 	{
 		reloadbindings();
@@ -855,7 +914,6 @@ public class KeybindingsManager implements LoadCycleListener
 	 * (non-Javadoc)
 	 * @see com.aptana.scripting.model.LoadCycleListener#scriptReloaded(java.io.File)
 	 */
-	@Override
 	public void scriptReloaded(File script)
 	{
 		reloadbindings();
@@ -865,7 +923,6 @@ public class KeybindingsManager implements LoadCycleListener
 	 * (non-Javadoc)
 	 * @see com.aptana.scripting.model.LoadCycleListener#scriptUnloaded(java.io.File)
 	 */
-	@Override
 	public void scriptUnloaded(File script)
 	{
 		reloadbindings();

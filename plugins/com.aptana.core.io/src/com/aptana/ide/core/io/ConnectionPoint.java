@@ -113,7 +113,7 @@ public abstract class ConnectionPoint extends PlatformObject implements IConnect
 	/**
 	 * @param id the id to set
 	 */
-	protected final void setId(String id) {
+	public final void setId(String id) {
 		this.id = id;
 		VirtualConnectionManager.getInstance().register(this);
 	}

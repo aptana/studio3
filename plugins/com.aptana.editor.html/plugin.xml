@@ -41,16 +41,6 @@
    </extension>
 
    <extension
-         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
-      <hyperlinkDetector
-            activate="true"
-            class="com.aptana.editor.html.HyperlinkDetector"
-            id="com.aptana.editor.html.hyperlinkDetector"
-            name="%hyperlinkDetector.name"
-            targetId="com.aptana.editor.html">
-      </hyperlinkDetector>
-   </extension>
-   <extension
          point="com.aptana.index.core.fileIndexingParticipants">
       <fileIndexingParticipant
             class="com.aptana.editor.html.contentassist.index.HTMLFileIndexingParticipant">
@@ -63,7 +53,18 @@
          point="com.aptana.parsing.parser">
       <parser
             class="com.aptana.editor.html.parsing.HTMLParser"
+            content-type="com.aptana.contenttype.html"
             language="text/html">
       </parser>
+   </extension>
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
+      <hyperlinkDetector
+            activate="true"
+            class="com.aptana.editor.html.text.hyperlink.CSSClassHyperlinkDetector"
+            id="com.aptana.editor.html.hyperlinkDetector"
+            name="CSS Class Hyperlinks"
+            targetId="com.aptana.editor.html">
+      </hyperlinkDetector>
    </extension>
 </plugin>

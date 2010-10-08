@@ -46,6 +46,7 @@ public class Messages extends NLS {
     public static String CopyFilesOperation_CopyJob_Title;
     public static String CopyFilesOperation_DefaultNewName;
 	public static String CopyFilesOperation_DefaultNewName_WithCount;
+	public static String CopyFilesOperation_DestinationNotAccessible;
 	public static String CopyFilesOperation_ERR_DestinationInSource;
     public static String CopyFilesOperation_ERR_FailedToCopy;
     public static String CopyFilesOperation_ERR_FailedToCopyToDest;

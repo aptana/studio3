@@ -43,14 +43,14 @@ import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.html.outline.HTMLOutlineContentProvider;
 import com.aptana.editor.html.outline.HTMLOutlineLabelProvider;
 import com.aptana.editor.html.parsing.HTMLParseState;
-import com.aptana.editor.html.parsing.ast.HTMLNode;
+import com.aptana.editor.html.parsing.IHTMLParserConstants;
 import com.aptana.editor.js.Activator;
 
 public class HTMLEditor extends AbstractThemeableEditor
 {
 
 	private static final char[] HTML_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'',
-			'\'', '"', '"', '<', '>', 'Ò', 'Ó' };
+			'\'', '"', '"', '<', '>', '\u201C', '\u201D', '\u2018', '\u2019' }; // curly double quotes, curly single quotes
 
 	@Override
 	protected void initializeEditor()
@@ -60,11 +60,11 @@ public class HTMLEditor extends AbstractThemeableEditor
 		setSourceViewerConfiguration(new HTMLSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new HTMLDocumentProvider());
 	}
-	
+
 	@Override
 	protected FileService createFileService()
 	{
-		return new FileService(HTMLNode.LANGUAGE, new HTMLParseState());
+		return new FileService(IHTMLParserConstants.LANGUAGE, new HTMLParseState());
 	}
 
 	/**
