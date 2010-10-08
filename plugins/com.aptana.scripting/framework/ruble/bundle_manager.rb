@@ -43,7 +43,7 @@ module Ruble
             java_bundle = manager.get_bundle_from_path(test_path)
           end
           
-          bundle = Bundle.new(java_bundle, path) unless java_bundle.nil?
+          bundle = Bundle.new(java_bundle) unless java_bundle.nil?
         end
         
         return bundle

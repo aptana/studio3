@@ -32,7 +32,7 @@ module Ruble
     end
     
     def path
-      @path
+      @path ||= @jobj.path
     end
     
     def to_env

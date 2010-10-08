@@ -7,7 +7,7 @@ module Ruble
   class Bundle < BaseElement
     @@defaults = {}
 
-    def initialize(name, path)
+    def initialize(name, path = nil)
       if name.kind_of? String
         super(name, path)
       else
