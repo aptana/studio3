@@ -53,6 +53,8 @@ public class HAMLPartitionerSwitchStrategy extends PartitionerSwitchStrategy {
 		{ "=", "\r" }, //$NON-NLS-1$ //$NON-NLS-2$
 		{ "~", "\n" }, //$NON-NLS-1$ //$NON-NLS-2$
 		{ "~", "\r" }, //$NON-NLS-1$ //$NON-NLS-2$
+		{ "-", "\n" }, //$NON-NLS-1$ //$NON-NLS-2$
+		{ "-", "\r" }, //$NON-NLS-1$ //$NON-NLS-2$
 	};
 	
 	private static final String[][] ESCAPE_PAIRS = new String[][] {
