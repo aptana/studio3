@@ -35,32 +35,34 @@
 package com.aptana.editor.js.formatter.nodes;
 
 import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
+import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 
 /**
- * A JS function declaration formatter node.<br>
- * This node represents the part of the function declaration up to the body part of the function.
+ * A formatter node that represents 'while' statements that end with a semicolon and do not contain an inner block.<br>
+ * It's defined as a Begin-End node to hold the condition parts as children.
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
-public class FormatterJSFunctionDeclarationNode extends FormatterBlockWithBeginNode
+public class FormatterJSNonBlockedWhileNode extends FormatterBlockWithBeginEndNode
 {
 
 	/**
 	 * @param document
 	 */
-	public FormatterJSFunctionDeclarationNode(IFormatterDocument document)
+	public FormatterJSNonBlockedWhileNode(IFormatterDocument document)
 	{
 		super(document);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingNewLine()
 	 */
 	@Override
 	protected boolean isAddingNewLine()
 	{
-		// TODO attach the preference key
+		// TODO - Set this one to true in case we'll decide the break multiple boolean
+		// expressions in this while condition.
 		return false;
 	}
 }

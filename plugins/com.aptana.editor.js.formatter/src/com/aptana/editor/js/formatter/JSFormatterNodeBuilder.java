@@ -34,15 +34,23 @@
  */
 package com.aptana.editor.js.formatter;
 
-import com.aptana.editor.js.formatter.nodes.FormatterJSIfBodyNode;
-import com.aptana.editor.js.formatter.nodes.FormatterJSIfConditionNode;
+import com.aptana.editor.js.formatter.nodes.FormatterJSBlockNode;
+import com.aptana.editor.js.formatter.nodes.FormatterJSCaseNode;
+import com.aptana.editor.js.formatter.nodes.FormatterJSDeclarationNode;
+import com.aptana.editor.js.formatter.nodes.FormatterJSDoWhileBlockNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSFunctionBodyNode;
-import com.aptana.editor.js.formatter.nodes.FormatterJSFunctionDeclarationNode;
+import com.aptana.editor.js.formatter.nodes.FormatterJSNonBlockedWhileNode;
+import com.aptana.editor.js.parsing.ast.JSCaseNode;
+import com.aptana.editor.js.parsing.ast.JSDefaultNode;
+import com.aptana.editor.js.parsing.ast.JSDoNode;
+import com.aptana.editor.js.parsing.ast.JSForInNode;
+import com.aptana.editor.js.parsing.ast.JSForNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSIfNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
+import com.aptana.editor.js.parsing.ast.JSSwitchNode;
 import com.aptana.editor.js.parsing.ast.JSTreeWalker;
 import com.aptana.editor.js.parsing.ast.JSWhileNode;
 import com.aptana.editor.js.parsing.ast.JSWithNode;
@@ -90,7 +98,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		public void visit(JSFunctionNode node)
 		{
 			// First, push the function declaration node
-			FormatterJSFunctionDeclarationNode declarationNode = new FormatterJSFunctionDeclarationNode(document);
+			FormatterJSDeclarationNode declarationNode = new FormatterJSDeclarationNode(document, true);
 			IParseNode body = node.getBody();
 			declarationNode.setBegin(createTextNode(document, node.getStartingOffset(), body.getStartingOffset()));
 			push(declarationNode);
@@ -102,7 +110,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			push(bodyNode);
 			super.visit(node);
 			checkedPop(bodyNode, body.getEndingOffset());
-			bodyNode.setEnd(createTextNode(document, body.getEndingOffset(), bodyNode.getEndOffset() + 1));
+			int end = locateSemicolonInLine(bodyNode.getEndOffset() + 1, document);
+			bodyNode.setEnd(createTextNode(document, body.getEndingOffset(), end));
 		}
 
 		/*
@@ -120,14 +129,14 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			boolean isCurlyFalseBlock = (!isEmptyFalseBlock && falseBlock.getNodeType() == JSNodeTypes.STATEMENTS);
 
 			// First, construct the if condition node
-			FormatterJSIfConditionNode conditionNode = new FormatterJSIfConditionNode(document, isCurlyTrueBlock);
+			FormatterJSDeclarationNode conditionNode = new FormatterJSDeclarationNode(document, isCurlyTrueBlock);
 			conditionNode.setBegin(createTextNode(document, node.getStartingOffset(), trueBlock.getStartingOffset()));
 			push(conditionNode);
 
 			// Construct the 'true' part of the 'if' and visit its children
 			if (isCurlyTrueBlock)
 			{
-				pushIfBodyNode(trueBlock);
+				pushBlockNode(trueBlock, isEmptyFalseBlock);
 			}
 			else
 			{
@@ -141,7 +150,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			{
 				if (isCurlyFalseBlock)
 				{
-					pushIfBodyNode(falseBlock);
+					pushBlockNode(falseBlock, true);
 				}
 				else
 				{
@@ -151,18 +160,42 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			}
 		}
 
-		/**
-		 * @param block
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSDoNode)
 		 */
-		private void pushIfBodyNode(JSNode block)
+		@Override
+		public void visit(JSDoNode node)
 		{
-			FormatterJSIfBodyNode bodyNode = new FormatterJSIfBodyNode(document);
-			bodyNode.setBegin(createTextNode(document, block.getStartingOffset(), block.getStartingOffset() + 1));
-			push(bodyNode);
-			// visit the children
-			visitChildren(block);
-			checkedPop(bodyNode, block.getEndingOffset());
-			bodyNode.setEnd(createTextNode(document, block.getEndingOffset(), block.getEndingOffset() + 1));
+			// First, push the 'do' declaration node
+			FormatterJSDeclarationNode declarationNode = new FormatterJSDeclarationNode(document, true);
+			IParseNode body = node.getBody();
+			declarationNode.setBegin(createTextNode(document, node.getStartingOffset(), body.getStartingOffset()));
+			push(declarationNode);
+			checkedPop(declarationNode, -1);
+
+			// Push the special do-while block node
+			FormatterJSDoWhileBlockNode doWhileBlock = new FormatterJSDoWhileBlockNode(document);
+			doWhileBlock.setBegin(createTextNode(document, body.getStartingOffset(), body.getStartingOffset() + 1));
+			push(doWhileBlock);
+			// visit the body only
+			super.visit((JSNode) node.getBody());
+			int blockEnd = body.getEndingOffset();
+			checkedPop(doWhileBlock, blockEnd);
+			doWhileBlock.setEnd(createTextNode(document, blockEnd, blockEnd + 1));
+
+			// now deal with the 'while' condition part. we need to include the word 'while' that appears
+			// somewhere between the block-end and the condition start.
+			// We wrap this node as a begin-end node that will hold the condition internals as children
+			JSNode condition = (JSNode) node.getCondition();
+			FormatterJSNonBlockedWhileNode whileNode = new FormatterJSNonBlockedWhileNode(document);
+			whileNode.setBegin(createTextNode(document, blockEnd + 1, condition.getStartingOffset()));
+			push(whileNode);
+			visitChildren(condition);
+			int conditionEnd = condition.getEndingOffset() + 1;
+			checkedPop(whileNode, conditionEnd);
+			int end = locateSemicolonInLine(conditionEnd, document);
+			whileNode.setEnd(createTextNode(document, conditionEnd, end));
 		}
 
 		/*
@@ -172,8 +205,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSWhileNode node)
 		{
-			// TODO Auto-generated method stub
-			super.visit(node);
+			visitCommonBlock(node, node.getBody());
 		}
 
 		/*
@@ -183,113 +215,160 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSWithNode node)
 		{
-			// TODO Auto-generated method stub
-			super.visit(node);
+			visitCommonBlock(node, node.getBody());
 		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSForInNode)
+		 */
+		@Override
+		public void visit(JSForInNode node)
+		{
+			visitCommonBlock(node, node.getBody());
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSForNode)
+		 */
+		@Override
+		public void visit(JSForNode node)
+		{
+			visitCommonBlock(node, node.getBody());
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSSwitchNode)
+		 */
+		@Override
+		public void visit(JSSwitchNode node)
+		{
+			// Push the switch-case declaration node
+			FormatterJSDeclarationNode switchNode = new FormatterJSDeclarationNode(document, true);
+			int blockStart = node.getLeftBrace().getStart();
+			switchNode.setBegin(createTextNode(document, node.getStartingOffset(), blockStart));
+			push(switchNode);
+			checkedPop(switchNode, -1);
+
+			// push a switch-case body node
+			FormatterJSBlockNode blockNode = new FormatterJSBlockNode(document);
+			blockNode.setBegin(createTextNode(document, blockStart, blockStart + 1));
+			push(blockNode);
+			// visit the children under that block node
+			super.visit(node);
+			int endingOffset = node.getEndingOffset();
+			// pop the block node
+			checkedPop(blockNode, endingOffset);
+			int endWithSemicolon = locateSemicolonInLine(endingOffset + 1, document);
+			blockNode.setEnd(createTextNode(document, endingOffset, endWithSemicolon));
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSCaseNode)
+		 */
+		@Override
+		public void visit(JSCaseNode node)
+		{
+			visitCaseOrDefaultNode(node, node.getColon().getStart() + 1);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSDefaultNode)
+		 */
+		@Override
+		public void visit(JSDefaultNode node)
+		{
+			visitCaseOrDefaultNode(node, node.getColon().getStart() + 1);
+		}
+
+		/**
+		 * Common visit behavior for 'case' and 'default' nodes under a switch-case block
+		 * 
+		 * @param node
+		 * @param colonOffset
+		 */
+		private void visitCaseOrDefaultNode(JSNode node, int colonOffset)
+		{
+			// push the case/default node till the colon
+			FormatterJSCaseNode switchNode = new FormatterJSCaseNode(document);
+			switchNode.setBegin(createTextNode(document, node.getStartingOffset(), colonOffset));
+			push(switchNode);
+			visitChildren(node);
+			checkedPop(switchNode, node.getEndingOffset() + 1);
+		}
+
+		/**
+		 * Push a FormatterJSBlockNode
+		 * 
+		 * @param block
+		 */
+		private void pushBlockNode(JSNode block, boolean consumeEndingSemicolon)
+		{
+			FormatterJSBlockNode bodyNode = new FormatterJSBlockNode(document);
+			bodyNode.setBegin(createTextNode(document, block.getStartingOffset(), block.getStartingOffset() + 1));
+			push(bodyNode);
+			// visit the children
+			visitChildren(block);
+			checkedPop(bodyNode, block.getEndingOffset());
+			int end = block.getEndingOffset() + 1;
+			if (consumeEndingSemicolon)
+			{
+				locateSemicolonInLine(end, document);
+			}
+			bodyNode.setEnd(createTextNode(document, block.getEndingOffset(), block.getEndingOffset() + 1));
+		}
+
+		/**
+		 * @param node
+		 */
+		private void visitCommonBlock(JSNode node, IParseNode body)
+		{
+			// First, push the while declaration
+			FormatterJSDeclarationNode declarationNode = new FormatterJSDeclarationNode(document,
+					(body.getNodeType() == JSNodeTypes.STATEMENTS));
+			declarationNode.setBegin(createTextNode(document, node.getStartingOffset(), body.getStartingOffset()));
+			push(declarationNode);
+			checkedPop(declarationNode, -1);
+
+			// Then, push the body
+			FormatterJSBlockNode blockNode = new FormatterJSBlockNode(document);
+			blockNode.setBegin(createTextNode(document, body.getStartingOffset(), body.getStartingOffset() + 1));
+			push(blockNode);
+			visitChildren(node);
+			checkedPop(blockNode, body.getEndingOffset());
+			int end = locateSemicolonInLine(blockNode.getEndOffset() + 1, document);
+			blockNode.setEnd(createTextNode(document, body.getEndingOffset(), end));
+		}
+
+		/**
+		 * Scan for a semicolon terminator located at the same line. Return the given offset if non is found.
+		 * 
+		 * @param offset
+		 * @param document
+		 * @return The semicolon offset; The given offset if a semicolon not found.
+		 */
+		private int locateSemicolonInLine(int offset, FormatterDocument document)
+		{
+			int i = offset;
+			int size = document.getLength();
+			for (; i < size; i++)
+			{
+				char c = document.charAt(i);
+				if (c == ';')
+				{
+					return i + 1;
+				}
+				if (c == '\n' || c == '\r')
+				{
+					break;
+				}
+			}
+			return offset;
+		}
+
 	}
-
-	/**
-	 * @param node
-	 * @param rootNode
-	 */
-	// private void addNode(IParseNode node)
-	// {
-	// if (node instanceof HTMLNode)
-	// {
-	// // DEBUG
-	// // System.out.println(elementNode.getName() + "[" + elementNode.getStartingOffset() + ", "
-	// // + elementNode.getEndingOffset() + "]");
-	//
-	// HTMLNode htmlNode = (HTMLNode) node;
-	// if (htmlNode.getNodeType() == HTMLNodeTypes.COMMENT)
-	// {
-	// // We got a HTMLCommentNode
-	// FormatterCommentNode commentNode = new FormatterJSCommentNode(document, htmlNode.getStartingOffset(),
-	// htmlNode.getEndingOffset() + 1);
-	// // We just need to add a child here. We cannot 'push', since the comment node is not a container node.
-	// addChild(commentNode);
-	// }
-	// else if (htmlNode.getNodeType() == HTMLNodeTypes.ELEMENT || htmlNode.getNodeType() == HTMLNodeTypes.SPECIAL)
-	// {
-	// // Check if we need to create a formatter node with a begin and end node, or just begin node.
-	// HTMLElementNode elementNode = (HTMLElementNode) node;
-	// String name = elementNode.getName().toLowerCase();
-	// if (VOID_ELEMENTS.contains(name) || !hasInlineClosingTag(elementNode))
-	// {
-	// // FormatterBlockWithBeginNode formatterNode = new FormatterVoidElementNode(document, name);
-	// // formatterNode.setBegin(createTextNode(document, elementNode.getStartingOffset(), elementNode
-	// // .getEndingOffset() + 1));
-	// // push(formatterNode);
-	// // checkedPop(formatterNode, -1);
-	// }
-	// else
-	// {
-	// pushFormatterNode(elementNode);
-	// }
-	// }
-	// }
-	// else
-	// {
-	// // it's a node that was generated from a different language parser, such as the RHTMLParser
-	// FormatterSpecialElementNode specialNode = new FormatterSpecialElementNode(document, StringUtil.EMPTY);
-	// int startingOffset = node.getStartingOffset();
-	// int endingOffset = node.getEndingOffset() + 1;
-	// specialNode.setBegin(createTextNode(document, startingOffset, endingOffset));
-	// specialNode.setEnd(createTextNode(document, endingOffset, endingOffset)); // empty end
-	// push(specialNode);
-	// checkedPop(specialNode, -1);
-	// }
-	// }
-
-	/**
-	 * Determine the type of the node and return a formatter node that should represent it while rewriting the doc.<br>
-	 * Ant HTMLElementNode is acceptable here, even the special nodes. These special node just represents the wrapping
-	 * nodes around the 'foreign' nodes that exist as their children (nodes produced from the RHTML parser and JS
-	 * parser, for example).<br>
-	 * This behavior allows the inner child of these HTMLSpecialNodes to be processed in the
-	 * {@link #addNode(IParseNode)} method and produce a FormatterSpecialElementNode.<br>
-	 * 
-	 * @param node
-	 * @return FormatterBlockWithBeginEndNode sub-classing instance
-	 */
-	// private FormatterBlockWithBeginEndNode pushFormatterNode(HTMLElementNode node)
-	// {
-	// String type = node.getName().toLowerCase();
-	// FormatterBlockWithBeginEndNode formatterNode;
-	// IRange beginNodeRange = node.getNameNode().getNameRange();
-	// INameNode endNode = node.getEndNode();
-	// int endOffset = node.getEndingOffset() + 1;
-	// if (endNode != null)
-	// {
-	// IRange endNodeRange = endNode.getNameRange();
-	// endOffset = endNodeRange.getStartingOffset();
-	// }
-	//
-	// formatterNode = new FormatterDefaultElementNode(document, type);
-	// formatterNode.setBegin(createTextNode(document, beginNodeRange.getStartingOffset(), beginNodeRange
-	// .getEndingOffset() + 1));
-	// push(formatterNode);
-	// if (node.getNodeType() == HTMLNodeTypes.SPECIAL)
-	// {
-	// // Everything under this HTMLSpecialNode should be wrapped with a
-	// // FormatterSpecialElementNode, and no need to visit its children.
-	// // The assumption here is that the wrapping HTMLElementNode of this special node
-	// // always have start and end tags.
-	// FormatterSpecialElementNode specialNode = new FormatterSpecialElementNode(document, StringUtil.EMPTY);
-	// int endSpecial = getEndWithoutWhiteSpaces(endNode.getNameRange().getStartingOffset() - 1, document) + 1;
-	// int beginSpecial = getBeginWithoutWhiteSpaces(beginNodeRange.getEndingOffset() + 1, document);
-	// specialNode.setBegin(createTextNode(document, beginSpecial, endSpecial));
-	// specialNode.setEnd(createTextNode(document, endSpecial, endSpecial)); // empty end
-	// push(specialNode);
-	// checkedPop(specialNode, -1);
-	// }
-	// else
-	// {
-	// // Recursively call this method till we are done with all the children under this node.
-	// addNodes(node.getChildren());
-	// }
-	// checkedPop(formatterNode, endOffset);
-	// formatterNode.setEnd(createTextNode(document, endOffset, node.getEndingOffset() + 1));
-	// return formatterNode;
-	// }
 }

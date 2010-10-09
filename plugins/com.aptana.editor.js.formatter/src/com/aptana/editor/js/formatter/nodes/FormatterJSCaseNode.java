@@ -35,21 +35,22 @@
 package com.aptana.editor.js.formatter.nodes;
 
 import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 
 /**
- * A JS if-else body formatter node.<br>
- * This node represents the body part of an 'if' expression 'true' and 'false' parts (everything between the
- * curly-brackets of the 'if' and the 'else').
+ * A JS 'case' formatter node.<br>
+ * This node represents a 'case' or 'default' part of a switch-case block.
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
-public class FormatterJSIfBodyNode extends FormatterJSBlockNode
+public class FormatterJSCaseNode extends FormatterBlockWithBeginNode
 {
 
 	/**
 	 * @param document
+	 * @param hasBlockedChild
 	 */
-	public FormatterJSIfBodyNode(IFormatterDocument document)
+	public FormatterJSCaseNode(IFormatterDocument document)
 	{
 		super(document);
 	}
@@ -61,8 +62,7 @@ public class FormatterJSIfBodyNode extends FormatterJSBlockNode
 	@Override
 	protected boolean isAddingNewLine()
 	{
-		// TODO attach the preference key
-		return false;
+		return true;
 	}
 
 	/*
