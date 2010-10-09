@@ -62,7 +62,8 @@ module Ruble
       def define_menu(name, &block)
         log_info("loading menu #{name}")
         
-        path = block.binding.eval("__FILE__")
+        path = $0
+        path = block.binding.eval("__FILE__") if block
         new_menu = Menu.new(name, path)
         block.call(new_menu) if block_given?
         

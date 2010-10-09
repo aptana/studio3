@@ -195,8 +195,8 @@ module Ruble
     class << self
       def define_bundle(name="", values={}, &block)
         log_info("loading bundle #{name}")
-
-        path = block.binding.eval("__FILE__")
+        path = $0
+        path = block.binding.eval("__FILE__") if block
         if File.basename(path) != "bundle.rb" || File.basename(File.dirname(path)) =~ /^(?:commands|snippets|templates)$/
           log_error("Attempted to define a bundle in a file other than the bundle's bundle.rb file: #{path}")
         else
