@@ -23,6 +23,10 @@ module Ruble
     def add_env(env)
       @jobj.add_env env.java_object
     end
+    
+    def add_smart_typing_pairs(p)
+      @jobj.add_smart_typing_pairs p.java_object
+    end
 
     def add_menu(menu)
       @jobj.add_menu menu.java_object
