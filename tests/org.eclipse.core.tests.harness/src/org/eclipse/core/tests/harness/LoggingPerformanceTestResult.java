@@ -107,6 +107,7 @@ public class LoggingPerformanceTestResult extends PerformanceTestResult {
 	 * Prints the header of the report
 	 */
 	protected void printHeader(PrintWriter out) {
+		// Nothing here right now
 	}
 
 	/**

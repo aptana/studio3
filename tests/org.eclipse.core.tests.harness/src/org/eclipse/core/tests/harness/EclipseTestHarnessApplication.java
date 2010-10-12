@@ -68,6 +68,7 @@ public class EclipseTestHarnessApplication implements IPlatformRunnable {
 		return null;
 	}
 
+	@SuppressWarnings("hiding")
 	protected String[] processCommandLine(String[] args) {
 		int[] configArgs = new int[100];
 		configArgs[0] = -1; // need to initialize the first element to something that could not be an index.

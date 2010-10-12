@@ -53,6 +53,7 @@ import com.aptana.core.util.IOUtil;
 public class RubyRegexpFolderPerformanceTest extends PerformanceTestCase
 {
 
+	@SuppressWarnings("unused")
 	public void testYUICSSFolding() throws Exception
 	{
 		Ruby runtime = Ruby.newInstance();
