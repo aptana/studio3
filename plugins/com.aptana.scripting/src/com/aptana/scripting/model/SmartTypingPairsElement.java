@@ -32,57 +32,48 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.common.internal.peer;
+package com.aptana.scripting.model;
 
-import org.eclipse.jface.text.Document;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.test.performance.PerformanceTestCase;
+import com.aptana.parsing.io.SourcePrinter;
 
-public class PeerCharacterCloserPerfTest extends PerformanceTestCase
+public class SmartTypingPairsElement extends AbstractBundleElement
 {
 
-	public void testCheckUnpairedClose() throws Exception
-	{
-		final char[] pairs = new char[] { '(', ')', '"', '"' };
-		PeerCharacterCloser closer = new PeerCharacterCloser(null)
-		{
-			protected char[] getPairs(String scope)
-			{
-				return pairs;
-			}
-		};
-		int numPairs = 25000;
+	private char[] _pairs;
 
-		IDocument document = createDocumentWithPairs(numPairs);
-		for (int i = 0; i < 10; i++)
-		{
-			startMeasuring();
-			if (closer.unpairedClose('(', ')', document, 0))
-			{
-				fail("bad!");
-			}
-			if (closer.unpairedClose('(', ')', document, numPairs * 2))
-			{
-				fail("bad!");
-			}
-			stopMeasuring();
-		}
-		commitMeasurements();
-		assertPerformance();
+	public SmartTypingPairsElement(String path)
+	{
+		super(path);
 	}
 
-	private IDocument createDocumentWithPairs(int numPairs)
+	@Override
+	protected String getElementName()
 	{
-		StringBuilder builder = new StringBuilder();
-		for (int i = 0; i < numPairs; i++)
+		return "smart_typing_pairs"; //$NON-NLS-1$
+	}
+
+	@Override
+	protected void printBody(SourcePrinter printer)
+	{
+		// output path, scope and pairs
+		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
+		printer.printWithIndent("scope: ").println(this.getScope()); //$NON-NLS-1$
+		printer.printWithIndent("pairs: ").println(this.getPairs().toString()); //$NON-NLS-1$
+	}
+
+	public void setPairs(String[] pairs)
+	{
+		this._pairs = new char[pairs.length];
+		int i = 0;
+		for (String pair : pairs)
 		{
-			builder.append('(');
+			this._pairs[i++] = pair.charAt(0);
 		}
-		for (int i = 0; i < numPairs; i++)
-		{
-			builder.append(')');
-		}
-		return new Document(builder.toString());
+	}
+
+	public char[] getPairs()
+	{
+		return _pairs;
 	}
 
 }
