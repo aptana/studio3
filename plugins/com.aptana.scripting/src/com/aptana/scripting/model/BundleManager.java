@@ -1542,10 +1542,6 @@ public class BundleManager
 					sub.subTask(script.getAbsolutePath());
 					loadScript(script, true, bundleLoadPaths);
 					sub.worked(1);
-					if (getState() != Job.NONE && script.getName().equals(BUNDLE_FILE))
-					{
-						yieldRule(monitor);
-					}
 				}
 			}
 			sub.done();
