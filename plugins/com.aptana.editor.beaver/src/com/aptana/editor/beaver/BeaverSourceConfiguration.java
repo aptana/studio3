@@ -50,6 +50,7 @@ import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
+import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.NonRuleBasedDamagerRepairer;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
@@ -69,8 +70,8 @@ public class BeaverSourceConfiguration implements IPartitioningConfiguration, IS
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] { //
 		new EndOfLineRule("//", new Token(BEAVER_SINGLELINE_COMMENT)), //$NON-NLS-1$
-		new MultiLineRule("/*", "*/", new Token(BEAVER_MULTILINE_COMMENT), '\0', true), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		new MultiLineRule("{:", ":}", new Token(BEAVER_BLOCK), '\0', true) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		new MultiLineRule("/*", "*/", new Token(BEAVER_MULTILINE_COMMENT), '\0', true), //$NON-NLS-1$ //$NON-NLS-2$
+		new MultiLineRule("{:", ":}", new Token(BEAVER_BLOCK), '\0', true) //$NON-NLS-1$ //$NON-NLS-2$
 	};
 	private BeaverSourceScanner beaverScanner;
 
@@ -189,13 +190,13 @@ public class BeaverSourceConfiguration implements IPartitioningConfiguration, IS
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
-		NonRuleBasedDamagerRepairer multilineCommentDR = new NonRuleBasedDamagerRepairer(this.getToken("comment.block.beaver")); //$NON-NLS-1$
-		reconciler.setDamager(multilineCommentDR, BEAVER_MULTILINE_COMMENT);
-		reconciler.setRepairer(multilineCommentDR, BEAVER_MULTILINE_COMMENT);
+		dr = new ThemeingDamagerRepairer(new CommentScanner(this.getToken("comment.block.beaver"))); //$NON-NLS-1$
+		reconciler.setDamager(dr, BEAVER_MULTILINE_COMMENT);
+		reconciler.setRepairer(dr, BEAVER_MULTILINE_COMMENT);
 
-		NonRuleBasedDamagerRepairer singlelineCommentDR = new NonRuleBasedDamagerRepairer(this.getToken("comment.line.double-slash.beaver")); //$NON-NLS-1$
-		reconciler.setDamager(singlelineCommentDR, BEAVER_SINGLELINE_COMMENT);
-		reconciler.setRepairer(singlelineCommentDR, BEAVER_SINGLELINE_COMMENT);
+		dr = new ThemeingDamagerRepairer(new CommentScanner(this.getToken("comment.line.double-slash.beaver"))); //$NON-NLS-1$
+		reconciler.setDamager(dr, BEAVER_SINGLELINE_COMMENT);
+		reconciler.setRepairer(dr, BEAVER_SINGLELINE_COMMENT);
 
 		NonRuleBasedDamagerRepairer blockDR = new NonRuleBasedDamagerRepairer(this.getToken("source.block.beaver")); //$NON-NLS-1$
 		reconciler.setDamager(blockDR, BEAVER_BLOCK);
