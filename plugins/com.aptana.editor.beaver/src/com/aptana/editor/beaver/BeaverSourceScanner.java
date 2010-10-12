@@ -49,26 +49,11 @@ import org.eclipse.jface.text.rules.WordRule;
 import com.aptana.editor.beaver.parsing.lexer.BeaverTokenType;
 import com.aptana.editor.common.text.rules.CharacterMapRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
+import com.aptana.editor.common.text.rules.WordDetector;
 
 @SuppressWarnings("nls")
 public class BeaverSourceScanner extends RuleBasedScanner
 {
-	/**
-	 * An identifier detector.
-	 */
-	static class IdentifierDetector implements IWordDetector
-	{
-		public boolean isWordStart(char c)
-		{
-			return Character.isJavaIdentifierStart(c);
-		}
-
-		public boolean isWordPart(char c)
-		{
-			return Character.isJavaIdentifierPart(c);
-		}
-	}
-
 	/**
 	 * A keyword detector.
 	 */
@@ -134,7 +119,7 @@ public class BeaverSourceScanner extends RuleBasedScanner
 		cmRule.add('+', createToken(BeaverTokenType.PLUS));
 		rules.add(cmRule);
 
-		rules.add(new WordRule(new IdentifierDetector(), createToken(BeaverTokenType.IDENTIFIER)));
+		rules.add(new WordRule(new WordDetector(), createToken(BeaverTokenType.IDENTIFIER)));
 
 		this.setRules(rules.toArray(new IRule[rules.size()]));
 		// this.setDefaultReturnToken(this.createToken("text"));
