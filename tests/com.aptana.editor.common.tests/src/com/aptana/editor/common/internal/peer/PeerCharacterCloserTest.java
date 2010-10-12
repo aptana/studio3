@@ -124,7 +124,7 @@ public class PeerCharacterCloserTest extends TestCase
 		assertTrue(closer.unpairedClose('(', ')', new Document(builder.toString()), times));
 	}
 
-	public void testDontCloseWhenScopeIsComment()
+	public void testDontCloseSingleQuotesInComment()
 	{
 		setDocument(" ");
 		closer = new PeerCharacterCloser(viewer)
@@ -132,7 +132,7 @@ public class PeerCharacterCloserTest extends TestCase
 
 			protected char[] getPairs(String scope)
 			{
-				return DEFAULT_PAIRS;
+				return new char[] { '(', ')', '"', '"'};
 			}
 
 			@Override
@@ -141,7 +141,7 @@ public class PeerCharacterCloserTest extends TestCase
 				return "source.js comment.block";
 			}
 		};
-		VerifyEvent event = sendEvent('(');
+		VerifyEvent event = sendEvent('\'');
 
 		assertTrue(event.doit); // don't interfere
 	}
