@@ -34,6 +34,7 @@
  */
 package com.aptana.editor.css.contentassist.index;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
@@ -44,21 +45,24 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.util.IOUtil;
+import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.css.Activator;
 import com.aptana.editor.css.CSSColors;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.css.parsing.ast.CSSAttributeSelectorNode;
+import com.aptana.editor.css.parsing.ast.CSSCommentNode;
 import com.aptana.editor.css.parsing.ast.CSSRuleNode;
 import com.aptana.editor.css.parsing.ast.CSSTermNode;
-import com.aptana.index.core.IFileStoreIndexingParticipant;
+import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 
-public class CSSFileIndexingParticipant implements IFileStoreIndexingParticipant
+public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 {
 
 	public void index(Set<IFileStore> files, Index index, IProgressMonitor monitor) throws CoreException
@@ -87,6 +91,8 @@ public class CSSFileIndexingParticipant implements IFileStoreIndexingParticipant
 		{
 			sub.subTask(file.getName());
 
+			removeTasks(file);
+
 			String fileContents = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(20)));
 			if (fileContents != null && fileContents.trim().length() > 0)
 			{
@@ -100,6 +106,7 @@ public class CSSFileIndexingParticipant implements IFileStoreIndexingParticipant
 					pool.checkIn(cssParser);
 					sub.worked(50);
 					walkNode(index, file, parseNode);
+					processComments(file, parseState.getParseResult());
 				}
 			}
 		}
@@ -119,6 +126,21 @@ public class CSSFileIndexingParticipant implements IFileStoreIndexingParticipant
 		finally
 		{
 			sub.done();
+		}
+	}
+
+	private void processComments(IFileStore file, IParseNode parseResult)
+	{
+		if (parseResult instanceof IParseRootNode)
+		{
+			IParseRootNode rootNode = (IParseRootNode) parseResult;
+			for (IParseNode commentNode : rootNode.getCommentNodes())
+			{
+				if (commentNode instanceof CSSCommentNode)
+				{
+					processCommentNode(file, (CSSCommentNode) commentNode);
+				}
+			}
 		}
 	}
 
@@ -171,6 +193,41 @@ public class CSSFileIndexingParticipant implements IFileStoreIndexingParticipant
 			}
 		}
 
+	}
+
+	private void processCommentNode(IFileStore store, CSSCommentNode commentNode)
+	{
+		String text = commentNode.getText();
+		String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
+		for (String line : lines)
+		{
+			if (!CommentScanner.isCaseSensitive())
+			{
+				line = line.toLowerCase();
+			}
+			for (Map.Entry<String, Integer> entry : CommentScanner.DEFAULT_TAGS.entrySet())
+			{
+				String tag = entry.getKey();
+				if (!CommentScanner.isCaseSensitive())
+				{
+					tag = tag.toLowerCase();
+				}
+				int index = line.indexOf(tag);
+				if (index == -1)
+				{
+					continue;
+				}
+
+				String message = line.substring(index).trim();
+				// Remove "*/" from the end of the line!
+				if (message.endsWith("*/")) //$NON-NLS-1$
+				{
+					message = message.substring(0, message.length() - 2).trim();
+				}
+				createTask(store, message, entry.getValue().intValue(), -1, commentNode.getStartingOffset(),
+						commentNode.getEndingOffset());
+			}
+		}
 	}
 
 	private static boolean isColor(String value)
