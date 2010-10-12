@@ -422,7 +422,7 @@ public class BundleConverter
 			if (hasStart)
 			{
 				List<Map<String, Object>> variables = (List<Map<String, Object>>) settings.get("shellVariables");
-				builder.append("env['").append(scope).append("'] do |e|\n");
+				builder.append("env '").append(scope).append("' do |e|\n");
 				for (Map<String, Object> var : variables)
 				{
 					builder.append("  e['").append(var.get("name")).append("'] = ");
