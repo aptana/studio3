@@ -95,6 +95,8 @@ public class RubyFileIndexingParticipant extends AbstractFileIndexingParticipant
 		{
 			sub.subTask(store.toString());
 
+			removeTasks(store);
+
 			// grab the source of the file we're going to parse
 			String source = IOUtil.read(store.openInputStream(EFS.NONE, sub.newChild(20)));
 

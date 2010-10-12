@@ -307,6 +307,8 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 		{
 			sub.subTask(file.getName());
 
+			removeTasks(file);
+
 			IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IHTMLParserConstants.LANGUAGE);
 			if (pool != null)
 			{

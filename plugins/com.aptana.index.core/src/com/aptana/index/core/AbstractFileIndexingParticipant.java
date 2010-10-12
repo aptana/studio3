@@ -14,6 +14,8 @@ import org.eclipse.core.runtime.Path;
 public abstract class AbstractFileIndexingParticipant implements IFileStoreIndexingParticipant
 {
 
+	private static final String EXTERNAL_URI = "uri"; //$NON-NLS-1$
+
 	protected void createTask(IFileStore store, String message, int priority, int line, int start, int end)
 	{
 		try
@@ -22,7 +24,7 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 			IMarker marker = resource.createMarker(IMarker.TASK);
 			if (resource.equals(ResourcesPlugin.getWorkspace().getRoot()))
 			{
-				marker.setAttribute("uri", store.toURI().toString());
+				marker.setAttribute(EXTERNAL_URI, store.toURI().toString());
 			}
 			marker.setAttribute(IMarker.MESSAGE, message);
 			marker.setAttribute(IMarker.PRIORITY, priority);
@@ -51,6 +53,39 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 			}
 		}
 		return ResourcesPlugin.getWorkspace().getRoot();
+	}
+
+	protected void removeTasks(IFileStore store) throws CoreException
+	{
+		URI uri = store.toURI();
+		String uriString = uri.toString();
+
+		IResource resource = getResource(store);
+		if (resource.equals(ResourcesPlugin.getWorkspace().getRoot()))
+		{
+			// Iterate over markers on the root and remove any with matching "uri"
+			IMarker[] tasks = resource.findMarkers(IMarker.TASK, true, IResource.DEPTH_ZERO);
+			for (IMarker task : tasks)
+			{
+				if (task == null)
+				{
+					continue;
+				}
+				String markerURI = (String) task.getAttribute(EXTERNAL_URI);
+				if (markerURI == null)
+				{
+					continue;
+				}
+				if (markerURI.equals(uriString))
+				{
+					task.delete();
+				}
+			}
+		}
+		else
+		{
+			resource.deleteMarkers(IMarker.TASK, true, IResource.DEPTH_ZERO);
+		}
 	}
 
 }
