@@ -91,9 +91,14 @@
             class="com.aptana.ide.ui.io.navigator.actions.FileSystemMgmtActionProvider"
             id="com.aptana.ide.syncing.ui.navigator.actions.FileSystemMgmtActions">
          <enablement>
-            <instanceof
-                  value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection">
-            </instanceof>
+            <or>
+               <instanceof
+                     value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnections">
+               </instanceof>
+            </or>
          </enablement>
       </actionProvider>
       <actionProvider

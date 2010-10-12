@@ -48,6 +48,9 @@
       <file
             name="ruble/env.rb">
       </file>
+      <file
+            name="ruble/smart_typing_pairs.rb">
+      </file>
    </extension>
    <extension
          point="com.aptana.scripting.contextContributors">

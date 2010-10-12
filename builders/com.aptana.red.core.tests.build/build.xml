@@ -45,6 +45,7 @@
           target: generate.build.properties              
          ================================= -->
 	<target name="generate.build.properties" description="Takes in properties from build_local.properties and the command line overrides and generates a combined build.properties to use for the build">
+		<exec executable="hostname" outputproperty="computer.hostname"/>
 		<echoproperties destfile="build.properties">
 			<propertyset negate="true">
 				<propertyref prefix="java." />
@@ -265,7 +266,7 @@
 			<property name="data-dir" value="${baseLocation}/junit-workspace -clean" />
 			<property name="plugin-name" value="${test.plugin}" />
 			<property name="classname" value="${test.classname}" />
-			<property name="extraVMargs" value="-ea -Demma.coverage.out.file=${coverageDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar -Declipse.perf.dbloc= -Declipse.perf.config=build=R3.0.0beta;host=ubunut32-jaxer-1;jvm=sun -Declipse.perf.assertAgainst=build=R3.0.0beta" />
+			<property name="extraVMargs" value="-ea -Demma.coverage.out.file=${coverageDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar -Declipse.perf.dbloc= -Declipse.perf.config=build=R3.0.0beta;host=${computer.hostname};jvm=1.6.0_03-b05 -Declipse.perf.assertAgainst=build=R3.0.0beta -Dsetup.override.eclipseArgs=vm=/usr/bin/java" />
 		</ant>
 	</target>
 

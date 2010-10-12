@@ -10,6 +10,7 @@ public class PerformanceTests
 	{
 		TestSuite suite = new TestSuite(PerformanceTests.class.getName());
 		// $JUnit-BEGIN$
+		suite.addTest(com.aptana.red.core.tests.startup.AllTests.suite());
 		suite.addTest(com.aptana.editor.common.tests.PerformanceTests.suite());
 		suite.addTest(com.aptana.editor.css.tests.PerformanceTests.suite());
 		suite.addTest(com.aptana.editor.js.tests.PerformanceTests.suite());
