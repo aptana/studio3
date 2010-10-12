@@ -113,7 +113,8 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		// early pruning to slow down normal typing as little as possible
 		if (!event.doit || !isAutoInsertEnabled() || isModifierKey(event.keyCode))
 		{
-			// TODO prune more aggressively on keys that fall outside the superset of all pairs to help increase performance!
+			// TODO prune more aggressively on keys that fall outside the superset of all pairs to help increase
+			// performance!
 			return;
 		}
 
@@ -228,6 +229,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 
 	private boolean isModifierKey(int keyCode)
 	{
+		// TODO Ignore if it's not in the superset of character pairs!
 		switch (keyCode)
 		{
 			case SWT.SHIFT:
@@ -256,7 +258,12 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		Map<ScopeSelector, SmartTypingPairsElement> map = new HashMap<ScopeSelector, SmartTypingPairsElement>();
 		for (SmartTypingPairsElement pe : pairs)
 		{
-			map.put(pe.getScopeSelector(), pe);
+			ScopeSelector ss = pe.getScopeSelector();
+			if (ss == null)
+			{
+				continue;
+			}
+			map.put(ss, pe);
 		}
 		ScopeSelector bestMatch = ScopeSelector.bestMatch(map.keySet(), scope);
 		SmartTypingPairsElement yay = map.get(bestMatch);
