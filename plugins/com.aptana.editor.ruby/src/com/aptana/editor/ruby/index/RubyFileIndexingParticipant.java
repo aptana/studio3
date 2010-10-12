@@ -34,18 +34,29 @@
  */
 package com.aptana.editor.ruby.index;
 
+import java.io.File;
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.jrubyparser.ast.CommentNode;
 import org.jrubyparser.ast.Node;
 import org.jrubyparser.parser.ParserResult;
 
 import com.aptana.core.util.IOUtil;
+import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.ruby.RubyEditorPlugin;
 import com.aptana.editor.ruby.parsing.IRubyParserConstants;
 import com.aptana.editor.ruby.parsing.ISourceElementRequestor;
@@ -111,6 +122,7 @@ public class RubyFileIndexingParticipant implements IFileStoreIndexingParticipan
 				ISourceElementRequestor builder = new RubySourceIndexer(index, store.toURI());
 				SourceElementVisitor visitor = new SourceElementVisitor(builder);
 				visitor.acceptNode(root);
+				detectTasks(store, result.getCommentNodes());
 			}
 		}
 		catch (Throwable e)
@@ -121,6 +133,76 @@ public class RubyFileIndexingParticipant implements IFileStoreIndexingParticipan
 		{
 			sub.done();
 		}
+	}
+
+	// TODO Implement the equivalent of this for each major language/indexer? Others may need to just use a simple
+	// regexp search?
+	private void detectTasks(IFileStore store, List<CommentNode> comments)
+	{
+		IResource resource = null;
+		for (CommentNode commentNode : comments)
+		{
+			String line = commentNode.getContent();
+			if (!CommentScanner.isCaseSensitive())
+			{
+				line = line.toLowerCase();
+			}
+			for (Map.Entry<String, Integer> entry : CommentScanner.DEFAULT_TAGS.entrySet())
+			{
+				String tag = entry.getKey();
+
+				if (!CommentScanner.isCaseSensitive())
+				{
+					tag = tag.toLowerCase();
+				}
+				int index = line.indexOf(tag);
+				if (index == -1)
+				{
+					continue;
+				}
+
+				String message = line.substring(index).trim();
+				try
+				{
+					if (resource == null)
+					{
+						resource = getResource(store);
+					}
+					IMarker marker = resource.createMarker(IMarker.TASK);
+					if (resource.equals(ResourcesPlugin.getWorkspace().getRoot()))
+					{
+						marker.setAttribute("uri", store.toURI().toString());
+					}
+					marker.setAttribute(IMarker.MESSAGE, message);
+					int priority = entry.getValue();
+					marker.setAttribute(IMarker.PRIORITY, priority);
+					marker.setAttribute(IMarker.LINE_NUMBER, commentNode.getPosition().getStartLine());
+					marker.setAttribute(IMarker.CHAR_START, commentNode.getPosition().getStartOffset());
+					marker.setAttribute(IMarker.CHAR_END, commentNode.getPosition().getEndOffset());
+				}
+				catch (CoreException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	private IResource getResource(IFileStore store)
+	{
+		URI uri = store.toURI();
+		if (uri.getScheme().equals("file"))
+		{
+			File file = new File(uri);
+			IFile iFile = ResourcesPlugin.getWorkspace().getRoot()
+					.getFileForLocation(Path.fromOSString(file.getAbsolutePath()));
+			if (iFile != null)
+			{
+				return iFile;
+			}
+		}
+		return ResourcesPlugin.getWorkspace().getRoot();
 	}
 
 }
