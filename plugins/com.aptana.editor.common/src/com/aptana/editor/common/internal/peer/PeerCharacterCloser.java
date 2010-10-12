@@ -82,11 +82,13 @@ import com.aptana.scripting.model.filters.ScopeFilter;
 public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListener
 {
 
+	private static final char[] NO_PAIRS = new char[0];
+
 	private ITextViewer textViewer;
 	private final String CATEGORY = toString();
 	private IPositionUpdater fUpdater = new ExclusivePositionUpdater(CATEGORY);
 	private Stack<BracketLevel> fBracketLevelStack = new Stack<BracketLevel>();
-	private char[] pairs = new char[0];
+	private char[] pairs = NO_PAIRS;
 
 	private static final ScopeSelector fgCommentSelector = new ScopeSelector("comment"); //$NON-NLS-1$
 	private static final ScopeSelector fgStringSelector = new ScopeSelector("string"); //$NON-NLS-1$
@@ -111,7 +113,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		// early pruning to slow down normal typing as little as possible
 		if (!event.doit || !isAutoInsertEnabled() || isModifierKey(event.keyCode))
 		{
-			// TODO Prune to avoid doing any work on modifier keys like Shift or Ctrl!
+			// TODO prune more aggressively on keys that fall outside the superset of all pairs to help increase performance!
 			return;
 		}
 
@@ -226,7 +228,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 
 	private boolean isModifierKey(int keyCode)
 	{
-		switch(keyCode)
+		switch (keyCode)
 		{
 			case SWT.SHIFT:
 			case SWT.BS:
@@ -243,13 +245,13 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		return false;
 	}
 
-	private char[] getPairs(String scope)
+	protected char[] getPairs(String scope)
 	{
 		ScopeFilter filter = new ScopeFilter(scope);
 		List<SmartTypingPairsElement> pairs = BundleManager.getInstance().getPairs(filter);
 		if (pairs == null || pairs.isEmpty())
 		{
-			return new char[0];
+			return NO_PAIRS;
 		}
 		Map<ScopeSelector, SmartTypingPairsElement> map = new HashMap<ScopeSelector, SmartTypingPairsElement>();
 		for (SmartTypingPairsElement pe : pairs)

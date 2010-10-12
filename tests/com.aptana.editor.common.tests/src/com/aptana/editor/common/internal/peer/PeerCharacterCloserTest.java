@@ -27,8 +27,13 @@ public class PeerCharacterCloserTest extends TestCase
 	{
 		super.setUp();
 		viewer = new TextViewer(new Shell(), SWT.NONE);
-		closer = new PeerCharacterCloser(viewer, DEFAULT_PAIRS)
+		closer = new PeerCharacterCloser(viewer)
 		{
+			protected char[] getPairs(String scope)
+			{
+				return DEFAULT_PAIRS;
+			}
+
 			@Override
 			protected String getScopeAtOffset(IDocument document, int offset) throws BadLocationException
 			{
@@ -47,7 +52,7 @@ public class PeerCharacterCloserTest extends TestCase
 	}
 
 	// TODO Add tests so we can verify that newline inside () inserts it, but in "" moves to exit of linked mode
-	
+
 	public void testDoesntDoubleEndingUnclosedPair()
 	{
 		setDocument("\" ");
@@ -96,8 +101,14 @@ public class PeerCharacterCloserTest extends TestCase
 
 	public void testUnpairedClose() throws Exception
 	{
-		char[] pairs = new char[] { '(', ')', '"', '"' };
-		closer = new PeerCharacterCloser(null, pairs);
+		final char[] pairs = new char[] { '(', ')', '"', '"' };
+		closer = new PeerCharacterCloser(null)
+		{
+			protected char[] getPairs(String scope)
+			{
+				return pairs;
+			}
+		};
 		StringBuilder builder = new StringBuilder();
 		int times = 5000;
 		for (int i = 0; i < times; i++)
@@ -116,8 +127,14 @@ public class PeerCharacterCloserTest extends TestCase
 	public void testDontCloseWhenScopeIsComment()
 	{
 		setDocument(" ");
-		closer = new PeerCharacterCloser(viewer, DEFAULT_PAIRS)
+		closer = new PeerCharacterCloser(viewer)
 		{
+
+			protected char[] getPairs(String scope)
+			{
+				return DEFAULT_PAIRS;
+			}
+
 			@Override
 			protected String getScopeAtOffset(IDocument document, int offset) throws BadLocationException
 			{
@@ -133,8 +150,13 @@ public class PeerCharacterCloserTest extends TestCase
 	{
 		setDocument("\n // )");
 		viewer.setSelectedRange(0, 0);
-		closer = new PeerCharacterCloser(viewer, DEFAULT_PAIRS)
+		closer = new PeerCharacterCloser(viewer)
 		{
+			protected char[] getPairs(String scope)
+			{
+				return DEFAULT_PAIRS;
+			}
+
 			@Override
 			protected String getScopeAtOffset(IDocument document, int offset) throws BadLocationException
 			{
@@ -153,8 +175,14 @@ public class PeerCharacterCloserTest extends TestCase
 	{
 		setDocument("// '\n ");
 		viewer.setSelectedRange(5, 0);
-		closer = new PeerCharacterCloser(viewer, DEFAULT_PAIRS)
+		closer = new PeerCharacterCloser(viewer)
 		{
+
+			protected char[] getPairs(String scope)
+			{
+				return DEFAULT_PAIRS;
+			}
+
 			@Override
 			protected String getScopeAtOffset(IDocument document, int offset) throws BadLocationException
 			{
@@ -174,8 +202,14 @@ public class PeerCharacterCloserTest extends TestCase
 		setDocument("function x()\n" + "{\n" + "    if (false)\n" + "    \n" + "\n" + "    if (false)\n" + "    {\n"
 				+ "        // scroll sub-regions\n" + "    }\n" + "};");
 		viewer.setSelectedRange(34, 0);
-		closer = new PeerCharacterCloser(viewer, DEFAULT_PAIRS)
+		closer = new PeerCharacterCloser(viewer)
 		{
+
+			protected char[] getPairs(String scope)
+			{
+				return DEFAULT_PAIRS;
+			}
+
 			@Override
 			protected String getScopeAtOffset(IDocument document, int offset) throws BadLocationException
 			{
