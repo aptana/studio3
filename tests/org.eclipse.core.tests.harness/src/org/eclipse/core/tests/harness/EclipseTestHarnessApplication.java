@@ -144,8 +144,7 @@ public class EclipseTestHarnessApplication implements IPlatformRunnable {
 		} catch (InvocationTargetException e) {
 			if (e.getTargetException() instanceof Error)
 				throw (Error) e.getTargetException();
-			else
-				throw e;
+			throw e;
 		}
 		run(suite);
 		return null;
