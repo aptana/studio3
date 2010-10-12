@@ -9,8 +9,14 @@ public class PeerCharacterCloserPerfTest extends PerformanceTestCase
 
 	public void testCheckUnpairedClose() throws Exception
 	{
-		char[] pairs = new char[] { '(', ')', '"', '"' };
-		PeerCharacterCloser closer = new PeerCharacterCloser(null, pairs);
+		final char[] pairs = new char[] { '(', ')', '"', '"' };
+		PeerCharacterCloser closer = new PeerCharacterCloser(null)
+		{
+			protected char[] getPairs(String scope)
+			{
+				return pairs;
+			}
+		};
 		int numPairs = 25000;
 
 		IDocument document = createDocumentWithPairs(numPairs);

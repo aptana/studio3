@@ -713,6 +713,30 @@ public class BundleManager
 	}
 
 	/**
+	 * getBundlePairs
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public SmartTypingPairsElement[] getBundlePairs(String name)
+	{
+		SmartTypingPairsElement[] result = new SmartTypingPairsElement[0];
+
+		synchronized (entryNamesLock)
+		{
+			if (this._entriesByName != null && this._entriesByName.containsKey(name))
+			{
+				// grab all bundles of the given name
+				BundleEntry entry = this._entriesByName.get(name);
+
+				result = entry.getPairs();
+			}
+		}
+
+		return result;
+	}
+
+	/**
 	 * getBundleDirectory
 	 * 
 	 * @param script
@@ -1542,10 +1566,6 @@ public class BundleManager
 					sub.subTask(script.getAbsolutePath());
 					loadScript(script, true, bundleLoadPaths);
 					sub.worked(1);
-					if (getState() != Job.NONE && script.getName().equals(BUNDLE_FILE))
-					{
-						yieldRule(monitor);
-					}
 				}
 			}
 			sub.done();
@@ -1993,6 +2013,41 @@ public class BundleManager
 		for (String name : this.getBundleNames())
 		{
 			for (EnvironmentElement command : this.getBundleEnvs(name))
+			{
+				if (filter.include(command))
+				{
+					result.add(command);
+				}
+			}
+		}
+
+		return result;
+	}
+
+	public List<SmartTypingPairsElement> getPairs(IModelFilter filter)
+	{
+
+		IModelFilter caFilter = new IModelFilter()
+		{
+
+			public boolean include(AbstractElement element)
+			{
+				return element instanceof SmartTypingPairsElement;
+			}
+		};
+		if (filter != null)
+		{
+			filter = new AndFilter(filter, caFilter);
+		}
+		else
+		{
+			filter = caFilter;
+		}
+
+		List<SmartTypingPairsElement> result = new ArrayList<SmartTypingPairsElement>();
+		for (String name : this.getBundleNames())
+		{
+			for (SmartTypingPairsElement command : this.getBundlePairs(name))
 			{
 				if (filter.include(command))
 				{

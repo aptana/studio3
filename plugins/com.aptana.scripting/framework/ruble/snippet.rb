@@ -47,7 +47,8 @@ module Ruble
       def define_snippet(name, &block)
         log_info("loading snippet #{name}")
         
-        path = block.binding.eval("__FILE__")
+        path = $0
+        path = block.binding.eval("__FILE__") if block
         snippet = Snippet.new(name, path)
         block.call(snippet) if block_given?
         

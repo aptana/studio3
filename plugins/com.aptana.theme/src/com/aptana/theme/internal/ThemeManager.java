@@ -40,9 +40,12 @@ import java.io.InputStream;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -60,6 +63,7 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
+import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.theme.IThemeManager;
@@ -289,57 +293,54 @@ public class ThemeManager implements IThemeManager
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private void loadBuiltinThemes()
 	{
 		fBuiltins = new HashSet<String>();
-		Enumeration<URL> urls = ThemePlugin.getDefault().getBundle().findEntries("themes", "*.properties", false); //$NON-NLS-1$ //$NON-NLS-2$
-		if (urls == null)
+		Collection<URL> urls = getBuiltinThemeURLs();
+		if (urls == null || urls.isEmpty())
 		{
 			return;
 		}
 		Map<String, Properties> nameToThemeProperties = new HashMap<String, Properties>();
-		
-		while (urls.hasMoreElements())
+		for (URL url : urls)
 		{
-			URL url = urls.nextElement();
 			try
 			{
-			    InputStream stream = url.openStream();
-		        try
-		        {
-		            Properties props = new Properties();
-                    props.load(stream);
-                    String themeName = props.getProperty(Theme.THEME_NAME_PROP_KEY);
-                    if(themeName != null)
-                    {
-                        if(!nameToThemeProperties.containsKey(themeName))
-                        {
-                            nameToThemeProperties.put(themeName, props);
-                        }
-                        else
-                        {
-							throw new IllegalStateException(MessageFormat.format(Messages.ThemeManager_ERR_DuplicateTheme,
-									themeName));
-                        }
-                    }
-                    else
-                    {
-                        throw new IllegalStateException(Messages.ThemeManager_ERR_ThemeNoName);
-                    }
-		        }
-		        finally
-		        {
-		            try
-		            {
-		                stream.close();
-		            }
-		            catch (IOException e)
-		            {
-		                // ignore
-		            }
-		        }
-				
+				InputStream stream = url.openStream();
+				try
+				{
+					Properties props = new Properties();
+					props.load(stream);
+					String themeName = props.getProperty(Theme.THEME_NAME_PROP_KEY);
+					if (themeName != null)
+					{
+						if (!nameToThemeProperties.containsKey(themeName))
+						{
+							nameToThemeProperties.put(themeName, props);
+						}
+						else
+						{
+							throw new IllegalStateException(MessageFormat.format(
+									Messages.ThemeManager_ERR_DuplicateTheme, themeName));
+						}
+					}
+					else
+					{
+						throw new IllegalStateException(Messages.ThemeManager_ERR_ThemeNoName);
+					}
+				}
+				finally
+				{
+					try
+					{
+						stream.close();
+					}
+					catch (IOException e)
+					{
+						// ignore
+					}
+				}
+
 			}
 			catch (Exception e)
 			{
@@ -352,7 +353,7 @@ public class ThemeManager implements IThemeManager
 		{
 			try
 			{
-				String multipleThemeExtends = (String) props.getProperty(Theme.THEME_EXTENDS_PROP_KEY);
+				String multipleThemeExtends = props.getProperty(Theme.THEME_EXTENDS_PROP_KEY);
 				if (multipleThemeExtends != null)
 				{
 					Properties newProperties = new Properties();
@@ -364,10 +365,8 @@ public class ThemeManager implements IThemeManager
 						Properties extended = nameToThemeProperties.get(themeExtends);
 						if (extended == null)
 						{
-							throw new IllegalStateException(
-									MessageFormat.format(
-											Messages.ThemeManager_ERR_NoThemeFound,
-											themeExtends, name));
+							throw new IllegalStateException(MessageFormat.format(
+									Messages.ThemeManager_ERR_NoThemeFound, themeExtends, name));
 						}
 						newProperties.putAll(extended);
 					}
@@ -402,15 +401,34 @@ public class ThemeManager implements IThemeManager
 		}
 	}
 
-    private void loadTheme(Properties props) {
-        Theme theme = new Theme(ThemePlugin.getDefault().getColorManager(), props);
-        if (theme != null)
-        {
-            fThemeMap.put(theme.getName(), theme);
-            fBuiltins.add(theme.getName());
-        }
-    }
+	@SuppressWarnings("unchecked")
+	private Collection<URL> getBuiltinThemeURLs()
+	{
+		ThemePlugin themePlugin = ThemePlugin.getDefault();
+		if (themePlugin == null)
+		{
+			return Collections.emptyList();
+		}
+		Bundle bundle = themePlugin.getBundle();
+		if (bundle == null)
+		{
+			return Collections.emptyList();
+		}
+		List<URL> collection = new ArrayList<URL>();
+		Enumeration<URL> enumeration = bundle.findEntries("themes", "*.properties", false); //$NON-NLS-1$ //$NON-NLS-2$
+		while (enumeration.hasMoreElements())
+		{
+			collection.add(enumeration.nextElement());
+		}
+		return collection;
+	}
 
+	private void loadTheme(Properties props)
+	{
+		Theme theme = new Theme(ThemePlugin.getDefault().getColorManager(), props);
+		fThemeMap.put(theme.getName(), theme);
+		fBuiltins.add(theme.getName());
+	}
 
 	public IToken getToken(String scope)
 	{

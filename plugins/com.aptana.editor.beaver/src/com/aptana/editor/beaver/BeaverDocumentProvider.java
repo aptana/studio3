@@ -32,30 +32,45 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.common.internal.peer;
+package com.aptana.editor.beaver;
 
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentPartitioner;
+import org.eclipse.jface.text.rules.FastPartitioner;
 
-public class Messages
+import com.aptana.editor.common.CommonDocumentProvider;
+import com.aptana.editor.common.CommonEditorPlugin;
+
+public class BeaverDocumentProvider extends CommonDocumentProvider
 {
-	private static final String BUNDLE_NAME = "com.aptana.editor.common.internal.peer.messages"; //$NON-NLS-1$
-
-	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
-
-	private Messages()
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonDocumentProvider#connect(java.lang.Object)
+	 */
+	public void connect(Object element) throws CoreException
 	{
+		super.connect(element);
+
+		IDocument document = this.getDocument(element);
+
+		if (document != null)
+		{
+			IDocumentPartitioner partitioner = new FastPartitioner(new BeaverPartitionScanner(), BeaverSourceConfiguration.CONTENT_TYPES);
+
+			partitioner.connect(document);
+			document.setDocumentPartitioner(partitioner);
+
+			CommonEditorPlugin.getDefault().getDocumentScopeManager().registerConfiguration(document, BeaverSourceConfiguration.getDefault());
+		}
 	}
 
-	public static String getString(String key)
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonDocumentProvider#getDefaultContentType(java.lang.String)
+	 */
+	protected String getDefaultContentType(String filename)
 	{
-		try
-		{
-			return RESOURCE_BUNDLE.getString(key);
-		}
-		catch (MissingResourceException e)
-		{
-			return '!' + key + '!';
-		}
+		return IBeaverConstants.CONTENT_TYPE_BEAVER;
 	}
 }
