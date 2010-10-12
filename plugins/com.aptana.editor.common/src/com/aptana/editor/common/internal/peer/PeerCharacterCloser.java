@@ -86,20 +86,19 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	private final String CATEGORY = toString();
 	private IPositionUpdater fUpdater = new ExclusivePositionUpdater(CATEGORY);
 	private Stack<BracketLevel> fBracketLevelStack = new Stack<BracketLevel>();
-	private char[] pairs;
+	private char[] pairs = new char[0];
 
 	private static final ScopeSelector fgCommentSelector = new ScopeSelector("comment"); //$NON-NLS-1$
 	private static final ScopeSelector fgStringSelector = new ScopeSelector("string"); //$NON-NLS-1$
 
-	PeerCharacterCloser(ITextViewer textViewer, char[] pairs)
+	PeerCharacterCloser(ITextViewer textViewer)
 	{
 		this.textViewer = textViewer;
-		this.pairs = pairs;
 	}
 
-	public static PeerCharacterCloser install(ITextViewer textViewer, char[] pairs)
+	public static PeerCharacterCloser install(ITextViewer textViewer)
 	{
-		PeerCharacterCloser pairMatcher = new PeerCharacterCloser(textViewer, pairs);
+		PeerCharacterCloser pairMatcher = new PeerCharacterCloser(textViewer);
 		textViewer.getTextWidget().addVerifyKeyListener(pairMatcher);
 		return pairMatcher;
 	}
