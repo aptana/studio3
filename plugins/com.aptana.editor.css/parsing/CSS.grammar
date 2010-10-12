@@ -65,11 +65,21 @@
 		IRange[] comments = scanner.getComments();
 		for (IRange comment : comments)
 		{
-			commentNodes.add(new CSSCommentNode(comment.getStartingOffset(), comment.getEndingOffset()));
+			commentNodes.add(new CSSCommentNode(getSource(parseState, comment), comment.getStartingOffset(), comment
+					.getEndingOffset()));
 		}
 		result.setCommentNodes(commentNodes.toArray(new CSSCommentNode[commentNodes.size()]));
 		parseState.setParseResult(result);
 		return result;
+	}
+	
+	private String getSource(IParseState parseState, IRange comment)
+	{
+		char[] src = parseState.getSource();
+		int length = comment.getLength();
+		char[] dest = new char[length];
+		System.arraycopy(src, comment.getStartingOffset(), dest, 0, length);
+		return new String(dest);
 	}
 :};
 
