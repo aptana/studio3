@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.Platform;
 /**
  * Allows test cases to wait for event notification.  
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class TestRegistryChangeListener implements IRegistryChangeListener {
 
 	/**

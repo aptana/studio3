@@ -17,6 +17,7 @@ import junit.framework.Test;
 import junit.textui.TestRunner;
 import org.eclipse.core.runtime.*;
 
+@SuppressWarnings({"unchecked", "rawtypes", "deprecation"})
 public class EclipseTestHarnessApplication implements IPlatformRunnable {
 	protected List tests;
 

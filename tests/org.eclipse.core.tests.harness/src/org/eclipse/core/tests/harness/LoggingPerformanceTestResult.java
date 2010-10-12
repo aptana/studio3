@@ -20,6 +20,7 @@ import junit.framework.TestFailure;
  * other output file, and have test results written to that file instead
  * of the standard output.
  */
+@SuppressWarnings("rawtypes")
 public class LoggingPerformanceTestResult extends PerformanceTestResult {
 	private static PrintWriter createWriter(File logFile) {
 		try {

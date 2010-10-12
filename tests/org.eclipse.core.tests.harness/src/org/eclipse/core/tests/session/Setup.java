@@ -24,6 +24,7 @@ import org.eclipse.core.tests.session.ProcessController.TimeOutException;
  * just Map) because we are interested in features that are specific to HashMap
  * (is Cloneable, allows null values).
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class Setup implements Cloneable {
 
 	public static final String APPLICATION = "application";

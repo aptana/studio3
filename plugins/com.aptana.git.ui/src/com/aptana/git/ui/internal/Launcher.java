@@ -90,6 +90,7 @@ public abstract class Launcher
 	// TODO 3.6+ Can't properly point to undeprecated constants until 3.6 is our base version where they moved these out
 	// to a core plugin
 	// @SuppressWarnings("deprecation")
+	@SuppressWarnings("deprecation")
 	private static ILaunchConfigurationWorkingCopy createLaunchConfig(String command, IPath workingDir, String... args)
 			throws CoreException
 	{

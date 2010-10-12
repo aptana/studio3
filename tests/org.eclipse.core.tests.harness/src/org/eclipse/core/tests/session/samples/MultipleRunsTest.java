@@ -31,11 +31,11 @@ public class MultipleRunsTest extends TestCase {
 		for (int i = 0; i < 5; i++) {
 			test.run(result);
 			if (result.failureCount() > 0) {
-				((TestFailure) result.failures().nextElement()).thrownException().printStackTrace();
+				result.failures().nextElement().thrownException().printStackTrace();
 				return;
 			}
 			if (result.errorCount() > 0) {
-				((TestFailure) result.errors().nextElement()).thrownException().printStackTrace();
+				result.errors().nextElement().thrownException().printStackTrace();
 				return;
 			}
 		}
