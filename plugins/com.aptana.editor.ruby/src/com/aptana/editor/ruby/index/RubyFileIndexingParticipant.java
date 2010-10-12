@@ -43,7 +43,6 @@ import java.util.Set;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -63,12 +62,12 @@ import com.aptana.editor.ruby.parsing.ISourceElementRequestor;
 import com.aptana.editor.ruby.parsing.RubyParser;
 import com.aptana.editor.ruby.parsing.RubySourceParser;
 import com.aptana.editor.ruby.parsing.SourceElementVisitor;
-import com.aptana.index.core.IFileStoreIndexingParticipant;
+import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParserPoolFactory;
 
-public class RubyFileIndexingParticipant implements IFileStoreIndexingParticipant
+public class RubyFileIndexingParticipant extends AbstractFileIndexingParticipant
 {
 
 	public void index(Set<IFileStore> files, final Index index, IProgressMonitor monitor) throws CoreException
@@ -135,11 +134,8 @@ public class RubyFileIndexingParticipant implements IFileStoreIndexingParticipan
 		}
 	}
 
-	// TODO Implement the equivalent of this for each major language/indexer? Others may need to just use a simple
-	// regexp search?
 	private void detectTasks(IFileStore store, List<CommentNode> comments)
 	{
-		IResource resource = null;
 		for (CommentNode commentNode : comments)
 		{
 			String line = commentNode.getContent();
@@ -162,29 +158,8 @@ public class RubyFileIndexingParticipant implements IFileStoreIndexingParticipan
 				}
 
 				String message = line.substring(index).trim();
-				try
-				{
-					if (resource == null)
-					{
-						resource = getResource(store);
-					}
-					IMarker marker = resource.createMarker(IMarker.TASK);
-					if (resource.equals(ResourcesPlugin.getWorkspace().getRoot()))
-					{
-						marker.setAttribute("uri", store.toURI().toString());
-					}
-					marker.setAttribute(IMarker.MESSAGE, message);
-					int priority = entry.getValue();
-					marker.setAttribute(IMarker.PRIORITY, priority);
-					marker.setAttribute(IMarker.LINE_NUMBER, commentNode.getPosition().getStartLine());
-					marker.setAttribute(IMarker.CHAR_START, commentNode.getPosition().getStartOffset());
-					marker.setAttribute(IMarker.CHAR_END, commentNode.getPosition().getEndOffset());
-				}
-				catch (CoreException e)
-				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				createTask(store, message, entry.getValue(), commentNode.getPosition().getStartLine(), commentNode
+						.getPosition().getStartOffset(), commentNode.getPosition().getEndOffset());
 			}
 		}
 	}

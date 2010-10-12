@@ -37,6 +37,7 @@ package com.aptana.editor.html.contentassist.index;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -51,24 +52,26 @@ import org.eclipse.core.runtime.SubMonitor;
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.common.resolver.IPathResolver;
 import com.aptana.editor.common.resolver.URIResolver;
+import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.html.Activator;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.IHTMLParserConstants;
+import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
 import com.aptana.editor.js.parsing.IJSParserConstants;
-import com.aptana.index.core.IFileStoreIndexingParticipant;
+import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 
-public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipant
+public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 {
 	private static final String ELEMENT_LINK = "link"; //$NON-NLS-1$
 	private static final String ELEMENT_SCRIPT = "script"; //$NON-NLS-1$
@@ -172,7 +175,7 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 			{
 				// process inline code
 				JSFileIndexingParticipant jsIndex = new JSFileIndexingParticipant();
-				
+
 				jsIndex.processParseResults(index, child, file.toURI());
 			}
 		}
@@ -185,7 +188,7 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 	 * @param file
 	 * @param current
 	 */
-	private static void processNode(Index index, IFileStore file, IParseNode current)
+	private void processNode(Index index, IFileStore file, IParseNode current)
 	{
 		if (current instanceof HTMLSpecialNode)
 		{
@@ -194,6 +197,45 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 		else if (current instanceof HTMLElementNode)
 		{
 			processHTMLElementNode(index, file, (HTMLElementNode) current);
+		}
+		else if (current instanceof HTMLCommentNode)
+		{
+			processHTMLCommentNode(file, (HTMLCommentNode) current);
+		}
+	}
+
+	private void processHTMLCommentNode(IFileStore store, HTMLCommentNode commentNode)
+	{
+		String text = commentNode.getText();
+		String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
+		for (String line : lines)
+		{
+			if (!CommentScanner.isCaseSensitive())
+			{
+				line = line.toLowerCase();
+			}
+			for (Map.Entry<String, Integer> entry : CommentScanner.DEFAULT_TAGS.entrySet())
+			{
+				String tag = entry.getKey();
+				if (!CommentScanner.isCaseSensitive())
+				{
+					tag = tag.toLowerCase();
+				}
+				int index = line.indexOf(tag);
+				if (index == -1)
+				{
+					continue;
+				}
+
+				String message = line.substring(index).trim();
+				// Remove "-->" from the end of the line!
+				if (message.endsWith("-->")) //$NON-NLS-1$
+				{
+					message = message.substring(0, message.length() - 3).trim();
+				}
+				createTask(store, message, entry.getValue().intValue(), -1, commentNode.getStartingOffset(),
+						commentNode.getEndingOffset());
+			}
 		}
 	}
 
@@ -204,7 +246,7 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 	 * @param file
 	 * @param parent
 	 */
-	public static void walkAST(Index index, IFileStore file, IParseNode parent)
+	public void walkAST(Index index, IFileStore file, IParseNode parent)
 	{
 		if (parent != null)
 		{
@@ -292,7 +334,10 @@ public class HTMLFileIndexingParticipant implements IFileStoreIndexingParticipan
 		}
 		catch (Throwable e)
 		{
-			Activator.logError(MessageFormat.format(Messages.HTMLFileIndexingParticipant_Error_During_Indexing, file.getName()), e);
+			Activator
+					.logError(
+							MessageFormat.format(Messages.HTMLFileIndexingParticipant_Error_During_Indexing,
+									file.getName()), e);
 		}
 		finally
 		{
