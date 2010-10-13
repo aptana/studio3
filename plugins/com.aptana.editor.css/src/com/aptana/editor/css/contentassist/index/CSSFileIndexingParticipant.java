@@ -91,7 +91,7 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		{
 			sub.subTask(file.getName());
 
-			removeTasks(file);
+			removeTasks(file, sub.newChild(10));
 
 			String fileContents = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(20)));
 			if (fileContents != null && fileContents.trim().length() > 0)
@@ -106,7 +106,8 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 					pool.checkIn(cssParser);
 					sub.worked(50);
 					walkNode(index, file, parseNode);
-					processComments(file, parseState.getParseResult());
+					sub.worked(10);
+					processComments(file, parseState.getParseResult(), sub.newChild(10));
 				}
 			}
 		}
@@ -129,18 +130,22 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 	}
 
-	private void processComments(IFileStore file, IParseNode parseResult)
+	private void processComments(IFileStore file, IParseNode parseResult, IProgressMonitor monitor)
 	{
 		if (parseResult instanceof IParseRootNode)
 		{
 			IParseRootNode rootNode = (IParseRootNode) parseResult;
-			for (IParseNode commentNode : rootNode.getCommentNodes())
+			IParseNode[] comments = rootNode.getCommentNodes();
+			SubMonitor sub = SubMonitor.convert(monitor, comments.length);
+			for (IParseNode commentNode : comments)
 			{
 				if (commentNode instanceof CSSCommentNode)
 				{
 					processCommentNode(file, (CSSCommentNode) commentNode);
 				}
+				sub.worked(1);
 			}
+			sub.done();
 		}
 	}
 

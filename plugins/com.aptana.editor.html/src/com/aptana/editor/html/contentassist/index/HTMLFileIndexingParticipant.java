@@ -310,7 +310,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 		{
 			sub.subTask(file.getName());
 
-			removeTasks(file);
+			removeTasks(file, sub.newChild(10));
 
 			IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IHTMLParserConstants.LANGUAGE);
 			if (pool != null)
@@ -328,6 +328,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 						pool.checkIn(htmlParser);
 						sub.worked(50);
 						walkAST(index, file, parseNode);
+						sub.worked(20);
 					}
 				}
 			}

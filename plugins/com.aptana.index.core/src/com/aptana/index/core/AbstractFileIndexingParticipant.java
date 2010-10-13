@@ -9,6 +9,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
 public abstract class AbstractFileIndexingParticipant implements IFileStoreIndexingParticipant
@@ -34,8 +35,7 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 		}
 		catch (CoreException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			IndexActivator.logError(e);
 		}
 	}
 
@@ -55,36 +55,50 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 		return ResourcesPlugin.getWorkspace().getRoot();
 	}
 
-	protected void removeTasks(IFileStore store) throws CoreException
+	protected void removeTasks(IFileStore store, IProgressMonitor monitor)
 	{
 		URI uri = store.toURI();
 		String uriString = uri.toString();
 
-		IResource resource = getResource(store);
-		if (resource.equals(ResourcesPlugin.getWorkspace().getRoot()))
+		try
 		{
-			// Iterate over markers on the root and remove any with matching "uri"
-			IMarker[] tasks = resource.findMarkers(IMarker.TASK, true, IResource.DEPTH_ZERO);
-			for (IMarker task : tasks)
+			IResource resource = getResource(store);
+			if (resource.equals(ResourcesPlugin.getWorkspace().getRoot()))
 			{
-				if (task == null)
+				// Iterate over markers on the root and remove any with matching "uri"
+				IMarker[] tasks = resource.findMarkers(IMarker.TASK, true, IResource.DEPTH_ZERO);
+				for (IMarker task : tasks)
 				{
-					continue;
-				}
-				String markerURI = (String) task.getAttribute(EXTERNAL_URI);
-				if (markerURI == null)
-				{
-					continue;
-				}
-				if (markerURI.equals(uriString))
-				{
-					task.delete();
+					if (task == null)
+					{
+						continue;
+					}
+					try
+					{
+						String markerURI = (String) task.getAttribute(EXTERNAL_URI);
+						if (markerURI == null)
+						{
+							continue;
+						}
+						if (markerURI.equals(uriString))
+						{
+							task.delete();
+						}
+					}
+					catch (CoreException e)
+					{
+						IndexActivator.logError(e);
+					}
 				}
 			}
+			else
+			{
+				resource.deleteMarkers(IMarker.TASK, true, IResource.DEPTH_ZERO);
+			}
 		}
-		else
+		catch (CoreException e)
 		{
-			resource.deleteMarkers(IMarker.TASK, true, IResource.DEPTH_ZERO);
+			IndexActivator.logError(e);
 		}
 	}
 

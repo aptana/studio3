@@ -165,7 +165,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 			try
 			{
-				removeTasks(file);
+				removeTasks(file, sub.newChild(10));
 
 				// grab the source of the file we're going to parse
 				String source = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(20)));
@@ -195,7 +195,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 						if (ast instanceof IParseRootNode)
 						{
 							IParseRootNode rootNode = (IParseRootNode) ast;
-							processComments(file, source, rootNode.getCommentNodes());
+							processComments(file, source, rootNode.getCommentNodes(), sub.newChild(20));
 						}
 					}
 				}
@@ -311,20 +311,22 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 	}
 
-	private void processComments(IFileStore file, String source, IParseNode[] commentNodes)
+	private void processComments(IFileStore file, String source, IParseNode[] commentNodes, IProgressMonitor monitor)
 	{
 		if (commentNodes == null || commentNodes.length == 0)
 		{
 			return;
 		}
-
+		SubMonitor sub = SubMonitor.convert(monitor, commentNodes.length);
 		for (IParseNode commentNode : commentNodes)
 		{
 			if (commentNode instanceof JSCommentNode)
 			{
 				processCommentNode(file, source, (JSCommentNode) commentNode);
 			}
+			sub.worked(1);
 		}
+		sub.done();
 	}
 
 	private void processCommentNode(IFileStore store, String source, JSCommentNode commentNode)

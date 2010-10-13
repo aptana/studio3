@@ -89,7 +89,7 @@ public class RubyFileIndexingParticipant extends AbstractFileIndexingParticipant
 		{
 			sub.subTask(store.toString());
 
-			removeTasks(store);
+			removeTasks(store, sub.newChild(10));
 
 			// grab the source of the file we're going to parse
 			String source = IOUtil.read(store.openInputStream(EFS.NONE, sub.newChild(20)));
@@ -111,13 +111,14 @@ public class RubyFileIndexingParticipant extends AbstractFileIndexingParticipant
 				ParserResult result = sourceParser.parse(store.getName(), source);
 
 				pool.checkIn(parser);
-				sub.worked(50);
+				sub.worked(40);
 
 				Node root = result.getAST();
 				ISourceElementRequestor builder = new RubySourceIndexer(index, store.toURI());
 				SourceElementVisitor visitor = new SourceElementVisitor(builder);
 				visitor.acceptNode(root);
-				detectTasks(store, result.getCommentNodes());
+				sub.worked(20);
+				detectTasks(store, result.getCommentNodes(), sub.newChild(10));
 			}
 		}
 		catch (Throwable e)
@@ -130,8 +131,14 @@ public class RubyFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 	}
 
-	private void detectTasks(IFileStore store, List<CommentNode> comments)
+	private void detectTasks(IFileStore store, List<CommentNode> comments, IProgressMonitor monitor)
 	{
+		if (comments == null || comments.isEmpty())
+		{
+			return;
+		}
+
+		SubMonitor sub = SubMonitor.convert(monitor, comments.size());
 		for (CommentNode commentNode : comments)
 		{
 			String text = commentNode.getContent();
@@ -166,6 +173,9 @@ public class RubyFileIndexingParticipant extends AbstractFileIndexingParticipant
 				offset += line.length();
 				lineOffset++;
 			}
+
+			sub.worked(1);
 		}
+		sub.done();
 	}
 }
