@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
@@ -51,6 +52,7 @@ import org.jaxen.JaxenException;
 import org.jaxen.XPath;
 
 import com.aptana.core.util.IOUtil;
+import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
@@ -61,18 +63,20 @@ import com.aptana.editor.js.inferencing.JSScope;
 import com.aptana.editor.js.inferencing.JSSymbolTypeInferrer;
 import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.editor.js.parsing.IJSParserConstants;
+import com.aptana.editor.js.parsing.ast.JSCommentNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
-import com.aptana.index.core.IFileStoreIndexingParticipant;
+import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.xpath.ParseNodeXPath;
 
-public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
+public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 {
 	private static XPath LAMBDAS_IN_SCOPE;
 	private JSIndexWriter _indexWriter;
@@ -131,9 +135,9 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 			{
 				throw new CoreException(Status.CANCEL_STATUS);
 			}
-			
+
 			Thread.yield(); // be nice to other threads, let them get in before each file...
-			
+
 			this.indexFileStore(index, file, sub.newChild(100));
 		}
 
@@ -150,7 +154,7 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 	private void indexFileStore(Index index, IFileStore file, IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
-		
+
 		if (file == null)
 		{
 			return;
@@ -161,6 +165,8 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 
 			try
 			{
+				removeTasks(file);
+
 				// grab the source of the file we're going to parse
 				String source = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(20)));
 
@@ -183,7 +189,14 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 						sub.worked(50);
 
 						// process results
-						this.processParseResults(index, parseState.getParseResult(), file.toURI());
+						IParseNode ast = parseState.getParseResult();
+						this.processParseResults(index, ast, file.toURI());
+
+						if (ast instanceof IParseRootNode)
+						{
+							IParseRootNode rootNode = (IParseRootNode) ast;
+							processComments(file, source, rootNode.getCommentNodes());
+						}
 					}
 				}
 			}
@@ -296,6 +309,70 @@ public class JSFileIndexingParticipant implements IFileStoreIndexingParticipant
 			// write new Window type to index
 			this._indexWriter.writeType(index, type, location);
 		}
+	}
+
+	private void processComments(IFileStore file, String source, IParseNode[] commentNodes)
+	{
+		if (commentNodes == null || commentNodes.length == 0)
+		{
+			return;
+		}
+
+		for (IParseNode commentNode : commentNodes)
+		{
+			if (commentNode instanceof JSCommentNode)
+			{
+				processCommentNode(file, source, (JSCommentNode) commentNode);
+			}
+		}
+	}
+
+	private void processCommentNode(IFileStore store, String source, JSCommentNode commentNode)
+	{
+		String text = getText(source, commentNode);
+		int offset = 0;
+		String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
+		for (String line : lines)
+		{
+			if (!CommentScanner.isCaseSensitive())
+			{
+				line = line.toLowerCase();
+			}
+			for (Map.Entry<String, Integer> entry : CommentScanner.DEFAULT_TAGS.entrySet())
+			{
+				String tag = entry.getKey();
+				if (!CommentScanner.isCaseSensitive())
+				{
+					tag = tag.toLowerCase();
+				}
+				int index = line.indexOf(tag);
+				if (index == -1)
+				{
+					continue;
+				}
+
+				String message = line.substring(index).trim();
+				// Remove "**/" from the end of the line!
+				if (message.endsWith("**/")) //$NON-NLS-1$
+				{
+					message = message.substring(0, message.length() - 3).trim();
+				}
+				// Remove "*/" from the end of the line!
+				if (message.endsWith("*/")) //$NON-NLS-1$
+				{
+					message = message.substring(0, message.length() - 2).trim();
+				}
+				int start = commentNode.getStartingOffset() + offset + index;
+				createTask(store, message, entry.getValue(), -1, start, start + message.length());
+			}
+			// FIXME This doesn't take the newline into account from split!
+			offset += line.length();
+		}
+	}
+
+	private String getText(String source, JSCommentNode commentNode)
+	{
+		return new String(source.substring(commentNode.getStartingOffset(), commentNode.getEndingOffset() + 1));
 	}
 
 	/**
