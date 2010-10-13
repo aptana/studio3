@@ -35,6 +35,7 @@
 package com.aptana.core.util;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -42,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.URL;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -213,6 +215,33 @@ public abstract class IOUtil
 					in.close();
 				} catch (IOException e) {
 				}
+			}
+		}
+	}
+
+	public static void write(OutputStream stream, String rawSource)
+	{
+		if (stream == null)
+			return;
+		BufferedWriter writer = null;
+		try
+		{
+			writer = new BufferedWriter(new OutputStreamWriter(stream));
+			writer.write(rawSource);
+		}
+		catch (IOException e)
+		{
+			log(e);
+		}
+		finally
+		{
+			try
+			{
+				writer.close();
+			}
+			catch (IOException e)
+			{
+				// ignore
 			}
 		}
 	}
