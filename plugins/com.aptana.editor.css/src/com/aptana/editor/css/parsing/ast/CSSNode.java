@@ -51,10 +51,16 @@ public class CSSNode extends ParseNode
 		this.start = start;
 		this.end = end;
 	}
-	
+
 	@Override
 	public String getText()
 	{
 		return toString();
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		return (obj instanceof CSSNode) && super.equals(obj);
 	}
 }

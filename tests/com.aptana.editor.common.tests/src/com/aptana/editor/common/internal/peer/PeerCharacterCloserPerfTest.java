@@ -1,41 +1,48 @@
 package com.aptana.editor.common.internal.peer;
 
-import junit.framework.TestCase;
-
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.test.performance.PerformanceTestCase;
 
-public class PeerCharacterCloserPerfTest extends TestCase
+public class PeerCharacterCloserPerfTest extends PerformanceTestCase
 {
 
-	public void testTime() throws Exception
+	public void testCheckUnpairedClose() throws Exception
 	{
 		char[] pairs = new char[] { '(', ')', '"', '"' };
 		PeerCharacterCloser closer = new PeerCharacterCloser(null, pairs);
-		StringBuilder builder = new StringBuilder();
-		int times = 50000;
-		for (int i = 0; i < times; i++)
+		int numPairs = 25000;
+
+		IDocument document = createDocumentWithPairs(numPairs);
+		for (int i = 0; i < 10; i++)
 		{
-			builder.append("((((((((((((((");
-		}
-		for (int i = 0; i < times; i++)
-		{
-			builder.append("))))))))))))))");
-		}
-		IDocument document = new Document(builder.toString());
-		builder = null;
-		int offset = times * 10;
-		int iterations = 5;
-		long start = System.currentTimeMillis();
-		for (int i = 0; i < iterations; i++)
-		{
-			if (closer.unpairedClose('(', ')', document, offset))
+			startMeasuring();
+			if (closer.unpairedClose('(', ')', document, 0))
 			{
-				throw new Exception("bad!");
+				fail("bad!");
 			}
+			if (closer.unpairedClose('(', ')', document, numPairs * 2))
+			{
+				fail("bad!");
+			}
+			stopMeasuring();
 		}
-		long end = System.currentTimeMillis();
-		System.out.println((end - start) / iterations);
+		commitMeasurements();
+		assertPerformance();
+	}
+
+	private IDocument createDocumentWithPairs(int numPairs)
+	{
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < numPairs; i++)
+		{
+			builder.append('(');
+		}
+		for (int i = 0; i < numPairs; i++)
+		{
+			builder.append(')');
+		}
+		return new Document(builder.toString());
 	}
 
 }

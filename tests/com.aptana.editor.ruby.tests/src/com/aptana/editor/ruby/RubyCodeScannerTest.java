@@ -1,32 +1,25 @@
 package com.aptana.editor.ruby;
 
-import junit.framework.TestCase;
-
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
 
-public class RubyCodeScannerTest extends TestCase
+import com.aptana.editor.common.tests.AbstractTokenScannerTestCase;
+
+public class RubyCodeScannerTest extends AbstractTokenScannerTestCase
 {
 
-	private RubyCodeScanner fScanner;
-
-	protected void setUp() throws Exception
+	@Override
+	protected ITokenScanner createTokenScanner()
 	{
-		super.setUp();
-		fScanner = new RubyCodeScanner()
+		return new RubyCodeScanner()
 		{
 			protected IToken getToken(String tokenName)
 			{
 				return new Token(tokenName);
 			};
 		};
-	}
-
-	protected void tearDown() throws Exception
-	{
-		fScanner = null;
-		super.tearDown();
 	}
 
 	private void setUpScanner(String code)
@@ -37,17 +30,18 @@ public class RubyCodeScannerTest extends TestCase
 	private void setUpScanner(String code, int offset, int length)
 	{
 		Document doc = new Document(code);
-		fScanner.setRange(doc, offset, length);
+		scanner.setRange(doc, offset, length);
 	}
 
 	private void assertToken(String scope, int offset, int length)
 	{
-		IToken token = fScanner.nextToken();
-		assertEquals("Offsets don't match", offset, fScanner.getTokenOffset());
-		assertEquals("Lengths don't match", length, fScanner.getTokenLength());
+		// FIXME MErge with AbstractTokenScannerTestCase.assertToken
+		IToken token = scanner.nextToken();
+		assertEquals("Offsets don't match", offset, scanner.getTokenOffset());
+		assertEquals("Lengths don't match", length, scanner.getTokenLength());
 		assertEquals("Token scope doesn't match", scope, token.getData());
 	}
-	
+
 	public void testNoParensNextIdentifierIsntParameter()
 	{
 		String code = "def denominator\nmethod_call\nend";

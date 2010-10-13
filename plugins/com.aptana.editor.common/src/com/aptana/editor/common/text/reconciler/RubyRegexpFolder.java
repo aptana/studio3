@@ -34,6 +34,8 @@
  */
 package com.aptana.editor.common.text.reconciler;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,11 +63,16 @@ class RubyRegexpFolder
 		this.fDocument = document;
 	}
 
-	public List<Position> emitFoldingRegions(List<Position> positions, IProgressMonitor monitor)
+	public List<Position> emitFoldingRegions(IProgressMonitor monitor)
 			throws BadLocationException
 	{
 		int lineCount = fDocument.getNumberOfLines();
-		Map<Integer, Integer> starts = new HashMap<Integer, Integer>();
+		if (lineCount <= 1) // Quick hack fix for minified files. We need at least two lines to have folding!
+		{
+			return Collections.emptyList();
+		}
+		List<Position> newPositions = new ArrayList<Position>(lineCount / 4);
+		Map<Integer, Integer> starts = new HashMap<Integer, Integer>(3);
 		if (monitor != null)
 		{
 			monitor.beginTask(Messages.CommonReconcilingStrategy_FoldingTaskName, lineCount);
@@ -74,7 +81,7 @@ class RubyRegexpFolder
 		{
 			// Check for cancellation
 			if (monitor != null && monitor.isCanceled())
-				return positions;
+				return newPositions;
 			
 			IRegion lineRegion = fDocument.getLineInformation(currentLine);
 			int offset = lineRegion.getOffset();
@@ -128,7 +135,7 @@ class RubyRegexpFolder
 							if (posLength > 0)
 							{
 								Position position = new Position(startingOffset, posLength);
-								positions.add(position);
+								newPositions.add(position);
 							}
 						}
 					}
@@ -142,7 +149,7 @@ class RubyRegexpFolder
 		{
 			monitor.done();
 		}
-		return positions;
+		return newPositions;
 	}
 
 	protected String getScopeAtOffset(int offset) throws BadLocationException

@@ -314,6 +314,7 @@ public class SiteConnectionsEditorDialog extends TitleAreaDialog implements Site
 		}
 	}
 
+	@Override
 	protected void buttonPressed(int buttonId) {
 		if (buttonId == IDialogConstants.APPLY_ID) {
 			applyPressed();
@@ -321,6 +322,13 @@ public class SiteConnectionsEditorDialog extends TitleAreaDialog implements Site
 		super.buttonPressed(buttonId);
 	}
 
+	@Override
+    protected void cancelPressed() {
+		sitePropertiesWidget.cancelChanges();
+    	super.cancelPressed();
+    }
+
+	@Override
 	protected void okPressed() {
 		if (applyPressed()) {
 			super.okPressed();

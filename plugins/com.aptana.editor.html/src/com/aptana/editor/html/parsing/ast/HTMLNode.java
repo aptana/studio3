@@ -60,4 +60,9 @@ public class HTMLNode extends ParseNode
 	{
 		return fType;
 	}
+
+	protected void setType(short type)
+	{
+		fType = type;
+	}
 }

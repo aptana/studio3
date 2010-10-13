@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Markdown Editor
+Bundle-SymbolicName: com.aptana.editor.markdown;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: com.aptana.editor.markdown.MarkdownEditorPlugin
+Bundle-Vendor: Aptana, Inc.
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ org.eclipse.jface.text,
+ org.eclipse.ui.editors,
+ com.aptana.editor.common,
+ com.aptana.editor.html;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-ActivationPolicy: lazy
+Bundle-Localization: plugin
+Eclipse-ExtensibleAPI: true

@@ -1,87 +1,22 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-  <head>
-    <title>
-      Aptana
-    </title>
-    <link href="stylesheets/main.css" rel="stylesheet" type="text/css" />
-    <link href="stylesheets/portal.css" rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src="javascripts/framework/prototype.js"></script>
-    <script type="text/javascript" src="javascripts/framework/array_list.js"></script>
-    <script type="text/javascript" src="javascripts/framework/events.js"></script>
-    <script type="text/javascript" src="javascripts/framework/elements.js"></script>
-    <script type="text/javascript" src="javascripts/framework/effects.js"></script>
-    <script type="text/javascript" src="javascripts/framework/lightbox.js"></script>
-    <script type="text/javascript" src="javascripts/framework/dialog_helper.js"></script>
-    <script type="text/javascript" src="javascripts/portal/tooltip.js"></script>
-    <script type="text/javascript" src="javascripts/portal/items_view.js"></script>
-    <script type="text/javascript" src="javascripts/portal/plugins.js"></script>
-    <script type="text/javascript" src="javascripts/portal/files.js"></script>
-    <script type="text/javascript" src="javascripts/portal/required_gems.js"></script>
-    <script type="text/javascript" src="javascripts/portal/apps.js"></script>
-    <script type="text/javascript" src="javascripts/portal/portal.js"></script>
-  </head>
-  <body onload="loadPortal()">
-    <div id="container">
-      <div id="header">
-        <a id="logo" href="/" name="logo"></a>
-      </div>
-      <div id="main">
-        <div id="top">
-          <h2>Developer Toolbox</h2>
-        </div>
-        <div id="content">
-          <div class="colmask threecol">
-            <div class="colmid">
-              <div class="colleft">
-                <div class="col1">
-                  <!-- Main column -->
-                  <div>
-                    <b>Applications</b>
-                  </div>
-                  <div id="app-versions"></div>
-                  
-                  <div id="divider"></div>
-                  
-                  <div>
-                    <b>Required Gems</b>
-                  </div>
-                  <div id="required-gems"></div>
-                  
-                  <div id="divider"></div>
-                  
-                  <div>
-                    <b>Plug-ins</b>
-                  </div>
-                  <div id="plugins"></div>
-                  <!-- Main column end -->
-                </div>
-                <div class="col2">
-                  <!-- Left column start -->
-                  <div>
-                    <b>Recently Opened Files</b>
-                  </div>
-                  <div id="recentFiles"></div>
-                  <!-- Left column end -->
-                </div>
-                <div class="col3">
-                  <!-- Right column start -->
-                  <div>
-                    <b>Ads</b>
-                  </div>
-                  <!-- Right column end -->
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id="footer">
-        <p>
-          Copyright 2005-2010 Aptana, Inc. | <a href="http://www.aptana.com/about">About Us</a> | <a href="http://www.aptana.com/privacy_policy">Privacy Policy</a>
-        </p>
-      </div>
-    </div>
-  </body>
-</html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html> 
+<head> 
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /> 
+  <title>Developer Toolbox : Offline</title> 
+  <link href="stylesheets/reset.css" media="screen" rel="stylesheet" type="text/css" /> 
+  <link href="stylesheets/common.css" media="screen" rel="stylesheet" type="text/css" />
+</head> 
+<body> 
+    <div id="header"> 
+        <img src="images/aptana-logo.png" class="logo"> 
+        <img src="images/page-header.png" class="page-title"> 
+    </div> 
+    
+    <div id="body"> 
+        <div><h2 align="center">Content Unavailable in Offline Mode</h2></div>
+        <span id="reload"><a href="javascript:reloadPortal()">reload</a></span>
+    </div> 
+    <script src="javascripts/framework/prototype.js" type="text/javascript"></script> 
+    <script src="javascripts/portal/offline_portal.js" type="text/javascript"></script> 
+</body> 
+</html> 
