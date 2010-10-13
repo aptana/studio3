@@ -22,6 +22,7 @@
          <action
                class="com.aptana.git.ui.actions.UnstageAction"
                definitionId="com.aptana.git.ui.command.unstage"
+               icon="icons/elcl16/subtract.gif"
                id="com.aptana.git.ui.actions.UnstageAction"
                label="%UnstageAction_label"
                menubarPath="team.main/targetGroup"
@@ -30,6 +31,7 @@
          <action
                class="com.aptana.git.ui.actions.StageAction"
                definitionId="com.aptana.git.ui.command.stage"
+               icon="icons/elcl16/add.gif"
                id="com.aptana.git.ui.actions.StageAction"
                label="%StageAction_label"
                menubarPath="team.main/targetGroup"
@@ -62,6 +64,7 @@
          <action
                class="com.aptana.git.ui.actions.PushAction"
                definitionId="com.aptana.git.ui.command.push"
+               icon="icons/elcl16/arrow_up.png"
                id="com.aptana.git.ui.actions.PushAction"
                label="%PushAction_label"
                menubarPath="team.main/projectGroup"
@@ -70,6 +73,7 @@
          <action
                class="com.aptana.git.ui.actions.PullAction"
                definitionId="com.aptana.git.ui.command.pull"
+               icon="icons/elcl16/arrow_down.png"
                id="com.aptana.git.ui.actions.PullAction"
                label="%PullAction_label"
                menubarPath="team.main/projectGroup"
@@ -93,6 +97,7 @@
          <action
                class="com.aptana.git.ui.actions.CommitAction"
                definitionId="com.aptana.git.ui.command.commit"
+               icon="icons/elcl16/disk.png"
                id="com.aptana.git.ui.actions.CommitAction"
                label="%CommitAction_label"
                menubarPath="team.main/targetGroup"

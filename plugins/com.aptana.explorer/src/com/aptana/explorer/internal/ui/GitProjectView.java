@@ -71,6 +71,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -135,10 +136,12 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	private static final String GIT_CHANGED_FILES_FILTER = "GitChangedFilesFilterEnabled"; //$NON-NLS-1$
 	private static final String PROJECT_DELIMITER = "######"; //$NON-NLS-1$
 	private static final String COMMIT_ICON_PATH = "icons/full/elcl16/disk.png"; //$NON-NLS-1$
-	private static final String PUSH_ICON_PATH = "icons/full/elcl16/arrow_right.png"; //$NON-NLS-1$
-	private static final String PULL_ICON_PATH = "icons/full/elcl16/arrow_left.png"; //$NON-NLS-1$
-	private static final String STASH_ICON_PATH = "icons/full/elcl16/arrow_down.png"; //$NON-NLS-1$
-	private static final String UNSTASH_ICON_PATH = "icons/full/elcl16/arrow_up.png"; //$NON-NLS-1$
+	private static final String PUSH_ICON_PATH = "icons/full/elcl16/arrow_up.png"; //$NON-NLS-1$
+	private static final String PULL_ICON_PATH = "icons/full/elcl16/arrow_down.png"; //$NON-NLS-1$
+	private static final String STAGE_ICON_PATH = "icons/full/elcl16/add.gif"; //$NON-NLS-1$
+	private static final String UNSTAGE_ICON_PATH = "icons/full/elcl16/subtract.gif"; //$NON-NLS-1$
+	private static final String STASH_ICON_PATH = "icons/full/elcl16/arrow_left.png"; //$NON-NLS-1$
+	private static final String UNSTASH_ICON_PATH = "icons/full/elcl16/arrow_right.png"; //$NON-NLS-1$
 	private static final String CHANGED_FILE_FILTER_ICON_PATH = "icons/full/elcl16/filter.png"; //$NON-NLS-1$
 
 	private static final String CREATE_NEW_BRANCH_TEXT = Messages.GitProjectView_createNewBranchOption;
@@ -580,19 +583,19 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	private void createRevertMenuItem(Menu menu, int index)
 	{
 		createSimpleGitAction(menu, index, getSelectedUnstagedFiles(), Messages.GitProjectView_RevertTooltip,
-				Messages.GitProjectView_RevertJobTitle, new RevertAction());
+				Messages.GitProjectView_RevertJobTitle, new RevertAction(), null);
 	}
 
 	private void createStageMenuItem(Menu menu, int index)
 	{
 		createSimpleGitAction(menu, index, getSelectedUnstagedFiles(), Messages.GitProjectView_StageTooltip,
-				Messages.GitProjectView_StageJobTitle, new StageAction());
+				Messages.GitProjectView_StageJobTitle, new StageAction(), ExplorerPlugin.getImage(STAGE_ICON_PATH));
 	}
 
 	private void createUnstageMenuItem(Menu menu, int index)
 	{
 		createSimpleGitAction(menu, index, getSelectedStagedFiles(), Messages.GitProjectView_UnstageTooltip,
-				Messages.GitProjectView_UnstageJobTitle, new UnstageAction());
+				Messages.GitProjectView_UnstageJobTitle, new UnstageAction(), ExplorerPlugin.getImage(UNSTAGE_ICON_PATH));
 	}
 
 	protected Set<IResource> getSelectedStagedFiles()
@@ -661,7 +664,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	}
 
 	private void createSimpleGitAction(Menu menu, int index, final Set<IResource> selected, String tooltip,
-			final String jobTitle, final GitAction action)
+			final String jobTitle, final GitAction action, Image image)
 	{
 		if (index < 0)
 		{
@@ -670,6 +673,9 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		MenuItem stage = new MenuItem(menu, SWT.PUSH, index);
 		stage.setText(tooltip);
 		stage.setEnabled(!selected.isEmpty());
+		if(image != null) {
+			stage.setImage(image);
+		}
 		stage.addSelectionListener(new SelectionAdapter()
 		{
 			@Override

@@ -197,15 +197,15 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 
 	private static final String GEAR_MENU_ICON = "icons/full/elcl16/command.png"; //$NON-NLS-1$
 	private static final String DEPLOY_MENU_ICON = "icons/full/elcl16/network_arrow.png"; //$NON-NLS-1$
-	private static final String UPLOAD_MENU_ICON = "icons/full/elcl16/direction_upload.png"; //$NON-NLS-1$
-	private static final String DOWNLOAD_MENU_ICON = "icons/full/elcl16/direction_download.png"; //$NON-NLS-1$
+	private static final String UPLOAD_MENU_ICON = "icons/full/elcl16/arrow_up.png"; //$NON-NLS-1$
+	private static final String DOWNLOAD_MENU_ICON = "icons/full/elcl16/arrow_down.png"; //$NON-NLS-1$
 	private static final String CLOSE_ICON = "icons/full/elcl16/close.png"; //$NON-NLS-1$
 	// private static final String[] animationImage = {
 	private static final String[] animationImageUp = {
-			"icons/full/elcl16/network_arrow_up.png", "icons/full/elcl16/network_arrow_up_20.png", "icons/full/elcl16/network_arrow_up_40.png", "icons/full/elcl16/network_arrow_up_60.png", "icons/full/elcl16/network_arrow_up_80.png", "icons/full/elcl16/network_arrow_up_60.png", "icons/full/elcl16/network_arrow_up_40.png", "icons/full/elcl16/network_arrow_up_20.png" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+			"icons/full/elcl16/arrow_up.png"};
 	private static final String[] animationImageDown = {
-			"icons/full/elcl16/network_arrow_down.png", "icons/full/elcl16/network_arrow_down_20.png", "icons/full/elcl16/network_arrow_down_40.png", "icons/full/elcl16/network_arrow_down_60.png", "icons/full/elcl16/network_arrow_down_80.png", "icons/full/elcl16/network_arrow_down_60.png", "icons/full/elcl16/network_arrow_down_40.png", "icons/full/elcl16/network_arrow_down_20.png" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
-
+			"icons/full/elcl16/arrow_down.png"};
+	
 	protected static final String GROUP_RUN = "group.run"; //$NON-NLS-1$
 	protected static final String GROUP_DEPLOY = "group.deploy"; //$NON-NLS-1$
 	protected static final String GROUP_HEROKU_COMMANDS = "group.herokucommands"; //$NON-NLS-1$
