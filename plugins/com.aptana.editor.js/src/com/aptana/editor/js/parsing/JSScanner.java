@@ -54,6 +54,7 @@ public class JSScanner extends Scanner
 	private IDocument fDocument;
 	private List<Symbol> fSDocComments;
 	private List<Symbol> fVSDocComments;
+	private List<Symbol> fSingleLineComments;
 
 	/**
 	 * JSScanner
@@ -109,6 +110,16 @@ public class JSScanner extends Scanner
 		return fSDocComments;
 	}
 
+	/**
+	 * getSingleLineComments
+	 * 
+	 * @return
+	 */
+	public List<Symbol> getSingleLineComments()
+	{
+		return fSingleLineComments;
+	}
+	
 	/**
 	 * getVSDocComments
 	 * 
@@ -169,6 +180,10 @@ public class JSScanner extends Scanner
 
 				switch (type)
 				{
+					case SINGLELINE_COMMENT:
+						fSingleLineComments.add(createSymbol(data));
+						break;
+						
 					case SDOC:
 						fSDocComments.add(createSymbol(data));
 						break;
