@@ -1,6 +1,5 @@
 package com.aptana.editor.css.formatter;
 
-import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.FormatterContext;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
@@ -43,22 +42,11 @@ public class CSSFormatterContext extends FormatterContext
 	 */
 	public int getCommentStartLength(CharSequence chars, int offset)
 	{
-		int count = 0;
-		if (chars.length() > offset + 1)
+		if (chars.length() > offset + 1 && chars.charAt(offset) == '/' && chars.charAt(offset+ 1) == '*')
 		{
-			if (chars.charAt(offset) == '<' && chars.charAt(offset + 1) == '!')
-			{
-				count = 2;
-			}
-			if (chars.length() > offset + 3)
-			{
-				if (chars.charAt(offset + 2) == '-' && chars.charAt(offset + 3) == '-')
-				{
-					count += 2;
-				}
-			}
+			return 2;
 		}
-		return count;
+		return 0;
 	}
 
 	/*
@@ -67,6 +55,6 @@ public class CSSFormatterContext extends FormatterContext
 	 */
 	public String getWrappingCommentPrefix()
 	{
-		return StringUtil.EMPTY;
+		return " * ";
 	}
 }

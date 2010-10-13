@@ -19,7 +19,6 @@ import com.aptana.editor.css.parsing.ast.*;
  * CSS formatter node builder.<br>
  * This builder generates the formatter nodes that will then be processed by the {@link HTMLFormatterNodeRewriter} to
  * produce the output for the code formatting process.
- * 
  */
 public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 {
@@ -81,8 +80,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		else if (cssNode.getNodeType() == CSSNodeTypes.RULE)
 		{
 			pushFormatterNode(cssNode);
-		} 
-
+		}
 
 	}
 
@@ -100,53 +98,61 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	private void pushFormatterNode(CSSNode node)
 	{
 		CSSRuleNode ruleNode = (CSSRuleNode) node;
-		FormatterBlockWithBeginNode formatterRuleNode = new FormatterCSSRuleNode(document, ruleNode.getNameNode().getName().toLowerCase());
-		
+		FormatterBlockWithBeginNode formatterRuleNode = new FormatterCSSRuleNode(document, ruleNode.getNameNode()
+				.getName().toLowerCase());
+
 		CSSSelectorNode[] selectors = ruleNode.getSelectors();
-		int selectorsEndOffset = getEndWithoutWhiteSpaces(selectors[selectors.length -1].getEndingOffset() + 1, document);
-		int blockStartOffset = getBeginWithoutWhiteSpaces(selectors[selectors.length -1].getEndingOffset() + 1, document);
-		//TODO: Account for case where there are no declarations??
-		
+		int selectorsEndOffset = getEndWithoutWhiteSpaces(selectors[selectors.length - 1].getEndingOffset() + 1,
+				document);
+		int blockStartOffset = getBeginWithoutWhiteSpaces(selectors[selectors.length - 1].getEndingOffset() + 1,
+				document);
+		// TODO: Account for case where there are no declarations??
+
 		CSSDeclarationNode[] declarations = ruleNode.getDeclarations();
-		formatterRuleNode.setBegin(createTextNode(document, ruleNode.getStartingOffset(),selectorsEndOffset +1));
+		formatterRuleNode.setBegin(createTextNode(document, ruleNode.getStartingOffset(), selectorsEndOffset + 1));
 		push(formatterRuleNode);
-		
+
 		checkedPop(formatterRuleNode, -1);
-		
-		
-		//TODO: need to change the type of element
+
+		// TODO: need to change the type of element
 		FormatterBlockWithBeginEndNode formatterBlockNode = new FormatterCSSBlockNode(document, StringUtil.EMPTY);
-		formatterBlockNode.setBegin(createTextNode(document, blockStartOffset , blockStartOffset+1));
-		formatterBlockNode.setEnd(createTextNode(document, ruleNode.getEndingOffset(), ruleNode.getEndingOffset()+1));
+		formatterBlockNode.setBegin(createTextNode(document, blockStartOffset, blockStartOffset + 1));
+		formatterBlockNode.setEnd(createTextNode(document, ruleNode.getEndingOffset(), ruleNode.getEndingOffset() + 1));
 		push(formatterBlockNode);
-		
+
 		if (declarations != null)
 		{
-			formatterBlockNode.addChild(createTextNode(document, blockStartOffset+1, declarations[0].getStartingOffset()));
+			formatterBlockNode.addChild(createTextNode(document, blockStartOffset + 1,
+					declarations[0].getStartingOffset()));
 		}
-		
-		for( int i = 0; i < declarations.length; ++i)
+
+		for (int i = 0; i < declarations.length; ++i)
 		{
 
 			CSSDeclarationNode declarationNode = declarations[i];
 			String type = declarationNode.getNameNode().getName().toLowerCase();
 			FormatterBlockWithBeginNode formatterDeclarationNode = new FormatterCSSDeclarationNode(document, type);
-			
-			formatterDeclarationNode.setBegin(createTextNode(document, declarationNode.getStartingOffset(), declarationNode.getEndingOffset()+1));
+
+			formatterDeclarationNode.setBegin(createTextNode(document, declarationNode.getStartingOffset(),
+					declarationNode.getEndingOffset() + 1));
 			push(formatterDeclarationNode);
-			
-			if( i+1 < declarations.length)
+
+			checkedPop(formatterDeclarationNode, -1);
+
+			if (i + 1 < declarations.length)
 			{
-				checkedPop(formatterDeclarationNode, declarations[i+1].getStartingOffset());
+				formatterBlockNode.addChild(createTextNode(document, declarations[i].getEndingOffset() + 1,
+						declarations[i + 1].getStartingOffset()));
 			}
 			else
 			{
-				checkedPop(formatterDeclarationNode, ruleNode.getEndingOffset());
+				formatterBlockNode.addChild(createTextNode(document, declarations[i].getEndingOffset() + 1,
+						ruleNode.getEndingOffset()));
 			}
 		}
 
 		checkedPop(formatterBlockNode, -1);
-		
+
 	}
 
 	/**
@@ -185,6 +191,5 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		}
 		return offset;
 	}
-	
-}
 
+}

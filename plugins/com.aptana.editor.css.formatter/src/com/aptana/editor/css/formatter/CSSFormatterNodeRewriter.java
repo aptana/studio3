@@ -27,7 +27,7 @@ public class CSSFormatterNodeRewriter
 	public CSSFormatterNodeRewriter(IParseRootNode parseResult, FormatterDocument document)
 	{
 		this.document = document;
-		
+
 		for (IParseNode commentNode : parseResult.getCommentNodes())
 		{
 			comments.add(commentNode);

@@ -32,7 +32,6 @@ import com.aptana.ui.preferences.IPreferenceDelegate;
 
 /**
  * CSS code formatter.
- * 
  */
 public class CSSFormatter extends AbstractScriptFormatter implements IScriptFormatter
 {
@@ -275,10 +274,10 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 		FormatterDocument document = new FormatterDocument(input);
 		document.setInt(CSSFormatterConstants.FORMATTER_TAB_SIZE, getInt(CSSFormatterConstants.FORMATTER_TAB_SIZE));
 		document.setBoolean(CSSFormatterConstants.WRAP_COMMENTS, getBoolean(CSSFormatterConstants.WRAP_COMMENTS));
-		document.setSet(CSSFormatterConstants.INDENT_EXCLUDED_TAGS, getSet(
-				CSSFormatterConstants.INDENT_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
-		document.setSet(CSSFormatterConstants.NEW_LINES_EXCLUDED_TAGS, getSet(
-				CSSFormatterConstants.NEW_LINES_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
+		document.setSet(CSSFormatterConstants.INDENT_EXCLUDED_TAGS,
+				getSet(CSSFormatterConstants.INDENT_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
+		document.setSet(CSSFormatterConstants.NEW_LINES_EXCLUDED_TAGS,
+				getSet(CSSFormatterConstants.NEW_LINES_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
 		for (int i = 0; i < BLANK_LINES.length; i++)
 		{
 			document.setInt(BLANK_LINES[i], getInt(BLANK_LINES[i]));
@@ -287,4 +286,3 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 	}
 
 }
-
