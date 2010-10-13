@@ -102,6 +102,6 @@ public class JSFormatterContext extends FormatterContext
 	 */
 	public String getWrappingCommentPrefix()
 	{
-		return StringUtil.EMPTY;
+		return " * "; //$NON-NLS-1$
 	}
 }

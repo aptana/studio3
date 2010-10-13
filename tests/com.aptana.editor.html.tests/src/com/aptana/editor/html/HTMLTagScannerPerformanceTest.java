@@ -34,7 +34,6 @@
  */
 package com.aptana.editor.html;
 
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 import org.eclipse.core.runtime.FileLocator;

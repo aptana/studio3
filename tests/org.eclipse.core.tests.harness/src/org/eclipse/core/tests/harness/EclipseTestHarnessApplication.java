@@ -17,6 +17,7 @@ import junit.framework.Test;
 import junit.textui.TestRunner;
 import org.eclipse.core.runtime.*;
 
+@SuppressWarnings({"unchecked", "rawtypes", "deprecation"})
 public class EclipseTestHarnessApplication implements IPlatformRunnable {
 	protected List tests;
 
@@ -67,6 +68,7 @@ public class EclipseTestHarnessApplication implements IPlatformRunnable {
 		return null;
 	}
 
+	@SuppressWarnings("hiding")
 	protected String[] processCommandLine(String[] args) {
 		int[] configArgs = new int[100];
 		configArgs[0] = -1; // need to initialize the first element to something that could not be an index.
@@ -142,8 +144,7 @@ public class EclipseTestHarnessApplication implements IPlatformRunnable {
 		} catch (InvocationTargetException e) {
 			if (e.getTargetException() instanceof Error)
 				throw (Error) e.getTargetException();
-			else
-				throw e;
+			throw e;
 		}
 		run(suite);
 		return null;

@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.Assert;
  *
  * @since 3.1
  */
+@SuppressWarnings("rawtypes")
 public class Accessor {
 
 	/** The class to access. */
@@ -94,6 +95,7 @@ public class Accessor {
 	 * @param constructorTypes the types of the constructor arguments
 	 * @param constructorArgs the constructor arguments
 	 */
+	@SuppressWarnings("unchecked")
 	public Accessor(String className, ClassLoader classLoader, Class[] constructorTypes, Object[] constructorArgs) {
 		try {
 			fClass= Class.forName(className, true, classLoader);
@@ -168,6 +170,7 @@ public class Accessor {
 	 * @param arguments the method arguments
 	 * @return the method return value
 	 */
+	@SuppressWarnings("unchecked")
 	public Object invoke(String methodName, Class[] types, Object[] arguments) {
 		Method method= null;
 		try {

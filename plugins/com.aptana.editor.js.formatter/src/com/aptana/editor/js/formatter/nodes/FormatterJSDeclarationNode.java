@@ -48,15 +48,20 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 {
 
 	private boolean hasBlockedChild;
+	private boolean noNewLine;
 
 	/**
 	 * @param document
 	 * @param hasBlockedChild
+	 * @param noNewLine
+	 *            Provide a hint flag to block any new line added before this node. Note that this is just a hint which
+	 *            can be overwritten by a preference setting.
 	 */
-	public FormatterJSDeclarationNode(IFormatterDocument document, boolean hasBlockedChild)
+	public FormatterJSDeclarationNode(IFormatterDocument document, boolean hasBlockedChild, boolean noNewLine)
 	{
 		super(document);
 		this.hasBlockedChild = hasBlockedChild;
+		this.noNewLine = noNewLine;
 	}
 
 	/*
@@ -66,8 +71,9 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 	@Override
 	protected boolean isAddingNewLine()
 	{
-		// TODO attach the preference key for braces position
-		return !hasBlockedChild;
+		// To change this behavior, it's recommended to create a designated subclass and override this method to return
+		// the value set in the preferences.
+		return !noNewLine;
 	}
 
 	/*

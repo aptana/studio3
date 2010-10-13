@@ -44,10 +44,10 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
+import com.aptana.editor.common.text.rules.CharacterMapRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.js.parsing.lexer.JSScopeType;
-import com.aptana.editor.js.text.rules.CharacterMapRule;
 import com.aptana.editor.js.text.rules.JSFunctionCallDetector;
 import com.aptana.editor.js.text.rules.JSIdentifierDetector;
 import com.aptana.editor.js.text.rules.JSNumberRule;

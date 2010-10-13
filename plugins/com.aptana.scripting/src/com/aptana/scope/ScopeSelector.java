@@ -139,12 +139,20 @@ public class ScopeSelector
 	 */
 	public static ScopeSelector bestMatch(Collection<ScopeSelector> selectors, String scope)
 	{
+		if (selectors == null || selectors.isEmpty())
+		{
+			return null;
+		}
 		int bestOffset = -1;
 		int bestLength = 0;
 		ScopeSelector bestMatch = null;
 
 		for (ScopeSelector selector : selectors)
 		{
+			if (selector == null)
+			{
+				continue;
+			}
 			if (selector.matches(scope))
 			{
 				int offset = selector.matchOffset; // This offset is the fragment of scope (counting spaces, basically)

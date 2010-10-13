@@ -12,8 +12,7 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true
 Eclipse-ExtensibleAPI: true
-Bundle-RequiredExecutionEnvironment: CDC-1.1/Foundation-1.1,
- J2SE-1.4
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ClassPath: .
 Export-Package: org.eclipse.tm.internal.terminal.connector;x-friends:="org.eclipse.tm.terminal.test",
  org.eclipse.tm.internal.terminal.control;x-friends:="com.aptana.terminal",

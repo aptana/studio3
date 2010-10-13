@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.tests.harness.FileSystemHelper;
 import org.eclipse.core.tests.session.SetupManager.SetupException;
 
+@SuppressWarnings("rawtypes")
 public class WorkspaceSessionTestSuite extends SessionTestSuite {
 
 	private IPath instanceLocation = FileSystemHelper.getRandomLocation(FileSystemHelper.getTempDir());

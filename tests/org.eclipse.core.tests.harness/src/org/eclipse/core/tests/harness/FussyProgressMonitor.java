@@ -88,6 +88,7 @@ public class FussyProgressMonitor extends TestProgressMonitor {
 	/**
 	 * @see IProgressMonitor#beginTask
 	 */
+	@SuppressWarnings("hiding")
 	public void beginTask(String name, int totalWork) {
 		//if (beginTaskCalled && doneCalls > 0) {
 		// this is a second call to beginTask which is allowed because

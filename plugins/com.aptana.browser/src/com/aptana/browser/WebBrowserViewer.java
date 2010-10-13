@@ -244,9 +244,9 @@ public class WebBrowserViewer extends Composite {
 	 * @return
 	 * @see com.aptana.swt.webkitbrowser.WebKitBrowser#setUrl(java.lang.String, java.lang.String, java.lang.String[])
 	 */
-	public boolean setURL(String url, String postData, String[] headers) {
+	/*public boolean setURL(String url, String postData, String[] headers) {
 		return browser.setUrl(url, postData, headers);
-	}
+	}*/
 
 	/**
 	 * @param url
