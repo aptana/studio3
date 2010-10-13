@@ -36,6 +36,8 @@ package com.aptana.editor.js.inferencing;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.Path;
+
 import com.aptana.editor.js.JSTypeConstants;
 
 public class FunctionInferencingTests extends InferencingTestsBase
@@ -45,9 +47,7 @@ public class FunctionInferencingTests extends InferencingTestsBase
 	 */
 	public void testReturnsBoolean()
 	{
-		String source = this.getContent("inferencing/function-returns-boolean.js");
-
-		this.lastStatementTypeTests(source, "Boolean");
+		this.lastStatementTypeTests(Path.fromPortableString("inferencing/function-returns-boolean.js"), "Boolean");
 	}
 
 	/**
@@ -55,9 +55,7 @@ public class FunctionInferencingTests extends InferencingTestsBase
 	 */
 	public void testReturnsFunction()
 	{
-		String source = this.getContent("inferencing/function-returns-function.js");
-
-		this.lastStatementTypeTests(source, "Function");
+		this.lastStatementTypeTests(Path.fromPortableString("inferencing/function-returns-function.js"), "Function");
 	}
 
 	/**
@@ -65,9 +63,7 @@ public class FunctionInferencingTests extends InferencingTestsBase
 	 */
 	public void testReturnsNumber()
 	{
-		String source = this.getContent("inferencing/function-returns-number.js");
-
-		this.lastStatementTypeTests(source, "Number");
+		this.lastStatementTypeTests(Path.fromPortableString("inferencing/function-returns-number.js"), "Number");
 	}
 
 	/**
@@ -75,9 +71,7 @@ public class FunctionInferencingTests extends InferencingTestsBase
 	 */
 	public void testReturnsRegExp()
 	{
-		String source = this.getContent("inferencing/function-returns-regexp.js");
-
-		this.lastStatementTypeTests(source, "RegExp");
+		this.lastStatementTypeTests(Path.fromPortableString("inferencing/function-returns-regexp.js"), "RegExp");
 	}
 
 	/**
@@ -85,9 +79,7 @@ public class FunctionInferencingTests extends InferencingTestsBase
 	 */
 	public void testReturnsString()
 	{
-		String source = this.getContent("inferencing/function-returns-string.js");
-
-		this.lastStatementTypeTests(source, "String");
+		this.lastStatementTypeTests(Path.fromPortableString("inferencing/function-returns-string.js"), "String");
 	}
 
 	/**
@@ -95,9 +87,7 @@ public class FunctionInferencingTests extends InferencingTestsBase
 	 */
 	public void testReturnsArray()
 	{
-		String source = this.getContent("inferencing/function-returns-array.js");
-
-		this.lastStatementTypeTests(source, "Array");
+		this.lastStatementTypeTests(Path.fromPortableString("inferencing/function-returns-array.js"), "Array");
 	}
 
 	/**
@@ -105,9 +95,7 @@ public class FunctionInferencingTests extends InferencingTestsBase
 	 */
 	public void testReturnsArrayOfNumbers()
 	{
-		String source = this.getContent("inferencing/function-returns-array-of-numbers.js");
-
-		this.lastStatementTypeTests(source, "Array<Number>");
+		this.lastStatementTypeTests(Path.fromPortableString("inferencing/function-returns-array-of-numbers.js"), "Array<Number>");
 	}
 
 	/**
@@ -115,9 +103,7 @@ public class FunctionInferencingTests extends InferencingTestsBase
 	 */
 	public void testReturnsObject()
 	{
-		String source = this.getContent("inferencing/function-returns-object.js");
-
-		this.lastStatementTypeTests(source, "Object");
+		this.lastStatementTypeTests(Path.fromPortableString("inferencing/function-returns-object.js"), "Object");
 	}
 
 	/**
@@ -125,8 +111,7 @@ public class FunctionInferencingTests extends InferencingTestsBase
 	 */
 	public void testReturnsUserObject()
 	{
-		String source = this.getContent("inferencing/function-returns-user-object.js");
-		List<String> types = this.getLastStatementTypes(source);
+		List<String> types = this.getLastStatementTypes(Path.fromPortableString("inferencing/function-returns-user-object.js"));
 
 		assertNotNull(types);
 		assertEquals(1, types.size());
@@ -134,6 +119,6 @@ public class FunctionInferencingTests extends InferencingTestsBase
 		String type = types.get(0);
 		assertTrue(type + " is not a user type", type.startsWith(JSTypeConstants.DYNAMIC_CLASS_PREFIX));
 
-		this.lastStatementTypeTests(source, JSTypeConstants.DYNAMIC_CLASS_PREFIX);
+		this.lastStatementTypeTests(Path.fromPortableString("inferencing/function-returns-user-object.js"), JSTypeConstants.DYNAMIC_CLASS_PREFIX);
 	}
 }
