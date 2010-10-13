@@ -15,6 +15,7 @@ import org.eclipse.core.tests.session.SetupManager.SetupException;
 /**
  * TODO It should live in the UI tests instead.
  */
+@SuppressWarnings("rawtypes")
 public class UIPerformanceSessionTestSuite extends PerformanceSessionTestSuite {
 
 	public UIPerformanceSessionTestSuite(String pluginId, int timesToRun) {

@@ -62,8 +62,10 @@ public class JSParseRootNode extends ParseRootNode
 	 */
 	public JSParseRootNode(Symbol[] children)
 	{
-		super(IJSParserConstants.LANGUAGE, children, (children != null && children.length > 0) ? children[0].getStart() : 0,
-			(children != null && children.length > 0) ? children[0].getEnd() : 0);
+		super( //
+			IJSParserConstants.LANGUAGE, children, //
+			(children != null && children.length > 0) ? children[0].getStart() : 0, //
+			(children != null && children.length > 0) ? children[children.length - 1].getEnd() : 0);
 	}
 
 	/**

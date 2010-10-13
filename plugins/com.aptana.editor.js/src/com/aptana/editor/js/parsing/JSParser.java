@@ -1,112 +1,22 @@
-/**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
- * Any modifications to this file must keep this entire header intact.
- */
 package com.aptana.editor.js.parsing;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import com.aptana.editor.js.vsdoc.parsing.VSDocReader;
 import java.util.ArrayList;
 import java.util.List;
-
-import beaver.Parser;
-import beaver.ParsingTables;
-import beaver.Scanner;
-import beaver.Symbol;
-
-import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
-import com.aptana.editor.js.parsing.ast.JSArrayNode;
-import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
-import com.aptana.editor.js.parsing.ast.JSBinaryArithmeticOperatorNode;
-import com.aptana.editor.js.parsing.ast.JSBinaryBooleanOperatorNode;
-import com.aptana.editor.js.parsing.ast.JSBreakNode;
-import com.aptana.editor.js.parsing.ast.JSCaseNode;
-import com.aptana.editor.js.parsing.ast.JSCatchNode;
-import com.aptana.editor.js.parsing.ast.JSCommaNode;
-import com.aptana.editor.js.parsing.ast.JSConditionalNode;
-import com.aptana.editor.js.parsing.ast.JSConstructNode;
-import com.aptana.editor.js.parsing.ast.JSContinueNode;
-import com.aptana.editor.js.parsing.ast.JSDeclarationNode;
-import com.aptana.editor.js.parsing.ast.JSDefaultNode;
-import com.aptana.editor.js.parsing.ast.JSDoNode;
-import com.aptana.editor.js.parsing.ast.JSElementsNode;
-import com.aptana.editor.js.parsing.ast.JSElisionNode;
-import com.aptana.editor.js.parsing.ast.JSEmptyNode;
-import com.aptana.editor.js.parsing.ast.JSErrorNode;
-import com.aptana.editor.js.parsing.ast.JSFalseNode;
-import com.aptana.editor.js.parsing.ast.JSFinallyNode;
-import com.aptana.editor.js.parsing.ast.JSForInNode;
-import com.aptana.editor.js.parsing.ast.JSForNode;
-import com.aptana.editor.js.parsing.ast.JSFunctionNode;
-import com.aptana.editor.js.parsing.ast.JSGetElementNode;
-import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
-import com.aptana.editor.js.parsing.ast.JSGroupNode;
-import com.aptana.editor.js.parsing.ast.JSIdentifierNode;
-import com.aptana.editor.js.parsing.ast.JSIfNode;
-import com.aptana.editor.js.parsing.ast.JSInvokeNode;
-import com.aptana.editor.js.parsing.ast.JSLabelledNode;
-import com.aptana.editor.js.parsing.ast.JSNameValuePairNode;
-import com.aptana.editor.js.parsing.ast.JSNode;
-import com.aptana.editor.js.parsing.ast.JSNodeTypes;
-import com.aptana.editor.js.parsing.ast.JSNullNode;
-import com.aptana.editor.js.parsing.ast.JSNumberNode;
-import com.aptana.editor.js.parsing.ast.JSObjectNode;
-import com.aptana.editor.js.parsing.ast.JSParametersNode;
-import com.aptana.editor.js.parsing.ast.JSParseRootNode;
-import com.aptana.editor.js.parsing.ast.JSPostUnaryOperatorNode;
-import com.aptana.editor.js.parsing.ast.JSPreUnaryOperatorNode;
-import com.aptana.editor.js.parsing.ast.JSRegexNode;
-import com.aptana.editor.js.parsing.ast.JSReturnNode;
-import com.aptana.editor.js.parsing.ast.JSStatementsNode;
-import com.aptana.editor.js.parsing.ast.JSStringNode;
-import com.aptana.editor.js.parsing.ast.JSSwitchNode;
-import com.aptana.editor.js.parsing.ast.JSThisNode;
-import com.aptana.editor.js.parsing.ast.JSThrowNode;
-import com.aptana.editor.js.parsing.ast.JSTrueNode;
-import com.aptana.editor.js.parsing.ast.JSTryNode;
-import com.aptana.editor.js.parsing.ast.JSVarNode;
-import com.aptana.editor.js.parsing.ast.JSWhileNode;
-import com.aptana.editor.js.parsing.ast.JSWithNode;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
-import com.aptana.editor.js.sdoc.parsing.SDocParser;
-import com.aptana.editor.js.vsdoc.parsing.VSDocReader;
-import com.aptana.parsing.IParseState;
-import com.aptana.parsing.IParser;
-import com.aptana.parsing.IRecoveryStrategy;
-import com.aptana.parsing.ast.IParseNode;
+import java.io.IOException;
 import com.aptana.parsing.ast.IParseRootNode;
+import com.aptana.parsing.IRecoveryStrategy;
+import com.aptana.editor.js.sdoc.parsing.SDocParser;
 import com.aptana.parsing.ast.ParseRootNode;
+import com.aptana.editor.js.parsing.ast.*;
+import java.util.Comparator;
+import beaver.*;
+import com.aptana.parsing.IParser;
+import com.aptana.parsing.ast.IParseNode;
+import java.io.ByteArrayInputStream;
+import com.aptana.parsing.IParseState;
 
 /**
  * This class is a LALR parser generated by
@@ -437,6 +347,31 @@ public class JSParser extends Parser implements IParser {
 	
 				attachPreDocumentationBlocks(root, source);
 				attachPostDocumentationBlocks(root, source);
+				
+				// create a list of all comments and attach to root node
+				List<JSCommentNode> comments = new ArrayList<JSCommentNode>();
+				
+				for (Symbol symbol : fScanner.getSDocComments())
+                {
+                    comments.add(new JSCommentNode(JSNodeTypes.SDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
+                }
+                
+                for (Symbol symbol : fScanner.getVSDocComments())
+                {
+                    comments.add(new JSCommentNode(JSNodeTypes.VSDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
+                }
+                
+                for (Symbol symbol : fScanner.getSingleLineComments())
+                {
+                    comments.add(new JSCommentNode(JSNodeTypes.SINGLE_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
+                }
+                
+                for (Symbol symbol : fScanner.getMultiLineComments())
+                {
+                    comments.add(new JSCommentNode(JSNodeTypes.MULTI_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
+                }
+                
+                root.setCommentNodes(comments.toArray(new IParseNode[comments.size()]));
 			}
 			
 			return result;
