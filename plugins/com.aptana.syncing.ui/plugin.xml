@@ -528,6 +528,27 @@
             </objectClass>
          </enablement>
       </decorator>
+      <decorator
+            adaptable="true"
+            class="com.aptana.ide.syncing.ui.decorators.SiteSourceDecorator"
+            icon="icons/full/obj16/sync_decorator.gif"
+            id="com.aptana.ide.syncing.ui.decorators.FileSiteDecorator"
+            label="%Decorator.FileSite.name"
+            lightweight="true"
+            location="BOTTOM_RIGHT"
+            state="true">
+         <enablement>
+            <and>
+               <objectClass
+                     name="com.aptana.ide.ui.io.navigator.FileSystemObject">
+               </objectClass>
+               <objectState
+                     name="isLocal"
+                     value="true">
+               </objectState>
+            </and>
+         </enablement>
+      </decorator>
    </extension>
    <extension
          point="org.eclipse.ui.propertyPages">
