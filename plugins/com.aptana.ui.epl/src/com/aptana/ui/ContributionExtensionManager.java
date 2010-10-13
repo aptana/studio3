@@ -37,6 +37,7 @@ public abstract class ContributionExtensionManager
 
 	private Map<String, List<IContributedExtension>> contentTypeToContribMap = new HashMap<String, List<IContributedExtension>>();
 	private Map<String, Object> contentTypeToSelectorMap = new HashMap<String, Object>();
+	private Map<IContributedExtension, String> contribToContentTypeMap = new HashMap<IContributedExtension, String>();
 
 	protected ContributionExtensionManager()
 	{
@@ -61,7 +62,7 @@ public abstract class ContributionExtensionManager
 		}
 		return (IContributedExtension[]) contributions.toArray(new IContributedExtension[contributions.size()]);
 	}
-	
+
 	public IContributedExtension getSelectedContribution(String contentType)
 	{
 		IContributedExtension[] contributions = getContributions(contentType);
@@ -172,6 +173,17 @@ public abstract class ContributionExtensionManager
 	}
 
 	/**
+	 * Returns the content-type that was declared for the given contribution extension.
+	 * 
+	 * @param contribution
+	 * @return The content-type that the given contribution was set for.
+	 */
+	protected String getContentTypeByContribution(IContributedExtension contribution)
+	{
+		return contribToContentTypeMap.get(contribution);
+	}
+
+	/**
 	 * Returns the name of the contribution xml element
 	 */
 	protected abstract String getContributionElementName();
@@ -227,6 +239,7 @@ public abstract class ContributionExtensionManager
 				}
 
 				list.add(contrib);
+				contribToContentTypeMap.put(object, contentType);
 			}
 		}
 		catch (CoreException e)

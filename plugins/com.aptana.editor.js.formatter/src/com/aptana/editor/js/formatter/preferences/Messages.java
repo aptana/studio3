@@ -42,24 +42,29 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.editor.js.formatter.preferences.Messages"; //$NON-NLS-1$
-	public static String JSFormatterBlankLinesPage_afterElements;
-	public static String JSFormatterBlankLinesPage_afterSpecialElements;
-	public static String JSFormatterBlankLinesPage_beforeSpecialElements;
+	public static String JSFormatterBlankLinesPage_afterFunctionDeclaration;
 	public static String JSFormatterBlankLinesPage_blankLinesGroupLabel;
 	public static String JSFormatterBlankLinesPage_existingBlankLinesGroupLabel;
 	public static String JSFormatterBlankLinesPage_existingBlankLinesToPreserve;
 	public static String JSFormatterCommentsPage_enableWrapping;
 	public static String JSFormatterCommentsPage_formattingGroupLabel;
 	public static String JSFormatterCommentsPage_maxLineWidth;
-	public static String JSFormatterIndentationTabPage_exclusionsMessage;
-	public static String JSFormatterTabPage_exclusionsGroupLabel;
+	public static String JSFormatterTabPage_indentGroupLabel;
+	public static String JSFormatterTabPage_newLinesGroupLabel;
 	public static String JSFormatterIndentationTabPage_indentationGeneralGroupLabel;
 	public static String JSFormatterModifyDialog_blankLinesTabName;
 	public static String JSFormatterModifyDialog_commentsTabName;
 	public static String JSFormatterModifyDialog_jsFormatterTitle;
 	public static String JSFormatterModifyDialog_intentationTabName;
 	public static String JSFormatterModifyDialog_newLinesTabName;
-	public static String JSFormatterNewLinesPage_exclusionsMessage;
+	public static String JSFormatterNewLinesPage_newLineBeforeCatch;
+	public static String JSFormatterNewLinesPage_newLineBeforeElse;
+	public static String JSFormatterNewLinesPage_newLineBeforeFinally;
+	public static String JSFormatterNewLinesPage_newLineBeforeIf;
+	public static String JSFormatterNewLinesPage_newLineBeforeWhileInDo;
+	public static String JSFormatterIndentationTabPage_statementsWithinBlocks;
+	public static String JSFormatterIndentationTabPage_statementsWithinSwitch;
+	public static String JSFormatterIndentationTabPage_statementsWithinCase;
 	static
 	{
 		// initialize resource bundle

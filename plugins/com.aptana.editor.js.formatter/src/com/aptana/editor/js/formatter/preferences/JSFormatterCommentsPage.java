@@ -81,6 +81,6 @@ public class JSFormatterCommentsPage extends FormatterModifyTabPage
 
 	protected URL getPreviewContent()
 	{
-		return getClass().getResource("wrapping-preview.html"); //$NON-NLS-1$
+		return getClass().getResource("wrapping-preview.js"); //$NON-NLS-1$
 	}
 }

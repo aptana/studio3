@@ -26,6 +26,7 @@ import com.aptana.formatter.ui.IProfile;
 import com.aptana.formatter.ui.IProfileManager;
 import com.aptana.formatter.ui.IProfileStore;
 import com.aptana.formatter.ui.IScriptFormatterFactory;
+import com.aptana.formatter.ui.ScriptFormatterManager;
 import com.aptana.formatter.ui.profile.ProfileManager;
 import com.aptana.formatter.ui.profile.ProfileStore;
 import com.aptana.ui.ContributedExtension;
@@ -47,6 +48,11 @@ public abstract class AbstractScriptFormatterFactory extends ContributedExtensio
 	 */
 	public String getMainContentType()
 	{
+		if (mainContentType == null)
+		{
+			// try to retrieve it from the extension contribution definition
+			mainContentType = ScriptFormatterManager.getContentTypeByFactory(this);
+		}
 		return mainContentType;
 	}
 
