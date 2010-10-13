@@ -79,26 +79,13 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 	private static final String ATTRIBUTE_SRC = "src"; //$NON-NLS-1$
 
 	/**
-	 * addIndex
-	 * 
-	 * @param index
-	 * @param file
-	 * @param category
-	 * @param word
-	 */
-	private static void addIndex(Index index, IFileStore file, String category, String word)
-	{
-		index.addEntry(category, word, file.toURI());
-	}
-
-	/**
 	 * processHTMLElementNode
 	 * 
 	 * @param index
 	 * @param file
 	 * @param element
 	 */
-	private static void processHTMLElementNode(Index index, IFileStore file, HTMLElementNode element)
+	private void processHTMLElementNode(Index index, IFileStore file, HTMLElementNode element)
 	{
 		String cssClass = element.getCSSClass();
 
@@ -143,7 +130,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 * @param file
 	 * @param htmlSpecialNode
 	 */
-	private static void processHTMLSpecialNode(Index index, IFileStore file, HTMLSpecialNode htmlSpecialNode)
+	private void processHTMLSpecialNode(Index index, IFileStore file, String source, HTMLSpecialNode htmlSpecialNode)
 	{
 		IParseNode child = htmlSpecialNode.getChild(0);
 
@@ -153,7 +140,9 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 			if (ICSSParserConstants.LANGUAGE.equals(language))
 			{
-				CSSFileIndexingParticipant.walkNode(index, file, child);
+				// process inline code
+				CSSFileIndexingParticipant cssIndex = new CSSFileIndexingParticipant();
+				cssIndex.processParseResults(file, index, child);
 			}
 		}
 
@@ -175,8 +164,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 			{
 				// process inline code
 				JSFileIndexingParticipant jsIndex = new JSFileIndexingParticipant();
-
-				jsIndex.processParseResults(index, child, file.toURI());
+				jsIndex.processParseResults(file, source, index, child);
 			}
 		}
 	}
@@ -188,11 +176,11 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 * @param file
 	 * @param current
 	 */
-	private void processNode(Index index, IFileStore file, IParseNode current)
+	private void processNode(Index index, IFileStore file, String source, IParseNode current)
 	{
 		if (current instanceof HTMLSpecialNode)
 		{
-			processHTMLSpecialNode(index, file, (HTMLSpecialNode) current);
+			processHTMLSpecialNode(index, file, source, (HTMLSpecialNode) current);
 		}
 		else if (current instanceof HTMLElementNode)
 		{
@@ -249,7 +237,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 * @param file
 	 * @param parent
 	 */
-	public void walkAST(Index index, IFileStore file, IParseNode parent)
+	private void walkAST(Index index, IFileStore file, String source, IParseNode parent)
 	{
 		if (parent != null)
 		{
@@ -262,7 +250,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 			{
 				IParseNode current = queue.poll();
 
-				processNode(index, file, current);
+				processNode(index, file, source, current);
 
 				for (IParseNode child : current)
 				{
@@ -327,7 +315,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 						IParseNode parseNode = htmlParser.parse(parseState);
 						pool.checkIn(htmlParser);
 						sub.worked(50);
-						walkAST(index, file, parseNode);
+						walkAST(index, file, fileContents, parseNode);
 						sub.worked(20);
 					}
 				}

@@ -102,4 +102,16 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 		}
 	}
 
+	/**
+	 * addIndex
+	 * 
+	 * @param index
+	 * @param file
+	 * @param category
+	 * @param word
+	 */
+	protected void addIndex(Index index, IFileStore file, String category, String word)
+	{
+		index.addEntry(category, word, file.toURI());
+	}
 }

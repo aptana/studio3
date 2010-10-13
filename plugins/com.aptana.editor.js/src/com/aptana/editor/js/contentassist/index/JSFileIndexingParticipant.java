@@ -46,6 +46,7 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jaxen.JaxenException;
@@ -190,13 +191,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 						// process results
 						IParseNode ast = parseState.getParseResult();
-						this.processParseResults(index, ast, file.toURI());
-
-						if (ast instanceof IParseRootNode)
-						{
-							IParseRootNode rootNode = (IParseRootNode) ast;
-							processComments(file, source, rootNode.getCommentNodes(), sub.newChild(20));
-						}
+						this.processParseResults(file, source, index, ast);
 					}
 				}
 			}
@@ -270,12 +265,18 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 * @param file
 	 * @param parseState
 	 */
-	public void processParseResults(Index index, IParseNode ast, URI location)
+	public void processParseResults(IFileStore file, String source, Index index, IParseNode ast)
 	{
-		JSScope globals = this.getGlobals(ast);
+		if (ast instanceof IParseRootNode)
+		{
+			processComments(file, source, ast.getStartingOffset(), ((IParseRootNode) ast).getCommentNodes(), new NullProgressMonitor());
+		}
 
+		JSScope globals = this.getGlobals(ast);
 		if (globals != null)
 		{
+			URI location = file.toURI();
+
 			// create new Window type for this file
 			TypeElement type = new TypeElement();
 			type.setName(JSTypeConstants.WINDOW_TYPE);
@@ -311,7 +312,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 	}
 
-	private void processComments(IFileStore file, String source, IParseNode[] commentNodes, IProgressMonitor monitor)
+	private void processComments(IFileStore file, String source, int initialOffset, IParseNode[] commentNodes, IProgressMonitor monitor)
 	{
 		if (commentNodes == null || commentNodes.length == 0)
 		{
@@ -322,17 +323,17 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		{
 			if (commentNode instanceof JSCommentNode)
 			{
-				processCommentNode(file, source, (JSCommentNode) commentNode);
+				processCommentNode(file, source, initialOffset, (JSCommentNode) commentNode);
 			}
 			sub.worked(1);
 		}
 		sub.done();
 	}
 
-	private void processCommentNode(IFileStore store, String source, JSCommentNode commentNode)
+	private void processCommentNode(IFileStore store, String source, int initialOffset, JSCommentNode commentNode)
 	{
-		String text = getText(source, commentNode);
-		int offset = 0;
+		int offset = initialOffset;
+		String text = getText(source, initialOffset, commentNode);
 		String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
 		for (String line : lines)
 		{
@@ -372,9 +373,9 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 	}
 
-	private String getText(String source, JSCommentNode commentNode)
+	private String getText(String source, int initialOffset, JSCommentNode commentNode)
 	{
-		return new String(source.substring(commentNode.getStartingOffset(), commentNode.getEndingOffset() + 1));
+		return new String(source.substring(initialOffset + commentNode.getStartingOffset(), initialOffset + commentNode.getEndingOffset() + 1));
 	}
 
 	/**

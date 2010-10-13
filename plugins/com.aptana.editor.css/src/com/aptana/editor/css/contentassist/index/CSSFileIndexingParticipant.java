@@ -41,6 +41,7 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
@@ -102,12 +103,13 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 				if (pool != null)
 				{
 					IParser cssParser = pool.checkOut();
-					IParseNode parseNode = cssParser.parse(parseState);
+					cssParser.parse(parseState);
 					pool.checkIn(cssParser);
 					sub.worked(50);
-					walkNode(index, file, parseNode);
-					sub.worked(10);
-					processComments(file, parseState.getParseResult(), sub.newChild(10));
+
+					// process results
+					IParseNode ast = parseState.getParseResult();
+					this.processParseResults(file, index, ast);
 				}
 			}
 		}
@@ -130,6 +132,16 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 	}
 
+	public void processParseResults(IFileStore file, Index index, IParseNode ast)
+	{
+		walkNode(index, file, ast);
+		// sub.worked(10);
+		if (ast instanceof IParseRootNode)
+		{
+			processComments(file, ast, new NullProgressMonitor());
+		}
+	}
+
 	private void processComments(IFileStore file, IParseNode parseResult, IProgressMonitor monitor)
 	{
 		if (parseResult instanceof IParseRootNode)
@@ -141,7 +153,7 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			{
 				if (commentNode instanceof CSSCommentNode)
 				{
-					processCommentNode(file, (CSSCommentNode) commentNode);
+					processCommentNode(file, rootNode.getStartingOffset(), (CSSCommentNode) commentNode);
 				}
 				sub.worked(1);
 			}
@@ -149,7 +161,7 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 	}
 
-	public static void walkNode(Index index, IFileStore file, IParseNode parent)
+	private void walkNode(Index index, IFileStore file, IParseNode parent)
 	{
 		if (parent == null)
 			return;
@@ -200,10 +212,10 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 	}
 
-	private void processCommentNode(IFileStore store, CSSCommentNode commentNode)
+	private void processCommentNode(IFileStore store, int initialOffset, CSSCommentNode commentNode)
 	{
 		String text = commentNode.getText();
-		int offset = 0;
+		int offset = initialOffset;
 		String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
 		for (String line : lines)
 		{
@@ -248,10 +260,4 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			return true; // FIXME Check to make sure it's hex values!
 		return false;
 	}
-
-	private static void addIndex(Index index, IFileStore file, String category, String word)
-	{
-		index.addEntry(category, word, file.toURI());
-	}
-
 }
