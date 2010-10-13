@@ -46,6 +46,7 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
@@ -142,7 +143,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 			{
 				// process inline code
 				CSSFileIndexingParticipant cssIndex = new CSSFileIndexingParticipant();
-				cssIndex.processParseResults(file, index, child);
+				cssIndex.processParseResults(file, index, child, new NullProgressMonitor());
 			}
 		}
 
@@ -164,7 +165,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 			{
 				// process inline code
 				JSFileIndexingParticipant jsIndex = new JSFileIndexingParticipant();
-				jsIndex.processParseResults(file, source, index, child);
+				jsIndex.processParseResults(file, source, index, child, new NullProgressMonitor());
 			}
 		}
 	}
@@ -236,8 +237,9 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 * @param index
 	 * @param file
 	 * @param parent
+	 * @param monitor 
 	 */
-	private void walkAST(Index index, IFileStore file, String source, IParseNode parent)
+	private void walkAST(Index index, IFileStore file, String source, IParseNode parent, IProgressMonitor monitor)
 	{
 		if (parent != null)
 		{
@@ -290,12 +292,13 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 	private void indexFileStore(Index index, IFileStore file, IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
-		if (file == null)
-		{
-			return;
-		}
 		try
 		{
+			if (file == null)
+			{
+				return;
+			}
+
 			sub.subTask(file.getName());
 
 			removeTasks(file, sub.newChild(10));
@@ -315,8 +318,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 						IParseNode parseNode = htmlParser.parse(parseState);
 						pool.checkIn(htmlParser);
 						sub.worked(50);
-						walkAST(index, file, fileContents, parseNode);
-						sub.worked(20);
+						walkAST(index, file, fileContents, parseNode, sub.newChild(20));
 					}
 				}
 			}

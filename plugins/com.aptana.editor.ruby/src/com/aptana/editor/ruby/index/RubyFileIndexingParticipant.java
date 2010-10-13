@@ -81,12 +81,13 @@ public class RubyFileIndexingParticipant extends AbstractFileIndexingParticipant
 	private void indexFileStore(final Index index, IFileStore store, IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
-		if (store == null)
-		{
-			return;
-		}
 		try
 		{
+			if (store == null)
+			{
+				return;
+			}
+
 			sub.subTask(store.toString());
 
 			removeTasks(store, sub.newChild(10));

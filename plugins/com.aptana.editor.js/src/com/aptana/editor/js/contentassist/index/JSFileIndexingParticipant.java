@@ -46,7 +46,6 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jaxen.JaxenException;
@@ -155,55 +154,52 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	private void indexFileStore(Index index, IFileStore file, IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
-
-		if (file == null)
-		{
-			return;
-		}
 		try
 		{
+			if (file == null)
+			{
+				return;
+			}
+
 			sub.subTask(file.getName());
 
-			try
+			removeTasks(file, sub.newChild(10));
+
+			// grab the source of the file we're going to parse
+			String source = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(20)));
+
+			// minor optimization when creating a new empty file
+			if (source != null && source.length() > 0)
 			{
-				removeTasks(file, sub.newChild(10));
+				// create parser and associated parse state
+				IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IJSParserConstants.LANGUAGE);
 
-				// grab the source of the file we're going to parse
-				String source = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(20)));
-
-				// minor optimization when creating a new empty file
-				if (source != null && source.length() > 0)
+				if (pool != null)
 				{
-					// create parser and associated parse state
-					IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IJSParserConstants.LANGUAGE);
+					IParser parser = pool.checkOut();
 
-					if (pool != null)
-					{
-						IParser parser = pool.checkOut();
+					// apply the source to the parse state and parse
+					ParseState parseState = new ParseState();
+					parseState.setEditState(source, source, 0, 0);
+					parser.parse(parseState);
 
-						// apply the source to the parse state and parse
-						ParseState parseState = new ParseState();
-						parseState.setEditState(source, source, 0, 0);
-						parser.parse(parseState);
+					pool.checkIn(parser);
+					sub.worked(50);
 
-						pool.checkIn(parser);
-						sub.worked(50);
-
-						// process results
-						IParseNode ast = parseState.getParseResult();
-						this.processParseResults(file, source, index, ast);
-					}
+					// process results
+					IParseNode ast = parseState.getParseResult();
+					this.processParseResults(file, source, index, ast, sub.newChild(20));
 				}
 			}
-			catch (beaver.Parser.Exception e)
-			{
-				// just like in FileServer ... "not logging the parsing error here since
-				// the source could be in an intermediate state of being edited by the user"
-			}
-			catch (Throwable e)
-			{
-				Activator.logError(e.getMessage(), e);
-			}
+		}
+		catch (beaver.Parser.Exception e)
+		{
+			// just like in FileServer ... "not logging the parsing error here since
+			// the source could be in an intermediate state of being edited by the user"
+		}
+		catch (Throwable e)
+		{
+			Activator.logError(e.getMessage(), e);
 		}
 		finally
 		{
@@ -263,14 +259,19 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 * 
 	 * @param index
 	 * @param file
+	 * @param monitor
 	 * @param parseState
 	 */
-	public void processParseResults(IFileStore file, String source, Index index, IParseNode ast)
+	public void processParseResults(IFileStore file, String source, Index index, IParseNode ast,
+			IProgressMonitor monitor)
 	{
+		SubMonitor sub = SubMonitor.convert(monitor, 100);
 		if (ast instanceof IParseRootNode)
 		{
-			processComments(file, source, ast.getStartingOffset(), ((IParseRootNode) ast).getCommentNodes(), new NullProgressMonitor());
+			processComments(file, source, ast.getStartingOffset(), ((IParseRootNode) ast).getCommentNodes(),
+					sub.newChild(20));
 		}
+		sub.setWorkRemaining(80);
 
 		JSScope globals = this.getGlobals(ast);
 		if (globals != null)
@@ -310,9 +311,12 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			// write new Window type to index
 			this._indexWriter.writeType(index, type, location);
 		}
+
+		sub.done();
 	}
 
-	private void processComments(IFileStore file, String source, int initialOffset, IParseNode[] commentNodes, IProgressMonitor monitor)
+	private void processComments(IFileStore file, String source, int initialOffset, IParseNode[] commentNodes,
+			IProgressMonitor monitor)
 	{
 		if (commentNodes == null || commentNodes.length == 0)
 		{
@@ -375,7 +379,8 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 	private String getText(String source, int initialOffset, JSCommentNode commentNode)
 	{
-		return new String(source.substring(initialOffset + commentNode.getStartingOffset(), initialOffset + commentNode.getEndingOffset() + 1));
+		return new String(source.substring(initialOffset + commentNode.getStartingOffset(),
+				initialOffset + commentNode.getEndingOffset() + 1));
 	}
 
 	/**

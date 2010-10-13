@@ -41,7 +41,6 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
@@ -109,7 +108,7 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 					// process results
 					IParseNode ast = parseState.getParseResult();
-					this.processParseResults(file, index, ast);
+					this.processParseResults(file, index, ast, sub.newChild(20));
 				}
 			}
 		}
@@ -132,14 +131,16 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 	}
 
-	public void processParseResults(IFileStore file, Index index, IParseNode ast)
+	public void processParseResults(IFileStore file, Index index, IParseNode ast, IProgressMonitor monitor)
 	{
+		SubMonitor sub = SubMonitor.convert(monitor, 100);
 		walkNode(index, file, ast);
-		// sub.worked(10);
+		sub.worked(70);
 		if (ast instanceof IParseRootNode)
 		{
-			processComments(file, ast, new NullProgressMonitor());
+			processComments(file, ast, sub.newChild(30));
 		}
+		sub.done();
 	}
 
 	private void processComments(IFileStore file, IParseNode parseResult, IProgressMonitor monitor)
