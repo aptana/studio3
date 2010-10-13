@@ -32,25 +32,30 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js.formatter;
+package com.aptana.editor.js.formatter.nodes;
 
 import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
+import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 
 /**
- * A JavaScript formatter node for Object blocks (such as hashes etc.)
+ * A formatter node that marks an 'if' block that arrives right after an 'else' ("...else if...")
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
-public class FormatterJSObjectNode extends FormatterBlockWithBeginEndNode
+public class FormatterJSElseIfNode extends FormatterBlockWithBeginNode
 {
+
+	private boolean hasBlockedChild;
 
 	/**
 	 * @param document
+	 * @param hasBlockedChild
+	 * @param isInAssignment
 	 */
-	public FormatterJSObjectNode(IFormatterDocument document)
+	public FormatterJSElseIfNode(IFormatterDocument document, boolean hasBlockedChild)
 	{
 		super(document);
+		this.hasBlockedChild = hasBlockedChild;
 	}
 
 	/*
@@ -60,7 +65,7 @@ public class FormatterJSObjectNode extends FormatterBlockWithBeginEndNode
 	@Override
 	protected boolean isAddingNewLine()
 	{
-		// TODO preferences?
+		// TODO attach the preference key for breaking else-if expressions
 		return false;
 	}
 
@@ -71,8 +76,7 @@ public class FormatterJSObjectNode extends FormatterBlockWithBeginEndNode
 	@Override
 	protected boolean isIndenting()
 	{
-		// TODO preferences?
-		return true;
+		// TODO attach the preference key
+		return !hasBlockedChild;
 	}
-
 }

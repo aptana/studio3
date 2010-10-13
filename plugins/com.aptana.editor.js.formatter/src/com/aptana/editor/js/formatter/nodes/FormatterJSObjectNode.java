@@ -38,17 +38,17 @@ import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 
 /**
- * Formatter node to JavaScript invocation elements.
+ * A JavaScript formatter node for Object blocks (such as hashes etc.)
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
-public class FormatterJSInvokeNode extends FormatterBlockWithBeginEndNode
+public class FormatterJSObjectNode extends FormatterBlockWithBeginEndNode
 {
 
 	/**
 	 * @param document
 	 */
-	public FormatterJSInvokeNode(IFormatterDocument document)
+	public FormatterJSObjectNode(IFormatterDocument document)
 	{
 		super(document);
 	}
@@ -60,7 +60,7 @@ public class FormatterJSInvokeNode extends FormatterBlockWithBeginEndNode
 	@Override
 	protected boolean isAddingNewLine()
 	{
-		// TODO - Preference value for breaking invocation code?
+		// TODO preferences?
 		return false;
 	}
 
@@ -71,7 +71,7 @@ public class FormatterJSInvokeNode extends FormatterBlockWithBeginEndNode
 	@Override
 	protected boolean isIndenting()
 	{
-		// TODO - Preference value for indenting the invocation content in case it spans across multiple lines.
+		// TODO preferences?
 		return true;
 	}
 
