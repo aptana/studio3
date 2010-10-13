@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="com.aptana.formatter.epl.formatterFactory">
+      <engineContribution
+            contentType="com.aptana.contenttype.css">
+         <formatterFactory
+               class="com.aptana.editor.css.formatter.CSSFormatterFactory"
+               description="CSS Code Formatter"
+               id="com.aptana.editor.css.formatterFactory"
+               name="CSS"
+               priority="10">
+         </formatterFactory>
+      </engineContribution>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.aptana.editor.css.formatter.CSSFormatterPreferenceInitializer">
+      </initializer>
+   </extension>
+
+</plugin>
