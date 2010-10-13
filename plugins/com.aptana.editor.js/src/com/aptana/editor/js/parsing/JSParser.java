@@ -361,9 +361,14 @@ public class JSParser extends Parser implements IParser {
                     comments.add(new JSCommentNode(JSNodeTypes.VSDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
                 }
                 
-                for (Symbol symbol : fScanner.getSDocComments())
+                for (Symbol symbol : fScanner.getSingleLineComments())
                 {
                     comments.add(new JSCommentNode(JSNodeTypes.SINGLE_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
+                }
+                
+                for (Symbol symbol : fScanner.getMultiLineComments())
+                {
+                    comments.add(new JSCommentNode(JSNodeTypes.MULTI_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
                 }
                 
                 root.setCommentNodes(comments.toArray(new IParseNode[comments.size()]));
