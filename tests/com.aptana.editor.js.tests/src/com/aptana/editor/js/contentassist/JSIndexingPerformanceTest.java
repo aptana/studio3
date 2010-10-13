@@ -37,8 +37,13 @@ package com.aptana.editor.js.contentassist;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.test.performance.PerformanceTestCase;
@@ -56,13 +61,7 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class JSIndexingPerformanceTest extends PerformanceTestCase
 {
-	public class Indexer extends JSFileIndexingParticipant
-	{
-		public void indexTree(Index index, JSParseRootNode root, URI location)
-		{
-			this.processParseResults(index, root, location);
-		}
-	}
+	
 
 	private JSParser fParser;
 
@@ -92,16 +91,6 @@ public class JSIndexingPerformanceTest extends PerformanceTestCase
 	private URI getIndexURI()
 	{
 		return URI.create("inference.testing");
-	}
-
-	/**
-	 * getURI
-	 * 
-	 * @return
-	 */
-	private URI getLocation()
-	{
-		return URI.create("inference_file.js");
 	}
 
 	/**
@@ -265,6 +254,12 @@ public class JSIndexingPerformanceTest extends PerformanceTestCase
 		// apply to parse state
 		IParseState parseState = new ParseState();
 		parseState.setEditState(src, src, 0, 0);
+		
+		URL url = FileLocator.find(Platform.getBundle(Activator.PLUGIN_ID), new Path(resourceName),
+				null);
+		url = FileLocator.toFileURL(url);
+		IFileStore store = EFS.getStore(url.toURI());
+		
 
 		try
 		{
@@ -274,8 +269,8 @@ public class JSIndexingPerformanceTest extends PerformanceTestCase
 
 			if (root instanceof JSParseRootNode)
 			{
-				Indexer indexer = new Indexer();
-
+				IProgressMonitor monitor = new NullProgressMonitor();
+				JSFileIndexingParticipant jsIndexer = new JSFileIndexingParticipant();
 				for (int i = 0; i < numRuns; i++)
 				{
 					URI indexURI = this.getIndexURI();
@@ -283,11 +278,10 @@ public class JSIndexingPerformanceTest extends PerformanceTestCase
 					{
 						IndexManager.getInstance().removeIndex(indexURI);
 					}
-					URI location = this.getLocation();
 					Index index = this.getIndex();
 
 					startMeasuring();
-					indexer.indexTree(index, (JSParseRootNode) root, location);
+					jsIndexer.processParseResults(store, src, index, root, monitor);
 					stopMeasuring();
 				}
 			}

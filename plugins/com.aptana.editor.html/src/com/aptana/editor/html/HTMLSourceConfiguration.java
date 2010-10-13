@@ -53,8 +53,8 @@ import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.CaseInsensitiveMultiLineRule;
+import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
-import com.aptana.editor.common.text.rules.NonRuleBasedDamagerRepairer;
 import com.aptana.editor.common.text.rules.PartitionerSwitchingIgnoreRule;
 import com.aptana.editor.common.text.rules.TagRule;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
@@ -87,7 +87,9 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
 			new CaseInsensitiveMultiLineRule("<!DOCTYPE ", ">", new Token(HTML_DOCTYPE)), //$NON-NLS-1$ //$NON-NLS-2$
-			new DocTypeRule(new Token(CDATA)), new PartitionerSwitchingIgnoreRule(new MultiLineRule("<!--", "-->", new Token(HTML_COMMENT), (char) 0, true)), //$NON-NLS-1$ //$NON-NLS-2$
+			new DocTypeRule(new Token(CDATA)),
+			new PartitionerSwitchingIgnoreRule(
+					new MultiLineRule("<!--", "-->", new Token(HTML_COMMENT), (char) 0, true)), //$NON-NLS-1$ //$NON-NLS-2$
 			new TagRule("script", new Token(HTML_SCRIPT), true), //$NON-NLS-1$
 			new TagRule("style", new Token(HTML_STYLE), true), //$NON-NLS-1$
 			new TagRule("/", new Token(HTML_TAG)), //$NON-NLS-1$
@@ -117,7 +119,8 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		c.addTranslation(new QualifiedContentType(HTML_SCRIPT), new QualifiedContentType("meta.tag.block.any.html")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(HTML_STYLE), new QualifiedContentType("meta.tag.block.any.html")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(CDATA), new QualifiedContentType("string.unquoted.cdata.xml")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(HTML_DOCTYPE), new QualifiedContentType("meta.tag.sgml.html", "meta.tag.sgml.doctype.html")); //$NON-NLS-1$ //$NON-NLS-2$
+		c.addTranslation(new QualifiedContentType(HTML_DOCTYPE), new QualifiedContentType(
+				"meta.tag.sgml.html", "meta.tag.sgml.doctype.html")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public static HTMLSourceConfiguration getDefault()
@@ -217,9 +220,9 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		reconciler.setDamager(dr, HTMLSourceConfiguration.HTML_TAG);
 		reconciler.setRepairer(dr, HTMLSourceConfiguration.HTML_TAG);
 
-		NonRuleBasedDamagerRepairer ndr = new NonRuleBasedDamagerRepairer(getToken("comment.block.html")); //$NON-NLS-1$
-		reconciler.setDamager(ndr, HTMLSourceConfiguration.HTML_COMMENT);
-		reconciler.setRepairer(ndr, HTMLSourceConfiguration.HTML_COMMENT);
+		dr = new ThemeingDamagerRepairer(getHTMLCommentScanner());
+		reconciler.setDamager(dr, HTMLSourceConfiguration.HTML_COMMENT);
+		reconciler.setRepairer(dr, HTMLSourceConfiguration.HTML_COMMENT);
 
 		dr = new ThemeingDamagerRepairer(getDoctypeScanner());
 		reconciler.setDamager(dr, HTMLSourceConfiguration.HTML_DOCTYPE);
@@ -228,6 +231,11 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		dr = new ThemeingDamagerRepairer(getCDATAScanner());
 		reconciler.setDamager(dr, CDATA);
 		reconciler.setRepairer(dr, CDATA);
+	}
+
+	protected ITokenScanner getHTMLCommentScanner()
+	{
+		return new CommentScanner(getToken("comment.block.html")); //$NON-NLS-1$
 	}
 
 	protected ITokenScanner getHTMLScanner()
@@ -257,7 +265,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		}
 		return tagScanner;
 	}
-	
+
 	protected ITokenScanner getDoctypeScanner()
 	{
 		if (docTypeScanner == null)
@@ -265,7 +273,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 			docTypeScanner = new HTMLDoctypeScanner();
 		}
 		return docTypeScanner;
-	}	
+	}
 
 	protected IToken getToken(String tokenName)
 	{

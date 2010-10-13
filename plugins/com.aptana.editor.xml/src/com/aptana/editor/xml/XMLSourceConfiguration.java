@@ -51,8 +51,8 @@ import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
+import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
-import com.aptana.editor.common.text.rules.NonRuleBasedDamagerRepairer;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.TagRule;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
@@ -175,9 +175,14 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		reconciler.setDamager(dr, XML_TAG);
 		reconciler.setRepairer(dr, XML_TAG);
 
-		NonRuleBasedDamagerRepairer ndr = new NonRuleBasedDamagerRepairer(getToken("comment.block.xml")); //$NON-NLS-1$
-		reconciler.setDamager(ndr, XMLSourceConfiguration.XML_COMMENT);
-		reconciler.setRepairer(ndr, XMLSourceConfiguration.XML_COMMENT);
+		dr = new ThemeingDamagerRepairer(getCommentScanner());
+		reconciler.setDamager(dr, XMLSourceConfiguration.XML_COMMENT);
+		reconciler.setRepairer(dr, XMLSourceConfiguration.XML_COMMENT);
+	}
+
+	private ITokenScanner getCommentScanner()
+	{
+		return new CommentScanner(getToken("comment.block.xml")); //$NON-NLS-1$
 	}
 
 	private ITokenScanner getPreProcessorScanner()

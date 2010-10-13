@@ -34,6 +34,8 @@
  */
 package com.aptana.editor.js.inferencing;
 
+import org.eclipse.core.runtime.Path;
+
 public class RecursiveInferencingTests extends InferencingTestsBase
 {
 	/**
@@ -81,9 +83,7 @@ public class RecursiveInferencingTests extends InferencingTestsBase
 	 */
 	public void testInvocationCycle()
 	{
-		String source = this.getContent("inferencing/invocation-cycle-1.js");
-
-		this.lastStatementTypeTests(source, "Function");
+		this.lastStatementTypeTests(Path.fromPortableString("inferencing/invocation-cycle-1.js"), "Function");
 	}
 
 	/**
@@ -91,9 +91,7 @@ public class RecursiveInferencingTests extends InferencingTestsBase
 	 */
 	public void testInvocationCycle2()
 	{
-		String source = this.getContent("inferencing/invocation-cycle-2.js");
-
-		this.lastStatementTypeTests(source, "Number");
+		this.lastStatementTypeTests(Path.fromPortableString("inferencing/invocation-cycle-2.js"), "Number");
 	}
 
 	/**
@@ -101,9 +99,7 @@ public class RecursiveInferencingTests extends InferencingTestsBase
 	 */
 	public void testInvocationCycle3()
 	{
-		String source = this.getContent("inferencing/invocation-cycle-3.js");
-
-		this.lastStatementTypeTests(source, "Number");
+		this.lastStatementTypeTests(Path.fromPortableString("inferencing/invocation-cycle-3.js"), "Number");
 	}
 
 	/**
@@ -111,8 +107,6 @@ public class RecursiveInferencingTests extends InferencingTestsBase
 	 */
 	public void testObjectPropertyReturnsSelf()
 	{
-		String source = this.getContent("inferencing/chaining.js");
-
-		this.lastStatementTypeTests(source, "Utils.create.self");
+		this.lastStatementTypeTests(Path.fromPortableString("inferencing/chaining.js"), "Utils.create.self");
 	}
 }
