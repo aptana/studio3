@@ -34,74 +34,45 @@
  */
 package com.aptana.editor.js.formatter;
 
-import com.aptana.core.util.StringUtil;
-import com.aptana.formatter.FormatterContext;
-import com.aptana.formatter.IFormatterContext;
-import com.aptana.formatter.nodes.IFormatterContainerNode;
-import com.aptana.formatter.nodes.IFormatterNode;
+import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 
 /**
- * A JavaScript formatter context.
+ * A JavaScript formatter node for Object blocks (such as hashes etc.)
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
-public class JSFormatterContext extends FormatterContext
+public class FormatterJSObjectNode extends FormatterBlockWithBeginEndNode
 {
 
 	/**
-	 * @param indent
+	 * @param document
 	 */
-	public JSFormatterContext(int indent)
+	public FormatterJSObjectNode(IFormatterDocument document)
 	{
-		super(indent);
-	}
-
-	/**
-	 * Returns true only if the given node is a container node (of type {@link IFormatterContainerNode}).
-	 * 
-	 * @param node
-	 *            An {@link IFormatterNode}
-	 * @return True only if the given node is a container node; False, otherwise.
-	 * @see com.aptana.formatter.FormatterContext#isCountable(com.aptana.formatter.nodes.IFormatterNode)
-	 */
-	protected boolean isCountable(IFormatterNode node)
-	{
-		return node instanceof IFormatterContainerNode;
-	}
-
-	/**
-	 * Check if the char sequence starts with a '&lt!' sequence or a '&lt!--' sequence. If so, return the length of the
-	 * sequence; Otherwise, return 0.
-	 * 
-	 * @see IFormatterContext#getCommentStartLength(CharSequence, int)
-	 */
-	public int getCommentStartLength(CharSequence chars, int offset)
-	{
-		// FIXME - Fix this for JS
-		int count = 0;
-		if (chars.length() > offset + 1)
-		{
-			if (chars.charAt(offset) == '<' && chars.charAt(offset + 1) == '!')
-			{
-				count = 2;
-			}
-			if (chars.length() > offset + 3)
-			{
-				if (chars.charAt(offset + 2) == '-' && chars.charAt(offset + 3) == '-')
-				{
-					count += 2;
-				}
-			}
-		}
-		return count;
+		super(document);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.IFormatterContext#getWrappingCommentPrefix()
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingNewLine()
 	 */
-	public String getWrappingCommentPrefix()
+	@Override
+	protected boolean isAddingNewLine()
 	{
-		return " * "; //$NON-NLS-1$
+		// TODO preferences?
+		return false;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isIndenting()
+	 */
+	@Override
+	protected boolean isIndenting()
+	{
+		// TODO preferences?
+		return true;
+	}
+
 }

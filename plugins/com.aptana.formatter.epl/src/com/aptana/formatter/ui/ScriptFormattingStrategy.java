@@ -122,7 +122,7 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 						((IScriptFormatterExtension) formatter).initialize(job.project);
 					}
 					formatter.setIsSlave(job.isSlave);
-					final int indentationLevel = formatter.detectIndentationLevel(document, offset);
+					final int indentationLevel = (offset != 0) ? formatter.detectIndentationLevel(document, offset) : 0;
 					final TextEdit edit = formatter.format(document.get(), offset, partition.getLength(),
 							indentationLevel);
 					if (edit != null)

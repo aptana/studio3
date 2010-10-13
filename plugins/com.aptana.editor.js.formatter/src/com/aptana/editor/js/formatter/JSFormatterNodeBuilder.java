@@ -37,26 +37,45 @@ package com.aptana.editor.js.formatter;
 import com.aptana.editor.js.formatter.nodes.FormatterJSBlockNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSCaseNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSDeclarationNode;
+import com.aptana.editor.js.formatter.nodes.FormatterJSDefaultLineNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSDoWhileBlockNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSFunctionBodyNode;
+import com.aptana.editor.js.formatter.nodes.FormatterJSGroupNode;
+import com.aptana.editor.js.formatter.nodes.FormatterJSInvokeNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSNonBlockedWhileNode;
+import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
+import com.aptana.editor.js.parsing.ast.JSBinaryArithmeticOperatorNode;
+import com.aptana.editor.js.parsing.ast.JSBinaryBooleanOperatorNode;
+import com.aptana.editor.js.parsing.ast.JSBinaryOperatorNode;
+import com.aptana.editor.js.parsing.ast.JSBreakNode;
 import com.aptana.editor.js.parsing.ast.JSCaseNode;
+import com.aptana.editor.js.parsing.ast.JSCatchNode;
+import com.aptana.editor.js.parsing.ast.JSContinueNode;
 import com.aptana.editor.js.parsing.ast.JSDefaultNode;
 import com.aptana.editor.js.parsing.ast.JSDoNode;
+import com.aptana.editor.js.parsing.ast.JSFinallyNode;
 import com.aptana.editor.js.parsing.ast.JSForInNode;
 import com.aptana.editor.js.parsing.ast.JSForNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
+import com.aptana.editor.js.parsing.ast.JSGroupNode;
 import com.aptana.editor.js.parsing.ast.JSIfNode;
+import com.aptana.editor.js.parsing.ast.JSInvokeNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
+import com.aptana.editor.js.parsing.ast.JSObjectNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
+import com.aptana.editor.js.parsing.ast.JSReturnNode;
 import com.aptana.editor.js.parsing.ast.JSSwitchNode;
+import com.aptana.editor.js.parsing.ast.JSThrowNode;
 import com.aptana.editor.js.parsing.ast.JSTreeWalker;
+import com.aptana.editor.js.parsing.ast.JSTryNode;
+import com.aptana.editor.js.parsing.ast.JSVarNode;
 import com.aptana.editor.js.parsing.ast.JSWhileNode;
 import com.aptana.editor.js.parsing.ast.JSWithNode;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.FormatterBlockNode;
+import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.parsing.ast.IParseNode;
 
@@ -98,7 +117,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		public void visit(JSFunctionNode node)
 		{
 			// First, push the function declaration node
-			FormatterJSDeclarationNode declarationNode = new FormatterJSDeclarationNode(document, true);
+			FormatterJSDeclarationNode declarationNode = new FormatterJSDeclarationNode(document, true,
+					getPreventNewLineHint(node));
 			IParseNode body = node.getBody();
 			declarationNode.setBegin(createTextNode(document, node.getStartingOffset(), body.getStartingOffset()));
 			push(declarationNode);
@@ -110,7 +130,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			push(bodyNode);
 			super.visit(node);
 			checkedPop(bodyNode, body.getEndingOffset());
-			int end = locateSemicolonInLine(bodyNode.getEndOffset() + 1, document);
+			int end = locateColonOrSemicolonInLine(bodyNode.getEndOffset() + 1, document);
 			bodyNode.setEnd(createTextNode(document, body.getEndingOffset(), end));
 		}
 
@@ -124,12 +144,11 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			JSNode trueBlock = (JSNode) node.getTrueBlock();
 			JSNode falseBlock = (JSNode) node.getFalseBlock();
 
-			boolean isEmptyFalseBlock = (trueBlock.getNodeType() == JSNodeTypes.EMPTY);
+			boolean isEmptyFalseBlock = (falseBlock.getNodeType() == JSNodeTypes.EMPTY);
 			boolean isCurlyTrueBlock = (trueBlock.getNodeType() == JSNodeTypes.STATEMENTS);
 			boolean isCurlyFalseBlock = (!isEmptyFalseBlock && falseBlock.getNodeType() == JSNodeTypes.STATEMENTS);
-
 			// First, construct the if condition node
-			FormatterJSDeclarationNode conditionNode = new FormatterJSDeclarationNode(document, isCurlyTrueBlock);
+			FormatterBlockWithBeginNode conditionNode = new FormatterJSDeclarationNode(document, isCurlyTrueBlock, true);
 			conditionNode.setBegin(createTextNode(document, node.getStartingOffset(), trueBlock.getStartingOffset()));
 			push(conditionNode);
 
@@ -141,13 +160,33 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			else
 			{
 				// Just visit the children
-				visitChildren(trueBlock);
+				trueBlock.accept(this);
 			}
 			checkedPop(conditionNode, trueBlock.getEndingOffset());
 
-			// Construct the 'false' part if exist
 			if (!isEmptyFalseBlock)
 			{
+				// Construct the 'false' part if exist.
+				// Note that the JS parser does not provide us with the start offset of the 'else' keyword, so we need
+				// to
+				// locate it in between the end of the 'true' block and the begin of the 'false' block.
+				int trueBlockEnd = trueBlock.getEndingOffset();
+				String segment = document.get(trueBlockEnd + 1, falseBlock.getStartingOffset());
+				int elsePos = segment.toLowerCase().indexOf("else"); //$NON-NLS-1$
+				int elseBlockStart = elsePos + trueBlockEnd + 1;
+				int elseBlockDeclarationEnd = falseBlock.getStartingOffset();
+				boolean isElseIf = (falseBlock.getNodeType() == JSNodeTypes.IF);
+				FormatterBlockWithBeginNode elseNode;
+				if (isElseIf)
+				{
+					elseNode = new FormatterJSElseIfNode(document, isCurlyTrueBlock);
+				}
+				else
+				{
+					elseNode = new FormatterJSDeclarationNode(document, isCurlyFalseBlock, false);
+				}
+				elseNode.setBegin(createTextNode(document, elseBlockStart, elseBlockDeclarationEnd));
+				push(elseNode);
 				if (isCurlyFalseBlock)
 				{
 					pushBlockNode(falseBlock, true);
@@ -155,8 +194,10 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				else
 				{
 					// Just visit the children
-					visitChildren(falseBlock);
+					falseBlock.accept(this);
+					// visitChildren(falseBlock);
 				}
+				checkedPop(elseNode, falseBlock.getEndingOffset() + 1);
 			}
 		}
 
@@ -168,7 +209,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		public void visit(JSDoNode node)
 		{
 			// First, push the 'do' declaration node
-			FormatterJSDeclarationNode declarationNode = new FormatterJSDeclarationNode(document, true);
+			FormatterJSDeclarationNode declarationNode = new FormatterJSDeclarationNode(document, true, false);
 			IParseNode body = node.getBody();
 			declarationNode.setBegin(createTextNode(document, node.getStartingOffset(), body.getStartingOffset()));
 			push(declarationNode);
@@ -194,7 +235,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			visitChildren(condition);
 			int conditionEnd = condition.getEndingOffset() + 1;
 			checkedPop(whileNode, conditionEnd);
-			int end = locateSemicolonInLine(conditionEnd, document);
+			int end = locateColonOrSemicolonInLine(conditionEnd, document);
 			whileNode.setEnd(createTextNode(document, conditionEnd, end));
 		}
 
@@ -240,13 +281,31 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 		/*
 		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSObjectNode)
+		 */
+		@Override
+		public void visit(JSObjectNode node)
+		{
+			FormatterJSObjectNode objectNode = new FormatterJSObjectNode(document);
+			objectNode.setBegin(createTextNode(document, node.getStartingOffset(), node.getStartingOffset() + 1));
+			push(objectNode);
+			visitChildren(node);
+			int end = node.getEndingOffset();
+			checkedPop(objectNode, end);
+			end = locateColonOrSemicolonInLine(end + 1, document);
+			objectNode.setEnd(createTextNode(document, node.getEndingOffset(), end));
+		}
+
+		/*
+		 * (non-Javadoc)
 		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSSwitchNode)
 		 */
 		@Override
 		public void visit(JSSwitchNode node)
 		{
 			// Push the switch-case declaration node
-			FormatterJSDeclarationNode switchNode = new FormatterJSDeclarationNode(document, true);
+			FormatterJSDeclarationNode switchNode = new FormatterJSDeclarationNode(document, true,
+					getPreventNewLineHint(node));
 			int blockStart = node.getLeftBrace().getStart();
 			switchNode.setBegin(createTextNode(document, node.getStartingOffset(), blockStart));
 			push(switchNode);
@@ -261,7 +320,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			int endingOffset = node.getEndingOffset();
 			// pop the block node
 			checkedPop(blockNode, endingOffset);
-			int endWithSemicolon = locateSemicolonInLine(endingOffset + 1, document);
+			int endWithSemicolon = locateColonOrSemicolonInLine(endingOffset + 1, document);
 			blockNode.setEnd(createTextNode(document, endingOffset, endWithSemicolon));
 		}
 
@@ -283,6 +342,253 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		public void visit(JSDefaultNode node)
 		{
 			visitCaseOrDefaultNode(node, node.getColon().getStart() + 1);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSTryNode)
+		 */
+		@Override
+		public void visit(JSTryNode node)
+		{
+			visitCommonBlock(node, node.getBody());
+			IParseNode catchBlock = node.getCatchBlock();
+			if (catchBlock.getNodeType() == JSNodeTypes.CATCH)
+			{
+				visit((JSCatchNode) catchBlock);
+			}
+			IParseNode finallyBlock = node.getFinallyBlock();
+			if (finallyBlock.getNodeType() == JSNodeTypes.FINALLY)
+			{
+				visit((JSFinallyNode) finallyBlock);
+			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSCatchNode)
+		 */
+		@Override
+		public void visit(JSCatchNode node)
+		{
+			visitCommonBlock(node, node.getBody());
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSFinallyNode)
+		 */
+		@Override
+		public void visit(JSFinallyNode node)
+		{
+			visitCommonBlock(node, node.getBlock());
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSAssignmentNode)
+		 */
+		@Override
+		public void visit(JSAssignmentNode node)
+		{
+			if (node.getSemicolonIncluded())
+			{
+				IFormatterContainerNode lineNode = pushLineNode(node);
+				super.visit(node);
+				checkedPop(lineNode, lineNode.getEndOffset());
+			}
+			else
+			{
+				super.visit(node);
+			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @seecom.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.
+		 * JSBinaryArithmeticOperatorNode)
+		 */
+		@Override
+		public void visit(JSBinaryArithmeticOperatorNode node)
+		{
+			if (node.getSemicolonIncluded())
+			{
+				IFormatterContainerNode lineNode = pushLineNode(node);
+				super.visit(node);
+				checkedPop(lineNode, lineNode.getEndOffset());
+			}
+			else
+			{
+				super.visit(node);
+			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see
+		 * com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSBinaryBooleanOperatorNode
+		 * )
+		 */
+		@Override
+		public void visit(JSBinaryBooleanOperatorNode node)
+		{
+			if (node.getSemicolonIncluded())
+			{
+				IFormatterContainerNode lineNode = pushLineNode(node);
+				super.visit(node);
+				checkedPop(lineNode, lineNode.getEndOffset());
+			}
+			else
+			{
+				super.visit(node);
+			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSContinueNode)
+		 */
+		@Override
+		public void visit(JSContinueNode node)
+		{
+			if (node.getSemicolonIncluded())
+			{
+				IFormatterContainerNode lineNode = pushLineNode(node);
+				super.visit(node);
+				checkedPop(lineNode, lineNode.getEndOffset());
+			}
+			else
+			{
+				super.visit(node);
+			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSInvokeNode)
+		 */
+		@Override
+		public void visit(JSInvokeNode node)
+		{
+			if (node.getSemicolonIncluded())
+			{
+				IFormatterContainerNode lineNode = pushLineNode(node);
+				super.visit(node);
+				checkedPop(lineNode, lineNode.getEndOffset());
+			}
+			else
+			{
+				super.visit(node);
+			}
+			// FormatterJSInvokeNode invokeNode = new FormatterJSInvokeNode(document);
+			// IParseNode arguments = node.getArguments();
+			// int beginOffset = node.getStartingOffset();
+			// invokeNode.setBegin(createTextNode(document, beginOffset, arguments.getStartingOffset() + 1));
+			// push(invokeNode);
+			// visitChildren(node);
+			// int invokeEnd = invokeNode.getEndOffset();
+			// checkedPop(invokeNode, invokeEnd);
+			// int endOffset = locateColonOrSemicolonInLine(arguments.getEndingOffset() + 1, document);
+			// invokeNode.setEnd(createTextNode(document, invokeEnd, endOffset));
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSReturnNode)
+		 */
+		@Override
+		public void visit(JSReturnNode node)
+		{
+			if (node.getSemicolonIncluded())
+			{
+				IFormatterContainerNode lineNode = pushLineNode(node);
+				super.visit(node);
+				checkedPop(lineNode, lineNode.getEndOffset());
+			}
+			else
+			{
+				super.visit(node);
+			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSThrowNode)
+		 */
+		@Override
+		public void visit(JSThrowNode node)
+		{
+			// TODO Auto-generated method stub
+			super.visit(node);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSBreakNode)
+		 */
+		@Override
+		public void visit(JSBreakNode node)
+		{
+			if (node.getSemicolonIncluded())
+			{
+				IFormatterContainerNode lineNode = pushLineNode(node);
+				super.visit(node);
+				checkedPop(lineNode, lineNode.getEndOffset());
+			}
+			else
+			{
+				super.visit(node);
+			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSVarNode)
+		 */
+		@Override
+		public void visit(JSVarNode node)
+		{
+			if (node.getSemicolonIncluded())
+			{
+				IFormatterContainerNode lineNode = pushLineNode(node);
+				super.visit(node);
+				checkedPop(lineNode, lineNode.getEndOffset());
+			}
+			else
+			{
+				super.visit(node);
+			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSGroupNode)
+		 */
+		@Override
+		public void visit(JSGroupNode node)
+		{
+			int beginOffset = node.getLeftParenthesis().getStart();
+			int endOffset = node.getRightParenthesis().getStart();
+			FormatterJSGroupNode groupNode = new FormatterJSGroupNode(document);
+			groupNode.setBegin(createTextNode(document, beginOffset, beginOffset + 1));
+			push(groupNode);
+			visitChildren(node);
+			checkedPop(groupNode, endOffset);
+			groupNode.setEnd(createTextNode(document, endOffset, endOffset + 1));
+		}
+
+		/**
+		 * Common push and return of a FormatterJSDefaultLineNode (a line that terminates with a semicolon).
+		 * 
+		 * @param node
+		 * @return
+		 */
+		private FormatterJSDefaultLineNode pushLineNode(JSNode node)
+		{
+			FormatterJSDefaultLineNode lineNode = new FormatterJSDefaultLineNode(document);
+			lineNode.setBegin(createTextNode(document, node.getStartingOffset(), node.getStartingOffset()));
+			push(lineNode);
+			return lineNode;
 		}
 
 		/**
@@ -317,9 +623,24 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			int end = block.getEndingOffset() + 1;
 			if (consumeEndingSemicolon)
 			{
-				locateSemicolonInLine(end, document);
+				end = locateColonOrSemicolonInLine(end, document);
 			}
-			bodyNode.setEnd(createTextNode(document, block.getEndingOffset(), block.getEndingOffset() + 1));
+			bodyNode.setEnd(createTextNode(document, block.getEndingOffset(), end));
+		}
+
+		/**
+		 * Returns true is the given node is on the right side of an assignment expression.
+		 * 
+		 * @param node
+		 */
+		private boolean getPreventNewLineHint(JSNode node)
+		{
+			IParseNode parent = node.getParent();
+			short nodeType = parent.getNodeType();
+			return nodeType == JSNodeTypes.DECLARATION || nodeType == JSNodeTypes.ASSIGN
+					|| nodeType == JSNodeTypes.RETURN || nodeType == JSNodeTypes.INVOKE
+					|| nodeType == JSNodeTypes.NAME_VALUE_PAIR || nodeType == JSNodeTypes.GROUP
+					|| nodeType == JSNodeTypes.CONDITIONAL || (parent instanceof JSBinaryOperatorNode);
 		}
 
 		/**
@@ -327,38 +648,60 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		 */
 		private void visitCommonBlock(JSNode node, IParseNode body)
 		{
-			// First, push the while declaration
+			boolean hasBody = (body.getNodeType() != JSNodeTypes.EMPTY);
+			// First, push the declaration part
+			// In some cases, the body is empty (like in a 'while' with no body). Those cases get a special treatment.
 			FormatterJSDeclarationNode declarationNode = new FormatterJSDeclarationNode(document,
-					(body.getNodeType() == JSNodeTypes.STATEMENTS));
-			declarationNode.setBegin(createTextNode(document, node.getStartingOffset(), body.getStartingOffset()));
+					(body.getNodeType() == JSNodeTypes.STATEMENTS), getPreventNewLineHint(node));
+			int endDeclarationOffset = (hasBody ? body.getStartingOffset() : body.getEndingOffset() + 1);
+			declarationNode.setBegin(createTextNode(document, node.getStartingOffset(), endDeclarationOffset));
 			push(declarationNode);
 			checkedPop(declarationNode, -1);
 
-			// Then, push the body
-			FormatterJSBlockNode blockNode = new FormatterJSBlockNode(document);
-			blockNode.setBegin(createTextNode(document, body.getStartingOffset(), body.getStartingOffset() + 1));
-			push(blockNode);
-			visitChildren(node);
-			checkedPop(blockNode, body.getEndingOffset());
-			int end = locateSemicolonInLine(blockNode.getEndOffset() + 1, document);
-			blockNode.setEnd(createTextNode(document, body.getEndingOffset(), end));
+			if (hasBody)
+			{
+				// Then, push the body (the body might be defined without any brackets, so in those cases the begin and
+				// end would be empty)
+				FormatterJSBlockNode blockNode = new FormatterJSBlockNode(document);
+				boolean bodyInBrackets = (body.getNodeType() == JSNodeTypes.STATEMENTS);
+				if (bodyInBrackets)
+				{
+					blockNode
+							.setBegin(createTextNode(document, body.getStartingOffset(), body.getStartingOffset() + 1));
+					push(blockNode);
+					visitChildren((JSNode) body);
+					checkedPop(blockNode, body.getEndingOffset());
+					int end = locateColonOrSemicolonInLine(blockNode.getEndOffset() + 1, document);
+					blockNode.setEnd(createTextNode(document, body.getEndingOffset(), end));
+				}
+				else
+				{
+					// Create an empty block and visit its children
+					blockNode.setBegin(createTextNode(document, body.getStartingOffset(), body.getStartingOffset()));
+					push(blockNode);
+					visitChildren((JSNode) body);
+					int blockEnd = locateColonOrSemicolonInLine(body.getEndingOffset(), document);
+					checkedPop(blockNode, blockEnd);
+					blockNode.setEnd(createTextNode(document, blockEnd, blockEnd));
+				}
+			}
 		}
 
 		/**
-		 * Scan for a semicolon terminator located at the same line. Return the given offset if non is found.
+		 * Scan for a colon or a semicolon terminator located at the same line. Return the given offset if non is found.
 		 * 
 		 * @param offset
 		 * @param document
 		 * @return The semicolon offset; The given offset if a semicolon not found.
 		 */
-		private int locateSemicolonInLine(int offset, FormatterDocument document)
+		private int locateColonOrSemicolonInLine(int offset, FormatterDocument document)
 		{
 			int i = offset;
 			int size = document.getLength();
 			for (; i < size; i++)
 			{
 				char c = document.charAt(i);
-				if (c == ';')
+				if (c == ';' || c == ',')
 				{
 					return i + 1;
 				}
@@ -366,9 +709,12 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				{
 					break;
 				}
+				if (c != ' ' || c != '\t')
+				{
+					break;
+				}
 			}
 			return offset;
 		}
-
 	}
 }
