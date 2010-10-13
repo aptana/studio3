@@ -193,6 +193,7 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 	private void updateContex(IFormattingContext context, String contentType)
 	{
 		IScriptFormatterFactory factory = ScriptFormatterManager.getSelected(contentType);
+		factory.setMainContentType(contentType);
 		if (factory != null && context != null)
 		{
 			context.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID, factory.getId());
