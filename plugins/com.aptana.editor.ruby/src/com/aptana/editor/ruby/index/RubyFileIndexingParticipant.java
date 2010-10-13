@@ -34,20 +34,14 @@
  */
 package com.aptana.editor.ruby.index;
 
-import java.io.File;
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jrubyparser.ast.CommentNode;
@@ -140,46 +134,38 @@ public class RubyFileIndexingParticipant extends AbstractFileIndexingParticipant
 	{
 		for (CommentNode commentNode : comments)
 		{
-			String line = commentNode.getContent();
-			if (!CommentScanner.isCaseSensitive())
+			String text = commentNode.getContent();
+			int offset = 0;
+			int lineOffset = 0;
+			String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
+			for (String line : lines)
 			{
-				line = line.toLowerCase();
-			}
-			for (Map.Entry<String, Integer> entry : CommentScanner.DEFAULT_TAGS.entrySet())
-			{
-				String tag = entry.getKey();
-
 				if (!CommentScanner.isCaseSensitive())
 				{
-					tag = tag.toLowerCase();
+					line = line.toLowerCase();
 				}
-				int index = line.indexOf(tag);
-				if (index == -1)
+				for (Map.Entry<String, Integer> entry : CommentScanner.DEFAULT_TAGS.entrySet())
 				{
-					continue;
+					String tag = entry.getKey();
+					if (!CommentScanner.isCaseSensitive())
+					{
+						tag = tag.toLowerCase();
+					}
+					int index = line.indexOf(tag);
+					if (index == -1)
+					{
+						continue;
+					}
+
+					String message = line.substring(index).trim();
+					int start = commentNode.getPosition().getStartOffset() + offset + index;
+					createTask(store, message, entry.getValue(), commentNode.getPosition().getStartLine() + lineOffset,
+							start, start + message.length());
 				}
-
-				String message = line.substring(index).trim();
-				createTask(store, message, entry.getValue(), commentNode.getPosition().getStartLine(), commentNode
-						.getPosition().getStartOffset(), commentNode.getPosition().getEndOffset());
+				// FIXME This doesn't take the newline into account from split!
+				offset += line.length();
+				lineOffset++;
 			}
 		}
 	}
-
-	private IResource getResource(IFileStore store)
-	{
-		URI uri = store.toURI();
-		if (uri.getScheme().equals("file"))
-		{
-			File file = new File(uri);
-			IFile iFile = ResourcesPlugin.getWorkspace().getRoot()
-					.getFileForLocation(Path.fromOSString(file.getAbsolutePath()));
-			if (iFile != null)
-			{
-				return iFile;
-			}
-		}
-		return ResourcesPlugin.getWorkspace().getRoot();
-	}
-
 }

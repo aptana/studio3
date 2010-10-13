@@ -207,6 +207,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 	private void processHTMLCommentNode(IFileStore store, HTMLCommentNode commentNode)
 	{
 		String text = commentNode.getText();
+		int offset = 0;
 		String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
 		for (String line : lines)
 		{
@@ -233,9 +234,11 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 				{
 					message = message.substring(0, message.length() - 3).trim();
 				}
-				createTask(store, message, entry.getValue().intValue(), -1, commentNode.getStartingOffset(),
-						commentNode.getEndingOffset());
+				int start = commentNode.getStartingOffset() + offset + index;
+				createTask(store, message, entry.getValue(), -1, start, start + message.length());
 			}
+			// FIXME This doesn't take the newline into account from split!
+			offset += line.length();
 		}
 	}
 
