@@ -18,6 +18,7 @@ import junit.framework.*;
  * Test result for a performance test.  Keeps track of all timers that
  * have been created within the test. 
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class PerformanceTestResult extends TestResult {
 	protected PrintWriter output;
 	protected ArrayList timerList = new ArrayList();

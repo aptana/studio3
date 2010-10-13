@@ -16,6 +16,7 @@ import junit.framework.*;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.tests.session.SetupManager.SetupException;
 
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class SessionTestSuite extends TestSuite {
 	public static final String CORE_TEST_APPLICATION = "org.eclipse.pde.junit.runtime.coretestapplication"; //$NON-NLS-1$	
 	public static final String UI_TEST_APPLICATION = "org.eclipse.pde.junit.runtime.uitestapplication"; //$NON-NLS-1$	

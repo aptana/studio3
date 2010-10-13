@@ -17,6 +17,7 @@ import org.eclipse.core.tests.session.SetupManager.SetupException;
  * Runs perfomance test cases multiple times (if they don't fail), 
  * enabling assertions for the first run.
  */
+@SuppressWarnings("rawtypes")
 public class PerformanceSessionTestSuite extends SessionTestSuite {
 
 	/**

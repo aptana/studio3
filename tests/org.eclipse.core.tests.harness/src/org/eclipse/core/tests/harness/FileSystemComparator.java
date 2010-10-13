@@ -19,6 +19,7 @@ import junit.framework.Assert;
  * A utility class that compares file system states. It is able to take snapshot of the file system and save it into a 
  * text file for later comparison. 
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class FileSystemComparator {
 
 	private class FileSummary {
