@@ -35,6 +35,7 @@ import org.eclipse.core.tests.harness.CoreTest;
  * This class is responsible for launching JUnit tests on a separate Eclipse session and collect
  * the tests results sent back through a socket . 
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class SessionTestRunner {
 
 	class Result {

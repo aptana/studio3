@@ -42,6 +42,7 @@ public class BundleTestingHelper {
 		return installBundle("", context, location);
 	}
 
+	@SuppressWarnings("deprecation")
 	public static Bundle installBundle(String tag, BundleContext context, String location) throws BundleException, MalformedURLException, IOException {
 		URL entry = context.getBundle().getEntry(location);
 		if (entry == null)

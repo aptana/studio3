@@ -222,6 +222,9 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 				}
 				for (String branch : repo.localBranches())
 				{
+					if (monitor != null && monitor.isCanceled())
+						return Status.CANCEL_STATUS;
+
 					boolean shouldPull = repo.shouldPull(branch);
 					synchronized (branchToPullIndicator)
 					{
@@ -246,12 +249,12 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	protected void doCreateToolbar(Composite toolbarComposite)
 	{
 		Composite branchComp = new Composite(toolbarComposite, SWT.NONE);
-		
+
 		GridLayout toolbarGridLayout = new GridLayout(3, false);
 		toolbarGridLayout.marginWidth = 2;
 		toolbarGridLayout.marginHeight = 0;
 		toolbarGridLayout.horizontalSpacing = 0;
-		
+
 		branchComp.setLayout(toolbarGridLayout);
 		createGitBranchCombo(branchComp);
 	}
@@ -403,12 +406,12 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		}
 		getGitRepositoryManager().removeListener(this);
 
-		branchToPullIndicator = null;
 		if (pullCalc != null)
 		{
 			pullCalc.cancel();
 			pullCalc = null;
 		}
+		branchToPullIndicator = null;
 		if (refreshUIJob != null)
 		{
 			refreshUIJob.cancel();

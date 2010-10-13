@@ -32,30 +32,48 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.common.internal.peer;
+package com.aptana.scripting.model;
 
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import com.aptana.parsing.io.SourcePrinter;
 
-public class Messages
+public class SmartTypingPairsElement extends AbstractBundleElement
 {
-	private static final String BUNDLE_NAME = "com.aptana.editor.common.internal.peer.messages"; //$NON-NLS-1$
 
-	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
+	private char[] _pairs;
 
-	private Messages()
+	public SmartTypingPairsElement(String path)
 	{
+		super(path);
 	}
 
-	public static String getString(String key)
+	@Override
+	protected String getElementName()
 	{
-		try
+		return "smart_typing_pairs"; //$NON-NLS-1$
+	}
+
+	@Override
+	protected void printBody(SourcePrinter printer)
+	{
+		// output path, scope and pairs
+		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
+		printer.printWithIndent("scope: ").println(this.getScope()); //$NON-NLS-1$
+		printer.printWithIndent("pairs: ").println(this.getPairs().toString()); //$NON-NLS-1$
+	}
+
+	public void setPairs(String[] pairs)
+	{
+		this._pairs = new char[pairs.length];
+		int i = 0;
+		for (String pair : pairs)
 		{
-			return RESOURCE_BUNDLE.getString(key);
-		}
-		catch (MissingResourceException e)
-		{
-			return '!' + key + '!';
+			this._pairs[i++] = pair.charAt(0);
 		}
 	}
+
+	public char[] getPairs()
+	{
+		return _pairs;
+	}
+
 }

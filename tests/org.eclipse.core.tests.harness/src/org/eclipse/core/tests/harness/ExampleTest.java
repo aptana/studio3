@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.Platform;
 /**
  * Tests which use the Eclipse Platform runtime only.
  */
+@SuppressWarnings({"unchecked", "rawtypes", "deprecation"})
 public class ExampleTest extends TestCase {
 	/**
 	 * Need a zero argument constructor to satisfy the test harness.

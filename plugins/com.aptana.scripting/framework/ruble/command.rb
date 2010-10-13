@@ -159,7 +159,8 @@ module Ruble
       def define_command(name, &block)
         log_info("loading command #{name}")
         
-        path = block.binding.eval("__FILE__")
+        path = $0
+        path = block.binding.eval("__FILE__") if block
         command = Command.new(name, path)
         block.call(command) if block_given?
 

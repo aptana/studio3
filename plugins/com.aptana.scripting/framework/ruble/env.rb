@@ -17,7 +17,8 @@ module Ruble
       def define_variables(scope, &block)
         log_info("loading env variable contributor #{scope}")
 
-        path = block.binding.eval("__FILE__")
+        path = $0
+        path = block.binding.eval("__FILE__") if block
         e = Env.new(scope, path, &block)
 
         # add env modifier to bundle

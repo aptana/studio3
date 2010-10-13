@@ -43,6 +43,7 @@ import org.eclipse.tm.terminal.model.TerminalTextDataFactory;
  * adjust columns when table gets resized....
  * 
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class TerminalTextUITest {
 	static TextCanvas fgTextCanvas;
 	static ITextCanvasModel fgModel;

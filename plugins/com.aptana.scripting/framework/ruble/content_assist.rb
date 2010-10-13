@@ -28,7 +28,8 @@ module Ruble
       def define_content_assist(name, &block)
         log_info("loading content_assist #{name}")
         
-        path = block.binding.eval("__FILE__")
+        path = $0
+        path = block.binding.eval("__FILE__") if block
         content_assist = ContentAssist.new(name, path)
         block.call(content_assist) if block_given?
         

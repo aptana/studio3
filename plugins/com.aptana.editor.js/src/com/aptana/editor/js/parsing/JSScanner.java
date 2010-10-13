@@ -35,6 +35,7 @@
 package com.aptana.editor.js.parsing;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -54,6 +55,8 @@ public class JSScanner extends Scanner
 	private IDocument fDocument;
 	private List<Symbol> fSDocComments;
 	private List<Symbol> fVSDocComments;
+	private List<Symbol> fSingleLineComments;
+	private List<Symbol> fMultiLineComments;
 
 	/**
 	 * JSScanner
@@ -61,8 +64,10 @@ public class JSScanner extends Scanner
 	public JSScanner()
 	{
 		fTokenScanner = new JSTokenScanner();
-		fSDocComments = new LinkedList<Symbol>();
-		fVSDocComments = new LinkedList<Symbol>();
+		fSDocComments = new ArrayList<Symbol>();
+		fVSDocComments = new ArrayList<Symbol>();
+		fSingleLineComments = new ArrayList<Symbol>();
+		fMultiLineComments = new ArrayList<Symbol>();
 	}
 
 	/**
@@ -100,6 +105,16 @@ public class JSScanner extends Scanner
 	}
 
 	/**
+	 * getMultiLineComments
+	 * 
+	 * @return
+	 */
+	public List<Symbol> getMultiLineComments()
+	{
+		return fMultiLineComments;
+	}
+	
+	/**
 	 * getSDocComments
 	 * 
 	 * @return
@@ -109,6 +124,16 @@ public class JSScanner extends Scanner
 		return fSDocComments;
 	}
 
+	/**
+	 * getSingleLineComments
+	 * 
+	 * @return
+	 */
+	public List<Symbol> getSingleLineComments()
+	{
+		return fSingleLineComments;
+	}
+	
 	/**
 	 * getVSDocComments
 	 * 
@@ -169,6 +194,14 @@ public class JSScanner extends Scanner
 
 				switch (type)
 				{
+					case SINGLELINE_COMMENT:
+						fSingleLineComments.add(createSymbol(data));
+						break;
+						
+					case MULTILINE_COMMENT:
+						fMultiLineComments.add(createSymbol(data));
+						break;
+						
 					case SDOC:
 						fSDocComments.add(createSymbol(data));
 						break;

@@ -18,6 +18,7 @@ import org.eclipse.tm.terminal.model.LineSegment;
 import org.eclipse.tm.terminal.model.Style;
 import org.eclipse.tm.terminal.model.StyleColor;
 
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class TerminalTextDataWindowTest extends AbstractITerminalTextDataTest {
 	int fOffset;
 	int fSize;
