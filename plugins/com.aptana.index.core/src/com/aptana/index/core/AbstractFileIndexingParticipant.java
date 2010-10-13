@@ -3,6 +3,7 @@ package com.aptana.index.core;
 import java.io.File;
 import java.net.URI;
 
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -42,7 +43,7 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 	private IResource getResource(IFileStore store)
 	{
 		URI uri = store.toURI();
-		if (uri.getScheme().equals("file"))
+		if (uri.getScheme().equals(EFS.SCHEME_FILE))
 		{
 			File file = new File(uri);
 			IFile iFile = ResourcesPlugin.getWorkspace().getRoot()
